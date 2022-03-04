@@ -31,6 +31,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -104,9 +105,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
    private Spinner            _spinFTP;
    private Spinner            _spinRestPulse;
    private Spinner            _spinCalories;
-   private Spinner            _spinWeather_Temperature_Avg;
-   private Spinner            _spinWeather_Wind_SpeedValue;
+   private Spinner            _spinWeather_Temperature_Average;
    private Spinner            _spinWeather_Wind_DirectionValue;
+   private Spinner            _spinWeather_Wind_SpeedValue;
 
    private Text               _txtDescription;
    private Text               _txtWeather;
@@ -636,7 +637,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                if (_isUpdateUI) {
                   return;
                }
-               onSelect_WindDirection_Text();
+               TourDataEditorView.onSelect_WindDirection_Text(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
             }));
 
             // fill combobox
@@ -663,20 +664,20 @@ public class DialogQuickEdit extends TitleAreaDialog {
                if (_isUpdateUI) {
                   return;
                }
-               onSelect_WindDirection_Value();
+               TourDataEditorView.onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
             });
             _spinWeather_Wind_DirectionValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
                if (_isUpdateUI) {
                   return;
                }
-               onSelect_WindDirection_Value();
+               TourDataEditorView.onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
             }));
             _spinWeather_Wind_DirectionValue.addMouseWheelListener(mouseEvent -> {
                Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
                if (_isUpdateUI) {
                   return;
                }
-               onSelect_WindDirection_Value();
+               TourDataEditorView.onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
             });
 
             // label: direction unit = degree
@@ -705,30 +706,30 @@ public class DialogQuickEdit extends TitleAreaDialog {
          _firstColumnControls.add(label);
 
          // spinner
-         _spinWeather_Temperature_Avg = new Spinner(container, SWT.BORDER);
+         _spinWeather_Temperature_Average = new Spinner(container, SWT.BORDER);
          GridDataFactory.fillDefaults()
                .align(SWT.BEGINNING, SWT.CENTER)
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-               .applyTo(_spinWeather_Temperature_Avg);
-         _spinWeather_Temperature_Avg.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
+               .applyTo(_spinWeather_Temperature_Average);
+         _spinWeather_Temperature_Average.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
 
          // the min/max temperature has a large range because fahrenheit has bigger values than celsius
-         _spinWeather_Temperature_Avg.setMinimum(-600);
-         _spinWeather_Temperature_Avg.setMaximum(1500);
+         _spinWeather_Temperature_Average.setMinimum(-600);
+         _spinWeather_Temperature_Average.setMaximum(1500);
 
-         _spinWeather_Temperature_Avg.addModifyListener(modifyEvent -> {
+         _spinWeather_Temperature_Average.addModifyListener(modifyEvent -> {
             if (_isUpdateUI) {
                return;
             }
             _isTemperatureManuallyModified = true;
          });
-         _spinWeather_Temperature_Avg.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+         _spinWeather_Temperature_Average.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
             if (_isUpdateUI) {
                return;
             }
             _isTemperatureManuallyModified = true;
          }));
-         _spinWeather_Temperature_Avg.addMouseWheelListener(mouseEvent -> {
+         _spinWeather_Temperature_Average.addMouseWheelListener(mouseEvent -> {
             Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
             if (_isUpdateUI) {
                return;
@@ -799,7 +800,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
    private void enableControls() {
 
-      _spinWeather_Temperature_Avg.setEnabled(_tourData.temperatureSerie == null);
+      _spinWeather_Wind_DirectionValue.setEnabled(_comboWeather_Wind_DirectionText.getSelectionIndex() > 0);
    }
 
    @Override
@@ -852,36 +853,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _firstColumnContainerControls.clear();
    }
 
-   private void onSelect_WindDirection_Text() {
-
-      // N=0=0  NE=1=45  E=2=90  SE=3=135  S=4=180  SW=5=225  W=6=270  NW=7=315
-      final int selectedIndex = _comboWeather_Wind_DirectionText.getSelectionIndex();
-
-      // get degree from selected direction
-
-      final int degree = (int) (selectedIndex * 22.5f * 10f);
-
-      _spinWeather_Wind_DirectionValue.setSelection(degree);
-   }
-
-   private void onSelect_WindDirection_Value() {
-
-      int degree = _spinWeather_Wind_DirectionValue.getSelection();
-
-      // this tricky code is used to scroll before 0 which will overscroll and starts from the beginning
-      if (degree == -1) {
-         degree = 3599;
-         _spinWeather_Wind_DirectionValue.setSelection(degree);
-      }
-
-      if (degree == 3600) {
-         degree = 0;
-         _spinWeather_Wind_DirectionValue.setSelection(degree);
-      }
-
-      _comboWeather_Wind_DirectionText.select(UI.getCardinalDirectionTextIndex(degree));
-   }
-
    private void onSelect_WindSpeed_Text() {
 
       _isWindSpeedManuallyModified = true;
@@ -929,6 +900,11 @@ public class DialogQuickEdit extends TitleAreaDialog {
       _tourData.setCalories(_spinCalories.getSelection());
 
       _tourData.setWeather_Wind_Direction((int) (_spinWeather_Wind_DirectionValue.getSelection() / 10.0f));
+      final int weatherWindDirection = _comboWeather_Wind_DirectionText.getSelectionIndex() == 0
+            ? -1
+            : (int) (_spinWeather_Wind_DirectionValue.getSelection() / 10.0f);
+      _tourData.setWeather_Wind_Direction(weatherWindDirection);
+
       if (_isWindSpeedManuallyModified) {
          /*
           * update the speed only when it was modified because when the measurement is changed
@@ -949,9 +925,9 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
       if (_isTemperatureManuallyModified) {
 
-         final float temperature = (float) _spinWeather_Temperature_Avg.getSelection() / 10;
+         final float temperature = (float) _spinWeather_Temperature_Average.getSelection() / 10;
 
-         _tourData.setWeather_Temperature_Average_Device(UI.convertTemperatureToMetric(temperature));
+         _tourData.setWeather_Temperature_Average(UI.convertTemperatureToMetric(temperature));
       }
 
    }
@@ -985,9 +961,17 @@ public class DialogQuickEdit extends TitleAreaDialog {
          _txtWeather.setText(_tourData.getWeather());
 
          // wind direction
-         final int weatherWindDirectionDegree = _tourData.getWeather_Wind_Direction() * 10;
-         _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirectionDegree);
-         _comboWeather_Wind_DirectionText.select(UI.getCardinalDirectionTextIndex(weatherWindDirectionDegree));
+         final int weatherWindDirection = _tourData.getWeather_Wind_Direction();
+         if (weatherWindDirection == -1) {
+            _spinWeather_Wind_DirectionValue.setSelection(0);
+            _spinWeather_Wind_DirectionValue.setEnabled(false);
+            _comboWeather_Wind_DirectionText.select(0);
+         } else {
+            final int weatherWindDirectionDegree = weatherWindDirection * 10;
+            _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirectionDegree);
+            _comboWeather_Wind_DirectionText.select(UI.getCardinalDirectionTextIndex((int) (weatherWindDirectionDegree / 10.0f)));
+            _spinWeather_Wind_DirectionValue.setEnabled(true);
+         }
 
          // wind speed
          final int windSpeed = _tourData.getWeather_Wind_Speed();
@@ -1005,10 +989,10 @@ public class DialogQuickEdit extends TitleAreaDialog {
           * Avg temperature
           */
          final float avgTemperature =
-               UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Average_Device());
+               UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Average());
 
-         _spinWeather_Temperature_Avg.setDigits(1);
-         _spinWeather_Temperature_Avg.setSelection(Math.round(avgTemperature * 10));
+         _spinWeather_Temperature_Average.setDigits(1);
+         _spinWeather_Temperature_Average.setSelection(Math.round(avgTemperature * 10));
       }
       _isUpdateUI = false;
    }

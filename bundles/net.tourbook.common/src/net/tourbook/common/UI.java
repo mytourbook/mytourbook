@@ -59,8 +59,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Geometry;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditor;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationEvent;
 import org.eclipse.jface.viewers.ColumnViewerEditorActivationStrategy;
@@ -696,17 +694,13 @@ public class UI {
       TRANSFORM_OPACITY_MAX = _prefStore_Common.getInt(ICommonPreferences.TRANSFORM_VALUE_OPACITY_MAX);
 
       // add prop listener
-      _prefStore_Common.addPropertyChangeListener(new IPropertyChangeListener() {
+      _prefStore_Common.addPropertyChangeListener(propertyChangeEvent -> {
 
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+         final String property = propertyChangeEvent.getProperty();
 
-            final String property = event.getProperty();
+         if (property.equals(ICommonPreferences.TRANSFORM_VALUE_OPACITY_MAX)) {
 
-            if (property.equals(ICommonPreferences.TRANSFORM_VALUE_OPACITY_MAX)) {
-
-               TRANSFORM_OPACITY_MAX = (int) event.getNewValue();
-            }
+            TRANSFORM_OPACITY_MAX = (int) propertyChangeEvent.getNewValue();
          }
       });
 
@@ -1579,11 +1573,15 @@ public class UI {
     */
    public static int getCardinalDirectionTextIndex(final int degreeDirection) {
 
-      final float degree = (degreeDirection / 10.0f + 11.25f) / 22.5f;
+      if (degreeDirection == -1) {
+         return 0;
+      }
+
+      final float degree = (degreeDirection + 11.25f) / 22.5f;
 
       final int directionIndex = ((int) degree) % 16;
 
-      return directionIndex;
+      return directionIndex + 1;
    }
 
    public static FontMetrics getDialogFontMetrics() {

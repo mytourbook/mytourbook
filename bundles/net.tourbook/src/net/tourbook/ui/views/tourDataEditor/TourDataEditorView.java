@@ -116,7 +116,6 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
-import net.tourbook.weather.WeatherUtils;
 
 import org.eclipse.core.databinding.conversion.text.StringToNumberConverter;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -1890,6 +1889,62 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          table.setSortColumn(tc);
          table.setSortDirection(direction);
       }
+   }
+
+   public static void onSelect_WindDirection_Text(final Spinner spinWeather_Wind_DirectionValue,
+                                                  final Combo comboWeather_WindDirectionText) {
+
+      // N=348.75=11.25   NNE=11.25=33.75    NE=33.75=56.25    ENE=56.25=78.75
+      // E=78.75=101.25   ESE=101.25=123.75  SE=123.75=146.25  SSE=146.25=168.75
+      // S=168.75=191.25  SSW=191.25=213.75  SW=213.75=236.25  WSW=236.25=258.75
+      // W=258.75=281.25  WNW=281.25=303.75  NW=303.75=326.25  NNW=326.25=348.75
+
+      int selectedIndex = comboWeather_WindDirectionText.getSelectionIndex();
+
+      int windDirectionValue = 0;
+      boolean isWindDirectionValueEnabled = true;
+
+      //0 represents an empty value
+      if (selectedIndex == 0) {
+
+         isWindDirectionValueEnabled = false;
+         windDirectionValue = 0;
+      } else {
+
+         //We decrement the index value to take into account the first element
+         //that represents the empty value.
+         --selectedIndex;
+
+         // get degree from selected direction
+         windDirectionValue = (int) (selectedIndex * 22.5f * 10f);
+      }
+
+      spinWeather_Wind_DirectionValue.setEnabled(isWindDirectionValueEnabled);
+      spinWeather_Wind_DirectionValue.setSelection(windDirectionValue);
+   }
+
+   public static void onSelect_WindDirection_Value(final Spinner spinWeather_Wind_DirectionValue,
+                                                  final Combo comboWeather_WindDirectionText) {
+
+      int degree = spinWeather_Wind_DirectionValue.getSelection();
+
+      // this tricky code is used to scroll before 0 which will overscroll and starts from the beginning
+      if (degree == -1) {
+         degree = 3599;
+         spinWeather_Wind_DirectionValue.setSelection(degree);
+      }
+
+      if (degree == 3600) {
+         degree = 0;
+         spinWeather_Wind_DirectionValue.setSelection(degree);
+      }
+
+      int windDirectionTextIndex = 0;
+      if (spinWeather_Wind_DirectionValue.isEnabled()) {
+         windDirectionTextIndex = UI.getCardinalDirectionTextIndex((int) (degree / 10.0f));
+      }
+
+      comboWeather_WindDirectionText.select(windDirectionTextIndex);
    }
 
    /**
@@ -4101,7 +4156,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
-               onSelect_WindDirectionText();
+               onSelect_WindDirection_Text(_spinWeather_Wind_DirectionValue, _comboWeather_WindDirectionText);
                setTourDirty();
             }));
 
@@ -4171,7 +4226,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
-               onSelect_WindDirectionValue();
+               onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_WindDirectionText);
                setTourDirty();
             });
             _spinWeather_Wind_DirectionValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
@@ -4179,7 +4234,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
-               onSelect_WindDirectionValue();
+               onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_WindDirectionText);
                setTourDirty();
             }));
 
@@ -4188,7 +4243,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
-               onSelect_WindDirectionValue();
+               onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_WindDirectionText);
                setTourDirty();
             });
 
@@ -7393,60 +7448,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
-   private void onSelect_WindDirectionText() {
-
-      // N=348.75=11.25   NNE=11.25=33.75    NE=33.75=56.25    ENE=56.25=78.75
-      // E=78.75=101.25   ESE=101.25=123.75  SE=123.75=146.25  SSE=146.25=168.75
-      // S=168.75=191.25  SSW=191.25=213.75  SW=213.75=236.25  WSW=236.25=258.75
-      // W=258.75=281.25  WNW=281.25=303.75  NW=303.75=326.25  NNW=326.25=348.75
-
-      int selectedIndex = _comboWeather_WindDirectionText.getSelectionIndex();
-
-      int windDirectionValue = 0;
-      boolean isWindDirectionValueEnabled = true;
-
-      //0 represents an empty value
-      if (selectedIndex == 0) {
-
-         isWindDirectionValueEnabled = false;
-         windDirectionValue = 0;
-      } else {
-
-         //We decrement the index value to take into account the first element
-         //that represents the empty value.
-         --selectedIndex;
-
-         // get degree from selected direction
-         windDirectionValue = (int) (selectedIndex * 22.5f * 10f);
-      }
-
-      _spinWeather_Wind_DirectionValue.setEnabled(isWindDirectionValueEnabled);
-      _spinWeather_Wind_DirectionValue.setSelection(windDirectionValue);
-   }
-
-   private void onSelect_WindDirectionValue() {
-
-      int degree = _spinWeather_Wind_DirectionValue.getSelection();
-
-      // this tricky code is used to scroll before 0 which will overscroll and starts from the beginning
-      if (degree == -1) {
-         degree = 3599;
-         _spinWeather_Wind_DirectionValue.setSelection(degree);
-      }
-
-      if (degree == 3600) {
-         degree = 0;
-         _spinWeather_Wind_DirectionValue.setSelection(degree);
-      }
-
-      int windDirectionTextIndex = 0;
-      if (_spinWeather_Wind_DirectionValue.isEnabled()) {
-         windDirectionTextIndex = WeatherUtils.getWindDirectionTextIndex((int) (degree / 10.0f));
-      }
-
-      _comboWeather_WindDirectionText.select(windDirectionTextIndex);
-   }
-
    private void onSelect_WindSpeedText() {
 
       _isWindSpeedManuallyModified = true;
@@ -8963,7 +8964,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       } else {
          final int weatherWindDirectionDegree = weatherWindDirection * 10;
          _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirectionDegree);
-         _comboWeather_WindDirectionText.select(WeatherUtils.getWindDirectionTextIndex((int) (weatherWindDirectionDegree / 10.0f)));
+         _comboWeather_WindDirectionText.select(UI.getCardinalDirectionTextIndex((int) (weatherWindDirectionDegree / 10.0f)));
          _spinWeather_Wind_DirectionValue.setEnabled(true);
       }
 

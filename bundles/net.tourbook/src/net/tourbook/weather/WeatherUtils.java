@@ -254,20 +254,6 @@ public class WeatherUtils {
 
    private static String getWindDirectionText(final int degreeDirection) {
 
-      return IWeather.windDirectionText[getWindDirectionTextIndex(degreeDirection)];
+      return IWeather.windDirectionText[UI.getCardinalDirectionTextIndex(degreeDirection)];
    }
-
-   public static int getWindDirectionTextIndex(final int degreeDirection) {
-
-      if (degreeDirection == -1) {
-         return 0;
-      }
-
-      final float degree = (degreeDirection + 11.25f) / 22.5f;
-
-      final int directionIndex = ((int) degree) % 16;
-
-      return directionIndex + 1;
-   }
-
 }
