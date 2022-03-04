@@ -68,7 +68,6 @@ import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer2;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
@@ -1924,7 +1923,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    }
 
    public static void onSelect_WindDirection_Value(final Spinner spinWeather_Wind_DirectionValue,
-                                                  final Combo comboWeather_WindDirectionText) {
+                                                   final Combo comboWeather_WindDirectionText) {
 
       int degree = spinWeather_Wind_DirectionValue.getSelection();
 
@@ -6541,9 +6540,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             && _tourData.latitudeSerie != null
             && _tourData.latitudeSerie.length > 0;
 
-      final boolean enableWeatherRetrieval =
-            _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
-                  StringUtils.hasContent(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
+      final boolean isWeatherRetrievalActivated = TourManager.isWeatherRetrievalActivated();
 
       _comboTitle.setEnabled(canEdit);
       _txtDescription.setEnabled(canEdit);
@@ -6551,7 +6548,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _comboLocation_End.setEnabled(canEdit);
 
       //Weather
-      _linkWeather.setEnabled(canEdit && enableWeatherRetrieval);
+      _linkWeather.setEnabled(canEdit && isWeatherRetrievalActivated);
       _comboWeather_Clouds.setEnabled(canEdit);
       _comboWeather_WindDirectionText.setEnabled(canEdit);
       _comboWeather_WindSpeedText.setEnabled(canEdit);

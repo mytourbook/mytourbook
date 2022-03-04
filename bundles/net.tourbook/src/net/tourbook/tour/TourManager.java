@@ -63,6 +63,7 @@ import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringToArrayConverter;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -91,6 +92,7 @@ import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.tourChart.X_AXIS_START_TIME;
+import net.tourbook.ui.views.IWeatherProvider;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.ui.views.collateTours.CollatedToursView;
 import net.tourbook.ui.views.rawData.RawDataView;
@@ -1903,6 +1905,26 @@ public class TourManager {
       }
 
       return false;
+   }
+
+   /**
+    * @return Returns <code>true</code> when a weather provider has been selected
+    *         and properly configured.
+    */
+   public static boolean isWeatherRetrievalActivated() {
+
+      final String weatherProviderId = _prefStore.getString(ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
+
+      switch (weatherProviderId) {
+
+      case IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP:
+         return true;
+      case IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE:
+         return StringUtils.hasContent(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
+      case IWeatherProvider.WEATHER_PROVIDER_NONE:
+      default:
+         return false;
+      }
    }
 
    /**

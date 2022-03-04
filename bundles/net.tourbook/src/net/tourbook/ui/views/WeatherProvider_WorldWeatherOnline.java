@@ -173,6 +173,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
     */
    private void onCheckConnection() {
 
+      //todo fb  put in mother class. provide the url and as longs as 200 is returned, its good
       BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
          try {

@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javadocmd.simplelatlng.LatLng;
 
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -42,11 +43,12 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    // that will work for most of the activities but not 100milers ....
 
    //todo fb externalize all strings
+   private static final String    HEROKU_APP_URL = "https://passeur-mytourbook-oauthapps.herokuapp.com";                  //$NON-NLS-1$
 
-   public static final HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
+   public static final HttpClient httpClient     = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
 
    //todo fb this will be replaced by HEROKU
-   private static final String baseApiUrl = "https://api.openweathermap.org/data/2.5/onecall/timemachine?"; //$NON-NLS-1$
+   private static final String baseApiUrl = HEROKU_APP_URL + "/openweathermap/timemachine?"; //$NON-NLS-1$
    private LatLng              searchAreaCenter;
    private long                startDate;
 
@@ -155,7 +157,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
          weatherHistory = response.body();
 
-         if (response.statusCode() != 200) {
+         if (response.statusCode() != HttpURLConnection.HTTP_OK) {
             logVendorError(weatherRequestWithParameters, response.statusCode(), response.body());
             return UI.EMPTY_STRING;
          }
