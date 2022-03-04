@@ -40,7 +40,7 @@ public class TimeMachineResult {
             hourly.stream().mapToDouble(Hourly::getHumidity).average();
 
       if (averageHumidity.isPresent()) {
-         return (float) averageHumidity.getAsDouble();
+         return roundDoubleToFloat(averageHumidity.getAsDouble());
       }
 
       return 0;
@@ -52,7 +52,7 @@ public class TimeMachineResult {
             hourly.stream().mapToDouble(Hourly::getPressure).average();
 
       if (averagePressure.isPresent()) {
-         return (float) averagePressure.getAsDouble();
+         return roundDoubleToFloat(averagePressure.getAsDouble());
       }
 
       return 0;
@@ -79,7 +79,7 @@ public class TimeMachineResult {
             hourly.stream().mapToDouble(Hourly::getRain).average();
 
       if (averagePrecipitation.isPresent()) {
-         return (float) averagePrecipitation.getAsDouble();
+         return roundDoubleToFloat(averagePrecipitation.getAsDouble());
       }
 
       return 0;
@@ -91,7 +91,7 @@ public class TimeMachineResult {
             hourly.stream().mapToDouble(Hourly::getTemp).average();
 
       if (averageTemperature.isPresent()) {
-         return (float) averageTemperature.getAsDouble();
+         return roundDoubleToFloat(averageTemperature.getAsDouble());
       }
 
       return 0;
@@ -103,7 +103,7 @@ public class TimeMachineResult {
             hourly.stream().mapToDouble(Hourly::getTemp).max();
 
       if (maxTemperature.isPresent()) {
-         return (float) maxTemperature.getAsDouble();
+         return roundDoubleToFloat(maxTemperature.getAsDouble());
       }
 
       return 0;
@@ -115,7 +115,7 @@ public class TimeMachineResult {
             hourly.stream().mapToDouble(Hourly::getTemp).min();
 
       if (minTemperature.isPresent()) {
-         return (float) minTemperature.getAsDouble();
+         return roundDoubleToFloat(minTemperature.getAsDouble());
       }
 
       return 0;
@@ -177,7 +177,7 @@ public class TimeMachineResult {
             hourly.stream().mapToDouble(Hourly::getFeels_like).average();
 
       if (averageWindChill.isPresent()) {
-         return (float) averageWindChill.getAsDouble();
+         return roundDoubleToFloat(averageWindChill.getAsDouble());
       }
 
       return 0;
@@ -205,6 +205,11 @@ public class TimeMachineResult {
       }
 
       return 0;
+   }
+
+   private float roundDoubleToFloat(final double value) {
+
+      return Math.round(value * 100.0) / 100.0f;
    }
 
 }

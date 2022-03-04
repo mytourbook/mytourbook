@@ -41,7 +41,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
    //todo fb add a label Note: while it's free, it's only for the last 5 days
    private static final String HEROKU_APP_URL = "https://passeur-mytourbook-oauthapps.herokuapp.com"; //$NON-NLS-1$
-   private static final String baseApiUrl     = HEROKU_APP_URL + "/openweathermap/timemachine?units=metric"; //$NON-NLS-1$
+   private static final String baseApiUrl     = HEROKU_APP_URL + "/openweathermap/timemachine";       //$NON-NLS-1$
 
    private LatLng              searchAreaCenter;
    private long                startDate;
@@ -76,6 +76,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                .setHost(apiUri.getHost())
                .setPath(apiUri.getPath());
 
+         uriBuilder.setParameter("units", "metric"); //$NON-NLS-1$
          uriBuilder.setParameter("lat", String.valueOf(searchAreaCenter.getLatitude())); //$NON-NLS-1$
          uriBuilder.setParameter("lon", String.valueOf(searchAreaCenter.getLongitude())); //$NON-NLS-1$
          uriBuilder.setParameter("dt", String.valueOf(startDate)); //$NON-NLS-1$

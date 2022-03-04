@@ -55,8 +55,10 @@ public class OpenWeatherMapRetrieverTests {
 
       final String openWeatherMapResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapResponse.json"); //$NON-NLS-1$
-      httpClientMock.onGet(
-            OAuth2Constants.HEROKU_APP_URL + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&dt=1646136000") //$NON-NLS-1$
+
+      final String url = OAuth2Constants.HEROKU_APP_URL
+            + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&dt=1646136000"; //$NON-NLS-1$
+      httpClientMock.onGet(url)
             .doReturn(openWeatherMapResponse);
       final Field field = OpenWeatherMapRetriever.class
             .getSuperclass()
@@ -71,19 +73,18 @@ public class OpenWeatherMapRetrieverTests {
       openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
 
       assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
-//      httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
+      httpClientMock.verify().get(url).called();
 
-      //todo fb is that normal to have lots of decimals???
       assertEquals("clear sky", tour.getWeather()); //$NON-NLS-1$
       assertEquals("weather-sunny", tour.getWeather_Clouds()); //$NON-NLS-1$
-      assertEquals(-5.788750171661377, tour.getWeather_Temperature_Average());
+      assertEquals(-5.79f, tour.getWeather_Temperature_Average());
       assertEquals(4.0, tour.getWeather_Wind_Speed());
       assertEquals(268.0, tour.getWeather_Wind_Direction());
       assertEquals(56.0, tour.getWeather_Humidity());
       assertEquals(0, tour.getWeather_Precipitation());
       assertEquals(1025.0, tour.getWeather_Pressure());
-      assertEquals(5.78000020980835, tour.getWeather_Temperature_Max());
-      assertEquals(-19.639999389648438, tour.getWeather_Temperature_Min());
-      assertEquals(-10.65291690826416, tour.getWeather_Temperature_WindChill());
+      assertEquals(5.78f, tour.getWeather_Temperature_Max());
+      assertEquals(-19.64f, tour.getWeather_Temperature_Min());
+      assertEquals(-10.65f, tour.getWeather_Temperature_WindChill());
    }
 }
