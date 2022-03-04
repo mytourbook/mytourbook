@@ -92,7 +92,7 @@ public abstract class HistoricalWeatherRetriever {
    private void logVendorError(final String exceptionMessage) {
 
       TourLogManager.subLog_ERROR(NLS.bind(
-            Messages.Log_HistoricalWeatherRetriever_001_RetrievalError,
+            Messages.Log_HistoricalWeatherRetriever_002_RetrievalError,
             TourManager.getTourDateTimeShort(_tour),
             exceptionMessage));
    }
@@ -100,7 +100,6 @@ public abstract class HistoricalWeatherRetriever {
    public abstract boolean retrieveHistoricalWeatherData();
 
    public String sendWeatherApiRequest(final String weatherRequestWithParameters) {
-
 
       String weatherHistoryData = UI.EMPTY_STRING;
 

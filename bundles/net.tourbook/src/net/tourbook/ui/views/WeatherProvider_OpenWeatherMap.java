@@ -30,6 +30,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -81,13 +82,29 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
                         .toEpochMilli()
                         / 1000;
                   HistoricalWeatherRetriever.checkVendorConnection(
-                        OpenWeatherMapRetriever.getBaseApiUrl() + "&lat=0&lon=0&dt=" + previousHour); //$NON-NLS-1$
+                        OpenWeatherMapRetriever.getBaseApiUrl() +
+                              "?units=metric&lat=0&lon=0&dt=" +
+                              previousHour);
                }));
          GridDataFactory.fillDefaults()
                .indent(defaultHIndent, 0)
                .align(SWT.BEGINNING, SWT.FILL)
                .span(2, 1)
                .applyTo(_btnTestConnection);
+      }
+
+      {
+         /*
+          * Label:
+          */
+         final Label note = new Label(container, SWT.NONE);
+         note.setText(Messages.Pref_Weather_OpenWeatherMap_Label_FiveDaysLimit);
+
+         GridDataFactory.fillDefaults()
+               .indent(defaultHIndent, 0)
+               .align(SWT.BEGINNING, SWT.FILL)
+               .span(2, 1)
+               .applyTo(note);
       }
       return container;
    }

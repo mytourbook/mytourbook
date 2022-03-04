@@ -121,7 +121,9 @@ public class WeatherUtils {
 
       final float precipitation = tourData.getWeather_Precipitation();
       if (precipitation > 0) {
-         weatherDataList.add(Math.round(UI.convertPrecipitation_FromMetric(precipitation)) +
+         weatherDataList.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Precipitation +
+               UI.SPACE +
+               Math.round(UI.convertPrecipitation_FromMetric(precipitation)) +
                UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       }
 

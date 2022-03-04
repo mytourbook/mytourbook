@@ -1217,12 +1217,13 @@ public class Messages extends NLS {
    public static String        Log_Tour_SaveTours;
    public static String        Log_Tour_SaveTours_End;
    public static String        Log_Tour_SaveTours_File;
-   public static String        Log_HistoricalWeatherRetriever_001_RetrievalError;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_WindDirection;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Humidity;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Precipitation;
+   public static String        Log_HistoricalWeatherRetriever_002_RetrievalError;
 
    public static String        Map25_Config_ClusterAlgorithm_FirstMarker_Distance;
    public static String        Map25_Config_ClusterAlgorithm_FirstMarker_Grid;
@@ -1761,6 +1762,7 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Label_WeatherProvider;
    public static String        Pref_Weather_Link_ApiSignup;
    public static String        Pref_Weather_OpenWeatherMap_Link;
+   public static String        Pref_Weather_OpenWeatherMap_Label_FiveDaysLimit;
 
    public static String        Pref_Weather_WorldWeatherOnline_Label_ApiKey_Tooltip;
 
