@@ -933,9 +933,9 @@ public class NatTable_DataLoader {
        */
       final int fetchKey = rowIndex / FETCH_SIZE;
 
-      LazyTourLoaderItem loaderItem = _pageNumbers_Loading.get(fetchKey);
+      LazyTourLoaderItem lazyTourLoaderItem = _pageNumbers_Loading.get(fetchKey);
 
-      if (loaderItem != null) {
+      if (lazyTourLoaderItem != null) {
 
          // tour is currently being loading -> wait until finished loading
 
@@ -946,25 +946,25 @@ public class NatTable_DataLoader {
        * Tour is not yet loaded or not yet loading -> load it now
        */
 
-      loaderItem = new LazyTourLoaderItem();
+      lazyTourLoaderItem = new LazyTourLoaderItem();
 
-      loaderItem.sqlOffset = fetchKey * FETCH_SIZE;
-      loaderItem.fetchKey = fetchKey;
+      lazyTourLoaderItem.sqlOffset = fetchKey * FETCH_SIZE;
+      lazyTourLoaderItem.fetchKey = fetchKey;
 
-      _pageNumbers_Loading.put(fetchKey, loaderItem);
+      _pageNumbers_Loading.put(fetchKey, lazyTourLoaderItem);
 
-      _loaderWaitingQueue.add(loaderItem);
+      _loaderWaitingQueue.add(lazyTourLoaderItem);
 
       _loadingExecutor.submit(() -> {
 
          // get last added loader item
-         final LazyTourLoaderItem loaderItem1 = _loaderWaitingQueue.pollFirst();
+         final LazyTourLoaderItem loaderItem = _loaderWaitingQueue.pollFirst();
 
-         if (loaderItem1 == null) {
+         if (loaderItem == null) {
             return;
          }
 
-         if (fetchPagedTourItems(loaderItem1)) {
+         if (fetchPagedTourItems(loaderItem)) {
 
             // update UI
 
@@ -982,7 +982,7 @@ public class NatTable_DataLoader {
             });
          }
 
-         final int loaderItemFetchKey = loaderItem1.fetchKey;
+         final int loaderItemFetchKey = loaderItem.fetchKey;
 
          _pageNumbers_Fetched.put(loaderItemFetchKey, loaderItemFetchKey);
          _pageNumbers_Loading.remove(loaderItemFetchKey);
