@@ -22,20 +22,22 @@ import com.javadocmd.simplelatlng.LatLng;
 
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.time.Duration;
 
+import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
+import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourManager;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WeatherUtils;
 
 import org.apache.http.client.utils.URIBuilder;
+import org.eclipse.osgi.util.NLS;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
@@ -43,12 +45,13 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    // that will work for most of the activities but not 100milers ....
 
    //todo fb externalize all strings
-   private static final String    HEROKU_APP_URL = "https://passeur-mytourbook-oauthapps.herokuapp.com";                  //$NON-NLS-1$
 
-   public static final HttpClient httpClient     = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
+   //todo fb add a label Note: while it's free, it's only for the last 5 days
+   private static final String    HEROKU_APP_URL = "https://passeur-mytourbook-oauthapps.herokuapp.com";                  //$NON-NLS-1$
 
    //todo fb this will be replaced by HEROKU
    private static final String baseApiUrl = HEROKU_APP_URL + "/openweathermap/timemachine?"; //$NON-NLS-1$
+
    private LatLng              searchAreaCenter;
    private long                startDate;
 
@@ -71,6 +74,11 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                                final String exceptionMessage) {
 
       final StringBuilder error = new StringBuilder();
+
+      TourLogManager.subLog_ERROR(NLS.bind(
+            Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
+            TourManager.getTourDateTimeShort(_tour),
+            exceptionMessage));
 
       error.append(
             "WeatherHistoryRetriever.processRequest : Error while executing the historical weather request with the parameters " + //$NON-NLS-1$

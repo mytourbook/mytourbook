@@ -57,7 +57,9 @@ public class WorldWeatherOnlineRetrieverTests {
       httpClientMock.onGet(
             "http://api.worldweatheronline.com/premium/v1/past-weather.ashx?key=&q=40.263996,-105.58854099999999&date=2020-07-04&tp=1&format=json&includelocation=yes&extra=utcDateTime") //$NON-NLS-1$
             .doReturn(worldWeatherOnlineResponse);
-      final Field field = WorldWeatherOnlineRetriever.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+      final Field field = WorldWeatherOnlineRetriever.class
+            .getSuperclass()
+            .getDeclaredField("httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
       field.set(null, httpClientMock);
 

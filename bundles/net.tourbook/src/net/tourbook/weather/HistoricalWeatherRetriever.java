@@ -15,15 +15,15 @@
  *******************************************************************************/
 package net.tourbook.weather;
 
+import java.net.http.HttpClient;
+import java.time.Duration;
+
 import net.tourbook.data.TourData;
 
 public abstract class HistoricalWeatherRetriever {
 
-   //todo fb I wanted to put the htpclient here but the unit tests can't access
-   //the field form the mother class, is there a fix for it ??
-   //      final Field field = OpenWeatherMapRetriever.class.getDeclaredField("httpClient"); //$NON-NLS-1$
-
-   public TourData _tour;
+   public static HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
+   public TourData          _tour;
 
    protected HistoricalWeatherRetriever(final TourData tourData) {
       _tour = tourData;

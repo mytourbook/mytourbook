@@ -7437,11 +7437,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       if (modifiedTours.size() > 0) {
          setTourDirty();
          updateUI_FromModel(modifiedTours.get(0), false, true);
-      } else {
-         MessageDialog.openInformation(
-               Display.getCurrent().getActiveShell(),
-               Messages.Dialog_RetrieveWeather_Dialog_Title,
-               Messages.Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved);
       }
    }
 

@@ -22,6 +22,7 @@ import com.pgssoft.httpclient.HttpClientMock;
 
 import java.lang.reflect.Field;
 
+import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.data.TourData;
 import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
 
@@ -55,10 +56,11 @@ public class OpenWeatherMapRetrieverTests {
       final String openWeatherMapResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapResponse.json"); //$NON-NLS-1$
       httpClientMock.onGet(
-            "https://api.openweathermap.org/data/2.5/onecall/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&dt=1646136000") //$NON-NLS-1$
+            OAuth2Constants.HEROKU_APP_URL + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&dt=1646136000") //$NON-NLS-1$
             .doReturn(openWeatherMapResponse);
-//TODO FB that mght work      final Field field = OpenWeatherMapRetriever.class.getSuperclass().getDeclaredField("httpClient"); //$NON-NLS-1$
-      final Field field = OpenWeatherMapRetriever.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+      final Field field = OpenWeatherMapRetriever.class
+            .getSuperclass()
+            .getDeclaredField("httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
       field.set(null, httpClientMock);
 
