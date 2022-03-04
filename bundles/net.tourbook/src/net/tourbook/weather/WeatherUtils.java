@@ -91,6 +91,7 @@ public class WeatherUtils {
       // Minimum temperature
       if (displayMinimumTemperature) {
          weatherDataList.add(
+               //to do fb translate
                "Min. " +
                      Math.round(
                            UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min())) +
