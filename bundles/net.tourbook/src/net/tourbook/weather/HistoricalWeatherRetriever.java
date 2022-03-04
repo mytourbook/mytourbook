@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.weather;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -25,11 +26,15 @@ import java.time.Duration;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.widgets.Display;
 
 public abstract class HistoricalWeatherRetriever {
 
@@ -40,18 +45,62 @@ public abstract class HistoricalWeatherRetriever {
       _tour = tourData;
    }
 
+   /**
+    * This method ensures the connection to the API can be made successfully.
+    */
+   public static void checkVendorConnection(final String vendorUrl) {
+
+      BusyIndicator.showWhile(Display.getCurrent(), () -> {
+
+         try {
+
+            final HttpRequest request = HttpRequest
+                  .newBuilder(URI.create(vendorUrl))
+                  .GET()
+                  .build();
+
+            final HttpResponse<String> response = httpClient.send(
+                  request,
+                  BodyHandlers.ofString());
+
+            final int statusCode = response.statusCode();
+            final String responseMessage = response.body();
+
+            final String message = statusCode == HttpURLConnection.HTTP_OK
+                  ? NLS.bind(
+                        Messages.Pref_Weather_CheckHTTPConnection_OK_Message,
+                        vendorUrl)
+                  : NLS.bind(
+                        Messages.Pref_Weather_CheckHTTPConnection_FAILED_Message,
+                        new Object[] {
+                              vendorUrl,
+                              statusCode,
+                              responseMessage });
+
+            MessageDialog.openInformation(
+                  Display.getCurrent().getActiveShell(),
+                  Messages.Pref_Weather_CheckHTTPConnection_Message,
+                  message);
+
+         } catch (final IOException | InterruptedException e) {
+            StatusUtil.log(e);
+            Thread.currentThread().interrupt();
+         }
+      });
+   }
+
    private void logVendorError(final String exceptionMessage) {
 
       TourLogManager.subLog_ERROR(NLS.bind(
             Messages.Log_HistoricalWeatherRetriever_001_RetrievalError,
             TourManager.getTourDateTimeShort(_tour),
             exceptionMessage));
-
    }
 
    public abstract boolean retrieveHistoricalWeatherData();
 
    public String sendWeatherApiRequest(final String weatherRequestWithParameters) {
+
 
       String weatherHistoryData = UI.EMPTY_STRING;
 

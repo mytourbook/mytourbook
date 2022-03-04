@@ -17,34 +17,21 @@ package net.tourbook.ui.views;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
-import java.time.Duration;
-
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 import net.tourbook.web.WEB;
 
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
@@ -52,7 +39,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
 
-   private static HttpClient      httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(5)).build();
    private final IPreferenceStore _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
 
    /*
@@ -145,7 +131,8 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
                   Messages.Pref_Weather_Button_TestHTTPConnection,
                   SWT.NONE);
             _btnTestConnection.addSelectionListener(widgetSelectedAdapter(
-                  selectionEvent -> onCheckConnection()));
+                  selectionEvent -> HistoricalWeatherRetriever.checkVendorConnection(
+                        WorldWeatherOnlineRetriever.getApiUrl() + _textApiKey_Value.getText())));
             GridDataFactory.fillDefaults()
                   .indent(defaultHIndent, 0)
                   .align(SWT.BEGINNING, SWT.FILL)
@@ -166,52 +153,6 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
    private void enableControls() {
 
       onModifyApiKey();
-   }
-
-   /**
-    * This method ensures the connection to the API can be made successfully.
-    */
-   private void onCheckConnection() {
-
-      //todo fb  put in mother class. provide the url and as longs as 200 is returned, its good
-      BusyIndicator.showWhile(Display.getCurrent(), () -> {
-
-         try {
-
-            final HttpRequest request = HttpRequest
-                  .newBuilder(URI.create(WorldWeatherOnlineRetriever.getApiUrl() +
-                        _textApiKey_Value.getText()))
-                  .GET()
-                  .build();
-
-            final HttpResponse<String> response = httpClient.send(
-                  request,
-                  BodyHandlers.ofString());
-
-            final int statusCode = response.statusCode();
-            final String responseMessage = response.body();
-
-            final String message = statusCode == HttpURLConnection.HTTP_OK
-                  ? NLS.bind(
-                        Messages.Pref_Weather_CheckHTTPConnection_OK_Message,
-                        WorldWeatherOnlineRetriever.getBaseApiUrl())
-                  : NLS.bind(
-                        Messages.Pref_Weather_CheckHTTPConnection_FAILED_Message,
-                        new Object[] {
-                              WorldWeatherOnlineRetriever.getBaseApiUrl(),
-                              statusCode,
-                              responseMessage });
-
-            MessageDialog.openInformation(
-                  Display.getCurrent().getActiveShell(),
-                  Messages.Pref_Weather_CheckHTTPConnection_Message,
-                  message);
-
-         } catch (final IOException | InterruptedException e) {
-            StatusUtil.log(e);
-            Thread.currentThread().interrupt();
-         }
-      });
    }
 
    private void onModifyApiKey() {
