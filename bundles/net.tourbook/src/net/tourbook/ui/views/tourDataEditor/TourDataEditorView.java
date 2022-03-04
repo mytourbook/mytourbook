@@ -231,6 +231,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //todo fb
    //make sure i renamed all the avgtemperature to _device
 
+   //  Snapshots temps for tour info tooltip
+
+//   OWM: tours without timeserie &  tours less than 30mins, take data from current only
+
+   //tours less than 2h30, average between the 2 hours
+   //when joining tours average of temps ??
+
    public static final String            ID                                        = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
    private static final String           GRAPH_LABEL_HEARTBEAT_UNIT                = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
