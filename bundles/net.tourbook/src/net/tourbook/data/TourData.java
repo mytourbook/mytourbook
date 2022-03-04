@@ -126,6 +126,8 @@ import org.hibernate.annotations.Cascade;
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tourId")
 public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable {
 
+   //todo fb revert some of the indentation that went bad (same for tourdataeditorview, tourdatabase andmore?)
+
    private static final char             NL                                = UI.NEW_LINE;
    private static final String           INTERVAL_SUMMARY_UNIT             = " ∑  ";                                  //$NON-NLS-1$
 

@@ -195,9 +195,9 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
    private static final String TAG_MT_TOUR_TEMPERATURE         = "mt:temperature";              //$NON-NLS-1$
    private static final String TAG_MT_TOUR_WEATHER             = "mt:weather";                  //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_WEATHER_CLOUDS      = "mt:weather_Clouds";            //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_WEATHER_WIND_DIR    = "mt:weather_Wind_Direction";     //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_WEATHER_WIND_SPEED  = "mt:weather_Wind_Speed";         //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_WEATHER_CLOUDS      = "mt:weatherClouds";            //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_WEATHER_WIND_DIR    = "mt:weatherWindDirection";     //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_WEATHER_WIND_SPEED  = "mt:weatherWindSpeed";         //$NON-NLS-1$
 
    private static final String TAG_MT_TOUR_TAG                 = "mt:tag";                      //$NON-NLS-1$
    private static final String TAG_MT_TOUR_TYPE                = "mt:tourType";                 //$NON-NLS-1$

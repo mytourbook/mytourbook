@@ -27,7 +27,19 @@ import net.tourbook.common.weather.IWeather;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeMachineResult {
 
-   public double       lat;
+   //todo fb verify that WWO and OWM take the actual hour of the tour since I
+   //think i saw temperatures that were so low they could have been
+   //the same day but at night
+
+   //todo fb
+   //make sure i renamed all the avgtemperature to _device
+
+//   OWM: tours without timeserie &  tours less than 30mins, take data from current only
+
+   //tours less than 2h30, average between the 2 hours
+   //when joining tours average of temps ??
+
+//TODO FB maybe useful to display in the log distance from tour to weather measurement ???   public double       lat
    public double       lon;
    public String       timezone;
    public int          timezone_offset;
