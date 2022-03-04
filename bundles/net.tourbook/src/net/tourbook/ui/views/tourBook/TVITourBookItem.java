@@ -114,7 +114,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "power_AvgLeftPedalSmoothness, " //                 45    //$NON-NLS-1$
             + "power_AvgRightPedalSmoothness, " //                46    //$NON-NLS-1$
 
-            + "bodyWeight, " //                                  47    //$NON-NLS-1$
+            + "bodyWeight, " //                                   47    //$NON-NLS-1$
             //
             // ---------- IMPORT -------------
             //
@@ -321,9 +321,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    //
    String       colTourTitle;
    //
-   String       colTourLocation_Start;     // tourStartPlace
-   String       colTourLocation_End;       // tourEndPlace
-   long         colPersonId;               // tourPerson_personId
+   String       colTourLocation_Start;        // tourStartPlace
+   String       colTourLocation_End;          // tourEndPlace
+   long         colPersonId;                  // tourPerson_personId
    //
    long         colCounter;
    //
