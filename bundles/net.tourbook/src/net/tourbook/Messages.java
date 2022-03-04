@@ -1757,7 +1757,6 @@ public class Messages extends NLS {
    public static String Pref_Weather_Label_WeatherProvider;
    public static String Pref_Weather_Link_ApiSignup;
    public static String Pref_Weather_OpenWeatherMap_Link;
-   public static String Pref_Weather_OpenWeatherMap_Button_TestConnection;
    public static String Pref_Weather_WorldWeatherOnline_Checkbox_ShowOrHideApiKey;
    public static String Pref_Weather_WorldWeatherOnline_Checkbox_ShowOrHideApiKey_Tooltip;
 

@@ -72,7 +72,7 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
           * Button: test connection
           */
          _btnTestConnection = new Button(container, SWT.NONE);
-         _btnTestConnection.setText(Messages.Pref_Weather_OpenWeatherMap_Button_TestConnection);
+         _btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
          _btnTestConnection.addSelectionListener(widgetSelectedAdapter(
                selectionEvent -> {
                   final var previousHour = Instant
