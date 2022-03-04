@@ -58,6 +58,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       //but that still wouldnt work for long activities (100milers)
       //BUT that would give the hourly data correct (i.e.: sun type in the middle of the run instead of the beginning only, which
       //is kind of an average
+      //if tour > 12 hours (11? 13?), then we need >= 2 API calls
       startDate = _tour.getTourStartTimeMS() / 1000;
    }
 
