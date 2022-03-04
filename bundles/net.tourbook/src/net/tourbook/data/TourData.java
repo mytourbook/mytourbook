@@ -6202,7 +6202,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             serieIndex++;
          }
 
-         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] createSRTMDataSerie()"
+         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] createSRTMDataSerie()" //$NON-NLS-1$ //$NON-NLS-2$
                + " - used srtm1 Values: " + usedSrtm1Values //$NON-NLS-1$
                + ", used srtm3 Values: " + usedSrtm3Values //$NON-NLS-1$
                + ", replaced \"wrong\" Values: " + usedCorrectedSrtmValues //$NON-NLS-1$

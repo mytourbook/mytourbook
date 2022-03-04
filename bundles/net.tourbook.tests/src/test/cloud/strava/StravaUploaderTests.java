@@ -111,7 +111,7 @@ public class StravaUploaderTests {
 
       final TourData tour = Initializer.createManualTour();
       tour.setWeather_Clouds(IWeather.WEATHER_ID_PART_CLOUDS);
-      tour.setWeather("Partly cloudy");
+      tour.setWeather("Partly cloudy"); //$NON-NLS-1$
       tour.setWeather_Temperature_Average(-1);
       tour.setWeather_Temperature_WindChill(-6);
       tour.setWeather_Humidity((short) 78);
@@ -127,7 +127,7 @@ public class StravaUploaderTests {
             .verify()
             .post("https://www.strava.com/api/v3/activities") //$NON-NLS-1$
             .withHeader(
-                  "Authorization",
+                  "Authorization", //$NON-NLS-1$
                   OAuth2Constants.BEARER + "8888888888888888888888888888888888888888") //$NON-NLS-1$
             .withBody(equalTo(
                   "{\"distance\":10,\"trainer\":\"0\",\"start_date_local\":\"2022-01-03T17:16:00Z[UTC]\",\"name\":\"Manual Tour ⛅\",\"elapsed_time\":3600,\"description\":\"⛅ Partly cloudy, -1°C, feels like -6°C, 18km/h from W, 78.0% Humidity, 3mm\",\"type\":\"Run\"}")) //$NON-NLS-1$
@@ -158,7 +158,7 @@ public class StravaUploaderTests {
             .verify()
             .post("https://www.strava.com/api/v3/uploads") //$NON-NLS-1$
             .withHeader(
-                  "Authorization",
+                  "Authorization", //$NON-NLS-1$
                   OAuth2Constants.BEARER + "8888888888888888888888888888888888888888") //$NON-NLS-1$
             .called();
 

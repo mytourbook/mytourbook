@@ -34,7 +34,6 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
-   //todo fb externalize all strings
    private static final String HEROKU_APP_URL = "https://passeur-mytourbook-oauthapps.herokuapp.com"; //$NON-NLS-1$
    private static final String baseApiUrl     = HEROKU_APP_URL + "/openweathermap/timemachine";       //$NON-NLS-1$
 
@@ -66,7 +65,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                .setHost(apiUri.getHost())
                .setPath(apiUri.getPath());
 
-         uriBuilder.setParameter("units", "metric"); //$NON-NLS-1$
+         uriBuilder.setParameter("units", "metric"); //$NON-NLS-1$ //$NON-NLS-2$
          uriBuilder.setParameter("lat", String.valueOf(searchAreaCenter.getLatitude())); //$NON-NLS-1$
          uriBuilder.setParameter("lon", String.valueOf(searchAreaCenter.getLongitude())); //$NON-NLS-1$
          uriBuilder.setParameter("dt", String.valueOf(startDate)); //$NON-NLS-1$
@@ -77,7 +76,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       } catch (final URISyntaxException e) {
 
          StatusUtil.logError(
-               "OpenWeatherMapRetriever.buildWeatherApiRequest : Error while " +
+               "OpenWeatherMapRetriever.buildWeatherApiRequest : Error while " + //$NON-NLS-1$
                      "building the historical weather request :" //$NON-NLS-1$
                      + e.getMessage());
          return UI.EMPTY_STRING;

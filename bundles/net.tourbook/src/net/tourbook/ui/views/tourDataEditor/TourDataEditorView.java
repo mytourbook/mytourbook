@@ -278,7 +278,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private static final int              _hintTextColumnWidth                      = IS_OSX ? 200 : 150;
    //
-   DecimalFormat                         _temperatureFormat                        = new DecimalFormat("###.0");
+   DecimalFormat                         _temperatureFormat                        = new DecimalFormat("###.0");                             //$NON-NLS-1$
    //
    private ZonedDateTime                 _tourStartTime;
    //

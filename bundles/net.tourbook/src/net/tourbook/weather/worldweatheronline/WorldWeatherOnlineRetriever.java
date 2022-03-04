@@ -114,14 +114,14 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                .setHost(apiUri.getHost())
                .setPath(apiUri.getPath());
 
-         uriBuilder.setParameter("key", _prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
-         uriBuilder.setParameter("q", searchAreaCenter.getLatitude() + "," + searchAreaCenter.getLongitude());
-         uriBuilder.setParameter("date", startDate);
+         uriBuilder.setParameter("key", _prefStore.getString(ITourbookPreferences.WEATHER_API_KEY)); //$NON-NLS-1$
+         uriBuilder.setParameter("q", searchAreaCenter.getLatitude() + "," + searchAreaCenter.getLongitude()); //$NON-NLS-1$ //$NON-NLS-2$
+         uriBuilder.setParameter("date", startDate); //$NON-NLS-1$
          //tp=1 : Specifies the weather forecast time interval in hours. Here, every 1 hour
-         uriBuilder.setParameter("tp", "1");
-         uriBuilder.setParameter("format", "json");
-         uriBuilder.setParameter("includelocation", "yes");
-         uriBuilder.setParameter("extra", "utcDateTime");
+         uriBuilder.setParameter("tp", "1"); //$NON-NLS-1$ //$NON-NLS-2$
+         uriBuilder.setParameter("format", "json"); //$NON-NLS-1$ //$NON-NLS-2$
+         uriBuilder.setParameter("includelocation", "yes"); //$NON-NLS-1$ //$NON-NLS-2$
+         uriBuilder.setParameter("extra", "utcDateTime"); //$NON-NLS-1$ //$NON-NLS-2$
 
          weatherRequestWithParameters = uriBuilder.build().toString();
 
@@ -130,7 +130,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       } catch (final URISyntaxException e) {
 
          StatusUtil.logError(
-               "OpenWeatherMapRetriever.buildWeatherApiRequest : Error while " +
+               "OpenWeatherMapRetriever.buildWeatherApiRequest : Error while " + //$NON-NLS-1$
                      "building the historical weather request :" //$NON-NLS-1$
                      + e.getMessage());
          return UI.EMPTY_STRING;
