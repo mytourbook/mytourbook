@@ -219,25 +219,6 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
-   //Use OpenWeatherMapApi to retrieve the weather data (use Heroku to avoid users to have to register)
-   //make the code generic so that it's easier to add another weather provider in the future
-
-   // Unit tests
-
-   //todo fb verify that WWO and OWM take the actual hour of the tour since I
-   //think i saw temperatures that were so low they could have been
-   //the same day but at night
-
-   //todo fb
-   //make sure i renamed all the avgtemperature to _device
-
-   //  Snapshots temps for tour info tooltip
-
-//   OWM: tours without timeserie &  tours less than 30mins, take data from current only
-
-   //tours less than 2h30, average between the 2 hours
-   //when joining tours average of temps ??
-
    public static final String            ID                                        = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
    private static final String           GRAPH_LABEL_HEARTBEAT_UNIT                = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;

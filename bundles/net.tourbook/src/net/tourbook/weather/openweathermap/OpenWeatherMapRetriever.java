@@ -34,12 +34,7 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
-   //todo fb i might have to do more than 1 call as the results only ocntains the 24 hours around the given start time
-   // that will work for most of the activities but not 100milers ....
-
    //todo fb externalize all strings
-
-   //todo fb add a label Note: while it's free, it's only for the last 5 days
    private static final String HEROKU_APP_URL = "https://passeur-mytourbook-oauthapps.herokuapp.com"; //$NON-NLS-1$
    private static final String baseApiUrl     = HEROKU_APP_URL + "/openweathermap/timemachine";       //$NON-NLS-1$
 
@@ -52,11 +47,6 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(_tour);
 
-      //todo fb maybe this should be the middle date of the middle of the activity = (end - start ) /2 + start
-      //but that still wouldnt work for long activities (100milers)
-      //BUT that would give the hourly data correct (i.e.: sun type in the middle of the run instead of the beginning only, which
-      //is kind of an average
-      //if tour > 12 hours (11? 13?), then we need >= 2 API calls
       startDate = _tour.getTourStartTimeMS() / 1000;
    }
 

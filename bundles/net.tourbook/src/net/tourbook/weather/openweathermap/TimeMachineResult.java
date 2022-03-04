@@ -27,10 +27,10 @@ import net.tourbook.common.weather.IWeather;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeMachineResult {
 
-//TODO FB maybe useful to display in the log distance from tour to weather measurement ???   public double       lat;
-//   public double       lon;
-//   public String       timezone;
-//   public int          timezone_offset;
+   public double       lat;
+   public double       lon;
+   public String       timezone;
+   public int          timezone_offset;
    public Current      current;
    public List<Hourly> hourly;
 

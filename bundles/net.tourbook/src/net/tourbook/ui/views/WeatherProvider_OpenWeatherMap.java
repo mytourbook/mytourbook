@@ -81,7 +81,7 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
                         .toEpochMilli()
                         / 1000;
                   HistoricalWeatherRetriever.checkVendorConnection(
-                        OpenWeatherMapRetriever.getBaseApiUrl() + "&lat=0&lon=0&dt=" + previousHour);
+                        OpenWeatherMapRetriever.getBaseApiUrl() + "&lat=0&lon=0&dt=" + previousHour); //$NON-NLS-1$
                }));
          GridDataFactory.fillDefaults()
                .indent(defaultHIndent, 0)
