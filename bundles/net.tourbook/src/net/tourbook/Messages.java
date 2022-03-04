@@ -1746,7 +1746,7 @@ public class Messages extends NLS {
    public static String        pref_view_layout_label_sub_sub;
    public static String        pref_view_layout_label_title;
 
-   //rename translations from api key to provider's connection
+   //todo fb rename translations from api key to provider's connection
    public static String Pref_Weather_Button_TestHTTPConnection;
    public static String Pref_Weather_CheckHTTPConnection_FAILED_Message;
    public static String Pref_Weather_CheckHTTPConnection_Message;
