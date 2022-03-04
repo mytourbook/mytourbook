@@ -1581,6 +1581,7 @@ public class UI {
 
       final int directionIndex = ((int) degree) % 16;
 
+      // We increment the index because the first element is the "empty" direction
       return directionIndex + 1;
    }
 
