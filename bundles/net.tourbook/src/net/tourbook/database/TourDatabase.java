@@ -8993,9 +8993,9 @@ public class TourDatabase {
             SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_WEATHER_WIND_SPEED__FROM,    RENAMED__TOUR_WEATHER_WIND_SPEED__INTO);
 
             // Add new columns
-            SQL.AddColumn_BigInt(stmt, TABLE_TOUR_DATA,     "weather_Temperature_Average", DEFAULT_0);                   //$NON-NLS-1$
-            SQL.AddColumn_BigInt(stmt, TABLE_TOUR_DATA,     "weather_Temperature_Max", DEFAULT_0);                   //$NON-NLS-1$
-            SQL.AddColumn_BigInt(stmt, TABLE_TOUR_DATA,     "weather_Temperature_Min", DEFAULT_0);                   //$NON-NLS-1$
+            SQL.AddColumn_Float(stmt, TABLE_TOUR_DATA,   "weather_Temperature_Average", DEFAULT_0);               //$NON-NLS-1$
+            SQL.AddColumn_Float(stmt, TABLE_TOUR_DATA,   "weather_Temperature_Max", DEFAULT_0);                   //$NON-NLS-1$
+            SQL.AddColumn_Float(stmt, TABLE_TOUR_DATA,   "weather_Temperature_Min", DEFAULT_0);                   //$NON-NLS-1$
 
 // SET_FORMATTING_ON
       }

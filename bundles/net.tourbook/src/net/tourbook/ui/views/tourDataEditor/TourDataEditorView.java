@@ -231,11 +231,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //the same day but at night
 
    //todo fb
-   //when in metric system in MT and entering -5.8 in the average temp spinner
-   //after I save, it displays -6.0, why ?? can I fix it?
-   //i checked on 22.2.1 and it doesn't have that bug, did I break something ?
-
-   //todo fb
    //make sure i renamed all the avgtemperature to _device
 
    public static final String            ID                                        = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
@@ -663,25 +658,24 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Spinner            _spinPerson_FTP;
    private Spinner            _spinPerson_RestPulse;
 
-   private Spinner            _spinWeather_Temperature_Average;
-   private Spinner            _spinWeather_Temperature_Min;
-   private Spinner            _spinWeather_Temperature_Max;
-
    private Spinner            _spinWeather_Humidity;
    private Spinner            _spinWeather_PrecipitationValue;
    private Spinner            _spinWeather_PressureValue;
+   private Spinner            _spinWeather_Temperature_Average;
+   private Spinner            _spinWeather_Temperature_Min;
+   private Spinner            _spinWeather_Temperature_Max;
    private Spinner            _spinWeather_Temperature_WindChill;
    private Spinner            _spinWeather_Wind_DirectionValue;
    private Spinner            _spinWeather_Wind_SpeedValue;
    //
-   private Text               _txtWeather_Temperature_Average_Device;
-   private Text               _txtWeather_Temperature_Min_Device;
-   private Text               _txtWeather_Temperature_Max_Device;
    private Text               _txtAltitudeDown;
    private Text               _txtAltitudeUp;
    private Text               _txtDescription;
    private Text               _txtDistance;
    private Text               _txtWeather;
+   private Text               _txtWeather_Temperature_Average_Device;
+   private Text               _txtWeather_Temperature_Min_Device;
+   private Text               _txtWeather_Temperature_Max_Device;
    //
    private TimeDuration       _deviceTime_Elapsed;                   // Total time of the activity
    private TimeDuration       _deviceTime_Recorded;                  // Time recorded by the device = Total time - paused times
