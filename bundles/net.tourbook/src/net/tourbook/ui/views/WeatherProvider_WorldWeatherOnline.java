@@ -93,10 +93,10 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
 
             _chkShowHideApiKey = formToolkit.createButton(
                   container,
-                  Messages.Pref_Weather_WorldWeatherOnline_Checkbox_ShowOrHideApiKey,
+                  Messages.Pref_Weather_Checkbox_ShowOrHideApiKey,
                   SWT.CHECK);
             _chkShowHideApiKey.setToolTipText(
-                  Messages.Pref_Weather_WorldWeatherOnline_Checkbox_ShowOrHideApiKey_Tooltip);
+                  Messages.Pref_Weather_Checkbox_ShowOrHideApiKey_Tooltip);
             _chkShowHideApiKey.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> Util.showOrHidePassword(
                         _textApiKey_Value,
