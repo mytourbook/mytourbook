@@ -1746,19 +1746,18 @@ public class Messages extends NLS {
    public static String        pref_view_layout_label_sub_sub;
    public static String        pref_view_layout_label_title;
 
-   //todo fb rename translations from api key to provider's connection
    public static String Pref_Weather_Button_TestHTTPConnection;
+   public static String Pref_Weather_Checkbox_ShowOrHideApiKey;
+   public static String Pref_Weather_Checkbox_ShowOrHideApiKey_Tooltip;
    public static String Pref_Weather_CheckHTTPConnection_FAILED_Message;
    public static String Pref_Weather_CheckHTTPConnection_Message;
    public static String Pref_Weather_CheckHTTPConnection_OK_Message;
-   //rename the texts from WWO to provider/service meteo pr le faire generique
    public static String Pref_Weather_Label_ApiKey;
-   public static String Pref_Weather_Label_ApiKey_Tooltip;
    public static String Pref_Weather_Label_WeatherProvider;
    public static String Pref_Weather_Link_ApiSignup;
    public static String Pref_Weather_OpenWeatherMap_Link;
-   public static String Pref_Weather_Checkbox_ShowOrHideApiKey;
-   public static String Pref_Weather_Checkbox_ShowOrHideApiKey_Tooltip;
+
+   public static String Pref_Weather_WorldWeatherOnline_Label_ApiKey_Tooltip;
 
    public static String Search_Manager_CreateFTIndex;
    public static String Search_Manager_Log_DeletingLuceneRootFolder;
