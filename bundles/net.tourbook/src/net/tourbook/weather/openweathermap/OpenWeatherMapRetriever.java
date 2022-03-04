@@ -138,6 +138,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
          weatherRequestWithParameters = uriBuilder.build().toString();
 
+         //TODO FB
+         //put this code in the base class when I have fixed the httpclient field access from the unit tests
+
          // NOTE :
          // This error below keeps popping up RANDOMLY and as of today, I haven't found a solution:
          // java.lang.NoClassDefFoundError: Could not initialize class sun.security.ssl.SSLContextImpl$CustomizedTLSContext

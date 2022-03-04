@@ -1747,11 +1747,12 @@ public class Messages extends NLS {
    public static String        pref_view_layout_label_sub_sub;
    public static String        pref_view_layout_label_title;
 
-   //todo fb Rename those fields to _WorldWeatherOnline_ ???
+   //rename translations from api key to provider's connection
    public static String Pref_Weather_Button_TestHTTPConnection;
    public static String Pref_Weather_CheckHTTPConnection_FAILED_Message;
    public static String Pref_Weather_CheckHTTPConnection_Message;
    public static String Pref_Weather_CheckHTTPConnection_OK_Message;
+   //rename the texts from WWO to provider/service meteo pr le faire generique
    public static String Pref_Weather_Label_ApiKey;
    public static String Pref_Weather_Label_ApiKey_Tooltip;
    public static String Pref_Weather_Label_WeatherProvider;
