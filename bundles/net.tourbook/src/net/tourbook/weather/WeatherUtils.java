@@ -22,6 +22,7 @@ import com.javadocmd.simplelatlng.util.LengthUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.weather.IWeather;
@@ -67,7 +68,8 @@ public class WeatherUtils {
       // Maximum temperature
       if (displayMaximumTemperature) {
          weatherDataList.add(
-               "Max. " +
+               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max +
+                     UI.SPACE +
                      Math.round(
                            UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max())) +
                      UI.UNIT_LABEL_TEMPERATURE);
@@ -76,8 +78,8 @@ public class WeatherUtils {
       // Minimum temperature
       if (displayMinimumTemperature) {
          weatherDataList.add(
-               //to do fb translate
-               "Min. " +
+               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min +
+                     UI.SPACE +
                      Math.round(
                            UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min())) +
                      UI.UNIT_LABEL_TEMPERATURE);
@@ -86,9 +88,11 @@ public class WeatherUtils {
       // Wind chill
       final float temperatureWindChill = tourData.getWeather_Temperature_WindChill();
       if (temperatureWindChill != Float.MIN_VALUE) {
-         weatherDataList.add("feels like " +
-               Math.round(UI.convertTemperatureFromMetric(temperatureWindChill)) +
-               UI.UNIT_LABEL_TEMPERATURE);
+         weatherDataList.add(
+               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
+                     UI.SPACE +
+                     Math.round(UI.convertTemperatureFromMetric(temperatureWindChill)) +
+                     UI.UNIT_LABEL_TEMPERATURE);
       }
 
       // Wind
@@ -96,7 +100,10 @@ public class WeatherUtils {
       if (windSpeed != Float.MIN_VALUE) {
 
          final String windDirection = tourData.getWeather_Wind_Direction() != -1
-               ? " from " + getWindDirectionText(tourData.getWeather_Wind_Direction())
+               ? UI.SPACE +
+                     Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_WindDirection +
+                     UI.SPACE +
+                     getWindDirectionText(tourData.getWeather_Wind_Direction())
                : UI.EMPTY_STRING;
          weatherDataList.add(Math.round(UI.convertSpeed_FromMetric(windSpeed)) +
                UI.UNIT_LABEL_SPEED +
@@ -106,7 +113,10 @@ public class WeatherUtils {
       // Humidity
       final float humidity = tourData.getWeather_Humidity();
       if (humidity != Float.MIN_VALUE) {
-         weatherDataList.add(humidity + UI.SYMBOL_PERCENTAGE + " Humidity");
+         weatherDataList.add((int) humidity +
+               UI.SYMBOL_PERCENTAGE +
+               UI.SPACE +
+               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Humidity);
       }
 
       final float precipitation = tourData.getWeather_Precipitation();
