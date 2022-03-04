@@ -809,9 +809,8 @@ public class Messages extends NLS {
    public static String        Dialog_ReplaceImportFilename_Radio_ReplaceAll;
    public static String        Dialog_ReplaceImportFilename_Radio_ReplaceThis;
    public static String        Dialog_ReplaceImportFilename_Title;
-  
+
    public static String        Dialog_RetrieveWeather_Dialog_Title;
-   public static String        Dialog_RetrieveWeather_WeatherDataNotFound;
 
    public static String        Dialog_SaveTags_Dialog_Title;
    public static String        Dialog_SaveTags_Label_Info;
@@ -1218,6 +1217,7 @@ public class Messages extends NLS {
    public static String        Log_Tour_SaveTours;
    public static String        Log_Tour_SaveTours_End;
    public static String        Log_Tour_SaveTours_File;
+   public static String        Log_HistoricalWeatherRetriever_001_RetrievalError;
 
    public static String        Map25_Config_ClusterAlgorithm_FirstMarker_Distance;
    public static String        Map25_Config_ClusterAlgorithm_FirstMarker_Grid;

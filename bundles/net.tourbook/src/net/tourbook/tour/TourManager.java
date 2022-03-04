@@ -2780,11 +2780,6 @@ public class TourManager {
                      TourLogManager.subLog_OK(getTourDateTimeShort(tourData) +
                            UI.SYMBOL_COLON + UI.SPACE +
                            WeatherUtils.buildWeatherDataString(tourData, true, true));
-
-                  } else {
-                     TourLogManager.subLog_ERROR(NLS.bind(
-                           Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
-                           TourManager.getTourDateTimeShort(tourData)));
                   }
                });
       }

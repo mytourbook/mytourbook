@@ -21,9 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javadocmd.simplelatlng.LatLng;
 
 import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
+import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -49,7 +47,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
-   private static final String  SYS_PROP__LOG_WEATHER_DATA = "logWeatherData";                                                      //$NON-NLS-1$
+   private static final String  SYS_PROP__LOG_WEATHER_DATA = "logWeatherData";                                      //$NON-NLS-1$
    private static final boolean _isLogWeatherData          = System.getProperty(SYS_PROP__LOG_WEATHER_DATA) != null;
 
    static {
@@ -102,6 +100,41 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
    public static String getBaseApiUrl() {
       return baseApiUrl;
+   }
+
+   private String buildWeatherApiRequest() {
+
+      String weatherRequestWithParameters = UI.EMPTY_STRING;
+
+      try {
+         final URI apiUri = new URI(baseApiUrl);
+
+         final URIBuilder uriBuilder = new URIBuilder()
+               .setScheme(apiUri.getScheme())
+               .setHost(apiUri.getHost())
+               .setPath(apiUri.getPath());
+
+         uriBuilder.setParameter("key", _prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
+         uriBuilder.setParameter("q", searchAreaCenter.getLatitude() + "," + searchAreaCenter.getLongitude());
+         uriBuilder.setParameter("date", startDate);
+         //tp=1 : Specifies the weather forecast time interval in hours. Here, every 1 hour
+         uriBuilder.setParameter("tp", "1");
+         uriBuilder.setParameter("format", "json");
+         uriBuilder.setParameter("includelocation", "yes");
+         uriBuilder.setParameter("extra", "utcDateTime");
+
+         weatherRequestWithParameters = uriBuilder.build().toString();
+
+         return weatherRequestWithParameters;
+
+      } catch (final URISyntaxException e) {
+
+         StatusUtil.logError(
+               "OpenWeatherMapRetriever.buildWeatherApiRequest : Error while " +
+                     "building the historical weather request :" //$NON-NLS-1$
+                     + e.getMessage());
+         return UI.EMPTY_STRING;
+      }
    }
 
    private void computeFinalWeatherData(final WeatherData weatherData,
@@ -231,7 +264,9 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    @Override
    public boolean retrieveHistoricalWeatherData() {
 
-      final String rawWeatherData = sendWeatherApiRequest();
+      final String weatherRequestWithParameters = buildWeatherApiRequest();
+
+      final String rawWeatherData = super.sendWeatherApiRequest(weatherRequestWithParameters);
       if (!rawWeatherData.contains("weather")) { //$NON-NLS-1$
          return false;
       }
@@ -257,57 +292,6 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       _tour.setWeather_Temperature_WindChill(historicalWeatherData.getWindChill());
 
       return true;
-   }
-
-   /**
-    * Processes a query against the weather API.
-    *
-    * @return The result of the weather API query.
-    */
-   private String sendWeatherApiRequest() {
-
-      String weatherRequestWithParameters = UI.EMPTY_STRING;
-      String weatherHistory = UI.EMPTY_STRING;
-
-      try {
-         final URI apiUri = new URI(baseApiUrl);
-
-         final URIBuilder uriBuilder = new URIBuilder()
-               .setScheme(apiUri.getScheme())
-               .setHost(apiUri.getHost())
-               .setPath(apiUri.getPath());
-
-         uriBuilder.setParameter("key", _prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
-         uriBuilder.setParameter("q", searchAreaCenter.getLatitude() + "," + searchAreaCenter.getLongitude());
-         uriBuilder.setParameter("date", startDate);
-         //tp=1 : Specifies the weather forecast time interval in hours. Here, every 1 hour
-         uriBuilder.setParameter("tp", "1");
-         uriBuilder.setParameter("format", "json");
-         uriBuilder.setParameter("includelocation", "yes");
-         uriBuilder.setParameter("extra", "utcDateTime");
-
-         weatherRequestWithParameters = uriBuilder.build().toString();
-
-         // NOTE :
-         // This error below keeps popping up RANDOMLY and as of today, I haven't found a solution:
-         // java.lang.NoClassDefFoundError: Could not initialize class sun.security.ssl.SSLContextImpl$CustomizedTLSContext
-         // 2019/06/20 : To avoid this issue, we are using the HTTP address of WWO and not the HTTPS.
-
-         final HttpRequest request = HttpRequest.newBuilder(URI.create(weatherRequestWithParameters)).GET().build();
-
-         final HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
-
-         weatherHistory = response.body();
-
-      } catch (final Exception ex) {
-         StatusUtil.logError(
-               "WeatherHistoryRetriever.processRequest : Error while executing the historical weather request with the parameters " //$NON-NLS-1$
-                     + weatherRequestWithParameters + "\n" + ex.getMessage()); //$NON-NLS-1$
-         Thread.currentThread().interrupt();
-         return UI.EMPTY_STRING;
-      }
-
-      return weatherHistory;
    }
 
 }

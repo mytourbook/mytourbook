@@ -20,24 +20,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javadocmd.simplelatlng.LatLng;
 
-import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
+import java.net.URISyntaxException;
 
-import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
-import net.tourbook.tour.TourLogManager;
-import net.tourbook.tour.TourManager;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WeatherUtils;
 
 import org.apache.http.client.utils.URIBuilder;
-import org.eclipse.osgi.util.NLS;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
@@ -47,10 +40,8 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    //todo fb externalize all strings
 
    //todo fb add a label Note: while it's free, it's only for the last 5 days
-   private static final String    HEROKU_APP_URL = "https://passeur-mytourbook-oauthapps.herokuapp.com";                  //$NON-NLS-1$
-
-   //todo fb this will be replaced by HEROKU
-   private static final String baseApiUrl = HEROKU_APP_URL + "/openweathermap/timemachine?"; //$NON-NLS-1$
+   private static final String HEROKU_APP_URL = "https://passeur-mytourbook-oauthapps.herokuapp.com"; //$NON-NLS-1$
+   private static final String baseApiUrl     = HEROKU_APP_URL + "/openweathermap/timemachine?";      //$NON-NLS-1$
 
    private LatLng              searchAreaCenter;
    private long                startDate;
@@ -69,35 +60,42 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       startDate = _tour.getTourStartTimeMS() / 1000;
    }
 
-   private void logVendorError(final String weatherRequestWithParameters,
-                               final int statusCode,
-                               final String exceptionMessage) {
+   private String buildWeatherApiRequest() {
 
-      final StringBuilder error = new StringBuilder();
+      String weatherRequestWithParameters = UI.EMPTY_STRING;
 
-      TourLogManager.subLog_ERROR(NLS.bind(
-            Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
-            TourManager.getTourDateTimeShort(_tour),
-            exceptionMessage));
+      try {
+         final URI apiUri = new URI(baseApiUrl);
 
-      error.append(
-            "WeatherHistoryRetriever.processRequest : Error while executing the historical weather request with the parameters " + //$NON-NLS-1$
-                  weatherRequestWithParameters);
+         final URIBuilder uriBuilder = new URIBuilder()
+               .setScheme(apiUri.getScheme())
+               .setHost(apiUri.getHost())
+               .setPath(apiUri.getPath());
 
-      if (statusCode > 0) {
-         error.append(UI.NEW_LINE + "Status Code: " + statusCode);//$NON-NLS-1$
+         uriBuilder.setParameter("units", "metric"); //$NON-NLS-1$ //$NON-NLS-2$
+         uriBuilder.setParameter("lat", String.valueOf(searchAreaCenter.getLatitude())); //$NON-NLS-1$
+         uriBuilder.setParameter("lon", String.valueOf(searchAreaCenter.getLongitude())); //$NON-NLS-1$
+         uriBuilder.setParameter("dt", String.valueOf(startDate)); //$NON-NLS-1$
+         weatherRequestWithParameters = uriBuilder.build().toString();
+
+         return weatherRequestWithParameters;
+
+      } catch (final URISyntaxException e) {
+
+         StatusUtil.logError(
+               "OpenWeatherMapRetriever.buildWeatherApiRequest : Error while " +
+                     "building the historical weather request :" //$NON-NLS-1$
+                     + e.getMessage());
+         return UI.EMPTY_STRING;
       }
-      if (StringUtils.hasContent(exceptionMessage)) {
-         error.append(exceptionMessage);
-      }
-
-      StatusUtil.logError(error.toString());
    }
 
    @Override
    public boolean retrieveHistoricalWeatherData() {
 
-      final String rawWeatherData = sendWeatherApiRequest();
+      final String weatherRequestWithParameters = buildWeatherApiRequest();
+
+      final String rawWeatherData = super.sendWeatherApiRequest(weatherRequestWithParameters);
       if (StringUtils.isNullOrEmpty(rawWeatherData)) {
          return false;
       }
@@ -122,63 +120,6 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       _tour.setWeather_Temperature_WindChill(timeMachineResult.getWindChill());
 
       return true;
-   }
-
-   /**
-    * Processes a query against the weather API.
-    *
-    * @return The result of the weather API query.
-    */
-   private String sendWeatherApiRequest() {
-
-      String weatherRequestWithParameters = UI.EMPTY_STRING;
-      String weatherHistory = UI.EMPTY_STRING;
-
-      try {
-         final URI apiUri = new URI(baseApiUrl);
-
-         final URIBuilder uriBuilder = new URIBuilder()
-               .setScheme(apiUri.getScheme())
-               .setHost(apiUri.getHost())
-               .setPath(apiUri.getPath());
-
-         //TODO FB heroku always use and expect units in metrics
-         uriBuilder.setParameter("units", "metric"); //$NON-NLS-1$ //$NON-NLS-2$
-         uriBuilder.setParameter("lat", String.valueOf(searchAreaCenter.getLatitude())); //$NON-NLS-1$
-         uriBuilder.setParameter("lon", String.valueOf(searchAreaCenter.getLongitude())); //$NON-NLS-1$
-         uriBuilder.setParameter("dt", String.valueOf(startDate)); //$NON-NLS-1$
-
-         weatherRequestWithParameters = uriBuilder.build().toString();
-
-         //TODO FB
-         //put this code in the base class when I have fixed the httpclient field access from the unit tests
-
-         // NOTE :
-         // This error below keeps popping up RANDOMLY and as of today, I haven't found a solution:
-         // java.lang.NoClassDefFoundError: Could not initialize class sun.security.ssl.SSLContextImpl$CustomizedTLSContext
-         // 2019/06/20 : To avoid this issue, we are using the HTTP address of WWO and not the HTTPS.
-
-         final HttpRequest request = HttpRequest.newBuilder(
-               URI.create(weatherRequestWithParameters)).GET().build();
-
-         final HttpResponse<String> response = httpClient.send(request, BodyHandlers.ofString());
-
-         weatherHistory = response.body();
-
-         if (response.statusCode() != HttpURLConnection.HTTP_OK) {
-            logVendorError(weatherRequestWithParameters, response.statusCode(), response.body());
-            return UI.EMPTY_STRING;
-         }
-
-      } catch (final Exception ex) {
-
-         logVendorError(weatherRequestWithParameters, 0, ex.getMessage());
-         Thread.currentThread().interrupt();
-
-         return UI.EMPTY_STRING;
-      }
-
-      return weatherHistory;
    }
 
    private TimeMachineResult serializeWeatherData(final String weatherDataResponse) {
