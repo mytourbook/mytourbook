@@ -41,7 +41,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    //todo fb i might have to do more than 1 call as the results only ocntains the 24 hours around the given start time
    // that will work for most of the activities but not 100milers ....
 
-   public static HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
+   //todo fb externalize all strings
+
+   public static final HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
 
    //todo fb this will be replaced by HEROKU
    private static final String baseApiUrl = "https://api.openweathermap.org/data/2.5/onecall/timemachine?"; //$NON-NLS-1$
@@ -131,10 +133,10 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                .setPath(apiUri.getPath());
 
          //TODO FB heroku always use and expect units in metrics
-         uriBuilder.setParameter("units", "metric");
-         uriBuilder.setParameter("lat", String.valueOf(searchAreaCenter.getLatitude()));
-         uriBuilder.setParameter("lon", String.valueOf(searchAreaCenter.getLongitude()));
-         uriBuilder.setParameter("dt", String.valueOf(startDate));
+         uriBuilder.setParameter("units", "metric"); //$NON-NLS-1$ //$NON-NLS-2$
+         uriBuilder.setParameter("lat", String.valueOf(searchAreaCenter.getLatitude())); //$NON-NLS-1$
+         uriBuilder.setParameter("lon", String.valueOf(searchAreaCenter.getLongitude())); //$NON-NLS-1$
+         uriBuilder.setParameter("dt", String.valueOf(startDate)); //$NON-NLS-1$
 
          weatherRequestWithParameters = uriBuilder.build().toString();
 
