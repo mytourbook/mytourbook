@@ -56,6 +56,9 @@ Improvements
   - Selecting/entering opacity values 0...100 or 0...255 is not user friendly. 
     With this new transformation, which is defined in the user preferences, opacity values could be selected between e.g. 0...8 which is then transformed to 0...255
 
+* Weather Retrieval
+  - Tour weather data improvement and new vendor addition (OpenWeatherMap) https://github.com/mytourbook/mytourbook/issues/479
+
 
 Changes
 =======
