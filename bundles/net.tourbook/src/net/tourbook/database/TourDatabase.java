@@ -109,7 +109,7 @@ public class TourDatabase {
 
 //   private static final int TOURBOOK_DB_VERSION = 47; // 22.X ??
 
-//   private static final int TOURBOOK_DB_VERSION = 46; // 21.?
+//   private static final int TOURBOOK_DB_VERSION = 46; // 21.12
 //   private static final int TOURBOOK_DB_VERSION = 45; // 21.9
 //   private static final int TOURBOOK_DB_VERSION = 44; // 21.6
 //   private static final int TOURBOOK_DB_VERSION = 43; // 21.3
@@ -4130,7 +4130,7 @@ public class TourDatabase {
             // version 46 start  -  after 21.9
             // version 46 end
 
-            // version 47 start  -  after 2X.X
+            // version 47 start  -  after 21.12
 
             + " weather_Temperature_Average           FLOAT DEFAULT 0,                   " + NL //$NON-NLS-1$
             + " weather_Temperature_Max               FLOAT DEFAULT 0,                   " + NL //$NON-NLS-1$
@@ -5792,7 +5792,7 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_044_To_045(conn, splashManager);
          }
 
-         // 45 -> 46    21.?
+         // 45 -> 46    21.12
          if (currentDbVersion == 45) {
             currentDbVersion = _dbDesignVersion_New = updateDb_045_To_046(conn, splashManager);
          }
@@ -8933,7 +8933,7 @@ public class TourDatabase {
    }
 
    /**
-    * DB version 45 -> 46 ... MT version 21.?
+    * DB version 45 -> 46 ... MT version 21.12
     *
     * @param conn
     * @param splashManager
