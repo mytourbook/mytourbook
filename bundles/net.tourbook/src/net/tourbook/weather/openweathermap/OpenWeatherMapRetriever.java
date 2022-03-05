@@ -34,16 +34,6 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
-   //todo fb i might have to do more than 1 call as the results only ocntains the 24 hours around the given start time
-   // that will work for most of the activities but not 100milers ....
-
-   //todo fb maybe this should be the middle date of the middle of the activity = (end - start ) /2 + start
-   //but that still wouldnt work for long activities (100milers)
-   //BUT that would give the hourly data correct (i.e.: sun type in the middle of the run instead of the beginning only, which
-   //is kind of an average
-   //if tour > 12 hours (11? 13?), then we need >= 2 API calls
-   // startDate = tour.getTourStartTimeMS() / 1000;
-
    private static final String HEROKU_APP_URL = "https://passeur-mytourbook-oauthapps.herokuapp.com"; //$NON-NLS-1$
    private static final String baseApiUrl     = HEROKU_APP_URL + "/openweathermap/timemachine";       //$NON-NLS-1$
 
@@ -87,7 +77,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
          StatusUtil.logError(
                "OpenWeatherMapRetriever.buildWeatherApiRequest : Error while " + //$NON-NLS-1$
-                     "building the historical weather request :" //$NON-NLS-1$
+                     "building the historical weather request:" //$NON-NLS-1$
                      + e.getMessage());
          return UI.EMPTY_STRING;
       }
@@ -129,6 +119,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       TimeMachineResult timeMachineResult = new TimeMachineResult();
       try {
+
          final ObjectMapper mapper = new ObjectMapper();
          final String weatherResults = mapper
                .readValue(weatherDataResponse, JsonNode.class)

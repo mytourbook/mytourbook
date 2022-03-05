@@ -22,8 +22,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Hourly {
 
-   //todo fb maybe useful when I make sure the time is in the given activity public int           dt;
-
    public int           dt;
    public double        temp;
    public double        feels_like;
