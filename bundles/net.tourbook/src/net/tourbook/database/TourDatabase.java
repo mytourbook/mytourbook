@@ -9005,6 +9005,13 @@ public class TourDatabase {
       return newDbVersion;
    }
 
+   /**
+    * For the previous average, max, min temperatures, if they were retrieved by
+    * a weather provider we copy them to the new fields
+    *
+    * @param conn
+    * @throws SQLException
+    */
    private void updateDb_046_to_047_DataUpdate(final Connection conn) throws SQLException {
 
       final long startTime = System.currentTimeMillis();
