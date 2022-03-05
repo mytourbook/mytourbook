@@ -99,7 +99,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          return false;
       }
 
-      tour.setIsWeatherDataFromApi(true);
+      tour.setIsWeatherDataFromProvider(true);
       tour.setWeather(timeMachineResult.getWeatherDescription());
       tour.setWeather_Clouds(timeMachineResult.getWeatherType());
       tour.setWeather_Temperature_Average(timeMachineResult.getTemperatureAverage());

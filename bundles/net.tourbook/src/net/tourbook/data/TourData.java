@@ -10729,8 +10729,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
-   public void setIsWeatherDataFromApi(final boolean isWeatherDataFromApi) {
-      this.isWeatherDataFromProvider = isWeatherDataFromApi;
+   public void setIsWeatherDataFromProvider(final boolean isWeatherDataFromProvider) {
+      this.isWeatherDataFromProvider = isWeatherDataFromProvider;
    }
 
    public void setMaxPulse(final float maxPulse) {
