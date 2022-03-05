@@ -32,6 +32,7 @@ import net.tourbook.ui.tourChart.ChartMarkerToolTip;
 import net.tourbook.ui.tourChart.ChartPauseToolTip;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
+import net.tourbook.ui.views.IWeatherProvider;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -554,6 +555,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
        */
       store.setDefault(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL,    false);
       store.setDefault(ITourbookPreferences.WEATHER_API_KEY, UI.EMPTY_STRING);
+      store.setDefault(ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID, IWeatherProvider.WEATHER_PROVIDER_NONE);
 
       /*
        * Tour Marker View

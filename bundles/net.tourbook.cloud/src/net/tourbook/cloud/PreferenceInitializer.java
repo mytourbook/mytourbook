@@ -49,6 +49,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(Preferences.STRAVA_ATHLETEFULLNAME, UI.EMPTY_STRING);
       store.setDefault(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE, false);
       store.setDefault(Preferences.STRAVA_SENDDESCRIPTION, true);
+      store.setDefault(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION, false);
       store.setDefault(Preferences.STRAVA_USETOURTYPEMAPPING, false);
 
       initializeDefaultSuuntoPreferences(store);

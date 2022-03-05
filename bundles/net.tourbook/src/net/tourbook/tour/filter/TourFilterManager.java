@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -83,7 +83,7 @@ public class TourFilterManager {
    private static final String TOUR_DATA_ALTITUDE_DOWN           = "TourData.tourAltDown";                                          //$NON-NLS-1$
    private static final String TOUR_DATA_ALTITUDE_UP             = "TourData.tourAltUp";                                            //$NON-NLS-1$
    private static final String TOUR_DATA_ALTITUDE_MAX            = "TourData.maxAltitude";                                          //$NON-NLS-1$
-   private static final String TOUR_DATA_AVG_TEMPERATURE         = "TourData.avgTemperature";                                       //$NON-NLS-1$
+   private static final String TOUR_DATA_TEMPERATURE_AVG_DEVICE  = "TourData.weather_Temperature_Average_Device";                   //$NON-NLS-1$
    private static final String TOUR_DATA_MANUAL_TOUR             = "TourData.devicePluginId";                                       //$NON-NLS-1$
    private static final String TOUR_DATA_NUMBER_OF_PHOTOS        = "TourData.numberOfPhotos";                                       //$NON-NLS-1$
    private static final String TOUR_DATA_POWER_AVG               = "TourData.power_Avg";                                            //$NON-NLS-1$
@@ -972,7 +972,7 @@ public class TourFilterManager {
             break;
 
          case WEATHER_TEMPERATURE:
-            sql = TOUR_DATA_AVG_TEMPERATURE;
+            sql = TOUR_DATA_TEMPERATURE_AVG_DEVICE;
             getSQL__FieldOperators_Number(sqlWhere, sqlParameters, fieldOperator, sql, double1, double2);
             break;
 

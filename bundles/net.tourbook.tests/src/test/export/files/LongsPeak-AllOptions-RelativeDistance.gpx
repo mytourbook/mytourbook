@@ -38,7 +38,7 @@
          <mt:temperature>0.0</mt:temperature>
          <mt:weather><![CDATA[]]></mt:weather>
          <mt:weatherClouds><![CDATA[]]></mt:weatherClouds>
-         <mt:weatherWindDirection>0</mt:weatherWindDirection>
+         <mt:weatherWindDirection>-1</mt:weatherWindDirection>
          <mt:weatherWindSpeed>0</mt:weatherWindSpeed>
       </extensions>
    </metadata>

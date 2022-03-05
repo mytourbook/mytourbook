@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -599,6 +599,7 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_RunDyn_VerticalRatio_Min;
    public static String        Tour_Tooltip_Label_Tags;
    public static String        Tour_Tooltip_Label_Temperature;
+   public static String        Tour_Tooltip_Label_Temperature_FromDevice;
    public static String        Tour_Tooltip_Label_TimeZone;
    public static String        Tour_Tooltip_Label_TimeZoneDifference;
    public static String        Tour_Tooltip_Label_TourType;

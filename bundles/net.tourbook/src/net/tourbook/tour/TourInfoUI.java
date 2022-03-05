@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,6 +57,7 @@ import net.tourbook.ui.views.sensors.SelectionSensor;
 import net.tourbook.ui.views.sensors.SensorChartView;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -254,6 +255,7 @@ public class TourInfoUI {
    private Label            _lblRecordedTime_Unit;
    private Label            _lblRestPulse;
    private Label            _lblTemperature;
+   private Label            _lblTemperature_FromDevice;
    private Label            _lblTimeZone_Value;
    private Label            _lblTimeZoneDifference;
    private Label            _lblTimeZoneDifference_Value;
@@ -310,7 +312,7 @@ public class TourInfoUI {
 
       public ActionCloseTooltip() {
 
-         super(null, Action.AS_PUSH_BUTTON);
+         super(null, IAction.AS_PUSH_BUTTON);
 
          setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
@@ -870,6 +872,15 @@ public class TourInfoUI {
       createUI_Label(parent, UI.UNIT_LABEL_TEMPERATURE);
 
       /*
+       * Temperature from device
+       */
+      createUI_Label(parent, Messages.Tour_Tooltip_Label_Temperature_FromDevice);
+
+      _lblTemperature_FromDevice = createUI_LabelValue(parent, SWT.TRAIL);
+
+      createUI_Label(parent, UI.UNIT_LABEL_TEMPERATURE);
+
+      /*
        * Wind speed
        */
       createUI_Label(parent, Messages.Tour_Tooltip_Label_WindSpeed);
@@ -1240,7 +1251,7 @@ public class TourInfoUI {
          // sensor label/link
          final Link link = createUI_Link(parent, sensor.getLabel());
          link.setData(sensor);
-         link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_Sensor(selectionEvent)));
+         link.addSelectionListener(widgetSelectedAdapter(this::onSelect_Sensor));
          _allSensorValue_Link.add(link);
 
          _allSensorValue_Level.add(createUI_LabelValue(parent, SWT.LEAD));
@@ -1725,7 +1736,7 @@ public class TourInfoUI {
          _lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
       }
 
-      int windSpeed = _tourData.getWeatherWindSpeed();
+      int windSpeed = _tourData.getWeather_Wind_Speed();
       windSpeed = (int) (windSpeed / UI.UNIT_VALUE_DISTANCE);
 
       _lblWindSpeed.setText(Integer.toString(windSpeed));
@@ -1736,20 +1747,21 @@ public class TourInfoUI {
                   IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
 
       // wind direction
-      final int weatherWindDirDegree = _tourData.getWeatherWindDir();
-      _lblWindDirection.setText(Integer.toString(weatherWindDirDegree));
+      final int weatherWindDirectionDegree = _tourData.getWeather_Wind_Direction();
+      _lblWindDirection.setText(Integer.toString(weatherWindDirectionDegree));
       _lblWindDirectionUnit.setText(String.format(
             Messages.Tour_Tooltip_Format_WindDirectionUnit,
-            UI.getCardinalDirectionText(weatherWindDirDegree * 10)));
+            UI.getCardinalDirectionText(weatherWindDirectionDegree * 10)));
 
       // temperature
-      float temperature = _tourData.getAvgTemperature();
-      if (UI.UNIT_IS_TEMPERATURE_FAHRENHEIT) {
-         temperature = temperature
-               * UI.UNIT_FAHRENHEIT_MULTI
-               + UI.UNIT_FAHRENHEIT_ADD;
-      }
+      final float temperature = UI.convertTemperatureFromMetric(
+            _tourData.getWeather_Temperature_Average());
       _lblTemperature.setText(_nf1.format(temperature));
+
+      // temperature (from device)
+      final float temperatureFromDevice = UI.convertTemperatureFromMetric(
+            _tourData.getWeather_Temperature_Average_Device());
+      _lblTemperature_FromDevice.setText(_nf1.format(temperatureFromDevice));
 
       // weather clouds
       final int weatherIndex = _tourData.getWeatherIndex();

@@ -319,6 +319,7 @@ public class Messages extends NLS {
    public static String        Calendar_Profile_Value_ShowNothing;
    public static String        Calendar_Profile_Value_Speed;
    public static String        Calendar_Profile_Value_Title;
+   public static String        Calendar_Profile_Value_WeatherIcon;
    public static String        Calendar_View_Action_Back;
    public static String        Calendar_View_Action_Back_Tooltip;
    public static String        Calendar_View_Action_Forward;
@@ -768,6 +769,7 @@ public class Messages extends NLS {
    public static String        Dialog_ModifyTours_Checkbox_RunningDynamicsValues;
    public static String        Dialog_ModifyTours_Checkbox_SwimmingValues;
    public static String        Dialog_ModifyTours_Checkbox_TemperatureValues;
+   public static String        Dialog_ModifyTours_Checkbox_TemperatureValues_FromDevice;
    public static String        Dialog_ModifyTours_Checkbox_TourMarkers;
    public static String        Dialog_ModifyTours_Checkbox_TourTimerPauses;
    public static String        Dialog_ModifyTours_Checkbox_TrainingValues;
@@ -809,8 +811,6 @@ public class Messages extends NLS {
    public static String        Dialog_ReplaceImportFilename_Title;
 
    public static String        Dialog_RetrieveWeather_Dialog_Title;
-   public static String        Dialog_RetrieveWeather_Label_WeatherDataNotRetrieved;
-   public static String        Dialog_RetrieveWeather_WeatherDataNotFound;
 
    public static String        Dialog_SaveTags_Dialog_Title;
    public static String        Dialog_SaveTags_Label_Info;
@@ -930,6 +930,7 @@ public class Messages extends NLS {
    public static String        External_Link_MyTourbook;
    public static String        External_Link_MyTourbook_TourChartSmoothing;
    public static String        External_Link_Weather_ApiSignup;
+   public static String        External_Link_Weather_OpenWeatherMap;
 
    public static String        Format_hhmm;
    public static String        Format_rawdata_file_yyyy_mm_dd;
@@ -1216,6 +1217,13 @@ public class Messages extends NLS {
    public static String        Log_Tour_SaveTours;
    public static String        Log_Tour_SaveTours_End;
    public static String        Log_Tour_SaveTours_File;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_WindDirection;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Humidity;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Precipitation;
+   public static String        Log_HistoricalWeatherRetriever_002_RetrievalError;
 
    public static String        Map25_Config_ClusterAlgorithm_FirstMarker_Distance;
    public static String        Map25_Config_ClusterAlgorithm_FirstMarker_Grid;
@@ -1745,14 +1753,18 @@ public class Messages extends NLS {
    public static String        pref_view_layout_label_title;
 
    public static String        Pref_Weather_Button_TestHTTPConnection;
-   public static String        Pref_Weather_Checkbox_UseRetrieval;
-   public static String        Pref_Weather_Checkbox_UseRetrieval_Tooltip;
+   public static String        Pref_Weather_Checkbox_ShowOrHideApiKey;
+   public static String        Pref_Weather_Checkbox_ShowOrHideApiKey_Tooltip;
    public static String        Pref_Weather_CheckHTTPConnection_FAILED_Message;
    public static String        Pref_Weather_CheckHTTPConnection_Message;
    public static String        Pref_Weather_CheckHTTPConnection_OK_Message;
    public static String        Pref_Weather_Label_ApiKey;
-   public static String        Pref_Weather_Label_ApiKey_Tooltip;
+   public static String        Pref_Weather_Label_WeatherProvider;
    public static String        Pref_Weather_Link_ApiSignup;
+   public static String        Pref_Weather_OpenWeatherMap_Link;
+   public static String        Pref_Weather_OpenWeatherMap_Label_FiveDaysLimit;
+
+   public static String        Pref_Weather_WorldWeatherOnline_Label_ApiKey_Tooltip;
 
    public static String        Search_Manager_CreateFTIndex;
    public static String        Search_Manager_Log_DeletingLuceneRootFolder;
@@ -2607,6 +2619,7 @@ public class Messages extends NLS {
    public static String        Tour_Data_Text_SpeedValues;
    public static String        Tour_Data_Text_SwimmingValues;
    public static String        Tour_Data_Text_TemperatureValues;
+   public static String        Tour_Data_Text_TemperatureFromDeviceValues;
    public static String        Tour_Data_Text_Time;
    public static String        Tour_Data_Text_TimeSlices;
    public static String        Tour_Data_Text_TourMarkers;
@@ -2693,8 +2706,11 @@ public class Messages extends NLS {
    public static String        Tour_Editor_Label_StrideSensor;
    public static String        Tour_Editor_Label_Temperature;
    public static String        Tour_Editor_Label_Temperature_Avg_Tooltip;
+   public static String        Tour_Editor_Label_Temperature_Avg_Device_Tooltip;
    public static String        Tour_Editor_Label_Temperature_Max_Tooltip;
+   public static String        Tour_Editor_Label_Temperature_Max_Device_Tooltip;
    public static String        Tour_Editor_Label_Temperature_Min_Tooltip;
+   public static String        Tour_Editor_Label_Temperature_Min_Device_Tooltip;
    public static String        Tour_Editor_Label_Temperature_Tooltip;
    public static String        Tour_Editor_Label_Temperature_WindChill_Tooltip;
    public static String        tour_editor_label_time;
@@ -2969,6 +2985,8 @@ public class Messages extends NLS {
    public static String        UI_Label_TourIsNotSelected;
 
    public static String        ui_tour_not_defined;
+
+   public static String        Weather_Provider_None;
 
    public static String        Year_Statistic_Combo_LastYears_Tooltip;
    public static String        Year_Statistic_Combo_NumberOfYears_Tooltip;

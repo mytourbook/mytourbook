@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -63,6 +63,7 @@ import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
@@ -474,7 +475,7 @@ public class Util {
    }
 
    /**
-    * Converts a comma-seaparated string into a list of strings.
+    * Converts a comma-separated string into a list of strings.
     *
     * @param text
     * @return
@@ -2603,6 +2604,12 @@ public class Util {
       }
 
       return xmlColorTag;
+   }
+
+   public static void showOrHidePassword(final Text text, final boolean showPassword) {
+
+      final char character = showPassword ? '\0' : 0x25cf;
+      text.setEchoChar(character);
    }
 
    /**

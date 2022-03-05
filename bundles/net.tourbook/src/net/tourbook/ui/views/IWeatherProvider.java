@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2020 Frédéric Bard
+ * Copyright (C) 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,15 +13,25 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.weather;
+package net.tourbook.ui.views;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class WWOValuesResults {
-   private String value;
+public interface IWeatherProvider {
 
-   public String getValue() {
-      return value;
-   }
+   public static final String WEATHER_PROVIDER_NONE               = "NoWeatherProvider";  //$NON-NLS-1$
+   public static final String WEATHER_PROVIDER_OPENWEATHERMAP     = "OpenWeatherMap";     //$NON-NLS-1$
+   public static final String WEATHER_PROVIDER_WORLDWEATHERONLINE = "WorldWeatherOnline"; //$NON-NLS-1$
+
+   Composite createUI(WeatherProvidersUI weatherProvidersUI,
+                      Composite parent,
+                      FormToolkit formToolkit);
+
+   void dispose();
+
+   void performDefaults();
+
+   void saveState();
+
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -3498,7 +3498,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          @Override
          public void update(final ViewerCell cell) {
 
-            final String weatherCloudId = ((TourData) cell.getElement()).getWeatherClouds();
+            final String weatherCloudId = ((TourData) cell.getElement()).getWeather_Clouds();
             if (weatherCloudId == null) {
                cell.setText(UI.EMPTY_STRING);
             } else {
@@ -4505,6 +4505,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       } catch (final Exception e) {
 
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         Thread.currentThread().interrupt();
 
       } finally {
 
@@ -5016,7 +5017,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       for (final TourData tourData : importedTours) {
 
-         final float oldTourAvgTemperature = tourData.getAvgTemperature();
+         final float oldTourAvgTemperature = tourData.getWeather_Temperature_Average_Device();
 
          // skip tours which avg temperature is above the minimum avg temperature
          if (oldTourAvgTemperature > avgMinimumTemperature) {
@@ -5091,7 +5092,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    }
 
    private void runEasyImport_050_RetrieveWeatherData(final ImportLauncher importLauncher,
-                                                      final ArrayList<TourData> importedTours) {
+                                                      final List<TourData> importedTours) {
 
       TourLogManager.log_DEFAULT(NLS.bind(
             EasyImportManager.LOG_EASY_IMPORT_050_RETRIEVE_WEATHER_DATA,
@@ -5099,9 +5100,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   getDurationText(importLauncher),
                   UI.UNIT_LABEL_TEMPERATURE }));
 
-      for (final TourData tourData : importedTours) {
-         TourManager.retrieveWeatherData(tourData);
-      }
+      TourManager.retrieveWeatherData(importedTours);
    }
 
    private ArrayList<TourData> runEasyImport_099_SaveTour(final TourPerson person, final ArrayList<TourData> importedTours) {
@@ -5909,6 +5908,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          } catch (final InterruptedException | ClosedWatchServiceException e3) {
             // no-op
+            Thread.currentThread().interrupt();
          } catch (final Exception e4) {
             TourLogManager.log_EXCEPTION_WithStacktrace(e4);
          } finally {

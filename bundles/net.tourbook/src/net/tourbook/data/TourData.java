@@ -109,6 +109,7 @@ import net.tourbook.ui.tourChart.ChartLayer2ndAltiSerie;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.weather.WeatherUtils;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -513,12 +514,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float                 avgCadence;                                             // db-version 4
 
    /**
-    * Average temperature with metric system
+    * Average temperature with metric system (from a weather provider or entered manually)
+    */
+   private float                 weather_Temperature_Average;                          // db-version 47
+   /**
+    * Average temperature with metric system (measured from the device)
     *
     * @since Is float since db version 21, before it was int. In db version 20 this field was
     *        already float but not the database field.
     */
-   private float                 avgTemperature;                                          // db-version 4
+   private float                 weather_Temperature_Average_Device;                   // db-version 4
 
    // ############################################# WEATHER #############################################
 
@@ -526,11 +531,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Is <code>true</code> when the weather data below is from the weather API and not
     * manually entered or from the device.
     */
-   private boolean               isWeatherDataFromApi = false;
+   private boolean               isWeatherDataFromProvider = false;
 
-   private int                   weatherWindDir;                                       // db-version 8
-   private int                   weatherWindSpd;                                       // db-version 8
-   private String                weatherClouds;                                        // db-version 8
+   private int                   weather_Wind_Direction  = -1;                         // db-version 8
+   private int                   weather_Wind_Speed;                                   // db-version 8
+   private String                weather_Clouds;                                       // db-version 8
 
    private String                weather;                                              // db-version 13
 
@@ -549,8 +554,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    private float                 weather_Pressure;                                     // db-version 39
 
-   private float                 weather_Temperature_Min;                              // db-version 39
-   private float                 weather_Temperature_Max;                              // db-version 39
+   private float                 weather_Temperature_Min;                              // db-version 47
+   private float                 weather_Temperature_Min_Device;                       // db-version 39
+   private float                 weather_Temperature_Max;                              // db-version 47
+   private float                 weather_Temperature_Max_Device;                       // db-version 39
+
    private float                 weather_Temperature_WindChill;                        // db-version 39
 
 
@@ -3448,10 +3456,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       if (tempLength > 0) {
 
-         weather_Temperature_Min = temperatureMin;
-         weather_Temperature_Max = temperatureMax;
+         weather_Temperature_Min_Device = temperatureMin;
+         weather_Temperature_Max_Device = temperatureMax;
 
-         avgTemperature = temperatureSum / tempLength;
+         weather_Temperature_Average_Device = temperatureSum / tempLength;
       }
    }
 
@@ -6199,7 +6207,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             serieIndex++;
          }
 
-         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] createSRTMDataSerie()"
+         System.out.println(UI.timeStampNano() + " [" + getClass().getSimpleName() + "] createSRTMDataSerie()" //$NON-NLS-1$ //$NON-NLS-2$
                + " - used srtm1 Values: " + usedSrtm1Values //$NON-NLS-1$
                + ", used srtm3 Values: " + usedSrtm3Values //$NON-NLS-1$
                + ", replaced \"wrong\" Values: " + usedCorrectedSrtmValues //$NON-NLS-1$
@@ -7513,13 +7521,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public float getAvgPulse() {
       return avgPulse;
-   }
-
-   /**
-    * @return Returns metric average temperature
-    */
-   public float getAvgTemperature() {
-      return avgTemperature;
    }
 
    public short[] getBattery_Percentage() {
@@ -9276,11 +9277,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       float[] serie;
 
-      final float unitValueTempterature = UI.UNIT_VALUE_TEMPERATURE;
+      final float unitValueTemperature = UI.UNIT_VALUE_TEMPERATURE;
       final float fahrenheitMulti = UI.UNIT_FAHRENHEIT_MULTI;
       final float fahrenheitAdd = UI.UNIT_FAHRENHEIT_ADD;
 
-      if (unitValueTempterature != 1) {
+      if (unitValueTemperature != 1) {
 
          // use imperial system
 
@@ -9696,6 +9697,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * @return Returns the {@link IWeather#WEATHER_ID_}... or <code>null</code> when weather is not
+    *         set.
+    */
+   public String getWeather_Clouds() {
+      return weather_Clouds;
+   }
+
+   /**
     * @return {@link #weather_Humidity}
     */
    public int getWeather_Humidity() {
@@ -9716,24 +9725,43 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return weather_Pressure;
    }
 
+   public float getWeather_Temperature_Average() {
+      return weather_Temperature_Average;
+   }
+
+   /**
+    * @return Returns metric average temperature
+    */
+   public float getWeather_Temperature_Average_Device() {
+      return weather_Temperature_Average_Device;
+   }
+
    public float getWeather_Temperature_Max() {
       return weather_Temperature_Max;
+   }
+
+   public float getWeather_Temperature_Max_Device() {
+      return weather_Temperature_Max_Device;
    }
 
    public float getWeather_Temperature_Min() {
       return weather_Temperature_Min;
    }
 
+   public float getWeather_Temperature_Min_Device() {
+      return weather_Temperature_Min_Device;
+   }
+
    public float getWeather_Temperature_WindChill() {
       return weather_Temperature_WindChill;
    }
 
-   /**
-    * @return Returns the {@link IWeather#WEATHER_ID_}... or <code>null</code> when weather is not
-    *         set.
-    */
-   public String getWeatherClouds() {
-      return weatherClouds;
+   public int getWeather_Wind_Direction() {
+      return weather_Wind_Direction;
+   }
+
+   public int getWeather_Wind_Speed() {
+      return weather_Wind_Speed;
    }
 
    /**
@@ -9742,27 +9770,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public int getWeatherIndex() {
 
-      int weatherCloudsIndex = -1;
-
-      if (weatherClouds != null) {
-         // binary search cannot be done because it requires sorting which we cannot...
-         for (int cloudIndex = 0; cloudIndex < IWeather.cloudIcon.length; ++cloudIndex) {
-            if (IWeather.cloudIcon[cloudIndex].equalsIgnoreCase(weatherClouds)) {
-               weatherCloudsIndex = cloudIndex;
-               break;
-            }
-         }
-      }
-
-      return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
-   }
-
-   public int getWeatherWindDir() {
-      return weatherWindDir;
-   }
-
-   public int getWeatherWindSpeed() {
-      return weatherWindSpd;
+      return WeatherUtils.getWeatherIndex(weather_Clouds);
    }
 
    /**
@@ -10127,8 +10135,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return serieData != null && serieData.visiblePoints_Surfing != null;
    }
 
-   public boolean isWeatherDataFromApi() {
-      return isWeatherDataFromApi;
+   public boolean isWeatherDataFromProvider() {
+      return isWeatherDataFromProvider;
    }
 
    /**
@@ -10394,14 +10402,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void setAvgPulse(final float avgPulse) {
       this.avgPulse = avgPulse;
-   }
-
-   /**
-    * @param avgTemperature
-    *           the avgTemperature to set
-    */
-   public void setAvgTemperature(final float avgTemperature) {
-      this.avgTemperature = avgTemperature;
    }
 
    public void setBattery_Percentage(final short[] battery_Percentage) {
@@ -10729,8 +10729,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
-   public void setIsWeatherDataFromApi(final boolean isWeatherDataFromApi) {
-      this.isWeatherDataFromApi = isWeatherDataFromApi;
+   public void setIsWeatherDataFromProvider(final boolean isWeatherDataFromProvider) {
+      this.isWeatherDataFromProvider = isWeatherDataFromProvider;
    }
 
    public void setMaxPulse(final float maxPulse) {
@@ -11795,17 +11795,17 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.visiblePoints_ForSurfing = visiblePoints_ForSurfing;
    }
 
-   public void setWayPoints(final ArrayList<TourWayPoint> wptList) {
+   public void setWayPoints(final List<TourWayPoint> waypointList) {
 
       // remove old way points
       tourWayPoints.clear();
 
-      if ((wptList == null) || (wptList.isEmpty())) {
+      if ((waypointList == null) || (waypointList.isEmpty())) {
          return;
       }
 
       // set new way points
-      for (final TourWayPoint tourWayPoint : wptList) {
+      for (final TourWayPoint tourWayPoint : waypointList) {
 
          /**
           * !!!! <br>
@@ -11821,6 +11821,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setWeather(final String weather) {
       this.weather = weather;
+   }
+
+   /**
+    * Sets the weather id which is defined in {@link IWeather#WEATHER_ID_}... or <code>null</code>
+    * when weather id is not defined
+    *
+    * @param weatherClouds
+    */
+   public void setWeather_Clouds(final String weatherClouds) {
+      this.weather_Clouds = weatherClouds;
    }
 
    /**
@@ -11850,34 +11860,40 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.weather_Pressure = weatherPressure;
    }
 
-   public void setWeather_Temperature_Max(final float weatherMaxTemperature) {
-      this.weather_Temperature_Max = weatherMaxTemperature;
+   public void setWeather_Temperature_Average(final float averageTemperature) {
+      weather_Temperature_Average = averageTemperature;
    }
 
-   public void setWeather_Temperature_Min(final float weatherMinTemperature) {
-      this.weather_Temperature_Min = weatherMinTemperature;
+   public void setWeather_Temperature_Average_Device(final float averageTemperature) {
+      weather_Temperature_Average_Device = averageTemperature;
+   }
+
+   public void setWeather_Temperature_Max(final float temperatureMax) {
+      weather_Temperature_Max = temperatureMax;
+   }
+
+   public void setWeather_Temperature_Max_Device(final float weatherMaxTemperature) {
+      this.weather_Temperature_Max_Device = weatherMaxTemperature;
+   }
+
+   public void setWeather_Temperature_Min(final float temperatureMin) {
+      weather_Temperature_Min = temperatureMin;
+   }
+
+   public void setWeather_Temperature_Min_Device(final float weatherMinTemperature) {
+      this.weather_Temperature_Min_Device = weatherMinTemperature;
    }
 
    public void setWeather_Temperature_WindChill(final float weatherWindChill) {
       this.weather_Temperature_WindChill = weatherWindChill;
    }
 
-   /**
-    * Sets the weather id which is defined in {@link IWeather#WEATHER_ID_}... or <code>null</code>
-    * when weather id is not defined
-    *
-    * @param weatherClouds
-    */
-   public void setWeatherClouds(final String weatherClouds) {
-      this.weatherClouds = weatherClouds;
+   public void setWeather_Wind_Direction(final int weatherWindDirection) {
+      this.weather_Wind_Direction = weatherWindDirection;
    }
 
-   public void setWeatherWindDir(final int weatherWindDir) {
-      this.weatherWindDir = weatherWindDir;
-   }
-
-   public void setWeatherWindSpeed(final int weatherWindSpeed) {
-      this.weatherWindSpd = weatherWindSpeed;
+   public void setWeather_Wind_Speed(final int weatherWindSpeed) {
+      this.weather_Wind_Speed = weatherWindSpeed;
    }
 
    /**

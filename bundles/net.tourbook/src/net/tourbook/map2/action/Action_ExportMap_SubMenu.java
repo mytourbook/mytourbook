@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,14 +15,14 @@
  *******************************************************************************/
 package net.tourbook.map2.action;
 
+import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
+
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.view.Map2View;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -69,20 +69,17 @@ public class Action_ExportMap_SubMenu extends Action implements IMenuCreator {
       _menu = new Menu(parent);
 
       // Add listener to re-populate the menu each time
-      _menu.addMenuListener(new MenuAdapter() {
-         @Override
-         public void menuShown(final MenuEvent e) {
+      _menu.addMenuListener(menuShownAdapter(menuEvent -> {
 
-            // dispose old menu items
-            for (final MenuItem menuItem : ((Menu) e.widget).getItems()) {
-               menuItem.dispose();
-            }
-
-            // add actions
-            new ActionContributionItem(_actionExportMapViewImage).fill(_menu, -1);
-            new ActionContributionItem(_actionExportMapViewClipboard).fill(_menu, -1);
+         // dispose old menu items
+         for (final MenuItem menuItem : ((Menu) menuEvent.widget).getItems()) {
+            menuItem.dispose();
          }
-      });
+
+         // add actions
+         new ActionContributionItem(_actionExportMapViewImage).fill(_menu, -1);
+         new ActionContributionItem(_actionExportMapViewClipboard).fill(_menu, -1);
+      }));
 
       return _menu;
    }

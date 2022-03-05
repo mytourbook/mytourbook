@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,7 @@ public interface IWeather {
 
    public static final String[] windDirectionText               = new String[] {
 
+         UI.EMPTY_STRING,
          Messages.Weather_WindDirection_N,
          Messages.Weather_WindDirection_NNE,
          Messages.Weather_WindDirection_NE,
