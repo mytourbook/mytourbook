@@ -107,8 +107,9 @@ public class TourDatabase {
     */
    private static final int TOURBOOK_DB_VERSION = 47;
 
-//   private static final int TOURBOOK_DB_VERSION = 46; // 21.?
+//   private static final int TOURBOOK_DB_VERSION = 47; // 22.X ??
 
+//   private static final int TOURBOOK_DB_VERSION = 46; // 21.?
 //   private static final int TOURBOOK_DB_VERSION = 45; // 21.9
 //   private static final int TOURBOOK_DB_VERSION = 44; // 21.6
 //   private static final int TOURBOOK_DB_VERSION = 43; // 21.3
@@ -4085,9 +4086,8 @@ public class TourDatabase {
             + " weather_Humidity                      SMALLINT DEFAULT 0,                 " + NL //$NON-NLS-1$
             + " weather_Precipitation                 FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
             + " weather_Pressure                      FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
-            //TOOD FB
-            + " weather_Temperature_Min_Device               FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
-            + " weather_Temperature_Max_Device               FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
+            + " weather_Temperature_Min_Device        FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
+            + " weather_Temperature_Max_Device        FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
             + " weather_Temperature_WindChill         FLOAT    DEFAULT 0,                 " + NL //$NON-NLS-1$
 
             // version 39 end
@@ -4132,9 +4132,9 @@ public class TourDatabase {
 
             // version 47 start  -  after 2X.X
 
-            + " weather_Temperature_Average  FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " weather_Temperature_Max  FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
-            + " weather_Temperature_Min  FLOAT DEFAULT 0,                                    " + NL //$NON-NLS-1$
+            + " weather_Temperature_Average           FLOAT DEFAULT 0,                   " + NL //$NON-NLS-1$
+            + " weather_Temperature_Max               FLOAT DEFAULT 0,                   " + NL //$NON-NLS-1$
+            + " weather_Temperature_Min               FLOAT DEFAULT 0,                   " + NL //$NON-NLS-1$
 
             // version 47 end
 
@@ -8966,7 +8966,7 @@ public class TourDatabase {
    }
 
    /**
-    * DB version 46 -> 47 ... MT version 21.?
+    * DB version 46 -> 47 ... MT version 22.?
     *
     * @param conn
     * @param splashManager
@@ -8984,13 +8984,13 @@ public class TourDatabase {
 
 // SET_FORMATTING_OFF
 
-            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_AVG_TEMPERATURE__FROM,    RENAMED__TOUR_AVG_TEMPERATURE__INTO);
-            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_MAX_TEMPERATURE__FROM,    RENAMED__TOUR_MAX_TEMPERATURE__INTO);
-            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_MIN_TEMPERATURE__FROM,    RENAMED__TOUR_MIN_TEMPERATURE__INTO);
-            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_ISWEATHERDATAFROMAPI__FROM,    RENAMED__TOUR_ISWEATHERDATAFROMAPI__INTO);
-            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_WEATHER_CLOUDS__FROM,    RENAMED__TOUR_WEATHER_CLOUDS__INTO);
-            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_WEATHER_WIND_DIRECTION__FROM,    RENAMED__TOUR_WEATHER_WIND_DIRECTION__INTO);
-            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_WEATHER_WIND_SPEED__FROM,    RENAMED__TOUR_WEATHER_WIND_SPEED__INTO);
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_AVG_TEMPERATURE__FROM,        RENAMED__TOUR_AVG_TEMPERATURE__INTO);
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_MAX_TEMPERATURE__FROM,        RENAMED__TOUR_MAX_TEMPERATURE__INTO);
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_MIN_TEMPERATURE__FROM,        RENAMED__TOUR_MIN_TEMPERATURE__INTO);
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_ISWEATHERDATAFROMAPI__FROM,   RENAMED__TOUR_ISWEATHERDATAFROMAPI__INTO);
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_WEATHER_CLOUDS__FROM,         RENAMED__TOUR_WEATHER_CLOUDS__INTO);
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_WEATHER_WIND_DIRECTION__FROM, RENAMED__TOUR_WEATHER_WIND_DIRECTION__INTO);
+            SQL.RenameCol(stmt,     TABLE_TOUR_DATA,     RENAMED__TOUR_WEATHER_WIND_SPEED__FROM,     RENAMED__TOUR_WEATHER_WIND_SPEED__INTO);
 
             // Add new columns
             SQL.AddColumn_Float(stmt, TABLE_TOUR_DATA,   "weather_Temperature_Average", DEFAULT_0);               //$NON-NLS-1$
