@@ -39,10 +39,10 @@ import org.eclipse.swt.widgets.Display;
 public abstract class HistoricalWeatherRetriever {
 
    public static HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
-   public TourData          _tour;
+   public TourData          tour;
 
    protected HistoricalWeatherRetriever(final TourData tourData) {
-      _tour = tourData;
+      tour = tourData;
    }
 
    /**
@@ -93,7 +93,7 @@ public abstract class HistoricalWeatherRetriever {
 
       TourLogManager.subLog_ERROR(NLS.bind(
             Messages.Log_HistoricalWeatherRetriever_002_RetrievalError,
-            TourManager.getTourDateTimeShort(_tour),
+            TourManager.getTourDateTimeShort(tour),
             exceptionMessage));
    }
 

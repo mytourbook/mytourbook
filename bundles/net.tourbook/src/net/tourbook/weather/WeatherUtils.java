@@ -43,11 +43,14 @@ public class WeatherUtils {
 
       final List<String> weatherDataList = new ArrayList<>();
 
+      // Icon
       final String weatherIcon = getWeatherIcon(tourData.getWeatherIndex());
       if (StringUtils.hasContent(weatherIcon)) {
+
          weatherDataList.add(weatherIcon.trim());
       }
 
+      // Description
       final String weatherText = tourData.getWeather();
       if (StringUtils.hasContent(weatherText)) {
 
@@ -67,6 +70,7 @@ public class WeatherUtils {
 
       // Maximum temperature
       if (displayMaximumTemperature) {
+
          weatherDataList.add(
                Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max +
                      UI.SPACE +
@@ -77,6 +81,7 @@ public class WeatherUtils {
 
       // Minimum temperature
       if (displayMinimumTemperature) {
+
          weatherDataList.add(
                Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min +
                      UI.SPACE +
@@ -88,6 +93,7 @@ public class WeatherUtils {
       // Wind chill
       final float temperatureWindChill = tourData.getWeather_Temperature_WindChill();
       if (temperatureWindChill != Float.MIN_VALUE) {
+
          weatherDataList.add(
                Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
                      UI.SPACE +
@@ -113,14 +119,17 @@ public class WeatherUtils {
       // Humidity
       final float humidity = tourData.getWeather_Humidity();
       if (humidity != Float.MIN_VALUE) {
+
          weatherDataList.add((int) humidity +
                UI.SYMBOL_PERCENTAGE +
                UI.SPACE +
                Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Humidity);
       }
 
+      // Precipitation
       final float precipitation = tourData.getWeather_Precipitation();
       if (precipitation > 0) {
+
          weatherDataList.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Precipitation +
                UI.SPACE +
                Math.round(UI.convertPrecipitation_FromMetric(precipitation)) +

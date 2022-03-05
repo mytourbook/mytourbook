@@ -37,12 +37,12 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    //todo fb i might have to do more than 1 call as the results only ocntains the 24 hours around the given start time
    // that will work for most of the activities but not 100milers ....
 
- //todo fb maybe this should be the middle date of the middle of the activity = (end - start ) /2 + start
-      //but that still wouldnt work for long activities (100milers)
-      //BUT that would give the hourly data correct (i.e.: sun type in the middle of the run instead of the beginning only, which
-      //is kind of an average
-      //if tour > 12 hours (11? 13?), then we need >= 2 API calls
-      // startDate = _tour.getTourStartTimeMS() / 1000;
+   //todo fb maybe this should be the middle date of the middle of the activity = (end - start ) /2 + start
+   //but that still wouldnt work for long activities (100milers)
+   //BUT that would give the hourly data correct (i.e.: sun type in the middle of the run instead of the beginning only, which
+   //is kind of an average
+   //if tour > 12 hours (11? 13?), then we need >= 2 API calls
+   // startDate = tour.getTourStartTimeMS() / 1000;
 
    private static final String HEROKU_APP_URL = "https://passeur-mytourbook-oauthapps.herokuapp.com"; //$NON-NLS-1$
    private static final String baseApiUrl     = HEROKU_APP_URL + "/openweathermap/timemachine";       //$NON-NLS-1$
@@ -54,9 +54,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       super(tourData);
 
-      searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(_tour);
+      searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(tour);
 
-      startDate = _tour.getTourStartTimeMS() / 1000;
+      startDate = tour.getTourStartTimeMS() / 1000;
    }
 
    public static String getBaseApiUrl() {
@@ -109,18 +109,18 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          return false;
       }
 
-      _tour.setIsWeatherDataFromApi(true);
-      _tour.setWeather(timeMachineResult.getWeatherDescription());
-      _tour.setWeather_Clouds(timeMachineResult.getWeatherType());
-      _tour.setWeather_Temperature_Average(timeMachineResult.getTemperatureAverage());
-      _tour.setWeather_Wind_Speed(timeMachineResult.getWindSpeed());
-      _tour.setWeather_Wind_Direction(timeMachineResult.getWindDirection());
-      _tour.setWeather_Humidity((short) timeMachineResult.getAverageHumidity());
-      _tour.setWeather_Precipitation(timeMachineResult.getPrecipitation());
-      _tour.setWeather_Pressure((short) timeMachineResult.getAveragePressure());
-      _tour.setWeather_Temperature_Max(timeMachineResult.getTemperatureMax());
-      _tour.setWeather_Temperature_Min(timeMachineResult.getTemperatureMin());
-      _tour.setWeather_Temperature_WindChill(timeMachineResult.getWindChill());
+      tour.setIsWeatherDataFromApi(true);
+      tour.setWeather(timeMachineResult.getWeatherDescription());
+      tour.setWeather_Clouds(timeMachineResult.getWeatherType());
+      tour.setWeather_Temperature_Average(timeMachineResult.getTemperatureAverage());
+      tour.setWeather_Wind_Speed(timeMachineResult.getWindSpeed());
+      tour.setWeather_Wind_Direction(timeMachineResult.getWindDirection());
+      tour.setWeather_Humidity((short) timeMachineResult.getAverageHumidity());
+      tour.setWeather_Precipitation(timeMachineResult.getPrecipitation());
+      tour.setWeather_Pressure((short) timeMachineResult.getAveragePressure());
+      tour.setWeather_Temperature_Max(timeMachineResult.getTemperatureMax());
+      tour.setWeather_Temperature_Min(timeMachineResult.getTemperatureMin());
+      tour.setWeather_Temperature_WindChill(timeMachineResult.getWindChill());
 
       return true;
    }

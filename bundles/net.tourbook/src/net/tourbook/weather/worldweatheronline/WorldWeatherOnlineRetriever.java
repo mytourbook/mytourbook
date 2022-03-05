@@ -80,14 +80,14 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
       super(tourData);
 
-      searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(_tour);
-      startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(_tour.getTourStartTime()); //$NON-NLS-1$
+      searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(tour);
+      startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime()); //$NON-NLS-1$
 
-      final double roundedStartTime = _tour.getTourStartTime().getHour();
+      final double roundedStartTime = tour.getTourStartTime().getHour();
       startTime = (int) roundedStartTime + "00"; //$NON-NLS-1$
 
-      int roundedEndHour = Instant.ofEpochMilli(_tour.getTourEndTimeMS()).atZone(_tour.getTimeZoneIdWithDefault()).getHour();
-      final int roundedEndMinutes = Instant.ofEpochMilli(_tour.getTourEndTimeMS()).atZone(_tour.getTimeZoneIdWithDefault()).getMinute();
+      int roundedEndHour = Instant.ofEpochMilli(tour.getTourEndTimeMS()).atZone(tour.getTimeZoneIdWithDefault()).getHour();
+      final int roundedEndMinutes = Instant.ofEpochMilli(tour.getTourEndTimeMS()).atZone(tour.getTimeZoneIdWithDefault()).getMinute();
       if (roundedEndMinutes >= 30) {
          ++roundedEndHour;
       }
@@ -212,10 +212,10 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
       if (_isLogWeatherData) {
 
-         final long elapsedTime = _tour.getTourDeviceTime_Elapsed();
-         final ZonedDateTime zdtTourStart = _tour.getTourStartTime();
+         final long elapsedTime = tour.getTourDeviceTime_Elapsed();
+         final ZonedDateTime zdtTourStart = tour.getTourStartTime();
          final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
-         final String tourTitle = _tour.getTourTitle();
+         final String tourTitle = tour.getTourTitle();
 
          System.out.println();
 
@@ -277,19 +277,19 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
          return false;
       }
 
-      _tour.setIsWeatherDataFromApi(true);
-      _tour.setWeather_Temperature_Average(historicalWeatherData.getTemperatureAverage());
-      _tour.setWeather_Wind_Speed(historicalWeatherData.getWindSpeed());
-      _tour.setWeather_Wind_Direction(historicalWeatherData.getWindDirection());
-      _tour.setWeather(historicalWeatherData.getWeatherDescription());
-      _tour.setWeather_Clouds(historicalWeatherData.getWeatherType());
+      tour.setIsWeatherDataFromApi(true);
+      tour.setWeather_Temperature_Average(historicalWeatherData.getTemperatureAverage());
+      tour.setWeather_Wind_Speed(historicalWeatherData.getWindSpeed());
+      tour.setWeather_Wind_Direction(historicalWeatherData.getWindDirection());
+      tour.setWeather(historicalWeatherData.getWeatherDescription());
+      tour.setWeather_Clouds(historicalWeatherData.getWeatherType());
 
-      _tour.setWeather_Humidity((short) historicalWeatherData.getAverageHumidity());
-      _tour.setWeather_Precipitation(historicalWeatherData.getPrecipitation());
-      _tour.setWeather_Pressure((short) historicalWeatherData.getAveragePressure());
-      _tour.setWeather_Temperature_Max(historicalWeatherData.getTemperatureMax());
-      _tour.setWeather_Temperature_Min(historicalWeatherData.getTemperatureMin());
-      _tour.setWeather_Temperature_WindChill(historicalWeatherData.getWindChill());
+      tour.setWeather_Humidity((short) historicalWeatherData.getAverageHumidity());
+      tour.setWeather_Precipitation(historicalWeatherData.getPrecipitation());
+      tour.setWeather_Pressure((short) historicalWeatherData.getAveragePressure());
+      tour.setWeather_Temperature_Max(historicalWeatherData.getTemperatureMax());
+      tour.setWeather_Temperature_Min(historicalWeatherData.getTemperatureMin());
+      tour.setWeather_Temperature_WindChill(historicalWeatherData.getWindChill());
 
       return true;
    }

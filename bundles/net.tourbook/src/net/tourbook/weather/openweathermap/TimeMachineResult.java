@@ -39,8 +39,6 @@ public class TimeMachineResult {
    //tours less than 2h30, average between the 2 hours
    //when joining tours average of temps ??
 
-//TODO FB maybe useful to display in the log distance from tour to weather measurement ???   public double       lat
-   public double       lon;
    public String       timezone;
    public int          timezone_offset;
    public Current      current;
