@@ -533,9 +533,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    private boolean               isWeatherDataFromProvider = false;
 
-   private int                   weather_Wind_Direction  = -1;                                 // db-version 8
+   private int                   weather_Wind_Direction  = -1;                         // db-version 8
    private int                   weather_Wind_Speed;                                       // db-version 8
-   private String                weather_Clouds;                                        // db-version 8
+   private String                weather_Clouds;                                       // db-version 8
 
    private String                weather;                                              // db-version 13
 
