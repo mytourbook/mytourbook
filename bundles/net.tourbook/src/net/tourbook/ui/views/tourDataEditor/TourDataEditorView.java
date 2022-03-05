@@ -303,9 +303,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private float[][]               _serieGears;
    private boolean[]               _serieBreakTime;
    private boolean[]               _seriePausedTime;
-//
+   //
    private short[]                 _swimSerie_StrokeRate;
-   // private short[]                 _swimSerie_LengthType;
+// private short[]                 _swimSerie_LengthType;
    private short[]                 _swimSerie_StrokesPerlength;
    private short[]                 _swimSerie_StrokeStyle;
    private int[]                   _swimSerie_Time;
@@ -355,44 +355,43 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _nf3NoGroup.setGroupingUsed(false);
    }
    //
-   private long    _timeSlice_ViewerTourId = -1;
-   private long    _swimSlice_ViewerTourId = -1;
+   private long                               _timeSlice_ViewerTourId = -1;
+   private long                               _swimSlice_ViewerTourId = -1;
    //
    /**
     * <code>true</code>: rows can be selected in the viewer<br>
     * <code>false</code>: cell can be selected in the viewer
     */
-   private boolean _isRowEditMode          = true;
-   private boolean _isEditMode;
-   private boolean _isTourDirty            = false;
-   private boolean _isTourWithSwimData;
-
+   private boolean                            _isRowEditMode          = true;
+   private boolean                            _isEditMode;
+   private boolean                            _isTourDirty            = false;
+   private boolean                            _isTourWithSwimData;
    //
    /**
     * is <code>true</code> when the tour is currently being saved to prevent a modify event or the
     * onSelectionChanged event
     */
-   private boolean            _isSavingInProgress = false;
+   private boolean                            _isSavingInProgress     = false;
 
    /**
     * When <code>true</code> then data are loaded into fields
     */
-   private boolean            _isSetField         = false;
+   private boolean                            _isSetField             = false;
+
    /**
     * contains the tour id from the last selection event
     */
-   private Long               _selectionTourId;
-   private ModifyListener     _modifyListener;
-   private ModifyListener     _modifyListener_Temperature;
-   private MouseWheelListener _mouseWheelListener;
-   private MouseWheelListener _mouseWheelListener_Temperature;
-   private SelectionListener  _selectionListener;
-   private SelectionListener  _selectionListener_Temperature;
-   private SelectionListener  _columnSortListener;
-   private SelectionAdapter   _tourTimeListener;
-   private ModifyListener     _verifyFloatValue;
-   private ModifyListener     _verifyIntValue;
-
+   private Long                               _selectionTourId;
+   private ModifyListener                     _modifyListener;
+   private ModifyListener                     _modifyListener_Temperature;
+   private MouseWheelListener                 _mouseWheelListener;
+   private MouseWheelListener                 _mouseWheelListener_Temperature;
+   private SelectionListener                  _selectionListener;
+   private SelectionListener                  _selectionListener_Temperature;
+   private SelectionListener                  _columnSortListener;
+   private SelectionAdapter                   _tourTimeListener;
+   private ModifyListener                     _verifyFloatValue;
+   private ModifyListener                     _verifyIntValue;
    //
    private PixelConverter                     _pc;
    private int                                _hintValueFieldWidth;
@@ -441,8 +440,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * counter when the UI update runnable is run, this will optimize performance to not update the
     * UI when the part is hidden
     */
-   private int                                _uiRunnableCounter    = 0;
-   private int                                _uiUpdateTitleCounter = 0;
+   private int                                _uiRunnableCounter      = 0;
+   private int                                _uiUpdateTitleCounter   = 0;
    private TourData                           _uiRunnableTourData;
    private boolean                            _uiRunnableForce_TimeSliceReload;
    private boolean                            _uiRunnableForce_SwimSliceReload;
@@ -459,12 +458,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private SliceEditingSupport_Short          _swimSlice_StrokesEditingSupport;
    private SliceEditor_ComboBox_StrokeStyle   _swimSlice_StrokeStyleEditingSupport;
    //
-   private int                                _enableActionCounter  = 0;
+   private int                                _enableActionCounter    = 0;
 
    /**
     * contains all markers with the data serie index as key
     */
-   private final HashMap<Integer, TourMarker> _markerMap            = new HashMap<>();
+   private final HashMap<Integer, TourMarker> _markerMap              = new HashMap<>();
 
    /**
     * When <code>true</code> the tour is created with the tour editor
@@ -643,7 +642,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Spinner            _spinPerson_Calories;
    private Spinner            _spinPerson_FTP;
    private Spinner            _spinPerson_RestPulse;
-
    private Spinner            _spinWeather_Humidity;
    private Spinner            _spinWeather_PrecipitationValue;
    private Spinner            _spinWeather_PressureValue;
@@ -4454,7 +4452,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _lblWeather_TemperatureUnit_Min.setToolTipText(
                   Messages.Tour_Editor_Label_Temperature_Min_Device_Tooltip);
          }
-
       }
    }
 
