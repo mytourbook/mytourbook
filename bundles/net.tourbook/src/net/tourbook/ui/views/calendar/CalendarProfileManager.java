@@ -3160,44 +3160,43 @@ public class CalendarProfileManager {
 
             final String xmlProfileType = xmlProfile.getType();
 
-            if (!xmlProfileType.equals(TAG_CALENDAR)) {
-               continue;
-            }
+            if (xmlProfileType.equals(TAG_CALENDAR)) {
 
-            // <Calendar>
+               // <Calendar>
 
-            final CalendarProfile profile = restoreProfile(xmlProfile);
+               final CalendarProfile profile = restoreProfile(xmlProfile);
 
-            if (profile.defaultId == DefaultId.XML_DEFAULT) {
+               if (profile.defaultId == DefaultId.XML_DEFAULT) {
 
-               /*
-                * The default id is unknown, this occurred when switching from 17.12.0 -> 17.12.1
-                * but it can occur when data are corrupted, setup as default
-                */
-               profile.defaultId = DefaultId.DEFAULT;
+                  /*
+                   * The default id is unknown, this occurred when switching from 17.12.0 -> 17.12.1
+                   * but it can occur when data are corrupted, setup as default
+                   */
+                  profile.defaultId = DefaultId.DEFAULT;
 
-               // this cannot be a default default
-               profile.isDefaultDefault = false;
-               profile.isUserParentDefault = false;
-               profile.userParentDefaultId = UI.EMPTY_STRING;
-            }
+                  // this cannot be a default default
+                  profile.isDefaultDefault = false;
+                  profile.isUserParentDefault = false;
+                  profile.userParentDefaultId = UI.EMPTY_STRING;
+               }
 
-            // set profile default name
-            if (profile.isDefaultDefault) {
+               // set profile default name
+               if (profile.isDefaultDefault) {
 
-               // overwrite default default profile name, it is readonly
+                  // overwrite default default profile name, it is readonly
 
-               for (final CalendarProfile defaultProfile : _allDefaultDefaultProfiles) {
+                  for (final CalendarProfile defaultProfile : _allDefaultDefaultProfiles) {
 
-                  if (profile.defaultId == defaultProfile.defaultId) {
+                     if (profile.defaultId == defaultProfile.defaultId) {
 
-                     profile.profileName = defaultProfile.profileName;
-                     break;
+                        profile.profileName = defaultProfile.profileName;
+                        break;
+                     }
                   }
                }
-            }
 
-            allCalendarProfiles.add(profile);
+               allCalendarProfiles.add(profile);
+            }
 
          } catch (final Exception e) {
             StatusUtil.log(Util.dumpMemento(xmlProfile), e);
