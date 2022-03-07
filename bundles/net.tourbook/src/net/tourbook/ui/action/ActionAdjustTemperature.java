@@ -65,8 +65,7 @@ public class ActionAdjustTemperature extends Action {
          return;
       }
 
-      final DialogAdjustTemperature_Wizard wizard =
-            new DialogAdjustTemperature_Wizard(selectedTours, _tourProvider);
+      final DialogAdjustTemperature_Wizard wizard = new DialogAdjustTemperature_Wizard(selectedTours, _tourProvider);
       final DialogAdjustTemperature dialog = new DialogAdjustTemperature(shell, wizard);
 
       dialog.open();
