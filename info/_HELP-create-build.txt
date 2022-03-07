@@ -40,12 +40,13 @@ Setup the graddle wrapper in the build folder:
 #################
 
    Setup Gradle environment
-   - Set org.gradle.java.home=C:/Program Files/Java/jdk1.8 in C:\Users\Wolfgang\.gradle\gradle.properties
+   - Set "org.gradle.java.home=C:/Program Files/Eclipse Adoptium/jdk-11.0.13.8-hotspot"
+     in C:\Users\Wolfgang\.gradle\gradle.properties
    
 
    Build plugin
    - Check versions in (gdxVersion)          /mytourbook/bundles/build.gradle 
-   - Update VTM files, run task assemble:    C:\DAT\MT\vtm-parent>gradlew ass
+   - Update VTM files,  run task assemble:   C:\DAT\MT\vtm-parent>gradlew ass
    - Update VTM plugin, run task assemble:   C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.vtm>gradle ass
 
    OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD
