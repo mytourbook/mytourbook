@@ -726,14 +726,8 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
          DialogUtils.addTourValueTypeFromCheckbox(_chkData_PowerAndSpeed, TourValueType.TIME_SLICES__POWER_AND_SPEED, tourValueTypes);
          DialogUtils.addTourValueTypeFromCheckbox(_chkData_RunningDynamics, TourValueType.TIME_SLICES__RUNNING_DYNAMICS, tourValueTypes);
          DialogUtils.addTourValueTypeFromCheckbox(_chkData_Swimming, TourValueType.TIME_SLICES__SWIMMING, tourValueTypes);
-         DialogUtils.addTourValueTypeFromCheckbox(
-               _chkData_Temperature,
-               TourValueType.TIME_SLICES__TEMPERATURE,
-               tourValueTypes);
-         DialogUtils.addTourValueTypeFromCheckbox(
-               _chkData_Temperature_FromDevice,
-               TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE,
-               tourValueTypes);
+         DialogUtils.addTourValueTypeFromCheckbox(_chkData_Temperature, TourValueType.TIME_SLICES__TEMPERATURE, tourValueTypes);
+         DialogUtils.addTourValueTypeFromCheckbox(_chkData_Temperature_FromDevice, TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE, tourValueTypes);
          DialogUtils.addTourValueTypeFromCheckbox(_chkData_TourTimerPauses, TourValueType.TIME_SLICES__TIMER_PAUSES, tourValueTypes);
          DialogUtils.addTourValueTypeFromCheckbox(_chkData_Training, TourValueType.TIME_SLICES__TRAINING, tourValueTypes);
          DialogUtils.addTourValueTypeFromCheckbox(_chkData_TourMarkers, TourValueType.TOUR__MARKER, tourValueTypes);
