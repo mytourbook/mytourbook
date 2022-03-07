@@ -16,7 +16,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.map25.layer.marker;
 
 import java.awt.Point;
@@ -27,53 +26,52 @@ import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map25.layer.marker.cluster.ClusterMarkerRenderer;
 
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Color;
 import org.oscim.backend.canvas.Paint;
 import org.oscim.core.GeoPoint;
-import org.oscim.layers.marker.ClusterMarkerRenderer;
 import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerInterface;
-//import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerRendererFactory;
 import org.oscim.layers.marker.MarkerSymbol;
 import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
 
 public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerInterface> {
+
    //ItemizedLayer<MarkerItem> mMarkerLayer;
-   protected int _fgColor = 0xFF000000;   // 100 percent black. AARRGGBB
-   protected int _bgColor = 0x80FF69B4;   // 50 percent pink. AARRGGBB
+   protected int  _fgColor                = 0xFF000000;                                                               // 100 percent black. AARRGGBB
+   protected int  _bgColor                = 0x80FF69B4;                                                               // 50 percent pink. AARRGGBB
    //protected int _poiColor = 0xFF91c7ff;  // blue like toolbar
    protected int  _poiColor               = 0xFFFFFF00;                                                               // yellow is better to see                                                             // 100percent yellow
-   protected int _clusterSymbolSizeDP = net.tourbook.map25.layer.marker.MarkerRenderer.MAP_MARKER_CLUSTER_SIZE_DP;
-   protected int _clusterForegroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_TEXT;
-   protected int _clusterBackgroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_BACK;
+   protected int  _clusterSymbolSizeDP    = net.tourbook.map25.layer.marker.MarkerRenderer.MAP_MARKER_CLUSTER_SIZE_DP;
+   protected int  _clusterForegroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_TEXT;
+   protected int  _clusterBackgroundColor = net.tourbook.map25.layer.marker.MarkerRenderer.CLUSTER_COLOR_BACK;
 
-   private int  _clusterSymbolWeight;
+   private int    _clusterSymbolWeight;
    private float  _clusterOutlineSize;
    private Bitmap _bitmapCluster;
    //private boolean _isBillboard;
 
-   public MarkerSymbol _symbol;  //marker symbol circle or star
-   protected float _symbolSize = 10f;
-   protected int _symbolSizeInt = 10;
-   protected int _clusterSymbol_Size;
+   public MarkerSymbol          _symbol;                                  //marker symbol circle or star
+   protected float              _symbolSize    = 10f;
+   protected int                _symbolSizeInt = 10;
+   protected int                _clusterSymbol_Size;
 
-   private Bitmap _bitmapPoi;
-   private Bitmap _bitmapStar;
-   private Bitmap _bitmapCircle;
-   private Bitmap _BitmapClusterSymbol;
+   private Bitmap               _bitmapPoi;
+   private Bitmap               _bitmapStar;
+   private Bitmap               _bitmapCircle;
+   private Bitmap               _BitmapClusterSymbol;
 
-
-   protected Paint _fillPainter = CanvasAdapter.newPaint();
-   protected Paint _linePainter = CanvasAdapter.newPaint();
+   protected Paint              _fillPainter   = CanvasAdapter.newPaint();
+   protected Paint              _linePainter   = CanvasAdapter.newPaint();
 
    public MarkerRendererFactory _markerRendererFactory;
 
-   public boolean _isMarkerClusteredLast;
+   public boolean               _isMarkerClusteredLast;
 
    public MarkerToolkit(final MarkerShape shape) {
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
@@ -86,7 +84,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       _bitmapCluster = createClusterBitmap(1);
       _bitmapPoi = createPoiBitmap(shape);
 
-      if(shape == MarkerShape.CIRCLE) {
+      if (shape == MarkerShape.CIRCLE) {
          _BitmapClusterSymbol = drawCircle(_clusterSymbol_Size);
       } else {
          _BitmapClusterSymbol = drawStar(_clusterSymbol_Size, _poiColor);
@@ -112,7 +110,8 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
    /**
     * creates a transparent symbol with text and description. for marker.
-    * short version of createAdvanceSymbol(final MarkerItem mItem, final Bitmap poiBitmap, false, false)
+    * short version of createAdvanceSymbol(final MarkerItem mItem, final Bitmap poiBitmap, false,
+    * false)
     *
     * @param mItem
     * @param poiBitmap
@@ -153,18 +152,19 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       final int margin = 3;
       final int dist2symbol = 30;
 
-      final Point titleSize = new Point((int) textPainter.getTextWidth(mItem.title) + 2 * margin, (int) textPainter.getTextHeight(mItem.title) + 2 * margin);
-      final Point symbolSize = new Point(poiBitmap.getWidth(),poiBitmap.getHeight());
+      final Point titleSize = new Point((int) textPainter.getTextWidth(mItem.title) + 2 * margin,
+            (int) textPainter.getTextHeight(mItem.title) + 2 * margin);
+      final Point symbolSize = new Point(poiBitmap.getWidth(), poiBitmap.getHeight());
       final Point subtitleSize = new Point();
-      final Point size = new Point();  //total  size of all elements
+      final Point size = new Point(); //total  size of all elements
 
       String subtitle = UI.EMPTY_STRING;
       boolean hasSubtitle = false;
-      if (mItem.description.length()>1) {
-         if (mItem.description.startsWith("#")){ //$NON-NLS-1$
+      if (mItem.description.length() > 1) {
+         if (mItem.description.startsWith("#")) { //$NON-NLS-1$
             subtitle = mItem.description.substring(1); // not the first # char
             subtitle = subtitle.split("\\R", 2)[0]; // only first line //$NON-NLS-1$
-            subtitleSize.x  = ((int) textPainter.getTextWidth(subtitle)) + 2 * margin;
+            subtitleSize.x = ((int) textPainter.getTextWidth(subtitle)) + 2 * margin;
             subtitleSize.y = ((int) textPainter.getTextHeight(subtitle)) + 2 * margin;
             hasSubtitle = true;
          }
@@ -181,7 +181,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       markerCanvas.setBitmap(markerBitmap);
 
       //titleCanvas for the title text
-      final Bitmap titleBitmap = CanvasAdapter.newBitmap( titleSize.x + margin, titleSize.y + margin, 0);
+      final Bitmap titleBitmap = CanvasAdapter.newBitmap(titleSize.x + margin, titleSize.y + margin, 0);
       final org.oscim.backend.canvas.Canvas titleCanvas = CanvasAdapter.newCanvas();
       titleCanvas.setBitmap(titleBitmap);
 
@@ -190,43 +190,43 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
           * the following three lines displaying a transparent box.
           * only for testing purposes, normally uncommented
           */
-      //fillPainter.setColor(0x60ffffff);
-      //markerCanvas.drawCircle(0, 0, size.x*2, fillPainter);
-      //fillPainter.setColor(_bgColor);
+         //fillPainter.setColor(0x60ffffff);
+         //markerCanvas.drawCircle(0, 0, size.x*2, fillPainter);
+         //fillPainter.setColor(_bgColor);
       }
 
       // draw an oversized transparent circle, so the canvas is completely filled with a transparent color
       // titleCanvas.fillRectangle() does not support transparency
-      titleCanvas.drawCircle(0, 0, size.x*2, fillPainter);
+      titleCanvas.drawCircle(0, 0, size.x * 2, fillPainter);
 
-      titleCanvas.drawText(mItem.title, margin, titleSize.y - margin , textPainter);
+      titleCanvas.drawText(mItem.title, margin, titleSize.y - margin, textPainter);
 
       if (hasSubtitle) {
-         final Bitmap subtitleBitmap = CanvasAdapter.newBitmap( subtitleSize.x + margin, subtitleSize.y + margin, 0);
+         final Bitmap subtitleBitmap = CanvasAdapter.newBitmap(subtitleSize.x + margin, subtitleSize.y + margin, 0);
          final org.oscim.backend.canvas.Canvas subtitleCanvas = CanvasAdapter.newCanvas();
          subtitleCanvas.setBitmap(subtitleBitmap);
-         subtitleCanvas.drawCircle(0, 0, size.x*2, fillPainter);
+         subtitleCanvas.drawCircle(0, 0, size.x * 2, fillPainter);
          subtitleCanvas.drawText(subtitle, margin, titleSize.y - margin, textPainter);
-         markerCanvas.drawBitmap(subtitleBitmap, size.x/2-(subtitleSize.x/2), size.y - (subtitleSize.y + margin));
-      } else if (isPhoto){
+         markerCanvas.drawBitmap(subtitleBitmap, size.x / 2 - (subtitleSize.x / 2), size.y - (subtitleSize.y + margin));
+      } else if (isPhoto) {
          final int lineLength = 20;
          textPainter.setStrokeWidth(2);
-         final Bitmap subtitleBitmap = CanvasAdapter.newBitmap( lineLength, lineLength, 0); //heigth as title
+         final Bitmap subtitleBitmap = CanvasAdapter.newBitmap(lineLength, lineLength, 0); //heigth as title
          final org.oscim.backend.canvas.Canvas subtitleCanvas = CanvasAdapter.newCanvas();
          subtitleCanvas.setBitmap(subtitleBitmap);
-         subtitleCanvas.drawLine(lineLength/2, 0, lineLength/2, lineLength, textPainter);
-         markerCanvas.drawBitmap(subtitleBitmap, size.x/2-(lineLength / 2), size.y - lineLength);
+         subtitleCanvas.drawLine(lineLength / 2, 0, lineLength / 2, lineLength, textPainter);
+         markerCanvas.drawBitmap(subtitleBitmap, size.x / 2 - (lineLength / 2), size.y - lineLength);
       }
 
       if (isPhoto) {
          if (showPhotoTitle) {
-            markerCanvas.drawBitmap(titleBitmap, size.x/2-(titleSize.x/2), 0);
+            markerCanvas.drawBitmap(titleBitmap, size.x / 2 - (titleSize.x / 2), 0);
          }
       } else {
-         markerCanvas.drawBitmap(titleBitmap, size.x/2-(titleSize.x/2), 0);
+         markerCanvas.drawBitmap(titleBitmap, size.x / 2 - (titleSize.x / 2), 0);
       }
 
-      markerCanvas.drawBitmap(poiBitmap, size.x/2-(symbolSize.x/2), size.y/2-(symbolSize.y/2));
+      markerCanvas.drawBitmap(poiBitmap, size.x / 2 - (symbolSize.x / 2), size.y / 2 - (symbolSize.y / 2));
 
       if (isPhoto) {
          return (new MarkerSymbol(markerBitmap, HotspotPlace.BOTTOM_CENTER));
@@ -242,6 +242,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
    /**
     * this creates the bitmap for clustering a draw the size as text in the middle
+    *
     * @param size
     * @return
     */
@@ -272,13 +273,14 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
                mapBookmark.name,
                UI.EMPTY_STRING,
                //new GeoPoint(mapBookmark.getLatitude(), mapBookmark.getLongitude())
-               new GeoPoint(mapBookmark.get_mapPositionMarkerLatitude(), mapBookmark.get_mapPositionMarkerLongitude())
-               );
+               new GeoPoint(mapBookmark.get_mapPositionMarkerLatitude(), mapBookmark.get_mapPositionMarkerLongitude()));
          item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
          pts.add(item);
       }
 
-      if (MarkerMode == MarkerMode.NORMAL) {return pts;}
+      if (MarkerMode == MarkerMode.NORMAL) {
+         return pts;
+      }
 
       final int COUNT = 5;
       final float STEP = 100f / 110000f; // roughly 100 meters
@@ -291,9 +293,10 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       for (int x = -COUNT; x < COUNT; x++) {
          for (int y = -COUNT; y < COUNT; y++) {
             final double random = STEP * Math.random() * 2;
-            final MarkerItem item = new MarkerItem(y + ", " + x, "Title " + demo_lat + "/" + demo_lon,"Description "  + x + "/" + y, //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
-                  new GeoPoint(demo_lat + y * STEP + random, demo_lon + x * STEP + random)
-                  );
+            final MarkerItem item = new MarkerItem(y + ", " + x, //$NON-NLS-1$
+                  "Title " + demo_lat + "/" + demo_lon, //$NON-NLS-1$//$NON-NLS-2$
+                  "Description " + x + "/" + y, //$NON-NLS-1$ //$NON-NLS-2$
+                  new GeoPoint(demo_lat + y * STEP + random, demo_lon + x * STEP + random));
             item.setMarker(createAdvanceSymbol(item, _bitmapPoi));
             pts.add(item);
          }
@@ -306,12 +309,12 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       _bitmapPoi = CanvasAdapter.newBitmap(_symbolSizeInt, _symbolSizeInt, 0);
 
-      if(shape == MarkerShape.CIRCLE) {
+      if (shape == MarkerShape.CIRCLE) {
          _bitmapPoi = drawCircle(_symbolSizeInt);
       } else {
          _bitmapPoi = drawStar(_symbolSizeInt, _poiColor);
       }
-     return _bitmapPoi;
+      return _bitmapPoi;
 
    }
 
@@ -319,35 +322,33 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       net.tourbook.map25.Map25App.debugPrint(debugText);
    }
 
-
    public Bitmap drawCircle(final int bitmapCircleSize) {
       _bitmapCircle = CanvasAdapter.newBitmap(bitmapCircleSize, bitmapCircleSize, 0);
       final org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
       defaultMarkerCanvas.setBitmap(_bitmapCircle);
-      final float half = bitmapCircleSize/2;
+      final float half = bitmapCircleSize / 2;
       _linePainter.setColor(0xA0000000); //gray like the PhotoSymbol in the UI
       _linePainter.setStrokeWidth(2);
       defaultMarkerCanvas.drawCircle(half, half, half * 0.8f, _linePainter);
       return _bitmapCircle;
    }
 
-
    public Bitmap drawStar(final int bitmapStarSize, final int starColor) {
       //_mapApp.debugPrint("*** Markertoolkit:  drawstar: "); //$NON-NLS-1$
       _bitmapStar = CanvasAdapter.newBitmap(bitmapStarSize, bitmapStarSize, 0);
       final org.oscim.backend.canvas.Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
       defaultMarkerCanvas.setBitmap(_bitmapStar);
-      final float half = bitmapStarSize/2;
+      final float half = bitmapStarSize / 2;
       _fillPainter.setColor(starColor);
       _fillPainter.setStrokeWidth(2);
       /*
        * link: https://stackoverflow.com/questions/16327588/how-to-make-star-shape-in-java
        */
-      defaultMarkerCanvas.drawLine(half * 0.1f  , half * 0.65f, half * 1.9f  , half * 0.65f, _fillPainter);
-      defaultMarkerCanvas.drawLine(half * 1.9f , half * 0.65f , half * 0.40f , half * 1.65f, _fillPainter);
-      defaultMarkerCanvas.drawLine(half * 0.40f , half * 1.65f, half         ,   0         , _fillPainter);
-      defaultMarkerCanvas.drawLine(half         ,   0         , half * 1.60f , half * 1.65f, _fillPainter);
-      defaultMarkerCanvas.drawLine(half * 1.60f , half * 1.65f, half * 0.1f  , half * 0.65f, _fillPainter);
+      defaultMarkerCanvas.drawLine(half * 0.1f, half * 0.65f, half * 1.9f, half * 0.65f, _fillPainter);
+      defaultMarkerCanvas.drawLine(half * 1.9f, half * 0.65f, half * 0.40f, half * 1.65f, _fillPainter);
+      defaultMarkerCanvas.drawLine(half * 0.40f, half * 1.65f, half, 0, _fillPainter);
+      defaultMarkerCanvas.drawLine(half, 0, half * 1.60f, half * 1.65f, _fillPainter);
+      defaultMarkerCanvas.drawLine(half * 1.60f, half * 1.65f, half * 0.1f, half * 0.65f, _fillPainter);
       return _bitmapStar;
    }
 
@@ -367,14 +368,13 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       defaultMarkerCanvas.drawLine(1f, 1f, bitmapArrowSizeF, bitmapArrowSizeF / 2, trackArrowPainter);
       defaultMarkerCanvas.drawLine(bitmapArrowSizeF, bitmapArrowSizeF / 2, 1, bitmapArrowSizeF / 2, trackArrowPainter);
 
-
       return bitmapTrackArrow;
    }
 
-   public void loadConfig () {
+   public void loadConfig() {
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
       _fgColor = ColorUtil.getARGB(config.markerOutline_Color, (int) (config.markerOutline_Opacity / 100.0 * 0xff));
-      _bgColor = ColorUtil.getARGB(config.markerFill_Color,    (int) (config.markerFill_Opacity    / 100.0 * 0xff));
+      _bgColor = ColorUtil.getARGB(config.markerFill_Color, (int) (config.markerFill_Opacity / 100.0 * 0xff));
       _clusterSymbolSizeDP = config.clusterSymbol_Size;
       _clusterForegroundColor = ColorUtil.getARGB(
             config.clusterOutline_Color,
@@ -409,13 +409,13 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       debugPrint(
             " Markertoolkit: " //$NON-NLS-1$
-            +
-            (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("\tonItemLongpress") //$NON-NLS-1$
-            + ("\tMapbookmark") //$NON-NLS-1$
+                  +
+                  (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
+                  + ("\tonItemLongpress") //$NON-NLS-1$
+                  + ("\tMapbookmark") //$NON-NLS-1$
                   + ("\tTitle:" + item.getTitle()) //$NON-NLS-1$
                   + ("\tDescription:" + item.description) //$NON-NLS-1$
-            + ("\tindex:" + index) //$NON-NLS-1$
+                  + ("\tindex:" + index) //$NON-NLS-1$
       //+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true") //$NON-NLS-1$ //$NON-NLS-2$
 
       //Pref_Map25_Encoding_Mapsforge
@@ -449,13 +449,13 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       debugPrint(
             " MarkerToolkit: " //$NON-NLS-1$
-            +
-            (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("\tonItemSingleTapUp") //$NON-NLS-1$
-            + ("\tMapbookmark") //$NON-NLS-1$
-            + ("\tTitle:" + item.getTitle()) //$NON-NLS-1$
-            + ("\tDescription:" + item.description) //$NON-NLS-1$
-            + ("\tindex:" + index) //$NON-NLS-1$
+                  +
+                  (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
+                  + ("\tonItemSingleTapUp") //$NON-NLS-1$
+                  + ("\tMapbookmark") //$NON-NLS-1$
+                  + ("\tTitle:" + item.getTitle()) //$NON-NLS-1$
+                  + ("\tDescription:" + item.description) //$NON-NLS-1$
+                  + ("\tindex:" + index) //$NON-NLS-1$
       //+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true") //$NON-NLS-1$ //$NON-NLS-2$
 
       //Pref_Map25_Encoding_Mapsforge
