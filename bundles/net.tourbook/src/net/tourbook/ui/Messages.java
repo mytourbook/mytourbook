@@ -606,6 +606,8 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_Weather;
    public static String        Tour_Tooltip_Label_WindDirection;
    public static String        Tour_Tooltip_Label_WindSpeed;
+   public static String        Tour_Tooltip_Value_AverageTemperatures;
+   public static String        Tour_Tooltip_Value_AverageTemperatures_Tooltip;
 
    public static String        TourType_Config_Border_Bottom;
    public static String        TourType_Config_Border_Circle;

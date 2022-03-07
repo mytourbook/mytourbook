@@ -255,7 +255,7 @@ public class TourInfoUI {
    private Label            _lblRecordedTime_Unit;
    private Label            _lblRestPulse;
    private Label            _lblTemperature;
-   private Label            _lblTemperature_FromDevice;
+   private Label            _lblTemperatureUnit;
    private Label            _lblTimeZone_Value;
    private Label            _lblTimeZoneDifference;
    private Label            _lblTimeZoneDifference_Value;
@@ -868,17 +868,7 @@ public class TourInfoUI {
       createUI_Label(parent, Messages.Tour_Tooltip_Label_Temperature);
 
       _lblTemperature = createUI_LabelValue(parent, SWT.TRAIL);
-
-      createUI_Label(parent, UI.UNIT_LABEL_TEMPERATURE);
-
-      /*
-       * Temperature from device
-       */
-      createUI_Label(parent, Messages.Tour_Tooltip_Label_Temperature_FromDevice);
-
-      _lblTemperature_FromDevice = createUI_LabelValue(parent, SWT.TRAIL);
-
-      createUI_Label(parent, UI.UNIT_LABEL_TEMPERATURE);
+      _lblTemperatureUnit = createUI_LabelValue(parent, SWT.LEAD);
 
       /*
        * Wind speed
@@ -1753,15 +1743,22 @@ public class TourInfoUI {
             Messages.Tour_Tooltip_Format_WindDirectionUnit,
             UI.getCardinalDirectionText(weatherWindDirectionDegree * 10)));
 
-      // temperature
-      final float temperature = UI.convertTemperatureFromMetric(
+      // Average temperature
+      final float averageTemperature = UI.convertTemperatureFromMetric(
             _tourData.getWeather_Temperature_Average());
-      _lblTemperature.setText(_nf1.format(temperature));
-
-      // temperature (from device)
-      final float temperatureFromDevice = UI.convertTemperatureFromMetric(
+      final float temperatureFromDeviceValue = UI.convertTemperatureFromMetric(
             _tourData.getWeather_Temperature_Average_Device());
-      _lblTemperature_FromDevice.setText(_nf1.format(temperatureFromDevice));
+
+      final String temperatureFromDevice = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0
+            ? _nf1.format(temperatureFromDeviceValue) + UI.UNIT_LABEL_TEMPERATURE
+            : UI.EMPTY_STRING;
+
+      _lblTemperature.setText(_nf1.format(averageTemperature));
+      _lblTemperatureUnit.setText(String.format(
+            Messages.Tour_Tooltip_Value_AverageTemperatures,
+            UI.UNIT_LABEL_TEMPERATURE,
+            temperatureFromDevice));
+      _lblTemperatureUnit.setToolTipText(Messages.Tour_Tooltip_Value_AverageTemperatures_Tooltip);
 
       // weather clouds
       final int weatherIndex = _tourData.getWeatherIndex();
