@@ -6333,6 +6333,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final boolean isTourInDb = isTourInDb();
       final boolean isTourValid = isTourValid() && isTourInDb;
       final boolean isNotManualTour = _isManualTour == false;
+      final boolean canEdit = _isEditMode && isTourInDb;
 
       // all actions are disabled when a cell editor is activated
       final boolean isCellEditorInactive = _isCellEditorActive == false;
@@ -6367,7 +6368,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   && (_isManualTour == false));
       _actionToggleReadEditMode.setEnabled(isCellEditorInactive && isTourInDb);
 
-      final boolean canEdit = _isEditMode && isTourInDb;
       _actionSetStartDistanceTo_0.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isDistanceLargerThan0);
       _actionDeleteDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isDistanceAvailable);
       _actionComputeDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isGeoAvailable);
