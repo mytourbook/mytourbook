@@ -6526,6 +6526,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             && _tourData.latitudeSerie.length > 0;
 
       final boolean isWeatherRetrievalActivated = TourManager.isWeatherRetrievalActivated();
+      final boolean isWindDirectionAvailable = _comboWeather_WindDirectionText.getSelectionIndex() > 0;
 
       _comboTitle.setEnabled(canEdit);
       _txtDescription.setEnabled(canEdit);
@@ -6540,8 +6541,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Humidity.setEnabled(canEdit);
       _spinWeather_PrecipitationValue.setEnabled(canEdit);
       _spinWeather_PressureValue.setEnabled(canEdit);
-      _spinWeather_Wind_DirectionValue.setEnabled(canEdit &&
-            _comboWeather_WindDirectionText.getSelectionIndex() > 0);
+      _spinWeather_Wind_DirectionValue.setEnabled(canEdit && isWindDirectionAvailable);
       _spinWeather_Wind_SpeedValue.setEnabled(canEdit);
       _txtWeather.setEnabled(canEdit && isWeatherRetrievalActivated);
 
