@@ -632,6 +632,7 @@ public interface ITourbookPreferences {
    //This is the api key for world weather online
    public static final String WEATHER_API_KEY               = "WEATHER_API_KEY";                     //$NON-NLS-1$
    public static final String WEATHER_WEATHER_PROVIDER_ID   = "WEATHER_WEATHER_PROVIDER_ID";         //$NON-NLS-1$
+   public static final String WEATHER_DISPLAY_FULL_LOG      = "WEATHER_DISPLAY_FULL_LOG";            //$NON-NLS-1$
 
    /*
     * Tour Marker View

@@ -22,8 +22,13 @@ import com.javadocmd.simplelatlng.LatLng;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 
+import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
@@ -34,11 +39,13 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
-   private static final String HEROKU_APP_URL = "https://passeur-mytourbook-oauthapps.herokuapp.com"; //$NON-NLS-1$
-   private static final String baseApiUrl     = HEROKU_APP_URL + "/openweathermap/timemachine";       //$NON-NLS-1$
+   private static final String HEROKU_APP_URL     = "https://passeur-mytourbook-oauthapps.herokuapp.com"; //$NON-NLS-1$
+   private static final String baseApiUrl         = HEROKU_APP_URL + "/openweathermap/timemachine";       //$NON-NLS-1$
 
    private LatLng              searchAreaCenter;
    private long                date;
+
+   private TimeMachineResult   _timeMachineResult = null;
 
    public OpenWeatherMapRetriever(final TourData tourData) {
 
@@ -53,6 +60,55 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
    public static String getBaseApiUrl() {
       return baseApiUrl;
+   }
+
+   @Override
+   protected String buildFullWeatherDataString() {
+
+      final long tourStartTime = tour.getTourStartTimeMS() / 1000;
+      final long tourEndTime = tour.getTourEndTimeMS() / 1000;
+      final long thirtyMinutes = 1800;
+
+      final List<String> fullWeatherDataList = new ArrayList<>();
+
+      for (final Hourly hourly : _timeMachineResult.hourly) {
+
+         if (hourly.dt < tourStartTime - thirtyMinutes ||
+               hourly.dt > tourEndTime + thirtyMinutes) {
+            continue;
+         }
+
+         final String temperature = hourly.getTemp() + UI.UNIT_LABEL_TEMPERATURE;
+         final String feelsLike = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
+               UI.SPACE +
+               Math.round(hourly.feels_like) +
+               UI.UNIT_LABEL_TEMPERATURE;
+         final String wind = hourly.wind_speed + UI.UNIT_LABEL_SPEED +
+               UI.SPACE + Messages.Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection +
+               UI.SPACE + hourly.wind_deg + UI.SYMBOL_DEGREE;
+         final String humidity = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Humidity +
+               UI.SPACE +
+               hourly.humidity;
+         final String precipitation = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation +
+               UI.SPACE +
+               hourly.rain;
+
+         final TourDateTime tourDateTime = TimeTools.createTourDateTime(hourly.dt * 1000L, tour.getTimeZoneId());
+         final String fullWeatherData = tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME +
+               UI.SYMBOL_BRACKET_LEFT +
+               temperature + UI.COMMA_SPACE +
+               feelsLike + UI.COMMA_SPACE +
+               wind + UI.COMMA_SPACE +
+               humidity + UI.SYMBOL_PERCENTAGE + UI.COMMA_SPACE +
+               precipitation + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH +
+               UI.SYMBOL_BRACKET_RIGHT;
+
+         fullWeatherDataList.add(fullWeatherData);
+      }
+
+      final String fullWeatherData = String.join(UI.COMMA_SPACE, fullWeatherDataList);
+
+      return fullWeatherData;
    }
 
    private String buildWeatherApiRequest() {
@@ -95,24 +151,24 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          return false;
       }
 
-      final TimeMachineResult timeMachineResult = serializeWeatherData(rawWeatherData);
+      _timeMachineResult = serializeWeatherData(rawWeatherData);
 
-      if (timeMachineResult == null) {
+      if (_timeMachineResult == null) {
          return false;
       }
 
       tour.setIsWeatherDataFromProvider(true);
-      tour.setWeather(timeMachineResult.getWeatherDescription());
-      tour.setWeather_Clouds(timeMachineResult.getWeatherType());
-      tour.setWeather_Temperature_Average(timeMachineResult.getTemperatureAverage(tour));
-      tour.setWeather_Wind_Speed(timeMachineResult.getWindSpeed(tour));
-      tour.setWeather_Wind_Direction(timeMachineResult.getWindDirection(tour));
-      tour.setWeather_Humidity((short) timeMachineResult.getAverageHumidity(tour));
-      tour.setWeather_Precipitation(timeMachineResult.getPrecipitation(tour));
-      tour.setWeather_Pressure((short) timeMachineResult.getAveragePressure(tour));
-      tour.setWeather_Temperature_Max(timeMachineResult.getTemperatureMax(tour));
-      tour.setWeather_Temperature_Min(timeMachineResult.getTemperatureMin(tour));
-      tour.setWeather_Temperature_WindChill(timeMachineResult.getWindChill(tour));
+      tour.setWeather(_timeMachineResult.getWeatherDescription());
+      tour.setWeather_Clouds(_timeMachineResult.getWeatherType());
+      tour.setWeather_Temperature_Average(_timeMachineResult.getTemperatureAverage(tour));
+      tour.setWeather_Wind_Speed(_timeMachineResult.getWindSpeed(tour));
+      tour.setWeather_Wind_Direction(_timeMachineResult.getWindDirection(tour));
+      tour.setWeather_Humidity((short) _timeMachineResult.getAverageHumidity(tour));
+      tour.setWeather_Precipitation(_timeMachineResult.getPrecipitation(tour));
+      tour.setWeather_Pressure((short) _timeMachineResult.getAveragePressure(tour));
+      tour.setWeather_Temperature_Max(_timeMachineResult.getTemperatureMax(tour));
+      tour.setWeather_Temperature_Min(_timeMachineResult.getTemperatureMin(tour));
+      tour.setWeather_Temperature_WindChill(_timeMachineResult.getWindChill(tour));
 
       return true;
    }

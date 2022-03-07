@@ -89,6 +89,12 @@ public abstract class HistoricalWeatherRetriever {
       });
    }
 
+   /**
+    * Returns the fully detailed weather data as a human readable string
+    * Example: 14h (Temperature 14C, feels like 12C, humidity 54% etc....)
+    */
+   protected abstract String buildFullWeatherDataString();
+
    private void logVendorError(final String exceptionMessage) {
 
       TourLogManager.subLog_ERROR(NLS.bind(

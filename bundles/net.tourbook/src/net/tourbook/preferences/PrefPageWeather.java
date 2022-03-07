@@ -99,6 +99,14 @@ public class PrefPageWeather extends PreferencePage implements IWorkbenchPrefere
    }
 
    @Override
+   protected void performDefaults() {
+
+      _weatherProvidersUI.performDefaults();
+
+      super.performDefaults();
+   }
+
+   @Override
    public boolean performOk() {
 
       _weatherProvidersUI.saveState();

@@ -1217,12 +1217,12 @@ public class Messages extends NLS {
    public static String        Log_Tour_SaveTours;
    public static String        Log_Tour_SaveTours_End;
    public static String        Log_Tour_SaveTours_File;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Humidity;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike;
-   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_WindDirection;
-   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Humidity;
-   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Precipitation;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection;
    public static String        Log_HistoricalWeatherRetriever_002_RetrievalError;
 
    public static String        Map25_Config_ClusterAlgorithm_FirstMarker_Distance;
@@ -1755,6 +1755,8 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Button_TestHTTPConnection;
    public static String        Pref_Weather_Checkbox_ShowOrHideApiKey;
    public static String        Pref_Weather_Checkbox_ShowOrHideApiKey_Tooltip;
+   public static String        Pref_Weather_Check_DisplayFullLog;
+   public static String        Pref_Weather_Check_DisplayFullLog_Tooltip;
    public static String        Pref_Weather_CheckHTTPConnection_FAILED_Message;
    public static String        Pref_Weather_CheckHTTPConnection_Message;
    public static String        Pref_Weather_CheckHTTPConnection_OK_Message;

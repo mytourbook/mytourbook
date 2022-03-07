@@ -99,7 +99,6 @@ import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.weather.TourWeatherRetriever;
-import net.tourbook.weather.WeatherUtils;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -2777,9 +2776,6 @@ public class TourManager {
                   if (TourWeatherRetriever.retrieveWeatherData(tourData, weatherProvider)) {
 
                      modifiedTours.add(tourData);
-                     TourLogManager.subLog_OK(getTourDateTimeShort(tourData) +
-                           UI.SYMBOL_COLON + UI.SPACE +
-                           WeatherUtils.buildWeatherDataString(tourData, true, true));
                   }
                });
       }

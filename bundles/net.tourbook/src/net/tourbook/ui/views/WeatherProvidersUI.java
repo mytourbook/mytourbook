@@ -29,6 +29,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -76,6 +77,8 @@ public class WeatherProvidersUI {
    private Composite   _pageOpenWeatherMapUI;
    private Composite   _pageWorldWeatherOnlineUI;
 
+   private Button      _chkDisplayFullLog;
+
    public WeatherProvidersUI() {}
 
    public void createUI(final Composite parent) {
@@ -98,14 +101,15 @@ public class WeatherProvidersUI {
             .applyTo(_uiContainer);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(_uiContainer);
       {
-         createUI_10_WeatherProvider(_uiContainer);
-         createUI_20_WeatherProviderPagebook(_uiContainer);
+         createUI_10_WeatherProvider();
+         createUI_20_WeatherProviderPagebook();
+         createUI_30_WeatherProviderMainPreferences();
       }
    }
 
-   private void createUI_10_WeatherProvider(final Composite parent) {
+   private void createUI_10_WeatherProvider() {
 
-      final Composite container = _formToolkit.createComposite(parent);
+      final Composite container = _formToolkit.createComposite(_uiContainer);
       GridDataFactory.fillDefaults().grab(false, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 0, 5).applyTo(container);
       {
@@ -136,13 +140,13 @@ public class WeatherProvidersUI {
       }
    }
 
-   private void createUI_20_WeatherProviderPagebook(final Composite parent) {
+   private void createUI_20_WeatherProviderPagebook() {
       /*
        * Pagebook: Weather provider
        */
-      _pagebookWeatherProvider = new PageBook(parent, SWT.NONE);
+      _pagebookWeatherProvider = new PageBook(_uiContainer, SWT.NONE);
       GridDataFactory.fillDefaults()
-            .grab(true, true)
+            .grab(true, false)
             .span(2, 1)
             .applyTo(_pagebookWeatherProvider);
       {
@@ -160,6 +164,22 @@ public class WeatherProvidersUI {
                this,
                _pagebookWeatherProvider,
                _formToolkit);
+      }
+   }
+
+   private void createUI_30_WeatherProviderMainPreferences() {
+
+      final Composite container = new Composite(_uiContainer, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
+      {
+         // Checkbox: Displays the full log
+         _chkDisplayFullLog = new Button(container, SWT.CHECK);
+         _chkDisplayFullLog.setText(
+               Messages.Pref_Weather_Check_DisplayFullLog);
+         _chkDisplayFullLog.setToolTipText(
+               Messages.Pref_Weather_Check_DisplayFullLog_Tooltip);
+         GridDataFactory.fillDefaults().applyTo(_chkDisplayFullLog);
       }
    }
 
@@ -196,12 +216,11 @@ public class WeatherProvidersUI {
 
    public void performDefaults() {
 
-      final String defaultWeatherProviderId = _prefStore.getDefaultString(//
-            ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
+      _chkDisplayFullLog.setSelection(
+            _prefStore.getDefaultBoolean(ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG));
 
-      _prefStore.setValue(ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID, defaultWeatherProviderId);
-
-      selectWeatherProvider(defaultWeatherProviderId);
+      selectWeatherProvider(
+            _prefStore.getDefaultString(ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID));
 
       updateUI();
 
@@ -228,6 +247,9 @@ public class WeatherProvidersUI {
 
          // Weather provider
          selectWeatherProvider(weatherProviderId);
+
+         _chkDisplayFullLog.setSelection(
+               _prefStore.getBoolean(ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG));
       }
       _isUpdateUI = false;
    }
@@ -237,9 +259,13 @@ public class WeatherProvidersUI {
     */
    public void saveState() {
 
-      _prefStore.setValue(//
+      _prefStore.setValue(
             ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID,
             getSelectedWeatherProvider().weatherProviderId);
+
+      _prefStore.setValue(
+            ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG,
+            _chkDisplayFullLog.getSelection());
 
       _weatherProvider_None.saveState();
       _weatherProvider_OpenWeatherMap.saveState();
@@ -257,10 +283,10 @@ public class WeatherProvidersUI {
          }
       }
       if (prefWeatherProviderIndex == -1) {
+
          prefWeatherProviderIndex = 0;
       }
       _comboWeatherProvider.select(prefWeatherProviderIndex);
-
    }
 
    private void setupUI() {
@@ -280,11 +306,13 @@ public class WeatherProvidersUI {
    private void updateUI() {
 
       final String selectedWeatherProvider = getSelectedWeatherProvider().weatherProviderId;
+      boolean areMainPreferencesVisible = true;
 
       // select weather provider page
       if (selectedWeatherProvider.equals(IWeatherProvider.WEATHER_PROVIDER_NONE)) {
 
          _pagebookWeatherProvider.showPage(_pageNoneUI);
+         areMainPreferencesVisible = false;
 
       } else if (selectedWeatherProvider.equals(IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP)) {
 
@@ -294,6 +322,8 @@ public class WeatherProvidersUI {
 
          _pagebookWeatherProvider.showPage(_pageWorldWeatherOnlineUI);
       }
+
+      _chkDisplayFullLog.setVisible(areMainPreferencesVisible);
 
       UI.updateScrolledContent(_uiContainer);
    }

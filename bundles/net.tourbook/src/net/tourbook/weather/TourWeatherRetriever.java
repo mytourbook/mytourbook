@@ -15,12 +15,21 @@
  *******************************************************************************/
 package net.tourbook.weather;
 
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
+import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.IWeatherProvider;
 import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
-import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;;
+import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
+
+import org.eclipse.jface.preference.IPreferenceStore;;
 
 public final class TourWeatherRetriever {
+
+   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    public static boolean retrieveWeatherData(final TourData tourData,
                                              final String weatherProvider) {
@@ -43,7 +52,21 @@ public final class TourWeatherRetriever {
          return false;
       }
 
-      return historicalWeatherRetriever.retrieveHistoricalWeatherData();
-   }
+      final boolean retrievalStatus = historicalWeatherRetriever.retrieveHistoricalWeatherData();
 
+      if (retrievalStatus) {
+
+         TourLogManager.subLog_OK(TourManager.getTourDateTimeShort(tourData) +
+               UI.SYMBOL_COLON + UI.SPACE +
+               WeatherUtils.buildWeatherDataString(tourData, true, true));
+
+         if (_prefStore.getBoolean(ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG)) {
+            TourLogManager.subLog_INFO(TourManager.getTourDateTimeShort(tourData) +
+                  UI.SYMBOL_COLON + UI.SPACE +
+                  historicalWeatherRetriever.buildFullWeatherDataString());
+         }
+      }
+
+      return retrievalStatus;
+   }
 }

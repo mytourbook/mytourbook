@@ -107,7 +107,7 @@ public class WeatherUtils {
 
          final String windDirection = tourData.getWeather_Wind_Direction() != -1
                ? UI.SPACE +
-                     Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_WindDirection +
+                     Messages.Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection +
                      UI.SPACE +
                      getWindDirectionText(tourData.getWeather_Wind_Direction())
                : UI.EMPTY_STRING;
@@ -123,14 +123,14 @@ public class WeatherUtils {
          weatherDataList.add((int) humidity +
                UI.SYMBOL_PERCENTAGE +
                UI.SPACE +
-               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Humidity);
+               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Humidity);
       }
 
       // Precipitation
       final float precipitation = tourData.getWeather_Precipitation();
       if (precipitation > 0) {
 
-         weatherDataList.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Precipitation +
+         weatherDataList.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation +
                UI.SPACE +
                Math.round(UI.convertPrecipitation_FromMetric(precipitation)) +
                UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
@@ -259,7 +259,7 @@ public class WeatherUtils {
       return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
    }
 
-   private static String getWindDirectionText(final int degreeDirection) {
+   public static String getWindDirectionText(final int degreeDirection) {
 
       return IWeather.windDirectionText[UI.getCardinalDirectionTextIndex(degreeDirection)];
    }
