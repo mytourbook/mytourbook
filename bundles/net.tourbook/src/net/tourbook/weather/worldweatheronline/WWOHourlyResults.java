@@ -18,13 +18,26 @@ package net.tourbook.weather.worldweatheronline;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import net.tourbook.common.UI;
+import net.tourbook.common.util.StringUtils;
 
 /**
  * A Java representation of a World Weather Online query result "hourly" element.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class WWOHourlyResults {
+
+   @JsonProperty("UTCdate")
+   private String                 utcDate;
+
+   @JsonProperty("UTCtime")
+   private String                 utcTime;
 
    private String                 time;
 
@@ -62,6 +75,29 @@ public class WWOHourlyResults {
     */
    private String                 precipMM;
 
+   public long getEpochSeconds(final ZoneId zoneId) {
+
+      if (StringUtils.isNullOrEmpty(utcTime) ||
+            !utcTime.endsWith("00")) { //$NON-NLS-1$
+         return 0;
+      }
+
+      final int timeHours = Integer.parseInt(utcTime.substring(0, utcTime.indexOf("00"))); //$NON-NLS-1$
+      final String dateTime = utcDate +
+            UI.SPACE +
+            String.format("%02d", timeHours) + //$NON-NLS-1$
+            UI.SYMBOL_COLON +
+            "00"; //$NON-NLS-1$
+      final ZonedDateTime zonedDateTime = LocalDateTime.parse(
+            dateTime,
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) //$NON-NLS-1$
+            .atZone(zoneId);
+
+      final long timeEpochSeconds = zonedDateTime.toInstant().toEpochMilli() / 1000;
+
+      return timeEpochSeconds;
+   }
+
    public int getFeelsLikeC() {
       return Integer.parseInt(feelsLikeC);
    }
@@ -84,6 +120,14 @@ public class WWOHourlyResults {
 
    public String gettime() {
       return time;
+   }
+
+   public String getUtcDate() {
+      return utcDate;
+   }
+
+   public String getUtcTime() {
+      return utcTime;
    }
 
    public String getWeatherCode() {

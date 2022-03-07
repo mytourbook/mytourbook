@@ -25,7 +25,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
@@ -78,30 +77,17 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
             continue;
          }
 
-         final String temperature = UI.convertTemperatureFromMetric((float) hourly.getTemp()) + UI.UNIT_LABEL_TEMPERATURE;
-         final String feelsLike = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
-               UI.SPACE +
-               UI.convertTemperatureFromMetric((float) hourly.feels_like) +
-               UI.UNIT_LABEL_TEMPERATURE;
-         final String wind = UI.convertSpeed_FromMetric((float) hourly.wind_speed) + UI.UNIT_LABEL_SPEED +
-               UI.SPACE + Messages.Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection +
-               UI.SPACE + hourly.wind_deg + UI.SYMBOL_DEGREE;
-         final String humidity = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Humidity +
-               UI.SPACE +
-               hourly.humidity;
-         final String precipitation = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation +
-               UI.SPACE +
-               UI.convertPrecipitation_FromMetric(hourly.rain);
-
          final TourDateTime tourDateTime = TimeTools.createTourDateTime(hourly.dt * 1000L, tour.getTimeZoneId());
-         final String fullWeatherData = tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME +
-               UI.SYMBOL_BRACKET_LEFT +
-               temperature + UI.COMMA_SPACE +
-               feelsLike + UI.COMMA_SPACE +
-               wind + UI.COMMA_SPACE +
-               humidity + UI.SYMBOL_PERCENTAGE + UI.COMMA_SPACE +
-               precipitation + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH +
-               UI.SYMBOL_BRACKET_RIGHT;
+
+         final String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
+               (float) hourly.getTemp(),
+               (float) hourly.feels_like,
+               (float) hourly.wind_speed,
+               hourly.wind_deg,
+               hourly.humidity,
+               hourly.rain,
+               tourDateTime.tourZonedDateTime.toEpochSecond(),
+               tour.getTimeZoneId());
 
          fullWeatherDataList.add(fullWeatherData);
       }

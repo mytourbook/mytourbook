@@ -25,16 +25,17 @@ import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.ui.Messages;
 import net.tourbook.ui.views.calendar.CalendarProfile;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WeatherUtils;
@@ -60,8 +61,8 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       }
    }
 
-   private static final String    baseApiUrl   = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
-   private static final String    keyParameter = "?key=";                                                          //$NON-NLS-1$
+   private static final String    baseApiUrl      = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
+   private static final String    keyParameter    = "?key=";                                                          //$NON-NLS-1$
    private LatLng                 searchAreaCenter;
    private String                 startDate;
    private String                 startTime;
@@ -70,7 +71,8 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
    private WeatherData            historicalWeatherData;
 
-   private final IPreferenceStore _prefStore   = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore _prefStore      = TourbookPlugin.getPrefStore();
+   private List<WWOHourlyResults> _rawWeatherData = null;
 
    /*
     * @param tour
@@ -100,6 +102,42 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
    public static String getBaseApiUrl() {
       return baseApiUrl;
+   }
+
+   @Override
+   protected String buildFullWeatherDataString() {
+
+      final long tourStartTime = tour.getTourStartTimeMS() / 1000;
+      final long tourEndTime = tour.getTourEndTimeMS() / 1000;
+      final long thirtyMinutes = 1800;
+
+      final List<String> fullWeatherDataList = new ArrayList<>();
+
+      for (final WWOHourlyResults hourly : _rawWeatherData) {
+
+         final long hourlyEpochSeconds = hourly.getEpochSeconds(tour.getTimeZoneIdWithDefault());
+         if (hourlyEpochSeconds < tourStartTime - thirtyMinutes ||
+               hourlyEpochSeconds > tourEndTime + thirtyMinutes) {
+            continue;
+         }
+
+         final TourDateTime tourDateTime = TimeTools.createTourDateTime(hourlyEpochSeconds * 1000L, tour.getTimeZoneId());
+         final String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
+               hourly.getTempC(),
+               hourly.getFeelsLikeC(),
+               hourly.getWindspeedKmph(),
+               hourly.getWinddirDegree(),
+               hourly.getHumidity(),
+               hourly.getPrecipMM(),
+               tourDateTime.tourZonedDateTime.getHour(),
+               tour.getTimeZoneId());
+
+         fullWeatherDataList.add(fullWeatherData);
+      }
+
+      final String fullWeatherData = String.join(UI.COMMA_SPACE, fullWeatherDataList);
+
+      return fullWeatherData;
    }
 
    private String buildWeatherApiRequest() {
@@ -223,7 +261,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
             System.out.println(tourTitle);
          }
 
-         System.out.println(String.format(Messages.Tour_Tooltip_Format_DateWeekTime,
+         System.out.println(String.format(net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime,
                zdtTourStart.format(TimeTools.Formatter_Date_F),
                zdtTourStart.format(TimeTools.Formatter_Time_M),
                zdtTourEnd.format(TimeTools.Formatter_Time_M),
@@ -242,9 +280,9 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                .get("hourly") //$NON-NLS-1$
                .toString();
 
-         final List<WWOHourlyResults> rawWeatherData = mapper.readValue(weatherResults, new TypeReference<List<WWOHourlyResults>>() {});
+         _rawWeatherData = mapper.readValue(weatherResults, new TypeReference<List<WWOHourlyResults>>() {});
 
-         computeFinalWeatherData(weatherData, rawWeatherData);
+         computeFinalWeatherData(weatherData, _rawWeatherData);
 
       } catch (final Exception e) {
          StatusUtil.logError(

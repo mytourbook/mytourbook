@@ -24,11 +24,69 @@ import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 
 public class WeatherUtils {
+
+   /**
+    * @param temperatureValue
+    *           in Celsius
+    * @param windChill
+    *           in Celsius
+    * @param windSpeed
+    *           in km/h
+    * @param windDirection
+    *           in degrees
+    * @param humidity
+    *           in *
+    * @param precipitation
+    *           in mm
+    * @param time
+    *           in epoch seconds
+    * @param timeZonedId
+    * @return
+    */
+   public static String buildFullWeatherDataString(final float temperatureValue,
+                                                   final float windChill,
+                                                   final float windSpeed,
+                                                   final int windDirection,
+                                                   final int humidityValue,
+                                                   final float precipitationValue,
+                                                   final long time,
+                                                   final String timeZoneId) {
+
+      final String temperature = UI.convertTemperatureFromMetric(temperatureValue) + UI.UNIT_LABEL_TEMPERATURE;
+      final String feelsLike = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
+            UI.SPACE +
+            UI.convertTemperatureFromMetric(windChill) +
+            UI.UNIT_LABEL_TEMPERATURE;
+      final String wind = UI.convertSpeed_FromMetric(windSpeed) + UI.UNIT_LABEL_SPEED +
+            UI.SPACE + Messages.Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection +
+            UI.SPACE + windDirection + UI.SYMBOL_DEGREE;
+      final String humidity = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Humidity +
+            UI.SPACE +
+            humidityValue;
+      final String precipitation = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation +
+            UI.SPACE +
+            UI.convertPrecipitation_FromMetric(precipitationValue);
+
+      final TourDateTime tourDateTime = TimeTools.createTourDateTime(time * 1000L, timeZoneId);
+      final String fullWeatherData = tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME +
+            UI.SYMBOL_BRACKET_LEFT +
+            temperature + UI.COMMA_SPACE +
+            feelsLike + UI.COMMA_SPACE +
+            wind + UI.COMMA_SPACE +
+            humidity + UI.SYMBOL_PERCENTAGE + UI.COMMA_SPACE +
+            precipitation + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH +
+            UI.SYMBOL_BRACKET_RIGHT;
+
+      return fullWeatherData;
+   }
+
    /**
     * Returns the weather data as a human readable string, depending on the
     * desired data.
