@@ -143,21 +143,20 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
     * ...
     */
    private static final String       STATE_EXPANDED_ITEMS                   = "STATE_EXPANDED_ITEMS";                   //$NON-NLS-1$
-
    private static final String       STATE_IS_ON_SELECT_EXPAND_COLLAPSE     = "STATE_IS_ON_SELECT_EXPAND_COLLAPSE";     //$NON-NLS-1$
    private static final String       STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS = "STATE_IS_SINGLE_EXPAND_COLLAPSE_OTHERS"; //$NON-NLS-1$
+
    private static final int          STATE_ITEM_TYPE_SEPARATOR              = -1;
 
    private static final int          STATE_ITEM_TYPE_CATEGORY               = 1;
-
    private static final int          STATE_ITEM_TYPE_TAG                    = 2;
    private static final int          STATE_ITEM_TYPE_YEAR                   = 3;
    private static final int          STATE_ITEM_TYPE_MONTH                  = 4;
+
    static final int                  TAG_VIEW_LAYOUT_FLAT                   = 0;
-
    static final int                  TAG_VIEW_LAYOUT_HIERARCHICAL           = 10;
-   private static final NumberFormat _nf0                                   = NumberFormat.getNumberInstance();
 
+   private static final NumberFormat _nf0                                   = NumberFormat.getNumberInstance();
    private static final NumberFormat _nf1                                   = NumberFormat.getNumberInstance();
 
    {
