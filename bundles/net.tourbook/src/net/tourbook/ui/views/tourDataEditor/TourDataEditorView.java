@@ -590,7 +590,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private ColumnManager            _swimSlice_ColumnManager;
    private SwimSlice_TourViewer     _swimSlice_TourViewer         = new SwimSlice_TourViewer();
 
-   private FormToolkit              _formToolkit;
+   private FormToolkit              _tk;
 
    /*
     * tab: tour
@@ -1374,11 +1374,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          GridDataFactory.fillDefaults().grab(true, false).applyTo(_pageReadMode);
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(_pageReadMode);
          {
-            _txtTime = _formToolkit.createText(_pageReadMode, UI.EMPTY_STRING, SWT.READ_ONLY);
+            _txtTime = _tk.createText(_pageReadMode, UI.EMPTY_STRING, SWT.READ_ONLY);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtTime);
             _txtTime.setEnabled(false);
 
-            _formToolkit.createLabel(_pageReadMode, UI.UNIT_LABEL_TIME, SWT.READ_ONLY);
+            _tk.createLabel(_pageReadMode, UI.UNIT_LABEL_TIME, SWT.READ_ONLY);
          }
 
          /*
@@ -1403,7 +1403,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             _spinHours.addMouseWheelListener(_mouseWheelListener);
             _spinHours.addSelectionListener(_tourTimeListener);
-            _formToolkit.adapt(_spinHours, true, true);
+            _tk.adapt(_spinHours, true, true);
 
             /*
              * minute
@@ -1419,7 +1419,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             _spinMinutes.addMouseWheelListener(_mouseWheelListener);
             _spinMinutes.addSelectionListener(_tourTimeListener);
-            _formToolkit.adapt(_spinMinutes, true, true);
+            _tk.adapt(_spinMinutes, true, true);
 
             /*
              * seconds
@@ -1435,7 +1435,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             _spinSeconds.addMouseWheelListener(_mouseWheelListener);
             _spinSeconds.addSelectionListener(_tourTimeListener);
-            _formToolkit.adapt(_spinSeconds, true, true);
+            _tk.adapt(_spinSeconds, true, true);
          }
 
          // default is read mode
@@ -3272,11 +3272,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _page_NoTourData = UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
-      _formToolkit = new FormToolkit(display);
+      _tk = new FormToolkit(display);
 
-      _page_EditorForm = _formToolkit.createForm(_pageBook);
+      _page_EditorForm = _tk.createForm(_pageBook);
       MTFont.setHeaderFont(_page_EditorForm);
-      _formToolkit.decorateFormHeading(_page_EditorForm);
+      _tk.decorateFormHeading(_page_EditorForm);
 
       _messageManager = new MessageManager(_page_EditorForm);
 
@@ -3336,12 +3336,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private Label createUI_LabelSeparator(final Composite parent) {
 
-      return _formToolkit.createLabel(parent, UI.EMPTY_STRING);
+      return _tk.createLabel(parent, UI.EMPTY_STRING);
    }
 
    private void createUI_Section_110_Title(final Composite parent) {
 
-      _sectionTitle = createSection(parent, _formToolkit, Messages.tour_editor_section_tour, true, true);
+      _sectionTitle = createSection(parent, _tk, Messages.tour_editor_section_tour, true, true);
       final Composite container = (Composite) _sectionTitle.getClient();
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
@@ -3349,14 +3349,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             /*
              * Title
              */
-            final Label label = _formToolkit.createLabel(container, Messages.tour_editor_label_tour_title);
+            final Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_title);
             _firstColumnControls.add(label);
 
             // combo: tour title with history
             _comboTitle = new Combo(container, SWT.BORDER | SWT.FLAT);
             _comboTitle.setText(UI.EMPTY_STRING);
 
-            _formToolkit.adapt(_comboTitle, true, false);
+            _tk.adapt(_comboTitle, true, false);
 
             GridDataFactory.fillDefaults()
                   .grab(true, false)
@@ -3385,11 +3385,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             /*
              * Description
              */
-            final Label label = _formToolkit.createLabel(container, Messages.tour_editor_label_description);
+            final Label label = _tk.createLabel(container, Messages.tour_editor_label_description);
             GridDataFactory.swtDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
             _firstColumnControls.add(label);
 
-            _txtDescription = _formToolkit.createText(
+            _txtDescription = _tk.createText(
                   container,
                   UI.EMPTY_STRING,
                   SWT.BORDER //
@@ -3413,13 +3413,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             /*
              * Start location
              */
-            final Label label = _formToolkit.createLabel(container, Messages.tour_editor_label_start_location);
+            final Label label = _tk.createLabel(container, Messages.tour_editor_label_start_location);
             _firstColumnControls.add(label);
 
             _comboLocation_Start = new Combo(container, SWT.BORDER | SWT.FLAT);
             _comboLocation_Start.setText(UI.EMPTY_STRING);
 
-            _formToolkit.adapt(_comboLocation_Start, true, false);
+            _tk.adapt(_comboLocation_Start, true, false);
 
             GridDataFactory.fillDefaults()
                   .grab(true, false)
@@ -3447,13 +3447,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             /*
              * End location
              */
-            final Label label = _formToolkit.createLabel(container, Messages.tour_editor_label_end_location);
+            final Label label = _tk.createLabel(container, Messages.tour_editor_label_end_location);
             _firstColumnControls.add(label);
 
             _comboLocation_End = new Combo(container, SWT.BORDER | SWT.FLAT);
             _comboLocation_End.setText(UI.EMPTY_STRING);
 
-            _formToolkit.adapt(_comboLocation_End, true, false);
+            _tk.adapt(_comboLocation_End, true, false);
 
             GridDataFactory.fillDefaults()
                   .grab(true, false)
@@ -3482,7 +3482,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void createUI_Section_120_DateTime(final Composite parent) {
 
-      _sectionDateTime = createSection(parent, _formToolkit, Messages.tour_editor_section_date_time, false, true);
+      _sectionDateTime = createSection(parent, _tk, Messages.tour_editor_section_date_time, false, true);
 
       final Composite container = (Composite) _sectionDateTime.getClient();
       GridLayoutFactory
@@ -3510,7 +3510,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private void createUI_Section_122_DateTime_Col1(final Composite section) {
 
-      final Composite container = _formToolkit.createComposite(section);
+      final Composite container = _tk.createComposite(section);
       GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       _firstColumnContainerControls.add(container);
@@ -3518,12 +3518,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          /*
           * date
           */
-         final Label label = _formToolkit.createLabel(container, Messages.tour_editor_label_tour_date);
+         final Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_date);
          _firstColumnControls.add(label);
 
          _dtTourDate = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
          GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourDate);
-         _formToolkit.adapt(_dtTourDate, true, false);
+         _tk.adapt(_dtTourDate, true, false);
          _dtTourDate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
             if (UI.isLinuxAsyncEvent(selectionEvent.widget) || _isSetField || _isSavingInProgress) {
@@ -3548,7 +3548,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private void createUI_Section_123_DateTime_Col2(final Composite section) {
 
-      final Composite container = _formToolkit.createComposite(section);
+      final Composite container = _tk.createComposite(section);
       GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
@@ -3556,11 +3556,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             /*
              * start time
              */
-            _lblStartTime = _formToolkit.createLabel(container, Messages.tour_editor_label_start_time);
+            _lblStartTime = _tk.createLabel(container, Messages.tour_editor_label_start_time);
             _secondColumnControls.add(_lblStartTime);
 
             _dtStartTime = new DateTime(container, SWT.TIME | SWT.MEDIUM | SWT.BORDER);
-            _formToolkit.adapt(_dtStartTime, true, false);
+            _tk.adapt(_dtStartTime, true, false);
             _dtStartTime.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
                if (UI.isLinuxAsyncEvent(selectionEvent.widget) || _isSetField || _isSavingInProgress) {
@@ -3580,7 +3580,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void createUI_Section_127_DateTime_Col1(final Composite section) {
 
-      final Composite container = _formToolkit.createComposite(section);
+      final Composite container = _tk.createComposite(section);
       GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       _firstColumnContainerControls.add(container);
@@ -3589,10 +3589,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             /*
              * tour distance
              */
-            final Label label = _formToolkit.createLabel(container, Messages.tour_editor_label_tour_distance);
+            final Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_distance);
             _firstColumnControls.add(label);
 
-            _txtDistance = _formToolkit.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
+            _txtDistance = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtDistance.addModifyListener(_verifyFloatValue);
             _txtDistance.setData(WIDGET_KEY, WIDGET_KEY_TOUR_DISTANCE);
             _txtDistance.addKeyListener(new KeyListener() {
@@ -3606,40 +3606,40 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             });
             GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).applyTo(_txtDistance);
 
-            _lblDistanceUnit = _formToolkit.createLabel(container, UI.UNIT_LABEL_DISTANCE);
+            _lblDistanceUnit = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE);
          }
 
          {
             /*
              * altitude up
              */
-            final Label label = _formToolkit.createLabel(container, Messages.Tour_Editor_Label_AltitudeUp);
+            final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_AltitudeUp);
             _firstColumnControls.add(label);
 
-            _txtAltitudeUp = _formToolkit.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
+            _txtAltitudeUp = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtAltitudeUp.addModifyListener(_verifyIntValue);
             _txtAltitudeUp.setData(WIDGET_KEY, WIDGET_KEY_ALTITUDE_UP);
             _txtAltitudeUp.addKeyListener(keyPressedAdapter(keyEvent -> _isAltitudeManuallyModified = true));
 
             GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).applyTo(_txtAltitudeUp);
 
-            _lblAltitudeUpUnit = _formToolkit.createLabel(container, UI.UNIT_LABEL_ELEVATION);
+            _lblAltitudeUpUnit = _tk.createLabel(container, UI.UNIT_LABEL_ELEVATION);
          }
 
          {
             /*
              * altitude down
              */
-            final Label label = _formToolkit.createLabel(container, Messages.Tour_Editor_Label_AltitudeDown);
+            final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_AltitudeDown);
             _firstColumnControls.add(label);
 
-            _txtAltitudeDown = _formToolkit.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
+            _txtAltitudeDown = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtAltitudeDown.addModifyListener(_verifyIntValue);
             _txtAltitudeDown.setData(WIDGET_KEY, WIDGET_KEY_ALTITUDE_DOWN);
             _txtAltitudeDown.addKeyListener(keyPressedAdapter(keyEvent -> _isAltitudeManuallyModified = true));
             GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).applyTo(_txtAltitudeDown);
 
-            _lblAltitudeDownUnit = _formToolkit.createLabel(container, UI.UNIT_LABEL_ELEVATION);
+            _lblAltitudeDownUnit = _tk.createLabel(container, UI.UNIT_LABEL_ELEVATION);
          }
       }
    }
@@ -3656,7 +3656,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             .spacing(COLUMN_SPACING, 0)
             .applyTo(container);
       {
-         final Composite container_Left = _formToolkit.createComposite(container);
+         final Composite container_Left = _tk.createComposite(container);
          GridDataFactory.fillDefaults().applyTo(container_Left);
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container_Left);
          {
@@ -3664,7 +3664,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                /*
                 * Elapsed time
                 */
-               final Label label = _formToolkit.createLabel(container_Left, Messages.tour_editor_label_elapsed_time);
+               final Label label = _tk.createLabel(container_Left, Messages.tour_editor_label_elapsed_time);
                _secondColumnControls.add(label);
 
                _deviceTime_Elapsed = new TimeDuration(container_Left);
@@ -3673,7 +3673,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                /*
                 * Recorded time
                 */
-               final Label label = _formToolkit.createLabel(container_Left, Messages.tour_editor_label_recorded_time);
+               final Label label = _tk.createLabel(container_Left, Messages.tour_editor_label_recorded_time);
                _secondColumnControls.add(label);
 
                _deviceTime_Recorded = new TimeDuration(container_Left);
@@ -3682,14 +3682,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                /*
                 * Paused time
                 */
-               final Label label = _formToolkit.createLabel(container_Left, Messages.tour_editor_label_paused_time);
+               final Label label = _tk.createLabel(container_Left, Messages.tour_editor_label_paused_time);
                _secondColumnControls.add(label);
 
                _deviceTime_Paused = new TimeDuration(container_Left);
             }
          }
 
-         final Composite container_Right = _formToolkit.createComposite(container);
+         final Composite container_Right = _tk.createComposite(container);
          GridDataFactory.fillDefaults()
 
                // align to the bottom that recorded/paused and moving/break time are at the same vertical position
@@ -3702,7 +3702,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             /*
              * Moving time
              */
-            final Label label = _formToolkit.createLabel(container_Right, Messages.tour_editor_label_moving_time);
+            final Label label = _tk.createLabel(container_Right, Messages.tour_editor_label_moving_time);
             _secondColumnControls.add(label);
 
             _computedTime_Moving = new TimeDuration(container_Right);
@@ -3712,7 +3712,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             /*
              * Break time
              */
-            final Label label = _formToolkit.createLabel(container_Right, Messages.tour_editor_label_break_time);
+            final Label label = _tk.createLabel(container_Right, Messages.tour_editor_label_break_time);
             _secondColumnControls.add(label);
 
             _computedTime_Break = new TimeDuration(container_Right);
@@ -3741,7 +3741,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          {
             // label
-            _lblTimeZone = _formToolkit.createLabel(container, Messages.Tour_Editor_Label_TimeZone);
+            _lblTimeZone = _tk.createLabel(container, Messages.Tour_Editor_Label_TimeZone);
             _firstColumnControls.add(_lblTimeZone);
          }
 
@@ -3760,7 +3760,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             }));
 
-            _formToolkit.adapt(_comboTimeZone, true, false);
+            _tk.adapt(_comboTimeZone, true, false);
 
             // fill combobox
             for (final TimeZoneData timeZone : TimeTools.getAllTimeZones()) {
@@ -3804,7 +3804,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   _linkDefaultTimeZone = new Link(actionContainer, SWT.NONE);
                   _linkDefaultTimeZone.setText(Messages.Tour_Editor_Link_SetDefautTimeZone);
                   _linkDefaultTimeZone.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionTimeZone_SetDefault()));
-                  _formToolkit.adapt(_linkDefaultTimeZone, true, true);
+                  _tk.adapt(_linkDefaultTimeZone, true, true);
                }
                {
                   // link: from geo
@@ -3813,7 +3813,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   _linkGeoTimeZone.setText(Messages.Tour_Editor_Link_SetGeoTimeZone);
                   _linkGeoTimeZone.setToolTipText(Messages.Tour_Editor_Link_SetGeoTimeZone_Tooltip);
                   _linkGeoTimeZone.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionTimeZone_SetFromGeo()));
-                  _formToolkit.adapt(_linkGeoTimeZone, true, true);
+                  _tk.adapt(_linkGeoTimeZone, true, true);
                }
                {
                   // link: remove
@@ -3822,7 +3822,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   _linkRemoveTimeZone.setText(Messages.Tour_Editor_Link_RemoveTimeZone);
                   _linkRemoveTimeZone.setToolTipText(Messages.Tour_Editor_Link_RemoveTimeZone_Tooltip);
                   _linkRemoveTimeZone.addSelectionListener(widgetSelectedAdapter(selectionEvent -> actionTimeZone_Remove()));
-                  _formToolkit.adapt(_linkRemoveTimeZone, true, true);
+                  _tk.adapt(_linkRemoveTimeZone, true, true);
                }
             }
          }
@@ -3831,7 +3831,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void createUI_Section_130_Personal(final Composite parent) {
 
-      _sectionPersonal = createSection(parent, _formToolkit, Messages.tour_editor_section_personal, false, true);
+      _sectionPersonal = createSection(parent, _tk, Messages.tour_editor_section_personal, false, true);
       final Composite container = (Composite) _sectionPersonal.getClient();
       GridLayoutFactory
             .fillDefaults()//
@@ -3849,7 +3849,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private void createUI_Section_132_PersonalCol1(final Composite parent) {
 
-      final Composite container = _formToolkit.createComposite(parent);
+      final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       _firstColumnContainerControls.add(container);
@@ -3860,7 +3860,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // label
-            final Label label = _formToolkit.createLabel(container, Messages.tour_editor_label_tour_calories);
+            final Label label = _tk.createLabel(container, Messages.tour_editor_label_tour_calories);
             _firstColumnControls.add(label);
 
             // spinner
@@ -3874,7 +3874,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _spinPerson_Calories.addSelectionListener(_selectionListener);
 
             // label: kcal
-            _formToolkit.createLabel(container, VALUE_UNIT_K_CALORIES);
+            _tk.createLabel(container, VALUE_UNIT_K_CALORIES);
          }
 
          {
@@ -3882,7 +3882,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              * rest pulse
              */
             // label: Rest pulse
-            final Label label = _formToolkit.createLabel(container, Messages.tour_editor_label_rest_pulse);
+            final Label label = _tk.createLabel(container, Messages.tour_editor_label_rest_pulse);
             label.setToolTipText(Messages.tour_editor_label_rest_pulse_Tooltip);
             _firstColumnControls.add(label);
 
@@ -3901,7 +3901,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _spinPerson_RestPulse.addSelectionListener(_selectionListener);
 
             // label: bpm
-            _formToolkit.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
+            _tk.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
          }
          {
             /*
@@ -3909,7 +3909,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // label: FTP
-            final Label label = _formToolkit.createLabel(container, Messages.Tour_Editor_Label_FTP);
+            final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_FTP);
             label.setToolTipText(Messages.Tour_Editor_Label_FTP_Tooltip);
             _firstColumnControls.add(label);
 
@@ -3926,7 +3926,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _spinPerson_FTP.addSelectionListener(_selectionListener);
 
             // spacer
-            _formToolkit.createLabel(container, UI.EMPTY_STRING);
+            _tk.createLabel(container, UI.EMPTY_STRING);
          }
       }
    }
@@ -3936,7 +3936,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private void createUI_Section_134_PersonalCol2(final Composite parent) {
 
-      final Composite container = _formToolkit.createComposite(parent);
+      final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
@@ -3946,7 +3946,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // label: Weight
-            final Label label = _formToolkit.createLabel(container, Messages.Tour_Editor_Label_BodyWeight);
+            final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_BodyWeight);
             label.setToolTipText(Messages.Tour_Editor_Label_BodyWeight_Tooltip);
             _secondColumnControls.add(label);
 
@@ -3964,7 +3964,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _spinPerson_BodyWeight.addSelectionListener(_selectionListener);
 
             // label: unit
-            _lblPerson_BodyWeightUnit = _formToolkit.createLabel(container, UI.UNIT_LABEL_WEIGHT);
+            _lblPerson_BodyWeightUnit = _tk.createLabel(container, UI.UNIT_LABEL_WEIGHT);
          }
          {
             /*
@@ -3972,7 +3972,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // label: fat
-            final Label label = _formToolkit.createLabel(container, Messages.Tour_Editor_Label_BodyFat);
+            final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_BodyFat);
             label.setToolTipText(Messages.Tour_Editor_Label_BodyFat_Tooltip);
             _secondColumnControls.add(label);
 
@@ -3990,14 +3990,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _spinPerson_BodyFat.addSelectionListener(_selectionListener);
 
             // label: unit
-            _lblPerson_BodyFatUnit = _formToolkit.createLabel(container, UI.UNIT_PERCENT);
+            _lblPerson_BodyFatUnit = _tk.createLabel(container, UI.UNIT_PERCENT);
          }
       }
    }
 
    private void createUI_Section_140_Weather(final Composite parent) {
 
-      _sectionWeather = createSection(parent, _formToolkit, Messages.tour_editor_section_weather, false, true);
+      _sectionWeather = createSection(parent, _tk, Messages.tour_editor_section_weather, false, true);
       final Composite container = (Composite) _sectionWeather.getClient();
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
@@ -4021,7 +4021,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void createUI_Section_141_Weather_Description(final Composite parent) {
 
-      final Composite container = _formToolkit.createComposite(parent);
+      final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
@@ -4041,10 +4041,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             }
             onSelect_Weather_Text();
          }));
-         _formToolkit.adapt(_linkWeather, true, true);
+         _tk.adapt(_linkWeather, true, true);
          _firstColumnControls.add(_linkWeather);
 
-         _txtWeather = _formToolkit.createText(
+         _txtWeather = _tk.createText(
                container, //
                UI.EMPTY_STRING,
                SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
@@ -4063,7 +4063,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void createUI_Section_142_Weather_Wind_Col1(final Composite parent) {
 
-      final Composite container = _formToolkit.createComposite(parent);
+      final Composite container = _tk.createComposite(parent);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       _firstColumnContainerControls.add(container);
@@ -4074,7 +4074,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // label
-            final Label label = _formToolkit.createLabel(container, Messages.tour_editor_label_wind_speed);
+            final Label label = _tk.createLabel(container, Messages.tour_editor_label_wind_speed);
             label.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
             _firstColumnControls.add(label);
 
@@ -4114,7 +4114,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             });
 
             // label: km/h, mi/h
-            _lblSpeedUnit = _formToolkit.createLabel(container, UI.UNIT_LABEL_SPEED);
+            _lblSpeedUnit = _tk.createLabel(container, UI.UNIT_LABEL_SPEED);
          }
          {
             /*
@@ -4122,13 +4122,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // label
-            final Label label = _formToolkit.createLabel(container, Messages.tour_editor_label_wind_direction);
+            final Label label = _tk.createLabel(container, Messages.tour_editor_label_wind_direction);
             label.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
             _firstColumnControls.add(label);
 
             // combo: wind direction text
             _comboWeather_WindDirectionText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-            _formToolkit.adapt(_comboWeather_WindDirectionText, true, false);
+            _tk.adapt(_comboWeather_WindDirectionText, true, false);
             GridDataFactory
                   .fillDefaults()//
                   .align(SWT.BEGINNING, SWT.FILL)
@@ -4159,7 +4159,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void createUI_Section_143_Weather_Wind_Col2(final Composite parent) {
 
-      final Composite container = _formToolkit.createComposite(parent);
+      final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
@@ -4174,7 +4174,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .align(SWT.BEGINNING, SWT.FILL)
                   .span(2, 1)
                   .applyTo(_comboWeather_WindSpeedText);
-            _formToolkit.adapt(_comboWeather_WindSpeedText, true, false);
+            _tk.adapt(_comboWeather_WindSpeedText, true, false);
             _comboWeather_WindSpeedText.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
             _comboWeather_WindSpeedText.setVisibleItemCount(20);
             _comboWeather_WindSpeedText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
@@ -4233,7 +4233,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             });
 
             // label: direction unit = degree
-            _formToolkit.createLabel(container, Messages.Tour_Editor_Label_WindDirection_Unit);
+            _tk.createLabel(container, Messages.Tour_Editor_Label_WindDirection_Unit);
          }
       }
    }
@@ -4245,7 +4245,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       Label label;
 
-      final Composite container = _formToolkit.createComposite(parent);
+      final Composite container = _tk.createComposite(parent);
       GridLayoutFactory.fillDefaults()
             .numColumns(3)
 //            .spacing(5, 5)
@@ -4259,7 +4259,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // label
-            label = _formToolkit.createLabel(container, Messages.Tour_Editor_Label_Temperature);
+            label = _tk.createLabel(container, Messages.Tour_Editor_Label_Temperature);
             label.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
             _firstColumnControls.add(label);
 
@@ -4281,7 +4281,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _spinWeather_Temperature_Average.addMouseWheelListener(_mouseWheelListener_Temperature);
 
             // label: celsius, fahrenheit
-            _lblWeather_TemperatureUnit_Avg = _formToolkit.createLabel(container, UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+            _lblWeather_TemperatureUnit_Avg = _tk.createLabel(container, UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
             _lblWeather_TemperatureUnit_Avg.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Tooltip);
          }
          {
@@ -4309,7 +4309,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .applyTo(_spinWeather_Temperature_Max);
 
             // unit
-            _lblWeather_TemperatureUnit_Max = _formToolkit.createLabel(container, UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+            _lblWeather_TemperatureUnit_Max = _tk.createLabel(container, UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
             _lblWeather_TemperatureUnit_Max.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Tooltip);
          }
          {
@@ -4337,7 +4337,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .applyTo(_spinWeather_Temperature_Min);
 
             // unit
-            _lblWeather_TemperatureUnit_Min = _formToolkit.createLabel(container, UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+            _lblWeather_TemperatureUnit_Min = _tk.createLabel(container, UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
             _lblWeather_TemperatureUnit_Min.setToolTipText(Messages.Tour_Editor_Label_Temperature_Min_Tooltip);
          }
          {
@@ -4365,7 +4365,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .applyTo(_spinWeather_Temperature_WindChill);
 
             // unit
-            _lblWeather_TemperatureUnit_WindChill = _formToolkit.createLabel(container, UI.SYMBOL_TILDE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+            _lblWeather_TemperatureUnit_WindChill = _tk.createLabel(container, UI.SYMBOL_TILDE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
             _lblWeather_TemperatureUnit_WindChill.setToolTipText(Messages.Tour_Editor_Label_Temperature_WindChill_Tooltip);
          }
       }
@@ -4376,7 +4376,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private void createUI_Section_144_Weather_Temperature_Device_Col2(final Composite parent) {
 
-      final Composite container = _formToolkit.createComposite(parent);
+      final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
@@ -4386,7 +4386,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // spinner
-            _txtWeather_Temperature_Average_Device = _formToolkit.createText(
+            _txtWeather_Temperature_Average_Device = _tk.createText(
                   container,
                   UI.EMPTY_STRING,
                   SWT.TRAIL);
@@ -4398,7 +4398,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _txtWeather_Temperature_Average_Device.setEnabled(false);
 
             // label: celsius, fahrenheit
-            _lblWeather_TemperatureUnit_Avg = _formToolkit.createLabel(
+            _lblWeather_TemperatureUnit_Avg = _tk.createLabel(
                   container,
                   UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
             _lblWeather_TemperatureUnit_Avg.setToolTipText(
@@ -4410,7 +4410,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // spinner
-            _txtWeather_Temperature_Max_Device = _formToolkit.createText(
+            _txtWeather_Temperature_Max_Device = _tk.createText(
                   container,
                   UI.EMPTY_STRING,
                   SWT.TRAIL);
@@ -4422,7 +4422,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .applyTo(_txtWeather_Temperature_Max_Device);
 
             // unit
-            _lblWeather_TemperatureUnit_Max = _formToolkit.createLabel(
+            _lblWeather_TemperatureUnit_Max = _tk.createLabel(
                   container,
                   UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
             _lblWeather_TemperatureUnit_Max.setToolTipText(
@@ -4434,7 +4434,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // spinner
-            _txtWeather_Temperature_Min_Device = _formToolkit.createText(
+            _txtWeather_Temperature_Min_Device = _tk.createText(
                   container,
                   UI.EMPTY_STRING,
                   SWT.TRAIL);
@@ -4446,7 +4446,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .applyTo(_txtWeather_Temperature_Min_Device);
 
             // unit
-            _lblWeather_TemperatureUnit_Min = _formToolkit.createLabel(
+            _lblWeather_TemperatureUnit_Min = _tk.createLabel(
                   container,
                   UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
             _lblWeather_TemperatureUnit_Min.setToolTipText(
@@ -4457,7 +4457,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void createUI_Section_147_Weather_Other_Col1(final Composite parent) {
 
-      final Composite container = _formToolkit.createComposite(parent);
+      final Composite container = _tk.createComposite(parent);
       GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       _firstColumnContainerControls.add(container);
@@ -4466,7 +4466,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
           * Pressure
           */
          // label
-         Label label = _formToolkit.createLabel(container, Messages.Tour_Editor_Label_AirPressure);
+         Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_AirPressure);
          label.setToolTipText(Messages.Tour_Editor_Label_AirPressure_Tooltip);
          _firstColumnControls.add(label);
 
@@ -4484,7 +4484,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                .applyTo(_spinWeather_PressureValue);
 
          // label: mb, inHg
-         _lblWeather_PressureUnit = _formToolkit.createLabel(container, UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG);
+         _lblWeather_PressureUnit = _tk.createLabel(container, UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG);
          GridDataFactory.fillDefaults()
                .grab(true, false)
                .align(SWT.FILL, SWT.CENTER)
@@ -4502,7 +4502,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          GridLayoutFactory.fillDefaults().numColumns(3).applyTo(cloudContainer);
          {
             // label: clouds
-            final Label label = _formToolkit.createLabel(cloudContainer, Messages.tour_editor_label_clouds);
+            final Label label = _tk.createLabel(cloudContainer, Messages.tour_editor_label_clouds);
             label.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
 
             // icon: clouds
@@ -4518,7 +4518,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // combo: clouds
          _comboWeather_Clouds = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
          GridDataFactory.fillDefaults().span(2, 1).applyTo(_comboWeather_Clouds);
-         _formToolkit.adapt(_comboWeather_Clouds, true, false);
+         _tk.adapt(_comboWeather_Clouds, true, false);
          _comboWeather_Clouds.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
          _comboWeather_Clouds.setVisibleItemCount(10);
          _comboWeather_Clouds.addModifyListener(_modifyListener);
@@ -4541,7 +4541,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void createUI_Section_148_Weather_Other_Col2(final Composite parent) {
 
-      final Composite container = _formToolkit.createComposite(parent);
+      final Composite container = _tk.createComposite(parent);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
@@ -4549,7 +4549,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
           * Humidity
           */
          // label
-         Label label = _formToolkit.createLabel(container, Messages.Tour_Editor_Label_Humidity);
+         Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Humidity);
          label.setToolTipText(Messages.Tour_Editor_Label_Humidity_Tooltip);
          _secondColumnControls.add(label);
 
@@ -4568,14 +4568,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                .applyTo(_spinWeather_Humidity);
 
          // label: mm, inches
-         label = _formToolkit.createLabel(container, UI.UNIT_PERCENT);
+         label = _tk.createLabel(container, UI.UNIT_PERCENT);
       }
       {
          /*
           * Precipitation
           */
          // label
-         final Label label = _formToolkit.createLabel(container, Messages.Tour_Editor_Label_Precipitation);
+         final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Precipitation);
          label.setToolTipText(Messages.Tour_Editor_Label_Precipitation_Tooltip);
          _secondColumnControls.add(label);
 
@@ -4593,13 +4593,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                .applyTo(_spinWeather_PrecipitationValue);
 
          // label: mm, inches
-         _lblWeather_PrecipitationUnit = _formToolkit.createLabel(container, UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+         _lblWeather_PrecipitationUnit = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       }
    }
 
    private void createUI_Section_150_Characteristics(final Composite parent) {
 
-      _sectionCharacteristics = createSection(parent, _formToolkit, Messages.tour_editor_section_characteristics, false, true);
+      _sectionCharacteristics = createSection(parent, _tk, Messages.tour_editor_section_characteristics, false, true);
       final Composite container = (Composite) _sectionCharacteristics.getClient();
       GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
 //    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
@@ -4615,10 +4615,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .align(SWT.BEGINNING, SWT.BEGINNING)
                   .applyTo(_linkTag);
             _linkTag.addSelectionListener(widgetSelectedAdapter(selectionEvent -> UI.openControlMenu(_linkTag)));
-            _formToolkit.adapt(_linkTag, true, true);
+            _tk.adapt(_linkTag, true, true);
             _firstColumnControls.add(_linkTag);
 
-            _lblTags = _formToolkit.createLabel(container, UI.EMPTY_STRING, SWT.WRAP);
+            _lblTags = _tk.createLabel(container, UI.EMPTY_STRING, SWT.WRAP);
             GridDataFactory
                   .fillDefaults()//
                   .grab(true, true)
@@ -4637,7 +4637,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _linkTourType = new Link(container, SWT.NONE);
             _linkTourType.setText(Messages.tour_editor_label_tour_type);
             _linkTourType.addSelectionListener(widgetSelectedAdapter(selectionEvent -> UI.openControlMenu(_linkTourType)));
-            _formToolkit.adapt(_linkTourType, true, true);
+            _tk.adapt(_linkTourType, true, true);
             _firstColumnControls.add(_linkTourType);
 
             _lblTourType = new CLabel(container, SWT.NONE);
@@ -4653,7 +4653,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // label
-            final Label label = _formToolkit.createLabel(container,
+            final Label label = _tk.createLabel(container,
                   Messages.Tour_Editor_Label_Cadence);
             label.setToolTipText(Messages.Tour_Editor_Label_Cadence_Tooltip);
             _firstColumnControls.add(label);
@@ -4674,7 +4674,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void createUI_SectionSeparator(final Composite parent) {
 
-      final Composite sep = _formToolkit.createComposite(parent);
+      final Composite sep = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 5).applyTo(sep);
    }
 
@@ -4693,14 +4693,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       {
          _tourContainer = new Composite(_tab1Container, SWT.NONE);
          GridDataFactory.fillDefaults().applyTo(_tourContainer);
-         _formToolkit.adapt(_tourContainer);
+         _tk.adapt(_tourContainer);
          GridLayoutFactory.swtDefaults().applyTo(_tourContainer);
 //       _tourContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_BLUE));
 
          // set content for scrolled composite
          _tab1Container.setContent(_tourContainer);
 
-         _formToolkit.setBorderStyle(SWT.BORDER);
+         _tk.setBorderStyle(SWT.BORDER);
          {
             createUI_Section_110_Title(_tourContainer);
             createUI_SectionSeparator(_tourContainer);
@@ -6114,8 +6114,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
       TourManager.getInstance().removeTourSaveListener(_tourSaveListener);
 
-      if (_formToolkit != null) {
-         _formToolkit.dispose();
+      if (_tk != null) {
+         _tk.dispose();
       }
 
       for (final Action_SetSwimStyle swimStyleAction : _allSwimStyleActions) {
