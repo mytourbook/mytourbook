@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.importdata;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+import static org.eclipse.swt.events.FocusListener.focusLostAdapter;
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.text.NumberFormat;
@@ -47,6 +50,7 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.CadenceMultiplier;
+import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ComboViewerCadence;
 import net.tourbook.ui.views.rawData.RawDataView;
@@ -86,18 +90,16 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -156,19 +158,19 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    //
    private IPropertyChangeListener      _prefChangeListener;
    //
-   private SelectionAdapter             _defaultModify_Listener;
+   private SelectionListener            _defaultModify_Listener;
    private MouseWheelListener           _defaultModify_MouseWheelListener;
    private MouseWheelListener           _defaultMouseWheelListener;
-   private SelectionAdapter             _icSelectionListener;
+   private SelectionListener            _icSelectionListener;
    private FocusListener                _ic_FolderFocusListener;
-   private KeyAdapter                   _ic_FolderKeyListener;
+   private KeyListener                  _ic_FolderKeyListener;
    private ModifyListener               _ic_FolderModifyListener;
    private ModifyListener               _icModifyListener;
    private ModifyListener               _ilModifyListener;
-   private SelectionAdapter             _ilSelectionListener;
-   private SelectionAdapter             _liveUpdateListener;
+   private SelectionListener            _ilSelectionListener;
+   private SelectionListener            _liveUpdateListener;
    private MouseWheelListener           _liveUpdateMouseWheelListener;
-   private SelectionAdapter             _speedTourTypeListener;
+   private SelectionListener            _speedTourTypeListener;
    //
    private ActionOpenPrefDialog         _actionOpenTourTypePrefs;
    private ActionResetToDefaults        _actionRestoreDefaults;
@@ -421,7 +423,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          onSpeed_IL_TT_Remove(_speedTTIndex);
       }
 
-      public void setData(final String key, final int speedTTIndex) {
+      public void setData(final int speedTTIndex) {
 
          _speedTTIndex = speedTTIndex;
       }
@@ -1089,12 +1091,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
              */
             _btnIC_New = new Button(container, SWT.NONE);
             _btnIC_New.setText(Messages.App_Action_New);
-            _btnIC_New.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onIC_Add(false);
-               }
-            });
+            _btnIC_New.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIC_Add(false)));
             setButtonLayoutData(_btnIC_New);
          }
 
@@ -1104,12 +1101,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
              */
             _btnIC_Duplicate = new Button(container, SWT.NONE);
             _btnIC_Duplicate.setText(Messages.App_Action_Duplicate);
-            _btnIC_Duplicate.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onIC_Add(true);
-               }
-            });
+            _btnIC_Duplicate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIC_Add(true)));
             setButtonLayoutData(_btnIC_Duplicate);
          }
 
@@ -1119,12 +1111,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
              */
             _btnIC_Remove = new Button(container, SWT.NONE);
             _btnIC_Remove.setText(Messages.App_Action_Remove_Immediate);
-            _btnIC_Remove.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onIC_Remove();
-               }
-            });
+            _btnIC_Remove.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIC_Remove()));
             setButtonLayoutData(_btnIC_Remove);
          }
 
@@ -1202,14 +1189,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _chkIC_CreateBackup.setText(Messages.Dialog_ImportConfig_Checkbox_CreateBackup);
          _chkIC_CreateBackup.setToolTipText(Messages.Dialog_ImportConfig_Checkbox_CreateBackup_Tooltip);
          _chkIC_CreateBackup.addSelectionListener(_icSelectionListener);
-         _chkIC_CreateBackup.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               if (_chkIC_CreateBackup.getSelection()) {
-                  _comboIC_BackupFolder.setFocus();
-               }
+         _chkIC_CreateBackup.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            if (_chkIC_CreateBackup.getSelection()) {
+               _comboIC_BackupFolder.setFocus();
             }
-         });
+         }));
          GridDataFactory.fillDefaults()
                .span(2, 1)
                .indent(0, 10)
@@ -1255,12 +1239,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           */
          _btnIC_SelectBackupFolder = new Button(container, SWT.PUSH);
          _btnIC_SelectBackupFolder.setText(Messages.app_btn_browse);
-         _btnIC_SelectBackupFolder.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelect_IC_Folder_Backup();
-            }
-         });
+         _btnIC_SelectBackupFolder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_IC_Folder_Backup()));
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(_btnIC_SelectBackupFolder);
@@ -1384,12 +1363,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _btnIC_SelectDeviceFolder = new Button(container, SWT.PUSH);
          _btnIC_SelectDeviceFolder.setText(Messages.app_btn_browse);
          _btnIC_SelectDeviceFolder.setData(_comboIC_DeviceFolder);
-         _btnIC_SelectDeviceFolder.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelect_IC_Folder_Device();
-            }
-         });
+         _btnIC_SelectDeviceFolder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_IC_Folder_Device()));
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(_btnIC_SelectDeviceFolder);
@@ -1769,12 +1743,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                TourTypeImage.getTourTypeImage(TourType.IMAGE_KEY_DIALOG_SELECTION));
          _btnIL_NewOne.setText(Messages.Dialog_ImportConfig_Action_NewOneTourType);
          _btnIL_NewOne.setToolTipText(Messages.Dialog_ImportConfig_Action_NewOneTourType_Tooltip);
-         _btnIL_NewOne.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               UI.openControlMenu(_btnIL_NewOne);
-            }
-         });
+         _btnIL_NewOne.addSelectionListener(widgetSelectedAdapter(selectionEvent -> UI.openControlMenu(_btnIL_NewOne)));
          setButtonLayoutData(_btnIL_NewOne);
 
          /*
@@ -1791,12 +1760,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           */
          _btnIL_New = new Button(container, SWT.NONE);
          _btnIL_New.setText(Messages.App_Action_New);
-         _btnIL_New.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onIL_Add(false);
-            }
-         });
+         _btnIL_New.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIL_Add(false)));
          setButtonLayoutData(_btnIL_New);
 
          /*
@@ -1804,12 +1768,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           */
          _btnIL_Duplicate = new Button(container, SWT.NONE);
          _btnIL_Duplicate.setText(Messages.App_Action_Duplicate);
-         _btnIL_Duplicate.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onIL_Add(true);
-            }
-         });
+         _btnIL_Duplicate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIL_Add(true)));
          setButtonLayoutData(_btnIL_Duplicate);
 
          /*
@@ -1817,12 +1776,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
           */
          _btnIL_Remove = new Button(container, SWT.NONE);
          _btnIL_Remove.setText(Messages.App_Action_Remove_Immediate);
-         _btnIL_Remove.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onIL_Remove();
-            }
-         });
+         _btnIL_Remove.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onIL_Remove()));
          setButtonLayoutData(_btnIL_Remove);
 
          // align to the end
@@ -2205,12 +2159,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             .applyTo(speedTTContainer);
 
       _speedTourType_ScrolledContainer.setContent(speedTTContainer);
-      _speedTourType_ScrolledContainer.addControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent e) {
-            _speedTourType_ScrolledContainer.setMinSize(speedTTContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-         }
-      });
+      _speedTourType_ScrolledContainer.addControlListener(controlResizedAdapter(ControlEvent -> _speedTourType_ScrolledContainer.setMinSize(
+            speedTTContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT))));
 
       return speedTTContainer;
    }
@@ -2343,13 +2293,11 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                updateUI_TemperatureAdjustmentDuration();
                onIL_Modified();
             });
-            _spinnerIL_TemperatureAdjustmentDuration.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  updateUI_TemperatureAdjustmentDuration();
-                  onIL_Modified();
-               }
-            });
+            _spinnerIL_TemperatureAdjustmentDuration.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> {
+                     updateUI_TemperatureAdjustmentDuration();
+                     onIL_Modified();
+                  }));
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(_spinnerIL_TemperatureAdjustmentDuration);
@@ -3354,8 +3302,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       final boolean isILSelected = _selectedIL != null;
       final boolean isLastMarkerSelected = isILSelected && _chkIL_SetLastMarker.getSelection();
       final boolean isAdjustTemperature = isILSelected && _chkIL_AdjustTemperature.getSelection();
-      final boolean isRetrieveWeatherData = _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL) &&
-            StringUtils.hasContent(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
+      final boolean isWeatherRetrievalActivated = TourManager.isWeatherRetrievalActivated();
 
       boolean isSetTourType = isILSelected && _chkIL_SetTourType.getSelection();
 
@@ -3393,20 +3340,12 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
                   for (final Label label : _lblTT_Speed_TourTypeIcon) {
 
-                     if (isILSelected) {
+                     final Integer speedTTIndex = (Integer) label.getData(DATA_KEY_SPEED_TOUR_TYPE_INDEX);
 
-                        final Integer speedTTIndex = (Integer) label.getData(DATA_KEY_SPEED_TOUR_TYPE_INDEX);
+                     final SpeedTourType speedTT = _selectedIL.speedTourTypes.get(speedTTIndex);
+                     final long tourTypeId = speedTT.tourTypeId;
 
-                        final SpeedTourType speedTT = _selectedIL.speedTourTypes.get(speedTTIndex);
-                        final long tourTypeId = speedTT.tourTypeId;
-
-                        label.setImage(TourTypeImage.getTourTypeImage(tourTypeId));
-
-                     } else {
-
-                        // the disabled image looks very ugly
-                        label.setImage(null);
-                     }
+                     label.setImage(TourTypeImage.getTourTypeImage(tourTypeId));
                   }
                }
 
@@ -3460,7 +3399,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _spinnerIL_TemperatureAdjustmentDuration.setEnabled(isAdjustTemperature);
 
       // Retrieve weather data
-      _chkIL_RetrieveWeatherData.setEnabled(isRetrieveWeatherData);
+      _chkIL_RetrieveWeatherData.setEnabled(isWeatherRetrievalActivated);
 
       _ilViewer.getTable().setEnabled(isLauncherAvailable);
 
@@ -3632,57 +3571,34 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       /*
        * IC listener
        */
-      _icSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onIC_Modified();
-            enable_IC_Controls();
-         }
-      };
+      _icSelectionListener = widgetSelectedAdapter(selectionEvent -> {
+         onIC_Modified();
+         enable_IC_Controls();
+      });
 
       _icModifyListener = modifyEvent -> onIC_Modified();
 
       /*
        * Path listener
        */
-      _ic_FolderFocusListener = new FocusAdapter() {
-         @Override
-         public void focusLost(final FocusEvent e) {
-            onIC_Folder_FocusLost(e);
-         }
-      };
+      _ic_FolderFocusListener = focusLostAdapter(this::onIC_Folder_FocusLost);
       _ic_FolderModifyListener = modifyEvent -> {
          onIC_Folder_Modified(modifyEvent);
          onIC_Modified();
       };
-      _ic_FolderKeyListener = new KeyAdapter() {
-         @Override
-         public void keyPressed(final KeyEvent e) {
-            onIC_Folder_KeyPressed(e);
-         }
-      };
+      _ic_FolderKeyListener = keyPressedAdapter(this::onIC_Folder_KeyPressed);
 
       /*
        * IL listener
        */
       _ilModifyListener = modifyEvent -> onIL_Modified();
 
-      _ilSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onIL_Modified();
-         }
-      };
+      _ilSelectionListener = widgetSelectedAdapter(selectionEvent -> onIL_Modified());
 
       /*
        * Field listener
        */
-      _liveUpdateListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            doLiveUpdate();
-         }
-      };
+      _liveUpdateListener = widgetSelectedAdapter(selectionEvent -> doLiveUpdate());
       _liveUpdateMouseWheelListener = mouseEvent -> {
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
          doLiveUpdate();
@@ -3693,24 +3609,15 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
        */
       _defaultMouseWheelListener = UI::adjustSpinnerValueOnMouseScroll;
 
-      _speedTourTypeListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
-            UI.openControlMenu((Link) event.widget);
-         }
-      };
+      _speedTourTypeListener = widgetSelectedAdapter(selectionEvent -> UI.openControlMenu((Link) selectionEvent.widget));
 
       /*
        * Default modify listener
        */
-      _defaultModify_Listener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-
-            onIL_Modified();
-            enable_IL_Controls();
-         }
-      };
+      _defaultModify_Listener = widgetSelectedAdapter(selectionEvent -> {
+         onIL_Modified();
+         enable_IL_Controls();
+      });
 
       _defaultModify_MouseWheelListener = mouseEvent -> {
 
@@ -4810,7 +4717,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
                   linkTourType.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
                   spinnerAvgSpeed.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
                   comboCadence.setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
-                  _actionTTSpeed_Delete[speedTTIndex].setData(DATA_KEY_SPEED_TOUR_TYPE_INDEX, speedTTIndex);
+                  _actionTTSpeed_Delete[speedTTIndex].setData(speedTTIndex);
 
                }
             }

@@ -6543,7 +6543,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Wind_DirectionValue.setEnabled(canEdit &&
             _comboWeather_WindDirectionText.getSelectionIndex() > 0);
       _spinWeather_Wind_SpeedValue.setEnabled(canEdit);
-      _txtWeather.setEnabled(canEdit);
+      _txtWeather.setEnabled(canEdit && isWeatherRetrievalActivated);
 
       _comboCadence.getCombo().setEnabled(canEdit);
 
