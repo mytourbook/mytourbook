@@ -57,7 +57,7 @@ public class OpenWeatherMapRetrieverTests {
             + "LongsPeak-Manual-OpenWeatherMapResponse.json"); //$NON-NLS-1$
 
       final String url = OAuth2Constants.HEROKU_APP_URL
-            + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&dt=1646182701"; //$NON-NLS-1$
+            + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&dt=1646157501"; //$NON-NLS-1$
       httpClientMock.onGet(url)
             .doReturn(openWeatherMapResponse);
       final Field field = OpenWeatherMapRetriever.class
@@ -79,14 +79,14 @@ public class OpenWeatherMapRetrieverTests {
 
       assertEquals("clear sky", tour.getWeather()); //$NON-NLS-1$
       assertEquals("weather-sunny", tour.getWeather_Clouds()); //$NON-NLS-1$
-      assertEquals(5.09f, tour.getWeather_Temperature_Average());
-      assertEquals(1.0, tour.getWeather_Wind_Speed());
-      assertEquals(250.0, tour.getWeather_Wind_Direction());
-      assertEquals(43.0, tour.getWeather_Humidity());
+      assertEquals(0.38f, tour.getWeather_Temperature_Average());
+      assertEquals(3.0, tour.getWeather_Wind_Speed());
+      assertEquals(259.0, tour.getWeather_Wind_Direction());
+      assertEquals(46.0, tour.getWeather_Humidity());
       assertEquals(0, tour.getWeather_Precipitation());
-      assertEquals(1015.0, tour.getWeather_Pressure());
+      assertEquals(1022.0, tour.getWeather_Pressure());
       assertEquals(5.78f, tour.getWeather_Temperature_Max());
-      assertEquals(3.97f, tour.getWeather_Temperature_Min());
-      assertEquals(4.43f, tour.getWeather_Temperature_WindChill());
+      assertEquals(-9.03f, tour.getWeather_Temperature_Min());
+      assertEquals(-2.77f, tour.getWeather_Temperature_WindChill());
    }
 }
