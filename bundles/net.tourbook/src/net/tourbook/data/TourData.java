@@ -531,7 +531,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Is <code>true</code> when the weather data below is from the weather API and not
     * manually entered or from the device.
     */
-   private boolean               isWeatherDataFromProvider = false;
+   private boolean               isWeatherDataFromProvider;
 
    private int                   weather_Wind_Direction  = -1;                         // db-version 8
    private int                   weather_Wind_Speed;                                   // db-version 8
