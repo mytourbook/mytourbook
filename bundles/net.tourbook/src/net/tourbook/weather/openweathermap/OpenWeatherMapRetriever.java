@@ -78,12 +78,12 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
             continue;
          }
 
-         final String temperature = hourly.getTemp() + UI.UNIT_LABEL_TEMPERATURE;
+         final String temperature = UI.convertTemperatureFromMetric((float) hourly.getTemp()) + UI.UNIT_LABEL_TEMPERATURE;
          final String feelsLike = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
                UI.SPACE +
-               Math.round(hourly.feels_like) +
+               UI.convertTemperatureFromMetric((float) hourly.feels_like) +
                UI.UNIT_LABEL_TEMPERATURE;
-         final String wind = hourly.wind_speed + UI.UNIT_LABEL_SPEED +
+         final String wind = UI.convertSpeed_FromMetric((float) hourly.wind_speed) + UI.UNIT_LABEL_SPEED +
                UI.SPACE + Messages.Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection +
                UI.SPACE + hourly.wind_deg + UI.SYMBOL_DEGREE;
          final String humidity = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Humidity +
@@ -91,7 +91,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                hourly.humidity;
          final String precipitation = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation +
                UI.SPACE +
-               hourly.rain;
+               UI.convertPrecipitation_FromMetric(hourly.rain);
 
          final TourDateTime tourDateTime = TimeTools.createTourDateTime(hourly.dt * 1000L, tour.getTimeZoneId());
          final String fullWeatherData = tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME +
