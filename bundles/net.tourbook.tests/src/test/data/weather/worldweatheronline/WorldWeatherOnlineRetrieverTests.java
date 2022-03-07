@@ -54,8 +54,9 @@ public class WorldWeatherOnlineRetrieverTests {
 
       final String worldWeatherOnlineResponse = Comparison.readFileContent(WORLDWEATHERONLINE_FILE_PATH
             + "LongsPeak-Manual-WorldWeatherOnlineResponse.json"); //$NON-NLS-1$
-      httpClientMock.onGet(
-            "http://api.worldweatheronline.com/premium/v1/past-weather.ashx?key=&q=40.263996,-105.58854099999999&date=2020-07-04&tp=1&format=json&includelocation=yes&extra=utcDateTime") //$NON-NLS-1$
+      final String url =
+            "http://api.worldweatheronline.com/premium/v1/past-weather.ashx?key=&q=40.263996,-105.58854099999999&date=2020-07-04&tp=1&format=json&includelocation=yes&extra=utcDateTime"; //$NON-NLS-1$
+      httpClientMock.onGet(url)
             .doReturn(worldWeatherOnlineResponse);
       final Field field = WorldWeatherOnlineRetriever.class
             .getSuperclass()
@@ -67,6 +68,7 @@ public class WorldWeatherOnlineRetrieverTests {
       historicalWeatherRetriever = new WorldWeatherOnlineRetriever(tour);
 
       assertTrue(historicalWeatherRetriever.retrieveHistoricalWeatherData());
+      httpClientMock.verify().get(url).called();
 
       assertEquals(16, tour.getWeather_Temperature_Average());
       assertEquals(9, tour.getWeather_Wind_Speed());
