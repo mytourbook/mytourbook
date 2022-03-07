@@ -38,7 +38,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    private static final String baseApiUrl     = HEROKU_APP_URL + "/openweathermap/timemachine";       //$NON-NLS-1$
 
    private LatLng              searchAreaCenter;
-   private long                startDate;
+   private long                date;
 
    public OpenWeatherMapRetriever(final TourData tourData) {
 
@@ -46,7 +46,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(tour);
 
-      startDate = tour.getTourStartTimeMS() / 1000;
+      final long tourStartTime = tour.getTourStartTimeMS();
+      final long tourMiddleTime = tourStartTime + ((tour.getTourEndTimeMS() - tourStartTime) / 2);
+      date = tourMiddleTime / 1000;
    }
 
    public static String getBaseApiUrl() {
@@ -68,7 +70,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          uriBuilder.setParameter("units", "metric"); //$NON-NLS-1$ //$NON-NLS-2$
          uriBuilder.setParameter("lat", String.valueOf(searchAreaCenter.getLatitude())); //$NON-NLS-1$
          uriBuilder.setParameter("lon", String.valueOf(searchAreaCenter.getLongitude())); //$NON-NLS-1$
-         uriBuilder.setParameter("dt", String.valueOf(startDate)); //$NON-NLS-1$
+         uriBuilder.setParameter("dt", String.valueOf(date)); //$NON-NLS-1$
          weatherRequestWithParameters = uriBuilder.build().toString();
 
          return weatherRequestWithParameters;
@@ -102,15 +104,15 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       tour.setIsWeatherDataFromProvider(true);
       tour.setWeather(timeMachineResult.getWeatherDescription());
       tour.setWeather_Clouds(timeMachineResult.getWeatherType());
-      tour.setWeather_Temperature_Average(timeMachineResult.getTemperatureAverage());
-      tour.setWeather_Wind_Speed(timeMachineResult.getWindSpeed());
-      tour.setWeather_Wind_Direction(timeMachineResult.getWindDirection());
-      tour.setWeather_Humidity((short) timeMachineResult.getAverageHumidity());
-      tour.setWeather_Precipitation(timeMachineResult.getPrecipitation());
-      tour.setWeather_Pressure((short) timeMachineResult.getAveragePressure());
-      tour.setWeather_Temperature_Max(timeMachineResult.getTemperatureMax());
-      tour.setWeather_Temperature_Min(timeMachineResult.getTemperatureMin());
-      tour.setWeather_Temperature_WindChill(timeMachineResult.getWindChill());
+      tour.setWeather_Temperature_Average(timeMachineResult.getTemperatureAverage(tour));
+      tour.setWeather_Wind_Speed(timeMachineResult.getWindSpeed(tour));
+      tour.setWeather_Wind_Direction(timeMachineResult.getWindDirection(tour));
+      tour.setWeather_Humidity((short) timeMachineResult.getAverageHumidity(tour));
+      tour.setWeather_Precipitation(timeMachineResult.getPrecipitation(tour));
+      tour.setWeather_Pressure((short) timeMachineResult.getAveragePressure(tour));
+      tour.setWeather_Temperature_Max(timeMachineResult.getTemperatureMax(tour));
+      tour.setWeather_Temperature_Min(timeMachineResult.getTemperatureMin(tour));
+      tour.setWeather_Temperature_WindChill(timeMachineResult.getWindChill(tour));
 
       return true;
    }
