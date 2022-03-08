@@ -61,6 +61,7 @@ public final class TourWeatherRetriever {
                WeatherUtils.buildWeatherDataString(tourData, true, true));
 
          if (_prefStore.getBoolean(ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG)) {
+
             TourLogManager.subLog_INFO(TourManager.getTourDateTimeShort(tourData) +
                   UI.SYMBOL_COLON + UI.SPACE +
                   historicalWeatherRetriever.buildFullWeatherDataString());

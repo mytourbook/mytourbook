@@ -1222,6 +1222,7 @@ public class Messages extends NLS {
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_WeatherStation_Link;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection;
    public static String        Log_HistoricalWeatherRetriever_002_RetrievalError;
 

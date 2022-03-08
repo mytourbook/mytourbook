@@ -19,6 +19,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javadocmd.simplelatlng.LatLng;
+import com.javadocmd.simplelatlng.LatLngTool;
+import com.javadocmd.simplelatlng.util.LengthUnit;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -27,6 +29,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -41,14 +44,17 @@ import net.tourbook.weather.WeatherUtils;
 
 import org.apache.http.client.utils.URIBuilder;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.osgi.util.NLS;
 
 /**
  * A class that retrieves, for a given track, the historical weather data.
  */
 public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
-   private static final String  SYS_PROP__LOG_WEATHER_DATA = "logWeatherData";                                      //$NON-NLS-1$
-   private static final boolean _isLogWeatherData          = System.getProperty(SYS_PROP__LOG_WEATHER_DATA) != null;
+   private static final String  TOUR_TOOLTIP_FORMAT_DATEWEEKTIME = net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime;
+
+   private static final String  SYS_PROP__LOG_WEATHER_DATA       = "logWeatherData";                                         //$NON-NLS-1$
+   private static final boolean _isLogWeatherData                = System.getProperty(SYS_PROP__LOG_WEATHER_DATA) != null;
 
    static {
 
@@ -69,6 +75,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
    private final IPreferenceStore _prefStore      = TourbookPlugin.getPrefStore();
    private List<WWOHourlyResults> _rawWeatherData = null;
+   private List<NearestArea>      _nearestArea    = null;
 
    /*
     * @param tour
@@ -113,6 +120,39 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                tour.getTimeZoneId());
 
          fullWeatherDataList.add(fullWeatherData);
+      }
+
+      //Adding the weather station information
+      if (_nearestArea != null && _nearestArea.size() > 0) {
+
+         final NearestArea nearestArea = _nearestArea.get(0);
+
+         String weatherStationName = UI.EMPTY_STRING;
+         if (nearestArea.areaName != null && nearestArea.areaName.size() > 0) {
+            weatherStationName = nearestArea.areaName.get(0).value;
+         }
+
+         final LatLng weatherStationCoordinates = new LatLng(
+               Double.valueOf(nearestArea.latitude),
+               Double.valueOf(nearestArea.longitude));
+
+         final float distanceFromTour = Math.round(
+               LatLngTool.distance(
+                     searchAreaCenter,
+                     weatherStationCoordinates,
+                     LengthUnit.METER)
+                     / UI.UNIT_VALUE_DISTANCE / 1000);
+
+         String weatherStationLink = UI.EMPTY_STRING;
+         if (nearestArea.weatherUrl != null && nearestArea.weatherUrl.size() > 0) {
+            weatherStationLink = nearestArea.weatherUrl.get(0).value;
+         }
+
+         fullWeatherDataList.add(NLS.bind(
+               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_WeatherStation_Link,
+               new Object[] { weatherStationLink,
+                     weatherStationName,
+                     distanceFromTour + UI.UNIT_LABEL_DISTANCE }));
       }
 
       final String fullWeatherData = String.join(UI.COMMA_SPACE, fullWeatherDataList);
@@ -267,7 +307,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
             System.out.println(tourTitle);
          }
 
-         System.out.println(String.format(net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime,
+         System.out.println(String.format(TOUR_TOOLTIP_FORMAT_DATEWEEKTIME,
                zdtTourStart.format(TimeTools.Formatter_Date_F),
                zdtTourStart.format(TimeTools.Formatter_Time_M),
                zdtTourEnd.format(TimeTools.Formatter_Time_M),
@@ -278,6 +318,8 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
       final WeatherData weatherData = new WeatherData();
       try {
+
+         //weather
          final ObjectMapper mapper = new ObjectMapper();
          final String weatherResults = mapper.readValue(weatherDataResponse, JsonNode.class)
                .get("data") //$NON-NLS-1$
@@ -289,6 +331,14 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
          _rawWeatherData = mapper.readValue(weatherResults, new TypeReference<List<WWOHourlyResults>>() {});
 
          computeFinalWeatherData(weatherData);
+
+         //nearest_area
+         final String nearestAreaResults = mapper.readValue(weatherDataResponse, JsonNode.class)
+               .get("data") //$NON-NLS-1$
+               .get("nearest_area") //$NON-NLS-1$
+               .toString();
+
+         _nearestArea = mapper.readValue(nearestAreaResults, new TypeReference<List<NearestArea>>() {});
 
       } catch (final Exception e) {
          StatusUtil.logError(
