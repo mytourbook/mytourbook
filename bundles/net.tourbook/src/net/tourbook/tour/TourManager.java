@@ -1920,7 +1920,7 @@ public class TourManager {
          return true;
       case IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE:
          return StringUtils.hasContent(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
-      case IWeatherProvider.WEATHER_PROVIDER_NONE:
+      case IWeatherProvider.Pref_Weather_Provider_None:
       default:
          return false;
       }

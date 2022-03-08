@@ -116,7 +116,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
             linkApiSignup.setEnabled(true);
             linkApiSignup.addListener(
                   SWT.Selection,
-                  event -> WEB.openUrl(Messages.External_Link_Weather_ApiSignup));
+                  event -> WEB.openUrl("https://www.worldweatheronline.com/developer/signup.aspx")); //$NON-NLS-1$
             GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .indent(defaultHIndent, 0)

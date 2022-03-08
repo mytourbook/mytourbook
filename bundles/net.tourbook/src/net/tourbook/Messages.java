@@ -929,8 +929,6 @@ public class Messages extends NLS {
 
    public static String        External_Link_MyTourbook;
    public static String        External_Link_MyTourbook_TourChartSmoothing;
-   public static String        External_Link_Weather_ApiSignup;
-   public static String        External_Link_Weather_OpenWeatherMap;
 
    public static String        Format_hhmm;
    public static String        Format_rawdata_file_yyyy_mm_dd;
@@ -1766,6 +1764,7 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Link_ApiSignup;
    public static String        Pref_Weather_OpenWeatherMap_Link;
    public static String        Pref_Weather_OpenWeatherMap_Label_FiveDaysLimit;
+   public static String        Pref_Weather_Provider_None;
 
    public static String        Pref_Weather_WorldWeatherOnline_Label_ApiKey_Tooltip;
 
@@ -2989,8 +2988,6 @@ public class Messages extends NLS {
    public static String        UI_Label_TourIsNotSelected;
 
    public static String        ui_tour_not_defined;
-
-   public static String        Weather_Provider_None;
 
    public static String        Year_Statistic_Combo_LastYears_Tooltip;
    public static String        Year_Statistic_Combo_NumberOfYears_Tooltip;

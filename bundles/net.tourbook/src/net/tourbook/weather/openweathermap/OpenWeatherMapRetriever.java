@@ -143,18 +143,22 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          return false;
       }
 
+// SET_FORMATTING_OFF
+
       tour.setIsWeatherDataFromProvider(true);
-      tour.setWeather(_timeMachineResult.getWeatherDescription());
-      tour.setWeather_Clouds(_timeMachineResult.getWeatherType());
-      tour.setWeather_Temperature_Average(_timeMachineResult.getTemperatureAverage(tour));
-      tour.setWeather_Wind_Speed(_timeMachineResult.getWindSpeed(tour));
-      tour.setWeather_Wind_Direction(_timeMachineResult.getWindDirection(tour));
-      tour.setWeather_Humidity((short) _timeMachineResult.getAverageHumidity(tour));
-      tour.setWeather_Precipitation(_timeMachineResult.getPrecipitation(tour));
-      tour.setWeather_Pressure((short) _timeMachineResult.getAveragePressure(tour));
-      tour.setWeather_Temperature_Max(_timeMachineResult.getTemperatureMax(tour));
-      tour.setWeather_Temperature_Min(_timeMachineResult.getTemperatureMin(tour));
-      tour.setWeather_Temperature_WindChill(_timeMachineResult.getWindChill(tour));
+      tour.setWeather(                       _timeMachineResult.getWeatherDescription());
+      tour.setWeather_Clouds(                _timeMachineResult.getWeatherType());
+      tour.setWeather_Temperature_Average(   _timeMachineResult.getTemperatureAverage(tour));
+      tour.setWeather_Wind_Speed(            _timeMachineResult.getWindSpeed(tour));
+      tour.setWeather_Wind_Direction(        _timeMachineResult.getWindDirection(tour));
+      tour.setWeather_Humidity((short)       _timeMachineResult.getAverageHumidity(tour));
+      tour.setWeather_Precipitation(         _timeMachineResult.getPrecipitation(tour));
+      tour.setWeather_Pressure((short)       _timeMachineResult.getAveragePressure(tour));
+      tour.setWeather_Temperature_Max(       _timeMachineResult.getTemperatureMax(tour));
+      tour.setWeather_Temperature_Min(       _timeMachineResult.getTemperatureMin(tour));
+      tour.setWeather_Temperature_WindChill( _timeMachineResult.getWindChill(tour));
+
+// SET_FORMATTING_ON
 
       return true;
    }

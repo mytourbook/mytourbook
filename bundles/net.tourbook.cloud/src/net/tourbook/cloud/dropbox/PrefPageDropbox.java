@@ -57,13 +57,15 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String      ID            = "net.tourbook.cloud.PrefPageDropbox";       //$NON-NLS-1$
+   public static final String      ID                    = "net.tourbook.cloud.PrefPageDropbox";       //$NON-NLS-1$
 
-   public static final String      ClientId      = "vye6ci8xzzsuiao";                          //$NON-NLS-1$
+   public static final String      ClientId              = "vye6ci8xzzsuiao";                          //$NON-NLS-1$
 
-   public static final int         CALLBACK_PORT = 4917;
+   public static final int         CALLBACK_PORT         = 4917;
 
-   private IPreferenceStore        _prefStore    = Activator.getDefault().getPreferenceStore();
+   private static final String     _dropbox_WebPage_Link = "https://www.dropbox.com";                  //$NON-NLS-1$
+
+   private IPreferenceStore        _prefStore            = Activator.getDefault().getPreferenceStore();
    private IPropertyChangeListener _prefChangeListener;
    private LocalHostServer         _server;
    /*
@@ -178,11 +180,11 @@ public class PrefPageDropbox extends FieldEditorPreferencePage implements IWorkb
 
             final Link linkWebPage = new Link(_group, SWT.NONE);
             linkWebPage.setText(UI.LINK_TAG_START +
-                  Messages.PrefPage_CloudConnectivity_Dropbox_WebPage_Link +
+                  _dropbox_WebPage_Link +
                   UI.LINK_TAG_END);
             linkWebPage.setEnabled(true);
             linkWebPage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
-                  Messages.PrefPage_CloudConnectivity_Dropbox_WebPage_Link)));
+                  _dropbox_WebPage_Link)));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);
          }
          {

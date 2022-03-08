@@ -43,7 +43,7 @@ public final class TourWeatherRetriever {
       case IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE:
          historicalWeatherRetriever = new WorldWeatherOnlineRetriever(tourData);
          break;
-      case IWeatherProvider.WEATHER_PROVIDER_NONE:
+      case IWeatherProvider.Pref_Weather_Provider_None:
       default:
          break;
       }

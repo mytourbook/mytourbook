@@ -42,8 +42,8 @@ public class WeatherProvidersUI {
    private static final WeatherProvider[] WEATHER_PROVIDER                    = {
 
          new WeatherProvider(
-               IWeatherProvider.WEATHER_PROVIDER_NONE,
-               Messages.Weather_Provider_None),
+               IWeatherProvider.Pref_Weather_Provider_None,
+               Messages.Pref_Weather_Provider_None),
 
          new WeatherProvider(
                IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP,
@@ -309,7 +309,7 @@ public class WeatherProvidersUI {
       boolean areMainPreferencesVisible = true;
 
       // select weather provider page
-      if (selectedWeatherProvider.equals(IWeatherProvider.WEATHER_PROVIDER_NONE)) {
+      if (selectedWeatherProvider.equals(IWeatherProvider.Pref_Weather_Provider_None)) {
 
          _pagebookWeatherProvider.showPage(_pageNoneUI);
          areMainPreferencesVisible = false;

@@ -62,7 +62,7 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
          linkApiSignup.setEnabled(true);
          linkApiSignup.addListener(
                SWT.Selection,
-               event -> WEB.openUrl(Messages.External_Link_Weather_OpenWeatherMap));
+               event -> WEB.openUrl("https://openweathermap.org/")); //$NON-NLS-1$
          GridDataFactory.fillDefaults()
                .span(2, 1)
                .indent(defaultHIndent, 0)
@@ -83,7 +83,7 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
                         / 1000;
                   HistoricalWeatherRetriever.checkVendorConnection(
                         OpenWeatherMapRetriever.getBaseApiUrl() +
-                              "?units=metric&lat=0&lon=0&dt=" +
+                              "?units=metric&lat=0&lon=0&dt=" + //$NON-NLS-1$
                               previousHour);
                }));
          GridDataFactory.fillDefaults()

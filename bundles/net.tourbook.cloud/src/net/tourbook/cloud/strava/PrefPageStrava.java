@@ -61,20 +61,22 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String      ID                  = "net.tourbook.cloud.PrefPageStrava";                                         //$NON-NLS-1$
-   public static final int         CALLBACK_PORT       = 4918;
+   public static final String      ID                      = "net.tourbook.cloud.PrefPageStrava";                                         //$NON-NLS-1$
+   public static final int         CALLBACK_PORT           = 4918;
 
-   public static final String      ClientId            = "55536";                                                                     //$NON-NLS-1$
+   public static final String      ClientId                = "55536";                                                                     //$NON-NLS-1$
 
-   private IPreferenceStore        _prefStore          = Activator.getDefault().getPreferenceStore();
+   private static final String     _stravaApp_WebPage_Link = "https://wwww.strava.com";                                                   //$NON-NLS-1$
+   private IPreferenceStore        _prefStore              = Activator.getDefault().getPreferenceStore();
    private IPropertyChangeListener _prefChangeListener;
    private SelectionListener       _defaultSelectionListener;
-   private LocalHostServer         _server;
 
+   private LocalHostServer         _server;
    private String                  _athleteId;
+
    private long                    _accessTokenExpiresAt;
 
-   private Image                   _imageStravaConnect = Activator.getImageDescriptor(CloudImages.Cloud_Strava_Connect).createImage();
+   private Image                   _imageStravaConnect     = Activator.getImageDescriptor(CloudImages.Cloud_Strava_Connect).createImage();
 
    /*
     * UI controls
@@ -212,10 +214,10 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             GridDataFactory.fillDefaults().applyTo(labelWebPage);
 
             final Link linkWebPage = new Link(group, SWT.NONE);
-            linkWebPage.setText(UI.LINK_TAG_START + Messages.PrefPage_AccountInformation_Link_Strava_WebPage + UI.LINK_TAG_END);
+            linkWebPage.setText(UI.LINK_TAG_START + _stravaApp_WebPage_Link + UI.LINK_TAG_END);
             linkWebPage.setEnabled(true);
             linkWebPage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
-                  Messages.PrefPage_AccountInformation_Link_Strava_WebPage)));
+                  _stravaApp_WebPage_Link)));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);
          }
          {
