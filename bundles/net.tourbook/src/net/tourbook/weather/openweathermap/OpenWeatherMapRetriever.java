@@ -92,7 +92,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          fullWeatherDataList.add(fullWeatherData);
       }
 
-      final String fullWeatherData = String.join(UI.COMMA_SPACE, fullWeatherDataList);
+      final String fullWeatherData = String.join(
+            UI.COMMA_SPACE + net.tourbook.ui.UI.SYSTEM_NEW_LINE,
+            fullWeatherDataList);
 
       return fullWeatherData;
    }

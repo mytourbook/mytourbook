@@ -33,7 +33,6 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -108,7 +107,6 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
          final long hourlyEpochSeconds = hourly.getEpochSeconds(tour.getTimeZoneIdWithDefault());
 
-         final TourDateTime tourDateTime = TimeTools.createTourDateTime(hourlyEpochSeconds * 1000L, tour.getTimeZoneId());
          final String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                hourly.getTempC(),
                hourly.getFeelsLikeC(),
@@ -116,7 +114,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                hourly.getWinddirDegree(),
                hourly.getHumidity(),
                hourly.getPrecipMM(),
-               tourDateTime.tourZonedDateTime.getHour(),
+               hourlyEpochSeconds,
                tour.getTimeZoneId());
 
          fullWeatherDataList.add(fullWeatherData);
@@ -155,7 +153,9 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                      distanceFromTour + UI.UNIT_LABEL_DISTANCE }));
       }
 
-      final String fullWeatherData = String.join(UI.COMMA_SPACE, fullWeatherDataList);
+      final String fullWeatherData = String.join(
+            UI.COMMA_SPACE + net.tourbook.ui.UI.SYSTEM_NEW_LINE,
+            fullWeatherDataList);
 
       return fullWeatherData;
    }

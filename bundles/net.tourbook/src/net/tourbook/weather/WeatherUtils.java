@@ -48,6 +48,8 @@ public class WeatherUtils {
     * @param time
     *           in epoch seconds
     * @param timeZonedId
+    *           Example: 17h(15.0°C, feels like 15.0°C, 5.0km/h from 68°, humidity 37%,
+    *           precipitation 0.0mm)
     * @return
     */
    public static String buildFullWeatherDataString(final float temperatureValue,
@@ -90,7 +92,7 @@ public class WeatherUtils {
    /**
     * Returns the weather data as a human readable string, depending on the
     * desired data.
-    * Example: ☀, Sunny, 98.6°F, 21.2°F, 11.184682mph, from , 1456.6929inch
+    * Example: ☀ Sunny, 19°C, max. 26°C, min. 10°C, feels like 19°C, 6km/h from SSE, 34% humidity
     *
     * @param tourData
     * @return
