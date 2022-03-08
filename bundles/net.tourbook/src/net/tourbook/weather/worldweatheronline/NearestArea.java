@@ -21,9 +21,9 @@ import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NearestArea {
+
    public List<AreaName>   areaName;
    public String           latitude;
    public String           longitude;
-   public String           population;
    public List<WeatherUrl> weatherUrl;
 }
