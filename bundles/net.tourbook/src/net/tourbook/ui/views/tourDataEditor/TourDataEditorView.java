@@ -6373,8 +6373,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _actionComputeDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isGeoAvailable);
 
       _actionEditTimeSlicesValues.setEnabled(isCellEditorInactive && canEdit);
-
-      _spinWeather_Wind_DirectionValue.setEnabled(_comboWeather_Wind_DirectionText.getSelectionIndex() > 0);
    }
 
    private void enableActions_SwimSlices() {
@@ -6578,6 +6576,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _linkTourType.setEnabled(canEdit);
 
       timeSliceTable.setEnabled(isDeviceTour);
+
+      _spinWeather_Wind_DirectionValue.setEnabled(_comboWeather_Wind_DirectionText.getSelectionIndex() > 0);
    }
 
    private void fillContextMenu_SwimSlice(final IMenuManager menuMgr) {
@@ -9176,6 +9176,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       _tourContainer.layout(true);
 
+      enableControls();
    }
 
    public void updateUI_Tab_2_TimeSlices() {
