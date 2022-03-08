@@ -673,8 +673,7 @@ public class RawDataManager {
          newData.add(Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT);
       }
 
-      if (isEntireTour_OR_AllTimeSlices ||
-            tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
+      if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
 
          float avgTemperature = UI.convertTemperatureFromMetric(
                oldTourData.getWeather_Temperature_Average_Device());
@@ -685,8 +684,7 @@ public class RawDataManager {
          newData.add(Math.round(avgTemperature) + UI.UNIT_LABEL_TEMPERATURE);
       }
 
-      if (isEntireTour_OR_AllTimeSlices ||
-            tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
+      if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
 
          float avgTemperature = UI.convertTemperatureFromMetric(
                oldTourData.getWeather_Temperature_Average());
@@ -1450,18 +1448,14 @@ public class RawDataManager {
                tourDataDummyClone.setPower_Avg(oldTourData.getPower_Avg());
             }
 
-            if (isEntireTour_OR_AllTimeSlices ||
-                  tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
 
-               tourDataDummyClone.setWeather_Temperature_Average(
-                     oldTourData.getWeather_Temperature_Average());
+               tourDataDummyClone.setWeather_Temperature_Average(oldTourData.getWeather_Temperature_Average());
             }
 
-            if (isEntireTour_OR_AllTimeSlices ||
-                  tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
 
-               tourDataDummyClone.setWeather_Temperature_Average_Device(
-                     oldTourData.getWeather_Temperature_Average_Device());
+               tourDataDummyClone.setWeather_Temperature_Average_Device(oldTourData.getWeather_Temperature_Average_Device());
             }
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TIMER_PAUSES) {
