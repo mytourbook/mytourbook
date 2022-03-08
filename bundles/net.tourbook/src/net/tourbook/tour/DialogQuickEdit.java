@@ -797,7 +797,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
    private void enableControls() {
 
-      _spinWeather_Wind_DirectionValue.setEnabled(_comboWeather_Wind_DirectionText.getSelectionIndex() > 0);
+      _spinWeather_Wind_DirectionValue.setEnabled(
+            _comboWeather_Wind_DirectionText.getSelectionIndex() > 0);
    }
 
    @Override
@@ -961,13 +962,11 @@ public class DialogQuickEdit extends TitleAreaDialog {
          final int weatherWindDirection = _tourData.getWeather_Wind_Direction();
          if (weatherWindDirection == -1) {
             _spinWeather_Wind_DirectionValue.setSelection(0);
-            _spinWeather_Wind_DirectionValue.setEnabled(false);
             _comboWeather_Wind_DirectionText.select(0);
          } else {
             final int weatherWindDirectionDegree = weatherWindDirection * 10;
             _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirectionDegree);
             _comboWeather_Wind_DirectionText.select(UI.getCardinalDirectionTextIndex((int) (weatherWindDirectionDegree / 10.0f)));
-            _spinWeather_Wind_DirectionValue.setEnabled(true);
          }
 
          // wind speed
@@ -990,6 +989,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
          _spinWeather_Temperature_Average.setDigits(1);
          _spinWeather_Temperature_Average.setSelection(Math.round(avgTemperature * 10));
+
+         enableControls();
       }
       _isUpdateUI = false;
    }

@@ -66,7 +66,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
    public static final String      ClientId                = "55536";                                                                     //$NON-NLS-1$
 
-   private static final String     _stravaApp_WebPage_Link = "https://wwww.strava.com";                                                   //$NON-NLS-1$
+   private static final String     _stravaApp_WebPage_Link = "https://www.strava.com";                                                    //$NON-NLS-1$
    private IPreferenceStore        _prefStore              = Activator.getDefault().getPreferenceStore();
    private IPropertyChangeListener _prefChangeListener;
    private SelectionListener       _defaultSelectionListener;
