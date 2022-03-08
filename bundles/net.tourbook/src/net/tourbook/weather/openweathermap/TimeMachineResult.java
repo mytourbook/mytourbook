@@ -49,7 +49,7 @@ public class TimeMachineResult {
       final long thirtyMinutes = 1800;
 
       for (final Hourly currentHourly : hourly) {
-         //The current data is not kept if its the measured time is:
+         //The current data is not kept if its measured time is:
          // - 30 mins before the tour start time
          // OR 30 mins after the tour start time
          if (currentHourly.dt < tourStartTime - thirtyMinutes ||

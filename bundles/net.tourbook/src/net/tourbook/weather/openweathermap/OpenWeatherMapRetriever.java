@@ -176,7 +176,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       } catch (final Exception e) {
 
          StatusUtil.logError(
-               "WeatherHistoryRetriever.parseWeatherData : Error while parsing the historical weather JSON object :" //$NON-NLS-1$
+               "OpenWeatherMapRetriever.serializeWeatherData : Error while serializing the historical weather JSON object :" //$NON-NLS-1$
                      + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
          return timeMachineResult;
       }

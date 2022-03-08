@@ -22,7 +22,6 @@ import com.javadocmd.simplelatlng.LatLng;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -65,9 +64,6 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    private static final String    keyParameter    = "?key=";                                                          //$NON-NLS-1$
    private LatLng                 searchAreaCenter;
    private String                 startDate;
-   private String                 startTime;
-
-   private String                 endTime;
 
    private WeatherData            historicalWeatherData;
 
@@ -84,16 +80,6 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
       searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(tour);
       startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime()); //$NON-NLS-1$
-
-      final double roundedStartTime = tour.getTourStartTime().getHour();
-      startTime = (int) roundedStartTime + "00"; //$NON-NLS-1$
-
-      int roundedEndHour = Instant.ofEpochMilli(tour.getTourEndTimeMS()).atZone(tour.getTimeZoneIdWithDefault()).getHour();
-      final int roundedEndMinutes = Instant.ofEpochMilli(tour.getTourEndTimeMS()).atZone(tour.getTimeZoneIdWithDefault()).getMinute();
-      if (roundedEndMinutes >= 30) {
-         ++roundedEndHour;
-      }
-      endTime = roundedEndHour + "00"; //$NON-NLS-1$
    }
 
    public static String getApiUrl() {
@@ -107,19 +93,13 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    @Override
    protected String buildFullWeatherDataString() {
 
-      final long tourStartTime = tour.getTourStartTimeMS() / 1000;
-      final long tourEndTime = tour.getTourEndTimeMS() / 1000;
-      final long thirtyMinutes = 1800;
+      final List<WWOHourlyResults> hourlyFiltered = filterHourlyData(tour);
 
       final List<String> fullWeatherDataList = new ArrayList<>();
 
-      for (final WWOHourlyResults hourly : _rawWeatherData) {
+      for (final WWOHourlyResults hourly : hourlyFiltered) {
 
          final long hourlyEpochSeconds = hourly.getEpochSeconds(tour.getTimeZoneIdWithDefault());
-         if (hourlyEpochSeconds < tourStartTime - thirtyMinutes ||
-               hourlyEpochSeconds > tourEndTime + thirtyMinutes) {
-            continue;
-         }
 
          final TourDateTime tourDateTime = TimeTools.createTourDateTime(hourlyEpochSeconds * 1000L, tour.getTimeZoneId());
          final String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
@@ -168,18 +148,15 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       } catch (final URISyntaxException e) {
 
          StatusUtil.logError(
-               "OpenWeatherMapRetriever.buildWeatherApiRequest : Error while " + //$NON-NLS-1$
+               "WorldWeatherOnlineRetriever.buildWeatherApiRequest : Error while " + //$NON-NLS-1$
                      "building the historical weather request :" //$NON-NLS-1$
                      + e.getMessage());
          return UI.EMPTY_STRING;
       }
    }
 
-   private void computeFinalWeatherData(final WeatherData weatherData,
-                                        final List<WWOHourlyResults> rawWeatherData) {
+   private void computeFinalWeatherData(final WeatherData weatherData) {
 
-      boolean isTourStartData = false;
-      boolean isTourEndData = false;
       int numHourlyDatasets = 0;
       int sumHumidity = 0;
       int sumPressure = 0;
@@ -191,41 +168,39 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       int maxTemperature = Integer.MIN_VALUE;
       int minTemperature = Integer.MAX_VALUE;
 
-      for (int index = 0; index < rawWeatherData.size() && !isTourEndData; index++) {
+      final List<WWOHourlyResults> hourlyFiltered = filterHourlyData(tour);
 
-         final WWOHourlyResults hourlyData = rawWeatherData.get(index);
+      final int tourMiddleData = (hourlyFiltered.size() / 2);
 
-         // Within the hourly data, find the times that corresponds to the tour time
-         // and extract all the weather data.
-         if (hourlyData.gettime().equals(startTime)) {
-            isTourStartData = true;
+      for (int index = 0; index < hourlyFiltered.size(); index++) {
+
+         final WWOHourlyResults hourlyData = hourlyFiltered.get(index);
+
+         // Within the hourly data, find the times that corresponds to the middle
+         // of the tour time and extract the weather data's description.
+         if (index == tourMiddleData) {
+
             weatherData.setWeatherDescription(hourlyData.getWeatherDescription());
             weatherData.setWeatherType(hourlyData.getWeatherCode());
          }
-         if (hourlyData.gettime().equals(endTime)) {
-            isTourEndData = true;
+
+         sumWindDirection += hourlyData.getWinddirDegree();
+         sumWindSpeed += hourlyData.getWindspeedKmph();
+         sumHumidity += hourlyData.getHumidity();
+         sumPrecipitation += hourlyData.getPrecipMM();
+         sumPressure += hourlyData.getPressure();
+         sumWindChill += hourlyData.getFeelsLikeC();
+         sumTemperature += hourlyData.getTempC();
+
+         if (hourlyData.getTempC() < minTemperature) {
+            minTemperature = hourlyData.getTempC();
          }
 
-         if (isTourStartData || isTourEndData) {
-
-            sumWindDirection += hourlyData.getWinddirDegree();
-            sumWindSpeed += hourlyData.getWindspeedKmph();
-            sumHumidity += hourlyData.getHumidity();
-            sumPrecipitation += hourlyData.getPrecipMM();
-            sumPressure += hourlyData.getPressure();
-            sumWindChill += hourlyData.getFeelsLikeC();
-            sumTemperature += hourlyData.getTempC();
-
-            if (hourlyData.getTempC() < minTemperature) {
-               minTemperature = hourlyData.getTempC();
-            }
-
-            if (hourlyData.getTempC() > maxTemperature) {
-               maxTemperature = hourlyData.getTempC();
-            }
-
-            ++numHourlyDatasets;
+         if (hourlyData.getTempC() > maxTemperature) {
+            maxTemperature = hourlyData.getTempC();
          }
+
+         ++numHourlyDatasets;
       }
 
       weatherData.setWindDirection((int) Math.ceil((double) sumWindDirection / (double) numHourlyDatasets));
@@ -237,6 +212,37 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       weatherData.setAverageHumidity((int) Math.ceil((double) sumHumidity / (double) numHourlyDatasets));
       weatherData.setAveragePressure((int) Math.ceil((double) sumPressure / (double) numHourlyDatasets));
       weatherData.setPrecipitation(sumPrecipitation);
+   }
+
+   /**
+    * Filters and keeps only the values included between the tour start and end times.
+    *
+    * @param tour
+    * @return
+    */
+   private List<WWOHourlyResults> filterHourlyData(final TourData tour) {
+
+      final List<WWOHourlyResults> filteredHourlyData = new ArrayList<>();
+
+      final long tourStartTime = tour.getTourStartTimeMS() / 1000;
+      final long tourEndTime = tour.getTourEndTimeMS() / 1000;
+      final long thirtyMinutes = 1800;
+
+      for (final WWOHourlyResults hourly : _rawWeatherData) {
+
+         //The current data is not kept if its measured time is:
+         // - 30 mins before the tour start time
+         // OR 30 mins after the tour start time
+         final long hourlyEpochSeconds = hourly.getEpochSeconds(tour.getTimeZoneIdWithDefault());
+         if (hourlyEpochSeconds < tourStartTime - thirtyMinutes ||
+               hourlyEpochSeconds > tourEndTime + thirtyMinutes) {
+            continue;
+         }
+
+         filteredHourlyData.add(hourly);
+      }
+
+      return filteredHourlyData;
    }
 
    /**
@@ -282,11 +288,11 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
          _rawWeatherData = mapper.readValue(weatherResults, new TypeReference<List<WWOHourlyResults>>() {});
 
-         computeFinalWeatherData(weatherData, _rawWeatherData);
+         computeFinalWeatherData(weatherData);
 
       } catch (final Exception e) {
          StatusUtil.logError(
-               "WeatherHistoryRetriever.parseWeatherData : Error while parsing the historical weather JSON object :" //$NON-NLS-1$
+               "WorldWeatherOnlineRetriever.parseWeatherData : Error while parsing the historical weather JSON object :" //$NON-NLS-1$
                      + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
          return null;
       }
