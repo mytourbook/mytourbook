@@ -1755,10 +1755,10 @@ public class TourInfoUI {
 
       _lblTemperature.setText(_nf1.format(averageTemperature));
       _lblTemperatureUnit.setText(String.format(
-            Messages.Tour_Tooltip_Value_AverageTemperatures,
+            Messages.Tour_Tooltip_Format_AverageTemperatures,
             UI.UNIT_LABEL_TEMPERATURE,
             temperatureFromDevice));
-      _lblTemperatureUnit.setToolTipText(Messages.Tour_Tooltip_Value_AverageTemperatures_Tooltip);
+      _lblTemperatureUnit.setToolTipText(Messages.Tour_Tooltip_Format_AverageTemperatures_Tooltip);
 
       // weather clouds
       final int weatherIndex = _tourData.getWeatherIndex();

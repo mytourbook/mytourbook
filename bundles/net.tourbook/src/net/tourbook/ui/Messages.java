@@ -542,6 +542,8 @@ public class Messages extends NLS {
    public static String        Tour_Marker_Column_IsVisibleNoEdit_Tooltip;
 
    public static String        Tour_Tooltip_Action_EditFormatPreferences;
+   public static String        Tour_Tooltip_Format_AverageTemperatures;
+   public static String        Tour_Tooltip_Format_AverageTemperatures_Tooltip;
    public static String        Tour_Tooltip_Format_DateWeekTime;
    public static String        Tour_Tooltip_Format_HistoryDateTime;
    public static String        Tour_Tooltip_Format_Pace;
@@ -606,8 +608,6 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_Weather;
    public static String        Tour_Tooltip_Label_WindDirection;
    public static String        Tour_Tooltip_Label_WindSpeed;
-   public static String        Tour_Tooltip_Value_AverageTemperatures;
-   public static String        Tour_Tooltip_Value_AverageTemperatures_Tooltip;
 
    public static String        TourType_Config_Border_Bottom;
    public static String        TourType_Config_Border_Circle;
