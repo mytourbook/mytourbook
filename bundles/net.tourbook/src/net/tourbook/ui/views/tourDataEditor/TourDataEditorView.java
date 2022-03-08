@@ -608,7 +608,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Combo              _comboLocation_End;
    private Combo              _comboTimeZone;
    private Combo              _comboWeather_Clouds;
-   private Combo              _comboWeather_WindDirectionText;
+   private Combo              _comboWeather_Wind_DirectionText;
    private Combo              _comboWeather_WindSpeedText;
    //
    private DateTime           _dtStartTime;
@@ -4127,27 +4127,27 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _firstColumnControls.add(label);
 
             // combo: wind direction text
-            _comboWeather_WindDirectionText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-            _tk.adapt(_comboWeather_WindDirectionText, true, false);
+            _comboWeather_Wind_DirectionText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+            _tk.adapt(_comboWeather_Wind_DirectionText, true, false);
             GridDataFactory
                   .fillDefaults()//
                   .align(SWT.BEGINNING, SWT.FILL)
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-                  .applyTo(_comboWeather_WindDirectionText);
-            _comboWeather_WindDirectionText.setToolTipText(Messages.tour_editor_label_WindDirectionNESW_Tooltip);
-            _comboWeather_WindDirectionText.setVisibleItemCount(16);
-            _comboWeather_WindDirectionText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+                  .applyTo(_comboWeather_Wind_DirectionText);
+            _comboWeather_Wind_DirectionText.setToolTipText(Messages.tour_editor_label_WindDirectionNESW_Tooltip);
+            _comboWeather_Wind_DirectionText.setVisibleItemCount(16);
+            _comboWeather_Wind_DirectionText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
-               onSelect_WindDirection_Text(_spinWeather_Wind_DirectionValue, _comboWeather_WindDirectionText);
+               onSelect_WindDirection_Text(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
                setTourDirty();
             }));
 
             // fill combobox
             for (final String windDirText : IWeather.windDirectionText) {
-               _comboWeather_WindDirectionText.add(windDirText);
+               _comboWeather_Wind_DirectionText.add(windDirText);
             }
 
             // spacer
@@ -4211,7 +4211,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
-               onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_WindDirectionText);
+               onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
                setTourDirty();
             });
             _spinWeather_Wind_DirectionValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
@@ -4219,7 +4219,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
-               onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_WindDirectionText);
+               onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
                setTourDirty();
             }));
 
@@ -4228,7 +4228,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
-               onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_WindDirectionText);
+               onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
                setTourDirty();
             });
 
@@ -6373,6 +6373,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _actionComputeDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isGeoAvailable);
 
       _actionEditTimeSlicesValues.setEnabled(isCellEditorInactive && canEdit);
+
+      _spinWeather_Wind_DirectionValue.setEnabled(_comboWeather_Wind_DirectionText.getSelectionIndex() > 0);
    }
 
    private void enableActions_SwimSlices() {
@@ -6526,7 +6528,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             && _tourData.latitudeSerie.length > 0;
 
       final boolean isWeatherRetrievalActivated = TourManager.isWeatherRetrievalActivated();
-      final boolean isWindDirectionAvailable = _comboWeather_WindDirectionText.getSelectionIndex() > 0;
+      final boolean isWindDirectionAvailable = _comboWeather_Wind_DirectionText.getSelectionIndex() > 0;
 
       _comboTitle.setEnabled(canEdit);
       _txtDescription.setEnabled(canEdit);
@@ -6536,7 +6538,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       //Weather
       _linkWeather.setEnabled(canEdit && isWeatherRetrievalActivated);
       _comboWeather_Clouds.setEnabled(canEdit);
-      _comboWeather_WindDirectionText.setEnabled(canEdit);
+      _comboWeather_Wind_DirectionText.setEnabled(canEdit);
       _comboWeather_WindSpeedText.setEnabled(canEdit);
       _spinWeather_Humidity.setEnabled(canEdit);
       _spinWeather_PrecipitationValue.setEnabled(canEdit);
@@ -8477,7 +8479,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
           * Weather
           */
          _tourData.setWeather(_txtWeather.getText().trim());
-         final int weatherWindDirection = _comboWeather_WindDirectionText.getSelectionIndex() == 0
+         final int weatherWindDirection = _comboWeather_Wind_DirectionText.getSelectionIndex() == 0
                ? -1
                : (int) (_spinWeather_Wind_DirectionValue.getSelection() / 10.0f);
 
@@ -8936,13 +8938,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final int weatherWindDirection = _tourData.getWeather_Wind_Direction();
       if (weatherWindDirection == -1) {
          _spinWeather_Wind_DirectionValue.setSelection(0);
-         _spinWeather_Wind_DirectionValue.setEnabled(false);
-         _comboWeather_WindDirectionText.select(0);
+         _comboWeather_Wind_DirectionText.select(0);
       } else {
          final int weatherWindDirectionDegree = weatherWindDirection * 10;
          _spinWeather_Wind_DirectionValue.setSelection(weatherWindDirectionDegree);
-         _comboWeather_WindDirectionText.select(UI.getCardinalDirectionTextIndex((int) (weatherWindDirectionDegree / 10.0f)));
-         _spinWeather_Wind_DirectionValue.setEnabled(true);
+         _comboWeather_Wind_DirectionText.select(UI.getCardinalDirectionTextIndex((int) (weatherWindDirectionDegree / 10.0f)));
       }
 
       // wind speed
