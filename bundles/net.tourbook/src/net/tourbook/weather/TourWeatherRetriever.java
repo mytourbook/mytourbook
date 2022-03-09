@@ -25,7 +25,7 @@ import net.tourbook.ui.views.IWeatherProvider;
 import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
 import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
-import org.eclipse.jface.preference.IPreferenceStore;;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 public final class TourWeatherRetriever {
 
@@ -62,9 +62,7 @@ public final class TourWeatherRetriever {
 
          if (_prefStore.getBoolean(ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG)) {
 
-            TourLogManager.subLog_INFO(TourManager.getTourDateTimeShort(tourData) +
-                  UI.SYMBOL_COLON + UI.SPACE +
-                  historicalWeatherRetriever.buildFullWeatherDataString());
+            TourLogManager.subLog_INFO(historicalWeatherRetriever.buildFullWeatherDataString());
          }
       }
 
