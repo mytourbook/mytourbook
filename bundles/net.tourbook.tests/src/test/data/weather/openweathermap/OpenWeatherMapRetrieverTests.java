@@ -77,16 +77,20 @@ public class OpenWeatherMapRetrieverTests {
       assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
       httpClientMock.verify().get(url).called();
 
-      assertEquals("clear sky", tour.getWeather()); //$NON-NLS-1$
+// SET_FORMATTING_OFF
+
+      assertEquals("clear sky",     tour.getWeather()); //$NON-NLS-1$
       assertEquals("weather-sunny", tour.getWeather_Clouds()); //$NON-NLS-1$
-      assertEquals(0.38f, tour.getWeather_Temperature_Average());
-      assertEquals(3.0, tour.getWeather_Wind_Speed());
-      assertEquals(259.0, tour.getWeather_Wind_Direction());
-      assertEquals(46.0, tour.getWeather_Humidity());
-      assertEquals(0, tour.getWeather_Precipitation());
-      assertEquals(1022.0, tour.getWeather_Pressure());
-      assertEquals(5.78f, tour.getWeather_Temperature_Max());
-      assertEquals(-9.03f, tour.getWeather_Temperature_Min());
-      assertEquals(-2.77f, tour.getWeather_Temperature_WindChill());
+      assertEquals(0.38f,           tour.getWeather_Temperature_Average());
+      assertEquals(3.0,             tour.getWeather_Wind_Speed());
+      assertEquals(259.0,           tour.getWeather_Wind_Direction());
+      assertEquals(46.0,            tour.getWeather_Humidity());
+      assertEquals(0,               tour.getWeather_Precipitation());
+      assertEquals(1022.0,          tour.getWeather_Pressure());
+      assertEquals(5.78f,           tour.getWeather_Temperature_Max());
+      assertEquals(-9.03f,          tour.getWeather_Temperature_Min());
+      assertEquals(-2.77f,          tour.getWeather_Temperature_WindChill());
+
+// SET_FORMATTING_ON
    }
 }

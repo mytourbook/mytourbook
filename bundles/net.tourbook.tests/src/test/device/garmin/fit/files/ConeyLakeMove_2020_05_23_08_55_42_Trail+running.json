@@ -197,6 +197,7 @@
   "weather_Humidity" : 0,
   "weather_Precipitation" : 0.0,
   "weather_Pressure" : 0.0,
+  "weather_Snowfall" : 0.0,
   "weather_Temperature_Average" : 0.0,
   "weather_Temperature_Average_Device" : 25.27696,
   "weather_Temperature_Max" : 0.0,

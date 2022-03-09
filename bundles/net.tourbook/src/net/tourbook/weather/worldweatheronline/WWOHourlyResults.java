@@ -81,9 +81,9 @@ public class WWOHourlyResults {
          return 0;
       }
 
-      final int timeHours = utcTime.equals("0")//$NON-NLS-1$
+      final int timeHours = utcTime.equals("0") || utcTime.length() < 2//$NON-NLS-1$
             ? 0
-            : Integer.parseInt(utcTime.substring(0, utcTime.indexOf("0")));//$NON-NLS-1$
+            : Integer.parseInt(utcTime.substring(0, utcTime.length() - 2));
       final String dateTime = utcDate +
             UI.SPACE +
             String.format("%02d", timeHours) + //$NON-NLS-1$

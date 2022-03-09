@@ -70,16 +70,21 @@ public class WorldWeatherOnlineRetrieverTests {
       assertTrue(historicalWeatherRetriever.retrieveHistoricalWeatherData());
       httpClientMock.verify().get(url).called();
 
-      assertEquals(12, tour.getWeather_Temperature_Average());
-      assertEquals(9, tour.getWeather_Wind_Speed());
-      assertEquals(177, tour.getWeather_Wind_Direction());
-      assertEquals("Partly cloudy", tour.getWeather()); //$NON-NLS-1$
+// SET_FORMATTING_OFF
+
+      assertEquals(12,               tour.getWeather_Temperature_Average());
+      assertEquals(9,                tour.getWeather_Wind_Speed());
+      assertEquals(185,              tour.getWeather_Wind_Direction());
+      assertEquals("Partly cloudy",  tour.getWeather()); //$NON-NLS-1$
       assertEquals("weather-cloudy", tour.getWeather_Clouds()); //$NON-NLS-1$
-      assertEquals(63, tour.getWeather_Humidity());
-      assertEquals(1.2, Math.round(tour.getWeather_Precipitation() * 10.0) / 10.0);
-      assertEquals(1019, tour.getWeather_Pressure());
-      assertEquals(19, tour.getWeather_Temperature_Max());
-      assertEquals(8, tour.getWeather_Temperature_Min());
-      assertEquals(12, tour.getWeather_Temperature_WindChill());
+      assertEquals(63,               tour.getWeather_Humidity());
+      assertEquals(1.2,              Math.round(tour.getWeather_Precipitation() * 10.0) / 10.0);
+      assertEquals(1019,             tour.getWeather_Pressure());
+      assertEquals(19,               tour.getWeather_Temperature_Max());
+      assertEquals(8,                tour.getWeather_Temperature_Min());
+      assertEquals(12,               tour.getWeather_Temperature_WindChill());
+
+// SET_FORMATTING_ON
+
    }
 }
