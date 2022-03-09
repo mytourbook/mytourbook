@@ -3468,10 +3468,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
    private void fillSpeedTourTypeMenu(final IMenuManager menuMgr, final Link linkTourType) {
 
-      // get tour type which will be checked in the menu
-      final TourType checkedTourType = null;
-
       final int speedTTIndex = (int) linkTourType.getData(DATA_KEY_SPEED_TOUR_TYPE_INDEX);
+      final SpeedTourType speedTT = _selectedIL.speedTourTypes.get(speedTTIndex);
+      final long speedTourTypeId = speedTT.tourTypeId;
 
       // add all tour types to the menu
       final ArrayList<TourType> tourTypes = TourDatabase.getAllTourTypes();
@@ -3479,7 +3478,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       for (final TourType tourType : tourTypes) {
 
          boolean isChecked = false;
-         if (checkedTourType != null && checkedTourType.getTypeId() == tourType.getTypeId()) {
+         if (speedTourTypeId == tourType.getTypeId()) {
             isChecked = true;
          }
 
