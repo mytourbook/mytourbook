@@ -2572,6 +2572,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             _timeSlice_Viewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
             _timeSlice_Viewer.refresh();
+
+         } else if (property.equals(ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID)) {
+
+            enableControls();
          }
       };
 
@@ -6544,6 +6548,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Wind_DirectionValue.setEnabled(canEdit && isWindDirectionAvailable);
       _spinWeather_Wind_SpeedValue.setEnabled(canEdit);
       _txtWeather.setEnabled(canEdit && isWeatherRetrievalActivated);
+      _spinWeather_Temperature_Average.setEnabled(canEdit);
+      _spinWeather_Temperature_Max.setEnabled(canEdit);
+      _spinWeather_Temperature_Min.setEnabled(canEdit);
+      _spinWeather_Temperature_WindChill.setEnabled(canEdit);
 
       _comboCadence.getCombo().setEnabled(canEdit);
 
@@ -6576,8 +6584,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _linkTourType.setEnabled(canEdit);
 
       timeSliceTable.setEnabled(isDeviceTour);
-
-      _spinWeather_Wind_DirectionValue.setEnabled(_comboWeather_Wind_DirectionText.getSelectionIndex() > 0);
    }
 
    private void fillContextMenu_SwimSlice(final IMenuManager menuMgr) {

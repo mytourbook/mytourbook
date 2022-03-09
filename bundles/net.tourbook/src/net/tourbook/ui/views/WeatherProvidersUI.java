@@ -211,7 +211,7 @@ public class WeatherProvidersUI {
 
       updateUI();
 
-      saveState();
+      saveVendorsState();
    }
 
    public void performDefaults() {
@@ -262,6 +262,14 @@ public class WeatherProvidersUI {
       _prefStore.setValue(
             ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID,
             getSelectedWeatherProvider().weatherProviderId);
+
+      saveVendorsState();
+   }
+
+   /**
+    * Update new values in the preference store
+    */
+   public void saveVendorsState() {
 
       _prefStore.setValue(
             ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG,

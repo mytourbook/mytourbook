@@ -673,26 +673,44 @@ public class RawDataManager {
          newData.add(Math.round(newTourData.getPower_Avg()) + UI.UNIT_POWER_SHORT);
       }
 
-      if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
-
-         float avgTemperature = UI.convertTemperatureFromMetric(
-               oldTourData.getWeather_Temperature_Average_Device());
-         previousData.add(Math.round(avgTemperature) + UI.UNIT_LABEL_TEMPERATURE);
-
-         avgTemperature = UI.convertTemperatureFromMetric(
-               newTourData.getWeather_Temperature_Average_Device());
-         newData.add(Math.round(avgTemperature) + UI.UNIT_LABEL_TEMPERATURE);
-      }
-
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
 
-         float avgTemperature = UI.convertTemperatureFromMetric(
-               oldTourData.getWeather_Temperature_Average());
-         previousData.add(Math.round(avgTemperature) + UI.UNIT_LABEL_TEMPERATURE);
+         previousData.add(
+               UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average()))
+                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
+                     UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Max())) + UI.UNIT_LABEL_TEMPERATURE
+                     + UI.COMMA_SPACE +
+                     UI.SYMBOL_MIN + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Min())) + UI.UNIT_LABEL_TEMPERATURE
+                     + UI.COMMA_SPACE +
+                     UI.SYMBOL_TILDE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_WindChill()))
+                     + UI.UNIT_LABEL_TEMPERATURE);
+         newData.add(
+               UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average()))
+                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
+                     UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Max()))
+                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
+                     UI.SYMBOL_MIN + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Min()))
+                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
+                     UI.SYMBOL_TILDE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_WindChill()))
+                     + UI.UNIT_LABEL_TEMPERATURE);
+      }
 
-         avgTemperature = UI.convertTemperatureFromMetric(
-               newTourData.getWeather_Temperature_Average());
-         newData.add(Math.round(avgTemperature) + UI.UNIT_LABEL_TEMPERATURE);
+      if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
+
+         previousData.add(
+               UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average_Device()))
+                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
+                     UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Max_Device()))
+                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
+                     UI.SYMBOL_MIN + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Min_Device()))
+                     + UI.UNIT_LABEL_TEMPERATURE);
+         newData.add(
+               UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average_Device()))
+                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
+                     UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Max_Device()))
+                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
+                     UI.SYMBOL_MIN + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Min_Device()))
+                     + UI.UNIT_LABEL_TEMPERATURE);
       }
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TIMER_PAUSES) {
@@ -1451,11 +1469,16 @@ public class RawDataManager {
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE) {
 
                tourDataDummyClone.setWeather_Temperature_Average(oldTourData.getWeather_Temperature_Average());
+               tourDataDummyClone.setWeather_Temperature_Max(oldTourData.getWeather_Temperature_Max());
+               tourDataDummyClone.setWeather_Temperature_Min(oldTourData.getWeather_Temperature_Min());
+               tourDataDummyClone.setWeather_Temperature_WindChill(oldTourData.getWeather_Temperature_WindChill());
             }
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
 
                tourDataDummyClone.setWeather_Temperature_Average_Device(oldTourData.getWeather_Temperature_Average_Device());
+               tourDataDummyClone.setWeather_Temperature_Max_Device(oldTourData.getWeather_Temperature_Max_Device());
+               tourDataDummyClone.setWeather_Temperature_Min_Device(oldTourData.getWeather_Temperature_Min_Device());
             }
 
             if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TIMER_PAUSES) {
@@ -1766,6 +1789,8 @@ public class RawDataManager {
             case TIME_SLICES__TEMPERATURE_FROMDEVICE:
 
                clonedTourData.setWeather_Temperature_Average_Device(tourData.getWeather_Temperature_Average_Device());
+               clonedTourData.setWeather_Temperature_Max_Device(tourData.getWeather_Temperature_Max_Device());
+               clonedTourData.setWeather_Temperature_Min_Device(tourData.getWeather_Temperature_Min_Device());
 
                tourData.temperatureSerie = null;
                tourData.setWeather_Temperature_Average_Device(0);
@@ -1776,10 +1801,14 @@ public class RawDataManager {
             case TIME_SLICES__TEMPERATURE:
 
                clonedTourData.setWeather_Temperature_Average(tourData.getWeather_Temperature_Average());
+               clonedTourData.setWeather_Temperature_Max(tourData.getWeather_Temperature_Max());
+               clonedTourData.setWeather_Temperature_Min(tourData.getWeather_Temperature_Min());
+               clonedTourData.setWeather_Temperature_WindChill(tourData.getWeather_Temperature_WindChill());
 
                tourData.setWeather_Temperature_Average(0);
                tourData.setWeather_Temperature_Max(0);
                tourData.setWeather_Temperature_Min(0);
+               tourData.setWeather_Temperature_WindChill(0);
                break;
 
             case TIME_SLICES__TIME:
@@ -3514,6 +3543,9 @@ public class RawDataManager {
          // re-import temperature only
 
          oldTourData.temperatureSerie = reimportedTourData.temperatureSerie;
+         oldTourData.setWeather_Temperature_Average_Device(reimportedTourData.getWeather_Temperature_Average_Device());
+         oldTourData.setWeather_Temperature_Max_Device(reimportedTourData.getWeather_Temperature_Max_Device());
+         oldTourData.setWeather_Temperature_Min_Device(reimportedTourData.getWeather_Temperature_Min_Device());
       }
 
       // Training
