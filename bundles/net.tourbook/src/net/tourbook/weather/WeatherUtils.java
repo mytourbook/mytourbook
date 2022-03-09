@@ -49,7 +49,9 @@ public class WeatherUtils {
     *           in *
     * @param precipitation
     *           in mm
-    * @param time
+    * @param snowFall
+    *           in mm
+    * @param snowFallValue
     *           in epoch seconds
     * @param timeZonedId
     * @return
@@ -60,6 +62,7 @@ public class WeatherUtils {
                                                    final int windDirection,
                                                    final int humidityValue,
                                                    final float precipitationValue,
+                                                   final float snowFallValue,
                                                    final long time,
                                                    final String timeZoneId) {
 
@@ -77,6 +80,9 @@ public class WeatherUtils {
       final String precipitation = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation +
             UI.SPACE +
             UI.convertPrecipitation_FromMetric(precipitationValue);
+      final String snowFall = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall +
+            UI.SPACE +
+            UI.convertPrecipitation_FromMetric(snowFallValue);
 
       final TourDateTime tourDateTime = TimeTools.createTourDateTime(time * 1000L, timeZoneId);
       final String fullWeatherData = tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME +
@@ -85,7 +91,8 @@ public class WeatherUtils {
             feelsLike + UI.COMMA_SPACE +
             wind + UI.COMMA_SPACE +
             humidity + UI.SYMBOL_PERCENTAGE + UI.COMMA_SPACE +
-            precipitation + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH +
+            precipitation + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH + UI.COMMA_SPACE +
+            snowFall + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH +
             UI.SYMBOL_BRACKET_RIGHT;
 
       return fullWeatherData;
@@ -95,7 +102,6 @@ public class WeatherUtils {
     * Returns the weather data as a human readable string, depending on the
     * desired data.
     * Example: ☀ Sunny, 19°C, max. 26°C, min. 10°C, feels like 19°C, 6km/h from SSE, 34% humidity
-    *
     */
    public static String buildWeatherDataString(final TourData tourData,
                                                final boolean displayMinimumTemperature,
@@ -193,6 +199,16 @@ public class WeatherUtils {
          weatherDataList.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation +
                UI.SPACE +
                Math.round(UI.convertPrecipitation_FromMetric(precipitation)) +
+               UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+      }
+
+      // Snowfall
+      final float snowfall = tourData.getWeather_Snowfall();
+      if (snowfall > 0) {
+
+         weatherDataList.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall +
+               UI.SPACE +
+               Math.round(UI.convertPrecipitation_FromMetric(snowfall)) +
                UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       }
 

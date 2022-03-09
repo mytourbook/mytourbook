@@ -553,6 +553,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Atmospheric pressure in millibars (mb)
     */
    private float                 weather_Pressure;                                     // db-version 39
+   /**
+    * Amount of snowfall  (mm)
+    */
+   private float                 weather_Snowfall;                                     // db-version 47
 
    private float                 weather_Temperature_Min;                              // db-version 47
    private float                 weather_Temperature_Min_Device;                       // db-version 39
@@ -9725,6 +9729,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return weather_Pressure;
    }
 
+   /**
+    * @return {@link #weather_Snowfall}
+    */
+   public float getWeather_Snowfall() {
+      return weather_Snowfall;
+   }
+
    public float getWeather_Temperature_Average() {
       return weather_Temperature_Average;
    }
@@ -11858,6 +11869,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void setWeather_Pressure(final float weatherPressure) {
       this.weather_Pressure = weatherPressure;
+   }
+
+   public void setWeather_Snowfall(final float weatherSnowfall) {
+      this.weather_Snowfall = weatherSnowfall;
    }
 
    public void setWeather_Temperature_Average(final float averageTemperature) {

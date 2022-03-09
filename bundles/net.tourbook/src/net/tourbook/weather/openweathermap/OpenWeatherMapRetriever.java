@@ -86,6 +86,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                hourly.wind_deg,
                hourly.humidity,
                hourly.getRain(),
+               hourly.getSnow(),
                tourDateTime.tourZonedDateTime.toEpochSecond(),
                tour.getTimeZoneId());
 
@@ -156,6 +157,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       tour.setWeather_Humidity((short)       _timeMachineResult.getAverageHumidity(tour));
       tour.setWeather_Precipitation(         _timeMachineResult.getPrecipitation(tour));
       tour.setWeather_Pressure((short)       _timeMachineResult.getAveragePressure(tour));
+      tour.setWeather_Snowfall(              _timeMachineResult.getAverageSnowfall(tour));
       tour.setWeather_Temperature_Max(       _timeMachineResult.getTemperatureMax(tour));
       tour.setWeather_Temperature_Min(       _timeMachineResult.getTemperatureMin(tour));
       tour.setWeather_Temperature_WindChill( _timeMachineResult.getWindChill(tour));

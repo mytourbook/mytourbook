@@ -89,6 +89,20 @@ public class TimeMachineResult {
       return 0;
    }
 
+   public float getAverageSnowfall(final TourData tour) {
+
+      final List<Hourly> hourlyFiltered = filterHourlyData(tour);
+
+      final OptionalDouble averageSnowfall =
+            hourlyFiltered.stream().mapToDouble(Hourly::getSnow).average();
+
+      if (averageSnowfall.isPresent()) {
+         return roundDoubleToFloat(averageSnowfall.getAsDouble());
+      }
+
+      return 0;
+   }
+
    private Weather getCurrentWeather() {
 
       final Weather currentWeather = null;

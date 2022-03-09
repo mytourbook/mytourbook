@@ -4135,6 +4135,7 @@ public class TourDatabase {
             + " weather_Temperature_Average           FLOAT DEFAULT 0,                   " + NL //$NON-NLS-1$
             + " weather_Temperature_Max               FLOAT DEFAULT 0,                   " + NL //$NON-NLS-1$
             + " weather_Temperature_Min               FLOAT DEFAULT 0,                   " + NL //$NON-NLS-1$
+            + " weather_Snowfall                      FLOAT DEFAULT 0,                   " + NL //$NON-NLS-1$
 
             // version 47 end
 
@@ -8996,6 +8997,7 @@ public class TourDatabase {
             SQL.AddColumn_Float(stmt, TABLE_TOUR_DATA,   "weather_Temperature_Average", DEFAULT_0);               //$NON-NLS-1$
             SQL.AddColumn_Float(stmt, TABLE_TOUR_DATA,   "weather_Temperature_Max", DEFAULT_0);                   //$NON-NLS-1$
             SQL.AddColumn_Float(stmt, TABLE_TOUR_DATA,   "weather_Temperature_Min", DEFAULT_0);                   //$NON-NLS-1$
+            SQL.AddColumn_Float(stmt, TABLE_TOUR_DATA,   "weather_Snowfall", DEFAULT_0);                   //$NON-NLS-1$
 
 // SET_FORMATTING_ON
       }

@@ -15,8 +15,10 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourDataEditor;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+import static org.eclipse.ui.forms.events.IExpansionListener.expansionStateChangedAdapter;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -161,10 +163,6 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -202,8 +200,6 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.commands.ICommandService;
-import org.eclipse.ui.forms.events.ExpansionAdapter;
-import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -645,6 +641,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Spinner            _spinWeather_Humidity;
    private Spinner            _spinWeather_PrecipitationValue;
    private Spinner            _spinWeather_PressureValue;
+   private Spinner            _spinWeather_SnowfallValue;
    private Spinner            _spinWeather_Temperature_Average;
    private Spinner            _spinWeather_Temperature_Min;
    private Spinner            _spinWeather_Temperature_Max;
@@ -3258,12 +3255,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final Composite sectionContainer = tk.createComposite(section);
       section.setClient(sectionContainer);
 
-      section.addExpansionListener(new ExpansionAdapter() {
-         @Override
-         public void expansionStateChanged(final ExpansionEvent e) {
-            onExpandSection();
-         }
-      });
+      section.addExpansionListener(expansionStateChangedAdapter(expansionEvent -> onExpandSection()));
 
       return section;
    }
@@ -3599,15 +3591,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _txtDistance = _tk.createText(container, UI.EMPTY_STRING, SWT.TRAIL);
             _txtDistance.addModifyListener(_verifyFloatValue);
             _txtDistance.setData(WIDGET_KEY, WIDGET_KEY_TOUR_DISTANCE);
-            _txtDistance.addKeyListener(new KeyListener() {
-               @Override
-               public void keyPressed(final KeyEvent e) {
-                  _isDistManuallyModified = true;
-               }
-
-               @Override
-               public void keyReleased(final KeyEvent e) {}
-            });
+            _txtDistance.addKeyListener(keyPressedAdapter(keyEvent -> _isDistManuallyModified = true));
             GridDataFactory.fillDefaults().hint(_hintValueFieldWidth, SWT.DEFAULT).applyTo(_txtDistance);
 
             _lblDistanceUnit = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE);
@@ -4027,41 +4011,87 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
 //      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
-         /*
-          * weather description
-          */
-         _linkWeather = new Link(container, SWT.NONE);
-         _linkWeather.setText(Messages.Tour_Editor_Link_RetrieveWeather);
-         _linkWeather.setToolTipText(Messages.Tour_Editor_Link_RetrieveWeather_Tooltip);
-         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(_linkWeather);
-         _linkWeather.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-            //Retrieve the weather
+         {
+            /*
+             * weather description
+             */
+            _linkWeather = new Link(container, SWT.NONE);
+            _linkWeather.setText(Messages.Tour_Editor_Link_RetrieveWeather);
+            _linkWeather.setToolTipText(Messages.Tour_Editor_Link_RetrieveWeather_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(_linkWeather);
+            _linkWeather.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               //Retrieve the weather
 
-            if (_isSetField || _isSavingInProgress) {
-               return;
+               if (_isSetField || _isSavingInProgress) {
+                  return;
+               }
+               onSelect_Weather_Text();
+            }));
+            _tk.adapt(_linkWeather, true, true);
+            _firstColumnControls.add(_linkWeather);
+
+            _txtWeather = _tk.createText(
+                  container, //
+                  UI.EMPTY_STRING,
+                  SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
+            );
+            _txtWeather.addModifyListener(_modifyListener);
+
+            GridDataFactory.fillDefaults()
+                  .grab(true, true)
+                  .span(2, 1)
+                  //
+                  // SWT.DEFAULT causes lots of problems with the layout therefore the hint is set
+                  //
+                  .hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(2))
+                  .applyTo(_txtWeather);
+         }
+         {
+            /*
+             * Clouds
+             */
+            final Composite cloudContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().applyTo(cloudContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(cloudContainer);
+            {
+               // label: clouds
+               final Label label = _tk.createLabel(cloudContainer, Messages.tour_editor_label_clouds);
+               label.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
+
+               // icon: clouds
+               _lblCloudIcon = new CLabel(cloudContainer, SWT.NONE);
+               GridDataFactory
+                     .fillDefaults()//
+                     .align(SWT.END, SWT.FILL)
+                     .grab(true, false)
+                     .applyTo(_lblCloudIcon);
             }
-            onSelect_Weather_Text();
-         }));
-         _tk.adapt(_linkWeather, true, true);
-         _firstColumnControls.add(_linkWeather);
 
-         _txtWeather = _tk.createText(
-               container, //
-               UI.EMPTY_STRING,
-               SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
-         );
-         _txtWeather.addModifyListener(_modifyListener);
+            // combo: clouds
+            _comboWeather_Clouds = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboWeather_Clouds);
+            _tk.adapt(_comboWeather_Clouds, true, false);
+            _comboWeather_Clouds.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
+            _comboWeather_Clouds.setVisibleItemCount(10);
+            _comboWeather_Clouds.addModifyListener(_modifyListener);
+            _comboWeather_Clouds.addSelectionListener(widgetSelectedAdapter(selectionEvent -> displayCloudIcon()));
 
-         GridDataFactory.fillDefaults()
-               .grab(true, true)
-               //
-               // SWT.DEFAULT causes lots of problems with the layout therefore the hint is set
-               //
-               .hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(2))
-               .applyTo(_txtWeather);
+            // fill combobox
+            for (final String cloudText : IWeather.cloudText) {
+               _comboWeather_Clouds.add(cloudText);
+            }
+
+            // force the icon to be displayed to ensure the width is correctly set when the size is computed
+            _isSetField = true;
+            {
+               _comboWeather_Clouds.select(0);
+               displayCloudIcon();
+            }
+            _isSetField = false;
+         }
       }
    }
 
@@ -4499,63 +4529,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
       {
          /*
-          * Clouds
-          */
-         final Composite cloudContainer = new Composite(container, SWT.NONE);
-         GridDataFactory.fillDefaults().applyTo(cloudContainer);
-         GridLayoutFactory.fillDefaults().numColumns(3).applyTo(cloudContainer);
-         {
-            // label: clouds
-            final Label label = _tk.createLabel(cloudContainer, Messages.tour_editor_label_clouds);
-            label.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
-
-            // icon: clouds
-            _lblCloudIcon = new CLabel(cloudContainer, SWT.NONE);
-            GridDataFactory
-                  .fillDefaults()//
-                  .align(SWT.END, SWT.FILL)
-                  .grab(true, false)
-                  .applyTo(_lblCloudIcon);
-         }
-         _firstColumnControls.add(cloudContainer);
-
-         // combo: clouds
-         _comboWeather_Clouds = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-         GridDataFactory.fillDefaults().span(2, 1).applyTo(_comboWeather_Clouds);
-         _tk.adapt(_comboWeather_Clouds, true, false);
-         _comboWeather_Clouds.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
-         _comboWeather_Clouds.setVisibleItemCount(10);
-         _comboWeather_Clouds.addModifyListener(_modifyListener);
-         _comboWeather_Clouds.addSelectionListener(widgetSelectedAdapter(selectionEvent -> displayCloudIcon()));
-
-         // fill combobox
-         for (final String cloudText : IWeather.cloudText) {
-            _comboWeather_Clouds.add(cloudText);
-         }
-
-         // force the icon to be displayed to ensure the width is correctly set when the size is computed
-         _isSetField = true;
-         {
-            _comboWeather_Clouds.select(0);
-            displayCloudIcon();
-         }
-         _isSetField = false;
-      }
-   }
-
-   private void createUI_Section_148_Weather_Other_Col2(final Composite parent) {
-
-      final Composite container = _tk.createComposite(parent);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-      {
-         /*
           * Humidity
           */
          // label
          Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Humidity);
          label.setToolTipText(Messages.Tour_Editor_Label_Humidity_Tooltip);
-         _secondColumnControls.add(label);
+         _firstColumnControls.add(label);
 
          // spinner: humidity value
          _spinWeather_Humidity = new Spinner(container, SWT.BORDER);
@@ -4574,6 +4553,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // label: mm, inches
          label = _tk.createLabel(container, UI.UNIT_PERCENT);
       }
+   }
+
+   private void createUI_Section_148_Weather_Other_Col2(final Composite parent) {
+
+      final Composite container = _tk.createComposite(parent);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          /*
           * Precipitation
@@ -4598,6 +4584,31 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          // label: mm, inches
          _lblWeather_PrecipitationUnit = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+      }
+      {
+         /*
+          * Snowfall
+          */
+         Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Snowfall);
+         label.setToolTipText(Messages.Tour_Editor_Label_Snowfall_Tooltip);
+         _secondColumnControls.add(label);
+
+         // spinner: humidity value
+         _spinWeather_SnowfallValue = new Spinner(container, SWT.BORDER);
+         _spinWeather_SnowfallValue.setToolTipText(Messages.Tour_Editor_Label_Snowfall_Tooltip);
+         _spinWeather_SnowfallValue.setMinimum(0);
+         _spinWeather_SnowfallValue.setMaximum(100);
+         _spinWeather_SnowfallValue.addMouseWheelListener(_mouseWheelListener);
+         _spinWeather_SnowfallValue.addSelectionListener(_selectionListener);
+
+         GridDataFactory
+               .fillDefaults()
+               .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .applyTo(_spinWeather_SnowfallValue);
+
+         // label: mm, inches
+         label = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       }
    }
 
@@ -4688,12 +4699,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _tab1Container = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
       _tab1Container.setExpandVertical(true);
       _tab1Container.setExpandHorizontal(true);
-      _tab1Container.addControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent e) {
-            onResizeTab1();
-         }
-      });
+      _tab1Container.addControlListener(controlResizedAdapter(controlEvent -> onResizeTab1()));
       {
          _tourContainer = new Composite(_tab1Container, SWT.NONE);
          GridDataFactory.fillDefaults().applyTo(_tourContainer);
@@ -4799,7 +4805,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 //       }
 //    });
 
-      table.addKeyListener(KeyListener.keyPressedAdapter(keyEvent -> {
+      table.addKeyListener(keyPressedAdapter(keyEvent -> {
 
          if ((_isEditMode == false) || (isTourInDb() == false)) {
             return;
@@ -6545,6 +6551,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Humidity.setEnabled(canEdit);
       _spinWeather_PrecipitationValue.setEnabled(canEdit);
       _spinWeather_PressureValue.setEnabled(canEdit);
+      _spinWeather_SnowfallValue.setEnabled(canEdit);
       _spinWeather_Wind_DirectionValue.setEnabled(canEdit && isWindDirectionAvailable);
       _spinWeather_Wind_SpeedValue.setEnabled(canEdit);
       _txtWeather.setEnabled(canEdit && isWeatherRetrievalActivated);
@@ -8506,6 +8513,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          final int precipitation = _spinWeather_PrecipitationValue.getSelection();
          _tourData.setWeather_Precipitation(UI.convertPrecipitation_ToMetric(precipitation));
 
+         final int snowfall = _spinWeather_SnowfallValue.getSelection();
+         _tourData.setWeather_Snowfall(UI.convertPrecipitation_ToMetric(snowfall));
+
          if (_isWindSpeedManuallyModified) {
 
             /*
@@ -9058,7 +9068,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       /*
        * Precipitation
        */
-
       final float precipitation = UI.convertPrecipitation_FromMetric(_tourData.getWeather_Precipitation());
 
       if (UI.UNIT_IS_LENGTH_SMALL_MILLIMETER) {
@@ -9069,6 +9078,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _spinWeather_PrecipitationValue.setSelection(Math.round(precipitation));
       }
       _spinWeather_PrecipitationValue.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
+
+      /*
+       * Snowfall
+       */
+      final float snowfall = UI.convertPrecipitation_FromMetric(_tourData.getWeather_Snowfall());
+
+      if (UI.UNIT_IS_LENGTH_SMALL_MILLIMETER) {
+         _spinWeather_SnowfallValue.setDigits(0);
+         _spinWeather_SnowfallValue.setSelection(Math.round(snowfall));
+      } else {
+         _spinWeather_SnowfallValue.setDigits(2);
+         _spinWeather_SnowfallValue.setSelection(Math.round(snowfall));
+      }
+      _spinWeather_SnowfallValue.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
 
       /*
        * Pressure

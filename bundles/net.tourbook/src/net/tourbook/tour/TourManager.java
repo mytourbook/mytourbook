@@ -2751,34 +2751,34 @@ public class TourManager {
       TourLogManager.showLogView();
       final long start = System.currentTimeMillis();
 
-      final String weatherProvider = _prefStore.getString(
-            ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
+      BusyIndicator.showWhile(Display.getCurrent(),
+            () -> {
 
-      TourLogManager.subLog_INFO(NLS.bind(
-            LOG_RETRIEVE_WEATHER_DATA_001_START,
-            weatherProvider));
+               final String weatherProvider = _prefStore.getString(
+                     ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
 
-      for (final TourData tourData : tourDataList) {
+               TourLogManager.subLog_INFO(NLS.bind(
+                     LOG_RETRIEVE_WEATHER_DATA_001_START,
+                     weatherProvider));
 
-         // ensure data is available
-         if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
+               for (final TourData tourData : tourDataList) {
 
-            TourLogManager.subLog_ERROR(String.format(
-                  LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
-                  getTourDateTimeShort(tourData)));
+                  // ensure data is available
+                  if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
 
-            return modifiedTours;
-         }
+                     TourLogManager.subLog_ERROR(String.format(
+                           LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
+                           getTourDateTimeShort(tourData)));
 
-         BusyIndicator.showWhile(Display.getCurrent(),
-               () -> {
+                     continue;
+                  }
 
                   if (TourWeatherRetriever.retrieveWeatherData(tourData, weatherProvider)) {
 
                      modifiedTours.add(tourData);
                   }
-               });
-      }
+               }
+            });
 
       TourLogManager.subLog_INFO(String.format(
             LOG_RETRIEVE_WEATHER_DATA_002_END,
