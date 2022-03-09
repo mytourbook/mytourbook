@@ -150,6 +150,7 @@ public class WeatherData {
          break;
       case "332": //$NON-NLS-1$
       case "335": //$NON-NLS-1$
+      case "338": //$NON-NLS-1$
       case "329": //$NON-NLS-1$
       case "326": //$NON-NLS-1$
       case "323": //$NON-NLS-1$
