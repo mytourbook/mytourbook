@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map25.ui;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
@@ -26,21 +28,14 @@ import net.tourbook.map25.layer.marker.MarkerConfig;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
@@ -49,14 +44,10 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
-   private SelectionAdapter   _defaultSelectionListener;
-   private MouseWheelListener _defaultMouseWheelListener;
-   private FocusListener      _keepOpenListener;
-   private SelectionAdapter   _layerSelectionListener;
-   private Listener           _btn_refresh_Bookmark_listener;
-   private PixelConverter     _pc;
+   private SelectionListener _defaultSelectionListener;
+   private SelectionListener _layerSelectionListener;
 
-   private Map25View          _map25View;
+   private Map25View         _map25View;
 
    /*
     * UI controls
@@ -72,7 +63,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private Button    _chkShowPhoto_Title;
    private Button    _chkShowPhoto_Scaled;
    private Button    _chkShowLayer_TileInfo;
-
    private Button    _chkUseDraggedKeyboardNavigation;
 
    private Spinner   _spinnerHillshadingOpacity;
@@ -152,9 +142,9 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Slideout_Map25MapOptions_Group_MapLayer);
       GridDataFactory
-      .fillDefaults()//
-      .grab(true, false)
-      .applyTo(group);
+            .fillDefaults()//
+            .grab(true, false)
+            .applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
       {
          {
@@ -191,26 +181,20 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
                   /*
                    * Opacity
                    */
-                  // spinner: fill
+
+                  final String tooltipText = NLS.bind(Messages.Slideout_Map25MapOptions_Spinner_Layer_Hillshading, UI.TRANSFORM_OPACITY_MAX);
+
                   _spinnerHillshadingOpacity = new Spinner(containerHillshading, SWT.BORDER);
                   _spinnerHillshadingOpacity.setMinimum(0);
-                  _spinnerHillshadingOpacity.setMaximum(100);
+                  _spinnerHillshadingOpacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
                   _spinnerHillshadingOpacity.setIncrement(1);
                   _spinnerHillshadingOpacity.setPageIncrement(10);
-                  _spinnerHillshadingOpacity.setToolTipText(Messages.Slideout_Map25MapOptions_Spinner_Layer_Hillshading);
+                  _spinnerHillshadingOpacity.setToolTipText(tooltipText);
 
-                  _spinnerHillshadingOpacity.addSelectionListener(new SelectionAdapter() {
-                     @Override
-                     public void widgetSelected(final SelectionEvent e) {
-                        onModify_HillShadingOpacity();
-                     }
-                  });
-                  _spinnerHillshadingOpacity.addMouseWheelListener(new MouseWheelListener() {
-                     @Override
-                     public void mouseScrolled(final MouseEvent event) {
-                        UI.adjustSpinnerValueOnMouseScroll(event);
-                        onModify_HillShadingOpacity();
-                     }
+                  _spinnerHillshadingOpacity.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModify_HillShadingOpacity()));
+                  _spinnerHillshadingOpacity.addMouseWheelListener(mouseEvent -> {
+                     UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+                     onModify_HillShadingOpacity();
                   });
                }
             }
@@ -238,21 +222,13 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
                   _spinnerPhoto_Size.setMinimum(160);
                   _spinnerPhoto_Size.setMaximum(640);
                   _spinnerPhoto_Size.setIncrement(10);
-                  _spinnerPhoto_Size.setPageIncrement(10);
+                  _spinnerPhoto_Size.setPageIncrement(50);
                   _spinnerPhoto_Size.setToolTipText(Messages.Slideout_Map25MapOptions_Spinner_Layer_Photo_Size);
 
-                  _spinnerPhoto_Size.addSelectionListener(new SelectionAdapter() {
-                     @Override
-                     public void widgetSelected(final SelectionEvent e) {
-                        onModify_PhotoSize();
-                     }
-                  });
-                  _spinnerPhoto_Size.addMouseWheelListener(new MouseWheelListener() {
-                     @Override
-                     public void mouseScrolled(final MouseEvent event) {
-                        UI.adjustSpinnerValueOnMouseScroll(event);
-                        onModify_PhotoSize();
-                     }
+                  _spinnerPhoto_Size.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModify_PhotoSize()));
+                  _spinnerPhoto_Size.addMouseWheelListener(mouseEvent -> {
+                     UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+                     onModify_PhotoSize();
                   });
                }
             }
@@ -304,7 +280,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       }
    }
 
-
    private void createUI_80_Other(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -324,8 +299,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             _chkUseDraggedKeyboardNavigation.setText(Messages.Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation);
             _chkUseDraggedKeyboardNavigation.setToolTipText(Messages.Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip);
             _chkUseDraggedKeyboardNavigation.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory
-                  .fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.BEGINNING)
                   .span(2, 1)
                   .applyTo(_chkUseDraggedKeyboardNavigation);
@@ -347,59 +321,8 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       _parent = parent;
 
-      _pc = new PixelConverter(parent);
-
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeUI();
-         }
-      };
-
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onChangeUI();
-         }
-      };
-
-      _keepOpenListener = new FocusListener() {
-
-         @Override
-         public void focusGained(final FocusEvent e) {
-
-            /*
-             * This will fix the problem that when the list of a combobox is displayed, then the
-             * slideout will disappear :-(((
-             */
-            setIsAnotherDialogOpened(true);
-         }
-
-         @Override
-         public void focusLost(final FocusEvent e) {
-            setIsAnotherDialogOpened(false);
-         }
-      };
-
-      _layerSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onModify_Layer();
-         }
-      };
-
-      _btn_refresh_Bookmark_listener = new Listener() {
-         @Override
-         public void handleEvent(final Event e) {
-            // TODO Auto-generated method stub
-            if (e.type == SWT.Selection){
-               final Map25App mapApp = _map25View.getMapApp();
-               mapApp.updateUI_MapBookmarkLayer();
-               //System.out.println("+++ SlideoutListener:  button pressed"); //$NON-NLS-1$
-            }
-         }
-      };
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
+      _layerSelectionListener = widgetSelectedAdapter(selectionEvent -> onModify_Layer());
 
    }
 
@@ -415,11 +338,11 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       final Map25App mapApp = _map25View.getMapApp();
 
       // updade model
-      final int hillShadingOpacity = _spinnerHillshadingOpacity.getSelection();
+      final int hillShadingOpacity = UI.transformOpacity_WhenSaved(_spinnerHillshadingOpacity.getSelection());
       mapApp.setLayer_HillShading_Opacity(hillShadingOpacity);
 
       // update UI
-      final float hillshadingAlpha = hillShadingOpacity / 100f;
+      final float hillshadingAlpha = hillShadingOpacity / 255f;
       mapApp.getLayer_HillShading().setBitmapAlpha(hillshadingAlpha, true);
 
       enableActions();
@@ -433,6 +356,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       mapApp.getLayer_BaseMap().setEnabled(_chkShowLayer_BaseMap.getSelection());
       mapApp.getLayer_HillShading().setEnabled(_chkShowLayer_Hillshading.getSelection());
+
       // satellite maps
       mapApp.getLayer_Satellite().setEnabled(_chkShowLayer_Satellite.getSelection());
 
@@ -440,7 +364,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       mapApp.getLayer_ScaleBar().setEnabled(_chkShowLayer_Scale.getSelection());
 
       mapApp.setIsPhotoShowTitle(_chkShowPhoto_Title.getSelection());
-
       mapApp.setIsPhotoShowScaled(_chkShowPhoto_Scaled.getSelection());
 
       mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
@@ -475,23 +398,21 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       final Map25App mapApp = _map25View.getMapApp();
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-      _chkShowLayer_BaseMap.setSelection(mapApp.getLayer_BaseMap().isEnabled());
-      _chkShowLayer_Hillshading.setSelection(mapApp.getLayer_HillShading().isEnabled());
+// SET_FORMATTING_OFF
 
-      _chkShowLayer_Satellite.setSelection(mapApp.getLayer_Satellite().isEnabled());
+      _chkShowLayer_BaseMap      .setSelection(mapApp.getLayer_BaseMap().isEnabled());
+      _chkShowLayer_Hillshading  .setSelection(mapApp.getLayer_HillShading().isEnabled());
+      _chkShowLayer_Satellite    .setSelection(mapApp.getLayer_Satellite().isEnabled());
+      _chkShowLayer_Label        .setSelection(mapApp.getLayer_Label().isEnabled());
+      _chkShowLayer_Scale        .setSelection(mapApp.getLayer_ScaleBar().isEnabled());
+      _chkShowPhoto_Title        .setSelection(mapApp.getIsPhotoShowTitle());
+      _chkShowPhoto_Scaled       .setSelection(mapApp.getIsPhotoShowScaled());
+      _chkShowLayer_TileInfo     .setSelection(mapApp.getLayer_TileInfo().isEnabled());
+      _chkShowLayer_Building     .setSelection(mapApp.getLayer_Building().isEnabled());
 
-      _chkShowLayer_Label.setSelection(mapApp.getLayer_Label().isEnabled());
-      _chkShowLayer_Scale.setSelection(mapApp.getLayer_ScaleBar().isEnabled());
+      _spinnerHillshadingOpacity .setSelection(UI.transformOpacity_WhenRestored(mapApp.getLayer_HillShading_Opacity()));
 
-      _chkShowPhoto_Title.setSelection(mapApp.getIsPhotoShowTitle());
-
-      _chkShowPhoto_Scaled.setSelection(mapApp.getIsPhotoShowScaled());
-
-      _chkShowLayer_TileInfo.setSelection(mapApp.getLayer_TileInfo().isEnabled());
-
-      _chkShowLayer_Building.setSelection(mapApp.getLayer_Building().isEnabled());
-
-      _spinnerHillshadingOpacity.setSelection(mapApp.getLayer_HillShading_Opacity());
+// SET_FORMATTING_ON
 
       // HERE i HAD a bug!!!! hopefully solved now
       _spinnerPhoto_Size.setSelection(config.markerPhoto_Size);

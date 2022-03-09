@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,11 +30,13 @@ public class Map25TrackConfig {
    public String defaultId = Map25ConfigManager.CONFIG_DEFAULT_ID_1;
    public String name      = Map25ConfigManager.CONFIG_DEFAULT_ID_1;
 
+// SET_FORMATTING_OFF
+
    // outline
-   public boolean isShowDirectionArrow = Map25ConfigManager.DEFAULT_OUTLINE_IS_SHOW_DIRECTION_ARROW;
-   public float   outlineWidth         = Map25ConfigManager.DEFAULT_OUTLINE_WIDTH;
-   public RGB     outlineColor         = Map25ConfigManager.DEFAULT_OUTLINE_COLOR;
-   public int     outlineOpacity       = Map25ConfigManager.DEFAULT_OUTLINE_OPACITY;
+   public boolean isShowDirectionArrow       = Map25ConfigManager.DEFAULT_OUTLINE_IS_SHOW_DIRECTION_ARROW;
+   public float   outlineWidth               = Map25ConfigManager.DEFAULT_OUTLINE_WIDTH;
+   public RGB     outlineColor               = Map25ConfigManager.DEFAULT_OUTLINE_COLOR;
+   public int     outlineOpacity             = Map25ConfigManager.DEFAULT_OUTLINE_OPACITY;
 
    // slider location
    public boolean isShowSliderLocation       = Map25ConfigManager.DEFAULT_IS_SHOW_CHART_SLIDER;
@@ -44,10 +46,12 @@ public class Map25TrackConfig {
    public int     sliderLocation_Size        = Map25ConfigManager.DEFAULT_SLIDER_LOCATION_SIZE;
 
    // slider path
-   public boolean isShowSliderPath     = Map25ConfigManager.DEFAULT_IS_SHOW_SLIDER_PATH;
-   public RGB     sliderPath_Color     = Map25ConfigManager.DEFAULT_SLIDER_PATH_COLOR;
-   public float   sliderPath_LineWidth = Map25ConfigManager.DEFAULT_SLIDER_PATH_LINE_WIDTH;
-   public int     sliderPath_Opacity   = Map25ConfigManager.DEFAULT_SLIDER_PATH_OPACITY;
+   public boolean isShowSliderPath           = Map25ConfigManager.DEFAULT_IS_SHOW_SLIDER_PATH;
+   public RGB     sliderPath_Color           = Map25ConfigManager.DEFAULT_SLIDER_PATH_COLOR;
+   public float   sliderPath_LineWidth       = Map25ConfigManager.DEFAULT_SLIDER_PATH_LINE_WIDTH;
+   public int     sliderPath_Opacity         = Map25ConfigManager.DEFAULT_SLIDER_PATH_OPACITY;
+
+// SET_FORMATTING_ON
 
    /**
     * Animation time in milli seconds when a tour is synched with the map, default is 2000 ms
