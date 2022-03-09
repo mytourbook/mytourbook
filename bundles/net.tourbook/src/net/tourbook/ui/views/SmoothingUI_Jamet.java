@@ -47,6 +47,12 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class SmoothingUI_Jamet implements ISmoothingAlgorithm {
 
+// SET_FORMATTING_OFF
+
+   private static final String    URL_TOUR_CHART_SMOOTHING = "https://mytourbook.sourceforge.io/mytourbook/index.php/documentation/tools/tour-chart-smoothing"; //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+
    private static final int       MAX_TAU    = 5000;
 
    private final IPreferenceStore _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
@@ -397,11 +403,7 @@ public class SmoothingUI_Jamet implements ISmoothingAlgorithm {
          link.setText(Messages.TourChart_Smoothing_Link_SmoothingOnlineDocumentation);
          link.setEnabled(true);
          link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-            WEB.openUrl(
-                  //
-                  // the URL MUST be split otherwise the messages editor will truncate it
-                  //
-                  Messages.External_Link_MyTourbook + Messages.External_Link_MyTourbook_TourChartSmoothing);
+            WEB.openUrl(URL_TOUR_CHART_SMOOTHING);
          }));
          _tk.adapt(link, true, true);
       }
