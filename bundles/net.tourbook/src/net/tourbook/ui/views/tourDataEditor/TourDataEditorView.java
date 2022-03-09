@@ -9204,8 +9204,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        * layout container to resize labels
        */
       _tourContainer.layout(true);
-
-      enableControls();
    }
 
    public void updateUI_Tab_2_TimeSlices() {

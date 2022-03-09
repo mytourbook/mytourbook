@@ -797,8 +797,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
    private void enableControls() {
 
-      _spinWeather_Wind_DirectionValue.setEnabled(
-            _comboWeather_Wind_DirectionText.getSelectionIndex() > 0);
+      _spinWeather_Wind_DirectionValue.setEnabled(_comboWeather_Wind_DirectionText.getSelectionIndex() > 0);
    }
 
    @Override
@@ -989,8 +988,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
          _spinWeather_Temperature_Average.setDigits(1);
          _spinWeather_Temperature_Average.setSelection(Math.round(avgTemperature * 10));
-
-         enableControls();
       }
       _isUpdateUI = false;
    }
