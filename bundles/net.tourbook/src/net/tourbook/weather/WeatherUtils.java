@@ -33,6 +33,10 @@ import net.tourbook.data.TourData;
 public class WeatherUtils {
 
    /**
+    * Returns the fully detailed weather data as a human readable string.
+    * Example: 17h(15.0°C, feels like 15.0°C, 5.0km/h from 68°, humidity 37%,
+    * precipitation 0.0mm)
+    *
     * @param temperatureValue
     *           in Celsius
     * @param windChill
@@ -48,8 +52,6 @@ public class WeatherUtils {
     * @param time
     *           in epoch seconds
     * @param timeZonedId
-    *           Example: 17h(15.0°C, feels like 15.0°C, 5.0km/h from 68°, humidity 37%,
-    *           precipitation 0.0mm)
     * @return
     */
    public static String buildFullWeatherDataString(final float temperatureValue,

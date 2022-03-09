@@ -85,7 +85,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                (float) hourly.wind_speed,
                hourly.wind_deg,
                hourly.humidity,
-               hourly.rain,
+               hourly.getRain(),
                tourDateTime.tourZonedDateTime.toEpochSecond(),
                tour.getTimeZoneId());
 

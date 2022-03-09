@@ -29,8 +29,6 @@ import net.tourbook.data.TourData;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeMachineResult {
 
-   public String       timezone;
-   public int          timezone_offset;
    public Current      current;
    public List<Hourly> hourly;
 

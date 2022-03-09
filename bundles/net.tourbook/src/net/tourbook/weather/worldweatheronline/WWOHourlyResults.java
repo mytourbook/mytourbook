@@ -77,12 +77,13 @@ public class WWOHourlyResults {
 
    public long getEpochSeconds(final ZoneId zoneId) {
 
-      if (StringUtils.isNullOrEmpty(utcTime) ||
-            !utcTime.endsWith("00")) { //$NON-NLS-1$
+      if (StringUtils.isNullOrEmpty(utcTime)) {
          return 0;
       }
 
-      final int timeHours = Integer.parseInt(utcTime.substring(0, utcTime.indexOf("00"))); //$NON-NLS-1$
+      final int timeHours = utcTime.equals("0")//$NON-NLS-1$
+            ? 0
+            : Integer.parseInt(utcTime.substring(0, utcTime.indexOf("0")));//$NON-NLS-1$
       final String dateTime = utcDate +
             UI.SPACE +
             String.format("%02d", timeHours) + //$NON-NLS-1$
