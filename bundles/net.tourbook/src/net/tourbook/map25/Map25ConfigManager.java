@@ -124,13 +124,13 @@ public class Map25ConfigManager {
    private static final String ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW    = "directionArrow";        //$NON-NLS-1$
    //
    public static final RGB     DEFAULT_OUTLINE_COLOR                   = new RGB(0x80, 0x0, 0x80);
-   public static final int     DEFAULT_OUTLINE_OPACITY                 = 70;
+   public static final int     DEFAULT_OUTLINE_OPACITY                 = 180;                     // 70 %
    public static final float   DEFAULT_OUTLINE_WIDTH                   = 2.5f;
    public static final boolean DEFAULT_OUTLINE_IS_SHOW_DIRECTION_ARROW = false;
-   public static final int     OUTLINE_OPACITY_MIN                     = 1;
-   public static final int     OUTLINE_OPACITY_MAX                     = 100;
-   public static final float   OUTLINE_WIDTH_MIN                       = 0.1f;
-   public static final float   OUTLINE_WIDTH_MAX                       = 20.0f;
+   public static final int     OUTLINE_OPACITY_MIN                     = 26;                      // 10 %;
+   public static final int     OUTLINE_OPACITY_MAX                     = 0xff;
+   public static final int     OUTLINE_WIDTH_MIN                       = 1;
+   public static final int     OUTLINE_WIDTH_MAX                       = 20;
    //
    // slider location/path
    private static final String TAG_SLIDER_PATH                     = "SliderPath";             //$NON-NLS-1$
@@ -144,22 +144,22 @@ public class Map25ConfigManager {
    private static final String ATTR_SLIDER_PATH_OPACITY            = "sliderPath_Opacity";     //$NON-NLS-1$
    //
    public static final boolean DEFAULT_IS_SHOW_SLIDER_PATH         = true;
-   public static final int     DEFAULT_SLIDER_LOCATION_OPACITY     = 100;
+   public static final int     DEFAULT_SLIDER_LOCATION_OPACITY     = 0xff;
    public static final int     DEFAULT_SLIDER_LOCATION_SIZE        = 30;
    public static final RGB     DEFAULT_SLIDER_LOCATION_LEFT_COLOR  = new RGB(0xff, 0x0, 0x0);
    public static final RGB     DEFAULT_SLIDER_LOCATION_RIGHT_COLOR = new RGB(0x0, 0xff, 0x0);
-   public static final int     SLIDER_LOCATION_OPACITY_MIN         = 1;
-   public static final int     SLIDER_LOCATION_OPACITY_MAX         = 100;
+   public static final int     SLIDER_LOCATION_OPACITY_MIN         = 26;                       //10 %;
+   public static final int     SLIDER_LOCATION_OPACITY_MAX         = 0xff;
    public static final int     SLIDER_LOCATION_SIZE_MIN            = 10;
    public static final int     SLIDER_LOCATION_SIZE_MAX            = 100;
    //
    public static final boolean DEFAULT_IS_SHOW_CHART_SLIDER        = true;
    public static final RGB     DEFAULT_SLIDER_PATH_COLOR           = new RGB(0xff, 0xff, 0x0);
    public static final float   DEFAULT_SLIDER_PATH_LINE_WIDTH      = 20.0f;
-   public static final int     DEFAULT_SLIDER_PATH_OPACITY         = 75;                       // 30 %
-   public static float         SLIDER_PATH_LINE_WIDTH_MIN          = 1.0f;
-   public static final float   SLIDER_PATH_LINE_WIDTH_MAX          = 50.0f;
-   public static final int     SLIDER_PATH_OPACITY_MIN             = 50;                       // 20%
+   public static final int     DEFAULT_SLIDER_PATH_OPACITY         = 77;                       // 30 %
+   public static final int     SLIDER_PATH_LINE_WIDTH_MIN          = 1;
+   public static final int     SLIDER_PATH_LINE_WIDTH_MAX          = 50;
+   public static final int     SLIDER_PATH_OPACITY_MIN             = 52;                       // 20%
    public static final int     SLIDER_PATH_OPACITY_MAX             = 0xff;
    //
    // other properties

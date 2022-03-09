@@ -927,9 +927,6 @@ public class Messages extends NLS {
    public static String        Elevation_Compare_Monitor_SubTask;
    public static String        Elevation_Compare_Monitor_Task;
 
-   public static String        External_Link_MyTourbook;
-   public static String        External_Link_MyTourbook_TourChartSmoothing;
-
    public static String        Format_hhmm;
    public static String        Format_rawdata_file_yyyy_mm_dd;
    public static String        Format_yyyymmdd_hhmmss;

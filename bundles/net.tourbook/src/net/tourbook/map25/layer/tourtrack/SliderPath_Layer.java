@@ -7,7 +7,6 @@ import gnu.trove.list.array.TIntArrayList;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
 
@@ -375,14 +374,12 @@ public class SliderPath_Layer extends Layer {
 
 		final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-      final int opacity = UI.transformOpacity_WhenRestored(trackConfig.sliderPath_Opacity);
-
       return LineStyle
 
             .builder()
 
 				.strokeWidth(trackConfig.sliderPath_LineWidth)
-            .color(ColorUtil.getARGB(trackConfig.sliderPath_Color, opacity))
+            .color(ColorUtil.getARGB(trackConfig.sliderPath_Color, trackConfig.sliderPath_Opacity))
             //.cap(Cap.BUTT)
             .cap(Paint.Cap.ROUND)
 				// this is not yet working
