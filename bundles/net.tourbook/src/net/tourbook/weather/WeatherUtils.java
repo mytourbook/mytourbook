@@ -96,8 +96,6 @@ public class WeatherUtils {
     * desired data.
     * Example: ☀ Sunny, 19°C, max. 26°C, min. 10°C, feels like 19°C, 6km/h from SSE, 34% humidity
     *
-    * @param tourData
-    * @return
     */
    public static String buildWeatherDataString(final TourData tourData,
                                                final boolean displayMinimumTemperature,
