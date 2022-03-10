@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2019, 2022 Wolfgang Schramm and Contributors
  * Copyright 2016-2018 devemux86
  * Copyright 2017 nebular
  * Copyright 2019, 2021 Thomas Theussing
@@ -372,21 +372,23 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
    }
 
    public void loadConfig() {
+
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-      _fgColor = ColorUtil.getARGB(config.markerOutline_Color, (int) (config.markerOutline_Opacity / 100.0 * 0xff));
-      _bgColor = ColorUtil.getARGB(config.markerFill_Color, (int) (config.markerFill_Opacity / 100.0 * 0xff));
-      _clusterSymbolSizeDP = config.clusterSymbol_Size;
-      _clusterForegroundColor = ColorUtil.getARGB(
-            config.clusterOutline_Color,
-            (int) (config.clusterOutline_Opacity / 100.0 * 0xff));
-      _clusterBackgroundColor = ColorUtil.getARGB(
-            config.clusterFill_Color,
-            (int) (config.clusterFill_Opacity / 100.0 * 0xff));
-      _clusterSymbolWeight = config.clusterSymbol_Weight;
-      _clusterOutlineSize = config.clusterOutline_Size;
-      _symbolSize = ScreenUtils.getPixels(config.markerSymbol_Size);
-      _symbolSizeInt = (int) Math.ceil(_symbolSize);
-      _clusterSymbol_Size = config.clusterSymbol_Size;
+
+// SET_FORMATTING_OFF
+
+      _fgColor                   = ColorUtil.getARGB(config.markerOutline_Color,    config.markerOutline_Opacity);
+      _bgColor                   = ColorUtil.getARGB(config.markerFill_Color,       config.markerFill_Opacity);
+      _clusterSymbolSizeDP       = config.clusterSymbol_Size;
+      _clusterForegroundColor    = ColorUtil.getARGB(config.clusterOutline_Color,   config.clusterOutline_Opacity);
+      _clusterBackgroundColor    = ColorUtil.getARGB(config.clusterFill_Color,      config.clusterFill_Opacity);
+      _clusterSymbolWeight       = config.clusterSymbol_Weight;
+      _clusterOutlineSize        = config.clusterOutline_Size;
+      _symbolSize                = ScreenUtils.getPixels(config.markerSymbol_Size);
+      _symbolSizeInt             = (int) Math.ceil(_symbolSize);
+      _clusterSymbol_Size        = config.clusterSymbol_Size;
+
+// SET_FORMATTING_ON
 
       //_mapApp.debugPrint("*** Markertoolkit:  fillradius for star: " + config.clusterSymbol_Size + " " + config.clusterSymbol_Weight); //$NON-NLS-1$
       //_mapApp.debugPrint("*** Markertoolkit:  _clusterOutlineSize for star: " + _clusterOutlineSize + " , _clusterSymbol_Size: " + _clusterSymbol_Size); //$NON-NLS-1$

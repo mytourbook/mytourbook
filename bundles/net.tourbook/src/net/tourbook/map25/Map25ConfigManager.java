@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -228,14 +228,14 @@ public class Map25ConfigManager {
    //
    // colors
    public static final RGB   DEFAULT_CLUSTER_FILL_COLOR      = new RGB(0xFC, 0x67, 0x00);
-   public static final int   DEFAULT_CLUSTER_FILL_OPACITY    = 80;
+   public static final int   DEFAULT_CLUSTER_FILL_OPACITY    = 200;                      // 80%;
    public static final RGB   DEFAULT_CLUSTER_OUTLINE_COLOR   = new RGB(0xff, 0xff, 0xff);
-   public static final int   DEFAULT_CLUSTER_OUTLINE_OPACITY = 80;
+   public static final int   DEFAULT_CLUSTER_OUTLINE_OPACITY = 200;                      // 80%;
    public static final float DEFAULT_CLUSTER_OUTLINE_SIZE    = 2.0f;
    public static final RGB   DEFAULT_MARKER_FILL_COLOR       = new RGB(0xFF, 0xFF, 0x00);
-   public static final int   DEFAULT_MARKER_FILL_OPACITY     = 80;
+   public static final int   DEFAULT_MARKER_FILL_OPACITY     = 200;                      // 80%;
    public static final RGB   DEFAULT_MARKER_OUTLINE_COLOR    = new RGB(0, 0, 0);
-   public static final int   DEFAULT_MARKER_OUTLINE_OPACITY  = 80;
+   public static final int   DEFAULT_MARKER_OUTLINE_OPACITY  = 200;                      // 80%;
    //
    // map movement with animation
    private static final Easing.Type ANIMATION_EASING_TYPE_DEFAULT   = Easing.Type.SINE_INOUT;
