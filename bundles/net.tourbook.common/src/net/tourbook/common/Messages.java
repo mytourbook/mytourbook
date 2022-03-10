@@ -278,7 +278,7 @@ public class Messages extends NLS {
 
    public static String        Weather_Clounds_Clouds;
    public static String        Weather_Clounds_Clouny;
-   public static String        Weather_Clounds_IsNotDefined;
+   public static String        Weather_Clouds_IsNotDefined;
    public static String        Weather_Clounds_Lightning;
    public static String        Weather_Clounds_Rain;
    public static String        Weather_Clounds_ScatteredShowers;

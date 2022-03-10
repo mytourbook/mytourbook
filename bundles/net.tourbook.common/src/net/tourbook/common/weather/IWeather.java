@@ -29,9 +29,12 @@ public interface IWeather {
    public static final String   WEATHER_ID_SEVERE_WEATHER_ALERT = "weather-severe";           //$NON-NLS-1$
    public static final String   WEATHER_ID_SCATTERED_SHOWERS    = "weather-showers-scatterd"; //$NON-NLS-1$
 
+   public static final String   windDirectionIsNotDefined       = UI.EMPTY_STRING;
+
    public static final String[] windDirectionText               = new String[] {
 
-         UI.EMPTY_STRING,
+         windDirectionIsNotDefined,
+
          Messages.Weather_WindDirection_N,
          Messages.Weather_WindDirection_NNE,
          Messages.Weather_WindDirection_NE,
@@ -166,7 +169,7 @@ public interface IWeather {
 
 // SET_FORMATTING_ON
 
-   public static final String cloudIsNotDefined = Messages.Weather_Clounds_IsNotDefined;
+   public static final String cloudIsNotDefined = Messages.Weather_Clouds_IsNotDefined;
 
    /*
     * cloudText and cloudDbValue must be in synch
