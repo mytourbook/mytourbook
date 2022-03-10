@@ -8976,7 +8976,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final boolean isTourTemperatureDeviceValid = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0;
       final boolean isTourTemperatureValid = _tourData.getWeather_Temperature_Average() != 0 ||
             _tourData.getWeather_Temperature_Max() != 0 ||
-            _tourData.getWeather_Temperature_Min() != 0;
+            _tourData.getWeather_Temperature_Min() != 0 ||
+            _tourData.isWeatherDataFromProvider();
       /*
        * Avg temperature from Device
        */

@@ -983,11 +983,20 @@ public class DialogQuickEdit extends TitleAreaDialog {
          /*
           * Avg temperature
           */
+         final boolean isTourTemperatureValid = _tourData.getWeather_Temperature_Average() != 0 ||
+               _tourData.getWeather_Temperature_Max() != 0 ||
+               _tourData.getWeather_Temperature_Min() != 0 ||
+               _tourData.isWeatherDataFromProvider();
          final float avgTemperature =
                UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Average());
 
          _spinWeather_Temperature_Average.setDigits(1);
-         _spinWeather_Temperature_Average.setSelection(Math.round(avgTemperature * 10));
+         int avgTemperatureValue = 0;
+         if (isTourTemperatureValid) {
+            avgTemperatureValue = Math.round(avgTemperature * 10);
+
+         }
+         _spinWeather_Temperature_Average.setSelection(avgTemperatureValue);
       }
       _isUpdateUI = false;
    }
