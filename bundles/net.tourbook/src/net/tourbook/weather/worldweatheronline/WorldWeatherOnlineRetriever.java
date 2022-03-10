@@ -73,7 +73,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    private WeatherData            historicalWeatherData;
 
    private final IPreferenceStore _prefStore      = TourbookPlugin.getPrefStore();
-   private List<WWOHourlyResults> _rawWeatherData = null;
+   private List<Hourly>           _rawWeatherData = null;
    private List<NearestArea>      _nearestArea    = null;
 
    /*
@@ -99,11 +99,11 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    @Override
    protected String buildFullWeatherDataString() {
 
-      final List<WWOHourlyResults> hourlyFiltered = filterHourlyData(tour);
+      final List<Hourly> hourlyFiltered = filterHourlyData(tour);
 
       final List<String> fullWeatherDataList = new ArrayList<>();
 
-      for (final WWOHourlyResults hourly : hourlyFiltered) {
+      for (final Hourly hourly : hourlyFiltered) {
 
          final long hourlyEpochSeconds = hourly.getEpochSeconds(tour.getTimeZoneIdWithDefault());
 
@@ -127,13 +127,13 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
          final NearestArea nearestArea = _nearestArea.get(0);
 
          String weatherStationName = UI.EMPTY_STRING;
-         if (nearestArea.areaName != null && nearestArea.areaName.size() > 0) {
-            weatherStationName = nearestArea.areaName.get(0).value;
+         if (nearestArea.getAreaName() != null && nearestArea.getAreaName().size() > 0) {
+            weatherStationName = nearestArea.getAreaName().get(0).getValue();
          }
 
          final LatLng weatherStationCoordinates = new LatLng(
-               Double.valueOf(nearestArea.latitude),
-               Double.valueOf(nearestArea.longitude));
+               Double.valueOf(nearestArea.getLatitude()),
+               Double.valueOf(nearestArea.getLongitude()));
 
          final float distanceFromTour = Math.round(
                LatLngTool.distance(
@@ -143,8 +143,8 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                      / UI.UNIT_VALUE_DISTANCE / 1000);
 
          String weatherStationLink = UI.EMPTY_STRING;
-         if (nearestArea.weatherUrl != null && nearestArea.weatherUrl.size() > 0) {
-            weatherStationLink = nearestArea.weatherUrl.get(0).value;
+         if (nearestArea.getWeatherUrl() != null && nearestArea.getWeatherUrl().size() > 0) {
+            weatherStationLink = nearestArea.getWeatherUrl().get(0).getValue();
          }
 
          fullWeatherDataList.add(NLS.bind(
@@ -209,13 +209,13 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       int maxTemperature = Integer.MIN_VALUE;
       int minTemperature = Integer.MAX_VALUE;
 
-      final List<WWOHourlyResults> hourlyFiltered = filterHourlyData(tour);
+      final List<Hourly> hourlyFiltered = filterHourlyData(tour);
 
       final int tourMiddleData = (hourlyFiltered.size() / 2);
 
       for (int index = 0; index < hourlyFiltered.size(); index++) {
 
-         final WWOHourlyResults hourlyData = hourlyFiltered.get(index);
+         final Hourly hourlyData = hourlyFiltered.get(index);
 
          // Within the hourly data, find the times that corresponds to the middle
          // of the tour time and extract the weather data's description.
@@ -261,15 +261,15 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
     * @param tour
     * @return
     */
-   private List<WWOHourlyResults> filterHourlyData(final TourData tour) {
+   private List<Hourly> filterHourlyData(final TourData tour) {
 
-      final List<WWOHourlyResults> filteredHourlyData = new ArrayList<>();
+      final List<Hourly> filteredHourlyData = new ArrayList<>();
 
       final long tourStartTime = tour.getTourStartTimeMS() / 1000;
       final long tourEndTime = tour.getTourEndTimeMS() / 1000;
       final long thirtyMinutes = 1800;
 
-      for (final WWOHourlyResults hourly : _rawWeatherData) {
+      for (final Hourly hourly : _rawWeatherData) {
 
          //The current data is not kept if its measured time is:
          // - 30 mins before the tour start time
@@ -329,7 +329,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                .get("hourly") //$NON-NLS-1$
                .toString();
 
-         _rawWeatherData = mapper.readValue(weatherResults, new TypeReference<List<WWOHourlyResults>>() {});
+         _rawWeatherData = mapper.readValue(weatherResults, new TypeReference<List<Hourly>>() {});
 
          computeFinalWeatherData(weatherData);
 

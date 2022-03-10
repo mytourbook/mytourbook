@@ -29,8 +29,9 @@ import net.tourbook.data.TourData;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeMachineResult {
 
-   public Current      current;
-   public List<Hourly> hourly;
+   private Current      current;
+
+   private List<Hourly> hourly;
 
    /**
     * Filters and keeps only the values included between the tour start and end times.
@@ -46,12 +47,12 @@ public class TimeMachineResult {
       final long tourEndTime = tour.getTourEndTimeMS() / 1000;
       final long thirtyMinutes = 1800;
 
-      for (final Hourly currentHourly : hourly) {
+      for (final Hourly currentHourly : getHourly()) {
          //The current data is not kept if its measured time is:
          // - 30 mins before the tour start time
          // OR 30 mins after the tour start time
-         if (currentHourly.dt < tourStartTime - thirtyMinutes ||
-               currentHourly.dt > tourEndTime + thirtyMinutes) {
+         if (currentHourly.getDt() < tourStartTime - thirtyMinutes ||
+               currentHourly.getDt() > tourEndTime + thirtyMinutes) {
             continue;
          }
 
@@ -103,6 +104,10 @@ public class TimeMachineResult {
       return 0;
    }
 
+   public Current getCurrent() {
+      return current;
+   }
+
    private Weather getCurrentWeather() {
 
       final Weather currentWeather = null;
@@ -111,12 +116,16 @@ public class TimeMachineResult {
          return currentWeather;
       }
 
-      final List<Weather> weather = current.weather;
+      final List<Weather> weather = current.getWeather();
       if (weather == null || weather.size() == 0) {
          return currentWeather;
       }
 
       return weather.get(0);
+   }
+
+   public List<Hourly> getHourly() {
+      return hourly;
    }
 
    public float getPrecipitation(final TourData tour) {
@@ -184,7 +193,7 @@ public class TimeMachineResult {
          return weatherDescription;
       }
 
-      return currentWeather.description;
+      return currentWeather.getDescription();
    }
 
    public String getWeatherType() {
@@ -198,7 +207,7 @@ public class TimeMachineResult {
 
       // Codes : https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
 
-      final int currentWeatherId = currentWeather.id;
+      final int currentWeatherId = currentWeather.getId();
 
       if (currentWeatherId >= 200 && currentWeatherId < 300) {
          weatherType = IWeather.WEATHER_ID_LIGHTNING;
@@ -218,8 +227,8 @@ public class TimeMachineResult {
             currentWeatherId == 771 || currentWeatherId == 781) {
          weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
       } else {
-         weatherType = "id: '" + currentWeather.id + "'," + //$NON-NLS-1$ //$NON-NLS-2$
-               "main: '" + currentWeather.main + "'"; //$NON-NLS-1$ //$NON-NLS-2$
+         weatherType = "id: '" + currentWeatherId + "'," + //$NON-NLS-1$ //$NON-NLS-2$
+               "main: '" + currentWeather.getMain() + "'"; //$NON-NLS-1$ //$NON-NLS-2$
       }
 
       return weatherType;

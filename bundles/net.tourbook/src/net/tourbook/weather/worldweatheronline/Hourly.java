@@ -31,49 +31,49 @@ import net.tourbook.common.util.StringUtils;
  * A Java representation of a World Weather Online query result "hourly" element.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WWOHourlyResults {
+public class Hourly {
 
    @JsonProperty("UTCdate")
-   private String                 utcDate;
+   private String            utcDate;
 
    @JsonProperty("UTCtime")
-   private String                 utcTime;
+   private String            utcTime;
 
-   private String                 time;
+   private String            time;
 
-   private String                 windspeedKmph;
+   private String            windspeedKmph;
 
-   private String                 winddirDegree;
+   private String            winddirDegree;
 
-   private List<WWOValuesResults> weatherDesc;
+   private List<ValueResult> weatherDesc;
 
-   private String                 weatherCode;
+   private String            weatherCode;
 
    /**
     * Feels like temperature in degrees Celsius (windchill)
     */
    @JsonProperty("FeelsLikeC")
-   private String                 feelsLikeC;
+   private String            feelsLikeC;
 
    /**
     * Temperature in degrees Celsius
     */
-   private String                 tempC;
+   private String            tempC;
 
    /**
     * Atmospheric pressure in millibars (mb)
     */
-   private String                 pressure;
+   private String            pressure;
 
    /**
     * Humidity in percentage (%)
     */
-   private int                    humidity;
+   private int               humidity;
 
    /**
     * Precipitation in millimeters
     */
-   private String                 precipMM;
+   private String            precipMM;
 
    public long getEpochSeconds(final ZoneId zoneId) {
 
@@ -135,7 +135,7 @@ public class WWOHourlyResults {
       return weatherCode;
    }
 
-   public List<WWOValuesResults> getWeatherDesc() {
+   public List<ValueResult> getWeatherDesc() {
       return weatherDesc;
    }
 

@@ -22,8 +22,24 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NearestArea {
 
-   public List<AreaName>   areaName;
-   public String           latitude;
-   public String           longitude;
-   public List<WeatherUrl> weatherUrl;
+   private List<ValueResult> areaName;
+   private String            latitude;
+   private String            longitude;
+   private List<ValueResult> weatherUrl;
+
+   public List<ValueResult> getAreaName() {
+      return areaName;
+   }
+
+   public String getLatitude() {
+      return latitude;
+   }
+
+   public String getLongitude() {
+      return longitude;
+   }
+
+   public List<ValueResult> getWeatherUrl() {
+      return weatherUrl;
+   }
 }

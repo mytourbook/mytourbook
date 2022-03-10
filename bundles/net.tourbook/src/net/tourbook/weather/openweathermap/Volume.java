@@ -22,5 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Volume {
 
    @JsonProperty("1h")
-   public double oneHour;
+   private double oneHour;
+
+   public double getOneHour() {
+      return oneHour;
+   }
 }

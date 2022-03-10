@@ -70,21 +70,21 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       final List<String> fullWeatherDataList = new ArrayList<>();
 
-      for (final Hourly hourly : _timeMachineResult.hourly) {
+      for (final Hourly hourly : _timeMachineResult.getHourly()) {
 
-         if (hourly.dt < tourStartTime - thirtyMinutes ||
-               hourly.dt > tourEndTime + thirtyMinutes) {
+         if (hourly.getDt() < tourStartTime - thirtyMinutes ||
+               hourly.getDt() > tourEndTime + thirtyMinutes) {
             continue;
          }
 
-         final TourDateTime tourDateTime = TimeTools.createTourDateTime(hourly.dt * 1000L, tour.getTimeZoneId());
+         final TourDateTime tourDateTime = TimeTools.createTourDateTime(hourly.getDt() * 1000L, tour.getTimeZoneId());
 
          final String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                (float) hourly.getTemp(),
-               (float) hourly.feels_like,
-               (float) hourly.wind_speed,
-               hourly.wind_deg,
-               hourly.humidity,
+               (float) hourly.getFeels_like(),
+               (float) hourly.getWind_speed(),
+               hourly.getWind_deg(),
+               hourly.getHumidity(),
                hourly.getRain(),
                hourly.getSnow(),
                tourDateTime.tourZonedDateTime.toEpochSecond(),

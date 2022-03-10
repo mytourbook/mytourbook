@@ -20,7 +20,19 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Weather {
 
-   public int    id;
-   public String main;
-   public String description;
+   private int    id;
+   private String main;
+   private String description;
+
+   public String getDescription() {
+      return description;
+   }
+
+   public int getId() {
+      return id;
+   }
+
+   public String getMain() {
+      return main;
+   }
 }
