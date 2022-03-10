@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  * Copyright (C) 2018, 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -391,8 +391,7 @@ public class TourLayer extends Layer {
 
          _markertoolkit = new MarkerToolkit(MarkerShape.ARROW);
 
-         _bitmapArrow = _markertoolkit.drawTrackArrow(40,
-               ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity));
+         _bitmapArrow = _markertoolkit.drawTrackArrow(40, ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity));
 
          _tex = new TextureItem(_bitmapArrow);
 
