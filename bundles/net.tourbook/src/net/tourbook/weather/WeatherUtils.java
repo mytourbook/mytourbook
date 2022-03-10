@@ -65,30 +65,30 @@ public class WeatherUtils {
                                                    final float snowFallValue,
                                                    final long time,
                                                    final String timeZoneId) {
-//todo fb
-      final String temperature = String.format("%10s", Math.round(UI.convertSpeed_FromMetric(temperatureValue) * 10.0) / 10.0)
+
+      final String temperature = String.format("%5s", Math.round(UI.convertSpeed_FromMetric(temperatureValue) * 10.0) / 10.0) //$NON-NLS-1$
             + UI.UNIT_LABEL_TEMPERATURE;
       final String feelsLike = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
             UI.SPACE +
-            UI.convertTemperatureFromMetric(windChill) +
+            String.format("%5s", UI.convertTemperatureFromMetric(windChill)) + //$NON-NLS-1$
             UI.UNIT_LABEL_TEMPERATURE;
-      final String wind = Math.round(UI.convertSpeed_FromMetric(windSpeed) * 10.0) / 10.0 + UI.UNIT_LABEL_SPEED +
+      final String wind = String.format("%5s", Math.round(UI.convertSpeed_FromMetric(windSpeed) * 10.0) / 10.0) + UI.UNIT_LABEL_SPEED + //$NON-NLS-1$
             UI.SPACE + Messages.Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection +
-            UI.SPACE + windDirection + UI.SYMBOL_DEGREE;
+            UI.SPACE + String.format("%3s", String.valueOf(windDirection)) + UI.SYMBOL_DEGREE; //$NON-NLS-1$
       final String humidity = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Humidity +
             UI.SPACE +
-            humidityValue;
+            String.format("%3s", humidityValue); //$NON-NLS-1$
       final String precipitation = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation +
             UI.SPACE +
-            UI.convertPrecipitation_FromMetric(precipitationValue);
+            String.format("%4s", UI.convertPrecipitation_FromMetric(precipitationValue)); //$NON-NLS-1$
       final String snowFall = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall +
             UI.SPACE +
             UI.convertPrecipitation_FromMetric(snowFallValue);
 
       final TourDateTime tourDateTime = TimeTools.createTourDateTime(time * 1000L, timeZoneId);
-      final String fullWeatherData = String.format("%3s", tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME) +
+      final String fullWeatherData = String.format("%3s", tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME) + //$NON-NLS-1$
             UI.SPACE + UI.SYMBOL_BRACKET_LEFT +
-            temperature+ UI.COMMA_SPACE +
+            temperature + UI.COMMA_SPACE +
             feelsLike + UI.COMMA_SPACE +
             wind + UI.COMMA_SPACE +
             humidity + UI.SYMBOL_PERCENTAGE + UI.COMMA_SPACE +

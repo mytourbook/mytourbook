@@ -155,7 +155,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       }
 
       final String fullWeatherData = String.join(
-            UI.COMMA_SPACE + net.tourbook.ui.UI.SYSTEM_NEW_LINE,
+            net.tourbook.ui.UI.SYSTEM_NEW_LINE,
             fullWeatherDataList);
 
       return fullWeatherData;
