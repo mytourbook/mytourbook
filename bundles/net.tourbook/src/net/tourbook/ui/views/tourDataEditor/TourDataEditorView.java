@@ -6035,9 +6035,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final int selectionIndex = _comboWeather_Clouds.getSelectionIndex();
 
       final String cloudKey = IWeather.cloudIcon[selectionIndex];
-      final Image cloundIcon = UI.IMAGE_REGISTRY.get(cloudKey);
+      final Image cloudIcon = UI.IMAGE_REGISTRY.get(cloudKey);
 
-      _lblCloudIcon.setImage(cloundIcon);
+      _lblCloudIcon.setImage(cloudIcon);
    }
 
    /**

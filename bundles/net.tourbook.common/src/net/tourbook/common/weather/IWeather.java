@@ -182,14 +182,14 @@ public interface IWeather {
 
          cloudIsNotDefined,
 
-         Messages.Weather_Clounds_Sunny,
-         Messages.Weather_Clounds_Clouny,
-         Messages.Weather_Clounds_Clouds,
-         Messages.Weather_Clounds_ScatteredShowers,
-         Messages.Weather_Clounds_Rain,
-         Messages.Weather_Clounds_Lightning,
-         Messages.Weather_Clounds_Snow,
-         Messages.Weather_Clounds_SevereWeatherAlert
+         Messages.Weather_Clouds_Sunny,
+         Messages.Weather_Clouds_Cloudy,
+         Messages.Weather_Clouds_Clouds,
+         Messages.Weather_Clouds_ScatteredShowers,
+         Messages.Weather_Clouds_Rain,
+         Messages.Weather_Clouds_Lightning,
+         Messages.Weather_Clouds_Snow,
+         Messages.Weather_Clouds_SevereWeatherAlert
 
    };
 
