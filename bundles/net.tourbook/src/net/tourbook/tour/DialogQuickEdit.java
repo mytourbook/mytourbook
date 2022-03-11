@@ -549,6 +549,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
       final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      _firstColumnContainerControls.add(container);
       {
          {
             /*
@@ -602,7 +603,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
       final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          {
             /*
@@ -615,7 +616,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
             _secondColumnControls.add(_txtWeather_Temperature_Average_Device);
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .span(2, 1)
                   .applyTo(_txtWeather_Temperature_Average_Device);
             _tk.adapt(_txtWeather_Temperature_Average_Device, true, false);
 
@@ -632,6 +632,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
       final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      _firstColumnContainerControls.add(container);
       {
          {
             /*
