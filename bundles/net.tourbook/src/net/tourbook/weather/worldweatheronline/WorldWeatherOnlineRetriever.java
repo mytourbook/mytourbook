@@ -367,6 +367,8 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    @Override
    public boolean retrieveHistoricalWeatherData() {
 
+      //todo fb test eith wasatch 100 for example
+      //when the tour overlaps 2 days, then do what i did for OWM
       final String weatherRequestWithParameters = buildWeatherApiRequest();
 
       final String rawWeatherData = super.sendWeatherApiRequest(weatherRequestWithParameters);

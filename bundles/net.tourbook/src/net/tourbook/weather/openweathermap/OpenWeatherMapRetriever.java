@@ -42,7 +42,6 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    private static final String baseApiUrl        = HEROKU_APP_URL + "/openweathermap/timemachine";       //$NON-NLS-1$
 
    private LatLng              searchAreaCenter;
-   //todo fb get the current condition fromthe hourly that matches the tour middle time. => delete the current in he root
    private long                tourMiddleTime;
    private long                tourStartTime;
    private long                tourEndTime;
@@ -57,8 +56,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       tourStartTime = tour.getTourStartTimeMS() / 1000;
       tourEndTime = tour.getTourEndTimeMS() / 1000;
-      final long tourMiddleTimeMillis = tourStartTime + ((tourEndTime - tourStartTime) / 2);
-      tourMiddleTime = tourMiddleTimeMillis / 1000;
+      tourMiddleTime = tourStartTime + ((tourEndTime - tourStartTime) / 2);
    }
 
    public static String getBaseApiUrl() {
@@ -176,6 +174,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       }
 
 // SET_FORMATTING_OFF
+      timeMachineResult.findMiddleHourly(tourMiddleTime);
 
       tour.setIsWeatherDataFromProvider(true);
       tour.setWeather(                       timeMachineResult.getWeatherDescription());

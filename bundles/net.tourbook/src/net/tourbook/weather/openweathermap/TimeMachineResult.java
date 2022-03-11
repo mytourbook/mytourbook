@@ -29,9 +29,9 @@ import net.tourbook.data.TourData;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeMachineResult {
 
-   private Current      current;
-
    private List<Hourly> hourly;
+
+   private Hourly       middleHourly;
 
    public TimeMachineResult() {
       hourly = new ArrayList<>();
@@ -79,6 +79,26 @@ public class TimeMachineResult {
       return filteredHourlyData;
    }
 
+   /**
+    * Finds the hourly that is closest to the middle of the tour. This will be used
+    * to determine the weather description of the tour.
+    */
+   public void findMiddleHourly(final long tourMiddleTime) {
+
+      middleHourly = null;
+
+      long timeDifference = Long.MAX_VALUE;
+      for (final Hourly currentHourly : hourly) {
+
+         final long currentTimeDifference = Math.abs(currentHourly.getDt() - tourMiddleTime);
+         if (currentTimeDifference < timeDifference) {
+            middleHourly = currentHourly;
+            timeDifference = currentTimeDifference;
+         }
+      }
+
+   }
+
    public float getAverageHumidity(final TourData tour) {
 
       final List<Hourly> hourlyFiltered = filterHourlyData(tour);
@@ -121,24 +141,14 @@ public class TimeMachineResult {
       return 0;
    }
 
-   public Current getCurrent() {
-      return current;
-   }
-
    private Weather getCurrentWeather() {
 
-      final Weather currentWeather = null;
-
-      if (current == null) {
-         return currentWeather;
+      final List<Weather> currentWeather = middleHourly.getWeather();
+      if (currentWeather == null || currentWeather.size() == 0) {
+         return null;
       }
 
-      final List<Weather> weather = current.getWeather();
-      if (weather == null || weather.size() == 0) {
-         return currentWeather;
-      }
-
-      return weather.get(0);
+      return currentWeather.get(0);
    }
 
    public List<Hourly> getHourly() {
@@ -215,7 +225,7 @@ public class TimeMachineResult {
 
    public String getWeatherType() {
 
-      String weatherType = UI.EMPTY_STRING;
+      String weatherType = IWeather.cloudIsNotDefined;
 
       final Weather currentWeather = getCurrentWeather();
       if (currentWeather == null) {
