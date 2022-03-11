@@ -546,7 +546,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
    private void createUI_142_Weather_Temperature_Col1(final Composite parent) {
 
-      final Composite container = _tk.createComposite(parent, SWT.BORDER);
+      final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
@@ -611,11 +611,10 @@ public class DialogQuickEdit extends TitleAreaDialog {
             _txtWeather_Temperature_Average_Device = _tk.createText(
                   container,
                   UI.EMPTY_STRING,
-                  SWT.READ_ONLY);
-            _firstColumnControls.add(_txtWeather_Temperature_Average_Device);
+                  SWT.READ_ONLY | SWT.TRAIL);
+            _secondColumnControls.add(_txtWeather_Temperature_Average_Device);
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .span(2, 1)
                   .applyTo(_txtWeather_Temperature_Average_Device);
             _tk.adapt(_txtWeather_Temperature_Average_Device, true, false);
