@@ -17,18 +17,21 @@ package net.tourbook.weather.openweathermap;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.List;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Hourly {
 
-   private int    dt;
-   private double temp;
-   private double feels_like;
-   private int    pressure;
-   private int    humidity;
-   private double wind_speed;
-   private int    wind_deg;
-   private Volume rain;
-   private Volume snow;
+   private int           dt;
+   private double        temp;
+   private double        feels_like;
+   private int           pressure;
+   private int           humidity;
+   private List<Weather> weather;
+   private double        wind_speed;
+   private int           wind_deg;
+   private Volume        rain;
+   private Volume        snow;
 
    public int getDt() {
       return dt;
@@ -66,6 +69,10 @@ public class Hourly {
 
    public double getTemp() {
       return temp;
+   }
+
+   public List<Weather> getWeather() {
+      return weather;
    }
 
    public int getWind_deg() {
