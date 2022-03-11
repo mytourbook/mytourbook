@@ -47,10 +47,7 @@ Changes
 Bugfix
 ======
 
-* Suunto Integration (Frederic)   
-  - Added leading zeros to month, day, hour and minutes in the downloaded file names 
-    https://sourceforge.net/p/mytourbook/feature-requests/198/
-  - Fixed the activity name mapping in the downloaded file names
+* 
 
 
 Translation    
