@@ -79,7 +79,10 @@
       
       <repository>
          <id>eclipse.platform.4.20</id>                                 <layout>p2</layout>
+<!-- 
          <url>https://download.eclipse.org/releases/2021-06</url>
+ -->
+         <url>https://download.eclipse.org/eclipse/updates/4.23-I-builds/I20220308-0310</url>
       </repository>   
 
       <repository>
