@@ -507,7 +507,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
             .applyTo(section);
       {
          createUI_141_Weather_Description(section);
-         createUI_142_Weather_Wind(section);
+         createUI_142_Weather_Wind_Col1(section);
+         createUI_142_Weather_Wind_Col2(section);
          createUI_142_Weather_Temperature(section);
          createUI_144_Weather_Other(section);
       }
@@ -548,151 +549,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
       GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(5).applyTo(container);
       {
-
-      }
-   }
-
-   private void createUI_142_Weather_Wind(final Composite parent) {
-
-      final Composite container = _tk.createComposite(parent, SWT.BORDER);
-      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(5).applyTo(container);
-      {
-         {
-            /*
-             * wind speed
-             */
-
-            // label
-            Label label = _tk.createLabel(container, Messages.tour_editor_label_wind_speed);
-            label.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
-            _firstColumnControls.add(label);
-
-            // spinner
-            _spinWeather_Wind_SpeedValue = new Spinner(container, SWT.BORDER);
-            GridDataFactory.fillDefaults()
-                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-                  .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_spinWeather_Wind_SpeedValue);
-            _spinWeather_Wind_SpeedValue.setMinimum(0);
-            _spinWeather_Wind_SpeedValue.setMaximum(120);
-            _spinWeather_Wind_SpeedValue.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
-
-            _spinWeather_Wind_SpeedValue.addModifyListener(modifyEvent -> {
-               if (_isUpdateUI) {
-                  return;
-               }
-               onSelect_WindSpeed_Value();
-            });
-            _spinWeather_Wind_SpeedValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-               if (_isUpdateUI) {
-                  return;
-               }
-               onSelect_WindSpeed_Value();
-            }));
-            _spinWeather_Wind_SpeedValue.addMouseWheelListener(mouseEvent -> {
-               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
-               if (_isUpdateUI) {
-                  return;
-               }
-               onSelect_WindSpeed_Value();
-            });
-
-            // label: km/h, mi/h
-            label = _tk.createLabel(container, UI.UNIT_LABEL_SPEED);
-
-            // combo: wind speed with text
-            _comboWeather_Wind_SpeedText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .indent(10, 0)
-                  .span(2, 1)
-                  .applyTo(_comboWeather_Wind_SpeedText);
-            _tk.adapt(_comboWeather_Wind_SpeedText, true, false);
-            _comboWeather_Wind_SpeedText.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
-            _comboWeather_Wind_SpeedText.setVisibleItemCount(20);
-            _comboWeather_Wind_SpeedText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-
-               if (_isUpdateUI) {
-                  return;
-               }
-               onSelect_WindSpeed_Text();
-            }));
-
-            // fill combobox
-            for (final String speedText : IWeather.windSpeedText) {
-               _comboWeather_Wind_SpeedText.add(speedText);
-            }
-         }
-         {
-            /*
-             * wind direction
-             */
-
-            // label
-            final Label label = _tk.createLabel(container, Messages.tour_editor_label_wind_direction);
-            label.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
-            _firstColumnControls.add(label);
-
-            // combo: wind direction text
-            _comboWeather_Wind_DirectionText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-            _tk.adapt(_comboWeather_Wind_DirectionText, true, false);
-            _comboWeather_Wind_DirectionText.setToolTipText(Messages.tour_editor_label_WindDirectionNESW_Tooltip);
-            _comboWeather_Wind_DirectionText.setVisibleItemCount(16);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-                  .applyTo(_comboWeather_Wind_DirectionText);
-            _comboWeather_Wind_DirectionText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-               if (_isUpdateUI) {
-                  return;
-               }
-               TourDataEditorView.onSelect_WindDirection_Text(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
-            }));
-
-            // fill combobox
-            for (final String fComboCloudsUIValue : IWeather.windDirectionText) {
-               _comboWeather_Wind_DirectionText.add(fComboCloudsUIValue);
-            }
-
-            // spacer
-            new Label(container, SWT.NONE);
-
-            // spinner: wind direction value
-            _spinWeather_Wind_DirectionValue = new Spinner(container, SWT.BORDER);
-            _spinWeather_Wind_DirectionValue.setMinimum(-1);
-            _spinWeather_Wind_DirectionValue.setMaximum(3600);
-            _spinWeather_Wind_DirectionValue.setDigits(1);
-            _spinWeather_Wind_DirectionValue.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
-            GridDataFactory.fillDefaults()
-                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-                  .indent(10, 0)
-                  .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_spinWeather_Wind_DirectionValue);
-
-            _spinWeather_Wind_DirectionValue.addModifyListener(modifyEvent -> {
-               if (_isUpdateUI) {
-                  return;
-               }
-               TourDataEditorView.onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
-            });
-            _spinWeather_Wind_DirectionValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-               if (_isUpdateUI) {
-                  return;
-               }
-               TourDataEditorView.onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
-            }));
-            _spinWeather_Wind_DirectionValue.addMouseWheelListener(mouseEvent -> {
-               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
-               if (_isUpdateUI) {
-                  return;
-               }
-               TourDataEditorView.onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
-            });
-
-            // label: direction unit = degree
-            _tk.createLabel(container, Messages.Tour_Editor_Label_WindDirection_Unit);
-         }
          {
             /*
              * Average temperature
@@ -748,7 +604,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-                  .indent(10, 0)
+                  .indent(100, 0)
                   .applyTo(_txtWeather_Temperature_Average_Device);
             _tk.adapt(_txtWeather_Temperature_Average_Device, true, false);
 
@@ -756,6 +612,163 @@ public class DialogQuickEdit extends TitleAreaDialog {
             label = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
             label.setToolTipText(
                   Messages.Tour_Editor_Label_Temperature_Avg_Device_Tooltip);
+         }
+      }
+   }
+
+   private void createUI_142_Weather_Wind_Col1(final Composite parent) {
+
+      final Composite container = _tk.createComposite(parent, SWT.BORDER);
+      GridDataFactory.fillDefaults().applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      {
+         {
+            /*
+             * wind speed
+             */
+
+            // label
+            Label label = _tk.createLabel(container, Messages.tour_editor_label_wind_speed);
+            label.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
+            _firstColumnControls.add(label);
+
+            // spinner
+            _spinWeather_Wind_SpeedValue = new Spinner(container, SWT.BORDER);
+            GridDataFactory.fillDefaults()
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinWeather_Wind_SpeedValue);
+            _spinWeather_Wind_SpeedValue.setMinimum(0);
+            _spinWeather_Wind_SpeedValue.setMaximum(120);
+            _spinWeather_Wind_SpeedValue.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
+
+            _spinWeather_Wind_SpeedValue.addModifyListener(modifyEvent -> {
+               if (_isUpdateUI) {
+                  return;
+               }
+               onSelect_WindSpeed_Value();
+            });
+            _spinWeather_Wind_SpeedValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               if (_isUpdateUI) {
+                  return;
+               }
+               onSelect_WindSpeed_Value();
+            }));
+            _spinWeather_Wind_SpeedValue.addMouseWheelListener(mouseEvent -> {
+               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               if (_isUpdateUI) {
+                  return;
+               }
+               onSelect_WindSpeed_Value();
+            });
+
+            // label: km/h, mi/h
+            label = _tk.createLabel(container, UI.UNIT_LABEL_SPEED);
+         }
+         {
+            /*
+             * wind direction
+             */
+
+            // label
+            final Label label = _tk.createLabel(container, Messages.tour_editor_label_wind_direction);
+            label.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
+            _firstColumnControls.add(label);
+
+            // combo: wind direction text
+            _comboWeather_Wind_DirectionText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+            _tk.adapt(_comboWeather_Wind_DirectionText, true, false);
+            _comboWeather_Wind_DirectionText.setToolTipText(Messages.tour_editor_label_WindDirectionNESW_Tooltip);
+            _comboWeather_Wind_DirectionText.setVisibleItemCount(16);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .applyTo(_comboWeather_Wind_DirectionText);
+            _comboWeather_Wind_DirectionText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               if (_isUpdateUI) {
+                  return;
+               }
+               TourDataEditorView.onSelect_WindDirection_Text(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
+            }));
+
+            // fill combobox
+            for (final String fComboCloudsUIValue : IWeather.windDirectionText) {
+               _comboWeather_Wind_DirectionText.add(fComboCloudsUIValue);
+            }
+
+            // spacer
+            new Label(container, SWT.NONE);
+         }
+      }
+   }
+
+   private void createUI_142_Weather_Wind_Col2(final Composite parent) {
+
+      final Composite container = _tk.createComposite(parent, SWT.BORDER);
+      GridDataFactory.fillDefaults().applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      {
+         {
+            // combo: wind speed with text
+            _comboWeather_Wind_SpeedText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+            _secondColumnControls.add(_comboWeather_Wind_SpeedText);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .span(2, 1)
+                  .indent(10, 0)
+                  .applyTo(_comboWeather_Wind_SpeedText);
+            _tk.adapt(_comboWeather_Wind_SpeedText, true, false);
+            _comboWeather_Wind_SpeedText.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
+            _comboWeather_Wind_SpeedText.setVisibleItemCount(20);
+            _comboWeather_Wind_SpeedText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
+               if (_isUpdateUI) {
+                  return;
+               }
+               onSelect_WindSpeed_Text();
+            }));
+
+            // fill combobox
+            for (final String speedText : IWeather.windSpeedText) {
+               _comboWeather_Wind_SpeedText.add(speedText);
+            }
+         }
+
+         {
+            // spinner: wind direction value
+            _spinWeather_Wind_DirectionValue = new Spinner(container, SWT.BORDER);
+            _spinWeather_Wind_DirectionValue.setMinimum(-1);
+            _spinWeather_Wind_DirectionValue.setMaximum(3600);
+            _spinWeather_Wind_DirectionValue.setDigits(1);
+            _spinWeather_Wind_DirectionValue.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
+            _secondColumnControls.add(_spinWeather_Wind_DirectionValue);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .indent(10, 0)
+                  .applyTo(_spinWeather_Wind_DirectionValue);
+
+            _spinWeather_Wind_DirectionValue.addModifyListener(modifyEvent -> {
+               if (_isUpdateUI) {
+                  return;
+               }
+               TourDataEditorView.onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
+            });
+            _spinWeather_Wind_DirectionValue.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               if (_isUpdateUI) {
+                  return;
+               }
+               TourDataEditorView.onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
+            }));
+            _spinWeather_Wind_DirectionValue.addMouseWheelListener(mouseEvent -> {
+               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               if (_isUpdateUI) {
+                  return;
+               }
+               TourDataEditorView.onSelect_WindDirection_Value(_spinWeather_Wind_DirectionValue, _comboWeather_Wind_DirectionText);
+            });
+
+            // label: direction unit = degree
+            _tk.createLabel(container, Messages.Tour_Editor_Label_WindDirection_Unit);
          }
       }
    }
