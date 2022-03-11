@@ -349,4 +349,31 @@ public class WeatherUtils {
 
       return IWeather.windDirectionText[UI.getCardinalDirectionTextIndex(degreeDirection)];
    }
+
+   /**
+    * Indicates if the hourly weather data set contains the weather information for every hour
+    * of the tour
+    *
+    * @param weatherDataStartTime
+    *           in seconds
+    * @param weatherDataEndTime
+    *           in seconds
+    * @param tourStartTime
+    *           in seconds
+    * @param tourEndTime
+    *           in seconds
+    * @return
+    */
+   public static boolean isTourWeatherDataComplete(final long weatherDataStartTime,
+                                                   final long weatherDataEndTime,
+                                                   final long tourStartTime,
+                                                   final long tourEndTime) {
+
+      if (weatherDataStartTime > tourStartTime ||
+            weatherDataEndTime < tourEndTime) {
+         return false;
+      }
+
+      return true;
+   }
 }

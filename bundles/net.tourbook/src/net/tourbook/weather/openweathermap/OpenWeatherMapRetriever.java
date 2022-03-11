@@ -42,6 +42,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    private static final String baseApiUrl        = HEROKU_APP_URL + "/openweathermap/timemachine";       //$NON-NLS-1$
 
    private LatLng              searchAreaCenter;
+   //todo fb get the current condition fromthe hourly that matches the tour middle time. => delete the current in he root
    private long                tourMiddleTime;
    private long                tourStartTime;
    private long                tourEndTime;
@@ -159,14 +160,19 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
             return false;
          }
 
-         //todo fb add hourly manually so that none overlap
-         timeMachineResult.getHourly().addAll(newTimeMachineResult.getHourly());
-         requestedTime = newTimeMachineResult.getHourly().get(newTimeMachineResult.getHourly().size() - 1).getDt();
-         requestedTime += 3600;
+         timeMachineResult.addAllHourly(newTimeMachineResult.getHourly());
+         final List<Hourly> hourly = timeMachineResult.getHourly();
 
-         if (timeMachineResult.isHourlyComplete(tourStartTime, tourEndTime)) {
+         if (WeatherUtils.isTourWeatherDataComplete(
+               hourly.get(0).getDt(),
+               hourly.get(timeMachineResult.getHourly().size() - 1).getDt(),
+               tourStartTime,
+               tourEndTime)) {
             break;
          }
+
+         requestedTime = newTimeMachineResult.getHourly().get(newTimeMachineResult.getHourly().size() - 1).getDt();
+         requestedTime += 3600;
       }
 
 // SET_FORMATTING_OFF
@@ -174,6 +180,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       tour.setIsWeatherDataFromProvider(true);
       tour.setWeather(                       timeMachineResult.getWeatherDescription());
       tour.setWeather_Clouds(                timeMachineResult.getWeatherType());
+
       tour.setWeather_Temperature_Average(   timeMachineResult.getTemperatureAverage(tour));
       tour.setWeather_Wind_Speed(            timeMachineResult.getWindSpeed(tour));
       tour.setWeather_Wind_Direction(        timeMachineResult.getWindDirection(tour));

@@ -38,6 +38,22 @@ public class TimeMachineResult {
    }
 
    /**
+    * This adds new hourly data manually to ensure only new data is added to the
+    * current dataset.
+    *
+    * @param newHourly
+    */
+   public void addAllHourly(final List<Hourly> newHourly) {
+
+      for (final Hourly currentHourly : newHourly) {
+         if (!hourly.contains(currentHourly)) {
+            hourly.add(currentHourly);
+         }
+      }
+
+   }
+
+   /**
     * Filters and keeps only the values included between the tour start and end times.
     *
     * @param tour
@@ -48,8 +64,6 @@ public class TimeMachineResult {
       final List<Hourly> filteredHourlyData = new ArrayList<>();
 
       final long tourStartTime = tour.getTourStartTimeMS() / 1000;
-      final long tourEndTime = tour.getTourEndTimeMS() / 1000;
-      final long thirtyMinutes = 1800;
 
       for (final Hourly currentHourly : getHourly()) {
          //The current data is not kept if its measured time is:
@@ -280,28 +294,6 @@ public class TimeMachineResult {
    }
 
    /**
-    * Indicates if the hourly data contains the weather information for every hour
-    * of the tour
-    *
-    * @param tourStartTime
-    * @param tourEndTime
-    * @return
-    */
-   public boolean isHourlyComplete(final long tourStartTime, final long tourEndTime) {
-
-      if (hourly == null || hourly.size() == 0) {
-         return false;
-      }
-
-      if (hourly.get(0).getDt() > tourStartTime ||
-            hourly.get(hourly.size() - 1).getDt() < tourEndTime) {
-         return false;
-      }
-
-      return true;
-   }
-
-   /**
     * Tests if a given time is not within a given tour time (+- 30 mins)
     *
     * @param time
@@ -312,8 +304,6 @@ public class TimeMachineResult {
 
       final long thirtyMinutes = 1800;
 
-      final var difference = (tourTime - thirtyMinutes) - time;
-      final var difference2 = (tourTime + thirtyMinutes) - time;
       return time < tourTime - thirtyMinutes ||
             time > tourTime + thirtyMinutes;
 
