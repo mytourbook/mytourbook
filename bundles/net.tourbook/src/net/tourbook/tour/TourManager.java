@@ -63,6 +63,7 @@ import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringToArrayConverter;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -91,13 +92,13 @@ import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.tourChart.X_AXIS_START_TIME;
+import net.tourbook.ui.views.IWeatherProvider;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.ui.views.collateTours.CollatedToursView;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
-import net.tourbook.weather.HistoricalWeatherRetriever;
-import net.tourbook.weather.WeatherData;
+import net.tourbook.weather.TourWeatherRetriever;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
@@ -493,11 +494,11 @@ public class TourManager {
          temperatureSerie[serieIndex] = initialTemperature;
       }
 
-      final float oldAvgTemperature = tourData.getAvgTemperature();
+      final float oldAvgTemperature = tourData.getWeather_Temperature_Average_Device();
 
       tourData.computeAvg_Temperature();
 
-      final float newAvgTemperature = tourData.getAvgTemperature();
+      final float newAvgTemperature = tourData.getWeather_Temperature_Average_Device();
 
       TourLogManager.subLog_OK(String.format(
             LOG_TEMP_ADJUST_003_TOUR_CHANGES,
@@ -1906,6 +1907,26 @@ public class TourManager {
    }
 
    /**
+    * @return Returns <code>true</code> when a weather provider has been selected
+    *         and properly configured.
+    */
+   public static boolean isWeatherRetrievalActivated() {
+
+      final String weatherProviderId = _prefStore.getString(ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
+
+      switch (weatherProviderId) {
+
+      case IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP:
+         return true;
+      case IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE:
+         return StringUtils.hasContent(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
+      case IWeatherProvider.Pref_Weather_Provider_None:
+      default:
+         return false;
+      }
+   }
+
+   /**
     * Loads multiple tour data from the database and shows a progressbar when it takes longer.
     *
     * @param allTourIds
@@ -2055,6 +2076,7 @@ public class TourManager {
 
          } catch (final InvocationTargetException | InterruptedException e) {
             StatusUtil.showStatus(e);
+            Thread.currentThread().interrupt();
          }
       }
 
@@ -2715,49 +2737,54 @@ public class TourManager {
    }
 
    /**
-    * @param tourData
+    * @param tourDataList
     * @return Returns <code>true</code> when the tour is modified, otherwise <code>false</code>.
     */
-   public static boolean retrieveWeatherData(final TourData tourData) {
+   public static List<TourData> retrieveWeatherData(final List<TourData> tourDataList) {
 
-      // ensure data is available
-      if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
+      final List<TourData> modifiedTours = new ArrayList<>();
 
-         TourLogManager.subLog_ERROR(String.format(
-               LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
-               getTourDateTimeShort(tourData)));
-
-         return false;
+      if (tourDataList == null || tourDataList.size() == 0) {
+         return modifiedTours;
       }
 
-      final WeatherData historicalWeatherData = new HistoricalWeatherRetriever(tourData).retrieveHistoricalWeatherData().getHistoricalWeatherData();
-      if (historicalWeatherData == null) {
+      TourLogManager.showLogView();
+      final long start = System.currentTimeMillis();
 
-         TourLogManager.subLog_ERROR(NLS.bind(
-               Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
-               TourManager.getTourDateTimeShort(tourData)));
+      BusyIndicator.showWhile(Display.getCurrent(),
+            () -> {
 
-         return false;
-      }
+               final String weatherProvider = _prefStore.getString(
+                     ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
 
-      tourData.setIsWeatherDataFromApi(true);
+               TourLogManager.subLog_INFO(NLS.bind(
+                     LOG_RETRIEVE_WEATHER_DATA_001_START,
+                     weatherProvider));
 
-      tourData.setAvgTemperature(historicalWeatherData.getTemperatureAverage());
-      tourData.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());
-      tourData.setWeatherWindDir(historicalWeatherData.getWindDirection());
-      tourData.setWeather(historicalWeatherData.getWeatherDescription());
-      tourData.setWeatherClouds(historicalWeatherData.getWeatherType());
+               for (final TourData tourData : tourDataList) {
 
-      tourData.setWeather_Humidity((short) historicalWeatherData.getAverageHumidity());
-      tourData.setWeather_Precipitation(historicalWeatherData.getPrecipitation());
-      tourData.setWeather_Pressure((short) historicalWeatherData.getAveragePressure());
-      tourData.setWeather_Temperature_Max(historicalWeatherData.getTemperatureMax());
-      tourData.setWeather_Temperature_Min(historicalWeatherData.getTemperatureMin());
-      tourData.setWeather_Temperature_WindChill(historicalWeatherData.getWindChill());
+                  // ensure data is available
+                  if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
 
-      TourLogManager.subLog_OK(getTourDateTimeShort(tourData));
+                     TourLogManager.subLog_ERROR(String.format(
+                           LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
+                           getTourDateTimeShort(tourData)));
 
-      return true;
+                     continue;
+                  }
+
+                  if (TourWeatherRetriever.retrieveWeatherData(tourData, weatherProvider)) {
+
+                     modifiedTours.add(tourData);
+                  }
+               }
+            });
+
+      TourLogManager.subLog_INFO(String.format(
+            LOG_RETRIEVE_WEATHER_DATA_002_END,
+            (System.currentTimeMillis() - start) / 1000.0));
+
+      return modifiedTours;
    }
 
    /**
@@ -2808,7 +2835,7 @@ public class TourManager {
     *           modified tours
     * @return Returns a list with all persisted {@link TourData}
     */
-   public static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours) {
+   public static ArrayList<TourData> saveModifiedTours(final List<TourData> modifiedTours) {
       return saveModifiedTours(modifiedTours, true);
    }
 
@@ -2825,7 +2852,7 @@ public class TourManager {
     *           when <code>true</code>, a notification is fired when the data are saved
     * @return a list with all persisted {@link TourData}
     */
-   private static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours,
+   private static ArrayList<TourData> saveModifiedTours(final List<TourData> modifiedTours,
                                                         final boolean canFireNotification) {
 
       // reset multiple tour data cache
@@ -2880,6 +2907,7 @@ public class TourManager {
 
          } catch (final InvocationTargetException | InterruptedException e) {
             StatusUtil.showStatus(e);
+            Thread.currentThread().interrupt();
          }
       }
 

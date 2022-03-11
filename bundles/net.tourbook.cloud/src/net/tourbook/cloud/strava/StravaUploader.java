@@ -49,7 +49,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
-import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.export.DialogExportTour;
@@ -62,6 +61,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
+import net.tourbook.weather.WeatherUtils;
 
 import org.apache.http.HttpHeaders;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -75,16 +75,13 @@ import org.json.JSONObject;
 
 public class StravaUploader extends TourbookCloudUploader {
 
-   private static final String     LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
-   private static final String     LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
+   private static final String     StravaBaseUrl     = "https://www.strava.com/api/v3";                                      //$NON-NLS-1$
 
-   private static final String     StravaBaseUrl                 = "https://www.strava.com/api/v3";                                      //$NON-NLS-1$
+   private static HttpClient       _httpClient       = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
+   private static IPreferenceStore _prefStore        = Activator.getDefault().getPreferenceStore();
+   private static TourExporter     _tourExporter     = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
 
-   private static HttpClient       _httpClient                   = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
-   private static IPreferenceStore _prefStore                    = Activator.getDefault().getPreferenceStore();
-   private static TourExporter     _tourExporter                 = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
-
-   private static String           CLOUD_UPLOADER_ID             = "Strava";                                                             //$NON-NLS-1$
+   private static String           CLOUD_UPLOADER_ID = "Strava";                                                             //$NON-NLS-1$
 
    // Source : https://developers.strava.com/docs/reference/#api-models-ActivityType
    private static final List<String> StravaManualActivityTypes       = List.of(
@@ -203,12 +200,34 @@ public class StravaUploader extends TourbookCloudUploader {
       return compressedFilePath;
    }
 
+   private String buildFormattedDescription(final TourData tourData) {
+
+      final StringBuilder description = new StringBuilder();
+      if (_prefStore.getBoolean(Preferences.STRAVA_SENDDESCRIPTION)) {
+
+         description.append(tourData.getTourDescription());
+      }
+      if (_prefStore.getBoolean(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION)) {
+
+         if (StringUtils.hasContent(description.toString())) {
+            description.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE);
+         }
+         String weatherData = WeatherUtils.buildWeatherDataString(tourData, false, false);
+         if (StringUtils.hasContent(description.toString())) {
+            weatherData = UI.NEW_LINE1 + weatherData;
+         }
+         description.append(weatherData);
+      }
+
+      return description.toString();
+   }
+
    private String buildFormattedTitle(final TourData tourData) {
 
       String title = tourData.getTourTitle();
 
       if (_prefStore.getBoolean(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE)) {
-         title += getWeatherIconInTitle(tourData.getWeatherIndex());
+         title += WeatherUtils.getWeatherIcon(tourData.getWeatherIndex());
       }
       return title;
    }
@@ -217,7 +236,9 @@ public class StravaUploader extends TourbookCloudUploader {
                                             final Map<String, TourData> toursWithTimeSeries,
                                             final TourData tourData) {
 
-      final String absoluteTourFilePath = FilesUtils.createTemporaryFile(String.valueOf(tourData.getTourId()), "tcx"); //$NON-NLS-1$
+      final String absoluteTourFilePath = FilesUtils.createTemporaryFile(
+            String.valueOf(tourData.getTourId()),
+            "tcx"); //$NON-NLS-1$
 
       final String exportedTcxGzFile = exportTcxGzFile(tourData, absoluteTourFilePath);
       if (StringUtils.hasContent(exportedTcxGzFile)) {
@@ -297,66 +318,6 @@ public class StravaUploader extends TourbookCloudUploader {
       }
 
       return isTokenValid;
-   }
-
-   /**
-    * Returns an appropriate weather Emoji based on the tour weather icon.
-    * To obtain the string representation of the icons in Unicode 7.0,
-    * I used the below code:
-    * https://stackoverflow.com/a/68537229/7066681
-    *
-    * @param weatherIndex
-    * @return
-    */
-   private String getWeatherIconInTitle(final int weatherIndex) {
-
-      String weatherIcon;
-
-      switch (IWeather.cloudIcon[weatherIndex]) {
-
-      case IWeather.WEATHER_ID_CLEAR:
-         //https://emojipedia.org/sun/
-         weatherIcon = "\u2600"; //$NON-NLS-1$
-         break;
-      case IWeather.WEATHER_ID_PART_CLOUDS:
-         //https://emojipedia.org/sun-behind-cloud/
-         weatherIcon = "\u26C5"; //$NON-NLS-1$
-         break;
-      case IWeather.WEATHER_ID_OVERCAST:
-         weatherIcon = "\u2601"; //$NON-NLS-1$
-         break;
-      case IWeather.WEATHER_ID_SCATTERED_SHOWERS:
-         //https://emojipedia.org/sun-behind-rain-cloud/
-         weatherIcon = "\ud83c\udf26"; //$NON-NLS-1$
-         break;
-      case IWeather.WEATHER_ID_RAIN:
-         //https://emojipedia.org/cloud-with-rain/
-         weatherIcon = "\ud83c\udf27"; //$NON-NLS-1$
-         break;
-      case IWeather.WEATHER_ID_LIGHTNING:
-         //https://emojipedia.org/cloud-with-lightning/
-         weatherIcon = "\ud83c\udf29"; //$NON-NLS-1$
-         break;
-      case IWeather.WEATHER_ID_SNOW:
-
-         //https://emojipedia.org/snowflake/
-         weatherIcon = "\u2744"; //$NON-NLS-1$
-
-         //Below is the official "Cloud with snow" icon but because it looks too
-         //much like the "Cloud with rain" icon, instead, we choose the "Snowflake"
-         //icon.
-         //https://emojipedia.org/cloud-with-snow/
-         break;
-      case IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT:
-         //https://emojipedia.org/warning/
-         weatherIcon = "\u26A0"; //$NON-NLS-1$
-         break;
-      case UI.IMAGE_EMPTY_16:
-      default:
-         return UI.EMPTY_STRING;
-      }
-
-      return UI.SPACE1 + weatherIcon;
    }
 
    @Override
@@ -564,9 +525,8 @@ public class StravaUploader extends TourbookCloudUploader {
             .addPart("name", title) //$NON-NLS-1$
             .addPart("file", Paths.get(compressedTourAbsoluteFilePath)); //$NON-NLS-1$
 
-      if (_prefStore.getBoolean(Preferences.STRAVA_SENDDESCRIPTION)) {
-         publisher.addPart("description", tourData.getTourDescription()); //$NON-NLS-1$
-      }
+      final String description = buildFormattedDescription(tourData);
+      publisher.addPart("description", description); //$NON-NLS-1$
 
       final HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(StravaBaseUrl + "/uploads")) //$NON-NLS-1$
@@ -602,9 +562,8 @@ public class StravaUploader extends TourbookCloudUploader {
       body.put("distance", tourData.getTourDistance()); //$NON-NLS-1$
       body.put("trainer", (isTrainerActivity ? "1" : "0")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-      if (_prefStore.getBoolean(Preferences.STRAVA_SENDDESCRIPTION)) {
-         body.put("description", tourData.getTourDescription()); //$NON-NLS-1$
-      }
+      final String description = buildFormattedDescription(tourData);
+      body.put("description", description); //$NON-NLS-1$
 
       final HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create(StravaBaseUrl + "/activities")) //$NON-NLS-1$
@@ -634,7 +593,7 @@ public class StravaUploader extends TourbookCloudUploader {
                   numberOfTours * 2);
 
             if (!getValidTokens()) {
-               TourLogManager.log_ERROR(LOG_CLOUDACTION_INVALIDTOKENS);
+               TourLogManager.log_ERROR(Messages.Log_CloudAction_InvalidTokens);
                return;
             }
 
@@ -670,7 +629,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
          new ProgressMonitorDialog(Display.getCurrent().getActiveShell()).run(true, true, runnable);
 
-         TourLogManager.log_TITLE(String.format(LOG_CLOUDACTION_END, (System.currentTimeMillis() - start) / 1000.0));
+         TourLogManager.log_TITLE(String.format(Messages.Log_CloudAction_End, (System.currentTimeMillis() - start) / 1000.0));
 
          MessageDialog.openInformation(
                Display.getDefault().getActiveShell(),

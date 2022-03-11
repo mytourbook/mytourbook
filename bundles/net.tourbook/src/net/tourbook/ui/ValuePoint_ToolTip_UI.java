@@ -1813,16 +1813,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       if (_isVisible_And_Available_Temperature) {
 
-         float temperature = _tourData.temperatureSerie[valueIndex];
-
-         if (UI.UNIT_IS_TEMPERATURE_FAHRENHEIT) {
-
-            // get imperial temperature
-
-            temperature = temperature
-                  * UI.UNIT_FAHRENHEIT_MULTI
-                  + UI.UNIT_FAHRENHEIT_ADD;
-         }
+         final float temperature = UI.convertTemperatureFromMetric(_tourData.temperatureSerie[valueIndex]);
 
          _lblTemperature.setText(_nf1.format(temperature));
       }

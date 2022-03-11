@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
@@ -50,7 +50,7 @@ public class ActionAdjustTemperature extends Action {
          return;
       }
 
-      final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
+      final List<TourData> selectedTours = _tourProvider.getSelectedTours();
 
       final Shell shell = Display.getCurrent().getActiveShell();
       if (selectedTours == null || selectedTours.isEmpty()) {

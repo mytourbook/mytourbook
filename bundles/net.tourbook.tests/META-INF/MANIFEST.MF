@@ -8,7 +8,8 @@ Require-Bundle: org.junit.jupiter.api;resolution:=optional,
  net.tourbook.ext.jars,
  net.tourbook.ext.ejb3,
  net.tourbook.cloud,
- org.eclipse.ui
+ org.eclipse.ui,
+ net.tourbook.common
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
  hibernate-entitymanager.jar,

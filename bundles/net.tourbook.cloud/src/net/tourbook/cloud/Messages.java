@@ -50,7 +50,6 @@ public class Messages extends NLS {
    public static String Dialog_DropboxBrowser_Text;
    public static String Dialog_DropboxBrowser_Title;
    public static String PrefPage_CloudConnectivity_Dropbox_AccessToken_Tooltip;
-   public static String PrefPage_CloudConnectivity_Dropbox_WebPage_Link;
 
    //STRAVA
    public static String Dialog_UploadToursToStrava_Message;
@@ -68,10 +67,11 @@ public class Messages extends NLS {
    public static String Log_UploadToursToStrava_005_TourTypeMappedMultipleTimes;
    public static String PrefPage_AccountInformation_Label_AthleteName;
    public static String PrefPage_AccountInformation_Label_AthleteWebPage;
-   public static String PrefPage_AccountInformation_Link_Strava_WebPage;
    public static String PrefPage_TourTypeFilter_Link_StravaTourTypes;
    public static String PrefPage_UploadConfiguration_Button_AddWeatherIconInTitle;
    public static String PrefPage_UploadConfiguration_Button_SendDescription;
+   public static String PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription;
+   public static String PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription_Tooltip;
    public static String PrefPage_UploadConfiguration_Button_UseTourTypeMapping;
    public static String PrefPage_UploadConfiguration_Button_UseTourTypeMapping_Tooltip;
    public static String VendorName_Strava;
@@ -123,7 +123,6 @@ public class Messages extends NLS {
    public static String Log_UploadRoutesToSuunto_002_NoGpsCoordinate;
    public static String Log_UploadRoutesToSuunto_003_UploadStatus;
    public static String Log_UploadRoutesToSuunto_004_UploadError;
-   public static String PrefPage_AccountInformation_Link_SuuntoApp_WebPage;
    public static String PrefPage_SuuntoWorkouts_Checkbox_StartDateFilter;
    public static String PrefPage_SuuntoWorkouts_DatesFilter_Tooltip;
    public static String PrefPage_SuuntoWorkouts_Checkbox_EndDateFilter;

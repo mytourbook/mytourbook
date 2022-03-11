@@ -47,11 +47,11 @@
          <mt:conconiDeflection>$tourData.ConconiDeflection</mt:conconiDeflection>
          <mt:dpTolerance>$tourData.DpTolerance</mt:dpTolerance>
 ## weather
-         <mt:temperature>$tourData.AvgTemperature</mt:temperature>
+         <mt:temperature>$tourData.weather_Temperature_Average_Device</mt:temperature>
          <mt:weather><![CDATA[$!tourData.weather]]></mt:weather>
-         <mt:weatherClouds><![CDATA[$!tourData.weatherClouds]]></mt:weatherClouds>
-         <mt:weatherWindDirection>$tourData.getWeatherWindDir()</mt:weatherWindDirection>
-         <mt:weatherWindSpeed>$tourData.getWeatherWindSpeed()</mt:weatherWindSpeed>
+         <mt:weatherClouds><![CDATA[$!tourData.weather_Clouds]]></mt:weatherClouds>
+         <mt:weatherWindDirection>$tourData.getWeather_Wind_Direction()</mt:weatherWindDirection>
+         <mt:weatherWindSpeed>$tourData.getWeather_Wind_Speed()</mt:weatherWindSpeed>
 ##
 ##
 ## TYPE

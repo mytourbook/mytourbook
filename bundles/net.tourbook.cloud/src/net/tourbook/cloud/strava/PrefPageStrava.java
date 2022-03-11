@@ -61,20 +61,22 @@ import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String      ID                  = "net.tourbook.cloud.PrefPageStrava";                                         //$NON-NLS-1$
-   public static final int         CALLBACK_PORT       = 4918;
+   public static final String      ID                      = "net.tourbook.cloud.PrefPageStrava";                                         //$NON-NLS-1$
+   public static final int         CALLBACK_PORT           = 4918;
 
-   public static final String      ClientId            = "55536";                                                                     //$NON-NLS-1$
+   public static final String      ClientId                = "55536";                                                                     //$NON-NLS-1$
 
-   private IPreferenceStore        _prefStore          = Activator.getDefault().getPreferenceStore();
+   private static final String     _stravaApp_WebPage_Link = "https://www.strava.com";                                                    //$NON-NLS-1$
+   private IPreferenceStore        _prefStore              = Activator.getDefault().getPreferenceStore();
    private IPropertyChangeListener _prefChangeListener;
    private SelectionListener       _defaultSelectionListener;
-   private LocalHostServer         _server;
 
+   private LocalHostServer         _server;
    private String                  _athleteId;
+
    private long                    _accessTokenExpiresAt;
 
-   private Image                   _imageStravaConnect = Activator.getImageDescriptor(CloudImages.Cloud_Strava_Connect).createImage();
+   private Image                   _imageStravaConnect     = Activator.getImageDescriptor(CloudImages.Cloud_Strava_Connect).createImage();
 
    /*
     * UI controls
@@ -82,6 +84,8 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    private Button             _btnCleanup;
    private Button             _chkAddWeatherIconInTitle;
    private Button             _chkSendDescription;
+   private Button             _chkSendWeatherDataInDescription;
+
    private Button             _chkShowHideTokens;
    private Button             _chkUseTourTypeMapping;
    private Label              _labelAccessToken;
@@ -210,10 +214,10 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             GridDataFactory.fillDefaults().applyTo(labelWebPage);
 
             final Link linkWebPage = new Link(group, SWT.NONE);
-            linkWebPage.setText(UI.LINK_TAG_START + Messages.PrefPage_AccountInformation_Link_Strava_WebPage + UI.LINK_TAG_END);
+            linkWebPage.setText(UI.LINK_TAG_START + _stravaApp_WebPage_Link + UI.LINK_TAG_END);
             linkWebPage.setEnabled(true);
             linkWebPage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(
-                  Messages.PrefPage_AccountInformation_Link_Strava_WebPage)));
+                  _stravaApp_WebPage_Link)));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(linkWebPage);
          }
          {
@@ -308,6 +312,16 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          }
          {
             /*
+             * Checkbox: Send the weather data in the tour description
+             */
+            _chkSendWeatherDataInDescription = new Button(group, SWT.CHECK);
+            GridDataFactory.fillDefaults().applyTo(_chkSendWeatherDataInDescription);
+
+            _chkSendWeatherDataInDescription.setText(Messages.PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription);
+            _chkSendWeatherDataInDescription.setToolTipText(Messages.PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription_Tooltip);
+         }
+         {
+            /*
              * Checkbox: Use tour type mapping
              */
             _chkUseTourTypeMapping = new Button(group, SWT.CHECK);
@@ -358,6 +372,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
       _chkShowHideTokens.setEnabled(isAuthorized);
       _chkAddWeatherIconInTitle.setEnabled(isAuthorized);
       _chkSendDescription.setEnabled(isAuthorized);
+      _chkSendWeatherDataInDescription.setEnabled(isAuthorized);
       _chkUseTourTypeMapping.setEnabled(isAuthorized);
       _btnCleanup.setEnabled(isAuthorized);
 
@@ -452,6 +467,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
       _chkAddWeatherIconInTitle.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE));
       _chkSendDescription.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_SENDDESCRIPTION));
+      _chkSendWeatherDataInDescription.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION));
       _chkUseTourTypeMapping.setSelection(_prefStore.getDefaultBoolean(Preferences.STRAVA_USETOURTYPEMAPPING));
 
       enableControls();
@@ -473,6 +489,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
          _prefStore.setValue(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE, _chkAddWeatherIconInTitle.getSelection());
          _prefStore.setValue(Preferences.STRAVA_SENDDESCRIPTION, _chkSendDescription.getSelection());
+         _prefStore.setValue(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION, _chkSendWeatherDataInDescription.getSelection());
 
          final boolean prefUseTourTypeMapping = _prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING);
          final boolean currentUseTourTypeMapping = _chkUseTourTypeMapping.getSelection();
@@ -524,6 +541,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
 
       _chkAddWeatherIconInTitle.setSelection(_prefStore.getBoolean(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE));
       _chkSendDescription.setSelection(_prefStore.getBoolean(Preferences.STRAVA_SENDDESCRIPTION));
+      _chkSendWeatherDataInDescription.setSelection(_prefStore.getBoolean(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION));
       _chkUseTourTypeMapping.setSelection(_prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING));
    }
 

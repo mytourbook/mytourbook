@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2020 Frédéric Bard
+ * Copyright (C) 2019, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.weather;
+package net.tourbook.weather.worldweatheronline;
 
 import net.tourbook.common.weather.IWeather;
 
@@ -127,17 +127,22 @@ public class WeatherData {
 
       switch (weatherCode) {
       case "122": //$NON-NLS-1$
+      case "119": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_OVERCAST;
          break;
       case "113": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_CLEAR;
          break;
       case "116": //$NON-NLS-1$
+      case "248": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_PART_CLOUDS;
          break;
-      //case "200":
-      //    WeatherType = IWeather.WEATHER_ID_LIGHTNING;
-      //   break;
+      case "395":
+      case "392":
+      case "389":
+      case "386":
+         WeatherType = IWeather.WEATHER_ID_LIGHTNING;
+         break;
       case "293": //$NON-NLS-1$
       case "296": //$NON-NLS-1$
       case "299": //$NON-NLS-1$
@@ -146,20 +151,40 @@ public class WeatherData {
       case "308": //$NON-NLS-1$
       case "356": //$NON-NLS-1$
       case "359": //$NON-NLS-1$
+      case "377": //$NON-NLS-1$
+      case "365": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_RAIN;
          break;
       case "332": //$NON-NLS-1$
       case "335": //$NON-NLS-1$
+      case "338": //$NON-NLS-1$
       case "329": //$NON-NLS-1$
       case "326": //$NON-NLS-1$
       case "323": //$NON-NLS-1$
       case "320": //$NON-NLS-1$
+      case "371": //$NON-NLS-1$
+      case "368": //$NON-NLS-1$
+      case "230": //$NON-NLS-1$
+      case "227": //$NON-NLS-1$
+      case "179": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_SNOW;
          break;
       case "200": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
          break;
       case "353": //$NON-NLS-1$
+      case "374": //$NON-NLS-1$
+      case "362": //$NON-NLS-1$
+      case "350": //$NON-NLS-1$
+      case "317": //$NON-NLS-1$
+      case "314": //$NON-NLS-1$
+      case "311": //$NON-NLS-1$
+      case "284": //$NON-NLS-1$
+      case "266": //$NON-NLS-1$
+      case "263": //$NON-NLS-1$
+      case "185": //$NON-NLS-1$
+      case "182": //$NON-NLS-1$
+      case "176": //$NON-NLS-1$
          WeatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
          break;
       default:
