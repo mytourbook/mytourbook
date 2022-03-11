@@ -550,9 +550,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
       {
          {
             /*
-             * temperature
+             * Average temperature
              */
-
             // label
             Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Temperature);
             label.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
@@ -564,7 +563,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .applyTo(_spinWeather_Temperature_Average);
-            _spinWeather_Temperature_Average.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
+            _spinWeather_Temperature_Average.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Tooltip);
 
             // the min/max temperature has a large range because fahrenheit has bigger values than celsius
             _spinWeather_Temperature_Average.setMinimum(-600);
@@ -592,8 +591,8 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
             // label: celsius, fahrenheit
             label = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
-         }
-         {
+            label.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Tooltip);
+
             /*
              * Average Temperature from device
              */
@@ -602,13 +601,14 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   UI.EMPTY_STRING,
                   SWT.TRAIL);
             GridDataFactory.fillDefaults()
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .indent(10, 0)
                   .applyTo(_txtWeather_Temperature_Average_Device);
+
             _txtWeather_Temperature_Average_Device.setEnabled(false);
 
             // label: celsius, fahrenheit
-            final Label label = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
+            label = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
             label.setToolTipText(
                   Messages.Tour_Editor_Label_Temperature_Avg_Device_Tooltip);
          }
@@ -675,6 +675,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
             _comboWeather_Wind_SpeedText.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
             _comboWeather_Wind_SpeedText.setVisibleItemCount(20);
             _comboWeather_Wind_SpeedText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
                if (_isUpdateUI) {
                   return;
                }
@@ -809,6 +810,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
    }
 
    private void createUI_SectionSeparator(final Composite parent) {
+
       final Composite sep = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 5).applyTo(sep);
    }
@@ -1025,6 +1027,15 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
          }
          _spinWeather_Temperature_Average.setSelection(avgTemperatureValue);
+
+         /*
+          * Avg temperature from Device
+          */
+         final boolean isTourTemperatureDeviceValid = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0;
+         final float avgTemperature_Device = UI.convertTemperatureFromMetric(_tourData.getWeather_Temperature_Average_Device());
+         _txtWeather_Temperature_Average_Device.setText(isTourTemperatureDeviceValid
+               ? String.valueOf(Math.round(avgTemperature_Device * 10.0) / 10.0)
+               : UI.EMPTY_STRING);
       }
       _isUpdateUI = false;
    }
