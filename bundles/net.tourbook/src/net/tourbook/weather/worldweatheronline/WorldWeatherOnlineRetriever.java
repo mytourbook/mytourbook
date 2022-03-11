@@ -69,6 +69,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    private static final String    keyParameter    = "?key=";                                                          //$NON-NLS-1$
    private LatLng                 searchAreaCenter;
    private String                 startDate;
+   private String                 endDate;
 
    private WeatherData            historicalWeatherData;
 
@@ -86,7 +87,9 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
       searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(tour);
       startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime()); //$NON-NLS-1$
+      endDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime().plusSeconds(tour.getTourDeviceTime_Elapsed())); //$NON-NLS-1$
    }
+   //todo fb + 86400L       endDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime().plusSeconds(tour.getTourDeviceTime_Elapsed())); //$NON-NLS-1$
 
    public static String getApiUrl() {
       return baseApiUrl + keyParameter;
@@ -181,6 +184,11 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
          uriBuilder.setParameter("format", "json"); //$NON-NLS-1$ //$NON-NLS-2$
          uriBuilder.setParameter("includelocation", "yes"); //$NON-NLS-1$ //$NON-NLS-2$
          uriBuilder.setParameter("extra", "utcDateTime"); //$NON-NLS-1$ //$NON-NLS-2$
+
+         //If the tour finishes a different day, we need to specify the ending date
+         if (!endDate.equals(startDate)) {
+            uriBuilder.setParameter("enddate", endDate); //$NON-NLS-1$
+         }
 
          weatherRequestWithParameters = uriBuilder.build().toString();
 

@@ -33,6 +33,10 @@ public class TimeMachineResult {
 
    private List<Hourly> hourly;
 
+   public TimeMachineResult() {
+      hourly = new ArrayList<>();
+   }
+
    /**
     * Filters and keeps only the values included between the tour start and end times.
     *
@@ -51,8 +55,7 @@ public class TimeMachineResult {
          //The current data is not kept if its measured time is:
          // - 30 mins before the tour start time
          // OR 30 mins after the tour start time
-         if (currentHourly.getDt() < tourStartTime - thirtyMinutes ||
-               currentHourly.getDt() > tourEndTime + thirtyMinutes) {
+         if (isTimeNotWithinTourTime(currentHourly.getDt(), tourStartTime)) {
             continue;
          }
 
@@ -276,6 +279,14 @@ public class TimeMachineResult {
       return 0;
    }
 
+   /**
+    * Indicates if the hourly data contains the weather information for every hour
+    * of the tour
+    *
+    * @param tourStartTime
+    * @param tourEndTime
+    * @return
+    */
    public boolean isHourlyComplete(final long tourStartTime, final long tourEndTime) {
 
       if (hourly == null || hourly.size() == 0) {
@@ -288,6 +299,24 @@ public class TimeMachineResult {
       }
 
       return true;
+   }
+
+   /**
+    * Tests if a given time is not within a given tour time (+- 30 mins)
+    *
+    * @param time
+    * @param tourTime
+    * @return
+    */
+   private boolean isTimeNotWithinTourTime(final long time, final long tourTime) {
+
+      final long thirtyMinutes = 1800;
+
+      final var difference = (tourTime - thirtyMinutes) - time;
+      final var difference2 = (tourTime + thirtyMinutes) - time;
+      return time < tourTime - thirtyMinutes ||
+            time > tourTime + thirtyMinutes;
+
    }
 
    private float roundDoubleToFloat(final double value) {

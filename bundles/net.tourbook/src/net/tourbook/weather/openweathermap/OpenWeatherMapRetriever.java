@@ -54,8 +54,8 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(tour);
 
-      tourStartTime = tour.getTourStartTimeMS();
-      tourEndTime = tour.getTourEndTimeMS();
+      tourStartTime = tour.getTourStartTimeMS() / 1000;
+      tourEndTime = tour.getTourEndTimeMS() / 1000;
       final long tourMiddleTimeMillis = tourStartTime + ((tourEndTime - tourStartTime) / 2);
       tourMiddleTime = tourMiddleTimeMillis / 1000;
    }
@@ -138,25 +138,35 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       timeMachineResult = new TimeMachineResult();
 
+      long requestedTime = tourStartTime;
+
       //while condition not satisfied
       //hourly list is less than or equal to start time/
       // hourly list is greater than or equal to end time
-      while (timeMachineResult.isHourlyComplete(tourStartTime, tourEndTime)) {
+      while (true) {
 
-      }
+         //we send an api request as long as we don'thave the results covering the entire duration of the tour
+         final String weatherRequestWithParameters = buildWeatherApiRequest(requestedTime);
 
-      //we send an api request as long as we don'thave the results covering the entire duration of the tour
-      final String weatherRequestWithParameters = buildWeatherApiRequest(tourStartTime);
+         final String rawWeatherData = super.sendWeatherApiRequest(weatherRequestWithParameters);
+         if (StringUtils.isNullOrEmpty(rawWeatherData)) {
+            return false;
+         }
 
-      final String rawWeatherData = super.sendWeatherApiRequest(weatherRequestWithParameters);
-      if (StringUtils.isNullOrEmpty(rawWeatherData)) {
-         return false;
-      }
+         final TimeMachineResult newTimeMachineResult = serializeWeatherData(rawWeatherData);
 
-      timeMachineResult = serializeWeatherData(rawWeatherData);
+         if (newTimeMachineResult == null) {
+            return false;
+         }
 
-      if (timeMachineResult == null) {
-         return false;
+         //todo fb add hourly manually so that none overlap
+         timeMachineResult.getHourly().addAll(newTimeMachineResult.getHourly());
+         requestedTime = newTimeMachineResult.getHourly().get(newTimeMachineResult.getHourly().size() - 1).getDt();
+         requestedTime += 3600;
+
+         if (timeMachineResult.isHourlyComplete(tourStartTime, tourEndTime)) {
+            break;
+         }
       }
 
 // SET_FORMATTING_OFF
