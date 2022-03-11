@@ -4423,13 +4423,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _txtWeather_Temperature_Average_Device = _tk.createText(
                   container,
                   UI.EMPTY_STRING,
-                  SWT.TRAIL);
+                  SWT.READ_ONLY);
             GridDataFactory
                   .fillDefaults()//
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_txtWeather_Temperature_Average_Device);
-            _txtWeather_Temperature_Average_Device.setEnabled(false);
 
             // label: celsius, fahrenheit
             _lblWeather_TemperatureUnit_Avg = _tk.createLabel(
@@ -4447,8 +4446,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _txtWeather_Temperature_Max_Device = _tk.createText(
                   container,
                   UI.EMPTY_STRING,
-                  SWT.TRAIL);
-            _txtWeather_Temperature_Max_Device.setEnabled(false);
+                  SWT.READ_ONLY);
 
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
@@ -4471,8 +4469,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _txtWeather_Temperature_Min_Device = _tk.createText(
                   container,
                   UI.EMPTY_STRING,
-                  SWT.TRAIL);
-            _txtWeather_Temperature_Min_Device.setEnabled(false);
+                  SWT.READ_ONLY);
 
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
