@@ -16,9 +16,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ClassPath: .,
  dropbox-core-sdk-4.0.0.jar,
  java7-fs-dropbox-0.0.3.jar,
- java7-fs-base-0.0.3.jar,
- httpcore-4.4.15.jar,
- httpclient-4.5.13.jar
+ java7-fs-base-0.0.3.jar
 Import-Package: com.fasterxml.jackson.core,
  net.tourbook,
  net.tourbook.application,
