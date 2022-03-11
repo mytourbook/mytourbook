@@ -94,8 +94,11 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       }
 
       final String fullWeatherData = String.join(
-            net.tourbook.ui.UI.SYSTEM_NEW_LINE,
-            fullWeatherDataList);
+            UI.SYSTEM_NEW_LINE,
+            fullWeatherDataList)
+
+            //  separate visually
+            + UI.SYSTEM_NEW_LINE;
 
       return fullWeatherData;
    }

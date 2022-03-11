@@ -557,24 +557,43 @@ public class TourLogView extends ViewPart {
 
       final String separator = "";//"\t"; //$NON-NLS-1$
 
-      return String.format(UI.EMPTY_STRING
+      final String logMessagePrefix = String.format(UI.EMPTY_STRING
 
             + "%s" + separator //            time              //$NON-NLS-1$
             + " [%-25s]" + separator //      thread name       //$NON-NLS-1$
             + " %-5d" + separator //         log number        //$NON-NLS-1$
             + " %-5s" + separator //         state icon        //$NON-NLS-1$
             + " %s" + separator //           indent            //$NON-NLS-1$
-            + "   %s" + separator //         message           //$NON-NLS-1$
             ,
 
             tourLog.time,
             tourLog.threadName,
             tourLog.logNumber,
             stateNoBrowser, // text instead of an icon
-            subIndent,
-            tourLog.message
+            subIndent);
 
-      );
+      final int prefixLength = logMessagePrefix.length();
+      final String linePrefix = UI.SPACE1.repeat(prefixLength + 3);
+
+      final String logMessageRaw = tourLog.message;
+      final String logMessageWithSpaces = logMessageRaw.replaceAll(
+
+            WEB.HTML_ELEMENT_BR,
+            WEB.HTML_ELEMENT_BR + linePrefix);
+      /*
+       * Replace new line breaks '<br>' with prefixed spaces
+       */
+
+      final String logMessage = String.format(UI.EMPTY_STRING
+
+            + "%s" //                        message prefix    //$NON-NLS-1$
+            + "   %s" + separator //         message           //$NON-NLS-1$
+            ,
+
+            logMessagePrefix,
+            logMessageWithSpaces);
+
+      return logMessage;
    }
 
    @Override

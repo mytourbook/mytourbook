@@ -66,35 +66,44 @@ public class WeatherUtils {
                                                    final long time,
                                                    final String timeZoneId) {
 
+      final TourDateTime tourDateTime = TimeTools.createTourDateTime(time * 1000L, timeZoneId);
+      final String tourTime = String.format("%3s", tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME); //$NON-NLS-1$
+
       final String temperature = String.format("%5s", Math.round(UI.convertSpeed_FromMetric(temperatureValue) * 10.0) / 10.0) //$NON-NLS-1$
             + UI.UNIT_LABEL_TEMPERATURE;
+
       final String feelsLike = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
             UI.SPACE +
             String.format("%5s", UI.convertTemperatureFromMetric(windChill)) + //$NON-NLS-1$
             UI.UNIT_LABEL_TEMPERATURE;
+
       final String wind = String.format("%5s", Math.round(UI.convertSpeed_FromMetric(windSpeed) * 10.0) / 10.0) + UI.UNIT_LABEL_SPEED + //$NON-NLS-1$
             UI.SPACE + Messages.Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection +
-            UI.SPACE + String.format("%3s", String.valueOf(windDirection)) + UI.SYMBOL_DEGREE; //$NON-NLS-1$
+            UI.SPACE + String.format("%3d", windDirection) + UI.SYMBOL_DEGREE; //$NON-NLS-1$
+
       final String humidity = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Humidity +
             UI.SPACE +
             String.format("%3s", humidityValue); //$NON-NLS-1$
-      final String precipitation = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation +
-            UI.SPACE +
-            String.format("%4s", UI.convertPrecipitation_FromMetric(precipitationValue)); //$NON-NLS-1$
-      final String snowFall = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall +
-            UI.SPACE +
-            UI.convertPrecipitation_FromMetric(snowFallValue);
 
-      final TourDateTime tourDateTime = TimeTools.createTourDateTime(time * 1000L, timeZoneId);
-      final String fullWeatherData = String.format("%3s", tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME) + //$NON-NLS-1$
-            UI.SPACE + UI.SYMBOL_BRACKET_LEFT +
-            temperature + UI.COMMA_SPACE +
-            feelsLike + UI.COMMA_SPACE +
-            wind + UI.COMMA_SPACE +
-            humidity + UI.SYMBOL_PERCENTAGE + UI.COMMA_SPACE +
-            precipitation + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH + UI.COMMA_SPACE +
-            snowFall + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH +
-            UI.SYMBOL_BRACKET_RIGHT;
+      final String precipitation = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation
+            + UI.SPACE
+            + String.format("%5s", UI.convertPrecipitation_FromMetric(precipitationValue)) //$NON-NLS-1$
+            + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
+
+      final String snowFall = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall
+            + UI.SPACE
+            + String.format("%5s", UI.convertPrecipitation_FromMetric(snowFallValue)) //$NON-NLS-1$
+            + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
+
+      final String fullWeatherData = UI.EMPTY_STRING
+
+            + tourTime + UI.SPACE3
+            + temperature + UI.SPACE3
+            + feelsLike + UI.SPACE3
+            + wind + UI.SPACE3
+            + humidity + UI.SYMBOL_PERCENTAGE + UI.SPACE3
+            + precipitation + UI.SPACE3
+            + snowFall;
 
       return fullWeatherData;
    }
