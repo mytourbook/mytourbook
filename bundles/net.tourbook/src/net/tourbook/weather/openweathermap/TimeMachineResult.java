@@ -276,6 +276,20 @@ public class TimeMachineResult {
       return 0;
    }
 
+   public boolean isHourlyComplete(final long tourStartTime, final long tourEndTime) {
+
+      if (hourly == null || hourly.size() == 0) {
+         return false;
+      }
+
+      if (hourly.get(0).getDt() > tourStartTime ||
+            hourly.get(hourly.size() - 1).getDt() < tourEndTime) {
+         return false;
+      }
+
+      return true;
+   }
+
    private float roundDoubleToFloat(final double value) {
 
       return Math.round(value * 100.0) / 100.0f;
