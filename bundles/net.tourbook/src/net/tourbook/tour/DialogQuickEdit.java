@@ -110,6 +110,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
    private Text               _txtWeather;
    private Text               _txtWeather_Temperature_Average_Device;
 
+
    private MouseWheelListener _mouseWheelListener;
    {
       _mouseWheelListener = Util::adjustSpinnerValueOnMouseScroll;
@@ -506,16 +507,13 @@ public class DialogQuickEdit extends TitleAreaDialog {
             .spacing(20, 5)
             .applyTo(section);
       {
-         createUI_141_Weather_Description(section);
-         createUI_142_Weather_Wind_Col1(section);
-         createUI_142_Weather_Wind_Col2(section);
-         createUI_142_Weather_Temperature_Col1(section);
-         createUI_142_Weather_Temperature_Col2(section);
-         createUI_144_Weather_Other(section);
+         createUI_141_Weather(section);
+         createUI_142_Weather(section);
+         createUI_144_Weather_Col1(section);
       }
    }
 
-   private void createUI_141_Weather_Description(final Composite parent) {
+   private void createUI_141_Weather(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
@@ -544,95 +542,11 @@ public class DialogQuickEdit extends TitleAreaDialog {
       }
    }
 
-   private void createUI_142_Weather_Temperature_Col1(final Composite parent) {
+   private void createUI_142_Weather(final Composite parent) {
 
       final Composite container = _tk.createComposite(parent);
-      GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-      _firstColumnContainerControls.add(container);
-      {
-         {
-            /*
-             * Average temperature
-             */
-            // label
-            Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Temperature);
-            label.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
-            _firstColumnControls.add(label);
-
-            // spinner
-            _spinWeather_Temperature_Average = new Spinner(container, SWT.BORDER);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.BEGINNING, SWT.CENTER)
-                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-                  .applyTo(_spinWeather_Temperature_Average);
-            _spinWeather_Temperature_Average.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Tooltip);
-
-            // the min/max temperature has a large range because fahrenheit has bigger values than celsius
-            _spinWeather_Temperature_Average.setMinimum(-600);
-            _spinWeather_Temperature_Average.setMaximum(1500);
-
-            _spinWeather_Temperature_Average.addModifyListener(modifyEvent -> {
-               if (_isUpdateUI) {
-                  return;
-               }
-               _isTemperatureManuallyModified = true;
-            });
-            _spinWeather_Temperature_Average.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-               if (_isUpdateUI) {
-                  return;
-               }
-               _isTemperatureManuallyModified = true;
-            }));
-            _spinWeather_Temperature_Average.addMouseWheelListener(mouseEvent -> {
-               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
-               if (_isUpdateUI) {
-                  return;
-               }
-               _isTemperatureManuallyModified = true;
-            });
-
-            // label: celsius, fahrenheit
-            label = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
-            label.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Tooltip);
-         }
-      }
-   }
-
-   private void createUI_142_Weather_Temperature_Col2(final Composite parent) {
-
-      final Composite container = _tk.createComposite(parent);
-      GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {
-         {
-            /*
-             * Average Temperature from device
-             */
-            _txtWeather_Temperature_Average_Device = _tk.createText(
-                  container,
-                  UI.EMPTY_STRING,
-                  SWT.READ_ONLY | SWT.TRAIL);
-            _secondColumnControls.add(_txtWeather_Temperature_Average_Device);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_txtWeather_Temperature_Average_Device);
-            _tk.adapt(_txtWeather_Temperature_Average_Device, true, false);
-
-            // label: celsius, fahrenheit
-            final Label label = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
-            label.setToolTipText(
-                  Messages.Tour_Editor_Label_Temperature_Avg_Device_Tooltip);
-         }
-      }
-   }
-
-   private void createUI_142_Weather_Wind_Col1(final Composite parent) {
-
-      final Composite container = _tk.createComposite(parent);
-      GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
-      _firstColumnContainerControls.add(container);
+      GridDataFactory.fillDefaults().span(2, 1).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(5).applyTo(container);
       {
          {
             /*
@@ -676,6 +590,28 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
             // label: km/h, mi/h
             label = _tk.createLabel(container, UI.UNIT_LABEL_SPEED);
+
+            // combo: wind speed with text
+            _comboWeather_Wind_SpeedText = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .indent(10, 0)
+                  .span(2, 1)
+                  .applyTo(_comboWeather_Wind_SpeedText);
+            _tk.adapt(_comboWeather_Wind_SpeedText, true, false);
+            _comboWeather_Wind_SpeedText.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
+            _comboWeather_Wind_SpeedText.setVisibleItemCount(20);
+            _comboWeather_Wind_SpeedText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               if (_isUpdateUI) {
+                  return;
+               }
+               onSelect_WindSpeed_Text();
+            }));
+
+            // fill combobox
+            for (final String speedText : IWeather.windSpeedText) {
+               _comboWeather_Wind_SpeedText.add(speedText);
+            }
          }
          {
             /*
@@ -710,50 +646,17 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
             // spacer
             new Label(container, SWT.NONE);
-         }
-      }
-   }
 
-   private void createUI_142_Weather_Wind_Col2(final Composite parent) {
-
-      final Composite container = _tk.createComposite(parent);
-      GridDataFactory.fillDefaults().applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {
-         {
-            // combo: wind speed with text
-            _comboWeather_Wind_SpeedText = new Combo(container, SWT.READ_ONLY);
-            _secondColumnControls.add(_comboWeather_Wind_SpeedText);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .span(2, 1)
-                  .applyTo(_comboWeather_Wind_SpeedText);
-            _tk.adapt(_comboWeather_Wind_SpeedText, true, false);
-            _comboWeather_Wind_SpeedText.setToolTipText(Messages.tour_editor_label_wind_speed_Tooltip);
-            _comboWeather_Wind_SpeedText.setVisibleItemCount(20);
-            _comboWeather_Wind_SpeedText.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-
-               if (_isUpdateUI) {
-                  return;
-               }
-               onSelect_WindSpeed_Text();
-            }));
-
-            // fill combobox
-            for (final String speedText : IWeather.windSpeedText) {
-               _comboWeather_Wind_SpeedText.add(speedText);
-            }
-         }
-         {
             // spinner: wind direction value
             _spinWeather_Wind_DirectionValue = new Spinner(container, SWT.BORDER);
             _spinWeather_Wind_DirectionValue.setMinimum(-1);
             _spinWeather_Wind_DirectionValue.setMaximum(3600);
             _spinWeather_Wind_DirectionValue.setDigits(1);
             _spinWeather_Wind_DirectionValue.setToolTipText(Messages.tour_editor_label_wind_direction_Tooltip);
-            _secondColumnControls.add(_spinWeather_Wind_DirectionValue);
             GridDataFactory.fillDefaults()
-                  .align(SWT.BEGINNING, SWT.FILL)
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .indent(10, 0)
+                  .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_spinWeather_Wind_DirectionValue);
 
             _spinWeather_Wind_DirectionValue.addModifyListener(modifyEvent -> {
@@ -779,10 +682,70 @@ public class DialogQuickEdit extends TitleAreaDialog {
             // label: direction unit = degree
             _tk.createLabel(container, Messages.Tour_Editor_Label_WindDirection_Unit);
          }
+         {
+            /*
+             * temperature
+             */
+
+            // label
+            Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Temperature);
+            label.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
+            _firstColumnControls.add(label);
+
+            // spinner
+            _spinWeather_Temperature_Average = new Spinner(container, SWT.BORDER);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .applyTo(_spinWeather_Temperature_Average);
+            _spinWeather_Temperature_Average.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
+
+            // the min/max temperature has a large range because fahrenheit has bigger values than celsius
+            _spinWeather_Temperature_Average.setMinimum(-600);
+            _spinWeather_Temperature_Average.setMaximum(1500);
+
+            _spinWeather_Temperature_Average.addModifyListener(modifyEvent -> {
+               if (_isUpdateUI) {
+                  return;
+               }
+               _isTemperatureManuallyModified = true;
+            });
+            _spinWeather_Temperature_Average.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               if (_isUpdateUI) {
+                  return;
+               }
+               _isTemperatureManuallyModified = true;
+            }));
+            _spinWeather_Temperature_Average.addMouseWheelListener(mouseEvent -> {
+               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+               if (_isUpdateUI) {
+                  return;
+               }
+               _isTemperatureManuallyModified = true;
+            });
+
+            // label: celsius, fahrenheit
+            label = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
+
+            _txtWeather_Temperature_Average_Device = new Text(container, SWT.BORDER | SWT.READ_ONLY);
+            GridDataFactory.fillDefaults()
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .indent(10, 0)
+                  .align(SWT.END, SWT.CENTER)
+                  .applyTo(_txtWeather_Temperature_Average_Device);
+            _tk.adapt(_txtWeather_Temperature_Average_Device, true, false);
+
+            // label: celsius, fahrenheit
+            label = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
+            label.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Device_Tooltip);
+         }
       }
    }
 
-   private void createUI_144_Weather_Other(final Composite parent) {
+   /**
+    * weather: 1. column
+    */
+   private void createUI_144_Weather_Col1(final Composite parent) {
 
       final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().applyTo(container);
@@ -833,7 +796,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
    }
 
    private void createUI_SectionSeparator(final Composite parent) {
-
       final Composite sep = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 5).applyTo(sep);
    }
