@@ -517,6 +517,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Average temperature with metric system (from a weather provider or entered manually)
     */
    private float                 weather_Temperature_Average;                          // db-version 47
+
    /**
     * Average temperature with metric system (measured from the device)
     *

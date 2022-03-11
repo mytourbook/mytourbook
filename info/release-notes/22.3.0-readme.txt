@@ -1,0 +1,70 @@
+22.3.0                                                 ?. March 2022
+
+
+New
+===
+
+* Weather Retrieval (Frederic)
+  - Tour weather data improvement and new vendor addition (OpenWeatherMap) https://github.com/mytourbook/mytourbook/issues/479
+
+
+Improvements
+============
+
+* Calendar View (Frederic)
+  - The combo of years now displays the most recent years at the top as it is more likely to be selected than the oldest years
+    https://github.com/mytourbook/mytourbook/pull/472
+
+* Tour Chart
+  - Switch between SRTM 1 and SRTM 3 values                             https://github.com/mytourbook/mytourbook/issues/469 
+
+* 2D Map
+  - Consolidated "Set map center when zoomed to ..."		               https://github.com/mytourbook/mytourbook/issues/468
+  - Show more details when multiple tours are hovered                   https://github.com/mytourbook/mytourbook/issues/470
+
+* Strava Integration (Frederic)   
+  - Added the possibility to send the weather data in the uploaded activity's description
+
+
+Changes
+=======
+
+* Transform Opacity
+  - It is possible, that existing opacity values must be adjusted because they are not migrated
+  - Selecting/entering opacity values 0...100 or 0...255 is not user friendly. 
+    With this new transformation, which is defined in the user preferences, opacity values could be selected between e.g. 0...8 which is then transformed to 0...255
+
+* Tour Chart
+  - Moved the options
+    - Graph line transparency
+    - Draw line graphs with antialiasing
+    from the pref page into the chart options slideout
+
+* 2D Map
+  - Moved action "Show earth map" from the toolbar into the map context menu
+
+
+Bugfix
+======
+
+* Suunto Integration (Frederic)   
+  - Added leading zeros to month, day, hour and minutes in the downloaded file names 
+    https://sourceforge.net/p/mytourbook/feature-requests/198/
+  - Fixed the activity name mapping in the downloaded file names
+
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* Milestone             https://github.com/mytourbook/mytourbook/milestone/3?closed=1
+* Eclipse 2022-03
+* FIT SDK 21.67
