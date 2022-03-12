@@ -110,7 +110,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       for (final Hourly hourly : hourlyFiltered) {
 
          final long hourlyEpochSeconds = hourly.getEpochSeconds(tour.getTimeZoneIdWithDefault());
-         final TourDateTime tourDateTime = TimeTools.createTourDateTime(hourlyEpochSeconds, tour.getTimeZoneId());
+         final TourDateTime tourDateTime = TimeTools.createTourDateTime(hourlyEpochSeconds * 1000L, tour.getTimeZoneId());
 
          final String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                hourly.getTempC(),
@@ -368,20 +368,30 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    @Override
    public boolean retrieveHistoricalWeatherData() {
 
-      //todo fb test eith wasatch 100 for example
-      //when the tour overlaps 2 days, then do what i did for OWM
-      final String weatherRequestWithParameters = buildWeatherApiRequest();
+      //  while (true) {
+         //todo fb test eith wasatch 100 for example
+         //when the tour overlaps 2 days, then do what i did for OWM
+         final String weatherRequestWithParameters = buildWeatherApiRequest();
 
-      final String rawWeatherData = super.sendWeatherApiRequest(weatherRequestWithParameters);
-      if (!rawWeatherData.contains("weather")) { //$NON-NLS-1$
-         return false;
-      }
+         final String rawWeatherData = super.sendWeatherApiRequest(weatherRequestWithParameters);
+         if (!rawWeatherData.contains("weather")) { //$NON-NLS-1$
+            return false;
+         }
 
-      historicalWeatherData = parseWeatherData(rawWeatherData);
+         historicalWeatherData = parseWeatherData(rawWeatherData);
 
-      if (historicalWeatherData == null) {
-         return false;
-      }
+         if (historicalWeatherData == null) {
+            return false;
+         }
+
+//         if (WeatherUtils.isTourWeatherDataComplete(
+//               historicalWeatherData.get.getDt(),
+//               hourly.get(timeMachineResult.getHourly().size() - 1).getDt(),
+//               tourStartTime,
+//               tourEndTime)) {
+//            break;
+//         }
+         //   }
 
       tour.setIsWeatherDataFromProvider(true);
       tour.setWeather_Temperature_Average(historicalWeatherData.getTemperatureAverage());

@@ -129,21 +129,18 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       long requestedTime = tourStartTime;
 
-      //while condition not satisfied
-      //hourly list is less than or equal to start time/
-      // hourly list is greater than or equal to end time
-      while (true) {
+      boolean isRetrievalIncomplete = true;
+      while (isRetrievalIncomplete) {
 
-         //we send an api request as long as we don'thave the results covering the entire duration of the tour
+         //Send an API request as long as we don't have the results covering the entire duration of the tour
          final String weatherRequestWithParameters = buildWeatherApiRequest(requestedTime);
 
-         final String rawWeatherData = super.sendWeatherApiRequest(weatherRequestWithParameters);
+         final String rawWeatherData = sendWeatherApiRequest(weatherRequestWithParameters);
          if (StringUtils.isNullOrEmpty(rawWeatherData)) {
             return false;
          }
 
          final TimeMachineResult newTimeMachineResult = serializeWeatherData(rawWeatherData);
-
          if (newTimeMachineResult == null) {
             return false;
          }
@@ -156,10 +153,11 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                hourly.get(timeMachineResult.getHourly().size() - 1).getDt(),
                tourStartTime,
                tourEndTime)) {
-            break;
+            isRetrievalIncomplete = false;
          }
 
          requestedTime = newTimeMachineResult.getHourly().get(newTimeMachineResult.getHourly().size() - 1).getDt();
+         //Setting the requested time to the next hour to retrieve the next set of weather data
          requestedTime += 3600;
       }
 
@@ -192,7 +190,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
    private TimeMachineResult serializeWeatherData(final String weatherDataResponse) {
 
-      TimeMachineResult newTimeMachineResult = new TimeMachineResult();
+      TimeMachineResult newTimeMachineResult = null;
       try {
 
          final ObjectMapper mapper = new ObjectMapper();
