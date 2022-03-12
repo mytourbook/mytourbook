@@ -393,6 +393,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 //         }
          //   }
 
+         //todo fb dolike OWM and get the weather desc from the middle hourly weather data
       tour.setIsWeatherDataFromProvider(true);
       tour.setWeather_Temperature_Average(historicalWeatherData.getTemperatureAverage());
       tour.setWeather_Wind_Speed(historicalWeatherData.getWindSpeed());
