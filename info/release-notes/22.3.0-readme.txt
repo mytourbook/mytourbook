@@ -44,12 +44,6 @@ Changes
   - Moved action "Show earth map" from the toolbar into the map context menu
 
 
-Bugfix
-======
-
-* 
-
-
 Translation    
 ===========
 
