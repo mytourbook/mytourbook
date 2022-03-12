@@ -66,18 +66,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    @Override
    protected String buildFullWeatherDataString() {
 
-      final long tourStartTime = tour.getTourStartTimeMS() / 1000;
-      final long tourEndTime = tour.getTourEndTimeMS() / 1000;
-      final long thirtyMinutes = 1800;
-
       final List<String> fullWeatherDataList = new ArrayList<>();
 
       for (final Hourly hourly : timeMachineResult.getHourly()) {
-
-         if (hourly.getDt() < tourStartTime - thirtyMinutes ||
-               hourly.getDt() > tourEndTime + thirtyMinutes) {
-            continue;
-         }
 
          final TourDateTime tourDateTime = TimeTools.createTourDateTime(hourly.getDt() * 1000L, tour.getTimeZoneId());
 
@@ -89,8 +80,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                hourly.getHumidity(),
                hourly.getRain(),
                hourly.getSnow(),
-               tourDateTime.tourZonedDateTime.toEpochSecond(),
-               tour.getTimeZoneId());
+               tourDateTime);
 
          fullWeatherDataList.add(fullWeatherData);
       }
@@ -174,22 +164,26 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       }
 
 // SET_FORMATTING_OFF
-      timeMachineResult.findMiddleHourly(tourMiddleTime);
+
+      timeMachineResult.filterHourlyData(tourStartTime, tourEndTime);
 
       tour.setIsWeatherDataFromProvider(true);
+
+      //We look for the weather data in the middle of the tour to populate the weather conditions
+      timeMachineResult.findMiddleHourly(tourMiddleTime);
       tour.setWeather(                       timeMachineResult.getWeatherDescription());
       tour.setWeather_Clouds(                timeMachineResult.getWeatherType());
 
-      tour.setWeather_Temperature_Average(   timeMachineResult.getTemperatureAverage(tour));
-      tour.setWeather_Wind_Speed(            timeMachineResult.getWindSpeed(tour));
-      tour.setWeather_Wind_Direction(        timeMachineResult.getWindDirection(tour));
-      tour.setWeather_Humidity((short)       timeMachineResult.getAverageHumidity(tour));
-      tour.setWeather_Precipitation(         timeMachineResult.getPrecipitation(tour));
-      tour.setWeather_Pressure((short)       timeMachineResult.getAveragePressure(tour));
-      tour.setWeather_Snowfall(              timeMachineResult.getAverageSnowfall(tour));
-      tour.setWeather_Temperature_Max(       timeMachineResult.getTemperatureMax(tour));
-      tour.setWeather_Temperature_Min(       timeMachineResult.getTemperatureMin(tour));
-      tour.setWeather_Temperature_WindChill( timeMachineResult.getWindChill(tour));
+      tour.setWeather_Temperature_Average(   timeMachineResult.getTemperatureAverage());
+      tour.setWeather_Wind_Speed(            timeMachineResult.getWindSpeed());
+      tour.setWeather_Wind_Direction(        timeMachineResult.getWindDirection());
+      tour.setWeather_Humidity((short)       timeMachineResult.getAverageHumidity());
+      tour.setWeather_Precipitation(         timeMachineResult.getPrecipitation());
+      tour.setWeather_Pressure((short)       timeMachineResult.getAveragePressure());
+      tour.setWeather_Snowfall(              timeMachineResult.getAverageSnowfall());
+      tour.setWeather_Temperature_Max(       timeMachineResult.getTemperatureMax());
+      tour.setWeather_Temperature_Min(       timeMachineResult.getTemperatureMin());
+      tour.setWeather_Temperature_WindChill( timeMachineResult.getWindChill());
 
 // SET_FORMATTING_ON
 

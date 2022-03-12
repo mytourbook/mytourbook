@@ -24,7 +24,6 @@ import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
-import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.weather.IWeather;
@@ -35,7 +34,7 @@ public class WeatherUtils {
    /**
     * Returns the fully detailed weather data as a human readable string.
     * Example: 17h(15.0°C, feels like 15.0°C, 5.0km/h from 68°, humidity 37%,
-    * precipitation 0.0mm)
+    * precipitation 0.0mm, snowfall 0.0mm)
     *
     * @param temperatureValue
     *           in Celsius
@@ -63,18 +62,16 @@ public class WeatherUtils {
                                                    final int humidityValue,
                                                    final float precipitationValue,
                                                    final float snowFallValue,
-                                                   final long time,
-                                                   final String timeZoneId) {
+                                                   final TourDateTime tourDateTime) {
 
-      final TourDateTime tourDateTime = TimeTools.createTourDateTime(time * 1000L, timeZoneId);
       final String tourTime = String.format("%3s", tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME); //$NON-NLS-1$
 
-      final String temperature = String.format("%5s", Math.round(UI.convertSpeed_FromMetric(temperatureValue) * 10.0) / 10.0) //$NON-NLS-1$
+      final String temperature = String.format("%5s", Math.round(UI.convertTemperatureFromMetric(temperatureValue) * 10.0) / 10.0) //$NON-NLS-1$
             + UI.UNIT_LABEL_TEMPERATURE;
 
       final String feelsLike = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
             UI.SPACE +
-            String.format("%5s", UI.convertTemperatureFromMetric(windChill)) + //$NON-NLS-1$
+            String.format("%5s", Math.round(UI.convertTemperatureFromMetric(windChill) * 10.0 / 10.0)) + //$NON-NLS-1$
             UI.UNIT_LABEL_TEMPERATURE;
 
       final String wind = String.format("%5s", Math.round(UI.convertSpeed_FromMetric(windSpeed) * 10.0) / 10.0) + UI.UNIT_LABEL_SPEED + //$NON-NLS-1$
