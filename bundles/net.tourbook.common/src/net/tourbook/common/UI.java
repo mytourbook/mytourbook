@@ -910,6 +910,39 @@ public class UI {
    }
 
    /**
+    * @param event
+    * @param defaultAccelerator
+    *           Could be 10 to increase e.g. image size by 10 without pressing an accelerator key
+    */
+   public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event, final int defaultAccelerator) {
+
+      boolean isCtrlKey;
+      boolean isShiftKey;
+
+      if (IS_OSX) {
+         isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+         isShiftKey = (event.stateMask & SWT.MOD3) > 0;
+         //         isAltKey = (event.stateMask & SWT.MOD3) > 0;
+      } else {
+         isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+         isShiftKey = (event.stateMask & SWT.MOD2) > 0;
+         //         isAltKey = (event.stateMask & SWT.MOD3) > 0;
+      }
+
+      // accelerate with Ctrl + Shift key
+      int accelerator = isCtrlKey ? 10 : 1;
+      accelerator *= isShiftKey ? 5 : 1;
+
+      accelerator *= defaultAccelerator;
+
+      final Spinner spinner = (Spinner) event.widget;
+      final int valueAdjustment = ((event.count > 0 ? 1 : -1) * accelerator);
+
+      final int oldValue = spinner.getSelection();
+      spinner.setSelection(oldValue + valueAdjustment);
+   }
+
+   /**
     * Computes the average elevation change with given values of total elevation
     * change and total distance.
     *

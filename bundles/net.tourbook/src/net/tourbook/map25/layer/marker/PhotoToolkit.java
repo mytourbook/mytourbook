@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright 2016-2018 devemux86
  * Copyright 2017 nebular
- * Copyright 2019, 2021 Wolfgang Schramm and Contributors
+ * Copyright 2019, 2022 Wolfgang Schramm and Contributors
  * Copyright 2019, 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -66,12 +66,12 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 //   public static final int               IMAGE_SIZE_MEDIUM        = 320;
 //   public static final int               IMAGE_SIZE_LARGE         = 320;
 
-   private Bitmap               _bitmapCluster;
+   private Bitmap      _bitmapCluster;
    //private boolean _isBillboard;
-   public MarkerSymbol          _symbol;               //marker symbol, circle or star
-   private Bitmap               _bitmapPhoto;          //normaly the photo as Bitmap
+   public MarkerSymbol _symbol;       //marker symbol, circle or star
+   private Bitmap      _bitmapPhoto;  //normaly the photo as Bitmap
 
-   private Bitmap               _BitmapClusterPhoto;   // The Bitmap when markers are clustered
+//   private Bitmap               _BitmapClusterPhoto;   // The Bitmap when markers are clustered
 
    private ArrayList<Photo>     _allPhotos;
 
@@ -105,8 +105,12 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       }
    }
 
-   public PhotoToolkit() {
+   public PhotoToolkit(final Map25App map25App) {
+
       super(MarkerShape.CIRCLE);
+
+      _mapApp = map25App;
+
       //debugPrint(" ** PhotoToolkit + *** Constructor"); //$NON-NLS-1$
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
@@ -116,7 +120,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       _bitmapCluster = createClusterBitmap(1);
       //_bitmapPhoto = createPhotoBitmap();
       _bitmapPhoto = createPoiBitmap(MarkerShape.CIRCLE);
-      _BitmapClusterPhoto = createPoiBitmap(MarkerShape.CIRCLE); //must be replaced later, like MarkerToolkit
+//      _BitmapClusterPhoto = createPoiBitmap(MarkerShape.CIRCLE); //must be replaced later, like MarkerToolkit
       _symbol = new MarkerSymbol(_bitmapPhoto, MarkerSymbol.HotspotPlace.BOTTOM_CENTER, false);
       _isMarkerClusteredLast = config.isMarkerClustered;
 
@@ -150,20 +154,20 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    }
 
    /**
-    * creates a LIST with tourphotos, which can directly added to the photoLayer via addItems
+    * Creates a LIST with tourphotos, which can directly added to the photoLayer via addItems
     *
     * @param galleryPhotos
     *           Arraylist of photos
-    * @param showPhotoTitle
+    * @param isShowPhotoTitle
     *           boolean, show photo with title or not
-    * @param showPhotoScaled
+    * @param isPhotoScaled
     * @return
     */
    public List<MarkerInterface> createPhotoItemList(final ArrayList<Photo> galleryPhotos,
-                                                    final boolean showPhotoTitle,
-                                                    final boolean showPhotoScaled) {
+                                                    final boolean isShowPhotoTitle,
+                                                    final boolean isPhotoScaled) {
 
-      _isPhotoShowScaled = showPhotoScaled;
+      _isPhotoShowScaled = isPhotoScaled;
       debugPrint(" Phototoolkit createPhotoItemList: entering "); //$NON-NLS-1$
 
       final List<MarkerInterface> pts = new ArrayList<>();
@@ -240,7 +244,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
                new GeoPoint(photoLat, photoLon));
 
          //now create the marker: photoimage with time and stars
-         final MarkerSymbol markerSymbol = createPhotoBitmapFromPhoto(photo, item, showPhotoTitle);
+         final MarkerSymbol markerSymbol = createPhotoBitmapFromPhoto(photo, item, isShowPhotoTitle);
 
          if (markerSymbol != null) {
             item.setMarker(markerSymbol);
@@ -263,8 +267,10 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    private Bitmap getPhotoBitmap(final Photo photo) {
 
       Bitmap photoBitmap = null;
-      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-      final int scaledThumbImageSize = config.markerPhoto_Size;
+
+      // ensure min photo size
+      final int scaledThumbImageSize = Math.max(10, _mapApp.getPhoto_Size());
+
       // using photo image size of 2D map, not working yet
       //_imageSize = Util.getStateInt(_state, STATE_PHOTO_PROPERTIES_IMAGE_SIZE, Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT);
       // ensure that an image is displayed, it happend that image size was 0

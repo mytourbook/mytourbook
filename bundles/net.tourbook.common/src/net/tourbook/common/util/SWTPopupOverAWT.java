@@ -7,29 +7,30 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 
 /*
- * This source code was found (1.8.2013) here http://www.eclipse.org/forums/index.php/t/208284/
+ * This source code was found (1.8.2013) here
+ * 
+ * https://www.eclipse.org/forums/index.php/t/208284/
  */
 
 /**
  * Demonstrates the workaround for displaying a SWT popup menu over swing components under GTK (menu
  * not displayed / visible bug)
- * 
+ *
  * @author Samuel Thiriot, INRIA
  */
 public class SWTPopupOverAWT {
 
-	private Display				swtDisplay;
-//	private Shell				swtShell;
+   private final static int MAX_RETRIES = 10;
 
-	private Menu				swtPopupMenu;
+   private Display          swtDisplay;
+   //	private Shell	       swtShell;
+   private Menu             swtPopupMenu;
 
-	private final static int	MAX_RETRIES	= 10;
+   public SWTPopupOverAWT(final Display display, final Menu swtContextMenu) {
 
-	public SWTPopupOverAWT(final Display display, final Menu swtContextMenu) {
-
-		swtDisplay = display;
-		swtPopupMenu = swtContextMenu;
-	}
+      swtDisplay = display;
+      swtPopupMenu = swtContextMenu;
+   }
 
 //	public static void main(final String[] args) {
 //
@@ -121,95 +122,96 @@ public class SWTPopupOverAWT {
 //
 //	}
 
-	/**
-	 * Workaround: due to a GTK problem (Linux and other Unix), popup menus are not always
-	 * displayed. This tries several times to display it. see
-	 * http://dev.eclipse.org/newslists/news.eclipse.platform.swt/msg33992.html
-	 * http://www.eclipsezone.com/eclipse/forums/t95687.html
-	 * 
-	 * @param menu
-	 * @param retriesRemaining
-	 */
-	protected void retryVisible(final int retriesRemaining) {
+   /**
+    * Workaround: due to a GTK problem (Linux and other Unix), popup menus are not always
+    * displayed. This tries several times to display it. see
+    * http://dev.eclipse.org/newslists/news.eclipse.platform.swt/msg33992.html
+    * http://www.eclipsezone.com/eclipse/forums/t95687.html
+    *
+    * @param menu
+    * @param retriesRemaining
+    */
+   protected void retryVisible(final int retriesRemaining) {
 
-		swtDisplay.asyncExec(new Runnable() {
+      swtDisplay.asyncExec(new Runnable() {
 
-			@Override
-			public void run() {
+         @Override
+         public void run() {
 
-				if (swtPopupMenu.isVisible()) {
+            if (swtPopupMenu.isVisible()) {
 //					System.out.println("made visible after " + (MAX_RETRIES - retriesRemaining) + " attempts"); //$NON-NLS-1$ //$NON-NLS-2$
 
-				} else if (retriesRemaining > 0) {
+            } else if (retriesRemaining > 0) {
 
 //					System.out.println("retrying (remains " + (retriesRemaining - 1) + ")"); //$NON-NLS-1$ //$NON-NLS-2$
 
-					//swtHost.getShell().forceFocus();
-					//swtHost.getShell().forceActive();
-					//menu.setVisible(false);
-					swtPopupMenu.setVisible(false);
+               //swtHost.getShell().forceFocus();
+               //swtHost.getShell().forceActive();
+               //menu.setVisible(false);
+               swtPopupMenu.setVisible(false);
 
-					{
-						final Shell shell = new Shell(swtDisplay, SWT.APPLICATION_MODAL | // should lead the window manager to switch another window to the front
-								SWT.DIALOG_TRIM // not displayed into taskbars nor in task managers
-						);
-						shell.setSize(10, 10); // big enough to avoid errors from the gtk layer
-						shell.setBackground(swtDisplay.getSystemColor(SWT.COLOR_RED));
-						shell.setText("Not visible"); //$NON-NLS-1$
-						shell.setVisible(false);
-						shell.open();
-						shell.dispose();
-					}
-					swtPopupMenu.getShell().forceActive();
+               {
+                  final Shell shell = new Shell(swtDisplay,
+                        SWT.APPLICATION_MODAL | // should lead the window manager to switch another window to the front
+                              SWT.DIALOG_TRIM // not displayed into taskbars nor in task managers
+                  );
+                  shell.setSize(10, 10); // big enough to avoid errors from the gtk layer
+                  shell.setBackground(swtDisplay.getSystemColor(SWT.COLOR_RED));
+                  shell.setText("Not visible"); //$NON-NLS-1$
+                  shell.setVisible(false);
+                  shell.open();
+                  shell.dispose();
+               }
+               swtPopupMenu.getShell().forceActive();
 
-					//forceFocus();
-					//forceActive();
-					swtPopupMenu.setVisible(true);
+               //forceFocus();
+               //forceActive();
+               swtPopupMenu.setVisible(true);
 
-					retryVisible(retriesRemaining - 1);
+               retryVisible(retriesRemaining - 1);
 
-				} else {
-					System.err.println("unable to display the menu, sorry :-("); //$NON-NLS-1$
-				}
-			}
-		});
-	}
+            } else {
+               System.err.println("unable to display the menu, sorry :-("); //$NON-NLS-1$
+            }
+         }
+      });
+   }
 
-	protected void swtDirectShowMenu(final int x, final int y) {
+   protected void swtDirectShowMenu(final int x, final int y) {
 
-		if (swtDisplay.isDisposed()) {
-			return;
-		}
+      if (swtDisplay.isDisposed()) {
+         return;
+      }
 
-		swtPopupMenu.setLocation(new Point(x, y));
+      swtPopupMenu.setLocation(new Point(x, y));
 
 //		System.out.println("Displaying the menu at coordinates " + x + "," + y); //$NON-NLS-1$ //$NON-NLS-2$
-		swtPopupMenu.setVisible(true);
+      swtPopupMenu.setVisible(true);
 
-		// if GUI not based on GTK, the menu should already be displayed.
+      // if GUI not based on GTK, the menu should already be displayed.
 
-		retryVisible(MAX_RETRIES); // but just in case, we ensure this is the case :-)
+      retryVisible(MAX_RETRIES); // but just in case, we ensure this is the case :-)
 
-	}
+   }
 
-	/**
-	 * May be called from the AWT thread. Just called swtDirectShowMenu with the very same
-	 * parameters, but from the right thread.
-	 * 
-	 * @param x
-	 * @param y
-	 */
-	public void swtIndirectShowMenu(final int x, final int y) {
+   /**
+    * May be called from the AWT thread. Just called swtDirectShowMenu with the very same
+    * parameters, but from the right thread.
+    *
+    * @param x
+    * @param y
+    */
+   public void swtIndirectShowMenu(final int x, final int y) {
 
-		swtDisplay.asyncExec(new Runnable() {
+      swtDisplay.asyncExec(new Runnable() {
 
-			@Override
-			public void run() {
+         @Override
+         public void run() {
 
-				swtDirectShowMenu(x, y);
-			}
-		});
+            swtDirectShowMenu(x, y);
+         }
+      });
 
-	}
+   }
 
 }

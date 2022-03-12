@@ -102,7 +102,6 @@ public class Map25ConfigManager {
    private static final String ATTR_CONFIG_VERSION = "configVersion";      //$NON-NLS-1$
    //
    /*
-    * ############# setIsPhotoShowTitle:
     * Tour options
     */
    private static final String TAG_OPTIONS                     = "Options";                      //$NON-NLS-1$
@@ -166,7 +165,7 @@ public class Map25ConfigManager {
    public static final int DEFAULT_ANIMATION_TIME = 2000;
    //
    /*
-    * Tour marker, map bookmarks, photomarks
+    * Tour marker, map bookmarks, photos
     */
    private static final String TAG_TOUR_MARKERS = "TourMarkers"; //$NON-NLS-1$
    private static final String TAG_MARKER       = "Marker";      //$NON-NLS-1$
@@ -176,9 +175,6 @@ public class Map25ConfigManager {
    private static final String TAG_MARKER_OUTLINE_COLOR    = "MarkerOutlineColor";   //$NON-NLS-1$
    private static final String ATTR_IS_SHOW_TOUR_MARKER    = "isShowTourMarker";     //$NON-NLS-1$
    private static final String ATTR_IS_SHOW_MAP_BOOKMARK   = "isShowMapBookmark";    //$NON-NLS-1$
-   private static final String ATTR_IS_SHOW_PHOTO          = "isShowPhoto";          //$NON-NLS-1$
-   private static final String ATTR_IS_SHOW_PHOTO_TITLE    = "isShowPhotoTitle";     //$NON-NLS-1$
-   private static final String ATTR_PHOTO_SIZE             = "markerPhotoSize";      //$NON-NLS-1$
    private static final String ATTR_MARKER_ORIENTATION     = "markerOrientation";    //$NON-NLS-1$
    //
    private static final String ATTR_MARKER_FILL_OPACITY    = "markerFillOpacity";    //$NON-NLS-1$
@@ -193,7 +189,6 @@ public class Map25ConfigManager {
    private static final String ATTR_CLUSTER_ORIENTATION     = "clusterOrientation";   //$NON-NLS-1$
    private static final String ATTR_CLUSTER_GRID_SIZE       = "clusterGridSize";      //$NON-NLS-1$
    private static final String ATTR_IS_MARKER_CLUSTERED     = "isMarkerClustered";    //$NON-NLS-1$
-   private static final String ATTR_IS_PHOTO_CLUSTERED      = "isPhotoClustered";     //$NON-NLS-1$
    //
    private static final String ATTR_CLUSTER_FILL_OPACITY    = "clusterFillOpacity";   //$NON-NLS-1$
    private static final String ATTR_CLUSTER_OUTLINE_OPACITY = "cluserOutlineOpacity"; //$NON-NLS-1$
@@ -478,9 +473,6 @@ public class Map25ConfigManager {
           */
          xmlConfig.putBoolean(      ATTR_IS_SHOW_TOUR_MARKER,     config.isShowTourMarker);
          xmlConfig.putBoolean(      ATTR_IS_SHOW_MAP_BOOKMARK,    config.isShowMapBookmark);
-         xmlConfig.putBoolean(      ATTR_IS_SHOW_PHOTO,           config.isShowPhoto);
-         xmlConfig.putBoolean(      ATTR_IS_SHOW_PHOTO_TITLE,     config.isShowPhotoTitle);
-         xmlConfig.putInteger(      ATTR_PHOTO_SIZE,              config.markerPhoto_Size);
          xmlConfig.putInteger(      ATTR_MARKER_ORIENTATION,      config.markerOrientation);
 
          xmlConfig.putInteger(      ATTR_MARKER_FILL_OPACITY,     config.markerFill_Opacity);
@@ -498,7 +490,6 @@ public class Map25ConfigManager {
          xmlConfig.putInteger(      ATTR_CLUSTER_GRID_SIZE,       config.clusterGrid_Size);
          xmlConfig.putInteger(      ATTR_CLUSTER_ORIENTATION,     config.clusterOrientation);
          xmlConfig.putBoolean(      ATTR_IS_MARKER_CLUSTERED,     config.isMarkerClustered);
-         xmlConfig.putBoolean(      ATTR_IS_PHOTO_CLUSTERED,      config.isPhotoClustered);
 
          xmlConfig.putInteger(      ATTR_CLUSTER_FILL_OPACITY,    config.clusterFill_Opacity);
          xmlConfig.putInteger(      ATTR_CLUSTER_OUTLINE_OPACITY, config.clusterOutline_Opacity);
@@ -774,9 +765,6 @@ public class Map25ConfigManager {
 
       config.isShowMapBookmark      = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_MAP_BOOKMARK,    true);
       config.isShowTourMarker       = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_MARKER,     true);
-      config.isShowPhoto            = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_PHOTO,           true);
-      config.markerPhoto_Size       = Util.getXmlInteger(xmlConfig,     ATTR_PHOTO_SIZE,              DEFAULT_MARKER_PHOTO_SIZE);
-      config.isShowPhotoTitle       = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_PHOTO_TITLE,     true);
       config.markerOrientation      = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_ORIENTATION,      Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
 
       config.markerFill_Opacity     = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_FILL_OPACITY,     Map25ConfigManager.DEFAULT_MARKER_FILL_OPACITY);
