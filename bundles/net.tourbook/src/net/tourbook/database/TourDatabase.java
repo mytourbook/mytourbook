@@ -9008,7 +9008,8 @@ public class TourDatabase {
 
    /**
     * For the previous average, max, min temperatures, if they were retrieved by
-    * a weather provider we copy them to the new fields
+    * a weather provider we copy them into the new fields.
+    * If necessary .. todo fb
     *
     * @param conn
     * @throws SQLException
