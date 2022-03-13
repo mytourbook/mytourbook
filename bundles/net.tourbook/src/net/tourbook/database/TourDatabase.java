@@ -9001,17 +9001,6 @@ public class TourDatabase {
 
 // SET_FORMATTING_ON
       }
-
-      //Recomputing the temperature values (average/max/min) measured from the device
-      final List<Long> allTourIds = getAllTourIds();
-
-      // loop: all tours
-      for (final Long tourId : allTourIds) {
-
-         updateDb_046_To_047_DataUpdate_Concurrent(tourId);
-      }
-
-
       logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
@@ -9049,6 +9038,15 @@ public class TourDatabase {
                + " WHERE isWeatherDataFromProvider=true"); //$NON-NLS-1$
 
          stmtUpdate.executeUpdate();
+
+         //Recomputing the temperature values (average/max/min) measured from the device
+         final List<Long> allTourIds = getAllTourIds();
+
+         // loop: all tours
+         for (final Long tourId : allTourIds) {
+
+            updateDb_046_To_047_DataUpdate_Concurrent(tourId);
+         }
 
       } finally {
 
