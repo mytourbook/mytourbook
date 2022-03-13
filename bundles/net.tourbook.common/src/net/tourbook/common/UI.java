@@ -885,28 +885,7 @@ public class UI {
 
    public static void adjustSpinnerValueOnMouseScroll(final MouseEvent event) {
 
-      boolean isCtrlKey;
-      boolean isShiftKey;
-
-      if (IS_OSX) {
-         isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
-         isShiftKey = (event.stateMask & SWT.MOD3) > 0;
-         //         isAltKey = (event.stateMask & SWT.MOD3) > 0;
-      } else {
-         isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
-         isShiftKey = (event.stateMask & SWT.MOD2) > 0;
-         //         isAltKey = (event.stateMask & SWT.MOD3) > 0;
-      }
-
-      // accelerate with Ctrl + Shift key
-      int accelerator = isCtrlKey ? 10 : 1;
-      accelerator *= isShiftKey ? 5 : 1;
-
-      final Spinner spinner = (Spinner) event.widget;
-      final int valueAdjustment = ((event.count > 0 ? 1 : -1) * accelerator);
-
-      final int oldValue = spinner.getSelection();
-      spinner.setSelection(oldValue + valueAdjustment);
+      adjustSpinnerValueOnMouseScroll(event, 1);
    }
 
    /**
@@ -922,11 +901,9 @@ public class UI {
       if (IS_OSX) {
          isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
          isShiftKey = (event.stateMask & SWT.MOD3) > 0;
-         //         isAltKey = (event.stateMask & SWT.MOD3) > 0;
       } else {
          isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
          isShiftKey = (event.stateMask & SWT.MOD2) > 0;
-         //         isAltKey = (event.stateMask & SWT.MOD3) > 0;
       }
 
       // accelerate with Ctrl + Shift key
@@ -936,7 +913,7 @@ public class UI {
       accelerator *= defaultAccelerator;
 
       final Spinner spinner = (Spinner) event.widget;
-      final int valueAdjustment = ((event.count > 0 ? 1 : -1) * accelerator);
+      final int valueAdjustment = (event.count > 0 ? 1 : -1) * accelerator;
 
       final int oldValue = spinner.getSelection();
       spinner.setSelection(oldValue + valueAdjustment);
