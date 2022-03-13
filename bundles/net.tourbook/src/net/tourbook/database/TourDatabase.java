@@ -9002,6 +9002,16 @@ public class TourDatabase {
 // SET_FORMATTING_ON
       }
 
+      //Recomputing the temperature values (average/max/min) measured from the device
+      final List<Long> allTourIds = getAllTourIds();
+
+      // loop: all tours
+      for (final Long tourId : allTourIds) {
+
+         updateDb_046_To_047_DataUpdate_Concurrent(tourId);
+      }
+
+
       logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
@@ -9046,6 +9056,98 @@ public class TourDatabase {
       }
 
       updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
+   }
+
+   /**
+    * Do data updates concurrently with all available processor threads, this is reducing time
+    * significantly.
+    *
+    * @param tourId
+    * @param <T>
+    * @param entity
+    * @param tourId
+    * @param entityClass
+    */
+   private void updateDb_046_To_047_DataUpdate_Concurrent(final Long tourId) {
+
+      // put tour ID (queue item) into the queue AND wait when it is full
+
+      try {
+
+         _dbUpdateQueue.put(tourId);
+
+      } catch (final InterruptedException e) {
+
+         _isSQLDataUpdateError = true;
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _dbUpdateExecutor.submit(() -> {
+
+         // get last added item
+         final Long queueItem_TourId = _dbUpdateQueue.poll();
+
+         if (queueItem_TourId == null) {
+            return;
+         }
+
+         final EntityManager em = TourDatabase.getInstance().getEntityManager();
+
+         try {
+
+            // get tour data by tour id
+            final TourData tourData = em.find(TourData.class, queueItem_TourId);
+            if (tourData == null) {
+               return;
+            }
+
+            // ignore tours which having no temperature serie
+            if (tourData.temperatureSerie == null) {
+
+               tourData.setWeather_Temperature_Average_Device(0);
+               tourData.setWeather_Temperature_Max_Device(0);
+               tourData.setWeather_Temperature_Min(0);
+            }
+            else
+            {
+              tourData.computeAvg_Temperature();
+            }
+
+            boolean isSaved = false;
+
+            final EntityTransaction ts = em.getTransaction();
+            try {
+
+               ts.begin();
+               {
+                  em.merge(tourData);
+               }
+               ts.commit();
+
+            } catch (final Exception e) {
+
+               _isSQLDataUpdateError = true;
+               StatusUtil.showStatus(e);
+
+            } finally {
+               if (ts.isActive()) {
+                  ts.rollback();
+               } else {
+                  isSaved = true;
+               }
+            }
+
+            if (isSaved == false) {
+               showTourSaveError(tourData);
+            }
+
+         } finally {
+
+            em.close();
+         }
+      });
    }
 
    private void updateMonitor(final SplashManager splashManager, final int newDbVersion) {
