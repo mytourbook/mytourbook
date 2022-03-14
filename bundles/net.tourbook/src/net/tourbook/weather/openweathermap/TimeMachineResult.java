@@ -151,7 +151,7 @@ public class TimeMachineResult {
       return hourly;
    }
 
-   public float getPrecipitation() {
+   public float getAveragePrecipitation() {
 
       final OptionalDouble averagePrecipitation =
             hourly.stream().mapToDouble(Hourly::getRain).average();
@@ -249,7 +249,7 @@ public class TimeMachineResult {
       return weatherType;
    }
 
-   public float getWindChill() {
+   public float getAverageWindChill() {
 
       final OptionalDouble averageWindChill =
             hourly.stream().mapToDouble(Hourly::getFeels_like).average();
@@ -261,7 +261,7 @@ public class TimeMachineResult {
       return 0;
    }
 
-   public int getWindDirection() {
+   public int getAverageWindDirection() {
 
       final OptionalDouble averageWindDirection =
             hourly.stream().mapToDouble(Hourly::getWind_deg).average();
@@ -273,7 +273,7 @@ public class TimeMachineResult {
       return 0;
    }
 
-   public int getWindSpeed() {
+   public int getAverageWindSpeed() {
 
       final OptionalDouble averageWindSpeed =
             hourly.stream().mapToDouble(Hourly::getWind_speed).average();

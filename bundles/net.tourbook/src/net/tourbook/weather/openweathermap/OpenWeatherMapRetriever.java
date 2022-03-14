@@ -42,9 +42,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    private static final String baseApiUrl        = HEROKU_APP_URL + "/openweathermap/timemachine";       //$NON-NLS-1$
 
    private LatLng              searchAreaCenter;
+   private long                tourEndTime;
    private long                tourMiddleTime;
    private long                tourStartTime;
-   private long                tourEndTime;
 
    private TimeMachineResult   timeMachineResult = null;
 
@@ -173,15 +173,15 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       tour.setWeather_Clouds(                timeMachineResult.getWeatherType());
 
       tour.setWeather_Temperature_Average(   timeMachineResult.getTemperatureAverage());
-      tour.setWeather_Wind_Speed(            timeMachineResult.getWindSpeed());
-      tour.setWeather_Wind_Direction(        timeMachineResult.getWindDirection());
+      tour.setWeather_Wind_Speed(            timeMachineResult.getAverageWindSpeed());
+      tour.setWeather_Wind_Direction(        timeMachineResult.getAverageWindDirection());
       tour.setWeather_Humidity((short)       timeMachineResult.getAverageHumidity());
-      tour.setWeather_Precipitation(         timeMachineResult.getPrecipitation());
+      tour.setWeather_Precipitation(         timeMachineResult.getAveragePrecipitation());
       tour.setWeather_Pressure((short)       timeMachineResult.getAveragePressure());
       tour.setWeather_Snowfall(              timeMachineResult.getAverageSnowfall());
       tour.setWeather_Temperature_Max(       timeMachineResult.getTemperatureMax());
       tour.setWeather_Temperature_Min(       timeMachineResult.getTemperatureMin());
-      tour.setWeather_Temperature_WindChill( timeMachineResult.getWindChill());
+      tour.setWeather_Temperature_WindChill( timeMachineResult.getAverageWindChill());
 
 // SET_FORMATTING_ON
 
