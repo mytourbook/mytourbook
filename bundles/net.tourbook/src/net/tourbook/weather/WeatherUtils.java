@@ -66,15 +66,15 @@ public class WeatherUtils {
 
       final String tourTime = String.format("%3s", tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME); //$NON-NLS-1$
 
-      final String temperature = String.format("%5s", Math.round(UI.convertTemperatureFromMetric(temperatureValue) * 10.0) / 10.0) //$NON-NLS-1$
+      final String temperature = String.format("%5s", roundDoubleToFloat(UI.convertTemperatureFromMetric(temperatureValue))) //$NON-NLS-1$
             + UI.UNIT_LABEL_TEMPERATURE;
 
       final String feelsLike = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
             UI.SPACE +
-            String.format("%5s", Math.round(UI.convertTemperatureFromMetric(windChill) * 10.0 / 10.0)) + //$NON-NLS-1$
+            String.format("%5s", roundDoubleToFloat(UI.convertTemperatureFromMetric(windChill))) + //$NON-NLS-1$
             UI.UNIT_LABEL_TEMPERATURE;
 
-      final String wind = String.format("%5s", Math.round(UI.convertSpeed_FromMetric(windSpeed) * 10.0) / 10.0) + UI.UNIT_LABEL_SPEED + //$NON-NLS-1$
+      final String wind = String.format("%5s", roundDoubleToFloat(UI.convertSpeed_FromMetric(windSpeed))) + UI.UNIT_LABEL_SPEED + //$NON-NLS-1$
             UI.SPACE + Messages.Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection +
             UI.SPACE + String.format("%3d", windDirection) + UI.SYMBOL_DEGREE; //$NON-NLS-1$
 
@@ -84,12 +84,12 @@ public class WeatherUtils {
 
       final String precipitation = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation
             + UI.SPACE
-            + String.format("%5s", UI.convertPrecipitation_FromMetric(precipitationValue)) //$NON-NLS-1$
+            + String.format("%5s", roundDoubleToFloat(UI.convertPrecipitation_FromMetric(precipitationValue))) //$NON-NLS-1$
             + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
 
       final String snowFall = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall
             + UI.SPACE
-            + String.format("%5s", UI.convertPrecipitation_FromMetric(snowFallValue)) //$NON-NLS-1$
+            + String.format("%5s", roundDoubleToFloat(UI.convertPrecipitation_FromMetric(snowFallValue))) //$NON-NLS-1$
             + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
 
       final String fullWeatherData = UI.EMPTY_STRING
@@ -137,7 +137,7 @@ public class WeatherUtils {
       // Average temperature
       final float averageTemperature = tourData.getWeather_Temperature_Average();
       if (averageTemperature != Float.MIN_VALUE) {
-         weatherDataList.add(Math.round(UI.convertTemperatureFromMetric(averageTemperature)) +
+         weatherDataList.add(roundDoubleToFloat(UI.convertTemperatureFromMetric(averageTemperature)) +
                UI.UNIT_LABEL_TEMPERATURE);
       }
 
@@ -147,7 +147,7 @@ public class WeatherUtils {
          weatherDataList.add(
                Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max +
                      UI.SPACE +
-                     Math.round(
+                     roundDoubleToFloat(
                            UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max())) +
                      UI.UNIT_LABEL_TEMPERATURE);
       }
@@ -158,7 +158,7 @@ public class WeatherUtils {
          weatherDataList.add(
                Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min +
                      UI.SPACE +
-                     Math.round(
+                     roundDoubleToFloat(
                            UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min())) +
                      UI.UNIT_LABEL_TEMPERATURE);
       }
@@ -170,7 +170,7 @@ public class WeatherUtils {
          weatherDataList.add(
                Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
                      UI.SPACE +
-                     Math.round(UI.convertTemperatureFromMetric(temperatureWindChill)) +
+                     roundDoubleToFloat(UI.convertTemperatureFromMetric(temperatureWindChill)) +
                      UI.UNIT_LABEL_TEMPERATURE);
       }
 
@@ -205,7 +205,7 @@ public class WeatherUtils {
 
          weatherDataList.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation +
                UI.SPACE +
-               Math.round(UI.convertPrecipitation_FromMetric(precipitation)) +
+               roundDoubleToFloat(UI.convertPrecipitation_FromMetric(precipitation)) +
                UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       }
 
@@ -215,7 +215,7 @@ public class WeatherUtils {
 
          weatherDataList.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall +
                UI.SPACE +
-               Math.round(UI.convertPrecipitation_FromMetric(snowfall)) +
+               roundDoubleToFloat(UI.convertPrecipitation_FromMetric(snowfall)) +
                UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       }
 

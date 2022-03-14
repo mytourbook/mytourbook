@@ -8510,10 +8510,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          _tourData.setWeather_Pressure(UI.convertPressure_ToMetric(pressure));
 
-         final int precipitation = _spinWeather_PrecipitationValue.getSelection();
+         final float precipitation = _spinWeather_PrecipitationValue.getSelection() / 100f;
          _tourData.setWeather_Precipitation(UI.convertPrecipitation_ToMetric(precipitation));
 
-         final int snowfall = _spinWeather_SnowfallValue.getSelection();
+         final float snowfall = _spinWeather_SnowfallValue.getSelection() / 100f;
          _tourData.setWeather_Snowfall(UI.convertPrecipitation_ToMetric(snowfall));
 
          if (_isWindSpeedManuallyModified) {
@@ -9071,13 +9071,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       final float precipitation = UI.convertPrecipitation_FromMetric(_tourData.getWeather_Precipitation());
 
-      if (UI.UNIT_IS_LENGTH_SMALL_MILLIMETER) {
-         _spinWeather_PrecipitationValue.setDigits(0);
-         _spinWeather_PrecipitationValue.setSelection(Math.round(precipitation));
-      } else {
-         _spinWeather_PrecipitationValue.setDigits(2);
-         _spinWeather_PrecipitationValue.setSelection(Math.round(precipitation));
-      }
+      _spinWeather_PrecipitationValue.setDigits(2);
+      _spinWeather_PrecipitationValue.setSelection(Math.round(precipitation * 100));
       _spinWeather_PrecipitationValue.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
 
       /*
@@ -9085,13 +9080,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       final float snowfall = UI.convertPrecipitation_FromMetric(_tourData.getWeather_Snowfall());
 
-      if (UI.UNIT_IS_LENGTH_SMALL_MILLIMETER) {
-         _spinWeather_SnowfallValue.setDigits(0);
-         _spinWeather_SnowfallValue.setSelection(Math.round(snowfall));
-      } else {
-         _spinWeather_SnowfallValue.setDigits(2);
-         _spinWeather_SnowfallValue.setSelection(Math.round(snowfall));
-      }
+      _spinWeather_SnowfallValue.setDigits(2);
+      _spinWeather_SnowfallValue.setSelection(Math.round(snowfall * 100));
       _spinWeather_SnowfallValue.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
 
       /*
