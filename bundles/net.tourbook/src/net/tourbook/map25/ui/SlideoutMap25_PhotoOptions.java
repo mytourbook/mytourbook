@@ -213,8 +213,8 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
 
       final Map25App mapApp = _map25View.getMapApp();
 
-      mapApp.getMap().updateMap(true);
       mapApp.updateUI_PhotoLayer();
+      mapApp.getMap().updateMap(true);
    }
 
 }

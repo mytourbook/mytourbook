@@ -106,7 +106,6 @@ import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
-import org.oscim.layers.marker.MarkerInterface;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.map.Animator;
 import org.oscim.map.Map;
@@ -138,7 +137,7 @@ public class Map25View extends ViewPart implements
 
    private static final String            STATE_LAYER_HILLSHADING_OPACITY              = "STATE_LAYER_HILLSHADING_OPACITY";                        //$NON-NLS-1$
    private static final String            STATE_MAP_SYNCHED_WITH                       = "STATE_MAP_SYNCHED_WITH";                                 //$NON-NLS-1$
-   
+
    // photo
    private static final String            STATE_IS_LAYER_PHOTO_VISIBLE                 = "STATE_IS_LAYER_PHOTO_VISIBLE";                           //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_PHOTO_SCALED                  = "STATE_IS_LAYER_PHOTO_SCALED";                            //$NON-NLS-1$
@@ -197,10 +196,10 @@ public class Map25View extends ViewPart implements
    /**
     * Contains photos which are displayed in the map
     */
+   private ArrayList<Photo>              _allPhotos      = new ArrayList<>();
 //   private final ArrayList<Photo>        _filteredPhotos = new ArrayList<>();
 //   private List<MarkerItem>              _photoItems     = new ArrayList<>();
 
-   private ArrayList<Photo>              _allPhotos      = new ArrayList<>();
 //   private List<MarkerInterface>         _photo_pts      = new ArrayList<>();
 //   private boolean                       _isPhotoFilterActive;
 //   private int                           _photoFilterRatingStars;
@@ -216,7 +215,7 @@ public class Map25View extends ViewPart implements
    private int     _rightSliderValueIndex;
    private int     _selectedSliderValueIndex;
    //
-   private int     _hash_AllPhotos;
+//   private int     _hash_AllPhotos;
    private int     _hashTourId;
    private int     _hashTourData;
    //
@@ -473,7 +472,7 @@ public class Map25View extends ViewPart implements
 
       if (_mapSynchedWith == MapSync.WITH_TOUR) {
 
-         paintTours_AndUpdateMap();
+         paintTours();
       }
    }
 
@@ -1145,16 +1144,20 @@ public class Map25View extends ViewPart implements
          final SelectionTourData selectionTourData = (SelectionTourData) selection;
          final TourData tourData = selectionTourData.getTourData();
 
-         paintTour(tourData);
-         paintPhotoSelection(selection);
+         setMapTour(tourData);
+         setMapPhotos(selection);
+
+         paintTours();
 
       } else if (selection instanceof SelectionTourId) {
 
          final SelectionTourId tourIdSelection = (SelectionTourId) selection;
          final TourData tourData = TourManager.getInstance().getTourData(tourIdSelection.getTourId());
 
-         paintTour(tourData);
-         paintPhotoSelection(selection);
+         setMapTour(tourData);
+         setMapPhotos(selection);
+
+         paintTours();
 
       } else if (selection instanceof SelectionTourIds) {
 
@@ -1171,15 +1174,19 @@ public class Map25View extends ViewPart implements
 
             final TourData tourData = TourManager.getInstance().getTourData(tourIds.get(0));
 
-            paintTour(tourData);
-            paintPhotoSelection(selection);
+            setMapTour(tourData);
+            setMapPhotos(selection);
+
+            paintTours();
 
          } else {
 
             // paint multiple tours
 
-            paintTours(tourIds);
-            paintPhotoSelection(selection);
+            setMapTours_FromIds(tourIds);
+            setMapPhotos(selection);
+
+            paintTours();
 
          }
 
@@ -1249,7 +1256,10 @@ public class Map25View extends ViewPart implements
 
             if (isShowSliderPath || isShowSliderLocation) {
 
-               paintTour(tourData);
+               setMapTour(tourData);
+               setMapPhotos(null);
+
+               paintTours();
             }
          }
 
@@ -1298,125 +1308,13 @@ public class Map25View extends ViewPart implements
    }
 
    /**
-    * Copied from Map2View 19.7.19
-    * called from paintPhotoSelection
-    *
-    * @param allNewPhotos
+    * Paint tours into map
+    * <p>
+    * {@link #_allTourData} must contain all tours<br>
+    * {@link #_allPhotos} must contain photos which should be displayed
     */
-   private void paintPhotos(final ArrayList<Photo> allNewPhotos) {
-      // DISABLED BECAUSE PHOTOS ARE NOT ALWAYS DISPLAYED
-      final int allNewPhotoHash = allNewPhotos.hashCode();
-//         _mapApp.debugPrint("* Map25View: paintPhotos: AllNewPhotoHash + _hashGalleryPhotos: " + allNewPhotoHash + " " + _hashGalleryPhotos);
-      if (allNewPhotoHash == _hash_AllPhotos) {
-         return;
-      }
-      Map25App.debugPrint("* Map25View: paintPhotos: allNewPhotos.size(): " + allNewPhotos.size()); //$NON-NLS-1$
+   private void paintTours() {
 
-      _allPhotos.clear(); //when active, no fotos
-      _allPhotos.addAll(allNewPhotos);
-      Map25App.debugPrint("* Map25View: paintPhotos: _allPhotos: size: " + _allPhotos.size()); //$NON-NLS-1$
-      _hash_AllPhotos = _allPhotos.hashCode(); //done in createPhotoItem
-
-   }
-
-   /**
-    * @param selection
-    * @return Returns a list which contains all photos.
-    *         copied from Map2View 17.07.2019
-    */
-   public ArrayList<Photo> paintPhotoSelection(final ISelection selection) {
-
-      Map25App.debugPrint("* Map25View: paintphotoselection: entering"); //$NON-NLS-1$
-
-      if (_mapApp.getPhotoToolkit() == null) {
-
-         //phototoolkit is not yet ready
-         return null;
-      }
-
-      //_isLinkPhotoDisplayed = false;
-      selection.toString();
-      final ArrayList<Photo> allPhotos = new ArrayList<>();
-      if (selection instanceof TourPhotoLinkSelection) {
-
-         //   _isLinkPhotoDisplayed = true;
-
-         final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) selection;
-
-         final ArrayList<TourPhotoLink> tourPhotoLinks = linkSelection.tourPhotoLinks;
-
-         for (final TourPhotoLink tourPhotoLink : tourPhotoLinks) {
-            allPhotos.addAll(tourPhotoLink.linkPhotos);
-         }
-
-         Map25App.debugPrint("* Map25View: paintphotoselection: TourPhotoLinkSelection size: " + allPhotos.size()); //$NON-NLS-1$
-
-      } else {
-
-         for (final TourData tourData : _allTourData) {
-
-            final ArrayList<Photo> galleryPhotos = tourData.getGalleryPhotos();
-
-            if (galleryPhotos != null) {
-               allPhotos.addAll(galleryPhotos);
-            }
-         }
-      }
-
-      //Map25App.debugPrint("* Map25View: paintphotoselection returning size: " + allPhotos.size());
-
-      paintPhotos(allPhotos);
-
-//      _photo_pts = _mapApp._phototoolkit.createPhotoItemList(_allPhotos, _mapApp.getIsPhotoShowTitle(), _mapApp.getIsPhotoShowScaled());
-
-      _allPhotos = allPhotos;
-
-      paintTours_AndUpdateMap();
-
-      return allPhotos;
-   }
-
-   private void paintTour(final TourData tourData) {
-
-      _allTourData.clear();
-
-      if (tourData != null && tourData.latitudeSerie != null && tourData.latitudeSerie.length > 0) {
-         _allTourData.add(tourData);
-      }
-
-      paintTours_AndUpdateMap();
-   }
-
-   private void paintTours(final ArrayList<Long> tourIdList) {
-
-      /*
-       * TESTING if a map redraw can be avoided, 15.6.2015
-       */
-      final int tourIdsHashCode = tourIdList.hashCode();
-      final int allToursHashCode = _allTourData.hashCode();
-      if (tourIdsHashCode == _hashTourId && allToursHashCode == _hashTourData) {
-         // skip redrawing
-         return;
-      }
-
-      if (tourIdList.hashCode() != _hashTourId || _allTourData.hashCode() != _hashTourData) {
-
-         // tour data needs to be loaded
-
-         TourManager.loadTourData(tourIdList, _allTourData, true);
-         //paintTours_AndUpdateMap();
-
-         _hashTourId = tourIdList.hashCode();
-         _hashTourData = _allTourData.hashCode();
-         //_hashGalleryPhotos = _allPhotos.hashCode(); //done in createPhotoItem
-
-      }
-      paintTours_AndUpdateMap();
-
-   }
-
-   private void paintTours_AndUpdateMap() {
-      Map25App.debugPrint(" Map25View: ** paintTours_AndUpdateMap: entering"); //$NON-NLS-1$
       enableActions();
 
       if (!_isShowTour) {
@@ -1528,18 +1426,15 @@ public class Map25View extends ViewPart implements
       /*
        * Photos
        */
-      paintPhotos(_allPhotos);
-      //_mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer OLD with size: " + _allPhotos.size());
-      final List<MarkerInterface> photoItems = _mapApp.getPhotoToolkit().createPhotoItemList(_allPhotos,
-            _mapApp.isPhoto_ShowTitle(),
-            _mapApp.isPhoto_Scaled());
+      if (_mapApp.isPhoto_Visible()) {
 
-      _mapApp.setPhotoSelection(photoItems);
-      //_mapApp.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photoItems with size: " + photoItems.size());
+//         final List<MarkerInterface> photoItems = _mapApp.getPhotoToolkit().createPhotoItems(_allPhotos,
+//               _mapApp.isPhoto_Scaled());
+//
+//         _mapApp.setPhotoSelection(photoItems);
 
-      _mapApp.updateUI_PhotoLayer();
-      //photoLayer.setEnabled(true);
-      Map25App.debugPrint(" Map25View: ** paintTours_AndUpdateMap: creating photolayer with size: " + _allPhotos.size()); //$NON-NLS-1$
+         _mapApp.updateUI_PhotoLayer();
+      }
 
       /*
        * Update map
@@ -1677,6 +1572,89 @@ public class Map25View extends ViewPart implements
 //		_swtContainer.setFocus();
    }
 
+   /**
+    * Central point to set photos into {@link #_allPhotos} from selection or from
+    * {@link #_allTourData}
+    *
+    * @param selection
+    *           Selection which contains photo references or <code>null</code>, then the photos from
+    *           {@link #_allTourData} are displayed
+    */
+   private void setMapPhotos(final ISelection selection) {
+
+      final ArrayList<Photo> allPhotos = new ArrayList<>();
+
+      if (selection instanceof TourPhotoLinkSelection) {
+
+         final TourPhotoLinkSelection linkSelection = (TourPhotoLinkSelection) selection;
+
+         final ArrayList<TourPhotoLink> tourPhotoLinks = linkSelection.tourPhotoLinks;
+
+         for (final TourPhotoLink tourPhotoLink : tourPhotoLinks) {
+            allPhotos.addAll(tourPhotoLink.linkPhotos);
+         }
+
+      } else {
+
+         for (final TourData tourData : _allTourData) {
+
+            final ArrayList<Photo> galleryPhotos = tourData.getGalleryPhotos();
+
+            if (galleryPhotos != null) {
+               allPhotos.addAll(galleryPhotos);
+            }
+         }
+      }
+
+      _allPhotos = allPhotos;
+   }
+
+   /**
+    * Central point to set tour data into {@link #_allTourData}
+    *
+    * @param tourData
+    */
+   private void setMapTour(final TourData tourData) {
+
+      _allTourData.clear();
+
+      if (tourData != null && tourData.latitudeSerie != null && tourData.latitudeSerie.length > 0) {
+         _allTourData.add(tourData);
+      }
+   }
+
+   /**
+    * Central point to set tour data into {@link #_allTourData}
+    *
+    * @param allTourData
+    */
+   private void setMapTours(final List<TourData> allTourData) {
+
+      _allTourData.clear();
+      _allTourData.addAll(allTourData);
+   }
+
+   /**
+    * Load tours from tour ID's
+    *
+    * @param allTourIds
+    * @return
+    */
+   private void setMapTours_FromIds(final List<Long> allTourIds) {
+
+      _allTourData.clear();
+
+      if (allTourIds.hashCode() != _hashTourId || _allTourData.hashCode() != _hashTourData) {
+
+         // tour data needs to be loaded
+
+         TourManager.loadTourData(allTourIds, _allTourData, true);
+
+         _hashTourId = allTourIds.hashCode();
+         _hashTourData = _allTourData.hashCode();
+      }
+   }
+
    private void showToursFromTourProvider() {
 
       if (!_isShowTour) {
@@ -1695,10 +1673,10 @@ public class Map25View extends ViewPart implements
             final ArrayList<TourData> tourDataList = TourManager.getSelectedTours(true);
             if (tourDataList != null) {
 
-               _allTourData.clear();
-               _allTourData.addAll(tourDataList);
+               setMapTours(tourDataList);
+               setMapPhotos(null);
 
-               paintTours_AndUpdateMap();
+               paintTours();
             }
 
             enableActions();

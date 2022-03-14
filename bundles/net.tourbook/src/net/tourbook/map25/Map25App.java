@@ -144,62 +144,61 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    //private VectorTileLayer      _layer_BaseMap;
    //private VectorTileLayer     _l;
 
-   private BuildingLayer          _layer_Building;
-   private S3DBLayer              _layer_S3DB_Building;
-   private TileSource             _hillshadingSource;
-   private TileSource             _satelliteSource;
+   private BuildingLayer _layer_Building;
+   private S3DBLayer     _layer_S3DB_Building;
+   private TileSource    _hillshadingSource;
+   private TileSource    _satelliteSource;
 //   private MapFileTileSource      _tileSourceOffline;
 //   private MultiMapFileTileSource _tileSourceOfflineMM;
-   private int                    _tileSourceOfflineMapCount = 0;
+   private int                  _tileSourceOfflineMapCount = 0;
 
-   private String                 _mp_key                    = "80d7bc63-94fe-416f-a63f-7173f81a484c"; //$NON-NLS-1$
+   private String               _mp_key                    = "80d7bc63-94fe-416f-a63f-7173f81a484c"; //$NON-NLS-1$
 
    /**
     * The opacity can be set in the layer but not read. This will keep the state of the hillshading
     * opacity.
     */
-   private int                    _layer_HillShading_Opacity;
+   private int                  _layer_HillShading_Opacity;
 
-   private LabelLayerMT           _layer_Label;
-   private MarkerLayer            _layer_Marker;
-   private BitmapTileLayer        _layer_HillShading;
-   private ItemizedLayer          _layer_Photo;
-   private BitmapTileLayer        _layer_Satellite;
-   private MapScaleBarLayer       _layer_ScaleBar;
-   private SliderLocation_Layer   _layer_SliderLocation;
-   private SliderPath_Layer       _layer_SliderPath;
-   private TileGridLayerMT        _layer_TileInfo;
-   private TourLayer              _layer_Tour;
+   private LabelLayerMT         _layer_Label;
+   private MarkerLayer          _layer_Marker;
+   private BitmapTileLayer      _layer_HillShading;
+   private ItemizedLayer        _layer_Photo;
+   private BitmapTileLayer      _layer_Satellite;
+   private MapScaleBarLayer     _layer_ScaleBar;
+   private SliderLocation_Layer _layer_SliderLocation;
+   private SliderPath_Layer     _layer_SliderPath;
+   private TileGridLayerMT      _layer_TileInfo;
+   private TourLayer            _layer_Tour;
 
-   private OkHttpFactoryMT        _httpFactory;
+   private OkHttpFactoryMT      _httpFactory;
 
-   private long                   _lastRenderTime;
-   private String                 _last_mf_themeFilePath     = "uninitialized";                        //$NON-NLS-1$
-   private String                 _last_mf_theme_styleID     = UI.EMPTY_STRING;
-   private Boolean                _last_is_mf_Map            = true;
-   private String                 _last_mf_mapFilePath       = "uninitialized";                        //$NON-NLS-1$
-   private Boolean                _last_mf_IsThemeFromFile;
+   private long                 _lastRenderTime;
+   private String               _last_mf_themeFilePath     = "uninitialized";                        //$NON-NLS-1$
+   private String               _last_mf_theme_styleID     = UI.EMPTY_STRING;
+   private Boolean              _last_is_mf_Map            = true;
+   private String               _last_mf_mapFilePath       = "uninitialized";                        //$NON-NLS-1$
+   private Boolean              _last_mf_IsThemeFromFile;
 
-   private IRenderTheme           _mf_IRenderTheme;
-   private float                  _mf_TextScale              = 0.75f;
-   private float                  _online_TextScale          = 0.50f;
-   private float                  _mf_UserScale              = 2.50f;
-   private float                  _online_UserScale          = 2.0f;
+   private IRenderTheme         _mf_IRenderTheme;
+   private float                _mf_TextScale              = 0.75f;
+   private float                _online_TextScale          = 0.50f;
+   private float                _mf_UserScale              = 2.50f;
+   private float                _online_UserScale          = 2.0f;
 
-   private ItemizedLayer          _layer_MapBookmark;
-   private MarkerToolkit          _markertoolkit;
-   private MarkerMode             _markerMode                = MarkerMode.NORMAL;                      // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
+   private ItemizedLayer        _layer_MapBookmark;
+   private MarkerToolkit        _markertoolkit;
+   private MarkerMode           _markerMode                = MarkerMode.NORMAL;                      // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
 
    /*
-    * Photo
+    * Photos
     */
+   private PhotoToolkit              _photoToolkit     = new PhotoToolkit(this);
+
    private boolean                   _isShowPhoto      = true;
    private boolean                   _isShowPhotoTitle = true;
    private boolean                   _isPhotoScaled    = false;
    private int                       _photoSize;
-   private PhotoToolkit              _photoToolkit;
-
-   public List<MarkerInterface>      _selectedPhotosPts;
 
    /**
     * Is <code>true</code> when a tour marker is hit.
@@ -398,8 +397,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       debugPrint(" map25: " + "# create Layers: Map encoding:                " + _selectedMapProvider.tileEncoding.toString()); //$NON-NLS-1$ //$NON-NLS-2$
       debugPrint(" map25: " + "# create Layers: prefered language:           " + _mf_prefered_language); //$NON-NLS-1$ //$NON-NLS-2$
 
-      if (_selectedMapProvider.tileEncoding != TileEncoding.MF) { // NOT mapsforge
+      if (_selectedMapProvider.tileEncoding != TileEncoding.MF) {
+
+         // NOT mapsforge
+
          _isOfflineMap = false;
+
          if (_selectedMapProvider.tileEncoding == TileEncoding.VTM) {
             final UrlTileSource tileSource = createTileSource(_selectedMapProvider, _httpFactory);
             setupMap(_selectedMapProvider, tileSource);
@@ -417,8 +420,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          debugPrint(" map25: " + "# create Layers OSCI: step 2: " + mMap.layers().toString() + " size: " + mMap.layers().size()); // result 3 //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
          debugPrint(" map25: " + "############# create Layers: is online map with theme: " + _selectedMapProvider.theme.name()); //$NON-NLS-1$ //$NON-NLS-2$
-      } else { //offline maps
+
+      } else {
+
+         //offline maps
+
          _isOfflineMap = true;
+
          //_httpFactory = null;
          //_mf_mapFilePath = checkFile(_selectedMapProvider.mf_MapFilepath);
          _mf_mapFilePath = _selectedMapProvider.mf_MapFilepath;
@@ -485,29 +493,32 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       restoreState();
 
       // update actions in UI thread, run this AFTER the layers are created
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            _map25View.restoreState();
-         }
-      });
+      Display.getDefault().asyncExec(() -> _map25View.restoreState());
+
    } // end createLayers()
 
    private MapilionMvtTileSource createMaplilionMvtTileSource(final Map25Provider mapProvider, final OkHttpFactoryMT httpFactory) {
+
       MapilionMvtTileSource tileSource;
+
       if (mapProvider.online_ApiKey == null || mapProvider.online_ApiKey.trim().length() == 0) {
+
          //debugPrint(" map25: " + "####### createMaplilionMvtTileSource API Key is empty using internal key: " + _mp_key); //$NON-NLS-1$ //$NON-NLS-2$
+
          tileSource = MapilionMvtTileSource.builder()
                .apiKey(_mp_key)
                .httpFactory(httpFactory)
                .build();
       } else {
+
          //debugPrint(" map25: " + "####### createMaplilionMvtTileSource API Key is not empty using it: " + mapProvider.online_ApiKey.trim()); //$NON-NLS-1$ //$NON-NLS-2$
+
          tileSource = MapilionMvtTileSource.builder()
                .apiKey(mapProvider.online_ApiKey.trim())
                .httpFactory(httpFactory)
                .build();
       }
+
       return tileSource;
    }
 
@@ -523,14 +534,18 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       if (apiKey != null && apiKey.trim().length() > 0) {
          map25Builder.apiKey(apiKey);
       }
+
       return map25Builder.build();
    }
 
    @Override
    public void dispose() {
+
       // stop loading tiles
       _tileManager.clearJobs();
+
       saveState();
+
       super.dispose();
    }
 
@@ -884,11 +899,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     */
    public void onModifyMarkerConfig() {
 
-      debugPrint("MapApp25: onModifyMarkerConfig size current: " + _selectedPhotosPts.size()); //$NON-NLS-1$
-
       updateUI_MarkerLayer();
       updateUI_MapBookmarkLayer();
-      updateUI_PhotoLayer();
 
       mMap.render();
    }
@@ -989,6 +1001,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    }
 
    public void setMapProvider(final Map25Provider mapProvider) {
+
       //saveState();  //doesnt help
       Boolean onlineOfflineStatusHasChanged = false;
       _mf_mapFilePath = mapProvider.mf_MapFilepath;
@@ -1126,7 +1139,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             //restoreState();
 
             updateUI_MapBookmarkLayer();
-
             updateUI_PhotoLayer();
 
             /**
@@ -1225,12 +1237,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    public void setPhoto_Size(final int layer_Photo_Size) {
       _photoSize = layer_Photo_Size;
-      debugPrint(" map25: " + "############# setLayer_PhotoSize to: " + layer_Photo_Size); //$NON-NLS-1$ //$NON-NLS-2$
-   }
-
-   public void setPhotoSelection(final List<MarkerInterface> photoItems) {
-      debugPrint("MapApp25: setPhotoSelection size input: " + photoItems.size()); //$NON-NLS-1$
-      _selectedPhotosPts = photoItems;
    }
 
    /**
@@ -1372,6 +1378,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    }
 
    private void setupMap_Layers() {
+
       debugPrint(" map25: " + "################ setupMap_Layers:  entering"); //$NON-NLS-1$ //$NON-NLS-2$
       final Layers layers = mMap.layers();
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
@@ -1470,7 +1477,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       layers.add(_layer_Marker);
 
       //Photos
-      _photoToolkit = new PhotoToolkit(this);
       if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
          _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit._markerRendererFactory, _photoToolkit);
       } else {
@@ -1513,6 +1519,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * replacing the mapbookmarkitems
     */
    public void updateUI_MapBookmarkLayer() {
+
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
       final Layers layers = mMap.layers();
       final int layer_index_MapBookmarkLayer = layers.indexOf(_layer_MapBookmark);
@@ -1531,13 +1538,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       } else {
          _layer_MapBookmark.removeAllItems();
       }
-      //_layer_Bookmark.removeAllItems();
+
       final List<MarkerInterface> pts = _markertoolkit.createMarkerItemList(_markerMode);
       //debugPrint(" map25: " + "# updateUI_MapBookmarkLayer(): #MapBookmartks: " + pts.size()); //$NON-NLS-1$
       _layer_MapBookmark.addItems(pts);
       _layer_MapBookmark.setEnabled(isShowMapBookmarkLayer);
+
       _markertoolkit._isMarkerClusteredLast = config.isMarkerClustered;
-      //
    }
 
    /**
@@ -1567,40 +1574,40 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     */
    public void updateUI_PhotoLayer() {
 
-      debugPrint(" map25: " + "# updateUI_PhotoLayer():  entering"); //$NON-NLS-1$ //$NON-NLS-2$
-
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-      final Layers layers = mMap.layers();
-      final int layer_index_PhotoLayer = layers.indexOf(_layer_Photo);
 
       // using settings from MapBookmarks must be changed later with own config
-      //"STATE_IS_LAYER_PHOTO_VISIBLE"
-      //debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size()); //$NON-NLS-1$
-      if (config.isMarkerClustered != _photoToolkit._isMarkerClusteredLast) { // only recreate PhotoLayer when changed in UI.
+      if (config.isMarkerClustered != _photoToolkit._isMarkerClusteredLast) {
 
-         //debugPrint(" map25: " + "# updateUI_PhotoLayer(): index was before: " + layer_index_PhotoLayer); //$NON-NLS-1$
+         // only recreate PhotoLayer when changed in UI
+
+         final Layers layers = mMap.layers();
+         final int photoLayerPosition = layers.indexOf(_layer_Photo);
+
          layers.remove(_layer_Photo);
 
-         //if (config.isPhotoClustered) {
+         //  config.isPhotoClustered
          if (config.isMarkerClustered) {
             _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit._markerRendererFactory, _photoToolkit);
          } else {
             _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit._symbol, _photoToolkit);
          }
-         layers.add(layer_index_PhotoLayer, _layer_Photo);
+
+         layers.add(photoLayerPosition, _layer_Photo);
 
       } else {
 
          _layer_Photo.removeAllItems();
       }
 
-      _selectedPhotosPts = _photoToolkit.createPhotoItemList(_map25View.getPhotos(), _isShowPhotoTitle, _isPhotoScaled); //hopefully done in map25view "paintToursAndUpdate"
-      debugPrint(" map25: " + "# updateUI_PhotoLayer(): #photos: " + _selectedPhotosPts.size() + " enabled: " + "isShowPhotoLayer"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-      _layer_Photo.addItems(_selectedPhotosPts); //hopefully done in map25view "paintToursAndUpdate"
+      final List<MarkerInterface> photoItems = _photoToolkit.createPhotoItems(_map25View.getPhotos());
+
+      _layer_Photo.addItems(photoItems);
       _layer_Photo.setEnabled(_isShowPhoto);
 
       //_phototoolkit._isMarkerClusteredLast = config.isPhotoClustered;
-      _photoToolkit._isMarkerClusteredLast = config.isMarkerClustered;// using settings from MapBookmarks must be changed later with own config
+      // using settings from MapBookmarks must be changed later with own config
+      _photoToolkit._isMarkerClusteredLast = config.isMarkerClustered;
    }
 
 }
