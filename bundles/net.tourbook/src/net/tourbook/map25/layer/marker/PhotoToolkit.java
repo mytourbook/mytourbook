@@ -31,6 +31,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.marker.cluster.ClusterMarkerRenderer;
+import net.tourbook.map25.ui.SlideoutMap25_PhotoOptions;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.ImageUtils;
@@ -105,7 +106,10 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
             return;
          }
 
-         onImageIsLoaded(_markerItem, _photo);
+         // create map bitmap from photo image
+         createPhotoItems_10_CreateBitmapFromPhoto(_markerItem, _photo, true);
+
+         _mapApp.updateMap();
       }
    }
 
@@ -230,8 +234,6 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          return allPhotoItems;
       }
 
-      final boolean isShowPhotoTitle = _mapApp.isPhoto_ShowTitle();
-
       for (final Photo photo : galleryPhotos) {
 
          final UUID photoKey = UUID.randomUUID();
@@ -246,7 +248,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
                geoPoint);
 
          // the photo bitmap is set into the markerItem
-         createPhotoItems_10_CreateBitmapFromPhoto(markerItem, photo, isShowPhotoTitle);
+         createPhotoItems_10_CreateBitmapFromPhoto(markerItem, photo, false);
 
          allPhotoItems.add(markerItem);
       }
@@ -254,15 +256,17 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       return allPhotoItems;
    }
 
-   private void createPhotoItems_10_CreateBitmapFromPhoto(final MarkerItem item, final Photo photo, final boolean isShowPhotoTitle) {
+   private void createPhotoItems_10_CreateBitmapFromPhoto(final MarkerItem item,
+                                                          final Photo photo,
+                                                          final boolean isImageLoaded) {
 
-      Bitmap bitmapImage = createPhotoItems_20_CreateBitmap(item, photo);
+      Bitmap bitmapImage = createPhotoItems_20_CreateBitmap(item, photo, isImageLoaded);
 
       if (bitmapImage == null) {
          bitmapImage = _bitmapNotLoadedPhoto;
       }
 
-      final MarkerSymbol bitmapPhoto = createAdvanceSymbol(item, bitmapImage, true, isShowPhotoTitle);
+      final MarkerSymbol bitmapPhoto = createAdvanceSymbol(item, bitmapImage, true, _mapApp.isPhoto_ShowTitle());
 
       item.setMarker(bitmapPhoto);
    }
@@ -272,20 +276,24 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
     *
     * @param item
     * @param photo
+    * @param isImageLoaded
     * @return the bitmap
     */
-   private Bitmap createPhotoItems_20_CreateBitmap(final MarkerItem item, final Photo photo) {
+   private Bitmap createPhotoItems_20_CreateBitmap(final MarkerItem item,
+                                                   final Photo photo,
+                                                   final boolean isImageLoaded) {
 
       Bitmap photoBitmap = null;
 
-      // ensure min photo size
-      final int scaledThumbImageSize = Math.max(10, _mapApp.getPhoto_Size());
+      // ensure photo minimum size
+      final int scaledImageSize = Math.max(SlideoutMap25_PhotoOptions.IMAGE_SIZE_MINIMUM, _mapApp.getPhoto_Size());
 
-      // using photo image size of 2D map, not working yet
-      //_imageSize = Util.getStateInt(_state, STATE_PHOTO_PROPERTIES_IMAGE_SIZE, Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT);
-      // ensure that an image is displayed, it happend that image size was 0
+      final ImageState imageState = createPhotoItems_30_GetScaledImage(
+            item,
+            photo,
+            scaledImageSize,
+            isImageLoaded);
 
-      final ImageState imageState = createPhotoItems_30_GetScaledImage(item, photo, scaledThumbImageSize);
       final Image scaledImage = imageState._photoImage;
 
       if (scaledImage != null) {
@@ -313,9 +321,13 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
     * @param photo
     * @param thumbSize
     *           thumbnail size from slideout
+    * @param isImageLoaded
     * @return
     */
-   private ImageState createPhotoItems_30_GetScaledImage(final MarkerItem item, final Photo photo, final int thumbSize) {
+   private ImageState createPhotoItems_30_GetScaledImage(final MarkerItem item,
+                                                         final Photo photo,
+                                                         final int thumbSize,
+                                                         final boolean isImageLoaded) {
 
       Image photoImage = null;
       Image scaledImage = null;
@@ -338,7 +350,10 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          if ((photoImage == null || photoImage.isDisposed())
 
                // photo image is not in loading queue
-               && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
+               && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false
+
+               // prevent reloading image
+               && isImageLoaded == false) {
 
             // the requested image is not available in the image cache -> image must be loaded
 
@@ -390,14 +405,6 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       }
 
       return new ImageState(scaledImage, isMustDisposeImage);
-   }
-
-   private void onImageIsLoaded(final MarkerItem markerItem, final Photo photo) {
-
-      // photo items must be recreated from loading photo symbol -> real photo
-      _mapApp.updateUI_PhotoLayer();
-
-      _mapApp.updateMap();
    }
 
    @Override
