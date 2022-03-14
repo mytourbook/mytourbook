@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.map2.view;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
@@ -27,12 +28,14 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.ui.IChangeUIListener;
 import net.tourbook.common.util.Util;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourPauseUI;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -53,6 +56,7 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
       IActionResetToDefault,
       IChangeUIListener {
 
+   private static final IPreferenceStore  _prefStore         = TourbookPlugin.getPrefStore();
    private static IDialogSettings         _state;
 
    private IPropertyChangeListener        _defaultChangePropertyListener;
@@ -70,7 +74,8 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
     */
    private Button                _chkIsDimMap;
    private Button                _chkIsToggleKeyboardPanning;
-   private Button                _chkIsZoomWithMousePosition;
+   private Button                _chkSelectInbetweenTimeSlices;
+   private Button                _chkShowValuePointTooltip;
 
    private Spinner               _spinnerDimValue;
 
@@ -175,19 +180,31 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
 
    private void createUI_20_MapOptions(final Composite parent) {
 
+      final GridDataFactory gdSpan2 = GridDataFactory.fillDefaults().span(2, 1);
+
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
          {
             /*
-             * Zoom to mouse position
+             * Show value point tooltip
              */
-            _chkIsZoomWithMousePosition = new Button(container, SWT.CHECK);
-            _chkIsZoomWithMousePosition.setText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition);
-            _chkIsZoomWithMousePosition.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ZoomWithMousePosition_Tooltip);
-            _chkIsZoomWithMousePosition.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsZoomWithMousePosition);
+            _chkShowValuePointTooltip = new Button(container, SWT.CHECK);
+            _chkShowValuePointTooltip.setText(Messages.Tour_Action_ValuePointToolTip_IsVisible);
+            _chkShowValuePointTooltip.addSelectionListener(widgetSelectedAdapter(selectionEvent -> saveState_ValuePointTooltip()));
+            gdSpan2.applyTo(_chkShowValuePointTooltip);
+         }
+         {
+            /*
+             * Options to select all the time slices in between the left and right sliders or only
+             * the current slider's one
+             */
+            _chkSelectInbetweenTimeSlices = new Button(container, SWT.CHECK);
+            _chkSelectInbetweenTimeSlices.setText(Messages.Tour_Action_Select_Inbetween_Timeslices);
+            _chkSelectInbetweenTimeSlices.setToolTipText(Messages.Tour_Action_Select_Inbetween_Timeslices_Tooltip);
+            _chkSelectInbetweenTimeSlices.addSelectionListener(_defaultSelectionListener);
+            gdSpan2.applyTo(_chkSelectInbetweenTimeSlices);
          }
          {
             /*
@@ -197,7 +214,7 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
             _chkIsToggleKeyboardPanning.setText(Messages.Slideout_Map_Options_Checkbox_ToggleKeyboardPanning);
             _chkIsToggleKeyboardPanning.setToolTipText(Messages.Slideout_Map_Options_Checkbox_ToggleKeyboardPanning_Tooltip);
             _chkIsToggleKeyboardPanning.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsToggleKeyboardPanning);
+            gdSpan2.applyTo(_chkIsToggleKeyboardPanning);
          }
          {
             /*
@@ -276,7 +293,8 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
 // SET_FORMATTING_OFF
 
       _chkIsToggleKeyboardPanning.setSelection(    Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT);
-      _chkIsZoomWithMousePosition.setSelection(    Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT);
+
+      _chkSelectInbetweenTimeSlices.setSelection(  _prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
 
       /*
        * Map dimming
@@ -286,6 +304,15 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
       _colorMapDimmColor.setColorValue(            Map2View.STATE_DIM_MAP_COLOR_DEFAULT);
 
 // SET_FORMATTING_ON
+
+      /*
+       * Value point tooltip
+       */
+      final boolean isShowValuePointTooltip = _prefStore.getDefaultBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2);
+      _chkShowValuePointTooltip.setSelection(isShowValuePointTooltip);
+
+      // this is not set in saveState()
+      _prefStore.setValue(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2, isShowValuePointTooltip);
 
       _tourPausesUI.resetToDefaults();
 
@@ -297,7 +324,8 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
 // SET_FORMATTING_OFF
 
       _chkIsToggleKeyboardPanning.setSelection(    Util.getStateBoolean(_state,  Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,      Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING_DEFAULT));
-      _chkIsZoomWithMousePosition.setSelection(    Util.getStateBoolean(_state,  Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,     Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION_DEFAULT));
+
+      _chkSelectInbetweenTimeSlices.setSelection(  _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES));
 
       /*
        * Map dimming
@@ -305,6 +333,8 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
       _chkIsDimMap.setSelection(          Util.getStateBoolean(_state,  Map2View.STATE_IS_MAP_DIMMED, Map2View.STATE_IS_MAP_DIMMED_DEFAULT));
       _spinnerDimValue.setSelection(      Util.getStateInt(    _state,  Map2View.STATE_DIM_MAP_VALUE, Map2View.STATE_DIM_MAP_VALUE_DEFAULT));
       _colorMapDimmColor.setColorValue(   Util.getStateRGB(    _state,  Map2View.STATE_DIM_MAP_COLOR, Map2View.STATE_DIM_MAP_COLOR_DEFAULT));
+
+      _chkShowValuePointTooltip.setSelection(      _prefStore.getBoolean(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2));
 
 // SET_FORMATTING_ON
 
@@ -316,7 +346,8 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
 // SET_FORMATTING_OFF
 
       _state.put(Map2View.STATE_IS_TOGGLE_KEYBOARD_PANNING,    _chkIsToggleKeyboardPanning.getSelection());
-      _state.put(Map2View.STATE_IS_ZOOM_WITH_MOUSE_POSITION,   _chkIsZoomWithMousePosition.getSelection());
+
+      _prefStore.setValue(ITourbookPreferences.GRAPH_IS_SELECT_INBETWEEN_TIME_SLICES, _chkSelectInbetweenTimeSlices.getSelection());
 
       /*
        * Map dimming
@@ -328,6 +359,14 @@ public class SlideoutMap2Options extends ToolbarSlideout implements
 // SET_FORMATTING_ON
 
       _tourPausesUI.saveState();
+   }
+
+   private void saveState_ValuePointTooltip() {
+
+      // set in pref store, tooltip is listening pref store modifications
+      _prefStore.setValue(
+            ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2,
+            _chkShowValuePointTooltip.getSelection());
    }
 
 }

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Connectivity to cloud applications
 Bundle-SymbolicName: net.tourbook.cloud;singleton:=true
-Bundle-Version: 22.1.0.qualifier
+Bundle-Version: 22.3.0.qualifier
 Bundle-Activator: net.tourbook.cloud.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
@@ -16,9 +16,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ClassPath: .,
  dropbox-core-sdk-4.0.0.jar,
  java7-fs-dropbox-0.0.3.jar,
- java7-fs-base-0.0.3.jar,
- httpcore-4.4.14.jar,
- httpclient-4.5.13.jar
+ java7-fs-base-0.0.3.jar
 Import-Package: com.fasterxml.jackson.core,
  net.tourbook,
  net.tourbook.application,
@@ -32,17 +30,9 @@ Import-Package: com.fasterxml.jackson.core,
  net.tourbook.tour,
  net.tourbook.web,
  org.apache.commons.io,
- org.apache.http,
- org.apache.http.client.entity,
- org.apache.http.client.methods,
- org.apache.http.client.utils,
- org.apache.http.entity,
- org.apache.http.entity.mime,
- org.apache.http.entity.mime.content,
- org.apache.http.impl.client,
- org.apache.http.message,
- org.apache.http.util,
  org.json
 Automatic-Module-Name: net.tourbook.cloud
-Export-Package: net.tourbook.cloud.oauth2,
- net.tourbook.cloud.strava
+Export-Package: net.tourbook.cloud,
+ net.tourbook.cloud.oauth2,
+ net.tourbook.cloud.strava,
+ net.tourbook.cloud.suunto

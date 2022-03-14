@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,15 +13,47 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package de.byteholder.geoclipse.map.event;
+
+import net.tourbook.common.UI;
 
 public class MapHoveredTourEvent {
 
-   public long hoveredTourId;
+   private static final char NL = UI.NEW_LINE;
 
-   public MapHoveredTourEvent(final long currentHoveredTourId) {
+   public Long               hoveredTourId;
+   public int                hoveredValuePointIndex;
 
-      hoveredTourId = currentHoveredTourId;
+   /**
+    * Mouse x position relative to the owner control
+    */
+   public int                mousePositionX;
+   public int                mousePositionY;
+
+   public MapHoveredTourEvent(final Long hoveredTourId,
+                              final int hoveredValuePointIndex,
+                              final int mousePositionX,
+                              final int mousePositionY) {
+
+      this.hoveredTourId = hoveredTourId;
+      this.hoveredValuePointIndex = hoveredValuePointIndex;
+
+      this.mousePositionX = mousePositionX;
+      this.mousePositionY = mousePositionY;
+   }
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "MapHoveredTourEvent" + NL //                                      //$NON-NLS-1$
+
+            + "[" + NL //                                                        //$NON-NLS-1$
+
+            + "hoveredTourId           =" + hoveredTourId + NL //                //$NON-NLS-1$
+            + "hoveredValuePointIndex  =" + hoveredValuePointIndex + NL //       //$NON-NLS-1$
+
+            + "]"; //                                                            //$NON-NLS-1$
    }
 }

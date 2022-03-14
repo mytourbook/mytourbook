@@ -608,9 +608,10 @@ public abstract class AnimatedToolTipShell {
    }
 
    /**
-    * Is called before the tooltip shell is set hidden.
+    * Is called before the tooltip shell is set hidden, the default is doing nothing.
     */
    protected void beforeHideToolTip() {
+
       // do nothing
    }
 

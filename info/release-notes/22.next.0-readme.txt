@@ -6,7 +6,7 @@ TODO's
 
 
 * Tour Chart      - Select color for 2nd graph line instead of compliment color
-                  - Set default graphs in the graph slideout, sorting still needs the pref page
+
 
 * Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
                     Need to check how to apply it to all projects, must maybe be done with the already existing ant script
@@ -18,7 +18,6 @@ TODO's
 Issues
 ======
 
-*  
 
 
 Experimental
@@ -30,45 +29,15 @@ Experimental
 New
 ===
 
-
-* Tour Pauses
-  - Show all tour pauses in a list
-
-* 2D Map (Frederic)
-  - Added the possibility to show/hide the tour weather icon on the map
+*
 
 
 Improvements
 ============
 
-* Multiple Tours
-  - Loading multiple tours is much faster because they are loaded concurrently
-  - Painting multiple tours in tour chart and 2D map are further optimized 
+* 
 
 
-* Tour Import
-  - Sort imported tours by number of markers/waypoints
-  
-* Tour Segmenter
-  - Show power value for each segment
-                                          https://sourceforge.net/p/mytourbook/feature-requests/204/
-                        
-* Photos + Tours        
-  - Show tours with these photo times: 
-    - Exif time
-    - Selected adjustment time
-    - Saved time
-  - Show photo location in view                         
-                                          https://github.com/mytourbook/mytourbook/issues/449
-
-* SRTM (Thomas)
-  - Additionally to the already usable SRTM3 Altitudes, SRTM1 is now also usable. 
-    The Data Files must be manually copied to the new SRTM1 folder. 
-    SRTM1 size is 25.9 MB per file. SRTM3 file size is 2.9 MB per file
-                                          https://sourceforge.net/p/mytourbook/discussion/622811/thread/7e83518a/
-                                          https://sourceforge.net/p/mytourbook/feature-requests/122/
-
-                                        
 Changes
 =======
 
@@ -78,11 +47,8 @@ Changes
 Bugfix
 ======
 
-* Suunto App Integration: (Frederic)   
-  - When determining if a Suunto activity already exists in the database, only the tours for the selected user are compared with the activities available on the Suunto App
-  
-* Tour Editor
-  - Fixed "Using DELETE in the Tour Editor is not consecutive "      https://sourceforge.net/p/mytourbook/bugs/127/  
+* 
+
 
 * Map25; (Thomas)
   - The old hillshading provider(wmflabs.org) is not avaible anymore, the new provider for hillshading is now "Mapilion"
@@ -91,7 +57,6 @@ Bugfix
 Translation    
 ===========
 
-- Czech 20.11 (Lukas)
 - Dutch (Maarten)
 - French (Frederic)
 - German
@@ -101,5 +66,6 @@ Translation
 System   
 ======
 
-* Eclipse 2021-06
+* Milestone             https://github.com/mytourbook/mytourbook/milestone/4?closed=1
+* Eclipse 2022-03
 * FIT SDK 21.67

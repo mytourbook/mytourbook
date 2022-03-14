@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -161,6 +161,7 @@ public interface ITourbookPreferences {
    public static final String GRAPH_IS_MARKER_VISIBLE                   = "Graph_IsMarkerVisible";                     //$NON-NLS-1$
    public static final String GRAPH_IS_SEGMENT_ALTERNATE_COLOR          = "GRAPH_IS_SEGMENT_ALTERNATE_COLOR";          //$NON-NLS-1$
    public static final String GRAPH_IS_SRTM_VISIBLE                     = "Graph_IsSRTMVisible";                       //$NON-NLS-1$
+   public static final String GRAPH_IS_SHOW_SRTM_1_VALUES               = "GRAPH_IS_SHOW_SRTM_1_VALUES";               //$NON-NLS-1$
    public static final String GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE       = "GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE";       //$NON-NLS-1$
    public static final String GRAPH_IS_TOUR_PHOTO_VISIBLE               = "GRAPH_IS_TOUR_PHOTO_VISIBLE";               //$NON-NLS-1$
    public static final String GRAPH_SEGMENT_ALTERNATE_COLOR             = "GRAPH_SEGMENT_ALTERNATE_COLOR";             //$NON-NLS-1$
@@ -414,39 +415,41 @@ public interface ITourbookPreferences {
    /*
     * regional settings
     */
-   public static final String REGIONAL_USE_CUSTOM_DECIMAL_FORMAT   = "regional_use.custom.decimal.format";      //$NON-NLS-1$
-   public static final String REGIONAL_DECIMAL_SEPARATOR           = "regional_decimal.separator";              //$NON-NLS-1$
-   public static final String REGIONAL_GROUP_SEPARATOR             = "regional_group.separator";                //$NON-NLS-1$
+   public static final String REGIONAL_USE_CUSTOM_DECIMAL_FORMAT    = "regional_use.custom.decimal.format";      //$NON-NLS-1$
+   public static final String REGIONAL_DECIMAL_SEPARATOR            = "regional_decimal.separator";              //$NON-NLS-1$
+   public static final String REGIONAL_GROUP_SEPARATOR              = "regional_group.separator";                //$NON-NLS-1$
 
    /**
     * layout for the views have been changed
     */
-   public static final String VIEW_LAYOUT_CHANGED                  = "view.layout.changed";                     //$NON-NLS-1$
-   public static final String VIEW_LAYOUT_DISPLAY_LINES            = "view.layout.display.lines";               //$NON-NLS-1$
+   public static final String VIEW_LAYOUT_CHANGED                   = "view.layout.changed";                     //$NON-NLS-1$
+   public static final String VIEW_LAYOUT_DISPLAY_LINES             = "view.layout.display.lines";               //$NON-NLS-1$
 
-   public static final String VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR    = "VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR";       //$NON-NLS-1$
-   public static final String VIEW_LAYOUT_COLOR_CATEGORY           = "view.layout.color.category";              //$NON-NLS-1$
-   public static final String VIEW_LAYOUT_COLOR_SUB                = "view.layout.color.sub";                   //$NON-NLS-1$
-   public static final String VIEW_LAYOUT_COLOR_SUB_SUB            = "view.layout.color.sub-sub";               //$NON-NLS-1$
-   public static final String VIEW_LAYOUT_COLOR_TITLE              = "view.layout.color.title";                 //$NON-NLS-1$
-   public static final String VIEW_LAYOUT_COLOR_TOUR               = "view.layout.color.tour";                  //$NON-NLS-1$
+   public static final String VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR     = "VIEW_LAYOUT_COLOR_BG_HISTORY_TOUR";       //$NON-NLS-1$
+   public static final String VIEW_LAYOUT_COLOR_CATEGORY            = "view.layout.color.category";              //$NON-NLS-1$
+   public static final String VIEW_LAYOUT_COLOR_SUB                 = "view.layout.color.sub";                   //$NON-NLS-1$
+   public static final String VIEW_LAYOUT_COLOR_SUB_SUB             = "view.layout.color.sub-sub";               //$NON-NLS-1$
+   public static final String VIEW_LAYOUT_COLOR_TITLE               = "view.layout.color.title";                 //$NON-NLS-1$
+   public static final String VIEW_LAYOUT_COLOR_TOUR                = "view.layout.color.tour";                  //$NON-NLS-1$
 
    /**
     * Layout for maps
     */
-   public static final String MAP_LAYOUT_BORDER_TYPE               = "MAP_LAYOUT_BORDER_TYPE";                  //$NON-NLS-1$
-   public static final String MAP_LAYOUT_BORDER_COLOR              = "MAP_LAYOUT_BORDER_COLOR";                 //$NON-NLS-1$
-   public static final String MAP_LAYOUT_BORDER_DIMM_VALUE         = "MAP_LAYOUT_BORDER_DIMM_VALUE";            //$NON-NLS-1$
-   public static final String MAP_LAYOUT_BORDER_WIDTH              = "map.layout.borderWidth";                  //$NON-NLS-1$
-   public static final String MAP_LAYOUT_LIVE_UPDATE               = "MAP_LAYOUT_LIVE_UPDATE";                  //$NON-NLS-1$
-   public static final String MAP_LAYOUT_PAINT_WITH_BORDER         = "map.layout.paintWithBorder";              //$NON-NLS-1$
-   public static final String MAP_LAYOUT_PLOT_TYPE                 = "map.layout.symbol";                       //$NON-NLS-1$
-   public static final String MAP_LAYOUT_SYMBOL_WIDTH              = "map.layout.symbol-width";                 //$NON-NLS-1$
-   public static final String MAP_LAYOUT_TOUR_PAINT_METHOD         = "map.layout.tour-paint-algorithm";         //$NON-NLS-1$
-   public static final String MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING = "map.layout.tour-paint-algorithm-warning"; //$NON-NLS-1$
+   public static final String MAP_LAYOUT_BORDER_TYPE                = "MAP_LAYOUT_BORDER_TYPE";                  //$NON-NLS-1$
+   public static final String MAP_LAYOUT_BORDER_COLOR               = "MAP_LAYOUT_BORDER_COLOR";                 //$NON-NLS-1$
+   public static final String MAP_LAYOUT_BORDER_DIMM_VALUE          = "MAP_LAYOUT_BORDER_DIMM_VALUE";            //$NON-NLS-1$
+   public static final String MAP_LAYOUT_BORDER_WIDTH               = "map.layout.borderWidth";                  //$NON-NLS-1$
+   public static final String MAP_LAYOUT_IS_ANTIALIAS_PAINTING      = "MAP_LAYOUT_IS_ANTIALIAS_PAINTING";        //$NON-NLS-1$
+   public static final String MAP_LAYOUT_IS_CUT_OFF_LINES_IN_PAUSES = "MAP_LAYOUT_IS_DRAW_LINES_IN_PAUSES";      //$NON-NLS-1$
+   public static final String MAP_LAYOUT_LIVE_UPDATE                = "MAP_LAYOUT_LIVE_UPDATE";                  //$NON-NLS-1$
+   public static final String MAP_LAYOUT_PAINT_WITH_BORDER          = "map.layout.paintWithBorder";              //$NON-NLS-1$
+   public static final String MAP_LAYOUT_PLOT_TYPE                  = "map.layout.symbol";                       //$NON-NLS-1$
+   public static final String MAP_LAYOUT_SYMBOL_WIDTH               = "map.layout.symbol-width";                 //$NON-NLS-1$
+   public static final String MAP_LAYOUT_TOUR_PAINT_METHOD          = "map.layout.tour-paint-algorithm";         //$NON-NLS-1$
+   public static final String MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING  = "map.layout.tour-paint-algorithm-warning"; //$NON-NLS-1$
 
-   public static final String MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY    = "MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY";       //$NON-NLS-1$
-   public static final String MAP2_LAYOUT_TOUR_TRACK_OPACITY       = "MAP2_LAYOUT_TOUR_TRACK_OPACITY";          //$NON-NLS-1$
+   public static final String MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY     = "MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY";       //$NON-NLS-1$
+   public static final String MAP2_LAYOUT_TOUR_TRACK_OPACITY        = "MAP2_LAYOUT_TOUR_TRACK_OPACITY";          //$NON-NLS-1$
 
    /*
     * Geo compare
@@ -497,6 +500,7 @@ public interface ITourbookPreferences {
 
    public static final String MERGE_TOUR_MERGE_GRAPH_ALTITUDE    = "merge.tour.merge-graph-altitude";              //$NON-NLS-1$
    public static final String MERGE_TOUR_MERGE_GRAPH_PULSE       = "merge.tour.merge-graph-pulse";                 //$NON-NLS-1$
+   public static final String MERGE_TOUR_MERGE_GRAPH_SPEED       = "merge.tour.merge-graph-speed";                 //$NON-NLS-1$
    public static final String MERGE_TOUR_MERGE_GRAPH_TEMPERATURE = "merge.tour.merge-graph-temperature";           //$NON-NLS-1$
    public static final String MERGE_TOUR_MERGE_GRAPH_CADENCE     = "merge.tour.merge-graph-cadence";               //$NON-NLS-1$
 
@@ -557,7 +561,8 @@ public interface ITourbookPreferences {
    /*
     * Value point tool tip
     */
-   public static final String VALUE_POINT_TOOL_TIP_IS_VISIBLE = "VALUE_POINT_TOOL_TIP_IS_VISIBLE"; //$NON-NLS-1$
+   public static final String VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2  = "VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2";  //$NON-NLS-1$
+   public static final String VALUE_POINT_TOOL_TIP_IS_VISIBLE_CHART = "VALUE_POINT_TOOL_TIP_IS_VISIBLE_CHART"; //$NON-NLS-1$
 
    /*
     * Map 2 D
@@ -624,7 +629,10 @@ public interface ITourbookPreferences {
     * Weather
     */
    public static final String WEATHER_USE_WEATHER_RETRIEVAL = "WEATHER_STATE_USE_WEATHER_RETRIEVAL"; //$NON-NLS-1$
+   //This is the api key for world weather online
    public static final String WEATHER_API_KEY               = "WEATHER_API_KEY";                     //$NON-NLS-1$
+   public static final String WEATHER_WEATHER_PROVIDER_ID   = "WEATHER_WEATHER_PROVIDER_ID";         //$NON-NLS-1$
+   public static final String WEATHER_DISPLAY_FULL_LOG      = "WEATHER_DISPLAY_FULL_LOG";            //$NON-NLS-1$
 
    /*
     * Tour Marker View

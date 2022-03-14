@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -532,15 +532,15 @@ public class FitLog_SAXHandler extends DefaultHandler {
        * weather
        */
       tourData.setWeather(_currentActivity.weatherText);
-      tourData.setWeatherClouds(_weatherId.get(_currentActivity.weatherConditions));
+      tourData.setWeather_Clouds(_weatherId.get(_currentActivity.weatherConditions));
 
       final float weatherTemperature = _currentActivity.weatherTemperature;
       if (weatherTemperature != Float.MIN_VALUE) {
-         tourData.setAvgTemperature(weatherTemperature);
+         tourData.setWeather_Temperature_Average_Device(weatherTemperature);
       }
 
       if (_currentActivity.weatherWindSpeed != Integer.MIN_VALUE) {
-         tourData.setWeatherWindSpeed(_currentActivity.weatherWindSpeed);
+         tourData.setWeather_Wind_Speed(_currentActivity.weatherWindSpeed);
       }
 
       if (_currentActivity.customDataFields.size() > 0) {

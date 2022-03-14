@@ -589,17 +589,16 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
              * Spinner: Opacity
              */
             final Spinner spinnerOpacity = new Spinner(vertexContainer, SWT.BORDER);
-            GridDataFactory.fillDefaults() //
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(spinnerOpacity);
-
-            spinnerOpacity.setMinimum(Map3GradientColorManager.OPACITY_MIN);
-            spinnerOpacity.setMaximum(Map3GradientColorManager.OPACITY_MAX);
+            spinnerOpacity.setMinimum(0);
+            spinnerOpacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
             spinnerOpacity.setIncrement(1);
             spinnerOpacity.setPageIncrement(10);
             spinnerOpacity.addSelectionListener(_defaultSelectionAdapter);
             spinnerOpacity.addMouseWheelListener(_defaultMouseWheelListener);
-            spinnerOpacity.setToolTipText(Messages.Map3Color_Dialog_Spinner_ColorOpacity_Tooltip);
+            spinnerOpacity.setToolTipText(NLS.bind(Messages.Map3Color_Dialog_Spinner_ColorOpacity_Tooltip, UI.TRANSFORM_OPACITY_MAX));
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(spinnerOpacity);
 
             /*
              * Radio: Pronto Color
@@ -1312,7 +1311,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
       for (int vertexIndex = 0; vertexIndex < rgbVertexListSize; vertexIndex++) {
 
          /*
-          * create vertices from UI controls
+          * Create vertices from UI controls
           */
          final Spinner spinnerOpacity = _spinnerOpacity[vertexIndex];
          final Spinner spinnerVertexValue = _spinnerVertexValue[vertexIndex];
@@ -1325,7 +1324,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
          final RGBVertex rgbVertex = new RGBVertex(sortId);
          rgbVertex.setValue(value);
          rgbVertex.setRGB(rgb);
-         rgbVertex.setOpacity(spinnerOpacity.getSelection());
+         rgbVertex.setOpacity((float) spinnerOpacity.getSelection() / UI.TRANSFORM_OPACITY_MAX);
 
          newRgbVertices.add(rgbVertex);
       }
@@ -1388,7 +1387,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
             // update opacity
             final Spinner spinnerOpacity = _spinnerOpacity[vertexIndex];
             // must be rounded otherwise it can be wrong
-            final double opacity = vertex.getOpacity() + 0.0001;
+            final double opacity = (vertex.getOpacity() + 0.0001) * UI.TRANSFORM_OPACITY_MAX;
             spinnerOpacity.setSelection((int) opacity);
 
             // update value

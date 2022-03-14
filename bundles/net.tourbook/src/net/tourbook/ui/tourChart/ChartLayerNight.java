@@ -21,7 +21,6 @@ import net.tourbook.chart.GraphDrawingData;
 import net.tourbook.chart.IChartLayer;
 import net.tourbook.chart.IChartOverlay;
 import net.tourbook.common.UI;
-import net.tourbook.common.color.ColorUtil;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.layout.PixelConverter;
@@ -50,7 +49,7 @@ public class ChartLayerNight implements IChartLayer, IChartOverlay {
    @Override
    public void draw(final GC gc, final GraphDrawingData graphDrawingData, final Chart chart, final PixelConverter pc) {
 
-      final int opacity = ColorUtil.getTransparencyFromPercentage(_prefStore.getInt(ITourbookPreferences.GRAPH_NIGHT_SECTIONS_OPACITY));
+      final int opacity = _prefStore.getInt(ITourbookPreferences.GRAPH_NIGHT_SECTIONS_OPACITY);
 
       final int devYTop = graphDrawingData.getDevYTop();
       final int devGraphHeight = graphDrawingData.devGraphHeight;

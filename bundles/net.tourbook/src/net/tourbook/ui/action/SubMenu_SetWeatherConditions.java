@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.action;
+
+import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +32,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -111,18 +111,15 @@ public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator
       _menu = new Menu(parent);
 
       // Add listener to re-populate the menu each time
-      _menu.addMenuListener(new MenuAdapter() {
-         @Override
-         public void menuShown(final MenuEvent e) {
+      _menu.addMenuListener(menuShownAdapter(menuEvent -> {
 
-            // dispose old menu items
-            for (final MenuItem menuItem : ((Menu) e.widget).getItems()) {
-               menuItem.dispose();
-            }
-
-            fillMenu(_menu);
+         // dispose old menu items
+         for (final MenuItem menuItem : ((Menu) menuEvent.widget).getItems()) {
+            menuItem.dispose();
          }
-      });
+
+         fillMenu(_menu);
+      }));
 
       return _menu;
    }
@@ -151,13 +148,13 @@ public class SubMenu_SetWeatherConditions extends Action implements IMenuCreator
 
       for (final TourData tourData : selectedTours) {
 
-         if (Objects.equals(tourData.getWeatherClouds(), weatherDescription)) {
+         if (Objects.equals(tourData.getWeather_Clouds(), weatherDescription)) {
             continue;
          }
 
          // Weather description is not the same
 
-         tourData.setWeatherClouds(weatherDescription);
+         tourData.setWeather_Clouds(weatherDescription);
 
          modifiedTours.add(tourData);
       }

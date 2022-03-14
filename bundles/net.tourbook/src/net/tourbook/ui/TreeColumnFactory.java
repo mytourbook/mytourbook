@@ -138,9 +138,9 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TRAINING_TRAINING_PERFORMANCE;
 
    public static final TreeColumnFactory WEATHER_CLOUDS;
-   public static final TreeColumnFactory WEATHER_TEMPERATURE_AVG;
-   public static final TreeColumnFactory WEATHER_TEMPERATURE_MIN;
-   public static final TreeColumnFactory WEATHER_TEMPERATURE_MAX;
+   public static final TreeColumnFactory WEATHER_TEMPERATURE_AVG_DEVICE;
+   public static final TreeColumnFactory WEATHER_TEMPERATURE_MIN_DEVICE;
+   public static final TreeColumnFactory WEATHER_TEMPERATURE_MAX_DEVICE;
    public static final TreeColumnFactory WEATHER_WIND_DIR;
    public static final TreeColumnFactory WEATHER_WIND_SPEED;
 
@@ -2378,12 +2378,12 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      WEATHER_TEMPERATURE_AVG = new TreeColumnFactory() {
+      WEATHER_TEMPERATURE_AVG_DEVICE = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "WEATHER_TEMPERATURE_AVG", SWT.TRAIL); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "WEATHER_TEMPERATURE_AVG_DEVICE", SWT.TRAIL); //$NON-NLS-1$
 
             final String unitLabel = UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_TEMPERATURE;
 
@@ -2405,12 +2405,12 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      WEATHER_TEMPERATURE_MIN = new TreeColumnFactory() {
+      WEATHER_TEMPERATURE_MIN_DEVICE = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "WEATHER_TEMPERATURE_MIN", SWT.TRAIL); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "WEATHER_TEMPERATURE_MIN_DEVICE", SWT.TRAIL); //$NON-NLS-1$
 
             final String unitLabel = UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
 
@@ -2432,12 +2432,12 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      WEATHER_TEMPERATURE_MAX = new TreeColumnFactory() {
+      WEATHER_TEMPERATURE_MAX_DEVICE = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "WEATHER_TEMPERATURE_MAX", SWT.TRAIL); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "WEATHER_TEMPERATURE_MAX_DEVICE", SWT.TRAIL); //$NON-NLS-1$
 
             final String unitLabel = UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
 

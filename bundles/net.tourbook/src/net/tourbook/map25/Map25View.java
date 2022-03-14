@@ -1594,7 +1594,7 @@ public class Map25View extends ViewPart implements
       Map25App.debugPrint(" Map25View: ** restore_state opacy: " + layerHillshadingOpacity); //$NON-NLS-1$
       _mapApp.setLayer_HillShading_Opacity(layerHillshadingOpacity);
       layer_HillShading.setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_HILLSHADING_VISIBLE, true));
-      layer_HillShading.setBitmapAlpha(layerHillshadingOpacity / 100f, true);
+      layer_HillShading.setBitmapAlpha(layerHillshadingOpacity / 255.0f, true);
 
       // satellite maps
       _mapApp.getLayer_Satellite().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SATELLITE_VISIBLE, false));

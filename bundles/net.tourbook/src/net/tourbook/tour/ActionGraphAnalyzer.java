@@ -50,7 +50,7 @@ public class ActionGraphAnalyzer extends Action {
          Util.showView(TourChartAnalyzerView.ID, true);
 
          // create a new selection to update the analyzer view
-         _chart.fireSliderMoveEvent();
+         _chart.fireEvent_SliderMove();
       }
    }
 }
