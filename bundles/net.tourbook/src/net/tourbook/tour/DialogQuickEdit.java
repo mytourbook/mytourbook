@@ -110,7 +110,6 @@ public class DialogQuickEdit extends TitleAreaDialog {
    private Text               _txtWeather;
    private Text               _txtWeather_Temperature_Average_Device;
 
-
    private MouseWheelListener _mouseWheelListener;
    {
       _mouseWheelListener = Util::adjustSpinnerValueOnMouseScroll;
@@ -684,7 +683,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
          }
          {
             /*
-             * temperature
+             * Average temperatures
              */
 
             // label
@@ -692,7 +691,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
             label.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
             _firstColumnControls.add(label);
 
-            // spinner
+            // Spinner: Average temperature
             _spinWeather_Temperature_Average = new Spinner(container, SWT.BORDER);
             GridDataFactory.fillDefaults()
                   .align(SWT.BEGINNING, SWT.CENTER)
@@ -700,7 +699,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   .applyTo(_spinWeather_Temperature_Average);
             _spinWeather_Temperature_Average.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
 
-            // the min/max temperature has a large range because fahrenheit has bigger values than celsius
+            // the min/max temperature has a large range because Fahrenheit has bigger values than Celsius
             _spinWeather_Temperature_Average.setMinimum(-600);
             _spinWeather_Temperature_Average.setMaximum(1500);
 
@@ -727,17 +726,23 @@ public class DialogQuickEdit extends TitleAreaDialog {
             // label: celsius, fahrenheit
             label = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
 
-            _txtWeather_Temperature_Average_Device = new Text(container, SWT.BORDER | SWT.READ_ONLY);
-            GridDataFactory.fillDefaults()
-                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-                  .indent(10, 0)
-                  .align(SWT.END, SWT.CENTER)
-                  .applyTo(_txtWeather_Temperature_Average_Device);
-            _tk.adapt(_txtWeather_Temperature_Average_Device, true, false);
+            final Composite temperatureFromDeviceContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(temperatureFromDeviceContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(temperatureFromDeviceContainer);
+            {
+               // Average temperature measured from device
+               _txtWeather_Temperature_Average_Device = new Text(temperatureFromDeviceContainer, SWT.BORDER | SWT.READ_ONLY);
+               GridDataFactory.fillDefaults()
+                     .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                     .indent(10, 0)
+                     .align(SWT.END, SWT.CENTER)
+                     .applyTo(_txtWeather_Temperature_Average_Device);
+               _tk.adapt(_txtWeather_Temperature_Average_Device, true, false);
 
-            // label: celsius, fahrenheit
-            label = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
-            label.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Device_Tooltip);
+               // label: celsius, fahrenheit
+               label = _tk.createLabel(temperatureFromDeviceContainer, UI.UNIT_LABEL_TEMPERATURE);
+               label.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Device_Tooltip);
+            }
          }
       }
    }

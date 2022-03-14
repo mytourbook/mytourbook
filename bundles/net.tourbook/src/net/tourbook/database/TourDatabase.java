@@ -9007,12 +9007,10 @@ public class TourDatabase {
    }
 
    /**
-    * For the previous average, max, min temperatures, if they were retrieved by
-    * a weather provider we copy them into the new fields.
-    * If necessary .. todo fb
-    *
-    * @param conn
-    * @throws SQLException
+    * If the previous average, max, min temperatures were retrieved by
+    * a weather provider, they are copied into the new fields.
+    * If necessary, the average, max, min temperatures measured from the device
+    * are recomputed
     */
    private void updateDb_046_to_047_DataUpdate(final Connection conn) throws SQLException {
 
@@ -9040,10 +9038,9 @@ public class TourDatabase {
 
          stmtUpdate.executeUpdate();
 
-         //Recomputing the temperature values (average/max/min) measured from the device
          final List<Long> allTourIds = getAllTourIds();
 
-         // loop: all tours
+         // If necessary, recomputing the temperature values (average/max/min) measured from the device
          for (final Long tourId : allTourIds) {
 
             updateDb_046_To_047_DataUpdate_Concurrent(tourId);
@@ -9062,10 +9059,6 @@ public class TourDatabase {
     * significantly.
     *
     * @param tourId
-    * @param <T>
-    * @param entity
-    * @param tourId
-    * @param entityClass
     */
    private void updateDb_046_To_047_DataUpdate_Concurrent(final Long tourId) {
 
@@ -9092,38 +9085,35 @@ public class TourDatabase {
             return;
          }
 
-         final EntityManager em = TourDatabase.getInstance().getEntityManager();
+         final EntityManager entityManager = TourDatabase.getInstance().getEntityManager();
 
          try {
 
             // get tour data by tour id
-            final TourData tourData = em.find(TourData.class, queueItem_TourId);
+            final TourData tourData = entityManager.find(TourData.class, queueItem_TourId);
             if (tourData == null) {
                return;
             }
 
-            // ignore tours which having no temperature serie
             if (tourData.temperatureSerie == null) {
 
                tourData.setWeather_Temperature_Average_Device(0);
                tourData.setWeather_Temperature_Max_Device(0);
-               tourData.setWeather_Temperature_Min(0);
-            }
-            else
-            {
-              tourData.computeAvg_Temperature();
+               tourData.setWeather_Temperature_Min_Device(0);
+            } else {
+               tourData.computeAvg_Temperature();
             }
 
             boolean isSaved = false;
 
-            final EntityTransaction ts = em.getTransaction();
+            final EntityTransaction transaction = entityManager.getTransaction();
             try {
 
-               ts.begin();
+               transaction.begin();
                {
-                  em.merge(tourData);
+                  entityManager.merge(tourData);
                }
-               ts.commit();
+               transaction.commit();
 
             } catch (final Exception e) {
 
@@ -9131,20 +9121,20 @@ public class TourDatabase {
                StatusUtil.showStatus(e);
 
             } finally {
-               if (ts.isActive()) {
-                  ts.rollback();
+               if (transaction.isActive()) {
+                  transaction.rollback();
                } else {
                   isSaved = true;
                }
             }
 
-            if (isSaved == false) {
+            if (!isSaved) {
                showTourSaveError(tourData);
             }
 
          } finally {
 
-            em.close();
+            entityManager.close();
          }
       });
    }
