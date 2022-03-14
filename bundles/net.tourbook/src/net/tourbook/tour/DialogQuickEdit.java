@@ -697,7 +697,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .applyTo(_spinWeather_Temperature_Average);
-            _spinWeather_Temperature_Average.setToolTipText(Messages.Tour_Editor_Label_Temperature_Tooltip);
+            _spinWeather_Temperature_Average.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Tooltip);
 
             // the min/max temperature has a large range because Fahrenheit has bigger values than Celsius
             _spinWeather_Temperature_Average.setMinimum(-600);
@@ -725,6 +725,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
 
             // label: celsius, fahrenheit
             label = _tk.createLabel(container, UI.UNIT_LABEL_TEMPERATURE);
+            label.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Tooltip);
 
             final Composite temperatureFromDeviceContainer = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults().span(2, 1).applyTo(temperatureFromDeviceContainer);
