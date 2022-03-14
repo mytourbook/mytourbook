@@ -211,9 +211,9 @@ public class Map25View extends ViewPart implements
 //   private Bitmap                        _bitmapPhoto;
 //   private Bitmap                        _bitmapStar;
 
-   private int     _leftSliderValueIndex;
-   private int     _rightSliderValueIndex;
-   private int     _selectedSliderValueIndex;
+   private int _leftSliderValueIndex;
+   private int _rightSliderValueIndex;
+   private int _selectedSliderValueIndex;
    //
 //   private int     _hash_AllPhotos;
    private int     _hashTourId;
@@ -1427,11 +1427,6 @@ public class Map25View extends ViewPart implements
        * Photos
        */
       if (_mapApp.isPhoto_Visible()) {
-
-//         final List<MarkerInterface> photoItems = _mapApp.getPhotoToolkit().createPhotoItems(_allPhotos,
-//               _mapApp.isPhoto_Scaled());
-//
-//         _mapApp.setPhotoSelection(photoItems);
 
          _mapApp.updateUI_PhotoLayer();
       }

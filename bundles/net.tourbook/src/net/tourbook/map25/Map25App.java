@@ -902,6 +902,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       updateUI_MarkerLayer();
       updateUI_MapBookmarkLayer();
 
+      // photos can be clustered which is currently set in the marker config
+      updateUI_PhotoLayer();
+
       mMap.render();
    }
 
@@ -1593,7 +1596,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit._symbol, _photoToolkit);
          }
 
-         layers.add(photoLayerPosition, _layer_Photo);
+         if (photoLayerPosition == -1) {
+            layers.add(_layer_Photo);
+         } else {
+            layers.add(photoLayerPosition, _layer_Photo);
+         }
 
       } else {
 
