@@ -31,8 +31,6 @@ import net.tourbook.data.TourData;
 
 public class WeatherUtils {
 
-   //todo fb for 22.3, set the weather provider to none by default and dont go thru hoops to keep the WWO by default
-
    /**
     * Returns the fully detailed weather data as a human readable string.
     * Example: 17h(15.0°C, feels like 15.0°C, 5.0km/h from 68°, humidity 37%,

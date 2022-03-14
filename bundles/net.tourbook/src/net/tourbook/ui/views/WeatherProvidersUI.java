@@ -22,7 +22,6 @@ import java.util.Arrays;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.StringUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -233,17 +232,8 @@ public class WeatherProvidersUI {
 
       _isUpdateUI = true;
       {
-         String weatherProviderId =
+         final String weatherProviderId =
                _prefStore.getString(ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
-
-         //For backwards compatibility purpose, we should select WorldWeatherOnline when
-         //the api key is not.
-         //Maybe this code could be suppressed in the future once most of the
-         //users have upgraded to 22.X ?
-         if (StringUtils.isNullOrEmpty(weatherProviderId) &&
-               _prefStore.getBoolean(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL)) {
-            weatherProviderId = IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE;
-         }
 
          // Weather provider
          selectWeatherProvider(weatherProviderId);
