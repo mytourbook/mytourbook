@@ -488,7 +488,7 @@ public class Map25View extends ViewPart implements
 
             animator.cancel();
             animator.animateZoom(500, _zoomFactor, 0, 0);
-            map25.updateMap(true);
+            map25.updateMap();
          }
       });
 
@@ -506,7 +506,7 @@ public class Map25View extends ViewPart implements
 
             animator.cancel();
             animator.animateZoom(500, 1 / _zoomFactor, 0, 0);
-            map25.updateMap(true);
+            map25.updateMap();
          }
       });
 
@@ -539,7 +539,7 @@ public class Map25View extends ViewPart implements
                   Easing.Type.SINE_INOUT,
                   Animator.ANIM_MOVE | Animator.ANIM_SCALE);
 
-            map25.updateMap(true);
+            map25.updateMap();
          }
       });
 
@@ -1456,13 +1456,13 @@ public class Map25View extends ViewPart implements
                   Map25ConfigManager.setMapLocation(map25, _allBoundingBox, animationTime);
                }
 
-               map25.updateMap(true);
+               map25.updateMap();
             }
          });
 
       } else {
 
-         map25.updateMap(true);
+         map25.updateMap();
       }
    }
 

@@ -89,13 +89,23 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
    private class LoadCallbackImage implements ILoadCallBack {
 
-      public LoadCallbackImage() {}
+      private MarkerItem _markerItem;
+      private Photo      _photo;
+
+      public LoadCallbackImage(final MarkerItem markerItem, final Photo photo) {
+
+         _markerItem = markerItem;
+         _photo = photo;
+      }
 
       @Override
       public void callBackImageIsLoaded(final boolean isUpdateUI) {
 
-         // photo items must be recreated from loading photo symbol -> real photo
-         _mapApp.updateUI_PhotoLayer();
+         if (isUpdateUI == false) {
+            return;
+         }
+
+         onImageIsLoaded(_markerItem, _photo);
       }
    }
 
@@ -142,17 +152,64 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       };
    }
 
-   private MarkerSymbol createPhotoBitmapFromPhoto(final Photo photo, final MarkerItem item, final boolean showPhotoTitle) {
+   private GeoPoint createPhoto_Location(final Photo photo) {
 
-      Bitmap bitmapImage = getPhotoBitmap(photo);
+      Double photoLat = 0.0;
+      Double photoLon = 0.0;
 
-      if (bitmapImage == null) {
-         bitmapImage = _bitmapNotLoadedPhoto;
+      final PhotoImageMetadata imageMetaData = photo.getImageMetaData();
+
+      if (photo.isGeoFromExif
+            && Math.abs(imageMetaData.latitude) > 0
+            && Math.abs(imageMetaData.longitude) > 0) {
+
+         // photo contains valid (>0) GPS position in the EXIF
+
+         photoLat = imageMetaData.latitude;
+         photoLon = imageMetaData.longitude;
+
+      } else {
+
+         // using position via time marker
+
+         photoLat = photo.getTourLatitude();
+         photoLon = photo.getTourLongitude();
       }
 
-      final MarkerSymbol bitmapPhoto = createAdvanceSymbol(item, bitmapImage, true, showPhotoTitle);
+      return new GeoPoint(photoLat, photoLon);
+   }
 
-      return bitmapPhoto;
+   private String createPhoto_Name(final Photo photo) {
+
+      final String photoStars = createPhoto_Stars(photo);
+      final String photoName = TimeTools.getZonedDateTime(photo.imageExifTime).format(TimeTools.Formatter_Time_S) + photoStars;
+
+      return photoName;
+   }
+
+   private String createPhoto_Stars(final Photo photo) {
+
+      String starText = UI.EMPTY_STRING;
+
+      switch (photo.ratingStars) {
+      case 1:
+         starText = " *"; //$NON-NLS-1$
+         break;
+      case 2:
+         starText = " **"; //$NON-NLS-1$
+         break;
+      case 3:
+         starText = " ***"; //$NON-NLS-1$
+         break;
+      case 4:
+         starText = " ****"; //$NON-NLS-1$
+         break;
+      case 5:
+         starText = " *****"; //$NON-NLS-1$
+         break;
+      }
+
+      return starText;
    }
 
    /**
@@ -167,92 +224,57 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
     */
    public List<MarkerInterface> createPhotoItems(final ArrayList<Photo> galleryPhotos) {
 
-      final List<MarkerInterface> allPhotoMapItems = new ArrayList<>();
+      final List<MarkerInterface> allPhotoItems = new ArrayList<>();
 
       if (galleryPhotos == null || galleryPhotos.isEmpty()) {
-         return allPhotoMapItems;
+         return allPhotoItems;
       }
 
       final boolean isShowPhotoTitle = _mapApp.isPhoto_ShowTitle();
 
       for (final Photo photo : galleryPhotos) {
 
-         String starText = UI.EMPTY_STRING;
-         String photoName = UI.EMPTY_STRING;
          final UUID photoKey = UUID.randomUUID();
-
-         switch (photo.ratingStars) {
-         case 1:
-            starText = " *"; //$NON-NLS-1$
-            break;
-         case 2:
-            starText = " **"; //$NON-NLS-1$
-            break;
-         case 3:
-            starText = " ***"; //$NON-NLS-1$
-            break;
-         case 4:
-            starText = " ****"; //$NON-NLS-1$
-            break;
-         case 5:
-            starText = " *****"; //$NON-NLS-1$
-            break;
-         }
-
-         photoName = TimeTools.getZonedDateTime(photo.imageExifTime).format(TimeTools.Formatter_Time_S) + starText;
-
+         final String photoName = createPhoto_Name(photo);
          final String photoDescription = "Ratingstars: " + Integer.toString(photo.ratingStars); //$NON-NLS-1$
+         final GeoPoint geoPoint = createPhoto_Location(photo);
 
-         Double photoLat = 0.0;
-         Double photoLon = 0.0;
-         final PhotoImageMetadata imageMetaData = photo.getImageMetaData();
+         final MarkerItem markerItem = new MarkerItem(
+               photoKey,
+               photoName, // time as name
+               photoDescription, // rating stars as description
+               geoPoint);
 
-         if (photo.isGeoFromExif
-               && Math.abs(imageMetaData.latitude) > Double.MIN_VALUE
-               && Math.abs(imageMetaData.longitude) > Double.MIN_VALUE) {
+         // the photo bitmap is set into the markerItem
+         createPhotoItems_10_CreateBitmapFromPhoto(markerItem, photo, isShowPhotoTitle);
 
-            //photo contains valid(>0) GPS position in the EXIF
-
-//            debugPrint("PhotoToolkit: *** createPhotoItemList: using exif geo");
-            photoLat = imageMetaData.latitude;
-            photoLon = imageMetaData.longitude;
-
-         } else {
-
-            //using position via time marker
-
-            debugPrint("PhotoToolkit: *** createPhotoItemList: using tour geo"); //$NON-NLS-1$
-            photoLat = photo.getTourLatitude();
-            photoLon = photo.getTourLongitude();
-         }
-
-         //debugPrint("PhotoToolkit: *** createPhotoItemList Name: " + photo.getImageMetaData().objectName + " Description: " + photo.getImageMetaData().captionAbstract);
-
-         final MarkerItem item = new MarkerItem(photoKey,
-               photoName, //time as name
-               photoDescription, //rating stars as description
-               new GeoPoint(photoLat, photoLon));
-
-         //now create the marker: photoimage with time and stars
-         final MarkerSymbol markerSymbol = createPhotoBitmapFromPhoto(photo, item, isShowPhotoTitle);
-
-         if (markerSymbol != null) {
-            item.setMarker(markerSymbol);
-         }
-
-         allPhotoMapItems.add(item);
+         allPhotoItems.add(markerItem);
       }
 
-      return allPhotoMapItems;
+      return allPhotoItems;
+   }
+
+   private void createPhotoItems_10_CreateBitmapFromPhoto(final MarkerItem item, final Photo photo, final boolean isShowPhotoTitle) {
+
+      Bitmap bitmapImage = createPhotoItems_20_CreateBitmap(item, photo);
+
+      if (bitmapImage == null) {
+         bitmapImage = _bitmapNotLoadedPhoto;
+      }
+
+      final MarkerSymbol bitmapPhoto = createAdvanceSymbol(item, bitmapImage, true, isShowPhotoTitle);
+
+      item.setMarker(bitmapPhoto);
    }
 
    /**
     * same as in TourMapPainter, but for 2.5D maps
     *
+    * @param item
     * @param photo
     * @return the bitmap
     */
-   private Bitmap getPhotoBitmap(final Photo photo) {
+   private Bitmap createPhotoItems_20_CreateBitmap(final MarkerItem item, final Photo photo) {
 
       Bitmap photoBitmap = null;
 
@@ -263,7 +285,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       //_imageSize = Util.getStateInt(_state, STATE_PHOTO_PROPERTIES_IMAGE_SIZE, Photo.MAP_IMAGE_DEFAULT_WIDTH_HEIGHT);
       // ensure that an image is displayed, it happend that image size was 0
 
-      final ImageState imageState = getPhotoImage(photo, scaledThumbImageSize);
+      final ImageState imageState = createPhotoItems_30_GetScaledImage(item, photo, scaledThumbImageSize);
       final Image scaledImage = imageState._photoImage;
 
       if (scaledImage != null) {
@@ -287,45 +309,51 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    }
 
    /**
+    * @param item
     * @param photo
     * @param thumbSize
     *           thumbnail size from slideout
     * @return
     */
-   private ImageState getPhotoImage(final Photo photo, final int thumbSize) {
+   private ImageState createPhotoItems_30_GetScaledImage(final MarkerItem item, final Photo photo, final int thumbSize) {
 
       Image photoImage = null;
       Image scaledImage = null;
 
       boolean isMustDisposeImage = false;
 
-//      final ImageQuality requestedImageQuality = ImageQuality.HQ; // THUMB;
+//    final ImageQuality requestedImageQuality = ImageQuality.HQ;
       final ImageQuality requestedImageQuality = ImageQuality.THUMB;
 
       // check if image has an loading error
       final PhotoLoadingState photoLoadingState = photo.getLoadingState(requestedImageQuality);
       if (photoLoadingState != PhotoLoadingState.IMAGE_IS_INVALID) {
 
-         // image is not yet loaded
+         // image is not invalid
 
          // check if image is in the cache
          photoImage = PhotoImageCache.getImage(photo, requestedImageQuality);
 
+         // put photo image in loading queue
          if ((photoImage == null || photoImage.isDisposed())
+
+               // photo image is not in loading queue
                && photoLoadingState == PhotoLoadingState.IMAGE_IS_IN_LOADING_QUEUE == false) {
 
             // the requested image is not available in the image cache -> image must be loaded
 
-            final ILoadCallBack imageLoadCallback = new LoadCallbackImage();
+            final ILoadCallBack imageLoadCallback = new LoadCallbackImage(item, photo);
 
             PhotoLoadManager.putImageInLoadingQueueThumbMap(photo, requestedImageQuality, imageLoadCallback);
          }
 
-         if (_mapApp.isPhoto_Scaled() == false) {
-            return new ImageState(photoImage, false);
-         }
-
          if (photoImage != null) {
+
+            if (_mapApp.isPhoto_Scaled() == false) {
+               return new ImageState(photoImage, false);
+            }
+
+            // scale image
 
             final Rectangle imageBounds = photoImage.getBounds();
             final int originalImageWidth = imageBounds.width;
@@ -335,16 +363,14 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
             final int imageHeight = originalImageHeight;
 
             //final int thumbSize = PhotoLoadManager.IMAGE_SIZE_THUMBNAIL;//    PhotoLoadManager.IMAGE_SIZE_LARGE_DEFAULT;
-            boolean isRotated = false;
-
             final Point bestSize = ImageUtils.getBestSize(imageWidth, imageHeight, thumbSize, thumbSize);
+
+            boolean isRotated = false;
             final Rotation thumbRotation = null;
             if (isRotated == false) {
                isRotated = true;
                //thumbRotation = getRotation();
             }
-
-            //debugPrint("??? getPhotoImage imageWidth and thumbsize: " + imageWidth + " " + thumbSize);
 
             scaledImage = ImageUtils.resize(
                   _display,
@@ -364,6 +390,14 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       }
 
       return new ImageState(scaledImage, isMustDisposeImage);
+   }
+
+   private void onImageIsLoaded(final MarkerItem markerItem, final Photo photo) {
+
+      // photo items must be recreated from loading photo symbol -> real photo
+      _mapApp.updateUI_PhotoLayer();
+
+      _mapApp.updateMap();
    }
 
    @Override

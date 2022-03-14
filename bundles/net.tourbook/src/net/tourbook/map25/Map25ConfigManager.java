@@ -1134,6 +1134,6 @@ public class Map25ConfigManager {
       map.setMapPosition(mapPosition);
 //      }
 
-      map.updateMap(true);
+      map.updateMap();
    }
 }

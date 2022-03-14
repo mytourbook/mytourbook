@@ -298,7 +298,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       enableActions();
 
-      mapApp.getMap().updateMap(true);
+      mapApp.updateMap();
    }
 
    private void onModify_Layer() {
@@ -321,7 +321,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       enableActions();
 
-      mapApp.getMap().updateMap(true);
+      mapApp.updateMap();
    }
 
 

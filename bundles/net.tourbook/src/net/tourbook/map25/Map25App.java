@@ -767,7 +767,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
           * }
           */
          mMap.clearMap();
-         mMap.updateMap(true);
+         mMap.updateMap();
       }
 
       else { //is mapsforge map
@@ -815,7 +815,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             _mf_IsThemeFromFile = false;
          }
          //mMap.clearMap();
-         mMap.updateMap(true);
+         mMap.updateMap();
 
       }
       debugPrint(" map25: " + "####### loadtheme: leaving styleID: " + styleId); //$NON-NLS-1$ //$NON-NLS-2$
@@ -836,6 +836,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     */
    @Override
    public boolean onItemLongPress(final int index, final MarkerInterface mi) {
+
       final MarkerItem markerItem = (MarkerItem) mi;
       System.out.println("Marker tap " + markerItem.getTitle()); //$NON-NLS-1$
       System.out.println(
@@ -1082,7 +1083,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          }
 
 //		mMap.clearMap();
-//		mMap.updateMap(true);
+//		mMap.updateMap();
 
          _mf_themeFilePath = UI.EMPTY_STRING; // so if mf is next themefile is parsed
       } else { //it mapsforge map
@@ -1214,7 +1215,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       }
 
       mMap.clearMap();
-      mMap.updateMap(true);
+      mMap.updateMap();
 
       //debugPrint(" map25: " + "############# setMapProvider: set language : " + _mf_prefered_language); //$NON-NLS-1$
       this._last_mf_themeFilePath = _mf_themeFilePath;
@@ -1514,6 +1515,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    void stop() {
 
       _lwjglApp.stop();
+   }
+
+   /**
+    * Update map and render next frame afterwards
+    */
+   public void updateMap() {
+
+      mMap.updateMap();
    }
 
    /**
