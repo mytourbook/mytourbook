@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.OptionalDouble;
 
 import net.tourbook.common.weather.IWeather;
+import net.tourbook.weather.WeatherUtils;
 
 /**
  * Class to store data from the WorldWeatherOnline API.
@@ -47,7 +48,6 @@ public class Data {
 
       //If the returned data is for more than 1 day, we combine the multiple hourly
       //lists into 1
-
       final List<Hourly> combinedHourly = new ArrayList<>();
       weather.forEach(currentWeather -> combinedHourly.addAll(currentWeather.getHourly()));
 
@@ -115,19 +115,19 @@ public class Data {
             getFilteredHourly().stream().mapToDouble(Hourly::getPrecipMM).average();
 
       if (averagePrecipitation.isPresent()) {
-         return (float) averagePrecipitation.getAsDouble();
+         return WeatherUtils.roundDoubleToFloat(averagePrecipitation.getAsDouble());
       }
 
       return 0;
    }
 
-   public short getAveragePressure() {
+   public float getAveragePressure() {
 
       final OptionalDouble averagePressure =
             getFilteredHourly().stream().mapToDouble(Hourly::getPressure).average();
 
       if (averagePressure.isPresent()) {
-         return (short) (averagePressure.getAsDouble());
+         return WeatherUtils.roundDoubleToFloat(averagePressure.getAsDouble());
       }
 
       return 0;
@@ -139,7 +139,7 @@ public class Data {
             getFilteredHourly().stream().mapToDouble(Hourly::getFeelsLikeC).average();
 
       if (averageWindChill.isPresent()) {
-         return (float) averageWindChill.getAsDouble();
+         return WeatherUtils.roundDoubleToFloat(averageWindChill.getAsDouble());
       }
 
       return 0;
@@ -183,7 +183,7 @@ public class Data {
             getFilteredHourly().stream().mapToDouble(Hourly::getTempC).average();
 
       if (averageTemperature.isPresent()) {
-         return (float) averageTemperature.getAsDouble();
+         return WeatherUtils.roundDoubleToFloat(averageTemperature.getAsDouble());
       }
 
       return 0;
@@ -195,7 +195,7 @@ public class Data {
             getFilteredHourly().stream().mapToDouble(Hourly::getTempC).max();
 
       if (maxTemperature.isPresent()) {
-         return (float) maxTemperature.getAsDouble();
+         return WeatherUtils.roundDoubleToFloat(maxTemperature.getAsDouble());
       }
 
       return 0;
@@ -207,7 +207,7 @@ public class Data {
             getFilteredHourly().stream().mapToDouble(Hourly::getTempC).min();
 
       if (minTemperature.isPresent()) {
-         return (float) minTemperature.getAsDouble();
+         return WeatherUtils.roundDoubleToFloat(minTemperature.getAsDouble());
       }
 
       return 0;

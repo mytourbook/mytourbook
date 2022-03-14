@@ -47,9 +47,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 
-//todo fb update unit tests
-//clean up files ,sonarlint....
-
 /**
  * A class that retrieves, for a given track, the historical weather data.
  */
@@ -172,7 +169,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       return fullWeatherData;
    }
 
-   private String buildWeatherApiRequest(final String startDate, final String endDate) {
+   private String buildWeatherApiRequest() {
 
       String weatherRequestWithParameters = UI.EMPTY_STRING;
 
@@ -220,11 +217,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    @Override
    public boolean retrieveHistoricalWeatherData() {
 
-      final String requestedStartDate = startDate;
-      final String requestedEndDate = endDate;
-
-      //Send an API request as long as we don't have the results covering the entire duration of the tour
-      final String weatherRequestWithParameters = buildWeatherApiRequest(requestedStartDate, requestedEndDate);
+      final String weatherRequestWithParameters = buildWeatherApiRequest();
 
       final String rawWeatherData = sendWeatherApiRequest(weatherRequestWithParameters);
       if (StringUtils.isNullOrEmpty(rawWeatherData)) {

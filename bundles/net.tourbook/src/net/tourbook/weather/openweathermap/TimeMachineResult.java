@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.OptionalDouble;
 
 import net.tourbook.common.weather.IWeather;
+import net.tourbook.weather.WeatherUtils;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeMachineResult {
@@ -107,7 +108,7 @@ public class TimeMachineResult {
             hourly.stream().mapToDouble(Hourly::getHumidity).average();
 
       if (averageHumidity.isPresent()) {
-         return roundDoubleToFloat(averageHumidity.getAsDouble());
+         return WeatherUtils.roundDoubleToFloat(averageHumidity.getAsDouble());
       }
 
       return 0;
@@ -119,7 +120,7 @@ public class TimeMachineResult {
             hourly.stream().mapToDouble(Hourly::getRain).average();
 
       if (averagePrecipitation.isPresent()) {
-         return roundDoubleToFloat(averagePrecipitation.getAsDouble());
+         return WeatherUtils.roundDoubleToFloat(averagePrecipitation.getAsDouble());
       }
 
       return 0;
@@ -131,7 +132,7 @@ public class TimeMachineResult {
             hourly.stream().mapToDouble(Hourly::getPressure).average();
 
       if (averagePressure.isPresent()) {
-         return roundDoubleToFloat(averagePressure.getAsDouble());
+         return WeatherUtils.roundDoubleToFloat(averagePressure.getAsDouble());
       }
 
       return 0;
@@ -143,7 +144,7 @@ public class TimeMachineResult {
             hourly.stream().mapToDouble(Hourly::getSnow).average();
 
       if (averageSnowfall.isPresent()) {
-         return roundDoubleToFloat(averageSnowfall.getAsDouble());
+         return WeatherUtils.roundDoubleToFloat(averageSnowfall.getAsDouble());
       }
 
       return 0;
@@ -155,7 +156,7 @@ public class TimeMachineResult {
             hourly.stream().mapToDouble(Hourly::getFeels_like).average();
 
       if (averageWindChill.isPresent()) {
-         return roundDoubleToFloat(averageWindChill.getAsDouble());
+         return WeatherUtils.roundDoubleToFloat(averageWindChill.getAsDouble());
       }
 
       return 0;
@@ -205,7 +206,7 @@ public class TimeMachineResult {
             hourly.stream().mapToDouble(Hourly::getTemp).average();
 
       if (averageTemperature.isPresent()) {
-         return roundDoubleToFloat(averageTemperature.getAsDouble());
+         return WeatherUtils.roundDoubleToFloat(averageTemperature.getAsDouble());
       }
 
       return 0;
@@ -217,7 +218,7 @@ public class TimeMachineResult {
             hourly.stream().mapToDouble(Hourly::getTemp).max();
 
       if (maxTemperature.isPresent()) {
-         return roundDoubleToFloat(maxTemperature.getAsDouble());
+         return WeatherUtils.roundDoubleToFloat(maxTemperature.getAsDouble());
       }
 
       return 0;
@@ -229,7 +230,7 @@ public class TimeMachineResult {
             hourly.stream().mapToDouble(Hourly::getTemp).min();
 
       if (minTemperature.isPresent()) {
-         return roundDoubleToFloat(minTemperature.getAsDouble());
+         return WeatherUtils.roundDoubleToFloat(minTemperature.getAsDouble());
       }
 
       return 0;
@@ -284,10 +285,4 @@ public class TimeMachineResult {
 
       return weatherType;
    }
-
-   private float roundDoubleToFloat(final double value) {
-
-      return Math.round(value * 100.0) / 100.0f;
-   }
-
 }

@@ -373,4 +373,9 @@ public class WeatherUtils {
 
       return true;
    }
+
+   public static float roundDoubleToFloat(final double value) {
+
+      return Math.round(value * 100.0) / 100.0f;
+   }
 }
