@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  * Copyright (C) 2018, 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -47,7 +47,6 @@ import org.oscim.theme.styles.LineStyle;
 import org.oscim.utils.FastMath;
 import org.oscim.utils.async.SimpleWorker;
 import org.oscim.utils.geom.LineClipper;
-
 
 /**
  * This class draws a path line in given color or texture.
@@ -392,8 +391,7 @@ public class TourLayer extends Layer {
 
          _markertoolkit = new MarkerToolkit(MarkerShape.ARROW);
 
-         _bitmapArrow = _markertoolkit.drawTrackArrow(40,
-               ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100));
+         _bitmapArrow = _markertoolkit.drawTrackArrow(40, ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity));
 
          _tex = new TextureItem(_bitmapArrow);
 
@@ -401,27 +399,31 @@ public class TourLayer extends Layer {
          final float faterOutlineWidth = Math.max(trackConfig.outlineWidth * 2, 5f);
 
          final LineStyle style = LineStyle.builder()
-               .stippleColor(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100))
+               .stippleColor(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity))
                .stipple(20)
                .strokeWidth(faterOutlineWidth)
-               .strokeColor(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100))
+               .strokeColor(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity))
                .fixed(true)
                .texture(_tex)
                .randomOffset(false)
-               .color(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100))
+               .color(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity))
                .cap(Cap.BUTT)
 
                .build();
+
          return style;
+
       } else {
+
          final LineStyle style = LineStyle.builder()
                .strokeWidth(trackConfig.outlineWidth)
-               .color(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity * 0xff / 100))
+               .color(ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity))
                //.cap(Cap.BUTT)
                .cap(Paint.Cap.ROUND)
                // this is not yet working
                // .isOutline(true)
                .build();
+
          return style;
       }
    }

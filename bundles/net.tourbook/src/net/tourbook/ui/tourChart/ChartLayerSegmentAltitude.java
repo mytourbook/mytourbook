@@ -661,7 +661,7 @@ public class ChartLayerSegmentAltitude implements IChartLayer, IChartOverlay {
    ChartLayerSegmentAltitude setLineProperties(final boolean isShowSegmenterLine, final int lineOpacity) {
 
       _isShowSegmenterLine = isShowSegmenterLine;
-      _lineOpacity = (int) (lineOpacity / 100.0 * 255);
+      _lineOpacity = lineOpacity;
 
       return this;
    }

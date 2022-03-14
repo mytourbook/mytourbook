@@ -35,6 +35,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -1035,18 +1036,16 @@ public class DialogExportTour extends TitleAreaDialog {
 
          final String notes = tourData.getTourDescription();
 
-         if (notes != null && notes.length() > 0) {
+         if (StringUtils.hasContent(notes)) {
 
             final String lapNotes = tourLap.getNotes();
 
-            if (lapNotes == null) {
-               tourLap.setNotes(notes);
-            } else {
-               tourLap.setNotes(lapNotes + "\n" + notes); //$NON-NLS-1$
-            }
+            final String tourLapNotes = StringUtils.isNullOrEmpty(lapNotes)
+                  ? notes
+                  : lapNotes + "\n" + notes; //$NON-NLS-1$
+            tourLap.setNotes(tourLapNotes);
          }
       }
-
    }
 
    private void enableExportButton(final boolean isEnabled) {

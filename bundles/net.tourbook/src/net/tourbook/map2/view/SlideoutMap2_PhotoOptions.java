@@ -18,7 +18,6 @@ package net.tourbook.map2.view;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.action.ActionResetToDefaults;
 import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.font.MTFont;
@@ -26,7 +25,6 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.Photo;
-import net.tourbook.preferences.PrefPage_Map2_Appearance;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -66,7 +64,6 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
    private IDialogSettings       _state;
 
    private ActionResetToDefaults _actionRestoreDefaults;
-   private ActionOpenPrefDialog  _actionPrefDialog;
 
    private Map2View              _map2View;
 
@@ -86,9 +83,9 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
     * @param map2State
     */
    public SlideoutMap2_PhotoOptions(final Control ownerControl,
-                                     final ToolBar toolBar,
-                                     final Map2View map2View,
-                                     final IDialogSettings map2State) {
+                                    final ToolBar toolBar,
+                                    final Map2View map2View,
+                                    final IDialogSettings map2State) {
 
       super(ownerControl, toolBar);
 
@@ -101,10 +98,6 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
    private void createActions() {
 
       _actionRestoreDefaults = new ActionResetToDefaults(this);
-
-      _actionPrefDialog = new ActionOpenPrefDialog(MAP_ACTION_EDIT2D_MAP_PREFERENCES, PrefPage_Map2_Appearance.ID)
-            .closeThisTooltip(this)
-            .setShell(_parent.getShell());
    }
 
    @Override
@@ -171,7 +164,6 @@ public class SlideoutMap2_PhotoOptions extends ToolbarSlideout implements IActio
             final ToolBarManager tbm = new ToolBarManager(toolbar);
 
             tbm.add(_actionRestoreDefaults);
-            tbm.add(_actionPrefDialog);
 
             tbm.update(true);
          }

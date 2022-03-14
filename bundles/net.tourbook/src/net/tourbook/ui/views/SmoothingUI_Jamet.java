@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views;
+
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -31,10 +33,8 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -47,6 +47,12 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class SmoothingUI_Jamet implements ISmoothingAlgorithm {
 
+// SET_FORMATTING_OFF
+
+   private static final String    URL_TOUR_CHART_SMOOTHING = "https://mytourbook.sourceforge.io/mytourbook/index.php/documentation/tools/tour-chart-smoothing"; //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+
    private static final int       MAX_TAU    = 5000;
 
    private final IPreferenceStore _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
@@ -58,7 +64,7 @@ public class SmoothingUI_Jamet implements ISmoothingAlgorithm {
 
    private SmoothingUI            _smoothingUI;
 
-   private SelectionAdapter       _selectionListener;
+   private SelectionListener      _selectionListener;
    private MouseWheelListener     _spinnerMouseWheelListener;
 
    private boolean                _isUpdateUI;
@@ -150,13 +156,13 @@ public class SmoothingUI_Jamet implements ISmoothingAlgorithm {
       _iconSpeed.setImage(_imageSpeed);
 
       /*
-       * label: smooth speed
+       * label: smooth speed and pace
        */
-      final Label label = _tk.createLabel(parent, Messages.TourChart_Smoothing_Label_SpeedSmoothing);
+      final Label label = _tk.createLabel(parent, Messages.TourChart_Smoothing_Label_SpeedAndPaceSmoothing);
       GridDataFactory.fillDefaults() //
             .align(SWT.FILL, SWT.CENTER)
             .applyTo(label);
-      label.setToolTipText(Messages.TourChart_Smoothing_Label_SpeedSmoothing_Tooltip);
+      label.setToolTipText(Messages.TourChart_Smoothing_Label_SpeedAndPaceSmoothing_Tooltip);
 
       /*
        * spinner: tau
@@ -356,12 +362,7 @@ public class SmoothingUI_Jamet implements ISmoothingAlgorithm {
                SWT.NONE);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).indent(0, 10).applyTo(btnComputValues);
          btnComputValues.setToolTipText(Messages.Compute_Smoothing_Button_ForAllTours_Tooltip);
-         btnComputValues.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               _smoothingUI.computeSmoothingForAllTours();
-            }
-         });
+         btnComputValues.addSelectionListener(widgetSelectedAdapter(selectionEvent -> _smoothingUI.computeSmoothingForAllTours()));
 
          /*
           * link: restore defaults
@@ -373,12 +374,7 @@ public class SmoothingUI_Jamet implements ISmoothingAlgorithm {
                .applyTo(link);
          link.setText(Messages.App_Link_RestoreDefaultValues);
          link.setEnabled(true);
-         link.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               performDefaults(true);
-            }
-         });
+         link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> performDefaults(true)));
          _tk.adapt(link, true, true);
 
          /*
@@ -390,16 +386,11 @@ public class SmoothingUI_Jamet implements ISmoothingAlgorithm {
                .applyTo(link);
          link.setText(Messages.TourChart_Smoothing_Link_PrefBreakTime);
          link.setEnabled(true);
-         link.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               PreferencesUtil.createPreferenceDialogOn(
-                     parent.getShell(),
-                     PrefPageComputedValues.ID,
-                     null,
-                     PrefPageComputedValues.TAB_FOLDER_BREAK_TIME).open();
-            }
-         });
+         link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> PreferencesUtil.createPreferenceDialogOn(
+               parent.getShell(),
+               PrefPageComputedValues.ID,
+               null,
+               PrefPageComputedValues.TAB_FOLDER_BREAK_TIME).open()));
          _tk.adapt(link, true, true);
 
          /*
@@ -411,16 +402,9 @@ public class SmoothingUI_Jamet implements ISmoothingAlgorithm {
                .applyTo(link);
          link.setText(Messages.TourChart_Smoothing_Link_SmoothingOnlineDocumentation);
          link.setEnabled(true);
-         link.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               WEB.openUrl(
-                     //
-                     // the url MUST be splitted otherwise the messages editor will truncate the url
-                     //
-                     Messages.External_Link_MyTourbook + Messages.External_Link_MyTourbook_TourChartSmoothing);
-            }
-         });
+         link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            WEB.openUrl(URL_TOUR_CHART_SMOOTHING);
+         }));
          _tk.adapt(link, true, true);
       }
    }
@@ -449,25 +433,19 @@ public class SmoothingUI_Jamet implements ISmoothingAlgorithm {
       _pc = new PixelConverter(parent);
       _hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
-      _selectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            if (_isUpdateUI) {
-               return;
-            }
-            onModifySmoothing(e.widget, true);
+      _selectionListener = widgetSelectedAdapter(selectionEvent -> {
+         if (_isUpdateUI) {
+            return;
          }
-      };
+         onModifySmoothing(selectionEvent.widget, true);
+      });
 
-      _spinnerMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            Util.adjustSpinnerValueOnMouseScroll(event);
-            if (_isUpdateUI) {
-               return;
-            }
-            onModifySmoothing(event.widget, true);
+      _spinnerMouseWheelListener = mouseEvent -> {
+         Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         if (_isUpdateUI) {
+            return;
          }
+         onModifySmoothing(mouseEvent.widget, true);
       };
    }
 

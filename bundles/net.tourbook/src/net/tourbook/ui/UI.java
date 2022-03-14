@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -63,8 +63,6 @@ import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
@@ -82,9 +80,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
@@ -95,81 +91,81 @@ import org.eclipse.ui.menus.UIElement;
 
 public class UI {
 
-   private static final String           ICONS_PATH                    = "/icons/";                            //$NON-NLS-1$
+   private static final String           ICONS_PATH                    = "/icons/";                    //$NON-NLS-1$
 
-   public static final String            EMPTY_STRING                  = "";                                   //$NON-NLS-1$
-   public static final String            SPACE                         = " ";                                  //$NON-NLS-1$
-   public static final String            SPACE2                        = "  ";                                 //$NON-NLS-1$
-   public static final String            SPACE4                        = "    ";                               //$NON-NLS-1$
-   public static final String            COLON_SPACE                   = ": ";                                 //$NON-NLS-1$
-   public static final String            COMMA_SPACE                   = ", ";                                 //$NON-NLS-1$
-   public static final String            UNDERSCORE                    = "_";                                  //$NON-NLS-1$
-   public static final String            DASH                          = "-";                                  //$NON-NLS-1$
-   public static final String            DASH_WITH_SPACE               = " - ";                                //$NON-NLS-1$
-   public static final String            DASH_WITH_DOUBLE_SPACE        = "   -   ";                            //$NON-NLS-1$
-   public static final String            SLASH_WITH_SPACE              = " / ";                                //$NON-NLS-1$
-   public static final String            EMPTY_STRING_FORMAT           = "%s";                                 //$NON-NLS-1$
-   public static final String            MNEMONIC                      = "&";                                  //$NON-NLS-1$
+   public static final String            EMPTY_STRING                  = "";                           //$NON-NLS-1$
+   public static final String            SPACE                         = " ";                          //$NON-NLS-1$
+   public static final String            SPACE2                        = "  ";                         //$NON-NLS-1$
+   public static final String            SPACE4                        = "    ";                       //$NON-NLS-1$
+   public static final String            COLON_SPACE                   = ": ";                         //$NON-NLS-1$
+   public static final String            COMMA_SPACE                   = ", ";                         //$NON-NLS-1$
+   public static final String            UNDERSCORE                    = "_";                          //$NON-NLS-1$
+   public static final String            DASH                          = "-";                          //$NON-NLS-1$
+   public static final String            DASH_WITH_SPACE               = " - ";                        //$NON-NLS-1$
+   public static final String            DASH_WITH_DOUBLE_SPACE        = "   -   ";                    //$NON-NLS-1$
+   public static final String            SLASH_WITH_SPACE              = " / ";                        //$NON-NLS-1$
+   public static final String            EMPTY_STRING_FORMAT           = "%s";                         //$NON-NLS-1$
+   public static final String            MNEMONIC                      = "&";                          //$NON-NLS-1$
 
    /**
     * contains a new line
     */
-   public static final String            NEW_LINE                      = "\n";                                 //$NON-NLS-1$
+   public static final String            NEW_LINE                      = "\n";                         //$NON-NLS-1$
 
    /**
     * contains 2 new lines
     */
-   public static final String            NEW_LINE2                     = "\n\n";                               //$NON-NLS-1$
+   public static final String            NEW_LINE2                     = "\n\n";                       //$NON-NLS-1$
 
-   public static final String            SYSTEM_NEW_LINE               = System.getProperty("line.separator"); //$NON-NLS-1$
+   public static final String            SYSTEM_NEW_LINE               = System.lineSeparator();
 
-   public static final String            IS_NOT_INITIALIZED            = "IS NOT INITIALIZED";                 //$NON-NLS-1$
+   public static final String            IS_NOT_INITIALIZED            = "IS NOT INITIALIZED";         //$NON-NLS-1$
 
-   public static final String            GRAPH_ALTIMETER               = "GRAPH_ALTIMETER";                    //$NON-NLS-1$
-   public static final String            GRAPH_ALTITUDE                = "GRAPH_ALTITUDE";                     //$NON-NLS-1$
-   public static final String            GRAPH_CADENCE                 = "GRAPH_CADENCE";                      //$NON-NLS-1$
-   public static final String            GRAPH_GRADIENT                = "GRAPH_GRADIENT";                     //$NON-NLS-1$
-   public static final String            GRAPH_PACE                    = "GRAPH_PACE";                         //$NON-NLS-1$
-   public static final String            GRAPH_POWER                   = "GRAPH_POWER";                        //$NON-NLS-1$
-   public static final String            GRAPH_PULSE                   = "GRAPH_PULSE";                        //$NON-NLS-1$
-   public static final String            GRAPH_SPEED                   = "GRAPH_SPEED";                        //$NON-NLS-1$
-   public static final String            GRAPH_TEMPERATURE             = "GRAPH_TEMPERATURE";                  //$NON-NLS-1$
+   public static final String            GRAPH_ALTIMETER               = "GRAPH_ALTIMETER";            //$NON-NLS-1$
+   public static final String            GRAPH_ALTITUDE                = "GRAPH_ALTITUDE";             //$NON-NLS-1$
+   public static final String            GRAPH_CADENCE                 = "GRAPH_CADENCE";              //$NON-NLS-1$
+   public static final String            GRAPH_GRADIENT                = "GRAPH_GRADIENT";             //$NON-NLS-1$
+   public static final String            GRAPH_PACE                    = "GRAPH_PACE";                 //$NON-NLS-1$
+   public static final String            GRAPH_POWER                   = "GRAPH_POWER";                //$NON-NLS-1$
+   public static final String            GRAPH_PULSE                   = "GRAPH_PULSE";                //$NON-NLS-1$
+   public static final String            GRAPH_SPEED                   = "GRAPH_SPEED";                //$NON-NLS-1$
+   public static final String            GRAPH_TEMPERATURE             = "GRAPH_TEMPERATURE";          //$NON-NLS-1$
 
-   public static final String            VIEW_COLOR_CATEGORY           = "view.color.category";                //$NON-NLS-1$
-   public static final String            VIEW_COLOR_TITLE              = "view.color.title";                   //$NON-NLS-1$
-   public static final String            VIEW_COLOR_SUB                = "view.color.sub";                     //$NON-NLS-1$
-   public static final String            VIEW_COLOR_SUB_SUB            = "view.color.sub-sub";                 //$NON-NLS-1$
-   public static final String            VIEW_COLOR_TOUR               = "view.color.tour";                    //$NON-NLS-1$
-   public static final String            VIEW_COLOR_BG_HISTORY_TOUR    = "VIEW_COLOR_BG_HISTORY_TOUR";         //$NON-NLS-1$
+   public static final String            VIEW_COLOR_CATEGORY           = "view.color.category";        //$NON-NLS-1$
+   public static final String            VIEW_COLOR_TITLE              = "view.color.title";           //$NON-NLS-1$
+   public static final String            VIEW_COLOR_SUB                = "view.color.sub";             //$NON-NLS-1$
+   public static final String            VIEW_COLOR_SUB_SUB            = "view.color.sub-sub";         //$NON-NLS-1$
+   public static final String            VIEW_COLOR_TOUR               = "view.color.tour";            //$NON-NLS-1$
+   public static final String            VIEW_COLOR_BG_HISTORY_TOUR    = "VIEW_COLOR_BG_HISTORY_TOUR"; //$NON-NLS-1$
 
-   public static final String            SYMBOL_AVERAGE                = "\u00f8";                             //$NON-NLS-1$
-   public static final String            SYMBOL_AVERAGE_WITH_SPACE     = "\u00f8 ";                            //$NON-NLS-1$
-   public static final String            SYMBOL_DASH                   = "-";                                  //$NON-NLS-1$
-   public static final String            SYMBOL_DOUBLE_HORIZONTAL      = "\u2550";                             //$NON-NLS-1$
-   public static final String            SYMBOL_DOUBLE_VERTICAL        = "\u2551";                             //$NON-NLS-1$
-   public static final String            SYMBOL_DEGREE                 = "\u00B0";                             //$NON-NLS-1$
-   public static final String            SYMBOL_INFINITY               = "\u221E";                             //$NON-NLS-1$
-   public static final String            SYMBOL_SUM_WITH_SPACE         = "\u2211 ";                            //$NON-NLS-1$
-   public static final String            SYMBOL_TAU                    = "\u03c4";                             //$NON-NLS-1$
+   public static final String            SYMBOL_AVERAGE                = "\u00f8";                     //$NON-NLS-1$
+   public static final String            SYMBOL_AVERAGE_WITH_SPACE     = "\u00f8 ";                    //$NON-NLS-1$
+   public static final String            SYMBOL_DASH                   = "-";                          //$NON-NLS-1$
+   public static final String            SYMBOL_DOUBLE_HORIZONTAL      = "\u2550";                     //$NON-NLS-1$
+   public static final String            SYMBOL_DOUBLE_VERTICAL        = "\u2551";                     //$NON-NLS-1$
+   public static final String            SYMBOL_DEGREE                 = "\u00B0";                     //$NON-NLS-1$
+   public static final String            SYMBOL_INFINITY               = "\u221E";                     //$NON-NLS-1$
+   public static final String            SYMBOL_SUM_WITH_SPACE         = "\u2211 ";                    //$NON-NLS-1$
+   public static final String            SYMBOL_TAU                    = "\u03c4";                     //$NON-NLS-1$
 
-   public static final String            SYMBOL_BRACKET_LEFT           = "(";                                  //$NON-NLS-1$
-   public static final String            SYMBOL_BRACKET_RIGHT          = ")";                                  //$NON-NLS-1$
-   public static final String            SYMBOL_COLON                  = ":";                                  //$NON-NLS-1$
-   public static final String            SYMBOL_DOT                    = ".";                                  //$NON-NLS-1$
-   public static final String            SYMBOL_EQUAL                  = "=";                                  //$NON-NLS-1$
-   public static final String            SYMBOL_GREATER_THAN           = ">";                                  //$NON-NLS-1$
-   public static final String            SYMBOL_LESS_THAN              = "<";                                  //$NON-NLS-1$
-   public static final String            SYMBOL_PERCENTAGE             = "%";                                  //$NON-NLS-1$
-   public static final String            SYMBOL_WIND_WITH_SPACE        = "W ";                                 //$NON-NLS-1$
-   public static final String            SYMBOL_EXCLAMATION_POINT      = "!";                                  //$NON-NLS-1$
+   public static final String            SYMBOL_BRACKET_LEFT           = "(";                          //$NON-NLS-1$
+   public static final String            SYMBOL_BRACKET_RIGHT          = ")";                          //$NON-NLS-1$
+   public static final String            SYMBOL_COLON                  = ":";                          //$NON-NLS-1$
+   public static final String            SYMBOL_DOT                    = ".";                          //$NON-NLS-1$
+   public static final String            SYMBOL_EQUAL                  = "=";                          //$NON-NLS-1$
+   public static final String            SYMBOL_GREATER_THAN           = ">";                          //$NON-NLS-1$
+   public static final String            SYMBOL_LESS_THAN              = "<";                          //$NON-NLS-1$
+   public static final String            SYMBOL_PERCENTAGE             = "%";                          //$NON-NLS-1$
+   public static final String            SYMBOL_WIND_WITH_SPACE        = "W ";                         //$NON-NLS-1$
+   public static final String            SYMBOL_EXCLAMATION_POINT      = "!";                          //$NON-NLS-1$
 
-   public final static ImageRegistry     IMAGE_REGISTRY;
+   public static final ImageRegistry     IMAGE_REGISTRY;
 
-   private static final String           PART_NAME_GRAPH_ID            = "graphId-";                           //$NON-NLS-1$
-   private static final String           PART_NAME_DISABLED            = "-disabled";                          //$NON-NLS-1$
+   private static final String           PART_NAME_GRAPH_ID            = "graphId-";                   //$NON-NLS-1$
+   private static final String           PART_NAME_DISABLED            = "-disabled";                  //$NON-NLS-1$
 
-   public static final String            IMAGE_TOUR_TYPE_FILTER        = "tourType-filter";                    //$NON-NLS-1$
-   public static final String            IMAGE_TOUR_TYPE_FILTER_SYSTEM = "tourType-filter-system";             //$NON-NLS-1$
+   public static final String            IMAGE_TOUR_TYPE_FILTER        = "tourType-filter";            //$NON-NLS-1$
+   public static final String            IMAGE_TOUR_TYPE_FILTER_SYSTEM = "tourType-filter-system";     //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore                    = TourbookPlugin.getPrefStore();
 
@@ -183,7 +179,7 @@ public class UI {
    public static Styler                  TAG_CATEGORY_STYLER;
    public static Styler                  TAG_SUB_STYLER;
 
-   private static final String           DEFAULT_MONO_FONT             = "Courier";                            //$NON-NLS-1$
+   private static final String           DEFAULT_MONO_FONT             = "Courier";                    //$NON-NLS-1$
    private static Font                   _fontForLogging;
 
    static {
@@ -343,55 +339,52 @@ public class UI {
             || fileCollisionValue == FileCollisionBehavior.REPLACE
             || fileCollisionValue == FileCollisionBehavior.KEEP) {
 
-         Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
+         Display.getDefault().syncExec(() -> {
 
-               final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-               final MessageDialog dialog = new MessageDialog(//
-                     shell,
-                     Messages.app_dlg_confirmFileOverwrite_title,
-                     null,
-                     NLS.bind(Messages.app_dlg_confirmFileOverwrite_message, file.getPath()),
-                     MessageDialog.QUESTION,
-                     new String[] {
-                           IDialogConstants.YES_LABEL,
-                           IDialogConstants.YES_TO_ALL_LABEL,
-                           IDialogConstants.NO_LABEL,
-                           IDialogConstants.NO_TO_ALL_LABEL,
-                           IDialogConstants.CANCEL_LABEL },
-                     0);
-               dialog.open();
+            final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+            final MessageDialog dialog = new MessageDialog(//
+                  shell,
+                  Messages.app_dlg_confirmFileOverwrite_title,
+                  null,
+                  NLS.bind(Messages.app_dlg_confirmFileOverwrite_message, file.getPath()),
+                  MessageDialog.QUESTION,
+                  new String[] {
+                        IDialogConstants.YES_LABEL,
+                        IDialogConstants.YES_TO_ALL_LABEL,
+                        IDialogConstants.NO_LABEL,
+                        IDialogConstants.NO_TO_ALL_LABEL,
+                        IDialogConstants.CANCEL_LABEL },
+                  0);
+            dialog.open();
 
-               final int returnCode = dialog.getReturnCode();
-               switch (returnCode) {
+            final int returnCode = dialog.getReturnCode();
+            switch (returnCode) {
 
-               case -1: // dialog was canceled
-               case 4:
-                  fileCollision.value = FileCollisionBehavior.DIALOG_IS_CANCELED;
-                  break;
+            case -1: // dialog was canceled
+            case 4:
+               fileCollision.value = FileCollisionBehavior.DIALOG_IS_CANCELED;
+               break;
 
-               case 0: // YES
-                  fileCollision.value = FileCollisionBehavior.REPLACE;
-                  isOverwrite[0] = true;
-                  break;
+            case 0: // YES
+               fileCollision.value = FileCollisionBehavior.REPLACE;
+               isOverwrite[0] = true;
+               break;
 
-               case 1: // YES_TO_ALL
-                  fileCollision.value = FileCollisionBehavior.REPLACE_ALL;
-                  isOverwrite[0] = true;
-                  break;
+            case 1: // YES_TO_ALL
+               fileCollision.value = FileCollisionBehavior.REPLACE_ALL;
+               isOverwrite[0] = true;
+               break;
 
-               case 2: // NO
-                  fileCollision.value = FileCollisionBehavior.KEEP;
-                  break;
+            case 2: // NO
+               fileCollision.value = FileCollisionBehavior.KEEP;
+               break;
 
-               case 3: // NO_TO_ALL
-                  fileCollision.value = FileCollisionBehavior.KEEP_ALL;
-                  break;
+            case 3: // NO_TO_ALL
+               fileCollision.value = FileCollisionBehavior.KEEP_ALL;
+               break;
 
-               default:
-                  break;
-               }
+            default:
+               break;
             }
          });
 
@@ -900,31 +893,28 @@ public class UI {
        * NOTE: EraseItem is called repeatedly. Therefore it is critical
        * for performance that this method be as efficient as possible.
        */
-      table.addListener(SWT.EraseItem, new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
+      table.addListener(SWT.EraseItem, event -> {
 
-            event.detail &= ~SWT.HOT;
+         event.detail &= ~SWT.HOT;
 
-            if ((event.detail & SWT.SELECTED) == 0) {
-               // item is not selected
-               return;
-            }
-
-            final int clientWidth = table.getClientArea().width;
-            final GC gc = event.gc;
-
-            final Color oldForeground = gc.getForeground();
-            final Color oldBackground = gc.getBackground();
-            {
-               gc.setBackground(bgSelectedColor);
-               gc.fillRectangle(0, event.y, clientWidth, event.height);
-            }
-            gc.setForeground(oldForeground);
-            gc.setBackground(oldBackground);
-
-            event.detail &= ~SWT.SELECTED;
+         if ((event.detail & SWT.SELECTED) == 0) {
+            // item is not selected
+            return;
          }
+
+         final int clientWidth = table.getClientArea().width;
+         final GC gc = event.gc;
+
+         final Color oldForeground = gc.getForeground();
+         final Color oldBackground = gc.getBackground();
+         {
+            gc.setBackground(bgSelectedColor);
+            gc.fillRectangle(0, event.y, clientWidth, event.height);
+         }
+         gc.setForeground(oldForeground);
+         gc.setBackground(oldBackground);
+
+         event.detail &= ~SWT.SELECTED;
       });
    }
 
@@ -946,48 +936,39 @@ public class UI {
       Assert.isNotNull(display);
 
       // hookup dispose
-      display.disposeExec(new Runnable() {
-         @Override
-         public void run() {
-            if (_fontForLogging != null) {
-               _fontForLogging.dispose();
-            }
+      display.disposeExec(() -> {
+         if (_fontForLogging != null) {
+            _fontForLogging.dispose();
          }
       });
 
       setupFonts_Logging(display);
 
       // update font after it changed
-      _prefStore.addPropertyChangeListener(new IPropertyChangeListener() {
+      _prefStore.addPropertyChangeListener(propertyChangeEvent -> {
 
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+         final String property = propertyChangeEvent.getProperty();
 
-            final String property = event.getProperty();
+         if (property.equals(IMappingPreferences.THEME_FONT_LOGGING)) {
 
-            if (property.equals(IMappingPreferences.THEME_FONT_LOGGING)) {
+            if (_fontForLogging != null) {
 
-               if (_fontForLogging != null) {
+               /**
+                * Delay old font disposal because org.eclipse.swt.custom.StyledTextRenderer is
+                * using the old font in setFont(...) before the new font is initialized
+                * -> really bad behavior !!!
+                */
+               final Font oldFont = _fontForLogging;
 
-                  /**
-                   * Delay old font disposal because org.eclipse.swt.custom.StyledTextRenderer is
-                   * using the old font in setFont(...) before the new font is initialized
-                   * -> realy bad behavior !!!
-                   */
-                  final Font oldFont = _fontForLogging;
+               display.timerExec(10_000, oldFont::dispose);
 
-                  display.timerExec(10_000, () -> {
-                     oldFont.dispose();
-                  });
-
-                  _fontForLogging = null;
-               }
-
-               setupFonts_Logging(display);
-
-               // fire event after the font is recreated to update the UI
-               _prefStore.setValue(ITourbookPreferences.FONT_LOGGING_IS_MODIFIED, Math.random());
+               _fontForLogging = null;
             }
+
+            setupFonts_Logging(display);
+
+            // fire event after the font is recreated to update the UI
+            _prefStore.setValue(ITourbookPreferences.FONT_LOGGING_IS_MODIFIED, Math.random());
          }
       });
 
@@ -1059,36 +1040,28 @@ public class UI {
 
    public static void showMessageInfo(final String title, final String message) {
 
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            MessageDialog.openInformation(Display.getDefault().getActiveShell(), title, message);
-         }
-      });
+      Display.getDefault().asyncExec(() -> MessageDialog.openInformation(Display.getDefault().getActiveShell(), title, message));
    }
 
    public static void showSQLException(final SQLException ex) {
 
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getDefault().asyncExec(() -> {
 
-            SQLException e = ex;
+         SQLException e = ex;
 
-            while (e != null) {
+         while (e != null) {
 
-               final String sqlExceptionText = Util.getSQLExceptionText(e);
+            final String sqlExceptionText = Util.getSQLExceptionText(e);
 
-               // log also the stacktrace
-               StatusUtil.logError(sqlExceptionText + Util.getStackTrace(e));
+            // log also the stacktrace
+            StatusUtil.logError(sqlExceptionText + Util.getStackTrace(e));
 
-               MessageDialog.openError(
-                     Display.getDefault().getActiveShell(),
-                     "SQL Error", //$NON-NLS-1$
-                     sqlExceptionText);
+            MessageDialog.openError(
+                  Display.getDefault().getActiveShell(),
+                  "SQL Error", //$NON-NLS-1$
+                  sqlExceptionText);
 
-               e = e.getNextException();
-            }
+            e = e.getNextException();
          }
       });
    }

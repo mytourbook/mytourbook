@@ -1844,7 +1844,7 @@ public class TourPhotoManager implements IPhotoServiceProvider {
                + "isGeoFromPhoto, " + NL //                             7  //$NON-NLS-1$
                + "ratingStars " + NL //                                 8  //$NON-NLS-1$
 
-               + "FROM " + TourDatabase.TABLE_TOUR_PHOTO + NL
+               + "FROM " + TourDatabase.TABLE_TOUR_PHOTO + NL //$NON-NLS-1$
 
                + "WHERE imageFilePathName=?" + NL //                       //$NON-NLS-1$
          ;

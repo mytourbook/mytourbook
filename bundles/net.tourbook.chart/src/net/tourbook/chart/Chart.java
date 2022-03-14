@@ -45,39 +45,39 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class Chart extends ViewForm {
 
-   private static final String ACTION_ID_MOVE_LEFT_SLIDER_HERE  = "ACTION_ID_MOVE_LEFT_SLIDER_HERE";  //$NON-NLS-1$
-   private static final String ACTION_ID_MOVE_RIGHT_SLIDER_HERE = "ACTION_ID_MOVE_RIGHT_SLIDER_HERE"; //$NON-NLS-1$
-   private static final String ACTION_ID_MOVE_SLIDERS_TO_BORDER = "ACTION_ID_MOVE_SLIDERS_TO_BORDER"; //$NON-NLS-1$
-   private static final String ACTION_ID_ZOOM_FIT_GRAPH         = "ACTION_ID_ZOOM_FIT_GRAPH";         //$NON-NLS-1$
-   private static final String ACTION_ID_ZOOM_IN_TO_SLIDER      = "ACTION_ID_ZOOM_IN_TO_SLIDER";      //$NON-NLS-1$
+   private static final String                       ACTION_ID_MOVE_LEFT_SLIDER_HERE  = "ACTION_ID_MOVE_LEFT_SLIDER_HERE";  //$NON-NLS-1$
+   private static final String                       ACTION_ID_MOVE_RIGHT_SLIDER_HERE = "ACTION_ID_MOVE_RIGHT_SLIDER_HERE"; //$NON-NLS-1$
+   private static final String                       ACTION_ID_MOVE_SLIDERS_TO_BORDER = "ACTION_ID_MOVE_SLIDERS_TO_BORDER"; //$NON-NLS-1$
+   private static final String                       ACTION_ID_ZOOM_FIT_GRAPH         = "ACTION_ID_ZOOM_FIT_GRAPH";         //$NON-NLS-1$
+   private static final String                       ACTION_ID_ZOOM_IN_TO_SLIDER      = "ACTION_ID_ZOOM_IN_TO_SLIDER";      //$NON-NLS-1$
 
-   static final int                                  NO_BAR_SELECTION            = -1;
+   static final int                                  NO_BAR_SELECTION                 = -1;
 
-   public static final String                        CUSTOM_DATA_TOUR_ID         = "tourId";            //$NON-NLS-1$
+   public static final String                        CUSTOM_DATA_TOUR_ID              = "tourId";                           //$NON-NLS-1$
 
-   public static final int                           SYNCH_MODE_NO               = 0;
-   public static final int                           SYNCH_MODE_BY_SCALE         = 1;
-   public static final int                           SYNCH_MODE_BY_SIZE          = 2;
+   public static final int                           SYNCH_MODE_NO                    = 0;
+   public static final int                           SYNCH_MODE_BY_SCALE              = 1;
+   public static final int                           SYNCH_MODE_BY_SIZE               = 2;
 
-   private static final int                          MouseMove                   = 10;
-   private static final int                          MouseDown                   = 20;
-   private static final int                          MouseUp                     = 30;
-   private static final int                          MouseDoubleClick            = 40;
-   private static final int                          MouseExit                   = 50;
-   private static final int                          KeyDown                     = 110;
-   private static final int                          ChartResized                = 999;
+   private static final int                          MouseMove                        = 10;
+   private static final int                          MouseDown                        = 20;
+   private static final int                          MouseUp                          = 30;
+   private static final int                          MouseDoubleClick                 = 40;
+   private static final int                          MouseExit                        = 50;
+   private static final int                          KeyDown                          = 110;
+   private static final int                          ChartResized                     = 999;
 
    public static Color                               FOREGROUND_COLOR_GRID;
    public static Color                               FOREGROUND_COLOR_UNITS;
 
-   private final ListenerList<IBarSelectionListener> _barSelectionListeners      = new ListenerList<>();
-   private final ListenerList<IBarSelectionListener> _barDoubleClickListeners    = new ListenerList<>();
-   private final ListenerList<IHoveredValueListener> _chartHoveredValueListener  = new ListenerList<>();
-   private final ListenerList<IKeyListener>          _chartKeyListener           = new ListenerList<>();
-   private final ListenerList<IMouseListener>        _chartMouseListener         = new ListenerList<>();
-   private final ListenerList<IMouseListener>        _chartMouseMoveListener     = new ListenerList<>();
-   private final ListenerList<IChartOverlay>         _chartOverlayListener       = new ListenerList<>();
-   private final ListenerList<ISliderMoveListener>   _sliderMoveListeners        = new ListenerList<>();
+   private final ListenerList<IBarSelectionListener> _barSelectionListeners           = new ListenerList<>();
+   private final ListenerList<IBarSelectionListener> _barDoubleClickListeners         = new ListenerList<>();
+   private final ListenerList<IHoveredValueListener> _chartHoveredValueListener       = new ListenerList<>();
+   private final ListenerList<IKeyListener>          _chartKeyListener                = new ListenerList<>();
+   private final ListenerList<IMouseListener>        _chartMouseListener              = new ListenerList<>();
+   private final ListenerList<IMouseListener>        _chartMouseMoveListener          = new ListenerList<>();
+   private final ListenerList<IChartOverlay>         _chartOverlayListener            = new ListenerList<>();
+   private final ListenerList<ISliderMoveListener>   _sliderMoveListeners             = new ListenerList<>();
 
    private ActionMouseWheelMode                      _action_MouseWheelMode;
    private ActionZoomIn                              _action_ZoomIn;
@@ -92,8 +92,8 @@ public class Chart extends ViewForm {
    private IToolBarManager                           _toolbarMgr;
    private IChartContextProvider                     _chartContextProvider;
 
-   private boolean                                   _isShowZoomActions          = false;
-   private boolean                                   _isShowMouseMode            = false;
+   private boolean                                   _isShowZoomActions               = false;
+   private boolean                                   _isShowMouseMode                 = false;
 
    private Color                                     _backgroundColor;
 
@@ -105,7 +105,7 @@ public class Chart extends ViewForm {
    private IHoveredValueTooltipListener              _hoveredValueTooltipListener;
 
    private HashMap<String, Action>                   _allChartActions;
-   private boolean                                   _isFillToolbar              = true;
+   private boolean                                   _isFillToolbar                   = true;
    private boolean                                   _isToolbarCreated;
 
    private int                                       _barSelectionSerieIndex;
@@ -116,27 +116,27 @@ public class Chart extends ViewForm {
    /**
     * <code>true</code> to start the bar chart at the bottom of the chart
     */
-   private boolean                                   _isDrawBarChartAtBottom     = true;
+   private boolean                                   _isDrawBarChartAtBottom          = true;
 
    /**
     * minimum width in pixel for one unit, this is only an approximate value because the pixel is
     * rounded up or down to fit a rounded unit
     */
-   protected int                                     gridVerticalDistance        = 30;
-   protected int                                     gridHorizontalDistance      = 70;
+   protected int                                     gridVerticalDistance             = 30;
+   protected int                                     gridHorizontalDistance           = 70;
 
-   protected boolean                                 isShowHorizontalGridLines   = false;
-   protected boolean                                 isShowVerticalGridLines     = false;
+   protected boolean                                 isShowHorizontalGridLines        = false;
+   protected boolean                                 isShowVerticalGridLines          = false;
 
    /**
     * Transparency of the graph lines
     */
-   protected int                                     graphTransparency_Line      = 0xFF;
+   protected int                                     graphTransparency_Line           = 0xFF;
 
    /**
     * Transparency of the graph fillings
     */
-   protected int                                     graphTransparency_Filling   = 0xE0;
+   protected int                                     graphTransparency_Filling        = 0xE0;
 
    /**
     * The graph transparency can be adjusted with this value. This value is multiplied with the
@@ -144,12 +144,12 @@ public class Chart extends ViewForm {
     * <p>
     * Opacity: 0.0 = transparent, 1.0 = opaque.
     */
-   double                                            graphTransparencyAdjustment = 1.0;
+   double                                            graphTransparencyAdjustment      = 1.0;
 
    /**
     * Antialiasing for the graph, can be {@link SWT#ON} or {@link SWT#OFF}.
     */
-   public int                                        graphAntialiasing           = SWT.OFF;
+   public int                                        graphAntialiasing                = SWT.OFF;
 
    /*
     * Segment alternate color
@@ -515,7 +515,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   void fireBarSelectionEvent(final int serieIndex, final int valueIndex) {
+   void fireEvent_BarSelection(final int serieIndex, final int valueIndex) {
 
       _barSelectionSerieIndex = serieIndex;
       _barSelectionValueIndex = valueIndex;
@@ -527,7 +527,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   void fireChartDoubleClick(final int serieIndex, final int valueIndex) {
+   void fireEvent_ChartDoubleClick(final int serieIndex, final int valueIndex) {
 
       _barSelectionSerieIndex = serieIndex;
       _barSelectionValueIndex = valueIndex;
@@ -539,7 +539,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   private void fireChartMouseEvent(final ChartMouseEvent mouseEvent) {
+   private void fireEvent_ChartMouse(final ChartMouseEvent mouseEvent) {
 
       final Object[] listeners = _chartMouseListener.getListeners();
       for (final Object listener : listeners) {
@@ -579,7 +579,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   private void fireChartMouseMoveEvent(final ChartMouseEvent mouseEvent) {
+   private void fireEvent_ChartMouseMove(final ChartMouseEvent mouseEvent) {
 
       final Object[] listeners = _chartMouseMoveListener.getListeners();
       for (final Object listener : listeners) {
@@ -592,7 +592,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   void fireHoveredValueEvent(final int hoveredValuePointIndex) {
+   void fireEvent_HoveredValue(final int hoveredValuePointIndex) {
 
       final Object[] allListeners = _chartHoveredValueListener.getListeners();
 
@@ -601,7 +601,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   private void fireKeyEvent(final ChartKeyEvent keyEvent) {
+   private void fireEvent_Key(final ChartKeyEvent keyEvent) {
 
       final Object[] listeners = _chartKeyListener.getListeners();
       for (final Object listener : listeners) {
@@ -621,7 +621,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   public void fireSliderMoveEvent() {
+   public void fireEvent_SliderMove() {
 
       if (_isInUpdateUI) {
          return;
@@ -881,7 +881,7 @@ public class Chart extends ViewForm {
 
    void onExternalChartResize() {
 
-      fireChartMouseEvent(
+      fireEvent_ChartMouse(
             new ChartMouseEvent(//
                   Chart.ChartResized,
                   System.currentTimeMillis(),
@@ -893,7 +893,7 @@ public class Chart extends ViewForm {
 
       final ChartKeyEvent keyEvent = new ChartKeyEvent(Chart.KeyDown, event.keyCode, event.stateMask);
 
-      fireKeyEvent(keyEvent);
+      fireEvent_Key(keyEvent);
 
       return keyEvent;
    }
@@ -906,7 +906,7 @@ public class Chart extends ViewForm {
             devXMouse,
             devYMouse);
 
-      fireChartMouseEvent(event);
+      fireEvent_ChartMouse(event);
 
       return event;
    }
@@ -918,14 +918,14 @@ public class Chart extends ViewForm {
 
       final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDown, eventTime, devXMouse, devYMouse, stateMask);
 
-      fireChartMouseEvent(event);
+      fireEvent_ChartMouse(event);
 
       return event;
    }
 
    void onExternalMouseExit(final long eventTime) {
 
-      fireChartMouseEvent(new ChartMouseEvent(Chart.MouseExit, eventTime, 0, 0));
+      fireEvent_ChartMouse(new ChartMouseEvent(Chart.MouseExit, eventTime, 0, 0));
    }
 
    ChartMouseEvent onExternalMouseMove(final long eventTime, final int devXMouse, final int devYMouse) {
@@ -936,7 +936,7 @@ public class Chart extends ViewForm {
             devXMouse,
             devYMouse);
 
-      fireChartMouseEvent(event);
+      fireEvent_ChartMouse(event);
 
       return event;
    }
@@ -949,7 +949,7 @@ public class Chart extends ViewForm {
             devXMouse,
             devYMouse);
 
-      fireChartMouseMoveEvent(event);
+      fireEvent_ChartMouseMove(event);
 
       return event;
    }
@@ -962,7 +962,7 @@ public class Chart extends ViewForm {
             devXMouse,
             devYMouse);
 
-      fireChartMouseEvent(event);
+      fireEvent_ChartMouse(event);
 
       return event;
    }
@@ -1135,6 +1135,10 @@ public class Chart extends ViewForm {
       graphTransparencyAdjustment = adjustment;
    }
 
+   public void setHovered_ValuePoint_Index(final int hoveredValuePointIndex) {
+      _chartComponents.getChartComponentGraph().setHovered_ValuePoint_Index(hoveredValuePointIndex);
+   }
+
    /**
     * Set hovered tour in the {@link ChartComponentGraph}.
     *
@@ -1194,7 +1198,7 @@ public class Chart extends ViewForm {
 
       _chartComponents.getChartComponentGraph().setSelectedBars(selectedItems);
 
-      fireBarSelectionEvent(0, _barSelectionValueIndex);
+      fireEvent_BarSelection(0, _barSelectionValueIndex);
    }
 
    public void setSelectedLines(final boolean isSelectionVisible) {
@@ -1423,7 +1427,7 @@ public class Chart extends ViewForm {
       }
 
       // update chart info view
-      fireSliderMoveEvent();
+      fireEvent_SliderMove();
    }
 
    /**

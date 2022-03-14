@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  * Copyright (C) 2018, 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -14,7 +14,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.map25;
 
 import com.badlogic.gdx.Gdx;
@@ -244,19 +243,23 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    protected static LwjglApplicationConfiguration getConfig(final String title) {
 
       LwjglApplicationConfiguration.disableAudio = true;
-      final LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
+      final LwjglApplicationConfiguration appConfig = new LwjglApplicationConfiguration();
 
-      cfg.title = title != null ? title : "vtm-gdx"; //$NON-NLS-1$
-      cfg.width = 1200;
-      cfg.height = 1000;
-      cfg.stencil = 8;
-      cfg.samples = 2;
-      cfg.foregroundFPS = 30;
-      cfg.backgroundFPS = 10;
+      appConfig.title = title != null ? title : "vtm-gdx"; //$NON-NLS-1$
+      appConfig.width = 1200;
+      appConfig.height = 1000;
+      appConfig.stencil = 8;
+      appConfig.samples = 2;
+      appConfig.foregroundFPS = 30;
+      appConfig.backgroundFPS = 10;
 
-      cfg.forceExit = false;
+      appConfig.forceExit = false;
 
-      return cfg;
+      // reduce CPU cycles
+      appConfig.pauseWhenBackground = true;
+      appConfig.backgroundFPS = 3;
+
+      return appConfig;
    }
 
    public static void init() {
@@ -801,9 +804,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       }
       debugPrint(" map25: " + "####### loadtheme: leaving styleID: " + styleId); //$NON-NLS-1$ //$NON-NLS-2$
    }
-
-
-
 
    @Override
    public boolean onItemLongPress(final int index, final MapMarker item) {
@@ -1379,17 +1379,17 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       final Layers layers = mMap.layers();
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-      _hillshadingSource = DefaultSources.HIKEBIKE_HILLSHADE
-            .httpFactory(_httpFactory)
-            .zoomMin(1)
-            .zoomMax(16)
-            .build();
+//      _hillshadingSource = DefaultSources.HIKEBIKE_HILLSHADE
+//            .httpFactory(_httpFactory)
+//            .zoomMin(1)
+//            .zoomMax(16)
+//            .build();
 
       /* needs long copyright hint... */
-//	   _hillshadingSource =  DefaultSources.MAPILION_HILLSHADE_2
-//	         .httpFactory(_httpFactory)
-//	         .apiKey(_mp_key)
-//	         .build();
+      _hillshadingSource = DefaultSources.MAPILION_HILLSHADE_2
+            .httpFactory(_httpFactory)
+            .apiKey(_mp_key)
+            .build();
 
       // hillshading with 1MB RAM Cache, using existing _httpfactory with diskcache
       _layer_HillShading = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 19);

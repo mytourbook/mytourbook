@@ -30,7 +30,7 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPage_Map2_Appearance;
+import net.tourbook.preferences.Map2_Appearance;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -461,7 +461,7 @@ public class SlideoutGeoCompareOptions extends ToolbarSlideout implements IColor
             {
                // spinner
                _spinnerMapOption_TrackOpacity = new Spinner(group, SWT.BORDER);
-               _spinnerMapOption_TrackOpacity.setMinimum(PrefPage_Map2_Appearance.MAP_OPACITY_MINIMUM);
+               _spinnerMapOption_TrackOpacity.setMinimum(Map2_Appearance.MAP_OPACITY_MINIMUM);
                _spinnerMapOption_TrackOpacity.setMaximum(100);
                _spinnerMapOption_TrackOpacity.setIncrement(1);
                _spinnerMapOption_TrackOpacity.setPageIncrement(10);

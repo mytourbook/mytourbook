@@ -82,13 +82,13 @@ public class TVICollatedTour_Event extends TVICollatedTour {
             + "maxPulse, " //                                        17 //$NON-NLS-1$
             + "avgPulse, " //                                        18 //$NON-NLS-1$
             + "avgCadence, " //                                      19 //$NON-NLS-1$
-            + "(DOUBLE(avgTemperature) / temperatureScale), " //     20 //$NON-NLS-1$
+            + "(DOUBLE(weather_Temperature_Average_Device) / temperatureScale), " //     20 //$NON-NLS-1$
             + "startWeek, " //                                       21 //$NON-NLS-1$
             + "startWeekYear, " //                                   22 //$NON-NLS-1$
 
-            + "weatherWindDir, " //                                  23 //$NON-NLS-1$
-            + "weatherWindSpd, " //                                  24 //$NON-NLS-1$
-            + "weatherClouds, " //                                   25 //$NON-NLS-1$
+            + "weather_Wind_Direction, " //                          23 //$NON-NLS-1$
+            + "weather_Wind_Speed, " //                              24 //$NON-NLS-1$
+            + "weather_Clouds, " //                                  25 //$NON-NLS-1$
 
             + "restPulse, " //                                       26 //$NON-NLS-1$
             + "calories, " //                                        27 //$NON-NLS-1$
@@ -104,7 +104,7 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 
             + NL
 
-            + "FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL
+            + "FROM " + TourDatabase.TABLE_TOUR_DATA + " TourData" + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // get tag id's
             + "LEFT OUTER JOIN " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" //    //$NON-NLS-1$ //$NON-NLS-2$

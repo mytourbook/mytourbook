@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -77,36 +77,36 @@ import org.eclipse.swt.widgets.Shell;
 
 public class DialogReimportTours extends TitleAreaDialog {
 
-   private static final String STATE_REIMPORT_TOURS_ALL                     = "STATE_REIMPORT_TOURS_ALL";                     //$NON-NLS-1$
-   private static final String STATE_REIMPORT_TOURS_SELECTED                = "STATE_REIMPORT_TOURS_SELECTED";                //$NON-NLS-1$
+   private static final String STATE_REIMPORT_TOURS_ALL                           = "STATE_REIMPORT_TOURS_ALL";                           //$NON-NLS-1$
+   private static final String STATE_REIMPORT_TOURS_SELECTED                      = "STATE_REIMPORT_TOURS_SELECTED";                      //$NON-NLS-1$
 
-   private static final String STATE_REIMPORT_TOURS_BETWEEN_DATES           = "STATE_REIMPORT_TOURS_BETWEEN_DATES";           //$NON-NLS-1$
-   private static final String STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM      = "STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM";      //$NON-NLS-1$
-   private static final String STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL     = "STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL";     //$NON-NLS-1$
+   private static final String STATE_REIMPORT_TOURS_BETWEEN_DATES                 = "STATE_REIMPORT_TOURS_BETWEEN_DATES";                 //$NON-NLS-1$
+   private static final String STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM            = "STATE_REIMPORT_TOURS_BETWEEN_DATES_FROM";            //$NON-NLS-1$
+   private static final String STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL           = "STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL";           //$NON-NLS-1$
 
-   private static final String STATE_IS_IMPORT_ALL_TIME_SLICES              = "STATE_IS_IMPORT_ALL_TIME_SLICES";              //$NON-NLS-1$
-   private static final String STATE_IS_IMPORT_ENTIRE_TOUR                  = "STATE_IS_IMPORT_ENTIRE_TOUR";                  //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_ALL_TIME_SLICES                    = "STATE_IS_IMPORT_ALL_TIME_SLICES";                    //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_ENTIRE_TOUR                        = "STATE_IS_IMPORT_ENTIRE_TOUR";                        //$NON-NLS-1$
 
-   private static final String STATE_IS_IMPORT_TOUR__CALORIES               = "STATE_IS_IMPORT_TOUR__CALORIES";               //$NON-NLS-1$
-   private static final String STATE_IS_IMPORT_TOUR__FILE_LOCATION          = "STATE_IS_IMPORT_TOUR__FILE_LOCATION";          //$NON-NLS-1$
-   private static final String STATE_IS_IMPORT_TOUR__MARKERS                = "STATE_IS_IMPORT_TOUR__MARKERS";                //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_TOUR__CALORIES                     = "STATE_IS_IMPORT_TOUR__CALORIES";                     //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_TOUR__FILE_LOCATION                = "STATE_IS_IMPORT_TOUR__FILE_LOCATION";                //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_TOUR__MARKERS                      = "STATE_IS_IMPORT_TOUR__MARKERS";                      //$NON-NLS-1$
 
-   private static final String STATE_IS_IMPORT_TIME_SLICE__BATTERY          = "STATE_IS_IMPORT_TIME_SLICE__BATTERY";          //$NON-NLS-1$
-   private static final String STATE_IS_IMPORT_TIME_SLICE__CADENCE          = "STATE_IS_IMPORT_TIME_SLICE__CADENCE";          //$NON-NLS-1$
-   private static final String STATE_IS_IMPORT_TIME_SLICE__ELEVATION        = "STATE_IS_IMPORT_TIME_SLICE__ELEVATION";        //$NON-NLS-1$
-   private static final String STATE_IS_IMPORT_TIME_SLICE__GEAR             = "STATE_IS_IMPORT_TIME_SLICE__GEAR";             //$NON-NLS-1$
-   private static final String STATE_IS_IMPORT_TIME_SLICE__POWER_AND_PULSE  = "STATE_IS_IMPORT_TIME_SLICE__POWER_AND_PULSE";  //$NON-NLS-1$
-   private static final String STATE_IS_IMPORT_TIME_SLICE__POWER_AND_SPEED  = "STATE_IS_IMPORT_TIME_SLICE__POWER_AND_SPEED";  //$NON-NLS-1$
-   private static final String STATE_IS_IMPORT_TIME_SLICE__RUNNING_DYNAMICS = "STATE_IS_IMPORT_TIME_SLICE__RUNNING_DYNAMICS"; //$NON-NLS-1$
-   private static final String STATE_IS_IMPORT_TIME_SLICE__SWIMMING         = "STATE_IS_IMPORT_TIME_SLICE__SWIMMING";         //$NON-NLS-1$
-   private static final String STATE_IS_IMPORT_TIME_SLICE__TEMPERATURE      = "STATE_IS_IMPORT_TIME_SLICE__TEMPERATURE";      //$NON-NLS-1$
-   private static final String STATE_IS_IMPORT_TIME_SLICE__TRAINING         = "STATE_IS_IMPORT_TIME_SLICE__TRAINING";         //$NON-NLS-1$
-   private static final String STATE_IS_IMPORT_TIME_SLICE__TIMER_PAUSES     = "STATE_IS_IMPORT_TIME_SLICE__TIMER_PAUSES";     //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_TIME_SLICE__BATTERY                = "STATE_IS_IMPORT_TIME_SLICE__BATTERY";                //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_TIME_SLICE__CADENCE                = "STATE_IS_IMPORT_TIME_SLICE__CADENCE";                //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_TIME_SLICE__ELEVATION              = "STATE_IS_IMPORT_TIME_SLICE__ELEVATION";              //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_TIME_SLICE__GEAR                   = "STATE_IS_IMPORT_TIME_SLICE__GEAR";                   //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_TIME_SLICE__POWER_AND_PULSE        = "STATE_IS_IMPORT_TIME_SLICE__POWER_AND_PULSE";        //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_TIME_SLICE__POWER_AND_SPEED        = "STATE_IS_IMPORT_TIME_SLICE__POWER_AND_SPEED";        //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_TIME_SLICE__RUNNING_DYNAMICS       = "STATE_IS_IMPORT_TIME_SLICE__RUNNING_DYNAMICS";       //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_TIME_SLICE__SWIMMING               = "STATE_IS_IMPORT_TIME_SLICE__SWIMMING";               //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_TIME_SLICE__TEMPERATURE_FROMDEVICE = "STATE_IS_IMPORT_TIME_SLICE__TEMPERATURE_FROMDEVICE"; //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_TIME_SLICE__TRAINING               = "STATE_IS_IMPORT_TIME_SLICE__TRAINING";               //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_TIME_SLICE__TIMER_PAUSES           = "STATE_IS_IMPORT_TIME_SLICE__TIMER_PAUSES";           //$NON-NLS-1$
 
-   private static final String STATE_IS_LOG_DETAILS                         = "STATE_IS_LOG_DETAILS";                         //$NON-NLS-1$
-   private static final String STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND = "STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND"; //$NON-NLS-1$
+   private static final String STATE_IS_LOG_DETAILS                               = "STATE_IS_LOG_DETAILS";                               //$NON-NLS-1$
+   private static final String STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND       = "STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND";       //$NON-NLS-1$
 
-   private static final int    VERTICAL_SECTION_MARGIN                      = 10;
+   private static final int    VERTICAL_SECTION_MARGIN                            = 10;
 
    //
    private static final IDialogSettings    _state          = TourbookPlugin.getState("DialogReimportTours"); //$NON-NLS-1$
@@ -167,7 +167,7 @@ public class DialogReimportTours extends TitleAreaDialog {
    private Button    _chkData_TimeSlice_PowerAndSpeed;
    private Button    _chkData_TimeSlice_RunningDynamics;
    private Button    _chkData_TimeSlice_Swimming;
-   private Button    _chkData_TimeSlice_Temperature;
+   private Button    _chkData_TimeSlice_TemperatureFromDevice;
    private Button    _chkData_TimeSlice_Training;
    private Button    _chkData_Tour_Markers;
    private Button    _chkData_TimeSlice_TourTimerPauses;
@@ -519,10 +519,10 @@ public class DialogReimportTours extends TitleAreaDialog {
             /*
              * Temperature
              */
-            _chkData_TimeSlice_Temperature = new Button(containerTimeSlices, SWT.CHECK);
-            _chkData_TimeSlice_Temperature.setText(Messages.Dialog_ModifyTours_Checkbox_TemperatureValues);
-            _chkData_TimeSlice_Temperature.addSelectionListener(_defaultListener);
-            gridDataItem.applyTo(_chkData_TimeSlice_Temperature);
+            _chkData_TimeSlice_TemperatureFromDevice = new Button(containerTimeSlices, SWT.CHECK);
+            _chkData_TimeSlice_TemperatureFromDevice.setText(Messages.Dialog_ModifyTours_Checkbox_TemperatureValues_FromDevice);
+            _chkData_TimeSlice_TemperatureFromDevice.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_TimeSlice_TemperatureFromDevice);
          }
 
          // row 4
@@ -990,7 +990,7 @@ public class DialogReimportTours extends TitleAreaDialog {
             _chkData_TimeSlice_PowerAndSpeed.getSelection() ||
             _chkData_TimeSlice_RunningDynamics.getSelection() ||
             _chkData_TimeSlice_Swimming.getSelection() ||
-            _chkData_TimeSlice_Temperature.getSelection() ||
+            _chkData_TimeSlice_TemperatureFromDevice.getSelection() ||
             _chkData_TimeSlice_Training.getSelection() ||
             _chkData_TimeSlice_TourTimerPauses.getSelection();
 
@@ -1022,7 +1022,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       _chkData_TimeSlice_PowerAndSpeed.setEnabled(isTimeSlice);
       _chkData_TimeSlice_RunningDynamics.setEnabled(isTimeSlice);
       _chkData_TimeSlice_Swimming.setEnabled(isTimeSlice);
-      _chkData_TimeSlice_Temperature.setEnabled(isTimeSlice);
+      _chkData_TimeSlice_TemperatureFromDevice.setEnabled(isTimeSlice);
       _chkData_TimeSlice_TourTimerPauses.setEnabled(isTimeSlice);
       _chkData_TimeSlice_Training.setEnabled(isTimeSlice);
 
@@ -1111,22 +1111,22 @@ public class DialogReimportTours extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Battery,           TourValueType.TIME_SLICES__BATTERY,          tourValueTypes);
-               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Cadence,           TourValueType.TIME_SLICES__CADENCE,          tourValueTypes);
-               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Elevation,         TourValueType.TIME_SLICES__ELEVATION,        tourValueTypes);
-               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Gear,              TourValueType.TIME_SLICES__GEAR,             tourValueTypes);
-               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_PowerAndPulse,     TourValueType.TIME_SLICES__POWER_AND_PULSE,  tourValueTypes);
-               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_PowerAndSpeed,     TourValueType.TIME_SLICES__POWER_AND_SPEED,  tourValueTypes);
-               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_RunningDynamics,   TourValueType.TIME_SLICES__RUNNING_DYNAMICS, tourValueTypes);
-               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Swimming,          TourValueType.TIME_SLICES__SWIMMING,         tourValueTypes);
-               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Temperature,       TourValueType.TIME_SLICES__TEMPERATURE,      tourValueTypes);
-               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_TourTimerPauses,   TourValueType.TIME_SLICES__TIMER_PAUSES,     tourValueTypes);
-               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Training,          TourValueType.TIME_SLICES__TRAINING,         tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Battery,               TourValueType.TIME_SLICES__BATTERY,                tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Cadence,               TourValueType.TIME_SLICES__CADENCE,                tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Elevation,             TourValueType.TIME_SLICES__ELEVATION,              tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Gear,                  TourValueType.TIME_SLICES__GEAR,                   tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_PowerAndPulse,         TourValueType.TIME_SLICES__POWER_AND_PULSE,        tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_PowerAndSpeed,         TourValueType.TIME_SLICES__POWER_AND_SPEED,        tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_RunningDynamics,       TourValueType.TIME_SLICES__RUNNING_DYNAMICS,       tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Swimming,              TourValueType.TIME_SLICES__SWIMMING,               tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_TemperatureFromDevice, TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE, tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_TourTimerPauses,       TourValueType.TIME_SLICES__TIMER_PAUSES,           tourValueTypes);
+               DialogUtils.addTourValueTypeFromCheckbox(_chkData_TimeSlice_Training,              TourValueType.TIME_SLICES__TRAINING,               tourValueTypes);
             }
 
-            DialogUtils.addTourValueTypeFromCheckbox(_chkData_Tour_Calories,           TourValueType.TOUR__CALORIES,                tourValueTypes);
-            DialogUtils.addTourValueTypeFromCheckbox(_chkData_Tour_Markers,            TourValueType.TOUR__MARKER,                  tourValueTypes);
-            DialogUtils.addTourValueTypeFromCheckbox(_chkData_Tour_ImportFileLocation, TourValueType.TOUR__IMPORT_FILE_LOCATION,    tourValueTypes);
+            DialogUtils.addTourValueTypeFromCheckbox(_chkData_Tour_Calories,           TourValueType.TOUR__CALORIES,             tourValueTypes);
+            DialogUtils.addTourValueTypeFromCheckbox(_chkData_Tour_Markers,            TourValueType.TOUR__MARKER,               tourValueTypes);
+            DialogUtils.addTourValueTypeFromCheckbox(_chkData_Tour_ImportFileLocation, TourValueType.TOUR__IMPORT_FILE_LOCATION, tourValueTypes);
 
 // SET_FORMATTING_ON
          }
@@ -1153,7 +1153,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       _chkData_TimeSlice_PowerAndSpeed.setSelection(false);
       _chkData_TimeSlice_RunningDynamics.setSelection(false);
       _chkData_TimeSlice_Swimming.setSelection(false);
-      _chkData_TimeSlice_Temperature.setSelection(false);
+      _chkData_TimeSlice_TemperatureFromDevice.setSelection(false);
       _chkData_TimeSlice_TourTimerPauses.setSelection(false);
       _chkData_TimeSlice_Training.setSelection(false);
 
@@ -1221,30 +1221,30 @@ public class DialogReimportTours extends TitleAreaDialog {
       Util.getStateDate(_state, STATE_REIMPORT_TOURS_BETWEEN_DATES_UNTIL, LocalDate.now(), _dtTourDate_Until);
 
       // Data to re-import
-      final boolean isReimportEntireTour = _state.getBoolean(STATE_IS_IMPORT_ENTIRE_TOUR);
-      _chkData_AllTimeSlices              .setSelection(_state.getBoolean(STATE_IS_IMPORT_ALL_TIME_SLICES));
-      _rdoData_EntireTour                 .setSelection(isReimportEntireTour);
-      _rdoData_PartOfATour                .setSelection(isReimportEntireTour == false);
+      final boolean isReimportEntireTour =     _state.getBoolean(STATE_IS_IMPORT_ENTIRE_TOUR);
+      _chkData_AllTimeSlices                  .setSelection(_state.getBoolean(STATE_IS_IMPORT_ALL_TIME_SLICES));
+      _rdoData_EntireTour                     .setSelection(isReimportEntireTour);
+      _rdoData_PartOfATour                    .setSelection(isReimportEntireTour == false);
 
-      _chkData_Tour_Calories              .setSelection(_state.getBoolean(STATE_IS_IMPORT_TOUR__CALORIES));
-      _chkData_Tour_ImportFileLocation    .setSelection(_state.getBoolean(STATE_IS_IMPORT_TOUR__FILE_LOCATION));
-      _chkData_Tour_Markers               .setSelection(_state.getBoolean(STATE_IS_IMPORT_TOUR__MARKERS));
+      _chkData_Tour_Calories                  .setSelection(_state.getBoolean(STATE_IS_IMPORT_TOUR__CALORIES));
+      _chkData_Tour_ImportFileLocation        .setSelection(_state.getBoolean(STATE_IS_IMPORT_TOUR__FILE_LOCATION));
+      _chkData_Tour_Markers                   .setSelection(_state.getBoolean(STATE_IS_IMPORT_TOUR__MARKERS));
 
-      _chkData_TimeSlice_Battery          .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__BATTERY));
-      _chkData_TimeSlice_Cadence          .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__CADENCE));
-      _chkData_TimeSlice_Elevation        .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__ELEVATION));
-      _chkData_TimeSlice_Gear             .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__GEAR));
-      _chkData_TimeSlice_PowerAndPulse    .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__POWER_AND_PULSE));
-      _chkData_TimeSlice_PowerAndSpeed    .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__POWER_AND_SPEED));
-      _chkData_TimeSlice_RunningDynamics  .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__RUNNING_DYNAMICS));
-      _chkData_TimeSlice_Swimming         .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__SWIMMING));
-      _chkData_TimeSlice_Temperature      .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__TEMPERATURE));
-      _chkData_TimeSlice_Training         .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__TRAINING));
-      _chkData_TimeSlice_TourTimerPauses  .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__TIMER_PAUSES));
+      _chkData_TimeSlice_Battery              .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__BATTERY));
+      _chkData_TimeSlice_Cadence              .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__CADENCE));
+      _chkData_TimeSlice_Elevation            .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__ELEVATION));
+      _chkData_TimeSlice_Gear                 .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__GEAR));
+      _chkData_TimeSlice_PowerAndPulse        .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__POWER_AND_PULSE));
+      _chkData_TimeSlice_PowerAndSpeed        .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__POWER_AND_SPEED));
+      _chkData_TimeSlice_RunningDynamics      .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__RUNNING_DYNAMICS));
+      _chkData_TimeSlice_Swimming             .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__SWIMMING));
+      _chkData_TimeSlice_TemperatureFromDevice.setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__TEMPERATURE_FROMDEVICE));
+      _chkData_TimeSlice_Training             .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__TRAINING));
+      _chkData_TimeSlice_TourTimerPauses      .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__TIMER_PAUSES));
 
       // Skip tours for which the import file is not found
-      _chkSkipTours_With_ImportFile_NotFound .setSelection(_state.getBoolean(STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND));
-      _chkLogDetails                         .setSelection(_state.getBoolean(STATE_IS_LOG_DETAILS));
+      _chkSkipTours_With_ImportFile_NotFound  .setSelection(_state.getBoolean(STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND));
+      _chkLogDetails                          .setSelection(_state.getBoolean(STATE_IS_LOG_DETAILS));
 
       enableControls();
 
@@ -1270,18 +1270,18 @@ public class DialogReimportTours extends TitleAreaDialog {
       _state.put(STATE_IS_IMPORT_TOUR__FILE_LOCATION,          _chkData_Tour_ImportFileLocation.getSelection());
       _state.put(STATE_IS_IMPORT_TOUR__MARKERS,                _chkData_Tour_Markers.getSelection());
 
-      _state.put(STATE_IS_IMPORT_ALL_TIME_SLICES,              _chkData_AllTimeSlices.getSelection());
-      _state.put(STATE_IS_IMPORT_TIME_SLICE__BATTERY,          _chkData_TimeSlice_Battery.getSelection());
-      _state.put(STATE_IS_IMPORT_TIME_SLICE__CADENCE,          _chkData_TimeSlice_Cadence.getSelection());
-      _state.put(STATE_IS_IMPORT_TIME_SLICE__ELEVATION,        _chkData_TimeSlice_Elevation.getSelection());
-      _state.put(STATE_IS_IMPORT_TIME_SLICE__GEAR,             _chkData_TimeSlice_Gear.getSelection());
-      _state.put(STATE_IS_IMPORT_TIME_SLICE__POWER_AND_PULSE,  _chkData_TimeSlice_PowerAndPulse.getSelection());
-      _state.put(STATE_IS_IMPORT_TIME_SLICE__POWER_AND_SPEED,  _chkData_TimeSlice_PowerAndSpeed.getSelection());
-      _state.put(STATE_IS_IMPORT_TIME_SLICE__RUNNING_DYNAMICS, _chkData_TimeSlice_RunningDynamics.getSelection());
-      _state.put(STATE_IS_IMPORT_TIME_SLICE__SWIMMING,         _chkData_TimeSlice_Swimming.getSelection());
-      _state.put(STATE_IS_IMPORT_TIME_SLICE__TEMPERATURE,      _chkData_TimeSlice_Temperature.getSelection());
-      _state.put(STATE_IS_IMPORT_TIME_SLICE__TIMER_PAUSES,     _chkData_TimeSlice_TourTimerPauses.getSelection());
-      _state.put(STATE_IS_IMPORT_TIME_SLICE__TRAINING,         _chkData_TimeSlice_Training.getSelection());
+      _state.put(STATE_IS_IMPORT_ALL_TIME_SLICES,                    _chkData_AllTimeSlices.getSelection());
+      _state.put(STATE_IS_IMPORT_TIME_SLICE__BATTERY,                _chkData_TimeSlice_Battery.getSelection());
+      _state.put(STATE_IS_IMPORT_TIME_SLICE__CADENCE,                _chkData_TimeSlice_Cadence.getSelection());
+      _state.put(STATE_IS_IMPORT_TIME_SLICE__ELEVATION,              _chkData_TimeSlice_Elevation.getSelection());
+      _state.put(STATE_IS_IMPORT_TIME_SLICE__GEAR,                   _chkData_TimeSlice_Gear.getSelection());
+      _state.put(STATE_IS_IMPORT_TIME_SLICE__POWER_AND_PULSE,        _chkData_TimeSlice_PowerAndPulse.getSelection());
+      _state.put(STATE_IS_IMPORT_TIME_SLICE__POWER_AND_SPEED,        _chkData_TimeSlice_PowerAndSpeed.getSelection());
+      _state.put(STATE_IS_IMPORT_TIME_SLICE__RUNNING_DYNAMICS,       _chkData_TimeSlice_RunningDynamics.getSelection());
+      _state.put(STATE_IS_IMPORT_TIME_SLICE__SWIMMING,               _chkData_TimeSlice_Swimming.getSelection());
+      _state.put(STATE_IS_IMPORT_TIME_SLICE__TEMPERATURE_FROMDEVICE, _chkData_TimeSlice_TemperatureFromDevice.getSelection());
+      _state.put(STATE_IS_IMPORT_TIME_SLICE__TIMER_PAUSES,           _chkData_TimeSlice_TourTimerPauses.getSelection());
+      _state.put(STATE_IS_IMPORT_TIME_SLICE__TRAINING,               _chkData_TimeSlice_Training.getSelection());
 
       // Skip tours for which the import file is not found
       _state.put(STATE_IS_SKIP_TOURS_WITH_IMPORTFILE_NOTFOUND, _chkSkipTours_With_ImportFile_NotFound.getSelection());

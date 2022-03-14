@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -681,7 +681,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       } else if (name.equals(TAG_MT_TOUR_TEMPERATURE)) {
 
-         _tourData.setAvgTemperature(getFloatValue(charData));
+         _tourData.setWeather_Temperature_Average_Device(getFloatValue(charData));
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_WEATHER)) {
@@ -691,17 +691,17 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       } else if (name.equals(TAG_MT_TOUR_WEATHER_CLOUDS)) {
 
-         _tourData.setWeatherClouds(charData);
+         _tourData.setWeather_Clouds(charData);
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_WEATHER_WIND_DIR)) {
 
-         _tourData.setWeatherWindDir(getIntValue(charData));
+         _tourData.setWeather_Wind_Direction(getIntValue(charData));
          _isInMT_Tour = false;
 
       } else if (name.equals(TAG_MT_TOUR_WEATHER_WIND_SPEED)) {
 
-         _tourData.setWeatherWindSpeed(getIntValue(charData));
+         _tourData.setWeather_Wind_Speed(getIntValue(charData));
          _isInMT_Tour = false;
       }
    }

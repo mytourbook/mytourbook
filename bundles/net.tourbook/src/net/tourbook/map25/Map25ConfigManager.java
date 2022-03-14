@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -124,13 +124,13 @@ public class Map25ConfigManager {
    private static final String ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW    = "directionArrow";        //$NON-NLS-1$
    //
    public static final RGB     DEFAULT_OUTLINE_COLOR                   = new RGB(0x80, 0x0, 0x80);
-   public static final int     DEFAULT_OUTLINE_OPACITY                 = 70;
+   public static final int     DEFAULT_OUTLINE_OPACITY                 = 180;                     // 70 %
    public static final float   DEFAULT_OUTLINE_WIDTH                   = 2.5f;
    public static final boolean DEFAULT_OUTLINE_IS_SHOW_DIRECTION_ARROW = false;
-   public static final int     OUTLINE_OPACITY_MIN                     = 1;
-   public static final int     OUTLINE_OPACITY_MAX                     = 100;
-   public static final float   OUTLINE_WIDTH_MIN                       = 0.1f;
-   public static final float   OUTLINE_WIDTH_MAX                       = 20.0f;
+   public static final int     OUTLINE_OPACITY_MIN                     = 26;                      // 10 %;
+   public static final int     OUTLINE_OPACITY_MAX                     = 0xff;
+   public static final int     OUTLINE_WIDTH_MIN                       = 1;
+   public static final int     OUTLINE_WIDTH_MAX                       = 20;
    //
    // slider location/path
    private static final String TAG_SLIDER_PATH                     = "SliderPath";             //$NON-NLS-1$
@@ -144,23 +144,23 @@ public class Map25ConfigManager {
    private static final String ATTR_SLIDER_PATH_OPACITY            = "sliderPath_Opacity";     //$NON-NLS-1$
    //
    public static final boolean DEFAULT_IS_SHOW_SLIDER_PATH         = true;
-   public static final int     DEFAULT_SLIDER_LOCATION_OPACITY     = 100;
+   public static final int     DEFAULT_SLIDER_LOCATION_OPACITY     = 0xff;
    public static final int     DEFAULT_SLIDER_LOCATION_SIZE        = 30;
    public static final RGB     DEFAULT_SLIDER_LOCATION_LEFT_COLOR  = new RGB(0xff, 0x0, 0x0);
    public static final RGB     DEFAULT_SLIDER_LOCATION_RIGHT_COLOR = new RGB(0x0, 0xff, 0x0);
-   public static final int     SLIDER_LOCATION_OPACITY_MIN         = 1;
-   public static final int     SLIDER_LOCATION_OPACITY_MAX         = 100;
+   public static final int     SLIDER_LOCATION_OPACITY_MIN         = 26;                       //10 %;
+   public static final int     SLIDER_LOCATION_OPACITY_MAX         = 0xff;
    public static final int     SLIDER_LOCATION_SIZE_MIN            = 10;
    public static final int     SLIDER_LOCATION_SIZE_MAX            = 100;
    //
    public static final boolean DEFAULT_IS_SHOW_CHART_SLIDER        = true;
    public static final RGB     DEFAULT_SLIDER_PATH_COLOR           = new RGB(0xff, 0xff, 0x0);
    public static final float   DEFAULT_SLIDER_PATH_LINE_WIDTH      = 20.0f;
-   public static final int     DEFAULT_SLIDER_PATH_OPACITY         = 30;
-   public static float         SLIDER_PATH_LINE_WIDTH_MIN          = 1.0f;
-   public static final float   SLIDER_PATH_LINE_WIDTH_MAX          = 50.0f;
-   public static final int     SLIDER_PATH_OPACITY_MIN             = 1;
-   public static final int     SLIDER_PATH_OPACITY_MAX             = 100;
+   public static final int     DEFAULT_SLIDER_PATH_OPACITY         = 77;                       // 30 %
+   public static final int     SLIDER_PATH_LINE_WIDTH_MIN          = 1;
+   public static final int     SLIDER_PATH_LINE_WIDTH_MAX          = 50;
+   public static final int     SLIDER_PATH_OPACITY_MIN             = 52;                       // 20%
+   public static final int     SLIDER_PATH_OPACITY_MAX             = 0xff;
    //
    // other properties
    public static final int DEFAULT_ANIMATION_TIME = 2000;
@@ -228,14 +228,14 @@ public class Map25ConfigManager {
    //
    // colors
    public static final RGB   DEFAULT_CLUSTER_FILL_COLOR      = new RGB(0xFC, 0x67, 0x00);
-   public static final int   DEFAULT_CLUSTER_FILL_OPACITY    = 80;
+   public static final int   DEFAULT_CLUSTER_FILL_OPACITY    = 200;                      // 80%;
    public static final RGB   DEFAULT_CLUSTER_OUTLINE_COLOR   = new RGB(0xff, 0xff, 0xff);
-   public static final int   DEFAULT_CLUSTER_OUTLINE_OPACITY = 80;
+   public static final int   DEFAULT_CLUSTER_OUTLINE_OPACITY = 200;                      // 80%;
    public static final float DEFAULT_CLUSTER_OUTLINE_SIZE    = 2.0f;
    public static final RGB   DEFAULT_MARKER_FILL_COLOR       = new RGB(0xFF, 0xFF, 0x00);
-   public static final int   DEFAULT_MARKER_FILL_OPACITY     = 80;
+   public static final int   DEFAULT_MARKER_FILL_OPACITY     = 200;                      // 80%;
    public static final RGB   DEFAULT_MARKER_OUTLINE_COLOR    = new RGB(0, 0, 0);
-   public static final int   DEFAULT_MARKER_OUTLINE_OPACITY  = 80;
+   public static final int   DEFAULT_MARKER_OUTLINE_OPACITY  = 200;                      // 80%;
    //
    // map movement with animation
    private static final Easing.Type ANIMATION_EASING_TYPE_DEFAULT   = Easing.Type.SINE_INOUT;

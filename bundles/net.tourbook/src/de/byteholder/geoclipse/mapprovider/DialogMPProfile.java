@@ -280,18 +280,21 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
    @Override
    public void actionZoomIn() {
+
       _map.setZoom(_map.getZoom() + 1);
       _map.paint();
    }
 
    @Override
    public void actionZoomOut() {
+
       _map.setZoom(_map.getZoom() - 1);
       _map.paint();
    }
 
    @Override
    public void actionZoomOutToMinZoom() {
+
       _map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
       _map.paint();
    }
@@ -2205,6 +2208,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
       final GeoPosition mapCenter = _map.getMapGeoCenter();
 
       if (mapZoom < factoryMinZoom) {
+
          _map.setZoom(factoryMinZoom);
          _map.setMapCenter(mapCenter);
       }

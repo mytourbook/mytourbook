@@ -127,6 +127,11 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK,       DayOfWeek.MONDAY.getValue());
       store.setDefault(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK,  4);
 
+      /*
+       * Transform values
+       */
+      store.setDefault(ICommonPreferences.TRANSFORM_VALUE_OPACITY_MAX,           10);
+
 // SET_FORMATTING_ON
    }
 }

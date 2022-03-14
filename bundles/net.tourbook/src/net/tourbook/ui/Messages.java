@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -477,7 +477,7 @@ public class Messages extends NLS {
    public static String        ColumnFactory_TourStartTime_Tooltip;
    public static String        ColumnFactory_TourTimeDiff_Header;
    public static String        ColumnFactory_TourTimeDiff_Label;
-   public static String        ColumnFactory_TourTimeDiff_Tooltip;
+   public static String        ColumnFactory_TourTimeDiff_Tooltip_2;
    public static String        ColumnFactory_TourTypeText_Header;
    public static String        ColumnFactory_TourTypeText_Label;
    public static String        ColumnFactory_TourWeekYear_Header;
@@ -542,6 +542,7 @@ public class Messages extends NLS {
    public static String        Tour_Marker_Column_IsVisibleNoEdit_Tooltip;
 
    public static String        Tour_Tooltip_Action_EditFormatPreferences;
+   public static String        Tour_Tooltip_Format_AverageTemperatures_Tooltip;
    public static String        Tour_Tooltip_Format_DateWeekTime;
    public static String        Tour_Tooltip_Format_HistoryDateTime;
    public static String        Tour_Tooltip_Format_Pace;
@@ -599,6 +600,7 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_RunDyn_VerticalRatio_Min;
    public static String        Tour_Tooltip_Label_Tags;
    public static String        Tour_Tooltip_Label_Temperature;
+   public static String        Tour_Tooltip_Label_Temperature_FromDevice;
    public static String        Tour_Tooltip_Label_TimeZone;
    public static String        Tour_Tooltip_Label_TimeZoneDifference;
    public static String        Tour_Tooltip_Label_TourType;

@@ -1,0 +1,17 @@
+22.2.1                                                 24. February 2022
+
+
+Bugfix
+======
+
+* 2D Map
+  - Fixed 2 NPE which were caused when saving manual tours
+
+
+ Issues
+ ======
+  
+* Suunto Integration (Frederic)   
+  - Added leading zeros to month, day, hour and minutes in the downloaded file names 
+    https://sourceforge.net/p/mytourbook/feature-requests/198/
+  - Fixed the activity name mapping in the downloaded file names

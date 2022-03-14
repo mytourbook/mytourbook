@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,7 +32,7 @@ public class ActionZoomShowEntireMap extends Action {
 
       _mapView = mapView;
 
-      setToolTipText(Messages.map_action_zoom_show_all);
+      setText(Messages.Map_Action_ShowEarthMap);
 
       setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Zoom_ShowEntireMap));
    }

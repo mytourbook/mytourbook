@@ -16,7 +16,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.map25.layer.marker;
 
 import java.awt.Point;
@@ -31,6 +30,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map25.layer.marker.cluster.ClusterMarkerRenderer;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.ImageQuality;
 import net.tourbook.photo.ImageUtils;
@@ -54,10 +54,8 @@ import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Color;
 import org.oscim.backend.canvas.Paint;
 import org.oscim.core.GeoPoint;
-import org.oscim.layers.marker.ClusterMarkerRenderer;
 import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerInterface;
-//import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.marker.MarkerRendererFactory;
 import org.oscim.layers.marker.MarkerSymbol;
@@ -68,7 +66,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 //   public static final int               IMAGE_SIZE_MEDIUM        = 320;
 //   public static final int               IMAGE_SIZE_LARGE         = 320;
 
-   private Bitmap _bitmapCluster;
+   private Bitmap               _bitmapCluster;
    //private boolean _isBillboard;
    public MarkerSymbol          _symbol;               //marker symbol, circle or star
    private Bitmap               _bitmapPhoto;          //normaly the photo as Bitmap
@@ -83,7 +81,6 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 
    public boolean               _isPhotoShowScaled;
    Display                      _display;
-
 
 //   private int  _imageSize;
 //   private static final String      STATE_PHOTO_PROPERTIES_IMAGE_SIZE      = "STATE_PHOTO_PROPERTIES_IMAGE_SIZE";       //$NON-NLS-1$
@@ -138,7 +135,6 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
          }
       };
    }
-
 
    public MarkerSymbol createPhotoBitmapFromPhoto(final Photo photo, final MarkerItem item, final boolean showPhotoTitle) {
 
@@ -384,7 +380,6 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       //showPhoto(_allPhotos.get(index));
       return false;
    }
-
 
    public void showPhoto(final Photo photo) {
 
