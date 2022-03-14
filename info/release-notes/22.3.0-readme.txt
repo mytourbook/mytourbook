@@ -43,6 +43,13 @@ Changes
 * 2D Map
   - Moved action "Show earth map" from the toolbar into the map context menu
 
+Bugfix
+======
+
+* Suunto Integration (Frederic)   
+  - Removing only the characters forbidden for each OS when downloading activities
+    https://sourceforge.net/p/mytourbook/feature-requests/198/#e0fb
+
 
 Translation    
 ===========
