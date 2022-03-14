@@ -47,6 +47,9 @@ import org.apache.http.client.utils.URIBuilder;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 
+//todo fb update unit tests
+//clean up files ,sonarlint....
+
 /**
  * A class that retrieves, for a given track, the historical weather data.
  */
@@ -80,8 +83,6 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    private final IPreferenceStore prefStore    = TourbookPlugin.getPrefStore();
    private Data                   weatherData  = null;
 
-   // private List<Hourly>           hourlyFiltered;
-
    /*
     * @param tour
     * The tour for which we need to retrieve the weather data.
@@ -98,7 +99,6 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       tourEndTime = tour.getTourEndTimeMS() / 1000;
       tourMiddleTime = tourStartTime + ((tourEndTime - tourStartTime) / 2);
    }
-   //todo fb + 86400L       endDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime().plusSeconds(tour.getTourDeviceTime_Elapsed())); //$NON-NLS-1$
 
    public static String getApiUrl() {
       return baseApiUrl + keyParameter;

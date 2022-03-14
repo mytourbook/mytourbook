@@ -75,7 +75,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          final String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                (float) hourly.getTemp(),
                (float) hourly.getFeels_like(),
-               (float) hourly.getWind_speed(),
+               (float) hourly.getWind_speedKmph(),
                hourly.getWind_deg(),
                hourly.getHumidity(),
                hourly.getRain(),

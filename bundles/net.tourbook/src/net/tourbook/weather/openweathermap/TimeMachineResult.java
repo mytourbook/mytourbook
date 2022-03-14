@@ -113,6 +113,18 @@ public class TimeMachineResult {
       return 0;
    }
 
+   public float getAveragePrecipitation() {
+
+      final OptionalDouble averagePrecipitation =
+            hourly.stream().mapToDouble(Hourly::getRain).average();
+
+      if (averagePrecipitation.isPresent()) {
+         return roundDoubleToFloat(averagePrecipitation.getAsDouble());
+      }
+
+      return 0;
+   }
+
    public float getAveragePressure() {
 
       final OptionalDouble averagePressure =
@@ -137,6 +149,42 @@ public class TimeMachineResult {
       return 0;
    }
 
+   public float getAverageWindChill() {
+
+      final OptionalDouble averageWindChill =
+            hourly.stream().mapToDouble(Hourly::getFeels_like).average();
+
+      if (averageWindChill.isPresent()) {
+         return roundDoubleToFloat(averageWindChill.getAsDouble());
+      }
+
+      return 0;
+   }
+
+   public int getAverageWindDirection() {
+
+      final OptionalDouble averageWindDirection =
+            hourly.stream().mapToDouble(Hourly::getWind_deg).average();
+
+      if (averageWindDirection.isPresent()) {
+         return (int) Math.round(averageWindDirection.getAsDouble());
+      }
+
+      return 0;
+   }
+
+   public int getAverageWindSpeed() {
+
+      final OptionalDouble averageWindSpeed =
+            hourly.stream().mapToDouble(Hourly::getWind_speedKmph).average();
+
+      if (averageWindSpeed.isPresent()) {
+         return (int) Math.round(averageWindSpeed.getAsDouble());
+      }
+
+      return 0;
+   }
+
    private Weather getCurrentWeather() {
 
       final List<Weather> currentWeather = middleHourly.getWeather();
@@ -149,18 +197,6 @@ public class TimeMachineResult {
 
    public List<Hourly> getHourly() {
       return hourly;
-   }
-
-   public float getAveragePrecipitation() {
-
-      final OptionalDouble averagePrecipitation =
-            hourly.stream().mapToDouble(Hourly::getRain).average();
-
-      if (averagePrecipitation.isPresent()) {
-         return roundDoubleToFloat(averagePrecipitation.getAsDouble());
-      }
-
-      return 0;
    }
 
    public float getTemperatureAverage() {
@@ -247,42 +283,6 @@ public class TimeMachineResult {
       }
 
       return weatherType;
-   }
-
-   public float getAverageWindChill() {
-
-      final OptionalDouble averageWindChill =
-            hourly.stream().mapToDouble(Hourly::getFeels_like).average();
-
-      if (averageWindChill.isPresent()) {
-         return roundDoubleToFloat(averageWindChill.getAsDouble());
-      }
-
-      return 0;
-   }
-
-   public int getAverageWindDirection() {
-
-      final OptionalDouble averageWindDirection =
-            hourly.stream().mapToDouble(Hourly::getWind_deg).average();
-
-      if (averageWindDirection.isPresent()) {
-         return (int) Math.round(averageWindDirection.getAsDouble());
-      }
-
-      return 0;
-   }
-
-   public int getAverageWindSpeed() {
-
-      final OptionalDouble averageWindSpeed =
-            hourly.stream().mapToDouble(Hourly::getWind_speed).average();
-
-      if (averageWindSpeed.isPresent()) {
-         return (int) Math.round(averageWindSpeed.getAsDouble());
-      }
-
-      return 0;
    }
 
    private float roundDoubleToFloat(final double value) {

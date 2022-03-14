@@ -82,4 +82,8 @@ public class Hourly {
    public double getWind_speed() {
       return wind_speed;
    }
+
+   public double getWind_speedKmph() {
+      return wind_speed * 3.6;
+   }
 }
