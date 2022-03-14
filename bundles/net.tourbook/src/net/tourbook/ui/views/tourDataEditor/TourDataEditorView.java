@@ -621,9 +621,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Label              _lblTimeZone;
    private Label              _lblWeather_PrecipitationUnit;
    private Label              _lblWeather_PressureUnit;
+   private Label              _lblWeather_SnowfallUnit;
    private Label              _lblWeather_TemperatureUnit_Avg;
+   private Label              _lblWeather_TemperatureUnit_Avg_Device;
    private Label              _lblWeather_TemperatureUnit_Max;
+   private Label              _lblWeather_TemperatureUnit_Max_Device;
    private Label              _lblWeather_TemperatureUnit_Min;
+   private Label              _lblWeather_TemperatureUnit_Min_Device;
    private Label              _lblWeather_TemperatureUnit_WindChill;
    //
    private Link               _linkDefaultTimeZone;
@@ -4423,16 +4427,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _txtWeather_Temperature_Average_Device = _tk.createText(
                   container,
                   UI.EMPTY_STRING,
-                  SWT.TRAIL);
+                  SWT.READ_ONLY);
             GridDataFactory
                   .fillDefaults()//
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_txtWeather_Temperature_Average_Device);
-            _txtWeather_Temperature_Average_Device.setEnabled(false);
 
             // label: celsius, fahrenheit
-            _lblWeather_TemperatureUnit_Avg = _tk.createLabel(
+            _lblWeather_TemperatureUnit_Avg_Device = _tk.createLabel(
                   container,
                   UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
             _lblWeather_TemperatureUnit_Avg.setToolTipText(
@@ -4447,8 +4450,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _txtWeather_Temperature_Max_Device = _tk.createText(
                   container,
                   UI.EMPTY_STRING,
-                  SWT.TRAIL);
-            _txtWeather_Temperature_Max_Device.setEnabled(false);
+                  SWT.READ_ONLY);
 
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
@@ -4456,7 +4458,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .applyTo(_txtWeather_Temperature_Max_Device);
 
             // unit
-            _lblWeather_TemperatureUnit_Max = _tk.createLabel(
+            _lblWeather_TemperatureUnit_Max_Device = _tk.createLabel(
                   container,
                   UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
             _lblWeather_TemperatureUnit_Max.setToolTipText(
@@ -4471,8 +4473,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _txtWeather_Temperature_Min_Device = _tk.createText(
                   container,
                   UI.EMPTY_STRING,
-                  SWT.TRAIL);
-            _txtWeather_Temperature_Min_Device.setEnabled(false);
+                  SWT.READ_ONLY);
 
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
@@ -4480,7 +4481,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .applyTo(_txtWeather_Temperature_Min_Device);
 
             // unit
-            _lblWeather_TemperatureUnit_Min = _tk.createLabel(
+            _lblWeather_TemperatureUnit_Min_Device = _tk.createLabel(
                   container,
                   UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
             _lblWeather_TemperatureUnit_Min.setToolTipText(
@@ -4589,15 +4590,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          /*
           * Snowfall
           */
-         Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Snowfall);
+         final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Snowfall);
          label.setToolTipText(Messages.Tour_Editor_Label_Snowfall_Tooltip);
          _secondColumnControls.add(label);
 
          // spinner: humidity value
          _spinWeather_SnowfallValue = new Spinner(container, SWT.BORDER);
          _spinWeather_SnowfallValue.setToolTipText(Messages.Tour_Editor_Label_Snowfall_Tooltip);
-         _spinWeather_SnowfallValue.setMinimum(0);
-         _spinWeather_SnowfallValue.setMaximum(100);
+         _spinWeather_SnowfallValue.setMaximum(10000);
          _spinWeather_SnowfallValue.addMouseWheelListener(_mouseWheelListener);
          _spinWeather_SnowfallValue.addSelectionListener(_selectionListener);
 
@@ -4608,7 +4608,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                .applyTo(_spinWeather_SnowfallValue);
 
          // label: mm, inches
-         label = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+         _lblWeather_SnowfallUnit = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       }
    }
 
@@ -8510,10 +8510,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          _tourData.setWeather_Pressure(UI.convertPressure_ToMetric(pressure));
 
-         final int precipitation = _spinWeather_PrecipitationValue.getSelection();
+         final float precipitation = _spinWeather_PrecipitationValue.getSelection() / 100f;
          _tourData.setWeather_Precipitation(UI.convertPrecipitation_ToMetric(precipitation));
 
-         final int snowfall = _spinWeather_SnowfallValue.getSelection();
+         final float snowfall = _spinWeather_SnowfallValue.getSelection() / 100f;
          _tourData.setWeather_Snowfall(UI.convertPrecipitation_ToMetric(snowfall));
 
          if (_isWindSpeedManuallyModified) {
@@ -9071,13 +9071,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       final float precipitation = UI.convertPrecipitation_FromMetric(_tourData.getWeather_Precipitation());
 
-      if (UI.UNIT_IS_LENGTH_SMALL_MILLIMETER) {
-         _spinWeather_PrecipitationValue.setDigits(0);
-         _spinWeather_PrecipitationValue.setSelection(Math.round(precipitation));
-      } else {
-         _spinWeather_PrecipitationValue.setDigits(2);
-         _spinWeather_PrecipitationValue.setSelection(Math.round(precipitation));
-      }
+      _spinWeather_PrecipitationValue.setDigits(2);
+      _spinWeather_PrecipitationValue.setSelection(Math.round(precipitation * 100));
       _spinWeather_PrecipitationValue.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
 
       /*
@@ -9085,13 +9080,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       final float snowfall = UI.convertPrecipitation_FromMetric(_tourData.getWeather_Snowfall());
 
-      if (UI.UNIT_IS_LENGTH_SMALL_MILLIMETER) {
-         _spinWeather_SnowfallValue.setDigits(0);
-         _spinWeather_SnowfallValue.setSelection(Math.round(snowfall));
-      } else {
-         _spinWeather_SnowfallValue.setDigits(2);
-         _spinWeather_SnowfallValue.setSelection(Math.round(snowfall));
-      }
+      _spinWeather_SnowfallValue.setDigits(2);
+      _spinWeather_SnowfallValue.setSelection(Math.round(snowfall * 100));
       _spinWeather_SnowfallValue.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
 
       /*
@@ -9191,10 +9181,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _lblPerson_BodyFatUnit.setText(UI.UNIT_PERCENT);
       _lblWeather_PrecipitationUnit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       _lblWeather_PressureUnit.setText(UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG);
+      _lblWeather_SnowfallUnit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       _lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
-      _lblWeather_TemperatureUnit_Avg.setText(UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
-      _lblWeather_TemperatureUnit_Max.setText(UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
-      _lblWeather_TemperatureUnit_Min.setText(UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+      final String averageTemperatureUnit = UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+      _lblWeather_TemperatureUnit_Avg.setText(averageTemperatureUnit);
+      _lblWeather_TemperatureUnit_Avg_Device.setText(averageTemperatureUnit);
+      final String maxTemperatureUnit = UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+      _lblWeather_TemperatureUnit_Max.setText(maxTemperatureUnit);
+      _lblWeather_TemperatureUnit_Max_Device.setText(maxTemperatureUnit);
+      final String minTemperatureUnit = UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+      _lblWeather_TemperatureUnit_Min.setText(minTemperatureUnit);
+      _lblWeather_TemperatureUnit_Min_Device.setText(minTemperatureUnit);
       _lblWeather_TemperatureUnit_WindChill.setText(UI.SYMBOL_TILDE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
 
       // cadence rpm/spm

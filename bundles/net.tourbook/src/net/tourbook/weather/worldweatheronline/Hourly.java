@@ -19,12 +19,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
 
 /**
@@ -75,7 +75,7 @@ public class Hourly {
     */
    private String            precipMM;
 
-   public long getEpochSeconds(final ZoneId zoneId) {
+   public long getEpochSeconds() {
 
       if (StringUtils.isNullOrEmpty(utcTime)) {
          return 0;
@@ -92,7 +92,7 @@ public class Hourly {
       final ZonedDateTime zonedDateTime = LocalDateTime.parse(
             dateTime,
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) //$NON-NLS-1$
-            .atZone(zoneId);
+            .atZone(TimeTools.UTC);
 
       final long timeEpochSeconds = zonedDateTime.toInstant().toEpochMilli() / 1000;
 
