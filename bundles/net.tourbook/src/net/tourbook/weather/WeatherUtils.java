@@ -34,8 +34,9 @@ public class WeatherUtils {
 
    /**
     * Returns the fully detailed weather data as a human readable string.
-    * Example: 17h(15.0°C, feels like 15.0°C, 5.0km/h from 68°, humidity 37%,
-    * precipitation 0.0mm, snowfall 0.0mm)
+    * Example:
+    * 12h 6°C feels like 3°C 12km/h from 84° humidity 97% pressure 1012mbar precipitation 3mm
+    * snowfall 0mm
     *
     * @param temperatureValue
     *           in Celsius
@@ -91,12 +92,12 @@ public class WeatherUtils {
 
       final String precipitation = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation
             + UI.SPACE
-            + String.format("%5s", FormatManager.formatTemperature(UI.convertPrecipitation_FromMetric(precipitationValue))) //$NON-NLS-1$
+            + String.format("%5s", roundDoubleToFloat(UI.convertPrecipitation_FromMetric(precipitationValue))) //$NON-NLS-1$
             + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
 
       final String snowFall = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall
             + UI.SPACE
-            + String.format("%5s", FormatManager.formatTemperature(UI.convertPrecipitation_FromMetric(snowFallValue))) //$NON-NLS-1$
+            + String.format("%5s", roundDoubleToFloat(UI.convertPrecipitation_FromMetric(snowFallValue))) //$NON-NLS-1$
             + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
 
       final String fullWeatherData = UI.EMPTY_STRING
@@ -209,13 +210,15 @@ public class WeatherUtils {
       }
 
       // Pressure
-      final float pressure = tourData.getWeather_Pressure();
-      if (pressure != Float.MIN_VALUE) {
+      if (displayPressure) {
+         final float pressure = tourData.getWeather_Pressure();
+         if (pressure != Float.MIN_VALUE) {
 
-         weatherDataList.add((int) pressure +
-               UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG +
-               UI.SPACE +
-               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Pressure);
+            weatherDataList.add((int) pressure +
+                  UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG +
+                  UI.SPACE +
+                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Pressure);
+         }
       }
 
       // Precipitation
@@ -224,7 +227,7 @@ public class WeatherUtils {
 
          weatherDataList.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation +
                UI.SPACE +
-               FormatManager.formatTemperature(UI.convertPrecipitation_FromMetric(precipitation)) +
+               roundDoubleToFloat(UI.convertPrecipitation_FromMetric(precipitation)) +
                UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       }
 
@@ -234,7 +237,7 @@ public class WeatherUtils {
 
          weatherDataList.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall +
                UI.SPACE +
-               FormatManager.formatTemperature(UI.convertPrecipitation_FromMetric(snowfall)) +
+               roundDoubleToFloat(UI.convertPrecipitation_FromMetric(snowfall)) +
                UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       }
 
