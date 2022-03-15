@@ -121,6 +121,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                hourly.getWindspeedKmph(),
                hourly.getWinddirDegree(),
                hourly.getHumidity(),
+               hourly.getPressure(),
                hourly.getPrecipMM(),
                0,
                tourDateTime);

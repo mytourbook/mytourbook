@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,7 +27,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class FormatManager {
 
-   private final static IPreferenceStore _prefStore                  = CommonActivator.getPrefStore();
+   private static final IPreferenceStore _prefStore                  = CommonActivator.getPrefStore();
 
    private static IValueFormatter        _valueFormatter_Number_1_0  = new ValueFormatter_Number_1_0();
    private static IValueFormatter        _valueFormatter_Number_1_1  = new ValueFormatter_Number_1_1();
@@ -44,6 +44,7 @@ public class FormatManager {
    private static IValueFormatter        _powerFormatter;
    private static IValueFormatter        _pulseFormatter;
    private static IValueFormatter        _speedFormatter;
+   private static IValueFormatter        _temperatureFormatter;
 
    private static IValueFormatter        _elapsedTimeFormatter;
    private static IValueFormatter        _recordedTimeFormatter;
@@ -57,6 +58,7 @@ public class FormatManager {
    private static IValueFormatter        _powerFormatter_Summary;
    private static IValueFormatter        _pulseFormatter_Summary;
    private static IValueFormatter        _speedFormatter_Summary;
+   private static IValueFormatter        _temperatureFormatter_Summary;
 
    private static IValueFormatter        _elapsedTimeFormatter_Summary;
    private static IValueFormatter        _recordedTimeFormatter_Summary;
@@ -189,6 +191,14 @@ public class FormatManager {
       return _speedFormatter_Summary.printDouble(value);
    }
 
+   public static String formatTemperature(final double value) {
+      return _temperatureFormatter.printDouble(value);
+   }
+
+   public static String formatTemperature_Summary(final double value) {
+      return _temperatureFormatter_Summary.printDouble(value);
+   }
+
    private static IValueFormatter getNumberFormatter(final String formatName) {
 
       if (formatName.equals(ValueFormat.NUMBER_1_0.name())) {
@@ -287,6 +297,7 @@ public class FormatManager {
       final String power                  = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_POWER);
       final String pulse                  = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE);
       final String speed                  = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED);
+      final String temperature            = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE);
 
       final String elapsedTime            = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME);
       final String recordedTime           = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME);
@@ -300,6 +311,7 @@ public class FormatManager {
       final String power_Summary          = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_POWER_SUMMARY);
       final String pulse_Summary          = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_PULSE_SUMMARY);
       final String speed_Summary          = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_SPEED_SUMMARY);
+      final String temperature_Summary    = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE_SUMMARY);
 
       final String elapsedTime_Summary    = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME_SUMMARY);
       final String recordedTime_Summary   = _prefStore.getString(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME_SUMMARY);
@@ -313,6 +325,7 @@ public class FormatManager {
       _powerFormatter                     = getNumberFormatter(power);
       _pulseFormatter                     = getNumberFormatter(pulse);
       _speedFormatter                     = getNumberFormatter(speed);
+      _temperatureFormatter               = getNumberFormatter(temperature);
 
       _elapsedTimeFormatter               = getTimeFormatter(elapsedTime);
       _recordedTimeFormatter              = getTimeFormatter(recordedTime);
@@ -326,6 +339,7 @@ public class FormatManager {
       _powerFormatter_Summary             = getNumberFormatter(power_Summary);
       _pulseFormatter_Summary             = getNumberFormatter(pulse_Summary);
       _speedFormatter_Summary             = getNumberFormatter(speed_Summary);
+      _temperatureFormatter_Summary       = getNumberFormatter(temperature_Summary);
 
       _elapsedTimeFormatter_Summary       = getTimeFormatter(elapsedTime_Summary);
       _recordedTimeFormatter_Summary      = getTimeFormatter(recordedTime_Summary);

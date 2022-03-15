@@ -78,6 +78,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                (float) hourly.getWind_speedKmph(),
                hourly.getWind_deg(),
                hourly.getHumidity(),
+               hourly.getPressure(),
                hourly.getRain(),
                hourly.getSnow(),
                tourDateTime);

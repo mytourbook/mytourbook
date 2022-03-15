@@ -34,6 +34,7 @@ public interface ICommonPreferences {
    public static final String DISPLAY_FORMAT_POWER                 = "DISPLAY_FORMAT_POWER";                 //$NON-NLS-1$
    public static final String DISPLAY_FORMAT_PULSE                 = "DISPLAY_FORMAT_PULSE";                 //$NON-NLS-1$
    public static final String DISPLAY_FORMAT_SPEED                 = "DISPLAY_FORMAT_SPEED";                 //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_TEMPERATURE           = "DISPLAY_FORMAT_TEMPERATURE";           //$NON-NLS-1$
 
    public static final String DISPLAY_FORMAT_ELAPSED_TIME          = "DISPLAY_FORMAT_ELAPSED_TIME";          //$NON-NLS-1$
    public static final String DISPLAY_FORMAT_RECORDED_TIME         = "DISPLAY_FORMAT_RECORDED_TIME";         //$NON-NLS-1$
@@ -47,6 +48,7 @@ public interface ICommonPreferences {
    public static final String DISPLAY_FORMAT_POWER_SUMMARY         = "DISPLAY_FORMAT_POWER_SUMMARY";         //$NON-NLS-1$
    public static final String DISPLAY_FORMAT_PULSE_SUMMARY         = "DISPLAY_FORMAT_PULSE_SUMMARY";         //$NON-NLS-1$
    public static final String DISPLAY_FORMAT_SPEED_SUMMARY         = "DISPLAY_FORMAT_SPEED_SUMMARY";         //$NON-NLS-1$
+   public static final String DISPLAY_FORMAT_TEMPERATURE_SUMMARY   = "DISPLAY_FORMAT_TEMPERATURE_SUMMARY";   //$NON-NLS-1$
 
    public static final String DISPLAY_FORMAT_ELAPSED_TIME_SUMMARY  = "DISPLAY_FORMAT_ELAPSED_TIME_SUMMARY";  //$NON-NLS-1$
    public static final String DISPLAY_FORMAT_RECORDED_TIME_SUMMARY = "DISPLAY_FORMAT_RECORDED_TIME_SUMMARY"; //$NON-NLS-1$

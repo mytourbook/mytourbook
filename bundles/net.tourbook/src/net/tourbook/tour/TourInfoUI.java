@@ -1746,16 +1746,23 @@ public class TourInfoUI {
       // Average temperature
       final float averageTemperatureValue = UI.convertTemperatureFromMetric(
             _tourData.getWeather_Temperature_Average());
+      final String formattedTemperatureValue = _tourData.isMultipleTours()
+            ? FormatManager.formatTemperature_Summary(averageTemperatureValue)
+            : FormatManager.formatTemperature(averageTemperatureValue);
       final String averageTemperature = _tourData.getWeather_Temperature_Average() > 0 ||
             _tourData.isWeatherDataFromProvider()
-                  ? _nf1.format(averageTemperatureValue) + UI.UNIT_LABEL_TEMPERATURE
+                  ? formattedTemperatureValue + UI.UNIT_LABEL_TEMPERATURE
                   : UI.EMPTY_STRING;
 
       final float temperatureFromDeviceValue = UI.convertTemperatureFromMetric(
             _tourData.getWeather_Temperature_Average_Device());
 
+      final String formattedTemperatureFromDeviceValue = _tourData.isMultipleTours()
+            ? FormatManager.formatTemperature_Summary(temperatureFromDeviceValue)
+            : FormatManager.formatTemperature(temperatureFromDeviceValue);
+
       final String averageTemperatureFromDevice = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0
-            ? UI.DASH + UI.SPACE2 + _nf1.format(temperatureFromDeviceValue) + UI.UNIT_LABEL_TEMPERATURE
+            ? UI.DASH + UI.SPACE2 + formattedTemperatureFromDeviceValue + UI.UNIT_LABEL_TEMPERATURE
             : UI.EMPTY_STRING;
 
       _lblTemperature.setText(averageTemperature);

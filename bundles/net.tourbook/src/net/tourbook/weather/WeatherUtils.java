@@ -24,6 +24,7 @@ import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.weather.IWeather;
@@ -60,21 +61,22 @@ public class WeatherUtils {
                                                    final float windSpeed,
                                                    final int windDirection,
                                                    final int humidityValue,
+                                                   final int pressureValue,
                                                    final float precipitationValue,
                                                    final float snowFallValue,
                                                    final TourDateTime tourDateTime) {
 
       final String tourTime = String.format("%3s", tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME); //$NON-NLS-1$
 
-      final String temperature = String.format("%5s", roundDoubleToFloat(UI.convertTemperatureFromMetric(temperatureValue))) //$NON-NLS-1$
+      final String temperature = String.format("%5s", FormatManager.formatTemperature(UI.convertTemperatureFromMetric(temperatureValue))) //$NON-NLS-1$
             + UI.UNIT_LABEL_TEMPERATURE;
 
       final String feelsLike = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
             UI.SPACE +
-            String.format("%5s", roundDoubleToFloat(UI.convertTemperatureFromMetric(windChill))) + //$NON-NLS-1$
+            String.format("%5s", FormatManager.formatTemperature(UI.convertTemperatureFromMetric(windChill))) + //$NON-NLS-1$
             UI.UNIT_LABEL_TEMPERATURE;
 
-      final String wind = String.format("%5s", roundDoubleToFloat(UI.convertSpeed_FromMetric(windSpeed))) + UI.UNIT_LABEL_SPEED + //$NON-NLS-1$
+      final String wind = String.format("%5s", FormatManager.formatTemperature(UI.convertSpeed_FromMetric(windSpeed))) + UI.UNIT_LABEL_SPEED + //$NON-NLS-1$
             UI.SPACE + Messages.Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection +
             UI.SPACE + String.format("%3d", windDirection) + UI.SYMBOL_DEGREE; //$NON-NLS-1$
 
@@ -82,14 +84,19 @@ public class WeatherUtils {
             UI.SPACE +
             String.format("%3s", humidityValue); //$NON-NLS-1$
 
+      final String pressure = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Pressure +
+            UI.SPACE +
+            String.format("%3s", pressureValue) + //$NON-NLS-1$
+            UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG;
+
       final String precipitation = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation
             + UI.SPACE
-            + String.format("%5s", roundDoubleToFloat(UI.convertPrecipitation_FromMetric(precipitationValue))) //$NON-NLS-1$
+            + String.format("%5s", FormatManager.formatTemperature(UI.convertPrecipitation_FromMetric(precipitationValue))) //$NON-NLS-1$
             + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
 
       final String snowFall = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall
             + UI.SPACE
-            + String.format("%5s", roundDoubleToFloat(UI.convertPrecipitation_FromMetric(snowFallValue))) //$NON-NLS-1$
+            + String.format("%5s", FormatManager.formatTemperature(UI.convertPrecipitation_FromMetric(snowFallValue))) //$NON-NLS-1$
             + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
 
       final String fullWeatherData = UI.EMPTY_STRING
@@ -99,6 +106,7 @@ public class WeatherUtils {
             + feelsLike + UI.SPACE3
             + wind + UI.SPACE3
             + humidity + UI.SYMBOL_PERCENTAGE + UI.SPACE3
+            + pressure + UI.SPACE3
             + precipitation + UI.SPACE3
             + snowFall;
 
@@ -112,7 +120,8 @@ public class WeatherUtils {
     */
    public static String buildWeatherDataString(final TourData tourData,
                                                final boolean displayMinimumTemperature,
-                                               final boolean displayMaximumTemperature) {
+                                               final boolean displayMaximumTemperature,
+                                               final boolean displayPressure) {
 
       final List<String> weatherDataList = new ArrayList<>();
 
@@ -137,7 +146,7 @@ public class WeatherUtils {
       // Average temperature
       final float averageTemperature = tourData.getWeather_Temperature_Average();
       if (averageTemperature != Float.MIN_VALUE) {
-         weatherDataList.add(roundDoubleToFloat(UI.convertTemperatureFromMetric(averageTemperature)) +
+         weatherDataList.add(FormatManager.formatTemperature(UI.convertTemperatureFromMetric(averageTemperature)) +
                UI.UNIT_LABEL_TEMPERATURE);
       }
 
@@ -147,7 +156,7 @@ public class WeatherUtils {
          weatherDataList.add(
                Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max +
                      UI.SPACE +
-                     roundDoubleToFloat(
+                     FormatManager.formatTemperature(
                            UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max())) +
                      UI.UNIT_LABEL_TEMPERATURE);
       }
@@ -158,7 +167,7 @@ public class WeatherUtils {
          weatherDataList.add(
                Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min +
                      UI.SPACE +
-                     roundDoubleToFloat(
+                     FormatManager.formatTemperature(
                            UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min())) +
                      UI.UNIT_LABEL_TEMPERATURE);
       }
@@ -170,7 +179,7 @@ public class WeatherUtils {
          weatherDataList.add(
                Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
                      UI.SPACE +
-                     roundDoubleToFloat(UI.convertTemperatureFromMetric(temperatureWindChill)) +
+                     FormatManager.formatTemperature(UI.convertTemperatureFromMetric(temperatureWindChill)) +
                      UI.UNIT_LABEL_TEMPERATURE);
       }
 
@@ -199,13 +208,23 @@ public class WeatherUtils {
                Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Humidity);
       }
 
+      // Pressure
+      final float pressure = tourData.getWeather_Pressure();
+      if (pressure != Float.MIN_VALUE) {
+
+         weatherDataList.add((int) pressure +
+               UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG +
+               UI.SPACE +
+               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Pressure);
+      }
+
       // Precipitation
       final float precipitation = tourData.getWeather_Precipitation();
       if (precipitation > 0) {
 
          weatherDataList.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation +
                UI.SPACE +
-               roundDoubleToFloat(UI.convertPrecipitation_FromMetric(precipitation)) +
+               FormatManager.formatTemperature(UI.convertPrecipitation_FromMetric(precipitation)) +
                UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       }
 
@@ -215,7 +234,7 @@ public class WeatherUtils {
 
          weatherDataList.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall +
                UI.SPACE +
-               roundDoubleToFloat(UI.convertPrecipitation_FromMetric(snowfall)) +
+               FormatManager.formatTemperature(UI.convertPrecipitation_FromMetric(snowfall)) +
                UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       }
 
