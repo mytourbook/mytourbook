@@ -1291,8 +1291,14 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       dialog.setText(Messages.Pref_Map25_Dialog_MapFilename_Title);
 
       dialog.setFilterPath(mapFile_Foldername);
-      dialog.setFileName("*." + Map25ProviderManager.MAPSFORGE_MAP_FILE_EXTENTION);//$NON-NLS-1$
-      dialog.setFilterExtensions(new String[] { Map25ProviderManager.MAPSFORGE_MAP_FILE_EXTENTION });
+
+      if (UI.IS_WIN) {
+
+         // with Linux the file select dialog is empty when using these filters !!!
+
+         dialog.setFileName("*." + Map25ProviderManager.MAPSFORGE_MAP_FILE_EXTENTION);//$NON-NLS-1$
+         dialog.setFilterExtensions(new String[] { Map25ProviderManager.MAPSFORGE_MAP_FILE_EXTENTION });
+      }
 
       final String selectedFilepath = dialog.open();
 
@@ -1343,8 +1349,13 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       dialog.setText(Messages.Pref_Map25_Dialog_MapStyleFilename_Title);
 
       dialog.setFilterPath(mapStyle_Foldername);
-      dialog.setFileName("*." + Map25ProviderManager.MAPSFORGE_STYLE_FILE_EXTENTION);//$NON-NLS-1$
-      dialog.setFilterExtensions(new String[] { Map25ProviderManager.MAPSFORGE_STYLE_FILE_EXTENTION });
+
+      if (UI.IS_WIN) {
+
+         // with Linux the file select dialog is empty when using these filters !!!
+         dialog.setFileName("*." + Map25ProviderManager.MAPSFORGE_STYLE_FILE_EXTENTION);//$NON-NLS-1$
+         dialog.setFilterExtensions(new String[] { Map25ProviderManager.MAPSFORGE_STYLE_FILE_EXTENTION });
+      }
 
       final String selectedFilepath = dialog.open();
 
