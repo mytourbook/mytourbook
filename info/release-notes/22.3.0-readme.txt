@@ -65,4 +65,4 @@ System
 
 * Milestone             https://github.com/mytourbook/mytourbook/milestone/3?closed=1
 * Eclipse 2022-03
-* FIT SDK 21.67
+* FIT SDK 21.78
