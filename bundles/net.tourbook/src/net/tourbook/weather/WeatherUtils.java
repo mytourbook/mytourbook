@@ -87,7 +87,7 @@ public class WeatherUtils {
 
       final String pressure = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Pressure +
             UI.SPACE +
-            String.format("%3s", pressureValue) + //$NON-NLS-1$
+            String.format("%6s", roundDoubleToFloat(pressureValue)) + //$NON-NLS-1$
             UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG;
 
       final String precipitation = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation
@@ -211,14 +211,11 @@ public class WeatherUtils {
 
       // Pressure
       if (displayPressure) {
-         final float pressure = tourData.getWeather_Pressure();
-         if (pressure != Float.MIN_VALUE) {
 
-            weatherDataList.add((int) pressure +
-                  UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG +
-                  UI.SPACE +
-                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Pressure);
-         }
+         weatherDataList.add(roundDoubleToFloat(tourData.getWeather_Pressure()) +
+               UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG +
+               UI.SPACE +
+               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Pressure);
       }
 
       // Precipitation
