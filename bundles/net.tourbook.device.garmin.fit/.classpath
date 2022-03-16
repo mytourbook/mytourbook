@@ -3,6 +3,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="fit-21.67.00.jar" sourcepath="/FIT SDK/FitSDKRelease/java"/> <!-- https://developer.garmin.com/fit/download/ https://forums.garmin.com/developer/fit-sdk/b/news-announcements/posts/fit-sdk-21-67-00-release -->
+	<classpathentry kind="lib" path="fit-21.78.00.jar" sourcepath="/FIT SDK/FitSDKRelease/java"/> <!-- https://developer.garmin.com/fit/download/ https://forums.garmin.com/developer/fit-sdk/b/news-announcements/posts/fit-sdk-21-78-00-release -->
 	<classpathentry kind="output" path="bin"/>
 </classpath>

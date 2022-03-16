@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -79,6 +79,16 @@ public final class StringUtils {
          return fileName;
       }
 
-      return fileName.replaceAll("[^a-zA-Z0-9 \\.\\-]", UI.DASH); //$NON-NLS-1$
+      String regEx;
+
+      if (UI.IS_WIN) {
+
+         regEx = "[\\\\/:*?\"<>|]"; //$NON-NLS-1$
+      } else //UI.IS_OSX or UI.IS_LINUX
+      {
+         regEx = "[\\/]";//$NON-NLS-1$
+      }
+
+      return fileName.replaceAll(regEx, UI.DASH);
    }
 }

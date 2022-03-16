@@ -952,6 +952,7 @@ public class UI {
    }
 
    public static float convertBodyHeightFromMetric(final float height) {
+
       if (UNIT_IS_ELEVATION_METER) {
          return height;
       }
@@ -1046,19 +1047,21 @@ public class UI {
 
    /**
     * @param precipitation
+    *           in mm or inch
     * @return Returns the precipitation amount in the current measurement system.
     */
    public static float convertPrecipitation_FromMetric(final float precipitation) {
 
-      if (UNIT_IS_TEMPERATURE_CELSIUS) {
+      if (UNIT_IS_LENGTH_SMALL_MILLIMETER) {
          return precipitation;
       }
 
-      return precipitation * UNIT_METER_TO_INCHES;
+      return precipitation * UNIT_METER_TO_INCHES / 1000;
    }
 
    /**
     * @param precipitation
+    *           in mm or inch
     * @return Returns the precipitation amount in the current measurement system.
     */
    public static float convertPrecipitation_ToMetric(final float precipitation) {
@@ -1067,7 +1070,7 @@ public class UI {
          return precipitation;
       }
 
-      return precipitation / UNIT_METER_TO_INCHES;
+      return precipitation / UNIT_METER_TO_INCHES * 1000;
    }
 
    /**

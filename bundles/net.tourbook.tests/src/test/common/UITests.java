@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2022 Frédéric Bard
+ * Copyright (C) 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,32 +13,37 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.util;
+package common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.tourbook.common.UI;
 
 import org.junit.jupiter.api.Test;
 
-public class StringUtilsTests {
+public class UITests {
 
    @Test
-   void testHasContent() {
+   void testConvertPrecipitation_FromMetric() {
 
-      assertTrue(StringUtils.hasContent("string")); //$NON-NLS-1$
-      assertFalse(StringUtils.hasContent(UI.SPACE1));
-      assertFalse(StringUtils.hasContent(UI.EMPTY_STRING));
-      assertFalse(StringUtils.hasContent(null));
+      UI.UNIT_IS_LENGTH_SMALL_MILLIMETER = true;
+      //1mm -> 1mm
+      assertEquals(1.0f, UI.convertPrecipitation_FromMetric(1.0f));
+
+      //1mm -> 0.03938in
+      UI.UNIT_IS_LENGTH_SMALL_MILLIMETER = false;
+      assertEquals(0.03937007874f, UI.convertPrecipitation_FromMetric(1.0f));
    }
 
    @Test
-   void testJoin() {
+   void testConvertPrecipitation_ToMetric() {
 
-      final String[] stringArray = { "1", "2", "3" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      assertEquals("1,2,3", StringUtils.join(stringArray, ",")); //$NON-NLS-1$ //$NON-NLS-2$
-      assertEquals("1", StringUtils.join(new String[] { "1" }, ",")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      UI.UNIT_IS_LENGTH_SMALL_MILLIMETER = true;
+      //1mm -> 1mm
+      assertEquals(1.0f, UI.convertPrecipitation_ToMetric(1.0f));
+
+      //1in -> 25.4mm
+      UI.UNIT_IS_LENGTH_SMALL_MILLIMETER = false;
+      assertEquals(25.4f, UI.convertPrecipitation_ToMetric(1.0f));
    }
 }
