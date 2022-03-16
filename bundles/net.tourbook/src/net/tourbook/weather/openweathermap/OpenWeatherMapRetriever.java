@@ -164,7 +164,11 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
 // SET_FORMATTING_OFF
 
-      timeMachineResult.filterHourlyData(tourStartTime, tourEndTime);
+      final boolean hourlyDataExists = timeMachineResult.filterHourlyData(tourStartTime, tourEndTime);
+      if(!hourlyDataExists)
+      {
+         return false;
+      }
 
       tour.setIsWeatherDataFromProvider(true);
 

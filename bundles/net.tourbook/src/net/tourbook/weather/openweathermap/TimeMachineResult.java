@@ -57,7 +57,7 @@ public class TimeMachineResult {
     *
     * @return
     */
-   public void filterHourlyData(final long tourStartTime, final long tourEndTime) {
+   public boolean filterHourlyData(final long tourStartTime, final long tourEndTime) {
 
       final List<Hourly> filteredHourlyData = new ArrayList<>();
 
@@ -80,6 +80,7 @@ public class TimeMachineResult {
 
       hourly = filteredHourlyData;
 
+      return hourly.size() > 0;
    }
 
    /**
