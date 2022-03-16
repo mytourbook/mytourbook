@@ -69,26 +69,31 @@ public class WeatherUtils {
 
       final String tourTime = String.format("%3s", tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME); //$NON-NLS-1$
 
-      final String temperature = String.format("%5s", FormatManager.formatTemperature(UI.convertTemperatureFromMetric(temperatureValue))) //$NON-NLS-1$
+      final String temperature = String.format("%5s", //$NON-NLS-1$
+            FormatManager.formatTemperature(UI.convertTemperatureFromMetric(temperatureValue)))
             + UI.UNIT_LABEL_TEMPERATURE;
 
-      final String feelsLike = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
-            UI.SPACE +
-            String.format("%5s", FormatManager.formatTemperature(UI.convertTemperatureFromMetric(windChill))) + //$NON-NLS-1$
-            UI.UNIT_LABEL_TEMPERATURE;
+      final String feelsLike = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike
+            + UI.SPACE
+            + String.format("%5s", FormatManager.formatTemperature(UI.convertTemperatureFromMetric(windChill))) //$NON-NLS-1$
+            + UI.UNIT_LABEL_TEMPERATURE;
 
-      final String wind = String.format("%5s", FormatManager.formatTemperature(UI.convertSpeed_FromMetric(windSpeed))) + UI.UNIT_LABEL_SPEED + //$NON-NLS-1$
-            UI.SPACE + Messages.Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection +
-            UI.SPACE + String.format("%3d", windDirection) + UI.SYMBOL_DEGREE; //$NON-NLS-1$
+      final String wind = String.format("%5s", FormatManager.formatTemperature(UI.convertSpeed_FromMetric(windSpeed))) //$NON-NLS-1$
+            + UI.UNIT_LABEL_SPEED
+            + UI.SPACE
+            + Messages.Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection
+            + UI.SPACE
+            + String.format("%3d", windDirection) //$NON-NLS-1$
+            + UI.SYMBOL_DEGREE;
 
-      final String humidity = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Humidity +
-            UI.SPACE +
-            String.format("%3s", humidityValue); //$NON-NLS-1$
+      final String humidity = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Humidity
+            + UI.SPACE
+            + String.format("%3s", humidityValue); //$NON-NLS-1$
 
-      final String pressure = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Pressure +
-            UI.SPACE +
-            String.format("%6s", roundDoubleToFloat(pressureValue)) + //$NON-NLS-1$
-            UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG;
+      final String pressure = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Pressure
+            + UI.SPACE
+            + String.format("%6s", roundDoubleToFloat(pressureValue)) //$NON-NLS-1$
+            + UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG;
 
       final String precipitation = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation
             + UI.SPACE
