@@ -1806,6 +1806,7 @@ public class RawDataManager {
                clonedTourData.setWeather_Wind_Direction(tourData.getWeather_Wind_Direction());
                clonedTourData.setWeather_Wind_Speed(tourData.getWeather_Wind_Speed());
 
+               tourData.setIsWeatherDataFromProvider(false);
                tourData.setWeather_Temperature_Average(0);
                tourData.setWeather_Temperature_Max(0);
                tourData.setWeather_Temperature_Min(0);

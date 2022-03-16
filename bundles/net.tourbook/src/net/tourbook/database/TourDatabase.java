@@ -9001,18 +9001,16 @@ public class TourDatabase {
 
 // SET_FORMATTING_ON
       }
-
       logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
    }
 
    /**
-    * For the previous average, max, min temperatures, if they were retrieved by
-    * a weather provider we copy them to the new fields
-    *
-    * @param conn
-    * @throws SQLException
+    * If the previous average, max, min temperatures were retrieved by
+    * a weather provider, they are copied into the new fields.
+    * If necessary, the average, max, min temperatures measured from the device
+    * are recomputed
     */
    private void updateDb_046_to_047_DataUpdate(final Connection conn) throws SQLException {
 
@@ -9040,12 +9038,105 @@ public class TourDatabase {
 
          stmtUpdate.executeUpdate();
 
+         final List<Long> allTourIds = getAllTourIds();
+
+         // If necessary, recomputing the temperature values (average/max/min) measured from the device
+         for (final Long tourId : allTourIds) {
+
+            updateDb_046_To_047_DataUpdate_Concurrent(tourId);
+         }
+
       } finally {
 
          net.tourbook.common.util.SQL.close(stmtUpdate);
       }
 
       updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
+   }
+
+   /**
+    * Do data updates concurrently with all available processor threads, this is reducing time
+    * significantly.
+    *
+    * @param tourId
+    */
+   private void updateDb_046_To_047_DataUpdate_Concurrent(final Long tourId) {
+
+      // put tour ID (queue item) into the queue AND wait when it is full
+
+      try {
+
+         _dbUpdateQueue.put(tourId);
+
+      } catch (final InterruptedException e) {
+
+         _isSQLDataUpdateError = true;
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _dbUpdateExecutor.submit(() -> {
+
+         // get last added item
+         final Long queueItem_TourId = _dbUpdateQueue.poll();
+
+         if (queueItem_TourId == null) {
+            return;
+         }
+
+         final EntityManager entityManager = TourDatabase.getInstance().getEntityManager();
+
+         try {
+
+            // get tour data by tour id
+            final TourData tourData = entityManager.find(TourData.class, queueItem_TourId);
+            if (tourData == null) {
+               return;
+            }
+
+            if (tourData.temperatureSerie == null) {
+
+               tourData.setWeather_Temperature_Average_Device(0);
+               tourData.setWeather_Temperature_Max_Device(0);
+               tourData.setWeather_Temperature_Min_Device(0);
+            } else {
+               tourData.computeAvg_Temperature();
+            }
+
+            boolean isSaved = false;
+
+            final EntityTransaction transaction = entityManager.getTransaction();
+            try {
+
+               transaction.begin();
+               {
+                  entityManager.merge(tourData);
+               }
+               transaction.commit();
+
+            } catch (final Exception e) {
+
+               _isSQLDataUpdateError = true;
+               StatusUtil.showStatus(e);
+
+            } finally {
+               if (transaction.isActive()) {
+                  transaction.rollback();
+               } else {
+                  isSaved = true;
+               }
+            }
+
+            if (!isSaved) {
+               showTourSaveError(tourData);
+            }
+
+         } finally {
+
+            entityManager.close();
+         }
+      });
    }
 
    private void updateMonitor(final SplashManager splashManager, final int newDbVersion) {

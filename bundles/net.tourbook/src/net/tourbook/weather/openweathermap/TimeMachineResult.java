@@ -24,33 +24,52 @@ import java.util.List;
 import java.util.OptionalDouble;
 
 import net.tourbook.common.weather.IWeather;
-import net.tourbook.data.TourData;
+import net.tourbook.weather.WeatherUtils;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeMachineResult {
 
-   private Current      current;
-
    private List<Hourly> hourly;
+
+   private Hourly       middleHourly;
+
+   public TimeMachineResult() {
+      hourly = new ArrayList<>();
+   }
+
+   /**
+    * This adds new hourly data manually to ensure only new data is added to the
+    * current dataset.
+    *
+    * @param newHourly
+    */
+   public void addAllHourly(final List<Hourly> newHourly) {
+
+      for (final Hourly currentHourly : newHourly) {
+         if (!hourly.contains(currentHourly)) {
+            hourly.add(currentHourly);
+         }
+      }
+   }
 
    /**
     * Filters and keeps only the values included between the tour start and end times.
     *
-    * @param tour
     * @return
     */
-   private List<Hourly> filterHourlyData(final TourData tour) {
+   public void filterHourlyData(final long tourStartTime, final long tourEndTime) {
 
       final List<Hourly> filteredHourlyData = new ArrayList<>();
 
-      final long tourStartTime = tour.getTourStartTimeMS() / 1000;
-      final long tourEndTime = tour.getTourEndTimeMS() / 1000;
-      final long thirtyMinutes = 1800;
+      for (final Hourly currentHourly : hourly) {
 
-      for (final Hourly currentHourly : getHourly()) {
          //The current data is not kept if its measured time is:
-         // - 30 mins before the tour start time
-         // OR 30 mins after the tour start time
+         // - more than 30 mins before the tour start time
+         // OR
+         // - more than 30 mins after the tour end time
+
+         final long thirtyMinutes = 1800;
+
          if (currentHourly.getDt() < tourStartTime - thirtyMinutes ||
                currentHourly.getDt() > tourEndTime + thirtyMinutes) {
             continue;
@@ -59,126 +78,159 @@ public class TimeMachineResult {
          filteredHourlyData.add(currentHourly);
       }
 
-      return filteredHourlyData;
+      hourly = filteredHourlyData;
+
    }
 
-   public float getAverageHumidity(final TourData tour) {
+   /**
+    * Finds the hourly that is closest to the middle of the tour. This will be used
+    * to determine the weather description of the tour.
+    */
+   public void findMiddleHourly(final long tourMiddleTime) {
 
-      final List<Hourly> hourlyFiltered = filterHourlyData(tour);
+      middleHourly = null;
+
+      long timeDifference = Long.MAX_VALUE;
+      for (final Hourly currentHourly : hourly) {
+
+         final long currentTimeDifference = Math.abs(currentHourly.getDt() - tourMiddleTime);
+         if (currentTimeDifference < timeDifference) {
+            middleHourly = currentHourly;
+            timeDifference = currentTimeDifference;
+         }
+      }
+
+   }
+
+   public float getAverageHumidity() {
 
       final OptionalDouble averageHumidity =
-            hourlyFiltered.stream().mapToDouble(Hourly::getHumidity).average();
+            hourly.stream().mapToDouble(Hourly::getHumidity).average();
 
       if (averageHumidity.isPresent()) {
-         return roundDoubleToFloat(averageHumidity.getAsDouble());
+         return WeatherUtils.roundDoubleToFloat(averageHumidity.getAsDouble());
       }
 
       return 0;
    }
 
-   public float getAveragePressure(final TourData tour) {
+   public float getAveragePrecipitation() {
 
-      final List<Hourly> hourlyFiltered = filterHourlyData(tour);
+      final OptionalDouble averagePrecipitation =
+            hourly.stream().mapToDouble(Hourly::getRain).average();
+
+      if (averagePrecipitation.isPresent()) {
+         return WeatherUtils.roundDoubleToFloat(averagePrecipitation.getAsDouble());
+      }
+
+      return 0;
+   }
+
+   public float getAveragePressure() {
 
       final OptionalDouble averagePressure =
-            hourlyFiltered.stream().mapToDouble(Hourly::getPressure).average();
+            hourly.stream().mapToDouble(Hourly::getPressure).average();
 
       if (averagePressure.isPresent()) {
-         return roundDoubleToFloat(averagePressure.getAsDouble());
+         return WeatherUtils.roundDoubleToFloat(averagePressure.getAsDouble());
       }
 
       return 0;
    }
 
-   public float getAverageSnowfall(final TourData tour) {
-
-      final List<Hourly> hourlyFiltered = filterHourlyData(tour);
+   public float getAverageSnowfall() {
 
       final OptionalDouble averageSnowfall =
-            hourlyFiltered.stream().mapToDouble(Hourly::getSnow).average();
+            hourly.stream().mapToDouble(Hourly::getSnow).average();
 
       if (averageSnowfall.isPresent()) {
-         return roundDoubleToFloat(averageSnowfall.getAsDouble());
+         return WeatherUtils.roundDoubleToFloat(averageSnowfall.getAsDouble());
       }
 
       return 0;
    }
 
-   public Current getCurrent() {
-      return current;
+   public float getAverageWindChill() {
+
+      final OptionalDouble averageWindChill =
+            hourly.stream().mapToDouble(Hourly::getFeels_like).average();
+
+      if (averageWindChill.isPresent()) {
+         return WeatherUtils.roundDoubleToFloat(averageWindChill.getAsDouble());
+      }
+
+      return 0;
+   }
+
+   public int getAverageWindDirection() {
+
+      final OptionalDouble averageWindDirection =
+            hourly.stream().mapToDouble(Hourly::getWind_deg).average();
+
+      if (averageWindDirection.isPresent()) {
+         return (int) Math.round(averageWindDirection.getAsDouble());
+      }
+
+      return 0;
+   }
+
+   public int getAverageWindSpeed() {
+
+      final OptionalDouble averageWindSpeed =
+            hourly.stream().mapToDouble(Hourly::getWind_speedKmph).average();
+
+      if (averageWindSpeed.isPresent()) {
+         return (int) Math.round(averageWindSpeed.getAsDouble());
+      }
+
+      return 0;
    }
 
    private Weather getCurrentWeather() {
 
-      final Weather currentWeather = null;
-
-      if (current == null) {
-         return currentWeather;
+      final List<Weather> currentWeather = middleHourly.getWeather();
+      if (currentWeather == null || currentWeather.size() == 0) {
+         return null;
       }
 
-      final List<Weather> weather = current.getWeather();
-      if (weather == null || weather.size() == 0) {
-         return currentWeather;
-      }
-
-      return weather.get(0);
+      return currentWeather.get(0);
    }
 
    public List<Hourly> getHourly() {
       return hourly;
    }
 
-   public float getPrecipitation(final TourData tour) {
-
-      final List<Hourly> hourlyFiltered = filterHourlyData(tour);
-
-      final OptionalDouble averagePrecipitation =
-            hourlyFiltered.stream().mapToDouble(Hourly::getRain).average();
-
-      if (averagePrecipitation.isPresent()) {
-         return roundDoubleToFloat(averagePrecipitation.getAsDouble());
-      }
-
-      return 0;
-   }
-
-   public float getTemperatureAverage(final TourData tour) {
-
-      final List<Hourly> hourlyFiltered = filterHourlyData(tour);
+   public float getTemperatureAverage() {
 
       final OptionalDouble averageTemperature =
-            hourlyFiltered.stream().mapToDouble(Hourly::getTemp).average();
+            hourly.stream().mapToDouble(Hourly::getTemp).average();
 
       if (averageTemperature.isPresent()) {
-         return roundDoubleToFloat(averageTemperature.getAsDouble());
+         return WeatherUtils.roundDoubleToFloat(averageTemperature.getAsDouble());
       }
 
       return 0;
    }
 
-   public float getTemperatureMax(final TourData tour) {
-
-      final List<Hourly> hourlyFiltered = filterHourlyData(tour);
+   public float getTemperatureMax() {
 
       final OptionalDouble maxTemperature =
-            hourlyFiltered.stream().mapToDouble(Hourly::getTemp).max();
+            hourly.stream().mapToDouble(Hourly::getTemp).max();
 
       if (maxTemperature.isPresent()) {
-         return roundDoubleToFloat(maxTemperature.getAsDouble());
+         return WeatherUtils.roundDoubleToFloat(maxTemperature.getAsDouble());
       }
 
       return 0;
    }
 
-   public float getTemperatureMin(final TourData tour) {
-
-      final List<Hourly> hourlyFiltered = filterHourlyData(tour);
+   public float getTemperatureMin() {
 
       final OptionalDouble minTemperature =
-            hourlyFiltered.stream().mapToDouble(Hourly::getTemp).min();
+            hourly.stream().mapToDouble(Hourly::getTemp).min();
 
       if (minTemperature.isPresent()) {
-         return roundDoubleToFloat(minTemperature.getAsDouble());
+         return WeatherUtils.roundDoubleToFloat(minTemperature.getAsDouble());
       }
 
       return 0;
@@ -198,7 +250,7 @@ public class TimeMachineResult {
 
    public String getWeatherType() {
 
-      String weatherType = UI.EMPTY_STRING;
+      String weatherType = IWeather.cloudIsNotDefined;
 
       final Weather currentWeather = getCurrentWeather();
       if (currentWeather == null) {
@@ -233,52 +285,4 @@ public class TimeMachineResult {
 
       return weatherType;
    }
-
-   public float getWindChill(final TourData tour) {
-
-      final List<Hourly> hourlyFiltered = filterHourlyData(tour);
-
-      final OptionalDouble averageWindChill =
-            hourlyFiltered.stream().mapToDouble(Hourly::getFeels_like).average();
-
-      if (averageWindChill.isPresent()) {
-         return roundDoubleToFloat(averageWindChill.getAsDouble());
-      }
-
-      return 0;
-   }
-
-   public int getWindDirection(final TourData tour) {
-
-      final List<Hourly> hourlyFiltered = filterHourlyData(tour);
-
-      final OptionalDouble averageWindDirection =
-            hourlyFiltered.stream().mapToDouble(Hourly::getWind_deg).average();
-
-      if (averageWindDirection.isPresent()) {
-         return (int) Math.round(averageWindDirection.getAsDouble());
-      }
-
-      return 0;
-   }
-
-   public int getWindSpeed(final TourData tour) {
-
-      final List<Hourly> hourlyFiltered = filterHourlyData(tour);
-
-      final OptionalDouble averageWindSpeed =
-            hourlyFiltered.stream().mapToDouble(Hourly::getWind_speed).average();
-
-      if (averageWindSpeed.isPresent()) {
-         return (int) Math.round(averageWindSpeed.getAsDouble());
-      }
-
-      return 0;
-   }
-
-   private float roundDoubleToFloat(final double value) {
-
-      return Math.round(value * 100.0) / 100.0f;
-   }
-
 }
