@@ -239,10 +239,10 @@ public class Data {
       case "248": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
          break;
-      case "395":
-      case "392":
-      case "389":
-      case "386":
+      case "395": //$NON-NLS-1$
+      case "392": //$NON-NLS-1$
+      case "389": //$NON-NLS-1$
+      case "386": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_LIGHTNING;
          break;
       case "293": //$NON-NLS-1$

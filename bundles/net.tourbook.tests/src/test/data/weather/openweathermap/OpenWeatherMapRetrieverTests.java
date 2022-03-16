@@ -60,13 +60,13 @@ public class OpenWeatherMapRetrieverTests {
             + "LongsPeak-Manual-OpenWeatherMapResponse-1647086400.json"); //$NON-NLS-1$
 
       //First call configuration
-      final String url1 = urlBase + "1647086400";
+      final String url1 = urlBase + "1647086400"; //$NON-NLS-1$
       httpClientMock.onGet(url1)
             .doReturn(openWeatherMapResponse1);
 
       final String openWeatherMapResponse2 = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapResponse-1647129600.json"); //$NON-NLS-1$
-      final String url2 = urlBase + "1647129600";
+      final String url2 = urlBase + "1647129600"; //$NON-NLS-1$
       httpClientMock.onGet(url2)
             .doReturn(openWeatherMapResponse2);
 

@@ -165,7 +165,7 @@ public class ClusterMarkerRenderer extends MarkerRenderer {
         if (size >= CLUSTER_MAXSIZE) {
             // restrict cluster indicator size. Bigger clusters will show as "+" instead of ie. "45"
             size = CLUSTER_MAXSIZE;
-            strValue = "+";
+            strValue = "+"; //$NON-NLS-1$
         } else {
             strValue = String.valueOf(size);
         }
