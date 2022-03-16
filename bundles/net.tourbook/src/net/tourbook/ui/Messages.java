@@ -600,7 +600,6 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_RunDyn_VerticalRatio_Min;
    public static String        Tour_Tooltip_Label_Tags;
    public static String        Tour_Tooltip_Label_Temperature;
-   public static String        Tour_Tooltip_Label_Temperature_FromDevice;
    public static String        Tour_Tooltip_Label_TimeZone;
    public static String        Tour_Tooltip_Label_TimeZoneDifference;
    public static String        Tour_Tooltip_Label_TourType;
