@@ -5854,7 +5854,7 @@ public class TourDatabase {
          updateDb_039_To_040_DataUpdate(conn, splashManager);
          updateDb_041_To_042_DataUpdate(conn);
          updateDb_042_to_043_DataUpdate(conn, splashManager);
-         updateDb_046_to_047_DataUpdate(conn);
+         updateDb_046_to_047_DataUpdate(conn, splashManager);
 
       } catch (final SQLException e) {
 
@@ -9011,8 +9011,10 @@ public class TourDatabase {
     * a weather provider, they are copied into the new fields.
     * If necessary, the average, max, min temperatures measured from the device
     * are recomputed
+    *
+    * @param splashManager
     */
-   private void updateDb_046_to_047_DataUpdate(final Connection conn) throws SQLException {
+   private void updateDb_046_to_047_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
 
       final long startTime = System.currentTimeMillis();
 
@@ -9038,10 +9040,52 @@ public class TourDatabase {
 
          stmtUpdate.executeUpdate();
 
+         long lastUpdateTime = startTime;
+
+         int tourIndex = 1;
+         int lastUpdateNumItems = 1;
+         int sumUpdatedTours = 0;
+
          final List<Long> allTourIds = getAllTourIds();
+         final int numAllTourIds = allTourIds.size();
 
          // If necessary, recomputing the temperature values (average/max/min) measured from the device
          for (final Long tourId : allTourIds) {
+
+            if (splashManager != null) {
+
+               final long currentTime = System.currentTimeMillis();
+               final long timeDiff = currentTime - lastUpdateTime;
+
+               // reduce logging
+               if (timeDiff > DELAY_SPLASH_LOGGING
+
+                     // update UI for the last tour otherwise it looks like that not all data are converted
+                     || tourIndex == numAllTourIds) {
+
+                  lastUpdateTime = currentTime;
+
+                  final long numTourDiff = tourIndex - lastUpdateNumItems;
+                  lastUpdateNumItems = tourIndex;
+                  sumUpdatedTours += numTourDiff;
+
+                  final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
+
+                  splashManager.setMessage(NLS.bind(
+
+                        // Data update 47: Converting weather data - {0} of {1} - {2} % - {3}
+                        Messages.Tour_Database_PostUpdate_047_Weather,
+
+                        new Object[] {
+                              sumUpdatedTours,
+                              numAllTourIds,
+                              percentValue,
+                              numTourDiff,
+                        }));
+               }
+
+               tourIndex++;
+            }
 
             updateDb_046_To_047_DataUpdate_Concurrent(tourId);
          }
@@ -9062,9 +9106,9 @@ public class TourDatabase {
     */
    private void updateDb_046_To_047_DataUpdate_Concurrent(final Long tourId) {
 
-      // put tour ID (queue item) into the queue AND wait when it is full
-
       try {
+
+         // put tour ID (queue item) into the queue AND wait when it is full
 
          _dbUpdateQueue.put(tourId);
 
