@@ -18,6 +18,8 @@ package net.tourbook.weather.worldweatheronline;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import de.byteholder.geoclipse.map.UI;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
@@ -44,7 +46,7 @@ public class Data {
     *
     * @return
     */
-   public void filterHourlyData(final long tourStartTime, final long tourEndTime) {
+   public boolean filterHourlyData(final long tourStartTime, final long tourEndTime) {
 
       //If the returned data is for more than 1 day, we combine the multiple hourly
       //lists into 1
@@ -67,8 +69,10 @@ public class Data {
             continue;
          }
 
-         getFilteredHourly().add(currentHourly);
+         filteredHourly.add(currentHourly);
       }
+
+      return filteredHourly.size() > 0;
    }
 
    /**
@@ -77,14 +81,14 @@ public class Data {
     */
    public void findMiddleHourly(final long tourMiddleTime) {
 
-      if (getFilteredHourly() == null) {
+      if (filteredHourly == null) {
          return;
       }
 
       middleHourly = null;
 
       long timeDifference = Long.MAX_VALUE;
-      for (final Hourly currentHourly : getFilteredHourly()) {
+      for (final Hourly currentHourly : filteredHourly) {
 
          final long hourlyEpochSeconds = currentHourly.getEpochSeconds();
          final long currentTimeDifference = Math.abs(hourlyEpochSeconds - tourMiddleTime);
@@ -99,8 +103,9 @@ public class Data {
    }
 
    public short getAverageHumidity() {
+
       final OptionalDouble averageHumidity =
-            getFilteredHourly().stream().mapToDouble(Hourly::getHumidity).average();
+            filteredHourly.stream().mapToDouble(Hourly::getHumidity).average();
 
       if (averageHumidity.isPresent()) {
          return (short) (averageHumidity.getAsDouble());
@@ -112,7 +117,7 @@ public class Data {
    public float getAveragePrecipitation() {
 
       final OptionalDouble averagePrecipitation =
-            getFilteredHourly().stream().mapToDouble(Hourly::getPrecipMM).average();
+            filteredHourly.stream().mapToDouble(Hourly::getPrecipMM).average();
 
       if (averagePrecipitation.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averagePrecipitation.getAsDouble());
@@ -124,7 +129,7 @@ public class Data {
    public float getAveragePressure() {
 
       final OptionalDouble averagePressure =
-            getFilteredHourly().stream().mapToDouble(Hourly::getPressure).average();
+            filteredHourly.stream().mapToDouble(Hourly::getPressure).average();
 
       if (averagePressure.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averagePressure.getAsDouble());
@@ -136,7 +141,7 @@ public class Data {
    public float getAverageWindChill() {
 
       final OptionalDouble averageWindChill =
-            getFilteredHourly().stream().mapToDouble(Hourly::getFeelsLikeC).average();
+            filteredHourly.stream().mapToDouble(Hourly::getFeelsLikeC).average();
 
       if (averageWindChill.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averageWindChill.getAsDouble());
@@ -148,7 +153,7 @@ public class Data {
    public int getAverageWindDirection() {
 
       final OptionalDouble averageWindDirection =
-            getFilteredHourly().stream().mapToDouble(Hourly::getWinddirDegree).average();
+            filteredHourly.stream().mapToDouble(Hourly::getWinddirDegree).average();
 
       if (averageWindDirection.isPresent()) {
          return (int) Math.round(averageWindDirection.getAsDouble());
@@ -160,7 +165,7 @@ public class Data {
    public int getAverageWindSpeed() {
 
       final OptionalDouble averageWindSpeed =
-            getFilteredHourly().stream().mapToDouble(Hourly::getWindspeedKmph).average();
+            filteredHourly.stream().mapToDouble(Hourly::getWindspeedKmph).average();
 
       if (averageWindSpeed.isPresent()) {
          return (int) Math.round(averageWindSpeed.getAsDouble());
@@ -180,7 +185,7 @@ public class Data {
    public float getTemperatureAverage() {
 
       final OptionalDouble averageTemperature =
-            getFilteredHourly().stream().mapToDouble(Hourly::getTempC).average();
+            filteredHourly.stream().mapToDouble(Hourly::getTempC).average();
 
       if (averageTemperature.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averageTemperature.getAsDouble());
@@ -192,7 +197,7 @@ public class Data {
    public float getTemperatureMax() {
 
       final OptionalDouble maxTemperature =
-            getFilteredHourly().stream().mapToDouble(Hourly::getTempC).max();
+            filteredHourly.stream().mapToDouble(Hourly::getTempC).max();
 
       if (maxTemperature.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(maxTemperature.getAsDouble());
@@ -204,7 +209,7 @@ public class Data {
    public float getTemperatureMin() {
 
       final OptionalDouble minTemperature =
-            getFilteredHourly().stream().mapToDouble(Hourly::getTempC).min();
+            filteredHourly.stream().mapToDouble(Hourly::getTempC).min();
 
       if (minTemperature.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(minTemperature.getAsDouble());
@@ -218,15 +223,19 @@ public class Data {
    }
 
    public String getWeatherDescription() {
-      return middleHourly.getWeatherDescription();
+
+      return middleHourly != null ? middleHourly.getWeatherDescription() : UI.EMPTY_STRING;
    }
 
    public String getWeatherType() {
 
       String weatherType = IWeather.cloudIsNotDefined;
 
-      // Codes : http://www.worldweatheronline.com/feed/wwoConditionCodes.xml
+      if (middleHourly == null) {
+         return weatherType;
+      }
 
+      // Codes : http://www.worldweatheronline.com/feed/wwoConditionCodes.xml
       switch (middleHourly.getWeatherCode()) {
       case "122": //$NON-NLS-1$
       case "119": //$NON-NLS-1$

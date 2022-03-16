@@ -240,7 +240,11 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
    // SET_FORMATTING_OFF
 
-      weatherData.filterHourlyData(tourStartTime, tourEndTime);
+      final boolean hourlyDataExists = weatherData.filterHourlyData(tourStartTime, tourEndTime);
+      if(!hourlyDataExists)
+      {
+         return false;
+      }
 
       tour.setIsWeatherDataFromProvider(true);
 
