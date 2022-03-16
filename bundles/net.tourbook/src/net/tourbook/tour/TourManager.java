@@ -176,7 +176,6 @@ public class TourManager {
    //
    public static final String  LOG_RETRIEVE_WEATHER_DATA_001_START             = Messages.Log_RetrieveWeatherData_001_Start;
    public static final String  LOG_RETRIEVE_WEATHER_DATA_002_END               = Messages.Log_RetrieveWeatherData_002_End;
-   public static final String  LOG_RETRIEVE_WEATHER_DATA_003_NO_WEATHER_DATA   = Messages.Log_RetrieveWeatherData_003_NoWeatherData;
    public static final String  LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE = Messages.Log_RetrieveWeatherData_010_NoGpsDataSeries;
    //
    public static final String  CUSTOM_DATA_TOUR_DATA                           = "tourData";                                                         //$NON-NLS-1$
@@ -2777,10 +2776,6 @@ public class TourManager {
                   if (TourWeatherRetriever.retrieveWeatherData(tourData, weatherProvider)) {
 
                      modifiedTours.add(tourData);
-                  } else {
-                     TourLogManager.subLog_INFO(String.format(
-                           LOG_RETRIEVE_WEATHER_DATA_003_NO_WEATHER_DATA,
-                           getTourDateTimeShort(tourData)));
                   }
                }
             });
