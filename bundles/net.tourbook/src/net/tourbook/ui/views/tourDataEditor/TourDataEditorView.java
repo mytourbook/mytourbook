@@ -4004,7 +4004,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          createUI_Section_143_Weather_Wind_Col2(container);
 
          createUI_Section_144_Weather_Temperature_Col1(container);
-         createUI_Section_144_Weather_Temperature_Device_Col2(container);
+         createUI_Section_144_Weather_Temperature_Col2_Device(container);
 
          createUI_Section_147_Weather_Other_Col1(container);
          createUI_Section_148_Weather_Other_Col2(container);
@@ -4303,11 +4303,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             // spinner
             _spinWeather_Temperature_Average = new Spinner(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults()//
-                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-                  .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_spinWeather_Temperature_Average);
             _spinWeather_Temperature_Average.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Tooltip);
 
             // the min/max temperature has a large range because fahrenheit has bigger values than celsius
@@ -4317,6 +4312,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _spinWeather_Temperature_Average.addModifyListener(_modifyListener_Temperature);
             _spinWeather_Temperature_Average.addSelectionListener(_selectionListener_Temperature);
             _spinWeather_Temperature_Average.addMouseWheelListener(_mouseWheelListener_Temperature);
+
+            GridDataFactory.fillDefaults()
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinWeather_Temperature_Average);
 
             // label: celsius, fahrenheit
             _lblWeather_TemperatureUnit_Avg = _tk.createLabel(container, UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
@@ -4412,7 +4412,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    /**
     * weather
     */
-   private void createUI_Section_144_Weather_Temperature_Device_Col2(final Composite parent) {
+   private void createUI_Section_144_Weather_Temperature_Col2_Device(final Composite parent) {
 
       final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().applyTo(container);
@@ -4424,22 +4424,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // spinner
-            _txtWeather_Temperature_Average_Device = _tk.createText(
-                  container,
-                  UI.EMPTY_STRING,
-                  SWT.READ_ONLY);
-            GridDataFactory
-                  .fillDefaults()//
+            _txtWeather_Temperature_Average_Device = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
+            _txtWeather_Temperature_Average_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Device_Tooltip);
+
+            GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
                   .applyTo(_txtWeather_Temperature_Average_Device);
 
             // label: celsius, fahrenheit
-            _lblWeather_TemperatureUnit_Avg_Device = _tk.createLabel(
-                  container,
-                  UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
-            _lblWeather_TemperatureUnit_Avg.setToolTipText(
-                  Messages.Tour_Editor_Label_Temperature_Avg_Device_Tooltip);
+            _lblWeather_TemperatureUnit_Avg_Device = _tk.createLabel(container, UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+            _lblWeather_TemperatureUnit_Avg_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Device_Tooltip);
          }
          {
             /*
@@ -4447,10 +4442,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // spinner
-            _txtWeather_Temperature_Max_Device = _tk.createText(
-                  container,
-                  UI.EMPTY_STRING,
-                  SWT.READ_ONLY);
+            _txtWeather_Temperature_Max_Device = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
+            _txtWeather_Temperature_Max_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Device_Tooltip);
 
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
@@ -4458,11 +4451,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .applyTo(_txtWeather_Temperature_Max_Device);
 
             // unit
-            _lblWeather_TemperatureUnit_Max_Device = _tk.createLabel(
-                  container,
-                  UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
-            _lblWeather_TemperatureUnit_Max.setToolTipText(
-                  Messages.Tour_Editor_Label_Temperature_Max_Device_Tooltip);
+            _lblWeather_TemperatureUnit_Max_Device = _tk.createLabel(container, UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+            _lblWeather_TemperatureUnit_Max_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Device_Tooltip);
          }
          {
             /*
@@ -4470,10 +4460,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // spinner
-            _txtWeather_Temperature_Min_Device = _tk.createText(
-                  container,
-                  UI.EMPTY_STRING,
-                  SWT.READ_ONLY);
+            _txtWeather_Temperature_Min_Device = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
+            _txtWeather_Temperature_Min_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Min_Device_Tooltip);
 
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
@@ -4481,11 +4469,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .applyTo(_txtWeather_Temperature_Min_Device);
 
             // unit
-            _lblWeather_TemperatureUnit_Min_Device = _tk.createLabel(
-                  container,
-                  UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
-            _lblWeather_TemperatureUnit_Min.setToolTipText(
-                  Messages.Tour_Editor_Label_Temperature_Min_Device_Tooltip);
+            _lblWeather_TemperatureUnit_Min_Device = _tk.createLabel(container, UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+            _lblWeather_TemperatureUnit_Min_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Min_Device_Tooltip);
          }
       }
    }
