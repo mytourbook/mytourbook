@@ -1763,7 +1763,6 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Label_ApiKey;
    public static String        Pref_Weather_Label_WeatherProvider;
    public static String        Pref_Weather_Link_ApiSignup;
-   public static String        Pref_Weather_OpenWeatherMap_Link;
    public static String        Pref_Weather_OpenWeatherMap_Label_FiveDaysLimit;
    public static String        Pref_Weather_Provider_None;
 
