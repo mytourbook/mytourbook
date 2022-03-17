@@ -217,8 +217,8 @@ public class UI {
 
    public static final CharSequence SYMBOL_HTML_BACKSLASH              = "&#92;";               //$NON-NLS-1$
 
-   public static final String       LINK_TAG_END                       = "</a>";                //$NON-NLS-1$
    public static final String       LINK_TAG_START                     = "<a>";                 //$NON-NLS-1$
+   public static final String       LINK_TAG_END                       = "</a>";                //$NON-NLS-1$
 
    public static final int          FORM_FIRST_COLUMN_INDENT           = 16;
 
