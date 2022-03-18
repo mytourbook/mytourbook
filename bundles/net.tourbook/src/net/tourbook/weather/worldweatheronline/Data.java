@@ -114,18 +114,6 @@ public class Data {
       return 0;
    }
 
-   public float getAveragePrecipitation() {
-
-      final OptionalDouble averagePrecipitation =
-            filteredHourly.stream().mapToDouble(Hourly::getPrecipMM).average();
-
-      if (averagePrecipitation.isPresent()) {
-         return WeatherUtils.roundDoubleToFloat(averagePrecipitation.getAsDouble());
-      }
-
-      return 0;
-   }
-
    public float getAveragePressure() {
 
       final OptionalDouble averagePressure =
@@ -216,6 +204,11 @@ public class Data {
       }
 
       return 0;
+   }
+
+   public float getTotalPrecipitation() {
+
+      return WeatherUtils.roundDoubleToFloat(filteredHourly.stream().mapToDouble(Hourly::getPrecipMM).sum());
    }
 
    public List<Weather> getWeather() {
