@@ -115,18 +115,6 @@ public class TimeMachineResult {
       return 0;
    }
 
-   public float getAveragePrecipitation() {
-
-      final OptionalDouble averagePrecipitation =
-            hourly.stream().mapToDouble(Hourly::getRain).average();
-
-      if (averagePrecipitation.isPresent()) {
-         return WeatherUtils.roundDoubleToFloat(averagePrecipitation.getAsDouble());
-      }
-
-      return 0;
-   }
-
    public float getAveragePressure() {
 
       final OptionalDouble averagePressure =
@@ -134,18 +122,6 @@ public class TimeMachineResult {
 
       if (averagePressure.isPresent()) {
          return WeatherUtils.roundDoubleToFloat(averagePressure.getAsDouble());
-      }
-
-      return 0;
-   }
-
-   public float getAverageSnowfall() {
-
-      final OptionalDouble averageSnowfall =
-            hourly.stream().mapToDouble(Hourly::getSnow).average();
-
-      if (averageSnowfall.isPresent()) {
-         return WeatherUtils.roundDoubleToFloat(averageSnowfall.getAsDouble());
       }
 
       return 0;
@@ -199,6 +175,16 @@ public class TimeMachineResult {
 
    public List<Hourly> getHourly() {
       return hourly;
+   }
+
+   public float getTotalPrecipitation() {
+
+      return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(Hourly::getRain).sum());
+   }
+
+   public float getTotalSnowfall() {
+
+      return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(Hourly::getSnow).sum());
    }
 
    public float getTemperatureAverage() {

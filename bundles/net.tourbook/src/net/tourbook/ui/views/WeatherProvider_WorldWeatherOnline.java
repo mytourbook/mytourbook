@@ -132,7 +132,8 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
                   SWT.NONE);
             _btnTestConnection.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> HistoricalWeatherRetriever.checkVendorConnection(
-                        WorldWeatherOnlineRetriever.getApiUrl() + _textApiKey_Value.getText())));
+                        WorldWeatherOnlineRetriever.getApiUrl() + _textApiKey_Value.getText(),
+                        IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE)));
             GridDataFactory.fillDefaults()
                   .indent(defaultHIndent, 0)
                   .align(SWT.BEGINNING, SWT.FILL)

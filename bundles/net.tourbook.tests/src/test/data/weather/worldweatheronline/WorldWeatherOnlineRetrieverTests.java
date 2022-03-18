@@ -78,7 +78,7 @@ public class WorldWeatherOnlineRetrieverTests {
       assertEquals("Patchy rain possible",      tour.getWeather()); //$NON-NLS-1$
       assertEquals("weather-showers-scattered", tour.getWeather_Clouds()); //$NON-NLS-1$
       assertEquals(49,                          tour.getWeather_Humidity());
-      assertEquals(0.12f,                       tour.getWeather_Precipitation());
+      assertEquals(1.6f,                        tour.getWeather_Precipitation());
       assertEquals(1016.54f,                    tour.getWeather_Pressure());
       assertEquals(19,                          tour.getWeather_Temperature_Max());
       assertEquals(8,                           tour.getWeather_Temperature_Min());

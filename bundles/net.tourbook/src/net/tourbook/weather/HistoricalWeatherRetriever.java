@@ -48,7 +48,7 @@ public abstract class HistoricalWeatherRetriever {
    /**
     * This method ensures the connection to the API can be made successfully.
     */
-   public static void checkVendorConnection(final String vendorUrl) {
+   public static void checkVendorConnection(final String vendorUrl, final String vendorName) {
 
       BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
@@ -69,7 +69,7 @@ public abstract class HistoricalWeatherRetriever {
             final String message = statusCode == HttpURLConnection.HTTP_OK
                   ? NLS.bind(
                         Messages.Pref_Weather_CheckHTTPConnection_OK_Message,
-                        vendorUrl)
+                        vendorName)
                   : NLS.bind(
                         Messages.Pref_Weather_CheckHTTPConnection_FAILED_Message,
                         new Object[] {

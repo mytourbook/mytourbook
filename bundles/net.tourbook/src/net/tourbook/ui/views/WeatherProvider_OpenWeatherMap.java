@@ -42,7 +42,7 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
    /*
     * UI controls
     */
-   private Button              _btnTestConnection;
+   private Button _btnTestConnection;
 
    public WeatherProvider_OpenWeatherMap() {}
 
@@ -86,7 +86,8 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
             HistoricalWeatherRetriever.checkVendorConnection(
                   OpenWeatherMapRetriever.getBaseApiUrl() +
                         "?units=metric&lat=0&lon=0&dt=" + //$NON-NLS-1$
-                        previousHour);
+                        previousHour,
+                  IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP);
          }));
 
          GridDataFactory.fillDefaults()
