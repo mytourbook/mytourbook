@@ -1,4 +1,4 @@
-22.3.0                                                 ?. March 2022
+22.3.0                                                 31. March 2022
 
 
 New
@@ -23,16 +23,16 @@ Improvements
   - Show more details when multiple tours are hovered                   https://github.com/mytourbook/mytourbook/issues/470
 
 * Strava Integration (Frederic)   
-  - Added the possibility to send the weather data in the uploaded activity's description
+  - Added the possibility to send the weather data in the uploaded activity's description       https://github.com/mytourbook/mytourbook/issues/479
 
 
 Changes
 =======
 
 * Transform Opacity
-  - It is possible, that existing opacity values must be adjusted because they are not migrated
   - Selecting/entering opacity values 0...100 or 0...255 is not user friendly. 
-    With this new transformation, which is defined in the user preferences, opacity values could be selected between e.g. 0...8 which is then transformed to 0...255
+    With this new transformation, which is defined in the user preferences "Appearance/Transform Values", opacity values could be selected between e.g. 0...8 which is then transformed into 0...255
+  - It is possible, that existing opacity values must be adjusted because they are not migrated
 
 * Tour Chart
   - Moved the options
