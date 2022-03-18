@@ -97,7 +97,7 @@ public class OpenWeatherMapRetrieverTests {
       assertEquals(15,                 tour.getWeather_Wind_Speed());
       assertEquals(266,                tour.getWeather_Wind_Direction());
       assertEquals(54,                 tour.getWeather_Humidity());
-      assertEquals(0.06f,              tour.getWeather_Precipitation());
+      assertEquals(0.76f,              tour.getWeather_Precipitation());
       assertEquals(0,                  tour.getWeather_Snowfall());
       assertEquals(1024,               tour.getWeather_Pressure());
       assertEquals(-0.87f,             tour.getWeather_Temperature_Max());
