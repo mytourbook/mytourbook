@@ -14,6 +14,9 @@ Improvements
 * Calendar View (Frederic)
   - The combo of years now displays the most recent years at the top as it is more likely to be selected than the oldest years
     https://github.com/mytourbook/mytourbook/pull/472
+    
+* Tour Book View
+  - Clone tour start/end location when a tour is copied                 https://sourceforge.net/p/mytourbook/feature-requests/206/  
 
 * Tour Chart
   - Switch between SRTM 1 and SRTM 3 values                             https://github.com/mytourbook/mytourbook/issues/469 

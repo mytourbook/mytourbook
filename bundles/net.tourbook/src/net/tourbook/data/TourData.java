@@ -2252,16 +2252,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       final TourData tourDataCopy = new TourData();
 
-      tourDataCopy.setTourPerson(this.getTourPerson());
-      tourDataCopy.setDeviceId(this.getDeviceId());
+// SET_FORMATTING_OFF
 
-      tourDataCopy.setTourStartTime(this.getTourStartTime());
+      tourDataCopy.setTourPerson(      this.getTourPerson());
+      tourDataCopy.setDeviceId(        this.getDeviceId());
 
-      tourDataCopy.setTourTitle(this.getTourTitle());
-      tourDataCopy.setTourDescription(this.getTourDescription());
+      tourDataCopy.setTourStartTime(   this.getTourStartTime());
 
-      tourDataCopy.setTourTags(new HashSet<>(this.getTourTags()));
-      tourDataCopy.setTourType(this.getTourType());
+      tourDataCopy.setTourTitle(       this.getTourTitle());
+      tourDataCopy.setTourDescription( this.getTourDescription());
+
+      tourDataCopy.setTourTags(        new HashSet<>(this.getTourTags()));
+      tourDataCopy.setTourType(        this.getTourType());
+
+      tourDataCopy.setTourStartPlace(  this.getTourStartPlace());
+      tourDataCopy.setTourEndPlace(    this.getTourEndPlace());
+
+// SET_FORMATTING_ON
 
       return tourDataCopy;
    }
