@@ -4,6 +4,10 @@
 TODO's
 ======
 
+* Tour Editor     - Elevation adjustment as an option                    https://sourceforge.net/p/mytourbook/feature-requests/196/
+                    Could be an option in the "Tour Editor Options"
+                    
+
 
 * Tour Chart      - Select color for 2nd graph line instead of compliment color
 
