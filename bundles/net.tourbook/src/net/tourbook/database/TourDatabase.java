@@ -9025,20 +9025,9 @@ public class TourDatabase {
          return;
       }
 
-      PreparedStatement stmtUpdate = null;
+      final PreparedStatement stmtUpdate = null;
 
       try {
-
-         stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
-
-               + "UPDATE " + TABLE_TOUR_DATA //                      //$NON-NLS-1$
-               + " SET" //                                           //$NON-NLS-1$
-               + " weather_Temperature_Average = weather_Temperature_Average_Device," //$NON-NLS-1$
-               + " weather_Temperature_Max = weather_Temperature_Max_Device," //$NON-NLS-1$
-               + " weather_Temperature_Min = weather_Temperature_Min_Device" //$NON-NLS-1$
-               + " WHERE isWeatherDataFromProvider=true"); //$NON-NLS-1$
-
-         stmtUpdate.executeUpdate();
 
          long lastUpdateTime = startTime;
 
@@ -9139,13 +9128,44 @@ public class TourDatabase {
                return;
             }
 
-            if (tourData.temperatureSerie == null) {
+            /*
+             * Migration scenarii:
+             * If the device has temperature data (i.e.: if the temperatureSerie is not null)
+             * - If weather was retrieved from WWO : copy the 22.2.1 temperatures to the new
+             * non-device fields (regardless if the weather was retrieved with WWO or manually
+             * entered) and recalculate the device temperatures
+             * - else DO nothing
+             * -
+             */
+            if (tourData.temperatureSerie == null || tourData.isWeatherDataFromProvider()) {
 
-               tourData.setWeather_Temperature_Average_Device(0);
-               tourData.setWeather_Temperature_Max_Device(0);
-               tourData.setWeather_Temperature_Min_Device(0);
-            } else {
-               tourData.computeAvg_Temperature();
+               /**
+                * If the device has NO temperature data or the weather was retrieved from WWO:
+                * - copy the temperatures (DB 46) to the new non-device fields (DB 47)
+                */
+               tourData.setWeather_Temperature_Average(tourData.getWeather_Temperature_Average_Device());
+               tourData.setWeather_Temperature_Max(tourData.getWeather_Temperature_Max_Device());
+               tourData.setWeather_Temperature_Min(tourData.getWeather_Temperature_Min_Device());
+
+               /**
+                * If the device has NO temperature data:
+                * - set the device temperatures to 0
+                */
+               if (tourData.temperatureSerie == null) {
+
+                  tourData.setWeather_Temperature_Average_Device(0);
+                  tourData.setWeather_Temperature_Max_Device(0);
+                  tourData.setWeather_Temperature_Min_Device(0);
+
+               } else if (tourData.isWeatherDataFromProvider()) {
+
+                  /**
+                   * If the device has temperature data and weather was retrieved from WWO:
+                   * - recalculate the device temperatures
+                   */
+
+                  tourData.computeAvg_Temperature();
+               }
             }
 
             boolean isSaved = false;
