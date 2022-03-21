@@ -9140,25 +9140,24 @@ public class TourDatabase {
                tourData.setWeather_Temperature_Average(tourData.getWeather_Temperature_Average_Device());
                tourData.setWeather_Temperature_Max(tourData.getWeather_Temperature_Max_Device());
                tourData.setWeather_Temperature_Min(tourData.getWeather_Temperature_Min_Device());
-
-               /**
-                * If the device has NO temperature data:
-                * - set the device temperatures to 0
-                */
-               if (tourData.temperatureSerie == null) {
-
-                  tourData.setWeather_Temperature_Average_Device(0);
-                  tourData.setWeather_Temperature_Max_Device(0);
-                  tourData.setWeather_Temperature_Min_Device(0);
-
-               }
             }
 
             /**
-             * If the device has temperature data:
-             * - recalculate the device temperatures
+             * If the device has NO temperature data:
+             * - set the device temperatures to 0
              */
-            if (tourData.temperatureSerie != null) {
+            if (tourData.temperatureSerie == null) {
+
+               tourData.setWeather_Temperature_Average_Device(0);
+               tourData.setWeather_Temperature_Max_Device(0);
+               tourData.setWeather_Temperature_Min_Device(0);
+
+            } else {
+
+               /**
+                * If the device has temperature data:
+                * - recalculate the device temperatures
+                */
                tourData.computeAvg_Temperature();
             }
 
