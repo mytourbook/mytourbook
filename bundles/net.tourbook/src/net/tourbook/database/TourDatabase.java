@@ -9129,13 +9129,7 @@ public class TourDatabase {
             }
 
             /*
-             * Migration scenarii:
-             * If the device has temperature data (i.e.: if the temperatureSerie is not null)
-             * - If weather was retrieved from WWO : copy the 22.2.1 temperatures to the new
-             * non-device fields (regardless if the weather was retrieved with WWO or manually
-             * entered) and recalculate the device temperatures
-             * - else DO nothing
-             * -
+             * Temperature Migration
              */
             if (tourData.temperatureSerie == null || tourData.isWeatherDataFromProvider()) {
 
@@ -9157,15 +9151,15 @@ public class TourDatabase {
                   tourData.setWeather_Temperature_Max_Device(0);
                   tourData.setWeather_Temperature_Min_Device(0);
 
-               } else if (tourData.isWeatherDataFromProvider()) {
-
-                  /**
-                   * If the device has temperature data and weather was retrieved from WWO:
-                   * - recalculate the device temperatures
-                   */
-
-                  tourData.computeAvg_Temperature();
                }
+            }
+
+            /**
+             * If the device has temperature data:
+             * - recalculate the device temperatures
+             */
+            if (tourData.temperatureSerie != null) {
+               tourData.computeAvg_Temperature();
             }
 
             boolean isSaved = false;

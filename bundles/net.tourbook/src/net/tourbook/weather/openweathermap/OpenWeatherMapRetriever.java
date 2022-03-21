@@ -162,7 +162,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          //Setting the requested time to the next hour to retrieve the next set of weather data
          requestedTime += 3600;
 
+         // We avoid requesting data in the future
          if (requestedTime > TimeTools.nowInMilliseconds() / 1000) {
+
             if (hourly.size() > 0) {
                break;
             } else {
