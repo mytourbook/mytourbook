@@ -109,8 +109,8 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          uriBuilder.setParameter("units", "metric"); //$NON-NLS-1$ //$NON-NLS-2$
          uriBuilder.setParameter("lat", String.valueOf(searchAreaCenter.getLatitude())); //$NON-NLS-1$
          uriBuilder.setParameter("lon", String.valueOf(searchAreaCenter.getLongitude())); //$NON-NLS-1$
-         uriBuilder.setParameter("dt", String.valueOf(date)); //$NON-NLS-1$
          uriBuilder.setParameter("lang", Locale.getDefault().getLanguage()); //$NON-NLS-1$
+         uriBuilder.setParameter("dt", String.valueOf(date)); //$NON-NLS-1$
          weatherRequestWithParameters = uriBuilder.build().toString();
 
          return weatherRequestWithParameters;
@@ -132,8 +132,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       long requestedTime = tourStartTime;
 
-      boolean isRetrievalIncomplete = true;
-      while (isRetrievalIncomplete) {
+      while (true) {
 
          //Send an API request as long as we don't have the results covering the entire duration of the tour
          final String weatherRequestWithParameters = buildWeatherApiRequest(requestedTime);
@@ -153,15 +152,23 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
          if (WeatherUtils.isTourWeatherDataComplete(
                hourly.get(0).getDt(),
-               hourly.get(timeMachineResult.getHourly().size() - 1).getDt(),
+               hourly.get(hourly.size() - 1).getDt(),
                tourStartTime,
                tourEndTime)) {
-            isRetrievalIncomplete = false;
+            break;
          }
 
          requestedTime = newTimeMachineResult.getHourly().get(newTimeMachineResult.getHourly().size() - 1).getDt();
          //Setting the requested time to the next hour to retrieve the next set of weather data
          requestedTime += 3600;
+
+         if (requestedTime > TimeTools.nowInMilliseconds() / 1000) {
+            if (hourly.size() > 0) {
+               break;
+            } else {
+               return false;
+            }
+         }
       }
 
 // SET_FORMATTING_OFF

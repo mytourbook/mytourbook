@@ -54,7 +54,7 @@ public class OpenWeatherMapRetrieverTests {
    void testWeatherRetrieval() throws IllegalAccessException, NoSuchFieldException {
 
       final String urlBase = OAuth2Constants.HEROKU_APP_URL
-            + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&dt="; //$NON-NLS-1$
+            + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
 
       final String openWeatherMapResponse1 = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapResponse-1647086400.json"); //$NON-NLS-1$
