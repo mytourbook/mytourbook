@@ -303,4 +303,8 @@ public class TourPhoto {
             .toString();
    }
 
+   public int getIsGeoFromPhoto() {
+      return isGeoFromPhoto;
+   }
+
 }

@@ -446,10 +446,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Time spent (in seconds) in the "Slow" cadence zone (for example: Hiking).
     */
    private int                   cadenceZone_SlowTime                        = 0;                     // db-version 40
+
    /**
     * Time spent (in seconds) in the "Fast" cadence zone (for example: Running).
     */
    private int                   cadenceZone_FastTime                        = 0;                     // db-version 40
+
    /**
     * The delimiter used when computing the existing values of cadenceZone_SlowTime & cadenceZone_FastTime
     */
@@ -535,12 +537,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private boolean               isWeatherDataFromProvider;
 
    private int                   weather_Wind_Direction  = -1;                         // db-version 8
+
    /**
     * Speed in km/h
     */
    private int                   weather_Wind_Speed;                                   // db-version 8
    private String                weather_Clouds;                                       // db-version 8
 
+   /**
+    * Weather description
+    */
    private String                weather;                                              // db-version 13
 
    /**
@@ -668,12 +674,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Scaling factor for the temperature data serie, e.g. when set to 10 the temperature data serie
-    * is multiplied by 10, default scaling is <code>1</code>
-    */
-   /*
-    * disabled when float was introduces in 11.after8, preserved in database that older ejb objects
+    * is multiplied by 10, default scaling is <code>1</code><p>
+    *
+    * Disabled when float was introduces in 11.after8, preserved in database that older ejb objects
     * can be loaded
-    */
+   */
    private int                   temperatureScale               = 1;                   // db-version 13
 
    /**
@@ -749,7 +754,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Number of photos.
     */
-   @SuppressWarnings("unused")
    private int                   numberOfPhotos;
 
    /**
@@ -8053,6 +8057,46 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return gradientSerie;
    }
 
+   public int getHrZone0() {
+      return hrZone0;
+   }
+
+   public int getHrZone1() {
+      return hrZone1;
+   }
+
+   public int getHrZone2() {
+      return hrZone2;
+   }
+
+   public int getHrZone3() {
+      return hrZone3;
+   }
+
+   public int getHrZone4() {
+      return hrZone4;
+   }
+
+   public int getHrZone5() {
+      return hrZone5;
+   }
+
+   public int getHrZone6() {
+      return hrZone6;
+   }
+
+   public int getHrZone7() {
+      return hrZone7;
+   }
+
+   public int getHrZone8() {
+      return hrZone8;
+   }
+
+   public int getHrZone9() {
+      return hrZone9;
+   }
+
    public HrZoneContext getHrZoneContext() {
 
       if (_hrZoneContext == null) {
@@ -8142,6 +8186,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       return UI.EMPTY_STRING;
+   }
+
+   public short getIsDistanceFromSensor() {
+      return isDistanceFromSensor;
+   }
+
+   public int getIsPowerSensorPresent() {
+      return isPowerSensorPresent;
+   }
+
+   public int getIsPulseSensorPresent() {
+      return isPulseSensorPresent;
+   }
+
+   public short getIsStrideSensorPresent() {
+      return isStrideSensorPresent;
    }
 
    /**
@@ -8234,6 +8294,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
 
       return numberOfHrZones;
+   }
+
+   public int getNumberOfPhotos() {
+      return numberOfPhotos;
    }
 
    public int getNumberOfTimeSlices() {
@@ -9280,6 +9344,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return _swim_Swolf;
    }
 
+   public int getTemperatureScale() {
+      return temperatureScale;
+   }
+
    /**
     * @return Returns the temperature serie for the current measurement system or <code>null</code>
     *         when temperature is not available
@@ -9705,7 +9773,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * @return Returns weather text or an empty string when weather text is not set.
+    * @return Returns weather description or an empty string when weather description is not set.
     */
    public String getWeather() {
       return weather == null ? UI.EMPTY_STRING : weather;
@@ -11844,6 +11912,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
+   /**
+    * Set Weather description
+    *
+    * @param weather
+    */
    public void setWeather(final String weather) {
       this.weather = weather;
    }
