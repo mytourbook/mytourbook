@@ -150,17 +150,17 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          timeMachineResult.addAllHourly(newTimeMachineResult.getHourly());
          final List<Hourly> hourly = timeMachineResult.getHourly();
 
+         final int lastWeatherDataHour = hourly.get(hourly.size() - 1).getDt();
          if (WeatherUtils.isTourWeatherDataComplete(
                hourly.get(0).getDt(),
-               hourly.get(hourly.size() - 1).getDt(),
+               lastWeatherDataHour,
                tourStartTime,
                tourEndTime)) {
             break;
          }
 
-         requestedTime = newTimeMachineResult.getHourly().get(newTimeMachineResult.getHourly().size() - 1).getDt();
          //Setting the requested time to the next hour to retrieve the next set of weather data
-         requestedTime += 3600;
+         requestedTime = lastWeatherDataHour + 3600L;
 
          // We avoid requesting data in the future
          if (requestedTime > TimeTools.nowInMilliseconds() / 1000) {

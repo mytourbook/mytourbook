@@ -32,6 +32,8 @@ import net.tourbook.data.TourData;
 
 public class WeatherUtils {
 
+   public static final int SECONDS_PER_THIRTY_MINUTE = 1800;
+
    /**
     * Returns the fully detailed weather data as a human readable string.
     * Example:
@@ -391,7 +393,7 @@ public class WeatherUtils {
                                                    final long tourEndTime) {
 
       if (weatherDataStartTime > tourStartTime ||
-            weatherDataEndTime < tourEndTime) {
+            weatherDataEndTime + WeatherUtils.SECONDS_PER_THIRTY_MINUTE < tourEndTime) {
          return false;
       }
 

@@ -61,11 +61,9 @@ public class Data {
          // OR
          // - more than 30 mins after the tour end time
 
-         final long thirtyMinutes = 1800;
-
          final long hourlyEpochSeconds = currentHourly.getEpochSeconds();
-         if (hourlyEpochSeconds < tourStartTime - thirtyMinutes ||
-               hourlyEpochSeconds > tourEndTime + thirtyMinutes) {
+         if (hourlyEpochSeconds < tourStartTime - WeatherUtils.SECONDS_PER_THIRTY_MINUTE ||
+               hourlyEpochSeconds > tourEndTime + WeatherUtils.SECONDS_PER_THIRTY_MINUTE) {
             continue;
          }
 
