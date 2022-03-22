@@ -4369,6 +4369,8 @@ public class Map2View extends ViewPart implements
       _state.put(STATE_IS_SHOW_TOUR_WEATHER_IN_MAP,               _actionShowTourWeatherInMap.isChecked());
       _state.put(STATE_IS_SHOW_WAY_POINTS,                        _actionShowWayPoints.isChecked());
 
+      Util.setStateEnum(_state, STATE_CENTER_MAP_BY,              _map.getCenterMapBy());
+
       _state.put(STATE_MAP_SYNC_MODE_IS_ACTIVE,                   isMapSynched());
       Util.setStateEnum(_state, STATE_MAP_SYNC_MODE,              _currentMapSyncMode);
 
