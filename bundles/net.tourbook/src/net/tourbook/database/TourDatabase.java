@@ -9025,63 +9025,54 @@ public class TourDatabase {
          return;
       }
 
-      final PreparedStatement stmtUpdate = null;
+      long lastUpdateTime = startTime;
 
-      try {
+      int tourIndex = 1;
+      int lastUpdateNumItems = 1;
+      int sumUpdatedTours = 0;
 
-         long lastUpdateTime = startTime;
+      final List<Long> allTourIds = getAllTourIds();
+      final int numAllTourIds = allTourIds.size();
 
-         int tourIndex = 1;
-         int lastUpdateNumItems = 1;
-         int sumUpdatedTours = 0;
+      // If necessary, recomputing the temperature values (average/max/min) measured from the device
+      for (final Long tourId : allTourIds) {
 
-         final List<Long> allTourIds = getAllTourIds();
-         final int numAllTourIds = allTourIds.size();
+         if (splashManager != null) {
 
-         // If necessary, recomputing the temperature values (average/max/min) measured from the device
-         for (final Long tourId : allTourIds) {
+            final long currentTime = System.currentTimeMillis();
+            final long timeDiff = currentTime - lastUpdateTime;
 
-            if (splashManager != null) {
+            // reduce logging
+            if (timeDiff > DELAY_SPLASH_LOGGING
 
-               final long currentTime = System.currentTimeMillis();
-               final long timeDiff = currentTime - lastUpdateTime;
+                  // update UI for the last tour otherwise it looks like that not all data are converted
+                  || tourIndex == numAllTourIds) {
 
-               // reduce logging
-               if (timeDiff > DELAY_SPLASH_LOGGING
+               lastUpdateTime = currentTime;
 
-                     // update UI for the last tour otherwise it looks like that not all data are converted
-                     || tourIndex == numAllTourIds) {
+               final long numTourDiff = tourIndex - lastUpdateNumItems;
+               lastUpdateNumItems = tourIndex;
+               sumUpdatedTours += numTourDiff;
 
-                  lastUpdateTime = currentTime;
+               final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
 
-                  final long numTourDiff = tourIndex - lastUpdateNumItems;
-                  lastUpdateNumItems = tourIndex;
-                  sumUpdatedTours += numTourDiff;
+               splashManager.setMessage(NLS.bind(
 
-                  final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
+                     // Data update 47: Converting weather data - {0} of {1} - {2} % - {3}
+                     Messages.Tour_Database_PostUpdate_047_Weather,
 
-                  splashManager.setMessage(NLS.bind(
-
-                        // Data update 47: Converting weather data - {0} of {1} - {2} % - {3}
-                        Messages.Tour_Database_PostUpdate_047_Weather,
-
-                        new Object[] {
-                              sumUpdatedTours,
-                              numAllTourIds,
-                              percentValue,
-                              numTourDiff,
-                        }));
-               }
-
-               tourIndex++;
+                     new Object[] {
+                           sumUpdatedTours,
+                           numAllTourIds,
+                           percentValue,
+                           numTourDiff,
+                     }));
             }
 
-            updateDb_046_To_047_DataUpdate_Concurrent(tourId);
+            tourIndex++;
          }
 
-      } finally {
-
-         net.tourbook.common.util.SQL.close(stmtUpdate);
+         updateDb_046_To_047_DataUpdate_Concurrent(tourId);
       }
 
       updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
