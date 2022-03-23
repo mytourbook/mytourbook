@@ -32,6 +32,8 @@ import net.tourbook.data.TourData;
 
 public class WeatherUtils {
 
+   public static final int SECONDS_PER_THIRTY_MINUTE = 1800;
+
    /**
     * Returns the fully detailed weather data as a human readable string.
     * Example:
@@ -259,9 +261,9 @@ public class WeatherUtils {
       final double[] longitudeSerie = tour.longitudeSerie;
 
       // Looking for the farthest point of the track
-      LatLng furthestPoint = null;
       double maxDistance = Double.MIN_VALUE;
       final LatLng startPoint = new LatLng(latitudeSerie[0], longitudeSerie[0]);
+      LatLng furthestPoint = startPoint;
 
       for (int index = 1; index < latitudeSerie.length && index < longitudeSerie.length; ++index) {
 
@@ -391,7 +393,7 @@ public class WeatherUtils {
                                                    final long tourEndTime) {
 
       if (weatherDataStartTime > tourStartTime ||
-            weatherDataEndTime < tourEndTime) {
+            weatherDataEndTime + WeatherUtils.SECONDS_PER_THIRTY_MINUTE < tourEndTime) {
          return false;
       }
 

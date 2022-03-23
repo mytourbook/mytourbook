@@ -68,10 +68,8 @@ public class TimeMachineResult {
          // OR
          // - more than 30 mins after the tour end time
 
-         final long thirtyMinutes = 1800;
-
-         if (currentHourly.getDt() < tourStartTime - thirtyMinutes ||
-               currentHourly.getDt() > tourEndTime + thirtyMinutes) {
+         if (currentHourly.getDt() < tourStartTime - WeatherUtils.SECONDS_PER_THIRTY_MINUTE ||
+               currentHourly.getDt() > tourEndTime + WeatherUtils.SECONDS_PER_THIRTY_MINUTE) {
             continue;
          }
 
@@ -177,16 +175,6 @@ public class TimeMachineResult {
       return hourly;
    }
 
-   public float getTotalPrecipitation() {
-
-      return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(Hourly::getRain).sum());
-   }
-
-   public float getTotalSnowfall() {
-
-      return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(Hourly::getSnow).sum());
-   }
-
    public float getTemperatureAverage() {
 
       final OptionalDouble averageTemperature =
@@ -221,6 +209,16 @@ public class TimeMachineResult {
       }
 
       return 0;
+   }
+
+   public float getTotalPrecipitation() {
+
+      return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(Hourly::getRain).sum());
+   }
+
+   public float getTotalSnowfall() {
+
+      return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(Hourly::getSnow).sum());
    }
 
    public String getWeatherDescription() {
