@@ -8057,42 +8057,52 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return gradientSerie;
    }
 
+   @JsonIgnore
    public int getHrZone0() {
       return hrZone0;
    }
 
+   @JsonIgnore
    public int getHrZone1() {
       return hrZone1;
    }
 
+   @JsonIgnore
    public int getHrZone2() {
       return hrZone2;
    }
 
+   @JsonIgnore
    public int getHrZone3() {
       return hrZone3;
    }
 
+   @JsonIgnore
    public int getHrZone4() {
       return hrZone4;
    }
 
+   @JsonIgnore
    public int getHrZone5() {
       return hrZone5;
    }
 
+   @JsonIgnore
    public int getHrZone6() {
       return hrZone6;
    }
 
+   @JsonIgnore
    public int getHrZone7() {
       return hrZone7;
    }
 
+   @JsonIgnore
    public int getHrZone8() {
       return hrZone8;
    }
 
+   @JsonIgnore
    public int getHrZone9() {
       return hrZone9;
    }
@@ -8188,18 +8198,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return UI.EMPTY_STRING;
    }
 
+   @JsonIgnore
    public short getIsDistanceFromSensor() {
       return isDistanceFromSensor;
    }
 
+   @JsonIgnore
    public int getIsPowerSensorPresent() {
       return isPowerSensorPresent;
    }
 
+   @JsonIgnore
    public int getIsPulseSensorPresent() {
       return isPulseSensorPresent;
    }
 
+   @JsonIgnore
    public short getIsStrideSensorPresent() {
       return isStrideSensorPresent;
    }
@@ -8296,6 +8310,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return numberOfHrZones;
    }
 
+   @JsonIgnore
    public int getNumberOfPhotos() {
       return numberOfPhotos;
    }
@@ -9344,6 +9359,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return _swim_Swolf;
    }
 
+   @JsonIgnore
    public int getTemperatureScale() {
       return temperatureScale;
    }
