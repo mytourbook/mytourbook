@@ -11137,6 +11137,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       tourEndTime = tourStartTime + (tourDeviceTime_Elapsed * 1000);
    }
 
+   public void setTourImportFileName(final String tourImportFileName) {
+      this.tourImportFileName = tourImportFileName;
+   }
+
+   public void setTourImportFilePath(final String tourImportFilePath) {
+      this.tourImportFilePath = tourImportFilePath;
+   }
+
    public void setTourMarkers(final Set<TourMarker> tourMarkers) {
 
       if (this.tourMarkers != null) {

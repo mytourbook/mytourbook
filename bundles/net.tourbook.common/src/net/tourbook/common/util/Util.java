@@ -81,11 +81,12 @@ import org.xml.sax.Attributes;
 
 public class Util {
 
-   // public static final String UNIQUE_ID_SUFFIX_CICLO_TOUR          = "83582";           //$NON-NLS-1$
+// public static final String UNIQUE_ID_SUFFIX_CICLO_TOUR          = "83582"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GARMIN_FIT          = "12653"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GARMIN_TCX          = "42984"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GPX                 = "31683"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_MIO_105             = "10500"; //$NON-NLS-1$
+   public static final String UNIQUE_ID_SUFFIX_MT                  = "74953"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_NMEA                = "32481"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_POLAR_HRM           = "63193"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_POLAR_PDD           = "76913"; //$NON-NLS-1$
@@ -1922,6 +1923,20 @@ public class Util {
       }
    }
 
+   public static float parseFloat_0(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Float.parseFloat(textValue);
+         } else {
+            return 0;
+         }
+
+      } catch (final NumberFormatException e) {
+         return 0;
+      }
+   }
+
    /**
     * Parses SAX attribute
     *
@@ -1961,6 +1976,23 @@ public class Util {
          // do nothing
       }
       return Integer.MIN_VALUE;
+   }
+
+   public static int parseInt_0(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Integer.parseInt(textValue);
+         } else {
+            return 0;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (int) parseFloat_0(textValue);
+      }
    }
 
    /**
@@ -2005,6 +2037,23 @@ public class Util {
          // do nothing
       }
       return Long.MIN_VALUE;
+   }
+
+   public static long parseLong_0(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Integer.parseInt(textValue);
+         } else {
+            return 0;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (long) parseFloat_0(textValue);
+      }
    }
 
    /**

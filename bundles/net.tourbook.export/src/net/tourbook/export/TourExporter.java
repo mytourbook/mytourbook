@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -60,6 +60,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.osgi.framework.Version;
 
 public class TourExporter {
+
    /*
     * Velocity (VC) context values
     */
@@ -86,11 +87,10 @@ public class TourExporter {
    private static final String            ZERO                       = "0";                                                //$NON-NLS-1$
 
    private static final DecimalFormat     _nf1                       = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-
    private static final DecimalFormat     _nf3                       = (DecimalFormat) NumberFormat.getInstance(Locale.US);
    private static final DecimalFormat     _nf8                       = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-   private static final DateTimeFormatter _dtIso                     = ISODateTimeFormat.dateTimeNoMillis();
 
+   private static final DateTimeFormatter _dtIso                     = ISODateTimeFormat.dateTimeNoMillis();
    private static final SimpleDateFormat  _dateFormat                = new SimpleDateFormat();
 
    static {
@@ -133,10 +133,6 @@ public class TourExporter {
 
    private boolean      _isGPX;
    private boolean      _isTCX;
-
-   public enum ExportType {
-      GPX, TCX
-   }
 
    public TourExporter(final String formatTemplate) {
 
@@ -256,7 +252,9 @@ public class TourExporter {
        */
       final Calendar now = Calendar.getInstance();
       final Date creationDate = now.getTime();
+
       vcContext.put("creation_date", creationDate); //$NON-NLS-1$
+      vcContext.put("created", ZonedDateTime.now()); //$NON-NLS-1$
 
       doExport_21_Creator(vcContext);
       doExport_22_MinMax_LatLon(vcContext);
@@ -276,9 +274,11 @@ public class TourExporter {
       String pluginQualifierVersion = ZERO;
 
       if (version != null) {
+
          pluginMajorVersion = Integer.toString(version.getMajor());
          pluginMinorVersion = Integer.toString(version.getMinor());
          pluginMicroVersion = Integer.toString(version.getMicro());
+
          final String versionQualifier = version.getQualifier();
          if (StringUtils.isNumeric(versionQualifier)) {
             pluginQualifierVersion = versionQualifier;
@@ -295,7 +295,7 @@ public class TourExporter {
        */
       String creatorText = UI.EMPTY_STRING;
       if (version != null) {
-         creatorText = String.format("MyTourbook %d.%d.%d.%s - http://mytourbook.sourceforge.net", //$NON-NLS-1$
+         creatorText = String.format("MyTourbook %d.%d.%d.%s - https://mytourbook.sourceforge.io", //$NON-NLS-1$
                version.getMajor(),
                version.getMinor(),
                version.getMicro(),
