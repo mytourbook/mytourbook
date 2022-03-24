@@ -22,25 +22,6 @@
 ##
 #if($isExportAllTourData)
       <extensions>
-##
-## texts
-##
-         <mt:tourDescription><![CDATA[$!tourData.tourDescription]]></mt:tourDescription>
-         <mt:tourTitle><![CDATA[$!tourData.tourTitle]]></mt:tourTitle>
-         <mt:tourStartPlace><![CDATA[$!tourData.tourStartPlace]]></mt:tourStartPlace>
-         <mt:tourEndPlace><![CDATA[$!tourData.tourEndPlace]]></mt:tourEndPlace>
-         <mt:weather><![CDATA[$!tourData.weather]]></mt:weather>
-#         
-#if ($tourData.getImportFileName())
-         <mt:importFileName><![CDATA[$!tourData.getImportFileName()]]></mt:importFileName>
-#end            
-#if ($tourData.getImportFilePath())
-         <mt:importFilePath><![CDATA[$!tourData.getImportFilePath()]]></mt:importFilePath>
-#end            
-         
-##
-## any other values
-##
          <mt:tour 
             tourId                                   ="$tourData.tourId" 
 ##
@@ -51,19 +32,7 @@
             typeId                                   ="$tourData.tourType.getTypeId()" 
 #end
             
-            tourStartTime                            ="$tourData.getTourStartTimeMS()" 
-            tourEndTime                              ="$tourData.getTourEndTimeMS()" 
-            timeZoneId                               ="$tourData.timeZoneId" 
-
-            startYear                                ="$tourData.startYear" 
-            startMonth                               ="$tourData.startMonth" 
-            startDay                                 ="$tourData.startDay" 
-            startHour                                ="$tourData.startHour" 
-            startMinute                              ="$tourData.startMinute" 
-            startSecond                              ="$tourData.startSecond" 
-            startWeek                                ="$tourData.startWeek" 
-            startWeekYear                            ="$tourData.startWeekYear" 
-
+            tourStartTime                            ="$tourData.getTourStartTime()" 
             tourComputedTime_Moving                  ="$tourData.tourComputedTime_Moving" 
             tourDeviceTime_Elapsed                   ="$tourData.tourDeviceTime_Elapsed" 
             tourDeviceTime_Paused                    ="$tourData.tourDeviceTime_Paused" 
@@ -226,13 +195,52 @@
             weather_Wind_Direction                   ="$tourData.weather_Wind_Direction"
             weather_Wind_Speed                       ="$tourData.weather_Wind_Speed"
          />
+         <mt:tourDescription><![CDATA[$!tourData.tourDescription]]></mt:tourDescription>
+         <mt:tourTitle><![CDATA[$!tourData.tourTitle]]></mt:tourTitle>
+         <mt:tourStartPlace><![CDATA[$!tourData.tourStartPlace]]></mt:tourStartPlace>
+         <mt:tourEndPlace><![CDATA[$!tourData.tourEndPlace]]></mt:tourEndPlace>
+         <mt:weather><![CDATA[$!tourData.weather]]></mt:weather>
 ##
-## PHOTOS
+#if ($tourData.getImportFileName())
+         <mt:importFileName><![CDATA[$!tourData.getImportFileName()]]></mt:importFileName>
+#end            
+#if ($tourData.getImportFilePath())
+         <mt:importFilePath><![CDATA[$!tourData.getImportFilePath()]]></mt:importFilePath>
+#end            
+##
+##
+## TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   
+##
+##
+#set ($tourType = $tourData.getTourType())
+#if($tourType)
+         <mt:tourType>
+            <mt:name><![CDATA[$!tourType.getName()]]></mt:name>
+         </mt:tourType>
+#end
+##
+##
+## TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   
+##
+##
+#if($tourData.getTourTags().size() > 0)
+         <mt:tags>
+#set ($tags = $tourData.getTourTags())
+#foreach ($tag in $tags)         
+            <mt:tag>
+               <mt:name><![CDATA[$!tag.getTagName()]]></mt:name>
+            </mt:tag>
+#end
+         </mt:tags>
+#end
+##
+##
+## PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   
 ##
 ##
 #if ($tourData.getTourPhotos().size() > 0)
 #set ($photos = $tourData.getTourPhotos())
-         <mt:tourPhotos>
+         <mt:photos>
 #foreach ($photo in $photos)
             <mt:photo
                photoId                             ="$photo.getPhotoId()"
@@ -247,33 +255,32 @@
                <mt:imageFilePathName><![CDATA[$!photo.getImageFilePathName()]]></mt:imageFilePathName>
             </mt:photo>
 #end            
-         </mt:tourPhotos>
+         </mt:photos>
 #end
 ##
 ##
-## TYPE
+## SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   
 ##
 ##
-#set ($tourType = $tourData.getTourType())
-#if($tourType)
-         <mt:tourType>
-            <mt:name><![CDATA[$!tourType.getName()]]></mt:name>
-         </mt:tourType>
-#end
-##
-##
-## TAGS
-##
-##
-#if($tourData.getTourTags().size() > 0)
-         <mt:tags>
-#set ($tags = $tourData.getTourTags())
-#foreach ($tag in $tags)         
-            <mt:tag>
-               <mt:name><![CDATA[$!tag.getTagName()]]></mt:name>
-            </mt:tag>
-#end
-         </mt:tags>
+#if ($tourData.getDeviceSensorValues().size() > 0)
+#set ($allSensors = $tourData.getDeviceSensorValues())
+         <mt:sensorValues>
+#foreach ($sensor in $allSensors)
+            <mt:sensorValue
+               sensorValueId                       ="$sensor.getSensorValueId()"
+               sensorId                            ="$sensor.getDeviceSensor().getSensorId()"
+               tourStartTime                       ="$sensor.getTourStartTime()"
+               tourEndTime                         ="$sensor.getTourEndTime()"
+               batteryLevel_Start                  ="$sensor.getBatteryLevel_Start()"
+               batteryLevel_End                    ="$sensor.getBatteryLevel_End()"
+               batteryStatus_Start                 ="$sensor.getBatteryStatus_End()"
+               batteryStatus_End                   ="$sensor.getBatteryStatus_Start()"
+               batteryVoltage_Start                ="$sensor.getBatteryVoltage_Start()"
+               batteryVoltage_End                  ="$sensor.getBatteryVoltage_End()"
+            >
+            </mt:sensorValue>
+#end            
+         </mt:sensorValues>
 #end
 ##
       </extensions>
@@ -283,7 +290,7 @@
 ##
 ##
 ##
-## WAYPOINTS
+## WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   
 ##
 ##
 #if($hasWayPoints)
@@ -324,7 +331,7 @@
 ##
 ##
 ##
-## TOUR MARKER
+## MARKER   MARKER   MARKER   MARKER   MARKER   MARKER   MARKER   MARKER   MARKER   MARKER   MARKER   MARKER   
 ##
 ##
 #if($hasTourMarkers)
@@ -370,7 +377,7 @@
 #end
 ##
 ##
-## TRACKS
+## TRACKS   TRACKS   TRACKS   TRACKS   TRACKS   TRACKS   TRACKS   TRACKS   TRACKS   TRACKS   TRACKS   TRACKS   
 ##
 ##
 #if($hasTracks)
@@ -424,7 +431,7 @@
                <gpxdata:distance>$nf3.format($point.Distance)</gpxdata:distance>
 #end
 #if($isExportAllTourData && $point.hasValidGear())
-               <mt:gear>$point.Gear</mt:gear>
+               <mttp:gear>$point.Gear</mttp:gear>
 #end
             </extensions>
 #end

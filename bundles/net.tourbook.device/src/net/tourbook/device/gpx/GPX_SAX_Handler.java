@@ -29,6 +29,7 @@ import java.util.TimeZone;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.MtMath;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -78,7 +79,6 @@ public class GPX_SAX_Handler extends DefaultHandler {
     * gpx tags, attributes
     */
    private static final String TAG_GPX                         = "gpx";      //$NON-NLS-1$
-   private static final String TAG_METADATA                    = "metadata"; //$NON-NLS-1$
 
    private static final String TAG_RTE                         = "rte";      //$NON-NLS-1$
    private static final String TAG_RTEPT                       = "rtept";    //$NON-NLS-1$
@@ -143,7 +143,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
    //  xmlns:ns3="http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
    private static final String TAG_EXT_NS3_HR                  = "ns3:hr"; //$NON-NLS-1$
 
-   // xmlns:mt="net.tourbook/1"
+   private static final String TAG_MT_PREFIX                   = "mt:";      //$NON-NLS-1$
+
    // marker
    private static final String TAG_MT_MARKER_DISTANCE          = "mt:distance";     //$NON-NLS-1$
    private static final String TAG_MT_MARKER_IS_VISIBLE        = "mt:isVisible";    //$NON-NLS-1$
@@ -154,50 +155,17 @@ public class GPX_SAX_Handler extends DefaultHandler {
    private static final String TAG_MT_MARKER_TYPE              = "mt:type";         //$NON-NLS-1$
 
    // serie data
-   private static final String TAG_MT_SERIE_GEAR               = "mt:gear"; //$NON-NLS-1$
+   private static final String TAG_MT_TP_SERIE_GEAR            = "mttp:gear"; //$NON-NLS-1$
 
    // tour
-
-//   <mt:tourType>
-//      <mt:id>34</mt:id>
-//      <mt:name>Rennvelo 2</mt:name>
-//   </mt:tourType>
-//   <mt:tags>
-//      <mt:tag>
-//         <mt:id>20</mt:id>
-//         <mt:name>Panne</mt:name>
-//      </mt:tag>
-//   </mt:tags>
-
+   private static final String TAG_MT_TOUR                     = "mt:tour";                     //$NON-NLS-1$
    private static final String TAG_MT_TOUR_DESCRIPTION         = "mt:tourDescription";          //$NON-NLS-1$
    private static final String TAG_MT_TOUR_TITLE               = "mt:tourTitle";                //$NON-NLS-1$
    private static final String TAG_MT_TOUR_START_PLACE         = "mt:tourStartPlace";           //$NON-NLS-1$
    private static final String TAG_MT_TOUR_END_PLACE           = "mt:tourEndPlace";             //$NON-NLS-1$
-
-   private static final String TAG_MT_TOUR_START_TIME          = "mt:tourStartTime";            //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_END_TIME            = "mt:tourEndTime";              //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_MOVING_TIME         = "mt:tourComputedTime_Moving";  //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_ELAPSED_TIME        = "mt:tourDeviceTime_Elapsed";   //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_RECORDED_TIME       = "mt:tourDeviceTime_Recorded";  //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_PAUSED_TIME         = "mt:tourDeviceTime_Paused";    //$NON-NLS-1$
-
-   private static final String TAG_MT_TOUR_ALTITUDE_UP         = "mt:tourAltUp";                //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_ALTITUDE_DOWN       = "mt:tourAltDown";              //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_DISTANCE            = "mt:tourDistance";             //$NON-NLS-1$
-
-   private static final String TAG_MT_TOUR_CALORIES            = "mt:calories";                 //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_REST_PULSE          = "mt:restPulse";                //$NON-NLS-1$
-
-   private static final String TAG_MT_TOUR_BODY_WEIGHT         = "mt:BodyWeight";               //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_BODY_FAT            = "mt:BodyFat";                  //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_CONCONI_DEFLECTION  = "mt:conconiDeflection";        //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_DP_TOLERANCE        = "mt:dpTolerance";              //$NON-NLS-1$
-
-   private static final String TAG_MT_TOUR_TEMPERATURE         = "mt:temperature";              //$NON-NLS-1$
    private static final String TAG_MT_TOUR_WEATHER             = "mt:weather";                  //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_WEATHER_CLOUDS      = "mt:weatherClouds";            //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_WEATHER_WIND_DIR    = "mt:weatherWindDirection";     //$NON-NLS-1$
-   private static final String TAG_MT_TOUR_WEATHER_WIND_SPEED  = "mt:weatherWindSpeed";         //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_IMPORT_FILE_NAME    = "mt:importFileName";           //$NON-NLS-1$
+   private static final String TAG_MT_TOUR_IMPORT_FILE_PATH    = "mt:importFilePath";           //$NON-NLS-1$
 
    private static final String TAG_MT_TOUR_TAG                 = "mt:tag";                      //$NON-NLS-1$
    private static final String TAG_MT_TOUR_TYPE                = "mt:tourType";                 //$NON-NLS-1$
@@ -245,7 +213,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
    private int     _gpxVersion = -1;
 
-   private boolean _isInMetaData;
+   private boolean _isInMT_Prefix;
    private boolean _isInTrk;
    private boolean _isInTrkName;
    private boolean _isInTrkDesc;
@@ -268,9 +236,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
    private boolean _isInGpxDataElapsedTime;
    private boolean _isInGpxDataDistance;
 
-   private boolean _isInMT_Tour;
-   private boolean _isInMT_TourTag;
-   private boolean _isInMT_TourType;
+   private boolean _isInMT_Tour_Tag;
+   private boolean _isInMT_Tour_Type;
    private boolean _isInMT_Trk;
    private boolean _isInMT_Wpt;
 
@@ -281,8 +248,8 @@ public class GPX_SAX_Handler extends DefaultHandler {
    private boolean                       _isInWpt_Ele;
    private boolean                       _isInWpt_Time;
    private boolean                       _isInWpt_Name;
-   private boolean                       _isInWpt_Cmt;
-   private boolean                       _isInWpt_Desc;
+   private boolean                       _isInWpt_Comment;
+   private boolean                       _isInWpt_Description;
    private boolean                       _isInWpt_Sym;
    private boolean                       _isInWpt_Type;
    private boolean                       _isInWpt_UrlAddress;
@@ -327,7 +294,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
    /**
     * Is <code>true</code> when tour contained mt: custom tags.
     */
-   private boolean                       _isMTData;
+   private boolean                       _isContainsMTData;
 
    private ImportState_File              _importState_File;
    private ImportState_Process           _importState_Process;
@@ -381,15 +348,14 @@ public class GPX_SAX_Handler extends DefaultHandler {
             || _isInPower
             || _isInTemp
             || _isInDistance
-            //
-            || _isInMT_Tour
-            || _isInMT_TourTag
-            || _isInMT_TourType
+
+            || _isInMT_Tour_Tag
+            || _isInMT_Tour_Type
             || _isInMT_Trk
             || _isInMT_Wpt
-            //
-            || _isInWpt_Cmt
-            || _isInWpt_Desc
+
+            || _isInWpt_Comment
+            || _isInWpt_Description
             || _isInWpt_Ele
             || _isInWpt_Name
             || _isInWpt_Sym
@@ -397,68 +363,141 @@ public class GPX_SAX_Handler extends DefaultHandler {
             || _isInWpt_Type
             || _isInWpt_UrlAddress
             || _isInWpt_UrlText
-            //
+
             || _isInGpxDataIndex
             || _isInGpxDataStartTime
             || _isInGpxDataElapsedTime
             || _isInGpxDataDistance
-      //
+
       ) {
 
          _characters.append(chars, startIndex, length);
       }
    }
 
-   @Override
-   public void endDocument() throws SAXException {
+   private void element_1_Start(final String name, final Attributes attributes) {
 
-      if (_newlyImportedTours.size() == 1) {
+      //      System.out.print("<" + name + ">");
 
-         final TourData tourData = (TourData) _newlyImportedTours.values().toArray()[0];
+      if (_isError) {
+         return;
+      }
 
-         // set tourmarkers/waypoints for the only 1 tour
-         tourData.setTourMarkers(_allTourMarker);
-         tourData.setWayPoints(_allWayPoints);
+      if (_gpxVersion < 0) {
 
-         if (_device.isConvertWayPoints) {
-            tourData.convertWayPoints();
+         // gpx version is not set
+
+         if (name.equals(TAG_GPX)) {
+
+            /*
+             * get version of the XML file
+             */
+            for (int attrIndex = 0; attrIndex < attributes.getLength(); attrIndex++) {
+
+               final String qName = attributes.getQName(attrIndex);
+               final String value = attributes.getValue(attrIndex);
+
+               if (value.contains(NAME_SPACE_GPX_1_0)
+
+                     // tolerate 'version="1.0"' without namespace
+                     || (qName.equalsIgnoreCase(ATTR_GPX_VERSION) && value.equals(ATTR_GPX_VERSION_1_0))
+
+               ) {
+
+                  _gpxVersion = GPX_VERSION_1_0;
+
+                  if (_device.isMergeTracks) {
+                     initNewTrack();
+                  }
+
+               } else if (value.contains(NAME_SPACE_GPX_1_1)
+
+                     // tolerate 'version="1.1"' without namespace
+                     || (qName.equalsIgnoreCase(ATTR_GPX_VERSION) && value.equals(ATTR_GPX_VERSION_1_1))
+
+               ) {
+
+                  _gpxVersion = GPX_VERSION_1_1;
+
+                  if (_device.isMergeTracks) {
+                     initNewTrack();
+                  }
+
+               } else if (value.contains(POLAR_WEBSYNC_CREATOR_2_3)) {
+
+                  _gpxHasLocalTime = true;
+
+               } else if (value.contains(GH600)) {
+
+                  _gpxHasLocalTime = true;
+
+               }
+            }
          }
 
-         /*
-          * Remove annoying marker when only 1 tour is imported
-          */
+      } else if ((_gpxVersion == GPX_VERSION_1_0) || (_gpxVersion == GPX_VERSION_1_1)) {
 
-//         final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
-//
-//         if (tourMarkers.size() > 0) {
-//
-//            // this happened
-//
-//            // sort by serie index
-//            final ArrayList<TourMarker> sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
-//            Collections.sort(sortedMarkers);
-//
-//            final TourMarker firstMarker = sortedMarkers.get(0);
-//            tourMarkers.remove(firstMarker);
-//         }
+         // name space: http://www.topografix.com/GPX/1/0/gpx.xsd
 
-      } else {
+         if (_isInTrk) {
 
-         /**
-          * Set tourmarker/waypoints AFTER all tours are created that tourmarker/waypoints are set
-          * only ONCE, otherwise this exception occurs:
-          * <p>
-          * org.hibernate.PersistentObjectException: detached entity passed to persist:
-          * net.tourbook.data.TourMarker
-          */
-         updateTMandWP();
+            element_TRK_1_Start(name, attributes);
+
+         } else if (_isInWpt) {
+
+            element_WPT_1_Start(name);
+
+         } else if (_isInMT_Prefix) {
+
+            element_MT_1_Start(name, attributes);
+
+         } else if (TAG_TRK.equals(name) || TAG_RTE.equals(name)) {
+
+            /*
+             * new track starts
+             */
+
+            _isInTrk = true;
+
+            if (_device.isMergeTracks) {
+
+               _trackCounter++;
+
+               _isSetTrackMarker = true;
+
+            } else {
+
+               initNewTrack();
+            }
+
+         } else if (name.equals(TAG_WPT)) {
+
+            /*
+             * new way point starts
+             */
+
+            _isInWpt = true;
+
+            _wayPoint = new TourWayPoint();
+
+            // get attributes
+            _wayPoint.setLatitude(getDoubleValue(attributes.getValue(ATTR_LATITUDE)));
+            _wayPoint.setLongitude(getDoubleValue(attributes.getValue(ATTR_LONGITUDE)));
+
+         } else if (name.equals(TAG_MT_TOUR)) {
+
+            element_MT_1_Start(name, attributes);
+
+         } else if (name.startsWith(TAG_MT_PREFIX)) {
+
+            _isInMT_Prefix = true;
+         }
       }
    }
 
-   @Override
-   public void endElement(final String uri, final String localName, final String name) throws SAXException {
+   private void element_2_End(final String name) {
 
-//      System.out.println("</" + name + ">");
+      //      System.out.println("</" + name + ">");
 
       if (_isError) {
          return;
@@ -468,56 +507,56 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
          final String charData = _characters.toString();
 
-//         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//               + ("\tcharData: " + charData));
-//         // TODO remove SYSTEM.OUT.PRINTLN
+         //         System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
+         //               + ("\tcharData: " + charData));
+         //         // TODO remove SYSTEM.OUT.PRINTLN
 
-//         if (charData.startsWith(CDATA_START)) {
-//
-//            if (charData.endsWith(CDATA_END)) {
-//
-//               final int start = CDATA_START.length();
-//               final int end = charData.length() - CDATA_END.length();
-//
-//               charData = charData.substring(start, end);
-//            }
-//         }
+         //         if (charData.startsWith(CDATA_START)) {
+         //
+         //            if (charData.endsWith(CDATA_END)) {
+         //
+         //               final int start = CDATA_START.length();
+         //               final int end = charData.length() - CDATA_END.length();
+         //
+         //               charData = charData.substring(start, end);
+         //            }
+         //         }
 
          if (_isInTrk) {
 
-            endElement_TRK(name, charData);
+            element_TRK_2_End(name, charData);
 
          } else if (_isInWpt) {
 
             // in <wpt>
 
-            endElement_WPT(name, charData);
+            element_WPT_2_End(name, charData);
 
-         } else if (_isInMT_Tour) {
+         } else if (_isInMT_Prefix) {
 
-            endElement_MT_Tour(name, charData);
+            element_MT_2_End(name, charData);
 
-         } else if (_isInMT_TourTag) {
+         } else if (_isInMT_Tour_Tag) {
 
             if (name.equals(TAG_MT_TOUR_SUB_NAME)) {
 
                _allImportedTagNames.add(charData);
-               _isInMT_TourTag = false;
+               _isInMT_Tour_Tag = false;
             }
 
-         } else if (_isInMT_TourType) {
+         } else if (_isInMT_Tour_Type) {
 
             if (name.equals(TAG_MT_TOUR_SUB_NAME)) {
 
                _tourTypeName = charData;
-               _isInMT_TourType = false;
+               _isInMT_Tour_Type = false;
             }
          }
 
          if (TAG_TRKPT.equals(name) || TAG_RTEPT.equals(name)) {
 
             /*
-             * trackpoint ends
+             * Trackpoint ends
              */
 
             _isInTrkPt = false;
@@ -527,7 +566,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
          } else if (TAG_TRK.equals(name) || TAG_RTE.equals(name)) {
 
             /*
-             * track ends
+             * Track ends
              */
 
             _isInTrk = false;
@@ -539,7 +578,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
          } else if (name.equals(TAG_WPT)) {
 
             /*
-             * way point ends
+             * Way point ends
              */
 
             _isInWpt = false;
@@ -549,7 +588,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
          } else if (name.equals(TAG_GPX)) {
 
             /*
-             * file end
+             * File end
              */
 
             if (_device.isMergeTracks) {
@@ -559,23 +598,91 @@ public class GPX_SAX_Handler extends DefaultHandler {
          } else if (name.equals(TAG_EXT_DATA_LAP)) {
 
             /*
-             * lap ends
+             * Lap ends
              */
             _isInGpxDataLap = false;
             finalizeLap();
 
-         } else if (name.equals(TAG_METADATA)) {
+         } else if (name.equals(TAG_MT_PREFIX)) {
 
-            _isInMetaData = false;
+            /*
+             * mt: ends
+             */
+
+            _isInMT_Prefix = false;
+            _isContainsMTData = true;
          }
 
       } catch (final NumberFormatException e) {
-         net.tourbook.common.util.StatusUtil.showStatus(e);
+         StatusUtil.showStatus(e);
       }
-
    }
 
-   private void endElement_MT_Tour(final String name, final String charData) {
+   private void element_MT_1_Start(final String name, final Attributes attributes) {
+
+      if (_isInMT_Tour_Tag || _isInMT_Tour_Type) {
+
+         if (name.equals(TAG_MT_TOUR_SUB_NAME)) {
+
+            _characters.delete(0, _characters.length());
+         }
+
+      } else if (name.equals(TAG_MT_TOUR_DESCRIPTION)
+            || name.equals(TAG_MT_TOUR_TITLE)
+            || name.equals(TAG_MT_TOUR_START_PLACE)
+            || name.equals(TAG_MT_TOUR_END_PLACE)
+
+            || name.equals(TAG_MT_TOUR_WEATHER)
+            || name.equals(TAG_MT_TOUR_IMPORT_FILE_NAME)
+            || name.equals(TAG_MT_TOUR_IMPORT_FILE_PATH)) {
+
+         _isInMT_Prefix = true;
+
+         _characters.delete(0, _characters.length());
+
+      } else if (name.equals(TAG_MT_TOUR)) {
+
+// SET_FORMATTING_OFF
+
+         _tourData.setTourStartTime(ZonedDateTime.parse(       attributes.getValue("tourStartTime")));
+
+         _tourData.setTourComputedTime_Moving(  getIntValue(   attributes.getValue("tourComputedTime_Moving")));
+         _tourData.setTourDeviceTime_Elapsed(   getLongValue(  attributes.getValue("tourDeviceTime_Elapsed")));
+         _tourData.setTourDeviceTime_Recorded(  getLongValue(  attributes.getValue("tourDeviceTime_Recorded")));
+         _tourData.setTourDeviceTime_Paused(    getLongValue(  attributes.getValue("tourDeviceTime_Paused")));
+
+         _tourData.setTourAltDown(              getFloatValue( attributes.getValue("tourAltDown")));
+         _tourData.setTourAltUp(                getFloatValue( attributes.getValue("tourAltUp")));
+
+         _tourData.setTourDistance(             getFloatValue( attributes.getValue("tourDistance")));
+
+         _tourData.setCalories(                 getIntValue(   attributes.getValue("calories")));
+         _tourData.setRestPulse(                getIntValue(   attributes.getValue("restPulse")));
+         _tourData.setBodyWeight(               getFloatValue( attributes.getValue("bodyWeight")));
+         _tourData.setBodyFat(                  getFloatValue( attributes.getValue("bodyFat")));
+
+         _tourData.setConconiDeflection(        getIntValue(   attributes.getValue("conconiDeflection")));
+         _tourData.setDpTolerance((short)       getIntValue(   attributes.getValue("dpTolerance")));
+
+         _tourData.setWeather_Clouds(                          attributes.getValue("weather_Clouds"));
+         _tourData.setWeather_Wind_Direction(   getIntValue(   attributes.getValue("weather_Wind_Direction")));
+         _tourData.setWeather_Wind_Speed(       getIntValue(   attributes.getValue("weather_Wind_Speed")));
+
+         _tourData.setWeather_Temperature_Average_Device(   getFloatValue(attributes.getValue("weather_Temperature_Average_Device")));
+
+// SET_FORMATTING_ON
+
+      } else if (name.equals(TAG_MT_TOUR_TAG)) {
+
+         _isInMT_Tour_Tag = true;
+
+      } else if (name.equals(TAG_MT_TOUR_TYPE)) {
+
+         _isInMT_Tour_Type = true;
+      }
+   }
+
+   private void element_MT_2_End(final String name, final String charData) {
 
       if (_tourData == null) {
          initNewTrack();
@@ -584,129 +691,143 @@ public class GPX_SAX_Handler extends DefaultHandler {
       if (name.equals(TAG_MT_TOUR_DESCRIPTION)) {
 
          _tourData.setTourDescription(charData);
-         _isInMT_Tour = false;
+         _isInMT_Prefix = false;
 
       } else if (name.equals(TAG_MT_TOUR_TITLE)) {
 
          _tourData.setTourTitle(charData);
-         _isInMT_Tour = false;
+         _isInMT_Prefix = false;
 
       } else if (name.equals(TAG_MT_TOUR_START_PLACE)) {
 
          _tourData.setTourStartPlace(charData);
-         _isInMT_Tour = false;
+         _isInMT_Prefix = false;
 
       } else if (name.equals(TAG_MT_TOUR_END_PLACE)) {
 
          _tourData.setTourEndPlace(charData);
-         _isInMT_Tour = false;
+         _isInMT_Prefix = false;
 
-      } else if (name.equals(TAG_MT_TOUR_START_TIME)) {
+      }
 
-         final long tourStartMills = getLongValue(charData);
+//      _tourData.setWeather(                  attributes.getValue(""));
+   }
 
-         final ZonedDateTime tourStartTime = TimeTools.getZonedDateTime(tourStartMills);
+   private void element_TRK_1_Start(final String name, final Attributes attributes) {
 
-         _tourData.setTourStartTime(tourStartTime);
-         _isInMT_Tour = false;
+      if (_isInTrkPt) {
 
-      } else if (name.equals(TAG_MT_TOUR_END_TIME)) {
+         if (name.equals(TAG_ELE)) {
 
-         _isInMT_Tour = false;
+            _isInEle = true;
+            _characters.delete(0, _characters.length());
 
-      } else if (name.equals(TAG_MT_TOUR_MOVING_TIME)) {
+         } else if (name.equals(TAG_TIME)) {
 
-         _tourData.setTourComputedTime_Moving(getIntValue(charData));
-         _isInMT_Tour = false;
+            _isInTime = true;
+            _characters.delete(0, _characters.length());
 
-      } else if (name.equals(TAG_MT_TOUR_ELAPSED_TIME)) {
+         } else if (name.equals(TAG_MT_TP_SERIE_GEAR)) {
 
-         _tourData.setTourDeviceTime_Elapsed(getLongValue(charData));
-         _isInMT_Tour = false;
+            _isInMT_Trk = true;
+            _characters.delete(0, _characters.length());
 
-      } else if (name.equals(TAG_MT_TOUR_RECORDED_TIME)) {
+         } else if (name.equals(TAG_EXT_TPX_CAD)
+               || name.equals(TAG_EXT_CAD)
+               || name.equals(TAG_EXT_UN_CAD)) {
 
-         _tourData.setTourDeviceTime_Recorded(getLongValue(charData));
-         _isInMT_Tour = false;
+            _isInCadence = true;
+            _characters.delete(0, _characters.length());
 
-      } else if (name.equals(TAG_MT_TOUR_PAUSED_TIME)) {
+         } else if (name.equals(TAG_EXT_TPX_HR)
+               || name.equals(TAG_EXT_GPXX_HR)
+               || name.equals(TAG_EXT_DATA_HR)
+               || name.equals(TAG_EXT_HR)
+               || name.equals(TAG_EXT_UN_HR)
+               || name.equals(TAG_EXT_NS3_HR)) {
 
-         _tourData.setTourDeviceTime_Paused(getLongValue(charData));
-         _isInMT_Tour = false;
+            _isInHr = true;
+            _characters.delete(0, _characters.length());
 
-      } else if (name.equals(TAG_MT_TOUR_ALTITUDE_DOWN)) {
+         } else if (name.equals(TAG_EXT_UN_POWER)) {
 
-         _tourData.setTourAltDown(getFloatValue(charData));
-         _isInMT_Tour = false;
+            _isInPower = true;
+            _characters.delete(0, _characters.length());
 
-      } else if (name.equals(TAG_MT_TOUR_ALTITUDE_UP)) {
+         } else if (name.equals(TAG_EXT_TPX_TEMP)
+               || name.equals(TAG_EXT_GPXX_TEMP)
+               || name.equals(TAG_EXT_GPXX_TEMPERATURE)
+               || name.equals(TAG_EXT_DATA_TEMP)) {
 
-         _tourData.setTourAltUp(getFloatValue(charData));
-         _isInMT_Tour = false;
+            _isInTemp = true;
+            _characters.delete(0, _characters.length());
 
-      } else if (name.equals(TAG_MT_TOUR_DISTANCE)) {
+         } else if (name.equals(TAG_EXT_DATA_DISTANCE)) {
 
-         _tourData.setTourDistance(getFloatValue(charData));
-         _isInMT_Tour = false;
+            _isInDistance = true;
+            _characters.delete(0, _characters.length());
+         }
 
-      } else if (name.equals(TAG_MT_TOUR_CALORIES)) {
+      } else if (TAG_TRKPT.equals(name) || TAG_RTEPT.equals(name)) {
 
-         _tourData.setCalories(getIntValue(charData));
-         _isInMT_Tour = false;
+         /*
+          * new trackpoint
+          */
+         _isInTrkPt = true;
 
-      } else if (name.equals(TAG_MT_TOUR_REST_PULSE)) {
+         // create new time item
+         _timeSlice = new TimeData();
 
-         _tourData.setRestPulse(getIntValue(charData));
-         _isInMT_Tour = false;
+         // get attributes
+         _timeSlice.latitude = getDoubleValue(attributes.getValue(ATTR_LATITUDE));
+         _timeSlice.longitude = getDoubleValue(attributes.getValue(ATTR_LONGITUDE));
 
-      } else if (name.equals(TAG_MT_TOUR_BODY_WEIGHT)) {
+      } else if (name.equals(TAG_TRK_NAME)) {
 
-         _tourData.setBodyWeight(getFloatValue(charData));
-         _isInMT_Tour = false;
+         _isInTrkName = true;
+         _characters.delete(0, _characters.length());
 
-      } else if (name.equals(TAG_MT_TOUR_BODY_FAT)) {
+      } else if (name.equals(TAG_TRK_DESC)) {
 
-         _tourData.setBodyFat(getFloatValue(charData));
-         _isInMT_Tour = false;
+         _isInTrkDesc = true;
+         _characters.delete(0, _characters.length());
 
-      } else if (name.equals(TAG_MT_TOUR_CONCONI_DEFLECTION)) {
+      } else if (name.equals(TAG_EXT_DATA_LAP)) {
 
-         _tourData.setConconiDeflection(getIntValue(charData));
-         _isInMT_Tour = false;
+         _isInGpxDataLap = true;
+         _gpxDataLap = new GPXDataLap();
 
-      } else if (name.equals(TAG_MT_TOUR_DP_TOLERANCE)) {
+      } else if (_isInGpxDataLap) {
 
-         _tourData.setDpTolerance((short) getIntValue(charData));
-         _isInMT_Tour = false;
+         if (name.equals(TAG_EXT_DATA_INDEX)) {
 
-      } else if (name.equals(TAG_MT_TOUR_TEMPERATURE)) {
+            _isInGpxDataIndex = true;
+            _characters.delete(0, _characters.length());
 
-         _tourData.setWeather_Temperature_Average_Device(getFloatValue(charData));
-         _isInMT_Tour = false;
+         } else if (name.equals(TAG_EXT_DATA_START_TIME)) {
 
-      } else if (name.equals(TAG_MT_TOUR_WEATHER)) {
+            _isInGpxDataStartTime = true;
+            _characters.delete(0, _characters.length());
 
-         _tourData.setWeather(charData);
-         _isInMT_Tour = false;
+         } else if (name.equals(TAG_EXT_DATA_END_POINT)) {
 
-      } else if (name.equals(TAG_MT_TOUR_WEATHER_CLOUDS)) {
+            _gpxDataLap.latitude = getDoubleValue(attributes.getValue(ATTR_LATITUDE));
+            _gpxDataLap.longitude = getDoubleValue(attributes.getValue(ATTR_LONGITUDE));
 
-         _tourData.setWeather_Clouds(charData);
-         _isInMT_Tour = false;
+         } else if (name.equals(TAG_EXT_DATA_ELAPSED_TIME)) {
 
-      } else if (name.equals(TAG_MT_TOUR_WEATHER_WIND_DIR)) {
+            _isInGpxDataElapsedTime = true;
+            _characters.delete(0, _characters.length());
 
-         _tourData.setWeather_Wind_Direction(getIntValue(charData));
-         _isInMT_Tour = false;
+         } else if (name.equals(TAG_EXT_DATA_DISTANCE)) {
 
-      } else if (name.equals(TAG_MT_TOUR_WEATHER_WIND_SPEED)) {
-
-         _tourData.setWeather_Wind_Speed(getIntValue(charData));
-         _isInMT_Tour = false;
+            _isInGpxDataDistance = true;
+            _characters.delete(0, _characters.length());
+         }
       }
    }
 
-   private void endElement_TRK(final String name, final String charData) {
+   private void element_TRK_2_End(final String name, final String charData) {
 
       if (_isInTrkPt) {
 
@@ -726,7 +847,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
             _timeSlice.absoluteTime = parseDateTime(charData);
 
-         } else if (name.equals(TAG_MT_SERIE_GEAR)) {
+         } else if (name.equals(TAG_MT_TP_SERIE_GEAR)) {
 
             // </mt:gear>
 
@@ -859,7 +980,75 @@ public class GPX_SAX_Handler extends DefaultHandler {
       }
    }
 
-   private void endElement_WPT(final String name, final String charData) {
+   private void element_WPT_1_Start(final String name) {
+
+      if (name.equals(TAG_WPT_ELE)) {
+
+         _isInWpt_Ele = true;
+         _characters.delete(0, _characters.length());
+
+      } else if (name.equals(TAG_WPT_TIME)) {
+
+         _isInWpt_Time = true;
+         _characters.delete(0, _characters.length());
+
+      } else if (name.equals(TAG_WPT_NAME)) {
+
+         _isInWpt_Name = true;
+         _characters.delete(0, _characters.length());
+
+      } else if (name.equals(TAG_WPT_CMT)) {
+
+         _isInWpt_Comment = true;
+         _characters.delete(0, _characters.length());
+
+      } else if (name.equals(TAG_WPT_DESC)) {
+
+         _isInWpt_Description = true;
+         _characters.delete(0, _characters.length());
+
+      } else if (name.equals(TAG_WPT_SYM)) {
+
+         _isInWpt_Sym = true;
+         _characters.delete(0, _characters.length());
+
+      } else if (name.equals(TAG_WPT_TYPE)) {
+
+         _isInWpt_Type = true;
+         _characters.delete(0, _characters.length());
+
+      } else if (name.equals(TAG_WPT_URL)) {
+
+         _isInWpt_UrlAddress = true;
+         _characters.delete(0, _characters.length());
+
+      } else if (name.equals(TAG_WPT_URLNAME)) {
+
+         _isInWpt_UrlText = true;
+         _characters.delete(0, _characters.length());
+
+      } else if (name.equals(TAG_MT_MARKER_DISTANCE)
+            || name.equals(TAG_MT_MARKER_IS_VISIBLE)
+            || name.equals(TAG_MT_MARKER_LABEL_POS)
+            || name.equals(TAG_MT_MARKER_LABEL_X_OFFSET)
+            || name.equals(TAG_MT_MARKER_LABEL_Y_OFFSET)
+            || name.equals(TAG_MT_MARKER_SERIE_INDEX)
+            || name.equals(TAG_MT_MARKER_TYPE)
+
+      ) {
+
+         _isInMT_Wpt = true;
+         _characters.delete(0, _characters.length());
+
+         if (_tempTourMarker == null) {
+            _tempTourMarker = new TourMarker();
+         }
+
+         _isTourMarkerImported = true;
+      }
+   }
+
+   private void element_WPT_2_End(final String name, final String charData) {
 
       if (name.equals(TAG_WPT_ELE)) {
 
@@ -888,14 +1077,14 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
          // </cmt> comment
 
-         _isInWpt_Cmt = false;
+         _isInWpt_Comment = false;
          _wayPoint.setComment(charData);
 
       } else if (name.equals(TAG_WPT_DESC)) {
 
          // </desc> description
 
-         _isInWpt_Desc = false;
+         _isInWpt_Description = false;
          _wayPoint.setDescription(charData);
 
       } else if (name.equals(TAG_WPT_SYM)) {
@@ -977,6 +1166,58 @@ public class GPX_SAX_Handler extends DefaultHandler {
       }
    }
 
+   @Override
+   public void endDocument() throws SAXException {
+
+      if (_newlyImportedTours.size() == 1) {
+
+         final TourData tourData = (TourData) _newlyImportedTours.values().toArray()[0];
+
+         // set tourmarkers/waypoints for the only 1 tour
+         tourData.setTourMarkers(_allTourMarker);
+         tourData.setWayPoints(_allWayPoints);
+
+         if (_device.isConvertWayPoints) {
+            tourData.convertWayPoints();
+         }
+
+         /*
+          * Remove annoying marker when only 1 tour is imported
+          */
+
+//         final Set<TourMarker> tourMarkers = tourData.getTourMarkers();
+//
+//         if (tourMarkers.size() > 0) {
+//
+//            // this happened
+//
+//            // sort by serie index
+//            final ArrayList<TourMarker> sortedMarkers = new ArrayList<TourMarker>(tourMarkers);
+//            Collections.sort(sortedMarkers);
+//
+//            final TourMarker firstMarker = sortedMarkers.get(0);
+//            tourMarkers.remove(firstMarker);
+//         }
+
+      } else {
+
+         /**
+          * Set tourmarker/waypoints AFTER all tours are created that tourmarker/waypoints are set
+          * only ONCE, otherwise this exception occurs:
+          * <p>
+          * org.hibernate.PersistentObjectException: detached entity passed to persist:
+          * net.tourbook.data.TourMarker
+          */
+         updateTMandWP();
+      }
+   }
+
+   @Override
+   public void endElement(final String uri, final String localName, final String name) throws SAXException {
+
+      element_2_End(name);
+   }
+
    private void finalizeLap() {
 
       if (_gpxDataLap == null) {
@@ -999,13 +1240,14 @@ public class GPX_SAX_Handler extends DefaultHandler {
 
       // create data object for each tour
 
-      if (_isMTData) {
+      if (_isContainsMTData) {
 
          // title and description are already set
 
          _tourData.setIsImportedMTTour(true);
 
       } else {
+
          _tourData.setTourTitle(_trkName);
          _tourData.setTourDescription(_trkDesc);
       }
@@ -1438,353 +1680,7 @@ public class GPX_SAX_Handler extends DefaultHandler {
    public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
          throws SAXException {
 
-//      System.out.print("<" + name + ">");
-
-      if (_isError) {
-         return;
-      }
-
-      if (_gpxVersion < 0) {
-
-         // gpx version is not set
-
-         if (name.equals(TAG_GPX)) {
-
-            /*
-             * get version of the XML file
-             */
-            for (int attrIndex = 0; attrIndex < attributes.getLength(); attrIndex++) {
-
-               final String qName = attributes.getQName(attrIndex);
-               final String value = attributes.getValue(attrIndex);
-
-               if (value.contains(NAME_SPACE_GPX_1_0)
-
-                     // tolerate 'version="1.0"' without namespace
-                     || (qName.equalsIgnoreCase(ATTR_GPX_VERSION) && value.equals(ATTR_GPX_VERSION_1_0))
-
-               ) {
-
-                  _gpxVersion = GPX_VERSION_1_0;
-
-                  if (_device.isMergeTracks) {
-                     initNewTrack();
-                  }
-
-               } else if (value.contains(NAME_SPACE_GPX_1_1)
-
-                     // tolerate 'version="1.1"' without namespace
-                     || (qName.equalsIgnoreCase(ATTR_GPX_VERSION) && value.equals(ATTR_GPX_VERSION_1_1))
-
-               ) {
-
-                  _gpxVersion = GPX_VERSION_1_1;
-
-                  if (_device.isMergeTracks) {
-                     initNewTrack();
-                  }
-
-               } else if (value.contains(POLAR_WEBSYNC_CREATOR_2_3)) {
-
-                  _gpxHasLocalTime = true;
-
-               } else if (value.contains(GH600)) {
-
-                  _gpxHasLocalTime = true;
-
-               }
-            }
-         }
-
-      } else if ((_gpxVersion == GPX_VERSION_1_0) || (_gpxVersion == GPX_VERSION_1_1)) {
-
-         // name space: http://www.topografix.com/GPX/1/0/gpx.xsd
-
-         if (_isInTrk) {
-
-            startElement_TRK(name, attributes);
-
-         } else if (_isInWpt) {
-
-            startElement_WPT(name);
-
-         } else if (_isInMetaData) {
-
-            startElement_META(name);
-
-         } else if (TAG_TRK.equals(name) || TAG_RTE.equals(name)) {
-
-            /*
-             * new track starts
-             */
-
-            _isInTrk = true;
-
-            if (_device.isMergeTracks) {
-
-               _trackCounter++;
-
-               _isSetTrackMarker = true;
-
-            } else {
-
-               initNewTrack();
-            }
-
-         } else if (name.equals(TAG_WPT)) {
-
-            /*
-             * new way point starts
-             */
-
-            _isInWpt = true;
-
-            _wayPoint = new TourWayPoint();
-
-            // get attributes
-            _wayPoint.setLatitude(getDoubleValue(attributes.getValue(ATTR_LATITUDE)));
-            _wayPoint.setLongitude(getDoubleValue(attributes.getValue(ATTR_LONGITUDE)));
-
-         } else if (name.equals(TAG_METADATA)) {
-
-            _isInMetaData = true;
-         }
-      }
-   }
-
-   private void startElement_META(final String name) {
-
-      if (_isInMT_TourTag || _isInMT_TourType) {
-
-         if (name.equals(TAG_MT_TOUR_SUB_NAME)) {
-
-            _characters.delete(0, _characters.length());
-         }
-
-      } else if (name.equals(TAG_MT_TOUR_DESCRIPTION)
-            || name.equals(TAG_MT_TOUR_TITLE)
-            || name.equals(TAG_MT_TOUR_START_PLACE)
-            || name.equals(TAG_MT_TOUR_END_PLACE)
-
-            || name.equals(TAG_MT_TOUR_START_TIME)
-            || name.equals(TAG_MT_TOUR_END_TIME)
-            || name.equals(TAG_MT_TOUR_MOVING_TIME)
-            || name.equals(TAG_MT_TOUR_ELAPSED_TIME)
-
-            || name.equals(TAG_MT_TOUR_ALTITUDE_DOWN)
-            || name.equals(TAG_MT_TOUR_ALTITUDE_UP)
-            || name.equals(TAG_MT_TOUR_DISTANCE)
-
-            || name.equals(TAG_MT_TOUR_CALORIES)
-            || name.equals(TAG_MT_TOUR_REST_PULSE)
-
-            || name.equals(TAG_MT_TOUR_BODY_WEIGHT)
-            || name.equals(TAG_MT_TOUR_BODY_FAT)
-            || name.equals(TAG_MT_TOUR_CONCONI_DEFLECTION)
-            || name.equals(TAG_MT_TOUR_DP_TOLERANCE)
-
-            || name.equals(TAG_MT_TOUR_TEMPERATURE)
-            || name.equals(TAG_MT_TOUR_WEATHER)
-            || name.equals(TAG_MT_TOUR_WEATHER_CLOUDS)
-            || name.equals(TAG_MT_TOUR_WEATHER_WIND_DIR)
-            || name.equals(TAG_MT_TOUR_WEATHER_WIND_SPEED)) {
-
-         _isMTData = true;
-         _isInMT_Tour = true;
-
-         _characters.delete(0, _characters.length());
-
-      } else if (name.equals(TAG_MT_TOUR_TAG)) {
-
-         _isInMT_TourTag = true;
-
-      } else if (name.equals(TAG_MT_TOUR_TYPE)) {
-
-         _isInMT_TourType = true;
-      }
-   }
-
-   private void startElement_TRK(final String name, final Attributes attributes) {
-
-      if (_isInTrkPt) {
-
-         if (name.equals(TAG_ELE)) {
-
-            _isInEle = true;
-            _characters.delete(0, _characters.length());
-
-         } else if (name.equals(TAG_TIME)) {
-
-            _isInTime = true;
-            _characters.delete(0, _characters.length());
-
-         } else if (name.equals(TAG_MT_SERIE_GEAR)) {
-
-            _isInMT_Trk = true;
-            _characters.delete(0, _characters.length());
-
-         } else if (name.equals(TAG_EXT_TPX_CAD) //
-               || name.equals(TAG_EXT_CAD)
-               || name.equals(TAG_EXT_UN_CAD)) {
-
-            _isInCadence = true;
-            _characters.delete(0, _characters.length());
-
-         } else if (name.equals(TAG_EXT_TPX_HR)
-               || name.equals(TAG_EXT_GPXX_HR)
-               || name.equals(TAG_EXT_DATA_HR)
-               || name.equals(TAG_EXT_HR)
-               || name.equals(TAG_EXT_UN_HR)
-               || name.equals(TAG_EXT_NS3_HR)) {
-
-            _isInHr = true;
-            _characters.delete(0, _characters.length());
-
-         } else if (name.equals(TAG_EXT_UN_POWER)) {
-
-            _isInPower = true;
-            _characters.delete(0, _characters.length());
-
-         } else if (name.equals(TAG_EXT_TPX_TEMP)
-               || name.equals(TAG_EXT_GPXX_TEMP)
-               || name.equals(TAG_EXT_GPXX_TEMPERATURE)
-               || name.equals(TAG_EXT_DATA_TEMP)) {
-
-            _isInTemp = true;
-            _characters.delete(0, _characters.length());
-
-         } else if (name.equals(TAG_EXT_DATA_DISTANCE)) {
-
-            _isInDistance = true;
-            _characters.delete(0, _characters.length());
-         }
-
-      } else if (TAG_TRKPT.equals(name) || TAG_RTEPT.equals(name)) {
-
-         /*
-          * new trackpoint
-          */
-         _isInTrkPt = true;
-
-         // create new time item
-         _timeSlice = new TimeData();
-
-         // get attributes
-         _timeSlice.latitude = getDoubleValue(attributes.getValue(ATTR_LATITUDE));
-         _timeSlice.longitude = getDoubleValue(attributes.getValue(ATTR_LONGITUDE));
-
-      } else if (name.equals(TAG_TRK_NAME)) {
-
-         _isInTrkName = true;
-         _characters.delete(0, _characters.length());
-
-      } else if (name.equals(TAG_TRK_DESC)) {
-
-         _isInTrkDesc = true;
-         _characters.delete(0, _characters.length());
-
-      } else if (name.equals(TAG_EXT_DATA_LAP)) {
-
-         _isInGpxDataLap = true;
-         _gpxDataLap = new GPXDataLap();
-
-      } else if (_isInGpxDataLap) {
-
-         if (name.equals(TAG_EXT_DATA_INDEX)) {
-
-            _isInGpxDataIndex = true;
-            _characters.delete(0, _characters.length());
-
-         } else if (name.equals(TAG_EXT_DATA_START_TIME)) {
-
-            _isInGpxDataStartTime = true;
-            _characters.delete(0, _characters.length());
-
-         } else if (name.equals(TAG_EXT_DATA_END_POINT)) {
-
-            _gpxDataLap.latitude = getDoubleValue(attributes.getValue(ATTR_LATITUDE));
-            _gpxDataLap.longitude = getDoubleValue(attributes.getValue(ATTR_LONGITUDE));
-
-         } else if (name.equals(TAG_EXT_DATA_ELAPSED_TIME)) {
-
-            _isInGpxDataElapsedTime = true;
-            _characters.delete(0, _characters.length());
-
-         } else if (name.equals(TAG_EXT_DATA_DISTANCE)) {
-
-            _isInGpxDataDistance = true;
-            _characters.delete(0, _characters.length());
-         }
-
-      }
-   }
-
-   private void startElement_WPT(final String name) {
-
-      if (name.equals(TAG_WPT_ELE)) {
-
-         _isInWpt_Ele = true;
-         _characters.delete(0, _characters.length());
-
-      } else if (name.equals(TAG_WPT_TIME)) {
-
-         _isInWpt_Time = true;
-         _characters.delete(0, _characters.length());
-
-      } else if (name.equals(TAG_WPT_NAME)) {
-
-         _isInWpt_Name = true;
-         _characters.delete(0, _characters.length());
-
-      } else if (name.equals(TAG_WPT_CMT)) {
-
-         _isInWpt_Cmt = true;
-         _characters.delete(0, _characters.length());
-
-      } else if (name.equals(TAG_WPT_DESC)) {
-
-         _isInWpt_Desc = true;
-         _characters.delete(0, _characters.length());
-
-      } else if (name.equals(TAG_WPT_SYM)) {
-
-         _isInWpt_Sym = true;
-         _characters.delete(0, _characters.length());
-
-      } else if (name.equals(TAG_WPT_TYPE)) {
-
-         _isInWpt_Type = true;
-         _characters.delete(0, _characters.length());
-
-      } else if (name.equals(TAG_WPT_URL)) {
-
-         _isInWpt_UrlAddress = true;
-         _characters.delete(0, _characters.length());
-
-      } else if (name.equals(TAG_WPT_URLNAME)) {
-
-         _isInWpt_UrlText = true;
-         _characters.delete(0, _characters.length());
-
-      } else if (name.equals(TAG_MT_MARKER_DISTANCE)
-            || name.equals(TAG_MT_MARKER_IS_VISIBLE)
-            || name.equals(TAG_MT_MARKER_LABEL_POS)
-            || name.equals(TAG_MT_MARKER_LABEL_X_OFFSET)
-            || name.equals(TAG_MT_MARKER_LABEL_Y_OFFSET)
-            || name.equals(TAG_MT_MARKER_SERIE_INDEX)
-            || name.equals(TAG_MT_MARKER_TYPE)
-
-      ) {
-
-         _isInMT_Wpt = true;
-         _characters.delete(0, _characters.length());
-
-         if (_tempTourMarker == null) {
-            _tempTourMarker = new TourMarker();
-         }
-
-         _isTourMarkerImported = true;
-      }
+      element_1_Start(name, attributes);
    }
 
    /**

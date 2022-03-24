@@ -28,6 +28,10 @@ Improvements
 * Strava Integration (Frederic)   
   - Added the possibility to send the weather data in the uploaded activity's description       https://github.com/mytourbook/mytourbook/issues/479
 
+* GPX Export/Import
+  - Export and import all values of a tour, however these values are not yet supported:
+    - Pulse times in milliseconds
+    - Swimming and surfing values
 
 Changes
 =======
@@ -45,6 +49,10 @@ Changes
 
 * 2D Map
   - Moved action "Show earth map" from the toolbar into the map context menu
+  
+* GPX export/import
+  - Many "<mt:...>" tags are replaced with tag attributes
+
 
 Bugfix
 ======
