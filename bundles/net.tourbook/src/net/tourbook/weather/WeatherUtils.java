@@ -279,8 +279,8 @@ public class WeatherUtils {
          floatNorthSouthVectorArray += Math.cos(Math.toRadians(windDirections[index])) * windSpeeds[index];
       }
 
-      final float eastWestVectorAverage = eastWestVectorArray / dataSize * -1;
-      float northSouthVectorAverage = floatNorthSouthVectorArray / dataSize * -1;
+      float eastWestVectorAverage = eastWestVectorArray / dataSize * -1;
+      final float northSouthVectorAverage = floatNorthSouthVectorArray / dataSize * -1;
 
       // Step 2: Combine Vectors back into a direction and speed
       final double averageWindSpeed = Math.sqrt(
@@ -288,7 +288,7 @@ public class WeatherUtils {
                   Math.pow(northSouthVectorAverage, 2));//Simple Pythagorean Theorem.
 
       if (northSouthVectorAverage < 0) {
-         northSouthVectorAverage *= -1;
+         eastWestVectorAverage *= -1;
       }
 
       final double atan2Direction = Math.atan2(eastWestVectorAverage, northSouthVectorAverage);
