@@ -9,10 +9,96 @@ import org.junit.jupiter.api.Test;
 public class WeatherUtilsTests {
 
    @Test
-   void testComputeAverageWindSpeedAndDirection() {
+   void testComputeAverageWindSpeedAndDirection_Basics() {
 
-      final Double[] windSpeeds = new Double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
-      final Integer[] windDirections = new Integer[] { 270, 270, 270, 180, 180, 180 };
+      final double[] windSpeeds = new double[] { 1.0 };
+
+      // Wind Coming From the North
+      int[] windDirections = new int[] { 0 };
+      int[] expectedAverageWindSpeedAndDirection = new int[] { 1, 0 };
+
+      assertArrayEquals(
+            expectedAverageWindSpeedAndDirection,
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
+
+      // Wind Coming From the East
+      windDirections = new int[] { 90 };
+      expectedAverageWindSpeedAndDirection = new int[] { 1, 90 };
+      assertArrayEquals(
+            expectedAverageWindSpeedAndDirection,
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
+
+      // Wind Coming From the South
+      windDirections = new int[] { 180 };
+      expectedAverageWindSpeedAndDirection = new int[] { 1, 180 };
+      assertArrayEquals(
+            expectedAverageWindSpeedAndDirection,
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
+
+      // Wind Coming From the West
+      windDirections = new int[] { 270 };
+      expectedAverageWindSpeedAndDirection = new int[] { 1, 270 };
+      assertArrayEquals(
+            expectedAverageWindSpeedAndDirection,
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
+
+      // Wind Coming From the NE
+      windDirections = new int[] { 45 };
+      expectedAverageWindSpeedAndDirection = new int[] { 1, 45 };
+      assertArrayEquals(
+            expectedAverageWindSpeedAndDirection,
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
+
+      // Wind Coming From the SE
+      windDirections = new int[] { 135 };
+      expectedAverageWindSpeedAndDirection = new int[] { 1, 135 };
+      assertArrayEquals(
+            expectedAverageWindSpeedAndDirection,
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
+
+      // Wind Coming From the SW
+      windDirections = new int[] { 225 };
+      expectedAverageWindSpeedAndDirection = new int[] { 1, 225 };
+      assertArrayEquals(
+            expectedAverageWindSpeedAndDirection,
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
+
+      // Wind Coming From the NW
+      windDirections = new int[] { 315 };
+      expectedAverageWindSpeedAndDirection = new int[] { 1, 315 };
+      assertArrayEquals(
+            expectedAverageWindSpeedAndDirection,
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
+   }
+
+   /**
+    * Testing and comparing the computation of the average speed and direction
+    * with the data provided below:
+    * https://www.itron.com/na/blog/forecasting/computing-a-weighted-average-wind-speed-and-wind-direction-across-multiple-weather-stations
+    */
+   @Test
+   void testComputeAverageWindSpeedAndDirection_Itron() {
+
+      final double[] windSpeeds = new double[] { 5.0, 10.0, 15.0, 20.0 };
+      final int[] windDirections = new int[] { 87, 122, 157, 192 };
+
+      final int[] expectedAverageWindSpeedAndDirection = new int[] { 10, 158 };
+
+      assertArrayEquals(
+            expectedAverageWindSpeedAndDirection,
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
+   }
+
+   /**
+    * Testing and comparing the computation of the average speed and direction
+    * with the data provided below:
+    * https://www.scadacore.com/2014/12/19/average-wind-direction-and-wind-speed/
+    */
+   @Test
+   void testComputeAverageWindSpeedAndDirection_ScadaCore() {
+
+      final double[] windSpeeds = new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 };
+      final int[] windDirections = new int[] { 270, 270, 270, 180, 180, 180 };
 
       final int[] expectedAverageWindSpeedAndDirection = new int[] { 1, 225 };
 
@@ -21,10 +107,16 @@ public class WeatherUtilsTests {
             WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
    }
 
-   //testNorthSouthVectorReversed
-   //18:58:36 [main - 1] 7  23/03/2022 16:43: ? ciel dégagé, 13°C, max. 13°C, min. 13°C, ressenti 11°C, 36km/h depuis S, 16% humidité, 1018.0mbar pression atm.
-//   18:58:36 [main - 1] 8  17h 13°C ressenti 11°C 39km/h depuis 360° humidité 15% pression atm. 1018.0mbar précipitations 0.0mm enneigement 0.0mm
-   // 18h 13°C ressenti 11°C 33km/h depuis 10° humidité 17% pression atm. 1018.0mbar précipitations 0.0mm enneigement 0.0mm
-   //18:58:36 [main - 1] 9  Données récupérées en 0,9 s 
+   @Test
+   void testComputeAverageWindSpeedAndDirection_toto() {
 
+      final double[] windSpeeds = new double[] { 36.0, 36.0 };
+      final int[] windDirections = new int[] { 325, 325 };
+
+      final int[] expectedAverageWindSpeedAndDirection = new int[] { 36, 325 };
+
+      assertArrayEquals(
+            expectedAverageWindSpeedAndDirection,
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
+   }
 }

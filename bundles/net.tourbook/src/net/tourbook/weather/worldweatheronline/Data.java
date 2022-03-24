@@ -46,17 +46,15 @@ public class Data {
 
    public void computeAverageWindSpeedAndDirection() {
 
-      final Double[] windSpeeds = filteredHourly
+      final double[] windSpeeds = filteredHourly
             .stream()
             .mapToDouble(Hourly::getWindspeedKmph)
-            .boxed()
-            .toArray(Double[]::new);
+            .toArray();
 
-      final Integer[] windDirections = filteredHourly
+      final int[] windDirections = filteredHourly
             .stream()
             .mapToInt(Hourly::getWinddirDegree)
-            .boxed()
-            .toArray(Integer[]::new);
+            .toArray();
 
       final int[] averageWindSpeedAndDirection =
             WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections);

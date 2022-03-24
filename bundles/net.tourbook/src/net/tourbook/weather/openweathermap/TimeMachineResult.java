@@ -57,17 +57,15 @@ public class TimeMachineResult {
 
    public void computeAverageWindSpeedAndDirection() {
 
-      final Double[] windSpeeds = hourly
+      final double[] windSpeeds = hourly
             .stream()
             .mapToDouble(Hourly::getWind_speedKmph)
-            .boxed()
-            .toArray(Double[]::new);
+            .toArray();
 
-      final Integer[] windDirections = hourly
+      final int[] windDirections = hourly
             .stream()
             .mapToInt(Hourly::getWind_deg)
-            .boxed()
-            .toArray(Integer[]::new);
+            .toArray();
 
       final int[] averageWindSpeedAndDirection =
             WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections);
