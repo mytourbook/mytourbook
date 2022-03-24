@@ -254,14 +254,16 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       tour.setWeather_Clouds(                weatherData.getWeatherType());
 
       tour.setWeather_Temperature_Average(   weatherData.getTemperatureAverage());
-      tour.setWeather_Wind_Speed(            weatherData.getAverageWindSpeed());
-      tour.setWeather_Wind_Direction(        weatherData.getAverageWindDirection());
       tour.setWeather_Humidity(              weatherData.getAverageHumidity());
       tour.setWeather_Precipitation(         weatherData.getTotalPrecipitation());
       tour.setWeather_Pressure(              weatherData.getAveragePressure());
       tour.setWeather_Temperature_Max(       weatherData.getTemperatureMax());
       tour.setWeather_Temperature_Min(       weatherData.getTemperatureMin());
       tour.setWeather_Temperature_WindChill( weatherData.getAverageWindChill());
+
+      weatherData.computeAverageWindSpeedAndDirection();
+      tour.setWeather_Wind_Speed(            weatherData.getAverageWindSpeed());
+      tour.setWeather_Wind_Direction(        weatherData.getAverageWindDirection());
 
 // SET_FORMATTING_ON
 

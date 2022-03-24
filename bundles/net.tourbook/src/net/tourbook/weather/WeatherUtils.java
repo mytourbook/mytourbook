@@ -251,6 +251,59 @@ public class WeatherUtils {
    }
 
    /**
+    * Algorithm taken from:
+    * https://www.scadacore.com/2014/12/19/average-wind-direction-and-wind-speed/
+    *
+    * @param windSpeeds
+    *           An array of wind speeds in km/h
+    * @param windDirections
+    *           An array of wind directions in degrees
+    * @return
+    */
+   public static int[] computeAverageWindSpeedAndDirection(final Double[] windSpeeds,
+                                                           final Integer[] windDirections) {
+
+      final int[] averageWindSpeedAndDirection = new int[2];
+      final int dataSize = windSpeeds.length;
+      if (dataSize == 0 || dataSize != windDirections.length) {
+         return averageWindSpeedAndDirection;
+      }
+
+      // Step 1: Break Out East/West and North/South Vectors
+      float eastWestVectorArray = 0;
+      float floatNorthSouthVectorArray = 0;
+
+      for (int index = 0; index < dataSize; ++index) {
+
+         eastWestVectorArray += Math.sin(Math.toRadians(windSpeeds[index])) * windSpeeds[index];
+         floatNorthSouthVectorArray += Math.cos(Math.toRadians(windDirections[index])) * windSpeeds[index];
+      }
+
+      final float eastWestVectorAverage = eastWestVectorArray / dataSize * -1;
+      final float northSouthVectorAverage = floatNorthSouthVectorArray / dataSize * -1;
+
+      // Step 2: Combine Vectors back into a direction and speed
+      final double averageWindSpeed = Math.sqrt(
+            Math.pow(eastWestVectorAverage, 2) +
+                  Math.pow(northSouthVectorAverage, 2));//Simple Pythagorean Theorem.
+
+      final double atan2Direction = Math.atan2(eastWestVectorAverage, northSouthVectorAverage * -1);
+
+      double averageDirection = Math.toDegrees(atan2Direction);
+
+      if (averageDirection > 180) {
+         averageDirection -= 180;
+      } else if (averageDirection < 180) {
+         averageDirection += 180;
+      }
+
+      averageWindSpeedAndDirection[0] = (int) Math.round(averageWindSpeed);
+      averageWindSpeedAndDirection[1] = (int) Math.round(averageDirection);
+
+      return averageWindSpeedAndDirection;
+   }
+
+   /**
     * Determines the geographic area covered by a GPS track. The goal is to
     * encompass most of the track to search a weather station as close as possible
     * to the overall course and not just to a specific point.

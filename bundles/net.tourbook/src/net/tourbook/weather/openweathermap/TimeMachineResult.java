@@ -33,6 +33,9 @@ public class TimeMachineResult {
 
    private Hourly       middleHourly;
 
+   private int          averageWindSpeed;
+   private int          averageWindDirection;
+
    public TimeMachineResult() {
       hourly = new ArrayList<>();
    }
@@ -50,6 +53,27 @@ public class TimeMachineResult {
             hourly.add(currentHourly);
          }
       }
+   }
+
+   public void computeAverageWindSpeedAndDirection() {
+
+      final Double[] windSpeeds = hourly
+            .stream()
+            .mapToDouble(Hourly::getWind_speedKmph)
+            .boxed()
+            .toArray(Double[]::new);
+
+      final Integer[] windDirections = hourly
+            .stream()
+            .mapToInt(Hourly::getWind_deg)
+            .boxed()
+            .toArray(Integer[]::new);
+
+      final int[] averageWindSpeedAndDirection =
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections);
+
+      averageWindSpeed = averageWindSpeedAndDirection[0];
+      averageWindDirection = averageWindSpeedAndDirection[1];
    }
 
    /**
@@ -139,27 +163,12 @@ public class TimeMachineResult {
 
    public int getAverageWindDirection() {
 
-      //todo fb https://www.scadacore.com/2014/12/19/average-wind-direction-and-wind-speed/
-      final OptionalDouble averageWindDirection =
-            hourly.stream().mapToDouble(Hourly::getWind_deg).average();
-
-      if (averageWindDirection.isPresent()) {
-         return (int) Math.round(averageWindDirection.getAsDouble());
-      }
-
-      return 0;
+      return averageWindDirection;
    }
 
    public int getAverageWindSpeed() {
 
-      final OptionalDouble averageWindSpeed =
-            hourly.stream().mapToDouble(Hourly::getWind_speedKmph).average();
-
-      if (averageWindSpeed.isPresent()) {
-         return (int) Math.round(averageWindSpeed.getAsDouble());
-      }
-
-      return 0;
+      return averageWindSpeed;
    }
 
    private Weather getCurrentWeather() {
