@@ -139,6 +139,7 @@ public class TimeMachineResult {
 
    public int getAverageWindDirection() {
 
+      //todo fb https://www.scadacore.com/2014/12/19/average-wind-direction-and-wind-speed/
       final OptionalDouble averageWindDirection =
             hourly.stream().mapToDouble(Hourly::getWind_deg).average();
 
@@ -264,6 +265,7 @@ public class TimeMachineResult {
             currentWeatherId == 771 || currentWeatherId == 781) {
          weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
       } else {
+         //todo fb not sure about that
          weatherType = "id: '" + currentWeatherId + "'," + //$NON-NLS-1$ //$NON-NLS-2$
                "main: '" + currentWeather.getMain() + "'"; //$NON-NLS-1$ //$NON-NLS-2$
       }
