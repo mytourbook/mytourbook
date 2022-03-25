@@ -271,10 +271,6 @@ public class TimeMachineResult {
       } else if (currentWeatherId == 711 || currentWeatherId == 762 ||
             currentWeatherId == 771 || currentWeatherId == 781) {
          weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
-      } else {
-         //todo fb not sure about that
-         weatherType = "id: '" + currentWeatherId + "'," + //$NON-NLS-1$ //$NON-NLS-2$
-               "main: '" + currentWeather.getMain() + "'"; //$NON-NLS-1$ //$NON-NLS-2$
       }
 
       return weatherType;
