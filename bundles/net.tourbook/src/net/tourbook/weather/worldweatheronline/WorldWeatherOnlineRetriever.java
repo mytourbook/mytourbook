@@ -234,9 +234,9 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
       final List<Weather> weather = weatherData.getWeather();
       if (weather == null ||
-            weather.size() == 0 ||
+            weather.isEmpty() ||
             weather.get(0).getHourly() == null ||
-            weather.get(0).getHourly().size() == 0) {
+            weather.get(0).getHourly().isEmpty()) {
          return false;
       }
 
