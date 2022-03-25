@@ -9,6 +9,19 @@ import org.junit.jupiter.api.Test;
 public class WeatherUtilsTests {
 
    @Test
+   void testComputeAverageWindSpeedAndDirection_Basic() {
+
+      final double[] windSpeeds = new double[] { 30.0, 36.0 };
+      final int[] windDirections = new int[] { 360, 350 };
+
+      final int[] expectedAverageWindSpeedAndDirection = new int[] { 33, 355 };
+
+      assertArrayEquals(
+            expectedAverageWindSpeedAndDirection,
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
+   }
+
+   @Test
    void testComputeAverageWindSpeedAndDirection_Basics() {
 
       final double[] windSpeeds = new double[] { 1.0 };
@@ -101,19 +114,6 @@ public class WeatherUtilsTests {
       final int[] windDirections = new int[] { 270, 270, 270, 180, 180, 180 };
 
       final int[] expectedAverageWindSpeedAndDirection = new int[] { 1, 225 };
-
-      assertArrayEquals(
-            expectedAverageWindSpeedAndDirection,
-            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
-   }
-
-   @Test
-   void testComputeAverageWindSpeedAndDirection_toto() {
-
-      final double[] windSpeeds = new double[] { 36.0, 36.0 };
-      final int[] windDirections = new int[] { 325, 325 };
-
-      final int[] expectedAverageWindSpeedAndDirection = new int[] { 36, 325 };
 
       assertArrayEquals(
             expectedAverageWindSpeedAndDirection,

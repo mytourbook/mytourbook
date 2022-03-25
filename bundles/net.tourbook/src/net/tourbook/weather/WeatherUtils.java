@@ -296,10 +296,6 @@ public class WeatherUtils {
 
       final double atan2Direction = Math.atan2(eastWestVectorAverage, northSouthVectorAverage);
 
-//      if (northSouthVectorAverage < 0) {
-//         atan2Direction *= -1;
-//      }
-
       double averageDirection = Math.toDegrees(atan2Direction);
 
       if (averageDirection > 180) {
