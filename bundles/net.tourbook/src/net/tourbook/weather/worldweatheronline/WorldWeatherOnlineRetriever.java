@@ -28,6 +28,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -190,6 +191,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
          uriBuilder.setParameter("format", "json"); //$NON-NLS-1$ //$NON-NLS-2$
          uriBuilder.setParameter("includelocation", "yes"); //$NON-NLS-1$ //$NON-NLS-2$
          uriBuilder.setParameter("extra", "utcDateTime"); //$NON-NLS-1$ //$NON-NLS-2$
+         uriBuilder.setParameter("lang", Locale.getDefault().getLanguage()); //$NON-NLS-1$
 
          //If the tour finishes a different day, we need to specify the ending date
          if (!endDate.equals(startDate)) {
