@@ -172,7 +172,7 @@ public class TimeMachineResult {
    private Weather getCurrentWeather() {
 
       final List<Weather> currentWeather = middleHourly.getWeather();
-      if (currentWeather == null || currentWeather.size() == 0) {
+      if (currentWeather == null || currentWeather.isEmpty()) {
          return null;
       }
 
