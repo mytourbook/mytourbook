@@ -425,6 +425,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Number of HR zones which are available for this tour, is 0 when HR zones are not defined.
     */
    private int                   numberOfHrZones               = 0;                     // db-version 18
+
    /**
     * Time for all HR zones are contained in {@link #hrZone0} ... {@link #hrZone9}. Each tour can
     * have up to 10 HR zones, when HR zone value is <code>-1</code> then this zone is not set.
@@ -8057,51 +8058,101 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return gradientSerie;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
    @JsonIgnore
    public int getHrZone0() {
       return hrZone0;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
    @JsonIgnore
    public int getHrZone1() {
       return hrZone1;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
    @JsonIgnore
    public int getHrZone2() {
       return hrZone2;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
    @JsonIgnore
    public int getHrZone3() {
       return hrZone3;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
    @JsonIgnore
    public int getHrZone4() {
       return hrZone4;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
    @JsonIgnore
    public int getHrZone5() {
       return hrZone5;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
    @JsonIgnore
    public int getHrZone6() {
       return hrZone6;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
    @JsonIgnore
    public int getHrZone7() {
       return hrZone7;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
    @JsonIgnore
    public int getHrZone8() {
       return hrZone8;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
    @JsonIgnore
    public int getHrZone9() {
       return hrZone9;
@@ -8198,21 +8249,41 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return UI.EMPTY_STRING;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
    @JsonIgnore
    public short getIsDistanceFromSensor() {
       return isDistanceFromSensor;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
    @JsonIgnore
    public int getIsPowerSensorPresent() {
       return isPowerSensorPresent;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
    @JsonIgnore
    public int getIsPulseSensorPresent() {
       return isPulseSensorPresent;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
    @JsonIgnore
    public short getIsStrideSensorPresent() {
       return isStrideSensorPresent;
@@ -8310,6 +8381,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return numberOfHrZones;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
    @JsonIgnore
    public int getNumberOfPhotos() {
       return numberOfPhotos;
@@ -9359,6 +9435,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return _swim_Swolf;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @return
+    */
    @JsonIgnore
    public int getTemperatureScale() {
       return temperatureScale;
@@ -10498,6 +10579,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * Used for MT import/export
+    */
+   public void setAvgAltitudeChange(final int avgAltitudeChange) {
+      this.avgAltitudeChange = avgAltitudeChange;
+   }
+
+   /**
     * @param avgCadence
     *           the avgCadence to set
     */
@@ -10563,6 +10651,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setCadenceZone_SlowTime(final int cadenceZone_SlowTime) {
       this.cadenceZone_SlowTime = cadenceZone_SlowTime;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setCadenceZones_DelimiterValue(final int cadenceZones_DelimiterValue) {
+      this.cadenceZones_DelimiterValue = cadenceZones_DelimiterValue;
    }
 
    /**
@@ -10766,8 +10861,81 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.rearShiftCount = rearShifts;
    }
 
+   /**
+    * Used for MT import/export
+    */
    public void setHasGeoData(final boolean hasGeoData) {
       this.hasGeoData = hasGeoData;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setHrZone0(final int hrZone) {
+      this.hrZone0 = hrZone;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setHrZone1(final int hrZone) {
+      this.hrZone1 = hrZone;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setHrZone2(final int hrZone) {
+      this.hrZone2 = hrZone;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setHrZone3(final int hrZone) {
+      this.hrZone3 = hrZone;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setHrZone4(final int hrZone) {
+      this.hrZone4 = hrZone;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setHrZone5(final int hrZone) {
+      this.hrZone5 = hrZone;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setHrZone6(final int hrZone) {
+      this.hrZone6 = hrZone;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setHrZone7(final int hrZone) {
+      this.hrZone7 = hrZone;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setHrZone8(final int hrZone) {
+      this.hrZone8 = hrZone;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setHrZone9(final int hrZone) {
+      this.hrZone9 = hrZone;
    }
 
    /**
@@ -10817,6 +10985,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.isDistanceFromSensor = (short) (isFromSensor ? 1 : 0);
    }
 
+   /**
+    * Used for MT import/export
+    * 
+    * @param isFromSensor
+    */
+   public void setIsDistanceFromSensor(final short isFromSensor) {
+      this.isDistanceFromSensor = isFromSensor;
+   }
+
    public void setIsImportedMTTour(final boolean isImportedMTTour) {
       _isImportedMTTour = isImportedMTTour;
    }
@@ -10825,8 +11002,26 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.isPowerSensorPresent = (short) (isFromSensor ? 1 : 0);
    }
 
+   /**
+    * Used for MT import/export
+    * 
+    * @param isFromSensor
+    */
+   public void setIsPowerSensorPresent(final short isFromSensor) {
+      this.isPowerSensorPresent = isFromSensor;
+   }
+
    public void setIsPulseSensorPresent(final boolean isFromSensor) {
       this.isPulseSensorPresent = (short) (isFromSensor ? 1 : 0);
+   }
+
+   /**
+    * Used for MT import/export
+    * 
+    * @param isFromSensor
+    */
+   public void setIsPulseSensorPresent(final short isFromSensor) {
+      this.isPulseSensorPresent = isFromSensor;
    }
 
    public void setIsStrideSensorPresent(final boolean isFromSensor) {
@@ -10838,12 +11033,42 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       }
    }
 
+   /**
+    * Used for MT import/export
+    * 
+    * @param isFromSensor
+    */
+   public void setIsStrideSensorPresent(final short isFromSensor) {
+      this.isStrideSensorPresent = isFromSensor;
+   }
+
    public void setIsWeatherDataFromProvider(final boolean isWeatherDataFromProvider) {
       this.isWeatherDataFromProvider = isWeatherDataFromProvider;
    }
 
+   /**
+    * Used for MT import/export
+    */
+   public void setMaxElevation(final float maxAltitude) {
+      this.maxAltitude = maxAltitude;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setMaxPace(final float maxPace) {
+      this.maxPace = maxPace;
+   }
+
    public void setMaxPulse(final float maxPulse) {
       this.maxPulse = maxPulse;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setMaxSpeed(final float maxSpeed) {
+      this.maxSpeed = maxSpeed;
    }
 
    public void setMergedAltitudeOffset(final int altitudeDiff) {
@@ -10866,6 +11091,27 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.mergeTargetTourId = mergeTargetTourId;
    }
 
+   /**
+    * Used for MT import/export
+    */
+   public void setNumberOfHrZones(final int numberOfHrZones) {
+      this.numberOfHrZones = numberOfHrZones;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setNumberOfPhotos(final int numberOfPhotos) {
+      this.numberOfPhotos = numberOfPhotos;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setNumberOfTimeSlices(final int numberOfTimeSlices) {
+      this.numberOfTimeSlices = numberOfTimeSlices;
+   }
+
    public void setPausedTime_Data(final long[] pausedTime_Data) {
       this.pausedTime_Data = pausedTime_Data;
    }
@@ -10876,6 +11122,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setPausedTime_Start(final long[] pausedTime_Start) {
       this.pausedTime_Start = pausedTime_Start;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setPhotoTimeAdjustment(final int photoTimeAdjustment) {
+      this.photoTimeAdjustment = photoTimeAdjustment;
    }
 
    public void setPower_Avg(final float avgPower) {
@@ -10951,6 +11204,111 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public void setRestPulse(final int restPulse) {
       this.restPulse = restPulse;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setRunDyn_StanceTime_Avg(final float runDyn_StanceTime_Avg) {
+      this.runDyn_StanceTime_Avg = runDyn_StanceTime_Avg;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setRunDyn_StanceTime_Max(final short runDyn_StanceTime_Max) {
+      this.runDyn_StanceTime_Max = runDyn_StanceTime_Max;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setRunDyn_StanceTime_Min(final short runDyn_StanceTime_Min) {
+      this.runDyn_StanceTime_Min = runDyn_StanceTime_Min;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setRunDyn_StanceTimeBalance_Avg(final float runDyn_StanceTimeBalance_Avg) {
+      this.runDyn_StanceTimeBalance_Avg = runDyn_StanceTimeBalance_Avg;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setRunDyn_StanceTimeBalance_Max(final short runDyn_StanceTimeBalance_Max) {
+      this.runDyn_StanceTimeBalance_Max = runDyn_StanceTimeBalance_Max;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setRunDyn_StanceTimeBalance_Min(final short runDyn_StanceTimeBalance_Min) {
+      this.runDyn_StanceTimeBalance_Min = runDyn_StanceTimeBalance_Min;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setRunDyn_StepLength_Avg(final float runDyn_StepLength_Avg) {
+      this.runDyn_StepLength_Avg = runDyn_StepLength_Avg;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setRunDyn_StepLength_Max(final short runDyn_StepLength_Max) {
+      this.runDyn_StepLength_Max = runDyn_StepLength_Max;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setRunDyn_StepLength_Min(final short runDyn_StepLength_Min) {
+      this.runDyn_StepLength_Min = runDyn_StepLength_Min;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setRunDyn_VerticalOscillation_Avg(final float runDyn_VerticalOscillation_Avg) {
+      this.runDyn_VerticalOscillation_Avg = runDyn_VerticalOscillation_Avg;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setRunDyn_VerticalOscillation_Max(final short runDyn_VerticalOscillation_Max) {
+      this.runDyn_VerticalOscillation_Max = runDyn_VerticalOscillation_Max;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setRunDyn_VerticalOscillation_Min(final short runDyn_VerticalOscillation_Min) {
+      this.runDyn_VerticalOscillation_Min = runDyn_VerticalOscillation_Min;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setRunDyn_VerticalRatio_Avg(final float runDyn_VerticalRatio_Avg) {
+      this.runDyn_VerticalRatio_Avg = runDyn_VerticalRatio_Avg;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setRunDyn_VerticalRatio_Max(final short runDyn_VerticalRatio_Max) {
+      this.runDyn_VerticalRatio_Max = runDyn_VerticalRatio_Max;
+   }
+
+   /**
+    * Used for MT import/export
+    */
+   public void setRunDyn_VerticalRatio_Min(final short runDyn_VerticalRatio_Min) {
+      this.runDyn_VerticalRatio_Min = runDyn_VerticalRatio_Min;
    }
 
    private void setSpeed(final int serieIndex,
@@ -11036,6 +11394,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.surfing_NumberOfEvents = surfing_NumberOfEvents;
    }
 
+   /**
+    * Used for MT import/export
+    * 
+    * @param temperatureScale
+    */
+   public void setTemperatureScale(final int temperatureScale) {
+      this.temperatureScale = temperatureScale;
+   }
+
    public void setTileHashes_ForTours(final TIntHashSet tileHashes, final int mapZoomLevel, final int projectionHash) {
 
       _tileHashes_Tours.put(projectionHash + mapZoomLevel, tileHashes);
@@ -11059,6 +11426,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    public void setTourAltDown(final float tourAltDown) {
+
       this.tourAltDown = (int) (tourAltDown + 0.5);
 
       // We update the average elevation change
@@ -11164,6 +11532,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void setTourPerson(final TourPerson tourPerson) {
       this.tourPerson = tourPerson;
+   }
+
+   /**
+    * Used for MT import/export
+    * <p>
+    * Set photos in this tour.
+    *
+    * @param allTourPhotos
+    */
+   public void setTourPhotos(final HashSet<TourPhoto> allTourPhotos) {
+
+      // force gallery photos to be recreated
+      _galleryPhotos.clear();
+
+      tourPhotos.clear();
+      tourPhotos.addAll(allTourPhotos);
    }
 
    /**
@@ -11276,6 +11660,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public void setTourStartTime(final ZonedDateTime zonedStartTime) {
 
       final long newZonedStartTime = zonedStartTime.toInstant().toEpochMilli();
+
       if (tourStartTime != 0) {
          updatePausedTimes(newZonedStartTime - tourStartTime);
       }
@@ -12133,4 +12518,5 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          pausedTime_End[index] += startTimeOffset;
       }
    }
+
 }

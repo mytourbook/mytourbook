@@ -1727,8 +1727,8 @@
 
          <view
             category    ="net.tourbook.category.Tour_Properties"
-            id          ="net.tourbook.ui.views.TourData_View"
-            class       ="net.tourbook.ui.views.TourData_View"
+            id          ="net.tourbook.ui.views.TourDataView"
+            class       ="net.tourbook.ui.views.TourDataView"
             icon        ="icons/tour-data.png"
             name        ="%View_Name_TourData"/>
 

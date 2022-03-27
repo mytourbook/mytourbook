@@ -80,7 +80,10 @@ public class DeviceSensorValue {
    @Transient
    private long                 _createId            = 0;
 
-   public DeviceSensorValue() {}
+   public DeviceSensorValue() {
+
+      _createId = _createCounter.incrementAndGet();
+   }
 
    public DeviceSensorValue(final DeviceSensor sensor) {
 
@@ -314,6 +317,60 @@ public class DeviceSensorValue {
          batteryVoltage_End = batteryVoltage_StartBackup;
 
       }
+   }
+
+   /**
+    * Used for MT import/export
+    *
+    * @param batteryLevel_End
+    */
+   public void setBatteryLevel_End(final short batteryLevel_End) {
+      this.batteryLevel_End = batteryLevel_End;
+   }
+
+   /**
+    * Used for MT import/export
+    *
+    * @param batteryLevel_Start
+    */
+   public void setBatteryLevel_Start(final short batteryLevel_Start) {
+      this.batteryLevel_Start = batteryLevel_Start;
+   }
+
+   /**
+    * Used for MT import/export
+    *
+    * @param batteryStatus_End
+    */
+   public void setBatteryStatus_End(final short batteryStatus_End) {
+      this.batteryStatus_End = batteryStatus_End;
+   }
+
+   /**
+    * Used for MT import/export
+    *
+    * @param batteryStatus_Start
+    */
+   public void setBatteryStatus_Start(final short batteryStatus_Start) {
+      this.batteryStatus_Start = batteryStatus_Start;
+   }
+
+   /**
+    * Used for MT import/export
+    *
+    * @param batteryVoltage_End
+    */
+   public void setBatteryVoltage_End(final float batteryVoltage_End) {
+      this.batteryVoltage_End = batteryVoltage_End;
+   }
+
+   /**
+    * Used for MT import/export
+    *
+    * @param batteryVoltage_Start
+    */
+   public void setBatteryVoltage_Start(final float batteryVoltage_Start) {
+      this.batteryVoltage_Start = batteryVoltage_Start;
    }
 
    public void setDeviceIndex(final int deviceIndex) {

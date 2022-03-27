@@ -29,6 +29,7 @@ import java.util.TreeSet;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
@@ -54,6 +55,9 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
 
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -63,6 +67,9 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.Point;
@@ -76,17 +83,17 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourData_View extends ViewPart {
+public class TourDataView extends ViewPart {
 
-   public static final String            ID                         = "net.tourbook.ui.views.TourData_View"; //$NON-NLS-1$
+   public static final String            ID                         = "net.tourbook.ui.views.TourDataView"; //$NON-NLS-1$
 
-   private static final String           ANNOTATION_TRANSIENT       = "Transient";                           //$NON-NLS-1$
+   private static final String           ANNOTATION_TRANSIENT       = "Transient";                          //$NON-NLS-1$
 
    private static final IPreferenceStore _prefStore                 = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common          = CommonActivator.getPrefStore();
    private static final IDialogSettings  _state                     = TourbookPlugin.getState(ID);
 
-   private static final String           STATE_VIEW_SCROLL_POSITION = "STATE_VIEW_SCROLL_POSITION";          //$NON-NLS-1$
+   private static final String           STATE_VIEW_SCROLL_POSITION = "STATE_VIEW_SCROLL_POSITION";         //$NON-NLS-1$
 
    private PostSelectionProvider         _postSelectionProvider;
    private ISelectionListener            _postSelectionListener;
@@ -97,6 +104,8 @@ public class TourData_View extends ViewPart {
    private boolean                       _isUIRestored;
 
    private TourData                      _tourData;
+
+   private Action                        _action_CopyIntoClipboard;
 
    /*
     * UI controls
@@ -131,6 +140,25 @@ public class TourData_View extends ViewPart {
    private ScrolledComposite _scrolledContainer;
 
    private Composite         _infoContainer;
+
+   private class Action_CopyValuesIntoClipboard extends Action {
+
+      Action_CopyValuesIntoClipboard() {
+
+         super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
+
+         // Copy log into the clipboard
+         setToolTipText(Messages.Tour_Log_Action_CopyTourLogIntoClipboard_Tooltip);
+
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
+         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy_Disabled));
+      }
+
+      @Override
+      public void run() {
+         onAction_CopyValuesIntoClipboard();
+      }
+   }
 
    public static Collection<Field> getAllFields(final Class<?> type) {
 
@@ -311,7 +339,7 @@ public class TourData_View extends ViewPart {
       _postSelectionListener = new ISelectionListener() {
          @Override
          public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-            if (part == TourData_View.this) {
+            if (part == TourDataView.this) {
                return;
             }
             onSelectionChanged(selection);
@@ -326,7 +354,7 @@ public class TourData_View extends ViewPart {
          @Override
          public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-            if (part == TourData_View.this) {
+            if (part == TourDataView.this) {
                return;
             }
 
@@ -420,6 +448,7 @@ public class TourData_View extends ViewPart {
 
    private void createActions() {
 
+      _action_CopyIntoClipboard = new Action_CopyValuesIntoClipboard();
    }
 
    @Override
@@ -429,6 +458,8 @@ public class TourData_View extends ViewPart {
 
       createUI(parent);
       createActions();
+
+      fillToolbar();
 
       addSelectionListener();
       addTourEventListener();
@@ -445,6 +476,8 @@ public class TourData_View extends ViewPart {
       if (_tourData == null) {
          showTourFromTourProvider();
       }
+
+      enableControls();
    }
 
    private void createUI(final Composite parent) {
@@ -661,6 +694,23 @@ public class TourData_View extends ViewPart {
       super.dispose();
    }
 
+   private void enableControls() {
+
+      final boolean isTourAvailable = _tourData != null;
+
+      _action_CopyIntoClipboard.setEnabled(isTourAvailable);
+   }
+
+   private void fillToolbar() {
+
+      /*
+       * fill view toolbar
+       */
+      final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+      tbm.add(_action_CopyIntoClipboard);
+   }
+
    private String getAllFieldsContent(final TourData tourData) {
 
       return printAllFields(tourData);
@@ -668,6 +718,40 @@ public class TourData_View extends ViewPart {
 
    private void initUI() {
 
+   }
+
+   /**
+    * Copy log text into clipboard
+    */
+   private void onAction_CopyValuesIntoClipboard() {
+
+      final String logText = getAllFieldsContent(_tourData);
+
+      if (logText.length() > 0) {
+
+         final Display display = Display.getDefault();
+         final TextTransfer textTransfer = TextTransfer.getInstance();
+
+         final Clipboard clipBoard = new Clipboard(display);
+         {
+            clipBoard.setContents(
+
+                  new Object[] { logText },
+                  new Transfer[] { textTransfer });
+         }
+         clipBoard.dispose();
+
+         final IStatusLineManager statusLineMgr = UI.getStatusLineManager();
+         if (statusLineMgr != null) {
+
+            // show info that data are copied
+            // "The log were copied into the clipboard"
+            statusLineMgr.setMessage(Messages.Tour_Log_Info_TourLogWasCopied);
+
+            // cleanup message
+            display.timerExec(3000, () -> statusLineMgr.setMessage(null));
+         }
+      }
    }
 
    private void onResize() {
@@ -738,6 +822,8 @@ public class TourData_View extends ViewPart {
       if (isTourAvailable) {
          updateUI();
       }
+
+      enableControls();
    }
 
    private void restoreState_UI() {

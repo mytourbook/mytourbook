@@ -302,7 +302,7 @@ public class TourTag implements Cloneable, Comparable<Object> {
             + "name        =" + name + NL //          //$NON-NLS-1$
             + "notes       =" + notes + NL //         //$NON-NLS-1$
             + "expandType  =" + expandType + NL //    //$NON-NLS-1$
-//            + "tourData    =" + tourData + NL //      //$NON-NLS-1$
+//          + "tourData    =" + tourData + NL //      //$NON-NLS-1$
             + "_createId   =" + _createId + NL //     //$NON-NLS-1$
 
             + "]" + NL //                             //$NON-NLS-1$

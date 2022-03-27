@@ -28,10 +28,10 @@ Improvements
 * Strava Integration (Frederic)   
   - Added the possibility to send the weather data in the uploaded activity's description       https://github.com/mytourbook/mytourbook/issues/479
 
-* GPX Export/Import
-  - Export and import all values of a tour, however these values are not yet supported:
-    - Pulse times in milliseconds
-    - Swimming and surfing values
+* MT Export/Import
+  - Export and import values of a tour
+  - Limits:
+    - A device sensor is not created, when sensor values for it are available
 
 Changes
 =======

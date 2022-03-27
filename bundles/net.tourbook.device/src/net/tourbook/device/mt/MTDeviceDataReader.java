@@ -77,17 +77,17 @@ public class MTDeviceDataReader extends TourbookDevice {
          return;
       }
 
-      MT_STAXHandler staxHandler = null;
+      MT_StAXHandler staxHandler = null;
 
       try {
 
-         staxHandler = new MT_STAXHandler(
+         staxHandler = new MT_StAXHandler(
                this,
                importFilePath,
                alreadyImportedTours,
-               newlyImportedTours);
-
-         importState_File.isFileImportedWithValidData = staxHandler.isImported();
+               newlyImportedTours,
+               importState_File,
+               importState_Process);
 
       } catch (final Exception e) {
 

@@ -136,14 +136,8 @@ public class TourPhoto {
       final File imageFile = galleryPhoto.imageFile;
 
       final String filePathName = imageFile.getAbsolutePath();
-      final IPath filePath = new Path(filePathName);
 
-      final String fileExtension = filePath.getFileExtension();
-
-      imageFileName = filePath.lastSegment();
-      imageFileExt = fileExtension == null ? UI.EMPTY_STRING : fileExtension;
-      imageFilePath = filePath.removeLastSegments(1).toOSString();
-      imageFilePathName = filePathName;
+      setFilePathName(filePathName);
 
       imageFileLastModified = imageFile.lastModified();
       imageExifTime = galleryPhoto.imageExifTime;
@@ -229,6 +223,15 @@ public class TourPhoto {
    }
 
    /**
+    * Used for MT import/export
+    * 
+    * @return
+    */
+   public int getIsGeoFromPhoto() {
+      return isGeoFromPhoto;
+   }
+
+   /**
     * @return Returns 0 when latitude is <b>NOT</b> set.
     */
    public double getLatitude() {
@@ -275,9 +278,48 @@ public class TourPhoto {
       this.adjustedTime = adjustedTime;
    }
 
+   public void setFilePathName(final String filePathName) {
+
+      final IPath filePath = new Path(filePathName);
+
+      final String fileExtension = filePath.getFileExtension();
+
+      imageFileName = filePath.lastSegment();
+      imageFileExt = fileExtension == null ? UI.EMPTY_STRING : fileExtension;
+      imageFilePath = filePath.removeLastSegments(1).toOSString();
+      imageFilePathName = filePathName;
+   }
+
    public void setGeoLocation(final double latitude, final double longitude) {
       this.latitude = latitude;
       this.longitude = longitude;
+   }
+
+   /**
+    * Used for MT import/export
+    * 
+    * @param imageExifTime
+    */
+   public void setImageExifTime(final long imageExifTime) {
+      this.imageExifTime = imageExifTime;
+   }
+
+   /**
+    * Used for MT import/export
+    * 
+    * @param imageFileLastModified
+    */
+   public void setImageFileLastModified(final long imageFileLastModified) {
+      this.imageFileLastModified = imageFileLastModified;
+   }
+
+   /**
+    * Used for MT import/export
+    * 
+    * @param fromFlag
+    */
+   public void setIsGeoFrom(final int fromFlag) {
+      isGeoFromPhoto = fromFlag;
    }
 
    public void setIsGeoFromPhoto() {
@@ -286,6 +328,24 @@ public class TourPhoto {
 
    public void setIsGeoFromTour() {
       isGeoFromPhoto = 0;
+   }
+
+   /**
+    * Used for MT import/export
+    * 
+    * @param latitude
+    */
+   public void setLatitude(final double latitude) {
+      this.latitude = latitude;
+   }
+
+   /**
+    * Used for MT import/export
+    * 
+    * @param longitude
+    */
+   public void setLongitude(final double longitude) {
+      this.longitude = longitude;
    }
 
    public void setRatingStars(final int ratingStars) {
@@ -301,10 +361,6 @@ public class TourPhoto {
             .append(" createId:") //$NON-NLS-1$
             .append(_createId)
             .toString();
-   }
-
-   public int getIsGeoFromPhoto() {
-      return isGeoFromPhoto;
    }
 
 }

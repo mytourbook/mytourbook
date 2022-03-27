@@ -1853,6 +1853,11 @@ public class Util {
             propertyDescription));
    }
 
+   public static boolean parseBoolean(final String textValue) {
+
+      return Boolean.valueOf(textValue);
+   }
+
    /**
     * Parses SAX attribute
     *
@@ -1874,6 +1879,10 @@ public class Util {
       return Double.MIN_VALUE;
    }
 
+   /**
+    * @param textValue
+    * @return Parsed value or {@link Double#MIN_VALUE} when not available
+    */
    public static double parseDouble(final String textValue) {
 
       try {
@@ -1885,6 +1894,43 @@ public class Util {
 
       } catch (final NumberFormatException e) {
          return Double.MIN_VALUE;
+      }
+   }
+
+   /**
+    * @param textValue
+    * @param defaultValue
+    * @return Parsed value or default when not available
+    */
+   public static double parseDouble(final String textValue, final double defaultValue) {
+
+      try {
+         if (textValue != null) {
+            return Double.parseDouble(textValue);
+         } else {
+            return defaultValue;
+         }
+
+      } catch (final NumberFormatException e) {
+         return defaultValue;
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or 0 when not available
+    */
+   public static double parseDouble_0(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Double.parseDouble(textValue);
+         } else {
+            return 0;
+         }
+
+      } catch (final NumberFormatException e) {
+         return 0;
       }
    }
 
@@ -1909,6 +1955,10 @@ public class Util {
       return Float.MIN_VALUE;
    }
 
+   /**
+    * @param textValue
+    * @return Parsed value or {@link Float#MIN_VALUE} when not available
+    */
    public static float parseFloat(final String textValue) {
 
       try {
@@ -1923,6 +1973,29 @@ public class Util {
       }
    }
 
+   /**
+    * @param textValue
+    * @param defaultValue
+    * @return Parsed value or default when not available
+    */
+   public static float parseFloat(final String textValue, final float defaultValue) {
+
+      try {
+         if (textValue != null) {
+            return Float.parseFloat(textValue);
+         } else {
+            return defaultValue;
+         }
+
+      } catch (final NumberFormatException e) {
+         return defaultValue;
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or 0 when not available
+    */
    public static float parseFloat_0(final String textValue) {
 
       try {
@@ -1934,6 +2007,24 @@ public class Util {
 
       } catch (final NumberFormatException e) {
          return 0;
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or -1 when not available
+    */
+   public static float parseFloat_n1(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Float.parseFloat(textValue);
+         } else {
+            return -1;
+         }
+
+      } catch (final NumberFormatException e) {
+         return -1;
       }
    }
 
@@ -1978,6 +2069,32 @@ public class Util {
       return Integer.MIN_VALUE;
    }
 
+   /**
+    * @param textValue
+    * @param defaultValue
+    * @return Parsed value or defaultValue when not available
+    */
+   public static int parseInt(final String textValue, final int defaultValue) {
+
+      try {
+         if (textValue != null) {
+            return Integer.parseInt(textValue);
+         } else {
+            return defaultValue;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (int) parseFloat(textValue, defaultValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or 0 when not available
+    */
    public static int parseInt_0(final String textValue) {
 
       try {
@@ -1992,6 +2109,27 @@ public class Util {
          // try to parse as float value
 
          return (int) parseFloat_0(textValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or -1 when not available
+    */
+   public static int parseInt_n1(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Integer.parseInt(textValue);
+         } else {
+            return -1;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (int) parseFloat_n1(textValue);
       }
    }
 
@@ -2039,11 +2177,36 @@ public class Util {
       return Long.MIN_VALUE;
    }
 
+   /**
+    * @param textValue
+    * @return Parsed value or {@link Long#MIN_VALUE} when not available
+    */
+   public static long parseLong(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Long.parseLong(textValue);
+         } else {
+            return Long.MIN_VALUE;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (long) parseFloat(textValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or 0 when not available
+    */
    public static long parseLong_0(final String textValue) {
 
       try {
          if (textValue != null) {
-            return Integer.parseInt(textValue);
+            return Long.parseLong(textValue);
          } else {
             return 0;
          }
@@ -2053,6 +2216,69 @@ public class Util {
          // try to parse as float value
 
          return (long) parseFloat_0(textValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or -1 when not available
+    */
+   public static long parseLong_n1(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Long.parseLong(textValue);
+         } else {
+            return -1;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (long) parseFloat_n1(textValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or 0 when not available
+    */
+   public static short parseShort_0(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Short.parseShort(textValue);
+         } else {
+            return 0;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (short) parseFloat_0(textValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or -1 when not available
+    */
+   public static short parseShort_n1(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Short.parseShort(textValue);
+         } else {
+            return -1;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (short) parseFloat_n1(textValue);
       }
    }
 

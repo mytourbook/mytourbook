@@ -82,7 +82,6 @@ public class DialogExportTour extends TitleAreaDialog {
 
    private static final String EXPORT_ID_GPX                     = "net.tourbook.export.gpx";           //$NON-NLS-1$
    private static final String EXPORT_ID_TCX                     = "net.tourbook.export.tcx";           //$NON-NLS-1$
-   private static final String EXPORT_ID_MT                      = "net.tourbook.export.mt";            //$NON-NLS-1$
 
    private static final String STATE_GPX_IS_ABSOLUTE_DISTANCE    = "STATE_GPX_IS_ABSOLUTE_DISTANCE";    //$NON-NLS-1$
    private static final String STATE_GPX_IS_EXPORT_DESCRITION    = "STATE_GPX_IS_EXPORT_DESCRITION";    //$NON-NLS-1$
@@ -155,7 +154,6 @@ public class DialogExportTour extends TitleAreaDialog {
     */
    private boolean                   _isSetup_GPX;
    private boolean                   _isSetup_TCX;
-   private boolean                   _isSetup_MT;
    private boolean                   _isGPXorTCX;
 
    /**
@@ -274,7 +272,6 @@ public class DialogExportTour extends TitleAreaDialog {
 
       _isSetup_GPX = _exportExtensionPoint.getExportId().equalsIgnoreCase(EXPORT_ID_GPX);
       _isSetup_TCX = _exportExtensionPoint.getExportId().equalsIgnoreCase(EXPORT_ID_TCX);
-      _isSetup_MT = _exportExtensionPoint.getExportId().equalsIgnoreCase(EXPORT_ID_MT);
       _isGPXorTCX = _isSetup_GPX || _isSetup_TCX;
 
       _isSetup_MultipleTours = _tourDataList.size() > 1;
