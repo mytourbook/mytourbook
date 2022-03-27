@@ -928,14 +928,6 @@ public class DialogExportTour extends TitleAreaDialog {
 
       _exportState_FileCollisionBehaviour = new FileCollisionBehavior();
 
-      if (_isSetup_TourRange) {
-         _exportState_IsRange = _chkExportTourRange.getSelection();
-      }
-
-      if (_isSetup_MultipleTours) {
-         _exportState_IsMergeTours = _chkMergeAllTours.getSelection();
-      }
-
       if (_isSetup_GPX) {
 
          _exportState_isAbsoluteDistance = _rdoGPX_DistanceAbsolute.getSelection();
@@ -960,6 +952,14 @@ public class DialogExportTour extends TitleAreaDialog {
       int exportState_CamouflageSpeed = 0;
 
       if (_isGPXorTCX) {
+
+         if (_isSetup_TourRange) {
+            _exportState_IsRange = _chkExportTourRange.getSelection();
+         }
+
+         if (_isSetup_MultipleTours) {
+            _exportState_IsMergeTours = _chkMergeAllTours.getSelection();
+         }
 
          _exportState_IsCamouflageSpeed = _chkCamouflageSpeed.getSelection();
 
@@ -1077,7 +1077,7 @@ public class DialogExportTour extends TitleAreaDialog {
       final boolean isSingleTour = _isSetup_MultipleTours == false;
       boolean isMergeIntoOneTour = false;
 
-      if (_isSetup_MultipleTours) {
+      if (_isGPXorTCX && _isSetup_MultipleTours) {
 
          isMergeIntoOneTour = _chkMergeAllTours.getSelection();
          _chkMergeAllTours.setEnabled(_isSetup_MultipleTours);
@@ -1400,18 +1400,19 @@ public class DialogExportTour extends TitleAreaDialog {
          updateUI_CourseName();
       }
 
-      // merge all tours
-      if (_isSetup_MultipleTours) {
-         _chkMergeAllTours.setSelection(_state.getBoolean(STATE_IS_MERGE_ALL_TOURS));
-      }
-
-      // export tour part
-      if (_isSetup_TourRange) {
-         _chkExportTourRange.setSelection(_state.getBoolean(STATE_IS_EXPORT_TOUR_RANGE));
-      }
-
-      // camouflage speed
       if (_isGPXorTCX) {
+
+         // merge all tours
+         if (_isSetup_MultipleTours) {
+            _chkMergeAllTours.setSelection(_state.getBoolean(STATE_IS_MERGE_ALL_TOURS));
+         }
+
+         // export tour part
+         if (_isSetup_TourRange) {
+            _chkExportTourRange.setSelection(_state.getBoolean(STATE_IS_EXPORT_TOUR_RANGE));
+         }
+
+         // camouflage speed
          _chkCamouflageSpeed.setSelection(_state.getBoolean(STATE_IS_CAMOUFLAGE_SPEED));
          _spinnerCamouflageSpeed.setSelection(Util.getStateInt(_state, STATE_CAMOUFLAGE_SPEED, 10));
       }
@@ -1449,20 +1450,21 @@ public class DialogExportTour extends TitleAreaDialog {
          _state.put(STATE_TCX_ACTIVITY_TYPE, getActivityType());
       }
 
-      // merge all tours
-      if (_isSetup_MultipleTours) {
-         _state.put(STATE_IS_MERGE_ALL_TOURS, _chkMergeAllTours.getSelection());
-      }
-
-      // export tour part
-      if (_isSetup_TourRange) {
-         _state.put(STATE_IS_EXPORT_TOUR_RANGE, _chkExportTourRange.getSelection());
-      }
-
       // camouflage speed
       if (_isGPXorTCX) {
+
          _state.put(STATE_IS_CAMOUFLAGE_SPEED, _chkCamouflageSpeed.getSelection());
          _state.put(STATE_CAMOUFLAGE_SPEED, _spinnerCamouflageSpeed.getSelection());
+
+         // merge all tours
+         if (_isSetup_MultipleTours) {
+            _state.put(STATE_IS_MERGE_ALL_TOURS, _chkMergeAllTours.getSelection());
+         }
+
+         // export tour part
+         if (_isSetup_TourRange) {
+            _state.put(STATE_IS_EXPORT_TOUR_RANGE, _chkExportTourRange.getSelection());
+         }
       }
 
       // export file/path

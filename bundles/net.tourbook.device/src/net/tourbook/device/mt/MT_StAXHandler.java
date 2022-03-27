@@ -36,6 +36,7 @@ import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPhoto;
+import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
@@ -56,11 +57,13 @@ public class MT_StAXHandler {
    private static final String              TAG_TOUR_PHOTO                = "photo";
    private static final String              TAG_TOUR_SENSOR_VALUE         = "sensorValue";
    private static final String              TAG_TOUR_TYPE                 = "tourType";
+   private static final String              TAG_TOUR_WAYPOINT             = "waypoint";
 
    private static final String              TAG_TOUR_ALL_MARKERS          = "markers";
    private static final String              TAG_TOUR_ALL_PHOTOS           = "photos";
    private static final String              TAG_TOUR_ALL_SENSOR_VALUES    = "sensorValues";
    private static final String              TAG_TOUR_ALL_TAGS             = "tags";
+   private static final String              TAG_TOUR_ALL_WAYPOINTS        = "waypoints";
 
    private static final String              SUB_TAG_NAME                  = "name";
 
@@ -80,6 +83,7 @@ public class MT_StAXHandler {
    private final HashSet<TourPhoto>         _importedData_AllPhotos       = new HashSet<>();
    private final HashSet<DeviceSensorValue> _importedData_AllSensorValues = new HashSet<>();
    private final HashSet<String>            _importedData_AllTagNames     = new HashSet<>();
+   private final Set<TourWayPoint>          _importedData_AllWayPoints    = new HashSet<>();
 
    /*
     * Imported data which must be set in the correct order
@@ -206,32 +210,37 @@ public class MT_StAXHandler {
 
             // <tour>
             case TAG_TOUR:
-               parseXML_10_Tour(eventReader, startElement);
+               parseXML_010_Tour(eventReader, startElement);
                break;
 
             // <tourType>
             case TAG_TOUR_TYPE:
-               parseXML_20_TourType(eventReader);
+               parseXML_020_TourType(eventReader);
                break;
 
             // <tags>
             case TAG_TOUR_ALL_TAGS:
-               parseXML_30_Tags(eventReader);
+               parseXML_030_Tags(eventReader);
                break;
 
             // <photos>
             case TAG_TOUR_ALL_PHOTOS:
-//               parseXML_40_Photos(eventReader);
+//               parseXML_040_Photos(eventReader);
                break;
 
             // <sensorValues>
             case TAG_TOUR_ALL_SENSOR_VALUES:
-               parseXML_50_SensorValues(eventReader);
+               parseXML_050_SensorValues(eventReader);
                break;
 
             // <markers>
             case TAG_TOUR_ALL_MARKERS:
-               parseXML_60_Markers(eventReader);
+               parseXML_060_Markers(eventReader);
+               break;
+
+            // <waypoints>
+            case TAG_TOUR_ALL_WAYPOINTS:
+               parseXML_070_Waypoints(eventReader);
                break;
 
             }
@@ -258,11 +267,11 @@ public class MT_StAXHandler {
     * @param startElement_Parent
     * @throws XMLStreamException
     */
-   private void parseXML_10_Tour(final XMLEventReader eventReader, final StartElement startElement_Parent) throws XMLStreamException {
+   private void parseXML_010_Tour(final XMLEventReader eventReader, final StartElement startElement_Parent) throws XMLStreamException {
 
       _tourData = new TourData();
 
-      parseXML_12_Tour_Attributes(startElement_Parent);
+      parseXML_012_Tour_Attributes(startElement_Parent);
 
 // SET_FORMATTING_OFF
 
@@ -297,13 +306,14 @@ public class MT_StAXHandler {
 
             switch (elementName) {
 
+            case "importFileName":     _tourData.setTourImportFileName( eventReader.nextEvent().asCharacters().getData());    break;
+            case "importFilePath":     _tourData.setTourImportFilePath( eventReader.nextEvent().asCharacters().getData());    break;
             case "tourDescription":    _tourData.setTourDescription(    eventReader.nextEvent().asCharacters().getData());    break;
             case "tourTitle":          _tourData.setTourTitle(          eventReader.nextEvent().asCharacters().getData());    break;
             case "tourStartPlace":     _tourData.setTourStartPlace(     eventReader.nextEvent().asCharacters().getData());    break;
             case "tourEndPlace":       _tourData.setTourEndPlace(       eventReader.nextEvent().asCharacters().getData());    break;
             case "weather":            _tourData.setWeather(            eventReader.nextEvent().asCharacters().getData());    break;
-            case "importFileName":     _tourData.setTourImportFileName( eventReader.nextEvent().asCharacters().getData());    break;
-            case "importFilePath":     _tourData.setTourImportFilePath( eventReader.nextEvent().asCharacters().getData());    break;
+            case "weather_Clouds":     _tourData.setWeather_Clouds(     eventReader.nextEvent().asCharacters().getData());    break;
 
             }
 
@@ -322,7 +332,7 @@ public class MT_StAXHandler {
       }
    }
 
-   private void parseXML_12_Tour_Attributes(final StartElement startElement) {
+   private void parseXML_012_Tour_Attributes(final StartElement startElement) {
 
       startElement.getAttributes().forEachRemaining(attribute -> {
 
@@ -453,7 +463,6 @@ public class MT_StAXHandler {
          case "training_TrainingEffect_Anaerob":      _tourData.setTraining_TrainingEffect_Anaerob(   Util.parseFloat_0(value));    break;
          case "training_TrainingPerformance":         _tourData.setTraining_TrainingPerformance(      Util.parseFloat_0(value));    break;
 
-         case "weather_Clouds":                       _tourData.setWeather_Clouds(                    value);                       break;
          case "weather_Humidity":                     _tourData.setWeather_Humidity(                  Util.parseShort_0(value));    break;
          case "weather_Precipitation":                _tourData.setWeather_Precipitation(             Util.parseFloat_0(value));    break;
          case "weather_Pressure":                     _tourData.setWeather_Pressure(                  Util.parseFloat_0(value));    break;
@@ -480,7 +489,7 @@ public class MT_StAXHandler {
     * @param eventReader
     * @throws XMLStreamException
     */
-   private void parseXML_20_TourType(final XMLEventReader eventReader) throws XMLStreamException {
+   private void parseXML_020_TourType(final XMLEventReader eventReader) throws XMLStreamException {
 
       while (eventReader.hasNext()) {
 
@@ -520,7 +529,7 @@ public class MT_StAXHandler {
     * @param startElement_
     * @throws XMLStreamException
     */
-   private void parseXML_30_Tags(final XMLEventReader eventReader) throws XMLStreamException {
+   private void parseXML_030_Tags(final XMLEventReader eventReader) throws XMLStreamException {
 
       while (eventReader.hasNext()) {
 
@@ -558,7 +567,7 @@ public class MT_StAXHandler {
     * @param eventReader
     * @throws XMLStreamException
     */
-   private void parseXML_40_Photos(final XMLEventReader eventReader) throws XMLStreamException {
+   private void parseXML_040_Photos(final XMLEventReader eventReader) throws XMLStreamException {
 
       // loop: all <photo>
       while (eventReader.hasNext()) {
@@ -574,7 +583,7 @@ public class MT_StAXHandler {
 
                // <photo>
 
-               parseXML_41_Photo(eventReader, startElement);
+               parseXML_041_Photo(eventReader, startElement);
             }
          }
 
@@ -593,12 +602,12 @@ public class MT_StAXHandler {
       }
    }
 
-   private void parseXML_41_Photo(final XMLEventReader eventReader,
+   private void parseXML_041_Photo(final XMLEventReader eventReader,
                                   final StartElement startElement_Photo) throws XMLStreamException {
 
       final TourPhoto tourPhoto = new TourPhoto();
 
-      parseXML_42_Photo_Attributes(startElement_Photo, tourPhoto);
+      parseXML_042_Photo_Attributes(startElement_Photo, tourPhoto);
 
       while (eventReader.hasNext()) {
 
@@ -634,7 +643,7 @@ public class MT_StAXHandler {
       _importedData_AllPhotos.add(tourPhoto);
    }
 
-   private void parseXML_42_Photo_Attributes(final StartElement startElement, final TourPhoto tourPhoto) {
+   private void parseXML_042_Photo_Attributes(final StartElement startElement, final TourPhoto tourPhoto) {
 
       startElement.getAttributes().forEachRemaining(attribute -> {
 
@@ -667,7 +676,7 @@ public class MT_StAXHandler {
     * @param eventReader
     * @throws XMLStreamException
     */
-   private void parseXML_50_SensorValues(final XMLEventReader eventReader) throws XMLStreamException {
+   private void parseXML_050_SensorValues(final XMLEventReader eventReader) throws XMLStreamException {
 
       // loop: all <sensorValue>
       while (eventReader.hasNext()) {
@@ -683,7 +692,7 @@ public class MT_StAXHandler {
 
                // <sensorValue>
 
-               parseXML_51_SensorValue(eventReader, startElement);
+               parseXML_051_SensorValue(eventReader, startElement);
             }
          }
 
@@ -703,17 +712,17 @@ public class MT_StAXHandler {
       }
    }
 
-   private void parseXML_51_SensorValue(final XMLEventReader eventReader,
+   private void parseXML_051_SensorValue(final XMLEventReader eventReader,
                                         final StartElement startElement_SensorValue) throws XMLStreamException {
 
       final DeviceSensorValue sensorValue = new DeviceSensorValue();
 
-      parseXML_52_SensorValue_Attributes(startElement_SensorValue, sensorValue);
+      parseXML_052_SensorValue_Attributes(startElement_SensorValue, sensorValue);
 
       _importedData_AllSensorValues.add(sensorValue);
    }
 
-   private void parseXML_52_SensorValue_Attributes(final StartElement startElement, final DeviceSensorValue sensorValue) {
+   private void parseXML_052_SensorValue_Attributes(final StartElement startElement, final DeviceSensorValue sensorValue) {
 
       startElement.getAttributes().forEachRemaining(attribute -> {
 
@@ -748,7 +757,7 @@ public class MT_StAXHandler {
     * @param eventReader
     * @throws XMLStreamException
     */
-   private void parseXML_60_Markers(final XMLEventReader eventReader) throws XMLStreamException {
+   private void parseXML_060_Markers(final XMLEventReader eventReader) throws XMLStreamException {
 
       // loop: all <marker>
       while (eventReader.hasNext()) {
@@ -764,7 +773,7 @@ public class MT_StAXHandler {
 
                // <marker>
 
-               parseXML_61_Marker(eventReader, startElement);
+               parseXML_061_Marker(eventReader, startElement);
             }
          }
 
@@ -783,12 +792,12 @@ public class MT_StAXHandler {
       }
    }
 
-   private void parseXML_61_Marker(final XMLEventReader eventReader,
+   private void parseXML_061_Marker(final XMLEventReader eventReader,
                                    final StartElement startElement_Marker) throws XMLStreamException {
 
       final TourMarker tourMarker = new TourMarker();
 
-      parseXML_62_Marker_Attributes(startElement_Marker, tourMarker);
+      parseXML_062_Marker_Attributes(startElement_Marker, tourMarker);
 
       while (eventReader.hasNext()) {
 
@@ -827,7 +836,7 @@ public class MT_StAXHandler {
       _importedData_AllMarkers.add(tourMarker);
    }
 
-   private void parseXML_62_Marker_Attributes(final StartElement startElement, final TourMarker tourMarker) {
+   private void parseXML_062_Marker_Attributes(final StartElement startElement, final TourMarker tourMarker) {
 
       startElement.getAttributes().forEachRemaining(attribute -> {
 
@@ -851,6 +860,118 @@ public class MT_StAXHandler {
          case "type":               tourMarker.setType(           Util.parseInt_0(     value));                               break;
          case "visualPosition":     tourMarker.setLabelPosition(  Util.parseInt_0(     value));                               break;
          case "isMarkerVisible":    tourMarker.setIsMarkerVisible(Util.parseInt(       value, 1));                             break;
+
+// SET_FORMATTING_ON
+
+         }
+
+      });
+   }
+
+   /**
+    * Parse {@code <waypoints>...</waypoints>}
+    *
+    * @param eventReader
+    * @throws XMLStreamException
+    */
+   private void parseXML_070_Waypoints(final XMLEventReader eventReader) throws XMLStreamException {
+
+      // loop: all <waypoint>
+      while (eventReader.hasNext()) {
+
+         final XMLEvent xmlEvent = eventReader.nextEvent();
+
+         if (xmlEvent.isStartElement()) {
+
+            final StartElement startElement = xmlEvent.asStartElement();
+            final String elementName = startElement.getName().getLocalPart();
+
+            if (TAG_TOUR_WAYPOINT.equals(elementName)) {
+
+               // <waypoint>
+
+               parseXML_071_Waypoint(eventReader, startElement);
+            }
+         }
+
+         if (xmlEvent.isEndElement()) {
+
+            if (TAG_TOUR_ALL_WAYPOINTS.equals(xmlEvent.asEndElement().getName().getLocalPart())) {
+
+               // </waypoints>
+               break;
+            }
+         }
+      }
+
+      if (_importedData_AllWayPoints.size() > 0) {
+         _tourData.getTourWayPoints().addAll(_importedData_AllWayPoints);
+      }
+   }
+
+   private void parseXML_071_Waypoint(final XMLEventReader eventReader,
+                                     final StartElement startElement_WayPoint) throws XMLStreamException {
+
+      final TourWayPoint tourWayPoint = new TourWayPoint();
+
+      parseXML_072_WayPoint_Attributes(startElement_WayPoint, tourWayPoint);
+
+      while (eventReader.hasNext()) {
+
+         final XMLEvent xmlEvent = eventReader.nextEvent();
+
+         if (xmlEvent.isStartElement()) {
+
+            final StartElement startElement = xmlEvent.asStartElement();
+            final String elementName = startElement.getName().getLocalPart();
+
+// SET_FORMATTING_OFF
+
+            switch (elementName) {
+
+            case "category":     tourWayPoint.setCategory(     eventReader.nextEvent().asCharacters().getData());    break;
+            case "comment":      tourWayPoint.setComment(      eventReader.nextEvent().asCharacters().getData());    break;
+            case "description":  tourWayPoint.setDescription(  eventReader.nextEvent().asCharacters().getData());    break;
+            case "name":         tourWayPoint.setName(         eventReader.nextEvent().asCharacters().getData());    break;
+            case "symbol":       tourWayPoint.setSymbol(       eventReader.nextEvent().asCharacters().getData());    break;
+            case "urlAddress":   tourWayPoint.setUrlAddress(   eventReader.nextEvent().asCharacters().getData());    break;
+            case "urlText":      tourWayPoint.setUrlText(      eventReader.nextEvent().asCharacters().getData());    break;
+
+            }
+
+// SET_FORMATTING_ON
+
+         }
+
+         if (xmlEvent.isEndElement()) {
+
+            if (TAG_TOUR_WAYPOINT.equals(xmlEvent.asEndElement().getName().getLocalPart())) {
+
+               // </waypoint>
+               break;
+            }
+         }
+      }
+
+      _importedData_AllWayPoints.add(tourWayPoint);
+   }
+
+   private void parseXML_072_WayPoint_Attributes(final StartElement startElement, final TourWayPoint tourWayPoint) {
+
+      startElement.getAttributes().forEachRemaining(attribute -> {
+
+         final String value = attribute.getValue();
+
+// SET_FORMATTING_OFF
+
+         final String attributeName = attribute.getName().getLocalPart();
+
+         switch (attributeName) {
+
+         case "altitude":     tourWayPoint.setAltitude(     Util.parseFloat(     value));  break;
+         case "latitude":     tourWayPoint.setLatitude(     Util.parseDouble(    value));  break;
+         case "longitude":    tourWayPoint.setLongitude(    Util.parseDouble(    value));  break;
+         case "time":         tourWayPoint.setTime(         Util.parseLong_0(    value));  break;
 
 // SET_FORMATTING_ON
 

@@ -168,7 +168,6 @@
       training_TrainingEffect_Anaerob        ="$tourData.training_TrainingEffect_Anaerob" 
       training_TrainingPerformance           ="$tourData.training_TrainingPerformance" 
 
-      weather_Clouds                         ="$tourData.weather_Clouds"
       weather_Humidity                       ="$tourData.weather_Humidity"
       weather_Precipitation                  ="$tourData.weather_Precipitation"
       weather_Pressure                       ="$tourData.weather_Pressure"
@@ -188,6 +187,7 @@
       <tourStartPlace><![CDATA[$!tourData.tourStartPlace]]></tourStartPlace>
       <tourEndPlace><![CDATA[$!tourData.tourEndPlace]]></tourEndPlace>
       <weather><![CDATA[$!tourData.weather]]></weather>
+      <weather_Clouds><![CDATA[$!tourData.weather_Clouds]]></weather_Clouds>
 ##
 #if ($tourData.getImportFileName())
       <importFileName><![CDATA[$!tourData.getImportFileName()]]></importFileName>
@@ -210,12 +210,12 @@
 #end
 ##
 ##
-## TOURMARKER
+## TOURMARKER   TOURMARKER   TOURMARKER   TOURMARKER   TOURMARKER   TOURMARKER   TOURMARKER   TOURMARKER   
 ##
 ##
 #if($tourData.getTourMarkers().size() > 0)
    <markers>
-#set ($allMarkers = $tourData.getTourMarkers())
+#set ($allMarkers = $tourData.getTourMarkersSorted())
 #foreach ($marker in $allMarkers)         
       <marker
          markerId          ="$marker.markerId"
@@ -239,6 +239,33 @@
       </marker>
 #end
    </markers>
+#end
+##
+##
+## WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   
+##
+##
+#if($tourData.getTourWayPoints().size() > 0)
+   <waypoints>
+#set ($allWayPoints = $tourData.getTourWayPoints())
+#foreach ($wayPoint in $allWayPoints)         
+      <waypoint
+         wayPointId     ="$wayPoint.wayPointId"
+         time           ="$wayPoint.time"
+         altitude       ="$wayPoint.altitude"
+         longitude      ="$wayPoint.longitude"
+         latitude       ="$wayPoint.latitude"
+      >
+         <name><![CDATA[$!wayPoint.name]]></name>
+         <description><![CDATA[$!wayPoint.description]]></description>
+         <comment><![CDATA[$!wayPoint.comment]]></comment>
+         <symbol><![CDATA[$!wayPoint.symbol]]></symbol>
+         <category><![CDATA[$!wayPoint.category]]></category>
+         <urlAddress><![CDATA[$!wayPoint.urlAddress]]></urlAddress>
+         <urlText><![CDATA[$!wayPoint.urlText]]></urlText>
+      </waypoint>
+#end
+   </waypoints>
 #end
 ##
 ##
