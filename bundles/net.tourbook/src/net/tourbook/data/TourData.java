@@ -1332,6 +1332,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @Transient
    public int                 offsetDDRecord;
+
    /*
     * data for the tour segments
     */
@@ -1345,9 +1346,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private int[]              segmentSerie_Time_Paused;
    @Transient
    public int[]               segmentSerie_Time_Moving;
-
    @Transient
    private int[]              segmentSerie_Time_Break;
+
    @Transient
    private float[]            segmentSerie_Distance_Diff;
    @Transient
@@ -1360,9 +1361,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public float[]             segmentSerie_Altitude_UpDown_Hour;
    @Transient
    public float               segmentSerieTotal_Altitude_Down;
-
    @Transient
    public float               segmentSerieTotal_Altitude_Up;
+
    @Transient
    public float[]             segmentSerie_Speed;
    @Transient
@@ -1375,7 +1376,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public float[]             segmentSerie_Power;
    @Transient
    public float[]             segmentSerie_Gradient;
-
    @Transient
    public float[]             segmentSerie_Pulse;
 
@@ -1607,9 +1607,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Transient
    public List<List<Long>>    multipleTourPauses;
 
-
    @Transient
    public boolean             multipleTour_IsCadenceRpm;
+
 
    @Transient
    public boolean             multipleTour_IsCadenceSpm;
@@ -1666,6 +1666,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @Transient
    public boolean             isBackupImportFile;
+
    /*
     * Running dynamics data
     *
@@ -1685,33 +1686,32 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @Transient
    public short[]       runDyn_StanceTime;
-
    @Transient
    private float[]      _runDyn_StanceTime_UI;
-   @Transient
-   public short[]       runDyn_StanceTimeBalance;
 
    @Transient
+   public short[]       runDyn_StanceTimeBalance;
+   @Transient
    private float[]      _runDyn_StanceTimeBalance_UI;
+
    @Transient
    public short[]       runDyn_StepLength;
    @Transient
    private float[]      _runDyn_StepLength_UI;
-
    @Transient
    private float[]      _runDyn_StepLength_UI_Imperial;
+
    @Transient
    public short[]       runDyn_VerticalOscillation;
    @Transient
    private float[]      _runDyn_VerticalOscillation_UI;
-
    @Transient
    private float[]      _runDyn_VerticalOscillation_UI_Imperial;
+
    @Transient
    public short[]       runDyn_VerticalRatio;
    @Transient
    private float[]      _runDyn_VerticalRatio_UI;
-
    /**
     * Swimming data has a different number of time slices than the other data series !!!
     *
@@ -9158,6 +9158,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * Used for MT import/export
+    *
+    * @return
+    */
+   public SerieData getSerieData() {
+      return serieData;
+   }
+
+   /**
     * @return the speed data in the current measurement system, which is defined in
     *         {@link UI#UNIT_VALUE_DISTANCE}
     */
@@ -10987,7 +10996,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Used for MT import/export
-    * 
+    *
     * @param isFromSensor
     */
    public void setIsDistanceFromSensor(final short isFromSensor) {
@@ -11004,7 +11013,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Used for MT import/export
-    * 
+    *
     * @param isFromSensor
     */
    public void setIsPowerSensorPresent(final short isFromSensor) {
@@ -11017,7 +11026,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Used for MT import/export
-    * 
+    *
     * @param isFromSensor
     */
    public void setIsPulseSensorPresent(final short isFromSensor) {
@@ -11035,7 +11044,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Used for MT import/export
-    * 
+    *
     * @param isFromSensor
     */
    public void setIsStrideSensorPresent(final short isFromSensor) {
@@ -11396,7 +11405,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * Used for MT import/export
-    * 
+    *
     * @param temperatureScale
     */
    public void setTemperatureScale(final int temperatureScale) {
@@ -12518,5 +12527,4 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          pausedTime_End[index] += startTimeOffset;
       }
    }
-
 }

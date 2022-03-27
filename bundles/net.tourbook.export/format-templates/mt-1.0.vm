@@ -3,12 +3,6 @@
    version="1.0"
    created="$created"
    creator="$creator">
-   <metadata>   
-      <bounds 
-         minlat="$nf8.format($min_latitude)"    minlon="$nf8.format($min_longitude)" 
-         maxlat="$nf8.format($max_latitude)"    maxlon="$nf8.format($max_longitude)"
-      />
-   </metadata>
    <tour 
       tourId                                 ="$tourData.tourId" 
 ##
@@ -332,7 +326,94 @@
 #end
 ##
 ##
-## TRACKS   TRACKS   TRACKS   TRACKS   TRACKS   TRACKS   TRACKS   TRACKS   TRACKS   TRACKS   TRACKS   TRACKS   
+## SERIE DATA   SERIE DATA   SERIE DATA   SERIE DATA   SERIE DATA   SERIE DATA   SERIE DATA   SERIE DATA   
 ##
 ##
+#if ($serieTime                             && $serieTime.size() > 0)
+     <serieTime                        values="$serieTime"/>
+#end
+#if ($serieAltitude                         && $serieAltitude.size() > 0)
+     <serieAltitude                    values="$serieAltitude"/>
+#end
+#if ($serieCadence                          && $serieCadence.size() > 0)
+     <serieCadence                     values="$serieCadence"/>
+#end
+#if ($serieDistance                         && $serieDistance.size() > 0)
+     <serieDistance                    values="$serieDistance"/>
+#end
+#if ($seriePulse                            && $seriePulse.size() > 0)
+     <seriePulse                       values="$seriePulse"/>
+#end
+#if ($serieTemperature                      && $serieTemperature.size() > 0)
+     <serieTemperature                 values="$serieTemperature"/>
+#end
+#if ($seriePower                            && $seriePower.size() > 0)
+     <seriePower                       values="$seriePower"/>
+#end
+#if ($serieSpeed                            && $serieSpeed.size() > 0)
+     <serieSpeed                       values="$serieSpeed"/>
+#end
+#if ($serieGears                            && $serieGears.size() > 0)
+     <serieGears                       values="$serieGears"/>
+#end
+#if ($serieLatitude                         && $serieLatitude.size() > 0)
+     <serieLatitude                    values="$serieLatitude"/>
+#end
+#if ($serieLongitude                        && $serieLongitude.size() > 0)
+     <serieLongitude                   values="$serieLongitude"/>
+#end
+#if ($seriePausedTime_Start                 && $seriePausedTime_Start.size() > 0)
+     <seriePausedTime_Start            values="$seriePausedTime_Start"/>
+#end
+#if ($seriePausedTime_End                   && $seriePausedTime_End.size() > 0)
+     <seriePausedTime_End              values="$seriePausedTime_End"/>
+#end
+#if ($seriePausedTime_Data                  && $seriePausedTime_Data.size() > 0)
+     <seriePausedTime_Data             values="$seriePausedTime_Data"/>
+#end
+#if ($seriePulseTimes                       && $seriePulseTimes.size() > 0)
+     <seriePulseTimes                  values="$seriePulseTimes"/>
+#end
+#if ($seriePulseTimes_TimeIndex             && $seriePulseTimes_TimeIndex.size() > 0)
+     <seriePulseTimes_TimeIndex        values="$seriePulseTimes_TimeIndex"/>
+#end
+#if ($serieRunDyn_StanceTime                && $serieRunDyn_StanceTime.size() > 0)
+     <serieRunDyn_StanceTime           values="$serieRunDyn_StanceTime"/>
+#end
+#if ($serieRunDyn_StanceTimeBalance         && $serieRunDyn_StanceTimeBalance.size() > 0)
+     <serieRunDyn_StanceTimeBalance    values="$serieRunDyn_StanceTimeBalance"/>
+#end
+#if ($serieRunDyn_StepLength                && $serieRunDyn_StepLength.size() > 0)
+     <serieRunDyn_StepLength           values="$serieRunDyn_StepLength"/>
+#end
+#if ($serieRunDyn_VerticalOscillation       && $serieRunDyn_VerticalOscillation.size() > 0)
+     <serieRunDyn_VerticalOscillation  values="$serieRunDyn_VerticalOscillation"/>
+#end
+#if ($serieRunDyn_VerticalRatio             && $serieRunDyn_VerticalRatio.size() > 0)
+     <serieRunDyn_VerticalRatio        values="$serieRunDyn_VerticalRatio"/>
+#end
+#if ($serieSwim_LengthType                  && $serieSwim_LengthType.size() > 0)
+     <serieSwim_LengthType             values="$serieSwim_LengthType"/>
+#end
+#if ($serieSwim_Cadence                     && $serieSwim_Cadence.size() > 0)
+     <serieSwim_Cadence                values="$serieSwim_Cadence"/>
+#end
+#if ($serieSwim_Strokes                     && $serieSwim_Strokes.size() > 0)
+     <serieSwim_Strokes                values="$serieSwim_Strokes"/>
+#end
+#if ($serieSwim_StrokeStyle                 && $serieSwim_StrokeStyle.size() > 0)
+     <serieSwim_StrokeStyle            values="$serieSwim_StrokeStyle"/>
+#end
+#if ($serieSwim_Time                        && $serieSwim_Time.size() > 0)
+     <serieSwim_Time                   values="$serieSwim_Time"/>
+#end
+#if ($serieVisiblePoints_Surfing            && $serieVisiblePoints_Surfing.size() > 0)
+     <serieVisiblePoints_Surfing       values="$serieVisiblePoints_Surfing"/>
+#end
+#if ($serieBattery_Percentage               && $serieBattery_Percentage.size() > 0)
+     <serieBattery_Percentage          values="$serieBattery_Percentage"/>
+#end
+#if ($serieBattery_Time                     && $serieBattery_Time.size() > 0)
+     <serieBattery_Time                values="$serieBattery_Time"/>
+#end
 </mt>
