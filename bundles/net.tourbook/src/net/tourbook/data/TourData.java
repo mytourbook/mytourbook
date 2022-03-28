@@ -9162,6 +9162,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
+   @JsonIgnore
    public SerieData getSerieData() {
       return serieData;
    }
@@ -11529,10 +11530,20 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       tourEndTime = tourStartTime + (tourDeviceTime_Elapsed * 1000);
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @param tourImportFileName
+    */
    public void setTourImportFileName(final String tourImportFileName) {
       this.tourImportFileName = tourImportFileName;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @param tourImportFilePath
+    */
    public void setTourImportFilePath(final String tourImportFilePath) {
       this.tourImportFilePath = tourImportFilePath;
    }
@@ -11561,7 +11572,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Used for MT import/export
     * <p>
-    * Set photos in this tour.
+    * Set photos into this tour
     *
     * @param allTourPhotos
     */

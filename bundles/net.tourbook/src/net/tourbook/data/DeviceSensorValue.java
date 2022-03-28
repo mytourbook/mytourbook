@@ -80,6 +80,9 @@ public class DeviceSensorValue {
    @Transient
    private long                 _createId            = 0;
 
+   /**
+    * Used for MT import/export
+    */
    public DeviceSensorValue() {
 
       _createId = _createCounter.incrementAndGet();

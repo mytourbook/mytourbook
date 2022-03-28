@@ -903,7 +903,7 @@ public class MT_StAXHandler {
    private void parseXML_061_Marker(final XMLEventReader eventReader,
                                     final StartElement startElement_Marker) throws XMLStreamException {
 
-      final TourMarker tourMarker = new TourMarker(true);
+      final TourMarker tourMarker = new TourMarker(_tourData);
 
       parseXML_062_Marker_Attributes(startElement_Marker, tourMarker);
 

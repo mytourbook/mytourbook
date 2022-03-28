@@ -393,8 +393,9 @@ public class TourPhoto {
             + "   latitude                =" + latitude + NL //               //$NON-NLS-1$
             + "   longitude               =" + longitude + NL //              //$NON-NLS-1$
 
+            + "   _createId               =" + _createId + NL //              //$NON-NLS-1$
+
 //          + "   tourData                =" + tourData + NL //               //$NON-NLS-1$
-//          + "   _createId               =" + _createId + NL //              //$NON-NLS-1$
 
             + "]" + NL //                                                     //$NON-NLS-1$
       ;

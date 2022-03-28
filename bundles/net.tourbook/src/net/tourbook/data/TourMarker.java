@@ -286,14 +286,14 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
    /**
     * Used for MT import/export
-    * 
-    * @param isCreateID
+    *
+    * @param tourData
     */
-   public TourMarker(final boolean isCreateID) {
+   public TourMarker(final TourData tourData) {
 
-      if (isCreateID) {
-         _createId = _createCounter.incrementAndGet();
-      }
+      this.tourData = tourData;
+
+      _createId = _createCounter.incrementAndGet();
    }
 
    public TourMarker(final TourData tourData, final int markerType) {
@@ -945,7 +945,6 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
             + "[" + NL //                                         //$NON-NLS-1$
 
             + "   markerId          =" + markerId + NL //         //$NON-NLS-1$
-//          + "   tourData          =" + tourData + NL
 
             + "   label             =" + label + NL //            //$NON-NLS-1$
             + "   altitude          =" + altitude + NL //         //$NON-NLS-1$
@@ -968,12 +967,14 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
             + "   urlText           =" + urlText + NL //          //$NON-NLS-1$
             + "   description       =" + description + NL //      //$NON-NLS-1$
 
+            + "   _createId         =" + _createId + NL //        //$NON-NLS-1$
+
+//          + "   tourData          =" + tourData + NL
 //          + "   markerType        =" + markerType + NL
 //          + "   distance          =" + distance + NL
 //          + "   category          =" + category + NL
 //          + "   _visibleType      =" + _visibleType + NL
 //          + "   _markerBounds     =" + _markerBounds + NL
-//          + "   _createId         =" + _createId + NL
 
             + "]" + NL; //                                        //$NON-NLS-1$
    }

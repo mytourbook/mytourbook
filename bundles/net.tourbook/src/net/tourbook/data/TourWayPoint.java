@@ -472,26 +472,27 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 
       return UI.EMPTY_STRING
 
-            + "TourWayPoint" + NL //                        //$NON-NLS-1$
+            + "TourWayPoint" + NL //                           //$NON-NLS-1$
 
-            + "[" + NL //                                   //$NON-NLS-1$
+            + "[" + NL //                                      //$NON-NLS-1$
 
-            + "wayPointId     =" + wayPointId + NL //       //$NON-NLS-1$
-            + "longitude      =" + longitude + NL //        //$NON-NLS-1$
-            + "latitude       =" + latitude + NL //         //$NON-NLS-1$
-            + "time           =" + time + NL //             //$NON-NLS-1$
-            + "altitude       =" + altitude + NL //         //$NON-NLS-1$
-            + "name           =" + name + NL //             //$NON-NLS-1$
-            + "description    =" + description + NL //      //$NON-NLS-1$
-            + "comment        =" + comment + NL //          //$NON-NLS-1$
-            + "symbol         =" + symbol + NL //           //$NON-NLS-1$
-            + "category       =" + category + NL //         //$NON-NLS-1$
-            + "urlText        =" + urlText + NL //          //$NON-NLS-1$
-            + "urlAddress     =" + urlAddress + NL //       //$NON-NLS-1$
+            + "   wayPointId     =" + wayPointId + NL //       //$NON-NLS-1$
+            + "   longitude      =" + longitude + NL //        //$NON-NLS-1$
+            + "   latitude       =" + latitude + NL //         //$NON-NLS-1$
+            + "   time           =" + time + NL //             //$NON-NLS-1$
+            + "   altitude       =" + altitude + NL //         //$NON-NLS-1$
+            + "   name           =" + name + NL //             //$NON-NLS-1$
+            + "   description    =" + description + NL //      //$NON-NLS-1$
+            + "   comment        =" + comment + NL //          //$NON-NLS-1$
+            + "   symbol         =" + symbol + NL //           //$NON-NLS-1$
+            + "   category       =" + category + NL //         //$NON-NLS-1$
+            + "   urlText        =" + urlText + NL //          //$NON-NLS-1$
+            + "   urlAddress     =" + urlAddress + NL //       //$NON-NLS-1$
 
-//          + "_createId      =" + _createId + NL //        //$NON-NLS-1$
-//          + "_geoPosition   =" + _geoPosition + NL //     //$NON-NLS-1$
+            + "   _createId      =" + _createId + NL //        //$NON-NLS-1$
 
-            + "]" + NL; //                                  //$NON-NLS-1$
+//          + "   _geoPosition   =" + _geoPosition + NL //     //$NON-NLS-1$
+
+            + "]" + NL; //                                     //$NON-NLS-1$
    }
 }

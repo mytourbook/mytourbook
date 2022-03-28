@@ -153,6 +153,10 @@ public class DialogExportTour extends TitleAreaDialog {
     * Is <code>true</code> when GPX export.
     */
    private boolean                   _isSetup_GPX;
+
+   /**
+    * Is <code>true</code> when TCX export.
+    */
    private boolean                   _isSetup_TCX;
    private boolean                   _isGPXorTCX;
 
@@ -1425,54 +1429,59 @@ public class DialogExportTour extends TitleAreaDialog {
 
    private void saveState() {
 
+// SET_FORMATTING_OFF
+
       if (_isSetup_GPX) {
 
-         _state.put(STATE_GPX_IS_EXPORT_DESCRITION, _chkGPX_Description.getSelection());
-         _state.put(STATE_GPX_IS_ABSOLUTE_DISTANCE, _rdoGPX_DistanceAbsolute.getSelection());
-         _state.put(STATE_GPX_IS_EXPORT_MARKERS, _chkGPX_Markers.getSelection());
-         _state.put(STATE_GPX_IS_EXPORT_TOUR_DATA, _chkGPX_NoneGPXFields.getSelection());
-         _state.put(STATE_GPX_IS_EXPORT_SURFING_WAVES, _chkGPX_SurfingWaves.getSelection());
-         _state.put(STATE_GPX_IS_WITH_BAROMETER, _chkGPX_WithBarometer.getSelection());
+         _state.put(STATE_GPX_IS_EXPORT_DESCRITION,      _chkGPX_Description.getSelection());
+         _state.put(STATE_GPX_IS_ABSOLUTE_DISTANCE,      _rdoGPX_DistanceAbsolute.getSelection());
+         _state.put(STATE_GPX_IS_EXPORT_MARKERS,         _chkGPX_Markers.getSelection());
+         _state.put(STATE_GPX_IS_EXPORT_TOUR_DATA,       _chkGPX_NoneGPXFields.getSelection());
+         _state.put(STATE_GPX_IS_EXPORT_SURFING_WAVES,   _chkGPX_SurfingWaves.getSelection());
+         _state.put(STATE_GPX_IS_WITH_BAROMETER,         _chkGPX_WithBarometer.getSelection());
 
       } else if (_isSetup_TCX) {
 
-         _state.put(STATE_TCX_IS_COURSES, _rdoTCX_Courses.getSelection());
-         _state.put(STATE_TCX_IS_EXPORT_DESCRITION, _chkTCX_Description.getSelection());
-         _state.put(STATE_TCX_IS_NAME_FROM_TOUR, _rdoTCX_NameFromTour.getSelection());
-         _state.put(STATE_TCX_COURSE_NAME, Util.getUniqueItems(_comboTcxCourseName.getItems(), getCourseName(), COMBO_HISTORY_LENGTH));
+         _state.put(STATE_TCX_IS_COURSES,                _rdoTCX_Courses.getSelection());
+         _state.put(STATE_TCX_IS_EXPORT_DESCRITION,      _chkTCX_Description.getSelection());
+         _state.put(STATE_TCX_IS_NAME_FROM_TOUR,         _rdoTCX_NameFromTour.getSelection());
+         _state.put(STATE_TCX_COURSE_NAME,               Util.getUniqueItems(_comboTcxCourseName.getItems(), getCourseName(), COMBO_HISTORY_LENGTH));
 
          final String currentText = _comboTcxActivityTypes.getText();
          final List<String> comboItems = Arrays.asList(_comboTcxActivityTypes.getItems());
          if (!comboItems.contains(currentText)) {
             _comboTcxActivityTypes.add(getActivityType());
          }
-         _state.put(STATE_TCX_ACTIVITY_TYPES, _comboTcxActivityTypes.getItems());
-         _state.put(STATE_TCX_ACTIVITY_TYPE, getActivityType());
+         _state.put(STATE_TCX_ACTIVITY_TYPES,            _comboTcxActivityTypes.getItems());
+         _state.put(STATE_TCX_ACTIVITY_TYPE,             getActivityType());
       }
 
       // camouflage speed
       if (_isGPXorTCX) {
 
-         _state.put(STATE_IS_CAMOUFLAGE_SPEED, _chkCamouflageSpeed.getSelection());
-         _state.put(STATE_CAMOUFLAGE_SPEED, _spinnerCamouflageSpeed.getSelection());
+         _state.put(STATE_IS_CAMOUFLAGE_SPEED,           _chkCamouflageSpeed.getSelection());
+         _state.put(STATE_CAMOUFLAGE_SPEED,              _spinnerCamouflageSpeed.getSelection());
 
          // merge all tours
          if (_isSetup_MultipleTours) {
-            _state.put(STATE_IS_MERGE_ALL_TOURS, _chkMergeAllTours.getSelection());
+            _state.put(STATE_IS_MERGE_ALL_TOURS,         _chkMergeAllTours.getSelection());
          }
 
          // export tour part
          if (_isSetup_TourRange) {
-            _state.put(STATE_IS_EXPORT_TOUR_RANGE, _chkExportTourRange.getSelection());
+            _state.put(STATE_IS_EXPORT_TOUR_RANGE,       _chkExportTourRange.getSelection());
          }
       }
 
       // export file/path
       if (validateFilePath()) {
-         _state.put(STATE_EXPORT_PATH_NAME, Util.getUniqueItems(_comboPath.getItems(), getExportPathName(), COMBO_HISTORY_LENGTH));
-         _state.put(STATE_EXPORT_FILE_NAME, Util.getUniqueItems(_comboFile.getItems(), getExportFileName(), COMBO_HISTORY_LENGTH));
+         _state.put(STATE_EXPORT_PATH_NAME,              Util.getUniqueItems(_comboPath.getItems(), getExportPathName(), COMBO_HISTORY_LENGTH));
+         _state.put(STATE_EXPORT_FILE_NAME,              Util.getUniqueItems(_comboFile.getItems(), getExportFileName(), COMBO_HISTORY_LENGTH));
       }
-      _state.put(STATE_IS_OVERWRITE_FILES, _chkOverwriteFiles.getSelection());
+      _state.put(STATE_IS_OVERWRITE_FILES,               _chkOverwriteFiles.getSelection());
+
+// SET_FORMATTING_ON
+
    }
 
    private void setError(final String message) {
