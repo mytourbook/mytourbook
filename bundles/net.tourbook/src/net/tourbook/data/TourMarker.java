@@ -284,6 +284,18 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
    public TourMarker() {}
 
+   /**
+    * Used for MT import/export
+    * 
+    * @param isCreateID
+    */
+   public TourMarker(final boolean isCreateID) {
+
+      if (isCreateID) {
+         _createId = _createCounter.incrementAndGet();
+      }
+   }
+
    public TourMarker(final TourData tourData, final int markerType) {
 
       this.tourData = tourData;
@@ -436,7 +448,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
    /**
     * Used for MT import/export
-    * 
+    *
     * @return
     */
    public int getIsMarkerVisible() {
@@ -774,7 +786,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
    /**
     * Used for MT import/export
-    * 
+    *
     * @param isMarkerVisible
     */
    public void setIsMarkerVisible(final int isMarkerVisible) {
@@ -871,7 +883,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
    /**
     * Used for MT import/export
-    * 
+    *
     * @param time
     */
    public void setTime(final int time) {
@@ -898,7 +910,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
    /**
     * Used for MT import/export
-    * 
+    *
     * @param tourTime
     */
    public void setTourTime(final long tourTime) {
@@ -929,41 +941,41 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
       return UI.EMPTY_STRING
 
-            + "TourMarker" + NL //                             //$NON-NLS-1$
-            + "[" + NL //                                      //$NON-NLS-1$
+            + "TourMarker" + NL //                                //$NON-NLS-1$
+            + "[" + NL //                                         //$NON-NLS-1$
 
-//          + "markerId          =" + markerId + NL //         //$NON-NLS-1$
-//          + "tourData          =" + tourData + NL
+            + "   markerId          =" + markerId + NL //         //$NON-NLS-1$
+//          + "   tourData          =" + tourData + NL
 
-            + "label             =" + label + NL //            //$NON-NLS-1$
-            + "altitude          =" + altitude + NL //         //$NON-NLS-1$
-            + "distance20        =" + distance20 + NL //       //$NON-NLS-1$
+            + "   label             =" + label + NL //            //$NON-NLS-1$
+            + "   altitude          =" + altitude + NL //         //$NON-NLS-1$
+            + "   distance20        =" + distance20 + NL //       //$NON-NLS-1$
 
-            + "latitude          =" + latitude + NL //         //$NON-NLS-1$
-            + "longitude         =" + longitude + NL //        //$NON-NLS-1$
+            + "   latitude          =" + latitude + NL //         //$NON-NLS-1$
+            + "   longitude         =" + longitude + NL //        //$NON-NLS-1$
 
-            + "labelXOffset      =" + labelXOffset + NL
-            + "labelYOffset      =" + labelYOffset + NL
-            + "serieIndex        =" + serieIndex + NL //       //$NON-NLS-1$
-            + "time              =" + time + NL //             //$NON-NLS-1$
-            + "tourTime          =" + tourTime + NL //         //$NON-NLS-1$
+            + "   labelXOffset      =" + labelXOffset + NL //     //$NON-NLS-1$
+            + "   labelYOffset      =" + labelYOffset + NL //     //$NON-NLS-1$
+            + "   serieIndex        =" + serieIndex + NL //       //$NON-NLS-1$
+            + "   time              =" + time + NL //             //$NON-NLS-1$
+            + "   tourTime          =" + tourTime + NL //         //$NON-NLS-1$
 
-            + "type              =" + type + NL
-            + "visualPosition    =" + visualPosition + NL //   //$NON-NLS-1$
-            + "isMarkerVisible   =" + isMarkerVisible + NL //  //$NON-NLS-1$
+            + "   type              =" + type + NL //$NON-NLS-1$
+            + "   visualPosition    =" + visualPosition + NL //   //$NON-NLS-1$
+            + "   isMarkerVisible   =" + isMarkerVisible + NL //  //$NON-NLS-1$
 
-            + "urlAddress        =" + urlAddress + NL //       //$NON-NLS-1$
-            + "urlText           =" + urlText + NL //          //$NON-NLS-1$
-            + "description       =" + description + NL //      //$NON-NLS-1$
+            + "   urlAddress        =" + urlAddress + NL //       //$NON-NLS-1$
+            + "   urlText           =" + urlText + NL //          //$NON-NLS-1$
+            + "   description       =" + description + NL //      //$NON-NLS-1$
 
-//          + "markerType        =" + markerType + NL
-//          + "distance          =" + distance + NL
-//          + "category          =" + category + NL
-//          + "_visibleType      =" + _visibleType + NL
-//          + "_markerBounds     =" + _markerBounds + NL
-//          + "_createId         =" + _createId + NL
+//          + "   markerType        =" + markerType + NL
+//          + "   distance          =" + distance + NL
+//          + "   category          =" + category + NL
+//          + "   _visibleType      =" + _visibleType + NL
+//          + "   _markerBounds     =" + _markerBounds + NL
+//          + "   _createId         =" + _createId + NL
 
-            + "]" + NL; //                                     //$NON-NLS-1$
+            + "]" + NL; //                                        //$NON-NLS-1$
    }
 
    @Override

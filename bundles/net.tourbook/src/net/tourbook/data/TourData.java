@@ -5493,7 +5493,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          final int intValue = intDataSerie[serieIndex];
 
-         floatDataSerie[serieIndex] = scale > 0 //
+         floatDataSerie[serieIndex] = scale > 0
                ? (float) intValue / scale
                : (float) intValue;
       }
@@ -10352,6 +10352,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       onPostLoadGetDataSeries();
    }
 
+   /**
+    * Move/convert serie data into tour data
+    */
    private void onPostLoadGetDataSeries() {
 
       timeSerie = serieData.timeSerie;
@@ -11318,6 +11321,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void setRunDyn_VerticalRatio_Min(final short runDyn_VerticalRatio_Min) {
       this.runDyn_VerticalRatio_Min = runDyn_VerticalRatio_Min;
+   }
+
+   /**
+    * Used for MT import/export
+    *
+    * @param serieData
+    */
+   public void setSerieData(final SerieData serieData) {
+
+      this.serieData = serieData;
+
+      onPostLoadGetDataSeries();
    }
 
    private void setSpeed(final int serieIndex,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.TreeSet;
 
 import net.tourbook.Messages;
@@ -37,6 +38,7 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourReference;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -162,7 +164,8 @@ public class TourDataView extends ViewPart {
 
    public static Collection<Field> getAllFields(final Class<?> type) {
 
-      final TreeSet<Field> fields = new TreeSet<>(
+      // sort fields
+      final TreeSet<Field> allFields = new TreeSet<>(
 
             new Comparator<Field>() {
 
@@ -226,19 +229,19 @@ public class TourDataView extends ViewPart {
             });
 
       for (Class<?> c = type; c != null; c = c.getSuperclass()) {
-         fields.addAll(Arrays.asList(c.getDeclaredFields()));
+         allFields.addAll(Arrays.asList(c.getDeclaredFields()));
       }
 
-      return fields;
+      return allFields;
    }
 
-   public static String printAllFields(final Object obj) {
+   private static String printAllFields(final TourData tourData) {
 
       final StringBuilder sb = new StringBuilder();
 
       int fieldNumber = 1;
 
-      for (final Field field : getAllFields(obj.getClass())) {
+      for (final Field field : getAllFields(tourData.getClass())) {
 
          final int modifiers = field.getModifiers();
 
@@ -261,13 +264,34 @@ public class TourDataView extends ViewPart {
          // value
          Object value = null;
          try {
-            value = field.get(obj);
+            value = field.get(tourData);
          } catch (IllegalArgumentException | IllegalAccessException e) {
             e.printStackTrace();
          }
          String valueString = UI.EMPTY_STRING;
          if (value != null) {
-            valueString = value.toString();
+
+            if ("tourMarkers".equals(fieldName)) { //$NON-NLS-1$
+
+               // show sorted markers
+
+               valueString = tourData.getTourMarkersSorted().toString();
+
+            } else if ("tourPhotos".equals(fieldName)) { //$NON-NLS-1$
+
+               // show sorted photos
+
+               final List<TourPhoto> sortedTourPhotos = new ArrayList<>(tourData.getTourPhotos());
+
+               Collections.sort(sortedTourPhotos,
+                     (photo1, photo2) -> photo1.getImageFileName().compareTo(photo2.getImageFileName()));
+
+               valueString = sortedTourPhotos.toString();
+
+            } else {
+
+               valueString = value.toString();
+            }
          }
 
          // type

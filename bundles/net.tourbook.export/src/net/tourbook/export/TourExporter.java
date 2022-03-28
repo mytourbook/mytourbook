@@ -230,35 +230,35 @@ public class TourExporter {
       /*
        * Export raw serie data
        */
-      vc.put("serieTime",                          serieData.timeSerie); //                     //$NON-NLS-1$
-      vc.put("serieAltitude",                      serieData.altitudeSerie20); //               //$NON-NLS-1$
-      vc.put("serieCadence",                       serieData.cadenceSerie20); //                //$NON-NLS-1$
-      vc.put("serieDistance",                      serieData.distanceSerie20); //               //$NON-NLS-1$
-      vc.put("seriePulse",                         serieData.pulseSerie20); //                  //$NON-NLS-1$
-      vc.put("serieTemperature",                   serieData.temperatureSerie20); //            //$NON-NLS-1$
-      vc.put("seriePower",                         serieData.powerSerie20); //                  //$NON-NLS-1$
-      vc.put("serieSpeed",                         serieData.speedSerie20); //                  //$NON-NLS-1$
-      vc.put("serieGears",                         serieData.gears); //                         //$NON-NLS-1$
-      vc.put("serieLatitude",                      _tourData.latitudeSerie); //                 //$NON-NLS-1$
-      vc.put("serieLongitude",                     _tourData.longitudeSerie); //                //$NON-NLS-1$
-      vc.put("seriePausedTime_Start",              serieData.pausedTime_Start); //              //$NON-NLS-1$
-      vc.put("seriePausedTime_End",                serieData.pausedTime_End); //                //$NON-NLS-1$
-      vc.put("seriePausedTime_Data",               serieData.pausedTime_Data); //               //$NON-NLS-1$
-      vc.put("seriePulseTimes",                    serieData.pulseTimes); //                    //$NON-NLS-1$
-      vc.put("seriePulseTimes_TimeIndex",          serieData.pulseTime_TimeIndex); //           //$NON-NLS-1$
-      vc.put("serieRunDyn_StanceTime",             serieData.runDyn_StanceTime); //             //$NON-NLS-1$
-      vc.put("serieRunDyn_StanceTimeBalance",      serieData.runDyn_StanceTimeBalance); //      //$NON-NLS-1$
-      vc.put("serieRunDyn_StepLength",             serieData.runDyn_StepLength); //             //$NON-NLS-1$
-      vc.put("serieRunDyn_VerticalOscillation",    serieData.runDyn_VerticalOscillation); //    //$NON-NLS-1$
-      vc.put("serieRunDyn_VerticalRatio",          serieData.runDyn_VerticalRatio); //          //$NON-NLS-1$
-      vc.put("serieSwim_LengthType",               serieData.swim_LengthType); //               //$NON-NLS-1$
-      vc.put("serieSwim_Cadence",                  serieData.swim_Cadence); //                  //$NON-NLS-1$
-      vc.put("serieSwim_Strokes",                  serieData.swim_Strokes); //                  //$NON-NLS-1$
-      vc.put("serieSwim_StrokeStyle",              serieData.swim_StrokeStyle); //              //$NON-NLS-1$
-      vc.put("serieSwim_Time",                     serieData.swim_Time); //                     //$NON-NLS-1$
-      vc.put("serieVisiblePoints_Surfing",         serieData.visiblePoints_Surfing); //         //$NON-NLS-1$
-      vc.put("serieBattery_Percentage",            serieData.battery_Percentage); //            //$NON-NLS-1$
-      vc.put("serieBattery_Time",                  serieData.battery_Time); //                  //$NON-NLS-1$
+      vc.put("serieTime",                          serieData.timeSerie                       ); //$NON-NLS-1$
+      vc.put("serieAltitude",                      serieData.altitudeSerie20                 ); //$NON-NLS-1$
+      vc.put("serieCadence",                       serieData.cadenceSerie20                  ); //$NON-NLS-1$
+      vc.put("serieDistance",                      serieData.distanceSerie20                 ); //$NON-NLS-1$
+      vc.put("seriePulse",                         serieData.pulseSerie20                    ); //$NON-NLS-1$
+      vc.put("serieTemperature",                   serieData.temperatureSerie20              ); //$NON-NLS-1$
+      vc.put("seriePower",                         serieData.powerSerie20                    ); //$NON-NLS-1$
+      vc.put("serieSpeed",                         serieData.speedSerie20                    ); //$NON-NLS-1$
+      vc.put("serieGears",                         serieData.gears                           ); //$NON-NLS-1$
+      vc.put("serieLatitude",                      serieData.latitudeE6                      ); //$NON-NLS-1$
+      vc.put("serieLongitude",                     serieData.longitudeE6                     ); //$NON-NLS-1$
+      vc.put("seriePausedTime_Start",              serieData.pausedTime_Start                ); //$NON-NLS-1$
+      vc.put("seriePausedTime_End",                serieData.pausedTime_End                  ); //$NON-NLS-1$
+      vc.put("seriePausedTime_Data",               serieData.pausedTime_Data                 ); //$NON-NLS-1$
+      vc.put("seriePulseTimes",                    serieData.pulseTimes                      ); //$NON-NLS-1$
+      vc.put("seriePulseTimes_TimeIndex",          serieData.pulseTime_TimeIndex             ); //$NON-NLS-1$
+      vc.put("serieRunDyn_StanceTime",             serieData.runDyn_StanceTime               ); //$NON-NLS-1$
+      vc.put("serieRunDyn_StanceTimeBalance",      serieData.runDyn_StanceTimeBalance        ); //$NON-NLS-1$
+      vc.put("serieRunDyn_StepLength",             serieData.runDyn_StepLength               ); //$NON-NLS-1$
+      vc.put("serieRunDyn_VerticalOscillation",    serieData.runDyn_VerticalOscillation      ); //$NON-NLS-1$
+      vc.put("serieRunDyn_VerticalRatio",          serieData.runDyn_VerticalRatio            ); //$NON-NLS-1$
+      vc.put("serieSwim_LengthType",               serieData.swim_LengthType                 ); //$NON-NLS-1$
+      vc.put("serieSwim_Cadence",                  serieData.swim_Cadence                    ); //$NON-NLS-1$
+      vc.put("serieSwim_Strokes",                  serieData.swim_Strokes                    ); //$NON-NLS-1$
+      vc.put("serieSwim_StrokeStyle",              serieData.swim_StrokeStyle                ); //$NON-NLS-1$
+      vc.put("serieSwim_Time",                     serieData.swim_Time                       ); //$NON-NLS-1$
+      vc.put("serieVisiblePoints_Surfing",         serieData.visiblePoints_Surfing           ); //$NON-NLS-1$
+      vc.put("serieBattery_Percentage",            serieData.battery_Percentage              ); //$NON-NLS-1$
+      vc.put("serieBattery_Time",                  serieData.battery_Time                    ); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
