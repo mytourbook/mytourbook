@@ -28,6 +28,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -190,6 +191,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
          uriBuilder.setParameter("format", "json"); //$NON-NLS-1$ //$NON-NLS-2$
          uriBuilder.setParameter("includelocation", "yes"); //$NON-NLS-1$ //$NON-NLS-2$
          uriBuilder.setParameter("extra", "utcDateTime"); //$NON-NLS-1$ //$NON-NLS-2$
+         uriBuilder.setParameter("lang", Locale.getDefault().getLanguage()); //$NON-NLS-1$
 
          //If the tour finishes a different day, we need to specify the ending date
          if (!endDate.equals(startDate)) {
@@ -232,9 +234,9 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
       final List<Weather> weather = weatherData.getWeather();
       if (weather == null ||
-            weather.size() == 0 ||
+            weather.isEmpty() ||
             weather.get(0).getHourly() == null ||
-            weather.get(0).getHourly().size() == 0) {
+            weather.get(0).getHourly().isEmpty()) {
          return false;
       }
 
@@ -254,14 +256,16 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       tour.setWeather_Clouds(                weatherData.getWeatherType());
 
       tour.setWeather_Temperature_Average(   weatherData.getTemperatureAverage());
-      tour.setWeather_Wind_Speed(            weatherData.getAverageWindSpeed());
-      tour.setWeather_Wind_Direction(        weatherData.getAverageWindDirection());
       tour.setWeather_Humidity(              weatherData.getAverageHumidity());
       tour.setWeather_Precipitation(         weatherData.getTotalPrecipitation());
       tour.setWeather_Pressure(              weatherData.getAveragePressure());
       tour.setWeather_Temperature_Max(       weatherData.getTemperatureMax());
       tour.setWeather_Temperature_Min(       weatherData.getTemperatureMin());
       tour.setWeather_Temperature_WindChill( weatherData.getAverageWindChill());
+
+      weatherData.computeAverageWindSpeedAndDirection();
+      tour.setWeather_Wind_Speed(            weatherData.getAverageWindSpeed());
+      tour.setWeather_Wind_Direction(        weatherData.getAverageWindDirection());
 
 // SET_FORMATTING_ON
 

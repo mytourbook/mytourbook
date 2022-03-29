@@ -94,8 +94,8 @@ public class OpenWeatherMapRetrieverTests {
       assertEquals("scattered clouds", tour.getWeather()); //$NON-NLS-1$
       assertEquals("weather-cloudy",   tour.getWeather_Clouds()); //$NON-NLS-1$
       assertEquals(-5.91f,             tour.getWeather_Temperature_Average());
-      assertEquals(15,                 tour.getWeather_Wind_Speed());
-      assertEquals(266,                tour.getWeather_Wind_Direction());
+      assertEquals(11,                 tour.getWeather_Wind_Speed());
+      assertEquals(280,                tour.getWeather_Wind_Direction());
       assertEquals(54,                 tour.getWeather_Humidity());
       assertEquals(0.76f,              tour.getWeather_Precipitation());
       assertEquals(0,                  tour.getWeather_Snowfall());

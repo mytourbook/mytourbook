@@ -165,10 +165,10 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          // We avoid requesting data in the future
          if (requestedTime > TimeTools.nowInMilliseconds() / 1000) {
 
-            if (hourly.size() > 0) {
-               break;
-            } else {
+            if (hourly.isEmpty()) {
                return false;
+            } else {
+               break;
             }
          }
       }
@@ -189,8 +189,6 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       tour.setWeather_Clouds(                timeMachineResult.getWeatherType());
 
       tour.setWeather_Temperature_Average(   timeMachineResult.getTemperatureAverage());
-      tour.setWeather_Wind_Speed(            timeMachineResult.getAverageWindSpeed());
-      tour.setWeather_Wind_Direction(        timeMachineResult.getAverageWindDirection());
       tour.setWeather_Humidity((short)       timeMachineResult.getAverageHumidity());
       tour.setWeather_Precipitation(         timeMachineResult.getTotalPrecipitation());
       tour.setWeather_Pressure((short)       timeMachineResult.getAveragePressure());
@@ -198,6 +196,10 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       tour.setWeather_Temperature_Max(       timeMachineResult.getTemperatureMax());
       tour.setWeather_Temperature_Min(       timeMachineResult.getTemperatureMin());
       tour.setWeather_Temperature_WindChill( timeMachineResult.getAverageWindChill());
+
+      timeMachineResult.computeAverageWindSpeedAndDirection();
+      tour.setWeather_Wind_Speed(            timeMachineResult.getAverageWindSpeed());
+      tour.setWeather_Wind_Direction(        timeMachineResult.getAverageWindDirection());
 
 // SET_FORMATTING_ON
 
