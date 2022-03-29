@@ -28,7 +28,7 @@ Improvements
 * Strava Integration (Frederic)   
   - Added the possibility to send the weather data in the uploaded activity's description       https://github.com/mytourbook/mytourbook/issues/479
 
-* MT Export/Import
+* MT Export/Import                                                      https://github.com/mytourbook/mytourbook/issues/493
   - Export and import all values of a tour
   - Limits:
     - A device sensor is not created, when sensor values for it are available

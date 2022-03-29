@@ -81,18 +81,27 @@ public class DeviceSensorValue {
    private long                 _createId            = 0;
 
    /**
-    * Used for MT import/export
+    * This constructor is needed for Hibernate
     */
-   public DeviceSensorValue() {
-
-      _createId = _createCounter.incrementAndGet();
-   }
+   public DeviceSensorValue() {}
 
    public DeviceSensorValue(final DeviceSensor sensor) {
 
       _createId = _createCounter.incrementAndGet();
 
       deviceSensor = sensor;
+   }
+
+   /**
+    * Used for MT import/export
+    *
+    * @param tourData
+    */
+   public DeviceSensorValue(final TourData tourData) {
+
+      this.tourData = tourData;
+
+      _createId = _createCounter.incrementAndGet();
    }
 
    /**

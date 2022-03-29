@@ -823,7 +823,7 @@ public class MT_StAXHandler {
    private void parseXML_051_SensorValue(final XMLEventReader eventReader,
                                          final StartElement startElement_SensorValue) throws XMLStreamException {
 
-      final DeviceSensorValue sensorValue = new DeviceSensorValue();
+      final DeviceSensorValue sensorValue = new DeviceSensorValue(_tourData);
 
       parseXML_052_SensorValue_Attributes(startElement_SensorValue, sensorValue);
 
