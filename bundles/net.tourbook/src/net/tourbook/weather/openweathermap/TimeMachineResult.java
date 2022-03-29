@@ -33,6 +33,9 @@ public class TimeMachineResult {
 
    private Hourly       middleHourly;
 
+   private int          averageWindSpeed;
+   private int          averageWindDirection;
+
    public TimeMachineResult() {
       hourly = new ArrayList<>();
    }
@@ -50,6 +53,25 @@ public class TimeMachineResult {
             hourly.add(currentHourly);
          }
       }
+   }
+
+   public void computeAverageWindSpeedAndDirection() {
+
+      final double[] windSpeeds = hourly
+            .stream()
+            .mapToDouble(Hourly::getWind_speedKmph)
+            .toArray();
+
+      final int[] windDirections = hourly
+            .stream()
+            .mapToInt(Hourly::getWind_deg)
+            .toArray();
+
+      final int[] averageWindSpeedAndDirection =
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections);
+
+      averageWindSpeed = averageWindSpeedAndDirection[0];
+      averageWindDirection = averageWindSpeedAndDirection[1];
    }
 
    /**
@@ -139,32 +161,18 @@ public class TimeMachineResult {
 
    public int getAverageWindDirection() {
 
-      final OptionalDouble averageWindDirection =
-            hourly.stream().mapToDouble(Hourly::getWind_deg).average();
-
-      if (averageWindDirection.isPresent()) {
-         return (int) Math.round(averageWindDirection.getAsDouble());
-      }
-
-      return 0;
+      return averageWindDirection;
    }
 
    public int getAverageWindSpeed() {
 
-      final OptionalDouble averageWindSpeed =
-            hourly.stream().mapToDouble(Hourly::getWind_speedKmph).average();
-
-      if (averageWindSpeed.isPresent()) {
-         return (int) Math.round(averageWindSpeed.getAsDouble());
-      }
-
-      return 0;
+      return averageWindSpeed;
    }
 
    private Weather getCurrentWeather() {
 
       final List<Weather> currentWeather = middleHourly.getWeather();
-      if (currentWeather == null || currentWeather.size() == 0) {
+      if (currentWeather == null || currentWeather.isEmpty()) {
          return null;
       }
 
@@ -263,9 +271,6 @@ public class TimeMachineResult {
       } else if (currentWeatherId == 711 || currentWeatherId == 762 ||
             currentWeatherId == 771 || currentWeatherId == 781) {
          weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
-      } else {
-         weatherType = "id: '" + currentWeatherId + "'," + //$NON-NLS-1$ //$NON-NLS-2$
-               "main: '" + currentWeather.getMain() + "'"; //$NON-NLS-1$ //$NON-NLS-2$
       }
 
       return weatherType;
