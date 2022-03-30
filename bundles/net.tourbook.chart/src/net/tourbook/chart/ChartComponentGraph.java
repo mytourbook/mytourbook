@@ -9902,7 +9902,15 @@ public class ChartComponentGraph extends Canvas {
                   continue;
                }
 
+               final int numYValues = yValueSerie.length;
+
                for (int valueIndex = xValueIndex_Left; valueIndex <= xValueIndex_Right; valueIndex++) {
+
+                  // fixing java.lang.ArrayIndexOutOfBoundsException: Index 1096 out of bounds for length 1096
+                  // https://github.com/mytourbook/mytourbook/issues/497
+                  if (valueIndex >= numYValues) {
+                     break;
+                  }
 
                   final float yValue = yValueSerie[valueIndex];
 
