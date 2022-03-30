@@ -32,6 +32,8 @@ import net.tourbook.data.TourData;
 
 public class WeatherUtils {
 
+   public static final int SECONDS_PER_THIRTY_MINUTE = 1800;
+
    /**
     * Returns the fully detailed weather data as a human readable string.
     * Example:
@@ -249,6 +251,65 @@ public class WeatherUtils {
    }
 
    /**
+    * Algorithm taken from:
+    * https://www.scadacore.com/2014/12/19/average-wind-direction-and-wind-speed/
+    * https://www.itron.com/na/blog/forecasting/computing-a-weighted-average-wind-speed-and-wind-direction-across-multiple-weather-stations
+    *
+    * @param windSpeeds
+    *           An array of wind speeds in km/h
+    * @param windDirections
+    *           An array of wind directions in degrees
+    * @return
+    */
+   public static int[] computeAverageWindSpeedAndDirection(final double[] windSpeeds,
+                                                           final int[] windDirections) {
+
+      final int[] averageWindSpeedAndDirection = new int[2];
+
+      final int dataSize = windSpeeds.length;
+      if (dataSize == 0 || dataSize != windDirections.length) {
+         return averageWindSpeedAndDirection;
+      }
+
+      // Step 1: Break Out East/West and North/South Vectors
+      float eastWestVectorArray = 0;
+      float northSouthVectorArray = 0;
+
+      for (int index = 0; index < dataSize; ++index) {
+
+         final Double currentWindSpeed = windSpeeds[index];
+         final double currentWindDirectionRadians = Math.toRadians(windDirections[index]);
+
+         eastWestVectorArray += Math.sin(currentWindDirectionRadians) * currentWindSpeed;
+         northSouthVectorArray += Math.cos(currentWindDirectionRadians) * currentWindSpeed;
+      }
+
+      final float eastWestVectorAverage = eastWestVectorArray / dataSize * -1;
+      final float northSouthVectorAverage = northSouthVectorArray / dataSize * -1;
+
+      // Step 2: Combine Vectors back into a direction and speed
+      final double averageWindSpeed = Math.sqrt(
+            Math.pow(eastWestVectorAverage, 2) +
+                  Math.pow(northSouthVectorAverage, 2));
+
+      averageWindSpeedAndDirection[0] = (int) Math.round(averageWindSpeed);
+
+      final double atan2Direction = Math.atan2(eastWestVectorAverage, northSouthVectorAverage);
+
+      double averageDirection = Math.toDegrees(atan2Direction);
+
+      if (averageDirection > 180) {
+         averageDirection -= 180;
+      } else if (averageDirection < 180) {
+         averageDirection += 180;
+      }
+
+      averageWindSpeedAndDirection[1] = (int) Math.round(averageDirection);
+
+      return averageWindSpeedAndDirection;
+   }
+
+   /**
     * Determines the geographic area covered by a GPS track. The goal is to
     * encompass most of the track to search a weather station as close as possible
     * to the overall course and not just to a specific point.
@@ -259,9 +320,9 @@ public class WeatherUtils {
       final double[] longitudeSerie = tour.longitudeSerie;
 
       // Looking for the farthest point of the track
-      LatLng furthestPoint = null;
       double maxDistance = Double.MIN_VALUE;
       final LatLng startPoint = new LatLng(latitudeSerie[0], longitudeSerie[0]);
+      LatLng furthestPoint = startPoint;
 
       for (int index = 1; index < latitudeSerie.length && index < longitudeSerie.length; ++index) {
 
@@ -391,7 +452,7 @@ public class WeatherUtils {
                                                    final long tourEndTime) {
 
       if (weatherDataStartTime > tourStartTime ||
-            weatherDataEndTime < tourEndTime) {
+            weatherDataEndTime + WeatherUtils.SECONDS_PER_THIRTY_MINUTE < tourEndTime) {
          return false;
       }
 

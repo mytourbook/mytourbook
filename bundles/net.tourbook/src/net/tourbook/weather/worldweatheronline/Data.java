@@ -41,6 +41,28 @@ public class Data {
    private List<Hourly>      filteredHourly;
    private Hourly            middleHourly;
 
+   private int               averageWindSpeed;
+   private int               averageWindDirection;
+
+   public void computeAverageWindSpeedAndDirection() {
+
+      final double[] windSpeeds = filteredHourly
+            .stream()
+            .mapToDouble(Hourly::getWindspeedKmph)
+            .toArray();
+
+      final int[] windDirections = filteredHourly
+            .stream()
+            .mapToInt(Hourly::getWinddirDegree)
+            .toArray();
+
+      final int[] averageWindSpeedAndDirection =
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections);
+
+      averageWindSpeed = averageWindSpeedAndDirection[0];
+      averageWindDirection = averageWindSpeedAndDirection[1];
+   }
+
    /**
     * Filters and keeps only the values included between the tour start and end times.
     *
@@ -61,11 +83,9 @@ public class Data {
          // OR
          // - more than 30 mins after the tour end time
 
-         final long thirtyMinutes = 1800;
-
          final long hourlyEpochSeconds = currentHourly.getEpochSeconds();
-         if (hourlyEpochSeconds < tourStartTime - thirtyMinutes ||
-               hourlyEpochSeconds > tourEndTime + thirtyMinutes) {
+         if (hourlyEpochSeconds < tourStartTime - WeatherUtils.SECONDS_PER_THIRTY_MINUTE ||
+               hourlyEpochSeconds > tourEndTime + WeatherUtils.SECONDS_PER_THIRTY_MINUTE) {
             continue;
          }
 
@@ -140,26 +160,12 @@ public class Data {
 
    public int getAverageWindDirection() {
 
-      final OptionalDouble averageWindDirection =
-            filteredHourly.stream().mapToDouble(Hourly::getWinddirDegree).average();
-
-      if (averageWindDirection.isPresent()) {
-         return (int) Math.round(averageWindDirection.getAsDouble());
-      }
-
-      return 0;
+      return averageWindDirection;
    }
 
    public int getAverageWindSpeed() {
 
-      final OptionalDouble averageWindSpeed =
-            filteredHourly.stream().mapToDouble(Hourly::getWindspeedKmph).average();
-
-      if (averageWindSpeed.isPresent()) {
-         return (int) Math.round(averageWindSpeed.getAsDouble());
-      }
-
-      return 0;
+      return averageWindSpeed;
    }
 
    public List<Hourly> getFilteredHourly() {

@@ -14,6 +14,9 @@ Improvements
 * Calendar View (Frederic)
   - The combo of years now displays the most recent years at the top as it is more likely to be selected than the oldest years
     https://github.com/mytourbook/mytourbook/pull/472
+    
+* Tour Book View
+  - Clone tour start/end location when a tour is copied                 https://sourceforge.net/p/mytourbook/feature-requests/206/  
 
 * Tour Chart
   - Switch between SRTM 1 and SRTM 3 values                             https://github.com/mytourbook/mytourbook/issues/469 
@@ -25,6 +28,10 @@ Improvements
 * Strava Integration (Frederic)   
   - Added the possibility to send the weather data in the uploaded activity's description       https://github.com/mytourbook/mytourbook/issues/479
 
+* MT Export/Import                                                      https://github.com/mytourbook/mytourbook/issues/493
+  - Export and import all values of a tour
+  - Limits:
+    - A device sensor is not created, when sensor values for it are available
 
 Changes
 =======
@@ -42,6 +49,7 @@ Changes
 
 * 2D Map
   - Moved action "Show earth map" from the toolbar into the map context menu
+  
 
 Bugfix
 ======

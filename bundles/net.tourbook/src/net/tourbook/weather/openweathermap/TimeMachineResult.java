@@ -33,6 +33,9 @@ public class TimeMachineResult {
 
    private Hourly       middleHourly;
 
+   private int          averageWindSpeed;
+   private int          averageWindDirection;
+
    public TimeMachineResult() {
       hourly = new ArrayList<>();
    }
@@ -52,6 +55,25 @@ public class TimeMachineResult {
       }
    }
 
+   public void computeAverageWindSpeedAndDirection() {
+
+      final double[] windSpeeds = hourly
+            .stream()
+            .mapToDouble(Hourly::getWind_speedKmph)
+            .toArray();
+
+      final int[] windDirections = hourly
+            .stream()
+            .mapToInt(Hourly::getWind_deg)
+            .toArray();
+
+      final int[] averageWindSpeedAndDirection =
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections);
+
+      averageWindSpeed = averageWindSpeedAndDirection[0];
+      averageWindDirection = averageWindSpeedAndDirection[1];
+   }
+
    /**
     * Filters and keeps only the values included between the tour start and end times.
     *
@@ -68,10 +90,8 @@ public class TimeMachineResult {
          // OR
          // - more than 30 mins after the tour end time
 
-         final long thirtyMinutes = 1800;
-
-         if (currentHourly.getDt() < tourStartTime - thirtyMinutes ||
-               currentHourly.getDt() > tourEndTime + thirtyMinutes) {
+         if (currentHourly.getDt() < tourStartTime - WeatherUtils.SECONDS_PER_THIRTY_MINUTE ||
+               currentHourly.getDt() > tourEndTime + WeatherUtils.SECONDS_PER_THIRTY_MINUTE) {
             continue;
          }
 
@@ -141,32 +161,18 @@ public class TimeMachineResult {
 
    public int getAverageWindDirection() {
 
-      final OptionalDouble averageWindDirection =
-            hourly.stream().mapToDouble(Hourly::getWind_deg).average();
-
-      if (averageWindDirection.isPresent()) {
-         return (int) Math.round(averageWindDirection.getAsDouble());
-      }
-
-      return 0;
+      return averageWindDirection;
    }
 
    public int getAverageWindSpeed() {
 
-      final OptionalDouble averageWindSpeed =
-            hourly.stream().mapToDouble(Hourly::getWind_speedKmph).average();
-
-      if (averageWindSpeed.isPresent()) {
-         return (int) Math.round(averageWindSpeed.getAsDouble());
-      }
-
-      return 0;
+      return averageWindSpeed;
    }
 
    private Weather getCurrentWeather() {
 
       final List<Weather> currentWeather = middleHourly.getWeather();
-      if (currentWeather == null || currentWeather.size() == 0) {
+      if (currentWeather == null || currentWeather.isEmpty()) {
          return null;
       }
 
@@ -175,16 +181,6 @@ public class TimeMachineResult {
 
    public List<Hourly> getHourly() {
       return hourly;
-   }
-
-   public float getTotalPrecipitation() {
-
-      return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(Hourly::getRain).sum());
-   }
-
-   public float getTotalSnowfall() {
-
-      return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(Hourly::getSnow).sum());
    }
 
    public float getTemperatureAverage() {
@@ -221,6 +217,16 @@ public class TimeMachineResult {
       }
 
       return 0;
+   }
+
+   public float getTotalPrecipitation() {
+
+      return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(Hourly::getRain).sum());
+   }
+
+   public float getTotalSnowfall() {
+
+      return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(Hourly::getSnow).sum());
    }
 
    public String getWeatherDescription() {
@@ -265,9 +271,6 @@ public class TimeMachineResult {
       } else if (currentWeatherId == 711 || currentWeatherId == 762 ||
             currentWeatherId == 771 || currentWeatherId == 781) {
          weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
-      } else {
-         weatherType = "id: '" + currentWeatherId + "'," + //$NON-NLS-1$ //$NON-NLS-2$
-               "main: '" + currentWeather.getMain() + "'"; //$NON-NLS-1$ //$NON-NLS-2$
       }
 
       return weatherType;

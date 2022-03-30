@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,6 +40,7 @@ import java.util.TimeZone;
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.data.SerieData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourWayPoint;
@@ -60,6 +61,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import org.osgi.framework.Version;
 
 public class TourExporter {
+
    /*
     * Velocity (VC) context values
     */
@@ -86,11 +88,10 @@ public class TourExporter {
    private static final String            ZERO                       = "0";                                                //$NON-NLS-1$
 
    private static final DecimalFormat     _nf1                       = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-
    private static final DecimalFormat     _nf3                       = (DecimalFormat) NumberFormat.getInstance(Locale.US);
    private static final DecimalFormat     _nf8                       = (DecimalFormat) NumberFormat.getInstance(Locale.US);
-   private static final DateTimeFormatter _dtIso                     = ISODateTimeFormat.dateTimeNoMillis();
 
+   private static final DateTimeFormatter _dtIso                     = ISODateTimeFormat.dateTimeNoMillis();
    private static final SimpleDateFormat  _dateFormat                = new SimpleDateFormat();
 
    static {
@@ -133,10 +134,6 @@ public class TourExporter {
 
    private boolean      _isGPX;
    private boolean      _isTCX;
-
-   public enum ExportType {
-      GPX, TCX
-   }
 
    public TourExporter(final String formatTemplate) {
 
@@ -210,21 +207,60 @@ public class TourExporter {
          vc.put("coursename", _courseName); //$NON-NLS-1$
       }
 
-      vc.put(VC_LAP, lap);
-      vc.put(VC_TRACKS, tracks);
-      vc.put(VC_WAY_POINTS, wayPoints);
-      vc.put(VC_TOUR_MARKERS, tourMarkers);
-      vc.put(VC_TOUR_DATA, _tourData);
+      final SerieData serieData = _tourData.getSerieData();
 
-      vc.put(VC_HAS_TOUR_MARKERS, Boolean.valueOf(tourMarkers.size() > 0));
-      vc.put(VC_HAS_TRACKS, Boolean.valueOf(tracks.size() > 0));
-      vc.put(VC_HAS_WAY_POINTS, Boolean.valueOf(wayPoints.size() > 0));
+// SET_FORMATTING_OFF
 
-      vc.put("dateformat", _dateFormat); //$NON-NLS-1$
-      vc.put("dtIso", _dtIso); //$NON-NLS-1$
-      vc.put("nf1", _nf1); //$NON-NLS-1$
-      vc.put("nf3", _nf3); //$NON-NLS-1$
-      vc.put("nf8", _nf8); //$NON-NLS-1$
+      vc.put(VC_LAP,                lap);
+      vc.put(VC_TRACKS,             tracks);
+      vc.put(VC_WAY_POINTS,         wayPoints);
+      vc.put(VC_TOUR_MARKERS,       tourMarkers);
+      vc.put(VC_TOUR_DATA,          _tourData);
+
+      vc.put(VC_HAS_TOUR_MARKERS,   Boolean.valueOf(tourMarkers.size() > 0));
+      vc.put(VC_HAS_TRACKS,         Boolean.valueOf(tracks.size() > 0));
+      vc.put(VC_HAS_WAY_POINTS,     Boolean.valueOf(wayPoints.size() > 0));
+
+      vc.put("dateformat",          _dateFormat); //  //$NON-NLS-1$
+      vc.put("dtIso",               _dtIso); //       //$NON-NLS-1$
+      vc.put("nf1",                 _nf1); //         //$NON-NLS-1$
+      vc.put("nf3",                 _nf3); //         //$NON-NLS-1$
+      vc.put("nf8",                 _nf8); //         //$NON-NLS-1$
+
+      /*
+       * Export raw serie data
+       */
+      vc.put("serieTime",                          serieData.timeSerie                       ); //$NON-NLS-1$
+      vc.put("serieAltitude",                      serieData.altitudeSerie20                 ); //$NON-NLS-1$
+      vc.put("serieCadence",                       serieData.cadenceSerie20                  ); //$NON-NLS-1$
+      vc.put("serieDistance",                      serieData.distanceSerie20                 ); //$NON-NLS-1$
+      vc.put("seriePulse",                         serieData.pulseSerie20                    ); //$NON-NLS-1$
+      vc.put("serieTemperature",                   serieData.temperatureSerie20              ); //$NON-NLS-1$
+      vc.put("seriePower",                         serieData.powerSerie20                    ); //$NON-NLS-1$
+      vc.put("serieSpeed",                         serieData.speedSerie20                    ); //$NON-NLS-1$
+      vc.put("serieGears",                         serieData.gears                           ); //$NON-NLS-1$
+      vc.put("serieLatitude",                      serieData.latitudeE6                      ); //$NON-NLS-1$
+      vc.put("serieLongitude",                     serieData.longitudeE6                     ); //$NON-NLS-1$
+      vc.put("seriePausedTime_Start",              serieData.pausedTime_Start                ); //$NON-NLS-1$
+      vc.put("seriePausedTime_End",                serieData.pausedTime_End                  ); //$NON-NLS-1$
+      vc.put("seriePausedTime_Data",               serieData.pausedTime_Data                 ); //$NON-NLS-1$
+      vc.put("seriePulseTimes",                    serieData.pulseTimes                      ); //$NON-NLS-1$
+      vc.put("seriePulseTimes_TimeIndex",          serieData.pulseTime_TimeIndex             ); //$NON-NLS-1$
+      vc.put("serieRunDyn_StanceTime",             serieData.runDyn_StanceTime               ); //$NON-NLS-1$
+      vc.put("serieRunDyn_StanceTimeBalance",      serieData.runDyn_StanceTimeBalance        ); //$NON-NLS-1$
+      vc.put("serieRunDyn_StepLength",             serieData.runDyn_StepLength               ); //$NON-NLS-1$
+      vc.put("serieRunDyn_VerticalOscillation",    serieData.runDyn_VerticalOscillation      ); //$NON-NLS-1$
+      vc.put("serieRunDyn_VerticalRatio",          serieData.runDyn_VerticalRatio            ); //$NON-NLS-1$
+      vc.put("serieSwim_LengthType",               serieData.swim_LengthType                 ); //$NON-NLS-1$
+      vc.put("serieSwim_Cadence",                  serieData.swim_Cadence                    ); //$NON-NLS-1$
+      vc.put("serieSwim_Strokes",                  serieData.swim_Strokes                    ); //$NON-NLS-1$
+      vc.put("serieSwim_StrokeStyle",              serieData.swim_StrokeStyle                ); //$NON-NLS-1$
+      vc.put("serieSwim_Time",                     serieData.swim_Time                       ); //$NON-NLS-1$
+      vc.put("serieVisiblePoints_Surfing",         serieData.visiblePoints_Surfing           ); //$NON-NLS-1$
+      vc.put("serieBattery_Percentage",            serieData.battery_Percentage              ); //$NON-NLS-1$
+      vc.put("serieBattery_Time",                  serieData.battery_Time                    ); //$NON-NLS-1$
+
+// SET_FORMATTING_ON
 
       doExport_20_TourValues(vc);
 
@@ -256,7 +292,9 @@ public class TourExporter {
        */
       final Calendar now = Calendar.getInstance();
       final Date creationDate = now.getTime();
+
       vcContext.put("creation_date", creationDate); //$NON-NLS-1$
+      vcContext.put("created", ZonedDateTime.now()); //$NON-NLS-1$
 
       doExport_21_Creator(vcContext);
       doExport_22_MinMax_LatLon(vcContext);
@@ -276,9 +314,11 @@ public class TourExporter {
       String pluginQualifierVersion = ZERO;
 
       if (version != null) {
+
          pluginMajorVersion = Integer.toString(version.getMajor());
          pluginMinorVersion = Integer.toString(version.getMinor());
          pluginMicroVersion = Integer.toString(version.getMicro());
+
          final String versionQualifier = version.getQualifier();
          if (StringUtils.isNumeric(versionQualifier)) {
             pluginQualifierVersion = versionQualifier;
@@ -295,7 +335,7 @@ public class TourExporter {
        */
       String creatorText = UI.EMPTY_STRING;
       if (version != null) {
-         creatorText = String.format("MyTourbook %d.%d.%d.%s - http://mytourbook.sourceforge.net", //$NON-NLS-1$
+         creatorText = String.format("MyTourbook %d.%d.%d.%s - https://mytourbook.sourceforge.io", //$NON-NLS-1$
                version.getMajor(),
                version.getMinor(),
                version.getMicro(),

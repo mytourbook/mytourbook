@@ -107,8 +107,9 @@ public class TourDatabase {
     */
    private static final int TOURBOOK_DB_VERSION = 47;
 
-//   private static final int TOURBOOK_DB_VERSION = 47; // 22.X ??
+//   private static final int TOURBOOK_DB_VERSION = 48; // 22.X ??
 
+//   private static final int TOURBOOK_DB_VERSION = 47; // 22.3
 //   private static final int TOURBOOK_DB_VERSION = 46; // 21.12
 //   private static final int TOURBOOK_DB_VERSION = 45; // 21.9
 //   private static final int TOURBOOK_DB_VERSION = 44; // 21.6
@@ -9025,74 +9026,54 @@ public class TourDatabase {
          return;
       }
 
-      PreparedStatement stmtUpdate = null;
+      long lastUpdateTime = startTime;
 
-      try {
+      int tourIndex = 1;
+      int lastUpdateNumItems = 1;
+      int sumUpdatedTours = 0;
 
-         stmtUpdate = conn.prepareStatement(UI.EMPTY_STRING
+      final List<Long> allTourIds = getAllTourIds();
+      final int numAllTourIds = allTourIds.size();
 
-               + "UPDATE " + TABLE_TOUR_DATA //                      //$NON-NLS-1$
-               + " SET" //                                           //$NON-NLS-1$
-               + " weather_Temperature_Average = weather_Temperature_Average_Device," //$NON-NLS-1$
-               + " weather_Temperature_Max = weather_Temperature_Max_Device," //$NON-NLS-1$
-               + " weather_Temperature_Min = weather_Temperature_Min_Device" //$NON-NLS-1$
-               + " WHERE isWeatherDataFromProvider=true"); //$NON-NLS-1$
+      // If necessary, recomputing the temperature values (average/max/min) measured from the device
+      for (final Long tourId : allTourIds) {
 
-         stmtUpdate.executeUpdate();
+         if (splashManager != null) {
 
-         long lastUpdateTime = startTime;
+            final long currentTime = System.currentTimeMillis();
+            final long timeDiff = currentTime - lastUpdateTime;
 
-         int tourIndex = 1;
-         int lastUpdateNumItems = 1;
-         int sumUpdatedTours = 0;
+            // reduce logging
+            if (timeDiff > DELAY_SPLASH_LOGGING
 
-         final List<Long> allTourIds = getAllTourIds();
-         final int numAllTourIds = allTourIds.size();
+                  // update UI for the last tour otherwise it looks like that not all data are converted
+                  || tourIndex == numAllTourIds) {
 
-         // If necessary, recomputing the temperature values (average/max/min) measured from the device
-         for (final Long tourId : allTourIds) {
+               lastUpdateTime = currentTime;
 
-            if (splashManager != null) {
+               final long numTourDiff = tourIndex - lastUpdateNumItems;
+               lastUpdateNumItems = tourIndex;
+               sumUpdatedTours += numTourDiff;
 
-               final long currentTime = System.currentTimeMillis();
-               final long timeDiff = currentTime - lastUpdateTime;
+               final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
 
-               // reduce logging
-               if (timeDiff > DELAY_SPLASH_LOGGING
+               splashManager.setMessage(NLS.bind(
 
-                     // update UI for the last tour otherwise it looks like that not all data are converted
-                     || tourIndex == numAllTourIds) {
+                     // Data update 47: Converting weather data - {0} of {1} - {2} % - {3}
+                     Messages.Tour_Database_PostUpdate_047_Weather,
 
-                  lastUpdateTime = currentTime;
-
-                  final long numTourDiff = tourIndex - lastUpdateNumItems;
-                  lastUpdateNumItems = tourIndex;
-                  sumUpdatedTours += numTourDiff;
-
-                  final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
-
-                  splashManager.setMessage(NLS.bind(
-
-                        // Data update 47: Converting weather data - {0} of {1} - {2} % - {3}
-                        Messages.Tour_Database_PostUpdate_047_Weather,
-
-                        new Object[] {
-                              sumUpdatedTours,
-                              numAllTourIds,
-                              percentValue,
-                              numTourDiff,
-                        }));
-               }
-
-               tourIndex++;
+                     new Object[] {
+                           sumUpdatedTours,
+                           numAllTourIds,
+                           percentValue,
+                           numTourDiff,
+                     }));
             }
 
-            updateDb_046_To_047_DataUpdate_Concurrent(tourId);
+            tourIndex++;
          }
 
-      } finally {
-
-         net.tourbook.common.util.SQL.close(stmtUpdate);
+         updateDb_046_To_047_DataUpdate_Concurrent(tourId);
       }
 
       updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
@@ -9139,12 +9120,36 @@ public class TourDatabase {
                return;
             }
 
+            /*
+             * Temperature Migration
+             */
+            if (tourData.temperatureSerie == null || tourData.isWeatherDataFromProvider()) {
+
+               /**
+                * If the device has NO temperature data or the weather was retrieved from WWO:
+                * - copy the temperatures (DB 46) to the new non-device fields (DB 47)
+                */
+               tourData.setWeather_Temperature_Average(tourData.getWeather_Temperature_Average_Device());
+               tourData.setWeather_Temperature_Max(tourData.getWeather_Temperature_Max_Device());
+               tourData.setWeather_Temperature_Min(tourData.getWeather_Temperature_Min_Device());
+            }
+
+            /**
+             * If the device has NO temperature data:
+             * - set the device temperatures to 0
+             */
             if (tourData.temperatureSerie == null) {
 
                tourData.setWeather_Temperature_Average_Device(0);
                tourData.setWeather_Temperature_Max_Device(0);
                tourData.setWeather_Temperature_Min_Device(0);
+
             } else {
+
+               /**
+                * If the device has temperature data:
+                * - recalculate the device temperatures
+                */
                tourData.computeAvg_Temperature();
             }
 

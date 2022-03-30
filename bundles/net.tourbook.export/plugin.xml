@@ -2,22 +2,29 @@
 <?eclipse version="3.4"?>
 <plugin>
 
-	<extension point="net.tourbook.exportTour">
+   <extension point="net.tourbook.exportTour">
 
-		<export
-			id="net.tourbook.export.gpx"
-			class="net.tourbook.export.ExportTourGPX"
-			name="GPX"
-			fileextension="gpx"
-		/>
+      <export
+         id             ="net.tourbook.export.gpx"
+         class          ="net.tourbook.export.ExportTourGPX"
+         name           ="GPX"
+         fileextension  ="gpx"
+      />
 
-		<export
-			id="net.tourbook.export.tcx"
-			class="net.tourbook.export.ExportTourTCX"
-			name="TCX"
-			fileextension="tcx"
-		/>
-		
-	</extension>
+      <export
+         id             ="net.tourbook.export.tcx"
+         class          ="net.tourbook.export.ExportTourTCX"
+         name           ="TCX"
+         fileextension  ="tcx"
+      />
+
+      <export
+         id             ="net.tourbook.export.mt"
+         class          ="net.tourbook.export.ExportTour_MT"
+         name           ="MyTourbook (.mt)"
+         fileextension  ="mt"
+      />
+      
+   </extension>
 
 </plugin>

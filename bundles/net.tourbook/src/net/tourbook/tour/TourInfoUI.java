@@ -410,6 +410,7 @@ public class TourInfoUI {
          GridLayoutFactory.fillDefaults()
                .margins(SHELL_MARGIN, SHELL_MARGIN)
                .applyTo(_ttContainer);
+//         _ttContainer.setBackground(UI.SYS_COLOR_GREEN);
          {
             createUI_10_UpperPart(_ttContainer);
 
@@ -1421,7 +1422,11 @@ public class TourInfoUI {
 
       final PixelConverter pc = new PixelConverter(parent);
 
-      _defaultTextWidth = pc.convertWidthInCharsToPixels(80);
+      /*
+       * !!! It is important that the width value is not too large otherwise empty lines (because of
+       * the default width) are added below the text control when there is a lot of content
+       */
+      _defaultTextWidth = pc.convertWidthInCharsToPixels(70);
       _descriptionScroll_Height = pc.convertHeightInCharsToPixels(_descriptionScroll_Lines);
    }
 

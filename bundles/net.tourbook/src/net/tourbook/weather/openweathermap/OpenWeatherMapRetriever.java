@@ -24,6 +24,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -108,6 +109,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          uriBuilder.setParameter("units", "metric"); //$NON-NLS-1$ //$NON-NLS-2$
          uriBuilder.setParameter("lat", String.valueOf(searchAreaCenter.getLatitude())); //$NON-NLS-1$
          uriBuilder.setParameter("lon", String.valueOf(searchAreaCenter.getLongitude())); //$NON-NLS-1$
+         uriBuilder.setParameter("lang", Locale.getDefault().getLanguage()); //$NON-NLS-1$
          uriBuilder.setParameter("dt", String.valueOf(date)); //$NON-NLS-1$
          weatherRequestWithParameters = uriBuilder.build().toString();
 
@@ -130,8 +132,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       long requestedTime = tourStartTime;
 
-      boolean isRetrievalIncomplete = true;
-      while (isRetrievalIncomplete) {
+      while (true) {
 
          //Send an API request as long as we don't have the results covering the entire duration of the tour
          final String weatherRequestWithParameters = buildWeatherApiRequest(requestedTime);
@@ -149,17 +150,27 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          timeMachineResult.addAllHourly(newTimeMachineResult.getHourly());
          final List<Hourly> hourly = timeMachineResult.getHourly();
 
+         final int lastWeatherDataHour = hourly.get(hourly.size() - 1).getDt();
          if (WeatherUtils.isTourWeatherDataComplete(
                hourly.get(0).getDt(),
-               hourly.get(timeMachineResult.getHourly().size() - 1).getDt(),
+               lastWeatherDataHour,
                tourStartTime,
                tourEndTime)) {
-            isRetrievalIncomplete = false;
+            break;
          }
 
-         requestedTime = newTimeMachineResult.getHourly().get(newTimeMachineResult.getHourly().size() - 1).getDt();
          //Setting the requested time to the next hour to retrieve the next set of weather data
-         requestedTime += 3600;
+         requestedTime = lastWeatherDataHour + 3600L;
+
+         // We avoid requesting data in the future
+         if (requestedTime > TimeTools.nowInMilliseconds() / 1000) {
+
+            if (hourly.isEmpty()) {
+               return false;
+            } else {
+               break;
+            }
+         }
       }
 
 // SET_FORMATTING_OFF
@@ -178,8 +189,6 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       tour.setWeather_Clouds(                timeMachineResult.getWeatherType());
 
       tour.setWeather_Temperature_Average(   timeMachineResult.getTemperatureAverage());
-      tour.setWeather_Wind_Speed(            timeMachineResult.getAverageWindSpeed());
-      tour.setWeather_Wind_Direction(        timeMachineResult.getAverageWindDirection());
       tour.setWeather_Humidity((short)       timeMachineResult.getAverageHumidity());
       tour.setWeather_Precipitation(         timeMachineResult.getTotalPrecipitation());
       tour.setWeather_Pressure((short)       timeMachineResult.getAveragePressure());
@@ -187,6 +196,10 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       tour.setWeather_Temperature_Max(       timeMachineResult.getTemperatureMax());
       tour.setWeather_Temperature_Min(       timeMachineResult.getTemperatureMin());
       tour.setWeather_Temperature_WindChill( timeMachineResult.getAverageWindChill());
+
+      timeMachineResult.computeAverageWindSpeedAndDirection();
+      tour.setWeather_Wind_Speed(            timeMachineResult.getAverageWindSpeed());
+      tour.setWeather_Wind_Direction(        timeMachineResult.getAverageWindDirection());
 
 // SET_FORMATTING_ON
 
