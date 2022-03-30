@@ -1089,7 +1089,7 @@ public class MT_StAXHandler {
    }
 
    /**
-    * Parse {@code <waypoints>...</waypoints>}
+    * Parse {@code <dataseries>...</dataseries>}
     *
     * @param eventReader
     * @throws XMLStreamException

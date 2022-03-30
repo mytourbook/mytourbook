@@ -87,27 +87,27 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourDataView extends ViewPart {
 
-   public static final String            ID                         = "net.tourbook.ui.views.TourDataView"; //$NON-NLS-1$
+   public static final String             ID                         = "net.tourbook.ui.views.TourDataView"; //$NON-NLS-1$
 
-   private static final String           ANNOTATION_TRANSIENT       = "Transient";                          //$NON-NLS-1$
+   private static final String            ANNOTATION_TRANSIENT       = "Transient";                          //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore                 = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore _prefStore_Common          = CommonActivator.getPrefStore();
-   private static final IDialogSettings  _state                     = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore  _prefStore                 = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore  _prefStore_Common          = CommonActivator.getPrefStore();
+   private static final IDialogSettings   _state                     = TourbookPlugin.getState(ID);
 
-   private static final String           STATE_VIEW_SCROLL_POSITION = "STATE_VIEW_SCROLL_POSITION";         //$NON-NLS-1$
+   private static final String            STATE_VIEW_SCROLL_POSITION = "STATE_VIEW_SCROLL_POSITION";         //$NON-NLS-1$
 
-   private PostSelectionProvider         _postSelectionProvider;
-   private ISelectionListener            _postSelectionListener;
-   private IPropertyChangeListener       _prefChangeListener;
-   private IPropertyChangeListener       _prefChangeListener_Common;
-   private ITourEventListener            _tourEventListener;
+   private PostSelectionProvider          _postSelectionProvider;
+   private ISelectionListener             _postSelectionListener;
+   private IPropertyChangeListener        _prefChangeListener;
+   private IPropertyChangeListener        _prefChangeListener_Common;
+   private ITourEventListener             _tourEventListener;
 
-   private boolean                       _isUIRestored;
+   private boolean                        _isUIRestored;
 
-   private TourData                      _tourData;
+   private TourData                       _tourData;
 
-   private Action                        _action_CopyIntoClipboard;
+   private Action_CopyValuesIntoClipboard _action_CopyIntoClipboard;
 
    /*
     * UI controls
@@ -149,8 +149,8 @@ public class TourDataView extends ViewPart {
 
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
-         // Copy log into the clipboard
-         setToolTipText(Messages.Tour_Log_Action_CopyTourLogIntoClipboard_Tooltip);
+         // "Copy data into the clipboard"
+         setToolTipText(Messages.App_Action_CopyDataIntoClipboard);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
          setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy_Disabled));
@@ -769,8 +769,8 @@ public class TourDataView extends ViewPart {
          if (statusLineMgr != null) {
 
             // show info that data are copied
-            // "The log were copied into the clipboard"
-            statusLineMgr.setMessage(Messages.Tour_Log_Info_TourLogWasCopied);
+            // "Data were copied into the clipboard"
+            statusLineMgr.setMessage(Messages.App_Action_CopyDataIntoClipboard_CopyIsDone);
 
             // cleanup message
             display.timerExec(3000, () -> statusLineMgr.setMessage(null));

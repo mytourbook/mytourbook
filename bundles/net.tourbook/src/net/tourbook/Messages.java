@@ -126,6 +126,8 @@ public class Messages extends NLS {
    public static String        app_action_collapse_others_tooltip;
    public static String        App_Action_Columns;
    public static String        App_Action_Copy;
+   public static String        App_Action_CopyDataIntoClipboard;
+   public static String        App_Action_CopyDataIntoClipboard_CopyIsDone;
    public static String        App_Action_Delete;
    public static String        App_Action_DeleteProfile;
    public static String        App_Action_DeleteProperty;
