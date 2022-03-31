@@ -104,6 +104,12 @@ public class TourDatabase {
 
    /**
     * Version for the database which is required that the tourbook application works successfully
+    * <p>
+    * When an entity structure is modified, a field is added/removed/renamed, then the .mt
+    * export/import <b>MUST</b> be adjusted which is done mainly in
+    * <p>
+    * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
+    * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
    private static final int TOURBOOK_DB_VERSION = 47;
 
