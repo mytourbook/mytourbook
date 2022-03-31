@@ -60,7 +60,7 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
-   private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
    private IDialogSettings               _state;
    //
    private IPropertyChangeListener       _defaultChangePropertyListener;
