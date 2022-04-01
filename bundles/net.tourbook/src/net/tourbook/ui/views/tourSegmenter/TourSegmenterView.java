@@ -441,6 +441,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
     */
    private final ArrayList<Control>       _firstColBreakTime  = new ArrayList<>();
    //
+   private ActionExportViewCSV            _actionExportViewCSV;
    private ActionTourChartSegmenterConfig _actionTourChartSegmenterConfig;
    //
    private boolean                        _isGetInitialTours;
@@ -786,6 +787,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    public static IDialogSettings getState() {
       return _state;
+   }
+
+   public void actionExportViewCSV() {
+      // TODO Auto-generated method stub
+
    }
 
    private void addPartListener() {
@@ -1142,6 +1148,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    private void createActions() {
 
+      _actionExportViewCSV = new ActionExportViewCSV(this);
       _actionTourChartSegmenterConfig = new ActionTourChartSegmenterConfig(this, _parent);
    }
 
@@ -3894,6 +3901,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final boolean isTourAvailable = _tourData != null;
 
       _actionTourChartSegmenterConfig.setEnabled(isTourAvailable);
+      _actionExportViewCSV.setEnabled(isTourAvailable);
 
       enableActions_Surfing();
    }
@@ -3952,6 +3960,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
       tbm.add(_actionTourChartSegmenterConfig);
+      tbm.add(_actionExportViewCSV);
 
       tbm.update(true);
    }
