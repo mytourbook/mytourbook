@@ -88,7 +88,14 @@ public class Initializer {
          }
       }
 
-      return Comparison.retrieveImportedTour(newlyImportedTours);
+      final TourData newlyImportedTour = Comparison.retrieveImportedTour(newlyImportedTours);
+
+      //Since this commit https://github.com/mytourbook/mytourbook/commit/26ff12c67601acc0070ed13f0433f5b7db6c9e10
+      //this needs to be called in order for the {@link TourData#serieData} to be initialized
+      //otherwise it is null and will create errors in the unit tests
+      newlyImportedTour.onPrePersist();
+
+      return newlyImportedTour;
    }
 
    public static TourData importTour_FIT(final String importFilePath) {
