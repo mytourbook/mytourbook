@@ -30,8 +30,9 @@ Improvements
 
 * MT Export/Import                                                      https://github.com/mytourbook/mytourbook/issues/493
   - Export and import all values of a tour
-  - Limits:
+  - Limits/behavior:
     - A device sensor is not created, when sensor values for it are available
+    - Body weight is overwritten when tour is saved and when "Set the persons's weight ..." is selected in the "Import" preferences
 
 Changes
 =======

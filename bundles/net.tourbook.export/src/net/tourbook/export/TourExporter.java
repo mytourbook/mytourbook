@@ -30,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -40,9 +41,12 @@ import java.util.TimeZone;
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.data.DeviceSensorValue;
 import net.tourbook.data.SerieData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
+import net.tourbook.data.TourPhoto;
+import net.tourbook.data.TourTag;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
 
@@ -65,16 +69,11 @@ public class TourExporter {
    /*
     * Velocity (VC) context values
     */
-   private static final String            VC_HAS_TOUR_MARKERS        = "hasTourMarkers";                                   //$NON-NLS-1$
-   private static final String            VC_HAS_TRACKS              = "hasTracks";                                        //$NON-NLS-1$
-   private static final String            VC_HAS_WAY_POINTS          = "hasWayPoints";                                     //$NON-NLS-1$
    private static final String            VC_IS_EXPORT_ALL_TOUR_DATA = "isExportAllTourData";                              //$NON-NLS-1$
 
    private static final String            VC_TOUR_MARKERS            = "tourMarkers";                                      //$NON-NLS-1$
    private static final String            VC_TRACKS                  = "tracks";                                           //$NON-NLS-1$
    private static final String            VC_WAY_POINTS              = "wayPoints";                                        //$NON-NLS-1$
-   private static final String            VC_LAP                     = "lap";                                              //$NON-NLS-1$
-   private static final String            VC_TOUR_DATA               = "tourData";                                         //$NON-NLS-1$
 
    /**
     * This is a special parameter to force elevation values from the device and not from the lat/lon
@@ -190,7 +189,40 @@ public class TourExporter {
                                    final List<TourMarker> tourMarkers,
                                    final GarminLap lap,
                                    final String exportFileName) throws IOException {
+      /*
+       * Create sorted lists that the comparision of before and after (export and import/export) can
+       * be done easily
+       */
+      final ArrayList<DeviceSensorValue> allSorted_SensorValues = new ArrayList<>(_tourData.getDeviceSensorValues());
+      Collections.sort(allSorted_SensorValues, (sensorValue1, sensorValue2) -> {
 
+         return sensorValue1.getDeviceSensor().getLabel().compareTo(
+               sensorValue2.getDeviceSensor().getLabel());
+      });
+
+      final ArrayList<TourWayPoint> allSorted_WayPoints = new ArrayList<>(_tourData.getTourWayPoints());
+      Collections.sort(allSorted_WayPoints, (item1, item2) -> {
+
+         return item1.getName().compareTo(item2.getName());
+      });
+
+      final ArrayList<TourTag> allSorted_Tags = new ArrayList<>(_tourData.getTourTags());
+      Collections.sort(allSorted_Tags, (item1, item2) -> {
+
+         return item1.getTagName().compareTo(item2.getTagName());
+      });
+
+      final ArrayList<TourPhoto> allSorted_Photos = new ArrayList<>(_tourData.getTourPhotos());
+      Collections.sort(allSorted_Photos, (item1, item2) -> {
+
+         return Long.compare(item1.getImageExifTime(), item2.getImageExifTime());
+      });
+
+      final SerieData serieData = _tourData.getSerieData();
+
+      /*
+       * Setup context
+       */
       final File exportFile = new File(exportFileName);
       final VelocityContext vc = new VelocityContext();
 
@@ -207,25 +239,28 @@ public class TourExporter {
          vc.put("coursename", _courseName); //$NON-NLS-1$
       }
 
-      final SerieData serieData = _tourData.getSerieData();
-
 // SET_FORMATTING_OFF
 
-      vc.put(VC_LAP,                lap);
-      vc.put(VC_TRACKS,             tracks);
-      vc.put(VC_WAY_POINTS,         wayPoints);
-      vc.put(VC_TOUR_MARKERS,       tourMarkers);
-      vc.put(VC_TOUR_DATA,          _tourData);
+      vc.put("lap",                                lap                                       ); //$NON-NLS-1$
+      vc.put("tracks",                             tracks                                    ); //$NON-NLS-1$
+      vc.put("wayPoints",                          wayPoints                                 ); //$NON-NLS-1$
+      vc.put("tourMarkers",                        tourMarkers                               ); //$NON-NLS-1$
+      vc.put("tourData",                           _tourData                                 ); //$NON-NLS-1$
 
-      vc.put(VC_HAS_TOUR_MARKERS,   Boolean.valueOf(tourMarkers.size() > 0));
-      vc.put(VC_HAS_TRACKS,         Boolean.valueOf(tracks.size() > 0));
-      vc.put(VC_HAS_WAY_POINTS,     Boolean.valueOf(wayPoints.size() > 0));
+      vc.put("hasTourMarkers",                     Boolean.valueOf(tourMarkers.size() > 0)   ); //$NON-NLS-1$
+      vc.put("hasTracks",                          Boolean.valueOf(tracks.size() > 0)        ); //$NON-NLS-1$
+      vc.put("hasWayPoints",                       Boolean.valueOf(wayPoints.size() > 0)     ); //$NON-NLS-1$
 
-      vc.put("dateformat",          _dateFormat); //  //$NON-NLS-1$
-      vc.put("dtIso",               _dtIso); //       //$NON-NLS-1$
-      vc.put("nf1",                 _nf1); //         //$NON-NLS-1$
-      vc.put("nf3",                 _nf3); //         //$NON-NLS-1$
-      vc.put("nf8",                 _nf8); //         //$NON-NLS-1$
+      vc.put("allSorted_Photos",                   allSorted_Photos                          ); //$NON-NLS-1$
+      vc.put("allSorted_SensorValues",             allSorted_SensorValues                    ); //$NON-NLS-1$
+      vc.put("allSorted_Tags",                     allSorted_Tags                            ); //$NON-NLS-1$
+      vc.put("allSorted_WayPoints",                allSorted_WayPoints                       ); //$NON-NLS-1$
+
+      vc.put("dateformat",                         _dateFormat                               ); //$NON-NLS-1$
+      vc.put("dtIso",                              _dtIso                                    ); //$NON-NLS-1$
+      vc.put("nf1",                                _nf1                                      ); //$NON-NLS-1$
+      vc.put("nf3",                                _nf3                                      ); //$NON-NLS-1$
+      vc.put("nf8",                                _nf8                                      ); //$NON-NLS-1$
 
       /*
        * Export raw serie data

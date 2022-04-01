@@ -627,7 +627,7 @@ public class MT_StAXHandler {
    private void parseXML_052_Waypoint(final XMLEventReader eventReader,
                                       final StartElement startElement_WayPoint) throws XMLStreamException {
 
-      final TourWayPoint tourWayPoint = new TourWayPoint();
+      final TourWayPoint tourWayPoint = new TourWayPoint(_tourData);
 
       startElement_WayPoint.getAttributes().forEachRemaining(attribute -> setValues_WayPoint_Attributes(tourWayPoint, attribute));
 

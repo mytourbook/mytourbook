@@ -4616,6 +4616,10 @@ public class Map2View extends ViewPart implements
          return;
       }
 
+      if (tourData == null) {
+         return;
+      }
+
       final int[] timeSerie = tourData.timeSerie;
       if (timeSerie == null) {
          return;
