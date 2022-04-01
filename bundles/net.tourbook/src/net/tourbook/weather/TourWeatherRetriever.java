@@ -70,6 +70,7 @@ public final class TourWeatherRetriever {
 
             TourLogManager.subLog_INFO(historicalWeatherRetriever.buildFullWeatherDataString());
          }
+
       } else {
          TourLogManager.subLog_INFO(String.format(
                Messages.Log_RetrieveWeatherData_003_NoWeatherData,

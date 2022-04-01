@@ -1759,6 +1759,8 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Checkbox_ShowOrHideApiKey_Tooltip;
    public static String        Pref_Weather_Check_DisplayFullLog;
    public static String        Pref_Weather_Check_DisplayFullLog_Tooltip;
+   public static String        Pref_Weather_Check_SaveLogInTourWeatherDescription;
+   public static String        Pref_Weather_Check_SaveLogInTourWeatherDescription_Tooltip;
    public static String        Pref_Weather_CheckHTTPConnection_FAILED_Message;
    public static String        Pref_Weather_CheckHTTPConnection_Message;
    public static String        Pref_Weather_CheckHTTPConnection_OK_Message;

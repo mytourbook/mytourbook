@@ -77,6 +77,7 @@ public class WeatherProvidersUI {
    private Composite   _pageWorldWeatherOnlineUI;
 
    private Button      _chkDisplayFullLog;
+   private Button      _chkSaveLogInTourWeatherDescription;
 
    public WeatherProvidersUI() {}
 
@@ -172,7 +173,15 @@ public class WeatherProvidersUI {
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
-         // Checkbox: Displays the full log
+         // Checkbox: Save the weather log in the tour weather's description
+         _chkSaveLogInTourWeatherDescription = new Button(container, SWT.CHECK);
+         _chkSaveLogInTourWeatherDescription.setText(
+               Messages.Pref_Weather_Check_SaveLogInTourWeatherDescription);
+         _chkSaveLogInTourWeatherDescription.setToolTipText(
+               Messages.Pref_Weather_Check_SaveLogInTourWeatherDescription_Tooltip);
+         GridDataFactory.fillDefaults().applyTo(_chkSaveLogInTourWeatherDescription);
+
+         // Checkbox: Display the full log
          _chkDisplayFullLog = new Button(container, SWT.CHECK);
          _chkDisplayFullLog.setText(
                Messages.Pref_Weather_Check_DisplayFullLog);
@@ -215,6 +224,8 @@ public class WeatherProvidersUI {
 
    public void performDefaults() {
 
+      _chkSaveLogInTourWeatherDescription.setSelection(
+            _prefStore.getDefaultBoolean(ITourbookPreferences.WEATHER_SAVE_LOG_IN_TOUR_WEATHER_DESCRIPTION));
       _chkDisplayFullLog.setSelection(
             _prefStore.getDefaultBoolean(ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG));
 
@@ -238,6 +249,8 @@ public class WeatherProvidersUI {
          // Weather provider
          selectWeatherProvider(weatherProviderId);
 
+         _chkSaveLogInTourWeatherDescription.setSelection(
+               _prefStore.getBoolean(ITourbookPreferences.WEATHER_SAVE_LOG_IN_TOUR_WEATHER_DESCRIPTION));
          _chkDisplayFullLog.setSelection(
                _prefStore.getBoolean(ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG));
       }
@@ -261,6 +274,9 @@ public class WeatherProvidersUI {
     */
    public void saveVendorsState() {
 
+      _prefStore.setValue(
+            ITourbookPreferences.WEATHER_SAVE_LOG_IN_TOUR_WEATHER_DESCRIPTION,
+            _chkSaveLogInTourWeatherDescription.getSelection());
       _prefStore.setValue(
             ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG,
             _chkDisplayFullLog.getSelection());
@@ -321,6 +337,7 @@ public class WeatherProvidersUI {
          _pagebookWeatherProvider.showPage(_pageWorldWeatherOnlineUI);
       }
 
+      _chkSaveLogInTourWeatherDescription.setVisible(areMainPreferencesVisible);
       _chkDisplayFullLog.setVisible(areMainPreferencesVisible);
 
       UI.updateScrolledContent(_uiContainer);
