@@ -46,6 +46,11 @@ public class StatisticServices {
       }
 
       final ArrayList<TourType> allTourTypes = TourDatabase.getActiveTourTypes();
+
+      if (allTourTypes.size() == 0) {
+         return -1;
+      }
+
       final long typeId = allTourTypes.get(serieIndex).getTypeId();
 
       return typeId;

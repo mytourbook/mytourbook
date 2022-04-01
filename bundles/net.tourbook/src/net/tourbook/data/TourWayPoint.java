@@ -126,6 +126,18 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
 
    public TourWayPoint() {}
 
+   /**
+    * Used for MT import/export
+    *
+    * @param tourData
+    */
+   public TourWayPoint(final TourData tourData) {
+
+      this.tourData = tourData;
+
+      _createId = _createCounter.incrementAndGet();
+   }
+
    public TourWayPoint clone(final TourData wpTourData) {
 
       try {
