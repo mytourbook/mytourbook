@@ -193,14 +193,14 @@
    </tour>          
 ##
 ##
-## TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   
+## TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   
 ##
 ##
 #set ($tourType = $tourData.getTourType())
 #if($tourType)
-   <tourType>
+   <tourtype>
       <name><![CDATA[$!tourType.getName()]]></name>
-   </tourType>
+   </tourtype>
 #end
 ##
 ##
@@ -323,6 +323,25 @@
       />
 #end            
    </sensorvalues>
+#end
+##
+##
+## TOUR REFERENCE   TOUR REFERENCE   TOUR REFERENCE   TOUR REFERENCE   TOUR REFERENCE   TOUR REFERENCE   TOUR REFERENCE   
+##
+##
+#if ($tourData.getTourReferences().size() > 0)
+#set ($allTourReferences = $tourData.getTourReferences())
+   <tourreferences>
+#foreach ($tourReference in $allTourReferences)
+      <tourreference
+         refId                   ="$tourReference.getRefId()"
+         endIndex                ="$tourReference.getEndValueIndex()"
+         startIndex              ="$tourReference.getStartValueIndex()"
+      >
+         <label><![CDATA[$!tourReference.getLabel()]]></label>
+      </tourreference>
+#end            
+   </tourreferences>
 #end
 ##
 ##
