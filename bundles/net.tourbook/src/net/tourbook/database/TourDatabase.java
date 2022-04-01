@@ -1625,8 +1625,6 @@ public class TourDatabase {
     * @param tourTypeList
     * @return Returns a list with all {@link TourType}'s which are currently used (with filter) to
     *         display tours.<br>
-    *         Returns <code>null</code> when {@link TourType}'s are not defined.<br>
-    *         Return an empty list when the {@link TourType} is not set within the {@link TourData}
     */
    public static ArrayList<TourType> getActiveTourTypes() {
       return _activeTourTypes;
