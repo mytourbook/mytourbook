@@ -5,7 +5,7 @@ New
 ===
 
 * Weather Retrieval (Frederic)
-  - Tour weather data improvement and new vendor addition (OpenWeatherMap) https://github.com/mytourbook/mytourbook/issues/479
+  - Tour weather data improvement and new vendor addition: OpenWeatherMap     https://github.com/mytourbook/mytourbook/issues/479
 
 
 Improvements
@@ -43,10 +43,10 @@ Changes
   - It is possible, that existing opacity values must be adjusted because they are not migrated
 
 * Tour Chart
-  - Moved the options
+  - Moved options from the pref page into the chart options slideout 
     - Graph line transparency
     - Draw line graphs with antialiasing
-    from the pref page into the chart options slideout
+
 
 * 2D Map
   - Moved action "Show earth map" from the toolbar into the map context menu
