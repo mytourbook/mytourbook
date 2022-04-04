@@ -14,7 +14,9 @@
 #end
 
       tourStartTime                          ="$tourData.getTourStartTime()" 
-      timeZoneId                             ="$tourData.getTimeZoneId()" 
+#if ($tourData.timeZoneId)
+      timeZoneId                             ="$tourData.timeZoneId" 
+#end
       tourComputedTime_Moving                ="$tourData.tourComputedTime_Moving" 
       tourDeviceTime_Elapsed                 ="$tourData.tourDeviceTime_Elapsed" 
       tourDeviceTime_Paused                  ="$tourData.tourDeviceTime_Paused" 
@@ -193,14 +195,14 @@
    </tour>          
 ##
 ##
-## TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   TYPE   
+## TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   
 ##
 ##
 #set ($tourType = $tourData.getTourType())
 #if($tourType)
-   <tourType>
+   <tourtype>
       <name><![CDATA[$!tourType.getName()]]></name>
-   </tourType>
+   </tourtype>
 #end
 ##
 ##
@@ -239,10 +241,9 @@
 ## WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   
 ##
 ##
-#if($tourData.getTourWayPoints().size() > 0)
+#if($allSorted_WayPoints.size() > 0)
    <waypoints>
-#set ($allWayPoints = $tourData.getTourWayPoints())
-#foreach ($wayPoint in $allWayPoints)         
+#foreach ($wayPoint in $allSorted_WayPoints)         
       <waypoint
          wayPointId     ="$wayPoint.wayPointId"
          time           ="$wayPoint.time"
@@ -266,10 +267,9 @@
 ## TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   
 ##
 ##
-#if($tourData.getTourTags().size() > 0)
+#if($allSorted_Tags.size() > 0)
    <tags>
-#set ($tags = $tourData.getTourTags())
-#foreach ($tag in $tags)         
+#foreach ($tag in $allSorted_Tags)         
       <tag>
          <name><![CDATA[$!tag.getTagName()]]></name>
       </tag>
@@ -281,10 +281,9 @@
 ## PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   
 ##
 ##
-#if ($tourData.getTourPhotos().size() > 0)
-#set ($photos = $tourData.getTourPhotos())
+#if ($allSorted_Photos.size() > 0)
    <photos>
-#foreach ($photo in $photos)
+#foreach ($photo in $allSorted_Photos)
       <photo
          photoId                 ="$photo.getPhotoId()"
          imageExifTime           ="$photo.getImageExifTime()"
@@ -305,10 +304,9 @@
 ## SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   
 ##
 ##
-#if ($tourData.getDeviceSensorValues().size() > 0)
-#set ($allSensors = $tourData.getDeviceSensorValues())
+#if ($allSorted_SensorValues).size() > 0)
    <sensorvalues>
-#foreach ($sensor in $allSensors)
+#foreach ($sensor in $allSorted_SensorValues)
       <sensorvalue
          sensorValueId           ="$sensor.getSensorValueId()"
          sensorId                ="$sensor.getDeviceSensor().getSensorId()"
@@ -323,6 +321,25 @@
       />
 #end            
    </sensorvalues>
+#end
+##
+##
+## TOUR REFERENCE   TOUR REFERENCE   TOUR REFERENCE   TOUR REFERENCE   TOUR REFERENCE   TOUR REFERENCE   TOUR REFERENCE   
+##
+##
+#if ($tourData.getTourReferences().size() > 0)
+#set ($allTourReferences = $tourData.getTourReferences())
+   <tourreferences>
+#foreach ($tourReference in $allTourReferences)
+      <tourreference
+         refId                   ="$tourReference.getRefId()"
+         endIndex                ="$tourReference.getEndValueIndex()"
+         startIndex              ="$tourReference.getStartValueIndex()"
+      >
+         <label><![CDATA[$!tourReference.getLabel()]]></label>
+      </tourreference>
+#end            
+   </tourreferences>
 #end
 ##
 ##

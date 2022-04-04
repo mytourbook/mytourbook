@@ -62,6 +62,16 @@ public class TourReference {
       this.endIndex = endIndex;
    }
 
+   /**
+    * Used for MT import/export
+    *
+    * @param tourData
+    */
+   public TourReference(final TourData tourData) {
+
+      this.tourData = tourData;
+   }
+
    @Override
    public boolean equals(final Object obj) {
       if (this == obj) {
@@ -140,19 +150,21 @@ public class TourReference {
       this.tourData = tourData;
    }
 
+   /**
+    * This method is called in the MT UI in the "Tour Data" view
+    */
    @Override
    public String toString() {
 
-      return "TourReference" + NL //$NON-NLS-1$
+      return "TourReference" + NL //                     //$NON-NLS-1$
 
-            + "[" + NL //$NON-NLS-1$
+            + "   label       = " + label + NL //        //$NON-NLS-1$
+            + "   refId       = " + refId + NL //        //$NON-NLS-1$
+            + "   startIndex  = " + startIndex + NL //   //$NON-NLS-1$
+            + "   endIndex    = " + endIndex + NL //     //$NON-NLS-1$
 
-            + "label       = " + label + NL //$NON-NLS-1$
-            + "refId       = " + refId + NL //$NON-NLS-1$
-            + "startIndex  = " + startIndex + NL //$NON-NLS-1$
-            + "endIndex    = " + endIndex + NL //$NON-NLS-1$
-            + "tourData    = " + tourData + NL //$NON-NLS-1$
+//          + "   tourData    = " + tourData + NL //     //$NON-NLS-1$
 
-            + "]"; //$NON-NLS-1$
+      ;
    }
 }
