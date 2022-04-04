@@ -38,7 +38,8 @@ Improvements
   - Recompute the elevation up/down values when tour is saved is now optional, this can be enabled/disabled in the tour editor options
     https://sourceforge.net/p/mytourbook/feature-requests/196/
 
-* 
+* 2.5D Map
+  -  Enlarge marker font on 4k display                https://github.com/mytourbook/mytourbook/issues/504
 
 
 Changes
