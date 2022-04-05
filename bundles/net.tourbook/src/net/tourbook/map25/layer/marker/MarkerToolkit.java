@@ -44,33 +44,17 @@ import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
 
 public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerInterface> {
 
-   //ItemizedLayer<MarkerItem> mMarkerLayer;
-   protected int  _fgColor                = 0xFF000000;                               // 100 percent black. AARRGGBB
-   protected int  _bgColor                = 0x80FF69B4;                               // 50 percent pink. AARRGGBB
-// protected int _poiColor = 0xFF91c7ff;  // blue like toolbar
-   protected int  _poiColor               = 0xFFFFFF00;                               // yellow is better to see                                                             // 100percent yellow
+   private int                  _poiColor    = 0xFFFFFF00;              // yellow is better to see                                                             // 100percent yellow
 
-   protected int  _clusterSymbolSizeDP    = MarkerRenderer.MAP_MARKER_CLUSTER_SIZE_DP;
-   protected int  _clusterForegroundColor = MarkerRenderer.CLUSTER_COLOR_TEXT;
-   protected int  _clusterBackgroundColor = MarkerRenderer.CLUSTER_COLOR_BACK;
-
-   private int    _clusterSymbolWeight;
-   private float  _clusterOutlineSize;
-   private Bitmap _bitmapCluster;
-   //private boolean _isBillboard;
-
-   public MarkerSymbol          _symbol;                                  //marker symbol circle or star
-   protected float              _symbolSize    = 10f;
-   protected int                _symbolSizeInt = 10;
-   protected int                _clusterSymbol_Size;
+   public MarkerSymbol          _symbol;                                //marker symbol circle or star
 
    private Bitmap               _bitmapPoi;
    private Bitmap               _bitmapStar;
    private Bitmap               _bitmapCircle;
-   private Bitmap               _BitmapClusterSymbol;
+   private Bitmap               _bitmapClusterSymbol;
 
-   protected Paint              _fillPainter   = CanvasAdapter.newPaint();
-   protected Paint              _linePainter   = CanvasAdapter.newPaint();
+   protected Paint              _fillPainter = CanvasAdapter.newPaint();
+   private Paint                _linePainter = CanvasAdapter.newPaint();
 
    public MarkerRendererFactory _markerRendererFactory;
 
@@ -80,33 +64,33 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-      loadConfig();
+      final int clusterSymbol_Size = config.clusterSymbol_Size;
 
       //_mapApp.debugPrint("*** Markertoolkit:  entering constructor"); //$NON-NLS-1$
       _fillPainter.setStyle(Paint.Style.FILL);
       _linePainter.setStyle(Paint.Style.STROKE);
       _linePainter.setStrokeWidth(4);
-      _bitmapCluster = createClusterBitmap(1);
       _bitmapPoi = createPoiBitmap(shape);
 
       if (shape == MarkerShape.CIRCLE) {
-         _BitmapClusterSymbol = drawCircle(_clusterSymbol_Size);
+         _bitmapClusterSymbol = drawCircle(clusterSymbol_Size);
       } else {
-         _BitmapClusterSymbol = drawStar(_clusterSymbol_Size, _poiColor);
+         _bitmapClusterSymbol = drawStar(clusterSymbol_Size, _poiColor);
       }
 
       _symbol = new MarkerSymbol(_bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
+
       _isMarkerClusteredLast = config.isMarkerClustered;
+
       _markerRendererFactory = new MarkerRendererFactory() {
          @Override
          public org.oscim.layers.marker.MarkerRenderer create(final org.oscim.layers.marker.MarkerLayer markerLayer) {
+
             return new ClusterMarkerRenderer(markerLayer, _symbol, new ClusterMarkerRenderer.ClusterStyle(Color.WHITE, Color.BLUE)) {
                @Override
                protected Bitmap getClusterBitmap(final int size) {
-                  // Can customize cluster bitmap here
-                  //_mapApp.debugPrint("*** Markertoolkit:  cluster size: " + size); //$NON-NLS-1$
-                  _bitmapCluster = createClusterBitmap(size);
-                  return _bitmapCluster;
+
+                  return createClusterBitmap(size);
                }
             };
          }
@@ -141,12 +125,14 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
     *           ignored
     * @return MarkerSymbol with title, description and symbol
     */
-   public MarkerSymbol createAdvanceSymbol(final MarkerItem mItem,
-                                           final Bitmap poiBitmap,
-                                           final Boolean isPhoto,
-                                           final boolean showPhotoTitle) {
-      loadConfig();
+   MarkerSymbol createAdvanceSymbol(final MarkerItem mItem,
+                                    final Bitmap poiBitmap,
+                                    final Boolean isPhoto,
+                                    final boolean showPhotoTitle) {
+
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+      final int markerForegroundColor = ColorUtil.getARGB(config.markerOutline_Color, config.markerOutline_Opacity);
+      final int markerBackgroundColor = ColorUtil.getARGB(config.markerFill_Color, config.markerFill_Opacity);
 
       final boolean isBillboard = config.markerOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 
@@ -154,7 +140,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       final Paint textPainter = CanvasAdapter.newPaint();
       textPainter.setStyle(Paint.Style.STROKE);
-      textPainter.setColor(_fgColor);
+      textPainter.setColor(markerForegroundColor);
 
       // adjust font to 4k display, otherwise it is really small
       final float fontHeight = textPainter.getFontHeight();
@@ -163,7 +149,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       final Paint fillPainter = CanvasAdapter.newPaint();
       fillPainter.setStyle(Paint.Style.FILL);
-      fillPainter.setColor(_bgColor);
+      fillPainter.setColor(markerBackgroundColor);
 
       final int margin = 3;
       final int dist2symbol = 30;
@@ -220,13 +206,16 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       titleCanvas.drawText(mItem.title, margin, titleSize.y - margin, textPainter);
 
       if (hasSubtitle) {
+
          final Bitmap subtitleBitmap = CanvasAdapter.newBitmap(subtitleSize.x + margin, subtitleSize.y + margin, 0);
          final Canvas subtitleCanvas = CanvasAdapter.newCanvas();
          subtitleCanvas.setBitmap(subtitleBitmap);
          subtitleCanvas.drawCircle(0, 0, size.x * 2, fillPainter);
          subtitleCanvas.drawText(subtitle, margin, titleSize.y - margin, textPainter);
          markerCanvas.drawBitmap(subtitleBitmap, size.x / 2 - (subtitleSize.x / 2), size.y - (subtitleSize.y + margin));
+
       } else if (isPhoto) {
+
          final int lineLength = 20;
          textPainter.setStrokeWidth(2);
          final Bitmap subtitleBitmap = CanvasAdapter.newBitmap(lineLength, lineLength, 0); //heigth as title
@@ -266,22 +255,32 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
     */
    public Bitmap createClusterBitmap(final int size) {
 
-      final ScreenUtils.ClusterDrawable drawable = new ScreenUtils.ClusterDrawable(
-            _clusterSymbolSizeDP,
-            _clusterForegroundColor,
-            _clusterBackgroundColor,
-            Integer.toString(size),
-            _clusterSymbolWeight,
-            _clusterOutlineSize);
+      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-      final Bitmap paintedBitmap = drawable.getBitmap(_BitmapClusterSymbol);
+      final ScreenUtils.ClusterDrawable drawable = new ScreenUtils.ClusterDrawable(
+
+            config.clusterSymbol_Size,
+            ColorUtil.getARGB(config.clusterOutline_Color, config.clusterOutline_Opacity),
+            ColorUtil.getARGB(config.clusterFill_Color, config.clusterFill_Opacity),
+            Integer.toString(size),
+            config.clusterSymbol_Weight,
+            config.clusterOutline_Size);
+
+      final Bitmap paintedBitmap = drawable.getBitmap(_bitmapClusterSymbol);
+
       return paintedBitmap;
    }
 
-   public List<MarkerInterface> createMarkerItemList(final MarkerMode MarkerMode) {
-      loadConfig();
+   public List<MarkerInterface> createMarkerItemList(final MarkerMode markerMode) {
+
+      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+
+      final int clusterSymbol_Size = config.clusterSymbol_Size;
+
       createPoiBitmap(MarkerShape.STAR);
-      _BitmapClusterSymbol = drawStar(_clusterSymbol_Size, _poiColor);
+
+      _bitmapClusterSymbol = drawStar(clusterSymbol_Size, _poiColor);
+
       final List<MarkerInterface> pts = new ArrayList<>();
 
       for (final MapBookmark mapBookmark : net.tourbook.map.bookmark.MapBookmarkManager.getAllBookmarks()) {
@@ -296,7 +295,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
          pts.add(item);
       }
 
-      if (MarkerMode == MarkerMode.NORMAL) {
+      if (markerMode == MarkerMode.NORMAL) {
          return pts;
       }
 
@@ -319,24 +318,28 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
             pts.add(item);
          }
       }
+
       return pts;
    }
 
-   public Bitmap createPoiBitmap(final MarkerShape shape) {
-      loadConfig();
+   Bitmap createPoiBitmap(final MarkerShape shape) {
 
-      _bitmapPoi = CanvasAdapter.newBitmap(_symbolSizeInt, _symbolSizeInt, 0);
+      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+
+      final int _symbolSize = (int) Math.ceil(ScreenUtils.getPixels(config.markerSymbol_Size));
+
+      _bitmapPoi = CanvasAdapter.newBitmap(_symbolSize, _symbolSize, 0);
 
       if (shape == MarkerShape.CIRCLE) {
-         _bitmapPoi = drawCircle(_symbolSizeInt);
+         _bitmapPoi = drawCircle(_symbolSize);
       } else {
-         _bitmapPoi = drawStar(_symbolSizeInt, _poiColor);
+         _bitmapPoi = drawStar(_symbolSize, _poiColor);
       }
       return _bitmapPoi;
 
    }
 
-   public void debugPrint(final String debugText) {
+   private void debugPrint(final String debugText) {
       net.tourbook.map25.Map25App.debugPrint(debugText);
    }
 
@@ -396,30 +399,6 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       return bitmapTrackArrow;
    }
 
-   public void loadConfig() {
-
-      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-
-// SET_FORMATTING_OFF
-
-      _fgColor                   = ColorUtil.getARGB(config.markerOutline_Color,    config.markerOutline_Opacity);
-      _bgColor                   = ColorUtil.getARGB(config.markerFill_Color,       config.markerFill_Opacity);
-      _clusterSymbolSizeDP       = config.clusterSymbol_Size;
-      _clusterForegroundColor    = ColorUtil.getARGB(config.clusterOutline_Color,   config.clusterOutline_Opacity);
-      _clusterBackgroundColor    = ColorUtil.getARGB(config.clusterFill_Color,      config.clusterFill_Opacity);
-      _clusterSymbolWeight       = config.clusterSymbol_Weight;
-      _clusterOutlineSize        = config.clusterOutline_Size;
-      _symbolSize                = ScreenUtils.getPixels(config.markerSymbol_Size);
-      _symbolSizeInt             = (int) Math.ceil(_symbolSize);
-      _clusterSymbol_Size        = config.clusterSymbol_Size;
-
-// SET_FORMATTING_ON
-
-      //_mapApp.debugPrint("*** Markertoolkit:  fillradius for star: " + config.clusterSymbol_Size + " " + config.clusterSymbol_Weight); //$NON-NLS-1$
-      //_mapApp.debugPrint("*** Markertoolkit:  _clusterOutlineSize for star: " + _clusterOutlineSize + " , _clusterSymbol_Size: " + _clusterSymbol_Size); //$NON-NLS-1$
-
-   }
-
    /**
     * longpress on a mapbookmark
     * this method is moved from map25App to here
@@ -432,8 +411,6 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
    public boolean onItemLongPress(final int index, final MarkerInterface mi) {
 
       final MarkerItem item = (MarkerItem) mi;
-
-      // TODO Auto-generated method stub
 
       debugPrint(
             " Markertoolkit: " //$NON-NLS-1$
@@ -474,7 +451,6 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
    public boolean onItemSingleTapUp(final int index, final MarkerInterface mi) {
 
       final MarkerItem item = (MarkerItem) mi;
-      // TODO Auto-generated method stub
 
       debugPrint(
             " MarkerToolkit: " //$NON-NLS-1$
