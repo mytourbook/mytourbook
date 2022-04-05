@@ -39,7 +39,8 @@ Improvements
     https://sourceforge.net/p/mytourbook/feature-requests/196/
 
 * 2.5D Map
-  -  Enlarge marker font on 4k display                https://github.com/mytourbook/mytourbook/issues/504
+  - Filter photos                                     https://github.com/mytourbook/mytourbook/issues/397
+  - Enlarge marker font on 4k display                 https://github.com/mytourbook/mytourbook/issues/504
 
 
 Changes
