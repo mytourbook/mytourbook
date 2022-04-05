@@ -1320,6 +1320,7 @@ public class Messages extends NLS {
    public static String        Photo_Filter_Operator_IsMore;
    public static String        Photo_Filter_Operator_IsMore_Tooltip;
    public static String        Photo_Filter_Title_Map2PhotoFilter;
+   public static String        Photo_Filter_Title_Map25PhotoFilter;
 
    public static String        Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip;
    public static String        Photo_Gallery_Action_ToggleGalleryVertical_ToolTip;

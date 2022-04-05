@@ -53,6 +53,7 @@ import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map.bookmark.MapPosition_with_MarkerPosition;
+import net.tourbook.map25.action.ActionMap25_PhotoFilter;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
 import net.tourbook.map25.action.ActionShowEntireTour;
 import net.tourbook.map25.action.ActionSyncMap2WithOtherMap;
@@ -71,6 +72,7 @@ import net.tourbook.map25.ui.SlideoutMap25_MapProvider;
 import net.tourbook.map25.ui.SlideoutMap25_PhotoOptions;
 import net.tourbook.map25.ui.SlideoutMap25_TrackOptions;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoRatingStarOperator;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
@@ -79,6 +81,7 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
+import net.tourbook.tour.photo.IMapWithPhotos;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.ui.tourChart.TourChart;
@@ -115,7 +118,8 @@ public class Map25View extends ViewPart implements
       IMapBookmarks,
       ICloseOpenedDialogs,
       IMapBookmarkListener,
-      IMapSyncListener {
+      IMapSyncListener,
+      IMapWithPhotos {
 
 // SET_FORMATTING_OFF
 
@@ -142,7 +146,10 @@ public class Map25View extends ViewPart implements
    private static final String            STATE_IS_LAYER_PHOTO_VISIBLE                 = "STATE_IS_LAYER_PHOTO_VISIBLE";                           //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_PHOTO_SCALED                  = "STATE_IS_LAYER_PHOTO_SCALED";                            //$NON-NLS-1$
    private static final String            STATE_IS_LAYER_PHOTO_TITLE_VISIBLE           = "STATE_IS_LAYER_PHOTO_TITLE_VISIBLE";                     //$NON-NLS-1$
+   private static final String            STATE_IS_PHOTO_FILTER_ACTIVE                 = "STATE_IS_PHOTO_FILTER_ACTIVE";                        //$NON-NLS-1$
    private static final String            STATE_LAYER_PHOTO_SIZE                       = "STATE_LAYER_PHOTO_SIZE";                            //$NON-NLS-1$
+   private static final String            STATE_PHOTO_FILTER_RATING_STARS              = "STATE_PHOTO_FILTER_RATING_STARS";                     //$NON-NLS-1$
+   private static final String            STATE_PHOTO_FILTER_RATING_STAR_OPERATOR      = "STATE_PHOTO_FILTER_RATING_STAR_OPERATOR";             //$NON-NLS-1$
 
    private static final ImageDescriptor   _imageSyncWithSlider                         = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider);
    private static final ImageDescriptor   _imageSyncWithSlider_Disabled                = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Disabled);
@@ -151,16 +158,17 @@ public class Map25View extends ViewPart implements
 
 // SET_FORMATTING_ON
    //
-   public static final String            ID              = "net.tourbook.map25.Map25View"; //$NON-NLS-1$
+   public static final String            ID                 = "net.tourbook.map25.Map25View";               //$NON-NLS-1$
    //
-   private static final IDialogSettings  _state          = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _state             = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _state_PhotoFilter = TourbookPlugin.getState(ID + ".PhotoFilter"); //$NON-NLS-1$
    //
-   private static int[]                  _eventCounter   = new int[1];
+   private static int[]                  _eventCounter      = new int[1];
    //
    private Map25App                      _mapApp;
    //
-   private OpenDialogManager             _openDlgMgr     = new OpenDialogManager();
-   private final MapInfoManager          _mapInfoManager = MapInfoManager.getInstance();
+   private OpenDialogManager             _openDlgMgr        = new OpenDialogManager();
+   private final MapInfoManager          _mapInfoManager    = MapInfoManager.getInstance();
    //
    private boolean                       _isPartVisible;
    private boolean                       _isShowTour;
@@ -175,6 +183,7 @@ public class Map25View extends ViewPart implements
    private ActionMapBookmarks            _actionMapBookmarks;
    private ActionMap25_MapProvider       _actionMapProvider;
    private ActionMap25_Options           _actionMapOptions;
+   private ActionMap25_PhotoFilter       _actionMapPhotoFilter;
    private ActionShowEntireTour          _actionShowEntireTour;
    private ActionMap25_ShowMarker        _actionShowMarkerOptions;
    private ActionShowPhotoOptions        _actionShowPhotoOptions;
@@ -185,35 +194,27 @@ public class Map25View extends ViewPart implements
    private ActionZoomIn                  _actionZoom_In;
    private ActionZoomOut                 _actionZoom_Out;
    //
-   private double                        _zoomFactor     = 1.5;
+   private double                        _zoomFactor        = 1.5;
 
    /** Contains only geo tours */
-   private ArrayList<TourData>           _allTourData    = new ArrayList<>();
-   private TIntArrayList                 _allTourStarts  = new TIntArrayList();
+   private ArrayList<TourData>           _allTourData       = new ArrayList<>();
+   private TIntArrayList                 _allTourStarts     = new TIntArrayList();
    private GeoPoint[]                    _allGeoPoints;
    private BoundingBox                   _allBoundingBox;
 
    /**
     * Contains photos which are displayed in the map
     */
-   private ArrayList<Photo>              _allPhotos      = new ArrayList<>();
-//   private final ArrayList<Photo>        _filteredPhotos = new ArrayList<>();
-//   private List<MarkerItem>              _photoItems     = new ArrayList<>();
-
-//   private List<MarkerInterface>         _photo_pts      = new ArrayList<>();
-//   private boolean                       _isPhotoFilterActive;
-//   private int                           _photoFilterRatingStars;
-//   private int                           _photoFilterRatingStarOperator;
-
-//   private MarkerSymbol                  _symbol;
-//   private float                         _symbolSize     = 20f;
-//   private int                           _symbolSizeInt  = 20;
-//   private Bitmap                        _bitmapPhoto;
-//   private Bitmap                        _bitmapStar;
-
-   private int _leftSliderValueIndex;
-   private int _rightSliderValueIndex;
-   private int _selectedSliderValueIndex;
+   private ArrayList<Photo>              _allPhotos         = new ArrayList<>();
+   private final ArrayList<Photo>        _filteredPhotos    = new ArrayList<>();
+   //
+   private boolean                       _isPhotoFilterActive;
+   private int                           _photoFilter_RatingStars;
+   private Enum<PhotoRatingStarOperator> _photoFilter_RatingStar_Operator;
+   //
+   private int                           _leftSliderValueIndex;
+   private int                           _rightSliderValueIndex;
+   private int                           _selectedSliderValueIndex;
    //
 //   private int     _hash_AllPhotos;
    private int     _hashTourId;
@@ -386,6 +387,11 @@ public class Map25View extends ViewPart implements
       // update UI
       _mapApp.getLayer_Photo().setEnabled(isPhotoVisible);
       _mapApp.getMap().render();
+
+      // hide photo filter when photos are hidden
+      if (isPhotoVisible == false) {
+         _actionMapPhotoFilter.getPhotoFilterSlideout().close();
+      }
 
       enableActions();
    }
@@ -712,18 +718,23 @@ public class Map25View extends ViewPart implements
 
    private void createActions() {
 
-      _actionShowMarkerOptions = new ActionMap25_ShowMarker(this, _parent);
-      _actionMapBookmarks = new ActionMapBookmarks(this._parent, this);
-      _actionShowPhotoOptions = new ActionShowPhotoOptions();
-      _actionMapProvider = new ActionMap25_MapProvider();
-      _actionMapOptions = new ActionMap25_Options();
-      _actionShowEntireTour = new ActionShowEntireTour(this);
-      _actionSyncMap_WithOtherMap = new ActionSyncMap2WithOtherMap(this);
-      _actionSyncMap_WithTour = new ActionSynchMapWithTour(this);
-      _actionSyncMap_WithChartSlider = new ActionSynchMapWithChartSlider(this);
-      _actionShowTourOptions = new ActionShowTour();
-      _actionZoom_In = new ActionZoomIn(this);
-      _actionZoom_Out = new ActionZoomOut(this);
+// SET_FORMATTING_OFF
+      
+      _actionMapBookmarks              = new ActionMapBookmarks(this._parent, this);
+      _actionMapOptions                = new ActionMap25_Options();
+      _actionMapPhotoFilter            = new ActionMap25_PhotoFilter(this, _state_PhotoFilter);
+      _actionMapProvider               = new ActionMap25_MapProvider();
+      _actionShowEntireTour            = new ActionShowEntireTour(this);
+      _actionShowMarkerOptions         = new ActionMap25_ShowMarker(this, _parent);
+      _actionShowPhotoOptions          = new ActionShowPhotoOptions();
+      _actionShowTourOptions           = new ActionShowTour();
+      _actionSyncMap_WithChartSlider   = new ActionSynchMapWithChartSlider(this);
+      _actionSyncMap_WithOtherMap      = new ActionSyncMap2WithOtherMap(this);
+      _actionSyncMap_WithTour          = new ActionSynchMapWithTour(this);
+      _actionZoom_In                   = new ActionZoomIn(this);
+      _actionZoom_Out                  = new ActionZoomOut(this);
+      
+// SET_FORMATTING_ON
    }
 
    private BoundingBox createBoundingBox(final GeoPoint[] geoPoints) {
@@ -987,6 +998,9 @@ public class Map25View extends ViewPart implements
       final boolean isTourAvailable = _allTourData.size() > 0;
       final boolean isPhotoAvailable = _allPhotos.size() > 0;
 
+      final boolean isPhotoDisplayed = _actionShowPhotoOptions.getSelection();
+      final boolean isTourWithPhoto = isTourAvailable && isPhotoAvailable;
+
       final boolean canShowTour = isTourAvailable && isTourLayerVisible;
 
       _actionMapBookmarks.setEnabled(true);
@@ -999,8 +1013,10 @@ public class Map25View extends ViewPart implements
       _actionShowMarkerOptions         .setEnabled(isTourAvailable);
       _actionSyncMap_WithChartSlider   .setEnabled(canShowTour);
       _actionSyncMap_WithTour          .setEnabled(canShowTour);
-      _actionShowPhotoOptions          .setEnabled(isTourAvailable && isPhotoAvailable);
       _actionShowTourOptions           .setEnabled(isTourAvailable);
+
+      _actionMapPhotoFilter            .setEnabled(isTourWithPhoto && isPhotoDisplayed);
+      _actionShowPhotoOptions          .setEnabled(isTourWithPhoto);
 
 // SET_FORMATTING_ON
    }
@@ -1018,6 +1034,7 @@ public class Map25View extends ViewPart implements
 
       tbm.add(new Separator());
       tbm.add(_actionShowPhotoOptions);
+      tbm.add(_actionMapPhotoFilter);
       tbm.add(_actionMapBookmarks); //should be moved to position like in Map2View
 
       tbm.add(new Separator());
@@ -1063,6 +1080,11 @@ public class Map25View extends ViewPart implements
       updateUI_MapPosition(mapPosition.getLatitude(), mapPosition.getLongitude(), mapPosition.zoomLevel);
    }
 
+   @Override
+   public List<Photo> getFilteredPhotos() {
+      return _filteredPhotos;
+   }
+
    public Map25App getMapApp() {
       return _mapApp;
    }
@@ -1078,6 +1100,7 @@ public class Map25View extends ViewPart implements
       return new MapLocation(mapPosition2);
    }
 
+   @Override
    public ArrayList<Photo> getPhotos() {
       return _allPhotos;
    }
@@ -1466,6 +1489,21 @@ public class Map25View extends ViewPart implements
       }
    }
 
+   public void photoFilter_UpdateFromAction(final boolean isFilterActive) {
+
+      _isPhotoFilterActive = isFilterActive;
+
+      updateFilteredPhotos();
+   }
+
+   private void photoFilter_UpdateFromSlideout(final int filterRatingStars, final PhotoRatingStarOperator ratingstaroperatorsvalues) {
+
+      _photoFilter_RatingStars = filterRatingStars;
+      _photoFilter_RatingStar_Operator = ratingstaroperatorsvalues;
+
+      updateFilteredPhotos();
+   }
+
    void restoreState() {
 
       /*
@@ -1492,6 +1530,12 @@ public class Map25View extends ViewPart implements
 
       _actionShowPhotoOptions.setSelection(isPhotoVisible);
       _mapApp.getLayer_Photo().setEnabled(isPhotoVisible);
+
+      _isPhotoFilterActive             = Util.getStateBoolean(_state, STATE_IS_PHOTO_FILTER_ACTIVE, false);
+      _photoFilter_RatingStars         = Util.getStateInt(_state, STATE_PHOTO_FILTER_RATING_STARS, 0);
+      _photoFilter_RatingStar_Operator = Util.getStateEnum(_state, STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, PhotoRatingStarOperator.HAS_ANY);
+      _actionMapPhotoFilter.setSelection(_isPhotoFilterActive);
+      _actionMapPhotoFilter.getPhotoFilterSlideout().restoreState(_photoFilter_RatingStars, _photoFilter_RatingStar_Operator);
 
       // hillshading layer
       final int layerHillshadingOpacity = Util.getStateInt(_state, STATE_LAYER_HILLSHADING_OPACITY, 255);
@@ -1528,6 +1572,60 @@ public class Map25View extends ViewPart implements
       showToursFromTourProvider();
    }
 
+   /**
+    * Filter photos by rating stars.
+    */
+   private void runPhotoFilter() {
+
+      _filteredPhotos.clear();
+
+      final boolean hasAnyStars = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.HAS_ANY;
+
+      if (_isPhotoFilterActive && hasAnyStars == false) {
+
+         final boolean isNoStar = _photoFilter_RatingStars == 0;
+         final boolean isEqual = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_EQUAL;
+         final boolean isMore = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_MORE_OR_EQUAL;
+         final boolean isLess = _photoFilter_RatingStar_Operator == PhotoRatingStarOperator.IS_LESS_OR_EQUAL;
+
+         for (final Photo photo : _allPhotos) {
+
+            final int ratingStars = photo.ratingStars;
+
+            if (isNoStar && ratingStars == 0) {
+
+               // only photos without stars are displayed
+
+               _filteredPhotos.add(photo);
+
+            } else if (isEqual && ratingStars == _photoFilter_RatingStars) {
+
+               _filteredPhotos.add(photo);
+
+            } else if (isMore && ratingStars >= _photoFilter_RatingStars) {
+
+               _filteredPhotos.add(photo);
+
+            } else if (isLess && ratingStars <= _photoFilter_RatingStars) {
+
+               _filteredPhotos.add(photo);
+            }
+         }
+
+      } else {
+
+         // photo filter is not active or any stars can be selected -> show all photos
+
+         _filteredPhotos.addAll(_allPhotos);
+      }
+
+      enableActions();
+
+      // update UI: photo filter slideout
+      _actionMapPhotoFilter.updateUI();
+      _actionMapPhotoFilter.getPhotoFilterSlideout().updateUI_NumberOfPhotos();
+   }
+
    @PersistState
    private void saveState() {
 
@@ -1555,6 +1653,13 @@ public class Map25View extends ViewPart implements
       // hillshading layer
       _state.put(STATE_IS_LAYER_HILLSHADING_VISIBLE,  _mapApp.getLayer_HillShading().isEnabled());
       _state.put(STATE_LAYER_HILLSHADING_OPACITY,     _mapApp.getLayer_HillShading_Opacity());
+
+
+      // photo filter
+      _state.put(STATE_IS_PHOTO_FILTER_ACTIVE,        _actionMapPhotoFilter.getSelection());
+      _state.put(STATE_PHOTO_FILTER_RATING_STARS,     _photoFilter_RatingStars);
+      Util.setStateEnum(_state, STATE_PHOTO_FILTER_RATING_STAR_OPERATOR, _photoFilter_RatingStar_Operator);
+      _actionMapPhotoFilter.getPhotoFilterSlideout().saveState();
 
 // SET_FORMATTING_ON
 
@@ -1602,6 +1707,8 @@ public class Map25View extends ViewPart implements
       }
 
       _allPhotos = allPhotos;
+
+      runPhotoFilter();
    }
 
    /**
@@ -1808,6 +1915,21 @@ public class Map25View extends ViewPart implements
       }
 
       Map25ConfigManager.setMapLocation(map, mapPosition);
+   }
+
+   private void updateFilteredPhotos() {
+
+      runPhotoFilter();
+
+      _mapApp.updateUI_PhotoLayer();
+      _mapApp.updateMap();
+
+   }
+
+   @Override
+   public void updatePhotoFilter(final int filterRatingStars, final PhotoRatingStarOperator ratingStarOperatorsValues) {
+
+      photoFilter_UpdateFromSlideout(filterRatingStars, ratingStarOperatorsValues);
    }
 
    private void updateUI_MapPosition(final double latitude, final double longitude, final int zoomLevel) {

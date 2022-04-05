@@ -1616,7 +1616,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          _layer_Photo.removeAllItems();
       }
 
-      final List<MarkerInterface> photoItems = _photoToolkit.createPhotoItems(_map25View.getPhotos());
+      final List<MarkerInterface> photoItems = _photoToolkit.createPhotoItems(_map25View.getFilteredPhotos());
 
       _layer_Photo.addItems(photoItems);
       _layer_Photo.setEnabled(_isShowPhoto);
