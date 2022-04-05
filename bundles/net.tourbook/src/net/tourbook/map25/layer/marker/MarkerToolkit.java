@@ -18,7 +18,6 @@
  *******************************************************************************/
 package net.tourbook.map25.layer.marker;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,17 +43,19 @@ import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
 
 public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerInterface> {
 
-   private int                  _poiColor    = 0xFFFFFF00;              // yellow is better to see                                                             // 100percent yellow
+   private int                  _starColor       = 0xFFFFFF00;              // yellow is better to see                                                             // 100percent yellow
+// private int                  _starColorBorder = 0xFFCBCB1F;
+   private int                  _starColorBorder = 0xFFff0000;
 
-   public MarkerSymbol          _symbol;                                //marker symbol circle or star
+   public MarkerSymbol          _symbol;                                    //marker symbol circle or star
 
    private Bitmap               _bitmapPoi;
    private Bitmap               _bitmapStar;
    private Bitmap               _bitmapCircle;
    private Bitmap               _bitmapClusterSymbol;
 
-   protected Paint              _fillPainter = CanvasAdapter.newPaint();
-   private Paint                _linePainter = CanvasAdapter.newPaint();
+   protected Paint              _fillPainter     = CanvasAdapter.newPaint();
+   private Paint                _linePainter     = CanvasAdapter.newPaint();
 
    public MarkerRendererFactory _markerRendererFactory;
 
@@ -75,7 +76,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       if (shape == MarkerShape.CIRCLE) {
          _bitmapClusterSymbol = drawCircle(clusterSymbol_Size);
       } else {
-         _bitmapClusterSymbol = drawStar(clusterSymbol_Size, _poiColor);
+         _bitmapClusterSymbol = drawStar(clusterSymbol_Size, _starColor, _starColorBorder);
       }
 
       _symbol = new MarkerSymbol(_bitmapPoi, MarkerSymbol.HotspotPlace.CENTER, false);
@@ -131,9 +132,9 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
                                     final boolean showPhotoTitle) {
 
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+
       final int markerForegroundColor = ColorUtil.getARGB(config.markerOutline_Color, config.markerOutline_Opacity);
       final int markerBackgroundColor = ColorUtil.getARGB(config.markerFill_Color, config.markerFill_Opacity);
-
       final boolean isBillboard = config.markerOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 
       createPoiBitmap(MarkerShape.STAR);
@@ -151,16 +152,17 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       fillPainter.setStyle(Paint.Style.FILL);
       fillPainter.setColor(markerBackgroundColor);
 
-      final int margin = 3;
-      final int dist2symbol = 30;
+      final int margin = 5;
+      final int dist2symbol = 40;
 
-      final Point titleSize = new Point(
-            (int) textPainter.getTextWidth(mItem.title) + 2 * margin,
-            (int) textPainter.getTextHeight(mItem.title) + 2 * margin);
+      final float titleWidth = textPainter.getTextWidth(mItem.title) + 2 * margin;
+      final float titleHeight = textPainter.getTextHeight(mItem.title) + 2 * margin;
 
-      final Point symbolSize = new Point(poiBitmap.getWidth(), poiBitmap.getHeight());
-      final Point subtitleSize = new Point();
-      final Point size = new Point(); //total  size of all elements
+      final int symbolWidth = poiBitmap.getWidth();
+      final int symbolHeight = poiBitmap.getHeight();
+
+      int subtitleWidth = 0;
+      int subtitleHeight = 0;
 
       String subtitle = UI.EMPTY_STRING;
       boolean hasSubtitle = false;
@@ -168,24 +170,24 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
          if (mItem.description.startsWith("#")) { //$NON-NLS-1$
             subtitle = mItem.description.substring(1); // not the first # char
             subtitle = subtitle.split("\\R", 2)[0]; // only first line //$NON-NLS-1$
-            subtitleSize.x = ((int) textPainter.getTextWidth(subtitle)) + 2 * margin;
-            subtitleSize.y = ((int) textPainter.getTextHeight(subtitle)) + 2 * margin;
+            subtitleWidth = ((int) textPainter.getTextWidth(subtitle)) + 2 * margin;
+            subtitleHeight = ((int) textPainter.getTextHeight(subtitle)) + 2 * margin;
             hasSubtitle = true;
          }
       }
 
-      size.x = java.lang.Math.max(titleSize.x, subtitleSize.x);
-      size.x = java.lang.Math.max(size.x, symbolSize.x);
-
-      size.y = titleSize.y + symbolSize.y + dist2symbol;
+      // total size of all elements
+      final float markerWidth = Math.max(Math.max(titleWidth, subtitleWidth), symbolWidth);
+      final float markerHeight = titleHeight + symbolHeight + dist2symbol;
+      final float markerWidth_Half = markerWidth / 2;
 
       // markerCanvas, the drawing area for all: title, description and symbol
-      final Bitmap markerBitmap = CanvasAdapter.newBitmap(size.x, size.y, 0);
+      final Bitmap markerBitmap = CanvasAdapter.newBitmap((int) markerWidth, (int) markerHeight, 0);
       final Canvas markerCanvas = CanvasAdapter.newCanvas();
       markerCanvas.setBitmap(markerBitmap);
 
-      //titleCanvas for the title text
-      final Bitmap titleBitmap = CanvasAdapter.newBitmap(titleSize.x + margin, titleSize.y + margin, 0);
+      // titleCanvas for the title text
+      final Bitmap titleBitmap = CanvasAdapter.newBitmap((int) (titleWidth + 0 * margin), (int) (titleHeight + 0 * margin), 0);
       final Canvas titleCanvas = CanvasAdapter.newCanvas();
       titleCanvas.setBitmap(titleBitmap);
 
@@ -201,18 +203,31 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       // draw an oversized transparent circle, so the canvas is completely filled with a transparent color
       // titleCanvas.fillRectangle() does not support transparency
-      titleCanvas.drawCircle(0, 0, size.x * 2, fillPainter);
+      titleCanvas.drawCircle(0, 0, markerWidth * 2, fillPainter);
+//      titleCanvas.fillRectangle(0, 0, markerWidth, markerHeight, Color.CYAN);
 
-      titleCanvas.drawText(mItem.title, margin, titleSize.y - margin, textPainter);
+      // finetune text position otherwise it is too near to the border, it is still not perfect !!!
+      titleCanvas.drawText(mItem.title,
+            0.6f * margin,
+            titleHeight - 1.3f * margin,
+            textPainter);
+
+      // draw border
+// SET_FORMATTING_OFF
+      titleCanvas.drawLine(         0,             0,          0, titleHeight, textPainter);
+      titleCanvas.drawLine(         0,             0, titleWidth,           0, textPainter);
+      titleCanvas.drawLine(         0,   titleHeight, titleWidth, titleHeight, textPainter);
+      titleCanvas.drawLine(titleWidth,             0, titleWidth, titleHeight, textPainter);
+// SET_FORMATTING_ON
 
       if (hasSubtitle) {
 
-         final Bitmap subtitleBitmap = CanvasAdapter.newBitmap(subtitleSize.x + margin, subtitleSize.y + margin, 0);
+         final Bitmap subtitleBitmap = CanvasAdapter.newBitmap(subtitleWidth + margin, subtitleHeight + margin, 0);
          final Canvas subtitleCanvas = CanvasAdapter.newCanvas();
          subtitleCanvas.setBitmap(subtitleBitmap);
-         subtitleCanvas.drawCircle(0, 0, size.x * 2, fillPainter);
-         subtitleCanvas.drawText(subtitle, margin, titleSize.y - margin, textPainter);
-         markerCanvas.drawBitmap(subtitleBitmap, size.x / 2 - (subtitleSize.x / 2), size.y - (subtitleSize.y + margin));
+         subtitleCanvas.drawCircle(0, 0, markerWidth * 2, fillPainter);
+         subtitleCanvas.drawText(subtitle, margin, titleHeight - margin, textPainter);
+         markerCanvas.drawBitmap(subtitleBitmap, markerWidth_Half - (subtitleWidth / 2), markerHeight - (subtitleHeight + margin));
 
       } else if (isPhoto) {
 
@@ -222,29 +237,27 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
          final Canvas subtitleCanvas = CanvasAdapter.newCanvas();
          subtitleCanvas.setBitmap(subtitleBitmap);
          subtitleCanvas.drawLine(lineLength / 2, 0, lineLength / 2, lineLength, textPainter);
-         markerCanvas.drawBitmap(subtitleBitmap, size.x / 2 - (lineLength / 2), size.y - lineLength);
+         markerCanvas.drawBitmap(subtitleBitmap, markerWidth_Half - (lineLength / 2), markerHeight - lineLength);
       }
 
       if (isPhoto) {
          if (showPhotoTitle) {
-            markerCanvas.drawBitmap(titleBitmap, size.x / 2 - (titleSize.x / 2), 0);
+            markerCanvas.drawBitmap(titleBitmap, markerWidth_Half - (titleWidth / 2), 0);
          }
       } else {
-         markerCanvas.drawBitmap(titleBitmap, size.x / 2 - (titleSize.x / 2), 0);
+         markerCanvas.drawBitmap(titleBitmap, markerWidth_Half - (titleWidth / 2), 0);
       }
 
-      markerCanvas.drawBitmap(poiBitmap, size.x / 2 - (symbolSize.x / 2), size.y / 2 - (symbolSize.y / 2));
+      markerCanvas.drawBitmap(poiBitmap, markerWidth_Half - (symbolWidth / 2), markerHeight / 2 - (symbolHeight / 2));
 
       if (isPhoto) {
-         return (new MarkerSymbol(markerBitmap, HotspotPlace.BOTTOM_CENTER));
-      }
 
-      if (isBillboard) {
-         return (new MarkerSymbol(markerBitmap, HotspotPlace.CENTER));
+         return new MarkerSymbol(markerBitmap, HotspotPlace.BOTTOM_CENTER);
+
       } else {
-         return (new MarkerSymbol(markerBitmap, HotspotPlace.CENTER, false));
-      }
 
+         return new MarkerSymbol(markerBitmap, HotspotPlace.CENTER, isBillboard);
+      }
    }
 
    /**
@@ -279,7 +292,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       createPoiBitmap(MarkerShape.STAR);
 
-      _bitmapClusterSymbol = drawStar(clusterSymbol_Size, _poiColor);
+      _bitmapClusterSymbol = drawStar(clusterSymbol_Size, _starColor, _starColorBorder);
 
       final List<MarkerInterface> pts = new ArrayList<>();
 
@@ -333,7 +346,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       if (shape == MarkerShape.CIRCLE) {
          _bitmapPoi = drawCircle(_symbolSize);
       } else {
-         _bitmapPoi = drawStar(_symbolSize, _poiColor);
+         _bitmapPoi = drawStar(_symbolSize, _starColor, _starColorBorder);
       }
       return _bitmapPoi;
 
@@ -348,24 +361,28 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       final float half = bitmapCircleSize / 2;
 
       _bitmapCircle = CanvasAdapter.newBitmap(bitmapCircleSize, bitmapCircleSize, 0);
-      final Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
-      defaultMarkerCanvas.setBitmap(_bitmapCircle);
+
       _linePainter.setColor(0xA0000000); //gray like the PhotoSymbol in the UI
       _linePainter.setStrokeWidth(2);
+
+      final Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
+      defaultMarkerCanvas.setBitmap(_bitmapCircle);
       defaultMarkerCanvas.drawCircle(half, half, half * 0.8f, _linePainter);
 
       return _bitmapCircle;
    }
 
-   private Bitmap drawStar(final int bitmapStarSize, final int starColor) {
+   private Bitmap drawStar(final int bitmapStarSize, final int starColor, final int starColorBorder) {
+
+      final float half = bitmapStarSize / 2;
 
       //_mapApp.debugPrint("*** Markertoolkit:  drawstar: "); //$NON-NLS-1$
       _bitmapStar = CanvasAdapter.newBitmap(bitmapStarSize, bitmapStarSize, 0);
-      final Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
-      defaultMarkerCanvas.setBitmap(_bitmapStar);
-      final float half = bitmapStarSize / 2;
       _fillPainter.setColor(starColor);
       _fillPainter.setStrokeWidth(2);
+
+      final Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
+      defaultMarkerCanvas.setBitmap(_bitmapStar);
 
       /*
        * link: https://stackoverflow.com/questions/16327588/how-to-make-star-shape-in-java
