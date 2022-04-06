@@ -71,7 +71,10 @@ import net.tourbook.map25.ui.SlideoutMap25_MapOptions;
 import net.tourbook.map25.ui.SlideoutMap25_MapProvider;
 import net.tourbook.map25.ui.SlideoutMap25_PhotoOptions;
 import net.tourbook.map25.ui.SlideoutMap25_TrackOptions;
+import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.Photo;
+import net.tourbook.photo.PhotoEventId;
+import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoRatingStarOperator;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
@@ -103,6 +106,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
@@ -119,7 +123,8 @@ public class Map25View extends ViewPart implements
       ICloseOpenedDialogs,
       IMapBookmarkListener,
       IMapSyncListener,
-      IMapWithPhotos {
+      IMapWithPhotos,
+      IPhotoEventListener {
 
 // SET_FORMATTING_OFF
 
@@ -719,7 +724,7 @@ public class Map25View extends ViewPart implements
    private void createActions() {
 
 // SET_FORMATTING_OFF
-      
+
       _actionMapBookmarks              = new ActionMapBookmarks(this._parent, this);
       _actionMapOptions                = new ActionMap25_Options();
       _actionMapPhotoFilter            = new ActionMap25_PhotoFilter(this, _state_PhotoFilter);
@@ -733,7 +738,7 @@ public class Map25View extends ViewPart implements
       _actionSyncMap_WithTour          = new ActionSynchMapWithTour(this);
       _actionZoom_In                   = new ActionZoomIn(this);
       _actionZoom_Out                  = new ActionZoomOut(this);
-      
+
 // SET_FORMATTING_ON
    }
 
@@ -891,8 +896,10 @@ public class Map25View extends ViewPart implements
       addPartListener();
       addTourEventListener();
       addSelectionListener();
+
       MapBookmarkManager.addBookmarkListener(this);
       MapManager.addMapSyncListener(this);
+      PhotoManager.addPhotoEventListener(this);
    }
 
    private void createUI(final Composite parent) {
@@ -973,6 +980,8 @@ public class Map25View extends ViewPart implements
 
       MapBookmarkManager.removeBookmarkListener(this);
       MapManager.removeMapSyncListener(this);
+      PhotoManager.removePhotoEventListener(this);
+
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
       disposeContextMenu();
@@ -1486,6 +1495,18 @@ public class Map25View extends ViewPart implements
       } else {
 
          map25.updateMap();
+      }
+   }
+
+   @Override
+   public void photoEvent(final IViewPart viewPart, final PhotoEventId photoEventId, final Object data) {
+
+      if (photoEventId == PhotoEventId.PHOTO_ATTRIBUTES_ARE_MODIFIED) {
+
+         if (data instanceof ArrayList<?>) {
+
+            updateFilteredPhotos();
+         }
       }
    }
 
