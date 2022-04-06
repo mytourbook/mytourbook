@@ -125,7 +125,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       _fillPainter.setStyle(Paint.Style.FILL);
 
 //    _bitmapPhoto = createPhotoBitmap();
-      _bitmapNotLoadedPhoto = createPoiBitmap(MarkerShape.CIRCLE);
+      _bitmapNotLoadedPhoto = createShapeBitmap(MarkerShape.CIRCLE);
 //    _bitmapClusterPhoto = createPoiBitmap(MarkerShape.CIRCLE); //must be replaced later, like MarkerToolkit
 
       _symbol = new MarkerSymbol(_bitmapNotLoadedPhoto, MarkerSymbol.HotspotPlace.BOTTOM_CENTER, false);
