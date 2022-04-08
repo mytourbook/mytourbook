@@ -218,7 +218,19 @@ public class TourExporter {
          return Long.compare(item1.getImageExifTime(), item2.getImageExifTime());
       });
 
-      final SerieData serieData = _tourData.getSerieData();
+      SerieData serieData = _tourData.getSerieData();
+      if (serieData == null) {
+
+         /**
+          * Fix the issue "NPE when exporting a tour imported but not saved" and support .mt export
+          * for not saved tours
+          * <p>
+          * https://github.com/mytourbook/mytourbook/issues/507
+          */
+         _tourData.onPrePersist();
+
+         serieData = _tourData.getSerieData();
+      }
 
       /*
        * Setup context
