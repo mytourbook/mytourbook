@@ -72,7 +72,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
             + "avgPulse," //                 8   //$NON-NLS-1$
             + "avgCadence," //               9   //$NON-NLS-1$
-            + "(DOUBLE(AvgTemperature) / TemperatureScale)," //         10   //$NON-NLS-1$
+            + "(DOUBLE(weather_Temperature_Average_Device) / TemperatureScale)," //         10   //$NON-NLS-1$
             + "TourDeviceTime_Recorded" //   11   //$NON-NLS-1$
       ;
    }
