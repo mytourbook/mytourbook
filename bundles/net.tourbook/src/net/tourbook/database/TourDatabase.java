@@ -9242,6 +9242,8 @@ public class TourDatabase {
 
                final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
 
+              //todo fb Because the concurrent db update code is mostly copied over and over again, I think it's now
+              //time, thas this code could be refactored by using an interface/abstract code which contains mosly of the current concurrent code.
                splashManager.setMessage(NLS.bind(
 
                      // Data update 48: Fixing the weather clouds texts - {0} of {1} - {2} % - {3}
