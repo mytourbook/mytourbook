@@ -4551,6 +4551,11 @@ public class Map2View extends ViewPart implements
       // update tour id's in the map
       final List<Long> allTourIds = new ArrayList<>();
       for (final TourData tourData : allTourData) {
+
+         if (tourData == null) {
+            continue;
+         }
+
          allTourIds.add(tourData.getTourId());
       }
       _map.setTourIds(allTourIds);

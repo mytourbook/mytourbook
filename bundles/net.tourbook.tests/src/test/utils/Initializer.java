@@ -90,11 +90,6 @@ public class Initializer {
 
       final TourData newlyImportedTour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-      //Since this commit https://github.com/mytourbook/mytourbook/commit/26ff12c67601acc0070ed13f0433f5b7db6c9e10
-      //this needs to be called in order for the {@link TourData#serieData} to be initialized
-      //otherwise it is null and will create errors in the unit tests
-      newlyImportedTour.onPrePersist();
-
       return newlyImportedTour;
    }
 
@@ -121,11 +116,11 @@ public class Initializer {
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
       final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
       final GarminTCX_DeviceDataReader deviceDataReader = new GarminTCX_DeviceDataReader();
-      final SAXParser parser = initializeParser();
       final String testFilePath = FilesUtils.getAbsoluteFilePath(importFilePath);
       final File file = new File(testFilePath);
 
       try (InputStream in = new FileInputStream(file)) {
+
          final GPX_SAX_Handler handler = new GPX_SAX_Handler(
                importFilePath,
                deviceData,
@@ -135,7 +130,10 @@ public class Initializer {
                new ImportState_Process(),
                deviceDataReader);
 
-         parser.parse(in, handler);
+         final SAXParser parser = initializeParser();
+         if (parser != null) {
+            parser.parse(in, handler);
+         }
 
       } catch (final SAXException | IOException e) {
          e.printStackTrace();
