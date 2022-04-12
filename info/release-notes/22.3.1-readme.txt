@@ -3,6 +3,7 @@
 Bugfix
 ======
 
-* Fix for the SQL error when using the Tagged Tours view (Frederic)   
+* Tagged Tours View (Frederic)
+  Fixed SQL error when tag filters are used 
   https://github.com/mytourbook/mytourbook/pull/512
 
