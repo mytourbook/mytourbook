@@ -9260,7 +9260,8 @@ public class TourDatabase {
             tourIndex++;
          }
 
-         updateDb_047_To_048_DataUpdate_Concurrent(tourId);
+         final TourDataUpdate_047_to_048 updateDb_047_To_048_DataUpdate_Concurrent = new TourDataUpdate_047_to_048();
+         updateDb_047_To_048_DataUpdate_Concurrent.updateDb_047_To_048_DataUpdate_Concurrent(tourId);
       }
 
       updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
