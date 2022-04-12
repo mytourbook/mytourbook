@@ -534,6 +534,8 @@ public class FitLog_SAXHandler extends DefaultHandler {
       tourData.setWeather(_currentActivity.weatherText);
       tourData.setWeather_Clouds(_weatherId.get(_currentActivity.weatherConditions));
 
+      //todo fb if tmeperatureserie, then not necessary
+      // else then set weather temp
       final float weatherTemperature = _currentActivity.weatherTemperature;
       if (weatherTemperature != Float.MIN_VALUE) {
          tourData.setWeather_Temperature_Average_Device(weatherTemperature);
