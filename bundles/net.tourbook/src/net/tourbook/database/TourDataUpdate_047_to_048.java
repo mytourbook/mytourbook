@@ -15,16 +15,27 @@
  *******************************************************************************/
 package net.tourbook.database;
 
+import net.tourbook.Messages;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 
-/**
- * Interface to compute tour values for {@link TourData}
- */
-public class TourDataUpdate_047_to_048 extends ITourDataUpdateConcurrent {
+public class TourDataUpdate_047_to_048 implements ITourDataUpdateConcurrent {
 
    @Override
-   protected void tourDataUpdate(final TourData tourData) {
+   public int getDatabaseVersion() {
+
+      return 48;
+   }
+
+   @Override
+   public String getSplashManagerMessage() {
+
+      // Data update 48: Fixing the weather clouds texts - {0} of {1} - {2} % - {3}
+      return Messages.Tour_Database_PostUpdate_048_Weather_Clouds;
+   }
+
+   @Override
+   public void updateTourData(final TourData tourData) {
 
       if (tourData.getWeather_Clouds().equalsIgnoreCase("weather-showers-scatterd")) { //$NON-NLS-1$
 
