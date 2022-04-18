@@ -4868,6 +4868,88 @@ public class TourDatabase {
       System.out.println();
    }
 
+   /**
+    * @param concurrentUpdater
+    *           {@link IComputeNoDataserieValues} interface to concurrently update
+    *           tours
+    * @param tourIds
+    *           Tour ID's which should be computed, when <code>null</code>, ALL tours will be
+    *           computed.
+    * @return
+    * @throws SQLException
+    */
+   public boolean performTourDataUpdate_ForAllTours(final Connection connection,
+                                                    final SplashManager splashManager,
+                                                    final ITourDataUpdateConcurrent concurrentUpdater) throws SQLException {
+
+      final long startTime = System.currentTimeMillis();
+
+      final int dbDataVersion = 48;
+
+      if (getDbVersion(connection, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return false;
+      }
+
+      long lastUpdateTime = startTime;
+
+      int tourIndex = 1;
+      int lastUpdateNumItems = 1;
+      int sumUpdatedTours = 0;
+
+      final List<Long> allTourIds = getAllTourIds();
+      final int numAllTourIds = allTourIds.size();
+
+      // If necessary, recomputing the temperature values (average/max/min) measured from the device
+      for (final Long tourId : allTourIds) {
+
+         if (splashManager != null) {
+
+            final long currentTime = System.currentTimeMillis();
+            final long timeDiff = currentTime - lastUpdateTime;
+
+            // reduce logging
+            if (timeDiff > DELAY_SPLASH_LOGGING
+
+                  // update UI for the last tour otherwise it looks like that not all data are converted
+                  || tourIndex == numAllTourIds) {
+
+               lastUpdateTime = currentTime;
+
+               final long numTourDiff = tourIndex - lastUpdateNumItems;
+               lastUpdateNumItems = tourIndex;
+               sumUpdatedTours += numTourDiff;
+
+               final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
+
+               //todo fb Because the concurrent db update code is mostly copied over and over again, I think it's now
+               //time, thas this code could be refactored by using an interface/abstract code which contains mosly of the current concurrent code.
+               splashManager.setMessage(NLS.bind(
+
+                     // Data update 48: Fixing the weather clouds texts - {0} of {1} - {2} % - {3}
+                     Messages.Tour_Database_PostUpdate_048_Weather_Clouds,
+
+                     new Object[] {
+                           sumUpdatedTours,
+                           numAllTourIds,
+                           percentValue,
+                           numTourDiff,
+                     }));
+            }
+
+            tourIndex++;
+         }
+
+         concurrentUpdater.tourDataUpdate(null);
+         final TourDataUpdate_047_to_048 updateDb_047_To_048_DataUpdate_Concurrent = new TourDataUpdate_047_to_048();
+         updateDb_047_To_048_DataUpdate_Concurrent.updateDb_047_To_048_DataUpdate_Concurrent(tourId);
+      }
+
+      updateVersionNumber_20_AfterDataUpdate(connection, dbDataVersion, startTime);
+
+      return true;
+   }
+
    public void removePropertyListener(final IPropertyListener listener) {
       _propertyListeners.remove(listener);
    }
@@ -9242,8 +9324,8 @@ public class TourDatabase {
 
                final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
 
-              //todo fb Because the concurrent db update code is mostly copied over and over again, I think it's now
-              //time, thas this code could be refactored by using an interface/abstract code which contains mosly of the current concurrent code.
+               //todo fb Because the concurrent db update code is mostly copied over and over again, I think it's now
+               //time, thas this code could be refactored by using an interface/abstract code which contains mosly of the current concurrent code.
                splashManager.setMessage(NLS.bind(
 
                      // Data update 48: Fixing the weather clouds texts - {0} of {1} - {2} % - {3}
