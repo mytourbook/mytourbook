@@ -5832,7 +5832,7 @@ public class TourDatabase {
    /**
     * This method may be updated when the database version is updated
     */
-   private boolean updateDb__2_Data(final Connection connection, final SplashManager splashManager) {
+   private boolean updateDb__2_Data(final Connection conn, final SplashManager splashManager) {
 
       /**
        * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -5848,26 +5848,26 @@ public class TourDatabase {
 
       try {
 
-         updateDb_003_To_004_DataUpdate(connection, splashManager);
-         updateDb_004_To_005_DataUpdate(connection, splashManager);
-         updateDb_008_To_009_DataUpdate(connection, splashManager);
-         updateDb_010_To_011_DataUpdate(connection, splashManager);
-         updateDb_012_To_013_DataUpdate(connection);
-         updateDb_019_To_020_DataUpdate(connection, splashManager);
-         updateDb_021_To_022_DataUpdate(connection, splashManager);
-         updateDb_022_To_023_DataUpdate(connection, splashManager);
-         updateDb_024_To_025_DataUpdate(connection, splashManager);
-         updateDb_027_To_028_DataUpdate(connection, splashManager);
-         updateDb_028_To_029_DataUpdate(connection, splashManager);
-         updateDb_031_To_032_DataUpdate(connection, splashManager);
-         updateDb_033_To_034_DataUpdate(connection, splashManager);
-         updateDb_036_To_037_DataUpdate(connection, splashManager);
-         updateDb_039_To_040_DataUpdate(connection, splashManager);
-         updateDb_041_To_042_DataUpdate(connection);
-         updateDb_042_to_043_DataUpdate(connection, splashManager);
-         updateDb_046_to_047_DataUpdate(connection, splashManager);
+         updateDb_003_To_004_DataUpdate(conn, splashManager);
+         updateDb_004_To_005_DataUpdate(conn, splashManager);
+         updateDb_008_To_009_DataUpdate(conn, splashManager);
+         updateDb_010_To_011_DataUpdate(conn, splashManager);
+         updateDb_012_To_013_DataUpdate(conn);
+         updateDb_019_To_020_DataUpdate(conn, splashManager);
+         updateDb_021_To_022_DataUpdate(conn, splashManager);
+         updateDb_022_To_023_DataUpdate(conn, splashManager);
+         updateDb_024_To_025_DataUpdate(conn, splashManager);
+         updateDb_027_To_028_DataUpdate(conn, splashManager);
+         updateDb_028_To_029_DataUpdate(conn, splashManager);
+         updateDb_031_To_032_DataUpdate(conn, splashManager);
+         updateDb_033_To_034_DataUpdate(conn, splashManager);
+         updateDb_036_To_037_DataUpdate(conn, splashManager);
+         updateDb_039_To_040_DataUpdate(conn, splashManager);
+         updateDb_041_To_042_DataUpdate(conn);
+         updateDb_042_to_043_DataUpdate(conn, splashManager);
+         updateDb_046_to_047_DataUpdate(conn, splashManager);
 
-         updateDb__3_Data_Concurrent(connection, splashManager, new TourDataUpdate_047_to_048());
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_047_to_048());
 
       } catch (final SQLException e) {
 
