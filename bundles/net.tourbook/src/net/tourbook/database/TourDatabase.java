@@ -1174,7 +1174,7 @@ public class TourDatabase {
     * @return
     */
    public static boolean computeAnyValues_ForAllTours(final IComputeTourValues computeValuesRunner,
-                                                      final ArrayList<Long> tourIds) {
+                                                      final List<Long> tourIds) {
 
       final int[] tourCounter = new int[] { 0 };
       final int[] tourListSize = new int[] { 0 };
@@ -1187,7 +1187,7 @@ public class TourDatabase {
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            ArrayList<Long> allTourIds;
+            List<Long> allTourIds;
             if (tourIds == null) {
                allTourIds = getAllTourIds();
             } else {
@@ -1322,7 +1322,8 @@ public class TourDatabase {
     *           computed.
     * @return
     */
-   public static boolean computeNoDataserieValues_ForAllTours(final IComputeNoDataserieValues tourRunner, final ArrayList<Long> tourIds) {
+   public static boolean computeNoDataserieValues_ForAllTours(final IComputeNoDataserieValues tourRunner,
+                                                              final List<Long> tourIds) {
 
       final int[] numCurrentlyProcessedTours = new int[] { 0 };
       final int[] numAllTours = new int[] { 0 };
@@ -1347,7 +1348,7 @@ public class TourDatabase {
 
          private void run_AllTours(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 
-            ArrayList<Long> allTourIds;
+            List<Long> allTourIds;
             if (tourIds == null) {
                allTourIds = getAllTourIds();
             } else {
@@ -2192,7 +2193,7 @@ public class TourDatabase {
     * @return Returns the tag names separated with a comma or an empty string when tagIds are.
     *         <code>null</code>
     */
-   public static String getTagNames(final ArrayList<Long> tagIds) {
+   public static String getTagNames(final List<Long> tagIds) {
 
       if (tagIds == null) {
          return UI.EMPTY_STRING;
@@ -2255,7 +2256,7 @@ public class TourDatabase {
       return getTagNamesText(tagNames, isVertical);
    }
 
-   public static String getTagNamesText(final ArrayList<String> tagNames, final boolean isVertical) {
+   public static String getTagNamesText(final List<String> tagNames, final boolean isVertical) {
 
       // sort tags by name
       Collections.sort(tagNames);
@@ -5948,15 +5949,14 @@ public class TourDatabase {
     * Do data updates concurrently with all available processor threads, this is reducing time
     * significantly.
     *
-    * @param concurrentUpdater
-    *           {@link ITourDataUpdate} interface to concurrently update
-    *           tours
+    * @param tourDataUpdater
+    *           {@link ITourDataUpdate} interface to update a tour
     * @param tourId
     *           Tour ID of the tour to be updated
     * @return
     */
    private void updateDb__4_Data_Concurrent_OneTour(final long tourId,
-                                                    final ITourDataUpdate concurrentUpdater) {
+                                                    final ITourDataUpdate tourDataUpdater) {
 
       try {
 
@@ -5994,7 +5994,7 @@ public class TourDatabase {
             /*
              * Tour update
              */
-            concurrentUpdater.updateTourData(tourData);
+            tourDataUpdater.updateTourData(tourData);
 
             boolean isSaved = false;
 
