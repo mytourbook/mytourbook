@@ -5809,7 +5809,7 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_046_To_047(conn, splashManager);
          }
 
-         // 47 -> 48    22.3.1 ??
+         // 47 -> 48    22.X ??
          if (currentDbVersion == 47) {
             currentDbVersion = _dbDesignVersion_New = 48;
          }
