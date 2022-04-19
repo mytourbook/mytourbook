@@ -27,10 +27,12 @@ public class TourDataUpdate_047_to_048 implements ITourDataUpdate {
       return 48;
    }
 
+   /**
+    * Data update 48: Fixing the weather clouds texts - {0} of {1} - {2} % - {3}
+    */
    @Override
    public String getSplashManagerMessage() {
 
-      // Data update 48: Fixing the weather clouds texts - {0} of {1} - {2} % - {3}
       return Messages.Tour_Database_PostUpdate_048_Weather_Clouds;
    }
 
