@@ -175,7 +175,7 @@
   "weather_Precipitation" : 0.0,
   "weather_Pressure" : 0.0,
   "weather_Snowfall" : 0.0,
-  "weather_Temperature_Average" : -3.889,
+  "weather_Temperature_Average" : 0.0,
   "weather_Temperature_Average_Device" : 30.246399,
   "weather_Temperature_Max" : 0.0,
   "weather_Temperature_Max_Device" : 31.4,
