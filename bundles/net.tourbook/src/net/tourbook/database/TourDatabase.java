@@ -4878,8 +4878,8 @@ public class TourDatabase {
     *           Tour ID of the tour to be updated
     * @return
     */
-   public void performTourDataUpdate_ForAllTours(final long tourId,
-                                                 final ITourDataUpdateConcurrent concurrentUpdater) {
+   private void performTourDataUpdate_ForAllTours(final long tourId,
+                                                  final ITourDataUpdateConcurrent concurrentUpdater) {
 
       try {
 
