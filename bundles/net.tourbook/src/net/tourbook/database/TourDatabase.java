@@ -4867,93 +4867,6 @@ public class TourDatabase {
       System.out.println();
    }
 
-   /**
-    * Do data updates concurrently with all available processor threads, this is reducing time
-    * significantly.
-    *
-    * @param concurrentUpdater
-    *           {@link IComputeNoDataserieValues} interface to concurrently update
-    *           tours
-    * @param tourId
-    *           Tour ID of the tour to be updated
-    * @return
-    */
-   private void performTourDataUpdate_ForAllTours(final long tourId,
-                                                  final ITourDataUpdateConcurrent concurrentUpdater) {
-
-      try {
-
-         // put tour ID (queue item) into the queue AND wait when it is full
-
-         _dbUpdateQueue.put(tourId);
-
-      } catch (final InterruptedException e) {
-
-         _isSQLDataUpdateError = true;
-
-         StatusUtil.log(e);
-         Thread.currentThread().interrupt();
-      }
-
-      _dbUpdateExecutor.submit(() -> {
-
-         // get last added item
-         final Long queueItem_TourId = _dbUpdateQueue.poll();
-
-         if (queueItem_TourId == null) {
-            return;
-         }
-
-         final EntityManager entityManager = TourDatabase.getInstance().getEntityManager();
-
-         try {
-
-            // get tour data by tour id
-            final TourData tourData = entityManager.find(TourData.class, queueItem_TourId);
-            if (tourData == null) {
-               return;
-            }
-
-            /*
-             * Tour update
-             */
-            concurrentUpdater.updateTourData(tourData);
-
-            boolean isSaved = false;
-
-            final EntityTransaction transaction = entityManager.getTransaction();
-            try {
-
-               transaction.begin();
-               {
-                  entityManager.merge(tourData);
-               }
-               transaction.commit();
-
-            } catch (final Exception e) {
-
-               _isSQLDataUpdateError = true;
-               StatusUtil.showStatus(e);
-
-            } finally {
-               if (transaction.isActive()) {
-                  transaction.rollback();
-               } else {
-                  isSaved = true;
-               }
-            }
-
-            if (!isSaved) {
-               showTourSaveError(tourData);
-            }
-
-         } finally {
-
-            entityManager.close();
-         }
-      });
-   }
-
    public void removePropertyListener(final IPropertyListener listener) {
       _propertyListeners.remove(listener);
    }
@@ -5594,71 +5507,6 @@ public class TourDatabase {
       }
    }
 
-   private void updateDatabase(final Connection connection,
-                               final SplashManager splashManager,
-                               final ITourDataUpdateConcurrent concurrentUpdater) throws SQLException {
-
-      final long startTime = System.currentTimeMillis();
-
-      final int dbDataVersion = concurrentUpdater.getDatabaseVersion();
-
-      if (getDbVersion(connection, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
-         // data version is higher -> nothing to do
-         return;
-      }
-
-      long lastUpdateTime = startTime;
-
-      int tourIndex = 1;
-      int lastUpdateNumItems = 1;
-      int sumUpdatedTours = 0;
-
-      final List<Long> allTourIds = getAllTourIds();
-      final int numAllTourIds = allTourIds.size();
-
-      // If necessary, recomputing the temperature values (average/max/min) measured from the device
-      for (final Long tourId : allTourIds) {
-
-         if (splashManager != null) {
-
-            final long currentTime = System.currentTimeMillis();
-            final long timeDiff = currentTime - lastUpdateTime;
-
-            // reduce logging
-            if (timeDiff > DELAY_SPLASH_LOGGING
-
-                  // update UI for the last tour otherwise it looks like that not all data are converted
-                  || tourIndex == numAllTourIds) {
-
-               lastUpdateTime = currentTime;
-
-               final long numTourDiff = tourIndex - lastUpdateNumItems;
-               lastUpdateNumItems = tourIndex;
-               sumUpdatedTours += numTourDiff;
-
-               final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
-
-               splashManager.setMessage(NLS.bind(
-
-                     concurrentUpdater.getSplashManagerMessage(),
-
-                     new Object[] {
-                           sumUpdatedTours,
-                           numAllTourIds,
-                           percentValue,
-                           numTourDiff,
-                     }));
-            }
-
-            tourIndex++;
-         }
-
-         performTourDataUpdate_ForAllTours(tourId, concurrentUpdater);
-      }
-
-      updateVersionNumber_20_AfterDataUpdate(connection, dbDataVersion, startTime);
-   }
-
    /**
     * This method must be updated when the database version is updated
     */
@@ -6017,9 +5865,9 @@ public class TourDatabase {
          updateDb_039_To_040_DataUpdate(connection, splashManager);
          updateDb_041_To_042_DataUpdate(connection);
          updateDb_042_to_043_DataUpdate(connection, splashManager);
+         updateDb_046_to_047_DataUpdate(connection, splashManager);
 
-         updateDatabase(connection, splashManager, new TourDataUpdate_046_to_047());
-         updateDatabase(connection, splashManager, new TourDataUpdate_047_to_048());
+         updateDb__3_Data_Concurrent(connection, splashManager, new TourDataUpdate_047_to_048());
 
       } catch (final SQLException e) {
 
@@ -6030,6 +5878,158 @@ public class TourDatabase {
       }
 
       return true;
+   }
+
+   private void updateDb__3_Data_Concurrent(final Connection connection,
+                                            final SplashManager splashManager,
+                                            final ITourDataUpdateConcurrent concurrentUpdater) throws SQLException {
+
+      final long startTime = System.currentTimeMillis();
+
+      final int dbDataVersion = concurrentUpdater.getDatabaseVersion();
+
+      if (getDbVersion(connection, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
+      long lastUpdateTime = startTime;
+
+      int tourIndex = 1;
+      int lastUpdateNumItems = 1;
+      int sumUpdatedTours = 0;
+
+      final List<Long> allTourIds = getAllTourIds();
+      final int numAllTourIds = allTourIds.size();
+
+      // If necessary, recomputing the temperature values (average/max/min) measured from the device
+      for (final Long tourId : allTourIds) {
+
+         if (splashManager != null) {
+
+            final long currentTime = System.currentTimeMillis();
+            final long timeDiff = currentTime - lastUpdateTime;
+
+            // reduce logging
+            if (timeDiff > DELAY_SPLASH_LOGGING
+
+                  // update UI for the last tour otherwise it looks like that not all data are converted
+                  || tourIndex == numAllTourIds) {
+
+               lastUpdateTime = currentTime;
+
+               final long numTourDiff = tourIndex - lastUpdateNumItems;
+               lastUpdateNumItems = tourIndex;
+               sumUpdatedTours += numTourDiff;
+
+               final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
+
+               splashManager.setMessage(NLS.bind(
+
+                     concurrentUpdater.getSplashManagerMessage(),
+
+                     new Object[] {
+                           sumUpdatedTours,
+                           numAllTourIds,
+                           percentValue,
+                           numTourDiff,
+                     }));
+            }
+
+            tourIndex++;
+         }
+
+         updateDb__4_Data_Concurrent_OneTour(tourId, concurrentUpdater);
+      }
+
+      updateVersionNumber_20_AfterDataUpdate(connection, dbDataVersion, startTime);
+   }
+
+   /**
+    * Do data updates concurrently with all available processor threads, this is reducing time
+    * significantly.
+    *
+    * @param concurrentUpdater
+    *           {@link ITourDataUpdateConcurrent} interface to concurrently update
+    *           tours
+    * @param tourId
+    *           Tour ID of the tour to be updated
+    * @return
+    */
+   private void updateDb__4_Data_Concurrent_OneTour(final long tourId,
+                                                    final ITourDataUpdateConcurrent concurrentUpdater) {
+
+      try {
+
+         // put tour ID (queue item) into the queue AND wait when it is full
+
+         _dbUpdateQueue.put(tourId);
+
+      } catch (final InterruptedException e) {
+
+         _isSQLDataUpdateError = true;
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _dbUpdateExecutor.submit(() -> {
+
+         // get last added item
+         final Long queueItem_TourId = _dbUpdateQueue.poll();
+
+         if (queueItem_TourId == null) {
+            return;
+         }
+
+         final EntityManager entityManager = TourDatabase.getInstance().getEntityManager();
+
+         try {
+
+            // get tour data by tour id
+            final TourData tourData = entityManager.find(TourData.class, queueItem_TourId);
+            if (tourData == null) {
+               return;
+            }
+
+            /*
+             * Tour update
+             */
+            concurrentUpdater.updateTourData(tourData);
+
+            boolean isSaved = false;
+
+            final EntityTransaction transaction = entityManager.getTransaction();
+            try {
+
+               transaction.begin();
+               {
+                  entityManager.merge(tourData);
+               }
+               transaction.commit();
+
+            } catch (final Exception e) {
+
+               _isSQLDataUpdateError = true;
+               StatusUtil.showStatus(e);
+
+            } finally {
+               if (transaction.isActive()) {
+                  transaction.rollback();
+               } else {
+                  isSaved = true;
+               }
+            }
+
+            if (!isSaved) {
+               showTourSaveError(tourData);
+            }
+
+         } finally {
+
+            entityManager.close();
+         }
+      });
    }
 
    private void updateDb_001_To_002(final Connection conn) throws SQLException {
@@ -9169,6 +9169,187 @@ public class TourDatabase {
       logDbUpdate_End(newDbVersion);
 
       return newDbVersion;
+   }
+
+   /**
+    * If the previous average, max, min temperatures were retrieved by
+    * a weather provider, they are copied into the new fields.
+    * If necessary, the average, max, min temperatures measured from the device
+    * are recomputed
+    *
+    * @param splashManager
+    */
+   private void updateDb_046_to_047_DataUpdate(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final long startTime = System.currentTimeMillis();
+
+      final int dbDataVersion = 47;
+
+      if (getDbVersion(conn, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
+      long lastUpdateTime = startTime;
+
+      int tourIndex = 1;
+      int lastUpdateNumItems = 1;
+      int sumUpdatedTours = 0;
+
+      final List<Long> allTourIds = getAllTourIds();
+      final int numAllTourIds = allTourIds.size();
+
+      // If necessary, recomputing the temperature values (average/max/min) measured from the device
+      for (final Long tourId : allTourIds) {
+
+         if (splashManager != null) {
+
+            final long currentTime = System.currentTimeMillis();
+            final long timeDiff = currentTime - lastUpdateTime;
+
+            // reduce logging
+            if (timeDiff > DELAY_SPLASH_LOGGING
+
+                  // update UI for the last tour otherwise it looks like that not all data are converted
+                  || tourIndex == numAllTourIds) {
+
+               lastUpdateTime = currentTime;
+
+               final long numTourDiff = tourIndex - lastUpdateNumItems;
+               lastUpdateNumItems = tourIndex;
+               sumUpdatedTours += numTourDiff;
+
+               final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
+
+               splashManager.setMessage(NLS.bind(
+
+                     // Data update 47: Converting weather data - {0} of {1} - {2} % - {3}
+                     Messages.Tour_Database_PostUpdate_047_Weather,
+
+                     new Object[] {
+                           sumUpdatedTours,
+                           numAllTourIds,
+                           percentValue,
+                           numTourDiff,
+                     }));
+            }
+
+            tourIndex++;
+         }
+
+         updateDb_046_To_047_DataUpdate_Concurrent(tourId);
+      }
+
+      updateVersionNumber_20_AfterDataUpdate(conn, dbDataVersion, startTime);
+   }
+
+   /**
+    * Do data updates concurrently with all available processor threads, this is reducing time
+    * significantly.
+    *
+    * @param tourId
+    */
+   private void updateDb_046_To_047_DataUpdate_Concurrent(final Long tourId) {
+
+      try {
+
+         // put tour ID (queue item) into the queue AND wait when it is full
+
+         _dbUpdateQueue.put(tourId);
+
+      } catch (final InterruptedException e) {
+
+         _isSQLDataUpdateError = true;
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _dbUpdateExecutor.submit(() -> {
+
+         // get last added item
+         final Long queueItem_TourId = _dbUpdateQueue.poll();
+
+         if (queueItem_TourId == null) {
+            return;
+         }
+
+         final EntityManager entityManager = TourDatabase.getInstance().getEntityManager();
+
+         try {
+
+            // get tour data by tour id
+            final TourData tourData = entityManager.find(TourData.class, queueItem_TourId);
+            if (tourData == null) {
+               return;
+            }
+
+            /*
+             * Temperature Migration
+             */
+            if (tourData.temperatureSerie == null || tourData.isWeatherDataFromProvider()) {
+
+               /**
+                * If the device has NO temperature data or the weather was retrieved from WWO:
+                * - copy the temperatures (DB 46) to the new non-device fields (DB 47)
+                */
+               tourData.setWeather_Temperature_Average(tourData.getWeather_Temperature_Average_Device());
+               tourData.setWeather_Temperature_Max(tourData.getWeather_Temperature_Max_Device());
+               tourData.setWeather_Temperature_Min(tourData.getWeather_Temperature_Min_Device());
+            }
+
+            /**
+             * If the device has NO temperature data:
+             * - set the device temperatures to 0
+             */
+            if (tourData.temperatureSerie == null) {
+
+               tourData.setWeather_Temperature_Average_Device(0);
+               tourData.setWeather_Temperature_Max_Device(0);
+               tourData.setWeather_Temperature_Min_Device(0);
+
+            } else {
+
+               /**
+                * If the device has temperature data:
+                * - recalculate the device temperatures
+                */
+               tourData.computeAvg_Temperature();
+            }
+
+            boolean isSaved = false;
+
+            final EntityTransaction transaction = entityManager.getTransaction();
+            try {
+
+               transaction.begin();
+               {
+                  entityManager.merge(tourData);
+               }
+               transaction.commit();
+
+            } catch (final Exception e) {
+
+               _isSQLDataUpdateError = true;
+               StatusUtil.showStatus(e);
+
+            } finally {
+               if (transaction.isActive()) {
+                  transaction.rollback();
+               } else {
+                  isSaved = true;
+               }
+            }
+
+            if (!isSaved) {
+               showTourSaveError(tourData);
+            }
+
+         } finally {
+
+            entityManager.close();
+         }
+      });
    }
 
    private void updateMonitor(final SplashManager splashManager, final int newDbVersion) {
