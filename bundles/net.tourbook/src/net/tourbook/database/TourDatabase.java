@@ -5882,7 +5882,7 @@ public class TourDatabase {
 
    private void updateDb__3_Data_Concurrent(final Connection connection,
                                             final SplashManager splashManager,
-                                            final ITourDataUpdateConcurrent concurrentUpdater) throws SQLException {
+                                            final ITourDataUpdate concurrentUpdater) throws SQLException {
 
       final long startTime = System.currentTimeMillis();
 
@@ -5902,7 +5902,6 @@ public class TourDatabase {
       final List<Long> allTourIds = getAllTourIds();
       final int numAllTourIds = allTourIds.size();
 
-      // If necessary, recomputing the temperature values (average/max/min) measured from the device
       for (final Long tourId : allTourIds) {
 
          if (splashManager != null) {
@@ -5950,14 +5949,14 @@ public class TourDatabase {
     * significantly.
     *
     * @param concurrentUpdater
-    *           {@link ITourDataUpdateConcurrent} interface to concurrently update
+    *           {@link ITourDataUpdate} interface to concurrently update
     *           tours
     * @param tourId
     *           Tour ID of the tour to be updated
     * @return
     */
    private void updateDb__4_Data_Concurrent_OneTour(final long tourId,
-                                                    final ITourDataUpdateConcurrent concurrentUpdater) {
+                                                    final ITourDataUpdate concurrentUpdater) {
 
       try {
 

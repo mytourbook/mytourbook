@@ -20,7 +20,7 @@ import net.tourbook.data.TourData;
 /**
  * Interface to update tour values for {@link TourData}
  */
-public interface ITourDataUpdateConcurrent {
+public interface ITourDataUpdate {
 
    public int getDatabaseVersion();
 

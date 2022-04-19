@@ -19,7 +19,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 
-public class TourDataUpdate_047_to_048 implements ITourDataUpdateConcurrent {
+public class TourDataUpdate_047_to_048 implements ITourDataUpdate {
 
    @Override
    public int getDatabaseVersion() {
