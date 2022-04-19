@@ -154,7 +154,6 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            //todo fb is that why it's displayed twice ??
             monitor.beginTask(Messages.Dialog_DownloadWorkoutsFromSuunto_Task, 2);
 
             monitor.subTask(Messages.Dialog_ValidatingSuuntoTokens_SubTask);
