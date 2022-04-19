@@ -42,7 +42,7 @@ Changes
 =======
 
 * Fitlog/FitlogEx Import (Frederic)
-  - The temperature is considered from the device when the file contains temperature data for each data point, otherwise, it's considered temperature manually entered/from a provider
+  - Differentiating the temperature from the device and the temperature manually entered/from a provider
   https://sourceforge.net/p/mytourbook/discussion/622811/thread/11993be696/
 
 
