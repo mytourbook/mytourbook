@@ -5994,7 +5994,10 @@ public class TourDatabase {
             /*
              * Tour update
              */
-            tourDataUpdater.updateTourData(tourData);
+            final boolean isTourUpdated = tourDataUpdater.updateTourData(tourData);
+            if (!isTourUpdated) {
+               return;
+            }
 
             boolean isSaved = false;
 

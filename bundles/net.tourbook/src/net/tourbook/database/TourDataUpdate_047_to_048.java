@@ -37,7 +37,7 @@ public class TourDataUpdate_047_to_048 implements ITourDataUpdate {
    }
 
    @Override
-   public void updateTourData(final TourData tourData) {
+   public boolean updateTourData(final TourData tourData) {
 
       if (tourData.getWeather_Clouds().equalsIgnoreCase("weather-showers-scatterd")) { //$NON-NLS-1$
 
@@ -46,7 +46,11 @@ public class TourDataUpdate_047_to_048 implements ITourDataUpdate {
           * it is updated to the new value
           */
          tourData.setWeather_Clouds(IWeather.WEATHER_ID_SCATTERED_SHOWERS);
+
+         return true;
       }
+
+      return false;
    }
 
 }

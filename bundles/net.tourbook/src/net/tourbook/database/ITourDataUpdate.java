@@ -26,5 +26,5 @@ public interface ITourDataUpdate {
 
    public String getSplashManagerMessage();
 
-   public void updateTourData(TourData tourData);
+   public boolean updateTourData(TourData tourData);
 }
