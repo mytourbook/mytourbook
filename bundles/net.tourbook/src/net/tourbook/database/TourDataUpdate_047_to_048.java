@@ -15,25 +15,14 @@
  *******************************************************************************/
 package net.tourbook.database;
 
-import net.tourbook.Messages;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 
-public class TourDataUpdate_047_to_048 implements ITourDataUpdate {
+public class TourDataUpdate_047_to_048 extends TourDataUpdate {
 
-   @Override
-   public int getDatabaseVersion() {
+   public TourDataUpdate_047_to_048(final int databaseVersion, final String splashManagerMessage) {
 
-      return 48;
-   }
-
-   /**
-    * Data update 48: Fixing the weather clouds texts - {0} of {1} - {2} % - {3}
-    */
-   @Override
-   public String getSplashManagerMessage() {
-
-      return Messages.Tour_Database_PostUpdate_048_Weather_Clouds;
+      super(databaseVersion, splashManagerMessage);
    }
 
    @Override

@@ -5868,7 +5868,7 @@ public class TourDatabase {
          updateDb_042_to_043_DataUpdate(conn, splashManager);
          updateDb_046_to_047_DataUpdate(conn, splashManager);
 
-         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_047_to_048());
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_047_to_048(48, Messages.Tour_Database_PostUpdate_048_Weather_Clouds));
 
       } catch (final SQLException e) {
 
@@ -5883,11 +5883,11 @@ public class TourDatabase {
 
    private void updateDb__3_Data_Concurrent(final Connection connection,
                                             final SplashManager splashManager,
-                                            final ITourDataUpdate concurrentUpdater) throws SQLException {
+                                            final TourDataUpdate tourDataUpdater) throws SQLException {
 
       final long startTime = System.currentTimeMillis();
 
-      final int dbDataVersion = concurrentUpdater.getDatabaseVersion();
+      final int dbDataVersion = tourDataUpdater.getDatabaseVersion();
 
       if (getDbVersion(connection, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
          // data version is higher -> nothing to do
@@ -5926,7 +5926,7 @@ public class TourDatabase {
 
                splashManager.setMessage(NLS.bind(
 
-                     concurrentUpdater.getSplashManagerMessage(),
+                     tourDataUpdater.getSplashManagerMessage(),
 
                      new Object[] {
                            sumUpdatedTours,
@@ -5939,7 +5939,7 @@ public class TourDatabase {
             tourIndex++;
          }
 
-         updateDb__4_Data_Concurrent_OneTour(tourId, concurrentUpdater);
+         updateDb__4_Data_Concurrent_OneTour(tourId, tourDataUpdater);
       }
 
       updateVersionNumber_20_AfterDataUpdate(connection, dbDataVersion, startTime);
@@ -5950,13 +5950,13 @@ public class TourDatabase {
     * significantly.
     *
     * @param tourDataUpdater
-    *           {@link ITourDataUpdate} interface to update a tour
+    *           {@link TourDataUpdate} interface to update a tour
     * @param tourId
     *           Tour ID of the tour to be updated
     * @return
     */
    private void updateDb__4_Data_Concurrent_OneTour(final long tourId,
-                                                    final ITourDataUpdate tourDataUpdater) {
+                                                    final TourDataUpdate tourDataUpdater) {
 
       try {
 
