@@ -18,11 +18,12 @@ package net.tourbook.database;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 
-public class TourDataUpdate_047_to_048 extends TourDataUpdate {
+public class TourDataUpdate_047_to_048 implements ITourDataUpdate {
 
-   public TourDataUpdate_047_to_048(final int databaseVersion, final String splashManagerMessage) {
+   @Override
+   public int getDatabaseVersion() {
 
-      super(databaseVersion, splashManagerMessage);
+      return 48;
    }
 
    @Override

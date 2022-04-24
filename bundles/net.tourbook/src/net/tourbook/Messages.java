@@ -2594,7 +2594,7 @@ public class Messages extends NLS {
    public static String        Tour_Database_PostUpdate_040_SetTourRecordingTime;
    public static String        Tour_Database_PostUpdate_043_LatLonE6;
    public static String        Tour_Database_PostUpdate_047_Weather;
-   public static String        Tour_Database_PostUpdate_048_Weather_Clouds;
+   public static String        Tour_Database_PostUpdate;
    public static String        Tour_Database_TourSaveError;
    public static String        Tour_Database_Update;
    public static String        Tour_Database_UpdateDone;

@@ -18,28 +18,11 @@ package net.tourbook.database;
 import net.tourbook.data.TourData;
 
 /**
- * Class to update tour values for {@link TourData}
+ * Interface to update tour values for {@link TourData}
  */
-public abstract class TourDataUpdate {
+public interface ITourDataUpdate {
 
-   private int    databaseVersion;
-   private String splashManagerMessage;
+   public int getDatabaseVersion();
 
-   protected TourDataUpdate(final int databaseVersion,
-                            final String splashManagerMessage) {
-
-      this.databaseVersion = databaseVersion;
-      this.splashManagerMessage = splashManagerMessage;
-   }
-
-   public int getDatabaseVersion() {
-      return databaseVersion;
-   }
-
-   public String getSplashManagerMessage() {
-
-      return String.format(splashManagerMessage, databaseVersion);
-   }
-
-   public abstract boolean updateTourData(TourData tourData);
+   public boolean updateTourData(TourData tourData);
 }

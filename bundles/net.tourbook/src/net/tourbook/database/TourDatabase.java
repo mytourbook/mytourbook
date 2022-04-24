@@ -5868,7 +5868,7 @@ public class TourDatabase {
          updateDb_042_to_043_DataUpdate(conn, splashManager);
          updateDb_046_to_047_DataUpdate(conn, splashManager);
 
-         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_047_to_048(48, Messages.Tour_Database_PostUpdate_048_Weather_Clouds));
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_047_to_048());
 
       } catch (final SQLException e) {
 
@@ -5883,7 +5883,7 @@ public class TourDatabase {
 
    private void updateDb__3_Data_Concurrent(final Connection connection,
                                             final SplashManager splashManager,
-                                            final TourDataUpdate tourDataUpdater) throws SQLException {
+                                            final ITourDataUpdate tourDataUpdater) throws SQLException {
 
       final long startTime = System.currentTimeMillis();
 
@@ -5924,16 +5924,13 @@ public class TourDatabase {
 
                final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
 
-               splashManager.setMessage(NLS.bind(
-
-                     tourDataUpdater.getSplashManagerMessage(),
-
-                     new Object[] {
-                           sumUpdatedTours,
-                           numAllTourIds,
-                           percentValue,
-                           numTourDiff,
-                     }));
+               splashManager.setMessage(String.format(
+                     Messages.Tour_Database_PostUpdate,
+                     dbDataVersion,
+                     sumUpdatedTours,
+                     numAllTourIds,
+                     percentValue,
+                     numTourDiff));
             }
 
             tourIndex++;
@@ -5950,13 +5947,13 @@ public class TourDatabase {
     * significantly.
     *
     * @param tourDataUpdater
-    *           {@link TourDataUpdate} interface to update a tour
+    *           {@link ITourDataUpdate} interface to update a tour
     * @param tourId
     *           Tour ID of the tour to be updated
     * @return
     */
    private void updateDb__4_Data_Concurrent_OneTour(final long tourId,
-                                                    final TourDataUpdate tourDataUpdater) {
+                                                    final ITourDataUpdate tourDataUpdater) {
 
       try {
 
