@@ -111,10 +111,11 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 47;
+   private static final int TOURBOOK_DB_VERSION = 48;
+
+//   private static final int TOURBOOK_DB_VERSION = 49; // 22.X ??
 
 //   private static final int TOURBOOK_DB_VERSION = 48; // 22.X ??
-
 //   private static final int TOURBOOK_DB_VERSION = 47; // 22.3
 //   private static final int TOURBOOK_DB_VERSION = 46; // 21.12
 //   private static final int TOURBOOK_DB_VERSION = 45; // 21.9
@@ -1173,7 +1174,7 @@ public class TourDatabase {
     * @return
     */
    public static boolean computeAnyValues_ForAllTours(final IComputeTourValues computeValuesRunner,
-                                                      final ArrayList<Long> tourIds) {
+                                                      final List<Long> tourIds) {
 
       final int[] tourCounter = new int[] { 0 };
       final int[] tourListSize = new int[] { 0 };
@@ -1186,7 +1187,7 @@ public class TourDatabase {
          @Override
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
-            ArrayList<Long> allTourIds;
+            List<Long> allTourIds;
             if (tourIds == null) {
                allTourIds = getAllTourIds();
             } else {
@@ -1321,7 +1322,8 @@ public class TourDatabase {
     *           computed.
     * @return
     */
-   public static boolean computeNoDataserieValues_ForAllTours(final IComputeNoDataserieValues tourRunner, final ArrayList<Long> tourIds) {
+   public static boolean computeNoDataserieValues_ForAllTours(final IComputeNoDataserieValues tourRunner,
+                                                              final List<Long> tourIds) {
 
       final int[] numCurrentlyProcessedTours = new int[] { 0 };
       final int[] numAllTours = new int[] { 0 };
@@ -1346,7 +1348,7 @@ public class TourDatabase {
 
          private void run_AllTours(final Connection conn, final IProgressMonitor monitor) throws SQLException {
 
-            ArrayList<Long> allTourIds;
+            List<Long> allTourIds;
             if (tourIds == null) {
                allTourIds = getAllTourIds();
             } else {
@@ -2191,7 +2193,7 @@ public class TourDatabase {
     * @return Returns the tag names separated with a comma or an empty string when tagIds are.
     *         <code>null</code>
     */
-   public static String getTagNames(final ArrayList<Long> tagIds) {
+   public static String getTagNames(final List<Long> tagIds) {
 
       if (tagIds == null) {
          return UI.EMPTY_STRING;
@@ -2254,7 +2256,7 @@ public class TourDatabase {
       return getTagNamesText(tagNames, isVertical);
    }
 
-   public static String getTagNamesText(final ArrayList<String> tagNames, final boolean isVertical) {
+   public static String getTagNamesText(final List<String> tagNames, final boolean isVertical) {
 
       // sort tags by name
       Collections.sort(tagNames);
@@ -5803,9 +5805,14 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_045_To_046(conn, splashManager);
          }
 
-         // 46 -> 47    22.?
+         // 46 -> 47    22.3.0
          if (currentDbVersion == 46) {
             currentDbVersion = _dbDesignVersion_New = updateDb_046_To_047(conn, splashManager);
+         }
+
+         // 47 -> 48    22.X ??
+         if (currentDbVersion == 47) {
+            currentDbVersion = _dbDesignVersion_New = 48;
          }
 
          // update db design version number
@@ -5861,6 +5868,8 @@ public class TourDatabase {
          updateDb_042_to_043_DataUpdate(conn, splashManager);
          updateDb_046_to_047_DataUpdate(conn, splashManager);
 
+         updateDb__3_Data_Concurrent(conn, splashManager, new TourDataUpdate_047_to_048());
+
       } catch (final SQLException e) {
 
          UI.showSQLException(e);
@@ -5870,6 +5879,156 @@ public class TourDatabase {
       }
 
       return true;
+   }
+
+   private void updateDb__3_Data_Concurrent(final Connection connection,
+                                            final SplashManager splashManager,
+                                            final ITourDataUpdate tourDataUpdater) throws SQLException {
+
+      final long startTime = System.currentTimeMillis();
+
+      final int dbDataVersion = tourDataUpdater.getDatabaseVersion();
+
+      if (getDbVersion(connection, TABLE_DB_VERSION_DATA) >= dbDataVersion) {
+         // data version is higher -> nothing to do
+         return;
+      }
+
+      long lastUpdateTime = startTime;
+
+      int tourIndex = 1;
+      int lastUpdateNumItems = 1;
+      int sumUpdatedTours = 0;
+
+      final List<Long> allTourIds = getAllTourIds();
+      final int numAllTourIds = allTourIds.size();
+
+      for (final Long tourId : allTourIds) {
+
+         if (splashManager != null) {
+
+            final long currentTime = System.currentTimeMillis();
+            final long timeDiff = currentTime - lastUpdateTime;
+
+            // reduce logging
+            if (timeDiff > DELAY_SPLASH_LOGGING
+
+                  // update UI for the last tour otherwise it looks like that not all data are converted
+                  || tourIndex == numAllTourIds) {
+
+               lastUpdateTime = currentTime;
+
+               final long numTourDiff = tourIndex - lastUpdateNumItems;
+               lastUpdateNumItems = tourIndex;
+               sumUpdatedTours += numTourDiff;
+
+               final String percentValue = String.format(NUMBER_FORMAT_1F, (float) tourIndex / numAllTourIds * 100.0);
+
+               splashManager.setMessage(String.format(
+                     Messages.Tour_Database_PostUpdate,
+                     dbDataVersion,
+                     sumUpdatedTours,
+                     numAllTourIds,
+                     percentValue,
+                     numTourDiff));
+            }
+
+            tourIndex++;
+         }
+
+         updateDb__4_Data_Concurrent_OneTour(tourId, tourDataUpdater);
+      }
+
+      updateVersionNumber_20_AfterDataUpdate(connection, dbDataVersion, startTime);
+   }
+
+   /**
+    * Do data updates concurrently with all available processor threads, this is reducing time
+    * significantly.
+    *
+    * @param tourDataUpdater
+    *           {@link ITourDataUpdate} interface to update a tour
+    * @param tourId
+    *           Tour ID of the tour to be updated
+    * @return
+    */
+   private void updateDb__4_Data_Concurrent_OneTour(final long tourId,
+                                                    final ITourDataUpdate tourDataUpdater) {
+
+      try {
+
+         // put tour ID (queue item) into the queue AND wait when it is full
+
+         _dbUpdateQueue.put(tourId);
+
+      } catch (final InterruptedException e) {
+
+         _isSQLDataUpdateError = true;
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _dbUpdateExecutor.submit(() -> {
+
+         // get last added item
+         final Long queueItem_TourId = _dbUpdateQueue.poll();
+
+         if (queueItem_TourId == null) {
+            return;
+         }
+
+         final EntityManager entityManager = TourDatabase.getInstance().getEntityManager();
+
+         try {
+
+            // get tour data by tour id
+            final TourData tourData = entityManager.find(TourData.class, queueItem_TourId);
+            if (tourData == null) {
+               return;
+            }
+
+            /*
+             * Tour update
+             */
+            final boolean isTourUpdated = tourDataUpdater.updateTourData(tourData);
+            if (!isTourUpdated) {
+               return;
+            }
+
+            boolean isSaved = false;
+
+            final EntityTransaction transaction = entityManager.getTransaction();
+            try {
+
+               transaction.begin();
+               {
+                  entityManager.merge(tourData);
+               }
+               transaction.commit();
+
+            } catch (final Exception e) {
+
+               _isSQLDataUpdateError = true;
+               StatusUtil.showStatus(e);
+
+            } finally {
+               if (transaction.isActive()) {
+                  transaction.rollback();
+               } else {
+                  isSaved = true;
+               }
+            }
+
+            if (!isSaved) {
+               showTourSaveError(tourData);
+            }
+
+         } finally {
+
+            entityManager.close();
+         }
+      });
    }
 
    private void updateDb_001_To_002(final Connection conn) throws SQLException {

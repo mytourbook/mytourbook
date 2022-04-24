@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
@@ -6872,11 +6873,43 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          // tour is imported
 
+         long tourDeviceTimeElapsed;
          if ((_serieTime == null) || (_serieTime.length == 0)) {
-            _tourData.setTourDeviceTime_Elapsed(0);
+            tourDeviceTimeElapsed = 0;
          } else {
-            _tourData.setTourDeviceTime_Elapsed(_serieTime[_serieTime.length - 1]);
+            tourDeviceTimeElapsed = _serieTime[_serieTime.length - 1];
          }
+         _tourData.setTourDeviceTime_Elapsed(tourDeviceTimeElapsed);
+
+         final long[] pausedTime_Start = _tourData.getPausedTime_Start();
+         if (pausedTime_Start != null && pausedTime_Start.length > 0) {
+
+            final List<Long> listPausedTime_Start = Arrays.stream(pausedTime_Start)
+                  .boxed()
+                  .collect(Collectors.toList());
+            final List<Long> listPausedTime_End = Arrays.stream(_tourData.getPausedTime_End())
+                  .boxed()
+                  .collect(Collectors.toList());
+
+            List<Long> listPausedTime_Data = null;
+            final long[] pausedTime_Data = _tourData.getPausedTime_Data();
+
+            if (pausedTime_Data != null) {
+
+               listPausedTime_Data = Arrays.stream(_tourData.getPausedTime_Data())
+                     .boxed()
+                     .collect(Collectors.toList());
+            }
+
+            _tourData.finalizeTour_TimerPauses(listPausedTime_Start,
+                  listPausedTime_End,
+                  listPausedTime_Data);
+         } else {
+            _tourData.setTourDeviceTime_Paused(0);
+         }
+
+         _tourData.setTourDeviceTime_Recorded(tourDeviceTimeElapsed - _tourData.getTourDeviceTime_Paused());
+
          _tourData.computeTourMovingTime();
 
          if ((_serieDistance == null) || (_serieDistance.length == 0)) {
