@@ -34,9 +34,8 @@ public class ActionExportViewCSV extends Action {
 
       _tourSegmenterView = tourSegmenterView;
 
-      //todo fb rename
-      setText(Messages.Tour_Book_Action_ExportViewCSV);
-      setToolTipText(Messages.Tour_Book_Action_ExportViewCSV_Tooltip);
+      setText(Messages.All_View_Action_ExportViewCSV);
+      setToolTipText(Messages.Tour_Segmenter_Action_ExportViewCSV_Tooltip);
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat));
       setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat_Disabled));
