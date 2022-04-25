@@ -258,23 +258,20 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
    static final RGB            STATE_COLOR_TOTALS_DEFAULT_DARK                = new RGB(154, 120, 1);
    //
    //
-   private static final float                    SPEED_DIGIT_VALUE                      = 10.0f;
+   private static final float                    SPEED_DIGIT_VALUE            = 10.0f;
    //
-   private static final String                   CSV_EXPORT_DEFAULT_FILE_NAME           = "TourSegmenter_";              //$NON-NLS-1$
-   private static final String                   SYS_PROP__USE_SIMPLE_CSV_EXPORT_FORMAT = "useSimpleCSVExportFormat";    //$NON-NLS-1$
-   private static boolean                        USE_SIMPLE_CSV_EXPORT_FORMAT           = System.getProperty(
-         SYS_PROP__USE_SIMPLE_CSV_EXPORT_FORMAT) != null;
+   private static final String                   CSV_EXPORT_DEFAULT_FILE_NAME = "TourSegmenter_";              //$NON-NLS-1$
    //
-   private static final IPreferenceStore         _prefStore                             = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore         _prefStore_Common                      = CommonActivator.getPrefStore();
-   private static final IDialogSettings          _state                                 = TourbookPlugin.getState(ID);
+   private static final IPreferenceStore         _prefStore                   = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore         _prefStore_Common            = CommonActivator.getPrefStore();
+   private static final IDialogSettings          _state                       = TourbookPlugin.getState(ID);
    //
    /**
     * Contains all available segmenters.
     * <p>
     * The sequence defines how they are displayed in the combobox.
     */
-   private static final ArrayList<TourSegmenter> _allTourSegmenter                      = new ArrayList<>();
+   private static final ArrayList<TourSegmenter> _allTourSegmenter            = new ArrayList<>();
    static {
 
       _allTourSegmenter.add(new TourSegmenter(
@@ -354,11 +351,11 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          new SurfingFilter(SurfingFilterType.NotSurfing, Messages.Tour_Segmenter_SurfingFilter_Paddling),
    };
    //
+   private static final boolean         _isOSX                    = UI.IS_OSX;
+   //
    private boolean                      CURRENT_UNIT_IS_DISTANCE_MILE;
    private boolean                      CURRENT_UNIT_IS_DISTANCE_NAUTICAL_MILE;
    private boolean                      CURRENT_UNIT_IS_LENGTH_YARD;
-   //
-   private final boolean                _isOSX                    = UI.IS_OSX;
    //
    private TableViewer                  _segmentViewer;
    private SegmenterComparator          _segmentComparator        = new SegmenterComparator();
@@ -798,16 +795,6 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    public void actionExportViewCSV() {
 
-      //todo fb refactor this code to reuse all of it ? most of it ?
-      /*
-       * Get selected items
-       */
-      final ISelection selection;
-
-      // tree view
-
-      final Table segmentViewerTable = _segmentViewer.getTable();
-
       /*
        * Get export filename
        */
@@ -840,12 +827,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          return;
       }
 
-      new CSVExport(segmentViewerTable, selectedFilePath, USE_SIMPLE_CSV_EXPORT_FORMAT);
-
-//      // DEBUGGING: USING DEFAULT PATH
-//      final IPath path = new Path(defaultExportFilePath).removeLastSegments(1).append(defaultExportFileName);
-//
-//      new CSVExport(selection, path.toOSString());
+      new CSVExport(_segmentViewer.getTable(), selectedFilePath);
    }
 
    private void addPartListener() {
@@ -5066,7 +5048,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             STATE_SELECTED_SEGMENTER_BY_USER,
             SegmenterType.ByAltitudeWithDP.name());
       try {
-         _userSelectedSegmenterType = SegmenterType.valueOf(SegmenterType.class, stateSegmenterName);
+         _userSelectedSegmenterType = Enum.valueOf(SegmenterType.class, stateSegmenterName);
       } catch (final Exception e) {
          // set default value
          _userSelectedSegmenterType = SegmenterType.ByAltitudeWithDP;
