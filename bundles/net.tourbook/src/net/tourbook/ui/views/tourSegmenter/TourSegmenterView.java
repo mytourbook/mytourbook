@@ -806,11 +806,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       // tree view
 
-      final Table table = _segmentViewer.getTable();
-
-      if (table == null) {
-         return;
-      }
+      final Table segmentViewerTable = _segmentViewer.getTable();
 
       /*
        * Get export filename
@@ -844,11 +840,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          return;
       }
 
-      new CSVExport(
-            table,
-            selectedFilePath,
-            this,
-            USE_SIMPLE_CSV_EXPORT_FORMAT);
+      new CSVExport(segmentViewerTable, selectedFilePath, USE_SIMPLE_CSV_EXPORT_FORMAT);
 
 //      // DEBUGGING: USING DEFAULT PATH
 //      final IPath path = new Path(defaultExportFilePath).removeLastSegments(1).append(defaultExportFileName);
