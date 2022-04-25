@@ -175,43 +175,40 @@ public class CSVExport {
    public CSVExport(final Table segmentViewerTable,
                     final String selectedFilePath,
                     final boolean isUseSimpleCSVFormat) {
-      _segmentViewerTable = segmentViewerTable;
-      exportCSV(selectedFilePath);
 
-//      if (isUseSimpleCSVFormat) {
-//
-//         SEPARATOR = UI.SYMBOL_SEMICOLON;
-//
-//         csvExport_SimpleFormat(selection, selectedFilePath);
-//
-//      } else {
-//
-//         SEPARATOR = UI.TAB;
-//
-//         csvExport_DefaultFormat(selection, selectedFilePath);
-//      }
+      _segmentViewerTable = segmentViewerTable;
+
+      SEPARATOR = UI.TAB;
+      csvExport(selectedFilePath);
+
+         //  csvExport_DefaultFormat(selection, selectedFilePath);
 
    }
 
-   private void exportCSV(final String selectedFilePath) {
+   private void csvExport(final String selectedFilePath) {
+
       final File file = new File(selectedFilePath);
+
       try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+
          final int[] columnOrder = _segmentViewerTable.getColumnOrder();
+
          for (final int columnIndex : columnOrder) {
+
             final TableColumn tableColumn = _segmentViewerTable.getColumn(columnIndex);
 
-            writer.write(tableColumn.getText());
-            writer.write(",");
+            writer.write(tableColumn.getText() + UI.TAB);
          }
          writer.write("\n");
 
          final int itemCount = _segmentViewerTable.getItemCount();
          for (int itemIndex = 0; itemIndex < itemCount; itemIndex++) {
+
             final TableItem item = _segmentViewerTable.getItem(itemIndex);
 
             for (final int columnIndex : columnOrder) {
                writer.write(item.getText(columnIndex));
-               writer.write(",");
+               writer.write(UI.TAB);
             }
             writer.write("\n");
          }
@@ -282,63 +279,6 @@ public class CSVExport {
                }
             }
          }
-
-      } catch (final IOException e) {
-         StatusUtil.showStatus(e);
-      }
-   }
-
-   private void csvExport_SimpleFormat(final ISelection selection, final String selectedFilePath) {
-
-      try (FileOutputStream fileOutputStream = new FileOutputStream(selectedFilePath);
-            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
-            Writer exportWriter = new BufferedWriter(outputStreamWriter)) {
-
-         final StringBuilder stringBuilder = new StringBuilder();
-
-         // Date (yyyy-mm-dd);
-         // Time (hh-mm);
-         // Duration (sec);
-         // Paused Time (sec);
-         // Distance (m);
-         // Title;
-         // Comment;
-         // Tour Type;
-         // Tags;
-         // Altitude Up (m);
-         // Altitude Down (m);
-         stringBuilder.append(TOUR_CSV_ID_3);
-         stringBuilder.append(NL);
-
-         exportWriter.write(stringBuilder.toString());
-
-//         if (selection instanceof ITreeSelection) {
-//
-//            for (final TreePath treePath : ((ITreeSelection) selection).getPaths()) {
-//
-//               final int numSegment = treePath.getSegmentCount();
-//
-//               for (int segmentIndex = 0; segmentIndex < numSegment; segmentIndex++) {
-//
-//                  final Object segment = treePath.getSegment(segmentIndex);
-//
-//                  if (segment instanceof TVITourBookTour) {
-//
-//                     csvExport_SimpleFormat_Tour(exportWriter, (TVITourBookTour) segment);
-//                  }
-//               }
-//            }
-//
-//         } else if (selection instanceof StructuredSelection) {
-//
-//            for (final Object element : (StructuredSelection) selection) {
-//
-//               if (element instanceof TVITourBookTour) {
-//
-//                  csvExport_SimpleFormat_Tour(exportWriter, (TVITourBookTour) element);
-//               }
-//            }
-//         }
 
       } catch (final IOException e) {
          StatusUtil.showStatus(e);
