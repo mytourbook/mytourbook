@@ -16,7 +16,9 @@
 package net.tourbook.ui.views.tourSegmenter;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
@@ -31,6 +33,9 @@ import net.tourbook.ui.views.tourBook.TVITourBookTour;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 
 public class CSVExport {
 
@@ -168,25 +173,51 @@ public class CSVExport {
     *           When <code>true</code> then the CSVTourDataReader can read the exported file,
     *           otherwise all values are exported
     */
-   public CSVExport(final ISelection selection,
+   public CSVExport(final Table table,
                     final String selectedFilePath,
                     final TourSegmenterView tourSegmenterView,
                     final boolean isUseSimpleCSVFormat) {
 
       _tourSegmenterView = tourSegmenterView;
+      final File file = new File("C:\\users\\frederic\\Desktop\\exportedTable.txt");
+      try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+         final int[] columnOrder = table.getColumnOrder();
+         for (final int columnIndex : columnOrder) {
+            final TableColumn tableColumn = table.getColumn(columnIndex);
 
-      if (isUseSimpleCSVFormat) {
+            writer.write(tableColumn.getText());
+            writer.write(",");
+         }
+         writer.write("\n");
 
-         SEPARATOR = UI.SYMBOL_SEMICOLON;
+         final int itemCount = table.getItemCount();
+         for (int itemIndex = 0; itemIndex < itemCount; itemIndex++) {
+            final TableItem item = table.getItem(itemIndex);
 
-         csvExport_SimpleFormat(selection, selectedFilePath);
-
-      } else {
-
-         SEPARATOR = UI.TAB;
-
-         csvExport_DefaultFormat(selection, selectedFilePath);
+            for (final int columnIndex : columnOrder) {
+               writer.write(item.getText(columnIndex));
+               writer.write(",");
+            }
+            writer.write("\n");
+         }
+      } catch (final IOException ioe) {
+         // TODO: add logic to inform the user of the problem
+         System.err.println("trouble exporting table data to file");
+         ioe.printStackTrace();
       }
+
+//      if (isUseSimpleCSVFormat) {
+//
+//         SEPARATOR = UI.SYMBOL_SEMICOLON;
+//
+//         csvExport_SimpleFormat(selection, selectedFilePath);
+//
+//      } else {
+//
+//         SEPARATOR = UI.TAB;
+//
+//         csvExport_DefaultFormat(selection, selectedFilePath);
+//      }
 
    }
 

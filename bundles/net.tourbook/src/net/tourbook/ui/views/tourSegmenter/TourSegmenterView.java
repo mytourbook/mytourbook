@@ -806,9 +806,9 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
       // tree view
 
-      selection = _segmentViewer.getSelection();
+      final Table table = _segmentViewer.getTable();
 
-      if (selection.isEmpty()) {
+      if (table == null) {
          return;
       }
 
@@ -845,7 +845,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       }
 
       new CSVExport(
-            selection,
+            table,
             selectedFilePath,
             this,
             USE_SIMPLE_CSV_EXPORT_FORMAT);
