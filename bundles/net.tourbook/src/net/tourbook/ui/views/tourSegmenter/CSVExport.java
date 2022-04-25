@@ -169,9 +169,9 @@ public class CSVExport {
     *           otherwise all values are exported
     */
    public CSVExport(final ISelection selection,
-             final String selectedFilePath,
+                    final String selectedFilePath,
                     final TourSegmenterView tourSegmenterView,
-             final boolean isUseSimpleCSVFormat) {
+                    final boolean isUseSimpleCSVFormat) {
 
       _tourSegmenterView = tourSegmenterView;
 
@@ -451,7 +451,6 @@ public class CSVExport {
 
    }
 
-
    private void export_140_Header_Elevation(final StringBuilder stringBuilder) {
 
 // SET_FORMATTING_OFF
@@ -515,8 +514,6 @@ public class CSVExport {
 
    }
 
-
-
    private void export_220_Header_RunningDynamics(final StringBuilder stringBuilder) {
 
 // SET_FORMATTING_OFF
@@ -558,9 +555,6 @@ public class CSVExport {
 // SET_FORMATTING_ON
 
    }
-
-
-
 
 //   private void export_400_Value_DateColumns(final StringBuilder stringBuilder,
 //                                             final int segmentCount,
