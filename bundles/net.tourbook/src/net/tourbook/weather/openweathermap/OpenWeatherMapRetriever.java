@@ -65,7 +65,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    }
 
    @Override
-   protected String buildFullWeatherDataString() {
+   protected String buildFullWeatherDataString(final boolean displayStationInformation) {
 
       final List<String> fullWeatherDataList = new ArrayList<>();
 

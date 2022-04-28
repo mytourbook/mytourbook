@@ -18,6 +18,7 @@ package net.tourbook.weather;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.TourLogManager;
@@ -51,10 +52,6 @@ public final class TourWeatherRetriever {
 
       case IWeatherProvider.Pref_Weather_Provider_None:
       default:
-         break;
-      }
-
-      if (historicalWeatherRetriever == null) {
          return false;
       }
 
@@ -68,9 +65,22 @@ public final class TourWeatherRetriever {
 
          if (_prefStore.getBoolean(ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG)) {
 
-            TourLogManager.subLog_INFO(historicalWeatherRetriever.buildFullWeatherDataString());
+            final String fullWeatherDataString = historicalWeatherRetriever.buildFullWeatherDataString(true);
+            TourLogManager.subLog_INFO(fullWeatherDataString);
          }
+         if (_prefStore.getBoolean(ITourbookPreferences.WEATHER_SAVE_LOG_IN_TOUR_WEATHER_DESCRIPTION)) {
 
+            String tourDataWeather = tourData.getWeather();
+            if (StringUtils.hasContent(tourDataWeather)) {
+               tourDataWeather += UI.SYSTEM_NEW_LINE;
+            }
+
+            //todo fb for 100-milers, there is not enough space !!!
+            //possibilities: remove the space by ", "
+            //do not output the 0mm precipitations
+            final String fullWeatherDataString = historicalWeatherRetriever.buildFullWeatherDataString(false);
+            tourData.setWeather(tourDataWeather + fullWeatherDataString);
+         }
       } else {
          TourLogManager.subLog_INFO(String.format(
                Messages.Log_RetrieveWeatherData_003_NoWeatherData,

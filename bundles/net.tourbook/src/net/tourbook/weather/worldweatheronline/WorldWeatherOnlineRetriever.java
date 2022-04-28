@@ -107,7 +107,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    }
 
    @Override
-   protected String buildFullWeatherDataString() {
+   protected String buildFullWeatherDataString(final boolean displayStationInformation) {
 
       final List<String> fullWeatherDataList = new ArrayList<>();
 
@@ -130,38 +130,41 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
          fullWeatherDataList.add(fullWeatherData);
       }
 
-      //Adding the weather station information
-      final List<NearestArea> nearestArea = weatherData.getNearestArea();
-      if (nearestArea != null && nearestArea.size() > 0) {
+      if (displayStationInformation) {
 
-         final NearestArea firstNearestArea = nearestArea.get(0);
+         //Adding the weather station information
+         final List<NearestArea> nearestArea = weatherData.getNearestArea();
+         if (nearestArea != null && nearestArea.size() > 0) {
 
-         String weatherStationName = UI.EMPTY_STRING;
-         if (firstNearestArea.getAreaName() != null && firstNearestArea.getAreaName().size() > 0) {
-            weatherStationName = firstNearestArea.getAreaName().get(0).getValue();
+            final NearestArea firstNearestArea = nearestArea.get(0);
+
+            String weatherStationName = UI.EMPTY_STRING;
+            if (firstNearestArea.getAreaName() != null && firstNearestArea.getAreaName().size() > 0) {
+               weatherStationName = firstNearestArea.getAreaName().get(0).getValue();
+            }
+
+            final LatLng weatherStationCoordinates = new LatLng(
+                  Double.valueOf(firstNearestArea.getLatitude()),
+                  Double.valueOf(firstNearestArea.getLongitude()));
+
+            final float distanceFromTour = Math.round(
+                  LatLngTool.distance(
+                        searchAreaCenter,
+                        weatherStationCoordinates,
+                        LengthUnit.METER)
+                        / UI.UNIT_VALUE_DISTANCE / 1000);
+
+            String weatherStationLink = UI.EMPTY_STRING;
+            if (firstNearestArea.getWeatherUrl() != null && firstNearestArea.getWeatherUrl().size() > 0) {
+               weatherStationLink = firstNearestArea.getWeatherUrl().get(0).getValue();
+            }
+
+            fullWeatherDataList.add(NLS.bind(
+                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_WeatherStation_Link,
+                  new Object[] { weatherStationLink,
+                        weatherStationName,
+                        distanceFromTour + UI.UNIT_LABEL_DISTANCE }));
          }
-
-         final LatLng weatherStationCoordinates = new LatLng(
-               Double.valueOf(firstNearestArea.getLatitude()),
-               Double.valueOf(firstNearestArea.getLongitude()));
-
-         final float distanceFromTour = Math.round(
-               LatLngTool.distance(
-                     searchAreaCenter,
-                     weatherStationCoordinates,
-                     LengthUnit.METER)
-                     / UI.UNIT_VALUE_DISTANCE / 1000);
-
-         String weatherStationLink = UI.EMPTY_STRING;
-         if (firstNearestArea.getWeatherUrl() != null && firstNearestArea.getWeatherUrl().size() > 0) {
-            weatherStationLink = firstNearestArea.getWeatherUrl().get(0).getValue();
-         }
-
-         fullWeatherDataList.add(NLS.bind(
-               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_WeatherStation_Link,
-               new Object[] { weatherStationLink,
-                     weatherStationName,
-                     distanceFromTour + UI.UNIT_LABEL_DISTANCE }));
       }
 
       final String fullWeatherData = String.join(
