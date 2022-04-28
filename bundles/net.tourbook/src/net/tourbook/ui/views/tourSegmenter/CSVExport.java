@@ -24,7 +24,6 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 public class CSVExport {
@@ -50,27 +49,26 @@ public class CSVExport {
 
    private void csvExport_CurrentView(final String selectedFilePath) {
 
-      final File file = new File(selectedFilePath);
-
-      try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+      try (BufferedWriter writer = new BufferedWriter(new FileWriter(new File(selectedFilePath)))) {
 
          final int[] columnOrder = _segmentViewerTable.getColumnOrder();
 
+         //Writing the headers
          for (final int columnIndex : columnOrder) {
 
-            final TableColumn tableColumn = _segmentViewerTable.getColumn(columnIndex);
+            final String tableColumnText = _segmentViewerTable.getColumn(columnIndex).getText();
 
-            writer.write(tableColumn.getText() + SEPARATOR);
+            writer.write(tableColumnText + SEPARATOR);
          }
          writer.write(NL);
 
-         final int itemCount = _segmentViewerTable.getItemCount();
-         for (int itemIndex = 0; itemIndex < itemCount; itemIndex++) {
+         //Writing the row data
+         for (int itemIndex = 0; itemIndex < _segmentViewerTable.getItemCount(); itemIndex++) {
 
-            final TableItem item = _segmentViewerTable.getItem(itemIndex);
+            final TableItem tableItem = _segmentViewerTable.getItem(itemIndex);
 
             for (final int columnIndex : columnOrder) {
-               writer.write(item.getText(columnIndex) + SEPARATOR);
+               writer.write(tableItem.getText(columnIndex) + SEPARATOR);
             }
             writer.write(NL);
          }

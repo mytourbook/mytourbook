@@ -25,9 +25,6 @@ public class ActionExportViewCSV extends Action {
 
    private TourSegmenterView _tourSegmenterView;
 
-   /**
-    * @param tourBookView
-    */
    public ActionExportViewCSV(final TourSegmenterView tourSegmenterView) {
 
       super();
