@@ -67,7 +67,7 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
    private boolean                _isToolTipModified;
 
    /*
-    * UI constrols
+    * UI controls
     */
    private Button _chkTourImport_Date;
    private Button _chkTourImport_Time;
@@ -121,6 +121,7 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 
          createUI_10_ViewActions(parent);
          createUI_30_ViewTooltip(parent);
+         createUI_50_ViewTemperatureValues(parent);
       }
    }
 
@@ -437,6 +438,43 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
       // spacer
       label = new Label(container, SWT.NONE);
       GridDataFactory.fillDefaults().span(1, 1).applyTo(label);
+   }
+
+   private void createUI_50_ViewTemperatureValues(final Composite parent) {
+
+      /*
+       * group: column time format
+       */
+      final Group group = new Group(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+      group.setText(Messages.PrefPage_ViewActions_Group);
+      {
+         /*
+          * label: info
+          */
+         Label label = new Label(group, SWT.NONE);
+         GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
+         label.setText(Messages.PrefPage_ViewActions_Label_Info);
+
+         // spacer
+         label = new Label(group, SWT.NONE);
+         GridDataFactory.fillDefaults().span(2, 1).hint(0, 2).applyTo(label);
+
+         /*
+          * combo: double click
+          */
+
+         addField(new ComboFieldEditor(
+               ITourbookPreferences.VIEW_DOUBLE_CLICK_ACTIONS,
+               Messages.PrefPage_ViewActions_Label_DoubleClick,
+               _doubleClickActions,
+               group));
+      }
+      // set group margin after the fields are created
+      final GridLayout gl = (GridLayout) group.getLayout();
+      gl.marginHeight = 5;
+      gl.marginWidth = 5;
+      gl.numColumns = 2;
    }
 
    private void createUI39ToolTipActions(final Composite parent) {
