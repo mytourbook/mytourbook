@@ -320,7 +320,6 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
             _chkSendWeatherDataInDescription.setText(Messages.PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription);
             _chkSendWeatherDataInDescription.setToolTipText(Messages.PrefPage_UploadConfiguration_Button_SendWeatherDataInDescription_Tooltip);
          }
-         //todo fb add with barometer  https://developers.strava.com/docs/uploads/#device-and-elevation-data
          {
             /*
              * Checkbox: Use tour type mapping

@@ -207,7 +207,6 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourBookView extends ViewPart implements ITourProvider2, ITourViewer3, ITourProviderByID, ITreeViewer, INatTable_PropertiesProvider,
       INatTable_TourProvider {
-   //todo fb display most recent tours on top ?
 
 // SET_FORMATTING_OFF
 
