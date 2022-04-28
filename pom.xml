@@ -30,7 +30,7 @@
    </dependencies>	
 
    <properties>
-      <tycho.version>2.7.0</tycho.version>
+      <tycho.version>2.7.1</tycho.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
 
@@ -207,7 +207,7 @@
       
       <plugin>
          <artifactId>jacoco-maven-plugin</artifactId>          <groupId>org.jacoco</groupId>
-                                                               <version>0.8.7</version>
+                                                               <version>0.8.8</version>
          <executions>
             <execution>
                <goals>

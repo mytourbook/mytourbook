@@ -2556,7 +2556,7 @@ public class Messages extends NLS {
    public static String        Tour_Book_Action_delete_selected_tours_dlg_title;
    public static String        Tour_Book_Action_delete_selected_tours_dlg_title_confirm;
    public static String        Tour_Book_Action_delete_selected_tours_menu;
-   public static String        Tour_Book_Action_ExportViewCSV;
+   public static String        All_View_Action_ExportViewCSV;
    public static String        Tour_Book_Action_ExportViewCSV_Tooltip;
    public static String        Tour_Book_Action_ToggleViewLayout_Tooltip;
    public static String        Tour_Book_Combo_statistic_tooltip;
@@ -2565,6 +2565,7 @@ public class Messages extends NLS {
    public static String        Tour_Book_Monitor_CollateSubtask;
    public static String        Tour_Book_Monitor_CollateTask;
    public static String        Tour_Book_SortColumnTooltip;
+   public static String        Tour_Segmenter_Action_ExportViewCSV_Tooltip;
 
    public static String        Tour_Chart_Label_ValuePoint_Title;
 

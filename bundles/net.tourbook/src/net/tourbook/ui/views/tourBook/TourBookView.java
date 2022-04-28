@@ -620,9 +620,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private class NatTable_Configuration_CellStyle extends AbstractRegistryConfiguration {
 
-      private ArrayList<ColumnDefinition> _allSortedColumns;
+      private List<ColumnDefinition> _allSortedColumns;
 
-      public NatTable_Configuration_CellStyle(final ArrayList<ColumnDefinition> allSortedColumns) {
+      public NatTable_Configuration_CellStyle(final List<ColumnDefinition> allSortedColumns) {
 
          _allSortedColumns = allSortedColumns;
       }
