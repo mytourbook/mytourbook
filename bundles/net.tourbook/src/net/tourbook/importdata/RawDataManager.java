@@ -58,7 +58,6 @@ import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.common.weather.IWeather;
 import net.tourbook.common.widgets.ComboEnumEntry;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.TourData;
@@ -1811,7 +1810,7 @@ public class RawDataManager {
                tourData.setWeather_Temperature_Max(0);
                tourData.setWeather_Temperature_Min(0);
                tourData.setWeather_Temperature_WindChill(0);
-               tourData.setWeather_Clouds(IWeather.cloudIsNotDefined);
+               tourData.setWeather_Clouds(UI.EMPTY_STRING);
                tourData.setWeather(UI.EMPTY_STRING);
                tourData.setWeather_Humidity((short) 0);
                tourData.setWeather_Pressure(0);

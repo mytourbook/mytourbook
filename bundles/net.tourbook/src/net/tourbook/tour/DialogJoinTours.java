@@ -29,6 +29,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -1237,16 +1238,16 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
           */
          if (_chkIncludeDescription.getSelection()) {
 
-            final String tourDescription = tourData.getTourDescription();
-
             if (joinedDescription.length() > 0) {
                // set space between two tours
                joinedDescription.append(UI.NEW_LINE2);
             }
 
-            joinedDescription.append(Messages.Dialog_JoinTours_Label_Tour);
+            joinedDescription.append(Messages.Dialog_JoinTours_Label_Tour + UI.COLON_SPACE);
             joinedDescription.append(TourManager.getTourTitleDetailed(tourData));
-            if (tourDescription.length() > 0) {
+
+            final String tourDescription = tourData.getTourDescription();
+            if (StringUtils.hasContent(tourDescription)) {
                joinedDescription.append(UI.NEW_LINE);
                joinedDescription.append(tourDescription);
             }

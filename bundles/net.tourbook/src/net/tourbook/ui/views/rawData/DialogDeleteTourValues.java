@@ -72,12 +72,12 @@ public class DialogDeleteTourValues extends TitleAreaDialog {
    private static final String          STATE_IS_DELETE_POWER_AND_SPEED             = "STATE_IS_DELETE_POWER_AND_SPEED";                 //$NON-NLS-1$
    private static final String          STATE_IS_DELETE_RUNNING_DYNAMICS            = "STATE_IS_DELETE_RUNNING_DYNAMICS";                //$NON-NLS-1$
    private static final String          STATE_IS_DELETE_SWIMMING                    = "STATE_IS_DELETE_SWIMMING";                        //$NON-NLS-1$
-   private static final String          STATE_IS_DELETE_WEATHER                     = "STATE_IS_DELETE_WEATHER";                         //$NON-NLS-1$
    private static final String          STATE_IS_DELETE_TEMPERATURE_FROMDEVICE      = "STATE_IS_DELETE_TEMPERATURE_FROMDEVICE";          //$NON-NLS-1$
    private static final String          STATE_IS_DELETE_TIME                        = "STATE_IS_DELETE_TIME";                            //$NON-NLS-1$
    private static final String          STATE_IS_DELETE_TIMER_PAUSES                = "STATE_IS_DELETE_TIMER_PAUSES";                    //$NON-NLS-1$
    private static final String          STATE_IS_DELETE_TOUR_MARKERS                = "STATE_IS_DELETE_TOUR_MARKERS";                    //$NON-NLS-1$
    private static final String          STATE_IS_DELETE_TRAINING                    = "STATE_IS_DELETE_TRAINING";                        //$NON-NLS-1$
+   private static final String          STATE_IS_DELETE_WEATHER                     = "STATE_IS_DELETE_WEATHER";                         //$NON-NLS-1$
 
    private static final IDialogSettings _state                                      = TourbookPlugin.getState("DialogDeleteTourValues"); //$NON-NLS-1$
 
