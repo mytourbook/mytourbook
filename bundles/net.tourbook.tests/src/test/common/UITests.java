@@ -20,19 +20,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import net.tourbook.common.UI;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 
 public class UITests {
 
-   private void setImperialSystem() {
+   @AfterAll
+   static void cleanUp() {
+      setMetricSystem();
+   }
 
-      MeasurementSystem_Manager.setActiveSystemProfileIndex(1, true);
+   private static void setMetricSystem() {
+
+      MeasurementSystem_Manager.setActiveSystemProfileIndex(0, true);
       UI.updateUnits();
    }
 
-   private void setMetricSystem() {
+   private void setImperialSystem() {
 
-      MeasurementSystem_Manager.setActiveSystemProfileIndex(0, true);
+      MeasurementSystem_Manager.setActiveSystemProfileIndex(1, true);
       UI.updateUnits();
    }
 
