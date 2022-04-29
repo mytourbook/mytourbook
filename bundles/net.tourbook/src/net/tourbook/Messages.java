@@ -147,6 +147,7 @@ public class Messages extends NLS {
    public static String        app_action_expand_type_flat;
    public static String        app_action_expand_type_year_day;
    public static String        app_action_expand_type_year_month_day;
+   public static String        App_Action_ExportViewCSV;
    public static String        App_Action_ExtractTour;
    public static String        App_Action_JoinTours;
    public static String        App_Action_Menu_Directory;
@@ -2556,7 +2557,6 @@ public class Messages extends NLS {
    public static String        Tour_Book_Action_delete_selected_tours_dlg_title;
    public static String        Tour_Book_Action_delete_selected_tours_dlg_title_confirm;
    public static String        Tour_Book_Action_delete_selected_tours_menu;
-   public static String        All_View_Action_ExportViewCSV;
    public static String        Tour_Book_Action_ExportViewCSV_Tooltip;
    public static String        Tour_Book_Action_ToggleViewLayout_Tooltip;
    public static String        Tour_Book_Combo_statistic_tooltip;
@@ -2565,7 +2565,6 @@ public class Messages extends NLS {
    public static String        Tour_Book_Monitor_CollateSubtask;
    public static String        Tour_Book_Monitor_CollateTask;
    public static String        Tour_Book_SortColumnTooltip;
-   public static String        Tour_Segmenter_Action_ExportViewCSV_Tooltip;
 
    public static String        Tour_Chart_Label_ValuePoint_Title;
 
@@ -2902,6 +2901,7 @@ public class Messages extends NLS {
    public static String        Tour_Pauses_Column_StartTime_Relative_Label;
    public static String        Tour_Pauses_Column_StartTime_Relative_Tooltip;
 
+   public static String        Tour_Segmenter_Action_ExportViewCSV_Tooltip;
    public static String        Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
    public static String        Tour_Segmenter_Button_SaveTour_Tooltip;
    public static String        tour_segmenter_button_updateAltitude;

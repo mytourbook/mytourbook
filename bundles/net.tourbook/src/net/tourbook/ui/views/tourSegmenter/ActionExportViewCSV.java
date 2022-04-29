@@ -31,7 +31,7 @@ public class ActionExportViewCSV extends Action {
 
       _tourSegmenterView = tourSegmenterView;
 
-      setText(Messages.All_View_Action_ExportViewCSV);
+      setText(Messages.App_Action_ExportViewCSV);
       setToolTipText(Messages.Tour_Segmenter_Action_ExportViewCSV_Tooltip);
 
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat));
