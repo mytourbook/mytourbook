@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
@@ -72,8 +73,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
@@ -798,12 +797,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
          public void update(final ViewerCell cell) {}
       });
 
-      colDef.setControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent e) {
-            onResizeImageColumn();
-         }
-      });
+      colDef.setControlListener(controlResizedAdapter(controlEvent -> onResizeImageColumn()));
    }
 
    /**
@@ -1461,7 +1455,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
    private void restoreStateViewer() {
 
-      final String[] expandedColorDefIds = Util.getStateArray(_state, STATE_EXPANDED_COLOR_DEFINITIONS, null);
+      final String[] expandedColorDefIds = Util.getStateStringArray(_state, STATE_EXPANDED_COLOR_DEFINITIONS, null);
       if (expandedColorDefIds != null) {
 
          final ArrayList<Map3ColorDefinition> expandedColorDefs = new ArrayList<>();
