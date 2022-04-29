@@ -1769,6 +1769,7 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Link_ApiSignup;
    public static String        Pref_Weather_OpenWeatherMap_Label_FiveDaysLimit;
    public static String        Pref_Weather_Provider_None;
+   public static String        Pref_Weather_WeatherApi_Label_SevenDaysLimit;
 
    public static String        Pref_Weather_WorldWeatherOnline_Label_ApiKey_Tooltip;
 

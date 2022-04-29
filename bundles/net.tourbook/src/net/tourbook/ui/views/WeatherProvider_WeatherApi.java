@@ -17,39 +17,32 @@ package net.tourbook.ui.views;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+
 import net.tourbook.Messages;
-import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.util.StringUtils;
-import net.tourbook.common.util.Util;
-import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.common.UI;
 import net.tourbook.weather.HistoricalWeatherRetriever;
-import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
+import net.tourbook.weather.weatherapi.WeatherApiRetriever;
 import net.tourbook.web.WEB;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class WeatherProvider_WeatherApi implements IWeatherProvider {
 
-   private final IPreferenceStore _prefStore = TourbookPlugin.getDefault().getPreferenceStore();
+   private static final String URL_WEATHERAPI_COM = "https://www.weatherapi.com/";//$NON-NLS-1$
 
    /*
     * UI controls
     */
    private Button _btnTestConnection;
-   private Button _chkShowHideApiKey;
-
-   private Label  _labelApiKey;
-
-   private Text   _textApiKey_Value;
 
    public WeatherProvider_WeatherApi() {}
 
@@ -62,120 +55,70 @@ public class WeatherProvider_WeatherApi implements IWeatherProvider {
 
       final Composite container = formToolkit.createComposite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
       {
-         {
-            /*
-             * API key
-             */
+         /*
+          * Weather API webpage
+          */
+         final Link linkApiSignup = new Link(container, SWT.PUSH);
+         linkApiSignup.setText(UI.LINK_TAG_START + URL_WEATHERAPI_COM + UI.LINK_TAG_END);
+         linkApiSignup.setEnabled(true);
+         linkApiSignup.addListener(SWT.Selection, event -> WEB.openUrl(URL_WEATHERAPI_COM));
 
-            // label
-            _labelApiKey = formToolkit.createLabel(container,
-                  Messages.Pref_Weather_Label_ApiKey,
-                  SWT.WRAP);
-            GridDataFactory.fillDefaults()
-                  .indent(defaultHIndent, 0)
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(_labelApiKey);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .indent(defaultHIndent, 0)
+               .applyTo(linkApiSignup);
+      }
+      {
+         /*
+          * Button: test connection
+          */
+         _btnTestConnection = new Button(container, SWT.NONE);
+         _btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
+         _btnTestConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-            // text
-            _textApiKey_Value = new Text(container, SWT.PASSWORD | SWT.BORDER);
-            //todo fb already the possibility to make this tooltip generic
-            _textApiKey_Value.setToolTipText(Messages.Pref_Weather_WorldWeatherOnline_Label_ApiKey_Tooltip);
-            _textApiKey_Value.addModifyListener(event -> onModifyApiKey());
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .applyTo(_textApiKey_Value);
-         }
-         {
-            /*
-             * Show/hide API key
-             */
+            final var previousHour = Instant
+                  .now()
+                  .minus(1, ChronoUnit.HOURS)
+                  .toEpochMilli() / 1000;
 
-            _chkShowHideApiKey = formToolkit.createButton(
-                  container,
-                  Messages.Pref_Weather_Checkbox_ShowOrHideApiKey,
-                  SWT.CHECK);
-            _chkShowHideApiKey.setToolTipText(
-                  Messages.Pref_Weather_Checkbox_ShowOrHideApiKey_Tooltip);
-            _chkShowHideApiKey.addSelectionListener(widgetSelectedAdapter(
-                  selectionEvent -> Util.showOrHidePassword(
-                        _textApiKey_Value,
-                        _chkShowHideApiKey.getSelection())));
-            GridDataFactory.fillDefaults()
-                  .indent(defaultHIndent, 0)
-                  .applyTo(_chkShowHideApiKey);
-         }
-         {
-            /*
-             * WWO Api Sign-up page
-             */
+            HistoricalWeatherRetriever.checkVendorConnection(
+                  WeatherApiRetriever.getBaseApiUrl() +
+                        "?q=0,0&unixdt=" + //$NON-NLS-1$
+                        previousHour,
+                  IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI);
+         }));
 
-            // Link - see http(s)://www.worldweatheronline.com/developer/signup.aspx
-            final Link linkApiSignup = new Link(container, SWT.PUSH);
-            linkApiSignup.setText(Messages.Pref_Weather_Link_ApiSignup);
-            linkApiSignup.setEnabled(true);
-            linkApiSignup.addListener(
-                  SWT.Selection,
-                  event -> WEB.openUrl("https://www.worldweatheronline.com/developer/signup.aspx")); //$NON-NLS-1$
-            GridDataFactory.fillDefaults()
-                  .span(2, 1)
-                  .indent(defaultHIndent, 0)
-                  .applyTo(linkApiSignup);
-         }
-         {
-            /*
-             * Button: test connection
-             */
-            _btnTestConnection = formToolkit.createButton(
-                  container,
-                  Messages.Pref_Weather_Button_TestHTTPConnection,
-                  SWT.NONE);
-            _btnTestConnection.addSelectionListener(widgetSelectedAdapter(
-                  selectionEvent -> HistoricalWeatherRetriever.checkVendorConnection(
-                        WorldWeatherOnlineRetriever.getApiUrl() + _textApiKey_Value.getText(),
-                        IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI)));
-            GridDataFactory.fillDefaults()
-                  .indent(defaultHIndent, 0)
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .span(2, 1)
-                  .applyTo(_btnTestConnection);
-         }
+         GridDataFactory.fillDefaults()
+               .indent(defaultHIndent, 0)
+               .align(SWT.BEGINNING, SWT.FILL)
+               .span(2, 1)
+               .applyTo(_btnTestConnection);
       }
 
-      restoreState();
-      enableControls();
+      {
+         /*
+          * Label:
+          */
+         final Label note = new Label(container, SWT.NONE);
+         note.setText(Messages.Pref_Weather_WeatherApi_Label_SevenDaysLimit);
 
+         GridDataFactory.fillDefaults()
+               .indent(defaultHIndent, 0)
+               .align(SWT.BEGINNING, SWT.FILL)
+               .span(2, 1)
+               .applyTo(note);
+      }
       return container;
    }
 
    @Override
    public void dispose() {}
 
-   private void enableControls() {
-
-      onModifyApiKey();
-   }
-
-   private void onModifyApiKey() {
-
-      _btnTestConnection.setEnabled(StringUtils.hasContent(_textApiKey_Value.getText()));
-   }
+   @Override
+   public void performDefaults() {}
 
    @Override
-   public void performDefaults() {
-
-      _textApiKey_Value.setText(_prefStore.getDefaultString(ITourbookPreferences.WEATHER_API_KEY));
-   }
-
-   private void restoreState() {
-
-      _textApiKey_Value.setText(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
-   }
-
-   @Override
-   public void saveState() {
-
-      _prefStore.setValue(ITourbookPreferences.WEATHER_API_KEY, _textApiKey_Value.getText());
-   }
+   public void saveState() {}
 }
