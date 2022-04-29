@@ -49,6 +49,10 @@ public class WeatherProvidersUI {
                IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP),
 
          new WeatherProvider(
+               IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI,
+               IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI),
+
+         new WeatherProvider(
                IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE,
                IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE)
    };
@@ -59,6 +63,7 @@ public class WeatherProvidersUI {
 
    private IWeatherProvider               _weatherProvider_None               = new WeatherProvider_None();
    private IWeatherProvider               _weatherProvider_OpenWeatherMap     = new WeatherProvider_OpenWeatherMap();
+   private IWeatherProvider               _weatherProvider_WeatherApi         = new WeatherProvider_WorldWeatherOnline();
    private IWeatherProvider               _weatherProvider_WorldWeatherOnline = new WeatherProvider_WorldWeatherOnline();
 
    /*
