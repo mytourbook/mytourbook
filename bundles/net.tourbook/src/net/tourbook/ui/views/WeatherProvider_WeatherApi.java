@@ -85,7 +85,7 @@ public class WeatherProvider_WeatherApi implements IWeatherProvider {
 
             HistoricalWeatherRetriever.checkVendorConnection(
                   WeatherApiRetriever.getBaseApiUrl() +
-                        "?q=0,0&unixdt=" + //$NON-NLS-1$
+                        "?lat=0&lon=0&unixdt=" + //$NON-NLS-1$
                         previousHour,
                   IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI);
          }));
