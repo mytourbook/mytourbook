@@ -60,13 +60,13 @@ public class WeatherProvidersUI {
                IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE)
    };
 
-   private static List<IWeatherProvider>  _weatherProviders     = List.of(
+   private List<IWeatherProvider>         _weatherProviders     = List.of(
          new WeatherProvider_None(),
          new WeatherProvider_OpenWeatherMap(),
          new WeatherProvider_WeatherApi(),
          new WeatherProvider_WorldWeatherOnline());
 
-   private static List<Composite>         _weatherProviderPages = new ArrayList<>();
+   private List<Composite>                _weatherProviderPages = new ArrayList<>();
 
    private final IPreferenceStore         _prefStore            = TourbookPlugin.getPrefStore();
 
