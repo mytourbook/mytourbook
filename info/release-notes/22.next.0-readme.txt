@@ -36,7 +36,8 @@ New
 Improvements
 ============
 
-* 
+* 2.5D Map
+  - Filter photos                      https://github.com/mytourbook/mytourbook/issues/397
 
 
 Changes
@@ -44,7 +45,7 @@ Changes
 
 * Fitlog/FitlogEx Import (Frederic)
   - Differentiating the temperature from the device and the temperature manually entered/from a provider
-  https://sourceforge.net/p/mytourbook/discussion/622811/thread/11993be696/
+    https://sourceforge.net/p/mytourbook/discussion/622811/thread/11993be696/
 
 
 Bugfix
@@ -52,7 +53,7 @@ Bugfix
 
 * Database (Frederic)
   - Fixed an issue where a cloud type was renamed in 22.3.0 and caused a missing icon for "Weather-Showers-Scattered"
-  https://sourceforge.net/p/mytourbook/discussion/622811/thread/11993be696/
+    https://sourceforge.net/p/mytourbook/discussion/622811/thread/11993be696/
 
 * Tour Editor (Frederic)
   - Fixed a bug where the recorded and paused times were not recomputed when using the feature "Delete Time Slices and Remove Time"
