@@ -29,7 +29,8 @@ Experimental
 New
 ===
 
-*
+* Tour Segmenter View (Frederic)
+  - Added the ability to export the current view in .CSV format
 
 
 Improvements
