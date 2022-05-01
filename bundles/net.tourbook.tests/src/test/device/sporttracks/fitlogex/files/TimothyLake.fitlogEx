@@ -16868,8 +16868,7 @@
         <Pause StartTime="2015-05-31T20:29:57.000Z" EndTime="2015-05-31T20:30:39.000Z"/>
         <Pause StartTime="2015-05-31T20:32:27.000Z" EndTime="2015-05-31T20:36:13.000Z"/>
       </TrackClock>
-      <Weather Conditions="PartClouds">
-      </Weather>
+      <Weather Conditions="PartClouds" Temp="-3.889">Sunny with clouds</Weather>
       <CustomDataFields>
         <CustomDataField Id="2622fa98-08a3-485f-b199-674f2b2ecac6" name="TRIMP" v="424.44497680664062"/>
         <CustomDataField Id="9c14447e-3d0a-4faf-b63f-f7727edd7f4a" name="Elevation Change/mile" v="249.309186736876"/>

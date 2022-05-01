@@ -22,6 +22,7 @@ import com.pgssoft.httpclient.HttpClientMock;
 import de.byteholder.geoclipse.map.UI;
 
 import java.lang.reflect.Field;
+import java.nio.file.Paths;
 import java.util.List;
 
 import net.tourbook.cloud.Activator;
@@ -143,6 +144,8 @@ public class SuuntoCloudDownloaderTests {
       final String downloadedFilename = "20110112-19h02-2011-01-13-601227a563c46e612c20b579-running.fit"; //$NON-NLS-1$
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
             downloadedFilename)));
+
+      net.tourbook.common.util.FilesUtils.deleteIfExists(Paths.get(downloadedFilename));
    }
 
    /*

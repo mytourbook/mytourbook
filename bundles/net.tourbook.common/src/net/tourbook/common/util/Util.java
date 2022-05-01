@@ -150,7 +150,7 @@ public class Util {
    }
 
    /**
-    * Revers an array sort order.
+    * Reverse an array sort order.
     *
     * @param arr
     * @return
@@ -429,7 +429,7 @@ public class Util {
     * @param allTexts
     * @return
     */
-   public static String convertListToString(final ArrayList<String> allTexts) {
+   public static String convertListToString(final List<String> allTexts) {
 
       if (allTexts == null) {
          return UI.EMPTY_STRING;
@@ -979,24 +979,6 @@ public class Util {
       sw.flush();
 
       return sw.toString();
-   }
-
-   /**
-    * @param state
-    * @param key
-    * @param defaultValue
-    * @return Returns a string value from {@link IDialogSettings}. When the key is not found, the
-    *         default value is returned.
-    */
-   public static String[] getStateArray(final IDialogSettings state, final String key, final String[] defaultValue) {
-
-      if (state == null) {
-         return defaultValue;
-      }
-
-      final String[] stateValue = state.getArray(key);
-
-      return stateValue == null ? defaultValue : stateValue;
    }
 
    /**
@@ -2780,7 +2762,16 @@ public class Util {
 
    public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
                                                        final String stateKey,
-                                                       final ArrayList<E> allValues) {
+                                                       final Enum<E> value) {
+
+      if (value != null) {
+         state.put(stateKey, value.name());
+      }
+   }
+
+   public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
+                                                       final String stateKey,
+                                                       final List<E> allValues) {
 
       final ArrayList<String> allEnumNames = new ArrayList<>();
 
@@ -2793,15 +2784,6 @@ public class Util {
 
       if (allEnumNames.size() > 0) {
          state.put(stateKey, allEnumNames.toArray(new String[allEnumNames.size()]));
-      }
-   }
-
-   public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
-                                                       final String stateKey,
-                                                       final Enum<E> value) {
-
-      if (value != null) {
-         state.put(stateKey, value.name());
       }
    }
 
