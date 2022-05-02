@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourSegmenter;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -22,12 +24,6 @@ import net.tourbook.common.UI;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -62,14 +58,10 @@ public class ActionTourChartSegmenterConfig extends ContributionItem {
       _imageEnabled = TourbookPlugin.getThemedImageDescriptor(Images.TourSegments).createImage();
       _imageDisabled = TourbookPlugin.getThemedImageDescriptor(Images.TourSegments_Disabled).createImage();
 
-      _parent.addDisposeListener(new DisposeListener() {
+      _parent.addDisposeListener(disposeEvent -> {
 
-         @Override
-         public void widgetDisposed(final DisposeEvent e) {
-
-            _imageEnabled.dispose();
-            _imageDisabled.dispose();
-         }
+         _imageEnabled.dispose();
+         _imageDisabled.dispose();
       });
    }
 
@@ -78,12 +70,9 @@ public class ActionTourChartSegmenterConfig extends ContributionItem {
 
       if (_actionToolItem == null && toolbar != null) {
 
-         toolbar.addDisposeListener(new DisposeListener() {
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-               _actionToolItem.dispose();
-               _actionToolItem = null;
-            }
+         toolbar.addDisposeListener(disposeEvent -> {
+            _actionToolItem.dispose();
+            _actionToolItem = null;
          });
 
          _toolBar = toolbar;
@@ -91,22 +80,14 @@ public class ActionTourChartSegmenterConfig extends ContributionItem {
          _actionToolItem = new ToolItem(toolbar, SWT.CHECK);
          _actionToolItem.setImage(_imageEnabled);
          _actionToolItem.setDisabledImage(_imageDisabled);
-         _actionToolItem.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onAction();
-            }
-         });
+         _actionToolItem.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction()));
 
-         toolbar.addMouseMoveListener(new MouseMoveListener() {
-            @Override
-            public void mouseMove(final MouseEvent e) {
+         toolbar.addMouseMoveListener(mouseEvent -> {
 
-               final Point mousePosition = new Point(e.x, e.y);
-               final ToolItem hoveredItem = toolbar.getItem(mousePosition);
+            final Point mousePosition = new Point(mouseEvent.x, mouseEvent.y);
+            final ToolItem hoveredItem = toolbar.getItem(mousePosition);
 
-               onMouseMove(hoveredItem, e);
-            }
+            onMouseMove(hoveredItem);
          });
 
          _slideoutTCSConfig = new SlideoutTourChartSegmenterProperties(_parent, _toolBar, _tourSegmenterView);
@@ -152,7 +133,7 @@ public class ActionTourChartSegmenterConfig extends ContributionItem {
       _tourSegmenterView.fireSegmentLayerChanged();
    }
 
-   private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {
+   private void onMouseMove(final ToolItem item) {
 
       // ignore other items
       if (item != _actionToolItem) {
@@ -164,19 +145,14 @@ public class ActionTourChartSegmenterConfig extends ContributionItem {
          return;
       }
 
-      final boolean isToolItemHovered = item == _actionToolItem;
-
       Rectangle itemBounds = null;
 
-      if (isToolItemHovered) {
+      itemBounds = item.getBounds();
 
-         itemBounds = item.getBounds();
+      final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
 
-         final Point itemDisplayPosition = _toolBar.toDisplay(itemBounds.x, itemBounds.y);
-
-         itemBounds.x = itemDisplayPosition.x;
-         itemBounds.y = itemDisplayPosition.y;
-      }
+      itemBounds.x = itemDisplayPosition.x;
+      itemBounds.y = itemDisplayPosition.y;
 
       openSlideout(itemBounds, true);
    }

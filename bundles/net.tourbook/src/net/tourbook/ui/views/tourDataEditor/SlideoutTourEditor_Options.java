@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.tourDataEditor;
+
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -31,10 +33,8 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -52,22 +52,26 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
    private ActionResetToDefaults _actionRestoreDefaults;
 
+   private SelectionListener     _defaultSelectionListener;
+
    private PixelConverter        _pc;
+
+   private int                   _hintValueFieldWidth;
 
    /*
     * UI controls
     */
    private Composite _shellContainer;
 
-   private Spinner   _spinnerLatLonDigits;
-   private Spinner   _spinnerDescriptionNumLines;
+   private Button    _chkRecomputeElevation;
 
-   private int       _hintValueFieldWidth;
+   private Spinner   _spinnerDescriptionNumLines;
+   private Spinner   _spinnerLatLonDigits;
 
    public SlideoutTourEditor_Options(final Control ownerControl,
-                                      final ToolBar toolBar,
-                                      final IDialogSettings state,
-                                      final TourDataEditorView tourEditorView) {
+                                     final ToolBar toolBar,
+                                     final IDialogSettings state,
+                                     final TourDataEditorView tourEditorView) {
 
       super(ownerControl, toolBar);
 
@@ -170,18 +174,10 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
          _spinnerDescriptionNumLines = new Spinner(parent, SWT.BORDER);
          _spinnerDescriptionNumLines.setMinimum(1);
          _spinnerDescriptionNumLines.setMaximum(100);
-         _spinnerDescriptionNumLines.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               UI.adjustSpinnerValueOnMouseScroll(event);
-               onSelect_NumDescriptionLines();
-            }
-         });
-         _spinnerDescriptionNumLines.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelect_NumDescriptionLines();
-            }
+         _spinnerDescriptionNumLines.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_NumDescriptionLines()));
+         _spinnerDescriptionNumLines.addMouseWheelListener(mouseEvent -> {
+            UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+            onSelect_NumDescriptionLines();
          });
          spinnerGridData.applyTo(_spinnerDescriptionNumLines);
       }
@@ -202,20 +198,22 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
          _spinnerLatLonDigits = new Spinner(parent, SWT.BORDER);
          _spinnerLatLonDigits.setMinimum(0);
          _spinnerLatLonDigits.setMaximum(20);
-         _spinnerLatLonDigits.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               UI.adjustSpinnerValueOnMouseScroll(event);
-               onSelect_LatLonDigits();
-            }
-         });
-         _spinnerLatLonDigits.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelect_LatLonDigits();
-            }
+         _spinnerLatLonDigits.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_LatLonDigits()));
+         _spinnerLatLonDigits.addMouseWheelListener(mouseEvent -> {
+            UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+            onSelect_LatLonDigits();
          });
          spinnerGridData.applyTo(_spinnerLatLonDigits);
+      }
+      {
+         /*
+          * Recompute elevation up/down when saved
+          */
+         _chkRecomputeElevation = new Button(parent, SWT.CHECK);
+         _chkRecomputeElevation.setText(Messages.Slideout_TourEditor_Checkbox_RecomputeElevationUpDown);
+         _chkRecomputeElevation.setToolTipText(Messages.Slideout_TourEditor_Checkbox_RecomputeElevationUpDown_Tooltip);
+         _chkRecomputeElevation.addSelectionListener(_defaultSelectionListener);
+         GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkRecomputeElevation);
       }
    }
 
@@ -224,6 +222,13 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _pc = new PixelConverter(parent);
 
       _hintValueFieldWidth = _pc.convertWidthInCharsToPixels(3);
+
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
+   }
+
+   private void onChangeUI() {
+
+      saveState();
    }
 
    private void onSelect_LatLonDigits() {
@@ -249,12 +254,15 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
       final int descriptionNumberOfLines = TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT;
       final int latLonDigits = TourDataEditorView.STATE_LAT_LON_DIGITS_DEFAULT;
+      final boolean isRecomputeElevation = TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT;
 
       // update model
       _state.put(TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES, descriptionNumberOfLines);
+      _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN, isRecomputeElevation);
       _state.put(TourDataEditorView.STATE_LAT_LON_DIGITS, latLonDigits);
 
       // update UI
+      _chkRecomputeElevation.setSelection(isRecomputeElevation);
       _spinnerDescriptionNumLines.setSelection(descriptionNumberOfLines);
       _spinnerLatLonDigits.setSelection(latLonDigits);
 
@@ -264,15 +272,22 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
    private void restoreState() {
 
-      _spinnerDescriptionNumLines.setSelection(Util.getStateInt(
-            _state,
+      _chkRecomputeElevation.setSelection(Util.getStateBoolean(_state,
+            TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,
+            TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT));
+
+      _spinnerDescriptionNumLines.setSelection(Util.getStateInt(_state,
             TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES,
             TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT));
 
-      _spinnerLatLonDigits.setSelection(Util.getStateInt(
-            _state,
+      _spinnerLatLonDigits.setSelection(Util.getStateInt(_state,
             TourDataEditorView.STATE_LAT_LON_DIGITS,
             TourDataEditorView.STATE_LAT_LON_DIGITS_DEFAULT));
+   }
+
+   private void saveState() {
+
+      _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN, _chkRecomputeElevation.getSelection());
    }
 
 }

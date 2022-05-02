@@ -254,16 +254,14 @@ public class Map25ConfigManager {
     * Contains all configurations which are loaded from a xml file.
     */
    private static final ArrayList<Map25TrackConfig> _allTrackConfigs  = new ArrayList<>();
-   private static Map25TrackConfig                  _activeTrackConfig;
    private static final ArrayList<MarkerConfig>     _allMarkerConfigs = new ArrayList<>();
+   private static Map25TrackConfig                  _activeTrackConfig;
    private static MarkerConfig                      _activeMarkerConfig;
    //
    private static String                            _fromXml_ActiveMarkerConfigId;
    private static String                            _fromXml_ActiveTrackConfigId;
 
-   // !!! enable new formatting
-   {}
-
+   //
    private static XMLMemento create_Root() {
 
       final XMLMemento xmlRoot = XMLMemento.createWriteRoot(TAG_ROOT);
@@ -572,7 +570,7 @@ public class Map25ConfigManager {
 
       // this case should not happen but ensure that a correct config is set
 
-      _activeMarkerConfig = _allMarkerConfigs.get(0);
+      setActiveMarkerConfig(_allMarkerConfigs.get(0));
 
       return 0;
    }
@@ -846,7 +844,7 @@ public class Map25ConfigManager {
          }
 
          _activeTrackConfig = getConfig_Track();
-         _activeMarkerConfig = getConfig_Marker();
+         setActiveMarkerConfig(getConfig_Marker());
 
       } catch (final Exception e) {
          StatusUtil.log(e);
@@ -871,7 +869,7 @@ public class Map25ConfigManager {
       newConfig.name = oldName;
 
       // update model
-      _activeMarkerConfig = newConfig;
+      setActiveMarkerConfig(newConfig);
       _allMarkerConfigs.add(activeMarkerConfigIndex, newConfig);
    }
 
@@ -879,7 +877,7 @@ public class Map25ConfigManager {
 
       createDefaults_Markers();
 
-      _activeMarkerConfig = _allMarkerConfigs.get(0);
+      setActiveMarkerConfig(_allMarkerConfigs.get(0));
    }
 
    private static void restoreState_10_Options(final XMLMemento xmlRoot) {
@@ -1089,7 +1087,7 @@ public class Map25ConfigManager {
       }
 
       animator.cancel();
-      animator.animateTo(//
+      animator.animateTo(
             locationAnimationTime,
             boundingBox,
             Easing.Type.SINE_INOUT,

@@ -1466,11 +1466,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _markertoolkit = new MarkerToolkit(MarkerShape.STAR);
       if (config.isMarkerClustered) {
          //_layer_MapBookmark = new ItemizedLayer<>(mMap, new ArrayList<MarkerItem>(), _markertoolkit._markerRendererFactory, this);
-         _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit._markerRendererFactory, _markertoolkit);
+         _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit.getMarkerRendererFactory(), _markertoolkit);
       } else {
-         _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit._symbol, _markertoolkit);
+         _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit.getMarkerSymbol(), _markertoolkit);
       }
-      final List<MarkerInterface> pts = _markertoolkit.createMarkerItemList(_markerMode);
+      final List<MarkerInterface> pts = _markertoolkit.createBookmarksAsMapMarker(_markerMode);
       _layer_MapBookmark.addItems(pts);
       _layer_MapBookmark.setEnabled(false);
       layers.add(_layer_MapBookmark);
@@ -1484,7 +1484,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
          _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit._markerRendererFactory, _photoToolkit);
       } else {
-         _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit._symbol, _photoToolkit);
+         _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit.getSymbol(), _photoToolkit);
       }
       //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loaded yet
       _layer_Photo.setEnabled(false);
@@ -1535,28 +1535,42 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
       final Layers layers = mMap.layers();
       final int layer_index_MapBookmarkLayer = layers.indexOf(_layer_MapBookmark);
-      final boolean isShowMapBookmarkLayer = config.isShowMapBookmark;
-      //debugPrint(" map25: # updateUI_MapBookmarkLayer(): entering"); //$NON-NLS-1$
-      if (config.isMarkerClustered != _markertoolkit._isMarkerClusteredLast) { // only recreate MapBookmarkLayer when changed in UI
+
+      // only recreate MapBookmarkLayer when changed in UI
+      if (config.isMarkerClustered != _markertoolkit.isMarkerClusteredLast()) {
 
          layers.remove(_layer_MapBookmark);
+
          if (config.isMarkerClustered) {
-            _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit._markerRendererFactory, _markertoolkit);
+
+            _layer_MapBookmark = new ItemizedLayer(
+                  mMap,
+                  new ArrayList<MarkerInterface>(),
+                  _markertoolkit.getMarkerRendererFactory(),
+                  _markertoolkit);
+
          } else {
-            _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit._symbol, _markertoolkit);
+
+            _layer_MapBookmark = new ItemizedLayer(
+                  mMap,
+                  new ArrayList<MarkerInterface>(),
+                  _markertoolkit.getMarkerSymbol(),
+                  _markertoolkit);
          }
+
          layers.add(layer_index_MapBookmarkLayer, _layer_MapBookmark);
-         //debugPrint(" map25: " + "# updateUI_MapBookmarkLayer(): index is now: " + layer_index_MapBookmark); //$NON-NLS-1$
+
       } else {
+
          _layer_MapBookmark.removeAllItems();
       }
 
-      final List<MarkerInterface> pts = _markertoolkit.createMarkerItemList(_markerMode);
-      //debugPrint(" map25: " + "# updateUI_MapBookmarkLayer(): #MapBookmartks: " + pts.size()); //$NON-NLS-1$
-      _layer_MapBookmark.addItems(pts);
-      _layer_MapBookmark.setEnabled(isShowMapBookmarkLayer);
+      final List<MarkerInterface> allBookmarkMarker = _markertoolkit.createBookmarksAsMapMarker(_markerMode);
 
-      _markertoolkit._isMarkerClusteredLast = config.isMarkerClustered;
+      _layer_MapBookmark.addItems(allBookmarkMarker);
+      _layer_MapBookmark.setEnabled(config.isShowMapBookmark);
+
+      _markertoolkit.setIsMarkerClusteredLast(config.isMarkerClustered);
    }
 
    /**
@@ -1602,7 +1616,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          if (config.isMarkerClustered) {
             _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit._markerRendererFactory, _photoToolkit);
          } else {
-            _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit._symbol, _photoToolkit);
+            _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit.getSymbol(), _photoToolkit);
          }
 
          if (photoLayerPosition == -1) {
@@ -1616,7 +1630,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          _layer_Photo.removeAllItems();
       }
 
-      final List<MarkerInterface> photoItems = _photoToolkit.createPhotoItems(_map25View.getPhotos());
+      final List<MarkerInterface> photoItems = _photoToolkit.createPhotoItems(_map25View.getFilteredPhotos());
 
       _layer_Photo.addItems(photoItems);
       _layer_Photo.setEnabled(_isShowPhoto);

@@ -1111,9 +1111,9 @@ public class Map2View extends ViewPart implements
       _map.paint();
    }
 
-   public void actionShowPhotos(final boolean isSelected) {
+   private void actionShowPhotos(final boolean isPhotoVisible) {
 
-      _isShowPhoto = isSelected;
+      _isShowPhoto = isPhotoVisible;
 
       enableActions();
 
@@ -1123,6 +1123,11 @@ public class Map2View extends ViewPart implements
       _map.disposeOverlayImageCache();
 
       _map.paint();
+
+      // hide photo filter when photos are hidden
+      if (isPhotoVisible == false) {
+         _actionMap2_PhotoFilter.getPhotoFilterSlideout().close();
+      }
    }
 
    public void actionShowSlider() {

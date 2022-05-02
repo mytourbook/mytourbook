@@ -147,6 +147,7 @@ public class Messages extends NLS {
    public static String        app_action_expand_type_flat;
    public static String        app_action_expand_type_year_day;
    public static String        app_action_expand_type_year_month_day;
+   public static String        App_Action_ExportViewCSV;
    public static String        App_Action_ExtractTour;
    public static String        App_Action_JoinTours;
    public static String        App_Action_Menu_Directory;
@@ -1320,6 +1321,7 @@ public class Messages extends NLS {
    public static String        Photo_Filter_Operator_IsMore;
    public static String        Photo_Filter_Operator_IsMore_Tooltip;
    public static String        Photo_Filter_Title_Map2PhotoFilter;
+   public static String        Photo_Filter_Title_Map25PhotoFilter;
 
    public static String        Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip;
    public static String        Photo_Gallery_Action_ToggleGalleryVertical_ToolTip;
@@ -2161,6 +2163,8 @@ public class Messages extends NLS {
    public static String        Slideout_TourChartOptions_Radio_SRTM3;
    public static String        Slideout_TourChartSmoothing_Label_Title;
 
+   public static String        Slideout_TourEditor_Checkbox_RecomputeElevationUpDown;
+   public static String        Slideout_TourEditor_Checkbox_RecomputeElevationUpDown_Tooltip;
    public static String        Slideout_TourEditor_Label_LatLonDigits;
    public static String        Slideout_TourEditor_Label_LatLonDigits_Tooltip;
    public static String        Slideout_TourEditor_Label_Title;
@@ -2559,7 +2563,6 @@ public class Messages extends NLS {
    public static String        Tour_Book_Action_delete_selected_tours_dlg_title;
    public static String        Tour_Book_Action_delete_selected_tours_dlg_title_confirm;
    public static String        Tour_Book_Action_delete_selected_tours_menu;
-   public static String        Tour_Book_Action_ExportViewCSV;
    public static String        Tour_Book_Action_ExportViewCSV_Tooltip;
    public static String        Tour_Book_Action_ToggleViewLayout_Tooltip;
    public static String        Tour_Book_Combo_statistic_tooltip;
@@ -2904,6 +2907,7 @@ public class Messages extends NLS {
    public static String        Tour_Pauses_Column_StartTime_Relative_Label;
    public static String        Tour_Pauses_Column_StartTime_Relative_Tooltip;
 
+   public static String        Tour_Segmenter_Action_ExportViewCSV_Tooltip;
    public static String        Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
    public static String        Tour_Segmenter_Button_SaveTour_Tooltip;
    public static String        tour_segmenter_button_updateAltitude;

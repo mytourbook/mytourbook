@@ -66,17 +66,16 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
     * This image is displayed when a photo is not yet loaded
     */
    private Bitmap   _bitmapNotLoadedPhoto;
-   private Bitmap   _bitmapCluster;
 // private Bitmap   _bitmapClusterPhoto;   // The Bitmap when markers are clustered
 
-   public MarkerSymbol          _symbol;               //marker symbol, circle or star
+   private MarkerSymbol         _symbol;               // marker symbol, circle or star
 
    public MarkerRendererFactory _markerRendererFactory;
 
 // private boolean _isBillboard;
    public boolean _isMarkerClusteredLast;
 
-   public class ImageState {
+   private class ImageState {
 
       Image   _photoImage;
       boolean _isMustDisposeImage;
@@ -123,13 +122,10 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       //debugPrint(" ** PhotoToolkit + *** Constructor"); //$NON-NLS-1$
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-      loadConfig();
-
       _fillPainter.setStyle(Paint.Style.FILL);
 
-      _bitmapCluster = createClusterBitmap(1);
 //    _bitmapPhoto = createPhotoBitmap();
-      _bitmapNotLoadedPhoto = createPoiBitmap(MarkerShape.CIRCLE);
+      _bitmapNotLoadedPhoto = createShapeBitmap(MarkerShape.CIRCLE);
 //    _bitmapClusterPhoto = createPoiBitmap(MarkerShape.CIRCLE); //must be replaced later, like MarkerToolkit
 
       _symbol = new MarkerSymbol(_bitmapNotLoadedPhoto, MarkerSymbol.HotspotPlace.BOTTOM_CENTER, false);
@@ -145,11 +141,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
                @Override
                protected Bitmap getClusterBitmap(final int size) {
 
-                  // Can customize cluster bitmap here
-                  //debugPrint("??? Markertoolkit:  cluster size: " + size); //$NON-NLS-1$
-                  _bitmapCluster = createClusterBitmap(size);
-
-                  return _bitmapCluster;
+                  return createClusterBitmap(size);
                }
             };
          }
@@ -226,7 +218,7 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
     * @param isPhotoScaled
     * @return
     */
-   public List<MarkerInterface> createPhotoItems(final ArrayList<Photo> galleryPhotos) {
+   public List<MarkerInterface> createPhotoItems(final List<Photo> galleryPhotos) {
 
       final List<MarkerInterface> allPhotoItems = new ArrayList<>();
 
@@ -405,6 +397,10 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       }
 
       return new ImageState(scaledImage, isMustDisposeImage);
+   }
+
+   public MarkerSymbol getSymbol() {
+      return _symbol;
    }
 
    @Override

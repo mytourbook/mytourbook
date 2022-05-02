@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -106,14 +106,15 @@ public class SlideoutPhotoFilter extends AdvancedSlideout {
 
    public SlideoutPhotoFilter(final ToolItem toolItem,
                               final IMapWithPhotos mapWithPhotos,
-                              final IDialogSettings state) {
+                              final IDialogSettings state,
+                              final String slideoutTitle) {
 
       super(toolItem.getParent(), state, new int[] { 220, 100, 220, 100 });
 
       _toolItem = toolItem;
       _mapWithPhotos = mapWithPhotos;
 
-      setTitleText(Messages.Photo_Filter_Title_Map2PhotoFilter);
+      setTitleText(slideoutTitle);
 
       // prevent that the opened slideout is partly hidden
       setIsForceBoundsToBeInsideOfViewport(true);
