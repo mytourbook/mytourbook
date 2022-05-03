@@ -332,9 +332,6 @@ public class Map25ProviderManager {
                         ? null
                         : (VtmThemes) Util.getXmlEnum(xml, ATTR_THEME, getDefaultTheme(tileEncoding));
 
-                  Map25App.debugPrint("################## Name, Url and online_TilePath: " + mapProvider.name + UI.SPACE1 + mapProvider.online_url //$NON-NLS-1$
-                        + mapProvider.online_TilePath);
-
                   allMapProvider.add(mapProvider);
                }
             }
