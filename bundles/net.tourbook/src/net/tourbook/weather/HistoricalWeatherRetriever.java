@@ -55,7 +55,7 @@ public abstract class HistoricalWeatherRetriever {
          try {
 
             final HttpRequest request = HttpRequest
-                  .newBuilder(URI.create(vendorUrl))
+                  .newBuilder(URI.create(vendorUrl.trim()))
                   .GET()
                   .build();
 
