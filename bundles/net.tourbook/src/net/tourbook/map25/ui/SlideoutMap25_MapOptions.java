@@ -53,7 +53,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
     */
    private Composite _parent;
 
-   private Button    _chkShowLayer_BaseMap;
+   private Button    _chkShowLayer_Cartography;
    private Button    _chkShowLayer_Building;
    private Button    _chkShowLayer_Hillshading;
    private Button    _chkShowLayer_Satellite;
@@ -205,16 +205,16 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
          }
          {
             /*
-             * Map
+             * Cartography / map
              */
-            _chkShowLayer_BaseMap = new Button(group, SWT.CHECK);
-            _chkShowLayer_BaseMap.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Cartography);
-            _chkShowLayer_BaseMap.setToolTipText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip);
-            _chkShowLayer_BaseMap.addSelectionListener(_layerSelectionListener);
+            _chkShowLayer_Cartography = new Button(group, SWT.CHECK);
+            _chkShowLayer_Cartography.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Cartography);
+            _chkShowLayer_Cartography.setToolTipText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip);
+            _chkShowLayer_Cartography.addSelectionListener(_layerSelectionListener);
          }
          {
             /*
-             * Satellite
+             * Satellite images
              */
             _chkShowLayer_Satellite = new Button(group, SWT.CHECK);
             _chkShowLayer_Satellite.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Satellite);
@@ -305,7 +305,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       final Map25App mapApp = _map25View.getMapApp();
 
-      mapApp.getLayer_BaseMap().setEnabled(_chkShowLayer_BaseMap.getSelection());
+      mapApp.getLayer_BaseMap().setEnabled(_chkShowLayer_Cartography.getSelection());
       mapApp.getLayer_HillShading().setEnabled(_chkShowLayer_Hillshading.getSelection());
 
       // satellite maps
@@ -332,13 +332,13 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
 // SET_FORMATTING_OFF
 
-      _chkShowLayer_BaseMap      .setSelection(mapApp.getLayer_BaseMap().isEnabled());
-      _chkShowLayer_Hillshading  .setSelection(mapApp.getLayer_HillShading().isEnabled());
-      _chkShowLayer_Satellite    .setSelection(mapApp.getLayer_Satellite().isEnabled());
-      _chkShowLayer_Label        .setSelection(mapApp.getLayer_Label().isEnabled());
-      _chkShowLayer_Scale        .setSelection(mapApp.getLayer_ScaleBar().isEnabled());
-      _chkShowLayer_TileInfo     .setSelection(mapApp.getLayer_TileInfo().isEnabled());
-      _chkShowLayer_Building     .setSelection(mapApp.getLayer_Building().isEnabled());
+      _chkShowLayer_Building     .setSelection(mapApp.getLayer_Building()     .isEnabled());
+      _chkShowLayer_Cartography  .setSelection(mapApp.getLayer_BaseMap()      .isEnabled());
+      _chkShowLayer_Hillshading  .setSelection(mapApp.getLayer_HillShading()  .isEnabled());
+      _chkShowLayer_Label        .setSelection(mapApp.getLayer_Label()        .isEnabled());
+      _chkShowLayer_Scale        .setSelection(mapApp.getLayer_ScaleBar()     .isEnabled());
+      _chkShowLayer_Satellite    .setSelection(mapApp.getLayer_Satellite()    .isEnabled());
+      _chkShowLayer_TileInfo     .setSelection(mapApp.getLayer_TileInfo()     .isEnabled());
 
       _spinnerHillshadingOpacity .setSelection(UI.transformOpacity_WhenRestored(mapApp.getLayer_HillShading_Opacity()));
 

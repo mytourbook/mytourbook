@@ -361,7 +361,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       final int selectedIndex = _listTheme.getSelectionIndex();
 
-      final boolean isThemeFromFile = mapProvider.is_mf_Map && selectedIndex == 0;
+      final boolean isThemeFromFile = mapProvider.isOfflineMap && selectedIndex == 0;
 
       mapProvider.mf_IsThemeFromFile = isThemeFromFile;
 
@@ -374,7 +374,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          int themeIndex = selectedIndex;
 
          // adjust index for offline maps because the first item is not a theme
-         if (mapProvider.is_mf_Map) {
+         if (mapProvider.isOfflineMap) {
             themeIndex--;
          }
 
@@ -478,7 +478,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       String mpTooltip = UI.EMPTY_STRING;
 
-      if (mapProvider.is_mf_Map) {
+      if (mapProvider.isOfflineMap) {
 
          // offline
 
@@ -525,7 +525,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
        */
       _listTheme.removeAll();
 
-      if (mapProvider != null && mapProvider.is_mf_Map) {
+      if (mapProvider != null && mapProvider.isOfflineMap) {
 
          // add an additional option to use the theme from the theme file
 
@@ -545,7 +545,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          return;
       }
 
-      if (mapProvider.is_mf_Map && mapProvider.mf_IsThemeFromFile) {
+      if (mapProvider.isOfflineMap && mapProvider.mf_IsThemeFromFile) {
 
          // select: theme is from a file
          _listTheme.select(0);
@@ -553,7 +553,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
 
       int themeIndex = Map25ProviderManager.getThemeIndex(mapProvider.theme, mapProvider.tileEncoding);
-      if (mapProvider.is_mf_Map) {
+      if (mapProvider.isOfflineMap) {
 
          // adjust because of the offline additional item
 
@@ -572,7 +572,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       _listThemeStyle.removeAll();
 
-      if (mapProvider.is_mf_Map == false) {
+      if (mapProvider.isOfflineMap == false) {
 
          // online map has no theme styles
 
@@ -601,7 +601,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          return;
       }
 
-      if (mapProvider.is_mf_Map && _listTheme.getSelectionIndex() > 0) {
+      if (mapProvider.isOfflineMap && _listTheme.getSelectionIndex() > 0) {
 
          /*
           * When it's an offline map and the themes are NOT from the a file then there are no theme

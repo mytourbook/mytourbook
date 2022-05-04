@@ -307,24 +307,24 @@ public class Map25ProviderManager {
                   mapProvider.name           = Util.getXmlString(xml, ATTR_NAME, UI.EMPTY_STRING);
                   mapProvider.description    = Util.getXmlString(xml, ATTR_DESCRIPTION, UI.EMPTY_STRING);
 
-                  mapProvider.is_mf_Map   = Util.getXmlBoolean(xml, ATTR_IS_OFFLINE_MAP, false);
+                  mapProvider.isOfflineMap   = Util.getXmlBoolean(xml, ATTR_IS_OFFLINE_MAP, false);
 
-                  if (mapProvider.is_mf_Map) {
+                  if (mapProvider.isOfflineMap) {
 
-                     mapProvider.mf_IsThemeFromFile    = Util.getXmlBoolean(xml, ATTR_OFFLINE_IS_THEME_FROM_FILE, true);
-                     mapProvider.mf_MapFilepath        = Util.getXmlString(xml, ATTR_OFFLINE_MAP_FILEPATH, UI.EMPTY_STRING);
-                     mapProvider.mf_ThemeFilepath      = Util.getXmlString(xml, ATTR_OFFLINE_THEME_FILEPATH, UI.EMPTY_STRING);
-                     mapProvider.mf_ThemeStyle         = Util.getXmlString(xml, ATTR_OFFLINE_THEME_STYLE, UI.EMPTY_STRING);
+                     mapProvider.mf_IsThemeFromFile   = Util.getXmlBoolean(xml, ATTR_OFFLINE_IS_THEME_FROM_FILE, true);
+                     mapProvider.mf_MapFilepath       = Util.getXmlString(xml, ATTR_OFFLINE_MAP_FILEPATH, UI.EMPTY_STRING);
+                     mapProvider.mf_ThemeFilepath     = Util.getXmlString(xml, ATTR_OFFLINE_THEME_FILEPATH, UI.EMPTY_STRING);
+                     mapProvider.mf_ThemeStyle        = Util.getXmlString(xml, ATTR_OFFLINE_THEME_STYLE, UI.EMPTY_STRING);
 
                   } else {
 
-                     mapProvider.online_ApiKey              = Util.getXmlString(xml, ATTR_ONLINE_API_KEY, UI.EMPTY_STRING);
-                     mapProvider.online_TilePath            = Util.getXmlString(xml, ATTR_ONLINE_TILE_PATH, "/{Z}/{X}/{Y}.vtm"); //$NON-NLS-1$
-                     mapProvider.online_url                 = Util.getXmlString(xml, ATTR_ONLINE_URL, "http://opensciencemap.org/tiles/vtm"); //$NON-NLS-1$
+                     mapProvider.online_ApiKey        = Util.getXmlString(xml, ATTR_ONLINE_API_KEY, UI.EMPTY_STRING);
+                     mapProvider.online_TilePath      = Util.getXmlString(xml, ATTR_ONLINE_TILE_PATH, "/{Z}/{X}/{Y}.vtm"); //$NON-NLS-1$
+                     mapProvider.online_url           = Util.getXmlString(xml, ATTR_ONLINE_URL, "http://opensciencemap.org/tiles/vtm"); //$NON-NLS-1$
                   }
 // SET_FORMATTING_ON
 
-                  final boolean isOfflineThemeFromFile = mapProvider.is_mf_Map && mapProvider.mf_IsThemeFromFile;
+                  final boolean isOfflineThemeFromFile = mapProvider.isOfflineMap && mapProvider.mf_IsThemeFromFile;
                   final TileEncoding tileEncoding = (TileEncoding) Util.getXmlEnum(xml, ATTR_TILE_ENCODING, TileEncoding.VTM);
 
                   mapProvider.tileEncoding = tileEncoding;
@@ -448,7 +448,7 @@ public class Map25ProviderManager {
 
             final IMemento xml = xmlRoot.createChild(TAG_MAP_PROVIDER);
 
-            final boolean isOfflineMap = mapProvider.is_mf_Map;
+            final boolean isOfflineMap = mapProvider.isOfflineMap;
 
             xml.putString(ATTR_UUID, mapProvider.getId().toString());
 

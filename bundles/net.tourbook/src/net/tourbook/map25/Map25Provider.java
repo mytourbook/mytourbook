@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -33,16 +33,16 @@ public class Map25Provider implements Cloneable {
    public boolean   isDefault;
 
    /**
-    * The field name is Thomas naming, have no idea what it means, this value is currently not set,
-    * except default is false.
+    * When <code>true</code> then the map provider is using the tile encoding
+    * {@link TileEncoding#MF}
     */
-   public boolean   is_mf_Map;
+   public boolean   isOfflineMap;
 
    public String    name        = UI.EMPTY_STRING;
    public String    description = UI.EMPTY_STRING;
 
    /**
-    * Requires that {@link #is_mf_Map} is <code>true</code> which is setting the theme filepath
+    * Requires that {@link #isOfflineMap} is <code>true</code> which is setting the theme filepath
     * {@link #mf_ThemeFilepath}
     */
    public boolean   mf_IsThemeFromFile;
@@ -63,7 +63,11 @@ public class Map25Provider implements Cloneable {
    public String       mf_ThemeFilepath = UI.EMPTY_STRING;
    public String       mf_ThemeStyle    = UI.EMPTY_STRING;
 
-   public TileEncoding tileEncoding          = TileEncoding.MVT;
+   /**
+    * When tile encoding is {@link TileEncoding#MF} then this is an offline map provider where
+    * {@link #isOfflineMap} is <code>true</code>
+    */
+   public TileEncoding tileEncoding     = TileEncoding.MVT;
 
    /*
     * Cached theme properties
@@ -206,7 +210,7 @@ public class Map25Provider implements Cloneable {
 //            + "_id            = " + _id + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "_uuid          = " + _uuid + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
-            + "isOfflineMap   = " + is_mf_Map + "\n" //$NON-NLS-1$ //$NON-NLS-2$
+            + "isOfflineMap   = " + isOfflineMap + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "tileEncoding   = " + tileEncoding + "\n" //$NON-NLS-1$ //$NON-NLS-2$
             + "theme          = " + theme + "\n" //$NON-NLS-1$ //$NON-NLS-2$
 
