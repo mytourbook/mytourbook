@@ -1369,6 +1369,8 @@ public class Messages extends NLS {
    public static String        PrefPage_ViewActions_Label_DoubleClick_OpenTour;
    public static String        PrefPage_ViewActions_Label_DoubleClick_QuickEdit;
    public static String        PrefPage_ViewActions_Label_Info;
+   public static String        PrefPage_ViewActions_Label_TemperatureValues_FromDevice;
+   public static String        PrefPage_ViewActions_Label_TemperatureValues_External;
 
    public static String        PrefPage_ViewTooltip_Button_DisableAll;
    public static String        PrefPage_ViewTooltip_Button_EnableAll;

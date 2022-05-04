@@ -39,9 +39,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageViews extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String     VIEW_TIME_LAYOUT_HH_MM                          = "hh_mm";                           //$NON-NLS-1$
-   public static final String     VIEW_TIME_LAYOUT_HH_MM_SS                       = "hh_mm_ss";                        //$NON-NLS-1$
-
    public static final String     VIEW_DOUBLE_CLICK_ACTION_NONE                   = "None";                            //$NON-NLS-1$
    public static final String     VIEW_DOUBLE_CLICK_ACTION_NONE_NO_WARNING        = "NoneNoWarning";                   //$NON-NLS-1$
    public static final String     VIEW_DOUBLE_CLICK_ACTION_QUICK_EDIT             = "QuickEdit";                       //$NON-NLS-1$
@@ -49,6 +46,9 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
    public static final String     VIEW_DOUBLE_CLICK_ACTION_EDIT_MARKER            = "EditMarker";                      //$NON-NLS-1$
    public static final String     VIEW_DOUBLE_CLICK_ACTION_ADJUST_ALTITUDE        = "AdjustAltitude";                  //$NON-NLS-1$
    public static final String     VIEW_DOUBLE_CLICK_ACTION_OPEN_TOUR_IN_EDIT_AREA = "OpenTourSeparately";              //$NON-NLS-1$
+
+   public static final String     VIEW_TEMPERATURE_VALUES_FROM_DEVICE             = "FromDevice";                      //$NON-NLS-1$
+   public static final String     VIEW_TEMPERATURE_VALUES_EXTERNAL                = "External";                        //$NON-NLS-1$
 
    private String[][]             _doubleClickActions                             = new String[][] {
          { Messages.PrefPage_ViewActions_Label_DoubleClick_QuickEdit, VIEW_DOUBLE_CLICK_ACTION_QUICK_EDIT },
@@ -58,6 +58,12 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
          { Messages.PrefPage_ViewActions_Label_DoubleClick_OpenTour, VIEW_DOUBLE_CLICK_ACTION_OPEN_TOUR_IN_EDIT_AREA },
          { Messages.PrefPage_ViewActions_Label_DoubleClick_None, VIEW_DOUBLE_CLICK_ACTION_NONE },
          { Messages.PrefPage_ViewActions_Label_DoubleClick_NoneNoWarning, VIEW_DOUBLE_CLICK_ACTION_NONE_NO_WARNING },
+         //
+   };
+
+   private String[][]             _temperatureValues                              = new String[][] {
+         { Messages.PrefPage_ViewActions_Label_TemperatureValues_FromDevice, VIEW_TEMPERATURE_VALUES_FROM_DEVICE },
+         { Messages.PrefPage_ViewActions_Label_TemperatureValues_External, VIEW_TEMPERATURE_VALUES_EXTERNAL }
          //
    };
 
@@ -456,7 +462,7 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
          addField(new ComboFieldEditor(
                ITourbookPreferences.VIEW_DOUBLE_CLICK_ACTIONS,
                "Preferred temperature to display", // Messages.PrefPage_ViewActions_Label_DoubleClick,
-               _doubleClickActions,
+               _temperatureValues,
                group));
       }
       // set group margin after the fields are created
