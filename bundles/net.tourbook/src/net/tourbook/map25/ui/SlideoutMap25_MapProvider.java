@@ -363,11 +363,11 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       final boolean isThemeFromFile = mapProvider.isOfflineMap && selectedIndex == 0;
 
-      mapProvider.mf_IsThemeFromFile = isThemeFromFile;
+      mapProvider.offline_IsThemeFromFile = isThemeFromFile;
 
       if (isThemeFromFile) {
 
-         mapProvider.theme = null;
+         mapProvider.vtmTheme = null;
 
       } else {
 
@@ -380,7 +380,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
          //update model
          final VtmThemes[] themeValues = VtmThemes.values();
-         mapProvider.theme = themeValues[themeIndex];
+         mapProvider.vtmTheme = themeValues[themeIndex];
       }
 
       Map25ProviderManager.saveMapProvider();
@@ -421,7 +421,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
 
       // update model
-      mapProvider.mf_ThemeStyle = selectedThemeStyle;
+      mapProvider.offline_ThemeStyle = selectedThemeStyle;
 
       Map25ProviderManager.saveMapProvider();
 
@@ -495,8 +495,8 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          mpTooltip = String.format(Messages.Slideout_Map25Provider_Combo_MapProvider_Offline_Tooltip,
 
                mapProvider.tileEncoding,
-               mapProvider.mf_MapFilepath,
-               mapProvider.mf_ThemeFilepath,
+               mapProvider.offline_MapFilepath,
+               mapProvider.offline_ThemeFilepath,
                themeStyleText
 
          );
@@ -544,7 +544,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
          _listTheme.select(0);
 
-      } else if (mapProvider.isOfflineMap && mapProvider.mf_IsThemeFromFile) {
+      } else if (mapProvider.isOfflineMap && mapProvider.offline_IsThemeFromFile) {
 
          // select: "From theme file"
 
@@ -552,7 +552,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       } else {
 
-         int themeIndex = Map25ProviderManager.getThemeIndex(mapProvider.theme, mapProvider.tileEncoding);
+         int themeIndex = Map25ProviderManager.getThemeIndex(mapProvider.vtmTheme, mapProvider.tileEncoding);
 
          if (mapProvider.isOfflineMap) {
 
@@ -636,7 +636,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
          _listThemeStyle.add(mfStyle.getLocaleName());
 
-         if (mfStyle.getXmlLayer().equals(mapProvider.mf_ThemeStyle)) {
+         if (mfStyle.getXmlLayer().equals(mapProvider.offline_ThemeStyle)) {
             styleSelectIndex = styleIndex + 1;
          }
       }

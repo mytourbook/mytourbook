@@ -119,7 +119,7 @@ public class OkHttpEngineMT extends OkHttpEngine {
    /**
     * @return Returns folder location where http requests are cached.
     */
-   static String getCacheDir() {
+   private static String getCacheDir() {
 
       final boolean isDefaultLocation = _prefStore.getBoolean(
             ITourbookPreferences.MAP25_OFFLINE_MAP_IS_DEFAULT_LOCATION);

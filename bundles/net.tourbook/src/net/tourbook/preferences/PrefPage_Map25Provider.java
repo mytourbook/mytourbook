@@ -851,8 +851,8 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
                final Map25Provider mapProvider = (Map25Provider) cell.getElement();
 
-               final Enum<VtmThemes> theme = mapProvider.theme;
-               final boolean isOfflineFromFile = mapProvider.isOfflineMap && mapProvider.mf_IsThemeFromFile;
+               final Enum<VtmThemes> theme = mapProvider.vtmTheme;
+               final boolean isOfflineFromFile = mapProvider.isOfflineMap && mapProvider.offline_IsThemeFromFile;
 
                cell.setText(isOfflineFromFile
 
@@ -879,7 +879,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
                final Map25Provider map25Provider = (Map25Provider) cell.getElement();
 
                cell.setText(map25Provider.isOfflineMap
-                     ? map25Provider.mf_MapFilepath
+                     ? map25Provider.offline_MapFilepath
                      : map25Provider.online_url);
             }
          });
@@ -899,7 +899,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
                final Map25Provider map25Provider = (Map25Provider) cell.getElement();
 
                cell.setText(map25Provider.isOfflineMap
-                     ? map25Provider.mf_ThemeFilepath
+                     ? map25Provider.offline_ThemeFilepath
                      : map25Provider.online_TilePath);
             }
          });
@@ -919,7 +919,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
                final Map25Provider map25Provider = (Map25Provider) cell.getElement();
 
                cell.setText(map25Provider.isOfflineMap
-                     ? map25Provider.mf_ThemeStyle
+                     ? map25Provider.offline_ThemeStyle
                      : map25Provider.online_ApiKey);
             }
          });
@@ -1369,7 +1369,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       final Map25Provider mapProvider = _newProvider != null ? _newProvider : _selectedMapProvider;
 
       // update model
-      mapProvider.mf_ThemeFilepath = selectedFilepath;
+      mapProvider.offline_ThemeFilepath = selectedFilepath;
 
       // update UI
       _txtOffline_ThemeFilepath.setText(selectedFilepath);
@@ -1523,10 +1523,10 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
       if (isOfflineMap) {
 
-         mapProvider.mf_IsThemeFromFile = selectedTheme == null ? true : false;
-         mapProvider.mf_MapFilepath = _txtOffline_MapFilepath.getText();
-         mapProvider.mf_ThemeFilepath = _txtOffline_ThemeFilepath.getText();
-         mapProvider.mf_ThemeStyle = getSelectedThemeStyle(mapProvider.getThemeStyles(false));
+         mapProvider.offline_IsThemeFromFile = selectedTheme == null ? true : false;
+         mapProvider.offline_MapFilepath = _txtOffline_MapFilepath.getText();
+         mapProvider.offline_ThemeFilepath = _txtOffline_ThemeFilepath.getText();
+         mapProvider.offline_ThemeStyle = getSelectedThemeStyle(mapProvider.getThemeStyles(false));
 
       } else {
 
@@ -1536,7 +1536,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       }
 
       mapProvider.tileEncoding = tileEncoding;
-      mapProvider.theme = selectedTheme;
+      mapProvider.vtmTheme = selectedTheme;
    }
 
    private void updateUI_FromProvider(final Map25Provider mapProvider) {
@@ -1570,8 +1570,8 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
                _txtOnline_Url.setText(UI.EMPTY_STRING);
                _txtOnline_TilePath.setText(UI.EMPTY_STRING);
 
-               _txtOffline_MapFilepath.setText(mapProvider.mf_MapFilepath);
-               _txtOffline_ThemeFilepath.setText(mapProvider.mf_ThemeFilepath);
+               _txtOffline_MapFilepath.setText(mapProvider.offline_MapFilepath);
+               _txtOffline_ThemeFilepath.setText(mapProvider.offline_ThemeFilepath);
 
             } else {
 
@@ -1589,7 +1589,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
          updateUI_Theme(mapProvider);
          updateUI_TileEncoding();
-         updateUI_ThemeStyle(mapProvider == null ? null : mapProvider.mf_ThemeFilepath, mapProvider, false);
+         updateUI_ThemeStyle(mapProvider == null ? null : mapProvider.offline_ThemeFilepath, mapProvider, false);
          updateUI_TileUrl();
       }
       _isInUpdateUI = false;
@@ -1622,14 +1622,14 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
          return;
       }
 
-      if (mapProvider.isOfflineMap && mapProvider.mf_IsThemeFromFile || mapProvider.theme == null) {
+      if (mapProvider.isOfflineMap && mapProvider.offline_IsThemeFromFile || mapProvider.vtmTheme == null) {
 
          // select: theme is from a file
          _comboTheme.select(0);
          return;
       }
 
-      int themeIndex = Map25ProviderManager.getThemeIndex(mapProvider.theme, mapProvider.tileEncoding);
+      int themeIndex = Map25ProviderManager.getThemeIndex(mapProvider.vtmTheme, mapProvider.tileEncoding);
       if (mapProvider.isOfflineMap) {
 
          // adjust because of the offline additional item
@@ -1640,7 +1640,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
    }
 
    /**
-    * @param mf_ThemeFilepath
+    * @param offline_ThemeFilepath
     *           Theme file pathname, can be <code>null</code>
     * @param mapProvider
     *           Map provider, can be <code>null</code>
@@ -1668,7 +1668,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
    }
 
    /**
-    * @param mf_ThemeFilepath
+    * @param offline_ThemeFilepath
     *           Can be <code>null</code>
     * @param mapProvider
     *           Can be <code>null</code>
@@ -1723,7 +1723,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
       String themeStyle = null;
       if (mapProvider != null) {
-         themeStyle = mapProvider.mf_ThemeStyle;
+         themeStyle = mapProvider.offline_ThemeStyle;
       }
 
       if (themeStyle == null

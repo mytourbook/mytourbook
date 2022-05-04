@@ -104,7 +104,7 @@ public class Map25ProviderManager {
       mapProvider.online_url = "https://tiles.mapilion.com/data/v3"; //$NON-NLS-1$
       mapProvider.online_TilePath = "/{Z}/{X}/{Y}.pbf"; //$NON-NLS-1$
       mapProvider.tileEncoding = TileEncoding.MP;
-      mapProvider.theme = VtmThemes.OPENMAPTILES;
+      mapProvider.vtmTheme = VtmThemes.OPENMAPTILES;
       mapProvider.description = Messages.Map25_Provider_Mapilion_Description;
 
       _defaultMapProvider = mapProvider;
@@ -121,10 +121,10 @@ public class Map25ProviderManager {
 
       mapProvider.isEnabled = false;
       mapProvider.name = "0_OpenandromapV4Map_OpenandromapTheme_Switzerland"; //$NON-NLS-1$
-      mapProvider.mf_MapFilepath = "C:\\OfflineMaps\\mapfiles\\www.openandromaps.org\\Switzerland_ML.map"; //$NON-NLS-1$
-      mapProvider.mf_ThemeFilepath = "C:\\OfflineMaps\\mapstyles\\www.openandromaps.org\\Elements.xml"; //$NON-NLS-1$
+      mapProvider.offline_MapFilepath = "C:\\OfflineMaps\\mapfiles\\www.openandromaps.org\\Switzerland_ML.map"; //$NON-NLS-1$
+      mapProvider.offline_ThemeFilepath = "C:\\OfflineMaps\\mapstyles\\www.openandromaps.org\\Elements.xml"; //$NON-NLS-1$
       mapProvider.tileEncoding = TileEncoding.MF;
-      mapProvider.mf_ThemeStyle = "elv-mtb"; //$NON-NLS-1$
+      mapProvider.offline_ThemeStyle = "elv-mtb"; //$NON-NLS-1$
       mapProvider.description = Messages.Map25_Provider_OpenAndoMap_Description;
 
       return mapProvider;
@@ -311,10 +311,10 @@ public class Map25ProviderManager {
 
                   if (mapProvider.isOfflineMap) {
 
-                     mapProvider.mf_IsThemeFromFile   = Util.getXmlBoolean(xml, ATTR_OFFLINE_IS_THEME_FROM_FILE, true);
-                     mapProvider.mf_MapFilepath       = Util.getXmlString(xml, ATTR_OFFLINE_MAP_FILEPATH, UI.EMPTY_STRING);
-                     mapProvider.mf_ThemeFilepath     = Util.getXmlString(xml, ATTR_OFFLINE_THEME_FILEPATH, UI.EMPTY_STRING);
-                     mapProvider.mf_ThemeStyle        = Util.getXmlString(xml, ATTR_OFFLINE_THEME_STYLE, UI.EMPTY_STRING);
+                     mapProvider.offline_IsThemeFromFile   = Util.getXmlBoolean(xml, ATTR_OFFLINE_IS_THEME_FROM_FILE, true);
+                     mapProvider.offline_MapFilepath       = Util.getXmlString(xml, ATTR_OFFLINE_MAP_FILEPATH, UI.EMPTY_STRING);
+                     mapProvider.offline_ThemeFilepath     = Util.getXmlString(xml, ATTR_OFFLINE_THEME_FILEPATH, UI.EMPTY_STRING);
+                     mapProvider.offline_ThemeStyle        = Util.getXmlString(xml, ATTR_OFFLINE_THEME_STYLE, UI.EMPTY_STRING);
 
                   } else {
 
@@ -324,11 +324,11 @@ public class Map25ProviderManager {
                   }
 // SET_FORMATTING_ON
 
-                  final boolean isOfflineThemeFromFile = mapProvider.isOfflineMap && mapProvider.mf_IsThemeFromFile;
+                  final boolean isOfflineThemeFromFile = mapProvider.isOfflineMap && mapProvider.offline_IsThemeFromFile;
                   final TileEncoding tileEncoding = (TileEncoding) Util.getXmlEnum(xml, ATTR_TILE_ENCODING, TileEncoding.VTM);
 
                   mapProvider.tileEncoding = tileEncoding;
-                  mapProvider.theme = isOfflineThemeFromFile
+                  mapProvider.vtmTheme = isOfflineThemeFromFile
                         ? null
                         : (VtmThemes) Util.getXmlEnum(xml, ATTR_THEME, getDefaultTheme(tileEncoding));
 
@@ -462,10 +462,10 @@ public class Map25ProviderManager {
 
             if (isOfflineMap) {
 
-               xml.putBoolean(ATTR_OFFLINE_IS_THEME_FROM_FILE, mapProvider.mf_IsThemeFromFile);
-               xml.putString(ATTR_OFFLINE_MAP_FILEPATH, mapProvider.mf_MapFilepath);
-               xml.putString(ATTR_OFFLINE_THEME_FILEPATH, mapProvider.mf_ThemeFilepath);
-               xml.putString(ATTR_OFFLINE_THEME_STYLE, mapProvider.mf_ThemeStyle);
+               xml.putBoolean(ATTR_OFFLINE_IS_THEME_FROM_FILE, mapProvider.offline_IsThemeFromFile);
+               xml.putString(ATTR_OFFLINE_MAP_FILEPATH, mapProvider.offline_MapFilepath);
+               xml.putString(ATTR_OFFLINE_THEME_FILEPATH, mapProvider.offline_ThemeFilepath);
+               xml.putString(ATTR_OFFLINE_THEME_STYLE, mapProvider.offline_ThemeStyle);
 
             } else {
 
@@ -474,7 +474,7 @@ public class Map25ProviderManager {
                xml.putString(ATTR_ONLINE_URL, mapProvider.online_url);
             }
 
-            Util.setXmlEnum(xml, ATTR_THEME, mapProvider.theme);
+            Util.setXmlEnum(xml, ATTR_THEME, mapProvider.vtmTheme);
             Util.setXmlEnum(xml, ATTR_TILE_ENCODING, mapProvider.tileEncoding);
          }
 
