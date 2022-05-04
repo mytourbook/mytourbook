@@ -69,7 +69,6 @@ import org.oscim.gdx.MotionHandler;
 import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerInterface;
 import org.oscim.layers.marker.MarkerItem;
-import org.oscim.layers.tile.TileManager;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.buildings.BuildingLayer;
 import org.oscim.layers.tile.buildings.S3DBLayer;
@@ -90,6 +89,7 @@ import org.oscim.theme.VtmThemes;
 import org.oscim.theme.XmlRenderThemeMenuCallback;
 import org.oscim.theme.XmlRenderThemeStyleLayer;
 import org.oscim.theme.XmlRenderThemeStyleMenu;
+import org.oscim.tiling.TileSource;
 import org.oscim.tiling.TileSource.OpenResult;
 import org.oscim.tiling.source.UrlTileSource;
 import org.oscim.tiling.source.bitmap.BitmapTileSource;
@@ -136,8 +136,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private Boolean                 _mf_IsThemeFromFile;
    private String                  _mf_prefered_language             = "en";                                   //$NON-NLS-1$
    private Map25Provider           _selectedMapProvider;
-
-   private TileManager             _tileManager;
 
    private BitmapTileSource        _hillshadingSource;
    private BitmapTileSource        _satelliteSource;
@@ -419,10 +417,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
          if (_selectedMapProvider.tileEncoding == TileEncoding.VTM) {
             final UrlTileSource tileSource = createTileSource(_selectedMapProvider, _httpFactory);
-            setupMap(_selectedMapProvider, tileSource);
+            setupMap_Online(_selectedMapProvider, tileSource);
          } else {
-            final MapilionMvtTileSource tileSource = createMaplilionMvtTileSource(_selectedMapProvider, _httpFactory);
-            setupMap(_selectedMapProvider, tileSource);
+            final MapilionMvtTileSource tileSource = createTileSource_Maplilion(_selectedMapProvider, _httpFactory);
+            setupMap_Online(_selectedMapProvider, tileSource);
          }
 
       } else {
@@ -457,7 +455,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          _mf_theme_styleID = _selectedMapProvider.mf_ThemeStyle;
 
          //setupMap(_selectedMapProvider, tileSource); //single map file
-         setupMap(_selectedMapProvider, tileSource); //multi map file
+         setupMap_Offline(_selectedMapProvider, tileSource); //multi map file
 
          loadTheme(_mf_theme_styleID);
 
@@ -489,27 +487,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    } // end createLayers()
 
-   private MapilionMvtTileSource createMaplilionMvtTileSource(final Map25Provider mapProvider, final OkHttpFactoryMT httpFactory) {
-
-      MapilionMvtTileSource tileSource;
-
-      if (mapProvider.online_ApiKey == null || mapProvider.online_ApiKey.trim().length() == 0) {
-
-         tileSource = MapilionMvtTileSource.builder()
-               .apiKey(_mp_key)
-               .httpFactory(httpFactory)
-               .build();
-      } else {
-
-         tileSource = MapilionMvtTileSource.builder()
-               .apiKey(mapProvider.online_ApiKey.trim())
-               .httpFactory(httpFactory)
-               .build();
-      }
-
-      return tileSource;
-   }
-
    private UrlTileSource createTileSource(final Map25Provider mapProvider, final OkHttpFactoryMT httpFactory) {
 
       final Builder<?> map25Builder = Map25TileSource
@@ -526,11 +503,33 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return map25Builder.build();
    }
 
+   private MapilionMvtTileSource createTileSource_Maplilion(final Map25Provider mapProvider, final OkHttpFactoryMT httpFactory) {
+
+      MapilionMvtTileSource tileSource;
+
+      if (mapProvider.online_ApiKey == null || mapProvider.online_ApiKey.trim().length() == 0) {
+
+         tileSource = MapilionMvtTileSource.builder()
+               .apiKey(_mp_key)
+               .httpFactory(httpFactory)
+               .build();
+
+      } else {
+
+         tileSource = MapilionMvtTileSource.builder()
+               .apiKey(mapProvider.online_ApiKey.trim())
+               .httpFactory(httpFactory)
+               .build();
+      }
+
+      return tileSource;
+   }
+
    @Override
    public void dispose() {
 
       // stop loading tiles
-      _tileManager.clearJobs();
+      _layer_BaseMap.getManager().clearJobs();
 
       saveState();
 
@@ -954,14 +953,17 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       final String stateSuffixName = '_' + suffixName;
 
       final MapPosition mapPosition = mMap.getMapPosition();
-      //final MapPosition_with_MarkerPosition mapPosition2 = (MapPosition_with_MarkerPosition) mMap.getMapPosition();
 
-      _state.put(STATE_MAP_POS_X + stateSuffixName, mapPosition.x);
-      _state.put(STATE_MAP_POS_Y + stateSuffixName, mapPosition.y);
-      _state.put(STATE_MAP_POS_BEARING + stateSuffixName, mapPosition.bearing);
-      _state.put(STATE_MAP_POS_SCALE + stateSuffixName, mapPosition.scale);
-      _state.put(STATE_MAP_POS_TILT + stateSuffixName, mapPosition.tilt);
+// SET_FORMATTING_OFF
+
+      _state.put(STATE_MAP_POS_X          + stateSuffixName, mapPosition.x);
+      _state.put(STATE_MAP_POS_Y          + stateSuffixName, mapPosition.y);
+      _state.put(STATE_MAP_POS_BEARING    + stateSuffixName, mapPosition.bearing);
+      _state.put(STATE_MAP_POS_SCALE      + stateSuffixName, mapPosition.scale);
+      _state.put(STATE_MAP_POS_TILT       + stateSuffixName, mapPosition.tilt);
       _state.put(STATE_MAP_POS_ZOOM_LEVEL + stateSuffixName, mapPosition.zoomLevel);
+
+// SET_FORMATTING_ON
    }
 
    public void setLayer_HillShading_Opacity(final int layer_HillShading_Opacity) {
@@ -970,8 +972,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    public void setMapProvider(final Map25Provider mapProvider) {
 
-      //saveState();  //doesnt help
       boolean isOnlineOfflineStatusHasChanged = false;
+
       _mf_mapFilePath = mapProvider.mf_MapFilepath;
 
       //if NOT mapsforge map
@@ -998,18 +1000,18 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             _layer_BaseMap.setTheme(ThemeLoader.load(VtmThemes.DEFAULT)); //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
 
             if (isOnlineOfflineStatusHasChanged) {
-               setupMap(mapProvider, tileSource);
+               setupMap_Online(mapProvider, tileSource);
             }
 
          } else {
 
-            final MapilionMvtTileSource tileSource = createMaplilionMvtTileSource(mapProvider, _httpFactory);
+            final MapilionMvtTileSource tileSource = createTileSource_Maplilion(mapProvider, _httpFactory);
 
             _layer_BaseMap.setTileSource(tileSource);
             _layer_BaseMap.setTheme(ThemeLoader.load(VtmThemes.OPENMAPTILES));
 
             if (isOnlineOfflineStatusHasChanged) {
-               setupMap(mapProvider, tileSource);
+               setupMap_Online(mapProvider, tileSource);
             }
          }
 
@@ -1030,24 +1032,24 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             mapViewport.setMinScale(2);
             updateUI_MarkerLayer();
             restoreState();
+
             // update actions in UI thread, run this AFTER the layers are created
-            Display.getDefault().asyncExec(new Runnable() {
-               @Override
-               public void run() {
-                  _map25View.restoreState();
-               }
-            });
+            Display.getDefault().asyncExec(() -> _map25View.restoreState());
          }
 
          if (mapProvider.theme != null && mapProvider.theme != VtmThemes.MAPZEN) {
-            //if (_selectedMapProvider.theme != null && _selectedMapProvider.theme != VtmThemes.MAPZEN && _selectedMapProvider.theme != VtmThemes.OPENMAPTILES) {
+
+            //if (_selectedMapProvider.theme != null
+            // && _selectedMapProvider.theme != VtmThemes.MAPZEN
+            // && _selectedMapProvider.theme != VtmThemes.OPENMAPTILES) {
+
             mMap.setTheme(mapProvider.theme);
-         } else { //when null or when not working MAPZEN or OPENMAPTILES is selected, using DEFAULT theme instead
+
+         } else {
+
+            // when null or when not working MAPZEN or OPENMAPTILES is selected, using DEFAULT theme instead
             mMap.setTheme(VtmThemes.DEFAULT);
          }
-
-//		mMap.clearMap();
-//		mMap.updateMap();
 
          _mf_themeFilePath = UI.EMPTY_STRING; // so if mf is next themefile is parsed
 
@@ -1087,7 +1089,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          if (_tileSourceOfflineMapCount == 0) {
             throw new IllegalArgumentException("cannot read (any) mapfile: " + _selectedMapProvider.mf_MapFilepath); //$NON-NLS-1$
          }
-         //_l = mMap.setBaseMap(tileSource);
 
          tileSource.setPreferredLanguage(_mf_prefered_language);
          _layer_BaseMap.setTileSource(tileSource);
@@ -1100,7 +1101,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
              * tileSource.setPreferredLanguage(_mf_prefered_language);
              * _layer_BaseMap.setTileSource(tileSource);
              */
-            setupMap(mapProvider, tileSource);
+            setupMap_Offline(mapProvider, tileSource);
             setupMap_Layers();
             //restoreState();
 
@@ -1121,12 +1122,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          //updateUI_MapBookmarkLayer();
 
          // update actions in UI thread, run this AFTER the layers are created
-         Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-               _map25View.restoreState();
-            }
-         });
+         Display.getDefault().asyncExec(() -> _map25View.restoreState());
 
          //restoreState();
 
@@ -1145,15 +1141,23 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             _mf_IsThemeFromFile = true;
 
             if (_mf_themeFilePath == null) {
+
                mMap.setTheme(VtmThemes.DEFAULT); // ThemeLoader.load(_mf_themeFilePath));
+
             } else {
-               if (!_mf_themeFilePath.equals(_last_mf_themeFilePath) || !_mf_theme_styleID.equals(_last_mf_theme_styleID)
-                     || _mf_IsThemeFromFile != _last_mf_IsThemeFromFile) { //only parsing when different file
+
+               if (!_mf_themeFilePath.equals(_last_mf_themeFilePath)
+                     || !_mf_theme_styleID.equals(_last_mf_theme_styleID)
+
+                     //only parsing when different file
+                     || _mf_IsThemeFromFile != _last_mf_IsThemeFromFile) {
+
                   _mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath);
                   _layer_BaseMap.setTheme(_mf_IRenderTheme);
-                  ////mMap.setTheme(_mf_IRenderTheme);
-                  loadTheme(mapProvider.mf_ThemeStyle); //whene starting with onlinemaps and switching to mf, osmarender is used ??? when uncommented it ok
-                  //_mf_IsThemeFromFile = true;
+
+                  // when starting with onlinemaps and switching to mf, osmarender is used ??? when uncommented it ok
+                  loadTheme(mapProvider.mf_ThemeStyle);
+
                } else {
 
                   StatusUtil.logError(" map25: " + "############# setMapProvider: mapprovider has the same theme file and style"); //$NON-NLS-1$ //$NON-NLS-2$
@@ -1206,125 +1210,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    public void setPhoto_Size(final int layer_Photo_Size) {
       _photoSize = layer_Photo_Size;
-   }
-
-   /**
-    * setupMap for Mapilion online maps
-    *
-    * @param mapProvider
-    * @param tileSource
-    */
-   private void setupMap(final Map25Provider mapProvider, final MapilionMvtTileSource tileSource) {
-
-      CanvasAdapter.textScale = _online_TextScale;
-      CanvasAdapter.userScale = _online_UserScale;
-
-      _layer_BaseMap = new OsmTileLayerMT(mMap);
-
-      _tileManager = _layer_BaseMap.getManager();
-
-      _layer_BaseMap.setTileSource(tileSource);
-
-      mMap.setBaseMap(_layer_BaseMap);
-
-      mMap.setTheme(getTheme(mapProvider));
-   }
-
-   /**
-    * setupMap for mapsforge
-    *
-    * @param mapProvider
-    * @param tileSource
-    */
-   private void setupMap(final Map25Provider mapProvider, final MultiMapFileTileSource tileSource) {
-
-      CanvasAdapter.textScale = _mf_TextScale;
-      CanvasAdapter.userScale = _mf_UserScale;
-
-      _mf_IsThemeFromFile = mapProvider.mf_IsThemeFromFile;
-      _mf_themeFilePath = checkFile(mapProvider.mf_ThemeFilepath); //check theme path, null when not found
-      _mf_theme_styleID = mapProvider.mf_ThemeStyle;
-      _mf_mapFilePath = mapProvider.mf_MapFilepath;
-
-      _layer_BaseMap = new OsmTileLayerMT(mMap);
-
-      _tileManager = _layer_BaseMap.getManager();
-
-      //_l = mMap.setBaseMap(tileSource);
-
-      _layer_BaseMap.setTileSource(tileSource);
-
-      _layer_BaseMap.setTheme(ThemeLoader.load(VtmThemes.DEFAULT)); //to avoid errors
-
-      // THIS IS NOT YET WORKING
-//		mapLayer.setNumLoaders(10);
-
-      mMap.setBaseMap(_layer_BaseMap);
-
-      //_mf_mapFilePath = checkFile(_selectedMapProvider.mf_MapFilepath);
-      //_mf_mapFilePath = _selectedMapProvider.mf_MapFilepath;
-
-      if (!checkMapFile(new File(_mf_mapFilePath))) {
-         throw new IllegalArgumentException("cannot read mapfile: " + _mf_mapFilePath); //$NON-NLS-1$
-      } else {
-
-         StatusUtil.logError(" map25: " + "############# setupMap: Map Path: " + _mf_mapFilePath); //$NON-NLS-1$ //$NON-NLS-2$
-      }
-
-      /*
-       * if (_tileSourceOfflineMapCount == 0) {
-       * ;
-       * //throw new IllegalArgumentException("cannot read mapfile: " +
-       * _selectedMapProvider.mf_MapFilepath); //$NON-NLS-1$
-       * } else {
-       * //$NON-NLS-1$
-       * }
-       */
-
-      //_mf_themeFilePath = checkFile(_selectedMapProvider.mf_ThemeFilepath);
-
-      if (_mf_themeFilePath == null) {
-         mMap.setTheme(VtmThemes.OSMARENDER); // ThemeLoader.load(_mf_themeFilePath));
-      } else {
-
-         //_l.setTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //to avoid errors
-         _mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath); // because of changes in loadtheme
-         _layer_BaseMap.setTheme(_mf_IRenderTheme);
-         mMap.setTheme(ThemeLoader.load(_mf_themeFilePath)); //neccercary?seem so
-         ////loadTheme(mapProvider.mf_ThemeStyle); //neccercary?
-      }
-
-   }
-
-   /**
-    * setupMap for online maps
-    *
-    * @param mapProvider
-    * @param tileSource
-    */
-   private void setupMap(final Map25Provider mapProvider, final UrlTileSource tileSource) {
-
-      CanvasAdapter.textScale = _online_TextScale;
-      CanvasAdapter.userScale = _online_UserScale;
-
-      //_l = mMap.setBaseMap(tileSource);
-
-      _layer_BaseMap = new OsmTileLayerMT(mMap);
-
-      _tileManager = _layer_BaseMap.getManager();
-
-      _layer_BaseMap.setTileSource(tileSource);
-
-      //_l.setTheme(ThemeLoader.load(VtmThemes.DEFAULT));  //if active, key 1-5 nor working, if not active "ERROR VectorTileLoader - no theme is set"
-
-// THIS IS NOT YET WORKING
-//		mapLayer.setNumLoaders(10);
-
-      mMap.setBaseMap(_layer_BaseMap);
-
-      mMap.setTheme(getTheme(mapProvider));
-      //mMap.setTheme((ThemeFile) Map25ProviderManager.getDefaultTheme(TileEncoding.VTM));
-
    }
 
    private void setupMap_Layers() {
@@ -1447,6 +1332,66 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       allMapLayer.add(_layer_SliderLocation);
       allMapLayer.add(_layer_ScaleBar);
       allMapLayer.add(_layer_TileInfo);
+   }
+
+   /**
+    * setupMap for mapsforge
+    *
+    * @param mapProvider
+    * @param tileSource
+    */
+   private void setupMap_Offline(final Map25Provider mapProvider, final MultiMapFileTileSource tileSource) {
+
+      CanvasAdapter.textScale = _mf_TextScale;
+      CanvasAdapter.userScale = _mf_UserScale;
+
+      _layer_BaseMap = new OsmTileLayerMT(mMap);
+      _layer_BaseMap.setTileSource(tileSource);
+      _layer_BaseMap.setTheme(ThemeLoader.load(VtmThemes.DEFAULT)); //to avoid errors
+
+      mMap.setBaseMap(_layer_BaseMap);
+
+      _mf_IsThemeFromFile = mapProvider.mf_IsThemeFromFile;
+      _mf_themeFilePath = checkFile(mapProvider.mf_ThemeFilepath); //check theme path, null when not found
+      _mf_theme_styleID = mapProvider.mf_ThemeStyle;
+      _mf_mapFilePath = mapProvider.mf_MapFilepath;
+
+      if (!checkMapFile(new File(_mf_mapFilePath))) {
+         throw new IllegalArgumentException("cannot read mapfile: " + _mf_mapFilePath); //$NON-NLS-1$
+      } else {
+
+         StatusUtil.logError(" map25: " + "############# setupMap: Map Path: " + _mf_mapFilePath); //$NON-NLS-1$ //$NON-NLS-2$
+      }
+
+      if (_mf_themeFilePath == null) {
+
+         mMap.setTheme(VtmThemes.OSMARENDER); // ThemeLoader.load(_mf_themeFilePath));
+
+      } else {
+
+         _mf_IRenderTheme = ThemeLoader.load(_mf_themeFilePath); // because of changes in loadtheme
+         _layer_BaseMap.setTheme(_mf_IRenderTheme);
+
+         mMap.setTheme(ThemeLoader.load(_mf_themeFilePath)); //neccercary?seem so
+      }
+   }
+
+   /**
+    * Setup map, e.g. for Mapilion online maps
+    *
+    * @param mapProvider
+    * @param tileSource
+    */
+   private void setupMap_Online(final Map25Provider mapProvider, final TileSource tileSource) {
+
+      CanvasAdapter.textScale = _online_TextScale;
+      CanvasAdapter.userScale = _online_UserScale;
+
+      _layer_BaseMap = new OsmTileLayerMT(mMap);
+      _layer_BaseMap.setTileSource(tileSource);
+
+      mMap.setBaseMap(_layer_BaseMap);
+      mMap.setTheme(getTheme(mapProvider));
    }
 
    void stop() {

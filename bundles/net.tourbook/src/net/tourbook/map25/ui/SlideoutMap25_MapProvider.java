@@ -341,6 +341,9 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          return;
       }
 
+      // set map provider which should be selected when the pref dialog is opened
+      _actionPrefDialog.setPrefData(selectedMapProvider);
+
       updateUI_Theme(selectedMapProvider);
       updateUI_Theme_Style(selectedMapProvider);
       updateUI_MapProvider_Tooltip(selectedMapProvider);
@@ -350,9 +353,6 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       // update UI
       updateMap(selectedMapProvider);
-
-      // set map provider which should be selected when the pref dialog is opened
-      _actionPrefDialog.setPrefData(selectedMapProvider);
    }
 
    private void onSelect_Theme() {
@@ -532,7 +532,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          _listTheme.add(Messages.Pref_Map25_Provider_Theme_FromThemeFile);
       }
 
-      // fill combobox with all themes
+      // fill combobox with VTM default themes
       for (final VtmThemes vtmTheme : VtmThemes.values()) {
          _listTheme.add(vtmTheme.toString());
       }
@@ -541,30 +541,33 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
        * Select theme
        */
       if (mapProvider == null) {
+
          _listTheme.select(0);
-         return;
-      }
 
-      if (mapProvider.isOfflineMap && mapProvider.mf_IsThemeFromFile) {
+      } else if (mapProvider.isOfflineMap && mapProvider.mf_IsThemeFromFile) {
 
-         // select: theme is from a file
+         // select: "From theme file"
+
          _listTheme.select(0);
-         return;
+
+      } else {
+
+         int themeIndex = Map25ProviderManager.getThemeIndex(mapProvider.theme, mapProvider.tileEncoding);
+
+         if (mapProvider.isOfflineMap) {
+
+            // adjust because of the offline additional item
+
+            themeIndex++;
+         }
+
+         _listTheme.select(themeIndex);
       }
-
-      int themeIndex = Map25ProviderManager.getThemeIndex(mapProvider.theme, mapProvider.tileEncoding);
-      if (mapProvider.isOfflineMap) {
-
-         // adjust because of the offline additional item
-
-         themeIndex++;
-      }
-      _listTheme.select(themeIndex);
    }
 
    /**
     * This must be called <b>AFTER</b> {@link #updateUI_Theme(Map25Provider)} because it depends on
-    * the {@link #_listTheme}
+    * the themes in {@link #_listTheme}
     *
     * @param mapProvider
     */
