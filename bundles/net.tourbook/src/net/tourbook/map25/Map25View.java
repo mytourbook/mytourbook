@@ -1133,7 +1133,7 @@ public class Map25View extends ViewPart implements
          moveToMapLocation(mapBookmark);
       } else if (mapBookmarkEventType == MapBookmarkEventType.MODIFIED) {
          //_mapApp.debugPrint("*** Map25View_onMapBookmarkActionPerformed modify: " + mapBookmark.name);
-         _mapApp.updateUI_MapBookmarkLayer();
+         _mapApp.updateLayer_MapBookmarks();
       }
    }
 
@@ -1460,7 +1460,7 @@ public class Map25View extends ViewPart implements
        */
       if (_mapApp.isPhoto_Visible()) {
 
-         _mapApp.updateUI_PhotoLayer();
+         _mapApp.updateLayer_Photos();
       }
 
       /*
@@ -1784,26 +1784,23 @@ public class Map25View extends ViewPart implements
          return;
       }
 
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getCurrent().asyncExec(() -> {
 
-            // validate widget
-            if (_swtContainer.isDisposed()) {
-               return;
-            }
-
-            final ArrayList<TourData> tourDataList = TourManager.getSelectedTours(true);
-            if (tourDataList != null) {
-
-               setMapTours(tourDataList);
-               setMapPhotos(null);
-
-               paintTours();
-            }
-
-            enableActions();
+         // validate widget
+         if (_swtContainer.isDisposed()) {
+            return;
          }
+
+         final ArrayList<TourData> tourDataList = TourManager.getSelectedTours(true);
+         if (tourDataList != null) {
+
+            setMapTours(tourDataList);
+            setMapPhotos(null);
+
+            paintTours();
+         }
+
+         enableActions();
       });
    }
 
@@ -1942,7 +1939,7 @@ public class Map25View extends ViewPart implements
 
       runPhotoFilter();
 
-      _mapApp.updateUI_PhotoLayer();
+      _mapApp.updateLayer_Photos();
       _mapApp.updateMap();
 
    }

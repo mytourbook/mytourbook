@@ -23,20 +23,20 @@ import org.oscim.tiling.source.ITileDecoder;
  */
 public enum TileEncoding {
 
-	/**
-	 * Mapzen tile encoding
-	 */
-	MVT,
+   /**
+    * Mapzen tile encoding
+    */
+   MVT,
 
-	/**
-	 * Open Science Map encoding
-	 */
-	VTM,
+   /**
+    * Open Science Map encoding
+    */
+   VTM,
 
-	/**
+   /**
     * Mapsforge Map encoding, this is used for offline maps
     */
-	MF,
+   MF,
 
    /**
     * Mapilion MVT Tile encoding (pbf)

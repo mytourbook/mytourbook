@@ -361,15 +361,12 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       final int selectedIndex = _listTheme.getSelectionIndex();
 
+      VtmThemes vtmTheme = null;
       final boolean isThemeFromFile = mapProvider.isOfflineMap && selectedIndex == 0;
 
-      mapProvider.offline_IsThemeFromFile = isThemeFromFile;
+      if (isThemeFromFile == false) {
 
-      if (isThemeFromFile) {
-
-         mapProvider.vtmTheme = null;
-
-      } else {
+         // an internal theme is used
 
          int themeIndex = selectedIndex;
 
@@ -378,10 +375,20 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
             themeIndex--;
          }
 
-         //update model
-         final VtmThemes[] themeValues = VtmThemes.values();
-         mapProvider.vtmTheme = themeValues[themeIndex];
+         vtmTheme = VtmThemes.values()[themeIndex];
       }
+
+      // check if update is necessary
+      if (mapProvider.offline_IsThemeFromFile == isThemeFromFile
+            && mapProvider.vtmTheme == vtmTheme) {
+
+         // it's the same value as before
+         return;
+      }
+
+      // update model
+      mapProvider.offline_IsThemeFromFile = isThemeFromFile;
+      mapProvider.vtmTheme = vtmTheme;
 
       Map25ProviderManager.saveMapProvider();
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -87,10 +87,14 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
     */
    private static final TileEncodingData[] _allTileEncoding                 = new TileEncodingData[] {
 
-         new TileEncodingData(TileEncoding.VTM, Messages.Pref_Map25_Encoding_OpenScienceMap, false),
-         new TileEncodingData(TileEncoding.MP, Messages.Pref_Map25_Encoding_Mapilion, false),
-         new TileEncodingData(TileEncoding.MVT, Messages.Pref_Map25_Encoding_Mapzen, false),
-         new TileEncodingData(TileEncoding.MF, Messages.Pref_Map25_Encoding_Mapsforge_Offline, true)
+// SET_FORMATTING_OFF
+
+      new TileEncodingData(TileEncoding.VTM, Messages.Pref_Map25_Encoding_OpenScienceMap,       false),
+      new TileEncodingData(TileEncoding.MP,  Messages.Pref_Map25_Encoding_Mapilion,             false),
+      new TileEncodingData(TileEncoding.MVT, Messages.Pref_Map25_Encoding_Mapzen,               false),
+      new TileEncodingData(TileEncoding.MF,  Messages.Pref_Map25_Encoding_Mapsforge_Offline,    true)
+
+// SET_FORMATTING_ON
    };
 
    private final IDialogSettings           _state                           = TourbookPlugin.getState(ID);
