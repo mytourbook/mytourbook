@@ -321,7 +321,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       enableActions();
 
-      mapApp.updateMap();
+      mapApp.updateLayer();
    }
 
 

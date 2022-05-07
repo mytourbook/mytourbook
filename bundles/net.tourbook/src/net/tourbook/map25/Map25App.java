@@ -28,8 +28,10 @@ import java.awt.Canvas;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import net.tourbook.common.UI;
@@ -66,6 +68,7 @@ import org.oscim.gdx.GdxMap;
 import org.oscim.gdx.GestureHandlerImpl;
 import org.oscim.gdx.LwjglGL20;
 import org.oscim.gdx.MotionHandler;
+import org.oscim.layers.Layer;
 import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerInterface;
 import org.oscim.layers.marker.MarkerItem;
@@ -422,7 +425,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          setMapProvider_02_Offline(_selectedMapProvider);
       }
 
-      setupMap_Layers(isOfflineMap);
+      createLayers_SetupLayers(isOfflineMap);
 
       /**
        * Map Viewport
@@ -438,7 +441,133 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       restoreState_MapPosition();
 
       // update actions in UI thread, run this AFTER the layers are created
-      Display.getDefault().asyncExec(() -> _map25View.restoreState());
+      Display.getDefault().asyncExec(() -> {
+
+         _map25View.restoreState();
+
+         showMapLayers();
+      });
+   }
+
+   /**
+    * {@link #_layer_BaseMap} must be set before calling this method
+    *
+    * @param isOfflineMap
+    */
+   private void createLayers_SetupLayers(final boolean isOfflineMap) {
+
+      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+
+      // needs long copyright hint...
+      _hillshadingSource = DefaultSources.MAPILION_HILLSHADE_2
+            .httpFactory(_httpFactory)
+            .apiKey(_mp_key)
+            .build();
+
+      // hillshading with 1MB RAM Cache, using existing _httpfactory with diskcache
+      _layer_HillShading = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 19);
+      _layer_HillShading.setEnabled(false);
+
+      /*
+       * Satellite maps like google earth
+       */
+      _satelliteSource = BitmapTileSource.builder()
+            .httpFactory(_httpFactory)
+            .url("http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile") //$NON-NLS-1$
+            .tilePath("/{Z}/{Y}/{X}.png") //$NON-NLS-1$
+            .zoomMin(1)
+            .zoomMax(18)
+            .build();
+
+      _layer_Satellite = new BitmapTileLayer(mMap, _satelliteSource, 1 << 19);
+      _layer_Satellite.setEnabled(false);
+
+      // tour
+      _layer_Tour = new TourLayer(mMap);
+      _layer_Tour.setEnabled(false);
+
+      // slider path
+      _layer_SliderPath = new SliderPath_Layer(mMap);
+      _layer_SliderPath.setEnabled(false);
+
+      /*
+       * Buildings
+       */
+      // this is working with subtheme switching, but no online buildings anymore
+      _layer_S3DB_Building = new S3DBLayer(mMap, _layer_BaseMap, true);
+
+      // building is not working with online maps, so deactvated also the shadow
+      _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, true, true);
+
+      if (isOfflineMap) {
+
+         // S3DB (simple 3D building)
+
+         /*
+          * here i have to investigate
+          * with this code i got always good S3DB, but online buildings did not look good with:
+          * "new S3DBLayer(mMap,_layer_BaseMap, true)"
+          */
+
+         _layer_S3DB_Building.setEnabled(true);
+         _layer_S3DB_Building.setColored(true);
+
+      } else {
+
+         // building
+
+         _layer_Building.setEnabled(true);
+      }
+
+      // label
+      _layer_Label = new LabelLayerMT(mMap, _layer_BaseMap);
+      _layer_Label.setEnabled(false);
+
+      /*
+       * Map bookmarks
+       */
+      _markertoolkit = new MarkerToolkit(MarkerShape.STAR);
+      if (config.isMarkerClustered) {
+         _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit.getMarkerRendererFactory(), _markertoolkit);
+      } else {
+         _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit.getMarkerSymbol(), _markertoolkit);
+      }
+      final List<MarkerInterface> pts = _markertoolkit.createBookmarksAsMapMarker(_markerMode);
+      _layer_MapBookmark.addItems(pts);
+      _layer_MapBookmark.setEnabled(false);
+
+      /*
+       * Marker
+       */
+      _layer_Marker = new MarkerLayer(mMap, this);
+      _layer_Marker.setEnabled(false);
+
+      /*
+       * Photos
+       */
+      if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
+         _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit._markerRendererFactory, _photoToolkit);
+      } else {
+         _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit.getSymbol(), _photoToolkit);
+      }
+      //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loaded yet
+      _layer_Photo.setEnabled(false);
+
+      // slider location
+      _layer_SliderLocation = new SliderLocation_Layer(mMap);
+      _layer_SliderLocation.setEnabled(false);
+
+      // scale bar
+      _layer_ScaleBar = createLayer_ScaleBar();
+
+      // tile info
+      _layer_TileInfo = new TileGridLayerMT(mMap);
+      _layer_TileInfo.setEnabled(false);
+
+      showMapLayers();
+
+      // layercheck
+//      allMapLayer.toString();
    }
 
    private UrlTileSource createTileSource(final Map25Provider mapProvider) {
@@ -661,7 +790,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private ThemeFile getTheme_Online(final Map25Provider mapProvider) {
 
       switch (mapProvider.tileEncoding) {
-      case MVT:  // Mapzen
+      case MVT: // Mapzen
          return VtmThemes.MAPZEN;
 
       case VTM: // Open Science Map
@@ -937,7 +1066,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    }
 
    /**
-    * Setup map, e.g. for Mapilion online maps
+    * Setup online map, e.g. Mapilion
     *
     * @param mapProvider
     */
@@ -949,7 +1078,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       CanvasAdapter.textScale = _online_TextScale;
       CanvasAdapter.userScale = _online_UserScale;
 
-      setMapProvider_10_SetMapTileLayer();
+      setMapProvider_10_CreateBaseMapLayer();
 
       /*
        * Set tile source for the map layer when changed
@@ -981,7 +1110,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    }
 
    /**
-    * Setup map for mapsforge
+    * Setup offline map for mapsforge
     *
     * @param mapProvider
     */
@@ -996,7 +1125,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       /*
        * Create/set _layer_BaseMap
        */
-      setMapProvider_10_SetMapTileLayer();
+      setMapProvider_10_CreateBaseMapLayer();
 
       /*
        * Set tile source from offline file
@@ -1079,7 +1208,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    /**
     * Set map tile layer
     */
-   private void setMapProvider_10_SetMapTileLayer() {
+   private void setMapProvider_10_CreateBaseMapLayer() {
 
       if (_layer_BaseMap == null) {
 
@@ -1105,146 +1234,104 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _photoSize = layer_Photo_Size;
    }
 
-   private void setupMap_Layers(final boolean isOfflineMap) {
+   /**
+    * Show and sort all enabled map layers.
+    * <p>
+    * Only visible layers are added to the map, otherwise just disabled layers would still be
+    * loading tile images !!!
+    */
+   private void showMapLayers() {
 
       final Layers allMapLayer = mMap.layers();
-      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-      // needs long copyright hint...
-      _hillshadingSource = DefaultSources.MAPILION_HILLSHADE_2
-            .httpFactory(_httpFactory)
-            .apiKey(_mp_key)
-            .build();
-
-      // hillshading with 1MB RAM Cache, using existing _httpfactory with diskcache
-      _layer_HillShading = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 19);
-      _layer_HillShading.setEnabled(false);
+      // Default layer
+      // 1st layer: event layer
+      // 2nd layer: base map layer
 
       /*
-       * Satellite maps like google earth
+       * Get all none default layers which are currently visible
        */
-      _satelliteSource = BitmapTileSource.builder()
-            .httpFactory(_httpFactory)
-            .url("http://services.arcgisonline.com/arcgis/rest/services/World_Imagery/MapServer/tile") //$NON-NLS-1$
-            .tilePath("/{Z}/{Y}/{X}.png") //$NON-NLS-1$
-            .zoomMin(1)
-            .zoomMax(18)
-            .build();
+      final int numLayers = allMapLayer.size();
+      final Map<Layer, Layer> allCurrentNoneDefaultLayers = new HashMap<>();
 
-      _layer_Satellite = new BitmapTileLayer(mMap, _satelliteSource, 1 << 19);
-      _layer_Satellite.setEnabled(false);
-
-      // tour
-      _layer_Tour = new TourLayer(mMap);
-      _layer_Tour.setEnabled(false);
-
-      // slider path
-      _layer_SliderPath = new SliderPath_Layer(mMap);
-      _layer_SliderPath.setEnabled(false);
+      for (int layerIndex = 2; layerIndex < numLayers; layerIndex++) {
+         final Layer layer = allMapLayer.get(layerIndex);
+         allCurrentNoneDefaultLayers.put(layer, layer);
+      }
 
       /*
-       * Buildings
+       * Building layer depends on off/online map
        */
-      // this is working with subtheme switching, but no online buildings anymore
-      _layer_S3DB_Building = new S3DBLayer(mMap, _layer_BaseMap, true);
+      Layer buildingLayer;
+      if (_currentOffOnline == OffOnline.IS_OFFLINE) {
+         buildingLayer = _layer_S3DB_Building;
+      } else {
+         buildingLayer = _layer_Building;
+      }
 
-      // building is not working with online maps, so deactvated also the shadow
-      _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, true, true);
+// SET_FORMATTING_OFF
 
-      if (isOfflineMap) {
+      showMapLayers_AddOrRemove(_layer_HillShading,      allCurrentNoneDefaultLayers.get(_layer_HillShading));
+      showMapLayers_AddOrRemove(_layer_Satellite,        allCurrentNoneDefaultLayers.get(_layer_Satellite));
+      showMapLayers_AddOrRemove(_layer_Tour,             allCurrentNoneDefaultLayers.get(_layer_Tour));
+      showMapLayers_AddOrRemove(_layer_SliderPath,       allCurrentNoneDefaultLayers.get(_layer_SliderPath));
+      showMapLayers_AddOrRemove(_layer_Label,            allCurrentNoneDefaultLayers.get(_layer_Label));
+      showMapLayers_AddOrRemove(buildingLayer,           allCurrentNoneDefaultLayers.get(buildingLayer));
+      showMapLayers_AddOrRemove(_layer_MapBookmark,      allCurrentNoneDefaultLayers.get(_layer_MapBookmark));
+      showMapLayers_AddOrRemove(_layer_Marker,           allCurrentNoneDefaultLayers.get(_layer_Marker));
+      showMapLayers_AddOrRemove(_layer_Photo,            allCurrentNoneDefaultLayers.get(_layer_Photo));
+      showMapLayers_AddOrRemove(_layer_SliderLocation,   allCurrentNoneDefaultLayers.get(_layer_SliderLocation));
+      showMapLayers_AddOrRemove(_layer_ScaleBar,         allCurrentNoneDefaultLayers.get(_layer_ScaleBar));
+      showMapLayers_AddOrRemove(_layer_TileInfo,         allCurrentNoneDefaultLayers.get(_layer_TileInfo));
 
-         // S3DB (simple 3D building)
+// SET_FORMATTING_ON
+   }
 
-         /*
-          * here i have to investigate
-          * with this code i got always good S3DB, but online buildings did not look good with:
-          * "new S3DBLayer(mMap,_layer_BaseMap, true)"
-          */
+   private void showMapLayers_AddOrRemove(final Layer requestedMapLayer,
+                                          final Layer alreadyAddedLayer) {
 
-         _layer_S3DB_Building.setEnabled(true);
-         _layer_S3DB_Building.setColored(true);
+      final Layers allMapLayer = mMap.layers();
+
+      if (requestedMapLayer.isEnabled()) {
+
+         if (alreadyAddedLayer == null) {
+
+            // show layer
+
+            allMapLayer.add(requestedMapLayer);
+
+         } else {
+
+            // layer is already available
+         }
 
       } else {
 
-         // building
+         // layer is disabled
 
-         _layer_Building.setEnabled(true);
+         if (alreadyAddedLayer == null) {
+
+            // layer is already not visible
+
+         } else {
+
+            // hide/remove layer
+
+            allMapLayer.remove(alreadyAddedLayer);
+         }
       }
-
-      // label
-      _layer_Label = new LabelLayerMT(mMap, _layer_BaseMap);
-      _layer_Label.setEnabled(false);
-
-      /*
-       * Map bookmarks
-       */
-      _markertoolkit = new MarkerToolkit(MarkerShape.STAR);
-      if (config.isMarkerClustered) {
-         _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit.getMarkerRendererFactory(), _markertoolkit);
-      } else {
-         _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit.getMarkerSymbol(), _markertoolkit);
-      }
-      final List<MarkerInterface> pts = _markertoolkit.createBookmarksAsMapMarker(_markerMode);
-      _layer_MapBookmark.addItems(pts);
-      _layer_MapBookmark.setEnabled(false);
-
-      /*
-       * Marker
-       */
-      _layer_Marker = new MarkerLayer(mMap, this);
-      _layer_Marker.setEnabled(false);
-
-      /*
-       * Photos
-       */
-      if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
-         _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit._markerRendererFactory, _photoToolkit);
-      } else {
-         _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit.getSymbol(), _photoToolkit);
-      }
-      //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loaded yet
-      _layer_Photo.setEnabled(false);
-
-      // slider location
-      _layer_SliderLocation = new SliderLocation_Layer(mMap);
-      _layer_SliderLocation.setEnabled(false);
-
-      // scale bar
-      _layer_ScaleBar = createLayer_ScaleBar();
-
-      // tile info
-      _layer_TileInfo = new TileGridLayerMT(mMap);
-      _layer_TileInfo.setEnabled(false);
-
-      /*
-       * Set layer sort order
-       */
-      allMapLayer.add(_layer_HillShading);
-//    allMapLayer.add(_layer_Satellite);
-      allMapLayer.add(_layer_Tour);
-      allMapLayer.add(_layer_SliderPath);
-
-      if (isOfflineMap) {
-         allMapLayer.add(_layer_S3DB_Building);
-      } else {
-         allMapLayer.add(_layer_Building);
-      }
-
-      allMapLayer.add(_layer_Label);
-      allMapLayer.add(_layer_MapBookmark);
-      allMapLayer.add(_layer_Marker);
-      allMapLayer.add(_layer_Photo);
-      allMapLayer.add(_layer_SliderLocation);
-      allMapLayer.add(_layer_ScaleBar);
-      allMapLayer.add(_layer_TileInfo);
-
-      // layercheck
-      allMapLayer.toString();
    }
 
    void stop() {
 
       _lwjglApp.stop();
+   }
+
+   public void updateLayer() {
+
+      showMapLayers();
+
+      mMap.clearMap();
    }
 
    /**
