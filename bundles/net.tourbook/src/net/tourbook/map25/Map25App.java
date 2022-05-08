@@ -28,10 +28,8 @@ import java.awt.Canvas;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 import net.tourbook.common.UI;
@@ -147,20 +145,27 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     */
    private int                     _layer_HillShading_Opacity;
    //
-   private S3DBLayer               _layer_S3DB_Building;                                                       // S3DB = Simple 3D Building
    private OsmTileLayerMT          _layer_BaseMap;
-   private BuildingLayer           _layer_Building;
-   private BitmapTileLayer         _layer_HillShading;
+   private Layer                   _layer_Building_VARYING;
+   private BuildingLayer           _layer_Building_Default;
+   private S3DBLayer               _layer_Building_S3DB;                                                       // S3DB = Simple 3D Building
+   private Layer                   _layer_HillShading_AFTER;
+   private BitmapTileLayer         _layer_HillShading_TILE_LOADING;
    private LabelLayerMT            _layer_Label;
-   private ItemizedLayer           _layer_MapBookmark;
-   private MarkerLayer             _layer_Marker;
-   private ItemizedLayer           _layer_Photo;
-   private BitmapTileLayer         _layer_Satellite;
+   private ItemizedLayer           _layer_MapBookmark_VARYING;
+   private ItemizedLayer           _layer_MapBookmark_Clustered;
+   private ItemizedLayer           _layer_MapBookmark_NotClustered;
+   private ItemizedLayer           _layer_Photo_VARYING;
+   private ItemizedLayer           _layer_Photo_Clustered;
+   private ItemizedLayer           _layer_Photo_NotCluster;
+   private Layer                   _layer_Satellite_AFTER;
+   private BitmapTileLayer         _layer_Satellite_TILE_LOADING;
    private MapScaleBarLayer        _layer_ScaleBar;
    private SliderLocation_Layer    _layer_SliderLocation;
    private SliderPath_Layer        _layer_SliderPath;
    private TileGridLayerMT         _layer_TileInfo;
    private TourLayer               _layer_Tour;
+   private MarkerLayer             _layer_TourMarker;
    //
    private OkHttpFactoryMT         _httpFactory;
    //
@@ -178,8 +183,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private TileSource              _currentOffline_TileSource;
    private String                  _currentOffline_TileSource_FilePath;
    //
-   private MarkerToolkit           _markertoolkit;
-   private MarkerMode              _markerMode                       = MarkerMode.NORMAL;                      // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
+   private MarkerToolkit           _tourMarkerToolkit                = new MarkerToolkit(MarkerShape.STAR);
+   // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
+   private MarkerMode              _tourMarkerMode                   = MarkerMode.NORMAL;
    //
    /*
     * Photos
@@ -443,9 +449,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       // update actions in UI thread, run this AFTER the layers are created
       Display.getDefault().asyncExec(() -> {
 
+         // enable/disable layers
          _map25View.restoreState();
 
-         showMapLayers();
+         setupMapLayers();
       });
    }
 
@@ -456,8 +463,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     */
    private void createLayers_SetupLayers(final boolean isOfflineMap) {
 
-      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-
       // needs long copyright hint...
       _hillshadingSource = DefaultSources.MAPILION_HILLSHADE_2
             .httpFactory(_httpFactory)
@@ -465,8 +470,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             .build();
 
       // hillshading with 1MB RAM Cache, using existing _httpfactory with diskcache
-      _layer_HillShading = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 19);
-      _layer_HillShading.setEnabled(false);
+      _layer_HillShading_TILE_LOADING = new BitmapTileLayer(mMap, _hillshadingSource, 1 << 19);
+      _layer_HillShading_TILE_LOADING.setEnabled(false);
 
       /*
        * Satellite maps like google earth
@@ -479,8 +484,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             .zoomMax(18)
             .build();
 
-      _layer_Satellite = new BitmapTileLayer(mMap, _satelliteSource, 1 << 19);
-      _layer_Satellite.setEnabled(false);
+      _layer_Satellite_TILE_LOADING = new BitmapTileLayer(mMap, _satelliteSource, 1 << 19);
+      _layer_Satellite_TILE_LOADING.setEnabled(false);
 
       // tour
       _layer_Tour = new TourLayer(mMap);
@@ -494,10 +499,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
        * Buildings
        */
       // this is working with subtheme switching, but no online buildings anymore
-      _layer_S3DB_Building = new S3DBLayer(mMap, _layer_BaseMap, true);
+      _layer_Building_S3DB = new S3DBLayer(mMap, _layer_BaseMap, true);
 
       // building is not working with online maps, so deactvated also the shadow
-      _layer_Building = new BuildingLayer(mMap, _layer_BaseMap, true, true);
+      _layer_Building_Default = new BuildingLayer(mMap, _layer_BaseMap, true, true);
 
       if (isOfflineMap) {
 
@@ -509,14 +514,18 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
           * "new S3DBLayer(mMap,_layer_BaseMap, true)"
           */
 
-         _layer_S3DB_Building.setEnabled(true);
-         _layer_S3DB_Building.setColored(true);
+         _layer_Building_S3DB.setEnabled(true);
+         _layer_Building_S3DB.setColored(true);
+
+         _layer_Building_VARYING = _layer_Building_S3DB;
 
       } else {
 
          // building
 
-         _layer_Building.setEnabled(true);
+         _layer_Building_Default.setEnabled(true);
+
+         _layer_Building_VARYING = _layer_Building_Default;
       }
 
       // label
@@ -526,32 +535,49 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       /*
        * Map bookmarks
        */
-      _markertoolkit = new MarkerToolkit(MarkerShape.STAR);
-      if (config.isMarkerClustered) {
-         _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit.getMarkerRendererFactory(), _markertoolkit);
+      final MarkerConfig markerConfig = Map25ConfigManager.getActiveMarkerConfig();
+
+      _layer_MapBookmark_Clustered = new ItemizedLayer(
+            mMap,
+            new ArrayList<MarkerInterface>(),
+            _tourMarkerToolkit.getMarkerRendererFactory(),
+            _tourMarkerToolkit);
+
+      _layer_MapBookmark_NotClustered = new ItemizedLayer(
+            mMap,
+            new ArrayList<MarkerInterface>(),
+            _tourMarkerToolkit.getMarkerSymbol(),
+            _tourMarkerToolkit);
+
+      if (markerConfig.isMarkerClustered) {
+         _layer_MapBookmark_VARYING = _layer_MapBookmark_Clustered;
       } else {
-         _layer_MapBookmark = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _markertoolkit.getMarkerSymbol(), _markertoolkit);
+         _layer_MapBookmark_VARYING = _layer_MapBookmark_NotClustered;
       }
-      final List<MarkerInterface> pts = _markertoolkit.createBookmarksAsMapMarker(_markerMode);
-      _layer_MapBookmark.addItems(pts);
-      _layer_MapBookmark.setEnabled(false);
+
+      final List<MarkerInterface> allMarkerItems = _tourMarkerToolkit.createBookmarksAsMapMarker(_tourMarkerMode);
+      _layer_MapBookmark_VARYING.addItems(allMarkerItems);
+      _layer_MapBookmark_VARYING.setEnabled(false);
 
       /*
-       * Marker
+       * Tour marker
        */
-      _layer_Marker = new MarkerLayer(mMap, this);
-      _layer_Marker.setEnabled(false);
+      _layer_TourMarker = new MarkerLayer(mMap, this);
+      _layer_TourMarker.setEnabled(false);
 
       /*
        * Photos
        */
-      if (config.isMarkerClustered) { //sharing same setting as MapBookmarks, later photolayer should get its own configuration
-         _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit._markerRendererFactory, _photoToolkit);
+      _layer_Photo_Clustered = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit._markerRendererFactory, _photoToolkit);
+      _layer_Photo_NotCluster = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit.getSymbol(), _photoToolkit);
+      if (markerConfig.isMarkerClustered) {
+         //sharing same setting as MapBookmarks, later photolayer should get its own configuration
+         _layer_Photo_VARYING = _layer_Photo_Clustered;
       } else {
-         _layer_Photo = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit.getSymbol(), _photoToolkit);
+         _layer_Photo_VARYING = _layer_Photo_NotCluster;
       }
       //_layer_Photo.addItems(_phototoolkit._photo_pts);  //must not be done at startup, no tour is loaded yet
-      _layer_Photo.setEnabled(false);
+      _layer_Photo_VARYING.setEnabled(false);
 
       // slider location
       _layer_SliderLocation = new SliderLocation_Layer(mMap);
@@ -564,7 +590,30 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_TileInfo = new TileGridLayerMT(mMap);
       _layer_TileInfo.setEnabled(false);
 
-      showMapLayers();
+      /*
+       * Add all layers
+       */
+      final Layers allMapLayer = mMap.layers();
+
+      allMapLayer.add(_layer_Satellite_TILE_LOADING);
+      allMapLayer.add(_layer_HillShading_TILE_LOADING);
+      allMapLayer.add(_layer_Tour);
+      allMapLayer.add(_layer_SliderPath);
+      allMapLayer.add(_layer_Label);
+      allMapLayer.add(_layer_Building_VARYING);
+      allMapLayer.add(_layer_MapBookmark_VARYING);
+      allMapLayer.add(_layer_TourMarker);
+      allMapLayer.add(_layer_Photo_VARYING);
+      allMapLayer.add(_layer_SliderLocation);
+      allMapLayer.add(_layer_ScaleBar);
+      allMapLayer.add(_layer_TileInfo);
+
+      /*
+       * Set static layers which are located after the named layer and which will never be removed,
+       * this "position" is used to set the correct position for removed/added layers
+       */
+      _layer_Satellite_AFTER = _layer_Tour;
+      _layer_HillShading_AFTER = _layer_Tour;
 
       // layercheck
 //      allMapLayer.toString();
@@ -694,12 +743,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return _layer_BaseMap;
    }
 
-   public BuildingLayer getLayer_Building() {
-      return _layer_Building;
+   public BuildingLayer getLayer_Building_Default() {
+      return _layer_Building_Default;
+   }
+
+   public S3DBLayer getLayer_Building_S3DB() {
+      return _layer_Building_S3DB;
    }
 
    public BitmapTileLayer getLayer_HillShading() {
-      return _layer_HillShading;
+      return _layer_HillShading_TILE_LOADING;
    }
 
    public int getLayer_HillShading_Opacity() {
@@ -711,19 +764,15 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    }
 
    public ItemizedLayer getLayer_MapBookmark() {
-      return _layer_MapBookmark;
+      return _layer_MapBookmark_VARYING;
    }
 
    public ItemizedLayer getLayer_Photo() {
-      return _layer_Photo;
-   }
-
-   public S3DBLayer getLayer_S3DB() {
-      return _layer_S3DB_Building;
+      return _layer_Photo_VARYING;
    }
 
    public BitmapTileLayer getLayer_Satellite() {
-      return _layer_Satellite;
+      return _layer_Satellite_TILE_LOADING;
    }
 
    public MapScaleBarLayer getLayer_ScaleBar() {
@@ -747,7 +796,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    }
 
    public MarkerLayer getLayer_TourMarker() {
-      return _layer_Marker;
+      return _layer_TourMarker;
    }
 
    Map25View getMap25View() {
@@ -1235,89 +1284,49 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    }
 
    /**
-    * Show and sort all enabled map layers.
-    * <p>
-    * Only visible layers are added to the map, otherwise just disabled layers would still be
-    * loading tile images !!!
+    * Remove tile layers which are not visible, otherwise they would still download tile images even
+    * when they are disabled !!!
     */
-   private void showMapLayers() {
+   private void setupMapLayers() {
 
-      final Layers allMapLayer = mMap.layers();
-
-      // Default layer
-      // 1st layer: event layer
-      // 2nd layer: base map layer
+      updateLayer_Building();
 
       /*
-       * Get all none default layers which are currently visible
+       * This order must be the same as when these layers were added initially
        */
-      final int numLayers = allMapLayer.size();
-      final Map<Layer, Layer> allCurrentNoneDefaultLayers = new HashMap<>();
+      setupMapLayers_SetTileLoadingLayer(_layer_Satellite_TILE_LOADING, _layer_Satellite_AFTER);
+      setupMapLayers_SetTileLoadingLayer(_layer_HillShading_TILE_LOADING, _layer_HillShading_AFTER);
 
-      for (int layerIndex = 2; layerIndex < numLayers; layerIndex++) {
-         final Layer layer = allMapLayer.get(layerIndex);
-         allCurrentNoneDefaultLayers.put(layer, layer);
-      }
-
-      /*
-       * Building layer depends on off/online map
-       */
-      Layer buildingLayer;
-      if (_currentOffOnline == OffOnline.IS_OFFLINE) {
-         buildingLayer = _layer_S3DB_Building;
-      } else {
-         buildingLayer = _layer_Building;
-      }
-
-// SET_FORMATTING_OFF
-
-      showMapLayers_AddOrRemove(_layer_HillShading,      allCurrentNoneDefaultLayers.get(_layer_HillShading));
-      showMapLayers_AddOrRemove(_layer_Satellite,        allCurrentNoneDefaultLayers.get(_layer_Satellite));
-      showMapLayers_AddOrRemove(_layer_Tour,             allCurrentNoneDefaultLayers.get(_layer_Tour));
-      showMapLayers_AddOrRemove(_layer_SliderPath,       allCurrentNoneDefaultLayers.get(_layer_SliderPath));
-      showMapLayers_AddOrRemove(_layer_Label,            allCurrentNoneDefaultLayers.get(_layer_Label));
-      showMapLayers_AddOrRemove(buildingLayer,           allCurrentNoneDefaultLayers.get(buildingLayer));
-      showMapLayers_AddOrRemove(_layer_MapBookmark,      allCurrentNoneDefaultLayers.get(_layer_MapBookmark));
-      showMapLayers_AddOrRemove(_layer_Marker,           allCurrentNoneDefaultLayers.get(_layer_Marker));
-      showMapLayers_AddOrRemove(_layer_Photo,            allCurrentNoneDefaultLayers.get(_layer_Photo));
-      showMapLayers_AddOrRemove(_layer_SliderLocation,   allCurrentNoneDefaultLayers.get(_layer_SliderLocation));
-      showMapLayers_AddOrRemove(_layer_ScaleBar,         allCurrentNoneDefaultLayers.get(_layer_ScaleBar));
-      showMapLayers_AddOrRemove(_layer_TileInfo,         allCurrentNoneDefaultLayers.get(_layer_TileInfo));
-
-// SET_FORMATTING_ON
    }
 
-   private void showMapLayers_AddOrRemove(final Layer requestedMapLayer,
-                                          final Layer alreadyAddedLayer) {
+   private void setupMapLayers_SetTileLoadingLayer(final BitmapTileLayer tileLoadingLayer, final Layer tileLoading_AFTER) {
 
       final Layers allMapLayer = mMap.layers();
 
-      if (requestedMapLayer.isEnabled()) {
+      final int currentLayerIndex = allMapLayer.indexOf(tileLoadingLayer);
 
-         if (alreadyAddedLayer == null) {
+      if (tileLoadingLayer.isEnabled()) {
 
-            // show layer
+         // layer should be visible
 
-            allMapLayer.add(requestedMapLayer);
+         if (currentLayerIndex == -1) {
 
-         } else {
+            // layer is hidden -> add this layer
 
-            // layer is already available
+            final int layerIndexAfter = allMapLayer.indexOf(tileLoading_AFTER);
+
+            allMapLayer.add(layerIndexAfter, tileLoadingLayer);
          }
 
       } else {
 
-         // layer is disabled
+         // layer should be hidden
 
-         if (alreadyAddedLayer == null) {
+         if (currentLayerIndex != -1) {
 
-            // layer is already not visible
+            // layer is visible -> remove this layer
 
-         } else {
-
-            // hide/remove layer
-
-            allMapLayer.remove(alreadyAddedLayer);
+            allMapLayer.remove(tileLoadingLayer);
          }
       }
    }
@@ -1329,9 +1338,49 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    public void updateLayer() {
 
-      showMapLayers();
+      setupMapLayers();
 
-      mMap.clearMap();
+//      mMap.clearMap();
+      mMap.updateMap();
+   }
+
+   private void updateLayer_Building() {
+
+      Layer newVaryingBuildingLayer = null;
+
+      /*
+       * Building layer depends on off/online map
+       */
+      if (_currentOffOnline == OffOnline.IS_OFFLINE) {
+
+         // ensure: _layer_Building_VARYING = _layer_Building_S3DB
+
+         if (_layer_Building_VARYING != _layer_Building_S3DB) {
+            newVaryingBuildingLayer = _layer_Building_S3DB;
+         }
+
+      } else {
+
+         // ensure: _layer_Building_VARYING = _layer_Building_Default;
+
+         if (_layer_Building_VARYING != _layer_Building_Default) {
+            newVaryingBuildingLayer = _layer_Building_Default;
+         }
+      }
+
+      if (newVaryingBuildingLayer != null) {
+
+         // set new building layer
+
+         final Layers allMapLayer = mMap.layers();
+
+         final int currentLayerIndex = allMapLayer.indexOf(_layer_Building_VARYING);
+
+         _layer_Building_VARYING = newVaryingBuildingLayer;
+
+         allMapLayer.remove(currentLayerIndex);
+         allMapLayer.add(currentLayerIndex, _layer_Building_VARYING);
+      }
    }
 
    /**
@@ -1344,43 +1393,35 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
       final Layers allMapLayer = mMap.layers();
 
-      final int bookmarkLayerPosition = allMapLayer.indexOf(_layer_MapBookmark);
+      final int bookmarkLayerPosition = allMapLayer.indexOf(_layer_MapBookmark_VARYING);
 
       // only recreate MapBookmarkLayer when changed in UI
-      if (config.isMarkerClustered != _markertoolkit.isMarkerClusteredLast()) {
+      if (config.isMarkerClustered != _tourMarkerToolkit.isMarkerClusteredLast()) {
 
-         allMapLayer.remove(_layer_MapBookmark);
+         allMapLayer.remove(_layer_MapBookmark_VARYING);
 
          if (config.isMarkerClustered) {
 
-            _layer_MapBookmark = new ItemizedLayer(
-                  mMap,
-                  new ArrayList<MarkerInterface>(),
-                  _markertoolkit.getMarkerRendererFactory(),
-                  _markertoolkit);
+            _layer_MapBookmark_VARYING = _layer_MapBookmark_Clustered;
 
          } else {
 
-            _layer_MapBookmark = new ItemizedLayer(
-                  mMap,
-                  new ArrayList<MarkerInterface>(),
-                  _markertoolkit.getMarkerSymbol(),
-                  _markertoolkit);
+            _layer_MapBookmark_VARYING = _layer_MapBookmark_NotClustered;
          }
 
-         allMapLayer.add(bookmarkLayerPosition, _layer_MapBookmark);
+         allMapLayer.add(bookmarkLayerPosition, _layer_MapBookmark_VARYING);
 
       } else {
 
-         _layer_MapBookmark.removeAllItems();
+         _layer_MapBookmark_VARYING.removeAllItems();
       }
 
-      final List<MarkerInterface> allBookmarkMarker = _markertoolkit.createBookmarksAsMapMarker(_markerMode);
+      final List<MarkerInterface> allBookmarkMarker = _tourMarkerToolkit.createBookmarksAsMapMarker(_tourMarkerMode);
 
-      _layer_MapBookmark.addItems(allBookmarkMarker);
-      _layer_MapBookmark.setEnabled(config.isShowMapBookmark);
+      _layer_MapBookmark_VARYING.addItems(allBookmarkMarker);
+      _layer_MapBookmark_VARYING.setEnabled(config.isShowMapBookmark);
 
-      _markertoolkit.setIsMarkerClusteredLast(config.isMarkerClustered);
+      _tourMarkerToolkit.setIsMarkerClusteredLast(config.isMarkerClustered);
    }
 
    /**
@@ -1399,42 +1440,34 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          // only recreate PhotoLayer when changed in UI
 
          final Layers allMapLayer = mMap.layers();
-         final int photoLayerPosition = allMapLayer.indexOf(_layer_Photo);
+         final int photoLayerPosition = allMapLayer.indexOf(_layer_Photo_VARYING);
 
-         allMapLayer.remove(_layer_Photo);
+         allMapLayer.remove(_layer_Photo_VARYING);
 
          //  config.isPhotoClustered
          if (config.isMarkerClustered) {
-            _layer_Photo = new ItemizedLayer(
-                  mMap,
-                  new ArrayList<MarkerInterface>(),
-                  _photoToolkit._markerRendererFactory,
-                  _photoToolkit);
+            _layer_Photo_VARYING = _layer_Photo_Clustered;
 
          } else {
 
-            _layer_Photo = new ItemizedLayer(
-                  mMap,
-                  new ArrayList<MarkerInterface>(),
-                  _photoToolkit.getSymbol(),
-                  _photoToolkit);
+            _layer_Photo_VARYING = _layer_Photo_NotCluster;
          }
 
          if (photoLayerPosition == -1) {
-            allMapLayer.add(_layer_Photo);
+            allMapLayer.add(_layer_Photo_VARYING);
          } else {
-            allMapLayer.add(photoLayerPosition, _layer_Photo);
+            allMapLayer.add(photoLayerPosition, _layer_Photo_VARYING);
          }
 
       } else {
 
-         _layer_Photo.removeAllItems();
+         _layer_Photo_VARYING.removeAllItems();
       }
 
       final List<MarkerInterface> photoItems = _photoToolkit.createPhotoItems(_map25View.getFilteredPhotos());
 
-      _layer_Photo.addItems(photoItems);
-      _layer_Photo.setEnabled(_isShowPhoto);
+      _layer_Photo_VARYING.addItems(photoItems);
+      _layer_Photo_VARYING.setEnabled(_isShowPhoto);
 
       //_phototoolkit._isMarkerClusteredLast = config.isPhotoClustered;
       // using settings from MapBookmarks must be changed later with own config
@@ -1447,11 +1480,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       final boolean isShowTourMarker = config.isShowTourMarker;
 
-      _layer_Marker.setEnabled(isShowTourMarker);
+      _layer_TourMarker.setEnabled(isShowTourMarker);
 
       if (isShowTourMarker) {
 
-         final MarkerRenderer markerRenderer = (MarkerRenderer) _layer_Marker.getRenderer();
+         final MarkerRenderer markerRenderer = (MarkerRenderer) _layer_TourMarker.getRenderer();
 
          markerRenderer.configureRenderer();
       }

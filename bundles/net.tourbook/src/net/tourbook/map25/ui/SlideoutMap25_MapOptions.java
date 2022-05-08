@@ -316,8 +316,8 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
 
       // switching on/off both building layers
-      mapApp.getLayer_Building().setEnabled(_chkShowLayer_Building.getSelection());
-      mapApp.getLayer_S3DB().setEnabled(_chkShowLayer_Building.getSelection());
+      mapApp.getLayer_Building_Default().setEnabled(_chkShowLayer_Building.getSelection());
+      mapApp.getLayer_Building_S3DB().setEnabled(_chkShowLayer_Building.getSelection());
 
       enableActions();
 
@@ -332,13 +332,13 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
 // SET_FORMATTING_OFF
 
-      _chkShowLayer_Building     .setSelection(mapApp.getLayer_Building()     .isEnabled());
-      _chkShowLayer_Cartography  .setSelection(mapApp.getLayer_BaseMap()      .isEnabled());
-      _chkShowLayer_Hillshading  .setSelection(mapApp.getLayer_HillShading()  .isEnabled());
-      _chkShowLayer_Label        .setSelection(mapApp.getLayer_Label()        .isEnabled());
-      _chkShowLayer_Scale        .setSelection(mapApp.getLayer_ScaleBar()     .isEnabled());
-      _chkShowLayer_Satellite    .setSelection(mapApp.getLayer_Satellite()    .isEnabled());
-      _chkShowLayer_TileInfo     .setSelection(mapApp.getLayer_TileInfo()     .isEnabled());
+      _chkShowLayer_Building     .setSelection(mapApp.getLayer_Building_Default()   .isEnabled());
+      _chkShowLayer_Cartography  .setSelection(mapApp.getLayer_BaseMap()            .isEnabled());
+      _chkShowLayer_Hillshading  .setSelection(mapApp.getLayer_HillShading()        .isEnabled());
+      _chkShowLayer_Label        .setSelection(mapApp.getLayer_Label()              .isEnabled());
+      _chkShowLayer_Scale        .setSelection(mapApp.getLayer_ScaleBar()           .isEnabled());
+      _chkShowLayer_Satellite    .setSelection(mapApp.getLayer_Satellite()          .isEnabled());
+      _chkShowLayer_TileInfo     .setSelection(mapApp.getLayer_TileInfo()           .isEnabled());
 
       _spinnerHillshadingOpacity .setSelection(UI.transformOpacity_WhenRestored(mapApp.getLayer_HillShading_Opacity()));
 
