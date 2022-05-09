@@ -66,6 +66,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
 // SET_FORMATTING_OFF
 
+   private static final String   APP_ACTION_CLOSE_TOOLTIP                  = net.tourbook.common.Messages.App_Action_Close_Tooltip;
+
    private static final String   GRAPH_LABEL_ALTIMETER                     = net.tourbook.common.Messages.Graph_Label_Altimeter;
    private static final String   GRAPH_LABEL_ALTITUDE                      = net.tourbook.common.Messages.Graph_Label_Altitude;
    private static final String   GRAPH_LABEL_CADENCE                       = net.tourbook.common.Messages.Graph_Label_Cadence;
@@ -103,7 +105,9 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private TourData                       _tourData;
 
    private ValuePoint_ToolTip_MenuManager _ttMenuMgr;
+
    private ActionOpenTooltipMenu          _actionOpenTooltipMenu;
+   private ActionCloseTooltip             _actionCloseTooltip;
 
    private String                         _headerTitle;
    private String                         _prefKey_TooltipIsVisible;
@@ -248,6 +252,22 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private Label     _lblRunDyn_VerticalRatio;
    private Label     _lblRunDyn_VerticalRatio_Unit;
 
+   private class ActionCloseTooltip extends Action {
+
+      public ActionCloseTooltip() {
+
+         super(null, IAction.AS_PUSH_BUTTON);
+
+         setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
+      }
+
+      @Override
+      public void run() {
+         hide();
+      }
+   }
+
    private class ActionOpenTooltipMenu extends Action {
 
       public ActionOpenTooltipMenu() {
@@ -255,7 +275,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          super(null, IAction.AS_PUSH_BUTTON);
 
          setToolTipText(Messages.Tooltip_ValuePoint_Action_OpenToolTipMenu_ToolTip);
-         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions));
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
       }
 
       @Override
@@ -393,6 +413,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       _ttMenuMgr.setCanBeDisplayed_ChartZoomFactor(_canBeDisplayed_ChartZoomFactor);
 
+      _actionCloseTooltip = new ActionCloseTooltip();
       _actionOpenTooltipMenu = new ActionOpenTooltipMenu();
    }
 
@@ -507,7 +528,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
        * create toolbar
        */
       _toolbarControl = new ToolBar(parent, SWT.FLAT);
-//      _toolbarControl.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//      _toolbarControl.setBackground(UI.SYS_COLOR_BLUE);
       GridDataFactory.fillDefaults()
             .align(SWT.END, SWT.BEGINNING)
             .applyTo(_toolbarControl);
@@ -515,6 +536,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       final ToolBarManager tbm = new ToolBarManager(_toolbarControl);
 
       tbm.add(_actionOpenTooltipMenu);
+      tbm.add(_actionCloseTooltip);
 
       tbm.update(true);
    }
@@ -535,7 +557,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
-            .align(SWT.FILL, SWT.CENTER)
+            .align(SWT.CENTER, SWT.CENTER)
             .grab(true, false)
             .applyTo(container);
 
