@@ -348,8 +348,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       updateUI_Theme_Style(selectedMapProvider);
       updateUI_MapProvider_Tooltip(selectedMapProvider);
 
-      // update UI otherwise the old theme style box is displayed until the next redraw
-      _parent.update();
+      updateUI_UILayout();
 
       // update UI
       updateMap(selectedMapProvider);
@@ -395,8 +394,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       // update UI
       updateUI_Theme_Style(mapProvider);
 
-      // update UI otherwise the old theme style box is displayed until the next redraw
-      _parent.update();
+      updateUI_UILayout();
 
       updateMap(mapProvider);
    }
@@ -659,6 +657,15 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          _listThemeStyle.select(styleSelectIndex);
       }
       _isInUpdateUI = false;
+   }
+
+   /**
+    * Update UI otherwise the old theme style box is displayed until the next redraw
+    */
+   private void updateUI_UILayout() {
+
+      _parent.getShell().pack(true);
+      _parent.update();
    }
 
 }
