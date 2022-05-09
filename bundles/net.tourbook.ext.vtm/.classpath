@@ -32,7 +32,7 @@
 			<attribute name="without_test_code" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/vtm.jar" exported="true" sourcepath="/vtm">
+	<classpathentry kind="lib" path="libs/vtm.jar" exported="true" sourcepath="/vtm/src">
 		<attributes>
 			<attribute name="without_test_code" value="true"/>
 		</attributes>

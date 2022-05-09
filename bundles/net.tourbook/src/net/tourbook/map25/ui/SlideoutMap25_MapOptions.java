@@ -24,7 +24,6 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.Map25View;
-import net.tourbook.map25.layer.marker.MarkerConfig;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -40,7 +39,7 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * Map 2.5D properties slideout.
+ * Map 2.5D properties slideout
  */
 public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
@@ -60,13 +59,10 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private Button    _chkShowLayer_Satellite;
    private Button    _chkShowLayer_Label;
    private Button    _chkShowLayer_Scale;
-   private Button    _chkShowPhoto_Title;
-   private Button    _chkShowPhoto_Scaled;
    private Button    _chkShowLayer_TileInfo;
    private Button    _chkUseDraggedKeyboardNavigation;
 
    private Spinner   _spinnerHillshadingOpacity;
-   private Spinner   _spinnerPhoto_Size;
 
    /**
     * @param ownerControl
@@ -201,40 +197,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
          }
          {
             /*
-             * Photo Size
-             */
-            final Composite containerPhotoSize = new Composite(group, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerPhotoSize);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerPhotoSize);
-            {
-
-               {
-                  _chkShowPhoto_Scaled = new Button(containerPhotoSize, SWT.CHECK);
-                  _chkShowPhoto_Scaled.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Photo_Size);
-                  _chkShowPhoto_Scaled.addSelectionListener(_layerSelectionListener);
-               }
-               {
-                  /*
-                   * PhotoSize
-                   */
-                  // spinner: fill
-                  _spinnerPhoto_Size = new Spinner(containerPhotoSize, SWT.BORDER);
-                  _spinnerPhoto_Size.setMinimum(160);
-                  _spinnerPhoto_Size.setMaximum(640);
-                  _spinnerPhoto_Size.setIncrement(10);
-                  _spinnerPhoto_Size.setPageIncrement(50);
-                  _spinnerPhoto_Size.setToolTipText(Messages.Slideout_Map25MapOptions_Spinner_Layer_Photo_Size);
-
-                  _spinnerPhoto_Size.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModify_PhotoSize()));
-                  _spinnerPhoto_Size.addMouseWheelListener(mouseEvent -> {
-                     UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
-                     onModify_PhotoSize();
-                  });
-               }
-            }
-         }
-         {
-            /*
              * Scale
              */
             _chkShowLayer_Scale = new Button(group, SWT.CHECK);
@@ -250,7 +212,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             _chkShowLayer_BaseMap.setToolTipText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip);
             _chkShowLayer_BaseMap.addSelectionListener(_layerSelectionListener);
          }
-
          {
             /*
              * Satellite
@@ -259,16 +220,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             _chkShowLayer_Satellite.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Satellite);
             _chkShowLayer_Satellite.addSelectionListener(_layerSelectionListener);
          }
-
-         {
-            /*
-             * Photo Title
-             */
-            _chkShowPhoto_Title = new Button(group, SWT.CHECK);
-            _chkShowPhoto_Title.setText(Messages.Slideout_Map25MapOptions_Checkbox_Photo_Title);
-            _chkShowPhoto_Title.addSelectionListener(_layerSelectionListener);
-         }
-
          {
             /*
              * Tile info
@@ -347,7 +298,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       enableActions();
 
-      mapApp.getMap().updateMap(true);
+      mapApp.updateMap();
    }
 
    private void onModify_Layer() {
@@ -362,10 +313,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       mapApp.getLayer_Label().setEnabled(_chkShowLayer_Label.getSelection());
       mapApp.getLayer_ScaleBar().setEnabled(_chkShowLayer_Scale.getSelection());
-
-      mapApp.setIsPhotoShowTitle(_chkShowPhoto_Title.getSelection());
-      mapApp.setIsPhotoShowScaled(_chkShowPhoto_Scaled.getSelection());
-
       mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
 
       // switching on/off both building layers
@@ -374,29 +321,14 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       enableActions();
 
-      mapApp.getMap().updateMap(true);
-      mapApp.updateUI_PhotoLayer();
+      mapApp.updateMap();
    }
 
-   private void onModify_PhotoSize() {
 
-      final Map25App mapApp = _map25View.getMapApp();
-      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
-      // updade model
-      final int photoSize = _spinnerPhoto_Size.getSelection();
-      mapApp.setLayer_Photo_Size(photoSize);
-      config.markerPhoto_Size = photoSize;
-
-      enableActions();
-
-      mapApp.getMap().updateMap(true);
-      mapApp.updateUI_PhotoLayer();
-   }
 
    private void restoreState() {
 
       final Map25App mapApp = _map25View.getMapApp();
-      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
 // SET_FORMATTING_OFF
 
@@ -405,17 +337,12 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       _chkShowLayer_Satellite    .setSelection(mapApp.getLayer_Satellite().isEnabled());
       _chkShowLayer_Label        .setSelection(mapApp.getLayer_Label().isEnabled());
       _chkShowLayer_Scale        .setSelection(mapApp.getLayer_ScaleBar().isEnabled());
-      _chkShowPhoto_Title        .setSelection(mapApp.getIsPhotoShowTitle());
-      _chkShowPhoto_Scaled       .setSelection(mapApp.getIsPhotoShowScaled());
       _chkShowLayer_TileInfo     .setSelection(mapApp.getLayer_TileInfo().isEnabled());
       _chkShowLayer_Building     .setSelection(mapApp.getLayer_Building().isEnabled());
 
       _spinnerHillshadingOpacity .setSelection(UI.transformOpacity_WhenRestored(mapApp.getLayer_HillShading_Opacity()));
 
 // SET_FORMATTING_ON
-
-      // HERE i HAD a bug!!!! hopefully solved now
-      _spinnerPhoto_Size.setSelection(config.markerPhoto_Size);
 
       _chkUseDraggedKeyboardNavigation.setSelection(Map25ConfigManager.useDraggedKeyboardNavigation);
    }

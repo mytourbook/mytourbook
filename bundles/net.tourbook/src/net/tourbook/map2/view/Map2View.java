@@ -1111,9 +1111,9 @@ public class Map2View extends ViewPart implements
       _map.paint();
    }
 
-   public void actionShowPhotos(final boolean isSelected) {
+   private void actionShowPhotos(final boolean isPhotoVisible) {
 
-      _isShowPhoto = isSelected;
+      _isShowPhoto = isPhotoVisible;
 
       enableActions();
 
@@ -1123,6 +1123,11 @@ public class Map2View extends ViewPart implements
       _map.disposeOverlayImageCache();
 
       _map.paint();
+
+      // hide photo filter when photos are hidden
+      if (isPhotoVisible == false) {
+         _actionMap2_PhotoFilter.getPhotoFilterSlideout().close();
+      }
    }
 
    public void actionShowSlider() {
@@ -4369,6 +4374,8 @@ public class Map2View extends ViewPart implements
       _state.put(STATE_IS_SHOW_TOUR_WEATHER_IN_MAP,               _actionShowTourWeatherInMap.isChecked());
       _state.put(STATE_IS_SHOW_WAY_POINTS,                        _actionShowWayPoints.isChecked());
 
+      Util.setStateEnum(_state, STATE_CENTER_MAP_BY,              _map.getCenterMapBy());
+
       _state.put(STATE_MAP_SYNC_MODE_IS_ACTIVE,                   isMapSynched());
       Util.setStateEnum(_state, STATE_MAP_SYNC_MODE,              _currentMapSyncMode);
 
@@ -4549,6 +4556,11 @@ public class Map2View extends ViewPart implements
       // update tour id's in the map
       final List<Long> allTourIds = new ArrayList<>();
       for (final TourData tourData : allTourData) {
+
+         if (tourData == null) {
+            continue;
+         }
+
          allTourIds.add(tourData.getTourId());
       }
       _map.setTourIds(allTourIds);
@@ -4611,6 +4623,10 @@ public class Map2View extends ViewPart implements
 
          tourData.visibleDataPointSerie = null;
 
+         return;
+      }
+
+      if (tourData == null) {
          return;
       }
 

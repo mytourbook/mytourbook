@@ -4714,7 +4714,7 @@ public class Map2 extends Canvas {
                FormatManager.formatDistance(distance / 1000.0),
                UI.UNIT_LABEL_DISTANCE);
 
-         final String text_ElevationUp = String.format("%s %s",
+         final String text_ElevationUp = String.format("%s %s", //$NON-NLS-1$
                FormatManager.formatElevation(elevationUp),
                UI.UNIT_LABEL_ELEVATION);
          /*

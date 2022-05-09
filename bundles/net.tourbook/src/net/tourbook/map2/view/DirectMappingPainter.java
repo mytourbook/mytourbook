@@ -206,6 +206,10 @@ public class DirectMappingPainter implements IDirectPainter {
       final double[] latitudeSerie = _tourData.latitudeSerie;
       final double[] longitudeSerie = _tourData.longitudeSerie;
 
+      if (latitudeSerie == null || latitudeSerie.length == 0) {
+         return;
+      }
+
       // force array bounds
       final int leftSliderValueIndex = Math.min(Math.max(_leftSliderValueIndex, 0), latitudeSerie.length - 1);
       final int rightSliderValueIndex = Math.min(Math.max(_rightSliderValueIndex, 0), latitudeSerie.length - 1);
@@ -330,7 +334,7 @@ public class DirectMappingPainter implements IDirectPainter {
       final double[] latitudeSerie = _tourData.latitudeSerie;
       final double[] longitudeSerie = _tourData.longitudeSerie;
 
-      if (latitudeSerie == null) {
+      if (latitudeSerie == null || latitudeSerie.length == 0) {
          return;
       }
 

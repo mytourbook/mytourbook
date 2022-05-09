@@ -126,6 +126,8 @@ public class Messages extends NLS {
    public static String        app_action_collapse_others_tooltip;
    public static String        App_Action_Columns;
    public static String        App_Action_Copy;
+   public static String        App_Action_CopyDataIntoClipboard;
+   public static String        App_Action_CopyDataIntoClipboard_CopyIsDone;
    public static String        App_Action_Delete;
    public static String        App_Action_DeleteProfile;
    public static String        App_Action_DeleteProperty;
@@ -145,6 +147,7 @@ public class Messages extends NLS {
    public static String        app_action_expand_type_flat;
    public static String        app_action_expand_type_year_day;
    public static String        app_action_expand_type_year_month_day;
+   public static String        App_Action_ExportViewCSV;
    public static String        App_Action_ExtractTour;
    public static String        App_Action_JoinTours;
    public static String        App_Action_Menu_Directory;
@@ -1176,6 +1179,7 @@ public class Messages extends NLS {
    public static String        Log_Reimport_Tour_Skipped_OtherReasons;
    public static String        Log_RetrieveWeatherData_001_Start;
    public static String        Log_RetrieveWeatherData_002_End;
+   public static String        Log_RetrieveWeatherData_003_NoWeatherData;
    public static String        Log_RetrieveWeatherData_010_NoGpsDataSeries;
    public static String        Log_SaveTags_End;
    public static String        Log_SaveTags_Progress_AppendTags;
@@ -1214,6 +1218,7 @@ public class Messages extends NLS {
    public static String        Log_Tour_SaveTours_File;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Humidity;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Pressure;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max;
@@ -1316,6 +1321,7 @@ public class Messages extends NLS {
    public static String        Photo_Filter_Operator_IsMore;
    public static String        Photo_Filter_Operator_IsMore_Tooltip;
    public static String        Photo_Filter_Title_Map2PhotoFilter;
+   public static String        Photo_Filter_Title_Map25PhotoFilter;
 
    public static String        Photo_Gallery_Action_ToggleGalleryHorizontal_ToolTip;
    public static String        Photo_Gallery_Action_ToggleGalleryVertical_ToolTip;
@@ -1430,6 +1436,7 @@ public class Messages extends NLS {
    public static String        Pref_DisplayFormat_Label_Power;
    public static String        Pref_DisplayFormat_Label_Pulse;
    public static String        Pref_DisplayFormat_Label_Speed;
+   public static String        Pref_DisplayFormat_Label_Temperature;
    public static String        Pref_DisplayFormat_Tab_MultipleTours;
    public static String        Pref_DisplayFormat_Tab_MultipleTours_Tooltip;
    public static String        Pref_DisplayFormat_Tab_OneTour;
@@ -1760,7 +1767,6 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Label_ApiKey;
    public static String        Pref_Weather_Label_WeatherProvider;
    public static String        Pref_Weather_Link_ApiSignup;
-   public static String        Pref_Weather_OpenWeatherMap_Link;
    public static String        Pref_Weather_OpenWeatherMap_Label_FiveDaysLimit;
    public static String        Pref_Weather_Provider_None;
 
@@ -2154,6 +2160,8 @@ public class Messages extends NLS {
    public static String        Slideout_TourChartOptions_Radio_SRTM3;
    public static String        Slideout_TourChartSmoothing_Label_Title;
 
+   public static String        Slideout_TourEditor_Checkbox_RecomputeElevationUpDown;
+   public static String        Slideout_TourEditor_Checkbox_RecomputeElevationUpDown_Tooltip;
    public static String        Slideout_TourEditor_Label_LatLonDigits;
    public static String        Slideout_TourEditor_Label_LatLonDigits_Tooltip;
    public static String        Slideout_TourEditor_Label_Title;
@@ -2552,7 +2560,6 @@ public class Messages extends NLS {
    public static String        Tour_Book_Action_delete_selected_tours_dlg_title;
    public static String        Tour_Book_Action_delete_selected_tours_dlg_title_confirm;
    public static String        Tour_Book_Action_delete_selected_tours_menu;
-   public static String        Tour_Book_Action_ExportViewCSV;
    public static String        Tour_Book_Action_ExportViewCSV_Tooltip;
    public static String        Tour_Book_Action_ToggleViewLayout_Tooltip;
    public static String        Tour_Book_Combo_statistic_tooltip;
@@ -2589,6 +2596,8 @@ public class Messages extends NLS {
    public static String        Tour_Database_PostUpdate_037_SetHasGeoData;
    public static String        Tour_Database_PostUpdate_040_SetTourRecordingTime;
    public static String        Tour_Database_PostUpdate_043_LatLonE6;
+   public static String        Tour_Database_PostUpdate_047_Weather;
+   public static String        Tour_Database_PostUpdate;
    public static String        Tour_Database_TourSaveError;
    public static String        Tour_Database_Update;
    public static String        Tour_Database_UpdateDone;
@@ -2895,6 +2904,7 @@ public class Messages extends NLS {
    public static String        Tour_Pauses_Column_StartTime_Relative_Label;
    public static String        Tour_Pauses_Column_StartTime_Relative_Tooltip;
 
+   public static String        Tour_Segmenter_Action_ExportViewCSV_Tooltip;
    public static String        Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;
    public static String        Tour_Segmenter_Button_SaveTour_Tooltip;
    public static String        tour_segmenter_button_updateAltitude;

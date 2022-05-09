@@ -20,14 +20,14 @@ import net.tourbook.common.UI;
 
 public interface IWeather {
 
-   public static final String   WEATHER_ID_CLEAR                = "weather-sunny";            //$NON-NLS-1$
-   public static final String   WEATHER_ID_PART_CLOUDS          = "weather-cloudy";           //$NON-NLS-1$
-   public static final String   WEATHER_ID_OVERCAST             = "weather-clouds";           //$NON-NLS-1$
-   public static final String   WEATHER_ID_LIGHTNING            = "weather-lightning";        //$NON-NLS-1$
-   public static final String   WEATHER_ID_RAIN                 = "weather-rain";             //$NON-NLS-1$
-   public static final String   WEATHER_ID_SNOW                 = "weather-snow";             //$NON-NLS-1$
-   public static final String   WEATHER_ID_SEVERE_WEATHER_ALERT = "weather-severe";           //$NON-NLS-1$
-   public static final String   WEATHER_ID_SCATTERED_SHOWERS    = "weather-showers-scatterd"; //$NON-NLS-1$
+   public static final String   WEATHER_ID_CLEAR                = "weather-sunny";             //$NON-NLS-1$
+   public static final String   WEATHER_ID_PART_CLOUDS          = "weather-cloudy";            //$NON-NLS-1$
+   public static final String   WEATHER_ID_OVERCAST             = "weather-clouds";            //$NON-NLS-1$
+   public static final String   WEATHER_ID_LIGHTNING            = "weather-lightning";         //$NON-NLS-1$
+   public static final String   WEATHER_ID_RAIN                 = "weather-rain";              //$NON-NLS-1$
+   public static final String   WEATHER_ID_SNOW                 = "weather-snow";              //$NON-NLS-1$
+   public static final String   WEATHER_ID_SEVERE_WEATHER_ALERT = "weather-severe";            //$NON-NLS-1$
+   public static final String   WEATHER_ID_SCATTERED_SHOWERS    = "weather-showers-scattered"; //$NON-NLS-1$
 
    public static final String   windDirectionIsNotDefined       = UI.EMPTY_STRING;
 

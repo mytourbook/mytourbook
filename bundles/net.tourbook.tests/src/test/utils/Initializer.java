@@ -88,7 +88,9 @@ public class Initializer {
          }
       }
 
-      return Comparison.retrieveImportedTour(newlyImportedTours);
+      final TourData newlyImportedTour = Comparison.retrieveImportedTour(newlyImportedTours);
+
+      return newlyImportedTour;
    }
 
    public static TourData importTour_FIT(final String importFilePath) {
@@ -114,11 +116,11 @@ public class Initializer {
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
       final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
       final GarminTCX_DeviceDataReader deviceDataReader = new GarminTCX_DeviceDataReader();
-      final SAXParser parser = initializeParser();
       final String testFilePath = FilesUtils.getAbsoluteFilePath(importFilePath);
       final File file = new File(testFilePath);
 
       try (InputStream in = new FileInputStream(file)) {
+
          final GPX_SAX_Handler handler = new GPX_SAX_Handler(
                importFilePath,
                deviceData,
@@ -128,7 +130,10 @@ public class Initializer {
                new ImportState_Process(),
                deviceDataReader);
 
-         parser.parse(in, handler);
+         final SAXParser parser = initializeParser();
+         if (parser != null) {
+            parser.parse(in, handler);
+         }
 
       } catch (final SAXException | IOException e) {
          e.printStackTrace();

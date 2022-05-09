@@ -17,7 +17,6 @@ package net.tourbook.common.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.tourbook.common.UI;
@@ -41,14 +40,5 @@ public class StringUtilsTests {
       final String[] stringArray = { "1", "2", "3" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       assertEquals("1,2,3", StringUtils.join(stringArray, ",")); //$NON-NLS-1$ //$NON-NLS-2$
       assertEquals("1", StringUtils.join(new String[] { "1" }, ",")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-   }
-
-   @Test
-   void testSanitizeFileName() {
-
-      final String fileName = "\\$%#filename.txt"; //$NON-NLS-1$
-      assertEquals("----filename.txt", StringUtils.sanitizeFileName(fileName)); //$NON-NLS-1$
-      assertNull(StringUtils.sanitizeFileName(null));
-      assertEquals(UI.EMPTY_STRING, StringUtils.sanitizeFileName(UI.EMPTY_STRING));
    }
 }

@@ -542,7 +542,6 @@ public class Messages extends NLS {
    public static String        Tour_Marker_Column_IsVisibleNoEdit_Tooltip;
 
    public static String        Tour_Tooltip_Action_EditFormatPreferences;
-   public static String        Tour_Tooltip_Format_AverageTemperatures_Tooltip;
    public static String        Tour_Tooltip_Format_DateWeekTime;
    public static String        Tour_Tooltip_Format_HistoryDateTime;
    public static String        Tour_Tooltip_Format_Pace;
@@ -556,6 +555,8 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_AvgPower;
    public static String        Tour_Tooltip_Label_AvgPulse;
    public static String        Tour_Tooltip_Label_AvgSpeed;
+   public static String        Tour_Tooltip_Label_AvgTemperature_FromDevice;
+   public static String        Tour_Tooltip_Label_AvgTemperature_NoDevice;
    public static String        Tour_Tooltip_Label_Battery;
    public static String        Tour_Tooltip_Label_Battery_Tooltip;
    public static String        Tour_Tooltip_Label_BatteryLevel_Tooltip;
@@ -600,7 +601,6 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_RunDyn_VerticalRatio_Min;
    public static String        Tour_Tooltip_Label_Tags;
    public static String        Tour_Tooltip_Label_Temperature;
-   public static String        Tour_Tooltip_Label_Temperature_FromDevice;
    public static String        Tour_Tooltip_Label_TimeZone;
    public static String        Tour_Tooltip_Label_TimeZoneDifference;
    public static String        Tour_Tooltip_Label_TourType;

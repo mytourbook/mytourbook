@@ -28,12 +28,15 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -65,16 +68,18 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       }
    }
 
-   private static final String    baseApiUrl      = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
-   private static final String    keyParameter    = "?key=";                                                          //$NON-NLS-1$
+   private static final String    baseApiUrl   = "http://api.worldweatheronline.com/premium/v1/past-weather.ashx"; //$NON-NLS-1$
+   private static final String    keyParameter = "?key=";                                                          //$NON-NLS-1$
+
+   private String                 endDate;
    private LatLng                 searchAreaCenter;
    private String                 startDate;
+   private long                   tourEndTime;
+   private long                   tourMiddleTime;
+   private long                   tourStartTime;
 
-   private WeatherData            historicalWeatherData;
-
-   private final IPreferenceStore _prefStore      = TourbookPlugin.getPrefStore();
-   private List<Hourly>           _rawWeatherData = null;
-   private List<NearestArea>      _nearestArea    = null;
+   private final IPreferenceStore prefStore    = TourbookPlugin.getPrefStore();
+   private Data                   weatherData  = null;
 
    /*
     * @param tour
@@ -86,6 +91,11 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
       searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(tour);
       startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime()); //$NON-NLS-1$
+      endDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime().plusSeconds(tour.getTourDeviceTime_Elapsed())); //$NON-NLS-1$
+
+      tourStartTime = tour.getTourStartTimeMS() / 1000;
+      tourEndTime = tour.getTourEndTimeMS() / 1000;
+      tourMiddleTime = tourStartTime + ((tourEndTime - tourStartTime) / 2);
    }
 
    public static String getApiUrl() {
@@ -99,13 +109,12 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    @Override
    protected String buildFullWeatherDataString() {
 
-      final List<Hourly> hourlyFiltered = filterHourlyData(tour);
-
       final List<String> fullWeatherDataList = new ArrayList<>();
 
-      for (final Hourly hourly : hourlyFiltered) {
+      for (final Hourly hourly : weatherData.getFilteredHourly()) {
 
-         final long hourlyEpochSeconds = hourly.getEpochSeconds(tour.getTimeZoneIdWithDefault());
+         final long hourlyEpochSeconds = hourly.getEpochSeconds();
+         final TourDateTime tourDateTime = TimeTools.createTourDateTime(hourlyEpochSeconds * 1000L, tour.getTimeZoneId());
 
          final String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                hourly.getTempC(),
@@ -113,27 +122,28 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                hourly.getWindspeedKmph(),
                hourly.getWinddirDegree(),
                hourly.getHumidity(),
+               hourly.getPressure(),
                hourly.getPrecipMM(),
                0,
-               hourlyEpochSeconds,
-               tour.getTimeZoneId());
+               tourDateTime);
 
          fullWeatherDataList.add(fullWeatherData);
       }
 
       //Adding the weather station information
-      if (_nearestArea != null && _nearestArea.size() > 0) {
+      final List<NearestArea> nearestArea = weatherData.getNearestArea();
+      if (nearestArea != null && nearestArea.size() > 0) {
 
-         final NearestArea nearestArea = _nearestArea.get(0);
+         final NearestArea firstNearestArea = nearestArea.get(0);
 
          String weatherStationName = UI.EMPTY_STRING;
-         if (nearestArea.getAreaName() != null && nearestArea.getAreaName().size() > 0) {
-            weatherStationName = nearestArea.getAreaName().get(0).getValue();
+         if (firstNearestArea.getAreaName() != null && firstNearestArea.getAreaName().size() > 0) {
+            weatherStationName = firstNearestArea.getAreaName().get(0).getValue();
          }
 
          final LatLng weatherStationCoordinates = new LatLng(
-               Double.valueOf(nearestArea.getLatitude()),
-               Double.valueOf(nearestArea.getLongitude()));
+               Double.valueOf(firstNearestArea.getLatitude()),
+               Double.valueOf(firstNearestArea.getLongitude()));
 
          final float distanceFromTour = Math.round(
                LatLngTool.distance(
@@ -143,8 +153,8 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                      / UI.UNIT_VALUE_DISTANCE / 1000);
 
          String weatherStationLink = UI.EMPTY_STRING;
-         if (nearestArea.getWeatherUrl() != null && nearestArea.getWeatherUrl().size() > 0) {
-            weatherStationLink = nearestArea.getWeatherUrl().get(0).getValue();
+         if (firstNearestArea.getWeatherUrl() != null && firstNearestArea.getWeatherUrl().size() > 0) {
+            weatherStationLink = firstNearestArea.getWeatherUrl().get(0).getValue();
          }
 
          fullWeatherDataList.add(NLS.bind(
@@ -173,7 +183,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                .setHost(apiUri.getHost())
                .setPath(apiUri.getPath());
 
-         uriBuilder.setParameter("key", _prefStore.getString(ITourbookPreferences.WEATHER_API_KEY)); //$NON-NLS-1$
+         uriBuilder.setParameter("key", prefStore.getString(ITourbookPreferences.WEATHER_API_KEY)); //$NON-NLS-1$
          uriBuilder.setParameter("q", searchAreaCenter.getLatitude() + "," + searchAreaCenter.getLongitude()); //$NON-NLS-1$ //$NON-NLS-2$
          uriBuilder.setParameter("date", startDate); //$NON-NLS-1$
          //tp=1 : Specifies the weather forecast time interval in hours. Here, every 1 hour
@@ -181,6 +191,12 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
          uriBuilder.setParameter("format", "json"); //$NON-NLS-1$ //$NON-NLS-2$
          uriBuilder.setParameter("includelocation", "yes"); //$NON-NLS-1$ //$NON-NLS-2$
          uriBuilder.setParameter("extra", "utcDateTime"); //$NON-NLS-1$ //$NON-NLS-2$
+         uriBuilder.setParameter("lang", Locale.getDefault().getLanguage()); //$NON-NLS-1$
+
+         //If the tour finishes a different day, we need to specify the ending date
+         if (!endDate.equals(startDate)) {
+            uriBuilder.setParameter("enddate", endDate); //$NON-NLS-1$
+         }
 
          weatherRequestWithParameters = uriBuilder.build().toString();
 
@@ -196,104 +212,74 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       }
    }
 
-   private void computeFinalWeatherData(final WeatherData weatherData) {
-
-      int numHourlyDatasets = 0;
-      int sumHumidity = 0;
-      int sumPressure = 0;
-      float sumPrecipitation = 0f;
-      int sumWindChill = 0;
-      int sumWindDirection = 0;
-      int sumWindSpeed = 0;
-      int sumTemperature = 0;
-      int maxTemperature = Integer.MIN_VALUE;
-      int minTemperature = Integer.MAX_VALUE;
-
-      final List<Hourly> hourlyFiltered = filterHourlyData(tour);
-
-      final int tourMiddleData = (hourlyFiltered.size() / 2);
-
-      for (int index = 0; index < hourlyFiltered.size(); index++) {
-
-         final Hourly hourlyData = hourlyFiltered.get(index);
-
-         // Within the hourly data, find the times that corresponds to the middle
-         // of the tour time and extract the weather data's description.
-         if (index == tourMiddleData) {
-
-            weatherData.setWeatherDescription(hourlyData.getWeatherDescription());
-            weatherData.setWeatherType(hourlyData.getWeatherCode());
-         }
-
-         sumWindDirection += hourlyData.getWinddirDegree();
-         sumWindSpeed += hourlyData.getWindspeedKmph();
-         sumHumidity += hourlyData.getHumidity();
-         sumPrecipitation += hourlyData.getPrecipMM();
-         sumPressure += hourlyData.getPressure();
-         sumWindChill += hourlyData.getFeelsLikeC();
-         sumTemperature += hourlyData.getTempC();
-
-         if (hourlyData.getTempC() < minTemperature) {
-            minTemperature = hourlyData.getTempC();
-         }
-
-         if (hourlyData.getTempC() > maxTemperature) {
-            maxTemperature = hourlyData.getTempC();
-         }
-
-         ++numHourlyDatasets;
-      }
-
-      weatherData.setWindDirection((int) Math.ceil((double) sumWindDirection / (double) numHourlyDatasets));
-      weatherData.setWindSpeed((int) Math.ceil((double) sumWindSpeed / (double) numHourlyDatasets));
-      weatherData.setTemperatureMax(maxTemperature);
-      weatherData.setTemperatureMin(minTemperature);
-      weatherData.setTemperatureAverage((int) Math.ceil((double) sumTemperature / (double) numHourlyDatasets));
-      weatherData.setWindChill((int) Math.ceil((double) sumWindChill / (double) numHourlyDatasets));
-      weatherData.setAverageHumidity((int) Math.ceil((double) sumHumidity / (double) numHourlyDatasets));
-      weatherData.setAveragePressure((int) Math.ceil((double) sumPressure / (double) numHourlyDatasets));
-      weatherData.setPrecipitation(sumPrecipitation);
-   }
-
    /**
-    * Filters and keeps only the values included between the tour start and end times.
+    * Retrieves the historical weather data
     *
-    * @param tour
-    * @return
+    * @return The weather data, if found.
     */
-   private List<Hourly> filterHourlyData(final TourData tour) {
+   @Override
+   public boolean retrieveHistoricalWeatherData() {
 
-      final List<Hourly> filteredHourlyData = new ArrayList<>();
+      final String weatherRequestWithParameters = buildWeatherApiRequest();
 
-      final long tourStartTime = tour.getTourStartTimeMS() / 1000;
-      final long tourEndTime = tour.getTourEndTimeMS() / 1000;
-      final long thirtyMinutes = 1800;
-
-      for (final Hourly hourly : _rawWeatherData) {
-
-         //The current data is not kept if its measured time is:
-         // - 30 mins before the tour start time
-         // OR 30 mins after the tour start time
-         final long hourlyEpochSeconds = hourly.getEpochSeconds(tour.getTimeZoneIdWithDefault());
-         if (hourlyEpochSeconds < tourStartTime - thirtyMinutes ||
-               hourlyEpochSeconds > tourEndTime + thirtyMinutes) {
-            continue;
-         }
-
-         filteredHourlyData.add(hourly);
+      final String rawWeatherData = sendWeatherApiRequest(weatherRequestWithParameters);
+      if (StringUtils.isNullOrEmpty(rawWeatherData)) {
+         return false;
       }
 
-      return filteredHourlyData;
+      weatherData = serializeWeatherData(rawWeatherData);
+      if (weatherData == null) {
+         return false;
+      }
+
+      final List<Weather> weather = weatherData.getWeather();
+      if (weather == null ||
+            weather.isEmpty() ||
+            weather.get(0).getHourly() == null ||
+            weather.get(0).getHourly().isEmpty()) {
+         return false;
+      }
+
+   // SET_FORMATTING_OFF
+
+      final boolean hourlyDataExists = weatherData.filterHourlyData(tourStartTime, tourEndTime);
+      if(!hourlyDataExists)
+      {
+         return false;
+      }
+
+      tour.setIsWeatherDataFromProvider(true);
+
+      //We look for the weather data in the middle of the tour to populate the weather conditions
+      weatherData.findMiddleHourly(tourMiddleTime);
+      tour.setWeather(                       weatherData.getWeatherDescription());
+      tour.setWeather_Clouds(                weatherData.getWeatherType());
+
+      tour.setWeather_Temperature_Average(   weatherData.getTemperatureAverage());
+      tour.setWeather_Humidity(              weatherData.getAverageHumidity());
+      tour.setWeather_Precipitation(         weatherData.getTotalPrecipitation());
+      tour.setWeather_Pressure(              weatherData.getAveragePressure());
+      tour.setWeather_Temperature_Max(       weatherData.getTemperatureMax());
+      tour.setWeather_Temperature_Min(       weatherData.getTemperatureMin());
+      tour.setWeather_Temperature_WindChill( weatherData.getAverageWindChill());
+
+      weatherData.computeAverageWindSpeedAndDirection();
+      tour.setWeather_Wind_Speed(            weatherData.getAverageWindSpeed());
+      tour.setWeather_Wind_Direction(        weatherData.getAverageWindDirection());
+
+// SET_FORMATTING_ON
+
+      return true;
    }
 
    /**
-    * Parses a JSON weather data object into a WeatherData object.
+    * Serialized a JSON weather data object into a WeatherData object.
     *
     * @param weatherDataResponse
     *           A string containing a historical weather data JSON object.
-    * @return The parsed weather data.
+    * @return The serialized weather data.
     */
-   private WeatherData parseWeatherData(final String weatherDataResponse) {
+   private Data serializeWeatherData(final String weatherDataResponse) {
 
       if (_isLogWeatherData) {
 
@@ -317,76 +303,25 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
          System.out.println(weatherDataResponse);
       }
 
-      final WeatherData weatherData = new WeatherData();
+      Data serializedWeatherData = new Data();
       try {
 
          //weather
          final ObjectMapper mapper = new ObjectMapper();
          final String weatherResults = mapper.readValue(weatherDataResponse, JsonNode.class)
                .get("data") //$NON-NLS-1$
-               .get("weather") //$NON-NLS-1$
-               .get(0)
-               .get("hourly") //$NON-NLS-1$
                .toString();
 
-         _rawWeatherData = mapper.readValue(weatherResults, new TypeReference<List<Hourly>>() {});
-
-         computeFinalWeatherData(weatherData);
-
-         //nearest_area
-         final String nearestAreaResults = mapper.readValue(weatherDataResponse, JsonNode.class)
-               .get("data") //$NON-NLS-1$
-               .get("nearest_area") //$NON-NLS-1$
-               .toString();
-
-         _nearestArea = mapper.readValue(nearestAreaResults, new TypeReference<List<NearestArea>>() {});
+         serializedWeatherData = mapper.readValue(weatherResults, new TypeReference<Data>() {});
 
       } catch (final Exception e) {
          StatusUtil.logError(
-               "WorldWeatherOnlineRetriever.parseWeatherData : Error while parsing the historical weather JSON object :" //$NON-NLS-1$
+               "WorldWeatherOnlineRetriever.serializeWeatherData : Error while parsing the historical weather JSON object :" //$NON-NLS-1$
                      + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
          return null;
       }
 
-      return weatherData;
-   }
-
-   /**
-    * Retrieves the historical weather data
-    *
-    * @return The weather data, if found.
-    */
-   @Override
-   public boolean retrieveHistoricalWeatherData() {
-
-      final String weatherRequestWithParameters = buildWeatherApiRequest();
-
-      final String rawWeatherData = super.sendWeatherApiRequest(weatherRequestWithParameters);
-      if (!rawWeatherData.contains("weather")) { //$NON-NLS-1$
-         return false;
-      }
-
-      historicalWeatherData = parseWeatherData(rawWeatherData);
-
-      if (historicalWeatherData == null) {
-         return false;
-      }
-
-      tour.setIsWeatherDataFromProvider(true);
-      tour.setWeather_Temperature_Average(historicalWeatherData.getTemperatureAverage());
-      tour.setWeather_Wind_Speed(historicalWeatherData.getWindSpeed());
-      tour.setWeather_Wind_Direction(historicalWeatherData.getWindDirection());
-      tour.setWeather(historicalWeatherData.getWeatherDescription());
-      tour.setWeather_Clouds(historicalWeatherData.getWeatherType());
-
-      tour.setWeather_Humidity((short) historicalWeatherData.getAverageHumidity());
-      tour.setWeather_Precipitation(historicalWeatherData.getPrecipitation());
-      tour.setWeather_Pressure((short) historicalWeatherData.getAveragePressure());
-      tour.setWeather_Temperature_Max(historicalWeatherData.getTemperatureMax());
-      tour.setWeather_Temperature_Min(historicalWeatherData.getTemperatureMin());
-      tour.setWeather_Temperature_WindChill(historicalWeatherData.getWindChill());
-
-      return true;
+      return serializedWeatherData;
    }
 
 }

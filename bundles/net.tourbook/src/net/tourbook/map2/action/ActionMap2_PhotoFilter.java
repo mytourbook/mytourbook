@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,6 +29,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.ToolItem;
 
 public class ActionMap2_PhotoFilter extends ActionToolbarSlideoutAdv {
+
+   private static final String PHOTO_FILTER_TITLE_MAP2_PHOTO_FILTER = net.tourbook.Messages.Photo_Filter_Title_Map2PhotoFilter;
 
    /*
     * UI resources
@@ -62,7 +64,7 @@ public class ActionMap2_PhotoFilter extends ActionToolbarSlideoutAdv {
    @Override
    protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-      _slideoutPhotoFilter = new SlideoutPhotoFilter(toolItem, _map2View, _state);
+      _slideoutPhotoFilter = new SlideoutPhotoFilter(toolItem, _map2View, _state, PHOTO_FILTER_TITLE_MAP2_PHOTO_FILTER);
       _slideoutPhotoFilter.setSlideoutLocation(SlideoutLocation.BELOW_CENTER);
 
       return _slideoutPhotoFilter;

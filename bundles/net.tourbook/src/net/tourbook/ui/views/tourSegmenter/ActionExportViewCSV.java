@@ -1,6 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
- * Copyright (C) 2019 Thomas Theussing
+ * Copyright (C) 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,35 +13,33 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map25.action;
+package net.tourbook.ui.views.tourSegmenter;
 
 import net.tourbook.Images;
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.map2.Messages;
-import net.tourbook.map25.Map25View;
 
 import org.eclipse.jface.action.Action;
 
-public class ActionShowPhotos extends Action {
+public class ActionExportViewCSV extends Action {
 
-   private Map25View _map25View;
+   private TourSegmenterView _tourSegmenterView;
 
-   public ActionShowPhotos(final Map25View map25View) {
+   public ActionExportViewCSV(final TourSegmenterView tourSegmenterView) {
 
-      super(null, AS_CHECK_BOX);
+      super();
 
-      _map25View = map25View;
+      _tourSegmenterView = tourSegmenterView;
 
-      setToolTipText(Messages.Map_Action_ShowPhotos_Tooltip);
+      setText(Messages.App_Action_ExportViewCSV);
+      setToolTipText(Messages.Tour_Segmenter_Action_ExportViewCSV_Tooltip);
 
-      setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.ShowPhotos_InMap));
-      setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.ShowAllPhotos_InMap_Disabled));
+      setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat));
+      setDisabledImageDescriptor(TourbookPlugin.getImageDescriptor(Images.CSVFormat_Disabled));
    }
 
    @Override
    public void run() {
-
-      _map25View.actionShowPhotos(isChecked());
+      _tourSegmenterView.actionExportViewCSV();
    }
-
 }

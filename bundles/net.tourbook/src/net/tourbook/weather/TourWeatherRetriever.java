@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.weather;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
@@ -37,12 +38,17 @@ public final class TourWeatherRetriever {
       HistoricalWeatherRetriever historicalWeatherRetriever = null;
 
       switch (weatherProvider) {
+
       case IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP:
+
          historicalWeatherRetriever = new OpenWeatherMapRetriever(tourData);
          break;
+
       case IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE:
+
          historicalWeatherRetriever = new WorldWeatherOnlineRetriever(tourData);
          break;
+
       case IWeatherProvider.Pref_Weather_Provider_None:
       default:
          break;
@@ -58,12 +64,16 @@ public final class TourWeatherRetriever {
 
          TourLogManager.subLog_OK(TourManager.getTourDateTimeShort(tourData) +
                UI.SYMBOL_COLON + UI.SPACE +
-               WeatherUtils.buildWeatherDataString(tourData, true, true));
+               WeatherUtils.buildWeatherDataString(tourData, true, true, true));
 
          if (_prefStore.getBoolean(ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG)) {
 
             TourLogManager.subLog_INFO(historicalWeatherRetriever.buildFullWeatherDataString());
          }
+      } else {
+         TourLogManager.subLog_INFO(String.format(
+               Messages.Log_RetrieveWeatherData_003_NoWeatherData,
+               TourManager.getTourDateTimeShort(tourData)));
       }
 
       return retrievalStatus;
