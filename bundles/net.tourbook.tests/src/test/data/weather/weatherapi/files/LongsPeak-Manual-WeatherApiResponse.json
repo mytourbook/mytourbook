@@ -1,0 +1,50 @@
+{
+    "location": {
+        "name": "Drakes",
+        "region": "Colorado",
+        "country": "United States of America",
+        "lat": 40.55,
+        "lon": -105.14,
+        "tz_id": "America/Denver",
+        "localtime_epoch": 1652198857,
+        "localtime": "2022-05-10 10:07"
+    },
+    "forecast": {
+        "forecastday": [
+            {
+                "date": "2022-05-09",
+                "date_epoch": 1652054400,
+                "day": {
+                    "maxtemp_c": 22.1,
+                    "maxtemp_f": 71.8,
+                    "mintemp_c": 7.4,
+                    "mintemp_f": 45.3,
+                    "avgtemp_c": 16.9,
+                    "avgtemp_f": 62.5,
+                    "maxwind_mph": 24.2,
+                    "maxwind_kph": 38.9,
+                    "totalprecip_mm": 0,
+                    "totalprecip_in": 0,
+                    "avgvis_km": 10,
+                    "avgvis_miles": 6,
+                    "avghumidity": 31,
+                    "condition": {
+                        "text": "Ensoleillé",
+                        "icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
+                        "code": 1000
+                    },
+                    "uv": 0
+                },
+                "astro": {
+                    "sunrise": "05:50 AM",
+                    "sunset": "08:05 PM",
+                    "moonrise": "12:58 PM",
+                    "moonset": "02:47 AM",
+                    "moon_phase": "First Quarter",
+                    "moon_illumination": "56"
+                },
+                "hour": []
+            }
+        ]
+    }
+}
