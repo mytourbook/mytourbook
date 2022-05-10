@@ -106,9 +106,9 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
          uriBuilder.setParameter("lat", String.valueOf(searchAreaCenter.getLatitude())); //$NON-NLS-1$
          uriBuilder.setParameter("lon", String.valueOf(searchAreaCenter.getLongitude())); //$NON-NLS-1$
          uriBuilder.setParameter("lang", Locale.getDefault().getLanguage()); //$NON-NLS-1$
-         //todo fb VERY IMPORTANT, the unixdt must be top of the hour!!!!
-         uriBuilder.setParameter("unixdt", String.valueOf(date)); //$NON-NLS-1$
-         uriBuilder.setParameter("unixend_dt", String.valueOf(date)); //$NON-NLS-1$
+         //todo fb apparently, unixdt doesn't restrict the hours so let's use dt and iterate if the
+         //event happens over multiple days (100 milers)
+         uriBuilder.setParameter("dt", String.valueOf(date)); //$NON-NLS-1$
          weatherRequestWithParameters = uriBuilder.build().toString();
 
          return weatherRequestWithParameters;
