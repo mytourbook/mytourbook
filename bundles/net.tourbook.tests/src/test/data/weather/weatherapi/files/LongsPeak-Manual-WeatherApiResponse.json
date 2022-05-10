@@ -29,7 +29,7 @@
 					"avgvis_miles": 6,
 					"avghumidity": 31,
 					"condition": {
-						"text": "Ensoleillé",
+						"text": "Ensoleille",
 						"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 						"code": 1000
 					},
@@ -62,7 +62,7 @@
 					"avgvis_miles": 6,
 					"avghumidity": 32,
 					"condition": {
-						"text": "Ensoleillé",
+						"text": "Ensoleille",
 						"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 						"code": 1000
 					},
@@ -306,7 +306,7 @@
 						"temp_f": 38.1,
 						"is_day": 1,
 						"condition": {
-							"text": "Ensoleillé",
+							"text": "Ensoleille",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 							"code": 1000
 						},
@@ -343,7 +343,7 @@
 						"temp_f": 41.4,
 						"is_day": 1,
 						"condition": {
-							"text": "Ensoleillé",
+							"text": "Ensoleille",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 							"code": 1000
 						},
@@ -380,7 +380,7 @@
 						"temp_f": 44.6,
 						"is_day": 1,
 						"condition": {
-							"text": "Ensoleillé",
+							"text": "Ensoleille",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 							"code": 1000
 						},
@@ -417,7 +417,7 @@
 						"temp_f": 47.8,
 						"is_day": 1,
 						"condition": {
-							"text": "Ensoleillé",
+							"text": "Ensoleille",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 							"code": 1000
 						},
@@ -454,7 +454,7 @@
 						"temp_f": 51.7,
 						"is_day": 1,
 						"condition": {
-							"text": "Ensoleillé",
+							"text": "Ensoleille",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 							"code": 1000
 						},
@@ -491,7 +491,7 @@
 						"temp_f": 55.5,
 						"is_day": 1,
 						"condition": {
-							"text": "Ensoleillé",
+							"text": "Ensoleille",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 							"code": 1000
 						},
@@ -528,7 +528,7 @@
 						"temp_f": 59.4,
 						"is_day": 1,
 						"condition": {
-							"text": "Ensoleillé",
+							"text": "Ensoleille",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 							"code": 1000
 						},
@@ -565,7 +565,7 @@
 						"temp_f": 61.8,
 						"is_day": 1,
 						"condition": {
-							"text": "Ensoleillé",
+							"text": "Ensoleille",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 							"code": 1000
 						},
@@ -602,7 +602,7 @@
 						"temp_f": 64.3,
 						"is_day": 1,
 						"condition": {
-							"text": "Ensoleillé",
+							"text": "Ensoleille",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 							"code": 1000
 						},
@@ -639,7 +639,7 @@
 						"temp_f": 66.7,
 						"is_day": 1,
 						"condition": {
-							"text": "Ensoleillé",
+							"text": "Ensoleille",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 							"code": 1000
 						},
@@ -676,7 +676,7 @@
 						"temp_f": 68.4,
 						"is_day": 1,
 						"condition": {
-							"text": "Ensoleillé",
+							"text": "Ensoleille",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 							"code": 1000
 						},
@@ -713,7 +713,7 @@
 						"temp_f": 70.1,
 						"is_day": 1,
 						"condition": {
-							"text": "Ensoleillé",
+							"text": "Ensoleille",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 							"code": 1000
 						},
@@ -750,7 +750,7 @@
 						"temp_f": 71.8,
 						"is_day": 1,
 						"condition": {
-							"text": "Ensoleillé",
+							"text": "Ensoleille",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 							"code": 1000
 						},
@@ -787,7 +787,7 @@
 						"temp_f": 67.5,
 						"is_day": 1,
 						"condition": {
-							"text": "Ensoleillé",
+							"text": "Ensoleille",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 							"code": 1000
 						},
@@ -824,7 +824,7 @@
 						"temp_f": 63.3,
 						"is_day": 1,
 						"condition": {
-							"text": "Ensoleillé",
+							"text": "Ensoleille",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/113.png",
 							"code": 1000
 						},

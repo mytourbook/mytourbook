@@ -22,8 +22,8 @@ import com.pgssoft.httpclient.HttpClientMock;
 
 import java.lang.reflect.Field;
 
-import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.data.TourData;
+import net.tourbook.weather.WeatherUtils;
 import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -53,7 +53,7 @@ public class OpenWeatherMapRetrieverTests {
    @Test
    void testWeatherRetrieval() throws IllegalAccessException, NoSuchFieldException {
 
-      final String urlBase = OAuth2Constants.HEROKU_APP_URL
+      final String urlBase = WeatherUtils.HEROKU_APP_URL
             + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
 
       final String openWeatherMapResponse1 = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH

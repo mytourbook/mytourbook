@@ -22,8 +22,8 @@ import com.pgssoft.httpclient.HttpClientMock;
 
 import java.lang.reflect.Field;
 
-import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.data.TourData;
+import net.tourbook.weather.WeatherUtils;
 import net.tourbook.weather.weatherapi.WeatherApiRetriever;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -53,12 +53,12 @@ public class WeatherAPIRetrieverTests {
    @Test
    void testWeatherRetrieval() throws IllegalAccessException, NoSuchFieldException {
 
-      final String worldWeatherOnlineResponse = Comparison.readFileContent(WEATHERAPI_FILE_PATH
+      final String weatherApiResponse = Comparison.readFileContent(WEATHERAPI_FILE_PATH
             + "LongsPeak-Manual-WeatherApiResponse.json"); //$NON-NLS-1$
-      final String url = OAuth2Constants.HEROKU_APP_URL
-            + "/weatherapi/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt=1647086400"; //$NON-NLS-1$
+      final String url = WeatherUtils.HEROKU_APP_URL
+            + "/weatherapi?lat=40.263996&lon=-105.58854099999999&lang=en&dt=2020-07-04"; //$NON-NLS-1$
       httpClientMock.onGet(url)
-            .doReturn(worldWeatherOnlineResponse);
+            .doReturn(weatherApiResponse);
       final Field field = WeatherApiRetriever.class
             .getSuperclass()
             .getDeclaredField("httpClient"); //$NON-NLS-1$
