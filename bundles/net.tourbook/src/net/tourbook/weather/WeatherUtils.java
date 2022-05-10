@@ -32,7 +32,9 @@ import net.tourbook.data.TourData;
 
 public class WeatherUtils {
 
-   public static final int SECONDS_PER_THIRTY_MINUTE = 1800;
+   public static final int    SECONDS_PER_THIRTY_MINUTE = 1800;
+
+   public static final String HEROKU_APP_URL            = "https://passeur-mytourbook-oauthapps.herokuapp.com"; //$NON-NLS-1$
 
    /**
     * Returns the fully detailed weather data as a human readable string.

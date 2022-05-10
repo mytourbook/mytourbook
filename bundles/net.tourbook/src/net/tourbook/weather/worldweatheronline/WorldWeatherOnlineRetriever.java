@@ -216,6 +216,58 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    }
 
    /**
+    * Deserialize a JSON weather data object into a WeatherData object.
+    *
+    * @param weatherDataResponse
+    *           A string containing a historical weather data JSON object.
+    * @return The serialized weather data.
+    */
+   private Data deserializeWeatherData(final String weatherDataResponse) {
+
+      if (_isLogWeatherData) {
+
+         final long elapsedTime = tour.getTourDeviceTime_Elapsed();
+         final ZonedDateTime zdtTourStart = tour.getTourStartTime();
+         final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
+         final String tourTitle = tour.getTourTitle();
+
+         System.out.println();
+
+         if (tourTitle.length() > 0) {
+            System.out.println(tourTitle);
+         }
+
+         System.out.println(String.format(TOUR_TOOLTIP_FORMAT_DATEWEEKTIME,
+               zdtTourStart.format(TimeTools.Formatter_Date_F),
+               zdtTourStart.format(TimeTools.Formatter_Time_M),
+               zdtTourEnd.format(TimeTools.Formatter_Time_M),
+               zdtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear())));
+
+         System.out.println(weatherDataResponse);
+      }
+
+      Data serializedWeatherData = new Data();
+      try {
+
+         //weather
+         final ObjectMapper mapper = new ObjectMapper();
+         final String weatherResults = mapper.readValue(weatherDataResponse, JsonNode.class)
+               .get("data") //$NON-NLS-1$
+               .toString();
+
+         serializedWeatherData = mapper.readValue(weatherResults, new TypeReference<Data>() {});
+
+      } catch (final Exception e) {
+         StatusUtil.logError(
+               "WorldWeatherOnlineRetriever.deserializeWeatherData : Error while deserializing the historical weather JSON object :" //$NON-NLS-1$
+                     + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
+         return null;
+      }
+
+      return serializedWeatherData;
+   }
+
+   /**
     * Retrieves the historical weather data
     *
     * @return The weather data, if found.
@@ -230,7 +282,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
          return false;
       }
 
-      weatherData = serializeWeatherData(rawWeatherData);
+      weatherData = deserializeWeatherData(rawWeatherData);
       if (weatherData == null) {
          return false;
       }
@@ -273,58 +325,6 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 // SET_FORMATTING_ON
 
       return true;
-   }
-
-   /**
-    * Serialized a JSON weather data object into a WeatherData object.
-    *
-    * @param weatherDataResponse
-    *           A string containing a historical weather data JSON object.
-    * @return The serialized weather data.
-    */
-   private Data serializeWeatherData(final String weatherDataResponse) {
-
-      if (_isLogWeatherData) {
-
-         final long elapsedTime = tour.getTourDeviceTime_Elapsed();
-         final ZonedDateTime zdtTourStart = tour.getTourStartTime();
-         final ZonedDateTime zdtTourEnd = zdtTourStart.plusSeconds(elapsedTime);
-         final String tourTitle = tour.getTourTitle();
-
-         System.out.println();
-
-         if (tourTitle.length() > 0) {
-            System.out.println(tourTitle);
-         }
-
-         System.out.println(String.format(TOUR_TOOLTIP_FORMAT_DATEWEEKTIME,
-               zdtTourStart.format(TimeTools.Formatter_Date_F),
-               zdtTourStart.format(TimeTools.Formatter_Time_M),
-               zdtTourEnd.format(TimeTools.Formatter_Time_M),
-               zdtTourStart.get(TimeTools.calendarWeek.weekOfWeekBasedYear())));
-
-         System.out.println(weatherDataResponse);
-      }
-
-      Data serializedWeatherData = new Data();
-      try {
-
-         //weather
-         final ObjectMapper mapper = new ObjectMapper();
-         final String weatherResults = mapper.readValue(weatherDataResponse, JsonNode.class)
-               .get("data") //$NON-NLS-1$
-               .toString();
-
-         serializedWeatherData = mapper.readValue(weatherResults, new TypeReference<Data>() {});
-
-      } catch (final Exception e) {
-         StatusUtil.logError(
-               "WorldWeatherOnlineRetriever.serializeWeatherData : Error while parsing the historical weather JSON object :" //$NON-NLS-1$
-                     + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
-         return null;
-      }
-
-      return serializedWeatherData;
    }
 
 }

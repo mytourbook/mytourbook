@@ -35,8 +35,7 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 
-   private static final String HEROKU_APP_URL    = "https://passeur-mytourbook-oauthapps.herokuapp.com"; //$NON-NLS-1$
-   private static final String baseApiUrl     = HEROKU_APP_URL + "/weatherapi";                       //$NON-NLS-1$
+   private static final String baseApiUrl = WeatherUtils.HEROKU_APP_URL + "/weatherapi"; //$NON-NLS-1$
 
    private LatLng              searchAreaCenter;
    private long                tourEndTime;
@@ -123,6 +122,32 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       }
    }
 
+   //todo fb isn't it a deserialization ???? if yes, rename also in other classes
+   private TimeMachineResult deserializeWeatherData(final String weatherDataResponse) {
+
+      TimeMachineResult newTimeMachineResult = null;
+      try {
+
+         final ObjectMapper mapper = new ObjectMapper();
+         final String weatherResults = mapper
+               .readValue(weatherDataResponse, JsonNode.class)
+               .toString();
+
+         newTimeMachineResult = mapper.readValue(
+               weatherResults,
+               new TypeReference<TimeMachineResult>() {});
+
+      } catch (final Exception e) {
+
+         StatusUtil.logError(
+               "WeatherApiRetriever.deserializeWeatherData : Error while deserializing the historical weather JSON object :" //$NON-NLS-1$
+                     + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
+         return newTimeMachineResult;
+      }
+
+      return newTimeMachineResult;
+   }
+
    @Override
    public boolean retrieveHistoricalWeatherData() {
 
@@ -202,31 +227,5 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 //// SET_FORMATTING_ON
 
       return true;
-   }
-
-   //todo fb isn't it a deserialization ???? if yes, rename also in other classes
-   private TimeMachineResult serializeWeatherData(final String weatherDataResponse) {
-
-      TimeMachineResult newTimeMachineResult = null;
-      try {
-
-         final ObjectMapper mapper = new ObjectMapper();
-         final String weatherResults = mapper
-               .readValue(weatherDataResponse, JsonNode.class)
-               .toString();
-
-         newTimeMachineResult = mapper.readValue(
-               weatherResults,
-               new TypeReference<TimeMachineResult>() {});
-
-      } catch (final Exception e) {
-
-         StatusUtil.logError(
-               "WeatherApiRetriever.serializeWeatherData : Error while serializing the historical weather JSON object :" //$NON-NLS-1$
-                     + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
-         return newTimeMachineResult;
-      }
-
-      return newTimeMachineResult;
    }
 }
