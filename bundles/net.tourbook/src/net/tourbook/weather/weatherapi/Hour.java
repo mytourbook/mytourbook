@@ -18,48 +18,25 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class Hour {
 
    private int       time_epoch;
-   private String    time;
    private double    temp_c;
-   private int       is_day;
    private Condition condition;
    private double    wind_kph;
    private int       wind_degree;
-   private String    wind_dir;
    private double    pressure_mb;
    private double    precip_mm;
    private int       humidity;
-   private int       cloud;
    private double    feelslike_c;
-   private double    windchill_c;
-   private double    dewpoint_c;
-   private double    gust_kph;
-
-   public int getCloud() {
-      return cloud;
-   }
 
    public Condition getCondition() {
       return condition;
-   }
-
-   public double getDewpoint_c() {
-      return dewpoint_c;
    }
 
    public double getFeelslike_c() {
       return feelslike_c;
    }
 
-   public double getGust_kph() {
-      return gust_kph;
-   }
-
    public int getHumidity() {
       return humidity;
-   }
-
-   public int getIs_day() {
-      return is_day;
    }
 
    public double getPrecip_mm() {
@@ -74,10 +51,6 @@ public class Hour {
       return temp_c;
    }
 
-   public String getTime() {
-      return time;
-   }
-
    public int getTime_epoch() {
       return time_epoch;
    }
@@ -86,16 +59,8 @@ public class Hour {
       return wind_degree;
    }
 
-   public String getWind_dir() {
-      return wind_dir;
-   }
-
    public double getWind_kph() {
       return wind_kph;
-   }
-
-   public double getWindchill_c() {
-      return windchill_c;
    }
 
 }

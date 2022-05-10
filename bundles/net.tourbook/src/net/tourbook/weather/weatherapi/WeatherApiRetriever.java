@@ -24,10 +24,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
@@ -65,32 +68,33 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
    @Override
    protected String buildFullWeatherDataString(final boolean displayStationInformation) {
 
-      return "";
-//      final List<String> fullWeatherDataList = new ArrayList<>();
-//
-//      for (final Hourly hourly : timeMachineResult.getHourly()) {
-//
-//         final TourDateTime tourDateTime = TimeTools.createTourDateTime(hourly.getDt() * 1000L, tour.getTimeZoneId());
-//
-//         final String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
-//               (float) hourly.getTemp(),
-//               (float) hourly.getFeels_like(),
-//               (float) hourly.getWind_speedKmph(),
-//               hourly.getWind_deg(),
-//               hourly.getHumidity(),
-//               hourly.getPressure(),
-//               hourly.getRain(),
-//               hourly.getSnow(),
-//               tourDateTime);
-//
-//         fullWeatherDataList.add(fullWeatherData);
-//      }
-//
-//      final String fullWeatherData = String.join(
-//            net.tourbook.ui.UI.SYSTEM_NEW_LINE,
-//            fullWeatherDataList);
-//
-//      return fullWeatherData;
+      final List<String> fullWeatherDataList = new ArrayList<>();
+
+      for (final Hour hour : historyResult.getHourList()) {
+
+         final TourDateTime tourDateTime = TimeTools.createTourDateTime(
+               hour.getTime_epoch() * 1000L,
+               tour.getTimeZoneId());
+
+         final String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
+               (float) hour.getTemp_c(),
+               (float) hour.getFeelslike_c(),
+               (float) hour.getWind_kph(),
+               hour.getWind_degree(),
+               hour.getHumidity(),
+               (int) hour.getPressure_mb(),
+               (float) hour.getPrecip_mm(),
+               0f,
+               tourDateTime);
+
+         fullWeatherDataList.add(fullWeatherData);
+      }
+
+      final String fullWeatherData = String.join(
+            net.tourbook.ui.UI.SYSTEM_NEW_LINE,
+            fullWeatherDataList);
+
+      return fullWeatherData;
    }
 
    private String buildWeatherApiRequest(final LocalDate requestedDate) {
@@ -126,7 +130,6 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       }
    }
 
-   //todo fb isn't it a deserialization ???? if yes, rename also in other classes
    private HistoryResult deserializeWeatherData(final String weatherDataResponse) {
 
       HistoryResult newHistoryResult = null;

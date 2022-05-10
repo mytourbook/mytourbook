@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.weather.WeatherUtils;
 
@@ -38,7 +39,6 @@ public class HistoryResult {
             hourList.add(newHour);
          }
       }
-
    }
 
    public void computeAverageWindSpeedAndDirection() {
@@ -59,7 +59,6 @@ public class HistoryResult {
       averageWindSpeed = averageWindSpeedAndDirection[0];
       averageWindDirection = averageWindSpeedAndDirection[1];
    }
-
 
    /**
     * Filters and keeps only the values included between the tour start and end times.
@@ -156,17 +155,6 @@ public class HistoryResult {
       return averageWindSpeed;
    }
 
-   private Hour getCurrentWeather() {
-
-      return middleHour;
-//      final List<Hour> currentWeather = middleHour.getCondition();
-//      if (currentWeather == null || currentWeather.isEmpty()) {
-//         return null;
-//      }
-//
-//      return currentWeather.get(0);
-   }
-
    public List<Hour> getForecastdayHourList() {
 
       if (forecast != null && forecast.getForecastday() != null &&
@@ -181,6 +169,18 @@ public class HistoryResult {
 
       return hourList;
    }
+
+   private Hour getMiddleHour() {
+
+      return middleHour;
+//      final List<Hour> currentWeather = middleHour.getCondition();
+//      if (currentWeather == null || currentWeather.isEmpty()) {
+//         return null;
+//      }
+//
+//      return currentWeather.get(0);
+   }
+
    public float getTemperatureAverage() {
 
       final OptionalDouble averageTemperature =
@@ -224,29 +224,28 @@ public class HistoryResult {
 
    public String getWeatherDescription() {
 
-      return "";
-//      final String weatherDescription = UI.EMPTY_STRING;
-//
-//      final Weather currentWeather = getCurrentWeather();
-//      if (currentWeather == null) {
-//         return weatherDescription;
-//      }
-//
-//      return currentWeather.getDescription();
+      final String weatherDescription = UI.EMPTY_STRING;
+
+      final Hour middleHour = getMiddleHour();
+      if (middleHour == null) {
+         return weatherDescription;
+      }
+
+      return middleHour.getCondition().getText();
    }
 
    public String getWeatherType() {
 
       String weatherType = IWeather.cloudIsNotDefined;
 
-      final Hour currentWeather = getCurrentWeather();
+      final Hour currentWeather = getMiddleHour();
       if (currentWeather == null) {
          return weatherType;
       }
 
-      // Codes : https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
+      // Weather Icons and Codes  : https://www.weatherapi.com/docs/#weather-icons
 
-      final int currentWeatherId = currentWeather.getWind_degree();
+      final int currentWeatherId = currentWeather.getCondition().getCode();
 
       if (currentWeatherId >= 200 && currentWeatherId < 300) {
          weatherType = IWeather.WEATHER_ID_LIGHTNING;

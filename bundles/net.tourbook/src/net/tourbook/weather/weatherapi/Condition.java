@@ -15,8 +15,16 @@ package net.tourbook.weather.weatherapi;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Condition{
-    public String text;
-    public String icon;
-    public int code;
+public class Condition {
+
+   private String text;
+   private int    code;
+
+   public int getCode() {
+      return code;
+   }
+
+   public String getText() {
+      return text;
+   }
 }
