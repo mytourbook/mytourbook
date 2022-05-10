@@ -48,16 +48,16 @@ public class WeatherProvidersUI {
                Messages.Pref_Weather_Provider_None),
 
          new WeatherProvider(
-               IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP,
-               IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP),
+               IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP_ID,
+               IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP_ID),
 
          new WeatherProvider(
-               IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI,
-               IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI),
+               IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI_ID,
+               "Weather API"),                                                                  //$NON-NLS-1$
 
          new WeatherProvider(
-               IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE,
-               IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE)
+               IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_ID,
+               "World Weather Online")                                                          //$NON-NLS-1$
    };
 
    private List<IWeatherProvider>         _weatherProviders     = List.of(
@@ -321,15 +321,15 @@ public class WeatherProvidersUI {
          selectedWeatherProviderPage = _weatherProviderPages.get(0);
          areMainPreferencesVisible = false;
 
-      } else if (selectedWeatherProvider.equals(IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP)) {
+      } else if (selectedWeatherProvider.equals(IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP_ID)) {
 
          selectedWeatherProviderPage = _weatherProviderPages.get(1);
 
-      } else if (selectedWeatherProvider.equals(IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI)) {
+      } else if (selectedWeatherProvider.equals(IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI_ID)) {
 
          selectedWeatherProviderPage = _weatherProviderPages.get(2);
 
-      } else if (selectedWeatherProvider.equals(IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE)) {
+      } else if (selectedWeatherProvider.equals(IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_ID)) {
 
          selectedWeatherProviderPage = _weatherProviderPages.get(3);
 

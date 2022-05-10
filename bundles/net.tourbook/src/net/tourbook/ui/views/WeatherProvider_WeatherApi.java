@@ -82,7 +82,7 @@ public class WeatherProvider_WeatherApi implements IWeatherProvider {
                   WeatherApiRetriever.getBaseApiUrl() +
                         "?lat=0&lon=0&dt=" + //$NON-NLS-1$
                         LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
-                  IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI);
+                  IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI_ID);
          }));
 
          GridDataFactory.fillDefaults()

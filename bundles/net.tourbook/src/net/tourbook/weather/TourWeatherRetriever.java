@@ -41,17 +41,17 @@ public final class TourWeatherRetriever {
 
       switch (weatherProvider) {
 
-      case IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP:
+      case IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP_ID:
 
          historicalWeatherRetriever = new OpenWeatherMapRetriever(tourData);
          break;
 
-      case IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI:
+      case IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI_ID:
 
          historicalWeatherRetriever = new WeatherApiRetriever(tourData);
          break;
 
-      case IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE:
+      case IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_ID:
 
          historicalWeatherRetriever = new WorldWeatherOnlineRetriever(tourData);
          break;
