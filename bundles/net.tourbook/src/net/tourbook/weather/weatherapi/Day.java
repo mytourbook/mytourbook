@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.weather.weatherapi;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Day {
    public double    maxtemp_c;
    public double    maxtemp_f;

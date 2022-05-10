@@ -15,12 +15,15 @@
  *******************************************************************************/
 package net.tourbook.weather.weatherapi;
 
-import java.util.ArrayList;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.List;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Forecastday {
-   public String          date;
-   public int             date_epoch;
-   public Day             day;
-   public Astro           astro;
-   public ArrayList<Hour> hour;
+
+   public String     date;
+   public int        date_epoch;
+   public Day        day;
+   public List<Hour> hour;
 }

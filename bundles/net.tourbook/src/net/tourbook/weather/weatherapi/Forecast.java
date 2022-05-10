@@ -17,13 +17,12 @@ package net.tourbook.weather.weatherapi;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Forecast {
 
-   private ArrayList<Forecastday> forecastday;
+   private List<Forecastday> forecastday;
 
    public List<Forecastday> getForecastday() {
       return forecastday;

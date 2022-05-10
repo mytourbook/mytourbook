@@ -12,37 +12,90 @@
  *******************************************************************************/
 package net.tourbook.weather.weatherapi;
 
-public class Hour{
-    public int time_epoch;
-    public String time;
-    public double temp_c;
-    public double temp_f;
-    public int is_day;
-    public Condition condition;
-    public double wind_mph;
-    public double wind_kph;
-    public int wind_degree;
-    public String wind_dir;
-    public double pressure_mb;
-    public double pressure_in;
-    public double precip_mm;
-    public double precip_in;
-    public int humidity;
-    public int cloud;
-    public double feelslike_c;
-    public double feelslike_f;
-    public double windchill_c;
-    public double windchill_f;
-    public double heatindex_c;
-    public double heatindex_f;
-    public double dewpoint_c;
-    public double dewpoint_f;
-    public int will_it_rain;
-    public int chance_of_rain;
-    public int will_it_snow;
-    public int chance_of_snow;
-    public double vis_km;
-    public double vis_miles;
-    public double gust_mph;
-    public double gust_kph;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Hour {
+
+   private int       time_epoch;
+   private String    time;
+   private double    temp_c;
+   private int       is_day;
+   private Condition condition;
+   private double    wind_kph;
+   private int       wind_degree;
+   private String    wind_dir;
+   private double    pressure_mb;
+   private double    precip_mm;
+   private int       humidity;
+   private int       cloud;
+   private double    feelslike_c;
+   private double    windchill_c;
+   private double    dewpoint_c;
+   private double    gust_kph;
+
+   public int getCloud() {
+      return cloud;
+   }
+
+   public Condition getCondition() {
+      return condition;
+   }
+
+   public double getDewpoint_c() {
+      return dewpoint_c;
+   }
+
+   public double getFeelslike_c() {
+      return feelslike_c;
+   }
+
+   public double getGust_kph() {
+      return gust_kph;
+   }
+
+   public int getHumidity() {
+      return humidity;
+   }
+
+   public int getIs_day() {
+      return is_day;
+   }
+
+   public double getPrecip_mm() {
+      return precip_mm;
+   }
+
+   public double getPressure_mb() {
+      return pressure_mb;
+   }
+
+   public double getTemp_c() {
+      return temp_c;
+   }
+
+   public String getTime() {
+      return time;
+   }
+
+   public int getTime_epoch() {
+      return time_epoch;
+   }
+
+   public int getWind_degree() {
+      return wind_degree;
+   }
+
+   public String getWind_dir() {
+      return wind_dir;
+   }
+
+   public double getWind_kph() {
+      return wind_kph;
+   }
+
+   public double getWindchill_c() {
+      return windchill_c;
+   }
+
 }
