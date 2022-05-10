@@ -25,7 +25,6 @@ import java.lang.reflect.Field;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.data.TourData;
 import net.tourbook.weather.weatherapi.WeatherApiRetriever;
-import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -60,7 +59,7 @@ public class WeatherAPIRetrieverTests {
             + "/weatherapi/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt=1647086400"; //$NON-NLS-1$
       httpClientMock.onGet(url)
             .doReturn(worldWeatherOnlineResponse);
-      final Field field = WorldWeatherOnlineRetriever.class
+      final Field field = WeatherApiRetriever.class
             .getSuperclass()
             .getDeclaredField("httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
