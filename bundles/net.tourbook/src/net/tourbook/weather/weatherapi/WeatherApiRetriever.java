@@ -106,7 +106,9 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
          uriBuilder.setParameter("lat", String.valueOf(searchAreaCenter.getLatitude())); //$NON-NLS-1$
          uriBuilder.setParameter("lon", String.valueOf(searchAreaCenter.getLongitude())); //$NON-NLS-1$
          uriBuilder.setParameter("lang", Locale.getDefault().getLanguage()); //$NON-NLS-1$
-         uriBuilder.setParameter("dt", String.valueOf(date)); //$NON-NLS-1$
+         //todo fb VERY IMPORTANT, the unixdt must be top of the hour!!!!
+         uriBuilder.setParameter("unixdt", String.valueOf(date)); //$NON-NLS-1$
+         uriBuilder.setParameter("unixend_dt", String.valueOf(date)); //$NON-NLS-1$
          weatherRequestWithParameters = uriBuilder.build().toString();
 
          return weatherRequestWithParameters;
@@ -202,6 +204,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       return true;
    }
 
+   //todo fb isn't it a deserialization ???? if yes, rename also in other classes
    private TimeMachineResult serializeWeatherData(final String weatherDataResponse) {
 
       TimeMachineResult newTimeMachineResult = null;
@@ -219,7 +222,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       } catch (final Exception e) {
 
          StatusUtil.logError(
-               "OpenWeatherMapRetriever.serializeWeatherData : Error while serializing the historical weather JSON object :" //$NON-NLS-1$
+               "WeatherApiRetriever.serializeWeatherData : Error while serializing the historical weather JSON object :" //$NON-NLS-1$
                      + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
          return newTimeMachineResult;
       }
