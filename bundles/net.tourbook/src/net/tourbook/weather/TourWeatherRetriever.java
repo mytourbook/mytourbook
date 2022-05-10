@@ -25,6 +25,7 @@ import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.IWeatherProvider;
 import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
+import net.tourbook.weather.weatherapi.WeatherApiRetriever;
 import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -43,6 +44,11 @@ public final class TourWeatherRetriever {
       case IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP:
 
          historicalWeatherRetriever = new OpenWeatherMapRetriever(tourData);
+         break;
+
+      case IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI:
+
+         historicalWeatherRetriever = new WeatherApiRetriever(tourData);
          break;
 
       case IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE:

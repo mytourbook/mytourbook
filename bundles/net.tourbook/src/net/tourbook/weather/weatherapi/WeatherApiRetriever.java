@@ -22,27 +22,28 @@ import com.javadocmd.simplelatlng.LatLng;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WeatherUtils;
-import net.tourbook.weather.openweathermap.TimeMachineResult;
 
 import org.apache.http.client.utils.URIBuilder;
 
 public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 
-   private static final String baseApiUrl = WeatherUtils.HEROKU_APP_URL + "/weatherapi"; //$NON-NLS-1$
+   private static final String baseApiUrl        = WeatherUtils.HEROKU_APP_URL + "/weatherapi"; //$NON-NLS-1$
 
    private LatLng              searchAreaCenter;
    private long                tourEndTime;
    private long                tourMiddleTime;
    private long                tourStartTime;
 
-   //private TimeMachineResult   timeMachineResult = null;
+   private HistoryResult       timeMachineResult = null;
 
    public WeatherApiRetriever(final TourData tourData) {
 
@@ -90,7 +91,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 //      return fullWeatherData;
    }
 
-   private String buildWeatherApiRequest(final long date) {
+   private String buildWeatherApiRequest(final String requestDate) {
 
       String weatherRequestWithParameters = UI.EMPTY_STRING;
 
@@ -105,9 +106,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
          uriBuilder.setParameter("lat", String.valueOf(searchAreaCenter.getLatitude())); //$NON-NLS-1$
          uriBuilder.setParameter("lon", String.valueOf(searchAreaCenter.getLongitude())); //$NON-NLS-1$
          uriBuilder.setParameter("lang", Locale.getDefault().getLanguage()); //$NON-NLS-1$
-         //todo fb apparently, unixdt doesn't restrict the hours so let's use dt and iterate if the
-         //event happens over multiple days (100 milers)
-         uriBuilder.setParameter("dt", String.valueOf(date)); //$NON-NLS-1$
+         uriBuilder.setParameter("dt", requestDate); //$NON-NLS-1$
          weatherRequestWithParameters = uriBuilder.build().toString();
 
          return weatherRequestWithParameters;
@@ -115,7 +114,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       } catch (final URISyntaxException e) {
 
          StatusUtil.logError(
-               "OpenWeatherMapRetriever.buildWeatherApiRequest : Error while " + //$NON-NLS-1$
+               "WeatherApiRetriever.buildWeatherApiRequest : Error while " + //$NON-NLS-1$
                      "building the historical weather request:" //$NON-NLS-1$
                      + e.getMessage());
          return UI.EMPTY_STRING;
@@ -123,9 +122,9 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
    }
 
    //todo fb isn't it a deserialization ???? if yes, rename also in other classes
-   private TimeMachineResult deserializeWeatherData(final String weatherDataResponse) {
+   private HistoryResult deserializeWeatherData(final String weatherDataResponse) {
 
-      TimeMachineResult newTimeMachineResult = null;
+      HistoryResult newHistoryResult = null;
       try {
 
          final ObjectMapper mapper = new ObjectMapper();
@@ -133,43 +132,42 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
                .readValue(weatherDataResponse, JsonNode.class)
                .toString();
 
-         newTimeMachineResult = mapper.readValue(
+         newHistoryResult = mapper.readValue(
                weatherResults,
-               new TypeReference<TimeMachineResult>() {});
+               new TypeReference<HistoryResult>() {});
 
       } catch (final Exception e) {
 
          StatusUtil.logError(
                "WeatherApiRetriever.deserializeWeatherData : Error while deserializing the historical weather JSON object :" //$NON-NLS-1$
                      + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
-         return newTimeMachineResult;
       }
 
-      return newTimeMachineResult;
+      return newHistoryResult;
    }
 
    @Override
    public boolean retrieveHistoricalWeatherData() {
 
-//      timeMachineResult = new TimeMachineResult();
-//
-//      long requestedTime = tourStartTime;
-//
-//      while (true) {
-//
-//         //Send an API request as long as we don't have the results covering the entire duration of the tour
-//         final String weatherRequestWithParameters = buildWeatherApiRequest(requestedTime);
-//
-//         final String rawWeatherData = sendWeatherApiRequest(weatherRequestWithParameters);
-//         if (StringUtils.isNullOrEmpty(rawWeatherData)) {
-//            return false;
-//         }
-//
-//         final TimeMachineResult newTimeMachineResult = serializeWeatherData(rawWeatherData);
-//         if (newTimeMachineResult == null) {
-//            return false;
-//         }
-//
+      timeMachineResult = new HistoryResult();
+
+      final String requestedTime = tour.getTourStartTime().toLocalDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+      while (true) {
+
+         //Send an API request as long as we don't have the results covering the entire duration of the tour
+         final String weatherRequestWithParameters = buildWeatherApiRequest(requestedTime);
+
+         final String rawWeatherData = sendWeatherApiRequest(weatherRequestWithParameters);
+         if (StringUtils.isNullOrEmpty(rawWeatherData)) {
+            return false;
+         }
+
+         final HistoryResult newHistoryResult = deserializeWeatherData(rawWeatherData);
+         if (newHistoryResult == null) {
+            return false;
+         }
+
 //         timeMachineResult.addAllHourly(newTimeMachineResult.getHourly());
 //         final List<Hourly> hourly = timeMachineResult.getHourly();
 //
@@ -181,11 +179,11 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 //               tourEndTime)) {
 //            break;
 //         }
-//
-//         //Setting the requested time to the next hour to retrieve the next set of weather data
-//         requestedTime = lastWeatherDataHour + 3600L;
-//
-//         // We avoid requesting data in the future
+
+         //Setting the requested time to the next hour to retrieve the next set of weather data
+         // requestedTime = lastWeatherDataHour + 3600L;
+
+         // We avoid requesting data in the future
 //         if (requestedTime > TimeTools.nowInMilliseconds() / 1000) {
 //
 //            if (hourly.isEmpty()) {
@@ -194,10 +192,10 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 //               break;
 //            }
 //         }
-//      }
-//
-//// SET_FORMATTING_OFF
-//
+      }
+
+// SET_FORMATTING_OFF
+
 //      final boolean hourlyDataExists = timeMachineResult.filterHourlyData(tourStartTime, tourEndTime);
 //      if(!hourlyDataExists)
 //      {
@@ -223,9 +221,9 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 //      timeMachineResult.computeAverageWindSpeedAndDirection();
 //      tour.setWeather_Wind_Speed(            timeMachineResult.getAverageWindSpeed());
 //      tour.setWeather_Wind_Direction(        timeMachineResult.getAverageWindDirection());
-//
-//// SET_FORMATTING_ON
 
-      return true;
+// SET_FORMATTING_ON
+
+      //  return true;
    }
 }

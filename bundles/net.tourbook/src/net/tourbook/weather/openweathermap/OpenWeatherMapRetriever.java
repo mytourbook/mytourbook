@@ -143,7 +143,6 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          StatusUtil.logError(
                "OpenWeatherMapRetriever.deserializeWeatherData : Error while deserializing the historical weather JSON object :" //$NON-NLS-1$
                      + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
-         return newTimeMachineResult;
       }
 
       return newTimeMachineResult;

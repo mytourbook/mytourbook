@@ -246,7 +246,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
          System.out.println(weatherDataResponse);
       }
 
-      Data serializedWeatherData = new Data();
+      Data serializedWeatherData = null;
       try {
 
          //weather
@@ -261,7 +261,6 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
          StatusUtil.logError(
                "WorldWeatherOnlineRetriever.deserializeWeatherData : Error while deserializing the historical weather JSON object :" //$NON-NLS-1$
                      + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
-         return null;
       }
 
       return serializedWeatherData;

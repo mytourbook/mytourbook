@@ -17,8 +17,8 @@ package net.tourbook.ui.views;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
@@ -78,15 +78,10 @@ public class WeatherProvider_WeatherApi implements IWeatherProvider {
          _btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
          _btnTestConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-            final var previousHour = Instant
-                  .now()
-                  .minus(1, ChronoUnit.HOURS)
-                  .toEpochMilli() / 1000;
-
             HistoricalWeatherRetriever.checkVendorConnection(
                   WeatherApiRetriever.getBaseApiUrl() +
-                        "?lat=0&lon=0&unixdt=" + //$NON-NLS-1$
-                        previousHour,
+                        "?lat=0&lon=0&dt=" + //$NON-NLS-1$
+                        LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
                   IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI);
          }));
 
