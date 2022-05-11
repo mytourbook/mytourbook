@@ -2420,7 +2420,7 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Temperature_Avg_Combined_Label);
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Temperature_Avg_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Temperature_Avg_Combined_Tooltip);
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
@@ -2445,9 +2445,9 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_Temperature_Avg_Device_Label);//Temperature - Average
+            colDef.setColumnLabel(              Messages.ColumnFactory_Temperature_Avg_Device_Label);
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Temperature_Avg_Tooltip);//Average temperature
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Temperature_Avg_Device_Tooltip);
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));

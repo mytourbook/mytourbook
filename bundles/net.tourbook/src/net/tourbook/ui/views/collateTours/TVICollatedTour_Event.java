@@ -184,7 +184,7 @@ public class TVICollatedTour_Event extends TVICollatedTour {
                tourItem.colMaxPulse = result.getLong(17);
                tourItem.colAvgPulse = result.getFloat(18);
                tourItem.colAvgCadence = result.getFloat(19);
-               tourItem.colAvgTemperature = result.getFloat(20);
+               tourItem.colAvgTemperature_Device = result.getFloat(20);
 
                tourItem.colWeekNo = result.getInt(21);
                tourItem.colWeekYear = result.getInt(22);

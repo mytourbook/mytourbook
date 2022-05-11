@@ -943,7 +943,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       defineColumn_Body_MaxPulse();
       defineColumn_Body_AvgPulse();
 
-      defineColumn_Weather_AvgTemperature();
+      defineColumn_Weather_Temperature_Avg_Device();
 
       defineColumn_Powertrain_AvgCadence();
    }
@@ -1507,9 +1507,9 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    }
 
    /**
-    * column: avg temperature
+    * Column: Weather - Average temperature (measured from the device)
     */
-   private void defineColumn_Weather_AvgTemperature() {
+   private void defineColumn_Weather_Temperature_Avg_Device() {
 
       final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_TEMPERATURE_AVG_DEVICE.createColumn(_columnManager, _pc);
       colDef.setLabelProvider(new CellLabelProvider() {
@@ -1523,7 +1523,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
 
             final double temperature = net.tourbook.common.UI.convertTemperatureFromMetric(//
-                  ((TVITagViewItem) element).colAvgTemperature);
+                  ((TVITagViewItem) element).colAvgTemperature_Device);
 
             colDef.printDoubleValue(cell, temperature, element instanceof TVITagView_Tour);
 

@@ -517,6 +517,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.VIEW_DOUBLE_CLICK_ACTIONS, PrefPageViews.VIEW_DOUBLE_CLICK_ACTION_QUICK_EDIT);
 
       /*
+       * View: combined temperatures
+       */
+      store.setDefault(ITourbookPreferences.VIEW_PREFERRED_TEMPERATURE_VALUE, PrefPageViews.VIEW_TEMPERATURE_VALUES_EXTERNAL);
+
+      /*
        * Map 2.5D
        */
       store.setDefault(ITourbookPreferences.MAP25_OFFLINE_MAP_IS_DEFAULT_LOCATION, true);

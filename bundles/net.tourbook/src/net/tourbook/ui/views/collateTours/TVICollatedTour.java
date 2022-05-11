@@ -110,7 +110,7 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
 
    float                          colAvgPulse;
    float                          colAvgCadence;
-   float                          colAvgTemperature;
+   float                          colAvgTemperature_Device;
    int                            colWindSpd;
    int                            colWindDir;
 
@@ -160,7 +160,7 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
 
       colAvgPulse = result.getFloat(startIndex + 10);
       colAvgCadence = result.getFloat(startIndex + 11);
-      colAvgTemperature = result.getFloat(startIndex + 12);
+      colAvgTemperature_Device = result.getFloat(startIndex + 12);
 
       colWindDir = result.getInt(startIndex + 13);
       colWindSpd = result.getInt(startIndex + 14);

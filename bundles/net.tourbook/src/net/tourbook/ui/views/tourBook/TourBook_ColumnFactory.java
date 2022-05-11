@@ -35,6 +35,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageViews;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.TreeColumnFactory;
@@ -3614,7 +3615,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Average_Device);
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Average);
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -3627,7 +3628,7 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Average_Device);
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Average);
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -3641,28 +3642,54 @@ public class TourBook_ColumnFactory {
     */
    private void defineColumn_Weather_Temperature_Avg_Combined() {
 
-      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_AVG_COMBINED.createColumn(_columnManager_NatTable, _pc);
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_AVG_COMBINED
+            .createColumn(_columnManager_NatTable, _pc);
       colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
 
          @Override
          public String getValueText(final Object element) {
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Average_Device);
+            final String action = _prefStore.getString(ITourbookPreferences.VIEW_PREFERRED_TEMPERATURE_VALUE);
+            float value = 0;
 
-            return colDef_NatTable.printDoubleValue(value);
+            final TVITourBookItem tourBookItem = (TVITourBookItem) element;
+
+            if (action.equals(PrefPageViews.VIEW_TEMPERATURE_VALUES_FROM_DEVICE)) {
+
+               value = tourBookItem.colTemperature_Average_Device;
+
+            } else if (action.equals(PrefPageViews.VIEW_TEMPERATURE_VALUES_EXTERNAL)) {
+
+               value = tourBookItem.colTemperature_Average;
+            }
+
+            return colDef_NatTable.printDoubleValue(UI.convertTemperatureFromMetric(value));
          }
       });
 
-      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_TEMPERATURE_AVG_COMBINED.createColumn(_columnManager_Tree, _pc);
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_TEMPERATURE_AVG_COMBINED
+            .createColumn(_columnManager_Tree, _pc);
       colDef_Tree.setLabelProvider(new CellLabelProvider() {
          @Override
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Average_Device);
+            final String action = _prefStore.getString(ITourbookPreferences.VIEW_PREFERRED_TEMPERATURE_VALUE);
+            float value = 0;
 
-            colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+            final TVITourBookItem tourBookItem = (TVITourBookItem) element;
+
+            if (action.equals(PrefPageViews.VIEW_TEMPERATURE_VALUES_FROM_DEVICE)) {
+
+               value = tourBookItem.colTemperature_Average_Device;
+
+            } else if (action.equals(PrefPageViews.VIEW_TEMPERATURE_VALUES_EXTERNAL)) {
+
+               value = tourBookItem.colTemperature_Average;
+            }
+
+            colDef_Tree.printDoubleValue(cell, UI.convertTemperatureFromMetric(value), element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
          }

@@ -548,6 +548,11 @@ public interface ITourbookPreferences {
    public static final String VIEW_DOUBLE_CLICK_ACTIONS = "ViewDoubleClickActions"; //$NON-NLS-1$
 
    /*
+    * View: combined temperatures
+    */
+   public static final String VIEW_PREFERRED_TEMPERATURE_VALUE = "ViewPreferredTemperatureValue"; //$NON-NLS-1$
+
+   /*
     * Dialog toggle states
     */
    public static final String TOGGLE_STATE_GEO_FILTER_DELETE_ALL_WITHOUT_NAME = "TOGGLE_STATE_GEO_FILTER_DELETE_ALL_WITHOUT_NAME";//$NON-NLS-1$

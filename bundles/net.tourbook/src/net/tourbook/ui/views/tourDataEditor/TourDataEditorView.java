@@ -6373,6 +6373,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _actionEditTimeSlicesValues.setEnabled(isCellEditorInactive && canEdit);
 
       final boolean isWeatherRetrievalActivated = TourManager.isWeatherRetrievalActivated();
+      //todo fb error as this is disposed when closing MT
       _linkWeather.setEnabled(canEdit && isWeatherRetrievalActivated && !isDirty());
    }
 

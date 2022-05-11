@@ -1067,10 +1067,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
          final String property = propertyChangeEvent.getProperty();
 
-         if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
+         if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED) ||
 
-               // when a tour type is deleted then the tours from the db must be reloaded
-               || property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+         // when a tour type is deleted then the tours from the db must be reloaded
+               property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED) ||
+
+               property.equals(ITourbookPreferences.VIEW_PREFERRED_TEMPERATURE_VALUE)) {
 
             /*
              * Flat view do not preserve column reordering when reloaded -> recreate it
@@ -2985,23 +2987,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       String viewLayoutImage = null;
 
-      if (_viewLayout == TourBookViewLayout.NAT_TABLE) {
-
+      switch (_viewLayout) {
+      case NAT_TABLE:
          viewLayoutImage = Images.TourBook_NatTable;
-
          _isLayoutNatTable = true;
-
-      } else if (_viewLayout == TourBookViewLayout.CATEGORY_MONTH) {
-
+         break;
+      case CATEGORY_MONTH:
          viewLayoutImage = Images.TourBook_Month;
-
          _isLayoutNatTable = false;
-
-      } else if (_viewLayout == TourBookViewLayout.CATEGORY_WEEK) {
-
+         break;
+      case CATEGORY_WEEK:
          viewLayoutImage = Images.TourBook_Week;
-
          _isLayoutNatTable = false;
+         break;
       }
 
       _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(viewLayoutImage));

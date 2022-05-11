@@ -431,7 +431,9 @@ public class Messages extends NLS {
    public static String        ColumnFactory_TagNotes_Tooltip;
 
    public static String        ColumnFactory_Temperature_Avg_Combined_Label;
+   public static String        ColumnFactory_Temperature_Avg_Combined_Tooltip;
    public static String        ColumnFactory_Temperature_Avg_Device_Label;
+   public static String        ColumnFactory_Temperature_Avg_Device_Tooltip;
    public static String        ColumnFactory_Temperature_Avg_Label;
    public static String        ColumnFactory_Temperature_Avg_Tooltip;
    public static String        ColumnFactory_Temperature_Max_Label;
