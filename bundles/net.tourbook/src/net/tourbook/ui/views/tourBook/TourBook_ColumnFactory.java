@@ -3605,7 +3605,7 @@ public class TourBook_ColumnFactory {
    }
 
    /**
-    * Column: Weather - Avg temperature
+    * Column: Weather - Average temperature
     */
    private void defineColumn_Weather_Temperature_Avg() {
 
@@ -3638,7 +3638,7 @@ public class TourBook_ColumnFactory {
    }
 
    /**
-    * Column: Weather - Combined Avg temperature
+    * Column: Weather - Combined Average temperature
     */
    private void defineColumn_Weather_Temperature_Avg_Combined() {
 
@@ -3697,7 +3697,7 @@ public class TourBook_ColumnFactory {
    }
 
    /**
-    * Column: Weather - Avg temperature (measured from the device)
+    * Column: Weather - Average temperature (measured from the device)
     */
    private void defineColumn_Weather_Temperature_Avg_Device() {
 
