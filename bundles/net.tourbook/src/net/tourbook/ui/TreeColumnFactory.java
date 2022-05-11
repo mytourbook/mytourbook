@@ -141,7 +141,11 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory WEATHER_TEMPERATURE_AVG;
    public static final TreeColumnFactory WEATHER_TEMPERATURE_AVG_COMBINED;
    public static final TreeColumnFactory WEATHER_TEMPERATURE_AVG_DEVICE;
+   public static final TreeColumnFactory WEATHER_TEMPERATURE_MIN;
+   public static final TreeColumnFactory WEATHER_TEMPERATURE_MIN_COMBINED;
    public static final TreeColumnFactory WEATHER_TEMPERATURE_MIN_DEVICE;
+   public static final TreeColumnFactory WEATHER_TEMPERATURE_MAX;
+   public static final TreeColumnFactory WEATHER_TEMPERATURE_MAX_COMBINED;
    public static final TreeColumnFactory WEATHER_TEMPERATURE_MAX_DEVICE;
    public static final TreeColumnFactory WEATHER_WIND_DIR;
    public static final TreeColumnFactory WEATHER_WIND_SPEED;

@@ -346,8 +346,16 @@ public abstract class TableColumnFactory {
    public static final String             WEATHER_TEMPERATURE_AVG_COMBINED_ID                = "WEATHER_TEMPERATURE_AVG_COMBINED_ID";             //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_AVG_DEVICE;
    public static final String             WEATHER_TEMPERATURE_AVG_DEVICE_ID                  = "WEATHER_TEMPERATURE_AVG_DEVICE";                  //$NON-NLS-1$
+   public static final TableColumnFactory WEATHER_TEMPERATURE_MIN;
+   public static final String             WEATHER_TEMPERATURE_MIN_ID                         = "WEATHER_TEMPERATURE_MIN_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory WEATHER_TEMPERATURE_MIN_COMBINED;
+   public static final String             WEATHER_TEMPERATURE_MIN_COMBINED_ID                = "WEATHER_TEMPERATURE_MIN_COMBINED_ID";             //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_MIN_DEVICE;
    public static final String             WEATHER_TEMPERATURE_MIN_DEVICE_ID                  = "WEATHER_TEMPERATURE_MIN_DEVICE";                  //$NON-NLS-1$
+   public static final TableColumnFactory WEATHER_TEMPERATURE_MAX;
+   public static final String             WEATHER_TEMPERATURE_MAX_ID                         = "WEATHER_TEMPERATURE_MAX_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory WEATHER_TEMPERATURE_MAX_COMBINED;
+   public static final String             WEATHER_TEMPERATURE_MAX_COMBINED_ID                = "WEATHER_TEMPERATURE_MAX_COMBINED_ID";             //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_MAX_DEVICE;
    public static final String             WEATHER_TEMPERATURE_MAX_DEVICE_ID                  = "WEATHER_TEMPERATURE_MAX_DEVICE";                  //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_TIME_SLICE;
