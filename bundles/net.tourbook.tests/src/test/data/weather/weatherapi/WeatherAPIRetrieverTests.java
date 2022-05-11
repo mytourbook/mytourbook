@@ -56,7 +56,7 @@ public class WeatherAPIRetrieverTests {
       final String weatherApiResponse = Comparison.readFileContent(WEATHERAPI_FILE_PATH
             + "LongsPeak-Manual-WeatherApiResponse.json"); //$NON-NLS-1$
       final String url = WeatherUtils.HEROKU_APP_URL
-            + "/weatherapi?lat=40.263996&lon=-105.58854099999999&lang=en&dt=2020-07-04"; //$NON-NLS-1$
+            + "/weatherapi?lat=40.263996&lon=-105.58854099999999&lang=en&dt=2022-05-10"; //$NON-NLS-1$
       httpClientMock.onGet(url)
             .doReturn(weatherApiResponse);
       final Field field = WeatherApiRetriever.class
@@ -66,6 +66,11 @@ public class WeatherAPIRetrieverTests {
       field.set(null, httpClientMock);
 
       final TourData tour = Initializer.importTour();
+      //Tuesday, May 10, 2022 12:00:00 PM
+      tour.setTourStartTime(2022, 5, 10, 12, 0, 0);
+      //We set the current time elapsed to trigger the computation of the new end time
+      tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
+
       weatherApiRetriever = new WeatherApiRetriever(tour);
 
       assertTrue(weatherApiRetriever.retrieveHistoricalWeatherData());
@@ -73,17 +78,17 @@ public class WeatherAPIRetrieverTests {
 
 // SET_FORMATTING_OFF
 
-      assertEquals(15.92f,                      tour.getWeather_Temperature_Average());
-      assertEquals(2,                           tour.getWeather_Wind_Speed());
-      assertEquals(120,                         tour.getWeather_Wind_Direction());
-      assertEquals("Patchy rain possible",      tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-showers-scattered", tour.getWeather_Clouds()); //$NON-NLS-1$
-      assertEquals(49,                          tour.getWeather_Humidity());
-      assertEquals(1.6f,                        tour.getWeather_Precipitation());
-      assertEquals(1016.54f,                    tour.getWeather_Pressure());
-      assertEquals(19,                          tour.getWeather_Temperature_Max());
-      assertEquals(8,                           tour.getWeather_Temperature_Min());
-      assertEquals(15.62f,                      tour.getWeather_Temperature_WindChill());
+      assertEquals(13.92f,                      tour.getWeather_Temperature_Average());
+      assertEquals(11,                          tour.getWeather_Wind_Speed());
+      assertEquals(121,                         tour.getWeather_Wind_Direction());
+      assertEquals("Ensoleille",                tour.getWeather()); //$NON-NLS-1$
+     // assertEquals("weather-showers-scattered", tour.getWeather_Clouds()); //$NON-NLS-1$
+      assertEquals(29,                          tour.getWeather_Humidity());
+      assertEquals(0.0,                         tour.getWeather_Precipitation());
+      assertEquals(1012.0,                      tour.getWeather_Pressure());
+      assertEquals(22.1f,                       tour.getWeather_Temperature_Max());
+      assertEquals(3.4f,                        tour.getWeather_Temperature_Min());
+      assertEquals(13.32f,                      tour.getWeather_Temperature_WindChill());
 
 // SET_FORMATTING_ON
    }

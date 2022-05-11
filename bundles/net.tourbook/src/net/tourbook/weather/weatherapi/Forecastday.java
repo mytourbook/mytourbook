@@ -22,8 +22,9 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Forecastday {
 
-   public String     date;
-   public int        date_epoch;
-   public Day        day;
-   public List<Hour> hour;
+   private List<Hour> hour;
+
+   public List<Hour> getHour() {
+      return hour;
+   }
 }

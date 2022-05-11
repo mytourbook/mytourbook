@@ -71,7 +71,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
                hour.getHumidity(),
                (int) hour.getPressure_mb(),
                (float) hour.getPrecip_mm(),
-               0f,
+               0,
                tourDateTime);
 
          fullWeatherDataList.add(fullWeatherData);
@@ -151,7 +151,8 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 
       final LocalDate tomorrow = LocalDate.now().plusDays(1);
 
-      //Send an API request as long as we don't have the results covering the entire duration of the tour
+      //Send an API request as long as we don't have the results covering the
+      //entire duration of the tour
       while (true) {
 
          final String weatherRequestWithParameters = buildWeatherApiRequest(requestedDate);
@@ -166,7 +167,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
             return false;
          }
 
-         historyResult.addAllHour(newHistoryResult.getForecastdayHourList());
+         historyResult.addHourList(newHistoryResult.getForecastdayHourList());
          final List<Hour> hourList = historyResult.getHourList();
 
          final int lastWeatherDataHour = hourList.get(hourList.size() - 1).getTime_epoch();

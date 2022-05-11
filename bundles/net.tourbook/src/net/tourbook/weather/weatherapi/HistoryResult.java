@@ -30,9 +30,9 @@ public class HistoryResult {
    private List<Hour> hourList = new ArrayList<>();
    private int        averageWindSpeed;
    private int        averageWindDirection;
-   private Hour       middleHour;
+   private Hour       middleHourData;
 
-   public void addAllHour(final List<Hour> newHourList) {
+   public void addHourList(final List<Hour> newHourList) {
 
       for (final Hour newHour : newHourList) {
          if (!hourList.contains(newHour)) {
@@ -95,18 +95,17 @@ public class HistoryResult {
     */
    public void findMiddleHour(final long tourMiddleTime) {
 
-      middleHour = null;
+      middleHourData = null;
 
       long timeDifference = Long.MAX_VALUE;
       for (final Hour currentHour : hourList) {
 
          final long currentTimeDifference = Math.abs(currentHour.getTime_epoch() - tourMiddleTime);
          if (currentTimeDifference < timeDifference) {
-            middleHour = currentHour;
+            middleHourData = currentHour;
             timeDifference = currentTimeDifference;
          }
       }
-
    }
 
    public float getAverageHumidity() {
@@ -158,8 +157,8 @@ public class HistoryResult {
    public List<Hour> getForecastdayHourList() {
 
       if (forecast != null && forecast.getForecastday() != null &&
-            forecast.getForecastday().size() == 1) {
-         return forecast.getForecastday().get(0).hour;
+            forecast.getForecastday().size() > 0) {
+         return forecast.getForecastday().get(0).getHour();
       }
 
       return new ArrayList<>();
@@ -170,15 +169,9 @@ public class HistoryResult {
       return hourList;
    }
 
-   private Hour getMiddleHour() {
+   private Hour getMiddleHourData() {
 
-      return middleHour;
-//      final List<Hour> currentWeather = middleHour.getCondition();
-//      if (currentWeather == null || currentWeather.isEmpty()) {
-//         return null;
-//      }
-//
-//      return currentWeather.get(0);
+      return middleHourData;
    }
 
    public float getTemperatureAverage() {
@@ -226,7 +219,7 @@ public class HistoryResult {
 
       final String weatherDescription = UI.EMPTY_STRING;
 
-      final Hour middleHour = getMiddleHour();
+      final Hour middleHour = getMiddleHourData();
       if (middleHour == null) {
          return weatherDescription;
       }
@@ -238,31 +231,29 @@ public class HistoryResult {
 
       String weatherType = IWeather.cloudIsNotDefined;
 
-      final Hour currentWeather = getMiddleHour();
-      if (currentWeather == null) {
+      if (middleHourData == null) {
          return weatherType;
       }
 
       // Weather Icons and Codes  : https://www.weatherapi.com/docs/#weather-icons
+      final int currentWeatherCode = middleHourData.getCondition().getCode();
 
-      final int currentWeatherId = currentWeather.getCondition().getCode();
-
-      if (currentWeatherId >= 200 && currentWeatherId < 300) {
+      if (currentWeatherCode >= 200 && currentWeatherCode < 300) {
          weatherType = IWeather.WEATHER_ID_LIGHTNING;
-      } else if (currentWeatherId >= 300 && currentWeatherId < 400) {
+      } else if (currentWeatherCode >= 300 && currentWeatherCode < 400) {
          weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
-      } else if (currentWeatherId >= 500 && currentWeatherId < 600) {
+      } else if (currentWeatherCode >= 500 && currentWeatherCode < 600) {
          weatherType = IWeather.WEATHER_ID_RAIN;
-      } else if (currentWeatherId >= 600 && currentWeatherId < 700) {
+      } else if (currentWeatherCode >= 600 && currentWeatherCode < 700) {
          weatherType = IWeather.WEATHER_ID_SNOW;
-      } else if (currentWeatherId == 800) {
+      } else if (currentWeatherCode == 800) {
          weatherType = IWeather.WEATHER_ID_CLEAR;
-      } else if (currentWeatherId == 801 || currentWeatherId == 802) {
+      } else if (currentWeatherCode == 801 || currentWeatherCode == 802) {
          weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
-      } else if (currentWeatherId == 803 || currentWeatherId == 804) {
+      } else if (currentWeatherCode == 803 || currentWeatherCode == 804) {
          weatherType = IWeather.WEATHER_ID_OVERCAST;
-      } else if (currentWeatherId == 711 || currentWeatherId == 762 ||
-            currentWeatherId == 771 || currentWeatherId == 781) {
+      } else if (currentWeatherCode == 711 || currentWeatherCode == 762 ||
+            currentWeatherCode == 771 || currentWeatherCode == 781) {
          weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
       }
 
