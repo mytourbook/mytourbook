@@ -102,6 +102,11 @@ public class EasyImportManager {
    private static final String      ATTR_DASH_ANIMATION_DURATION                       = "animationDuration";                                //$NON-NLS-1$
    private static final String      ATTR_DASH_IS_LIVE_UPDATE                           = "isLiveUpdate";                                     //$NON-NLS-1$
    private static final String      ATTR_DASH_IS_LOG_DETAILS                           = "isLogDetails";                                     //$NON-NLS-1$
+   private static final String      ATTR_DASH_IS_SHOW_TILE_CLOUD_APPS                  = "isShowTile_CloudApps";                             //$NON-NLS-1$
+   private static final String      ATTR_DASH_IS_SHOW_TILE_FILES                       = "isShowTile_Files";                                 //$NON-NLS-1$
+   private static final String      ATTR_DASH_IS_SHOW_TILE_FOSSIL_UI                   = "isShowTile_FossilUI";                              //$NON-NLS-1$
+   private static final String      ATTR_DASH_IS_SHOW_TILE_SERIAL_PORT                 = "isShowTile_SerialPort";                            //$NON-NLS-1$
+   private static final String      ATTR_DASH_IS_SHOW_TILE_SERIAL_PORT_WITH_CONFIG     = "isShowTile_SerialPortWithConfig";                  //$NON-NLS-1$
    private static final String      ATTR_DASH_NUM_UI_COLUMNS                           = "uiColumns";                                        //$NON-NLS-1$
    private static final String      ATTR_DASH_STATE_TOOLTIP_DISPLAY_ABSOLUTE_FILE_PATH = "stateTooltipDisplayAbsoluteFilePath";              //$NON-NLS-1$
    private static final String      ATTR_DASH_STATE_TOOLTIP_WIDTH                      = "stateTooltipWidth";                                //$NON-NLS-1$
@@ -726,6 +731,26 @@ public class EasyImportManager {
       dashConfig.isLogDetails = Util.getXmlBoolean(xmlMemento,
             ATTR_DASH_IS_LOG_DETAILS,
             EasyConfig.IS_LOG_DETAILS_DEFAULT);
+
+      dashConfig.isShowTile_CloudApps = Util.getXmlBoolean(xmlMemento,
+            ATTR_DASH_IS_SHOW_TILE_CLOUD_APPS,
+            EasyConfig.IS_SHOW_TILE_CLOUD_APPS_DEFAULT);
+
+      dashConfig.isShowTile_Files = Util.getXmlBoolean(xmlMemento,
+            ATTR_DASH_IS_SHOW_TILE_FILES,
+            EasyConfig.IS_SHOW_TILE_FILES_DEFAULT);
+
+      dashConfig.isShowTile_FossilUI = Util.getXmlBoolean(xmlMemento,
+            ATTR_DASH_IS_SHOW_TILE_FOSSIL_UI,
+            EasyConfig.IS_SHOW_TILE_FOSSIL_UI_DEFAULT);
+
+      dashConfig.isShowTile_SerialPort = Util.getXmlBoolean(xmlMemento,
+            ATTR_DASH_IS_SHOW_TILE_SERIAL_PORT,
+            EasyConfig.IS_SHOW_TILE_SERIAL_PORT_DEFAULT);
+
+      dashConfig.isShowTile_SerialPortWithConfig = Util.getXmlBoolean(xmlMemento,
+            ATTR_DASH_IS_SHOW_TILE_SERIAL_PORT_WITH_CONFIG,
+            EasyConfig.IS_SHOW_TILE_SERIAL_PORT_WITH_CONFIG_DEFAULT);
    }
 
    private void loadEasyConfig_30_Config(final XMLMemento xmlConfig, final EasyConfig dashConfig) {
@@ -1117,6 +1142,8 @@ public class EasyImportManager {
 
    private void saveEasyConfig_Data(final XMLMemento xmlMemento, final EasyConfig dashConfig) {
 
+// SET_FORMATTING_OFF
+
       /*
        * Common config
        */
@@ -1130,15 +1157,20 @@ public class EasyImportManager {
       {
          final IMemento xmlConfig = xmlMemento.createChild(TAG_DASH_CONFIG);
 
-         xmlConfig.putInteger(ATTR_DASH_ANIMATION_CRAZY_FACTOR, dashConfig.animationCrazinessFactor);
-         xmlConfig.putInteger(ATTR_DASH_ANIMATION_DURATION, dashConfig.animationDuration);
-         xmlConfig.putInteger(ATTR_DASH_BACKGROUND_OPACITY, dashConfig.backgroundOpacity);
-         xmlConfig.putBoolean(ATTR_DASH_IS_LIVE_UPDATE, dashConfig.isLiveUpdate);
-         xmlConfig.putBoolean(ATTR_DASH_IS_LOG_DETAILS, dashConfig.isLogDetails);
-         xmlConfig.putInteger(ATTR_DASH_NUM_UI_COLUMNS, dashConfig.numHorizontalTiles);
-         xmlConfig.putBoolean(ATTR_DASH_STATE_TOOLTIP_DISPLAY_ABSOLUTE_FILE_PATH, dashConfig.stateToolTipDisplayAbsoluteFilePath);
-         xmlConfig.putInteger(ATTR_DASH_STATE_TOOLTIP_WIDTH, dashConfig.stateToolTipWidth);
-         xmlConfig.putInteger(ATTR_DASH_TILE_SIZE, dashConfig.tileSize);
+         xmlConfig.putInteger(ATTR_DASH_ANIMATION_CRAZY_FACTOR,                     dashConfig.animationCrazinessFactor);
+         xmlConfig.putInteger(ATTR_DASH_ANIMATION_DURATION,                         dashConfig.animationDuration);
+         xmlConfig.putInteger(ATTR_DASH_BACKGROUND_OPACITY,                         dashConfig.backgroundOpacity);
+         xmlConfig.putBoolean(ATTR_DASH_IS_LIVE_UPDATE,                             dashConfig.isLiveUpdate);
+         xmlConfig.putBoolean(ATTR_DASH_IS_LOG_DETAILS,                             dashConfig.isLogDetails);
+         xmlConfig.putBoolean(ATTR_DASH_IS_SHOW_TILE_CLOUD_APPS,                    dashConfig.isShowTile_CloudApps);
+         xmlConfig.putBoolean(ATTR_DASH_IS_SHOW_TILE_FILES,                         dashConfig.isShowTile_Files);
+         xmlConfig.putBoolean(ATTR_DASH_IS_SHOW_TILE_FOSSIL_UI,                     dashConfig.isShowTile_FossilUI);
+         xmlConfig.putBoolean(ATTR_DASH_IS_SHOW_TILE_SERIAL_PORT,                   dashConfig.isShowTile_SerialPort);
+         xmlConfig.putBoolean(ATTR_DASH_IS_SHOW_TILE_SERIAL_PORT_WITH_CONFIG,       dashConfig.isShowTile_SerialPortWithConfig);
+         xmlConfig.putInteger(ATTR_DASH_NUM_UI_COLUMNS,                             dashConfig.numHorizontalTiles);
+         xmlConfig.putBoolean(ATTR_DASH_STATE_TOOLTIP_DISPLAY_ABSOLUTE_FILE_PATH,   dashConfig.stateToolTipDisplayAbsoluteFilePath);
+         xmlConfig.putInteger(ATTR_DASH_STATE_TOOLTIP_WIDTH,                        dashConfig.stateToolTipWidth);
+         xmlConfig.putInteger(ATTR_DASH_TILE_SIZE,                                  dashConfig.tileSize);
       }
 
       /*
@@ -1154,16 +1186,16 @@ public class EasyImportManager {
 
          xmlConfig.putString(ATTR_NAME, importConfig.name);
 
-         xmlConfig.putBoolean(ATTR_IS_ACTIVE_CONFIG, isActiveConfig);
-         xmlConfig.putBoolean(ATTR_IS_CREATE_BACKUP, importConfig.isCreateBackup);
-         xmlConfig.putBoolean(ATTR_IS_DELETE_DEVICE_FILES, importConfig.isDeleteDeviceFiles);
-         xmlConfig.putBoolean(ATTR_IS_TURN_OFF_WATCHING, importConfig.isTurnOffWatching);
+         xmlConfig.putBoolean(ATTR_IS_ACTIVE_CONFIG,        isActiveConfig);
+         xmlConfig.putBoolean(ATTR_IS_CREATE_BACKUP,        importConfig.isCreateBackup);
+         xmlConfig.putBoolean(ATTR_IS_DELETE_DEVICE_FILES,  importConfig.isDeleteDeviceFiles);
+         xmlConfig.putBoolean(ATTR_IS_TURN_OFF_WATCHING,    importConfig.isTurnOffWatching);
 
-         xmlConfig.putString(ATTR_BACKUP_FOLDER, importConfig.getBackupFolder());
-         xmlConfig.putString(ATTR_DEVICE_FOLDER, importConfig.getDeviceFolder());
-         xmlConfig.putInteger(ATTR_DEVICE_TYPE, importConfig.getDeviceType());
+         xmlConfig.putString(ATTR_BACKUP_FOLDER,            importConfig.getBackupFolder());
+         xmlConfig.putString(ATTR_DEVICE_FOLDER,            importConfig.getDeviceFolder());
+         xmlConfig.putInteger(ATTR_DEVICE_TYPE,             importConfig.getDeviceType());
 
-         xmlConfig.putString(ATTR_DEVICE_FILES, importConfig.fileGlobPattern);
+         xmlConfig.putString(ATTR_DEVICE_FILES,             importConfig.fileGlobPattern);
       }
 
       /*
@@ -1173,23 +1205,23 @@ public class EasyImportManager {
 
          final IMemento xmlConfig = xmlMemento.createChild(TAG_LAUNCHER_CONFIG);
 
-         xmlConfig.putString(ATTR_NAME, importLauncher.name);
-         xmlConfig.putString(ATTR_IL_DESCRIPTION, importLauncher.description);
-         xmlConfig.putBoolean(ATTR_IL_IS_SAVE_TOUR, importLauncher.isSaveTour);
-         xmlConfig.putBoolean(ATTR_IL_IS_SHOW_IN_DASHBOARD, importLauncher.isShowInDashboard);
+         xmlConfig.putString(ATTR_NAME,                                 importLauncher.name);
+         xmlConfig.putString(ATTR_IL_DESCRIPTION,                       importLauncher.description);
+         xmlConfig.putBoolean(ATTR_IL_IS_SAVE_TOUR,                     importLauncher.isSaveTour);
+         xmlConfig.putBoolean(ATTR_IL_IS_SHOW_IN_DASHBOARD,             importLauncher.isShowInDashboard);
 
          // last marker
-         xmlConfig.putBoolean(ATTR_IL_IS_SET_LAST_MARKER, importLauncher.isSetLastMarker);
-         xmlConfig.putString(ATTR_IL_LAST_MARKER_TEXT, importLauncher.lastMarkerText);
-         xmlConfig.putInteger(ATTR_IL_LAST_MARKER_DISTANCE, importLauncher.lastMarkerDistance);
+         xmlConfig.putBoolean(ATTR_IL_IS_SET_LAST_MARKER,               importLauncher.isSetLastMarker);
+         xmlConfig.putString(ATTR_IL_LAST_MARKER_TEXT,                  importLauncher.lastMarkerText);
+         xmlConfig.putInteger(ATTR_IL_LAST_MARKER_DISTANCE,             importLauncher.lastMarkerDistance);
 
          // adjust temperature
-         xmlConfig.putBoolean(ATTR_IL_IS_ADJUST_TEMPERATURE, importLauncher.isAdjustTemperature);
-         xmlConfig.putInteger(ATTR_IL_TEMPERATURE_ADJUSTMENT_DURATION, importLauncher.temperatureAdjustmentDuration);
-         xmlConfig.putFloat(ATTR_IL_TEMPERATURE_TOUR_AVG_TEMPERATURE, importLauncher.tourAvgTemperature);
+         xmlConfig.putBoolean(ATTR_IL_IS_ADJUST_TEMPERATURE,            importLauncher.isAdjustTemperature);
+         xmlConfig.putInteger(ATTR_IL_TEMPERATURE_ADJUSTMENT_DURATION,  importLauncher.temperatureAdjustmentDuration);
+         xmlConfig.putFloat(ATTR_IL_TEMPERATURE_TOUR_AVG_TEMPERATURE,   importLauncher.tourAvgTemperature);
 
          // Retrieve weather data
-         xmlConfig.putBoolean(ATTR_IL_IS_RETRIEVE_WEATHER_DATA, importLauncher.isRetrieveWeatherData);
+         xmlConfig.putBoolean(ATTR_IL_IS_RETRIEVE_WEATHER_DATA,         importLauncher.isRetrieveWeatherData);
 
          // adjust elevation
          xmlConfig.putBoolean(ATTR_IL_IS_REPLACE_FIRST_TIME_SLICE_ELEVATION, importLauncher.isReplaceFirstTimeSliceElevation);
@@ -1221,8 +1253,8 @@ public class EasyImportManager {
             final TourType oneTourType = importLauncher.oneTourType;
 
             if (oneTourType != null) {
-               Util.setXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID, oneTourType.getTypeId());
-               Util.setXmlEnum(xmlConfig, ATTR_IL_TOUR_TYPE_CADENCE, importLauncher.oneTourTypeCadence);
+               Util.setXmlLong(xmlConfig, ATTR_TOUR_TYPE_ID,            oneTourType.getTypeId());
+               Util.setXmlEnum(xmlConfig, ATTR_IL_TOUR_TYPE_CADENCE,    importLauncher.oneTourTypeCadence);
             }
 
          } else {
@@ -1230,6 +1262,7 @@ public class EasyImportManager {
             // this is the default, a tour type is not set
          }
       }
+// SET_FORMATTING_ON
    }
 
    /**

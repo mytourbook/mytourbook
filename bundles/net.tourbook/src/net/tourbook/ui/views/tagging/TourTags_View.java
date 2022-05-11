@@ -1947,6 +1947,10 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       for (final TourData tourData : _allSelectedTours) {
 
+         if (tourData == null) {
+            continue;
+         }
+
          final Set<TourTag> allTourTags = tourData.getTourTags();
 
          if (allTourTags != null && allTourTags.size() > 0) {

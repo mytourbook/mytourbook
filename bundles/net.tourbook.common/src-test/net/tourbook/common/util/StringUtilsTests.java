@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,6 @@ package net.tourbook.common.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import net.tourbook.common.UI;
@@ -30,8 +29,8 @@ public class StringUtilsTests {
    void testHasContent() {
 
       assertTrue(StringUtils.hasContent("string")); //$NON-NLS-1$
-      assertFalse(StringUtils.hasContent(" ")); //$NON-NLS-1$
-      assertFalse(StringUtils.hasContent("")); //$NON-NLS-1$
+      assertFalse(StringUtils.hasContent(UI.SPACE1));
+      assertFalse(StringUtils.hasContent(UI.EMPTY_STRING));
       assertFalse(StringUtils.hasContent(null));
    }
 
@@ -39,16 +38,7 @@ public class StringUtilsTests {
    void testJoin() {
 
       final String[] stringArray = { "1", "2", "3" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      assertEquals(StringUtils.join(stringArray, ","), "1,2,3"); //$NON-NLS-1$ //$NON-NLS-2$
-      assertEquals(StringUtils.join(new String[] { "1" }, ","), "1"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-   }
-
-   @Test
-   void testSanitizeFileName() {
-
-      final String fileName = "\\$%#filename.txt"; //$NON-NLS-1$
-      assertEquals(StringUtils.sanitizeFileName(fileName), "----filename.txt"); //$NON-NLS-1$
-      assertNull(StringUtils.sanitizeFileName(null));
-      assertEquals(StringUtils.sanitizeFileName(""), UI.EMPTY_STRING); //$NON-NLS-1$
+      assertEquals("1,2,3", StringUtils.join(stringArray, ",")); //$NON-NLS-1$ //$NON-NLS-2$
+      assertEquals("1", StringUtils.join(new String[] { "1" }, ",")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
    }
 }

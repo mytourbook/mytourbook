@@ -374,12 +374,12 @@ public class SliderPath_Layer extends Layer {
 
 		final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-		return LineStyle
+      return LineStyle
 
-				.builder()//
+            .builder()
 
 				.strokeWidth(trackConfig.sliderPath_LineWidth)
-				.color(ColorUtil.getARGB(trackConfig.sliderPath_Color, trackConfig.sliderPath_Opacity * 0xff / 100))
+            .color(ColorUtil.getARGB(trackConfig.sliderPath_Color, trackConfig.sliderPath_Opacity))
             //.cap(Cap.BUTT)
             .cap(Paint.Cap.ROUND)
 				// this is not yet working

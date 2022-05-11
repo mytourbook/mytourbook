@@ -4,9 +4,8 @@
 TODO's
 ======
 
-
 * Tour Chart      - Select color for 2nd graph line instead of compliment color
-                  - Set default graphs in the graph slideout, sorting still needs the pref page
+
 
 * Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
                     Need to check how to apply it to all projects, must maybe be done with the already existing ant script
@@ -18,7 +17,6 @@ TODO's
 Issues
 ======
 
-*  
 
 
 Experimental
@@ -30,33 +28,44 @@ Experimental
 New
 ===
 
-* Tour Pauses
-  - Show all tour pauses in a list
+* Tour Segmenter View (Frederic)
+  - Added the ability to export the current view in .CSV format
 
 
 Improvements
 ============
 
-* Tours
-  - Loading multiple tours is now much faster because they are loaded concurrently
+* Tour Editor     
+  - Recompute the elevation up/down values when tour is saved is now optional, this can be enabled/disabled in the tour editor options
+    https://sourceforge.net/p/mytourbook/feature-requests/196/
+
+* 2.5D Map
+  - Filter photos                      			https://github.com/mytourbook/mytourbook/issues/397
+  - Enlarge marker font on 4k display           https://github.com/mytourbook/mytourbook/issues/504
 
 
 Changes
 =======
 
-* 
+* Fitlog/FitlogEx Import (Frederic)
+  - Differentiating the temperature from the device and the temperature manually entered/from a provider
+    https://sourceforge.net/p/mytourbook/discussion/622811/thread/11993be696/
 
 
 Bugfix
 ======
 
-* 
+* Database (Frederic)
+  - Fixed an issue where a cloud type was renamed in 22.3.0 and caused a missing icon for "Weather-Showers-Scattered"
+    https://sourceforge.net/p/mytourbook/discussion/622811/thread/11993be696/
+
+* Tour Editor (Frederic)
+  - Fixed a bug where the recorded and paused times were not recomputed when using the feature "Delete Time Slices and Remove Time"
 
 
 Translation    
 ===========
 
-- Czech 20.11 (Lukas)
 - Dutch (Maarten)
 - French (Frederic)
 - German
@@ -66,5 +75,6 @@ Translation
 System   
 ======
 
-* Eclipse 2021-06
-* FIT SDK 21.60
+* Milestone             https://github.com/mytourbook/mytourbook/milestone/4?closed=1
+* Eclipse 2022-03
+* FIT SDK 21.67

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -53,8 +53,6 @@ public class Comparison {
    public static void compareTourDataAgainstControl(final TourData testTourData,
                                                     final String controlFileName) {
 
-      final String controlDocument = readFileContent(controlFileName + JSON);
-
       testTourData.getTourMarkersSorted();
       final String testJson = testTourData.toJson();
 
@@ -71,6 +69,8 @@ public class Comparison {
             new Customization("importFilePathName", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("importFilePathNameText", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("tourId", (o1, o2) -> true)); //$NON-NLS-1$
+
+      final String controlDocument = readFileContent(controlFileName + JSON);
 
       final JSONCompareResult result = JSONCompare.compareJSON(controlDocument, testJson, customArrayValueComparator);
 

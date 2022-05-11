@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.map3.layer.tourtrack;
+
+import static net.tourbook.common.util.Util.getXmlFloatFloat;
 
 import gov.nasa.worldwind.WorldWind;
 
@@ -303,7 +305,7 @@ public class TourTrackConfigManager {
          // append custom configurations
          for (int customIndex = 0; customIndex < 10; customIndex++) {
 
-            createDefaultXml_10(//
+            createDefaultXml_10(
                   xmlRoot,
                   String.format("%s #%d", CONFIG_NAME_DEFAULT, (customIndex + 1)), //$NON-NLS-1$
                   DEFAULT_ID_DEFAULT);
@@ -784,7 +786,7 @@ public class TourTrackConfigManager {
 
    private static void parse_010_Root(final XMLMemento xmlRoot) {
 
-      _activeConfigIdFromXml = Util.getXmlString(//
+      _activeConfigIdFromXml = Util.getXmlString(
             xmlRoot,
             ATTR_ACTIVE_CONFIG_ID,
             null);
@@ -792,23 +794,23 @@ public class TourTrackConfigManager {
 
    private static void parse_100_ConfigAttr(final XMLMemento xmlConfig, final TourTrackConfig config) {
 
-      config.id = Util.getXmlString(xmlConfig, //
+      config.id = Util.getXmlString(xmlConfig,
             ATTR_ID,
             Long.toString(System.nanoTime()));
 
-      config.defaultId = Util.getXmlString(xmlConfig, //
+      config.defaultId = Util.getXmlString(xmlConfig,
             ATTR_DEFAULT_ID,
             DEFAULT_ID_DEFAULT);
 
-      config.name = Util.getXmlString(xmlConfig, //
+      config.name = Util.getXmlString(xmlConfig,
             ATTR_CONFIG_NAME,
             CONFIG_NAME_UNKNOWN);
 
-      config.isFollowTerrain = Util.getXmlBoolean(xmlConfig, //
+      config.isFollowTerrain = Util.getXmlBoolean(xmlConfig,
             ATTR_IS_FOLLOW_TERRAIN,
             CONFIG_IS_FOLLOW_TERRAIN_DEFAULT);
 
-      config.trackColorOpacity = Util.getXmlFloatInt(
+      config.trackColorOpacity = getXmlFloatFloat(
             xmlConfig,
             ATTR_TRACK_COLOR_OPACITY_DEFAULT,
             Map3GradientColorManager.OPACITY_DEFAULT,
@@ -818,17 +820,17 @@ public class TourTrackConfigManager {
 
    private static void parse_200_DirectionArrows(final XMLMemento xmlDirectionArrow, final TourTrackConfig config) {
 
-      config.isShowDirectionArrows = Util.getXmlBoolean(xmlDirectionArrow, //
+      config.isShowDirectionArrows = Util.getXmlBoolean(xmlDirectionArrow,
             ATTR_IS_VISIBLE,
             IS_DIRECTION_ARROWS_VISIBLE_DEFAULT);
 
-      config.directionArrowSize = Util.getXmlFloatInt(xmlDirectionArrow, //
+      config.directionArrowSize = Util.getXmlFloatInt(xmlDirectionArrow,
             ATTR_DIRECTION_ARROW_SIZE,
             DIRECTION_ARROW_SIZE_DEFAULT,
             DIRECTION_ARROW_SIZE_MIN,
             DIRECTION_ARROW_SIZE_MAX);
 
-      config.directionArrowDistance = Util.getXmlFloatInt(xmlDirectionArrow, //
+      config.directionArrowDistance = Util.getXmlFloatInt(xmlDirectionArrow,
             ATTR_VERTICAL_DISTANCE,
             DIRECTION_ARROW_VERTICAL_DISTANCE_DEFAULT,
             DIRECTION_ARROW_VERTICAL_DISTANCE_MIN,
@@ -866,19 +868,19 @@ public class TourTrackConfigManager {
 
    private static void parse_310__ColorMode(final XMLMemento xmlColorMode, final TourTrackConfig config) {
 
-      config.outlineColorMode = Util.getXmlInteger(xmlColorMode, //
+      config.outlineColorMode = Util.getXmlInteger(xmlColorMode,
             ATTR_NORMAL,
             OUTLINE_COLOR_MODE_NORMAL_DEFAULT);
 
-      config.outlineColorMode_Hovered = Util.getXmlInteger(xmlColorMode, //
+      config.outlineColorMode_Hovered = Util.getXmlInteger(xmlColorMode,
             ATTR_HOVERED,
             OUTLINE_COLOR_MODE_HOVERED_DEFAULT);
 
-      config.outlineColorMode_Selected = Util.getXmlInteger(xmlColorMode, //
+      config.outlineColorMode_Selected = Util.getXmlInteger(xmlColorMode,
             ATTR_SELECTED,
             OUTLINE_COLOR_MODE_SELECTED_DEFAULT);
 
-      config.outlineColorMode_HovSel = Util.getXmlInteger(xmlColorMode, //
+      config.outlineColorMode_HovSel = Util.getXmlInteger(xmlColorMode,
             ATTR_HOV_AND_SEL,
             OUTLINE_COLOR_MODE_HOV_SEL_DEFAULT);
    }
@@ -911,25 +913,25 @@ public class TourTrackConfigManager {
 
    private static void parse_330__Opacity(final XMLMemento xmlOpacity, final TourTrackConfig trackConfig) {
 
-      trackConfig.outlineOpacity = Util.getXmlFloatInt(xmlOpacity, //
+      trackConfig.outlineOpacity = getXmlFloatFloat(xmlOpacity,
             ATTR_NORMAL,
             OUTLINE_OPACITY_NORMAL_DEFAULT,
             Map3GradientColorManager.OPACITY_MIN,
             Map3GradientColorManager.OPACITY_MAX);
 
-      trackConfig.outlineOpacity_Hovered = Util.getXmlFloatInt(xmlOpacity, //
+      trackConfig.outlineOpacity_Hovered = getXmlFloatFloat(xmlOpacity,
             ATTR_HOVERED,
             OUTLINE_OPACITY_HOVERED_DEFAULT,
             Map3GradientColorManager.OPACITY_MIN,
             Map3GradientColorManager.OPACITY_MAX);
 
-      trackConfig.outlineOpacity_Selected = Util.getXmlFloatInt(xmlOpacity, //
+      trackConfig.outlineOpacity_Selected = getXmlFloatFloat(xmlOpacity,
             ATTR_SELECTED,
             OUTLINE_OPACITY_SELECTED_DEFAULT,
             Map3GradientColorManager.OPACITY_MIN,
             Map3GradientColorManager.OPACITY_MAX);
 
-      trackConfig.outlineOpacity_HovSel = Util.getXmlFloatInt(xmlOpacity, //
+      trackConfig.outlineOpacity_HovSel = getXmlFloatFloat(xmlOpacity,
             ATTR_HOV_AND_SEL,
             OUTLINE_OPACITY_HOV_SEL_DEFAULT,
             Map3GradientColorManager.OPACITY_MIN,
@@ -938,12 +940,12 @@ public class TourTrackConfigManager {
 
    private static void parse_400_Interior(final XMLMemento xmlInterior, final TourTrackConfig trackConfig) {
 
-      trackConfig.isShowInterior = Util.getXmlBoolean(//
+      trackConfig.isShowInterior = Util.getXmlBoolean(
             xmlInterior,
             ATTR_IS_VISIBLE,
             IS_INTERIOR_VISIBLE_DEFAULT);
 
-      trackConfig.isDrawVerticals = Util.getXmlBoolean(//
+      trackConfig.isDrawVerticals = Util.getXmlBoolean(
             xmlInterior,
             ATTR_IS_DRAW_VERTICALS,
             IS_DRAW_VERTICALS_DEFAULT);
@@ -970,19 +972,19 @@ public class TourTrackConfigManager {
 
    private static void parse_410__ColorMode(final XMLMemento xmlColorMode, final TourTrackConfig config) {
 
-      config.interiorColorMode = Util.getXmlInteger(xmlColorMode, //
+      config.interiorColorMode = Util.getXmlInteger(xmlColorMode,
             ATTR_NORMAL,
             INTERIOR_COLOR_MODE_NORMAL_DEFAULT);
 
-      config.interiorColorMode_Hovered = Util.getXmlInteger(xmlColorMode, //
+      config.interiorColorMode_Hovered = Util.getXmlInteger(xmlColorMode,
             ATTR_HOVERED,
             INTERIOR_COLOR_MODE_HOVERED_DEFAULT);
 
-      config.interiorColorMode_Selected = Util.getXmlInteger(xmlColorMode, //
+      config.interiorColorMode_Selected = Util.getXmlInteger(xmlColorMode,
             ATTR_SELECTED,
             INTERIOR_COLOR_MODE_SELECTED_DEFAULT);
 
-      config.interiorColorMode_HovSel = Util.getXmlInteger(xmlColorMode, //
+      config.interiorColorMode_HovSel = Util.getXmlInteger(xmlColorMode,
             ATTR_HOV_AND_SEL,
             INTERIOR_COLOR_MODE_HOV_SEL_DEFAULT);
    }
@@ -1015,25 +1017,25 @@ public class TourTrackConfigManager {
 
    private static void parse_430__Opacity(final XMLMemento xmlOpacity, final TourTrackConfig config) {
 
-      config.interiorOpacity = Util.getXmlFloatInt(xmlOpacity, //
+      config.interiorOpacity = getXmlFloatFloat(xmlOpacity,
             ATTR_NORMAL,
             INTERIOR_OPACITY_NORMAL_DEFAULT,
             Map3GradientColorManager.OPACITY_MIN,
             Map3GradientColorManager.OPACITY_MAX);
 
-      config.interiorOpacity_Hovered = Util.getXmlFloatInt(xmlOpacity, //
+      config.interiorOpacity_Hovered = getXmlFloatFloat(xmlOpacity,
             ATTR_HOVERED,
             INTERIOR_OPACITY_HOVERED_DEFAULT,
             Map3GradientColorManager.OPACITY_MIN,
             Map3GradientColorManager.OPACITY_MAX);
 
-      config.interiorOpacity_Selected = Util.getXmlFloatInt(xmlOpacity, //
+      config.interiorOpacity_Selected = getXmlFloatFloat(xmlOpacity,
             ATTR_SELECTED,
             INTERIOR_OPACITY_SELECTED_DEFAULT,
             Map3GradientColorManager.OPACITY_MIN,
             Map3GradientColorManager.OPACITY_MAX);
 
-      config.interiorOpacity_HovSel = Util.getXmlFloatInt(xmlOpacity, //
+      config.interiorOpacity_HovSel = getXmlFloatFloat(xmlOpacity,
             ATTR_HOV_AND_SEL,
             INTERIOR_OPACITY_HOV_SEL_DEFAULT,
             Map3GradientColorManager.OPACITY_MIN,
@@ -1042,11 +1044,11 @@ public class TourTrackConfigManager {
 
    private static void parse_500_TrackPosition(final XMLMemento xmlTrackPosition, final TourTrackConfig config) {
 
-      config.isShowTrackPosition = Util.getXmlBoolean(xmlTrackPosition, //
+      config.isShowTrackPosition = Util.getXmlBoolean(xmlTrackPosition,
             ATTR_IS_VISIBLE,
             IS_SHOW_TRACK_POSITION_DEFAULT);
 
-      config.trackPositionThreshold = Util.getXmlInteger(xmlTrackPosition, //
+      config.trackPositionThreshold = Util.getXmlInteger(xmlTrackPosition,
             ATTR_TRACK_POSITION_THRESHOLD,
             TRACK_POSITION_THRESHOLD_DEFAULT,
             TRACK_POSITION_THRESHOLD_MIN,
@@ -1056,25 +1058,25 @@ public class TourTrackConfigManager {
 
          final XMLMemento xmlTrackSize = (XMLMemento) mementoTrackSize;
 
-         config.trackPositionSize = Util.getXmlFloatInt(xmlTrackSize, //
+         config.trackPositionSize = Util.getXmlFloatInt(xmlTrackSize,
                ATTR_NORMAL,
                TRACK_POSITION_SIZE_NORMAL_DEFAULT,
                TRACK_POSITION_SIZE_MIN,
                TRACK_POSITION_SIZE_MAX);
 
-         config.trackPositionSize_Hovered = Util.getXmlFloatInt(xmlTrackSize, //
+         config.trackPositionSize_Hovered = Util.getXmlFloatInt(xmlTrackSize,
                ATTR_HOVERED,
                TRACK_POSITION_SIZE_HOVERED_DEFAULT,
                TRACK_POSITION_SIZE_MIN,
                TRACK_POSITION_SIZE_MAX);
 
-         config.trackPositionSize_Selected = Util.getXmlFloatInt(xmlTrackSize, //
+         config.trackPositionSize_Selected = Util.getXmlFloatInt(xmlTrackSize,
                ATTR_SELECTED,
                TRACK_POSITION_SIZE_SELECTED_DEFAULT,
                TRACK_POSITION_SIZE_MIN,
                TRACK_POSITION_SIZE_MAX);
 
-         config.trackPositionSize_HovSel = Util.getXmlFloatInt(xmlTrackSize, //
+         config.trackPositionSize_HovSel = Util.getXmlFloatInt(xmlTrackSize,
                ATTR_HOV_AND_SEL,
                TRACK_POSITION_SIZE_HOV_SEL_DEFAULT,
                TRACK_POSITION_SIZE_MIN,
@@ -1085,31 +1087,31 @@ public class TourTrackConfigManager {
 
    private static void parse_600_Altitude(final XMLMemento xmlAltitude, final TourTrackConfig config) {
 
-      final int xmlAltitudeMode = Util.getXmlInteger(xmlAltitude, //
+      final int xmlAltitudeMode = Util.getXmlInteger(xmlAltitude,
             ATTR_ALTITUDE_MODE,
             ALTITUDE_MODE_DEFAULT);
 
       config.altitudeMode = TourTrackConfig.getValidAltitudeModeValue(xmlAltitudeMode);
 
-      config.isAltitudeOffset = Util.getXmlBoolean(xmlAltitude, //
+      config.isAltitudeOffset = Util.getXmlBoolean(xmlAltitude,
             ATTR_IS_ABSOLUTE_OFFSET,
             IS_ALTITUDE_OFFSET_DEFAULT);
 
-      config.isAltitudeOffsetRandom = Util.getXmlBoolean(xmlAltitude, //
+      config.isAltitudeOffsetRandom = Util.getXmlBoolean(xmlAltitude,
             ATTR_IS_ABSOLUTE_OFFSET_RANDOM,
             IS_ALTITUDE_OFFSET_RANDOM_DEFAULT);
 
-      config.altitudeOffsetMode = Util.getXmlInteger(xmlAltitude, //
+      config.altitudeOffsetMode = Util.getXmlInteger(xmlAltitude,
             ATTR_ALTITUDE_OFFSET_MODE,
             ALTITUDE_OFFSET_MODE_DEFAULT);
 
-      config.altitudeOffsetDistanceAbsolute = Util.getXmlInteger(xmlAltitude, //
+      config.altitudeOffsetDistanceAbsolute = Util.getXmlInteger(xmlAltitude,
             ATTR_ALTITUDE_OFFSET_ABSOLUTE,
             ALTITUDE_OFFSET_ABSOLUTE_DEFAULT,
             ALTITUDE_OFFSET_ABSOLUTE_MIN,
             ALTITUDE_OFFSET_ABSOLUTE_MAX);
 
-      config.altitudeOffsetDistanceRelative = Util.getXmlInteger(xmlAltitude, //
+      config.altitudeOffsetDistanceRelative = Util.getXmlInteger(xmlAltitude,
             ATTR_ALTITUDE_OFFSET_RELATIVE,
             ALTITUDE_OFFSET_RELATIVE_DEFAULT,
             ALTITUDE_OFFSET_RELATIVE_MIN,

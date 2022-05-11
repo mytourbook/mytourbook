@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,6 @@ import java.net.MalformedURLException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -183,9 +182,9 @@ public class MapProviderManager {
    private static final String PART_TYPE_HTML                                = "HTML";               //$NON-NLS-1$
    private static final String PART_TYPE_RANDOM_INTEGER                      = "RANDOM_INTEGER";     //$NON-NLS-1$
    private static final String PART_TYPE_RANDOM_ALPHA                        = "RANDOM_ALPHA";       //$NON-NLS-1$
-   private static final String PART_TYPE_X                                   = "X";                  //$NON-NLS-1$;
-   private static final String PART_TYPE_Y                                   = "Y";                  //$NON-NLS-1$;
-   private static final String PART_TYPE_ZOOM                                = "ZOOM";               //$NON-NLS-1$;
+   private static final String PART_TYPE_X                                   = "X";                  //$NON-NLS-1$
+   private static final String PART_TYPE_Y                                   = "Y";                  //$NON-NLS-1$
+   private static final String PART_TYPE_ZOOM                                = "ZOOM";               //$NON-NLS-1$
 
    /*
     * WMS map provider
@@ -1919,12 +1918,7 @@ public class MapProviderManager {
       }
 
       // sort parts by position
-      Collections.sort(urlParts, new Comparator<UrlPart>() {
-         @Override
-         public int compare(final UrlPart p1, final UrlPart p2) {
-            return p1.getPosition() - p2.getPosition();
-         }
-      });
+      Collections.sort(urlParts, (urlPart1, urlPart2) -> urlPart1.getPosition() - urlPart2.getPosition());
 
       /*
        * update model

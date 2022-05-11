@@ -3,7 +3,7 @@
  */
 package net.tourbook.map25.layer.tourtrack;
 
-import static org.oscim.backend.GLAdapter.*;
+import static org.oscim.backend.GLAdapter.gl;
 
 import net.tourbook.map25.Map25ConfigManager;
 
@@ -175,7 +175,8 @@ public class LocationRenderer extends LayerRenderer {
 
 			boolean isViewShed = false;
 
-			animate(true);
+         // reduce CPU cycles
+//			animate(true);
 
 			final boolean isLocationVisible = _isLocationVisible[locationIndex];
 			if (isLocationVisible) {

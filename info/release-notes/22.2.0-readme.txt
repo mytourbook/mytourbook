@@ -1,0 +1,124 @@
+22.2.0                                                 22. February 2022
+
+
+New
+===
+
+* 2D Map - Select Trackpoint           
+  https://github.com/mytourbook/mytourbook/issues/461
+  - A trackpoint can be selected with the mouse when only one tour is displayed 
+  - With the <Shift> key the 2nd trackpoint can be selected
+  - Select in-between trackpoints can be activated/deactivated in the 
+    "2D Map Options" slideout
+
+* Suunto Integration (Frederic)   
+  - Added the possibility to customize the downloaded file names 
+    https://sourceforge.net/p/mytourbook/feature-requests/198/
+  - Added a workout filter end date
+
+* SRTM 1 (Thomas)
+    https://sourceforge.net/p/mytourbook/discussion/622811/thread/7e83518a/
+    https://sourceforge.net/p/mytourbook/feature-requests/122/
+  - Additionally to the already usable SRTM3 elevations, SRTM1 is now also usable. 
+    The data files must be manually copied to the new SRTM1 folder.
+    - SRTM1 file size is 25.9 MB
+    - SRTM3 file size is 2.9 MB
+
+* Tour Pauses
+  - Show all tour pauses in a list
+
+
+Improvements
+============
+
+* Multiple Tours
+  - Loading multiple tours is much faster because they are loaded concurrently
+  - Painting multiple tours in tour chart and 2D map are further optimized 
+
+* Tour Import
+  - Sort imported tours by number of markers/waypoints
+  - Customize simple import tiles in the easy import page         
+    https://github.com/mytourbook/mytourbook/issues/460
+  
+* 2D Map 
+  - Added the possibility to show/hide the tour weather icon on the map  (Frederic)
+  - Cut off lines in pauses                                       
+    https://github.com/mytourbook/mytourbook/issues/463
+  - Show tour directions always                                   
+    https://github.com/mytourbook/mytourbook/issues/464
+  - Paint tour tracks with/without antialiasing. 
+    A dimmed map may look better without antialiasing
+  - Track options slideout has a new UI to reduce the size of this slideout
+
+* Photos + Tours                                                  
+  https://github.com/mytourbook/mytourbook/issues/449
+  - Show tours with these photo times
+    - Exif time
+    - Selected adjustment time
+    - Saved time
+  - Show photo location in view                         
+
+* Tour Segmenter
+  - Show power value for each segment                             
+    https://sourceforge.net/p/mytourbook/feature-requests/204/
+  
+* Cloud Integration (Frederic)
+  - By default, sensitive data such as tokens are hidden but can be fully displayed by the user
+
+* Strava Integration (Frederic)   
+  - Added the possibility to add the tour weather icon in the uploaded Strava activity title
+
+* Tour Merging (Frederic)
+ - Added the possibility to merge speed
+
+
+Changes
+=======
+
+* Tour Editor
+  - Time difference column shows now the time difference to the next time slice, 
+    until now the time difference to the previous time slice was displayed
+  - A "wrong" time slice is deleted                               
+    https://github.com/mytourbook/mytourbook/issues/456
+  - When time slices are deleted, then the distance differences will always be removed. 
+    Until now, the distances were kept with the action "Delete Time Slices and Keep Time"
+    https://github.com/mytourbook/mytourbook/issues/462
+
+Bugfix
+======
+
+* Suunto Integration (Frederic)   
+  - When determining if a Suunto activity already exists in the database, 
+    only the tours for the selected user are compared with the activities 
+    available on the Suunto App
+
+* Map25 (Thomas)
+  - The old hillshading provider(wmflabs.org) is not available anymore, 
+    the new provider for hillshading is now "Mapilion"
+  
+* Tour Editor
+  - Using DELETE in the Tour Editor is not consecutive            
+    https://sourceforge.net/p/mytourbook/bugs/127/
+  - Canceling the tour editor still saves the changes             
+    https://sourceforge.net/p/mytourbook/bugs/128/
+
+* TCX Tour Export (Frederic)
+  - Removing the lat/lon tags when those values are invalid/not provided 
+    as it creates an invalid TCX file
+
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* Milestone 22.2        https://github.com/mytourbook/mytourbook/milestone/2?closed=1
+* Eclipse 2021-06       https://github.com/mytourbook/mytourbook/issues/440
+* FIT SDK 21.67

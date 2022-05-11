@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,8 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 
 public abstract class TourbookDevice implements IRawDataReader {
+
+   private static final char     NL                              = UI.NEW_LINE;
 
    protected static final String XML_START_ID                    = "<?xml";                                                    //$NON-NLS-1$
    protected static final String XML_HEADER                      = "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";              //$NON-NLS-1$
@@ -327,15 +329,17 @@ public abstract class TourbookDevice implements IRawDataReader {
 
    @Override
    public String toString() {
-      return "TourbookDevice [deviceId=" //$NON-NLS-1$
-            + deviceId
-            + ", visibleName=" //$NON-NLS-1$
-            + visibleName
-            + ", fileExtension=" //$NON-NLS-1$
-            + fileExtension
-            + ", extensionSortPriority=" //$NON-NLS-1$
-            + extensionSortPriority
-            + "]"; //$NON-NLS-1$
+
+      return "TourbookDevice" //                                           //$NON-NLS-1$
+
+            + "[" + NL //                                                  //$NON-NLS-1$
+
+            + "fileExtension           =" + fileExtension + NL //          //$NON-NLS-1$
+            + "visibleName             =" + visibleName + NL //            //$NON-NLS-1$
+            + "extensionSortPriority   =" + extensionSortPriority + NL //  //$NON-NLS-1$
+            + "deviceId                =" + deviceId + NL //               //$NON-NLS-1$
+
+            + "]" + NL; //                                                 //$NON-NLS-1$
    }
 
    public String userConfirmationMessage() {

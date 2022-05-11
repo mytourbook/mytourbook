@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -276,15 +276,15 @@ public class Messages extends NLS {
    public static String        Pref_System_Option_Temperature_Celsius;
    public static String        Pref_System_Option_Temperature_Fahrenheit;
 
-   public static String        Weather_Clounds_Clouds;
-   public static String        Weather_Clounds_Clouny;
-   public static String        Weather_Clounds_IsNotDefined;
-   public static String        Weather_Clounds_Lightning;
-   public static String        Weather_Clounds_Rain;
-   public static String        Weather_Clounds_ScatteredShowers;
-   public static String        Weather_Clounds_SevereWeatherAlert;
-   public static String        Weather_Clounds_Snow;
-   public static String        Weather_Clounds_Sunny;
+   public static String        Weather_Clouds_Clouds;
+   public static String        Weather_Clouds_Cloudy;
+   public static String        Weather_Clouds_IsNotDefined;
+   public static String        Weather_Clouds_Lightning;
+   public static String        Weather_Clouds_Rain;
+   public static String        Weather_Clouds_ScatteredShowers;
+   public static String        Weather_Clouds_SevereWeatherAlert;
+   public static String        Weather_Clouds_Snow;
+   public static String        Weather_Clouds_Sunny;
 
    public static String        Weather_WindDirection_N;
    public static String        Weather_WindDirection_NNE;

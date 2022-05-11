@@ -495,7 +495,14 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       _isInCreateUI = false;
 
-      Display.getCurrent().asyncExec(() -> _comboMarkerName.setFocus());
+      Display.getCurrent().asyncExec(() -> {
+
+         if (_comboMarkerName.isDisposed()) {
+            return;
+         }
+
+         _comboMarkerName.setFocus();
+      });
 
       return dlgContainer;
    }

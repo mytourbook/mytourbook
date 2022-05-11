@@ -1,0 +1,97 @@
+22.3.0                                                     9. April 2022
+
+
+New
+===
+
+* Weather Retrieval (Frederic)
+  - Tour weather data improvement and new vendor addition: OpenWeatherMap     
+    https://github.com/mytourbook/mytourbook/issues/479
+
+
+Improvements
+============
+
+* Calendar View (Frederic)
+  - The combo of years now displays the most recent years at the top as 
+    it is more likely to be selected than the oldest years
+    https://github.com/mytourbook/mytourbook/pull/472
+    
+* Tour Book View
+  - Clone tour start/end location when a tour is copied                 
+    https://sourceforge.net/p/mytourbook/feature-requests/206/  
+
+* Tour Chart
+  - Switch between SRTM 1 and SRTM 3 values                             
+    https://github.com/mytourbook/mytourbook/issues/469 
+
+* 2D Map
+  - Consolidated "Set map center when zoomed to ..."		               
+    https://github.com/mytourbook/mytourbook/issues/468
+  - Show more details when multiple tours are hovered                   
+    https://github.com/mytourbook/mytourbook/issues/470
+
+* Strava Integration (Frederic)   
+  - Added the possibility to send the weather data in the uploaded 
+    activity's description       
+    https://github.com/mytourbook/mytourbook/issues/479
+
+* MT Export/Import                                                      
+    https://github.com/mytourbook/mytourbook/issues/493
+  - Export and import all values of a tour
+  - Limits/behavior:
+    - A device sensor is not created, when sensor values for it are available
+    - Body weight is overwritten when tour is saved and when 
+      "Set the persons's weight ..." is selected in the "Import" preferences
+
+Changes
+=======
+
+* Transform Opacity
+  - Selecting/entering opacity values 0...100 or 0...255 is not user friendly. 
+    With this new transformation, which is defined in the user preferences 
+    "Appearance/Transform Values", opacity values could be selected 
+    between e.g. 0...8 which is then transformed into 0...255
+  - It is possible, that existing opacity values must be adjusted because 
+    they are not migrated
+
+* Tour Chart
+  - Moved options from the pref page into the chart options slideout 
+    - Graph line transparency
+    - Draw line graphs with antialiasing
+
+
+* 2D Map
+  - Moved action "Show earth map" from the toolbar into the map context menu
+
+
+Bugfix
+======
+
+* Suunto Integration (Frederic)   
+  - Removing only the characters forbidden for each OS when downloading activities
+    https://sourceforge.net/p/mytourbook/feature-requests/198/#e0fb
+  
+
+Issues
+======
+* All Radio Buttons
+  Shortcuts for radio buttons do not work                               
+  https://github.com/eclipse-platform/eclipse.platform.swt/issues/6
+
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* Milestone             https://github.com/mytourbook/mytourbook/milestone/3?closed=1
+* Eclipse 2022-03
+* FIT SDK 21.78

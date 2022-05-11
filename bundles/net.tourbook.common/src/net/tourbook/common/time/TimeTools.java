@@ -256,15 +256,23 @@ public class TimeTools {
     */
    public static long createdNowAsYMDhms() {
 
-      final ZonedDateTime zdtNow = ZonedDateTime.now();
+      return createYMDhms_From_DateTime(ZonedDateTime.now());
+   }
 
-      final long dtYMDhms = (zdtNow.getYear() * 10000000000L)
-            + (zdtNow.getMonthValue() * 100000000L)
-            + (zdtNow.getDayOfMonth() * 1000000L)
-            //
-            + (zdtNow.getHour() * 10000L)
-            + (zdtNow.getMinute() * 100L)
-            + zdtNow.getSecond();
+   /**
+    * @return Returns a long value for the given date/time in the YYYYMMDDhhmmss format
+    */
+   public static long createYMDhms_From_DateTime(final ZonedDateTime zonedDateTime) {
+
+      final long dtYMDhms = 0
+
+            + (zonedDateTime.getYear() * 10000000000L)
+            + (zonedDateTime.getMonthValue() * 100000000L)
+            + (zonedDateTime.getDayOfMonth() * 1000000L)
+
+            + (zonedDateTime.getHour() * 10000L)
+            + (zonedDateTime.getMinute() * 100L)
+            + zonedDateTime.getSecond();
 
       return dtYMDhms;
    }

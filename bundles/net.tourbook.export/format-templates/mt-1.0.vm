@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mt
+   version="1.0"
+   created="$created"
+   creator="$creator">
+   <tour 
+      tourId                                 ="$tourData.tourId" 
+##
+#if ($tourData.tourPerson)            
+      personId                               ="$tourData.tourPerson.getPersonId()" 
+#end
+#if ($tourData.tourType)
+      typeId                                 ="$tourData.tourType.getTypeId()" 
+#end
+
+      tourStartTime                          ="$tourData.getTourStartTime()" 
+#if ($tourData.timeZoneId)
+      timeZoneId                             ="$tourData.timeZoneId" 
+#end
+      tourComputedTime_Moving                ="$tourData.tourComputedTime_Moving" 
+      tourDeviceTime_Elapsed                 ="$tourData.tourDeviceTime_Elapsed" 
+      tourDeviceTime_Paused                  ="$tourData.tourDeviceTime_Paused" 
+      tourDeviceTime_Recorded                ="$tourData.tourDeviceTime_Recorded" 
+
+      avgAltitudeChange                      ="$tourData.avgAltitudeChange"
+      avgCadence                             ="$tourData.avgCadence"
+      avgPulse                               ="$tourData.avgPulse"
+      battery_Percentage_End                 ="$tourData.battery_Percentage_End"
+      battery_Percentage_Start               ="$tourData.battery_Percentage_Start"
+      bodyFat                                ="$tourData.bodyFat"
+      bodyWeight                             ="$tourData.bodyWeight"
+
+      cadenceMultiplier                      ="$tourData.cadenceMultiplier"
+      cadenceZone_FastTime                   ="$tourData.cadenceZone_FastTime"
+      cadenceZone_SlowTime                   ="$tourData.getCadenceZone_SlowTime()"
+      cadenceZones_DelimiterValue            ="$tourData.cadenceZones_DelimiterValue"
+
+      calories                               ="$tourData.calories"
+      conconiDeflection                      ="$tourData.conconiDeflection"
+
+#if ($tourData.dateTimeCreated)
+      dateTimeCreated                        ="$tourData.dateTimeCreated"
+#end
+#if ($tourData.dateTimeModified)
+      dateTimeModified                       ="$tourData.dateTimeModified"
+#end            
+##
+## Unused fieds
+##    deviceAvgSpeed                         ="$tourData.deviceAvgSpeed"
+##    deviceDistance                         ="$tourData.deviceDistance"
+##    deviceMode                             ="$tourData.deviceMode"
+##    deviceTotalDown                        ="$tourData.deviceTotalDown"
+##    deviceTotalUp                          ="$tourData.deviceTotalUp"
+##    deviceTourType                         ="$tourData.deviceTourType"
+##    deviceTravelTime                       ="$tourData.deviceTravelTime"
+##    deviceWeight                           ="$tourData.deviceWeight"
+##    deviceWheel                            ="$tourData.deviceWheel"
+##    distance                               ="$tourData.distance"
+
+      devicePluginId                         ="$tourData.getDeviceId()"
+      deviceFirmwareVersion                  ="$tourData.deviceFirmwareVersion"
+#if ($tourData.deviceModeName)
+      deviceModeName                         ="$tourData.deviceModeName"
+#end
+#if ($tourData.devicePluginName)
+      devicePluginName                       ="$tourData.devicePluginName"
+#end
+      deviceTimeInterval                     ="$tourData.deviceTimeInterval"
+      dpTolerance                            ="$tourData.dpTolerance"
+      frontShiftCount                        ="$tourData.frontShiftCount"
+      hasGeoData                             ="$tourData.hasGeoData()"
+
+      hrZone0                                ="$tourData.getHrZone0()"
+      hrZone1                                ="$tourData.getHrZone1()"
+      hrZone2                                ="$tourData.getHrZone2()"
+      hrZone3                                ="$tourData.getHrZone3()"
+      hrZone4                                ="$tourData.getHrZone4()"
+      hrZone5                                ="$tourData.getHrZone5()"
+      hrZone6                                ="$tourData.getHrZone6()"
+      hrZone7                                ="$tourData.getHrZone7()"
+      hrZone8                                ="$tourData.getHrZone8()"
+      hrZone9                                ="$tourData.getHrZone9()"
+
+      isDistanceFromSensor                   ="$tourData.getIsDistanceFromSensor()"
+      isPowerSensorPresent                   ="$tourData.getIsPowerSensorPresent()"
+      isPulseSensorPresent                   ="$tourData.getIsPulseSensorPresent()"
+      isStrideSensorPresent                  ="$tourData.getIsStrideSensorPresent()"
+      isWeatherDataFromProvider              ="$tourData.isWeatherDataFromProvider()"
+
+      maxAltitude                            ="$tourData.maxAltitude"
+      maxPace                                ="$tourData.maxPace"
+      maxPulse                               ="$tourData.maxPulse"
+      maxSpeed                               ="$tourData.maxSpeed"
+
+#if($tourData.getMergeSourceTourId())          
+      mergeSourceTourId                      ="$tourData.getMergeSourceTourId()"
+#end
+#if($tourData.getMergeTargetTourId())
+      mergeTargetTourId                      ="$tourData.getMergeTargetTourId()"
+#end
+      mergedAltitudeOffset                   ="$tourData.mergedAltitudeOffset"
+      mergedTourTimeOffset                   ="$tourData.mergedTourTimeOffset"
+
+      numberOfHrZones                        ="$tourData.numberOfHrZones"
+      numberOfPhotos                         ="$tourData.getNumberOfPhotos()"
+      numberOfTimeSlices                     ="$tourData.numberOfTimeSlices"
+      
+      photoTimeAdjustment                    ="$tourData.photoTimeAdjustment"
+
+      power_Avg                              ="$tourData.power_Avg"
+      power_AvgLeftPedalSmoothness           ="$tourData.power_AvgLeftPedalSmoothness"
+      power_AvgLeftTorqueEffectiveness       ="$tourData.power_AvgLeftTorqueEffectiveness"
+      power_AvgRightPedalSmoothness          ="$tourData.power_AvgRightPedalSmoothness"
+      power_AvgRightTorqueEffectiveness      ="$tourData.power_AvgRightTorqueEffectiveness"
+
+#if($tourData.getPower_DataSource())
+      power_DataSource                       ="$tourData.getPower_DataSource()"
+#end
+      power_FTP                              ="$tourData.power_FTP"
+      power_IntensityFactor                  ="$tourData.power_IntensityFactor"
+      power_Max                              ="$tourData.power_Max"
+      power_Normalized                       ="$tourData.power_Normalized"
+      power_PedalLeftRightBalance            ="$tourData.power_PedalLeftRightBalance"
+      power_TotalWork                        ="$tourData.power_TotalWork"
+      power_TrainingStressScore              ="$tourData.power_TrainingStressScore"
+
+      rearShiftCount                         ="$tourData.rearShiftCount"
+      restPulse                              ="$tourData.restPulse"
+
+      runDyn_StanceTimeBalance_Avg           ="$tourData.runDyn_StanceTimeBalance_Avg"
+      runDyn_StanceTimeBalance_Max           ="$tourData.runDyn_StanceTimeBalance_Max"
+      runDyn_StanceTimeBalance_Min           ="$tourData.runDyn_StanceTimeBalance_Min"
+      runDyn_StanceTime_Avg                  ="$tourData.runDyn_StanceTime_Avg"
+      runDyn_StanceTime_Max                  ="$tourData.runDyn_StanceTime_Max"
+      runDyn_StanceTime_Min                  ="$tourData.runDyn_StanceTime_Min"
+      runDyn_StepLength_Avg                  ="$tourData.runDyn_StepLength_Avg"
+      runDyn_StepLength_Max                  ="$tourData.runDyn_StepLength_Max"
+      runDyn_StepLength_Min                  ="$tourData.runDyn_StepLength_Min"
+      runDyn_VerticalOscillation_Avg         ="$tourData.runDyn_VerticalOscillation_Avg"
+      runDyn_VerticalOscillation_Max         ="$tourData.runDyn_VerticalOscillation_Max"
+      runDyn_VerticalOscillation_Min         ="$tourData.runDyn_VerticalOscillation_Min"
+      runDyn_VerticalRatio_Avg               ="$tourData.runDyn_VerticalRatio_Avg"
+      runDyn_VerticalRatio_Max               ="$tourData.runDyn_VerticalRatio_Max"
+      runDyn_VerticalRatio_Min               ="$tourData.runDyn_VerticalRatio_Min"
+      
+      startAltitude                          ="$tourData.startAltitude" 
+      startDistance                          ="$tourData.startDistance" 
+      startPulse                             ="$tourData.startPulse" 
+      
+      surfing_IsMinDistance                  ="$tourData.surfing_IsMinDistance" 
+      surfing_MinDistance                    ="$tourData.surfing_MinDistance" 
+      surfing_MinSpeed_StartStop             ="$tourData.surfing_MinSpeed_StartStop" 
+      surfing_MinSpeed_Surfing               ="$tourData.surfing_MinSpeed_Surfing" 
+      surfing_MinTimeDuration                ="$tourData.surfing_MinTimeDuration" 
+      surfing_NumberOfEvents                 ="$tourData.surfing_NumberOfEvents" 
+
+      temperatureScale                       ="$tourData.getTemperatureScale()" 
+      
+      tourAltDown                            ="$tourData.tourAltDown" 
+      tourAltUp                              ="$tourData.tourAltUp" 
+      tourDistance                           ="$tourData.tourDistance" 
+
+      training_TrainingEffect_Aerob          ="$tourData.training_TrainingEffect_Aerob" 
+      training_TrainingEffect_Anaerob        ="$tourData.training_TrainingEffect_Anaerob" 
+      training_TrainingPerformance           ="$tourData.training_TrainingPerformance" 
+
+      weather_Humidity                       ="$tourData.weather_Humidity"
+      weather_Precipitation                  ="$tourData.weather_Precipitation"
+      weather_Pressure                       ="$tourData.weather_Pressure"
+      weather_Snowfall                       ="$tourData.weather_Snowfall"
+      weather_Temperature_Average            ="$tourData.weather_Temperature_Average"
+      weather_Temperature_Average_Device     ="$tourData.weather_Temperature_Average_Device"
+      weather_Temperature_Max                ="$tourData.weather_Temperature_Max"
+      weather_Temperature_Max_Device         ="$tourData.weather_Temperature_Max_Device"
+      weather_Temperature_Min                ="$tourData.weather_Temperature_Min"
+      weather_Temperature_Min_Device         ="$tourData.weather_Temperature_Min_Device"
+      weather_Temperature_WindChill          ="$tourData.weather_Temperature_WindChill"
+      weather_Wind_Direction                 ="$tourData.weather_Wind_Direction"
+      weather_Wind_Speed                     ="$tourData.weather_Wind_Speed"
+   >
+      <tourDescription><![CDATA[$!tourData.tourDescription]]></tourDescription>
+      <tourTitle><![CDATA[$!tourData.tourTitle]]></tourTitle>
+      <tourStartPlace><![CDATA[$!tourData.tourStartPlace]]></tourStartPlace>
+      <tourEndPlace><![CDATA[$!tourData.tourEndPlace]]></tourEndPlace>
+      <weather><![CDATA[$!tourData.weather]]></weather>
+      <weather_Clouds><![CDATA[$!tourData.weather_Clouds]]></weather_Clouds>
+##
+#if ($tourData.getImportFileName())
+      <importFileName><![CDATA[$!tourData.getImportFileName()]]></importFileName>
+#end            
+#if ($tourData.getImportFilePath())
+      <importFilePath><![CDATA[$!tourData.getImportFilePath()]]></importFilePath>
+#end  
+##
+   </tour>          
+##
+##
+## TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   TOURTYPE   
+##
+##
+#set ($tourType = $tourData.getTourType())
+#if($tourType)
+   <tourtype>
+      <name><![CDATA[$!tourType.getName()]]></name>
+   </tourtype>
+#end
+##
+##
+## TOURMARKER   TOURMARKER   TOURMARKER   TOURMARKER   TOURMARKER   TOURMARKER   TOURMARKER   TOURMARKER   
+##
+##
+#if($tourData.getTourMarkers().size() > 0)
+   <markers>
+#set ($allMarkers = $tourData.getTourMarkersSorted())
+#foreach ($marker in $allMarkers)         
+      <marker
+         markerId          ="$marker.markerId"
+         altitude          ="$marker.altitude"
+         distance20        ="$marker.getDistance()"
+         latitude          ="$marker.latitude"
+         longitude         ="$marker.longitude"
+         labelXOffset      ="$marker.labelXOffset"
+         labelYOffset      ="$marker.labelYOffset"
+         serieIndex        ="$marker.serieIndex"
+         time              ="$marker.time"
+         tourTime          ="$marker.tourTime"
+         type              ="$marker.type"
+         visualPosition    ="$marker.getLabelPosition()"
+         isMarkerVisible   ="$marker.getIsMarkerVisible()"
+      >
+         <label><![CDATA[$!marker.label]]></label>
+         <description><![CDATA[$!marker.description]]></description>
+         <urlAddress><![CDATA[$!marker.urlAddress]]></urlAddress>
+         <urlText><![CDATA[$!marker.urlText]]></urlText>
+      </marker>
+#end
+   </markers>
+#end
+##
+##
+## WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   WAYPOINTS   
+##
+##
+#if($allSorted_WayPoints.size() > 0)
+   <waypoints>
+#foreach ($wayPoint in $allSorted_WayPoints)         
+      <waypoint
+         wayPointId     ="$wayPoint.wayPointId"
+         time           ="$wayPoint.time"
+         altitude       ="$wayPoint.altitude"
+         longitude      ="$wayPoint.longitude"
+         latitude       ="$wayPoint.latitude"
+      >
+         <name><![CDATA[$!wayPoint.name]]></name>
+         <description><![CDATA[$!wayPoint.description]]></description>
+         <comment><![CDATA[$!wayPoint.comment]]></comment>
+         <symbol><![CDATA[$!wayPoint.symbol]]></symbol>
+         <category><![CDATA[$!wayPoint.category]]></category>
+         <urlAddress><![CDATA[$!wayPoint.urlAddress]]></urlAddress>
+         <urlText><![CDATA[$!wayPoint.urlText]]></urlText>
+      </waypoint>
+#end
+   </waypoints>
+#end
+##
+##
+## TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   TAGS   
+##
+##
+#if($allSorted_Tags.size() > 0)
+   <tags>
+#foreach ($tag in $allSorted_Tags)         
+      <tag>
+         <name><![CDATA[$!tag.getTagName()]]></name>
+      </tag>
+#end
+   </tags>
+#end
+##
+##
+## PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   PHOTOS   
+##
+##
+#if ($allSorted_Photos.size() > 0)
+   <photos>
+#foreach ($photo in $allSorted_Photos)
+      <photo
+         photoId                 ="$photo.getPhotoId()"
+         imageExifTime           ="$photo.getImageExifTime()"
+         imageFileLastModified   ="$photo.getImageFileLastModified()"
+         adjustedTime            ="$photo.getAdjustedTime()"
+         isGeoFromPhoto          ="$photo.getIsGeoFromPhoto()"
+         ratingStars             ="$photo.getRatingStars()"
+         latitude                ="$photo.getLatitude()"
+         longitude               ="$photo.getLongitude()"
+      >
+         <imageFilePathName><![CDATA[$!photo.getImageFilePathName()]]></imageFilePathName>
+      </photo>
+#end            
+   </photos>
+#end
+##
+##
+## SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   SENSOR   
+##
+##
+#if ($allSorted_SensorValues).size() > 0)
+   <sensorvalues>
+#foreach ($sensor in $allSorted_SensorValues)
+      <sensorvalue
+         sensorValueId           ="$sensor.getSensorValueId()"
+         sensorId                ="$sensor.getDeviceSensor().getSensorId()"
+         tourStartTime           ="$sensor.getTourStartTime()"
+         tourEndTime             ="$sensor.getTourEndTime()"
+         batteryLevel_Start      ="$sensor.getBatteryLevel_Start()"
+         batteryLevel_End        ="$sensor.getBatteryLevel_End()"
+         batteryStatus_Start     ="$sensor.getBatteryStatus_Start()"
+         batteryStatus_End       ="$sensor.getBatteryStatus_End()"
+         batteryVoltage_Start    ="$sensor.getBatteryVoltage_Start()"
+         batteryVoltage_End      ="$sensor.getBatteryVoltage_End()"
+      />
+#end            
+   </sensorvalues>
+#end
+##
+##
+## TOUR REFERENCE   TOUR REFERENCE   TOUR REFERENCE   TOUR REFERENCE   TOUR REFERENCE   TOUR REFERENCE   TOUR REFERENCE   
+##
+##
+#if ($tourData.getTourReferences().size() > 0)
+#set ($allTourReferences = $tourData.getTourReferences())
+   <tourreferences>
+#foreach ($tourReference in $allTourReferences)
+      <tourreference
+         refId                   ="$tourReference.getRefId()"
+         endIndex                ="$tourReference.getEndValueIndex()"
+         startIndex              ="$tourReference.getStartValueIndex()"
+      >
+         <label><![CDATA[$!tourReference.getLabel()]]></label>
+      </tourreference>
+#end            
+   </tourreferences>
+#end
+##
+##
+## DATA SERIE   DATA SERIE   DATA SERIE   DATA SERIE   DATA SERIE   DATA SERIE   DATA SERIE   DATA SERIE   
+##
+##
+   <dataseries>
+#if  ($serieTime                             && $serieTime.size() > 0)
+      <serieTime                        values="$serieTime"/>
+#end
+#if  ($serieAltitude                         && $serieAltitude.size() > 0)
+      <serieAltitude                    values="$serieAltitude"/>
+#end 
+#if  ($serieCadence                          && $serieCadence.size() > 0)
+      <serieCadence                     values="$serieCadence"/>
+#end 
+#if  ($serieDistance                         && $serieDistance.size() > 0)
+      <serieDistance                    values="$serieDistance"/>
+#end 
+#if  ($seriePulse                            && $seriePulse.size() > 0)
+      <seriePulse                       values="$seriePulse"/>
+#end 
+#if  ($serieTemperature                      && $serieTemperature.size() > 0)
+      <serieTemperature                 values="$serieTemperature"/>
+#end 
+#if  ($seriePower                            && $seriePower.size() > 0)
+      <seriePower                       values="$seriePower"/>
+#end 
+#if  ($serieSpeed                            && $serieSpeed.size() > 0)
+      <serieSpeed                       values="$serieSpeed"/>
+#end 
+#if  ($serieGears                            && $serieGears.size() > 0)
+      <serieGears                       values="$serieGears"/>
+#end 
+#if  ($serieLatitude                         && $serieLatitude.size() > 0)
+      <serieLatitude                    values="$serieLatitude"/>
+#end 
+#if  ($serieLongitude                        && $serieLongitude.size() > 0)
+      <serieLongitude                   values="$serieLongitude"/>
+#end 
+#if  ($seriePausedTime_Start                 && $seriePausedTime_Start.size() > 0)
+      <seriePausedTime_Start            values="$seriePausedTime_Start"/>
+#end 
+#if  ($seriePausedTime_End                   && $seriePausedTime_End.size() > 0)
+      <seriePausedTime_End              values="$seriePausedTime_End"/>
+#end 
+#if  ($seriePausedTime_Data                  && $seriePausedTime_Data.size() > 0)
+      <seriePausedTime_Data             values="$seriePausedTime_Data"/>
+#end 
+#if  ($seriePulseTimes                       && $seriePulseTimes.size() > 0)
+      <seriePulseTimes                  values="$seriePulseTimes"/>
+#end 
+#if  ($seriePulseTimes_TimeIndex             && $seriePulseTimes_TimeIndex.size() > 0)
+      <seriePulseTimes_TimeIndex        values="$seriePulseTimes_TimeIndex"/>
+#end 
+#if  ($serieRunDyn_StanceTime                && $serieRunDyn_StanceTime.size() > 0)
+      <serieRunDyn_StanceTime           values="$serieRunDyn_StanceTime"/>
+#end 
+#if  ($serieRunDyn_StanceTimeBalance         && $serieRunDyn_StanceTimeBalance.size() > 0)
+      <serieRunDyn_StanceTimeBalance    values="$serieRunDyn_StanceTimeBalance"/>
+#end 
+#if  ($serieRunDyn_StepLength                && $serieRunDyn_StepLength.size() > 0)
+      <serieRunDyn_StepLength           values="$serieRunDyn_StepLength"/>
+#end 
+#if  ($serieRunDyn_VerticalOscillation       && $serieRunDyn_VerticalOscillation.size() > 0)
+      <serieRunDyn_VerticalOscillation  values="$serieRunDyn_VerticalOscillation"/>
+#end 
+#if  ($serieRunDyn_VerticalRatio             && $serieRunDyn_VerticalRatio.size() > 0)
+      <serieRunDyn_VerticalRatio        values="$serieRunDyn_VerticalRatio"/>
+#end 
+#if  ($serieSwim_LengthType                  && $serieSwim_LengthType.size() > 0)
+      <serieSwim_LengthType             values="$serieSwim_LengthType"/>
+#end 
+#if  ($serieSwim_Cadence                     && $serieSwim_Cadence.size() > 0)
+      <serieSwim_Cadence                values="$serieSwim_Cadence"/>
+#end 
+#if  ($serieSwim_Strokes                     && $serieSwim_Strokes.size() > 0)
+      <serieSwim_Strokes                values="$serieSwim_Strokes"/>
+#end 
+#if  ($serieSwim_StrokeStyle                 && $serieSwim_StrokeStyle.size() > 0)
+      <serieSwim_StrokeStyle            values="$serieSwim_StrokeStyle"/>
+#end 
+#if  ($serieSwim_Time                        && $serieSwim_Time.size() > 0)
+      <serieSwim_Time                   values="$serieSwim_Time"/>
+#end 
+#if  ($serieVisiblePoints_Surfing            && $serieVisiblePoints_Surfing.size() > 0)
+      <serieVisiblePoints_Surfing       values="$serieVisiblePoints_Surfing"/>
+#end 
+#if  ($serieBattery_Percentage               && $serieBattery_Percentage.size() > 0)
+      <serieBattery_Percentage          values="$serieBattery_Percentage"/>
+#end
+#if  ($serieBattery_Time                     && $serieBattery_Time.size() > 0)
+      <serieBattery_Time                values="$serieBattery_Time"/>
+#end
+   </dataseries>
+</mt>

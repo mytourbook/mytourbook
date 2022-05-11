@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
+import net.tourbook.common.UI;
+
 import org.eclipse.jface.viewers.ISelection;
 
 /**
@@ -22,39 +24,35 @@ import org.eclipse.jface.viewers.ISelection;
  */
 public class SelectionChartXSliderPosition implements ISelection {
 
-   public static final int IGNORE_SLIDER_POSITION          = -1;
-   public static final int SLIDER_POSITION_AT_CHART_BORDER = -2;
+   private static final char NL                              = UI.NEW_LINE;
 
-   private int             _beforeLeftSliderIndex          = IGNORE_SLIDER_POSITION;
-   private int             _leftSliderValueIndex           = IGNORE_SLIDER_POSITION;
-   private int             _rightSliderValueIndex          = IGNORE_SLIDER_POSITION;
+   public static final int   IGNORE_SLIDER_POSITION          = -1;
+   public static final int   SLIDER_POSITION_AT_CHART_BORDER = -2;
+
+   private int               _beforeLeftSliderIndex          = IGNORE_SLIDER_POSITION;
+   private int               _leftSliderValueIndex           = IGNORE_SLIDER_POSITION;
+   private int               _rightSliderValueIndex          = IGNORE_SLIDER_POSITION;
 
    /**
     * When <code>true</code> the slider will be positioned in the center of the chart.
     */
-   private boolean         _isCenterSliderPosition         = false;
+   private boolean           _isCenterSliderPosition         = false;
 
    /**
     * When <code>true</code> then the slider will be set visible in the chart by repositioning the
     * graph (this is the old default behavior), otherwise <code>false</code>.
     */
-   private boolean         _isMoveChartToShowSlider        = true;
+   private boolean           _isMoveChartToShowSlider        = true;
 
-   private Chart           _chart;
-
-   /**
-    * When <code>true</code> the start index must be adjusted to the next time slice, this bug
-    * exists since the beginning but is visible since the break time is visualized.
-    */
-   private boolean         _isAdjustStartIndex;
+   private Chart             _chart;
 
    /**
     * When <code>true</code> the zoom position is set to the center of the chart that the next zoom
     * starts from the center of the sliders.
     */
-   private boolean         _isCenterZoomPosition;
+   private boolean           _isCenterZoomPosition;
 
-   private Object          _customData;
+   private Object            _customData;
 
    public SelectionChartXSliderPosition(final Chart chart,
                                         final int leftValueIndex,
@@ -64,18 +62,6 @@ public class SelectionChartXSliderPosition implements ISelection {
 
       _leftSliderValueIndex = leftValueIndex;
       _rightSliderValueIndex = rightValueIndex;
-   }
-
-   public SelectionChartXSliderPosition(final Chart chart,
-                                        final int startIndex,
-                                        final int endIndex,
-                                        final boolean isSelectInBetweenTimeSlices,
-                                        final boolean isAdjustStartIndex) {
-
-      this(chart, startIndex, endIndex);
-
-      _isAdjustStartIndex = isAdjustStartIndex;
-
    }
 
    public SelectionChartXSliderPosition(final Chart chart,
@@ -110,10 +96,6 @@ public class SelectionChartXSliderPosition implements ISelection {
 
    public int getRightSliderValueIndex() {
       return _rightSliderValueIndex;
-   }
-
-   public boolean isAdjustStartIndex() {
-      return _isAdjustStartIndex;
    }
 
    public boolean isCenterSliderPosition() {
@@ -158,15 +140,18 @@ public class SelectionChartXSliderPosition implements ISelection {
 
    @Override
    public String toString() {
-      return "SelectionChartXSliderPosition [" //$NON-NLS-1$
-            + ("_beforeLeftSliderIndex=" + _beforeLeftSliderIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_leftSliderValueIndex=" + _leftSliderValueIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_rightSliderValueIndex=" + _rightSliderValueIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_isCenterSliderPosition=" + _isCenterSliderPosition + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("_chart=" + _chart + ", ")
-            + ("_isAdjustStartIndex=" + _isAdjustStartIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-//				+ ("_customData=" + _customData)
-            //
+      return UI.EMPTY_STRING
+
+            + "SelectionChartXSliderPosition [" + NL //                       //$NON-NLS-1$
+
+            + "_beforeLeftSliderIndex  =" + _beforeLeftSliderIndex + NL //    //$NON-NLS-1$
+            + "_leftSliderValueIndex   =" + _leftSliderValueIndex + NL //     //$NON-NLS-1$
+            + "_rightSliderValueIndex  =" + _rightSliderValueIndex + NL //    //$NON-NLS-1$
+            + "_isCenterSliderPosition =" + _isCenterSliderPosition + NL //   //$NON-NLS-1$
+
+//				+ "_chart=" + _chart + NL //
+//				+ "_customData=" + _customData+ NL //
+
             + "]"; //$NON-NLS-1$
    }
 

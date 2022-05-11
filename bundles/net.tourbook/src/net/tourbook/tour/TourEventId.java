@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,8 @@ import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.views.sensors.SelectionRecordingDeviceBattery;
 import net.tourbook.ui.views.sensors.SelectionSensor;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+
+import org.eclipse.jface.viewers.ISelection;
 
 public enum TourEventId {
 
@@ -126,6 +128,11 @@ public enum TourEventId {
     * A sensor is selected, event data contains a {@link SelectionRecordingDeviceBattery}
     */
    SELECTION_RECORDING_DEVICE_BATTERY,
+
+   /**
+    * Something is selected in the map, event data contains a {@link ISelection}
+    */
+   MAP_SELECTION,
 
    /**
     * Show geo grid in the map, event data contains {@link TourGeoFilterItem}

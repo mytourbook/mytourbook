@@ -162,7 +162,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             if (_tourData.isMultipleTours()) {
 
-               tourMarkers = _tourData.multiTourMarkers.toArray();
+               tourMarkers = _tourData.multipleTourMarkers.toArray();
 
             } else {
 
@@ -1122,11 +1122,11 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
    private int getMultiTourSerieIndex(final int currentMarkerIndex) {
 
-      if (_tourData == null || _tourData.multiTourMarkers == null) {
+      if (_tourData == null || _tourData.multipleTourMarkers == null) {
          return 0;
       }
 
-      final TourMarker result = _tourData.multiTourMarkers.stream()
+      final TourMarker result = _tourData.multipleTourMarkers.stream()
             .filter(t -> t.getSerieIndex() == currentMarkerIndex)
             .findAny()
             .orElse(null);

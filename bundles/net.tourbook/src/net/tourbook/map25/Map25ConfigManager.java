@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -102,7 +102,6 @@ public class Map25ConfigManager {
    private static final String ATTR_CONFIG_VERSION = "configVersion";      //$NON-NLS-1$
    //
    /*
-    * ############# setIsPhotoShowTitle:
     * Tour options
     */
    private static final String TAG_OPTIONS                     = "Options";                      //$NON-NLS-1$
@@ -124,13 +123,13 @@ public class Map25ConfigManager {
    private static final String ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW    = "directionArrow";        //$NON-NLS-1$
    //
    public static final RGB     DEFAULT_OUTLINE_COLOR                   = new RGB(0x80, 0x0, 0x80);
-   public static final int     DEFAULT_OUTLINE_OPACITY                 = 70;
+   public static final int     DEFAULT_OUTLINE_OPACITY                 = 180;                     // 70 %
    public static final float   DEFAULT_OUTLINE_WIDTH                   = 2.5f;
    public static final boolean DEFAULT_OUTLINE_IS_SHOW_DIRECTION_ARROW = false;
-   public static final int     OUTLINE_OPACITY_MIN                     = 1;
-   public static final int     OUTLINE_OPACITY_MAX                     = 100;
-   public static final float   OUTLINE_WIDTH_MIN                       = 0.1f;
-   public static final float   OUTLINE_WIDTH_MAX                       = 20.0f;
+   public static final int     OUTLINE_OPACITY_MIN                     = 26;                      // 10 %;
+   public static final int     OUTLINE_OPACITY_MAX                     = 0xff;
+   public static final int     OUTLINE_WIDTH_MIN                       = 1;
+   public static final int     OUTLINE_WIDTH_MAX                       = 20;
    //
    // slider location/path
    private static final String TAG_SLIDER_PATH                     = "SliderPath";             //$NON-NLS-1$
@@ -144,29 +143,29 @@ public class Map25ConfigManager {
    private static final String ATTR_SLIDER_PATH_OPACITY            = "sliderPath_Opacity";     //$NON-NLS-1$
    //
    public static final boolean DEFAULT_IS_SHOW_SLIDER_PATH         = true;
-   public static final int     DEFAULT_SLIDER_LOCATION_OPACITY     = 100;
+   public static final int     DEFAULT_SLIDER_LOCATION_OPACITY     = 0xff;
    public static final int     DEFAULT_SLIDER_LOCATION_SIZE        = 30;
    public static final RGB     DEFAULT_SLIDER_LOCATION_LEFT_COLOR  = new RGB(0xff, 0x0, 0x0);
    public static final RGB     DEFAULT_SLIDER_LOCATION_RIGHT_COLOR = new RGB(0x0, 0xff, 0x0);
-   public static final int     SLIDER_LOCATION_OPACITY_MIN         = 1;
-   public static final int     SLIDER_LOCATION_OPACITY_MAX         = 100;
+   public static final int     SLIDER_LOCATION_OPACITY_MIN         = 26;                       //10 %;
+   public static final int     SLIDER_LOCATION_OPACITY_MAX         = 0xff;
    public static final int     SLIDER_LOCATION_SIZE_MIN            = 10;
    public static final int     SLIDER_LOCATION_SIZE_MAX            = 100;
    //
    public static final boolean DEFAULT_IS_SHOW_CHART_SLIDER        = true;
    public static final RGB     DEFAULT_SLIDER_PATH_COLOR           = new RGB(0xff, 0xff, 0x0);
    public static final float   DEFAULT_SLIDER_PATH_LINE_WIDTH      = 20.0f;
-   public static final int     DEFAULT_SLIDER_PATH_OPACITY         = 30;
-   public static float         SLIDER_PATH_LINE_WIDTH_MIN          = 1.0f;
-   public static final float   SLIDER_PATH_LINE_WIDTH_MAX          = 50.0f;
-   public static final int     SLIDER_PATH_OPACITY_MIN             = 1;
-   public static final int     SLIDER_PATH_OPACITY_MAX             = 100;
+   public static final int     DEFAULT_SLIDER_PATH_OPACITY         = 77;                       // 30 %
+   public static final int     SLIDER_PATH_LINE_WIDTH_MIN          = 1;
+   public static final int     SLIDER_PATH_LINE_WIDTH_MAX          = 50;
+   public static final int     SLIDER_PATH_OPACITY_MIN             = 52;                       // 20%
+   public static final int     SLIDER_PATH_OPACITY_MAX             = 0xff;
    //
    // other properties
    public static final int DEFAULT_ANIMATION_TIME = 2000;
    //
    /*
-    * Tour marker, map bookmarks, photomarks
+    * Tour marker, map bookmarks, photos
     */
    private static final String TAG_TOUR_MARKERS = "TourMarkers"; //$NON-NLS-1$
    private static final String TAG_MARKER       = "Marker";      //$NON-NLS-1$
@@ -176,9 +175,6 @@ public class Map25ConfigManager {
    private static final String TAG_MARKER_OUTLINE_COLOR    = "MarkerOutlineColor";   //$NON-NLS-1$
    private static final String ATTR_IS_SHOW_TOUR_MARKER    = "isShowTourMarker";     //$NON-NLS-1$
    private static final String ATTR_IS_SHOW_MAP_BOOKMARK   = "isShowMapBookmark";    //$NON-NLS-1$
-   private static final String ATTR_IS_SHOW_PHOTO          = "isShowPhoto";          //$NON-NLS-1$
-   private static final String ATTR_IS_SHOW_PHOTO_TITLE    = "isShowPhotoTitle";     //$NON-NLS-1$
-   private static final String ATTR_PHOTO_SIZE             = "markerPhotoSize";      //$NON-NLS-1$
    private static final String ATTR_MARKER_ORIENTATION     = "markerOrientation";    //$NON-NLS-1$
    //
    private static final String ATTR_MARKER_FILL_OPACITY    = "markerFillOpacity";    //$NON-NLS-1$
@@ -193,7 +189,6 @@ public class Map25ConfigManager {
    private static final String ATTR_CLUSTER_ORIENTATION     = "clusterOrientation";   //$NON-NLS-1$
    private static final String ATTR_CLUSTER_GRID_SIZE       = "clusterGridSize";      //$NON-NLS-1$
    private static final String ATTR_IS_MARKER_CLUSTERED     = "isMarkerClustered";    //$NON-NLS-1$
-   private static final String ATTR_IS_PHOTO_CLUSTERED      = "isPhotoClustered";     //$NON-NLS-1$
    //
    private static final String ATTR_CLUSTER_FILL_OPACITY    = "clusterFillOpacity";   //$NON-NLS-1$
    private static final String ATTR_CLUSTER_OUTLINE_OPACITY = "cluserOutlineOpacity"; //$NON-NLS-1$
@@ -228,14 +223,14 @@ public class Map25ConfigManager {
    //
    // colors
    public static final RGB   DEFAULT_CLUSTER_FILL_COLOR      = new RGB(0xFC, 0x67, 0x00);
-   public static final int   DEFAULT_CLUSTER_FILL_OPACITY    = 80;
+   public static final int   DEFAULT_CLUSTER_FILL_OPACITY    = 200;                      // 80%;
    public static final RGB   DEFAULT_CLUSTER_OUTLINE_COLOR   = new RGB(0xff, 0xff, 0xff);
-   public static final int   DEFAULT_CLUSTER_OUTLINE_OPACITY = 80;
+   public static final int   DEFAULT_CLUSTER_OUTLINE_OPACITY = 200;                      // 80%;
    public static final float DEFAULT_CLUSTER_OUTLINE_SIZE    = 2.0f;
    public static final RGB   DEFAULT_MARKER_FILL_COLOR       = new RGB(0xFF, 0xFF, 0x00);
-   public static final int   DEFAULT_MARKER_FILL_OPACITY     = 80;
+   public static final int   DEFAULT_MARKER_FILL_OPACITY     = 200;                      // 80%;
    public static final RGB   DEFAULT_MARKER_OUTLINE_COLOR    = new RGB(0, 0, 0);
-   public static final int   DEFAULT_MARKER_OUTLINE_OPACITY  = 80;
+   public static final int   DEFAULT_MARKER_OUTLINE_OPACITY  = 200;                      // 80%;
    //
    // map movement with animation
    private static final Easing.Type ANIMATION_EASING_TYPE_DEFAULT   = Easing.Type.SINE_INOUT;
@@ -259,16 +254,14 @@ public class Map25ConfigManager {
     * Contains all configurations which are loaded from a xml file.
     */
    private static final ArrayList<Map25TrackConfig> _allTrackConfigs  = new ArrayList<>();
-   private static Map25TrackConfig                  _activeTrackConfig;
    private static final ArrayList<MarkerConfig>     _allMarkerConfigs = new ArrayList<>();
+   private static Map25TrackConfig                  _activeTrackConfig;
    private static MarkerConfig                      _activeMarkerConfig;
    //
    private static String                            _fromXml_ActiveMarkerConfigId;
    private static String                            _fromXml_ActiveTrackConfigId;
 
-   // !!! enable new formatting
-   {}
-
+   //
    private static XMLMemento create_Root() {
 
       final XMLMemento xmlRoot = XMLMemento.createWriteRoot(TAG_ROOT);
@@ -478,9 +471,6 @@ public class Map25ConfigManager {
           */
          xmlConfig.putBoolean(      ATTR_IS_SHOW_TOUR_MARKER,     config.isShowTourMarker);
          xmlConfig.putBoolean(      ATTR_IS_SHOW_MAP_BOOKMARK,    config.isShowMapBookmark);
-         xmlConfig.putBoolean(      ATTR_IS_SHOW_PHOTO,           config.isShowPhoto);
-         xmlConfig.putBoolean(      ATTR_IS_SHOW_PHOTO_TITLE,     config.isShowPhotoTitle);
-         xmlConfig.putInteger(      ATTR_PHOTO_SIZE,              config.markerPhoto_Size);
          xmlConfig.putInteger(      ATTR_MARKER_ORIENTATION,      config.markerOrientation);
 
          xmlConfig.putInteger(      ATTR_MARKER_FILL_OPACITY,     config.markerFill_Opacity);
@@ -498,7 +488,6 @@ public class Map25ConfigManager {
          xmlConfig.putInteger(      ATTR_CLUSTER_GRID_SIZE,       config.clusterGrid_Size);
          xmlConfig.putInteger(      ATTR_CLUSTER_ORIENTATION,     config.clusterOrientation);
          xmlConfig.putBoolean(      ATTR_IS_MARKER_CLUSTERED,     config.isMarkerClustered);
-         xmlConfig.putBoolean(      ATTR_IS_PHOTO_CLUSTERED,      config.isPhotoClustered);
 
          xmlConfig.putInteger(      ATTR_CLUSTER_FILL_OPACITY,    config.clusterFill_Opacity);
          xmlConfig.putInteger(      ATTR_CLUSTER_OUTLINE_OPACITY, config.clusterOutline_Opacity);
@@ -581,7 +570,7 @@ public class Map25ConfigManager {
 
       // this case should not happen but ensure that a correct config is set
 
-      _activeMarkerConfig = _allMarkerConfigs.get(0);
+      setActiveMarkerConfig(_allMarkerConfigs.get(0));
 
       return 0;
    }
@@ -774,9 +763,6 @@ public class Map25ConfigManager {
 
       config.isShowMapBookmark      = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_MAP_BOOKMARK,    true);
       config.isShowTourMarker       = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_TOUR_MARKER,     true);
-      config.isShowPhoto            = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_PHOTO,           true);
-      config.markerPhoto_Size       = Util.getXmlInteger(xmlConfig,     ATTR_PHOTO_SIZE,              DEFAULT_MARKER_PHOTO_SIZE);
-      config.isShowPhotoTitle       = Util.getXmlBoolean(xmlConfig,     ATTR_IS_SHOW_PHOTO_TITLE,     true);
       config.markerOrientation      = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_ORIENTATION,      Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD);
 
       config.markerFill_Opacity     = Util.getXmlInteger(xmlConfig,     ATTR_MARKER_FILL_OPACITY,     Map25ConfigManager.DEFAULT_MARKER_FILL_OPACITY);
@@ -858,7 +844,7 @@ public class Map25ConfigManager {
          }
 
          _activeTrackConfig = getConfig_Track();
-         _activeMarkerConfig = getConfig_Marker();
+         setActiveMarkerConfig(getConfig_Marker());
 
       } catch (final Exception e) {
          StatusUtil.log(e);
@@ -883,7 +869,7 @@ public class Map25ConfigManager {
       newConfig.name = oldName;
 
       // update model
-      _activeMarkerConfig = newConfig;
+      setActiveMarkerConfig(newConfig);
       _allMarkerConfigs.add(activeMarkerConfigIndex, newConfig);
    }
 
@@ -891,7 +877,7 @@ public class Map25ConfigManager {
 
       createDefaults_Markers();
 
-      _activeMarkerConfig = _allMarkerConfigs.get(0);
+      setActiveMarkerConfig(_allMarkerConfigs.get(0));
    }
 
    private static void restoreState_10_Options(final XMLMemento xmlRoot) {
@@ -1101,7 +1087,7 @@ public class Map25ConfigManager {
       }
 
       animator.cancel();
-      animator.animateTo(//
+      animator.animateTo(
             locationAnimationTime,
             boundingBox,
             Easing.Type.SINE_INOUT,
@@ -1146,6 +1132,6 @@ public class Map25ConfigManager {
       map.setMapPosition(mapPosition);
 //      }
 
-      map.updateMap(true);
+      map.updateMap();
    }
 }

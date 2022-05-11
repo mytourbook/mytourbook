@@ -15,6 +15,8 @@
  *******************************************************************************/
 package utils;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -29,6 +31,7 @@ import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
+import net.tourbook.device.garmin.fit.FitDataReader;
 import net.tourbook.device.gpx.GPX_SAX_Handler;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
@@ -83,6 +86,57 @@ public class Initializer {
          } catch (SAXException | IOException e) {
             e.printStackTrace();
          }
+      }
+
+      final TourData newlyImportedTour = Comparison.retrieveImportedTour(newlyImportedTours);
+
+      return newlyImportedTour;
+   }
+
+   public static TourData importTour_FIT(final String importFilePath) {
+
+      final DeviceData deviceData = new DeviceData();
+      final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
+      final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
+      final FitDataReader fitDataReader = new FitDataReader();
+
+      fitDataReader.processDeviceData(importFilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process());
+
+      return Comparison.retrieveImportedTour(newlyImportedTours);
+   }
+
+   public static TourData importTour_GPX(final String importFilePath) {
+
+      final DeviceData deviceData = new DeviceData();
+      final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
+      final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
+      final GarminTCX_DeviceDataReader deviceDataReader = new GarminTCX_DeviceDataReader();
+      final String testFilePath = FilesUtils.getAbsoluteFilePath(importFilePath);
+      final File file = new File(testFilePath);
+
+      try (InputStream in = new FileInputStream(file)) {
+
+         final GPX_SAX_Handler handler = new GPX_SAX_Handler(
+               importFilePath,
+               deviceData,
+               alreadyImportedTours,
+               newlyImportedTours,
+               new ImportState_File(),
+               new ImportState_Process(),
+               deviceDataReader);
+
+         final SAXParser parser = initializeParser();
+         if (parser != null) {
+            parser.parse(in, handler);
+         }
+
+      } catch (final SAXException | IOException e) {
+         e.printStackTrace();
       }
 
       return Comparison.retrieveImportedTour(newlyImportedTours);

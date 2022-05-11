@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,6 +29,7 @@ import net.tourbook.map25.layer.marker.algorithm.distance.ClusterItem;
 import net.tourbook.map25.layer.marker.algorithm.distance.DistanceClustering;
 import net.tourbook.map25.layer.marker.algorithm.distance.QuadItem;
 import net.tourbook.map25.layer.marker.algorithm.distance.StaticCluster;
+
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Paint;
@@ -55,294 +56,291 @@ import org.oscim.utils.geom.GeometryUtils;
  */
 public class MarkerRenderer extends BucketRenderer {
 
-	/**
-	 * default color of number inside the icon. Would be super-cool to cook this into the map theme
-	 */
-	public static final int						CLUSTER_COLOR_TEXT			= 0xff8000c0;
+   /**
+    * default color of number inside the icon. Would be super-cool to cook this into the map theme
+    */
+   public static final int                       CLUSTER_COLOR_TEXT         = 0xff8000c0;
 
-	/**
-	 * default color of circle background
-	 */
-	public static final int						CLUSTER_COLOR_BACK			= 0xffffffff;
+   /**
+    * default color of circle background
+    */
+   public static final int                       CLUSTER_COLOR_BACK         = 0xffffffff;
 
-	/**
-	 * Map Cluster Icon Size. This is the biggest size for clusters of CLUSTER_MAXSIZE elements.
-	 * Smaller clusters will be slightly smaller
-	 */
-	public static final int							MAP_MARKER_CLUSTER_SIZE_DP	= 64;
+   /**
+    * Map Cluster Icon Size. This is the biggest size for clusters of CLUSTER_MAXSIZE elements.
+    * Smaller clusters will be slightly smaller
+    */
+   public static final int                       MAP_MARKER_CLUSTER_SIZE_DP = 64;
 
-	/**
-	 * Clustering grid square size, decrease to cluster more aggresively. Ideally this value is the
-	 * typical marker size
-	 */
-	private static final int						MAP_GRID_SIZE_DP			= 64;
+   /**
+    * Clustering grid square size, decrease to cluster more aggresively. Ideally this value is the
+    * typical marker size
+    */
+   private static final int                      MAP_GRID_SIZE_DP           = 64;
 
-	private static final HashMap<Integer, Bitmap>	_clusterBitmaps				= new HashMap<>();
+   private static final HashMap<Integer, Bitmap> _clusterBitmaps            = new HashMap<>();
 
-	private static final TimSort<ProjectedItem>		ZSORT						= new TimSort<>();
+   private static final TimSort<ProjectedItem>   ZSORT                      = new TimSort<>();
 
-	final static Comparator<ProjectedItem>			zComparator;
-	static {
+   final static Comparator<ProjectedItem>        zComparator;
+   static {
 
-		zComparator = new Comparator<ProjectedItem>() {
+      zComparator = new Comparator<>() {
 
-			@Override
-			public int compare(	final ProjectedItem a,
-								final ProjectedItem b) {
+         @Override
+         public int compare(final ProjectedItem a,
+                            final ProjectedItem b) {
 
-				if (a.isVisible && b.isVisible) {
+            if (a.isVisible && b.isVisible) {
 
-					if (a.dy > b.dy) {
-						return -1;
-					}
-					if (a.dy < b.dy) {
-						return 1;
-					}
+               if (a.dy > b.dy) {
+                  return -1;
+               }
+               if (a.dy < b.dy) {
+                  return 1;
+               }
 
-				} else if (a.isVisible) {
+            } else if (a.isVisible) {
 
-					return -1;
+               return -1;
 
-				} else if (b.isVisible) {
+            } else if (b.isVisible) {
 
-					return 1;
-				}
+               return 1;
+            }
 
-				return 0;
-			}
-		};
-	}
-
-	private MarkerSymbol					_defaultMarkerSymbol;
+            return 0;
+         }
+      };
+   }
+
+   private MarkerSymbol                    _defaultMarkerSymbol;
 
-	private int _fgColor;
-	private int _bgColor;
+   private int                             _fgColor;
+   private int                             _bgColor;
 
-	private final MarkerLayer				_markerLayer;
-	private final SymbolBucket				_symbolBucket;
+   private final MarkerLayer               _markerLayer;
+   private final SymbolBucket              _symbolBucket;
 
-	private final float[]					_tmpBox					= new float[8];
-	private final Point						_tmpPoint				= new Point();
+   private final float[]                   _tmpBox                 = new float[8];
+   private final Point                     _tmpPoint               = new Point();
 
-	/**
-	 * increase view to show items that are partially visible
-	 */
-	private int								_extents				= 100;
+   /**
+    * increase view to show items that are partially visible
+    */
+   private int                             _extents                = 100;
 
-	/**
-	 * flag to force update of markers
-	 */
-	private boolean							_isForceUpdateMarkers;
+   /**
+    * flag to force update of markers
+    */
+   private boolean                         _isForceUpdateMarkers;
 
-	private ProjectedItem[]					_allProjectedItems;
+   private ProjectedItem[]                 _allProjectedItems;
 
-	private int								_clusterBackgroundColor	= CLUSTER_COLOR_BACK;
-	private int								_clusterForegroundColor	= CLUSTER_COLOR_TEXT;
+   private int                             _clusterBackgroundColor = CLUSTER_COLOR_BACK;
+   private int                             _clusterForegroundColor = CLUSTER_COLOR_TEXT;
 
-	/**
-	 * Discrete scale step, used to trigger reclustering on significant scale change
-	 */
-	private int								_scaleSaved				= 0;
+   /**
+    * Discrete scale step, used to trigger reclustering on significant scale change
+    */
+   private int                             _scaleSaved             = 0;
 
-	/**
-	 * We use a flat Sparse array to calculate the clusters. The sparse array models a 2D map where
-	 * every (x,y) denotes a grid slot, ie. 64x64dp. For efficiency I use a linear sparsearray with
-	 * ARRindex = SLOTypos * max_x + SLOTxpos"
-	 */
-	private SparseIntArray					_clusterCells			= new SparseIntArray(200);				// initial space for 200 markers, that's not a lot of memory, and in most cases will avoid resizing the array
+   /**
+    * We use a flat Sparse array to calculate the clusters. The sparse array models a 2D map where
+    * every (x,y) denotes a grid slot, ie. 64x64dp. For efficiency I use a linear sparsearray with
+    * ARRindex = SLOTypos * max_x + SLOTxpos"
+    */
+   private SparseIntArray                  _clusterCells           = new SparseIntArray(200);   // initial space for 200 markers, that's not a lot of memory, and in most cases will avoid resizing the array
 
-	private double							_mapTileScale;
+   private double                          _mapTileScale;
 
-	private int								_clusterGridSize		= MAP_GRID_SIZE_DP;
-	private int								_clusterSymbolSizeDP	= MAP_MARKER_CLUSTER_SIZE_DP;
-	private int								_clusterSymbolWeight;
-	private float							_clusterOutlineSize;
+   private int                             _clusterGridSize        = MAP_GRID_SIZE_DP;
+   private int                             _clusterSymbolSizeDP    = MAP_MARKER_CLUSTER_SIZE_DP;
+   private int                             _clusterSymbolWeight;
+   private float                           _clusterOutlineSize;
 
-	/**
-	 * When <code>true</code> all items are clustered, otherwise nothing is clustered.
-	 */
-	private boolean							_isClustering			= true;
+   /**
+    * When <code>true</code> all items are clustered, otherwise nothing is clustered.
+    */
+   private boolean                         _isClustering           = true;
 
-	/**
-	 * When <code>true</code> then the symbol is displayed as billboard, otherwise it is clamped to
-	 * the ground.
-	 */
-	private boolean							_isBillboard;
+   /**
+    * When <code>true</code> then the symbol is displayed as billboard, otherwise it is clamped to
+    * the ground.
+    */
+   private boolean                         _isBillboard;
 
-	private ClusterAlgorithm				_clusterAlgorithm;
+   private ClusterAlgorithm                _clusterAlgorithm;
 
-	private DistanceClustering<ClusterItem>	_distanceAlgorithm		= new DistanceClustering<>();
+   private DistanceClustering<ClusterItem> _distanceAlgorithm      = new DistanceClustering<>();
 
-	private MarkerToolkit _markertoolkit;
+   private MarkerToolkit                   _markertoolkit;
 
-	/**
-	 * Class to wrap the cluster icon style properties
-	 */
-	public static class ClusterStyle {
+   /**
+    * Class to wrap the cluster icon style properties
+    */
+   public static class ClusterStyle {
 
-		final int	background;
-		final int	foreground;
+      final int background;
+      final int foreground;
 
-		/**
-		 * Creates the Cluster style
-		 *
-		 * @param fore
-		 *            Foreground (border and text) color
-		 * @param back
-		 *            Background (circle) color
-		 */
+      /**
+       * Creates the Cluster style
+       *
+       * @param fore
+       *           Foreground (border and text) color
+       * @param back
+       *           Background (circle) color
+       */
 
-		public ClusterStyle(final int fore, final int back) {
+      public ClusterStyle(final int fore, final int back) {
 
-			foreground = fore;
-			background = back;
-		}
-	}
+         foreground = fore;
+         background = back;
+      }
+   }
 
-	/**
-	 * Constructs a clustered marker renderer
-	 *
-	 * @param markerLayer
-	 *            The owner layer
-	 * @param defaultSymbol
-	 *            The default symbol
-	 * @param style
-	 *            The desired style, or NULL to disable clustering
-	 */
-	public MarkerRenderer(final MarkerLayer markerLayer) {
+   /**
+    * Constructs a clustered marker renderer
+    *
+    * @param markerLayer
+    *           The owner layer
+    * @param defaultSymbol
+    *           The default symbol
+    * @param style
+    *           The desired style, or NULL to disable clustering
+    */
+   public MarkerRenderer(final MarkerLayer markerLayer) {
 
-		_markerLayer = markerLayer;
+      _markerLayer = markerLayer;
 
-		_symbolBucket = new SymbolBucket();
+      _symbolBucket = new SymbolBucket();
 
-		_markertoolkit = new MarkerToolkit(MarkerShape.CIRCLE);
+      _markertoolkit = new MarkerToolkit(MarkerShape.CIRCLE);
 
-		configureRenderer();
-	}
+      configureRenderer();
+   }
 
-	private static void sort(final ProjectedItem[] a, final int lo, final int hi) {
+   private static void sort(final ProjectedItem[] a, final int lo, final int hi) {
 
-		final int nRemaining = hi - lo;
-		if (nRemaining < 2) {
-			return;
-		}
+      final int nRemaining = hi - lo;
+      if (nRemaining < 2) {
+         return;
+      }
 
-		ZSORT.doSort(a, zComparator, lo, hi);
-	}
+      ZSORT.doSort(a, zComparator, lo, hi);
+   }
 
-	public synchronized void configureRenderer() {
+   public synchronized void configureRenderer() {
 
-		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-		_fgColor = ColorUtil.getARGB(config.markerOutline_Color, (int) (config.markerOutline_Opacity / 100.0 * 0xff));
-		_bgColor = ColorUtil.getARGB(config.markerFill_Color,    (int) (config.markerFill_Opacity    / 100.0 * 0xff));
+      _fgColor = ColorUtil.getARGB(config.markerOutline_Color, config.markerOutline_Opacity);
+      _bgColor = ColorUtil.getARGB(config.markerFill_Color, config.markerFill_Opacity);
 
-		/*System.out.println("***textOpacy: " + config.markerOutline_Opacity); //$NON-NLS-1$
-		System.out.println("***FillOpacy: " + config.markerFill_Opacity); //$NON-NLS-1$
-		System.out.println("***bgColor: " + _bgColor); //$NON-NLS-1$ */
+      /*
+       * System.out.println("***textOpacy: " + config.markerOutline_Opacity); //$NON-NLS-1$
+       * System.out.println("***FillOpacy: " + config.markerFill_Opacity); //$NON-NLS-1$
+       * System.out.println("***bgColor: " + _bgColor); //$NON-NLS-1$
+       */
 
-		_clusterSymbolSizeDP = config.clusterSymbol_Size;
-		_clusterSymbolWeight = config.clusterSymbol_Weight;
-		_clusterOutlineSize = config.clusterOutline_Size;
+      _clusterSymbolSizeDP = config.clusterSymbol_Size;
+      _clusterSymbolWeight = config.clusterSymbol_Weight;
+      _clusterOutlineSize = config.clusterOutline_Size;
 
-		_isBillboard = config.clusterOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
+      _isBillboard = config.clusterOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 
-		_clusterForegroundColor = ColorUtil.getARGB(
-				config.clusterOutline_Color,
-				(int) (config.clusterOutline_Opacity / 100.0 * 0xff));
+      _clusterForegroundColor = ColorUtil.getARGB(config.clusterOutline_Color, config.clusterOutline_Opacity);
+      _clusterBackgroundColor = ColorUtil.getARGB(config.clusterFill_Color, config.clusterFill_Opacity);
 
-		_clusterBackgroundColor = ColorUtil.getARGB(
-				config.clusterFill_Color,
-				(int) (config.clusterFill_Opacity / 100.0 * 0xff));
+      _defaultMarkerSymbol = createMarkerSymbol();
 
-		_defaultMarkerSymbol = createMarkerSymbol();
+      // remove cached bitmaps
+      _clusterBitmaps.clear();
 
-		// remove cached bitmaps
-		_clusterBitmaps.clear();
+      final boolean isClustering = config.isMarkerClustered;
+      final int clusterGridSize = config.clusterGrid_Size;
+      final ClusterAlgorithm clusterAlgorithm = (ClusterAlgorithm) config.clusterAlgorithm;
 
-		final boolean isClustering = config.isMarkerClustered;
-		final int clusterGridSize = config.clusterGrid_Size;
-		final ClusterAlgorithm clusterAlgorithm = (ClusterAlgorithm) config.clusterAlgorithm;
+      // check if modified, this is an expensive operation
+      if (isClustering != _isClustering //
+            || clusterGridSize != _clusterGridSize
+            || clusterAlgorithm != _clusterAlgorithm) {
 
-		// check if modified, this is an expensive operation
-		if (isClustering != _isClustering //
-				|| clusterGridSize != _clusterGridSize
-				|| clusterAlgorithm != _clusterAlgorithm) {
+         // relevant data are modified, rebuild the cluster
 
-			// relevant data are modified, rebuild the cluster
+         _isClustering = isClustering;
+         _clusterGridSize = clusterGridSize;
+         _clusterAlgorithm = clusterAlgorithm;
 
-			_isClustering = isClustering;
-			_clusterGridSize = clusterGridSize;
-			_clusterAlgorithm = clusterAlgorithm;
+         // post repopulation to the main thread
+         _markerLayer.map().post(new Runnable() {
+            @Override
+            public void run() {
+               createClusterItems();
+            }
+         });
+      }
 
-			// post repopulation to the main thread
-			_markerLayer.map().post(new Runnable() {
-				@Override
-				public void run() {
-					createClusterItems();
-				}
-			});
-		}
+      _isForceUpdateMarkers = true;
+   }
 
-		_isForceUpdateMarkers = true;
-	}
+   void createClusterItems() {
 
-	void createClusterItems() {
+      ProjectedItem[] allProjectedMarker;
 
-		ProjectedItem[] allProjectedMarker;
+      if (_isClustering) {
 
-		if (_isClustering) {
+         switch (_clusterAlgorithm) {
 
-			switch (_clusterAlgorithm) {
+         case FirstMarker_Distance:
+            allProjectedMarker = createClusterItems_Distance();
+            break;
 
-			case FirstMarker_Distance:
-				allProjectedMarker = createClusterItems_Distance();
-				break;
+         case FirstMarker_Grid:
+         case Grid_Center:
+         default:
+            allProjectedMarker = createClusterItems_Grid();
+            break;
+         }
+      } else {
 
-			case FirstMarker_Grid:
-			case Grid_Center:
-			default:
-				allProjectedMarker = createClusterItems_Grid();
-				break;
-			}
-		} else {
+         // use "default" clustering which supports none clustering
 
-			// use "default" clustering which supports none clustering
+         allProjectedMarker = createClusterItems_Grid();
+      }
 
-			allProjectedMarker = createClusterItems_Grid();
-		}
+      // update the UI
+      synchronized (this) {
 
-		// update the UI
-		synchronized (this) {
+         _isForceUpdateMarkers = true;
+         _allProjectedItems = allProjectedMarker;
+      }
+   }
 
-			_isForceUpdateMarkers = true;
-			_allProjectedItems = allProjectedMarker;
-		}
-	}
+   private ProjectedItem[] createClusterItems_Distance() {
 
-	private ProjectedItem[] createClusterItems_Distance() {
+      final List<MapMarker> allMarkers = _markerLayer.getAllMarkers();
 
-		final List<MapMarker> allMarkers = _markerLayer.getAllMarkers();
+      final Collection<ClusterItem> allClusterItems = new ArrayList<>();
 
-		final Collection<ClusterItem> allClusterItems = new ArrayList<>();
+      // convert MapMarker list into ClusterItem list
+      allClusterItems.addAll(allMarkers);
 
-		// convert MapMarker list into ClusterItem list
-		allClusterItems.addAll(allMarkers);
-
-		_distanceAlgorithm.clearItems();
-		_distanceAlgorithm.addItems(allClusterItems);
+      _distanceAlgorithm.clearItems();
+      _distanceAlgorithm.addItems(allClusterItems);
 //		_distanceAlgorithm.addItems((Collection<ClusterItem>) (Object) allMarkers);
 
-		// get current position
-		final MapPosition currentMapPos = new MapPosition();
-		_markerLayer.map().viewport().getMapPosition(currentMapPos);
-		final double zoom = currentMapPos.zoomLevel;
+      // get current position
+      final MapPosition currentMapPos = new MapPosition();
+      _markerLayer.map().viewport().getMapPosition(currentMapPos);
+      final double zoom = currentMapPos.zoomLevel;
 
-		final int clusterGridSize = (int) ScreenUtils.getPixels(_clusterGridSize);
+      final int clusterGridSize = (int) ScreenUtils.getPixels(_clusterGridSize);
 
-		final Set<? extends Cluster<ClusterItem>> markerClusters = _distanceAlgorithm.getClusters(
-				zoom,
-				clusterGridSize);
+      final Set<? extends Cluster<ClusterItem>> markerClusters = _distanceAlgorithm.getClusters(
+            zoom,
+            clusterGridSize);
 
 //		System.out.println();
 //		System.out.println(
@@ -351,492 +349,492 @@ public class MarkerRenderer extends BucketRenderer {
 //		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t" + markerClusters));
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-		final ProjectedItem[] allProjectedMarker = new ProjectedItem[markerClusters.size()];
+      final ProjectedItem[] allProjectedMarker = new ProjectedItem[markerClusters.size()];
 
-		int itemIndex = 0;
+      int itemIndex = 0;
 
-		for (final Cluster<ClusterItem> item : markerClusters) {
+      for (final Cluster<ClusterItem> item : markerClusters) {
 
-			final ProjectedItem projectedMarker = allProjectedMarker[itemIndex++] = new ProjectedItem();
+         final ProjectedItem projectedMarker = allProjectedMarker[itemIndex++] = new ProjectedItem();
 
-			if (item instanceof QuadItem) {
+         if (item instanceof QuadItem) {
 
-				// item is a marker
+            // item is a marker
 
-				final QuadItem<?> quadItem = (QuadItem<?>) item;
-				final ClusterItem quadClusterItem = quadItem.mClusterItem;
+            final QuadItem<?> quadItem = (QuadItem<?>) item;
+            final ClusterItem quadClusterItem = quadItem.mClusterItem;
 
-				if (quadClusterItem instanceof MapMarker) {
+            if (quadClusterItem instanceof MapMarker) {
 
-					final MapMarker mapMarker = (MapMarker) quadClusterItem;
+               final MapMarker mapMarker = (MapMarker) quadClusterItem;
 
-					projectedMarker.mapMarker = mapMarker;
+               projectedMarker.mapMarker = mapMarker;
 
-					projectedMarker.projectedX = quadItem.mPoint.x;
-					projectedMarker.projectedY = quadItem.mPoint.y;
-				}
+               projectedMarker.projectedX = quadItem.mPoint.x;
+               projectedMarker.projectedY = quadItem.mPoint.y;
+            }
 
-			} else if (item instanceof StaticCluster) {
+         } else if (item instanceof StaticCluster) {
 
-				// item is a cluster
+            // item is a cluster
 
-				final StaticCluster<?> clusterItem = (StaticCluster<?>) item;
+            final StaticCluster<?> clusterItem = (StaticCluster<?>) item;
 
-				final ProjectedItem projectedCluster = projectedMarker;
+            final ProjectedItem projectedCluster = projectedMarker;
 
-				projectedCluster.clusterSize = clusterItem.getSize();
+            projectedCluster.clusterSize = clusterItem.getSize();
 
-				final GeoPoint geoPoint = clusterItem.getPosition();
+            final GeoPoint geoPoint = clusterItem.getPosition();
 
-				MercatorProjection.project(geoPoint, _tmpPoint);
+            MercatorProjection.project(geoPoint, _tmpPoint);
 
-				projectedCluster.projectedX = _tmpPoint.x;
-				projectedCluster.projectedY = _tmpPoint.y;
-				projectedCluster.projectedClusterX = _tmpPoint.x;
-				projectedCluster.projectedClusterY = _tmpPoint.y;
+            projectedCluster.projectedX = _tmpPoint.x;
+            projectedCluster.projectedY = _tmpPoint.y;
+            projectedCluster.projectedClusterX = _tmpPoint.x;
+            projectedCluster.projectedClusterY = _tmpPoint.y;
 
-			}
-		}
+         }
+      }
 
-		return allProjectedMarker;
-	}
+      return allProjectedMarker;
+   }
 
-	private ProjectedItem[] createClusterItems_Grid() {
+   private ProjectedItem[] createClusterItems_Grid() {
 
-		final List<MapMarker> allMarkers = _markerLayer.getAllMarkers();
+      final List<MapMarker> allMarkers = _markerLayer.getAllMarkers();
 
-		final int numMarkers = allMarkers.size();
+      final int numMarkers = allMarkers.size();
 
-		final ProjectedItem[] allProjectedMarker = new ProjectedItem[numMarkers];
+      final ProjectedItem[] allProjectedMarker = new ProjectedItem[numMarkers];
 
-		/*
-		 * the grid slot size in px. increase to group more aggressively. currently set to marker
-		 * size
-		 */
-		final int clusterGridSize = (int) ScreenUtils.getPixels(_clusterGridSize);
+      /*
+       * the grid slot size in px. increase to group more aggressively. currently set to marker
+       * size
+       */
+      final int clusterGridSize = (int) ScreenUtils.getPixels(_clusterGridSize);
 
-		/*
-		 * the factor to map into Grid Coordinates (discrete squares of GRIDSIZE x GRIDSIZE)
-		 */
-		final long maxCols = (long) (_mapTileScale / clusterGridSize);
+      /*
+       * the factor to map into Grid Coordinates (discrete squares of GRIDSIZE x GRIDSIZE)
+       */
+      final long maxCols = (long) (_mapTileScale / clusterGridSize);
 
-		// clear grid map to count items that share the same "grid slot"
-		_clusterCells.clear();
+      // clear grid map to count items that share the same "grid slot"
+      _clusterCells.clear();
 
-		for (int markerIndex = 0; markerIndex < numMarkers; markerIndex++) {
+      for (int markerIndex = 0; markerIndex < numMarkers; markerIndex++) {
 
-			final MapMarker mapMarker = allMarkers.get(markerIndex);
-			final ProjectedItem projectedMarker = allProjectedMarker[markerIndex] = new ProjectedItem();
+         final MapMarker mapMarker = allMarkers.get(markerIndex);
+         final ProjectedItem projectedMarker = allProjectedMarker[markerIndex] = new ProjectedItem();
 
-			projectedMarker.mapMarker = mapMarker;
+         projectedMarker.mapMarker = mapMarker;
 
-			// project marker
-			MercatorProjection.project(projectedMarker.mapMarker.geoPoint, _tmpPoint);
-			projectedMarker.projectedX = _tmpPoint.x;
-			projectedMarker.projectedY = _tmpPoint.y;
+         // project marker
+         MercatorProjection.project(projectedMarker.mapMarker.geoPoint, _tmpPoint);
+         projectedMarker.projectedX = _tmpPoint.x;
+         projectedMarker.projectedY = _tmpPoint.y;
 
-			// items can be declared non-clusterable
-			if (_isClustering) {
+         // items can be declared non-clusterable
+         if (_isClustering) {
 
-				// absolute item X position in the grid
-				final int colX = (int) (projectedMarker.projectedX * maxCols);
-				final int colY = (int) (projectedMarker.projectedY * maxCols); // absolute item Y position
+            // absolute item X position in the grid
+            final int colX = (int) (projectedMarker.projectedX * maxCols);
+            final int colY = (int) (projectedMarker.projectedY * maxCols); // absolute item Y position
 
-				// Index in the sparsearray map
-				final int clusterIndex = (int) (colX + colY * maxCols);
+            // Index in the sparsearray map
+            final int clusterIndex = (int) (colX + colY * maxCols);
 
-				// we store in the linear sparsearray the index of the marker,
-				// ie, index = y * maxcols + x; array[index} = markerIndex
+            // we store in the linear sparsearray the index of the marker,
+            // ie, index = y * maxcols + x; array[index} = markerIndex
 
-				// Lets check if there's already an item in the grid slot
-				final int storedClusterIndex = _clusterCells.get(clusterIndex, -1);
+            // Lets check if there's already an item in the grid slot
+            final int storedClusterIndex = _clusterCells.get(clusterIndex, -1);
 
-				if (storedClusterIndex == -1) {
+            if (storedClusterIndex == -1) {
 
-					// no item at that grid position. The grid slot is free so let's
-					// store this item "i" (we identify every item by its InternalItem index)
+               // no item at that grid position. The grid slot is free so let's
+               // store this item "i" (we identify every item by its InternalItem index)
 
-					_clusterCells.put(clusterIndex, markerIndex);
+               _clusterCells.put(clusterIndex, markerIndex);
 
-				} else {
+            } else {
 
-					// at that grid position there's already a marker index
-					// mark this item as clustered out, so it will be skipped in the update() call
+               // at that grid position there's already a marker index
+               // mark this item as clustered out, so it will be skipped in the update() call
 
-					projectedMarker.isClusteredOut = true;
+               projectedMarker.isClusteredOut = true;
 
-					// and increment the count on its "parent" that will from now on act as a cluster
-					final ProjectedItem projectedCluster = allProjectedMarker[storedClusterIndex];
+               // and increment the count on its "parent" that will from now on act as a cluster
+               final ProjectedItem projectedCluster = allProjectedMarker[storedClusterIndex];
 
-					// set cluster position to the center of the grid
-					if (projectedCluster.clusterSize == 0) {
+               // set cluster position to the center of the grid
+               if (projectedCluster.clusterSize == 0) {
 
-						final double projectedCol_X1 = (double) colX / maxCols;
-						final double projectedCol_X2 = (double) (colX + 1) / maxCols;
-						final double projectedCol_Xhalf = (projectedCol_X1 - projectedCol_X2) / 2;
+                  final double projectedCol_X1 = (double) colX / maxCols;
+                  final double projectedCol_X2 = (double) (colX + 1) / maxCols;
+                  final double projectedCol_Xhalf = (projectedCol_X1 - projectedCol_X2) / 2;
 
-						final double projectedCol_Y1 = (double) colY / maxCols;
-						final double projectedCol_Y2 = (double) (colY + 1) / maxCols;
-						final double projectedCol_Yhalf = (projectedCol_Y1 - projectedCol_Y2) / 2;
+                  final double projectedCol_Y1 = (double) colY / maxCols;
+                  final double projectedCol_Y2 = (double) (colY + 1) / maxCols;
+                  final double projectedCol_Yhalf = (projectedCol_Y1 - projectedCol_Y2) / 2;
 
-						projectedCluster.projectedClusterX = projectedCol_X2 + projectedCol_Xhalf;
-						projectedCluster.projectedClusterY = projectedCol_Y2 + projectedCol_Yhalf;
-					}
+                  projectedCluster.projectedClusterX = projectedCol_X2 + projectedCol_Xhalf;
+                  projectedCluster.projectedClusterY = projectedCol_Y2 + projectedCol_Yhalf;
+               }
 
-					projectedCluster.clusterSize++;
-					projectedCluster.isInGridCluster = true;
-				}
-			}
-		}
+               projectedCluster.clusterSize++;
+               projectedCluster.isInGridCluster = true;
+            }
+         }
+      }
 
-		return allProjectedMarker;
-	}
+      return allProjectedMarker;
+   }
 
-	private MarkerSymbol createMarkerSymbol() {
+   private MarkerSymbol createMarkerSymbol() {
 
-		final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
+      final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
-		final int markerFill_Opacity = (int) (config.markerFill_Opacity / 100.0 * 0xff);
-		final int markerOutline_Opacity = (int) (config.markerOutline_Opacity / 100.0 * 0xff);
+      final int markerFill_Opacity = config.markerFill_Opacity;
+      final int markerOutline_Opacity = config.markerOutline_Opacity;
 
-		/**
-		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		 * <p>
-		 * Painting with decimals is not working correctly because AWT do not support it, all is
-		 * converted to integer. It took me some hours to not find a solution.
-		 * <p>
-		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		 */
-		final float outlineWidth = ScreenUtils.getPixels(config.markerOutline_Size);
-		final float symbolSize = ScreenUtils.getPixels(config.markerSymbol_Size);
+      /**
+       * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       * <p>
+       * Painting with decimals is not working correctly because AWT do not support it, all is
+       * converted to integer. It took me some hours to not find a solution.
+       * <p>
+       * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+       */
+      final float outlineWidth = ScreenUtils.getPixels(config.markerOutline_Size);
+      final float symbolSize = ScreenUtils.getPixels(config.markerSymbol_Size);
 
-		final int outlineWidthInt = (int) Math.ceil(outlineWidth);
-		final int symbolSizeInt = (int) Math.ceil(symbolSize);
+      final int outlineWidthInt = (int) Math.ceil(outlineWidth);
+      final int symbolSizeInt = (int) Math.ceil(symbolSize);
 
-		final float symbolRadius = symbolSizeInt / 2;
+      final float symbolRadius = symbolSizeInt / 2;
 
-		final int bitmapSizeInt = symbolSizeInt + 2 * outlineWidthInt + 6;
-		final int bitmapSize2Int = bitmapSizeInt / 2;
+      final int bitmapSizeInt = symbolSizeInt + 2 * outlineWidthInt + 6;
+      final int bitmapSize2Int = bitmapSizeInt / 2;
 
-		final float outlineRadius = symbolRadius + outlineWidth / 2;
-		final float fillRadius = outlineRadius - outlineWidth / 2;
+      final float outlineRadius = symbolRadius + outlineWidth / 2;
+      final float fillRadius = outlineRadius - outlineWidth / 2;
 
-		final int noClippingPos = bitmapSize2Int + 1;
+      final int noClippingPos = bitmapSize2Int + 1;
 
-		final Paint fillPainter = CanvasAdapter.newPaint();
-		fillPainter.setStyle(Paint.Style.FILL);
-		fillPainter.setColor(ColorUtil.getARGB(config.markerFill_Color, markerFill_Opacity));
+      final Paint fillPainter = CanvasAdapter.newPaint();
+      fillPainter.setStyle(Paint.Style.FILL);
+      fillPainter.setColor(ColorUtil.getARGB(config.markerFill_Color, markerFill_Opacity));
 
-		final Bitmap bitmap = CanvasAdapter.newBitmap(bitmapSizeInt, bitmapSizeInt, 0);
-		final org.oscim.backend.canvas.Canvas canvas = CanvasAdapter.newCanvas();
-		canvas.setBitmap(bitmap);
+      final Bitmap bitmap = CanvasAdapter.newBitmap(bitmapSizeInt, bitmapSizeInt, 0);
+      final org.oscim.backend.canvas.Canvas canvas = CanvasAdapter.newCanvas();
+      canvas.setBitmap(bitmap);
 
-		// fill symbol
-		canvas.drawCircle(noClippingPos, noClippingPos, fillRadius, fillPainter);
+      // fill symbol
+      canvas.drawCircle(noClippingPos, noClippingPos, fillRadius, fillPainter);
 
-		// draw outline
-		if (outlineWidth > 0) {
+      // draw outline
+      if (outlineWidth > 0) {
 
-			final Paint outlinePainter = CanvasAdapter.newPaint();
-			outlinePainter.setStyle(Paint.Style.STROKE);
-			outlinePainter.setStrokeWidth(outlineWidth);
-			outlinePainter.setColor(ColorUtil.getARGB(config.markerOutline_Color, markerOutline_Opacity));
+         final Paint outlinePainter = CanvasAdapter.newPaint();
+         outlinePainter.setStyle(Paint.Style.STROKE);
+         outlinePainter.setStrokeWidth(outlineWidth);
+         outlinePainter.setColor(ColorUtil.getARGB(config.markerOutline_Color, markerOutline_Opacity));
 
-			canvas.drawCircle(noClippingPos, noClippingPos, outlineRadius, outlinePainter);
-		}
+         canvas.drawCircle(noClippingPos, noClippingPos, outlineRadius, outlinePainter);
+      }
 
-		/*final Paint textPainter = CanvasAdapter.newPaint();
-		textPainter.setStyle(Paint.Style.STROKE);
-		textPainter.setColor(ColorUtil.getARGB(config.markerOutline_Color, markerOutline_Opacity));
-		canvas.drawText("--Test--", noClippingPos-20, noClippingPos, textPainter);*/
+//		final Paint textPainter = CanvasAdapter.newPaint();
+//		textPainter.setStyle(Paint.Style.STROKE);
+//		textPainter.setColor(ColorUtil.getARGB(config.markerOutline_Color, markerOutline_Opacity));
+//		canvas.drawText("--Test--", noClippingPos-20, noClippingPos, textPainter);
 
 
-		final boolean isBillboard = config.markerOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
+      final boolean isBillboard = config.markerOrientation == Map25ConfigManager.SYMBOL_ORIENTATION_BILLBOARD;
 
-		return new MarkerSymbol(bitmap, MarkerSymbol.HotspotPlace.CENTER, isBillboard);
-	}
+      return new MarkerSymbol(bitmap, MarkerSymbol.HotspotPlace.CENTER, isBillboard);
+   }
 
-	/**
-	 * Gets a bitmap for a given cluster size
-	 *
-	 * @param size
-	 *            The cluster size. Can be greater than CLUSTER_MAXSIZE.
-	 * @return A somewhat cool bitmap to be used as the cluster marker
-	 */
-	private Bitmap getClusterBitmap(final int size) {
+   /**
+    * Gets a bitmap for a given cluster size
+    *
+    * @param size
+    *           The cluster size. Can be greater than CLUSTER_MAXSIZE.
+    * @return A somewhat cool bitmap to be used as the cluster marker
+    */
+   private Bitmap getClusterBitmap(final int size) {
 
-		// return cached bitmap if exists. cache hit !
-		final Bitmap clusterBitmap = _clusterBitmaps.get(size);
+      // return cached bitmap if exists. cache hit !
+      final Bitmap clusterBitmap = _clusterBitmaps.get(size);
 
-		if (clusterBitmap != null) {
-			return clusterBitmap;
-		}
+      if (clusterBitmap != null) {
+         return clusterBitmap;
+      }
 
-		// create and cache bitmap. This is unacceptable inside the GL thread,
-		// so we'll call this routine at the beginning to pre-cache all bitmaps
+      // create and cache bitmap. This is unacceptable inside the GL thread,
+      // so we'll call this routine at the beginning to pre-cache all bitmaps
 
-		final ScreenUtils.ClusterDrawable drawable = new ScreenUtils.ClusterDrawable(
+      final ScreenUtils.ClusterDrawable drawable = new ScreenUtils.ClusterDrawable(
 
-				_clusterSymbolSizeDP,
+            _clusterSymbolSizeDP,
 
-				_clusterForegroundColor,
-				_clusterBackgroundColor,
+            _clusterForegroundColor,
+            _clusterBackgroundColor,
 
-				Integer.toString(size),
-				_clusterSymbolWeight,
-				_clusterOutlineSize);
+            Integer.toString(size),
+            _clusterSymbolWeight,
+            _clusterOutlineSize);
 
-		final Bitmap paintedBitmap = drawable.getBitmap();
+      final Bitmap paintedBitmap = drawable.getBitmap();
 
-		_clusterBitmaps.put(size, paintedBitmap);
+      _clusterBitmaps.put(size, paintedBitmap);
 
-		return paintedBitmap;
-	}
+      return paintedBitmap;
+   }
 
-	public MarkerSymbol getDefaultMarkerSymbol() {
-		return _defaultMarkerSymbol;
-	}
+   public MarkerSymbol getDefaultMarkerSymbol() {
+      return _defaultMarkerSymbol;
+   }
 
-	public void update() {
-		_isForceUpdateMarkers = true;
-	}
+   public void update() {
+      _isForceUpdateMarkers = true;
+   }
 
-	@Override
-	public synchronized void update(final GLViewport viewport) {
+   @Override
+   public synchronized void update(final GLViewport viewport) {
 
-		if (!_markerLayer.isEnabled()) {
-			return;
-		}
+      if (!_markerLayer.isEnabled()) {
+         return;
+      }
 
 //		System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\tupdate()")); //$NON-NLS-1$  //$NON-NLS-2$  //$NON-NLS-3$
 //		// TODO remove SYSTEM.OUT.PRINTLN
 
-		final MapPosition mapPosition = viewport.pos;
-		final double mapScale = mapPosition.scale;
-		final float mapRotation = mapPosition.bearing;
+      final MapPosition mapPosition = viewport.pos;
+      final double mapScale = mapPosition.scale;
+      final float mapRotation = mapPosition.bearing;
 
-		final double mapTileScale = Tile.SIZE * mapScale;
+      final double mapTileScale = Tile.SIZE * mapScale;
 
-		/*
-		 * Clustering check: If clustering is enabled and there's been a significant scale change
-		 * trigger repopulation and return. After repopulation, this will be called again
-		 */
+      /*
+       * Clustering check: If clustering is enabled and there's been a significant scale change
+       * trigger repopulation and return. After repopulation, this will be called again
+       */
 
-		// (int) log of scale gives us adequate steps to trigger clustering
-		final int scaleSaved = FastMath.log2((int) mapTileScale);
+      // (int) log of scale gives us adequate steps to trigger clustering
+      final int scaleSaved = FastMath.log2((int) mapTileScale);
 
-		if (scaleSaved != _scaleSaved) {
+      if (scaleSaved != _scaleSaved) {
 
-			_scaleSaved = scaleSaved;
-			_mapTileScale = mapTileScale;
+         _scaleSaved = scaleSaved;
+         _mapTileScale = mapTileScale;
 
-			// post repopulation to the main thread
-			_markerLayer.map().post(new Runnable() {
-				@Override
-				public void run() {
-					createClusterItems();
-				}
-			});
+         // post repopulation to the main thread
+         _markerLayer.map().post(new Runnable() {
+            @Override
+            public void run() {
+               createClusterItems();
+            }
+         });
 
-			// wait and see
-			return;
-		}
+         // wait and see
+         return;
+      }
 
-		if (!viewport.changed() && !_isForceUpdateMarkers) {
-			return;
-		}
+      if (!viewport.changed() && !_isForceUpdateMarkers) {
+         return;
+      }
 
-		_isForceUpdateMarkers = false;
+      _isForceUpdateMarkers = false;
 
-		final double projectedMapX = mapPosition.x;
-		final double projectedMapY = mapPosition.y;
+      final double projectedMapX = mapPosition.x;
+      final double projectedMapY = mapPosition.y;
 
-		//int changesInvisible = 0;
-		//int changedVisible = 0;
-		int numVisible = 0;
+      //int changesInvisible = 0;
+      //int changedVisible = 0;
+      int numVisible = 0;
 
-		_markerLayer.map().viewport().getMapExtents(_tmpBox, _extents);
+      _markerLayer.map().viewport().getMapExtents(_tmpBox, _extents);
 
-		final long flip = (long) (mapTileScale) >> 1;
+      final long flip = (long) (mapTileScale) >> 1;
 
-		if (_allProjectedItems == null) {
+      if (_allProjectedItems == null) {
 
-			if (buckets.get() != null) {
-				buckets.clear();
-				compile();
-			}
+         if (buckets.get() != null) {
+            buckets.clear();
+            compile();
+         }
 
-			return;
-		}
+         return;
+      }
 
-		final double angle = Math.toRadians(mapPosition.bearing);
-		final float cos = (float) Math.cos(angle);
-		final float sin = (float) Math.sin(angle);
+      final double angle = Math.toRadians(mapPosition.bearing);
+      final float cos = (float) Math.cos(angle);
+      final float sin = (float) Math.sin(angle);
 
-		/* check visibility */
-		for (final ProjectedItem projectedItem : _allProjectedItems) {
+      /* check visibility */
+      for (final ProjectedItem projectedItem : _allProjectedItems) {
 
-			projectedItem.isModified = false;
+         projectedItem.isModified = false;
 
-			projectedItem.mapX = (float) ((projectedItem.projectedX - projectedMapX) * mapTileScale);
-			projectedItem.mapY = (float) ((projectedItem.projectedY - projectedMapY) * mapTileScale);
+         projectedItem.mapX = (float) ((projectedItem.projectedX - projectedMapX) * mapTileScale);
+         projectedItem.mapY = (float) ((projectedItem.projectedY - projectedMapY) * mapTileScale);
 
-			// flip map world border
-			if (projectedItem.mapX > flip) {
-				projectedItem.mapX -= (long) mapTileScale;
-			} else if (projectedItem.mapX < -flip) {
-				projectedItem.mapX += (long) mapTileScale;
-			}
+         // flip map world border
+         if (projectedItem.mapX > flip) {
+            projectedItem.mapX -= (long) mapTileScale;
+         } else if (projectedItem.mapX < -flip) {
+            projectedItem.mapX += (long) mapTileScale;
+         }
 
-			if (projectedItem.isClusteredOut || !GeometryUtils.pointInPoly(
-					projectedItem.mapX,
-					projectedItem.mapY,
-					_tmpBox,
-					8,
-					0)) {
+         if (projectedItem.isClusteredOut || !GeometryUtils.pointInPoly(
+               projectedItem.mapX,
+               projectedItem.mapY,
+               _tmpBox,
+               8,
+               0)) {
 
-				// either properly invisible, or clustered out. Items marked as clustered out mean there's another item
-				// on the same-ish position that will be promoted to cluster marker, so this particular item is considered
-				// invisible
+            // either properly invisible, or clustered out. Items marked as clustered out mean there's another item
+            // on the same-ish position that will be promoted to cluster marker, so this particular item is considered
+            // invisible
 
-				if (projectedItem.isVisible && (!projectedItem.isClusteredOut)) {
+            if (projectedItem.isVisible && (!projectedItem.isClusteredOut)) {
 
-					// it was previously visible, but now it won't
-					projectedItem.isModified = true;
+               // it was previously visible, but now it won't
+               projectedItem.isModified = true;
 
-					// changes to invible
-					//changesInvisible++;
-				}
+               // changes to invible
+               //changesInvisible++;
+            }
 
-				continue;
-			}
+            continue;
+         }
 
-			// item IS definitely visible
-			projectedItem.dy = sin * projectedItem.mapX + cos * projectedItem.mapY;
+         // item IS definitely visible
+         projectedItem.dy = sin * projectedItem.mapX + cos * projectedItem.mapY;
 
-			if (!projectedItem.isVisible) {
-				projectedItem.isVisible = true;
-				//changedVisible++;
-			}
+         if (!projectedItem.isVisible) {
+            projectedItem.isVisible = true;
+            //changedVisible++;
+         }
 
-			numVisible++;
-		}
+         numVisible++;
+      }
 
-		//log.debug(numVisible + " " + changedVisible + " " + changesInvisible);
+      //log.debug(numVisible + " " + changedVisible + " " + changesInvisible);
 
-		/*
-		 * only update when zoomlevel changed, new items are visible or more than 10 of the current
-		 * items became invisible
-		 */
-		//if ((numVisible == 0) && (changedVisible == 0 && changesInvisible < 10))
-		//	return;
-		buckets.clear();
+      /*
+       * only update when zoomlevel changed, new items are visible or more than 10 of the current
+       * items became invisible
+       */
+      //if ((numVisible == 0) && (changedVisible == 0 && changesInvisible < 10))
+      //	return;
+      buckets.clear();
 
-		if (numVisible == 0) {
-			compile();
-			return;
-		}
+      if (numVisible == 0) {
+         compile();
+         return;
+      }
 
-		/* keep position for current state */
-		mMapPosition.copy(mapPosition);
-		mMapPosition.bearing = -mMapPosition.bearing;
+      /* keep position for current state */
+      mMapPosition.copy(mapPosition);
+      mMapPosition.bearing = -mMapPosition.bearing;
 
-		// why do we sort ? z-index?
-		sort(_allProjectedItems, 0, _allProjectedItems.length);
+      // why do we sort ? z-index?
+      sort(_allProjectedItems, 0, _allProjectedItems.length);
 
-		//log.debug(Arrays.toString(mItems));
+      //log.debug(Arrays.toString(mItems));
 
-		for (final ProjectedItem projItem : _allProjectedItems) {
+      for (final ProjectedItem projItem : _allProjectedItems) {
 
-			// skip invisible AND clustered-out
-			if (!projItem.isVisible || projItem.isClusteredOut) {
-				continue;
-			}
+         // skip invisible AND clustered-out
+         if (!projItem.isVisible || projItem.isClusteredOut) {
+            continue;
+         }
 
-			if (projItem.isModified) {
+         if (projItem.isModified) {
 
-				projItem.isVisible = false;
+            projItem.isVisible = false;
 
-				continue;
-			}
+            continue;
+         }
 
-			final SymbolItem mapSymbol = SymbolItem.pool.get();
+         final SymbolItem mapSymbol = SymbolItem.pool.get();
 
-			if (projItem.clusterSize > 0) {
+         if (projItem.clusterSize > 0) {
 
-				// this item will act as a cluster, just use a proper bitmap
-				// depending on cluster size, instead of its marker
+            // this item will act as a cluster, just use a proper bitmap
+            // depending on cluster size, instead of its marker
 
-				final int numClusters = projItem.clusterSize + (projItem.isInGridCluster ? 1 : 0);
+            final int numClusters = projItem.clusterSize + (projItem.isInGridCluster ? 1 : 0);
 
-				final Bitmap bitmap = getClusterBitmap(numClusters);
+            final Bitmap bitmap = getClusterBitmap(numClusters);
 
-				float mapX = 0;
-				float mapY = 0;
+            float mapX = 0;
+            float mapY = 0;
 
-				switch (_clusterAlgorithm) {
+            switch (_clusterAlgorithm) {
 
-				case FirstMarker_Distance:
-				case Grid_Center:
+            case FirstMarker_Distance:
+            case Grid_Center:
 
-					mapX = (float) ((projItem.projectedClusterX - projectedMapX) * mapTileScale);
-					mapY = (float) ((projItem.projectedClusterY - projectedMapY) * mapTileScale);
+               mapX = (float) ((projItem.projectedClusterX - projectedMapX) * mapTileScale);
+               mapY = (float) ((projItem.projectedClusterY - projectedMapY) * mapTileScale);
 
-					// flip map world border
-					if (mapX > flip) {
-						mapX -= (long) mapTileScale;
-					} else if (mapX < -flip) {
-						mapX += (long) mapTileScale;
-					}
+               // flip map world border
+               if (mapX > flip) {
+                  mapX -= (long) mapTileScale;
+               } else if (mapX < -flip) {
+                  mapX += (long) mapTileScale;
+               }
 
-					break;
+               break;
 
-				case FirstMarker_Grid:
-				default:
+            case FirstMarker_Grid:
+            default:
 
-					mapX = projItem.mapX;
-					mapY = projItem.mapY;
+               mapX = projItem.mapX;
+               mapY = projItem.mapY;
 
-					break;
-				}
+               break;
+            }
 
-				mapSymbol.set(mapX, mapY, bitmap, true);
+            mapSymbol.set(mapX, mapY, bitmap, true);
 
-				mapSymbol.offset = new PointF(0.5f, 0.5f);
-				mapSymbol.billboard = _isBillboard;
+            mapSymbol.offset = new PointF(0.5f, 0.5f);
+            mapSymbol.billboard = _isBillboard;
 
-				if (!_isBillboard) {
+            if (!_isBillboard) {
 // CLUSTERING IS VERY BUGGY WHEN ROTATION IS SET
 //					mapSymbol.rotation = -mapRotation;
-				}
+            }
 
-			} else {
+         } else {
 
-			   MarkerSymbol markerSymbol = projItem.mapMarker.markerSymbol;
-			   if (markerSymbol == null) {
-			      markerSymbol = _defaultMarkerSymbol;
-			   }
+            MarkerSymbol markerSymbol = projItem.mapMarker.markerSymbol;
+            if (markerSymbol == null) {
+               markerSymbol = _defaultMarkerSymbol;
+            }
 
             final String title = projItem.mapMarker.title;
             final String subtitle = projItem.mapMarker.description;
             //System.out.println("***** subtitle: " +  subtitle + " and length: " + subtitle.length()); //$NON-NLS-1$  //$NON-NLS-2$
 
             //create dummy MarkerItem with dummy coordinates. only need it for create the label
-			   final MarkerItem item = new MarkerItem(title, subtitle, new GeoPoint(5.0, 5.0));
+            final MarkerItem item = new MarkerItem(title, subtitle, new GeoPoint(5.0, 5.0));
             item.setMarker(_markertoolkit.createAdvanceSymbol(item, markerSymbol.getBitmap()));
 
-			   mapSymbol.set(projItem.mapX, projItem.mapY, item.getMarker().getBitmap(), markerSymbol.mBillboard);
-			   mapSymbol.offset = markerSymbol.getHotspot();
-			   mapSymbol.billboard = markerSymbol.isBillboard();
-			}
+            mapSymbol.set(projItem.mapX, projItem.mapY, item.getMarker().getBitmap(), markerSymbol.mBillboard);
+            mapSymbol.offset = markerSymbol.getHotspot();
+            mapSymbol.billboard = markerSymbol.isBillboard();
+         }
 
-			_symbolBucket.pushSymbol(mapSymbol);
-		}
+         _symbolBucket.pushSymbol(mapSymbol);
+      }
 
-		buckets.set(_symbolBucket);
-		buckets.prepare();
+      buckets.set(_symbolBucket);
+      buckets.prepare();
 
-		compile();
-	}
+      compile();
+   }
 
 }

@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -23,6 +24,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.ColumnDefinition;
 import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.ITourViewer;
@@ -37,6 +39,7 @@ import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
+import net.tourbook.tour.SelectionTourPause;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
@@ -104,6 +107,8 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
    private PixelConverter         _pc;
 
+   private ZonedDateTime          _tourStartTime;
+
    /*
     * UI controls
     */
@@ -121,7 +126,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
       int  serieIndex;
 
-      public DevicePause(final long relativeStartTime, final long relativeEndTime, final int serieIndex) {
+      public DevicePause(final long relativeStartTime,
+                         final long relativeEndTime,
+                         final int serieIndex) {
 
          this.relativeStartTime = relativeStartTime;
          this.relativeEndTime = relativeEndTime;
@@ -307,7 +314,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
                         // get modified tour
                         setupViewerContent(tourData);
 
-                        updateUI_PausesrViewer();
+                        updateUI_PausesViewer();
 
                         // removed old tour data from the selection provider
                         _postSelectionProvider.clearSelection();
@@ -318,9 +325,9 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
                   }
                }
 
-            } else if (tourEventId == TourEventId.MARKER_SELECTION) {
+            } else if (tourEventId == TourEventId.PAUSE_SELECTION && eventData instanceof SelectionTourPause) {
 
-               onTourEvent_TourMarker(eventData);
+               onTourEvent_TourPause((SelectionTourPause) eventData);
 
             } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
@@ -336,7 +343,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
       _tourData = null;
 
-      updateUI_PausesrViewer();
+      updateUI_PausesViewer();
 
       _postSelectionProvider.clearSelection();
    }
@@ -344,13 +351,6 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    private void createActions() {
 
    }
-
-//   private void createMenuManager() {
-//
-//      _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
-//      _viewerMenuManager.setRemoveAllWhenShown(true);
-//      _viewerMenuManager.addMenuListener(this::fillContextMenu);
-//   }
 
    @Override
    public void createPartControl(final Composite parent) {
@@ -448,21 +448,15 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       _columnManager.createHeaderContextMenu(table, null);
    }
 
-//   private Menu createUI_22_CreateViewerContextMenu() {
-//
-//      final Table table = (Table) _pausesViewer.getControl();
-//      final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
-//
-//      return tableContextMenu;
-//   }
-
    private void defineAllColumns() {
 
       defineColumn_PauseDuration();
 
-      defineColumn_Time_Start_Relative();
-      defineColumn_Time_End_Relative();
+      defineColumn_Time_Relative_Start();
+      defineColumn_Time_Relative_End();
 
+      defineColumn_Time_Daytime_Start();
+      defineColumn_Time_Daytime_End();
    }
 
    /**
@@ -493,15 +487,67 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    }
 
    /**
+    * Column: Pause end time of day
+    */
+   private void defineColumn_Time_Daytime_End() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "pauseEndTime_Daytime", SWT.LEAD); //$NON-NLS-1$
+
+      colDef.setColumnLabel(Messages.Tour_Pauses_Column_EndTime_Daytime_Label);
+      colDef.setColumnHeaderText(Messages.Tour_Pauses_Column_EndTime_Daytime_Label);
+      colDef.setColumnHeaderToolTipText(Messages.Tour_Pauses_Column_EndTime_Daytime_Tooltip);
+
+      colDef.setColumnCategory(COLUMN_FACTORY_CATEGORY_TIME);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final DevicePause pause = (DevicePause) cell.getElement();
+
+            cell.setText(_tourStartTime.plusSeconds(pause.relativeEndTime).format(TimeTools.Formatter_Time_M));
+         }
+      });
+   }
+
+   /**
+    * Column: Pause start time of day
+    */
+   private void defineColumn_Time_Daytime_Start() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "pauseStartTime_Daytime", SWT.LEAD); //$NON-NLS-1$
+
+      colDef.setColumnLabel(Messages.Tour_Pauses_Column_StartTime_Daytime_Label);
+      colDef.setColumnHeaderText(Messages.Tour_Pauses_Column_StartTime_Daytime_Label);
+      colDef.setColumnHeaderToolTipText(Messages.Tour_Pauses_Column_StartTime_Daytime_Tooltip);
+
+      colDef.setColumnCategory(COLUMN_FACTORY_CATEGORY_TIME);
+
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final DevicePause pause = (DevicePause) cell.getElement();
+
+            cell.setText(_tourStartTime.plusSeconds(pause.relativeStartTime).format(TimeTools.Formatter_Time_M));
+         }
+      });
+   }
+
+   /**
     * Column: Pause relative end time
     */
-   private void defineColumn_Time_End_Relative() {
+   private void defineColumn_Time_Relative_End() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "pauseEndTime_Relative", SWT.TRAIL); //$NON-NLS-1$
 
-      colDef.setColumnLabel(Messages.Tour_Pauses_Column_EndTime_Label);
-      colDef.setColumnHeaderText(Messages.Tour_Pauses_Column_EndTime_Header);
-      colDef.setColumnHeaderToolTipText(Messages.Tour_Pauses_Column_EndTime_Label);
+      colDef.setColumnLabel(Messages.Tour_Pauses_Column_EndTime_Relative_Label);
+      colDef.setColumnHeaderText(Messages.Tour_Pauses_Column_EndTime_Relative_Header);
+      colDef.setColumnHeaderToolTipText(Messages.Tour_Pauses_Column_EndTime_Relative_Label);
 
       colDef.setColumnCategory(COLUMN_FACTORY_CATEGORY_TIME);
 
@@ -522,13 +568,13 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    /**
     * Column: Pause relative start time
     */
-   private void defineColumn_Time_Start_Relative() {
+   private void defineColumn_Time_Relative_Start() {
 
       final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "pauseStartTime_Relative", SWT.TRAIL); //$NON-NLS-1$
 
-      colDef.setColumnLabel(Messages.Tour_Pauses_Column_StartTime_Label);
-      colDef.setColumnHeaderText(Messages.Tour_Pauses_Column_StartTime_Header);
-      colDef.setColumnHeaderToolTipText(Messages.Tour_Pauses_Column_StartTime_Tooltip);
+      colDef.setColumnLabel(Messages.Tour_Pauses_Column_StartTime_Relative_Label);
+      colDef.setColumnHeaderText(Messages.Tour_Pauses_Column_StartTime_Relative_Header);
+      colDef.setColumnHeaderToolTipText(Messages.Tour_Pauses_Column_StartTime_Relative_Tooltip);
 
       colDef.setColumnCategory(COLUMN_FACTORY_CATEGORY_TIME);
 
@@ -575,22 +621,6 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    private void enableActions() {
 
    }
-
-//   private void fillContextMenu(final IMenuManager menuMgr) {
-//
-//      menuMgr.add(_actionEditTourMarkers);
-//      menuMgr.add(_actionDeleteTourMarkers);
-//
-//      // add standard group which allows other plug-ins to contribute here
-//      menuMgr.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-//
-//      // set the marker which should be selected in the marker dialog
-//      final IStructuredSelection selection = (IStructuredSelection) _markerViewer.getSelection();
-//      _actionEditTourMarkers.setTourMarker((TourMarker) selection.getFirstElement());
-//      _actionDeleteTourMarkers.setTourMarkers(selection.toArray());
-//
-//      enableActions();
-//   }
 
    /**
     * Select the chart/map slider(s) according to the selected slices
@@ -726,10 +756,6 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
          return;
       }
 
-//      System.out.println((net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
-//            + ("\tonSelectionChanged: " + selection));
-//      // TODO remove SYSTEM.OUT.PRINTLN
-
       long tourId = TourDatabase.ENTITY_IS_NOT_SAVED;
       TourData tourData = null;
 
@@ -794,34 +820,28 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
          setupViewerContent(tourData);
       }
 
-      updateUI_PausesrViewer();
+      updateUI_PausesViewer();
    }
 
-   private void onTourEvent_TourMarker(final Object eventData) {
+   private void onTourEvent_TourPause(final SelectionTourPause pauseSelection) {
 
-//      if (eventData instanceof SelectionTourMarker) {
-//
-//         /*
-//          * Select the tour marker in the view
-//          */
-//         final SelectionTourMarker selection = (SelectionTourMarker) eventData;
-//
-//         final TourData tourData = selection.getTourData();
-//         final ArrayList<TourMarker> tourMarker = selection.getSelectedTourMarker();
-//
-//         if (tourData != _tourData) {
-//
-//            setupViewerContent(tourData);
-//
-//            updateUI_PausesrViewer();
-//         }
-//
-//         _isInUpdate = true;
-//         {
-//            _pausesViewer.setSelection(new StructuredSelection(tourMarker), true);
-//         }
-//         _isInUpdate = false;
-//      }
+      final TourData tourData = pauseSelection.getTourData();
+
+      if (tourData != _tourData) {
+
+         setupViewerContent(tourData);
+
+         updateUI_PausesViewer();
+      }
+
+      _isInUpdate = true;
+      {
+         final int pauseIndex = pauseSelection.getPauseIndex();
+         final DevicePause devicePause = _allDevicePauses.get(pauseIndex);
+
+         _pausesViewer.setSelection(new StructuredSelection(devicePause), true);
+      }
+      _isInUpdate = false;
    }
 
    @Override
@@ -855,7 +875,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    @Override
    public void reloadViewer() {
 
-      updateUI_PausesrViewer();
+      updateUI_PausesViewer();
    }
 
    @PersistState
@@ -873,10 +893,11 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    private void setupViewerContent(final TourData tourData) {
 
       _tourData = tourData;
+      _tourStartTime = tourData.getTourStartTime();
 
       final long[] allPausedTime_Start = _tourData.getPausedTime_Start();
       final long[] allPausedTime_End = _tourData.getPausedTime_End();
-      final long[] allPausedTime_Data = _tourData.getPausedTime_Data();
+//      final long[] allPausedTime_Data = _tourData.getPausedTime_Data();
       final int[] timeSerie = _tourData.timeSerie;
 
       final long tourStartTimeMS = _tourData.getTourStartTimeMS();
@@ -890,15 +911,15 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       // loop: all pauses
       for (int pausesIndex = 0; pausesIndex < allPausedTime_Start.length; pausesIndex++) {
 
-         final long pausedTimeStartMS = allPausedTime_Start[pausesIndex];
-         final long pausedTimeEndMS = allPausedTime_End[pausesIndex];
+         final long absolutePausedTimeStartMS = allPausedTime_Start[pausesIndex];
+         final long absolutePausedTimeEndMS = allPausedTime_End[pausesIndex];
 
-         final long relativeStartTime = (pausedTimeStartMS - tourStartTimeMS) / 1000;
-         final long relativeEndTime = (pausedTimeEndMS - tourStartTimeMS) / 1000;
+         final long relativeStartTime = (absolutePausedTimeStartMS - tourStartTimeMS) / 1000;
+         final long relativeEndTime = (absolutePausedTimeEndMS - tourStartTimeMS) / 1000;
 
          if (relativeStartTime < 0) {
 
-            // pause start is before tour start -> this occures very often
+            // the pause start is before the tour start -> this occures very often, so keep this value !
 
 //            continue;
          }
@@ -909,16 +930,16 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final long currentTime = timeSerie[serieIndex] * 1000L + tourStartTimeMS;
 
-            if (currentTime > pausedTimeStartMS) {
+            if (currentTime > absolutePausedTimeStartMS) {
                break;
             }
          }
 
-         final boolean isPauseAnAutoPause = allPausedTime_Data == null
-               ? true
-               : allPausedTime_Data[pausesIndex] == 1;
-
-         final long pauseDuration = Math.round((pausedTimeEndMS - pausedTimeStartMS) / 1000f);
+//         final boolean isPauseAnAutoPause = allPausedTime_Data == null
+//               ? true
+//               : allPausedTime_Data[pausesIndex] == 1;
+//
+//         final long pauseDuration = Math.round((pausedTimeEndMS - pausedTimeStartMS) / 1000f);
 
          _allDevicePauses.add(new DevicePause(
                relativeStartTime,
@@ -954,7 +975,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    @Override
    public void updateColumnHeader(final ColumnDefinition colDef) {}
 
-   private void updateUI_PausesrViewer() {
+   private void updateUI_PausesViewer() {
 
       if (_tourData == null) {
 

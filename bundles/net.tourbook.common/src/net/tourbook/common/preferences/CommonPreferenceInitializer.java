@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -87,6 +87,7 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_POWER,                 ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PULSE,                 ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SPEED,                 ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE,           ValueFormat.NUMBER_1_0.name());
 
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME,          ValueFormat.TIME_HH_MM.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME,         ValueFormat.TIME_HH_MM.name());
@@ -100,6 +101,7 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_POWER_SUMMARY,         ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_PULSE_SUMMARY,         ValueFormat.NUMBER_1_0.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_SPEED_SUMMARY,         ValueFormat.NUMBER_1_0.name());
+      store.setDefault(ICommonPreferences.DISPLAY_FORMAT_TEMPERATURE_SUMMARY,   ValueFormat.NUMBER_1_0.name());
 
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_ELAPSED_TIME_SUMMARY,  ValueFormat.TIME_HH.name());
       store.setDefault(ICommonPreferences.DISPLAY_FORMAT_RECORDED_TIME_SUMMARY, ValueFormat.TIME_HH.name());
@@ -126,6 +128,11 @@ public class CommonPreferenceInitializer extends AbstractPreferenceInitializer {
        */
       store.setDefault(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK,       DayOfWeek.MONDAY.getValue());
       store.setDefault(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK,  4);
+
+      /*
+       * Transform values
+       */
+      store.setDefault(ICommonPreferences.TRANSFORM_VALUE_OPACITY_MAX,           10);
 
 // SET_FORMATTING_ON
    }

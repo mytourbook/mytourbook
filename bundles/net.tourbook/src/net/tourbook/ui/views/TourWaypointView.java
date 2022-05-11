@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -150,19 +150,15 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
          final TourWayPoint wp2 = (TourWayPoint) e2;
 
          /*
-          * sort by time
+          * Sort by time
           */
          final long wp1Time = wp1.getTime();
          final long wp2Time = wp2.getTime();
 
-         if (wp1Time != 0 && wp2Time != 0) {
-            return wp1Time > wp2Time ? 1 : -1;
-         }
-
-         return wp1Time != 0 ? 1 : -1;
+         return (int) (wp1Time - wp2Time);
 
 //			/*
-//			 * sort by creation sequence
+//			 * Sort by creation sequence
 //			 */
 //			final long wp1CreateId = wp1.getCreateId();
 //			final long wp2CreateId = wp2.getCreateId();
@@ -839,7 +835,10 @@ public class TourWaypointView extends ViewPart implements ITourProvider, ITourVi
    public ArrayList<TourData> getSelectedTours() {
 
       final ArrayList<TourData> selectedTours = new ArrayList<>();
-      selectedTours.add(_tourData);
+
+      if (_tourData != null) {
+         selectedTours.add(_tourData);
+      }
 
       return selectedTours;
    }

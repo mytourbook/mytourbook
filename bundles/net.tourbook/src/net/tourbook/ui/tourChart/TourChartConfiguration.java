@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -136,6 +136,12 @@ public class TourChartConfiguration {
     * when <code>true</code> the SRTM data are visible in the altitude graph
     */
    public boolean                 isSRTMDataVisible       = false;
+
+   /**
+    * When <code>true</code> then SRTM 1 values are displayed, when they are available, otherwise
+    * SRTM 3 values are displayed
+    */
+   public boolean                 isShowSrtm1Values;
 
    /**
     * when <code>true</code> the SRTM data are visible in the altitude graph
@@ -323,6 +329,19 @@ public class TourChartConfiguration {
 
 // SET_FORMATTING_OFF
 
+      isSRTMDataVisible             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
+      isShowSrtm1Values             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_SRTM_1_VALUES);
+
+      isGraphOverlapped             = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_GRAPH_OVERLAPPED);
+
+      isShowTourPhotos              = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE);
+      isShowTourPhotoTooltip        = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE);
+
+      isShowBreaktimeValues         = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
+      isShowValuePointValue         = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_VALUE_POINT_VALUE);
+
+      isShowNightSections           = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_NIGHT_SECTIONS);
+
       /*
        * Initialize tour marker settings from the pref store
        */
@@ -379,6 +398,7 @@ public class TourChartConfiguration {
        * Pulse values
        */
       pulseGraph                    = (PulseGraph) Util.getEnumValue(_prefStore.getString(ITourbookPreferences.GRAPH_PULSE_GRAPH_VALUES), TourChart.PULSE_GRAPH_DEFAULT);
+
 
 // SET_FORMATTING_ON
 
