@@ -236,25 +236,72 @@ public class HistoryResult {
       }
 
       // Weather Icons and Codes  : https://www.weatherapi.com/docs/#weather-icons
-      final int currentWeatherCode = middleHourData.getCondition().getCode();
-
-      if (currentWeatherCode >= 200 && currentWeatherCode < 300) {
-         weatherType = IWeather.WEATHER_ID_LIGHTNING;
-      } else if (currentWeatherCode >= 300 && currentWeatherCode < 400) {
-         weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
-      } else if (currentWeatherCode >= 500 && currentWeatherCode < 600) {
-         weatherType = IWeather.WEATHER_ID_RAIN;
-      } else if (currentWeatherCode >= 600 && currentWeatherCode < 700) {
-         weatherType = IWeather.WEATHER_ID_SNOW;
-      } else if (currentWeatherCode == 800) {
-         weatherType = IWeather.WEATHER_ID_CLEAR;
-      } else if (currentWeatherCode == 801 || currentWeatherCode == 802) {
-         weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
-      } else if (currentWeatherCode == 803 || currentWeatherCode == 804) {
+      switch (middleHourData.getCondition().getCode()) {
+      case 1006:
+      case 1009:
+      case 1030:
+      case 1135:
+      case 1147:
          weatherType = IWeather.WEATHER_ID_OVERCAST;
-      } else if (currentWeatherCode == 711 || currentWeatherCode == 762 ||
-            currentWeatherCode == 771 || currentWeatherCode == 781) {
-         weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
+         break;
+      case 1000:
+         weatherType = IWeather.WEATHER_ID_CLEAR;
+         break;
+      case 1003:
+         weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
+         break;
+      case 1087:
+         weatherType = IWeather.WEATHER_ID_LIGHTNING;
+         break;
+      case 1192:
+      case 1195:
+      case 1201:
+      case 1243:
+      case 1246:
+      case 1252:
+      case 1276:
+         weatherType = IWeather.WEATHER_ID_RAIN;
+         break;
+      case 1066:
+      case 1072:
+      case 1114:
+      case 1117:
+      case 1168:
+      case 1171:
+      case 1210:
+      case 1213:
+      case 1216:
+      case 1219:
+      case 1222:
+      case 1225:
+      case 1237:
+      case 1255:
+      case 1258:
+      case 1261:
+      case 1264:
+      case 1279:
+      case 1282:
+         weatherType = IWeather.WEATHER_ID_SNOW;
+         break;
+      case 1063:
+      case 1069:
+      case 1150:
+      case 1153:
+      case 1180:
+      case 1183:
+      case 1186:
+      case 1189:
+      case 1198:
+      case 1204:
+      case 1207:
+      case 1240:
+      case 1249:
+      case 1273:
+         weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
+         break;
+      default:
+         weatherType = IWeather.cloudIsNotDefined;
+         break;
       }
 
       return weatherType;
