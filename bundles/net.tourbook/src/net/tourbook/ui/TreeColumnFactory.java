@@ -2380,34 +2380,7 @@ public abstract class TreeColumnFactory {
          }
       };
 
-      WEATHER_TEMPERATURE_AVG_DEVICE = new TreeColumnFactory() {
-         @Override
-         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
-                                                  final PixelConverter pixelConverter) {
-
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "WEATHER_TEMPERATURE_AVG_DEVICE", SWT.TRAIL); //$NON-NLS-1$
-
-            final String unitLabel = UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_TEMPERATURE;
-
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
-
-            colDef.setColumnLabel(              Messages.ColumnFactory_avg_temperature_label);//Temperature - Average
-            colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_avg_temperature_tooltip);//Average temperature
-            colDef.setColumnUnit(               unitLabel);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
-            colDef.setValueFormats(
-                  ValueFormatSet.Number,
-                  ValueFormat.NUMBER_1_1,
-                  ValueFormat.NUMBER_1_1,
-                  columnManager);
-
-            return colDef;
-         }
-      };
-
-      WEATHER_TEMPERATURE_AVG= new TreeColumnFactory() {
+      WEATHER_TEMPERATURE_AVG = new TreeColumnFactory() {
          @Override
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
@@ -2418,9 +2391,9 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_avg_temperature_label);//Temperature - Average
+            colDef.setColumnLabel(              Messages.ColumnFactory_Temperature_Avg_Label);
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_avg_temperature_tooltip);//Average temperature
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Temperature_Avg_Tooltip);
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
@@ -2445,9 +2418,36 @@ public abstract class TreeColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_avg_temperature_label);//Temperature - Average
+            colDef.setColumnLabel(              Messages.ColumnFactory_Temperature_Avg_Combined_Label);
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_avg_temperature_tooltip);//Average temperature
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Temperature_Avg_Tooltip);
+            colDef.setColumnUnit(               unitLabel);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_1,
+                  ValueFormat.NUMBER_1_1,
+                  columnManager);
+
+            return colDef;
+         }
+      };
+
+      WEATHER_TEMPERATURE_AVG_DEVICE = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "WEATHER_TEMPERATURE_AVG_DEVICE", SWT.TRAIL); //$NON-NLS-1$
+
+            final String unitLabel = UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_TEMPERATURE;
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Temperature_Avg_Device_Label);//Temperature - Average
+            colDef.setColumnHeaderText(         unitLabel);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Temperature_Avg_Tooltip);//Average temperature
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));

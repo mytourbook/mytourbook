@@ -4435,9 +4435,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_avg_temperature_label);//Temperature - Average
+            colDef.setColumnLabel(              Messages.ColumnFactory_Temperature_Avg_Label);//Temperature - Average
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_avg_temperature_tooltip);//Average temperature
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Temperature_Avg_Tooltip);//Average temperature
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
@@ -4462,9 +4462,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
 
-            colDef.setColumnLabel(              "COmbined temperature");//Messages.ColumnFactory_avg_temperature_label);//Temperature - Average
+            colDef.setColumnLabel(              "COmbined temperature");//Messages.ColumnFactory_Temperature_Avg_Label);//Temperature - Average
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_avg_temperature_tooltip);//Average temperature
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Temperature_Avg_Tooltip);//Average temperature
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
@@ -4490,9 +4490,9 @@ public abstract class TableColumnFactory {
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
 
             //todo fb rename to device
-            colDef.setColumnLabel(              Messages.ColumnFactory_avg_temperature_label);//Temperature - Average
+            colDef.setColumnLabel(              Messages.ColumnFactory_Temperature_Avg_Label);//Temperature - Average
             colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_avg_temperature_tooltip);//Average temperature
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Temperature_Avg_Tooltip);//Average temperature
             colDef.setColumnUnit(               unitLabel);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
