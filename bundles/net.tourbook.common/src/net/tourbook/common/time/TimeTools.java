@@ -41,6 +41,7 @@ import java.time.temporal.WeekFields;
 import java.time.zone.ZoneRules;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.Messages;
@@ -84,7 +85,7 @@ public class TimeTools {
    /**
     * Contains the short weekday strings. For example: "Sun", "Mon", etc.
     */
-   public static String[]                         weekDays_Short;
+   protected static String[]                      weekDays_Short;
 
    /**
     * Contains the full text, typically the full description. For example, day-of-week Monday might
@@ -126,6 +127,7 @@ public class TimeTools {
    public static final DateTimeFormatter   Formatter_Week_Month         = DateTimeFormatter.ofPattern("dd MMM");                 //$NON-NLS-1$
    public static final DateTimeFormatter   Formatter_Weekday            = DateTimeFormatter.ofPattern("E");                      //$NON-NLS-1$
    public static final DateTimeFormatter   Formatter_Weekday_L          = DateTimeFormatter.ofPattern("EEEE");                   //$NON-NLS-1$
+   public static final DateTimeFormatter   Formatter_YearMonthDay       = DateTimeFormatter.ofPattern("yyyy-MM-dd");             //$NON-NLS-1$
 
    public static final DateTimeFormatter   Formatter_DayTimeSecondsAmPm = DateTimeFormatter.ofPattern("h:mm:ss a");              //$NON-NLS-1$
 
@@ -259,24 +261,6 @@ public class TimeTools {
       return createYMDhms_From_DateTime(ZonedDateTime.now());
    }
 
-   /**
-    * @return Returns a long value for the given date/time in the YYYYMMDDhhmmss format
-    */
-   public static long createYMDhms_From_DateTime(final ZonedDateTime zonedDateTime) {
-
-      final long dtYMDhms = 0
-
-            + (zonedDateTime.getYear() * 10000000000L)
-            + (zonedDateTime.getMonthValue() * 100000000L)
-            + (zonedDateTime.getDayOfMonth() * 1000000L)
-
-            + (zonedDateTime.getHour() * 10000L)
-            + (zonedDateTime.getMinute() * 100L)
-            + zonedDateTime.getSecond();
-
-      return dtYMDhms;
-   }
-
    private static SunTimes createSunTimes(final ZonedDateTime zonedDateTime, final double latitude, final double longitude) {
 
       // Because giving a date with a specific hour could result into getting the
@@ -343,6 +327,24 @@ public class TimeTools {
       return new TourDateTime(tourZonedDateTime, timeZoneOffsetLabel, weekDays_Short[weekDayIndex]);
    }
 
+   /**
+    * @return Returns a long value for the given date/time in the YYYYMMDDhhmmss format
+    */
+   public static long createYMDhms_From_DateTime(final ZonedDateTime zonedDateTime) {
+
+      final long dtYMDhms = 0
+
+            + (zonedDateTime.getYear() * 10000000000L)
+            + (zonedDateTime.getMonthValue() * 100000000L)
+            + (zonedDateTime.getDayOfMonth() * 1000000L)
+
+            + (zonedDateTime.getHour() * 10000L)
+            + (zonedDateTime.getMinute() * 100L)
+            + zonedDateTime.getSecond();
+
+      return dtYMDhms;
+   }
+
    public static ZonedDateTime determineSunriseTimes(final ZonedDateTime zonedDateTime,
                                                      final double latitude,
                                                      final double longitude) {
@@ -365,7 +367,7 @@ public class TimeTools {
     * @return Returns a list with all available time zones which are sorted by zone offset, zone id
     *         and zone name key.
     */
-   public static ArrayList<TimeZoneData> getAllTimeZones() {
+   public static List<TimeZoneData> getAllTimeZones() {
 
       if (_allSortedTimeZones == null) {
 
@@ -519,7 +521,7 @@ public class TimeTools {
     */
    private static TimeZoneData getTimeZone(final String timeZoneId) {
 
-      final ArrayList<TimeZoneData> allTimeZones = getAllTimeZones();
+      final List<TimeZoneData> allTimeZones = getAllTimeZones();
 
       for (final TimeZoneData timeZone : allTimeZones) {
 
@@ -533,7 +535,7 @@ public class TimeTools {
 
    public static TimeZoneData getTimeZone_ByIndex(final int selectedTimeZoneIndex) {
 
-      final ArrayList<TimeZoneData> allTimeZone = getAllTimeZones();
+      final List<TimeZoneData> allTimeZone = getAllTimeZones();
 
       if (selectedTimeZoneIndex == -1) {
          return allTimeZone.get(0);
@@ -578,7 +580,7 @@ public class TimeTools {
     */
    public static int getTimeZoneIndex(final String timeZoneId) {
 
-      final ArrayList<TimeZoneData> allTimeZones = getAllTimeZones();
+      final List<TimeZoneData> allTimeZones = getAllTimeZones();
 
       for (int timeZoneIndex = 0; timeZoneIndex < allTimeZones.size(); timeZoneIndex++) {
 

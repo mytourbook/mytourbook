@@ -117,8 +117,6 @@ public class UI {
     */
    public static final String            NEW_LINE2                     = "\n\n";                       //$NON-NLS-1$
 
-   public static final String            SYSTEM_NEW_LINE               = System.lineSeparator();
-
    public static final String            IS_NOT_INITIALIZED            = "IS NOT INITIALIZED";         //$NON-NLS-1$
 
    public static final String            GRAPH_ALTIMETER               = "GRAPH_ALTIMETER";            //$NON-NLS-1$
