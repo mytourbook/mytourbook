@@ -41,16 +41,21 @@ public class WorldWeatherOnlineRetrieverTests {
    WorldWeatherOnlineRetriever historicalWeatherRetriever;
 
    @BeforeAll
-   static void initAll() {
+   static void initAll() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 
       httpClientMock = new HttpClientMock();
+      final Field field = WorldWeatherOnlineRetriever.class
+            .getSuperclass()
+            .getDeclaredField("httpClient"); //$NON-NLS-1$
+      field.setAccessible(true);
+      field.set(null, httpClientMock);
    }
 
    /**
     * Regression test for the weather retrieval from World Weather Online.
     */
    @Test
-   void testWeatherRetrieval() throws IllegalAccessException, NoSuchFieldException {
+   void testWeatherRetrieval() {
 
       final String worldWeatherOnlineResponse = Comparison.readFileContent(WORLDWEATHERONLINE_FILE_PATH
             + "LongsPeak-Manual-WorldWeatherOnlineResponse.json"); //$NON-NLS-1$
@@ -58,11 +63,6 @@ public class WorldWeatherOnlineRetrieverTests {
             "http://api.worldweatheronline.com/premium/v1/past-weather.ashx?key=&q=40.263996,-105.58854099999999&date=2020-07-04&tp=1&format=json&includelocation=yes&extra=utcDateTime&lang=en"; //$NON-NLS-1$
       httpClientMock.onGet(url)
             .doReturn(worldWeatherOnlineResponse);
-      final Field field = WorldWeatherOnlineRetriever.class
-            .getSuperclass()
-            .getDeclaredField("httpClient"); //$NON-NLS-1$
-      field.setAccessible(true);
-      field.set(null, httpClientMock);
 
       final TourData tour = Initializer.importTour();
       historicalWeatherRetriever = new WorldWeatherOnlineRetriever(tour);

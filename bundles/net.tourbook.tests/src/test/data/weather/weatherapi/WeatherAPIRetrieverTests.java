@@ -42,16 +42,21 @@ public class WeatherAPIRetrieverTests {
    WeatherApiRetriever         weatherApiRetriever;
 
    @BeforeAll
-   static void initAll() {
+   static void initAll() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
 
       httpClientMock = new HttpClientMock();
+      final Field field = WeatherApiRetriever.class
+            .getSuperclass()
+            .getDeclaredField("httpClient"); //$NON-NLS-1$
+      field.setAccessible(true);
+      field.set(null, httpClientMock);
    }
 
    /**
     * Regression test for the weather retrieval from WeatherAPI.
     */
    @Test
-   void testWeatherRetrieval() throws IllegalAccessException, NoSuchFieldException {
+   void testWeatherRetrieval() {
 
       final String weatherApiResponse = Comparison.readFileContent(WEATHERAPI_FILE_PATH
             + "LongsPeak-Manual-WeatherApiResponse.json"); //$NON-NLS-1$
@@ -59,11 +64,6 @@ public class WeatherAPIRetrieverTests {
             + "/weatherapi?lat=40.263996&lon=-105.58854099999999&lang=en&dt=2022-05-10"; //$NON-NLS-1$
       httpClientMock.onGet(url)
             .doReturn(weatherApiResponse);
-      final Field field = WeatherApiRetriever.class
-            .getSuperclass()
-            .getDeclaredField("httpClient"); //$NON-NLS-1$
-      field.setAccessible(true);
-      field.set(null, httpClientMock);
 
       final TourData tour = Initializer.importTour();
       //Tuesday, May 10, 2022 12:00:00 PM
@@ -78,17 +78,17 @@ public class WeatherAPIRetrieverTests {
 
 // SET_FORMATTING_OFF
 
-      assertEquals(13.92f,                      tour.getWeather_Temperature_Average());
-      assertEquals(11,                          tour.getWeather_Wind_Speed());
-      assertEquals(121,                         tour.getWeather_Wind_Direction());
-      assertEquals("Ensoleille",                tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-sunny",             tour.getWeather_Clouds()); //$NON-NLS-1$
-      assertEquals(29,                          tour.getWeather_Humidity());
-      assertEquals(0.0,                         tour.getWeather_Precipitation());
-      assertEquals(1012.0,                      tour.getWeather_Pressure());
-      assertEquals(22.1f,                       tour.getWeather_Temperature_Max());
-      assertEquals(3.4f,                        tour.getWeather_Temperature_Min());
-      assertEquals(13.32f,                      tour.getWeather_Temperature_WindChill());
+      assertEquals(13.92f,          tour.getWeather_Temperature_Average());
+      assertEquals(11,              tour.getWeather_Wind_Speed());
+      assertEquals(121,             tour.getWeather_Wind_Direction());
+      assertEquals("Ensoleille",    tour.getWeather()); //$NON-NLS-1$
+      assertEquals("weather-sunny", tour.getWeather_Clouds()); //$NON-NLS-1$
+      assertEquals(29,              tour.getWeather_Humidity());
+      assertEquals(0.0,             tour.getWeather_Precipitation());
+      assertEquals(1012.0,          tour.getWeather_Pressure());
+      assertEquals(22.1f,           tour.getWeather_Temperature_Max());
+      assertEquals(3.4f,            tour.getWeather_Temperature_Min());
+      assertEquals(13.32f,          tour.getWeather_Temperature_WindChill());
 
 // SET_FORMATTING_ON
    }
