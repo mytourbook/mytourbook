@@ -18,12 +18,10 @@ package net.tourbook.weather.weatherapi;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javadocmd.simplelatlng.LatLng;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -43,22 +41,11 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 
    private static final String baseApiUrl    = WeatherUtils.HEROKU_APP_URL + "/weatherapi"; //$NON-NLS-1$
 
-   private LatLng              searchAreaCenter;
-   private long                tourEndTime;
-   private long                tourMiddleTime;
-   private long                tourStartTime;
-
    private HistoryResult       historyResult = null;
 
    public WeatherApiRetriever(final TourData tourData) {
 
       super(tourData);
-
-      searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(tour);
-
-      tourStartTime = tour.getTourStartTimeMS() / 1000;
-      tourEndTime = tour.getTourEndTimeMS() / 1000;
-      tourMiddleTime = tourStartTime + ((tourEndTime - tourStartTime) / 2);
    }
 
    public static String getBaseApiUrl() {
@@ -91,7 +78,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       }
 
       final String fullWeatherData = String.join(
-            net.tourbook.ui.UI.SYSTEM_NEW_LINE,
+            UI.SYSTEM_NEW_LINE,
             fullWeatherDataList);
 
       return fullWeatherData;
@@ -113,7 +100,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
          uriBuilder.setParameter("lon", String.valueOf(searchAreaCenter.getLongitude())); //$NON-NLS-1$
          uriBuilder.setParameter("lang", Locale.getDefault().getLanguage()); //$NON-NLS-1$
 
-         final String date = requestedDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")); //$NON-NLS-1$
+         final String date = requestedDate.format(TimeTools.Formatter_YearMonthDay);
 
          uriBuilder.setParameter("dt", date); //$NON-NLS-1$
          weatherRequestWithParameters = uriBuilder.build().toString();
@@ -147,8 +134,9 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       } catch (final Exception e) {
 
          StatusUtil.logError(
-               "WeatherApiRetriever.deserializeWeatherData : Error while deserializing the historical weather JSON object :" //$NON-NLS-1$
-                     + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
+               "WeatherApiRetriever.deserializeWeatherData : Error while " + //$NON-NLS-1$
+                     "deserializing the historical weather JSON object :" //$NON-NLS-1$
+                     + weatherDataResponse + UI.SYSTEM_NEW_LINE + e.getMessage());
       }
 
       return newHistoryResult;
@@ -163,9 +151,9 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 
       final LocalDate tomorrow = LocalDate.now().plusDays(1);
 
+      //Send an API request as long as we don't have the results covering the entire duration of the tour
       while (true) {
 
-         //Send an API request as long as we don't have the results covering the entire duration of the tour
          final String weatherRequestWithParameters = buildWeatherApiRequest(requestedDate);
 
          final String rawWeatherData = sendWeatherApiRequest(weatherRequestWithParameters);

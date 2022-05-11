@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.weather;
 
+import com.javadocmd.simplelatlng.LatLng;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -40,9 +42,19 @@ public abstract class HistoricalWeatherRetriever {
 
    public static HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
    public TourData          tour;
+   public LatLng            searchAreaCenter;
+   public long              tourEndTime;
+   public long              tourMiddleTime;
+   public long              tourStartTime;
 
    protected HistoricalWeatherRetriever(final TourData tourData) {
       tour = tourData;
+
+      searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(tour);
+
+      tourStartTime = tour.getTourStartTimeMS() / 1000;
+      tourEndTime = tour.getTourEndTimeMS() / 1000;
+      tourMiddleTime = tourStartTime + ((tourEndTime - tourStartTime) / 2);
    }
 
    /**

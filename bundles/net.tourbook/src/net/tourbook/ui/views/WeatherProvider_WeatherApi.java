@@ -18,10 +18,10 @@ package net.tourbook.ui.views;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.weatherapi.WeatherApiRetriever;
 import net.tourbook.web.WEB;
@@ -81,7 +81,7 @@ public class WeatherProvider_WeatherApi implements IWeatherProvider {
             HistoricalWeatherRetriever.checkVendorConnection(
                   WeatherApiRetriever.getBaseApiUrl() +
                         "?lat=0&lon=0&dt=" + //$NON-NLS-1$
-                        LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+                        LocalDate.now().format(TimeTools.Formatter_YearMonthDay),
                   IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI_ID);
          }));
 

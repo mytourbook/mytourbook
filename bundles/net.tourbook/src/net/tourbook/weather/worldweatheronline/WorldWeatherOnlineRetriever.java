@@ -25,7 +25,6 @@ import com.javadocmd.simplelatlng.util.LengthUnit;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -72,11 +71,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    private static final String    keyParameter = "?key=";                                                          //$NON-NLS-1$
 
    private String                 endDate;
-   private LatLng                 searchAreaCenter;
    private String                 startDate;
-   private long                   tourEndTime;
-   private long                   tourMiddleTime;
-   private long                   tourStartTime;
 
    private final IPreferenceStore prefStore    = TourbookPlugin.getPrefStore();
    private Data                   weatherData  = null;
@@ -89,13 +84,9 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
       super(tourData);
 
-      searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(tour);
-      startDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime()); //$NON-NLS-1$
-      endDate = DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tour.getTourStartTime().plusSeconds(tour.getTourDeviceTime_Elapsed())); //$NON-NLS-1$
-
-      tourStartTime = tour.getTourStartTimeMS() / 1000;
-      tourEndTime = tour.getTourEndTimeMS() / 1000;
-      tourMiddleTime = tourStartTime + ((tourEndTime - tourStartTime) / 2);
+      startDate = TimeTools.Formatter_YearMonthDay.format(tour.getTourStartTime());
+      endDate = TimeTools.Formatter_YearMonthDay.format(tour.getTourStartTime()
+            .plusSeconds(tour.getTourDeviceTime_Elapsed()));
    }
 
    public static String getApiUrl() {
@@ -168,7 +159,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       }
 
       final String fullWeatherData = String.join(
-            net.tourbook.ui.UI.SYSTEM_NEW_LINE,
+            UI.SYSTEM_NEW_LINE,
             fullWeatherDataList);
 
       return fullWeatherData;
@@ -258,19 +249,16 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
          serializedWeatherData = mapper.readValue(weatherResults, new TypeReference<Data>() {});
 
       } catch (final Exception e) {
+
          StatusUtil.logError(
-               "WorldWeatherOnlineRetriever.deserializeWeatherData : Error while deserializing the historical weather JSON object :" //$NON-NLS-1$
-                     + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
+               "WorldWeatherOnlineRetriever.deserializeWeatherData : Error while " + //$NON-NLS-1$
+                     "deserializing the historical weather JSON object :" //$NON-NLS-1$
+                     + weatherDataResponse + UI.SYSTEM_NEW_LINE + e.getMessage());
       }
 
       return serializedWeatherData;
    }
 
-   /**
-    * Retrieves the historical weather data
-    *
-    * @return The weather data, if found.
-    */
    @Override
    public boolean retrieveHistoricalWeatherData() {
 

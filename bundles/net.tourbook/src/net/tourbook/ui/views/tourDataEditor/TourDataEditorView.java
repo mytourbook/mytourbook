@@ -2181,7 +2181,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             sb.append(UI.TAB);
 
             // end of line
-            sb.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE);
+            sb.append(UI.SYSTEM_NEW_LINE);
             exportWriter.write(sb.toString());
          }
 
@@ -9559,7 +9559,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       sb.append(UI.TAB);
 
       // end of line
-      sb.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE);
+      sb.append(UI.SYSTEM_NEW_LINE);
       exportWriter.write(sb.toString());
    }
 }
