@@ -466,6 +466,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          _tagViewer.reveal(tagItem);
 
          _isModified = true;
+
+         fireModifyEvent();
       }
 
       setFocusToViewer();
@@ -607,7 +609,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
                   //                  System.out.println("dragStart");
                   transfer.setSelection(selection);
-                  transfer.setSelectionSetTime(_dragStartTime = event.time & 0xFFFFFFFFL);
+                  _dragStartTime = event.time & 0xFFFFFFFFL;
+                  transfer.setSelectionSetTime(_dragStartTime);
 
                   event.doit = !selection.isEmpty();
                }
@@ -1034,8 +1037,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       final Object parentItem = ((StructuredSelection) _tagViewer.getStructuredSelection()).getFirstElement();
       final TourTag tagToDuplicate = ((TVIPrefTag) parentItem).getTourTag();
 
+      //Deselecting the current selection so that the duplicate tag is a root tag
       _tagViewer.setSelection(null);
 
+      //todo fb
       createNewTourTag(tagToDuplicate.getTagName() + "DUPLICATE", tagToDuplicate.getNotes());
    }
 
@@ -1436,7 +1441,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       {
          final Object[] expandedElements = _tagViewer.getExpandedElements();
 
-         _tagViewer.setInput(_rootItem = new TVIPrefTagRoot(_tagViewer, true));
+         _rootItem = new TVIPrefTagRoot(_tagViewer, true);
+         _tagViewer.setInput(_rootItem);
          _tagViewer.setExpandedElements(expandedElements);
       }
       tree.setRedraw(true);

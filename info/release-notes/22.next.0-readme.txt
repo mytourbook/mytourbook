@@ -31,6 +31,10 @@ New
 * Tour Segmenter View (Frederic)
   - Added the ability to export the current view in .CSV format
 
+* Weather Retrieval (Frederic)
+  - New vendor addition: Weather API     
+    https://github.com/mytourbook/mytourbook/issues/505
+
 
 Improvements
 ============
@@ -61,6 +65,9 @@ Bugfix
 
 * Tour Editor (Frederic)
   - Fixed a bug where the recorded and paused times were not recomputed when using the feature "Delete Time Slices and Remove Time"
+
+* Tag View (Frederic)
+  - Fixed a bug where newly created tags that were immediately deleted were causing a NPE.
 
 
 Translation    
