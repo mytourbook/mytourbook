@@ -3743,7 +3743,7 @@ public class TourBook_ColumnFactory {
    }
 
    /**
-    * Column: Weather - Min temperature (measured from the device)
+    * Column: Weather - Combined Max temperature
     */
    private void defineColumn_Weather_Temperature_Max_Combined() {
 
@@ -3844,7 +3844,7 @@ public class TourBook_ColumnFactory {
    }
 
    /**
-    * Column: Weather - Min temperature (measured from the device)
+    * Column: Weather - Combined Min temperature
     */
    private void defineColumn_Weather_Temperature_Min_Combined() {
 
