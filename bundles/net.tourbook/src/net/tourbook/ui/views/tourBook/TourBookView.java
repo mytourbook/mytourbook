@@ -1432,7 +1432,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       /*
        * Setup other data
        */
-      final ArrayList<ColumnDefinition> allSortedColumns = _natTable_DataLoader.allSortedColumns;
+      final List<ColumnDefinition> allSortedColumns = _natTable_DataLoader.allSortedColumns;
 
       natTable_SetColumnWidths(allSortedColumns, _natTable_Body_DataLayer);
       natTable_RegisterColumnLabels(allSortedColumns, _natTable_Body_DataLayer, _natTable_ColumnHeader_DataLayer);
@@ -2335,7 +2335,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * @param body_DataLayer
     * @param columnHeader_DataLayer
     */
-   private void natTable_RegisterColumnLabels(final ArrayList<ColumnDefinition> allSortedColumns,
+   private void natTable_RegisterColumnLabels(final List<ColumnDefinition> allSortedColumns,
                                               final DataLayer body_DataLayer,
                                               final DataLayer columnHeader_DataLayer) {
 
@@ -2401,7 +2401,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * @param allSortedColumns
     * @param body_DataLayer
     */
-   private void natTable_SetColumnWidths(final ArrayList<ColumnDefinition> allSortedColumns, final DataLayer body_DataLayer) {
+   private void natTable_SetColumnWidths(final List<ColumnDefinition> allSortedColumns, final DataLayer body_DataLayer) {
 
       // set column widths
       for (int colIndex = 0; colIndex < allSortedColumns.size(); colIndex++) {
@@ -3171,7 +3171,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                   /**
                    * <code>
-                  
+
                      Caused by: java.lang.NullPointerException
                      at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                      at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -3189,13 +3189,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                      at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-                  
+
                      at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-                  
+
                      at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                      at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                      ... 22 more
-                  
+
                    * </code>
                    */
 
