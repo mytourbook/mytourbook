@@ -195,7 +195,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "Battery_Percentage_End," //                        90    //$NON-NLS-1$
 
             // -------- TEMPERATURES -----------
-            + "weather_Temperature_Average " //           91    //$NON-NLS-1$
+            + "weather_Temperature_Average," //           91    //$NON-NLS-1$
+            + "weather_Temperature_Max," //               92    //$NON-NLS-1$
+            + "weather_Temperature_Min " //               93    //$NON-NLS-1$
 
       ;
 
@@ -623,6 +625,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       // -------- TEMPERATURES -----------
 
       final float dbAvgTemperature = result.getFloat(91);
+      tourItem.colTemperature_Max = result.getFloat(92);
+      tourItem.colTemperature_Min = result.getFloat(93);
 
 // SET_FORMATTING_ON
 
