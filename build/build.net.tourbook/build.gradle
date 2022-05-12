@@ -157,6 +157,7 @@ task mt_40_ExtractWinFiles {
 
 /*
 * Run the functional tests
+* Initialli, I had => goals       'clean', 'package'
 */
 task mt_41_RunUIUnittests {
 
@@ -169,7 +170,7 @@ task mt_41_RunUIUnittests {
       mavenexec {
 
          workingDir  buildDir
-         goals       'clean', 'package'
+         goals       'package'
          threads '2C'
          quiet true
       }
