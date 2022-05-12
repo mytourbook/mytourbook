@@ -53,11 +53,11 @@ public class WeatherProvidersUI {
 
          new WeatherProvider(
                IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI_ID,
-               "Weather API"),                                                                  //$NON-NLS-1$
+               IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI_NAME),
 
          new WeatherProvider(
                IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_ID,
-               "World Weather Online")                                                          //$NON-NLS-1$
+               IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_NAME)
    };
 
    private List<IWeatherProvider>         _weatherProviders     = List.of(
