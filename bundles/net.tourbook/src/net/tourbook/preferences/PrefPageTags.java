@@ -145,6 +145,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
     */
    private ToolBar _toolBar;
 
+   private Button  _btnDuplicateTag;
    private Button  _btnEditTagOrCategory;
    private Button  _btnNewTag;
    private Button  _btnNewTagCategory;
@@ -338,6 +339,136 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       addPrefListener();
 
       return ui;
+   }
+
+   private void createNewTourTag(final String tagName, final String tagNotes) {
+
+      TourTag savedTag = null;
+
+      // create new tour tag + item
+      final TourTag tourTag = new TourTag(tagName);
+      tourTag.setNotes(tagNotes);
+      final TVIPrefTag tagItem = new TVIPrefTag(_tagViewer, tourTag);
+
+      final Object parentItem = ((StructuredSelection) _tagViewer.getSelection()).getFirstElement();
+      if (parentItem == null) {
+
+         // a parent is not selected, this will be a root tag
+
+         tourTag.setRoot(true);
+
+         /*
+          * Update model
+          */
+         tagItem.setParentItem(_rootItem);
+         _rootItem.getFetchedChildren().add(tagItem);
+
+         // persist tag
+         savedTag = TourDatabase.saveEntity(tourTag, TourDatabase.ENTITY_IS_NOT_SAVED, TourTag.class);
+
+         if (savedTag != null) {
+
+            // update item
+            tagItem.setTourTag(savedTag);
+
+            /*
+             * Update UI
+             */
+            _tagViewer.add(_rootItem, tagItem);
+         }
+
+      } else if (parentItem instanceof TVIPrefTagCategory) {
+
+         // parent is a category
+
+         final TVIPrefTagCategory parentCategoryItem = (TVIPrefTagCategory) parentItem;
+         TourTagCategory parentTagCategory = parentCategoryItem.getTourTagCategory();
+
+         /*
+          * update model
+          */
+
+         // set parent into tag
+         tagItem.setParentItem(parentCategoryItem);
+
+         /*
+          * persist tag without new category otherwise an exception "detached entity passed to
+          * persist: net.tourbook.data.TourTagCategory" is raised
+          */
+         savedTag = TourDatabase.saveEntity(tourTag, TourDatabase.ENTITY_IS_NOT_SAVED, TourTag.class);
+         if (savedTag != null) {
+
+            // update item
+            tagItem.setTourTag(savedTag);
+
+            // update parent category
+            final EntityManager em = TourDatabase.getInstance().getEntityManager();
+            {
+
+               final TourTagCategory parentTagCategoryEntity = em.find(
+                     TourTagCategory.class,
+                     parentTagCategory.getCategoryId());
+
+               // set new entity
+               parentTagCategory = parentTagCategoryEntity;
+               parentCategoryItem.setTourTagCategory(parentTagCategoryEntity);
+
+               // set tag into parent category
+               final Set<TourTag> lazyTourTags = parentTagCategoryEntity.getTourTags();
+               lazyTourTags.add(tourTag);
+
+               parentTagCategory.setTagCounter(lazyTourTags.size());
+            }
+            em.close();
+
+            // persist parent category
+            final TourTagCategory savedParent = TourDatabase.saveEntity(
+                  parentTagCategory,
+                  parentTagCategory.getCategoryId(),
+                  TourTagCategory.class);
+
+            if (savedParent != null) {
+
+               // update item
+               parentCategoryItem.setTourTagCategory(savedParent);
+
+               // set category in tag,
+// this seems to be not necessary
+//               tourTag.setTagCategory(parentTagCategory);
+
+               // persist tag with category
+               savedTag = TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
+
+            }
+
+         }
+
+         if (savedTag != null) {
+
+            // clear tour tag list
+            TourDatabase.clearTourTags();
+
+            /*
+             * update viewer
+             */
+            parentCategoryItem.clearChildren();
+
+            _tagViewer.add(parentCategoryItem, tagItem);
+            _tagViewer.update(parentCategoryItem, null);
+
+            _tagViewer.expandToLevel(parentCategoryItem, 1);
+         }
+      }
+
+      if (savedTag != null) {
+
+         // show new tag in viewer
+         _tagViewer.reveal(tagItem);
+
+         _isModified = true;
+      }
+
+      setFocusToViewer();
    }
 
    private Composite createUI(final Composite parent) {
@@ -538,6 +669,17 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             _btnEditTagOrCategory.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction_Edit_TagOrCategory()));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnEditTagOrCategory);
          }
+
+         {
+            // Button: Duplicate tag
+
+            _btnDuplicateTag = new Button(container, SWT.NONE);
+            _btnDuplicateTag.setText("TODO FB duplicate tag");//Messages.pref_tourtag_btn_new_tag);
+            //todo fb only enable this button when a tag is selected. Not even when more than 1 are selected
+            _btnDuplicateTag.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction_DuplicateTag()));
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnDuplicateTag);
+         }
+
          {
             // Button: reset
 
@@ -728,6 +870,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       final boolean isSelection = firstElement != null;
 
+      _btnDuplicateTag.setEnabled(isTagSelected && numTags == 1);
       _btnNewTag.setEnabled((isSelection == false || isCategorySelected && isTagSelected == false));
       _btnNewTagCategory.setEnabled((isSelection == false || isCategorySelected && isTagSelected == false));
 
@@ -849,7 +992,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
 
-         final ArrayList<TourTag> allSelectedTags = new ArrayList<>();
+         final List<TourTag> allSelectedTags = new ArrayList<>();
          for (final Object object : allSelection) {
 
             if (object instanceof TVIPrefTag) {
@@ -860,6 +1003,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             }
          }
 
+         //todo fb existing bug when creating a tour tag and deleting it creates an NPE
          if (allSelectedTags.size() > 0) {
 
             if (TagManager.deleteTourTag(allSelectedTags)) {
@@ -883,6 +1027,16 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       }
 
       setFocusToViewer();
+   }
+
+   private void onAction_DuplicateTag() {
+
+      final Object parentItem = ((StructuredSelection) _tagViewer.getStructuredSelection()).getFirstElement();
+      final TourTag tagToDuplicate = ((TVIPrefTag) parentItem).getTourTag();
+
+      _tagViewer.setSelection(null);
+
+      createNewTourTag(tagToDuplicate.getTagName() + "DUPLICATE", tagToDuplicate.getNotes());
    }
 
    /**
@@ -1092,131 +1246,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          return;
       }
 
-      TourTag savedTag = null;
-
-      // create new tour tag + item
-      final TourTag tourTag = new TourTag(inputDialog.getValue().trim());
-      final TVIPrefTag tagItem = new TVIPrefTag(_tagViewer, tourTag);
-
-      final Object parentItem = ((StructuredSelection) _tagViewer.getSelection()).getFirstElement();
-      if (parentItem == null) {
-
-         // a parent is not selected, this will be a root tag
-
-         tourTag.setRoot(true);
-
-         /*
-          * Update model
-          */
-         tagItem.setParentItem(_rootItem);
-         _rootItem.getFetchedChildren().add(tagItem);
-
-         // persist tag
-         savedTag = TourDatabase.saveEntity(tourTag, TourDatabase.ENTITY_IS_NOT_SAVED, TourTag.class);
-
-         if (savedTag != null) {
-
-            // update item
-            tagItem.setTourTag(savedTag);
-
-            /*
-             * Update UI
-             */
-            _tagViewer.add(_rootItem, tagItem);
-         }
-
-      } else if (parentItem instanceof TVIPrefTagCategory) {
-
-         // parent is a category
-
-         final TVIPrefTagCategory parentCategoryItem = (TVIPrefTagCategory) parentItem;
-         TourTagCategory parentTagCategory = parentCategoryItem.getTourTagCategory();
-
-         /*
-          * update model
-          */
-
-         // set parent into tag
-         tagItem.setParentItem(parentCategoryItem);
-
-         /*
-          * persist tag without new category otherwise an exception "detached entity passed to
-          * persist: net.tourbook.data.TourTagCategory" is raised
-          */
-         savedTag = TourDatabase.saveEntity(tourTag, TourDatabase.ENTITY_IS_NOT_SAVED, TourTag.class);
-         if (savedTag != null) {
-
-            // update item
-            tagItem.setTourTag(savedTag);
-
-            // update parent category
-            final EntityManager em = TourDatabase.getInstance().getEntityManager();
-            {
-
-               final TourTagCategory parentTagCategoryEntity = em.find(
-                     TourTagCategory.class,
-                     parentTagCategory.getCategoryId());
-
-               // set new entity
-               parentTagCategory = parentTagCategoryEntity;
-               parentCategoryItem.setTourTagCategory(parentTagCategoryEntity);
-
-               // set tag into parent category
-               final Set<TourTag> lazyTourTags = parentTagCategoryEntity.getTourTags();
-               lazyTourTags.add(tourTag);
-
-               parentTagCategory.setTagCounter(lazyTourTags.size());
-            }
-            em.close();
-
-            // persist parent category
-            final TourTagCategory savedParent = TourDatabase.saveEntity(
-                  parentTagCategory,
-                  parentTagCategory.getCategoryId(),
-                  TourTagCategory.class);
-
-            if (savedParent != null) {
-
-               // update item
-               parentCategoryItem.setTourTagCategory(savedParent);
-
-               // set category in tag,
-// this seems to be not necessary
-//               tourTag.setTagCategory(parentTagCategory);
-
-               // persist tag with category
-               savedTag = TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
-
-            }
-
-         }
-
-         if (savedTag != null) {
-
-            // clear tour tag list
-            TourDatabase.clearTourTags();
-
-            /*
-             * update viewer
-             */
-            parentCategoryItem.clearChildren();
-
-            _tagViewer.add(parentCategoryItem, tagItem);
-            _tagViewer.update(parentCategoryItem, null);
-
-            _tagViewer.expandToLevel(parentCategoryItem, 1);
-         }
-      }
-
-      if (savedTag != null) {
-
-         // show new tag in viewer
-         _tagViewer.reveal(tagItem);
-
-         _isModified = true;
-      }
-
-      setFocusToViewer();
+      createNewTourTag(inputDialog.getValue().trim(), UI.EMPTY_STRING);
    }
 
    private void onAction_Reset() {
