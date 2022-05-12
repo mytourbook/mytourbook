@@ -35,6 +35,9 @@ New
   - New vendor addition: Weather API     
     https://github.com/mytourbook/mytourbook/issues/505
 
+* Tag View (Frederic)
+  - Added the ability to duplicate a tag
+
 
 Improvements
 ============

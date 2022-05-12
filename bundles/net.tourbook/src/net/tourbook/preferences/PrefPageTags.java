@@ -677,8 +677,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             // Button: Duplicate tag
 
             _btnDuplicateTag = new Button(container, SWT.NONE);
-            _btnDuplicateTag.setText("TODO FB duplicate tag");//Messages.pref_tourtag_btn_new_tag);
-            //todo fb only enable this button when a tag is selected. Not even when more than 1 are selected
+            _btnDuplicateTag.setText(Messages.PrefPage_TourTag_Button_DuplicateTag);
             _btnDuplicateTag.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction_DuplicateTag()));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnDuplicateTag);
          }
@@ -1006,7 +1005,6 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
             }
          }
 
-         //todo fb existing bug when creating a tour tag and deleting it creates an NPE
          if (allSelectedTags.size() > 0) {
 
             if (TagManager.deleteTourTag(allSelectedTags)) {
@@ -1040,8 +1038,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       //Deselecting the current selection so that the duplicate tag is a root tag
       _tagViewer.setSelection(null);
 
-      //todo fb
-      createNewTourTag(tagToDuplicate.getTagName() + "DUPLICATE", tagToDuplicate.getNotes());
+      createNewTourTag(tagToDuplicate.getTagName() + UI.SPACE + Messages.PrefPage_TourTag_Label_Duplicate,
+            tagToDuplicate.getNotes());
    }
 
    /**

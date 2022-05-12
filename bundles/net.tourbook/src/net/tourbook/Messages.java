@@ -1359,6 +1359,9 @@ public class Messages extends NLS {
    public static String        PrefPage_Import_Default_CadenceValue_Tooltip;
    public static String        PrefPage_Import_Label_Info;
 
+   public static String        PrefPage_TourTag_Button_DuplicateTag;
+   public static String        PrefPage_TourTag_Label_Duplicate;
+
    public static String        PrefPage_ViewActions_Group;
    public static String        PrefPage_ViewActions_Label_DoubleClick;
    public static String        PrefPage_ViewActions_Label_DoubleClick_AdjustAltitude;
