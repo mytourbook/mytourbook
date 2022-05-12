@@ -170,6 +170,8 @@ task mt_41_RunUIUnittests {
 
          workingDir  buildDir
          goals       'clean', 'package'
+         threads '2C'
+         quiet true
       }
    }
 }
