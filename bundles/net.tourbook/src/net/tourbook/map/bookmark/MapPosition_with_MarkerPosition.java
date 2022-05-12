@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  * Copyright 2012 Hannes Janetzek
  * Copyright (C) 2019 Thomas Theussing
  *
@@ -29,26 +29,30 @@ public class MapPosition_with_MarkerPosition extends org.oscim.core.MapPosition 
    public double mapPositionMarkerY;
 
    public MapPosition_with_MarkerPosition() {
+      
       super();
+      
       this.mapPositionMarkerX = 0.5;
       this.mapPositionMarkerY = 0.5;
    }
 
    public MapPosition_with_MarkerPosition(final double latitude, final double longitude, final int scale) {
+      
       super(latitude, longitude, scale);
    }
 
    //TODO: this constuctor is not used yet. lat/long must be converted to mercador first, or?
    public MapPosition_with_MarkerPosition(final double latitude, final double longitude, final int scale, final double markerLatitude, final double markerLongitude) {
+      
       super(latitude, longitude, scale);
       //this.mapPositionMarkerY = markerLatitude;
       //this.mapPositionMarkerX = markerLongitude;
    }
 
    public MapPosition_with_MarkerPosition(final MapPosition mapPosition) {
-      
+
       super(mapPosition.getLatitude(), mapPosition.getLongitude(), mapPosition.scale);
-      
+
       this.bearing = mapPosition.bearing;
       this.roll = mapPosition.roll;
       this.zoomLevel = mapPosition.zoomLevel;
@@ -59,9 +63,6 @@ public class MapPosition_with_MarkerPosition extends org.oscim.core.MapPosition 
 
       this.mapPositionMarkerX = mapPosition.x;
       this.mapPositionMarkerY = mapPosition.y;
-
-      System.out.println("constructor lat: " + mapPosition.getLatitude() + " lon: " + mapPosition.getLongitude()); //$NON-NLS-1$ //$NON-NLS-2$
-      System.out.println("constructor y: " + mapPositionMarkerY + " x: " + mapPositionMarkerX); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    public double getMapPositionMarkerX() {

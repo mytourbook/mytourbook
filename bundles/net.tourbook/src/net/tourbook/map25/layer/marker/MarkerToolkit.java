@@ -357,10 +357,6 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       return shapeBitmap;
    }
 
-   private void debugPrint(final String debugText) {
-      net.tourbook.map25.Map25App.debugPrint(debugText);
-   }
-
    private Bitmap drawCircle(final int bitmapCircleSize) {
 
       final float half = bitmapCircleSize / 2;
@@ -446,19 +442,19 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       final MarkerItem item = (MarkerItem) mi;
 
-      debugPrint(
-            " Markertoolkit: " //$NON-NLS-1$
-                  +
-                  (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
-                  + ("\tonItemLongpress") //$NON-NLS-1$
-                  + ("\tMapbookmark") //$NON-NLS-1$
-                  + ("\tTitle:" + item.getTitle()) //$NON-NLS-1$
-                  + ("\tDescription:" + item.description) //$NON-NLS-1$
-                  + ("\tindex:" + index) //$NON-NLS-1$
-      //+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true") //$NON-NLS-1$ //$NON-NLS-2$
-
-      //Pref_Map25_Encoding_Mapsforge
-      );
+//      debugPrint(
+//            " Markertoolkit: " //$NON-NLS-1$
+//                  +
+//                  (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
+//                  + ("\tonItemLongpress") //$NON-NLS-1$
+//                  + ("\tMapbookmark") //$NON-NLS-1$
+//                  + ("\tTitle:" + item.getTitle()) //$NON-NLS-1$
+//                  + ("\tDescription:" + item.description) //$NON-NLS-1$
+//                  + ("\tindex:" + index) //$NON-NLS-1$
+//      //+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true") //$NON-NLS-1$ //$NON-NLS-2$
+//
+//      //Pref_Map25_Encoding_Mapsforge
+//      );
 
       if (item.getMarker() == null) {
 
@@ -486,19 +482,19 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       final MarkerItem item = (MarkerItem) mi;
 
-      debugPrint(
-            " MarkerToolkit: " //$NON-NLS-1$
-                  +
-                  (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
-                  + ("\tonItemSingleTapUp") //$NON-NLS-1$
-                  + ("\tMapbookmark") //$NON-NLS-1$
-                  + ("\tTitle:" + item.getTitle()) //$NON-NLS-1$
-                  + ("\tDescription:" + item.description) //$NON-NLS-1$
-                  + ("\tindex:" + index) //$NON-NLS-1$
-      //+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true") //$NON-NLS-1$ //$NON-NLS-2$
-
-      //Pref_Map25_Encoding_Mapsforge
-      );
+//      debugPrint(
+//            " MarkerToolkit: " //$NON-NLS-1$
+//                  +
+//                  (UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") //$NON-NLS-1$ //$NON-NLS-2$
+//                  + ("\tonItemSingleTapUp") //$NON-NLS-1$
+//                  + ("\tMapbookmark") //$NON-NLS-1$
+//                  + ("\tTitle:" + item.getTitle()) //$NON-NLS-1$
+//                  + ("\tDescription:" + item.description) //$NON-NLS-1$
+//                  + ("\tindex:" + index) //$NON-NLS-1$
+//      //+ ("\t_isMapItemHit:" + _isMapItemHit + " -> true") //$NON-NLS-1$ //$NON-NLS-2$
+//
+//      //Pref_Map25_Encoding_Mapsforge
+//      );
 
       if (item.getMarker() == null) {
 
