@@ -438,8 +438,16 @@ public class Messages extends NLS {
    public static String        ColumnFactory_Temperature_Avg_Tooltip;
    public static String        ColumnFactory_Temperature_Max_Label;
    public static String        ColumnFactory_Temperature_Max_Tooltip;
+   public static String        ColumnFactory_Temperature_Max_Combined_Label;
+   public static String        ColumnFactory_Temperature_Max_Combined_Tooltip;
+   public static String        ColumnFactory_Temperature_Max_Device_Label;
+   public static String        ColumnFactory_Temperature_Max_Device_Tooltip;
    public static String        ColumnFactory_Temperature_Min_Label;
    public static String        ColumnFactory_Temperature_Min_Tooltip;
+   public static String        ColumnFactory_Temperature_Min_Combined_Label;
+   public static String        ColumnFactory_Temperature_Min_Combined_Tooltip;
+   public static String        ColumnFactory_Temperature_Min_Device_Label;
+   public static String        ColumnFactory_Temperature_Min_Device_Tooltip;
 
    public static String        ColumnFactory_TimeDelta_Header;
    public static String        ColumnFactory_TimeDelta_Label;
