@@ -399,6 +399,9 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       updateMap(mapProvider);
    }
 
+   /**
+    * Theme style is set only for offline maps
+    */
    private void onSelect_ThemeStyle() {
 
       if (_isInUpdateUI) {

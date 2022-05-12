@@ -27,6 +27,7 @@ import com.badlogic.gdx.utils.SharedLibraryLoader;
 import java.awt.Canvas;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -84,12 +85,17 @@ import org.oscim.scalebar.MapScaleBarLayer;
 import org.oscim.scalebar.MetricUnitAdapter;
 import org.oscim.theme.ExternalRenderTheme;
 import org.oscim.theme.IRenderTheme;
+import org.oscim.theme.RenderTheme;
 import org.oscim.theme.ThemeFile;
 import org.oscim.theme.ThemeLoader;
 import org.oscim.theme.VtmThemes;
 import org.oscim.theme.XmlRenderThemeMenuCallback;
 import org.oscim.theme.XmlRenderThemeStyleLayer;
 import org.oscim.theme.XmlRenderThemeStyleMenu;
+import org.oscim.theme.rule.Rule;
+import org.oscim.theme.rule.Rule.RuleVisitor;
+import org.oscim.theme.styles.ExtrusionStyle;
+import org.oscim.theme.styles.RenderStyle;
 import org.oscim.tiling.TileSource;
 import org.oscim.tiling.TileSource.OpenResult;
 import org.oscim.tiling.source.UrlTileSource;
@@ -109,8 +115,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    /**
     * When <code>true</code> then <b>net.tourbook.ext.vtm</b> plugin is used, when
     * <code>false</code> then <b>vtm-parent</b> plugin for map25 development is used.
+    * <p>
+    * <b>Before releasing, set this to <code>true</code></b>
+    * <p>
     */
-   private static final boolean    IS_USING_VTM_PRODUCTION_PLUGIN    = true;                                   // before releasing, set this TRUE
+   private static final boolean    IS_USING_VTM_PRODUCTION_PLUGIN    = true;
    //
    private static final String     STATE_MAP_POS_X                   = "STATE_MAP_POS_X";                      //$NON-NLS-1$
    private static final String     STATE_MAP_POS_Y                   = "STATE_MAP_POS_Y";                      //$NON-NLS-1$
@@ -183,6 +192,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private TileSource              _currentOffline_TileSource;
    private String                  _currentOffline_TileSource_FilePath;
    //
+   private int                     _buildingMinZoomLevel             = 15;
+   //
    private MarkerToolkit           _tourMarkerToolkit                = new MarkerToolkit(MarkerShape.STAR);
    // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
    private MarkerMode              _tourMarkerMode                   = MarkerMode.NORMAL;
@@ -202,6 +213,48 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * Is <code>true</code> when a tour marker is hit.
     */
    private boolean      _isMapItemHit;
+
+   private static class MinZoomRuleVisitor extends RuleVisitor {
+
+      private int _minZoomMask;
+
+      public MinZoomRuleVisitor(final int minZoomLevel) {
+
+         _minZoomMask = 1 << minZoomLevel;
+      }
+
+      @Override
+      public void apply(final Rule rule) {
+
+         for (final RenderStyle<?> style : rule.styles) {
+
+            if (style instanceof ExtrusionStyle) {
+
+               /*
+                * Using reflection because the zoom field is final and the 2.5D author do not want
+                * to modify it
+                * https://github.com/mapsforge/vtm/discussions/927#discussioncomment-2735903
+                */
+               try {
+
+                  final Field zoomField = rule.getClass().getField("zoom"); //$NON-NLS-1$
+
+                  zoomField.setAccessible(true);
+                  zoomField.setInt(rule, _minZoomMask);
+
+               } catch (NoSuchFieldException
+                     | SecurityException
+                     | IllegalArgumentException
+                     | IllegalAccessException e) {
+
+                  e.printStackTrace();
+               }
+            }
+         }
+
+         super.apply(rule);
+      }
+   }
 
    private static enum OffOnline {
       IS_ONLINE, IS_OFFLINE
@@ -498,11 +551,17 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       /*
        * Buildings
        */
+      final boolean isShadow = true;
+      final int minZoom = _buildingMinZoomLevel;
+      final int maxZoom = mMap.viewport().getMaxZoomLevel();
+
       // this is working with subtheme switching, but no online buildings anymore
       _layer_Building_S3DB = new S3DBLayer(mMap, _layer_BaseMap, true);
+      _layer_Building_S3DB = new S3DBLayer(mMap, _layer_BaseMap, minZoom, maxZoom, isShadow);
 
       // building is not working with online maps, so deactvated also the shadow
-      _layer_Building_Default = new BuildingLayer(mMap, _layer_BaseMap, true, true);
+//    _layer_Building_Default = new BuildingLayer(mMap, _layer_BaseMap, true, true);
+      _layer_Building_Default = new BuildingLayer(mMap, _layer_BaseMap, minZoom, maxZoom, true, isShadow);
 
       if (isOfflineMap) {
 
@@ -1096,8 +1155,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       _selectedMapProvider = mapProvider;
 
-//      mMap.setTheme(VtmThemes.DEFAULT);
-
       if (mapProvider.tileEncoding == TileEncoding.MF) {
 
          // offline map
@@ -1149,12 +1206,20 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
        * Set theme when changed
        */
       final ThemeFile mapProviderTheme = getTheme_Online(mapProvider);
+
       if (isUpdateAll || mapProviderTheme != _currentOnline_MapProviderTheme) {
 
          _currentOnline_MapProviderTheme = mapProviderTheme;
 
-         final IRenderTheme renderTheme = ThemeLoader.load(mapProviderTheme);
-         mMap.setTheme(renderTheme, false);
+         final IRenderTheme loadedRenderTheme = ThemeLoader.load(mapProviderTheme);
+         mMap.setTheme(loadedRenderTheme, false);
+
+         /*
+          * Adjust building min zoom level
+          */
+         final RenderTheme modifiedRenderTheme = (RenderTheme) loadedRenderTheme;
+         modifiedRenderTheme.traverseRules(new MinZoomRuleVisitor(_buildingMinZoomLevel));
+         modifiedRenderTheme.updateStyles();
       }
    }
 
@@ -1296,7 +1361,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
        */
       setupMapLayers_SetTileLoadingLayer(_layer_Satellite_TILE_LOADING, _layer_Satellite_AFTER);
       setupMapLayers_SetTileLoadingLayer(_layer_HillShading_TILE_LOADING, _layer_HillShading_AFTER);
-
    }
 
    private void setupMapLayers_SetTileLoadingLayer(final BitmapTileLayer tileLoadingLayer, final Layer tileLoading_AFTER) {

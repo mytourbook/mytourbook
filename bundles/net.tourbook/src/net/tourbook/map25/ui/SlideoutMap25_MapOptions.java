@@ -162,6 +162,31 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
          {
             /*
+             * Scale
+             */
+            _chkShowLayer_Scale = new Button(group, SWT.CHECK);
+            _chkShowLayer_Scale.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_ScaleBar);
+            _chkShowLayer_Scale.addSelectionListener(_layerSelectionListener);
+         }
+         {
+            /*
+             * Cartography / map
+             */
+            _chkShowLayer_Cartography = new Button(group, SWT.CHECK);
+            _chkShowLayer_Cartography.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Cartography);
+            _chkShowLayer_Cartography.setToolTipText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip);
+            _chkShowLayer_Cartography.addSelectionListener(_layerSelectionListener);
+         }
+         {
+            /*
+             * Satellite images
+             */
+            _chkShowLayer_Satellite = new Button(group, SWT.CHECK);
+            _chkShowLayer_Satellite.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Satellite);
+            _chkShowLayer_Satellite.addSelectionListener(_layerSelectionListener);
+         }
+         {
+            /*
              * Hillshading
              */
             final Composite containerHillshading = new Composite(group, SWT.NONE);
@@ -194,31 +219,6 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
                   });
                }
             }
-         }
-         {
-            /*
-             * Scale
-             */
-            _chkShowLayer_Scale = new Button(group, SWT.CHECK);
-            _chkShowLayer_Scale.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_ScaleBar);
-            _chkShowLayer_Scale.addSelectionListener(_layerSelectionListener);
-         }
-         {
-            /*
-             * Cartography / map
-             */
-            _chkShowLayer_Cartography = new Button(group, SWT.CHECK);
-            _chkShowLayer_Cartography.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Cartography);
-            _chkShowLayer_Cartography.setToolTipText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip);
-            _chkShowLayer_Cartography.addSelectionListener(_layerSelectionListener);
-         }
-         {
-            /*
-             * Satellite images
-             */
-            _chkShowLayer_Satellite = new Button(group, SWT.CHECK);
-            _chkShowLayer_Satellite.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Satellite);
-            _chkShowLayer_Satellite.addSelectionListener(_layerSelectionListener);
          }
          {
             /*
