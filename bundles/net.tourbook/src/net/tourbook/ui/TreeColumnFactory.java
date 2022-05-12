@@ -2386,19 +2386,19 @@ public abstract class TreeColumnFactory {
 
       WEATHER_TEMPERATURE_AVG = createTreeColumnFactory_Temperature(
             "WEATHER_TEMPERATURE_AVG",
-            UI.SYMBOL_AVERAGE_WITH_SPACE,
+            UI.SYMBOL_AVERAGE,
             Messages.ColumnFactory_Temperature_Avg_Label,
             Messages.ColumnFactory_Temperature_Avg_Tooltip);
 
       WEATHER_TEMPERATURE_AVG_COMBINED = createTreeColumnFactory_Temperature(
             "WEATHER_TEMPERATURE_AVG_COMBINED",
-            UI.SYMBOL_AVERAGE_WITH_SPACE,
+            UI.SYMBOL_AVERAGE,
             Messages.ColumnFactory_Temperature_Avg_Combined_Label,
             Messages.ColumnFactory_Temperature_Avg_Combined_Tooltip);
 
       WEATHER_TEMPERATURE_AVG_DEVICE = createTreeColumnFactory_Temperature(
             "WEATHER_TEMPERATURE_AVG_DEVICE",
-            UI.SYMBOL_AVERAGE_WITH_SPACE,
+            UI.SYMBOL_AVERAGE,
             Messages.ColumnFactory_Temperature_Avg_Device_Label,
             Messages.ColumnFactory_Temperature_Avg_Device_Tooltip);
 

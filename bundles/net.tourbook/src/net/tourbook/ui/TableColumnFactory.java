@@ -4434,19 +4434,19 @@ public abstract class TableColumnFactory {
 
       WEATHER_TEMPERATURE_AVG = createTableColumnFactory_Temperature(
             WEATHER_TEMPERATURE_AVG_ID,
-            UI.SYMBOL_AVERAGE_WITH_SPACE,
+            UI.SYMBOL_AVERAGE,
             Messages.ColumnFactory_Temperature_Avg_Label,
             Messages.ColumnFactory_Temperature_Avg_Tooltip);
 
       WEATHER_TEMPERATURE_AVG_COMBINED = createTableColumnFactory_Temperature(
             WEATHER_TEMPERATURE_AVG_COMBINED_ID,
-            UI.SYMBOL_AVERAGE_WITH_SPACE,
+            UI.SYMBOL_AVERAGE,
             Messages.ColumnFactory_Temperature_Avg_Combined_Label,
             Messages.ColumnFactory_Temperature_Avg_Combined_Tooltip);
 
       WEATHER_TEMPERATURE_AVG_DEVICE = createTableColumnFactory_Temperature(
             WEATHER_TEMPERATURE_AVG_DEVICE_ID,
-            UI.SYMBOL_AVERAGE_WITH_SPACE,
+            UI.SYMBOL_AVERAGE,
             Messages.ColumnFactory_Temperature_Avg_Device_Label,
             Messages.ColumnFactory_Temperature_Avg_Device_Tooltip);
 
