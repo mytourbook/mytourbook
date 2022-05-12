@@ -19,7 +19,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
@@ -79,7 +80,7 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
     * Id's for the tags or <code>null</code> when tags are not available.
     */
    private ArrayList<Long>        _tagIds;
-   HashSet<Long>                  sqlTagIds;
+   Set<Long>                      sqlTagIds;
 
    /**
     * Tour start time in ms.
@@ -180,7 +181,7 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
       colPausedTime = colElapsedTime - colRecordedTime;
    }
 
-   public ArrayList<Long> getTagIds() {
+   public List<Long> getTagIds() {
 
       if (sqlTagIds != null && _tagIds == null) {
          _tagIds = new ArrayList<>(sqlTagIds);
@@ -194,7 +195,7 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
       return null;
    }
 
-   public void setTagIds(final HashSet<Long> tagIds) {
+   public void setTagIds(final Set<Long> tagIds) {
       sqlTagIds = tagIds;
    }
 
