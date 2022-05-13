@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,13 +13,18 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.device;
+package net.tourbook.weather.weatherapi;
 
-public interface IPreferences {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-   String GPX_IS_RELATIVE_DISTANCE_VALUE = "GPX_IS_RELATIVE_DISTANCE_VALUE"; //$NON-NLS-1$
+import java.util.List;
 
-   String SUUNTO9_ALTITUDE_DATA_SOURCE   = "SUUNTO9_ALTITUDE_DATA_SOURCE";   //$NON-NLS-1$
-   String SUUNTO9_DISTANCE_DATA_SOURCE   = "Suunto9_DISTANCE_DATA_SOURCE";   //$NON-NLS-1$
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Forecast {
 
+   private List<Forecastday> forecastday;
+
+   public List<Forecastday> getForecastday() {
+      return forecastday;
+   }
 }

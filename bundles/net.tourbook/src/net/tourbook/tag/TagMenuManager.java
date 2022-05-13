@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Images;
@@ -48,7 +49,6 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Point;
@@ -118,12 +118,7 @@ public class TagMenuManager {
 
       @Override
       public void run() {
-         BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-            @Override
-            public void run() {
-               runnableRemoveAllTags();
-            }
-         });
+         BusyIndicator.showWhile(Display.getCurrent(), TagMenuManager.this::runnableRemoveAllTags);
       }
    }
 
@@ -240,22 +235,19 @@ public class TagMenuManager {
    private static void addPrefListener() {
 
       // create pref listener
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
-            final String property = event.getProperty();
+      _prefChangeListener = propertyChangeEvent -> {
+         final String property = propertyChangeEvent.getProperty();
 
-            // check if the number of recent tags has changed
-            if (property.equals(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS)) {
+         // check if the number of recent tags has changed
+         if (property.equals(ITourbookPreferences.APPEARANCE_NUMBER_OF_RECENT_TAGS)) {
 
-               setupRecentActions();
+            setupRecentActions();
 
-            } else if (property.equals(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN)
-                  || property.equals(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION)
-                  || property.equals(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY)) {
+         } else if (property.equals(ITourbookPreferences.APPEARANCE_IS_TAGGING_AUTO_OPEN)
+               || property.equals(ITourbookPreferences.APPEARANCE_IS_TAGGING_ANIMATION)
+               || property.equals(ITourbookPreferences.APPEARANCE_TAGGING_AUTO_OPEN_DELAY)) {
 
-               restoreAutoOpen();
-            }
+            restoreAutoOpen();
          }
       };
 
@@ -496,7 +488,7 @@ public class TagMenuManager {
     */
    public void enableTagActions(final boolean isTourSelected,
                                 final boolean isOneTour,
-                                final ArrayList<Long> oneTourTagIds) {
+                                final List<Long> oneTourTagIds) {
 
       final boolean isAddTagEnabled = isTourSelected;
       final boolean isRemoveTagEnabled;
@@ -761,49 +753,45 @@ public class TagMenuManager {
     */
    void saveTourTags(final HashMap<Long, TourTag> modifiedTags, final boolean isAddMode) {
 
-      final Runnable runnable = new Runnable() {
+      final Runnable runnable = () -> {
 
-         @Override
-         public void run() {
+         final ArrayList<TourData> modifiedTours = _tourProvider.getSelectedTours();
 
-            final ArrayList<TourData> modifiedTours = _tourProvider.getSelectedTours();
-
-            // get tours which tag should be changed
-            if (modifiedTours == null || modifiedTours.isEmpty()) {
-               return;
-            }
-
-            final Collection<TourTag> tagCollection = modifiedTags.values();
-
-            // add the tag into all selected tours
-            for (final TourData tourData : modifiedTours) {
-
-               // set tag into tour
-               final Set<TourTag> tourTags = tourData.getTourTags();
-
-               if (isAddMode) {
-                  // add tag to the tour
-                  tourTags.addAll(tagCollection);
-               } else {
-                  // remove tag from tour
-                  tourTags.removeAll(tagCollection);
-               }
-            }
-
-            // update recent tags
-            for (final TourTag tag : tagCollection) {
-               _recentTags.remove(tag);
-               _recentTags.addFirst(tag);
-            }
-
-            // it's possible that both hash maps are the same when previous tags has been added as last
-            if (_allPreviousTags != modifiedTags) {
-               _allPreviousTags.clear();
-               _allPreviousTags.putAll(modifiedTags);
-            }
-
-            saveAndNotify(modifiedTags, modifiedTours);
+         // get tours which tag should be changed
+         if (modifiedTours == null || modifiedTours.isEmpty()) {
+            return;
          }
+
+         final Collection<TourTag> tagCollection = modifiedTags.values();
+
+         // add the tag into all selected tours
+         for (final TourData tourData : modifiedTours) {
+
+            // set tag into tour
+            final Set<TourTag> tourTags = tourData.getTourTags();
+
+            if (isAddMode) {
+               // add tag to the tour
+               tourTags.addAll(tagCollection);
+            } else {
+               // remove tag from tour
+               tourTags.removeAll(tagCollection);
+            }
+         }
+
+         // update recent tags
+         for (final TourTag tag : tagCollection) {
+            _recentTags.remove(tag);
+            _recentTags.addFirst(tag);
+         }
+
+         // it's possible that both hash maps are the same when previous tags has been added as last
+         if (_allPreviousTags != modifiedTags) {
+            _allPreviousTags.clear();
+            _allPreviousTags.putAll(modifiedTags);
+         }
+
+         saveAndNotify(modifiedTags, modifiedTours);
       };
 
       BusyIndicator.showWhile(Display.getCurrent(), runnable);

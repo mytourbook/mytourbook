@@ -17,13 +17,13 @@ package net.tourbook.ui.views;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.LocalDate;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.weather.HistoricalWeatherRetriever;
-import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
+import net.tourbook.weather.weatherapi.WeatherApiRetriever;
 import net.tourbook.web.WEB;
 
 import org.eclipse.jface.layout.GridDataFactory;
@@ -35,16 +35,16 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
+public class WeatherProvider_WeatherApi implements IWeatherProvider {
 
-   private static final String URL_OPENWEATHERMAP_ORG = "https://openweathermap.org/";//$NON-NLS-1$
+   private static final String URL_WEATHERAPI_COM = "https://www.weatherapi.com/";//$NON-NLS-1$
 
    /*
     * UI controls
     */
    private Button _btnTestConnection;
 
-   public WeatherProvider_OpenWeatherMap() {}
+   public WeatherProvider_WeatherApi() {}
 
    @Override
    public Composite createUI(final WeatherProvidersUI weatherProvidersUI,
@@ -58,12 +58,12 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
          /*
-          * OpenWeatherMap webpage
+          * Weather API webpage
           */
          final Link linkApiSignup = new Link(container, SWT.PUSH);
-         linkApiSignup.setText(UI.LINK_TAG_START + URL_OPENWEATHERMAP_ORG + UI.LINK_TAG_END);
+         linkApiSignup.setText(UI.LINK_TAG_START + URL_WEATHERAPI_COM + UI.LINK_TAG_END);
          linkApiSignup.setEnabled(true);
-         linkApiSignup.addListener(SWT.Selection, event -> WEB.openUrl(URL_OPENWEATHERMAP_ORG));
+         linkApiSignup.addListener(SWT.Selection, event -> WEB.openUrl(URL_WEATHERAPI_COM));
 
          GridDataFactory.fillDefaults()
                .span(2, 1)
@@ -78,16 +78,11 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
          _btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
          _btnTestConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-            final var previousHour = Instant
-                  .now()
-                  .minus(1, ChronoUnit.HOURS)
-                  .toEpochMilli() / 1000;
-
             HistoricalWeatherRetriever.checkVendorConnection(
-                  OpenWeatherMapRetriever.getBaseApiUrl() +
-                        "?units=metric&lat=0&lon=0&dt=" + //$NON-NLS-1$
-                        previousHour,
-                  IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP_ID);
+                  WeatherApiRetriever.getBaseApiUrl() +
+                        "?lat=0&lon=0&dt=" + //$NON-NLS-1$
+                        LocalDate.now().format(TimeTools.Formatter_YearMonthDay),
+                  IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI_NAME);
          }));
 
          GridDataFactory.fillDefaults()
@@ -102,7 +97,7 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
           * Label:
           */
          final Label note = new Label(container, SWT.NONE);
-         note.setText(Messages.Pref_Weather_OpenWeatherMap_Label_FiveDaysLimit);
+         note.setText(Messages.Pref_Weather_WeatherApi_Label_SevenDaysLimit);
 
          GridDataFactory.fillDefaults()
                .indent(defaultHIndent, 0)

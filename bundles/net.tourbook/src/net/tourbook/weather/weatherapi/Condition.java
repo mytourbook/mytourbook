@@ -1,25 +1,30 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
- *
+ * Copyright (C) 2022 Frédéric Bard
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.device;
+package net.tourbook.weather.weatherapi;
 
-public interface IPreferences {
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-   String GPX_IS_RELATIVE_DISTANCE_VALUE = "GPX_IS_RELATIVE_DISTANCE_VALUE"; //$NON-NLS-1$
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Condition {
 
-   String SUUNTO9_ALTITUDE_DATA_SOURCE   = "SUUNTO9_ALTITUDE_DATA_SOURCE";   //$NON-NLS-1$
-   String SUUNTO9_DISTANCE_DATA_SOURCE   = "Suunto9_DISTANCE_DATA_SOURCE";   //$NON-NLS-1$
+   private String text;
+   private int    code;
 
+   public int getCode() {
+      return code;
+   }
+
+   public String getText() {
+      return text;
+   }
 }
