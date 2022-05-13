@@ -6523,9 +6523,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             && _tourData.latitudeSerie != null
             && _tourData.latitudeSerie.length > 0;
 
-      final boolean isWindDirectionAvailable = _comboWeather_Wind_DirectionText.getSelectionIndex() > 0;
-
       final boolean isWeatherRetrievalActivated = TourManager.isWeatherRetrievalActivated();
+      final boolean isWindDirectionAvailable = _comboWeather_Wind_DirectionText.getSelectionIndex() > 0;
 
       _comboTitle.setEnabled(canEdit);
       _txtDescription.setEnabled(canEdit);
