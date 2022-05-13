@@ -453,15 +453,15 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
        */
       final Group group = new Group(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
-      group.setText("Combined temperature Values");//Messages.PrefPage_ViewActions_Group);
+      group.setText(Messages.PrefPage_ViewCombinedTemperatures_Group);
       {
          /*
-          * combo: double click
+          * Combo
           */
 
          addField(new ComboFieldEditor(
                ITourbookPreferences.VIEW_PREFERRED_TEMPERATURE_VALUE,
-               "Preferred temperature to display", // Messages.PrefPage_ViewActions_Label_DoubleClick,
+               Messages.PrefPage_ViewCombinedTemperatures_Label_PreferredValue,
                _temperatureValues,
                group));
       }

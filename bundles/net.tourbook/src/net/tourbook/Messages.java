@@ -1375,6 +1375,9 @@ public class Messages extends NLS {
    public static String        PrefPage_ViewActions_Label_TemperatureValues_FromDevice;
    public static String        PrefPage_ViewActions_Label_TemperatureValues_External;
 
+   public static String        PrefPage_ViewCombinedTemperatures_Group;
+   public static String        PrefPage_ViewCombinedTemperatures_Label_PreferredValue;
+
    public static String        PrefPage_ViewTooltip_Button_DisableAll;
    public static String        PrefPage_ViewTooltip_Button_EnableAll;
    public static String        PrefPage_ViewTooltip_Chkbox_Collation;

@@ -2385,55 +2385,55 @@ public abstract class TreeColumnFactory {
       };
 
       WEATHER_TEMPERATURE_AVG = createTreeColumnFactory_Temperature(
-            "WEATHER_TEMPERATURE_AVG",
+            "WEATHER_TEMPERATURE_AVG", //$NON-NLS-1$
             UI.SYMBOL_AVERAGE,
             Messages.ColumnFactory_Temperature_Avg_Label,
             Messages.ColumnFactory_Temperature_Avg_Tooltip);
 
       WEATHER_TEMPERATURE_AVG_COMBINED = createTreeColumnFactory_Temperature(
-            "WEATHER_TEMPERATURE_AVG_COMBINED",
+            "WEATHER_TEMPERATURE_AVG_COMBINED", //$NON-NLS-1$
             UI.SYMBOL_AVERAGE,
             Messages.ColumnFactory_Temperature_Avg_Combined_Label,
             Messages.ColumnFactory_Temperature_Avg_Combined_Tooltip);
 
       WEATHER_TEMPERATURE_AVG_DEVICE = createTreeColumnFactory_Temperature(
-            "WEATHER_TEMPERATURE_AVG_DEVICE",
+            "WEATHER_TEMPERATURE_AVG_DEVICE", //$NON-NLS-1$
             UI.SYMBOL_AVERAGE,
             Messages.ColumnFactory_Temperature_Avg_Device_Label,
             Messages.ColumnFactory_Temperature_Avg_Device_Tooltip);
 
       WEATHER_TEMPERATURE_MIN = createTreeColumnFactory_Temperature(
-            "WEATHER_TEMPERATURE_MIN",
+            "WEATHER_TEMPERATURE_MIN", //$NON-NLS-1$
             UI.SYMBOL_MIN,
             Messages.ColumnFactory_Temperature_Min_Label,
             Messages.ColumnFactory_Temperature_Min_Tooltip);
 
       WEATHER_TEMPERATURE_MIN_COMBINED = createTreeColumnFactory_Temperature(
-            "WEATHER_TEMPERATURE_MIN_COMBINED",
+            "WEATHER_TEMPERATURE_MIN_COMBINED", //$NON-NLS-1$
             UI.SYMBOL_MIN,
             Messages.ColumnFactory_Temperature_Min_Combined_Label,
             Messages.ColumnFactory_Temperature_Min_Combined_Tooltip);
 
       WEATHER_TEMPERATURE_MIN_DEVICE = createTreeColumnFactory_Temperature(
-            "WEATHER_TEMPERATURE_MIN_DEVICE",
+            "WEATHER_TEMPERATURE_MIN_DEVICE", //$NON-NLS-1$
             UI.SYMBOL_MIN,
             Messages.ColumnFactory_Temperature_Min_Device_Label,
             Messages.ColumnFactory_Temperature_Min_Device_Tooltip);
 
       WEATHER_TEMPERATURE_MAX = createTreeColumnFactory_Temperature(
-            "WEATHER_TEMPERATURE_MAX",
+            "WEATHER_TEMPERATURE_MAX", //$NON-NLS-1$
             UI.SYMBOL_MAX,
             Messages.ColumnFactory_Temperature_Max_Label,
             Messages.ColumnFactory_Temperature_Max_Tooltip);
 
       WEATHER_TEMPERATURE_MAX_COMBINED = createTreeColumnFactory_Temperature(
-            "WEATHER_TEMPERATURE_MAX_COMBINED",
+            "WEATHER_TEMPERATURE_MAX_COMBINED", //$NON-NLS-1$
             UI.SYMBOL_MAX,
             Messages.ColumnFactory_Temperature_Max_Combined_Label,
             Messages.ColumnFactory_Temperature_Max_Combined_Tooltip);
 
       WEATHER_TEMPERATURE_MAX_DEVICE = createTreeColumnFactory_Temperature(
-            "WEATHER_TEMPERATURE_MAX_DEVICE",
+            "WEATHER_TEMPERATURE_MAX_DEVICE", //$NON-NLS-1$
             UI.SYMBOL_MAX,
             Messages.ColumnFactory_Temperature_Max_Device_Label,
             Messages.ColumnFactory_Temperature_Max_Device_Tooltip);
