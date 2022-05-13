@@ -98,16 +98,19 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
    }
 
    @Override
-   protected String buildFullWeatherDataString(final boolean displayStationInformation) {
+   protected String buildDetailedWeatherLog(final boolean isCompressed) {
 
       final List<String> fullWeatherDataList = new ArrayList<>();
 
       for (final Hourly hourly : weatherData.getFilteredHourly()) {
 
          final long hourlyEpochSeconds = hourly.getEpochSeconds();
-         final TourDateTime tourDateTime = TimeTools.createTourDateTime(hourlyEpochSeconds * 1000L, tour.getTimeZoneId());
+         final TourDateTime tourDateTime = TimeTools.createTourDateTime(
+               hourlyEpochSeconds * 1000L,
+               tour.getTimeZoneId());
 
-         final String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
+         final boolean isDisplayEmptyValues = !isCompressed;
+         String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                hourly.getTempC(),
                hourly.getFeelsLikeC(),
                hourly.getWindspeedKmph(),
@@ -116,12 +119,17 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                hourly.getPressure(),
                hourly.getPrecipMM(),
                0,
-               tourDateTime);
+               tourDateTime,
+               isDisplayEmptyValues);
+
+         if (isCompressed) {
+            fullWeatherData = fullWeatherData.replaceAll("\\s+", UI.SPACE1); //$NON-NLS-1$
+         }
 
          fullWeatherDataList.add(fullWeatherData);
       }
 
-      if (displayStationInformation) {
+      if (!isCompressed) {
 
          //Adding the weather station information
          final List<NearestArea> nearestArea = weatherData.getNearestArea();
@@ -158,8 +166,14 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
          }
       }
 
+      String separator = UI.SYSTEM_NEW_LINE;
+
+      if (isCompressed) {
+         separator = String.valueOf(UI.SYMBOL_SEMICOLON);
+      }
+
       final String fullWeatherData = String.join(
-            UI.SYSTEM_NEW_LINE,
+            separator,
             fullWeatherDataList);
 
       return fullWeatherData;

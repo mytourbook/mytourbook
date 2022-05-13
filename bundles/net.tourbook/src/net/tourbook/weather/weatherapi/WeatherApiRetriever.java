@@ -53,7 +53,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
    }
 
    @Override
-   protected String buildFullWeatherDataString(final boolean displayStationInformation) {
+   protected String buildDetailedWeatherLog(final boolean isCompressed) {
 
       final List<String> fullWeatherDataList = new ArrayList<>();
 
@@ -63,7 +63,8 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
                hour.getTime_epoch() * 1000L,
                tour.getTimeZoneId());
 
-         final String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
+         final boolean isDisplayEmptyValues = !isCompressed;
+         String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                (float) hour.getTemp_c(),
                (float) hour.getFeelslike_c(),
                (float) hour.getWind_kph(),
@@ -72,13 +73,24 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
                (int) hour.getPressure_mb(),
                (float) hour.getPrecip_mm(),
                0,
-               tourDateTime);
+               tourDateTime,
+               isDisplayEmptyValues);
+
+         if (isCompressed) {
+            fullWeatherData = fullWeatherData.replaceAll("\\s+", UI.SPACE1); //$NON-NLS-1$
+         }
 
          fullWeatherDataList.add(fullWeatherData);
       }
 
+      String separator = UI.SYSTEM_NEW_LINE;
+
+      if (isCompressed) {
+         separator = String.valueOf(UI.SYMBOL_SEMICOLON);
+      }
+
       final String fullWeatherData = String.join(
-            UI.SYSTEM_NEW_LINE,
+            separator,
             fullWeatherDataList);
 
       return fullWeatherData;

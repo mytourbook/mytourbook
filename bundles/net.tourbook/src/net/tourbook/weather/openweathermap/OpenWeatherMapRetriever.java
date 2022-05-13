@@ -52,15 +52,18 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    }
 
    @Override
-   protected String buildFullWeatherDataString(final boolean displayStationInformation) {
+   protected String buildDetailedWeatherLog(final boolean isCompressed) {
 
       final List<String> fullWeatherDataList = new ArrayList<>();
 
       for (final Hourly hourly : timeMachineResult.getHourly()) {
 
-         final TourDateTime tourDateTime = TimeTools.createTourDateTime(hourly.getDt() * 1000L, tour.getTimeZoneId());
+         final TourDateTime tourDateTime = TimeTools.createTourDateTime(
+               hourly.getDt() * 1000L,
+               tour.getTimeZoneId());
 
-         final String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
+         final boolean isDisplayEmptyValues = !isCompressed;
+         String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                (float) hourly.getTemp(),
                (float) hourly.getFeels_like(),
                (float) hourly.getWind_speedKmph(),
@@ -69,13 +72,24 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                hourly.getPressure(),
                hourly.getRain(),
                hourly.getSnow(),
-               tourDateTime);
+               tourDateTime,
+               isDisplayEmptyValues);
+
+         if (isCompressed) {
+            fullWeatherData = fullWeatherData.replaceAll("\\s+", UI.SPACE1); //$NON-NLS-1$
+         }
 
          fullWeatherDataList.add(fullWeatherData);
       }
 
+      String separator = UI.SYSTEM_NEW_LINE;
+
+      if (isCompressed) {
+         separator = String.valueOf(UI.SYMBOL_SEMICOLON);
+      }
+
       final String fullWeatherData = String.join(
-            UI.SYSTEM_NEW_LINE,
+            separator,
             fullWeatherDataList);
 
       return fullWeatherData;

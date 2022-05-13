@@ -71,8 +71,8 @@ public final class TourWeatherRetriever {
 
          if (_prefStore.getBoolean(ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG)) {
 
-            final String fullWeatherDataString = historicalWeatherRetriever.buildFullWeatherDataString(true);
-            TourLogManager.subLog_INFO(fullWeatherDataString);
+            final String detailedWeatherLog = historicalWeatherRetriever.buildDetailedWeatherLog(false);
+            TourLogManager.subLog_INFO(detailedWeatherLog);
          }
          if (_prefStore.getBoolean(ITourbookPreferences.WEATHER_SAVE_LOG_IN_TOUR_WEATHER_DESCRIPTION)) {
 
@@ -82,10 +82,8 @@ public final class TourWeatherRetriever {
             }
 
             //todo fb for 100-milers, there is not enough space !!!
-            //possibilities: remove the space by ", "
-            //do not output the 0mm precipitations
-            final String fullWeatherDataString = historicalWeatherRetriever.buildFullWeatherDataString(false);
-            tourData.setWeather(tourDataWeather + fullWeatherDataString);
+            final String detailedWeatherLog = historicalWeatherRetriever.buildDetailedWeatherLog(true);
+            tourData.setWeather(tourDataWeather + detailedWeatherLog);
          }
       } else {
          TourLogManager.subLog_INFO(String.format(

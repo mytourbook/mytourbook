@@ -102,15 +102,15 @@ public abstract class HistoricalWeatherRetriever {
    }
 
    /**
-    * Returns the fully detailed weather data as a human readable string
+    * Returns the fully detailed weather log as a human readable string
     * Example: 14h (Temperature 14C, feels like 12C, humidity 54% etc....)
     *
-    * @param displayStationInformation
-    *           When true and supported by the weather API, displays the info
-    *           about the weather station that was used to measure the weather
-    *           data (web page link, distance from tour...).
+    * @param isCompressed
+    *           When true, displays the weather data in the most compressed way
+    *           in order to reduce its size as much as possible (example: hiding
+    *           empty values, replacing new lines by ';' etc...
     */
-   protected abstract String buildFullWeatherDataString(final boolean displayStationInformation);
+   protected abstract String buildDetailedWeatherLog(final boolean isCompressed);
 
    private void logVendorError(final String exceptionMessage) {
 

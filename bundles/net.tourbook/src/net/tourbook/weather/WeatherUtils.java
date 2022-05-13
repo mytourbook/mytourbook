@@ -59,6 +59,7 @@ public class WeatherUtils {
     * @param snowFallValue
     *           in epoch seconds
     * @param timeZonedId
+    * @param isDisplayEmptyValues
     * @return
     */
    public static String buildFullWeatherDataString(final float temperatureValue,
@@ -69,7 +70,8 @@ public class WeatherUtils {
                                                    final int pressureValue,
                                                    final float precipitationValue,
                                                    final float snowFallValue,
-                                                   final TourDateTime tourDateTime) {
+                                                   final TourDateTime tourDateTime,
+                                                   final boolean isDisplayEmptyValues) {
 
       final String tourTime = String.format("%3s", tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME); //$NON-NLS-1$
 
@@ -99,15 +101,23 @@ public class WeatherUtils {
             + String.format("%6s", roundDoubleToFloat(pressureValue)) //$NON-NLS-1$
             + UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG;
 
-      final String precipitation = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation
-            + UI.SPACE
-            + String.format("%5s", roundDoubleToFloat(UI.convertPrecipitation_FromMetric(precipitationValue))) //$NON-NLS-1$
-            + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
+      String precipitation = UI.EMPTY_STRING;
+      if (precipitationValue > 0 || isDisplayEmptyValues) {
 
-      final String snowFall = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall
-            + UI.SPACE
-            + String.format("%5s", roundDoubleToFloat(UI.convertPrecipitation_FromMetric(snowFallValue))) //$NON-NLS-1$
-            + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
+         precipitation = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation
+               + UI.SPACE
+               + String.format("%5s", roundDoubleToFloat(UI.convertPrecipitation_FromMetric(precipitationValue))) //$NON-NLS-1$
+               + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
+      }
+
+      String snowFall = UI.EMPTY_STRING;
+      if (snowFallValue > 0 || isDisplayEmptyValues) {
+
+         snowFall = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall
+               + UI.SPACE
+               + String.format("%5s", roundDoubleToFloat(UI.convertPrecipitation_FromMetric(snowFallValue))) //$NON-NLS-1$
+               + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
+      }
 
       final String fullWeatherData = UI.EMPTY_STRING
 
