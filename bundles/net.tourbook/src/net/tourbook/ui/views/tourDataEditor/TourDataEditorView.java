@@ -6371,10 +6371,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _actionComputeDistanceValues.setEnabled(isCellEditorInactive && isNotManualTour && canEdit && isGeoAvailable);
 
       _actionEditTimeSlicesValues.setEnabled(isCellEditorInactive && canEdit);
-
-      final boolean isWeatherRetrievalActivated = TourManager.isWeatherRetrievalActivated();
-      //todo fb error as this is disposed when closing MT
-      _linkWeather.setEnabled(canEdit && isWeatherRetrievalActivated && !isDirty());
    }
 
    private void enableActions_SwimSlices() {
@@ -6529,12 +6525,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final boolean isWindDirectionAvailable = _comboWeather_Wind_DirectionText.getSelectionIndex() > 0;
 
+      final boolean isWeatherRetrievalActivated = TourManager.isWeatherRetrievalActivated();
+
       _comboTitle.setEnabled(canEdit);
       _txtDescription.setEnabled(canEdit);
       _comboLocation_Start.setEnabled(canEdit);
       _comboLocation_End.setEnabled(canEdit);
 
       //Weather
+      _linkWeather.setEnabled(canEdit && isWeatherRetrievalActivated);
       _comboWeather_Clouds.setEnabled(canEdit);
       _comboWeather_Wind_DirectionText.setEnabled(canEdit);
       _comboWeather_WindSpeedText.setEnabled(canEdit);

@@ -81,7 +81,6 @@ public final class TourWeatherRetriever {
                tourDataWeather += UI.SYSTEM_NEW_LINE;
             }
 
-            //todo fb for 100-milers, there is not enough space !!!
             final String detailedWeatherLog = historicalWeatherRetriever.buildDetailedWeatherLog(true);
             tourData.setWeather(tourDataWeather + detailedWeatherLog);
          }
