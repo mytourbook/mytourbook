@@ -3930,7 +3930,7 @@ public class TourDatabase {
             // version 13 start
 
             + " TemperatureScale       INTEGER DEFAULT 1,                                    " + NL //$NON-NLS-1$
-            + " Weather                VARCHAR(" + TourData.DB_LENGTH_WEATHER + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + " Weather                VARCHAR(" + TourData.DB_LENGTH_WEATHER_V48 + "),      " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 13 end ---------
 
@@ -5812,7 +5812,7 @@ public class TourDatabase {
 
          // 47 -> 48    22.X ??
          if (currentDbVersion == 47) {
-            currentDbVersion = _dbDesignVersion_New = 48;
+            currentDbVersion = _dbDesignVersion_New = updateDb_047_To_048(conn, splashManager);
          }
 
          // update db design version number
@@ -6520,10 +6520,10 @@ public class TourDatabase {
                final short dbMinute = result.getShort(5);
                final short dbSecond = result.getShort(6);
 
-               final long dtCreated = (dbYear * 10000000000L)
-                     + (dbMonth * 100000000L)
-                     + (dbDay * 1000000L)
-                     + (dbHour * 10000L)
+               final long dtCreated = (dbYear * 10_000_000_000L)
+                     + (dbMonth * 100_000_000L)
+                     + (dbDay * 1_000_000L)
+                     + (dbHour * 10_000L)
                      + (dbMinute * 100L)
                      + dbSecond;
 
@@ -9349,6 +9349,28 @@ public class TourDatabase {
             entityManager.close();
          }
       });
+   }
+
+   private int updateDb_047_To_048(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 48;
+
+      logDbUpdate_Start(newDbVersion);
+
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         final String sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ALTER COLUMN   Weather SET DATA TYPE VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
+               + TourData.DB_LENGTH_WEATHER_V48 + ")"; //$NON-NLS-1$
+
+         exec(stmt, sql);
+      }
+      stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
    }
 
    private void updateMonitor(final SplashManager splashManager, final int newDbVersion) {

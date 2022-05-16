@@ -82,14 +82,8 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          fullWeatherDataList.add(fullWeatherData);
       }
 
-      String separator = UI.SYSTEM_NEW_LINE;
-
-      if (isCompressed) {
-         separator = String.valueOf(UI.SYMBOL_SEMICOLON);
-      }
-
       final String fullWeatherData = String.join(
-            separator,
+            UI.SYSTEM_NEW_LINE,
             fullWeatherDataList);
 
       return fullWeatherData;

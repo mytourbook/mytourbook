@@ -243,10 +243,10 @@ public class TimeTools {
     */
    public static ZonedDateTime createDateTimeFromYMDhms(final long yyyymmddhhmmss) {
 
-      final int year = (int) (yyyymmddhhmmss / 10000000000L) % 10000;
-      final int month = (int) (yyyymmddhhmmss / 100000000) % 100;
-      final int day = (int) (yyyymmddhhmmss / 1000000) % 100;
-      final int hour = (int) (yyyymmddhhmmss / 10000) % 100;
+      final int year = (int) (yyyymmddhhmmss / 10_000_000_000L) % 10000;
+      final int month = (int) (yyyymmddhhmmss / 100_000_000L) % 100;
+      final int day = (int) (yyyymmddhhmmss / 1_000_000L) % 100;
+      final int hour = (int) (yyyymmddhhmmss / 10_000L) % 100;
       final int minute = (int) (yyyymmddhhmmss / 100 % 100);
       final int second = (int) (yyyymmddhhmmss % 100);
 
@@ -334,11 +334,11 @@ public class TimeTools {
 
       final long dtYMDhms = 0
 
-            + (zonedDateTime.getYear() * 10000000000L)
-            + (zonedDateTime.getMonthValue() * 100000000L)
-            + (zonedDateTime.getDayOfMonth() * 1000000L)
+            + (zonedDateTime.getYear() * 10_000_000_000L)
+            + (zonedDateTime.getMonthValue() * 100_000_000L)
+            + (zonedDateTime.getDayOfMonth() * 1_000_000L)
 
-            + (zonedDateTime.getHour() * 10000L)
+            + (zonedDateTime.getHour() * 10_000L)
             + (zonedDateTime.getMinute() * 100L)
             + zonedDateTime.getSecond();
 
