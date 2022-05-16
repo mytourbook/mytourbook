@@ -1953,6 +1953,7 @@ public class Messages extends NLS {
    public static String        Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle_Tooltip;
 
    public static String        Slideout_Map25MapOptions_Checkbox_Layer_3DBuilding;
+   public static String        Slideout_Map25MapOptions_Checkbox_Layer_Building_IsShowShadow;
    public static String        Slideout_Map25MapOptions_Checkbox_Layer_Cartography;
    public static String        Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip;
    public static String        Slideout_Map25MapOptions_Checkbox_Layer_Hillshading;
@@ -1965,6 +1966,10 @@ public class Messages extends NLS {
    public static String        Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation;
    public static String        Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip;
    public static String        Slideout_Map25MapOptions_Group_MapLayer;
+   public static String Slideout_Map25MapOptions_Label_BuildingMinZoomLevel;
+
+   public static String Slideout_Map25MapOptions_Label_BuildingMinZoomLevel_Tooltip;
+
    public static String        Slideout_Map25MapOptions_Label_MapOptions;
    public static String        Slideout_Map25MapOptions_Spinner_Layer_Hillshading;
    public static String        Slideout_Map25MapOptions_Spinner_Layer_Photo_Size;

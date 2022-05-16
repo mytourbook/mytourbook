@@ -41,7 +41,12 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Map 2.5D properties slideout
  */
-public class SlideoutMap25_MapOptions extends ToolbarSlideout {
+public class SlideoutMap25_MapLayer extends ToolbarSlideout {
+
+   /**
+    * The zoom level in the UI starts with 1 but internally it starts with 0
+    */
+   private static final int  ZOOM_UI_OFFSET = 1;
 
    private SelectionListener _defaultSelectionListener;
    private SelectionListener _layerSelectionListener;
@@ -55,6 +60,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
    private Button    _chkShowLayer_Cartography;
    private Button    _chkShowLayer_Building;
+   private Button    _chkShowLayer_Building_Shadow;
    private Button    _chkShowLayer_Hillshading;
    private Button    _chkShowLayer_Satellite;
    private Button    _chkShowLayer_Label;
@@ -62,16 +68,19 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private Button    _chkShowLayer_TileInfo;
    private Button    _chkUseDraggedKeyboardNavigation;
 
-   private Spinner   _spinnerHillshadingOpacity;
+   private Label     _lblBuildingMinZoomLevel;
+
+   private Spinner   _spinnerBuildingMinZoomLevel;
+   private Spinner   _spinnerHillShadingOpacity;
 
    /**
     * @param ownerControl
     * @param toolBar
     * @param map25View
     */
-   public SlideoutMap25_MapOptions(final Control ownerControl,
-                                   final ToolBar toolBar,
-                                   final Map25View map25View) {
+   public SlideoutMap25_MapLayer(final Control ownerControl,
+                                 final ToolBar toolBar,
+                                 final Map25View map25View) {
 
       super(ownerControl, toolBar);
 
@@ -127,8 +136,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       final Label label = new Label(parent, SWT.NONE);
       label.setText(Messages.Slideout_Map25MapOptions_Label_MapOptions);
       MTFont.setBannerFont(label);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .align(SWT.BEGINNING, SWT.CENTER)
             .applyTo(label);
    }
@@ -137,8 +145,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Slideout_Map25MapOptions_Group_MapLayer);
-      GridDataFactory
-            .fillDefaults()//
+      GridDataFactory.fillDefaults()
             .grab(true, false)
             .applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
@@ -159,7 +166,49 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             _chkShowLayer_Building.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_3DBuilding);
             _chkShowLayer_Building.addSelectionListener(_layerSelectionListener);
          }
+         {
+            /*
+             * Building: Shadow
+             */
+            _chkShowLayer_Building_Shadow = new Button(group, SWT.CHECK);
+            _chkShowLayer_Building_Shadow.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Building_IsShowShadow);
+            _chkShowLayer_Building_Shadow.addSelectionListener(_layerSelectionListener);
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .indent(8, 0)
+                  .applyTo(_chkShowLayer_Building_Shadow);
+         }
+         {
+            /*
+             * Building: Min zoom level
+             */
+            final Composite containerBuilding = new Composite(group, SWT.NONE);
+            GridDataFactory.fillDefaults().indent(8, 0).applyTo(containerBuilding);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerBuilding);
+            {
+               final String tooltipText = Messages.Slideout_Map25MapOptions_Label_BuildingMinZoomLevel_Tooltip;
+               {
+                  _lblBuildingMinZoomLevel = new Label(containerBuilding, SWT.NONE);
+                  _lblBuildingMinZoomLevel.setText(Messages.Slideout_Map25MapOptions_Label_BuildingMinZoomLevel);
+                  _lblBuildingMinZoomLevel.setToolTipText(tooltipText);
+                  GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblBuildingMinZoomLevel);
+               }
+               {
+                  _spinnerBuildingMinZoomLevel = new Spinner(containerBuilding, SWT.BORDER);
+                  _spinnerBuildingMinZoomLevel.setMinimum(11 + ZOOM_UI_OFFSET);
+                  _spinnerBuildingMinZoomLevel.setMaximum(17 + ZOOM_UI_OFFSET);
+                  _spinnerBuildingMinZoomLevel.setIncrement(1);
+                  _spinnerBuildingMinZoomLevel.setPageIncrement(2);
+                  _spinnerBuildingMinZoomLevel.setToolTipText(tooltipText);
 
+                  _spinnerBuildingMinZoomLevel.addSelectionListener(_layerSelectionListener);
+                  _spinnerBuildingMinZoomLevel.addMouseWheelListener(mouseEvent -> {
+                     UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+                     onModify_Layer();
+                  });
+               }
+            }
+         }
          {
             /*
              * Scale
@@ -205,15 +254,15 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
                   final String tooltipText = NLS.bind(Messages.Slideout_Map25MapOptions_Spinner_Layer_Hillshading, UI.TRANSFORM_OPACITY_MAX);
 
-                  _spinnerHillshadingOpacity = new Spinner(containerHillshading, SWT.BORDER);
-                  _spinnerHillshadingOpacity.setMinimum(0);
-                  _spinnerHillshadingOpacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
-                  _spinnerHillshadingOpacity.setIncrement(1);
-                  _spinnerHillshadingOpacity.setPageIncrement(10);
-                  _spinnerHillshadingOpacity.setToolTipText(tooltipText);
+                  _spinnerHillShadingOpacity = new Spinner(containerHillshading, SWT.BORDER);
+                  _spinnerHillShadingOpacity.setMinimum(0);
+                  _spinnerHillShadingOpacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
+                  _spinnerHillShadingOpacity.setIncrement(1);
+                  _spinnerHillShadingOpacity.setPageIncrement(10);
+                  _spinnerHillShadingOpacity.setToolTipText(tooltipText);
 
-                  _spinnerHillshadingOpacity.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModify_HillShadingOpacity()));
-                  _spinnerHillshadingOpacity.addMouseWheelListener(mouseEvent -> {
+                  _spinnerHillShadingOpacity.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModify_HillShadingOpacity()));
+                  _spinnerHillShadingOpacity.addMouseWheelListener(mouseEvent -> {
                      UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
                      onModify_HillShadingOpacity();
                   });
@@ -261,8 +310,14 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private void enableActions() {
 
       final boolean isHillShading = _chkShowLayer_Hillshading.getSelection();
+      final boolean isBuildingVisible = _chkShowLayer_Building.getSelection();
 
-      _spinnerHillshadingOpacity.setEnabled(isHillShading);
+      _chkShowLayer_Building_Shadow.setEnabled(isBuildingVisible);
+
+      _lblBuildingMinZoomLevel.setEnabled(isBuildingVisible);
+
+      _spinnerHillShadingOpacity.setEnabled(isHillShading);
+      _spinnerBuildingMinZoomLevel.setEnabled(isBuildingVisible);
 
       // force UI update otherwise the slideout UI update is done after the map is updated
       _parent.update();
@@ -289,7 +344,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       final Map25App mapApp = _map25View.getMapApp();
 
       // updade model
-      final int hillShadingOpacity = UI.transformOpacity_WhenSaved(_spinnerHillshadingOpacity.getSelection());
+      final int hillShadingOpacity = UI.transformOpacity_WhenSaved(_spinnerHillShadingOpacity.getSelection());
       mapApp.setLayer_HillShading_Opacity(hillShadingOpacity);
 
       // update UI
@@ -303,6 +358,43 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
    private void onModify_Layer() {
 
+      saveState_Layer();
+
+      enableActions();
+
+      _map25View.getMapApp().updateLayer();
+   }
+
+   private void restoreState() {
+
+      final Map25App mapApp = _map25View.getMapApp();
+
+// SET_FORMATTING_OFF
+
+      _chkShowLayer_Building           .setSelection(mapApp.getLayer_Building_VARYING()   .isEnabled());
+      _chkShowLayer_Building_Shadow    .setSelection(mapApp.getLayer_Building_IsShadow());
+      _chkShowLayer_Cartography        .setSelection(mapApp.getLayer_BaseMap()            .isEnabled());
+      _chkShowLayer_Hillshading        .setSelection(mapApp.getLayer_HillShading()        .isEnabled());
+      _chkShowLayer_Label              .setSelection(mapApp.getLayer_Label()              .isEnabled());
+      _chkShowLayer_Scale              .setSelection(mapApp.getLayer_ScaleBar()           .isEnabled());
+      _chkShowLayer_Satellite          .setSelection(mapApp.getLayer_Satellite()          .isEnabled());
+      _chkShowLayer_TileInfo           .setSelection(mapApp.getLayer_TileInfo()           .isEnabled());
+
+      _spinnerBuildingMinZoomLevel     .setSelection(mapApp.getLayer_Building_MinZoomLevel() + ZOOM_UI_OFFSET);
+      _spinnerHillShadingOpacity       .setSelection(UI.transformOpacity_WhenRestored(mapApp.getLayer_HillShading_Opacity()));
+
+// SET_FORMATTING_ON
+
+      _chkUseDraggedKeyboardNavigation.setSelection(Map25ConfigManager.useDraggedKeyboardNavigation);
+   }
+
+   private void saveState() {
+
+      Map25ConfigManager.useDraggedKeyboardNavigation = _chkUseDraggedKeyboardNavigation.getSelection();
+   }
+
+   private void saveState_Layer() {
+
       final Map25App mapApp = _map25View.getMapApp();
 
       mapApp.getLayer_BaseMap().setEnabled(_chkShowLayer_Cartography.getSelection());
@@ -315,41 +407,10 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       mapApp.getLayer_ScaleBar().setEnabled(_chkShowLayer_Scale.getSelection());
       mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
 
-      // switching on/off both building layers
-      mapApp.getLayer_Building_Default().setEnabled(_chkShowLayer_Building.getSelection());
-      mapApp.getLayer_Building_S3DB().setEnabled(_chkShowLayer_Building.getSelection());
-
-      enableActions();
-
-      mapApp.updateLayer();
-   }
-
-
-
-   private void restoreState() {
-
-      final Map25App mapApp = _map25View.getMapApp();
-
-// SET_FORMATTING_OFF
-
-      _chkShowLayer_Building     .setSelection(mapApp.getLayer_Building_Default()   .isEnabled());
-      _chkShowLayer_Cartography  .setSelection(mapApp.getLayer_BaseMap()            .isEnabled());
-      _chkShowLayer_Hillshading  .setSelection(mapApp.getLayer_HillShading()        .isEnabled());
-      _chkShowLayer_Label        .setSelection(mapApp.getLayer_Label()              .isEnabled());
-      _chkShowLayer_Scale        .setSelection(mapApp.getLayer_ScaleBar()           .isEnabled());
-      _chkShowLayer_Satellite    .setSelection(mapApp.getLayer_Satellite()          .isEnabled());
-      _chkShowLayer_TileInfo     .setSelection(mapApp.getLayer_TileInfo()           .isEnabled());
-
-      _spinnerHillshadingOpacity .setSelection(UI.transformOpacity_WhenRestored(mapApp.getLayer_HillShading_Opacity()));
-
-// SET_FORMATTING_ON
-
-      _chkUseDraggedKeyboardNavigation.setSelection(Map25ConfigManager.useDraggedKeyboardNavigation);
-   }
-
-   private void saveState() {
-
-      Map25ConfigManager.useDraggedKeyboardNavigation = _chkUseDraggedKeyboardNavigation.getSelection();
+      mapApp.setLayer_Building_Options(
+            _chkShowLayer_Building.getSelection(),
+            _chkShowLayer_Building_Shadow.getSelection(),
+            _spinnerBuildingMinZoomLevel.getSelection() - ZOOM_UI_OFFSET);
    }
 
 }

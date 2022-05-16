@@ -67,7 +67,7 @@ import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
-import net.tourbook.map25.ui.SlideoutMap25_MapOptions;
+import net.tourbook.map25.ui.SlideoutMap25_MapLayer;
 import net.tourbook.map25.ui.SlideoutMap25_MapProvider;
 import net.tourbook.map25.ui.SlideoutMap25_PhotoOptions;
 import net.tourbook.map25.ui.SlideoutMap25_TrackOptions;
@@ -132,48 +132,45 @@ public class Map25View extends ViewPart implements
    private static final String            MAP_ACTION_SYNCH_WITH_SLIDER                 = net.tourbook.map2.Messages.map_action_synch_with_slider;
    private static final String            MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED        = net.tourbook.map2.Messages.Map_Action_SynchWithSlider_Centered;
 
-   private static final String            STATE_IS_LAYER_BASE_MAP_VISIBLE              = "STATE_IS_LAYER_BASE_MAP_VISIBLE";                        //$NON-NLS-1$
-   private static final String            STATE_IS_LAYER_BUILDING_VISIBLE              = "STATE_IS_LAYER_BUILDING_VISIBLE";                        //$NON-NLS-1$
-   //private static final String          STATE_IS_LAYER_S3DB_VISIBLE                  = "STATE_IS_LAYER_S3DB_VISIBLE";                            //$NON-NLS-1$
-   private static final String            STATE_IS_LAYER_BOOKMARK_VISIBLE              = "STATE_IS_LAYER_BOOKMARK_VISIBLE";                        //$NON-NLS-1$
-   private static final String            STATE_IS_LAYER_HILLSHADING_VISIBLE           = "STATE_IS_LAYER_HILLSHADING_VISIBLE";                     //$NON-NLS-1$
-   private static final String            STATE_IS_LAYER_SATELLITE_VISIBLE             = "STATE_IS_LAYER_SATELLITE_VISIBLE";                         //$NON-NLS-1$
-   private static final String            STATE_IS_LAYER_LABEL_VISIBLE                 = "STATE_IS_LAYER_LABEL_VISIBLE";                           //$NON-NLS-1$
-   private static final String            STATE_IS_LAYER_MARKER_VISIBLE                = "STATE_IS_LAYER_MARKER_VISIBLE";                          //$NON-NLS-1$
-   private static final String            STATE_IS_LAYER_SCALE_BAR_VISIBLE             = "STATE_IS_LAYER_SCALE_BAR_VISIBLE";                       //$NON-NLS-1$
-   private static final String            STATE_IS_LAYER_TILE_INFO_VISIBLE             = "STATE_IS_LAYER_TILE_INFO_VISIBLE";                       //$NON-NLS-1$
-   private static final String            STATE_IS_LAYER_TOUR_VISIBLE                  = "STATE_IS_LAYER_TOUR_VISIBLE";                            //$NON-NLS-1$
-
-   private static final String            STATE_LAYER_HILLSHADING_OPACITY              = "STATE_LAYER_HILLSHADING_OPACITY";                        //$NON-NLS-1$
-   private static final String            STATE_MAP_SYNCHED_WITH                       = "STATE_MAP_SYNCHED_WITH";                                 //$NON-NLS-1$
-
-   // photo
-   private static final String            STATE_IS_LAYER_PHOTO_VISIBLE                 = "STATE_IS_LAYER_PHOTO_VISIBLE";                           //$NON-NLS-1$
-   private static final String            STATE_IS_LAYER_PHOTO_SCALED                  = "STATE_IS_LAYER_PHOTO_SCALED";                            //$NON-NLS-1$
-   private static final String            STATE_IS_LAYER_PHOTO_TITLE_VISIBLE           = "STATE_IS_LAYER_PHOTO_TITLE_VISIBLE";                     //$NON-NLS-1$
-   private static final String            STATE_IS_PHOTO_FILTER_ACTIVE                 = "STATE_IS_PHOTO_FILTER_ACTIVE";                        //$NON-NLS-1$
-   private static final String            STATE_LAYER_PHOTO_SIZE                       = "STATE_LAYER_PHOTO_SIZE";                            //$NON-NLS-1$
-   private static final String            STATE_PHOTO_FILTER_RATING_STARS              = "STATE_PHOTO_FILTER_RATING_STARS";                     //$NON-NLS-1$
-   private static final String            STATE_PHOTO_FILTER_RATING_STAR_OPERATOR      = "STATE_PHOTO_FILTER_RATING_STAR_OPERATOR";             //$NON-NLS-1$
-
    private static final ImageDescriptor   _imageSyncWithSlider                         = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider);
    private static final ImageDescriptor   _imageSyncWithSlider_Disabled                = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Disabled);
    private static final ImageDescriptor   _imageSyncWithSlider_Centered                = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Centered);
    private static final ImageDescriptor   _imageSyncWithSlider_Centered_Disabled       = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Centered_Disabled);
 
 // SET_FORMATTING_ON
+
+   private static final String           STATE_IS_LAYER_BASE_MAP_VISIBLE         = "STATE_IS_LAYER_BASE_MAP_VISIBLE";            //$NON-NLS-1$
+   private static final String           STATE_IS_LAYER_BOOKMARK_VISIBLE         = "STATE_IS_LAYER_BOOKMARK_VISIBLE";            //$NON-NLS-1$
+   private static final String           STATE_IS_LAYER_HILLSHADING_VISIBLE      = "STATE_IS_LAYER_HILLSHADING_VISIBLE";         //$NON-NLS-1$
+   private static final String           STATE_IS_LAYER_LABEL_VISIBLE            = "STATE_IS_LAYER_LABEL_VISIBLE";               //$NON-NLS-1$
+   private static final String           STATE_IS_LAYER_MARKER_VISIBLE           = "STATE_IS_LAYER_MARKER_VISIBLE";              //$NON-NLS-1$
+   private static final String           STATE_IS_LAYER_SATELLITE_VISIBLE        = "STATE_IS_LAYER_SATELLITE_VISIBLE";           //$NON-NLS-1$
+   private static final String           STATE_IS_LAYER_SCALE_BAR_VISIBLE        = "STATE_IS_LAYER_SCALE_BAR_VISIBLE";           //$NON-NLS-1$
+   private static final String           STATE_IS_LAYER_TILE_INFO_VISIBLE        = "STATE_IS_LAYER_TILE_INFO_VISIBLE";           //$NON-NLS-1$
+   private static final String           STATE_IS_LAYER_TOUR_VISIBLE             = "STATE_IS_LAYER_TOUR_VISIBLE";                //$NON-NLS-1$
+
+   private static final String           STATE_LAYER_HILLSHADING_OPACITY         = "STATE_LAYER_HILLSHADING_OPACITY";            //$NON-NLS-1$
+   private static final String           STATE_MAP_SYNCHED_WITH                  = "STATE_MAP_SYNCHED_WITH";                     //$NON-NLS-1$
+
+   private static final String           STATE_IS_LAYER_PHOTO_VISIBLE            = "STATE_IS_LAYER_PHOTO_VISIBLE";               //$NON-NLS-1$
+   private static final String           STATE_IS_LAYER_PHOTO_SCALED             = "STATE_IS_LAYER_PHOTO_SCALED";                //$NON-NLS-1$
+   private static final String           STATE_IS_LAYER_PHOTO_TITLE_VISIBLE      = "STATE_IS_LAYER_PHOTO_TITLE_VISIBLE";         //$NON-NLS-1$
+   private static final String           STATE_IS_PHOTO_FILTER_ACTIVE            = "STATE_IS_PHOTO_FILTER_ACTIVE";               //$NON-NLS-1$
+   private static final String           STATE_LAYER_PHOTO_SIZE                  = "STATE_LAYER_PHOTO_SIZE";                     //$NON-NLS-1$
+   private static final String           STATE_PHOTO_FILTER_RATING_STARS         = "STATE_PHOTO_FILTER_RATING_STARS";            //$NON-NLS-1$
+   private static final String           STATE_PHOTO_FILTER_RATING_STAR_OPERATOR = "STATE_PHOTO_FILTER_RATING_STAR_OPERATOR";    //$NON-NLS-1$
    //
-   public static final String            ID                 = "net.tourbook.map25.Map25View";               //$NON-NLS-1$
+   public static final String            ID                                      = "net.tourbook.map25.Map25View";               //$NON-NLS-1$
    //
-   private static final IDialogSettings  _state             = TourbookPlugin.getState(ID);
-   private static final IDialogSettings  _state_PhotoFilter = TourbookPlugin.getState(ID + ".PhotoFilter"); //$NON-NLS-1$
+   private static final IDialogSettings  _state                                  = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _state_PhotoFilter                      = TourbookPlugin.getState(ID + ".PhotoFilter"); //$NON-NLS-1$
    //
-   private static int[]                  _eventCounter      = new int[1];
+   private static int[]                  _eventCounter                           = new int[1];
    //
    private Map25App                      _mapApp;
    //
-   private OpenDialogManager             _openDlgMgr        = new OpenDialogManager();
-   private final MapInfoManager          _mapInfoManager    = MapInfoManager.getInstance();
+   private OpenDialogManager             _openDlgMgr                             = new OpenDialogManager();
+   private final MapInfoManager          _mapInfoManager                         = MapInfoManager.getInstance();
    //
    private boolean                       _isPartVisible;
    private boolean                       _isShowTour;
@@ -199,19 +196,19 @@ public class Map25View extends ViewPart implements
    private ActionZoomIn                  _actionZoom_In;
    private ActionZoomOut                 _actionZoom_Out;
    //
-   private double                        _zoomFactor        = 1.5;
+   private double                        _zoomFactor                             = 1.5;
 
    /** Contains only geo tours */
-   private ArrayList<TourData>           _allTourData       = new ArrayList<>();
-   private TIntArrayList                 _allTourStarts     = new TIntArrayList();
+   private ArrayList<TourData>           _allTourData                            = new ArrayList<>();
+   private TIntArrayList                 _allTourStarts                          = new TIntArrayList();
    private GeoPoint[]                    _allGeoPoints;
    private BoundingBox                   _allBoundingBox;
 
    /**
     * Contains photos which are displayed in the map
     */
-   private ArrayList<Photo>              _allPhotos         = new ArrayList<>();
-   private final ArrayList<Photo>        _filteredPhotos    = new ArrayList<>();
+   private ArrayList<Photo>              _allPhotos                              = new ArrayList<>();
+   private final ArrayList<Photo>        _filteredPhotos                         = new ArrayList<>();
    //
    private boolean                       _isPhotoFilterActive;
    private int                           _photoFilter_RatingStars;
@@ -275,7 +272,7 @@ public class Map25View extends ViewPart implements
 
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-         return new SlideoutMap25_MapOptions(_parent, toolbar, Map25View.this);
+         return new SlideoutMap25_MapLayer(_parent, toolbar, Map25View.this);
       }
 
       @Override
@@ -1570,10 +1567,6 @@ public class Map25View extends ViewPart implements
 
       // other layers
       _mapApp.getLayer_BaseMap()          .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BASE_MAP_VISIBLE,  true));
-      _mapApp.getLayer_Building_Default() .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BUILDING_VISIBLE,  true));
-
-      //handling S3DB like building, not used layer will be removed in map25app
-      _mapApp.getLayer_Building_S3DB()    .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BUILDING_VISIBLE,  true));
 
       _mapApp.getLayer_MapBookmark()      .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BOOKMARK_VISIBLE,  true));
       _mapApp.getLayer_Label()            .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_LABEL_VISIBLE,     true));
@@ -1587,6 +1580,8 @@ public class Map25View extends ViewPart implements
       updateUI_SyncSliderAction();
 
 // SET_FORMATTING_ON
+
+//      _mapApp.updateLayer_Building();
 
       enableActions();
 
@@ -1657,7 +1652,7 @@ public class Map25View extends ViewPart implements
       // other layers
       _state.put(STATE_IS_LAYER_BASE_MAP_VISIBLE,     _mapApp.getLayer_BaseMap().isEnabled());
       _state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE,     _mapApp.getLayer_MapBookmark().isEnabled());
-      _state.put(STATE_IS_LAYER_BUILDING_VISIBLE,     _mapApp.getLayer_Building_Default().isEnabled());
+//    _state.put(STATE_IS_LAYER_BUILDING_VISIBLE,     _mapApp.getLayer_Building_VARYING().isEnabled());
       _state.put(STATE_IS_LAYER_MARKER_VISIBLE,       _mapApp.getLayer_TourMarker().isEnabled());
       _state.put(STATE_IS_LAYER_LABEL_VISIBLE,        _mapApp.getLayer_Label().isEnabled());
       _state.put(STATE_IS_LAYER_SATELLITE_VISIBLE,    _mapApp.getLayer_Satellite().isEnabled());
@@ -1674,6 +1669,11 @@ public class Map25View extends ViewPart implements
       // hillshading layer
       _state.put(STATE_IS_LAYER_HILLSHADING_VISIBLE,  _mapApp.getLayer_HillShading().isEnabled());
       _state.put(STATE_LAYER_HILLSHADING_OPACITY,     _mapApp.getLayer_HillShading_Opacity());
+
+
+
+
+
 
 
       // photo filter
