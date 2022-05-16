@@ -26,7 +26,6 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.skedgo.converter.TimezoneMapper;
 
 import gnu.trove.list.array.TIntArrayList;
@@ -5325,7 +5324,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          prevTime = currentTime;
 
-         final int durationTime = currentTime - sumBreakTime - sumSkipTime;
+         final double durationTime = currentTime - sumBreakTime - sumSkipTime;
 
          final float speed_Metric = durationTime == 0
                ? 0
@@ -12475,7 +12474,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final ObjectMapper mapper = new ObjectMapper();
       mapper.setSerializationInclusion(Include.NON_NULL);
       mapper.setSerializationInclusion(Include.NON_EMPTY);
-      JsonMapper.builder().configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+      mapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
 
       String jsonString = UI.EMPTY_STRING;
       try {
