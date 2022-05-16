@@ -50,4 +50,13 @@ public class TimeToolsTests {
 
       assertEquals(20220516165348L, testDateTime);
    }
+
+   @Test
+   void testGetNumberOfDaysWithYear() {
+
+      //2022 is not a leap year
+      assertEquals(365, TimeTools.getNumberOfDaysWithYear(2022));
+      //2020 is a leap year
+      assertEquals(366, TimeTools.getNumberOfDaysWithYear(2020));
+   }
 }
