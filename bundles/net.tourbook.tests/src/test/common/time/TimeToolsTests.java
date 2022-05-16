@@ -29,7 +29,15 @@ public class TimeToolsTests {
    void testCreateDateTimeFromYMDhms() {
 
       final ZonedDateTime testZonedDateTime = TimeTools.createDateTimeFromYMDhms(20220516165348L);
-      final ZonedDateTime controlZonedDateTime = ZonedDateTime.of(2022, 05, 16, 16, 53, 48, 0, TimeTools.getDefaultTimeZone());
+      final ZonedDateTime controlZonedDateTime = ZonedDateTime.of(
+            2022,
+            05,
+            16,
+            16,
+            53,
+            48,
+            0,
+            TimeTools.getDefaultTimeZone());
 
       assertEquals(controlZonedDateTime, testZonedDateTime);
    }
