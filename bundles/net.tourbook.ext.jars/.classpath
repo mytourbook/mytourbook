@@ -11,7 +11,7 @@
 	<classpathentry exported="true" kind="lib" path="jackson-core-2.13.3.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
 	<classpathentry exported="true" kind="lib" path="jackson-databind-2.13.3.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
 	<classpathentry exported="true" kind="lib" path="jackson-annotations-2.13.3.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-annotations -->
-	<classpathentry exported="true" kind="lib" path="joda-time-2.10.10.jar"/> <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
+	<classpathentry exported="true" kind="lib" path="joda-time-2.10.14.jar"/> <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
 	<classpathentry exported="true" kind="lib" path="json-20220320.jar"/> <!-- https://mvnrepository.com/artifact/org.json/json -->
 	<classpathentry exported="true" kind="lib" path="lat-lon-timezone-converter-2019-04-30.jar" /> <!-- https://github.com/drtimcooper/LatLongToTimezone/blob/master/src/main/java/com/skedgo/converter/TimezoneMapper.java -->
 	<classpathentry exported="true" kind="lib" path="net.sf.swtaddons_0.1.1.jar"/>

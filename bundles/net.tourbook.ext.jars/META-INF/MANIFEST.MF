@@ -6,7 +6,7 @@ Bundle-Version: 22.3.1.qualifier
 Eclipse-BuddyPolicy: registered
 Bundle-Vendor: MyTourbook
 Bundle-ClassPath: 
- joda-time-2.10.10.jar,
+ joda-time-2.10.14.jar,
  c3p0-0.9.1.2.jar,
  net.sf.swtaddons_0.1.1.jar,
  core-3.1.0.jar,
