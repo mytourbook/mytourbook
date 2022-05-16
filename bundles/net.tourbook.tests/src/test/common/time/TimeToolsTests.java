@@ -17,9 +17,11 @@ package common.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.time.TourDateTime;
 
 import org.junit.jupiter.api.Test;
 
@@ -43,6 +45,25 @@ public class TimeToolsTests {
    }
 
    @Test
+   void testCreateTourDateTime() {
+
+      final String chileZoneId = "Chile/Continental"; //$NON-NLS-1$
+      final ZonedDateTime controlZonedDateTime = ZonedDateTime.of(
+            2022,
+            05,
+            16,
+            17,
+            46,
+            10,
+            0,
+            ZoneId.of(chileZoneId));
+
+      final TourDateTime controlTourDateTime = new TourDateTime(controlZonedDateTime);
+
+      assertEquals(controlTourDateTime, TimeTools.createTourDateTime(1652737570000L, chileZoneId));
+   }
+
+   @Test
    void testCreateYMDhms_From_DateTime() {
 
       final long testDateTime = TimeTools.createYMDhms_From_DateTime(
@@ -59,4 +80,5 @@ public class TimeToolsTests {
       //2020 is a leap year
       assertEquals(366, TimeTools.getNumberOfDaysWithYear(2020));
    }
+
 }
