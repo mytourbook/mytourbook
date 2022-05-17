@@ -173,18 +173,14 @@ public class WeatherProvidersUI {
       {
          // Checkbox: Save the weather log in the tour weather's description
          _chkSaveLogInTourWeatherDescription = new Button(container, SWT.CHECK);
-         _chkSaveLogInTourWeatherDescription.setText(
-               Messages.Pref_Weather_Check_SaveLogInTourWeatherDescription);
-         _chkSaveLogInTourWeatherDescription.setToolTipText(
-               Messages.Pref_Weather_Check_SaveLogInTourWeatherDescription_Tooltip);
+         _chkSaveLogInTourWeatherDescription.setText(Messages.Pref_Weather_Check_SaveLogInTourWeatherDescription);
+         _chkSaveLogInTourWeatherDescription.setToolTipText(Messages.Pref_Weather_Check_SaveLogInTourWeatherDescription_Tooltip);
          GridDataFactory.fillDefaults().applyTo(_chkSaveLogInTourWeatherDescription);
 
          // Checkbox: Display the full log
          _chkDisplayFullLog = new Button(container, SWT.CHECK);
-         _chkDisplayFullLog.setText(
-               Messages.Pref_Weather_Check_DisplayFullLog);
-         _chkDisplayFullLog.setToolTipText(
-               Messages.Pref_Weather_Check_DisplayFullLog_Tooltip);
+         _chkDisplayFullLog.setText(Messages.Pref_Weather_Check_DisplayFullLog);
+         _chkDisplayFullLog.setToolTipText(Messages.Pref_Weather_Check_DisplayFullLog_Tooltip);
          GridDataFactory.fillDefaults().applyTo(_chkDisplayFullLog);
       }
    }
