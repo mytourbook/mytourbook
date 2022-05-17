@@ -5301,7 +5301,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          if (tourDistance < 0.01) {
 
             /*
-             * Ignore start distances when they are 0, this can occure when there is no GPS
+             * Ignore start distances when they are 0, this can occur when there is no GPS
              * signal at the tour start
              */
             sumSkipTime += timeDiff;

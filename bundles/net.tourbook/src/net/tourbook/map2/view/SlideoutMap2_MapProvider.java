@@ -1359,7 +1359,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
       if (selectedMapProvider == null) {
 
-         // this can occure when the last selected mp is not available or filtered out
+         // this can occur when the last selected mp is not available or filtered out
 
          selectedMapProvider = _allMapProvider.get(0);
       }
@@ -1414,7 +1414,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
          }
       }
 
-      // this case can occure when switched from show all to only visible map providers
+      // this case can occur when switched from show all to only visible map providers
       selectMapProvider_Internal(allMPInViewer.get(0));
    }
 
@@ -1422,7 +1422,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
       if (_mpViewer.getTable().isDisposed()) {
 
-         // this can occures when the action is pressed with the keyboard and the slideout is closed
+         // this can occur when the action is pressed with the keyboard and the slideout is closed
 
          return;
       }
@@ -1453,7 +1453,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
          }
       }
 
-      // this case can occure when switched from show all to only visible map providers
+      // this case can occur when switched from show all to only visible map providers
       selectMapProvider_Internal(allMPInViewer.get(0));
    }
 

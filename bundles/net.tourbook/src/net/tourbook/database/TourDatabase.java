@@ -5258,7 +5258,7 @@ public class TourDatabase {
    /**
     * @param splashManager
     *           Progress monitor or <code>null</code> when the monitor is not available
-    * @return <code>true</code> when design verion is updated to the last version, returns
+    * @return <code>true</code> when design version is updated to the last version, returns
     *         <code>false</code> when an error occurred
     */
    private boolean sqlStartup_50_IsDesignVersionValid(final SplashManager splashManager) {
@@ -5298,7 +5298,7 @@ public class TourDatabase {
 
             /*
              * Current db version is HIGHER than the db version which the code is created for,
-             * this can occure during the development and should not happen by the end users.
+             * this can occur during the development and should not happen by the end users.
              */
 
             MessageDialog.openInformation(
@@ -5340,7 +5340,7 @@ public class TourDatabase {
     *
     * @param splashManager
     *           Progress monitor or <code>null</code> when the monitor is not available
-    * @return <code>true</code> when data verion is updated to the last version, returns
+    * @return <code>true</code> when data version is updated to the last version, returns
     *         <code>false</code> when an error occurred
     */
    private boolean sqlStartup_70_IsDataVersionValid(final SplashManager splashManager) {
@@ -5371,7 +5371,7 @@ public class TourDatabase {
 
             /*
              * Current db version is HIGHER than the db version which the code is created for,
-             * this can occure during the development and should not happen by the end users.
+             * this can occur during the development and should not happen by the end users.
              */
 
             MessageDialog.openInformation(
