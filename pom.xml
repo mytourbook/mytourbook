@@ -200,8 +200,7 @@
          <configuration>
              <useUIHarness>true</useUIHarness>
              <useUIThread>false</useUIThread>
-             <product>net.tourbook.productWithoutJRE</product>
-	     <application>org.eclipse.ui.ide.workbench</application>
+             <product>org.eclipse.platform.ide</product>
              <skipTests>true</skipTests>
          </configuration>
       </plugin>
