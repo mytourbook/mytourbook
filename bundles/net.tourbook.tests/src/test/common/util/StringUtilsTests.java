@@ -23,6 +23,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +37,7 @@ public class StringUtilsTests {
    public void beforeClass() {
       // don't use SWTWorkbenchBot here which relies on Platform 3.x
       bot = new SWTBot();
+      SWTBotPreferences.TIMEOUT = 20000;
    }
 
    @Test
