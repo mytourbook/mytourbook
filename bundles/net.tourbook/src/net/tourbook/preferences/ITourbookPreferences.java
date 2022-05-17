@@ -550,7 +550,7 @@ public interface ITourbookPreferences {
    /*
     * View: combined temperatures
     */
-   public static final String VIEW_PREFERRED_TEMPERATURE_VALUE = "ViewPreferredTemperatureValue"; //$NON-NLS-1$
+   public static final String VIEW_PREFERRED_TEMPERATURE_VALUE = "VIEW_PREFERRED_TEMPERATURE_VALUE"; //$NON-NLS-1$
 
    /*
     * Dialog toggle states
