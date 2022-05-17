@@ -6520,10 +6520,10 @@ public class TourDatabase {
                final short dbMinute = result.getShort(5);
                final short dbSecond = result.getShort(6);
 
-               final long dtCreated = (dbYear * 10_000_000_000L)
-                     + (dbMonth * 100_000_000L)
-                     + (dbDay * 1_000_000L)
-                     + (dbHour * 10_000L)
+               final long dtCreated = (dbYear * 10000000000L)
+                     + (dbMonth * 100000000L)
+                     + (dbDay * 1000000L)
+                     + (dbHour * 10000L)
                      + (dbMinute * 100L)
                      + dbSecond;
 
