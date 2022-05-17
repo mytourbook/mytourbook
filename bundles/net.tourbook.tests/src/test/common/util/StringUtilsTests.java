@@ -26,7 +26,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeClass;
 import org.junit.jupiter.api.Test;
 
 public class StringUtilsTests {
