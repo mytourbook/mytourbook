@@ -25,22 +25,21 @@ import net.tourbook.common.util.StringUtils;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class StringUtilsTests {
 
    private static SWTBot bot;
 
-   @BeforeClass
-   public static void beforeClass() {
-      // don't use SWTWorkbenchBot here which relies on Platform 3.x
+   @BeforeEach
+   public void beforeClass() {
       bot = new SWTBot();
       SWTBotPreferences.TIMEOUT = 20000;
    }
 
    @Test
-   public static void testOpenMyTourbook() {
+   void testOpenMyTourbook() {
 
       final SWTBotButton myTourbookMenu = bot.button("OK").click();
       assertNotNull(myTourbookMenu);
