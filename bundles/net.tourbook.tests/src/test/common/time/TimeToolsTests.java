@@ -81,4 +81,10 @@ public class TimeToolsTests {
       assertEquals(366, TimeTools.getNumberOfDaysWithYear(2020));
    }
 
+   @Test
+   void testGetNumberOfWeeksWithYear() {
+
+      assertEquals(52, TimeTools.getNumberOfWeeksWithYear(2022));
+      assertEquals(53, TimeTools.getNumberOfWeeksWithYear(2020));
+   }
 }
