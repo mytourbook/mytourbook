@@ -85,7 +85,7 @@ public class TimeTools {
    /**
     * Contains the short weekday strings. For example: "Sun", "Mon", etc.
     */
-   protected static String[]                      weekDays_Short;
+   public static String[]                         weekDays_Short;
 
    /**
     * Contains the full text, typically the full description. For example, day-of-week Monday might
