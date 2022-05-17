@@ -1,7 +1,8 @@
 name: Build
 on:
-  schedule:
-  - cron: "20 7 * * *"
+  push:
+    branches:
+      - fb-swtbottest
 jobs:
   build:
     needs: check_date

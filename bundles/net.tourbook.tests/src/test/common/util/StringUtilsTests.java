@@ -16,14 +16,40 @@
 package common.util;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
 
+import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class StringUtilsTests {
+
+   private SWTBot bot;
+
+   @BeforeEach
+   public void beforeClass() {
+      // don't use SWTWorkbenchBot here which relies on Platform 3.x
+      bot = new SWTBot();
+   }
+
+   @Test
+   public void testOpenMyTourbook() {
+
+      final SWTBotButton myTourbookMenu = bot.button("OK").click();
+      assertNotNull(myTourbookMenu);
+      final SWTBotButton measurementSystemMenu = bot.button("OK").click();
+      assertNotNull(measurementSystemMenu);
+      final SWTBotButton peopleMenu = bot.button("Apply and Close").click();
+      assertNotNull(peopleMenu);
+      final SWTBotButton firstStartMenu = bot.button("OK").click();
+      assertNotNull(firstStartMenu);
+      bot.menu("New").menu("Exit").click();
+   }
 
    /**
     * File name sanitization with a Windows environment.
