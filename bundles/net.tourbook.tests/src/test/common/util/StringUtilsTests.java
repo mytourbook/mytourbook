@@ -31,10 +31,10 @@ import org.junit.jupiter.api.Test;
 
 public class StringUtilsTests {
 
-   private SWTBot bot;
+   private static SWTBot bot;
 
-   @BeforeEach
-   public void beforeClass() {
+   @BeforeClass
+   public static void beforeClass() {
       // don't use SWTWorkbenchBot here which relies on Platform 3.x
       bot = new SWTBot();
       SWTBotPreferences.TIMEOUT = 20000;
