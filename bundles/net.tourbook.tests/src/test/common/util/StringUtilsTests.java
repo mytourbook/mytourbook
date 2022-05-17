@@ -24,6 +24,7 @@ import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +40,7 @@ public class StringUtilsTests {
 
    @Test
    public void testOpenMyTourbook() {
-
+      final SWTBotShell shell = bot.activeShell();
       final SWTBotButton myTourbookMenu = bot.button("OK").click();
       assertNotNull(myTourbookMenu);
       final SWTBotButton measurementSystemMenu = bot.button("OK").click();
