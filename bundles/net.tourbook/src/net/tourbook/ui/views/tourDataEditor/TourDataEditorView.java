@@ -4053,7 +4053,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   //
                   // SWT.DEFAULT causes lots of problems with the layout therefore the hint is set
                   //
-                  .hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(2))
+                  .hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(6))
                   .applyTo(_txtWeather);
          }
          {

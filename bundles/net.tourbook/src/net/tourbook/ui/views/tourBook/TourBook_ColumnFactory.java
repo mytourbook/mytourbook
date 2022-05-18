@@ -148,14 +148,14 @@ public class TourBook_ColumnFactory {
       // Weather
       defineColumn_Weather_Clouds();
       defineColumn_Weather_Temperature_Avg();
-      defineColumn_Weather_Temperature_Avg_Combined();
-      defineColumn_Weather_Temperature_Avg_Device();
       defineColumn_Weather_Temperature_Min();
-      defineColumn_Weather_Temperature_Min_Combined();
-      defineColumn_Weather_Temperature_Min_Device();
       defineColumn_Weather_Temperature_Max();
-      defineColumn_Weather_Temperature_Max_Combined();
+      defineColumn_Weather_Temperature_Avg_Device();
+      defineColumn_Weather_Temperature_Min_Device();
       defineColumn_Weather_Temperature_Max_Device();
+      defineColumn_Weather_Temperature_Avg_Combined();
+      defineColumn_Weather_Temperature_Min_Combined();
+      defineColumn_Weather_Temperature_Max_Combined();
       defineColumn_Weather_WindSpeed();
       defineColumn_Weather_WindDirection();
 
