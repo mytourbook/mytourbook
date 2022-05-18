@@ -3426,7 +3426,7 @@ public class Map2View extends ViewPart implements
 
       /**
        * It is possible that sync photo action is disabled but map can be synched with photos. This
-       * occure when show photos are deactivated but the photo sync is still selected.
+       * occur when show photos are deactivated but the photo sync is still selected.
        * <p>
        * To reactivate photo sync, first photos must be set visible.
        */
@@ -3969,7 +3969,7 @@ public class Map2View extends ViewPart implements
       final double latitude = latitudeSerie[sliderIndex];
       final double longitude = longitudeSerie[sliderIndex];
 
-      // ignore lat/lon == 0, this occure when there are no geo data
+      // ignore lat/lon == 0, this occur when there are no geo data
       if (latitude != 0 && longitude != 0) {
          _map.setMapCenter(new GeoPosition(latitude, longitude));
       }

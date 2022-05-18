@@ -31,6 +31,13 @@ New
 * Tour Segmenter View (Frederic)
   - Added the ability to export the current view in .CSV format
 
+* Weather Retrieval (Frederic)
+  - New vendor addition: Weather API     
+    https://github.com/mytourbook/mytourbook/issues/505
+
+* Tag View (Frederic)
+  - Added the ability to duplicate a tag
+
 
 Improvements
 ============
@@ -42,6 +49,14 @@ Improvements
 * 2.5D Map
   - Filter photos                      			https://github.com/mytourbook/mytourbook/issues/397
   - Enlarge marker font on 4k display           https://github.com/mytourbook/mytourbook/issues/504
+
+* Weather Retrieval (Frederic)
+  - Added the ability to save the weather retrieval log in the tour weather field
+    https://github.com/mytourbook/mytourbook/issues/498
+
+* Temperatures (Frederic)
+  - Added the ability to display combined temperatures (either measured from the device, from a provider or manually entered)
+    https://github.com/mytourbook/mytourbook/issues/495
 
 
 Changes
@@ -61,6 +76,9 @@ Bugfix
 
 * Tour Editor (Frederic)
   - Fixed a bug where the recorded and paused times were not recomputed when using the feature "Delete Time Slices and Remove Time"
+
+* Tag View (Frederic)
+  - Fixed a bug where newly created tags that were immediately deleted were causing a NPE.
 
 
 Translation    

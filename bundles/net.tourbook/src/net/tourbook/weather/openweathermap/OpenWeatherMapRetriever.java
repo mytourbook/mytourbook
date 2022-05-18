@@ -18,7 +18,6 @@ package net.tourbook.weather.openweathermap;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javadocmd.simplelatlng.LatLng;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -39,25 +38,13 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
-   private static final String HEROKU_APP_URL    = "https://passeur-mytourbook-oauthapps.herokuapp.com"; //$NON-NLS-1$
-   private static final String baseApiUrl        = HEROKU_APP_URL + "/openweathermap/timemachine";       //$NON-NLS-1$
-
-   private LatLng              searchAreaCenter;
-   private long                tourEndTime;
-   private long                tourMiddleTime;
-   private long                tourStartTime;
+   private static final String baseApiUrl        = WeatherUtils.HEROKU_APP_URL + "/openweathermap/timemachine"; //$NON-NLS-1$
 
    private TimeMachineResult   timeMachineResult = null;
 
    public OpenWeatherMapRetriever(final TourData tourData) {
 
       super(tourData);
-
-      searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(tour);
-
-      tourStartTime = tour.getTourStartTimeMS() / 1000;
-      tourEndTime = tour.getTourEndTimeMS() / 1000;
-      tourMiddleTime = tourStartTime + ((tourEndTime - tourStartTime) / 2);
    }
 
    public static String getBaseApiUrl() {
@@ -65,15 +52,18 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    }
 
    @Override
-   protected String buildFullWeatherDataString() {
+   protected String buildDetailedWeatherLog(final boolean isCompressed) {
 
       final List<String> fullWeatherDataList = new ArrayList<>();
 
       for (final Hourly hourly : timeMachineResult.getHourly()) {
 
-         final TourDateTime tourDateTime = TimeTools.createTourDateTime(hourly.getDt() * 1000L, tour.getTimeZoneId());
+         final TourDateTime tourDateTime = TimeTools.createTourDateTime(
+               hourly.getDt() * 1000L,
+               tour.getTimeZoneId());
 
-         final String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
+         final boolean isDisplayEmptyValues = !isCompressed;
+         String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                (float) hourly.getTemp(),
                (float) hourly.getFeels_like(),
                (float) hourly.getWind_speedKmph(),
@@ -82,13 +72,18 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                hourly.getPressure(),
                hourly.getRain(),
                hourly.getSnow(),
-               tourDateTime);
+               tourDateTime,
+               isDisplayEmptyValues);
+
+         if (isCompressed) {
+            fullWeatherData = fullWeatherData.replaceAll("\\s+", UI.SPACE1); //$NON-NLS-1$
+         }
 
          fullWeatherDataList.add(fullWeatherData);
       }
 
       final String fullWeatherData = String.join(
-            net.tourbook.ui.UI.SYSTEM_NEW_LINE,
+            UI.SYSTEM_NEW_LINE,
             fullWeatherDataList);
 
       return fullWeatherData;
@@ -125,6 +120,31 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       }
    }
 
+   private TimeMachineResult deserializeWeatherData(final String weatherDataResponse) {
+
+      TimeMachineResult newTimeMachineResult = null;
+      try {
+
+         final ObjectMapper mapper = new ObjectMapper();
+         final String weatherResults = mapper
+               .readValue(weatherDataResponse, JsonNode.class)
+               .toString();
+
+         newTimeMachineResult = mapper.readValue(
+               weatherResults,
+               new TypeReference<TimeMachineResult>() {});
+
+      } catch (final Exception e) {
+
+         StatusUtil.logError(
+               "OpenWeatherMapRetriever.deserializeWeatherData : Error while " + //$NON-NLS-1$
+                     "deserializing the historical weather JSON object :" //$NON-NLS-1$
+                     + weatherDataResponse + UI.SYSTEM_NEW_LINE + e.getMessage());
+      }
+
+      return newTimeMachineResult;
+   }
+
    @Override
    public boolean retrieveHistoricalWeatherData() {
 
@@ -142,7 +162,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
             return false;
          }
 
-         final TimeMachineResult newTimeMachineResult = serializeWeatherData(rawWeatherData);
+         final TimeMachineResult newTimeMachineResult = deserializeWeatherData(rawWeatherData);
          if (newTimeMachineResult == null) {
             return false;
          }
@@ -204,30 +224,5 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 // SET_FORMATTING_ON
 
       return true;
-   }
-
-   private TimeMachineResult serializeWeatherData(final String weatherDataResponse) {
-
-      TimeMachineResult newTimeMachineResult = null;
-      try {
-
-         final ObjectMapper mapper = new ObjectMapper();
-         final String weatherResults = mapper
-               .readValue(weatherDataResponse, JsonNode.class)
-               .toString();
-
-         newTimeMachineResult = mapper.readValue(
-               weatherResults,
-               new TypeReference<TimeMachineResult>() {});
-
-      } catch (final Exception e) {
-
-         StatusUtil.logError(
-               "OpenWeatherMapRetriever.serializeWeatherData : Error while serializing the historical weather JSON object :" //$NON-NLS-1$
-                     + weatherDataResponse + "\n" + e.getMessage()); //$NON-NLS-1$
-         return newTimeMachineResult;
-      }
-
-      return newTimeMachineResult;
    }
 }

@@ -1916,9 +1916,10 @@ public class TourManager {
 
       switch (weatherProviderId) {
 
-      case IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP:
+      case IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP_ID:
+      case IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI_ID:
          return true;
-      case IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE:
+      case IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_ID:
          return StringUtils.hasContent(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
       case IWeatherProvider.Pref_Weather_Provider_None:
       default:
