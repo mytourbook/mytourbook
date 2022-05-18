@@ -49,7 +49,11 @@ public class BasicTests {
 @Test
 void testTourMarkerView()
 	{
+		// This is the equivalent of
+		// bot.viewByTitle("Calendar").show();
+		// for SWTBot.
 		bot.menu("Tour Editor");
+
 		bot.tree().getTreeItem("2020   3").expand();
 		bot.tree().getTreeItem("2020   3").getNode("May   2").expand();
 		bot.tree().getTreeItem("2020   3").getNode("May   2").select();
