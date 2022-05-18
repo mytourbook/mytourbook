@@ -1,0 +1,46 @@
+/*******************************************************************************
+ * Copyright (C) 2022 Frédéric Bard
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+public class BasicTests {
+
+   private static SWTBot bot;
+
+   @BeforeEach
+   public void beforeClass() {
+      bot = new SWTBot();
+		SWTBotPreferences.TIMEOUT = 20000;
+   }
+
+   @Test
+   void testOpenMyTourbook() {
+
+      final SWTBotButton myTourbookMenu = bot.button("OK").click();
+      assertNotNull(myTourbookMenu);
+      final SWTBotButton measurementSystemMenu = bot.button("OK").click();
+      assertNotNull(measurementSystemMenu);
+      final SWTBotButton peopleMenu = bot.button("Apply and Close").click();
+      assertNotNull(peopleMenu);
+      final SWTBotButton firstStartMenu = bot.button("OK").click();
+      assertNotNull(firstStartMenu);
+   }
+}
