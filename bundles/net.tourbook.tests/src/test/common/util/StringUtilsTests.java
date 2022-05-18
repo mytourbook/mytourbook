@@ -49,7 +49,6 @@ public class StringUtilsTests {
       assertNotNull(peopleMenu);
       final SWTBotButton firstStartMenu = bot.button("OK").click();
       assertNotNull(firstStartMenu);
-      bot.menu("New").menu("Exit").click();
    }
 
    /**
