@@ -145,6 +145,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public static final int               DB_LENGTH_TIME_ZONE_ID            = 255;
 
    public static final int               DB_LENGTH_WEATHER                 = 1000;
+   public static final int               DB_LENGTH_WEATHER_V48             = 32000;
    public static final int               DB_LENGTH_WEATHER_CLOUDS          = 255;
 
    public static final int               DB_LENGTH_POWER_DATA_SOURCE       = 255;
@@ -2435,7 +2436,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          final float distanceDiff = distanceSerie[indexHigh] - distanceSerie[indexLow];
          final float altitudeDiff = altitudeSerie[indexHigh] - altitudeSerie[indexLow];
 
-         final float timeDiff = deviceTimeInterval * (indexHigh - indexLow);
+         final int timeDiff = deviceTimeInterval * (indexHigh - indexLow);
 
          // keep altimeter data
          dataSerieAltimeter[serieIndex] = 3600 * altitudeDiff / timeDiff / UI.UNIT_VALUE_ELEVATION;
@@ -3783,7 +3784,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
          for (int serieIndex = 1; serieIndex < serieLength; serieIndex++) {
 
-            final float timeDiff = timeSerie[serieIndex] - timeSerie[serieIndex - 1];
+            final int timeDiff = timeSerie[serieIndex] - timeSerie[serieIndex - 1];
             final float distanceDiff = distanceSerie[serieIndex] - distanceSerie[serieIndex - 1];
             final float altitudeDiff = altitudeSerie[serieIndex] - altitudeSerie[serieIndex - 1];
 
@@ -3815,7 +3816,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       for (int serieIndex = 1; serieIndex < serieLength; serieIndex++) {
 
-         final float timeDiff = timeSerie[serieIndex] - timeSerie[serieIndex - 1];
+         final int timeDiff = timeSerie[serieIndex] - timeSerie[serieIndex - 1];
          final float distanceDiff = distanceSerie[serieIndex] - distanceSerie[serieIndex - 1];
 
          if (timeDiff == 0) {
@@ -5002,7 +5003,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          distIndexHigh = (0 >= serieIndexHighAdjustedMin) ? 0 : serieIndexHighAdjustedMin;
 
          final float distDiff = distanceSerie[distIndexHigh] - distanceSerie[distIndexLow];
-         final float timeDiff = timeSerie[distIndexHigh] - timeSerie[distIndexLow];
+         final int timeDiff = timeSerie[distIndexHigh] - timeSerie[distIndexLow];
 
          /*
           * speed
@@ -5300,7 +5301,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          if (tourDistance < 0.01) {
 
             /*
-             * Ignore start distances when they are 0, this can occure when there is no GPS
+             * Ignore start distances when they are 0, this can occur when there is no GPS
              * signal at the tour start
              */
             sumSkipTime += timeDiff;
@@ -10311,14 +10312,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
        */
       fieldValidation = TourDatabase.isFieldValidForSave(//
             weather,
-            DB_LENGTH_WEATHER,
+            DB_LENGTH_WEATHER_V48,
             Messages.Db_Field_TourData_Weather,
             false);
 
       if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
          return false;
       } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-         weather = weather.substring(0, DB_LENGTH_WEATHER);
+         weather = weather.substring(0, DB_LENGTH_WEATHER_V48);
       }
 
       return true;

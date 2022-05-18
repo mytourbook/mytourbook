@@ -341,18 +341,17 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          return;
       }
 
+      // set map provider which should be selected when the pref dialog is opened
+      _actionPrefDialog.setPrefData(selectedMapProvider);
+
       updateUI_Theme(selectedMapProvider);
       updateUI_Theme_Style(selectedMapProvider);
       updateUI_MapProvider_Tooltip(selectedMapProvider);
 
-      // update UI otherwise the old theme style box is displayed until the next redraw
-      _parent.update();
+      updateUI_UILayout();
 
       // update UI
       updateMap(selectedMapProvider);
-
-      // set map provider which should be selected when the pref dialog is opened
-      _actionPrefDialog.setPrefData(selectedMapProvider);
    }
 
    private void onSelect_Theme() {
@@ -361,39 +360,48 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       final int selectedIndex = _listTheme.getSelectionIndex();
 
-      final boolean isThemeFromFile = mapProvider.is_mf_Map && selectedIndex == 0;
+      VtmThemes vtmTheme = null;
+      final boolean isThemeFromFile = mapProvider.isOfflineMap && selectedIndex == 0;
 
-      mapProvider.mf_IsThemeFromFile = isThemeFromFile;
+      if (isThemeFromFile == false) {
 
-      if (isThemeFromFile) {
-
-         mapProvider.theme = null;
-
-      } else {
+         // an internal theme is used
 
          int themeIndex = selectedIndex;
 
          // adjust index for offline maps because the first item is not a theme
-         if (mapProvider.is_mf_Map) {
+         if (mapProvider.isOfflineMap) {
             themeIndex--;
          }
 
-         //update model
-         final VtmThemes[] themeValues = VtmThemes.values();
-         mapProvider.theme = themeValues[themeIndex];
+         vtmTheme = VtmThemes.values()[themeIndex];
       }
+
+      // check if update is necessary
+      if (mapProvider.offline_IsThemeFromFile == isThemeFromFile
+            && mapProvider.vtmTheme == vtmTheme) {
+
+         // it's the same value as before
+         return;
+      }
+
+      // update model
+      mapProvider.offline_IsThemeFromFile = isThemeFromFile;
+      mapProvider.vtmTheme = vtmTheme;
 
       Map25ProviderManager.saveMapProvider();
 
       // update UI
       updateUI_Theme_Style(mapProvider);
 
-      // update UI otherwise the old theme style box is displayed until the next redraw
-      _parent.update();
+      updateUI_UILayout();
 
       updateMap(mapProvider);
    }
 
+   /**
+    * Theme style is set only for offline maps
+    */
    private void onSelect_ThemeStyle() {
 
       if (_isInUpdateUI) {
@@ -421,7 +429,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
       }
 
       // update model
-      mapProvider.mf_ThemeStyle = selectedThemeStyle;
+      mapProvider.offline_ThemeStyle = selectedThemeStyle;
 
       Map25ProviderManager.saveMapProvider();
 
@@ -478,7 +486,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       String mpTooltip = UI.EMPTY_STRING;
 
-      if (mapProvider.is_mf_Map) {
+      if (mapProvider.isOfflineMap) {
 
          // offline
 
@@ -495,8 +503,8 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          mpTooltip = String.format(Messages.Slideout_Map25Provider_Combo_MapProvider_Offline_Tooltip,
 
                mapProvider.tileEncoding,
-               mapProvider.mf_MapFilepath,
-               mapProvider.mf_ThemeFilepath,
+               mapProvider.offline_MapFilepath,
+               mapProvider.offline_ThemeFilepath,
                themeStyleText
 
          );
@@ -525,14 +533,14 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
        */
       _listTheme.removeAll();
 
-      if (mapProvider != null && mapProvider.is_mf_Map) {
+      if (mapProvider != null && mapProvider.isOfflineMap) {
 
          // add an additional option to use the theme from the theme file
 
          _listTheme.add(Messages.Pref_Map25_Provider_Theme_FromThemeFile);
       }
 
-      // fill combobox with all themes
+      // fill combobox with VTM default themes
       for (final VtmThemes vtmTheme : VtmThemes.values()) {
          _listTheme.add(vtmTheme.toString());
       }
@@ -541,30 +549,33 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
        * Select theme
        */
       if (mapProvider == null) {
+
          _listTheme.select(0);
-         return;
-      }
 
-      if (mapProvider.is_mf_Map && mapProvider.mf_IsThemeFromFile) {
+      } else if (mapProvider.isOfflineMap && mapProvider.offline_IsThemeFromFile) {
 
-         // select: theme is from a file
+         // select: "From theme file"
+
          _listTheme.select(0);
-         return;
+
+      } else {
+
+         int themeIndex = Map25ProviderManager.getThemeIndex(mapProvider.vtmTheme, mapProvider.tileEncoding);
+
+         if (mapProvider.isOfflineMap) {
+
+            // adjust because of the offline additional item
+
+            themeIndex++;
+         }
+
+         _listTheme.select(themeIndex);
       }
-
-      int themeIndex = Map25ProviderManager.getThemeIndex(mapProvider.theme, mapProvider.tileEncoding);
-      if (mapProvider.is_mf_Map) {
-
-         // adjust because of the offline additional item
-
-         themeIndex++;
-      }
-      _listTheme.select(themeIndex);
    }
 
    /**
     * This must be called <b>AFTER</b> {@link #updateUI_Theme(Map25Provider)} because it depends on
-    * the {@link #_listTheme}
+    * the themes in {@link #_listTheme}
     *
     * @param mapProvider
     */
@@ -572,7 +583,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       _listThemeStyle.removeAll();
 
-      if (mapProvider.is_mf_Map == false) {
+      if (mapProvider.isOfflineMap == false) {
 
          // online map has no theme styles
 
@@ -601,7 +612,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          return;
       }
 
-      if (mapProvider.is_mf_Map && _listTheme.getSelectionIndex() > 0) {
+      if (mapProvider.isOfflineMap && _listTheme.getSelectionIndex() > 0) {
 
          /*
           * When it's an offline map and the themes are NOT from the a file then there are no theme
@@ -633,7 +644,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
          _listThemeStyle.add(mfStyle.getLocaleName());
 
-         if (mfStyle.getXmlLayer().equals(mapProvider.mf_ThemeStyle)) {
+         if (mfStyle.getXmlLayer().equals(mapProvider.offline_ThemeStyle)) {
             styleSelectIndex = styleIndex + 1;
          }
       }
@@ -649,6 +660,15 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
          _listThemeStyle.select(styleSelectIndex);
       }
       _isInUpdateUI = false;
+   }
+
+   /**
+    * Update UI otherwise the old theme style box is displayed until the next redraw
+    */
+   private void updateUI_UILayout() {
+
+      _parent.getShell().pack(true);
+      _parent.update();
    }
 
 }

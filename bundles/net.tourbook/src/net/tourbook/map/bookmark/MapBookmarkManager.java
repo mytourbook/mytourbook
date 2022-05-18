@@ -665,13 +665,9 @@ public class MapBookmarkManager {
       mapPosition2.zoomLevel = Util.getXmlInteger(xmlBookmark, ATTR_MAP_POSITION_ZOOM_LEVEL, 1);
 
       if (mapPosition2.mapPositionMarkerX == invalidPosition || mapPosition2.mapPositionMarkerY == invalidPosition) {
-         net.tourbook.map25.Map25App.debugPrint("++++ MapBookmarkManager: parse_22_Bookmarks_One: markerPos not in xml, migrating..."); //$NON-NLS-1$
          mapPosition2.mapPositionMarkerX = mapPosition2.x;
          mapPosition2.mapPositionMarkerY = mapPosition2.y;
       }
-
-      net.tourbook.map25.Map25App.debugPrint("++++ MapBookmarkManager: parse_22_Bookmarks_One: name: " + bookmark.name + " markerpos_x: " //$NON-NLS-1$//$NON-NLS-2$
-            + mapPosition2.mapPositionMarkerX + " pos_x: " + mapPosition2.x); //$NON-NLS-1$
 
       bookmark.setMapPosition(mapPosition2);
       bookmark.setMapPositionMarker(mapPosition2);

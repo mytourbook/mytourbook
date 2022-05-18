@@ -1133,7 +1133,7 @@ public class Map25View extends ViewPart implements
          moveToMapLocation(mapBookmark);
       } else if (mapBookmarkEventType == MapBookmarkEventType.MODIFIED) {
          //_mapApp.debugPrint("*** Map25View_onMapBookmarkActionPerformed modify: " + mapBookmark.name);
-         _mapApp.updateUI_MapBookmarkLayer();
+         _mapApp.updateLayer_MapBookmarks();
       }
    }
 
@@ -1460,7 +1460,7 @@ public class Map25View extends ViewPart implements
        */
       if (_mapApp.isPhoto_Visible()) {
 
-         _mapApp.updateUI_PhotoLayer();
+         _mapApp.updateLayer_Photos();
       }
 
       /*
@@ -1559,31 +1559,31 @@ public class Map25View extends ViewPart implements
       _actionMapPhotoFilter.getPhotoFilterSlideout().restoreState(_photoFilter_RatingStars, _photoFilter_RatingStar_Operator);
 
       // hillshading layer
-      final int layerHillshadingOpacity = Util.getStateInt(_state, STATE_LAYER_HILLSHADING_OPACITY, 255);
-      final BitmapTileLayer layer_HillShading = _mapApp.getLayer_HillShading();
+      final int layerHillshadingOpacity         = Util.getStateInt(_state, STATE_LAYER_HILLSHADING_OPACITY, 255);
+      final BitmapTileLayer layer_HillShading   = _mapApp.getLayer_HillShading();
       layer_HillShading.setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_HILLSHADING_VISIBLE, true));
       layer_HillShading.setBitmapAlpha(layerHillshadingOpacity / 255.0f, true);
       _mapApp.setLayer_HillShading_Opacity(layerHillshadingOpacity);
 
       // satellite maps
-      _mapApp.getLayer_Satellite().setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SATELLITE_VISIBLE, false));
+      _mapApp.getLayer_Satellite()        .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SATELLITE_VISIBLE, false));
 
       // other layers
-      _mapApp.getLayer_BaseMap()       .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BASE_MAP_VISIBLE, true));
-      _mapApp.getLayer_Building()      .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BUILDING_VISIBLE, true));
+      _mapApp.getLayer_BaseMap()          .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BASE_MAP_VISIBLE,  true));
+      _mapApp.getLayer_Building_Default() .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BUILDING_VISIBLE,  true));
 
       //handling S3DB like building, not used layer will be removed in map25app
-      _mapApp.getLayer_S3DB()          .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BUILDING_VISIBLE, true));
+      _mapApp.getLayer_Building_S3DB()    .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BUILDING_VISIBLE,  true));
 
-      _mapApp.getLayer_MapBookmark()   .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BOOKMARK_VISIBLE, true));
-      _mapApp.getLayer_Label()         .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_LABEL_VISIBLE, true));
-      _mapApp.getLayer_ScaleBar()      .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SCALE_BAR_VISIBLE, true));
-      _mapApp.getLayer_TileInfo()      .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_TILE_INFO_VISIBLE, false));
+      _mapApp.getLayer_MapBookmark()      .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BOOKMARK_VISIBLE,  true));
+      _mapApp.getLayer_Label()            .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_LABEL_VISIBLE,     true));
+      _mapApp.getLayer_ScaleBar()         .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SCALE_BAR_VISIBLE, true));
+      _mapApp.getLayer_TileInfo()         .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_TILE_INFO_VISIBLE, false));
 
       // map is synced with
       _mapSynchedWith = (MapSync) Util.getStateEnum(_state, STATE_MAP_SYNCHED_WITH, MapSync.NONE);
-      _actionSyncMap_WithOtherMap      .setChecked(_mapSynchedWith == MapSync.WITH_OTHER_MAP);
-      _actionSyncMap_WithTour          .setChecked(_mapSynchedWith == MapSync.WITH_TOUR);
+      _actionSyncMap_WithOtherMap         .setChecked(_mapSynchedWith == MapSync.WITH_OTHER_MAP);
+      _actionSyncMap_WithTour             .setChecked(_mapSynchedWith == MapSync.WITH_TOUR);
       updateUI_SyncSliderAction();
 
 // SET_FORMATTING_ON
@@ -1657,7 +1657,7 @@ public class Map25View extends ViewPart implements
       // other layers
       _state.put(STATE_IS_LAYER_BASE_MAP_VISIBLE,     _mapApp.getLayer_BaseMap().isEnabled());
       _state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE,     _mapApp.getLayer_MapBookmark().isEnabled());
-      _state.put(STATE_IS_LAYER_BUILDING_VISIBLE,     _mapApp.getLayer_Building().isEnabled());
+      _state.put(STATE_IS_LAYER_BUILDING_VISIBLE,     _mapApp.getLayer_Building_Default().isEnabled());
       _state.put(STATE_IS_LAYER_MARKER_VISIBLE,       _mapApp.getLayer_TourMarker().isEnabled());
       _state.put(STATE_IS_LAYER_LABEL_VISIBLE,        _mapApp.getLayer_Label().isEnabled());
       _state.put(STATE_IS_LAYER_SATELLITE_VISIBLE,    _mapApp.getLayer_Satellite().isEnabled());
@@ -1784,26 +1784,23 @@ public class Map25View extends ViewPart implements
          return;
       }
 
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getCurrent().asyncExec(() -> {
 
-            // validate widget
-            if (_swtContainer.isDisposed()) {
-               return;
-            }
-
-            final ArrayList<TourData> tourDataList = TourManager.getSelectedTours(true);
-            if (tourDataList != null) {
-
-               setMapTours(tourDataList);
-               setMapPhotos(null);
-
-               paintTours();
-            }
-
-            enableActions();
+         // validate widget
+         if (_swtContainer.isDisposed()) {
+            return;
          }
+
+         final ArrayList<TourData> tourDataList = TourManager.getSelectedTours(true);
+         if (tourDataList != null) {
+
+            setMapTours(tourDataList);
+            setMapPhotos(null);
+
+            paintTours();
+         }
+
+         enableActions();
       });
    }
 
@@ -1942,7 +1939,7 @@ public class Map25View extends ViewPart implements
 
       runPhotoFilter();
 
-      _mapApp.updateUI_PhotoLayer();
+      _mapApp.updateLayer_Photos();
       _mapApp.updateMap();
 
    }

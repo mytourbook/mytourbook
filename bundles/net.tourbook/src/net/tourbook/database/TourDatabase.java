@@ -3930,7 +3930,7 @@ public class TourDatabase {
             // version 13 start
 
             + " TemperatureScale       INTEGER DEFAULT 1,                                    " + NL //$NON-NLS-1$
-            + " Weather                VARCHAR(" + TourData.DB_LENGTH_WEATHER + "),          " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + " Weather                VARCHAR(" + TourData.DB_LENGTH_WEATHER_V48 + "),      " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 13 end ---------
 
@@ -5258,7 +5258,7 @@ public class TourDatabase {
    /**
     * @param splashManager
     *           Progress monitor or <code>null</code> when the monitor is not available
-    * @return <code>true</code> when design verion is updated to the last version, returns
+    * @return <code>true</code> when design version is updated to the last version, returns
     *         <code>false</code> when an error occurred
     */
    private boolean sqlStartup_50_IsDesignVersionValid(final SplashManager splashManager) {
@@ -5298,7 +5298,7 @@ public class TourDatabase {
 
             /*
              * Current db version is HIGHER than the db version which the code is created for,
-             * this can occure during the development and should not happen by the end users.
+             * this can occur during the development and should not happen by the end users.
              */
 
             MessageDialog.openInformation(
@@ -5340,7 +5340,7 @@ public class TourDatabase {
     *
     * @param splashManager
     *           Progress monitor or <code>null</code> when the monitor is not available
-    * @return <code>true</code> when data verion is updated to the last version, returns
+    * @return <code>true</code> when data version is updated to the last version, returns
     *         <code>false</code> when an error occurred
     */
    private boolean sqlStartup_70_IsDataVersionValid(final SplashManager splashManager) {
@@ -5371,7 +5371,7 @@ public class TourDatabase {
 
             /*
              * Current db version is HIGHER than the db version which the code is created for,
-             * this can occure during the development and should not happen by the end users.
+             * this can occur during the development and should not happen by the end users.
              */
 
             MessageDialog.openInformation(
@@ -5812,7 +5812,7 @@ public class TourDatabase {
 
          // 47 -> 48    22.X ??
          if (currentDbVersion == 47) {
-            currentDbVersion = _dbDesignVersion_New = 48;
+            currentDbVersion = _dbDesignVersion_New = updateDb_047_To_048(conn, splashManager);
          }
 
          // update db design version number
@@ -9349,6 +9349,28 @@ public class TourDatabase {
             entityManager.close();
          }
       });
+   }
+
+   private int updateDb_047_To_048(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 48;
+
+      logDbUpdate_Start(newDbVersion);
+
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+         final String sql = "ALTER TABLE " + TABLE_TOUR_DATA + " ALTER COLUMN   Weather SET DATA TYPE VARCHAR(" //$NON-NLS-1$//$NON-NLS-2$
+               + TourData.DB_LENGTH_WEATHER_V48 + ")"; //$NON-NLS-1$
+
+         exec(stmt, sql);
+      }
+      stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
    }
 
    private void updateMonitor(final SplashManager splashManager, final int newDbVersion) {

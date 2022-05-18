@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.map2.view;
 
 import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import de.byteholder.geoclipse.map.Map2;
@@ -80,10 +81,6 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -638,15 +635,12 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
          }
       });
 
-      table.addKeyListener(new KeyAdapter() {
-         @Override
-         public void keyPressed(final KeyEvent e) {
+      table.addKeyListener(keyPressedAdapter(keyEvent -> {
 
-            if (e.character == ' ') {
-               toggleMPVisibility();
-            }
+         if (keyEvent.character == ' ') {
+            toggleMPVisibility();
          }
-      });
+      }));
 
       /*
        * Create table viewer
@@ -661,12 +655,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
       // set initial width
       setWidth_ForColumn_IsVisible();
 
-      _colDef_IsMPVisible.setControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent e) {
-            setWidth_ForColumn_IsVisible();
-         }
-      });
+      _colDef_IsMPVisible.setControlListener(controlResizedAdapter(controlEvent -> setWidth_ForColumn_IsVisible()));
 
       _mpViewer.setUseHashlookup(true);
 
@@ -1359,7 +1348,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
       if (selectedMapProvider == null) {
 
-         // this can occure when the last selected mp is not available or filtered out
+         // this can occur when the last selected mp is not available or filtered out
 
          selectedMapProvider = _allMapProvider.get(0);
       }
@@ -1414,7 +1403,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
          }
       }
 
-      // this case can occure when switched from show all to only visible map providers
+      // this case can occur when switched from show all to only visible map providers
       selectMapProvider_Internal(allMPInViewer.get(0));
    }
 
@@ -1422,7 +1411,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
 
       if (_mpViewer.getTable().isDisposed()) {
 
-         // this can occures when the action is pressed with the keyboard and the slideout is closed
+         // this can occur when the action is pressed with the keyboard and the slideout is closed
 
          return;
       }
@@ -1453,7 +1442,7 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
          }
       }
 
-      // this case can occure when switched from show all to only visible map providers
+      // this case can occur when switched from show all to only visible map providers
       selectMapProvider_Internal(allMPInViewer.get(0));
    }
 
