@@ -65,6 +65,7 @@ Export-Package: de.byteholder.geoclipse.map,
  net.tourbook.ui.views.rawData,
  net.tourbook.weather,
  net.tourbook.weather.openweathermap,
+ net.tourbook.weather.weatherapi,
  net.tourbook.weather.worldweatheronline
 Import-Package: com.fasterxml.jackson.core.type,
  com.fasterxml.jackson.databind,

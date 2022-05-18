@@ -22,8 +22,8 @@ import com.pgssoft.httpclient.HttpClientMock;
 
 import java.lang.reflect.Field;
 
-import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.data.TourData;
+import net.tourbook.weather.WeatherUtils;
 import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -42,24 +42,28 @@ public class OpenWeatherMapRetrieverTests {
    OpenWeatherMapRetriever     openWeatherMapRetriever;
 
    @BeforeAll
-   static void initAll() {
+   static void initAll() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
 
       httpClientMock = new HttpClientMock();
+      final Field field = OpenWeatherMapRetriever.class
+            .getSuperclass()
+            .getDeclaredField("httpClient"); //$NON-NLS-1$
+      field.setAccessible(true);
+      field.set(null, httpClientMock);
    }
 
    /**
     * Regression test for the weather retrieval from OpenWeatherMap.
     */
    @Test
-   void testWeatherRetrieval() throws IllegalAccessException, NoSuchFieldException {
+   void testWeatherRetrieval() {
 
-      final String urlBase = OAuth2Constants.HEROKU_APP_URL
+      final String urlBase = WeatherUtils.HEROKU_APP_URL
             + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
 
       final String openWeatherMapResponse1 = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapResponse-1647086400.json"); //$NON-NLS-1$
 
-      //First call configuration
       final String url1 = urlBase + "1647086400"; //$NON-NLS-1$
       httpClientMock.onGet(url1)
             .doReturn(openWeatherMapResponse1);
@@ -69,13 +73,6 @@ public class OpenWeatherMapRetrieverTests {
       final String url2 = urlBase + "1647129600"; //$NON-NLS-1$
       httpClientMock.onGet(url2)
             .doReturn(openWeatherMapResponse2);
-
-      //Second call configuration
-      final Field field = OpenWeatherMapRetriever.class
-            .getSuperclass()
-            .getDeclaredField("httpClient"); //$NON-NLS-1$
-      field.setAccessible(true);
-      field.set(null, httpClientMock);
 
       final TourData tour = Initializer.importTour();
       //Tuesday, March 12, 2022 12:00:00 PM

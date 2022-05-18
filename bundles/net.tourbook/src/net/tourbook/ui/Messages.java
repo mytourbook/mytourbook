@@ -54,8 +54,6 @@ public class Messages extends NLS {
    public static String        ColumnFactory_avg_pulse_tooltip;
    public static String        ColumnFactory_avg_speed_label;
    public static String        ColumnFactory_avg_speed_tooltip;
-   public static String        ColumnFactory_avg_temperature_label;
-   public static String        ColumnFactory_avg_temperature_tooltip;
    public static String        ColumnFactory_BodyWeight_Label;
    public static String        ColumnFactory_BodyWeight_Tooltip;
    public static String        ColumnFactory_BreakTime_Header;
@@ -432,10 +430,24 @@ public class Messages extends NLS {
    public static String        ColumnFactory_TagNotes_Label;
    public static String        ColumnFactory_TagNotes_Tooltip;
 
+   public static String        ColumnFactory_Temperature_Avg_Combined_Label;
+   public static String        ColumnFactory_Temperature_Avg_Combined_Tooltip;
+   public static String        ColumnFactory_Temperature_Avg_Device_Label;
+   public static String        ColumnFactory_Temperature_Avg_Device_Tooltip;
+   public static String        ColumnFactory_Temperature_Avg_Label;
+   public static String        ColumnFactory_Temperature_Avg_Tooltip;
    public static String        ColumnFactory_Temperature_Max_Label;
    public static String        ColumnFactory_Temperature_Max_Tooltip;
+   public static String        ColumnFactory_Temperature_Max_Combined_Label;
+   public static String        ColumnFactory_Temperature_Max_Combined_Tooltip;
+   public static String        ColumnFactory_Temperature_Max_Device_Label;
+   public static String        ColumnFactory_Temperature_Max_Device_Tooltip;
    public static String        ColumnFactory_Temperature_Min_Label;
    public static String        ColumnFactory_Temperature_Min_Tooltip;
+   public static String        ColumnFactory_Temperature_Min_Combined_Label;
+   public static String        ColumnFactory_Temperature_Min_Combined_Tooltip;
+   public static String        ColumnFactory_Temperature_Min_Device_Label;
+   public static String        ColumnFactory_Temperature_Min_Device_Tooltip;
 
    public static String        ColumnFactory_TimeDelta_Header;
    public static String        ColumnFactory_TimeDelta_Label;

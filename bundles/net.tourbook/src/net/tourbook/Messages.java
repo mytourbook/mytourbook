@@ -1359,6 +1359,9 @@ public class Messages extends NLS {
    public static String        PrefPage_Import_Default_CadenceValue_Tooltip;
    public static String        PrefPage_Import_Label_Info;
 
+   public static String        PrefPage_TourTag_Button_DuplicateTag;
+   public static String        PrefPage_TourTag_Label_Duplicate;
+
    public static String        PrefPage_ViewActions_Group;
    public static String        PrefPage_ViewActions_Label_DoubleClick;
    public static String        PrefPage_ViewActions_Label_DoubleClick_AdjustAltitude;
@@ -1369,6 +1372,11 @@ public class Messages extends NLS {
    public static String        PrefPage_ViewActions_Label_DoubleClick_OpenTour;
    public static String        PrefPage_ViewActions_Label_DoubleClick_QuickEdit;
    public static String        PrefPage_ViewActions_Label_Info;
+   public static String        PrefPage_ViewActions_Label_TemperatureValues_FromDevice;
+   public static String        PrefPage_ViewActions_Label_TemperatureValues_External;
+
+   public static String        PrefPage_ViewCombinedTemperatures_Group;
+   public static String        PrefPage_ViewCombinedTemperatures_Label_PreferredValue;
 
    public static String        PrefPage_ViewTooltip_Button_DisableAll;
    public static String        PrefPage_ViewTooltip_Button_EnableAll;
@@ -1761,6 +1769,8 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Checkbox_ShowOrHideApiKey_Tooltip;
    public static String        Pref_Weather_Check_DisplayFullLog;
    public static String        Pref_Weather_Check_DisplayFullLog_Tooltip;
+   public static String        Pref_Weather_Check_SaveLogInTourWeatherDescription;
+   public static String        Pref_Weather_Check_SaveLogInTourWeatherDescription_Tooltip;
    public static String        Pref_Weather_CheckHTTPConnection_FAILED_Message;
    public static String        Pref_Weather_CheckHTTPConnection_Message;
    public static String        Pref_Weather_CheckHTTPConnection_OK_Message;
@@ -1769,6 +1779,7 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Link_ApiSignup;
    public static String        Pref_Weather_OpenWeatherMap_Label_FiveDaysLimit;
    public static String        Pref_Weather_Provider_None;
+   public static String        Pref_Weather_WeatherApi_Label_SevenDaysLimit;
 
    public static String        Pref_Weather_WorldWeatherOnline_Label_ApiKey_Tooltip;
 
