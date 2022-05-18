@@ -27,7 +27,7 @@ public class BasicTests {
 
    @BeforeEach
    public void beforeClass() {
-      bot = new SWTBot();
+		bot = new SWTBot();
 		SWTBotPreferences.TIMEOUT = 20000;
    }
 
