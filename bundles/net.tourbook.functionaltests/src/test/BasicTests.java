@@ -13,14 +13,19 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class BasicTests {
 
    private static SWTBot bot;
+
+	// todo fb, redo the workspace in english
 
    @BeforeEach
    public void beforeClass() {
@@ -46,9 +51,20 @@ public class BasicTests {
 		bot.button("Apply and Close").click();
 	}
 
-@Test
-void testTourMarkerView()
-	{
+//	@Test
+//	void testStatisticsView() {
+//
+//		bot.sleep(5000);
+//		final SWTBotMenu statisticsView = bot.menu("Statistiques");// todo fb
+//																	// rename in
+//																	// english
+//		assertNotNull(statisticsView);
+//		bot.sleep(5000);
+//	}
+
+	@Test
+	void testTourMarkerView() {
+
 		// This is the equivalent of
 		// bot.viewByTitle("Calendar").show();
 		// for SWTBot.
@@ -58,7 +74,8 @@ void testTourMarkerView()
 		bot.tree().getTreeItem("2020   3").getNode("May   2").expand();
 		bot.tree().getTreeItem("2020   3").getNode("May   2").select();
 		bot.tree().getTreeItem("2020   3").getNode("May   2").getNode("23").select();
-		bot.menu("Tour Markers");
+		final SWTBotMenu tourMarkerView = bot.menu("Tour Markers");
+		assertNotNull(tourMarkerView);
 		bot.table().select(0);
 		bot.table().select(1);
 	}
