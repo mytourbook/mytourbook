@@ -1,0 +1,57 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!-- Change groupId, artifactId and version -->
+  <artifactId>rcpttTests</artifactId>
+  <groupId>mytourbook-functionaltests</groupId>
+  <version>21.9.0</version>
+  
+  <packaging>rcpttTest</packaging>
+
+  <!-- Change properies below to your values -->
+  <properties>
+	  <autPath>${project.basedir}/../../../../mytourbook-PRODUCT/21.9.0/mytourbook-21.9.0-win-64/mytourbook</autPath>
+		  <!-- or C:\Users\frederic\git\MT\mytourbook\build\build.net.tourbook.product\target\products\net.tourbook.product\win32\win32\x86_64\mytourbook-->
+  </properties>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.rcptt</groupId>
+        <artifactId>rcptt-maven-plugin</artifactId>
+        <version>2.5.2-M1</version>
+        <extensions>true</extensions>
+        <configuration>
+          <aut>
+            <explicit>${autPath}</explicit>
+	    <vmArgs>
+	      <vmArg>-noverify</vmArg>
+            </vmArgs>
+		     <reuseExistingWorkspace>true</reuseExistingWorkspace>
+          </aut>
+          <runner>
+            <version>2.5.2-M1</version>
+          </runner>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>rcptt-snapshots</id>
+      <name>RCPTT Maven Snapshots repository</name>
+      <snapshots>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+      <url>https://repo.eclipse.org/content/repositories/rcptt-snapshots/</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>rcptt-releases</id>
+      <name>RCPTT Maven repository</name>
+      <url>https://repo.eclipse.org/content/repositories/rcptt-releases/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+</project>
