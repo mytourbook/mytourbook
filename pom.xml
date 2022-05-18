@@ -203,7 +203,7 @@
               <product>net.tourbook.productWithoutJRE</product>
               <application>net.tourbook.appWithoutJRE</application>
              <skipTests>true</skipTests>
-	     <osgiDataDirectory>${project.basedir}/../../../../bundles/net.tourbook.functionaltests/workspace</osgiDataDirectory>
+	     <osgiDataDirectory>${project.basedir}/workspace</osgiDataDirectory>
  	     <deleteOsgiDataDirectory>false</deleteOsgiDataDirectory>
          </configuration>
       </plugin>
