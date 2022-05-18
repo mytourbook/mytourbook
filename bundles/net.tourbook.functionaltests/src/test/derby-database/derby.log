@@ -1,0 +1,13 @@
+----------------------------------------------------------------
+Wed May 18 17:06:55 UTC 2022:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.2.0 - (1828579): instance a816c00e-0180-d823-0304-0000259d543c 
+on database directory C:\Users\frederic\eclipse-workspace\runtime-mytourbook\derby-database\tourbook with class loader org.eclipse.osgi.internal.loader.EquinoxClassLoader@30dd00b6[net.tourbook.ext.apache:1.0.0.v10_14__7_5(id=29)] 
+Loaded from file:/C:/Users/frederic/git/MT/mytourbook/bundles/net.tourbook.ext.apache/derby-10.14.2.jar
+java.vendor=AdoptOpenJDK
+java.runtime.version=11.0.9.1+1
+user.dir=C:\Windows\System32
+os.name=Windows 10
+os.arch=amd64
+os.version=10.0
+derby.system.home=/C:/Users/frederic/eclipse-workspace/runtime-mytourbook/derby-database
+Database Class Loader started - derby.database.classpath=''

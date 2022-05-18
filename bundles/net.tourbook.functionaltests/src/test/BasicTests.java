@@ -13,11 +13,8 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,14 +28,14 @@ public class BasicTests {
 		SWTBotPreferences.TIMEOUT = 20000;
 		// the best would be to copy a database that already has tours
 
-		final SWTBotButton myTourbookMenu = bot.button("OK").click();
-		assertNotNull(myTourbookMenu);
-		final SWTBotButton measurementSystemMenu = bot.button("OK").click();
-		assertNotNull(measurementSystemMenu);
-		final SWTBotButton peopleMenu = bot.button("Apply and Close").click();
-		assertNotNull(peopleMenu);
-		final SWTBotButton firstStartMenu = bot.button("OK").click();
-		assertNotNull(firstStartMenu);
+//		final SWTBotButton myTourbookMenu = bot.button("OK").click();
+//		assertNotNull(myTourbookMenu);
+//		final SWTBotButton measurementSystemMenu = bot.button("OK").click();
+//		assertNotNull(measurementSystemMenu);
+//		final SWTBotButton peopleMenu = bot.button("Apply and Close").click();
+//		assertNotNull(peopleMenu);
+//		final SWTBotButton firstStartMenu = bot.button("OK").click();
+//		assertNotNull(firstStartMenu);
 
    }
 
@@ -47,5 +44,18 @@ public class BasicTests {
 
 		bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click();
 		bot.button("Apply and Close").click();
+	}
+
+@Test
+void testTourMarkerView()
+	{
+		bot.menu("Tour Editor");
+		bot.tree().getTreeItem("2020   3").expand();
+		bot.tree().getTreeItem("2020   3").getNode("May   2").expand();
+		bot.tree().getTreeItem("2020   3").getNode("May   2").select();
+		bot.tree().getTreeItem("2020   3").getNode("May   2").getNode("23").select();
+		bot.menu("Tour Markers");
+		bot.table().select(0);
+		bot.table().select(1);
 	}
 }

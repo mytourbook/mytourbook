@@ -1,0 +1,1446 @@
+<?xml version="1.0" encoding="ASCII"?>
+<application:Application xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:advanced="http://www.eclipse.org/ui/2010/UIModel/application/ui/advanced" xmlns:application="http://www.eclipse.org/ui/2010/UIModel/application" xmlns:basic="http://www.eclipse.org/ui/2010/UIModel/application/ui/basic" xmlns:menu="http://www.eclipse.org/ui/2010/UIModel/application/ui/menu" xmi:id="_YBpjUdbLEeyKzNlIcTh7bg" elementId="org.eclipse.e4.legacy.ide.application" contributorURI="platform:/plugin/org.eclipse.ui.workbench" selectedElement="_YBpjUtbLEeyKzNlIcTh7bg" bindingContexts="_YBpjW9bLEeyKzNlIcTh7bg">
+  <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;workbench>&#xD;&#xA;&lt;mruList/>&#xD;&#xA;&lt;/workbench>"/>
+  <tags>activeSchemeId:net.tourbook.scheme</tags>
+  <children xsi:type="basic:TrimmedWindow" xmi:id="_YBpjUtbLEeyKzNlIcTh7bg" elementId="IDEWindow" contributorURI="platform:/plugin/org.eclipse.ui.workbench" selectedElement="_YQB9kNbLEeyKzNlIcTh7bg" x="26" y="26" width="950" height="700">
+    <persistedState key="coolBarVisible" value="true"/>
+    <persistedState key="perspectiveBarVisible" value="true"/>
+    <persistedState key="isRestored" value="true"/>
+    <persistedState key="show_in_time" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;show_in_time/>"/>
+    <persistedState key="workingSets" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;workingSets/>"/>
+    <persistedState key="aggregateWorkingSetId"/>
+    <tags>topLevel</tags>
+    <tags>shellMaximized</tags>
+    <children xsi:type="basic:PartSashContainer" xmi:id="_YQB9kNbLEeyKzNlIcTh7bg" selectedElement="_YQB9kdbLEeyKzNlIcTh7bg" horizontal="true">
+      <children xsi:type="advanced:PerspectiveStack" xmi:id="_YQB9kdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.ide.perspectivestack" containerData="7500" selectedElement="_Y_N-0NbLEeyKzNlIcTh7bg">
+        <children xsi:type="advanced:Perspective" xmi:id="_Y_N-0NbLEeyKzNlIcTh7bg" elementId="net.tourbook.perspective.TourBook" selectedElement="_Y_N-0dbLEeyKzNlIcTh7bg" label="Livre des parcours" iconURI="platform:/plugin/net.tourbook/icons/tourbook-tours-perspective.png">
+          <persistedState key="persp.hiddenItems" value="persp.hideToolbarSC:print,persp.hideToolbarSC:org.eclipse.ui.edit.undo,persp.hideToolbarSC:org.eclipse.ui.edit.redo,persp.hideToolbarSC:org.eclipse.ui.edit.text.toggleShowSelectedElementOnly,"/>
+          <tags>persp.actionSet:org.eclipse.ui.edit.text.actionSet.annotationNavigation</tags>
+          <tags>persp.actionSet:org.eclipse.ui.edit.text.actionSet.navigation</tags>
+          <tags>persp.actionSet:org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo</tags>
+          <tags>persp.actionSet:org.eclipse.ui.actionSet.keyBindings</tags>
+          <tags>persp.actionSet:org.eclipse.ui.actionSet.openFiles</tags>
+          <tags>persp.perspSC:net.tourbook.perspective.TourBook</tags>
+          <tags>persp.perspSC:net.tourbook.perspective.TourCatalog</tags>
+          <tags>persp.perspSC:net.tourbook.perspective.Statistic</tags>
+          <tags>persp.perspSC:net.tourbook.perspective.RawData</tags>
+          <tags>persp.perspSC:net.tourbook.perspective.CompareTours</tags>
+          <tags>persp.perspSC:net.tourbook.perspective.TourPhotoLinks</tags>
+          <children xsi:type="basic:PartSashContainer" xmi:id="_Y_N-0dbLEeyKzNlIcTh7bg" selectedElement="_Y_N-4tbLEeyKzNlIcTh7bg" horizontal="true">
+            <children xsi:type="basic:PartSashContainer" xmi:id="_Y_N-0tbLEeyKzNlIcTh7bg" containerData="4000" selectedElement="_Y_N-09bLEeyKzNlIcTh7bg">
+              <children xsi:type="basic:PartSashContainer" xmi:id="_Y_N-09bLEeyKzNlIcTh7bg" containerData="6000" selectedElement="_Y_N-1NbLEeyKzNlIcTh7bg">
+                <children xsi:type="basic:PartStack" xmi:id="_Y_N-1NbLEeyKzNlIcTh7bg" elementId="list" containerData="6000" selectedElement="_Y_N-1tbLEeyKzNlIcTh7bg">
+                  <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-1dbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.rawData.RawDataView" ref="_Y_JGUNbLEeyKzNlIcTh7bg" closeable="true">
+                    <tags>View</tags>
+                    <tags>categoryTag:1. Dossier des parcours</tags>
+                  </children>
+                  <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-1tbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.tourListView" ref="_Y_JGUdbLEeyKzNlIcTh7bg" closeable="true">
+                    <tags>View</tags>
+                    <tags>categoryTag:1. Dossier des parcours</tags>
+                  </children>
+                  <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-19bLEeyKzNlIcTh7bg" elementId="net.tourbook.views.calendar.CalendarView" ref="_Y_JGUtbLEeyKzNlIcTh7bg" closeable="true">
+                    <tags>View</tags>
+                    <tags>categoryTag:1. Dossier des parcours</tags>
+                  </children>
+                  <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-2NbLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.collateTours.CollatedToursView" toBeRendered="false" ref="_Y_JGU9bLEeyKzNlIcTh7bg" closeable="true">
+                    <tags>View</tags>
+                    <tags>categoryTag:1. Dossier des parcours</tags>
+                  </children>
+                  <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-2dbLEeyKzNlIcTh7bg" elementId="net.tourbook.statistic.StatisticView" ref="_Y_JGVNbLEeyKzNlIcTh7bg" closeable="true">
+                    <tags>View</tags>
+                    <tags>categoryTag:1. Dossier des parcours</tags>
+                  </children>
+                  <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-2tbLEeyKzNlIcTh7bg" elementId="net.tourbook.photo.PicDirView" toBeRendered="false" ref="_Y_JGVdbLEeyKzNlIcTh7bg" closeable="true">
+                    <tags>View</tags>
+                    <tags>categoryTag:5. Photo</tags>
+                  </children>
+                </children>
+                <children xsi:type="basic:PartStack" xmi:id="_Y_N-29bLEeyKzNlIcTh7bg" elementId="marker" containerData="4000" selectedElement="_Y_N-3NbLEeyKzNlIcTh7bg">
+                  <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-3NbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourMarkerView" ref="_Y_JGVtbLEeyKzNlIcTh7bg" closeable="true">
+                    <tags>View</tags>
+                    <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+                  </children>
+                  <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-3dbLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.tagging.TourTags_View" ref="_Y_JGV9bLEeyKzNlIcTh7bg" closeable="true">
+                    <tags>View</tags>
+                    <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+                  </children>
+                  <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-3tbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourWaypointView" ref="_Y_JGWNbLEeyKzNlIcTh7bg" closeable="true">
+                    <tags>View</tags>
+                    <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+                  </children>
+                  <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-39bLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.TourPausesView" ref="_Y_JGWdbLEeyKzNlIcTh7bg" closeable="true">
+                    <tags>View</tags>
+                    <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+                  </children>
+                  <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-4NbLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.geoCompare.GeoCompareView" toBeRendered="false" ref="_Y_JGWtbLEeyKzNlIcTh7bg" closeable="true">
+                    <tags>View</tags>
+                    <tags>categoryTag:4. Comparer des parcours</tags>
+                  </children>
+                </children>
+              </children>
+              <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-4dbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.editorss" toBeRendered="false" containerData="4000" ref="_Y-85ENbLEeyKzNlIcTh7bg"/>
+            </children>
+            <children xsi:type="basic:PartSashContainer" xmi:id="_Y_N-4tbLEeyKzNlIcTh7bg" containerData="6000" selectedElement="_Y_N-49bLEeyKzNlIcTh7bg">
+              <children xsi:type="basic:PartStack" xmi:id="_Y_N-49bLEeyKzNlIcTh7bg" elementId="map" containerData="5000" selectedElement="_Y_N-5tbLEeyKzNlIcTh7bg">
+                <tags>active</tags>
+                <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-5NbLEeyKzNlIcTh7bg" elementId="net.tourbook.map2.view.Map2ViewId" ref="_Y_C_sNbLEeyKzNlIcTh7bg" closeable="true">
+                  <tags>View</tags>
+                  <tags>categoryTag:6. Carte</tags>
+                </children>
+                <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-5dbLEeyKzNlIcTh7bg" elementId="net.tourbook.map3.view.Map3ViewId" toBeRendered="false" ref="_Y_H4MNbLEeyKzNlIcTh7bg" closeable="true">
+                  <tags>View</tags>
+                  <tags>categoryTag:6. Carte</tags>
+                </children>
+                <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-5tbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourDataEditorView" ref="_Y_H4MdbLEeyKzNlIcTh7bg" closeable="true">
+                  <tags>View</tags>
+                  <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+                </children>
+                <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-59bLEeyKzNlIcTh7bg" elementId="net.tourbook.tour.TourLogView" ref="_Y_H4MtbLEeyKzNlIcTh7bg" closeable="true">
+                  <tags>View</tags>
+                  <tags>categoryTag:3. Outils</tags>
+                </children>
+              </children>
+              <children xsi:type="basic:PartStack" xmi:id="_Y_N-6NbLEeyKzNlIcTh7bg" elementId="chart" containerData="5000" selectedElement="_Y_N-6dbLEeyKzNlIcTh7bg">
+                <children xsi:type="advanced:Placeholder" xmi:id="_Y_N-6dbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourChartView" ref="_Y_H4M9bLEeyKzNlIcTh7bg" closeable="true">
+                  <tags>View</tags>
+                  <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+                </children>
+              </children>
+            </children>
+          </children>
+        </children>
+      </children>
+      <children xsi:type="basic:PartStack" xmi:id="_YQB9ktbLEeyKzNlIcTh7bg" elementId="stickyFolderRight" toBeRendered="false" containerData="2500">
+        <children xsi:type="advanced:Placeholder" xmi:id="_YQB9k9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.internal.introview" toBeRendered="false" ref="_YQAIYNbLEeyKzNlIcTh7bg" closeable="true">
+          <tags>View</tags>
+          <tags>categoryTag:General</tags>
+        </children>
+      </children>
+    </children>
+    <sharedElements xsi:type="basic:Part" xmi:id="_YQAIYNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.internal.introview" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Welcome" iconURI="platform:/plugin/org.eclipse.ui/icons/full/eview16/defaultview_misc.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="org.eclipse.ui.internal.ViewIntroAdapterPart"/>
+      <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.ui"/>
+      <tags>View</tags>
+      <tags>categoryTag:General</tags>
+    </sharedElements>
+    <sharedElements xsi:type="advanced:Area" xmi:id="_Y-85ENbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.editorss">
+      <children xsi:type="basic:PartStack" xmi:id="_Y-85EdbLEeyKzNlIcTh7bg" elementId="org.eclipse.e4.primaryDataStack">
+        <tags>org.eclipse.e4.primaryDataStack</tags>
+        <tags>EditorStack</tags>
+      </children>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_Y_C_sNbLEeyKzNlIcTh7bg" elementId="net.tourbook.map2.view.Map2ViewId" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Carte 2D" iconURI="platform:/plugin/net.tourbook/icons/map2-view.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.map2.view.Map2View"/>
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
+      <tags>View</tags>
+      <tags>categoryTag:6. Carte</tags>
+      <menus xmi:id="_ZK970NbLEeyKzNlIcTh7bg" elementId="net.tourbook.map2.view.Map2ViewId">
+        <tags>ViewMenu</tags>
+        <tags>menuContribution:menu</tags>
+      </menus>
+      <toolbar xmi:id="_ZK970dbLEeyKzNlIcTh7bg" elementId="net.tourbook.map2.view.Map2ViewId" visible="false"/>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_Y_H4MNbLEeyKzNlIcTh7bg" elementId="net.tourbook.map3.view.Map3ViewId" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Carte 3D" iconURI="platform:/plugin/net.tourbook/icons/map3-view.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.map3.view.Map3View"/>
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <tags>View</tags>
+      <tags>categoryTag:6. Carte</tags>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_Y_H4MdbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourDataEditorView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="&#xc9;diteur de parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-editor.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tourDataEditor.TourDataEditorView"/>
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
+      <tags>View</tags>
+      <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+      <tags>active</tags>
+      <tags>activeOnClose</tags>
+      <menus xmi:id="_8SDk4NbMEeyjfteImKjphA" elementId="net.tourbook.views.TourDataEditorView">
+        <tags>ViewMenu</tags>
+        <tags>menuContribution:menu</tags>
+      </menus>
+      <toolbar xmi:id="_8SDk4dbMEeyjfteImKjphA" elementId="net.tourbook.views.TourDataEditorView" visible="false"/>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_Y_H4MtbLEeyKzNlIcTh7bg" elementId="net.tourbook.tour.TourLogView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Log des Parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-log.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.tour.TourLogView"/>
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
+      <tags>View</tags>
+      <tags>categoryTag:3. Outils</tags>
+      <menus xmi:id="_b_kKYNbLEeyKzNlIcTh7bg" elementId="net.tourbook.tour.TourLogView">
+        <tags>ViewMenu</tags>
+        <tags>menuContribution:menu</tags>
+      </menus>
+      <toolbar xmi:id="_b_kKYdbLEeyKzNlIcTh7bg" elementId="net.tourbook.tour.TourLogView" visible="false"/>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_Y_H4M9bLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourChartView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Graphique de parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-chart.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.tourChart.TourChartView"/>
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
+      <tags>View</tags>
+      <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+      <menus xmi:id="_ZOZDQNbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourChartView">
+        <tags>ViewMenu</tags>
+        <tags>menuContribution:menu</tags>
+      </menus>
+      <toolbar xmi:id="_ZOZDQdbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourChartView" visible="false"/>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_Y_JGUNbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.rawData.RawDataView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Import de parcours" iconURI="platform:/plugin/net.tourbook/icons/imported-tours.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.rawData.RawDataView"/>
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
+      <tags>View</tags>
+      <tags>categoryTag:1. Dossier des parcours</tags>
+      <menus xmi:id="_ZESFANbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.rawData.RawDataView">
+        <tags>ViewMenu</tags>
+        <tags>menuContribution:menu</tags>
+      </menus>
+      <toolbar xmi:id="_ZESFAdbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.rawData.RawDataView" visible="false"/>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_Y_JGUdbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.tourListView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Livre des parcours" iconURI="platform:/plugin/net.tourbook/icons/tourbook-tours.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tourBook.TourBookView"/>
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
+      <tags>View</tags>
+      <tags>categoryTag:1. Dossier des parcours</tags>
+      <menus xmi:id="_ltGmsNbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.tourListView">
+        <tags>ViewMenu</tags>
+        <tags>menuContribution:menu</tags>
+      </menus>
+      <toolbar xmi:id="_ltGmsdbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.tourListView" visible="false"/>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_Y_JGUtbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.calendar.CalendarView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Calendrier" iconURI="platform:/plugin/net.tourbook/icons/calendar.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.calendar.CalendarView"/>
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <tags>View</tags>
+      <tags>categoryTag:1. Dossier des parcours</tags>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_Y_JGU9bLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.collateTours.CollatedToursView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Parcours combin&#xe9;s" iconURI="platform:/plugin/net.tourbook/icons/collated-tours.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.collateTours.CollatedToursView"/>
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <tags>View</tags>
+      <tags>categoryTag:1. Dossier des parcours</tags>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_Y_JGVNbLEeyKzNlIcTh7bg" elementId="net.tourbook.statistic.StatisticView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Statistiques" iconURI="platform:/plugin/net.tourbook/icons/statistics.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.statistic.StatisticView"/>
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <tags>View</tags>
+      <tags>categoryTag:1. Dossier des parcours</tags>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_Y_JGVdbLEeyKzNlIcTh7bg" elementId="net.tourbook.photo.PicDirView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Photos" iconURI="platform:/plugin/net.tourbook.photo/icons/photo-directory.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.photo.PicDirView"/>
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook.photo"/>
+      <tags>View</tags>
+      <tags>categoryTag:5. Photo</tags>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_Y_JGVtbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourMarkerView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Marqueurs de parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-marker.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tourMarker.TourMarkerView"/>
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
+      <tags>View</tags>
+      <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+      <menus xmi:id="_ZJxpANbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourMarkerView">
+        <tags>ViewMenu</tags>
+        <tags>menuContribution:menu</tags>
+      </menus>
+      <toolbar xmi:id="_ZJxpAdbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourMarkerView" visible="false"/>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_Y_JGV9bLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.tagging.TourTags_View" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="&#xc9;tiquettes de parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-tags.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tagging.TourTags_View"/>
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <tags>View</tags>
+      <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_Y_JGWNbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourWaypointView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Waypoints" iconURI="platform:/plugin/net.tourbook/icons/tour-waypoint.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.TourWaypointView"/>
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <tags>View</tags>
+      <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_Y_JGWdbLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.TourPausesView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Pauses de Parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-pauses.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.TourPausesView"/>
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <tags>View</tags>
+      <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_Y_JGWtbLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.geoCompare.GeoCompareView" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Comparaison g&#xe9;ographique" iconURI="platform:/plugin/net.tourbook/icons/geo-parts.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.geoCompare.GeoCompareView"/>
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <tags>View</tags>
+      <tags>categoryTag:4. Comparer des parcours</tags>
+    </sharedElements>
+    <trimBars xmi:id="_YBpjU9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.main.toolbar" contributorURI="platform:/plugin/org.eclipse.ui.workbench">
+      <children xsi:type="menu:ToolBar" xmi:id="_YRfWINbLEeyKzNlIcTh7bg" elementId="people">
+        <tags>Draggable</tags>
+      </children>
+      <children xsi:type="menu:ToolBar" xmi:id="_YRfWIdbLEeyKzNlIcTh7bg" elementId="tourtype">
+        <tags>Draggable</tags>
+      </children>
+      <children xsi:type="menu:ToolBar" xmi:id="_YRfWItbLEeyKzNlIcTh7bg" elementId="mc_tb_AppFilter">
+        <tags>Draggable</tags>
+      </children>
+      <children xsi:type="menu:ToolBar" xmi:id="_YRv00NbLEeyKzNlIcTh7bg" elementId="mc_tb_TourEditor">
+        <tags>Draggable</tags>
+      </children>
+      <children xsi:type="menu:ToolBar" xmi:id="_Y9TTQNbLEeyKzNlIcTh7bg" elementId="additions" toBeRendered="false">
+        <tags>toolbarSeparator</tags>
+        <children xsi:type="menu:ToolBarSeparator" xmi:id="_Y9TTQdbLEeyKzNlIcTh7bg" elementId="additions" toBeRendered="false"/>
+      </children>
+      <children xsi:type="menu:ToolBar" xmi:id="_Y_tHANbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.actionSet.annotationNavigation">
+        <tags>Draggable</tags>
+      </children>
+      <children xsi:type="menu:ToolBar" xmi:id="_ZAGIkNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.actionSet.navigation">
+        <tags>Draggable</tags>
+      </children>
+      <children xsi:type="menu:ToolControl" xmi:id="_Y9TTQtbLEeyKzNlIcTh7bg" elementId="PerspectiveSpacer" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl">
+        <tags>stretch</tags>
+        <tags>SHOW_RESTORE_MENU</tags>
+      </children>
+      <children xsi:type="menu:ToolControl" xmi:id="_Y9YLwNbLEeyKzNlIcTh7bg" elementId="PerspectiveSwitcher" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.e4.ui.workbench.addons.perspectiveswitcher.PerspectiveSwitcher">
+        <tags>Draggable</tags>
+        <tags>HIDEABLE</tags>
+        <tags>SHOW_RESTORE_MENU</tags>
+      </children>
+    </trimBars>
+    <trimBars xmi:id="_YBpjVNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.trim.status" contributorURI="platform:/plugin/org.eclipse.ui.workbench" side="Bottom">
+      <children xsi:type="menu:ToolControl" xmi:id="_YBpjVdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.StatusLine" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim">
+        <tags>stretch</tags>
+      </children>
+      <children xsi:type="menu:ToolControl" xmi:id="_YBpjVtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.HeapStatus" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim">
+        <tags>Draggable</tags>
+      </children>
+      <children xsi:type="menu:ToolControl" xmi:id="_YBpjV9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.ProgressBar" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim">
+        <tags>Draggable</tags>
+      </children>
+    </trimBars>
+    <trimBars xmi:id="_YBpjWNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.trim.vertical1" contributorURI="platform:/plugin/org.eclipse.ui.workbench" side="Left"/>
+    <trimBars xmi:id="_YBpjWdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.trim.vertical2" contributorURI="platform:/plugin/org.eclipse.ui.workbench" side="Right"/>
+  </children>
+  <bindingTables xmi:id="_YBpjWtbLEeyKzNlIcTh7bg" contributorURI="platform:/plugin/org.eclipse.ui.workbench" bindingContext="_YBpjW9bLEeyKzNlIcTh7bg">
+    <bindings xmi:id="_YCssP9bLEeyKzNlIcTh7bg" keySequence="CTRL+F10" command="_YCQAzNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssQ9bLEeyKzNlIcTh7bg" keySequence="CTRL+INSERT" command="_YCQAZdbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssS9bLEeyKzNlIcTh7bg" keySequence="CTRL+PAGE_UP" command="_YCQA0NbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssTNbLEeyKzNlIcTh7bg" keySequence="CTRL+PAGE_DOWN" command="_YCQATNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssTtbLEeyKzNlIcTh7bg" keySequence="ALT+SHIFT+F3" command="_YCQAv9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssVtbLEeyKzNlIcTh7bg" keySequence="CTRL+1" command="_YCQBdtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssZ9bLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+L" command="_YCQA6tbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssb9bLEeyKzNlIcTh7bg" keySequence="CTRL+SPACE" command="_YCQAe9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCsseNbLEeyKzNlIcTh7bg" keySequence="SHIFT+DEL" command="_YCQAodbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssftbLEeyKzNlIcTh7bg" keySequence="CTRL+V" command="_YCQAo9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oB9bLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+SPACE" command="_YCQAatbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oCNbLEeyKzNlIcTh7bg" keySequence="CTRL+A" command="_YCQBHNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oCtbLEeyKzNlIcTh7bg" keySequence="CTRL+C" command="_YCQAZdbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oFdbLEeyKzNlIcTh7bg" keySequence="CTRL+X" command="_YCQAodbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oFtbLEeyKzNlIcTh7bg" keySequence="CTRL+Y" command="_YCQBV9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oGNbLEeyKzNlIcTh7bg" keySequence="CTRL+Z" command="_YCQAmNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dP9bLEeyKzNlIcTh7bg" keySequence="ALT+PAGE_UP" command="_YCQBaNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dQNbLEeyKzNlIcTh7bg" keySequence="ALT+PAGE_DOWN" command="_YCQBK9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dQtbLEeyKzNlIcTh7bg" keySequence="SHIFT+INSERT" command="_YCQAo9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dRdbLEeyKzNlIcTh7bg" keySequence="ALT+F11" command="_YCQA99bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <tags>platform:win32</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_YCi7MNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.contexts.window" bindingContext="_YBpjXNbLEeyKzNlIcTh7bg">
+    <bindings xmi:id="_YCssMNbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+F7" command="_YCQBENbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssMdbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+F8" command="_YCQAbtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssNdbLEeyKzNlIcTh7bg" keySequence="ALT+CTRL+ARROW_LEFT" command="_YCQAx9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssNtbLEeyKzNlIcTh7bg" keySequence="ALT+CTRL+ARROW_RIGHT" command="_YCQBFNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssONbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+F4" command="_YCQAoNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssOtbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+F6" command="_YCQA8dbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssPdbLEeyKzNlIcTh7bg" keySequence="CTRL+F7" command="_YCQAZtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssPtbLEeyKzNlIcTh7bg" keySequence="CTRL+F8" command="_YCQBeNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssRNbLEeyKzNlIcTh7bg" keySequence="CTRL+F4" command="_YCQBYtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssRdbLEeyKzNlIcTh7bg" keySequence="CTRL+F6" command="_YCQA-dbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssRtbLEeyKzNlIcTh7bg" keySequence="ALT+SHIFT+F7" command="_YCQBRNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssT9bLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+P" command="_YCQBUtbLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YCssU9bLEeyKzNlIcTh7bg" keySequence="ALT+SHIFT+Q O" command="_YCQBFtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <parameters xmi:id="_YCssVNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.views.showView.viewId" name="org.eclipse.ui.views.showView.viewId" value="org.eclipse.ui.views.ContentOutline"/>
+    </bindings>
+    <bindings xmi:id="_YCssV9bLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+R" command="_YCQA_dbLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YCssWNbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+R" command="_YCQBfNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssWdbLEeyKzNlIcTh7bg" keySequence="ALT+SHIFT+Q Q" command="_YCQBFtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssWtbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+S" command="_YCQAvNbLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YCssW9bLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+S" command="_YCQA59bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssXNbLEeyKzNlIcTh7bg" keySequence="CTRL+3" command="_YCQATtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssXdbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+T" command="_YCQA4tbLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YCssXtbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+W" command="_YCQAoNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssX9bLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+H" command="_YCQA3NbLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YCssYNbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+I" command="_YCQAstbLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YCssZNbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+K" command="_YCQBB9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssZtbLEeyKzNlIcTh7bg" keySequence="CTRL+," command="_YCQAqNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssaNbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+M" command="_YCQA19bLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YCssa9bLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+N" command="_YCQAgdbLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YCssbNbLEeyKzNlIcTh7bg" keySequence="CTRL+." command="_YCQBSNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssbdbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+O" command="_YCQBLdbLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YCsscNbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+B" command="_YCQAl9bLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YCsscdbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+C" command="_YCQA8NbLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YCssc9bLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+E" command="_YCQBKdbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssdNbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+G" command="_YCQBItbLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YCssddbLEeyKzNlIcTh7bg" keySequence="ALT+SHIFT+Q X" command="_YCQBFtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <parameters xmi:id="_YCssdtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.views.showView.viewId" name="org.eclipse.ui.views.showView.viewId" value="org.eclipse.ui.views.ProblemView"/>
+    </bindings>
+    <bindings xmi:id="_YCssedbLEeyKzNlIcTh7bg" keySequence="CTRL+P" command="_YCQAttbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssetbLEeyKzNlIcTh7bg" keySequence="CTRL+Q" command="_YCQAx9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssfNbLEeyKzNlIcTh7bg" keySequence="CTRL+S" command="_YCQBVNbLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YCssfdbLEeyKzNlIcTh7bg" keySequence="CTRL+S" command="_YCQA7tbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssf9bLEeyKzNlIcTh7bg" keySequence="CTRL+W" command="_YCQAW9bLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YCssgNbLEeyKzNlIcTh7bg" keySequence="CTRL+W" command="_YCQBYtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssgdbLEeyKzNlIcTh7bg" keySequence="CTRL+I" command="_YCQAYdbLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YCssgtbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+NUMPAD_MULTIPLY" command="_YCQA5NbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCsshdbLEeyKzNlIcTh7bg" keySequence="CTRL+K" command="_YCQAWtbLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YCsshtbLEeyKzNlIcTh7bg" keySequence="CTRL+K" command="_YCQBIdbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oANbLEeyKzNlIcTh7bg" keySequence="CTRL+L" command="_YCQAbNbLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YC0oAtbLEeyKzNlIcTh7bg" keySequence="CTRL+M" command="_YCQAddbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oA9bLEeyKzNlIcTh7bg" keySequence="CTRL+N" command="_YCQAudbLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YC0oBNbLEeyKzNlIcTh7bg" keySequence="CTRL+N" command="_YCQBXNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oBdbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+NUMPAD_DIVIDE" command="_YCQAc9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oCdbLEeyKzNlIcTh7bg" keySequence="CTRL+B" command="_YCQArNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oC9bLEeyKzNlIcTh7bg" keySequence="ALT+SHIFT+Q C" command="_YCQBFtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <parameters xmi:id="_YC0oDNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.views.showView.viewId" name="org.eclipse.ui.views.showView.viewId" value="org.eclipse.ui.console.ConsoleView"/>
+    </bindings>
+    <bindings xmi:id="_YC0oDtbLEeyKzNlIcTh7bg" keySequence="CTRL+E" command="_YCQAjtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oD9bLEeyKzNlIcTh7bg" keySequence="CTRL+F" command="_YCQA8tbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oENbLEeyKzNlIcTh7bg" keySequence="ALT+SHIFT+W" command="_YCQBRtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oEtbLEeyKzNlIcTh7bg" keySequence="ALT+SHIFT+N" command="_YCQAndbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oE9bLEeyKzNlIcTh7bg" keySequence="DEL" command="_YCQBA9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oF9bLEeyKzNlIcTh7bg" keySequence="CTRL+Z" command="_YCQAp9bLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YC12INbLEeyKzNlIcTh7bg" keySequence="CTRL+_" command="_YCQAb9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <parameters xmi:id="_YC2dMNbLEeyKzNlIcTh7bg" elementId="Splitter.isHorizontal" name="Splitter.isHorizontal" value="true"/>
+    </bindings>
+    <bindings xmi:id="_YC2dNNbLEeyKzNlIcTh7bg" keySequence="CTRL+{" command="_YCQAb9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <parameters xmi:id="_YC2dNdbLEeyKzNlIcTh7bg" elementId="Splitter.isHorizontal" name="Splitter.isHorizontal" value="false"/>
+    </bindings>
+    <bindings xmi:id="_YC2dNtbLEeyKzNlIcTh7bg" keySequence="ALT+-" command="_YCQAf9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dO9bLEeyKzNlIcTh7bg" keySequence="ALT+ARROW_LEFT" command="_YCQBG9bLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YC2dPNbLEeyKzNlIcTh7bg" keySequence="ALT+ARROW_LEFT" command="_YCQAz9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dPdbLEeyKzNlIcTh7bg" keySequence="ALT+ARROW_RIGHT" command="_YCQAytbLEeyKzNlIcTh7bg"/>
+    <bindings xmi:id="_YC2dPtbLEeyKzNlIcTh7bg" keySequence="ALT+ARROW_RIGHT" command="_YCQAvtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dRNbLEeyKzNlIcTh7bg" keySequence="ALT+F7" command="_YCQApNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dR9bLEeyKzNlIcTh7bg" keySequence="ALT+CR" command="_YCQAXtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dSNbLEeyKzNlIcTh7bg" keySequence="ALT+F5" command="_YCQBDtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dSdbLEeyKzNlIcTh7bg" keySequence="F12" command="_YCQAfdbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dStbLEeyKzNlIcTh7bg" keySequence="CTRL+&#xc8;" command="_YCQAb9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <tags>locale:fr</tags>
+      <parameters xmi:id="_YC2dS9bLEeyKzNlIcTh7bg" elementId="Splitter.isHorizontal" name="Splitter.isHorizontal" value="false"/>
+    </bindings>
+    <bindings xmi:id="_YC2dTtbLEeyKzNlIcTh7bg" keySequence="F2" command="_YCQAqtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dUNbLEeyKzNlIcTh7bg" keySequence="F5" command="_YCQA1dbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_YCssMtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.textEditorScope" bindingContext="_YCZxQ9bLEeyKzNlIcTh7bg">
+    <bindings xmi:id="_YCssM9bLEeyKzNlIcTh7bg" keySequence="ALT+CTRL+ARROW_UP" command="_YCQBR9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssNNbLEeyKzNlIcTh7bg" keySequence="ALT+CTRL+ARROW_DOWN" command="_YCQBMNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssN9bLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+INSERT" command="_YCQBM9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssOdbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+CR" command="_YCQAvdbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssO9bLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+ARROW_LEFT" command="_YCQBANbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssPNbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+ARROW_RIGHT" command="_YCQBQNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssQNbLEeyKzNlIcTh7bg" keySequence="CTRL+F10" command="_YCQAt9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssQdbLEeyKzNlIcTh7bg" keySequence="CTRL+END" command="_YCQBQ9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssQtbLEeyKzNlIcTh7bg" keySequence="CTRL+BS" command="_YCQAXNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssR9bLEeyKzNlIcTh7bg" keySequence="CTRL+ARROW_UP" command="_YCQBD9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssSNbLEeyKzNlIcTh7bg" keySequence="CTRL+ARROW_DOWN" command="_YCQBetbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssSdbLEeyKzNlIcTh7bg" keySequence="CTRL+ARROW_LEFT" command="_YCQAXdbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssStbLEeyKzNlIcTh7bg" keySequence="CTRL+ARROW_RIGHT" command="_YCQBWNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssTdbLEeyKzNlIcTh7bg" keySequence="CTRL+HOME" command="_YCQAotbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssVdbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+Q" command="_YCQBX9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssYdbLEeyKzNlIcTh7bg" keySequence="CTRL+NUMPAD_MULTIPLY" command="_YCQBW9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssYtbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+J" command="_YCQBTNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssY9bLEeyKzNlIcTh7bg" keySequence="CTRL+NUMPAD_ADD" command="_YCQBJNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssZdbLEeyKzNlIcTh7bg" keySequence="CTRL++" command="_YCQA89bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssadbLEeyKzNlIcTh7bg" keySequence="CTRL+NUMPAD_SUBTRACT" command="_YCQAutbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssatbLEeyKzNlIcTh7bg" keySequence="CTRL+-" command="_YCQA7NbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssbtbLEeyKzNlIcTh7bg" keySequence="CTRL+NUMPAD_DIVIDE" command="_YCQBEtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssd9bLEeyKzNlIcTh7bg" keySequence="ALT+CTRL+J" command="_YCQBcNbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCsse9bLEeyKzNlIcTh7bg" keySequence="ALT+SHIFT+A" command="_YCQAktbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssg9bLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+NUMPAD_MULTIPLY" command="_YCQBbtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCsshNbLEeyKzNlIcTh7bg" keySequence="CTRL+J" command="_YCQA09bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oAdbLEeyKzNlIcTh7bg" keySequence="CTRL+L" command="_YCQAj9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oBtbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+NUMPAD_DIVIDE" command="_YCQAxtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oDdbLEeyKzNlIcTh7bg" keySequence="CTRL+D" command="_YCQA49bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oEdbLEeyKzNlIcTh7bg" keySequence="CTRL+=" command="_YCQA89bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC0oFNbLEeyKzNlIcTh7bg" keySequence="ALT+SHIFT+Y" command="_YCQAUdbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dMdbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+DEL" command="_YCQAgtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dMtbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+X" command="_YCQActbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dM9bLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+Y" command="_YCQA69bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dN9bLEeyKzNlIcTh7bg" keySequence="CTRL+DEL" command="_YCQAkdbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dONbLEeyKzNlIcTh7bg" keySequence="ALT+/" command="_YCQBAtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dOdbLEeyKzNlIcTh7bg" keySequence="ALT+ARROW_UP" command="_YCQBZ9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dOtbLEeyKzNlIcTh7bg" keySequence="ALT+ARROW_DOWN" command="_YCQBO9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dQdbLEeyKzNlIcTh7bg" keySequence="SHIFT+END" command="_YCQA-NbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dQ9bLEeyKzNlIcTh7bg" keySequence="SHIFT+CR" command="_YCQA-9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dRtbLEeyKzNlIcTh7bg" keySequence="SHIFT+HOME" command="_YCQA3dbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dTNbLEeyKzNlIcTh7bg" keySequence="END" command="_YCQA1NbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dTdbLEeyKzNlIcTh7bg" keySequence="INSERT" command="_YCQAw9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dT9bLEeyKzNlIcTh7bg" keySequence="F2" command="_YCQAT9bLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YC2dUdbLEeyKzNlIcTh7bg" keySequence="HOME" command="_YCQA_NbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_YCssUdbLEeyKzNlIcTh7bg" elementId="org.eclipse.core.runtime.xml" bindingContext="_YCssUNbLEeyKzNlIcTh7bg">
+    <bindings xmi:id="_YCssUtbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+P" command="_YCQAftbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_YCssctbLEeyKzNlIcTh7bg" keySequence="CTRL+SHIFT+D" command="_YCQBTtbLEeyKzNlIcTh7bg">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_Y_BxkdbLEeyKzNlIcTh7bg" bindingContext="_Y_BxkNbLEeyKzNlIcTh7bg"/>
+  <bindingTables xmi:id="_Y_Bxk9bLEeyKzNlIcTh7bg" bindingContext="_Y_BxktbLEeyKzNlIcTh7bg"/>
+  <bindingTables xmi:id="_Y_BxldbLEeyKzNlIcTh7bg" bindingContext="_Y_BxlNbLEeyKzNlIcTh7bg"/>
+  <bindingTables xmi:id="_Y_Bxl9bLEeyKzNlIcTh7bg" bindingContext="_Y_BxltbLEeyKzNlIcTh7bg"/>
+  <bindingTables xmi:id="_Y_BxmdbLEeyKzNlIcTh7bg" bindingContext="_Y_BxmNbLEeyKzNlIcTh7bg"/>
+  <bindingTables xmi:id="_Y_Bxm9bLEeyKzNlIcTh7bg" bindingContext="_Y_BxmtbLEeyKzNlIcTh7bg"/>
+  <bindingTables xmi:id="_Y_BxndbLEeyKzNlIcTh7bg" bindingContext="_Y_BxnNbLEeyKzNlIcTh7bg"/>
+  <bindingTables xmi:id="_Y_Bxn9bLEeyKzNlIcTh7bg" bindingContext="_Y_BxntbLEeyKzNlIcTh7bg"/>
+  <bindingTables xmi:id="_Y_BxodbLEeyKzNlIcTh7bg" bindingContext="_Y_BxoNbLEeyKzNlIcTh7bg"/>
+  <rootContext xmi:id="_YBpjW9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.contexts.dialogAndWindow" contributorURI="platform:/plugin/org.eclipse.ui.workbench" name="In Dialogs and Windows" description="Either a dialog or a window is open">
+    <children xmi:id="_YBpjXNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.contexts.window" contributorURI="platform:/plugin/org.eclipse.ui.workbench" name="In Windows" description="A window is open">
+      <children xmi:id="_YBpjXdbLEeyKzNlIcTh7bg" elementId="org.eclipse.e4.ui.contexts.views" contributorURI="platform:/plugin/org.eclipse.ui.workbench" name="%bindingcontext.name.bindingView"/>
+      <children xmi:id="_YCZxQtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.console.ConsoleView" name="In Console View" description="In Console View"/>
+      <children xmi:id="_YCZxQ9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.textEditorScope" name="Editing Text" description="Editing Text Context"/>
+    </children>
+    <children xmi:id="_YBpjXtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.contexts.dialog" contributorURI="platform:/plugin/org.eclipse.ui.workbench" name="In Dialogs" description="A dialog is open"/>
+  </rootContext>
+  <rootContext xmi:id="_YCZxQNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.contexts.workbenchMenu" name="Workbench Menu" description="When no Workbench windows are active"/>
+  <rootContext xmi:id="_YCZxQdbLEeyKzNlIcTh7bg" elementId="net.tourbook.chart.context.isTourChart" name="net.tourbook.chart.context.isTourChart"/>
+  <rootContext xmi:id="_YCZxRNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.contexts.actionSet" name="Action Set" description="Parent context for action sets"/>
+  <rootContext xmi:id="_YCssUNbLEeyKzNlIcTh7bg" elementId="org.eclipse.core.runtime.xml" name="Auto::org.eclipse.core.runtime.xml"/>
+  <rootContext xmi:id="_Y_BxkNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.actionSet.annotationNavigation" name="Auto::org.eclipse.ui.edit.text.actionSet.annotationNavigation"/>
+  <rootContext xmi:id="_Y_BxktbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.actionSet.navigation" name="Auto::org.eclipse.ui.edit.text.actionSet.navigation"/>
+  <rootContext xmi:id="_Y_BxlNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo" name="Auto::org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo"/>
+  <rootContext xmi:id="_Y_BxltbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.NavigateActionSet" name="Auto::org.eclipse.ui.NavigateActionSet"/>
+  <rootContext xmi:id="_Y_BxmNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.actionSet.keyBindings" name="Auto::org.eclipse.ui.actionSet.keyBindings"/>
+  <rootContext xmi:id="_Y_BxmtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.WorkingSetModificationActionSet" name="Auto::org.eclipse.ui.WorkingSetModificationActionSet"/>
+  <rootContext xmi:id="_Y_BxnNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.WorkingSetActionSet" name="Auto::org.eclipse.ui.WorkingSetActionSet"/>
+  <rootContext xmi:id="_Y_BxntbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.actionSet.openFiles" name="Auto::org.eclipse.ui.actionSet.openFiles"/>
+  <rootContext xmi:id="_Y_BxoNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.actionSet.presentation" name="Auto::org.eclipse.ui.edit.text.actionSet.presentation"/>
+  <descriptors xmi:id="_YDcTENbLEeyKzNlIcTh7bg" elementId="org.eclipse.swt.tools.spies.partdescriptor.sleak" contributorURI="platform:/plugin/org.eclipse.swt.tools.spies" label="Sleak" iconURI="platform:/plugin/org.eclipse.swt.tools.spies/icons/sleak.png" category="SWT Tools" closeable="true" contributionURI="bundleclass://org.eclipse.swt.tools.spies/org.eclipse.swt.tools.views.SleakView">
+    <persistedState key="persistState" value="true"/>
+    <tags>View</tags>
+  </descriptors>
+  <descriptors xmi:id="_YFPp4NbLEeyKzNlIcTh7bg" elementId="org.eclipse.e4.ui.compatibility.editor" allowMultiple="true" category="org.eclipse.e4.primaryDataStack" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityEditor">
+    <tags>Editor</tags>
+    <tags>removeOnHide</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPXPMNbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.rawData.RawDataView" label="Import de parcours" iconURI="platform:/plugin/net.tourbook/icons/imported-tours.png" tooltip="" category="1. Dossier des parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.rawData.RawDataView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:1. Dossier des parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPcHsNbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.tourListView" label="Livre des parcours" iconURI="platform:/plugin/net.tourbook/icons/tourbook-tours.png" tooltip="" category="1. Dossier des parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tourBook.TourBookView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:1. Dossier des parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPcHsdbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.calendar.CalendarView" label="Calendrier" iconURI="platform:/plugin/net.tourbook/icons/calendar.png" tooltip="" category="1. Dossier des parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.calendar.CalendarView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:1. Dossier des parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPcHstbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.tagViewID" label="Parcours avec &#xe9;tiquettes" iconURI="platform:/plugin/net.tourbook/icons/tagged-tours.png" tooltip="" category="1. Dossier des parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tagging.TaggingView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:1. Dossier des parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPcHs9bLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.collateTours.CollatedToursView" label="Parcours combin&#xe9;s" iconURI="platform:/plugin/net.tourbook/icons/collated-tours.png" tooltip="" category="1. Dossier des parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.collateTours.CollatedToursView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:1. Dossier des parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPcHtNbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.tourCatalog.TourCatalogView" label="Parcours de R&#xe9;f&#xe9;rence" iconURI="platform:/plugin/net.tourbook/icons/reference-tours.png" tooltip="" category="1. Dossier des parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tourCatalog.TourCatalogView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:1. Dossier des parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPcHtdbLEeyKzNlIcTh7bg" elementId="net.tourbook.statistic.StatisticView" label="Statistiques" iconURI="platform:/plugin/net.tourbook/icons/statistics.png" tooltip="" category="1. Dossier des parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.statistic.StatisticView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:1. Dossier des parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPcHttbLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.TourMarkerAllView" label="Marqueurs de parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-marker-all.png" tooltip="" category="1. Dossier des parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tourMarker.TourMarkerAllView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:1. Dossier des parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPhAMNbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourChartView" label="Graphique de parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-chart.png" tooltip="" category="2. Propri&#xe9;t&#xe9;s du parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.tourChart.TourChartView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPiOUNbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourDataEditorView" label="&#xc9;diteur de parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-editor.png" tooltip="" category="2. Propri&#xe9;t&#xe9;s du parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tourDataEditor.TourDataEditorView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPiOUdbLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.TourPausesView" label="Pauses de Parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-pauses.png" tooltip="" category="2. Propri&#xe9;t&#xe9;s du parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.TourPausesView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPiOUtbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourMarkerView" label="Marqueurs de parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-marker.png" tooltip="" category="2. Propri&#xe9;t&#xe9;s du parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tourMarker.TourMarkerView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPiOU9bLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.tagging.TourTags_View" label="&#xc9;tiquettes de parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-tags.png" tooltip="" category="2. Propri&#xe9;t&#xe9;s du parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tagging.TourTags_View"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPiOVNbLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.TourBlogView" label="Blog des parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-blog.png" tooltip="" category="2. Propri&#xe9;t&#xe9;s du parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.TourBlogView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPiOVdbLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.TourInfo_View" label="Informations du parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-info.png" tooltip="" category="2. Propri&#xe9;t&#xe9;s du parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.TourInfo_View"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPiOVtbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourWaypointView" label="Waypoints" iconURI="platform:/plugin/net.tourbook/icons/tour-waypoint.png" tooltip="" category="2. Propri&#xe9;t&#xe9;s du parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.TourWaypointView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPiOV9bLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.TourDataView" label="Donn&#xe9;es de parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-data.png" tooltip="" category="2. Propri&#xe9;t&#xe9;s du parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.TourDataView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:2. Propri&#xe9;t&#xe9;s du parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPiOWNbLEeyKzNlIcTh7bg" elementId="net.tourbook.search.SearchView" label="Recherche" iconURI="platform:/plugin/net.tourbook/icons/search.png" tooltip="" category="3. Outils" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.search.SearchView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:3. Outils</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPnG0NbLEeyKzNlIcTh7bg" elementId="de.byteholder.geoclipse.poi.poiView" label="Recherche de Points d'int&#xe9;r&#xea;ts" iconURI="platform:/plugin/net.tourbook/icons/search-poi.png" tooltip="" category="3. Outils" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="de.byteholder.geoclipse.poi.PoiView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:3. Outils</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPnG0dbLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView" label="Variabilit&#xe9; de Fr&#xe9;quence cardiaque" iconURI="platform:/plugin/net.tourbook/icons/heart-rate-variability.png" tooltip="" category="3. Outils" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:3. Outils</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPnG0tbLEeyKzNlIcTh7bg" elementId="net.tourbook.conconi.ConconiView" label="Test de Conconi" iconURI="platform:/plugin/net.tourbook/icons/conconi-chart.png" tooltip="" category="3. Outils" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.conconi.ConconiView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:3. Outils</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPoU8NbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourChartAnalyzer" label="Analyseur de parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-analyzer.png" tooltip="" category="3. Outils" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.TourChartAnalyzerView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:3. Outils</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPoU8dbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourSegmenter" label="Segmentation de parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-segmenter.png" tooltip="" category="3. Outils" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tourSegmenter.TourSegmenterView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:3. Outils</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPoU8tbLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.TourChartSmoothingView" label="Lissage de parcours" iconURI="platform:/plugin/net.tourbook/icons/smooth.png" tooltip="" category="3. Outils" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.TourChartSmoothingView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:3. Outils</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPqKINbLEeyKzNlIcTh7bg" elementId="net.tourbook.statistic.StatisticValuesView" label="Valeurs Statistiques" iconURI="platform:/plugin/net.tourbook/icons/statistic-values.png" tooltip="" category="3. Outils" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.statistic.StatisticValuesView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:3. Outils</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPqKIdbLEeyKzNlIcTh7bg" elementId="net.tourbook.tour.TourLogView" label="Log des Parcours" iconURI="platform:/plugin/net.tourbook/icons/tour-log.png" tooltip="" category="3. Outils" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.tour.TourLogView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:3. Outils</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPqKItbLEeyKzNlIcTh7bg" elementId="net.tourbook.training.TrainingView" label="Entra&#xee;nement" iconURI="platform:/plugin/net.tourbook/icons/pulse-zones.png" tooltip="" category="3. Outils" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.training.TrainingView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:3. Outils</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPqKI9bLEeyKzNlIcTh7bg" elementId="net.tourbook.views.tourCatalog.CompareResultView" label="Comparaison des r&#xe9;sultats" iconURI="platform:/plugin/net.tourbook/icons/tour-map-compare-result.png" tooltip="" category="4. Comparer des parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tourCatalog.TourCompareResultView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:4. Comparer des parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPqKJNbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.tourCatalog.referenceTourView" label="Parcours de r&#xe9;f&#xe9;rence" iconURI="platform:/plugin/net.tourbook/icons/tour-map-reftour.png" tooltip="" category="4. Comparer des parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tourCatalog.TourCatalogView_ReferenceTour"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:4. Comparer des parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPt0gNbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.tourCatalog.comparedTourView" label="Parcours compar&#xe9;s" iconURI="platform:/plugin/net.tourbook/icons/tour-map-comparetour.png" tooltip="" category="4. Comparer des parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tourCatalog.TourCatalogView_ComparedTour"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:4. Comparer des parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPt0gdbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.tourCatalog.yearStatisticView" label="Statistiques annuelles" iconURI="platform:/plugin/net.tourbook/icons/tour-map-statistic.png" tooltip="" category="4. Comparer des parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tourCatalog.RefTour_YearStatistic_View"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:4. Comparer des parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPt0gtbLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.geoCompare.GeoCompareView" label="Comparaison g&#xe9;ographique" iconURI="platform:/plugin/net.tourbook/icons/geo-parts.png" tooltip="" category="4. Comparer des parcours" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.geoCompare.GeoCompareView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:4. Comparer des parcours</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPvCoNbLEeyKzNlIcTh7bg" elementId="net.tourbook.photo.PhotosAndToursView.ID" label="Photos + Parcours" iconURI="platform:/plugin/net.tourbook/icons/photo-and-tours-view.png" tooltip="" category="5. Photo" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.tour.photo.TourPhotoLinkView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:5. Photo</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPvCodbLEeyKzNlIcTh7bg" elementId="net.tourbook.photo.TourPhotosView.ID" label="Photos du parcours" iconURI="platform:/plugin/net.tourbook/icons/photo-tour-photos.png" tooltip="" category="5. Photo" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.tour.photo.TourPhotosView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:5. Photo</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPvCotbLEeyKzNlIcTh7bg" elementId="net.tourbook.map2.view.Map2ViewId" label="Carte 2D" iconURI="platform:/plugin/net.tourbook/icons/map2-view.png" tooltip="" category="6. Carte" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.map2.view.Map2View"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:6. Carte</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPvCo9bLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.sensors.SensorView.ID" label="Capteur" iconURI="platform:/plugin/net.tourbook/icons/sensor.png" tooltip="" category="7. &#xc9;quipement" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.sensors.SensorView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:7. &#xc9;quipement</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPvCpNbLEeyKzNlIcTh7bg" elementId="net.tourbook.ui.views.sensors.SensorChartView.ID" label="Graphique des capteurs" iconURI="platform:/plugin/net.tourbook/icons/sensor-chart.png" tooltip="" category="7. &#xc9;quipement" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.sensors.SensorChartView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:7. &#xc9;quipement</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPvCpdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.views.ProgressView" label="Progress" iconURI="platform:/plugin/org.eclipse.ui.ide/icons/full/eview16/pview.png" tooltip="" category="General" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="org.eclipse.ui.internal.progress.ProgressView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.ui.ide"/>
+    <tags>View</tags>
+    <tags>categoryTag:99. Syst&#xe8;me</tags>
+    <tags>categoryTag:General</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPvCptbLEeyKzNlIcTh7bg" elementId="net.tourbook.views.TourChartPropertyView" label="Propri&#xe9;t&#xe9;s des graphiques " iconURI="platform:/plugin/net.tourbook/icons/tourchart-properties.gif" tooltip="" category="99. Syst&#xe8;me" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.TourChartPropertyView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:99. Syst&#xe8;me</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPvCp9bLEeyKzNlIcTh7bg" elementId="net.tourbook.map2.view.Map2DebugView" label="Propri&#xe9;t&#xe9;s cartographique" iconURI="platform:/plugin/net.tourbook/icons/tour-map-properties.png" tooltip="" category="99. Syst&#xe8;me" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.map2.view.Map2DebugView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:99. Syst&#xe8;me</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPvCqNbLEeyKzNlIcTh7bg" elementId="net.tourbook.map25.Map25View" label="Carte 2.5D" iconURI="platform:/plugin/net.tourbook/icons/map25-view.png" tooltip="" category="6. Carte" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.map25.Map25View"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:6. Carte</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPz7INbLEeyKzNlIcTh7bg" elementId="net.tourbook.map25.Map25DebugView" label="Informations de d&#xe9;buggage sur la 2.5D" iconURI="platform:/plugin/net.tourbook/icons/map25-debug-view.png" tooltip="" category="6. Carte" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.map25.Map25DebugView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:6. Carte</tags>
+  </descriptors>
+  <descriptors xmi:id="_YPz7IdbLEeyKzNlIcTh7bg" elementId="net.tourbook.map3.view.Map3ViewId" label="Carte 3D" iconURI="platform:/plugin/net.tourbook/icons/map3-view.png" tooltip="" category="6. Carte" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.map3.view.Map3View"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:6. Carte</tags>
+  </descriptors>
+  <descriptors xmi:id="_YP1JQNbLEeyKzNlIcTh7bg" elementId="net.tourbook.map3.Map3StatisticsView" label="Statistiques Cartes 3D" iconURI="platform:/plugin/net.tourbook/icons/map3-statistics.png" tooltip="" category="6. Carte" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.map3.view.Map3StatisticsView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:6. Carte</tags>
+  </descriptors>
+  <descriptors xmi:id="_YP1JQdbLEeyKzNlIcTh7bg" elementId="net.tourbook.map.bookmark.MapBookmarkView" label="Favoris Cartographiques" iconURI="platform:/plugin/net.tourbook/icons/map-bookmark.png" tooltip="" category="6. Carte" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.map.bookmark.MapBookmarkView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:6. Carte</tags>
+  </descriptors>
+  <descriptors xmi:id="_YP1JQtbLEeyKzNlIcTh7bg" elementId="net.tourbook.photo.PicDirView" label="Photos" iconURI="platform:/plugin/net.tourbook.photo/icons/photo-directory.png" tooltip="" category="5. Photo" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.photo.PicDirView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook.photo"/>
+    <tags>View</tags>
+    <tags>categoryTag:5. Photo</tags>
+  </descriptors>
+  <descriptors xmi:id="_YP1JQ9bLEeyKzNlIcTh7bg" elementId="org.eclipse.m2e.core.views.MavenRepositoryView" label="Maven Repositories" iconURI="platform:/plugin/org.eclipse.m2e.core.ui/icons/maven_indexes.png" tooltip="" category="Maven" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="org.eclipse.m2e.core.ui.internal.views.MavenRepositoryView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.m2e.core.ui"/>
+    <tags>View</tags>
+    <tags>categoryTag:Maven</tags>
+  </descriptors>
+  <descriptors xmi:id="_YP1JRNbLEeyKzNlIcTh7bg" elementId="org.eclipse.m2e.core.views.MavenLifecycleMappingsView" label="Maven Lifecycle Mappings" iconURI="platform:/plugin/org.eclipse.m2e.core.ui/icons/main_tab.png" tooltip="" category="Maven" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="org.eclipse.m2e.core.ui.internal.views.MavenLifecycleMappingsView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.m2e.core.ui"/>
+    <tags>View</tags>
+    <tags>categoryTag:Maven</tags>
+  </descriptors>
+  <descriptors xmi:id="_YP1JRdbLEeyKzNlIcTh7bg" elementId="org.eclipse.m2e.core.views.MavenBuild" label="Maven Workspace Build" iconURI="platform:/plugin/org.eclipse.ui/icons/full/eview16/defaultview_misc.png" tooltip="" category="Maven" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="org.eclipse.m2e.core.ui.internal.views.build.BuildDebugView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.m2e.core.ui"/>
+    <tags>View</tags>
+    <tags>categoryTag:Maven</tags>
+  </descriptors>
+  <descriptors xmi:id="_YP1JRtbLEeyKzNlIcTh7bg" elementId="org.eclipse.swt.tools.views.MacGeneratorView" label="Mac Generator" iconURI="platform:/plugin/org.eclipse.swt.tools/icons/mac.gif" tooltip="" category="SWT Tools" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="org.eclipse.swt.tools.views.MacGeneratorView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.swt.tools"/>
+    <tags>View</tags>
+    <tags>categoryTag:SWT Tools</tags>
+  </descriptors>
+  <descriptors xmi:id="_YP1JR9bLEeyKzNlIcTh7bg" elementId="org.eclipse.swt.tools.views.SpyView" label="SWT Spy" iconURI="platform:/plugin/org.eclipse.swt.tools.spies/icons/spy.png" tooltip="" category="SWT Tools" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="org.eclipse.swt.tools.views.SpyView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.swt.tools.spies"/>
+    <tags>View</tags>
+    <tags>categoryTag:SWT Tools</tags>
+  </descriptors>
+  <descriptors xmi:id="_YP1JSNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.internal.introview" label="Welcome" iconURI="platform:/plugin/org.eclipse.ui/icons/full/eview16/defaultview_misc.png" tooltip="" category="General" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="org.eclipse.ui.internal.ViewIntroAdapterPart"/>
+    <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.ui"/>
+    <tags>View</tags>
+    <tags>categoryTag:General</tags>
+  </descriptors>
+  <descriptors xmi:id="_YP1JSdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.console.ConsoleView" label="Console" iconURI="platform:/plugin/org.eclipse.ui.console/icons/full/cview16/console_view.png" tooltip="" allowMultiple="true" category="General" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="org.eclipse.ui.internal.console.ConsoleView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.ui.console"/>
+    <tags>View</tags>
+    <tags>categoryTag:General</tags>
+  </descriptors>
+  <descriptors xmi:id="_YP7P4NbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.views.ResourceNavigator" label="Navigator (Deprecated)" iconURI="platform:/plugin/org.eclipse.ui.ide/icons/full/eview16/filenav_nav.png" tooltip="" category="General" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="org.eclipse.ui.views.navigator.ResourceNavigator"/>
+    <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.ui.ide"/>
+    <tags>View</tags>
+    <tags>categoryTag:General</tags>
+  </descriptors>
+  <descriptors xmi:id="_YP7P4dbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.views.BookmarkView" label="Bookmarks" iconURI="platform:/plugin/org.eclipse.ui.ide/icons/full/eview16/bkmrk_nav.png" tooltip="" allowMultiple="true" category="General" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="org.eclipse.ui.internal.views.markers.BookmarksView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.ui.ide"/>
+    <tags>View</tags>
+    <tags>categoryTag:General</tags>
+  </descriptors>
+  <descriptors xmi:id="_YP7P4tbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.views.TaskList" label="Tasks" iconURI="platform:/plugin/org.eclipse.ui.ide/icons/full/eview16/tasks_tsk.png" tooltip="" allowMultiple="true" category="General" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="org.eclipse.ui.internal.views.markers.TasksView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.ui.ide"/>
+    <tags>View</tags>
+    <tags>categoryTag:General</tags>
+  </descriptors>
+  <descriptors xmi:id="_YP7P49bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.views.ProblemView" label="Problems" iconURI="platform:/plugin/org.eclipse.ui.ide/icons/full/eview16/problems_view.png" tooltip="" allowMultiple="true" category="General" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="org.eclipse.ui.internal.views.markers.ProblemsView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.ui.ide"/>
+    <tags>View</tags>
+    <tags>categoryTag:General</tags>
+  </descriptors>
+  <descriptors xmi:id="_YP7P5NbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.views.AllMarkersView" label="Markers" iconURI="platform:/plugin/org.eclipse.ui.ide/icons/full/eview16/problems_view.png" tooltip="" allowMultiple="true" category="General" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="org.eclipse.ui.internal.views.markers.AllMarkersView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.ui.ide"/>
+    <tags>View</tags>
+    <tags>categoryTag:General</tags>
+  </descriptors>
+  <descriptors xmi:id="_YP9FENbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.views.minimap.MinimapView" label="Minimap" iconURI="platform:/plugin/org.eclipse.ui.workbench.texteditor/icons/full/eview16/minimap.png" tooltip="" category="General" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="org.eclipse.ui.internal.views.minimap.MinimapView"/>
+    <persistedState key="originalCompatibilityViewBundle" value="org.eclipse.ui.workbench.texteditor"/>
+    <tags>View</tags>
+    <tags>categoryTag:General</tags>
+  </descriptors>
+  <commands xmi:id="_YCQAS9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.pinEditor" commandName="Pin Editor" description="Pin the current editor" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQATNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.nextTab" commandName="Next Tab" description="Switch to the next tab" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQATdbLEeyKzNlIcTh7bg" elementId="net.tourbook.command.tourCompareWizard" commandName="Assistant de comparateur de parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQATtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.quickAccess" commandName="Find Actions" description="Quickly access UI elements" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAT9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.showInformation" commandName="Show Tooltip Description" description="Displays information for the current caret location in a focused hover" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAUNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.select.pageUp" commandName="Select Page Up" description="Select to the top of the page" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAUdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.toggleWordWrap" commandName="Toggle Word Wrap" description="Toggle word wrap in the current text editor" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAUtbLEeyKzNlIcTh7bg" elementId="net.tourbook.command.dbTool.consistencyCheck" commandName="Contr&#xf4;le de coh&#xe9;rence de la base de donn&#xe9;es " category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAU9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.goto.pageUp" commandName="Page Up" description="Go up one page" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAVNbLEeyKzNlIcTh7bg" elementId="net.tourbook.command.tourChart.canScrollChart" commandName="D&#xe9;filer le graphique zoom&#xe9;" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAVdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.goto.columnPrevious" commandName="Previous Column" description="Go to the previous column" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAVtbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.PhotoFilter" commandName="Afficher uniquement les parcours avec photos" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAV9bLEeyKzNlIcTh7bg" elementId="net.tourbook.command.device.synchronize" commandName="Recevoir des parcours depuis le port s&#xe9;rie" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAWNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.ide.copyBuildIdCommand" commandName="Copy Build Id Information To Clipboard" description="Copies the build identification information to the clipboard." category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAWdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.select.textEnd" commandName="Select Text End" description="Select to the end of the text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAWtbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.search.SearchView" commandName="Recherche" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAW9bLEeyKzNlIcTh7bg" elementId="net.tourbook.command.App_ClosePart" commandName="Fermer la vue/le parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAXNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.deletePreviousWord" commandName="Delete Previous Word" description="Delete the previous word" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAXdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.goto.wordPrevious" commandName="Previous Word" description="Go to the previous word" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAXtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.properties" commandName="Properties" description="Display the properties of the selected item" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAX9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.preferences" commandName="Preferences" description="Open the preferences dialog" category="_YCQASNbLEeyKzNlIcTh7bg">
+    <parameters xmi:id="_YCQAYNbLEeyKzNlIcTh7bg" elementId="preferencePageId" name="Preference Page"/>
+  </commands>
+  <commands xmi:id="_YCQAYdbLEeyKzNlIcTh7bg" elementId="net.tourbook.command.device.importFromFile" commandName="Importer des fichiers" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAYtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.showRulerAnnotationInformation" commandName="Show Ruler Annotation Tooltip" description="Displays annotation information for the caret line in a focused hover" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAY9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.delimiter.unix" commandName="Convert Line Delimiters to Unix (LF, \n, 0A, &#xb6;)" description="Converts the line delimiters to Unix (LF, \n, 0A, &#xb6;)" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAZNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.activeContextInfo" commandName="Show activeContext Info" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAZdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.copy" commandName="Copy" description="Copy the selection to the clipboard" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAZtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.nextView" commandName="Next View" description="Switch to the next view" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAZ9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.select.textStart" commandName="Select Text Start" description="Select to the beginning of the text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAaNbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.ui.views.TourChartSmoothingView" commandName="Lissage de parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAadbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.revertToSaved" commandName="Revert to Saved" description="Revert to the last saved state" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAatbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.contentAssist.contextInformation" commandName="Context Information" description="Show Context Information" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAa9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.saveAs" commandName="Save As" description="Save the current contents to another location" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAbNbLEeyKzNlIcTh7bg" elementId="command.de.byteholder.geoclipse.poi.ShowPOI" commandName="Recherche de Points d'int&#xe9;r&#xea;ts" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAbdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.addToWorkingSet" commandName="Add to Working Set" description="Adds the selected object to a working set." category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAbtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.previousPerspective" commandName="Previous Perspective" description="Switch to the previous perspective" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAb9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.splitEditor" commandName="Toggle Split Editor" description="Split or join the currently active editor." category="_YCQASNbLEeyKzNlIcTh7bg">
+    <parameters xmi:id="_YCQAcNbLEeyKzNlIcTh7bg" elementId="Splitter.isHorizontal" name="Orientation" optional="false"/>
+  </commands>
+  <commands xmi:id="_YCQAcdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.showChangeRulerInformation" commandName="Show Quick Diff Ruler Tooltip" description="Displays quick diff or revision information for the caret line in a focused hover" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQActbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.upperCase" commandName="To Upper Case" description="Changes the selection to upper case" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAc9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.collapseAll" commandName="Collapse All" description="Collapse the current tree" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAdNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.goInto" commandName="Go Into" description="Navigate into the selected item" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAddbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.maximizePart" commandName="Maximize Active View or Editor" description="Toggles maximize/restore state of active view or editor" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAdtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.lockToolBar" commandName="Toggle Lock Toolbars" description="Toggle the Lock on the Toolbars" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAd9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.select.windowEnd" commandName="Select Window End" description="Select to the end of the window" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAeNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.newEditor" commandName="Clone Editor" description="Open another editor on the active editor's input" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAedbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.minimizePart" commandName="Minimize Active View or Editor" description="Minimizes the active view or editor" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAetbLEeyKzNlIcTh7bg" elementId="net.tourbook.command.device.synchronize.direct" commandName="Recevoir des parcours depuis le port s&#xe9;rie (avec une configuration pr&#xe9;c&#xe9;dente)" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAe9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.contentAssist.proposals" commandName="Content Assist" description="Content Assist" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAfNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.up" commandName="Up" description="Navigate up one level" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAfdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.activateEditor" commandName="Activate Editor" description="Activate the editor" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAftbLEeyKzNlIcTh7bg" elementId="org.eclipse.m2e.core.ui.command.addPlugin" commandName="Add Maven Plugin" description="Add Maven plugin" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAf9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.showSystemMenu" commandName="Show System Menu" description="Show the system menu" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAgNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.removeFromWorkingSet" commandName="Remove From Working Set" description="Removes the selected object from a working set." category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAgdbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.ui.views.sensors.SensorView" commandName="Capteur" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAgtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.delete.line.to.end" commandName="Delete to End of Line" description="Delete to the end of a line of text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAg9bLEeyKzNlIcTh7bg" elementId="command.net.tourbook.views.TourPausesView" commandName="Pauses de Parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAhNbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.photo.LinkPhotoWithTourInGallerySelected" commandName="Lier les photos s&#xe9;lectionn&#xe9;es avec les parcours..." category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAhdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.savePerspective" commandName="Save Perspective As" description="Save the current perspective" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAhtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.ide.deleteCompleted" commandName="Delete Completed Tasks" description="Delete the tasks marked as completed" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAh9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.move" commandName="Move..." description="Move the selected item" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAiNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.editors.revisions.author.toggle" commandName="Toggle Revision Author Display" description="Toggles the display of the revision author" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAidbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.goto.windowEnd" commandName="Window End" description="Go to the end of the window" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAitbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.perspectives.showPerspective" commandName="Show Perspective" description="Show a particular perspective" category="_YCQAQdbLEeyKzNlIcTh7bg">
+    <parameters xmi:id="_YCQAi9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.perspectives.showPerspective.perspectiveId" name="Parameter"/>
+    <parameters xmi:id="_YCQAjNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.perspectives.showPerspective.newWindow" name="In New Window"/>
+  </commands>
+  <commands xmi:id="_YCQAjdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.linkWithEditor" commandName="Toggle Link with Editor" description="Toggles linking of a view's selection with the active editor's selection" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAjtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.openEditorDropDown" commandName="Quick Switch Editor" description="Open the editor drop down list" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAj9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.goto.line" commandName="Go to Line" description="Go to a specified line of text" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAkNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.editors.quickdiff.revert" commandName="Revert Lines" description="Revert the current selection, block or deleted lines" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAkdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.deleteNextWord" commandName="Delete Next Word" description="Delete the next word" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAktbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.toggleBlockSelectionMode" commandName="Toggle Block Selection" description="Toggle block / column selection in the current text editor" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAk9bLEeyKzNlIcTh7bg" elementId="net.tourbook.command.OpenHomePage" commandName="Site web MyTourbook" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAlNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.goToResource" commandName="Go to Resource" description="Go to a particular resource in the active view" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAldbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.resetPerspective" commandName="Reset Perspective" description="Reset the current perspective to its default state" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAltbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.select.lineUp" commandName="Select Line Up" description="Extend the selection to the previous line of text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAl9bLEeyKzNlIcTh7bg" elementId="command.net.tourbook.views.tourListView" commandName="Livre des parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAmNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.undo" commandName="Undo" description="Undo the last operation" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAmdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.project.buildLast" commandName="Repeat Working Set Build" description="Repeat the last working set build" category="_YCQAQtbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAmtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.project.buildProject" commandName="Build Project" description="Build the selected project" category="_YCQAQtbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAm9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.cut.line.to.end" commandName="Cut to End of Line" description="Cut to the end of a line of text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAnNbLEeyKzNlIcTh7bg" elementId="net.tourbook.map.bookmark.command.MapBookmarkView" commandName="Favoris Cartographiques" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAndbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.newQuickMenu" commandName="New menu" description="Open the New menu" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAntbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.project.openProject" commandName="Open Project" description="Open a project" category="_YCQAQtbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAn9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.openWorkspace" commandName="Switch Workspace" description="Open the workspace selection dialog" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAoNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.closeAll" commandName="Close All" description="Close all editors" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAodbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.cut" commandName="Cut" description="Cut the selection to the clipboard" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAotbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.goto.textStart" commandName="Text Start" description="Go to the beginning of the text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAo9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.paste" commandName="Paste" description="Paste from the clipboard" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQApNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.part.nextPage" commandName="Next Page" description="Switch to the next page" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQApdbLEeyKzNlIcTh7bg" elementId="net.tourbook.command.tourDataEditor" commandName="&#xc9;diteur de parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAptbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.views.TourMarkerView" commandName="Marqueurs de parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAp9bLEeyKzNlIcTh7bg" elementId="command.net.tourbook.tour.RestoreTour" commandName="R&#xe9;tablir le parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAqNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.previous" commandName="Previous" description="Navigate to the previous item" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAqdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.project.properties" commandName="Properties" description="Display the properties of the selected item's project " category="_YCQAQtbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAqtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.rename" commandName="Rename" description="Rename the selected item" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAq9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.clear.mark" commandName="Clear Mark" description="Clear the mark" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQArNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.project.buildAll" commandName="Build All" description="Build all projects" category="_YCQAQtbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQArdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.select.columnPrevious" commandName="Select Previous Column" description="Select the previous column" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQArtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly" commandName="Show Selected Element Only" description="Show Selected Element Only" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAr9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.cut.line.to.beginning" commandName="Cut to Beginning of Line" description="Cut to the beginning of a line of text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAsNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.export" commandName="Export" description="Export" category="_YCQARdbLEeyKzNlIcTh7bg">
+    <parameters xmi:id="_YCQAsdbLEeyKzNlIcTh7bg" elementId="exportWizardId" name="Export Wizard"/>
+  </commands>
+  <commands xmi:id="_YCQAstbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.views.rawData.RawDataView" commandName="Import de parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAs9bLEeyKzNlIcTh7bg" elementId="net.tourbook.command.tourChart.tool.adjustAltitude" commandName="Ajuster l'altitude" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAtNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.editors.revisions.rendering.cycle" commandName="Cycle Revision Coloring Mode" description="Cycles through the available coloring modes for revisions" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAtdbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.statistic.StatisticValuesView" commandName="Valeurs Statistiques" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAttbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.print" commandName="Print" description="Print" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAt9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.showRulerContextMenu" commandName="Show Ruler Context Menu" description="Show the context menu for the ruler" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAuNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.ide.copyConfigCommand" commandName="Copy Configuration Data To Clipboard" description="Copies the configuration data (system properties, installed bundles, etc) to the clipboard." category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAudbLEeyKzNlIcTh7bg" elementId="net.tourbook.command.createNewTour" commandName="Cr&#xe9;er un nouveau Parcours/&#xc9;v&#xe9;nement" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAutbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.folding.collapse" commandName="Collapse" description="Collapses the folded region at the current selection" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAu9bLEeyKzNlIcTh7bg" elementId="command.net.tourbook.tour.TourLogView" commandName="Log des Parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAvNbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.statistic.StatisticView" commandName="Statistiques" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAvdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.smartEnterInverse" commandName="Insert Line Above Current Line" description="Adds a new line above the current line" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAvtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.forwardHistory" commandName="Forward History" description="Move forward in the editor navigation history" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAv9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.spy" commandName="Show Contributing Plug-in" description="Shows contribution information for the currently selected element" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAwNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.help.helpSearch" commandName="Help Search" description="Open the help search" category="_YCQAStbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAwdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.restartWorkbench" commandName="Restart" description="Restart the workbench" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAwtbLEeyKzNlIcTh7bg" elementId="org.eclipse.e4.ui.importer.openDirectory" commandName="Open Projects from File System..." category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAw9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.toggleOverwrite" commandName="Toggle Overwrite" description="Toggle overwrite mode" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAxNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.goto.lineDown" commandName="Line Down" description="Go down one line of text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAxdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.project.rebuildAll" commandName="Rebuild All" description="Rebuild all projects" category="_YCQAQtbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAxtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.folding.collapse_all" commandName="Collapse All" description="Collapses all folded regions" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAx9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.gotoLastEditPosition" commandName="Previous Edit Location" description="Previous edit location" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAyNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.open.hyperlink" commandName="Open Hyperlink" description="Opens the hyperlink at the caret location or opens a chooser if more than one hyperlink is available" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAydbLEeyKzNlIcTh7bg" elementId="net.tourbook.map3.command.TourMap3" commandName="Carte 3D" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAytbLEeyKzNlIcTh7bg" elementId="net.tourbook.command.PicDir.NavigateHistoryForward" commandName="Rejouer l'historique" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAy9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.openLocalFile" commandName="Open File..." description="Open a file" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAzNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.showViewMenu" commandName="Show View Menu" description="Show the view menu" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAzdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.ide.configureFilters" commandName="Filters..." description="Configure the filters to apply to the markers view" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAztbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.shiftRight" commandName="Shift Right" description="Shift a block of text to the right" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQAz9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.backwardHistory" commandName="Backward History" description="Move backward in the editor navigation history" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA0NbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.previousTab" commandName="Previous Tab" description="Switch to the previous tab" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA0dbLEeyKzNlIcTh7bg" elementId="net.tourbook.map25.command.TourMap25" commandName="Carte 2.5D" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA0tbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.removeTrailingWhitespace" commandName="Remove Trailing Whitespace" description="Removes the trailing whitespace of each line" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA09bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.findIncremental" commandName="Incremental Find" description="Incremental find" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA1NbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.goto.lineEnd" commandName="Line End" description="Go to the end of the line of text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA1dbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.refresh" commandName="Refresh" description="Refresh the selected items" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA1tbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.swap.mark" commandName="Swap Mark" description="Swap the mark with the cursor position" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA19bLEeyKzNlIcTh7bg" elementId="command.net.tourbook.ui.views.TourMarkerAllView" commandName="Marqueurs de parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA2NbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.closeAllPerspectives" commandName="Close All Perspectives" description="Close all open perspectives" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA2dbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.deletePrevious" commandName="Delete Previous" description="Delete the previous character" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA2tbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.shiftLeft" commandName="Shift Left" description="Shift a block of text to the left" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA29bLEeyKzNlIcTh7bg" elementId="net.tourbook.command.selectedTour" commandName="Graphique du parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA3NbLEeyKzNlIcTh7bg" elementId="net.tourbook.command.PicDir.ShowNaviationHistory" commandName="Afficher l'historique de navigation" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA3dbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.select.lineStart" commandName="Select Line Start" description="Select to the beginning of the line of text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA3tbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.views.TourWaypointView" commandName="Waypoints" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA39bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.editors.lineNumberToggle" commandName="Show Line Numbers" description="Toggle display of line numbers" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA4NbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.select.columnNext" commandName="Select Next Column" description="Select the next column" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA4dbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.views.ConconiChart" commandName="Test de Conconi" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA4tbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.photo.PicDirView" commandName="Photos" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA49bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.delete.line" commandName="Delete Line" description="Delete a line of text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA5NbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.expandAll" commandName="Expand All" description="Expand the current tree" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA5dbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.ide.showInSystemExplorer" commandName="Show In (System Explorer)" description="Show in system's explorer (file manager)" category="_YCQAQ9bLEeyKzNlIcTh7bg">
+    <parameters xmi:id="_YCQA5tbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.ide.showInSystemExplorer.path" name="Resource System Path Parameter"/>
+  </commands>
+  <commands xmi:id="_YCQA59bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.saveAll" commandName="Save All" description="Save all current contents" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA6NbLEeyKzNlIcTh7bg" elementId="net.tourbook.command.tourChart.tool.graphAnalyzer" commandName="Analyseur de parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA6dbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.select.lineDown" commandName="Select Line Down" description="Extend the selection to the next line of text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA6tbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.showKeyAssist" commandName="Show Key Assist" description="Show the key assist dialog" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA69bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.lowerCase" commandName="To Lower Case" description="Changes the selection to lower case" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA7NbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.zoomOut" commandName="Zoom Out" description="Zoom out text, decrease default font size for text editors" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA7dbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.closeOthers" commandName="Close Others" description="Close all editors except the one that is active" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA7tbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.save" commandName="Save" description="Save the current contents" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA79bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.editors.quickdiff.revertLine" commandName="Revert Line" description="Revert the current line" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA8NbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.views.calendar.CalendarView" commandName="Calendrier" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA8dbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.previousEditor" commandName="Previous Editor" description="Switch to the previous editor" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA8tbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.findReplace" commandName="Find and Replace" description="Find and replace text" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA89bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.zoomIn" commandName="Zoom In" description="Zoom in text, increase default font size for text editors" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA9NbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.views.TourData_View" commandName="Donn&#xe9;es de parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA9dbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.ide.OpenMarkersView" commandName="Open Another" description="Open another view" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA9tbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.help.tipsAndTricksAction" commandName="Tips and Tricks" description="Open the tips and tricks help page" category="_YCQAStbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA99bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.fullscreenmode" commandName="Toggle Full Screen" description="Toggles the window between full screen and normal" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA-NbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.select.lineEnd" commandName="Select Line End" description="Select to the end of the line of text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA-dbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.nextEditor" commandName="Next Editor" description="Switch to the next editor" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA-tbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.project.closeUnrelatedProjects" commandName="Close Unrelated Projects" description="Close unrelated projects" category="_YCQAQtbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA-9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.smartEnter" commandName="Insert Line Below Current Line" description="Adds a new line below the current line" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA_NbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.goto.lineStart" commandName="Line Start" description="Go to the start of the line of text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA_dbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.views.tourCatalog.TourCatalogView" commandName="Parcours de R&#xe9;f&#xe9;rence" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA_tbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.photo.RefreshFolder" commandName="Actualiser le dossier" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQA_9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.ide.markers.copyMarkerResourceQualifiedName" commandName="Copy Resource Qualified Name To Clipboard" description="Copies markers resource qualified name to the clipboard" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBANbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.select.wordPrevious" commandName="Select Previous Word" description="Select the previous word" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBAdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.help.helpContents" commandName="Help Contents" description="Open the help contents" category="_YCQAStbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBAtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.hippieCompletion" commandName="Word Completion" description="Context insensitive completion" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBA9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.delete" commandName="Delete" description="Delete the selection" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBBNbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.ui.views.tagging.TourTags_View" commandName="&#xc9;tiquettes de parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBBdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.delete.line.to.beginning" commandName="Delete to Beginning of Line" description="Delete to the beginning of a line of text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBBtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.ide.configureColumns" commandName="Configure Columns..." description="Configure the columns in the markers view" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBB9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.findPrevious" commandName="Find Previous" description="Find previous item" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBCNbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.photo.LinkPhotoWithTourInFolder" commandName="Lier toutes les photos de ce dossier avec les parcours..." category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBCdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.exit" commandName="Exit" description="Exit the application" category="_YCQARdbLEeyKzNlIcTh7bg">
+    <parameters xmi:id="_YCQBCtbLEeyKzNlIcTh7bg" elementId="mayPrompt" name="may prompt"/>
+  </commands>
+  <commands xmi:id="_YCQBC9bLEeyKzNlIcTh7bg" elementId="net.tourbook.command.tourChart.tool.tourSegmenter" commandName="Segmenter le parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBDNbLEeyKzNlIcTh7bg" elementId="org.eclipse.m2e.core.ui.command.openPom" commandName="Open Maven POM" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBDdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.addBookmark" commandName="Add Bookmark" description="Add a bookmark" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBDtbLEeyKzNlIcTh7bg" elementId="org.eclipse.m2e.core.ui.command.updateProject" commandName="Update Maven Project" description="Update Maven project configuration and dependencies" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBD9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.scroll.lineUp" commandName="Scroll Line Up" description="Scroll up one line of text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBENbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.previousView" commandName="Previous View" description="Switch to the previous view" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBEdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.set.mark" commandName="Set Mark" description="Set the mark" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBEtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.folding.toggle" commandName="Toggle Folding" description="Toggles folding in the current editor" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBE9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.toggleShowWhitespaceCharacters" commandName="Show Whitespace Characters" description="Shows whitespace characters in current text editor" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBFNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.gotoNextEditPosition" commandName="Next Edit Location" description="Next edit location" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBFdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.revert" commandName="Revert" description="Revert to the last saved state" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBFtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.views.showView" commandName="Show View" description="Shows a particular view" category="_YCQAQNbLEeyKzNlIcTh7bg">
+    <parameters xmi:id="_YCQBF9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.views.showView.viewId" name="View"/>
+    <parameters xmi:id="_YCQBGNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.views.showView.secondaryId" name="Secondary Id"/>
+    <parameters xmi:id="_YCQBGdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.views.showView.makeFast" name="As FastView"/>
+  </commands>
+  <commands xmi:id="_YCQBGtbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.training.Training" commandName="Entra&#xee;nement" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBG9bLEeyKzNlIcTh7bg" elementId="net.tourbook.command.PicDir.NavigateHistoryBackward" commandName="Annuler l'historique" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBHNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.selectAll" commandName="Select All" description="Select all" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBHdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.ide.markers.copyDescription" commandName="Copy Description To Clipboard" description="Copies markers description field to the clipboard" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBHtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.showResourceByPath" commandName="Show Resource in Navigator" description="Show a resource in the Navigator given its path" category="_YCQAQ9bLEeyKzNlIcTh7bg">
+    <parameters xmi:id="_YCQBH9bLEeyKzNlIcTh7bg" elementId="resourcePath" name="Resource Path" typeId="org.eclipse.ui.ide.resourcePath" optional="false"/>
+  </commands>
+  <commands xmi:id="_YCQBINbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.delimiter.windows" commandName="Convert Line Delimiters to Windows (CRLF, \r\n, 0D0A, &#xa4;&#xb6;)" description="Converts the line delimiters to Windows (CRLF, \r\n, 0D0A, &#xa4;&#xb6;)" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBIdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.findNext" commandName="Find Next" description="Find next item" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBItbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.views.tagViewID" commandName="Parcours avec &#xe9;tiquettes" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBI9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.hidetrimbars" commandName="Toggle visibility of the window toolbars" description="Toggle the visibility of the toolbars of the current window" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBJNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.folding.expand" commandName="Expand" description="Expands the folded region at the current selection" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBJdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.project.rebuildProject" commandName="Rebuild Project" description="Rebuild the selected projects" category="_YCQAQtbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBJtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.project.buildAutomatically" commandName="Build Automatically" description="Toggle the workspace build automatically function" category="_YCQAQtbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBJ9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.import" commandName="Import" description="Import" category="_YCQARdbLEeyKzNlIcTh7bg">
+    <parameters xmi:id="_YCQBKNbLEeyKzNlIcTh7bg" elementId="importWizardId" name="Import Wizard"/>
+  </commands>
+  <commands xmi:id="_YCQBKdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.switchToEditor" commandName="Switch to Editor" description="Switch to an editor" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBKtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.help.dynamicHelp" commandName="Show Context Help" description="Open the contextual help" category="_YCQAStbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBK9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.nextSubTab" commandName="Next Sub-Tab" description="Switch to the next sub-tab" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBLNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.toMultiSelection" commandName="To multi-selection" description="Turn current selection into multiple text selections" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBLdbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.views.collatedToursViewID" commandName="Parcours combin&#xe9;s" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBLtbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.views.TourBlogView" commandName="Blog des parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBL9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.addTask" commandName="Add Task..." description="Add a task" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBMNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.copyLineDown" commandName="Copy Lines" description="Duplicates the selected lines and moves the selection to the copy" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBMdbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.ui.views.sensors.SensorChartView" commandName="Graphique des capteurs" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBMtbLEeyKzNlIcTh7bg" elementId="net.tourbook.command.DbTool.CompressDatabase" commandName="Compactage de la base de donn&#xe9;es..." category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBM9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.toggleInsertMode" commandName="Toggle Insert Mode" description="Toggle insert mode" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBNNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.togglestatusbar" commandName="Toggle Statusbar" description="Toggle the visibility of the bottom status bar" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBNdbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.PicDir.SyncPhotoWithTour" commandName="Lier automatiquement les photos aux parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBNtbLEeyKzNlIcTh7bg" elementId="net.tourbook.mapping.command.tourMap" commandName="Carte 2D" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBN9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.closePart" commandName="Close Part" description="Close the active workbench part" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBONbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.editors.revisions.id.toggle" commandName="Toggle Revision Id Display" description="Toggles the display of the revision id" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBOdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.project.cleanAction" commandName="Build Clean" description="Discard old built state" category="_YCQAQtbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBOtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.help.installationDialog" commandName="Installation Information" description="Open the installation dialog" category="_YCQAStbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBO9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.moveLineDown" commandName="Move Lines Down" description="Moves the selected lines down" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBPNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.goto.lineUp" commandName="Line Up" description="Go up one line of text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBPdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.goto.windowStart" commandName="Window Start" description="Go to the start of the window" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBPtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.back" commandName="Back" description="Navigate back" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBP9bLEeyKzNlIcTh7bg" elementId="command.net.tourbook.views.TourInfo_View" commandName="Informations du parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBQNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.select.wordNext" commandName="Select Next Word" description="Select the next word" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBQdbLEeyKzNlIcTh7bg" elementId="org.eclipse.equinox.p2.ui.sdk.update" commandName="Rechercher des mises &#xe0; jour" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBQtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.goto.pageDown" commandName="Page Down" description="Go down one page" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBQ9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.goto.textEnd" commandName="Text End" description="Go to the end of the text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBRNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.part.previousPage" commandName="Previous Page" description="Switch to the previous page" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBRdbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.photo.LinkPhotoWithTourInGalleryAll" commandName="Lier toutes les photos de cette galerie avec les parcours..." category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBRtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.showInQuickMenu" commandName="Show In..." description="Open the Show In menu" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBR9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.copyLineUp" commandName="Duplicate Lines" description="Duplicates the selected lines and leaves the selection unchanged" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBSNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.next" commandName="Next" description="Navigate to the next item" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBSdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.closePerspective" commandName="Close Perspective" description="Close the current perspective" category="_YCQASNbLEeyKzNlIcTh7bg">
+    <parameters xmi:id="_YCQBStbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.closePerspective.perspectiveId" name="Perspective Id"/>
+  </commands>
+  <commands xmi:id="_YCQBS9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.project.closeProject" commandName="Close Project" description="Close the selected project" category="_YCQAQtbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBTNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.findIncrementalReverse" commandName="Incremental Find Reverse" description="Incremental find reverse" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBTdbLEeyKzNlIcTh7bg" elementId="net.tourbook.command.tourChart.showStartTime" commandName="Afficher l'heure de d&#xe9;part sur l'axe X" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBTtbLEeyKzNlIcTh7bg" elementId="org.eclipse.m2e.core.ui.command.addDependency" commandName="Add Maven Dependency" description="Add Maven dependency" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBT9bLEeyKzNlIcTh7bg" elementId="net.tourbook.command.tourChart.options" commandName="Options des graphiques" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBUNbLEeyKzNlIcTh7bg" elementId="net.tourbook.command.OpenForum" commandName="Forum de discussion..." category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBUdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.help.aboutAction" commandName="About" description="Open the about dialog" category="_YCQAStbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBUtbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.preferences" commandName="Pr&#xe9;f&#xe9;rences" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBU9bLEeyKzNlIcTh7bg" elementId="command.net.tourbook.views.HeartRateVariabilityChart" commandName="Variabilit&#xe9; de Fr&#xe9;quence cardiaque" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBVNbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.tour.SaveTour" commandName="Sauvegarder le parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBVdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.goto.columnNext" commandName="Next Column" description="Go to the next column" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBVtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.closeAllSaved" commandName="Close All Saved" description="Close all saved editors" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBV9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.redo" commandName="Redo" description="Redo the last operation" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBWNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.goto.wordNext" commandName="Next Word" description="Go to the next word" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBWdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.cut.line" commandName="Cut Line" description="Cut a line of text, or multiple lines when invoked again without interruption" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBWtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.selectWorkingSets" commandName="Select Working Sets" description="Select the working sets that are applicable for this window." category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBW9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.folding.expand_all" commandName="Expand All" description="Expands all folded regions" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBXNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.newWizard" commandName="New" description="Open the New item wizard" category="_YCQARdbLEeyKzNlIcTh7bg">
+    <parameters xmi:id="_YCQBXdbLEeyKzNlIcTh7bg" elementId="newWizardId" name="New Wizard"/>
+  </commands>
+  <commands xmi:id="_YCQBXtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.newWindow" commandName="New Window" description="Open another window" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBX9bLEeyKzNlIcTh7bg" elementId="org.eclipse.quickdiff.toggle" commandName="Quick Diff Toggle" description="Toggles quick diff information display on the line number ruler" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBYNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.deleteNext" commandName="Delete Next" description="Delete the next character" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBYdbLEeyKzNlIcTh7bg" elementId="org.eclipse.e4.ui.importer.configureProject" commandName="Configure and Detect Nested Projects..." category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBYtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.file.close" commandName="Close" description="Close the active editor" category="_YCQARdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBY9bLEeyKzNlIcTh7bg" elementId="org.eclipse.equinox.p2.ui.sdk.install" commandName="Installer de nouveaux logiciels/composants&#x2026;" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBZNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.customizePerspective" commandName="Customize Perspective" description="Customize the current perspective" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBZdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.toggleShowKeys" commandName="Toggle Show Key Bindings" description="Shows key binding when command is invoked" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBZtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.help.quickStartAction" commandName="Welcome" description="Show help for beginning users" category="_YCQAStbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBZ9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.moveLineUp" commandName="Move Lines Up" description="Moves the selected lines up" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBaNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.previousSubTab" commandName="Previous Sub-Tab" description="Switch to the previous sub-tab" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBadbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.hideShowEditors" commandName="Toggle Shared Area Visibility" description="Toggles the visibility of the shared area" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBatbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.showIn" commandName="Show In" category="_YCQAQ9bLEeyKzNlIcTh7bg">
+    <parameters xmi:id="_YCQBa9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.showIn.targetId" name="Show In Target Id" optional="false"/>
+  </commands>
+  <commands xmi:id="_YCQBbNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.help.displayHelp" commandName="Display Help" description="Display a Help topic" category="_YCQAStbLEeyKzNlIcTh7bg">
+    <parameters xmi:id="_YCQBbdbLEeyKzNlIcTh7bg" elementId="href" name="Help topic href"/>
+  </commands>
+  <commands xmi:id="_YCQBbtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.folding.restore" commandName="Reset Structure" description="Resets the folding structure" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBb9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.select.pageDown" commandName="Select Page Down" description="Select to the bottom of the page" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBcNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.join.lines" commandName="Join Lines" description="Join lines of text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBcdbLEeyKzNlIcTh7bg" elementId="command.net.tourbook.photo.TourPhotosView" commandName="Photos du parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBctbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.showContextMenu" commandName="Show Context Menu" description="Show the context menu" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBc9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.ide.markCompleted" commandName="Mark Completed" description="Mark the selected tasks as completed" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBdNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.recenter" commandName="Recenter" description="Scroll cursor line to center, top and bottom" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBddbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.forward" commandName="Forward" description="Navigate forward" category="_YCQAQ9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBdtbLEeyKzNlIcTh7bg" elementId="org.eclipse.jdt.ui.edit.text.java.correction.assist.proposals" commandName="Quick Fix" description="Suggest possible fixes for a problem" category="_YCQARNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBd9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.select.windowStart" commandName="Select Window Start" description="Select to the start of the window" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBeNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.window.nextPerspective" commandName="Next Perspective" description="Switch to the next perspective" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBedbLEeyKzNlIcTh7bg" elementId="net.tourbook.command.GeoParts" commandName="Comparaison g&#xe9;ographique de parcours" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBetbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.edit.text.scroll.lineDown" commandName="Scroll Line Down" description="Scroll down one line of text" category="_YCQAR9bLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBe9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.ToggleCoolbarAction" commandName="Toggle Main Toolbar Visibility" description="Toggles the visibility of the window toolbar" category="_YCQASNbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YCQBfNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.navigate.openResource" commandName="Open Resource" description="Open an editor on a particular resource" category="_YCQAQ9bLEeyKzNlIcTh7bg">
+    <parameters xmi:id="_YCQBfdbLEeyKzNlIcTh7bg" elementId="filePath" name="File Path" typeId="org.eclipse.ui.ide.resourcePath"/>
+  </commands>
+  <commands xmi:id="_YOE1wNbLEeyKzNlIcTh7bg" elementId="AUTOGEN:::org.eclipse.ui.texteditor.ruler.actions/org.eclipse.ui.texteditor.BookmarkRulerAction" commandName="Text Editor Bookmark Ruler Action" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <commands xmi:id="_YOE1wdbLEeyKzNlIcTh7bg" elementId="AUTOGEN:::org.eclipse.ui.texteditor.ruler.actions/org.eclipse.ui.texteditor.SelectRulerAction" commandName="Text Editor Ruler Single-Click" category="_YCQASdbLEeyKzNlIcTh7bg"/>
+  <addons xmi:id="_YBpjX9bLEeyKzNlIcTh7bg" elementId="org.eclipse.e4.core.commands.service" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
+  <addons xmi:id="_YBpjYNbLEeyKzNlIcTh7bg" elementId="org.eclipse.e4.ui.contexts.service" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
+  <addons xmi:id="_YBpjYdbLEeyKzNlIcTh7bg" elementId="org.eclipse.e4.ui.bindings.service" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
+  <addons xmi:id="_YBpjYtbLEeyKzNlIcTh7bg" elementId="org.eclipse.e4.ui.workbench.commands.model" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.CommandProcessingAddon"/>
+  <addons xmi:id="_YBpjY9bLEeyKzNlIcTh7bg" elementId="org.eclipse.e4.ui.workbench.contexts.model" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.ContextProcessingAddon"/>
+  <addons xmi:id="_YBpjZNbLEeyKzNlIcTh7bg" elementId="org.eclipse.e4.ui.workbench.bindings.model" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.swt/org.eclipse.e4.ui.workbench.swt.util.BindingProcessingAddon"/>
+  <addons xmi:id="_YBpjZdbLEeyKzNlIcTh7bg" elementId="Cleanup Addon" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.cleanupaddon.CleanupAddon"/>
+  <addons xmi:id="_YBpjZtbLEeyKzNlIcTh7bg" elementId="DnD Addon" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.dndaddon.DnDAddon"/>
+  <addons xmi:id="_YBpjZ9bLEeyKzNlIcTh7bg" elementId="MinMax Addon" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.minmax.MinMaxAddon"/>
+  <addons xmi:id="_YBpjaNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.workbench.addon.0" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.HandlerProcessingAddon"/>
+  <addons xmi:id="_YB3lwNbLEeyKzNlIcTh7bg" elementId="SplitterAddon" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.splitteraddon.SplitterAddon"/>
+  <addons xmi:id="_6lU9UdbMEeyjfteImKjphA" elementId="org.eclipse.ui.ide.addon.0" contributionURI="bundleclass://org.eclipse.ui.ide/org.eclipse.ui.internal.ide.addons.SaveAllDirtyPartsAddon"/>
+  <categories xmi:id="_YCQAQNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.category.views" name="Views" description="Commands for opening views"/>
+  <categories xmi:id="_YCQAQdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.category.perspectives" name="Perspectives" description="Commands for opening perspectives"/>
+  <categories xmi:id="_YCQAQtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.category.project" name="Project"/>
+  <categories xmi:id="_YCQAQ9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.category.navigate" name="Navigate"/>
+  <categories xmi:id="_YCQARNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.category.edit" name="Edit"/>
+  <categories xmi:id="_YCQARdbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.category.file" name="File"/>
+  <categories xmi:id="_YCQARtbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.ide.markerContents" name="Contents" description="The category for menu contents"/>
+  <categories xmi:id="_YCQAR9bLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.category.textEditor" name="Text Editing" description="Text Editing Commands"/>
+  <categories xmi:id="_YCQASNbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.category.window" name="Window"/>
+  <categories xmi:id="_YCQASdbLEeyKzNlIcTh7bg" elementId="org.eclipse.core.commands.categories.autogenerated" name="Uncategorized" description="Commands that were either auto-generated or have no category"/>
+  <categories xmi:id="_YCQAStbLEeyKzNlIcTh7bg" elementId="org.eclipse.ui.category.help" name="Help"/>
+</application:Application>
