@@ -88,13 +88,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.rcptt.core"
-         download-size="0"
-         install-size="0"
-         version="2.5.1.M3"
-         unpack="false"/>
-         
-   <plugin
          id="org.eclipse.ui.themes"
          download-size="0"
          install-size="0"
