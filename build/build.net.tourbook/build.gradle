@@ -41,7 +41,6 @@ mt_0_Build.dependsOn(
    'mt_20_BuildProduct',
    'mt_30_CopyProduct',
    'mt_40_ExtractWinFiles',
-   'mt_41_RunUIUnittests',
    'mt_50_CreateExeFiles',
    'mt_60_CleanupFiles',
    'mt_70_CopyReleaseNotes',
@@ -151,28 +150,6 @@ task mt_40_ExtractWinFiles {
             from zipTree(winZipFile)
             into outputDir
          }
-      }
-   }
-}
-
-/*
-* Run the functional tests
-* Initialli, I had => goals       'clean', 'package'
-*/
-task mt_41_RunUIUnittests {
-
-   doLast {
-
-      def buildDir = file('../../build/build.net.tourbook.functionaltests')
-
- println '\tFrom ' + buildDir   
-
-      mavenexec {
-
-         workingDir  buildDir
-         goals       'package'
-         threads '2C'
-         quiet true
       }
    }
 }
