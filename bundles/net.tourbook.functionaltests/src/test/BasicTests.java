@@ -29,18 +29,23 @@ public class BasicTests {
    public void beforeClass() {
 		bot = new SWTBot();
 		SWTBotPreferences.TIMEOUT = 20000;
+		// the best would be to copy a database that already has tours
+
+		final SWTBotButton myTourbookMenu = bot.button("OK").click();
+		assertNotNull(myTourbookMenu);
+		final SWTBotButton measurementSystemMenu = bot.button("OK").click();
+		assertNotNull(measurementSystemMenu);
+		final SWTBotButton peopleMenu = bot.button("Apply and Close").click();
+		assertNotNull(peopleMenu);
+		final SWTBotButton firstStartMenu = bot.button("OK").click();
+		assertNotNull(firstStartMenu);
+
    }
 
-   @Test
-   void testOpenMyTourbook() {
+	@Test
+	void testOpenPreferences() {
 
-      final SWTBotButton myTourbookMenu = bot.button("OK").click();
-      assertNotNull(myTourbookMenu);
-      final SWTBotButton measurementSystemMenu = bot.button("OK").click();
-      assertNotNull(measurementSystemMenu);
-      final SWTBotButton peopleMenu = bot.button("Apply and Close").click();
-      assertNotNull(peopleMenu);
-      final SWTBotButton firstStartMenu = bot.button("OK").click();
-      assertNotNull(firstStartMenu);
-   }
+		bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click();
+		bot.button("Apply and Close").click();
+	}
 }

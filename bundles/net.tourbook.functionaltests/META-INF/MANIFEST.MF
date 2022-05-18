@@ -4,13 +4,9 @@ Bundle-Name: GUI tests suite for MyTourbook
 Bundle-SymbolicName: net.tourbook.functionaltests;singleton:=true
 Bundle-Version: 22.3.1.qualifier
 Require-Bundle: org.junit.jupiter.api;resolution:=optional,
- net.tourbook,
- net.tourbook.ext.jars,
- net.tourbook.ext.ejb3,
  org.eclipse.swtbot.go
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: .,
- hibernate-entitymanager.jar
+Bundle-ClassPath: .
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: net.tourbook.functionaltests
