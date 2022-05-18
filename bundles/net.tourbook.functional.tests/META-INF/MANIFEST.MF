@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: GUI tests suite for MyTourbook
-Bundle-SymbolicName: net.tourbook.functionaltests;singleton:=true
+Bundle-SymbolicName: net.tourbook.functional.tests;singleton:=true
 Bundle-Version: 22.3.1.qualifier
 Require-Bundle: org.junit.jupiter.api;resolution:=optional,
  org.eclipse.swtbot.go
@@ -9,4 +9,4 @@ Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Automatic-Module-Name: net.tourbook.functionaltests
+Automatic-Module-Name: net.tourbook.functional.tests
