@@ -126,7 +126,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    @Override
    public void downloadTours() {
 
-      _useActivePerson = SuuntoTokensRetrievalHandler.isReady_ActivePerson();
+      _useActivePerson = SuuntoTokensRetrievalHandler.isDownloadReady_ActivePerson();
 
       _useAllPeople = false;
       if (!_useActivePerson) {

@@ -174,7 +174,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
    @Override
    protected boolean isReady() {
 
-      _useActivePerson = SuuntoTokensRetrievalHandler.isReady_ActivePerson();
+      _useActivePerson = SuuntoTokensRetrievalHandler.isUploadReady_ActivePerson();
 
       _useAllPeople = false;
       if (!_useActivePerson) {
