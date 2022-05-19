@@ -115,22 +115,25 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * <b>Before releasing, set this to <code>true</code></b>
     * <p>
     */
-   private static final boolean IS_USING_VTM_PRODUCTION_PLUGIN      = true;
+   private static final boolean IS_USING_VTM_PRODUCTION_PLUGIN       = true;
    //
-   private static final String  STATE_LAYER_BUILDING_IS_SHOW_SHADOW = "STATE_LAYER_BUILDING_IS_SHOW_SHADOW"; //$NON-NLS-1$
-   private static final String  STATE_LAYER_BUILDING_IS_VISIBLE     = "STATE_LAYER_BUILDING_IS_VISIBLE";     //$NON-NLS-1$
-   private static final String  STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL = "STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL"; //$NON-NLS-1$
-   private static final String  STATE_MAP_POS_X                     = "STATE_MAP_POS_X";                     //$NON-NLS-1$
-   private static final String  STATE_MAP_POS_Y                     = "STATE_MAP_POS_Y";                     //$NON-NLS-1$
-   private static final String  STATE_MAP_POS_ZOOM_LEVEL            = "STATE_MAP_POS_ZOOM_LEVEL";            //$NON-NLS-1$
-   private static final String  STATE_MAP_POS_BEARING               = "STATE_MAP_POS_BEARING";               //$NON-NLS-1$
-   private static final String  STATE_MAP_POS_SCALE                 = "STATE_MAP_POS_SCALE";                 //$NON-NLS-1$
-   private static final String  STATE_MAP_POS_TILT                  = "STATE_MAP_POS_TILT";                  //$NON-NLS-1$
-   private static final String  STATE_SELECTED_MAP25_PROVIDER_ID    = "STATE_SELECTED_MAP25_PROVIDER_ID";    //$NON-NLS-1$
-   private static final String  STATE_SUFFIX_MAP_CURRENT_POSITION   = "MapCurrentPosition";                  //$NON-NLS-1$
-   static final String          STATE_SUFFIX_MAP_DEFAULT_POSITION   = "MapDefaultPosition";                  //$NON-NLS-1$
+   private static final String  STATE_LAYER_BUILDING_IS_SHOW_SHADOW  = "STATE_LAYER_BUILDING_IS_SHOW_SHADOW";  //$NON-NLS-1$
+   private static final String  STATE_LAYER_BUILDING_IS_VISIBLE      = "STATE_LAYER_BUILDING_IS_VISIBLE";      //$NON-NLS-1$
+   private static final String  STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL  = "STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL";  //$NON-NLS-1$
+   private static final String  STATE_LAYER_LABEL_IS_VISIBLE         = "STATE_LAYER_LABEL_IS_VISIBLE";         //$NON-NLS-1$
+   private static final String  STATE_LAYER_LABEL_IS_BEFORE_BUILDING = "STATE_LAYER_LABEL_IS_BEFORE_BUILDING"; //$NON-NLS-1$
+
+   private static final String  STATE_MAP_POS_X                      = "STATE_MAP_POS_X";                      //$NON-NLS-1$
+   private static final String  STATE_MAP_POS_Y                      = "STATE_MAP_POS_Y";                      //$NON-NLS-1$
+   private static final String  STATE_MAP_POS_ZOOM_LEVEL             = "STATE_MAP_POS_ZOOM_LEVEL";             //$NON-NLS-1$
+   private static final String  STATE_MAP_POS_BEARING                = "STATE_MAP_POS_BEARING";                //$NON-NLS-1$
+   private static final String  STATE_MAP_POS_SCALE                  = "STATE_MAP_POS_SCALE";                  //$NON-NLS-1$
+   private static final String  STATE_MAP_POS_TILT                   = "STATE_MAP_POS_TILT";                   //$NON-NLS-1$
+   private static final String  STATE_SELECTED_MAP25_PROVIDER_ID     = "STATE_SELECTED_MAP25_PROVIDER_ID";     //$NON-NLS-1$
+   private static final String  STATE_SUFFIX_MAP_CURRENT_POSITION    = "MapCurrentPosition";                   //$NON-NLS-1$
+   static final String          STATE_SUFFIX_MAP_DEFAULT_POSITION    = "MapDefaultPosition";                   //$NON-NLS-1$
    //
-   public static final String   THEME_STYLE_ALL                     = "theme-style-all";                     //$NON-NLS-1$
+   public static final String   THEME_STYLE_ALL                      = "theme-style-all";                      //$NON-NLS-1$
 
    //
    private static IDialogSettings  _state;
@@ -160,6 +163,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private int                     _layer_Building_IsShowShadow;
    private boolean                 _layer_Building_IsVisible;
    private int                     _layer_Building_MinZoomLevel;
+   //
+   private boolean                 _layer_Label_IsVisible;
+   private boolean                 _layer_Label_IsBeforeBuilding;
    //
    private OsmTileLayerMT          _layer_BaseMap;
    private S3DBLayer               _layer_Building_S3DB;
@@ -520,7 +526,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          // enable/disable layers
          _map25View.restoreState();
 
-         setupMapLayers();
+         restoreMapLayers();
       });
    }
 
@@ -562,7 +568,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_SliderPath.setEnabled(false);
 
       /*
-       * Buildings, create a default layer to keep it's position, it will be replaced later on
+       * Buildings, create a default layer to keep it's position, it can be replaced later on
        */
       final boolean isShowShadow = _layer_Building_IsShowShadow == 1;
       final int minZoom = _layer_Building_MinZoomLevel;
@@ -648,8 +654,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       allMapLayer.add(_layer_HillShading_TILE_LOADING);
       allMapLayer.add(_layer_Tour);
       allMapLayer.add(_layer_SliderPath);
-      allMapLayer.add(_layer_Label);
       allMapLayer.add(_layer_Building_S3DB);
+      allMapLayer.add(_layer_Label);
       allMapLayer.add(_layer_MapBookmark_VARYING);
       allMapLayer.add(_layer_TourMarker);
       allMapLayer.add(_layer_Photo_VARYING);
@@ -811,6 +817,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    public LabelLayerMT getLayer_Label() {
       return _layer_Label;
+   }
+
+   public boolean getLayer_Label_IsBeforeBuilding() {
+      return _layer_Label_IsBeforeBuilding;
    }
 
    public ItemizedLayer getLayer_MapBookmark() {
@@ -1091,13 +1101,34 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       super.resize(w, h);
    }
 
+   /**
+    * Remove tile layers which are not visible, otherwise they would still download tile images even
+    * when they are disabled !!!
+    */
+   private void restoreMapLayers() {
+
+      updateLayer_Building();
+      updateLayer_Label();
+
+      updateLayer_ReorderLayers();
+
+      /*
+       * This order must be the same as when these layers were added initially
+       */
+      setupMapLayers_SetTileLoadingLayer(_layer_Satellite_TILE_LOADING, _layer_Satellite_AFTER);
+      setupMapLayers_SetTileLoadingLayer(_layer_HillShading_TILE_LOADING, _layer_HillShading_AFTER);
+   }
+
    private void restoreState() {
 
 // SET_FORMATTING_OFF
 
-      _layer_Building_IsVisible     = Util.getStateBoolean(_state, STATE_LAYER_BUILDING_IS_VISIBLE, true);
-      _layer_Building_IsShowShadow  = Util.getStateBoolean(_state, STATE_LAYER_BUILDING_IS_SHOW_SHADOW, true) ? 1 : 0;
-      _layer_Building_MinZoomLevel  = Util.getStateInt(    _state, STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL, 17);
+      _layer_Building_IsVisible     = Util.getStateBoolean(_state, STATE_LAYER_BUILDING_IS_VISIBLE,      true);
+      _layer_Building_IsShowShadow  = Util.getStateBoolean(_state, STATE_LAYER_BUILDING_IS_SHOW_SHADOW,  true) ? 1 : 0;
+      _layer_Building_MinZoomLevel  = Util.getStateInt(    _state, STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL,  17);
+
+      _layer_Label_IsVisible        = Util.getStateBoolean(_state, STATE_LAYER_LABEL_IS_VISIBLE,         true) ;
+      _layer_Label_IsBeforeBuilding = Util.getStateBoolean(_state, STATE_LAYER_LABEL_IS_BEFORE_BUILDING, true) ;
 
 // SET_FORMATTING_ON
    }
@@ -1121,11 +1152,18 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    private void saveState() {
 
-      _state.put(STATE_LAYER_BUILDING_IS_VISIBLE, _layer_Building_IsVisible);
-      _state.put(STATE_LAYER_BUILDING_IS_SHOW_SHADOW, _layer_Building_IsShowShadow == 1);
-      _state.put(STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL, _layer_Building_MinZoomLevel);
+// SET_FORMATTING_OFF
 
-      _state.put(STATE_SELECTED_MAP25_PROVIDER_ID, _selectedMapProvider.getId());
+      _state.put(STATE_LAYER_BUILDING_IS_VISIBLE,        _layer_Building_IsVisible);
+      _state.put(STATE_LAYER_BUILDING_IS_SHOW_SHADOW,    _layer_Building_IsShowShadow == 1);
+      _state.put(STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL,    _layer_Building_MinZoomLevel);
+
+      _state.put(STATE_LAYER_LABEL_IS_VISIBLE,           _layer_Label_IsVisible);
+      _state.put(STATE_LAYER_LABEL_IS_BEFORE_BUILDING,   _layer_Label_IsBeforeBuilding);
+
+      _state.put(STATE_SELECTED_MAP25_PROVIDER_ID,       _selectedMapProvider.getId());
+
+// SET_FORMATTING_ON
 
       saveState_MapPosition(STATE_SUFFIX_MAP_CURRENT_POSITION);
    }
@@ -1155,9 +1193,15 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_Building_MinZoomLevel = minZoomLevel;
    }
 
-   public void setLayer_HillShading_Opacity(final int layer_HillShading_Opacity) {
+   public void setLayer_HillShading_Options(final int layer_HillShading_Opacity) {
 
       _layer_HillShading_Opacity = layer_HillShading_Opacity;
+   }
+
+   public void setLayer_Label_Options(final boolean isVisible, final boolean isBeforeBuilding) {
+
+      _layer_Label_IsVisible = isVisible;
+      _layer_Label_IsBeforeBuilding = isBeforeBuilding;
    }
 
    /**
@@ -1377,21 +1421,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _photoSize = layer_Photo_Size;
    }
 
-   /**
-    * Remove tile layers which are not visible, otherwise they would still download tile images even
-    * when they are disabled !!!
-    */
-   private void setupMapLayers() {
-
-      updateLayer_Building();
-
-      /*
-       * This order must be the same as when these layers were added initially
-       */
-      setupMapLayers_SetTileLoadingLayer(_layer_Satellite_TILE_LOADING, _layer_Satellite_AFTER);
-      setupMapLayers_SetTileLoadingLayer(_layer_HillShading_TILE_LOADING, _layer_HillShading_AFTER);
-   }
-
    private void setupMapLayers_SetTileLoadingLayer(final BitmapTileLayer tileLoadingLayer, final Layer tileLoading_AFTER) {
 
       final Layers allMapLayer = mMap.layers();
@@ -1431,12 +1460,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    public void updateLayer() {
 
-      setupMapLayers();
+      restoreMapLayers();
 
       mMap.updateMap();
    }
 
-   void updateLayer_Building() {
+   private void updateLayer_Building() {
 
       // check if building parameters have changed
       if (_layer_Building_MinZoomLevel == _currentBuildingLayer_MinZoomLevel
@@ -1485,6 +1514,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          // this is necessarry that the new zoom level is applied, otherwise it do not work
          setMapProvider(_selectedMapProvider);
       }
+   }
+
+   private void updateLayer_Label() {
+
+      _layer_Label.setEnabled(_layer_Label_IsVisible);
    }
 
    /**
@@ -1576,6 +1610,42 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       //_phototoolkit._isMarkerClusteredLast = config.isPhotoClustered;
       // using settings from MapBookmarks must be changed later with own config
       _photoToolkit._isMarkerClusteredLast = config.isMarkerClustered;
+   }
+
+   private void updateLayer_ReorderLayers() {
+
+      final Layers allMapLayer = mMap.layers();
+
+      final int layerLabel_CurrentIndex = allMapLayer.indexOf(_layer_Label);
+      int layerBuilding_CurrentIndex = allMapLayer.indexOf(_layer_Building_S3DB);
+
+      final boolean isLabelBeforeBuilding = layerLabel_CurrentIndex > layerBuilding_CurrentIndex;
+
+      if (_layer_Building_IsVisible && _layer_Label_IsVisible) {
+
+         // both layers must be visible
+
+         if (_layer_Label_IsBeforeBuilding && isLabelBeforeBuilding == false) {
+
+            // label < building -> label > building
+
+            allMapLayer.remove(_layer_Label);
+
+            layerBuilding_CurrentIndex = allMapLayer.indexOf(_layer_Building_S3DB);
+
+            allMapLayer.add(layerBuilding_CurrentIndex + 1, _layer_Label);
+
+         } else if (_layer_Label_IsBeforeBuilding == false && isLabelBeforeBuilding) {
+
+            // label > building -> label < building
+
+            allMapLayer.remove(_layer_Label);
+
+            layerBuilding_CurrentIndex = allMapLayer.indexOf(_layer_Building_S3DB);
+
+            allMapLayer.add(layerBuilding_CurrentIndex, _layer_Label);
+         }
+      }
    }
 
    private void updateLayer_TourMarkers() {

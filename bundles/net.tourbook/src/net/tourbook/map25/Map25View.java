@@ -142,7 +142,6 @@ public class Map25View extends ViewPart implements
    private static final String           STATE_IS_LAYER_BASE_MAP_VISIBLE         = "STATE_IS_LAYER_BASE_MAP_VISIBLE";            //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_BOOKMARK_VISIBLE         = "STATE_IS_LAYER_BOOKMARK_VISIBLE";            //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_HILLSHADING_VISIBLE      = "STATE_IS_LAYER_HILLSHADING_VISIBLE";         //$NON-NLS-1$
-   private static final String           STATE_IS_LAYER_LABEL_VISIBLE            = "STATE_IS_LAYER_LABEL_VISIBLE";               //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_MARKER_VISIBLE           = "STATE_IS_LAYER_MARKER_VISIBLE";              //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_SATELLITE_VISIBLE        = "STATE_IS_LAYER_SATELLITE_VISIBLE";           //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_SCALE_BAR_VISIBLE        = "STATE_IS_LAYER_SCALE_BAR_VISIBLE";           //$NON-NLS-1$
@@ -1560,7 +1559,7 @@ public class Map25View extends ViewPart implements
       final BitmapTileLayer layer_HillShading   = _mapApp.getLayer_HillShading();
       layer_HillShading.setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_HILLSHADING_VISIBLE, true));
       layer_HillShading.setBitmapAlpha(layerHillshadingOpacity / 255.0f, true);
-      _mapApp.setLayer_HillShading_Opacity(layerHillshadingOpacity);
+      _mapApp.setLayer_HillShading_Options(layerHillshadingOpacity);
 
       // satellite maps
       _mapApp.getLayer_Satellite()        .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SATELLITE_VISIBLE, false));
@@ -1569,7 +1568,6 @@ public class Map25View extends ViewPart implements
       _mapApp.getLayer_BaseMap()          .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BASE_MAP_VISIBLE,  true));
 
       _mapApp.getLayer_MapBookmark()      .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BOOKMARK_VISIBLE,  true));
-      _mapApp.getLayer_Label()            .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_LABEL_VISIBLE,     true));
       _mapApp.getLayer_ScaleBar()         .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SCALE_BAR_VISIBLE, true));
       _mapApp.getLayer_TileInfo()         .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_TILE_INFO_VISIBLE, false));
 
@@ -1581,7 +1579,7 @@ public class Map25View extends ViewPart implements
 
 // SET_FORMATTING_ON
 
-//      _mapApp.updateLayer_Building();
+      // other layers are enabled/disabled in net.tourbook.map25.Map25App.restoreMapLayers()
 
       enableActions();
 
@@ -1652,9 +1650,7 @@ public class Map25View extends ViewPart implements
       // other layers
       _state.put(STATE_IS_LAYER_BASE_MAP_VISIBLE,     _mapApp.getLayer_BaseMap().isEnabled());
       _state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE,     _mapApp.getLayer_MapBookmark().isEnabled());
-//    _state.put(STATE_IS_LAYER_BUILDING_VISIBLE,     _mapApp.getLayer_Building_VARYING().isEnabled());
       _state.put(STATE_IS_LAYER_MARKER_VISIBLE,       _mapApp.getLayer_TourMarker().isEnabled());
-      _state.put(STATE_IS_LAYER_LABEL_VISIBLE,        _mapApp.getLayer_Label().isEnabled());
       _state.put(STATE_IS_LAYER_SATELLITE_VISIBLE,    _mapApp.getLayer_Satellite().isEnabled());
       _state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE,    _mapApp.getLayer_ScaleBar().isEnabled());
       _state.put(STATE_IS_LAYER_TILE_INFO_VISIBLE,    _mapApp.getLayer_TileInfo().isEnabled());
@@ -1669,12 +1665,6 @@ public class Map25View extends ViewPart implements
       // hillshading layer
       _state.put(STATE_IS_LAYER_HILLSHADING_VISIBLE,  _mapApp.getLayer_HillShading().isEnabled());
       _state.put(STATE_LAYER_HILLSHADING_OPACITY,     _mapApp.getLayer_HillShading_Opacity());
-
-
-
-
-
-
 
       // photo filter
       _state.put(STATE_IS_PHOTO_FILTER_ACTIVE,        _actionMapPhotoFilter.getSelection());

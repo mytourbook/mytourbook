@@ -51,7 +51,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
    private SelectionListener _defaultSelectionListener;
    private SelectionListener _layerSelectionListener;
 
-   private Map25View         _map25View;
+   private Map25App          _mapApp;
 
    /*
     * UI controls
@@ -64,6 +64,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
    private Button    _chkShowLayer_Hillshading;
    private Button    _chkShowLayer_Satellite;
    private Button    _chkShowLayer_Label;
+   private Button    _chkShowLayer_Label_IsBeforeBuilding;
    private Button    _chkShowLayer_Scale;
    private Button    _chkShowLayer_TileInfo;
    private Button    _chkUseDraggedKeyboardNavigation;
@@ -84,7 +85,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
       super(ownerControl, toolBar);
 
-      _map25View = map25View;
+      _mapApp = map25View.getMapApp();
    }
 
    private void createActions() {
@@ -143,6 +144,8 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
    private void createUI_50_Layer(final Composite parent) {
 
+      final GridDataFactory indentGridData = GridDataFactory.fillDefaults().grab(true, false).indent(8, 0);
+
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Slideout_Map25MapOptions_Group_MapLayer);
       GridDataFactory.fillDefaults()
@@ -160,6 +163,15 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
          }
          {
             /*
+             * Text label: Behind building
+             */
+            _chkShowLayer_Label_IsBeforeBuilding = new Button(group, SWT.CHECK);
+            _chkShowLayer_Label_IsBeforeBuilding.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_LabelSymbol_IsBehindBuilding);
+            _chkShowLayer_Label_IsBeforeBuilding.addSelectionListener(_layerSelectionListener);
+            indentGridData.applyTo(_chkShowLayer_Label_IsBeforeBuilding);
+         }
+         {
+            /*
              * Building
              */
             _chkShowLayer_Building = new Button(group, SWT.CHECK);
@@ -173,10 +185,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
             _chkShowLayer_Building_Shadow = new Button(group, SWT.CHECK);
             _chkShowLayer_Building_Shadow.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Building_IsShowShadow);
             _chkShowLayer_Building_Shadow.addSelectionListener(_layerSelectionListener);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .indent(8, 0)
-                  .applyTo(_chkShowLayer_Building_Shadow);
+            indentGridData.applyTo(_chkShowLayer_Building_Shadow);
          }
          {
             /*
@@ -311,8 +320,10 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
       final boolean isHillShading = _chkShowLayer_Hillshading.getSelection();
       final boolean isBuildingVisible = _chkShowLayer_Building.getSelection();
+      final boolean isLabelVisible = _chkShowLayer_Label.getSelection();
 
       _chkShowLayer_Building_Shadow.setEnabled(isBuildingVisible);
+      _chkShowLayer_Label_IsBeforeBuilding.setEnabled(isLabelVisible && isBuildingVisible);
 
       _lblBuildingMinZoomLevel.setEnabled(isBuildingVisible);
 
@@ -341,19 +352,17 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
    private void onModify_HillShadingOpacity() {
 
-      final Map25App mapApp = _map25View.getMapApp();
-
       // updade model
       final int hillShadingOpacity = UI.transformOpacity_WhenSaved(_spinnerHillShadingOpacity.getSelection());
-      mapApp.setLayer_HillShading_Opacity(hillShadingOpacity);
+      _mapApp.setLayer_HillShading_Options(hillShadingOpacity);
 
       // update UI
       final float hillshadingAlpha = hillShadingOpacity / 255f;
-      mapApp.getLayer_HillShading().setBitmapAlpha(hillshadingAlpha, true);
+      _mapApp.getLayer_HillShading().setBitmapAlpha(hillshadingAlpha, true);
 
       enableActions();
 
-      mapApp.updateMap();
+      _mapApp.updateMap();
    }
 
    private void onModify_Layer() {
@@ -362,26 +371,25 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
       enableActions();
 
-      _map25View.getMapApp().updateLayer();
+      _mapApp.updateLayer();
    }
 
    private void restoreState() {
 
-      final Map25App mapApp = _map25View.getMapApp();
-
 // SET_FORMATTING_OFF
 
-      _chkShowLayer_Building           .setSelection(mapApp.getLayer_Building_VARYING()   .isEnabled());
-      _chkShowLayer_Building_Shadow    .setSelection(mapApp.getLayer_Building_IsShadow());
-      _chkShowLayer_Cartography        .setSelection(mapApp.getLayer_BaseMap()            .isEnabled());
-      _chkShowLayer_Hillshading        .setSelection(mapApp.getLayer_HillShading()        .isEnabled());
-      _chkShowLayer_Label              .setSelection(mapApp.getLayer_Label()              .isEnabled());
-      _chkShowLayer_Scale              .setSelection(mapApp.getLayer_ScaleBar()           .isEnabled());
-      _chkShowLayer_Satellite          .setSelection(mapApp.getLayer_Satellite()          .isEnabled());
-      _chkShowLayer_TileInfo           .setSelection(mapApp.getLayer_TileInfo()           .isEnabled());
+      _chkShowLayer_Building              .setSelection(_mapApp.getLayer_Building_VARYING()         .isEnabled());
+      _chkShowLayer_Building_Shadow       .setSelection(_mapApp.getLayer_Building_IsShadow());
+      _chkShowLayer_Cartography           .setSelection(_mapApp.getLayer_BaseMap()                  .isEnabled());
+      _chkShowLayer_Hillshading           .setSelection(_mapApp.getLayer_HillShading()              .isEnabled());
+      _chkShowLayer_Label                 .setSelection(_mapApp.getLayer_Label()                    .isEnabled());
+      _chkShowLayer_Label_IsBeforeBuilding.setSelection(_mapApp.getLayer_Label_IsBeforeBuilding());
+      _chkShowLayer_Scale                 .setSelection(_mapApp.getLayer_ScaleBar()                 .isEnabled());
+      _chkShowLayer_Satellite             .setSelection(_mapApp.getLayer_Satellite()                .isEnabled());
+      _chkShowLayer_TileInfo              .setSelection(_mapApp.getLayer_TileInfo()                 .isEnabled());
 
-      _spinnerBuildingMinZoomLevel     .setSelection(mapApp.getLayer_Building_MinZoomLevel() + ZOOM_UI_OFFSET);
-      _spinnerHillShadingOpacity       .setSelection(UI.transformOpacity_WhenRestored(mapApp.getLayer_HillShading_Opacity()));
+      _spinnerBuildingMinZoomLevel        .setSelection(_mapApp.getLayer_Building_MinZoomLevel() + ZOOM_UI_OFFSET);
+      _spinnerHillShadingOpacity          .setSelection(UI.transformOpacity_WhenRestored(_mapApp.getLayer_HillShading_Opacity()));
 
 // SET_FORMATTING_ON
 
@@ -395,19 +403,21 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
    private void saveState_Layer() {
 
-      final Map25App mapApp = _map25View.getMapApp();
-
-      mapApp.getLayer_BaseMap().setEnabled(_chkShowLayer_Cartography.getSelection());
-      mapApp.getLayer_HillShading().setEnabled(_chkShowLayer_Hillshading.getSelection());
+      _mapApp.getLayer_BaseMap().setEnabled(_chkShowLayer_Cartography.getSelection());
+      _mapApp.getLayer_HillShading().setEnabled(_chkShowLayer_Hillshading.getSelection());
 
       // satellite maps
-      mapApp.getLayer_Satellite().setEnabled(_chkShowLayer_Satellite.getSelection());
+      _mapApp.getLayer_Satellite().setEnabled(_chkShowLayer_Satellite.getSelection());
 
-      mapApp.getLayer_Label().setEnabled(_chkShowLayer_Label.getSelection());
-      mapApp.getLayer_ScaleBar().setEnabled(_chkShowLayer_Scale.getSelection());
-      mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
+      _mapApp.getLayer_Label().setEnabled(_chkShowLayer_Label.getSelection());
+      _mapApp.getLayer_ScaleBar().setEnabled(_chkShowLayer_Scale.getSelection());
+      _mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
 
-      mapApp.setLayer_Building_Options(
+      _mapApp.setLayer_Label_Options(
+            _chkShowLayer_Label.getSelection(),
+            _chkShowLayer_Label_IsBeforeBuilding.getSelection());
+
+      _mapApp.setLayer_Building_Options(
             _chkShowLayer_Building.getSelection(),
             _chkShowLayer_Building_Shadow.getSelection(),
             _spinnerBuildingMinZoomLevel.getSelection() - ZOOM_UI_OFFSET);
