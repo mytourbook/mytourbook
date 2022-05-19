@@ -130,7 +130,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
       _useAllPeople = false;
       if (!_useActivePerson) {
-         _useAllPeople = SuuntoTokensRetrievalHandler.isReady_AllPeople();
+         _useAllPeople = SuuntoTokensRetrievalHandler.isDownloadReady_AllPeople();
       }
 
       if (!_useActivePerson && !_useAllPeople) {

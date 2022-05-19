@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -178,7 +178,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
       _useAllPeople = false;
       if (!_useActivePerson) {
-         _useAllPeople = SuuntoTokensRetrievalHandler.isReady_AllPeople();
+         _useAllPeople = SuuntoTokensRetrievalHandler.isUploadReady_AllPeople();
       }
 
       return StringUtils.hasContent(getAccessToken() + getRefreshToken());
