@@ -192,11 +192,25 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             // -------- BATTERY -----------
             + "Battery_Percentage_Start, " //                     89    //$NON-NLS-1$
-            + "Battery_Percentage_End " //                        90    //$NON-NLS-1$
+            + "Battery_Percentage_End," //                        90    //$NON-NLS-1$
+
+            // -------- TEMPERATURES -----------
+            + "weather_Temperature_Average," //                   91    //$NON-NLS-1$
+            + "weather_Temperature_Max," //                       92    //$NON-NLS-1$
+            + "weather_Temperature_Min " //                       93    //$NON-NLS-1$
+
+      //////////////////////////////////////////////////////////////////////////////////////////
+      //
+      // VERY IMPORTANT
+      //
+      // Adjust constant SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER when sql fields are added,
+      // otherwise tags and number of markers are not displayed !!!
+      //
+      //////////////////////////////////////////////////////////////////////////////////////////
 
       ;
 
-      SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 91;
+      SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER = 94;
 
       /////////////////////////////////////////////////////////////////////////
       // -------- JOINT TABLES, they are added at the end --------------
@@ -268,8 +282,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "AVG( CASE WHEN AvgCadence = 0       THEN NULL ELSE DOUBLE(AvgCadence) * CadenceMultiplier END)," + NL //       10    //$NON-NLS-1$
             + "AVG( CASE WHEN weather_Temperature_Average_Device = 0   THEN NULL ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END)," //$NON-NLS-1$
             + NL //    11
-            + "AVG( CASE WHEN Weather_Wind_Direction = 0 THEN NULL ELSE Weather_Wind_Direction END), " + NL //                              12    //$NON-NLS-1$
-            + "AVG( CASE WHEN Weather_Wind_Speed = 0 THEN NULL ELSE Weather_Wind_Speed END), " + NL //                              13    //$NON-NLS-1$
+            + "AVG( CASE WHEN Weather_Wind_Direction = 0 THEN NULL ELSE Weather_Wind_Direction END), " + NL //                12    //$NON-NLS-1$
+            + "AVG( CASE WHEN Weather_Wind_Speed = 0 THEN NULL ELSE Weather_Wind_Speed END), " + NL //                        13    //$NON-NLS-1$
             + "AVG( CASE WHEN RestPulse = 0        THEN NULL ELSE RestPulse END), " + NL //                                   14    //$NON-NLS-1$
             //
             + "SUM( CAST(Calories AS BIGINT))," + NL //                 15 //$NON-NLS-1$
@@ -287,11 +301,13 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "SUM( CAST(cadenceZone_FastTime AS BIGINT))," + NL //     23 //$NON-NLS-1$
             + "AVG( CASE WHEN cadenceZones_DelimiterValue = 0 THEN NULL ELSE cadenceZones_DelimiterValue END)," + NL //       24 //$NON-NLS-1$
 
-            + "MIN( CASE WHEN weather_Temperature_Min_Device = 0 THEN NULL ELSE weather_Temperature_Min_Device END)," + NL //               25 //$NON-NLS-1$
-            + "MAX( CASE WHEN weather_Temperature_Max_Device = 0 THEN NULL ELSE weather_Temperature_Max_Device END)," + NL //               26 //$NON-NLS-1$
+            + "MIN( CASE WHEN weather_Temperature_Min_Device = 0 THEN NULL ELSE weather_Temperature_Min_Device END)," + NL // 25 //$NON-NLS-1$
+            + "MAX( CASE WHEN weather_Temperature_Max_Device = 0 THEN NULL ELSE weather_Temperature_Max_Device END)," + NL // 26 //$NON-NLS-1$
 
             + "SUM( CAST(tourDeviceTime_Recorded AS BIGINT))," + NL //  27 //$NON-NLS-1$
-            + "SUM( CAST(tourDeviceTime_Paused AS BIGINT))" + NL //     28 //$NON-NLS-1$
+            + "SUM( CAST(tourDeviceTime_Paused AS BIGINT))," + NL //    28 //$NON-NLS-1$
+
+            + "AVG( CASE WHEN weather_Temperature_Average = 0   THEN NULL ELSE DOUBLE(weather_Temperature_Average) / TemperatureScale END)" // 29 //$NON-NLS-1$
       ;
 
    }
@@ -351,6 +367,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    float        colAvgPulse;
    float        colAvgCadence;
    //
+   float        colTemperature_Average;
+   float        colTemperature_Min;
+   float        colTemperature_Max;
    float        colTemperature_Average_Device;
    float        colTemperature_Min_Device;
    float        colTemperature_Max_Device;
@@ -486,7 +505,7 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourItem.colMaxPulse                = result.getLong(16);
       tourItem.colAvgPulse                = result.getFloat(17);
       final float dbAvgCadence            = result.getFloat(18);
-      final float dbAvgTemperature        = result.getFloat(19);
+      final float dbAvgTemperature_Device = result.getFloat(19);
 
       final long dbTourStartTime          = result.getLong(20);
       final String dbTimeZoneId           = result.getString(21);
@@ -612,6 +631,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourItem.colBatterySoC_Start                    = result.getShort(89);
       tourItem.colBatterySoC_End                      = result.getShort(90);
 
+      // -------- TEMPERATURES -----------
+
+      final float dbAvgTemperature = result.getFloat(91);
+      tourItem.colTemperature_Max = result.getFloat(92);
+      tourItem.colTemperature_Min = result.getFloat(93);
+
 // SET_FORMATTING_ON
 
       // -----------------------------------------------
@@ -624,7 +649,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       tourItem.colSlowVsFastCadence = TourManager.generateCadenceZones_TimePercentages(cadenceZone_SlowTime, cadenceZone_FastTime);
 
-      tourItem.colTemperature_Average_Device = dbAvgTemperature / dbTemperatureScale;
+      tourItem.colTemperature_Average_Device = dbAvgTemperature_Device / dbTemperatureScale;
+
+      tourItem.colTemperature_Average = dbAvgTemperature / dbTemperatureScale;
 
       // -----------------------------------------------
 
@@ -703,10 +730,10 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       colAvgPulse                      = result.getFloat(startIndex + 9);
       colAvgCadence                    = result.getFloat(startIndex + 10);
-      colTemperature_Average_Device               = result.getFloat(startIndex + 11);
+      colTemperature_Average_Device    = result.getFloat(startIndex + 11);
 
-      colWindDirection                       = result.getInt(startIndex + 12);
-      colWindSpeed                       = result.getInt(startIndex + 13);
+      colWindDirection                 = result.getInt(startIndex + 12);
+      colWindSpeed                     = result.getInt(startIndex + 13);
       colRestPulse                     = result.getInt(startIndex + 14);
 
       colCalories                      = result.getLong(startIndex + 15);
@@ -729,6 +756,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
       colTourDeviceTime_Recorded       = result.getLong(startIndex + 27);
       colTourDeviceTime_Paused         = result.getLong(startIndex + 28);
+
+      colTemperature_Average           = result.getFloat(startIndex + 29);
 
 // SET_FORMATTING_ON
 

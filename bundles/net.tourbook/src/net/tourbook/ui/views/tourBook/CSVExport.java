@@ -43,7 +43,7 @@ public class CSVExport {
 
    private static char         SEPARATOR;
 
-   private static final String NL                                                     = net.tourbook.ui.UI.SYSTEM_NEW_LINE;
+   private static final String NL                                                     = UI.SYSTEM_NEW_LINE;
 
    private static final String CSV_EXPORT_DURATION_HHH_MM_SS                          = "hhh:mm:ss";                                        //$NON-NLS-1$
 

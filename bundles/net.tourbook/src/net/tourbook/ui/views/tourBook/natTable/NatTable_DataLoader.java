@@ -24,6 +24,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -90,7 +91,7 @@ public class NatTable_DataLoader {
    private final LinkedBlockingDeque<LazyTourLoaderItem>  _loaderWaitingQueue   = new LinkedBlockingDeque<>();
 
    private String[]                                       _allSortColumnIds;
-   private ArrayList<SortDirectionEnum>                   _allSortDirections;
+   private List<SortDirectionEnum>                        _allSortDirections;
 
    private ArrayList<String>                              _allSqlSortFields     = new ArrayList<>();
    private ArrayList<String>                              _allSqlSortDirections = new ArrayList<>();
@@ -99,7 +100,7 @@ public class NatTable_DataLoader {
     * Contains all columns (also hidden columns), sorted in the order how they are displayed in the
     * UI.
     */
-   public ArrayList<ColumnDefinition>                     allSortedColumns;
+   public List<ColumnDefinition>                          allSortedColumns;
 
    /**
     * Number of all tours for the current lazy loader
@@ -169,7 +170,7 @@ public class NatTable_DataLoader {
       allSortedColumns = _columnManager.getVisibleAndSortedColumns();
    }
 
-   private int[] createRowIndicesFromTourIds(final ArrayList<Long> allRequestedTourIds) {
+   private int[] createRowIndicesFromTourIds(final List<Long> allRequestedTourIds) {
 
       final int numRequestedTourIds = allRequestedTourIds.size();
       if (numRequestedTourIds == 0) {
@@ -684,7 +685,7 @@ public class NatTable_DataLoader {
     * @param allRequestedTourIds
     * @return Returns NatTable row indices from the requested tour id's.
     */
-   public CompletableFuture<int[]> getRowIndexFromTourId(final ArrayList<Long> allRequestedTourIds) {
+   public CompletableFuture<int[]> getRowIndexFromTourId(final List<Long> allRequestedTourIds) {
 
       if (_allLoadedTourIds == null) {
 
@@ -712,7 +713,7 @@ public class NatTable_DataLoader {
       return _allSortColumnIds;
    }
 
-   public ArrayList<SortDirectionEnum> getSortDirections() {
+   public List<SortDirectionEnum> getSortDirections() {
       return _allSortDirections;
    }
 
@@ -891,8 +892,14 @@ public class NatTable_DataLoader {
        * WEATHER
        */
       case TableColumnFactory.WEATHER_CLOUDS_ID:                     return "weather_Clouds";   // an icon is displayed     //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_AVG_ID:            return "(DOUBLE(weather_Temperature_Average) / temperatureScale)"; //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_AVG_COMBINED_ID:   return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.WEATHER_TEMPERATURE_AVG_DEVICE_ID:     return "(DOUBLE(weather_Temperature_Average_Device) / temperatureScale)"; //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_MIN_ID:            return "weather_Temperature_Min";                     //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_MIN_COMBINED_ID:   return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.WEATHER_TEMPERATURE_MIN_DEVICE_ID:     return "weather_Temperature_Min_Device";                     //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_MAX_ID:            return "weather_Temperature_Max";                     //$NON-NLS-1$
+      case TableColumnFactory.WEATHER_TEMPERATURE_MAX_COMBINED_ID:   return FIELD_WITHOUT_SORTING;
       case TableColumnFactory.WEATHER_TEMPERATURE_MAX_DEVICE_ID:     return "weather_Temperature_Max_Device";                     //$NON-NLS-1$
       case TableColumnFactory.WEATHER_WIND_DIRECTION_ID:             return "weather_Wind_Direction";                              //$NON-NLS-1$
       case TableColumnFactory.WEATHER_WIND_SPEED_ID:                 return "weather_Wind_Speed";                              //$NON-NLS-1$
@@ -1029,7 +1036,7 @@ public class NatTable_DataLoader {
     * @param allSortColumnIds
     * @param allSortDirections
     */
-   public void setupSortColumns(final String[] allSortColumnIds, final ArrayList<SortDirectionEnum> allSortDirections) {
+   public void setupSortColumns(final String[] allSortColumnIds, final List<SortDirectionEnum> allSortDirections) {
 
       // cleanup old fetched tours
       resetTourItems();

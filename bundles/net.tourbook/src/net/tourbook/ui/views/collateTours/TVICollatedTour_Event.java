@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -184,7 +185,7 @@ public class TVICollatedTour_Event extends TVICollatedTour {
                tourItem.colMaxPulse = result.getLong(17);
                tourItem.colAvgPulse = result.getFloat(18);
                tourItem.colAvgCadence = result.getFloat(19);
-               tourItem.colAvgTemperature = result.getFloat(20);
+               tourItem.colAvgTemperature_Device = result.getFloat(20);
 
                tourItem.colWeekNo = result.getInt(21);
                tourItem.colWeekYear = result.getInt(22);
@@ -219,7 +220,7 @@ public class TVICollatedTour_Event extends TVICollatedTour {
 
                // compute average speed/pace, prevent divide by 0
                tourItem.colAvgSpeed = dbMovingTime == 0 ? 0 : 3.6f * dbDistance / dbMovingTime;
-               tourItem.colAvgPace = dbDistance == 0 ? 0 : dbMovingTime * 1000 / dbDistance;
+               tourItem.colAvgPace = dbDistance == 0 ? 0 : dbMovingTime * 1000f / dbDistance;
 
                tourItem.colPausedTime = tourItem.colElapsedTime - tourItem.colRecordedTime;
                tourItem.colBreakTime = tourItem.colElapsedTime - tourItem.colMovingTime;
@@ -272,7 +273,7 @@ public class TVICollatedTour_Event extends TVICollatedTour {
    }
 
    @Override
-   public void setTagIds(final HashSet<Long> tagIds) {
+   public void setTagIds(final Set<Long> tagIds) {
       sqlTagIds = tagIds;
    }
 

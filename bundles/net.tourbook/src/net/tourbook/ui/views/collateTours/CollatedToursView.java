@@ -20,6 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
@@ -664,7 +665,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
       defineColumn_Altitude_MaxAltitude();
 
       defineColumn_Weather_Clouds();
-      defineColumn_Weather_AvgTemperature();
+      defineColumn_Weather_Temperature_Avg_Device();
       defineColumn_Weather_WindSpeed();
       defineColumn_Weather_WindDirection();
 
@@ -1531,7 +1532,7 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
          public void update(final ViewerCell cell) {
             final Object element = cell.getElement();
 
-            ArrayList<Long> tagIds = null;
+            List<Long> tagIds = null;
             if (element instanceof TVICollatedTour_Tour) {
 
                tagIds = ((TVICollatedTour_Tour) element).getTagIds();
@@ -1633,27 +1634,6 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
    }
 
    /**
-    * column: avg temperature
-    */
-   private void defineColumn_Weather_AvgTemperature() {
-
-      final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_TEMPERATURE_AVG_DEVICE.createColumn(_columnManager, _pc);
-
-      colDef.setLabelProvider(new CellLabelProvider() {
-         @Override
-         public void update(final ViewerCell cell) {
-
-            final Object element = cell.getElement();
-            final float value = UI.convertTemperatureFromMetric(((TVICollatedTour) element).colAvgTemperature);
-
-            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
-
-            setCellColor(cell, element);
-         }
-      });
-   }
-
-   /**
     * column: clouds
     */
    private void defineColumn_Weather_Clouds() {
@@ -1678,6 +1658,27 @@ public class CollatedToursView extends ViewPart implements ITourProvider, ITourV
                   cell.setText(windClouds);
                }
             }
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Weather - Average temperature (measured from the device)
+    */
+   private void defineColumn_Weather_Temperature_Avg_Device() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_TEMPERATURE_AVG_DEVICE.createColumn(_columnManager, _pc);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            final float value = UI.convertTemperatureFromMetric(((TVICollatedTour) element).colAvgTemperature_Device);
+
+            colDef.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
             setCellColor(cell, element);
          }

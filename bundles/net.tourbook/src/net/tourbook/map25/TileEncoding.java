@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017, 2019, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,6 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-
 package net.tourbook.map25;
 
 import org.oscim.theme.VtmThemes;
@@ -24,20 +23,20 @@ import org.oscim.tiling.source.ITileDecoder;
  */
 public enum TileEncoding {
 
-	/**
-	 * Mapzen tile encoding
-	 */
-	MVT,
+   /**
+    * Mapzen tile encoding
+    */
+   MVT,
 
-	/**
-	 * Open Science Map encoding
-	 */
-	VTM,
+   /**
+    * Open Science Map encoding
+    */
+   VTM,
 
-	/**
-	 * Mapsforge Map encoding
-	 */
-	MF,
+   /**
+    * Mapsforge Map encoding, this is used for offline maps
+    */
+   MF,
 
    /**
     * Mapilion MVT Tile encoding (pbf)

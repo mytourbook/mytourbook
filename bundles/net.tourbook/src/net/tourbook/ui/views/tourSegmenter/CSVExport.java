@@ -30,7 +30,7 @@ public class CSVExport {
 
    private static char         SEPARATOR = UI.TAB;
 
-   private static final String NL        = net.tourbook.ui.UI.SYSTEM_NEW_LINE;
+   private static final String NL        = UI.SYSTEM_NEW_LINE;
 
    private Table               _segmentViewerTable;
 
