@@ -158,18 +158,28 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
       return isTokenValid;
    }
 
+   public static boolean isDownloadReady_ActivePerson() {
+
+      return isReady_ActivePerson() &&
+            StringUtils.hasContent(getDownloadFolder_ActivePerson());
+   }
+
+   public static boolean isDownloadReady_AllPeople() {
+
+      return isReady_AllPeople() &&
+            StringUtils.hasContent(getDownloadFolder_AllPeople());
+   }
+
    public static boolean isReady_ActivePerson() {
 
       return StringUtils.hasContent(getAccessToken_ActivePerson()) &&
-            StringUtils.hasContent(getRefreshToken_ActivePerson()) &&
-            StringUtils.hasContent(getDownloadFolder_ActivePerson());
+            StringUtils.hasContent(getRefreshToken_ActivePerson());
    }
 
    public static boolean isReady_AllPeople() {
 
       return StringUtils.hasContent(getAccessToken_AllPeople()) &&
-            StringUtils.hasContent(getRefreshToken_AllPeople()) &&
-            StringUtils.hasContent(getDownloadFolder_AllPeople());
+            StringUtils.hasContent(getRefreshToken_AllPeople());
    }
 
    @Override
