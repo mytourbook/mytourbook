@@ -21,9 +21,9 @@ import org.oscim.map.Viewport;
  * is drawn as last and therefore the 'topmost' marker. It also gets checked for onTap first. This
  * class is generic, because you then you get your custom item-class passed back in onTap(). << TODO
  */
-public class MarkerLayer extends Layer implements GestureListener {
+public class MarkerLayerMT extends Layer implements GestureListener {
 
-   private final MarkerRenderer  _markerRenderer;
+   private final MarkerRendererMT  _markerRenderer;
 
    private final List<MapMarker> _allMarker = new ArrayList<>();
    private MapMarker             _focusedMarker;
@@ -41,7 +41,7 @@ public class MarkerLayer extends Layer implements GestureListener {
          @Override
          public boolean run(final int index) {
 
-            final MarkerLayer that = MarkerLayer.this;
+            final MarkerLayerMT that = MarkerLayerMT.this;
 
             if (_gestureListener == null) {
                return false;
@@ -56,7 +56,7 @@ public class MarkerLayer extends Layer implements GestureListener {
          @Override
          public boolean run(final int index) {
 
-            final MarkerLayer that = MarkerLayer.this;
+            final MarkerLayerMT that = MarkerLayerMT.this;
 
             if (that._gestureListener == null) {
                return false;
@@ -106,11 +106,11 @@ public class MarkerLayer extends Layer implements GestureListener {
       boolean onSnapToItem(int x, int y, Point snapPoint);
    }
 
-   public MarkerLayer(final Map map, final OnItemGestureListener listener) {
+   public MarkerLayerMT(final Map map, final OnItemGestureListener listener) {
 
       super(map);
 
-      mRenderer = _markerRenderer = new MarkerRenderer(this);
+      mRenderer = _markerRenderer = new MarkerRendererMT(this);
 
       _gestureListener = listener;
 

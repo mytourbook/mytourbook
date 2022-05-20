@@ -62,7 +62,7 @@ import net.tourbook.map25.action.ActionSynchMapWithTour;
 import net.tourbook.map25.action.ActionZoomIn;
 import net.tourbook.map25.action.ActionZoomOut;
 import net.tourbook.map25.layer.marker.MapMarker;
-import net.tourbook.map25.layer.marker.MarkerLayer;
+import net.tourbook.map25.layer.marker.MarkerLayerMT;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
@@ -1445,7 +1445,7 @@ public class Map25View extends ViewPart implements
       /*
        * Markers
        */
-      final MarkerLayer markerLayer = _mapApp.getLayer_TourMarker();
+      final MarkerLayerMT markerLayer = _mapApp.getLayer_TourMarker();
       if (markerLayer.isEnabled()) {
          final List<MapMarker> allMarkers = createMapMarkers(_allTourData);
          markerLayer.replaceMarkers(allMarkers);

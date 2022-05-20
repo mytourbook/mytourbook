@@ -41,10 +41,10 @@ import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
 import net.tourbook.map25.layer.labeling.LabelLayerMT;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerConfig;
-import net.tourbook.map25.layer.marker.MarkerLayer;
-import net.tourbook.map25.layer.marker.MarkerLayer.OnItemGestureListener;
+import net.tourbook.map25.layer.marker.MarkerLayerMT;
+import net.tourbook.map25.layer.marker.MarkerLayerMT.OnItemGestureListener;
 import net.tourbook.map25.layer.marker.MarkerMode;
-import net.tourbook.map25.layer.marker.MarkerRenderer;
+import net.tourbook.map25.layer.marker.MarkerRendererMT;
 import net.tourbook.map25.layer.marker.MarkerShape;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
 import net.tourbook.map25.layer.marker.PhotoToolkit;
@@ -185,7 +185,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private SliderPath_Layer        _layer_SliderPath;
    private TileGridLayerMT         _layer_TileInfo;
    private TourLayer               _layer_Tour;
-   private MarkerLayer             _layer_TourMarker;
+   private MarkerLayerMT             _layer_TourMarker;
    //
    private OkHttpFactoryMT         _httpFactory;
    //
@@ -616,7 +616,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       /*
        * Tour marker
        */
-      _layer_TourMarker = new MarkerLayer(mMap, this);
+      _layer_TourMarker = new MarkerLayerMT(mMap, this);
       _layer_TourMarker.setEnabled(false);
 
       /*
@@ -854,7 +854,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return _layer_Tour;
    }
 
-   public MarkerLayer getLayer_TourMarker() {
+   public MarkerLayerMT getLayer_TourMarker() {
       return _layer_TourMarker;
    }
 
@@ -1657,7 +1657,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       if (isShowTourMarker) {
 
-         final MarkerRenderer markerRenderer = (MarkerRenderer) _layer_TourMarker.getRenderer();
+         final MarkerRendererMT markerRenderer = (MarkerRendererMT) _layer_TourMarker.getRenderer();
 
          markerRenderer.configureRenderer();
       }

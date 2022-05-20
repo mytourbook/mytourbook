@@ -54,7 +54,7 @@ import org.oscim.utils.geom.GeometryUtils;
 /**
  * Original: {@link org.oscim.layers.marker.MarkerRenderer}
  */
-public class MarkerRenderer extends BucketRenderer {
+public class MarkerRendererMT extends BucketRenderer {
 
    /**
     * default color of number inside the icon. Would be super-cool to cook this into the map theme
@@ -119,7 +119,7 @@ public class MarkerRenderer extends BucketRenderer {
    private int                             _fgColor;
    private int                             _bgColor;
 
-   private final MarkerLayer               _markerLayer;
+   private final MarkerLayerMT             _markerLayer;
    private final SymbolBucket              _symbolBucket;
 
    private final float[]                   _tmpBox                 = new float[8];
@@ -210,7 +210,7 @@ public class MarkerRenderer extends BucketRenderer {
     * @param style
     *           The desired style, or NULL to disable clustering
     */
-   public MarkerRenderer(final MarkerLayer markerLayer) {
+   public MarkerRendererMT(final MarkerLayerMT markerLayer) {
 
       _markerLayer = markerLayer;
 
