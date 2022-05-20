@@ -33,7 +33,7 @@ public class MarkerLayer extends Layer implements GestureListener {
    private OnItemGestureListener _gestureListener;
 
    private final ActiveMarker    _activeMarker_SingleTap;
-   private final ActiveMarker    _ActiveMarker_LongPress;
+   private final ActiveMarker    _activeMarker_LongPress;
 
    {
       _activeMarker_SingleTap = new ActiveMarker() {
@@ -51,7 +51,7 @@ public class MarkerLayer extends Layer implements GestureListener {
          }
       };
 
-      _ActiveMarker_LongPress = new ActiveMarker() {
+      _activeMarker_LongPress = new ActiveMarker() {
 
          @Override
          public boolean run(final int index) {
@@ -224,7 +224,7 @@ public class MarkerLayer extends Layer implements GestureListener {
       }
 
       if (g instanceof Gesture.LongPress) {
-         return activateSelectedMarker(e, _ActiveMarker_LongPress);
+         return activateSelectedMarker(e, _activeMarker_LongPress);
       }
 
       return false;

@@ -210,7 +210,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private String                  _currentOffline_TileSource_FilePath;
    //
    //
-   private MarkerToolkit _tourMarkerToolkit = new MarkerToolkit(MarkerShape.STAR);
+   private MarkerToolkit _mapBookmarkToolkit = new MarkerToolkit(MarkerShape.STAR);
    // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
    private MarkerMode    _tourMarkerMode    = MarkerMode.NORMAL;
    //
@@ -592,17 +592,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
        */
       final MarkerConfig markerConfig = Map25ConfigManager.getActiveMarkerConfig();
 
-      _layer_MapBookmark_Clustered = new ItemizedLayer(
-            mMap,
+      _layer_MapBookmark_Clustered = new ItemizedLayer(mMap,
             new ArrayList<MarkerInterface>(),
-            _tourMarkerToolkit.getMarkerRendererFactory(),
-            _tourMarkerToolkit);
+            _mapBookmarkToolkit.getMarkerRendererFactory(),
+            _mapBookmarkToolkit);
 
       _layer_MapBookmark_NotClustered = new ItemizedLayer(
             mMap,
             new ArrayList<MarkerInterface>(),
-            _tourMarkerToolkit.getMarkerSymbol(),
-            _tourMarkerToolkit);
+            _mapBookmarkToolkit.getMarkerSymbol(),
+            _mapBookmarkToolkit);
 
       if (markerConfig.isMarkerClustered) {
          _layer_MapBookmark_VARYING = _layer_MapBookmark_Clustered;
@@ -610,7 +609,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          _layer_MapBookmark_VARYING = _layer_MapBookmark_NotClustered;
       }
 
-      final List<MarkerInterface> allMarkerItems = _tourMarkerToolkit.createBookmarksAsMapMarker(_tourMarkerMode);
+      final List<MarkerInterface> allMarkerItems = _mapBookmarkToolkit.createBookmarksAsMapMarker(_tourMarkerMode);
       _layer_MapBookmark_VARYING.addItems(allMarkerItems);
       _layer_MapBookmark_VARYING.setEnabled(false);
 
@@ -623,7 +622,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       /*
        * Photos
        */
-      _layer_Photo_Clustered = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit._markerRendererFactory, _photoToolkit);
+      _layer_Photo_Clustered = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit.getMarkerRendererFactory(), _photoToolkit);
       _layer_Photo_NotCluster = new ItemizedLayer(mMap, new ArrayList<MarkerInterface>(), _photoToolkit.getSymbol(), _photoToolkit);
       if (markerConfig.isMarkerClustered) {
          //sharing same setting as MapBookmarks, later photolayer should get its own configuration
@@ -1534,7 +1533,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       final int bookmarkLayerPosition = allMapLayer.indexOf(_layer_MapBookmark_VARYING);
 
       // only recreate MapBookmarkLayer when changed in UI
-      if (config.isMarkerClustered != _tourMarkerToolkit.isMarkerClusteredLast()) {
+      if (config.isMarkerClustered != _mapBookmarkToolkit.isMarkerClusteredLast()) {
 
          allMapLayer.remove(_layer_MapBookmark_VARYING);
 
@@ -1554,12 +1553,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          _layer_MapBookmark_VARYING.removeAllItems();
       }
 
-      final List<MarkerInterface> allBookmarkMarker = _tourMarkerToolkit.createBookmarksAsMapMarker(_tourMarkerMode);
+      final List<MarkerInterface> allBookmarkMarker = _mapBookmarkToolkit.createBookmarksAsMapMarker(_tourMarkerMode);
 
       _layer_MapBookmark_VARYING.addItems(allBookmarkMarker);
       _layer_MapBookmark_VARYING.setEnabled(config.isShowMapBookmark);
 
-      _tourMarkerToolkit.setIsMarkerClusteredLast(config.isMarkerClustered);
+      _mapBookmarkToolkit.setIsMarkerClusteredLast(config.isMarkerClustered);
    }
 
    /**
@@ -1573,7 +1572,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
       // using settings from MapBookmarks must be changed later with own config
-      if (config.isMarkerClustered != _photoToolkit._isMarkerClusteredLast) {
+      if (config.isMarkerClustered != _photoToolkit.isMarkerClusteredLast()) {
 
          // only recreate PhotoLayer when changed in UI
 
@@ -1609,7 +1608,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       //_phototoolkit._isMarkerClusteredLast = config.isPhotoClustered;
       // using settings from MapBookmarks must be changed later with own config
-      _photoToolkit._isMarkerClusteredLast = config.isMarkerClustered;
+      _photoToolkit.setIsMarkerClusteredLast(config.isMarkerClustered);
    }
 
    private void updateLayer_ReorderLayers() {
