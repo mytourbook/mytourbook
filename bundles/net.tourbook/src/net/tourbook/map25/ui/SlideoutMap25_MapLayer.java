@@ -207,7 +207,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
                   _spinnerBuildingMinZoomLevel.setMinimum(11 + ZOOM_UI_OFFSET);
                   _spinnerBuildingMinZoomLevel.setMaximum(17 + ZOOM_UI_OFFSET);
                   _spinnerBuildingMinZoomLevel.setIncrement(1);
-                  _spinnerBuildingMinZoomLevel.setPageIncrement(2);
+                  _spinnerBuildingMinZoomLevel.setPageIncrement(1);
                   _spinnerBuildingMinZoomLevel.setToolTipText(tooltipText);
 
                   _spinnerBuildingMinZoomLevel.addSelectionListener(_layerSelectionListener);
