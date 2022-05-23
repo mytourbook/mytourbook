@@ -169,6 +169,7 @@ public class Messages extends NLS {
    public static String        App_Action_RemoveTourPhotos;
    public static String        App_Action_Remove_Immediate;
    public static String        App_Action_Rename;
+   public static String        App_Action_ResetValue_Tooltip;
    public static String        App_Action_RestartApp;
    public static String        App_Action_Save;
    public static String        App_Action_SetPerson;
@@ -1977,9 +1978,16 @@ public class Messages extends NLS {
    public static String        Slideout_Map25MapOptions_Checkbox_Photo_Title;
    public static String        Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation;
    public static String        Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip;
+   public static String Slideout_Map25MapOptions_Combo_SunPosition_CurrentTime;
+
+   public static String Slideout_Map25MapOptions_Combo_SunPosition_DayTime;
+
+   public static String Slideout_Map25MapOptions_Combo_SunPosition_NightTime;
+
    public static String        Slideout_Map25MapOptions_Group_MapLayer;
    public static String        Slideout_Map25MapOptions_Label_BuildingMinZoomLevel;
    public static String        Slideout_Map25MapOptions_Label_BuildingMinZoomLevel_Tooltip;
+   public static String        Slideout_Map25MapOptions_Label_BuildingSunPosition;
    public static String        Slideout_Map25MapOptions_Label_MapOptions;
    public static String        Slideout_Map25MapOptions_Spinner_Layer_Hillshading;
    public static String        Slideout_Map25MapOptions_Spinner_Layer_Photo_Size;

@@ -22,15 +22,23 @@ import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.map25.Map25App;
+import net.tourbook.map25.Map25App.SunDayTime;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.Map25View;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
@@ -46,12 +54,19 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
    /**
     * The zoom level in the UI starts with 1 but internally it starts with 0
     */
-   private static final int  ZOOM_UI_OFFSET = 1;
+   private static final int   ZOOM_UI_OFFSET = 1;
 
-   private SelectionListener _defaultSelectionListener;
-   private SelectionListener _layerSelectionListener;
+   private SelectionListener  _defaultSelectionListener;
+   private SelectionListener  _layerSelectionListener;
+   private MouseWheelListener _mouseWheelListener;
+   private FocusListener      _keepOpenListener;
 
-   private Map25App          _mapApp;
+   private Map25App           _mapApp;
+
+   private Action_ResetValue  _actionResetValue_SunTime_Hour;
+   private Action_ResetValue  _actionResetValue_SunTime_Minute;
+
+   private PixelConverter     _pc;
 
    /*
     * UI controls
@@ -69,10 +84,38 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
    private Button    _chkShowLayer_TileInfo;
    private Button    _chkUseDraggedKeyboardNavigation;
 
-   private Label     _lblBuildingMinZoomLevel;
+   private Combo     _comboBuilding_SunPosition;
 
-   private Spinner   _spinnerBuildingMinZoomLevel;
+   private Label     _lblBuilding_MinZoomLevel;
+   private Label     _lblBuilding_SunPosition;
+
+   private Spinner   _spinnerBuilding_MinZoomLevel;
+   private Spinner   _spinnerBuilding_SunTime_Hour;
+   private Spinner   _spinnerBuilding_SunTime_Minute;
    private Spinner   _spinnerHillShadingOpacity;
+
+   /**
+    * Reset spinner value
+    */
+   private class Action_ResetValue extends Action {
+
+      private Spinner _spinner;
+
+      public Action_ResetValue(final Spinner spinner) {
+
+         super(UI.RESET_LABEL, AS_PUSH_BUTTON);
+
+         setToolTipText(Messages.App_Action_ResetValue_Tooltip);
+
+         _spinner = spinner;
+      }
+
+      @Override
+      public void run() {
+
+         onResetValue(_spinner);
+      }
+   }
 
    /**
     * @param ownerControl
@@ -101,8 +144,9 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
       final Composite ui = createUI(parent);
 
+      fillUI();
       restoreState();
-      enableActions();
+      enableControls();
 
       return ui;
    }
@@ -144,7 +188,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
    private void createUI_50_Layer(final Composite parent) {
 
-      final GridDataFactory indentGridData = GridDataFactory.fillDefaults().grab(true, false).indent(8, 0);
+      final GridDataFactory indentGridData = GridDataFactory.fillDefaults().grab(true, false).indent(UI.FORM_FIRST_COLUMN_INDENT, 0);
 
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Slideout_Map25MapOptions_Group_MapLayer);
@@ -180,6 +224,34 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
          }
          {
             /*
+             * Building: Min zoom level
+             */
+            final Composite containerBuilding = new Composite(group, SWT.NONE);
+            GridDataFactory.fillDefaults().indent(UI.FORM_FIRST_COLUMN_INDENT, 0).applyTo(containerBuilding);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerBuilding);
+            {
+               final String tooltipText = Messages.Slideout_Map25MapOptions_Label_BuildingMinZoomLevel_Tooltip;
+               {
+                  _lblBuilding_MinZoomLevel = new Label(containerBuilding, SWT.NONE);
+                  _lblBuilding_MinZoomLevel.setText(Messages.Slideout_Map25MapOptions_Label_BuildingMinZoomLevel);
+                  _lblBuilding_MinZoomLevel.setToolTipText(tooltipText);
+                  GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblBuilding_MinZoomLevel);
+               }
+               {
+                  _spinnerBuilding_MinZoomLevel = new Spinner(containerBuilding, SWT.BORDER);
+                  _spinnerBuilding_MinZoomLevel.setMinimum(11 + ZOOM_UI_OFFSET);
+                  _spinnerBuilding_MinZoomLevel.setMaximum(17 + ZOOM_UI_OFFSET);
+                  _spinnerBuilding_MinZoomLevel.setIncrement(1);
+                  _spinnerBuilding_MinZoomLevel.setPageIncrement(1);
+                  _spinnerBuilding_MinZoomLevel.setToolTipText(tooltipText);
+
+                  _spinnerBuilding_MinZoomLevel.addSelectionListener(_layerSelectionListener);
+                  _spinnerBuilding_MinZoomLevel.addMouseWheelListener(_mouseWheelListener);
+               }
+            }
+         }
+         {
+            /*
              * Building: Shadow
              */
             _chkShowLayer_Building_Shadow = new Button(group, SWT.CHECK);
@@ -189,32 +261,63 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
          }
          {
             /*
-             * Building: Min zoom level
+             * Sun position
              */
-            final Composite containerBuilding = new Composite(group, SWT.NONE);
-            GridDataFactory.fillDefaults().indent(8, 0).applyTo(containerBuilding);
-            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerBuilding);
+            final Composite containerSunPosition = new Composite(group, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).indent(UI.FORM_FIRST_COLUMN_INDENT * 2, 0).applyTo(containerSunPosition);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerSunPosition);
             {
-               final String tooltipText = Messages.Slideout_Map25MapOptions_Label_BuildingMinZoomLevel_Tooltip;
                {
-                  _lblBuildingMinZoomLevel = new Label(containerBuilding, SWT.NONE);
-                  _lblBuildingMinZoomLevel.setText(Messages.Slideout_Map25MapOptions_Label_BuildingMinZoomLevel);
-                  _lblBuildingMinZoomLevel.setToolTipText(tooltipText);
-                  GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblBuildingMinZoomLevel);
+                  // label
+                  _lblBuilding_SunPosition = new Label(containerSunPosition, SWT.NONE);
+                  _lblBuilding_SunPosition.setText(Messages.Slideout_Map25MapOptions_Label_BuildingSunPosition);
+                  GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblBuilding_SunPosition);
                }
                {
-                  _spinnerBuildingMinZoomLevel = new Spinner(containerBuilding, SWT.BORDER);
-                  _spinnerBuildingMinZoomLevel.setMinimum(11 + ZOOM_UI_OFFSET);
-                  _spinnerBuildingMinZoomLevel.setMaximum(17 + ZOOM_UI_OFFSET);
-                  _spinnerBuildingMinZoomLevel.setIncrement(1);
-                  _spinnerBuildingMinZoomLevel.setPageIncrement(1);
-                  _spinnerBuildingMinZoomLevel.setToolTipText(tooltipText);
+                  // combo
+                  _comboBuilding_SunPosition = new Combo(containerSunPosition, SWT.READ_ONLY | SWT.BORDER);
+                  _comboBuilding_SunPosition.setVisibleItemCount(2);
+                  _comboBuilding_SunPosition.addFocusListener(_keepOpenListener);
+                  _comboBuilding_SunPosition.addSelectionListener(_layerSelectionListener);
+                  GridDataFactory.fillDefaults()
+//                        .grab(true, false)
+                        .align(SWT.BEGINNING, SWT.CENTER).applyTo(_comboBuilding_SunPosition);
+               }
+               final Composite containerSunTime = new Composite(containerSunPosition, SWT.NONE);
+               GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(containerSunTime);
+               GridLayoutFactory.fillDefaults().numColumns(4).applyTo(containerSunTime);
+               {
+                  {
+                     // select sun time hours
+                     _spinnerBuilding_SunTime_Hour = new Spinner(containerSunTime, SWT.BORDER);
+                     _spinnerBuilding_SunTime_Hour.setMinimum(0);
+                     _spinnerBuilding_SunTime_Hour.setMaximum((int) (2 * Map25App.SUN_TIME_HOURS * 2));
+                     _spinnerBuilding_SunTime_Hour.setIncrement(1);
+                     _spinnerBuilding_SunTime_Hour.setPageIncrement((int) (Map25App.SUN_TIME_HOURS / 10));
+                     _spinnerBuilding_SunTime_Hour.addSelectionListener(_layerSelectionListener);
+                     _spinnerBuilding_SunTime_Hour.addMouseWheelListener(_mouseWheelListener);
 
-                  _spinnerBuildingMinZoomLevel.addSelectionListener(_layerSelectionListener);
-                  _spinnerBuildingMinZoomLevel.addMouseWheelListener(mouseEvent -> {
-                     UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
-                     onModify_Layer();
-                  });
+                     _actionResetValue_SunTime_Hour = createUI_Action_ResetValue(containerSunTime, _spinnerBuilding_SunTime_Hour);
+                  }
+                  {
+                     // select sun time minutes
+                     _spinnerBuilding_SunTime_Minute = new Spinner(containerSunTime, SWT.BORDER);
+                     _spinnerBuilding_SunTime_Minute.setMinimum((int) -Map25App.SUN_TIME_MINUTES);
+                     _spinnerBuilding_SunTime_Minute.setMaximum((int) Map25App.SUN_TIME_MINUTES);
+                     _spinnerBuilding_SunTime_Minute.setIncrement(1);
+                     _spinnerBuilding_SunTime_Minute.setPageIncrement(10);
+                     _spinnerBuilding_SunTime_Minute.addSelectionListener(_layerSelectionListener);
+                     _spinnerBuilding_SunTime_Minute.addMouseWheelListener(_mouseWheelListener);
+
+                     _actionResetValue_SunTime_Minute = createUI_Action_ResetValue(containerSunTime, _spinnerBuilding_SunTime_Minute);
+                  }
+
+//                  {
+//                     // time unit
+//                     _lblBuilding_SunDayTime_Unit = new Label(containerSunTime, SWT.NONE);
+//                     _lblBuilding_SunDayTime_Unit.setText("h:mm");
+//                     GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblBuilding_SunDayTime_Unit);
+//                  }
                }
             }
          }
@@ -316,38 +419,126 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       }
    }
 
-   private void enableActions() {
+   private Action_ResetValue createUI_Action_ResetValue(final Composite parent, final Spinner spinner) {
 
-      final boolean isHillShading = _chkShowLayer_Hillshading.getSelection();
-      final boolean isBuildingVisible = _chkShowLayer_Building.getSelection();
+      final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
+      GridDataFactory.fillDefaults().applyTo(toolbar);
+
+      final ToolBarManager tbm = new ToolBarManager(toolbar);
+
+      final Action_ResetValue action = new Action_ResetValue(spinner);
+
+      tbm.add(action);
+
+      tbm.update(true);
+
+      return action;
+   }
+
+   private void enableControls() {
+
+      final boolean isHillShadingVisible = _chkShowLayer_Hillshading.getSelection();
       final boolean isLabelVisible = _chkShowLayer_Label.getSelection();
 
-      _chkShowLayer_Building_Shadow.setEnabled(isBuildingVisible);
-      _chkShowLayer_Label_IsBeforeBuilding.setEnabled(isLabelVisible && isBuildingVisible);
+      final boolean isBuilding_Visible = _chkShowLayer_Building.getSelection();
+      final boolean isBuilding_ShowShadow = _chkShowLayer_Building_Shadow.getSelection() && isBuilding_Visible;
 
-      _lblBuildingMinZoomLevel.setEnabled(isBuildingVisible);
+      final SunDayTime selectedSunDayTime = getSelectedSunDayTime();
+      final boolean isBuilding_SunRiseDownTime = (selectedSunDayTime.equals(SunDayTime.DAY_TIME)
+            || selectedSunDayTime.equals(SunDayTime.NIGHT_TIME))
+            && isBuilding_ShowShadow;
 
-      _spinnerHillShadingOpacity.setEnabled(isHillShading);
-      _spinnerBuildingMinZoomLevel.setEnabled(isBuildingVisible);
+      _chkShowLayer_Building_Shadow.setEnabled(isBuilding_Visible);
+      _chkShowLayer_Label_IsBeforeBuilding.setEnabled(isLabelVisible && isBuilding_Visible);
+
+      _comboBuilding_SunPosition.setEnabled(isBuilding_ShowShadow);
+
+      _lblBuilding_MinZoomLevel.setEnabled(isBuilding_Visible);
+      _lblBuilding_SunPosition.setEnabled(isBuilding_ShowShadow);
+
+      _spinnerHillShadingOpacity.setEnabled(isHillShadingVisible);
+      _spinnerBuilding_MinZoomLevel.setEnabled(isBuilding_Visible);
+      _spinnerBuilding_SunTime_Hour.setEnabled(isBuilding_SunRiseDownTime);
+      _spinnerBuilding_SunTime_Minute.setEnabled(isBuilding_SunRiseDownTime);
 
       // force UI update otherwise the slideout UI update is done after the map is updated
       _parent.update();
+   }
+
+   private void fillUI() {
+
+      // must be the same sorting as SunDayTime
+      _comboBuilding_SunPosition.add(Messages.Slideout_Map25MapOptions_Combo_SunPosition_CurrentTime);
+      _comboBuilding_SunPosition.add(Messages.Slideout_Map25MapOptions_Combo_SunPosition_DayTime);
+      _comboBuilding_SunPosition.add(Messages.Slideout_Map25MapOptions_Combo_SunPosition_NightTime);
+   }
+
+   private SunDayTime getSelectedSunDayTime() {
+
+      switch (_comboBuilding_SunPosition.getSelectionIndex()) {
+      case 1:
+         return SunDayTime.DAY_TIME;
+      case 2:
+         return SunDayTime.NIGHT_TIME;
+
+      case 0:
+      default:
+         return SunDayTime.CURRENT_TIME;
+      }
+   }
+
+   private int getSunPositionIndex() {
+
+      switch (_mapApp.getLayer_Building_SunDayTime()) {
+      case DAY_TIME:
+         return 1;
+      case NIGHT_TIME:
+         return 2;
+
+      case CURRENT_TIME:
+      default:
+         return 0;
+      }
    }
 
    private void initUI(final Composite parent) {
 
       _parent = parent;
 
+      _pc = new PixelConverter(parent);
+
       _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
       _layerSelectionListener = widgetSelectedAdapter(selectionEvent -> onModify_Layer());
 
+      _mouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onModify_Layer();
+      };
+
+      _keepOpenListener = new FocusListener() {
+
+         @Override
+         public void focusGained(final FocusEvent e) {
+
+            /*
+             * This will fix the problem that when the list of a combobox is displayed, then the
+             * slideout will disappear :-(((
+             */
+            setIsAnotherDialogOpened(true);
+         }
+
+         @Override
+         public void focusLost(final FocusEvent e) {
+            setIsAnotherDialogOpened(false);
+         }
+      };
    }
 
    private void onChangeUI() {
 
       saveState();
 
-      enableActions();
+      enableControls();
    }
 
    private void onModify_HillShadingOpacity() {
@@ -360,7 +551,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       final float hillshadingAlpha = hillShadingOpacity / 255f;
       _mapApp.getLayer_HillShading().setBitmapAlpha(hillshadingAlpha, true);
 
-      enableActions();
+      enableControls();
 
       _mapApp.updateMap();
    }
@@ -369,12 +560,24 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
       saveState_Layer();
 
-      enableActions();
+      enableControls();
 
       _mapApp.updateLayer();
    }
 
+   private void onResetValue(final Spinner spinner) {
+
+      spinner.setSelection(0);
+      spinner.setFocus();
+
+      onModify_Layer();
+   }
+
    private void restoreState() {
+
+      final int sunDayTime = _mapApp.getLayer_Building_SunRiseDownTime();
+      final int sunTimeHours = (int) (sunDayTime / Map25App.SUN_TIME_MINUTES);
+      final int sunTimeMinutes = (int) (sunDayTime % Map25App.SUN_TIME_MINUTES);
 
 // SET_FORMATTING_OFF
 
@@ -388,8 +591,12 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       _chkShowLayer_Satellite             .setSelection(_mapApp.getLayer_Satellite()                .isEnabled());
       _chkShowLayer_TileInfo              .setSelection(_mapApp.getLayer_TileInfo()                 .isEnabled());
 
-      _spinnerBuildingMinZoomLevel        .setSelection(_mapApp.getLayer_Building_MinZoomLevel() + ZOOM_UI_OFFSET);
+      _spinnerBuilding_MinZoomLevel       .setSelection(_mapApp.getLayer_Building_MinZoomLevel() + ZOOM_UI_OFFSET);
+      _spinnerBuilding_SunTime_Hour       .setSelection(sunTimeHours);
+      _spinnerBuilding_SunTime_Minute     .setSelection(sunTimeMinutes);
       _spinnerHillShadingOpacity          .setSelection(UI.transformOpacity_WhenRestored(_mapApp.getLayer_HillShading_Opacity()));
+
+      _comboBuilding_SunPosition          .select(getSunPositionIndex());
 
 // SET_FORMATTING_ON
 
@@ -417,10 +624,18 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
             _chkShowLayer_Label.getSelection(),
             _chkShowLayer_Label_IsBeforeBuilding.getSelection());
 
+      final int sunTimeHours = _spinnerBuilding_SunTime_Hour.getSelection();
+      final int sunTimeMinutes = _spinnerBuilding_SunTime_Minute.getSelection();
+      final float sunRiseDownTime = (sunTimeHours * Map25App.SUN_TIME_MINUTES + sunTimeMinutes);
+
+      final SunDayTime sunDayTime = getSelectedSunDayTime();
+
       _mapApp.setLayer_Building_Options(
             _chkShowLayer_Building.getSelection(),
+            _spinnerBuilding_MinZoomLevel.getSelection() - ZOOM_UI_OFFSET,
             _chkShowLayer_Building_Shadow.getSelection(),
-            _spinnerBuildingMinZoomLevel.getSelection() - ZOOM_UI_OFFSET);
+            sunDayTime,
+            sunRiseDownTime);
    }
 
 }
