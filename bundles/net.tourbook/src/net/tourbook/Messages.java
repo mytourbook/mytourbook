@@ -1978,19 +1978,21 @@ public class Messages extends NLS {
    public static String        Slideout_Map25MapOptions_Checkbox_Photo_Title;
    public static String        Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation;
    public static String        Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip;
-   public static String Slideout_Map25MapOptions_Combo_SunPosition_CurrentTime;
-
-   public static String Slideout_Map25MapOptions_Combo_SunPosition_DayTime;
-
-   public static String Slideout_Map25MapOptions_Combo_SunPosition_NightTime;
-
+   public static String        Slideout_Map25MapOptions_Combo_SunPosition_CurrentTime;
+   public static String        Slideout_Map25MapOptions_Combo_SunPosition_DayTime;
+   public static String        Slideout_Map25MapOptions_Combo_SunPosition_NightTime;
    public static String        Slideout_Map25MapOptions_Group_MapLayer;
    public static String        Slideout_Map25MapOptions_Label_BuildingMinZoomLevel;
    public static String        Slideout_Map25MapOptions_Label_BuildingMinZoomLevel_Tooltip;
-   public static String        Slideout_Map25MapOptions_Label_BuildingSunPosition;
    public static String        Slideout_Map25MapOptions_Label_MapOptions;
+   public static String        Slideout_Map25MapOptions_Label_SunPosition;
+   public static String        Slideout_Map25MapOptions_Label_SunTime;
+   public static String        Slideout_Map25MapOptions_Label_SunTime_Tooltip;
    public static String        Slideout_Map25MapOptions_Spinner_Layer_Hillshading;
    public static String        Slideout_Map25MapOptions_Spinner_Layer_Photo_Size;
+   public static String        Slideout_Map25MapOptions_Spinner_SunTime_Coarse;
+   public static String        Slideout_Map25MapOptions_Spinner_SunTime_Fine;
+
    public static String        Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering;
    public static String        Slideout_Map25MarkerOptions_Checkbox_IsShowBookmarks;
    public static String        Slideout_Map25MarkerOptions_Checkbox_IsShowTourMarker;
@@ -2016,12 +2018,14 @@ public class Messages extends NLS {
    public static String        Slideout_Map25MarkerOptions_Label_Name_Tooltip;
    public static String        Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip;
    public static String        Slideout_Map25MarkerOptions_Label_Title;
+
    public static String        Slideout_Map25Provider_Combo_MapProvider_Offline_Tooltip;
    public static String        Slideout_Map25Provider_Combo_MapProvider_Online_Tooltip;
    public static String        Slideout_Map25Provider_Label_DefaultTheme;
    public static String        Slideout_Map25Provider_Label_MapProvider;
    public static String        Slideout_Map25Provider_Label_MapProvider_Title;
    public static String        Slideout_Map25Provider_Label_ThemeStyle;
+
    public static String        Slideout_Map25TrackOptions_Label_ConfigName_Tooltip;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrows;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip;

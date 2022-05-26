@@ -1058,8 +1058,8 @@ public class Map25View extends ViewPart implements
       tbm.add(new Separator());
 
       tbm.add(_actionShowMarkerOptions);
-      tbm.add(_actionMapOptions);
       tbm.add(_actionMapProvider);
+      tbm.add(_actionMapOptions);
 
       /*
        * fill view menu
