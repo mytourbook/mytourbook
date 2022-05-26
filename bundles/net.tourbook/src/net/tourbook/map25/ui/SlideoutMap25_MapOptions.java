@@ -100,7 +100,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
        * Label: Slideout title
        */
       final Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Slideout_Map25MapOptions_Label_MapOptions);
+      label.setText(Messages.Slideout_Map25Options_Label_MapOptions);
       MTFont.setBannerFont(label);
       GridDataFactory.fillDefaults()
             .align(SWT.BEGINNING, SWT.CENTER)
@@ -123,8 +123,8 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
             // checkbox
             _chkUseDraggedKeyboardNavigation = new Button(container, SWT.CHECK);
-            _chkUseDraggedKeyboardNavigation.setText(Messages.Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation);
-            _chkUseDraggedKeyboardNavigation.setToolTipText(Messages.Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip);
+            _chkUseDraggedKeyboardNavigation.setText(Messages.Slideout_Map25Options_Checkbox_UseDraggedKeyNavigation);
+            _chkUseDraggedKeyboardNavigation.setToolTipText(Messages.Slideout_Map25Options_Checkbox_UseDraggedKeyNavigation_Tooltip);
             _chkUseDraggedKeyboardNavigation.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.BEGINNING)
