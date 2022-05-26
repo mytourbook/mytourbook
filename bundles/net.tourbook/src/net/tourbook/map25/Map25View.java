@@ -68,6 +68,7 @@ import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 import net.tourbook.map25.ui.SlideoutMap25_MapLayer;
+import net.tourbook.map25.ui.SlideoutMap25_MapOptions;
 import net.tourbook.map25.ui.SlideoutMap25_MapProvider;
 import net.tourbook.map25.ui.SlideoutMap25_PhotoOptions;
 import net.tourbook.map25.ui.SlideoutMap25_TrackOptions;
@@ -183,6 +184,7 @@ public class Map25View extends ViewPart implements
    //
    private ActionMapBookmarks            _actionMapBookmarks;
    private ActionMap25_MapProvider       _actionMapProvider;
+   private ActionMap25_Layer             _actionMapLayer;
    private ActionMap25_Options           _actionMapOptions;
    private ActionMap25_PhotoFilter       _actionMapPhotoFilter;
    private ActionShowEntireTour          _actionShowEntireTour;
@@ -236,14 +238,32 @@ public class Map25View extends ViewPart implements
 
    private Menu      _swtContextMenu;
 
+   private class ActionMap25_Layer extends ActionToolbarSlideout {
+
+      public ActionMap25_Layer() {
+
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapLayer),
+               TourbookPlugin.getThemedImageDescriptor(Images.MapLayer));
+      }
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+         return new SlideoutMap25_MapLayer(_parent, toolbar, Map25View.this);
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+   }
+
    private class ActionMap25_MapProvider extends ActionToolbarSlideout {
 
       private SlideoutMap25_MapProvider __slideoutMap25_MapProvider;
 
       public ActionMap25_MapProvider() {
 
-         super(
-               TourbookPlugin.getThemedImageDescriptor(Images.MapProvider),
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapProvider),
                TourbookPlugin.getThemedImageDescriptor(Images.MapProvider));
       }
 
@@ -271,7 +291,7 @@ public class Map25View extends ViewPart implements
 
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-         return new SlideoutMap25_MapLayer(_parent, toolbar, Map25View.this);
+         return new SlideoutMap25_MapOptions(_parent, toolbar);
       }
 
       @Override
@@ -722,6 +742,7 @@ public class Map25View extends ViewPart implements
 // SET_FORMATTING_OFF
 
       _actionMapBookmarks              = new ActionMapBookmarks(this._parent, this);
+      _actionMapLayer                  = new ActionMap25_Layer();
       _actionMapOptions                = new ActionMap25_Options();
       _actionMapPhotoFilter            = new ActionMap25_PhotoFilter(this, _state_PhotoFilter);
       _actionMapProvider               = new ActionMap25_MapProvider();
@@ -1058,6 +1079,7 @@ public class Map25View extends ViewPart implements
       tbm.add(new Separator());
 
       tbm.add(_actionShowMarkerOptions);
+      tbm.add(_actionMapLayer);
       tbm.add(_actionMapProvider);
       tbm.add(_actionMapOptions);
 

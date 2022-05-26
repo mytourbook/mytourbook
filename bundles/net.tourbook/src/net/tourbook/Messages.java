@@ -1981,11 +1981,13 @@ public class Messages extends NLS {
    public static String        Slideout_Map25MapOptions_Combo_SunPosition_CurrentTime;
    public static String        Slideout_Map25MapOptions_Combo_SunPosition_DayTime;
    public static String        Slideout_Map25MapOptions_Combo_SunPosition_NightTime;
-   public static String        Slideout_Map25MapOptions_Group_MapLayer;
    public static String        Slideout_Map25MapOptions_Label_BuildingMinZoomLevel;
    public static String        Slideout_Map25MapOptions_Label_BuildingMinZoomLevel_Tooltip;
+   public static String        Slideout_Map25MapOptions_Label_MapLayer;
    public static String        Slideout_Map25MapOptions_Label_MapOptions;
    public static String        Slideout_Map25MapOptions_Label_SunPosition;
+   public static String        Slideout_Map25MapOptions_Label_Sunrise;
+   public static String        Slideout_Map25MapOptions_Label_Sunset;
    public static String        Slideout_Map25MapOptions_Label_SunTime;
    public static String        Slideout_Map25MapOptions_Label_SunTime_Tooltip;
    public static String        Slideout_Map25MapOptions_Spinner_Layer_Hillshading;

@@ -25,7 +25,6 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25App.SunDayTime;
-import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.Map25View;
 
 import org.eclipse.jface.action.Action;
@@ -42,7 +41,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
@@ -58,11 +56,8 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
    /**
     * The zoom level in the UI starts with 1 but internally it starts with 0
     */
-   private static final int ZOOM_UI_OFFSET = 1;
+   private static final int   ZOOM_UI_OFFSET = 1;
 
-//   private static final int   SUN_TIME_MAX   = 100;
-
-   private SelectionListener  _defaultSelectionListener;
    private SelectionListener  _layerSelectionListener;
    private MouseWheelListener _mouseWheelListener;
    private FocusListener      _keepOpenListener;
@@ -86,7 +81,6 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
    private Button    _chkShowLayer_Label_IsBeforeBuilding;
    private Button    _chkShowLayer_Scale;
    private Button    _chkShowLayer_TileInfo;
-   private Button    _chkUseDraggedKeyboardNavigation;
 
    private Combo     _comboBuilding_SunPosition;
 
@@ -173,9 +167,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 //       container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
          {
             createUI_10_Title(container);
-
             createUI_50_Layer(container);
-            createUI_80_Other(container);
          }
       }
 
@@ -188,7 +180,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
        * Label: Slideout title
        */
       final Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Slideout_Map25MapOptions_Label_MapOptions);
+      label.setText(Messages.Slideout_Map25MapOptions_Label_MapLayer);
       MTFont.setBannerFont(label);
       GridDataFactory.fillDefaults()
             .align(SWT.BEGINNING, SWT.CENTER)
@@ -200,18 +192,15 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 //      final GridDataFactory centerGridData = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
       final GridDataFactory indentGridData = GridDataFactory.fillDefaults().grab(true, false).indent(UI.FORM_FIRST_COLUMN_INDENT, 0);
 
-      final Group group = new Group(parent, SWT.NONE);
-      group.setText(Messages.Slideout_Map25MapOptions_Group_MapLayer);
-      GridDataFactory.fillDefaults()
-            .grab(true, false)
-            .applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(group);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
       {
          {
             /*
              * Text label
              */
-            _chkShowLayer_Label = new Button(group, SWT.CHECK);
+            _chkShowLayer_Label = new Button(container, SWT.CHECK);
             _chkShowLayer_Label.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_LabelSymbol);
             _chkShowLayer_Label.addSelectionListener(_layerSelectionListener);
          }
@@ -219,17 +208,17 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
             /*
              * Text label: Behind building
              */
-            _chkShowLayer_Label_IsBeforeBuilding = new Button(group, SWT.CHECK);
+            _chkShowLayer_Label_IsBeforeBuilding = new Button(container, SWT.CHECK);
             _chkShowLayer_Label_IsBeforeBuilding.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_LabelSymbol_IsBehindBuilding);
             _chkShowLayer_Label_IsBeforeBuilding.addSelectionListener(_layerSelectionListener);
             indentGridData.applyTo(_chkShowLayer_Label_IsBeforeBuilding);
          }
-         createUI_60_Building(group);
+         createUI_60_Building(container);
          {
             /*
              * Scale
              */
-            _chkShowLayer_Scale = new Button(group, SWT.CHECK);
+            _chkShowLayer_Scale = new Button(container, SWT.CHECK);
             _chkShowLayer_Scale.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_ScaleBar);
             _chkShowLayer_Scale.addSelectionListener(_layerSelectionListener);
          }
@@ -237,7 +226,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
             /*
              * Cartography / map
              */
-            _chkShowLayer_Cartography = new Button(group, SWT.CHECK);
+            _chkShowLayer_Cartography = new Button(container, SWT.CHECK);
             _chkShowLayer_Cartography.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Cartography);
             _chkShowLayer_Cartography.setToolTipText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip);
             _chkShowLayer_Cartography.addSelectionListener(_layerSelectionListener);
@@ -246,7 +235,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
             /*
              * Satellite images
              */
-            _chkShowLayer_Satellite = new Button(group, SWT.CHECK);
+            _chkShowLayer_Satellite = new Button(container, SWT.CHECK);
             _chkShowLayer_Satellite.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Satellite);
             _chkShowLayer_Satellite.addSelectionListener(_layerSelectionListener);
          }
@@ -254,7 +243,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
             /*
              * Hillshading
              */
-            final Composite containerHillshading = new Composite(group, SWT.NONE);
+            final Composite containerHillshading = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(containerHillshading);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerHillshading);
             {
@@ -289,14 +278,14 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
             /*
              * Tile info
              */
-            _chkShowLayer_TileInfo = new Button(group, SWT.CHECK);
+            _chkShowLayer_TileInfo = new Button(container, SWT.CHECK);
             _chkShowLayer_TileInfo.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_TileInfo);
             _chkShowLayer_TileInfo.addSelectionListener(_layerSelectionListener);
          }
       }
    }
 
-   private void createUI_60_Building(final Group parent) {
+   private void createUI_60_Building(final Composite parent) {
 
       final GridDataFactory centerGridData = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
       final GridDataFactory indentGridData = GridDataFactory.fillDefaults().grab(true, false).indent(UI.FORM_FIRST_COLUMN_INDENT, 0);
@@ -390,6 +379,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
                    */
                   _lblBuilding_SunRise = new Label(containerSunTime, SWT.NONE);
                   _lblBuilding_SunRise.setText(UI.SPACE1);
+                  _lblBuilding_SunRise.setToolTipText(Messages.Slideout_Map25MapOptions_Label_Sunrise);
                   centerGridData.span(2, 1).applyTo(_lblBuilding_SunRise);
                }
                {
@@ -398,6 +388,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
                    */
                   _lblBuilding_SunSet = new Label(containerSunTime, SWT.NONE);
                   _lblBuilding_SunSet.setText(UI.SPACE1);
+                  _lblBuilding_SunSet.setToolTipText(Messages.Slideout_Map25MapOptions_Label_Sunset);
                   GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).span(2, 1).applyTo(_lblBuilding_SunSet);
                }
 
@@ -453,33 +444,6 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       }
    }
 
-   private void createUI_80_Other(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()
-            .numColumns(2)
-            .applyTo(container);
-      {
-         {
-            /*
-             * Keyboard navigation
-             */
-
-            // checkbox
-            _chkUseDraggedKeyboardNavigation = new Button(container, SWT.CHECK);
-            _chkUseDraggedKeyboardNavigation.setText(Messages.Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation);
-            _chkUseDraggedKeyboardNavigation.setToolTipText(Messages.Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip);
-            _chkUseDraggedKeyboardNavigation.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.BEGINNING)
-                  .span(2, 1)
-                  .applyTo(_chkUseDraggedKeyboardNavigation);
-         }
-      }
-   }
-
    private Action_ResetValue createUI_Action_ResetValue(final Composite parent, final Spinner spinner) {
 
       final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
@@ -521,6 +485,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       _lblBuilding_SunPosition.setEnabled(isBuilding_ShowShadow);
       _lblBuilding_SunRise.setEnabled(isBuilding_SunRiseSetTime);
       _lblBuilding_SunSet.setEnabled(isBuilding_SunRiseSetTime);
+      _lblBuilding_SunTime.setEnabled(isBuilding_SunRiseSetTime);
 
       _scaleBuilding_SunTime.setEnabled(isBuilding_SunRiseSetTime);
 
@@ -610,7 +575,6 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
       _parent = parent;
 
-      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
       _layerSelectionListener = widgetSelectedAdapter(selectionEvent -> onModify_Layer());
 
       _mouseWheelListener = mouseEvent -> {
@@ -635,13 +599,6 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
             setIsAnotherDialogOpened(false);
          }
       };
-   }
-
-   private void onChangeUI() {
-
-      saveState();
-
-      enableControls();
    }
 
    private void onModify_Building(final Widget widget) {
@@ -679,7 +636,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
    private void onModify_Layer() {
 
-      saveState_Layer();
+      saveState();
 
       enableControls();
 
@@ -728,17 +685,10 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
 // SET_FORMATTING_ON
 
-      _chkUseDraggedKeyboardNavigation.setSelection(Map25ConfigManager.useDraggedKeyboardNavigation);
-
       setSunPosition();
    }
 
    private void saveState() {
-
-      Map25ConfigManager.useDraggedKeyboardNavigation = _chkUseDraggedKeyboardNavigation.getSelection();
-   }
-
-   private void saveState_Layer() {
 
       _mapApp.getLayer_BaseMap().setEnabled(_chkShowLayer_Cartography.getSelection());
       _mapApp.getLayer_HillShading().setEnabled(_chkShowLayer_Hillshading.getSelection());
@@ -789,8 +739,8 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       _lblBuilding_SunRise             .setText(sunRiseTime.toString());
       _lblBuilding_SunSet              .setText(sunSetTime.toString());
 
-      _spinnerBuilding_SunTime_Coarse         .setSelection(sunTime);
-      _spinnerBuilding_SunTime_Fine  .setSelection(sunTimeDetail);
+      _spinnerBuilding_SunTime_Coarse  .setSelection(sunTime);
+      _spinnerBuilding_SunTime_Fine    .setSelection(sunTimeDetail);
 
       _scaleBuilding_SunTime           .setSelection(sunTime);
 
