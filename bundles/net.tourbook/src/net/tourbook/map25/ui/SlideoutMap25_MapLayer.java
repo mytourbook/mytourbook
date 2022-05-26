@@ -20,6 +20,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import java.time.LocalTime;
 
 import net.tourbook.Messages;
+import net.tourbook.common.Bool;
 import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -86,8 +87,8 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
    private Label     _lblBuilding_MinZoomLevel;
    private Label     _lblBuilding_SunPosition;
-   private Label     _lblBuilding_SunRise;
-   private Label     _lblBuilding_SunSet;
+   private Label     _lblBuilding_Sunrise;
+   private Label     _lblBuilding_Sunset;
    private Label     _lblBuilding_SunTime;
 
    private Scale     _scaleBuilding_SunTime;
@@ -377,19 +378,19 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
                   /*
                    * Sunrise time
                    */
-                  _lblBuilding_SunRise = new Label(containerSunTime, SWT.NONE);
-                  _lblBuilding_SunRise.setText(UI.SPACE1);
-                  _lblBuilding_SunRise.setToolTipText(Messages.Slideout_Map25Layer_Label_Sunrise);
-                  centerGridData.span(2, 1).applyTo(_lblBuilding_SunRise);
+                  _lblBuilding_Sunrise = new Label(containerSunTime, SWT.NONE);
+                  _lblBuilding_Sunrise.setText(UI.SPACE1);
+                  _lblBuilding_Sunrise.setToolTipText(Messages.Slideout_Map25Layer_Label_Sunrise);
+                  centerGridData.span(2, 1).applyTo(_lblBuilding_Sunrise);
                }
                {
                   /*
                    * Sunset time
                    */
-                  _lblBuilding_SunSet = new Label(containerSunTime, SWT.NONE);
-                  _lblBuilding_SunSet.setText(UI.SPACE1);
-                  _lblBuilding_SunSet.setToolTipText(Messages.Slideout_Map25Layer_Label_Sunset);
-                  GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).span(2, 1).applyTo(_lblBuilding_SunSet);
+                  _lblBuilding_Sunset = new Label(containerSunTime, SWT.NONE);
+                  _lblBuilding_Sunset.setText(UI.SPACE1);
+                  _lblBuilding_Sunset.setToolTipText(Messages.Slideout_Map25Layer_Label_Sunset);
+                  GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).span(2, 1).applyTo(_lblBuilding_Sunset);
                }
 
                {
@@ -469,12 +470,12 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       final boolean isBuilding_ShowShadow = _chkShowLayer_Building_Shadow.getSelection() && isBuilding_Visible;
 
       final SunDayTime selectedSunDayTime = getSelected_SunDayTime();
-      final boolean isBuilding_SunRiseSetTime = (selectedSunDayTime.equals(SunDayTime.DAY_TIME)
+      final boolean isBuilding_Sunrise_Sunset_Time = (selectedSunDayTime.equals(SunDayTime.DAY_TIME)
             || selectedSunDayTime.equals(SunDayTime.NIGHT_TIME))
             && isBuilding_ShowShadow;
 
-      _actionResetValue_SunTime_Coarse.setEnabled(isBuilding_SunRiseSetTime);
-      _actionResetValue_SunTime_Fine.setEnabled(isBuilding_SunRiseSetTime);
+      _actionResetValue_SunTime_Coarse.setEnabled(isBuilding_Sunrise_Sunset_Time);
+      _actionResetValue_SunTime_Fine.setEnabled(isBuilding_Sunrise_Sunset_Time);
 
       _chkShowLayer_Building_Shadow.setEnabled(isBuilding_Visible);
       _chkShowLayer_Label_IsBeforeBuilding.setEnabled(isLabelVisible && isBuilding_Visible);
@@ -483,16 +484,16 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
       _lblBuilding_MinZoomLevel.setEnabled(isBuilding_Visible);
       _lblBuilding_SunPosition.setEnabled(isBuilding_ShowShadow);
-      _lblBuilding_SunRise.setEnabled(isBuilding_SunRiseSetTime);
-      _lblBuilding_SunSet.setEnabled(isBuilding_SunRiseSetTime);
-      _lblBuilding_SunTime.setEnabled(isBuilding_SunRiseSetTime);
+      _lblBuilding_Sunrise.setEnabled(isBuilding_Sunrise_Sunset_Time);
+      _lblBuilding_Sunset.setEnabled(isBuilding_Sunrise_Sunset_Time);
+      _lblBuilding_SunTime.setEnabled(isBuilding_Sunrise_Sunset_Time);
 
-      _scaleBuilding_SunTime.setEnabled(isBuilding_SunRiseSetTime);
+      _scaleBuilding_SunTime.setEnabled(isBuilding_Sunrise_Sunset_Time);
 
       _spinnerHillShadingOpacity.setEnabled(isHillShadingVisible);
       _spinnerBuilding_MinZoomLevel.setEnabled(isBuilding_Visible);
-      _spinnerBuilding_SunTime_Coarse.setEnabled(isBuilding_SunRiseSetTime);
-      _spinnerBuilding_SunTime_Fine.setEnabled(isBuilding_SunRiseSetTime);
+      _spinnerBuilding_SunTime_Coarse.setEnabled(isBuilding_Sunrise_Sunset_Time);
+      _spinnerBuilding_SunTime_Fine.setEnabled(isBuilding_Sunrise_Sunset_Time);
 
       // force UI update otherwise the slideout UI update is done after the map is updated
       _parent.update();
@@ -669,7 +670,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 // SET_FORMATTING_OFF
 
       _chkShowLayer_Building                 .setSelection(_mapApp.getLayer_Building_S3DB()              .isEnabled());
-      _chkShowLayer_Building_Shadow          .setSelection(_mapApp.getLayer_Building_IsShadow());
+      _chkShowLayer_Building_Shadow          .setSelection(_mapApp.getLayer_Building_IsShadow()          == Bool.TRUE);
       _chkShowLayer_Cartography              .setSelection(_mapApp.getLayer_BaseMap()                    .isEnabled());
       _chkShowLayer_Hillshading              .setSelection(_mapApp.getLayer_HillShading()                .isEnabled());
       _chkShowLayer_Label                    .setSelection(_mapApp.getLayer_Label()                      .isEnabled());
@@ -707,7 +708,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       _mapApp.setLayer_Building_Options(
             _chkShowLayer_Building.getSelection(),
             _spinnerBuilding_MinZoomLevel.getSelection() - ZOOM_UI_OFFSET,
-            _chkShowLayer_Building_Shadow.getSelection(),
+            _chkShowLayer_Building_Shadow.getSelection() ? Bool.TRUE : Bool.FALSE,
             getSelected_SunDayTime(),
             getSelected_Sunrise_Sunset_Time(true));
    }
@@ -720,24 +721,24 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       final int sunTime = (int) (sunrise_Sunset_Time * 100);
       final int sunTimeDetail = (int) (((sunrise_Sunset_Time * 100) - sunTime) * 100);
 
-      final float sunRise = sun.getSunrise();
-      final float sunSet = sun.getSunset();
+      final float sunrise = sun.getSunrise();
+      final float sunset = sun.getSunset();
 
-      final float sunRiseFixed = (sunRise < 0 ? sunRise + 24 : sunRise) % 24;
-      final float sunSetFixed = (sunSet < 0 ? sunSet + 24 : sunSet) % 24;
+      final float sunriseFixed = (sunrise < 0 ? sunrise + 24 : sunrise) % 24;
+      final float sunsetFixed = (sunset < 0 ? sunset + 24 : sunset) % 24;
 
-      final int sunRiseHour = (int) sunRiseFixed;
-      final int sunRiseMinutes = (int) ((sunRiseFixed - sunRiseHour) * 60f);
-      final int sunSetHour = (int) sunSetFixed;
-      final int sunSetMinutes = (int) ((sunSetFixed - sunSetHour) * 60f);
+      final int sunriseHour = (int) sunriseFixed;
+      final int sunriseMinutes = (int) ((sunriseFixed - sunriseHour) * 60f);
+      final int sunsetHour = (int) sunsetFixed;
+      final int sunsetMinutes = (int) ((sunsetFixed - sunsetHour) * 60f);
 
-      final LocalTime sunRiseTime = LocalTime.of(sunRiseHour, sunRiseMinutes);
-      final LocalTime sunSetTime = LocalTime.of(sunSetHour, sunSetMinutes);
+      final LocalTime sunriseTime = LocalTime.of(sunriseHour, sunriseMinutes);
+      final LocalTime sunsetTime = LocalTime.of(sunsetHour, sunsetMinutes);
 
 // SET_FORMATTING_OFF
 
-      _lblBuilding_SunRise             .setText(sunRiseTime.toString());
-      _lblBuilding_SunSet              .setText(sunSetTime.toString());
+      _lblBuilding_Sunrise             .setText(sunriseTime.toString());
+      _lblBuilding_Sunset              .setText(sunsetTime.toString());
 
       _spinnerBuilding_SunTime_Coarse  .setSelection(sunTime);
       _spinnerBuilding_SunTime_Fine    .setSelection(sunTimeDetail);

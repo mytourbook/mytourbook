@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import net.tourbook.common.Bool;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -167,14 +168,21 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     */
    private int                     _layer_HillShading_Opacity;
    //
+   private Bool                    _building_IsShowShadow;
+   private boolean                 _building_IsVisible;
+   private int                     _building_MinZoomLevel;
+   private SunDayTime              _building_SunDaytime;
+   //
    /**
-    * <code>true == 1</code> , <code>false == 0</code>
+    * Relative time <code>0...1</code> between sunset and sunrise
     */
-   private int                     _layer_Building_IsShowShadow;
-   private boolean                 _layer_Building_IsVisible;
-   private int                     _layer_Building_MinZoomLevel;
-   private SunDayTime              _layer_Building_SunDaytime;
-   private float                   _layer_Building_Sunrise_Sunset_Time;
+   private float                   _building_Sunrise_Sunset_Time;
+   //
+   private Bool                    _currentBuilding_IsShowShadow;
+   private int                     _currentBuilding_MinZoomLevel;
+   private IRenderTheme            _currentBuilding_RenderTheme;
+   private SunDayTime              _currentBuilding_SunDayTime;
+   private float                   _currentBuilding_Sunrise_Sunset_Time;
    //
    private boolean                 _layer_Label_IsVisible;
    private boolean                 _layer_Label_IsBeforeBuilding;
@@ -208,15 +216,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private float                   _offline_UserScale                     = 2.50f;
    private float                   _online_TextScale                      = 0.50f;
    private float                   _online_UserScale                      = 2.0f;
-   /**
-    * <code>true == 1</code> , <code>false == 0</code>
-    */
-   private int                     _currentBuildingLayer_MinZoomLevel;
 
-   private IRenderTheme            _currentBuildingLayer_RenderTheme;
-   private int                     _currentBuildingLayer_IsShowShadow     = -1;
-   private SunDayTime              _currentBuildingLayer_SunDayTime;
-   private float                   _currentBuildingLayer_Sunrise_Sunset_Time;
    private OffOnline               _currentOffOnline;
    private TileSource              _currentOnline_TileSource;
    private TileEncoding            _currentOnline_TileSource_Encoding;
@@ -313,7 +313,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
        */
       private void setSunPosition(final GLViewport viewport) {
 
-         if (_layer_Building_IsVisible == false || _layer_Building_IsShowShadow != 1) {
+         if (_building_IsVisible == false || _building_IsShowShadow != Bool.TRUE) {
             return;
          }
 
@@ -625,8 +625,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       /*
        * Buildings, create a default layer to keep it's position, it can be replaced later on
        */
-      final boolean isShowShadow = _layer_Building_IsShowShadow == 1;
-      final int minZoom = _layer_Building_MinZoomLevel;
+      final boolean isShowShadow = _building_IsShowShadow == Bool.TRUE;
+      final int minZoom = _building_MinZoomLevel;
       final int maxZoom = mMap.viewport().getMaxZoomLevel();
 
       _layer_Building_S3DB_SunUpdate = new GenericLayer(mMap, new SunUpdateRenderer());
@@ -637,10 +637,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       setLayer_Building_SunPosition();
 
       // keep current building states
-      _currentBuildingLayer_IsShowShadow = _layer_Building_IsShowShadow;
-      _currentBuildingLayer_SunDayTime = _layer_Building_SunDaytime;
-      _currentBuildingLayer_Sunrise_Sunset_Time = _layer_Building_Sunrise_Sunset_Time;
-      _currentBuildingLayer_MinZoomLevel = minZoom;
+      _currentBuilding_IsShowShadow = _building_IsShowShadow;
+      _currentBuilding_SunDayTime = _building_SunDaytime;
+      _currentBuilding_Sunrise_Sunset_Time = _building_Sunrise_Sunset_Time;
+      _currentBuilding_MinZoomLevel = minZoom;
 
       /*
        * Label
@@ -856,12 +856,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return _layer_BaseMap;
    }
 
-   public boolean getLayer_Building_IsShadow() {
-      return _layer_Building_IsShowShadow == 1;
+   public Bool getLayer_Building_IsShadow() {
+      return _building_IsShowShadow;
    }
 
    public int getLayer_Building_MinZoomLevel() {
-      return _layer_Building_MinZoomLevel;
+      return _building_MinZoomLevel;
    }
 
    public S3DBLayer getLayer_Building_S3DB() {
@@ -869,11 +869,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    }
 
    public SunDayTime getLayer_Building_SunDayTime() {
-      return _layer_Building_SunDaytime;
+      return _building_SunDaytime;
    }
 
+   /**
+    * @return Returns relative time between sunset and sunrise
+    */
    public float getLayer_Building_Sunrise_Sunset_Time() {
-      return _layer_Building_Sunrise_Sunset_Time;
+      return _building_Sunrise_Sunset_Time;
    }
 
    public BitmapTileLayer getLayer_HillShading() {
@@ -1192,12 +1195,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 // SET_FORMATTING_OFF
 
-      _layer_Building_IsVisible        = Util.getStateBoolean( _state, STATE_LAYER_BUILDING_IS_VISIBLE,      true);
-      _layer_Building_MinZoomLevel     = Util.getStateInt(     _state, STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL,  17);
+      _building_IsVisible              = Util.getStateBoolean( _state, STATE_LAYER_BUILDING_IS_VISIBLE,      true);
+      _building_MinZoomLevel           = Util.getStateInt(     _state, STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL,  17);
+      _building_Sunrise_Sunset_Time    = Util.getStateFloat(   _state, STATE_LAYER_BUILDING_SUN_RISE_SET_TIME, 0.5f);
 
-      _layer_Building_IsShowShadow     = Util.getStateBoolean( _state, STATE_LAYER_BUILDING_IS_SHOW_SHADOW,  true) ? 1 : 0;
-      _layer_Building_SunDaytime       = (SunDayTime) Util.getStateEnum(_state, STATE_LAYER_BUILDING_SUN_DAY_TIME, SunDayTime.CURRENT_TIME);
-      _layer_Building_Sunrise_Sunset_Time   = Util.getStateFloat(   _state, STATE_LAYER_BUILDING_SUN_RISE_SET_TIME, 0.5f);
+      _building_IsShowShadow           = (Bool)       Util.getStateEnum(_state, STATE_LAYER_BUILDING_IS_SHOW_SHADOW,    Bool.TRUE);
+      _building_SunDaytime             = (SunDayTime) Util.getStateEnum(_state, STATE_LAYER_BUILDING_SUN_DAY_TIME,      SunDayTime.CURRENT_TIME);
 
       _layer_Label_IsVisible           = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_VISIBLE,         true) ;
       _layer_Label_IsBeforeBuilding    = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_BEFORE_BUILDING, true) ;
@@ -1226,16 +1229,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 // SET_FORMATTING_OFF
 
-      _state.put(STATE_LAYER_BUILDING_IS_VISIBLE,           _layer_Building_IsVisible);
-      _state.put(STATE_LAYER_BUILDING_IS_SHOW_SHADOW,       _layer_Building_IsShowShadow == 1);
-      _state.put(STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL,       _layer_Building_MinZoomLevel);
-      _state.put(STATE_LAYER_BUILDING_SUN_RISE_SET_TIME,    _layer_Building_Sunrise_Sunset_Time);
-      Util.setStateEnum(_state, STATE_LAYER_BUILDING_SUN_DAY_TIME, _layer_Building_SunDaytime);
+      _state.put(STATE_LAYER_BUILDING_IS_VISIBLE,                    _building_IsVisible);
+      _state.put(STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL,                _building_MinZoomLevel);
+      _state.put(STATE_LAYER_BUILDING_SUN_RISE_SET_TIME,             _building_Sunrise_Sunset_Time);
+      Util.setStateEnum(_state, STATE_LAYER_BUILDING_IS_SHOW_SHADOW, _building_IsShowShadow);
+      Util.setStateEnum(_state, STATE_LAYER_BUILDING_SUN_DAY_TIME,   _building_SunDaytime);
 
-      _state.put(STATE_LAYER_LABEL_IS_VISIBLE,              _layer_Label_IsVisible);
-      _state.put(STATE_LAYER_LABEL_IS_BEFORE_BUILDING,      _layer_Label_IsBeforeBuilding);
+      _state.put(STATE_LAYER_LABEL_IS_VISIBLE,                       _layer_Label_IsVisible);
+      _state.put(STATE_LAYER_LABEL_IS_BEFORE_BUILDING,               _layer_Label_IsBeforeBuilding);
 
-      _state.put(STATE_SELECTED_MAP25_PROVIDER_ID,          _selectedMapProvider.getId());
+      _state.put(STATE_SELECTED_MAP25_PROVIDER_ID,                   _selectedMapProvider.getId());
 
 // SET_FORMATTING_ON
 
@@ -1267,32 +1270,32 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     */
    private void setLayer_Building_MinZoomLevel(final IRenderTheme renderTheme) {
 
-      _currentBuildingLayer_RenderTheme = renderTheme;
+      _currentBuilding_RenderTheme = renderTheme;
 
       final RenderTheme modifiedRenderTheme = (RenderTheme) renderTheme;
 
-      modifiedRenderTheme.traverseRules(new MinZoomRuleVisitor(_layer_Building_MinZoomLevel));
+      modifiedRenderTheme.traverseRules(new MinZoomRuleVisitor(_building_MinZoomLevel));
       modifiedRenderTheme.updateStyles();
    }
 
    public void setLayer_Building_Options(final boolean isVisible,
                                          final int minZoomLevel,
-                                         final boolean isShowShadow,
+                                         final Bool isShowShadow,
                                          final SunDayTime sunDayTime,
                                          final float sunRiseSetTime) {
 
-      _layer_Building_IsVisible = isVisible;
-      _layer_Building_MinZoomLevel = minZoomLevel;
-      _layer_Building_IsShowShadow = isShowShadow ? 1 : 0;
-      _layer_Building_SunDaytime = sunDayTime;
-      _layer_Building_Sunrise_Sunset_Time = sunRiseSetTime;
+      _building_IsVisible = isVisible;
+      _building_MinZoomLevel = minZoomLevel;
+      _building_IsShowShadow = isShowShadow;
+      _building_SunDaytime = sunDayTime;
+      _building_Sunrise_Sunset_Time = sunRiseSetTime;
    }
 
    public void setLayer_Building_SunOptions(final SunDayTime sunDayTime,
                                             final float sunRiseSetTime) {
 
-      _layer_Building_SunDaytime = sunDayTime;
-      _layer_Building_Sunrise_Sunset_Time = sunRiseSetTime;
+      _building_SunDaytime = sunDayTime;
+      _building_Sunrise_Sunset_Time = sunRiseSetTime;
 
       setLayer_Building_SunPosition();
    }
@@ -1301,7 +1304,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       final ExtrusionRenderer extrusionRenderer = _layer_Building_S3DB.getExtrusionRenderer();
 
-      if (_layer_Building_SunDaytime == SunDayTime.CURRENT_TIME) {
+      if (_building_SunDaytime == SunDayTime.CURRENT_TIME) {
 
          // show shadow for the current sun day time position
 
@@ -1317,9 +1320,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          //
          // of the daylight in range 0 (sunrise) to 1 (sunset) and
          // of the night    in range 1 (sunset)  to 2 (sunrise)
-         final int nightAdjustment = _layer_Building_SunDaytime == SunDayTime.NIGHT_TIME ? 1 : 0;
+         final int nightAdjustment = _building_SunDaytime == SunDayTime.NIGHT_TIME ? 1 : 0;
 
-         final float sunPosition = _layer_Building_Sunrise_Sunset_Time + nightAdjustment;
+         final float sunPosition = _building_Sunrise_Sunset_Time + nightAdjustment;
 
          System.out.println((System.currentTimeMillis() + " sun: " + sunPosition));
          // TODO remove SYSTEM.OUT.PRINTLN
@@ -1606,16 +1609,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    private void updateLayer_Building() {
 
-      _layer_Building_S3DB.setEnabled(_layer_Building_IsVisible);
-      _layer_Building_S3DB_SunUpdate.setEnabled(_layer_Building_IsVisible);
+      _layer_Building_S3DB.setEnabled(_building_IsVisible);
+      _layer_Building_S3DB_SunUpdate.setEnabled(_building_IsVisible);
 
       /*
        * Check if ALL building parameters have changed
        */
-      if (_layer_Building_MinZoomLevel == _currentBuildingLayer_MinZoomLevel
-            && _layer_Building_IsShowShadow == _currentBuildingLayer_IsShowShadow
-            && _layer_Building_SunDaytime == _currentBuildingLayer_SunDayTime
-            && _layer_Building_Sunrise_Sunset_Time == _currentBuildingLayer_Sunrise_Sunset_Time) {
+      if (_building_MinZoomLevel == _currentBuilding_MinZoomLevel
+            && _building_IsShowShadow == _currentBuilding_IsShowShadow
+            && _building_SunDaytime == _currentBuilding_SunDayTime
+            && _building_Sunrise_Sunset_Time == _currentBuilding_Sunrise_Sunset_Time) {
 
          return;
       }
@@ -1624,14 +1627,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
        * Check if only the sun position has changed, this does not need to recreate the building
        * layer -> this is much faster
        */
-      if (_layer_Building_MinZoomLevel == _currentBuildingLayer_MinZoomLevel
-            && _layer_Building_IsShowShadow == _currentBuildingLayer_IsShowShadow) {
+      if (_building_MinZoomLevel == _currentBuilding_MinZoomLevel
+            && _building_IsShowShadow == _currentBuilding_IsShowShadow) {
 
          setLayer_Building_SunPosition();
 
          // keep current building layer states to compare it the next time
-         _currentBuildingLayer_SunDayTime = _layer_Building_SunDaytime;
-         _currentBuildingLayer_Sunrise_Sunset_Time = _layer_Building_Sunrise_Sunset_Time;
+         _currentBuilding_SunDayTime = _building_SunDaytime;
+         _currentBuilding_Sunrise_Sunset_Time = _building_Sunrise_Sunset_Time;
 
          return;
       }
@@ -1639,12 +1642,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       /*
        * Recreate building layer
        */
-      final boolean isMinZoomLevelModified = _layer_Building_MinZoomLevel != _currentBuildingLayer_MinZoomLevel;
-      final int minZoom = _layer_Building_MinZoomLevel;
+      final boolean isMinZoomLevelModified = _building_MinZoomLevel != _currentBuilding_MinZoomLevel;
+      final int minZoom = _building_MinZoomLevel;
       final int maxZoom = mMap.viewport().getMaxZoomLevel();
-      final boolean isShowShadow = _layer_Building_IsShowShadow == 1;
+      final Bool isShowShadow = _building_IsShowShadow;
 
-      final S3DBLayer newBuildingLayer = new S3DBLayer(mMap, _layer_BaseMap, minZoom, maxZoom, isShowShadow);
+      final S3DBLayer newBuildingLayer = new S3DBLayer(mMap, _layer_BaseMap, minZoom, maxZoom, isShowShadow == Bool.TRUE);
 
       /*
        * Replace old building layer
@@ -1657,18 +1660,18 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       allMapLayer.add(currentLayerIndex, newBuildingLayer);
 
       _layer_Building_S3DB = newBuildingLayer;
-      _layer_Building_S3DB.setEnabled(_layer_Building_IsVisible);
+      _layer_Building_S3DB.setEnabled(_building_IsVisible);
       setLayer_Building_SunPosition();
 
       // keep current building layer states to compare it the next time
-      _currentBuildingLayer_MinZoomLevel = _layer_Building_MinZoomLevel;
-      _currentBuildingLayer_IsShowShadow = _layer_Building_IsShowShadow;
-      _currentBuildingLayer_SunDayTime = _layer_Building_SunDaytime;
-      _currentBuildingLayer_Sunrise_Sunset_Time = _layer_Building_Sunrise_Sunset_Time;
+      _currentBuilding_MinZoomLevel = _building_MinZoomLevel;
+      _currentBuilding_IsShowShadow = _building_IsShowShadow;
+      _currentBuilding_SunDayTime = _building_SunDaytime;
+      _currentBuilding_Sunrise_Sunset_Time = _building_Sunrise_Sunset_Time;
 
       if (isMinZoomLevelModified) {
 
-         setLayer_Building_MinZoomLevel(_currentBuildingLayer_RenderTheme);
+         setLayer_Building_MinZoomLevel(_currentBuilding_RenderTheme);
 
          // force update
          _currentOffOnline = null;
@@ -1783,7 +1786,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       final boolean isLabelBeforeBuilding = layerLabel_CurrentIndex > layerBuilding_CurrentIndex;
 
-      if (_layer_Building_IsVisible && _layer_Label_IsVisible) {
+      if (_building_IsVisible && _layer_Label_IsVisible) {
 
          // both layers must be visible
 
