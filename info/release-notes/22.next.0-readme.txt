@@ -49,6 +49,8 @@ Improvements
 * 2.5D Map
   - Filter photos                      			https://github.com/mytourbook/mytourbook/issues/397
   - Enlarge marker font on 4k display           https://github.com/mytourbook/mytourbook/issues/504
+  - Select sun position for building shadow     https://github.com/mytourbook/mytourbook/issues/866
+  - Set building min-zoom level                 https://github.com/mytourbook/mytourbook/issues/867
 
 * Weather Retrieval (Frederic)
   - Added the ability to save the weather retrieval log in the tour weather field
@@ -66,6 +68,8 @@ Changes
   - Differentiating the temperature from the device and the temperature manually entered/from a provider
     https://sourceforge.net/p/mytourbook/discussion/622811/thread/11993be696/
 
+* 2.5D Map
+  - Separated map options slideout into map layer und map options slideouts
 
 Bugfix
 ======
