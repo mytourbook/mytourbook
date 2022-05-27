@@ -1980,6 +1980,7 @@ public class Messages extends NLS {
    public static String        Slideout_Map25Layer_Label_BuildingMinZoomLevel;
    public static String        Slideout_Map25Layer_Label_BuildingMinZoomLevel_Tooltip;
    public static String        Slideout_Map25Layer_Label_MapLayer;
+   public static String        Slideout_Map25Layer_Label_SelectedSunTime;
    public static String        Slideout_Map25Layer_Label_SunPosition;
    public static String        Slideout_Map25Layer_Label_Sunrise;
    public static String        Slideout_Map25Layer_Label_Sunset;

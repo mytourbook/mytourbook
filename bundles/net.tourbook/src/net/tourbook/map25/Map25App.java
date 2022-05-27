@@ -873,7 +873,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    }
 
    /**
-    * @return Returns relative time between sunset and sunrise
+    * @return Returns relative time <code>0...1</code> between sunset and sunrise
     */
    public float getLayer_Building_Sunrise_Sunset_Time() {
       return _building_Sunrise_Sunset_Time;
