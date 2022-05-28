@@ -4,9 +4,6 @@
 TODO's
 ======
 
-* Tour Chart      - Select color for 2nd graph line instead of compliment color
-
-
 * Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
                     Need to check how to apply it to all projects, must maybe be done with the already existing ant script
 
