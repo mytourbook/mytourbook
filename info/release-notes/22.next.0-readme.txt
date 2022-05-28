@@ -14,6 +14,7 @@ TODO's
 Issues
 ======
 
+*
 
 
 Experimental
@@ -25,61 +26,24 @@ Experimental
 New
 ===
 
-* Tour Segmenter View (Frederic)
-  - Added the ability to export the current view in .CSV format
-
-* Weather Retrieval (Frederic)
-  - New vendor addition: Weather API     
-    https://github.com/mytourbook/mytourbook/issues/505
-
-* Tag View (Frederic)
-  - Added the ability to duplicate a tag
-
+* 
 
 Improvements
 ============
 
-* Tour Editor     
-  - Recompute the elevation up/down values when tour is saved is now optional, this can be enabled/disabled in the tour editor options
-    https://sourceforge.net/p/mytourbook/feature-requests/196/
-
-* 2.5D Map
-  - Filter photos                      			https://github.com/mytourbook/mytourbook/issues/397
-  - Enlarge marker font on 4k display           https://github.com/mytourbook/mytourbook/issues/504
-  - Select sun position for building shadow     https://github.com/mytourbook/mytourbook/issues/866
-  - Set building min-zoom level                 https://github.com/mytourbook/mytourbook/issues/867
-
-* Weather Retrieval (Frederic)
-  - Added the ability to save the weather retrieval log in the tour weather field
-    https://github.com/mytourbook/mytourbook/issues/498
-
-* Temperatures (Frederic)
-  - Added the ability to display combined temperatures (either measured from the device, from a provider or manually entered)
-    https://github.com/mytourbook/mytourbook/issues/495
+* 
 
 
 Changes
 =======
 
-* Fitlog/FitlogEx Import (Frederic)
-  - Differentiating the temperature from the device and the temperature manually entered/from a provider
-    https://sourceforge.net/p/mytourbook/discussion/622811/thread/11993be696/
+* 
 
-* 2.5D Map
-  - Separated map options slideout into map layer und map options slideouts
 
 Bugfix
 ======
 
-* Database (Frederic)
-  - Fixed an issue where a cloud type was renamed in 22.3.0 and caused a missing icon for "Weather-Showers-Scattered"
-    https://sourceforge.net/p/mytourbook/discussion/622811/thread/11993be696/
-
-* Tour Editor (Frederic)
-  - Fixed a bug where the recorded and paused times were not recomputed when using the feature "Delete Time Slices and Remove Time"
-
-* Tag View (Frederic)
-  - Fixed a bug where newly created tags that were immediately deleted were causing a NPE.
+* 
 
 
 Translation    
@@ -95,5 +59,5 @@ System
 ======
 
 * Milestone             https://github.com/mytourbook/mytourbook/milestone/4?closed=1
-* Eclipse 2022-03
-* FIT SDK 21.67
+* Eclipse 2022-xx
+* FIT SDK 21.xx
