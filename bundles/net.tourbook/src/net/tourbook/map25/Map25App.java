@@ -298,7 +298,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    }
 
    /**
-    * There is no easy way to update the sun position when current time is not selected, this will
+    * There is no easy way to update the sun position when current time is NOT selected, this will
     * "overwrite" {@link org.oscim.renderer.ExtrusionRenderer.update(GLViewport)}
     */
    private class SunUpdateRenderer extends LayerRenderer {
@@ -331,11 +331,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
             // location is only updated if necessary (not every frame)
 
-            System.out.println((System.currentTimeMillis() + " sun pos: " + lat + " " + lon));
-            // TODO remove SYSTEM.OUT.PRINTLN
-
             sun.setCoordinates(lat, lon);
-            sun.update();
+
+            setLayer_Building_SunPosition();
          }
       }
 
@@ -1324,7 +1322,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
          final float sunPosition = _building_Sunrise_Sunset_Time + nightAdjustment;
 
-         System.out.println((System.currentTimeMillis() + " sun: " + sunPosition));
+//         System.out.println((System.currentTimeMillis() + " sun: " + sunPosition));
          // TODO remove SYSTEM.OUT.PRINTLN
 
          final Sun sun = extrusionRenderer.getSun();

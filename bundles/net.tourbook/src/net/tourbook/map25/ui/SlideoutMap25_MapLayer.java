@@ -523,6 +523,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       _lblBuilding_Sunrise.setEnabled(isBuilding_Sunrise_Sunset_Time);
       _lblBuilding_Sunset.setEnabled(isBuilding_Sunrise_Sunset_Time);
       _lblBuilding_SunTime.setEnabled(isBuilding_Sunrise_Sunset_Time);
+      _lblBuilding_SelectedSunTime.setEnabled(isBuilding_Sunrise_Sunset_Time);
 
       _scaleBuilding_SunTime.setEnabled(isBuilding_Sunrise_Sunset_Time);
 
