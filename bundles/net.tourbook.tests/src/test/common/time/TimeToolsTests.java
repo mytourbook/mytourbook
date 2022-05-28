@@ -145,7 +145,7 @@ public class TimeToolsTests {
    @Test
    void testGetDefaultTimeZoneOffset() {
 
-      assertEquals("0 m", TimeTools.getDefaultTimeZoneOffset());
+      assertEquals("0 m", TimeTools.getDefaultTimeZoneOffset()); //$NON-NLS-1$
    }
 
    @Test
@@ -175,8 +175,8 @@ public class TimeToolsTests {
 
       final TimeZoneData controlTimeZoneData = new TimeZoneData();
 
-      controlTimeZoneData.label = "+00:00    +00:00    Africa/Abidjan";
-      controlTimeZoneData.zoneId = ZoneId.of("Africa/Abidjan").getId();
+      controlTimeZoneData.label = "+00:00    +00:00    Africa/Abidjan"; //$NON-NLS-1$
+      controlTimeZoneData.zoneId = ZoneId.of("Africa/Abidjan").getId(); //$NON-NLS-1$
       controlTimeZoneData.zoneOffsetSeconds = 0;
 
       final TimeZoneData testTimeZoneData = TimeTools.getTimeZone_ByIndex(-1);
