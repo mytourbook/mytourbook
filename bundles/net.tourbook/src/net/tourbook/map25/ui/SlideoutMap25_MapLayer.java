@@ -405,7 +405,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
                       */
                      _lblBuilding_Sunrise = new Label(containerSunriseSunset, SWT.NONE);
                      _lblBuilding_Sunrise.setText(UI.SPACE1);
-                     _lblBuilding_Sunrise.setToolTipText(Messages.Slideout_Map25Layer_Label_Sunrise);
+                     _lblBuilding_Sunrise.setToolTipText(Messages.Slideout_Map25Layer_Label_Sunrise_Tooltip);
                      GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblBuilding_Sunrise);
                   }
                   {
@@ -414,7 +414,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
                       */
                      _lblBuilding_SelectedSunTime = new Label(containerSunriseSunset, SWT.NONE);
                      _lblBuilding_SelectedSunTime.setText(UI.SPACE1);
-                     _lblBuilding_SelectedSunTime.setToolTipText(Messages.Slideout_Map25Layer_Label_SelectedSunTime);
+                     _lblBuilding_SelectedSunTime.setToolTipText(Messages.Slideout_Map25Layer_Label_SelectedSunTime_Tooltip);
                      GridDataFactory.fillDefaults().grab(true, false).align(SWT.CENTER, SWT.CENTER).applyTo(_lblBuilding_SelectedSunTime);
                   }
                   {
@@ -423,7 +423,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
                       */
                      _lblBuilding_Sunset = new Label(containerSunriseSunset, SWT.NONE);
                      _lblBuilding_Sunset.setText(UI.SPACE1);
-                     _lblBuilding_Sunset.setToolTipText(Messages.Slideout_Map25Layer_Label_Sunset);
+                     _lblBuilding_Sunset.setToolTipText(Messages.Slideout_Map25Layer_Label_Sunset_Tooltip);
                      GridDataFactory.fillDefaults().align(SWT.END, SWT.CENTER).applyTo(_lblBuilding_Sunset);
                   }
                }
