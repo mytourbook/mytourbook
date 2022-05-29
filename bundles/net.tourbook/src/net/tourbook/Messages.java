@@ -126,7 +126,7 @@ public class Messages extends NLS {
    public static String        app_action_collapse_others_tooltip;
    public static String        App_Action_Columns;
    public static String        App_Action_Copy;
-   public static String        App_Action_CopyDataIntoClipboard;
+   public static String        App_Action_CopyDataIntoClipboard_Tooltip;
    public static String        App_Action_CopyDataIntoClipboard_CopyIsDone;
    public static String        App_Action_Delete;
    public static String        App_Action_DeleteProfile;
@@ -1776,13 +1776,13 @@ public class Messages extends NLS {
    public static String        Pref_Weather_CheckHTTPConnection_Message;
    public static String        Pref_Weather_CheckHTTPConnection_OK_Message;
    public static String        Pref_Weather_Label_ApiKey;
+   public static String        Pref_Weather_Label_OpenWeatherMap_FiveDaysLimit;
    public static String        Pref_Weather_Label_WeatherProvider;
+   public static String        Pref_Weather_Label_WeatherApi_SevenDaysLimit;
+   public static String        Pref_Weather_Label_WorldWeatherOnline_ApiKey_Tooltip;
    public static String        Pref_Weather_Link_ApiSignup;
-   public static String        Pref_Weather_OpenWeatherMap_Label_FiveDaysLimit;
    public static String        Pref_Weather_Provider_None;
-   public static String        Pref_Weather_WeatherApi_Label_SevenDaysLimit;
 
-   public static String        Pref_Weather_WorldWeatherOnline_Label_ApiKey_Tooltip;
 
    public static String        Search_Manager_CreateFTIndex;
    public static String        Search_Manager_Log_DeletingLuceneRootFolder;
