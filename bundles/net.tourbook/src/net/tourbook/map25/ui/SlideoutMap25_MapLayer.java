@@ -32,6 +32,8 @@ import net.tourbook.map25.Map25View;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.osgi.util.NLS;
@@ -40,6 +42,7 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -76,33 +79,36 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
    /*
     * UI controls
     */
-   private Composite _parent;
+   private Composite         _parent;
 
-   private Button    _chkShowLayer_Cartography;
-   private Button    _chkShowLayer_Building;
-   private Button    _chkShowLayer_Building_Shadow;
-   private Button    _chkShowLayer_Hillshading;
-   private Button    _chkShowLayer_Satellite;
-   private Button    _chkShowLayer_Label;
-   private Button    _chkShowLayer_Label_IsBeforeBuilding;
-   private Button    _chkShowLayer_Scale;
-   private Button    _chkShowLayer_TileInfo;
+   private ControlDecoration _decoratorShowLayer_Building;
+   private ControlDecoration _decoratorShowLayer_Label;
 
-   private Combo     _comboBuilding_SunPosition;
+   private Button            _chkShowLayer_Cartography;
+   private Button            _chkShowLayer_Building;
+   private Button            _chkShowLayer_Building_Shadow;
+   private Button            _chkShowLayer_Hillshading;
+   private Button            _chkShowLayer_Satellite;
+   private Button            _chkShowLayer_Label;
+   private Button            _chkShowLayer_Label_IsBeforeBuilding;
+   private Button            _chkShowLayer_Scale;
+   private Button            _chkShowLayer_TileInfo;
 
-   private Label     _lblBuilding_MinZoomLevel;
-   private Label     _lblBuilding_SelectedSunTime;
-   private Label     _lblBuilding_SunPosition;
-   private Label     _lblBuilding_Sunrise;
-   private Label     _lblBuilding_Sunset;
-   private Label     _lblBuilding_SunTime;
+   private Combo             _comboBuilding_SunPosition;
 
-   private Scale     _scaleBuilding_SunTime;
+   private Label             _lblBuilding_MinZoomLevel;
+   private Label             _lblBuilding_SelectedSunTime;
+   private Label             _lblBuilding_SunPosition;
+   private Label             _lblBuilding_Sunrise;
+   private Label             _lblBuilding_Sunset;
+   private Label             _lblBuilding_SunTime;
 
-   private Spinner   _spinnerBuilding_MinZoomLevel;
-   private Spinner   _spinnerBuilding_SunTime_Coarse;
-   private Spinner   _spinnerBuilding_SunTime_Fine;
-   private Spinner   _spinnerHillShadingOpacity;
+   private Scale             _scaleBuilding_SunTime;
+
+   private Spinner           _spinnerBuilding_MinZoomLevel;
+   private Spinner           _spinnerBuilding_SunTime_Coarse;
+   private Spinner           _spinnerBuilding_SunTime_Fine;
+   private Spinner           _spinnerHillShadingOpacity;
 
    /**
     * Reset spinner value
@@ -182,8 +188,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       {
          final Composite container = new Composite(shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-         GridLayoutFactory
-               .fillDefaults()//
+         GridLayoutFactory.fillDefaults()
                .applyTo(container);
 //       container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
          {
@@ -214,7 +219,8 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().spacing(5, 5).numColumns(1).applyTo(container);
+//      GridLayoutFactory.fillDefaults().spacing(5, 5).numColumns(1).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
          {
@@ -224,6 +230,9 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
             _chkShowLayer_Label = new Button(container, SWT.CHECK);
             _chkShowLayer_Label.setText(Messages.Slideout_Map25Layer_Checkbox_Layer_LabelSymbol);
             _chkShowLayer_Label.addSelectionListener(_layerSelectionListener);
+
+            _decoratorShowLayer_Label = new ControlDecoration(_chkShowLayer_Label, SWT.TOP | SWT.LEFT);
+
          }
          {
             /*
@@ -331,6 +340,8 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
          _chkShowLayer_Building = new Button(parent, SWT.CHECK);
          _chkShowLayer_Building.setText(Messages.Slideout_Map25Layer_Checkbox_Layer_3DBuilding);
          _chkShowLayer_Building.addSelectionListener(_layerSelectionListener);
+
+         _decoratorShowLayer_Building = new ControlDecoration(_chkShowLayer_Building, SWT.TOP | SWT.LEFT);
       }
       {
          /*
@@ -505,6 +516,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
    private void enableControls() {
 
+      final boolean isCartographyVisible = _chkShowLayer_Cartography.getSelection();
       final boolean isHillShadingVisible = _chkShowLayer_Hillshading.getSelection();
       final boolean isLabelVisible = _chkShowLayer_Label.getSelection();
 
@@ -537,6 +549,26 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       _spinnerBuilding_MinZoomLevel.setEnabled(isBuilding_Visible);
       _spinnerBuilding_SunTime_Coarse.setEnabled(isBuilding_Sunrise_Sunset_Time);
       _spinnerBuilding_SunTime_Fine.setEnabled(isBuilding_Sunrise_Sunset_Time);
+
+      if (isCartographyVisible) {
+
+         _decoratorShowLayer_Building.hide();
+         _decoratorShowLayer_Label.hide();
+
+      } else {
+
+         final Image decorationImage = FieldDecorationRegistry.getDefault()
+               .getFieldDecoration(FieldDecorationRegistry.DEC_WARNING)
+               .getImage();
+
+         _decoratorShowLayer_Building.setDescriptionText(Messages.Slideout_Map25Layer_Decorator_Cartography);
+         _decoratorShowLayer_Building.setImage(decorationImage);
+         _decoratorShowLayer_Building.show();
+
+         _decoratorShowLayer_Label.setDescriptionText(Messages.Slideout_Map25Layer_Decorator_Cartography);
+         _decoratorShowLayer_Label.setImage(decorationImage);
+         _decoratorShowLayer_Label.show();
+      }
 
       // force UI update otherwise the slideout UI update is done after the map is updated
       _parent.update();

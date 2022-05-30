@@ -1783,7 +1783,6 @@ public class Messages extends NLS {
    public static String        Pref_Weather_Link_ApiSignup;
    public static String        Pref_Weather_Provider_None;
 
-
    public static String        Search_Manager_CreateFTIndex;
    public static String        Search_Manager_Log_DeletingLuceneRootFolder;
    public static String        Search_Manager_Log_LuceneRootFolderIsDeleted;
@@ -1977,6 +1976,7 @@ public class Messages extends NLS {
    public static String        Slideout_Map25Layer_Combo_SunPosition_CurrentTime;
    public static String        Slideout_Map25Layer_Combo_SunPosition_DayTime;
    public static String        Slideout_Map25Layer_Combo_SunPosition_NightTime;
+   public static String        Slideout_Map25Layer_Decorator_Cartography;
    public static String        Slideout_Map25Layer_Label_BuildingMinZoomLevel;
    public static String        Slideout_Map25Layer_Label_BuildingMinZoomLevel_Tooltip;
    public static String        Slideout_Map25Layer_Label_MapLayer;
