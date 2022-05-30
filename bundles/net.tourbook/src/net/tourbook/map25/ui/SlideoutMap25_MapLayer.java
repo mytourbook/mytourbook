@@ -210,12 +210,12 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
    private void createUI_50_Layer(final Composite parent) {
 
-//      final GridDataFactory centerGridData = GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER);
       final GridDataFactory indentGridData = GridDataFactory.fillDefaults().grab(true, false).indent(UI.FORM_FIRST_COLUMN_INDENT, 0);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
+      GridLayoutFactory.fillDefaults().spacing(5, 5).numColumns(1).applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
          {
             /*
@@ -234,7 +234,9 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
             _chkShowLayer_Label_IsBeforeBuilding.addSelectionListener(_layerSelectionListener);
             indentGridData.applyTo(_chkShowLayer_Label_IsBeforeBuilding);
          }
+
          createUI_60_Building(container);
+
          {
             /*
              * Scale
@@ -286,12 +288,12 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
                   _spinnerHillShadingOpacity.setIncrement(1);
                   _spinnerHillShadingOpacity.setPageIncrement(UI.TRANSFORM_OPACITY_MAX / 10);
                   _spinnerHillShadingOpacity.setToolTipText(tooltipText);
-
                   _spinnerHillShadingOpacity.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModify_HillShadingOpacity()));
                   _spinnerHillShadingOpacity.addMouseWheelListener(mouseEvent -> {
                      UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
                      onModify_HillShadingOpacity();
                   });
+                  GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.CENTER).applyTo(_spinnerHillShadingOpacity);
                }
             }
          }
@@ -374,6 +376,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
          final Composite containerSunPosition = new Composite(parent, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).indent(UI.FORM_FIRST_COLUMN_INDENT * 2, 0).applyTo(containerSunPosition);
          GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerSunPosition);
+//         containerSunPosition.setBackground(UI.SYS_COLOR_DARK_GREEN);
          {
             {
                // label
@@ -387,17 +390,19 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
                _comboBuilding_SunPosition.setVisibleItemCount(2);
                _comboBuilding_SunPosition.addFocusListener(_keepOpenListener);
                _comboBuilding_SunPosition.addSelectionListener(_layerSelectionListener);
-               centerGridData.applyTo(_comboBuilding_SunPosition);
+               GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.CENTER).applyTo(_comboBuilding_SunPosition);
             }
             final Composite containerSunTime = new Composite(containerSunPosition, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(containerSunTime);
             GridLayoutFactory.fillDefaults().numColumns(5).applyTo(containerSunTime);
+//            containerSunTime.setBackground(UI.SYS_COLOR_MAGENTA);
             {
                UI.createSpacer_Horizontal(containerSunTime, 1);
 
                final Composite containerSunriseSunset = new Composite(containerSunTime, SWT.NONE);
                GridDataFactory.fillDefaults().grab(true, false).span(4, 1).applyTo(containerSunriseSunset);
                GridLayoutFactory.fillDefaults().numColumns(3).applyTo(containerSunriseSunset);
+//               containerSunriseSunset.setBackground(UI.SYS_COLOR_BLUE);
                {
                   {
                      /*
@@ -473,6 +478,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
                   _spinnerBuilding_SunTime_Fine.setToolTipText(Messages.Slideout_Map25Layer_Spinner_SunTime_Fine);
                   _spinnerBuilding_SunTime_Fine.addSelectionListener(sunTimeSelectionListener);
                   _spinnerBuilding_SunTime_Fine.addMouseWheelListener(sunTimeMouseWheelListenerSpinner);
+                  GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.FILL).applyTo(_spinnerBuilding_SunTime_Fine);
 
                   _actionResetValue_SunTime_Fine = createUI_Action_ResetValue(containerSunTime, _spinnerBuilding_SunTime_Fine);
                }
@@ -484,7 +490,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
    private Action_ResetValue createUI_Action_ResetValue(final Composite parent, final Spinner spinner) {
 
       final ToolBar toolbar = new ToolBar(parent, SWT.FLAT);
-      GridDataFactory.fillDefaults().applyTo(toolbar);
+      GridDataFactory.fillDefaults().indent(-5, 0).applyTo(toolbar);
 
       final ToolBarManager tbm = new ToolBarManager(toolbar);
 
