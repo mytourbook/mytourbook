@@ -21,9 +21,9 @@ import org.oscim.map.Viewport;
  * is drawn as last and therefore the 'topmost' marker. It also gets checked for onTap first. This
  * class is generic, because you then you get your custom item-class passed back in onTap(). << TODO
  */
-public class MarkerLayer extends Layer implements GestureListener {
+public class MarkerLayerMT extends Layer implements GestureListener {
 
-   private final MarkerRenderer  _markerRenderer;
+   private final MarkerRendererMT  _markerRenderer;
 
    private final List<MapMarker> _allMarker = new ArrayList<>();
    private MapMarker             _focusedMarker;
@@ -33,7 +33,7 @@ public class MarkerLayer extends Layer implements GestureListener {
    private OnItemGestureListener _gestureListener;
 
    private final ActiveMarker    _activeMarker_SingleTap;
-   private final ActiveMarker    _ActiveMarker_LongPress;
+   private final ActiveMarker    _activeMarker_LongPress;
 
    {
       _activeMarker_SingleTap = new ActiveMarker() {
@@ -41,7 +41,7 @@ public class MarkerLayer extends Layer implements GestureListener {
          @Override
          public boolean run(final int index) {
 
-            final MarkerLayer that = MarkerLayer.this;
+            final MarkerLayerMT that = MarkerLayerMT.this;
 
             if (_gestureListener == null) {
                return false;
@@ -51,12 +51,12 @@ public class MarkerLayer extends Layer implements GestureListener {
          }
       };
 
-      _ActiveMarker_LongPress = new ActiveMarker() {
+      _activeMarker_LongPress = new ActiveMarker() {
 
          @Override
          public boolean run(final int index) {
 
-            final MarkerLayer that = MarkerLayer.this;
+            final MarkerLayerMT that = MarkerLayerMT.this;
 
             if (that._gestureListener == null) {
                return false;
@@ -106,11 +106,11 @@ public class MarkerLayer extends Layer implements GestureListener {
       boolean onSnapToItem(int x, int y, Point snapPoint);
    }
 
-   public MarkerLayer(final Map map, final OnItemGestureListener listener) {
+   public MarkerLayerMT(final Map map, final OnItemGestureListener listener) {
 
       super(map);
 
-      mRenderer = _markerRenderer = new MarkerRenderer(this);
+      mRenderer = _markerRenderer = new MarkerRendererMT(this);
 
       _gestureListener = listener;
 
@@ -224,7 +224,7 @@ public class MarkerLayer extends Layer implements GestureListener {
       }
 
       if (g instanceof Gesture.LongPress) {
-         return activateSelectedMarker(e, _ActiveMarker_LongPress);
+         return activateSelectedMarker(e, _activeMarker_LongPress);
       }
 
       return false;

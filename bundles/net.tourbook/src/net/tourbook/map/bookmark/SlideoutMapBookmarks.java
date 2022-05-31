@@ -265,7 +265,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
                final MapBookmark bookmark = (MapBookmark) cell.getElement();
                final MapPosition mapPos = bookmark.getMapPosition();
 
-               cell.setText(Integer.toString(mapPos.zoomLevel));
+               cell.setText(Integer.toString(mapPos.zoomLevel + 1));
             }
          });
          tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(5), true));

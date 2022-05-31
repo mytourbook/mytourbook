@@ -46,21 +46,21 @@ import org.oscim.layers.marker.MarkerSymbol.HotspotPlace;
 
 public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerInterface> {
 
-   private int                  _starColor       = 0xFFFFFF00;              // yellow is better to see                                                             // 100percent yellow
+   private int                   _starColor       = 0xFFFFFF00;              // yellow is better to see                                                             // 100percent yellow
 // private int                  _starColorBorder = 0xFFCBCB1F;
-   private int                  _starColorBorder = 0xFFff0000;
+   private int                   _starColorBorder = 0xFFff0000;
 
-   public MarkerSymbol          _markerSymbol;                              //marker symbol circle or star
+   public MarkerSymbol           _markerSymbol;                              //marker symbol circle or star
 
-   private Bitmap               _bitmapCircle;
-   private Bitmap               _bitmapClusterSymbol;
+   private Bitmap                _bitmapCircle;
+   private Bitmap                _bitmapClusterSymbol;
 
-   protected Paint              _fillPainter     = CanvasAdapter.newPaint();
-   private Paint                _linePainter     = CanvasAdapter.newPaint();
+   protected Paint               _fillPainter     = CanvasAdapter.newPaint();
+   private Paint                 _linePainter     = CanvasAdapter.newPaint();
 
-   public MarkerRendererFactory _markerRendererFactory;
+   private MarkerRendererFactory _markerRendererFactory;
 
-   private boolean              _isMarkerClusteredLast;
+   private boolean               _isMarkerClusteredLast;
 
    public MarkerToolkit(final MarkerShape shape) {
 
@@ -84,19 +84,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       _isMarkerClusteredLast = config.isMarkerClustered;
 
-      _markerRendererFactory = new MarkerRendererFactory() {
-
-         @Override
-         public MarkerRenderer create(final MarkerLayer markerLayer) {
-            return new ClusterMarkerRenderer(markerLayer, _markerSymbol, new ClusterMarkerRenderer.ClusterStyle(Color.WHITE, Color.BLUE)) {
-               @Override
-               protected Bitmap getClusterBitmap(final int size) {
-
-                  return createClusterBitmap(size);
-               }
-            };
-         }
-      };
+      setMarkerRenderer();
    }
 
    /**
@@ -510,6 +498,23 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
    public void setIsMarkerClusteredLast(final boolean isMarkerClusteredLast) {
       _isMarkerClusteredLast = isMarkerClusteredLast;
+   }
+
+   protected void setMarkerRenderer() {
+
+      _markerRendererFactory = new MarkerRendererFactory() {
+
+         @Override
+         public MarkerRenderer create(final MarkerLayer markerLayer) {
+            return new ClusterMarkerRenderer(markerLayer, _markerSymbol, new ClusterMarkerRenderer.ClusterStyle(Color.WHITE, Color.BLUE)) {
+               @Override
+               protected Bitmap getClusterBitmap(final int size) {
+
+                  return createClusterBitmap(size);
+               }
+            };
+         }
+      };
    }
 
 }

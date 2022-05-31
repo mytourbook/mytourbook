@@ -536,7 +536,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
                //
                // SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
                //
-               .hint(_pc.convertWidthInCharsToPixels(80), _pc.convertHeightInCharsToPixels(2))
+               .hint(_pc.convertWidthInCharsToPixels(80), _pc.convertHeightInCharsToPixels(6))
                .applyTo(_txtWeather);
       }
    }

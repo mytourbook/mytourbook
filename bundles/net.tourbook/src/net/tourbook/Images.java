@@ -170,6 +170,8 @@ public class Images {
    public static final String MapBookmark_Disabled                       = "map-bookmark-disabled.png";                           //$NON-NLS-1$
    public static final String MapBookmark_Location                       = "map-bookmark-location.png";                           //$NON-NLS-1$
    public static final String MapBookmark_New                            = "map-bookmark-new.png";                                //$NON-NLS-1$
+   public static final String MapLayer                                   = "map-layer.png";                                       //$NON-NLS-1$
+   public static final String MapLayer_Dark                              = "map-layer-dark.png";                                  //$NON-NLS-1$
    public static final String MapOptions                                 = "map-options.png";                                     //$NON-NLS-1$
    public static final String MapOptions_Dark                            = "map-options-dark.png";                                //$NON-NLS-1$
    public static final String MapOptions_Disabled                        = "map-options-disabled.png";                            //$NON-NLS-1$

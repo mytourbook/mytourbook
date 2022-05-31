@@ -150,7 +150,7 @@ public class TourDataView extends ViewPart {
          super(UI.EMPTY_STRING, AS_PUSH_BUTTON);
 
          // "Copy data into the clipboard"
-         setToolTipText(Messages.App_Action_CopyDataIntoClipboard);
+         setToolTipText(Messages.App_Action_CopyDataIntoClipboard_Tooltip);
 
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
          setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy_Disabled));
