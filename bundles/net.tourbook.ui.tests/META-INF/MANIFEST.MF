@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: GUI tests suite for MyTourbook
-Bundle-SymbolicName: net.tourbook.functional.tests;singleton:=true
+Bundle-SymbolicName: net.tourbook.ui.tests;singleton:=true
 Bundle-Version: 22.3.1.qualifier
 Require-Bundle: org.junit.jupiter.api;resolution:=optional,
  org.eclipse.swtbot.go
