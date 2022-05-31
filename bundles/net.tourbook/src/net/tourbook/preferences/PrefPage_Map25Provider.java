@@ -65,6 +65,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -382,7 +383,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          {
             /*
@@ -419,7 +420,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
       {
 
          {
@@ -660,7 +661,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(1).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//    container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          {
             /*
@@ -848,18 +849,18 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
    private void deleteOfflineMapFiles(final Map25Provider map25Provider) {
 
-//		if (MapProviderManager.deleteOfflineMap(map25Provider, false)) {
+//    if (MapProviderManager.deleteOfflineMap(map25Provider, false)) {
 //
-//			map25Provider.setStateToReloadOfflineCounter();
+//       map25Provider.setStateToReloadOfflineCounter();
 //
-//			// update viewer
-//			_mpViewer.update(map25Provider, null);
+//       // update viewer
+//       _mpViewer.update(map25Provider, null);
 //
-//			updateUIOfflineInfoTotal();
+//       updateUIOfflineInfoTotal();
 //
-//			// clear map image cache
-//			map25Provider.disposeTileImages();
-//		}
+//       // clear map image cache
+//       map25Provider.disposeTileImages();
+//    }
    }
 
    @Override
@@ -1032,8 +1033,8 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
       noDefaultAndApplyButton();
 
-      _defaultModifyListener = modifyEvent -> onProvider_Modify();
-      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onProvider_Modify());
+      _defaultModifyListener = modifyEvent -> onProvider_Modify(modifyEvent.widget);
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onProvider_Modify(selectionEvent.item));
    }
 
    private void initUI(final Composite parent) {
@@ -1181,8 +1182,8 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
    private void onProvider_Delete() {
 
-//		Title:     Delete Map Provider
-//		Message:   Are you sure to delete the map provider "{0}" and all it's offline images?
+//    Title:     Delete Map Provider
+//    Message:   Are you sure to delete the map provider "{0}" and all it's offline images?
 
       if (MessageDialog.openConfirm(
             getShell(),
@@ -1229,9 +1230,13 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
       enableControls();
    }
 
-   private void onProvider_Modify() {
+   private void onProvider_Modify(final Widget widget) {
 
       if (_isInUpdateUI) {
+         return;
+      }
+
+      if (widget != null && UI.isLinuxAsyncEvent(widget)) {
          return;
       }
 
@@ -1329,7 +1334,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
       // show error message when selected map provider is not valid
       isDataValid();
-      
+
       enableControls();
    }
 
@@ -1386,7 +1391,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
       updateUI_TileEncoding();
 
-      onProvider_Modify();
+      onProvider_Modify(null);
    }
 
    @Override
@@ -1674,6 +1679,8 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
 
       }
       _isInUpdateUI = isInUpdateUI_Backup;
+
+      _comboOffline_ThemeStyle.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
    }
 
    /**
@@ -1709,7 +1716,7 @@ public class PrefPage_Map25Provider extends PreferencePage implements IWorkbench
        * Fill combo with styles
        */
 
-      if (mfStyles != null && mfStyles.isEmpty()) {
+      if (mfStyles == null || mfStyles != null && mfStyles.isEmpty()) {
 
          _comboOffline_ThemeStyle.add(Messages.Pref_Map25_Provider_ThemeStyle_Info_NoStyles);
          _comboOffline_ThemeStyle.select(0);
