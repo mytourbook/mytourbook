@@ -1457,12 +1457,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          if (checkMapFile(new File(offlineMapFilePath))) {
             StatusUtil.logInfo("[2.5D Map] Using map file: " + offlineMapFilePath); //$NON-NLS-1$
          } else {
-            throw new IllegalArgumentException("[2.5D Map] Cannot read map file: " + offlineMapFilePath); //$NON-NLS-1$
+            final String errorText = "[2.5D Map] Cannot read map file: " + offlineMapFilePath;
+            StatusUtil.showStatus(errorText);
+            throw new IllegalArgumentException(errorText);
          }
 
          tileSource = getAllOfflineMapFiles(offlineMapFilePath);
          if (_numOfflineMapFiles == 0) {
-            throw new IllegalArgumentException("[2.5D Map] Cannot read multiple map files from: " + offlineMapFilePath); //$NON-NLS-1$
+            final String errorText = "[2.5D Map] Cannot read multiple map files from: " + offlineMapFilePath;
+            StatusUtil.showStatus(errorText);
+            throw new IllegalArgumentException(errorText);
          }
 
          _currentOffline_TileSource = tileSource;
