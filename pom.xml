@@ -171,7 +171,7 @@
          <artifactId>maven-surefire-plugin</artifactId>        <groupId>org.apache.maven.plugins</groupId>
                                                                <version>3.0.0-M6</version>
          <configuration>
-            <skipTests>true</skipTests>
+            <skipTests>false</skipTests>
          </configuration>
          <executions>
             <execution>
@@ -204,7 +204,7 @@
              <useUIThread>false</useUIThread>
               <product>net.tourbook.productWithoutJRE</product>
               <application>net.tourbook.appWithoutJRE</application>
-             <skipTests>true</skipTests>
+             <skipTests>false</skipTests>
 	     <osgiDataDirectory>${project.basedir}/workspace</osgiDataDirectory>
  	     <deleteOsgiDataDirectory>false</deleteOsgiDataDirectory>
          </configuration>
@@ -226,7 +226,7 @@
                   <goal>report-aggregate</goal>
                </goals>
                <configuration>
-                  <skip>true</skip>
+                  <skip>false</skip>
                </configuration>
             </execution>
             <execution>
@@ -236,7 +236,7 @@
                   <goal>report</goal>
                </goals>
                <configuration>
-                  <skip>true</skip>
+                  <skip>false</skip>
                </configuration>
             </execution>
          </executions>
