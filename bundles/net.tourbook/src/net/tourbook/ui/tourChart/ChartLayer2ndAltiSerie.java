@@ -90,12 +90,12 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       final boolean isDiffValues = yDiffTo2ndSerie != null;
       final boolean isAdjustedValues = yAdjustedSerie != null;
 
-      final boolean isPointInGraph = _splineData != null && _splineData.splinePoint_DataSerieIndex != null;
+      final boolean isSplinePointInGraph = _splineData != null && _splineData.splinePoint_DataSerieIndex != null;
 
-      if (xValues == null || xValues.length == 0 /*
-                                                  * || yValues2ndSerie == null ||
-                                                  * yValues2ndSerie.length == 0
-                                                  */) {
+      if (xValues == null || xValues.length == 0
+//        || yValues2ndSerie == null || yValues2ndSerie.length == 0
+      ) {
+
          return;
       }
 
@@ -122,7 +122,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       _devY0Spline = devYBottom - devGraphHeight / 2;
 
       /*
-       * convert all diff values into positive values
+       * Convert all diff values into positive values
        */
       float[] diffValues = null;
       double scaleValueDiff = _scaleY;
@@ -132,6 +132,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
          float maxValueDiff = 0;
 
          diffValues = new float[yDiffTo2ndSerie.length];
+
          for (float valueDiff : yDiffTo2ndSerie) {
             diffValues[valueIndex++] = valueDiff = (valueDiff < 0) ? -valueDiff : valueDiff;
             maxValueDiff = (maxValueDiff >= valueDiff) ? maxValueDiff : valueDiff;
@@ -331,14 +332,13 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       /*
        * paint spline points
        */
-      final SplineData splineData = _tourData.splineDataPoints;
-      if (splineData != null) {
+      if (isSplinePointInGraph) {
 
          final int[] graphSerieIndex = _splineData.splinePoint_DataSerieIndex;
 
-         final double[] graphXSplineValues = splineData.posX_GraphValues;
-         final double[] graphYSplineValues = splineData.posY_GraphValues;
-         final boolean[] isPointMovable = splineData.isPointMovable;
+         final double[] graphXSplineValues = _splineData.posX_GraphValues;
+         final double[] graphYSplineValues = _splineData.posY_GraphValues;
+         final boolean[] isPointMovable = _splineData.isPointMovable;
 
          final int splinePointLength = graphXSplineValues.length;
 
@@ -422,7 +422,7 @@ public class ChartLayer2ndAltiSerie implements IChartLayer {
       /*
        * Paint spline points in the graph
        */
-      if (isPointInGraph && isAdjustedValues) {
+      if (isSplinePointInGraph && isAdjustedValues) {
 
          gc.setForeground(UI.IS_DARK_THEME
                ? new Color(245, 245, 245, 0xff)
