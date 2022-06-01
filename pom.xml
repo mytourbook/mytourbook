@@ -202,11 +202,11 @@
          <configuration>
              <useUIHarness>true</useUIHarness>
              <useUIThread>false</useUIThread>
-              <product>net.tourbook.productWithoutJRE</product>
-              <application>net.tourbook.appWithoutJRE</application>
+             <product>net.tourbook.productWithoutJRE</product>
+             <application>net.tourbook.appWithoutJRE</application>
              <skipTests>false</skipTests>
-	     <osgiDataDirectory>${project.basedir}/workspace</osgiDataDirectory>
- 	     <deleteOsgiDataDirectory>false</deleteOsgiDataDirectory>
+             <osgiDataDirectory>${project.basedir}/workspace</osgiDataDirectory>
+             <deleteOsgiDataDirectory>false</deleteOsgiDataDirectory>
          </configuration>
       </plugin>
       
