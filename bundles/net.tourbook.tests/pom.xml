@@ -28,7 +28,7 @@
          <configuration>
              <useUIHarness>true</useUIHarness>
              <useUIThread>true</useUIThread>
-	     <product>org.eclipse.platform.ide</product>
+             <product>org.eclipse.platform.ide</product>
              <skipTests>true</skipTests>
          </configuration>
       </plugin>
