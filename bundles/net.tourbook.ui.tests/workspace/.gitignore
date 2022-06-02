@@ -6,3 +6,4 @@ derby-database/*.log
 .metadata/.plugins/net.tourbook.common/invalidfiles_to_ignore.txt
 .metadata/.plugins/org.eclipse.jdt.ui/*
 .metadata/.plugins/net.tourbook/calendar-profiles.xml
+.metadata/.plugins/net.tourbook.web/*
