@@ -8,10 +8,45 @@
 		</list>
 	</section>
 	<section name="TourFilter">
+		<item key="STATE_HORIZ_SLIDEOUT_WIDTH" value="900"/>
+		<item key="STATE_HORIZ_SLIDEOUT_HEIGHT" value="200"/>
+		<item key="STATE_VERT_SLIDEOUT_WIDTH" value="900"/>
+		<item key="STATE_VERT_SLIDEOUT_HEIGHT" value="200"/>
+		<item key="STATE_IS_SLIDEOUT_PINNED" value="false"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_IS_KEEP_SLIDEOUT_OPEN" value="false"/>
 	</section>
 	<section name="TourTagFilterSlideout">
+		<item key="STATE_IS_HIERARCHICAL_LAYOUT" value="true"/>
+		<item key="STATE_IS_LIVE_UPDATE" value="false"/>
+		<item key="STATE_HORIZ_SLIDEOUT_WIDTH" value="700"/>
+		<item key="STATE_HORIZ_SLIDEOUT_HEIGHT" value="400"/>
+		<item key="STATE_VERT_SLIDEOUT_WIDTH" value="700"/>
+		<item key="STATE_VERT_SLIDEOUT_HEIGHT" value="400"/>
+		<item key="STATE_IS_SLIDEOUT_PINNED" value="false"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_IS_KEEP_SLIDEOUT_OPEN" value="false"/>
 	</section>
 	<section name="TourGeoFilter">
+		<item key="STATE_SORT_COLUMN_ID" value="createdDateTime"/>
+		<item key="STATE_SORT_COLUMN_DIRECTION" value="1"/>
+		<item key="XML_STATE_COLUMN_MANAGER" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;ColumnProfiles isShowCategory=&quot;true&quot; isShowColumnAnnotation_Formatting=&quot;false&quot; isShowColumnAnnotation_Sorting=&quot;false&quot;&gt;&#x0D;&#x0A;&lt;Profile isActiveProfile=&quot;true&quot; name=&quot;Column Profile&quot; visibleColumnIds=&quot;filterName,createdDateTime,geoParts,zoomLevel,&quot; visibleColumnIdsAndWidth=&quot;filterName,72,createdDateTime,120,geoParts,36,zoomLevel,30,&quot;&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;filterName&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;createdDateTime&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;geoParts&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;zoomLevel&quot;/&gt;&#x0D;&#x0A;&lt;/Profile&gt;&#x0D;&#x0A;&lt;/ColumnProfiles&gt;"/>
+		<item key="STATE_HORIZ_SLIDEOUT_WIDTH" value="700"/>
+		<item key="STATE_HORIZ_SLIDEOUT_HEIGHT" value="200"/>
+		<item key="STATE_VERT_SLIDEOUT_WIDTH" value="700"/>
+		<item key="STATE_VERT_SLIDEOUT_HEIGHT" value="200"/>
+		<item key="STATE_IS_SLIDEOUT_PINNED" value="false"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_IS_KEEP_SLIDEOUT_OPEN" value="false"/>
 	</section>
 	<section name="TourTypeFilterManager">
 		<item key="application.last-selected-tourtypefilter" value="All Tour Types"/>
