@@ -26,22 +26,11 @@ public class BasicTests {
 
    private static SWTBot bot;
 
-   // todo fb, redo the workspace in english
-
    @BeforeEach
    public void beforeClass() {
+
       bot = new SWTBot();
-      SWTBotPreferences.TIMEOUT = 20000;
-
-//		final SWTBotButton myTourbookMenu = bot.button("OK").click();
-//		assertNotNull(myTourbookMenu);
-//		final SWTBotButton measurementSystemMenu = bot.button("OK").click();
-//		assertNotNull(measurementSystemMenu);
-//		final SWTBotButton peopleMenu = bot.button("Apply and Close").click();
-//		assertNotNull(peopleMenu);
-//		final SWTBotButton firstStartMenu = bot.button("OK").click();
-//		assertNotNull(firstStartMenu);
-
+      SWTBotPreferences.TIMEOUT = 10000;
    }
 
    @Test
