@@ -13,9 +13,11 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.weather;
+package net.tourbook.common.weather;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+
+import net.tourbook.weather.WeatherUtils;
 
 import org.junit.jupiter.api.Test;
 
