@@ -24,9 +24,10 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.BeforeClass;
 import org.junit.jupiter.api.Test;
 
-public class BasicTests {
+public class WorkbenchTests {
 
-   private SWTWorkbenchBot bot = new SWTWorkbenchBot();
+   private SWTWorkbenchBot bot               = new SWTWorkbenchBot();
+   private String          tourBookViewTitle = "Tour Book";
 
    @BeforeClass
    public static void beforeClass() {
@@ -40,17 +41,12 @@ public class BasicTests {
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click();
       bot.button("Apply and Close").click();
    }
-//   bot.viewByTitle("Tour Editor").show();
-//   bot.viewByTitle("Tour Editor").show();
-//   bot.viewByTitle("Tour Editor").show();
-//   bot.comboBox().setText("New Title");
-//   bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click();
 
    @Test
    void testOpenViews() {
 
       //Select a tour so that the selected views contain information
-      final SWTBotView tourBookView = bot.viewByTitle("Tour Book");
+      final SWTBotView tourBookView = bot.viewByTitle(tourBookViewTitle);
       assertNotNull(tourBookView);
       tourBookView.show();
 
@@ -99,7 +95,7 @@ public class BasicTests {
    @Test
    void testTourMarkerView() {
 
-      final SWTBotView tourBookView = bot.viewByTitle("Tour Book");
+      final SWTBotView tourBookView = bot.viewByTitle(tourBookViewTitle);
       assertNotNull(tourBookView);
       tourBookView.show();
 
@@ -122,7 +118,7 @@ public class BasicTests {
    @Test
    void testTourPausesView() {
 
-      final SWTBotView tourBookView = bot.viewByTitle("Tour Book");
+      final SWTBotView tourBookView = bot.viewByTitle(tourBookViewTitle);
       assertNotNull(tourBookView);
       tourBookView.show();
 
