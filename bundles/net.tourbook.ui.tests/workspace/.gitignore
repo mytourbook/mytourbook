@@ -2,3 +2,5 @@ offline-map
 derby-database/lucene-index/*
 derby-database/tourbook/log/*
 .metadata/.plugins/org.eclipse.ui.workbench/workingsets.xml
+.metadata/.plugins/org.eclipse.oomph.setup.ui/dialog_settings.xml
+.metadata/.plugins/org.eclipse.oomph.setup/*
