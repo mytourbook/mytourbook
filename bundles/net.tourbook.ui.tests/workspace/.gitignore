@@ -7,3 +7,4 @@ derby-database/tourbook/log/*
 .metadata/.plugins/org.eclipse.jdt.ui/*
 .metadata/.plugins/org.eclipse.jdt.core/*
 .metadata/.plugins/org.eclipse.egit.core/*
+.metadata/.plugins/org.eclipse.core.runtime/*
