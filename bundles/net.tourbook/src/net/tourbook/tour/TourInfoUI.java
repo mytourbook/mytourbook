@@ -64,11 +64,13 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -189,6 +191,8 @@ public class TourInfoUI {
     */
    private Color _bgColor;
    private Color _fgColor;
+
+   private Font  _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    /*
     * UI controls
@@ -1109,7 +1113,7 @@ public class TourInfoUI {
       _lowerPartContainer.setBackground(_bgColor);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_lowerPartContainer);
       GridLayoutFactory.fillDefaults().numColumns(numColumns).spacing(16, 0).applyTo(_lowerPartContainer);
-//      _lowerPartContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
+//      _lowerPartContainer.setBackground(UI.SYS_COLOR_CYAN);
       {
 
          createUI_92_SensorValues(_lowerPartContainer);
@@ -1126,8 +1130,8 @@ public class TourInfoUI {
             _lblTourType_Value = createUI_LabelValue(_lowerPartContainer, SWT.LEAD | SWT.WRAP);
             GridDataFactory.fillDefaults()
                   .span(numColumns - 1, 1)
-                  .grab(true, false)
-                  .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
+//                  .grab(true, false)
+//                  .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
                   .indent(0, 5)
                   .applyTo(_lblTourType_Value);
          }
@@ -1141,8 +1145,8 @@ public class TourInfoUI {
             _lblTourTags_Value = createUI_LabelValue(_lowerPartContainer, SWT.LEAD | SWT.WRAP);
             GridDataFactory.fillDefaults()
                   .span(numColumns - 1, 1)
-                  .grab(true, false)
-                  .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
+//                  .grab(true, false)
+//                  .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
                   .applyTo(_lblTourTags_Value);
          }
          {
@@ -1150,16 +1154,20 @@ public class TourInfoUI {
              * Weather
              */
             _lblWeather = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_Weather);
+            _lblWeather.setFont(_boldFont);
             GridDataFactory.fillDefaults()
                   .span(numColumns, 1)
-                  .indent(0, 5)
+                  .indent(0, 10)
                   .applyTo(_lblWeather);
 
-            _txtWeather = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER);
+            _txtWeather = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY
+//                  | SWT.BORDER
+            );
             GridDataFactory.fillDefaults()
                   .span(numColumns, 1)
-                  .grab(true, false)
-                  .hint(_defaultTextWidth, SWT.DEFAULT)
+//                  .indent(-5, 0)
+//                  .grab(true, false)
+//                  .hint(_defaultTextWidth, SWT.DEFAULT)
                   .applyTo(_txtWeather);
 
             _txtWeather.setForeground(_fgColor);
@@ -1172,13 +1180,16 @@ public class TourInfoUI {
 
             // label
             _lblDescription = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_Description);
+            _lblDescription.setFont(_boldFont);
             GridDataFactory.fillDefaults()
                   .span(numColumns, 1)
-                  .indent(0, 5)
+                  .indent(0, 10)
                   .applyTo(_lblDescription);
 
             // text field
-            int style = SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER;
+            int style = SWT.WRAP | SWT.MULTI | SWT.READ_ONLY
+//                  | SWT.BORDER
+            ;
             _descriptionLineCount = Util.countCharacter(_tourData.getTourDescription(), '\n');
 
             if (_descriptionLineCount > _descriptionScroll_Lines) {
@@ -1188,8 +1199,9 @@ public class TourInfoUI {
             _txtDescription = new Text(_lowerPartContainer, style);
             GridDataFactory.fillDefaults()
                   .span(numColumns, 1)
-                  .grab(true, false)
-                  .hint(_defaultTextWidth, SWT.DEFAULT)
+//                  .indent(-5, 0)
+//                  .grab(true, false)
+//                  .hint(_defaultTextWidth, SWT.DEFAULT)
                   .applyTo(_txtDescription);
 
             if (_descriptionLineCount > _descriptionScroll_Lines) {
@@ -1426,7 +1438,7 @@ public class TourInfoUI {
        * !!! It is important that the width value is not too large otherwise empty lines (because of
        * the default width) are added below the text control when there is a lot of content
        */
-      _defaultTextWidth = pc.convertWidthInCharsToPixels(70);
+      _defaultTextWidth = pc.convertWidthInCharsToPixels(75);
       _descriptionScroll_Height = pc.convertHeightInCharsToPixels(_descriptionScroll_Lines);
    }
 
