@@ -1,2 +1,4 @@
 offline-map
 derby-database/lucene-index
+.metadata/.plugins/org.eclipse.core.resources/.projects/.org.eclipse.egit.core.cmp/*
+.metadata/.plugins/org.eclipse.core.resources/0.snap
