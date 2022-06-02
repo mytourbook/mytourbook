@@ -1,3 +1,4 @@
 offline-map
 derby-database/lucene-index/*
 derby-database/tourbook/log/*
+.metadata/.plugins/org.eclipse.ui.workbench/workingsets.xml
