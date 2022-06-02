@@ -9,3 +9,4 @@ derby-database/*.log
 .metadata/.plugins/org.eclipse.egit.core/*
 .metadata/.plugins/org.eclipse.oomph.setup/*
 .metadata/.plugins/org.eclipse.oomph.setup.ui/*
+.metadata/.plugins/org.eclipse.ui.workbench/*
