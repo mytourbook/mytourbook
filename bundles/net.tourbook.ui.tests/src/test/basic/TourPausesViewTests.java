@@ -20,10 +20,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.BeforeClass;
 import org.junit.jupiter.api.Test;
 
-public class TourDataEditorViewTests {
+public class TourPausesViewTests {
 
    private SWTWorkbenchBot bot = new SWTWorkbenchBot();
 
@@ -34,26 +35,24 @@ public class TourDataEditorViewTests {
    }
 
    @Test
-   void testNewTourTitle() {
+   void testTourPausesView() {
 
-      final SWTBotView tourEditorView = bot.viewByTitle("Tour Editor");
-      assertNotNull(tourEditorView);
-      tourEditorView.show();
+      final SWTBotView tourBookView = bot.viewByTitle("Tour Book");
+      assertNotNull(tourBookView);
+      tourBookView.show();
 
-      bot.cTabItem("Tour").activate();
+      final String march2020 = "2021   2";
+      bot.tree().getTreeItem(march2020).expand();
+      final String january = "Jan   2";
+      final SWTBotTreeItem januaryNode = bot.tree().getTreeItem(march2020).getNode(january);
+      januaryNode.expand();
+      januaryNode.select();
+      januaryNode.getNode("31").select();
 
-      bot.comboBox().setText("New Title");
-      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click();
-   }
+      final SWTBotView tourPausesView = bot.viewByTitle("Tour Pauses");
+      assertNotNull(tourPausesView);
+      tourPausesView.show();
 
-   @Test
-   void testViewTabs() {
-
-      final SWTBotView tourEditorView = bot.viewByTitle("Tour Editor");
-      assertNotNull(tourEditorView);
-      tourEditorView.show();
-
-      bot.cTabItem("Time Slices").activate();
-      bot.cTabItem("Swim Slices").activate();
+      bot.table().select("15:40");
    }
 }
