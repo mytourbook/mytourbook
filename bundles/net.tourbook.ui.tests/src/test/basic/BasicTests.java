@@ -32,7 +32,6 @@ public class BasicTests {
    public static void beforeClass() {
 
       SWTBotPreferences.TIMEOUT = 10000;
-      SWTBotPreferences.PLAYBACK_DELAY = 5000;
    }
 
    @Test
@@ -41,6 +40,11 @@ public class BasicTests {
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click();
       bot.button("Apply and Close").click();
    }
+//   bot.viewByTitle("Tour Editor").show();
+//   bot.viewByTitle("Tour Editor").show();
+//   bot.viewByTitle("Tour Editor").show();
+//   bot.comboBox().setText("New Title");
+//   bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click();
 
    @Test
    void testOpenViews() {

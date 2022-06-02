@@ -116,7 +116,7 @@
 	</section>
 	<section name="net.tourbook.views.TourDataEditorView">
 		<item key="tourDataEditor.selectedTab" value="0"/>
-		<item key="tourDataEditor.isEditMode" value="false"/>
+		<item key="tourDataEditor.isEditMode" value="true"/>
 		<item key="tourDataEditor.rowEditMode" value="false"/>
 		<item key="STATE_SECTION_CHARACTERISTICS" value="true"/>
 		<item key="STATE_SECTION_DATE_TIME" value="true"/>
@@ -137,12 +137,13 @@
 		<item key="XML_STATE_EASY_IMPORT" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;EasyImportConfig&gt;&#x0D;&#x0A;&lt;DashConfig animationCrazyFactor=&quot;1&quot; animationDuration=&quot;20&quot; backgroundOpacity=&quot;5&quot; isLiveUpdate=&quot;true&quot; isLogDetails=&quot;false&quot; isShowTile_CloudApps=&quot;true&quot; isShowTile_Files=&quot;true&quot; isShowTile_FossilUI=&quot;true&quot; isShowTile_SerialPort=&quot;false&quot; isShowTile_SerialPortWithConfig=&quot;false&quot; stateTooltipDisplayAbsoluteFilePath=&quot;false&quot; stateTooltipWidth=&quot;500&quot; tileSize=&quot;100&quot; uiColumns=&quot;5&quot;/&gt;&#x0D;&#x0A;&lt;ImportConfig backupFolder=&quot;&quot; deviceFiles=&quot;*&quot; deviceFolder=&quot;&quot; deviceType=&quot;0&quot; isActiveConfig=&quot;true&quot; isCreateBackup=&quot;true&quot; isDeleteDeviceFiles=&quot;false&quot; isTurnOffWatching=&quot;false&quot; name=&quot;My Tour Recording Device&quot;/&gt;&#x0D;&#x0A;&lt;LauncherConfig description=&quot;Start easy import with this configuration.&quot; isAdjustTemperature=&quot;false&quot; isReplaceFirstTimeSliceElevation=&quot;false&quot; isRetrieveWeatherData=&quot;false&quot; isSaveTour=&quot;false&quot; isSetLastMarker=&quot;false&quot; isSetTourType=&quot;false&quot; isShowInDashBoard=&quot;true&quot; lastMarkerDistance=&quot;0&quot; lastMarkerText=&quot;&quot; name=&quot;Start Import&quot; temperatureAdjustmentDuration=&quot;720&quot; tourAverageTemperature=&quot;15.0&quot;/&gt;&#x0D;&#x0A;&lt;/EasyImportConfig&gt;"/>
 	</section>
 	<section name="net.tourbook.views.tourListView">
-		<item key="STATE_SELECTED_YEAR" value="-1"/>
-		<item key="STATE_SELECTED_MONTH" value="-1"/>
+		<item key="STATE_SELECTED_YEAR" value="2021"/>
+		<item key="STATE_SELECTED_MONTH" value="1"/>
 		<item key="STATE_IS_SELECT_YEAR_MONTH_TOURS" value="false"/>
 		<item key="STATE_IS_LINK_WITH_OTHER_VIEWS" value="false"/>
 		<item key="STATE_VIEW_LAYOUT" value="CATEGORY_MONTH"/>
 		<list key="STATE_SELECTED_TOURS">
+			<item value="202113022473019"/>
 		</list>
 		<list key="STATE_SORT_COLUMN_ID">
 			<item value="TIME_DATE"/>
@@ -156,5 +157,17 @@
 	</section>
 	<section name="net.tourbook.views.tourListView_TREE">
 		<item key="XML_STATE_COLUMN_MANAGER" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;ColumnProfiles isShowCategory=&quot;true&quot; isShowColumnAnnotation_Formatting=&quot;false&quot; isShowColumnAnnotation_Sorting=&quot;false&quot;&gt;&#x0D;&#x0A;&lt;Profile isActiveProfile=&quot;true&quot; name=&quot;Column Profile&quot; visibleColumnIds=&quot;TIME_DATE,TIME_WEEK_DAY,TIME_TOUR_START_TIME,TIME__COMPUTED_MOVING_TIME,TOUR_TYPE,TOUR_TITLE,TOUR_NUM_MARKERS,TOUR_NUM_PHOTOS,TOUR_TAGS,MOTION_DISTANCE,ALTITUDE_UP,ALTITUDE_AVG_CHANGE,WEATHER_CLOUDS,&quot; visibleColumnIdsAndWidth=&quot;TIME_DATE,108,TIME_WEEK_DAY,30,TIME_TOUR_START_TIME,72,TIME__COMPUTED_MOVING_TIME,60,TOUR_TYPE,30,TOUR_TITLE,120,TOUR_NUM_MARKERS,30,TOUR_NUM_PHOTOS,48,TOUR_TAGS,120,MOTION_DISTANCE,72,ALTITUDE_UP,60,ALTITUDE_AVG_CHANGE,60,WEATHER_CLOUDS,25,&quot;&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME_DATE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME_WEEK_DAY&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME_TOUR_START_TIME&quot; detailFormat=&quot;TIME_HH_MM&quot;/&gt;&#x0D;&#x0A;&lt;Column categoryFormat=&quot;TIME_HH&quot; columnId=&quot;TIME__COMPUTED_MOVING_TIME&quot; detailFormat=&quot;TIME_HH_MM&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TYPE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TITLE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_NUM_MARKERS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_NUM_PHOTOS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TAGS&quot;/&gt;&#x0D;&#x0A;&lt;Column categoryFormat=&quot;NUMBER_1_0&quot; columnId=&quot;MOTION_DISTANCE&quot; detailFormat=&quot;NUMBER_1_3&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;ALTITUDE_UP&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;ALTITUDE_AVG_CHANGE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WEATHER_CLOUDS&quot;/&gt;&#x0D;&#x0A;&lt;/Profile&gt;&#x0D;&#x0A;&lt;/ColumnProfiles&gt;"/>
+	</section>
+	<section name="TourStatisticsView">
+	</section>
+	<section name="TourCalendarView">
+	</section>
+	<section name="SlideoutCalendarOptions">
+	</section>
+	<section name="net.tourbook.views.TourWaypointView">
+	</section>
+	<section name="net.tourbook.ui.views.TourPausesView">
+	</section>
+	<section name="TourTagsView">
 	</section>
 </section>
