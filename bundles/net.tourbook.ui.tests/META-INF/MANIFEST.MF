@@ -5,7 +5,7 @@ Bundle-SymbolicName: net.tourbook.ui.tests;singleton:=true
 Bundle-Version: 22.6.0.qualifier
 Require-Bundle: net.tourbook,
  org.junit.jupiter.api;bundle-version="5.8.1",
- org.eclipse.swtbot.go;bundle-version="3.1.0"
+ org.eclipse.swtbot.go;bundle-version="3.2.0"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Vendor: MyTourbook
