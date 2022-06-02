@@ -140,6 +140,7 @@ public class UI {
    public static final String       NEW_LINE1                          = "\n";                  //$NON-NLS-1$
    public static final String       NEW_LINE2                          = "\n\n";                //$NON-NLS-1$
    public static final String       NEW_LINE3                          = "\n\n\n";              //$NON-NLS-1$
+   public static final String       NULL                               = "null";                //$NON-NLS-1$
    public static final String       RESET_LABEL                        = " X ";                 //$NON-NLS-1$
    public static final String       SLASH                              = "/";                   //$NON-NLS-1$
    public static final String       SLASH_WITH_SPACE                   = " / ";                 //$NON-NLS-1$
@@ -625,6 +626,7 @@ public class UI {
 
    public static Color           SYS_COLOR_BLACK;
    public static Color           SYS_COLOR_BLUE;
+   public static Color           SYS_COLOR_CYAN;
    public static Color           SYS_COLOR_GRAY;
    public static Color           SYS_COLOR_GREEN;
    public static Color           SYS_COLOR_MAGENTA;
@@ -683,6 +685,7 @@ public class UI {
 
       SYS_COLOR_BLACK       = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
       SYS_COLOR_BLUE        = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
+      SYS_COLOR_CYAN        = Display.getCurrent().getSystemColor(SWT.COLOR_CYAN);
       SYS_COLOR_GRAY        = Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
       SYS_COLOR_GREEN       = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
       SYS_COLOR_MAGENTA     = Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA);

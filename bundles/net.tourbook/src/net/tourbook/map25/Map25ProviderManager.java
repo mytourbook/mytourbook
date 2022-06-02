@@ -222,7 +222,14 @@ public class Map25ProviderManager {
 
       for (final Map25Provider map25Provider : getAllMapProviders()) {
 
-         if (mapProviderId.equals(map25Provider.getId())) {
+         if (mapProviderId.equals(map25Provider.getId())
+
+               /*
+                * Ensure this map provider is also enabled, this allows to disable map providers
+                * which has errors, e.g. wrong map/theme file
+                */
+               && map25Provider.isEnabled) {
+
             return map25Provider;
          }
       }
