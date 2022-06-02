@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  * Copyright (C) 2022 Frédéric Bard
  *
@@ -25,13 +26,12 @@ public class BasicTests {
 
    private static SWTBot bot;
 
-	// todo fb, redo the workspace in english
+   // todo fb, redo the workspace in english
 
    @BeforeEach
    public void beforeClass() {
-		bot = new SWTBot();
-		SWTBotPreferences.TIMEOUT = 20000;
-		// the best would be to copy a database that already has tours
+      bot = new SWTBot();
+      SWTBotPreferences.TIMEOUT = 20000;
 
 //		final SWTBotButton myTourbookMenu = bot.button("OK").click();
 //		assertNotNull(myTourbookMenu);
@@ -44,12 +44,12 @@ public class BasicTests {
 
    }
 
-	@Test
-	void testOpenPreferences() {
+   @Test
+   void testOpenPreferences() {
 
-		bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click();
-		bot.button("Apply and Close").click();
-	}
+      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click();
+      bot.button("Apply and Close").click();
+   }
 
 //	@Test
 //	void testStatisticsView() {
@@ -62,21 +62,21 @@ public class BasicTests {
 //		bot.sleep(5000);
 //	}
 
-	@Test
-	void testTourMarkerView() {
+   @Test
+   void testTourMarkerView() {
 
-		// This is the equivalent of
-		// bot.viewByTitle("Calendar").show();
-		// for SWTBot.
-		bot.menu("Tour Editor");
+      // This is the equivalent of
+      // bot.viewByTitle("Calendar").show();
+      // for SWTBot.
+      bot.menu("Tour Editor");
 
-		bot.tree().getTreeItem("2020   3").expand();
-		bot.tree().getTreeItem("2020   3").getNode("May   2").expand();
-		bot.tree().getTreeItem("2020   3").getNode("May   2").select();
-		bot.tree().getTreeItem("2020   3").getNode("May   2").getNode("23").select();
-		final SWTBotMenu tourMarkerView = bot.menu("Tour Markers");
-		assertNotNull(tourMarkerView);
-		bot.table().select(0);
-		bot.table().select(1);
-	}
+      bot.tree().getTreeItem("2020   3").expand();
+      bot.tree().getTreeItem("2020   3").getNode("May   2").expand();
+      bot.tree().getTreeItem("2020   3").getNode("May   2").select();
+      bot.tree().getTreeItem("2020   3").getNode("May   2").getNode("23").select();
+      final SWTBotMenu tourMarkerView = bot.menu("Tour Markers");
+      assertNotNull(tourMarkerView);
+      bot.table().select(0);
+      bot.table().select(1);
+   }
 }
