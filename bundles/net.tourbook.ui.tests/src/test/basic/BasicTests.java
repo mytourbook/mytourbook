@@ -1,4 +1,3 @@
-
 /*******************************************************************************
  * Copyright (C) 2022 Frédéric Bard
  *
@@ -14,22 +13,23 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
+package basic;
+
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.BeforeClass;
 import org.junit.jupiter.api.Test;
 
 public class BasicTests {
 
-   private static SWTBot bot;
+   private SWTBot bot = new SWTBot();
 
-   @BeforeEach
-   public void beforeClass() {
+   @BeforeClass
+   public static void beforeClass() {
 
-      bot = new SWTBot();
       SWTBotPreferences.TIMEOUT = 10000;
    }
 
@@ -40,16 +40,12 @@ public class BasicTests {
       bot.button("Apply and Close").click();
    }
 
-//	@Test
-//	void testStatisticsView() {
+//   @Test
+//   void testStatisticsView() {
 //
-//		bot.sleep(5000);
-//		final SWTBotMenu statisticsView = bot.menu("Statistiques");// todo fb
-//																	// rename in
-//																	// english
-//		assertNotNull(statisticsView);
-//		bot.sleep(5000);
-//	}
+//      final SWTBotMenu statisticsView = bot.menu("Statistics");
+//      assertNotNull(statisticsView);
+//   }
 
    @Test
    void testTourMarkerView() {
@@ -59,10 +55,12 @@ public class BasicTests {
       // for SWTBot.
       bot.menu("Tour Editor");
 
-      bot.tree().getTreeItem("2020   3").expand();
-      bot.tree().getTreeItem("2020   3").getNode("May   2").expand();
-      bot.tree().getTreeItem("2020   3").getNode("May   2").select();
-      bot.tree().getTreeItem("2020   3").getNode("May   2").getNode("23").select();
+      final String march2020 = "2020   3";
+      bot.tree().getTreeItem(march2020).expand();
+      final String maySecond = "May   2";
+      bot.tree().getTreeItem(march2020).getNode(maySecond).expand();
+      bot.tree().getTreeItem(march2020).getNode(maySecond).select();
+      bot.tree().getTreeItem(march2020).getNode(maySecond).getNode("23").select();
       final SWTBotMenu tourMarkerView = bot.menu("Tour Markers");
       assertNotNull(tourMarkerView);
       bot.table().select(0);
