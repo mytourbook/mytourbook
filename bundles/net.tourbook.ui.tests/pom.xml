@@ -30,7 +30,7 @@
              <useUIThread>false</useUIThread>
              <product>net.tourbook.productWithoutJRE</product>
              <application>net.tourbook.appWithoutJRE</application>
-             <skipTests>false</skipTests>
+             <skipTests>true</skipTests>
              <osgiDataDirectory>${project.basedir}/workspace</osgiDataDirectory>
              <deleteOsgiDataDirectory>false</deleteOsgiDataDirectory>
          </configuration>
