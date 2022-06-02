@@ -32,11 +32,10 @@
           <tags>persp.actionSet:org.eclipse.search.searchActionSet</tags>
           <tags>persp.actionSet:org.eclipse.text.quicksearch.actionSet</tags>
           <tags>persp.actionSet:org.eclipse.ui.externaltools.ExternalToolsSet</tags>
-          <children xsi:type="basic:PartSashContainer" xmi:id="_nYIBuOKKEeyB59fpdb3pkQ" selectedElement="_nYIBueKKEeyB59fpdb3pkQ" horizontal="true">
+          <children xsi:type="basic:PartSashContainer" xmi:id="_nYIBuOKKEeyB59fpdb3pkQ" selectedElement="_nYIByeKKEeyB59fpdb3pkQ" horizontal="true">
             <children xsi:type="basic:PartSashContainer" xmi:id="_nYIBueKKEeyB59fpdb3pkQ" containerData="4000" selectedElement="_nYIBuuKKEeyB59fpdb3pkQ">
-              <children xsi:type="basic:PartSashContainer" xmi:id="_nYIBuuKKEeyB59fpdb3pkQ" containerData="6000" selectedElement="_nYIBu-KKEeyB59fpdb3pkQ">
-                <children xsi:type="basic:PartStack" xmi:id="_nYIBu-KKEeyB59fpdb3pkQ" elementId="list" containerData="6000" selectedElement="_nYIBveKKEeyB59fpdb3pkQ">
-                  <tags>active</tags>
+              <children xsi:type="basic:PartSashContainer" xmi:id="_nYIBuuKKEeyB59fpdb3pkQ" containerData="6000" selectedElement="_nYIBwuKKEeyB59fpdb3pkQ">
+                <children xsi:type="basic:PartStack" xmi:id="_nYIBu-KKEeyB59fpdb3pkQ" elementId="list" containerData="6000" selectedElement="_nYIBvuKKEeyB59fpdb3pkQ">
                   <children xsi:type="advanced:Placeholder" xmi:id="_nYIBvOKKEeyB59fpdb3pkQ" elementId="net.tourbook.views.rawData.RawDataView" ref="_nYB7FeKKEeyB59fpdb3pkQ" closeable="true">
                     <tags>View</tags>
                     <tags>categoryTag:1. Tour Directories</tags>
@@ -62,7 +61,7 @@
                     <tags>categoryTag:5. Photo</tags>
                   </children>
                 </children>
-                <children xsi:type="basic:PartStack" xmi:id="_nYIBwuKKEeyB59fpdb3pkQ" elementId="marker" containerData="4000" selectedElement="_nYIBw-KKEeyB59fpdb3pkQ">
+                <children xsi:type="basic:PartStack" xmi:id="_nYIBwuKKEeyB59fpdb3pkQ" elementId="marker" containerData="4000" selectedElement="_nYIBxeKKEeyB59fpdb3pkQ">
                   <children xsi:type="advanced:Placeholder" xmi:id="_nYIBw-KKEeyB59fpdb3pkQ" elementId="net.tourbook.views.TourMarkerView" ref="_nYIBsuKKEeyB59fpdb3pkQ" closeable="true">
                     <tags>View</tags>
                     <tags>categoryTag:2. Tour Properties</tags>
@@ -89,6 +88,7 @@
             </children>
             <children xsi:type="basic:PartSashContainer" xmi:id="_nYIByeKKEeyB59fpdb3pkQ" containerData="6000" selectedElement="_nYIByuKKEeyB59fpdb3pkQ">
               <children xsi:type="basic:PartStack" xmi:id="_nYIByuKKEeyB59fpdb3pkQ" elementId="map" containerData="5000" selectedElement="_nYIBzeKKEeyB59fpdb3pkQ">
+                <tags>active</tags>
                 <children xsi:type="advanced:Placeholder" xmi:id="_nYIBy-KKEeyB59fpdb3pkQ" elementId="net.tourbook.map2.view.Map2ViewId" ref="_nYB7EOKKEeyB59fpdb3pkQ" closeable="true">
                   <tags>View</tags>
                   <tags>categoryTag:6. Map</tags>
@@ -159,6 +159,7 @@
       <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
       <tags>View</tags>
       <tags>categoryTag:2. Tour Properties</tags>
+      <tags>active</tags>
       <menus xmi:id="_o97h4OKKEeyB59fpdb3pkQ" elementId="net.tourbook.views.TourDataEditorView">
         <tags>ViewMenu</tags>
         <tags>menuContribution:menu</tags>
@@ -207,8 +208,6 @@
       <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
       <tags>View</tags>
       <tags>categoryTag:1. Tour Directories</tags>
-      <tags>active</tags>
-      <tags>activeOnClose</tags>
       <menus xmi:id="_sKZd4OKKEeyB59fpdb3pkQ" elementId="net.tourbook.views.tourListView">
         <tags>ViewMenu</tags>
         <tags>menuContribution:menu</tags>
@@ -322,16 +321,16 @@
         <tags>toolbarSeparator</tags>
         <children xsi:type="menu:ToolBarSeparator" xmi:id="_nWXHIeKKEeyB59fpdb3pkQ" elementId="additions" toBeRendered="false"/>
       </children>
-      <children xsi:type="menu:ToolBar" xmi:id="_O_Z90OKfEeyDzbE4k-4UUA" elementId="org.eclipse.debug.ui.launchActionSet" visible="false">
+      <children xsi:type="menu:ToolBar" xmi:id="_O_Z90OKfEeyDzbE4k-4UUA" elementId="org.eclipse.debug.ui.launchActionSet">
         <tags>Draggable</tags>
       </children>
-      <children xsi:type="menu:ToolBar" xmi:id="_O-9R4OKfEeyDzbE4k-4UUA" elementId="org.eclipse.rcptt.ui.actionSet3" visible="false">
+      <children xsi:type="menu:ToolBar" xmi:id="_O-9R4OKfEeyDzbE4k-4UUA" elementId="org.eclipse.rcptt.ui.actionSet3">
         <tags>Draggable</tags>
       </children>
-      <children xsi:type="menu:ToolBar" xmi:id="_O-D6AOKfEeyDzbE4k-4UUA" elementId="org.eclipse.rcptt.ui.navigation" visible="false">
+      <children xsi:type="menu:ToolBar" xmi:id="_O-D6AOKfEeyDzbE4k-4UUA" elementId="org.eclipse.rcptt.ui.navigation">
         <tags>Draggable</tags>
       </children>
-      <children xsi:type="menu:ToolBar" xmi:id="_O-pv4OKfEeyDzbE4k-4UUA" elementId="org.eclipse.search.searchActionSet" visible="false">
+      <children xsi:type="menu:ToolBar" xmi:id="_O-pv4OKfEeyDzbE4k-4UUA" elementId="org.eclipse.search.searchActionSet">
         <tags>Draggable</tags>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_nYtQgOKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.edit.text.actionSet.annotationNavigation">
@@ -354,7 +353,7 @@
       <children xsi:type="menu:ToolControl" xmi:id="_mdMqheKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.StatusLine" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim">
         <tags>stretch</tags>
       </children>
-      <children xsi:type="menu:ToolControl" xmi:id="_mdMqhuKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.HeapStatus" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim">
+      <children xsi:type="menu:ToolControl" xmi:id="_mdMqhuKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.HeapStatus" contributorURI="platform:/plugin/org.eclipse.ui.workbench" toBeRendered="false" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim">
         <tags>Draggable</tags>
       </children>
       <children xsi:type="menu:ToolControl" xmi:id="_mdMqh-KKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.ProgressBar" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.StandardTrim">
@@ -425,6 +424,21 @@
     <bindings xmi:id="_meGCw-KKEeyB59fpdb3pkQ" keySequence="ALT+F11" command="_mdqlKOKKEeyB59fpdb3pkQ">
       <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
       <tags>platform:win32</tags>
+    </bindings>
+    <bindings xmi:id="_aozVC-LCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+I" command="_OKzRnuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVIuLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+D" command="_OKzTP-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GR-LCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+F1" command="_OKzRi-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GSOLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+F2" command="_OKzSoeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GT-LCEeyA5PO7AstiaQ" keySequence="ALT+CTRL+SHIFT+F9" command="_OKzSBuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
     </bindings>
   </bindingTables>
   <bindingTables xmi:id="_md8RYOKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.contexts.window" bindingContext="_mdMqjOKKEeyB59fpdb3pkQ">
@@ -601,6 +615,251 @@
     <bindings xmi:id="_meGCzOKKEeyB59fpdb3pkQ" keySequence="F5" command="_mdqlBuKKEeyB59fpdb3pkQ">
       <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
     </bindings>
+    <bindings xmi:id="_aozU8eLCEeyA5PO7AstiaQ" keySequence="ALT+CTRL+SHIFT+A" command="_OKzSsuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozU8-LCEeyA5PO7AstiaQ" keySequence="ALT+CTRL+SHIFT+L" command="_OKzSb-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozU9OLCEeyA5PO7AstiaQ" keySequence="ALT+CTRL+SHIFT+M" command="_OKzTOeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozU-OLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+Q P" command="_mdqlR-KKEeyB59fpdb3pkQ">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <parameters xmi:id="_aozU-eLCEeyA5PO7AstiaQ" elementId="org.eclipse.ui.views.showView.viewId" name="org.eclipse.ui.views.showView.viewId" value="org.eclipse.jdt.ui.PackageExplorer"/>
+    </bindings>
+    <bindings xmi:id="_aozU--LCEeyA5PO7AstiaQ" keySequence="ALT+CTRL+B" command="_OKzSqeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozU_OLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+T" command="_OKzR1uKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozU_eLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+T" command="_OKzRjOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozU_uLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+Q S" command="_mdqlR-KKEeyB59fpdb3pkQ">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <parameters xmi:id="_aozU_-LCEeyA5PO7AstiaQ" elementId="org.eclipse.ui.views.showView.viewId" name="org.eclipse.ui.views.showView.viewId" value="org.eclipse.search.ui.views.SearchView"/>
+    </bindings>
+    <bindings xmi:id="_aozVAOLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+U" command="_OKzRkuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVAeLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+Q T" command="_mdqlR-KKEeyB59fpdb3pkQ">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <parameters xmi:id="_aozVAuLCEeyA5PO7AstiaQ" elementId="org.eclipse.ui.views.showView.viewId" name="org.eclipse.ui.views.showView.viewId" value="org.eclipse.jdt.ui.TypeHierarchy"/>
+    </bindings>
+    <bindings xmi:id="_aozVA-LCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+V" command="_OKzTEeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVBOLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+Q V" command="_mdqlR-KKEeyB59fpdb3pkQ">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <parameters xmi:id="_aozVBeLCEeyA5PO7AstiaQ" elementId="org.eclipse.ui.views.showView.viewId" name="org.eclipse.ui.views.showView.viewId" value="org.eclipse.debug.ui.VariableView"/>
+    </bindings>
+    <bindings xmi:id="_aozVCeLCEeyA5PO7AstiaQ" keySequence="ALT+CTRL+G" command="_OKzSn-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVCuLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+H" command="_OKzSROKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVDOLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+Q H" command="_mdqlR-KKEeyB59fpdb3pkQ">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <parameters xmi:id="_aozVDeLCEeyA5PO7AstiaQ" elementId="org.eclipse.ui.views.showView.viewId" name="org.eclipse.ui.views.showView.viewId" value="org.eclipse.ui.cheatsheets.views.CheatSheetView"/>
+    </bindings>
+    <bindings xmi:id="_aozVDuLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+Q J" command="_mdqlR-KKEeyB59fpdb3pkQ">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <parameters xmi:id="_aozVD-LCEeyA5PO7AstiaQ" elementId="org.eclipse.ui.views.showView.viewId" name="org.eclipse.ui.views.showView.viewId" value="org.eclipse.jdt.ui.JavadocView"/>
+    </bindings>
+    <bindings xmi:id="_aozVEeLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+Q L" command="_mdqlR-KKEeyB59fpdb3pkQ">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <parameters xmi:id="_aozVEuLCEeyA5PO7AstiaQ" elementId="org.eclipse.ui.views.showView.viewId" name="org.eclipse.ui.views.showView.viewId" value="org.eclipse.pde.runtime.LogView"/>
+    </bindings>
+    <bindings xmi:id="_aozVE-LCEeyA5PO7AstiaQ" keySequence="CTRL+-" command="_OKzTI-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVFOLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+N" command="_OKzSUuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVGOLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+O" command="_OKzTO-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVGeLCEeyA5PO7AstiaQ" keySequence="ALT+CTRL+P" command="_OKzRguKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVG-LCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+A" command="_OKzSquKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVHeLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+B" command="_OKzRieKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVHuLCEeyA5PO7AstiaQ" keySequence="CTRL+#" command="_OKzRY-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVKeLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+G" command="_OKzTWeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVLOLCEeyA5PO7AstiaQ" keySequence="ALT+CTRL+H" command="_OKzRYOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVLeLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+Q Y" command="_mdqlR-KKEeyB59fpdb3pkQ">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <parameters xmi:id="_aozVLuLCEeyA5PO7AstiaQ" elementId="org.eclipse.ui.views.showView.viewId" name="org.eclipse.ui.views.showView.viewId" value="org.eclipse.team.sync.views.SynchronizeView"/>
+    </bindings>
+    <bindings xmi:id="_aozVL-LCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+Q Z" command="_mdqlR-KKEeyB59fpdb3pkQ">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <parameters xmi:id="_aozVMOLCEeyA5PO7AstiaQ" elementId="org.eclipse.ui.views.showView.viewId" name="org.eclipse.ui.views.showView.viewId" value="org.eclipse.team.ui.GenericHistoryView"/>
+    </bindings>
+    <bindings xmi:id="_aozVOOLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+C" command="_OKzS4eKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVO-LCEeyA5PO7AstiaQ" keySequence="CTRL+U" command="_OKzSI-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVPeLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+F" command="_OKzTAeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9F8eLCEeyA5PO7AstiaQ" keySequence="CTRL+H" command="_OKzS3-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9F9-LCEeyA5PO7AstiaQ" keySequence="CTRL+J" command="_OKzRcuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9F-eLCEeyA5PO7AstiaQ" keySequence="CTRL+L" command="_OKzS_eKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GA-LCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+P" command="_mdqlPeKKEeyB59fpdb3pkQ">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GBeLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+R" command="_OKzSKOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GBuLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+R" command="_mdqk2-KKEeyB59fpdb3pkQ">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GB-LCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+Q B" command="_mdqlR-KKEeyB59fpdb3pkQ">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <parameters xmi:id="_ao9GCOLCEeyA5PO7AstiaQ" elementId="org.eclipse.ui.views.showView.viewId" name="org.eclipse.ui.views.showView.viewId" value="org.eclipse.debug.ui.BreakpointView"/>
+    </bindings>
+    <bindings xmi:id="_ao9GC-LCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+S" command="_OKzSO-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GDOLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+T" command="_OKzSX-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GDuLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+Q D" command="_mdqlR-KKEeyB59fpdb3pkQ">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <parameters xmi:id="_ao9GD-LCEeyA5PO7AstiaQ" elementId="org.eclipse.ui.views.showView.viewId" name="org.eclipse.ui.views.showView.viewId" value="org.eclipse.jdt.ui.SourceView"/>
+    </bindings>
+    <bindings xmi:id="_ao9GEOLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+V" command="_OKzR_eKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GE-LCEeyA5PO7AstiaQ" keySequence="CTRL+G" command="_OKzRMeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GFOLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+I" command="_OKzRZOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GFeLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+J" command="_OKzRzeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GFuLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+L" command="_OKzRquKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GF-LCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+M" command="_OKzTQ-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GGOLCEeyA5PO7AstiaQ" keySequence="CTRL+=" command="_OKzR5uKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GG-LCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+Z" command="_OKzSP-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GHeLCEeyA5PO7AstiaQ" keySequence="ALT+CTRL+Y" command="_OKzTE-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GIeLCEeyA5PO7AstiaQ" keySequence="SHIFT+F2" command="_OKzShuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GIuLCEeyA5PO7AstiaQ" keySequence="SHIFT+F5" command="_OKzSF-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GJeLCEeyA5PO7AstiaQ" keySequence="F11" command="_OKzTOOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GKOLCEeyA5PO7AstiaQ" keySequence="F3" command="_OKzRqeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GLOLCEeyA5PO7AstiaQ" keySequence="F4" command="_OKzRWeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GMOLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+X 3" command="_OKzTFOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GNeLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+X J" command="_OKzSreKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GNuLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+X M" command="_OKzSDuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GN-LCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+X A" command="_OKzRUeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GOOLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+X E" command="_OKzSnuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GP-LCEeyA5PO7AstiaQ" keySequence="CTRL+F11" command="_OKzTD-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GReLCEeyA5PO7AstiaQ" keySequence="ALT+CTRL+X G" command="_OKzTNeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GSeLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+X O" command="_OKzSh-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GSuLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+X P" command="_OKzTSOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GS-LCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+X Q" command="_OKzRnOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GTOLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+X R" command="_OKzS7-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GTeLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+X S" command="_OKzTN-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GTuLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+X T" command="_OKzSCuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GUeLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+D 3" command="_OKzR5OKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_apGP5OLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+D E" command="_OKzTZuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_apGP5eLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+D A" command="_OKzS6OKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_apGP5uLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+D R" command="_OKzRN-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_apGP5-LCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+D S" command="_OKzRxuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_apGP6OLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+D T" command="_OKzRO-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_apGP6eLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+D J" command="_OKzSxOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_apGP6uLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+D O" command="_OKzSSuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_apGP6-LCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+D P" command="_OKzS8-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_apGP7OLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+D Q" command="_OKzSG-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
   </bindingTables>
   <bindingTables xmi:id="_md8RY-KKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.textEditorScope" bindingContext="_mdqlsuKKEeyB59fpdb3pkQ">
     <bindings xmi:id="_md8RZOKKEeyB59fpdb3pkQ" keySequence="ALT+CTRL+ARROW_UP" command="_mdqleOKKEeyB59fpdb3pkQ">
@@ -738,6 +997,15 @@
     <bindings xmi:id="_meGCzeKKEeyB59fpdb3pkQ" keySequence="HOME" command="_mdqlLeKKEeyB59fpdb3pkQ">
       <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
     </bindings>
+    <bindings xmi:id="_aozVJeLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+F" command="_OKzRyOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9F9uLCEeyA5PO7AstiaQ" keySequence="CTRL+J" command="_OKzRcuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9F_uLCEeyA5PO7AstiaQ" keySequence="CTRL+O" command="_OKzSS-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
   </bindingTables>
   <bindingTables xmi:id="_md8RguKKEeyB59fpdb3pkQ" elementId="org.eclipse.core.runtime.xml" bindingContext="_md8RgeKKEeyB59fpdb3pkQ">
     <bindings xmi:id="_md8Rg-KKEeyB59fpdb3pkQ" keySequence="CTRL+SHIFT+P" command="_mdqkr-KKEeyB59fpdb3pkQ">
@@ -756,26 +1024,329 @@
   <bindingTables xmi:id="_nX70f-KKEeyB59fpdb3pkQ" bindingContext="_nX70fuKKEeyB59fpdb3pkQ"/>
   <bindingTables xmi:id="_nX70geKKEeyB59fpdb3pkQ" bindingContext="_nX70gOKKEeyB59fpdb3pkQ"/>
   <bindingTables xmi:id="_nX70g-KKEeyB59fpdb3pkQ" bindingContext="_nX70guKKEeyB59fpdb3pkQ"/>
-  <bindingTables xmi:id="_OLP9AeKfEeyDzbE4k-4UUA" elementId="org.eclipse.jdt.ui.javaEditorScope" bindingContext="_OK9CHeKfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLP9B-KfEeyDzbE4k-4UUA" elementId="org.eclipse.wst.sse.ui.structuredTextEditorScope" bindingContext="_OK9CIOKfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLP9C-KfEeyDzbE4k-4UUA" elementId="org.eclipse.jdt.ui.classFileEditorScope" bindingContext="_OK9CGOKfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLP9GeKfEeyDzbE4k-4UUA" elementId="org.eclipse.jdt.ui.propertiesEditorScope" bindingContext="_OK9CMeKfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLP9G-KfEeyDzbE4k-4UUA" elementId="org.eclipse.rcptt.ui.eclEditor" bindingContext="_OK9CKuKfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLP9LuKfEeyDzbE4k-4UUA" elementId="org.eclipse.rcptt.ui.contexts.recording" bindingContext="_OK9CHuKfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLP9OOKfEeyDzbE4k-4UUA" elementId="org.eclipse.ant.ui.AntEditorScope" bindingContext="_OK9CK-KfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLP9POKfEeyDzbE4k-4UUA" elementId="org.eclipse.pde.ui.pdeEditorContext" bindingContext="_OK9CFOKfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLP9QeKfEeyDzbE4k-4UUA" elementId="org.eclipse.ui.genericeditor.genericEditorContext" bindingContext="_OK9CF-KfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLP9SeKfEeyDzbE4k-4UUA" elementId="org.eclipse.debug.ui.memoryview" bindingContext="_OK9CFuKfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLP9TuKfEeyDzbE4k-4UUA" elementId="org.eclipse.jdt.ui.breadcrumbEditorScope" bindingContext="_OK9CHOKfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLP9UOKfEeyDzbE4k-4UUA" elementId="org.eclipse.debug.ui.debugging" bindingContext="_OK9CGeKfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLP9YuKfEeyDzbE4k-4UUA" elementId="org.eclipse.debug.ui.memory.abstractasynctablerendering" bindingContext="_OK9CGuKfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLP9Z-KfEeyDzbE4k-4UUA" elementId="org.eclipse.egit.ui.DiffViewer" bindingContext="_OK9CEeKfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLP9deKfEeyDzbE4k-4UUA" elementId="org.eclipse.egit.ui.RepositoriesView" bindingContext="_OK9CMuKfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLP9d-KfEeyDzbE4k-4UUA" elementId="org.eclipse.egit.ui.ReflogView" bindingContext="_OK9CG-KfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLP9iuKfEeyDzbE4k-4UUA" elementId="org.eclipse.debug.ui.console" bindingContext="_OK9CE-KfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLZG-uKfEeyDzbE4k-4UUA" elementId="org.eclipse.egit.ui.RepositoriesView.SingleRepository" bindingContext="_OK9CM-KfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLZHAuKfEeyDzbE4k-4UUA" elementId="org.eclipse.buildship.ui.contexts.taskview" bindingContext="_OK9CJ-KfEeyDzbE4k-4UUA"/>
-  <bindingTables xmi:id="_OLZHLeKfEeyDzbE4k-4UUA" elementId="org.eclipse.debug.ui.BreakpointView" bindingContext="_OK9CEuKfEeyDzbE4k-4UUA"/>
+  <bindingTables xmi:id="_OLP9AeKfEeyDzbE4k-4UUA" elementId="org.eclipse.jdt.ui.javaEditorScope" bindingContext="_OK9CHeKfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_aozU8uLCEeyA5PO7AstiaQ" keySequence="ALT+CTRL+SHIFT+R" command="_OKzSBeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozU9eLCEeyA5PO7AstiaQ" keySequence="ALT+CTRL+SHIFT+M" command="_OKzSmuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozU9uLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+P" command="_OKzStOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVBuLCEeyA5PO7AstiaQ" keySequence="CTRL+7" command="_OKzSVeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVEOLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+M" command="_OKzRteKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVFeLCEeyA5PO7AstiaQ" keySequence="CTRL+/" command="_OKzSVeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVH-LCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+C" command="_OKzSVeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVJOLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+F" command="_OKzTKuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVNOLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+B" command="_OKzTZeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVN-LCEeyA5PO7AstiaQ" keySequence="CTRL+R" command="_OKzS0-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVOuLCEeyA5PO7AstiaQ" keySequence="CTRL+T" command="_OKzSXOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVPOLCEeyA5PO7AstiaQ" keySequence="CTRL+U" command="_OKzROeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9F8uLCEeyA5PO7AstiaQ" keySequence="CTRL+I" command="_OKzR4-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9F9eLCEeyA5PO7AstiaQ" keySequence="CTRL+J" command="_OKzRcuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9F_eLCEeyA5PO7AstiaQ" keySequence="CTRL+O" command="_OKzSDOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GAeLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+/" command="_OKzSJOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GDeLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+U" command="_OKzSyuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GEeLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+'" command="_OKzSZ-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GGuLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+O" command="_OKzR0OKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GHuLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+\" command="_OKzRcOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GMeLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+ARROW_UP" command="_OKzSLuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GM-LCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+ARROW_DOWN" command="_OKzSDeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GOeLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+ARROW_UP" command="_OKzSGuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GO-LCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+ARROW_DOWN" command="_OKzRiuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GPeLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+ARROW_LEFT" command="_OKzR6-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GQOLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+ARROW_RIGHT" command="_OKzRa-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GQ-LCEeyA5PO7AstiaQ" keySequence="CTRL+F3" command="_OKzTT-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GUOLCEeyA5PO7AstiaQ" keySequence="CTRL+2 F" command="_OKzTQuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GU-LCEeyA5PO7AstiaQ" keySequence="CTRL+2 R" command="_OKzS1eKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_apGP4OLCEeyA5PO7AstiaQ" keySequence="CTRL+2 T" command="_OKzSVOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_apGP4eLCEeyA5PO7AstiaQ" keySequence="CTRL+2 L" command="_OKzRZeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_apGP4uLCEeyA5PO7AstiaQ" keySequence="CTRL+2 M" command="_OKzR7-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLP9B-KfEeyDzbE4k-4UUA" elementId="org.eclipse.wst.sse.ui.structuredTextEditorScope" bindingContext="_OK9CIOKfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_aozU9-LCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+P" command="_OKzSXeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVHOLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+A" command="_OKzTb-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVIeLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+C" command="_OKzTKeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVKOLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+F" command="_OKzTWuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVM-LCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+>" command="_OKzS6eKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9F8-LCEeyA5PO7AstiaQ" keySequence="CTRL+I" command="_OKzS-eKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GAOLCEeyA5PO7AstiaQ" keySequence="CTRL+O" command="_OKzSZuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GAuLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+/" command="_OKzSUOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GH-LCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+\" command="_OKzSoOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GK-LCEeyA5PO7AstiaQ" keySequence="F3" command="_OKzSW-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GMuLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+ARROW_UP" command="_OKzRmOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GNOLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+ARROW_DOWN" command="_OKzSHeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GOuLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+ARROW_UP" command="_OKzSr-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GPOLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+ARROW_DOWN" command="_OKzSuuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GPuLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+ARROW_LEFT" command="_OKzRXuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GQeLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+ARROW_RIGHT" command="_OKzSiOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLP9C-KfEeyDzbE4k-4UUA" elementId="org.eclipse.jdt.ui.classFileEditorScope" bindingContext="_OK9CGOKfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_aozU-uLCEeyA5PO7AstiaQ" keySequence="CTRL+1" command="_OKzTVuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLP9GeKfEeyDzbE4k-4UUA" elementId="org.eclipse.jdt.ui.propertiesEditorScope" bindingContext="_OK9CMeKfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_aozVB-LCEeyA5PO7AstiaQ" keySequence="CTRL+7" command="_OKzSVeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVFuLCEeyA5PO7AstiaQ" keySequence="CTRL+/" command="_OKzSVeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVIOLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+C" command="_OKzSVeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLP9G-KfEeyDzbE4k-4UUA" elementId="org.eclipse.rcptt.ui.eclEditor" bindingContext="_OK9CKuKfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_aozVCOLCEeyA5PO7AstiaQ" keySequence="CTRL+7" command="_OKzSEuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVF-LCEeyA5PO7AstiaQ" keySequence="CTRL+/" command="_OKzSEuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVJ-LCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+F" command="_OKzSeOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GKeLCEeyA5PO7AstiaQ" keySequence="F3" command="_OKzR9OKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLP9LuKfEeyDzbE4k-4UUA" elementId="org.eclipse.rcptt.ui.contexts.recording" bindingContext="_OK9CHuKfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_aozVGuLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+0" command="_OKzSTuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVK-LCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+7" command="_OKzRouKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9F8OLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+8" command="_OKzSWeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9F9OLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+9" command="_OKzTV-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GUuLCEeyA5PO7AstiaQ" keySequence="ESC" command="_OKzTROKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLP9OOKfEeyDzbE4k-4UUA" elementId="org.eclipse.ant.ui.AntEditorScope" bindingContext="_OK9CK-KfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_aozVI-LCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+F" command="_OKzTKuKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GBOLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+R" command="_OKzRWOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GGeLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+O" command="_OKzROOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GIOLCEeyA5PO7AstiaQ" keySequence="SHIFT+F2" command="_OKzSaeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GJ-LCEeyA5PO7AstiaQ" keySequence="F3" command="_OKzRPeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLP9POKfEeyDzbE4k-4UUA" elementId="org.eclipse.pde.ui.pdeEditorContext" bindingContext="_OK9CFOKfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_aozVJuLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+F" command="_OKzRauKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9F_-LCEeyA5PO7AstiaQ" keySequence="CTRL+O" command="_OKzRf-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLP9QeKfEeyDzbE4k-4UUA" elementId="org.eclipse.ui.genericeditor.genericEditorContext" bindingContext="_OK9CF-KfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_aozVKuLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+G" command="_OKzTDeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GKuLCEeyA5PO7AstiaQ" keySequence="F3" command="_mdqk-eKKEeyB59fpdb3pkQ">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLP9SeKfEeyDzbE4k-4UUA" elementId="org.eclipse.debug.ui.memoryview" bindingContext="_OK9CFuKfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_aozVMeLCEeyA5PO7AstiaQ" keySequence="ALT+CTRL+M" command="_OKzSCOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVMuLCEeyA5PO7AstiaQ" keySequence="ALT+CTRL+N" command="_OKzTReKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVOeLCEeyA5PO7AstiaQ" keySequence="CTRL+T" command="_OKzRt-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_aozVPuLCEeyA5PO7AstiaQ" keySequence="CTRL+W" command="_OKzSfOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9F-uLCEeyA5PO7AstiaQ" keySequence="CTRL+N" command="_OKzSnOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLP9TuKfEeyDzbE4k-4UUA" elementId="org.eclipse.jdt.ui.breadcrumbEditorScope" bindingContext="_OK9CHOKfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_aozVNeLCEeyA5PO7AstiaQ" keySequence="ALT+SHIFT+B" command="_OKzTZeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLP9UOKfEeyDzbE4k-4UUA" elementId="org.eclipse.debug.ui.debugging" bindingContext="_OK9CGeKfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_aozVNuLCEeyA5PO7AstiaQ" keySequence="CTRL+R" command="_OKzSSeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GI-LCEeyA5PO7AstiaQ" keySequence="F7" command="_OKzTUeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GJOLCEeyA5PO7AstiaQ" keySequence="F8" command="_OKzSdOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GLuLCEeyA5PO7AstiaQ" keySequence="F5" command="_OKzRXeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GL-LCEeyA5PO7AstiaQ" keySequence="F6" command="_OKzR_uKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GQuLCEeyA5PO7AstiaQ" keySequence="CTRL+F2" command="_OKzS4-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GROLCEeyA5PO7AstiaQ" keySequence="CTRL+F5" command="_OKzTNOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLP9YuKfEeyDzbE4k-4UUA" elementId="org.eclipse.debug.ui.memory.abstractasynctablerendering" bindingContext="_OK9CGuKfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_ao9F-OLCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+," command="_OKzTAOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9F--LCEeyA5PO7AstiaQ" keySequence="CTRL+SHIFT+." command="_OKzS2uKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GEuLCEeyA5PO7AstiaQ" keySequence="CTRL+G" command="_OKzS2-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLP9Z-KfEeyDzbE4k-4UUA" elementId="org.eclipse.egit.ui.DiffViewer" bindingContext="_OK9CEeKfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_ao9F_OLCEeyA5PO7AstiaQ" keySequence="CTRL+O" command="_OKzSGeKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLP9deKfEeyDzbE4k-4UUA" elementId="org.eclipse.egit.ui.RepositoriesView" bindingContext="_OK9CMuKfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_ao9GCeLCEeyA5PO7AstiaQ" keySequence="CTRL+C" command="_OKzRu-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+    <bindings xmi:id="_ao9GRuLCEeyA5PO7AstiaQ" keySequence="CTRL+ARROW_LEFT" command="_OKzRbOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLP9d-KfEeyDzbE4k-4UUA" elementId="org.eclipse.egit.ui.ReflogView" bindingContext="_OK9CG-KfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_ao9GCuLCEeyA5PO7AstiaQ" keySequence="CTRL+C" command="_OKzRg-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLP9iuKfEeyDzbE4k-4UUA" elementId="org.eclipse.debug.ui.console" bindingContext="_OK9CE-KfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_ao9GHOLCEeyA5PO7AstiaQ" keySequence="CTRL+Z" command="_OKzTTOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+      <tags>platform:win32</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLZG-uKfEeyDzbE4k-4UUA" elementId="org.eclipse.egit.ui.RepositoriesView.SingleRepository" bindingContext="_OK9CM-KfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_ao9GJuLCEeyA5PO7AstiaQ" keySequence="F2" command="_OKzRheKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLZHAuKfEeyDzbE4k-4UUA" elementId="org.eclipse.buildship.ui.contexts.taskview" bindingContext="_OK9CJ-KfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_ao9GLeLCEeyA5PO7AstiaQ" keySequence="F5" command="_OKzTKOKfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
+  <bindingTables xmi:id="_OLZHLeKfEeyDzbE4k-4UUA" elementId="org.eclipse.debug.ui.BreakpointView" bindingContext="_OK9CEuKfEeyDzbE4k-4UUA">
+    <bindings xmi:id="_apGP4-LCEeyA5PO7AstiaQ" keySequence="ALT+CR" command="_OKzSQ-KfEeyDzbE4k-4UUA">
+      <tags>schemeId:org.eclipse.ui.defaultAcceleratorConfiguration</tags>
+    </bindings>
+  </bindingTables>
   <bindingTables xmi:id="_OcYwUeKfEeyDzbE4k-4UUA" bindingContext="_OcYwUOKfEeyDzbE4k-4UUA"/>
   <bindingTables xmi:id="_OcYwU-KfEeyDzbE4k-4UUA" bindingContext="_OcYwUuKfEeyDzbE4k-4UUA"/>
   <bindingTables xmi:id="_OcYwVeKfEeyDzbE4k-4UUA" bindingContext="_OcYwVOKfEeyDzbE4k-4UUA"/>
@@ -1248,30 +1819,30 @@
     <tags>View</tags>
     <tags>categoryTag:General</tags>
   </descriptors>
-  <descriptors xmi:id="_OMSe0OKfEeyDzbE4k-4UUA" elementId="org.eclipse.pde.spy.preferences.parts.PreferenceSpyPart" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences" label="Preference Spy" iconURI="platform:/plugin/org.eclipse.pde.spy.preferences/$nl$/icons/preference_spy.png" category="Eclipse Runtime Spies" closeable="true" contributionURI="bundleclass://org.eclipse.pde.spy.preferences/org.eclipse.pde.spy.preferences.parts.PreferenceSpyPart" description="Spy to display preferences">
+  <descriptors xmi:id="_ap12zuLCEeyA5PO7AstiaQ" elementId="org.eclipse.pde.spy.preferences.parts.PreferenceSpyPart" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences" label="Preference Spy" iconURI="platform:/plugin/org.eclipse.pde.spy.preferences/$nl$/icons/preference_spy.png" category="Eclipse Runtime Spies" closeable="true" contributionURI="bundleclass://org.eclipse.pde.spy.preferences/org.eclipse.pde.spy.preferences.parts.PreferenceSpyPart" description="Spy to display preferences">
     <persistedState key="perstistState" value="false"/>
     <tags>View</tags>
     <tags>Spy</tags>
     <tags>categoryTag:Eclipse Runtime Spies</tags>
-    <toolbar xmi:id="_OMSe1uKfEeyDzbE4k-4UUA" elementId="org.eclipse.pde.spy.preferences.toolbar" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences">
-      <children xsi:type="menu:ToolControl" xmi:id="_OMSe1-KfEeyDzbE4k-4UUA" elementId="org.eclipse.pde.spy.preferences.toolcontrol.layout" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences" contributionURI="bundleclass://org.eclipse.pde.spy.preferences/org.eclipse.pde.spy.preferences.handler.ToggleLayoutControl"/>
-      <children xsi:type="menu:ToolBarSeparator" xmi:id="_OMSe2OKfEeyDzbE4k-4UUA" elementId="org.eclipse.pde.spy.preferences.toolbarseparator.0" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences"/>
-      <children xsi:type="menu:HandledToolItem" xmi:id="_OMSe2eKfEeyDzbE4k-4UUA" elementId="org.eclipse.pde.spy.preferences.handledtoolitem.showall" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences" iconURI="platform:/plugin/org.eclipse.pde.spy.preferences/icons/show_all_preferences.png">
+    <toolbar xmi:id="_ap121OLCEeyA5PO7AstiaQ" elementId="org.eclipse.pde.spy.preferences.toolbar" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences">
+      <children xsi:type="menu:ToolControl" xmi:id="_ap121eLCEeyA5PO7AstiaQ" elementId="org.eclipse.pde.spy.preferences.toolcontrol.layout" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences" contributionURI="bundleclass://org.eclipse.pde.spy.preferences/org.eclipse.pde.spy.preferences.handler.ToggleLayoutControl"/>
+      <children xsi:type="menu:ToolBarSeparator" xmi:id="_ap121uLCEeyA5PO7AstiaQ" elementId="org.eclipse.pde.spy.preferences.toolbarseparator.0" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences"/>
+      <children xsi:type="menu:HandledToolItem" xmi:id="_ap121-LCEeyA5PO7AstiaQ" elementId="org.eclipse.pde.spy.preferences.handledtoolitem.showall" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences" iconURI="platform:/plugin/org.eclipse.pde.spy.preferences/icons/show_all_preferences.png">
         <command href="platform:/plugin/org.eclipse.pde.spy.preferences/fragment.e4xmi#_ufxRsHY2EeSuTdKDH5hMwg"/>
       </children>
-      <children xsi:type="menu:ToolControl" xmi:id="_OMSe2uKfEeyDzbE4k-4UUA" elementId="org.eclipse.pde.spy.preferences.toolcontrol.trace" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences" contributionURI="bundleclass://org.eclipse.pde.spy.preferences/org.eclipse.pde.spy.preferences.handler.TogglePreferenceTraceControl"/>
-      <children xsi:type="menu:ToolBarSeparator" xmi:id="_OMSe2-KfEeyDzbE4k-4UUA" elementId="org.eclipse.pde.spy.preferences.toolbarseparator.1" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences"/>
-      <children xsi:type="menu:HandledToolItem" xmi:id="_OMSe3OKfEeyDzbE4k-4UUA" elementId="org.eclipse.pde.spy.preferences.handledtoolitem.expandall" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences" iconURI="platform:/plugin/org.eclipse.pde.spy.preferences/icons/expandall.png">
+      <children xsi:type="menu:ToolControl" xmi:id="_ap122OLCEeyA5PO7AstiaQ" elementId="org.eclipse.pde.spy.preferences.toolcontrol.trace" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences" contributionURI="bundleclass://org.eclipse.pde.spy.preferences/org.eclipse.pde.spy.preferences.handler.TogglePreferenceTraceControl"/>
+      <children xsi:type="menu:ToolBarSeparator" xmi:id="_ap122eLCEeyA5PO7AstiaQ" elementId="org.eclipse.pde.spy.preferences.toolbarseparator.1" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences"/>
+      <children xsi:type="menu:HandledToolItem" xmi:id="_ap122uLCEeyA5PO7AstiaQ" elementId="org.eclipse.pde.spy.preferences.handledtoolitem.expandall" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences" iconURI="platform:/plugin/org.eclipse.pde.spy.preferences/icons/expandall.png">
         <command href="platform:/plugin/org.eclipse.pde.spy.preferences/fragment.e4xmi#_4NM_IH_gEeSk-4v3KnNHPw"/>
       </children>
-      <children xsi:type="menu:HandledToolItem" xmi:id="_OMSe3eKfEeyDzbE4k-4UUA" elementId="org.eclipse.pde.spy.preferences.handledtoolitem.collapseall" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences" iconURI="platform:/plugin/org.eclipse.pde.spy.preferences/icons/collapseall.png">
+      <children xsi:type="menu:HandledToolItem" xmi:id="_ap122-LCEeyA5PO7AstiaQ" elementId="org.eclipse.pde.spy.preferences.handledtoolitem.collapseall" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences" iconURI="platform:/plugin/org.eclipse.pde.spy.preferences/icons/collapseall.png">
         <command href="platform:/plugin/org.eclipse.pde.spy.preferences/fragment.e4xmi#_68UQwH_gEeSk-4v3KnNHPw"/>
       </children>
-      <children xsi:type="menu:ToolBarSeparator" xmi:id="_OMSe3uKfEeyDzbE4k-4UUA" elementId="org.eclipse.pde.spy.preferences.toolbarseparator.2" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences"/>
-      <children xsi:type="menu:HandledToolItem" xmi:id="_OMSe3-KfEeyDzbE4k-4UUA" elementId="org.eclipse.pde.spy.preferences.handledtoolitem.removeentry" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences" iconURI="platform:/plugin/org.eclipse.pde.spy.preferences/icons/remove_co.png">
+      <children xsi:type="menu:ToolBarSeparator" xmi:id="_ap123OLCEeyA5PO7AstiaQ" elementId="org.eclipse.pde.spy.preferences.toolbarseparator.2" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences"/>
+      <children xsi:type="menu:HandledToolItem" xmi:id="_ap123eLCEeyA5PO7AstiaQ" elementId="org.eclipse.pde.spy.preferences.handledtoolitem.removeentry" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences" iconURI="platform:/plugin/org.eclipse.pde.spy.preferences/icons/remove_co.png">
         <command href="platform:/plugin/org.eclipse.pde.spy.preferences/fragment.e4xmi#_iGEkYGxiEeSQ7v0akw7aRA"/>
       </children>
-      <children xsi:type="menu:HandledToolItem" xmi:id="_OMSe4OKfEeyDzbE4k-4UUA" elementId="org.eclipse.pde.spy.preferences.handledtoolitem.removeall" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences" iconURI="platform:/plugin/org.eclipse.pde.spy.preferences/icons/removeall_co.png">
+      <children xsi:type="menu:HandledToolItem" xmi:id="_ap123uLCEeyA5PO7AstiaQ" elementId="org.eclipse.pde.spy.preferences.handledtoolitem.removeall" contributorURI="platform:/plugin/org.eclipse.pde.spy.preferences" iconURI="platform:/plugin/org.eclipse.pde.spy.preferences/icons/removeall_co.png">
         <command href="platform:/plugin/org.eclipse.pde.spy.preferences/fragment.e4xmi#_eBGTEGxiEeSQ7v0akw7aRA"/>
       </children>
     </toolbar>
@@ -2766,7 +3337,7 @@
   <addons xmi:id="_mdMql-KKEeyB59fpdb3pkQ" elementId="MinMax Addon" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.minmax.MinMaxAddon"/>
   <addons xmi:id="_mdMqmOKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.workbench.addon.0" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.e4.ui.workbench/org.eclipse.e4.ui.internal.workbench.addons.HandlerProcessingAddon"/>
   <addons xmi:id="_mdMqmeKKEeyB59fpdb3pkQ" elementId="SplitterAddon" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.addons.swt/org.eclipse.e4.ui.workbench.addons.splitteraddon.SplitterAddon"/>
-  <addons xmi:id="_g9YqseK9EeyNnN-yjM_Eng" elementId="org.eclipse.ui.ide.addon.0" contributionURI="bundleclass://org.eclipse.ui.ide/org.eclipse.ui.internal.ide.addons.SaveAllDirtyPartsAddon"/>
+  <addons xmi:id="_IYS0IKimEeS11vbz3f9ezw" elementId="org.eclipse.ui.ide.addon.0" contributorURI="platform:/plugin/org.eclipse.ui.ide" contributionURI="bundleclass://org.eclipse.ui.ide/org.eclipse.ui.internal.ide.addons.SaveAllDirtyPartsAddon"/>
   <addons xmi:id="_dz0JgGOlEeSMMaPQU2nlzw" elementId="org.eclipse.ui.ide.application.addon.0" contributorURI="platform:/plugin/org.eclipse.ui.ide.application" contributionURI="bundleclass://org.eclipse.ui.ide.application/org.eclipse.ui.internal.ide.application.addons.ModelCleanupAddon"/>
   <categories xmi:id="_mdgzkOKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.category.views" name="Views" description="Commands for opening views"/>
   <categories xmi:id="_mdgzkeKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.category.perspectives" name="Perspectives" description="Commands for opening perspectives"/>
