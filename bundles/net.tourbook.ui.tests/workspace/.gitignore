@@ -11,5 +11,4 @@ derby-database/*.log
 .metadata/.plugins/org.eclipse.oomph.setup.ui/*
 .metadata/.plugins/org.eclipse.ui.workbench/*
 .metadata/.plugins/org.eclipse.pde.core/*
-.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.*
-.metadata/.plugins/org.eclipse.core.runtime/.settings/net.sourceforge.vrapper.eclipse.prefs
+.metadata/.plugins/org.eclipse.core.runtime/*
