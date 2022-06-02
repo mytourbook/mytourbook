@@ -3,3 +3,4 @@ derby-database/lucene-index
 .metadata/.plugins/org.eclipse.core.resources/.projects/.org.eclipse.egit.core.cmp/*
 .metadata/.plugins/org.eclipse.core.resources/0.snap
 .metadata/.plugins/net.tourbook.common/invalidfiles_to_ignore.txt
+.metadata/.plugins/org.eclipse.jdt.ui/*
