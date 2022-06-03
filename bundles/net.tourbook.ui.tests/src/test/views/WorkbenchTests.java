@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.BeforeClass;
 import org.junit.jupiter.api.Test;
@@ -87,5 +88,54 @@ public class WorkbenchTests {
       final SWTBotView tourEditorView = bot.viewByTitle("Tour Editor");
       assertNotNull(tourEditorView);
       tourEditorView.show();
+
+      final String toolsMenuText = "Tools ";
+      final SWTBotMenu tourSegmenterMenu = bot.menu(toolsMenuText).menu("Tour Segmenter").click();
+      assertNotNull(tourSegmenterMenu);
+      final SWTBotView tourSegmenterView = bot.viewByTitle("Tour Segmenter");
+      assertNotNull(tourSegmenterView);
+      tourSegmenterView.show();
+
+      final SWTBotMenu tourAnalyzerMenu = bot.menu(toolsMenuText).menu("Tour Analyzer").click();
+      assertNotNull(tourAnalyzerMenu);
+      final SWTBotView tourAnalyzerView = bot.viewByTitle("Tour Analyzer");
+      assertNotNull(tourAnalyzerView);
+      tourAnalyzerView.show();
+
+      final SWTBotMenu compareGeoTourMenu = bot.menu(toolsMenuText).menu("Compare Geo Tour").click();
+      assertNotNull(compareGeoTourMenu);
+      final SWTBotView geoCompareView = bot.viewByTitle("Geo Compare");
+      assertNotNull(geoCompareView);
+      geoCompareView.show();
+
+      final SWTBotMenu tourChartSmoothingMenu = bot.menu(toolsMenuText).menu("Tour Chart Smoothing").click();
+      assertNotNull(tourChartSmoothingMenu);
+      final SWTBotView tourChartSmoothingView = bot.viewByTitle("Tour Chart Smoothing");
+      assertNotNull(tourChartSmoothingView);
+      tourChartSmoothingView.show();
+
+      final SWTBotMenu statisticsValuesMenu = bot.menu(toolsMenuText).menu("Statistic Values").click();
+      assertNotNull(statisticsValuesMenu);
+      final SWTBotView statisticsValuesView = bot.viewByTitle("Statistic Values");
+      assertNotNull(statisticsValuesView);
+      statisticsValuesView.show();
+
+      final SWTBotMenu trainingMenu = bot.menu(toolsMenuText).menu("Training").click();
+      assertNotNull(trainingMenu);
+      final SWTBotView trainingView = bot.viewByTitle("Training");
+      assertNotNull(trainingView);
+      trainingView.show();
+
+      final SWTBotMenu conconiTestMenu = bot.menu(toolsMenuText).menu("Conconi Test").click();
+      assertNotNull(conconiTestMenu);
+      final SWTBotView conconiTestView = bot.viewByTitle("Conconi Test");
+      assertNotNull(conconiTestView);
+      conconiTestView.show();
+
+      final SWTBotMenu heartRateVariabilityMenu = bot.menu(toolsMenuText).menu("Heart Rate Variability").click();
+      assertNotNull(heartRateVariabilityMenu);
+      final SWTBotView heartRateVariabilityView = bot.viewByTitle("Heart Rate Variability");
+      assertNotNull(heartRateVariabilityView);
+      heartRateVariabilityView.show();
    }
 }
