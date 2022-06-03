@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2009  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,17 +23,17 @@ import org.eclipse.jface.action.Action;
 
 public class ActionCreateSplinePoint extends Action {
 
-   private DialogAdjustAltitude fDialogAdjustAltitude;
+   private DialogAdjustAltitude _dialogAdjustAltitude;
 
-   int                          fMouseDownDevPositionX;
-   int                          fMouseDownDevPositionY;
+   int                          _mouseDownDevPositionX;
+   int                          _mouseDownDevPositionY;
 
    /**
     * @param dialogAdjustAltitude
     */
    public ActionCreateSplinePoint(final DialogAdjustAltitude dialogAdjustAltitude) {
 
-      fDialogAdjustAltitude = dialogAdjustAltitude;
+      _dialogAdjustAltitude = dialogAdjustAltitude;
 
       setText(Messages.adjust_altitude_action_create_spline_point);
       setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.SplinePoint));
@@ -41,7 +41,7 @@ public class ActionCreateSplinePoint extends Action {
 
    @Override
    public void run() {
-      fDialogAdjustAltitude.actionCreateSplinePoint(fMouseDownDevPositionX, fMouseDownDevPositionY);
+      _dialogAdjustAltitude.actionCreateSplinePoint(_mouseDownDevPositionX, _mouseDownDevPositionY);
    }
 
 }
