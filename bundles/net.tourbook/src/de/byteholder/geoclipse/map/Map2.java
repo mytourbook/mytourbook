@@ -4851,6 +4851,12 @@ public class Map2 extends Canvas {
             }
          }
 
+         // fix: java.lang.ArrayIndexOutOfBoundsException: Index 15091 out of bounds for length 8244 
+         // this could not be reproduced, it happened when 2 tours were displayed/selected after a geo search
+         if (serieIndex >= latitudeSerie.length) {
+            continue;
+         }
+
          // get world position for the current lat/lon
          final java.awt.Point worldPosAWT = mp.geoToPixel(
                new GeoPosition(latitudeSerie[serieIndex], longitudeSerie[serieIndex]),
