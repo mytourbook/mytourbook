@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package basic;
+package views;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -24,7 +24,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.BeforeClass;
 import org.junit.jupiter.api.Test;
 
-public class TourTagsViewTests {
+public class TourMarkerViewTests {
 
    private SWTWorkbenchBot bot = new SWTWorkbenchBot();
 
@@ -35,23 +35,25 @@ public class TourTagsViewTests {
    }
 
    @Test
-   void testTourTagsView() {
+   void testTourMarkerView() {
 
       final SWTBotView tourBookView = bot.viewByTitle("Tour Book");
       assertNotNull(tourBookView);
       tourBookView.show();
 
-      final String twentyTwentyOne = "2021   2";
-      bot.tree().getTreeItem(twentyTwentyOne).expand();
-      final String january = "Jan   2";
-      final SWTBotTreeItem januaryNode = bot.tree().getTreeItem(twentyTwentyOne).getNode(january);
-      januaryNode.expand();
-      januaryNode.select();
-      januaryNode.getNode("31").select();
+      final String march2020 = "2020   3";
+      bot.tree().getTreeItem(march2020).expand();
+      final String maySecond = "May   2";
+      final SWTBotTreeItem marchNode = bot.tree().getTreeItem(march2020).getNode(maySecond);
+      marchNode.expand();
+      marchNode.select();
+      marchNode.getNode("23").select();
 
-      final SWTBotView tourTagsView = bot.viewByTitle("Tour Tags");
-      assertNotNull(tourTagsView);
-      tourTagsView.show();
-      // bot.tree().getTreeItem("Shoes 2").select();
+      final SWTBotView tourMarkerView = bot.viewByTitle("Tour Markers");
+      assertNotNull(tourMarkerView);
+      tourMarkerView.show();
+
+      bot.table().select(0);
+      bot.table().select(1);
    }
 }

@@ -13,18 +13,17 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package basic;
+package views;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.BeforeClass;
 import org.junit.jupiter.api.Test;
 
-public class TourMarkerViewTests {
+public class TourDataEditorViewTests {
 
    private SWTWorkbenchBot bot = new SWTWorkbenchBot();
 
@@ -35,25 +34,26 @@ public class TourMarkerViewTests {
    }
 
    @Test
-   void testTourMarkerView() {
+   void testNewTourTitle() {
 
-      final SWTBotView tourBookView = bot.viewByTitle("Tour Book");
-      assertNotNull(tourBookView);
-      tourBookView.show();
+      final SWTBotView tourEditorView = bot.viewByTitle("Tour Editor");
+      assertNotNull(tourEditorView);
+      tourEditorView.show();
 
-      final String march2020 = "2020   3";
-      bot.tree().getTreeItem(march2020).expand();
-      final String maySecond = "May   2";
-      final SWTBotTreeItem marchNode = bot.tree().getTreeItem(march2020).getNode(maySecond);
-      marchNode.expand();
-      marchNode.select();
-      marchNode.getNode("23").select();
+      bot.cTabItem("Tour").activate();
 
-      final SWTBotView tourMarkerView = bot.viewByTitle("Tour Markers");
-      assertNotNull(tourMarkerView);
-      tourMarkerView.show();
+      bot.comboBox().setText("New Title");
+      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click();
+   }
 
-      bot.table().select(0);
-      bot.table().select(1);
+   @Test
+   void testViewTabs() {
+
+      final SWTBotView tourEditorView = bot.viewByTitle("Tour Editor");
+      assertNotNull(tourEditorView);
+      tourEditorView.show();
+
+      bot.cTabItem("Time Slices").activate();
+      bot.cTabItem("Swim Slices").activate();
    }
 }
