@@ -1,6 +1,7 @@
 offline-map
 derby-database/lucene-index
 derby-database/*.log
+.metadata/*.log
 .metadata/.plugins/org.eclipse.core.resources/*
 .metadata/.plugins/net.tourbook.common/invalidfiles_to_ignore.txt
 .metadata/.plugins/org.eclipse.jdt.ui/*
@@ -14,3 +15,4 @@ derby-database/*.log
 .metadata/.plugins/org.eclipse.ui.workbench/*
 .metadata/.plugins/org.eclipse.pde.core/*
 .metadata/.plugins/org.eclipse.core.runtime/*
+.metadata/.plugins/org.eclipse.e4.ui.workbench.swt/*
