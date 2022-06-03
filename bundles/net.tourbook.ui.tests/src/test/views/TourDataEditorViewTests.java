@@ -19,19 +19,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.junit.BeforeClass;
 import org.junit.jupiter.api.Test;
 
 public class TourDataEditorViewTests {
 
    private SWTWorkbenchBot bot = new SWTWorkbenchBot();
-
-   @BeforeClass
-   public static void beforeClass() {
-
-      SWTBotPreferences.TIMEOUT = 10000;
-   }
 
    @Test
    void testNewTourTitle() {
