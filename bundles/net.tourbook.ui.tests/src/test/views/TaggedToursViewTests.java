@@ -19,39 +19,40 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.junit.BeforeClass;
 import org.junit.jupiter.api.Test;
 
-public class TourTagsViewTests {
+public class TaggedToursViewTests {
 
    private SWTWorkbenchBot bot = new SWTWorkbenchBot();
 
-   @BeforeClass
-   public static void beforeClass() {
-
-      SWTBotPreferences.TIMEOUT = 10000;
-   }
-
+   /**
+    * This test could have caught this bug in the 22.3 release
+    */
    @Test
-   void testTourTagsView() {
+   void testTaggedToursView() {
+
+      //Open the Tagged Tours view
+      final SWTBotMenu otherMenu = bot.menu("Tools ").menu("All Views").menu("Other...").click();
+      assertNotNull(otherMenu);
+      bot.tree().getTreeItem("1. Tour Directories").expand();
+      bot.tree().getTreeItem("1. Tour Directories").getNode("Tagged Tours").select();
+      bot.button("Open").click();
 
       final SWTBotView tourBookView = bot.viewByTitle("Tour Book");
       assertNotNull(tourBookView);
       tourBookView.show();
 
-      final String twentyTwentyOne = "2021   2";
-      bot.tree().getTreeItem(twentyTwentyOne).expand();
-      final String january = "Jan   2";
-      final SWTBotTreeItem januaryNode = bot.tree().getTreeItem(twentyTwentyOne).getNode(january);
-      januaryNode.expand();
-      januaryNode.select();
-      januaryNode.getNode("31").select();
+      bot.tree().getTreeItem("2021   2").getNode("Jan   2").getNode("31").select();
 
-      final SWTBotView tourTagsView = bot.viewByTitle("Tour Tags");
-      assertNotNull(tourTagsView);
-      tourTagsView.show();
-      bot.tree(1).getTreeItem("Shoes 2").select();
+      final SWTBotView taggedToursView = bot.viewByTitle("Tagged Tours");
+      assertNotNull(taggedToursView);
+      taggedToursView.show();
+
+      final SWTBotTreeItem item = bot.tree(1).getTreeItem("Shoes 2   1").select();
+      final SWTBotTreeItem node = bot.tree(1).getTreeItem("Shoes 2   1").getNode("5/31/15").select();
+      assertNotNull(item);
+      assertNotNull(node);
    }
 }
