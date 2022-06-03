@@ -29,6 +29,7 @@ public class TaggedToursViewTests {
 
    /**
     * This test could have caught this bug in the 22.3 release
+    * https://sourceforge.net/p/mytourbook/discussion/622811/thread/a4d83a6052/
     */
    @Test
    void testTaggedToursView() {
@@ -51,8 +52,8 @@ public class TaggedToursViewTests {
       taggedToursView.show();
 
       final SWTBotTreeItem item = bot.tree(1).getTreeItem("Shoes 2   1").select();
-      final SWTBotTreeItem node = bot.tree(1).getTreeItem("Shoes 2   1").getNode("5/31/15").select();
       assertNotNull(item);
+      final SWTBotTreeItem node = bot.tree(1).getTreeItem("Shoes 2   1").getNode("5/31/15").select();
       assertNotNull(node);
    }
 }
