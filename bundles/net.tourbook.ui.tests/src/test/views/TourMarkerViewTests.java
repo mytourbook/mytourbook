@@ -15,10 +15,12 @@
  *******************************************************************************/
 package views;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
@@ -35,17 +37,36 @@ public class TourMarkerViewTests {
 
       final String twentyTwenty = "2020   3";
       bot.tree().getTreeItem(twentyTwenty).expand();
-      final SWTBotTreeItem marchNode = bot.tree().getTreeItem(twentyTwenty).getNode("May   2");
-      marchNode.expand();
-      marchNode.select();
-      final SWTBotTreeItem tourTreeitem = marchNode.getNode("23").select();
+      final SWTBotTreeItem mayNode = bot.tree().getTreeItem(twentyTwenty).getNode("May   2");
+      mayNode.expand();
+      mayNode.select();
+      final SWTBotTreeItem tourTreeitem = mayNode.getNode("23").select();
       assertNotNull(tourTreeitem);
 
       final SWTBotView tourMarkerView = bot.viewByTitle("Tour Markers");
       assertNotNull(tourMarkerView);
       tourMarkerView.show();
 
-      bot.table().select(0);
-      bot.table().select(1);
+      final SWTBotTable tableMarkers = bot.table();
+
+      //Make sure that the tour contains 2 markers
+      assertEquals(2, tableMarkers.rowCount());
+
+      tableMarkers.select(0);
+      tableMarkers.select(1);
+
+      tourMarkerView.show();
+      // bot.radio("Moving Time").click();
+      tourMarkerView.show();
+      tableMarkers.select(1);
+      // bot.radio("Elapsed Time").click();
+      tableMarkers.select(1);
+      tourMarkerView.show();
+      tableMarkers.select(1);
+      tableMarkers.contextMenu("Delete Markers...").click();
+      bot.button("Yes").click();
+
+      //Make sure that the tour now contains 1 marker
+      assertEquals(1, tableMarkers.rowCount());
    }
 }
