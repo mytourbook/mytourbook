@@ -42,5 +42,7 @@ public class DialogQuickEditTests {
       tour.contextMenu("Quick Edit...").click();
       bot.textWithLabel("&Weather").setText("Sunny");
       bot.button("Save ").click();
+
+      bot.sleep(3000);
    }
 }
