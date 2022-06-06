@@ -15,10 +15,12 @@
  *******************************************************************************/
 package views;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.junit.jupiter.api.Test;
 
 public class TourDataEditorViewTests {
@@ -34,8 +36,14 @@ public class TourDataEditorViewTests {
 
       bot.cTabItem("Tour").activate();
 
-      bot.comboBox().setText("New Title");
+      final String newTourTitle = "New Tour Title";
+
+      bot.comboBox().setText(newTourTitle);
       bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click();
+
+      final SWTBotCombo titleCombo = bot.comboBox(newTourTitle);
+      assertNotNull(titleCombo);
+      assertEquals(newTourTitle, titleCombo.getText());
    }
 
    @Test
