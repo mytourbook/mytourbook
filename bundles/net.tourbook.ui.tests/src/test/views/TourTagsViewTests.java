@@ -35,11 +35,11 @@ public class TourTagsViewTests {
 
       final String twentyTwentyOne = "2021   2";
       bot.tree().getTreeItem(twentyTwentyOne).expand();
-      final String january = "Jan   2";
-      final SWTBotTreeItem januaryNode = bot.tree().getTreeItem(twentyTwentyOne).getNode(january);
+      final SWTBotTreeItem januaryNode = bot.tree().getTreeItem(twentyTwentyOne).getNode("Jan   2");
       januaryNode.expand();
       januaryNode.select();
-      januaryNode.getNode("31").select();
+      final SWTBotTreeItem tourTreeitem = januaryNode.getNode("31").select();
+      assertNotNull(tourTreeitem);
 
       final SWTBotView tourTagsView = bot.viewByTitle("Tour Tags");
       assertNotNull(tourTagsView);

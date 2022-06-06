@@ -22,30 +22,40 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
-public class TourMarkerViewTests {
+public class DialogQuickEditTests {
 
    private SWTWorkbenchBot bot = new SWTWorkbenchBot();
 
    @Test
-   void testTourMarkerView() {
+   void testEditWeatherDescription() {
 
       final SWTBotView tourBookView = bot.viewByTitle("Tour Book");
       assertNotNull(tourBookView);
       tourBookView.show();
 
-      final String twentyTwenty = "2020   3";
-      bot.tree().getTreeItem(twentyTwenty).expand();
-      final SWTBotTreeItem marchNode = bot.tree().getTreeItem(twentyTwenty).getNode("May   2");
-      marchNode.expand();
-      marchNode.select();
-      final SWTBotTreeItem tourTreeitem = marchNode.getNode("23").select();
+      bot.toolbarButtonWithTooltip("&Collapse All").click();
+
+      final String twentyTwentyOne = "2021   2";
+      bot.tree().getTreeItem(twentyTwentyOne).expand();
+      final SWTBotTreeItem januaryNode = bot.tree().getTreeItem(twentyTwentyOne).getNode("Jan   2");
+      januaryNode.expand();
+      januaryNode.select();
+      final SWTBotTreeItem tourTreeitem = januaryNode.getNode("31").select();
       assertNotNull(tourTreeitem);
 
-      final SWTBotView tourMarkerView = bot.viewByTitle("Tour Markers");
-      assertNotNull(tourMarkerView);
-      tourMarkerView.show();
+      tourTreeitem.contextMenu("Quick Edit...").click();
+      bot.textWithLabel("&Weather").setText("Sunny");
+      bot.button("Save ").click();
+   }
 
-      bot.table().select(0);
-      bot.table().select(1);
+   @Test
+   void testViewTabs() {
+
+      final SWTBotView tourEditorView = bot.viewByTitle("Tour Editor");
+      assertNotNull(tourEditorView);
+      tourEditorView.show();
+
+      bot.cTabItem("Time Slices").activate();
+      bot.cTabItem("Swim Slices").activate();
    }
 }
