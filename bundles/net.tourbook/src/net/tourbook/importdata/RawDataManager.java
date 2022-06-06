@@ -2991,6 +2991,14 @@ public class RawDataManager {
                                                          final ImportState_Process importState_Process,
                                                          final ReImportStatus reImportStatus) {
 
+      final Shell activeShell = Display.getDefault().getActiveShell();
+
+      // during initialization there is no active shell
+      if (activeShell == null) {
+         StatusUtil.showStatus(RawDataManager.class.getSimpleName() + ": An active shell is not available");
+         return;
+      }
+
       if (existingImportFilePathName == null) {
 
          // import filepath is not available, in older versions -> the file path name is not saved in the tour
@@ -3088,7 +3096,7 @@ public class RawDataManager {
                fileName,
                dataFormat);
 
-         final FileDialog dialog = new FileDialog(Display.getDefault().getActiveShell(), SWT.OPEN);
+         final FileDialog dialog = new FileDialog(activeShell, SWT.OPEN);
          dialog.setText(dialogTitle);
 
          if (existingImportFilePathName != null) {
