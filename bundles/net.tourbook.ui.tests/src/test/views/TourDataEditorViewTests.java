@@ -39,6 +39,10 @@ public class TourDataEditorViewTests {
       bot.comboBox().setText(newTourTitle);
       bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click();
 
+      final SWTBotView tourEditorView = bot.viewByTitle("Tour Editor");
+      assertNotNull(tourEditorView);
+      tourEditorView.show();
+
       final SWTBotCombo titleCombo = bot.comboBox(newTourTitle);
       assertNotNull(titleCombo);
       assertEquals(newTourTitle, titleCombo.getText());
