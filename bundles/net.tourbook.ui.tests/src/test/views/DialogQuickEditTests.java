@@ -43,6 +43,9 @@ public class DialogQuickEditTests {
       bot.textWithLabel("&Weather").setText("Sunny");
       bot.button("Save ").click();
 
+      //Necessary otherwise the subsequent tests fail.
+      //Not sure why but my hunch is that the window is not fully closed for the
+      //subsequent tests.
       bot.sleep(3000);
    }
 }
