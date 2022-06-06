@@ -51,13 +51,9 @@ public class WorkbenchTests {
       assertNotNull(tourBookView);
       tourBookView.show();
 
-      final String twentyThirteen = "2013   1";
-      bot.tree().getTreeItem(twentyThirteen).expand();
-      final String may = "May   1";
-      final SWTBotTreeItem mayNode = bot.tree().getTreeItem(twentyThirteen).getNode(may);
-      mayNode.expand();
-      mayNode.select();
-      mayNode.getNode("18").select();
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand()
+            .getNode("May   1").expand().select().getNode("18").select();
+      assertNotNull(tour);
 
       final SWTBotView tourTourImportView = bot.viewByTitle("Tour Import");
       assertNotNull(tourTourImportView);

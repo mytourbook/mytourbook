@@ -35,13 +35,9 @@ public class TourMarkerViewTests {
       assertNotNull(tourBookView);
       tourBookView.show();
 
-      final SWTBotTreeItem twentyTwentyTreeItem = bot.tree().getTreeItem("2020   3");
-      twentyTwentyTreeItem.expand();
-      final SWTBotTreeItem mayNode = twentyTwentyTreeItem.getNode("May   2");
-      mayNode.expand();
-      mayNode.select();
-      final SWTBotTreeItem tourTreeitem = mayNode.getNode("23").select();
-      assertNotNull(tourTreeitem);
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2020   3").expand()
+            .getNode("May   2").expand().select().getNode("23").select();
+      assertNotNull(tour);
 
       //Open the Tour Marker View
       final SWTBotView tourMarkerView = bot.viewByTitle("Tour Markers");

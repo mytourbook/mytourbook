@@ -35,27 +35,12 @@ public class DialogQuickEditTests {
 
       bot.toolbarButtonWithTooltip("&Collapse All").click();
 
-      final String twentyTwentyOne = "2021   2";
-      bot.tree().getTreeItem(twentyTwentyOne).expand();
-      final SWTBotTreeItem januaryNode = bot.tree().getTreeItem(twentyTwentyOne).getNode("Jan   2");
-      januaryNode.expand();
-      januaryNode.select();
-      final SWTBotTreeItem tourTreeitem = januaryNode.getNode("31").select();
-      assertNotNull(tourTreeitem);
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand()
+            .getNode("Jan   2").expand().select().getNode("31").select();
+      assertNotNull(tour);
 
-      tourTreeitem.contextMenu("Quick Edit...").click();
+      tour.contextMenu("Quick Edit...").click();
       bot.textWithLabel("&Weather").setText("Sunny");
       bot.button("Save ").click();
-   }
-
-   @Test
-   void testViewTabs() {
-
-      final SWTBotView tourEditorView = bot.viewByTitle("Tour Editor");
-      assertNotNull(tourEditorView);
-      tourEditorView.show();
-
-      bot.cTabItem("Time Slices").activate();
-      bot.cTabItem("Swim Slices").activate();
    }
 }

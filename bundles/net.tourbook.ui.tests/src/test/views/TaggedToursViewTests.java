@@ -53,7 +53,7 @@ public class TaggedToursViewTests {
 
       final SWTBotTreeItem item = bot.tree(1).getTreeItem("Shoes 2   1").select();
       assertNotNull(item);
-      final SWTBotTreeItem node = bot.tree(1).getTreeItem("Shoes 2   1").getNode("5/31/15").select();
+      final SWTBotTreeItem node = item.getNode("5/31/15").select();
       assertNotNull(node);
    }
 }

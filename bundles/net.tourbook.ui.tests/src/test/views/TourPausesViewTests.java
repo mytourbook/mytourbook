@@ -33,13 +33,9 @@ public class TourPausesViewTests {
       assertNotNull(tourBookView);
       tourBookView.show();
 
-      final String twentyTwentyOne = "2021   2";
-      bot.tree().getTreeItem(twentyTwentyOne).expand();
-      final SWTBotTreeItem januaryNode = bot.tree().getTreeItem(twentyTwentyOne).getNode("Jan   2");
-      januaryNode.expand();
-      januaryNode.select();
-      final SWTBotTreeItem tourTreeitem = januaryNode.getNode("31").select();
-      assertNotNull(tourTreeitem);
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand()
+            .getNode("Jan   2").expand().select().getNode("31").select();
+      assertNotNull(tour);
 
       final SWTBotView tourPausesView = bot.viewByTitle("Tour Pauses");
       assertNotNull(tourPausesView);
