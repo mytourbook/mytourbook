@@ -55,14 +55,6 @@ public class TourMarkerViewTests {
       tableMarkers.select(0);
       tableMarkers.select(1);
 
-      tourMarkerView.show();
-      // bot.radio("Moving Time").click();
-      tourMarkerView.show();
-      tableMarkers.select(1);
-      // bot.radio("Elapsed Time").click();
-      tableMarkers.select(1);
-      tourMarkerView.show();
-      tableMarkers.select(1);
       tableMarkers.contextMenu("Delete Markers...").click();
       bot.button("Yes").click();
 
