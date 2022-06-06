@@ -40,6 +40,7 @@ public class TourTagsViewTests {
       final SWTBotView tourTagsView = bot.viewByTitle("Tour Tags");
       assertNotNull(tourTagsView);
       tourTagsView.show();
-      bot.tree(1).getTreeItem("Shoes 2").select();
+      final SWTBotTreeItem tag = bot.tree(1).getTreeItem("Shoes 2").select();
+      assertNotNull(tag);
    }
 }
