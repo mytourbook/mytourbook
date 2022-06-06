@@ -28,11 +28,9 @@ public class TourDataEditorViewTests {
    private SWTWorkbenchBot bot = new SWTWorkbenchBot();
 
    @Test
-   void testNewTourTitle() {
+   void testNewTour() {
 
-      final SWTBotView tourEditorView = bot.viewByTitle("Tour Editor");
-      assertNotNull(tourEditorView);
-      tourEditorView.show();
+      bot.toolbarButtonWithTooltip("Create new tour/event (Ctrl+N)").click();
 
       bot.cTabItem("Tour").activate();
 
