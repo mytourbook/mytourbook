@@ -2789,9 +2789,9 @@
      showgrid="true"
      inkscape:current-layer="layer1"
      inkscape:document-units="px"
-     inkscape:cy="748.6493"
-     inkscape:cx="119.32427"
-     inkscape:zoom="2.8284271"
+     inkscape:cy="763.32813"
+     inkscape:cx="190.10938"
+     inkscape:zoom="32"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
      borderopacity="1.0"
@@ -9678,7 +9678,7 @@
        id="path37741-2-5-2-7-6"
        style="display:inline;fill:#c9c9c9;fill-opacity:1;stroke:none;stroke-width:0.499999;stroke-linecap:square;stroke-dasharray:none;stroke-opacity:1"
        d="m 196.85455,753.97011 c -1.5464,0 -2.8,1.30364 -2.8,2.91176 0.002,0.10027 0.008,0.20033 0.0199,0.29986 -0.0245,-9.7e-4 -0.049,-0.002 -0.0736,-0.002 -1.65726,-2.2e-4 -3.00085,1.29608 -3.00085,2.89521 0,1.59913 1.34359,2.89544 3.00085,2.89523 2.61404,-0.008 5.37612,8.1e-4 7.65823,0 h 0.0318 v -0.002 c 1.83192,-0.0181 3.30808,-1.56707 3.30909,-3.4722 0,-1.91878 -1.49577,-3.47427 -3.34091,-3.47427 -0.72582,0.003 -1.43088,0.25228 -2.00852,0.70933 -0.0773,-1.54717 -1.30612,-2.76057 -2.79602,-2.76069 z"
-       sodipodi:nodetypes="scccscccccccs"
+       sodipodi:nodetypes="scccscccccccss"
        inkscape:export-filename="..\..\net.tourbook.common\icons\weather-overcast-dark.png"
        inkscape:export-xdpi="96"
        inkscape:export-ydpi="96" /><rect
@@ -9737,8 +9737,8 @@
        d="m 199.52792,733.13643 -4.0453,7.07401 1.88682,0.001 -1.15069,4.5524 4.37102,-6.02781 -2.26765,0.006 z"
        id="path103713"
        sodipodi:nodetypes="ccccccc" /><path
-       style="display:inline;fill:#ffe700;fill-opacity:1;stroke:#a39300;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 199.47612,758.19594 -4.0453,7.07401 1.88682,10e-4 -1.15069,4.5524 4.37102,-6.02781 -2.26765,0.006 z"
+       style="display:inline;fill:#ffe700;fill-opacity:1;stroke:none;stroke-width:0.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 199,758 -4.03793,7.98815 L 197,766 l -1,4 4,-6 h -2 z"
        id="path103713-8"
        sodipodi:nodetypes="ccccccc" /><rect
        inkscape:export-ydpi="96"
