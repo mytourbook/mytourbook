@@ -29,9 +29,13 @@ import org.junit.jupiter.api.Test;
 
 public class DialogExportTests {
 
-   private SWTWorkbenchBot bot              = new SWTWorkbenchBot();
+   private static final String EXPORT_TOUR      = "Export Tour";
 
-   private String          WorkingDirectory = System.getProperty("user.dir");
+   private static final String EXPORT           = "Export";
+
+   private SWTWorkbenchBot     bot              = new SWTWorkbenchBot();
+
+   private String              WorkingDirectory = System.getProperty("user.dir");
 
    private SWTBotTreeItem getTour() {
 
@@ -44,6 +48,7 @@ public class DialogExportTests {
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand()
             .getNode("Jan   2").expand().select().getNode("31").select();
       assertNotNull(tour);
+
       return tour;
    }
 
@@ -52,10 +57,10 @@ public class DialogExportTests {
 
       final SWTBotTreeItem tour = getTour();
 
-      tour.contextMenu("Export Tour").menu("GPX").click();
+      tour.contextMenu(EXPORT_TOUR).menu("GPX").click();
       final String fileName = bot.comboBox(0).getText() + ".gpx";
       bot.comboBox(1).setText(WorkingDirectory);
-      bot.button("Export").click();
+      bot.button(EXPORT).click();
 
       final Path gpxFilePath = Paths.get(WorkingDirectory, fileName);
       assertTrue(Files.exists(gpxFilePath));
@@ -66,10 +71,10 @@ public class DialogExportTests {
 
       final SWTBotTreeItem tour = getTour();
 
-      tour.contextMenu("Export Tour").menu("MyTourbook (.mt)").click();
+      tour.contextMenu(EXPORT_TOUR).menu("MyTourbook (.mt)").click();
       final String fileName = bot.comboBox(0).getText() + ".mt";
       bot.comboBox(1).setText(WorkingDirectory);
-      bot.button("Export").click();
+      bot.button(EXPORT).click();
 
       final Path mtFilePath = Paths.get(WorkingDirectory, fileName);
       assertTrue(Files.exists(mtFilePath));
@@ -80,11 +85,11 @@ public class DialogExportTests {
 
       final SWTBotTreeItem tour = getTour();
 
-      tour.contextMenu("Export Tour").menu("TCX").click();
+      tour.contextMenu(EXPORT_TOUR).menu("TCX").click();
       bot.radio("Activities").click();
       final String fileName = bot.comboBox(2).getText() + ".tcx";
       bot.comboBox(3).setText(WorkingDirectory);
-      bot.button("Export").click();
+      bot.button(EXPORT).click();
 
       final Path tcxFilePath = Paths.get(WorkingDirectory, fileName);
       assertTrue(Files.exists(tcxFilePath));
