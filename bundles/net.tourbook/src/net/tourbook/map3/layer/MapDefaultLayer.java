@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,13 +57,8 @@ public class MapDefaultLayer {
 //    *     </Layer>
 //    *     <Layer href="config/Earth/BMNGWMSLayer2.xml" actuate="onLoad"/>
 //    *     <Layer href="config/Earth/LandsatI3WMSLayer2.xml" actuate="onLoad"/>
-//    *     <Layer href="config/Earth/USDANAIPWMSImageLayer.xml" actuate="onRequest"/>
 //    *     <Layer href="config/Earth/USDANAIPUSGSWMSImageLayer.xml" actuate="onRequest"/>
-//    *     <Layer href="config/Earth/MSVirtualEarthAerialLayer.xml" actuate="onRequest"/>
 //    *     <Layer href="config/Earth/BingImagery.xml" actuate="onRequest"/>
-//    *     <Layer href="config/Earth/USGSTopoLowResLayer.xml" actuate="onRequest"/>
-//    *     <Layer href="config/Earth/USGSTopoMedResLayer.xml" actuate="onRequest"/>
-//    *     <Layer href="config/Earth/USGSTopoHighResLayer.xml" actuate="onRequest"/>
 //    *     <Layer href="config/Earth/USGSUrbanAreaOrthoLayer.xml" actuate="onRequest"/>
 //    *     <!--<Layer className="gov.nasa.worldwind.layers.Earth.OSMMapnikLayer" actuate="onRequest"/>-->
 //    *     <!--<Layer className="gov.nasa.worldwind.layers.Earth.OSMCycleMapLayer" actuate="onRequest"/>-->
