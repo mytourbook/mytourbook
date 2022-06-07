@@ -34,6 +34,10 @@ Improvements
 
 * Tour Segmenter View (Frederic)
   - Added the ability to export the current view in .CSV format
+  
+* Weather Icons
+  - Redrawing of icon images
+  - Show adjusted weather icons in dark mode
 
 
 Changes
