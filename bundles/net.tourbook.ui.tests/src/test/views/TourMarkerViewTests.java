@@ -28,21 +28,55 @@ public class TourMarkerViewTests {
 
    private SWTWorkbenchBot bot = new SWTWorkbenchBot();
 
+//   @Test
+//   void testAddTourMarker() {
+//
+//      final SWTBotView tourBookView = bot.viewByTitle("Tour Book");
+//      assertNotNull(tourBookView);
+//      tourBookView.show();
+//
+//      final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   2").expand()
+//            .getNode("May   2").expand().select().getNode("31").select();
+//      assertNotNull(tour);
+//
+//      //Open the Tour Marker View
+//      final SWTBotView tourMarkerView = bot.viewByTitle("Tour Markers");
+//      assertNotNull(tourMarkerView);
+//      tourMarkerView.show();
+//
+//      final SWTBotTable tableMarkers = bot.table();
+//
+//      //Make sure that the tour contains no marker
+//      assertEquals(0, tableMarkers.rowCount());
+//
+//      final SWTBotView tourChartView = bot.viewByTitle("Tour Chart");
+//      assertNotNull(tourChartView);
+//      tourChartView.show();
+//      tourChartView.setFocus();
+
+   //THIS DOESN'T WORK YET. The context menu is not found.
+//      tourChartView.viewMenu().contextMenu("Create Tour Marker").click();
+//      bot.button("Save ").click();
+//
+//      tour.contextMenu("Edit Marker...").click();
+//      bot.comboBox().setText("Marker 1");
+//      bot.button("Save ").click();
+//
+//      //Make sure that the tour now contains 1 marker
+//      assertEquals(1, tableMarkers.rowCount());
+//   }
+
    @Test
-   void testTourMarkerView() {
-
-      final SWTBotView tourBookView = bot.viewByTitle("Tour Book");
-      assertNotNull(tourBookView);
-      tourBookView.show();
-
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2020   3").expand()
-            .getNode("May   2").expand().select().getNode("23").select();
-      assertNotNull(tour);
+   void testDeleteTourMarker() {
 
       //Open the Tour Marker View
       final SWTBotView tourMarkerView = bot.viewByTitle("Tour Markers");
       assertNotNull(tourMarkerView);
       tourMarkerView.show();
+
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2020   3").expand()
+            .getNode("May   2").expand().select().getNode("23").select();
+      assertNotNull(tour);
 
       final SWTBotTable tableMarkers = bot.table();
 
@@ -58,4 +92,5 @@ public class TourMarkerViewTests {
       //Make sure that the tour now contains 1 marker
       assertEquals(1, tableMarkers.rowCount());
    }
+
 }
