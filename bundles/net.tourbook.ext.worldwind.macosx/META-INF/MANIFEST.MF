@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: World Wind Resources
 Bundle-SymbolicName: net.tourbook.ext.worldwind.macosx;singleton:=true
-Bundle-Version: 2.2.20200812
+Bundle-Version: 2.2.20220607
 Bundle-Vendor: NASA World Wind
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Fragment-Host: net.tourbook.ext.worldwind;bundle-version="2.2.20200812"
+Fragment-Host: net.tourbook.ext.worldwind;bundle-version="2.2.20220607"
 Automatic-Module-Name: net.tourbook.ext.worldwind.macosx
