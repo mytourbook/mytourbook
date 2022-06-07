@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test;
 
 public class DialogExportTests {
 
-   private static final String EXPORT_TOUR      = "E&xport Tour";
+   private static final String EXPORT_TOUR      = "Export Tour";
 
    private static final String EXPORT           = "Export";
 
