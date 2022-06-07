@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -436,7 +436,7 @@ public class Map3Manager {
       /*
        * create WW layer
        */
-      _wwLayer_TourTrack = new TourTrackLayer(_state);
+      _wwLayer_TourTrack = new TourTrackLayer();
 
       /*
        * create UI model layer
@@ -1236,7 +1236,7 @@ public class Map3Manager {
 
       Map3GradientColorManager.saveColors();
 
-      _wwLayer_TourTrack.saveState(_state);
+      _wwLayer_TourTrack.saveState();
 
       /*
        * save layer structure in xml file
