@@ -121,8 +121,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * <b>Before releasing, set this to <code>true</code></b>
     * <p>
     */
-   private static final boolean IS_USING_VTM_PRODUCTION_PLUGIN = true;
-
+   private static final boolean    IS_USING_VTM_PRODUCTION_PLUGIN         = true;
    //
    private static final String     STATE_LAYER_BUILDING_IS_SHOW_SHADOW    = "STATE_LAYER_BUILDING_IS_SHOW_SHADOW";    //$NON-NLS-1$
    private static final String     STATE_LAYER_BUILDING_IS_VISIBLE        = "STATE_LAYER_BUILDING_IS_VISIBLE";        //$NON-NLS-1$
@@ -721,6 +720,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       allMapLayer.add(_layer_SliderLocation);
       allMapLayer.add(_layer_ScaleBar);
       allMapLayer.add(_layer_TileInfo);
+
+      /*
+       * OpenGL test
+       */
+//    final GenericLayer _layer_OpenGLTest = new GenericLayer(mMap, new CustomRenderer(mMap));
+      final GenericLayer _layer_OpenGLTest = new GenericLayer(mMap, new HexagonRenderer());
+      _layer_OpenGLTest.setEnabled(true);
+      allMapLayer.add(_layer_OpenGLTest);
 
       /*
        * Set static layers which are located after the named layer and which will never be removed,

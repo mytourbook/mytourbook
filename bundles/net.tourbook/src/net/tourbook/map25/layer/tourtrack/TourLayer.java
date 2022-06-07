@@ -52,6 +52,8 @@ import org.oscim.utils.geom.LineClipper;
  * <p>
  * Example to handle track hover/selection
  * org.oscim.layers.marker.ItemizedLayer.activateSelectedItems(MotionEvent, ActiveItem)
+ * <p>
+ * Original code: org.oscim.layers.PathLayer
  */
 public class TourLayer extends Layer {
 
@@ -183,15 +185,15 @@ public class TourLayer extends Layer {
                _isUpdatePoints = false;
                __numPoints = numPoints = _geoPoints.length;
 
-               double[] points = __preProjectedPoints;
+               double[] preProjectedPoints = __preProjectedPoints;
 
-               if (numPoints * 2 >= points.length) {
-                  points = __preProjectedPoints = new double[numPoints * 2];
+               if (numPoints * 2 >= preProjectedPoints.length) {
+                  preProjectedPoints = __preProjectedPoints = new double[numPoints * 2];
                   __projectedPoints = new float[numPoints * 2];
                }
 
                for (int pointIndex = 0; pointIndex < numPoints; pointIndex++) {
-                  MercatorProjection.project(_geoPoints[pointIndex], points, pointIndex);
+                  MercatorProjection.project(_geoPoints[pointIndex], preProjectedPoints, pointIndex);
                }
             }
          }
@@ -261,8 +263,8 @@ public class TourLayer extends Layer {
 
          __lineClipper.clipStart(x, y);
 
-         final float[] projected = __projectedPoints;
-         int i = addPoint(projected, 0, x, y);
+         final float[] projectedPoints = __projectedPoints;
+         int i = addPoint(projectedPoints, 0, x, y);
 
          float prevX = x;
          float prevY = y;
@@ -286,11 +288,11 @@ public class TourLayer extends Layer {
             if (flip != flipDirection) {
                flip = flipDirection;
                if (i > 2) {
-                  lineBucket.addLine(projected, i, false);
+                  lineBucket.addLine(projectedPoints, i, false);
                }
 
                __lineClipper.clipStart(x, y);
-               i = addPoint(projected, 0, x, y);
+               i = addPoint(projectedPoints, 0, x, y);
                continue;
             }
 
@@ -301,11 +303,11 @@ public class TourLayer extends Layer {
 
                // start a new line (copied from flip code)
                if (i > 2) {
-                  lineBucket.addLine(projected, i, false);
+                  lineBucket.addLine(projectedPoints, i, false);
                }
 
                __lineClipper.clipStart(x, y);
-               i = addPoint(projected, 0, x, y);
+               i = addPoint(projectedPoints, 0, x, y);
                continue;
             }
 
@@ -313,7 +315,7 @@ public class TourLayer extends Layer {
             if (clip != LineClipper.INSIDE) {
 
                if (i > 2) {
-                  lineBucket.addLine(projected, i, false);
+                  lineBucket.addLine(projectedPoints, i, false);
                }
 
                if (clip == LineClipper.INTERSECTION) {
@@ -333,8 +335,8 @@ public class TourLayer extends Layer {
 
                // if the end point is inside, add it
                if (__lineClipper.getPrevOutcode() == LineClipper.INSIDE) {
-                  projected[i++] = prevX;
-                  projected[i++] = prevY;
+                  projectedPoints[i++] = prevX;
+                  projectedPoints[i++] = prevY;
                }
                continue;
             }
@@ -342,13 +344,13 @@ public class TourLayer extends Layer {
             final float dx = x - prevX;
             final float dy = y - prevY;
             if ((i == 0) || FastMath.absMaxCmp(dx, dy, MIN_DIST)) {
-               projected[i++] = prevX = x;
-               projected[i++] = prevY = y;
+               projectedPoints[i++] = prevX = x;
+               projectedPoints[i++] = prevY = y;
             }
          }
 
          if (i > 2) {
-            lineBucket.addLine(projected, i, false);
+            lineBucket.addLine(projectedPoints, i, false);
          }
       }
 
@@ -378,16 +380,16 @@ public class TourLayer extends Layer {
    private LineStyle createLineStyle() {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-      
-      int lineColor = ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity);
+
+      final int lineColor = ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity);
 
       if (trackConfig.isShowDirectionArrow) {
 
-         MarkerToolkit _markertoolkit = new MarkerToolkit(MarkerShape.ARROW);
+         final MarkerToolkit _markertoolkit = new MarkerToolkit(MarkerShape.ARROW);
 
-         Bitmap _bitmapArrow = _markertoolkit.drawTrackArrow(40, lineColor);
+         final Bitmap _bitmapArrow = _markertoolkit.drawTrackArrow(40, lineColor);
 
-         TextureItem _tex = new TextureItem(_bitmapArrow);
+         final TextureItem _tex = new TextureItem(_bitmapArrow);
 
          //width must not to tiny, otherwise no place that arrow can be painted
          final float faterOutlineWidth = Math.max(trackConfig.outlineWidth * 2, 5f);
