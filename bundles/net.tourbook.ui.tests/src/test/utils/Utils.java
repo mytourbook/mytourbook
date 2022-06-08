@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  * Copyright (C) 2022 Frédéric Bard
  *
@@ -13,40 +14,28 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package dialogs;
+package utils;
 
-import static org.junit.Assert.assertTrue;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.junit.jupiter.api.Test;
 
-import utils.Utils;
+public class Utils {
 
-public class DialogPrintTour {
+   public static SWTBotTreeItem getTour(final SWTWorkbenchBot bot) {
 
-   private SWTWorkbenchBot bot              = new SWTWorkbenchBot();
+      final SWTBotView tourBookView = bot.viewByTitle("Tour Book");
+      assertNotNull(tourBookView);
+      tourBookView.show();
 
-   private String          workingDirectory = System.getProperty("user.dir");
+      bot.toolbarButtonWithTooltip("&Collapse All").click();
 
-   @Test
-   void testPrintTour() {
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand()
+            .getNode("Jan   2").expand().select().getNode("31").select();
+      assertNotNull(tour);
 
-      final SWTBotTreeItem tour = Utils.getTour(bot);
-
-      tour.contextMenu("Print Tour").menu("PDF").click();
-      bot.checkBox("Print Markers").click();
-      bot.checkBox("Print Description").click();
-
-      final String fileName = bot.comboBox(2).getText() + ".pdf";
-      bot.comboBox(3).setText(workingDirectory);
-      bot.button("Print ").click();
-
-      final Path pdfFilePath = Paths.get(workingDirectory, fileName);
-      assertTrue(Files.exists(pdfFilePath));
+      return tour;
    }
 }

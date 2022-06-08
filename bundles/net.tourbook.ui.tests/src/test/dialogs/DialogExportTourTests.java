@@ -16,16 +16,16 @@
 package dialogs;
 
 import static org.junit.Assert.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
+
+import utils.Utils;
 
 public class DialogExportTourTests {
 
@@ -37,25 +37,10 @@ public class DialogExportTourTests {
 
    private String              workingDirectory = System.getProperty("user.dir");
 
-   private SWTBotTreeItem getTour() {
-
-      final SWTBotView tourBookView = bot.viewByTitle("Tour Book");
-      assertNotNull(tourBookView);
-      tourBookView.show();
-
-      bot.toolbarButtonWithTooltip("&Collapse All").click();
-
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand()
-            .getNode("Jan   2").expand().select().getNode("31").select();
-      assertNotNull(tour);
-
-      return tour;
-   }
-
    @Test
    void testExportGpx() {
 
-      final SWTBotTreeItem tour = getTour();
+      final SWTBotTreeItem tour = Utils.getTour(bot);
 
       tour.contextMenu(EXPORT_TOUR).menu("GPX").click();
 
@@ -78,7 +63,7 @@ public class DialogExportTourTests {
    @Test
    void testExportMt() {
 
-      final SWTBotTreeItem tour = getTour();
+      final SWTBotTreeItem tour = Utils.getTour(bot);
 
       tour.contextMenu(EXPORT_TOUR).menu("MyTourbook (.mt)").click();
       final String fileName = bot.comboBox(0).getText() + ".mt";
@@ -92,7 +77,7 @@ public class DialogExportTourTests {
    @Test
    void testExportTcx() {
 
-      final SWTBotTreeItem tour = getTour();
+      final SWTBotTreeItem tour = Utils.getTour(bot);
 
       tour.contextMenu(EXPORT_TOUR).menu("TCX").click();
       bot.radio("Activities").click();
