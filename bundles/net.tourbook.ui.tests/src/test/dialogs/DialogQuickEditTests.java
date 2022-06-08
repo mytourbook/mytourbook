@@ -22,6 +22,8 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
+import utils.Utils;
+
 public class DialogQuickEditTests {
 
    private SWTWorkbenchBot bot = new SWTWorkbenchBot();
@@ -35,9 +37,7 @@ public class DialogQuickEditTests {
 
       bot.toolbarButtonWithTooltip("&Collapse All").click();
 
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand()
-            .getNode("Jan   2").expand().select().getNode("31").select();
-      assertNotNull(tour);
+      final SWTBotTreeItem tour = Utils.getTour(bot);
 
       tour.contextMenu("Quick Edit...").click();
       bot.textWithLabel("&Weather").setText("Sunny");
