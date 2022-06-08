@@ -21,6 +21,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import net.tourbook.Messages;
+
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
@@ -29,34 +31,28 @@ import utils.Utils;
 
 public class DialogExportTourTests {
 
-   private static final String EXPORT_TOUR      = "Export Tour";
-
-   private static final String EXPORT           = "Export";
-
-   private SWTWorkbenchBot     bot              = new SWTWorkbenchBot();
-
-   private String              workingDirectory = System.getProperty("user.dir");
+   private SWTWorkbenchBot bot = new SWTWorkbenchBot();
 
    @Test
    void testExportGpx() {
 
       final SWTBotTreeItem tour = Utils.getTour(bot);
 
-      tour.contextMenu(EXPORT_TOUR).menu("GPX").click();
+      tour.contextMenu(Messages.action_export_tour).menu("GPX").click();
 
-      bot.checkBox("Description and Title").click();
-      bot.checkBox("Markers and WayPoints").click();
-      bot.checkBox("Tour fields").click();
-      bot.checkBox("Only surfed Waves").click();
-      bot.checkBox("Camouflage Speed").click();
-      bot.checkBox("\"creator\" \" with barometer\"").click();
-      bot.checkBox("Overwrite existing file(s)").click();
+      bot.checkBox(Messages.Dialog_Export_Checkbox_Description).click();
+      bot.checkBox(Messages.dialog_export_chk_exportMarkers).click();
+      bot.checkBox(Messages.Dialog_Export_Checkbox_TourFields).click();
+      bot.checkBox(Messages.Dialog_Export_Checkbox_SurfingWaves).click();
+      bot.checkBox(Messages.dialog_export_chk_camouflageSpeed).click();
+      bot.checkBox(Messages.Dialog_Export_Checkbox_WithBarometer).click();
+      bot.checkBox(Messages.dialog_export_chk_overwriteFiles).click();
 
       final String fileName = bot.comboBox(0).getText() + ".gpx";
-      bot.comboBox(1).setText(workingDirectory);
-      bot.button(EXPORT).click();
+      bot.comboBox(1).setText(Utils.workingDirectory);
+      bot.button(Messages.dialog_export_btn_export).click();
 
-      final Path gpxFilePath = Paths.get(workingDirectory, fileName);
+      final Path gpxFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(gpxFilePath));
    }
 
@@ -65,12 +61,12 @@ public class DialogExportTourTests {
 
       final SWTBotTreeItem tour = Utils.getTour(bot);
 
-      tour.contextMenu(EXPORT_TOUR).menu("MyTourbook (.mt)").click();
+      tour.contextMenu(Messages.action_export_tour).menu("MyTourbook (.mt)").click();
       final String fileName = bot.comboBox(0).getText() + ".mt";
-      bot.comboBox(1).setText(workingDirectory);
-      bot.button(EXPORT).click();
+      bot.comboBox(1).setText(Utils.workingDirectory);
+      bot.button(Messages.dialog_export_btn_export).click();
 
-      final Path mtFilePath = Paths.get(workingDirectory, fileName);
+      final Path mtFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(mtFilePath));
    }
 
@@ -79,16 +75,17 @@ public class DialogExportTourTests {
 
       final SWTBotTreeItem tour = Utils.getTour(bot);
 
-      tour.contextMenu(EXPORT_TOUR).menu("TCX").click();
-      bot.radio("Activities").click();
-      bot.checkBox("Description").click();
-      bot.checkBox("Camouflage Speed").click();
+      tour.contextMenu(Messages.action_export_tour).menu("TCX").click();
+      //TODO rename to Dialog_Export_Radio_TCX_Activities
+      bot.radio(Messages.Dialog_Export_Radio_TCX_Aktivities).click();
+      bot.checkBox(Messages.dialog_export_chk_exportNotes).click();
+      bot.checkBox(Messages.dialog_export_chk_camouflageSpeed).click();
 
       final String fileName = bot.comboBox(2).getText() + ".tcx";
-      bot.comboBox(3).setText(workingDirectory);
-      bot.button(EXPORT).click();
+      bot.comboBox(3).setText(Utils.workingDirectory);
+      bot.button(Messages.dialog_export_btn_export).click();
 
-      final Path tcxFilePath = Paths.get(workingDirectory, fileName);
+      final Path tcxFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(tcxFilePath));
    }
 }

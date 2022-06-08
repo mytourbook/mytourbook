@@ -1,4 +1,3 @@
-
 /*******************************************************************************
  * Copyright (C) 2022 Frédéric Bard
  *
@@ -18,24 +17,47 @@ package utils;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import net.tourbook.Messages;
+
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 public class Utils {
 
+   private static String tourBookViewTitle = "Tour Book";
+
+   public static String  workingDirectory  = System.getProperty("user.dir");
+
    public static SWTBotTreeItem getTour(final SWTWorkbenchBot bot) {
 
-      final SWTBotView tourBookView = bot.viewByTitle("Tour Book");
-      assertNotNull(tourBookView);
-      tourBookView.show();
+      showTourBookView(bot);
 
-      bot.toolbarButtonWithTooltip("&Collapse All").click();
+      bot.toolbarButtonWithTooltip(Messages.App_Action_CollapseAll).click();
 
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand()
             .getNode("Jan   2").expand().select().getNode("31").select();
       assertNotNull(tour);
 
       return tour;
+   }
+
+   public static void showTourBookView(final SWTWorkbenchBot bot) {
+
+      showView(bot, tourBookViewTitle);
+   }
+
+   public static void showView(final SWTWorkbenchBot bot, final String viewName) {
+
+      final SWTBotView tourBookView = bot.viewByTitle(viewName);
+      assertNotNull(tourBookView);
+      tourBookView.show();
+   }
+
+   public static void showViewFromMenu(final SWTWorkbenchBot bot, final String menuName, final String viewName) {
+
+      final SWTBotMenu viewMenu = bot.menu(menuName).menu(viewName).click();
+      assertNotNull(viewMenu);
    }
 }

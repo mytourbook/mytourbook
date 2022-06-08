@@ -18,11 +18,14 @@ package views;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import net.tourbook.Messages;
+
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
+
+import utils.Utils;
 
 public class TourMarkerViewTests {
 
@@ -70,9 +73,7 @@ public class TourMarkerViewTests {
    void testDeleteTourMarker() {
 
       //Open the Tour Marker View
-      final SWTBotView tourMarkerView = bot.viewByTitle("Tour Markers");
-      assertNotNull(tourMarkerView);
-      tourMarkerView.show();
+      Utils.showView(bot, "Tour Markers");
 
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2020   3").expand()
             .getNode("May   2").expand().select().getNode("23").select();
@@ -86,7 +87,7 @@ public class TourMarkerViewTests {
       tableMarkers.select(0);
       tableMarkers.select(1);
 
-      tableMarkers.contextMenu("Delete Markers...").click();
+      tableMarkers.contextMenu(Messages.App_Action_DeleteTourMarker).click();
       bot.button("Yes").click();
 
       //Make sure that the tour now contains 1 marker

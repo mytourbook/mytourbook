@@ -4,10 +4,11 @@ Bundle-Name: GUI tests suite for MyTourbook
 Bundle-SymbolicName: net.tourbook.ui.tests;singleton:=true
 Bundle-Version: 22.6.0.qualifier
 Require-Bundle: net.tourbook,
+ net.tourbook.common,
  net.tourbook.export,
  net.tourbook.printing,
  org.junit.jupiter.api;bundle-version="5.8.1",
- org.eclipse.swtbot.go;bundle-version="3.1.0"
+ org.eclipse.swtbot.go
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Vendor: MyTourbook

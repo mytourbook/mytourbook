@@ -15,12 +15,10 @@
  *******************************************************************************/
 package views;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
+
+import utils.Utils;
 
 public class TourPausesViewTests {
 
@@ -29,17 +27,9 @@ public class TourPausesViewTests {
    @Test
    void testTourPausesView() {
 
-      final SWTBotView tourBookView = bot.viewByTitle("Tour Book");
-      assertNotNull(tourBookView);
-      tourBookView.show();
+      Utils.getTour(bot);
 
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand()
-            .getNode("Jan   2").expand().select().getNode("31").select();
-      assertNotNull(tour);
-
-      final SWTBotView tourPausesView = bot.viewByTitle("Tour Pauses");
-      assertNotNull(tourPausesView);
-      tourPausesView.show();
+      Utils.showView(bot, "Tour Pauses");
 
       bot.table().select("15:40");
    }
