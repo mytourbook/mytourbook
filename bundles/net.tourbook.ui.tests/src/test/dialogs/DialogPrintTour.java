@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import utils.Utils;
 
-public class DialogPrintTourTests {
+public class DialogPrintTour {
 
    private SWTWorkbenchBot bot              = new SWTWorkbenchBot();
 
