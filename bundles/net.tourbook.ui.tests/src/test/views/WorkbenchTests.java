@@ -133,5 +133,15 @@ public class WorkbenchTests {
       final SWTBotView heartRateVariabilityView = bot.viewByTitle("Heart Rate Variability");
       assertNotNull(heartRateVariabilityView);
       heartRateVariabilityView.show();
+
+      bot.menu("Directory").menu("Sensor").click();
+      final SWTBotView sensorView = bot.viewByTitle("Sensor");
+      assertNotNull(sensorView);
+      sensorView.show();
+
+      bot.menu("Directory").menu("Sensor Chart").click();
+      final SWTBotView sensorChartView = bot.viewByTitle("Sensor Chart");
+      assertNotNull(sensorChartView);
+      sensorChartView.show();
    }
 }
