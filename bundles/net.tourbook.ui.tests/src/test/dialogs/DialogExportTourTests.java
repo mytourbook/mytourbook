@@ -27,7 +27,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
-public class DialogExportTests {
+public class DialogExportTourTests {
 
    private static final String EXPORT_TOUR      = "Export Tour";
 
@@ -58,6 +58,15 @@ public class DialogExportTests {
       final SWTBotTreeItem tour = getTour();
 
       tour.contextMenu(EXPORT_TOUR).menu("GPX").click();
+
+      bot.checkBox("Description and Title").click();
+      bot.checkBox("Markers and WayPoints").click();
+      bot.checkBox("Tour fields").click();
+      bot.checkBox("Only surfed Waves").click();
+      bot.checkBox("Camouflage Speed").click();
+      bot.checkBox("\"creator\" \" with barometer\"").click();
+      bot.checkBox("Overwrite existing file(s)").click();
+
       final String fileName = bot.comboBox(0).getText() + ".gpx";
       bot.comboBox(1).setText(WorkingDirectory);
       bot.button(EXPORT).click();
@@ -87,6 +96,8 @@ public class DialogExportTests {
 
       tour.contextMenu(EXPORT_TOUR).menu("TCX").click();
       bot.radio("Activities").click();
+      bot.checkBox("Camouflage Speed").click();
+
       final String fileName = bot.comboBox(2).getText() + ".tcx";
       bot.comboBox(3).setText(WorkingDirectory);
       bot.button(EXPORT).click();
