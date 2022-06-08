@@ -4851,7 +4851,7 @@ public class Map2 extends Canvas {
             }
          }
 
-         // fix: java.lang.ArrayIndexOutOfBoundsException: Index 15091 out of bounds for length 8244 
+         // fix: java.lang.ArrayIndexOutOfBoundsException: Index 15091 out of bounds for length 8244
          // this could not be reproduced, it happened when 2 tours were displayed/selected after a geo search
          if (serieIndex >= latitudeSerie.length) {
             continue;
@@ -7284,7 +7284,7 @@ public class Map2 extends Canvas {
 
       Point2D.Double wpNewMapCenter;
 
-      if (centerMapBy.equals(CenterMapBy.Mouse)
+      if (CenterMapBy.Mouse.equals(centerMapBy)
 
             // fixes this "issue" https://github.com/wolfgang-ch/mytourbook/issues/370
             && isNewZoomLevel) {
