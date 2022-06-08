@@ -96,6 +96,7 @@ public class DialogExportTourTests {
 
       tour.contextMenu(EXPORT_TOUR).menu("TCX").click();
       bot.radio("Activities").click();
+      bot.checkBox("Description").click();
       bot.checkBox("Camouflage Speed").click();
 
       final String fileName = bot.comboBox(2).getText() + ".tcx";
