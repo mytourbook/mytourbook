@@ -35,7 +35,7 @@ public class DialogExportTourTests {
 
    private SWTWorkbenchBot     bot              = new SWTWorkbenchBot();
 
-   private String              WorkingDirectory = System.getProperty("user.dir");
+   private String              workingDirectory = System.getProperty("user.dir");
 
    private SWTBotTreeItem getTour() {
 
@@ -68,10 +68,10 @@ public class DialogExportTourTests {
       bot.checkBox("Overwrite existing file(s)").click();
 
       final String fileName = bot.comboBox(0).getText() + ".gpx";
-      bot.comboBox(1).setText(WorkingDirectory);
+      bot.comboBox(1).setText(workingDirectory);
       bot.button(EXPORT).click();
 
-      final Path gpxFilePath = Paths.get(WorkingDirectory, fileName);
+      final Path gpxFilePath = Paths.get(workingDirectory, fileName);
       assertTrue(Files.exists(gpxFilePath));
    }
 
@@ -82,10 +82,10 @@ public class DialogExportTourTests {
 
       tour.contextMenu(EXPORT_TOUR).menu("MyTourbook (.mt)").click();
       final String fileName = bot.comboBox(0).getText() + ".mt";
-      bot.comboBox(1).setText(WorkingDirectory);
+      bot.comboBox(1).setText(workingDirectory);
       bot.button(EXPORT).click();
 
-      final Path mtFilePath = Paths.get(WorkingDirectory, fileName);
+      final Path mtFilePath = Paths.get(workingDirectory, fileName);
       assertTrue(Files.exists(mtFilePath));
    }
 
@@ -100,10 +100,10 @@ public class DialogExportTourTests {
       bot.checkBox("Camouflage Speed").click();
 
       final String fileName = bot.comboBox(2).getText() + ".tcx";
-      bot.comboBox(3).setText(WorkingDirectory);
+      bot.comboBox(3).setText(workingDirectory);
       bot.button(EXPORT).click();
 
-      final Path tcxFilePath = Paths.get(WorkingDirectory, fileName);
+      final Path tcxFilePath = Paths.get(workingDirectory, fileName);
       assertTrue(Files.exists(tcxFilePath));
    }
 }
