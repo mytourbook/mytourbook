@@ -21,6 +21,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.web.WEB;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -30,12 +31,19 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * Map 2.5D properties slideout
+ * Slideout for 2.5D map
  */
 public class SlideoutMap25_MapOptions extends ToolbarSlideout {
+
+// SET_FORMATTING_OFF
+
+   private static final String MAP_25D_KEYBOARD_SHORTCUTS = "https://mytourbook.sourceforge.io/mytourbook/index.php/documentation/show-tours/2-5d-map/25d-actions#keyboard"; //$NON-NLS-1$
+
+// SET_FORMATTING_ON
 
    private SelectionListener _defaultSelectionListener;
 
@@ -43,6 +51,8 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
     * UI controls
     */
    private Button _chkUseDraggedKeyboardNavigation;
+
+   private Link   _linkKeyboardShortcuts;
 
    /**
     * @param ownerControl
@@ -113,7 +123,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory
             .fillDefaults()
-            .numColumns(2)
+            .numColumns(1)
             .applyTo(container);
       {
          {
@@ -126,10 +136,11 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             _chkUseDraggedKeyboardNavigation.setText(Messages.Slideout_Map25Options_Checkbox_UseDraggedKeyNavigation);
             _chkUseDraggedKeyboardNavigation.setToolTipText(Messages.Slideout_Map25Options_Checkbox_UseDraggedKeyNavigation_Tooltip);
             _chkUseDraggedKeyboardNavigation.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.FILL, SWT.BEGINNING)
-                  .span(2, 1)
-                  .applyTo(_chkUseDraggedKeyboardNavigation);
+
+            _linkKeyboardShortcuts = new Link(container, SWT.NONE);
+            _linkKeyboardShortcuts.setText(Messages.Slideout_Map25Options_Link_KeyboardShortcuts);
+            _linkKeyboardShortcuts.setToolTipText(MAP_25D_KEYBOARD_SHORTCUTS);
+            _linkKeyboardShortcuts.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(MAP_25D_KEYBOARD_SHORTCUTS)));
          }
       }
    }
