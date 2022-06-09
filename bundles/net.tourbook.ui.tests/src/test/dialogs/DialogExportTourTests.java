@@ -76,8 +76,7 @@ public class DialogExportTourTests {
       final SWTBotTreeItem tour = Utils.getTour(bot);
 
       tour.contextMenu(Messages.action_export_tour).menu("TCX").click();
-      //TODO rename to Dialog_Export_Radio_TCX_Activities
-      bot.radio(Messages.Dialog_Export_Radio_TCX_Aktivities).click();
+      bot.radio(Messages.Dialog_Export_Radio_TCX_Activities).click();
       bot.checkBox(Messages.dialog_export_chk_exportNotes).click();
       bot.checkBox(Messages.dialog_export_chk_camouflageSpeed).click();
 
