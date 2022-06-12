@@ -92,6 +92,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
    private Button            _chkShowLayer_Label;
    private Button            _chkShowLayer_Label_IsBeforeBuilding;
    private Button            _chkShowLayer_Scale;
+   private Button            _chkShowLayer_OpenGLTest;
    private Button            _chkShowLayer_TileInfo;
 
    private Combo             _comboBuilding_SunPosition;
@@ -223,6 +224,14 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
+         {
+            /*
+             * Test layer
+             */
+            _chkShowLayer_OpenGLTest = new Button(container, SWT.CHECK);
+            _chkShowLayer_OpenGLTest.setText("TEST Layer");
+            _chkShowLayer_OpenGLTest.addSelectionListener(_layerSelectionListener);
+         }
          {
             /*
              * Text label
@@ -722,6 +731,8 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
 // SET_FORMATTING_OFF
 
+      _chkShowLayer_OpenGLTest               .setSelection(_mapApp.getLayer_OpenGLTest()                 .isEnabled());
+
       _chkShowLayer_Building                 .setSelection(_mapApp.getLayer_Building_S3DB()              .isEnabled());
       _chkShowLayer_Building_Shadow          .setSelection(_mapApp.getLayer_Building_IsShadow()          == Bool.TRUE);
       _chkShowLayer_Cartography              .setSelection(_mapApp.getLayer_BaseMap()                    .isEnabled());
@@ -741,6 +752,8 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
    }
 
    private void saveState() {
+
+      _mapApp.getLayer_OpenGLTest().setEnabled(_chkShowLayer_OpenGLTest.getSelection());
 
       _mapApp.getLayer_BaseMap().setEnabled(_chkShowLayer_Cartography.getSelection());
       _mapApp.getLayer_HillShading().setEnabled(_chkShowLayer_Hillshading.getSelection());

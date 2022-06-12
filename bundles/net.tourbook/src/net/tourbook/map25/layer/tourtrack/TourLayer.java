@@ -26,6 +26,9 @@ import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.marker.MarkerShape;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
+import net.tourbook.map25.renderer.BucketRendererMT;
+import net.tourbook.map25.renderer.LineBucketMT;
+import net.tourbook.map25.renderer.RenderBucketsMT;
 
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Paint;
@@ -37,10 +40,7 @@ import org.oscim.core.Tile;
 import org.oscim.layers.Layer;
 //import org.oscim.layers.vector.
 import org.oscim.map.Map;
-import org.oscim.renderer.BucketRenderer;
 import org.oscim.renderer.GLViewport;
-import org.oscim.renderer.bucket.LineBucket;
-import org.oscim.renderer.bucket.RenderBuckets;
 import org.oscim.renderer.bucket.TextureItem;
 import org.oscim.theme.styles.LineStyle;
 import org.oscim.utils.FastMath;
@@ -75,14 +75,14 @@ public class TourLayer extends Layer {
 
    private boolean          _isUpdateLayer;
 
-   private final class TourRenderer extends BucketRenderer {
+   private final class TourRenderer extends BucketRendererMT {
 
-      private int __curX = -1;
-      private int __curY = -1;
-      private int __curZ = -1;
+      private int __oldX = -1;
+      private int __oldY = -1;
+      private int __oldZ = -1;
 
       @Override
-      public synchronized void update(final GLViewport v) {
+      public synchronized void update(final GLViewport viewport) {
 
 //			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t\t\tupdate()"));
 //			// TODO remove SYSTEM.OUT.PRINTLN
@@ -91,12 +91,12 @@ public class TourLayer extends Layer {
             return;
          }
 
-         final int tz = 1 << v.pos.zoomLevel;
-         final int tx = (int) (v.pos.x * tz);
-         final int ty = (int) (v.pos.y * tz);
+         final int currentZ = 1 << viewport.pos.zoomLevel;
+         final int currentX = (int) (viewport.pos.x * currentZ);
+         final int currentY = (int) (viewport.pos.y * currentZ);
 
          /* update layers when map moved by at least one tile */
-         if (tx != __curX || ty != __curY || tz != __curZ || _isUpdateLayer) {
+         if (currentX != __oldX || currentY != __oldY || currentZ != __oldZ || _isUpdateLayer) {
 
             /*
              * It took me many days to find this solution that a newly selected tour is
@@ -111,9 +111,9 @@ public class TourLayer extends Layer {
 
             _simpleWorker.submit(RENDERING_DELAY);
 
-            __curX = tx;
-            __curY = ty;
-            __curZ = tz;
+            __oldX = currentX;
+            __oldY = currentY;
+            __oldZ = currentZ;
          }
 
          final TourRenderTask workerTask = _simpleWorker.poll();
@@ -132,8 +132,8 @@ public class TourLayer extends Layer {
 
    private final static class TourRenderTask {
 
-      RenderBuckets __renderBuckets = new RenderBuckets();
-      MapPosition   __mapPos        = new MapPosition();
+      RenderBucketsMT __renderBuckets = new RenderBucketsMT();
+      MapPosition     __mapPos        = new MapPosition();
    }
 
    final class Worker extends SimpleWorker<TourRenderTask> {
@@ -141,10 +141,14 @@ public class TourLayer extends Layer {
       private static final int MIN_DIST = 3;
 
       // limit coords
-      private final int __max = 2048;
+      private final int __max                = 2048;
 
-      // pre-projected points
-      private double[] __preProjectedPoints = new double[2];
+      /**
+       * pre-projected points
+       * <p>
+       * Is projecting -180°...180° => 0...1 by using the {@link MercatorProjection}
+       */
+      private double[]  __preProjectedPoints = new double[2];
 
       // projected points
       private float[]           __projectedPoints;
@@ -219,80 +223,85 @@ public class TourLayer extends Layer {
 
       private void doWork_Rendering(final TourRenderTask task, final int numPoints) {
 
-         LineBucket lineBucket;
+         LineBucketMT lineBucket;
 
-         if (_lineStyle.stipple == 0 && _lineStyle.texture == null) {
-            lineBucket = task.__renderBuckets.getLineBucket(0);
-         } else {
-            lineBucket = task.__renderBuckets.getLineTexBucket(0);
-         }
+//         if (_lineStyle.stipple == 0 && _lineStyle.texture == null) {
+         lineBucket = task.__renderBuckets.getLineBucket(0);
+//         } else {
+//            lineBucket = task.__renderBuckets.getLineTexBucket(0);
+//         }
 
          lineBucket.line = _lineStyle;
 
          //ll.scale = ll.line.width;
 
-         mMap.getMapPosition(task.__mapPos);
+         final MapPosition mapPos = task.__mapPos;
+         mMap.getMapPosition(mapPos);
 
-         final int zoomlevel = task.__mapPos.zoomLevel;
-         task.__mapPos.scale = 1 << zoomlevel;
+         final int zoomlevel = mapPos.zoomLevel;
+         mapPos.scale = 1 << zoomlevel;
 
-         final double mx = task.__mapPos.x;
-         final double my = task.__mapPos.y;
-         final double scale = Tile.SIZE * task.__mapPos.scale;
+         final double mapX = mapPos.x; // 0...1
+         final double mapY = mapPos.y; // 0...1
+
+         final double scale = Tile.SIZE * mapPos.scale;
 
          // flip around dateline
          int flip = 0;
-         final int maxx = Tile.SIZE << (zoomlevel - 1);
 
-         int x = (int) ((__preProjectedPoints[0] - mx) * scale);
-         int y = (int) ((__preProjectedPoints[1] - my) * scale);
+         final int scaledMaxX = Tile.SIZE << (zoomlevel - 1);
 
-         if (x > maxx) {
-            x -= (maxx * 2);
+         int scaledX = (int) ((__preProjectedPoints[0] - mapX) * scale);
+         int scaledY = (int) ((__preProjectedPoints[1] - mapY) * scale);
+
+         if (scaledX > scaledMaxX) {
+            scaledX -= (scaledMaxX * 2);
             flip = -1;
-         } else if (x < -maxx) {
-            x += (maxx * 2);
+         } else if (scaledX < -scaledMaxX) {
+            scaledX += (scaledMaxX * 2);
             flip = 1;
          }
 
-         /*
-          * Setup tour clipper
-          */
+         // setup tour index
          int tourIndex = 0;
          int nextTourStartIndex = getNextTourStartIndex(tourIndex);
 
-         __lineClipper.clipStart(x, y);
+         // setup tour clipper
+         __lineClipper.clipStart(scaledX, scaledY);
 
          final float[] projectedPoints = __projectedPoints;
-         int i = addPoint(projectedPoints, 0, x, y);
+         int projectedPointIndex = addPoint(projectedPoints, 0, scaledX, scaledY);
 
-         float prevX = x;
-         float prevY = y;
+         float prevX = scaledX;
+         float prevY = scaledY;
 
          float[] segment = null;
 
          for (int pointIndex = 2; pointIndex < numPoints * 2; pointIndex += 2) {
 
-            x = (int) ((__preProjectedPoints[pointIndex + 0] - mx) * scale);
-            y = (int) ((__preProjectedPoints[pointIndex + 1] - my) * scale);
+            scaledX = (int) ((__preProjectedPoints[pointIndex + 0] - mapX) * scale);
+            scaledY = (int) ((__preProjectedPoints[pointIndex + 1] - mapY) * scale);
 
             int flipDirection = 0;
-            if (x > maxx) {
-               x -= maxx * 2;
+            if (scaledX > scaledMaxX) {
+               scaledX -= scaledMaxX * 2;
                flipDirection = -1;
-            } else if (x < -maxx) {
-               x += maxx * 2;
+            } else if (scaledX < -scaledMaxX) {
+               scaledX += scaledMaxX * 2;
                flipDirection = 1;
             }
 
+//            System.out.println((System.currentTimeMillis() + " " + scaledX + " : " + scaledY));
+//            // TODO remove SYSTEM.OUT.PRINTLN
+
             if (flip != flipDirection) {
                flip = flipDirection;
-               if (i > 2) {
-                  lineBucket.addLine(projectedPoints, i, false);
+               if (projectedPointIndex > 2) {
+                  lineBucket.addLine(projectedPoints, projectedPointIndex, false);
                }
 
-               __lineClipper.clipStart(x, y);
-               i = addPoint(projectedPoints, 0, x, y);
+               __lineClipper.clipStart(scaledX, scaledY);
+               projectedPointIndex = addPoint(projectedPoints, 0, scaledX, scaledY);
                continue;
             }
 
@@ -302,23 +311,23 @@ public class TourLayer extends Layer {
                nextTourStartIndex = getNextTourStartIndex(++tourIndex);
 
                // start a new line (copied from flip code)
-               if (i > 2) {
-                  lineBucket.addLine(projectedPoints, i, false);
+               if (projectedPointIndex > 2) {
+                  lineBucket.addLine(projectedPoints, projectedPointIndex, false);
                }
 
-               __lineClipper.clipStart(x, y);
-               i = addPoint(projectedPoints, 0, x, y);
+               __lineClipper.clipStart(scaledX, scaledY);
+               projectedPointIndex = addPoint(projectedPoints, 0, scaledX, scaledY);
                continue;
             }
 
-            final int clip = __lineClipper.clipNext(x, y);
-            if (clip != LineClipper.INSIDE) {
+            final int clipOutcode = __lineClipper.clipNext(scaledX, scaledY);
+            if (clipOutcode != LineClipper.INSIDE) {
 
-               if (i > 2) {
-                  lineBucket.addLine(projectedPoints, i, false);
+               if (projectedPointIndex > 2) {
+                  lineBucket.addLine(projectedPoints, projectedPointIndex, false);
                }
 
-               if (clip == LineClipper.INTERSECTION) {
+               if (clipOutcode == LineClipper.INTERSECTION) {
 
                   /* add line segment */
                   segment = __lineClipper.getLine(segment, 0);
@@ -327,31 +336,35 @@ public class TourLayer extends Layer {
                   // the prev point is the real point not the clipped point
                   //prevX = mClipper.outX2;
                   //prevY = mClipper.outY2;
-                  prevX = x;
-                  prevY = y;
+                  prevX = scaledX;
+                  prevY = scaledY;
                }
 
-               i = 0;
+               projectedPointIndex = 0;
 
                // if the end point is inside, add it
                if (__lineClipper.getPrevOutcode() == LineClipper.INSIDE) {
-                  projectedPoints[i++] = prevX;
-                  projectedPoints[i++] = prevY;
+                  projectedPoints[projectedPointIndex++] = prevX;
+                  projectedPoints[projectedPointIndex++] = prevY;
                }
                continue;
             }
 
-            final float dx = x - prevX;
-            final float dy = y - prevY;
-            if ((i == 0) || FastMath.absMaxCmp(dx, dy, MIN_DIST)) {
-               projectedPoints[i++] = prevX = x;
-               projectedPoints[i++] = prevY = y;
+            final float diffX = scaledX - prevX;
+            final float diffY = scaledY - prevY;
+            if ((projectedPointIndex == 0) || FastMath.absMaxCmp(diffX, diffY, MIN_DIST)) {
+               projectedPoints[projectedPointIndex++] = prevX = scaledX;
+               projectedPoints[projectedPointIndex++] = prevY = scaledY;
             }
          }
 
-         if (i > 2) {
-            lineBucket.addLine(projectedPoints, i, false);
+         if (projectedPointIndex > 2) {
+            lineBucket.addLine(projectedPoints, projectedPointIndex, false);
          }
+
+         System.out.println((System.currentTimeMillis() + " " + numPoints + " " + projectedPoints.length + " " + projectedPointIndex));
+         // TODO remove SYSTEM.OUT.PRINTLN
+
       }
 
       private int getNextTourStartIndex(final int tourIndex) {

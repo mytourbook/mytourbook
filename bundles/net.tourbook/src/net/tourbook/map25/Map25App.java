@@ -52,6 +52,7 @@ import net.tourbook.map25.layer.marker.PhotoToolkit;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
+import net.tourbook.map25.renderer.RenderBucketsMT;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
@@ -206,6 +207,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private TileGridLayerMT         _layer_TileInfo;
    private TourLayer               _layer_Tour;
    private MarkerLayerMT           _layer_TourMarker;
+   //
+   private OpenGLTestLayer         _layer_OpenGLTest;
    //
    private OkHttpFactoryMT         _httpFactory;
    //
@@ -540,6 +543,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    @Override
    public void createLayers() {
 
+      // setup MT shader
+      RenderBucketsMT.initRenderer();
+
       _selectedMapProvider = restoreState_MapProvider();
       _map25View.updateUI_SelectedMapProvider(_selectedMapProvider);
       _httpFactory = new OkHttpEngineMT.OkHttpFactoryMT();
@@ -724,8 +730,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       /*
        * OpenGL test
        */
-//    final GenericLayer _layer_OpenGLTest = new GenericLayer(mMap, new CustomRenderer(mMap));
-      final GenericLayer _layer_OpenGLTest = new GenericLayer(mMap, new HexagonRenderer());
+      _layer_OpenGLTest = new OpenGLTestLayer(mMap);
       _layer_OpenGLTest.setEnabled(true);
       allMapLayer.add(_layer_OpenGLTest);
 
@@ -902,6 +907,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    public ItemizedLayer getLayer_MapBookmark() {
       return _layer_MapBookmark_VARYING;
+   }
+
+   public OpenGLTestLayer getLayer_OpenGLTest() {
+      return _layer_OpenGLTest;
    }
 
    public ItemizedLayer getLayer_Photo() {

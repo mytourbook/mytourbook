@@ -144,14 +144,15 @@ public class Map25View extends ViewPart implements
    private static final String           STATE_IS_LAYER_BOOKMARK_VISIBLE         = "STATE_IS_LAYER_BOOKMARK_VISIBLE";            //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_HILLSHADING_VISIBLE      = "STATE_IS_LAYER_HILLSHADING_VISIBLE";         //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_MARKER_VISIBLE           = "STATE_IS_LAYER_MARKER_VISIBLE";              //$NON-NLS-1$
+   private static final String           STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE     = "STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE";        //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_SATELLITE_VISIBLE        = "STATE_IS_LAYER_SATELLITE_VISIBLE";           //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_SCALE_BAR_VISIBLE        = "STATE_IS_LAYER_SCALE_BAR_VISIBLE";           //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_TILE_INFO_VISIBLE        = "STATE_IS_LAYER_TILE_INFO_VISIBLE";           //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_TOUR_VISIBLE             = "STATE_IS_LAYER_TOUR_VISIBLE";                //$NON-NLS-1$
-
+   //
    private static final String           STATE_LAYER_HILLSHADING_OPACITY         = "STATE_LAYER_HILLSHADING_OPACITY";            //$NON-NLS-1$
    private static final String           STATE_MAP_SYNCHED_WITH                  = "STATE_MAP_SYNCHED_WITH";                     //$NON-NLS-1$
-
+   // photo layer
    private static final String           STATE_IS_LAYER_PHOTO_VISIBLE            = "STATE_IS_LAYER_PHOTO_VISIBLE";               //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_PHOTO_SCALED             = "STATE_IS_LAYER_PHOTO_SCALED";                //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_PHOTO_TITLE_VISIBLE      = "STATE_IS_LAYER_PHOTO_TITLE_VISIBLE";         //$NON-NLS-1$
@@ -1593,6 +1594,8 @@ public class Map25View extends ViewPart implements
       _mapApp.getLayer_ScaleBar()         .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SCALE_BAR_VISIBLE, true));
       _mapApp.getLayer_TileInfo()         .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_TILE_INFO_VISIBLE, false));
 
+      _mapApp.getLayer_OpenGLTest()       .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE, false));
+
       // map is synced with
       _mapSynchedWith = (MapSync) Util.getStateEnum(_state, STATE_MAP_SYNCHED_WITH, MapSync.NONE);
       _actionSyncMap_WithOtherMap         .setChecked(_mapSynchedWith == MapSync.WITH_OTHER_MAP);
@@ -1677,6 +1680,8 @@ public class Map25View extends ViewPart implements
       _state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE,    _mapApp.getLayer_ScaleBar().isEnabled());
       _state.put(STATE_IS_LAYER_TILE_INFO_VISIBLE,    _mapApp.getLayer_TileInfo().isEnabled());
       _state.put(STATE_IS_LAYER_TOUR_VISIBLE,         _mapApp.getLayer_Tour().isEnabled());
+
+      _state.put(STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE, _mapApp.getLayer_OpenGLTest().isEnabled());
 
       // photo layer
       _state.put(STATE_IS_LAYER_PHOTO_VISIBLE,        _mapApp.isPhoto_Visible());

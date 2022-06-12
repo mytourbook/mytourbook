@@ -25,6 +25,7 @@ import net.tourbook.common.UI;
 
 import org.oscim.backend.GL;
 import org.oscim.backend.canvas.Color;
+import org.oscim.layers.Layer;
 import org.oscim.renderer.BucketRenderer;
 import org.oscim.renderer.BufferObject;
 import org.oscim.renderer.GLShader;
@@ -36,52 +37,34 @@ import org.oscim.utils.FastMath;
 
 public class HexagonRenderer extends BucketRenderer {
 
-   private static final char   NL         = UI.NEW_LINE;
+   private static final char NL = UI.NEW_LINE;
 
-   private static final String VERTEXT_SHADER  = ""
+   private int               _glHandle_ShaderProgram;
 
-         + "#ifdef GLES                                                    " + NL
-         + "precision mediump float;                                       " + NL
-         + "#endif                                                         " + NL
-         + "uniform mat4 u_mvp;                                            " + NL
-         + "uniform vec2 u_center;                                         " + NL
-         + "attribute vec2 a_pos;                                          " + NL
-         + "void main()                                                    " + NL
-         + "{                                                              " + NL
-         + "   gl_Position = u_mvp * vec4(u_center + a_pos, 0.0, 1.0);     " + NL
-         + "}                                                              " + NL
+   private int               _glHandle_a_pos_VertexPosition;
+   private int               _glHandle_u_mvp_MatrixPosition;
 
-   ;
+   private int               _glHandle_u_color_ColorPosition;
+   private int               _glHandle_u_center_CenterPosition;
 
-   private static final String FRAGMENT_SHADER = ""
+   private boolean           _isShaderSetup;
 
-         + "#ifdef GLES                                                    " + NL
-         + "precision mediump float;                                       " + NL
-         + "#endif                                                         " + NL
-         + "varying float alpha;                                           " + NL
-         + "uniform vec4 u_color;                                          " + NL
-         + "void main()                                                    " + NL
-         + "{                                                              " + NL
-         + "  gl_FragColor = u_color;                                      " + NL
-         + "}                                                              " + NL
+   private BufferObject      _vbo;
 
-   ;
+   private float             _cellScale;
 
-   private int                 _programObject;
+   private Layer             _layer;
 
-   private int                 _glHandle_VertexPosition;
-   private int                 _glHandle_MatrixPosition;
+   private int               _oldX;
+   private int               _oldY;
+   private int               _oldZ;
 
-   private int                 _glHandle_ColorPosition;
-   private int                 _glHandle_CenterPosition;
+   public HexagonRenderer(final Layer openGLTestLayer) {
 
-   //private FloatBuffer mVertices;
-   private boolean      mInitialized;
-   private BufferObject mVBO;
+      super();
 
-   int                  mZoom      = -1;
-
-   float                mCellScale = 30 * COORD_SCALE;
+      _layer = openGLTestLayer;
+   }
 
    @Override
    protected void compile() {
@@ -89,20 +72,55 @@ public class HexagonRenderer extends BucketRenderer {
       final float[] vertices = new float[12];
 
       for (int i = 0; i < 6; i++) {
-         vertices[i * 2 + 0] = (float) Math.cos(Math.PI * 2 * i / 6) * mCellScale;
-         vertices[i * 2 + 1] = (float) Math.sin(Math.PI * 2 * i / 6) * mCellScale;
+         vertices[i * 2 + 0] = (float) Math.cos(Math.PI * 2 * i / 6) * _cellScale;
+         vertices[i * 2 + 1] = (float) Math.sin(Math.PI * 2 * i / 6) * _cellScale;
       }
 
       final FloatBuffer buf = MapRenderer.getFloatBuffer(12);
       buf.put(vertices);
 
-      mVBO = BufferObject.get(GL.ARRAY_BUFFER, 0);
-      mVBO.loadBufferData(buf.flip(), 12 * 4);
+      _vbo = BufferObject.get(GL.ARRAY_BUFFER, 0);
+      _vbo.loadBufferData(buf.flip(), 12 * 4);
 
       setReady(true);
    }
 
    private boolean init() {
+
+      _cellScale = 10 * COORD_SCALE;
+
+      final String VERTEXT_SHADER = ""
+
+            + "#ifdef GLES                                                    " + NL
+            + "precision mediump float;                                       " + NL
+            + "#endif                                                         " + NL
+
+            + "uniform mat4 u_mvp;                                            " + NL
+            + "uniform vec2 u_center;                                         " + NL
+            + "attribute vec2 a_pos;                                          " + NL
+
+            + "void main()                                                    " + NL
+            + "{                                                              " + NL
+            + "   gl_Position = u_mvp * vec4(u_center + a_pos, 0.0, 1.0);     " + NL
+            + "}                                                              " + NL
+
+      ;
+
+      final String FRAGMENT_SHADER = ""
+
+            + "#ifdef GLES                                                    " + NL
+            + "precision mediump float;                                       " + NL
+            + "#endif                                                         " + NL
+
+            + "varying float alpha;                                           " + NL
+            + "uniform vec4 u_color;                                          " + NL
+
+            + "void main()                                                    " + NL
+            + "{                                                              " + NL
+            + "  gl_FragColor = u_color;                                      " + NL
+            + "}                                                              " + NL
+
+      ;
 
       // Load the vertex/fragment shaders
       final int programObject = GLShader.createProgram(VERTEXT_SHADER, FRAGMENT_SHADER);
@@ -112,13 +130,13 @@ public class HexagonRenderer extends BucketRenderer {
       }
 
       // Handle for vertex position in shader
-      _glHandle_VertexPosition = gl.getAttribLocation(programObject, "a_pos");
-      _glHandle_MatrixPosition = gl.getUniformLocation(programObject, "u_mvp");
-      _glHandle_ColorPosition = gl.getUniformLocation(programObject, "u_color");
-      _glHandle_CenterPosition = gl.getUniformLocation(programObject, "u_center");
+      _glHandle_a_pos_VertexPosition = gl.getAttribLocation(programObject, "a_pos");
+      _glHandle_u_mvp_MatrixPosition = gl.getUniformLocation(programObject, "u_mvp");
+      _glHandle_u_color_ColorPosition = gl.getUniformLocation(programObject, "u_color");
+      _glHandle_u_center_CenterPosition = gl.getUniformLocation(programObject, "u_center");
 
       // Store the program object
-      _programObject = programObject;
+      _glHandle_ShaderProgram = programObject;
 
       return true;
    }
@@ -126,26 +144,32 @@ public class HexagonRenderer extends BucketRenderer {
    @Override
    public void render(final GLViewport viewport) {
 
+      System.out.println((System.currentTimeMillis() + " net.tourbook.map25.HexagonRenderer.render(GLViewport) " + mMapPosition));
+      // TODO remove SYSTEM.OUT.PRINTLN
+
       // Use the program object
-      GLState.useProgram(_programObject);
+      GLState.useProgram(_glHandle_ShaderProgram);
 
       GLState.blend(true);
       GLState.test(false, false);
 
       // bind VBO data
-      mVBO.bind();
+      _vbo.bind();
 
       // set VBO vertex layout
-      gl.vertexAttribPointer(_glHandle_VertexPosition, 2, GL.FLOAT, false, 0, 0);
+      gl.vertexAttribPointer(_glHandle_a_pos_VertexPosition, 2, GL.FLOAT, false, 0, 0);
 
-      GLState.enableVertexArrays(_glHandle_VertexPosition, GLState.DISABLED);
+      GLState.enableVertexArrays(_glHandle_a_pos_VertexPosition, GLState.DISABLED);
 
       /* apply view and projection matrices */
       // set mvp (tmp) matrix relative to mMapPosition
       // i.e. fixed on the map
       setMatrix(viewport);
-      viewport.mvp.setAsUniform(_glHandle_MatrixPosition);
+      viewport.mvp.setAsUniform(_glHandle_u_mvp_MatrixPosition);
 
+      /*
+       * Draw hexagon cells
+       */
       final int offset_x = 4;
       final int offset_y = 16;
 
@@ -157,12 +181,16 @@ public class HexagonRenderer extends BucketRenderer {
             final float xx = x * 2 + (y % 2 == 0 ? 1 : 0);
             final float yy = y * h + h / 2;
 
-            gl.uniform2f(_glHandle_CenterPosition, xx * (mCellScale * 1.5f), yy * mCellScale);
+            final float xPos = xx * (_cellScale * 1.5f);
+            final float yPos = yy * _cellScale;
+            gl.uniform2f(_glHandle_u_center_CenterPosition, xPos, yPos);
 
             //float alpha = 1 + (float) Math.log10(FastMath.clamp(
             //        (float) Math.sqrt(xx * xx + yy * yy) / offset_y, 0.0f, 1.0f)) * 2;
 
-            final float alpha = (float) Math.sqrt(xx * xx + yy * yy) / offset_y;
+            // less opaque in the center
+            float alpha = (float) Math.sqrt(xx * xx + yy * yy) / offset_y;
+            alpha = 0.7f;
 
             final float fy = (float) (y + offset_y) / (offset_y * 2);
             final float fx = (float) (x + offset_x) / (offset_x * 2);
@@ -173,25 +201,28 @@ public class HexagonRenderer extends BucketRenderer {
                   0,
                   1);
 
-            final int c = 0xff << 24
+            final int color = 0xff << 24
                   | (int) (0xff * fy) << 16
                   | (int) (0xff * fx) << 8
                   | (int) (0xff * fz);
 
-            GLUtils.setColor(_glHandle_ColorPosition, c, alpha);
+            GLUtils.setColor(_glHandle_u_color_ColorPosition, color, alpha);
 
             gl.drawArrays(GL.TRIANGLE_FAN, 0, 6);
          }
       }
 
-      GLUtils.setColor(_glHandle_ColorPosition, Color.DKGRAY, 0.3f);
+      /*
+       * Draw cell border
+       */
+      GLUtils.setColor(_glHandle_u_color_ColorPosition, Color.DKGRAY, 0.3f);
 
       for (int y = -offset_y; y < offset_y; y++) {
          for (int x = -offset_x; x < offset_x; x++) {
             final float xx = x * 2 + (y % 2 == 0 ? 1 : 0);
             final float yy = y * h + h / 2;
 
-            gl.uniform2f(_glHandle_CenterPosition, xx * (mCellScale * 1.5f), yy * mCellScale);
+            gl.uniform2f(_glHandle_u_center_CenterPosition, xx * (_cellScale * 1.5f), yy * _cellScale);
             gl.drawArrays(GL.LINE_LOOP, 0, 6);
          }
       }
@@ -200,21 +231,53 @@ public class HexagonRenderer extends BucketRenderer {
    }
 
    @Override
-   public void update(final GLViewport v) {
-      if (!mInitialized) {
-         if (!init()) {
-            return;
-         }
-         mInitialized = true;
+   public void update(final GLViewport viewport) {
 
-         compile();
-         mMapPosition.copy(v.pos);
+      if (_layer.isEnabled() == false) {
+         return;
       }
 
-      //if (mZoom != v.pos.zoomLevel) {
-      //    mMapPosition.copy(v.pos);
-      //    mZoom = v.pos.zoomLevel;
-      //}
+      if (_isShaderSetup == false) {
+
+         if (init() == false) {
+            return;
+         }
+
+         _isShaderSetup = true;
+
+         compile();
+
+      }
+
+      mMapPosition.copy(viewport.pos);
+
+//      final MapPosition currentMapPosition = viewport.pos;
+//
+//      /*
+//       * Scale coordinates relative to current 'zoom-level' to get the position as the nearest
+//       * tile coordinate
+//       */
+//      final int currentZ = 1 << currentMapPosition.zoomLevel;
+//      final int currentX = (int) (currentMapPosition.x * currentZ);
+//      final int currentY = (int) (currentMapPosition.y * currentZ);
+//
+//      // update buckets when map moved by at least one tile
+//      if (currentX == _oldX && currentY == _oldY && currentZ == _oldZ) {
+//         return;
+//      }
+//
+//      _oldX = currentX;
+//      _oldY = currentY;
+//      _oldZ = currentZ;
+//
+//      /*
+//       * Overwrite map position in this renderer
+//       */
+//      mMapPosition.copy(currentMapPosition);
+//      mMapPosition.x = (double) currentX / currentZ;
+//      mMapPosition.y = (double) currentY / currentZ;
+//      mMapPosition.scale = currentZ;
+
    }
 
 }

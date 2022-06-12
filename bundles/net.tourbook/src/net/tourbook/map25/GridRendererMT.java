@@ -34,166 +34,173 @@ import org.oscim.theme.styles.TextStyle;
 
 public class GridRendererMT extends BucketRenderer {
 
-	private final TextBucket		mTextBucket;
-	private final TextStyle			_textStyle;
-	private final LineBucket		mLineBucket;
-	private final GeometryBuffer	mLines;
+   private final TextBucket     mTextBucket;
+   private final TextStyle      _textStyle;
+   private final LineBucket     mLineBucket;
+   private final GeometryBuffer mLines;
 
-	private TileGridLayerMT			_tileGridLayerMT;
+   private TileGridLayerMT      _tileGridLayerMT;
 
-	private int						mCurX, mCurY, mCurZ;
+   private int                  _oldX, _oldY, _oldZ;
 
-	public GridRendererMT(final float scale) {
+   public GridRendererMT(final float scale) {
 
-		this(
-				1,
+      this(
+            1,
 
-				new LineStyle(Color.GRAY, 1.2f * scale, Cap.BUTT),
+            new LineStyle(Color.GRAY, 1.2f * scale, Cap.BUTT),
 
-				TextStyle
-						.builder()
-						.fontSize(26 * scale)
-						.fontStyle(Paint.FontStyle.NORMAL)
-						.color(Color.RED)
-						.build());
-	}
+            TextStyle
+                  .builder()
+                  .fontSize(26 * scale)
+                  .fontStyle(Paint.FontStyle.NORMAL)
+                  .color(Color.RED)
+                  .build());
+   }
 
-	public GridRendererMT(final int numLines, final LineStyle lineStyle, final TextStyle textStyle) {
+   public GridRendererMT(final int numLines, final LineStyle lineStyle, final TextStyle textStyle) {
 
-		final int size = Tile.SIZE;
+      final int size = Tile.SIZE;
 
-		/* not needed to set but we know: 16 lines 'a' two points */
-		mLines = new GeometryBuffer(2 * 16, 16);
+      /* not needed to set but we know: 16 lines 'a' two points */
+      mLines = new GeometryBuffer(2 * 16, 16);
 
-		final float pos = -size * 4;
+      final float pos = -size * 4;
 
-		/* 8 vertical lines */
-		for (int i = 0; i < 8 * numLines; i++) {
-			final float x = pos + i * size / numLines;
-			mLines.startLine();
-			mLines.addPoint(x, pos);
-			mLines.addPoint(x, pos + size * 8);
-		}
+      /* 8 vertical lines */
+      for (int i = 0; i < 8 * numLines; i++) {
+         final float x = pos + i * size / numLines;
+         mLines.startLine();
+         mLines.addPoint(x, pos);
+         mLines.addPoint(x, pos + size * 8);
+      }
 
-		/* 8 horizontal lines */
-		for (int j = 0; j < 8 * numLines; j++) {
-			final float y = pos + j * size / numLines;
-			mLines.startLine();
-			mLines.addPoint(pos, y);
-			mLines.addPoint(pos + size * 8, y);
-		}
+      /* 8 horizontal lines */
+      for (int j = 0; j < 8 * numLines; j++) {
+         final float y = pos + j * size / numLines;
+         mLines.startLine();
+         mLines.addPoint(pos, y);
+         mLines.addPoint(pos + size * 8, y);
+      }
 
-		_textStyle = textStyle;
+      _textStyle = textStyle;
 
-		mLineBucket = new LineBucket(0);
-		mLineBucket.line = lineStyle;
+      mLineBucket = new LineBucket(0);
+      mLineBucket.line = lineStyle;
 
-		if (_textStyle != null) {
-			mTextBucket = new TextBucket();
-			mTextBucket.next = mLineBucket;
-		} else {
-			mTextBucket = null;
-			mLineBucket.addLine(mLines);
-			buckets.set(mLineBucket);
-		}
-	}
+      if (_textStyle != null) {
+         mTextBucket = new TextBucket();
+         mTextBucket.next = mLineBucket;
+      } else {
+         mTextBucket = null;
+         mLineBucket.addLine(mLines);
+         buckets.set(mLineBucket);
+      }
+   }
 
-	public GridRendererMT(final TileGridLayerMT tileGridLayerMT) {
+   public GridRendererMT(final TileGridLayerMT tileGridLayerMT) {
 
-		this(1);
+      this(1);
 
-		_tileGridLayerMT = tileGridLayerMT;
-	}
+      _tileGridLayerMT = tileGridLayerMT;
+   }
 
-	private void addLabels(final int x, final int y, final int z, final MapPosition mapPosition) {
+   private void addLabels(final int x, final int y, final int z, final MapPosition mapPosition) {
 
-		final int s = Tile.SIZE;
+      final int s = Tile.SIZE;
 
-		final int tileZ = 1 << z;
-		final float lineHeight = _textStyle.fontSize + 1;
+      final int tileZ = 1 << z;
+      final float lineHeight = _textStyle.fontSize + 1;
 
-		final TextBucket textBucket = mTextBucket;
-		textBucket.clear();
+      final TextBucket textBucket = mTextBucket;
+      textBucket.clear();
 
-		for (int yy = -2; yy < 2; yy++) {
-			for (int xx = -2; xx < 2; xx++) {
+      for (int yy = -2; yy < 2; yy++) {
+         for (int xx = -2; xx < 2; xx++) {
 
-				final int tileX = x + xx;
-				final int tileY = y + yy;
+            final int tileX = x + xx;
+            final int tileY = y + yy;
 
-				final double latitude = MercatorProjection.toLatitude((double) tileY / tileZ);
-				final double longitude = MercatorProjection.toLongitude((double) tileX / tileZ);
+            final double latitude = MercatorProjection.toLatitude((double) tileY / tileZ);
+            final double longitude = MercatorProjection.toLongitude((double) tileX / tileZ);
 
-				final String labelTile = String.format("%d / %d / %d", z, tileX, tileY); //$NON-NLS-1$
+            final String labelTile = String.format("%d / %d / %d", z, tileX, tileY); //$NON-NLS-1$
 
-				final String labelLat = String.format("lat %.4f", latitude); //$NON-NLS-1$
-				final String labelLon = String.format("lon %.4f", longitude); //$NON-NLS-1$
+            final String labelLat = String.format("lat %.4f", latitude); //$NON-NLS-1$
+            final String labelLon = String.format("lon %.4f", longitude); //$NON-NLS-1$
 
-				final int textX = s * xx + s / 2;
-				final int textY = s * yy + s / 2;
+            final int textX = s * xx + s / 2;
+            final int textY = s * yy + s / 2;
 
-				TextItem textItem = TextItem.pool.get();
-				textItem.set(textX, textY, labelTile, _textStyle);
-				textBucket.addText(textItem);
+            TextItem textItem = TextItem.pool.get();
+            textItem.set(textX, textY, labelTile, _textStyle);
+            textBucket.addText(textItem);
 
-				/*
-				 * Lat/Lon
-				 */
-				textItem = TextItem.pool.get();
-				textItem.set(textX, textY + lineHeight, labelLat, _textStyle);
-				textBucket.addText(textItem);
+            /*
+             * Lat/Lon
+             */
+            textItem = TextItem.pool.get();
+            textItem.set(textX, textY + lineHeight, labelLat, _textStyle);
+            textBucket.addText(textItem);
 
-				textItem = TextItem.pool.get();
-				textItem.set(textX, textY + lineHeight * 2, labelLon, _textStyle);
-				textBucket.addText(textItem);
-			}
-		}
-	}
+            textItem = TextItem.pool.get();
+            textItem.set(textX, textY + lineHeight * 2, labelLon, _textStyle);
+            textBucket.addText(textItem);
+         }
+      }
+   }
 
-	@Override
-	public void update(final GLViewport viewport) {
+   @Override
+   public void update(final GLViewport viewport) {
 
-		if (!_tileGridLayerMT.isEnabled()) {
-			return;
-		}
+      if (_tileGridLayerMT.isEnabled() == false) {
+         return;
+      }
 
-		final MapPosition mapPosition = viewport.pos;
+      final MapPosition currentMapPosition = viewport.pos;
 
-		/*
-		 * scale coordinates relative to current 'zoom-level' to get the position as the nearest
-		 * tile coordinate
-		 */
-		final int z = 1 << mapPosition.zoomLevel;
-		final int x = (int) (mapPosition.x * z);
-		final int y = (int) (mapPosition.y * z);
+      /*
+       * Scale coordinates relative to current 'zoom-level' to get the position as the nearest
+       * tile coordinate
+       */
+      final int currentZ = 1 << currentMapPosition.zoomLevel;
+      final int currentX = (int) (currentMapPosition.x * currentZ);
+      final int currentY = (int) (currentMapPosition.y * currentZ);
 
-		/* update buckets when map moved by at least one tile */
-		if (x == mCurX && y == mCurY && z == mCurZ) {
-			return;
-		}
+      // update buckets when map moved by at least one tile
+      if (currentX == _oldX && currentY == _oldY && currentZ == _oldZ) {
+         return;
+      }
 
-		mCurX = x;
-		mCurY = y;
-		mCurZ = z;
+      _oldX = currentX;
+      _oldY = currentY;
+      _oldZ = currentZ;
 
-		mMapPosition.copy(mapPosition);
-		mMapPosition.x = (double) x / z;
-		mMapPosition.y = (double) y / z;
-		mMapPosition.scale = z;
+      /*
+       * Overwrite map position in this renderer
+       */
+      mMapPosition.copy(currentMapPosition);
+      mMapPosition.x = (double) currentX / currentZ;
+      mMapPosition.y = (double) currentY / currentZ;
+      mMapPosition.scale = currentZ;
 
-		if (_textStyle != null) {
+//      System.out.println((System.currentTimeMillis() + " " + mMapPosition));
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-			buckets.set(mTextBucket);
+      if (_textStyle != null) {
 
-			addLabels(x, y, mapPosition.zoomLevel, mapPosition);
+         buckets.set(mTextBucket);
 
-			mLineBucket.addLine(mLines);
-			buckets.prepare();
-			setReady(false);
-		}
+         addLabels(currentX, currentY, currentMapPosition.zoomLevel, currentMapPosition);
 
-		if (!isReady()) {
-			compile();
-		}
-	}
+         mLineBucket.addLine(mLines);
+         buckets.prepare();
+
+         setReady(false);
+      }
+
+      if (isReady() == false) {
+         compile();
+      }
+   }
 }
