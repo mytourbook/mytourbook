@@ -1270,6 +1270,11 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Dialog_ValidationAddName;
    public static String        Map_Bookmark_Dialog_ValidationRename;
 
+   public static String        Map_Location_Action_GotoLocation;
+   public static String        Map_Location_DialogTitle;
+   public static String        Map_Location_Label_LocationLatitude;
+   public static String        Map_Location_Label_LocationLongitude;
+
    public static String        merge_tour_dlg_invalid_serie_data_message;
    public static String        merge_tour_dlg_invalid_tour_data_message;
    public static String        merge_tour_dlg_invalid_tour_message;
