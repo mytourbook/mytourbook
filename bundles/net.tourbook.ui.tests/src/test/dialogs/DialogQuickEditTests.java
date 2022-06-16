@@ -15,12 +15,13 @@
  *******************************************************************************/
 package dialogs;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import net.tourbook.Messages;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
+
+import utils.Utils;
 
 public class DialogQuickEditTests {
 
@@ -29,19 +30,15 @@ public class DialogQuickEditTests {
    @Test
    void testEditWeatherDescription() {
 
-      final SWTBotView tourBookView = bot.viewByTitle("Tour Book");
-      assertNotNull(tourBookView);
-      tourBookView.show();
+      Utils.showTourBookView(bot);
 
-      bot.toolbarButtonWithTooltip("&Collapse All").click();
+      bot.toolbarButtonWithTooltip(Messages.App_Action_CollapseAll).click();
 
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand()
-            .getNode("Jan   2").expand().select().getNode("31").select();
-      assertNotNull(tour);
+      final SWTBotTreeItem tour = Utils.getTour(bot);
 
-      tour.contextMenu("Quick Edit...").click();
-      bot.textWithLabel("&Weather").setText("Sunny");
-      bot.button("Save ").click();
+      tour.contextMenu(Messages.app_action_quick_edit).click();
+      bot.textWithLabel(Messages.Tour_Action_Weather).setText(net.tourbook.common.Messages.Weather_Clouds_Sunny);
+      bot.button(Messages.App_Action_Save).click();
 
       //Necessary otherwise the subsequent tests fail.
       //Not sure why but my hunch is that the window is not fully closed for the

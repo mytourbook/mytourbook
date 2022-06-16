@@ -18,10 +18,13 @@ package views;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import net.tourbook.Messages;
+
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.junit.jupiter.api.Test;
+
+import utils.Utils;
 
 public class TourDataEditorViewTests {
 
@@ -32,16 +35,14 @@ public class TourDataEditorViewTests {
 
       bot.toolbarButtonWithTooltip("Create new tour/event (Ctrl+N)").click();
 
-      bot.cTabItem("Tour").activate();
+      bot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
 
       final String newTourTitle = "New Tour Title";
 
       bot.comboBox().setText(newTourTitle);
       bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click();
 
-      final SWTBotView tourEditorView = bot.viewByTitle("Tour Editor");
-      assertNotNull(tourEditorView);
-      tourEditorView.show();
+      Utils.showView(bot, "Tour Editor");
 
       final SWTBotCombo titleCombo = bot.comboBox(newTourTitle);
       assertNotNull(titleCombo);
@@ -51,11 +52,9 @@ public class TourDataEditorViewTests {
    @Test
    void testViewTabs() {
 
-      final SWTBotView tourEditorView = bot.viewByTitle("Tour Editor");
-      assertNotNull(tourEditorView);
-      tourEditorView.show();
+      Utils.showView(bot, "Tour Editor");
 
-      bot.cTabItem("Time Slices").activate();
-      bot.cTabItem("Swim Slices").activate();
+      bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
+      bot.cTabItem(Messages.Tour_Editor_TabLabel_SwimSlices).activate();
    }
 }

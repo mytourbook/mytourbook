@@ -579,8 +579,8 @@ public class Messages extends NLS {
    public static String        Dialog_Export_Radio_GPX_DistanceAbsolute_Tooltip;
    public static String        Dialog_Export_Radio_GPX_DistanceRelative;
    public static String        Dialog_Export_Radio_GPX_DistanceRelative_Tooltip;
-   public static String        Dialog_Export_Radio_TCX_Aktivities;
-   public static String        Dialog_Export_Radio_TCX_Aktivities_Tooltip;
+   public static String        Dialog_Export_Radio_TCX_Activities;
+   public static String        Dialog_Export_Radio_TCX_Activities_Tooltip;
    public static String        Dialog_Export_Radio_TCX_Courses;
    public static String        Dialog_Export_Radio_TCX_Courses_Tooltip;
    public static String        Dialog_Export_Radio_TCX_NameFromField;

@@ -13,9 +13,15 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package views;
+package dialogs;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import net.tourbook.printing.Messages;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -23,18 +29,24 @@ import org.junit.jupiter.api.Test;
 
 import utils.Utils;
 
-public class TourTagsViewTests {
+public class DialogPrintTour {
 
    private SWTWorkbenchBot bot = new SWTWorkbenchBot();
 
    @Test
-   void testTourTagsView() {
+   void testPrintTour() {
 
-      Utils.getTour(bot);
+      final SWTBotTreeItem tour = Utils.getTour(bot);
 
-      Utils.showView(bot, "Tour Tags");
+      tour.contextMenu(net.tourbook.Messages.action_print_tour).menu("PDF").click();
+      bot.checkBox(Messages.Dialog_Print_Chk_PrintMarkers).click();
+      bot.checkBox(Messages.Dialog_Print_Chk_PrintNotes).click();
 
-      final SWTBotTreeItem tag = bot.tree(1).getTreeItem("Shoes 2").select();
-      assertNotNull(tag);
+      final String fileName = bot.comboBox(2).getText() + ".pdf";
+      bot.comboBox(3).setText(Utils.workingDirectory);
+      bot.button(Messages.Dialog_Print_Btn_Print).click();
+
+      final Path pdfFilePath = Paths.get(Utils.workingDirectory, fileName);
+      assertTrue(Files.exists(pdfFilePath));
    }
 }
