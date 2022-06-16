@@ -14,10 +14,12 @@
    <packaging>pom</packaging>
    
    <dependencies>
+   <!-- 
       <dependency>
          <artifactId>org.eclipse.pde.junit.runtime</artifactId>         <groupId>org.eclipse.pde</groupId>
                                                                         <version>3.6.0</version>
       </dependency>
+    -->
       <dependency>
          <artifactId>org.eclipse.core.runtime</artifactId>              <groupId>org.eclipse.core</groupId>
                                                                         <version>3.7.0</version>
@@ -80,11 +82,12 @@
       <repository>
          <id>eclipse.platform.4.24</id>                                 <layout>p2</layout>
          
+         <url>https://download.eclipse.org/releases/2022-06</url>
+         
 <!-- 
          <url>https://download.eclipse.org/eclipse/updates/4.24-I-builds/I20220525-1800/</url>
          <url>https://download.eclipse.org/eclipse/updates/4.23-I-builds/I20220308-0310</url>
  -->
-         <url>https://download.eclipse.org/releases/2022-06</url>
       </repository>   
 
       <repository>
