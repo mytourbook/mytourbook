@@ -48,8 +48,17 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
    public static final String SQL_ALL_OTHER_FIELDS;
    public static final int    SQL_ALL_OTHER_FIELDS__COLUMN_START_NUMBER;
 
+   /**
+    * <b>All</b> fields which are used in {@link #SQL_SUM_COLUMNS} <b>MUST be defined in</b>
+    * {@link #SQL_SUM_FIELDS}, otherwise the SQL fails
+    */
    static final String        SQL_SUM_COLUMNS;
+
+   /**
+    * SQL fields for {@link #SQL_SUM_COLUMNS}, the field ordering is NOT important
+    */
    static final String        SQL_SUM_FIELDS;
+
    static {
 
       SQL_ALL_TOUR_FIELDS = UI.EMPTY_STRING
@@ -235,11 +244,9 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
 
             + "AvgCadence," + NL //                                        //$NON-NLS-1$
             + "AvgPulse," + NL //                                          //$NON-NLS-1$
-            + "weather_Temperature_Average_Device," + NL //                //$NON-NLS-1$
+
             + "CadenceMultiplier," + NL //                                 //$NON-NLS-1$
             + "TemperatureScale," + NL //                                  //$NON-NLS-1$
-            + "Weather_Wind_Direction," + NL //                            //$NON-NLS-1$
-            + "Weather_Wind_Speed," + NL //                                //$NON-NLS-1$
 
             + "Calories," + NL //                                          //$NON-NLS-1$
             + "RestPulse," + NL //                                         //$NON-NLS-1$
@@ -258,8 +265,12 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
             + "cadenceZone_FastTime," + NL //                              //$NON-NLS-1$
             + "cadenceZones_DelimiterValue," + NL //                       //$NON-NLS-1$
 
-            + "weather_Temperature_Min_Device," + NL //                    //$NON-NLS-1$
-            + "weather_Temperature_Max_Device," + NL //                    //$NON-NLS-1$
+            + "Weather_Temperature_Average," + NL //                       //$NON-NLS-1$
+            + "Weather_Temperature_Average_Device," + NL //                //$NON-NLS-1$
+            + "Weather_Temperature_Min_Device," + NL //                    //$NON-NLS-1$
+            + "Weather_Temperature_Max_Device," + NL //                    //$NON-NLS-1$
+            + "Weather_Wind_Direction," + NL //                            //$NON-NLS-1$
+            + "Weather_Wind_Speed," + NL //                                //$NON-NLS-1$
 
             + "tourDeviceTime_Recorded," + NL //                           //$NON-NLS-1$
             + "tourDeviceTime_Paused" + NL //                              //$NON-NLS-1$
@@ -513,8 +524,8 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
       tourItem.colWeekNo                  = result.getInt(22);
       tourItem.colWeekYear                = result.getInt(23);
 
-      tourItem.colWindDirection                 = result.getInt(24);
-      tourItem.colWindSpeed                 = result.getInt(25);
+      tourItem.colWindDirection           = result.getInt(24);
+      tourItem.colWindSpeed               = result.getInt(25);
       tourItem.colClouds                  = result.getString(26);
       tourItem.colRestPulse               = result.getInt(27);
 

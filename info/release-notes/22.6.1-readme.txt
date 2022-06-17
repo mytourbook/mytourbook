@@ -1,0 +1,8 @@
+22.6.1                                                 17.June 2022
+
+
+Bugfix
+======
+
+* Tour Tag Filter
+  - Fixed SQL error        https://github.com/mytourbook/mytourbook/issues/885
