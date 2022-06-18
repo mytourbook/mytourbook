@@ -836,7 +836,7 @@ public class MapBookmarkManager {
             /*
              * Map position
              */
-            final MapPosition_with_MarkerPosition mapPosition = bookmark.getMapPosition();
+            final MapPosition_with_MarkerPosition mapPosition = bookmark.getMapPositionProjected();
 
             Util.setXmlDouble(xmlBookmark, ATTR_MAP_POSITION_X, mapPosition.x);
             Util.setXmlDouble(xmlBookmark, ATTR_MAP_POSITION_Y, mapPosition.y);

@@ -1138,7 +1138,7 @@ public class Map25View extends ViewPart implements
       MapBookmarkManager.setLastSelectedBookmark(selectedBookmark);
 
       final Map map = _mapApp.getMap();
-      final MapPosition mapPosition = selectedBookmark.getMapPosition();
+      final MapPosition mapPosition = selectedBookmark.getMapPositionProjected();
 
       Map25ConfigManager.setMapLocation(map, mapPosition);
    }

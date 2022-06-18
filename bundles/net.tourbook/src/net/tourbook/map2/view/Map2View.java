@@ -943,7 +943,7 @@ public class Map2View extends ViewPart implements
 
       final GeoPosition mouseDown_GeoPosition = _map.get_mouseDown_GeoPosition();
 
-      final String geoPosition = String.format("Latitude:  %.6f\nLongitude: %.6f",
+      final String geoPosition = String.format("Latitude:  %.6f - Longitude: %.6f",
             mouseDown_GeoPosition.latitude,
             mouseDown_GeoPosition.longitude);
 
@@ -963,7 +963,7 @@ public class Map2View extends ViewPart implements
       if (statusLineMgr != null) {
 
          // show info that data are copied
-         statusLineMgr.setMessage(String.format("Copied: Latitude: %4.6f - Longitude: %4.6f",
+         statusLineMgr.setMessage(String.format("Copied: Latitude: %.6f - Longitude: %.6f",
                mouseDown_GeoPosition.latitude,
                mouseDown_GeoPosition.longitude));
 
@@ -982,21 +982,23 @@ public class Map2View extends ViewPart implements
          return;
       }
 
-//      final double latitude = 46.792661;
-//      final double longitude = 9.679014;
-
-      final double latitude = dialogGotoLocation.getLatitude();
-      final double longitude = dialogGotoLocation.getLongitude();
-      final GeoPosition geoLocation = new GeoPosition(latitude, longitude);
+      final GeoPosition geoLocation = dialogGotoLocation.getEnteredGeoPosition();
 
       // keep current zoom level
       final int zoomLevel = _map.getZoom();
 
       final String poiName = String.format("Latitude: %4.6f\nLongitude: %4.6f",
-            latitude,
-            longitude);
+            geoLocation.latitude,
+            geoLocation.longitude);
 
       _map.setPoi(geoLocation, zoomLevel, poiName);
+
+      /*
+       * Create map bookmark
+       */
+      if (dialogGotoLocation.isCreateMapBookmark()) {
+
+      }
    }
 
    public void actionPOI() {
@@ -2997,7 +2999,7 @@ public class Map2View extends ViewPart implements
 
       MapBookmarkManager.setLastSelectedBookmark(mapBookmark);
 
-      final MapPosition mapPosition = mapBookmark.getMapPosition();
+      final MapPosition mapPosition = mapBookmark.getMapPositionProjected();
 
       _map.setZoom(mapPosition.zoomLevel + 1);
       _map.setMapCenter(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()));

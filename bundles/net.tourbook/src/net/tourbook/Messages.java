@@ -1271,7 +1271,10 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Dialog_ValidationRename;
 
    public static String        Map_Location_Action_GotoLocation;
-   public static String        Map_Location_DialogTitle;
+   public static String        Map_Location_Checkbox_IsCreateBookmark;
+   public static String        Map_Location_Dialog_Message;
+   public static String        Map_Location_Dialog_Title;
+   public static String        Map_Location_Error_ValueCannotBeEmpty;
    public static String        Map_Location_Label_LocationLatitude;
    public static String        Map_Location_Label_LocationLongitude;
 

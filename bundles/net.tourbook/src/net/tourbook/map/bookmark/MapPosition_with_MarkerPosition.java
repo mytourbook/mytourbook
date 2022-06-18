@@ -22,31 +22,27 @@ import org.oscim.core.MercatorProjection;
 
 public class MapPosition_with_MarkerPosition extends org.oscim.core.MapPosition {
 
-   /** Projected position x 0..1 */
+   /**
+    * Projected position X: 0..1
+    */
    public double mapPositionMarkerX;
 
-   /** Projected position x 0..1 */
+   /**
+    * Projected position Y: 0..1
+    */
    public double mapPositionMarkerY;
 
    public MapPosition_with_MarkerPosition() {
-      
+
       super();
-      
+
       this.mapPositionMarkerX = 0.5;
       this.mapPositionMarkerY = 0.5;
    }
 
    public MapPosition_with_MarkerPosition(final double latitude, final double longitude, final int scale) {
-      
-      super(latitude, longitude, scale);
-   }
 
-   //TODO: this constuctor is not used yet. lat/long must be converted to mercador first, or?
-   public MapPosition_with_MarkerPosition(final double latitude, final double longitude, final int scale, final double markerLatitude, final double markerLongitude) {
-      
       super(latitude, longitude, scale);
-      //this.mapPositionMarkerY = markerLatitude;
-      //this.mapPositionMarkerX = markerLongitude;
    }
 
    public MapPosition_with_MarkerPosition(final MapPosition mapPosition) {
@@ -65,28 +61,12 @@ public class MapPosition_with_MarkerPosition extends org.oscim.core.MapPosition 
       this.mapPositionMarkerY = mapPosition.y;
    }
 
-   public double getMapPositionMarkerX() {
-      return mapPositionMarkerX;
-   }
-
-   public double getMapPositionMarkerY() {
-      return mapPositionMarkerY;
-   }
-
    public double getMarkerLatitude() {
       return MercatorProjection.toLatitude(mapPositionMarkerY);
    }
 
    public double getMarkerLongitude() {
       return MercatorProjection.toLongitude(mapPositionMarkerX);
-   }
-
-   public void setMapPositionMarkerX(final double mapPositionMarkerX) {
-      this.mapPositionMarkerX = mapPositionMarkerX;
-   }
-
-   public void setMapPositionMarkerY(final double mapPositionMarkerY) {
-      this.mapPositionMarkerY = mapPositionMarkerY;
    }
 
 }

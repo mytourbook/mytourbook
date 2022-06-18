@@ -444,7 +444,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             final MapBookmark bookmark = (MapBookmark) cell.getElement();
-            final MapPosition mapPos = bookmark.getMapPosition();
+            final MapPosition mapPos = bookmark.getMapPositionProjected();
 
             cell.setText(Integer.toString(mapPos.zoomLevel));
          }
@@ -471,7 +471,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
             final MapBookmark bookmark = (MapBookmark) cell.getElement();
 
-            final double value = bookmark.getMapPosition().scale;
+            final double value = bookmark.getMapPositionProjected().scale;
 
             String valueText;
             if (value == 0) {
@@ -507,7 +507,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
             final MapBookmark bookmark = (MapBookmark) cell.getElement();
 
-            final float value = bookmark.getMapPosition().bearing;
+            final float value = bookmark.getMapPositionProjected().bearing;
             String valueText;
 
             if (value == 0) {
@@ -543,7 +543,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
 
             final MapBookmark bookmark = (MapBookmark) cell.getElement();
 
-            final float value = bookmark.getMapPosition().tilt;
+            final float value = bookmark.getMapPositionProjected().tilt;
             String valueText;
 
             if (value == 0) {
@@ -631,7 +631,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             final MapBookmark bookmark = (MapBookmark) cell.getElement();
-            final String valueText = _nfLatLon.format(bookmark.get_mapPositionMarkerLatitude());
+            final String valueText = _nfLatLon.format(bookmark.getMapPosition_MarkerLatitude());
 
             cell.setText(valueText);
          }
@@ -658,7 +658,7 @@ public class MapBookmarkView extends ViewPart implements ITourViewer {
          public void update(final ViewerCell cell) {
 
             final MapBookmark bookmark = (MapBookmark) cell.getElement();
-            final String valueText = _nfLatLon.format(bookmark.get_mapPositionMarkerLongitude());
+            final String valueText = _nfLatLon.format(bookmark.getMapPosition_MarkerLongitude());
 
             cell.setText(valueText);
          }

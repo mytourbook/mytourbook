@@ -15,7 +15,8 @@
  *******************************************************************************/
 package net.tourbook.map.bookmark;
 
-import java.text.NumberFormat;
+import static org.eclipse.swt.events.FocusListener.focusGainedAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -27,12 +28,13 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -42,31 +44,28 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogGotoLocation extends TitleAreaDialog {
 
-//   private static final String       NL = UI.NEW_LINE1;
+   private static final String          GEO_LOCATION_FORMAT = "%.6f";                                                                 //$NON-NLS-1$
 
-   private static final NumberFormat _nf0;
+   private static final IDialogSettings _state              = TourbookPlugin.getState("net.tourbook.map.bookmark.DialogGotoLocation");//$NON-NLS-1$
 
-   static {
+   private GeoPosition                  _currentGeoPosition;
+   private GeoPosition                  _enteredGeoPosition;
 
-      _nf0 = NumberFormat.getNumberInstance();
-      _nf0.setMinimumFractionDigits(0);
-      _nf0.setMaximumFractionDigits(0);
-   }
+   private boolean                      _isCreateMapBookmark;
+   private String                       _bookmarkName;
 
-   private static final IDialogSettings _state = TourbookPlugin.getState("net.tourbook.map.bookmark.DialogGotoLocation");//$NON-NLS-1$
-
-   private double                       _latitude;
-   private double                       _longitude;
-
-   private ModifyListener               _modifyFloatValue;
+   private PixelConverter               _pc;
 
    /*
     * UI controls
     */
-   private Text        _txtLatitude;
-   private Text        _txtLongitude;
+   private Button _chkIsCreateMapBookmark;
 
-   private GeoPosition _currentGeoPosition;
+   private Label  _lblBookmarkName;
+
+   private Text   _txtBookmarkName;
+   private Text   _txtLatitude;
+   private Text   _txtLongitude;
 
    public DialogGotoLocation(final GeoPosition currentGeoPosition) {
 
@@ -84,7 +83,7 @@ public class DialogGotoLocation extends TitleAreaDialog {
       super.configureShell(shell);
 
       // set window title
-      shell.setText(Messages.Map_Location_DialogTitle);
+      shell.setText(Messages.Map_Location_Dialog_Title);
    }
 
    @Override
@@ -92,7 +91,7 @@ public class DialogGotoLocation extends TitleAreaDialog {
 
       super.create();
 
-      setTitle(Messages.Map_Location_DialogTitle);
+      setTitle(Messages.Map_Location_Dialog_Title);
    }
 
    @Override
@@ -108,7 +107,7 @@ public class DialogGotoLocation extends TitleAreaDialog {
    @Override
    protected Control createDialogArea(final Composite parent) {
 
-      initUI();
+      initUI(parent);
 
       final Composite shellContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(shellContainer);
@@ -119,13 +118,18 @@ public class DialogGotoLocation extends TitleAreaDialog {
       }
 
       restoreState();
+      enableControls();
 
-      setMessage("The current position is prefilled");
+      setMessage(Messages.Map_Location_Dialog_Message);
 
       return shellContainer;
    }
 
    private Control createUI(final Composite parent) {
+
+      final GridDataFactory latLonGridData = GridDataFactory.fillDefaults()
+            .align(SWT.BEGINNING, SWT.FILL)
+            .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
@@ -139,26 +143,63 @@ public class DialogGotoLocation extends TitleAreaDialog {
             label.setText(Messages.Map_Location_Label_LocationLatitude);
 
             _txtLatitude = new Text(container, SWT.BORDER);
-            _txtLatitude.addFocusListener(FocusListener.focusGainedAdapter(focusEvent -> onFocusGained(focusEvent)));
-//            _txtLatitude.addModifyListener(modifyEvent -> onLatLon_Modify(modifyEvent));
-            _txtLatitude.addModifyListener(_modifyFloatValue);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtLatitude);
+            _txtLatitude.addFocusListener(focusGainedAdapter(focusEvent -> onFocusGained(focusEvent)));
+            _txtLatitude.addModifyListener(modifyEvent -> onLatLon_Modify(modifyEvent));
+            _txtLatitude.addVerifyListener(verifyEvent -> onLatLon_Verify(verifyEvent));
+            latLonGridData.applyTo(_txtLatitude);
          }
          {
             /*
-             * Latitude
+             * Longitude
              */
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Map_Location_Label_LocationLongitude);
 
             _txtLongitude = new Text(container, SWT.BORDER);
             _txtLongitude.addFocusListener(FocusListener.focusGainedAdapter(focusEvent -> onFocusGained(focusEvent)));
-            _txtLongitude.addModifyListener(_modifyFloatValue);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtLongitude);
+            _txtLongitude.addModifyListener(modifyEvent -> onLatLon_Modify(modifyEvent));
+            _txtLongitude.addVerifyListener(verifyEvent -> onLatLon_Verify(verifyEvent));
+            latLonGridData.applyTo(_txtLongitude);
+         }
+
+         {
+            /*
+             * Create map bookmark ?
+             */
+            _chkIsCreateMapBookmark = new Button(container, SWT.CHECK);
+            _chkIsCreateMapBookmark.setText(Messages.Map_Location_Checkbox_IsCreateBookmark);
+            _chkIsCreateMapBookmark.addSelectionListener(widgetSelectedAdapter(selectionEvent -> enableControls()));
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkIsCreateMapBookmark);
+         }
+         {
+            /*
+             * Bookmark name
+             */
+            _lblBookmarkName = new Label(container, SWT.NONE);
+            _lblBookmarkName.setText(Messages.Map_Bookmark_Dialog_AddBookmark_Message);
+            GridDataFactory.fillDefaults().indent(16, 0).applyTo(_lblBookmarkName);
+
+            _txtBookmarkName = new Text(container, SWT.BORDER);
+            _txtBookmarkName.addModifyListener(modifyEvent -> enableControls());
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtBookmarkName);
          }
       }
 
       return container;
+   }
+
+   private void enableControls() {
+
+      final boolean isCreateMapBookmark = _chkIsCreateMapBookmark.getSelection();
+      final boolean isLatLonValid = isInputValid(false);
+
+      _chkIsCreateMapBookmark.setEnabled(isLatLonValid);
+      _lblBookmarkName.setEnabled(isLatLonValid && isCreateMapBookmark);
+      _txtBookmarkName.setEnabled(isLatLonValid && isCreateMapBookmark);
+   }
+
+   public String getBookmarkName() {
+      return _bookmarkName;
    }
 
    @Override
@@ -167,61 +208,64 @@ public class DialogGotoLocation extends TitleAreaDialog {
       // keep window size and position
       return _state;
 
-//      return null;
+      // for debugging: test default position/size
+//    return null;
    }
 
-   public double getLatitude() {
-      return _latitude;
+   public GeoPosition getEnteredGeoPosition() {
+      return _enteredGeoPosition;
    }
 
-   public double getLongitude() {
-      return _longitude;
+   private void initUI(final Composite parent) {
+
+      _pc = new PixelConverter(parent);
    }
 
-   private void initUI() {
-
-      _modifyFloatValue = modifyEvent -> {
-
-         final Text widget = (Text) modifyEvent.widget;
-         final String valueText = widget.getText().trim();
-
-         isLatLonValid(valueText);
-      };
+   public boolean isCreateMapBookmark() {
+      return _isCreateMapBookmark;
    }
 
-   private boolean isInputValid() {
+   private boolean isInputValid(final boolean isShowErrorState) {
 
-      if (isLatLonValid(_txtLatitude.getText()) == false) {
+      if (isLatLonValid(_txtLatitude.getText().trim(), isShowErrorState) == false) {
 
-         _txtLatitude.setFocus();
+         if (isShowErrorState) {
+            _txtLatitude.setFocus();
+         }
+
          return false;
       }
 
-      if (isLatLonValid(_txtLongitude.getText()) == false) {
+      if (isLatLonValid(_txtLongitude.getText().trim(), isShowErrorState) == false) {
 
-         _txtLongitude.setFocus();
+         if (isShowErrorState) {
+            _txtLongitude.setFocus();
+         }
+
          return false;
       }
 
       return true;
    }
 
-   private boolean isLatLonValid(final String valueText) {
+   private boolean isLatLonValid(final String valueText, final boolean isShowErrorMessage) {
 
       if (valueText.length() > 0) {
 
          try {
 
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             //
-            // Float.parseFloat() ignores localized strings therefore the databinding converter is used
-            // which provides also a good error message
+            // Float.parseFloat() ignores localized strings therefore the databinding converter
+            // is used which provides also a good error message
             //
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
             StringToNumberConverter.toFloat(true).convert(valueText);
 
-            setErrorMessage(null);
+            if (isShowErrorMessage) {
+               setErrorMessage(null);
+            }
 
             // hide initial message
             setMessage(null);
@@ -232,14 +276,18 @@ public class DialogGotoLocation extends TitleAreaDialog {
 
             // wrong characters are entered, display an error message
 
-            setErrorMessage(e.getLocalizedMessage());
+            if (isShowErrorMessage) {
+               setErrorMessage(e.getLocalizedMessage());
+            }
 
             return false;
          }
 
       } else {
 
-         setErrorMessage("Value cannot be empty");
+         if (isShowErrorMessage) {
+            setErrorMessage(Messages.Map_Location_Error_ValueCannotBeEmpty);
+         }
 
          return false;
       }
@@ -248,7 +296,7 @@ public class DialogGotoLocation extends TitleAreaDialog {
    @Override
    protected void okPressed() {
 
-      if (isInputValid() == false) {
+      if (isInputValid(true) == false) {
          return;
       }
 
@@ -264,37 +312,41 @@ public class DialogGotoLocation extends TitleAreaDialog {
    }
 
    private void onLatLon_Modify(final ModifyEvent modifyEvent) {
-      // TODO Auto-generated method stub
 
-//      modifyEvent.
+      final Text widget = (Text) modifyEvent.widget;
+      final String valueText = widget.getText().trim();
+
+      isLatLonValid(valueText, true);
+
+      enableControls();
    }
 
    private void onLatLon_Verify(final VerifyEvent verifyEvent) {
 
+      // trim text which is helpful when pasting text
+
       final String fieldText = verifyEvent.text;
 
-      final boolean isValueOK = fieldText.length() == 0
-
-            // allow DEL key
-            ? true
-
-            : fieldText.matches("^[+-]?([0-9]*[.])?[0-9]+$");
-
-      verifyEvent.doit = isValueOK;
+      verifyEvent.text = fieldText.trim();
    }
 
    private void restoreState() {
 
       // fill location with current map position
 
-      _txtLatitude.setText(String.format("%.6f", _currentGeoPosition.latitude));
-      _txtLongitude.setText(String.format("%.6f", _currentGeoPosition.longitude));
+      _txtLatitude.setText(String.format(GEO_LOCATION_FORMAT, _currentGeoPosition.latitude));
+      _txtLongitude.setText(String.format(GEO_LOCATION_FORMAT, _currentGeoPosition.longitude));
    }
 
    private void saveState() {
 
-      _latitude = Float.parseFloat(_txtLatitude.getText());
-      _longitude = Float.parseFloat(_txtLongitude.getText());
+      // convert into geoposition -> this will ensure that lat/lon values are in the correct range
+      _enteredGeoPosition = new GeoPosition(
+            Float.parseFloat(_txtLatitude.getText().trim()),
+            Float.parseFloat(_txtLongitude.getText().trim()));
+
+      _isCreateMapBookmark = _chkIsCreateMapBookmark.getSelection();
+      _bookmarkName = _txtBookmarkName.getText();
    }
 
 }

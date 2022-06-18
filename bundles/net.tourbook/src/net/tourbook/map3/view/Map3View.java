@@ -1521,7 +1521,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    @Override
    public void moveToMapLocation(final MapBookmark mapBookmark) {
 
-      moveToMapLocation(mapBookmark.getMapPosition(), 0);
+      moveToMapLocation(mapBookmark.getMapPositionProjected(), 0);
    }
 
    private void moveToMapLocation(final MapPosition mapPosition, final int positionFlags) {

@@ -263,7 +263,7 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
             public void update(final ViewerCell cell) {
 
                final MapBookmark bookmark = (MapBookmark) cell.getElement();
-               final MapPosition mapPos = bookmark.getMapPosition();
+               final MapPosition mapPos = bookmark.getMapPositionProjected();
 
                cell.setText(Integer.toString(mapPos.zoomLevel + 1));
             }

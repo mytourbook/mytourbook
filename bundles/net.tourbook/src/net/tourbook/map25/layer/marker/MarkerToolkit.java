@@ -267,7 +267,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
                mapBookmark.id,
                mapBookmark.name,
                UI.EMPTY_STRING,
-               new GeoPoint(mapBookmark.get_mapPositionMarkerLatitude(), mapBookmark.get_mapPositionMarkerLongitude()));
+               new GeoPoint(mapBookmark.getMapPosition_MarkerLatitude(), mapBookmark.getMapPosition_MarkerLongitude()));
 
          item.setMarker(createAdvanceSymbol(item, bitmapPoi));
 
