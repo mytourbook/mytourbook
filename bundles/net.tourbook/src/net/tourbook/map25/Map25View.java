@@ -51,8 +51,6 @@ import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
-import net.tourbook.map.bookmark.MapLocation;
-import net.tourbook.map.bookmark.MapPosition_with_MarkerPosition;
 import net.tourbook.map25.action.ActionMap25_PhotoFilter;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
 import net.tourbook.map25.action.ActionShowEntireTour;
@@ -1117,14 +1115,9 @@ public class Map25View extends ViewPart implements
    }
 
    @Override
-   public MapLocation getMapLocation() {
+   public MapPosition getMapPosition() {
 
-      final MapPosition_with_MarkerPosition mapPosition2 = new MapPosition_with_MarkerPosition(_mapApp.getMap().getMapPosition());
-      //System.out.println("++++++++++Map25view tilt: " + _mapApp.getMap().getMapPosition().tilt + " bearing: " + _mapApp.getMap().getMapPosition().bearing);
-      //final MapPosition_with_MarkerPosition mapPosition = (MapPosition_with_MarkerPosition) _mapApp.getMap().getMapPosition();
-      //final MapPosition mapPosition =  _mapApp.getMap().getMapPosition();  //only for testing, removing later
-
-      return new MapLocation(mapPosition2);
+      return _mapApp.getMap().getMapPosition();
    }
 
    @Override
@@ -1138,7 +1131,7 @@ public class Map25View extends ViewPart implements
       MapBookmarkManager.setLastSelectedBookmark(selectedBookmark);
 
       final Map map = _mapApp.getMap();
-      final MapPosition mapPosition = selectedBookmark.getMapPositionProjected();
+      final MapPosition mapPosition = selectedBookmark.getMapPosition();
 
       Map25ConfigManager.setMapLocation(map, mapPosition);
    }

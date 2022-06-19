@@ -17,19 +17,23 @@ package net.tourbook.map.bookmark;
 
 import java.util.UUID;
 
+import net.tourbook.common.UI;
+
+import org.oscim.core.MapPosition;
+
 public class MapBookmark {
 
-   public String                           id = UUID.randomUUID().toString();
+   private static final char NL = UI.NEW_LINE                  //
+   ;
 
-   public String                           name;
+   public String             id = UUID.randomUUID().toString();
 
-   private double                          _latitude;
-   private double                          _longitude;
+   public String             name;
 
-   private double                          _mapPosition_MarkerLatitude;
-   private double                          _mapPosition_MarkerLongitude;
+   private double            _latitude;
+   private double            _longitude;
 
-   private MapPosition_with_MarkerPosition _mapPositionProjected;
+   private MapPosition       _mapPosition;
 
    @Override
    public boolean equals(final Object obj) {
@@ -67,16 +71,8 @@ public class MapBookmark {
       return _longitude;
    }
 
-   public double getMapPosition_MarkerLatitude() {
-      return _mapPosition_MarkerLatitude;
-   }
-
-   public double getMapPosition_MarkerLongitude() {
-      return _mapPosition_MarkerLongitude;
-   }
-
-   public MapPosition_with_MarkerPosition getMapPositionProjected() {
-      return _mapPositionProjected;
+   public MapPosition getMapPosition() {
+      return _mapPosition;
    }
 
    @Override
@@ -90,44 +86,27 @@ public class MapBookmark {
       return result;
    }
 
-   public void setMapPosition(final MapPosition_with_MarkerPosition mapPosition) {
+   public void setMapPosition(final MapPosition mapPosition) {
 
-      _mapPositionProjected = mapPosition;
+      _mapPosition = mapPosition;
 
       _latitude = mapPosition.getLatitude();
       _longitude = mapPosition.getLongitude();
-
-      //this should be in a seperate methode like "setMapMarkerPosition():
-      //_mapPositionMarkerLatitude = mapPosition.getMarkerLatitude();
-      //_mapPositionMarkerLongitude = mapPosition.getMarkerLongitude();
-
-   }
-
-   public void setMapPositionMarker(final MapPosition_with_MarkerPosition mapPosition) {
-
-      _mapPositionProjected = mapPosition;
-
-      _mapPosition_MarkerLatitude = mapPosition.getMarkerLatitude();
-      _mapPosition_MarkerLongitude = mapPosition.getMarkerLongitude();
-
    }
 
    @Override
    public String toString() {
-      return "\n" //$NON-NLS-1$
 
-            + "MapBookmark " //$NON-NLS-1$
+      return UI.EMPTY_STRING
 
-            + "[" //$NON-NLS-1$
+            + "MapBookmark" + NL //                            //$NON-NLS-1$
 
-            + "id=" + id + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "name=" + name + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "latitude=" + _latitude + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "longitude=" + _longitude + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "marker lat=" + _mapPosition_MarkerLatitude + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "marker long=" + _mapPosition_MarkerLongitude + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "bearing=" + _mapPositionProjected.bearing + ", " //$NON-NLS-1$ //$NON-NLS-2$
-            + "]"; //$NON-NLS-1$
+            + "id       =" + id + NL //                        //$NON-NLS-1$
+            + "name     =" + name + NL //                      //$NON-NLS-1$
+            + "latitude =" + _latitude + NL //                 //$NON-NLS-1$
+            + "longitude=" + _longitude + NL //                //$NON-NLS-1$
+            + "bearing  =" + _mapPosition.bearing + NL //      //$NON-NLS-1$
+      ;
    }
 
 }

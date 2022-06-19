@@ -81,7 +81,6 @@ import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
-import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.action.ActionCreateTourMarkerFromMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
@@ -2457,12 +2456,15 @@ public class Map2View extends ViewPart implements
    }
 
    @Override
-   public MapLocation getMapLocation() {
+   public MapPosition getMapPosition() {
 
       final GeoPosition mapPosition = _map.getMapGeoCenter();
       final int mapZoomLevel = _map.getZoom() - 1;
 
-      return new MapLocation(mapPosition, mapZoomLevel);
+      return new MapPosition(
+            mapPosition.latitude,
+            mapPosition.longitude,
+            Math.pow(2, mapZoomLevel));
    }
 
    public Image getMapViewImage() {
@@ -2907,7 +2909,10 @@ public class Map2View extends ViewPart implements
 
       _lastFiredSyncEventTime = System.currentTimeMillis();
 
-      final MapPosition mapPosition = new MapLocation(geoCenter, zoomLevel - 1).getMapPosition();
+      final MapPosition mapPosition = new MapPosition(
+            geoCenter.latitude,
+            geoCenter.longitude,
+            Math.pow(2, zoomLevel - 1));
 
       MapManager.fireSyncMapEvent(mapPosition, this, 0);
    }
@@ -2999,7 +3004,7 @@ public class Map2View extends ViewPart implements
 
       MapBookmarkManager.setLastSelectedBookmark(mapBookmark);
 
-      final MapPosition mapPosition = mapBookmark.getMapPositionProjected();
+      final MapPosition mapPosition = mapBookmark.getMapPosition();
 
       _map.setZoom(mapPosition.zoomLevel + 1);
       _map.setMapCenter(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()));
