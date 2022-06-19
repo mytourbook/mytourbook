@@ -595,6 +595,18 @@ public class Messages extends NLS {
    public static String        Dialog_ExtractTour_Label_DeviceName;
    public static String        Dialog_ExtractTour_Label_SplitMethod;
 
+   public static String        Dialog_GotoMapLocation_Action_GotoLocation;
+   public static String        Dialog_GotoMapLocation_Button_PastTextFromClipboard;
+   public static String        Dialog_GotoMapLocation_Checkbox_IsCreateBookmark;
+   public static String        Dialog_GotoMapLocation_Dialog_Message;
+   public static String        Dialog_GotoMapLocation_Dialog_PastText_Message;
+   public static String        Dialog_GotoMapLocation_Dialog_PastText_Title;
+   public static String        Dialog_GotoMapLocation_Dialog_Title;
+   public static String        Dialog_GotoMapLocation_Error_ValueCannotBeEmpty;
+   public static String        Dialog_GotoMapLocation_Info_LatitudeAndLongitudeIsPasted;
+   public static String        Dialog_GotoMapLocation_Label_LocationLatitude;
+   public static String        Dialog_GotoMapLocation_Label_LocationLongitude;
+
    public static String        Dialog_HRZone_Button_AddZone;
    public static String        Dialog_HRZone_Button_EditHrZones;
    public static String        Dialog_HRZone_Button_RemoveZone;
@@ -1269,14 +1281,6 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Dialog_RenameBookmark_Title;
    public static String        Map_Bookmark_Dialog_ValidationAddName;
    public static String        Map_Bookmark_Dialog_ValidationRename;
-
-   public static String        Map_Location_Action_GotoLocation;
-   public static String        Map_Location_Checkbox_IsCreateBookmark;
-   public static String        Map_Location_Dialog_Message;
-   public static String        Map_Location_Dialog_Title;
-   public static String        Map_Location_Error_ValueCannotBeEmpty;
-   public static String        Map_Location_Label_LocationLatitude;
-   public static String        Map_Location_Label_LocationLongitude;
 
    public static String        merge_tour_dlg_invalid_serie_data_message;
    public static String        merge_tour_dlg_invalid_tour_data_message;

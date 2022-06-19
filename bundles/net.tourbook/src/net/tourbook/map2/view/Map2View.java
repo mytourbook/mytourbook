@@ -76,7 +76,7 @@ import net.tourbook.map.MapInfoManager;
 import net.tourbook.map.MapManager;
 import net.tourbook.map.MapUtils;
 import net.tourbook.map.bookmark.ActionMapBookmarks;
-import net.tourbook.map.bookmark.DialogGotoLocation;
+import net.tourbook.map.bookmark.DialogGotoMapLocation;
 import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
@@ -973,7 +973,7 @@ public class Map2View extends ViewPart implements
 
    private void actionGotoLocation() {
 
-      final DialogGotoLocation dialogGotoLocation = new DialogGotoLocation(_map.get_mouseDown_GeoPosition());
+      final DialogGotoMapLocation dialogGotoLocation = new DialogGotoMapLocation(_map.get_mouseDown_GeoPosition());
 
       dialogGotoLocation.open();
 

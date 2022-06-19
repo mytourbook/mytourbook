@@ -2885,10 +2885,10 @@ public class Map2 extends Canvas {
       final int devMouseX = mouseEvent.x;
       final int devMouseY = mouseEvent.y;
 
-      // check if left mouse button is pressed
+      // check context menu
       if (mouseEvent.button != 1) {
 
-         // keep mouse down context position
+         // right mouse down is pressed -> keep position
 
          final Point worldMousePosition = new Point(
                _worldPixel_TopLeft_Viewport.x + devMouseX,
