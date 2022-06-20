@@ -18,7 +18,6 @@ package net.tourbook.map3.layer.tourtrack;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL2ES1;
-import com.jogamp.opengl.fixedfunc.GLPointerFunc;
 
 import gnu.trove.list.array.TIntArrayList;
 
@@ -545,14 +544,14 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
          if (useVertexColors) {
 
             // Convert stride and offset from number of elements to number of bytes.
-            gl.glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+            gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
             gl.glColorPointer(4, GL2.GL_FLOAT, 4 * stride, 4L * pathData.getColorOffset());
          }
 
          gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, count);
 
          if (useVertexColors) {
-            gl.glDisableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+            gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
          }
 
          if (hasExtrusionPoints && isDrawVerticals()) {
@@ -679,14 +678,14 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
       // Convert stride from number of elements to number of bytes.
       gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, vboIds[0]);
       {
-         gl.glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+         gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
          {
             gl.glVertexPointer(3, GL2.GL_FLOAT, 4 * vertexStride, 0);
             gl.glColorPointer(4, GL2.GL_FLOAT, 4 * vertexStride, 4L * pathData.getColorOffset());
 
             gl.glDrawArrays(GL2.GL_TRIANGLE_STRIP, 0, pathData.getVertexCount());
          }
-         gl.glDisableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+         gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
       }
       gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
    }
@@ -734,14 +733,14 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
       if (dc.isPickingMode()) {
 
-         gl.glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+         gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
          gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
          gl.glColorPointer(3, GL2.GL_UNSIGNED_BYTE, 0, pickPositionColors);
 
       } else if (useVertexColors) {
          // Apply this path's per-position colors if we're in normal rendering mode (not picking) and this path's
          // positionColors is non-null. Convert the stride and offset from number of elements to number of bytes.
-         gl.glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+         gl.glEnableClientState(GL2.GL_COLOR_ARRAY);
          gl.glColorPointer(4, GL2.GL_FLOAT, 4 * pathData.getVertexStride(), 4L * pathData.getColorOffset());
       }
 
@@ -756,7 +755,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
       // Restore the previous GL color array state.
       if (dc.isPickingMode() || useVertexColors) {
-         gl.glDisableClientState(GLPointerFunc.GL_COLOR_ARRAY);
+         gl.glDisableClientState(GL2.GL_COLOR_ARRAY);
       }
    }
 
