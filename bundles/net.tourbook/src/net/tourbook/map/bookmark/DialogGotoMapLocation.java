@@ -52,42 +52,50 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.oscim.core.MapPosition;
 
 public class DialogGotoMapLocation extends TitleAreaDialog {
 
-   private static final String GEO_LOCATION_FORMAT = "%.6f"; //$NON-NLS-1$
+   private static final String          GEO_LOCATION_FORMAT = "%.6f";                                                                 //$NON-NLS-1$
 
-   private static final Pattern         _intOrFloatPattern = Pattern.compile("\\d*\\.?\\d+");                                        //$NON-NLS-1$
+   private static final Pattern         _intOrFloatPattern  = Pattern.compile("\\d*\\.?\\d+");                                        //$NON-NLS-1$
 
-   private static final IDialogSettings _state             = TourbookPlugin.getState("net.tourbook.map.bookmark.DialogGotoLocation");//$NON-NLS-1$
+   private static final IDialogSettings _state              = TourbookPlugin.getState("net.tourbook.map.bookmark.DialogGotoLocation");//$NON-NLS-1$
 
-   private GeoPosition                  _currentGeoPosition;
-   private GeoPosition                  _enteredGeoPosition;
+   private MapPosition                  _mapPosition;
+   private GeoPosition                  _mouseMapPosition;
 
    private boolean                      _isCreateMapBookmark;
+   private boolean                      _isInStartUp;
+   private boolean                      _isPasteLatLonFromMouseMapPosition;
    private String                       _bookmarkName;
+
+   private String                       _invalid_ErrorMessage;
 
    private PixelConverter               _pc;
 
    /*
     * UI controls
     */
-   private Button _chkIsCreateMapBookmark;
-   private Button _btnPasteFromClipboard;
+   private Button  _chkIsCreateMapBookmark;
+   private Button  _btnPasteLatLon;
 
-   private Label  _lblBookmarkName;
+   private Label   _lblBookmarkName;
 
-   private Text   _txtBookmarkName;
-   private Text   _txtLatitude;
-   private Text   _txtLongitude;
+   private Text    _txtBookmarkName;
+   private Text    _txtLatitude;
+   private Text    _txtLongitude;
 
-   private Image  _imagePaste;
+   private Image   _imagePaste;
 
-   public DialogGotoMapLocation(final GeoPosition currentGeoPosition) {
+   private Control _invalid_Control;
+
+   public DialogGotoMapLocation(final MapPosition mapPosition, final GeoPosition mouseMapPosition) {
 
       super(Display.getDefault().getActiveShell());
 
-      _currentGeoPosition = currentGeoPosition;
+      _mapPosition = mapPosition;
+      _mouseMapPosition = mouseMapPosition;
 
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
@@ -99,7 +107,7 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
       super.configureShell(shell);
 
       // set window title
-      shell.setText(Messages.Dialog_GotoMapLocation_Dialog_Title);
+      shell.setText(Messages.Dialog_GotoMapLocation_Title);
 
       shell.addDisposeListener(disposeEvent -> dispose());
    }
@@ -109,7 +117,7 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
 
       super.create();
 
-      setTitle(Messages.Dialog_GotoMapLocation_Dialog_Title);
+      setTitle(Messages.Dialog_GotoMapLocation_Title);
    }
 
    @Override
@@ -141,11 +149,17 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
          restoreState();
          enableControls();
 
-         setMessage(Messages.Dialog_GotoMapLocation_Dialog_Message);
+         if (_invalid_Control != null) {
 
-         // initially the onfocus listener is not working
-         _txtLatitude.setFocus();
-         _txtLatitude.selectAll();
+            _invalid_Control.setFocus();
+            setErrorMessage(_invalid_ErrorMessage);
+
+         } else {
+
+            // initially the onfocus listener is not working
+            _txtLatitude.setFocus();
+            _txtLatitude.selectAll();
+         }
       });
 
       return shellContainer;
@@ -174,13 +188,10 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
             _txtLatitude.addVerifyListener(verifyEvent -> onLatLon_Verify(verifyEvent));
             latLonGridData.applyTo(_txtLatitude);
 
-            _btnPasteFromClipboard = new Button(container, SWT.NONE);
-            _btnPasteFromClipboard.setImage(_imagePaste);
-            _btnPasteFromClipboard.setToolTipText(Messages.Dialog_GotoMapLocation_Button_PastTextFromClipboard);
-            _btnPasteFromClipboard.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onPastText()));
-            GridDataFactory.fillDefaults()
-                  .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_btnPasteFromClipboard);
+            _btnPasteLatLon = new Button(container, SWT.NONE);
+            _btnPasteLatLon.setImage(_imagePaste);
+            _btnPasteLatLon.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onPasteLatLon()));
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_btnPasteLatLon);
          }
          {
             /*
@@ -202,7 +213,7 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
              */
             _chkIsCreateMapBookmark = new Button(container, SWT.CHECK);
             _chkIsCreateMapBookmark.setText(Messages.Dialog_GotoMapLocation_Checkbox_IsCreateBookmark);
-            _chkIsCreateMapBookmark.addSelectionListener(widgetSelectedAdapter(selectionEvent -> enableControls()));
+            _chkIsCreateMapBookmark.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyValue()));
             GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkIsCreateMapBookmark);
          }
          {
@@ -214,7 +225,7 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
             GridDataFactory.fillDefaults().indent(16, 0).applyTo(_lblBookmarkName);
 
             _txtBookmarkName = new Text(container, SWT.BORDER);
-            _txtBookmarkName.addModifyListener(modifyEvent -> enableControls());
+            _txtBookmarkName.addModifyListener(modifyEvent -> onModifyValue());
             GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_txtBookmarkName);
          }
       }
@@ -230,15 +241,9 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
    private void enableControls() {
 
       final boolean isCreateMapBookmark = _chkIsCreateMapBookmark.getSelection();
-      final boolean isLatLonValid = isInputValid(false);
 
-      _chkIsCreateMapBookmark.setEnabled(isLatLonValid);
-      _lblBookmarkName.setEnabled(isLatLonValid && isCreateMapBookmark);
-      _txtBookmarkName.setEnabled(isLatLonValid && isCreateMapBookmark);
-
-      final Button okButton = getButton(IDialogConstants.OK_ID);
-
-      okButton.setEnabled(isLatLonValid);
+      _lblBookmarkName.setEnabled(isCreateMapBookmark);
+      _txtBookmarkName.setEnabled(isCreateMapBookmark);
    }
 
    public String getBookmarkName() {
@@ -255,8 +260,8 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
 //    return null;
    }
 
-   public GeoPosition getEnteredGeoPosition() {
-      return _enteredGeoPosition;
+   public MapPosition getMapPosition() {
+      return _mapPosition;
    }
 
    private void initUI(final Composite parent) {
@@ -270,22 +275,46 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
       return _isCreateMapBookmark;
    }
 
-   private boolean isInputValid(final boolean isShowErrorState) {
+   private boolean isInputValid() {
 
-      if (isLatLonValid(_txtLatitude.getText().trim(), isShowErrorState) == false) {
+      _invalid_Control = null;
+      _invalid_ErrorMessage = null;
 
-         if (isShowErrorState) {
-            _txtLatitude.setFocus();
-         }
+      /*
+       * Validate latitude
+       */
+      if (isLatLonValid(_txtLatitude.getText().trim()) == false) {
+
+         _invalid_Control = _txtLatitude;
 
          return false;
       }
 
-      if (isLatLonValid(_txtLongitude.getText().trim(), isShowErrorState) == false) {
+      /*
+       * Validate longitude
+       */
+      if (isLatLonValid(_txtLongitude.getText().trim()) == false) {
 
-         if (isShowErrorState) {
-            _txtLongitude.setFocus();
-         }
+         _invalid_Control = _txtLongitude;
+
+         return false;
+      }
+
+      return isInputValid_BookmarkName();
+   }
+
+   /**
+    * Validate bookmark name
+    *
+    * @return
+    */
+   private boolean isInputValid_BookmarkName() {
+
+      if (_chkIsCreateMapBookmark.getSelection()
+            && _txtBookmarkName.getText().trim().length() == 0) {
+
+         _invalid_Control = _txtBookmarkName;
+         _invalid_ErrorMessage = Messages.Dialog_GotoMapLocation_Error_ValueCannotBeEmpty;
 
          return false;
       }
@@ -293,7 +322,9 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
       return true;
    }
 
-   private boolean isLatLonValid(final String valueText, final boolean isShowErrorMessage) {
+   private boolean isLatLonValid(final String valueText) {
+
+      _invalid_ErrorMessage = null;
 
       if (valueText.length() > 0) {
 
@@ -308,31 +339,20 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
 
             StringToNumberConverter.toFloat(true).convert(valueText);
 
-            if (isShowErrorMessage) {
-               setErrorMessage(null);
-            }
-
-            // hide initial message
-            setMessage(null);
-
             return true;
 
          } catch (final IllegalArgumentException e) {
 
             // wrong characters are entered, display an error message
 
-            if (isShowErrorMessage) {
-               setErrorMessage(e.getLocalizedMessage());
-            }
+            _invalid_ErrorMessage = e.getLocalizedMessage();
 
             return false;
          }
 
       } else {
 
-         if (isShowErrorMessage) {
-            setErrorMessage(Messages.Dialog_GotoMapLocation_Error_ValueCannotBeEmpty);
-         }
+         _invalid_ErrorMessage = Messages.Dialog_GotoMapLocation_Error_ValueCannotBeEmpty;
 
          return false;
       }
@@ -341,7 +361,12 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
    @Override
    protected void okPressed() {
 
-      if (isInputValid(true) == false) {
+      if (isInputValid() == false) {
+
+         _invalid_Control.setFocus();
+
+         setErrorMessage(_invalid_ErrorMessage);
+
          return;
       }
 
@@ -358,10 +383,20 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
 
    private void onLatLon_Modify(final ModifyEvent modifyEvent) {
 
+      if (_isInStartUp) {
+         return;
+      }
+
+      // hide default message
+      setMessage(null);
+
       final Text widget = (Text) modifyEvent.widget;
       final String valueText = widget.getText().trim();
 
-      isLatLonValid(valueText, true);
+      isLatLonValid(valueText);
+
+      // show/hide error message
+      setErrorMessage(_invalid_ErrorMessage);
 
       enableControls();
    }
@@ -375,14 +410,55 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
       verifyEvent.text = fieldText.trim();
    }
 
-   private void onPastText() {
+   private void onModifyValue() {
+
+      // hide default message
+      setMessage(null);
+
+      // validate input
+      final boolean isValid = isInputValid_BookmarkName();
+
+      // show error only when invalid and selected
+      if (_chkIsCreateMapBookmark.getSelection() && isValid == false) {
+
+         setErrorMessage(_invalid_ErrorMessage);
+
+      } else {
+
+         setErrorMessage(null);
+      }
+
+      enableControls();
+   }
+
+   private void onPasteLatLon() {
+
+      if (_isPasteLatLonFromMouseMapPosition) {
+
+         pasteLatLon_FromMouseMapPosition();
+
+      } else {
+
+         pasteLatLon_FromClipboard(true);
+      }
+
+      if (_invalid_Control != null) {
+         _invalid_Control.setFocus();
+      }
+   }
+
+   /**
+    * @param isShowFailureMessage
+    * @return Returns <code>true</code> when clipboard content was pasted into the lat/lon fields
+    */
+   private boolean pasteLatLon_FromClipboard(final boolean isShowFailureMessage) {
 
       /*
        * Get text fromt the clipboard
        */
       String textData = null;
 
-      final Clipboard clipboard = new Clipboard(_btnPasteFromClipboard.getDisplay());
+      final Clipboard clipboard = new Clipboard(_btnPasteLatLon.getDisplay());
       try {
 
          final TextTransfer textTransfer = TextTransfer.getInstance();
@@ -395,13 +471,13 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
       }
 
       if (textData == null) {
-         return;
+         return false;
       }
 
       /*
        * Convert clipboard text into lat/lon values
        */
-      boolean isShowFailureMessage = true;
+      boolean isLatLonPasted = false;
       try {
 
          final Matcher latlonMatcher = _intOrFloatPattern.matcher(textData);
@@ -424,7 +500,7 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
 
                longitude = floatText;
 
-               isShowFailureMessage = false;
+               isLatLonPasted = true;
                break;
             }
          }
@@ -437,40 +513,73 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
          e.printStackTrace();
       }
 
-      if (isShowFailureMessage) {
+      if (isLatLonPasted == false) {
 
-         MessageDialog.openInformation(
-               getShell(),
-               Messages.Dialog_GotoMapLocation_Dialog_PastText_Title,
-               NLS.bind(Messages.Dialog_GotoMapLocation_Dialog_PastText_Message, UI.shortenText(textData, 500, true)));
+         if (isShowFailureMessage) {
+
+            MessageDialog.openInformation(
+                  getShell(),
+                  Messages.Dialog_GotoMapLocation_Dialog_PasteLatLonError_Title,
+                  NLS.bind(Messages.Dialog_GotoMapLocation_Dialog_PasteLatLonError_Message, UI.shortenText(textData, 500, true)));
+         }
+
+         return false;
+
       } else {
 
          // show content of clipboard which was pasted
 
          // replace line breaks
-         final String cleanedText = textData.replace("(\r\n|\n|\r)", UI.SPACE1);
+         final String cleanedText = textData.replace("(\r\n|\n|\r)", UI.SPACE1); //$NON-NLS-1$
 
-         setMessage(NLS.bind(Messages.Dialog_GotoMapLocation_Info_LatitudeAndLongitudeIsPasted, cleanedText));
+         setMessage(NLS.bind(Messages.Dialog_GotoMapLocation_Message_LatLonIsPasted_FromClipboard, cleanedText));
+
+         return true;
       }
+   }
+
+   private void pasteLatLon_FromMouseMapPosition() {
+
+      _txtLatitude.setText(String.format(GEO_LOCATION_FORMAT, _mouseMapPosition.latitude));
+      _txtLongitude.setText(String.format(GEO_LOCATION_FORMAT, _mouseMapPosition.longitude));
+
+      setMessage(Messages.Dialog_GotoMapLocation_Message_LatLonIsPasted_FromMouseMapPosition);
    }
 
    private void restoreState() {
 
-      // fill location with current mouse position
+      _isInStartUp = true;
+      {
+         // first try to paste lat/lon from the clipboard
+         if (pasteLatLon_FromClipboard(false)) {
 
-      _txtLatitude.setText(String.format(GEO_LOCATION_FORMAT, _currentGeoPosition.latitude));
-      _txtLongitude.setText(String.format(GEO_LOCATION_FORMAT, _currentGeoPosition.longitude));
+            _isPasteLatLonFromMouseMapPosition = true;
+
+            _btnPasteLatLon.setToolTipText(Messages.Dialog_GotoMapLocation_Button_PasteLatLon_FromMapMousePosition_Tooltip);
+
+         } else {
+
+            // fill location with current mouse map position
+
+            _isPasteLatLonFromMouseMapPosition = false;
+
+            _btnPasteLatLon.setToolTipText(Messages.Dialog_GotoMapLocation_Button_PasteLatLon_FromClipboard_Tooltip);
+
+            pasteLatLon_FromMouseMapPosition();
+         }
+      }
+      _isInStartUp = false;
    }
 
    private void saveState() {
 
-      // convert into geoposition -> this will also ensure that lat/lon values are in the correct range
-      _enteredGeoPosition = new GeoPosition(
-            Float.parseFloat(_txtLatitude.getText().trim()),
-            Float.parseFloat(_txtLongitude.getText().trim()));
-
-      _isCreateMapBookmark = _chkIsCreateMapBookmark.getSelection();
       _bookmarkName = _txtBookmarkName.getText();
+      _isCreateMapBookmark = _chkIsCreateMapBookmark.getSelection();
+
+      // update map position
+      final float latitude = Float.parseFloat(_txtLatitude.getText().trim());
+      final float longitude = Float.parseFloat(_txtLongitude.getText().trim());
+      _mapPosition.setPosition(latitude, longitude);
    }
 
 }

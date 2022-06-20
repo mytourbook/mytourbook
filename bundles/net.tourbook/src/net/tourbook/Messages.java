@@ -596,16 +596,17 @@ public class Messages extends NLS {
    public static String        Dialog_ExtractTour_Label_SplitMethod;
 
    public static String        Dialog_GotoMapLocation_Action_GotoLocation;
-   public static String        Dialog_GotoMapLocation_Button_PastTextFromClipboard;
+   public static String        Dialog_GotoMapLocation_Button_PasteLatLon_FromClipboard_Tooltip;
+   public static String        Dialog_GotoMapLocation_Button_PasteLatLon_FromMapMousePosition_Tooltip;
    public static String        Dialog_GotoMapLocation_Checkbox_IsCreateBookmark;
-   public static String        Dialog_GotoMapLocation_Dialog_Message;
-   public static String        Dialog_GotoMapLocation_Dialog_PastText_Message;
-   public static String        Dialog_GotoMapLocation_Dialog_PastText_Title;
-   public static String        Dialog_GotoMapLocation_Dialog_Title;
+   public static String        Dialog_GotoMapLocation_Dialog_PasteLatLonError_Message;
+   public static String        Dialog_GotoMapLocation_Dialog_PasteLatLonError_Title;
    public static String        Dialog_GotoMapLocation_Error_ValueCannotBeEmpty;
-   public static String        Dialog_GotoMapLocation_Info_LatitudeAndLongitudeIsPasted;
    public static String        Dialog_GotoMapLocation_Label_LocationLatitude;
    public static String        Dialog_GotoMapLocation_Label_LocationLongitude;
+   public static String        Dialog_GotoMapLocation_Message_LatLonIsPasted_FromClipboard;
+   public static String        Dialog_GotoMapLocation_Message_LatLonIsPasted_FromMouseMapPosition;
+   public static String        Dialog_GotoMapLocation_Title;
 
    public static String        Dialog_HRZone_Button_AddZone;
    public static String        Dialog_HRZone_Button_EditHrZones;

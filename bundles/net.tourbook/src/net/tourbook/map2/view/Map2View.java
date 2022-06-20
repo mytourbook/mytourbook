@@ -942,7 +942,7 @@ public class Map2View extends ViewPart implements
 
       final GeoPosition mouseDown_GeoPosition = _map.get_mouseDown_GeoPosition();
 
-      final String geoPosition = String.format("Latitude:  %.6f - Longitude: %.6f",
+      final String geoPosition = String.format(Messages.Clipboard_Content_MapLocation,
             mouseDown_GeoPosition.latitude,
             mouseDown_GeoPosition.longitude);
 
@@ -962,7 +962,7 @@ public class Map2View extends ViewPart implements
       if (statusLineMgr != null) {
 
          // show info that data are copied
-         statusLineMgr.setMessage(String.format("Copied: Latitude: %.6f - Longitude: %.6f",
+         statusLineMgr.setMessage(String.format(Messages.StatusLine_Message_CopiedLatitudeLongitude,
                mouseDown_GeoPosition.latitude,
                mouseDown_GeoPosition.longitude));
 
@@ -973,30 +973,35 @@ public class Map2View extends ViewPart implements
 
    private void actionGotoLocation() {
 
-      final DialogGotoMapLocation dialogGotoLocation = new DialogGotoMapLocation(_map.get_mouseDown_GeoPosition());
+      final DialogGotoMapLocation dialogGotoMapLocation = new DialogGotoMapLocation(getMapPosition(), _map.get_mouseDown_GeoPosition());
 
-      dialogGotoLocation.open();
+      dialogGotoMapLocation.open();
 
-      if (dialogGotoLocation.getReturnCode() != Window.OK) {
+      if (dialogGotoMapLocation.getReturnCode() != Window.OK) {
          return;
       }
 
-      final GeoPosition geoLocation = dialogGotoLocation.getEnteredGeoPosition();
+      final MapPosition mapPosition = dialogGotoMapLocation.getMapPosition();
 
-      // keep current zoom level
-      final int zoomLevel = _map.getZoom();
+      /*
+       * Show location as POI
+       */
+      final String poiName = String.format(Messages.Map_POI_MapLocation,
+            mapPosition.getLatitude(),
+            mapPosition.getLongitude());
 
-      final String poiName = String.format("Latitude: %4.6f\nLongitude: %4.6f",
-            geoLocation.latitude,
-            geoLocation.longitude);
-
-      _map.setPoi(geoLocation, zoomLevel, poiName);
+      _map.setPoi(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()),
+            mapPosition.getZoomLevel() + 1, // the correct zoom level is lost, adjust it to keep the same as the current
+            poiName);
 
       /*
        * Create map bookmark
        */
-      if (dialogGotoLocation.isCreateMapBookmark()) {
+      if (dialogGotoMapLocation.isCreateMapBookmark()) {
 
+         final String bookmarkName = dialogGotoMapLocation.getBookmarkName();
+
+         MapBookmarkManager.addBookmark(mapPosition, bookmarkName);
       }
    }
 

@@ -294,17 +294,9 @@ public class MapBookmarkManager {
 //      final LatLng clickedTourPoint = new LatLng(clickedTourPointLatitude, clickedTourPointLongitude);
 
       final MapPosition mapPosition = mapBookmarks.getMapPosition();
+      final String bookmarkName = addDialog.getValue();
 
-      final MapBookmark newMapBookmark = new MapBookmark();
-
-      newMapBookmark.name = addDialog.getValue();
-      newMapBookmark.setMapPosition(mapPosition);
-
-      _allBookmarks.add(newMapBookmark);
-
-      setLastSelectedBookmark(newMapBookmark);
-
-      onUpdateBookmark(newMapBookmark);
+      addBookmark(mapPosition, bookmarkName);
    }
 
    private static void actionBookmark_Rename(final IMapBookmarks mapBookmarks) {
@@ -370,6 +362,20 @@ public class MapBookmarkManager {
             onUpdateBookmark(lastSelectedBookmark);
          }
       }
+   }
+
+   public static void addBookmark(final MapPosition mapPosition, final String bookmarkName) {
+
+      final MapBookmark newMapBookmark = new MapBookmark();
+
+      newMapBookmark.name = bookmarkName;
+      newMapBookmark.setMapPosition(mapPosition);
+
+      _allBookmarks.add(newMapBookmark);
+
+      setLastSelectedBookmark(newMapBookmark);
+
+      onUpdateBookmark(newMapBookmark);
    }
 
    public static void addBookmarkListener(final IMapBookmarkListener listener) {

@@ -23,6 +23,8 @@ public class Messages extends NLS {
 
    public static String        App_Action_Apply;
 
+   public static String        Clipboard_Content_MapLocation;
+
    public static String        Default_Label_NewTourMarker;
 
    public static String        graph_label_gradient_unit;
@@ -95,6 +97,8 @@ public class Messages extends NLS {
 
    public static String Map_Label_ValuePoint_Title;
 
+   public static String Map_POI_MapLocation;
+
    public static String Map_Properties_ShowGeoGrid;
    public static String Map_Properties_ShowTileBorder;
    public static String Map_Properties_ShowTileInfo;
@@ -138,6 +142,8 @@ public class Messages extends NLS {
    public static String Dialog_ExportImage_Label_ImageQuality_Tooltip;
    public static String Dialog_ExportImage_Title;
    public static String Dialog_ExportImage_Message;
+
+   public static String StatusLine_Message_CopiedLatitudeLongitude;
 
    static {
       // initialize resource bundle
