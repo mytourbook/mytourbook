@@ -16,7 +16,6 @@
 package net.tourbook.map3.layer.tourtrack;
 
 import com.jogamp.common.nio.Buffers;
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL2ES1;
 import com.jogamp.opengl.fixedfunc.GLPointerFunc;
@@ -538,8 +537,8 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
          }
 
          // Convert stride from number of elements to number of bytes.
-         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[0]);
-         gl.glVertexPointer(3, GL.GL_FLOAT, 4 * stride, 0);
+         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, vboIds[0]);
+         gl.glVertexPointer(3, GL2.GL_FLOAT, 4 * stride, 0);
 
          // Apply this path's per-position colors if we're in normal rendering mode (not picking) and this path's
          // positionColors is non-null.
@@ -547,10 +546,10 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
             // Convert stride and offset from number of elements to number of bytes.
             gl.glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
-            gl.glColorPointer(4, GL.GL_FLOAT, 4 * stride, 4L * pathData.getColorOffset());
+            gl.glColorPointer(4, GL2.GL_FLOAT, 4 * stride, 4L * pathData.getColorOffset());
          }
 
-         gl.glDrawArrays(GL.GL_LINE_STRIP, 0, count);
+         gl.glDrawArrays(GL2.GL_LINE_STRIP, 0, count);
 
          if (useVertexColors) {
             gl.glDisableClientState(GLPointerFunc.GL_COLOR_ARRAY);
@@ -574,8 +573,8 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
          }
 
       } finally {
-         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
-         gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, 0);
+         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
+         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
       }
    }
 
@@ -641,11 +640,11 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
          // draw triangle
          gl.glColor4ub((byte) rgb.red, (byte) rgb.green, (byte) rgb.blue, (byte) opacity);
 
-         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[_arrowSurfaceVboId]);
+         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, vboIds[_arrowSurfaceVboId]);
 
          // Convert stride from number of elements to number of bytes.
-         gl.glVertexPointer(3, GL.GL_FLOAT, 4 * 3, 0);
-         gl.glDrawArrays(GL.GL_TRIANGLES, 0, _numberOfDirectionArrows);
+         gl.glVertexPointer(3, GL2.GL_FLOAT, 4 * 3, 0);
+         gl.glDrawArrays(GL2.GL_TRIANGLES, 0, _numberOfDirectionArrows);
 
          // draw border
          final Color borderColor = ColorUtil.getContrastColorAWT(rgb.red, rgb.green, rgb.blue, opacity);
@@ -656,11 +655,11 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
                (byte) borderColor.getBlue(),
                (byte) opacity);
 
-         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[_arrowBorderVboId]);
+         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, vboIds[_arrowBorderVboId]);
 
          // Convert stride from number of elements to number of bytes.
-         gl.glVertexPointer(3, GL.GL_FLOAT, 4 * 3, 0);
-         gl.glDrawArrays(GL.GL_LINES, 0, _numberOfDirectionArrows * 2);
+         gl.glVertexPointer(3, GL2.GL_FLOAT, 4 * 3, 0);
+         gl.glDrawArrays(GL2.GL_LINES, 0, _numberOfDirectionArrows * 2);
 
       } finally {
 
@@ -678,18 +677,18 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
       final int vertexStride = pathData.getVertexStride();
 
       // Convert stride from number of elements to number of bytes.
-      gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[0]);
+      gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, vboIds[0]);
       {
          gl.glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
          {
-            gl.glVertexPointer(3, GL.GL_FLOAT, 4 * vertexStride, 0);
-            gl.glColorPointer(4, GL.GL_FLOAT, 4 * vertexStride, 4L * pathData.getColorOffset());
+            gl.glVertexPointer(3, GL2.GL_FLOAT, 4 * vertexStride, 0);
+            gl.glColorPointer(4, GL2.GL_FLOAT, 4 * vertexStride, 4L * pathData.getColorOffset());
 
-            gl.glDrawArrays(GL.GL_TRIANGLE_STRIP, 0, pathData.getVertexCount());
+            gl.glDrawArrays(GL2.GL_TRIANGLE_STRIP, 0, pathData.getVertexCount());
          }
          gl.glDisableClientState(GLPointerFunc.GL_COLOR_ARRAY);
       }
-      gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
+      gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
    }
 
    /**
@@ -731,25 +730,25 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
       final GL2 gl = dc.getGL().getGL2(); // GL initialization checks for GL2 compatibility.
 
       // Convert stride from number of elements to number of bytes.
-      gl.glVertexPointer(3, GL.GL_FLOAT, 4 * pathData.getVertexStride(), 0);
+      gl.glVertexPointer(3, GL2.GL_FLOAT, 4 * pathData.getVertexStride(), 0);
 
       if (dc.isPickingMode()) {
 
          gl.glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
-         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
-         gl.glColorPointer(3, GL.GL_UNSIGNED_BYTE, 0, pickPositionColors);
+         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
+         gl.glColorPointer(3, GL2.GL_UNSIGNED_BYTE, 0, pickPositionColors);
 
       } else if (useVertexColors) {
          // Apply this path's per-position colors if we're in normal rendering mode (not picking) and this path's
          // positionColors is non-null. Convert the stride and offset from number of elements to number of bytes.
          gl.glEnableClientState(GLPointerFunc.GL_COLOR_ARRAY);
-         gl.glColorPointer(4, GL.GL_FLOAT, 4 * pathData.getVertexStride(), 4L * pathData.getColorOffset());
+         gl.glColorPointer(4, GL2.GL_FLOAT, 4 * pathData.getVertexStride(), 4L * pathData.getColorOffset());
       }
 
       prepareToDrawPoints(dc);
 
-      gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, vboIds[2]);
-      gl.glDrawElements(GL.GL_POINTS, posPoints.limit(), GL.GL_UNSIGNED_INT, 0);
+      gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, vboIds[2]);
+      gl.glDrawElements(GL2.GL_POINTS, posPoints.limit(), GL2.GL_UNSIGNED_INT, 0);
 
       // Restore the previous GL point state.
       gl.glPointSize(1f);
@@ -819,19 +818,19 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
       try {
 
          final FloatBuffer vb = pathData.getRenderedPath();
-         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[0]);
-         gl.glBufferData(GL.GL_ARRAY_BUFFER, vb.limit() * 4L, vb.rewind(), GL.GL_STATIC_DRAW);
+         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, vboIds[0]);
+         gl.glBufferData(GL2.GL_ARRAY_BUFFER, vb.limit() * 4L, vb.rewind(), GL2.GL_STATIC_DRAW);
 
          if (pathData.isHasExtrusionPoints() && isDrawVerticals()) {
             final IntBuffer ib = pathData.getPolePositions();
-            gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, vboIds[1]);
-            gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, ib.limit() * 4L, ib.rewind(), GL.GL_STATIC_DRAW);
+            gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, vboIds[1]);
+            gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, ib.limit() * 4L, ib.rewind(), GL2.GL_STATIC_DRAW);
          }
 
          if (isShowPositions()) {
             final IntBuffer ib = pathData.getPositionPoints();
-            gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, vboIds[2]);
-            gl.glBufferData(GL.GL_ELEMENT_ARRAY_BUFFER, ib.limit() * 4L, ib.rewind(), GL.GL_STATIC_DRAW);
+            gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, vboIds[2]);
+            gl.glBufferData(GL2.GL_ELEMENT_ARRAY_BUFFER, ib.limit() * 4L, ib.rewind(), GL2.GL_STATIC_DRAW);
          }
 
          if (config.isShowDirectionArrows) {
@@ -841,24 +840,24 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
             // create vbo for direction arrows
             _arrowPositionVboId = vboIndex++;
             FloatBuffer fb = (FloatBuffer) pathData.getValue(ARROW_POSITION_KEY);
-            gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[_arrowPositionVboId]);
-            gl.glBufferData(GL.GL_ARRAY_BUFFER, fb.limit() * 4L, fb.rewind(), GL.GL_STATIC_DRAW);
+            gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, vboIds[_arrowPositionVboId]);
+            gl.glBufferData(GL2.GL_ARRAY_BUFFER, fb.limit() * 4L, fb.rewind(), GL2.GL_STATIC_DRAW);
 
             _arrowSurfaceVboId = vboIndex++;
             fb = (FloatBuffer) pathData.getValue(ARROW_SURFACE_KEY);
-            gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[_arrowSurfaceVboId]);
-            gl.glBufferData(GL.GL_ARRAY_BUFFER, fb.limit() * 4L, fb.rewind(), GL.GL_STATIC_DRAW);
+            gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, vboIds[_arrowSurfaceVboId]);
+            gl.glBufferData(GL2.GL_ARRAY_BUFFER, fb.limit() * 4L, fb.rewind(), GL2.GL_STATIC_DRAW);
 
             _arrowBorderVboId = vboIndex++;
             fb = (FloatBuffer) pathData.getValue(ARROW_BORDER_KEY);
-            gl.glBindBuffer(GL.GL_ARRAY_BUFFER, vboIds[_arrowBorderVboId]);
-            gl.glBufferData(GL.GL_ARRAY_BUFFER, fb.limit() * 4L, fb.rewind(), GL.GL_STATIC_DRAW);
+            gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, vboIds[_arrowBorderVboId]);
+            gl.glBufferData(GL2.GL_ARRAY_BUFFER, fb.limit() * 4L, fb.rewind(), GL2.GL_STATIC_DRAW);
          }
 
       } finally {
 
-         gl.glBindBuffer(GL.GL_ARRAY_BUFFER, 0);
-         gl.glBindBuffer(GL.GL_ELEMENT_ARRAY_BUFFER, 0);
+         gl.glBindBuffer(GL2.GL_ARRAY_BUFFER, 0);
+         gl.glBindBuffer(GL2.GL_ELEMENT_ARRAY_BUFFER, 0);
       }
    }
 
