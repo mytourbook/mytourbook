@@ -17,7 +17,6 @@ package net.tourbook.map3.layer.tourtrack;
 
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.GL2ES1;
 
 import gnu.trove.list.array.TIntArrayList;
 
@@ -751,7 +750,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
 
       // Restore the previous GL point state.
       gl.glPointSize(1f);
-      gl.glDisable(GL2ES1.GL_POINT_SMOOTH);
+      gl.glDisable(GL2.GL_POINT_SMOOTH);
 
       // Restore the previous GL color array state.
       if (dc.isPickingMode() || useVertexColors) {
