@@ -542,6 +542,9 @@ public class SlideoutMapBookmarks extends ToolbarSlideout {
       }
       setIsAnotherDialogOpened(false);
 
+      // set focus back to the viewer
+      _bookmarkViewer.getTable().setFocus();
+
       if (addDialog.getReturnCode() != Window.OK) {
          return;
       }

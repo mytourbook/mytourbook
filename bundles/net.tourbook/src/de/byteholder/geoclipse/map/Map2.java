@@ -341,6 +341,7 @@ public class Map2 extends Canvas {
    private boolean                 _isMapPanned;
 
    private Point                   _mouseDownPosition;
+   private GeoPosition             _mouseDown_ContextMenu_GeoPosition;
    private int                     _mouseMove_DevPosition_X = Integer.MIN_VALUE;
    private int                     _mouseMove_DevPosition_Y = Integer.MIN_VALUE;
    private int                     _mouseMove_DevPosition_X_Last;
@@ -1286,6 +1287,10 @@ public class Map2 extends Canvas {
       }
    }
 
+   public GeoPosition get_mouseDown_GeoPosition() {
+      return _mouseDown_ContextMenu_GeoPosition;
+   }
+
    public GeoPosition get_mouseMove_GeoPosition() {
       return _mouseMove_GeoPosition;
    }
@@ -1506,7 +1511,7 @@ public class Map2 extends Canvas {
       return _overlayKey + tile.getTileKey(xOffset, yOffset, projectionId);
    }
 
-   private PoiToolTip getPoi() {
+   private PoiToolTip getPoiTooltip() {
 
       if (_poi_Tooltip == null) {
          _poi_Tooltip = new PoiToolTip(getShell());
@@ -2763,11 +2768,11 @@ public class Map2 extends Canvas {
       if (TextTransfer.getInstance().isSupportedType(transferDataType)) {
 
          if (event.data instanceof String) {
-            isPOI = parsePOIText((String) event.data);
+            isPOI = parseAndDisplayPOIText((String) event.data);
          }
 
       } else if (URLTransfer.getInstance().isSupportedType(transferDataType)) {
-         isPOI = parsePOIText((String) event.data);
+         isPOI = parseAndDisplayPOIText((String) event.data);
       }
 
       if (isPOI == false) {
@@ -2784,8 +2789,7 @@ public class Map2 extends Canvas {
             }
          }
 
-         MessageDialog.openInformation(
-               getShell(), //
+         MessageDialog.openInformation(getShell(),
                Messages.Dialog_DropNoPOI_Title,
                NLS.bind(Messages.Dialog_DropNoPOI_Message, poiText));
       }
@@ -2871,25 +2875,48 @@ public class Map2 extends Canvas {
 
    private void onMouse_Down(final MouseEvent mouseEvent) {
 
-      // check if left mouse button is pressed
+      if (_worldPixel_TopLeft_Viewport == null) {
+
+         // map is not yet fully initialized
+
+         return;
+      }
+
+      final int devMouseX = mouseEvent.x;
+      final int devMouseY = mouseEvent.y;
+
+      // check context menu
       if (mouseEvent.button != 1) {
+
+         // right mouse down is pressed -> keep position
+
+         final Point worldMousePosition = new Point(
+               _worldPixel_TopLeft_Viewport.x + devMouseX,
+               _worldPixel_TopLeft_Viewport.y + devMouseY);
+
+         final GeoPosition geoMousePosition = _mp.pixelToGeo(
+               new Point2D.Double(worldMousePosition.x, worldMousePosition.y),
+               _mapZoomLevel);
+
+         _mouseDown_ContextMenu_GeoPosition = geoMousePosition;
+
          return;
       }
 
       final boolean isShift = (mouseEvent.stateMask & SWT.SHIFT) != 0;
-//      final boolean isCtrl = (mouseEvent.stateMask & SWT.CTRL) != 0;
+//    final boolean isCtrl = (mouseEvent.stateMask & SWT.CTRL) != 0;
 
       hideTourTooltipHoveredArea();
       setPoiVisible(false);
 
-      final Point devMousePosition = new Point(mouseEvent.x, mouseEvent.y);
+      final Point devMousePosition = new Point(devMouseX, devMouseY);
 
       if (_offline_IsSelectingOfflineArea) {
 
          _offline_IsOfflineSelectionStarted = true;
 
-         final int worldMouseX = _worldPixel_TopLeft_Viewport.x + mouseEvent.x;
-         final int worldMouseY = _worldPixel_TopLeft_Viewport.y + mouseEvent.y;
+         final int worldMouseX = _worldPixel_TopLeft_Viewport.x + devMouseX;
+         final int worldMouseY = _worldPixel_TopLeft_Viewport.y + devMouseY;
 
          _offline_DevMouse_Start = devMousePosition;
          _offline_DevMouse_End = devMousePosition;
@@ -2906,8 +2933,8 @@ public class Map2 extends Canvas {
          _geoGrid_Data_Hovered.isSelectionStarted = true;
 
          final Point worldMousePosition = new Point(
-               _worldPixel_TopLeft_Viewport.x + mouseEvent.x,
-               _worldPixel_TopLeft_Viewport.y + mouseEvent.y);
+               _worldPixel_TopLeft_Viewport.x + devMouseX,
+               _worldPixel_TopLeft_Viewport.y + devMouseY);
 
          _geoGrid_Data_Hovered.isSelectionStarted = true;
 
@@ -3271,6 +3298,7 @@ public class Map2 extends Canvas {
             showPoi();
 
          } else {
+
             setPoiVisible(false);
          }
       }
@@ -6223,7 +6251,11 @@ public class Map2 extends Canvas {
       fireEvent_MapPosition(false);
    }
 
-   private boolean parsePOIText(String text) {
+   /**
+    * @param text
+    * @return Returns <code>true</code> when POI could be identified and it's displayed in the map
+    */
+   private boolean parseAndDisplayPOIText(String text) {
 
       try {
          text = URLDecoder.decode(text, UI.UTF_8);
@@ -6417,58 +6449,77 @@ public class Map2 extends Canvas {
 
 // source: https://wiki.toolserver.org/view/GeoHack
 //
-// type:                                   ratio           m / pixel   {scale}    {mmscale}   {span}   {altitude}   {zoom}   {osmzoom}
+// type                                               ratio           m / pixel      {scale}    {mmscale} {span}  {altitude}   {zoom}   {osmzoom}
 //
-// country, satellite                         1 : 10,000,000    3528       10000000    10000000    10.0    1430       1       5
-// state                                  1 : 3,000,000    1058       3000000    4000000    3.0    429       3       7
-// adm1st                                  1 : 1,000,000    353       1000000    1000000    1.0    143       4       9
-// adm2nd (default)                         1 : 300,000    106       300000       200000       0.3    42          5       11
-// adm3rd, city, mountain, isle, river, waterbody    1 : 100,000    35.3       100000       100000       0.1    14          6       12
-// event, forest, glacier                      1 : 50,000       17.6       50000       50000       0.05    7          7       13
-// airport                                  1 : 30,000       10.6       30000       25000       0.03    4          7       14
-// edu, pass, landmark, railwaystation             1 : 10,000       3.53       10000       10000       0.01    1          8       15
+// country, satellite                                 1 : 10,000,000    3528        10000000    10000000    10.0        1430        1           5
+// state                                              1 : 3,000,000     1058         3000000     4000000     3.0         429        3           7
+// adm1st                                             1 : 1,000,000      353         1000000     1000000     1.0         143        4           9
+// adm2nd (default)                                   1 : 300,000        106          300000      200000     0.3          42        5          11
+// adm3rd, city, mountain, isle, river, waterbody     1 : 100,000         35.3        100000      100000     0.1          14        6          12
+// event, forest, glacier                             1 : 50,000          17.6         50000       50000     0.05          7        7          13
+// airport                                            1 : 30,000          10.6         30000       25000     0.03          4        7          14
+// edu, pass, landmark, railwaystation                1 : 10,000          3.53         10000       10000     0.01          1        8          15
 
-                  if (type.equals("country") //             //$NON-NLS-1$
-                        || type.equals("satellite")) { //   //$NON-NLS-1$
+                  if (type.equals("country") //                   //$NON-NLS-1$
+                        || type.equals("satellite")) { //         //$NON-NLS-1$
+
                      zoom = 5 - 1;
-                  } else if (type.equals("state")) { //      //$NON-NLS-1$
+
+                  } else if (type.equals("state")) { //           //$NON-NLS-1$
+
                      zoom = 7 - 1;
-                  } else if (type.equals("adm1st")) { //      //$NON-NLS-1$
+
+                  } else if (type.equals("adm1st")) { //          //$NON-NLS-1$
+
                      zoom = 9 - 1;
-                  } else if (type.equals("adm2nd")) { //      //$NON-NLS-1$
+
+                  } else if (type.equals("adm2nd")) { //          //$NON-NLS-1$
+
                      zoom = 11 - 1;
-                  } else if (type.equals("adm3rd") //         //$NON-NLS-1$
-                        || type.equals("city") //         //$NON-NLS-1$
-                        || type.equals("mountain") //      //$NON-NLS-1$
-                        || type.equals("isle") //         //$NON-NLS-1$
-                        || type.equals("river") //         //$NON-NLS-1$
-                        || type.equals("waterbody")) { //   //$NON-NLS-1$
+
+                  } else if (type.equals("adm3rd") //             //$NON-NLS-1$
+                        || type.equals("city") //                 //$NON-NLS-1$
+                        || type.equals("mountain") //             //$NON-NLS-1$
+                        || type.equals("isle") //                 //$NON-NLS-1$
+                        || type.equals("river") //                //$NON-NLS-1$
+                        || type.equals("waterbody")) { //         //$NON-NLS-1$
+
                      zoom = 12 - 1;
-                  } else if (type.equals("event")//         //$NON-NLS-1$
-                        || type.equals("forest") //       //$NON-NLS-1$
-                        || type.equals("glacier")) { //      //$NON-NLS-1$
+
+                  } else if (type.equals("event")//               //$NON-NLS-1$
+                        || type.equals("forest") //               //$NON-NLS-1$
+                        || type.equals("glacier")) { //           //$NON-NLS-1$
+
                      zoom = 13 - 1;
-                  } else if (type.equals("airport")) { //      //$NON-NLS-1$
+
+                  } else if (type.equals("airport")) { //         //$NON-NLS-1$
+
                      zoom = 14 - 1;
-                  } else if (type.equals("edu") //         //$NON-NLS-1$
-                        || type.equals("pass") //         //$NON-NLS-1$
-                        || type.equals("landmark") //      //$NON-NLS-1$
-                        || type.equals("railwaystation")) { //$NON-NLS-1$
+
+                  } else if (type.equals("edu") //                //$NON-NLS-1$
+                        || type.equals("pass") //                 //$NON-NLS-1$
+                        || type.equals("landmark") //             //$NON-NLS-1$
+                        || type.equals("railwaystation")) { //    //$NON-NLS-1$
+
                      zoom = 15 - 1;
                   }
                }
 
+               final String poiText = pageName.replace('_', ' ');
+               final double lat1 = lat;
+               final double lon1 = lon;
+               final int zoom1 = zoom;
+
                // hide previous tooltip
                setPoiVisible(false);
 
-               final GeoPosition poiGeoPosition = new GeoPosition(lat, lon);
-               final String poiText = pageName.replace('_', ' ');
+               final GeoPosition poiGeoPosition = new GeoPosition(lat1, lon1);
 
-               final PoiToolTip poi = getPoi();
+               final PoiToolTip poi = getPoiTooltip();
                poi.geoPosition = poiGeoPosition;
                poi.setText(poiText);
 
-               setZoom(zoom);
+               setZoom(zoom1);
                setMapCenter(poiGeoPosition);
 
                _isPoiVisible = true;
@@ -7010,7 +7061,7 @@ public class Map2 extends Canvas {
 
       _isPoiVisible = true;
 
-      final PoiToolTip poiToolTip = getPoi();
+      final PoiToolTip poiToolTip = getPoiTooltip();
       poiToolTip.geoPosition = poiGeoPosition;
       poiToolTip.setText(poiText);
 
@@ -7026,7 +7077,7 @@ public class Map2 extends Canvas {
       }
 
       /*
-       * when poi is set, it is possible that the mouse is already over the poi -> update tooltip
+       * When poi is set, it is possible that the mouse is already over the poi -> update tooltip
        */
       final Point devMouse = this.toControl(getDisplay().getCursorLocation());
       final int devMouseX = devMouse.x;
@@ -7482,7 +7533,7 @@ public class Map2 extends Canvas {
          return;
       }
 
-      final PoiToolTip poiTT = getPoi();
+      final PoiToolTip poiTT = getPoiTooltip();
       final Point poiDisplayPosition = this.toDisplay(_poiImageDevPosition);
 
       poiTT.show(
@@ -7536,7 +7587,7 @@ public class Map2 extends Canvas {
     */
    private boolean updatePoiImageDevPosition() {
 
-      final GeoPosition poiGeoPosition = getPoi().geoPosition;
+      final GeoPosition poiGeoPosition = getPoiTooltip().geoPosition;
       if (poiGeoPosition == null) {
          return false;
       }
