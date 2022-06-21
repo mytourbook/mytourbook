@@ -982,25 +982,28 @@ public class Map2View extends ViewPart implements
       }
 
       final MapPosition mapPosition = dialogGotoMapLocation.getMapPosition();
+      final boolean isCreateMapBookmark = dialogGotoMapLocation.isCreateMapBookmark();
+      final String bookmarkName = dialogGotoMapLocation.getBookmarkName();
 
       /*
        * Show location as POI
        */
-      final String poiName = String.format(Messages.Map_POI_MapLocation,
+      final String latLonText = String.format(Messages.Map_POI_MapLocation,
             mapPosition.getLatitude(),
             mapPosition.getLongitude());
 
+      final String poiText = isCreateMapBookmark
+            ? bookmarkName + UI.NEW_LINE2 + latLonText
+            : latLonText;
+
       _map.setPoi(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()),
             mapPosition.getZoomLevel() + 1, // the correct zoom level is lost, adjust it to keep the same as the current
-            poiName);
+            poiText);
 
       /*
        * Create map bookmark
        */
-      if (dialogGotoMapLocation.isCreateMapBookmark()) {
-
-         final String bookmarkName = dialogGotoMapLocation.getBookmarkName();
-
+      if (isCreateMapBookmark) {
          MapBookmarkManager.addBookmark(mapPosition, bookmarkName);
       }
    }
@@ -2212,8 +2215,6 @@ public class Map2View extends ViewPart implements
       enableActions();
 
       menuMgr.add(_actionSearchTourByLocation);
-      menuMgr.add(_actionGotoLocation);
-      menuMgr.add(_actionCopyLocation);
       menuMgr.add(_actionCreateTourMarkerFromMap);
 
       /*
@@ -2246,6 +2247,8 @@ public class Map2View extends ViewPart implements
 
       MapBookmarkManager.fillContextMenu_RecentBookmarks(menuMgr, this);
 
+      menuMgr.add(_actionGotoLocation);
+      menuMgr.add(_actionCopyLocation);
       menuMgr.add(_actionSetDefaultPosition);
       menuMgr.add(_actionSaveDefaultPosition);
 
