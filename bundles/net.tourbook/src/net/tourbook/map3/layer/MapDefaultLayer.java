@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,13 +57,8 @@ public class MapDefaultLayer {
 //    *     </Layer>
 //    *     <Layer href="config/Earth/BMNGWMSLayer2.xml" actuate="onLoad"/>
 //    *     <Layer href="config/Earth/LandsatI3WMSLayer2.xml" actuate="onLoad"/>
-//    *     <Layer href="config/Earth/USDANAIPWMSImageLayer.xml" actuate="onRequest"/>
 //    *     <Layer href="config/Earth/USDANAIPUSGSWMSImageLayer.xml" actuate="onRequest"/>
-//    *     <Layer href="config/Earth/MSVirtualEarthAerialLayer.xml" actuate="onRequest"/>
 //    *     <Layer href="config/Earth/BingImagery.xml" actuate="onRequest"/>
-//    *     <Layer href="config/Earth/USGSTopoLowResLayer.xml" actuate="onRequest"/>
-//    *     <Layer href="config/Earth/USGSTopoMedResLayer.xml" actuate="onRequest"/>
-//    *     <Layer href="config/Earth/USGSTopoHighResLayer.xml" actuate="onRequest"/>
 //    *     <Layer href="config/Earth/USGSUrbanAreaOrthoLayer.xml" actuate="onRequest"/>
 //    *     <!--<Layer className="gov.nasa.worldwind.layers.Earth.OSMMapnikLayer" actuate="onRequest"/>-->
 //    *     <!--<Layer className="gov.nasa.worldwind.layers.Earth.OSMCycleMapLayer" actuate="onRequest"/>-->
@@ -154,28 +149,23 @@ public class MapDefaultLayer {
    // see here : https://github.com/NASAWorldWind/WorldWindJava/blob/7a329a40861f02af5c16293c2c695c3cc1493469/src/config/worldwind.layers.xml#L26
    //public static final String                         ID_MS_VIRTUAL_EARTH_AERIAL       = getNormalizedLayerKey("MS Virtual Earth Aerial");       //$NON-NLS-1$
 
-   public static final String                         ID_BING_IMAGERY                   = getNormalizedLayerKey("Bing Imagery");                   //$NON-NLS-1$
-   public static final String                         ID_USGS_TOPO_BASE_MAP             = getNormalizedLayerKey("USGS Topo Base Map");             //$NON-NLS-1$
-   public static final String                         ID_USGS_TOPO_BASE_MAP_LARGE_SCALE = getNormalizedLayerKey("USGS Topo Base Map Large Scale"); //$NON-NLS-1$
-   public static final String                         ID_USGS_TOPO_SCANNED_MAPS_1_100K  = getNormalizedLayerKey("USGS Topo Scanned Maps 1:100K");  //$NON-NLS-1$
-   public static final String                         ID_USGS_TOPO_SCANNED_MAPS_1_24K   = getNormalizedLayerKey("USGS Topo Scanned Maps 1:24K");   //$NON-NLS-1$
-   public static final String                         ID_USGS_TOPO_SCANNED_MAPS_1_250K  = getNormalizedLayerKey("USGS Topo Scanned Maps 1:250K");  //$NON-NLS-1$
+   public static final String                         ID_BING_IMAGERY         = getNormalizedLayerKey("Bing Imagery");         //$NON-NLS-1$
 
-   public static final String                         ID_OPEN_STREET_MAP                = getNormalizedLayerKey("Open Street Map");                //$NON-NLS-1$
-   public static final String                         ID_EARTH_AT_NIGHT                 = getNormalizedLayerKey("Earth at Night");                 //$NON-NLS-1$
+   public static final String                         ID_OPEN_STREET_MAP      = getNormalizedLayerKey("Open Street Map");      //$NON-NLS-1$
+   public static final String                         ID_EARTH_AT_NIGHT       = getNormalizedLayerKey("Earth at Night");       //$NON-NLS-1$
 
-   public static final String                         ID_POLITICAL_BOUNDARIES           = getNormalizedLayerKey("Political Boundaries");           //$NON-NLS-1$
-   public static final String                         ID_PLACE_NAMES                    = getNormalizedLayerKey("Place Names");                    //$NON-NLS-1$
-   public static final String                         ID_WORLD_MAP                      = getNormalizedLayerKey("World Map");                      //$NON-NLS-1$
-   public static final String                         ID_SCALE_BAR                      = getNormalizedLayerKey("Scale bar");                      //$NON-NLS-1$
-   public static final String                         ID_COMPASS                        = getNormalizedLayerKey("Compass");                        //$NON-NLS-1$
+   public static final String                         ID_POLITICAL_BOUNDARIES = getNormalizedLayerKey("Political Boundaries"); //$NON-NLS-1$
+   public static final String                         ID_PLACE_NAMES          = getNormalizedLayerKey("Place Names");          //$NON-NLS-1$
+   public static final String                         ID_WORLD_MAP            = getNormalizedLayerKey("World Map");            //$NON-NLS-1$
+   public static final String                         ID_SCALE_BAR            = getNormalizedLayerKey("Scale bar");            //$NON-NLS-1$
+   public static final String                         ID_COMPASS              = getNormalizedLayerKey("Compass");              //$NON-NLS-1$
 
-   private static final HashMap<String, DefaultLayer> _wwDefaultLayer                   = new HashMap<>();
+   private static final HashMap<String, DefaultLayer> _wwDefaultLayer         = new HashMap<>();
 
    /**
     * Key is the global (english) layer id, value is the locale layer id.
     */
-   private static final HashMap<String, String>       _wwLocaleLayerNames               = new HashMap<>();
+   private static final HashMap<String, String>       _wwLocaleLayerNames     = new HashMap<>();
 
    static {
 
@@ -220,11 +210,6 @@ public class MapDefaultLayer {
       _wwLocaleLayerNames.put(ID_USGS_NAIP_PLUS,                  ID_USGS_NAIP_PLUS);
 
       _wwLocaleLayerNames.put(ID_BING_IMAGERY,                    ID_BING_IMAGERY);
-      _wwLocaleLayerNames.put(ID_USGS_TOPO_BASE_MAP,              ID_USGS_TOPO_BASE_MAP);
-      _wwLocaleLayerNames.put(ID_USGS_TOPO_BASE_MAP_LARGE_SCALE,  ID_USGS_TOPO_BASE_MAP_LARGE_SCALE);
-      _wwLocaleLayerNames.put(ID_USGS_TOPO_SCANNED_MAPS_1_100K,   ID_USGS_TOPO_SCANNED_MAPS_1_100K);
-      _wwLocaleLayerNames.put(ID_USGS_TOPO_SCANNED_MAPS_1_24K,    ID_USGS_TOPO_SCANNED_MAPS_1_24K);
-      _wwLocaleLayerNames.put(ID_USGS_TOPO_SCANNED_MAPS_1_250K,   ID_USGS_TOPO_SCANNED_MAPS_1_250K);
 
       _wwLocaleLayerNames.put(ID_OPEN_STREET_MAP,                 ID_OPEN_STREET_MAP);
       _wwLocaleLayerNames.put(ID_EARTH_AT_NIGHT,                  ID_EARTH_AT_NIGHT);
@@ -240,12 +225,6 @@ public class MapDefaultLayer {
 
 
       _wwDefaultLayer.put(ID_BING_IMAGERY,                     new DefaultLayer(ID_BING_IMAGERY,                     Messages.Default_Layer_WMS_BingImagery));
-
-      _wwDefaultLayer.put(ID_USGS_TOPO_BASE_MAP,               new DefaultLayer(ID_USGS_TOPO_BASE_MAP,               Messages.Default_Layer_WMS_USGS_TOPO_BASE_MAP));
-      _wwDefaultLayer.put(ID_USGS_TOPO_BASE_MAP_LARGE_SCALE,   new DefaultLayer(ID_USGS_TOPO_BASE_MAP_LARGE_SCALE,   Messages.Default_Layer_WMS_USGS_TOPO_BASE_MAP_LARGE_SCALE));
-      _wwDefaultLayer.put(ID_USGS_TOPO_SCANNED_MAPS_1_250K,    new DefaultLayer(ID_USGS_TOPO_SCANNED_MAPS_1_250K,    Messages.Default_Layer_WMS_USGS_Topo250));
-      _wwDefaultLayer.put(ID_USGS_TOPO_SCANNED_MAPS_1_100K,    new DefaultLayer(ID_USGS_TOPO_SCANNED_MAPS_1_100K,    Messages.Default_Layer_WMS_USGS_Topo100));
-      _wwDefaultLayer.put(ID_USGS_TOPO_SCANNED_MAPS_1_24K,     new DefaultLayer(ID_USGS_TOPO_SCANNED_MAPS_1_24K,     Messages.Default_Layer_WMS_USGS_Topo24));
 
       _wwDefaultLayer.put(ID_POLITICAL_BOUNDARIES,             new DefaultLayer(ID_POLITICAL_BOUNDARIES,             Messages.Default_Layer_PoliticalBoundaries));
 
