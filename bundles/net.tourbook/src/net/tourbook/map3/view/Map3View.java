@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -243,7 +243,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    /**
     * Contains all tours which are displayed in the map.
     */
-   private ArrayList<TourData>            _allTours   = new ArrayList<>();
+   private List<TourData>                 _allTours   = new ArrayList<>();
    //
    private int                            _allTourIdHash;
    private int                            _allTourDataHash;
@@ -1390,7 +1390,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
     * @param allTours
     * @return Returns only tours which can be displayed in the map (which contains geo coordinates).
     */
-   private ArrayList<TourData> getMapTours(final ArrayList<TourData> allTours) {
+   private ArrayList<TourData> getMapTours(final List<TourData> allTours) {
 
       final ArrayList<TourData> mapTours = new ArrayList<>(allTours.size());
 
@@ -1521,7 +1521,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       final double latitude = mapPosition.getLatitude();
       final double longitude = mapPosition.getLongitude();
 
-      final double zoomElevation = Math.pow(2 * 1.5, 20 - zoomLevel);
+      final double zoomElevation = Math.pow(2 * 1.5, 20.0 - zoomLevel);
 
       final LatLon latlon = LatLon.fromDegrees(latitude, longitude);
 
@@ -2094,7 +2094,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          // track layer is displayed
 
-         final ArrayList<TourMap3Position> allPositions = tourTrackLayer.createTrackPaths(_allTours);
+         final List<TourMap3Position> allPositions = tourTrackLayer.createTrackPaths(_allTours);
 
          final boolean isTourAvailable = _allTours.size() > 0;
 
@@ -2147,7 +2147,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 //2013-10-06 10:12:12.318'141 [Map3View] 	    431273  JVM used memory (Kb)
 
    private void showAllTours_Final(final boolean isSyncMapViewWithTour,
-                                   final ArrayList<TourMap3Position> allPositions) {
+                                   final List<TourMap3Position> allPositions) {
 
       if (isSyncMapViewWithTour) {
 
@@ -2168,7 +2168,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       showAllTours(_isMapSynched_WithTour);
    }
 
-   private void showAllTours_NewTours(final ArrayList<TourData> newTours) {
+   private void showAllTours_NewTours(final List<TourData> newTours) {
 
       // check if new tours are already displayed
       if (newTours.hashCode() == _allTours.hashCode()) {
@@ -2201,7 +2201,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
             if (_allTours.size() > 1) {
 
                final TourTrackLayer tourTrackLayer = Map3Manager.getLayer_TourTrack();
-               final ArrayList<TourMap3Position> trackPositions = tourTrackLayer.selectTrackPath(newTourData);
+               final List<TourMap3Position> trackPositions = tourTrackLayer.selectTrackPath(newTourData);
 
                if (trackPositions == null) {
                   // track is already selected

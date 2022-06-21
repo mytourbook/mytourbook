@@ -19,6 +19,9 @@
  */
 package net.tourbook.map3.ui;
 
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -57,8 +60,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -280,25 +281,22 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 
       shell.addDisposeListener(disposeEvent -> onDispose());
 
-      shell.addControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent e) {
+      shell.addControlListener(controlResizedAdapter(controlEvent -> {
 
-            // allow resizing the height, preserve minimum width
+         // allow resizing the height, preserve minimum width
 
-            final Point defaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-            final Point shellSize = shell.getSize();
+         final Point defaultSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+         final Point shellSize = shell.getSize();
 
-//            if (shellSize.x < defaultSize.x) {
+//         if (shellSize.x < defaultSize.x) {
 //
-//            }
+//         }
 
-            final int width = defaultSize.x;
-            final int height = shellSize.y;
+         final int width = defaultSize.x;
+         final int height = shellSize.y;
 
-            shell.setSize(width, height);
-         }
-      });
+         shell.setSize(width, height);
+      }));
    }
 
    @Override
@@ -448,12 +446,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
             .hint(_pc.convertWidthInCharsToPixels(20), SWT.DEFAULT)
             .applyTo(_canvasProfileImage);
 
-      _canvasProfileImage.addControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent e) {
-            drawProfileImage();
-         }
-      });
+      _canvasProfileImage.addControlListener(controlResizedAdapter(controlEvent -> drawProfileImage()));
    }
 
    private void createUI_40_VertexFields(final Composite parent) {
@@ -520,23 +513,15 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
             mouseEvent -> onFieldMouseDown(display, mouseEvent));
 
       // value listener
-      final SelectionListener valueSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
-            onFieldSelectValue(event.widget);
-         }
-      };
+      final SelectionListener valueSelectionListener = widgetSelectedAdapter(
+            selectionEvent -> onFieldSelectValue(selectionEvent.widget));
+
       final MouseWheelListener valueMouseWheelListener = mouseEvent -> {
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
          onFieldSelectValue(mouseEvent.widget);
       };
 
-      final SelectionListener prontoListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
-            onFieldSelectPronto(event.widget);
-         }
-      };
+      final SelectionListener prontoListener = widgetSelectedAdapter(this::onFieldSelectPronto);
 
       /*
        * fields
@@ -647,12 +632,8 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 //    vertexContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GRAY));
 
       _vertexScrolledContainer.setContent(vertexContainer);
-      _vertexScrolledContainer.addControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent e) {
-            _vertexScrolledContainer.setMinSize(vertexContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-         }
-      });
+      _vertexScrolledContainer.addControlListener(controlResizedAdapter(controlEvent -> _vertexScrolledContainer.setMinSize(vertexContainer
+            .computeSize(SWT.DEFAULT, SWT.DEFAULT))));
 
       return vertexContainer;
    }
@@ -689,12 +670,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
                   .applyTo(_chkProntoColor);
             _chkProntoColor.setText(Messages.Map3Color_Dialog_Checkbox_EnableProntoColor);
             _chkProntoColor.setToolTipText(Messages.Map3Color_Dialog_Checkbox_EnableProntoColor_Tooltip);
-            _chkProntoColor.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  enableControls_Pronto();
-               }
-            });
+            _chkProntoColor.addSelectionListener(widgetSelectedAdapter(selectionEvent -> enableControls_Pronto()));
 
             // invalidate pronto color, initially a pronto color is not checked
             _prontoColorVertexIndex = null;
@@ -879,12 +855,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
                IDialogConstants.CLIENT_ID + 6,
                Messages.Map3Color_Dialog_Button_Apply,
                false);
-         _btnApply.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onApply(true);
-            }
-         });
+         _btnApply.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onApply(true)));
       }
 
       // create default buttons (OK, Cancel)
@@ -1189,9 +1160,9 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
       }
    }
 
-   private void onFieldSelectPronto(final Widget widget) {
+   private void onFieldSelectPronto(final SelectionEvent selectionEvent) {
 
-      final Integer vertexIndex = (Integer) widget.getData(DATA_KEY_VERTEX_INDEX);
+      final Integer vertexIndex = (Integer) selectionEvent.widget.getData(DATA_KEY_VERTEX_INDEX);
 
       // keep pronto index
       _prontoColorVertexIndex = vertexIndex;
