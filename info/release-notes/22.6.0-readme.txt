@@ -1,4 +1,4 @@
-22.6.0                                                 ?.June 2022
+22.6.0                                                 16.June 2022
 
 
 
@@ -8,7 +8,8 @@ New
 * Weather Retrieval (Frederic)
   - New vendor addition: Weather API     
     https://github.com/mytourbook/mytourbook/issues/505
-  - Added the ability to save the weather retrieval log in the tour weather field
+  - Added the ability to save the weather retrieval log in the tour 
+    weather field
     https://github.com/mytourbook/mytourbook/issues/498
 
 
@@ -16,7 +17,8 @@ Improvements
 ============
 
 * Temperatures (Frederic)
-  - Added the ability to display combined temperatures (either measured from the device, from a provider or manually entered)
+  - Added the ability to display combined temperatures (either measured 
+    from the device, from a provider or manually entered)
     https://github.com/mytourbook/mytourbook/issues/495
 
 * Tag View (Frederic)
@@ -29,7 +31,8 @@ Improvements
   - Set building min-zoom level                 https://github.com/mytourbook/mytourbook/issues/867
 
 * Tour Editor     
-  - Recompute the elevation up/down values when tour is saved is now optional, this can be enabled/disabled in the tour editor options
+  - Recompute the elevation up/down values when tour is saved is now 
+    optional, this can be enabled/disabled in the tour editor options
     https://sourceforge.net/p/mytourbook/feature-requests/196/
 
 * Tour Segmenter View (Frederic)
@@ -44,7 +47,8 @@ Changes
 =======
 
 * Fitlog/FitlogEx Import (Frederic)
-  - Differentiating the temperature from the device and the temperature manually entered/from a provider
+  - Differentiating the temperature from the device and the temperature 
+    manually entered/from a provider
     https://sourceforge.net/p/mytourbook/discussion/622811/thread/11993be696/
 
 * 2.5D Map
@@ -55,14 +59,17 @@ Bugfix
 ======
 
 * Database (Frederic)
-  - Fixed an issue where a cloud type was renamed in 22.3.0 and caused a missing icon for "Weather-Showers-Scattered"
+  - Fixed an issue where a cloud type was renamed in 22.3.0 and caused 
+    a missing icon for "Weather-Showers-Scattered"
     https://sourceforge.net/p/mytourbook/discussion/622811/thread/11993be696/
 
 * Tag View (Frederic)
-  - Fixed a bug where newly created tags that were immediately deleted were causing a NPE.
+  - Fixed a bug where newly created tags that were immediately deleted 
+    were causing a NPE
 
 * Tour Editor (Frederic)
-  - Fixed a bug where the recorded and paused times were not recomputed when using the feature "Delete Time Slices and Remove Time"
+  - Fixed a bug where the recorded and paused times were not recomputed 
+    when using the feature "Delete Time Slices and Remove Time"
 
 
 Translation    

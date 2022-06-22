@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,6 +31,7 @@ import gov.nasa.worldwind.render.ShapeAttributes;
 import java.awt.Color;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.common.color.IMapColorProvider;
 import net.tourbook.data.TourData;
@@ -41,7 +42,6 @@ import net.tourbook.map3.view.Map3View;
 import net.tourbook.map3.view.TVIMap3Layer;
 import net.tourbook.tour.SelectionTourData;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.graphics.RGB;
 
 public class TourTrackLayer extends RenderableLayer implements SelectListener, ICheckStateListener {
@@ -69,7 +69,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
     */
    private int                      _lastAddRemoveAction = -1;
 
-   public TourTrackLayer(final IDialogSettings state) {
+   public TourTrackLayer() {
 
       _tourPositionColors = new TourPositionColors();
 
@@ -82,7 +82,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
     * @param allTours
     * @return
     */
-   public ArrayList<TourMap3Position> createTrackPaths(final ArrayList<TourData> allTours) {
+   public List<TourMap3Position> createTrackPaths(final List<TourData> allTours) {
 
 //		final long start = System.currentTimeMillis();
 
@@ -274,7 +274,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
       }
    }
 
-   public void saveState(final IDialogSettings state) {
+   public void saveState() {
 
       TourTrackConfigManager.saveState();
    }
@@ -305,11 +305,11 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
          return;
       }
 
-      if (eventAction == SelectEvent.HOVER) {
+      if (eventAction.equals(SelectEvent.HOVER)) {
 
          // not yet used
 
-      } else if (eventAction == SelectEvent.RIGHT_PRESS) {
+      } else if (eventAction.equals(SelectEvent.RIGHT_PRESS)) {
 
          /**
           * When the context menu should be displayed and the right mouse button is pressed,
@@ -356,7 +356,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
 
       final ITrackPath backupSelectedTrackPath = _selectedTrackPath;
 
-      if (eventAction == SelectEvent.LEFT_CLICK) {
+      if (eventAction.equals(SelectEvent.LEFT_CLICK)) {
 
          if (_lastHoveredTourTrack != null) {
 
@@ -365,7 +365,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
          }
       }
 
-      if (eventAction == SelectEvent.ROLLOVER || eventAction == SelectEvent.LEFT_CLICK) {
+      if (eventAction.equals(SelectEvent.ROLLOVER) || eventAction.equals(SelectEvent.LEFT_CLICK)) {
 
          // updated colors
 
@@ -398,7 +398,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
     * @param tourData
     * @return Returns track positions or <code>null</code> when track is already selected.
     */
-   public ArrayList<TourMap3Position> selectTrackPath(final TourData tourData) {
+   public List<TourMap3Position> selectTrackPath(final TourData tourData) {
 
       if (_selectedTrackPath != null && _selectedTrackPath.getTourTrack().getTourData().equals(tourData)) {
 
@@ -860,7 +860,7 @@ public class TourTrackLayer extends RenderableLayer implements SelectListener, I
       }
    }
 
-   public void updateColors(final ArrayList<TourData> allTours) {
+   public void updateColors(final List<TourData> allTours) {
 
       _tourPositionColors.updateColorProvider(allTours);
    }

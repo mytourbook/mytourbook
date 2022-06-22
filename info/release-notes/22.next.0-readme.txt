@@ -31,7 +31,10 @@ New
 Improvements
 ============
 
-* 
+* 2D Map
+  - Goto location                         https://github.com/mytourbook/mytourbook/issues/884
+  - Copy location to clipboard
+
 
 
 Changes
@@ -60,4 +63,5 @@ System
 
 * Milestone             https://github.com/mytourbook/mytourbook/milestone/4?closed=1
 * Eclipse 2022-xx
-* FIT SDK 21.xx
+* FIT SDK 21.84
+* WorldWind 2.2.1       https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

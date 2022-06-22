@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
@@ -596,7 +597,7 @@ public class TourTrackConfigManager {
       return 0;
    }
 
-   public static ArrayList<TourTrackConfig> getAllConfigurations() {
+   public static List<TourTrackConfig> getAllConfigurations() {
 
       // ensure configs are loaded
       getActiveConfig();

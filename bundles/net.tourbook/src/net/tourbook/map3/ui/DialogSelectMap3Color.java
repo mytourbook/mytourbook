@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,9 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.map3.ui;
+
+import static org.eclipse.swt.events.ControlListener.controlResizedAdapter;
+import static org.eclipse.swt.events.MouseTrackListener.mouseExitAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,10 +64,6 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -207,14 +206,8 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 
    private void addListener(final ToolBar toolBar) {
 
-      toolBar.addMouseTrackListener(new MouseTrackAdapter() {
-         @Override
-         public void mouseExit(final MouseEvent e) {
-
-            // prevent to open the tooltip
-            _canOpenToolTip = false;
-         }
-      });
+      // prevent to open the tooltip
+      toolBar.addMouseTrackListener(mouseExitAdapter(mouseEvent -> _canOpenToolTip = false));
 
 //		ownerControl.addDisposeListener(new DisposeListener() {
 //			@Override
@@ -386,24 +379,21 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
          /*
           * Set maximum number of visible rows
           */
-         table.addControlListener(new ControlAdapter() {
-            @Override
-            public void controlResized(final ControlEvent e) {
+         table.addControlListener(controlResizedAdapter(controlEvent -> {
 
-               final int itemHeight = table.getItemHeight();
-               final int maxHeight = itemHeight * NUMBER_OF_VISIBLE_ROWS;
+            final int itemHeight = table.getItemHeight();
+            final int maxHeight = itemHeight * NUMBER_OF_VISIBLE_ROWS;
 
-               final int defaultHeight = table.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+            final int defaultHeight = table.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
 
-               if (defaultHeight > maxHeight) {
+            if (defaultHeight > maxHeight) {
 
-                  final GridData gd = (GridData) container.getLayoutData();
-                  gd.heightHint = maxHeight;
+               final GridData gd = (GridData) container.getLayoutData();
+               gd.heightHint = maxHeight;
 
 //						container.layout(true, true);
-               }
             }
-         });
+         }));
 
          _colorViewer = new CheckboxTableViewer(table);
 
@@ -554,16 +544,11 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
       _tcProfileImage = tc;
       _columnIndexProfileImage = _colorViewer.getTable().getColumnCount() - 1;
 
-      tc.addControlListener(new ControlAdapter() {
-         @Override
-         public void controlResized(final ControlEvent e) {
-            onResizeImageColumn();
-         }
-      });
+      tc.addControlListener(controlResizedAdapter(controlEvent -> onResizeImageColumn()));
 
       tvc.setLabelProvider(new CellLabelProvider() {
 
-         // !!! set dummy label provider, otherwise an error occures !!!
+         // !!! set dummy label provider, otherwise an error occurs !!!
          @Override
          public void update(final ViewerCell cell) {}
       });
