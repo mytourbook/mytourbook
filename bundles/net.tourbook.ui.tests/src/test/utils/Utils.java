@@ -48,11 +48,13 @@ public class Utils {
       showView(bot, tourBookViewTitle);
    }
 
-   public static void showView(final SWTWorkbenchBot bot, final String viewName) {
+   public static SWTBotView showView(final SWTWorkbenchBot bot, final String viewName) {
 
-      final SWTBotView tourBookView = bot.viewByTitle(viewName);
-      assertNotNull(tourBookView);
-      tourBookView.show();
+      final SWTBotView view = bot.viewByTitle(viewName);
+      assertNotNull(view);
+      view.show();
+
+      return view;
    }
 
    public static void showViewFromMenu(final SWTWorkbenchBot bot, final String menuName, final String viewName) {
