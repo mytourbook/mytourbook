@@ -60,7 +60,15 @@ public class WorkbenchTests {
       Utils.showView(bot, "Calendar");
 
       Utils.showView(bot, "2D Tour Map");
-      //Sleeping 3 seconds as the 2D map can be slow to display
+      //Sleeping 3 seconds as the map can be slow to display
+      bot.sleep(3000);
+
+      Utils.showViewFromMenu(bot, "Map", "2.5D Tour Map");
+      //Sleeping 3 seconds as the map can be slow to display
+      bot.sleep(3000);
+
+      Utils.showViewFromMenu(bot, "Map", "3D Tour Map");
+      //Sleeping 3 seconds as the map can be slow to display
       bot.sleep(3000);
 
       Utils.showView(bot, "Tour Log");
