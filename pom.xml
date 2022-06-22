@@ -14,19 +14,13 @@
    <packaging>pom</packaging>
    
    <dependencies>
-   <!-- 
-      <dependency>
-         <artifactId>org.eclipse.pde.junit.runtime</artifactId>         <groupId>org.eclipse.pde</groupId>
-                                                                        <version>3.6.0</version>
-      </dependency>
-    -->
       <dependency>
          <artifactId>org.eclipse.core.runtime</artifactId>              <groupId>org.eclipse.core</groupId>
                                                                         <version>3.7.0</version>
       </dependency>
       <dependency>
          <artifactId>junit-jupiter-engine</artifactId>                  <groupId>org.junit.jupiter</groupId>
-                                                                        <version>5.8.1</version>
+                                                                        <version>5.8.2</version>
          <scope>test</scope>
       </dependency>
    </dependencies>	
