@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import net.tourbook.Messages;
+import net.tourbook.common.util.FilesUtils;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -54,6 +55,9 @@ public class DialogExportTourTests {
 
       final Path gpxFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(gpxFilePath));
+
+      FilesUtils.deleteIfExists(gpxFilePath);
+      assertTrue(!Files.exists(gpxFilePath));
    }
 
    @Test
@@ -68,6 +72,9 @@ public class DialogExportTourTests {
 
       final Path mtFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(mtFilePath));
+
+      FilesUtils.deleteIfExists(mtFilePath);
+      assertTrue(!Files.exists(mtFilePath));
    }
 
    @Test
@@ -86,5 +93,8 @@ public class DialogExportTourTests {
 
       final Path tcxFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(tcxFilePath));
+
+      FilesUtils.deleteIfExists(tcxFilePath);
+      assertTrue(!Files.exists(tcxFilePath));
    }
 }
