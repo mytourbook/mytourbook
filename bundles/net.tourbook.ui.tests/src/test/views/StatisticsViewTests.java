@@ -15,9 +15,13 @@
  *******************************************************************************/
 package views;
 
+import static org.junit.Assert.assertNotNull;
+
 import net.tourbook.Messages;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.junit.jupiter.api.Test;
 
@@ -32,11 +36,16 @@ public class StatisticsViewTests {
    @Test
    void testStatisticsView() {
 
-      Utils.showView(bot, STATISTICS_VIEW_NAME);
+      final SWTBotView tourEditorView = Utils.showView(bot, STATISTICS_VIEW_NAME);
 
-      final SWTBotCombo statisticsTypeComboBox = bot.comboBox();
-      statisticsTypeComboBox.setSelection("Daytime");
-      bot.comboBox(2).setSelection("9");
+      final SWTBot tourEditorViewBot = tourEditorView.bot();
+      final SWTBotCombo statisticsTypeComboBox = tourEditorViewBot.comboBox(0);
+      assertNotNull(statisticsTypeComboBox);
+      statisticsTypeComboBox.setSelection(0);
+
+      final SWTBotCombo yearComboBox = tourEditorViewBot.comboBox(2);
+      assertNotNull(yearComboBox);
+      yearComboBox.setSelection("9");
 
       statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_DaySummary);
       statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_WeekSummary);
