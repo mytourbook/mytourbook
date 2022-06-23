@@ -117,19 +117,21 @@ public class Map25ConfigManager {
    private static final String TAG_TRACK       = "Track";      //$NON-NLS-1$
    //
    // outline
-   private static final String TAG_OUTLINE                             = "Outline";               //$NON-NLS-1$
-   private static final String ATTR_OUTLINE_OPACITY                    = "opacity";               //$NON-NLS-1$
-   private static final String ATTR_OUTLINE_WIDTH                      = "width";                 //$NON-NLS-1$
-   private static final String ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW    = "directionArrow";        //$NON-NLS-1$
+   private static final String TAG_OUTLINE                              = "Outline";               //$NON-NLS-1$
+   private static final String ATTR_OUTLINE_OPACITY                     = "opacity";               //$NON-NLS-1$
+   private static final String ATTR_OUTLINE_WIDTH                       = "width";                 //$NON-NLS-1$
+   private static final String ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW     = "directionArrow";        //$NON-NLS-1$
    //
-   public static final RGB     DEFAULT_OUTLINE_COLOR                   = new RGB(0x80, 0x0, 0x80);
-   public static final int     DEFAULT_OUTLINE_OPACITY                 = 180;                     // 70 %
-   public static final float   DEFAULT_OUTLINE_WIDTH                   = 2.5f;
-   public static final boolean DEFAULT_OUTLINE_IS_SHOW_DIRECTION_ARROW = false;
-   public static final int     OUTLINE_OPACITY_MIN                     = 26;                      // 10 %;
-   public static final int     OUTLINE_OPACITY_MAX                     = 0xff;
-   public static final int     OUTLINE_WIDTH_MIN                       = 1;
-   public static final int     OUTLINE_WIDTH_MAX                       = 20;
+   public static final boolean OUTLINE_IS_TRACK_VERTICAL_OFFSET_DEFAULT = false;
+   public static final RGB     DEFAULT_OUTLINE_COLOR                    = new RGB(0x80, 0x0, 0x80);
+   public static final int     DEFAULT_OUTLINE_OPACITY                  = 180;                     // 70 %
+   public static final float   DEFAULT_OUTLINE_WIDTH                    = 2.5f;
+   public static final boolean DEFAULT_OUTLINE_IS_SHOW_DIRECTION_ARROW  = false;
+   public static final int     OUTLINE_OPACITY_MIN                      = 26;                      // 10 %;
+   public static final int     OUTLINE_OPACITY_MAX                      = 0xff;
+   public static final int     OUTLINE_TRACK_VERTICAL_OFFSET_DEFAULT    = 20;
+   public static final int     OUTLINE_WIDTH_MIN                        = 1;
+   public static final int     OUTLINE_WIDTH_MAX                        = 20;
    //
    // slider location/path
    private static final String TAG_SLIDER_PATH                     = "SliderPath";             //$NON-NLS-1$

@@ -41,14 +41,14 @@ public class GridRendererMT extends BucketRenderer {
 
    private TileGridLayerMT      _tileGridLayerMT;
 
-   private int                  _oldX, _oldY, _oldZ;
+   private int                  _oldX, _oldY, _oldZoomLevel;
 
    public GridRendererMT(final float scale) {
 
       this(
             1,
 
-            new LineStyle(Color.GRAY, 1.2f * scale, Cap.BUTT),
+            new LineStyle(Color.RED, 2f, Cap.BUTT),
 
             TextStyle
                   .builder()
@@ -60,27 +60,27 @@ public class GridRendererMT extends BucketRenderer {
 
    public GridRendererMT(final int numLines, final LineStyle lineStyle, final TextStyle textStyle) {
 
-      final int size = Tile.SIZE;
+      final int tileSize = Tile.SIZE;
 
       /* not needed to set but we know: 16 lines 'a' two points */
       mLines = new GeometryBuffer(2 * 16, 16);
 
-      final float pos = -size * 4;
+      final float pos = -tileSize * 4;
 
       /* 8 vertical lines */
       for (int i = 0; i < 8 * numLines; i++) {
-         final float x = pos + i * size / numLines;
+         final float x = pos + i * tileSize / numLines;
          mLines.startLine();
          mLines.addPoint(x, pos);
-         mLines.addPoint(x, pos + size * 8);
+         mLines.addPoint(x, pos + tileSize * 8);
       }
 
       /* 8 horizontal lines */
       for (int j = 0; j < 8 * numLines; j++) {
-         final float y = pos + j * size / numLines;
+         final float y = pos + j * tileSize / numLines;
          mLines.startLine();
          mLines.addPoint(pos, y);
-         mLines.addPoint(pos + size * 8, y);
+         mLines.addPoint(pos + tileSize * 8, y);
       }
 
       _textStyle = textStyle;
@@ -105,32 +105,31 @@ public class GridRendererMT extends BucketRenderer {
       _tileGridLayerMT = tileGridLayerMT;
    }
 
-   private void addLabels(final int x, final int y, final int z, final MapPosition mapPosition) {
+   private void addLabels(final int x, final int y, final int zoomLevel, final MapPosition mapPosition) {
 
-      final int s = Tile.SIZE;
+      final int tileSize = Tile.SIZE;
 
-      final int tileZ = 1 << z;
+      final int tileScale = 1 << zoomLevel;
       final float lineHeight = _textStyle.fontSize + 1;
 
       final TextBucket textBucket = mTextBucket;
       textBucket.clear();
 
-      for (int yy = -2; yy < 2; yy++) {
-         for (int xx = -2; xx < 2; xx++) {
+      for (int yy = -4; yy < 3; yy++) {
+         for (int xx = -4; xx < 3; xx++) {
 
             final int tileX = x + xx;
             final int tileY = y + yy;
 
-            final double latitude = MercatorProjection.toLatitude((double) tileY / tileZ);
-            final double longitude = MercatorProjection.toLongitude((double) tileX / tileZ);
+            final double latitude = MercatorProjection.toLatitude((double) tileY / tileScale);
+            final double longitude = MercatorProjection.toLongitude((double) tileX / tileScale);
 
-            final String labelTile = String.format("%d / %d / %d", z, tileX, tileY); //$NON-NLS-1$
-
+            final String labelTile = String.format("%d / %d / %d", zoomLevel, tileX, tileY); //$NON-NLS-1$
             final String labelLat = String.format("lat %.4f", latitude); //$NON-NLS-1$
             final String labelLon = String.format("lon %.4f", longitude); //$NON-NLS-1$
 
-            final int textX = s * xx + s / 2;
-            final int textY = s * yy + s / 2;
+            final int textX = tileSize * xx + tileSize / 2;
+            final int textY = tileSize * yy + tileSize / 2;
 
             TextItem textItem = TextItem.pool.get();
             textItem.set(textX, textY, labelTile, _textStyle);
@@ -163,26 +162,26 @@ public class GridRendererMT extends BucketRenderer {
        * Scale coordinates relative to current 'zoom-level' to get the position as the nearest
        * tile coordinate
        */
-      final int currentZ = 1 << currentMapPosition.zoomLevel;
-      final int currentX = (int) (currentMapPosition.x * currentZ);
-      final int currentY = (int) (currentMapPosition.y * currentZ);
+      final int currentScale = 1 << currentMapPosition.zoomLevel;
+      final int currentX = (int) (currentMapPosition.x * currentScale);
+      final int currentY = (int) (currentMapPosition.y * currentScale);
 
       // update buckets when map moved by at least one tile
-      if (currentX == _oldX && currentY == _oldY && currentZ == _oldZ) {
+      if (currentX == _oldX && currentY == _oldY && currentScale == _oldZoomLevel) {
          return;
       }
 
       _oldX = currentX;
       _oldY = currentY;
-      _oldZ = currentZ;
+      _oldZoomLevel = currentScale;
 
       /*
        * Overwrite map position in this renderer
        */
       mMapPosition.copy(currentMapPosition);
-      mMapPosition.x = (double) currentX / currentZ;
-      mMapPosition.y = (double) currentY / currentZ;
-      mMapPosition.scale = currentZ;
+      mMapPosition.x = (double) currentX / currentScale;
+      mMapPosition.y = (double) currentY / currentScale;
+      mMapPosition.scale = currentScale;
 
 //      System.out.println((System.currentTimeMillis() + " " + mMapPosition));
 //      // TODO remove SYSTEM.OUT.PRINTLN

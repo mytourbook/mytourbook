@@ -53,7 +53,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * Slideout for 2.5D tour track configuration.
+ * Slideout for 2.5D tour track configuration
  */
 public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColorSelectorListener {
 
@@ -77,6 +77,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
    private Button                _chkShowSliderLocation;
    private Button                _chkShowSliderPath;
    private Button                _chkShowDirectionArrows;
+   private Button                _chkTrackVerticalOffset;
 
    private Combo                 _comboName;
 
@@ -92,6 +93,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
    private Spinner               _spinnerSliderLocation_Opacity;
    private Spinner               _spinnerSliderPath_LineWidth;
    private Spinner               _spinnerSliderPath_Opacity;
+   private Spinner               _spinnerTrackVerticalOffset;
 
    private Text                  _textConfigName;
 
@@ -266,6 +268,25 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
                   _chkShowDirectionArrows.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip);
                   _chkShowDirectionArrows.addSelectionListener(_defaultSelectionListener);
                   GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowDirectionArrows);
+               }
+               {
+                  /*
+                   * Track vertical offset
+                   */
+                  _chkTrackVerticalOffset = new Button(group, SWT.CHECK);
+                  _chkTrackVerticalOffset.setText(Messages.Slideout_Map25TrackOptions_Checkbox_TrackVerticalOffset);
+//                  _chkTrackVerticalOffset.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip);
+                  _chkTrackVerticalOffset.addSelectionListener(_defaultSelectionListener);
+//                  GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkTrackVerticalOffset);
+
+                  // offset value
+                  _spinnerTrackVerticalOffset = new Spinner(group, SWT.BORDER);
+                  _spinnerTrackVerticalOffset.setMinimum(-1000);
+                  _spinnerTrackVerticalOffset.setMaximum(1000);
+                  _spinnerTrackVerticalOffset.setIncrement(1);
+                  _spinnerTrackVerticalOffset.setPageIncrement(10);
+                  _spinnerTrackVerticalOffset.addSelectionListener(_defaultSelectionListener);
+                  _spinnerTrackVerticalOffset.addMouseWheelListener(_defaultMouseWheelListener);
                }
             }
          }
@@ -464,6 +485,12 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       final boolean isShowSliderPath = _chkShowSliderPath.getSelection();
       final boolean isShowSliderLocation = _chkShowSliderLocation.getSelection();
+      final boolean isTrackVerticalOffset = _chkTrackVerticalOffset.getSelection();
+
+      /*
+       * Track
+       */
+      _spinnerTrackVerticalOffset.setEnabled(isTrackVerticalOffset);
 
       /*
        * Slider location
@@ -597,27 +624,33 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       // get active config AFTER getting the index because this could change the active config
       final int activeConfigIndex = Map25ConfigManager.getActiveTourTrackConfigIndex();
 
-      _comboName.select(activeConfigIndex);
-      _textConfigName.setText(config.name);
+// SET_FORMATTING_OFF
+
+      _comboName                       .select(activeConfigIndex);
+      _textConfigName                  .setText(config.name);
 
       // track line
-      _chkShowDirectionArrows.setSelection(config.isShowDirectionArrow);
-      _colorOutline_Color.setColorValue(config.outlineColor);
-      _spinnerOutline_Width.setSelection((int) (config.outlineWidth));
-      _spinnerOutline_Opacity.setSelection(UI.transformOpacity_WhenRestored(config.outlineOpacity));
+      _chkShowDirectionArrows          .setSelection(config.isShowDirectionArrow);
+      _chkTrackVerticalOffset          .setSelection(config.isTrackVerticalOffset);
+      _colorOutline_Color              .setColorValue(config.outlineColor);
+      _spinnerOutline_Opacity          .setSelection(UI.transformOpacity_WhenRestored(config.outlineOpacity));
+      _spinnerOutline_Width            .setSelection((int) (config.outlineWidth));
+      _spinnerTrackVerticalOffset      .setSelection(config.trackVerticalOffset);
 
       // slider location
-      _chkShowSliderLocation.setSelection(config.isShowSliderLocation);
-      _colorSliderLocation_Left.setColorValue(config.sliderLocation_Left_Color);
-      _colorSliderLocation_Right.setColorValue(config.sliderLocation_Right_Color);
-      _spinnerSliderLocation_Opacity.setSelection(UI.transformOpacity_WhenRestored(config.sliderLocation_Opacity));
-      _spinnerSliderLocation_Size.setSelection(config.sliderLocation_Size);
+      _chkShowSliderLocation           .setSelection(config.isShowSliderLocation);
+      _colorSliderLocation_Left        .setColorValue(config.sliderLocation_Left_Color);
+      _colorSliderLocation_Right       .setColorValue(config.sliderLocation_Right_Color);
+      _spinnerSliderLocation_Opacity   .setSelection(UI.transformOpacity_WhenRestored(config.sliderLocation_Opacity));
+      _spinnerSliderLocation_Size      .setSelection(config.sliderLocation_Size);
 
       // slider path
-      _chkShowSliderPath.setSelection(config.isShowSliderPath);
-      _colorSliderPathColor.setColorValue(config.sliderPath_Color);
-      _spinnerSliderPath_LineWidth.setSelection((int) (config.sliderPath_LineWidth));
-      _spinnerSliderPath_Opacity.setSelection(UI.transformOpacity_WhenRestored(config.sliderPath_Opacity));
+      _chkShowSliderPath               .setSelection(config.isShowSliderPath);
+      _colorSliderPathColor            .setColorValue(config.sliderPath_Color);
+      _spinnerSliderPath_LineWidth     .setSelection((int) (config.sliderPath_LineWidth));
+      _spinnerSliderPath_Opacity       .setSelection(UI.transformOpacity_WhenRestored(config.sliderPath_Opacity));
+
+// SET_FORMATTING_ON
 
       _isUpdateUI = false;
    }
@@ -628,26 +661,32 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       final Map25TrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
 
-      config.name = _textConfigName.getText();
+// SET_FORMATTING_OFF
+
+      config.name                         = _textConfigName.getText();
 
       // track line
-      config.isShowDirectionArrow = _chkShowDirectionArrows.getSelection();
-      config.outlineColor = _colorOutline_Color.getColorValue();
-      config.outlineWidth = _spinnerOutline_Width.getSelection();
-      config.outlineOpacity = UI.transformOpacity_WhenSaved(_spinnerOutline_Opacity.getSelection());
+      config.isShowDirectionArrow         = _chkShowDirectionArrows.getSelection();
+      config.isTrackVerticalOffset        = _chkTrackVerticalOffset.getSelection();
+      config.outlineColor                 = _colorOutline_Color.getColorValue();
+      config.outlineOpacity               = UI.transformOpacity_WhenSaved(_spinnerOutline_Opacity.getSelection());
+      config.outlineWidth                 = _spinnerOutline_Width.getSelection();
+      config.trackVerticalOffset          = _spinnerTrackVerticalOffset.getSelection();
 
       // slider location
-      config.isShowSliderLocation = _chkShowSliderLocation.getSelection();
-      config.sliderLocation_Left_Color = _colorSliderLocation_Left.getColorValue();
-      config.sliderLocation_Right_Color = _colorSliderLocation_Right.getColorValue();
-      config.sliderLocation_Opacity = UI.transformOpacity_WhenSaved(_spinnerSliderLocation_Opacity.getSelection());
-      config.sliderLocation_Size = _spinnerSliderLocation_Size.getSelection();
+      config.isShowSliderLocation         = _chkShowSliderLocation.getSelection();
+      config.sliderLocation_Left_Color    = _colorSliderLocation_Left.getColorValue();
+      config.sliderLocation_Right_Color   = _colorSliderLocation_Right.getColorValue();
+      config.sliderLocation_Opacity       = UI.transformOpacity_WhenSaved(_spinnerSliderLocation_Opacity.getSelection());
+      config.sliderLocation_Size          = _spinnerSliderLocation_Size.getSelection();
 
       // slider path
-      config.isShowSliderPath = _chkShowSliderPath.getSelection();
-      config.sliderPath_Color = _colorSliderPathColor.getColorValue();
-      config.sliderPath_LineWidth = _spinnerSliderPath_LineWidth.getSelection();
-      config.sliderPath_Opacity = UI.transformOpacity_WhenSaved(_spinnerSliderPath_Opacity.getSelection());
+      config.isShowSliderPath             = _chkShowSliderPath.getSelection();
+      config.sliderPath_Color             = _colorSliderPathColor.getColorValue();
+      config.sliderPath_LineWidth         = _spinnerSliderPath_LineWidth.getSelection();
+      config.sliderPath_Opacity           = UI.transformOpacity_WhenSaved(_spinnerSliderPath_Opacity.getSelection());
+
+// SET_FORMATTING_ON
    }
 
    private void updateUI_SetActiveConfig() {

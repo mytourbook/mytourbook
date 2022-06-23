@@ -2,13 +2,16 @@
 // highp is necessary to not loose texture coordinate bits
 precision highp float;
 #endif
+
 uniform mat4 u_mvp;
 // uniform mat4 u_vp;
+
 // factor to increase line width relative to scale
 uniform float u_width;
 
 // xy hold position, zw extrusion vector
 attribute vec4 a_pos;
+
 uniform float u_height;
 varying vec2 v_st;
 

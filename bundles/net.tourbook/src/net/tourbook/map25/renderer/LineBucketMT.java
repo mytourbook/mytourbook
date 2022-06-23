@@ -26,6 +26,7 @@ import org.oscim.backend.GL;
 import org.oscim.backend.GLAdapter;
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeometryBuffer;
+import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 import org.oscim.renderer.GLState;
 import org.oscim.renderer.GLUtils;
@@ -43,31 +44,34 @@ import org.slf4j.LoggerFactory;
  */
 public class LineBucketMT extends RenderBucketMT {
 
-   static final Logger        log       = LoggerFactory.getLogger(LineBucketMT.class);
+   static final Logger         log             = LoggerFactory.getLogger(LineBucketMT.class);
 
-   private static final char  NL        = UI.NEW_LINE;
+   private static final char   NL              = UI.NEW_LINE;
 
    /**
     * scale factor mapping extrusion vector to short values
     */
-   public static final float  DIR_SCALE = 2048;
+   public static final float   DIR_SCALE       = 2048;
 
    /**
     * maximal resolution
     */
-   public static final float  MIN_DIST  = 1 / 8f;
+   public static final float   MIN_DIST        = 1 / 8f;
 
    /**
     * not quite right.. need to go back so that additional
     * bevel vertices are at least MIN_DIST apart
     */
-   private static final float MIN_BEVEL = MIN_DIST * 4;
+   private static final float  MIN_BEVEL       = MIN_DIST * 4;
 
    /**
     * mask for packing last two bits of extrusion vector with texture
     * coordinates
     */
-   private static final int   DIR_MASK  = 0xFFFFFFFC;
+   private static final int    DIR_MASK        = 0xFFFFFFFC;
+
+   private static final double STROKE_INCREASE = 1.4;
+   private static final byte   STROKE_MIN_ZOOM = 12;
 
    /* lines referenced by this outline layer */
    public LineBucketMT outlines;
@@ -90,37 +94,42 @@ public class LineBucketMT extends RenderBucketMT {
        */
 
       /* factor to normalize extrusion vector and scale to coord scale */
-      private static final float COORD_SCALE_BY_DIR_SCALE = COORD_SCALE / LineBucketMT.DIR_SCALE;
+      private static final float COORD_SCALE_BY_DIR_SCALE = COORD_SCALE / DIR_SCALE;
 
       private static final int   CAP_THIN                 = 0;
       private static final int   CAP_BUTT                 = 1;
       private static final int   CAP_ROUND                = 2;
 
+      private static final int   SHADER_PROJECTED         = 0;
       private static final int   SHADER_FLAT              = 1;
-      private static final int   SHADER_PROJ              = 0;
 
-      public static int          mTexID;
-      private static Shader[]    shaders                  = { null, null };
+      private static int         _textureID;
+      private static Shader[]    _shaders                 = { null, null };
 
-      public static RenderBucketMT draw(RenderBucketMT b,
-                                        final GLViewport v,
+      public static RenderBucketMT draw(RenderBucketMT renderBucket,
+                                        final GLViewport viewport,
                                         final float scale,
                                         final RenderBucketsMT buckets) {
 
+         final MapPosition mapPosition = viewport.pos;
+
          /*
-          * simple line shader does not take forward shortening into
+          * Simple line shader does not take forward shortening into
           * account. only used when tilt is 0.
           */
-         final int mode = v.pos.tilt < 1
+         int mode = mapPosition.tilt < 1
 
                // 1 == not projected
-               ? 1
+               ? SHADER_FLAT
 
                // 0 == projected
-               : 0;
+               : SHADER_PROJECTED;
 
-         final Shader s = shaders[mode];
-         s.useProgram();
+         mode = mode;
+         mode = SHADER_FLAT;
+
+         final Shader shader = _shaders[mode];
+         shader.useProgram();
 
          GLState.blend(true);
 
@@ -131,23 +140,25 @@ public class LineBucketMT extends RenderBucketMT {
           * so for now:
           */
          if (!GLAdapter.GDX_DESKTOP_QUIRKS) {
-            GLState.bindTex2D(mTexID);
+            GLState.bindTex2D(_textureID);
          }
 
-         final int uLineFade = s.uFade;
-         final int uLineMode = s.uMode;
-         final int uLineColor = s.uColor;
-         final int uLineWidth = s.uWidth;
-         final int uLineHeight = s.uHeight;
+         final int uLineFade = shader.uFade;
+         final int uLineMode = shader.uMode;
+         final int uLineColor = shader.uColor;
+         final int shader_u_width = shader.u_width;
+         final int shader_u_height = shader.u_height;
 
-         gl.vertexAttribPointer(s.aPos,
+         gl.vertexAttribPointer(shader.a_pos,
                4,
                GL.SHORT,
                false,
                0,
                buckets.offset[LINE]);
 
-         v.mvp.setAsUniform(s.uMVP);
+         viewport.mvp.setAsUniform(shader.uMVP);
+
+         final double groundResolution = MercatorProjection.groundResolution(mapPosition);
 
          /*
           * Line scale factor for non fixed lines: Within a zoom-
@@ -161,51 +172,68 @@ public class LineBucketMT extends RenderBucketMT {
           * scale factor to map one pixel on tile to one pixel on screen:
           * used with orthographic projection, (shader mode == 1)
           */
-         final double pixel = (mode == SHADER_PROJ) ? 0.0001 : 1.5 / scale;
+         final double pixel = (mode == SHADER_PROJECTED)
+               ? 0.0001
+               : 1.5 / scale;
 
          gl.uniform1f(uLineFade, (float) pixel);
 
          int capMode = 0;
          gl.uniform1i(uLineMode, capMode);
 
-         boolean blur = false;
+         boolean isBlur = false;
          double width;
 
          float heightOffset = 0;
-         gl.uniform1f(uLineHeight, heightOffset);
+         gl.uniform1f(shader_u_height, heightOffset);
 
          //    if (1 == 1)
          //        return b.next;
          //
-         for (; b != null && b.type == RenderBucketMT.LINE; b = b.next) {
-            final LineBucketMT lb = (LineBucketMT) b;
-            final LineStyle line = lb.line.current();
+         for (; renderBucket != null && renderBucket.type == RenderBucketMT.LINE; renderBucket = renderBucket.next) {
 
-            if (line.heightOffset != lb.heightOffset) {
-               lb.heightOffset = line.heightOffset;
-            }
-            if (lb.heightOffset != heightOffset) {
-               heightOffset = lb.heightOffset;
+            final LineBucketMT lineBucket = (LineBucketMT) renderBucket;
+            final LineStyle line = lineBucket.line.current();
 
-               gl.uniform1f(uLineHeight, (float) (heightOffset / MercatorProjection.groundResolution(v.pos)));
+            if (line.heightOffset != lineBucket.heightOffset) {
+               lineBucket.heightOffset = line.heightOffset;
             }
 
-            if (line.fadeScale < v.pos.zoomLevel) {
+            if (lineBucket.heightOffset != heightOffset) {
+
+               heightOffset = lineBucket.heightOffset;
+
+//               final double lineHeight = (heightOffset / groundResolution) / scale;
+               final double lineHeight = (heightOffset) * scale;
+
+//               System.out.println((System.currentTimeMillis() + " lineHeight:" + lineHeight));
+//               // TODO remove SYSTEM.OUT.PRINTLN
+
+               gl.uniform1f(shader_u_height, (float) lineHeight);
+            }
+
+            if (line.fadeScale < mapPosition.zoomLevel) {
+
                GLUtils.setColor(uLineColor, line.color, 1);
-            } else if (line.fadeScale > v.pos.zoomLevel) {
+
+            } else if (line.fadeScale > mapPosition.zoomLevel) {
+
                continue;
+
             } else {
+
                final float alpha = (float) (scale > 1.2 ? scale : 1.2) - 1;
                GLUtils.setColor(uLineColor, line.color, alpha);
             }
 
-            if (mode == SHADER_PROJ && blur && line.blur == 0) {
+            if (mode == SHADER_PROJECTED && isBlur && line.blur == 0) {
                gl.uniform1f(uLineFade, (float) pixel);
-               blur = false;
+               isBlur = false;
             }
 
             /* draw LineLayer */
-            if (!line.outline) {
+            if (line.outline == false) {
+
                /*
                 * invert scaling of extrusion vectors so that line
                 * width stays the same.
@@ -213,28 +241,28 @@ public class LineBucketMT extends RenderBucketMT {
                if (line.fixed) {
                   width = Math.max(line.width, 1) / scale;
                } else {
-                  width = lb.scale * line.width / variableScale;
+                  width = lineBucket.scale * line.width / variableScale;
                }
 
-               gl.uniform1f(uLineWidth,
-                     (float) (width * COORD_SCALE_BY_DIR_SCALE));
+               // factor to increase line width relative to scale
+               gl.uniform1f(shader_u_width, (float) (width * COORD_SCALE_BY_DIR_SCALE));
 
                /* Line-edge fade */
                if (line.blur > 0) {
                   gl.uniform1f(uLineFade, line.blur);
-                  blur = true;
+                  isBlur = true;
                } else if (mode == SHADER_FLAT) {
                   gl.uniform1f(uLineFade, (float) (pixel / width));
                   //GL.uniform1f(uLineScale, (float)(pixel / (ll.width / s)));
                }
 
                /* Cap mode */
-               if (lb.scale < 1.0) {
+               if (lineBucket.scale < 1.0) {
                   if (capMode != CAP_THIN) {
                      capMode = CAP_THIN;
                      gl.uniform1i(uLineMode, capMode);
                   }
-               } else if (lb.roundCap) {
+               } else if (lineBucket.roundCap) {
                   if (capMode != CAP_ROUND) {
                      capMode = CAP_ROUND;
                      gl.uniform1i(uLineMode, capMode);
@@ -245,15 +273,16 @@ public class LineBucketMT extends RenderBucketMT {
                }
 
                gl.drawArrays(GL.TRIANGLE_STRIP,
-                     b.vertexOffset,
-                     b.numVertices);
+                     renderBucket.vertexOffset,
+                     renderBucket.numVertices);
 
                continue;
             }
 
             /* draw LineLayers references by this outline */
 
-            for (LineBucketMT ref = lb.outlines; ref != null; ref = ref.outlines) {
+            for (LineBucketMT ref = lineBucket.outlines; ref != null; ref = ref.outlines) {
+
                final LineStyle core = ref.line.current();
 
                // core width
@@ -262,20 +291,21 @@ public class LineBucketMT extends RenderBucketMT {
                } else {
                   width = ref.scale * core.width / variableScale;
                }
+
                // add outline width
                if (line.fixed) {
                   width += line.width / scale;
                } else {
-                  width += lb.scale * line.width / variableScale;
+                  width += lineBucket.scale * line.width / variableScale;
                }
 
-               gl.uniform1f(uLineWidth,
+               gl.uniform1f(shader_u_width,
                      (float) (width * COORD_SCALE_BY_DIR_SCALE));
 
                /* Line-edge fade */
                if (line.blur > 0) {
                   gl.uniform1f(uLineFade, line.blur);
-                  blur = true;
+                  isBlur = true;
                } else if (mode == SHADER_FLAT) {
                   gl.uniform1f(uLineFade, (float) (pixel / width));
                }
@@ -297,13 +327,13 @@ public class LineBucketMT extends RenderBucketMT {
             }
          }
 
-         return b;
+         return renderBucket;
       }
 
       static boolean init() {
 
-         shaders[0] = new Shader("line_aa_proj");
-         shaders[1] = new Shader("line_aa");
+         _shaders[0] = new Shader("line_aa_proj");
+         _shaders[1] = new Shader("line_aa");
 
          /*
           * create lookup table as texture for 'length(0..1,0..1)'
@@ -323,7 +353,7 @@ public class LineBucketMT extends RenderBucketMT {
             }
          }
 
-         mTexID = GLUtils.loadTexture(pixel,
+         _textureID = GLUtils.loadTexture(pixel,
                128,
                128,
                GL.ALPHA,
@@ -331,13 +361,14 @@ public class LineBucketMT extends RenderBucketMT {
                GL.NEAREST,
                GL.MIRRORED_REPEAT,
                GL.MIRRORED_REPEAT);
+
          return true;
       }
    }
 
    static class Shader extends GLShaderMT {
 
-      int uMVP, uFade, uWidth, uColor, uMode, uHeight, aPos;
+      int uMVP, uFade, u_width, uColor, uMode, u_height, a_pos;
 
       Shader(final String shaderFile) {
 
@@ -347,18 +378,20 @@ public class LineBucketMT extends RenderBucketMT {
 
          uMVP = getUniform("u_mvp");
          uFade = getUniform("u_fade");
-         uWidth = getUniform("u_width");
          uColor = getUniform("u_color");
          uMode = getUniform("u_mode");
-         uHeight = getUniform("u_height");
-         aPos = getAttrib("a_pos");
+
+         u_width = getUniform("u_width");
+         u_height = getUniform("u_height");
+
+         a_pos = getAttrib("a_pos");
       }
 
       @Override
       public boolean useProgram() {
 
          if (super.useProgram()) {
-            GLState.enableVertexArrays(aPos, GLState.DISABLED);
+            GLState.enableVertexArrays(a_pos, GLState.DISABLED);
             return true;
          }
 
@@ -375,40 +408,43 @@ public class LineBucketMT extends RenderBucketMT {
       this.level = layer;
    }
 
-   public void addLine(final float[] points, final int numPoints, final boolean closed) {
+   public void addLine(final float[] points, final int numPoints, final boolean isCapClosed) {
       if (numPoints >= 4) {
-         addLine(points, null, numPoints, closed);
+         addLine(points, null, numPoints, isCapClosed);
       }
+      System.out.println((System.currentTimeMillis() + " numPoints:" + numPoints));
+// TODO remove SYSTEM.OUT.PRINTLN
+
    }
 
-   void addLine(final float[] points, final int[] index, final int numPoints, final boolean closed) {
+   private void addLine(final float[] points, final int[] index, final int numPoints, final boolean isCapClosed) {
 
-      boolean rounded = false;
-      boolean squared = false;
+      boolean isCapRounded = false;
+      boolean isCapSquared = false;
 
       if (line.cap == Cap.ROUND) {
-         rounded = true;
+         isCapRounded = true;
       } else if (line.cap == Cap.SQUARE) {
-         squared = true;
+         isCapSquared = true;
       }
 
       /*
        * Note: just a hack to save some vertices, when there are
        * more than 200 lines per type. FIXME make optional!
        */
-      if (rounded && index != null) {
+      if (isCapRounded && index != null) {
          int cnt = 0;
          for (int i = 0, n = index.length; i < n; i++, cnt++) {
             if (index[i] < 0) {
                break;
             }
             if (cnt > 400) {
-               rounded = false;
+               isCapRounded = false;
                break;
             }
          }
       }
-      roundCap = rounded;
+      roundCap = isCapRounded;
 
       int n;
       int length = 0;
@@ -425,6 +461,7 @@ public class LineBucketMT extends RenderBucketMT {
       }
 
       for (int i = 0, pos = 0; i < n; i++) {
+
          if (index != null) {
             length = index[i];
          }
@@ -446,6 +483,7 @@ public class LineBucketMT extends RenderBucketMT {
          if (length == 4 &&
                points[ipos] == points[ipos + 2] &&
                points[ipos + 1] == points[ipos + 3]) {
+
             continue;
          }
 
@@ -453,10 +491,11 @@ public class LineBucketMT extends RenderBucketMT {
          if (length == 6 &&
                points[ipos] == points[ipos + 4] &&
                points[ipos + 1] == points[ipos + 5]) {
+
             length -= 2;
          }
 
-         addLine(vertexItems, points, ipos, length, rounded, squared, closed);
+         addLine(vertexItems, points, ipos, length, isCapRounded, isCapSquared, isCapClosed);
       }
    }
 
@@ -475,9 +514,9 @@ public class LineBucketMT extends RenderBucketMT {
                         final float[] points,
                         final int start,
                         final int length,
-                        final boolean rounded,
-                        final boolean squared,
-                        final boolean closed) {
+                        final boolean isRounded,
+                        final boolean isSquared,
+                        final boolean isClosed) {
 
       float ux, uy;
       float vPrevX, vPrevY;
@@ -492,7 +531,9 @@ public class LineBucketMT extends RenderBucketMT {
        * + 4 for round caps
        * + 2 for closing polygons
        */
-      numVertices += length + (rounded ? 6 : 2) + (closed ? 2 : 0);
+      numVertices += length
+            + (isRounded ? 6 : 2)
+            + (isClosed ? 2 : 0);
 
       int ipos = start;
 
@@ -525,9 +566,10 @@ public class LineBucketMT extends RenderBucketMT {
       short dx, dy;
 
       /* when the endpoint is outside the tile region omit round caps. */
-      boolean outside = (curX < tmin || curX > tmax || curY < tmin || curY > tmax);
+      boolean isOutside = (curX < tmin || curX > tmax || curY < tmin || curY > tmax);
 
-      if (rounded && !outside) {
+      if (isRounded && !isOutside) {
+
          ddx = (int) ((ux - vPrevX) * DIR_SCALE);
          ddy = (int) ((uy - vPrevY) * DIR_SCALE);
          dx = (short) (0 | ddx & DIR_MASK);
@@ -539,7 +581,8 @@ public class LineBucketMT extends RenderBucketMT {
          ddx = (int) (-(ux + vPrevX) * DIR_SCALE);
          ddy = (int) (-(uy + vPrevY) * DIR_SCALE);
 
-         vertices.add(ox,
+         vertices.add(
+               ox,
                oy,
                (short) (2 | ddx & DIR_MASK),
                (short) (2 | ddy & DIR_MASK));
@@ -548,33 +591,38 @@ public class LineBucketMT extends RenderBucketMT {
          ddx = (int) (ux * DIR_SCALE);
          ddy = (int) (uy * DIR_SCALE);
 
-         vertices.add(ox,
+         vertices.add(
+               ox,
                oy,
                (short) (0 | ddx & DIR_MASK),
                (short) (1 | ddy & DIR_MASK));
 
-         vertices.add(ox,
+         vertices.add(
+               ox,
                oy,
                (short) (2 | -ddx & DIR_MASK),
                (short) (1 | -ddy & DIR_MASK));
+
       } else {
+
          /*
           * outside means line is probably clipped
           * TODO should align ending with tile boundary
           * for now, just extend the line a little
           */
+
          float tx = vPrevX;
          float ty = vPrevY;
 
-         if (!rounded && !squared) {
+         if (!isRounded && !isSquared) {
             tx = 0;
             ty = 0;
-         } else if (rounded) {
+         } else if (isRounded) {
             tx *= 0.5;
             ty *= 0.5;
          }
 
-         if (rounded) {
+         if (isRounded) {
             numVertices -= 2;
          }
 
@@ -590,7 +638,8 @@ public class LineBucketMT extends RenderBucketMT {
          ddx = (int) (-(ux + tx) * DIR_SCALE);
          ddy = (int) (-(uy + ty) * DIR_SCALE);
 
-         vertices.add(ox,
+         vertices.add(
+               ox,
                oy,
                (short) (2 | ddx & DIR_MASK),
                (short) (1 | ddy & DIR_MASK));
@@ -610,7 +659,7 @@ public class LineBucketMT extends RenderBucketMT {
          if (ipos < end) {
             nextX = points[ipos++];
             nextY = points[ipos++];
-         } else if (closed && ipos < end + 2) {
+         } else if (isClosed && ipos < end + 2) {
             /* add startpoint == endpoint */
             nextX = points[start];
             nextY = points[start + 1];
@@ -706,12 +755,12 @@ public class LineBucketMT extends RenderBucketMT {
       ux = vPrevY;
       uy = -vPrevX;
 
-      outside = (curX < tmin || curX > tmax || curY < tmin || curY > tmax);
+      isOutside = (curX < tmin || curX > tmax || curY < tmin || curY > tmax);
 
       ox = (short) (curX * COORD_SCALE);
       oy = (short) (curY * COORD_SCALE);
 
-      if (rounded && !outside) {
+      if (isRounded && !isOutside) {
          ddx = (int) (ux * DIR_SCALE);
          ddy = (int) (uy * DIR_SCALE);
 
@@ -741,15 +790,15 @@ public class LineBucketMT extends RenderBucketMT {
          dy = (short) (0 | ddy & DIR_MASK);
 
       } else {
-         if (!rounded && !squared) {
+         if (!isRounded && !isSquared) {
             vPrevX = 0;
             vPrevY = 0;
-         } else if (rounded) {
+         } else if (isRounded) {
             vPrevX *= 0.5;
             vPrevY *= 0.5;
          }
 
-         if (rounded) {
+         if (isRounded) {
             numVertices -= 2;
          }
 

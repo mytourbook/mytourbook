@@ -34,9 +34,11 @@ public class Map25TrackConfig {
 
    // outline
    public boolean isShowDirectionArrow       = Map25ConfigManager.DEFAULT_OUTLINE_IS_SHOW_DIRECTION_ARROW;
+   public boolean isTrackVerticalOffset      = Map25ConfigManager.OUTLINE_IS_TRACK_VERTICAL_OFFSET_DEFAULT;
    public float   outlineWidth               = Map25ConfigManager.DEFAULT_OUTLINE_WIDTH;
    public RGB     outlineColor               = Map25ConfigManager.DEFAULT_OUTLINE_COLOR;
    public int     outlineOpacity             = Map25ConfigManager.DEFAULT_OUTLINE_OPACITY;
+   public int     trackVerticalOffset        = Map25ConfigManager.OUTLINE_TRACK_VERTICAL_OFFSET_DEFAULT;
 
    // slider location
    public boolean isShowSliderLocation       = Map25ConfigManager.DEFAULT_IS_SHOW_CHART_SLIDER;

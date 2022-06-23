@@ -154,7 +154,7 @@ public class TourLayer extends Layer {
       private float[]           __projectedPoints;
 
       private final LineClipper __lineClipper;
-      private int               __numPoints;
+      private int               __numGeoPoints;
 
       public Worker(final Map map) {
 
@@ -180,29 +180,29 @@ public class TourLayer extends Layer {
       @Override
       public boolean doWork(final TourRenderTask task) {
 
-         int numPoints = __numPoints;
+         int numGeoPoints = __numGeoPoints;
 
          if (_isUpdatePoints) {
 
             synchronized (_geoPoints) {
 
                _isUpdatePoints = false;
-               __numPoints = numPoints = _geoPoints.length;
+               __numGeoPoints = numGeoPoints = _geoPoints.length;
 
                double[] preProjectedPoints = __preProjectedPoints;
 
-               if (numPoints * 2 >= preProjectedPoints.length) {
-                  preProjectedPoints = __preProjectedPoints = new double[numPoints * 2];
-                  __projectedPoints = new float[numPoints * 2];
+               if (numGeoPoints * 2 >= preProjectedPoints.length) {
+                  preProjectedPoints = __preProjectedPoints = new double[numGeoPoints * 2];
+                  __projectedPoints = new float[numGeoPoints * 2];
                }
 
-               for (int pointIndex = 0; pointIndex < numPoints; pointIndex++) {
+               for (int pointIndex = 0; pointIndex < numGeoPoints; pointIndex++) {
                   MercatorProjection.project(_geoPoints[pointIndex], preProjectedPoints, pointIndex);
                }
             }
          }
 
-         if (numPoints == 0) {
+         if (numGeoPoints == 0) {
 
             if (task.__renderBuckets.get() != null) {
 
@@ -213,7 +213,7 @@ public class TourLayer extends Layer {
             return true;
          }
 
-         doWork_Rendering(task, numPoints);
+         doWork_Rendering(task, numGeoPoints);
 
          // trigger redraw to let renderer fetch the result.
          mMap.render();
@@ -362,7 +362,10 @@ public class TourLayer extends Layer {
             lineBucket.addLine(projectedPoints, projectedPointIndex, false);
          }
 
-         System.out.println((System.currentTimeMillis() + " " + numPoints + " " + projectedPoints.length + " " + projectedPointIndex));
+         System.out.println((System.currentTimeMillis()
+               + " " + numPoints
+               + " " + projectedPoints.length
+               + " " + projectedPointIndex));
          // TODO remove SYSTEM.OUT.PRINTLN
 
       }
@@ -424,13 +427,24 @@ public class TourLayer extends Layer {
 
       } else {
 
+         final int trackVerticalOffset = trackConfig.isTrackVerticalOffset
+               ? trackConfig.trackVerticalOffset
+               : 0;
+
          final LineStyle style = LineStyle.builder()
+
                .strokeWidth(trackConfig.outlineWidth)
                .color(lineColor)
+
                //.cap(Cap.BUTT)
                .cap(Paint.Cap.ROUND)
-               // this is not yet working
+
+               // outline is not yet working
                // .isOutline(true)
+
+               // "u_height" is above the ground -> this is the z axis
+               .heightOffset(trackVerticalOffset)
+
                .build();
 
          return style;
