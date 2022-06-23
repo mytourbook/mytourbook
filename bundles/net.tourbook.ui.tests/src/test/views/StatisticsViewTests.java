@@ -18,6 +18,7 @@ package views;
 import net.tourbook.Messages;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.junit.jupiter.api.Test;
 
 import utils.Utils;
@@ -33,34 +34,35 @@ public class StatisticsViewTests {
 
       Utils.showView(bot, STATISTICS_VIEW_NAME);
 
-      bot.comboBox().setSelection("Daytime");
+      final SWTBotCombo statisticsTypeComboBox = bot.comboBox();
+      statisticsTypeComboBox.setSelection("Daytime");
       bot.comboBox(2).setSelection("9");
 
-      bot.comboBox().setSelection(Messages.Pref_Statistic_Group_DaySummary);
-      bot.comboBox().setSelection(Messages.Pref_Statistic_Group_WeekSummary);
-      bot.comboBox().setSelection(Messages.Pref_Statistic_Group_MonthSummary);
-      bot.comboBox().setSelection(Messages.Pref_Statistic_Group_YearSummary);
-      bot.comboBox().setSelection(Messages.Pref_Statistic_Group_TourFrequency);
-      bot.comboBox().setSelection("HR Zones - Week");
-      bot.comboBox().setSelection("HR Zones - Month");
-      bot.comboBox().setSelection("Training - Line");
-      bot.comboBox().setSelection("Training - Bar");
-      bot.comboBox().setSelection("Tour Time - Day");
-      bot.comboBox().setSelection("Tour Time - Week");
-      bot.comboBox().setSelection("Tour Time - Month");
-      bot.comboBox().setSelection("Tour Time - Year");
-      bot.comboBox().setSelection("Distance - Day");
-      bot.comboBox().setSelection("Distance - Week");
-      bot.comboBox().setSelection("Distance - Month");
-      bot.comboBox().setSelection("Distance - Year");
-      bot.comboBox().setSelection("Elevation - Day");
-      bot.comboBox().setSelection("Elevation - Week");
-      bot.comboBox().setSelection("Elevation - Month");
-      bot.comboBox().setSelection("Elevation - Year");
-      bot.comboBox().setSelection("Athlete's Data - Day");
-      bot.comboBox().setSelection("Athlete's Data - Week");
-      bot.comboBox().setSelection("Athlete's Data - Month");
-      bot.comboBox().setSelection("Athlete's Data - Year");
-      bot.comboBox().setSelection("Battery SoC");
+      statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_DaySummary);
+      statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_WeekSummary);
+      statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_MonthSummary);
+      statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_YearSummary);
+      statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_TourFrequency);
+      statisticsTypeComboBox.setSelection("HR Zones - Week");
+      statisticsTypeComboBox.setSelection("HR Zones - Month");
+      statisticsTypeComboBox.setSelection("Training - Line");
+      statisticsTypeComboBox.setSelection("Training - Bar");
+      statisticsTypeComboBox.setSelection("Tour Time - Day");
+      statisticsTypeComboBox.setSelection("Tour Time - Week");
+      statisticsTypeComboBox.setSelection("Tour Time - Month");
+      statisticsTypeComboBox.setSelection("Tour Time - Year");
+      statisticsTypeComboBox.setSelection("Distance - Day");
+      statisticsTypeComboBox.setSelection("Distance - Week");
+      statisticsTypeComboBox.setSelection("Distance - Month");
+      statisticsTypeComboBox.setSelection("Distance - Year");
+      statisticsTypeComboBox.setSelection("Elevation - Day");
+      statisticsTypeComboBox.setSelection("Elevation - Week");
+      statisticsTypeComboBox.setSelection("Elevation - Month");
+      statisticsTypeComboBox.setSelection("Elevation - Year");
+      statisticsTypeComboBox.setSelection("Athlete's Data - Day");
+      statisticsTypeComboBox.setSelection("Athlete's Data - Week");
+      statisticsTypeComboBox.setSelection("Athlete's Data - Month");
+      statisticsTypeComboBox.setSelection("Athlete's Data - Year");
+      statisticsTypeComboBox.setSelection("Battery SoC");
    }
 }
