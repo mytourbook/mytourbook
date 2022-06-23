@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project 
+
+   xsi:schemaLocation   ="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+   xmlns                ="http://maven.apache.org/POM/4.0.0"
+   xmlns:xsi            ="http://www.w3.org/2001/XMLSchema-instance">
+
+   <modelVersion>4.0.0</modelVersion>
+
+   <artifactId>net.tourbook.ui.tests</artifactId>    <groupId>net.tourbook</groupId>
+                                                      <version>22.6.1-SNAPSHOT</version>
+   <packaging>eclipse-test-plugin</packaging>
+
+   <parent>
+      <artifactId>mytourbook-app</artifactId>         <groupId>net.tourbook</groupId>
+                                                      <version>22.6.1-SNAPSHOT</version>
+						      <relativePath>../../../MT/mytourbook/pom.xml</relativePath>
+   </parent>
+  <build>
+   
+      <testSourceDirectory>${project.basedir}/src-test</testSourceDirectory>
+	  
+   <plugins>
+
+      <plugin>
+        <artifactId>tycho-surefire-plugin</artifactId>         <groupId>org.eclipse.tycho</groupId>
+                                                               <version>${tycho.version}</version>
+         <configuration>
+             <useUIHarness>true</useUIHarness>
+             <useUIThread>false</useUIThread>
+             <product>net.tourbook.productWithoutJRE</product>
+             <application>net.tourbook.appWithoutJRE</application>
+             <skipTests>true</skipTests>
+             <osgiDataDirectory>${project.basedir}/workspace</osgiDataDirectory>
+             <deleteOsgiDataDirectory>false</deleteOsgiDataDirectory>
+         </configuration>
+      </plugin>
+      
+    </plugins>
+  </build>
+	  
+</project>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<measurementSystem version="1">
+<profile distance="KILOMETER" elevation="METER" height="METER" isActive="true" length="METER" lengthSmall="MILLIMETER" name="Metric" pace="MINUTES_PER_KILOMETER" pressureAtmosphere="MILLIBAR" temperature="CELSIUS" weight="KILOGRAM"/>
+<profile distance="MILE" elevation="FOOT" height="INCH" length="YARD" lengthSmall="INCH" name="Imperial" pace="MINUTES_PER_MILE" pressureAtmosphere="INCH_OF_MERCURY" temperature="FAHRENHEIT" weight="POUND"/>
+<profile distance="NAUTIC_MILE" elevation="METER" height="METER" length="METER" lengthSmall="MILLIMETER" name="Nautical" pace="MINUTES_PER_KILOMETER" pressureAtmosphere="MILLIBAR" temperature="CELSIUS" weight="KILOGRAM"/>
+<profile distance="KILOMETER" elevation="METER" height="METER" length="METER" lengthSmall="MILLIMETER" name="Other 1" pace="MINUTES_PER_KILOMETER" pressureAtmosphere="MILLIBAR" temperature="CELSIUS" weight="KILOGRAM"/>
+<profile distance="KILOMETER" elevation="METER" height="METER" length="METER" lengthSmall="MILLIMETER" name="Other 2" pace="MINUTES_PER_KILOMETER" pressureAtmosphere="MILLIBAR" temperature="CELSIUS" weight="KILOGRAM"/>
+<profile distance="KILOMETER" elevation="METER" height="METER" length="METER" lengthSmall="MILLIMETER" name="Other 3" pace="MINUTES_PER_KILOMETER" pressureAtmosphere="MILLIBAR" temperature="CELSIUS" weight="KILOGRAM"/>
+</measurementSystem>

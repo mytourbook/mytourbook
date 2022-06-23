@@ -22,3 +22,4 @@ Import-Package: net.tourbook.application,
  org.apache.fop.apps,
  org.apache.xmlgraphics.util
 Automatic-Module-Name: net.tourbook.printing
+Export-Package: net.tourbook.printing
