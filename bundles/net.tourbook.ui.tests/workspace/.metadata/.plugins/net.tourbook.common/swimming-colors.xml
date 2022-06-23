@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SwimmingStrokes Created="2022-06-02T21:47:17.362970700Z[UTC]" VersionMajor="22" VersionMicro="0" VersionMinor="6" VersionQualifier="qualifier" xmlVersion="1">
+<SwimStroke name="FREESTYLE">
+<BackgroundColor blue="255" green="255" red="0"/>
+</SwimStroke>
+<SwimStroke name="BREASTSTROKE">
+<BackgroundColor blue="0" green="255" red="0"/>
+</SwimStroke>
+<SwimStroke name="BACKSTROKE">
+<BackgroundColor blue="0" green="255" red="255"/>
+</SwimStroke>
+<SwimStroke name="BUTTERFLY">
+<BackgroundColor blue="0" green="0" red="255"/>
+</SwimStroke>
+<SwimStroke name="IM">
+<BackgroundColor blue="255" green="0" red="255"/>
+</SwimStroke>
+<SwimStroke name="MIXED">
+<BackgroundColor blue="204" green="0" red="153"/>
+</SwimStroke>
+<SwimStroke name="DRILL">
+<BackgroundColor blue="179" green="179" red="179"/>
+</SwimStroke>
+</SwimmingStrokes>

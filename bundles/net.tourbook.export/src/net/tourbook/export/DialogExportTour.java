@@ -753,8 +753,8 @@ public class DialogExportTour extends TitleAreaDialog {
                 */
                _rdoTCX_Activities = new Button(containerActivities, SWT.RADIO);
                GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_rdoTCX_Activities);
-               _rdoTCX_Activities.setText(Messages.Dialog_Export_Radio_TCX_Aktivities);
-               _rdoTCX_Activities.setToolTipText(Messages.Dialog_Export_Radio_TCX_Aktivities_Tooltip);
+               _rdoTCX_Activities.setText(Messages.Dialog_Export_Radio_TCX_Activities);
+               _rdoTCX_Activities.setToolTipText(Messages.Dialog_Export_Radio_TCX_Activities_Tooltip);
                _rdoTCX_Activities.addSelectionListener(defaultSelectionListener);
 
                /*
