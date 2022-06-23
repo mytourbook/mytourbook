@@ -21,7 +21,7 @@
 	</section>
 	<section name="TourTagFilterSlideout">
 		<item key="STATE_IS_HIERARCHICAL_LAYOUT" value="true"/>
-		<item key="STATE_IS_LIVE_UPDATE" value="false"/>
+		<item key="STATE_IS_LIVE_UPDATE" value="true"/>
 		<item key="STATE_HORIZ_SLIDEOUT_WIDTH" value="700"/>
 		<item key="STATE_HORIZ_SLIDEOUT_HEIGHT" value="400"/>
 		<item key="STATE_VERT_SLIDEOUT_WIDTH" value="700"/>
@@ -61,6 +61,10 @@
 	</section>
 	<section name="TagManager.RecentTags">
 		<list key="tagId">
+			<item value="0"/>
+		</list>
+		<list key="">
+			<item value="0"/>
 		</list>
 	</section>
 	<section name="DialogSelectPerson">
@@ -70,7 +74,7 @@
 		</list>
 	</section>
 	<section name="TourMarkerView">
-		<item key="XML_STATE_COLUMN_MANAGER" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;ColumnProfiles isShowCategory=&quot;true&quot; isShowColumnAnnotation_Formatting=&quot;false&quot; isShowColumnAnnotation_Sorting=&quot;false&quot;&gt;&#x0D;&#x0A;&lt;Profile isActiveProfile=&quot;true&quot; name=&quot;Column Profile&quot; visibleColumnIds=&quot;MARKER_MAP_VISIBLE,TIME_TOUR_TIME_HH_MM_SS,MOTION_DISTANCE,WAYPOINT_NAME,WAYPOINT_DESCRIPTION,MARKER_URL,&quot; visibleColumnIdsAndWidth=&quot;MARKER_MAP_VISIBLE,48,TIME_TOUR_TIME_HH_MM_SS,72,MOTION_DISTANCE,66,WAYPOINT_NAME,180,WAYPOINT_DESCRIPTION,180,MARKER_URL,150,&quot;&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MARKER_MAP_VISIBLE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME_TOUR_TIME_HH_MM_SS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_DISTANCE&quot; detailFormat=&quot;NUMBER_1_3&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WAYPOINT_NAME&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WAYPOINT_DESCRIPTION&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MARKER_URL&quot;/&gt;&#x0D;&#x0A;&lt;/Profile&gt;&#x0D;&#x0A;&lt;/ColumnProfiles&gt;"/>
+		<item key="XML_STATE_COLUMN_MANAGER" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;ColumnProfiles isShowCategory=&quot;true&quot; isShowColumnAnnotation_Formatting=&quot;false&quot; isShowColumnAnnotation_Sorting=&quot;false&quot;&gt;&#x0D;&#x0A;&lt;Profile isActiveProfile=&quot;true&quot; name=&quot;Column Profile&quot; visibleColumnIds=&quot;MARKER_MAP_VISIBLE,TIME_TOUR_TIME_HH_MM_SS,MOTION_DISTANCE,MOTION_DISTANCE_DELTA_ID,ALTITUDE_GRADIENT_AVG,MOTION_AVG_PACE,MARKER_ALTITUDE_ELEVATION_GAIN_DELTA,MARKER_ALTITUDE_ELEVATION_LOSS_DELTA,MARKER_SERIE_INDEX,BODY_AVG_PULSE,MOTION_AVG_SPEED,MARKER_TIME_DELTA,WAYPOINT_NAME,WAYPOINT_DESCRIPTION,MARKER_URL,&quot; visibleColumnIdsAndWidth=&quot;MARKER_MAP_VISIBLE,48,TIME_TOUR_TIME_HH_MM_SS,72,MOTION_DISTANCE,66,MOTION_DISTANCE_DELTA_ID,66,ALTITUDE_GRADIENT_AVG,48,MOTION_AVG_PACE,72,MARKER_ALTITUDE_ELEVATION_GAIN_DELTA,72,MARKER_ALTITUDE_ELEVATION_LOSS_DELTA,72,MARKER_SERIE_INDEX,48,BODY_AVG_PULSE,60,MOTION_AVG_SPEED,60,MARKER_TIME_DELTA,72,WAYPOINT_NAME,180,WAYPOINT_DESCRIPTION,180,MARKER_URL,150,&quot;&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MARKER_MAP_VISIBLE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME_TOUR_TIME_HH_MM_SS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_DISTANCE&quot; detailFormat=&quot;NUMBER_1_3&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_DISTANCE_DELTA_ID&quot; detailFormat=&quot;NUMBER_1_3&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;ALTITUDE_GRADIENT_AVG&quot; detailFormat=&quot;NUMBER_1_1&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_AVG_PACE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MARKER_ALTITUDE_ELEVATION_GAIN_DELTA&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MARKER_ALTITUDE_ELEVATION_LOSS_DELTA&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MARKER_SERIE_INDEX&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;BODY_AVG_PULSE&quot; detailFormat=&quot;NUMBER_1_1&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_AVG_SPEED&quot; detailFormat=&quot;NUMBER_1_1&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MARKER_TIME_DELTA&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WAYPOINT_NAME&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WAYPOINT_DESCRIPTION&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MARKER_URL&quot;/&gt;&#x0D;&#x0A;&lt;/Profile&gt;&#x0D;&#x0A;&lt;/ColumnProfiles&gt;"/>
 	</section>
 	<section name="net.tourbook.map2.view.Map2ViewId">
 		<item key="STATE_IS_SHOW_TOUR_IN_MAP" value="true"/>
@@ -178,7 +182,7 @@
 		<item key="STATE_IS_LINK_WITH_OTHER_VIEWS" value="false"/>
 		<item key="STATE_VIEW_LAYOUT" value="CATEGORY_MONTH"/>
 		<list key="STATE_SELECTED_TOURS">
-			<item value="202113022473019"/>
+			<item value="20211311415542"/>
 		</list>
 		<list key="STATE_SORT_COLUMN_ID">
 			<item value="TIME_DATE"/>
