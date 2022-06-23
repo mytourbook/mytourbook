@@ -33,9 +33,9 @@ public class StatisticsViewTests {
 
       Utils.showView(bot, STATISTICS_VIEW_NAME);
 
-      bot.comboBox(2).setSelection("9");
-      bot.viewByTitle(STATISTICS_VIEW_NAME).show();
       bot.comboBox().setSelection("Daytime");
+      bot.comboBox(2).setSelection("9");
+
       bot.comboBox().setSelection(Messages.Pref_Statistic_Group_DaySummary);
       bot.comboBox().setSelection(Messages.Pref_Statistic_Group_WeekSummary);
       bot.comboBox().setSelection(Messages.Pref_Statistic_Group_MonthSummary);
