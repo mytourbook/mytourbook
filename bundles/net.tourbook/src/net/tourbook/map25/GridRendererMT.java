@@ -109,27 +109,28 @@ public class GridRendererMT extends BucketRenderer {
 
       final int tileSize = Tile.SIZE;
 
-      final int tileScale = 1 << zoomLevel;
+      final int mapScale = 1 << zoomLevel;
       final float lineHeight = _textStyle.fontSize + 1;
 
       final TextBucket textBucket = mTextBucket;
       textBucket.clear();
 
-      for (int yy = -4; yy < 3; yy++) {
-         for (int xx = -4; xx < 3; xx++) {
+      for (int yOffset = -4; yOffset < 3; yOffset++) {
+         for (int xOffset = -5; xOffset < 4; xOffset++) {
 
-            final int tileX = x + xx;
-            final int tileY = y + yy;
+            final int tileX = x + xOffset;
+            final int tileY = y + yOffset;
 
-            final double latitude = MercatorProjection.toLatitude((double) tileY / tileScale);
-            final double longitude = MercatorProjection.toLongitude((double) tileX / tileScale);
+            final double latitude = MercatorProjection.toLatitude((double) tileY / mapScale);
+            final double longitude = MercatorProjection.toLongitude((double) tileX / mapScale);
 
-            final String labelTile = String.format("%d / %d / %d", zoomLevel, tileX, tileY); //$NON-NLS-1$
+            final String labelTile = String.format("%d / X:%d / Y:%d", zoomLevel, tileX, tileY); //$NON-NLS-1$
             final String labelLat = String.format("lat %.4f", latitude); //$NON-NLS-1$
             final String labelLon = String.format("lon %.4f", longitude); //$NON-NLS-1$
 
-            final int textX = tileSize * xx + tileSize / 2;
-            final int textY = tileSize * yy + tileSize / 2;
+            // center within the tile
+            final int textX = tileSize * xOffset + tileSize / 2;
+            final int textY = tileSize * yOffset + tileSize / 2 - (int) lineHeight;
 
             TextItem textItem = TextItem.pool.get();
             textItem.set(textX, textY, labelTile, _textStyle);

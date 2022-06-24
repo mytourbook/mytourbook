@@ -409,12 +409,13 @@ public class LineBucketMT extends RenderBucketMT {
    }
 
    public void addLine(final float[] points, final int numPoints, final boolean isCapClosed) {
+
       if (numPoints >= 4) {
          addLine(points, null, numPoints, isCapClosed);
       }
+
       System.out.println((System.currentTimeMillis() + " numPoints:" + numPoints));
 // TODO remove SYSTEM.OUT.PRINTLN
-
    }
 
    private void addLine(final float[] points, final int[] index, final int numPoints, final boolean isCapClosed) {
@@ -446,24 +447,24 @@ public class LineBucketMT extends RenderBucketMT {
       }
       roundCap = isCapRounded;
 
-      int n;
+      int numIndices;
       int length = 0;
 
       if (index == null) {
-         n = 1;
+         numIndices = 1;
          if (numPoints > 0) {
             length = numPoints;
          } else {
             length = points.length;
          }
       } else {
-         n = index.length;
+         numIndices = index.length;
       }
 
-      for (int i = 0, pos = 0; i < n; i++) {
+      for (int indexIndex = 0, pos = 0; indexIndex < numIndices; indexIndex++) {
 
          if (index != null) {
-            length = index[i];
+            length = index[indexIndex];
          }
 
          /* check end-marker in indices */
@@ -471,7 +472,7 @@ public class LineBucketMT extends RenderBucketMT {
             break;
          }
 
-         final int ipos = pos;
+         final int startIndex = pos;
          pos += length;
 
          /* need at least two points */
@@ -479,23 +480,23 @@ public class LineBucketMT extends RenderBucketMT {
             continue;
          }
 
-         /* start an enpoint are equal */
+         /* start and enpoint are equal */
          if (length == 4 &&
-               points[ipos] == points[ipos + 2] &&
-               points[ipos + 1] == points[ipos + 3]) {
+               points[startIndex] == points[startIndex + 2] &&
+               points[startIndex + 1] == points[startIndex + 3]) {
 
             continue;
          }
 
          /* avoid simple 180 degree angles */
          if (length == 6 &&
-               points[ipos] == points[ipos + 4] &&
-               points[ipos + 1] == points[ipos + 5]) {
+               points[startIndex] == points[startIndex + 4] &&
+               points[startIndex + 1] == points[startIndex + 5]) {
 
             length -= 2;
          }
 
-         addLine(vertexItems, points, ipos, length, isCapRounded, isCapSquared, isCapClosed);
+         addLine(vertexItems, points, startIndex, length, isCapRounded, isCapSquared, isCapClosed);
       }
    }
 
@@ -510,9 +511,18 @@ public class LineBucketMT extends RenderBucketMT {
       }
    }
 
+   /**
+    * @param vertices
+    * @param points
+    * @param startIndex
+    * @param length
+    * @param isRounded
+    * @param isSquared
+    * @param isClosed
+    */
    private void addLine(final VertexData vertices,
                         final float[] points,
-                        final int start,
+                        final int startIndex,
                         final int length,
                         final boolean isRounded,
                         final boolean isSquared,
@@ -523,7 +533,7 @@ public class LineBucketMT extends RenderBucketMT {
       float vNextX, vNextY;
       float curX, curY;
       float nextX, nextY;
-      double a;
+      double xyDistance;
 
       /*
        * amount of vertices used
@@ -535,19 +545,19 @@ public class LineBucketMT extends RenderBucketMT {
             + (isRounded ? 6 : 2)
             + (isClosed ? 2 : 0);
 
-      int ipos = start;
+      int pointIndex = startIndex;
 
-      curX = points[ipos++];
-      curY = points[ipos++];
-      nextX = points[ipos++];
-      nextY = points[ipos++];
+      curX = points[pointIndex++];
+      curY = points[pointIndex++];
+      nextX = points[pointIndex++];
+      nextY = points[pointIndex++];
 
       /* Unit vector to next node */
       vPrevX = nextX - curX;
       vPrevY = nextY - curY;
-      a = (float) Math.sqrt(vPrevX * vPrevX + vPrevY * vPrevY);
-      vPrevX /= a;
-      vPrevY /= a;
+      xyDistance = (float) Math.sqrt(vPrevX * vPrevX + vPrevY * vPrevY);
+      vPrevX /= xyDistance;
+      vPrevY /= xyDistance;
 
       /* perpendicular on the first segment */
       ux = -vPrevY;
@@ -654,31 +664,39 @@ public class LineBucketMT extends RenderBucketMT {
 
       //        vertexItem.used = opos + 4;
 
-      for (final int end = start + length;;) {
+      for (final int endIndex = startIndex + length;;) {
 
-         if (ipos < end) {
-            nextX = points[ipos++];
-            nextY = points[ipos++];
-         } else if (isClosed && ipos < end + 2) {
+         if (pointIndex < endIndex) {
+
+            nextX = points[pointIndex++];
+            nextY = points[pointIndex++];
+
+         } else if (isClosed && pointIndex < endIndex + 2) {
+
             /* add startpoint == endpoint */
-            nextX = points[start];
-            nextY = points[start + 1];
-            ipos += 2;
+
+            nextX = points[startIndex];
+            nextY = points[startIndex + 1];
+
+            pointIndex += 2;
+
          } else {
+
             break;
          }
 
          /* unit vector pointing forward to next node */
          vNextX = nextX - curX;
          vNextY = nextY - curY;
-         a = Math.sqrt(vNextX * vNextX + vNextY * vNextY);
+         xyDistance = Math.sqrt(vNextX * vNextX + vNextY * vNextY);
+
          /* skip two vertex segments */
-         if (a < mMinDist) {
+         if (xyDistance < mMinDist) {
             numVertices -= 2;
             continue;
          }
-         vNextX /= a;
-         vNextY /= a;
+         vNextX /= xyDistance;
+         vNextY /= xyDistance;
 
          final double dotp = (vNextX * vPrevX + vNextY * vPrevY);
 
@@ -694,28 +712,39 @@ public class LineBucketMT extends RenderBucketMT {
 
             float px, py;
             if (dotp > 0.999) {
+
                /* 360 degree angle, set points aside */
                ux = vPrevX + vNextX;
                uy = vPrevY + vNextY;
-               a = vNextX * uy - vNextY * ux;
-               if (a < 0.1 && a > -0.1) {
+
+               xyDistance = vNextX * uy - vNextY * ux;
+
+               if (xyDistance < 0.1 && xyDistance > -0.1) {
+
                   /* Almost straight */
                   ux = -vNextY;
                   uy = vNextX;
+
                } else {
-                  ux /= a;
-                  uy /= a;
+
+                  ux /= xyDistance;
+                  uy /= xyDistance;
                }
+
                //log.debug("aside " + a + " " + ux + " " + uy);
                px = curX - ux * mMinBevel;
                py = curY - uy * mMinBevel;
                curX = curX + ux * mMinBevel;
                curY = curY + uy * mMinBevel;
+
             } else {
+
                //log.debug("back");
+
                /* go back by min dist */
                px = curX + vPrevX * mMinBevel;
                py = curY + vPrevY * mMinBevel;
+
                /* go forward by min dist */
                curX = curX + vNextX * mMinBevel;
                curY = curY + vNextY * mMinBevel;
@@ -724,9 +753,9 @@ public class LineBucketMT extends RenderBucketMT {
             /* unit vector pointing forward to next node */
             vNextX = curX - px;
             vNextY = curY - py;
-            a = Math.sqrt(vNextX * vNextX + vNextY * vNextY);
-            vNextX /= a;
-            vNextY /= a;
+            xyDistance = Math.sqrt(vNextX * vNextX + vNextY * vNextY);
+            vNextX /= xyDistance;
+            vNextY /= xyDistance;
 
             addVertex(vertices, px, py, vPrevX, vPrevY, vNextX, vNextY);
 
@@ -737,9 +766,9 @@ public class LineBucketMT extends RenderBucketMT {
             /* unit vector pointing forward to next node */
             vNextX = nextX - curX;
             vNextY = nextY - curY;
-            a = Math.sqrt(vNextX * vNextX + vNextY * vNextY);
-            vNextX /= a;
-            vNextY /= a;
+            xyDistance = Math.sqrt(vNextX * vNextX + vNextY * vNextY);
+            vNextX /= xyDistance;
+            vNextY /= xyDistance;
          }
 
          addVertex(vertices, curX, curY, vPrevX, vPrevY, vNextX, vNextY);

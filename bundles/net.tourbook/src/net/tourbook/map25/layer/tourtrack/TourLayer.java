@@ -138,30 +138,46 @@ public class TourLayer extends Layer {
 
    final class Worker extends SimpleWorker<TourRenderTask> {
 
-      private static final int MIN_DIST = 3;
-
-      // limit coords
-      private final int __max                = 2048;
+      private static final int  MIN_DIST          = 3;
 
       /**
-       * pre-projected points
+       * Visible pixel of a line/tour, all other pixels are clipped with {@link #__lineClipper}
+       */
+      // limit coords
+      private static final int  MAX_VISIBLE_PIXEL = 2048;
+
+      /**
+       * Pre-projected points
        * <p>
        * Is projecting -180°...180° => 0...1 by using the {@link MercatorProjection}
        */
-      private double[]  __preProjectedPoints = new double[2];
+      private double[]          __projectedPoints = new double[2];
 
-      // projected points
-      private float[]           __projectedPoints;
+      /**
+       * Points which are projected (0...1) and scaled to pixel
+       */
+      private float[]           __pixelPoints;
 
+      /**
+       * Is clipping line positions between - {@link #MAX_VISIBLE_PIXEL} and +
+       * {@link #MAX_VISIBLE_PIXEL}
+       */
       private final LineClipper __lineClipper;
+
       private int               __numGeoPoints;
 
       public Worker(final Map map) {
 
          super(map, 50, new TourRenderTask(), new TourRenderTask());
 
-         __lineClipper = new LineClipper(-__max, -__max, __max, __max);
-         __projectedPoints = new float[0];
+         __lineClipper = new LineClipper(
+
+               -MAX_VISIBLE_PIXEL,
+               -MAX_VISIBLE_PIXEL,
+               MAX_VISIBLE_PIXEL,
+               MAX_VISIBLE_PIXEL);
+
+         __pixelPoints = new float[0];
       }
 
       private int addPoint(final float[] points, int i, final int x, final int y) {
@@ -189,15 +205,16 @@ public class TourLayer extends Layer {
                _isUpdatePoints = false;
                __numGeoPoints = numGeoPoints = _geoPoints.length;
 
-               double[] preProjectedPoints = __preProjectedPoints;
+               double[] projectedPoints = __projectedPoints;
 
-               if (numGeoPoints * 2 >= preProjectedPoints.length) {
-                  preProjectedPoints = __preProjectedPoints = new double[numGeoPoints * 2];
-                  __projectedPoints = new float[numGeoPoints * 2];
+               if (numGeoPoints * 2 >= projectedPoints.length) {
+
+                  projectedPoints = __projectedPoints = new double[numGeoPoints * 2];
+                  __pixelPoints = new float[numGeoPoints * 2];
                }
 
                for (int pointIndex = 0; pointIndex < numGeoPoints; pointIndex++) {
-                  MercatorProjection.project(_geoPoints[pointIndex], preProjectedPoints, pointIndex);
+                  MercatorProjection.project(_geoPoints[pointIndex], projectedPoints, pointIndex);
                }
             }
          }
@@ -223,14 +240,7 @@ public class TourLayer extends Layer {
 
       private void doWork_Rendering(final TourRenderTask task, final int numPoints) {
 
-         LineBucketMT lineBucket;
-
-//         if (_lineStyle.stipple == 0 && _lineStyle.texture == null) {
-         lineBucket = task.__renderBuckets.getLineBucket(0);
-//         } else {
-//            lineBucket = task.__renderBuckets.getLineTexBucket(0);
-//         }
-
+         final LineBucketMT lineBucket = task.__renderBuckets.getLineBucket(0);
          lineBucket.line = _lineStyle;
 
          //ll.scale = ll.line.width;
@@ -241,53 +251,63 @@ public class TourLayer extends Layer {
          final int zoomlevel = mapPos.zoomLevel;
          mapPos.scale = 1 << zoomlevel;
 
-         final double mapX = mapPos.x; // 0...1
-         final double mapY = mapPos.y; // 0...1
+         // current map positions 0...1
+         final double currentMapPosX = mapPos.x; // 0...1
+         final double currentMapPosY = mapPos.y; // 0...1
 
-         final double scale = Tile.SIZE * mapPos.scale;
+         // number of x/y pixels for the whole map at the current zoom level
+         final double maxMapPixel = Tile.SIZE * mapPos.scale;
 
          // flip around dateline
          int flip = 0;
 
-         final int scaledMaxX = Tile.SIZE << (zoomlevel - 1);
+         final int maxMapPixel2 = Tile.SIZE << (zoomlevel - 1);
 
-         int scaledX = (int) ((__preProjectedPoints[0] - mapX) * scale);
-         int scaledY = (int) ((__preProjectedPoints[1] - mapY) * scale);
+         int pixelX = (int) ((__projectedPoints[0] - currentMapPosX) * maxMapPixel);
+         int pixelY = (int) ((__projectedPoints[1] - currentMapPosY) * maxMapPixel);
 
-         if (scaledX > scaledMaxX) {
-            scaledX -= (scaledMaxX * 2);
+         if (pixelX > maxMapPixel2) {
+
+            pixelX -= maxMapPixel2 * 2;
             flip = -1;
-         } else if (scaledX < -scaledMaxX) {
-            scaledX += (scaledMaxX * 2);
+
+         } else if (pixelX < -maxMapPixel2) {
+
+            pixelX += maxMapPixel2 * 2;
             flip = 1;
          }
 
-         // setup tour index
+         // setup first tour index
          int tourIndex = 0;
          int nextTourStartIndex = getNextTourStartIndex(tourIndex);
 
          // setup tour clipper
-         __lineClipper.clipStart(scaledX, scaledY);
+         __lineClipper.clipStart(pixelX, pixelY);
 
-         final float[] projectedPoints = __projectedPoints;
-         int projectedPointIndex = addPoint(projectedPoints, 0, scaledX, scaledY);
+         final float[] pixelPoints = __pixelPoints;
+         int pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
 
-         float prevX = scaledX;
-         float prevY = scaledY;
+         float prevX = pixelX;
+         float prevY = pixelY;
 
          float[] segment = null;
 
          for (int pointIndex = 2; pointIndex < numPoints * 2; pointIndex += 2) {
 
-            scaledX = (int) ((__preProjectedPoints[pointIndex + 0] - mapX) * scale);
-            scaledY = (int) ((__preProjectedPoints[pointIndex + 1] - mapY) * scale);
+            // convert projected points 0...1 into map pixel
+            pixelX = (int) ((__projectedPoints[pointIndex + 0] - currentMapPosX) * maxMapPixel);
+            pixelY = (int) ((__projectedPoints[pointIndex + 1] - currentMapPosY) * maxMapPixel);
 
             int flipDirection = 0;
-            if (scaledX > scaledMaxX) {
-               scaledX -= scaledMaxX * 2;
+
+            if (pixelX > maxMapPixel2) {
+
+               pixelX -= maxMapPixel2 * 2;
                flipDirection = -1;
-            } else if (scaledX < -scaledMaxX) {
-               scaledX += scaledMaxX * 2;
+
+            } else if (pixelX < -maxMapPixel2) {
+
+               pixelX += maxMapPixel2 * 2;
                flipDirection = 1;
             }
 
@@ -295,36 +315,42 @@ public class TourLayer extends Layer {
 //            // TODO remove SYSTEM.OUT.PRINTLN
 
             if (flip != flipDirection) {
+
                flip = flipDirection;
-               if (projectedPointIndex > 2) {
-                  lineBucket.addLine(projectedPoints, projectedPointIndex, false);
+
+               if (pixelPointIndex > 2) {
+                  lineBucket.addLine(pixelPoints, pixelPointIndex, false);
                }
 
-               __lineClipper.clipStart(scaledX, scaledY);
-               projectedPointIndex = addPoint(projectedPoints, 0, scaledX, scaledY);
+               __lineClipper.clipStart(pixelX, pixelY);
+
+               pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
+
                continue;
             }
 
+            // ckeck if a new tour starts
             if (pointIndex >= nextTourStartIndex) {
+
+               // finish last tour (copied from flip code)
+               if (pixelPointIndex > 2) {
+                  lineBucket.addLine(pixelPoints, pixelPointIndex, false);
+               }
 
                // setup next tour
                nextTourStartIndex = getNextTourStartIndex(++tourIndex);
 
-               // start a new line (copied from flip code)
-               if (projectedPointIndex > 2) {
-                  lineBucket.addLine(projectedPoints, projectedPointIndex, false);
-               }
+               __lineClipper.clipStart(pixelX, pixelY);
+               pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
 
-               __lineClipper.clipStart(scaledX, scaledY);
-               projectedPointIndex = addPoint(projectedPoints, 0, scaledX, scaledY);
                continue;
             }
 
-            final int clipOutcode = __lineClipper.clipNext(scaledX, scaledY);
+            final int clipOutcode = __lineClipper.clipNext(pixelX, pixelY);
             if (clipOutcode != LineClipper.INSIDE) {
 
-               if (projectedPointIndex > 2) {
-                  lineBucket.addLine(projectedPoints, projectedPointIndex, false);
+               if (pixelPointIndex > 2) {
+                  lineBucket.addLine(pixelPoints, pixelPointIndex, false);
                }
 
                if (clipOutcode == LineClipper.INTERSECTION) {
@@ -336,36 +362,36 @@ public class TourLayer extends Layer {
                   // the prev point is the real point not the clipped point
                   //prevX = mClipper.outX2;
                   //prevY = mClipper.outY2;
-                  prevX = scaledX;
-                  prevY = scaledY;
+                  prevX = pixelX;
+                  prevY = pixelY;
                }
 
-               projectedPointIndex = 0;
+               pixelPointIndex = 0;
 
                // if the end point is inside, add it
                if (__lineClipper.getPrevOutcode() == LineClipper.INSIDE) {
-                  projectedPoints[projectedPointIndex++] = prevX;
-                  projectedPoints[projectedPointIndex++] = prevY;
+                  pixelPoints[pixelPointIndex++] = prevX;
+                  pixelPoints[pixelPointIndex++] = prevY;
                }
                continue;
             }
 
-            final float diffX = scaledX - prevX;
-            final float diffY = scaledY - prevY;
-            if ((projectedPointIndex == 0) || FastMath.absMaxCmp(diffX, diffY, MIN_DIST)) {
-               projectedPoints[projectedPointIndex++] = prevX = scaledX;
-               projectedPoints[projectedPointIndex++] = prevY = scaledY;
+            final float diffX = pixelX - prevX;
+            final float diffY = pixelY - prevY;
+            if ((pixelPointIndex == 0) || FastMath.absMaxCmp(diffX, diffY, MIN_DIST)) {
+               pixelPoints[pixelPointIndex++] = prevX = pixelX;
+               pixelPoints[pixelPointIndex++] = prevY = pixelY;
             }
          }
 
-         if (projectedPointIndex > 2) {
-            lineBucket.addLine(projectedPoints, projectedPointIndex, false);
+         if (pixelPointIndex > 2) {
+            lineBucket.addLine(pixelPoints, pixelPointIndex, false);
          }
 
          System.out.println((System.currentTimeMillis()
                + " " + numPoints
-               + " " + projectedPoints.length
-               + " " + projectedPointIndex));
+               + " " + pixelPoints.length
+               + " " + pixelPointIndex));
          // TODO remove SYSTEM.OUT.PRINTLN
 
       }
