@@ -54,12 +54,13 @@ public class BucketRendererMT extends LayerRenderer {
    /**
     * Buckets for rendering
     */
-   public final RenderBucketsMT buckets;
+   public final AllRenderBucketsMT allBuckets;
 
    protected boolean            mInitialized;
 
    public BucketRendererMT() {
-      buckets = new RenderBucketsMT();
+
+      allBuckets = new AllRenderBucketsMT();
       mMapPosition = new MapPosition();
    }
 
@@ -69,7 +70,8 @@ public class BucketRendererMT extends LayerRenderer {
     * then BufferObject will be released and buckets will not be rendered.
     */
    protected synchronized void compile() {
-      final boolean ok = buckets.compile(true);
+
+      final boolean ok = allBuckets.compile(true);
       setReady(ok);
    }
 
@@ -77,33 +79,34 @@ public class BucketRendererMT extends LayerRenderer {
     * Render all 'buckets'
     */
    @Override
-   public synchronized void render(final GLViewport v) {
-      final MapPosition layerPos = mMapPosition;
+   public synchronized void render(final GLViewport viewport) {
+
+      final MapPosition mapPosition = mMapPosition;
 
       GLState.test(false, false);
       GLState.blend(true);
 
-      final float div = (float) (v.pos.scale / layerPos.scale);
+      final float div = (float) (viewport.pos.scale / mapPosition.scale);
 
-      boolean project = true;
+      boolean isProjected = true;
 
-      setMatrix(v, project);
+      setMatrix(viewport, isProjected);
 
-      for (RenderBucketMT b = buckets.get(); b != null;) {
+      for (RenderBucketMT bucket = allBuckets.get(); bucket != null;) {
 
-         buckets.bind();
+         allBuckets.bind();
 
-         if (!project && b.type != SYMBOL) {
-            project = true;
-            setMatrix(v, project);
+         if (!isProjected && bucket.type != SYMBOL) {
+            isProjected = true;
+            setMatrix(viewport, isProjected);
          }
 
-         switch (b.type) {
+         switch (bucket.type) {
 //                case POLYGON:
 //                    b = PolygonBucket.Renderer.draw(b, v, 1, true);
 //                    break;
          case LINE:
-            b = LineBucketMT.Renderer.draw(b, v, div, buckets);
+            bucket = LineBucketMT.Renderer.draw(bucket, viewport, div, allBuckets);
             break;
 //                case TEXLINE:
 //                    b = LineTexBucket.Renderer.draw(b, v,
@@ -130,8 +133,8 @@ public class BucketRendererMT extends LayerRenderer {
 //                    b = CircleBucket.Renderer.draw(b, v);
 //                    break;
          default:
-            log.error("invalid bucket {}", b.type);
-            b = b.next;
+            log.error("invalid bucket {}", bucket.type);
+            bucket = bucket.next;
             break;
          }
       }

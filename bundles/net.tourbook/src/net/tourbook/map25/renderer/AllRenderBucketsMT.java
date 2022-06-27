@@ -36,22 +36,24 @@ import org.slf4j.LoggerFactory;
  * MapTile. It can be used for other purposes as well but some optimizations
  * (and limitations) probably wont make sense in different contexts.
  */
-public class RenderBucketsMT extends TileData {
+public class AllRenderBucketsMT extends TileData {
 
-   static final Logger log = LoggerFactory.getLogger(RenderBucketsMT.class);
+   static final Logger log = LoggerFactory.getLogger(AllRenderBucketsMT.class);
 
    /* Count of units needed for one vertex */
-   public static final int[] VERTEX_CNT  = {
-         4,                                  // LINE_VERTEX
-         6,                                  // TEXLINE_VERTEX
-         2,                                  // POLY_VERTEX
-         2,                                  // MESH_VERTEX
-         4,                                  // EXTRUSION_VERTEX
-         2,                                  // HAIRLINE_VERTEX
-         6,                                  // SYMBOL
-         6,                                  // BITMAP
-         2,                                  // CIRCLE
-   };
+   public static final int[] VERTEX_CNT  =
+
+         {
+               4,                            // LINE_VERTEX
+               6,                            // TEXLINE_VERTEX
+               2,                            // POLY_VERTEX
+               2,                            // MESH_VERTEX
+               4,                            // EXTRUSION_VERTEX
+               2,                            // HAIRLINE_VERTEX
+               6,                            // SYMBOL
+               6,                            // BITMAP
+               2,                            // CIRCLE
+         };
 
    public static final int   SHORT_BYTES = 2;
    // public static final int INT_BYTES = 4;
@@ -64,16 +66,18 @@ public class RenderBucketsMT extends TileData {
    private static short[]  fillShortCoords;
 
    static {
+
       final short s = (short) (Tile.SIZE * COORD_SCALE);
       fillShortCoords = new short[] { 0, s, s, s, 0, 0, s, 0 };
    }
-   private RenderBucketMT buckets;
+
+   private RenderBucketMT _allBuckets;
 
    /**
     * VBO holds all vertex data to draw lines and polygons after compilation.
     * Layout:
-    * 16 bytes fill coordinates ({@link #TILE_FILL_VERTICES} * {@link #SHORT_BYTES} *
-    * coordsPerVertex),
+    * 16 bytes fill coordinates
+    * ({@link #TILE_FILL_VERTICES} * {@link #SHORT_BYTES} * coordsPerVertex),
     * n bytes polygon vertices,
     * m bytes lines vertices
     * ...
@@ -90,9 +94,9 @@ public class RenderBucketsMT extends TileData {
     */
    public int[]           offset = { 0, 0 };
 
-   private RenderBucketMT mCurBucket;
+   private RenderBucketMT _currentBucket;
 
-   public RenderBucketsMT() {}
+   public AllRenderBucketsMT() {}
 
    public static void initRenderer() {
 
@@ -174,9 +178,10 @@ public class RenderBucketsMT extends TileData {
     * cleanup only when buckets are not used by tile or bucket anymore!
     */
    public void clear() {
+
       /* NB: set null calls clear() on each bucket! */
       set(null);
-      mCurBucket = null;
+      _currentBucket = null;
 
       vbo = BufferObject.release(vbo);
       ibo = BufferObject.release(ibo);
@@ -186,12 +191,13 @@ public class RenderBucketsMT extends TileData {
     * cleanup only when buckets are not used by tile or bucket anymore!
     */
    public void clearBuckets() {
+
       /* NB: set null calls clear() on each bucket! */
-      for (RenderBucketMT l = buckets; l != null; l = l.next) {
+      for (RenderBucketMT l = _allBuckets; l != null; l = l.next) {
          l.clear();
       }
 
-      mCurBucket = null;
+      _currentBucket = null;
    }
 
    /**
@@ -230,7 +236,7 @@ public class RenderBucketsMT extends TileData {
 
       int pos = addFill ? TILE_FILL_VERTICES : 0;
 
-      for (RenderBucketMT l = buckets; l != null; l = l.next) {
+      for (RenderBucketMT l = _allBuckets; l != null; l = l.next) {
          if (l.type == POLYGON) {
             l.compile(vboData, iboData);
             l.vertexOffset = pos;
@@ -240,7 +246,7 @@ public class RenderBucketsMT extends TileData {
 
       offset[LINE] = vboData.position() * SHORT_BYTES;
       pos = 0;
-      for (RenderBucketMT l = buckets; l != null; l = l.next) {
+      for (RenderBucketMT l = _allBuckets; l != null; l = l.next) {
          if (l.type == LINE) {
             l.compile(vboData, iboData);
 
@@ -249,7 +255,7 @@ public class RenderBucketsMT extends TileData {
          }
       }
 
-      for (RenderBucketMT l = buckets; l != null; l = l.next) {
+      for (RenderBucketMT l = _allBuckets; l != null; l = l.next) {
          if (l.type != LINE && l.type != POLYGON) {
             l.compile(vboData, iboData);
          }
@@ -295,7 +301,7 @@ public class RenderBucketsMT extends TileData {
    private int countIboSize() {
       int numIndices = 0;
 
-      for (RenderBucketMT l = buckets; l != null; l = l.next) {
+      for (RenderBucketMT l = _allBuckets; l != null; l = l.next) {
          numIndices += l.numIndices;
       }
 
@@ -305,7 +311,7 @@ public class RenderBucketsMT extends TileData {
    private int countVboSize() {
       int vboSize = 0;
 
-      for (RenderBucketMT l = buckets; l != null; l = l.next) {
+      for (RenderBucketMT l = _allBuckets; l != null; l = l.next) {
          vboSize += l.numVertices * VERTEX_CNT[l.type];
       }
 
@@ -321,36 +327,42 @@ public class RenderBucketsMT extends TileData {
     * @return internal linked list of RenderBucket items
     */
    public RenderBucketMT get() {
-      return buckets;
+      return _allBuckets;
    }
 
    private RenderBucketMT getBucket(final int level, final int type) {
+
       RenderBucketMT bucket = null;
 
-      if (mCurBucket != null && mCurBucket.level == level) {
-         bucket = mCurBucket;
+      if (_currentBucket != null && _currentBucket.level == level) {
+
+         bucket = _currentBucket;
+
          if (bucket.type != type) {
             log.error("BUG wrong bucket {} {} on level {}", bucket.type, type, level);
             throw new IllegalArgumentException();
          }
+
          return bucket;
       }
 
-      RenderBucketMT b = buckets;
+      RenderBucketMT b = _allBuckets;
       if (b == null || b.level > level) {
          /* insert new bucket at start */
          b = null;
       } else {
-         if (mCurBucket != null && level > mCurBucket.level) {
-            b = mCurBucket;
+         if (_currentBucket != null && level > _currentBucket.level) {
+            b = _currentBucket;
          }
 
          while (true) {
+
             /* found bucket */
             if (b.level == level) {
                bucket = b;
                break;
             }
+
             /* insert bucket between current and next bucket */
             if (b.next == null || b.next.level > level) {
                break;
@@ -361,8 +373,10 @@ public class RenderBucketsMT extends TileData {
       }
 
       if (bucket == null) {
+
          /* add a new RenderElement */
          if (type == LINE) {
+
             bucket = new LineBucketMT(level);
 //            } else if (type == POLYGON) {
 //               bucket = new PolygonBucket(level);
@@ -381,10 +395,13 @@ public class RenderBucketsMT extends TileData {
          }
 
          if (b == null) {
+
             /** insert at start */
-            bucket.next = buckets;
-            buckets = bucket;
+            bucket.next = _allBuckets;
+            _allBuckets = bucket;
+
          } else {
+
             bucket.next = b.next;
             b.next = bucket;
          }
@@ -396,7 +413,7 @@ public class RenderBucketsMT extends TileData {
          throw new IllegalArgumentException();
       }
 
-      mCurBucket = bucket;
+      _currentBucket = bucket;
 
       return bucket;
    }
@@ -450,7 +467,7 @@ public class RenderBucketsMT extends TileData {
 //    }
 
    public void prepare() {
-      for (RenderBucketMT l = buckets; l != null; l = l.next) {
+      for (RenderBucketMT l = _allBuckets; l != null; l = l.next) {
          l.prepare();
       }
    }
@@ -459,22 +476,23 @@ public class RenderBucketsMT extends TileData {
     * Set new bucket items and clear previous.
     */
    public void set(final RenderBucketMT buckets) {
-      for (RenderBucketMT l = this.buckets; l != null; l = l.next) {
+      for (RenderBucketMT l = this._allBuckets; l != null; l = l.next) {
          l.clear();
       }
 
-      this.buckets = buckets;
+      this._allBuckets = buckets;
    }
 
-   public void setFrom(final RenderBucketsMT buckets) {
-      if (buckets == this) {
+   public void setFrom(final AllRenderBucketsMT allBuckets) {
+
+      if (allBuckets == this) {
          throw new IllegalArgumentException("Cannot set from oneself!");
       }
 
-      set(buckets.buckets);
+      set(allBuckets._allBuckets);
 
-      mCurBucket = null;
-      buckets.buckets = null;
-      buckets.mCurBucket = null;
+      _currentBucket = null;
+      allBuckets._allBuckets = null;
+      allBuckets._currentBucket = null;
    }
 }

@@ -52,7 +52,7 @@ import net.tourbook.map25.layer.marker.PhotoToolkit;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
-import net.tourbook.map25.renderer.RenderBucketsMT;
+import net.tourbook.map25.renderer.AllRenderBucketsMT;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
@@ -544,7 +544,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    public void createLayers() {
 
       // setup MT shader
-      RenderBucketsMT.initRenderer();
+      AllRenderBucketsMT.initRenderer();
 
       _selectedMapProvider = restoreState_MapProvider();
       _map25View.updateUI_SelectedMapProvider(_selectedMapProvider);

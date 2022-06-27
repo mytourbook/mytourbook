@@ -34,6 +34,10 @@ import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
+import net.tourbook.common.color.ColorProviderConfig;
+import net.tourbook.common.color.IGradientColorProvider;
+import net.tourbook.common.color.IMapColorProvider;
+import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ICloseOpenedDialogs;
 import net.tourbook.common.tooltip.IOpeningDialog;
@@ -44,6 +48,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.map.IMapSyncListener;
+import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapInfoManager;
 import net.tourbook.map.MapManager;
 import net.tourbook.map.bookmark.ActionMapBookmarks;
@@ -51,6 +56,7 @@ import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
+import net.tourbook.map2.view.IDiscreteColorProvider;
 import net.tourbook.map25.action.ActionMap25_PhotoFilter;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
 import net.tourbook.map25.action.ActionShowEntireTour;
@@ -202,7 +208,7 @@ public class Map25View extends ViewPart implements
    private ArrayList<TourData>           _allTourData                            = new ArrayList<>();
    private TIntArrayList                 _allTourStarts                          = new TIntArrayList();
    private GeoPoint[]                    _allGeoPoints;
-   private BoundingBox                   _allBoundingBox;
+   private BoundingBox                   _boundingBox;
 
    /**
     * Contains photos which are displayed in the map
@@ -540,7 +546,7 @@ public class Map25View extends ViewPart implements
 
    public void actionZoomShowEntireTour() {
 
-      if (_allBoundingBox == null) {
+      if (_boundingBox == null) {
 
          // a tour is not yet displayed
 
@@ -561,7 +567,7 @@ public class Map25View extends ViewPart implements
             animator.cancel();
             animator.animateTo(//
                   2000,
-                  _allBoundingBox,
+                  _boundingBox,
                   Easing.Type.SINE_INOUT,
                   Animator.ANIM_MOVE | Animator.ANIM_SCALE);
 
@@ -1375,14 +1381,18 @@ public class Map25View extends ViewPart implements
          return;
       }
 
-      int geoSize = 0;
+      final IMapColorProvider mapColorProvider = MapColorProvider.getActiveMap2ColorProvider(MapGraphId.Altitude);
+
+      int numAllTimeSlices = 0;
+
       for (final TourData tourData : _allTourData) {
-         geoSize += tourData.latitudeSerie.length;
+         numAllTimeSlices += tourData.latitudeSerie.length;
       }
 
       // use array to optimize performance when millions of points are created
-      _allGeoPoints = new GeoPoint[geoSize];
+      _allGeoPoints = new GeoPoint[numAllTimeSlices];
       _allTourStarts.clear();
+      final int[] allGeoPointColors = new int[numAllTimeSlices];
 
       int tourIndex = 0;
       int geoIndex = 0;
@@ -1412,14 +1422,36 @@ public class Map25View extends ViewPart implements
             final double[] latitudeSerie = tourData.latitudeSerie;
             final double[] longitudeSerie = tourData.longitudeSerie;
 
+            final float[] elevationSerie = tourData.altitudeSerie;
+
             // create vtm geo points
             for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++, tourIndex++) {
-               _allGeoPoints[geoIndex++] = (new GeoPoint(latitudeSerie[serieIndex], longitudeSerie[serieIndex]));
+
+               _allGeoPoints[geoIndex] = (new GeoPoint(latitudeSerie[serieIndex], longitudeSerie[serieIndex]));
+
+               int colorValue = 0;
+
+               if (mapColorProvider instanceof IGradientColorProvider) {
+
+                  colorValue = ((IGradientColorProvider) mapColorProvider).getRGBValue(
+                        ColorProviderConfig.MAP2,
+                        elevationSerie[serieIndex]);
+
+               } else if (mapColorProvider instanceof IDiscreteColorProvider) {
+
+                  // e.g. HR zone color provider
+
+//                  colorValue = ((IDiscreteColorProvider) mapColorProvider).getColorValue(tourData, serieIndex, isDrawLine);
+               }
+
+               allGeoPointColors[geoIndex] = colorValue;
+
+               geoIndex++;
             }
          }
       }
 
-      tourLayer.setPoints(_allGeoPoints, _allTourStarts);
+      tourLayer.setPoints(_allGeoPoints, allGeoPointColors, _allTourStarts);
 
       checkSliderIndices();
 
@@ -1491,13 +1523,13 @@ public class Map25View extends ViewPart implements
             public void run() {
 
                // create outside isSynch that data are available when map is zoomed to show the whole tour
-               _allBoundingBox = createBoundingBox(_allGeoPoints);
+               _boundingBox = createBoundingBox(_allGeoPoints);
 
                if (_mapSynchedWith == MapSync.WITH_TOUR) {
 
 //						final int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
                   final int animationTime = Map25ConfigManager.DEFAULT_ANIMATION_TIME;
-                  Map25ConfigManager.setMapLocation(map25, _allBoundingBox, animationTime);
+                  Map25ConfigManager.setMapLocation(map25, _boundingBox, animationTime);
                }
 
                map25.updateMap();

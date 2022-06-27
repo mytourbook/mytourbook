@@ -34,10 +34,12 @@ import org.oscim.theme.styles.TextStyle;
 
 public class GridRendererMT extends BucketRenderer {
 
-   private final TextBucket     mTextBucket;
    private final TextStyle      _textStyle;
-   private final LineBucket     mLineBucket;
-   private final GeometryBuffer mLines;
+
+   private final TextBucket     _textBucket;
+   private final LineBucket     _lineBucket;
+
+   private final GeometryBuffer _geoBufferLines;
 
    private TileGridLayerMT      _tileGridLayerMT;
 
@@ -63,38 +65,38 @@ public class GridRendererMT extends BucketRenderer {
       final int tileSize = Tile.SIZE;
 
       /* not needed to set but we know: 16 lines 'a' two points */
-      mLines = new GeometryBuffer(2 * 16, 16);
+      _geoBufferLines = new GeometryBuffer(2 * 16, 16);
 
       final float pos = -tileSize * 4;
 
       /* 8 vertical lines */
       for (int i = 0; i < 8 * numLines; i++) {
          final float x = pos + i * tileSize / numLines;
-         mLines.startLine();
-         mLines.addPoint(x, pos);
-         mLines.addPoint(x, pos + tileSize * 8);
+         _geoBufferLines.startLine();
+         _geoBufferLines.addPoint(x, pos);
+         _geoBufferLines.addPoint(x, pos + tileSize * 8);
       }
 
       /* 8 horizontal lines */
       for (int j = 0; j < 8 * numLines; j++) {
          final float y = pos + j * tileSize / numLines;
-         mLines.startLine();
-         mLines.addPoint(pos, y);
-         mLines.addPoint(pos + tileSize * 8, y);
+         _geoBufferLines.startLine();
+         _geoBufferLines.addPoint(pos, y);
+         _geoBufferLines.addPoint(pos + tileSize * 8, y);
       }
 
       _textStyle = textStyle;
 
-      mLineBucket = new LineBucket(0);
-      mLineBucket.line = lineStyle;
+      _lineBucket = new LineBucket(0);
+      _lineBucket.line = lineStyle;
 
       if (_textStyle != null) {
-         mTextBucket = new TextBucket();
-         mTextBucket.next = mLineBucket;
+         _textBucket = new TextBucket();
+         _textBucket.next = _lineBucket;
       } else {
-         mTextBucket = null;
-         mLineBucket.addLine(mLines);
-         buckets.set(mLineBucket);
+         _textBucket = null;
+         _lineBucket.addLine(_geoBufferLines);
+         buckets.set(_lineBucket);
       }
    }
 
@@ -112,7 +114,7 @@ public class GridRendererMT extends BucketRenderer {
       final int mapScale = 1 << zoomLevel;
       final float lineHeight = _textStyle.fontSize + 1;
 
-      final TextBucket textBucket = mTextBucket;
+      final TextBucket textBucket = _textBucket;
       textBucket.clear();
 
       for (int yOffset = -4; yOffset < 3; yOffset++) {
@@ -189,11 +191,11 @@ public class GridRendererMT extends BucketRenderer {
 
       if (_textStyle != null) {
 
-         buckets.set(mTextBucket);
+         buckets.set(_textBucket);
 
          addLabels(currentX, currentY, currentMapPosition.zoomLevel, currentMapPosition);
 
-         mLineBucket.addLine(mLines);
+         _lineBucket.addLine(_geoBufferLines);
          buckets.prepare();
 
          setReady(false);

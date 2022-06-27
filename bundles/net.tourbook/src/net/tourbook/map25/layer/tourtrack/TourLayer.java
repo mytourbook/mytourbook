@@ -28,7 +28,7 @@ import net.tourbook.map25.layer.marker.MarkerShape;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
 import net.tourbook.map25.renderer.BucketRendererMT;
 import net.tourbook.map25.renderer.LineBucketMT;
-import net.tourbook.map25.renderer.RenderBucketsMT;
+import net.tourbook.map25.renderer.AllRenderBucketsMT;
 
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Paint;
@@ -61,8 +61,8 @@ public class TourLayer extends Layer {
    /**
     * Stores points, converted to the map projection.
     */
-   protected GeoPoint[]     _geoPoints;
-   protected TIntArrayList  _tourStarts;
+   protected GeoPoint[]     _allGeoPoints;
+   protected TIntArrayList  _allTourStarts;
 
    protected boolean        _isUpdatePoints;
 
@@ -74,12 +74,13 @@ public class TourLayer extends Layer {
    final Worker             _simpleWorker;
 
    private boolean          _isUpdateLayer;
+   private int[]            _allGeoPointColors;
 
    private final class TourRenderer extends BucketRendererMT {
 
-      private int __oldX = -1;
-      private int __oldY = -1;
-      private int __oldZ = -1;
+      private int __oldX         = -1;
+      private int __oldY         = -1;
+      private int __oldZoomLevel = -1;
 
       @Override
       public synchronized void update(final GLViewport viewport) {
@@ -91,12 +92,12 @@ public class TourLayer extends Layer {
             return;
          }
 
-         final int currentZ = 1 << viewport.pos.zoomLevel;
-         final int currentX = (int) (viewport.pos.x * currentZ);
-         final int currentY = (int) (viewport.pos.y * currentZ);
+         final int currentZoomLevel = 1 << viewport.pos.zoomLevel;
+         final int currentX = (int) (viewport.pos.x * currentZoomLevel);
+         final int currentY = (int) (viewport.pos.y * currentZoomLevel);
 
          /* update layers when map moved by at least one tile */
-         if (currentX != __oldX || currentY != __oldY || currentZ != __oldZ || _isUpdateLayer) {
+         if (currentX != __oldX || currentY != __oldY || currentZoomLevel != __oldZoomLevel || _isUpdateLayer) {
 
             /*
              * It took me many days to find this solution that a newly selected tour is
@@ -113,7 +114,7 @@ public class TourLayer extends Layer {
 
             __oldX = currentX;
             __oldY = currentY;
-            __oldZ = currentZ;
+            __oldZoomLevel = currentZoomLevel;
          }
 
          final TourRenderTask workerTask = _simpleWorker.poll();
@@ -125,14 +126,14 @@ public class TourLayer extends Layer {
          mMapPosition.copy(workerTask.__mapPos);
 
          /* compile new layers */
-         buckets.set(workerTask.__renderBuckets.get());
+         allBuckets.set(workerTask.__renderBuckets.get());
          compile();
       }
    }
 
    private final static class TourRenderTask {
 
-      RenderBucketsMT __renderBuckets = new RenderBucketsMT();
+      AllRenderBucketsMT __renderBuckets = new AllRenderBucketsMT();
       MapPosition     __mapPos        = new MapPosition();
    }
 
@@ -200,10 +201,10 @@ public class TourLayer extends Layer {
 
          if (_isUpdatePoints) {
 
-            synchronized (_geoPoints) {
+            synchronized (_allGeoPoints) {
 
                _isUpdatePoints = false;
-               __numGeoPoints = numGeoPoints = _geoPoints.length;
+               __numGeoPoints = numGeoPoints = _allGeoPoints.length;
 
                double[] projectedPoints = __projectedPoints;
 
@@ -214,7 +215,7 @@ public class TourLayer extends Layer {
                }
 
                for (int pointIndex = 0; pointIndex < numGeoPoints; pointIndex++) {
-                  MercatorProjection.project(_geoPoints[pointIndex], projectedPoints, pointIndex);
+                  MercatorProjection.project(_allGeoPoints[pointIndex], projectedPoints, pointIndex);
                }
             }
          }
@@ -243,7 +244,8 @@ public class TourLayer extends Layer {
          final LineBucketMT lineBucket = task.__renderBuckets.getLineBucket(0);
          lineBucket.line = _lineStyle;
 
-         //ll.scale = ll.line.width;
+//         lineBucket.next
+
 
          final MapPosition mapPos = task.__mapPos;
          mMap.getMapPosition(mapPos);
@@ -398,8 +400,8 @@ public class TourLayer extends Layer {
 
       private int getNextTourStartIndex(final int tourIndex) {
 
-         if (_tourStarts.size() > tourIndex + 1) {
-            return _tourStarts.get(tourIndex + 1) * 2;
+         if (_allTourStarts.size() > tourIndex + 1) {
+            return _allTourStarts.get(tourIndex + 1) * 2;
          } else {
             return Integer.MAX_VALUE;
          }
@@ -412,8 +414,8 @@ public class TourLayer extends Layer {
 
       _lineStyle = createLineStyle();
 
-      _geoPoints = new GeoPoint[] {};
-      _tourStarts = new TIntArrayList();
+      _allGeoPoints = new GeoPoint[] {};
+      _allTourStarts = new TIntArrayList();
 
       mRenderer = new TourRenderer();
       _simpleWorker = new Worker(map);
@@ -484,14 +486,15 @@ public class TourLayer extends Layer {
       _simpleWorker.submit(RENDERING_DELAY);
    }
 
-   public void setPoints(final GeoPoint[] geoPoints, final TIntArrayList tourStarts) {
+   public void setPoints(final GeoPoint[] allGeoPoints, final int[] allGeoPointColors, final TIntArrayList allTourStarts) {
 
-      synchronized (_geoPoints) {
+      synchronized (_allGeoPoints) {
 
-         _tourStarts.clear();
-         _tourStarts.addAll(tourStarts);
+         _allGeoPoints = allGeoPoints;
+         _allGeoPointColors = allGeoPointColors;
 
-         _geoPoints = geoPoints;
+         _allTourStarts.clear();
+         _allTourStarts.addAll(allTourStarts);
       }
 
       _simpleWorker.cancel(true);

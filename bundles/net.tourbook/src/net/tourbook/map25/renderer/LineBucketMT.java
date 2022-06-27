@@ -27,7 +27,6 @@ import org.oscim.backend.GLAdapter;
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeometryBuffer;
 import org.oscim.core.MapPosition;
-import org.oscim.core.MercatorProjection;
 import org.oscim.renderer.GLState;
 import org.oscim.renderer.GLUtils;
 import org.oscim.renderer.GLViewport;
@@ -109,7 +108,7 @@ public class LineBucketMT extends RenderBucketMT {
       public static RenderBucketMT draw(RenderBucketMT renderBucket,
                                         final GLViewport viewport,
                                         final float scale,
-                                        final RenderBucketsMT buckets) {
+                                        final AllRenderBucketsMT buckets) {
 
          final MapPosition mapPosition = viewport.pos;
 
@@ -125,7 +124,7 @@ public class LineBucketMT extends RenderBucketMT {
                // 0 == projected
                : SHADER_PROJECTED;
 
-         mode = mode;
+//         mode = mode;
          mode = SHADER_FLAT;
 
          final Shader shader = _shaders[mode];
@@ -143,22 +142,22 @@ public class LineBucketMT extends RenderBucketMT {
             GLState.bindTex2D(_textureID);
          }
 
-         final int uLineFade = shader.uFade;
-         final int uLineMode = shader.uMode;
-         final int uLineColor = shader.uColor;
-         final int shader_u_width = shader.u_width;
-         final int shader_u_height = shader.u_height;
+         final int shader_u_fade = shader.shader_u_fade;
+         final int shader_u_mode = shader.shader_u_mode;
+         final int shader_u_color = shader.shader_u_color;
+         final int shader_u_width = shader.shader_u_width;
+         final int shader_u_height = shader.shader_u_height;
 
-         gl.vertexAttribPointer(shader.a_pos,
+         gl.vertexAttribPointer(shader.shader_a_pos,
                4,
                GL.SHORT,
                false,
                0,
                buckets.offset[LINE]);
 
-         viewport.mvp.setAsUniform(shader.uMVP);
+         viewport.mvp.setAsUniform(shader.shader_u_mvp);
 
-         final double groundResolution = MercatorProjection.groundResolution(mapPosition);
+//         final double groundResolution = MercatorProjection.groundResolution(mapPosition);
 
          /*
           * Line scale factor for non fixed lines: Within a zoom-
@@ -176,10 +175,13 @@ public class LineBucketMT extends RenderBucketMT {
                ? 0.0001
                : 1.5 / scale;
 
-         gl.uniform1f(uLineFade, (float) pixel);
+//         System.out.println((System.currentTimeMillis() + " pixel:" + pixel + "  scale:" + scale));
+//         // TODO remove SYSTEM.OUT.PRINTLN
+
+         gl.uniform1f(shader_u_fade, (float) pixel);
 
          int capMode = 0;
-         gl.uniform1i(uLineMode, capMode);
+         gl.uniform1i(shader_u_mode, capMode);
 
          boolean isBlur = false;
          double width;
@@ -193,10 +195,10 @@ public class LineBucketMT extends RenderBucketMT {
          for (; renderBucket != null && renderBucket.type == RenderBucketMT.LINE; renderBucket = renderBucket.next) {
 
             final LineBucketMT lineBucket = (LineBucketMT) renderBucket;
-            final LineStyle line = lineBucket.line.current();
+            final LineStyle lineStyle = lineBucket.line.current();
 
-            if (line.heightOffset != lineBucket.heightOffset) {
-               lineBucket.heightOffset = line.heightOffset;
+            if (lineStyle.heightOffset != lineBucket.heightOffset) {
+               lineBucket.heightOffset = lineStyle.heightOffset;
             }
 
             if (lineBucket.heightOffset != heightOffset) {
@@ -206,53 +208,50 @@ public class LineBucketMT extends RenderBucketMT {
 //               final double lineHeight = (heightOffset / groundResolution) / scale;
                final double lineHeight = (heightOffset) * scale;
 
-//               System.out.println((System.currentTimeMillis() + " lineHeight:" + lineHeight));
-//               // TODO remove SYSTEM.OUT.PRINTLN
-
                gl.uniform1f(shader_u_height, (float) lineHeight);
             }
 
-            if (line.fadeScale < mapPosition.zoomLevel) {
+            if (lineStyle.fadeScale < mapPosition.zoomLevel) {
 
-               GLUtils.setColor(uLineColor, line.color, 1);
+               GLUtils.setColor(shader_u_color, lineStyle.color, 1);
 
-            } else if (line.fadeScale > mapPosition.zoomLevel) {
+            } else if (lineStyle.fadeScale > mapPosition.zoomLevel) {
 
                continue;
 
             } else {
 
                final float alpha = (float) (scale > 1.2 ? scale : 1.2) - 1;
-               GLUtils.setColor(uLineColor, line.color, alpha);
+               GLUtils.setColor(shader_u_color, lineStyle.color, alpha);
             }
 
-            if (mode == SHADER_PROJECTED && isBlur && line.blur == 0) {
-               gl.uniform1f(uLineFade, (float) pixel);
+            if (mode == SHADER_PROJECTED && isBlur && lineStyle.blur == 0) {
+               gl.uniform1f(shader_u_fade, (float) pixel);
                isBlur = false;
             }
 
             /* draw LineLayer */
-            if (line.outline == false) {
+            if (lineStyle.outline == false) {
 
                /*
                 * invert scaling of extrusion vectors so that line
                 * width stays the same.
                 */
-               if (line.fixed) {
-                  width = Math.max(line.width, 1) / scale;
+               if (lineStyle.fixed) {
+                  width = Math.max(lineStyle.width, 1) / scale;
                } else {
-                  width = lineBucket.scale * line.width / variableScale;
+                  width = lineBucket.scale * lineStyle.width / variableScale;
                }
 
                // factor to increase line width relative to scale
                gl.uniform1f(shader_u_width, (float) (width * COORD_SCALE_BY_DIR_SCALE));
 
                /* Line-edge fade */
-               if (line.blur > 0) {
-                  gl.uniform1f(uLineFade, line.blur);
+               if (lineStyle.blur > 0) {
+                  gl.uniform1f(shader_u_fade, lineStyle.blur);
                   isBlur = true;
                } else if (mode == SHADER_FLAT) {
-                  gl.uniform1f(uLineFade, (float) (pixel / width));
+                  gl.uniform1f(shader_u_fade, (float) (pixel / width));
                   //GL.uniform1f(uLineScale, (float)(pixel / (ll.width / s)));
                }
 
@@ -260,16 +259,16 @@ public class LineBucketMT extends RenderBucketMT {
                if (lineBucket.scale < 1.0) {
                   if (capMode != CAP_THIN) {
                      capMode = CAP_THIN;
-                     gl.uniform1i(uLineMode, capMode);
+                     gl.uniform1i(shader_u_mode, capMode);
                   }
                } else if (lineBucket.roundCap) {
                   if (capMode != CAP_ROUND) {
                      capMode = CAP_ROUND;
-                     gl.uniform1i(uLineMode, capMode);
+                     gl.uniform1i(shader_u_mode, capMode);
                   }
                } else if (capMode != CAP_BUTT) {
                   capMode = CAP_BUTT;
-                  gl.uniform1i(uLineMode, capMode);
+                  gl.uniform1i(shader_u_mode, capMode);
                }
 
                gl.drawArrays(GL.TRIANGLE_STRIP,
@@ -293,32 +292,32 @@ public class LineBucketMT extends RenderBucketMT {
                }
 
                // add outline width
-               if (line.fixed) {
-                  width += line.width / scale;
+               if (lineStyle.fixed) {
+                  width += lineStyle.width / scale;
                } else {
-                  width += lineBucket.scale * line.width / variableScale;
+                  width += lineBucket.scale * lineStyle.width / variableScale;
                }
 
                gl.uniform1f(shader_u_width,
                      (float) (width * COORD_SCALE_BY_DIR_SCALE));
 
                /* Line-edge fade */
-               if (line.blur > 0) {
-                  gl.uniform1f(uLineFade, line.blur);
+               if (lineStyle.blur > 0) {
+                  gl.uniform1f(shader_u_fade, lineStyle.blur);
                   isBlur = true;
                } else if (mode == SHADER_FLAT) {
-                  gl.uniform1f(uLineFade, (float) (pixel / width));
+                  gl.uniform1f(shader_u_fade, (float) (pixel / width));
                }
 
                /* Cap mode */
                if (ref.roundCap) {
                   if (capMode != CAP_ROUND) {
                      capMode = CAP_ROUND;
-                     gl.uniform1i(uLineMode, capMode);
+                     gl.uniform1i(shader_u_mode, capMode);
                   }
                } else if (capMode != CAP_BUTT) {
                   capMode = CAP_BUTT;
-                  gl.uniform1i(uLineMode, capMode);
+                  gl.uniform1i(shader_u_mode, capMode);
                }
 
                gl.drawArrays(GL.TRIANGLE_STRIP,
@@ -366,9 +365,18 @@ public class LineBucketMT extends RenderBucketMT {
       }
    }
 
-   static class Shader extends GLShaderMT {
+   private static class Shader extends GLShaderMT {
 
-      int uMVP, uFade, u_width, uColor, uMode, u_height, a_pos;
+      int shader_u_mvp,
+
+            shader_u_fade,
+            shader_u_color,
+            shader_u_mode,
+
+            shader_u_width,
+            shader_u_height,
+
+            shader_a_pos;
 
       Shader(final String shaderFile) {
 
@@ -376,22 +384,23 @@ public class LineBucketMT extends RenderBucketMT {
             return;
          }
 
-         uMVP = getUniform("u_mvp");
-         uFade = getUniform("u_fade");
-         uColor = getUniform("u_color");
-         uMode = getUniform("u_mode");
+         shader_u_mvp = getUniform("u_mvp");
 
-         u_width = getUniform("u_width");
-         u_height = getUniform("u_height");
+         shader_u_fade = getUniform("u_fade");
+         shader_u_color = getUniform("u_color");
+         shader_u_mode = getUniform("u_mode");
 
-         a_pos = getAttrib("a_pos");
+         shader_u_width = getUniform("u_width");
+         shader_u_height = getUniform("u_height");
+
+         shader_a_pos = getAttrib("a_pos");
       }
 
       @Override
       public boolean useProgram() {
 
          if (super.useProgram()) {
-            GLState.enableVertexArrays(a_pos, GLState.DISABLED);
+            GLState.enableVertexArrays(shader_a_pos, GLState.DISABLED);
             return true;
          }
 
@@ -702,6 +711,7 @@ public class LineBucketMT extends RenderBucketMT {
 
          //log.debug("acos " + dotp);
          if (dotp > 0.65) {
+
             /* add bevel join to avoid miter going to infinity */
             numVertices += 2;
 

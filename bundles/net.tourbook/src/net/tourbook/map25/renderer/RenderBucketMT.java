@@ -44,27 +44,30 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
     * Drawing order from bottom to top.
     */
    int                        level;
+
    /**
     * Number of vertices for this layer.
     */
    protected int              numVertices;
-
    protected int              numIndices;
+
    /**
     * Temporary list of vertex data.
     */
    protected final VertexData vertexItems;
-
    protected final VertexData indiceItems;
+
    final boolean              quads;
 
    protected int              vertexOffset;                // in bytes
-
    protected int              indiceOffset;                // in bytes
 
    protected RenderBucketMT(final byte type, final boolean indexed, final boolean quads) {
+
       this.type = type;
+
       vertexItems = new VertexData();
+
       if (indexed) {
          indiceItems = new VertexData();
       } else {
@@ -78,8 +81,10 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
     * Clear all resources.
     */
    protected void clear() {
+
       vertexItems.dispose();
       indiceItems.dispose();
+
       numVertices = 0;
       numIndices = 0;
    }
@@ -92,6 +97,7 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
    }
 
    protected void compileIndicesItems(final ShortBuffer iboData) {
+
       /* keep offset of layer data in ibo */
       if (indiceItems == null || indiceItems.empty()) {
          return;

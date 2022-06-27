@@ -39,13 +39,12 @@ public class HexagonRenderer extends BucketRenderer {
 
    private static final char NL = UI.NEW_LINE;
 
-   private int               _glHandle_ShaderProgram;
+   private int               _shaderProgram;
 
-   private int               _glHandle_a_pos_VertexPosition;
-   private int               _glHandle_u_mvp_MatrixPosition;
-
-   private int               _glHandle_u_color_ColorPosition;
-   private int               _glHandle_u_center_CenterPosition;
+   private int               _shader_a_pos_VertexPosition;
+   private int               _shader_u_mvp_MatrixPosition;
+   private int               _shader_u_color_ColorPosition;
+   private int               _shader_u_center_CenterPosition;
 
    private boolean           _isShaderSetup;
 
@@ -130,13 +129,13 @@ public class HexagonRenderer extends BucketRenderer {
       }
 
       // Handle for vertex position in shader
-      _glHandle_a_pos_VertexPosition = gl.getAttribLocation(programObject, "a_pos");
-      _glHandle_u_mvp_MatrixPosition = gl.getUniformLocation(programObject, "u_mvp");
-      _glHandle_u_color_ColorPosition = gl.getUniformLocation(programObject, "u_color");
-      _glHandle_u_center_CenterPosition = gl.getUniformLocation(programObject, "u_center");
+      _shader_a_pos_VertexPosition = gl.getAttribLocation(programObject, "a_pos");
+      _shader_u_mvp_MatrixPosition = gl.getUniformLocation(programObject, "u_mvp");
+      _shader_u_color_ColorPosition = gl.getUniformLocation(programObject, "u_color");
+      _shader_u_center_CenterPosition = gl.getUniformLocation(programObject, "u_center");
 
       // Store the program object
-      _glHandle_ShaderProgram = programObject;
+      _shaderProgram = programObject;
 
       return true;
    }
@@ -144,11 +143,11 @@ public class HexagonRenderer extends BucketRenderer {
    @Override
    public void render(final GLViewport viewport) {
 
-      System.out.println((System.currentTimeMillis() + " net.tourbook.map25.HexagonRenderer.render(GLViewport) " + mMapPosition));
-      // TODO remove SYSTEM.OUT.PRINTLN
+//      System.out.println((System.currentTimeMillis() + " net.tourbook.map25.HexagonRenderer.render(GLViewport) " + mMapPosition));
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
       // Use the program object
-      GLState.useProgram(_glHandle_ShaderProgram);
+      GLState.useProgram(_shaderProgram);
 
       GLState.blend(true);
       GLState.test(false, false);
@@ -157,15 +156,15 @@ public class HexagonRenderer extends BucketRenderer {
       _vbo.bind();
 
       // set VBO vertex layout
-      gl.vertexAttribPointer(_glHandle_a_pos_VertexPosition, 2, GL.FLOAT, false, 0, 0);
+      gl.vertexAttribPointer(_shader_a_pos_VertexPosition, 2, GL.FLOAT, false, 0, 0);
 
-      GLState.enableVertexArrays(_glHandle_a_pos_VertexPosition, GLState.DISABLED);
+      GLState.enableVertexArrays(_shader_a_pos_VertexPosition, GLState.DISABLED);
 
       /* apply view and projection matrices */
       // set mvp (tmp) matrix relative to mMapPosition
       // i.e. fixed on the map
       setMatrix(viewport);
-      viewport.mvp.setAsUniform(_glHandle_u_mvp_MatrixPosition);
+      viewport.mvp.setAsUniform(_shader_u_mvp_MatrixPosition);
 
       /*
        * Draw hexagon cells
@@ -183,7 +182,7 @@ public class HexagonRenderer extends BucketRenderer {
 
             final float xPos = xx * (_cellScale * 1.5f);
             final float yPos = yy * _cellScale;
-            gl.uniform2f(_glHandle_u_center_CenterPosition, xPos, yPos);
+            gl.uniform2f(_shader_u_center_CenterPosition, xPos, yPos);
 
             //float alpha = 1 + (float) Math.log10(FastMath.clamp(
             //        (float) Math.sqrt(xx * xx + yy * yy) / offset_y, 0.0f, 1.0f)) * 2;
@@ -206,7 +205,7 @@ public class HexagonRenderer extends BucketRenderer {
                   | (int) (0xff * fx) << 8
                   | (int) (0xff * fz);
 
-            GLUtils.setColor(_glHandle_u_color_ColorPosition, color, alpha);
+            GLUtils.setColor(_shader_u_color_ColorPosition, color, alpha);
 
             gl.drawArrays(GL.TRIANGLE_FAN, 0, 6);
          }
@@ -215,14 +214,15 @@ public class HexagonRenderer extends BucketRenderer {
       /*
        * Draw cell border
        */
-      GLUtils.setColor(_glHandle_u_color_ColorPosition, Color.DKGRAY, 0.3f);
+      GLUtils.setColor(_shader_u_color_ColorPosition, Color.DKGRAY, 0.3f);
 
       for (int y = -offset_y; y < offset_y; y++) {
          for (int x = -offset_x; x < offset_x; x++) {
+
             final float xx = x * 2 + (y % 2 == 0 ? 1 : 0);
             final float yy = y * h + h / 2;
 
-            gl.uniform2f(_glHandle_u_center_CenterPosition, xx * (_cellScale * 1.5f), yy * _cellScale);
+            gl.uniform2f(_shader_u_center_CenterPosition, xx * (_cellScale * 1.5f), yy * _cellScale);
             gl.drawArrays(GL.LINE_LOOP, 0, 6);
          }
       }
