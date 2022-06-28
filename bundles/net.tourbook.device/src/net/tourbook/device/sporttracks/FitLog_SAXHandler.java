@@ -687,6 +687,11 @@ public class FitLog_SAXHandler extends DefaultHandler {
 
       if (_currentActivity.avgPower != 0) {
          tourData.setPower_Avg(_currentActivity.avgPower);
+      } else {
+         final float[] powerSerie = tourData.getPowerSerie();
+         if (powerSerie != null) {
+            tourData.setPower_Avg(tourData.computeAvg_FromValues(powerSerie, 0, powerSerie.length - 1));
+         }
       }
       if (_currentActivity.maxPower != 0) {
          tourData.setPower_Max((int) (_currentActivity.maxPower + 0.5));
