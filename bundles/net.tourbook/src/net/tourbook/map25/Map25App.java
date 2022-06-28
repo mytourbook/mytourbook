@@ -1248,9 +1248,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 // SET_FORMATTING_ON
 
-      if (_mapCenter_VerticalPosition_IsEnabled) {
-         mMap.viewport().setMapViewCenterY(_mapCenter_VerticalPosition / 10.0f);
-      }
+      updateMap_VericalCenter();
 
       mMap.setMapPosition(mapPosition);
    }
@@ -1394,21 +1392,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _mapCenter_VerticalPosition_IsEnabled = isMapCenter_VerticalPosition;
       _mapCenter_VerticalPosition = mapCenter_VerticalPostion;
 
-      final float newMapCenter_VerticalPosition = _mapCenter_VerticalPosition_IsEnabled
-
-            // -100...100 -> +1...-1  invert sign that the top value is positive and not negative
-            ? _mapCenter_VerticalPosition / -MAP_CENTER_VERTICAL_MAX_VALUE
-
-            // set default value which is about the vertical center
-            : 0;
-
-      final ViewController viewport = mMap.viewport();
-
-      viewport.setMapViewCenterY(newMapCenter_VerticalPosition);
+      updateMap_VericalCenter();
 
       // update map, this must be run in the "main" thread
       mMap.post(() -> {
-         viewport.tiltMap(0.0001f);
+         mMap.viewport().tiltMap(0.0001f);
       });
    }
 
@@ -1905,6 +1893,22 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    public void updateMap() {
 
       mMap.updateMap();
+   }
+
+   /**
+    * Set map vertical center in the map viewport
+    */
+   private void updateMap_VericalCenter() {
+
+      final float newMapCenter_VerticalPosition = _mapCenter_VerticalPosition_IsEnabled
+
+            // -100...100 -> +1...-1  invert sign that the top value is positive and not negative
+            ? _mapCenter_VerticalPosition / -MAP_CENTER_VERTICAL_MAX_VALUE
+
+            // set default value which is about the vertical middle
+            : 0;
+
+      mMap.viewport().setMapViewCenterY(newMapCenter_VerticalPosition);
    }
 
 }

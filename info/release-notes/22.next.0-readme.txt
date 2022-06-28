@@ -32,12 +32,12 @@ Improvements
 ============
 
 * 2D Map
-  - Goto location                                  https://github.com/mytourbook/mytourbook/issues/884
-  - Copy location to clipboard
+  - Goto latitude/longitude location                        https://github.com/mytourbook/mytourbook/issues/884
+  - Copy geo location to clipboard
   
 * 2.5D Map
-  - Paint tour track with a vertical offset       
-
+  - Paint tour track with a vertical offset                 https://github.com/mytourbook/mytourbook/issues/889
+  - Set vertical position for the map tilt rotation axis    https://github.com/mytourbook/mytourbook/issues/890
 
 
 Changes
