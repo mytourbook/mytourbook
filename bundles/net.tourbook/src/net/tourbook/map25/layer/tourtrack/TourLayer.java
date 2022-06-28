@@ -26,9 +26,9 @@ import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.marker.MarkerShape;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
+import net.tourbook.map25.renderer.AllRenderBucketsMT;
 import net.tourbook.map25.renderer.BucketRendererMT;
 import net.tourbook.map25.renderer.LineBucketMT;
-import net.tourbook.map25.renderer.AllRenderBucketsMT;
 
 import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Paint;
@@ -88,7 +88,7 @@ public class TourLayer extends Layer {
 //			System.out.println((UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ") + ("\t\t\tupdate()"));
 //			// TODO remove SYSTEM.OUT.PRINTLN
 
-         if (!isEnabled()) {
+         if (isEnabled() == false) {
             return;
          }
 
@@ -134,7 +134,7 @@ public class TourLayer extends Layer {
    private final static class TourRenderTask {
 
       AllRenderBucketsMT __renderBuckets = new AllRenderBucketsMT();
-      MapPosition     __mapPos        = new MapPosition();
+      MapPosition        __mapPos        = new MapPosition();
    }
 
    final class Worker extends SimpleWorker<TourRenderTask> {
@@ -245,7 +245,6 @@ public class TourLayer extends Layer {
          lineBucket.line = _lineStyle;
 
 //         lineBucket.next
-
 
          final MapPosition mapPos = task.__mapPos;
          mMap.getMapPosition(mapPos);

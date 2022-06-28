@@ -68,6 +68,7 @@ public class AllRenderBucketsMT extends TileData {
    static {
 
       final short s = (short) (Tile.SIZE * COORD_SCALE);
+
       fillShortCoords = new short[] { 0, s, s, s, 0, 0, s, 0 };
    }
 
@@ -75,11 +76,12 @@ public class AllRenderBucketsMT extends TileData {
 
    /**
     * VBO holds all vertex data to draw lines and polygons after compilation.
+    * <p>
     * Layout:
-    * 16 bytes fill coordinates
-    * ({@link #TILE_FILL_VERTICES} * {@link #SHORT_BYTES} * coordsPerVertex),
-    * n bytes polygon vertices,
-    * m bytes lines vertices
+    * - 16 bytes fill coordinates:
+    * {@link #TILE_FILL_VERTICES} * {@link #SHORT_BYTES} * coordsPerVertex
+    * - n bytes polygon vertices
+    * - m bytes lines vertices
     * ...
     */
    public BufferObject    vbo;
@@ -88,9 +90,10 @@ public class AllRenderBucketsMT extends TileData {
 
    /**
     * To not need to switch VertexAttribPointer positions all the time:
-    * 1. polygons are packed in VBO at offset 0
-    * 2. lines afterwards at lineOffset
-    * 3. other buckets keep their byte offset in offset
+    * <p>
+    * <li>1. polygons are packed in VBO at offset 0</li>
+    * <li>2. lines afterwards at lineOffset</li>
+    * <li>3. other buckets keep their byte offset in offset</li>
     */
    public int[]           offset = { 0, 0 };
 
@@ -135,14 +138,18 @@ public class AllRenderBucketsMT extends TileData {
     * ordered from bottom (0) to top
     */
    public LineBucketMT addLineBucket(final int level, final LineStyle style) {
-      final LineBucketMT l = (LineBucketMT) getBucket(level, LINE);
-      if (l == null) {
+
+      final LineBucketMT lineBucket = (LineBucketMT) getBucket(level, LINE);
+
+      if (lineBucket == null) {
          return null;
       }
+
       // FIXME l.scale = style.width;
-      l.scale = 1;
-      l.line = style;
-      return l;
+      lineBucket.scale = 1;
+      lineBucket.line = style;
+
+      return lineBucket;
    }
 
 //    public MeshBucket addMeshBucket(final int level, final AreaStyle style) {
@@ -163,7 +170,11 @@ public class AllRenderBucketsMT extends TileData {
 //        return l;
 //    }
 
+   /**
+    * Binds vbo and ibo
+    */
    public void bind() {
+
       if (vbo != null) {
          vbo.bind();
       }
@@ -212,8 +223,10 @@ public class AllRenderBucketsMT extends TileData {
       int vboSize = countVboSize();
 
       if (vboSize <= 0) {
+
          vbo = BufferObject.release(vbo);
          ibo = BufferObject.release(ibo);
+
          return false;
       }
 
@@ -234,48 +247,67 @@ public class AllRenderBucketsMT extends TileData {
          iboData = MapRenderer.getShortBuffer(iboSize);
       }
 
-      int pos = addFill ? TILE_FILL_VERTICES : 0;
+      int vertexOffset = addFill ? TILE_FILL_VERTICES : 0;
 
-      for (RenderBucketMT l = _allBuckets; l != null; l = l.next) {
-         if (l.type == POLYGON) {
-            l.compile(vboData, iboData);
-            l.vertexOffset = pos;
-            pos += l.numVertices;
+      /*
+       * Compile polygons
+       */
+      for (RenderBucketMT oneBucket = _allBuckets; oneBucket != null; oneBucket = oneBucket.next) {
+
+         if (oneBucket.type == POLYGON) {
+
+            oneBucket.compile(vboData, iboData);
+            oneBucket.vertexOffset = vertexOffset;
+
+            vertexOffset += oneBucket.numVertices;
          }
       }
 
+      /*
+       * Compile lines
+       */
       offset[LINE] = vboData.position() * SHORT_BYTES;
-      pos = 0;
-      for (RenderBucketMT l = _allBuckets; l != null; l = l.next) {
-         if (l.type == LINE) {
-            l.compile(vboData, iboData);
+      vertexOffset = 0;
+      for (RenderBucketMT oneBucket = _allBuckets; oneBucket != null; oneBucket = oneBucket.next) {
 
-            l.vertexOffset = pos;
-            pos += l.numVertices;
+         if (oneBucket.type == LINE) {
+
+            oneBucket.compile(vboData, iboData);
+            oneBucket.vertexOffset = vertexOffset;
+
+            vertexOffset += oneBucket.numVertices;
          }
       }
 
-      for (RenderBucketMT l = _allBuckets; l != null; l = l.next) {
-         if (l.type != LINE && l.type != POLYGON) {
-            l.compile(vboData, iboData);
+      /*
+       * Compile others
+       */
+      for (RenderBucketMT oneBucket = _allBuckets; oneBucket != null; oneBucket = oneBucket.next) {
+
+         if (oneBucket.type != LINE && oneBucket.type != POLYGON) {
+            oneBucket.compile(vboData, iboData);
          }
       }
 
       if (vboSize != vboData.position()) {
+
          log.debug("wrong vertex buffer size: "
                + " new size: " + vboSize
                + " buffer pos: " + vboData.position()
                + " buffer limit: " + vboData.limit()
                + " buffer fill: " + vboData.remaining());
+
          return false;
       }
 
       if (iboSize > 0 && iboSize != iboData.position()) {
+
          log.debug("wrong indice buffer size: "
                + " new size: " + iboSize
                + " buffer pos: " + iboData.position()
                + " buffer limit: " + iboData.limit()
                + " buffer fill: " + iboData.remaining());
+
          return false;
       }
 
@@ -287,6 +319,7 @@ public class AllRenderBucketsMT extends TileData {
       vbo.loadBufferData(vboData.flip(), vboSize * SHORT_BYTES);
 
       if (iboSize > 0) {
+
          if (ibo == null) {
             ibo = BufferObject.get(GL.ELEMENT_ARRAY_BUFFER, iboSize);
          }

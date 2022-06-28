@@ -26,17 +26,17 @@ import org.oscim.utils.pool.Inlist;
 
 public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
 
-   public static final byte   LINE      = 0;
-   public static final byte   TEXLINE   = 1;
-   public static final byte   POLYGON   = 2;
-   public static final byte   MESH      = 3;
-   public static final byte   EXTRUSION = 4;
-   public static final byte   HAIRLINE  = 5;
-   public static final byte   SYMBOL    = 6;
-   public static final byte   BITMAP    = 7;
-   public static final byte   CIRCLE    = 8;
+   public static final byte LINE = 0;
+//   public static final byte   TEXLINE   = 1;
+//   public static final byte   POLYGON   = 2;
+//   public static final byte   MESH      = 3;
+//   public static final byte   EXTRUSION = 4;
+//   public static final byte   HAIRLINE  = 5;
+//   public static final byte   SYMBOL    = 6;
+//   public static final byte   BITMAP    = 7;
+//   public static final byte   CIRCLE    = 8;
 
-   static final VertexData    EMPTY     = new VertexData();
+   static final VertexData    EMPTY = new VertexData();
 
    public final byte          type;
 
@@ -59,8 +59,8 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
 
    final boolean              quads;
 
-   protected int              vertexOffset;                // in bytes
-   protected int              indiceOffset;                // in bytes
+   protected int              vertexOffset;            // in bytes
+   protected int              indiceOffset;            // in bytes
 
    protected RenderBucketMT(final byte type, final boolean indexed, final boolean quads) {
 
@@ -90,7 +90,9 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
    }
 
    protected void compile(final ShortBuffer vboData, final ShortBuffer iboData) {
+
       compileVertexItems(vboData);
+
       if (iboData != null) {
          compileIndicesItems(iboData);
       }
@@ -108,7 +110,10 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
    }
 
    protected void compileVertexItems(final ShortBuffer vboData) {
-      /* keep offset of layer data in vbo */
+
+      /*
+       * Keep offset of layer data in vbo
+       */
       vertexOffset = vboData.position() * RenderBuckets.SHORT_BYTES;
       vertexItems.compile(vboData);
    }

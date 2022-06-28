@@ -37,26 +37,26 @@ import org.slf4j.LoggerFactory;
  */
 public class BucketRendererMT extends LayerRenderer {
 
-   public static final Logger   log             = LoggerFactory.getLogger(BucketRendererMT.class);
+   public static final Logger         log             = LoggerFactory.getLogger(BucketRendererMT.class);
 
    /**
     * Use mMapPosition.copy(position) to keep the position for which
     * the Overlay is *compiled*. NOTE: required by setMatrix utility
     * functions to draw this layer fixed to the map
     */
-   protected MapPosition        mMapPosition;
+   protected MapPosition              mMapPosition;
 
    /**
     * Wrap around dateline
     */
-   protected boolean            mFlipOnDateLine = true;
+   protected boolean                  mFlipOnDateLine = true;
 
    /**
     * Buckets for rendering
     */
-   public final AllRenderBucketsMT allBuckets;
+   protected final AllRenderBucketsMT allBuckets;
 
-   protected boolean            mInitialized;
+   protected boolean                  mInitialized;
 
    public BucketRendererMT() {
 
@@ -94,44 +94,48 @@ public class BucketRendererMT extends LayerRenderer {
 
       for (RenderBucketMT bucket = allBuckets.get(); bucket != null;) {
 
+         // performs GL.bindBuffer() for the vbo
          allBuckets.bind();
 
-         if (!isProjected && bucket.type != SYMBOL) {
+         if (isProjected == false && bucket.type != SYMBOL) {
             isProjected = true;
             setMatrix(viewport, isProjected);
          }
 
          switch (bucket.type) {
-//                case POLYGON:
-//                    b = PolygonBucket.Renderer.draw(b, v, 1, true);
-//                    break;
+
+//       case POLYGON:
+//           b = PolygonBucket.Renderer.draw(b, v, 1, true);
+//           break;
+
          case LINE:
             bucket = LineBucketMT.Renderer.draw(bucket, viewport, div, allBuckets);
             break;
-//                case TEXLINE:
-//                    b = LineTexBucket.Renderer.draw(b, v,
-//                            FastMath.pow(layerPos.zoomLevel - v.pos.zoomLevel) * (float) layerPos.getZoomScale(),
-//                            buckets);
-//                    break;
-//                case MESH:
-//                    b = MeshBucket.Renderer.draw(b, v);
-//                    break;
-//                case HAIRLINE:
-//                    b = HairLineBucket.Renderer.draw(b, v);
-//                    break;
-//                case BITMAP:
-//                    b = BitmapBucket.Renderer.draw(b, v, 1, 1);
-//                    break;
-//                case SYMBOL:
-//                    if (project) {
-//                        project = false;
-//                        setMatrix(v, project);
-//                    }
-//                    b = TextureBucket.Renderer.draw(b, v, div);
-//                    break;
-//                case CIRCLE:
-//                    b = CircleBucket.Renderer.draw(b, v);
-//                    break;
+
+//       case TEXLINE:
+//           b = LineTexBucket.Renderer.draw(b, v,
+//                   FastMath.pow(layerPos.zoomLevel - v.pos.zoomLevel) * (float) layerPos.getZoomScale(),
+//                   buckets);
+//           break;
+//       case MESH:
+//           b = MeshBucket.Renderer.draw(b, v);
+//           break;
+//       case HAIRLINE:
+//           b = HairLineBucket.Renderer.draw(b, v);
+//           break;
+//       case BITMAP:
+//           b = BitmapBucket.Renderer.draw(b, v, 1, 1);
+//           break;
+//       case SYMBOL:
+//           if (project) {
+//               project = false;
+//               setMatrix(v, project);
+//           }
+//           b = TextureBucket.Renderer.draw(b, v, div);
+//           break;
+//       case CIRCLE:
+//           b = CircleBucket.Renderer.draw(b, v);
+//           break;
          default:
             log.error("invalid bucket {}", bucket.type);
             bucket = bucket.next;

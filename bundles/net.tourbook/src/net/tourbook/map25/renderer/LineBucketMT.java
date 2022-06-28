@@ -37,53 +37,52 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Note:
- * Coordinates must be in range +/- (Short.MAX_VALUE / COORD_SCALE) if using GL.SHORT.
+ * <p>
+ * Coordinates must be in range +/- (Short.MAX_VALUE / COORD_SCALE) if using GL.SHORT
+ * <p>
  * The maximum resolution for coordinates is 0.25 as points will be converted
  * to fixed point values.
  */
 public class LineBucketMT extends RenderBucketMT {
 
-   static final Logger         log             = LoggerFactory.getLogger(LineBucketMT.class);
+   static final Logger        log       = LoggerFactory.getLogger(LineBucketMT.class);
 
-   private static final char   NL              = UI.NEW_LINE;
+   private static final char  NL        = UI.NEW_LINE;
 
    /**
-    * scale factor mapping extrusion vector to short values
+    * Scale factor mapping extrusion vector to short values
     */
-   public static final float   DIR_SCALE       = 2048;
+   public static final float  DIR_SCALE = 2048;
 
    /**
-    * maximal resolution
+    * Maximal resolution
     */
-   public static final float   MIN_DIST        = 1 / 8f;
+   public static final float  MIN_DIST  = 1 / 8f;
 
    /**
-    * not quite right.. need to go back so that additional
+    * Not quite right.. need to go back so that additional
     * bevel vertices are at least MIN_DIST apart
     */
-   private static final float  MIN_BEVEL       = MIN_DIST * 4;
+   private static final float MIN_BEVEL = MIN_DIST * 4;
 
    /**
     * mask for packing last two bits of extrusion vector with texture
     * coordinates
     */
-   private static final int    DIR_MASK        = 0xFFFFFFFC;
-
-   private static final double STROKE_INCREASE = 1.4;
-   private static final byte   STROKE_MIN_ZOOM = 12;
+   private static final int   DIR_MASK  = 0xFFFFFFFC;
 
    /* lines referenced by this outline layer */
    public LineBucketMT outlines;
    public LineStyle    line;
-   public float        scale     = 1;
+   public float        scale            = 1;
 
-   public boolean      roundCap;
-   private float       mMinDist  = MIN_DIST;
-   private float       mMinBevel = MIN_BEVEL;
+   private boolean     _isCapRounded;
+   private float       _minimumDistance = MIN_DIST;
+   private float       _minimumBevel    = MIN_BEVEL;
 
    public float        heightOffset;
 
-   private int         tmin      = Integer.MIN_VALUE, tmax = Integer.MAX_VALUE;
+   private int         tmin             = Integer.MIN_VALUE, tmax = Integer.MAX_VALUE;
 
    public static final class Renderer {
 
@@ -92,7 +91,9 @@ public class LineBucketMT extends RenderBucketMT {
        * http://http.developer.nvidia.com/GPUGems2/gpugems2_chapter22.html
        */
 
-      /* factor to normalize extrusion vector and scale to coord scale */
+      /**
+       * Factor to normalize extrusion vector and scale to coord scale
+       */
       private static final float COORD_SCALE_BY_DIR_SCALE = COORD_SCALE / DIR_SCALE;
 
       private static final int   CAP_THIN                 = 0;
@@ -124,19 +125,20 @@ public class LineBucketMT extends RenderBucketMT {
                // 0 == projected
                : SHADER_PROJECTED;
 
-//         mode = mode;
+//       mode = mode;
          mode = SHADER_FLAT;
 
          final Shader shader = _shaders[mode];
+
+         // is calling GL.enableVertexAttribArray() for shader_a_pos
          shader.useProgram();
 
          GLState.blend(true);
 
          /*
-          * Somehow we loose the texture after an indefinite
-          * time, when label/symbol textures are used.
-          * Debugging gl on Desktop is most fun imaginable,
-          * so for now:
+          * Somehow we loose the texture after an indefinite time, when label/symbol textures are
+          * used.
+          * Debugging gl on Desktop is most fun imaginable, so for now:
           */
          if (!GLAdapter.GDX_DESKTOP_QUIRKS) {
             GLState.bindTex2D(_textureID);
@@ -148,16 +150,19 @@ public class LineBucketMT extends RenderBucketMT {
          final int shader_u_width = shader.shader_u_width;
          final int shader_u_height = shader.shader_u_height;
 
-         gl.vertexAttribPointer(shader.shader_a_pos,
-               4,
-               GL.SHORT,
-               false,
-               0,
-               buckets.offset[LINE]);
+         gl.vertexAttribPointer(
+
+               shader.shader_a_pos, //    index of the vertex attribute that is to be modified
+               4, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
+               GL.SHORT, //               data type of each component in the array
+               false, //                  values should be normalized
+               0, //                      offset in bytes between the beginning of consecutive vertex attributes
+               buckets.offset[LINE] //    offset in bytes of the first component in the vertex attribute array
+         );
 
          viewport.mvp.setAsUniform(shader.shader_u_mvp);
 
-//         final double groundResolution = MercatorProjection.groundResolution(mapPosition);
+//       final double groundResolution = MercatorProjection.groundResolution(mapPosition);
 
          /*
           * Line scale factor for non fixed lines: Within a zoom-
@@ -168,15 +173,15 @@ public class LineBucketMT extends RenderBucketMT {
          final double variableScale = Math.sqrt(scale);
 
          /*
-          * scale factor to map one pixel on tile to one pixel on screen:
+          * Scale factor to map one pixel on tile to one pixel on screen:
           * used with orthographic projection, (shader mode == 1)
           */
          final double pixel = (mode == SHADER_PROJECTED)
                ? 0.0001
                : 1.5 / scale;
 
-//         System.out.println((System.currentTimeMillis() + " pixel:" + pixel + "  scale:" + scale));
-//         // TODO remove SYSTEM.OUT.PRINTLN
+//       System.out.println((System.currentTimeMillis() + " pixel:" + pixel + "  scale:" + scale));
+//       // TODO remove SYSTEM.OUT.PRINTLN
 
          gl.uniform1f(shader_u_fade, (float) pixel);
 
@@ -189,10 +194,7 @@ public class LineBucketMT extends RenderBucketMT {
          float heightOffset = 0;
          gl.uniform1f(shader_u_height, heightOffset);
 
-         //    if (1 == 1)
-         //        return b.next;
-         //
-         for (; renderBucket != null && renderBucket.type == RenderBucketMT.LINE; renderBucket = renderBucket.next) {
+         for (; renderBucket != null && renderBucket.type == LINE; renderBucket = renderBucket.next) {
 
             final LineBucketMT lineBucket = (LineBucketMT) renderBucket;
             final LineStyle lineStyle = lineBucket.line.current();
@@ -230,11 +232,13 @@ public class LineBucketMT extends RenderBucketMT {
                isBlur = false;
             }
 
-            /* draw LineLayer */
+            /*
+             * Draw LineLayer
+             */
             if (lineStyle.outline == false) {
 
                /*
-                * invert scaling of extrusion vectors so that line
+                * Invert scaling of extrusion vectors so that line
                 * width stays the same.
                 */
                if (lineStyle.fixed) {
@@ -261,7 +265,7 @@ public class LineBucketMT extends RenderBucketMT {
                      capMode = CAP_THIN;
                      gl.uniform1i(shader_u_mode, capMode);
                   }
-               } else if (lineBucket.roundCap) {
+               } else if (lineBucket._isCapRounded) {
                   if (capMode != CAP_ROUND) {
                      capMode = CAP_ROUND;
                      gl.uniform1i(shader_u_mode, capMode);
@@ -272,14 +276,15 @@ public class LineBucketMT extends RenderBucketMT {
                }
 
                gl.drawArrays(GL.TRIANGLE_STRIP,
-                     renderBucket.vertexOffset,
-                     renderBucket.numVertices);
+                     lineBucket.vertexOffset,
+                     lineBucket.numVertices);
 
                continue;
             }
 
-            /* draw LineLayers references by this outline */
-
+            /*
+             * Draw LineLayers references by this outline
+             */
             for (LineBucketMT ref = lineBucket.outlines; ref != null; ref = ref.outlines) {
 
                final LineStyle core = ref.line.current();
@@ -310,7 +315,7 @@ public class LineBucketMT extends RenderBucketMT {
                }
 
                /* Cap mode */
-               if (ref.roundCap) {
+               if (ref._isCapRounded) {
                   if (capMode != CAP_ROUND) {
                      capMode = CAP_ROUND;
                      gl.uniform1i(shader_u_mode, capMode);
@@ -367,22 +372,26 @@ public class LineBucketMT extends RenderBucketMT {
 
    private static class Shader extends GLShaderMT {
 
-      int shader_u_mvp,
+      int shader_a_pos,
+
+            shader_u_mvp,
 
             shader_u_fade,
             shader_u_color,
             shader_u_mode,
 
             shader_u_width,
-            shader_u_height,
+            shader_u_height
 
-            shader_a_pos;
+      ;
 
       Shader(final String shaderFile) {
 
          if (!createMT(shaderFile)) {
             return;
          }
+
+         shader_a_pos = getAttrib("a_pos");
 
          shader_u_mvp = getUniform("u_mvp");
 
@@ -392,15 +401,15 @@ public class LineBucketMT extends RenderBucketMT {
 
          shader_u_width = getUniform("u_width");
          shader_u_height = getUniform("u_height");
-
-         shader_a_pos = getAttrib("a_pos");
       }
 
       @Override
       public boolean useProgram() {
 
          if (super.useProgram()) {
+
             GLState.enableVertexArrays(shader_a_pos, GLState.DISABLED);
+
             return true;
          }
 
@@ -423,7 +432,7 @@ public class LineBucketMT extends RenderBucketMT {
          addLine(points, null, numPoints, isCapClosed);
       }
 
-      System.out.println((System.currentTimeMillis() + " numPoints:" + numPoints));
+      System.out.println((System.currentTimeMillis() + "addLine - numPoints:" + numPoints));
 // TODO remove SYSTEM.OUT.PRINTLN
    }
 
@@ -454,7 +463,7 @@ public class LineBucketMT extends RenderBucketMT {
             }
          }
       }
-      roundCap = isCapRounded;
+      _isCapRounded = isCapRounded;
 
       int numIndices;
       int length = 0;
@@ -700,7 +709,7 @@ public class LineBucketMT extends RenderBucketMT {
          xyDistance = Math.sqrt(vNextX * vNextX + vNextY * vNextY);
 
          /* skip two vertex segments */
-         if (xyDistance < mMinDist) {
+         if (xyDistance < _minimumDistance) {
             numVertices -= 2;
             continue;
          }
@@ -742,22 +751,22 @@ public class LineBucketMT extends RenderBucketMT {
                }
 
                //log.debug("aside " + a + " " + ux + " " + uy);
-               px = curX - ux * mMinBevel;
-               py = curY - uy * mMinBevel;
-               curX = curX + ux * mMinBevel;
-               curY = curY + uy * mMinBevel;
+               px = curX - ux * _minimumBevel;
+               py = curY - uy * _minimumBevel;
+               curX = curX + ux * _minimumBevel;
+               curY = curY + uy * _minimumBevel;
 
             } else {
 
                //log.debug("back");
 
                /* go back by min dist */
-               px = curX + vPrevX * mMinBevel;
-               py = curY + vPrevY * mMinBevel;
+               px = curX + vPrevX * _minimumBevel;
+               py = curY + vPrevY * _minimumBevel;
 
                /* go forward by min dist */
-               curX = curX + vNextX * mMinBevel;
-               curY = curY + vNextY * mMinBevel;
+               curX = curX + vNextX * _minimumBevel;
+               curY = curY + vNextY * _minimumBevel;
             }
 
             /* unit vector pointing forward to next node */
@@ -915,14 +924,14 @@ public class LineBucketMT extends RenderBucketMT {
     * Default is MIN_DIST * 4 = 1/8 * 4.
     */
    public void setBevelDistance(final float minBevel) {
-      mMinBevel = minBevel;
+      _minimumBevel = minBevel;
    }
 
    /**
     * For point reduction by minimal distance. Default is 1/8.
     */
    public void setDropDistance(final float minDist) {
-      mMinDist = minDist;
+      _minimumDistance = minDist;
    }
 
    public void setExtents(final int min, final int max) {
