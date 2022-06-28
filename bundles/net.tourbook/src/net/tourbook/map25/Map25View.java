@@ -296,7 +296,8 @@ public class Map25View extends ViewPart implements
 
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-         return new SlideoutMap25_MapOptions(_parent, toolbar);
+
+         return new SlideoutMap25_MapOptions(_parent, toolbar, Map25View.this);
       }
 
       @Override
@@ -511,17 +512,13 @@ public class Map25View extends ViewPart implements
    public void actionZoomIn() {
       final Map map25 = _mapApp.getMap();
 
-      map25.post(new Runnable() {
+      map25.post(() -> {
 
-         @Override
-         public void run() {
+         final Animator animator = map25.animator();
 
-            final Animator animator = map25.animator();
-
-            animator.cancel();
-            animator.animateZoom(500, _zoomFactor, 0, 0);
-            map25.updateMap();
-         }
+         animator.cancel();
+         animator.animateZoom(500, _zoomFactor, 0, 0);
+         map25.updateMap();
       });
 
    }
@@ -529,17 +526,13 @@ public class Map25View extends ViewPart implements
    public void actionZoomOut() {
       final Map map25 = _mapApp.getMap();
 
-      map25.post(new Runnable() {
+      map25.post(() -> {
 
-         @Override
-         public void run() {
+         final Animator animator = map25.animator();
 
-            final Animator animator = map25.animator();
-
-            animator.cancel();
-            animator.animateZoom(500, 1 / _zoomFactor, 0, 0);
-            map25.updateMap();
-         }
+         animator.cancel();
+         animator.animateZoom(500, 1 / _zoomFactor, 0, 0);
+         map25.updateMap();
       });
 
    }
@@ -557,22 +550,18 @@ public class Map25View extends ViewPart implements
 
       final Map map25 = _mapApp.getMap();
 
-      map25.post(new Runnable() {
+      map25.post(() -> {
 
-         @Override
-         public void run() {
+         final Animator animator = map25.animator();
 
-            final Animator animator = map25.animator();
+         animator.cancel();
+         animator.animateTo(//
+               2000,
+               _boundingBox,
+               Easing.Type.SINE_INOUT,
+               Animator.ANIM_MOVE | Animator.ANIM_SCALE);
 
-            animator.cancel();
-            animator.animateTo(//
-                  2000,
-                  _boundingBox,
-                  Easing.Type.SINE_INOUT,
-                  Animator.ANIM_MOVE | Animator.ANIM_SCALE);
-
-            map25.updateMap();
-         }
+         map25.updateMap();
       });
 
    }
@@ -1517,23 +1506,19 @@ public class Map25View extends ViewPart implements
 
       if (isSyncWithSlider == false) {
 
-         map25.post(new Runnable() {
+         map25.post(() -> {
 
-            @Override
-            public void run() {
+            // create outside isSynch that data are available when map is zoomed to show the whole tour
+            _boundingBox = createBoundingBox(_allGeoPoints);
 
-               // create outside isSynch that data are available when map is zoomed to show the whole tour
-               _boundingBox = createBoundingBox(_allGeoPoints);
-
-               if (_mapSynchedWith == MapSync.WITH_TOUR) {
+            if (_mapSynchedWith == MapSync.WITH_TOUR) {
 
 //						final int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
-                  final int animationTime = Map25ConfigManager.DEFAULT_ANIMATION_TIME;
-                  Map25ConfigManager.setMapLocation(map25, _boundingBox, animationTime);
-               }
-
-               map25.updateMap();
+               final int animationTime = Map25ConfigManager.DEFAULT_ANIMATION_TIME;
+               Map25ConfigManager.setMapLocation(map25, _boundingBox, animationTime);
             }
+
+            map25.updateMap();
          });
 
       } else {

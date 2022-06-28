@@ -122,30 +122,34 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * <b>Before releasing, set this to <code>true</code></b>
     * <p>
     */
-   private static final boolean    IS_USING_VTM_PRODUCTION_PLUGIN         = true;
+   private static final boolean    IS_USING_VTM_PRODUCTION_PLUGIN                = true;
    //
-   private static final String     STATE_LAYER_BUILDING_IS_SHOW_SHADOW    = "STATE_LAYER_BUILDING_IS_SHOW_SHADOW";    //$NON-NLS-1$
-   private static final String     STATE_LAYER_BUILDING_IS_VISIBLE        = "STATE_LAYER_BUILDING_IS_VISIBLE";        //$NON-NLS-1$
-   private static final String     STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL    = "STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL";    //$NON-NLS-1$
-   private static final String     STATE_LAYER_BUILDING_SUN_DAY_TIME      = "STATE_LAYER_BUILDING_SUN_DAY_TIME";      //$NON-NLS-1$
-   private static final String     STATE_LAYER_BUILDING_SUN_RISE_SET_TIME = "STATE_LAYER_BUILDING_SUN_RISE_SET_TIME"; //$NON-NLS-1$
-   private static final String     STATE_LAYER_LABEL_IS_VISIBLE           = "STATE_LAYER_LABEL_IS_VISIBLE";           //$NON-NLS-1$
-   private static final String     STATE_LAYER_LABEL_IS_BEFORE_BUILDING   = "STATE_LAYER_LABEL_IS_BEFORE_BUILDING";   //$NON-NLS-1$
-   private static final String     STATE_MAP_POS_X                        = "STATE_MAP_POS_X";                        //$NON-NLS-1$
-
-   private static final String     STATE_MAP_POS_Y                        = "STATE_MAP_POS_Y";                        //$NON-NLS-1$
-   private static final String     STATE_MAP_POS_ZOOM_LEVEL               = "STATE_MAP_POS_ZOOM_LEVEL";               //$NON-NLS-1$
-   private static final String     STATE_MAP_POS_BEARING                  = "STATE_MAP_POS_BEARING";                  //$NON-NLS-1$
-   private static final String     STATE_MAP_POS_SCALE                    = "STATE_MAP_POS_SCALE";                    //$NON-NLS-1$
-   private static final String     STATE_MAP_POS_TILT                     = "STATE_MAP_POS_TILT";                     //$NON-NLS-1$
-   private static final String     STATE_SELECTED_MAP25_PROVIDER_ID       = "STATE_SELECTED_MAP25_PROVIDER_ID";       //$NON-NLS-1$
-   private static final String     STATE_SUFFIX_MAP_CURRENT_POSITION      = "MapCurrentPosition";                     //$NON-NLS-1$
-   static final String             STATE_SUFFIX_MAP_DEFAULT_POSITION      = "MapDefaultPosition";                     //$NON-NLS-1$
+   private static final String     STATE_LAYER_BUILDING_IS_SHOW_SHADOW           = "STATE_LAYER_BUILDING_IS_SHOW_SHADOW";          //$NON-NLS-1$
+   private static final String     STATE_LAYER_BUILDING_IS_VISIBLE               = "STATE_LAYER_BUILDING_IS_VISIBLE";              //$NON-NLS-1$
+   private static final String     STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL           = "STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL";          //$NON-NLS-1$
+   private static final String     STATE_LAYER_BUILDING_SUN_DAY_TIME             = "STATE_LAYER_BUILDING_SUN_DAY_TIME";            //$NON-NLS-1$
+   private static final String     STATE_LAYER_BUILDING_SUN_RISE_SET_TIME        = "STATE_LAYER_BUILDING_SUN_RISE_SET_TIME";       //$NON-NLS-1$
+   private static final String     STATE_LAYER_LABEL_IS_VISIBLE                  = "STATE_LAYER_LABEL_IS_VISIBLE";                 //$NON-NLS-1$
+   private static final String     STATE_LAYER_LABEL_IS_BEFORE_BUILDING          = "STATE_LAYER_LABEL_IS_BEFORE_BUILDING";         //$NON-NLS-1$
    //
-   public static final String      THEME_STYLE_ALL                        = "theme-style-all";                        //$NON-NLS-1$
+   private static final String     STATE_MAP_CENTER_VERTICAL_POSITION_IS_ENABLED = "STATE_MAP_CENTER_VERTICAL_POSITION_IS_ENABLED";//$NON-NLS-1$
+   private static final String     STATE_MAP_CENTER_VERTICAL_POSITION            = "STATE_MAP_CENTER_VERTICAL_POSITION";           //$NON-NLS-1$
+   private static final String     STATE_MAP_POS_X                               = "STATE_MAP_POS_X";                              //$NON-NLS-1$
+   private static final String     STATE_MAP_POS_Y                               = "STATE_MAP_POS_Y";                              //$NON-NLS-1$
+   private static final String     STATE_MAP_POS_ZOOM_LEVEL                      = "STATE_MAP_POS_ZOOM_LEVEL";                     //$NON-NLS-1$
+   private static final String     STATE_MAP_POS_BEARING                         = "STATE_MAP_POS_BEARING";                        //$NON-NLS-1$
+   private static final String     STATE_MAP_POS_SCALE                           = "STATE_MAP_POS_SCALE";                          //$NON-NLS-1$
+   private static final String     STATE_MAP_POS_TILT                            = "STATE_MAP_POS_TILT";                           //$NON-NLS-1$
+   private static final String     STATE_SELECTED_MAP25_PROVIDER_ID              = "STATE_SELECTED_MAP25_PROVIDER_ID";             //$NON-NLS-1$
+   private static final String     STATE_SUFFIX_MAP_CURRENT_POSITION             = "MapCurrentPosition";                           //$NON-NLS-1$
+   static final String             STATE_SUFFIX_MAP_DEFAULT_POSITION             = "MapDefaultPosition";                           //$NON-NLS-1$
    //
-   public static final float       SUN_TIME_RANGE                         = 10;
-   public static final float       SUN_TIME_DETAIL_RANGE                  = 50;
+   public static final String      THEME_STYLE_ALL                               = "theme-style-all";                              //$NON-NLS-1$
+   //
+   public static final float       SUN_TIME_RANGE                                = 10;
+   public static final float       SUN_TIME_DETAIL_RANGE                         = 50;
+   //
+   public static final float       MAP_CENTER_VERTICAL_MAX_VALUE                 = 100.0f;
    //
    private static IDialogSettings  _state;
    //
@@ -154,13 +158,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    //
    private Map25Provider           _selectedMapProvider;
    //
-   private String                  _mapDefaultLanguage                    = Locale.getDefault().toString();
+   private String                  _mapDefaultLanguage                           = Locale.getDefault().toString();
    private BitmapTileSource        _hillshadingSource;
    private BitmapTileSource        _satelliteSource;
    //
-   private int                     _numOfflineMapFiles                    = 0;
+   private int                     _numOfflineMapFiles                           = 0;
    //
-   private String                  _mp_key                                = "80d7bc63-94fe-416f-a63f-7173f81a484c";   //$NON-NLS-1$
+   private String                  _mp_key                                       = "80d7bc63-94fe-416f-a63f-7173f81a484c";         //$NON-NLS-1$
    //
    /**
     * The opacity can be set in the layer but not read. This will keep the state of the hillshading
@@ -214,10 +218,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    //
    private long                    _lastRenderTime;
    //
-   private float                   _offline_TextScale                     = 0.75f;
-   private float                   _offline_UserScale                     = 2.50f;
-   private float                   _online_TextScale                      = 0.50f;
-   private float                   _online_UserScale                      = 2.0f;
+   private float                   _offline_TextScale                            = 0.75f;
+   private float                   _offline_UserScale                            = 2.50f;
+   private float                   _online_TextScale                             = 0.50f;
+   private float                   _online_UserScale                             = 2.0f;
 
    private OffOnline               _currentOffOnline;
    private TileSource              _currentOnline_TileSource;
@@ -230,6 +234,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private MarkerToolkit _mapBookmarkToolkit = new MarkerToolkit(MarkerShape.STAR);
    // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
    private MarkerMode    _tourMarkerMode     = MarkerMode.NORMAL;
+   //
+   private boolean       _mapCenter_VerticalPosition_IsEnabled;
+   private int           _mapCenter_VerticalPosition;
    //
    /*
     * Photos
@@ -576,7 +583,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       updateLayer_TourMarkers();
 
-      restoreState_MapPosition();
+      restoreState_Map();
 
       // update actions in UI thread, run this AFTER the layers are created
       Display.getDefault().asyncExec(() -> {
@@ -949,6 +956,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return _map25View;
    }
 
+   public int getMapCenter_VerticalPosition() {
+      return _mapCenter_VerticalPosition;
+   }
+
+   public boolean getMapCenter_VerticalPosition_IsEnabled() {
+      return _mapCenter_VerticalPosition_IsEnabled;
+   }
+
    public int getPhoto_Size() {
       return _photoSize;
    }
@@ -1209,22 +1224,33 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 // SET_FORMATTING_OFF
 
-      _building_IsVisible              = Util.getStateBoolean( _state, STATE_LAYER_BUILDING_IS_VISIBLE,      true);
-      _building_MinZoomLevel           = Util.getStateInt(     _state, STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL,  17);
+      _building_IsVisible              = Util.getStateBoolean( _state, STATE_LAYER_BUILDING_IS_VISIBLE,        true);
+      _building_MinZoomLevel           = Util.getStateInt(     _state, STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL,    17);
       _building_Sunrise_Sunset_Time    = Util.getStateFloat(   _state, STATE_LAYER_BUILDING_SUN_RISE_SET_TIME, 0.5f);
 
       _building_IsShowShadow           = (Bool)       Util.getStateEnum(_state, STATE_LAYER_BUILDING_IS_SHOW_SHADOW,    Bool.TRUE);
       _building_SunDaytime             = (SunDayTime) Util.getStateEnum(_state, STATE_LAYER_BUILDING_SUN_DAY_TIME,      SunDayTime.CURRENT_TIME);
 
-      _layer_Label_IsVisible           = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_VISIBLE,         true) ;
-      _layer_Label_IsBeforeBuilding    = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_BEFORE_BUILDING, true) ;
+      _layer_Label_IsVisible           = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_VISIBLE,           true) ;
+      _layer_Label_IsBeforeBuilding    = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_BEFORE_BUILDING,   true) ;
 
 // SET_FORMATTING_ON
    }
 
-   private void restoreState_MapPosition() {
+   private void restoreState_Map() {
 
       final MapPosition mapPosition = getStateMapPosition(STATE_SUFFIX_MAP_CURRENT_POSITION);
+
+// SET_FORMATTING_OFF
+
+      _mapCenter_VerticalPosition_IsEnabled  = Util.getStateBoolean( _state, STATE_MAP_CENTER_VERTICAL_POSITION_IS_ENABLED,   false);
+      _mapCenter_VerticalPosition            = Util.getStateInt(     _state, STATE_MAP_CENTER_VERTICAL_POSITION,              0);
+
+// SET_FORMATTING_ON
+
+      if (_mapCenter_VerticalPosition_IsEnabled) {
+         mMap.viewport().setMapViewCenterY(_mapCenter_VerticalPosition / 10.0f);
+      }
 
       mMap.setMapPosition(mapPosition);
    }
@@ -1242,6 +1268,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private void saveState() {
 
 // SET_FORMATTING_OFF
+
+      _state.put(STATE_MAP_CENTER_VERTICAL_POSITION_IS_ENABLED,      _mapCenter_VerticalPosition_IsEnabled);
+      _state.put(STATE_MAP_CENTER_VERTICAL_POSITION,                 _mapCenter_VerticalPosition);
 
       _state.put(STATE_LAYER_BUILDING_IS_VISIBLE,                    _building_IsVisible);
       _state.put(STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL,                _building_MinZoomLevel);
@@ -1358,6 +1387,29 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       _layer_Label_IsVisible = isVisible;
       _layer_Label_IsBeforeBuilding = isBeforeBuilding;
+   }
+
+   public void setMap_VerticalPosition(final boolean isMapCenter_VerticalPosition, final int mapCenter_VerticalPostion) {
+
+      _mapCenter_VerticalPosition_IsEnabled = isMapCenter_VerticalPosition;
+      _mapCenter_VerticalPosition = mapCenter_VerticalPostion;
+
+      final float newMapCenter_VerticalPosition = _mapCenter_VerticalPosition_IsEnabled
+
+            // -100...100 -> +1...-1  invert sign that the top value is positive and not negative
+            ? _mapCenter_VerticalPosition / -MAP_CENTER_VERTICAL_MAX_VALUE
+
+            // set default value which is about the vertical center
+            : 0;
+
+      final ViewController viewport = mMap.viewport();
+
+      viewport.setMapViewCenterY(newMapCenter_VerticalPosition);
+
+      // update map, this must be run in the "main" thread
+      mMap.post(() -> {
+         viewport.tiltMap(0.0001f);
+      });
    }
 
    /**
