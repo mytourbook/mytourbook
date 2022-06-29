@@ -45,7 +45,7 @@ public class TaggedToursViewTests {
 
       Utils.showView(bot, "Tagged Tours");
 
-      final SWTBotTreeItem item = bot.tree(1).getTreeItem("Shoes 2   1").select();
+      final SWTBotTreeItem item = bot.tree(1).getTreeItem("Shoes 2   7").select();
       assertNotNull(item);
       final SWTBotTreeItem node = item.getNode("5/31/15").select();
       assertNotNull(node);

@@ -27,8 +27,9 @@ import utils.Utils;
 
 public class WorkbenchTests {
 
-   private static final String TOOLS = "Tools ";
-   private SWTWorkbenchBot     bot   = new SWTWorkbenchBot();
+   private static final String DIRECTORY = "Directory";
+   private static final String TOOLS     = "Tools ";
+   private SWTWorkbenchBot     bot       = new SWTWorkbenchBot();
 
    @BeforeClass
    public static void beforeClass() {
@@ -101,10 +102,15 @@ public class WorkbenchTests {
       Utils.showViewFromMenu(bot, TOOLS, "Heart Rate Variability");
       Utils.showView(bot, "Heart Rate Variability");
 
-      Utils.showViewFromMenu(bot, "Directory", "Sensor");
+      Utils.showViewFromMenu(bot, DIRECTORY, "Sensor");
       Utils.showView(bot, "Sensor");
 
-      Utils.showViewFromMenu(bot, "Directory", "Sensor Chart");
+      Utils.showViewFromMenu(bot, DIRECTORY, "Sensor Chart");
       Utils.showView(bot, "Sensor Chart");
+
+      Utils.showViewFromMenu(bot, DIRECTORY, "Photos");
+      Utils.showView(bot, "Photos");
+      //Sleeping 3 seconds as the view can be slow to display
+      bot.sleep(3000);
    }
 }
