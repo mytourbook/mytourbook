@@ -40,7 +40,8 @@ Improvements
 Changes
 =======
 
-* 
+* Fitlog/FitlogEx Import (Frederic)
+  - Compute the average power when power data is provided but average power value is not
 
 
 Bugfix
