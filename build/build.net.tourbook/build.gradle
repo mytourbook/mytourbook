@@ -257,12 +257,3 @@ task mt_70_CopyReleaseNotes {
       }
    }
 }
-
-jacocoTestReport {
-    reports {
-        xml.enabled true
-        html.enabled false
-    }
-}
-
-check.dependsOn jacocoTestReport
