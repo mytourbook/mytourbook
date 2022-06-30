@@ -241,8 +241,18 @@ public class TourLayer extends Layer {
 
       private void doWork_Rendering(final TourRenderTask task, final int numPoints) {
 
-         final LineBucketMT lineBucket = task.__renderBuckets.getLineBucket(0);
+         LineBucketMT lineBucket;
+
+         if (_lineStyle.stipple == 0 && _lineStyle.texture == null) {
+            lineBucket = task.__renderBuckets.getLineBucket(0);
+         } else {
+            lineBucket = task.__renderBuckets.getLineTexBucket(0);
+         }
+
          lineBucket.line = _lineStyle;
+
+//         final LineBucketMT lineBucket = task.__renderBuckets.getLineBucket(0);
+//         lineBucket.line = _lineStyle;
 
 //         lineBucket.next
 

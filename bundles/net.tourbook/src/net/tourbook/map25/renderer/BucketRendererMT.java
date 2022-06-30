@@ -20,6 +20,7 @@ package net.tourbook.map25.renderer;
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 import static org.oscim.renderer.bucket.RenderBucket.LINE;
 import static org.oscim.renderer.bucket.RenderBucket.SYMBOL;
+import static org.oscim.renderer.bucket.RenderBucket.TEXLINE;
 
 import org.oscim.core.MapPosition;
 import org.oscim.core.Tile;
@@ -27,6 +28,7 @@ import org.oscim.renderer.GLMatrix;
 import org.oscim.renderer.GLState;
 import org.oscim.renderer.GLViewport;
 import org.oscim.renderer.LayerRenderer;
+import org.oscim.utils.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,11 +114,12 @@ public class BucketRendererMT extends LayerRenderer {
             bucket = LineBucketMT.Renderer.draw(bucket, viewport, div, allBuckets);
             break;
 
-//       case TEXLINE:
-//           b = LineTexBucket.Renderer.draw(b, v,
-//                   FastMath.pow(layerPos.zoomLevel - v.pos.zoomLevel) * (float) layerPos.getZoomScale(),
-//                   buckets);
-//           break;
+         case TEXLINE:
+            bucket = LineTexBucketMT.Renderer.draw(bucket,
+                  viewport,
+                  FastMath.pow(mapPosition.zoomLevel - viewport.pos.zoomLevel) * (float) mapPosition.getZoomScale(),
+                  allBuckets);
+            break;
 //       case MESH:
 //           b = MeshBucket.Renderer.draw(b, v);
 //           break;
@@ -136,8 +139,9 @@ public class BucketRendererMT extends LayerRenderer {
 //       case CIRCLE:
 //           b = CircleBucket.Renderer.draw(b, v);
 //           break;
+
          default:
-            log.error("invalid bucket {}", bucket.type);
+            log.error("Invalid bucket {}", bucket.type);
             bucket = bucket.next;
             break;
          }

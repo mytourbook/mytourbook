@@ -19,6 +19,7 @@ package net.tourbook.map25.renderer;
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 import static org.oscim.renderer.bucket.RenderBucket.LINE;
 import static org.oscim.renderer.bucket.RenderBucket.POLYGON;
+import static org.oscim.renderer.bucket.RenderBucket.TEXLINE;
 
 import java.nio.ShortBuffer;
 
@@ -104,14 +105,14 @@ public class AllRenderBucketsMT extends TileData {
    public static void initRenderer() {
 
       LineBucketMT.Renderer.init();
+      LineTexBucketMT.Renderer.init();
 
-//        LineTexBucket.Renderer.init();
-//        PolygonBucket.Renderer.init();
-//        TextureBucket.Renderer.init();
-//        BitmapBucket.Renderer.init();
-//        MeshBucket.Renderer.init();
-//        HairLineBucket.Renderer.init();
-//        CircleBucket.Renderer.init();
+//    PolygonBucket.Renderer.init();
+//    TextureBucket.Renderer.init();
+//    BitmapBucket.Renderer.init();
+//    MeshBucket.Renderer.init();
+//    HairLineBucket.Renderer.init();
+//    CircleBucket.Renderer.init();
    }
 
 //    public CircleBucket addCircleBucket(final int level, final CircleStyle style) {
@@ -407,20 +408,23 @@ public class AllRenderBucketsMT extends TileData {
 
       if (bucket == null) {
 
-         /* add a new RenderElement */
+         // add a new RenderElement
          if (type == LINE) {
 
             bucket = new LineBucketMT(level);
-//            } else if (type == POLYGON) {
-//               bucket = new PolygonBucket(level);
-//            } else if (type == TEXLINE) {
-//               bucket = new LineTexBucket(level);
-//            } else if (type == MESH) {
-//               bucket = new MeshBucket(level);
-//            } else if (type == HAIRLINE) {
-//               bucket = new HairLineBucket(level);
-//            } else if (type == CIRCLE) {
-//               bucket = new CircleBucket(level);
+
+//       } else if (type == POLYGON) {
+//          bucket = new PolygonBucket(level);
+
+         } else if (type == TEXLINE) {
+            bucket = new LineTexBucketMT(level);
+
+//       } else if (type == MESH) {
+//          bucket = new MeshBucket(level);
+//       } else if (type == HAIRLINE) {
+//          bucket = new HairLineBucket(level);
+//       } else if (type == CIRCLE) {
+//          bucket = new CircleBucket(level);
          }
 
          if (bucket == null) {
@@ -475,13 +479,13 @@ public class AllRenderBucketsMT extends TileData {
       return (LineBucketMT) getBucket(level, LINE);
    }
 
-//    /**
-//     * Get or add the TexLineBucket for a level. Levels are ordered from
-//     * bottom (0) to top
-//     */
-//    public LineTexBucket getLineTexBucket(final int level) {
-//        return (LineTexBucket) getBucket(level, TEXLINE);
-//    }
+   /**
+    * Get or add the TexLineBucket for a level. Levels are ordered from
+    * bottom (0) to top
+    */
+   public LineTexBucketMT getLineTexBucket(final int level) {
+      return (LineTexBucketMT) getBucket(level, TEXLINE);
+   }
 //
 //    /**
 //     * Get or add the MeshBucket for a level. Levels are ordered from

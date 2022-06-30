@@ -436,7 +436,7 @@ public class LineBucketMT extends RenderBucketMT {
 // TODO remove SYSTEM.OUT.PRINTLN
    }
 
-   private void addLine(final float[] points, final int[] index, final int numPoints, final boolean isCapClosed) {
+   void addLine(final float[] points, final int[] index, final int numPoints, final boolean isCapClosed) {
 
       boolean isCapRounded = false;
       boolean isCapSquared = false;
