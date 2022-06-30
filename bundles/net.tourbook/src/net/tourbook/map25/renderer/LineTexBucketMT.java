@@ -44,48 +44,50 @@ import org.slf4j.LoggerFactory;
 
 /**
  * RenderElement for textured or stippled lines
- * <p/>
+ * <p>
  * Interleave two segment quads in one block to be able to use
  * vertices twice. pos0 and pos1 use the same vertex array where
  * pos1 has an offset of one vertex. The vertex shader will use
  * pos0 when the vertexId is even, pos1 when the Id is odd.
- * <p/>
+ * <p>
  * As there is no gl_VertexId in gles 2.0 an additional 'flip'
  * array is used. Depending on 'flip' extrusion is inverted.
  * <p/>
  * Indices and flip buffers can be static.
- * <p/>
+ * <p>
  *
  * <pre>
- * First pass: using even vertex array positions
- *   (used vertices are in braces)
+ * First pass: using even vertex array positions (used vertices are in braces)
+ *
  * vertex id   0  1  2  3  4  5  6  7
  * pos0     x (0) 1 (2) 3 (4) 5 (6) 7 x
- * pos1        x (0) 1 (2) 3 (4) 5 (6) 7 x
+ * pos1     x (0) 1 (2) 3 (4) 5 (6) 7 x
  * flip        0  1  0  1  0  1  0  1
  *
  * Second pass: using odd vertex array positions
+ *
  * vertex id   0  1  2  3  4  5  6  7
- * pos0   x 0 (1) 2 (3) 4 (5) 6 (7) x
+ * pos0      x 0 (1) 2 (3) 4 (5) 6 (7) x
  * pos1      x 0 (1) 2 (3) 4 (5) 6 (7) x
  * flip        0  1  0  1  0  1  0  1
  * </pre>
- * <p/>
+ * <p>
  * Vertex layout (here: 1 unit == 1 short):
- * [2 unit] position,
- * [2 unit] extrusion,
- * [1 unit] line length
- * [1 unit] unused
- * <p/>
- * indices, for two blocks:
+ * <p>
+ * [2 unit] position,<br>
+ * [2 unit] extrusion,<br>
+ * [1 unit] line length<br>
+ * [1 unit] unused<br>
+ * <p>
+ * Indices, for two blocks:
  * 0, 1, 2,
  * 2, 1, 3,
  * 4, 5, 6,
  * 6, 5, 7,
- * <p/>
- * BIG NOTE: renderer assumes to be able to offset vertex array position
- * so that in the first pass 'pos1' offset will be < 0 if no data precedes
- * - in our case there is always the polygon fill array at start
+ * <p>
+ * <b>BIG NOTE:</b> The renderer assumes to be able to offset vertex array position
+ * so that in the first pass 'pos1' offset will be < 0 if no data precedes<br>
+ * - in our case there is always the polygon fill array at start<br>
  * - see addLine hack otherwise.
  */
 public final class LineTexBucketMT extends LineBucketMT {
@@ -108,17 +110,17 @@ public final class LineTexBucketMT extends LineBucketMT {
       private static int         mVertexFlipID;
 
       /* posX, posY, extrX, extrY, length, unused */
-      private static final int STRIDE = 6 * AllRenderBucketsMT.SHORT_BYTES;
+      private static final int STRIDE = 6 * RenderBuckets_AllMT.SHORT_BYTES;
 
       //static TextureItem tex;
 
       /* offset for line length, unused; skip first 4 units */
-      private static final int LEN_OFFSET = 4 * AllRenderBucketsMT.SHORT_BYTES;
+      private static final int LEN_OFFSET = 4 * RenderBuckets_AllMT.SHORT_BYTES;
 
-      public static RenderBucketMT draw(RenderBucketMT b,
-                                        final GLViewport v,
+      public static RenderBucketMT draw(RenderBucketMT renderBucket,
+                                        final GLViewport viewport,
                                         final float div,
-                                        final AllRenderBucketsMT buckets) {
+                                        final RenderBuckets_AllMT buckets) {
 
          GLState.blend(true);
          shader.useProgram();
@@ -137,7 +139,7 @@ public final class LineTexBucketMT extends LineBucketMT {
          gl.enableVertexAttribArray(aLen1);
          gl.enableVertexAttribArray(aFlip);
 
-         v.mvp.setAsUniform(shader.uMVP);
+         viewport.mvp.setAsUniform(shader.uMVP);
 
          bindQuadIndicesVBO();
 
@@ -151,13 +153,13 @@ public final class LineTexBucketMT extends LineBucketMT {
 
          buckets.vbo.bind();
 
-         final float scale = (float) v.pos.getZoomScale();
-         final float s = scale / div;
+         final float mapPositionScale = (float) viewport.pos.getZoomScale();
+         final float s = mapPositionScale / div;
 
-         for (; b != null && b.type == TEXLINE; b = b.next) {
+         for (; renderBucket != null && renderBucket.type == TEXLINE; renderBucket = renderBucket.next) {
 
-            final LineTexBucketMT lb = (LineTexBucketMT) b;
-            final LineStyle line = lb.line.current();
+            final LineTexBucketMT lineTexBucket = (LineTexBucketMT) renderBucket;
+            final LineStyle line = lineTexBucket.line.current();
 
             gl.uniform1i(shader.uMode, line.dashArray != null ? 2 : (line.texture != null ? 1 : 0));
 
@@ -186,66 +188,71 @@ public final class LineTexBucketMT extends LineBucketMT {
             gl.uniform1f(shader.uPatternWidth, line.stippleWidth);
 
             /* keep line width fixed */
-            gl.uniform1f(shader.uWidth, (lb.scale * line.width) / s * COORD_SCALE_BY_DIR_SCALE);
+            gl.uniform1f(shader.uWidth, (lineTexBucket.scale * line.width) / s * COORD_SCALE_BY_DIR_SCALE);
 
             /* add offset vertex */
             final int vOffset = -STRIDE;
 
             // TODO interleave 1. and 2. pass to improve vertex cache usage?
             /* first pass */
-            int allIndices = (lb.evenQuads * 6);
+            int allIndices = (lineTexBucket.evenQuads * 6);
             for (int i = 0; i < allIndices; i += MAX_INDICES) {
+
                int numIndices = allIndices - i;
                if (numIndices > MAX_INDICES) {
                   numIndices = MAX_INDICES;
                }
 
                /* i * (24 units per block / 6) * unit bytes) */
-               final int add = (b.vertexOffset + i * 4 * AllRenderBucketsMT.SHORT_BYTES) + vOffset;
+               final int add = (renderBucket.vertexOffset + i * 4 * RenderBuckets_AllMT.SHORT_BYTES) + vOffset;
 
-               gl.vertexAttribPointer(aPos0,
+               gl.vertexAttribPointer(
+                     aPos0,
                      4,
                      GL.SHORT,
                      false,
                      STRIDE,
                      add + STRIDE);
 
-               gl.vertexAttribPointer(aLen0,
+               gl.vertexAttribPointer(
+                     aLen0,
                      2,
                      GL.SHORT,
                      false,
                      STRIDE,
                      add + STRIDE + LEN_OFFSET);
 
-               gl.vertexAttribPointer(aPos1,
+               gl.vertexAttribPointer(
+                     aPos1,
                      4,
                      GL.SHORT,
                      false,
                      STRIDE,
                      add);
 
-               gl.vertexAttribPointer(aLen1,
+               gl.vertexAttribPointer(
+                     aLen1,
                      2,
                      GL.SHORT,
                      false,
                      STRIDE,
                      add + LEN_OFFSET);
 
-               gl.drawElements(GL.TRIANGLES,
-                     numIndices,
-                     GL.UNSIGNED_SHORT,
-                     0);
+               gl.drawElements(GL.TRIANGLES, numIndices, GL.UNSIGNED_SHORT, 0);
             }
 
             /* second pass */
-            allIndices = (lb.oddQuads * 6);
+            allIndices = (lineTexBucket.oddQuads * 6);
+
             for (int i = 0; i < allIndices; i += MAX_INDICES) {
+
                int numIndices = allIndices - i;
                if (numIndices > MAX_INDICES) {
                   numIndices = MAX_INDICES;
                }
+
                /* i * (24 units per block / 6) * unit bytes) */
-               final int add = (b.vertexOffset + i * 4 * AllRenderBucketsMT.SHORT_BYTES) + vOffset;
+               final int add = (renderBucket.vertexOffset + i * 4 * RenderBuckets_AllMT.SHORT_BYTES) + vOffset;
 
                gl.vertexAttribPointer(aPos0,
                      4,
@@ -275,10 +282,7 @@ public final class LineTexBucketMT extends LineBucketMT {
                      STRIDE,
                      add + STRIDE + LEN_OFFSET);
 
-               gl.drawElements(GL.TRIANGLES,
-                     numIndices,
-                     GL.UNSIGNED_SHORT,
-                     0);
+               gl.drawElements(GL.TRIANGLES, numIndices, GL.UNSIGNED_SHORT, 0);
             }
          }
 
@@ -288,13 +292,13 @@ public final class LineTexBucketMT extends LineBucketMT {
          gl.disableVertexAttribArray(aLen1);
          gl.disableVertexAttribArray(aFlip);
 
-         return b;
+         return renderBucket;
       }
 
       public static void init() {
 
          shader = new Shader("linetex_layer_tex");
-         //shader = new Shader("linetex_layer");
+//       shader = new Shader("linetex_layer");
 
          final int[] vboIds = GLUtils.glGenBuffers(1);
          mVertexFlipID = vboIds[0];
@@ -331,6 +335,7 @@ public final class LineTexBucketMT extends LineBucketMT {
       }
 
       public static int loadStippleTexture(final byte[] stipple) {
+
          int sum = 0;
          for (final byte flip : stipple) {
             sum += flip;
@@ -433,9 +438,10 @@ public final class LineTexBucketMT extends LineBucketMT {
          n = index.length;
       }
 
-      for (int i = 0, pos = 0; i < n; i++) {
+      for (int indexIndex = 0, pointIndex = 0; indexIndex < n; indexIndex++) {
+
          if (index != null) {
-            length = index[i];
+            length = index[indexIndex];
          }
 
          /* check end-marker in indices */
@@ -445,20 +451,20 @@ public final class LineTexBucketMT extends LineBucketMT {
 
          /* need at least two points */
          if (length < 4) {
-            pos += length;
+            pointIndex += length;
             continue;
          }
 
-         final int end = pos + length;
-         float x = points[pos++] * COORD_SCALE;
-         float y = points[pos++] * COORD_SCALE;
+         final int end = pointIndex + length;
+         float x = points[pointIndex++] * COORD_SCALE;
+         float y = points[pointIndex++] * COORD_SCALE;
 
          /* randomize a bit (must be within range of +/- Short.MAX_VALUE) */
          float lineLength = line.randomOffset ? (x * x + y * y) % 80 : 0;
 
-         while (pos < end) {
-            final float nx = points[pos++] * COORD_SCALE;
-            final float ny = points[pos++] * COORD_SCALE;
+         while (pointIndex < end) {
+            final float nx = points[pointIndex++] * COORD_SCALE;
+            final float ny = points[pointIndex++] * COORD_SCALE;
 
             /* Calculate triangle corners for the given width */
             final float vx = nx - x;
@@ -478,12 +484,14 @@ public final class LineTexBucketMT extends LineBucketMT {
             }
 
             if (dist > (Short.MAX_VALUE - Short.MIN_VALUE)) {
+
                // In rare cases sloping lines are larger than max range of short:
                // sqrt(x² + y²) > short range. So need to split them in 2 parts.
                // Alternatively can set max clip value to:
                // (Short.MAX_VALUE / Math.sqrt(2)) / MapRenderer.COORD_SCALE
                final float ix = (x + (vx / 2));
                final float iy = (y + (vy / 2));
+
                addShortVertex(vi,
                      (short) x,
                      (short) y,
@@ -493,6 +501,7 @@ public final class LineTexBucketMT extends LineBucketMT {
                      dy,
                      (short) lineLength,
                      (int) (dist / 2));
+
                addShortVertex(vi,
                      (short) ix,
                      (short) iy,
@@ -502,7 +511,9 @@ public final class LineTexBucketMT extends LineBucketMT {
                      dy,
                      (short) lineLength,
                      (int) (dist / 2));
+
             } else {
+
                addShortVertex(vi,
                      (short) x,
                      (short) y,
@@ -512,6 +523,7 @@ public final class LineTexBucketMT extends LineBucketMT {
                      dy,
                      (short) lineLength,
                      (int) dist);
+
                if (mTexRepeat) {
                   lineLength += dist;
                }
@@ -529,6 +541,7 @@ public final class LineTexBucketMT extends LineBucketMT {
 
    @Override
    public void addLine(final GeometryBuffer geom) {
+
       addLine(geom.points, geom.index, -1, false);
    }
 

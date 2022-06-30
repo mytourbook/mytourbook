@@ -56,13 +56,13 @@ public class BucketRendererMT extends LayerRenderer {
    /**
     * Buckets for rendering
     */
-   protected final AllRenderBucketsMT allBuckets;
+   protected final RenderBuckets_AllMT allBuckets;
 
    protected boolean                  mInitialized;
 
    public BucketRendererMT() {
 
-      allBuckets = new AllRenderBucketsMT();
+      allBuckets = new RenderBuckets_AllMT();
       mMapPosition = new MapPosition();
    }
 
@@ -88,7 +88,8 @@ public class BucketRendererMT extends LayerRenderer {
       GLState.test(false, false);
       GLState.blend(true);
 
-      final float div = (float) (viewport.pos.scale / mapPosition.scale);
+      // viewport scale 2 map scale is between 1...2
+      final float vp2mpScale = (float) (viewport.pos.scale / mapPosition.scale);
 
       boolean isProjected = true;
 
@@ -111,7 +112,7 @@ public class BucketRendererMT extends LayerRenderer {
 //           break;
 
          case LINE:
-            bucket = LineBucketMT.Renderer.draw(bucket, viewport, div, allBuckets);
+            bucket = LineBucketMT.Renderer.draw(bucket, viewport, vp2mpScale, allBuckets);
             break;
 
          case TEXLINE:
@@ -120,6 +121,7 @@ public class BucketRendererMT extends LayerRenderer {
                   FastMath.pow(mapPosition.zoomLevel - viewport.pos.zoomLevel) * (float) mapPosition.getZoomScale(),
                   allBuckets);
             break;
+
 //       case MESH:
 //           b = MeshBucket.Renderer.draw(b, v);
 //           break;
@@ -148,29 +150,39 @@ public class BucketRendererMT extends LayerRenderer {
       }
    }
 
-   protected void setMatrix(final GLMatrix mvp, final GLViewport v, final boolean project, final float coordScale) {
-      final MapPosition oPos = mMapPosition;
+   protected void setMatrix(final GLMatrix mvp,
+                            final GLViewport viewport,
+                            final boolean isProjected,
+                            final float coordScale) {
 
-      final double tileScale = Tile.SIZE * v.pos.scale;
+      final MapPosition mapPosition = mMapPosition;
 
-      double x = oPos.x - v.pos.x;
-      final double y = oPos.y - v.pos.y;
+      final double tileScale = Tile.SIZE * viewport.pos.scale;
+
+      double x = mapPosition.x - viewport.pos.x;
+      final double y = mapPosition.y - viewport.pos.y;
 
       if (mFlipOnDateLine) {
+
          //wrap around date-line
          while (x < 0.5) {
             x += 1.0;
          }
+
          while (x > 0.5) {
             x -= 1.0;
          }
       }
 
-      mvp.setTransScale((float) (x * tileScale),
+      mvp.setTransScale(
+            (float) (x * tileScale),
             (float) (y * tileScale),
-            (float) (v.pos.scale / oPos.scale) / coordScale);
+            (float) (viewport.pos.scale / mapPosition.scale) / coordScale);
 
-      mvp.multiplyLhs(project ? v.viewproj : v.view);
+      mvp.multiplyLhs(isProjected
+
+            ? viewport.viewproj
+            : viewport.view);
    }
 
    /**
@@ -178,27 +190,34 @@ public class BucketRendererMT extends LayerRenderer {
     * MapPosition and the last updated Overlay MapPosition and applies
     * view-projection-matrix.
     */
-   protected void setMatrix(final GLViewport v) {
-      setMatrix(v, true);
+   protected void setMatrix(final GLViewport viewport) {
+
+      setMatrix(viewport, true);
    }
 
    /**
     * Utility: Set matrices.mvp matrix relative to the difference of current
     * MapPosition and the last updated Overlay MapPosition.
+    * <p>
     * Use this to 'stick' your layer to the map. Note: Vertex coordinates
     * are assumed to be scaled by MapRenderer.COORD_SCALE (== 8).
     *
-    * @param v
+    * @param viewport
     *           GLViewport
-    * @param project
+    * @param isProjected
     *           if true apply view- and projection, or just view otherwise.
     */
-   protected void setMatrix(final GLViewport v, final boolean project) {
-      setMatrix(v, project, COORD_SCALE);
+   protected void setMatrix(final GLViewport viewport,
+                            final boolean isProjected) {
+
+      setMatrix(viewport, isProjected, COORD_SCALE);
    }
 
-   protected void setMatrix(final GLViewport v, final boolean project, final float coordScale) {
-      setMatrix(v.mvp, v, project, coordScale);
+   protected void setMatrix(final GLViewport viewport,
+                            final boolean isProjected,
+                            final float coordScale) {
+
+      setMatrix(viewport.mvp, viewport, isProjected, coordScale);
    }
 
    /**
@@ -206,10 +225,13 @@ public class BucketRendererMT extends LayerRenderer {
     * Copy initial Viewport position and compile buckets.
     */
    @Override
-   public void update(final GLViewport v) {
+   public void update(final GLViewport viewport) {
+
       if (!mInitialized) {
-         mMapPosition.copy(v.pos);
+
+         mMapPosition.copy(viewport.pos);
          mInitialized = true;
+
          compile();
       }
    }

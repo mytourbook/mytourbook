@@ -38,6 +38,7 @@ Improvements
 * 2.5D Map
   - Paint tour track with a vertical offset                 https://github.com/mytourbook/mytourbook/issues/889
   - Set vertical position for the map tilt rotation axis    https://github.com/mytourbook/mytourbook/issues/890
+  - Fixed: Track width jumped when the zoom-level changed, now it's width is always the same
 
 
 Changes

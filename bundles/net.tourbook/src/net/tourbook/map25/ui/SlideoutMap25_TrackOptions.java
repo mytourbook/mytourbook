@@ -95,6 +95,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
    private Spinner               _spinnerSliderPath_Opacity;
    private Spinner               _spinnerTrackVerticalOffset;
 
+   private Spinner               _spinnerTESTValue;
+
    private Text                  _textConfigName;
 
    private ColorSelectorExtended _colorOutline_Color;
@@ -227,9 +229,30 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
          }
          {
             /*
-             * Line
+             * TEST value
              */
 
+            // label
+            final Label label = new Label(group, SWT.NONE);
+            label.setText("TEST value");
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+            // spinner
+            _spinnerTESTValue = new Spinner(group, SWT.BORDER);
+            _spinnerTESTValue.setMinimum(0);
+            _spinnerTESTValue.setMaximum(100);
+            _spinnerTESTValue.setIncrement(1);
+            _spinnerTESTValue.setPageIncrement(10);
+            _spinnerTESTValue.addSelectionListener(_defaultSelectionListener);
+            _spinnerTESTValue.addMouseWheelListener(_defaultMouseWheelListener);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(_spinnerTESTValue);
+         }
+         {
+            /*
+             * Color
+             */
             final int opacityMin = (int) ((Map25ConfigManager.OUTLINE_OPACITY_MIN / 255.0f) * UI.TRANSFORM_OPACITY_MAX);
             final String tooltipText = NLS.bind(Messages.Slideout_Map25TrackOptions_Label_OutlineColor_Tooltip, UI.TRANSFORM_OPACITY_MAX);
 
@@ -259,36 +282,36 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
                   _colorOutline_Color.addListener(_defaultPropertyChangeListener);
                   _colorOutline_Color.addOpenListener(this);
                }
-               {
-                  /*
-                   * Text label
-                   */
-                  _chkShowDirectionArrows = new Button(group, SWT.CHECK);
-                  _chkShowDirectionArrows.setText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows);
-                  _chkShowDirectionArrows.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip);
-                  _chkShowDirectionArrows.addSelectionListener(_defaultSelectionListener);
-                  GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowDirectionArrows);
-               }
-               {
-                  /*
-                   * Track vertical offset
-                   */
-                  _chkTrackVerticalOffset = new Button(group, SWT.CHECK);
-                  _chkTrackVerticalOffset.setText(Messages.Slideout_Map25TrackOptions_Checkbox_TrackVerticalOffset);
+            }
+         }
+         {
+            /*
+             * Direction arrows
+             */
+            _chkShowDirectionArrows = new Button(group, SWT.CHECK);
+            _chkShowDirectionArrows.setText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows);
+            _chkShowDirectionArrows.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip);
+            _chkShowDirectionArrows.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowDirectionArrows);
+         }
+         {
+            /*
+             * Track vertical offset
+             */
+            _chkTrackVerticalOffset = new Button(group, SWT.CHECK);
+            _chkTrackVerticalOffset.setText(Messages.Slideout_Map25TrackOptions_Checkbox_TrackVerticalOffset);
 //                  _chkTrackVerticalOffset.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip);
-                  _chkTrackVerticalOffset.addSelectionListener(_defaultSelectionListener);
+            _chkTrackVerticalOffset.addSelectionListener(_defaultSelectionListener);
 //                  GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkTrackVerticalOffset);
 
-                  // offset value
-                  _spinnerTrackVerticalOffset = new Spinner(group, SWT.BORDER);
-                  _spinnerTrackVerticalOffset.setMinimum(-1000);
-                  _spinnerTrackVerticalOffset.setMaximum(1000);
-                  _spinnerTrackVerticalOffset.setIncrement(1);
-                  _spinnerTrackVerticalOffset.setPageIncrement(10);
-                  _spinnerTrackVerticalOffset.addSelectionListener(_defaultSelectionListener);
-                  _spinnerTrackVerticalOffset.addMouseWheelListener(_defaultMouseWheelListener);
-               }
-            }
+            // offset value
+            _spinnerTrackVerticalOffset = new Spinner(group, SWT.BORDER);
+            _spinnerTrackVerticalOffset.setMinimum(-1000);
+            _spinnerTrackVerticalOffset.setMaximum(1000);
+            _spinnerTrackVerticalOffset.setIncrement(1);
+            _spinnerTrackVerticalOffset.setPageIncrement(10);
+            _spinnerTrackVerticalOffset.addSelectionListener(_defaultSelectionListener);
+            _spinnerTrackVerticalOffset.addMouseWheelListener(_defaultMouseWheelListener);
          }
       }
    }
@@ -486,11 +509,15 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       final boolean isShowSliderPath = _chkShowSliderPath.getSelection();
       final boolean isShowSliderLocation = _chkShowSliderLocation.getSelection();
       final boolean isTrackVerticalOffset = _chkTrackVerticalOffset.getSelection();
+      final boolean isShowDirectionArrows = _chkShowDirectionArrows.getSelection();
+
+      final boolean isHideDirectionArrows = isShowDirectionArrows == false;
 
       /*
        * Track
        */
-      _spinnerTrackVerticalOffset.setEnabled(isTrackVerticalOffset);
+      _chkTrackVerticalOffset.setEnabled(isHideDirectionArrows);
+      _spinnerTrackVerticalOffset.setEnabled(isHideDirectionArrows && isTrackVerticalOffset);
 
       /*
        * Slider location
@@ -650,6 +677,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       _spinnerSliderPath_LineWidth     .setSelection((int) (config.sliderPath_LineWidth));
       _spinnerSliderPath_Opacity       .setSelection(UI.transformOpacity_WhenRestored(config.sliderPath_Opacity));
 
+      _spinnerTESTValue.setSelection((config.testValue));
+
 // SET_FORMATTING_ON
 
       _isUpdateUI = false;
@@ -685,6 +714,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       config.sliderPath_Color             = _colorSliderPathColor.getColorValue();
       config.sliderPath_LineWidth         = _spinnerSliderPath_LineWidth.getSelection();
       config.sliderPath_Opacity           = UI.transformOpacity_WhenSaved(_spinnerSliderPath_Opacity.getSelection());
+
+      config.testValue                    = _spinnerTESTValue.getSelection();
 
 // SET_FORMATTING_ON
    }

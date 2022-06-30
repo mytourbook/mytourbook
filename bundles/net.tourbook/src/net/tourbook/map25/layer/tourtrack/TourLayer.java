@@ -26,12 +26,11 @@ import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.marker.MarkerShape;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
-import net.tourbook.map25.renderer.AllRenderBucketsMT;
 import net.tourbook.map25.renderer.BucketRendererMT;
 import net.tourbook.map25.renderer.LineBucketMT;
+import net.tourbook.map25.renderer.RenderBuckets_AllMT;
 
 import org.oscim.backend.canvas.Bitmap;
-import org.oscim.backend.canvas.Paint;
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
@@ -58,20 +57,21 @@ import org.oscim.utils.geom.LineClipper;
 public class TourLayer extends Layer {
 
    private static final int RENDERING_DELAY = 0;
+
    /**
     * Stores points, converted to the map projection.
     */
-   protected GeoPoint[]     _allGeoPoints;
-   protected TIntArrayList  _allTourStarts;
+   private GeoPoint[]       _allGeoPoints;
+   private TIntArrayList    _allTourStarts;
 
-   protected boolean        _isUpdatePoints;
+   private boolean          _isUpdatePoints;
 
    /**
     * Line style
     */
-   LineStyle                _lineStyle;
+   private LineStyle        _lineStyle;
 
-   final Worker             _simpleWorker;
+   private final Worker     _simpleWorker;
 
    private boolean          _isUpdateLayer;
    private int[]            _allGeoPointColors;
@@ -96,7 +96,7 @@ public class TourLayer extends Layer {
          final int currentX = (int) (viewport.pos.x * currentZoomLevel);
          final int currentY = (int) (viewport.pos.y * currentZoomLevel);
 
-         /* update layers when map moved by at least one tile */
+         // update layers when map moved by at least one tile
          if (currentX != __oldX || currentY != __oldY || currentZoomLevel != __oldZoomLevel || _isUpdateLayer) {
 
             /*
@@ -118,14 +118,17 @@ public class TourLayer extends Layer {
          }
 
          final TourRenderTask workerTask = _simpleWorker.poll();
+
          if (workerTask == null) {
+
+            // nothing to do
             return;
          }
 
-         /* keep position to render relative to current state */
+         // keep position to render relative to current state
          mMapPosition.copy(workerTask.__mapPos);
 
-         /* compile new layers */
+         // compile new layers
          allBuckets.set(workerTask.__renderBuckets.get());
          compile();
       }
@@ -133,8 +136,8 @@ public class TourLayer extends Layer {
 
    private final static class TourRenderTask {
 
-      AllRenderBucketsMT __renderBuckets = new AllRenderBucketsMT();
-      MapPosition        __mapPos        = new MapPosition();
+      RenderBuckets_AllMT __renderBuckets = new RenderBuckets_AllMT();
+      MapPosition         __mapPos        = new MapPosition();
    }
 
    final class Worker extends SimpleWorker<TourRenderTask> {
@@ -436,24 +439,33 @@ public class TourLayer extends Layer {
 
       final int lineColor = ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity);
 
+      final int trackVerticalOffset = trackConfig.isTrackVerticalOffset
+            ? trackConfig.trackVerticalOffset
+            : 0;
+
       if (trackConfig.isShowDirectionArrow) {
 
-         final MarkerToolkit _markertoolkit = new MarkerToolkit(MarkerShape.ARROW);
+         // create texture from arrow image
+         final MarkerToolkit markertoolkit = new MarkerToolkit(MarkerShape.ARROW);
+         final Bitmap bitmapArrow = markertoolkit.drawTrackArrow(40, lineColor);
+         final TextureItem textureItem = new TextureItem(bitmapArrow);
 
-         final Bitmap _bitmapArrow = _markertoolkit.drawTrackArrow(40, lineColor);
-
-         final TextureItem _tex = new TextureItem(_bitmapArrow);
-
-         //width must not to tiny, otherwise no place that arrow can be painted
+         // width must be not too tiny, otherwise there is no place that the arrow can be painted
          final float faterOutlineWidth = Math.max(trackConfig.outlineWidth * 2, 5f);
 
          final LineStyle style = LineStyle.builder()
+
                .stippleColor(lineColor)
                .stipple(20)
                .strokeWidth(faterOutlineWidth)
                .strokeColor(lineColor)
+
+               // this is not working
+               // "u_height" is above the ground -> this is the z axis
+//             .heightOffset(trackVerticalOffset)
+
                .fixed(true)
-               .texture(_tex)
+               .texture(textureItem)
                .randomOffset(false)
                .color(lineColor)
                .cap(Cap.BUTT)
@@ -464,23 +476,27 @@ public class TourLayer extends Layer {
 
       } else {
 
-         final int trackVerticalOffset = trackConfig.isTrackVerticalOffset
-               ? trackConfig.trackVerticalOffset
-               : 0;
-
          final LineStyle style = LineStyle.builder()
 
                .strokeWidth(trackConfig.outlineWidth)
+
                .color(lineColor)
 
-               //.cap(Cap.BUTT)
-               .cap(Paint.Cap.ROUND)
+//             .cap(Cap.BUTT)
+//             .cap(Cap.SQUARE)
+               .cap(Cap.ROUND)
 
-               // outline is not yet working
+               // I don't know how outline is working
                // .isOutline(true)
 
                // "u_height" is above the ground -> this is the z axis
                .heightOffset(trackVerticalOffset)
+
+               // VERY IMPORTANT: Set fixed=true, otherwise the line width
+               // will jump when the zoom-level is changed !!!
+               .fixed(true)
+
+//             .blur(trackConfig.testValue / 100.0f)
 
                .build();
 

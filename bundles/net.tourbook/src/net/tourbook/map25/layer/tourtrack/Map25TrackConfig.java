@@ -53,6 +53,8 @@ public class Map25TrackConfig {
    public float   sliderPath_LineWidth       = Map25ConfigManager.DEFAULT_SLIDER_PATH_LINE_WIDTH;
    public int     sliderPath_Opacity         = Map25ConfigManager.DEFAULT_SLIDER_PATH_OPACITY;
 
+   public int     testValue                  = 50;
+
 // SET_FORMATTING_ON
 
    /**

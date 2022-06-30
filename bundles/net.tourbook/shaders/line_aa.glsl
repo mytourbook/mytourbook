@@ -20,12 +20,12 @@ varying vec2 v_st;
 void main() {
 	
     // scale extrusion to u_width pixel
-    // just ignore the two most insignificant bits.
+    // just ignore the two most insignificant bits
     vec2 dir = a_pos.zw;
 	 
     gl_Position = u_mvp * vec4(a_pos.xy + (u_width * dir), u_height, 1.0);
 
-    // last two bits hold the texture coordinates.
+    // last two bits hold the texture coordinates
     v_st = abs(mod(dir, 4.0)) - 1.0;
 }
 
@@ -61,6 +61,7 @@ void main() {
     }
 	 
     // Antialias line-edges:
+    //
     // - 'len' is 0 at center of line. -> (1.0 - len) is 0 at the edges
     // - 'u_fade' is 'pixel' / 'width', i.e. the inverse width of the line in pixel on screen
     // - 'pixel' is 1.5 / relativeScale
