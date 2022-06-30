@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -77,6 +77,7 @@ public class CommonImages {
    public static final String Weather_Cloudy               = "weather-cloudy.png";                        //$NON-NLS-1$
    public static final String Weather_Lightning            = "weather-lightning.png";                     //$NON-NLS-1$
    public static final String Weather_Rain                 = "weather-rain.png";                          //$NON-NLS-1$
+   public static final String Weather_Drizzle              = "weather-drizzle.png";                       //$NON-NLS-1$
    public static final String Weather_Snow                 = "weather-snow.png";                          //$NON-NLS-1$
    public static final String Weather_Sunny                = "weather-sunny.png";                         //$NON-NLS-1$
 

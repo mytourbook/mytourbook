@@ -396,6 +396,7 @@ public class WeatherUtils {
          //https://emojipedia.org/cloud-with-rain/
          weatherIcon = "\ud83c\udf27"; //$NON-NLS-1$
          break;
+      //todo fb drizzle
       case IWeather.WEATHER_ID_LIGHTNING:
          //https://emojipedia.org/cloud-with-lightning/
          weatherIcon = "\ud83c\udf29"; //$NON-NLS-1$
