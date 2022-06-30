@@ -7,6 +7,7 @@ on:
 jobs:
   build:
     needs: check_date
+    if: ${{ needs.check_date.outputs.should_run != 'false' }}
     name: Build
     runs-on: windows-latest
     steps:
