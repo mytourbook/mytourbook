@@ -19,7 +19,6 @@ package net.tourbook.cloud;
  * Contains image constants which do not need to be translated
  */
 public class CloudImages {
-   public static final String Cloud_Dropbox_File2         = "dropbox-file.png";                 //$NON-NLS-1$
 
    public static final String Cloud_Dropbox_File         = "dropbox-file.png";                 //$NON-NLS-1$
    public static final String Cloud_Dropbox_Folder       = "dropbox-folder.png";               //$NON-NLS-1$
