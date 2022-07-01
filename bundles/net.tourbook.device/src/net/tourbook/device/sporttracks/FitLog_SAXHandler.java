@@ -145,7 +145,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
       _weatherId.put("MostClouds",     IWeather.WEATHER_ID_OVERCAST); //            *)    //$NON-NLS-1$
       _weatherId.put("Clouds",         IWeather.WEATHER_ID_OVERCAST); //                  //$NON-NLS-1$
       _weatherId.put("ChanceRain",     IWeather.WEATHER_ID_DRIZZLE); //                   //$NON-NLS-1$
-      _weatherId.put("LightDrizzle",   IWeather.WEATHER_ID_SCATTERED_SHOWERS); //             *)    //$NON-NLS-1$
+      _weatherId.put("LightDrizzle",   IWeather.WEATHER_ID_SCATTERED_SHOWERS); //   *)    //$NON-NLS-1$
       _weatherId.put("LightRain",      IWeather.WEATHER_ID_SCATTERED_SHOWERS); //         //$NON-NLS-1$
       _weatherId.put("Rain",           IWeather.WEATHER_ID_RAIN); //                      //$NON-NLS-1$
       _weatherId.put("HeavyRain",      IWeather.WEATHER_ID_RAIN); //                *)    //$NON-NLS-1$
