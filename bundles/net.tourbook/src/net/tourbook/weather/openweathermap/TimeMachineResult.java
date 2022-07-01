@@ -258,6 +258,8 @@ public class TimeMachineResult {
          weatherType = IWeather.WEATHER_ID_LIGHTNING;
       } else if (currentWeatherId >= 300 && currentWeatherId < 400) {
          weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
+      } else if (currentWeatherId >= 300 && currentWeatherId < 400) {
+         weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
       } else if (currentWeatherId >= 500 && currentWeatherId < 600) {
          weatherType = IWeather.WEATHER_ID_RAIN;
       } else if (currentWeatherId >= 600 && currentWeatherId < 700) {

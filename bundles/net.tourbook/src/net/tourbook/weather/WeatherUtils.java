@@ -389,6 +389,7 @@ public class WeatherUtils {
          weatherIcon = "\u2601"; //$NON-NLS-1$
          break;
       case IWeather.WEATHER_ID_SCATTERED_SHOWERS:
+      case IWeather.WEATHER_ID_DRIZZLE:
          //https://emojipedia.org/sun-behind-rain-cloud/
          weatherIcon = "\ud83c\udf26"; //$NON-NLS-1$
          break;
@@ -396,7 +397,6 @@ public class WeatherUtils {
          //https://emojipedia.org/cloud-with-rain/
          weatherIcon = "\ud83c\udf27"; //$NON-NLS-1$
          break;
-      //todo fb drizzle
       case IWeather.WEATHER_ID_LIGHTNING:
          //https://emojipedia.org/cloud-with-lightning/
          weatherIcon = "\ud83c\udf29"; //$NON-NLS-1$
