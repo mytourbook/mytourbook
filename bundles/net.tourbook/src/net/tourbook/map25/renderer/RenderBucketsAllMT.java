@@ -37,9 +37,9 @@ import org.slf4j.LoggerFactory;
  * MapTile. It can be used for other purposes as well but some optimizations
  * (and limitations) probably wont make sense in different contexts.
  */
-public class RenderBuckets_AllMT extends TileData {
+public class RenderBucketsAllMT extends TileData {
 
-   static final Logger log = LoggerFactory.getLogger(RenderBuckets_AllMT.class);
+   static final Logger log = LoggerFactory.getLogger(RenderBucketsAllMT.class);
 
    /* Count of units needed for one vertex */
    public static final int[] VERTEX_CNT  =
@@ -100,7 +100,7 @@ public class RenderBuckets_AllMT extends TileData {
 
    private RenderBucketMT _currentBucket;
 
-   public RenderBuckets_AllMT() {}
+   public RenderBucketsAllMT() {}
 
    public static void initRenderer() {
 
@@ -520,7 +520,7 @@ public class RenderBuckets_AllMT extends TileData {
       this._allBuckets = buckets;
    }
 
-   public void setFrom(final RenderBuckets_AllMT allBuckets) {
+   public void setFrom(final RenderBucketsAllMT allBuckets) {
 
       if (allBuckets == this) {
          throw new IllegalArgumentException("Cannot set from oneself!");

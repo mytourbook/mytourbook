@@ -56,13 +56,13 @@ public class BucketRendererMT extends LayerRenderer {
    /**
     * Buckets for rendering
     */
-   protected final RenderBuckets_AllMT allBuckets;
+   protected final RenderBucketsAllMT allBuckets;
 
    protected boolean                  mInitialized;
 
    public BucketRendererMT() {
 
-      allBuckets = new RenderBuckets_AllMT();
+      allBuckets = new RenderBucketsAllMT();
       mMapPosition = new MapPosition();
    }
 
@@ -88,7 +88,7 @@ public class BucketRendererMT extends LayerRenderer {
       GLState.test(false, false);
       GLState.blend(true);
 
-      // viewport scale 2 map scale is between 1...2
+      // viewport scale 2 map scale: it is between 1...2
       final float vp2mpScale = (float) (viewport.pos.scale / mapPosition.scale);
 
       boolean isProjected = true;
@@ -108,7 +108,7 @@ public class BucketRendererMT extends LayerRenderer {
          switch (bucket.type) {
 
 //       case POLYGON:
-//           b = PolygonBucket.Renderer.draw(b, v, 1, true);
+//           bucket = PolygonBucket.Renderer.draw(bucket, viewport, 1, true);
 //           break;
 
          case LINE:
@@ -123,23 +123,23 @@ public class BucketRendererMT extends LayerRenderer {
             break;
 
 //       case MESH:
-//           b = MeshBucket.Renderer.draw(b, v);
+//           bucket = MeshBucket.Renderer.draw(bucket, viewport);
 //           break;
 //       case HAIRLINE:
-//           b = HairLineBucket.Renderer.draw(b, v);
+//           bucket = HairLineBucket.Renderer.draw(bucket, viewport);
 //           break;
 //       case BITMAP:
-//           b = BitmapBucket.Renderer.draw(b, v, 1, 1);
+//           bucket = BitmapBucket.Renderer.draw(bucket, viewport, 1, 1);
 //           break;
 //       case SYMBOL:
-//           if (project) {
-//               project = false;
-//               setMatrix(v, project);
+//           if (isProjected) {
+//               isProjected = false;
+//               setMatrix(viewport, isProjected);
 //           }
-//           b = TextureBucket.Renderer.draw(b, v, div);
+//           bucket = TextureBucket.Renderer.draw(bucket, viewport, vp2mpScale);
 //           break;
 //       case CIRCLE:
-//           b = CircleBucket.Renderer.draw(b, v);
+//           bucket = CircleBucket.Renderer.draw(bucket, viewport);
 //           break;
 
          default:

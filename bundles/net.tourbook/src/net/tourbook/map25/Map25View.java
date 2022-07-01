@@ -51,6 +51,7 @@ import net.tourbook.map.IMapSyncListener;
 import net.tourbook.map.MapColorProvider;
 import net.tourbook.map.MapInfoManager;
 import net.tourbook.map.MapManager;
+import net.tourbook.map.MapUtils;
 import net.tourbook.map.bookmark.ActionMapBookmarks;
 import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
@@ -1370,7 +1371,17 @@ public class Map25View extends ViewPart implements
          return;
       }
 
+      // set colors according to the tour values
       final IMapColorProvider mapColorProvider = MapColorProvider.getActiveMap2ColorProvider(MapGraphId.Altitude);
+      if (mapColorProvider instanceof IGradientColorProvider) {
+
+         MapUtils.configureColorProvider(
+               _allTourData,
+               (IGradientColorProvider) mapColorProvider,
+               ColorProviderConfig.MAP2,
+               200 // set dummy for now
+         );
+      }
 
       int numAllTimeSlices = 0;
 
@@ -1413,7 +1424,7 @@ public class Map25View extends ViewPart implements
 
             final float[] elevationSerie = tourData.altitudeSerie;
 
-            // create vtm geo points
+            // create vtm geo points and colors
             for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++, tourIndex++) {
 
                _allGeoPoints[geoIndex] = (new GeoPoint(latitudeSerie[serieIndex], longitudeSerie[serieIndex]));
@@ -1425,6 +1436,14 @@ public class Map25View extends ViewPart implements
                   colorValue = ((IGradientColorProvider) mapColorProvider).getRGBValue(
                         ColorProviderConfig.MAP2,
                         elevationSerie[serieIndex]);
+
+                  final int red = (colorValue & 0xFF) >>> 0;
+                  final int green = (colorValue & 0xFF00) >>> 8;
+                  final int blue = (colorValue & 0xFF0000) >>> 16;
+
+                  colorValue = ((red & 0xFF) << 0) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 16);
+
+//                  float a = Color.aToFloat(colorValue);
 
                } else if (mapColorProvider instanceof IDiscreteColorProvider) {
 

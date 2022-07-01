@@ -37,13 +37,13 @@ public class LocationRenderer extends LayerRenderer {
 
    private String            _shaderFile;
    private int               _shaderProgram;
-   private int               _shader_VertexPosition;
-   private int               _shader_MatrixPosition;
-   private int               _shader_Scale;
-   private int               _shader_Phase;
-   private int               _shader_Direction;
-   private int               _shader_Color;
-   private int               _shader_Mode;
+   private int               _shader_a_pos;
+   private int               _shader_u_mvp;
+   private int               _shader_u_scale;
+   private int               _shader_u_phase;
+   private int               _shader_u_dir;
+   private int               _shader_u_color;
+   private int               _shader_u_mode;
 
    private Callback          _render_Callback;
    private final float       _render_Scale;
@@ -148,15 +148,15 @@ public class LocationRenderer extends LayerRenderer {
 
 // SET_FORMATTING_OFF
 
-      _shaderProgram          = program;
+      _shaderProgram       = program;
 
-      _shader_VertexPosition  = gl.getAttribLocation (program, "a_pos"); //$NON-NLS-1$
-      _shader_MatrixPosition  = gl.getUniformLocation(program, "u_mvp"); //$NON-NLS-1$
-      _shader_Phase           = gl.getUniformLocation(program, "u_phase"); //$NON-NLS-1$
-      _shader_Scale           = gl.getUniformLocation(program, "u_scale"); //$NON-NLS-1$
-      _shader_Direction       = gl.getUniformLocation(program, "u_dir"); //$NON-NLS-1$
-      _shader_Color           = gl.getUniformLocation(program, "u_color"); //$NON-NLS-1$
-      _shader_Mode            = gl.getUniformLocation(program, "u_mode"); //$NON-NLS-1$
+      _shader_a_pos        = gl.getAttribLocation (program, "a_pos"); //$NON-NLS-1$
+      _shader_u_mvp        = gl.getUniformLocation(program, "u_mvp"); //$NON-NLS-1$
+      _shader_u_phase      = gl.getUniformLocation(program, "u_phase"); //$NON-NLS-1$
+      _shader_u_scale      = gl.getUniformLocation(program, "u_scale"); //$NON-NLS-1$
+      _shader_u_dir        = gl.getUniformLocation(program, "u_dir"); //$NON-NLS-1$
+      _shader_u_color      = gl.getUniformLocation(program, "u_color"); //$NON-NLS-1$
+      _shader_u_mode       = gl.getUniformLocation(program, "u_mode"); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
 
@@ -170,8 +170,8 @@ public class LocationRenderer extends LayerRenderer {
       GLState.blend(true);
       GLState.test(false, false);
 
-      GLState.enableVertexArrays(_shader_VertexPosition, -1);
-      MapRenderer.bindQuadVertexVBO(_shader_VertexPosition/* , true */);
+      GLState.enableVertexArrays(_shader_a_pos, -1);
+      MapRenderer.bindQuadVertexVBO(_shader_a_pos/* , true */);
 
       final MapPosition viewPortPosition = viewPort.pos;
       float radius = _render_CircleSize * _render_Scale;
@@ -193,7 +193,7 @@ public class LocationRenderer extends LayerRenderer {
 
             isViewShed = true;
          }
-         gl.uniform1f(_shader_Scale, radius);
+         gl.uniform1f(_shader_u_scale, radius);
 
          final Point locationPosition = _render_IndicatorPositions[locationIndex];
          final double x = locationPosition.x - viewPortPosition.x;
@@ -202,11 +202,11 @@ public class LocationRenderer extends LayerRenderer {
 
          viewPort.mvp.setTransScale((float) (x * tileScale), (float) (y * tileScale), 1);
          viewPort.mvp.multiplyMM(viewPort.viewproj, viewPort.mvp);
-         viewPort.mvp.setAsUniform(_shader_MatrixPosition);
+         viewPort.mvp.setAsUniform(_shader_u_mvp);
 
          if (isViewShed) {
 
-            gl.uniform1f(_shader_Phase, 1);
+            gl.uniform1f(_shader_u_phase, 1);
 
          } else {
 
@@ -215,7 +215,7 @@ public class LocationRenderer extends LayerRenderer {
             //phase = Interpolation.fade.apply(phase);
             phase = Interpolation.swing.apply(phase);
 
-            gl.uniform1f(_shader_Phase, 0.8f + phase * 0.2f);
+            gl.uniform1f(_shader_u_phase, 0.8f + phase * 0.2f);
 
          }
 
@@ -225,25 +225,25 @@ public class LocationRenderer extends LayerRenderer {
 
                float rotation = _render_Callback.getRotation();
                rotation -= 90;
-               gl.uniform2f(_shader_Direction,
+               gl.uniform2f(_shader_u_dir,
                      (float) Math.cos(Math.toRadians(rotation)),
                      (float) Math.sin(Math.toRadians(rotation)));
-               gl.uniform1i(_shader_Mode, 1); // With bearing
+               gl.uniform1i(_shader_u_mode, 1); // With bearing
 
             } else {
 
-               gl.uniform2f(_shader_Direction, 0, 0);
-               gl.uniform1i(_shader_Mode, 0); // Without bearing
+               gl.uniform2f(_shader_u_dir, 0, 0);
+               gl.uniform1i(_shader_u_mode, 0); // Without bearing
             }
 
          } else {
 
             // Outside screen
 
-            gl.uniform1i(_shader_Mode, -1);
+            gl.uniform1i(_shader_u_mode, -1);
          }
 
-         GLUtils.glUniform4fv(_shader_Color, 1, _render_Colors[locationIndex]);
+         GLUtils.glUniform4fv(_shader_u_color, 1, _render_Colors[locationIndex]);
 
          gl.drawArrays(GL.TRIANGLE_STRIP, 0, 4);
       }

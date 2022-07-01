@@ -110,34 +110,34 @@ public final class LineTexBucketMT extends LineBucketMT {
       private static int         mVertexFlipID;
 
       /* posX, posY, extrX, extrY, length, unused */
-      private static final int STRIDE = 6 * RenderBuckets_AllMT.SHORT_BYTES;
+      private static final int STRIDE = 6 * RenderBucketsAllMT.SHORT_BYTES;
 
       //static TextureItem tex;
 
       /* offset for line length, unused; skip first 4 units */
-      private static final int LEN_OFFSET = 4 * RenderBuckets_AllMT.SHORT_BYTES;
+      private static final int LEN_OFFSET = 4 * RenderBucketsAllMT.SHORT_BYTES;
 
       public static RenderBucketMT draw(RenderBucketMT renderBucket,
                                         final GLViewport viewport,
                                         final float div,
-                                        final RenderBuckets_AllMT buckets) {
+                                        final RenderBucketsAllMT buckets) {
 
          GLState.blend(true);
          shader.useProgram();
 
          GLState.enableVertexArrays(GLState.DISABLED, GLState.DISABLED);
 
-         final int aLen0 = shader.aLen0;
-         final int aLen1 = shader.aLen1;
-         final int aPos0 = shader.aPos0;
-         final int aPos1 = shader.aPos1;
-         final int aFlip = shader.aFlip;
+         final int shader_aLen0 = shader.aLen0;
+         final int shader_aLen1 = shader.aLen1;
+         final int shader_aPos0 = shader.aPos0;
+         final int shader_aPos1 = shader.aPos1;
+         final int shader_aFlip = shader.aFlip;
 
-         gl.enableVertexAttribArray(aPos0);
-         gl.enableVertexAttribArray(aPos1);
-         gl.enableVertexAttribArray(aLen0);
-         gl.enableVertexAttribArray(aLen1);
-         gl.enableVertexAttribArray(aFlip);
+         gl.enableVertexAttribArray(shader_aPos0);
+         gl.enableVertexAttribArray(shader_aPos1);
+         gl.enableVertexAttribArray(shader_aLen0);
+         gl.enableVertexAttribArray(shader_aLen1);
+         gl.enableVertexAttribArray(shader_aFlip);
 
          viewport.mvp.setAsUniform(shader.uMVP);
 
@@ -204,10 +204,10 @@ public final class LineTexBucketMT extends LineBucketMT {
                }
 
                /* i * (24 units per block / 6) * unit bytes) */
-               final int add = (renderBucket.vertexOffset + i * 4 * RenderBuckets_AllMT.SHORT_BYTES) + vOffset;
+               final int add = (renderBucket.vertexOffset + i * 4 * RenderBucketsAllMT.SHORT_BYTES) + vOffset;
 
                gl.vertexAttribPointer(
-                     aPos0,
+                     shader_aPos0,
                      4,
                      GL.SHORT,
                      false,
@@ -215,7 +215,7 @@ public final class LineTexBucketMT extends LineBucketMT {
                      add + STRIDE);
 
                gl.vertexAttribPointer(
-                     aLen0,
+                     shader_aLen0,
                      2,
                      GL.SHORT,
                      false,
@@ -223,7 +223,7 @@ public final class LineTexBucketMT extends LineBucketMT {
                      add + STRIDE + LEN_OFFSET);
 
                gl.vertexAttribPointer(
-                     aPos1,
+                     shader_aPos1,
                      4,
                      GL.SHORT,
                      false,
@@ -231,7 +231,7 @@ public final class LineTexBucketMT extends LineBucketMT {
                      add);
 
                gl.vertexAttribPointer(
-                     aLen1,
+                     shader_aLen1,
                      2,
                      GL.SHORT,
                      false,
@@ -252,30 +252,30 @@ public final class LineTexBucketMT extends LineBucketMT {
                }
 
                /* i * (24 units per block / 6) * unit bytes) */
-               final int add = (renderBucket.vertexOffset + i * 4 * RenderBuckets_AllMT.SHORT_BYTES) + vOffset;
+               final int add = (renderBucket.vertexOffset + i * 4 * RenderBucketsAllMT.SHORT_BYTES) + vOffset;
 
-               gl.vertexAttribPointer(aPos0,
+               gl.vertexAttribPointer(shader_aPos0,
                      4,
                      GL.SHORT,
                      false,
                      STRIDE,
                      add + 2 * STRIDE);
 
-               gl.vertexAttribPointer(aLen0,
+               gl.vertexAttribPointer(shader_aLen0,
                      2,
                      GL.SHORT,
                      false,
                      STRIDE,
                      add + 2 * STRIDE + LEN_OFFSET);
 
-               gl.vertexAttribPointer(aPos1,
+               gl.vertexAttribPointer(shader_aPos1,
                      4,
                      GL.SHORT,
                      false,
                      STRIDE,
                      add + STRIDE);
 
-               gl.vertexAttribPointer(aLen1,
+               gl.vertexAttribPointer(shader_aLen1,
                      2,
                      GL.SHORT,
                      false,
@@ -286,11 +286,11 @@ public final class LineTexBucketMT extends LineBucketMT {
             }
          }
 
-         gl.disableVertexAttribArray(aPos0);
-         gl.disableVertexAttribArray(aPos1);
-         gl.disableVertexAttribArray(aLen0);
-         gl.disableVertexAttribArray(aLen1);
-         gl.disableVertexAttribArray(aFlip);
+         gl.disableVertexAttribArray(shader_aPos0);
+         gl.disableVertexAttribArray(shader_aPos1);
+         gl.disableVertexAttribArray(shader_aLen0);
+         gl.disableVertexAttribArray(shader_aLen1);
+         gl.disableVertexAttribArray(shader_aFlip);
 
          return renderBucket;
       }
@@ -412,7 +412,7 @@ public final class LineTexBucketMT extends LineBucketMT {
    }
 
    @Override
-   void addLine(final float[] points, final int[] index, final int numPoints, final boolean closed) {
+   void addLine(final float[] points, final int[] index, final int numPoints, final boolean closed, final int[] pixelPointColors) {
 
       if (vertexItems.empty()) {
          /*
@@ -542,7 +542,7 @@ public final class LineTexBucketMT extends LineBucketMT {
    @Override
    public void addLine(final GeometryBuffer geom) {
 
-      addLine(geom.points, geom.index, -1, false);
+      addLine(geom.points, geom.index, -1, false, null);
    }
 
    private void addShortVertex(final VertexData vi,

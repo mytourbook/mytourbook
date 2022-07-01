@@ -119,7 +119,7 @@ public class LineBucketMT extends RenderBucketMT {
       public static RenderBucketMT draw(RenderBucketMT renderBucket,
                                         final GLViewport viewport,
                                         final float vp2mpScale,
-                                        final RenderBuckets_AllMT buckets) {
+                                        final RenderBucketsAllMT buckets) {
 
          final MapPosition mapPosition = viewport.pos;
 
@@ -436,26 +436,38 @@ public class LineBucketMT extends RenderBucketMT {
    /**
     * This is called from {@link TourLayer#_simpleWorker}
     *
-    * @param points
+    * @param pixelPoints
+    *           -2048 ... 2048
     * @param numPoints
     * @param isCapClosed
+    * @param pixelPointColors
     */
-   public void addLine(final float[] points,
+   public void addLine(final float[] pixelPoints,
                        final int numPoints,
-                       final boolean isCapClosed) {
+                       final boolean isCapClosed,
+                       final int[] pixelPointColors) {
 
       if (numPoints >= 4) {
-         addLine(points, null, numPoints, isCapClosed);
+         addLine(pixelPoints, null, numPoints, isCapClosed, pixelPointColors);
       }
 
       System.out.println((System.currentTimeMillis() + "addLine - numPoints:" + numPoints));
 // TODO remove SYSTEM.OUT.PRINTLN
    }
 
-   void addLine(final float[] points,
+   /**
+    * @param pixelPoints
+    *           -2048 ... 2048
+    * @param index
+    * @param numPoints
+    * @param isCapClosed
+    * @param pixelPointColors
+    */
+   void addLine(final float[] pixelPoints,
                 final int[] index,
                 final int numPoints,
-                final boolean isCapClosed) {
+                final boolean isCapClosed,
+                final int[] pixelPointColors) {
 
       boolean isCapRounded = false;
       boolean isCapSquared = false;
@@ -492,7 +504,7 @@ public class LineBucketMT extends RenderBucketMT {
          if (numPoints > 0) {
             numLinePoints = numPoints;
          } else {
-            numLinePoints = points.length;
+            numLinePoints = pixelPoints.length;
          }
       } else {
          numIndices = index.length;
@@ -519,38 +531,44 @@ public class LineBucketMT extends RenderBucketMT {
 
          /* start and end point are equal */
          if (numLinePoints == 4 &&
-               points[startIndex] == points[startIndex + 2] &&
-               points[startIndex + 1] == points[startIndex + 3]) {
+               pixelPoints[startIndex] == pixelPoints[startIndex + 2] &&
+               pixelPoints[startIndex + 1] == pixelPoints[startIndex + 3]) {
 
             continue;
          }
 
          /* avoid simple 180 degree angles */
          if (numLinePoints == 6 &&
-               points[startIndex] == points[startIndex + 4] &&
-               points[startIndex + 1] == points[startIndex + 5]) {
+               pixelPoints[startIndex] == pixelPoints[startIndex + 4] &&
+               pixelPoints[startIndex + 1] == pixelPoints[startIndex + 5]) {
 
             numLinePoints -= 2;
          }
 
-         addLine(vertexItems, points, startIndex, numLinePoints, isCapRounded, isCapSquared, isCapClosed);
+         addLine(vertexItems, pixelPoints, startIndex, numLinePoints, isCapRounded, isCapSquared, isCapClosed);
       }
    }
 
    public void addLine(final GeometryBuffer geom) {
 
-      if (geom.isPoly()) {
-         addLine(geom.points, geom.index, -1, true);
-      } else if (geom.isLine()) {
-         addLine(geom.points, geom.index, -1, false);
-      } else {
-         log.debug("geometry must be LINE or POLYGON");
-      }
+//      if (geom.isPoly()) {
+//
+//         addLine(geom.points, geom.index, -1, true);
+//
+//      } else if (geom.isLine()) {
+//
+//         addLine(geom.points, geom.index, -1, false);
+//
+//      } else {
+//
+//         log.debug("geometry must be LINE or POLYGON");
+//      }
    }
 
    /**
     * @param vertices
     * @param points
+    *           -2048 ... 2048
     * @param startIndex
     * @param numLinePoints
     * @param isRounded
@@ -626,27 +644,14 @@ public class LineBucketMT extends RenderBucketMT {
          ddx = (int) (-(ux + vPrevX) * DIR_SCALE);
          ddy = (int) (-(uy + vPrevY) * DIR_SCALE);
 
-         vertices.add(
-               ox,
-               oy,
-               (short) (2 | ddx & DIR_MASK),
-               (short) (2 | ddy & DIR_MASK));
+         vertices.add(ox, oy, (short) (2 | ddx & DIR_MASK), (short) (2 | ddy & DIR_MASK));
 
          // start of line
          ddx = (int) (ux * DIR_SCALE);
          ddy = (int) (uy * DIR_SCALE);
 
-         vertices.add(
-               ox,
-               oy,
-               (short) (0 | ddx & DIR_MASK),
-               (short) (1 | ddy & DIR_MASK));
-
-         vertices.add(
-               ox,
-               oy,
-               (short) (2 | -ddx & DIR_MASK),
-               (short) (1 | -ddy & DIR_MASK));
+         vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (1 | ddy & DIR_MASK));
+         vertices.add(ox, oy, (short) (2 | -ddx & DIR_MASK), (short) (1 | -ddy & DIR_MASK));
 
       } else {
 
@@ -686,11 +691,7 @@ public class LineBucketMT extends RenderBucketMT {
          ddx = (int) (-(ux + tx) * DIR_SCALE);
          ddy = (int) (-(uy + ty) * DIR_SCALE);
 
-         vertices.add(
-               ox,
-               oy,
-               (short) (2 | ddx & DIR_MASK),
-               (short) (1 | ddy & DIR_MASK));
+         vertices.add(ox, oy, (short) (2 | ddx & DIR_MASK), (short) (1 | ddy & DIR_MASK));
       }
 
       curX = nextX;
@@ -709,7 +710,8 @@ public class LineBucketMT extends RenderBucketMT {
 
          } else if (isClosed && pointIndex < endIndex + 2) {
 
-            // add startpoint == endpoint
+            // close the loop -> the next point is back to the startpoint
+            // (Original comment) add startpoint == endpoint
 
             nextX = points[startIndex];
             nextY = points[startIndex + 1];
@@ -728,7 +730,9 @@ public class LineBucketMT extends RenderBucketMT {
 
          // skip too short segments
          if (xyDistance < _minimumDistance) {
+
             numVertices -= 2;
+
             continue;
          }
 
@@ -739,6 +743,7 @@ public class LineBucketMT extends RenderBucketMT {
 
          //log.debug("acos " + dotp);
          if (dotp > 0.65) {
+//       if (dotp > 0.965) {
 
             // add bevel join to avoid miter going to infinity
             numVertices += 2;
@@ -832,27 +837,14 @@ public class LineBucketMT extends RenderBucketMT {
          ddx = (int) (ux * DIR_SCALE);
          ddy = (int) (uy * DIR_SCALE);
 
-         vertices.add(
-               ox,
-               oy,
-               (short) (0 | ddx & DIR_MASK),
-               (short) (1 | ddy & DIR_MASK));
-
-         vertices.add(
-               ox,
-               oy,
-               (short) (2 | -ddx & DIR_MASK),
-               (short) (1 | -ddy & DIR_MASK));
+         vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (1 | ddy & DIR_MASK));
+         vertices.add(ox, oy, (short) (2 | -ddx & DIR_MASK), (short) (1 | -ddy & DIR_MASK));
 
          // For rounded line edges
          ddx = (int) ((ux - vPrevX) * DIR_SCALE);
          ddy = (int) ((uy - vPrevY) * DIR_SCALE);
 
-         vertices.add(
-               ox,
-               oy,
-               (short) (0 | ddx & DIR_MASK),
-               (short) (0 | ddy & DIR_MASK));
+         vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (0 | ddy & DIR_MASK));
 
          // last vertex
          ddx = (int) (-(ux + vPrevX) * DIR_SCALE);
@@ -880,11 +872,7 @@ public class LineBucketMT extends RenderBucketMT {
          ddx = (int) ((ux - vPrevX) * DIR_SCALE);
          ddy = (int) ((uy - vPrevY) * DIR_SCALE);
 
-         vertices.add(
-               ox,
-               oy,
-               (short) (0 | ddx & DIR_MASK),
-               (short) (1 | ddy & DIR_MASK));
+         vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (1 | ddy & DIR_MASK));
 
          // last vertex
          ddx = (int) (-(ux + vPrevX) * DIR_SCALE);
@@ -910,6 +898,17 @@ public class LineBucketMT extends RenderBucketMT {
       outlines = link;
    }
 
+   /**
+    * Adds 2 vertices
+    *
+    * @param vertexData
+    * @param x
+    * @param y
+    * @param vNextX
+    * @param vNextY
+    * @param vPrevX
+    * @param vPrevY
+    */
    private void addVertex(final VertexData vertexData,
                           final float x,
                           final float y,
@@ -938,17 +937,12 @@ public class LineBucketMT extends RenderBucketMT {
       final int ddx = (int) (ux * DIR_SCALE);
       final int ddy = (int) (uy * DIR_SCALE);
 
-      vertexData.add(
-            ox,
-            oy,
-            (short) (0 | ddx & DIR_MASK),
-            (short) (1 | ddy & DIR_MASK));
+// SET_FORMATTING_OFF
 
-      vertexData.add(
-            ox,
-            oy,
-            (short) (2 | -ddx & DIR_MASK),
-            (short) (1 | -ddy & DIR_MASK));
+      vertexData.add(ox, oy, (short) (0 |  ddx & DIR_MASK), (short) (1 |  ddy & DIR_MASK));
+      vertexData.add(ox, oy, (short) (2 | -ddx & DIR_MASK), (short) (1 | -ddy & DIR_MASK));
+
+// SET_FORMATTING_ON
    }
 
    /**
