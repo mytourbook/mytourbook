@@ -126,7 +126,7 @@ public class Messages extends NLS {
    public static String        app_action_collapse_others_tooltip;
    public static String        App_Action_Columns;
    public static String        App_Action_Copy;
-   public static String        App_Action_CopyDataIntoClipboard;
+   public static String        App_Action_CopyDataIntoClipboard_Tooltip;
    public static String        App_Action_CopyDataIntoClipboard_CopyIsDone;
    public static String        App_Action_Delete;
    public static String        App_Action_DeleteProfile;
@@ -169,6 +169,7 @@ public class Messages extends NLS {
    public static String        App_Action_RemoveTourPhotos;
    public static String        App_Action_Remove_Immediate;
    public static String        App_Action_Rename;
+   public static String        App_Action_ResetValue_Tooltip;
    public static String        App_Action_RestartApp;
    public static String        App_Action_Save;
    public static String        App_Action_SetPerson;
@@ -578,8 +579,8 @@ public class Messages extends NLS {
    public static String        Dialog_Export_Radio_GPX_DistanceAbsolute_Tooltip;
    public static String        Dialog_Export_Radio_GPX_DistanceRelative;
    public static String        Dialog_Export_Radio_GPX_DistanceRelative_Tooltip;
-   public static String        Dialog_Export_Radio_TCX_Aktivities;
-   public static String        Dialog_Export_Radio_TCX_Aktivities_Tooltip;
+   public static String        Dialog_Export_Radio_TCX_Activities;
+   public static String        Dialog_Export_Radio_TCX_Activities_Tooltip;
    public static String        Dialog_Export_Radio_TCX_Courses;
    public static String        Dialog_Export_Radio_TCX_Courses_Tooltip;
    public static String        Dialog_Export_Radio_TCX_NameFromField;
@@ -593,6 +594,19 @@ public class Messages extends NLS {
    public static String        Dialog_ExtractTour_DlgArea_Title;
    public static String        Dialog_ExtractTour_Label_DeviceName;
    public static String        Dialog_ExtractTour_Label_SplitMethod;
+
+   public static String        Dialog_GotoMapLocation_Action_GotoLocation;
+   public static String        Dialog_GotoMapLocation_Button_PasteLatLon_FromClipboard_Tooltip;
+   public static String        Dialog_GotoMapLocation_Button_PasteLatLon_FromMapMousePosition_Tooltip;
+   public static String        Dialog_GotoMapLocation_Checkbox_IsCreateBookmark;
+   public static String        Dialog_GotoMapLocation_Dialog_PasteLatLonError_Message;
+   public static String        Dialog_GotoMapLocation_Dialog_PasteLatLonError_Title;
+   public static String        Dialog_GotoMapLocation_Error_ValueCannotBeEmpty;
+   public static String        Dialog_GotoMapLocation_Label_LocationLatitude;
+   public static String        Dialog_GotoMapLocation_Label_LocationLongitude;
+   public static String        Dialog_GotoMapLocation_Message_LatLonIsPasted_FromClipboard;
+   public static String        Dialog_GotoMapLocation_Message_LatLonIsPasted_FromMouseMapPosition;
+   public static String        Dialog_GotoMapLocation_Title;
 
    public static String        Dialog_HRZone_Button_AddZone;
    public static String        Dialog_HRZone_Button_EditHrZones;
@@ -1775,13 +1789,12 @@ public class Messages extends NLS {
    public static String        Pref_Weather_CheckHTTPConnection_Message;
    public static String        Pref_Weather_CheckHTTPConnection_OK_Message;
    public static String        Pref_Weather_Label_ApiKey;
+   public static String        Pref_Weather_Label_OpenWeatherMap_FiveDaysLimit;
    public static String        Pref_Weather_Label_WeatherProvider;
+   public static String        Pref_Weather_Label_WeatherApi_SevenDaysLimit;
+   public static String        Pref_Weather_Label_WorldWeatherOnline_ApiKey_Tooltip;
    public static String        Pref_Weather_Link_ApiSignup;
-   public static String        Pref_Weather_OpenWeatherMap_Label_FiveDaysLimit;
    public static String        Pref_Weather_Provider_None;
-   public static String        Pref_Weather_WeatherApi_Label_SevenDaysLimit;
-
-   public static String        Pref_Weather_WorldWeatherOnline_Label_ApiKey_Tooltip;
 
    public static String        Search_Manager_CreateFTIndex;
    public static String        Search_Manager_Log_DeletingLuceneRootFolder;
@@ -1963,22 +1976,42 @@ public class Messages extends NLS {
    public static String        Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle;
    public static String        Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle_Tooltip;
 
-   public static String        Slideout_Map25MapOptions_Checkbox_Layer_3DBuilding;
-   public static String        Slideout_Map25MapOptions_Checkbox_Layer_Cartography;
-   public static String        Slideout_Map25MapOptions_Checkbox_Layer_Cartography_Tooltip;
-   public static String        Slideout_Map25MapOptions_Checkbox_Layer_Hillshading;
-   public static String        Slideout_Map25MapOptions_Checkbox_Layer_LabelSymbol;
-   public static String        Slideout_Map25MapOptions_Checkbox_Layer_Photo_Size;
-   public static String        Slideout_Map25MapOptions_Checkbox_Layer_Satellite;
-   public static String        Slideout_Map25MapOptions_Checkbox_Layer_ScaleBar;
-   public static String        Slideout_Map25MapOptions_Checkbox_Layer_TileInfo;
-   public static String        Slideout_Map25MapOptions_Checkbox_Photo_Title;
-   public static String        Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation;
-   public static String        Slideout_Map25MapOptions_Checkbox_UseDraggedKeyNavigation_Tooltip;
-   public static String        Slideout_Map25MapOptions_Group_MapLayer;
-   public static String        Slideout_Map25MapOptions_Label_MapOptions;
-   public static String        Slideout_Map25MapOptions_Spinner_Layer_Hillshading;
-   public static String        Slideout_Map25MapOptions_Spinner_Layer_Photo_Size;
+   public static String        Slideout_Map25Layer_Checkbox_Layer_3DBuilding;
+   public static String        Slideout_Map25Layer_Checkbox_Layer_Building_IsShowShadow;
+   public static String        Slideout_Map25Layer_Checkbox_Layer_Cartography;
+   public static String        Slideout_Map25Layer_Checkbox_Layer_Cartography_Tooltip;
+   public static String        Slideout_Map25Layer_Checkbox_Layer_Hillshading;
+   public static String        Slideout_Map25Layer_Checkbox_Layer_LabelSymbol;
+   public static String        Slideout_Map25Layer_Checkbox_Layer_LabelSymbol_IsBehindBuilding;
+   public static String        Slideout_Map25Layer_Checkbox_Layer_Satellite;
+   public static String        Slideout_Map25Layer_Checkbox_Layer_ScaleBar;
+   public static String        Slideout_Map25Layer_Checkbox_Layer_TileInfo;
+   public static String        Slideout_Map25Layer_Combo_SunPosition_CurrentTime;
+   public static String        Slideout_Map25Layer_Combo_SunPosition_DayTime;
+   public static String        Slideout_Map25Layer_Combo_SunPosition_NightTime;
+   public static String        Slideout_Map25Layer_Decorator_Cartography;
+   public static String        Slideout_Map25Layer_Label_BuildingMinZoomLevel;
+   public static String        Slideout_Map25Layer_Label_BuildingMinZoomLevel_Tooltip;
+   public static String        Slideout_Map25Layer_Label_MapLayer;
+   public static String        Slideout_Map25Layer_Label_SelectedSunTime_Tooltip;
+   public static String        Slideout_Map25Layer_Label_SunPosition;
+   public static String        Slideout_Map25Layer_Label_Sunrise_Tooltip;
+   public static String        Slideout_Map25Layer_Label_Sunset_Tooltip;
+   public static String        Slideout_Map25Layer_Label_SunTime;
+   public static String        Slideout_Map25Layer_Label_SunTime_Tooltip;
+   public static String        Slideout_Map25Layer_Spinner_Layer_Hillshading;
+   public static String        Slideout_Map25Layer_Spinner_SunTime_Coarse;
+   public static String        Slideout_Map25Layer_Spinner_SunTime_Fine;
+
+   public static String        Slideout_Map25Options_Checkbox_UseDraggedKeyNavigation;
+   public static String        Slideout_Map25Options_Checkbox_UseDraggedKeyNavigation_Tooltip;
+   public static String        Slideout_Map25Options_Label_MapOptions;
+   public static String        Slideout_Map25Options_Link_KeyboardShortcuts;
+
+   public static String        Slideout_Map25PhotoOptions_Checkbox_Layer_Photo_Size;
+   public static String        Slideout_Map25PhotoOptions_Checkbox_Photo_Title;
+   public static String        Slideout_Map25PhotoOptions_Spinner_Layer_Photo_Size;
+
    public static String        Slideout_Map25MarkerOptions_Checkbox_IsMarkerClustering;
    public static String        Slideout_Map25MarkerOptions_Checkbox_IsShowBookmarks;
    public static String        Slideout_Map25MarkerOptions_Checkbox_IsShowTourMarker;
@@ -2004,12 +2037,14 @@ public class Messages extends NLS {
    public static String        Slideout_Map25MarkerOptions_Label_Name_Tooltip;
    public static String        Slideout_Map25MarkerOptions_Label_SwapColor_Tooltip;
    public static String        Slideout_Map25MarkerOptions_Label_Title;
+
    public static String        Slideout_Map25Provider_Combo_MapProvider_Offline_Tooltip;
    public static String        Slideout_Map25Provider_Combo_MapProvider_Online_Tooltip;
    public static String        Slideout_Map25Provider_Label_DefaultTheme;
    public static String        Slideout_Map25Provider_Label_MapProvider;
    public static String        Slideout_Map25Provider_Label_MapProvider_Title;
    public static String        Slideout_Map25Provider_Label_ThemeStyle;
+
    public static String        Slideout_Map25TrackOptions_Label_ConfigName_Tooltip;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrows;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip;

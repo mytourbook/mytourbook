@@ -1532,6 +1532,10 @@ public class TrainingView extends ViewPart {
                return;
             }
 
+            if (_canvasHrZoneImage.isDisposed()) {
+               return;
+            }
+
             final boolean isHrZoneDataAvailable = TrainingManager.isRequiredHrZoneDataAvailable(_tourData);
 
             final Point imageSize = _canvasHrZoneImage.getSize();

@@ -49,6 +49,7 @@ import net.tourbook.chart.HoveredValuePointData;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorProviderConfig;
@@ -75,11 +76,11 @@ import net.tourbook.map.MapInfoManager;
 import net.tourbook.map.MapManager;
 import net.tourbook.map.MapUtils;
 import net.tourbook.map.bookmark.ActionMapBookmarks;
+import net.tourbook.map.bookmark.DialogGotoMapLocation;
 import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
-import net.tourbook.map.bookmark.MapLocation;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.action.ActionCreateTourMarkerFromMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
@@ -161,6 +162,7 @@ import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -169,7 +171,11 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -464,8 +470,10 @@ public class Map2View extends ViewPart implements
    private ActionTourColor                   _actionTourColor_HrZone;
    private ActionTourColor                   _actionTourColor_RunDyn_StepLength;
    //
+   private ActionCopyLocation                _actionCopyLocation;
    private ActionCreateTourMarkerFromMap     _actionCreateTourMarkerFromMap;
    private Action_ExportMap_SubMenu          _actionExportMap_SubMenu;
+   private ActionGotoLocation                _actionGotoLocation;
    private ActionManageMapProviders          _actionManageMapProvider;
    private ActionMapBookmarks                _actionMap2_Bookmarks;
    private ActionMap2Color                   _actionMap2_Color;
@@ -519,6 +527,37 @@ public class Map2View extends ViewPart implements
     */
    private Composite _parent;
    private Map2      _map;
+
+   private class ActionCopyLocation extends Action {
+
+      public ActionCopyLocation() {
+
+         setText(Messages.Map_Action_CopyLocation);
+
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy));
+         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Copy_Disabled));
+      }
+
+      @Override
+      public void run() {
+         actionCopyLocationToClipboard();
+      }
+   }
+
+   private class ActionGotoLocation extends Action {
+
+      public ActionGotoLocation() {
+
+         setText(Messages.Map_Action_GotoLocation);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.Show_POI));
+      }
+
+      @Override
+      public void run() {
+         actionGotoLocation();
+      }
+   }
 
    private class ActionMap2_Graphs extends ActionToolbarSlideout {
 
@@ -895,6 +934,78 @@ public class Map2View extends ViewPart implements
       }
 
       syncMap_ShowCurrentSyncModeImage(_isMapSyncWith_ValuePoint);
+   }
+
+   private void actionCopyLocationToClipboard() {
+
+      final Display display = Display.getDefault();
+
+      final GeoPosition mouseDown_GeoPosition = _map.get_mouseDown_GeoPosition();
+
+      final String geoPosition = String.format(Messages.Clipboard_Content_MapLocation,
+            mouseDown_GeoPosition.latitude,
+            mouseDown_GeoPosition.longitude);
+
+      final TextTransfer textTransfer = TextTransfer.getInstance();
+
+      final Clipboard clipBoard = new Clipboard(display);
+      {
+         clipBoard.setContents(
+
+               new Object[] { geoPosition },
+               new Transfer[] { textTransfer } //
+         );
+      }
+      clipBoard.dispose();
+
+      final IStatusLineManager statusLineMgr = UI.getStatusLineManager();
+      if (statusLineMgr != null) {
+
+         // show info that data are copied
+         statusLineMgr.setMessage(String.format(Messages.StatusLine_Message_CopiedLatitudeLongitude,
+               mouseDown_GeoPosition.latitude,
+               mouseDown_GeoPosition.longitude));
+
+         // cleanup message
+         display.timerExec(4000, () -> statusLineMgr.setMessage(null));
+      }
+   }
+
+   private void actionGotoLocation() {
+
+      final DialogGotoMapLocation dialogGotoMapLocation = new DialogGotoMapLocation(getMapPosition(), _map.get_mouseDown_GeoPosition());
+
+      dialogGotoMapLocation.open();
+
+      if (dialogGotoMapLocation.getReturnCode() != Window.OK) {
+         return;
+      }
+
+      final MapPosition mapPosition = dialogGotoMapLocation.getMapPosition();
+      final boolean isCreateMapBookmark = dialogGotoMapLocation.isCreateMapBookmark();
+      final String bookmarkName = dialogGotoMapLocation.getBookmarkName();
+
+      /*
+       * Show location as POI
+       */
+      final String latLonText = String.format(Messages.Map_POI_MapLocation,
+            mapPosition.getLatitude(),
+            mapPosition.getLongitude());
+
+      final String poiText = isCreateMapBookmark
+            ? bookmarkName + UI.NEW_LINE2 + latLonText
+            : latLonText;
+
+      _map.setPoi(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()),
+            mapPosition.getZoomLevel() + 1, // the correct zoom level is lost, adjust it to keep the same as the current
+            poiText);
+
+      /*
+       * Create map bookmark
+       */
+      if (isCreateMapBookmark) {
+         MapBookmarkManager.addBookmark(mapPosition, bookmarkName);
+      }
    }
 
    public void actionPOI() {
@@ -1649,7 +1760,9 @@ public class Map2View extends ViewPart implements
       _actionZoom_ShowEntireMap           = new ActionZoomShowEntireMap(this);
       _actionZoom_ShowEntireTour          = new ActionZoomShowEntireTour(this);
 
+      _actionCopyLocation                 = new ActionCopyLocation();
       _actionCreateTourMarkerFromMap      = new ActionCreateTourMarkerFromMap(this);
+      _actionGotoLocation                 = new ActionGotoLocation();
       _actionManageMapProvider            = new ActionManageMapProviders(this);
       _actionReloadFailedMapImages        = new ActionReloadFailedMapImages(this);
       _actionSaveDefaultPosition          = new ActionSaveDefaultPosition(this);
@@ -2134,6 +2247,8 @@ public class Map2View extends ViewPart implements
 
       MapBookmarkManager.fillContextMenu_RecentBookmarks(menuMgr, this);
 
+      menuMgr.add(_actionGotoLocation);
+      menuMgr.add(_actionCopyLocation);
       menuMgr.add(_actionSetDefaultPosition);
       menuMgr.add(_actionSaveDefaultPosition);
 
@@ -2349,12 +2464,15 @@ public class Map2View extends ViewPart implements
    }
 
    @Override
-   public MapLocation getMapLocation() {
+   public MapPosition getMapPosition() {
 
       final GeoPosition mapPosition = _map.getMapGeoCenter();
       final int mapZoomLevel = _map.getZoom() - 1;
 
-      return new MapLocation(mapPosition, mapZoomLevel);
+      return new MapPosition(
+            mapPosition.latitude,
+            mapPosition.longitude,
+            Math.pow(2, mapZoomLevel));
    }
 
    public Image getMapViewImage() {
@@ -2799,7 +2917,10 @@ public class Map2View extends ViewPart implements
 
       _lastFiredSyncEventTime = System.currentTimeMillis();
 
-      final MapPosition mapPosition = new MapLocation(geoCenter, zoomLevel - 1).getMapPosition();
+      final MapPosition mapPosition = new MapPosition(
+            geoCenter.latitude,
+            geoCenter.longitude,
+            Math.pow(2, zoomLevel - 1));
 
       MapManager.fireSyncMapEvent(mapPosition, this, 0);
    }

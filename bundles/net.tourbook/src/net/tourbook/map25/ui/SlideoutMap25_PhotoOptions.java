@@ -137,7 +137,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
          {
             {
                _chkShowPhoto_Scaled = new Button(containerPhotoSize, SWT.CHECK);
-               _chkShowPhoto_Scaled.setText(Messages.Slideout_Map25MapOptions_Checkbox_Layer_Photo_Size);
+               _chkShowPhoto_Scaled.setText(Messages.Slideout_Map25PhotoOptions_Checkbox_Layer_Photo_Size);
                _chkShowPhoto_Scaled.addSelectionListener(_defaultSelectionListener);
             }
             {
@@ -150,7 +150,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
                _spinnerPhoto_Size.setMaximum(1000);
                _spinnerPhoto_Size.setIncrement(10);
                _spinnerPhoto_Size.setPageIncrement(50);
-               _spinnerPhoto_Size.setToolTipText(Messages.Slideout_Map25MapOptions_Spinner_Layer_Photo_Size);
+               _spinnerPhoto_Size.setToolTipText(Messages.Slideout_Map25PhotoOptions_Spinner_Layer_Photo_Size);
 
                _spinnerPhoto_Size.addSelectionListener(_defaultSelectionListener);
                _spinnerPhoto_Size.addMouseWheelListener(mouseEvent -> {
@@ -166,7 +166,7 @@ public class SlideoutMap25_PhotoOptions extends ToolbarSlideout {
           * Photo Title
           */
          _chkShowPhoto_Title = new Button(group, SWT.CHECK);
-         _chkShowPhoto_Title.setText(Messages.Slideout_Map25MapOptions_Checkbox_Photo_Title);
+         _chkShowPhoto_Title.setText(Messages.Slideout_Map25PhotoOptions_Checkbox_Photo_Title);
          _chkShowPhoto_Title.addSelectionListener(_defaultSelectionListener);
       }
    }

@@ -140,6 +140,7 @@ public class UI {
    public static final String       NEW_LINE1                          = "\n";                  //$NON-NLS-1$
    public static final String       NEW_LINE2                          = "\n\n";                //$NON-NLS-1$
    public static final String       NEW_LINE3                          = "\n\n\n";              //$NON-NLS-1$
+   public static final String       NULL                               = "null";                //$NON-NLS-1$
    public static final String       RESET_LABEL                        = " X ";                 //$NON-NLS-1$
    public static final String       SLASH                              = "/";                   //$NON-NLS-1$
    public static final String       SLASH_WITH_SPACE                   = " / ";                 //$NON-NLS-1$
@@ -625,6 +626,7 @@ public class UI {
 
    public static Color           SYS_COLOR_BLACK;
    public static Color           SYS_COLOR_BLUE;
+   public static Color           SYS_COLOR_CYAN;
    public static Color           SYS_COLOR_GRAY;
    public static Color           SYS_COLOR_GREEN;
    public static Color           SYS_COLOR_MAGENTA;
@@ -671,18 +673,9 @@ public class UI {
       IMAGE_REGISTRY.put(IMAGE_CONFIGURE_COLUMNS,                    CommonActivator.getImageDescriptor(CommonImages.CustomizeProfilesColumns));
       IMAGE_REGISTRY.put(IMAGE_EMPTY_16,                             CommonActivator.getImageDescriptor(CommonImages.App_EmptyIcon_Placeholder));
 
-      // weather images
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_CLEAR,                  CommonActivator.getImageDescriptor(CommonImages.Weather_Sunny));
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_PART_CLOUDS,            CommonActivator.getImageDescriptor(CommonImages.Weather_Cloudy));
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_OVERCAST,               CommonActivator.getImageDescriptor(CommonImages.Weather_Clouds));
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_LIGHTNING,              CommonActivator.getImageDescriptor(CommonImages.Weather_Lightning));
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_RAIN,                   CommonActivator.getImageDescriptor(CommonImages.Weather_Rain));
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SNOW,                   CommonActivator.getImageDescriptor(CommonImages.Weather_Snow));
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SCATTERED_SHOWERS,      CommonActivator.getImageDescriptor(CommonImages.Weather_ScatteredShowers));
-      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,   CommonActivator.getImageDescriptor(CommonImages.Weather_Severe));
-
       SYS_COLOR_BLACK       = Display.getCurrent().getSystemColor(SWT.COLOR_BLACK);
       SYS_COLOR_BLUE        = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
+      SYS_COLOR_CYAN        = Display.getCurrent().getSystemColor(SWT.COLOR_CYAN);
       SYS_COLOR_GRAY        = Display.getCurrent().getSystemColor(SWT.COLOR_GRAY);
       SYS_COLOR_GREEN       = Display.getCurrent().getSystemColor(SWT.COLOR_GREEN);
       SYS_COLOR_MAGENTA     = Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA);
@@ -2432,10 +2425,20 @@ public class UI {
 
 // SET_FORMATTING_OFF
 
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER,               CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter));
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_DISABLED,      CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_Disabled));
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS,     CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_NoPhotos));
-      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS,   CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_WithPhotos));
+      // weather images
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_CLEAR,                  CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Sunny));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_PART_CLOUDS,            CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Cloudy));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_OVERCAST,               CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Clouds));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_LIGHTNING,              CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Lightning));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_RAIN,                   CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Rain));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SNOW,                   CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Snow));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SCATTERED_SHOWERS,      CommonActivator.getThemedImageDescriptor(CommonImages.Weather_ScatteredShowers));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,   CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Severe));
+
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER,                  CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter));
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_DISABLED,         CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_Disabled));
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_NO_PHOTOS,        CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_NoPhotos));
+      IMAGE_REGISTRY.put(IMAGE_ACTION_PHOTO_FILTER_WITH_PHOTOS,      CommonActivator.getThemedImageDescriptor(CommonImages.PhotoFilter_WithPhotos));
 
 // SET_FORMATTING_ON
    }

@@ -23,6 +23,8 @@ public class Messages extends NLS {
 
    public static String        App_Action_Apply;
 
+   public static String        Clipboard_Content_MapLocation;
+
    public static String        Default_Label_NewTourMarker;
 
    public static String        graph_label_gradient_unit;
@@ -64,15 +66,15 @@ public class Messages extends NLS {
    public static String map_action_save_default_position;
    public static String map_action_set_default_position;
 
+   public static String Map_Action_CopyLocation;
    public static String Map_Action_CreateTourMarkerFromMap;
    public static String Map_Action_Edit2DMapPreferences;
-
    public static String Map_Action_Export_Map_Clipboard_Copied_Info;
    public static String Map_Action_Export_Map_View;
    public static String Map_Action_Export_Map_View_Clipboard;
    public static String Map_Action_Export_Map_View_Image;
    public static String Map_Action_Export_Map_View_Image_Tooltip;
-
+   public static String Map_Action_GotoLocation;
    public static String Map_Action_ManageMapProviders;
    public static String Map_Action_PhotoFilter2_Tooltip;
    public static String Map_Action_POI;
@@ -94,6 +96,8 @@ public class Messages extends NLS {
    public static String Map_Action_Zoom_CenteredBy_Tour_Tooltip;
 
    public static String Map_Label_ValuePoint_Title;
+
+   public static String Map_POI_MapLocation;
 
    public static String Map_Properties_ShowGeoGrid;
    public static String Map_Properties_ShowTileBorder;
@@ -138,6 +142,8 @@ public class Messages extends NLS {
    public static String Dialog_ExportImage_Label_ImageQuality_Tooltip;
    public static String Dialog_ExportImage_Title;
    public static String Dialog_ExportImage_Message;
+
+   public static String StatusLine_Message_CopiedLatitudeLongitude;
 
    static {
       // initialize resource bundle

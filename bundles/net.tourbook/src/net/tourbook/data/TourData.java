@@ -1458,13 +1458,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public float[]             dataSerieAdjustedAlti;
 
    /**
-    * contains special data points
-    */
-   @Transient
-   public SplineData          splineDataPoints;
-
-   /**
-    * Contains a spline data serie
+    * Contains a spline data serie, is used for the spline interpolated elevation graph
     */
    @Transient
    public float[]             dataSerieSpline;
@@ -12469,6 +12463,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       _twpWorldPosition.put(projectionHash + zoomLevel, worldPositions);
    }
 
+   @SuppressWarnings("deprecation")
    public String toJson() {
 
       final ObjectMapper mapper = new ObjectMapper();

@@ -30,7 +30,6 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
-import net.tourbook.map25.layer.marker.cluster.ClusterMarkerRenderer;
 import net.tourbook.map25.ui.SlideoutMap25_PhotoOptions;
 import net.tourbook.photo.ILoadCallBack;
 import net.tourbook.photo.ImageQuality;
@@ -48,13 +47,11 @@ import org.eclipse.swt.widgets.Display;
 import org.imgscalr.Scalr.Rotation;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.canvas.Bitmap;
-import org.oscim.backend.canvas.Color;
 import org.oscim.backend.canvas.Paint;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.marker.ItemizedLayer;
 import org.oscim.layers.marker.MarkerInterface;
 import org.oscim.layers.marker.MarkerItem;
-import org.oscim.layers.marker.MarkerRendererFactory;
 import org.oscim.layers.marker.MarkerSymbol;
 
 public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemGestureListener<MarkerInterface> {
@@ -68,12 +65,9 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
    private Bitmap   _bitmapNotLoadedPhoto;
 // private Bitmap   _bitmapClusterPhoto;   // The Bitmap when markers are clustered
 
-   private MarkerSymbol         _symbol;               // marker symbol, circle or star
-
-   public MarkerRendererFactory _markerRendererFactory;
+   private MarkerSymbol _symbol; // marker symbol, circle or star
 
 // private boolean _isBillboard;
-   public boolean _isMarkerClusteredLast;
 
    private class ImageState {
 
@@ -119,7 +113,6 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
       _mapApp = map25App;
       _display = Display.getDefault();
 
-      //debugPrint(" ** PhotoToolkit + *** Constructor"); //$NON-NLS-1$
       final MarkerConfig config = Map25ConfigManager.getActiveMarkerConfig();
 
       _fillPainter.setStyle(Paint.Style.FILL);
@@ -129,23 +122,9 @@ public class PhotoToolkit extends MarkerToolkit implements ItemizedLayer.OnItemG
 //    _bitmapClusterPhoto = createPoiBitmap(MarkerShape.CIRCLE); //must be replaced later, like MarkerToolkit
 
       _symbol = new MarkerSymbol(_bitmapNotLoadedPhoto, MarkerSymbol.HotspotPlace.BOTTOM_CENTER, false);
-      _isMarkerClusteredLast = config.isMarkerClustered;
 
-      _markerRendererFactory = new MarkerRendererFactory() {
-
-         @Override
-         public org.oscim.layers.marker.MarkerRenderer create(final org.oscim.layers.marker.MarkerLayer markerLayer) {
-
-            return new ClusterMarkerRenderer(markerLayer, _symbol, new ClusterMarkerRenderer.ClusterStyle(Color.WHITE, Color.BLUE)) {
-
-               @Override
-               protected Bitmap getClusterBitmap(final int size) {
-
-                  return createClusterBitmap(size);
-               }
-            };
-         }
-      };
+      setIsMarkerClusteredLast(config.isMarkerClustered);
+      setMarkerRenderer();
    }
 
    private GeoPoint createPhoto_Location(final Photo photo) {

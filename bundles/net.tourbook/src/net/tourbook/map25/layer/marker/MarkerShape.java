@@ -20,7 +20,7 @@ package net.tourbook.map25.layer.marker;
 import net.tourbook.map25.Map25App;
 
 /**
- * Tile encoding format. {@link Map25App} and {@link MarkerToolkit} and {@link MarkerRenderer} and {@link PhotoToolkit} depends on this.
+ * Tile encoding format. {@link Map25App} and {@link MarkerToolkit} and {@link MarkerRendererMT} and {@link PhotoToolkit} depends on this.
  */
 public enum MarkerShape {
 
