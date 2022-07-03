@@ -36,7 +36,6 @@ import org.oscim.renderer.GLUtils;
 import org.oscim.renderer.GLViewport;
 import org.oscim.renderer.MapRenderer;
 import org.oscim.renderer.bucket.LineBucket;
-import org.oscim.renderer.bucket.VertexData;
 import org.oscim.theme.styles.LineStyle;
 import org.oscim.utils.FastMath;
 import org.slf4j.Logger;
@@ -412,7 +411,11 @@ public final class LineTexBucketMT extends LineBucketMT {
    }
 
    @Override
-   void addLine(final float[] points, final int[] index, final int numPoints, final boolean closed, final int[] pixelPointColors) {
+   void addLine(final float[] pixelPoints,
+                final int[] index,
+                final int numPoints,
+                final boolean isCapClosed,
+                final int[] pixelPointColors) {
 
       if (vertexItems.empty()) {
          /*
@@ -421,7 +424,7 @@ public final class LineTexBucketMT extends LineBucketMT {
           */
          numVertices = 1;
       }
-      final VertexData vi = vertexItems;
+      final VertexDataMT vi = vertexItems;
 
       /* reset offset to last written position */
       if (!evenSegment) {
@@ -456,15 +459,15 @@ public final class LineTexBucketMT extends LineBucketMT {
          }
 
          final int end = pointIndex + length;
-         float x = points[pointIndex++] * COORD_SCALE;
-         float y = points[pointIndex++] * COORD_SCALE;
+         float x = pixelPoints[pointIndex++] * COORD_SCALE;
+         float y = pixelPoints[pointIndex++] * COORD_SCALE;
 
          /* randomize a bit (must be within range of +/- Short.MAX_VALUE) */
          float lineLength = line.randomOffset ? (x * x + y * y) % 80 : 0;
 
          while (pointIndex < end) {
-            final float nx = points[pointIndex++] * COORD_SCALE;
-            final float ny = points[pointIndex++] * COORD_SCALE;
+            final float nx = pixelPoints[pointIndex++] * COORD_SCALE;
+            final float ny = pixelPoints[pointIndex++] * COORD_SCALE;
 
             /* Calculate triangle corners for the given width */
             final float vx = nx - x;
@@ -545,7 +548,7 @@ public final class LineTexBucketMT extends LineBucketMT {
       addLine(geom.points, geom.index, -1, false, null);
    }
 
-   private void addShortVertex(final VertexData vi,
+   private void addShortVertex(final VertexDataMT vi,
                                final short x,
                                final short y,
                                final short nx,

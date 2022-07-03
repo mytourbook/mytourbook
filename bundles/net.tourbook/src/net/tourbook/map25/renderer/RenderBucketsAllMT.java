@@ -512,12 +512,13 @@ public class RenderBucketsAllMT extends TileData {
    /**
     * Set new bucket items and clear previous.
     */
-   public void set(final RenderBucketMT buckets) {
-      for (RenderBucketMT l = this._allBuckets; l != null; l = l.next) {
-         l.clear();
+   public void set(final RenderBucketMT newBuckets) {
+
+      for (RenderBucketMT previousBucket = _allBuckets; previousBucket != null; previousBucket = previousBucket.next) {
+         previousBucket.clear();
       }
 
-      this._allBuckets = buckets;
+      _allBuckets = newBuckets;
    }
 
    public void setFrom(final RenderBucketsAllMT allBuckets) {

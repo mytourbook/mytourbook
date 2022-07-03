@@ -36,37 +36,37 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
 //   public static final byte   BITMAP    = 7;
 //   public static final byte   CIRCLE    = 8;
 
-   static final VertexData    EMPTY = new VertexData();
+   static final VertexData      EMPTY = new VertexData();
 
-   public final byte          type;
+   public final byte            type;
 
    /**
     * Drawing order from bottom to top.
     */
-   int                        level;
+   int                          level;
 
    /**
     * Number of vertices for this layer.
     */
-   protected int              numVertices;
-   protected int              numIndices;
+   protected int                numVertices;
+   protected int                numIndices;
 
    /**
     * Temporary list of vertex data.
     */
-   protected final VertexData vertexItems;
-   protected final VertexData indiceItems;
+   protected final VertexDataMT vertexItems;
+   protected final VertexData   indiceItems;
 
-   final boolean              quads;
+   final boolean                quads;
 
-   protected int              vertexOffset;            // in bytes
-   protected int              indiceOffset;            // in bytes
+   protected int                vertexOffset;            // in bytes
+   protected int                indiceOffset;            // in bytes
 
    protected RenderBucketMT(final byte type, final boolean indexed, final boolean quads) {
 
       this.type = type;
 
-      vertexItems = new VertexData();
+      vertexItems = new VertexDataMT();
 
       if (indexed) {
          indiceItems = new VertexData();

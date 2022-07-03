@@ -12,10 +12,14 @@ uniform float u_width;
 // xy hold position, zw extrusion vector
 attribute vec4 a_pos;
 
+// colors for each a_pos vertex
+attribute vec4 a_colors;
+
 // z axis, line is above/below ground
 uniform float u_height;
 
 varying vec2 v_st;
+varying vec4 v_color;
 
 void main() {
 	
@@ -27,6 +31,9 @@ void main() {
 
     // last two bits hold the texture coordinates
     v_st = abs(mod(dir, 4.0)) - 1.0;
+	 
+	 // transfer colors to the fragment shader
+	 v_color = a_colors;
 }
 
 $$
@@ -34,11 +41,14 @@ $$
 #ifdef GLES
 precision highp float;
 #endif
+
 uniform sampler2D	u_tex;
 uniform float 		u_fade;
 uniform int 		u_mode;
 uniform vec4 		u_color;
+
 varying vec2 		v_st;
+varying vec4 		v_color;
 
 void main() {
 	

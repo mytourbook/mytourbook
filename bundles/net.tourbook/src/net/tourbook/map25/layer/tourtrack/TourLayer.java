@@ -39,6 +39,7 @@ import org.oscim.core.Tile;
 import org.oscim.layers.Layer;
 //import org.oscim.layers.vector.
 import org.oscim.map.Map;
+import org.oscim.renderer.BufferObject;
 import org.oscim.renderer.GLViewport;
 import org.oscim.renderer.bucket.TextureItem;
 import org.oscim.theme.styles.LineStyle;
@@ -76,11 +77,27 @@ public class TourLayer extends Layer {
    private boolean          _isUpdateLayer;
    private int[]            _allGeoPointColors;
 
+   private BufferObject     _vboColors;
+
    private final class TourRenderer extends BucketRendererMT {
 
       private int __oldX         = -1;
       private int __oldY         = -1;
       private int __oldZoomLevel = -1;
+
+      @Override
+      protected synchronized void compile() {
+
+         // TODO Auto-generated method stub
+
+         super.compile();
+
+//         final FloatBuffer buf = MapRenderer.getFloatBuffer(12);
+//         buf.put(vertices);
+//
+//         _vboColors = BufferObject.get(GL.ARRAY_BUFFER, 0);
+//         _vboColors.loadBufferData(buf.flip(), 12 * 4);
+      }
 
       @Override
       public synchronized void update(final GLViewport viewport) {
@@ -130,6 +147,7 @@ public class TourLayer extends Layer {
 
          // compile new layers
          allBuckets.set(workerTask.__renderBuckets.get());
+
          compile();
       }
    }
@@ -137,7 +155,7 @@ public class TourLayer extends Layer {
    private final static class TourRenderTask {
 
       RenderBucketsAllMT __renderBuckets = new RenderBucketsAllMT();
-      MapPosition         __mapPos        = new MapPosition();
+      MapPosition        __mapPos        = new MapPosition();
    }
 
    final class Worker extends SimpleWorker<TourRenderTask> {
@@ -161,7 +179,11 @@ public class TourLayer extends Layer {
        * Points which are projected (0...1) and then scaled to pixel
        */
       private float[]           __pixelPoints;
-      private int[]             __pixelPointColors;
+
+      /**
+       * One {@link #__pixelPointColors2} has two {@link #__pixelPoints}, 2 == Halfe of items
+       */
+      private int[]             __pixelPointColors2;
 
       /**
        * Is clipping line positions between
@@ -185,11 +207,12 @@ public class TourLayer extends Layer {
                MAX_VISIBLE_PIXEL);
 
          __pixelPoints = new float[0];
-         __pixelPointColors = new int[0];
+         __pixelPointColors2 = new int[0];
       }
 
       /**
-       * Adds a point which are in the range of the {@link #__lineClipper}, -2048...+2048
+       * Adds a point (2 points: x,y) which are in the range of the {@link #__lineClipper},
+       * -2048...+2048
        *
        * @param points
        * @param pointIndex
@@ -207,7 +230,10 @@ public class TourLayer extends Layer {
 
       @Override
       public void cleanup(final TourRenderTask task) {
+
          task.__renderBuckets.clear();
+
+         BufferObject.release(_vboColors);
       }
 
       @Override
@@ -229,7 +255,7 @@ public class TourLayer extends Layer {
                   projectedPoints = __projectedPoints = new double[numGeoPoints * 2];
 
                   __pixelPoints = new float[numGeoPoints * 2];
-                  __pixelPointColors = new int[numGeoPoints];
+                  __pixelPointColors2 = new int[numGeoPoints];
                }
 
                for (int pointIndex = 0; pointIndex < numGeoPoints; pointIndex++) {
@@ -314,11 +340,11 @@ public class TourLayer extends Layer {
          __lineClipper.clipStart(pixelX, pixelY);
 
          final float[] pixelPoints = __pixelPoints;
-         final int[] pixelPointColors = __pixelPointColors;
+         final int[] pixelPointColors2 = __pixelPointColors2;
 
          // set first point/color
          int pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
-         pixelPointColors[0] = _allGeoPointColors[0];
+         pixelPointColors2[0] = _allGeoPointColors[0];
 
          float prevX = pixelX;
          float prevY = pixelY;
@@ -352,13 +378,13 @@ public class TourLayer extends Layer {
                flip = flipDirection;
 
                if (pixelPointIndex > 2) {
-                  lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors);
+                  lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors2);
                }
 
                __lineClipper.clipStart(pixelX, pixelY);
 
                pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
-               pixelPointColors[0] = _allGeoPointColors[pointIndex / 2];
+               pixelPointColors2[0] = _allGeoPointColors[pointIndex / 2];
 
                continue;
             }
@@ -368,7 +394,7 @@ public class TourLayer extends Layer {
 
                // finish last tour (copied from flip code)
                if (pixelPointIndex > 2) {
-                  lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors);
+                  lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors2);
                }
 
                // setup next tour
@@ -376,7 +402,7 @@ public class TourLayer extends Layer {
 
                __lineClipper.clipStart(pixelX, pixelY);
                pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
-               pixelPointColors[0] = _allGeoPointColors[pointIndex / 2];
+               pixelPointColors2[0] = _allGeoPointColors[pointIndex / 2];
 
                continue;
             }
@@ -390,14 +416,14 @@ public class TourLayer extends Layer {
                 */
 
                if (pixelPointIndex > 2) {
-                  lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors);
+                  lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors2);
                }
 
                if (clipperCode == LineClipper.INTERSECTION) {
 
                   // add line segment
                   segment = __lineClipper.getLine(segment, 0);
-                  lineBucket.addLine(segment, 4, false, pixelPointColors);
+                  lineBucket.addLine(segment, 4, false, pixelPointColors2);
 
                   // the prev point is the real point not the clipped point
                   // prevX = __lineClipper.outX2;
@@ -414,7 +440,7 @@ public class TourLayer extends Layer {
                   pixelPoints[pixelPointIndex++] = prevX;
                   pixelPoints[pixelPointIndex++] = prevY;
 
-                  pixelPointColors[(pixelPointIndex - 1) / 2] = _allGeoPointColors[pointIndex / 2];
+                  pixelPointColors2[(pixelPointIndex - 1) / 2] = _allGeoPointColors[pointIndex / 2];
                }
 
                continue;
@@ -434,12 +460,12 @@ public class TourLayer extends Layer {
                pixelPoints[pixelPointIndex++] = prevX = pixelX;
                pixelPoints[pixelPointIndex++] = prevY = pixelY;
 
-               pixelPointColors[(pixelPointIndex - 1) / 2] = _allGeoPointColors[pointIndex / 2];
+               pixelPointColors2[(pixelPointIndex - 1) / 2] = _allGeoPointColors[pointIndex / 2];
             }
          }
 
          if (pixelPointIndex > 2) {
-            lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors);
+            lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors2);
          }
 
          System.out.println((System.currentTimeMillis()

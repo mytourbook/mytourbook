@@ -97,7 +97,7 @@ public class BucketRendererMT extends LayerRenderer {
 
       for (RenderBucketMT bucket = allBuckets.get(); bucket != null;) {
 
-         // performs GL.bindBuffer() for the vbo
+         // performs GL.bindBuffer() of the vbo/ibo
          allBuckets.bind();
 
          if (isProjected == false && bucket.type != SYMBOL) {

@@ -31,7 +31,6 @@ import org.oscim.core.MapPosition;
 import org.oscim.renderer.GLState;
 import org.oscim.renderer.GLUtils;
 import org.oscim.renderer.GLViewport;
-import org.oscim.renderer.bucket.VertexData;
 import org.oscim.theme.styles.LineStyle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,44 +45,47 @@ import org.slf4j.LoggerFactory;
  */
 public class LineBucketMT extends RenderBucketMT {
 
-   static final Logger        log       = LoggerFactory.getLogger(LineBucketMT.class);
+   static final Logger        log              = LoggerFactory.getLogger(LineBucketMT.class);
 
-   private static final char  NL        = UI.NEW_LINE;
+   private static final char  NL               = UI.NEW_LINE;
 
    /**
     * Scale factor mapping extrusion vector to short values
     */
-   public static final float  DIR_SCALE = 2048;
+   public static final float  DIR_SCALE        = 2048;
 
    /**
     * Maximal resolution
     */
-   public static final float  MIN_DIST  = 1 / 8f;
+   public static final float  MIN_DIST         = 1 / 8f;
 
    /**
     * Not quite right.. need to go back so that additional
     * bevel vertices are at least MIN_DIST apart
     */
-   private static final float MIN_BEVEL = MIN_DIST * 4;
+   private static final float MIN_BEVEL        = MIN_DIST * 4;
 
    /**
     * mask for packing last two bits of extrusion vector with texture
     * coordinates
     */
-   private static final int   DIR_MASK  = 0xFFFFFFFC;
+   private static final int   DIR_MASK         = 0xFFFFFFFC;
 
-   /* lines referenced by this outline layer */
-   public LineBucketMT outlines;
-   public LineStyle    line;
-   public float        scale            = 1;
+   /**
+    * Lines referenced by this outline layer
+    */
+   public LineBucketMT        outlines;
 
-   private boolean     _isCapRounded;
-   private float       _minimumDistance = MIN_DIST;
-   private float       _minimumBevel    = MIN_BEVEL;
+   public LineStyle           line;
+   public float               scale            = 1;
 
-   public float        heightOffset;
+   private boolean            _isCapRounded;
+   private float              _minimumDistance = MIN_DIST;
+   private float              _minimumBevel    = MIN_BEVEL;
 
-   private int         tmin             = Integer.MIN_VALUE, tmax = Integer.MAX_VALUE;
+   public float               heightOffset;
+
+   private int                tmin             = Integer.MIN_VALUE, tmax = Integer.MAX_VALUE;
 
    public static final class Renderer {
 
@@ -394,7 +396,7 @@ public class LineBucketMT extends RenderBucketMT {
 
       Shader(final String shaderFile) {
 
-         if (!createMT(shaderFile)) {
+         if (createMT(shaderFile) == false) {
             return;
          }
 
@@ -440,15 +442,16 @@ public class LineBucketMT extends RenderBucketMT {
     *           -2048 ... 2048
     * @param numPoints
     * @param isCapClosed
-    * @param pixelPointColors
+    * @param pixelPointColors2
+    *           One {@link #pixelPointColors2} has two {@link #pixelPoints}
     */
    public void addLine(final float[] pixelPoints,
                        final int numPoints,
                        final boolean isCapClosed,
-                       final int[] pixelPointColors) {
+                       final int[] pixelPointColors2) {
 
       if (numPoints >= 4) {
-         addLine(pixelPoints, null, numPoints, isCapClosed, pixelPointColors);
+         addLine(pixelPoints, null, numPoints, isCapClosed, pixelPointColors2);
       }
 
       System.out.println((System.currentTimeMillis() + "addLine - numPoints:" + numPoints));
@@ -545,7 +548,17 @@ public class LineBucketMT extends RenderBucketMT {
             numLinePoints -= 2;
          }
 
-         addLine(vertexItems, pixelPoints, startIndex, numLinePoints, isCapRounded, isCapSquared, isCapClosed);
+         addLine_ToVertices(
+
+               vertexItems,
+
+               pixelPoints,
+               pixelPointColors,
+               startIndex,
+               numLinePoints,
+               isCapRounded,
+               isCapSquared,
+               isCapClosed);
       }
    }
 
@@ -567,21 +580,23 @@ public class LineBucketMT extends RenderBucketMT {
 
    /**
     * @param vertices
-    * @param points
+    * @param pixelPoints
     *           -2048 ... 2048
+    * @param pixelPointColors
     * @param startIndex
     * @param numLinePoints
     * @param isRounded
     * @param isSquared
     * @param isClosed
     */
-   private void addLine(final VertexData vertices,
-                        final float[] points,
-                        final int startIndex,
-                        final int numLinePoints,
-                        final boolean isRounded,
-                        final boolean isSquared,
-                        final boolean isClosed) {
+   private void addLine_ToVertices(final VertexDataMT vertices,
+                                   final float[] pixelPoints,
+                                   final int[] pixelPointColors,
+                                   final int startIndex,
+                                   final int numLinePoints,
+                                   final boolean isRounded,
+                                   final boolean isSquared,
+                                   final boolean isClosed) {
 
       float ux, uy;
       float vPrevX, vPrevY;
@@ -602,11 +617,11 @@ public class LineBucketMT extends RenderBucketMT {
 
       int pointIndex = startIndex;
 
-      curX = points[pointIndex++];
-      curY = points[pointIndex++];
+      curX = pixelPoints[pointIndex++];
+      curY = pixelPoints[pointIndex++];
 
-      nextX = points[pointIndex++];
-      nextY = points[pointIndex++];
+      nextX = pixelPoints[pointIndex++];
+      nextY = pixelPoints[pointIndex++];
 
       // unit vector to next node
       vPrevX = nextX - curX;
@@ -705,16 +720,16 @@ public class LineBucketMT extends RenderBucketMT {
 
          if (pointIndex < endIndex) {
 
-            nextX = points[pointIndex++];
-            nextY = points[pointIndex++];
+            nextX = pixelPoints[pointIndex++];
+            nextY = pixelPoints[pointIndex++];
 
          } else if (isClosed && pointIndex < endIndex + 2) {
 
             // close the loop -> the next point is back to the startpoint
             // (Original comment) add startpoint == endpoint
 
-            nextX = points[startIndex];
-            nextY = points[startIndex + 1];
+            nextX = pixelPoints[startIndex];
+            nextY = pixelPoints[startIndex + 1];
 
             pointIndex += 2;
 
@@ -743,7 +758,6 @@ public class LineBucketMT extends RenderBucketMT {
 
          //log.debug("acos " + dotp);
          if (dotp > 0.65) {
-//       if (dotp > 0.965) {
 
             // add bevel join to avoid miter going to infinity
             numVertices += 2;
@@ -834,13 +848,15 @@ public class LineBucketMT extends RenderBucketMT {
 
       if (isRounded && isOutside == false) {
 
+         // inside
+
          ddx = (int) (ux * DIR_SCALE);
          ddy = (int) (uy * DIR_SCALE);
 
          vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (1 | ddy & DIR_MASK));
          vertices.add(ox, oy, (short) (2 | -ddx & DIR_MASK), (short) (1 | -ddy & DIR_MASK));
 
-         // For rounded line edges
+         // for rounded line edges
          ddx = (int) ((ux - vPrevX) * DIR_SCALE);
          ddy = (int) ((uy - vPrevY) * DIR_SCALE);
 
@@ -909,7 +925,7 @@ public class LineBucketMT extends RenderBucketMT {
     * @param vPrevX
     * @param vPrevY
     */
-   private void addVertex(final VertexData vertexData,
+   private void addVertex(final VertexDataMT vertexData,
                           final float x,
                           final float y,
                           final float vNextX,
