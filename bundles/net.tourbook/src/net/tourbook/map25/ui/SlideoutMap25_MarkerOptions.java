@@ -1069,7 +1069,6 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
    private void updateUI_Map() {
 
       _map25View.getMapApp().onModifyMarkerConfig();
-
    }
 
 }

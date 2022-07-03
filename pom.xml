@@ -10,27 +10,23 @@
    <name>MyTourbook App</name>
 
    <artifactId>mytourbook-app</artifactId>   <groupId>net.tourbook</groupId>
-                                             <version>22.3.0-SNAPSHOT</version>
+                                             <version>22.6.1-SNAPSHOT</version>
    <packaging>pom</packaging>
    
    <dependencies>
-      <dependency>
-         <artifactId>org.eclipse.pde.junit.runtime</artifactId>         <groupId>org.eclipse.pde</groupId>
-                                                                        <version>3.6.0</version>
-      </dependency>
       <dependency>
          <artifactId>org.eclipse.core.runtime</artifactId>              <groupId>org.eclipse.core</groupId>
                                                                         <version>3.7.0</version>
       </dependency>
       <dependency>
          <artifactId>junit-jupiter-engine</artifactId>                  <groupId>org.junit.jupiter</groupId>
-                                                                        <version>5.8.1</version>
+                                                                        <version>5.8.2</version>
          <scope>test</scope>
       </dependency>
    </dependencies>	
 
    <properties>
-      <tycho.version>2.5.0</tycho.version>
+      <tycho.version>2.7.3</tycho.version>
       <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>  
    </properties>
 
@@ -78,11 +74,14 @@
       <!-- Eclipse E4 web repository -->
       
       <repository>
-         <id>eclipse.platform.4.20</id>                                 <layout>p2</layout>
+         <id>eclipse.platform.4.24</id>                                 <layout>p2</layout>
+         
+         <url>https://download.eclipse.org/releases/2022-06</url>
+         
 <!-- 
-         <url>https://download.eclipse.org/releases/2021-06</url>
- -->
+         <url>https://download.eclipse.org/eclipse/updates/4.24-I-builds/I20220525-1800/</url>
          <url>https://download.eclipse.org/eclipse/updates/4.23-I-builds/I20220308-0310</url>
+ -->
       </repository>   
 
       <repository>
@@ -167,7 +166,7 @@
 
       <plugin>
          <artifactId>maven-surefire-plugin</artifactId>        <groupId>org.apache.maven.plugins</groupId>
-                                                               <version>3.0.0-M5</version>
+                                                               <version>3.0.0-M7</version>
          <configuration>
             <skipTests>true</skipTests>
          </configuration>
@@ -182,7 +181,7 @@
       
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>         <groupId>org.apache.maven.plugins</groupId>
-                                                               <version>3.8.1</version>
+                                                               <version>3.10.1</version>
          <executions>
             <execution>
                <id>compiletests</id>
@@ -195,19 +194,8 @@
       </plugin>
       
       <plugin>
-        <artifactId>tycho-surefire-plugin</artifactId>         <groupId>org.eclipse.tycho</groupId>
-                                                               <version>${tycho.version}</version>
-         <configuration>
-             <useUIHarness>true</useUIHarness>
-             <useUIThread>true</useUIThread>
-             <product>org.eclipse.platform.ide</product>
-             <skipTests>true</skipTests>
-         </configuration>
-      </plugin>
-      
-      <plugin>
          <artifactId>jacoco-maven-plugin</artifactId>          <groupId>org.jacoco</groupId>
-                                                               <version>0.8.7</version>
+                                                               <version>0.8.8</version>
          <executions>
             <execution>
                <goals>

@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
@@ -215,66 +216,68 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
-   public static final String            ID                                        = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
+   public static final String            ID                                           = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
-   private static final String           GRAPH_LABEL_HEARTBEAT_UNIT                = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-   private static final String           VALUE_UNIT_K_CALORIES                     = net.tourbook.ui.Messages.Value_Unit_KCalories;
+   private static final String           GRAPH_LABEL_HEARTBEAT_UNIT                   = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String           VALUE_UNIT_K_CALORIES                        = net.tourbook.ui.Messages.Value_Unit_KCalories;
    //
-   private static final int              COLUMN_SPACING                            = 20;
+   private static final int              COLUMN_SPACING                               = 20;
    //
-   private static final String           WIDGET_KEY                                = "widgetKey";                                            //$NON-NLS-1$
-   private static final String           WIDGET_KEY_TOUR_DISTANCE                  = "tourDistance";                                         //$NON-NLS-1$
-   private static final String           WIDGET_KEY_ALTITUDE_UP                    = "altitudeUp";                                           //$NON-NLS-1$
-   private static final String           WIDGET_KEY_ALTITUDE_DOWN                  = "altitudeDown";                                         //$NON-NLS-1$
-   private static final String           WIDGET_KEY_PERSON                         = "tourPerson";                                           //$NON-NLS-1$
+   private static final String           WIDGET_KEY                                   = "widgetKey";                                            //$NON-NLS-1$
+   private static final String           WIDGET_KEY_TOUR_DISTANCE                     = "tourDistance";                                         //$NON-NLS-1$
+   private static final String           WIDGET_KEY_ALTITUDE_UP                       = "altitudeUp";                                           //$NON-NLS-1$
+   private static final String           WIDGET_KEY_ALTITUDE_DOWN                     = "altitudeDown";                                         //$NON-NLS-1$
+   private static final String           WIDGET_KEY_PERSON                            = "tourPerson";                                           //$NON-NLS-1$
    //
-   private static final String           MESSAGE_KEY_ANOTHER_SELECTION             = "anotherSelection";                                     //$NON-NLS-1$
+   private static final String           MESSAGE_KEY_ANOTHER_SELECTION                = "anotherSelection";                                     //$NON-NLS-1$
    //
    /**
     * shows the busy indicator to load the slice viewer when there are more items as this value
     */
-   private static final int              BUSY_INDICATOR_ITEMS                      = 5000;
+   private static final int              BUSY_INDICATOR_ITEMS                         = 5000;
    //
-   private static final String           STATE_SELECTED_TAB                        = "tourDataEditor.selectedTab";                           //$NON-NLS-1$
-   private static final String           STATE_ROW_EDIT_MODE                       = "tourDataEditor.rowEditMode";                           //$NON-NLS-1$
-   private static final String           STATE_IS_EDIT_MODE                        = "tourDataEditor.isEditMode";                            //$NON-NLS-1$
-   private static final String           STATE_CSV_EXPORT_PATH                     = "tourDataEditor.csvExportPath";                         //$NON-NLS-1$
+   private static final String           STATE_SELECTED_TAB                           = "tourDataEditor.selectedTab";                           //$NON-NLS-1$
+   private static final String           STATE_ROW_EDIT_MODE                          = "tourDataEditor.rowEditMode";                           //$NON-NLS-1$
+   private static final String           STATE_IS_EDIT_MODE                           = "tourDataEditor.isEditMode";                            //$NON-NLS-1$
+   private static final String           STATE_CSV_EXPORT_PATH                        = "tourDataEditor.csvExportPath";                         //$NON-NLS-1$
    //
-   private static final String           STATE_SECTION_CHARACTERISTICS             = "STATE_SECTION_CHARACTERISTICS";                        //$NON-NLS-1$
-   private static final String           STATE_SECTION_DATE_TIME                   = "STATE_SECTION_DATE_TIME";                              //$NON-NLS-1$
-   private static final String           STATE_SECTION_PERSONAL                    = "STATE_SECTION_PERSONAL";                               //$NON-NLS-1$
-   private static final String           STATE_SECTION_TITLE                       = "STATE_SECTION_TITLE";                                  //$NON-NLS-1$
-   private static final String           STATE_SECTION_WEATHER                     = "STATE_SECTION_WEATHER";                                //$NON-NLS-1$
+   private static final String           STATE_SECTION_CHARACTERISTICS                = "STATE_SECTION_CHARACTERISTICS";                        //$NON-NLS-1$
+   private static final String           STATE_SECTION_DATE_TIME                      = "STATE_SECTION_DATE_TIME";                              //$NON-NLS-1$
+   private static final String           STATE_SECTION_PERSONAL                       = "STATE_SECTION_PERSONAL";                               //$NON-NLS-1$
+   private static final String           STATE_SECTION_TITLE                          = "STATE_SECTION_TITLE";                                  //$NON-NLS-1$
+   private static final String           STATE_SECTION_WEATHER                        = "STATE_SECTION_WEATHER";                                //$NON-NLS-1$
    //
-   static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES         = "STATE_DESCRIPTION_NUMBER_OF_LINES";                    //$NON-NLS-1$
-   static final int                      STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT = 3;
-   static final String                   STATE_LAT_LON_DIGITS                      = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
-   static final int                      STATE_LAT_LON_DIGITS_DEFAULT              = 5;
+   static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES            = "STATE_DESCRIPTION_NUMBER_OF_LINES";                    //$NON-NLS-1$
+   static final int                      STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT    = 3;
+   static final String                   STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN         = "STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN";                 //$NON-NLS-1$
+   static final boolean                  STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT = true;
+   static final String                   STATE_LAT_LON_DIGITS                         = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
+   static final int                      STATE_LAT_LON_DIGITS_DEFAULT                 = 5;
    //
-   private static final String           COLUMN_ALTITUDE                           = "ALTITUDE_ALTITUDE";                                    //$NON-NLS-1$
-   private static final String           COLUMN_CADENCE                            = "POWERTRAIN_CADENCE";                                   //$NON-NLS-1$
-   private static final String           COLUMN_DATA_SEQUENCE                      = "DATA_SEQUENCE";                                        //$NON-NLS-1$
-   private static final String           COLUMN_POWER                              = "POWER";                                                //$NON-NLS-1$
-   private static final String           COLUMN_PACE                               = "MOTION_PACE";                                          //$NON-NLS-1$
-   private static final String           COLUMN_PULSE                              = "BODY_PULSE";                                           //$NON-NLS-1$
-   private static final String           COLUMN_TEMPERATURE                        = "WEATHER_TEMPERATURE";                                  //$NON-NLS-1$
+   private static final String           COLUMN_ALTITUDE                              = "ALTITUDE_ALTITUDE";                                    //$NON-NLS-1$
+   private static final String           COLUMN_CADENCE                               = "POWERTRAIN_CADENCE";                                   //$NON-NLS-1$
+   private static final String           COLUMN_DATA_SEQUENCE                         = "DATA_SEQUENCE";                                        //$NON-NLS-1$
+   private static final String           COLUMN_POWER                                 = "POWER";                                                //$NON-NLS-1$
+   private static final String           COLUMN_PACE                                  = "MOTION_PACE";                                          //$NON-NLS-1$
+   private static final String           COLUMN_PULSE                                 = "BODY_PULSE";                                           //$NON-NLS-1$
+   private static final String           COLUMN_TEMPERATURE                           = "WEATHER_TEMPERATURE";                                  //$NON-NLS-1$
    //
-   private static final IPreferenceStore _prefStore                                = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore _prefStore_Common                         = CommonActivator.getPrefStore();
-   private static final IDialogSettings  _state                                    = TourbookPlugin.getState(ID);
-   private static final IDialogSettings  _stateSwimSlice                           = TourbookPlugin.getState(ID + ".swimSlice");             //$NON-NLS-1$
-   private static final IDialogSettings  _stateTimeSlice                           = TourbookPlugin.getState(ID + ".slice");                 //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore                                   = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common                            = CommonActivator.getPrefStore();
+   private static final IDialogSettings  _state                                       = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _stateSwimSlice                              = TourbookPlugin.getState(ID + ".swimSlice");             //$NON-NLS-1$
+   private static final IDialogSettings  _stateTimeSlice                              = TourbookPlugin.getState(ID + ".slice");                 //$NON-NLS-1$
    //
-   private static final boolean          IS_LINUX                                  = UI.IS_LINUX;
-   private static final boolean          IS_OSX                                    = UI.IS_OSX;
-   private static final boolean          IS_DARK_THEME                             = UI.isDarkTheme();
+   private static final boolean          IS_LINUX                                     = UI.IS_LINUX;
+   private static final boolean          IS_OSX                                       = UI.IS_OSX;
+   private static final boolean          IS_DARK_THEME                                = UI.isDarkTheme();
    /**
     * this width is used as a hint for the width of the description field, this value also
     * influences the width of the columns in this editor
     */
-   private static final int              _hintTextColumnWidth                      = IS_OSX ? 200 : 150;
+   private static final int              _hintTextColumnWidth                         = IS_OSX ? 200 : 150;
    //
-   DecimalFormat                         _temperatureFormat                        = new DecimalFormat("###.0");                             //$NON-NLS-1$
+   DecimalFormat                         _temperatureFormat                           = new DecimalFormat("###.0");                             //$NON-NLS-1$
    //
    private ZonedDateTime                 _tourStartTime;
    //
@@ -621,9 +624,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Label              _lblTimeZone;
    private Label              _lblWeather_PrecipitationUnit;
    private Label              _lblWeather_PressureUnit;
+   private Label              _lblWeather_SnowfallUnit;
    private Label              _lblWeather_TemperatureUnit_Avg;
+   private Label              _lblWeather_TemperatureUnit_Avg_Device;
    private Label              _lblWeather_TemperatureUnit_Max;
+   private Label              _lblWeather_TemperatureUnit_Max_Device;
    private Label              _lblWeather_TemperatureUnit_Min;
+   private Label              _lblWeather_TemperatureUnit_Min_Device;
    private Label              _lblWeather_TemperatureUnit_WindChill;
    //
    private Link               _linkDefaultTimeZone;
@@ -2174,7 +2181,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             sb.append(UI.TAB);
 
             // end of line
-            sb.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE);
+            sb.append(UI.SYSTEM_NEW_LINE);
             exportWriter.write(sb.toString());
          }
 
@@ -4000,7 +4007,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          createUI_Section_143_Weather_Wind_Col2(container);
 
          createUI_Section_144_Weather_Temperature_Col1(container);
-         createUI_Section_144_Weather_Temperature_Device_Col2(container);
+         createUI_Section_144_Weather_Temperature_Col2_Device(container);
 
          createUI_Section_147_Weather_Other_Col1(container);
          createUI_Section_148_Weather_Other_Col2(container);
@@ -4023,8 +4030,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _linkWeather.setToolTipText(Messages.Tour_Editor_Link_RetrieveWeather_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(_linkWeather);
             _linkWeather.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
-               //Retrieve the weather
 
+               //Retrieve the weather
                if (_isSetField || _isSavingInProgress) {
                   return;
                }
@@ -4046,7 +4053,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   //
                   // SWT.DEFAULT causes lots of problems with the layout therefore the hint is set
                   //
-                  .hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(2))
+                  .hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(6))
                   .applyTo(_txtWeather);
          }
          {
@@ -4299,11 +4306,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             // spinner
             _spinWeather_Temperature_Average = new Spinner(container, SWT.BORDER);
-            GridDataFactory
-                  .fillDefaults()//
-                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-                  .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_spinWeather_Temperature_Average);
             _spinWeather_Temperature_Average.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Tooltip);
 
             // the min/max temperature has a large range because fahrenheit has bigger values than celsius
@@ -4314,37 +4316,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _spinWeather_Temperature_Average.addSelectionListener(_selectionListener_Temperature);
             _spinWeather_Temperature_Average.addMouseWheelListener(_mouseWheelListener_Temperature);
 
-            // label: celsius, fahrenheit
-            _lblWeather_TemperatureUnit_Avg = _tk.createLabel(container, UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
-            _lblWeather_TemperatureUnit_Avg.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Tooltip);
-         }
-         {
-            /*
-             * Maximum Temperature
-             */
-
-            // spacer
-            new Label(container, SWT.NONE);
-
-            // spinner
-            _spinWeather_Temperature_Max = new Spinner(container, SWT.BORDER);
-            _spinWeather_Temperature_Max.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Tooltip);
-            _spinWeather_Temperature_Max.addModifyListener(_modifyListener_Temperature);
-            _spinWeather_Temperature_Max.addSelectionListener(_selectionListener_Temperature);
-            _spinWeather_Temperature_Max.addMouseWheelListener(_mouseWheelListener_Temperature);
-
-            // the min/max temperature has a large range because fahrenheit has bigger values than celsius
-            _spinWeather_Temperature_Max.setMinimum(-600);
-            _spinWeather_Temperature_Max.setMaximum(1500);
-
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_spinWeather_Temperature_Max);
+                  .applyTo(_spinWeather_Temperature_Average);
 
-            // unit
-            _lblWeather_TemperatureUnit_Max = _tk.createLabel(container, UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
-            _lblWeather_TemperatureUnit_Max.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Tooltip);
+            // label: celsius, fahrenheit
+            _lblWeather_TemperatureUnit_Avg = _tk.createLabel(container, UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+            _lblWeather_TemperatureUnit_Avg.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Tooltip);
          }
          {
             /*
@@ -4373,6 +4352,34 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             // unit
             _lblWeather_TemperatureUnit_Min = _tk.createLabel(container, UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
             _lblWeather_TemperatureUnit_Min.setToolTipText(Messages.Tour_Editor_Label_Temperature_Min_Tooltip);
+         }
+         {
+            /*
+             * Maximum Temperature
+             */
+
+            // spacer
+            new Label(container, SWT.NONE);
+
+            // spinner
+            _spinWeather_Temperature_Max = new Spinner(container, SWT.BORDER);
+            _spinWeather_Temperature_Max.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Tooltip);
+            _spinWeather_Temperature_Max.addModifyListener(_modifyListener_Temperature);
+            _spinWeather_Temperature_Max.addSelectionListener(_selectionListener_Temperature);
+            _spinWeather_Temperature_Max.addMouseWheelListener(_mouseWheelListener_Temperature);
+
+            // the min/max temperature has a large range because fahrenheit has bigger values than celsius
+            _spinWeather_Temperature_Max.setMinimum(-600);
+            _spinWeather_Temperature_Max.setMaximum(1500);
+
+            GridDataFactory.fillDefaults()
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_spinWeather_Temperature_Max);
+
+            // unit
+            _lblWeather_TemperatureUnit_Max = _tk.createLabel(container, UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+            _lblWeather_TemperatureUnit_Max.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Tooltip);
          }
          {
             /*
@@ -4408,7 +4415,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    /**
     * weather
     */
-   private void createUI_Section_144_Weather_Temperature_Device_Col2(final Composite parent) {
+   private void createUI_Section_144_Weather_Temperature_Col2_Device(final Composite parent) {
 
       final Composite container = _tk.createComposite(parent);
       GridDataFactory.fillDefaults().applyTo(container);
@@ -4420,47 +4427,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // spinner
-            _txtWeather_Temperature_Average_Device = _tk.createText(
-                  container,
-                  UI.EMPTY_STRING,
-                  SWT.TRAIL);
-            GridDataFactory
-                  .fillDefaults()//
-                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
-                  .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_txtWeather_Temperature_Average_Device);
-            _txtWeather_Temperature_Average_Device.setEnabled(false);
-
-            // label: celsius, fahrenheit
-            _lblWeather_TemperatureUnit_Avg = _tk.createLabel(
-                  container,
-                  UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
-            _lblWeather_TemperatureUnit_Avg.setToolTipText(
-                  Messages.Tour_Editor_Label_Temperature_Avg_Device_Tooltip);
-         }
-         {
-            /*
-             * Maximum Temperature from device
-             */
-
-            // spinner
-            _txtWeather_Temperature_Max_Device = _tk.createText(
-                  container,
-                  UI.EMPTY_STRING,
-                  SWT.TRAIL);
-            _txtWeather_Temperature_Max_Device.setEnabled(false);
+            _txtWeather_Temperature_Average_Device = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
+            _txtWeather_Temperature_Average_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Device_Tooltip);
 
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
                   .align(SWT.BEGINNING, SWT.CENTER)
-                  .applyTo(_txtWeather_Temperature_Max_Device);
+                  .applyTo(_txtWeather_Temperature_Average_Device);
 
-            // unit
-            _lblWeather_TemperatureUnit_Max = _tk.createLabel(
-                  container,
-                  UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
-            _lblWeather_TemperatureUnit_Max.setToolTipText(
-                  Messages.Tour_Editor_Label_Temperature_Max_Device_Tooltip);
+            // label: celsius, fahrenheit
+            _lblWeather_TemperatureUnit_Avg_Device = _tk.createLabel(container, UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+            _lblWeather_TemperatureUnit_Avg_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Avg_Device_Tooltip);
          }
          {
             /*
@@ -4468,11 +4445,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // spinner
-            _txtWeather_Temperature_Min_Device = _tk.createText(
-                  container,
-                  UI.EMPTY_STRING,
-                  SWT.TRAIL);
-            _txtWeather_Temperature_Min_Device.setEnabled(false);
+            _txtWeather_Temperature_Min_Device = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
+            _txtWeather_Temperature_Min_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Min_Device_Tooltip);
 
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
@@ -4480,11 +4454,26 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   .applyTo(_txtWeather_Temperature_Min_Device);
 
             // unit
-            _lblWeather_TemperatureUnit_Min = _tk.createLabel(
-                  container,
-                  UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
-            _lblWeather_TemperatureUnit_Min.setToolTipText(
-                  Messages.Tour_Editor_Label_Temperature_Min_Device_Tooltip);
+            _lblWeather_TemperatureUnit_Min_Device = _tk.createLabel(container, UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+            _lblWeather_TemperatureUnit_Min_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Min_Device_Tooltip);
+         }
+         {
+            /*
+             * Maximum Temperature from device
+             */
+
+            // spinner
+            _txtWeather_Temperature_Max_Device = _tk.createText(container, UI.EMPTY_STRING, SWT.READ_ONLY);
+            _txtWeather_Temperature_Max_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Device_Tooltip);
+
+            GridDataFactory.fillDefaults()
+                  .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_txtWeather_Temperature_Max_Device);
+
+            // unit
+            _lblWeather_TemperatureUnit_Max_Device = _tk.createLabel(container, UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+            _lblWeather_TemperatureUnit_Max_Device.setToolTipText(Messages.Tour_Editor_Label_Temperature_Max_Device_Tooltip);
          }
       }
    }
@@ -4589,15 +4578,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          /*
           * Snowfall
           */
-         Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Snowfall);
+         final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Snowfall);
          label.setToolTipText(Messages.Tour_Editor_Label_Snowfall_Tooltip);
          _secondColumnControls.add(label);
 
          // spinner: humidity value
          _spinWeather_SnowfallValue = new Spinner(container, SWT.BORDER);
          _spinWeather_SnowfallValue.setToolTipText(Messages.Tour_Editor_Label_Snowfall_Tooltip);
-         _spinWeather_SnowfallValue.setMinimum(0);
-         _spinWeather_SnowfallValue.setMaximum(100);
+         _spinWeather_SnowfallValue.setMaximum(10000);
          _spinWeather_SnowfallValue.addMouseWheelListener(_mouseWheelListener);
          _spinWeather_SnowfallValue.addSelectionListener(_selectionListener);
 
@@ -4608,7 +4596,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                .applyTo(_spinWeather_SnowfallValue);
 
          // label: mm, inches
-         label = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+         _lblWeather_SnowfallUnit = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       }
    }
 
@@ -6554,7 +6542,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_SnowfallValue.setEnabled(canEdit);
       _spinWeather_Wind_DirectionValue.setEnabled(canEdit && isWindDirectionAvailable);
       _spinWeather_Wind_SpeedValue.setEnabled(canEdit);
-      _txtWeather.setEnabled(canEdit && isWeatherRetrievalActivated);
+      _txtWeather.setEnabled(canEdit);
       _spinWeather_Temperature_Average.setEnabled(canEdit);
       _spinWeather_Temperature_Max.setEnabled(canEdit);
       _spinWeather_Temperature_Min.setEnabled(canEdit);
@@ -6887,11 +6875,43 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          // tour is imported
 
+         long tourDeviceTimeElapsed;
          if ((_serieTime == null) || (_serieTime.length == 0)) {
-            _tourData.setTourDeviceTime_Elapsed(0);
+            tourDeviceTimeElapsed = 0;
          } else {
-            _tourData.setTourDeviceTime_Elapsed(_serieTime[_serieTime.length - 1]);
+            tourDeviceTimeElapsed = _serieTime[_serieTime.length - 1];
          }
+         _tourData.setTourDeviceTime_Elapsed(tourDeviceTimeElapsed);
+
+         final long[] pausedTime_Start = _tourData.getPausedTime_Start();
+         if (pausedTime_Start != null && pausedTime_Start.length > 0) {
+
+            final List<Long> listPausedTime_Start = Arrays.stream(pausedTime_Start)
+                  .boxed()
+                  .collect(Collectors.toList());
+            final List<Long> listPausedTime_End = Arrays.stream(_tourData.getPausedTime_End())
+                  .boxed()
+                  .collect(Collectors.toList());
+
+            List<Long> listPausedTime_Data = null;
+            final long[] pausedTime_Data = _tourData.getPausedTime_Data();
+
+            if (pausedTime_Data != null) {
+
+               listPausedTime_Data = Arrays.stream(_tourData.getPausedTime_Data())
+                     .boxed()
+                     .collect(Collectors.toList());
+            }
+
+            _tourData.finalizeTour_TimerPauses(listPausedTime_Start,
+                  listPausedTime_End,
+                  listPausedTime_Data);
+         } else {
+            _tourData.setTourDeviceTime_Paused(0);
+         }
+
+         _tourData.setTourDeviceTime_Recorded(tourDeviceTimeElapsed - _tourData.getTourDeviceTime_Paused());
+
          _tourData.computeTourMovingTime();
 
          if ((_serieDistance == null) || (_serieDistance.length == 0)) {
@@ -7430,9 +7450,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void onSelect_Weather_Text() {
 
-      final List<TourData> tourDataList = new ArrayList<>();
-      tourDataList.add(_tourData);
-      final List<TourData> modifiedTours = TourManager.retrieveWeatherData(tourDataList);
+      final List<TourData> modifiedTours = TourManager.retrieveWeatherData(List.of(_tourData));
 
       if (modifiedTours.size() > 0) {
          setTourDirty();
@@ -8001,11 +8019,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private boolean saveTourIntoDB() {
 
+      final boolean isRecomputeElevation = Util.getStateBoolean(_state,
+            TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,
+            TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT);
+
       _isSavingInProgress = true;
       {
          updateModel_FromUI();
 
-         _tourData.computeAltitudeUpDown();
+         if (isRecomputeElevation) {
+            _tourData.computeAltitudeUpDown();
+         }
+
          _tourData.computeTourMovingTime();
          _tourData.computeComputedValues();
 
@@ -8510,10 +8535,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          _tourData.setWeather_Pressure(UI.convertPressure_ToMetric(pressure));
 
-         final int precipitation = _spinWeather_PrecipitationValue.getSelection();
+         final float precipitation = _spinWeather_PrecipitationValue.getSelection() / 100f;
          _tourData.setWeather_Precipitation(UI.convertPrecipitation_ToMetric(precipitation));
 
-         final int snowfall = _spinWeather_SnowfallValue.getSelection();
+         final float snowfall = _spinWeather_SnowfallValue.getSelection() / 100f;
          _tourData.setWeather_Snowfall(UI.convertPrecipitation_ToMetric(snowfall));
 
          if (_isWindSpeedManuallyModified) {
@@ -9071,13 +9096,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       final float precipitation = UI.convertPrecipitation_FromMetric(_tourData.getWeather_Precipitation());
 
-      if (UI.UNIT_IS_LENGTH_SMALL_MILLIMETER) {
-         _spinWeather_PrecipitationValue.setDigits(0);
-         _spinWeather_PrecipitationValue.setSelection(Math.round(precipitation));
-      } else {
-         _spinWeather_PrecipitationValue.setDigits(2);
-         _spinWeather_PrecipitationValue.setSelection(Math.round(precipitation));
-      }
+      _spinWeather_PrecipitationValue.setDigits(2);
+      _spinWeather_PrecipitationValue.setSelection(Math.round(precipitation * 100));
       _spinWeather_PrecipitationValue.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
 
       /*
@@ -9085,13 +9105,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       final float snowfall = UI.convertPrecipitation_FromMetric(_tourData.getWeather_Snowfall());
 
-      if (UI.UNIT_IS_LENGTH_SMALL_MILLIMETER) {
-         _spinWeather_SnowfallValue.setDigits(0);
-         _spinWeather_SnowfallValue.setSelection(Math.round(snowfall));
-      } else {
-         _spinWeather_SnowfallValue.setDigits(2);
-         _spinWeather_SnowfallValue.setSelection(Math.round(snowfall));
-      }
+      _spinWeather_SnowfallValue.setDigits(2);
+      _spinWeather_SnowfallValue.setSelection(Math.round(snowfall * 100));
       _spinWeather_SnowfallValue.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
 
       /*
@@ -9191,10 +9206,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _lblPerson_BodyFatUnit.setText(UI.UNIT_PERCENT);
       _lblWeather_PrecipitationUnit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       _lblWeather_PressureUnit.setText(UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG);
+      _lblWeather_SnowfallUnit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       _lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
-      _lblWeather_TemperatureUnit_Avg.setText(UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
-      _lblWeather_TemperatureUnit_Max.setText(UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
-      _lblWeather_TemperatureUnit_Min.setText(UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+      final String averageTemperatureUnit = UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+      _lblWeather_TemperatureUnit_Avg.setText(averageTemperatureUnit);
+      _lblWeather_TemperatureUnit_Avg_Device.setText(averageTemperatureUnit);
+      final String maxTemperatureUnit = UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+      _lblWeather_TemperatureUnit_Max.setText(maxTemperatureUnit);
+      _lblWeather_TemperatureUnit_Max_Device.setText(maxTemperatureUnit);
+      final String minTemperatureUnit = UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+      _lblWeather_TemperatureUnit_Min.setText(minTemperatureUnit);
+      _lblWeather_TemperatureUnit_Min_Device.setText(minTemperatureUnit);
       _lblWeather_TemperatureUnit_WindChill.setText(UI.SYMBOL_TILDE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
 
       // cadence rpm/spm
@@ -9536,7 +9558,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       sb.append(UI.TAB);
 
       // end of line
-      sb.append(net.tourbook.ui.UI.SYSTEM_NEW_LINE);
+      sb.append(UI.SYSTEM_NEW_LINE);
       exportWriter.write(sb.toString());
    }
 }

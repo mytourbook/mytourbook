@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,14 +15,14 @@
  *******************************************************************************/
 package net.tourbook.ui.action;
 
+import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
+
 import net.tourbook.Messages;
 import net.tourbook.ui.ITourProvider2;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -87,19 +87,16 @@ public class SubMenu_Weather extends Action implements IMenuCreator {
 
       _menu = new Menu(parent);
 
-      // Add listener to repopulate the menu each time
-      _menu.addMenuListener(new MenuAdapter() {
-         @Override
-         public void menuShown(final MenuEvent e) {
+      // Add listener to re-populate the menu each time
+      _menu.addMenuListener(menuShownAdapter(menuEvent -> {
 
-            // dispose old menu items
-            for (final MenuItem menuItem : ((Menu) e.widget).getItems()) {
-               menuItem.dispose();
-            }
-
-            fillMenu(_menu);
+         // dispose old menu items
+         for (final MenuItem menuItem : ((Menu) menuEvent.widget).getItems()) {
+            menuItem.dispose();
          }
-      });
+
+         fillMenu(_menu);
+      }));
 
       return _menu;
    }

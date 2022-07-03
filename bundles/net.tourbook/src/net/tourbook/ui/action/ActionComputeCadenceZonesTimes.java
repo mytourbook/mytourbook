@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2020 Frédéric Bard
+ * Copyright (C) 2019, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -95,19 +95,16 @@ public class ActionComputeCadenceZonesTimes extends Action {
 
             TourManager.getInstance().clearTourDataCache();
 
-            Display.getDefault().asyncExec(new Runnable() {
-               @Override
-               public void run() {
+            Display.getDefault().asyncExec(() -> {
 
-                  TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
-                  // prevent re-importing in the import view
-                  RawDataManager.setIsReimportingActive(true);
-                  {
-                     // fire unique event for all changes
-                     TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
-                  }
-                  RawDataManager.setIsReimportingActive(false);
+               TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
+               // prevent re-importing in the import view
+               RawDataManager.setIsReimportingActive(true);
+               {
+                  // fire unique event for all changes
+                  TourManager.fireEvent(TourEventId.ALL_TOURS_ARE_MODIFIED);
                }
+               RawDataManager.setIsReimportingActive(false);
             });
          }
       }

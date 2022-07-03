@@ -64,11 +64,13 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -190,6 +192,8 @@ public class TourInfoUI {
    private Color _bgColor;
    private Color _fgColor;
 
+   private Font  _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
+
    /*
     * UI controls
     */
@@ -254,8 +258,8 @@ public class TourInfoUI {
    private Label            _lblRecordedTime;
    private Label            _lblRecordedTime_Unit;
    private Label            _lblRestPulse;
-   private Label            _lblTemperature;
-   private Label            _lblTemperatureFromDevice;
+   private Label            _lblTemperature_Part1;
+   private Label            _lblTemperature_Part2;
    private Label            _lblTimeZone_Value;
    private Label            _lblTimeZoneDifference;
    private Label            _lblTimeZoneDifference_Value;
@@ -410,6 +414,7 @@ public class TourInfoUI {
          GridLayoutFactory.fillDefaults()
                .margins(SHELL_MARGIN, SHELL_MARGIN)
                .applyTo(_ttContainer);
+//         _ttContainer.setBackground(UI.SYS_COLOR_GREEN);
          {
             createUI_10_UpperPart(_ttContainer);
 
@@ -867,8 +872,8 @@ public class TourInfoUI {
        */
       createUI_Label(parent, Messages.Tour_Tooltip_Label_Temperature);
 
-      _lblTemperature = createUI_LabelValue(parent, SWT.TRAIL);
-      _lblTemperatureFromDevice = createUI_LabelValue(parent, SWT.LEAD);
+      _lblTemperature_Part1 = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblTemperature_Part2 = createUI_LabelValue(parent, SWT.LEAD);
 
       /*
        * Wind speed
@@ -1108,7 +1113,7 @@ public class TourInfoUI {
       _lowerPartContainer.setBackground(_bgColor);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_lowerPartContainer);
       GridLayoutFactory.fillDefaults().numColumns(numColumns).spacing(16, 0).applyTo(_lowerPartContainer);
-//      _lowerPartContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
+//      _lowerPartContainer.setBackground(UI.SYS_COLOR_CYAN);
       {
 
          createUI_92_SensorValues(_lowerPartContainer);
@@ -1125,8 +1130,8 @@ public class TourInfoUI {
             _lblTourType_Value = createUI_LabelValue(_lowerPartContainer, SWT.LEAD | SWT.WRAP);
             GridDataFactory.fillDefaults()
                   .span(numColumns - 1, 1)
-                  .grab(true, false)
-                  .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
+//                  .grab(true, false)
+//                  .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
                   .indent(0, 5)
                   .applyTo(_lblTourType_Value);
          }
@@ -1140,8 +1145,8 @@ public class TourInfoUI {
             _lblTourTags_Value = createUI_LabelValue(_lowerPartContainer, SWT.LEAD | SWT.WRAP);
             GridDataFactory.fillDefaults()
                   .span(numColumns - 1, 1)
-                  .grab(true, false)
-                  .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
+//                  .grab(true, false)
+//                  .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
                   .applyTo(_lblTourTags_Value);
          }
          {
@@ -1149,16 +1154,20 @@ public class TourInfoUI {
              * Weather
              */
             _lblWeather = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_Weather);
+            _lblWeather.setFont(_boldFont);
             GridDataFactory.fillDefaults()
                   .span(numColumns, 1)
-                  .indent(0, 5)
+                  .indent(0, 10)
                   .applyTo(_lblWeather);
 
-            _txtWeather = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER);
+            _txtWeather = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY
+//                  | SWT.BORDER
+            );
             GridDataFactory.fillDefaults()
                   .span(numColumns, 1)
-                  .grab(true, false)
-                  .hint(_defaultTextWidth, SWT.DEFAULT)
+//                  .indent(-5, 0)
+//                  .grab(true, false)
+//                  .hint(_defaultTextWidth, SWT.DEFAULT)
                   .applyTo(_txtWeather);
 
             _txtWeather.setForeground(_fgColor);
@@ -1171,13 +1180,16 @@ public class TourInfoUI {
 
             // label
             _lblDescription = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_Description);
+            _lblDescription.setFont(_boldFont);
             GridDataFactory.fillDefaults()
                   .span(numColumns, 1)
-                  .indent(0, 5)
+                  .indent(0, 10)
                   .applyTo(_lblDescription);
 
             // text field
-            int style = SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER;
+            int style = SWT.WRAP | SWT.MULTI | SWT.READ_ONLY
+//                  | SWT.BORDER
+            ;
             _descriptionLineCount = Util.countCharacter(_tourData.getTourDescription(), '\n');
 
             if (_descriptionLineCount > _descriptionScroll_Lines) {
@@ -1187,8 +1199,9 @@ public class TourInfoUI {
             _txtDescription = new Text(_lowerPartContainer, style);
             GridDataFactory.fillDefaults()
                   .span(numColumns, 1)
-                  .grab(true, false)
-                  .hint(_defaultTextWidth, SWT.DEFAULT)
+//                  .indent(-5, 0)
+//                  .grab(true, false)
+//                  .hint(_defaultTextWidth, SWT.DEFAULT)
                   .applyTo(_txtDescription);
 
             if (_descriptionLineCount > _descriptionScroll_Lines) {
@@ -1421,7 +1434,11 @@ public class TourInfoUI {
 
       final PixelConverter pc = new PixelConverter(parent);
 
-      _defaultTextWidth = pc.convertWidthInCharsToPixels(80);
+      /*
+       * !!! It is important that the width value is not too large otherwise empty lines (because of
+       * the default width) are added below the text control when there is a lot of content
+       */
+      _defaultTextWidth = pc.convertWidthInCharsToPixels(75);
       _descriptionScroll_Height = pc.convertHeightInCharsToPixels(_descriptionScroll_Lines);
    }
 
@@ -1744,24 +1761,63 @@ public class TourInfoUI {
             UI.getCardinalDirectionText(weatherWindDirectionDegree * 10)));
 
       // Average temperature
-      final float averageTemperatureValue = UI.convertTemperatureFromMetric(
-            _tourData.getWeather_Temperature_Average());
-      final String averageTemperature = _tourData.getWeather_Temperature_Average() > 0 ||
-            _tourData.isWeatherDataFromProvider()
-                  ? _nf1.format(averageTemperatureValue) + UI.UNIT_LABEL_TEMPERATURE
-                  : UI.EMPTY_STRING;
+      final float temperature_NoDevice = _tourData.getWeather_Temperature_Average();
+      final float temperature_FromDevice = _tourData.getWeather_Temperature_Average_Device();
 
-      final float temperatureFromDeviceValue = UI.convertTemperatureFromMetric(
-            _tourData.getWeather_Temperature_Average_Device());
+      final float convertedTemperature_NoDevice = UI.convertTemperatureFromMetric(temperature_NoDevice);
+      final float convertedTemperature_FromDevice = UI.convertTemperatureFromMetric(temperature_FromDevice);
 
-      final String averageTemperatureFromDevice = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0
-            ? UI.DASH + UI.SPACE2 + _nf1.format(temperatureFromDeviceValue) + UI.UNIT_LABEL_TEMPERATURE
-            : UI.EMPTY_STRING;
+      final String formattedTemperature_NoDevice = _tourData.isMultipleTours()
+            ? FormatManager.formatTemperature_Summary(convertedTemperature_NoDevice)
+            : FormatManager.formatTemperature(convertedTemperature_NoDevice);
+      final String formattedTemperature_FromDevice = _tourData.isMultipleTours()
+            ? FormatManager.formatTemperature_Summary(convertedTemperature_FromDevice)
+            : FormatManager.formatTemperature(convertedTemperature_FromDevice);
 
-      _lblTemperature.setText(averageTemperature);
-      _lblTemperature.setToolTipText(Messages.Tour_Tooltip_Format_AverageTemperatures_Tooltip);
-      _lblTemperatureFromDevice.setText(averageTemperatureFromDevice);
-      _lblTemperatureFromDevice.setToolTipText(Messages.Tour_Tooltip_Format_AverageTemperatures_Tooltip);
+      final boolean isTemperature_NoDevice = temperature_NoDevice > 0 || _tourData.isWeatherDataFromProvider();
+      final boolean isTemperature_FromDevice = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0;
+
+      String part1Text = UI.EMPTY_STRING;
+      String part2Text = UI.EMPTY_STRING;
+      String part1Tooltip = UI.EMPTY_STRING;
+      String part2Tooltip = UI.EMPTY_STRING;
+
+      if (isTemperature_NoDevice && isTemperature_FromDevice) {
+
+         // both values are available
+
+         part1Text = formattedTemperature_NoDevice + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+         part2Text = formattedTemperature_FromDevice + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+
+         part1Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_NoDevice;
+         part2Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_FromDevice;
+
+      } else if (isTemperature_NoDevice) {
+
+         // values only from provider or manual
+
+         part1Text = formattedTemperature_NoDevice;
+         part2Text = UI.UNIT_LABEL_TEMPERATURE;
+
+         part1Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_NoDevice;
+         part2Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_NoDevice;
+
+      } else if (isTemperature_FromDevice) {
+
+         // values only from device
+
+         part1Text = formattedTemperature_FromDevice;
+         part2Text = UI.UNIT_LABEL_TEMPERATURE;
+
+         part1Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_FromDevice;
+         part2Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_FromDevice;
+      }
+
+      _lblTemperature_Part1.setText(part1Text);
+      _lblTemperature_Part1.setToolTipText(part1Tooltip);
+
+      _lblTemperature_Part2.setText(part2Text);
+      _lblTemperature_Part2.setToolTipText(part2Tooltip);
 
       // weather clouds
       final int weatherIndex = _tourData.getWeatherIndex();

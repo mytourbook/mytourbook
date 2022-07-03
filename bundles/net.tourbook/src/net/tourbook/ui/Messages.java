@@ -54,8 +54,6 @@ public class Messages extends NLS {
    public static String        ColumnFactory_avg_pulse_tooltip;
    public static String        ColumnFactory_avg_speed_label;
    public static String        ColumnFactory_avg_speed_tooltip;
-   public static String        ColumnFactory_avg_temperature_label;
-   public static String        ColumnFactory_avg_temperature_tooltip;
    public static String        ColumnFactory_BodyWeight_Label;
    public static String        ColumnFactory_BodyWeight_Tooltip;
    public static String        ColumnFactory_BreakTime_Header;
@@ -432,10 +430,24 @@ public class Messages extends NLS {
    public static String        ColumnFactory_TagNotes_Label;
    public static String        ColumnFactory_TagNotes_Tooltip;
 
+   public static String        ColumnFactory_Temperature_Avg_Combined_Label;
+   public static String        ColumnFactory_Temperature_Avg_Combined_Tooltip;
+   public static String        ColumnFactory_Temperature_Avg_Device_Label;
+   public static String        ColumnFactory_Temperature_Avg_Device_Tooltip;
+   public static String        ColumnFactory_Temperature_Avg_Label;
+   public static String        ColumnFactory_Temperature_Avg_Tooltip;
    public static String        ColumnFactory_Temperature_Max_Label;
    public static String        ColumnFactory_Temperature_Max_Tooltip;
+   public static String        ColumnFactory_Temperature_Max_Combined_Label;
+   public static String        ColumnFactory_Temperature_Max_Combined_Tooltip;
+   public static String        ColumnFactory_Temperature_Max_Device_Label;
+   public static String        ColumnFactory_Temperature_Max_Device_Tooltip;
    public static String        ColumnFactory_Temperature_Min_Label;
    public static String        ColumnFactory_Temperature_Min_Tooltip;
+   public static String        ColumnFactory_Temperature_Min_Combined_Label;
+   public static String        ColumnFactory_Temperature_Min_Combined_Tooltip;
+   public static String        ColumnFactory_Temperature_Min_Device_Label;
+   public static String        ColumnFactory_Temperature_Min_Device_Tooltip;
 
    public static String        ColumnFactory_TimeDelta_Header;
    public static String        ColumnFactory_TimeDelta_Label;
@@ -542,7 +554,6 @@ public class Messages extends NLS {
    public static String        Tour_Marker_Column_IsVisibleNoEdit_Tooltip;
 
    public static String        Tour_Tooltip_Action_EditFormatPreferences;
-   public static String        Tour_Tooltip_Format_AverageTemperatures_Tooltip;
    public static String        Tour_Tooltip_Format_DateWeekTime;
    public static String        Tour_Tooltip_Format_HistoryDateTime;
    public static String        Tour_Tooltip_Format_Pace;
@@ -556,6 +567,8 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_AvgPower;
    public static String        Tour_Tooltip_Label_AvgPulse;
    public static String        Tour_Tooltip_Label_AvgSpeed;
+   public static String        Tour_Tooltip_Label_AvgTemperature_FromDevice;
+   public static String        Tour_Tooltip_Label_AvgTemperature_NoDevice;
    public static String        Tour_Tooltip_Label_Battery;
    public static String        Tour_Tooltip_Label_Battery_Tooltip;
    public static String        Tour_Tooltip_Label_BatteryLevel_Tooltip;
@@ -600,7 +613,6 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Label_RunDyn_VerticalRatio_Min;
    public static String        Tour_Tooltip_Label_Tags;
    public static String        Tour_Tooltip_Label_Temperature;
-   public static String        Tour_Tooltip_Label_Temperature_FromDevice;
    public static String        Tour_Tooltip_Label_TimeZone;
    public static String        Tour_Tooltip_Label_TimeZoneDifference;
    public static String        Tour_Tooltip_Label_TourType;

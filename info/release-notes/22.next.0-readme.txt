@@ -4,10 +4,6 @@
 TODO's
 ======
 
-
-* Tour Chart      - Select color for 2nd graph line instead of compliment color
-
-
 * Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
                     Need to check how to apply it to all projects, must maybe be done with the already existing ant script
 
@@ -18,6 +14,7 @@ TODO's
 Issues
 ======
 
+*
 
 
 Experimental
@@ -29,19 +26,22 @@ Experimental
 New
 ===
 
-*
-
+* 
 
 Improvements
 ============
 
-* 
+* 2D Map
+  - Goto location                         https://github.com/mytourbook/mytourbook/issues/884
+  - Copy location to clipboard
+
 
 
 Changes
 =======
 
-* 
+* Fitlog/FitlogEx Import (Frederic)
+  - Compute the average power when power data is provided but average power value is not
 
 
 Bugfix
@@ -67,5 +67,6 @@ System
 ======
 
 * Milestone             https://github.com/mytourbook/mytourbook/milestone/4?closed=1
-* Eclipse 2022-03
-* FIT SDK 21.67
+* Eclipse 2022-xx
+* FIT SDK 21.84
+* WorldWind 2.2.1       https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

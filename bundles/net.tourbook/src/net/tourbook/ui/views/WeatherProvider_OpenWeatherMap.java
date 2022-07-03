@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
 import net.tourbook.web.WEB;
@@ -35,6 +36,8 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
+
+   private static final String URL_OPENWEATHERMAP_ORG = "https://openweathermap.org/";//$NON-NLS-1$
 
    /*
     * UI controls
@@ -58,11 +61,10 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
           * OpenWeatherMap webpage
           */
          final Link linkApiSignup = new Link(container, SWT.PUSH);
-         linkApiSignup.setText(Messages.Pref_Weather_OpenWeatherMap_Link);
+         linkApiSignup.setText(UI.LINK_TAG_START + URL_OPENWEATHERMAP_ORG + UI.LINK_TAG_END);
          linkApiSignup.setEnabled(true);
-         linkApiSignup.addListener(
-               SWT.Selection,
-               event -> WEB.openUrl("https://openweathermap.org/")); //$NON-NLS-1$
+         linkApiSignup.addListener(SWT.Selection, event -> WEB.openUrl(URL_OPENWEATHERMAP_ORG));
+
          GridDataFactory.fillDefaults()
                .span(2, 1)
                .indent(defaultHIndent, 0)
@@ -74,18 +76,20 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
           */
          _btnTestConnection = new Button(container, SWT.NONE);
          _btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
-         _btnTestConnection.addSelectionListener(widgetSelectedAdapter(
-               selectionEvent -> {
-                  final var previousHour = Instant
-                        .now()
-                        .minus(1, ChronoUnit.HOURS)
-                        .toEpochMilli()
-                        / 1000;
-                  HistoricalWeatherRetriever.checkVendorConnection(
-                        OpenWeatherMapRetriever.getBaseApiUrl() +
-                              "?units=metric&lat=0&lon=0&dt=" + //$NON-NLS-1$
-                              previousHour);
-               }));
+         _btnTestConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
+            final var previousHour = Instant
+                  .now()
+                  .minus(1, ChronoUnit.HOURS)
+                  .toEpochMilli() / 1000;
+
+            HistoricalWeatherRetriever.checkVendorConnection(
+                  OpenWeatherMapRetriever.getBaseApiUrl() +
+                        "?units=metric&lat=0&lon=0&dt=" + //$NON-NLS-1$
+                        previousHour,
+                  IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP_ID);
+         }));
+
          GridDataFactory.fillDefaults()
                .indent(defaultHIndent, 0)
                .align(SWT.BEGINNING, SWT.FILL)
@@ -98,7 +102,7 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
           * Label:
           */
          final Label note = new Label(container, SWT.NONE);
-         note.setText(Messages.Pref_Weather_OpenWeatherMap_Label_FiveDaysLimit);
+         note.setText(Messages.Pref_Weather_Label_OpenWeatherMap_FiveDaysLimit);
 
          GridDataFactory.fillDefaults()
                .indent(defaultHIndent, 0)

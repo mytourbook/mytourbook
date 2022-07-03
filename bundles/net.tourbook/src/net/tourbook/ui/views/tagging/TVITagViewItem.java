@@ -72,7 +72,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
             + "avgPulse," //                 8   //$NON-NLS-1$
             + "avgCadence," //               9   //$NON-NLS-1$
-            + "(DOUBLE(AvgTemperature) / TemperatureScale)," //         10   //$NON-NLS-1$
+            + "(DOUBLE(weather_Temperature_Average_Device) / TemperatureScale)," //         10   //$NON-NLS-1$
             + "TourDeviceTime_Recorded" //   11   //$NON-NLS-1$
       ;
    }
@@ -103,7 +103,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
    float                            colAvgPulse;
    float                            colAvgCadence;
-   float                            colAvgTemperature;
+   float                            colAvgTemperature_Device;
 
    long                             colTourCounter;
 
@@ -175,7 +175,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
       colAvgPulse = result.getFloat(startIndex + 8);
       colAvgCadence = result.getFloat(startIndex + 9);
-      colAvgTemperature = result.getFloat(startIndex + 10);
+      colAvgTemperature_Device = result.getFloat(startIndex + 10);
 
       colRecordedTime = result.getLong(startIndex + 11);
 
@@ -203,7 +203,7 @@ public abstract class TVITagViewItem extends TreeViewerItem {
 
          colAvgPulse = UI.scrambleNumbers(colAvgPulse);
          colAvgCadence = UI.scrambleNumbers(colAvgCadence);
-         colAvgTemperature = UI.scrambleNumbers(colAvgTemperature);
+         colAvgTemperature_Device = UI.scrambleNumbers(colAvgTemperature_Device);
 
          colAvgSpeed = UI.scrambleNumbers(colAvgSpeed);
          colAvgPace = UI.scrambleNumbers(colAvgPace);

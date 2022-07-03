@@ -80,7 +80,7 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
 
             // text
             _textApiKey_Value = new Text(container, SWT.PASSWORD | SWT.BORDER);
-            _textApiKey_Value.setToolTipText(Messages.Pref_Weather_WorldWeatherOnline_Label_ApiKey_Tooltip);
+            _textApiKey_Value.setToolTipText(Messages.Pref_Weather_Label_WorldWeatherOnline_ApiKey_Tooltip);
             _textApiKey_Value.addModifyListener(event -> onModifyApiKey());
             GridDataFactory.fillDefaults()
                   .grab(true, false)
@@ -132,7 +132,8 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
                   SWT.NONE);
             _btnTestConnection.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> HistoricalWeatherRetriever.checkVendorConnection(
-                        WorldWeatherOnlineRetriever.getApiUrl() + _textApiKey_Value.getText())));
+                        WorldWeatherOnlineRetriever.getApiUrl() + _textApiKey_Value.getText(),
+                        IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_NAME)));
             GridDataFactory.fillDefaults()
                   .indent(defaultHIndent, 0)
                   .align(SWT.BEGINNING, SWT.FILL)

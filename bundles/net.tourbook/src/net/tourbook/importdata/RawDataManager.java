@@ -58,7 +58,6 @@ import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.common.weather.IWeather;
 import net.tourbook.common.widgets.ComboEnumEntry;
 import net.tourbook.data.DeviceSensor;
 import net.tourbook.data.TourData;
@@ -1806,11 +1805,12 @@ public class RawDataManager {
                clonedTourData.setWeather_Wind_Direction(tourData.getWeather_Wind_Direction());
                clonedTourData.setWeather_Wind_Speed(tourData.getWeather_Wind_Speed());
 
+               tourData.setIsWeatherDataFromProvider(false);
                tourData.setWeather_Temperature_Average(0);
                tourData.setWeather_Temperature_Max(0);
                tourData.setWeather_Temperature_Min(0);
                tourData.setWeather_Temperature_WindChill(0);
-               tourData.setWeather_Clouds(IWeather.cloudIsNotDefined);
+               tourData.setWeather_Clouds(UI.EMPTY_STRING);
                tourData.setWeather(UI.EMPTY_STRING);
                tourData.setWeather_Humidity((short) 0);
                tourData.setWeather_Pressure(0);
@@ -2991,6 +2991,14 @@ public class RawDataManager {
                                                          final ImportState_Process importState_Process,
                                                          final ReImportStatus reImportStatus) {
 
+      final Shell activeShell = Display.getDefault().getActiveShell();
+
+      // during initialization there is no active shell
+      if (activeShell == null) {
+         StatusUtil.showStatus(RawDataManager.class.getSimpleName() + ": An active shell is not available");
+         return;
+      }
+
       if (existingImportFilePathName == null) {
 
          // import filepath is not available, in older versions -> the file path name is not saved in the tour
@@ -3088,7 +3096,7 @@ public class RawDataManager {
                fileName,
                dataFormat);
 
-         final FileDialog dialog = new FileDialog(Display.getDefault().getActiveShell(), SWT.OPEN);
+         final FileDialog dialog = new FileDialog(activeShell, SWT.OPEN);
          dialog.setText(dialogTitle);
 
          if (existingImportFilePathName != null) {

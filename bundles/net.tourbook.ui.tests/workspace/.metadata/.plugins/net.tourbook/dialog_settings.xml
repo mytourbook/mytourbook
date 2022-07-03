@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item key="application.last-selected-person-id" value="0"/>
+	<section name="PhotoManager">
+		<list key="STATE_CAMERA_ADJUSTMENT_NAME">
+		</list>
+		<list key="STATE_CAMERA_ADJUSTMENT_TIME">
+		</list>
+	</section>
+	<section name="TourFilter">
+		<item key="STATE_HORIZ_SLIDEOUT_WIDTH" value="900"/>
+		<item key="STATE_HORIZ_SLIDEOUT_HEIGHT" value="200"/>
+		<item key="STATE_VERT_SLIDEOUT_WIDTH" value="900"/>
+		<item key="STATE_VERT_SLIDEOUT_HEIGHT" value="200"/>
+		<item key="STATE_IS_SLIDEOUT_PINNED" value="false"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_IS_KEEP_SLIDEOUT_OPEN" value="false"/>
+	</section>
+	<section name="TourTagFilterSlideout">
+		<item key="STATE_IS_HIERARCHICAL_LAYOUT" value="true"/>
+		<item key="STATE_IS_LIVE_UPDATE" value="true"/>
+		<item key="STATE_HORIZ_SLIDEOUT_WIDTH" value="700"/>
+		<item key="STATE_HORIZ_SLIDEOUT_HEIGHT" value="400"/>
+		<item key="STATE_VERT_SLIDEOUT_WIDTH" value="700"/>
+		<item key="STATE_VERT_SLIDEOUT_HEIGHT" value="400"/>
+		<item key="STATE_IS_SLIDEOUT_PINNED" value="false"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_IS_KEEP_SLIDEOUT_OPEN" value="false"/>
+	</section>
+	<section name="TourGeoFilter">
+		<item key="STATE_SORT_COLUMN_ID" value="createdDateTime"/>
+		<item key="STATE_SORT_COLUMN_DIRECTION" value="1"/>
+		<item key="XML_STATE_COLUMN_MANAGER" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;ColumnProfiles isShowCategory=&quot;true&quot; isShowColumnAnnotation_Formatting=&quot;false&quot; isShowColumnAnnotation_Sorting=&quot;false&quot;&gt;&#x0D;&#x0A;&lt;Profile isActiveProfile=&quot;true&quot; name=&quot;Column Profile&quot; visibleColumnIds=&quot;filterName,createdDateTime,geoParts,zoomLevel,&quot; visibleColumnIdsAndWidth=&quot;filterName,72,createdDateTime,120,geoParts,36,zoomLevel,30,&quot;&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;filterName&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;createdDateTime&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;geoParts&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;zoomLevel&quot;/&gt;&#x0D;&#x0A;&lt;/Profile&gt;&#x0D;&#x0A;&lt;/ColumnProfiles&gt;"/>
+		<item key="STATE_HORIZ_SLIDEOUT_WIDTH" value="700"/>
+		<item key="STATE_HORIZ_SLIDEOUT_HEIGHT" value="200"/>
+		<item key="STATE_VERT_SLIDEOUT_WIDTH" value="700"/>
+		<item key="STATE_VERT_SLIDEOUT_HEIGHT" value="200"/>
+		<item key="STATE_IS_SLIDEOUT_PINNED" value="false"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_IS_KEEP_SLIDEOUT_OPEN" value="false"/>
+	</section>
+	<section name="TourTypeFilterManager">
+		<item key="application.last-selected-tourtypefilter" value="All Tour Types"/>
+	</section>
+	<section name="net.tourbook.views.rawData.RawDataView">
+		<item key="XML_STATE_COLUMN_MANAGER" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;ColumnProfiles isShowCategory=&quot;true&quot; isShowColumnAnnotation_Formatting=&quot;false&quot; isShowColumnAnnotation_Sorting=&quot;false&quot;&gt;&#x0D;&#x0A;&lt;Profile isActiveProfile=&quot;true&quot; name=&quot;Column Profile&quot; visibleColumnIds=&quot;STATE_IMPORT_STATE,STATE_DB_STATUS,TIME_TOUR_DATE,TIME_TOUR_START_TIME,TIME__DEVICE_ELAPSED_TIME,TOUR_TYPE,TOUR_TITLE,TOUR_TAGS,TOUR_NUM_MARKERS,MOTION_DISTANCE,MOTION_AVG_SPEED,MOTION_AVG_PACE,ALTITUDE_SUMMARIZED_BORDER_UP,WEATHER_CLOUDS,&quot; visibleColumnIdsAndWidth=&quot;STATE_IMPORT_STATE,20,STATE_DB_STATUS,20,TIME_TOUR_DATE,72,TIME_TOUR_START_TIME,84,TIME__DEVICE_ELAPSED_TIME,60,TOUR_TYPE,30,TOUR_TITLE,150,TOUR_TAGS,120,TOUR_NUM_MARKERS,30,MOTION_DISTANCE,66,MOTION_AVG_SPEED,60,MOTION_AVG_PACE,72,ALTITUDE_SUMMARIZED_BORDER_UP,48,WEATHER_CLOUDS,25,&quot;&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;STATE_IMPORT_STATE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;STATE_DB_STATUS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME_TOUR_DATE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME_TOUR_START_TIME&quot; detailFormat=&quot;TIME_HH_MM&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME__DEVICE_ELAPSED_TIME&quot; detailFormat=&quot;TIME_HH_MM&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TYPE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TITLE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TAGS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_NUM_MARKERS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_DISTANCE&quot; detailFormat=&quot;NUMBER_1_3&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_AVG_SPEED&quot; detailFormat=&quot;NUMBER_1_1&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_AVG_PACE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;ALTITUDE_SUMMARIZED_BORDER_UP&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WEATHER_CLOUDS&quot;/&gt;&#x0D;&#x0A;&lt;/Profile&gt;&#x0D;&#x0A;&lt;/ColumnProfiles&gt;"/>
+		<item key="STATE_IS_REMOVE_TOURS_WHEN_VIEW_CLOSED" value="true"/>
+		<list key="importedFilenames">
+		</list>
+		<list key="SelectedTourIndices">
+		</list>
+	</section>
+	<section name="TagManager.RecentTags">
+		<list key="tagId">
+			<item value="0"/>
+		</list>
+		<list key="">
+			<item value="0"/>
+		</list>
+	</section>
+	<section name="DialogSelectPerson">
+	</section>
+	<section name="TourTypeManager.RecentTourTypes">
+		<list key="TourTypeId">
+		</list>
+	</section>
+	<section name="TourMarkerView">
+		<item key="XML_STATE_COLUMN_MANAGER" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;ColumnProfiles isShowCategory=&quot;true&quot; isShowColumnAnnotation_Formatting=&quot;false&quot; isShowColumnAnnotation_Sorting=&quot;false&quot;&gt;&#x0D;&#x0A;&lt;Profile isActiveProfile=&quot;true&quot; name=&quot;Column Profile&quot; visibleColumnIds=&quot;MARKER_MAP_VISIBLE,TIME_TOUR_TIME_HH_MM_SS,MOTION_DISTANCE,MOTION_DISTANCE_DELTA_ID,ALTITUDE_GRADIENT_AVG,MOTION_AVG_PACE,MARKER_ALTITUDE_ELEVATION_GAIN_DELTA,MARKER_ALTITUDE_ELEVATION_LOSS_DELTA,MARKER_SERIE_INDEX,BODY_AVG_PULSE,MOTION_AVG_SPEED,MARKER_TIME_DELTA,WAYPOINT_NAME,WAYPOINT_DESCRIPTION,MARKER_URL,&quot; visibleColumnIdsAndWidth=&quot;MARKER_MAP_VISIBLE,48,TIME_TOUR_TIME_HH_MM_SS,72,MOTION_DISTANCE,66,MOTION_DISTANCE_DELTA_ID,66,ALTITUDE_GRADIENT_AVG,48,MOTION_AVG_PACE,72,MARKER_ALTITUDE_ELEVATION_GAIN_DELTA,72,MARKER_ALTITUDE_ELEVATION_LOSS_DELTA,72,MARKER_SERIE_INDEX,48,BODY_AVG_PULSE,60,MOTION_AVG_SPEED,60,MARKER_TIME_DELTA,72,WAYPOINT_NAME,180,WAYPOINT_DESCRIPTION,180,MARKER_URL,150,&quot;&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MARKER_MAP_VISIBLE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME_TOUR_TIME_HH_MM_SS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_DISTANCE&quot; detailFormat=&quot;NUMBER_1_3&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_DISTANCE_DELTA_ID&quot; detailFormat=&quot;NUMBER_1_3&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;ALTITUDE_GRADIENT_AVG&quot; detailFormat=&quot;NUMBER_1_1&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_AVG_PACE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MARKER_ALTITUDE_ELEVATION_GAIN_DELTA&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MARKER_ALTITUDE_ELEVATION_LOSS_DELTA&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MARKER_SERIE_INDEX&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;BODY_AVG_PULSE&quot; detailFormat=&quot;NUMBER_1_1&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_AVG_SPEED&quot; detailFormat=&quot;NUMBER_1_1&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MARKER_TIME_DELTA&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WAYPOINT_NAME&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WAYPOINT_DESCRIPTION&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MARKER_URL&quot;/&gt;&#x0D;&#x0A;&lt;/Profile&gt;&#x0D;&#x0A;&lt;/ColumnProfiles&gt;"/>
+	</section>
+	<section name="net.tourbook.map2.view.Map2ViewId">
+		<item key="STATE_IS_SHOW_TOUR_IN_MAP" value="true"/>
+		<item key="STATE_IS_SHOW_PHOTO_IN_MAP" value="true"/>
+		<item key="STATE_IS_SHOW_LEGEND_IN_MAP" value="true"/>
+		<item key="STATE_IS_SHOW_VALUE_POINT" value="true"/>
+		<item key="STATE_IS_SHOW_START_END_IN_MAP" value="false"/>
+		<item key="STATE_IS_SHOW_SCALE_IN_MAP" value="true"/>
+		<item key="STATE_IS_SHOW_SLIDER_IN_MAP" value="true"/>
+		<item key="STATE_IS_SHOW_SLIDER_IN_LEGEND" value="false"/>
+		<item key="STATE_IS_SHOW_TOUR_INFO_IN_MAP" value="true"/>
+		<item key="STATE_IS_SHOW_TOUR_MARKER" value="true"/>
+		<item key="STATE_IS_SHOW_TOUR_PAUSES" value="true"/>
+		<item key="STATE_IS_SHOW_TOUR_WEATHER_IN_MAP" value="true"/>
+		<item key="STATE_IS_SHOW_WAY_POINTS" value="true"/>
+		<item key="STATE_CENTER_MAP_BY" value="Mouse"/>
+		<item key="STATE_MAP_SYNC_MODE_IS_ACTIVE" value="false"/>
+		<item key="STATE_MAP_SYNC_MODE" value="IsSyncWith_Tour"/>
+		<item key="STATE_ZOOM_LEVEL_ADJUSTMENT" value="0"/>
+		<item key="selected.map-provider-id" value="osm"/>
+		<item key="STATE_DEFAULT_POSITION_ZOOM" value="10"/>
+		<item key="STATE_DEFAULT_POSITION_LATITUDE" value="46.303074"/>
+		<item key="STATE_DEFAULT_POSITION_LONGITUDE" value="7.526386"/>
+		<item key="STATE_IS_PHOTO_FILTER_ACTIVE" value="false"/>
+		<item key="STATE_PHOTO_FILTER_RATING_STARS" value="0"/>
+		<item key="STATE_PHOTO_FILTER_RATING_STAR_OPERATOR" value="HAS_ANY"/>
+		<item key="STATE_TOUR_COLOR_ID" value="Altitude"/>
+		<item key="Pinned_ToolTip_DiffPositionX" value="0"/>
+		<item key="Pinned_ToolTip_DiffPositionY" value="0"/>
+		<item key="Pinned_ToolTip_PinnedLocation" value="TopRight"/>
+		<item key="Pinned_ToolTip_MouseXPositionRelative" value="0"/>
+		<item key="Pinned_ToolTip_IsToolTipAboveValuePoint" value="true"/>
+	</section>
+	<section name="net.tourbook.map2.view.Map2View.MapProvider">
+	</section>
+	<section name="net.tourbook.map2.view.Map2View.PhotoFilter">
+		<item key="STATE_HORIZ_SLIDEOUT_WIDTH" value="220"/>
+		<item key="STATE_HORIZ_SLIDEOUT_HEIGHT" value="100"/>
+		<item key="STATE_VERT_SLIDEOUT_WIDTH" value="220"/>
+		<item key="STATE_VERT_SLIDEOUT_HEIGHT" value="100"/>
+		<item key="STATE_IS_SLIDEOUT_PINNED" value="false"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_IS_KEEP_SLIDEOUT_OPEN" value="false"/>
+	</section>
+	<section name="net.tourbook.views.TourChartView">
+		<item key="STATE_HORIZ_SLIDEOUT_WIDTH" value="300"/>
+		<item key="STATE_HORIZ_SLIDEOUT_HEIGHT" value="150"/>
+		<item key="STATE_VERT_SLIDEOUT_WIDTH" value="400"/>
+		<item key="STATE_VERT_SLIDEOUT_HEIGHT" value="250"/>
+		<item key="STATE_IS_SLIDEOUT_PINNED" value="false"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_IS_KEEP_SLIDEOUT_OPEN" value="false"/>
+		<item key="STATE_PHOTO_GALLERY_IS_VERTICAL" value="true"/>
+		<item key="STATE_TOOL_TIP_LOCATION" value="1"/>
+		<item key="Pinned_ToolTip_DiffPositionX" value="0"/>
+		<item key="Pinned_ToolTip_DiffPositionY" value="0"/>
+		<item key="Pinned_ToolTip_PinnedLocation" value="TopRight"/>
+		<item key="Pinned_ToolTip_MouseXPositionRelative" value="0"/>
+		<item key="Pinned_ToolTip_IsToolTipAboveValuePoint" value="true"/>
+	</section>
+	<section name="net.tourbook.views.TourSegmenter">
+	</section>
+	<section name="net.tourbook.tourType.TourTypeManager">
+		<item key="XML_STATE_TOUR_TYPE_MANAGER" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;TourTypeImageLayout tourTypeBorderColor=&quot;COLOR_LINE&quot; tourTypeBorderLayout=&quot;BORDER_LEFT_RIGHT&quot; tourTypeBorderWidth=&quot;1&quot; tourTypeImageColor1=&quot;COLOR_DARK&quot; tourTypeImageColor2=&quot;COLOR_BRIGHT&quot; tourTypeImageLayout=&quot;RECTANGLE&quot;/&gt;"/>
+	</section>
+	<section name="TourCompareManager">
+		<item key="STATE_REFERENCE_TOUR_VIEW_LAYOUT" value="0"/>
+	</section>
+	<section name="net.tourbook.preferences.PrefPagePeopleId">
+		<item key="selectedPersonId" value="0"/>
+		<item key="selectedTabFolder" value="0"/>
+	</section>
+	<section name="net.tourbook.views.TourDataEditorView">
+		<item key="tourDataEditor.selectedTab" value="0"/>
+		<item key="tourDataEditor.isEditMode" value="true"/>
+		<item key="tourDataEditor.rowEditMode" value="false"/>
+		<item key="STATE_SECTION_CHARACTERISTICS" value="true"/>
+		<item key="STATE_SECTION_DATE_TIME" value="true"/>
+		<item key="STATE_SECTION_PERSONAL" value="true"/>
+		<item key="STATE_SECTION_TITLE" value="true"/>
+		<item key="STATE_SECTION_WEATHER" value="true"/>
+	</section>
+	<section name="net.tourbook.views.TourDataEditorView.swimSlice">
+		<item key="XML_STATE_COLUMN_MANAGER" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;ColumnProfiles isShowCategory=&quot;true&quot; isShowColumnAnnotation_Formatting=&quot;false&quot; isShowColumnAnnotation_Sorting=&quot;false&quot;&gt;&#x0D;&#x0A;&lt;Profile isActiveProfile=&quot;true&quot; name=&quot;Column Profile&quot; visibleColumnIds=&quot;DATA_FIRST_COLUMN,DATA_SEQUENCE,SWIM__TIME_TOUR_TIME_HH_MM_SS,SWIM__SWIM_STROKES_PER_LENGTH,SWIM__SWIM_STROKE_RATE,SWIM__SWIM_STROKE_STYLE,&quot; visibleColumnIdsAndWidth=&quot;DATA_FIRST_COLUMN,0,DATA_SEQUENCE,48,SWIM__TIME_TOUR_TIME_HH_MM_SS,72,SWIM__SWIM_STROKES_PER_LENGTH,54,SWIM__SWIM_STROKE_RATE,54,SWIM__SWIM_STROKE_STYLE,54,&quot;&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;DATA_FIRST_COLUMN&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;DATA_SEQUENCE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;SWIM__TIME_TOUR_TIME_HH_MM_SS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;SWIM__SWIM_STROKES_PER_LENGTH&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;SWIM__SWIM_STROKE_RATE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;SWIM__SWIM_STROKE_STYLE&quot;/&gt;&#x0D;&#x0A;&lt;/Profile&gt;&#x0D;&#x0A;&lt;/ColumnProfiles&gt;"/>
+	</section>
+	<section name="net.tourbook.views.TourDataEditorView.slice">
+		<item key="XML_STATE_COLUMN_MANAGER" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;ColumnProfiles isShowCategory=&quot;true&quot; isShowColumnAnnotation_Formatting=&quot;false&quot; isShowColumnAnnotation_Sorting=&quot;false&quot;&gt;&#x0D;&#x0A;&lt;Profile isActiveProfile=&quot;true&quot; name=&quot;Column Profile&quot; visibleColumnIds=&quot;DATA_FIRST_COLUMN,DATA_SEQUENCE,TIME_TOUR_TIME_HH_MM_SS,MOTION_DISTANCE,MOTION_LATITUDE,MOTION_LONGITUDE,ALTITUDE_ALTITUDE,ALTITUDE_GRADIENT,TOUR_MARKER,&quot; visibleColumnIdsAndWidth=&quot;DATA_FIRST_COLUMN,0,DATA_SEQUENCE,48,TIME_TOUR_TIME_HH_MM_SS,72,MOTION_DISTANCE,66,MOTION_LATITUDE,84,MOTION_LONGITUDE,84,ALTITUDE_ALTITUDE,54,ALTITUDE_GRADIENT,48,TOUR_MARKER,120,&quot;&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;DATA_FIRST_COLUMN&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;DATA_SEQUENCE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME_TOUR_TIME_HH_MM_SS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_DISTANCE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_LATITUDE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_LONGITUDE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;ALTITUDE_ALTITUDE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;ALTITUDE_GRADIENT&quot; detailFormat=&quot;NUMBER_1_1&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_MARKER&quot;/&gt;&#x0D;&#x0A;&lt;/Profile&gt;&#x0D;&#x0A;&lt;/ColumnProfiles&gt;"/>
+	</section>
+	<section name="net.tourbook.tour.TourLogView">
+		<item key="STATE_IS_UI_COLORFULL" value="true"/>
+	</section>
+	<section name="net.tourbook.importdata.EasyImportManager">
+		<item key="XML_STATE_EASY_IMPORT" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;EasyImportConfig&gt;&#x0D;&#x0A;&lt;DashConfig animationCrazyFactor=&quot;1&quot; animationDuration=&quot;20&quot; backgroundOpacity=&quot;5&quot; isLiveUpdate=&quot;true&quot; isLogDetails=&quot;false&quot; isShowTile_CloudApps=&quot;true&quot; isShowTile_Files=&quot;true&quot; isShowTile_FossilUI=&quot;true&quot; isShowTile_SerialPort=&quot;false&quot; isShowTile_SerialPortWithConfig=&quot;false&quot; stateTooltipDisplayAbsoluteFilePath=&quot;false&quot; stateTooltipWidth=&quot;500&quot; tileSize=&quot;100&quot; uiColumns=&quot;5&quot;/&gt;&#x0D;&#x0A;&lt;ImportConfig backupFolder=&quot;&quot; deviceFiles=&quot;*&quot; deviceFolder=&quot;&quot; deviceType=&quot;0&quot; isActiveConfig=&quot;true&quot; isCreateBackup=&quot;true&quot; isDeleteDeviceFiles=&quot;false&quot; isTurnOffWatching=&quot;false&quot; name=&quot;My Tour Recording Device&quot;/&gt;&#x0D;&#x0A;&lt;LauncherConfig description=&quot;Start easy import with this configuration.&quot; isAdjustTemperature=&quot;false&quot; isReplaceFirstTimeSliceElevation=&quot;false&quot; isRetrieveWeatherData=&quot;false&quot; isSaveTour=&quot;false&quot; isSetLastMarker=&quot;false&quot; isSetTourType=&quot;false&quot; isShowInDashBoard=&quot;true&quot; lastMarkerDistance=&quot;0&quot; lastMarkerText=&quot;&quot; name=&quot;Start Import&quot; temperatureAdjustmentDuration=&quot;720&quot; tourAverageTemperature=&quot;15.0&quot;/&gt;&#x0D;&#x0A;&lt;/EasyImportConfig&gt;"/>
+	</section>
+	<section name="net.tourbook.views.tourListView">
+		<item key="STATE_SELECTED_YEAR" value="2020"/>
+		<item key="STATE_SELECTED_MONTH" value="2"/>
+		<item key="STATE_IS_SELECT_YEAR_MONTH_TOURS" value="false"/>
+		<item key="STATE_IS_LINK_WITH_OTHER_VIEWS" value="false"/>
+		<item key="STATE_VIEW_LAYOUT" value="CATEGORY_MONTH"/>
+		<list key="STATE_SELECTED_TOURS">
+			<item value="202022019451223"/>
+		</list>
+		<list key="STATE_SORT_COLUMN_ID">
+			<item value="TIME_DATE"/>
+		</list>
+		<list key="STATE_SORT_COLUMN_DIRECTION">
+			<item value="DESC"/>
+		</list>
+	</section>
+	<section name="net.tourbook.views.tourListView_NAT_TABLE">
+		<item key="XML_STATE_COLUMN_MANAGER" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;ColumnProfiles isShowCategory=&quot;true&quot; isShowColumnAnnotation_Formatting=&quot;false&quot; isShowColumnAnnotation_Sorting=&quot;false&quot;&gt;&#x0D;&#x0A;&lt;Profile isActiveProfile=&quot;true&quot; name=&quot;Column Profile&quot; visibleColumnIds=&quot;TIME_DATE,TIME_WEEK_DAY,TIME_TOUR_START_TIME,TIME__COMPUTED_MOVING_TIME,TOUR_TYPE,TOUR_TITLE,TOUR_NUM_MARKERS,TOUR_NUM_PHOTOS,TOUR_TAGS,MOTION_DISTANCE,ALTITUDE_SUMMARIZED_BORDER_UP,ALTITUDE_AVG_CHANGE,WEATHER_CLOUDS,&quot; visibleColumnIdsAndWidth=&quot;TIME_DATE,108,TIME_WEEK_DAY,30,TIME_TOUR_START_TIME,84,TIME__COMPUTED_MOVING_TIME,60,TOUR_TYPE,30,TOUR_TITLE,150,TOUR_NUM_MARKERS,30,TOUR_NUM_PHOTOS,48,TOUR_TAGS,120,MOTION_DISTANCE,66,ALTITUDE_SUMMARIZED_BORDER_UP,48,ALTITUDE_AVG_CHANGE,60,WEATHER_CLOUDS,25,&quot;&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME_DATE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME_WEEK_DAY&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME_TOUR_START_TIME&quot; detailFormat=&quot;TIME_HH_MM&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME__COMPUTED_MOVING_TIME&quot; detailFormat=&quot;TIME_HH_MM&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TYPE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TITLE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_NUM_MARKERS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_NUM_PHOTOS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TAGS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_DISTANCE&quot; detailFormat=&quot;NUMBER_1_3&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;ALTITUDE_SUMMARIZED_BORDER_UP&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;ALTITUDE_AVG_CHANGE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WEATHER_CLOUDS&quot;/&gt;&#x0D;&#x0A;&lt;/Profile&gt;&#x0D;&#x0A;&lt;/ColumnProfiles&gt;"/>
+	</section>
+	<section name="net.tourbook.views.tourListView_TREE">
+		<item key="XML_STATE_COLUMN_MANAGER" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;ColumnProfiles isShowCategory=&quot;true&quot; isShowColumnAnnotation_Formatting=&quot;false&quot; isShowColumnAnnotation_Sorting=&quot;false&quot;&gt;&#x0D;&#x0A;&lt;Profile isActiveProfile=&quot;true&quot; name=&quot;Column Profile&quot; visibleColumnIds=&quot;TIME_DATE,TIME_WEEK_DAY,TIME_TOUR_START_TIME,TIME__COMPUTED_MOVING_TIME,TOUR_TYPE,TOUR_TITLE,TOUR_NUM_MARKERS,TOUR_NUM_PHOTOS,TOUR_TAGS,MOTION_DISTANCE,ALTITUDE_UP,ALTITUDE_AVG_CHANGE,WEATHER_CLOUDS,&quot; visibleColumnIdsAndWidth=&quot;TIME_DATE,108,TIME_WEEK_DAY,30,TIME_TOUR_START_TIME,72,TIME__COMPUTED_MOVING_TIME,60,TOUR_TYPE,30,TOUR_TITLE,120,TOUR_NUM_MARKERS,30,TOUR_NUM_PHOTOS,48,TOUR_TAGS,120,MOTION_DISTANCE,72,ALTITUDE_UP,60,ALTITUDE_AVG_CHANGE,60,WEATHER_CLOUDS,25,&quot;&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME_DATE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME_WEEK_DAY&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME_TOUR_START_TIME&quot; detailFormat=&quot;TIME_HH_MM&quot;/&gt;&#x0D;&#x0A;&lt;Column categoryFormat=&quot;TIME_HH&quot; columnId=&quot;TIME__COMPUTED_MOVING_TIME&quot; detailFormat=&quot;TIME_HH_MM&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TYPE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TITLE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_NUM_MARKERS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_NUM_PHOTOS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TAGS&quot;/&gt;&#x0D;&#x0A;&lt;Column categoryFormat=&quot;NUMBER_1_0&quot; columnId=&quot;MOTION_DISTANCE&quot; detailFormat=&quot;NUMBER_1_3&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;ALTITUDE_UP&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;ALTITUDE_AVG_CHANGE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WEATHER_CLOUDS&quot;/&gt;&#x0D;&#x0A;&lt;/Profile&gt;&#x0D;&#x0A;&lt;/ColumnProfiles&gt;"/>
+	</section>
+	<section name="TourStatisticsView">
+	</section>
+	<section name="TourCalendarView">
+	</section>
+	<section name="SlideoutCalendarOptions">
+	</section>
+	<section name="net.tourbook.views.TourWaypointView">
+	</section>
+	<section name="net.tourbook.ui.views.TourPausesView">
+	</section>
+	<section name="TourTagsView">
+	</section>
+</section>

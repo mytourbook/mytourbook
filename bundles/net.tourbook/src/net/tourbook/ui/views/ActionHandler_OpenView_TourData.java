@@ -32,7 +32,7 @@ public class ActionHandler_OpenView_TourData extends AbstractHandler implements 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-      Util.showView(TourData_View.ID, true);
+      Util.showView(TourDataView.ID, true);
 
       return null;
    }

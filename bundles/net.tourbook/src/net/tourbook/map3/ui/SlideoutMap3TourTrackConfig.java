@@ -20,7 +20,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import gov.nasa.worldwind.WorldWind;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorSelectorExtended;
@@ -1042,7 +1042,7 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
    private void onSelectConfig(final SelectionEvent selectionEvent) {
 
       final int selectedIndex = _comboName.getSelectionIndex();
-      final ArrayList<TourTrackConfig> allConfigurations = TourTrackConfigManager.getAllConfigurations();
+      final List<TourTrackConfig> allConfigurations = TourTrackConfigManager.getAllConfigurations();
 
       final TourTrackConfig selectedConfig = allConfigurations.get(selectedIndex);
       final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
@@ -1224,7 +1224,7 @@ public class SlideoutMap3TourTrackConfig extends AnimatedToolTipShell implements
       _chkAltitudeOffsetRandom            .setSelection(config.isAltitudeOffsetRandom);
       _rdoOffsetAbsolute                  .setSelection(isOffsetAbsolute);
       _rdoOffsetRelative                  .setSelection(!isOffsetAbsolute);
-      _spinnerAltitudeOffsetAbsolute      .setSelection((int) ((float)config.altitudeOffsetDistanceAbsolute / UI.UNIT_VALUE_ELEVATION));
+      _spinnerAltitudeOffsetAbsolute      .setSelection((int) (config.altitudeOffsetDistanceAbsolute / UI.UNIT_VALUE_ELEVATION));
       _spinnerAltitudeOffsetRelative      .setSelection(config.altitudeOffsetDistanceRelative);
       _chkFollowTerrain                   .setSelection(config.isFollowTerrain);
 

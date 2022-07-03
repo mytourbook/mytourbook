@@ -620,9 +620,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
    private class NatTable_Configuration_CellStyle extends AbstractRegistryConfiguration {
 
-      private ArrayList<ColumnDefinition> _allSortedColumns;
+      private List<ColumnDefinition> _allSortedColumns;
 
-      public NatTable_Configuration_CellStyle(final ArrayList<ColumnDefinition> allSortedColumns) {
+      public NatTable_Configuration_CellStyle(final List<ColumnDefinition> allSortedColumns) {
 
          _allSortedColumns = allSortedColumns;
       }
@@ -1070,7 +1070,9 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
 
                // when a tour type is deleted then the tours from the db must be reloaded
-               || property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+               || property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)
+
+               || property.equals(ITourbookPreferences.VIEW_PREFERRED_TEMPERATURE_VALUE)) {
 
             /*
              * Flat view do not preserve column reordering when reloaded -> recreate it
@@ -1430,7 +1432,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
       /*
        * Setup other data
        */
-      final ArrayList<ColumnDefinition> allSortedColumns = _natTable_DataLoader.allSortedColumns;
+      final List<ColumnDefinition> allSortedColumns = _natTable_DataLoader.allSortedColumns;
 
       natTable_SetColumnWidths(allSortedColumns, _natTable_Body_DataLayer);
       natTable_RegisterColumnLabels(allSortedColumns, _natTable_Body_DataLayer, _natTable_ColumnHeader_DataLayer);
@@ -2333,7 +2335,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * @param body_DataLayer
     * @param columnHeader_DataLayer
     */
-   private void natTable_RegisterColumnLabels(final ArrayList<ColumnDefinition> allSortedColumns,
+   private void natTable_RegisterColumnLabels(final List<ColumnDefinition> allSortedColumns,
                                               final DataLayer body_DataLayer,
                                               final DataLayer columnHeader_DataLayer) {
 
@@ -2399,7 +2401,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
     * @param allSortedColumns
     * @param body_DataLayer
     */
-   private void natTable_SetColumnWidths(final ArrayList<ColumnDefinition> allSortedColumns, final DataLayer body_DataLayer) {
+   private void natTable_SetColumnWidths(final List<ColumnDefinition> allSortedColumns, final DataLayer body_DataLayer) {
 
       // set column widths
       for (int colIndex = 0; colIndex < allSortedColumns.size(); colIndex++) {
@@ -2985,23 +2987,19 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       String viewLayoutImage = null;
 
-      if (_viewLayout == TourBookViewLayout.NAT_TABLE) {
-
+      switch (_viewLayout) {
+      case NAT_TABLE:
          viewLayoutImage = Images.TourBook_NatTable;
-
          _isLayoutNatTable = true;
-
-      } else if (_viewLayout == TourBookViewLayout.CATEGORY_MONTH) {
-
+         break;
+      case CATEGORY_MONTH:
          viewLayoutImage = Images.TourBook_Month;
-
          _isLayoutNatTable = false;
-
-      } else if (_viewLayout == TourBookViewLayout.CATEGORY_WEEK) {
-
+         break;
+      case CATEGORY_WEEK:
          viewLayoutImage = Images.TourBook_Week;
-
          _isLayoutNatTable = false;
+         break;
       }
 
       _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(viewLayoutImage));

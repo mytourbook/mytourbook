@@ -20,9 +20,12 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public interface IWeatherProvider {
 
-   public static final String Pref_Weather_Provider_None               = "NoWeatherProvider";  //$NON-NLS-1$
-   public static final String WEATHER_PROVIDER_OPENWEATHERMAP     = "OpenWeatherMap";     //$NON-NLS-1$
-   public static final String WEATHER_PROVIDER_WORLDWEATHERONLINE = "WorldWeatherOnline"; //$NON-NLS-1$
+   public static final String Pref_Weather_Provider_None               = "NoWeatherProvider";    //$NON-NLS-1$
+   public static final String WEATHER_PROVIDER_OPENWEATHERMAP_ID       = "OpenWeatherMap";       //$NON-NLS-1$
+   public static final String WEATHER_PROVIDER_WEATHERAPI_ID           = "WeatherAPI";           //$NON-NLS-1$
+   public static final String WEATHER_PROVIDER_WEATHERAPI_NAME         = "Weather API";          //$NON-NLS-1$
+   public static final String WEATHER_PROVIDER_WORLDWEATHERONLINE_ID   = "WorldWeatherOnline";   //$NON-NLS-1$
+   public static final String WEATHER_PROVIDER_WORLDWEATHERONLINE_NAME = "World Weather Online"; //$NON-NLS-1$
 
    Composite createUI(WeatherProvidersUI weatherProvidersUI,
                       Composite parent,

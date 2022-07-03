@@ -548,6 +548,11 @@ public interface ITourbookPreferences {
    public static final String VIEW_DOUBLE_CLICK_ACTIONS = "ViewDoubleClickActions"; //$NON-NLS-1$
 
    /*
+    * View: combined temperatures
+    */
+   public static final String VIEW_PREFERRED_TEMPERATURE_VALUE = "VIEW_PREFERRED_TEMPERATURE_VALUE"; //$NON-NLS-1$
+
+   /*
     * Dialog toggle states
     */
    public static final String TOGGLE_STATE_GEO_FILTER_DELETE_ALL_WITHOUT_NAME = "TOGGLE_STATE_GEO_FILTER_DELETE_ALL_WITHOUT_NAME";//$NON-NLS-1$
@@ -628,11 +633,11 @@ public interface ITourbookPreferences {
    /*
     * Weather
     */
-   public static final String WEATHER_USE_WEATHER_RETRIEVAL = "WEATHER_STATE_USE_WEATHER_RETRIEVAL"; //$NON-NLS-1$
    //This is the api key for world weather online
-   public static final String WEATHER_API_KEY               = "WEATHER_API_KEY";                     //$NON-NLS-1$
-   public static final String WEATHER_WEATHER_PROVIDER_ID   = "WEATHER_WEATHER_PROVIDER_ID";         //$NON-NLS-1$
-   public static final String WEATHER_DISPLAY_FULL_LOG      = "WEATHER_DISPLAY_FULL_LOG";            //$NON-NLS-1$
+   public static final String WEATHER_API_KEY                              = "WEATHER_API_KEY";                              //$NON-NLS-1$
+   public static final String WEATHER_WEATHER_PROVIDER_ID                  = "WEATHER_WEATHER_PROVIDER_ID";                  //$NON-NLS-1$
+   public static final String WEATHER_DISPLAY_FULL_LOG                     = "WEATHER_DISPLAY_FULL_LOG";                     //$NON-NLS-1$
+   public static final String WEATHER_SAVE_LOG_IN_TOUR_WEATHER_DESCRIPTION = "WEATHER_SAVE_LOG_IN_TOUR_WEATHER_DESCRIPTION"; //$NON-NLS-1$
 
    /*
     * Tour Marker View

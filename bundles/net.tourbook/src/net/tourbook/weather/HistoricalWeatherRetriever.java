@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.weather;
 
+import com.javadocmd.simplelatlng.LatLng;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -40,22 +42,32 @@ public abstract class HistoricalWeatherRetriever {
 
    public static HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(20)).build();
    public TourData          tour;
+   public LatLng            searchAreaCenter;
+   public long              tourEndTime;
+   public long              tourMiddleTime;
+   public long              tourStartTime;
 
    protected HistoricalWeatherRetriever(final TourData tourData) {
       tour = tourData;
+
+      searchAreaCenter = WeatherUtils.determineWeatherSearchAreaCenter(tour);
+
+      tourStartTime = tour.getTourStartTimeMS() / 1000;
+      tourEndTime = tour.getTourEndTimeMS() / 1000;
+      tourMiddleTime = tourStartTime + ((tourEndTime - tourStartTime) / 2);
    }
 
    /**
     * This method ensures the connection to the API can be made successfully.
     */
-   public static void checkVendorConnection(final String vendorUrl) {
+   public static void checkVendorConnection(final String vendorUrl, final String vendorName) {
 
       BusyIndicator.showWhile(Display.getCurrent(), () -> {
 
          try {
 
             final HttpRequest request = HttpRequest
-                  .newBuilder(URI.create(vendorUrl))
+                  .newBuilder(URI.create(vendorUrl.trim()))
                   .GET()
                   .build();
 
@@ -69,7 +81,7 @@ public abstract class HistoricalWeatherRetriever {
             final String message = statusCode == HttpURLConnection.HTTP_OK
                   ? NLS.bind(
                         Messages.Pref_Weather_CheckHTTPConnection_OK_Message,
-                        vendorUrl)
+                        vendorName)
                   : NLS.bind(
                         Messages.Pref_Weather_CheckHTTPConnection_FAILED_Message,
                         new Object[] {
@@ -90,10 +102,15 @@ public abstract class HistoricalWeatherRetriever {
    }
 
    /**
-    * Returns the fully detailed weather data as a human readable string
+    * Returns the fully detailed weather log as a human readable string
     * Example: 14h (Temperature 14C, feels like 12C, humidity 54% etc....)
+    *
+    * @param isCompressed
+    *           When true, displays the weather data in the most compressed way
+    *           in order to reduce its size as much as possible (example: hiding
+    *           empty values, replacing new lines by ';' etc...
     */
-   protected abstract String buildFullWeatherDataString();
+   protected abstract String buildDetailedWeatherLog(final boolean isCompressed);
 
    private void logVendorError(final String exceptionMessage) {
 

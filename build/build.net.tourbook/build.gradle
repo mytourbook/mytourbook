@@ -1,7 +1,7 @@
 plugins {
 
    id 'com.github.dkorotych.gradle-maven-exec' version '2.2.1'
-   id 'org.sonarqube' version '3.3'
+   id 'org.sonarqube' version '3.4.0.2513'
    id 'jacoco'
 }
 
@@ -53,10 +53,10 @@ sonarqube {
     property 'sonar.host.url',                       'https://sonarcloud.io'
     property 'sonar.sources',                        'bundles'
     property 'sonar.exclusions',                     'bundles/net.tourbook.ext.jars/**/*'
-    property 'sonar.coverage.exclusions',            'bundles/net.tourbook.tests/**/*.*, **src-test/**/*.*'
+    property 'sonar.coverage.exclusions',            'bundles/net.tourbook.tests/**/*.*, **src-test/**/*.*, bundles/net.tourbook.ui.tests/**/*.*'
     property 'sonar.java.binaries',                  '.'
     property 'sonar.java.libraries',                 'bundles/net.tourbook.ext.jars/**/*.jar'
-    property 'sonar.coverage.jacoco.xmlReportPaths', '../../mytourbook-BUILD-autocreated/core/net.tourbook.tests/target/site/jacoco-aggregate/jacoco.xml'
+    property 'sonar.coverage.jacoco.xmlReportPaths', '../../mytourbook-BUILD-autocreated/core/net.tourbook.tests/target/site/jacoco-aggregate/jacoco.xml, ../../mytourbook-BUILD-autocreated/core/net.tourbook.ui.tests/target/site/jacoco-aggregate/jacoco.xml'
   }
 }
 

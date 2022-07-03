@@ -18,7 +18,6 @@ package net.tourbook.data;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
@@ -31,6 +30,7 @@ import javax.persistence.Transient;
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.map.GeoPosition;
 import net.tourbook.common.util.IHoveredArea;
 import net.tourbook.common.util.StatusUtil;
@@ -47,6 +47,8 @@ import org.eclipse.swt.graphics.Image;
 @Entity
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "wayPointId")
 public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea {
+
+   private static final char          NL                          = UI.NEW_LINE;
 
    private static final String        IMAGE_MAP_WAY_POINT_HOVERED = Images.Map_WayPoint_Hovered;
 
@@ -103,7 +105,6 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
     *
     * @since DB version 28
     */
-   // <urlname> Text to display on the <url> hyperlink
    private String      urlText;
 
    /**
@@ -111,7 +112,6 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
     *
     * @since DB version 28
     */
-   // <url> URL associated with the waypoint
    private String      urlAddress;
 
    @Transient
@@ -125,6 +125,18 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
    private long        _createId = _createCounter.incrementAndGet();
 
    public TourWayPoint() {}
+
+   /**
+    * Used for MT import/export
+    *
+    * @param tourData
+    */
+   public TourWayPoint(final TourData tourData) {
+
+      this.tourData = tourData;
+
+      _createId = _createCounter.incrementAndGet();
+   }
 
    public TourWayPoint clone(final TourData wpTourData) {
 
@@ -464,22 +476,35 @@ public class TourWayPoint implements Cloneable, Comparable<Object>, IHoveredArea
       this.urlText = urlText;
    }
 
+   /**
+    * This method is called in the "Tour Data" view !!!
+    */
    @Override
    public String toString() {
-      return "TourWayPoint [" //$NON-NLS-1$
 
-            + ("time=" + Instant.ofEpochMilli(time) + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("_createId=" + _createId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("wayPointId=" + wayPointId + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("latitude=" + latitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("longitude=" + longitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            //          + ("altitude=" + altitude + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            //          + ("name=" + name + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            //          + ("description=" + description + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            //          + ("comment=" + comment + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            //          + ("symbol=" + symbol + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            //          + ("category=" + category) //$NON-NLS-1$
+      return UI.EMPTY_STRING
 
-            + "]\n"; //$NON-NLS-1$
+            + "TourWayPoint" + NL //                           //$NON-NLS-1$
+
+            + "[" + NL //                                      //$NON-NLS-1$
+
+            + "   wayPointId     =" + wayPointId + NL //       //$NON-NLS-1$
+            + "   longitude      =" + longitude + NL //        //$NON-NLS-1$
+            + "   latitude       =" + latitude + NL //         //$NON-NLS-1$
+            + "   time           =" + time + NL //             //$NON-NLS-1$
+            + "   altitude       =" + altitude + NL //         //$NON-NLS-1$
+            + "   name           =" + name + NL //             //$NON-NLS-1$
+            + "   description    =" + description + NL //      //$NON-NLS-1$
+            + "   comment        =" + comment + NL //          //$NON-NLS-1$
+            + "   symbol         =" + symbol + NL //           //$NON-NLS-1$
+            + "   category       =" + category + NL //         //$NON-NLS-1$
+            + "   urlText        =" + urlText + NL //          //$NON-NLS-1$
+            + "   urlAddress     =" + urlAddress + NL //       //$NON-NLS-1$
+
+            + "   _createId      =" + _createId + NL //        //$NON-NLS-1$
+
+//          + "   _geoPosition   =" + _geoPosition + NL //     //$NON-NLS-1$
+
+            + "]" + NL; //                                     //$NON-NLS-1$
    }
 }

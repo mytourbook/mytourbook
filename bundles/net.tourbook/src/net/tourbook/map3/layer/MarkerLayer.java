@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,7 +27,7 @@ import gov.nasa.worldwind.render.PointPlacemark;
 import gov.nasa.worldwind.render.PointPlacemarkAttributes;
 
 import java.net.URL;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
@@ -57,7 +57,7 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
 
    public MarkerLayer() {}
 
-   public void createMarker(final ArrayList<TourData> allTours) {
+   public void createMarker(final List<TourData> allTours) {
 
       removeAllRenderables();
 
@@ -152,7 +152,7 @@ public class MarkerLayer extends RenderableLayer implements SelectListener, IChe
       }
    }
 
-   public void onModifyConfig(final ArrayList<TourData> allTours) {
+   public void onModifyConfig(final List<TourData> allTours) {
 
       final TourTrackConfig trackConfig = TourTrackConfigManager.getActiveConfig();
 
