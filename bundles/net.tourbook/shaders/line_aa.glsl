@@ -32,8 +32,8 @@ void main() {
     // last two bits hold the texture coordinates
     v_st = abs(mod(dir, 4.0)) - 1.0;
 	 
-	 // transfer colors to the fragment shader
-	 v_color = a_colors;
+	 // transfer colors to the fragment shader - rgb 0...255 -> 0...1
+	 v_color = a_colors / 255.0;
 }
 
 $$

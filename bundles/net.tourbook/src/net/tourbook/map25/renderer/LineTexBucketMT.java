@@ -150,7 +150,7 @@ public final class LineTexBucketMT extends LineBucketMT {
                0,
                0);
 
-         buckets.vbo.bind();
+         buckets.vbo_BufferObject.bind();
 
          final float mapPositionScale = (float) viewport.pos.getZoomScale();
          final float s = mapPositionScale / div;
@@ -564,6 +564,7 @@ public final class LineTexBucketMT extends LineBucketMT {
       vi.add(nx, ny, dx, dy, (short) (lineLength + dist), (short) 0);
 
       if (evenSegment) {
+
          /* go to second segment */
          vi.seek(-12);
          evenSegment = false;
@@ -571,7 +572,9 @@ public final class LineTexBucketMT extends LineBucketMT {
          /* vertex 0 and 2 were added */
          numVertices += 3;
          evenQuads++;
+
       } else {
+
          /* go to next block */
          evenSegment = true;
 
@@ -590,8 +593,10 @@ public final class LineTexBucketMT extends LineBucketMT {
    }
 
    @Override
-   protected void compile(final ShortBuffer vboData, final ShortBuffer iboData) {
-      compileVertexItems(vboData);
+   protected void compile(final ShortBuffer vboData, final ShortBuffer iboData, final ByteBuffer colorBuffer) {
+
+      compileVertexItems(vboData, null);
+
       /* add additional vertex for interleaving, see TexLineLayer. */
       vboData.position(vboData.position() + 6);
    }

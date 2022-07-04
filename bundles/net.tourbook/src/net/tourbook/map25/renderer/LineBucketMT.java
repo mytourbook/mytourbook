@@ -138,11 +138,11 @@ public class LineBucketMT extends RenderBucketMT {
                : SHADER_PROJECTED;
 
          mode = mode;
-//         mode = SHADER_FLAT;
+//       mode = SHADER_FLAT;
 
          final Shader shader = _shaders[mode];
 
-         // is calling GL.enableVertexAttribArray() for shader_a_pos
+         // is calling GL.enableVertexAttribArray() for shader_a_pos, shader_a_colors
          shader.useProgram();
 
          GLState.blend(true);
@@ -198,7 +198,7 @@ public class LineBucketMT extends RenderBucketMT {
 
          gl.uniform1f(shader_u_fade, (float) pixel);
 
-         int capMode = 0;
+         int capMode = CAP_THIN;
          gl.uniform1i(shader_u_mode, capMode);
 
          boolean isBlur = false;
@@ -284,9 +284,7 @@ public class LineBucketMT extends RenderBucketMT {
                   gl.uniform1i(shader_u_mode, capMode);
                }
 
-               gl.drawArrays(GL.TRIANGLE_STRIP,
-                     lineBucket.vertexOffset,
-                     lineBucket.numVertices);
+               gl.drawArrays(GL.TRIANGLE_STRIP, lineBucket.vertexOffset, lineBucket.numVertices);
 
                continue;
             }
@@ -334,9 +332,7 @@ public class LineBucketMT extends RenderBucketMT {
                   gl.uniform1i(shader_u_mode, capMode);
                }
 
-               gl.drawArrays(GL.TRIANGLE_STRIP,
-                     ref.vertexOffset,
-                     ref.numVertices);
+               gl.drawArrays(GL.TRIANGLE_STRIP, ref.vertexOffset, ref.numVertices);
             }
          }
 
@@ -382,6 +378,7 @@ public class LineBucketMT extends RenderBucketMT {
    private static class Shader extends GLShaderMT {
 
       int shader_a_pos,
+            shader_a_colors,
 
             shader_u_mvp,
 
@@ -401,6 +398,7 @@ public class LineBucketMT extends RenderBucketMT {
          }
 
          shader_a_pos = getAttrib("a_pos");
+         shader_a_colors = getAttrib("a_colors");
 
          shader_u_mvp = getUniform("u_mvp");
 
@@ -417,7 +415,7 @@ public class LineBucketMT extends RenderBucketMT {
 
          if (super.useProgram()) {
 
-            GLState.enableVertexArrays(shader_a_pos, GLState.DISABLED);
+            GLState.enableVertexArrays(shader_a_pos, shader_a_colors);
 
             return true;
          }
@@ -442,19 +440,19 @@ public class LineBucketMT extends RenderBucketMT {
     *           -2048 ... 2048
     * @param numPoints
     * @param isCapClosed
-    * @param pixelPointColors2
-    *           One {@link #pixelPointColors2} has two {@link #pixelPoints}
+    * @param pixelPointColors
+    *           One {@link #pixelPointColors} has two {@link #pixelPoints}
     */
    public void addLine(final float[] pixelPoints,
                        final int numPoints,
                        final boolean isCapClosed,
-                       final int[] pixelPointColors2) {
+                       final int[] pixelPointColors) {
 
       if (numPoints >= 4) {
-         addLine(pixelPoints, null, numPoints, isCapClosed, pixelPointColors2);
+         addLine(pixelPoints, null, numPoints, isCapClosed, pixelPointColors);
       }
 
-      System.out.println((System.currentTimeMillis() + "addLine - numPoints:" + numPoints));
+      System.out.println((System.currentTimeMillis() + " addLine() numPoints:" + numPoints));
 // TODO remove SYSTEM.OUT.PRINTLN
    }
 
@@ -604,6 +602,7 @@ public class LineBucketMT extends RenderBucketMT {
       float curX, curY;
       float nextX, nextY;
       double xyDistance;
+      int pixelColor;
 
       /*
        * amount of vertices used
@@ -616,12 +615,15 @@ public class LineBucketMT extends RenderBucketMT {
             + (isClosed ? 2 : 0);
 
       int pointIndex = startIndex;
+      int pointIndexColor = startIndex / 2;
 
       curX = pixelPoints[pointIndex++];
       curY = pixelPoints[pointIndex++];
+      pixelColor = pixelPointColors[pointIndexColor++];
 
       nextX = pixelPoints[pointIndex++];
       nextY = pixelPoints[pointIndex++];
+      pixelColor = pixelPointColors[pointIndexColor++];
 
       // unit vector to next node
       vPrevX = nextX - curX;
@@ -653,20 +655,20 @@ public class LineBucketMT extends RenderBucketMT {
          dx = (short) (0 | ddx & DIR_MASK);
          dy = (short) (2 | ddy & DIR_MASK);
 
-         vertices.add(ox, oy, dx, dy);
-         vertices.add(ox, oy, dx, dy);
+         vertices.add(ox, oy, dx, dy, pixelColor);
+         vertices.add(ox, oy, dx, dy, pixelColor);
 
          ddx = (int) (-(ux + vPrevX) * DIR_SCALE);
          ddy = (int) (-(uy + vPrevY) * DIR_SCALE);
 
-         vertices.add(ox, oy, (short) (2 | ddx & DIR_MASK), (short) (2 | ddy & DIR_MASK));
+         vertices.add(ox, oy, (short) (2 | ddx & DIR_MASK), (short) (2 | ddy & DIR_MASK), pixelColor);
 
          // start of line
          ddx = (int) (ux * DIR_SCALE);
          ddy = (int) (uy * DIR_SCALE);
 
-         vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (1 | ddy & DIR_MASK));
-         vertices.add(ox, oy, (short) (2 | -ddx & DIR_MASK), (short) (1 | -ddy & DIR_MASK));
+         vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (1 | ddy & DIR_MASK), pixelColor);
+         vertices.add(ox, oy, (short) (2 | -ddx & DIR_MASK), (short) (1 | -ddy & DIR_MASK), pixelColor);
 
       } else {
 
@@ -700,13 +702,13 @@ public class LineBucketMT extends RenderBucketMT {
          dx = (short) (0 | ddx & DIR_MASK);
          dy = (short) (1 | ddy & DIR_MASK);
 
-         vertices.add(ox, oy, dx, dy);
-         vertices.add(ox, oy, dx, dy);
+         vertices.add(ox, oy, dx, dy, pixelColor);
+         vertices.add(ox, oy, dx, dy, pixelColor);
 
          ddx = (int) (-(ux + tx) * DIR_SCALE);
          ddy = (int) (-(uy + ty) * DIR_SCALE);
 
-         vertices.add(ox, oy, (short) (2 | ddx & DIR_MASK), (short) (1 | ddy & DIR_MASK));
+         vertices.add(ox, oy, (short) (2 | ddx & DIR_MASK), (short) (1 | ddy & DIR_MASK), pixelColor);
       }
 
       curX = nextX;
@@ -723,6 +725,8 @@ public class LineBucketMT extends RenderBucketMT {
             nextX = pixelPoints[pointIndex++];
             nextY = pixelPoints[pointIndex++];
 
+            pixelColor = pixelPointColors[pointIndexColor++];
+
          } else if (isClosed && pointIndex < endIndex + 2) {
 
             // close the loop -> the next point is back to the startpoint
@@ -732,6 +736,7 @@ public class LineBucketMT extends RenderBucketMT {
             nextY = pixelPoints[startIndex + 1];
 
             pointIndex += 2;
+            pixelColor = pixelPointColors[pointIndexColor++];
 
          } else {
 
@@ -814,7 +819,7 @@ public class LineBucketMT extends RenderBucketMT {
             vNextX /= xyDistance;
             vNextY /= xyDistance;
 
-            addVertex(vertices, px, py, vPrevX, vPrevY, vNextX, vNextY);
+            addVertex(vertices, px, py, vPrevX, vPrevY, vNextX, vNextY, pixelColor);
 
             // flip unit vector to point back
             vPrevX = -vNextX;
@@ -828,7 +833,7 @@ public class LineBucketMT extends RenderBucketMT {
             vNextY /= xyDistance;
          }
 
-         addVertex(vertices, curX, curY, vPrevX, vPrevY, vNextX, vNextY);
+         addVertex(vertices, curX, curY, vPrevX, vPrevY, vNextX, vNextY, pixelColor);
 
          curX = nextX;
          curY = nextY;
@@ -853,14 +858,14 @@ public class LineBucketMT extends RenderBucketMT {
          ddx = (int) (ux * DIR_SCALE);
          ddy = (int) (uy * DIR_SCALE);
 
-         vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (1 | ddy & DIR_MASK));
-         vertices.add(ox, oy, (short) (2 | -ddx & DIR_MASK), (short) (1 | -ddy & DIR_MASK));
+         vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (1 | ddy & DIR_MASK), pixelColor);
+         vertices.add(ox, oy, (short) (2 | -ddx & DIR_MASK), (short) (1 | -ddy & DIR_MASK), pixelColor);
 
          // for rounded line edges
          ddx = (int) ((ux - vPrevX) * DIR_SCALE);
          ddy = (int) ((uy - vPrevY) * DIR_SCALE);
 
-         vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (0 | ddy & DIR_MASK));
+         vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (0 | ddy & DIR_MASK), pixelColor);
 
          // last vertex
          ddx = (int) (-(ux + vPrevX) * DIR_SCALE);
@@ -888,7 +893,7 @@ public class LineBucketMT extends RenderBucketMT {
          ddx = (int) ((ux - vPrevX) * DIR_SCALE);
          ddy = (int) ((uy - vPrevY) * DIR_SCALE);
 
-         vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (1 | ddy & DIR_MASK));
+         vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (1 | ddy & DIR_MASK), pixelColor);
 
          // last vertex
          ddx = (int) (-(ux + vPrevX) * DIR_SCALE);
@@ -898,8 +903,8 @@ public class LineBucketMT extends RenderBucketMT {
       }
 
       // add last vertex twice
-      vertices.add(ox, oy, dx, dy);
-      vertices.add(ox, oy, dx, dy);
+      vertices.add(ox, oy, dx, dy, pixelColor);
+      vertices.add(ox, oy, dx, dy, pixelColor);
    }
 
    public void addOutline(final LineBucketMT link) {
@@ -924,6 +929,7 @@ public class LineBucketMT extends RenderBucketMT {
     * @param vNextY
     * @param vPrevX
     * @param vPrevY
+    * @param pixelColor
     */
    private void addVertex(final VertexDataMT vertexData,
                           final float x,
@@ -931,7 +937,8 @@ public class LineBucketMT extends RenderBucketMT {
                           final float vNextX,
                           final float vNextY,
                           final float vPrevX,
-                          final float vPrevY) {
+                          final float vPrevY,
+                          final int pixelColor) {
 
       float ux = vNextX + vPrevX;
       float uy = vNextY + vPrevY;
@@ -955,8 +962,8 @@ public class LineBucketMT extends RenderBucketMT {
 
 // SET_FORMATTING_OFF
 
-      vertexData.add(ox, oy, (short) (0 |  ddx & DIR_MASK), (short) (1 |  ddy & DIR_MASK));
-      vertexData.add(ox, oy, (short) (2 | -ddx & DIR_MASK), (short) (1 | -ddy & DIR_MASK));
+      vertexData.add(ox, oy, (short) (0 |  ddx & DIR_MASK), (short) (1 |  ddy & DIR_MASK), pixelColor);
+      vertexData.add(ox, oy, (short) (2 | -ddx & DIR_MASK), (short) (1 | -ddy & DIR_MASK), pixelColor);
 
 // SET_FORMATTING_ON
    }

@@ -295,11 +295,6 @@ public class TourLayer extends Layer {
 
          lineBucket.line = _lineStyle;
 
-//         final LineBucketMT lineBucket = task.__renderBuckets.getLineBucket(0);
-//         lineBucket.line = _lineStyle;
-
-//         lineBucket.next
-
          final MapPosition mapPos = task.__mapPos;
          mMap.getMapPosition(mapPos);
 
@@ -369,9 +364,6 @@ public class TourLayer extends Layer {
                pixelX += maxMapPixel2 * 2;
                flipDirection = 1;
             }
-
-//            System.out.println((System.currentTimeMillis() + " " + scaledX + " : " + scaledY));
-//            // TODO remove SYSTEM.OUT.PRINTLN
 
             if (flip != flipDirection) {
 
@@ -468,7 +460,7 @@ public class TourLayer extends Layer {
             lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors2);
          }
 
-         System.out.println((System.currentTimeMillis()
+         System.out.println((System.currentTimeMillis() + " doWork_Rendering() "
                + " " + numPoints
                + " " + pixelPoints.length
                + " " + pixelPointIndex));

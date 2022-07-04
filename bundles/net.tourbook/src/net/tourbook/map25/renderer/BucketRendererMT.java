@@ -100,8 +100,11 @@ public class BucketRendererMT extends LayerRenderer {
          // performs GL.bindBuffer() of the vbo/ibo
          allBuckets.bind();
 
+         // reset is projected
          if (isProjected == false && bucket.type != SYMBOL) {
+
             isProjected = true;
+
             setMatrix(viewport, isProjected);
          }
 

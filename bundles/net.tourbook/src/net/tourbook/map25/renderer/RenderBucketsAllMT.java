@@ -21,6 +21,8 @@ import static org.oscim.renderer.bucket.RenderBucket.LINE;
 import static org.oscim.renderer.bucket.RenderBucket.POLYGON;
 import static org.oscim.renderer.bucket.RenderBucket.TEXLINE;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 
 import org.oscim.backend.GL;
@@ -73,7 +75,7 @@ public class RenderBucketsAllMT extends TileData {
       fillShortCoords = new short[] { 0, s, s, s, 0, 0, s, 0 };
    }
 
-   private RenderBucketMT _allBuckets;
+   private RenderBucketMT _firstChainedBucket;
 
    /**
     * VBO holds all vertex data to draw lines and polygons after compilation.
@@ -85,9 +87,11 @@ public class RenderBucketsAllMT extends TileData {
     * - m bytes lines vertices
     * ...
     */
-   public BufferObject    vbo;
+   public BufferObject    vbo_BufferObject;
 
-   public BufferObject    ibo;
+   public BufferObject    ibo_BufferObject;
+
+   private BufferObject   _vboColor_BufferObject;
 
    /**
     * To not need to switch VertexAttribPointer positions all the time:
@@ -176,14 +180,17 @@ public class RenderBucketsAllMT extends TileData {
     */
    public void bind() {
 
-      if (vbo != null) {
-         vbo.bind();
+      if (vbo_BufferObject != null) {
+         vbo_BufferObject.bind();
       }
 
-      if (ibo != null) {
-         ibo.bind();
+      if (ibo_BufferObject != null) {
+         ibo_BufferObject.bind();
       }
 
+      if (_vboColor_BufferObject != null) {
+         _vboColor_BufferObject.bind();
+      }
    }
 
    /**
@@ -195,8 +202,9 @@ public class RenderBucketsAllMT extends TileData {
       set(null);
       _currentBucket = null;
 
-      vbo = BufferObject.release(vbo);
-      ibo = BufferObject.release(ibo);
+      vbo_BufferObject = BufferObject.release(vbo_BufferObject);
+      ibo_BufferObject = BufferObject.release(ibo_BufferObject);
+      _vboColor_BufferObject = BufferObject.release(_vboColor_BufferObject);
    }
 
    /**
@@ -205,7 +213,7 @@ public class RenderBucketsAllMT extends TileData {
    public void clearBuckets() {
 
       /* NB: set null calls clear() on each bucket! */
-      for (RenderBucketMT l = _allBuckets; l != null; l = l.next) {
+      for (RenderBucketMT l = _firstChainedBucket; l != null; l = l.next) {
          l.clear();
       }
 
@@ -213,20 +221,21 @@ public class RenderBucketsAllMT extends TileData {
    }
 
    /**
-    * Compile different types of buckets in one {@link #vbo VBO}.
+    * Compile different types of buckets in one {@link #vbo_BufferObject VBO}.
     *
     * @param addFill
-    *           fill tile (add {@link #TILE_FILL_VERTICES 4} vertices).
+    *           Fill tile (add {@link #TILE_FILL_VERTICES 4} vertices).
     * @return true if compilation succeeded.
     */
    public boolean compile(final boolean addFill) {
 
       int vboSize = countVboSize();
-
       if (vboSize <= 0) {
 
-         vbo = BufferObject.release(vbo);
-         ibo = BufferObject.release(ibo);
+         vbo_BufferObject = BufferObject.release(vbo_BufferObject);
+         ibo_BufferObject = BufferObject.release(ibo_BufferObject);
+
+         _vboColor_BufferObject = BufferObject.release(_vboColor_BufferObject);
 
          return false;
       }
@@ -235,17 +244,20 @@ public class RenderBucketsAllMT extends TileData {
          vboSize += TILE_FILL_VERTICES * 2;
       }
 
-      final ShortBuffer vboData = MapRenderer.getShortBuffer(vboSize);
+      final int vboColorSize = vboSize / 4 * 3;
+
+      final ShortBuffer vboBuffer = MapRenderer.getShortBuffer(vboSize);
+      final ByteBuffer vboColorBuffer = ByteBuffer.allocateDirect(vboColorSize).order(ByteOrder.nativeOrder());
 
       if (addFill) {
-         vboData.put(fillShortCoords, 0, TILE_FILL_VERTICES * 2);
+         vboBuffer.put(fillShortCoords, 0, TILE_FILL_VERTICES * 2);
       }
 
-      ShortBuffer iboData = null;
+      ShortBuffer iboBuffer = null;
 
       final int iboSize = countIboSize();
       if (iboSize > 0) {
-         iboData = MapRenderer.getShortBuffer(iboSize);
+         iboBuffer = MapRenderer.getShortBuffer(iboSize);
       }
 
       int vertexOffset = addFill ? TILE_FILL_VERTICES : 0;
@@ -253,11 +265,11 @@ public class RenderBucketsAllMT extends TileData {
       /*
        * Compile polygons
        */
-      for (RenderBucketMT oneBucket = _allBuckets; oneBucket != null; oneBucket = oneBucket.next) {
+      for (RenderBucketMT oneBucket = _firstChainedBucket; oneBucket != null; oneBucket = oneBucket.next) {
 
          if (oneBucket.type == POLYGON) {
 
-            oneBucket.compile(vboData, iboData);
+            oneBucket.compile(vboBuffer, iboBuffer, null);
             oneBucket.vertexOffset = vertexOffset;
 
             vertexOffset += oneBucket.numVertices;
@@ -267,13 +279,13 @@ public class RenderBucketsAllMT extends TileData {
       /*
        * Compile lines
        */
-      offset[LINE] = vboData.position() * SHORT_BYTES;
+      offset[LINE] = vboBuffer.position() * SHORT_BYTES;
       vertexOffset = 0;
-      for (RenderBucketMT oneBucket = _allBuckets; oneBucket != null; oneBucket = oneBucket.next) {
+      for (RenderBucketMT oneBucket = _firstChainedBucket; oneBucket != null; oneBucket = oneBucket.next) {
 
          if (oneBucket.type == LINE) {
 
-            oneBucket.compile(vboData, iboData);
+            oneBucket.compile(vboBuffer, iboBuffer, vboColorBuffer);
             oneBucket.vertexOffset = vertexOffset;
 
             vertexOffset += oneBucket.numVertices;
@@ -283,50 +295,66 @@ public class RenderBucketsAllMT extends TileData {
       /*
        * Compile others
        */
-      for (RenderBucketMT oneBucket = _allBuckets; oneBucket != null; oneBucket = oneBucket.next) {
+      for (RenderBucketMT oneBucket = _firstChainedBucket; oneBucket != null; oneBucket = oneBucket.next) {
 
          if (oneBucket.type != LINE && oneBucket.type != POLYGON) {
-            oneBucket.compile(vboData, iboData);
+            oneBucket.compile(vboBuffer, iboBuffer, null);
          }
       }
 
-      if (vboSize != vboData.position()) {
+      if (vboSize != vboBuffer.position()) {
 
          log.debug("wrong vertex buffer size: "
                + " new size: " + vboSize
-               + " buffer pos: " + vboData.position()
-               + " buffer limit: " + vboData.limit()
-               + " buffer fill: " + vboData.remaining());
+               + " buffer pos: " + vboBuffer.position()
+               + " buffer limit: " + vboBuffer.limit()
+               + " buffer fill: " + vboBuffer.remaining());
 
          return false;
       }
 
-      if (iboSize > 0 && iboSize != iboData.position()) {
+      if (iboSize > 0 && iboSize != iboBuffer.position()) {
 
          log.debug("wrong indice buffer size: "
                + " new size: " + iboSize
-               + " buffer pos: " + iboData.position()
-               + " buffer limit: " + iboData.limit()
-               + " buffer fill: " + iboData.remaining());
+               + " buffer pos: " + iboBuffer.position()
+               + " buffer limit: " + iboBuffer.limit()
+               + " buffer fill: " + iboBuffer.remaining());
 
          return false;
       }
 
-      if (vbo == null) {
-         vbo = BufferObject.get(GL.ARRAY_BUFFER, vboSize);
+      /*
+       * VBO
+       */
+      if (vbo_BufferObject == null) {
+         vbo_BufferObject = BufferObject.get(GL.ARRAY_BUFFER, vboSize);
       }
 
       // Set VBO data to READ mode
-      vbo.loadBufferData(vboData.flip(), vboSize * SHORT_BYTES);
+      vbo_BufferObject.loadBufferData(vboBuffer.flip(), vboSize * SHORT_BYTES);
 
+      /*
+       * VBO color
+       */
+      if (_vboColor_BufferObject == null) {
+//         _vboColor_BufferObject = BufferObject.get(GL.ARRAY_BUFFER, vboColorSize);
+      }
+
+      // Set VBO data to READ mode
+//      _vboColor_BufferObject.loadBufferData(vboColorBuffer.flip(), vboColorSize * 1);
+
+      /*
+       * IBO
+       */
       if (iboSize > 0) {
 
-         if (ibo == null) {
-            ibo = BufferObject.get(GL.ELEMENT_ARRAY_BUFFER, iboSize);
+         if (ibo_BufferObject == null) {
+            ibo_BufferObject = BufferObject.get(GL.ELEMENT_ARRAY_BUFFER, iboSize);
          }
 
          // Set IBO data to READ mode
-         ibo.loadBufferData(iboData.flip(), iboSize * SHORT_BYTES);
+         ibo_BufferObject.loadBufferData(iboBuffer.flip(), iboSize * SHORT_BYTES);
       }
 
       return true;
@@ -335,18 +363,19 @@ public class RenderBucketsAllMT extends TileData {
    private int countIboSize() {
       int numIndices = 0;
 
-      for (RenderBucketMT l = _allBuckets; l != null; l = l.next) {
-         numIndices += l.numIndices;
+      for (RenderBucketMT bucket = _firstChainedBucket; bucket != null; bucket = bucket.next) {
+         numIndices += bucket.numIndices;
       }
 
       return numIndices;
    }
 
    private int countVboSize() {
+
       int vboSize = 0;
 
-      for (RenderBucketMT l = _allBuckets; l != null; l = l.next) {
-         vboSize += l.numVertices * VERTEX_CNT[l.type];
+      for (RenderBucketMT bucket = _firstChainedBucket; bucket != null; bucket = bucket.next) {
+         vboSize += bucket.numVertices * VERTEX_CNT[bucket.type];
       }
 
       return vboSize;
@@ -361,63 +390,63 @@ public class RenderBucketsAllMT extends TileData {
     * @return internal linked list of RenderBucket items
     */
    public RenderBucketMT get() {
-      return _allBuckets;
+      return _firstChainedBucket;
    }
 
    private RenderBucketMT getBucket(final int level, final int type) {
 
-      RenderBucketMT bucket = null;
+      RenderBucketMT typedBucket = null;
 
       if (_currentBucket != null && _currentBucket.level == level) {
 
-         bucket = _currentBucket;
+         typedBucket = _currentBucket;
 
-         if (bucket.type != type) {
-            log.error("BUG wrong bucket {} {} on level {}", bucket.type, type, level);
+         if (typedBucket.type != type) {
+            log.error("BUG wrong bucket {} {} on level {}", typedBucket.type, type, level);
             throw new IllegalArgumentException();
          }
 
-         return bucket;
+         return typedBucket;
       }
 
-      RenderBucketMT b = _allBuckets;
-      if (b == null || b.level > level) {
+      RenderBucketMT chainedBucked = _firstChainedBucket;
+      if (chainedBucked == null || chainedBucked.level > level) {
          /* insert new bucket at start */
-         b = null;
+         chainedBucked = null;
       } else {
          if (_currentBucket != null && level > _currentBucket.level) {
-            b = _currentBucket;
+            chainedBucked = _currentBucket;
          }
 
          while (true) {
 
             /* found bucket */
-            if (b.level == level) {
-               bucket = b;
+            if (chainedBucked.level == level) {
+               typedBucket = chainedBucked;
                break;
             }
 
             /* insert bucket between current and next bucket */
-            if (b.next == null || b.next.level > level) {
+            if (chainedBucked.next == null || chainedBucked.next.level > level) {
                break;
             }
 
-            b = b.next;
+            chainedBucked = chainedBucked.next;
          }
       }
 
-      if (bucket == null) {
+      if (typedBucket == null) {
 
          // add a new RenderElement
          if (type == LINE) {
 
-            bucket = new LineBucketMT(level);
+            typedBucket = new LineBucketMT(level);
 
 //       } else if (type == POLYGON) {
 //          bucket = new PolygonBucket(level);
 
          } else if (type == TEXLINE) {
-            bucket = new LineTexBucketMT(level);
+            typedBucket = new LineTexBucketMT(level);
 
 //       } else if (type == MESH) {
 //          bucket = new MeshBucket(level);
@@ -427,32 +456,32 @@ public class RenderBucketsAllMT extends TileData {
 //          bucket = new CircleBucket(level);
          }
 
-         if (bucket == null) {
+         if (typedBucket == null) {
             throw new IllegalArgumentException();
          }
 
-         if (b == null) {
+         if (chainedBucked == null) {
 
             /** insert at start */
-            bucket.next = _allBuckets;
-            _allBuckets = bucket;
+            typedBucket.next = _firstChainedBucket;
+            _firstChainedBucket = typedBucket;
 
          } else {
 
-            bucket.next = b.next;
-            b.next = bucket;
+            typedBucket.next = chainedBucked.next;
+            chainedBucked.next = typedBucket;
          }
       }
 
       /* check if found buckets matches requested type */
-      if (bucket.type != type) {
-         log.error("BUG wrong bucket {} {} on level {}", bucket.type, type, level);
+      if (typedBucket.type != type) {
+         log.error("BUG wrong bucket {} {} on level {}", typedBucket.type, type, level);
          throw new IllegalArgumentException();
       }
 
-      _currentBucket = bucket;
+      _currentBucket = typedBucket;
 
-      return bucket;
+      return typedBucket;
    }
 
 //    /**
@@ -504,7 +533,7 @@ public class RenderBucketsAllMT extends TileData {
 //    }
 
    public void prepare() {
-      for (RenderBucketMT l = _allBuckets; l != null; l = l.next) {
+      for (RenderBucketMT l = _firstChainedBucket; l != null; l = l.next) {
          l.prepare();
       }
    }
@@ -514,11 +543,11 @@ public class RenderBucketsAllMT extends TileData {
     */
    public void set(final RenderBucketMT newBuckets) {
 
-      for (RenderBucketMT previousBucket = _allBuckets; previousBucket != null; previousBucket = previousBucket.next) {
+      for (RenderBucketMT previousBucket = _firstChainedBucket; previousBucket != null; previousBucket = previousBucket.next) {
          previousBucket.clear();
       }
 
-      _allBuckets = newBuckets;
+      _firstChainedBucket = newBuckets;
    }
 
    public void setFrom(final RenderBucketsAllMT allBuckets) {
@@ -527,10 +556,10 @@ public class RenderBucketsAllMT extends TileData {
          throw new IllegalArgumentException("Cannot set from oneself!");
       }
 
-      set(allBuckets._allBuckets);
+      set(allBuckets._firstChainedBucket);
 
       _currentBucket = null;
-      allBuckets._allBuckets = null;
+      allBuckets._firstChainedBucket = null;
       allBuckets._currentBucket = null;
    }
 }

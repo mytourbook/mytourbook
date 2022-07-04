@@ -18,6 +18,7 @@
  */
 package net.tourbook.map25.renderer;
 
+import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
 import org.oscim.renderer.bucket.RenderBuckets;
@@ -89,9 +90,9 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
       numIndices = 0;
    }
 
-   protected void compile(final ShortBuffer vboData, final ShortBuffer iboData) {
+   protected void compile(final ShortBuffer vboData, final ShortBuffer iboData, final ByteBuffer colorBuffer) {
 
-      compileVertexItems(vboData);
+      compileVertexItems(vboData, colorBuffer);
 
       if (iboData != null) {
          compileIndicesItems(iboData);
@@ -109,13 +110,13 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
       indiceItems.compile(iboData);
    }
 
-   protected void compileVertexItems(final ShortBuffer vboData) {
+   protected void compileVertexItems(final ShortBuffer vboData, final ByteBuffer colorBuffer) {
 
       /*
        * Keep offset of layer data in vbo
        */
       vertexOffset = vboData.position() * RenderBuckets.SHORT_BYTES;
-      vertexItems.compile(vboData);
+      vertexItems.compile(vboData, colorBuffer);
    }
 
    /**
