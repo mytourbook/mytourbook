@@ -58,10 +58,7 @@ public class Initializer {
 
    public static TourData importTour() {
 
-      final TourData newlyImportedTour =
-            importTour_GPX(FilesUtils.rootPath + "/utils/files/LongsPeak-Manual.gpx"); //$NON-NLS-1$
-
-      return newlyImportedTour;
+      return importTour_GPX(FilesUtils.rootPath + "/utils/files/LongsPeak-Manual.gpx"); //$NON-NLS-1$
    }
 
    public static TourData importTour_FIT(final String importFilePath) {

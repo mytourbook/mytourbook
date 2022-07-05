@@ -56,7 +56,52 @@ public class OpenWeatherMapRetrieverTests {
     * Regression test for the weather retrieval from OpenWeatherMap.
     */
    @Test
-   void testWeatherRetrieval() {
+   void testWeatherRetrieval_July2022() {
+
+      final String urlBase = WeatherUtils.HEROKU_APP_URL
+            + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
+
+      final String openWeatherMapResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
+            + "LongsPeak-Manual-OpenWeatherMapResponse-1656720000.json"); //$NON-NLS-1$
+
+      final String url = urlBase + "1656720000"; //$NON-NLS-1$
+      httpClientMock.onGet(url)
+            .doReturn(openWeatherMapResponse);
+
+      final TourData tour = Initializer.importTour();
+      //Tuesday, July 2, 2022 12:00:00 AM
+      tour.setTourStartTime(2022, 7, 2, 0, 0, 0);
+      //We set the current time elapsed to trigger the computation of the new end time
+      tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
+
+      openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
+
+      assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
+      httpClientMock.verify().get(url).called();
+
+// SET_FORMATTING_OFF
+
+      assertEquals("broken clouds",    tour.getWeather()); //$NON-NLS-1$
+      assertEquals("weather-drizzle",  tour.getWeather_Clouds()); //$NON-NLS-1$
+      assertEquals(7.58f,              tour.getWeather_Temperature_Average());
+      assertEquals(3,                  tour.getWeather_Wind_Speed());
+      assertEquals(240,                tour.getWeather_Wind_Direction());
+      assertEquals(70,                 tour.getWeather_Humidity());
+      assertEquals(0,                  tour.getWeather_Precipitation());
+      assertEquals(0,                  tour.getWeather_Snowfall());
+      assertEquals(1007,               tour.getWeather_Pressure());
+      assertEquals(14.15f,             tour.getWeather_Temperature_Max());
+      assertEquals(3.93f,              tour.getWeather_Temperature_Min());
+      assertEquals(6.33f,              tour.getWeather_Temperature_WindChill());
+
+// SET_FORMATTING_ON
+   }
+
+   /**
+    * Regression test for the weather retrieval from OpenWeatherMap.
+    */
+   @Test
+   void testWeatherRetrieval_March2022() {
 
       final String urlBase = WeatherUtils.HEROKU_APP_URL
             + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
