@@ -79,7 +79,7 @@ public class WeatherAPIRetrieverTests {
       assertEquals(3,                             tour.getWeather_Wind_Speed());
       assertEquals(171,                           tour.getWeather_Wind_Direction());
       assertEquals("Thundery outbreaks possible", tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-lightning",           tour.getWeather_Clouds()); //$NON-NLS-1$
+      assertEquals("weather-drizzle",             tour.getWeather_Clouds()); //$NON-NLS-1$
       assertEquals(51,                            tour.getWeather_Humidity());
       assertEquals(6.13f,                         tour.getWeather_Precipitation());
       assertEquals(1016.0,                        tour.getWeather_Pressure());

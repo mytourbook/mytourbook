@@ -460,7 +460,7 @@
 						"condition": {
 							"text": "Thundery outbreaks possible",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/200.png",
-							"code": 1087
+							"code": 1072
 						},
 						"wind_mph": 6.1,
 						"wind_kph": 9.8,
@@ -497,7 +497,7 @@
 						"condition": {
 							"text": "Thundery outbreaks possible",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/200.png",
-							"code": 1087
+							"code": 1072
 						},
 						"wind_mph": 8.9,
 						"wind_kph": 14.4,
@@ -534,7 +534,7 @@
 						"condition": {
 							"text": "Thundery outbreaks possible",
 							"icon": "//cdn.weatherapi.com/weather/64x64/day/200.png",
-							"code": 1087
+							"code": 1072
 						},
 						"wind_mph": 8.2,
 						"wind_kph": 13.2,
