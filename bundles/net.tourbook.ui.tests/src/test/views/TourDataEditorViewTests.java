@@ -52,9 +52,9 @@ public class TourDataEditorViewTests {
       assertNotNull(titleCombo);
       assertEquals(newTourTitle, titleCombo.getText());
 
-      final SWTBotDateTime toto = bot.dateTimeWithLabel(Messages.tour_editor_label_tour_date);
-      toto.setDate(Date.from(Instant.now()));
-      assertNotNull(toto);
+      final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.tour_editor_label_tour_date);
+      tourDateTime.setDate(Date.from(Instant.now()));
+      assertNotNull(tourDateTime);
 
       bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click();
    }
