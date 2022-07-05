@@ -308,8 +308,7 @@ public final class LineTexBucketMT extends LineBucketMT {
             flip[i] = (byte) (i % 2);
          }
 
-         final ByteBuffer buf = ByteBuffer.allocateDirect(flip.length)
-               .order(ByteOrder.nativeOrder());
+         final ByteBuffer buf = ByteBuffer.allocateDirect(flip.length).order(ByteOrder.nativeOrder());
          buf.put(flip);
          buf.flip();
 
@@ -317,10 +316,7 @@ public final class LineTexBucketMT extends LineBucketMT {
 
          //GL.bindBuffer(GL20.ARRAY_BUFFER, mVertexFlipID);
          GLState.bindVertexBuffer(mVertexFlipID);
-         gl.bufferData(GL.ARRAY_BUFFER,
-               flip.length,
-               sbuf,
-               GL.STATIC_DRAW);
+         gl.bufferData(GL.ARRAY_BUFFER, flip.length, sbuf, GL.STATIC_DRAW);
          GLState.bindVertexBuffer(GLState.UNBIND);
 
          //    mTexID = new int[10];

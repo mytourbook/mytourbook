@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  */
 public class BucketRendererMT extends LayerRenderer {
 
-   public static final Logger         log             = LoggerFactory.getLogger(BucketRendererMT.class);
+   public static final Logger         log               = LoggerFactory.getLogger(BucketRendererMT.class);
 
    /**
     * Use mMapPosition.copy(position) to keep the position for which
@@ -51,14 +51,14 @@ public class BucketRendererMT extends LayerRenderer {
    /**
     * Wrap around dateline
     */
-   protected boolean                  mFlipOnDateLine = true;
+   private boolean                    _isFlipOnDateLine = true;
 
    /**
     * Buckets for rendering
     */
    protected final RenderBucketsAllMT allBuckets;
 
-   protected boolean                  mInitialized;
+   private boolean                    _isInitialized;
 
    public BucketRendererMT() {
 
@@ -73,12 +73,13 @@ public class BucketRendererMT extends LayerRenderer {
     */
    protected synchronized void compile() {
 
-      final boolean ok = allBuckets.compile(true);
-      setReady(ok);
+      final boolean isOK = allBuckets.compile(true);
+
+      setReady(isOK);
    }
 
    /**
-    * Render all 'buckets'
+    * Render (do OpenGL drawing) all 'buckets'
     */
    @Override
    public synchronized void render(final GLViewport viewport) {
@@ -97,7 +98,7 @@ public class BucketRendererMT extends LayerRenderer {
 
       for (RenderBucketMT bucket = allBuckets.get(); bucket != null;) {
 
-         // performs GL.bindBuffer() of the vbo/ibo
+         // performs GL.bindBuffer() of the vbo/ibo buffer
          allBuckets.bind();
 
          // reset is projected
@@ -165,7 +166,7 @@ public class BucketRendererMT extends LayerRenderer {
       double x = mapPosition.x - viewport.pos.x;
       final double y = mapPosition.y - viewport.pos.y;
 
-      if (mFlipOnDateLine) {
+      if (_isFlipOnDateLine) {
 
          //wrap around date-line
          while (x < 0.5) {
@@ -230,10 +231,10 @@ public class BucketRendererMT extends LayerRenderer {
    @Override
    public void update(final GLViewport viewport) {
 
-      if (!mInitialized) {
+      if (_isInitialized == false) {
 
          mMapPosition.copy(viewport.pos);
-         mInitialized = true;
+         _isInitialized = true;
 
          compile();
       }

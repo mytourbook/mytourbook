@@ -91,8 +91,6 @@ public class RenderBucketsAllMT extends TileData {
 
    public BufferObject    ibo_BufferObject;
 
-   private BufferObject   _vboColor_BufferObject;
-
    /**
     * To not need to switch VertexAttribPointer positions all the time:
     * <p>
@@ -187,10 +185,6 @@ public class RenderBucketsAllMT extends TileData {
       if (ibo_BufferObject != null) {
          ibo_BufferObject.bind();
       }
-
-      if (_vboColor_BufferObject != null) {
-         _vboColor_BufferObject.bind();
-      }
    }
 
    /**
@@ -204,7 +198,6 @@ public class RenderBucketsAllMT extends TileData {
 
       vbo_BufferObject = BufferObject.release(vbo_BufferObject);
       ibo_BufferObject = BufferObject.release(ibo_BufferObject);
-      _vboColor_BufferObject = BufferObject.release(_vboColor_BufferObject);
    }
 
    /**
@@ -234,8 +227,6 @@ public class RenderBucketsAllMT extends TileData {
 
          vbo_BufferObject = BufferObject.release(vbo_BufferObject);
          ibo_BufferObject = BufferObject.release(ibo_BufferObject);
-
-         _vboColor_BufferObject = BufferObject.release(_vboColor_BufferObject);
 
          return false;
       }
@@ -333,16 +324,6 @@ public class RenderBucketsAllMT extends TileData {
 
       // Set VBO data to READ mode
       vbo_BufferObject.loadBufferData(vboBuffer.flip(), vboSize * SHORT_BYTES);
-
-      /*
-       * VBO color
-       */
-      if (_vboColor_BufferObject == null) {
-//         _vboColor_BufferObject = BufferObject.get(GL.ARRAY_BUFFER, vboColorSize);
-      }
-
-      // Set VBO data to READ mode
-//      _vboColor_BufferObject.loadBufferData(vboColorBuffer.flip(), vboColorSize * 1);
 
       /*
        * IBO

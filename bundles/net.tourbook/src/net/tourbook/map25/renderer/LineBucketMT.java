@@ -129,7 +129,7 @@ public class LineBucketMT extends RenderBucketMT {
           * Simple line shader does not take forward shortening into
           * account. only used when tilt is 0.
           */
-         int mode = mapPosition.tilt < 1
+         int shaderMode = mapPosition.tilt < 1
 
                // 1 == not projected
                ? SHADER_FLAT
@@ -137,10 +137,10 @@ public class LineBucketMT extends RenderBucketMT {
                // 0 == projected
                : SHADER_PROJECTED;
 
-         mode = mode;
-//       mode = SHADER_FLAT;
+         shaderMode = shaderMode;
+         shaderMode = SHADER_FLAT;
 
-         final Shader shader = _shaders[mode];
+         final Shader shader = _shaders[shaderMode];
 
          // is calling GL.enableVertexAttribArray() for shader_a_pos, shader_a_colors
          shader.useProgram();
@@ -189,7 +189,7 @@ public class LineBucketMT extends RenderBucketMT {
           * Scale factor to map one pixel on tile to one pixel on screen:
           * used with orthographic projection, (shader mode == 1)
           */
-         final double pixel = (mode == SHADER_PROJECTED)
+         final double pixel = (shaderMode == SHADER_PROJECTED)
                ? 0.0001
                : 1.5 / vp2mpScale;
 
@@ -240,7 +240,7 @@ public class LineBucketMT extends RenderBucketMT {
                GLUtils.setColor(shader_u_color, lineStyle.color, alpha);
             }
 
-            if (mode == SHADER_PROJECTED && isBlur && lineStyle.blur == 0) {
+            if (shaderMode == SHADER_PROJECTED && isBlur && lineStyle.blur == 0) {
                gl.uniform1f(shader_u_fade, (float) pixel);
                isBlur = false;
             }
@@ -264,7 +264,7 @@ public class LineBucketMT extends RenderBucketMT {
                if (lineStyle.blur > 0) {
                   gl.uniform1f(shader_u_fade, lineStyle.blur);
                   isBlur = true;
-               } else if (mode == SHADER_FLAT) {
+               } else if (shaderMode == SHADER_FLAT) {
                   gl.uniform1f(shader_u_fade, (float) (pixel / width));
                }
 
@@ -317,7 +317,7 @@ public class LineBucketMT extends RenderBucketMT {
                if (lineStyle.blur > 0) {
                   gl.uniform1f(shader_u_fade, lineStyle.blur);
                   isBlur = true;
-               } else if (mode == SHADER_FLAT) {
+               } else if (shaderMode == SHADER_FLAT) {
                   gl.uniform1f(shader_u_fade, (float) (pixel / width));
                }
 
@@ -341,8 +341,8 @@ public class LineBucketMT extends RenderBucketMT {
 
       static boolean init() {
 
-         _shaders[0] = new Shader("line_aa_proj");
-         _shaders[1] = new Shader("line_aa");
+         _shaders[SHADER_PROJECTED] = new Shader("line_aa_proj");
+         _shaders[SHADER_FLAT] = new Shader("line_aa");
 
          /*
           * create lookup table as texture for 'length(0..1,0..1)'
@@ -378,7 +378,7 @@ public class LineBucketMT extends RenderBucketMT {
    private static class Shader extends GLShaderMT {
 
       int shader_a_pos,
-            shader_a_colors,
+            shader_aVertexColor,
 
             shader_u_mvp,
 
@@ -398,7 +398,7 @@ public class LineBucketMT extends RenderBucketMT {
          }
 
          shader_a_pos = getAttrib("a_pos");
-         shader_a_colors = getAttrib("a_colors");
+         shader_aVertexColor = getAttrib("aVertexColor");
 
          shader_u_mvp = getUniform("u_mvp");
 
@@ -415,7 +415,7 @@ public class LineBucketMT extends RenderBucketMT {
 
          if (super.useProgram()) {
 
-            GLState.enableVertexArrays(shader_a_pos, shader_a_colors);
+            GLState.enableVertexArrays(shader_a_pos, shader_aVertexColor);
 
             return true;
          }
