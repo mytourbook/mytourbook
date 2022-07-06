@@ -33,7 +33,7 @@ import utils.FilesUtils;
 import utils.Initializer;
 
 /**
- * Regression test for the weather retrieval from World Weather Online.
+ * Regression tests for the weather retrieval from World Weather Online.
  */
 public class WorldWeatherOnlineRetrieverTests {
 

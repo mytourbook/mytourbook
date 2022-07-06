@@ -33,6 +33,9 @@ import utils.Comparison;
 import utils.FilesUtils;
 import utils.Initializer;
 
+/**
+ * Regression tests for the weather retrieval from WeatherAPI.
+ */
 public class WeatherAPIRetrieverTests {
 
    private static final String WEATHERAPI_FILE_PATH =
@@ -90,9 +93,6 @@ public class WeatherAPIRetrieverTests {
 // SET_FORMATTING_ON
    }
 
-   /**
-    * Regression test for the weather retrieval from WeatherAPI.
-    */
    @Test
    void testWeatherRetrieval_May2022() {
 
