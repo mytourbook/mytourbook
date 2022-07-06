@@ -43,11 +43,13 @@ public class StatisticsViewTests {
       final SWTBotCombo statisticsTypeComboBox = tourEditorViewBot.comboBox(0);
       assertNotNull(statisticsTypeComboBox);
       statisticsTypeComboBox.setSelection(0);
+      assertEquals("Daytime", statisticsTypeComboBox.selection());
 
       final SWTBotCombo yearComboBox = tourEditorViewBot.comboBox(2);
       assertNotNull(yearComboBox);
       assertEquals(11, yearComboBox.itemCount());
       yearComboBox.setSelection("9");
+      assertEquals("9", yearComboBox.selection());
 
       statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_DaySummary);
       statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_WeekSummary);
