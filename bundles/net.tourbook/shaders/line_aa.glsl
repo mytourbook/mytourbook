@@ -13,7 +13,7 @@ uniform float u_width;
 attribute vec4 a_pos;
 
 // colors for each a_pos vertex
-attribute vec4 aVertexColors;
+attribute vec3 aVertexColor;
 
 // z axis, line is above/below ground
 uniform float u_height;
@@ -33,7 +33,7 @@ void main() {
     v_st = abs(mod(dir, 4.0)) - 1.0;
 	 
 	 // transfer colors to the fragment shader - rgb 0...255 -> 0...1
-	 vFragmentColor = aVertexColors / 255.0;
+	 vFragmentColor = vec4(aVertexColor / 255.0, 1.0);
 }
 
 $$

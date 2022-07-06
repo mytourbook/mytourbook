@@ -102,6 +102,9 @@ public class RenderBucketsAllMT extends TileData {
 
    private RenderBucketMT _currentBucket;
 
+   private ByteBuffer     _colorBuffer;
+   private int            _colorBuffer_Size;
+
    public RenderBucketsAllMT() {}
 
    public static void initRenderer() {
@@ -238,7 +241,7 @@ public class RenderBucketsAllMT extends TileData {
       final int vboColorSize = vboSize / 4 * 3;
 
       final ShortBuffer vboBuffer = MapRenderer.getShortBuffer(vboSize);
-      final ByteBuffer vboColorBuffer = ByteBuffer.allocateDirect(vboColorSize).order(ByteOrder.nativeOrder());
+      final ByteBuffer colorBuffer = getColorBuffer(vboColorSize);
 
       if (addFill) {
          vboBuffer.put(fillShortCoords, 0, TILE_FILL_VERTICES * 2);
@@ -276,7 +279,7 @@ public class RenderBucketsAllMT extends TileData {
 
          if (oneBucket.type == LINE) {
 
-            oneBucket.compile(vboBuffer, iboBuffer, vboColorBuffer);
+            oneBucket.compile(vboBuffer, iboBuffer, colorBuffer);
             oneBucket.vertexOffset = vertexOffset;
 
             vertexOffset += oneBucket.numVertices;
@@ -463,6 +466,28 @@ public class RenderBucketsAllMT extends TileData {
       _currentBucket = typedBucket;
 
       return typedBucket;
+   }
+
+   private ByteBuffer getColorBuffer(final int requestedColorSize) {
+
+      final int bufferBlockSize = 2048;
+      final int numBufferBlocks = requestedColorSize / bufferBlockSize;
+      final int roundedBufferSize = (numBufferBlocks + 1) * bufferBlockSize;
+
+      if (_colorBuffer == null || _colorBuffer_Size < roundedBufferSize) {
+
+         _colorBuffer = ByteBuffer.allocateDirect(roundedBufferSize).order(ByteOrder.nativeOrder());
+
+         _colorBuffer_Size = roundedBufferSize;
+
+      } else {
+
+         // IMPORTANT: reset position to 0 to prevent BufferOverflowException
+
+         _colorBuffer.clear();
+      }
+
+      return _colorBuffer;
    }
 
 //    /**

@@ -39,7 +39,6 @@ import org.oscim.core.Tile;
 import org.oscim.layers.Layer;
 //import org.oscim.layers.vector.
 import org.oscim.map.Map;
-import org.oscim.renderer.BufferObject;
 import org.oscim.renderer.GLViewport;
 import org.oscim.renderer.bucket.TextureItem;
 import org.oscim.theme.styles.LineStyle;
@@ -77,13 +76,11 @@ public class TourLayer extends Layer {
    private boolean          _isUpdateLayer;
    private int[]            _allGeoPointColors;
 
-   private BufferObject     _vboColors;
-
    private final class TourRenderer extends BucketRendererMT {
 
       private int __oldX         = -1;
       private int __oldY         = -1;
-      private int __oldZoomLevel = -1;
+      private int __oldZoomScale = -1;
 
       @Override
       protected synchronized void compile() {
@@ -97,6 +94,10 @@ public class TourLayer extends Layer {
 //
 //         _vboColors = BufferObject.get(GL.ARRAY_BUFFER, 0);
 //         _vboColors.loadBufferData(buf.flip(), 12 * 4);
+
+//         gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+//         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
+
       }
 
       @Override
@@ -109,12 +110,12 @@ public class TourLayer extends Layer {
             return;
          }
 
-         final int currentZoomLevel = 1 << viewport.pos.zoomLevel;
-         final int currentX = (int) (viewport.pos.x * currentZoomLevel);
-         final int currentY = (int) (viewport.pos.y * currentZoomLevel);
+         final int currentZoomScale = 1 << viewport.pos.zoomLevel;
+         final int currentX = (int) (viewport.pos.x * currentZoomScale);
+         final int currentY = (int) (viewport.pos.y * currentZoomScale);
 
          // update layers when map moved by at least one tile
-         if (currentX != __oldX || currentY != __oldY || currentZoomLevel != __oldZoomLevel || _isUpdateLayer) {
+         if (currentX != __oldX || currentY != __oldY || currentZoomScale != __oldZoomScale || _isUpdateLayer) {
 
             /*
              * It took me many days to find this solution that a newly selected tour is
@@ -131,14 +132,14 @@ public class TourLayer extends Layer {
 
             __oldX = currentX;
             __oldY = currentY;
-            __oldZoomLevel = currentZoomLevel;
+            __oldZoomScale = currentZoomScale;
          }
 
          final TourRenderTask workerTask = _simpleWorker.poll();
 
          if (workerTask == null) {
 
-            // nothing to do
+            // task is done -> nothing to do
             return;
          }
 
@@ -232,8 +233,6 @@ public class TourLayer extends Layer {
       public void cleanup(final TourRenderTask task) {
 
          task.__renderBuckets.clear();
-
-         BufferObject.release(_vboColors);
       }
 
       @Override
