@@ -235,69 +235,69 @@ public class Data {
       }
 
       // Codes : http://www.worldweatheronline.com/feed/wwoConditionCodes.xml
-      switch (Integer.valueOf(middleHourly.getWeatherCode())) {
-      case 122:
-      case 119:
+      switch (middleHourly.getWeatherCode()) {
+      case "122": //$NON-NLS-1$
+      case "119": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_OVERCAST;
          break;
-      case 113:
+      case "113": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_CLEAR;
          break;
-      case 116:
-      case 248:
+      case "116": //$NON-NLS-1$
+      case "248": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
          break;
-      case 395:
-      case 392:
-      case 389:
-      case 386:
+      case "395": //$NON-NLS-1$
+      case "392": //$NON-NLS-1$
+      case "389": //$NON-NLS-1$
+      case "386": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_LIGHTNING;
          break;
-      case 293:
-      case 296:
-      case 299:
-      case 302:
-      case 305:
-      case 308:
-      case 356:
-      case 359:
-      case 377:
-      case 365:
+      case "293": //$NON-NLS-1$
+      case "296": //$NON-NLS-1$
+      case "299": //$NON-NLS-1$
+      case "302": //$NON-NLS-1$
+      case "305": //$NON-NLS-1$
+      case "308": //$NON-NLS-1$
+      case "356": //$NON-NLS-1$
+      case "359": //$NON-NLS-1$
+      case "377": //$NON-NLS-1$
+      case "365": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_RAIN;
          break;
-      case 332:
-      case 335:
-      case 338:
-      case 329:
-      case 326:
-      case 323:
-      case 320:
-      case 371:
-      case 368:
-      case 230:
-      case 227:
-      case 179:
+      case "332": //$NON-NLS-1$
+      case "335": //$NON-NLS-1$
+      case "338": //$NON-NLS-1$
+      case "329": //$NON-NLS-1$
+      case "326": //$NON-NLS-1$
+      case "323": //$NON-NLS-1$
+      case "320": //$NON-NLS-1$
+      case "371": //$NON-NLS-1$
+      case "368": //$NON-NLS-1$
+      case "230": //$NON-NLS-1$
+      case "227": //$NON-NLS-1$
+      case "179": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_SNOW;
          break;
-      case 200:
+      case "200": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
          break;
-      case 353:
-      case 374:
-      case 362:
-      case 350:
-      case 317:
-      case 314:
-      case 311:
-      case 182:
-      case 176:
+      case "353": //$NON-NLS-1$
+      case "374": //$NON-NLS-1$
+      case "362": //$NON-NLS-1$
+      case "350": //$NON-NLS-1$
+      case "317": //$NON-NLS-1$
+      case "314": //$NON-NLS-1$
+      case "311": //$NON-NLS-1$
+      case "182": //$NON-NLS-1$
+      case "176": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
          break;
-      case 185:
-      case 263:
-      case 266:
-      case 281:
-      case 284:
+      case "185":
+      case "263":
+      case "266":
+      case "281":
+      case "284":
          weatherType = IWeather.WEATHER_ID_DRIZZLE;
          break;
       default:
