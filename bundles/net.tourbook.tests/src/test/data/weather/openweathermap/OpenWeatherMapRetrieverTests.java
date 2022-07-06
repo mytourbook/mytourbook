@@ -56,7 +56,7 @@ public class OpenWeatherMapRetrieverTests {
    }
 
    @Test
-   void testWeatherRetrieval_July2022() {
+   void testWeatherRetrieval_JulySecond2022() {
 
       final String urlBase = WeatherUtils.HEROKU_APP_URL
             + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
@@ -92,6 +92,47 @@ public class OpenWeatherMapRetrieverTests {
       assertEquals(14.15f,            tour.getWeather_Temperature_Max());
       assertEquals(3.93f,             tour.getWeather_Temperature_Min());
       assertEquals(6.33f,             tour.getWeather_Temperature_WindChill());
+
+// SET_FORMATTING_ON
+   }
+
+   @Test
+   void testWeatherRetrieval_JulySixth2022() {
+
+      final String urlBase = WeatherUtils.HEROKU_APP_URL
+            + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
+
+      final String openWeatherMapResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
+            + "LongsPeak-Manual-OpenWeatherMapResponse-1657065600.json"); //$NON-NLS-1$
+
+      final String url = urlBase + "1657065600"; //$NON-NLS-1$
+      httpClientMock.onGet(url).doReturn(openWeatherMapResponse);
+
+      final TourData tour = Initializer.importTour();
+      //Tuesday, July 6, 2022 12:00:00 AM
+      tour.setTourStartTime(2022, 7, 6, 0, 0, 0);
+      //We set the current time elapsed to trigger the computation of the new end time
+      tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
+
+      openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
+
+      assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
+      httpClientMock.verify().get(url).called();
+
+// SET_FORMATTING_OFF
+
+      assertEquals("overcast clouds", tour.getWeather()); //$NON-NLS-1$
+      assertEquals("weather-rain",    tour.getWeather_Clouds()); //$NON-NLS-1$
+      assertEquals(8.35f,             tour.getWeather_Temperature_Average());
+      assertEquals(3,                 tour.getWeather_Wind_Speed());
+      assertEquals(268,               tour.getWeather_Wind_Direction());
+      assertEquals(72,                tour.getWeather_Humidity());
+      assertEquals(0.42f,             tour.getWeather_Precipitation());
+      assertEquals(0,                 tour.getWeather_Snowfall());
+      assertEquals(1008,              tour.getWeather_Pressure());
+      assertEquals(14.13f,            tour.getWeather_Temperature_Max());
+      assertEquals(5.95f,             tour.getWeather_Temperature_Min());
+      assertEquals(7.66f,             tour.getWeather_Temperature_WindChill());
 
 // SET_FORMATTING_ON
    }
