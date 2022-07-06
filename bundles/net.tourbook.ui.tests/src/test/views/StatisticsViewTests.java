@@ -16,6 +16,7 @@
 package views;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.tourbook.Messages;
 
@@ -45,6 +46,7 @@ public class StatisticsViewTests {
 
       final SWTBotCombo yearComboBox = tourEditorViewBot.comboBox(2);
       assertNotNull(yearComboBox);
+      assertEquals(11, yearComboBox.itemCount());
       yearComboBox.setSelection("9");
 
       statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_DaySummary);
