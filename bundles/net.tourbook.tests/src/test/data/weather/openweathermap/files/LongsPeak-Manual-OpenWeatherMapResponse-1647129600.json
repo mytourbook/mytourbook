@@ -2,7 +2,7 @@
     "lat": 40.264,
     "lon": -105.5885,
     "timezone": "America/Denver",
-    "timezone_offset": -25200,
+    "timezone_offset": -28020,
     "current": {
         "dt": 1647129600,
         "sunrise": 1647091124,
@@ -262,7 +262,7 @@
             "wind_gust": 3.84,
             "weather": [
                 {
-                    "id": 520,
+                    "id": 802,
                     "main": "Clouds",
                     "description": "scattered clouds",
                     "icon": "03n"
@@ -284,7 +284,7 @@
             "wind_gust": 3.44,
             "weather": [
                 {
-                    "id": 520,
+                    "id": 802,
                     "main": "Clouds",
                     "description": "scattered clouds",
                     "icon": "03n"
@@ -490,7 +490,7 @@
             ]
         },
         {
-            "dt": 1647205200,
+            "dt": 1647208020,
             "temp": 1.55,
             "feels_like": 1.55,
             "pressure": 1002,

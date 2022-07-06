@@ -2,7 +2,7 @@
     "lat": 40.264,
     "lon": -105.5885,
     "timezone": "America/Denver",
-    "timezone_offset": -25200,
+    "timezone_offset": -28020,
     "current": {
         "dt": 1647086400,
         "sunrise": 1647091124,
@@ -20,7 +20,7 @@
         "wind_gust": 8,
         "weather": [
             {
-                "id": 520,
+                "id": 802,
                 "main": "Clouds",
                 "description": "scattered clouds",
                 "icon": "03n"
@@ -43,7 +43,7 @@
             "wind_gust": 6.71,
             "weather": [
                 {
-                    "id": 520,
+                    "id": 802,
                     "main": "Clouds",
                     "description": "scattered clouds",
                     "icon": "03d"
@@ -171,7 +171,7 @@
             "wind_deg": 271,
             "weather": [
                 {
-                    "id": 520,
+                    "id": 802,
                     "main": "Clouds",
                     "description": "scattered clouds",
                     "icon": "03n"
@@ -303,7 +303,7 @@
             "wind_gust": 8,
             "weather": [
                 {
-                    "id": 520,
+                    "id": 802,
                     "main": "Clouds",
                     "description": "scattered clouds",
                     "icon": "03n"
@@ -435,7 +435,7 @@
             "wind_gust": 7.6,
             "weather": [
                 {
-                    "id": 520,
+                    "id": 802,
                     "main": "Clouds",
                     "description": "scattered clouds",
                     "icon": "03d"
@@ -464,7 +464,7 @@
             ]
         },
         {
-            "dt": 1647115200,
+            "dt": 1647118020,
             "temp": -1.67,
             "feels_like": -5.63,
             "pressure": 1022,
