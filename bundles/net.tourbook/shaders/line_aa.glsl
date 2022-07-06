@@ -78,7 +78,8 @@ void main() {
     // - '(1.0 - len) / u_fade' interpolates the 'pixel' on line-edge
     
 	 // between 0 and 1 (it is greater 1 for all inner pixel).
-    gl_FragColor = u_color * clamp((1.0 - len) / u_fade, 0.0, 1.0);
+//  gl_FragColor = u_color * clamp((1.0 - len) / u_fade, 0.0, 1.0);
+    gl_FragColor = vFragmentColor * clamp((1.0 - len) / u_fade, 0.0, 1.0);
     
 	 // -> nicer for thin lines
     //gl_FragColor = u_color * clamp((1.0 - (len * len)) / u_fade, 0.0, 1.0);

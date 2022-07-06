@@ -28,6 +28,7 @@ import net.tourbook.map25.layer.marker.MarkerShape;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
 import net.tourbook.map25.renderer.BucketRendererMT;
 import net.tourbook.map25.renderer.LineBucketMT;
+import net.tourbook.map25.renderer.RenderBucketMT;
 import net.tourbook.map25.renderer.RenderBucketsAllMT;
 
 import org.oscim.backend.canvas.Bitmap;
@@ -82,23 +83,25 @@ public class TourLayer extends Layer {
       private int __oldY         = -1;
       private int __oldZoomScale = -1;
 
-      @Override
-      protected synchronized void compile() {
-
-         // TODO Auto-generated method stub
-
-         super.compile();
-
-//         final FloatBuffer buf = MapRenderer.getFloatBuffer(12);
-//         buf.put(vertices);
+//      @Override
+//      protected synchronized void compile() {
 //
-//         _vboColors = BufferObject.get(GL.ARRAY_BUFFER, 0);
-//         _vboColors.loadBufferData(buf.flip(), 12 * 4);
-
-//         gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
-//         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
-
-      }
+//         // TODO Auto-generated method stub
+//
+//         super.compile();
+//
+////         final FloatBuffer buf = MapRenderer.getFloatBuffer(12);
+////         buf.put(vertices);
+////
+////         _vboColors = BufferObject.get(GL.ARRAY_BUFFER, 0);
+////         _vboColors.loadBufferData(buf.flip(), 12 * 4);
+//
+////         gl.bindBuffer(gl.ARRAY_BUFFER, vertexPositionBuffer);
+////         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositionData), gl.STATIC_DRAW);
+//
+////         RenderBucketsAllMT __renderBuckets = TourRenderTask.__renderBuckets;
+//
+//      }
 
       @Override
       public synchronized void update(final GLViewport viewport) {
@@ -147,7 +150,8 @@ public class TourLayer extends Layer {
          mMapPosition.copy(workerTask.__mapPos);
 
          // compile new layers
-         allBuckets.set(workerTask.__renderBuckets.get());
+         final RenderBucketMT firstChainedBucket = workerTask.__renderBuckets.get();
+         allBuckets.set(firstChainedBucket);
 
          compile();
       }

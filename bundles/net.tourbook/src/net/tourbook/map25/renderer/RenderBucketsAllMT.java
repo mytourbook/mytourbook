@@ -16,6 +16,7 @@
  */
 package net.tourbook.map25.renderer;
 
+import static org.oscim.backend.GLAdapter.gl;
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 import static org.oscim.renderer.bucket.RenderBucket.LINE;
 import static org.oscim.renderer.bucket.RenderBucket.POLYGON;
@@ -92,18 +93,23 @@ public class RenderBucketsAllMT extends TileData {
    public BufferObject    ibo_BufferObject;
 
    /**
+    * OpenGL id for the vertex colors
+    */
+
+   /**
     * To not need to switch VertexAttribPointer positions all the time:
     * <p>
     * <li>1. polygons are packed in VBO at offset 0</li>
     * <li>2. lines afterwards at lineOffset</li>
     * <li>3. other buckets keep their byte offset in offset</li>
     */
-   public int[]           offset = { 0, 0 };
+   public int[]           offset        = { 0, 0 };
 
    private RenderBucketMT _currentBucket;
 
-   private ByteBuffer     _colorBuffer;
-   private int            _colorBuffer_Size;
+   public int             vertexColorId = Integer.MIN_VALUE;
+   private ByteBuffer     _vertexColorBuffer;
+   private int            _vertexColorBuffer_Size;
 
    public RenderBucketsAllMT() {}
 
@@ -238,10 +244,10 @@ public class RenderBucketsAllMT extends TileData {
          vboSize += TILE_FILL_VERTICES * 2;
       }
 
-      final int vboColorSize = vboSize / 4 * 3;
+      final int vertexColorSize = vboSize / 4 * 3;
 
       final ShortBuffer vboBuffer = MapRenderer.getShortBuffer(vboSize);
-      final ByteBuffer colorBuffer = getColorBuffer(vboColorSize);
+      final ByteBuffer colorBuffer = getColorBuffer(vertexColorSize);
 
       if (addFill) {
          vboBuffer.put(fillShortCoords, 0, TILE_FILL_VERTICES * 2);
@@ -340,6 +346,18 @@ public class RenderBucketsAllMT extends TileData {
          // Set IBO data to READ mode
          ibo_BufferObject.loadBufferData(iboBuffer.flip(), iboSize * SHORT_BYTES);
       }
+
+      /*
+       * Load vertex color into the GPU
+       */
+      if (vertexColorId == Integer.MIN_VALUE) {
+
+         // create buffer id
+         vertexColorId = gl.genBuffer();
+      }
+
+      gl.bindBuffer(GL.ARRAY_BUFFER, vertexColorId);
+      gl.bufferData(GL.ARRAY_BUFFER, vertexColorSize, _vertexColorBuffer.flip(), GL.STATIC_DRAW);
 
       return true;
    }
@@ -474,20 +492,20 @@ public class RenderBucketsAllMT extends TileData {
       final int numBufferBlocks = requestedColorSize / bufferBlockSize;
       final int roundedBufferSize = (numBufferBlocks + 1) * bufferBlockSize;
 
-      if (_colorBuffer == null || _colorBuffer_Size < roundedBufferSize) {
+      if (_vertexColorBuffer == null || _vertexColorBuffer_Size < roundedBufferSize) {
 
-         _colorBuffer = ByteBuffer.allocateDirect(roundedBufferSize).order(ByteOrder.nativeOrder());
+         _vertexColorBuffer = ByteBuffer.allocateDirect(roundedBufferSize).order(ByteOrder.nativeOrder());
 
-         _colorBuffer_Size = roundedBufferSize;
+         _vertexColorBuffer_Size = roundedBufferSize;
 
       } else {
 
          // IMPORTANT: reset position to 0 to prevent BufferOverflowException
 
-         _colorBuffer.clear();
+         _vertexColorBuffer.clear();
       }
 
-      return _colorBuffer;
+      return _vertexColorBuffer;
    }
 
 //    /**

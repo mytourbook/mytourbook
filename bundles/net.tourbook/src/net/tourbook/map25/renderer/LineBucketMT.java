@@ -109,7 +109,6 @@ public class LineBucketMT extends RenderBucketMT {
       private static int         _textureID;
       private static Shader[]    _shaders                 = { null, null };
 
-
       /**
        * Performs OpenGL drawing commands of the renderBucket(s)
        *
@@ -138,7 +137,7 @@ public class LineBucketMT extends RenderBucketMT {
                // 0 == projected
                : SHADER_PROJECTED;
 
-         shaderMode = shaderMode;
+//         shaderMode = shaderMode;
          shaderMode = SHADER_FLAT;
 
          final Shader shader = _shaders[shaderMode];
@@ -175,17 +174,17 @@ public class LineBucketMT extends RenderBucketMT {
                buckets.offset[LINE] //    offset in bytes of the first component in the vertex attribute array
          );
 
-//         gl.bindBuffer(gl.ARRAY_BUFFER, vertexTexCoordBuffer);
-//         gl.enableVertexAttribArray(shader_aVertexColor);
-//         gl.vertexAttribPointer(
-//
-//               shader.shader_aVertexColor, //   index of the vertex attribute that is to be modified
-//               3, //                            number of components per vertex attribute, must be 1, 2, 3, or 4
-//               GL.BYTE, //                      data type of each component in the array
-//               false, //                        values should be normalized
-//               0, //                            offset in bytes between the beginning of consecutive vertex attributes
-//               0 //                             offset in bytes of the first component in the vertex attribute array
-//         );
+         gl.bindBuffer(GL.ARRAY_BUFFER, buckets.vertexColorId);
+         gl.enableVertexAttribArray(shader_aVertexColor);
+         gl.vertexAttribPointer(
+
+               shader_aVertexColor, //   index of the vertex attribute that is to be modified
+               3, //                            number of components per vertex attribute, must be 1, 2, 3, or 4
+               GL.UNSIGNED_BYTE, //             data type of each component in the array
+               false, //                        values should be normalized
+               0, //                            offset in bytes between the beginning of consecutive vertex attributes
+               0 //                             offset in bytes of the first component in the vertex attribute array
+         );
 
          viewport.mvp.setAsUniform(shader.shader_u_mvp);
 
@@ -351,7 +350,7 @@ public class LineBucketMT extends RenderBucketMT {
             }
          }
 
-//         gl.disableVertexAttribArray(shader_aVertexColor);
+         gl.disableVertexAttribArray(shader_aVertexColor);
 
          return renderBucket;
       }
@@ -387,8 +386,6 @@ public class LineBucketMT extends RenderBucketMT {
                GL.NEAREST,
                GL.MIRRORED_REPEAT,
                GL.MIRRORED_REPEAT);
-
-//         _vertexColorId = gl.genBuffer();
 
          return true;
       }
