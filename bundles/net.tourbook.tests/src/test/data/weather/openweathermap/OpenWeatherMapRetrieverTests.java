@@ -38,8 +38,11 @@ import utils.Initializer;
  */
 public class OpenWeatherMapRetrieverTests {
 
+   private static final String OPENWEATHERMAP_BASE_URL  = WeatherUtils.HEROKU_APP_URL
+         + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt=";
+
    private static final String OPENWEATHERMAP_FILE_PATH =
-         FilesUtils.rootPath + "data/weather/openweathermap/files/"; //$NON-NLS-1$
+         FilesUtils.rootPath + "data/weather/openweathermap/files/";                                    //$NON-NLS-1$
 
    static HttpClientMock       httpClientMock;
    OpenWeatherMapRetriever     openWeatherMapRetriever;
@@ -58,13 +61,10 @@ public class OpenWeatherMapRetrieverTests {
    @Test
    void testWeatherRetrieval_JulySecond2022() {
 
-      final String urlBase = WeatherUtils.HEROKU_APP_URL
-            + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
-
       final String openWeatherMapResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapResponse-1656720000.json"); //$NON-NLS-1$
 
-      final String url = urlBase + "1656720000"; //$NON-NLS-1$
+      final String url = OPENWEATHERMAP_BASE_URL + "1656720000"; //$NON-NLS-1$
       httpClientMock.onGet(url).doReturn(openWeatherMapResponse);
 
       final TourData tour = Initializer.importTour();
@@ -99,13 +99,10 @@ public class OpenWeatherMapRetrieverTests {
    @Test
    void testWeatherRetrieval_JulySixth2022() {
 
-      final String urlBase = WeatherUtils.HEROKU_APP_URL
-            + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
-
       final String openWeatherMapResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapResponse-1657065600.json"); //$NON-NLS-1$
 
-      final String url = urlBase + "1657065600"; //$NON-NLS-1$
+      final String url = OPENWEATHERMAP_BASE_URL + "1657065600"; //$NON-NLS-1$
       httpClientMock.onGet(url).doReturn(openWeatherMapResponse);
 
       final TourData tour = Initializer.importTour();
@@ -140,18 +137,15 @@ public class OpenWeatherMapRetrieverTests {
    @Test
    void testWeatherRetrieval_March2022() {
 
-      final String urlBase = WeatherUtils.HEROKU_APP_URL
-            + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
-
       final String openWeatherMapResponse1 = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapResponse-1647086400.json"); //$NON-NLS-1$
 
-      final String url1 = urlBase + "1647086400"; //$NON-NLS-1$
+      final String url1 = OPENWEATHERMAP_BASE_URL + "1647086400"; //$NON-NLS-1$
       httpClientMock.onGet(url1).doReturn(openWeatherMapResponse1);
 
       final String openWeatherMapResponse2 = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapResponse-1647129600.json"); //$NON-NLS-1$
-      final String url2 = urlBase + "1647129600"; //$NON-NLS-1$
+      final String url2 = OPENWEATHERMAP_BASE_URL + "1647129600"; //$NON-NLS-1$
       httpClientMock.onGet(url2).doReturn(openWeatherMapResponse2);
 
       final TourData tour = Initializer.importTour();
