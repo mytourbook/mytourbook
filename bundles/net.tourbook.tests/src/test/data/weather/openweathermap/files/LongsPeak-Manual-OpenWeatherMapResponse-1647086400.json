@@ -2,7 +2,7 @@
     "lat": 40.264,
     "lon": -105.5885,
     "timezone": "America/Denver",
-    "timezone_offset": -28020,
+    "timezone_offset": -25200,
     "current": {
         "dt": 1647086400,
         "sunrise": 1647091124,
@@ -464,7 +464,7 @@
             ]
         },
         {
-            "dt": 1647118020,
+            "dt": 1647115200,
             "temp": -1.67,
             "feels_like": -5.63,
             "pressure": 1022,
