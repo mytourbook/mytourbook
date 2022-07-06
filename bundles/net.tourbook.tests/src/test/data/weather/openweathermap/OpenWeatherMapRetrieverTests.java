@@ -132,18 +132,18 @@ public class OpenWeatherMapRetrieverTests {
 
 // SET_FORMATTING_OFF
 
-      assertEquals("scattered clouds", tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-cloudy",   tour.getWeather_Clouds()); //$NON-NLS-1$
-      assertEquals(-5.91f,             tour.getWeather_Temperature_Average());
-      assertEquals(11,                 tour.getWeather_Wind_Speed());
-      assertEquals(280,                tour.getWeather_Wind_Direction());
-      assertEquals(54,                 tour.getWeather_Humidity());
-      assertEquals(0.76f,              tour.getWeather_Precipitation());
-      assertEquals(0,                  tour.getWeather_Snowfall());
-      assertEquals(1024,               tour.getWeather_Pressure());
-      assertEquals(-0.87f,             tour.getWeather_Temperature_Max());
-      assertEquals(-15.96f,            tour.getWeather_Temperature_Min());
-      assertEquals(-11.07f,            tour.getWeather_Temperature_WindChill());
+      assertEquals("scattered clouds",            tour.getWeather()); //$NON-NLS-1$
+      assertEquals("weather-showers-scattered",   tour.getWeather_Clouds()); //$NON-NLS-1$
+      assertEquals(-5.91f,                        tour.getWeather_Temperature_Average());
+      assertEquals(11,                            tour.getWeather_Wind_Speed());
+      assertEquals(280,                           tour.getWeather_Wind_Direction());
+      assertEquals(54,                            tour.getWeather_Humidity());
+      assertEquals(0.76f,                         tour.getWeather_Precipitation());
+      assertEquals(0,                             tour.getWeather_Snowfall());
+      assertEquals(1024,                          tour.getWeather_Pressure());
+      assertEquals(-0.87f,                        tour.getWeather_Temperature_Max());
+      assertEquals(-15.96f,                       tour.getWeather_Temperature_Min());
+      assertEquals(-11.07f,                       tour.getWeather_Temperature_WindChill());
 
 // SET_FORMATTING_ON
    }

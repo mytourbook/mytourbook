@@ -262,7 +262,7 @@
             "wind_gust": 3.84,
             "weather": [
                 {
-                    "id": 802,
+                    "id": 520,
                     "main": "Clouds",
                     "description": "scattered clouds",
                     "icon": "03n"
@@ -284,7 +284,7 @@
             "wind_gust": 3.44,
             "weather": [
                 {
-                    "id": 802,
+                    "id": 520,
                     "main": "Clouds",
                     "description": "scattered clouds",
                     "icon": "03n"

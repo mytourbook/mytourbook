@@ -20,7 +20,7 @@
         "wind_gust": 8,
         "weather": [
             {
-                "id": 802,
+                "id": 520,
                 "main": "Clouds",
                 "description": "scattered clouds",
                 "icon": "03n"
@@ -43,7 +43,7 @@
             "wind_gust": 6.71,
             "weather": [
                 {
-                    "id": 802,
+                    "id": 520,
                     "main": "Clouds",
                     "description": "scattered clouds",
                     "icon": "03d"
@@ -171,7 +171,7 @@
             "wind_deg": 271,
             "weather": [
                 {
-                    "id": 802,
+                    "id": 520,
                     "main": "Clouds",
                     "description": "scattered clouds",
                     "icon": "03n"
@@ -303,7 +303,7 @@
             "wind_gust": 8,
             "weather": [
                 {
-                    "id": 802,
+                    "id": 520,
                     "main": "Clouds",
                     "description": "scattered clouds",
                     "icon": "03n"
@@ -435,7 +435,7 @@
             "wind_gust": 7.6,
             "weather": [
                 {
-                    "id": 802,
+                    "id": 520,
                     "main": "Clouds",
                     "description": "scattered clouds",
                     "icon": "03d"
