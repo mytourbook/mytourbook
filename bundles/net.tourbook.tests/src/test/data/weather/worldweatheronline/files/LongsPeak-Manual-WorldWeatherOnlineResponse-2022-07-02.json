@@ -1,0 +1,1024 @@
+{
+	"data": {
+		"request": [
+			{
+				"type": "LatLon",
+				"query": "Lat 40.26 and Lon -105.59"
+			}
+		],
+		"nearest_area": [
+			{
+				"areaName": [
+					{
+						"value": "Meeker Park"
+					}
+				],
+				"country": [
+					{
+						"value": "United States of America"
+					}
+				],
+				"region": [
+					{
+						"value": "Colorado"
+					}
+				],
+				"latitude": "40.234",
+				"longitude": "-105.530",
+				"population": "0",
+				"weatherUrl": [
+					{
+						"value": "https://www.worldweatheronline.com/v2/weather.aspx?q=40.263996,-105.58854099999999"
+					}
+				]
+			}
+		],
+		"weather": [
+			{
+				"date": "2022-07-02",
+				"astronomy": [
+					{
+						"sunrise": "05:37 AM",
+						"sunset": "08:36 PM",
+						"moonrise": "08:41 AM",
+						"moonset": "11:20 PM",
+						"moon_phase": "New Moon",
+						"moon_illumination": "22"
+					}
+				],
+				"maxtempC": "22",
+				"maxtempF": "72",
+				"mintempC": "8",
+				"mintempF": "46",
+				"avgtempC": "16",
+				"avgtempF": "60",
+				"totalSnow_cm": "0.0",
+				"sunHour": "12.4",
+				"uvIndex": "4",
+				"hourly": [
+					{
+						"time": "0",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "600",
+						"tempC": "8",
+						"tempF": "47",
+						"windspeedMiles": "7",
+						"windspeedKmph": "11",
+						"winddirDegree": "266",
+						"winddir16Point": "W",
+						"weatherCode": "185",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0025_light_rain_showers_night.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Patchy rain possible"
+							}
+						],
+						"precipMM": "0.7",
+						"precipInches": "0.0",
+						"humidity": "80",
+						"visibility": "9",
+						"visibilityMiles": "5",
+						"pressure": "1019",
+						"pressureInches": "30",
+						"cloudcover": "81",
+						"HeatIndexC": "8",
+						"HeatIndexF": "47",
+						"DewPointC": "5",
+						"DewPointF": "41",
+						"WindChillC": "7",
+						"WindChillF": "44",
+						"WindGustMiles": "15",
+						"WindGustKmph": "23",
+						"FeelsLikeC": "7",
+						"FeelsLikeF": "44",
+						"uvIndex": "1"
+					}, {
+						"time": "100",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "700",
+						"tempC": "8",
+						"tempF": "47",
+						"windspeedMiles": "7",
+						"windspeedKmph": "12",
+						"winddirDegree": "267",
+						"winddir16Point": "W",
+						"weatherCode": "185",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0025_light_rain_showers_night.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Patchy rain possible"
+							}
+						],
+						"precipMM": "0.4",
+						"precipInches": "0.0",
+						"humidity": "80",
+						"visibility": "9",
+						"visibilityMiles": "5",
+						"pressure": "1019",
+						"pressureInches": "30",
+						"cloudcover": "59",
+						"HeatIndexC": "8",
+						"HeatIndexF": "47",
+						"DewPointC": "5",
+						"DewPointF": "41",
+						"WindChillC": "6",
+						"WindChillF": "43",
+						"WindGustMiles": "15",
+						"WindGustKmph": "24",
+						"FeelsLikeC": "6",
+						"FeelsLikeF": "43",
+						"uvIndex": "1"
+					}, {
+						"time": "200",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "800",
+						"tempC": "8",
+						"tempF": "46",
+						"windspeedMiles": "8",
+						"windspeedKmph": "12",
+						"winddirDegree": "268",
+						"winddir16Point": "W",
+						"weatherCode": "113",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0008_clear_sky_night.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Clear"
+							}
+						],
+						"precipMM": "0.0",
+						"precipInches": "0.0",
+						"humidity": "80",
+						"visibility": "10",
+						"visibilityMiles": "6",
+						"pressure": "1019",
+						"pressureInches": "30",
+						"cloudcover": "36",
+						"HeatIndexC": "8",
+						"HeatIndexF": "46",
+						"DewPointC": "5",
+						"DewPointF": "40",
+						"WindChillC": "6",
+						"WindChillF": "42",
+						"WindGustMiles": "16",
+						"WindGustKmph": "25",
+						"FeelsLikeC": "6",
+						"FeelsLikeF": "42",
+						"uvIndex": "1"
+					}, {
+						"time": "300",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "900",
+						"tempC": "8",
+						"tempF": "46",
+						"windspeedMiles": "8",
+						"windspeedKmph": "13",
+						"winddirDegree": "269",
+						"winddir16Point": "W",
+						"weatherCode": "113",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0008_clear_sky_night.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Clear"
+							}
+						],
+						"precipMM": "0.0",
+						"precipInches": "0.0",
+						"humidity": "80",
+						"visibility": "10",
+						"visibilityMiles": "6",
+						"pressure": "1019",
+						"pressureInches": "30",
+						"cloudcover": "14",
+						"HeatIndexC": "8",
+						"HeatIndexF": "46",
+						"DewPointC": "4",
+						"DewPointF": "40",
+						"WindChillC": "5",
+						"WindChillF": "42",
+						"WindGustMiles": "16",
+						"WindGustKmph": "26",
+						"FeelsLikeC": "5",
+						"FeelsLikeF": "42",
+						"uvIndex": "1"
+					}, {
+						"time": "400",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "1000",
+						"tempC": "8",
+						"tempF": "46",
+						"windspeedMiles": "8",
+						"windspeedKmph": "13",
+						"winddirDegree": "268",
+						"winddir16Point": "W",
+						"weatherCode": "113",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0008_clear_sky_night.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Clear"
+							}
+						],
+						"precipMM": "0.0",
+						"precipInches": "0.0",
+						"humidity": "79",
+						"visibility": "10",
+						"visibilityMiles": "6",
+						"pressure": "1019",
+						"pressureInches": "30",
+						"cloudcover": "14",
+						"HeatIndexC": "8",
+						"HeatIndexF": "46",
+						"DewPointC": "4",
+						"DewPointF": "40",
+						"WindChillC": "5",
+						"WindChillF": "42",
+						"WindGustMiles": "16",
+						"WindGustKmph": "26",
+						"FeelsLikeC": "5",
+						"FeelsLikeF": "42",
+						"uvIndex": "1"
+					}, {
+						"time": "500",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "1100",
+						"tempC": "8",
+						"tempF": "46",
+						"windspeedMiles": "8",
+						"windspeedKmph": "13",
+						"winddirDegree": "267",
+						"winddir16Point": "W",
+						"weatherCode": "113",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0008_clear_sky_night.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Clear"
+							}
+						],
+						"precipMM": "0.0",
+						"precipInches": "0.0",
+						"humidity": "79",
+						"visibility": "10",
+						"visibilityMiles": "6",
+						"pressure": "1019",
+						"pressureInches": "30",
+						"cloudcover": "13",
+						"HeatIndexC": "8",
+						"HeatIndexF": "46",
+						"DewPointC": "4",
+						"DewPointF": "40",
+						"WindChillC": "5",
+						"WindChillF": "42",
+						"WindGustMiles": "16",
+						"WindGustKmph": "26",
+						"FeelsLikeC": "5",
+						"FeelsLikeF": "42",
+						"uvIndex": "1"
+					}, {
+						"time": "600",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "1200",
+						"tempC": "8",
+						"tempF": "46",
+						"windspeedMiles": "8",
+						"windspeedKmph": "13",
+						"winddirDegree": "266",
+						"winddir16Point": "W",
+						"weatherCode": "113",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0001_sunny.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Sunny"
+							}
+						],
+						"precipMM": "0.0",
+						"precipInches": "0.0",
+						"humidity": "79",
+						"visibility": "10",
+						"visibilityMiles": "6",
+						"pressure": "1019",
+						"pressureInches": "30",
+						"cloudcover": "13",
+						"HeatIndexC": "8",
+						"HeatIndexF": "46",
+						"DewPointC": "4",
+						"DewPointF": "40",
+						"WindChillC": "5",
+						"WindChillF": "42",
+						"WindGustMiles": "16",
+						"WindGustKmph": "26",
+						"FeelsLikeC": "5",
+						"FeelsLikeF": "42",
+						"uvIndex": "3"
+					}, {
+						"time": "700",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "1300",
+						"tempC": "11",
+						"tempF": "51",
+						"windspeedMiles": "5",
+						"windspeedKmph": "9",
+						"winddirDegree": "274",
+						"winddir16Point": "W",
+						"weatherCode": "113",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0001_sunny.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Sunny"
+							}
+						],
+						"precipMM": "0.0",
+						"precipInches": "0.0",
+						"humidity": "66",
+						"visibility": "10",
+						"visibilityMiles": "6",
+						"pressure": "1018",
+						"pressureInches": "30",
+						"cloudcover": "10",
+						"HeatIndexC": "11",
+						"HeatIndexF": "51",
+						"DewPointC": "4",
+						"DewPointF": "39",
+						"WindChillC": "9",
+						"WindChillF": "49",
+						"WindGustMiles": "11",
+						"WindGustKmph": "18",
+						"FeelsLikeC": "9",
+						"FeelsLikeF": "49",
+						"uvIndex": "4"
+					}, {
+						"time": "800",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "1400",
+						"tempC": "14",
+						"tempF": "57",
+						"windspeedMiles": "3",
+						"windspeedKmph": "5",
+						"winddirDegree": "283",
+						"winddir16Point": "WNW",
+						"weatherCode": "113",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0001_sunny.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Sunny"
+							}
+						],
+						"precipMM": "0.0",
+						"precipInches": "0.0",
+						"humidity": "53",
+						"visibility": "10",
+						"visibilityMiles": "6",
+						"pressure": "1017",
+						"pressureInches": "30",
+						"cloudcover": "7",
+						"HeatIndexC": "14",
+						"HeatIndexF": "57",
+						"DewPointC": "4",
+						"DewPointF": "38",
+						"WindChillC": "13",
+						"WindChillF": "56",
+						"WindGustMiles": "6",
+						"WindGustKmph": "9",
+						"FeelsLikeC": "13",
+						"FeelsLikeF": "56",
+						"uvIndex": "4"
+					}, {
+						"time": "900",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "1500",
+						"tempC": "17",
+						"tempF": "63",
+						"windspeedMiles": "0",
+						"windspeedKmph": "1",
+						"winddirDegree": "292",
+						"winddir16Point": "WNW",
+						"weatherCode": "113",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0001_sunny.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Sunny"
+							}
+						],
+						"precipMM": "0.0",
+						"precipInches": "0.0",
+						"humidity": "40",
+						"visibility": "10",
+						"visibilityMiles": "6",
+						"pressure": "1017",
+						"pressureInches": "30",
+						"cloudcover": "4",
+						"HeatIndexC": "17",
+						"HeatIndexF": "63",
+						"DewPointC": "3",
+						"DewPointF": "38",
+						"WindChillC": "17",
+						"WindChillF": "63",
+						"WindGustMiles": "0",
+						"WindGustKmph": "1",
+						"FeelsLikeC": "17",
+						"FeelsLikeF": "63",
+						"uvIndex": "5"
+					}, {
+						"time": "1000",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "1600",
+						"tempC": "19",
+						"tempF": "66",
+						"windspeedMiles": "3",
+						"windspeedKmph": "5",
+						"winddirDegree": "230",
+						"winddir16Point": "SW",
+						"weatherCode": "113",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0001_sunny.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Sunny"
+							}
+						],
+						"precipMM": "0.0",
+						"precipInches": "0.0",
+						"humidity": "37",
+						"visibility": "10",
+						"visibilityMiles": "6",
+						"pressure": "1016",
+						"pressureInches": "30",
+						"cloudcover": "17",
+						"HeatIndexC": "19",
+						"HeatIndexF": "66",
+						"DewPointC": "3",
+						"DewPointF": "38",
+						"WindChillC": "19",
+						"WindChillF": "66",
+						"WindGustMiles": "4",
+						"WindGustKmph": "6",
+						"FeelsLikeC": "19",
+						"FeelsLikeF": "66",
+						"uvIndex": "5"
+					}, {
+						"time": "1100",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "1700",
+						"tempC": "20",
+						"tempF": "69",
+						"windspeedMiles": "6",
+						"windspeedKmph": "10",
+						"winddirDegree": "168",
+						"winddir16Point": "SSE",
+						"weatherCode": "200",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0016_thundery_showers.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Thundery outbreaks possible"
+							}
+						],
+						"precipMM": "0.0",
+						"precipInches": "0.0",
+						"humidity": "33",
+						"visibility": "9",
+						"visibilityMiles": "5",
+						"pressure": "1015",
+						"pressureInches": "30",
+						"cloudcover": "30",
+						"HeatIndexC": "21",
+						"HeatIndexF": "70",
+						"DewPointC": "4",
+						"DewPointF": "38",
+						"WindChillC": "20",
+						"WindChillF": "69",
+						"WindGustMiles": "7",
+						"WindGustKmph": "11",
+						"FeelsLikeC": "20",
+						"FeelsLikeF": "69",
+						"uvIndex": "5"
+					}, {
+						"time": "1200",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "1800",
+						"tempC": "22",
+						"tempF": "72",
+						"windspeedMiles": "9",
+						"windspeedKmph": "14",
+						"winddirDegree": "106",
+						"winddir16Point": "ESE",
+						"weatherCode": "200",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0016_thundery_showers.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Thundery outbreaks possible"
+							}
+						],
+						"precipMM": "0.0",
+						"precipInches": "0.0",
+						"humidity": "30",
+						"visibility": "9",
+						"visibilityMiles": "5",
+						"pressure": "1014",
+						"pressureInches": "30",
+						"cloudcover": "44",
+						"HeatIndexC": "23",
+						"HeatIndexF": "74",
+						"DewPointC": "4",
+						"DewPointF": "38",
+						"WindChillC": "22",
+						"WindChillF": "72",
+						"WindGustMiles": "10",
+						"WindGustKmph": "17",
+						"FeelsLikeC": "23",
+						"FeelsLikeF": "74",
+						"uvIndex": "5"
+					}, {
+						"time": "1300",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "1900",
+						"tempC": "21",
+						"tempF": "71",
+						"windspeedMiles": "8",
+						"windspeedKmph": "13",
+						"winddirDegree": "107",
+						"winddir16Point": "ESE",
+						"weatherCode": "200",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0016_thundery_showers.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Thundery outbreaks possible"
+							}
+						],
+						"precipMM": "0.0",
+						"precipInches": "0.0",
+						"humidity": "33",
+						"visibility": "9",
+						"visibilityMiles": "5",
+						"pressure": "1014",
+						"pressureInches": "30",
+						"cloudcover": "55",
+						"HeatIndexC": "22",
+						"HeatIndexF": "72",
+						"DewPointC": "4",
+						"DewPointF": "40",
+						"WindChillC": "21",
+						"WindChillF": "71",
+						"WindGustMiles": "9",
+						"WindGustKmph": "15",
+						"FeelsLikeC": "21",
+						"FeelsLikeF": "71",
+						"uvIndex": "5"
+					}, {
+						"time": "1400",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "2000",
+						"tempC": "21",
+						"tempF": "69",
+						"windspeedMiles": "7",
+						"windspeedKmph": "12",
+						"winddirDegree": "107",
+						"winddir16Point": "ESE",
+						"weatherCode": "185",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0009_light_rain_showers.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Patchy rain possible"
+							}
+						],
+						"precipMM": "0.1",
+						"precipInches": "0.0",
+						"humidity": "36",
+						"visibility": "9",
+						"visibilityMiles": "5",
+						"pressure": "1014",
+						"pressureInches": "30",
+						"cloudcover": "65",
+						"HeatIndexC": "21",
+						"HeatIndexF": "70",
+						"DewPointC": "5",
+						"DewPointF": "41",
+						"WindChillC": "21",
+						"WindChillF": "69",
+						"WindGustMiles": "9",
+						"WindGustKmph": "14",
+						"FeelsLikeC": "21",
+						"FeelsLikeF": "69",
+						"uvIndex": "5"
+					}, {
+						"time": "1500",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "2100",
+						"tempC": "20",
+						"tempF": "68",
+						"windspeedMiles": "7",
+						"windspeedKmph": "11",
+						"winddirDegree": "108",
+						"winddir16Point": "ESE",
+						"weatherCode": "185",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0009_light_rain_showers.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Patchy rain possible"
+							}
+						],
+						"precipMM": "0.1",
+						"precipInches": "0.0",
+						"humidity": "40",
+						"visibility": "9",
+						"visibilityMiles": "5",
+						"pressure": "1014",
+						"pressureInches": "30",
+						"cloudcover": "76",
+						"HeatIndexC": "20",
+						"HeatIndexF": "68",
+						"DewPointC": "6",
+						"DewPointF": "43",
+						"WindChillC": "20",
+						"WindChillF": "68",
+						"WindGustMiles": "8",
+						"WindGustKmph": "13",
+						"FeelsLikeC": "20",
+						"FeelsLikeF": "68",
+						"uvIndex": "5"
+					}, {
+						"time": "1600",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "2200",
+						"tempC": "17",
+						"tempF": "63",
+						"windspeedMiles": "6",
+						"windspeedKmph": "10",
+						"winddirDegree": "174",
+						"winddir16Point": "S",
+						"weatherCode": "185",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0009_light_rain_showers.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Patchy rain possible"
+							}
+						],
+						"precipMM": "0.1",
+						"precipInches": "0.0",
+						"humidity": "56",
+						"visibility": "8",
+						"visibilityMiles": "4",
+						"pressure": "1016",
+						"pressureInches": "30",
+						"cloudcover": "80",
+						"HeatIndexC": "17",
+						"HeatIndexF": "63",
+						"DewPointC": "7",
+						"DewPointF": "45",
+						"WindChillC": "17",
+						"WindChillF": "63",
+						"WindGustMiles": "8",
+						"WindGustKmph": "12",
+						"FeelsLikeC": "17",
+						"FeelsLikeF": "63",
+						"uvIndex": "4"
+					}, {
+						"time": "1700",
+						"UTCdate": "2022-07-02",
+						"UTCtime": "2300",
+						"tempC": "14",
+						"tempF": "58",
+						"windspeedMiles": "6",
+						"windspeedKmph": "9",
+						"winddirDegree": "241",
+						"winddir16Point": "WSW",
+						"weatherCode": "305",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0010_heavy_rain_showers.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Heavy rain at times"
+							}
+						],
+						"precipMM": "2.5",
+						"precipInches": "0.1",
+						"humidity": "73",
+						"visibility": "7",
+						"visibilityMiles": "4",
+						"pressure": "1018",
+						"pressureInches": "30",
+						"cloudcover": "85",
+						"HeatIndexC": "14",
+						"HeatIndexF": "58",
+						"DewPointC": "9",
+						"DewPointF": "48",
+						"WindChillC": "14",
+						"WindChillF": "57",
+						"WindGustMiles": "7",
+						"WindGustKmph": "12",
+						"FeelsLikeC": "14",
+						"FeelsLikeF": "57",
+						"uvIndex": "3"
+					}, {
+						"time": "1800",
+						"UTCdate": "2022-07-03",
+						"UTCtime": "0",
+						"tempC": "12",
+						"tempF": "53",
+						"windspeedMiles": "5",
+						"windspeedKmph": "9",
+						"winddirDegree": "307",
+						"winddir16Point": "NW",
+						"weatherCode": "305",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0026_heavy_rain_showers_night.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Heavy rain at times"
+							}
+						],
+						"precipMM": "3.3",
+						"precipInches": "0.1",
+						"humidity": "90",
+						"visibility": "6",
+						"visibilityMiles": "3",
+						"pressure": "1020",
+						"pressureInches": "30",
+						"cloudcover": "89",
+						"HeatIndexC": "12",
+						"HeatIndexF": "53",
+						"DewPointC": "10",
+						"DewPointF": "50",
+						"WindChillC": "11",
+						"WindChillF": "51",
+						"WindGustMiles": "7",
+						"WindGustKmph": "12",
+						"FeelsLikeC": "11",
+						"FeelsLikeF": "51",
+						"uvIndex": "1"
+					}, {
+						"time": "1900",
+						"UTCdate": "2022-07-03",
+						"UTCtime": "100",
+						"tempC": "11",
+						"tempF": "52",
+						"windspeedMiles": "5",
+						"windspeedKmph": "8",
+						"winddirDegree": "279",
+						"winddir16Point": "W",
+						"weatherCode": "305",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0026_heavy_rain_showers_night.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Heavy rain at times"
+							}
+						],
+						"precipMM": "1.7",
+						"precipInches": "0.1",
+						"humidity": "87",
+						"visibility": "7",
+						"visibilityMiles": "4",
+						"pressure": "1019",
+						"pressureInches": "30",
+						"cloudcover": "86",
+						"HeatIndexC": "11",
+						"HeatIndexF": "52",
+						"DewPointC": "9",
+						"DewPointF": "48",
+						"WindChillC": "10",
+						"WindChillF": "50",
+						"WindGustMiles": "8",
+						"WindGustKmph": "13",
+						"FeelsLikeC": "10",
+						"FeelsLikeF": "50",
+						"uvIndex": "1"
+					}, {
+						"time": "2000",
+						"UTCdate": "2022-07-03",
+						"UTCtime": "200",
+						"tempC": "10",
+						"tempF": "51",
+						"windspeedMiles": "5",
+						"windspeedKmph": "8",
+						"winddirDegree": "250",
+						"winddir16Point": "WSW",
+						"weatherCode": "185",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0025_light_rain_showers_night.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Patchy rain possible"
+							}
+						],
+						"precipMM": "0.1",
+						"precipInches": "0.0",
+						"humidity": "84",
+						"visibility": "8",
+						"visibilityMiles": "4",
+						"pressure": "1019",
+						"pressureInches": "30",
+						"cloudcover": "83",
+						"HeatIndexC": "10",
+						"HeatIndexF": "51",
+						"DewPointC": "8",
+						"DewPointF": "46",
+						"WindChillC": "9",
+						"WindChillF": "49",
+						"WindGustMiles": "9",
+						"WindGustKmph": "15",
+						"FeelsLikeC": "9",
+						"FeelsLikeF": "49",
+						"uvIndex": "1"
+					}, {
+						"time": "2100",
+						"UTCdate": "2022-07-03",
+						"UTCtime": "300",
+						"tempC": "10",
+						"tempF": "49",
+						"windspeedMiles": "5",
+						"windspeedKmph": "8",
+						"winddirDegree": "221",
+						"winddir16Point": "SW",
+						"weatherCode": "185",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0025_light_rain_showers_night.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Patchy rain possible"
+							}
+						],
+						"precipMM": "0.2",
+						"precipInches": "0.0",
+						"humidity": "81",
+						"visibility": "9",
+						"visibilityMiles": "5",
+						"pressure": "1018",
+						"pressureInches": "30",
+						"cloudcover": "80",
+						"HeatIndexC": "10",
+						"HeatIndexF": "49",
+						"DewPointC": "7",
+						"DewPointF": "44",
+						"WindChillC": "9",
+						"WindChillF": "48",
+						"WindGustMiles": "10",
+						"WindGustKmph": "17",
+						"FeelsLikeC": "9",
+						"FeelsLikeF": "48",
+						"uvIndex": "1"
+					}, {
+						"time": "2200",
+						"UTCdate": "2022-07-03",
+						"UTCtime": "400",
+						"tempC": "10",
+						"tempF": "49",
+						"windspeedMiles": "5",
+						"windspeedKmph": "8",
+						"winddirDegree": "231",
+						"winddir16Point": "SW",
+						"weatherCode": "185",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0025_light_rain_showers_night.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Patchy rain possible"
+							}
+						],
+						"precipMM": "0.1",
+						"precipInches": "0.0",
+						"humidity": "77",
+						"visibility": "9",
+						"visibilityMiles": "5",
+						"pressure": "1018",
+						"pressureInches": "30",
+						"cloudcover": "81",
+						"HeatIndexC": "10",
+						"HeatIndexF": "49",
+						"DewPointC": "6",
+						"DewPointF": "42",
+						"WindChillC": "8",
+						"WindChillF": "47",
+						"WindGustMiles": "10",
+						"WindGustKmph": "17",
+						"FeelsLikeC": "8",
+						"FeelsLikeF": "47",
+						"uvIndex": "1"
+					}, {
+						"time": "2300",
+						"UTCdate": "2022-07-03",
+						"UTCtime": "500",
+						"tempC": "9",
+						"tempF": "49",
+						"windspeedMiles": "5",
+						"windspeedKmph": "8",
+						"winddirDegree": "241",
+						"winddir16Point": "WSW",
+						"weatherCode": "185",
+						"weatherIconUrl": [
+							{
+								"value": "http://cdn.worldweatheronline.com/images/wsymbols01_png_64/wsymbol_0025_light_rain_showers_night.png"
+							}
+						],
+						"weatherDesc": [
+							{
+								"value": "Patchy rain possible"
+							}
+						],
+						"precipMM": "0.1",
+						"precipInches": "0.0",
+						"humidity": "74",
+						"visibility": "10",
+						"visibilityMiles": "6",
+						"pressure": "1018",
+						"pressureInches": "30",
+						"cloudcover": "81",
+						"HeatIndexC": "9",
+						"HeatIndexF": "49",
+						"DewPointC": "5",
+						"DewPointF": "41",
+						"WindChillC": "8",
+						"WindChillF": "47",
+						"WindGustMiles": "10",
+						"WindGustKmph": "17",
+						"FeelsLikeC": "8",
+						"FeelsLikeF": "47",
+						"uvIndex": "1"
+					}
+				]
+			}
+		]
+	}
+}
