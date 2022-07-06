@@ -21,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import net.tourbook.Messages;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.junit.jupiter.api.Test;
@@ -37,10 +36,8 @@ public class StatisticsViewTests {
    @Test
    void testStatisticsView() {
 
-      final SWTBotView tourEditorView = Utils.showView(bot, STATISTICS_VIEW_NAME);
-
-      final SWTBot tourEditorViewBot = tourEditorView.bot();
-      final SWTBotCombo statisticsTypeComboBox = tourEditorViewBot.comboBox(0);
+      final SWTBot tourEditorViewBot = Utils.showView(bot, STATISTICS_VIEW_NAME).bot();
+      final SWTBotCombo statisticsTypeComboBox = bot.comboBox(0);
       assertEquals(27, statisticsTypeComboBox.itemCount());
       assertNotNull(statisticsTypeComboBox);
       statisticsTypeComboBox.setSelection(0);
