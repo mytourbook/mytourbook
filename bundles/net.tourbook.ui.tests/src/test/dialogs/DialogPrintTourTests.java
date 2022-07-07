@@ -15,10 +15,22 @@
  *******************************************************************************/
 package dialogs;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import net.tourbook.common.util.FilesUtils;
+import net.tourbook.printing.Messages;
 import net.tourbook.printing.PrintTourPDF;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
+
+import utils.Utils;
 
 public class DialogPrintTourTests {
 
@@ -33,32 +45,34 @@ public class DialogPrintTourTests {
    @Test
    void testPrintTour() {
 
-//      final SWTBotTreeItem tour = Utils.getTour(bot);
-//
-//      tour.contextMenu(net.tourbook.Messages.action_print_tour).menu("PDF").click(); //$NON-NLS-1$
-//      bot.checkBox(Messages.Dialog_Print_Chk_PrintMarkers).click();
-//      bot.checkBox(Messages.Dialog_Print_Chk_PrintNotes).click();
-//
-//      final String fileName = bot.comboBox(2).getText() + ".pdf"; //$NON-NLS-1$
-//
-//      bot.comboBox(3).setText(Utils.workingDirectory);
-//      bot.button(Messages.Dialog_Print_Btn_Print).click();
-//
-//      bot.sleep(3000);
-//
-//      final Path pdfFilePath = Paths.get(Utils.workingDirectory, fileName);
-//      assertTrue(Files.exists(pdfFilePath));
-//
-//      //Kill Acrobat Reader otherwise it could make the subsequent tests fail
-//      try {
-//         Runtime.getRuntime().exec("taskkill /F /IM Acrobat.exe"); //$NON-NLS-1$
-//      } catch (final IOException e) {
-//         //ignored
-//      }
-//
-//      bot.sleep(3000);
-//
-//      FilesUtils.deleteIfExists(pdfFilePath);
-//      assertTrue(!Files.exists(pdfFilePath));
+      final SWTBotTreeItem tour = Utils.getTour(bot);
+
+      tour.contextMenu(net.tourbook.Messages.action_print_tour).menu("PDF").click(); //$NON-NLS-1$
+      bot.checkBox(Messages.Dialog_Print_Chk_PrintMarkers).click();
+      bot.checkBox(Messages.Dialog_Print_Chk_PrintNotes).click();
+
+      final String fileName = bot.comboBox(2).getText() + ".pdf"; //$NON-NLS-1$
+
+      bot.comboBox(3).setText(Utils.workingDirectory);
+      bot.button(Messages.Dialog_Print_Btn_Print).click();
+
+      bot.sleep(3000);
+
+      final Path pdfFilePath = Paths.get(Utils.workingDirectory, fileName);
+      assertTrue(Files.exists(pdfFilePath));
+
+      //Kill Acrobat Reader otherwise it could make the subsequent tests fail
+      try {
+         Runtime.getRuntime().exec("taskkill /F /IM Acrobat.exe"); //$NON-NLS-1$
+      } catch (final IOException e) {
+         //ignored
+      }
+
+      bot.sleep(3000);
+
+      FilesUtils.deleteIfExists(pdfFilePath);
+      assertTrue(!Files.exists(pdfFilePath));
+
+      Utils.showView(bot, "Tour Book");
    }
 }
