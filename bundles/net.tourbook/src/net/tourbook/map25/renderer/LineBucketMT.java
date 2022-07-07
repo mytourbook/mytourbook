@@ -212,9 +212,6 @@ public class LineBucketMT extends RenderBucketMT {
                ? 0.0001
                : 1.5 / vp2mpScale;
 
-//       System.out.println((System.currentTimeMillis() + " pixel:" + pixel + "  scale:" + scale));
-//       // TODO remove SYSTEM.OUT.PRINTLN
-
          gl.uniform1f(shader_u_fade, (float) pixel);
 
          int capMode = CAP_THIN;
@@ -259,7 +256,7 @@ public class LineBucketMT extends RenderBucketMT {
                GLUtils.setColor(shader_u_color, lineStyle.color, alpha);
             }
 
-            // set vertex color alpha
+            // set common alpha for the vertex color
             final float vertexAlpha = ((lineStyle.color >>> 24) & 0xff) / 255f;
             gl.uniform1f(shader_uVertexColorAlpha, vertexAlpha);
 
@@ -315,15 +312,15 @@ public class LineBucketMT extends RenderBucketMT {
             /*
              * Draw LineLayers references by this outline
              */
-            for (LineBucketMT ref = lineBucket.outlines; ref != null; ref = ref.outlines) {
+            for (LineBucketMT outlineBucket = lineBucket.outlines; outlineBucket != null; outlineBucket = outlineBucket.outlines) {
 
-               final LineStyle core = ref.line.current();
+               final LineStyle coreLineStyle = outlineBucket.line.current();
 
                // core width
-               if (core.fixed) {
-                  width = Math.max(core.width, 1) / vp2mpScale;
+               if (coreLineStyle.fixed) {
+                  width = Math.max(coreLineStyle.width, 1) / vp2mpScale;
                } else {
-                  width = ref.scale * core.width / variableScale;
+                  width = outlineBucket.scale * coreLineStyle.width / variableScale;
                }
 
                // add outline width
@@ -333,10 +330,9 @@ public class LineBucketMT extends RenderBucketMT {
                   width += lineBucket.scale * lineStyle.width / variableScale;
                }
 
-               gl.uniform1f(shader_u_width,
-                     (float) (width * COORD_SCALE_BY_DIR_SCALE));
+               gl.uniform1f(shader_u_width, (float) (width * COORD_SCALE_BY_DIR_SCALE));
 
-               /* Line-edge fade */
+               // line-edge fade
                if (lineStyle.blur > 0) {
                   gl.uniform1f(shader_u_fade, lineStyle.blur);
                   isBlur = true;
@@ -344,8 +340,8 @@ public class LineBucketMT extends RenderBucketMT {
                   gl.uniform1f(shader_u_fade, (float) (pixel / width));
                }
 
-               /* Cap mode */
-               if (ref._isCapRounded) {
+               // cap mode
+               if (outlineBucket._isCapRounded) {
                   if (capMode != CAP_ROUND) {
                      capMode = CAP_ROUND;
                      gl.uniform1i(shader_u_mode, capMode);
@@ -355,7 +351,7 @@ public class LineBucketMT extends RenderBucketMT {
                   gl.uniform1i(shader_u_mode, capMode);
                }
 
-               gl.drawArrays(GL.TRIANGLE_STRIP, ref.vertexOffset, ref.numVertices);
+               gl.drawArrays(GL.TRIANGLE_STRIP, outlineBucket.vertexOffset, outlineBucket.numVertices);
             }
          }
 
@@ -481,9 +477,6 @@ public class LineBucketMT extends RenderBucketMT {
       if (numPoints >= 4) {
          addLine(pixelPoints, null, numPoints, isCapClosed, pixelPointColors);
       }
-
-      System.out.println((System.currentTimeMillis() + " addLine() numPoints:" + numPoints));
-// TODO remove SYSTEM.OUT.PRINTLN
    }
 
    /**

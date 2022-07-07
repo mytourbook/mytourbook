@@ -1443,8 +1443,6 @@ public class Map25View extends ViewPart implements
 
                   colorValue = ((red & 0xFF) << 16) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 0);
 
-//                  float a = Color.aToFloat(colorValue);
-
                } else if (mapColorProvider instanceof IDiscreteColorProvider) {
 
                   // e.g. HR zone color provider

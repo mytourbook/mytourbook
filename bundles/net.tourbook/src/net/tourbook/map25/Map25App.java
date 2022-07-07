@@ -1365,9 +1365,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
          final float sunPosition = _building_Sunrise_Sunset_Time + nightAdjustment;
 
-//         System.out.println((System.currentTimeMillis() + " sun: " + sunPosition));
-         // TODO remove SYSTEM.OUT.PRINTLN
-
          final Sun sun = extrusionRenderer.getSun();
 
          sun.setProgress(sunPosition);
