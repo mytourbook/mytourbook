@@ -1437,11 +1437,11 @@ public class Map25View extends ViewPart implements
                         ColorProviderConfig.MAP2,
                         elevationSerie[serieIndex]);
 
-                  final int red = (colorValue & 0xFF) >>> 0;
-                  final int green = (colorValue & 0xFF00) >>> 8;
                   final int blue = (colorValue & 0xFF0000) >>> 16;
+                  final int green = (colorValue & 0xFF00) >>> 8;
+                  final int red = (colorValue & 0xFF) >>> 0;
 
-                  colorValue = ((red & 0xFF) << 0) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 16);
+                  colorValue = ((red & 0xFF) << 16) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 0);
 
 //                  float a = Color.aToFloat(colorValue);
 
