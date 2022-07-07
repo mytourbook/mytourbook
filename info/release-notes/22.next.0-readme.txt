@@ -40,11 +40,15 @@ Improvements
   - Set vertical position for the map tilt rotation axis    https://github.com/mytourbook/mytourbook/issues/890
   - Fixed: Track width jumped when the zoom-level changed, now it's width is always the same
 
+* Weather (Frederic)
+  - Added a drizzle weather icon          https://github.com/mytourbook/mytourbook/issues/874
+
 
 Changes
 =======
 
-* 
+* Fitlog/FitlogEx Import (Frederic)
+  - Compute the average power when power data is provided but average power value is not
 
 
 Bugfix

@@ -33,10 +33,16 @@ import utils.Comparison;
 import utils.FilesUtils;
 import utils.Initializer;
 
+/**
+ * Regression tests for the weather retrieval from OpenWeatherMap.
+ */
 public class OpenWeatherMapRetrieverTests {
 
+   private static final String OPENWEATHERMAP_BASE_URL  = WeatherUtils.HEROKU_APP_URL
+         + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt=";
+
    private static final String OPENWEATHERMAP_FILE_PATH =
-         FilesUtils.rootPath + "data/weather/openweathermap/files/"; //$NON-NLS-1$
+         FilesUtils.rootPath + "data/weather/openweathermap/files/";                                    //$NON-NLS-1$
 
    static HttpClientMock       httpClientMock;
    OpenWeatherMapRetriever     openWeatherMapRetriever;
@@ -52,27 +58,95 @@ public class OpenWeatherMapRetrieverTests {
       field.set(null, httpClientMock);
    }
 
-   /**
-    * Regression test for the weather retrieval from OpenWeatherMap.
-    */
    @Test
-   void testWeatherRetrieval() {
+   void testWeatherRetrieval_JulySecond2022() {
 
-      final String urlBase = WeatherUtils.HEROKU_APP_URL
-            + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
+      final String openWeatherMapResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
+            + "LongsPeak-Manual-OpenWeatherMapResponse-1656720000.json"); //$NON-NLS-1$
+
+      final String url = OPENWEATHERMAP_BASE_URL + "1656720000"; //$NON-NLS-1$
+      httpClientMock.onGet(url).doReturn(openWeatherMapResponse);
+
+      final TourData tour = Initializer.importTour();
+      //Tuesday, July 2, 2022 12:00:00 AM
+      tour.setTourStartTime(2022, 7, 2, 0, 0, 0);
+      //We set the current time elapsed to trigger the computation of the new end time
+      tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
+
+      openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
+
+      assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
+      httpClientMock.verify().get(url).called();
+
+// SET_FORMATTING_OFF
+
+      assertEquals("broken clouds",   tour.getWeather()); //$NON-NLS-1$
+      assertEquals("weather-drizzle", tour.getWeather_Clouds()); //$NON-NLS-1$
+      assertEquals(7.58f,             tour.getWeather_Temperature_Average());
+      assertEquals(3,                 tour.getWeather_Wind_Speed());
+      assertEquals(240,               tour.getWeather_Wind_Direction());
+      assertEquals(70,                tour.getWeather_Humidity());
+      assertEquals(0,                 tour.getWeather_Precipitation());
+      assertEquals(0,                 tour.getWeather_Snowfall());
+      assertEquals(1007,              tour.getWeather_Pressure());
+      assertEquals(14.15f,            tour.getWeather_Temperature_Max());
+      assertEquals(3.93f,             tour.getWeather_Temperature_Min());
+      assertEquals(6.33f,             tour.getWeather_Temperature_WindChill());
+
+// SET_FORMATTING_ON
+   }
+
+   @Test
+   void testWeatherRetrieval_JulySixth2022() {
+
+      final String openWeatherMapResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
+            + "LongsPeak-Manual-OpenWeatherMapResponse-1657065600.json"); //$NON-NLS-1$
+
+      final String url = OPENWEATHERMAP_BASE_URL + "1657065600"; //$NON-NLS-1$
+      httpClientMock.onGet(url).doReturn(openWeatherMapResponse);
+
+      final TourData tour = Initializer.importTour();
+      //Tuesday, July 6, 2022 12:00:00 AM
+      tour.setTourStartTime(2022, 7, 6, 0, 0, 0);
+      //We set the current time elapsed to trigger the computation of the new end time
+      tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
+
+      openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
+
+      assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
+      httpClientMock.verify().get(url).called();
+
+// SET_FORMATTING_OFF
+
+      assertEquals("overcast clouds", tour.getWeather()); //$NON-NLS-1$
+      assertEquals("weather-rain",    tour.getWeather_Clouds()); //$NON-NLS-1$
+      assertEquals(8.35f,             tour.getWeather_Temperature_Average());
+      assertEquals(3,                 tour.getWeather_Wind_Speed());
+      assertEquals(268,               tour.getWeather_Wind_Direction());
+      assertEquals(72,                tour.getWeather_Humidity());
+      assertEquals(0.42f,             tour.getWeather_Precipitation());
+      assertEquals(0,                 tour.getWeather_Snowfall());
+      assertEquals(1008,              tour.getWeather_Pressure());
+      assertEquals(14.13f,            tour.getWeather_Temperature_Max());
+      assertEquals(5.95f,             tour.getWeather_Temperature_Min());
+      assertEquals(7.66f,             tour.getWeather_Temperature_WindChill());
+
+// SET_FORMATTING_ON
+   }
+
+   @Test
+   void testWeatherRetrieval_March2022() {
 
       final String openWeatherMapResponse1 = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapResponse-1647086400.json"); //$NON-NLS-1$
 
-      final String url1 = urlBase + "1647086400"; //$NON-NLS-1$
-      httpClientMock.onGet(url1)
-            .doReturn(openWeatherMapResponse1);
+      final String url1 = OPENWEATHERMAP_BASE_URL + "1647086400"; //$NON-NLS-1$
+      httpClientMock.onGet(url1).doReturn(openWeatherMapResponse1);
 
       final String openWeatherMapResponse2 = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapResponse-1647129600.json"); //$NON-NLS-1$
-      final String url2 = urlBase + "1647129600"; //$NON-NLS-1$
-      httpClientMock.onGet(url2)
-            .doReturn(openWeatherMapResponse2);
+      final String url2 = OPENWEATHERMAP_BASE_URL + "1647129600"; //$NON-NLS-1$
+      httpClientMock.onGet(url2).doReturn(openWeatherMapResponse2);
 
       final TourData tour = Initializer.importTour();
       //Tuesday, March 12, 2022 12:00:00 PM

@@ -60,62 +60,76 @@ import org.xml.sax.helpers.DefaultHandler;
 
 public class FitLog_SAXHandler extends DefaultHandler {
 
-   private static final String                  TAG_ACTIVITY                = "Activity";        //$NON-NLS-1$
-   private static final String                  TAG_ACTIVITY_CADENCE        = "Cadence";         //$NON-NLS-1$
-   private static final String                  TAG_ACTIVITY_CALORIES       = "Calories";        //$NON-NLS-1$
-   private static final String                  TAG_ACTIVITY_CATEGORY       = "Category";        //$NON-NLS-1$
-   private static final String                  TAG_ACTIVITY_DURATION       = "Duration";        //$NON-NLS-1$
-   private static final String                  TAG_ACTIVITY_DISTANCE       = "Distance";        //$NON-NLS-1$
-   private static final String                  TAG_ACTIVITY_ELEVATION      = "Elevation";       //$NON-NLS-1$
-   private static final String                  TAG_ACTIVITY_EQUIPMENT_ITEM = "EquipmentItem";   //$NON-NLS-1$
-   private static final String                  TAG_ACTIVITY_HEART_RATE     = "HeartRate";       //$NON-NLS-1$
-   private static final String                  TAG_ACTIVITY_LOCATION       = "Location";        //$NON-NLS-1$
-   private static final String                  TAG_ACTIVITY_NAME           = "Name";            //$NON-NLS-1$
-   private static final String                  TAG_ACTIVITY_NOTES          = "Notes";           //$NON-NLS-1$
-   private static final String                  TAG_ACTIVITY_POWER          = "Power";           //$NON-NLS-1$
-   private static final String                  TAG_ACTIVITY_WEATHER        = "Weather";         //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY                           = "Activity";                           //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_CADENCE                   = "Cadence";                            //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_CALORIES                  = "Calories";                           //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_CATEGORY                  = "Category";                           //$NON-NLS-1$
+   static final String                          TAG_ACTIVITY_CUSTOM_DATA_FIELD         = "CustomDataField";                    //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_CUSTOM_DATA_FIELDS        = TAG_ACTIVITY_CUSTOM_DATA_FIELD + "s"; //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_DURATION                  = "Duration";                           //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_DISTANCE                  = "Distance";                           //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_ELEVATION                 = "Elevation";                          //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_EQUIPMENT_ITEM            = "EquipmentItem";                      //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_HAS_START_TIME            = "HasStartTime";                       //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_HEART_RATE                = "HeartRate";                          //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_LOCATION                  = "Location";                           //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_NAME                      = "Name";                               //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_NOTES                     = "Notes";                              //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_POWER                     = "Power";                              //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_TIMEZONE_UTC_OFFSET       = "TimeZoneUtcOffset";                  //$NON-NLS-1$
+   private static final String                  TAG_ACTIVITY_WEATHER                   = "Weather";                            //$NON-NLS-1$
+   static final String                          TAG_EQUIPMENT_DATE_PURCHASED           = "DatePurchased";                      //$NON-NLS-1$
+   static final String                          TAG_EQUIPMENT_EXPECTED_LIFE_KILOMETERS = "ExpectedLifeKilometers";             //$NON-NLS-1$
+   static final String                          TAG_EQUIPMENT_IN_USE                   = "InUse";                              //$NON-NLS-1$
+   static final String                          TAG_EQUIPMENT_NOTES                    = "Notes";                              //$NON-NLS-1$
+   static final String                          TAG_EQUIPMENT_PURCHASE_LOCATION        = "PurchaseLocation";                   //$NON-NLS-1$
+   static final String                          TAG_EQUIPMENT_PURCHASE_PRICE           = "PurchasePrice";                      //$NON-NLS-1$
+   static final String                          TAG_EQUIPMENT_TYPE                     = "Type";                               //$NON-NLS-1$
+   static final String                          TAG_EQUIPMENT_WEIGHT_KILOGRAMS         = "WeightKilograms";                    //$NON-NLS-1$
 
-   private static final String                  ATTRIB_DURATION_SECONDS     = "DurationSeconds"; //$NON-NLS-1$
-   static final String                          ATTRIB_EQUIPMENT_ID         = "Id";              //$NON-NLS-1$
-   private static final String                  ATTRIB_NAME                 = "Name";            //$NON-NLS-1$
-   private static final String                  ATTRIB_START_TIME           = "StartTime";       //$NON-NLS-1$
-   private static final String                  ATTRIB_END_TIME             = "EndTime";         //$NON-NLS-1$
-   private static final String                  ATTRIB_TOTAL_SECONDS        = "TotalSeconds";    //$NON-NLS-1$
-   private static final String                  ATTRIB_TOTAL_METERS         = "TotalMeters";     //$NON-NLS-1$
-   private static final String                  ATTRIB_TOTAL_CAL            = "TotalCal";        //$NON-NLS-1$
-   private static final String                  ATTRIB_ASCEND_METERS        = "AscendMeters";    //$NON-NLS-1$
-   private static final String                  ATTRIB_DESCEND_METERS       = "DescendMeters";   //$NON-NLS-1$
-   private static final String                  ATTRIB_AVERAGE_BPM          = "AverageBPM";      //$NON-NLS-1$
-   private static final String                  ATTRIB_MAXIMUM_BPM          = "MaximumBPM";      //$NON-NLS-1$
-   private static final String                  ATTRIB_AVERAGE_WATTS        = "AverageWatts";    //$NON-NLS-1$
-   private static final String                  ATTRIB_MAXIMUM_WATTS        = "MaximumWatts";    //$NON-NLS-1$
-   private static final String                  ATTRIB_AVERAGE_RPM          = "AverageRPM";      //$NON-NLS-1$
-   private static final String                  ATTRIB_WEATHER_TEMP         = "Temp";            //$NON-NLS-1$
-   private static final String                  ATTRIB_WEATHER_CONDITIONS   = "Conditions";      //$NON-NLS-1$
+   private static final String                  ATTRIB_CUSTOM_DATA_FIELD_NAME          = "name";                               //$NON-NLS-1$
+   private static final String                  ATTRIB_CUSTOM_DATA_FIELD_VALUE         = "v";                                  //$NON-NLS-1$
+   private static final String                  ATTRIB_DURATION_SECONDS                = "DurationSeconds";                    //$NON-NLS-1$
+   static final String                          ATTRIB_EQUIPMENT_ID                    = "Id";                                 //$NON-NLS-1$
+   private static final String                  ATTRIB_NAME                            = "Name";                               //$NON-NLS-1$
+   private static final String                  ATTRIB_START_TIME                      = "StartTime";                          //$NON-NLS-1$
+   private static final String                  ATTRIB_END_TIME                        = "EndTime";                            //$NON-NLS-1$
+   private static final String                  ATTRIB_TOTAL_SECONDS                   = "TotalSeconds";                       //$NON-NLS-1$
+   private static final String                  ATTRIB_TOTAL_METERS                    = "TotalMeters";                        //$NON-NLS-1$
+   private static final String                  ATTRIB_TOTAL_CAL                       = "TotalCal";                           //$NON-NLS-1$
+   private static final String                  ATTRIB_ASCEND_METERS                   = "AscendMeters";                       //$NON-NLS-1$
+   private static final String                  ATTRIB_DESCEND_METERS                  = "DescendMeters";                      //$NON-NLS-1$
+   private static final String                  ATTRIB_AVERAGE_BPM                     = "AverageBPM";                         //$NON-NLS-1$
+   private static final String                  ATTRIB_MAXIMUM_BPM                     = "MaximumBPM";                         //$NON-NLS-1$
+   private static final String                  ATTRIB_AVERAGE_WATTS                   = "AverageWatts";                       //$NON-NLS-1$
+   private static final String                  ATTRIB_MAXIMUM_WATTS                   = "MaximumWatts";                       //$NON-NLS-1$
+   private static final String                  ATTRIB_AVERAGE_RPM                     = "AverageRPM";                         //$NON-NLS-1$
+   private static final String                  ATTRIB_WEATHER_TEMP                    = "Temp";                               //$NON-NLS-1$
+   private static final String                  ATTRIB_WEATHER_CONDITIONS              = "Conditions";                         //$NON-NLS-1$
    //
-   private static final String                  TAG_TRACK                   = "Track";           //$NON-NLS-1$
-   private static final String                  TAG_TRACK_PT                = "pt";              //$NON-NLS-1$
-   private static final String                  ATTRIB_PT_CADENCE           = "cadence";         //$NON-NLS-1$
-   private static final String                  ATTRIB_PT_DIST              = "dist";            //$NON-NLS-1$
-   private static final String                  ATTRIB_PT_ELE               = "ele";             //$NON-NLS-1$
-   private static final String                  ATTRIB_PT_HR                = "hr";              //$NON-NLS-1$
-   private static final String                  ATTRIB_PT_LAT               = "lat";             //$NON-NLS-1$
-   private static final String                  ATTRIB_PT_LON               = "lon";             //$NON-NLS-1$
-   private static final String                  ATTRIB_PT_POWER             = "power";           //$NON-NLS-1$
-   private static final String                  ATTRIB_PT_TEMP              = "temp";            //$NON-NLS-1$
-   private static final String                  ATTRIB_PT_TM                = "tm";              //$NON-NLS-1$
+   private static final String                  TAG_TRACK                              = "Track";                              //$NON-NLS-1$
+   private static final String                  TAG_TRACK_PT                           = "pt";                                 //$NON-NLS-1$
+   private static final String                  ATTRIB_PT_CADENCE                      = "cadence";                            //$NON-NLS-1$
+   private static final String                  ATTRIB_PT_DIST                         = "dist";                               //$NON-NLS-1$
+   private static final String                  ATTRIB_PT_ELE                          = "ele";                                //$NON-NLS-1$
+   private static final String                  ATTRIB_PT_HR                           = "hr";                                 //$NON-NLS-1$
+   private static final String                  ATTRIB_PT_LAT                          = "lat";                                //$NON-NLS-1$
+   private static final String                  ATTRIB_PT_LON                          = "lon";                                //$NON-NLS-1$
+   private static final String                  ATTRIB_PT_POWER                        = "power";                              //$NON-NLS-1$
+   private static final String                  ATTRIB_PT_TEMP                         = "temp";                               //$NON-NLS-1$
+   private static final String                  ATTRIB_PT_TM                           = "tm";                                 //$NON-NLS-1$
    //
-   private static final String                  TAG_LAPS                    = "Laps";            //$NON-NLS-1$
-   private static final String                  TAG_LAP                     = "Lap";             //$NON-NLS-1$
-   private static final String                  TAG_TRACK_CLOCK             = "TrackClock";      //$NON-NLS-1$
-   private static final String                  TAG_PAUSE                   = "Pause";           //$NON-NLS-1$
+   private static final String                  TAG_LAPS                               = "Laps";                               //$NON-NLS-1$
+   private static final String                  TAG_LAP                                = "Lap";                                //$NON-NLS-1$
+   private static final String                  TAG_TRACK_CLOCK                        = "TrackClock";                         //$NON-NLS-1$
+   private static final String                  TAG_PAUSE                              = "Pause";                              //$NON-NLS-1$
 
-   private static final String                  SUB_ATTRIB_WIND_SPEED       = "Wind Speed:";     //$NON-NLS-1$
+   private static final String                  SUB_ATTRIB_WIND_SPEED                  = "Wind Speed:";                        //$NON-NLS-1$
    //
-   private static final char                    NL                          = UI.NEW_LINE;
-   private static final String                  COLON_SPACE                 = ": ";              //$NON-NLS-1$
+   private static final char                    NL                                     = UI.NEW_LINE;
+   private static final String                  COLON_SPACE                            = ": ";                                 //$NON-NLS-1$
 
-   private static final HashMap<String, String> _weatherId                  = new HashMap<>();
+   private static final HashMap<String, String> _weatherId                             = new HashMap<>();
    static {
 
       /*
@@ -127,10 +141,10 @@ public class FitLog_SAXHandler extends DefaultHandler {
       _weatherId.put("Clear",          IWeather.WEATHER_ID_CLEAR); //                     //$NON-NLS-1$
       _weatherId.put("ScatterClouds",  IWeather.WEATHER_ID_PART_CLOUDS); //         *)    //$NON-NLS-1$
       _weatherId.put("PartClouds",     IWeather.WEATHER_ID_PART_CLOUDS); //               //$NON-NLS-1$
-      _weatherId.put("Overcast",       IWeather.WEATHER_ID_OVERCAST); //                  //$NON-NLS-1$
+      _weatherId.put("Overcast",       IWeather.WEATHER_ID_OVERCAST); //            *)    //$NON-NLS-1$
       _weatherId.put("MostClouds",     IWeather.WEATHER_ID_OVERCAST); //            *)    //$NON-NLS-1$
-      _weatherId.put("Clouds",         IWeather.WEATHER_ID_OVERCAST); //            *)    //$NON-NLS-1$
-      _weatherId.put("ChanceRain",     IWeather.WEATHER_ID_SCATTERED_SHOWERS); //   *)    //$NON-NLS-1$
+      _weatherId.put("Clouds",         IWeather.WEATHER_ID_OVERCAST); //                  //$NON-NLS-1$
+      _weatherId.put("ChanceRain",     IWeather.WEATHER_ID_DRIZZLE); //                   //$NON-NLS-1$
       _weatherId.put("LightDrizzle",   IWeather.WEATHER_ID_SCATTERED_SHOWERS); //   *)    //$NON-NLS-1$
       _weatherId.put("LightRain",      IWeather.WEATHER_ID_SCATTERED_SHOWERS); //         //$NON-NLS-1$
       _weatherId.put("Rain",           IWeather.WEATHER_ID_RAIN); //                      //$NON-NLS-1$
@@ -251,29 +265,29 @@ public class FitLog_SAXHandler extends DefaultHandler {
 // SET_FORMATTING_OFF
 
          if (StringUtils.hasContent(DatePurchased)) {
-            notes.append(NL + FitLogEx_SAXHandler.TAG_EQUIPMENT_DATE_PURCHASED           + COLON_SPACE + DatePurchased);
+            notes.append(NL + TAG_EQUIPMENT_DATE_PURCHASED           + COLON_SPACE + DatePurchased);
          }
          if (StringUtils.hasContent(ExpectedLifeKilometers)) {
-            notes.append(NL + FitLogEx_SAXHandler.TAG_EQUIPMENT_EXPECTED_LIFE_KILOMETERS + COLON_SPACE + ExpectedLifeKilometers);
+            notes.append(NL + TAG_EQUIPMENT_EXPECTED_LIFE_KILOMETERS + COLON_SPACE + ExpectedLifeKilometers);
          }
          if (StringUtils.hasContent(InUse)) {
-            notes.append(NL + FitLogEx_SAXHandler.TAG_EQUIPMENT_IN_USE                   + COLON_SPACE + InUse);
+            notes.append(NL + TAG_EQUIPMENT_IN_USE                   + COLON_SPACE + InUse);
          }
          if (StringUtils.hasContent(PurchaseLocation)) {
-            notes.append(NL + FitLogEx_SAXHandler.TAG_EQUIPMENT_PURCHASE_LOCATION        + COLON_SPACE + PurchaseLocation);
+            notes.append(NL + TAG_EQUIPMENT_PURCHASE_LOCATION        + COLON_SPACE + PurchaseLocation);
          }
          if (StringUtils.hasContent(PurchasePrice)) {
-            notes.append(NL + FitLogEx_SAXHandler.TAG_EQUIPMENT_PURCHASE_PRICE           + COLON_SPACE + PurchasePrice);
+            notes.append(NL + TAG_EQUIPMENT_PURCHASE_PRICE           + COLON_SPACE + PurchasePrice);
          }
          if (StringUtils.hasContent(Type)) {
-            notes.append(NL + FitLogEx_SAXHandler.TAG_EQUIPMENT_TYPE                     + COLON_SPACE + Type);
+            notes.append(NL + TAG_EQUIPMENT_TYPE                     + COLON_SPACE + Type);
          }
          if (StringUtils.hasContent(WeightKilograms)
                && !WeightKilograms.equals("0.000")) { //$NON-NLS-1$
-            notes.append(NL + FitLogEx_SAXHandler.TAG_EQUIPMENT_WEIGHT_KILOGRAMS         + COLON_SPACE + WeightKilograms);
+            notes.append(NL + TAG_EQUIPMENT_WEIGHT_KILOGRAMS         + COLON_SPACE + WeightKilograms);
          }
          if (StringUtils.hasContent(Notes)) {
-            notes.append(NL + FitLogEx_SAXHandler.TAG_EQUIPMENT_NOTES                    + COLON_SPACE + Notes);
+            notes.append(NL + TAG_EQUIPMENT_NOTES                    + COLON_SPACE + Notes);
          }
 
 // SET_FORMATTING_ON
@@ -665,7 +679,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
 
          _isInPauses = false;
 
-      } else if (name.equals(FitLogEx_SAXHandler.TAG_ACTIVITY_CUSTOM_DATA_FIELDS)) {
+      } else if (name.equals(TAG_ACTIVITY_CUSTOM_DATA_FIELDS)) {
 
          _isInCustomDataFields = false;
 
@@ -687,6 +701,11 @@ public class FitLog_SAXHandler extends DefaultHandler {
 
       if (_currentActivity.avgPower != 0) {
          tourData.setPower_Avg(_currentActivity.avgPower);
+      } else {
+         final float[] powerSerie = tourData.getPowerSerie();
+         if (powerSerie != null) {
+            tourData.setPower_Avg(tourData.computeAvg_FromValues(powerSerie, 0, powerSerie.length - 1));
+         }
       }
       if (_currentActivity.maxPower != 0) {
          tourData.setPower_Max((int) (_currentActivity.maxPower + 0.5));
@@ -986,10 +1005,10 @@ public class FitLog_SAXHandler extends DefaultHandler {
          _currentActivity.avgPower = Util.parseFloat0(attributes, ATTRIB_AVERAGE_WATTS);
          _currentActivity.maxPower = Util.parseFloat0(attributes, ATTRIB_MAXIMUM_WATTS);
          break;
-      case FitLogEx_SAXHandler.TAG_ACTIVITY_TIMEZONE_UTC_OFFSET:
+      case TAG_ACTIVITY_TIMEZONE_UTC_OFFSET:
          _isInTimeZoneUtcOffset = true;
          break;
-      case FitLogEx_SAXHandler.TAG_ACTIVITY_HAS_START_TIME:
+      case TAG_ACTIVITY_HAS_START_TIME:
          _isInHasStartTime = true;
          break;
       case TAG_ACTIVITY_CADENCE:
@@ -1075,10 +1094,10 @@ public class FitLog_SAXHandler extends DefaultHandler {
 
    private void parseCustomDataFields(final String name, final Attributes attributes) {
 
-      if (name.equals(FitLogEx_SAXHandler.TAG_ACTIVITY_CUSTOM_DATA_FIELD)) {
+      if (name.equals(TAG_ACTIVITY_CUSTOM_DATA_FIELD)) {
 
-         final String customFieldName = attributes.getValue(FitLogEx_SAXHandler.ATTRIB_CUSTOM_DATA_FIELD_NAME);
-         final String customFieldValue = attributes.getValue(FitLogEx_SAXHandler.ATTRIB_CUSTOM_DATA_FIELD_VALUE);
+         final String customFieldName = attributes.getValue(ATTRIB_CUSTOM_DATA_FIELD_NAME);
+         final String customFieldValue = attributes.getValue(ATTRIB_CUSTOM_DATA_FIELD_VALUE);
 
          final boolean isCustomDataFieldValid = StringUtils.hasContent(customFieldName) &&
                StringUtils.hasContent(customFieldValue);
@@ -1279,7 +1298,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
          _isInActivity = true;
 
          initTour(attributes);
-      } else if (name.equals(FitLogEx_SAXHandler.TAG_ACTIVITY_CUSTOM_DATA_FIELDS)) {
+      } else if (name.equals(TAG_ACTIVITY_CUSTOM_DATA_FIELDS)) {
          _isInCustomDataFields = true;
 
       }

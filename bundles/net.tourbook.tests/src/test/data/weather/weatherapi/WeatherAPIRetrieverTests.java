@@ -33,6 +33,9 @@ import utils.Comparison;
 import utils.FilesUtils;
 import utils.Initializer;
 
+/**
+ * Regression tests for the weather retrieval from WeatherAPI.
+ */
 public class WeatherAPIRetrieverTests {
 
    private static final String WEATHERAPI_FILE_PATH =
@@ -52,14 +55,49 @@ public class WeatherAPIRetrieverTests {
       field.set(null, httpClientMock);
    }
 
-   /**
-    * Regression test for the weather retrieval from WeatherAPI.
-    */
    @Test
-   void testWeatherRetrieval() {
+   void testWeatherRetrieval_July2022() {
 
       final String weatherApiResponse = Comparison.readFileContent(WEATHERAPI_FILE_PATH
-            + "LongsPeak-Manual-WeatherApiResponse.json"); //$NON-NLS-1$
+            + "LongsPeak-Manual-WeatherApiResponse-July2022.json"); //$NON-NLS-1$
+      final String url = WeatherUtils.HEROKU_APP_URL
+            + "/weatherapi?lat=40.263996&lon=-105.58854099999999&lang=en&dt=2022-07-02"; //$NON-NLS-1$
+      httpClientMock.onGet(url)
+            .doReturn(weatherApiResponse);
+
+      final TourData tour = Initializer.importTour();
+      //Tuesday, July 02, 2022 12:00:00 PM
+      tour.setTourStartTime(2022, 7, 2, 12, 0, 0);
+      //We set the current time elapsed to trigger the computation of the new end time
+      tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
+
+      weatherApiRetriever = new WeatherApiRetriever(tour);
+
+      assertTrue(weatherApiRetriever.retrieveHistoricalWeatherData());
+      httpClientMock.verify().get(url).called();
+
+// SET_FORMATTING_OFF
+
+      assertEquals(16.6f,                         tour.getWeather_Temperature_Average());
+      assertEquals(3,                             tour.getWeather_Wind_Speed());
+      assertEquals(171,                           tour.getWeather_Wind_Direction());
+      assertEquals("Thundery outbreaks possible", tour.getWeather()); //$NON-NLS-1$
+      assertEquals("weather-drizzle",             tour.getWeather_Clouds()); //$NON-NLS-1$
+      assertEquals(51,                            tour.getWeather_Humidity());
+      assertEquals(6.13f,                         tour.getWeather_Precipitation());
+      assertEquals(1016.0,                        tour.getWeather_Pressure());
+      assertEquals(22.0f,                         tour.getWeather_Temperature_Max());
+      assertEquals(7.6f,                          tour.getWeather_Temperature_Min());
+      assertEquals(16.22f,                        tour.getWeather_Temperature_WindChill());
+
+// SET_FORMATTING_ON
+   }
+
+   @Test
+   void testWeatherRetrieval_May2022() {
+
+      final String weatherApiResponse = Comparison.readFileContent(WEATHERAPI_FILE_PATH
+            + "LongsPeak-Manual-WeatherApiResponse-May2022.json"); //$NON-NLS-1$
       final String url = WeatherUtils.HEROKU_APP_URL
             + "/weatherapi?lat=40.263996&lon=-105.58854099999999&lang=en&dt=2022-05-10"; //$NON-NLS-1$
       httpClientMock.onGet(url)
