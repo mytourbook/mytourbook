@@ -45,11 +45,11 @@ public class DialogPrintTourTests {
 
       final SWTBotTreeItem tour = Utils.getTour(bot);
 
-      tour.contextMenu(net.tourbook.Messages.action_print_tour).menu("PDF").click();
+      tour.contextMenu(net.tourbook.Messages.action_print_tour).menu("PDF").click(); //$NON-NLS-1$
       bot.checkBox(Messages.Dialog_Print_Chk_PrintMarkers).click();
       bot.checkBox(Messages.Dialog_Print_Chk_PrintNotes).click();
 
-      final String fileName = bot.comboBox(2).getText() + ".pdf";
+      final String fileName = bot.comboBox(2).getText() + ".pdf"; //$NON-NLS-1$
       bot.comboBox(3).setText(Utils.workingDirectory);
       bot.button(Messages.Dialog_Print_Btn_Print).click();
 
