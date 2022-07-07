@@ -58,12 +58,12 @@ public class VertexDataMT extends Inlist.List<Chunk> {
    private int               _numUsedChunkVertices = SIZE;
    private int               _numUsedChunkColors   = SIZE / 4;
 
-   private short[]           _vertices;
+   private short[]           _currentChunk_Vertices;
 
    /**
     * There are 3 color componentsfor 4 chunks
     */
-   private byte[]            _colors;
+   private byte[]            _currentChunk_Colors;
 
    public static class Chunk extends Inlist<Chunk> {
 
@@ -104,19 +104,19 @@ public class VertexDataMT extends Inlist.List<Chunk> {
       /*
        * Set vertices
        */
-      _vertices[_numUsedChunkVertices + 0] = a;
-      _vertices[_numUsedChunkVertices + 1] = b;
-      _vertices[_numUsedChunkVertices + 2] = c;
-      _vertices[_numUsedChunkVertices + 3] = d;
+      _currentChunk_Vertices[_numUsedChunkVertices + 0] = a;
+      _currentChunk_Vertices[_numUsedChunkVertices + 1] = b;
+      _currentChunk_Vertices[_numUsedChunkVertices + 2] = c;
+      _currentChunk_Vertices[_numUsedChunkVertices + 3] = d;
 
       _numUsedChunkVertices += 4;
 
       /*
        * Set color components rgb
        */
-      _colors[_numUsedChunkColors + 0] = (byte) ((color >>> 16) & 0xff); // red
-      _colors[_numUsedChunkColors + 1] = (byte) ((color >>> 8) & 0xff); // green
-      _colors[_numUsedChunkColors + 2] = (byte) ((color >>> 0) & 0xff); // blue
+      _currentChunk_Colors[_numUsedChunkColors + 0] = (byte) ((color >>> 16) & 0xff); // red
+      _currentChunk_Colors[_numUsedChunkColors + 1] = (byte) ((color >>> 8) & 0xff); // green
+      _currentChunk_Colors[_numUsedChunkColors + 2] = (byte) ((color >>> 0) & 0xff); // blue
 
       _numUsedChunkColors += 3;
    }
@@ -139,12 +139,12 @@ public class VertexDataMT extends Inlist.List<Chunk> {
          getNext();
       }
 
-      _vertices[_numUsedChunkVertices + 0] = a;
-      _vertices[_numUsedChunkVertices + 1] = b;
-      _vertices[_numUsedChunkVertices + 2] = c;
-      _vertices[_numUsedChunkVertices + 3] = d;
-      _vertices[_numUsedChunkVertices + 4] = e;
-      _vertices[_numUsedChunkVertices + 5] = f;
+      _currentChunk_Vertices[_numUsedChunkVertices + 0] = a;
+      _currentChunk_Vertices[_numUsedChunkVertices + 1] = b;
+      _currentChunk_Vertices[_numUsedChunkVertices + 2] = c;
+      _currentChunk_Vertices[_numUsedChunkVertices + 3] = d;
+      _currentChunk_Vertices[_numUsedChunkVertices + 4] = e;
+      _currentChunk_Vertices[_numUsedChunkVertices + 5] = f;
 
       _numUsedChunkVertices += 6;
    }
@@ -162,8 +162,8 @@ public class VertexDataMT extends Inlist.List<Chunk> {
       _numUsedChunkVertices = SIZE; // set SIZE to get new item on add
 
       _currentChunk = null;
-      _vertices = null;
-      _colors = null;
+      _currentChunk_Vertices = null;
+      _currentChunk_Colors = null;
 
       return super.clear();
    }
@@ -208,8 +208,8 @@ public class VertexDataMT extends Inlist.List<Chunk> {
       _numUsedChunkVertices = SIZE; // set SIZE to get new item on add
 
       _currentChunk = null;
-      _vertices = null;
-      _colors = null;
+      _currentChunk_Vertices = null;
+      _currentChunk_Colors = null;
    }
 
    public boolean empty() {
@@ -231,12 +231,14 @@ public class VertexDataMT extends Inlist.List<Chunk> {
          }
 
          _currentChunk._numChunkUsedVertices = SIZE;
+         _currentChunk._numChunkUsedColors = _numUsedChunkColors;
+
          _currentChunk.next = pool.get();
          _currentChunk = _currentChunk.next;
       }
 
-      _vertices = _currentChunk._chunkVertices;
-      _colors = _currentChunk._chunkColors;
+      _currentChunk_Vertices = _currentChunk._chunkVertices;
+      _currentChunk_Colors = _currentChunk._chunkColors;
 
       _numUsedChunkVertices = 0;
       _numUsedChunkColors = 0;

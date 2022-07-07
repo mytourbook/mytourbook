@@ -115,13 +115,13 @@ public class LineBucketMT extends RenderBucketMT {
        * @param renderBucket
        * @param viewport
        * @param vp2mpScale
-       * @param buckets
+       * @param renderBucketsAll
        * @return
        */
       public static RenderBucketMT draw(RenderBucketMT renderBucket,
                                         final GLViewport viewport,
                                         final float vp2mpScale,
-                                        final RenderBucketsAllMT buckets) {
+                                        final RenderBucketsAllMT renderBucketsAll) {
 
          final MapPosition mapPosition = viewport.pos;
 
@@ -156,7 +156,9 @@ public class LineBucketMT extends RenderBucketMT {
             GLState.bindTex2D(_textureID);
          }
 
+         final int shader_a_pos = shader.shader_a_pos;
          final int shader_aVertexColor = shader.shader_aVertexColor;
+         final int shader_uVertexColorAlpha = shader.shader_uVertexColorAlpha;
 
          final int shader_u_fade = shader.shader_u_fade;
          final int shader_u_mode = shader.shader_u_mode;
@@ -166,24 +168,27 @@ public class LineBucketMT extends RenderBucketMT {
 
          gl.vertexAttribPointer(
 
-               shader.shader_a_pos, //    index of the vertex attribute that is to be modified
-               4, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
-               GL.SHORT, //               data type of each component in the array
-               false, //                  values should be normalized
-               0, //                      offset in bytes between the beginning of consecutive vertex attributes
-               buckets.offset[LINE] //    offset in bytes of the first component in the vertex attribute array
+               shader_a_pos, //                    index of the vertex attribute that is to be modified
+               4, //                               number of components per vertex attribute, must be 1, 2, 3, or 4
+               GL.SHORT, //                        data type of each component in the array
+               false, //                           values should be normalized
+               0, //                               offset in bytes between the beginning of consecutive vertex attributes
+               renderBucketsAll.offset[LINE] //    offset in bytes of the first component in the vertex attribute array
          );
 
-         gl.bindBuffer(GL.ARRAY_BUFFER, buckets.vertexColorId);
+         /*
+          * Set vertex color
+          */
+         gl.bindBuffer(GL.ARRAY_BUFFER, renderBucketsAll.vertexColorId);
          gl.enableVertexAttribArray(shader_aVertexColor);
          gl.vertexAttribPointer(
 
-               shader_aVertexColor, //   index of the vertex attribute that is to be modified
-               3, //                            number of components per vertex attribute, must be 1, 2, 3, or 4
-               GL.UNSIGNED_BYTE, //             data type of each component in the array
-               false, //                        values should be normalized
-               0, //                            offset in bytes between the beginning of consecutive vertex attributes
-               0 //                             offset in bytes of the first component in the vertex attribute array
+               shader_aVertexColor, //    index of the vertex attribute that is to be modified
+               3, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
+               GL.UNSIGNED_BYTE, //       data type of each component in the array
+               false, //                  values should be normalized
+               0, //                      offset in bytes between the beginning of consecutive vertex attributes
+               0 //                       offset in bytes of the first component in the vertex attribute array
          );
 
          viewport.mvp.setAsUniform(shader.shader_u_mvp);
@@ -253,6 +258,10 @@ public class LineBucketMT extends RenderBucketMT {
                final float alpha = (float) (vp2mpScale > 1.2 ? vp2mpScale : 1.2) - 1;
                GLUtils.setColor(shader_u_color, lineStyle.color, alpha);
             }
+
+            // set vertex color alpha
+            final float vertexAlpha = ((lineStyle.color >>> 24) & 0xff) / 255f;
+            gl.uniform1f(shader_uVertexColorAlpha, vertexAlpha);
 
             if (shaderMode == SHADER_PROJECTED && isBlur && lineStyle.blur == 0) {
                gl.uniform1f(shader_u_fade, (float) pixel);
@@ -403,7 +412,9 @@ public class LineBucketMT extends RenderBucketMT {
             shader_u_mode,
 
             shader_u_width,
-            shader_u_height
+            shader_u_height,
+
+            shader_uVertexColorAlpha
 
       ;
 
@@ -424,6 +435,8 @@ public class LineBucketMT extends RenderBucketMT {
 
          shader_u_width = getUniform("u_width");
          shader_u_height = getUniform("u_height");
+
+         shader_uVertexColorAlpha = getUniform("uVertexColorAlpha");
       }
 
       @Override

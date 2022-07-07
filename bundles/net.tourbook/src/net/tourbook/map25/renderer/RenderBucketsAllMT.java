@@ -359,6 +359,9 @@ public class RenderBucketsAllMT extends TileData {
       gl.bindBuffer(GL.ARRAY_BUFFER, vertexColorId);
       gl.bufferData(GL.ARRAY_BUFFER, vertexColorSize, _vertexColorBuffer.flip(), GL.STATIC_DRAW);
 
+      System.out.println((System.currentTimeMillis() + " vertexColorSize: " + vertexColorSize));
+      // TODO remove SYSTEM.OUT.PRINTLN
+
       return true;
    }
 
