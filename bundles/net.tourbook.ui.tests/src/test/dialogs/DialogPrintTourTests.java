@@ -50,6 +50,7 @@ public class DialogPrintTourTests {
       bot.checkBox(Messages.Dialog_Print_Chk_PrintNotes).click();
 
       final String fileName = bot.comboBox(2).getText() + ".pdf"; //$NON-NLS-1$
+
       bot.comboBox(3).setText(Utils.workingDirectory);
       bot.button(Messages.Dialog_Print_Btn_Print).click();
 
