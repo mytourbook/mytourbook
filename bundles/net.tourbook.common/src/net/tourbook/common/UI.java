@@ -2431,6 +2431,7 @@ public class UI {
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_OVERCAST,               CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Clouds));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_LIGHTNING,              CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Lightning));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_RAIN,                   CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Rain));
+      IMAGE_REGISTRY.put(IWeather.WEATHER_ID_DRIZZLE,                CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Drizzle));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SNOW,                   CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Snow));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SCATTERED_SHOWERS,      CommonActivator.getThemedImageDescriptor(CommonImages.Weather_ScatteredShowers));
       IMAGE_REGISTRY.put(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,   CommonActivator.getThemedImageDescriptor(CommonImages.Weather_Severe));

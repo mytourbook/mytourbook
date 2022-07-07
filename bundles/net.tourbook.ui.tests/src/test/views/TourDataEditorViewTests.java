@@ -18,10 +18,14 @@ package views;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.time.Instant;
+import java.util.Date;
+
 import net.tourbook.Messages;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotDateTime;
 import org.junit.jupiter.api.Test;
 
 import utils.Utils;
@@ -47,6 +51,12 @@ public class TourDataEditorViewTests {
       final SWTBotCombo titleCombo = bot.comboBox(newTourTitle);
       assertNotNull(titleCombo);
       assertEquals(newTourTitle, titleCombo.getText());
+
+      final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.tour_editor_label_tour_date);
+      tourDateTime.setDate(Date.from(Instant.now()));
+      assertNotNull(tourDateTime);
+
+      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click();
    }
 
    @Test

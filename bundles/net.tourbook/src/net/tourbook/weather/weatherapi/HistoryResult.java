@@ -266,11 +266,8 @@ public class HistoryResult {
          weatherType = IWeather.WEATHER_ID_RAIN;
          break;
       case 1066:
-      case 1072:
       case 1114:
       case 1117:
-      case 1168:
-      case 1171:
       case 1210:
       case 1213:
       case 1216:
@@ -288,8 +285,6 @@ public class HistoryResult {
          break;
       case 1063:
       case 1069:
-      case 1150:
-      case 1153:
       case 1180:
       case 1183:
       case 1186:
@@ -301,6 +296,13 @@ public class HistoryResult {
       case 1249:
       case 1273:
          weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
+         break;
+      case 1072:
+      case 1150:
+      case 1153:
+      case 1168:
+      case 1171:
+         weatherType = IWeather.WEATHER_ID_DRIZZLE;
          break;
       default:
          weatherType = IWeather.cloudIsNotDefined;
