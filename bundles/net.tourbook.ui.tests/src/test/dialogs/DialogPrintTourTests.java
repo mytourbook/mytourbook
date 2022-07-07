@@ -17,6 +17,7 @@ package dialogs;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -56,5 +57,12 @@ public class DialogPrintTourTests {
 
       final Path pdfFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(pdfFilePath));
+
+      //Kill Acrobat Reader otherwise it could make the subsequent tests fail
+      try {
+         Runtime.getRuntime().exec("taskkill /F /IM AcroRd32.exe"); //$NON-NLS-1$
+      } catch (final IOException e) {
+         //ignored
+      }
    }
 }
