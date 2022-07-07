@@ -324,6 +324,23 @@ public class RenderBucketsAllMT extends TileData {
          return false;
       }
 
+      /**
+       * Load vertex color into the GPU
+       * <p>
+       * VERY IMPORTANT
+       * <p>
+       * BUFFER MUST BE BINDED BEFORE VBO/IBO otherwise the map is mostly covered with the vertex
+       * color !!!
+       */
+      if (vertexColorId == Integer.MIN_VALUE) {
+
+         // create buffer id
+         vertexColorId = gl.genBuffer();
+      }
+
+      gl.bindBuffer(GL.ARRAY_BUFFER, vertexColorId);
+      gl.bufferData(GL.ARRAY_BUFFER, vertexColorSize, _vertexColorBuffer.flip(), GL.STATIC_DRAW);
+
       /*
        * VBO
        */
@@ -346,21 +363,6 @@ public class RenderBucketsAllMT extends TileData {
          // Set IBO data to READ mode
          ibo_BufferObject.loadBufferData(iboBuffer.flip(), iboSize * SHORT_BYTES);
       }
-
-      /*
-       * Load vertex color into the GPU
-       */
-      if (vertexColorId == Integer.MIN_VALUE) {
-
-         // create buffer id
-         vertexColorId = gl.genBuffer();
-      }
-
-      gl.bindBuffer(GL.ARRAY_BUFFER, vertexColorId);
-      gl.bufferData(GL.ARRAY_BUFFER, vertexColorSize, _vertexColorBuffer.flip(), GL.STATIC_DRAW);
-
-      System.out.println((System.currentTimeMillis() + " vertexColorSize: " + vertexColorSize));
-      // TODO remove SYSTEM.OUT.PRINTLN
 
       return true;
    }
