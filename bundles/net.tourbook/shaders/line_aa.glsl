@@ -16,14 +16,19 @@ attribute vec4 a_pos;
 attribute vec3 aVertexColor;
 
 // common alpha for the vertex color
-uniform float   uVertexColorAlpha;
+uniform float     uVertexColorAlpha;
+
+// Factor to multiply the color when painting the ourline
+// outline  < 1
+// coreline = 1.0
+uniform float     uOutlineDarkness;
 
 // z axis, line is above/below ground
-uniform float u_height;
+uniform float     u_height;
 
 // fragment values
-varying vec2    v_st;
-varying vec4    vFragmentColor;
+varying vec2      v_st;
+varying vec4      vFragmentColor;
 
 
 void main() {
@@ -38,7 +43,7 @@ void main() {
     v_st = abs(mod(dir, 4.0)) - 1.0;
     
     // transfer colors to the fragment shader - rgb 0...255 -> 0...1
-    vFragmentColor = vec4(aVertexColor / 255.0, uVertexColorAlpha);
+    vFragmentColor = vec4(aVertexColor / 255.0 * uOutlineDarkness, uVertexColorAlpha);
 }
 
 $$
@@ -47,9 +52,9 @@ $$
 precision highp float;
 #endif
 
-uniform sampler2D   u_tex;
-uniform float       u_fade;
-uniform int       u_mode;
+uniform sampler2D  u_tex;
+uniform float      u_fade;
+uniform int        u_mode;
 uniform vec4       u_color;
 
 varying vec2       v_st;

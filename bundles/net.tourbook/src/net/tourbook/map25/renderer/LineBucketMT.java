@@ -20,7 +20,6 @@ package net.tourbook.map25.renderer;
 import static org.oscim.backend.GLAdapter.gl;
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
-import net.tourbook.common.UI;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 
 import org.oscim.backend.GL;
@@ -46,8 +45,6 @@ import org.slf4j.LoggerFactory;
 public class LineBucketMT extends RenderBucketMT {
 
    static final Logger        log              = LoggerFactory.getLogger(LineBucketMT.class);
-
-   private static final char  NL               = UI.NEW_LINE;
 
    /**
     * Scale factor mapping extrusion vector to short values
@@ -159,6 +156,7 @@ public class LineBucketMT extends RenderBucketMT {
          final int shader_a_pos = shader.shader_a_pos;
          final int shader_aVertexColor = shader.shader_aVertexColor;
          final int shader_uVertexColorAlpha = shader.shader_uVertexColorAlpha;
+         final int shader_uOutlineDarkness = shader.shader_uOutlineDarkness;
 
          final int shader_u_fade = shader.shader_u_fade;
          final int shader_u_mode = shader.shader_u_mode;
@@ -223,6 +221,12 @@ public class LineBucketMT extends RenderBucketMT {
          float heightOffset = 0;
          gl.uniform1f(shader_u_height, heightOffset);
 
+         boolean isPaintOutline = true;
+         isPaintOutline = isPaintOutline == true;
+
+         final float outlineWidth = 2.f;
+         final float outlineDarkness = 0.3f;
+
          for (; renderBucket != null && renderBucket.type == LINE; renderBucket = renderBucket.next) {
 
             final LineBucketMT lineBucket = (LineBucketMT) renderBucket;
@@ -266,18 +270,27 @@ public class LineBucketMT extends RenderBucketMT {
             }
 
             /*
-             * Draw LineLayer
+             * First draw the outline which is partly overwritten by the core line
              */
-            if (lineStyle.outline == false) {
+            if (isPaintOutline) {
 
-               // invert scaling of extrusion vectors so that line width stays the same.
+               // core width
                if (lineStyle.fixed) {
                   width = Math.max(lineStyle.width, 1) / vp2mpScale;
                } else {
                   width = lineBucket.scale * lineStyle.width / variableScale;
                }
 
-               // factor to increase line width relative to scale
+               // add outline width
+               if (lineStyle.fixed) {
+                  width += outlineWidth / vp2mpScale;
+               } else {
+                  width += lineBucket.scale * outlineWidth / variableScale;
+               }
+
+               // outline darkness
+               gl.uniform1f(shader_uOutlineDarkness, outlineDarkness);
+
                gl.uniform1f(shader_u_width, (float) (width * COORD_SCALE_BY_DIR_SCALE));
 
                // line-edge fade
@@ -289,12 +302,7 @@ public class LineBucketMT extends RenderBucketMT {
                }
 
                // cap mode
-               if (lineBucket.scale < 1.0) {
-                  if (capMode != CAP_THIN) {
-                     capMode = CAP_THIN;
-                     gl.uniform1i(shader_u_mode, capMode);
-                  }
-               } else if (lineBucket._isCapRounded) {
+               if (lineBucket._isCapRounded) {
                   if (capMode != CAP_ROUND) {
                      capMode = CAP_ROUND;
                      gl.uniform1i(shader_u_mode, capMode);
@@ -305,54 +313,50 @@ public class LineBucketMT extends RenderBucketMT {
                }
 
                gl.drawArrays(GL.TRIANGLE_STRIP, lineBucket.vertexOffset, lineBucket.numVertices);
-
-               continue;
             }
 
             /*
-             * Draw LineLayers references by this outline
+             * Draw core line over the outline
              */
-            for (LineBucketMT outlineBucket = lineBucket.outlines; outlineBucket != null; outlineBucket = outlineBucket.outlines) {
 
-               final LineStyle coreLineStyle = outlineBucket.line.current();
+            // invert scaling of extrusion vectors so that line width stays the same.
+            if (lineStyle.fixed) {
+               width = Math.max(lineStyle.width, 1) / vp2mpScale;
+            } else {
+               width = lineBucket.scale * lineStyle.width / variableScale;
+            }
 
-               // core width
-               if (coreLineStyle.fixed) {
-                  width = Math.max(coreLineStyle.width, 1) / vp2mpScale;
-               } else {
-                  width = outlineBucket.scale * coreLineStyle.width / variableScale;
-               }
+            // disable outline darkness
+            gl.uniform1f(shader_uOutlineDarkness, 1.0f);
 
-               // add outline width
-               if (lineStyle.fixed) {
-                  width += lineStyle.width / vp2mpScale;
-               } else {
-                  width += lineBucket.scale * lineStyle.width / variableScale;
-               }
+            // factor to increase line width relative to scale
+            gl.uniform1f(shader_u_width, (float) (width * COORD_SCALE_BY_DIR_SCALE));
 
-               gl.uniform1f(shader_u_width, (float) (width * COORD_SCALE_BY_DIR_SCALE));
+            // line-edge fade
+            if (lineStyle.blur > 0) {
+               gl.uniform1f(shader_u_fade, lineStyle.blur);
+               isBlur = true;
+            } else if (shaderMode == SHADER_FLAT) {
+               gl.uniform1f(shader_u_fade, (float) (pixel / width));
+            }
 
-               // line-edge fade
-               if (lineStyle.blur > 0) {
-                  gl.uniform1f(shader_u_fade, lineStyle.blur);
-                  isBlur = true;
-               } else if (shaderMode == SHADER_FLAT) {
-                  gl.uniform1f(shader_u_fade, (float) (pixel / width));
-               }
-
-               // cap mode
-               if (outlineBucket._isCapRounded) {
-                  if (capMode != CAP_ROUND) {
-                     capMode = CAP_ROUND;
-                     gl.uniform1i(shader_u_mode, capMode);
-                  }
-               } else if (capMode != CAP_BUTT) {
-                  capMode = CAP_BUTT;
+            // cap mode
+            if (lineBucket.scale < 1.0) {
+               if (capMode != CAP_THIN) {
+                  capMode = CAP_THIN;
                   gl.uniform1i(shader_u_mode, capMode);
                }
-
-               gl.drawArrays(GL.TRIANGLE_STRIP, outlineBucket.vertexOffset, outlineBucket.numVertices);
+            } else if (lineBucket._isCapRounded) {
+               if (capMode != CAP_ROUND) {
+                  capMode = CAP_ROUND;
+                  gl.uniform1i(shader_u_mode, capMode);
+               }
+            } else if (capMode != CAP_BUTT) {
+               capMode = CAP_BUTT;
+               gl.uniform1i(shader_u_mode, capMode);
             }
+
+            gl.drawArrays(GL.TRIANGLE_STRIP, lineBucket.vertexOffset, lineBucket.numVertices);
          }
 
          gl.disableVertexAttribArray(shader_aVertexColor);
@@ -410,7 +414,8 @@ public class LineBucketMT extends RenderBucketMT {
             shader_u_width,
             shader_u_height,
 
-            shader_uVertexColorAlpha
+            shader_uVertexColorAlpha,
+            shader_uOutlineDarkness
 
       ;
 
@@ -433,6 +438,7 @@ public class LineBucketMT extends RenderBucketMT {
          shader_u_height = getUniform("u_height");
 
          shader_uVertexColorAlpha = getUniform("uVertexColorAlpha");
+         shader_uOutlineDarkness = getUniform("uOutlineDarkness");
       }
 
       @Override
