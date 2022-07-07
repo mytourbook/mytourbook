@@ -256,9 +256,12 @@ public class TimeMachineResult {
 
       if (currentWeatherId >= 200 && currentWeatherId < 300) {
          weatherType = IWeather.WEATHER_ID_LIGHTNING;
-      } else if (currentWeatherId >= 300 && currentWeatherId < 400) {
+      } else if (currentWeatherId >= 300 && currentWeatherId < 313) {
+         weatherType = IWeather.WEATHER_ID_DRIZZLE;
+      } else if ((currentWeatherId >= 313 && currentWeatherId < 400) ||
+            (currentWeatherId >= 520 && currentWeatherId < 600)) {
          weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
-      } else if (currentWeatherId >= 500 && currentWeatherId < 600) {
+      } else if (currentWeatherId >= 500 && currentWeatherId < 520) {
          weatherType = IWeather.WEATHER_ID_RAIN;
       } else if (currentWeatherId >= 600 && currentWeatherId < 700) {
          weatherType = IWeather.WEATHER_ID_SNOW;

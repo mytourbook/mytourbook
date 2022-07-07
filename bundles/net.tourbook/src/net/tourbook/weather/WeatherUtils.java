@@ -389,6 +389,7 @@ public class WeatherUtils {
          weatherIcon = "\u2601"; //$NON-NLS-1$
          break;
       case IWeather.WEATHER_ID_SCATTERED_SHOWERS:
+      case IWeather.WEATHER_ID_DRIZZLE:
          //https://emojipedia.org/sun-behind-rain-cloud/
          weatherIcon = "\ud83c\udf26"; //$NON-NLS-1$
          break;

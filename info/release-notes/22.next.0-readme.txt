@@ -35,6 +35,9 @@ Improvements
   - Goto location                         https://github.com/mytourbook/mytourbook/issues/884
   - Copy location to clipboard
 
+* Weather (Frederic)
+  - Added a drizzle weather icon          https://github.com/mytourbook/mytourbook/issues/874
+
 
 
 Changes

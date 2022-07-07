@@ -32,6 +32,9 @@ import utils.Comparison;
 import utils.FilesUtils;
 import utils.Initializer;
 
+/**
+ * Regression tests for the weather retrieval from World Weather Online.
+ */
 public class WorldWeatherOnlineRetrieverTests {
 
    private static final String WORLDWEATHERONLINE_FILE_PATH =
@@ -51,14 +54,11 @@ public class WorldWeatherOnlineRetrieverTests {
       field.set(null, httpClientMock);
    }
 
-   /**
-    * Regression test for the weather retrieval from World Weather Online.
-    */
    @Test
-   void testWeatherRetrieval() {
+   void testWeatherRetrieval_July2020() {
 
       final String worldWeatherOnlineResponse = Comparison.readFileContent(WORLDWEATHERONLINE_FILE_PATH
-            + "LongsPeak-Manual-WorldWeatherOnlineResponse.json"); //$NON-NLS-1$
+            + "LongsPeak-Manual-WorldWeatherOnlineResponse-2020-07-04.json"); //$NON-NLS-1$
       final String url =
             "http://api.worldweatheronline.com/premium/v1/past-weather.ashx?key=&q=40.263996,-105.58854099999999&date=2020-07-04&tp=1&format=json&includelocation=yes&extra=utcDateTime&lang=en"; //$NON-NLS-1$
       httpClientMock.onGet(url)
@@ -83,6 +83,45 @@ public class WorldWeatherOnlineRetrieverTests {
       assertEquals(19,                          tour.getWeather_Temperature_Max());
       assertEquals(8,                           tour.getWeather_Temperature_Min());
       assertEquals(15.62f,                      tour.getWeather_Temperature_WindChill());
+
+// SET_FORMATTING_ON
+
+   }
+
+   @Test
+   void testWeatherRetrieval_July2022() {
+
+      final String worldWeatherOnlineResponse = Comparison.readFileContent(WORLDWEATHERONLINE_FILE_PATH
+            + "LongsPeak-Manual-WorldWeatherOnlineResponse-2022-07-02.json"); //$NON-NLS-1$
+      final String url =
+            "http://api.worldweatheronline.com/premium/v1/past-weather.ashx?key=&q=40.263996,-105.58854099999999&date=2022-07-02&tp=1&format=json&includelocation=yes&extra=utcDateTime&lang=en"; //$NON-NLS-1$
+      httpClientMock.onGet(url)
+            .doReturn(worldWeatherOnlineResponse);
+
+      final TourData tour = Initializer.importTour();
+      //Tuesday, July 2, 2022 12:00:00 AM
+      tour.setTourStartTime(2022, 7, 2, 0, 0, 0);
+      //We set the current time elapsed to trigger the computation of the new end time
+      tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
+
+      historicalWeatherRetriever = new WorldWeatherOnlineRetriever(tour);
+
+      assertTrue(historicalWeatherRetriever.retrieveHistoricalWeatherData());
+      httpClientMock.verify().get(url).called();
+
+// SET_FORMATTING_OFF
+
+      assertEquals(8,                      tour.getWeather_Temperature_Average());
+      assertEquals(12,                     tour.getWeather_Wind_Speed());
+      assertEquals(267,                    tour.getWeather_Wind_Direction());
+      assertEquals("Patchy rain possible", tour.getWeather()); //$NON-NLS-1$
+      assertEquals("weather-drizzle",      tour.getWeather_Clouds()); //$NON-NLS-1$
+      assertEquals(79,                     tour.getWeather_Humidity());
+      assertEquals(1.1f,                   tour.getWeather_Precipitation());
+      assertEquals(1019f,                  tour.getWeather_Pressure());
+      assertEquals(8,                      tour.getWeather_Temperature_Max());
+      assertEquals(8,                      tour.getWeather_Temperature_Min());
+      assertEquals(5.57f,                  tour.getWeather_Temperature_WindChill());
 
 // SET_FORMATTING_ON
 
