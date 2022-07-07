@@ -15,13 +15,14 @@
  *******************************************************************************/
 package dialogs;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import net.tourbook.common.util.FilesUtils;
 import net.tourbook.printing.Messages;
 import net.tourbook.printing.PrintTourPDF;
 
@@ -64,5 +65,8 @@ public class DialogPrintTourTests {
       } catch (final IOException e) {
          //ignored
       }
+
+      FilesUtils.deleteIfExists(pdfFilePath);
+      assertTrue(!Files.exists(pdfFilePath));
    }
 }
