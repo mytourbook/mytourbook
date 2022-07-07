@@ -25,6 +25,7 @@ public interface IWeather {
    public static final String   WEATHER_ID_OVERCAST             = "weather-clouds";            //$NON-NLS-1$
    public static final String   WEATHER_ID_LIGHTNING            = "weather-lightning";         //$NON-NLS-1$
    public static final String   WEATHER_ID_RAIN                 = "weather-rain";              //$NON-NLS-1$
+   public static final String   WEATHER_ID_DRIZZLE              = "weather-drizzle";           //$NON-NLS-1$
    public static final String   WEATHER_ID_SNOW                 = "weather-snow";              //$NON-NLS-1$
    public static final String   WEATHER_ID_SEVERE_WEATHER_ALERT = "weather-severe";            //$NON-NLS-1$
    public static final String   WEATHER_ID_SCATTERED_SHOWERS    = "weather-showers-scattered"; //$NON-NLS-1$
@@ -185,6 +186,7 @@ public interface IWeather {
          Messages.Weather_Clouds_Sunny,
          Messages.Weather_Clouds_Cloudy,
          Messages.Weather_Clouds_Clouds,
+         Messages.Weather_Clouds_Drizzle,
          Messages.Weather_Clouds_ScatteredShowers,
          Messages.Weather_Clouds_Rain,
          Messages.Weather_Clouds_Lightning,
@@ -203,6 +205,7 @@ public interface IWeather {
          WEATHER_ID_CLEAR,
          WEATHER_ID_PART_CLOUDS,
          WEATHER_ID_OVERCAST,
+         WEATHER_ID_DRIZZLE,
          WEATHER_ID_SCATTERED_SHOWERS,
          WEATHER_ID_RAIN,
          WEATHER_ID_LIGHTNING,
