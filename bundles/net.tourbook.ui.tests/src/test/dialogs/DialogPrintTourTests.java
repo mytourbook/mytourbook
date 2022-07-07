@@ -15,9 +15,24 @@
  *******************************************************************************/
 package dialogs;
 
-public class DialogPrintTour {
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-//   private SWTWorkbenchBot bot = new SWTWorkbenchBot();
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import net.tourbook.printing.Messages;
+import net.tourbook.printing.PrintTourPDF;
+
+import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.junit.jupiter.api.Test;
+
+import utils.Utils;
+
+public class DialogPrintTourTests {
+
+   private SWTWorkbenchBot bot = new SWTWorkbenchBot();
 
    /**
     * Test ignored as of today because this line fails on the build machine
@@ -25,20 +40,20 @@ public class DialogPrintTour {
     * {@link PrintTourPDF printPDF}
     * Program.launch(printSettings.getCompleteFilePath());
     */
-//   @Test
-//   void testPrintTour() {
-//
-//      final SWTBotTreeItem tour = Utils.getTour(bot);
-//
-//      tour.contextMenu(net.tourbook.Messages.action_print_tour).menu("PDF").click();
-//      bot.checkBox(Messages.Dialog_Print_Chk_PrintMarkers).click();
-//      bot.checkBox(Messages.Dialog_Print_Chk_PrintNotes).click();
-//
-//      final String fileName = bot.comboBox(2).getText() + ".pdf";
-//      bot.comboBox(3).setText(Utils.workingDirectory);
-//      bot.button(Messages.Dialog_Print_Btn_Print).click();
-//
-//      final Path pdfFilePath = Paths.get(Utils.workingDirectory, fileName);
-//      assertTrue(Files.exists(pdfFilePath));
-//   }
+   @Test
+   void testPrintTour() {
+
+      final SWTBotTreeItem tour = Utils.getTour(bot);
+
+      tour.contextMenu(net.tourbook.Messages.action_print_tour).menu("PDF").click();
+      bot.checkBox(Messages.Dialog_Print_Chk_PrintMarkers).click();
+      bot.checkBox(Messages.Dialog_Print_Chk_PrintNotes).click();
+
+      final String fileName = bot.comboBox(2).getText() + ".pdf";
+      bot.comboBox(3).setText(Utils.workingDirectory);
+      bot.button(Messages.Dialog_Print_Btn_Print).click();
+
+      final Path pdfFilePath = Paths.get(Utils.workingDirectory, fileName);
+      assertTrue(Files.exists(pdfFilePath));
+   }
 }
