@@ -58,39 +58,7 @@ public class Initializer {
 
    public static TourData importTour() {
 
-      final SAXParser parser = Initializer.initializeParser();
-      final DeviceData deviceData = new DeviceData();
-      final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
-      final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
-      final GarminTCX_DeviceDataReader deviceDataReader = new GarminTCX_DeviceDataReader();
-
-      final String IMPORT_FILE_PATH = "/utils/files/LongsPeak-Manual.gpx"; //$NON-NLS-1$
-
-      final InputStream gpx = Initializer.class.getResourceAsStream(IMPORT_FILE_PATH);
-
-      final GPX_SAX_Handler handler = new GPX_SAX_Handler(
-
-            IMPORT_FILE_PATH,
-            deviceData,
-            alreadyImportedTours,
-            newlyImportedTours,
-
-            new ImportState_File(),
-            new ImportState_Process(),
-
-            deviceDataReader);
-
-      if (parser != null) {
-         try {
-            parser.parse(gpx, handler);
-         } catch (SAXException | IOException e) {
-            e.printStackTrace();
-         }
-      }
-
-      final TourData newlyImportedTour = Comparison.retrieveImportedTour(newlyImportedTours);
-
-      return newlyImportedTour;
+      return importTour_GPX(FilesUtils.rootPath + "/utils/files/LongsPeak-Manual.gpx"); //$NON-NLS-1$
    }
 
    public static TourData importTour_FIT(final String importFilePath) {
