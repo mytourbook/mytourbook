@@ -52,6 +52,7 @@ jobs:
         run: cd ./build/build.net.tourbook && ./gradlew mt_10_CreateBuildFiles mt_20_BuildProduct sonarqube --warning-mode all --stacktrace --info
 
   check_date:
+    runs-on: windows-latest
     name: Check latest commit is less than 24 hours old
     outputs:
       should_run: ${{ steps.should_run.outputs.should_run }}
