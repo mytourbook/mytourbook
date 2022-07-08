@@ -211,8 +211,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
             // label
             final Label label = new Label(group, SWT.NONE);
-            label.setText(Messages.Slideout_Map25TrackOptions_Label_OutlineWidth);
-            label.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_OutlineWidth_Tooltip);
+            label.setText(Messages.Slideout_Map25TrackOptions_Label_LineWidth);
+            label.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_LineWidth_Tooltip);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
             // spinner
@@ -254,11 +254,11 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
              * Color
              */
             final int opacityMin = (int) ((Map25ConfigManager.OUTLINE_OPACITY_MIN / 255.0f) * UI.TRANSFORM_OPACITY_MAX);
-            final String tooltipText = NLS.bind(Messages.Slideout_Map25TrackOptions_Label_OutlineColor_Tooltip, UI.TRANSFORM_OPACITY_MAX);
+            final String tooltipText = NLS.bind(Messages.Slideout_Map25TrackOptions_Label_LineColor_Tooltip, UI.TRANSFORM_OPACITY_MAX);
 
             // label
             final Label label = new Label(group, SWT.NONE);
-            label.setText(Messages.Slideout_Map25TrackOptions_Label_OutlineColor);
+            label.setText(Messages.Slideout_Map25TrackOptions_Label_LineColor);
             label.setToolTipText(tooltipText);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 

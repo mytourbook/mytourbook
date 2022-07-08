@@ -2051,11 +2051,11 @@ public class Messages extends NLS {
    public static String        Slideout_Map25TrackOptions_Label_ConfigName_Tooltip;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrows;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip;
+   public static String        Slideout_Map25TrackOptions_Label_LineColor;
+   public static String        Slideout_Map25TrackOptions_Label_LineColor_Tooltip;
+   public static String        Slideout_Map25TrackOptions_Label_LineWidth;
+   public static String        Slideout_Map25TrackOptions_Label_LineWidth_Tooltip;
    public static String        Slideout_Map25TrackOptions_Label_Name;
-   public static String        Slideout_Map25TrackOptions_Label_OutlineColor;
-   public static String        Slideout_Map25TrackOptions_Label_OutlineColor_Tooltip;
-   public static String        Slideout_Map25TrackOptions_Label_OutlineWidth;
-   public static String        Slideout_Map25TrackOptions_Label_OutlineWidth_Tooltip;
 
    public static String        Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic;
    public static String        Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message;
