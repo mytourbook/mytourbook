@@ -116,22 +116,22 @@ public class Map25ConfigManager {
    private static final String TAG_TOUR_TRACKS = "TourTracks"; //$NON-NLS-1$
    private static final String TAG_TRACK       = "Track";      //$NON-NLS-1$
    //
-   // outline
-   private static final String TAG_OUTLINE                              = "Outline";               //$NON-NLS-1$
-   private static final String ATTR_OUTLINE_OPACITY                     = "opacity";               //$NON-NLS-1$
-   private static final String ATTR_OUTLINE_WIDTH                       = "width";                 //$NON-NLS-1$
-   private static final String ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW     = "directionArrow";        //$NON-NLS-1$
+   // line
+   private static final String TAG_LINE                              = "Line";                  //$NON-NLS-1$
+   private static final String ATTR_LINE_OPACITY                     = "opacity";               //$NON-NLS-1$
+   private static final String ATTR_LINE_WIDTH                       = "width";                 //$NON-NLS-1$
+   private static final String ATTR_LINE_IS_SHOW_DIRECTION_ARROW     = "directionArrow";        //$NON-NLS-1$
    //
-   public static final boolean OUTLINE_IS_TRACK_VERTICAL_OFFSET_DEFAULT = false;
-   public static final RGB     DEFAULT_OUTLINE_COLOR                    = new RGB(0x80, 0x0, 0x80);
-   public static final int     DEFAULT_OUTLINE_OPACITY                  = 180;                     // 70 %
-   public static final float   DEFAULT_OUTLINE_WIDTH                    = 2.5f;
-   public static final boolean DEFAULT_OUTLINE_IS_SHOW_DIRECTION_ARROW  = false;
-   public static final int     OUTLINE_OPACITY_MIN                      = 26;                      // 10 %;
-   public static final int     OUTLINE_OPACITY_MAX                      = 0xff;
-   public static final int     OUTLINE_TRACK_VERTICAL_OFFSET_DEFAULT    = 20;
-   public static final int     OUTLINE_WIDTH_MIN                        = 1;
-   public static final int     OUTLINE_WIDTH_MAX                        = 20;
+   public static final boolean LINE_IS_TRACK_VERTICAL_OFFSET_DEFAULT = false;
+   public static final RGB     DEFAULT_LINE_COLOR                    = new RGB(0x80, 0x0, 0x80);
+   public static final int     DEFAULT_LINE_OPACITY                  = 180;                     // 70 %
+   public static final float   DEFAULT_LINE_WIDTH                    = 2.5f;
+   public static final boolean DEFAULT_LINE_IS_SHOW_DIRECTION_ARROW  = false;
+   public static final int     LINE_OPACITY_MIN                      = 26;                      // 10 %;
+   public static final int     LINE_OPACITY_MAX                      = 0xff;
+   public static final int     LINE_TRACK_VERTICAL_OFFSET_DEFAULT    = 20;
+   public static final int     LINE_WIDTH_MIN                        = 1;
+   public static final int     LINE_WIDTH_MAX                        = 20;
    //
    // slider location/path
    private static final String TAG_SLIDER_PATH                     = "SliderPath";             //$NON-NLS-1$
@@ -405,52 +405,52 @@ public class Map25ConfigManager {
 
       case 1:
          config.name = config.defaultId = CONFIG_DEFAULT_ID_1;
-         config.outlineWidth = DEFAULT_OUTLINE_WIDTH;
+         config.lineWidth = DEFAULT_LINE_WIDTH;
          break;
 
       case 2:
          config.name = config.defaultId = CONFIG_DEFAULT_ID_2;
-         config.outlineWidth = 1;
+         config.lineWidth = 1;
          break;
 
       case 3:
          config.name = config.defaultId = CONFIG_DEFAULT_ID_3;
-         config.outlineWidth = 3;
+         config.lineWidth = 3;
          break;
 
       case 4:
          config.name = config.defaultId = CONFIG_DEFAULT_ID_4;
-         config.outlineWidth = 4;
+         config.lineWidth = 4;
          break;
 
       case 5:
          config.name = config.defaultId = CONFIG_DEFAULT_ID_5;
-         config.outlineWidth = 5;
+         config.lineWidth = 5;
          break;
 
       case 6:
          config.name = config.defaultId = CONFIG_DEFAULT_ID_6;
-         config.outlineWidth = 6;
+         config.lineWidth = 6;
          break;
 
       case 7:
          config.name = config.defaultId = CONFIG_DEFAULT_ID_7;
-         config.outlineWidth = 7;
+         config.lineWidth = 7;
          break;
 
       case 8:
          config.name = config.defaultId = CONFIG_DEFAULT_ID_8;
-         config.outlineWidth = 8;
+         config.lineWidth = 8;
          break;
 
       case 9:
          config.name = config.defaultId = CONFIG_DEFAULT_ID_9;
-         config.outlineWidth = 9;
+         config.lineWidth = 9;
          break;
 
       case 10:
          config.name = config.defaultId = CONFIG_DEFAULT_ID_10;
-         config.outlineWidth = 10;
+         config.lineWidth = 10;
          break;
 
       }
@@ -512,12 +512,12 @@ public class Map25ConfigManager {
 
 //         xmlConfig.putInteger(ATTR_ANIMATION_TIME, config.animationTime);
 
-         // <Outline>
-         final IMemento xmlOutline = Util.setXmlRgb(xmlConfig, TAG_OUTLINE, config.outlineColor);
+         // <Line>
+         final IMemento xmlLine = Util.setXmlRgb(xmlConfig, TAG_LINE, config.lineColor);
          {
-            xmlOutline.putBoolean(     ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW, config.isShowDirectionArrow);
-            xmlOutline.putFloat(       ATTR_OUTLINE_WIDTH,                   config.outlineWidth);
-            xmlOutline.putInteger(     ATTR_OUTLINE_OPACITY,                 config.outlineOpacity);
+            xmlLine.putBoolean(     ATTR_LINE_IS_SHOW_DIRECTION_ARROW, config.isShowDirectionArrow);
+            xmlLine.putFloat(       ATTR_LINE_WIDTH,                   config.lineWidth);
+            xmlLine.putInteger(     ATTR_LINE_OPACITY,                 config.lineOpacity);
          }
 
          // <SliderPath>
@@ -713,12 +713,12 @@ public class Map25ConfigManager {
 
          switch (xmlConfigChild.getType()) {
 
-         case TAG_OUTLINE:
+         case TAG_LINE:
 
-            config.isShowDirectionArrow      = Util.getXmlBoolean(xmlConfigChild,      ATTR_OUTLINE_IS_SHOW_DIRECTION_ARROW, DEFAULT_OUTLINE_IS_SHOW_DIRECTION_ARROW);
-            config.outlineColor              = Util.getXmlRgb(xmlConfigChild,          DEFAULT_OUTLINE_COLOR);
-            config.outlineOpacity            = Util.getXmlInteger(xmlConfigChild,      ATTR_OUTLINE_OPACITY,   DEFAULT_OUTLINE_OPACITY,   OUTLINE_OPACITY_MIN, OUTLINE_OPACITY_MAX);
-            config.outlineWidth              = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_OUTLINE_WIDTH,     DEFAULT_OUTLINE_WIDTH,     OUTLINE_WIDTH_MIN,   OUTLINE_WIDTH_MAX);
+            config.isShowDirectionArrow      = Util.getXmlBoolean(xmlConfigChild,      ATTR_LINE_IS_SHOW_DIRECTION_ARROW, DEFAULT_LINE_IS_SHOW_DIRECTION_ARROW);
+            config.lineColor              = Util.getXmlRgb(xmlConfigChild,          DEFAULT_LINE_COLOR);
+            config.lineOpacity            = Util.getXmlInteger(xmlConfigChild,      ATTR_LINE_OPACITY,   DEFAULT_LINE_OPACITY,   LINE_OPACITY_MIN, LINE_OPACITY_MAX);
+            config.lineWidth              = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_LINE_WIDTH,     DEFAULT_LINE_WIDTH,     LINE_WIDTH_MIN,   LINE_WIDTH_MAX);
             break;
 
          case TAG_SLIDER_PATH:

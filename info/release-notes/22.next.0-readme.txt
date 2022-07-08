@@ -50,6 +50,8 @@ Changes
 * Fitlog/FitlogEx Import (Frederic)
   - Compute the average power when power data is provided but average power value is not
 
+* 2.5D Map
+  - Track (line) colors in the color profiles are reset to defaults
 
 Bugfix
 ======

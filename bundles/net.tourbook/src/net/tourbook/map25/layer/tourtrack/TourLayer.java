@@ -468,7 +468,7 @@ public class TourLayer extends Layer {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-      final int lineColor = ColorUtil.getARGB(trackConfig.outlineColor, trackConfig.outlineOpacity);
+      final int lineColor = ColorUtil.getARGB(trackConfig.lineColor, trackConfig.lineOpacity);
 
       final int trackVerticalOffset = trackConfig.isTrackVerticalOffset
             ? trackConfig.trackVerticalOffset
@@ -482,7 +482,7 @@ public class TourLayer extends Layer {
          final TextureItem textureItem = new TextureItem(bitmapArrow);
 
          // width must be not too tiny, otherwise there is no place that the arrow can be painted
-         final float faterOutlineWidth = Math.max(trackConfig.outlineWidth * 2, 5f);
+         final float faterOutlineWidth = Math.max(trackConfig.lineWidth * 2, 5f);
 
          final LineStyle style = LineStyle.builder()
 
@@ -509,7 +509,7 @@ public class TourLayer extends Layer {
 
          final LineStyle style = LineStyle.builder()
 
-               .strokeWidth(trackConfig.outlineWidth)
+               .strokeWidth(trackConfig.lineWidth)
 
                .color(lineColor)
 
