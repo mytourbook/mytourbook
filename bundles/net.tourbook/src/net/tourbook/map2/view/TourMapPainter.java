@@ -1624,10 +1624,10 @@ public class TourMapPainter extends Map2Painter {
          _symbolHoveredMargin2 = _symbolHoveredMargin / 2;
 
          gcTile.setLineWidth(_symbolSize);
-         
+
          int devFrom_WithOffsetX = 0;
          int devFrom_WithOffsetY = 0;
-         
+
          Color lastVisibleColor = null;
 
          for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
@@ -1781,7 +1781,6 @@ public class TourMapPainter extends Map2Painter {
 
                   lastInsideIndex = serieIndex;
                }
-
 
                // check first outside point
                if (isVisibleDataPoint && serieIndex == lastInsideIndex + 1) {
@@ -2498,9 +2497,14 @@ public class TourMapPainter extends Map2Painter {
                                      final Rectangle legendBounds,
                                      final int valueIndex) {
 
-      if (_dataSerie == null || valueIndex >= _dataSerie.length || //
-      // check legend provider type
-            _legendProvider instanceof IGradientColorProvider == false//
+      if (_dataSerie == null
+
+            || valueIndex < 0
+            || valueIndex >= _dataSerie.length
+
+            // check legend provider type
+            || _legendProvider instanceof IGradientColorProvider == false
+
       ) {
          return Integer.MIN_VALUE;
       }
