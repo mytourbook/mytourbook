@@ -57,25 +57,30 @@ import org.oscim.utils.geom.LineClipper;
  */
 public class TourLayer extends Layer {
 
-   private static final int RENDERING_DELAY = 0;
+   private static final int   RENDERING_DELAY = 0;
 
    /**
     * Stores points, converted to the map projection.
     */
-   private GeoPoint[]       _allGeoPoints;
-   private TIntArrayList    _allTourStarts;
+   private GeoPoint[]         _allGeoPoints;
+   private TIntArrayList      _allTourStarts;
 
-   private boolean          _isUpdatePoints;
+   private boolean            _isUpdatePoints;
 
    /**
     * Line style
     */
-   private LineStyle        _lineStyle;
+   private LineStyle          _lineStyle;
+   public boolean             _isShowOutline;
+   private float              _outlineBrightness;
+   private float              _outlineWidth;
 
-   private final Worker     _simpleWorker;
+   private final Worker       _simpleWorker;
 
-   private boolean          _isUpdateLayer;
-   private int[]            _allGeoPointColors;
+   private boolean            _isUpdateLayer;
+   private int[]              _allGeoPointColors;
+
+   private RenderBucketsAllMT _currentTaskRenderBuckets;
 
    private final class TourRenderer extends BucketRendererMT {
 
@@ -244,6 +249,8 @@ public class TourLayer extends Layer {
             }
          }
 
+         _currentTaskRenderBuckets = task.__renderBuckets;
+
          if (numGeoPoints == 0) {
 
             if (task.__renderBuckets.get() != null) {
@@ -265,15 +272,7 @@ public class TourLayer extends Layer {
 
       private void doWork_Rendering(final TourRenderTask task, final int numPoints) {
 
-         LineBucketMT lineBucket;
-
-         if (_lineStyle.stipple == 0 && _lineStyle.texture == null) {
-            lineBucket = task.__renderBuckets.getLineBucket(0);
-         } else {
-            lineBucket = task.__renderBuckets.getLineTexBucket(0);
-         }
-
-         lineBucket.line = _lineStyle;
+         final LineBucketMT lineBucket = updateLineStyle(task.__renderBuckets);
 
          final MapPosition mapPos = task.__mapPos;
          mMap.getMapPosition(mapPos);
@@ -449,6 +448,7 @@ public class TourLayer extends Layer {
             return Integer.MAX_VALUE;
          }
       }
+
    }
 
    public TourLayer(final Map map) {
@@ -473,6 +473,10 @@ public class TourLayer extends Layer {
       final int trackVerticalOffset = trackConfig.isTrackVerticalOffset
             ? trackConfig.trackVerticalOffset
             : 0;
+
+      _isShowOutline = trackConfig.isShowOutline;
+      _outlineBrightness = trackConfig.outlineBrighness;
+      _outlineWidth = trackConfig.outlineWidth;
 
       if (trackConfig.isShowDirectionArrow) {
 
@@ -539,7 +543,10 @@ public class TourLayer extends Layer {
 
       _lineStyle = createLineStyle();
 
-      _simpleWorker.submit(RENDERING_DELAY);
+      updateLineStyle(_currentTaskRenderBuckets);
+
+      // trigger redraw to let renderer fetch the result.
+      mMap.render();
    }
 
    public void setPoints(final GeoPoint[] allGeoPoints, final int[] allGeoPointColors, final TIntArrayList allTourStarts) {
@@ -557,5 +564,30 @@ public class TourLayer extends Layer {
 
       _isUpdatePoints = true;
       _isUpdateLayer = true;
+   }
+
+   /**
+    * Update linestyle in the bucket
+    *
+    * @param renderBuckets
+    * @return
+    */
+   private LineBucketMT updateLineStyle(final RenderBucketsAllMT renderBuckets) {
+
+      LineBucketMT lineBucket;
+
+      if (_lineStyle.stipple == 0 && _lineStyle.texture == null) {
+         lineBucket = renderBuckets.getLineBucket(0);
+      } else {
+         lineBucket = renderBuckets.getLineTexBucket(0);
+      }
+
+      lineBucket.line = _lineStyle;
+
+      lineBucket.isShowOutline = _isShowOutline;
+      lineBucket.outlineBrightness = _outlineBrightness;
+      lineBucket.outlineWidth = _outlineWidth;
+
+      return lineBucket;
    }
 }

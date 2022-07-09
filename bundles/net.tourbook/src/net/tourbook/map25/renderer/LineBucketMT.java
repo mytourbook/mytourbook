@@ -74,13 +74,17 @@ public class LineBucketMT extends RenderBucketMT {
    public LineBucketMT        outlines;
 
    public LineStyle           line;
+   public boolean             isShowOutline;
+   public float               outlineBrightness;
+   public float               outlineWidth;
+
    public float               scale            = 1;
 
    private boolean            _isCapRounded;
    private float              _minimumDistance = MIN_DIST;
    private float              _minimumBevel    = MIN_BEVEL;
 
-   public float               heightOffset;
+   private float              _heightOffset;
 
    private int                tmin             = Integer.MIN_VALUE, tmax = Integer.MAX_VALUE;
 
@@ -156,7 +160,7 @@ public class LineBucketMT extends RenderBucketMT {
          final int shader_a_pos = shader.shader_a_pos;
          final int shader_aVertexColor = shader.shader_aVertexColor;
          final int shader_uVertexColorAlpha = shader.shader_uVertexColorAlpha;
-         final int shader_uOutlineDarkness = shader.shader_uOutlineDarkness;
+         final int shader_uOutlineBrightness = shader.shader_uOutlineBrightness;
 
          final int shader_u_fade = shader.shader_u_fade;
          final int shader_u_mode = shader.shader_u_mode;
@@ -221,24 +225,25 @@ public class LineBucketMT extends RenderBucketMT {
          float heightOffset = 0;
          gl.uniform1f(shader_u_height, heightOffset);
 
-         boolean isPaintOutline = true;
-         isPaintOutline = isPaintOutline == true;
-
-         final float outlineWidth = 2.f;
-         final float outlineDarkness = 0.3f;
-
          for (; renderBucket != null && renderBucket.type == LINE; renderBucket = renderBucket.next) {
 
             final LineBucketMT lineBucket = (LineBucketMT) renderBucket;
             final LineStyle lineStyle = lineBucket.line.current();
 
-            if (lineStyle.heightOffset != lineBucket.heightOffset) {
-               lineBucket.heightOffset = lineStyle.heightOffset;
+            final float scale = lineBucket.scale;
+
+            final boolean isPaintOutline = lineBucket.isShowOutline;
+            final float outlineWidth = lineBucket.outlineWidth;
+            final float outlineBrightnessRaw = lineBucket.outlineBrightness; // -1.0 ... 1.0
+            final float outlineBrightness = outlineBrightnessRaw + 1; // 0...2
+
+            if (lineStyle.heightOffset != lineBucket._heightOffset) {
+               lineBucket._heightOffset = lineStyle.heightOffset;
             }
 
-            if (lineBucket.heightOffset != heightOffset) {
+            if (lineBucket._heightOffset != heightOffset) {
 
-               heightOffset = lineBucket.heightOffset;
+               heightOffset = lineBucket._heightOffset;
 
 //             final double lineHeight = (heightOffset / groundResolution) / scale;
                final double lineHeight = heightOffset * vp2mpScale;
@@ -278,18 +283,18 @@ public class LineBucketMT extends RenderBucketMT {
                if (lineStyle.fixed) {
                   width = Math.max(lineStyle.width, 1) / vp2mpScale;
                } else {
-                  width = lineBucket.scale * lineStyle.width / variableScale;
+                  width = scale * lineStyle.width / variableScale;
                }
 
                // add outline width
                if (lineStyle.fixed) {
                   width += outlineWidth / vp2mpScale;
                } else {
-                  width += lineBucket.scale * outlineWidth / variableScale;
+                  width += scale * outlineWidth / variableScale;
                }
 
-               // outline darkness
-               gl.uniform1f(shader_uOutlineDarkness, outlineDarkness);
+               // outline brighness
+               gl.uniform1f(shader_uOutlineBrightness, outlineBrightness);
 
                gl.uniform1f(shader_u_width, (float) (width * COORD_SCALE_BY_DIR_SCALE));
 
@@ -323,11 +328,11 @@ public class LineBucketMT extends RenderBucketMT {
             if (lineStyle.fixed) {
                width = Math.max(lineStyle.width, 1) / vp2mpScale;
             } else {
-               width = lineBucket.scale * lineStyle.width / variableScale;
+               width = scale * lineStyle.width / variableScale;
             }
 
-            // disable outline darkness
-            gl.uniform1f(shader_uOutlineDarkness, 1.0f);
+            // disable outline brighness/darkness, this value is multiplied with the color
+            gl.uniform1f(shader_uOutlineBrightness, 1.0f);
 
             // factor to increase line width relative to scale
             gl.uniform1f(shader_u_width, (float) (width * COORD_SCALE_BY_DIR_SCALE));
@@ -341,7 +346,7 @@ public class LineBucketMT extends RenderBucketMT {
             }
 
             // cap mode
-            if (lineBucket.scale < 1.0) {
+            if (scale < 1.0) {
                if (capMode != CAP_THIN) {
                   capMode = CAP_THIN;
                   gl.uniform1i(shader_u_mode, capMode);
@@ -415,7 +420,7 @@ public class LineBucketMT extends RenderBucketMT {
             shader_u_height,
 
             shader_uVertexColorAlpha,
-            shader_uOutlineDarkness
+            shader_uOutlineBrightness
 
       ;
 
@@ -438,7 +443,7 @@ public class LineBucketMT extends RenderBucketMT {
          shader_u_height = getUniform("u_height");
 
          shader_uVertexColorAlpha = getUniform("uVertexColorAlpha");
-         shader_uOutlineDarkness = getUniform("uOutlineDarkness");
+         shader_uOutlineBrightness = getUniform("uOutlineBrightness");
       }
 
       @Override

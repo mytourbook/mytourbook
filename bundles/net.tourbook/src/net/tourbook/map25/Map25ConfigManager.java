@@ -118,20 +118,32 @@ public class Map25ConfigManager {
    //
    // line
    private static final String TAG_LINE                              = "Line";                  //$NON-NLS-1$
-   private static final String ATTR_LINE_OPACITY                     = "opacity";               //$NON-NLS-1$
-   private static final String ATTR_LINE_WIDTH                       = "width";                 //$NON-NLS-1$
    private static final String ATTR_LINE_IS_SHOW_DIRECTION_ARROW     = "directionArrow";        //$NON-NLS-1$
+   private static final String ATTR_LINE_OPACITY                     = "lineOpacity";           //$NON-NLS-1$
+   private static final String ATTR_LINE_WIDTH                       = "lineWidth";             //$NON-NLS-1$
+   private static final String ATTR_OUTLINE_IS_SHOW_OUTLINE          = "isShowOutline";         //$NON-NLS-1$
+   private static final String ATTR_OUTLINE_WIDTH                    = "outlineWidth";          //$NON-NLS-1$
+   private static final String ATTR_OUTLINE_BRIGHTNESS               = "outlineBrightness";     //$NON-NLS-1$
    //
+   public static final RGB     LINE_COLOR_DEFAULT                    = new RGB(0x80, 0x0, 0x80);
+   public static final boolean LINE_IS_SHOW_DIRECTION_ARROW_DEFAULT  = false;
    public static final boolean LINE_IS_TRACK_VERTICAL_OFFSET_DEFAULT = false;
-   public static final RGB     DEFAULT_LINE_COLOR                    = new RGB(0x80, 0x0, 0x80);
-   public static final int     DEFAULT_LINE_OPACITY                  = 180;                     // 70 %
-   public static final float   DEFAULT_LINE_WIDTH                    = 2.5f;
-   public static final boolean DEFAULT_LINE_IS_SHOW_DIRECTION_ARROW  = false;
-   public static final int     LINE_OPACITY_MIN                      = 26;                      // 10 %;
-   public static final int     LINE_OPACITY_MAX                      = 0xff;
    public static final int     LINE_TRACK_VERTICAL_OFFSET_DEFAULT    = 20;
+   //
+   public static final int     LINE_OPACITY_MIN                      = 26;                      // 10 %
+   public static final int     LINE_OPACITY_MAX                      = 0xff;
+   public static final int     LINE_OPACITY_DEFAULT                  = 180;                     // 70 %
    public static final int     LINE_WIDTH_MIN                        = 1;
    public static final int     LINE_WIDTH_MAX                        = 20;
+   public static final float   LINE_WIDTH_DEFAULT                    = 2.5f;
+   //
+   public static final boolean OUTLINE_IS_SHOW_OUTLINE_DEFAULT       = true;
+   public static final int     OUTLINE_BRIGHTNESS_MIN                = -10;
+   public static final int     OUTLINE_BRIGHTNESS_MAX                = 10;
+   public static final float   OUTLINE_BRIGHTNESS_DEFAULT            = 0.5f;
+   public static final int     OUTLINE_WIDTH_MIN                     = 0;
+   public static final int     OUTLINE_WIDTH_MAX                     = 20;
+   public static final float   OUTLINE_WIDTH_DEFAULT                 = 2f;
    //
    // slider location/path
    private static final String TAG_SLIDER_PATH                     = "SliderPath";             //$NON-NLS-1$
@@ -144,24 +156,26 @@ public class Map25ConfigManager {
    private static final String ATTR_SLIDER_PATH_LINE_WIDTH         = "sliderPath_LineWidth";   //$NON-NLS-1$
    private static final String ATTR_SLIDER_PATH_OPACITY            = "sliderPath_Opacity";     //$NON-NLS-1$
    //
-   public static final boolean DEFAULT_IS_SHOW_SLIDER_PATH         = true;
-   public static final int     DEFAULT_SLIDER_LOCATION_OPACITY     = 0xff;
-   public static final int     DEFAULT_SLIDER_LOCATION_SIZE        = 30;
-   public static final RGB     DEFAULT_SLIDER_LOCATION_LEFT_COLOR  = new RGB(0xff, 0x0, 0x0);
-   public static final RGB     DEFAULT_SLIDER_LOCATION_RIGHT_COLOR = new RGB(0x0, 0xff, 0x0);
+   public static final boolean SLIDER_IS_SHOW_SLIDER_PATH_DEFAULT  = true;
+   public static final RGB     SLIDER_LOCATION_LEFT_COLOR_DEFAULT  = new RGB(0xff, 0x0, 0x0);
+   public static final RGB     SLIDER_LOCATION_RIGHT_COLOR_DEFAULT = new RGB(0x0, 0xff, 0x0);
+   //
    public static final int     SLIDER_LOCATION_OPACITY_MIN         = 26;                       //10 %;
    public static final int     SLIDER_LOCATION_OPACITY_MAX         = 0xff;
+   public static final int     SLIDER_LOCATION_OPACITY_DEFAULT     = 0xff;
    public static final int     SLIDER_LOCATION_SIZE_MIN            = 10;
    public static final int     SLIDER_LOCATION_SIZE_MAX            = 100;
+   public static final int     SLIDER_LOCATION_SIZE_DEFAULT        = 30;
    //
-   public static final boolean DEFAULT_IS_SHOW_CHART_SLIDER        = true;
-   public static final RGB     DEFAULT_SLIDER_PATH_COLOR           = new RGB(0xff, 0xff, 0x0);
-   public static final float   DEFAULT_SLIDER_PATH_LINE_WIDTH      = 20.0f;
-   public static final int     DEFAULT_SLIDER_PATH_OPACITY         = 77;                       // 30 %
+   public static final boolean SLIDER_IS_SHOW_CHART_SLIDER_DEFAULT = true;
+   public static final RGB     SLIDER_PATH_COLOR_DEFAULT           = new RGB(0xff, 0xff, 0x0);
+   //
    public static final int     SLIDER_PATH_LINE_WIDTH_MIN          = 1;
    public static final int     SLIDER_PATH_LINE_WIDTH_MAX          = 50;
+   public static final float   SLIDER_PATH_LINE_WIDTH_DEFAULT      = 20.0f;
    public static final int     SLIDER_PATH_OPACITY_MIN             = 52;                       // 20%
    public static final int     SLIDER_PATH_OPACITY_MAX             = 0xff;
+   public static final int     SLIDER_PATH_OPACITY_DEFAULT         = 77;                       // 30 %
    //
    // other properties
    public static final int DEFAULT_ANIMATION_TIME = 2000;
@@ -405,7 +419,7 @@ public class Map25ConfigManager {
 
       case 1:
          config.name = config.defaultId = CONFIG_DEFAULT_ID_1;
-         config.lineWidth = DEFAULT_LINE_WIDTH;
+         config.lineWidth = LINE_WIDTH_DEFAULT;
          break;
 
       case 2:
@@ -513,11 +527,15 @@ public class Map25ConfigManager {
 //         xmlConfig.putInteger(ATTR_ANIMATION_TIME, config.animationTime);
 
          // <Line>
-         final IMemento xmlLine = Util.setXmlRgb(xmlConfig, TAG_LINE, config.lineColor);
+         final IMemento xmlLine = Util.setXmlRgb(xmlConfig, TAG_LINE,   config.lineColor);
          {
-            xmlLine.putBoolean(     ATTR_LINE_IS_SHOW_DIRECTION_ARROW, config.isShowDirectionArrow);
-            xmlLine.putFloat(       ATTR_LINE_WIDTH,                   config.lineWidth);
-            xmlLine.putInteger(     ATTR_LINE_OPACITY,                 config.lineOpacity);
+            xmlLine.putBoolean(     ATTR_LINE_IS_SHOW_DIRECTION_ARROW,  config.isShowDirectionArrow);
+            xmlLine.putFloat(       ATTR_LINE_WIDTH,                    config.lineWidth);
+            xmlLine.putInteger(     ATTR_LINE_OPACITY,                  config.lineOpacity);
+
+            xmlLine.putBoolean(     ATTR_OUTLINE_IS_SHOW_OUTLINE,       config.isShowOutline);
+            xmlLine.putFloat(       ATTR_OUTLINE_BRIGHTNESS,            config.outlineBrighness);
+            xmlLine.putFloat(       ATTR_OUTLINE_WIDTH,                 config.outlineWidth);
          }
 
          // <SliderPath>
@@ -703,9 +721,9 @@ public class Map25ConfigManager {
       config.id   = Util.getXmlString(xmlConfig, ATTR_ID,            Long.toString(System.nanoTime()));
       config.name = Util.getXmlString(xmlConfig, ATTR_CONFIG_NAME,   UI.EMPTY_STRING);
 
-      config.isShowSliderLocation      = Util.getXmlBoolean(xmlConfig,  ATTR_IS_SHOW_SLIDER_LOCATION,    DEFAULT_IS_SHOW_CHART_SLIDER);
-      config.sliderLocation_Opacity    = Util.getXmlInteger(xmlConfig,  ATTR_SLIDER_LOCATION_OPACITY,    DEFAULT_SLIDER_LOCATION_OPACITY,    SLIDER_LOCATION_OPACITY_MIN,   SLIDER_LOCATION_OPACITY_MAX);
-      config.sliderLocation_Size       = Util.getXmlInteger(xmlConfig,  ATTR_SLIDER_LOCATION_SIZE,       DEFAULT_SLIDER_LOCATION_SIZE,       SLIDER_LOCATION_SIZE_MIN,      SLIDER_LOCATION_SIZE_MAX);
+      config.isShowSliderLocation      = Util.getXmlBoolean(xmlConfig,  ATTR_IS_SHOW_SLIDER_LOCATION,    SLIDER_IS_SHOW_CHART_SLIDER_DEFAULT);
+      config.sliderLocation_Opacity    = Util.getXmlInteger(xmlConfig,  ATTR_SLIDER_LOCATION_OPACITY,    SLIDER_LOCATION_OPACITY_DEFAULT,    SLIDER_LOCATION_OPACITY_MIN,   SLIDER_LOCATION_OPACITY_MAX);
+      config.sliderLocation_Size       = Util.getXmlInteger(xmlConfig,  ATTR_SLIDER_LOCATION_SIZE,       SLIDER_LOCATION_SIZE_DEFAULT,       SLIDER_LOCATION_SIZE_MIN,      SLIDER_LOCATION_SIZE_MAX);
 
       for (final IMemento mementoConfigChild : xmlConfig.getChildren()) {
 
@@ -715,28 +733,33 @@ public class Map25ConfigManager {
 
          case TAG_LINE:
 
-            config.isShowDirectionArrow      = Util.getXmlBoolean(xmlConfigChild,      ATTR_LINE_IS_SHOW_DIRECTION_ARROW, DEFAULT_LINE_IS_SHOW_DIRECTION_ARROW);
-            config.lineColor              = Util.getXmlRgb(xmlConfigChild,          DEFAULT_LINE_COLOR);
-            config.lineOpacity            = Util.getXmlInteger(xmlConfigChild,      ATTR_LINE_OPACITY,   DEFAULT_LINE_OPACITY,   LINE_OPACITY_MIN, LINE_OPACITY_MAX);
-            config.lineWidth              = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_LINE_WIDTH,     DEFAULT_LINE_WIDTH,     LINE_WIDTH_MIN,   LINE_WIDTH_MAX);
+            config.isShowDirectionArrow   = Util.getXmlBoolean(xmlConfigChild,      ATTR_LINE_IS_SHOW_DIRECTION_ARROW, LINE_IS_SHOW_DIRECTION_ARROW_DEFAULT);
+            config.lineColor              = Util.getXmlRgb(xmlConfigChild,          LINE_COLOR_DEFAULT);
+            config.lineOpacity            = Util.getXmlInteger(xmlConfigChild,      ATTR_LINE_OPACITY,            LINE_OPACITY_DEFAULT,         LINE_OPACITY_MIN,    LINE_OPACITY_MAX);
+            config.lineWidth              = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_LINE_WIDTH,              LINE_WIDTH_DEFAULT,           LINE_WIDTH_MIN,      LINE_WIDTH_MAX);
+
+            config.isShowOutline          = Util.getXmlBoolean(xmlConfigChild,      ATTR_OUTLINE_IS_SHOW_OUTLINE, OUTLINE_IS_SHOW_OUTLINE_DEFAULT);
+            config.outlineBrighness       = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_OUTLINE_BRIGHTNESS,      OUTLINE_BRIGHTNESS_DEFAULT,   OUTLINE_WIDTH_MIN,   OUTLINE_BRIGHTNESS_MAX);
+            config.outlineWidth           = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_OUTLINE_WIDTH,           OUTLINE_WIDTH_DEFAULT,        OUTLINE_WIDTH_MIN,   OUTLINE_WIDTH_MAX);
+
             break;
 
          case TAG_SLIDER_PATH:
 
-            config.isShowSliderPath    = Util.getXmlBoolean(xmlConfigChild,      ATTR_IS_SHOW_SLIDER_PATH,       DEFAULT_IS_SHOW_SLIDER_PATH);
-            config.sliderPath_Color    = Util.getXmlRgb(xmlConfigChild,          DEFAULT_SLIDER_PATH_COLOR);
-            config.sliderPath_LineWidth= Util.getXmlFloatFloat(xmlConfigChild,   ATTR_SLIDER_PATH_LINE_WIDTH,    DEFAULT_SLIDER_PATH_LINE_WIDTH, SLIDER_PATH_LINE_WIDTH_MIN, SLIDER_PATH_LINE_WIDTH_MAX);
-            config.sliderPath_Opacity  = Util.getXmlInteger(xmlConfigChild,      ATTR_SLIDER_PATH_OPACITY,       DEFAULT_SLIDER_PATH_OPACITY,    SLIDER_PATH_OPACITY_MIN,    SLIDER_PATH_OPACITY_MAX);
+            config.isShowSliderPath    = Util.getXmlBoolean(xmlConfigChild,      ATTR_IS_SHOW_SLIDER_PATH,       SLIDER_IS_SHOW_SLIDER_PATH_DEFAULT);
+            config.sliderPath_Color    = Util.getXmlRgb(xmlConfigChild,          SLIDER_PATH_COLOR_DEFAULT);
+            config.sliderPath_LineWidth= Util.getXmlFloatFloat(xmlConfigChild,   ATTR_SLIDER_PATH_LINE_WIDTH,    SLIDER_PATH_LINE_WIDTH_DEFAULT, SLIDER_PATH_LINE_WIDTH_MIN, SLIDER_PATH_LINE_WIDTH_MAX);
+            config.sliderPath_Opacity  = Util.getXmlInteger(xmlConfigChild,      ATTR_SLIDER_PATH_OPACITY,       SLIDER_PATH_OPACITY_DEFAULT,    SLIDER_PATH_OPACITY_MIN,    SLIDER_PATH_OPACITY_MAX);
             break;
 
          case TAG_SLIDER_LOCATION_LEFT:
 
-            config.sliderLocation_Left_Color   = Util.getXmlRgb(xmlConfigChild,  DEFAULT_SLIDER_LOCATION_LEFT_COLOR);
+            config.sliderLocation_Left_Color   = Util.getXmlRgb(xmlConfigChild,  SLIDER_LOCATION_LEFT_COLOR_DEFAULT);
             break;
 
          case TAG_SLIDER_LOCATION_RIGHT:
 
-            config.sliderLocation_Right_Color   = Util.getXmlRgb(xmlConfigChild, DEFAULT_SLIDER_LOCATION_RIGHT_COLOR);
+            config.sliderLocation_Right_Color   = Util.getXmlRgb(xmlConfigChild, SLIDER_LOCATION_RIGHT_COLOR_DEFAULT);
             break;
          }
 

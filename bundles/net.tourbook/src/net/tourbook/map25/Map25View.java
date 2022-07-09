@@ -1422,20 +1422,20 @@ public class Map25View extends ViewPart implements
             final double[] latitudeSerie = tourData.latitudeSerie;
             final double[] longitudeSerie = tourData.longitudeSerie;
 
-            final float[] elevationSerie = tourData.altitudeSerie;
+            final float[] valueSerie = tourData.altitudeSerie;
 
             // create vtm geo points and colors
             for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++, tourIndex++) {
 
                _allGeoPoints[geoIndex] = (new GeoPoint(latitudeSerie[serieIndex], longitudeSerie[serieIndex]));
 
-               int colorValue = 0;
+               int colorValue = 0x808080;
 
-               if (mapColorProvider instanceof IGradientColorProvider) {
+               if (valueSerie != null && mapColorProvider instanceof IGradientColorProvider) {
 
                   colorValue = ((IGradientColorProvider) mapColorProvider).getRGBValue(
                         ColorProviderConfig.MAP2,
-                        elevationSerie[serieIndex]);
+                        valueSerie[serieIndex]);
 
                   final int blue = (colorValue & 0xFF0000) >>> 16;
                   final int green = (colorValue & 0xFF00) >>> 8;
@@ -1785,7 +1785,10 @@ public class Map25View extends ViewPart implements
 
       _allTourData.clear();
 
-      if (tourData != null && tourData.latitudeSerie != null && tourData.latitudeSerie.length > 0) {
+      if (tourData != null
+            && tourData.latitudeSerie != null
+            && tourData.latitudeSerie.length > 0) {
+
          _allTourData.add(tourData);
       }
    }

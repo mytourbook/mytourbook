@@ -74,9 +74,10 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
     */
    private Composite             _shellContainer;
 
+   private Button                _chkShowDirectionArrows;
+   private Button                _chkShowOutline;
    private Button                _chkShowSliderLocation;
    private Button                _chkShowSliderPath;
-   private Button                _chkShowDirectionArrows;
    private Button                _chkTrackVerticalOffset;
 
    private Combo                 _comboName;
@@ -89,6 +90,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
    private Spinner               _spinnerLine_Opacity;
    private Spinner               _spinnerLine_Width;
+   private Spinner               _spinnerOutline_Width;
+   private Spinner               _spinnerOutline_Brighness;
    private Spinner               _spinnerSliderLocation_Size;
    private Spinner               _spinnerSliderLocation_Opacity;
    private Spinner               _spinnerSliderPath_LineWidth;
@@ -208,15 +211,17 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
             /*
              * Line width
              */
+            final String tooltipText = Messages.Slideout_Map25TrackOptions_Label_LineWidth_Tooltip;
 
             // label
             final Label label = new Label(group, SWT.NONE);
             label.setText(Messages.Slideout_Map25TrackOptions_Label_LineWidth);
-            label.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_LineWidth_Tooltip);
+            label.setToolTipText(tooltipText);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
             // spinner
             _spinnerLine_Width = new Spinner(group, SWT.BORDER);
+            _spinnerLine_Width.setToolTipText(tooltipText);
             _spinnerLine_Width.setMinimum(Map25ConfigManager.LINE_WIDTH_MIN);
             _spinnerLine_Width.setMaximum(Map25ConfigManager.LINE_WIDTH_MAX);
             _spinnerLine_Width.setIncrement(1);
@@ -229,25 +234,69 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
          }
          {
             /*
-             * TEST value
+             * Outline
              */
+            final String tooltipText = Messages.Slideout_Map25TrackOptions_Checkbox_Outline_Tooltip;
 
-            // label
-            final Label label = new Label(group, SWT.NONE);
-            label.setText("TEST value");
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+            _chkShowOutline = new Button(group, SWT.CHECK);
+            _chkShowOutline.setText(Messages.Slideout_Map25TrackOptions_Checkbox_Outline);
+            _chkShowOutline.setToolTipText(tooltipText);
+            _chkShowOutline.addSelectionListener(_defaultSelectionListener);
 
-            // spinner
-            _spinnerTESTValue = new Spinner(group, SWT.BORDER);
-            _spinnerTESTValue.setMinimum(0);
-            _spinnerTESTValue.setMaximum(100);
-            _spinnerTESTValue.setIncrement(1);
-            _spinnerTESTValue.setPageIncrement(10);
-            _spinnerTESTValue.addSelectionListener(_defaultSelectionListener);
-            _spinnerTESTValue.addMouseWheelListener(_defaultMouseWheelListener);
-            GridDataFactory.fillDefaults()
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(_spinnerTESTValue);
+            final Composite container = new Composite(group, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+            {
+               {
+                  // outline width
+                  _spinnerOutline_Width = new Spinner(container, SWT.BORDER);
+                  _spinnerOutline_Width.setToolTipText(tooltipText);
+                  _spinnerOutline_Width.setMinimum(0);
+                  _spinnerOutline_Width.setMaximum(20);
+                  _spinnerOutline_Width.setIncrement(1);
+                  _spinnerOutline_Width.setPageIncrement(10);
+                  _spinnerOutline_Width.addSelectionListener(_defaultSelectionListener);
+                  _spinnerOutline_Width.addMouseWheelListener(_defaultMouseWheelListener);
+               }
+               {
+                  // outline brightness/darkness
+                  _spinnerOutline_Brighness = new Spinner(container, SWT.BORDER);
+                  _spinnerOutline_Brighness.setToolTipText(tooltipText);
+                  _spinnerOutline_Brighness.setMinimum(-10);
+                  _spinnerOutline_Brighness.setMaximum(10);
+                  _spinnerOutline_Brighness.setIncrement(1);
+                  _spinnerOutline_Brighness.setPageIncrement(10);
+                  _spinnerOutline_Brighness.addSelectionListener(_defaultSelectionListener);
+                  _spinnerOutline_Brighness.addMouseWheelListener(_defaultMouseWheelListener);
+               }
+            }
+         }
+         {
+            /*
+             * Track vertical offset
+             */
+            _chkTrackVerticalOffset = new Button(group, SWT.CHECK);
+            _chkTrackVerticalOffset.setText(Messages.Slideout_Map25TrackOptions_Checkbox_TrackVerticalOffset);
+            _chkTrackVerticalOffset.addSelectionListener(_defaultSelectionListener);
+
+            // offset value
+            _spinnerTrackVerticalOffset = new Spinner(group, SWT.BORDER);
+            _spinnerTrackVerticalOffset.setMinimum(-1000);
+            _spinnerTrackVerticalOffset.setMaximum(1000);
+            _spinnerTrackVerticalOffset.setIncrement(1);
+            _spinnerTrackVerticalOffset.setPageIncrement(10);
+            _spinnerTrackVerticalOffset.addSelectionListener(_defaultSelectionListener);
+            _spinnerTrackVerticalOffset.addMouseWheelListener(_defaultMouseWheelListener);
+         }
+         {
+            /*
+             * Direction arrows
+             */
+            _chkShowDirectionArrows = new Button(group, SWT.CHECK);
+            _chkShowDirectionArrows.setText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows);
+            _chkShowDirectionArrows.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip);
+            _chkShowDirectionArrows.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowDirectionArrows);
          }
          {
             /*
@@ -286,32 +335,25 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
          }
          {
             /*
-             * Direction arrows
+             * TEST value
              */
-            _chkShowDirectionArrows = new Button(group, SWT.CHECK);
-            _chkShowDirectionArrows.setText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows);
-            _chkShowDirectionArrows.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip);
-            _chkShowDirectionArrows.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowDirectionArrows);
-         }
-         {
-            /*
-             * Track vertical offset
-             */
-            _chkTrackVerticalOffset = new Button(group, SWT.CHECK);
-            _chkTrackVerticalOffset.setText(Messages.Slideout_Map25TrackOptions_Checkbox_TrackVerticalOffset);
-//                  _chkTrackVerticalOffset.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip);
-            _chkTrackVerticalOffset.addSelectionListener(_defaultSelectionListener);
-//                  GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkTrackVerticalOffset);
 
-            // offset value
-            _spinnerTrackVerticalOffset = new Spinner(group, SWT.BORDER);
-            _spinnerTrackVerticalOffset.setMinimum(-1000);
-            _spinnerTrackVerticalOffset.setMaximum(1000);
-            _spinnerTrackVerticalOffset.setIncrement(1);
-            _spinnerTrackVerticalOffset.setPageIncrement(10);
-            _spinnerTrackVerticalOffset.addSelectionListener(_defaultSelectionListener);
-            _spinnerTrackVerticalOffset.addMouseWheelListener(_defaultMouseWheelListener);
+            // label
+            final Label label = new Label(group, SWT.NONE);
+            label.setText("TEST value"); //$NON-NLS-1$
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+
+            // spinner
+            _spinnerTESTValue = new Spinner(group, SWT.BORDER);
+            _spinnerTESTValue.setMinimum(0);
+            _spinnerTESTValue.setMaximum(100);
+            _spinnerTESTValue.setIncrement(1);
+            _spinnerTESTValue.setPageIncrement(10);
+            _spinnerTESTValue.addSelectionListener(_defaultSelectionListener);
+            _spinnerTESTValue.addMouseWheelListener(_defaultMouseWheelListener);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .applyTo(_spinnerTESTValue);
          }
       }
    }
@@ -510,6 +552,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       final boolean isShowSliderLocation = _chkShowSliderLocation.getSelection();
       final boolean isTrackVerticalOffset = _chkTrackVerticalOffset.getSelection();
       final boolean isShowDirectionArrows = _chkShowDirectionArrows.getSelection();
+      final boolean isShowOutline = _chkShowOutline.getSelection();
 
       final boolean isHideDirectionArrows = isShowDirectionArrows == false;
 
@@ -517,6 +560,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
        * Track
        */
       _chkTrackVerticalOffset.setEnabled(isHideDirectionArrows);
+      _spinnerOutline_Brighness.setEnabled(isShowOutline);
+      _spinnerOutline_Width.setEnabled(isShowOutline);
       _spinnerTrackVerticalOffset.setEnabled(isHideDirectionArrows && isTrackVerticalOffset);
 
       /*
@@ -658,10 +703,13 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       // track line
       _chkShowDirectionArrows          .setSelection(config.isShowDirectionArrow);
+      _chkShowOutline                  .setSelection(config.isShowOutline);
       _chkTrackVerticalOffset          .setSelection(config.isTrackVerticalOffset);
       _colorLine_Color                 .setColorValue(config.lineColor);
       _spinnerLine_Opacity             .setSelection(UI.transformOpacity_WhenRestored(config.lineOpacity));
       _spinnerLine_Width               .setSelection((int) (config.lineWidth));
+      _spinnerOutline_Brighness        .setSelection((int) (config.outlineBrighness * 10));
+      _spinnerOutline_Width            .setSelection((int) (config.outlineWidth));
       _spinnerTrackVerticalOffset      .setSelection(config.trackVerticalOffset);
 
       // slider location
@@ -696,10 +744,17 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       // track line
       config.isShowDirectionArrow         = _chkShowDirectionArrows.getSelection();
-      config.isTrackVerticalOffset        = _chkTrackVerticalOffset.getSelection();
       config.lineColor                    = _colorLine_Color.getColorValue();
       config.lineOpacity                  = UI.transformOpacity_WhenSaved(_spinnerLine_Opacity.getSelection());
       config.lineWidth                    = _spinnerLine_Width.getSelection();
+
+      // track outline
+      config.isShowOutline                = _chkShowOutline.getSelection();
+      config.outlineBrighness             = _spinnerOutline_Brighness.getSelection() / 10.0f;
+      config.outlineWidth                 = _spinnerOutline_Width.getSelection();
+
+      // track vertical offset
+      config.isTrackVerticalOffset        = _chkTrackVerticalOffset.getSelection();
       config.trackVerticalOffset          = _spinnerTrackVerticalOffset.getSelection();
 
       // slider location
