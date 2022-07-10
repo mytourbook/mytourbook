@@ -256,6 +256,7 @@ public class TourLayer extends Layer {
             if (task.__renderBuckets.get() != null) {
 
                task.__renderBuckets.clear();
+
                mMap.render();
             }
 
@@ -539,14 +540,25 @@ public class TourLayer extends Layer {
       }
    }
 
-   public void onModifyConfig() {
+   public void onModifyConfig(final boolean isLineLayoutModified) {
 
       _lineStyle = createLineStyle();
 
-      updateLineStyle(_currentTaskRenderBuckets);
+      if (isLineLayoutModified) {
 
-      // trigger redraw to let renderer fetch the result.
-      mMap.render();
+         // new buckets needs to be created, otherwise this error occurs
+         // ERROR RenderBucketsAllMT - BUG wrong bucket 1 0 on level 0
+
+         _simpleWorker.submit(RENDERING_DELAY);
+
+      } else {
+
+         // do a fast update
+
+         updateLineStyle(_currentTaskRenderBuckets);
+
+         mMap.render();
+      }
    }
 
    public void setPoints(final GeoPoint[] allGeoPoints, final int[] allGeoPointColors, final TIntArrayList allTourStarts) {

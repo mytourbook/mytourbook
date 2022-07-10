@@ -107,6 +107,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
    private ColorSelectorExtended _colorSliderLocation_Right;
    private ColorSelectorExtended _colorSliderPathColor;
 
+   private boolean               _isLineLayoutModified;
+
    public SlideoutMap25_TrackOptions(final Composite ownerControl,
                                      final ToolBar toolbar,
                                      final Map25View map25View) {
@@ -641,7 +643,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       final Map25App mapApp = _map25View.getMapApp();
 
-      mapApp.getLayer_Tour().onModifyConfig();
+      mapApp.getLayer_Tour().onModifyConfig(_isLineLayoutModified);
       mapApp.getLayer_SliderPath().onModifyConfig();
       mapApp.getLayer_SliderLocation().onModifyConfig();
    }
@@ -696,6 +698,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       // get active config AFTER getting the index because this could change the active config
       final int activeConfigIndex = Map25ConfigManager.getActiveTourTrackConfigIndex();
 
+
 // SET_FORMATTING_OFF
 
       _comboName                       .select(activeConfigIndex);
@@ -738,12 +741,15 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       final Map25TrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
 
+      final boolean isShowDirectionArrows = _chkShowDirectionArrows.getSelection();
+      _isLineLayoutModified = config.isShowDirectionArrow != isShowDirectionArrows;
+
 // SET_FORMATTING_OFF
 
       config.name                         = _textConfigName.getText();
 
       // track line
-      config.isShowDirectionArrow         = _chkShowDirectionArrows.getSelection();
+      config.isShowDirectionArrow         = isShowDirectionArrows;
       config.lineColor                    = _colorLine_Color.getColorValue();
       config.lineOpacity                  = UI.transformOpacity_WhenSaved(_spinnerLine_Opacity.getSelection());
       config.lineWidth                    = _spinnerLine_Width.getSelection();
@@ -783,7 +789,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       final Map25App mapApp = _map25View.getMapApp();
 
-      mapApp.getLayer_Tour().onModifyConfig();
+      mapApp.getLayer_Tour().onModifyConfig(_isLineLayoutModified);
       mapApp.getLayer_SliderPath().onModifyConfig();
       mapApp.getLayer_SliderLocation().onModifyConfig();
    }
