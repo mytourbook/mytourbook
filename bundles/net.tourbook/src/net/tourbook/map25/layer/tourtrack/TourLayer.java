@@ -75,6 +75,8 @@ public class TourLayer extends Layer {
    private float              _outlineBrightness;
    private float              _outlineWidth;
 
+   private int                _testValue;
+
    private final Worker       _simpleWorker;
 
    private boolean            _isUpdateLayer;
@@ -479,6 +481,8 @@ public class TourLayer extends Layer {
       _outlineBrightness = trackConfig.outlineBrighness;
       _outlineWidth = trackConfig.outlineWidth;
 
+      _testValue = trackConfig.testValue;
+
       if (trackConfig.isShowDirectionArrow) {
 
          // create texture from arrow image
@@ -599,6 +603,8 @@ public class TourLayer extends Layer {
       lineBucket.isShowOutline = _isShowOutline;
       lineBucket.outlineBrightness = _outlineBrightness;
       lineBucket.outlineWidth = _outlineWidth;
+
+      lineBucket.testValue = _testValue;
 
       return lineBucket;
    }

@@ -742,7 +742,10 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       final Map25TrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
 
       final boolean isShowDirectionArrows = _chkShowDirectionArrows.getSelection();
-      _isLineLayoutModified = config.isShowDirectionArrow != isShowDirectionArrows;
+      final int testValue = _spinnerTESTValue.getSelection();
+
+      _isLineLayoutModified = config.isShowDirectionArrow != isShowDirectionArrows
+            || config.testValue != testValue;
 
 // SET_FORMATTING_OFF
 
@@ -776,7 +779,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       config.sliderPath_LineWidth         = _spinnerSliderPath_LineWidth.getSelection();
       config.sliderPath_Opacity           = UI.transformOpacity_WhenSaved(_spinnerSliderPath_Opacity.getSelection());
 
-      config.testValue                    = _spinnerTESTValue.getSelection();
+      config.testValue                    = testValue;
 
 // SET_FORMATTING_ON
    }

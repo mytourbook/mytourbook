@@ -78,6 +78,8 @@ public class LineBucketMT extends RenderBucketMT {
    public float               outlineBrightness;
    public float               outlineWidth;
 
+   public float               testValue;
+
    public float               scale            = 1;
 
    private boolean            _isCapRounded;
@@ -116,6 +118,7 @@ public class LineBucketMT extends RenderBucketMT {
        * @param renderBucket
        * @param viewport
        * @param vp2mpScale
+       *           Viewport scale 2 map scale: it is between 1...2
        * @param renderBucketsAll
        * @return
        */
@@ -193,6 +196,7 @@ public class LineBucketMT extends RenderBucketMT {
                0 //                       offset in bytes of the first component in the vertex attribute array
          );
 
+         // set matrix
          viewport.mvp.setAsUniform(shader.shader_u_mvp);
 
 //       final double groundResolution = MercatorProjection.groundResolution(mapPosition);
@@ -202,7 +206,7 @@ public class LineBucketMT extends RenderBucketMT {
           * <p>
           * Within a zoom-level, lines would be scaled by the factor 2 by view-matrix.
           * Though lines should only scale by sqrt(2). This is achieved
-          * by inverting scaling of extrusion vector with: width/sqrt(s).
+          * by inverting scaling of extrusion vector with: width/sqrt(scale).
           */
          final double variableScale = Math.sqrt(vp2mpScale);
 
@@ -275,7 +279,7 @@ public class LineBucketMT extends RenderBucketMT {
             }
 
             /*
-             * First draw the outline which is partly overwritten by the core line
+             * First draw the outline which is afterwards overwritten partly by the core line
              */
             if (isPaintOutline) {
 
@@ -293,10 +297,10 @@ public class LineBucketMT extends RenderBucketMT {
                   width += scale * outlineWidth / variableScale;
                }
 
+               gl.uniform1f(shader_u_width, (float) (width * COORD_SCALE_BY_DIR_SCALE));
+
                // outline brighness
                gl.uniform1f(shader_uOutlineBrightness, outlineBrightness);
-
-               gl.uniform1f(shader_u_width, (float) (width * COORD_SCALE_BY_DIR_SCALE));
 
                // line-edge fade
                if (lineStyle.blur > 0) {
@@ -503,6 +507,9 @@ public class LineBucketMT extends RenderBucketMT {
                 final int numPoints,
                 final boolean isCapClosed,
                 final int[] pixelPointColors) {
+
+      // test minimum distance
+//      _minimumDistance = testValue * 2.0f;
 
       boolean isCapRounded = false;
       boolean isCapSquared = false;
