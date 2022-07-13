@@ -76,12 +76,14 @@ import net.tourbook.map25.ui.SlideoutMap25_MapLayer;
 import net.tourbook.map25.ui.SlideoutMap25_MapOptions;
 import net.tourbook.map25.ui.SlideoutMap25_MapProvider;
 import net.tourbook.map25.ui.SlideoutMap25_PhotoOptions;
+import net.tourbook.map25.ui.SlideoutMap25_TrackColors;
 import net.tourbook.map25.ui.SlideoutMap25_TrackOptions;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoEventId;
 import net.tourbook.photo.PhotoManager;
 import net.tourbook.photo.PhotoRatingStarOperator;
+import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.ITourEventListener;
 import net.tourbook.tour.SelectionDeletedTours;
 import net.tourbook.tour.SelectionTourData;
@@ -96,10 +98,13 @@ import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.ui.tourChart.TourChart;
 
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
@@ -109,6 +114,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
@@ -132,13 +138,20 @@ public class Map25View extends ViewPart implements
       IMapWithPhotos,
       IPhotoEventListener {
 
+   private static final String MAP_ACTION_TOUR_COLOR_ALTITUDE_TOOLTIP = net.tourbook.map2.Messages.map_action_tour_color_altitude_tooltip;
+   private static final String MAP_ACTION_TOUR_COLOR_GRADIENT_TOOLTIP = net.tourbook.map2.Messages.map_action_tour_color_gradient_tooltip;
+   private static final String MAP_ACTION_TOUR_COLOR_PACE_TOOLTIP     = net.tourbook.map2.Messages.map_action_tour_color_pase_tooltip;
+   private static final String MAP_ACTION_TOUR_COLOR_PULSE_TOOLTIP    = net.tourbook.map2.Messages.map_action_tour_color_pulse_tooltip;
+   private static final String MAP_ACTION_TOUR_COLOR_SPEED_TOOLTIP    = net.tourbook.map2.Messages.map_action_tour_color_speed_tooltip;
+   private static final String TOUR_ACTION_SHOW_HR_ZONES_TOOLTIP      = net.tourbook.map2.Messages.Tour_Action_ShowHrZones_Tooltip;
+   private static final String MAP_ACTION_SHOW_TOUR_IN_MAP            = net.tourbook.map2.Messages.map_action_show_tour_in_map;
+
 // SET_FORMATTING_OFF
 
-   private static final String            MAP_ACTION_SHOW_TOUR_IN_MAP                  = net.tourbook.map2.Messages.map_action_show_tour_in_map;
    private static final String            MAP_ACTION_SYNCH_WITH_SLIDER                 = net.tourbook.map2.Messages.map_action_synch_with_slider;
    private static final String            MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED        = net.tourbook.map2.Messages.Map_Action_SynchWithSlider_Centered;
-
    private static final ImageDescriptor   _imageSyncWithSlider                         = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider);
+
    private static final ImageDescriptor   _imageSyncWithSlider_Disabled                = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Disabled);
    private static final ImageDescriptor   _imageSyncWithSlider_Centered                = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Centered);
    private static final ImageDescriptor   _imageSyncWithSlider_Centered_Disabled       = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Centered_Disabled);
@@ -157,6 +170,7 @@ public class Map25View extends ViewPart implements
    //
    private static final String           STATE_LAYER_HILLSHADING_OPACITY         = "STATE_LAYER_HILLSHADING_OPACITY";            //$NON-NLS-1$
    private static final String           STATE_MAP_SYNCHED_WITH                  = "STATE_MAP_SYNCHED_WITH";                     //$NON-NLS-1$
+   private static final String           STATE_TRACK_GRAPH_ID                    = "STATE_TRACK_GRAPH_ID";                       //$NON-NLS-1$
    // photo layer
    private static final String           STATE_IS_LAYER_PHOTO_VISIBLE            = "STATE_IS_LAYER_PHOTO_VISIBLE";               //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_PHOTO_SCALED             = "STATE_IS_LAYER_PHOTO_SCALED";                //$NON-NLS-1$
@@ -168,6 +182,7 @@ public class Map25View extends ViewPart implements
    //
    public static final String            ID                                      = "net.tourbook.map25.Map25View";               //$NON-NLS-1$
    //
+   private static final IPreferenceStore _prefStore                              = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _state                                  = TourbookPlugin.getState(ID);
    private static final IDialogSettings  _state_PhotoFilter                      = TourbookPlugin.getState(ID + ".PhotoFilter"); //$NON-NLS-1$
    //
@@ -175,7 +190,7 @@ public class Map25View extends ViewPart implements
    //
    private Map25App                      _mapApp;
    //
-   private OpenDialogManager             _openDlgMgr                             = new OpenDialogManager();
+   private OpenDialogManager             _openDialogManager                      = new OpenDialogManager();
    private final MapInfoManager          _mapInfoManager                         = MapInfoManager.getInstance();
    //
    private boolean                       _isPartVisible;
@@ -184,6 +199,7 @@ public class Map25View extends ViewPart implements
    private IPartListener2                _partListener;
    private ISelectionListener            _postSelectionListener;
    private ITourEventListener            _tourEventListener;
+   private IPropertyChangeListener       _prefChangeListener;
    //
    private ISelection                    _lastHiddenSelection;
    private int                           _lastSelectionHash;
@@ -203,18 +219,26 @@ public class Map25View extends ViewPart implements
    private ActionZoomIn                  _actionZoom_In;
    private ActionZoomOut                 _actionZoom_Out;
    //
+   private List<Object>                  _allTrackColorActions;
+   private ActionTrackColor              _actionTrackColor_Altitude;
+   private ActionTrackColor              _actionTrackColor_Gradient;
+   private ActionTrackColor              _actionTrackColor_Pace;
+   private ActionTrackColor              _actionTrackColor_Pulse;
+   private ActionTrackColor              _actionTrackColor_Speed;
+   private Action                        _actionTrackColor_HrZone;
+   //
    private double                        _zoomFactor                             = 1.5;
-
+   //
    /** Contains only geo tours */
    private ArrayList<TourData>           _allTourData                            = new ArrayList<>();
    private TIntArrayList                 _allTourStarts                          = new TIntArrayList();
    private GeoPoint[]                    _allGeoPoints;
    private BoundingBox                   _boundingBox;
-
    /**
     * Contains photos which are displayed in the map
     */
    private ArrayList<Photo>              _allPhotos                              = new ArrayList<>();
+
    private final ArrayList<Photo>        _filteredPhotos                         = new ArrayList<>();
    //
    private boolean                       _isPhotoFilterActive;
@@ -225,23 +249,27 @@ public class Map25View extends ViewPart implements
    private int                           _rightSliderValueIndex;
    private int                           _selectedSliderValueIndex;
    //
-//   private int     _hash_AllPhotos;
-   private int     _hashTourId;
-   private int     _hashTourData;
+   private int                           _hashTourId;
+   private int                           _hashTourData;
    //
-   private MapSync _mapSynchedWith = MapSync.NONE;
+   private MapSync                       _mapSynchedWith                         = MapSync.NONE;
    //
-   private long    _lastFiredSyncEventTime;
-
+   private long                          _lastFiredSyncEventTime;
+   //
+   /**
+    * Color id for the currently displayed tour tracks.
+    */
+   private MapGraphId                    _trackGraphId;
+   private IMapColorProvider             _mapColorProvider;
+   //
    // context menu
 //   private boolean _isContextMenuVisible;
-
    /*
     * UI controls
     */
    private Composite _swtContainer;
    private Composite _parent;
-
+   //   
    private Menu      _swtContextMenu;
 
    private class ActionMap25_Layer extends ActionToolbarSlideout {
@@ -365,6 +393,62 @@ public class Map25View extends ViewPart implements
 
          actionShowTour(getSelection());
       }
+   }
+
+   private class ActionTrackColor extends ActionToolbarSlideout {
+
+      public MapGraphId _graphId = null;
+
+      ActionTrackColor(final MapGraphId graphId,
+                       final String toolTipText) {
+
+         super(net.tourbook.ui.UI.getGraphImage(graphId),
+               net.tourbook.ui.UI.getGraphImage_Disabled(graphId));
+
+         _graphId = graphId;
+
+         isToggleAction = true;
+         notSelectedTooltip = toolTipText;
+      }
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+         return new SlideoutMap25_TrackColors(_parent, toolbar, Map25View.this, _graphId);
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+
+      @Override
+      protected void onSelect() {
+
+         super.onSelect();
+
+         actionTrackColor(this);
+      }
+   }
+
+   private class ActionTrackColor_HrZone extends Action {
+
+      public MapGraphId _graphId = MapGraphId.HrZone;
+
+      public ActionTrackColor_HrZone() {
+
+         super(null, AS_CHECK_BOX);
+
+         setToolTipText(TOUR_ACTION_SHOW_HR_ZONES_TOOLTIP);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PulseZones));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.PulseZones_Disabled));
+      }
+
+      @Override
+      public void run() {
+         actionTrackColor(this);
+      }
+
    }
 
    private class Map25ContextMenu extends SWTPopupOverAWT {
@@ -510,7 +594,66 @@ public class Map25View extends ViewPart implements
       }
    }
 
+   private void actionTrackColor(final Object selectedAction) {
+
+      // get graph ID
+      MapGraphId selectedActionGraphId = null;
+      if (selectedAction instanceof ActionTrackColor) {
+
+         selectedActionGraphId = ((ActionTrackColor) selectedAction)._graphId;
+
+      } else if (selectedAction instanceof ActionTrackColor_HrZone) {
+
+         selectedActionGraphId = ((ActionTrackColor_HrZone) selectedAction)._graphId;
+      }
+
+      if (_trackGraphId == selectedActionGraphId) {
+
+         // active color is selected -> prevent unchecking selected color
+
+         if (selectedAction instanceof ActionTrackColor) {
+
+            final ActionTrackColor action = (ActionTrackColor) selectedAction;
+            if (action.getSelection() == false) {
+
+               action.setSelection(false);
+            }
+
+         } else if (selectedAction instanceof ActionTrackColor_HrZone) {
+
+            final ActionTrackColor_HrZone action = (ActionTrackColor_HrZone) selectedAction;
+            if (action.isChecked() == false) {
+
+               action.setChecked(false);
+            }
+         }
+
+         return;
+      }
+
+      // a new color is selected, uncheck previous colors
+
+      for (final Object action : _allTrackColorActions) {
+
+         // uncheck any other colors
+         if (action != selectedAction) {
+
+            if (action instanceof ActionTrackColor) {
+
+               ((ActionTrackColor) action).setSelection(false);
+
+            } else if (action instanceof ActionTrackColor_HrZone) {
+
+               ((ActionTrackColor_HrZone) action).setChecked(false);
+            }
+         }
+      }
+
+      setColorProvider(selectedActionGraphId, true);
+   }
+
    public void actionZoomIn() {
+
       final Map map25 = _mapApp.getMap();
 
       map25.post(() -> {
@@ -556,7 +699,7 @@ public class Map25View extends ViewPart implements
          final Animator animator = map25.animator();
 
          animator.cancel();
-         animator.animateTo(//
+         animator.animateTo(
                2000,
                _boundingBox,
                Easing.Type.SINE_INOUT,
@@ -627,6 +770,23 @@ public class Map25View extends ViewPart implements
          }
       };
       getViewSite().getPage().addPartListener(_partListener);
+   }
+
+   private void addPrefListener() {
+
+      _prefChangeListener = propertyChangeEvent -> {
+
+         final String property = propertyChangeEvent.getProperty();
+
+         if (property.equals(ITourbookPreferences.MAP3_COLOR_IS_MODIFIED)) {
+
+            // update map colors
+
+            setColorProvider(_trackGraphId, true);
+         }
+      };
+
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
    /**
@@ -729,7 +889,7 @@ public class Map25View extends ViewPart implements
     */
    @Override
    public void closeOpenedDialogs(final IOpeningDialog openingDialog) {
-      _openDlgMgr.closeOpenedDialogs(openingDialog);
+      _openDialogManager.closeOpenedDialogs(openingDialog);
    }
 
    private void createActions() {
@@ -751,7 +911,22 @@ public class Map25View extends ViewPart implements
       _actionZoom_In                   = new ActionZoomIn(this);
       _actionZoom_Out                  = new ActionZoomOut(this);
 
+      _actionTrackColor_Altitude        = new ActionTrackColor(MapGraphId.Altitude,   MAP_ACTION_TOUR_COLOR_ALTITUDE_TOOLTIP);
+      _actionTrackColor_Gradient        = new ActionTrackColor(MapGraphId.Gradient,   MAP_ACTION_TOUR_COLOR_GRADIENT_TOOLTIP);
+      _actionTrackColor_Pace            = new ActionTrackColor(MapGraphId.Pace,       MAP_ACTION_TOUR_COLOR_PACE_TOOLTIP);
+      _actionTrackColor_Pulse           = new ActionTrackColor(MapGraphId.Pulse,      MAP_ACTION_TOUR_COLOR_PULSE_TOOLTIP);
+      _actionTrackColor_Speed           = new ActionTrackColor(MapGraphId.Speed,      MAP_ACTION_TOUR_COLOR_SPEED_TOOLTIP);
+      _actionTrackColor_HrZone          = new ActionTrackColor_HrZone();
+
 // SET_FORMATTING_ON
+
+      _allTrackColorActions = new ArrayList<>();
+      _allTrackColorActions.add(_actionTrackColor_Altitude);
+      _allTrackColorActions.add(_actionTrackColor_Gradient);
+      _allTrackColorActions.add(_actionTrackColor_Pace);
+      _allTrackColorActions.add(_actionTrackColor_Pulse);
+      _allTrackColorActions.add(_actionTrackColor_Speed);
+      _allTrackColorActions.add(_actionTrackColor_HrZone);
    }
 
    private BoundingBox createBoundingBox(final GeoPoint[] geoPoints) {
@@ -906,6 +1081,7 @@ public class Map25View extends ViewPart implements
       createUI(parent);
 
       addPartListener();
+      addPrefListener();
       addTourEventListener();
       addSelectionListener();
 
@@ -990,6 +1166,8 @@ public class Map25View extends ViewPart implements
          _mapApp.getMap().destroy();
       }
 
+      _prefStore.removePropertyChangeListener(_prefChangeListener);
+
       MapBookmarkManager.removeBookmarkListener(this);
       MapManager.removeMapSyncListener(this);
       PhotoManager.removePhotoEventListener(this);
@@ -1053,7 +1231,15 @@ public class Map25View extends ViewPart implements
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
+      tbm.add(_actionTrackColor_Altitude);
+      tbm.add(_actionTrackColor_Pulse);
+      tbm.add(_actionTrackColor_Speed);
+      tbm.add(_actionTrackColor_Pace);
+      tbm.add(_actionTrackColor_Gradient);
+      tbm.add(_actionTrackColor_HrZone);
+
       tbm.add(new Separator());
+
       tbm.add(_actionShowPhotoOptions);
       tbm.add(_actionMapPhotoFilter);
       tbm.add(_actionMapBookmarks); //should be moved to position like in Map2View
@@ -1120,6 +1306,38 @@ public class Map25View extends ViewPart implements
    @Override
    public ArrayList<Photo> getPhotos() {
       return _allPhotos;
+   }
+
+   public Shell getShell() {
+
+      return _parent.getShell();
+   }
+
+   private float[] getValueSerie(final TourData tourData) {
+
+      switch (_trackGraphId) {
+
+      case Altitude:
+         return tourData.getAltitudeSerie();
+      case Cadence:
+         return tourData.getCadenceSerie();
+      case Gradient:
+         return tourData.getGradientSerie();
+      case Pulse:
+         return tourData.pulseSerie;
+      case Pace:
+         return tourData.getPaceSerie();
+      case Speed:
+         return tourData.getSpeedSerie();
+
+      case Altimeter:
+      case HrZone:
+      case Power:
+      case RunDyn_StepLength:
+      case Temperature:
+      default:
+         return null;
+      }
    }
 
    @Override
@@ -1372,13 +1590,12 @@ public class Map25View extends ViewPart implements
       }
 
       // set colors according to the tour values
-      final IMapColorProvider mapColorProvider = MapColorProvider.getActiveMap2ColorProvider(MapGraphId.Altitude);
-      if (mapColorProvider instanceof IGradientColorProvider) {
+      if (_mapColorProvider instanceof IGradientColorProvider) {
 
          MapUtils.configureColorProvider(
                _allTourData,
-               (IGradientColorProvider) mapColorProvider,
-               ColorProviderConfig.MAP2,
+               (IGradientColorProvider) _mapColorProvider,
+               ColorProviderConfig.MAP3_TOUR,
                200 // set dummy for now
          );
       }
@@ -1399,7 +1616,7 @@ public class Map25View extends ViewPart implements
 
       if (_allTourData.size() == 1 && _allTourData.get(0).isMultipleTours()) {
 
-         // tourdata contains multiple tours
+         // one tourdata contains multiple tours
 
          final TourData tourData = _allTourData.get(0);
 
@@ -1422,7 +1639,7 @@ public class Map25View extends ViewPart implements
             final double[] latitudeSerie = tourData.latitudeSerie;
             final double[] longitudeSerie = tourData.longitudeSerie;
 
-            final float[] valueSerie = tourData.altitudeSerie;
+            final float[] valueSerie = getValueSerie(tourData);
 
             // create vtm geo points and colors
             for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++, tourIndex++) {
@@ -1431,9 +1648,9 @@ public class Map25View extends ViewPart implements
 
                int colorValue = 0x808080;
 
-               if (valueSerie != null && mapColorProvider instanceof IGradientColorProvider) {
+               if (valueSerie != null && _mapColorProvider instanceof IGradientColorProvider) {
 
-                  colorValue = ((IGradientColorProvider) mapColorProvider).getRGBValue(
+                  colorValue = ((IGradientColorProvider) _mapColorProvider).getRGBValue(
                         ColorProviderConfig.MAP2,
                         valueSerie[serieIndex]);
 
@@ -1443,11 +1660,11 @@ public class Map25View extends ViewPart implements
 
                   colorValue = ((red & 0xFF) << 16) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 0);
 
-               } else if (mapColorProvider instanceof IDiscreteColorProvider) {
+               } else if (_mapColorProvider instanceof IDiscreteColorProvider) {
 
                   // e.g. HR zone color provider
 
-//                  colorValue = ((IDiscreteColorProvider) mapColorProvider).getColorValue(tourData, serieIndex, isDrawLine);
+                  colorValue = ((IDiscreteColorProvider) _mapColorProvider).getColorValue(tourData, serieIndex, true);
                }
 
                allGeoPointColors[geoIndex] = colorValue;
@@ -1573,15 +1790,21 @@ public class Map25View extends ViewPart implements
 
    void restoreState() {
 
+// SET_FORMATTING_OFF
+
       /*
        * Layer
        */
-// SET_FORMATTING_OFF
 
       // tour layer
-      _isShowTour = Util.getStateBoolean(_state, STATE_IS_LAYER_TOUR_VISIBLE, true);
+      _isShowTour       = Util.getStateBoolean(_state, STATE_IS_LAYER_TOUR_VISIBLE, true);
       _actionShowTourOptions.setSelection(_isShowTour);
       _mapApp.getLayer_Tour().setEnabled(_isShowTour);
+
+      // track color
+      _trackGraphId     = (MapGraphId) Util.getStateEnum(_state, STATE_TRACK_GRAPH_ID, MapGraphId.Altitude);
+      restoreState_TrackColorActions(_trackGraphId);
+      setColorProvider(_trackGraphId,false);
 
       // tour marker layer
       final boolean isMarkerVisible = Util.getStateBoolean(_state, STATE_IS_LAYER_MARKER_VISIBLE, true);
@@ -1636,6 +1859,30 @@ public class Map25View extends ViewPart implements
       enableActions();
 
       showToursFromTourProvider();
+   }
+
+   /**
+    * Select track color action
+    *
+    * @param trackGraphId
+    */
+   private void restoreState_TrackColorActions(final MapGraphId trackGraphId) {
+
+      for (final Object action : _allTrackColorActions) {
+
+         if (action instanceof ActionTrackColor) {
+
+            final ActionTrackColor trackAction = (ActionTrackColor) action;
+
+            trackAction.setSelection(trackGraphId == trackAction._graphId);
+
+         } else if (action instanceof ActionTrackColor_HrZone) {
+
+            final ActionTrackColor_HrZone trackAction = (ActionTrackColor_HrZone) action;
+
+            trackAction.setChecked(trackGraphId == trackAction._graphId);
+         }
+      }
    }
 
    /**
@@ -1695,9 +1942,10 @@ public class Map25View extends ViewPart implements
    @PersistState
    private void saveState() {
 
-      Util.setStateEnum(_state, STATE_MAP_SYNCHED_WITH, _mapSynchedWith);
-
 // SET_FORMATTING_OFF
+
+      Util.setStateEnum(_state, STATE_MAP_SYNCHED_WITH,  _mapSynchedWith);
+      Util.setStateEnum(_state, STATE_TRACK_GRAPH_ID,    _trackGraphId);
 
       // other layers
       _state.put(STATE_IS_LAYER_BASE_MAP_VISIBLE,     _mapApp.getLayer_BaseMap().isEnabled());
@@ -1729,6 +1977,21 @@ public class Map25View extends ViewPart implements
 // SET_FORMATTING_ON
 
       Map25ConfigManager.saveState();
+   }
+
+   /**
+    * @param trackGraphId
+    * @param isPaintTours
+    */
+   private void setColorProvider(final MapGraphId trackGraphId, final boolean isPaintTours) {
+
+      _trackGraphId = trackGraphId;
+
+      _mapColorProvider = MapColorProvider.getActiveMap3ColorProvider(trackGraphId);
+
+      if (isPaintTours) {
+         paintTours();
+      }
    }
 
    @Override
