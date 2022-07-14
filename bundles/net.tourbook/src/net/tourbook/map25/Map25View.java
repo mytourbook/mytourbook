@@ -37,6 +37,7 @@ import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
+import net.tourbook.common.color.Map3GradientColorManager;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.tooltip.ActionToolbarSlideout;
 import net.tourbook.common.tooltip.ICloseOpenedDialogs;
@@ -1651,7 +1652,7 @@ public class Map25View extends ViewPart implements
                if (valueSerie != null && _mapColorProvider instanceof IGradientColorProvider) {
 
                   final int abgr = ((IGradientColorProvider) _mapColorProvider).getRGBValue(
-                        ColorProviderConfig.MAP2,
+                        ColorProviderConfig.MAP3_TOUR,
                         valueSerie[serieIndex]);
 // SET_FORMATTING_OFF
 
@@ -1985,6 +1986,7 @@ public class Map25View extends ViewPart implements
 // SET_FORMATTING_ON
 
       Map25ConfigManager.saveState();
+      Map3GradientColorManager.saveColors();
    }
 
    /**

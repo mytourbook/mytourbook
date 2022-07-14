@@ -738,7 +738,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
        * OpenGL test
        */
       _layer_OpenGLTest = new OpenGLTestLayer(mMap);
-      _layer_OpenGLTest.setEnabled(true);
+      _layer_OpenGLTest.setEnabled(false);
       allMapLayer.add(_layer_OpenGLTest);
 
       /*

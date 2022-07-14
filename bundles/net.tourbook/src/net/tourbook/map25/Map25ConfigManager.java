@@ -735,12 +735,12 @@ public class Map25ConfigManager {
 
             config.isShowDirectionArrow   = Util.getXmlBoolean(xmlConfigChild,      ATTR_LINE_IS_SHOW_DIRECTION_ARROW, LINE_IS_SHOW_DIRECTION_ARROW_DEFAULT);
             config.lineColor              = Util.getXmlRgb(xmlConfigChild,          LINE_COLOR_DEFAULT);
-            config.lineOpacity            = Util.getXmlInteger(xmlConfigChild,      ATTR_LINE_OPACITY,            LINE_OPACITY_DEFAULT,         LINE_OPACITY_MIN,    LINE_OPACITY_MAX);
-            config.lineWidth              = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_LINE_WIDTH,              LINE_WIDTH_DEFAULT,           LINE_WIDTH_MIN,      LINE_WIDTH_MAX);
+            config.lineOpacity            = Util.getXmlInteger(xmlConfigChild,      ATTR_LINE_OPACITY,            LINE_OPACITY_DEFAULT,         LINE_OPACITY_MIN,          LINE_OPACITY_MAX);
+            config.lineWidth              = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_LINE_WIDTH,              LINE_WIDTH_DEFAULT,           LINE_WIDTH_MIN,            LINE_WIDTH_MAX);
 
             config.isShowOutline          = Util.getXmlBoolean(xmlConfigChild,      ATTR_OUTLINE_IS_SHOW_OUTLINE, OUTLINE_IS_SHOW_OUTLINE_DEFAULT);
-            config.outlineBrighness       = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_OUTLINE_BRIGHTNESS,      OUTLINE_BRIGHTNESS_DEFAULT,   OUTLINE_WIDTH_MIN,   OUTLINE_BRIGHTNESS_MAX);
-            config.outlineWidth           = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_OUTLINE_WIDTH,           OUTLINE_WIDTH_DEFAULT,        OUTLINE_WIDTH_MIN,   OUTLINE_WIDTH_MAX);
+            config.outlineBrighness       = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_OUTLINE_BRIGHTNESS,      OUTLINE_BRIGHTNESS_DEFAULT,   OUTLINE_BRIGHTNESS_MIN,    OUTLINE_BRIGHTNESS_MAX);
+            config.outlineWidth           = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_OUTLINE_WIDTH,           OUTLINE_WIDTH_DEFAULT,        OUTLINE_WIDTH_MIN,         OUTLINE_WIDTH_MAX);
 
             break;
 
