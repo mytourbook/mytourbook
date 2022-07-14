@@ -244,7 +244,7 @@ public class RenderBucketsAllMT extends TileData {
          vboSize += TILE_FILL_VERTICES * 2;
       }
 
-      final int vertexColorSize = vboSize / 4 * 3;
+      final int vertexColorSize = vboSize;
 
       final ShortBuffer vboBuffer = MapRenderer.getShortBuffer(vboSize);
       final ByteBuffer colorBuffer = getColorBuffer(vertexColorSize);

@@ -61,14 +61,14 @@ public class VertexDataMT extends Inlist.List<Chunk> {
    private short[]           _currentChunk_Vertices;
 
    /**
-    * There are 3 color componentsfor 4 chunks
+    * There are 4 color components for 4 chunks
     */
    private byte[]            _currentChunk_Colors;
 
    public static class Chunk extends Inlist<Chunk> {
 
       public final short[] _chunkVertices = new short[SIZE];
-      public final byte[]  _chunkColors   = new byte[SIZE / 4 * 3];
+      public final byte[]  _chunkColors   = new byte[SIZE];
 
       public int           _numChunkUsedVertices;
       public int           _numChunkUsedColors;
@@ -117,8 +117,9 @@ public class VertexDataMT extends Inlist.List<Chunk> {
       _currentChunk_Colors[_numUsedChunkColors + 0] = (byte) ((color >>> 16) & 0xff); // red
       _currentChunk_Colors[_numUsedChunkColors + 1] = (byte) ((color >>> 8) & 0xff); // green
       _currentChunk_Colors[_numUsedChunkColors + 2] = (byte) ((color >>> 0) & 0xff); // blue
+      _currentChunk_Colors[_numUsedChunkColors + 3] = (byte) ((color >>> 24) & 0xff); // opacity / alpha
 
-      _numUsedChunkColors += 3;
+      _numUsedChunkColors += 4;
    }
 
    /**

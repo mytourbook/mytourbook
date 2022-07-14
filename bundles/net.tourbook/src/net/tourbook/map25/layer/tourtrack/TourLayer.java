@@ -170,7 +170,7 @@ public class TourLayer extends Layer {
       private float[]           __pixelPoints;
 
       /**
-       * One {@link #__pixelPointColors2} has two {@link #__pixelPoints}, 2 == Halfe of items
+       * One {@link #__pixelPointColors2} has two {@link #__pixelPoints}, 2 == Half of items
        */
       private int[]             __pixelPointColors2;
 

@@ -13,7 +13,7 @@ uniform float u_width;
 attribute vec4 a_pos;
 
 // colors for each a_pos vertex
-attribute vec3 aVertexColor;
+attribute vec4    aVertexColor;
 
 // common alpha for the vertex color
 uniform float     uVertexColorAlpha;
@@ -45,7 +45,7 @@ void main() {
     v_st = abs(mod(dir, 4.0)) - 1.0;
     
     // transfer colors to the fragment shader - rgb 0...255 -> 0...1
-    vec3 vertexColor01 = aVertexColor / 255.0;
+    vec4 vertexColor01 = aVertexColor / 255.0;
 
     // 0...2 -> -1...1
     float outlineBrightness01 = uOutlineBrightness - 1.0;
@@ -58,10 +58,10 @@ void main() {
             // < 0 -> darker
             : vertexColor01 * uOutlineBrightness;
     
-    vFragmentColor = vec4(vertexColorWithBrightness, uVertexColorAlpha);
+    vFragmentColor = vec4(vertexColorWithBrightness, vertexColor01.a * uVertexColorAlpha);
 }
 
-$$
+$$ 
 
 #ifdef GLES
 precision highp float;

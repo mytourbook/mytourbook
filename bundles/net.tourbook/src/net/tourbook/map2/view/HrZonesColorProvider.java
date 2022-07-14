@@ -106,6 +106,10 @@ public class HrZonesColorProvider implements IDiscreteColorProvider {
       return _graphId;
    }
 
+   /**
+    * @param serieIndex
+    * @return Returns argb (alpha, blue, green, red)
+    */
    private int getHrColor(final int serieIndex) {
 
       final float pulse = _pulseData[serieIndex];
@@ -114,12 +118,12 @@ public class HrZonesColorProvider implements IDiscreteColorProvider {
       final TourPersonHRZone hrZone = _personHrZones.get(zoneIndex);
       final RGB rgb = hrZone.getColor();
 
-      final int rgbValue = ((rgb.red & 0xFF) << 0)
+      final int abgr = ((rgb.red & 0xFF) << 0)
             | ((rgb.green & 0xFF) << 8)
             | ((rgb.blue & 0xFF) << 16)
             | ((0xFF) << 24);
 
-      return rgbValue;
+      return abgr;
    }
 
 }

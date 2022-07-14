@@ -269,7 +269,7 @@ public class Map25View extends ViewPart implements
     */
    private Composite _swtContainer;
    private Composite _parent;
-   //   
+   //
    private Menu      _swtContextMenu;
 
    private class ActionMap25_Layer extends ActionToolbarSlideout {
@@ -1650,15 +1650,23 @@ public class Map25View extends ViewPart implements
 
                if (valueSerie != null && _mapColorProvider instanceof IGradientColorProvider) {
 
-                  colorValue = ((IGradientColorProvider) _mapColorProvider).getRGBValue(
+                  final int abgr = ((IGradientColorProvider) _mapColorProvider).getRGBValue(
                         ColorProviderConfig.MAP2,
                         valueSerie[serieIndex]);
+// SET_FORMATTING_OFF
 
-                  final int blue = (colorValue & 0xFF0000) >>> 16;
-                  final int green = (colorValue & 0xFF00) >>> 8;
-                  final int red = (colorValue & 0xFF) >>> 0;
+                  final int alpha   = (abgr & 0xFF000000) >>> 24;
+                  final int blue    = (abgr & 0xFF0000)   >>> 16;
+                  final int green   = (abgr & 0xFF00)     >>> 8;
+                  final int red     = (abgr & 0xFF)       >>> 0;
 
-                  colorValue = ((red & 0xFF) << 16) | ((green & 0xFF) << 8) | ((blue & 0xFF) << 0);
+                  colorValue =
+                          ((alpha   & 0xFF) << 24)
+                        | ((red     & 0xFF) << 16)
+                        | ((green   & 0xFF) << 8)
+                        | ((blue    & 0xFF) << 0);
+
+// SET_FORMATTING_ON
 
                } else if (_mapColorProvider instanceof IDiscreteColorProvider) {
 

@@ -189,7 +189,7 @@ public class LineBucketMT extends RenderBucketMT {
          gl.vertexAttribPointer(
 
                shader_aVertexColor, //    index of the vertex attribute that is to be modified
-               3, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
+               4, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
                GL.UNSIGNED_BYTE, //       data type of each component in the array
                false, //                  values should be normalized
                0, //                      offset in bytes between the beginning of consecutive vertex attributes
