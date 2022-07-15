@@ -53,10 +53,10 @@ void main() {
     vec3 vertexColorWithBrightness = outlineBrightness01 > 0
             
             // > 0 -> brighter
-            ? vertexColor01 + outlineBrightness01
+            ? vertexColor01.rgb + outlineBrightness01
             
             // < 0 -> darker
-            : vertexColor01 * uOutlineBrightness;
+            : vertexColor01.rgb * uOutlineBrightness;
     
     vFragmentColor = vec4(vertexColorWithBrightness, vertexColor01.a * uVertexColorAlpha);
 }
