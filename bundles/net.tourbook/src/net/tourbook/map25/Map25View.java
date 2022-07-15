@@ -617,7 +617,7 @@ public class Map25View extends ViewPart implements
             final ActionTrackColor action = (ActionTrackColor) selectedAction;
             if (action.getSelection() == false) {
 
-               action.setSelection(false);
+               action.setSelection(true);
             }
 
          } else if (selectedAction instanceof ActionTrackColor_HrZone) {
@@ -625,7 +625,7 @@ public class Map25View extends ViewPart implements
             final ActionTrackColor_HrZone action = (ActionTrackColor_HrZone) selectedAction;
             if (action.isChecked() == false) {
 
-               action.setChecked(false);
+               action.setChecked(true);
             }
          }
 
@@ -1647,34 +1647,37 @@ public class Map25View extends ViewPart implements
 
                _allGeoPoints[geoIndex] = (new GeoPoint(latitudeSerie[serieIndex], longitudeSerie[serieIndex]));
 
-               int colorValue = 0x808080;
+               int colorValue = 0xff_80_80_80;
+               int abgr = 0;
+
 
                if (valueSerie != null && _mapColorProvider instanceof IGradientColorProvider) {
 
-                  final int abgr = ((IGradientColorProvider) _mapColorProvider).getRGBValue(
+                  abgr = ((IGradientColorProvider) _mapColorProvider).getRGBValue(
                         ColorProviderConfig.MAP3_TOUR,
                         valueSerie[serieIndex]);
-// SET_FORMATTING_OFF
-
-                  final int alpha   = (abgr & 0xFF000000) >>> 24;
-                  final int blue    = (abgr & 0xFF0000)   >>> 16;
-                  final int green   = (abgr & 0xFF00)     >>> 8;
-                  final int red     = (abgr & 0xFF)       >>> 0;
-
-                  colorValue =
-                          ((alpha   & 0xFF) << 24)
-                        | ((red     & 0xFF) << 16)
-                        | ((green   & 0xFF) << 8)
-                        | ((blue    & 0xFF) << 0);
-
-// SET_FORMATTING_ON
 
                } else if (_mapColorProvider instanceof IDiscreteColorProvider) {
 
                   // e.g. HR zone color provider
 
-                  colorValue = ((IDiscreteColorProvider) _mapColorProvider).getColorValue(tourData, serieIndex, true);
+                  abgr = ((IDiscreteColorProvider) _mapColorProvider).getColorValue(tourData, serieIndex, true);
                }
+
+// SET_FORMATTING_OFF
+
+               final int alpha   = (abgr & 0xFF000000) >>> 24;
+               final int blue    = (abgr & 0xFF0000)   >>> 16;
+               final int green   = (abgr & 0xFF00)     >>> 8;
+               final int red     = (abgr & 0xFF)       >>> 0;
+
+               colorValue =
+                       ((alpha   & 0xFF) << 24)
+                     | ((red     & 0xFF) << 16)
+                     | ((green   & 0xFF) << 8)
+                     | ((blue    & 0xFF) << 0);
+
+// SET_FORMATTING_ON
 
                allGeoPointColors[geoIndex] = colorValue;
 
@@ -1813,7 +1816,7 @@ public class Map25View extends ViewPart implements
       // track color
       _trackGraphId     = (MapGraphId) Util.getStateEnum(_state, STATE_TRACK_GRAPH_ID, MapGraphId.Altitude);
       restoreState_TrackColorActions(_trackGraphId);
-      setColorProvider(_trackGraphId,false);
+      setColorProvider(_trackGraphId, false);
 
       // tour marker layer
       final boolean isMarkerVisible = Util.getStateBoolean(_state, STATE_IS_LAYER_MARKER_VISIBLE, true);
