@@ -147,6 +147,7 @@ public class Messages extends NLS {
    public static String        Graph_Label_HeartRateVariability;
    public static String        Graph_Label_HeartRateVariability_Unit;
    public static String        Graph_Label_History;
+   public static String        Graph_Label_HrZone;
    public static String        Graph_Label_Pace;
    public static String        Graph_Label_Pace_Summarized;
    public static String        Graph_Label_Power;
@@ -340,6 +341,8 @@ public class Messages extends NLS {
    public static String        Slideout_Dialog_Action_DragSlideout_ToolTip;
    public static String        Slideout_Dialog_Action_KeepSlideoutOpen_Tooltip;
    public static String        Slideout_Dialog_Action_PinSlideoutLocation_Tooltip;
+
+   public static String        Slideout_Map_TrackColors_Label_Title;
 
    public static String        Swim_Stroke_Backstroke;
    public static String        Swim_Stroke_Breaststroke;

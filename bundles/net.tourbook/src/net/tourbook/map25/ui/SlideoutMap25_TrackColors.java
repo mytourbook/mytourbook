@@ -21,8 +21,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import net.tourbook.Messages;
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
+import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.Map3ColorDefinition;
@@ -44,7 +47,9 @@ import net.tourbook.map3.ui.DialogMap3ColorEditor;
 import net.tourbook.map3.ui.IMap3ColorUpdater;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageMap3Color;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -62,6 +67,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -77,6 +83,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 
 /**
  * Slideout for 2.5D tour track configuration
@@ -85,9 +92,12 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
 // SET_FORMATTING_OFF
 
-   private static final String PREF_MAP3_COLOR_COLUMN_LEGEND_MARKER           = net.tourbook.map3.Messages.Pref_Map3Color_Column_Legend_Marker;
-   private static final String PREF_MAP3_COLOR_COLUMN_VALUE_MARKER_RELATIVE   = net.tourbook.map3.Messages.Pref_Map3Color_Column_ValueMarker_Relative;
-   private static final String PREF_MAP3_COLOR_COLUMN_VALUE_MARKER_ABSOLUTE   = net.tourbook.map3.Messages.Pref_Map3Color_Column_ValueMarker_Absolute;
+   private static final String MAP3_SELECT_COLOR_DIALOG_ACTION_ADD_COLOR_TOOLTIP    = net.tourbook.map3.Messages.Map3SelectColor_Dialog_Action_AddColor_Tooltip;
+   private static final String MAP3_SELECT_COLOR_DIALOG_ACTION_EDIT_ALL_COLORS      = net.tourbook.map3.Messages.Map3SelectColor_Dialog_Action_EditAllColors;
+   private static final String MAP3_SELECT_COLOR_DIALOG_ACTION_EDIT_SELECTED_COLORS = net.tourbook.map3.Messages.Map3SelectColor_Dialog_Action_EditSelectedColors;
+   private static final String PREF_MAP3_COLOR_COLUMN_LEGEND_MARKER                 = net.tourbook.map3.Messages.Pref_Map3Color_Column_Legend_Marker;
+   private static final String PREF_MAP3_COLOR_COLUMN_VALUE_MARKER_RELATIVE         = net.tourbook.map3.Messages.Pref_Map3Color_Column_ValueMarker_Relative;
+   private static final String PREF_MAP3_COLOR_COLUMN_VALUE_MARKER_ABSOLUTE         = net.tourbook.map3.Messages.Pref_Map3Color_Column_ValueMarker_Absolute;
 
 // SET_FORMATTING_ON
 
@@ -104,6 +114,11 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
    private Map25View                     _map25View;
 
    private CheckboxTableViewer           _colorViewer;
+   private TableColumn                   _tcProfileImage;
+
+   private Action                        _actionAddColor;
+   private Action                        _actionEditSelectedColor;
+   private Action                        _actionEditAllColors;
 
    private FocusListener                 _keepOpenListener;
 
@@ -115,8 +130,6 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
    private MapGraphId                    _graphId;
 
    private PixelConverter                _pc;
-
-   private TableColumn                   _tcProfileImage;
 
    /*
     * UI resources
@@ -137,6 +150,37 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
       _map25View = map25View;
       _graphId = graphId;
+   }
+
+   private void actionAddColor() {
+
+      final Object selectedItem = ((IStructuredSelection) _colorViewer.getSelection()).getFirstElement();
+
+      final Map3GradientColorProvider selectedColorProvider = (Map3GradientColorProvider) selectedItem;
+      final Map3GradientColorProvider duplicatedColorProvider = selectedColorProvider.clone();
+
+      // create a new profile name by setting it to the profile id which is unique
+      duplicatedColorProvider.getMap3ColorProfile().setDuplicatedName();
+
+      close();
+
+      new DialogMap3ColorEditor(
+            _map25View.getShell(),
+            duplicatedColorProvider,
+            this,
+            true).open();
+
+   }
+
+   private void actionEditAllColors() {
+
+      close();
+
+      PreferencesUtil.createPreferenceDialogOn(
+            _map25View.getShell(),
+            PrefPageMap3Color.ID,
+            null,
+            _graphId).open();
    }
 
    private void actionEditSelectedColor() {
@@ -180,6 +224,48 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
    private void createActions() {
 
+      {
+         /*
+          * Action: Add color
+          */
+         _actionAddColor = new Action() {
+            @Override
+            public void run() {
+               actionAddColor();
+            }
+         };
+
+         _actionAddColor.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.App_Add));
+         _actionAddColor.setToolTipText(MAP3_SELECT_COLOR_DIALOG_ACTION_ADD_COLOR_TOOLTIP);
+      }
+      {
+         /*
+          * Action: Edit selected color
+          */
+         _actionEditSelectedColor = new Action() {
+            @Override
+            public void run() {
+               actionEditSelectedColor();
+            }
+         };
+
+         _actionEditSelectedColor.setImageDescriptor(net.tourbook.ui.UI.getGraphImageDescriptor(_graphId));
+         _actionEditSelectedColor.setToolTipText(MAP3_SELECT_COLOR_DIALOG_ACTION_EDIT_SELECTED_COLORS);
+      }
+      {
+         /*
+          * Action: Edit all colors
+          */
+         _actionEditAllColors = new Action() {
+            @Override
+            public void run() {
+               actionEditAllColors();
+            }
+         };
+
+         _actionEditAllColors.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
+         _actionEditAllColors.setToolTipText(MAP3_SELECT_COLOR_DIALOG_ACTION_EDIT_ALL_COLORS);
+      }
    }
 
    @Override
@@ -202,28 +288,12 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
    private Composite createUI(final Composite parent) {
 
-//      _shellContainer = new Composite(parent, SWT.NONE);
-//      GridLayoutFactory.fillDefaults().margins(UI.SHELL_MARGIN, UI.SHELL_MARGIN).applyTo(_shellContainer);
-////      _shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
-//      {
-//         final Composite container = new Composite(_shellContainer, SWT.NO_FOCUS);
-//         GridLayoutFactory.fillDefaults()
-//               .numColumns(1)
-//               .applyTo(container);
-////         container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-//         {
-//
-//         }
-//      }
-//
-//      return _shellContainer;
-
       _shellContainer = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults()
             .margins(UI.SHELL_MARGIN, UI.SHELL_MARGIN)
-            .spacing(0, 0)
+            .spacing(0, 5)
             .applyTo(_shellContainer);
-//    _shellContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
+//      _shellContainer.setBackground(UI.SYS_COLOR_RED);
       {
          createUI_00_Title(_shellContainer);
          createUI_10_ColorViewer(_shellContainer);
@@ -249,7 +319,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
           * Label: Title
           */
          final Label title = new Label(parent, SWT.LEAD);
-         title.setText(Messages.Slideout_Map_TourColors_Label_Title);
+         title.setText(NLS.bind(Messages.Slideout_Map_TrackColors_Label_Title, getSlideoutTitle()));
          MTFont.setBannerFont(title);
          GridDataFactory.fillDefaults()
                .grab(true, false)
@@ -260,8 +330,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
    private void createUI_10_ColorViewer(final Composite parent) {
 
-      final List<Map3GradientColorProvider> colorProviders = Map3GradientColorManager
-            .getColorProviders(_graphId);
+      final List<Map3GradientColorProvider> colorProviders = Map3GradientColorManager.getColorProviders(_graphId);
 
       int tableStyle;
       if (colorProviders.size() > NUMBER_OF_VISIBLE_ROWS) {
@@ -281,11 +350,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
       }
 
       final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
-            .grab(true, true)
-            .applyTo(container);
-
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.fillDefaults().applyTo(container);
       {
          /*
@@ -325,7 +390,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
                final GridData gd = (GridData) container.getLayoutData();
                gd.heightHint = maxHeight;
 
-//                container.layout(true, true);
+               container.layout(true, true);
             }
          }));
 
@@ -372,9 +437,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
          });
 
          _colorViewer.addCheckStateListener(this::onViewerCheckStateChange);
-
          _colorViewer.addSelectionChangedListener(selectionChangedEvent -> onViewerSelectColor());
-
          _colorViewer.addDoubleClickListener(doubleClickEvent -> actionEditSelectedColor());
       }
    }
@@ -383,8 +446,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()//
+      GridLayoutFactory.fillDefaults()
             .numColumns(2)
             .extendedMargins(2, 0, 3, 2)
             .applyTo(container);
@@ -394,9 +456,9 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
          final ToolBarManager tbm = new ToolBarManager(toolbar);
 
-//         tbm.add(_actionAddColor);
-//         tbm.add(_actionEditSelectedColor);
-//         tbm.add(_actionEditAllColors);
+         tbm.add(_actionAddColor);
+         tbm.add(_actionEditSelectedColor);
+         tbm.add(_actionEditAllColors);
 
          tbm.update(true);
       }
@@ -670,6 +732,35 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
       return image;
    }
 
+   private String getSlideoutTitle() {
+
+      switch (_graphId) {
+
+      case Altitude:
+         return Messages.Graph_Label_Altitude;
+
+      case Gradient:
+         return Messages.Graph_Label_Gradient;
+
+      case HrZone:
+         return Messages.Graph_Label_HrZone;
+
+      case Pace:
+         return Messages.Graph_Label_Pace;
+
+      case Pulse:
+         return Messages.Graph_Label_Heartbeat;
+
+      case Speed:
+         return Messages.Graph_Label_Speed;
+
+      default:
+         break;
+      }
+
+      return UI.EMPTY_STRING;
+   }
+
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
@@ -919,6 +1010,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
        * Select checked color provider that the actions can always be enabled.
        */
       for (final Map3GradientColorProvider colorProvider : Map3GradientColorManager.getColorProviders(_graphId)) {
+
          if (colorProvider.getMap3ColorProfile().isActiveColorProfile()) {
 
             /**
