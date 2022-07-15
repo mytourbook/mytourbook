@@ -50,7 +50,7 @@ void main() {
     // 0...2 -> -1...1
     float outlineBrightness01 = uOutlineBrightness - 1.0;
 
-    vec3 vertexColorWithBrightness = outlineBrightness01 > 0
+    vec3 vertexColorWithBrightness = outlineBrightness01 > 0.0
             
             // > 0 -> brighter
             ? vertexColor01.rgb + outlineBrightness01
