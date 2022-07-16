@@ -30,6 +30,7 @@ import net.tourbook.common.widgets.ComboEntry;
 import net.tourbook.map25.layer.marker.ClusterAlgorithm;
 import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
+import net.tourbook.map25.layer.tourtrack.Map25TrackConfig.LineColorMode;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -117,33 +118,35 @@ public class Map25ConfigManager {
    private static final String TAG_TRACK       = "Track";      //$NON-NLS-1$
    //
    // line
-   private static final String TAG_LINE                              = "Line";                  //$NON-NLS-1$
-   private static final String ATTR_LINE_IS_SHOW_DIRECTION_ARROW     = "directionArrow";        //$NON-NLS-1$
-   private static final String ATTR_LINE_OPACITY                     = "lineOpacity";           //$NON-NLS-1$
-   private static final String ATTR_LINE_WIDTH                       = "lineWidth";             //$NON-NLS-1$
-   private static final String ATTR_OUTLINE_IS_SHOW_OUTLINE          = "isShowOutline";         //$NON-NLS-1$
-   private static final String ATTR_OUTLINE_WIDTH                    = "outlineWidth";          //$NON-NLS-1$
-   private static final String ATTR_OUTLINE_BRIGHTNESS               = "outlineBrightness";     //$NON-NLS-1$
+   private static final String       TAG_LINE                              = "Line";                  //$NON-NLS-1$
+   private static final String       ATTR_LINE_IS_SHOW_DIRECTION_ARROW     = "directionArrow";        //$NON-NLS-1$
+   private static final String       ATTR_LINE_OPACITY                     = "lineOpacity";           //$NON-NLS-1$
+   private static final String       ATTR_LINE_WIDTH                       = "lineWidth";             //$NON-NLS-1$
+   private static final String       ATTR_OUTLINE_IS_SHOW_OUTLINE          = "isShowOutline";         //$NON-NLS-1$
+   private static final String       ATTR_OUTLINE_WIDTH                    = "outlineWidth";          //$NON-NLS-1$
+   private static final String       ATTR_OUTLINE_BRIGHTNESS               = "outlineBrightness";     //$NON-NLS-1$
    //
-   public static final RGB     LINE_COLOR_DEFAULT                    = new RGB(0x80, 0x0, 0x80);
-   public static final boolean LINE_IS_SHOW_DIRECTION_ARROW_DEFAULT  = false;
-   public static final boolean LINE_IS_TRACK_VERTICAL_OFFSET_DEFAULT = false;
-   public static final int     LINE_TRACK_VERTICAL_OFFSET_DEFAULT    = 20;
+   public static final boolean       LINE_IS_SHOW_DIRECTION_ARROW_DEFAULT  = false;
+   public static final boolean       LINE_IS_TRACK_VERTICAL_OFFSET_DEFAULT = false;
+   public static final int           LINE_TRACK_VERTICAL_OFFSET_DEFAULT    = 20;
    //
-   public static final int     LINE_OPACITY_MIN                      = 26;                      // 10 %
-   public static final int     LINE_OPACITY_MAX                      = 0xff;
-   public static final int     LINE_OPACITY_DEFAULT                  = 180;                     // 70 %
-   public static final int     LINE_WIDTH_MIN                        = 1;
-   public static final int     LINE_WIDTH_MAX                        = 20;
-   public static final float   LINE_WIDTH_DEFAULT                    = 2.5f;
+   public static final RGB           LINE_COLOR_DEFAULT                    = new RGB(0x80, 0x0, 0x80);
+   public static final LineColorMode LINE_COLOR_MODE_DEFAULT               = LineColorMode.GRADIENT;
    //
-   public static final boolean OUTLINE_IS_SHOW_OUTLINE_DEFAULT       = true;
-   public static final int     OUTLINE_BRIGHTNESS_MIN                = -10;
-   public static final int     OUTLINE_BRIGHTNESS_MAX                = 10;
-   public static final float   OUTLINE_BRIGHTNESS_DEFAULT            = 0.5f;
-   public static final int     OUTLINE_WIDTH_MIN                     = 0;
-   public static final int     OUTLINE_WIDTH_MAX                     = 20;
-   public static final float   OUTLINE_WIDTH_DEFAULT                 = 2f;
+   public static final int           LINE_OPACITY_MIN                      = 26;                      // 10 %
+   public static final int           LINE_OPACITY_MAX                      = 0xff;
+   public static final int           LINE_OPACITY_DEFAULT                  = 180;                     // 70 %
+   public static final int           LINE_WIDTH_MIN                        = 1;
+   public static final int           LINE_WIDTH_MAX                        = 20;
+   public static final float         LINE_WIDTH_DEFAULT                    = 2.5f;
+   //
+   public static final boolean       OUTLINE_IS_SHOW_OUTLINE_DEFAULT       = true;
+   public static final int           OUTLINE_BRIGHTNESS_MIN                = -10;
+   public static final int           OUTLINE_BRIGHTNESS_MAX                = 10;
+   public static final float         OUTLINE_BRIGHTNESS_DEFAULT            = 0.5f;
+   public static final int           OUTLINE_WIDTH_MIN                     = 0;
+   public static final int           OUTLINE_WIDTH_MAX                     = 20;
+   public static final float         OUTLINE_WIDTH_DEFAULT                 = 2f;
    //
    // slider location/path
    private static final String TAG_SLIDER_PATH                     = "SliderPath";             //$NON-NLS-1$

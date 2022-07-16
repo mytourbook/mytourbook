@@ -1314,6 +1314,10 @@ public class Map25View extends ViewPart implements
       return _parent.getShell();
    }
 
+   public MapGraphId getTrackGraphId() {
+      return _trackGraphId;
+   }
+
    private float[] getValueSerie(final TourData tourData) {
 
       switch (_trackGraphId) {
@@ -1649,7 +1653,6 @@ public class Map25View extends ViewPart implements
 
                int colorValue = 0xff_80_80_80;
                int abgr = 0;
-
 
                if (valueSerie != null && _mapColorProvider instanceof IGradientColorProvider) {
 
@@ -1990,6 +1993,30 @@ public class Map25View extends ViewPart implements
 
       Map25ConfigManager.saveState();
       Map3GradientColorManager.saveColors();
+   }
+
+   /**
+    * @param graphId
+    */
+   public void selectColorAction(final MapGraphId graphId) {
+
+      for (final Object action : _allTrackColorActions) {
+
+         if (action instanceof ActionTrackColor) {
+
+            final ActionTrackColor colorAction = (ActionTrackColor) action;
+
+            colorAction.setSelection(colorAction._graphId == graphId);
+
+         } else if (action instanceof ActionTrackColor_HrZone) {
+
+            final ActionTrackColor_HrZone colorAction = (ActionTrackColor_HrZone) action;
+
+            colorAction.setChecked(colorAction._graphId == graphId);
+         }
+      }
+
+      setColorProvider(graphId, true);
    }
 
    /**

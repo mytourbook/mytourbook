@@ -2050,14 +2050,17 @@ public class Messages extends NLS {
    public static String        Slideout_Map25TrackOptions_Checkbox_Outline;
    public static String        Slideout_Map25TrackOptions_Checkbox_Outline_Tooltip;
    public static String        Slideout_Map25TrackOptions_Checkbox_TrackVerticalOffset;
+   public static String        Slideout_Map25TrackOptions_Label_ColorMode;
    public static String        Slideout_Map25TrackOptions_Label_ConfigName_Tooltip;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrows;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip;
-   public static String        Slideout_Map25TrackOptions_Label_LineColor;
-   public static String        Slideout_Map25TrackOptions_Label_LineColor_Tooltip;
+   public static String        Slideout_Map25TrackOptions_Label_LineColorOpacity;
+   public static String        Slideout_Map25TrackOptions_Label_LineColorOpacity_Tooltip;
    public static String        Slideout_Map25TrackOptions_Label_LineWidth;
    public static String        Slideout_Map25TrackOptions_Label_LineWidth_Tooltip;
    public static String        Slideout_Map25TrackOptions_Label_Name;
+   public static String        Slideout_Map25TrackOptions_Radio_ColorMode_Gradient;
+   public static String        Slideout_Map25TrackOptions_Radio_ColorMode_Solid;
 
    public static String        Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic;
    public static String        Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message;

@@ -31,6 +31,7 @@ import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.Map25View;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
+import net.tourbook.map25.layer.tourtrack.Map25TrackConfig.LineColorMode;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -128,6 +129,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       ActionTrackColor(final MapGraphId graphId) {
 
+         super(UI.EMPTY_STRING, AS_CHECK_BOX);
+
          setImageDescriptor(net.tourbook.ui.UI.getGraphImageDescriptor(graphId));
          setDisabledImageDescriptor(net.tourbook.ui.UI.getGraphImageDescriptor_Disabled(graphId));
 
@@ -158,7 +161,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
    private void createActions() {
 
-      _actionGradientColor_Elevation = new ActionTrackColor(MapGraphId.Altimeter);
+      _actionGradientColor_Elevation = new ActionTrackColor(MapGraphId.Altitude);
       _actionGradientColor_Gradient = new ActionTrackColor(MapGraphId.Gradient);
       _actionGradientColor_HrZone = new ActionTrackColor(MapGraphId.HrZone);
       _actionGradientColor_Pace = new ActionTrackColor(MapGraphId.Pace);
@@ -192,7 +195,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
          GridLayoutFactory.fillDefaults()
                .numColumns(2)
                .applyTo(container);
-//         container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
+//         container.setBackground(UI.SYS_COLOR_YELLOW);
          {
             createUI_000_Title(container);
 
@@ -246,6 +249,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       group.setText(Messages.Slideout_Map_Options_Group_TourTrack);
       GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(group);
       GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+//      group.setBackground(UI.SYS_COLOR_GREEN);
       {
          {
             /*
@@ -344,25 +348,25 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
              */
             // label
             final Label label = new Label(group, SWT.NONE);
-            label.setText(Messages.Slideout_Map25TrackOptions_Label_LineColor);
-//            label.setToolTipText();
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+            label.setText(Messages.Slideout_Map25TrackOptions_Label_ColorMode);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING)
+                  .indent(0, 3) // align with the gradient label
+                  .applyTo(label);
 
             final Composite containerColorMode = new Composite(group, SWT.NONE);
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .applyTo(containerColorMode);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerColorMode);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerColorMode);
             {
                // radio: gradient
                _rdoColorMode_Gradient = new Button(containerColorMode, SWT.RADIO);
-               _rdoColorMode_Gradient.setText(Messages.Pref_MapLayout_Checkbox_BorderColor_Darker);
+               _rdoColorMode_Gradient.setText(Messages.Slideout_Map25TrackOptions_Radio_ColorMode_Gradient);
                _rdoColorMode_Gradient.addSelectionListener(_defaultSelectionListener);
 
                {
-                  final ToolBar toolbar = new ToolBar(containerColorMode, SWT.FLAT);
-
-                  final ToolBarManager tbm = new ToolBarManager(toolbar);
+                  /*
+                   * Gradient actions
+                   */
+                  final ToolBarManager tbm = new ToolBarManager(new ToolBar(containerColorMode, SWT.FLAT));
 
                   tbm.add(_actionGradientColor_Elevation);
                   tbm.add(_actionGradientColor_Pulse);
@@ -376,7 +380,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
                // radio: solid
                _rdoColorMode_Solid = new Button(containerColorMode, SWT.RADIO);
-               _rdoColorMode_Solid.setText(Messages.Pref_MapLayout_Checkbox_BorderColor_Color);
+               _rdoColorMode_Solid.setText(Messages.Slideout_Map25TrackOptions_Radio_ColorMode_Solid);
                _rdoColorMode_Solid.addSelectionListener(_defaultSelectionListener);
 
                // color
@@ -387,14 +391,14 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
          }
          {
             /*
-             * Solid color
+             * Color opacity
              */
             final int opacityMin = (int) ((Map25ConfigManager.LINE_OPACITY_MIN / 255.0f) * UI.TRANSFORM_OPACITY_MAX);
-            final String tooltipText = NLS.bind(Messages.Slideout_Map25TrackOptions_Label_LineColor_Tooltip, UI.TRANSFORM_OPACITY_MAX);
+            final String tooltipText = NLS.bind(Messages.Slideout_Map25TrackOptions_Label_LineColorOpacity_Tooltip, UI.TRANSFORM_OPACITY_MAX);
 
             // label
             final Label label = new Label(group, SWT.NONE);
-            label.setText(Messages.Slideout_Map25TrackOptions_Label_LineColor);
+            label.setText(Messages.Slideout_Map25TrackOptions_Label_LineColorOpacity);
             label.setToolTipText(tooltipText);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
@@ -716,8 +720,11 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
    }
 
    private void onAction_GradientColor(final MapGraphId graphId) {
-      // TODO Auto-generated method stub
 
+      _map25View.selectColorAction(graphId);
+
+      // MUST be selected after _map25View.selectColorAction(graphId);
+      selectGradientColorAction();
    }
 
    private void onModifyConfig() {
@@ -790,14 +797,20 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       // track line
       _chkShowDirectionArrows          .setSelection(config.isShowDirectionArrow);
-      _chkShowOutline                  .setSelection(config.isShowOutline);
       _chkTrackVerticalOffset          .setSelection(config.isTrackVerticalOffset);
-      _colorLine_SolidColor                 .setColorValue(config.lineColor);
-      _spinnerLine_Opacity             .setSelection(UI.transformOpacity_WhenRestored(config.lineOpacity));
       _spinnerLine_Width               .setSelection((int) (config.lineWidth));
+      _spinnerTrackVerticalOffset      .setSelection(config.trackVerticalOffset);
+
+      // track color
+      _colorLine_SolidColor            .setColorValue(config.lineColor);
+      _rdoColorMode_Gradient           .setSelection(config.lineColorMode.equals(LineColorMode.GRADIENT));
+      _rdoColorMode_Solid              .setSelection(config.lineColorMode.equals(LineColorMode.SOLID));
+      _spinnerLine_Opacity             .setSelection(UI.transformOpacity_WhenRestored(config.lineOpacity));
+
+      // track outline
+      _chkShowOutline                  .setSelection(config.isShowOutline);
       _spinnerOutline_Brighness        .setSelection((int) (config.outlineBrighness * 10));
       _spinnerOutline_Width            .setSelection((int) (config.outlineWidth));
-      _spinnerTrackVerticalOffset      .setSelection(config.trackVerticalOffset);
 
       // slider location
       _chkShowSliderLocation           .setSelection(config.isShowSliderLocation);
@@ -815,6 +828,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       _spinnerTESTValue.setSelection((config.testValue));
 
 // SET_FORMATTING_ON
+
+      selectGradientColorAction();
 
       _isUpdateUI = false;
    }
@@ -837,9 +852,12 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       // track line
       config.isShowDirectionArrow         = isShowDirectionArrows;
+      config.lineWidth                    = _spinnerLine_Width.getSelection();
+
+      // track color
+      config.lineColorMode                = _rdoColorMode_Gradient.getSelection() ? LineColorMode.GRADIENT : LineColorMode.SOLID;
       config.lineColor                    = _colorLine_SolidColor.getColorValue();
       config.lineOpacity                  = UI.transformOpacity_WhenSaved(_spinnerLine_Opacity.getSelection());
-      config.lineWidth                    = _spinnerLine_Width.getSelection();
 
       // track outline
       config.isShowOutline                = _chkShowOutline.getSelection();
@@ -866,6 +884,44 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       config.testValue                    = testValue;
 
 // SET_FORMATTING_ON
+   }
+
+   private void selectGradientColorAction() {
+
+      _actionGradientColor_Elevation.setChecked(false);
+      _actionGradientColor_Pulse.setChecked(false);
+      _actionGradientColor_Speed.setChecked(false);
+      _actionGradientColor_Pace.setChecked(false);
+      _actionGradientColor_Gradient.setChecked(false);
+      _actionGradientColor_HrZone.setChecked(false);
+
+      switch (_map25View.getTrackGraphId()) {
+
+      case Pulse:
+         _actionGradientColor_Pulse.setChecked(true);
+         break;
+
+      case Speed:
+         _actionGradientColor_Speed.setChecked(true);
+         break;
+
+      case Pace:
+         _actionGradientColor_Pace.setChecked(true);
+         break;
+
+      case Gradient:
+         _actionGradientColor_Gradient.setChecked(true);
+         break;
+
+      case HrZone:
+         _actionGradientColor_HrZone.setChecked(true);
+         break;
+
+      case Altitude:
+      default:
+         _actionGradientColor_Elevation.setChecked(true);
+         break;
+      }
    }
 
    private void updateUI_SetActiveConfig() {
