@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -120,6 +121,8 @@ public class Map25ConfigManager {
    // line
    private static final String       TAG_LINE                              = "Line";                  //$NON-NLS-1$
    private static final String       ATTR_LINE_IS_SHOW_DIRECTION_ARROW     = "directionArrow";        //$NON-NLS-1$
+   private static final String       ATTR_LINE_COLOR_MODE                  = "lineColorMode";         //$NON-NLS-1$
+   private static final String       ATTR_LINE_GRADIENT_COLOR_GRAPH_ID     = "gradientColorGraphId";  //$NON-NLS-1$
    private static final String       ATTR_LINE_OPACITY                     = "lineOpacity";           //$NON-NLS-1$
    private static final String       ATTR_LINE_WIDTH                       = "lineWidth";             //$NON-NLS-1$
    private static final String       ATTR_OUTLINE_IS_SHOW_OUTLINE          = "isShowOutline";         //$NON-NLS-1$
@@ -132,6 +135,7 @@ public class Map25ConfigManager {
    //
    public static final RGB           LINE_COLOR_DEFAULT                    = new RGB(0x80, 0x0, 0x80);
    public static final LineColorMode LINE_COLOR_MODE_DEFAULT               = LineColorMode.GRADIENT;
+   public static final MapGraphId    LINE_GRADIENT_COLOR_GRAPH_ID_DEFAULT  = MapGraphId.Altitude;
    //
    public static final int           LINE_OPACITY_MIN                      = 26;                      // 10 %
    public static final int           LINE_OPACITY_MAX                      = 0xff;
@@ -532,13 +536,15 @@ public class Map25ConfigManager {
          // <Line>
          final IMemento xmlLine = Util.setXmlRgb(xmlConfig, TAG_LINE,   config.lineColor);
          {
-            xmlLine.putBoolean(     ATTR_LINE_IS_SHOW_DIRECTION_ARROW,  config.isShowDirectionArrow);
-            xmlLine.putFloat(       ATTR_LINE_WIDTH,                    config.lineWidth);
-            xmlLine.putInteger(     ATTR_LINE_OPACITY,                  config.lineOpacity);
+            xmlLine.putBoolean(        ATTR_LINE_IS_SHOW_DIRECTION_ARROW,  config.isShowDirectionArrow);
+            xmlLine.putFloat(          ATTR_LINE_WIDTH,                    config.lineWidth);
+            xmlLine.putInteger(        ATTR_LINE_OPACITY,                  config.lineOpacity);
+            Util.setXmlEnum(xmlLine,   ATTR_LINE_COLOR_MODE,               config.lineColorMode);
+            Util.setXmlEnum(xmlLine,   ATTR_LINE_GRADIENT_COLOR_GRAPH_ID,  config.gradientColorGraphID);
 
-            xmlLine.putBoolean(     ATTR_OUTLINE_IS_SHOW_OUTLINE,       config.isShowOutline);
-            xmlLine.putFloat(       ATTR_OUTLINE_BRIGHTNESS,            config.outlineBrighness);
-            xmlLine.putFloat(       ATTR_OUTLINE_WIDTH,                 config.outlineWidth);
+            xmlLine.putBoolean(        ATTR_OUTLINE_IS_SHOW_OUTLINE,       config.isShowOutline);
+            xmlLine.putFloat(          ATTR_OUTLINE_BRIGHTNESS,            config.outlineBrighness);
+            xmlLine.putFloat(          ATTR_OUTLINE_WIDTH,                 config.outlineWidth);
          }
 
          // <SliderPath>
@@ -598,6 +604,9 @@ public class Map25ConfigManager {
       return 0;
    }
 
+   /**
+    * @return Returns the active configuration, is not returning <code>null</code>
+    */
    public static Map25TrackConfig getActiveTourTrackConfig() {
 
       if (_activeTrackConfig == null) {
@@ -736,10 +745,12 @@ public class Map25ConfigManager {
 
          case TAG_LINE:
 
-            config.isShowDirectionArrow   = Util.getXmlBoolean(xmlConfigChild,      ATTR_LINE_IS_SHOW_DIRECTION_ARROW, LINE_IS_SHOW_DIRECTION_ARROW_DEFAULT);
-            config.lineColor              = Util.getXmlRgb(xmlConfigChild,          LINE_COLOR_DEFAULT);
-            config.lineOpacity            = Util.getXmlInteger(xmlConfigChild,      ATTR_LINE_OPACITY,            LINE_OPACITY_DEFAULT,         LINE_OPACITY_MIN,          LINE_OPACITY_MAX);
-            config.lineWidth              = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_LINE_WIDTH,              LINE_WIDTH_DEFAULT,           LINE_WIDTH_MIN,            LINE_WIDTH_MAX);
+            config.isShowDirectionArrow   = Util.getXmlBoolean(      xmlConfigChild,         ATTR_LINE_IS_SHOW_DIRECTION_ARROW, LINE_IS_SHOW_DIRECTION_ARROW_DEFAULT);
+            config.lineColor              = Util.getXmlRgb(          xmlConfigChild,         LINE_COLOR_DEFAULT);
+            config.lineOpacity            = Util.getXmlInteger(      xmlConfigChild,         ATTR_LINE_OPACITY,                  LINE_OPACITY_DEFAULT,         LINE_OPACITY_MIN,          LINE_OPACITY_MAX);
+            config.lineWidth              = Util.getXmlFloatFloat(   xmlConfigChild,         ATTR_LINE_WIDTH,                    LINE_WIDTH_DEFAULT,           LINE_WIDTH_MIN,            LINE_WIDTH_MAX);
+            config.lineColorMode          = (LineColorMode) Util.getXmlEnum(xmlConfigChild,  ATTR_LINE_COLOR_MODE,               LINE_COLOR_MODE_DEFAULT);
+            config.gradientColorGraphID   = (MapGraphId)    Util.getXmlEnum(xmlConfigChild,  ATTR_LINE_GRADIENT_COLOR_GRAPH_ID,  LINE_GRADIENT_COLOR_GRAPH_ID_DEFAULT);
 
             config.isShowOutline          = Util.getXmlBoolean(xmlConfigChild,      ATTR_OUTLINE_IS_SHOW_OUTLINE, OUTLINE_IS_SHOW_OUTLINE_DEFAULT);
             config.outlineBrighness       = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_OUTLINE_BRIGHTNESS,      OUTLINE_BRIGHTNESS_DEFAULT,   OUTLINE_BRIGHTNESS_MIN,    OUTLINE_BRIGHTNESS_MAX);

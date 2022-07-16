@@ -26,6 +26,7 @@ import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.marker.MarkerShape;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
+import net.tourbook.map25.layer.tourtrack.Map25TrackConfig.LineColorMode;
 import net.tourbook.map25.renderer.BucketRendererMT;
 import net.tourbook.map25.renderer.LineBucketMT;
 import net.tourbook.map25.renderer.RenderBucketMT;
@@ -71,6 +72,7 @@ public class TourLayer extends Layer {
     * Line style
     */
    private LineStyle          _lineStyle;
+   private int                _lineColorMode;
    public boolean             _isShowOutline;
    private float              _outlineBrightness;
    private float              _outlineWidth;
@@ -480,6 +482,13 @@ public class TourLayer extends Layer {
       _isShowOutline = trackConfig.isShowOutline;
       _outlineBrightness = trackConfig.outlineBrighness;
       _outlineWidth = trackConfig.outlineWidth;
+      _lineColorMode = trackConfig.lineColorMode == LineColorMode.SOLID
+
+            // solid color
+            ? 0
+
+            // gradient color
+            : 1;
 
       _testValue = trackConfig.testValue;
 
@@ -601,8 +610,10 @@ public class TourLayer extends Layer {
       lineBucket.line = _lineStyle;
 
       lineBucket.isShowOutline = _isShowOutline;
+      lineBucket.lineColorMode = _lineColorMode;
       lineBucket.outlineBrightness = _outlineBrightness;
       lineBucket.outlineWidth = _outlineWidth;
+
 
       lineBucket.testValue = _testValue;
 

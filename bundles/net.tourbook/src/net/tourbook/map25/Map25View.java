@@ -171,7 +171,6 @@ public class Map25View extends ViewPart implements
    //
    private static final String           STATE_LAYER_HILLSHADING_OPACITY         = "STATE_LAYER_HILLSHADING_OPACITY";            //$NON-NLS-1$
    private static final String           STATE_MAP_SYNCHED_WITH                  = "STATE_MAP_SYNCHED_WITH";                     //$NON-NLS-1$
-   private static final String           STATE_TRACK_GRAPH_ID                    = "STATE_TRACK_GRAPH_ID";                       //$NON-NLS-1$
    // photo layer
    private static final String           STATE_IS_LAYER_PHOTO_VISIBLE            = "STATE_IS_LAYER_PHOTO_VISIBLE";               //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_PHOTO_SCALED             = "STATE_IS_LAYER_PHOTO_SCALED";                //$NON-NLS-1$
@@ -257,10 +256,6 @@ public class Map25View extends ViewPart implements
    //
    private long                          _lastFiredSyncEventTime;
    //
-   /**
-    * Color id for the currently displayed tour tracks.
-    */
-   private MapGraphId                    _trackGraphId;
    private IMapColorProvider             _mapColorProvider;
    //
    // context menu
@@ -608,7 +603,8 @@ public class Map25View extends ViewPart implements
          selectedActionGraphId = ((ActionTrackColor_HrZone) selectedAction)._graphId;
       }
 
-      if (_trackGraphId == selectedActionGraphId) {
+      final MapGraphId trackGraphId = Map25ConfigManager.getActiveTourTrackConfig().gradientColorGraphID;
+      if (trackGraphId == selectedActionGraphId) {
 
          // active color is selected -> prevent unchecking selected color
 
@@ -783,7 +779,9 @@ public class Map25View extends ViewPart implements
 
             // update map colors
 
-            setColorProvider(_trackGraphId, true);
+            final MapGraphId trackGraphId = Map25ConfigManager.getActiveTourTrackConfig().gradientColorGraphID;
+
+            setColorProvider(trackGraphId, true);
          }
       };
 
@@ -1314,24 +1312,27 @@ public class Map25View extends ViewPart implements
       return _parent.getShell();
    }
 
-   public MapGraphId getTrackGraphId() {
-      return _trackGraphId;
-   }
-
    private float[] getValueSerie(final TourData tourData) {
 
-      switch (_trackGraphId) {
+      final MapGraphId trackGraphId = Map25ConfigManager.getActiveTourTrackConfig().gradientColorGraphID;
+
+      switch (trackGraphId) {
 
       case Altitude:
          return tourData.getAltitudeSerie();
+
       case Cadence:
          return tourData.getCadenceSerie();
+
       case Gradient:
          return tourData.getGradientSerie();
+
       case Pulse:
          return tourData.pulseSerie;
+
       case Pace:
          return tourData.getPaceSerie();
+
       case Speed:
          return tourData.getSpeedSerie();
 
@@ -1817,9 +1818,9 @@ public class Map25View extends ViewPart implements
       _mapApp.getLayer_Tour().setEnabled(_isShowTour);
 
       // track color
-      _trackGraphId     = (MapGraphId) Util.getStateEnum(_state, STATE_TRACK_GRAPH_ID, MapGraphId.Altitude);
-      restoreState_TrackColorActions(_trackGraphId);
-      setColorProvider(_trackGraphId, false);
+      final MapGraphId trackGraphId = Map25ConfigManager.getActiveTourTrackConfig().gradientColorGraphID;
+      restoreState_TrackColorActions(trackGraphId);
+      setColorProvider(trackGraphId, false);
 
       // tour marker layer
       final boolean isMarkerVisible = Util.getStateBoolean(_state, STATE_IS_LAYER_MARKER_VISIBLE, true);
@@ -1960,7 +1961,6 @@ public class Map25View extends ViewPart implements
 // SET_FORMATTING_OFF
 
       Util.setStateEnum(_state, STATE_MAP_SYNCHED_WITH,  _mapSynchedWith);
-      Util.setStateEnum(_state, STATE_TRACK_GRAPH_ID,    _trackGraphId);
 
       // other layers
       _state.put(STATE_IS_LAYER_BASE_MAP_VISIBLE,     _mapApp.getLayer_BaseMap().isEnabled());
@@ -2025,7 +2025,8 @@ public class Map25View extends ViewPart implements
     */
    private void setColorProvider(final MapGraphId trackGraphId, final boolean isPaintTours) {
 
-      _trackGraphId = trackGraphId;
+      // update model
+      Map25ConfigManager.getActiveTourTrackConfig().gradientColorGraphID = trackGraphId;
 
       _mapColorProvider = MapColorProvider.getActiveMap3ColorProvider(trackGraphId);
 

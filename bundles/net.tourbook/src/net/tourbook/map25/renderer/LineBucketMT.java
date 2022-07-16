@@ -74,7 +74,9 @@ public class LineBucketMT extends RenderBucketMT {
    public LineBucketMT        outlines;
 
    public LineStyle           line;
+
    public boolean             isShowOutline;
+   public int                 lineColorMode;
    public float               outlineBrightness;
    public float               outlineWidth;
 
@@ -141,8 +143,8 @@ public class LineBucketMT extends RenderBucketMT {
                // 0 == projected
                : SHADER_PROJECTED;
 
-//         shaderMode = shaderMode;
-         shaderMode = SHADER_FLAT;
+         shaderMode = shaderMode;
+//         shaderMode = SHADER_FLAT;
 
          final Shader shader = _shaders[shaderMode];
 
@@ -162,14 +164,16 @@ public class LineBucketMT extends RenderBucketMT {
 
          final int shader_a_pos = shader.shader_a_pos;
          final int shader_aVertexColor = shader.shader_aVertexColor;
-         final int shader_uVertexColorAlpha = shader.shader_uVertexColorAlpha;
-         final int shader_uOutlineBrightness = shader.shader_uOutlineBrightness;
 
          final int shader_u_fade = shader.shader_u_fade;
          final int shader_u_mode = shader.shader_u_mode;
          final int shader_u_color = shader.shader_u_color;
          final int shader_u_width = shader.shader_u_width;
          final int shader_u_height = shader.shader_u_height;
+
+         final int shader_uColorMode = shader.shader_uColorMode;
+         final int shader_uOutlineBrightness = shader.shader_uOutlineBrightness;
+         final int shader_uVertexColorAlpha = shader.shader_uVertexColorAlpha;
 
          gl.vertexAttribPointer(
 
@@ -229,6 +233,7 @@ public class LineBucketMT extends RenderBucketMT {
          float heightOffset = 0;
          gl.uniform1f(shader_u_height, heightOffset);
 
+
          for (; renderBucket != null && renderBucket.type == LINE; renderBucket = renderBucket.next) {
 
             final LineBucketMT lineBucket = (LineBucketMT) renderBucket;
@@ -240,6 +245,8 @@ public class LineBucketMT extends RenderBucketMT {
             final float outlineWidth = lineBucket.outlineWidth;
             final float outlineBrightnessRaw = lineBucket.outlineBrightness; // -1.0 ... 1.0
             final float outlineBrightness = outlineBrightnessRaw + 1; // 0...2
+
+            gl.uniform1i(shader_uColorMode, lineBucket.lineColorMode);
 
             if (lineStyle.heightOffset != lineBucket._heightOffset) {
                lineBucket._heightOffset = lineStyle.heightOffset;
@@ -423,8 +430,9 @@ public class LineBucketMT extends RenderBucketMT {
             shader_u_width,
             shader_u_height,
 
-            shader_uVertexColorAlpha,
-            shader_uOutlineBrightness
+            shader_uColorMode,
+            shader_uOutlineBrightness,
+            shader_uVertexColorAlpha
 
       ;
 
@@ -446,8 +454,9 @@ public class LineBucketMT extends RenderBucketMT {
          shader_u_width = getUniform("u_width");
          shader_u_height = getUniform("u_height");
 
-         shader_uVertexColorAlpha = getUniform("uVertexColorAlpha");
+         shader_uColorMode = getUniform("uColorMode");
          shader_uOutlineBrightness = getUniform("uOutlineBrightness");
+         shader_uVertexColorAlpha = getUniform("uVertexColorAlpha");
       }
 
       @Override

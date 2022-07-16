@@ -25,6 +25,10 @@ uniform float     uVertexColorAlpha;
 //          1...2 is brighter
 uniform float     uOutlineBrightness;
 
+// 0 = solid color
+// 1 = gradient color
+uniform int       uColorMode;
+
 // z axis, line is above/below ground
 uniform float u_height;
 
@@ -43,22 +47,27 @@ void main() {
 
     // last two bits hold the texture coordinates
     v_st = abs(mod(dir, 4.0)) - 1.0;
-    
-    // transfer colors to the fragment shader - rgb 0...255 -> 0...1
-    vec4 vertexColor01 = aVertexColor / 255.0;
 
-    // 0...2 -> -1...1
-    float outlineBrightness01 = uOutlineBrightness - 1.0;
+    if (uColorMode == 1) {
 
-    vec3 vertexColorWithBrightness = outlineBrightness01 > 0.0
-            
+       // gradient color
+
+       // transfer colors to the fragment shader - rgb 0...255 -> 0...1
+      vec4 vertexColor01 = aVertexColor / 255.0;
+
+      // 0...2 -> -1...1
+      float outlineBrightness01 = uOutlineBrightness - 1.0;
+
+      vec3 vertexColorWithBrightness = outlineBrightness01 > 0.0
+
             // > 0 -> brighter
             ? vertexColor01.rgb + outlineBrightness01
-            
+
             // < 0 -> darker
             : vertexColor01.rgb * uOutlineBrightness;
-    
-    vFragmentColor = vec4(vertexColorWithBrightness, vertexColor01.a * uVertexColorAlpha);
+
+      vFragmentColor = vec4(vertexColorWithBrightness, vertexColor01.a * uVertexColorAlpha);
+   }
 }
 
 
@@ -76,47 +85,63 @@ precision highp float;
 #endif
 
 uniform sampler2D u_tex;
-uniform int u_mode; 
-uniform vec4 u_color;
-uniform float u_fade;
+uniform float     u_fade;
+uniform int       u_mode; 
+uniform vec4      u_color;
+
+// 0 = solid color
+// 1 = gradient color
+uniform int        uColorMode;
 
 varying vec2   v_st;
-varying vec4   vFragmentColor;                                  
+varying vec4   vFragmentColor;
 
 void main() {
-	
-    float len;
-    float fuzz;
-	 
-    if (u_mode == 2) {
-		 
-        // round cap line
-#ifdef DESKTOP_QUIRKS
-        len = length(v_st);
-#else
-        len = texture2D(u_tex, v_st).a;
-#endif
-        vec2 st_width = fwidth(v_st);
-        fuzz = max(st_width.s, st_width.t);
-		  
-    } else {
-		 
-        // flat cap line 
-		  
-        len = abs(v_st.s);
-        fuzz = fwidth(v_st.s);
-    }
-	 
-    // u_mode == 0 -> thin line
-    // len = len * clamp(float(u_mode), len, 1.0);
-	 
-    if (fuzz > 2.0)
-        // gl_FragColor = u_color * 0.5;
-        gl_FragColor = vFragmentColor * 0.5;
-    else
-        gl_FragColor = vFragmentColor * clamp((1.0 - len) / max(u_fade, fuzz), 0.0, 1.0);
-        // gl_FragColor = u_color * clamp((1.0 - len) / max(u_fade, fuzz), 0.0, 1.0);
-        // gl_FragColor = u_color * clamp((1.0 - len), 0.0, 1.0);
 
-	 // gl_FragColor = u_color * 0.5;
+   float len;
+   float fuzz;
+
+   if (u_mode == 2) {
+
+      // round cap line
+#ifdef DESKTOP_QUIRKS
+      len = length(v_st);
+#else
+      len = texture2D(u_tex, v_st).a;
+#endif
+      vec2 st_width = fwidth(v_st);
+      fuzz = max(st_width.s, st_width.t);
+
+   } else {
+
+      // flat cap line 
+
+      len = abs(v_st.s);
+      fuzz = fwidth(v_st.s);
+   }
+
+   // u_mode == 0 -> thin line
+   // len = len * clamp(float(u_mode), len, 1.0);
+
+   if (uColorMode == 0) {
+
+      // solid color
+
+      if (fuzz > 2.0)
+         gl_FragColor = u_color * 0.5;
+      else
+         gl_FragColor = u_color * clamp((1.0 - len) / max(u_fade, fuzz), 0.0, 1.0);
+         // gl_FragColor = u_color * clamp((1.0 - len), 0.0, 1.0);
+
+      // gl_FragColor = u_color * 0.5;
+
+   } else {
+
+      // gradient color
+
+      if (fuzz > 2.0)
+         gl_FragColor = vFragmentColor * 0.5;
+      else
+         gl_FragColor = vFragmentColor * clamp((1.0 - len) / max(u_fade, fuzz), 0.0, 1.0);
+   }
 }
