@@ -47,7 +47,7 @@ import net.tourbook.map3.ui.DialogMap3ColorEditor;
 import net.tourbook.map3.ui.IMap3ColorUpdater;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageMap3Color;
+import net.tourbook.preferences.PrefPageMap25_Map3_Color;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -178,7 +178,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
       PreferencesUtil.createPreferenceDialogOn(
             _map25View.getShell(),
-            PrefPageMap3Color.ID,
+            PrefPageMap25_Map3_Color.ID,
             null,
             _graphId).open();
    }

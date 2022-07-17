@@ -93,9 +93,9 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPreferencePage, IMap3ColorUpdater, ITourViewer, ITreeViewer {
+public class PrefPageMap25_Map3_Color extends PreferencePage implements IWorkbenchPreferencePage, IMap3ColorUpdater, ITourViewer, ITreeViewer {
 
-   public static final String                        ID                               = "net.tourbook.preferences.PrefPageMap3Color";      //$NON-NLS-1$
+   public static final String                        ID                               = "net.tourbook.preferences.PrefPageMap25_Map3_Color"; //$NON-NLS-1$
 
    private static final String                       APP_ACTION_COLUMNS               = net.tourbook.Messages.App_Action_Columns;
    private static final String                       APP_ACTION_DUPLICATE             = net.tourbook.Messages.App_Action_Duplicate;
@@ -106,7 +106,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
    private static int                                PROFILE_IMAGE_HEIGHT;
    private static final int                          PROFILE_IMAGE_MIN_SIZE           = 30;
 
-   private static final String                       STATE_EXPANDED_COLOR_DEFINITIONS = "STATE_EXPANDED_COLOR_DEFINITIONS";                //$NON-NLS-1$
+   private static final String                       STATE_EXPANDED_COLOR_DEFINITIONS = "STATE_EXPANDED_COLOR_DEFINITIONS";                  //$NON-NLS-1$
 
    private final IPreferenceStore                    _prefStore                       = TourbookPlugin.getPrefStore();
    private final IDialogSettings                     _state                           = TourbookPlugin.getState(this.getClass().getName());
@@ -207,7 +207,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
       @Override
       public Object[] getElements(final Object inputElement) {
 
-         if (inputElement instanceof PrefPageMap3Color) {
+         if (inputElement instanceof PrefPageMap25_Map3_Color) {
             return getColorDefinitions();
          }
 
@@ -233,7 +233,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
-   public PrefPageMap3Color() {
+   public PrefPageMap25_Map3_Color() {
 
 //      noDefaultAndApplyButton();
    }

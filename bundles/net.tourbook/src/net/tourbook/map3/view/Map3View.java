@@ -105,7 +105,7 @@ import net.tourbook.map3.layer.tourtrack.TourTrackConfig;
 import net.tourbook.map3.layer.tourtrack.TourTrackConfigManager;
 import net.tourbook.map3.layer.tourtrack.TourTrackLayer;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageMap3Color;
+import net.tourbook.preferences.PrefPageMap25_Map3_Color;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
 import net.tourbook.tour.ITourEventListener;
@@ -838,7 +838,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       _actionOpenMap3StatisticsView = new ActionOpenMap3StatisticsView();
 
       _actionMap3Color = new ActionMap3Color();
-      _actionMap3Colors = new ActionOpenPrefDialog(Messages.Map3_Action_TrackColors, PrefPageMap3Color.ID, _graphId);
+      _actionMap3Colors = new ActionOpenPrefDialog(Messages.Map3_Action_TrackColors, PrefPageMap25_Map3_Color.ID, _graphId);
       _actionMap3Colors.setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Options));
 
       _actionMapBookmarks = new ActionMapBookmarks(_parent, this);

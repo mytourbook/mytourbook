@@ -241,17 +241,26 @@
          class    ="net.tourbook.preferences.PrefPageMap3"
       />
          <page
-            name        ="%Pref_Page_Map3_Color"
-            id          ="net.tourbook.preferences.PrefPageMap3Color"
-            class       ="net.tourbook.preferences.PrefPageMap3Color"
-            category    ="net.tourbook.preferences.PrefPageMap3"
-         />
-         
-         <page
             name        ="%Pref_Page_Map3_Layer"
             id          ="net.tourbook.preferences.PrefPageMap3Layer"
             class       ="net.tourbook.preferences.PrefPageMap3Layer"
             category    ="net.tourbook.preferences.PrefPageMap3"
+         />
+
+      <!--
+         2.5D + 3D Map
+      -->
+      
+      <page
+         name     ="%Pref_Page_Map25_Map3"
+         id       ="net.tourbook.preferences.PrefPageMap25_Map3"
+         class    ="net.tourbook.preferences.PrefPageMap25_Map3"
+      />
+         <page
+            name        ="%Pref_Page_Map25_Map3_Color"
+            id          ="net.tourbook.preferences.PrefPageMap25_Map3_Color"
+            class       ="net.tourbook.preferences.PrefPageMap25_Map3_Color"
+            category    ="net.tourbook.preferences.PrefPageMap25_Map3"
          />
          
 

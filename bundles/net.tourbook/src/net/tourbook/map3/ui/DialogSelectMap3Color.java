@@ -43,7 +43,7 @@ import net.tourbook.map3.Messages;
 import net.tourbook.map3.view.Map3View;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.preferences.PrefPageMap3Color;
+import net.tourbook.preferences.PrefPageMap25_Map3_Color;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -183,7 +183,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 
       PreferencesUtil.createPreferenceDialogOn(//
             _map3View.getShell(),
-            PrefPageMap3Color.ID,
+            PrefPageMap25_Map3_Color.ID,
             null,
             _graphId).open();
    }
