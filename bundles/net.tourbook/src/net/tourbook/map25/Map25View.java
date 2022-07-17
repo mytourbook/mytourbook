@@ -70,6 +70,7 @@ import net.tourbook.map25.action.ActionZoomOut;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerLayerMT;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
+import net.tourbook.map25.layer.tourtrack.Map25TrackConfig.LineColorMode;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
@@ -1201,6 +1202,11 @@ public class Map25View extends ViewPart implements
 
       final boolean canShowTour = isTourAvailable && isTourLayerVisible;
 
+      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+
+      final boolean isGradientColor = trackConfig.lineColorMode == LineColorMode.GRADIENT
+            && trackConfig.isShowDirectionArrow == false;
+
       _actionMapBookmarks.setEnabled(true);
       _actionMapProvider.setEnabled(true);
       _actionMapOptions.setEnabled(true);
@@ -1215,6 +1221,13 @@ public class Map25View extends ViewPart implements
 
       _actionMapPhotoFilter            .setEnabled(isTourWithPhoto && isPhotoDisplayed);
       _actionShowPhotoOptions          .setEnabled(isTourWithPhoto);
+
+      _actionTrackColor_Altitude       .setEnabled(isGradientColor);
+      _actionTrackColor_Gradient       .setEnabled(isGradientColor);
+      _actionTrackColor_HrZone         .setEnabled(isGradientColor);
+      _actionTrackColor_Pace           .setEnabled(isGradientColor);
+      _actionTrackColor_Pulse          .setEnabled(isGradientColor);
+      _actionTrackColor_Speed          .setEnabled(isGradientColor);
 
 // SET_FORMATTING_ON
    }
