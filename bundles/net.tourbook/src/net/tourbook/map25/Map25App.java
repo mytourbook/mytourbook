@@ -40,6 +40,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
 import net.tourbook.map25.layer.labeling.LabelLayerMT;
+import net.tourbook.map25.layer.legend.LegendLayer;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerLayerMT;
@@ -197,6 +198,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private Layer                   _layer_HillShading_AFTER;
    private BitmapTileLayer         _layer_HillShading_TILE_LOADING;
    private LabelLayerMT            _layer_Label;
+   private LegendLayer             _layer_Legend;
    private ItemizedLayer           _layer_MapBookmark_VARYING;
    private ItemizedLayer           _layer_MapBookmark_Clustered;
    private ItemizedLayer           _layer_MapBookmark_NotClustered;
@@ -540,6 +542,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       final MapScaleBarLayer layer = new MapScaleBarLayer(mMap, mapScaleBar);
       layer.setEnabled(true);
 
+      // set scale bar position
       final BitmapRenderer renderer = layer.getRenderer();
       renderer.setPosition(GLViewport.Position.BOTTOM_RIGHT);
       renderer.setOffset(5, 0);
@@ -715,6 +718,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_TileInfo = new TileGridLayerMT(mMap);
       _layer_TileInfo.setEnabled(false);
 
+      // legend
+      _layer_Legend = new LegendLayer(mMap);
+      _layer_Legend.setEnabled(false);
+
       /*
        * Add all layers
        */
@@ -732,6 +739,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       allMapLayer.add(_layer_Photo_VARYING);
       allMapLayer.add(_layer_SliderLocation);
       allMapLayer.add(_layer_ScaleBar);
+      allMapLayer.add(_layer_Legend);
       allMapLayer.add(_layer_TileInfo);
 
       /*
@@ -910,6 +918,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    public boolean getLayer_Label_IsBeforeBuilding() {
       return _layer_Label_IsBeforeBuilding;
+   }
+
+   public LegendLayer getLayer_Legend() {
+      return _layer_Legend;
    }
 
    public ItemizedLayer getLayer_MapBookmark() {
@@ -1198,6 +1210,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
          return;
       }
+
+      _layer_Legend.onResize();
 
       super.resize(w, h);
    }

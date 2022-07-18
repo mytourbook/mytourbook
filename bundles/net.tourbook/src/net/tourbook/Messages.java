@@ -1983,6 +1983,7 @@ public class Messages extends NLS {
    public static String        Slideout_Map25Layer_Checkbox_Layer_Hillshading;
    public static String        Slideout_Map25Layer_Checkbox_Layer_LabelSymbol;
    public static String        Slideout_Map25Layer_Checkbox_Layer_LabelSymbol_IsBehindBuilding;
+   public static String        Slideout_Map25Layer_Checkbox_Layer_Legend;
    public static String        Slideout_Map25Layer_Checkbox_Layer_Satellite;
    public static String        Slideout_Map25Layer_Checkbox_Layer_ScaleBar;
    public static String        Slideout_Map25Layer_Checkbox_Layer_TileInfo;

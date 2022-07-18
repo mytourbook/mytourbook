@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021  Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,9 @@ package net.tourbook.common.color;
 
 public interface IMapColorProvider {
 
+   /**
+    * Width for the legend gradient graph, this does not include the labels
+    */
    public static final int DEFAULT_LEGEND_GRAPHIC_WIDTH = 20;
 
    public static final int LEGEND_IMAGE_BORDER_WIDTH    = 1;

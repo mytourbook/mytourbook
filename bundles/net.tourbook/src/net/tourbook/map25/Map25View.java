@@ -163,6 +163,7 @@ public class Map25View extends ViewPart implements
    private static final String           STATE_IS_LAYER_BASE_MAP_VISIBLE         = "STATE_IS_LAYER_BASE_MAP_VISIBLE";            //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_BOOKMARK_VISIBLE         = "STATE_IS_LAYER_BOOKMARK_VISIBLE";            //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_HILLSHADING_VISIBLE      = "STATE_IS_LAYER_HILLSHADING_VISIBLE";         //$NON-NLS-1$
+   private static final String           STATE_IS_LAYER_LEGEND_VISIBLE           = "STATE_IS_LAYER_LEGEND_VISIBLE";              //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_MARKER_VISIBLE           = "STATE_IS_LAYER_MARKER_VISIBLE";              //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE     = "STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE";        //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_SATELLITE_VISIBLE        = "STATE_IS_LAYER_SATELLITE_VISIBLE";           //$NON-NLS-1$
@@ -189,7 +190,7 @@ public class Map25View extends ViewPart implements
    //
    private static int[]                  _eventCounter                           = new int[1];
    //
-   private Map25App                      _mapApp;
+   private Map25App                      _map25App;
    //
    private OpenDialogManager             _openDialogManager                      = new OpenDialogManager();
    private final MapInfoManager          _mapInfoManager                         = MapInfoManager.getInstance();
@@ -491,11 +492,11 @@ public class Map25View extends ViewPart implements
       final boolean isPhotoVisible = _actionShowPhotoOptions.getSelection();
 
       // update model
-      _mapApp.setPhoto_IsVisible(isPhotoVisible);
+      _map25App.setPhoto_IsVisible(isPhotoVisible);
 
       // update UI
-      _mapApp.getLayer_Photo().setEnabled(isPhotoVisible);
-      _mapApp.getMap().render();
+      _map25App.getLayer_Photo().setEnabled(isPhotoVisible);
+      _map25App.getMap().render();
 
       // hide photo filter when photos are hidden
       if (isPhotoVisible == false) {
@@ -517,21 +518,21 @@ public class Map25View extends ViewPart implements
       final boolean isShowSliderLocation = activeTourTrackConfig.isShowSliderLocation;
       final boolean isShowSliderPath = activeTourTrackConfig.isShowSliderPath;
 
-      _mapApp.getLayer_Tour().setEnabled(_isShowTour);
-      _mapApp.getLayer_SliderLocation().setEnabled(_isShowTour && isShowSliderLocation);
-      _mapApp.getLayer_SliderPath().setEnabled(_isShowTour && isShowSliderPath);
+      _map25App.getLayer_Tour().setEnabled(_isShowTour);
+      _map25App.getLayer_SliderLocation().setEnabled(_isShowTour && isShowSliderLocation);
+      _map25App.getLayer_SliderPath().setEnabled(_isShowTour && isShowSliderPath);
 
-      _mapApp.getMap().render();
+      _map25App.getMap().render();
 
       enableActions();
    }
 
    public void actionShowTourMarker(final boolean isMarkerVisible) {
 
-      _mapApp.getLayer_MapBookmark().setEnabled(isMarkerVisible);
-      _mapApp.getLayer_TourMarker().setEnabled(isMarkerVisible);
+      _map25App.getLayer_MapBookmark().setEnabled(isMarkerVisible);
+      _map25App.getLayer_TourMarker().setEnabled(isMarkerVisible);
 
-      _mapApp.getMap().render();
+      _map25App.getMap().render();
 
       enableActions();
    }
@@ -652,7 +653,7 @@ public class Map25View extends ViewPart implements
 
    public void actionZoomIn() {
 
-      final Map map25 = _mapApp.getMap();
+      final Map map25 = _map25App.getMap();
 
       map25.post(() -> {
 
@@ -666,7 +667,7 @@ public class Map25View extends ViewPart implements
    }
 
    public void actionZoomOut() {
-      final Map map25 = _mapApp.getMap();
+      final Map map25 = _map25App.getMap();
 
       map25.post(() -> {
 
@@ -690,7 +691,7 @@ public class Map25View extends ViewPart implements
          return;
       }
 
-      final Map map25 = _mapApp.getMap();
+      final Map map25 = _map25App.getMap();
 
       map25.post(() -> {
 
@@ -1111,7 +1112,7 @@ public class Map25View extends ViewPart implements
             /*
              * Render map otherwise a black screen is displayed until the map is moved
              */
-            final Map map = _mapApp.getMap();
+            final Map map = _map25App.getMap();
 
             // check if initialized
             if (map == null) {
@@ -1122,7 +1123,7 @@ public class Map25View extends ViewPart implements
          }
       });
 
-      _mapApp = Map25App.createMap(this, _state, awtCanvas);
+      _map25App = Map25App.createMap(this, _state, awtCanvas);
    }
 
    private void deactivateOtherMapSync() {
@@ -1162,8 +1163,8 @@ public class Map25View extends ViewPart implements
 
          getViewSite().getPage().removePartListener(_partListener);
 
-         _mapApp.stop();
-         _mapApp.getMap().destroy();
+         _map25App.stop();
+         _map25App.getMap().destroy();
       }
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
@@ -1191,7 +1192,7 @@ public class Map25View extends ViewPart implements
     */
    void enableActions() {
 
-      final TourLayer tourLayer = _mapApp.getLayer_Tour();
+      final TourLayer tourLayer = _map25App.getLayer_Tour();
       final boolean isTourLayerVisible = tourLayer == null ? false : tourLayer.isEnabled();
 
       final boolean isTourAvailable = _allTourData.size() > 0;
@@ -1306,13 +1307,13 @@ public class Map25View extends ViewPart implements
    }
 
    public Map25App getMapApp() {
-      return _mapApp;
+      return _map25App;
    }
 
    @Override
    public MapPosition getMapPosition() {
 
-      return _mapApp.getMap().getMapPosition();
+      return _map25App.getMap().getMapPosition();
    }
 
    @Override
@@ -1364,7 +1365,7 @@ public class Map25View extends ViewPart implements
 
       MapBookmarkManager.setLastSelectedBookmark(selectedBookmark);
 
-      final Map map = _mapApp.getMap();
+      final Map map = _map25App.getMap();
       final MapPosition mapPosition = selectedBookmark.getMapPosition();
 
       Map25ConfigManager.setMapLocation(map, mapPosition);
@@ -1378,7 +1379,7 @@ public class Map25View extends ViewPart implements
          moveToMapLocation(mapBookmark);
       } else if (mapBookmarkEventType == MapBookmarkEventType.MODIFIED) {
          //_mapApp.debugPrint("*** Map25View_onMapBookmarkActionPerformed modify: " + mapBookmark.name);
-         _mapApp.updateLayer_MapBookmarks();
+         _map25App.updateLayer_MapBookmarks();
       }
    }
 
@@ -1601,7 +1602,7 @@ public class Map25View extends ViewPart implements
       /*
        * Tours
        */
-      final TourLayer tourLayer = _mapApp.getLayer_Tour();
+      final TourLayer tourLayer = _map25App.getLayer_Tour();
       if (tourLayer == null) {
 
          // tour layer is not yet created, this happened
@@ -1715,8 +1716,8 @@ public class Map25View extends ViewPart implements
       final boolean isShowSliderPath = activeTourTrackConfig.isShowSliderPath;
 
       // show/hide layer
-      final SliderLocation_Layer sliderLocation_Layer = _mapApp.getLayer_SliderLocation();
-      final SliderPath_Layer sliderPath_Layer = _mapApp.getLayer_SliderPath();
+      final SliderLocation_Layer sliderLocation_Layer = _map25App.getLayer_SliderLocation();
+      final SliderPath_Layer sliderPath_Layer = _map25App.getLayer_SliderPath();
 
       sliderPath_Layer.setEnabled(isShowSliderPath);
       sliderLocation_Layer.setEnabled(isShowSliderLocation);
@@ -1745,7 +1746,7 @@ public class Map25View extends ViewPart implements
       /*
        * Markers
        */
-      final MarkerLayerMT markerLayer = _mapApp.getLayer_TourMarker();
+      final MarkerLayerMT markerLayer = _map25App.getLayer_TourMarker();
       if (markerLayer.isEnabled()) {
          final List<MapMarker> allMarkers = createMapMarkers(_allTourData);
          markerLayer.replaceMarkers(allMarkers);
@@ -1754,15 +1755,20 @@ public class Map25View extends ViewPart implements
       /*
        * Photos
        */
-      if (_mapApp.isPhoto_Visible()) {
+      if (_map25App.isPhoto_Visible()) {
 
-         _mapApp.updateLayer_Photos();
+         _map25App.updateLayer_Photos();
       }
+
+      /*
+       * Legend
+       */
+      _map25App.getLayer_Legend().updateLegend(_allTourData);
 
       /*
        * Update map
        */
-      final Map map25 = _mapApp.getMap();
+      final Map map25 = _map25App.getMap();
 
       final boolean isSyncWithSlider = _mapSynchedWith == MapSync.WITH_SLIDER
             || _mapSynchedWith == MapSync.WITH_SLIDER_CENTERED;
@@ -1828,7 +1834,7 @@ public class Map25View extends ViewPart implements
       // tour layer
       _isShowTour       = Util.getStateBoolean(_state, STATE_IS_LAYER_TOUR_VISIBLE, true);
       _actionShowTourOptions.setSelection(_isShowTour);
-      _mapApp.getLayer_Tour().setEnabled(_isShowTour);
+      _map25App.getLayer_Tour().setEnabled(_isShowTour);
 
       // track color
       final MapGraphId trackGraphId = Map25ConfigManager.getActiveTourTrackConfig().gradientColorGraphID;
@@ -1838,17 +1844,17 @@ public class Map25View extends ViewPart implements
       // tour marker layer
       final boolean isMarkerVisible = Util.getStateBoolean(_state, STATE_IS_LAYER_MARKER_VISIBLE, true);
       _actionShowMarkerOptions.setSelected(isMarkerVisible);
-      _mapApp.getLayer_TourMarker().setEnabled(isMarkerVisible);
+      _map25App.getLayer_TourMarker().setEnabled(isMarkerVisible);
 
       // photo_layer
       final boolean isPhotoVisible = Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_VISIBLE, true);
-      _mapApp.setPhoto_IsShowTitle  (Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_TITLE_VISIBLE, true));
-      _mapApp.setPhoto_IsScaled     (Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_SCALED, true));
-      _mapApp.setPhoto_IsVisible    (isPhotoVisible);
-      _mapApp.setPhoto_Size         (Util.getStateInt(_state, STATE_LAYER_PHOTO_SIZE, SlideoutMap25_PhotoOptions.IMAGE_SIZE_MINIMUM));
+      _map25App.setPhoto_IsShowTitle  (Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_TITLE_VISIBLE, true));
+      _map25App.setPhoto_IsScaled     (Util.getStateBoolean(_state, STATE_IS_LAYER_PHOTO_SCALED, true));
+      _map25App.setPhoto_IsVisible    (isPhotoVisible);
+      _map25App.setPhoto_Size         (Util.getStateInt(_state, STATE_LAYER_PHOTO_SIZE, SlideoutMap25_PhotoOptions.IMAGE_SIZE_MINIMUM));
 
       _actionShowPhotoOptions.setSelection(isPhotoVisible);
-      _mapApp.getLayer_Photo().setEnabled(isPhotoVisible);
+      _map25App.getLayer_Photo().setEnabled(isPhotoVisible);
 
       _isPhotoFilterActive             = Util.getStateBoolean(_state, STATE_IS_PHOTO_FILTER_ACTIVE, false);
       _photoFilter_RatingStars         = Util.getStateInt(_state, STATE_PHOTO_FILTER_RATING_STARS, 0);
@@ -1858,22 +1864,23 @@ public class Map25View extends ViewPart implements
 
       // hillshading layer
       final int layerHillshadingOpacity         = Util.getStateInt(_state, STATE_LAYER_HILLSHADING_OPACITY, 255);
-      final BitmapTileLayer layer_HillShading   = _mapApp.getLayer_HillShading();
+      final BitmapTileLayer layer_HillShading   = _map25App.getLayer_HillShading();
       layer_HillShading.setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_HILLSHADING_VISIBLE, true));
       layer_HillShading.setBitmapAlpha(layerHillshadingOpacity / 255.0f, true);
-      _mapApp.setLayer_HillShading_Options(layerHillshadingOpacity);
+      _map25App.setLayer_HillShading_Options(layerHillshadingOpacity);
 
       // satellite maps
-      _mapApp.getLayer_Satellite()        .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SATELLITE_VISIBLE, false));
+      _map25App.getLayer_Satellite()        .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SATELLITE_VISIBLE,     false));
 
       // other layers
-      _mapApp.getLayer_BaseMap()          .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BASE_MAP_VISIBLE,  true));
+      _map25App.getLayer_BaseMap()          .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BASE_MAP_VISIBLE,      true));
 
-      _mapApp.getLayer_MapBookmark()      .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BOOKMARK_VISIBLE,  true));
-      _mapApp.getLayer_ScaleBar()         .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SCALE_BAR_VISIBLE, true));
-      _mapApp.getLayer_TileInfo()         .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_TILE_INFO_VISIBLE, false));
+      _map25App.getLayer_MapBookmark()      .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BOOKMARK_VISIBLE,      true));
+      _map25App.getLayer_Legend()           .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_LEGEND_VISIBLE,        true));
+      _map25App.getLayer_ScaleBar()         .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SCALE_BAR_VISIBLE,     true));
+      _map25App.getLayer_TileInfo()         .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_TILE_INFO_VISIBLE,     false));
 
-      _mapApp.getLayer_OpenGLTest()       .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE, false));
+      _map25App.getLayer_OpenGLTest()       .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE,  false));
 
       // map is synced with
       _mapSynchedWith = (MapSync) Util.getStateEnum(_state, STATE_MAP_SYNCHED_WITH, MapSync.NONE);
@@ -1976,25 +1983,26 @@ public class Map25View extends ViewPart implements
       Util.setStateEnum(_state, STATE_MAP_SYNCHED_WITH,  _mapSynchedWith);
 
       // other layers
-      _state.put(STATE_IS_LAYER_BASE_MAP_VISIBLE,     _mapApp.getLayer_BaseMap().isEnabled());
-      _state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE,     _mapApp.getLayer_MapBookmark().isEnabled());
-      _state.put(STATE_IS_LAYER_MARKER_VISIBLE,       _mapApp.getLayer_TourMarker().isEnabled());
-      _state.put(STATE_IS_LAYER_SATELLITE_VISIBLE,    _mapApp.getLayer_Satellite().isEnabled());
-      _state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE,    _mapApp.getLayer_ScaleBar().isEnabled());
-      _state.put(STATE_IS_LAYER_TILE_INFO_VISIBLE,    _mapApp.getLayer_TileInfo().isEnabled());
-      _state.put(STATE_IS_LAYER_TOUR_VISIBLE,         _mapApp.getLayer_Tour().isEnabled());
+      _state.put(STATE_IS_LAYER_BASE_MAP_VISIBLE,     _map25App.getLayer_BaseMap().isEnabled());
+      _state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE,     _map25App.getLayer_MapBookmark().isEnabled());
+      _state.put(STATE_IS_LAYER_LEGEND_VISIBLE,       _map25App.getLayer_Legend().isEnabled());
+      _state.put(STATE_IS_LAYER_MARKER_VISIBLE,       _map25App.getLayer_TourMarker().isEnabled());
+      _state.put(STATE_IS_LAYER_SATELLITE_VISIBLE,    _map25App.getLayer_Satellite().isEnabled());
+      _state.put(STATE_IS_LAYER_SCALE_BAR_VISIBLE,    _map25App.getLayer_ScaleBar().isEnabled());
+      _state.put(STATE_IS_LAYER_TILE_INFO_VISIBLE,    _map25App.getLayer_TileInfo().isEnabled());
+      _state.put(STATE_IS_LAYER_TOUR_VISIBLE,         _map25App.getLayer_Tour().isEnabled());
 
-      _state.put(STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE, _mapApp.getLayer_OpenGLTest().isEnabled());
+      _state.put(STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE, _map25App.getLayer_OpenGLTest().isEnabled());
 
       // photo layer
-      _state.put(STATE_IS_LAYER_PHOTO_VISIBLE,        _mapApp.isPhoto_Visible());
-      _state.put(STATE_IS_LAYER_PHOTO_TITLE_VISIBLE,  _mapApp.isPhoto_ShowTitle());
-      _state.put(STATE_IS_LAYER_PHOTO_SCALED,         _mapApp.isPhoto_Scaled());
-      _state.put(STATE_LAYER_PHOTO_SIZE,              _mapApp.getPhoto_Size());
+      _state.put(STATE_IS_LAYER_PHOTO_VISIBLE,        _map25App.isPhoto_Visible());
+      _state.put(STATE_IS_LAYER_PHOTO_TITLE_VISIBLE,  _map25App.isPhoto_ShowTitle());
+      _state.put(STATE_IS_LAYER_PHOTO_SCALED,         _map25App.isPhoto_Scaled());
+      _state.put(STATE_LAYER_PHOTO_SIZE,              _map25App.getPhoto_Size());
 
       // hillshading layer
-      _state.put(STATE_IS_LAYER_HILLSHADING_VISIBLE,  _mapApp.getLayer_HillShading().isEnabled());
-      _state.put(STATE_LAYER_HILLSHADING_OPACITY,     _mapApp.getLayer_HillShading_Opacity());
+      _state.put(STATE_IS_LAYER_HILLSHADING_VISIBLE,  _map25App.getLayer_HillShading().isEnabled());
+      _state.put(STATE_LAYER_HILLSHADING_OPACITY,     _map25App.getLayer_HillShading_Opacity());
 
       // photo filter
       _state.put(STATE_IS_PHOTO_FILTER_ACTIVE,        _actionMapPhotoFilter.getSelection());
@@ -2042,6 +2050,8 @@ public class Map25View extends ViewPart implements
       Map25ConfigManager.getActiveTourTrackConfig().gradientColorGraphID = trackGraphId;
 
       _mapColorProvider = MapColorProvider.getActiveMap3ColorProvider(trackGraphId);
+
+      _map25App.getLayer_Legend().setColorProvider(_mapColorProvider);
 
       if (isPaintTours) {
          paintTours();
@@ -2192,7 +2202,7 @@ public class Map25View extends ViewPart implements
       final double latitude = latitudeSerie[checkedValueIndex];
       final double longitude = tourData.longitudeSerie[checkedValueIndex];
 
-      final Map map25 = _mapApp.getMap();
+      final Map map25 = _map25App.getMap();
       final MapPosition currentMapPos = new MapPosition();
 
       if (_mapSynchedWith == MapSync.WITH_SLIDER) {
@@ -2282,7 +2292,7 @@ public class Map25View extends ViewPart implements
          return;
       }
 
-      final Map map = _mapApp.getMap();
+      final Map map = _map25App.getMap();
 
       /**
        * Keep current tilt/bearing
@@ -2303,8 +2313,8 @@ public class Map25View extends ViewPart implements
 
       runPhotoFilter();
 
-      _mapApp.updateLayer_Photos();
-      _mapApp.updateMap();
+      _map25App.updateLayer_Photos();
+      _map25App.updateMap();
 
    }
 
