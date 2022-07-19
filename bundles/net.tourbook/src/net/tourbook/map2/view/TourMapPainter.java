@@ -434,10 +434,30 @@ public class TourMapPainter extends Map2Painter {
                      } else {
 
                         if (legendFormatDigits == 0) {
+
                            valueText = Integer.toString(unitValue.intValue()) + UI.SPACE + unitText;
+
                         } else {
+
                            // currently only 1 digit is supported
-                           valueText = _nf1.format(unitValue) + UI.SPACE + unitText;
+
+                           final float unitDecimals = unitValue.floatValue() - unitValue.intValue();
+
+                           if (Math.abs(unitDecimals) < 0.1) {
+
+                              // hide ".0" decimals
+
+                              valueText = UI.EMPTY_STRING
+
+                                    // add space to align values in a column, it't not perfect but better than nothing
+                                    + UI.SPACE3
+
+                                    + Integer.toString(unitValue.intValue()) + UI.SPACE + unitText;
+
+                           } else {
+
+                              valueText = _nf1.format(unitValue) + UI.SPACE + unitText;
+                           }
                         }
                      }
 
@@ -1781,7 +1801,6 @@ public class TourMapPainter extends Map2Painter {
 
                   lastInsideIndex = serieIndex;
                }
-
 
                // check first outside point
                if (isVisibleDataPoint && serieIndex == lastInsideIndex + 1) {
