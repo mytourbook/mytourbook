@@ -1493,6 +1493,10 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       return sliderYPosition;
    }
 
+   public IDialogSettings getState() {
+      return _state;
+   }
+
    public MapGraphId getTrackColorId() {
       return _graphId;
    }

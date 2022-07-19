@@ -173,8 +173,6 @@ public class Map25View extends ViewPart implements
    //
    private static final String           STATE_LAYER_HILLSHADING_OPACITY         = "STATE_LAYER_HILLSHADING_OPACITY";            //$NON-NLS-1$
    private static final String           STATE_MAP_SYNCHED_WITH                  = "STATE_MAP_SYNCHED_WITH";                     //$NON-NLS-1$
-   public static final String            STATE_VISIBLE_COLOR_PROFILES            = "STATE_VISIBLE_COLOR_PROFILES";               //$NON-NLS-1$
-   public static final int               STATE_VISIBLE_COLOR_PROFILES_DEFAULT    = 10;
    // photo layer
    private static final String           STATE_IS_LAYER_PHOTO_VISIBLE            = "STATE_IS_LAYER_PHOTO_VISIBLE";               //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_PHOTO_SCALED             = "STATE_IS_LAYER_PHOTO_SCALED";                //$NON-NLS-1$

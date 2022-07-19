@@ -122,8 +122,6 @@ public class Messages extends NLS {
    public static String        Pref_Map3Color_Column_ValueMarker_Relative;
    public static String        Pref_Map3Color_Dialog_RemoveProfile_Message;
    public static String        Pref_Map3Color_Dialog_RemoveProfile_Title;
-   public static String        Pref_Map3Color_Label_NumberOfColors;
-   public static String        Pref_Map3Color_Label_NumberOfColors_Tooltip;
    public static String        Pref_Map3Color_Label_Title;
 
    public static String        Prop_Viewer_Label_AltitudeRange_Tooltip;

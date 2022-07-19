@@ -39,6 +39,7 @@ import net.tourbook.common.color.RGBVertex;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
+import net.tourbook.map.MapManager;
 import net.tourbook.map2.view.TourMapPainter;
 import net.tourbook.map25.Map25View;
 import net.tourbook.map3.ui.DialogMap3ColorEditor;
@@ -114,7 +115,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
    private static int             PROFILE_IMAGE_HEIGHT           = -1;
 
-   private int                    _numVisibleRows                = Map25View.STATE_VISIBLE_COLOR_PROFILES_DEFAULT;
+   private int                    _numVisibleRows                = MapManager.STATE_VISIBLE_COLOR_PROFILES_DEFAULT;
 
    private Map25View              _map25View;
 
@@ -143,8 +144,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
    /*
     * UI controls
     */
-   private Composite _shellContainer;
-   private Composite _tableLayoutContainer;
+   private Composite _tableContainer;
 
    private Spinner   _spinnerNumVisibleProfiles;
 
@@ -289,11 +289,10 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
       final Composite ui = createUI(parent);
 
       restoreState();
-      enableControls();
 
       // must be run async otherwise the image width is 0 -> exception
       parent.getDisplay().asyncExec(() -> {
-         updateUI_colorViewer();
+         updateUI_ColorViewer();
       });
 
       return ui;
@@ -301,16 +300,16 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
    private Composite createUI(final Composite parent) {
 
-      _shellContainer = new Composite(parent, SWT.NONE);
+      final Composite shellContainer = new Composite(parent, SWT.NONE);
       GridLayoutFactory.fillDefaults()
-            .margins(UI.SHELL_MARGIN, UI.SHELL_MARGIN)
-            .spacing(0, 5)
-            .applyTo(_shellContainer);
+            .margins(2, 2)
+            .spacing(0, 3)
+            .applyTo(shellContainer);
 //      _shellContainer.setBackground(UI.SYS_COLOR_RED);
       {
-         createUI_00_Title(_shellContainer);
-         createUI_10_ColorViewer(_shellContainer);
-         createUI_20_Options(_shellContainer);
+         createUI_00_Title(shellContainer);
+         createUI_10_ColorViewer(shellContainer);
+         createUI_20_Options(shellContainer);
       }
 
       // set color for all controls, the dark theme is already painting in dark colors
@@ -320,12 +319,12 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
          final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
          final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
 
-         net.tourbook.common.UI.setChildColors(_shellContainer, fgColor, bgColor);
+         net.tourbook.common.UI.setChildColors(shellContainer, fgColor, bgColor);
       }
 
-      _shellContainer.addDisposeListener(disposeEvent -> onDispose());
+      shellContainer.addDisposeListener(disposeEvent -> onDispose());
 
-      return _shellContainer;
+      return shellContainer;
    }
 
    private void createUI_00_Title(final Composite parent) {
@@ -367,15 +366,15 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
       final TableLayout tableLayout = new TableLayout();
       final TableColumnLayout columnLayout = new TableColumnLayout();
 
-      _tableLayoutContainer = new Composite(parent, SWT.NONE);
-      _tableLayoutContainer.setLayout(columnLayout);
+      _tableContainer = new Composite(parent, SWT.NONE);
+      _tableContainer.setLayout(columnLayout);
 
-      setUI_TableLayout(_tableLayoutContainer);
+      setUI_TableLayout(_tableContainer);
 
       /*
        * create table
        */
-      final Table table = new Table(_tableLayoutContainer, tableStyle);
+      final Table table = new Table(_tableContainer, tableStyle);
       table.setLayout(tableLayout);
       table.setHeaderVisible(false);
       table.setLinesVisible(false);
@@ -461,27 +460,29 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
          tbm.update(true);
       }
-      final Composite containerOptions = new Composite(container, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.FILL).applyTo(containerOptions);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerOptions);
       {
+         final Composite containerOptions = new Composite(container, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.FILL).applyTo(containerOptions);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerOptions);
          {
-            /*
-             * Number of visible color profiles
-             */
+            {
+               /*
+                * Number of visible color profiles
+                */
 
-            // label
-            final Label label = new Label(containerOptions, SWT.NONE);
-            label.setText(Messages.Slideout_Map_TrackColors_Label_VisibleColorProfiles);
-            label.setToolTipText(Messages.Slideout_Map_TrackColors_Label_VisibleColorProfiles_Tooltip);
+               // label
+               final Label label = new Label(containerOptions, SWT.NONE);
+               label.setText(Messages.Slideout_Map_TrackColors_Label_VisibleColorProfiles);
+               label.setToolTipText(Messages.Slideout_Map_TrackColors_Label_VisibleColorProfiles_Tooltip);
 
-            // spinner
-            _spinnerNumVisibleProfiles = new Spinner(containerOptions, SWT.BORDER);
-            _spinnerNumVisibleProfiles.setMinimum(0);
-            _spinnerNumVisibleProfiles.setMaximum(100);
-            _spinnerNumVisibleProfiles.setPageIncrement(5);
-            _spinnerNumVisibleProfiles.addSelectionListener(_defaultSelectionListener);
-            _spinnerNumVisibleProfiles.addMouseWheelListener(_defaultMouseWheelListener);
+               // spinner
+               _spinnerNumVisibleProfiles = new Spinner(containerOptions, SWT.BORDER);
+               _spinnerNumVisibleProfiles.setMinimum(0);
+               _spinnerNumVisibleProfiles.setMaximum(100);
+               _spinnerNumVisibleProfiles.setPageIncrement(5);
+               _spinnerNumVisibleProfiles.addSelectionListener(_defaultSelectionListener);
+               _spinnerNumVisibleProfiles.addMouseWheelListener(_defaultMouseWheelListener);
+            }
          }
       }
    }
@@ -690,10 +691,6 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
       _profileImages.clear();
    }
 
-   private void enableControls() {
-
-   }
-
    /**
     * Fire event that 3D map colors have changed.
     */
@@ -823,7 +820,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
        */
       restoreState_BeforeUI();
 
-      setUI_TableLayout(_tableLayoutContainer);
+      setUI_TableLayout(_tableContainer);
 
       final Shell shell = _colorViewer.getTable().getShell();
       shell.pack(true);
@@ -950,12 +947,12 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
    private void restoreState_BeforeUI() {
 
-      _numVisibleRows = Util.getStateInt(_state, Map25View.STATE_VISIBLE_COLOR_PROFILES, Map25View.STATE_VISIBLE_COLOR_PROFILES_DEFAULT);
+      _numVisibleRows = Util.getStateInt(_state, MapManager.STATE_VISIBLE_COLOR_PROFILES, MapManager.STATE_VISIBLE_COLOR_PROFILES_DEFAULT);
    }
 
    private void saveState() {
 
-      _state.put(Map25View.STATE_VISIBLE_COLOR_PROFILES, _spinnerNumVisibleProfiles.getSelection());
+      _state.put(MapManager.STATE_VISIBLE_COLOR_PROFILES, _spinnerNumVisibleProfiles.getSelection());
    }
 
    /**
@@ -1030,7 +1027,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
             .applyTo(tableLayoutContainer);
    }
 
-   private void updateUI_colorViewer() {
+   private void updateUI_ColorViewer() {
 
       _colorViewer.setInput(this);
 
