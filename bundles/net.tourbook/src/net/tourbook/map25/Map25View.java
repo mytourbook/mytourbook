@@ -152,8 +152,8 @@ public class Map25View extends ViewPart implements
 
    private static final String            MAP_ACTION_SYNCH_WITH_SLIDER                 = net.tourbook.map2.Messages.map_action_synch_with_slider;
    private static final String            MAP_ACTION_SYNCH_WITH_SLIDER_CENTERED        = net.tourbook.map2.Messages.Map_Action_SynchWithSlider_Centered;
-   private static final ImageDescriptor   _imageSyncWithSlider                         = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider);
 
+   private static final ImageDescriptor   _imageSyncWithSlider                         = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider);
    private static final ImageDescriptor   _imageSyncWithSlider_Disabled                = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Disabled);
    private static final ImageDescriptor   _imageSyncWithSlider_Centered                = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Centered);
    private static final ImageDescriptor   _imageSyncWithSlider_Centered_Disabled       = TourbookPlugin.getThemedImageDescriptor(Images.SyncWith_Slider_Centered_Disabled);
@@ -173,6 +173,8 @@ public class Map25View extends ViewPart implements
    //
    private static final String           STATE_LAYER_HILLSHADING_OPACITY         = "STATE_LAYER_HILLSHADING_OPACITY";            //$NON-NLS-1$
    private static final String           STATE_MAP_SYNCHED_WITH                  = "STATE_MAP_SYNCHED_WITH";                     //$NON-NLS-1$
+   public static final String            STATE_VISIBLE_COLOR_PROFILES            = "STATE_VISIBLE_COLOR_PROFILES";               //$NON-NLS-1$
+   public static final int               STATE_VISIBLE_COLOR_PROFILES_DEFAULT    = 10;
    // photo layer
    private static final String           STATE_IS_LAYER_PHOTO_VISIBLE            = "STATE_IS_LAYER_PHOTO_VISIBLE";               //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_PHOTO_SCALED             = "STATE_IS_LAYER_PHOTO_SCALED";                //$NON-NLS-1$
@@ -411,7 +413,7 @@ public class Map25View extends ViewPart implements
 
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
-         return new SlideoutMap25_TrackColors(_parent, toolbar, Map25View.this, _graphId);
+         return new SlideoutMap25_TrackColors(_parent, toolbar, Map25View.this, _graphId, _state);
       }
 
       @Override

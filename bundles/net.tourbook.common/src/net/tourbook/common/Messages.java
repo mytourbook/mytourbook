@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.common.messages";             //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.common.messages";               //$NON-NLS-1$
 
    public static String        App_Action_Close_Tooltip;
    public static String        App_Action_New_WithConfirm;
@@ -343,6 +343,8 @@ public class Messages extends NLS {
    public static String        Slideout_Dialog_Action_PinSlideoutLocation_Tooltip;
 
    public static String        Slideout_Map_TrackColors_Label_Title;
+   public static String        Slideout_Map_TrackColors_Label_VisibleColorProfiles;
+   public static String        Slideout_Map_TrackColors_Label_VisibleColorProfiles_Tooltip;
 
    public static String        Swim_Stroke_Backstroke;
    public static String        Swim_Stroke_Breaststroke;

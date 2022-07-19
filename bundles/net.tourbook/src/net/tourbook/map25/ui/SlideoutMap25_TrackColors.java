@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -40,9 +40,7 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.view.TourMapPainter;
-import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.Map25View;
-import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map3.ui.DialogMap3ColorEditor;
 import net.tourbook.map3.ui.IMap3ColorUpdater;
 import net.tourbook.photo.IPhotoPreferences;
@@ -51,34 +49,40 @@ import net.tourbook.preferences.PrefPageMap25_Map3_Color;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
-import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ICheckStateProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -86,7 +90,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 
 /**
- * Slideout for 2.5D tour track configuration
+ * Slideout for 2.5D track colors
  */
 public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3ColorUpdater {
 
@@ -101,35 +105,35 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
 // SET_FORMATTING_ON
 
-   private static final IPreferenceStore _prefStore                     = TourbookPlugin.getPrefStore();
+   private static IDialogSettings _state;
 
-   private static final int              COLUMN_WIDTH_ABSOLUTE_RELATIVE = 4;
-   private static final int              COLUMN_WIDTH_COLOR_IMAGE       = 15;
-   private static final int              COLUMN_WIDTH_NAME              = 15;
-   private static final int              COLUMN_WIDTH_VALUE             = 8;
+   private static final int       COLUMN_WIDTH_ABSOLUTE_RELATIVE = 4;
+   private static final int       COLUMN_WIDTH_COLOR_IMAGE       = 15;
+   private static final int       COLUMN_WIDTH_NAME              = 15;
+   private static final int       COLUMN_WIDTH_VALUE             = 8;
 
-   private static int                    NUMBER_OF_VISIBLE_ROWS         = 6;
-   private static int                    PROFILE_IMAGE_HEIGHT           = -1;
+   private static int             PROFILE_IMAGE_HEIGHT           = -1;
 
-   private Map25View                     _map25View;
+   private int                    _numVisibleRows                = Map25View.STATE_VISIBLE_COLOR_PROFILES_DEFAULT;
 
-   private CheckboxTableViewer           _colorViewer;
-   private TableColumn                   _tcProfileImage;
+   private Map25View              _map25View;
 
-   private Action                        _actionAddColor;
-   private Action                        _actionEditSelectedColor;
-   private Action                        _actionEditAllColors;
+   private CheckboxTableViewer    _colorViewer;
+   private TableColumn            _tcProfileImage;
 
-   private FocusListener                 _keepOpenListener;
+   private Action                 _actionAddColor;
+   private Action                 _actionEditSelectedColor;
+   private Action                 _actionEditAllColors;
 
-   private boolean                       _isUpdateUI;
-   private boolean                       _isInUIUpdate;
-   private boolean                       _isInFireEvent;
+   private SelectionAdapter       _defaultSelectionListener;
+   private MouseWheelListener     _defaultMouseWheelListener;
 
-   private int                           _columnIndexProfileImage;
-   private MapGraphId                    _graphId;
+   private boolean                _isInUIUpdate;
 
-   private PixelConverter                _pc;
+   private int                    _columnIndexProfileImage;
+   private MapGraphId             _graphId;
+
+   private PixelConverter         _pc;
 
    /*
     * UI resources
@@ -140,16 +144,21 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
     * UI controls
     */
    private Composite _shellContainer;
+   private Composite _tableLayoutContainer;
+
+   private Spinner   _spinnerNumVisibleProfiles;
 
    public SlideoutMap25_TrackColors(final Composite ownerControl,
                                     final ToolBar toolbar,
                                     final Map25View map25View,
-                                    final MapGraphId graphId) {
+                                    final MapGraphId graphId,
+                                    final IDialogSettings state) {
 
       super(ownerControl, toolbar);
 
       _map25View = map25View;
       _graphId = graphId;
+      _state = state;
    }
 
    private void actionAddColor() {
@@ -275,13 +284,17 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
       createActions();
 
+      restoreState_BeforeUI();
+
       final Composite ui = createUI(parent);
 
-      fillUI();
       restoreState();
       enableControls();
 
-      updateUI_colorViewer();
+      // must be run async otherwise the image width is 0 -> exception
+      parent.getDisplay().asyncExec(() -> {
+         updateUI_colorViewer();
+      });
 
       return ui;
    }
@@ -297,15 +310,18 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
       {
          createUI_00_Title(_shellContainer);
          createUI_10_ColorViewer(_shellContainer);
-         createUI_20_Actions(_shellContainer);
+         createUI_20_Options(_shellContainer);
       }
 
-      // set color for all controls
-      final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-      final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
-      final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+      // set color for all controls, the dark theme is already painting in dark colors
+      if (UI.IS_DARK_THEME == false) {
 
-      net.tourbook.common.UI.setChildColors(_shellContainer, fgColor, bgColor);
+         final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
+         final Color fgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_FOREGROUND);
+         final Color bgColor = colorRegistry.get(IPhotoPreferences.PHOTO_VIEWER_COLOR_BACKGROUND);
+
+         net.tourbook.common.UI.setChildColors(_shellContainer, fgColor, bgColor);
+      }
 
       _shellContainer.addDisposeListener(disposeEvent -> onDispose());
 
@@ -330,119 +346,101 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
    private void createUI_10_ColorViewer(final Composite parent) {
 
-      final List<Map3GradientColorProvider> colorProviders = Map3GradientColorManager.getColorProviders(_graphId);
+      final int numColorProviders = Map3GradientColorManager.getColorProviders(_graphId).size();
 
       int tableStyle;
-      if (colorProviders.size() > NUMBER_OF_VISIBLE_ROWS) {
+      if (numColorProviders > _numVisibleRows) {
 
-         tableStyle = SWT.CHECK //
+         tableStyle = SWT.CHECK
                | SWT.FULL_SELECTION
-               //          | SWT.H_SCROLL
                | SWT.V_SCROLL
                | SWT.NO_SCROLL;
       } else {
 
-         // table contains less than maximum entries, scroll is not necessary
+         // table contains less than or equal maximum entries, scroll is not necessary
 
-         tableStyle = SWT.CHECK //
+         tableStyle = SWT.CHECK
                | SWT.FULL_SELECTION
                | SWT.NO_SCROLL;
       }
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.fillDefaults().applyTo(container);
-      {
-         /*
-          * create table
-          */
-         final Table table = new Table(container, tableStyle);
+      final TableLayout tableLayout = new TableLayout();
+      final TableColumnLayout columnLayout = new TableColumnLayout();
 
-         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
-         table.setHeaderVisible(false);
-         table.setLinesVisible(false);
+      _tableLayoutContainer = new Composite(parent, SWT.NONE);
+      _tableLayoutContainer.setLayout(columnLayout);
 
-         /*
-          * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
-          * critical for performance that these methods be as efficient as possible.
-          */
-         final Listener paintListener = event -> {
+      setUI_TableLayout(_tableLayoutContainer);
 
-            if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
-               onViewerPaint(event);
-            }
-         };
-         table.addListener(SWT.MeasureItem, paintListener);
-         table.addListener(SWT.PaintItem, paintListener);
+      /*
+       * create table
+       */
+      final Table table = new Table(_tableLayoutContainer, tableStyle);
+      table.setLayout(tableLayout);
+      table.setHeaderVisible(false);
+      table.setLinesVisible(false);
 
-         /*
-          * Set maximum number of visible rows
-          */
-         table.addControlListener(controlResizedAdapter(controlEvent -> {
+      /*
+       * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
+       * critical for performance that these methods be as efficient as possible.
+       */
+      final Listener paintListener = event -> {
 
-            final int itemHeight = table.getItemHeight();
-            final int maxHeight = itemHeight * NUMBER_OF_VISIBLE_ROWS;
+         if (event.type == SWT.MeasureItem || event.type == SWT.PaintItem) {
+            onViewerPaint(event);
+         }
+      };
+      table.addListener(SWT.MeasureItem, paintListener);
+      table.addListener(SWT.PaintItem, paintListener);
 
-            final int defaultHeight = table.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+      _colorViewer = new CheckboxTableViewer(table);
 
-            if (defaultHeight > maxHeight) {
+      /*
+       * create columns
+       */
+      defineColumn_10_Checkbox(columnLayout);
+      defineColumn_20_MinValue(columnLayout);
+      defineColumn_30_ColorImage(columnLayout);
+      defineColumn_40_MaxValue(columnLayout);
+      defineColumn_50_RelativeAbsolute(columnLayout);
+      defineColumn_52_OverwriteLegendMinMax(columnLayout);
 
-               final GridData gd = (GridData) container.getLayoutData();
-               gd.heightHint = maxHeight;
+      _colorViewer.setComparator(new Map3ProfileComparator());
 
-               container.layout(true, true);
-            }
-         }));
+      _colorViewer.setContentProvider(new IStructuredContentProvider() {
 
-         _colorViewer = new CheckboxTableViewer(table);
+         @Override
+         public void dispose() {}
 
-         /*
-          * create columns
-          */
-         defineColumn_10_Checkbox();
-         defineColumn_20_MinValue();
-         defineColumn_30_ColorImage();
-         defineColumn_40_MaxValue();
-         defineColumn_50_RelativeAbsolute();
-         defineColumn_52_OverwriteLegendMinMax();
+         @Override
+         public Object[] getElements(final Object inputElement) {
 
-         _colorViewer.setComparator(new Map3ProfileComparator());
+            return Map3GradientColorManager.getColorProviders(_graphId).toArray(new Map3GradientColorProvider[numColorProviders]);
+         }
 
-         _colorViewer.setContentProvider(new IStructuredContentProvider() {
+         @Override
+         public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
+      });
 
-            @Override
-            public void dispose() {}
+      _colorViewer.setCheckStateProvider(new ICheckStateProvider() {
 
-            @Override
-            public Object[] getElements(final Object inputElement) {
+         @Override
+         public boolean isChecked(final Object element) {
+            return onViewerIsChecked(element);
+         }
 
-               return colorProviders.toArray(new Map3GradientColorProvider[colorProviders.size()]);
-            }
+         @Override
+         public boolean isGrayed(final Object element) {
+            return onViewerIsGrayed(element);
+         }
+      });
 
-            @Override
-            public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
-         });
-
-         _colorViewer.setCheckStateProvider(new ICheckStateProvider() {
-
-            @Override
-            public boolean isChecked(final Object element) {
-               return onViewerIsChecked(element);
-            }
-
-            @Override
-            public boolean isGrayed(final Object element) {
-               return onViewerIsGrayed(element);
-            }
-         });
-
-         _colorViewer.addCheckStateListener(this::onViewerCheckStateChange);
-         _colorViewer.addSelectionChangedListener(selectionChangedEvent -> onViewerSelectColor());
-         _colorViewer.addDoubleClickListener(doubleClickEvent -> actionEditSelectedColor());
-      }
+      _colorViewer.addCheckStateListener(this::onViewerCheckStateChange);
+      _colorViewer.addSelectionChangedListener(selectionChangedEvent -> onViewerSelectColor());
+      _colorViewer.addDoubleClickListener(doubleClickEvent -> actionEditSelectedColor());
    }
 
-   private void createUI_20_Actions(final Composite parent) {
+   private void createUI_20_Options(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -450,6 +448,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
             .numColumns(2)
             .extendedMargins(2, 0, 3, 2)
             .applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_BLUE);
       {
 
          final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
@@ -462,17 +461,41 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
          tbm.update(true);
       }
+      final Composite containerOptions = new Composite(container, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.FILL).applyTo(containerOptions);
+      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerOptions);
+      {
+         {
+            /*
+             * Number of visible color profiles
+             */
+
+            // label
+            final Label label = new Label(containerOptions, SWT.NONE);
+            label.setText(Messages.Slideout_Map_TrackColors_Label_VisibleColorProfiles);
+            label.setToolTipText(Messages.Slideout_Map_TrackColors_Label_VisibleColorProfiles_Tooltip);
+
+            // spinner
+            _spinnerNumVisibleProfiles = new Spinner(containerOptions, SWT.BORDER);
+            _spinnerNumVisibleProfiles.setMinimum(0);
+            _spinnerNumVisibleProfiles.setMaximum(100);
+            _spinnerNumVisibleProfiles.setPageIncrement(5);
+            _spinnerNumVisibleProfiles.addSelectionListener(_defaultSelectionListener);
+            _spinnerNumVisibleProfiles.addMouseWheelListener(_defaultMouseWheelListener);
+         }
+      }
    }
 
    /**
     * Column: Show only the checkbox
+    *
+    * @param tableLayout
     */
-   private void defineColumn_10_Checkbox() {
+   private void defineColumn_10_Checkbox(final TableColumnLayout tableLayout) {
 
       final TableViewerColumn tvc = new TableViewerColumn(_colorViewer, SWT.LEAD);
 
       final TableColumn tc = tvc.getColumn();
-      tc.setWidth(_pc.convertWidthInCharsToPixels(COLUMN_WIDTH_NAME));
 
       tvc.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -488,17 +511,17 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
             }
          }
       });
+      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(COLUMN_WIDTH_NAME), true));
    }
 
    /**
     * Column: Min value
     */
-   private void defineColumn_20_MinValue() {
+   private void defineColumn_20_MinValue(final TableColumnLayout tableLayout) {
 
       final TableViewerColumn tvc = new TableViewerColumn(_colorViewer, SWT.TRAIL);
 
       final TableColumn tc = tvc.getColumn();
-      tc.setWidth(_pc.convertWidthInCharsToPixels(COLUMN_WIDTH_VALUE));
 
       tvc.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -525,17 +548,17 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
             }
          }
       });
+      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(COLUMN_WIDTH_VALUE), true));
    }
 
    /**
     * Column: Color image
     */
-   private void defineColumn_30_ColorImage() {
+   private void defineColumn_30_ColorImage(final TableColumnLayout tableLayout) {
 
       final TableViewerColumn tvc = new TableViewerColumn(_colorViewer, SWT.LEAD);
 
       final TableColumn tc = tvc.getColumn();
-      tc.setWidth(_pc.convertWidthInCharsToPixels(COLUMN_WIDTH_COLOR_IMAGE));
 
       _tcProfileImage = tc;
       _columnIndexProfileImage = _colorViewer.getTable().getColumnCount() - 1;
@@ -548,17 +571,18 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
          @Override
          public void update(final ViewerCell cell) {}
       });
+
+      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(COLUMN_WIDTH_COLOR_IMAGE), true));
    }
 
    /**
     * Column: Max value
     */
-   private void defineColumn_40_MaxValue() {
+   private void defineColumn_40_MaxValue(final TableColumnLayout tableLayout) {
 
       final TableViewerColumn tvc = new TableViewerColumn(_colorViewer, SWT.LEAD);
 
       final TableColumn tc = tvc.getColumn();
-      tc.setWidth(_pc.convertWidthInCharsToPixels(COLUMN_WIDTH_VALUE));
 
       tvc.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -586,17 +610,17 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
             }
          }
       });
+      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(COLUMN_WIDTH_VALUE), true));
    }
 
    /**
     * Column: Relative/absolute values
     */
-   private void defineColumn_50_RelativeAbsolute() {
+   private void defineColumn_50_RelativeAbsolute(final TableColumnLayout tableLayout) {
 
       final TableViewerColumn tvc = new TableViewerColumn(_colorViewer, SWT.TRAIL);
 
       final TableColumn tc = tvc.getColumn();
-      tc.setWidth(_pc.convertWidthInCharsToPixels(COLUMN_WIDTH_ABSOLUTE_RELATIVE));
 
       tvc.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -620,17 +644,17 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
             }
          }
       });
+      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(COLUMN_WIDTH_ABSOLUTE_RELATIVE), true));
    }
 
    /**
     * Column: Legend overwrite marker
     */
-   private void defineColumn_52_OverwriteLegendMinMax() {
+   private void defineColumn_52_OverwriteLegendMinMax(final TableColumnLayout tableLayout) {
 
       final TableViewerColumn tvc = new TableViewerColumn(_colorViewer, SWT.TRAIL);
 
       final TableColumn tc = tvc.getColumn();
-      tc.setWidth(_pc.convertWidthInCharsToPixels(COLUMN_WIDTH_ABSOLUTE_RELATIVE));
 
       tvc.setLabelProvider(new CellLabelProvider() {
          @Override
@@ -654,6 +678,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
             }
          }
       });
+      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(COLUMN_WIDTH_ABSOLUTE_RELATIVE), true));
    }
 
    private void disposeProfileImages() {
@@ -669,26 +694,16 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
    }
 
-   private void fillUI() {
-
-      final boolean backupIsUpdateUI = _isUpdateUI;
-      _isUpdateUI = true;
-      {
-
-      }
-      _isUpdateUI = backupIsUpdateUI;
-   }
-
    /**
     * Fire event that 3D map colors have changed.
     */
    private void fireModifyEvent() {
 
-      _isInFireEvent = true;
+//      _isInFireEvent = true;
       {
          TourbookPlugin.getPrefStore().setValue(ITourbookPreferences.MAP3_COLOR_IS_MODIFIED, Math.random());
       }
-      _isInFireEvent = false;
+//      _isInFireEvent = false;
    }
 
    private Image getProfileImage(final Map3GradientColorProvider colorProvider) {
@@ -766,25 +781,21 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
       _pc = new PixelConverter(parent);
 
       PROFILE_IMAGE_HEIGHT = (int) (_pc.convertHeightInCharsToPixels(1) * 1.0);
-      NUMBER_OF_VISIBLE_ROWS = _prefStore.getInt(ITourbookPreferences.MAP3_NUMBER_OF_COLOR_SELECTORS);
 
-      /*
-       * This will fix the problem that when the list of a combobox is displayed, then the
-       * slideout will disappear :-(((
-       */
-      _keepOpenListener = new FocusListener() {
-
+      _defaultSelectionListener = new SelectionAdapter() {
          @Override
-         public void focusGained(final FocusEvent e) {
-            setIsAnotherDialogOpened(true);
-         }
-
-         @Override
-         public void focusLost(final FocusEvent e) {
-            setIsAnotherDialogOpened(false);
+         public void widgetSelected(final SelectionEvent e) {
+            onChangeUI();
          }
       };
 
+      _defaultMouseWheelListener = new MouseWheelListener() {
+         @Override
+         public void mouseScrolled(final MouseEvent event) {
+            UI.adjustSpinnerValueOnMouseScroll(event);
+            onChangeUI();
+         }
+      };
    }
 
    /**
@@ -801,6 +812,21 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
       }
 
       return true;
+   }
+
+   private void onChangeUI() {
+
+      saveState();
+
+      /*
+       * Update UI with new number of visible rows
+       */
+      restoreState_BeforeUI();
+
+      setUI_TableLayout(_tableLayoutContainer);
+
+      final Shell shell = _colorViewer.getTable().getShell();
+      shell.pack(true);
    }
 
    private void onResizeImageColumn() {
@@ -917,36 +943,19 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
       }
    }
 
-   /**
-    * Restores state values from the tour track configuration and update the UI.
-    */
    private void restoreState() {
 
-      _isUpdateUI = true;
+      _spinnerNumVisibleProfiles.setSelection(_numVisibleRows);
+   }
 
-      final Map25TrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
+   private void restoreState_BeforeUI() {
 
-      // get active config AFTER getting the index because this could change the active config
-      final int activeConfigIndex = Map25ConfigManager.getActiveTourTrackConfigIndex();
-
-// SET_FORMATTING_OFF
-
-
-// SET_FORMATTING_ON
-
-      _isUpdateUI = false;
+      _numVisibleRows = Util.getStateInt(_state, Map25View.STATE_VISIBLE_COLOR_PROFILES, Map25View.STATE_VISIBLE_COLOR_PROFILES_DEFAULT);
    }
 
    private void saveState() {
 
-      // update config
-
-      final Map25TrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
-
-// SET_FORMATTING_OFF
-
-
-// SET_FORMATTING_ON
+      _state.put(Map25View.STATE_VISIBLE_COLOR_PROFILES, _spinnerNumVisibleProfiles.getSelection());
    }
 
    /**
@@ -1002,12 +1011,31 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
       return false;
    }
 
+   private void setUI_TableLayout(final Composite tableLayoutContainer) {
+
+      final int numColorProviders = Map3GradientColorManager.getColorProviders(_graphId).size();
+
+      final int numVisibleRows = _numVisibleRows == 0
+
+            // show all color provider
+            ? numColorProviders
+
+            : Math.min(numColorProviders, _numVisibleRows);
+
+      GridDataFactory.fillDefaults()
+
+            .hint(SWT.DEFAULT,
+                  (int) (_pc.convertHeightInCharsToPixels(numVisibleRows) * 1.35))
+
+            .applyTo(tableLayoutContainer);
+   }
+
    private void updateUI_colorViewer() {
 
       _colorViewer.setInput(this);
 
       /*
-       * Select checked color provider that the actions can always be enabled.
+       * Select checked color provider that the actions can always be enabled
        */
       for (final Map3GradientColorProvider colorProvider : Map3GradientColorManager.getColorProviders(_graphId)) {
 
