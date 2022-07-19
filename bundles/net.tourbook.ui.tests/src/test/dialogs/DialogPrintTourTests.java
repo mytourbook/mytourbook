@@ -70,7 +70,7 @@ public class DialogPrintTourTests {
          final long pid = p.pid();
          assertEquals(pid, 12);
       } catch (final IOException ex) {
-         assertEquals(1, 12);
+         assertEquals("toto", ex.getMessage());
       }
 
       bot.sleep(3000);
