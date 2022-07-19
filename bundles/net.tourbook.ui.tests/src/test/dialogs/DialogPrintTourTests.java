@@ -15,6 +15,7 @@
  *******************************************************************************/
 package dialogs;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -63,9 +64,13 @@ public class DialogPrintTourTests {
 
       //Kill Acrobat Reader otherwise it could make the subsequent tests fail
       try {
-         Runtime.getRuntime().exec("taskkill /F /IM Acrobat.exe"); //$NON-NLS-1$
-      } catch (final IOException e) {
-         //ignored
+         //Runtime.getRuntime().exec("taskkill /F /IM AcroRd32.exe"); //$NON-NLS-1$
+         final ProcessBuilder pb = new ProcessBuilder("taskkill /F /IM AcroRd32.exe");
+         final Process p = pb.start();
+         final long pid = p.pid();
+         assertEquals(pid, 12);
+      } catch (final IOException ex) {
+         // ...
       }
 
       bot.sleep(3000);
