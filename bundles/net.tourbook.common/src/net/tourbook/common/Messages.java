@@ -336,6 +336,11 @@ public class Messages extends NLS {
    public static String        legend_color_keep_color;
    public static String        legend_color_lighten_color;
 
+   public static String        Legend_UnitLayout_BrightBackground_NoShadow;
+   public static String        Legend_UnitLayout_BrightBackground_WithShadow;
+   public static String        Legend_UnitLayout_DarkBackground_NoShadow;
+   public static String        Legend_UnitLayout_DarkBackground_WithShadow;
+
    public static String        rgv_vertex_class_cast_exception;
 
    public static String        Slideout_Dialog_Action_DragSlideout_ToolTip;

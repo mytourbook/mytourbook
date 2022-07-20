@@ -19,10 +19,10 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorProviderConfig;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.IMapColorProvider;
+import net.tourbook.common.map.MapUI.LegendUnitLayout;
 import net.tourbook.data.TourData;
 import net.tourbook.map.MapUtils;
 import net.tourbook.map2.view.TourMapPainter;
@@ -68,14 +68,14 @@ public class LegendLayer extends Layer {
       return _legendRenderer;
    }
 
-   public void onResize() {
-
-      updateLegend(_allTourData);
-   }
-
    public void setColorProvider(final IMapColorProvider mapColorProvider) {
 
       _mapColorProvider = mapColorProvider;
+   }
+
+   public void updateLegend() {
+
+      updateLegend(_allTourData);
    }
 
    public void updateLegend(final List<TourData> allTourData) {
@@ -138,6 +138,35 @@ public class LegendLayer extends Layer {
 
          if (isDataAvailable) {
 
+            final LegendUnitLayout legendUnitLayout = trackConfig.legendUnitLayout;
+
+            boolean isDarkBackground;
+            boolean isShowUnitShadow;
+
+            switch (legendUnitLayout) {
+
+            case BRIGHT_BACKGROUND__NO_SHADOW:
+               isDarkBackground = false;
+               isShowUnitShadow = false;
+               break;
+
+            case BRIGHT_BACKGROUND__WITH_SHADOW:
+               isDarkBackground = false;
+               isShowUnitShadow = true;
+               break;
+
+            case DARK_BACKGROUND__NO_SHADOW:
+               isDarkBackground = true;
+               isShowUnitShadow = false;
+               break;
+
+            case DARK_BACKGROUND__WITH_SHADOW:
+            default:
+               isDarkBackground = true;
+               isShowUnitShadow = true;
+               break;
+            }
+
             TourMapPainter.drawMap3_Legend(
 
                   g2d,
@@ -145,10 +174,10 @@ public class LegendLayer extends Layer {
                   ColorProviderConfig.MAP3_TOUR,
                   legendWidth,
                   legendHeight,
-                  UI.IS_DARK_THEME,
 
-//                false // hide unit shadow
-                  true // show unit shadow
+                  isDarkBackground,
+                  isShowUnitShadow
+
             );
          }
 

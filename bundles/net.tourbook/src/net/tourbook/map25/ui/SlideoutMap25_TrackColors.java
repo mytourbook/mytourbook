@@ -1029,6 +1029,10 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
    private void updateUI_ColorViewer() {
 
+      if (_colorViewer.getTable().isDisposed()) {
+         return;
+      }
+
       _colorViewer.setInput(this);
 
       /*

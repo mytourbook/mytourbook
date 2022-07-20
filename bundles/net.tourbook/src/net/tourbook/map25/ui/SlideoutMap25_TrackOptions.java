@@ -25,6 +25,9 @@ import net.tourbook.common.color.ColorSelectorExtended;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.font.MTFont;
+import net.tourbook.common.map.MapUI;
+import net.tourbook.common.map.MapUI.LegendUnitLayout;
+import net.tourbook.common.map.MapUI.LegendUnitLayoutItem;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25App;
@@ -60,66 +63,65 @@ import org.eclipse.swt.widgets.ToolBar;
 public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColorSelectorListener {
 
    private Map25View               _map25View;
-
+   //
    private MouseWheelListener      _defaultMouseWheelListener;
    private IPropertyChangeListener _defaultPropertyChangeListener;
    private SelectionListener       _defaultSelectionListener;
    private FocusListener           _keepOpenListener;
-
+   //
    private ActionTrackColor        _actionGradientColor_Elevation;
    private ActionTrackColor        _actionGradientColor_Gradient;
    private ActionTrackColor        _actionGradientColor_HrZone;
    private ActionTrackColor        _actionGradientColor_Pace;
    private ActionTrackColor        _actionGradientColor_Pulse;
    private ActionTrackColor        _actionGradientColor_Speed;
-
    private boolean                 _isUpdateUI;
-
+   //
    private PixelConverter          _pc;
+   //
    private int                     _firstColumnIndent;
-
+   //
+   private boolean                 _isLineLayoutModified;
+   //
    /*
     * UI controls
     */
-   private Composite _shellContainer;
-
-   private Button    _chkShowDirectionArrows;
-   private Button    _chkShowOutline;
-   private Button    _chkShowSliderLocation;
-   private Button    _chkShowSliderPath;
-   private Button    _chkTrackVerticalOffset;
-
-   private Button    _rdoColorMode_Gradient;
-   private Button    _rdoColorMode_Solid;
-
-   private Combo     _comboName;
-
-   private Label     _lblConfigName;
-   private Label     _lblSliderLocation_Size;
-   private Label     _lblSliderLocation_Color;
-   private Label     _lblSliderPath_Width;
-   private Label     _lblSliderPath_Color;
-
-   private Spinner   _spinnerLine_Opacity;
-   private Spinner   _spinnerLine_Width;
-   private Spinner   _spinnerOutline_Width;
-   private Spinner   _spinnerOutline_Brighness;
-   private Spinner   _spinnerSliderLocation_Size;
-   private Spinner   _spinnerSliderLocation_Opacity;
-   private Spinner   _spinnerSliderPath_LineWidth;
-   private Spinner   _spinnerSliderPath_Opacity;
-   private Spinner   _spinnerTrackVerticalOffset;
-
-//   private Spinner               _spinnerTESTValue;
-
+   private Composite             _shellContainer;
+   //
+   private Button                _chkShowDirectionArrows;
+   private Button                _chkShowOutline;
+   private Button                _chkShowSliderLocation;
+   private Button                _chkShowSliderPath;
+   private Button                _chkTrackVerticalOffset;
+   private Button                _rdoColorMode_Gradient;
+   private Button                _rdoColorMode_Solid;
+   //
+   private Combo                 _comboName;
+   private Combo                 _comboLegendUnitLayout;
+   //
+   private Label                 _lblConfigName;
+   private Label                 _lblLegendUnitLayout;
+   private Label                 _lblSliderLocation_Size;
+   private Label                 _lblSliderLocation_Color;
+   private Label                 _lblSliderPath_Width;
+   private Label                 _lblSliderPath_Color;
+   //
+   private Spinner               _spinnerLine_Opacity;
+   private Spinner               _spinnerLine_Width;
+   private Spinner               _spinnerOutline_Width;
+   private Spinner               _spinnerOutline_Brighness;
+   private Spinner               _spinnerSliderLocation_Size;
+   private Spinner               _spinnerSliderLocation_Opacity;
+   private Spinner               _spinnerSliderPath_LineWidth;
+   private Spinner               _spinnerSliderPath_Opacity;
+   private Spinner               _spinnerTrackVerticalOffset;
+   //
    private Text                  _textConfigName;
-
+   //
    private ColorSelectorExtended _colorLine_SolidColor;
    private ColorSelectorExtended _colorSliderLocation_Left;
    private ColorSelectorExtended _colorSliderLocation_Right;
    private ColorSelectorExtended _colorSliderPathColor;
-
-   private boolean               _isLineLayoutModified;
 
    private class ActionTrackColor extends Action {
 
@@ -198,8 +200,9 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
             createUI_000_Title(container);
 
             createUI_100_Track(container);
-            createUI_200_SliderLocation(container);
-            createUI_210_SliderPath(container);
+            createUI_200_LegendUnitLayout(container);
+            createUI_500_SliderLocation(container);
+            createUI_510_SliderPath(container);
 
             createUI_999_ConfigName(container);
          }
@@ -212,7 +215,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       {
          /*
-          * Label: Title
+          * Title
           */
          final Label title = new Label(parent, SWT.LEAD);
          title.setText(Messages.Slideout_Map_TrackOptions_Label_Title);
@@ -226,7 +229,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       {
 
          /*
-          * Combo: Configutation
+          * Configuration name
           */
          _comboName = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
          _comboName.setVisibleItemCount(20);
@@ -418,6 +421,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
                {}
             }
          }
+
 //         {
 //            /*
 //             * TEST value
@@ -443,7 +447,34 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       }
    }
 
-   private void createUI_200_SliderLocation(final Composite parent) {
+   private void createUI_200_LegendUnitLayout(final Composite parent) {
+
+      {
+         /*
+          * Legend unit layout
+          */
+
+         // label
+         _lblLegendUnitLayout = new Label(parent, SWT.NONE);
+         _lblLegendUnitLayout.setText(Messages.Slideout_Map25TrackOptions_Label_LegendUnitLayout);
+         _lblLegendUnitLayout.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_LegendUnitLayout_Tooltip);
+         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblLegendUnitLayout);
+
+         // combo
+         _comboLegendUnitLayout = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
+         _comboLegendUnitLayout.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_LegendUnitLayout_Tooltip);
+         _comboLegendUnitLayout.setVisibleItemCount(20);
+         _comboLegendUnitLayout.addFocusListener(_keepOpenListener);
+         _comboLegendUnitLayout.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyConfig()));
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .align(SWT.BEGINNING, SWT.CENTER)
+               .span(3, 1)
+               .applyTo(_comboLegendUnitLayout);
+      }
+   }
+
+   private void createUI_500_SliderLocation(final Composite parent) {
 
       {
          /*
@@ -522,7 +553,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       }
    }
 
-   private void createUI_210_SliderPath(final Composite parent) {
+   private void createUI_510_SliderPath(final Composite parent) {
 
       {
          /*
@@ -660,6 +691,12 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       _actionGradientColor_Speed.setEnabled(isShowGradientColor);
 
       /*
+       * Legend
+       */
+      _lblLegendUnitLayout.setEnabled(isShowGradientColor);
+      _comboLegendUnitLayout.setEnabled(isShowGradientColor);
+
+      /*
        * Slider location
        */
       _colorSliderLocation_Left.setEnabled(isShowSliderLocation);
@@ -691,8 +728,28 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
          for (final Map25TrackConfig config : Map25ConfigManager.getAllTourTrackConfigs()) {
             _comboName.add(config.name);
          }
+
+         for (final LegendUnitLayoutItem layout : MapUI.ALL_LEGEND_UNIT_LAYOUTS) {
+            _comboLegendUnitLayout.add(layout.label);
+         }
       }
       _isUpdateUI = backupIsUpdateUI;
+   }
+
+   private int getLegendUnitLayoutIndex(final LegendUnitLayout legendUnitLayout) {
+
+      final LegendUnitLayoutItem[] allLegendUnitLayouts = MapUI.ALL_LEGEND_UNIT_LAYOUTS;
+
+      for (int layoutIndex = 0; layoutIndex < allLegendUnitLayouts.length; layoutIndex++) {
+
+         final LegendUnitLayoutItem legendUnitLayoutItem = allLegendUnitLayouts[layoutIndex];
+
+         if (legendUnitLayout == legendUnitLayoutItem.legendUnitLayout) {
+            return layoutIndex;
+         }
+      }
+
+      return 0;
    }
 
    private Map25TrackConfig getSelectedConfig() {
@@ -701,6 +758,14 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       final ArrayList<Map25TrackConfig> allConfigurations = Map25ConfigManager.getAllTourTrackConfigs();
 
       return allConfigurations.get(selectedIndex);
+   }
+
+   private MapUI.LegendUnitLayout getSelectedLegendUnitLayout() {
+
+      // get valid index
+      final int selectionIndex = Math.max(0, _comboLegendUnitLayout.getSelectionIndex());
+
+      return MapUI.ALL_LEGEND_UNIT_LAYOUTS[selectionIndex].legendUnitLayout;
    }
 
    private void initUI(final Composite parent) {
@@ -754,6 +819,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       final Map25App mapApp = _map25View.getMapApp();
 
+      mapApp.getLayer_Legend().updateLegend();
       mapApp.getLayer_Tour().onModifyConfig(_isLineLayoutModified);
       mapApp.getLayer_SliderPath().onModifyConfig();
       mapApp.getLayer_SliderLocation().onModifyConfig();
@@ -831,6 +897,9 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       _spinnerOutline_Brighness        .setSelection((int) (config.outlineBrighness * 10));
       _spinnerOutline_Width            .setSelection((int) (config.outlineWidth));
 
+      // legend
+      _comboLegendUnitLayout           .select(getLegendUnitLayoutIndex(config.legendUnitLayout));
+
       // slider location
       _chkShowSliderLocation           .setSelection(config.isShowSliderLocation);
       _colorSliderLocation_Left        .setColorValue(config.sliderLocation_Left_Color);
@@ -887,6 +956,9 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       // track vertical offset
       config.isTrackVerticalOffset        = _chkTrackVerticalOffset.getSelection();
       config.trackVerticalOffset          = _spinnerTrackVerticalOffset.getSelection();
+
+      // legend
+      config.legendUnitLayout             = getSelectedLegendUnitLayout();
 
       // slider location
       config.isShowSliderLocation         = _chkShowSliderLocation.getSelection();

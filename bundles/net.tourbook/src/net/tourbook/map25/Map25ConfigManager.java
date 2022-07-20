@@ -24,6 +24,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.map.MapUI.LegendUnitLayout;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -152,6 +153,9 @@ public class Map25ConfigManager {
    public static final int           OUTLINE_WIDTH_MAX                     = 20;
    public static final float         OUTLINE_WIDTH_DEFAULT                 = 2f;
    //
+   private static final String       TAG_LEGEND                            = "Legend";                //$NON-NLS-1$
+   private static final String       ATTR_LEGEND_UNIT_LAYOUT               = "unitLayout";            //$NON-NLS-1$
+   //
    // slider location/path
    private static final String TAG_SLIDER_PATH                     = "SliderPath";             //$NON-NLS-1$
    private static final String TAG_SLIDER_LOCATION_LEFT            = "SliderLocation_Left";    //$NON-NLS-1$
@@ -185,7 +189,8 @@ public class Map25ConfigManager {
    public static final int     SLIDER_PATH_OPACITY_DEFAULT         = 77;                       // 30 %
    //
    // other properties
-   public static final int DEFAULT_ANIMATION_TIME = 2000;
+   public static final int              DEFAULT_ANIMATION_TIME     = 2000;
+   public static final LegendUnitLayout LEGEND_UNIT_LAYOUT_DEFAULT = LegendUnitLayout.DARK_BACKGROUND__WITH_SHADOW;
    //
    /*
     * Tour marker, map bookmarks, photos
@@ -547,26 +552,32 @@ public class Map25ConfigManager {
             xmlLine.putFloat(          ATTR_OUTLINE_WIDTH,                 config.outlineWidth);
          }
 
+         // <Legend>
+         final IMemento xmlLegend= xmlConfig.createChild(TAG_LEGEND);
+         {
+            Util.setXmlEnum(xmlLegend, ATTR_LEGEND_UNIT_LAYOUT,            config.legendUnitLayout);
+         }
+
          // <SliderPath>
          final IMemento xmlSliderPath = Util.setXmlRgb(xmlConfig, TAG_SLIDER_PATH, config.sliderPath_Color);
          {
-            xmlSliderPath.putBoolean(  ATTR_IS_SHOW_SLIDER_PATH,     config.isShowSliderPath);
-            xmlSliderPath.putFloat(    ATTR_SLIDER_PATH_LINE_WIDTH,  config.sliderPath_LineWidth);
-            xmlSliderPath.putInteger(  ATTR_SLIDER_PATH_OPACITY,     config.sliderPath_Opacity);
+            xmlSliderPath.putBoolean(  ATTR_IS_SHOW_SLIDER_PATH,           config.isShowSliderPath);
+            xmlSliderPath.putFloat(    ATTR_SLIDER_PATH_LINE_WIDTH,        config.sliderPath_LineWidth);
+            xmlSliderPath.putInteger(  ATTR_SLIDER_PATH_OPACITY,           config.sliderPath_Opacity);
          }
 
          /*
           * Slider location
           */
-         xmlConfig.putBoolean(   ATTR_IS_SHOW_SLIDER_LOCATION,    config.isShowSliderLocation);
-         xmlConfig.putInteger(   ATTR_SLIDER_LOCATION_OPACITY,    config.sliderLocation_Opacity);
-         xmlConfig.putInteger(   ATTR_SLIDER_LOCATION_SIZE,       config.sliderLocation_Size);
+         xmlConfig.putBoolean(         ATTR_IS_SHOW_SLIDER_LOCATION,       config.isShowSliderLocation);
+         xmlConfig.putInteger(         ATTR_SLIDER_LOCATION_OPACITY,       config.sliderLocation_Opacity);
+         xmlConfig.putInteger(         ATTR_SLIDER_LOCATION_SIZE,          config.sliderLocation_Size);
 
          // <SliderLocation_Left>
-         Util.setXmlRgb(xmlConfig, TAG_SLIDER_LOCATION_LEFT,      config.sliderLocation_Left_Color);
+         Util.setXmlRgb(xmlConfig,     TAG_SLIDER_LOCATION_LEFT,           config.sliderLocation_Left_Color);
 
          // <SliderLocation_Right>
-         Util.setXmlRgb(xmlConfig, TAG_SLIDER_LOCATION_RIGHT,     config.sliderLocation_Right_Color);
+         Util.setXmlRgb(xmlConfig,     TAG_SLIDER_LOCATION_RIGHT,          config.sliderLocation_Right_Color);
       }
    }
 
@@ -758,12 +769,18 @@ public class Map25ConfigManager {
 
             break;
 
+         case TAG_LEGEND:
+
+            config.legendUnitLayout       = (LegendUnitLayout) Util.getXmlEnum(xmlConfigChild, ATTR_LEGEND_UNIT_LAYOUT, LEGEND_UNIT_LAYOUT_DEFAULT);
+
+            break;
+
          case TAG_SLIDER_PATH:
 
-            config.isShowSliderPath    = Util.getXmlBoolean(xmlConfigChild,      ATTR_IS_SHOW_SLIDER_PATH,       SLIDER_IS_SHOW_SLIDER_PATH_DEFAULT);
-            config.sliderPath_Color    = Util.getXmlRgb(xmlConfigChild,          SLIDER_PATH_COLOR_DEFAULT);
-            config.sliderPath_LineWidth= Util.getXmlFloatFloat(xmlConfigChild,   ATTR_SLIDER_PATH_LINE_WIDTH,    SLIDER_PATH_LINE_WIDTH_DEFAULT, SLIDER_PATH_LINE_WIDTH_MIN, SLIDER_PATH_LINE_WIDTH_MAX);
-            config.sliderPath_Opacity  = Util.getXmlInteger(xmlConfigChild,      ATTR_SLIDER_PATH_OPACITY,       SLIDER_PATH_OPACITY_DEFAULT,    SLIDER_PATH_OPACITY_MIN,    SLIDER_PATH_OPACITY_MAX);
+            config.isShowSliderPath       = Util.getXmlBoolean(xmlConfigChild,      ATTR_IS_SHOW_SLIDER_PATH,       SLIDER_IS_SHOW_SLIDER_PATH_DEFAULT);
+            config.sliderPath_Color       = Util.getXmlRgb(xmlConfigChild,          SLIDER_PATH_COLOR_DEFAULT);
+            config.sliderPath_LineWidth   = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_SLIDER_PATH_LINE_WIDTH,    SLIDER_PATH_LINE_WIDTH_DEFAULT, SLIDER_PATH_LINE_WIDTH_MIN, SLIDER_PATH_LINE_WIDTH_MAX);
+            config.sliderPath_Opacity     = Util.getXmlInteger(xmlConfigChild,      ATTR_SLIDER_PATH_OPACITY,       SLIDER_PATH_OPACITY_DEFAULT,    SLIDER_PATH_OPACITY_MIN,    SLIDER_PATH_OPACITY_MAX);
             break;
 
          case TAG_SLIDER_LOCATION_LEFT:

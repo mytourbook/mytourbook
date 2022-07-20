@@ -2055,6 +2055,8 @@ public class Messages extends NLS {
    public static String        Slideout_Map25TrackOptions_Label_ConfigName_Tooltip;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrows;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip;
+   public static String        Slideout_Map25TrackOptions_Label_LegendUnitLayout;
+   public static String        Slideout_Map25TrackOptions_Label_LegendUnitLayout_Tooltip;
    public static String        Slideout_Map25TrackOptions_Label_LineColorOpacity;
    public static String        Slideout_Map25TrackOptions_Label_LineColorOpacity_Tooltip;
    public static String        Slideout_Map25TrackOptions_Label_LineWidth;

@@ -1211,7 +1211,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          return;
       }
 
-      _layer_Legend.onResize();
+      _layer_Legend.updateLegend();
 
       super.resize(w, h);
    }

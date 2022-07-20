@@ -17,6 +17,7 @@ package net.tourbook.map25.layer.tourtrack;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.map.MapUI.LegendUnitLayout;
 import net.tourbook.map25.Map25ConfigManager;
 
 import org.eclipse.swt.graphics.RGB;
@@ -65,6 +66,9 @@ public class Map25TrackConfig {
    public float   sliderPath_LineWidth       = Map25ConfigManager.SLIDER_PATH_LINE_WIDTH_DEFAULT;
    public int     sliderPath_Opacity         = Map25ConfigManager.SLIDER_PATH_OPACITY_DEFAULT;
    public int     testValue                  = 50;
+
+   // legend
+   public LegendUnitLayout legendUnitLayout  = Map25ConfigManager.LEGEND_UNIT_LAYOUT_DEFAULT;
 
 // SET_FORMATTING_ON
 
