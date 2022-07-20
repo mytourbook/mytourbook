@@ -203,10 +203,10 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 
             + "_profileId                 =" + _profileId + NL //                //$NON-NLS-1$
             + "_profileName               =" + _profileName + NL //              //$NON-NLS-1$
-            + "_profileImage              =" + _profileImage + NL //             //$NON-NLS-1$
-            + "_isAbsoluteValues          =" + _isAbsoluteValues + NL //         //$NON-NLS-1$
             + "_isActiveColorProfile      =" + _isActiveColorProfile + NL //     //$NON-NLS-1$
+            + "_isAbsoluteValues          =" + _isAbsoluteValues + NL //         //$NON-NLS-1$
             + "_isOverwriteLegendValues   =" + _isOverwriteLegendValues + NL //  //$NON-NLS-1$
+            + "_profileImage              =" + _profileImage + NL //             //$NON-NLS-1$
 
             + "]" + NL //                                                        //$NON-NLS-1$
       ;

@@ -100,15 +100,14 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
    private static final String MAP3_SELECT_COLOR_DIALOG_ACTION_ADD_COLOR_TOOLTIP    = net.tourbook.map3.Messages.Map3SelectColor_Dialog_Action_AddColor_Tooltip;
    private static final String MAP3_SELECT_COLOR_DIALOG_ACTION_EDIT_ALL_COLORS      = net.tourbook.map3.Messages.Map3SelectColor_Dialog_Action_EditAllColors;
    private static final String MAP3_SELECT_COLOR_DIALOG_ACTION_EDIT_SELECTED_COLORS = net.tourbook.map3.Messages.Map3SelectColor_Dialog_Action_EditSelectedColors;
-   private static final String PREF_MAP3_COLOR_COLUMN_LEGEND_MARKER                 = net.tourbook.map3.Messages.Pref_Map3Color_Column_Legend_Marker;
-   private static final String PREF_MAP3_COLOR_COLUMN_VALUE_MARKER_RELATIVE         = net.tourbook.map3.Messages.Pref_Map3Color_Column_ValueMarker_Relative;
-   private static final String PREF_MAP3_COLOR_COLUMN_VALUE_MARKER_ABSOLUTE         = net.tourbook.map3.Messages.Pref_Map3Color_Column_ValueMarker_Absolute;
+   private static final String PREF_MAP3_COLOR_COLUMN_LEGEND_MARKER_DETAIL          = net.tourbook.map3.Messages.Pref_Map3Color_Column_Legend_Marker_Detail;
+   private static final String PREF_MAP3_COLOR_COLUMN_VALUE_MARKER_ABSOLUTE_DETAIL  = net.tourbook.map3.Messages.Pref_Map3Color_Column_ValueMarker_Absolute_Detail;
+   private static final String PREF_MAP3_COLOR_COLUMN_VALUE_MARKER_RELATIVE_DETAIL  = net.tourbook.map3.Messages.Pref_Map3Color_Column_ValueMarker_Relative_Detail;
 
 // SET_FORMATTING_ON
 
    private static IDialogSettings _state;
 
-   private static final int       COLUMN_WIDTH_ABSOLUTE_RELATIVE = 4;
    private static final int       COLUMN_WIDTH_COLOR_IMAGE       = 15;
    private static final int       COLUMN_WIDTH_NAME              = 15;
    private static final int       COLUMN_WIDTH_VALUE             = 8;
@@ -376,8 +375,6 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
        */
       final Table table = new Table(_tableContainer, tableStyle);
       table.setLayout(tableLayout);
-      table.setHeaderVisible(false);
-      table.setLinesVisible(false);
 
       /*
        * NOTE: MeasureItem, PaintItem and EraseItem are called repeatedly. Therefore, it is
@@ -619,7 +616,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
     */
    private void defineColumn_50_RelativeAbsolute(final TableColumnLayout tableLayout) {
 
-      final TableViewerColumn tvc = new TableViewerColumn(_colorViewer, SWT.TRAIL);
+      final TableViewerColumn tvc = new TableViewerColumn(_colorViewer, SWT.LEAD);
 
       final TableColumn tc = tvc.getColumn();
 
@@ -634,9 +631,9 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
                final Map3ColorProfile colorProfile = ((Map3GradientColorProvider) (element)).getMap3ColorProfile();
 
                if (colorProfile.isAbsoluteValues()) {
-                  cell.setText(PREF_MAP3_COLOR_COLUMN_VALUE_MARKER_ABSOLUTE);
+                  cell.setText(PREF_MAP3_COLOR_COLUMN_VALUE_MARKER_ABSOLUTE_DETAIL);
                } else {
-                  cell.setText(PREF_MAP3_COLOR_COLUMN_VALUE_MARKER_RELATIVE);
+                  cell.setText(PREF_MAP3_COLOR_COLUMN_VALUE_MARKER_RELATIVE_DETAIL);
                }
 
             } else {
@@ -645,15 +642,15 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
             }
          }
       });
-      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(COLUMN_WIDTH_ABSOLUTE_RELATIVE), true));
+      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10), true));
    }
 
    /**
-    * Column: Legend overwrite marker
+    * Column: Legend overwrite min/max
     */
    private void defineColumn_52_OverwriteLegendMinMax(final TableColumnLayout tableLayout) {
 
-      final TableViewerColumn tvc = new TableViewerColumn(_colorViewer, SWT.TRAIL);
+      final TableViewerColumn tvc = new TableViewerColumn(_colorViewer, SWT.LEAD);
 
       final TableColumn tc = tvc.getColumn();
 
@@ -668,7 +665,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
                final Map3ColorProfile colorProfile = ((Map3GradientColorProvider) (element)).getMap3ColorProfile();
 
                if (colorProfile.isAbsoluteValues() && colorProfile.isOverwriteLegendValues()) {
-                  cell.setText(PREF_MAP3_COLOR_COLUMN_LEGEND_MARKER);
+                  cell.setText(PREF_MAP3_COLOR_COLUMN_LEGEND_MARKER_DETAIL);
                } else {
                   cell.setText(UI.EMPTY_STRING);
                }
@@ -679,7 +676,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
             }
          }
       });
-      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(COLUMN_WIDTH_ABSOLUTE_RELATIVE), true));
+      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10), true));
    }
 
    private void disposeProfileImages() {
