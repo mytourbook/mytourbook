@@ -66,8 +66,7 @@ public class DialogPrintTourTests {
       try {
          Runtime.getRuntime().exec("taskkill /F /IM Acrobat.exe"); //$NON-NLS-1$
       } catch (final IOException ex) {
-         //ignored
-         assertEquals("toto", ex.getMessage());
+         assertEquals("Error", ex.getMessage()); //$NON-NLS-1$
       }
 
       bot.sleep(3000);
