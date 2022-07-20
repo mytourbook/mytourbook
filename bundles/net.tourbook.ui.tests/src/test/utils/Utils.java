@@ -43,9 +43,9 @@ public class Utils {
       return tour;
    }
 
-   public static void showTourBookView(final SWTWorkbenchBot bot) {
+   public static SWTBotView showTourBookView(final SWTWorkbenchBot bot) {
 
-      showView(bot, tourBookViewTitle);
+      return showView(bot, tourBookViewTitle);
    }
 
    public static SWTBotView showView(final SWTWorkbenchBot bot, final String viewName) {

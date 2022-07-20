@@ -75,6 +75,6 @@ public class DialogPrintTourTests {
       FilesUtils.deleteIfExists(pdfFilePath);
       assertTrue(!Files.exists(pdfFilePath));
 
-      Utils.showView(bot, "Tour Book");
+      Utils.showTourBookView(bot);
    }
 }

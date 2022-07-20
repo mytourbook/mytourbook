@@ -18,6 +18,7 @@ package dialogs;
 import net.tourbook.Messages;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
@@ -30,9 +31,9 @@ public class DialogQuickEditTests {
    @Test
    void testEditWeatherDescription() {
 
-      Utils.showTourBookView(bot);
+      final SWTBotView tourEditorView = Utils.showTourBookView(bot);
 
-      bot.toolbarButtonWithTooltip(Messages.App_Action_CollapseAll).click();
+      // tourEditorView.bot().toolbarButtonWithTooltip(Messages.App_Action_CollapseAll).click();
 
       final SWTBotTreeItem tour = Utils.getTour(bot);
 

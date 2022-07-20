@@ -36,7 +36,7 @@ public class TourMarkerViewTests {
    @Test
    void testAddAndDeleteTourMarker() {
 
-      Utils.showView(bot, "Tour Book");
+      Utils.showTourBookView(bot);
 
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2020   3").expand()
             .getNode("May   2").expand().select().getNode("23").select();
