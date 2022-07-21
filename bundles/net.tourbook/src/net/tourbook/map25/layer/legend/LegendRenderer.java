@@ -23,6 +23,16 @@ public class LegendRenderer extends BitmapRenderer {
 
    private boolean _isLegendVisible;
 
+   public LegendRenderer() {
+
+      super();
+
+      /*
+       * Prevent exception when mBitmap == null
+       */
+      mInitialized = true;
+   }
+
    @Override
    public synchronized void render(final GLViewport viewport) {
 

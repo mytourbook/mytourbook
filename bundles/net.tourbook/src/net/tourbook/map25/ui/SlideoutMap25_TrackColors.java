@@ -108,13 +108,13 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
    private static IDialogSettings _state;
 
-   private static final int       COLUMN_WIDTH_COLOR_IMAGE       = 15;
-   private static final int       COLUMN_WIDTH_NAME              = 15;
-   private static final int       COLUMN_WIDTH_VALUE             = 8;
+   private static final int       COLUMN_WIDTH_COLOR_IMAGE = 15;
+   private static final int       COLUMN_WIDTH_NAME        = 15;
+   private static final int       COLUMN_WIDTH_VALUE       = 8;
 
-   private static int             PROFILE_IMAGE_HEIGHT           = -1;
+   private static int             PROFILE_IMAGE_HEIGHT     = -1;
 
-   private int                    _numVisibleRows                = MapManager.STATE_VISIBLE_COLOR_PROFILES_DEFAULT;
+   private int                    _numVisibleRows          = MapManager.STATE_VISIBLE_COLOR_PROFILES_DEFAULT;
 
    private Map25View              _map25View;
 
@@ -138,7 +138,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
    /*
     * UI resources
     */
-   private HashMap<Map3GradientColorProvider, Image> _profileImages = new HashMap<>();
+   private HashMap<Map3GradientColorProvider, Image> _allProfileImages = new HashMap<>();
 
    /*
     * UI controls
@@ -681,11 +681,11 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
    private void disposeProfileImages() {
 
-      for (final Image profileImage : _profileImages.values()) {
+      for (final Image profileImage : _allProfileImages.values()) {
          profileImage.dispose();
       }
 
-      _profileImages.clear();
+      _allProfileImages.clear();
    }
 
    /**
@@ -702,13 +702,15 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
    private Image getProfileImage(final Map3GradientColorProvider colorProvider) {
 
-      Image image = _profileImages.get(colorProvider);
+      Image image = _allProfileImages.get(colorProvider);
 
       if (isProfileImageValid(image)) {
 
          // image is OK
 
       } else {
+
+         // create new image
 
          final int imageWidth = _tcProfileImage.getWidth();
          final int imageHeight = PROFILE_IMAGE_HEIGHT - 1;
@@ -733,7 +735,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
                false // no shadow
          );
 
-         final Image oldImage = _profileImages.put(colorProvider, image);
+         final Image oldImage = _allProfileImages.put(colorProvider, image);
 
          Util.disposeResource(oldImage);
       }
@@ -774,7 +776,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
       _pc = new PixelConverter(parent);
 
-      PROFILE_IMAGE_HEIGHT = (int) (_pc.convertHeightInCharsToPixels(1) * 1.0);
+      PROFILE_IMAGE_HEIGHT = _pc.convertHeightInCharsToPixels(1);
 
       _defaultSelectionListener = new SelectionAdapter() {
          @Override
@@ -821,6 +823,14 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
 
       final Shell shell = _colorViewer.getTable().getShell();
       shell.pack(true);
+   }
+
+   @Override
+   protected void onDispose() {
+
+      disposeProfileImages();
+
+      super.onDispose();
    }
 
    private void onResizeImageColumn() {
