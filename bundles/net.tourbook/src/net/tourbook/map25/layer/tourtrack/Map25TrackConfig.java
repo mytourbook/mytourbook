@@ -153,7 +153,7 @@ public class Map25TrackConfig {
             + "isShowDirectionArrow       =" + isShowDirectionArrow + NL //      //$NON-NLS-1$
             + "isTrackVerticalOffset      =" + isTrackVerticalOffset + NL //     //$NON-NLS-1$
             + "lineColor                  =" + lineColor + NL //                 //$NON-NLS-1$
-            + "lineColorMode              =" + lineColorMode + NL //                 //$NON-NLS-1$
+            + "lineColorMode              =" + lineColorMode + NL //             //$NON-NLS-1$
             + "lineOpacity                =" + lineOpacity + NL //               //$NON-NLS-1$
             + "lineWidth                  =" + lineWidth + NL //                 //$NON-NLS-1$
             + "trackVerticalOffset        =" + trackVerticalOffset + NL //       //$NON-NLS-1$

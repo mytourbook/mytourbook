@@ -198,20 +198,4 @@ public class RGBVertex implements Comparable<Object>, Cloneable {
       return String.format("\n\tRGBVertex [_value=%s, _rgb=%s, _opacity=%3.1f]", _value, _rgb, _opacity); //$NON-NLS-1$
    }
 
-   public String toString1() {
-
-      return UI.EMPTY_STRING
-
-            + "RGBVertex" + NL //                  //$NON-NLS-1$
-
-            + "[" + NL //                          //$NON-NLS-1$
-
-            + "_value   =" + _value + NL //        //$NON-NLS-1$
-            + "_rgb     =" + _rgb + NL //          //$NON-NLS-1$
-            + "_opacity =" + _opacity + NL //      //$NON-NLS-1$
-            + "_sortId  =" + _sortId + NL //       //$NON-NLS-1$
-
-            + "]" + NL //                          //$NON-NLS-1$
-      ;
-   }
 }

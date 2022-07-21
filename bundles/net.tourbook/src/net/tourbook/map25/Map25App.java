@@ -214,7 +214,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private TourLayer               _layer_Tour;
    private MarkerLayerMT           _layer_TourMarker;
    //
-   private OpenGLTestLayer         _layer_OpenGLTest;
+//   private OpenGLTestLayer         _layer_OpenGLTest;
    //
    private OkHttpFactoryMT         _httpFactory;
    //
@@ -742,12 +742,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       allMapLayer.add(_layer_Legend);
       allMapLayer.add(_layer_TileInfo);
 
-      /*
-       * OpenGL test
-       */
-      _layer_OpenGLTest = new OpenGLTestLayer(mMap);
-      _layer_OpenGLTest.setEnabled(false);
-      allMapLayer.add(_layer_OpenGLTest);
+//      /*
+//       * OpenGL test
+//       */
+//      _layer_OpenGLTest = new OpenGLTestLayer(mMap);
+//      _layer_OpenGLTest.setEnabled(false);
+//      allMapLayer.add(_layer_OpenGLTest);
 
       /*
        * Set static layers which are located after the named layer and which will never be removed,
@@ -928,9 +928,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return _layer_MapBookmark_VARYING;
    }
 
-   public OpenGLTestLayer getLayer_OpenGLTest() {
-      return _layer_OpenGLTest;
-   }
+//   public OpenGLTestLayer getLayer_OpenGLTest() {
+//      return _layer_OpenGLTest;
+//   }
 
    public ItemizedLayer getLayer_Photo() {
       return _layer_Photo_VARYING;

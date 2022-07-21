@@ -616,7 +616,7 @@ public class Map25ConfigManager {
    }
 
    /**
-    * @return Returns the active configuration, is not returning <code>null</code>
+    * @return Returns the active configuration, it is not returning <code>null</code>
     */
    public static Map25TrackConfig getActiveTourTrackConfig() {
 

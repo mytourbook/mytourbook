@@ -108,8 +108,6 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 
 // SET_FORMATTING_ON
 
-   private static final int SHELL_MARGIN                  = 5;
-
    private static final int COLUMN_WITH_ABSOLUTE_RELATIVE = 4;
    private static final int COLUMN_WITH_COLOR_IMAGE       = 15;
    private static final int COLUMN_WITH_NAME              = 15;
