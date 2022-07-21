@@ -5,6 +5,8 @@ labels: ["Bug"]
 # assignees: ""
 body:
   - type: markdown
+    value: "## Welcome!"
+  - type: markdown
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
