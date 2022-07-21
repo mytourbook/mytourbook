@@ -132,7 +132,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private static final String     STATE_LAYER_BUILDING_SUN_RISE_SET_TIME        = "STATE_LAYER_BUILDING_SUN_RISE_SET_TIME";       //$NON-NLS-1$
    private static final String     STATE_LAYER_LABEL_IS_VISIBLE                  = "STATE_LAYER_LABEL_IS_VISIBLE";                 //$NON-NLS-1$
    private static final String     STATE_LAYER_LABEL_IS_BEFORE_BUILDING          = "STATE_LAYER_LABEL_IS_BEFORE_BUILDING";         //$NON-NLS-1$
-   private static final String     STATE_LAYER_COMPASS_ROSE_IS_VISIBLE           = "STATE_LAYER_COMPASS_ROSE_IS_VISIBLE";          //$NON-NLS-1$
    //
    private static final String     STATE_MAP_CENTER_VERTICAL_POSITION_IS_ENABLED = "STATE_MAP_CENTER_VERTICAL_POSITION_IS_ENABLED";//$NON-NLS-1$
    private static final String     STATE_MAP_CENTER_VERTICAL_POSITION            = "STATE_MAP_CENTER_VERTICAL_POSITION";           //$NON-NLS-1$
@@ -195,7 +194,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    //
    private boolean                 _layer_Label_IsVisible;
    private boolean                 _layer_Label_IsBeforeBuilding;
-   private boolean                 _layer_CompassRose_IsVisible;
 
    //
    private OsmTileLayerMT          _layer_BaseMap;
@@ -740,6 +738,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       allMapLayer.add(_layer_Satellite_TILE_LOADING);
       allMapLayer.add(_layer_HillShading_TILE_LOADING);
+      //allMapLayer.add(_layer_CompassRose); // i would prefer this position
       allMapLayer.add(_layer_Tour);
       allMapLayer.add(_layer_SliderPath);
       allMapLayer.add(_layer_Building_S3DB_SunUpdate);
@@ -1264,7 +1263,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_Label_IsVisible           = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_VISIBLE,           true) ;
       _layer_Label_IsBeforeBuilding    = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_BEFORE_BUILDING,   true) ;
 
-      _layer_CompassRose_IsVisible     = Util.getStateBoolean( _state, STATE_LAYER_COMPASS_ROSE_IS_VISIBLE,   true) ;
+      //_layer_CompassRose_IsVisible     = Util.getStateBoolean( _state, STATE_LAYER_COMPASS_ROSE_IS_VISIBLE,   true) ;
 
 // SET_FORMATTING_ON
    }
@@ -1310,8 +1309,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       _state.put(STATE_LAYER_LABEL_IS_VISIBLE,                       _layer_Label_IsVisible);
       _state.put(STATE_LAYER_LABEL_IS_BEFORE_BUILDING,               _layer_Label_IsBeforeBuilding);
-
-      _state.put(STATE_LAYER_COMPASS_ROSE_IS_VISIBLE,                _layer_CompassRose_IsVisible);
 
       _state.put(STATE_SELECTED_MAP25_PROVIDER_ID,                   _selectedMapProvider.getId());
 
@@ -1405,11 +1402,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          sun.updatePosition();
          sun.updateColor();
       }
-   }
-
-   public void setLayer_CompassRose_Options(final boolean isVisible) {
-
-      _layer_CompassRose_IsVisible = isVisible;
    }
 
    public void setLayer_HillShading_Options(final int layer_HillShading_Opacity) {
@@ -1775,10 +1767,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       }
    }
 
-   private void updateLayer_CompassRose() {
-
-      _layer_CompassRose.setEnabled(_layer_CompassRose_IsVisible);
-   }
 
    private void updateLayer_Label() {
 
