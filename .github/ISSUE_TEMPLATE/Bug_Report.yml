@@ -10,6 +10,7 @@ body:
         
         Replace **AREA** in the title where the bug occurred, e.g.        
           - FIT Import
+          - Tour Book View
           - Tour Chart
           - Tour Editor
           - 2D Map
