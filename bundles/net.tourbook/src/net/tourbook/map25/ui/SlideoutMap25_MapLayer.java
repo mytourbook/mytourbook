@@ -333,8 +333,9 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
              * CompassRose layer
              */
             _chkShowLayer_CompassRose = new Button(container, SWT.CHECK);
-            _chkShowLayer_CompassRose.setText("Compass Rose");
+            _chkShowLayer_CompassRose.setText(Messages.Slideout_Map25Layer_Checkbox_Layer_CompassRose);
             _chkShowLayer_CompassRose.addSelectionListener(_layerSelectionListener);
+            _chkShowLayer_CompassRose.setToolTipText(Messages.Slideout_Map25Layer_Checkbox_Layer_CompassRose_Tooltip);
          }
          {
             /*
