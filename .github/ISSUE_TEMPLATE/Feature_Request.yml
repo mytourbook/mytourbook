@@ -11,7 +11,7 @@ body:
     id: what-missed
     attributes:
       label: What is missing ?
-      description: Tell us youre ideas
+      description: Tell us your ideas
       placeholder: Tell us what you like!
       value: 
     validations:
