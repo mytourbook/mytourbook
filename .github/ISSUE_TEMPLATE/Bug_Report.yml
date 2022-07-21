@@ -13,7 +13,7 @@ body:
           - Tour Chart
           - Tour Editor
           - 2D Map
-          - ...
+          . . .
   - type: textarea
     id: what-happened
     attributes:
