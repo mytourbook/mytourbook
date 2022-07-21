@@ -18,10 +18,10 @@ package dialogs;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import net.tourbook.common.util.FilesUtils;
 import net.tourbook.printing.Messages;
@@ -37,44 +37,55 @@ public class DialogPrintTourTests {
 
    private SWTWorkbenchBot bot = new SWTWorkbenchBot();
 
-   /**
-    * Test ignored as of today because this line fails on the build machine
-    * as there is probably not a default PDF reader installed.
-    * {@link PrintTourPDF printPDF}
-    * Program.launch(printSettings.getCompleteFilePath());
-    */
-   @Test
-   void testPrintTour() {
+   private static String processDetails(final ProcessHandle process) {
+      return String.format("%8d %8s %10s %26s %-40s",
+              process.pid(),
+              text(process.parent().map(ProcessHandle::pid)),
+              text(process.info().user()),
+              text(process.info().startInstant()),
+              text(process.info().commandLine()));
+  }
 
-      final SWTBotTreeItem tour = Utils.getTour(bot);
+  private static String text(final Optional<?> optional) {
+     return optional.map(Object::toString).orElse("-");
+  }
 
-      tour.contextMenu(net.tourbook.Messages.action_print_tour).menu("PDF").click(); //$NON-NLS-1$
-      bot.checkBox(Messages.Dialog_Print_Chk_PrintMarkers).click();
-      bot.checkBox(Messages.Dialog_Print_Chk_PrintNotes).click();
+  /**
+ * Test ignored as of today because this line fails on the build machine
+ * as there is probably not a default PDF reader installed.
+ * {@link PrintTourPDF printPDF}
+ * Program.launch(printSettings.getCompleteFilePath());
+ */
+@Test
+void testPrintTour() {
 
-      final String fileName = bot.comboBox(2).getText() + ".pdf"; //$NON-NLS-1$
+   final SWTBotTreeItem tour = Utils.getTour(bot);
 
-      bot.comboBox(3).setText(Utils.workingDirectory);
-      bot.button(Messages.Dialog_Print_Btn_Print).click();
+   tour.contextMenu(net.tourbook.Messages.action_print_tour).menu("PDF").click(); //$NON-NLS-1$
+   bot.checkBox(Messages.Dialog_Print_Chk_PrintMarkers).click();
+   bot.checkBox(Messages.Dialog_Print_Chk_PrintNotes).click();
 
-      bot.sleep(3000);
+   final String fileName = bot.comboBox(2).getText() + ".pdf"; //$NON-NLS-1$
 
-      final Path pdfFilePath = Paths.get(Utils.workingDirectory, fileName);
-      assertTrue(Files.exists(pdfFilePath));
+   bot.comboBox(3).setText(Utils.workingDirectory);
+   bot.button(Messages.Dialog_Print_Btn_Print).click();
 
-      //Kill Acrobat Reader otherwise it could make the subsequent tests fail
-      try {
-         final Process toto = Runtime.getRuntime().exec("taskkill /F /IM Acro*"); //$NON-NLS-1$
-         bot.sleep(3000);
-         assertEquals(toto.exitValue(), 0);
-         //assertEquals(toto.pid(), 12);
-      } catch (final IOException ex) {
-         assertEquals("Error", ex.getMessage()); //$NON-NLS-1$
-      }
+   bot.sleep(3000);
 
-      bot.sleep(3000);
+   final Path pdfFilePath = Paths.get(Utils.workingDirectory, fileName);
+   assertTrue(Files.exists(pdfFilePath));
 
-      FilesUtils.deleteIfExists(pdfFilePath);
-      assertTrue(!Files.exists(pdfFilePath));
-   }
+   // final Process toto = Runtime.getRuntime().exec("taskkill /F /IM Acro*"); //$NON-NLS-1$
+   final StringBuilder toti = new StringBuilder();
+   ProcessHandle.allProcesses()
+         .forEach(process -> toti.append(processDetails(process)));
+   bot.sleep(3000);
+   assertEquals(toti, "toto");
+   //assertEquals(toto.pid(), 12);
+
+   bot.sleep(3000);
+
+   FilesUtils.deleteIfExists(pdfFilePath);
+   assertTrue(!Files.exists(pdfFilePath));
+}
 }
