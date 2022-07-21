@@ -67,7 +67,7 @@ public class DialogPrintTourTests {
          final Process toto = Runtime.getRuntime().exec("taskkill /F /IM Acro*"); //$NON-NLS-1$
          bot.sleep(3000);
          assertEquals(toto.exitValue(), 0);
-         assertEquals(toto.pid(), 12);
+         //assertEquals(toto.pid(), 12);
       } catch (final IOException ex) {
          assertEquals("Error", ex.getMessage()); //$NON-NLS-1$
       }
