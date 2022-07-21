@@ -29,6 +29,8 @@ New
 * 2.5D Map
   - Draw tour track with a gradient color, the color depends on the track value, e.g. elevation
                                                             https://github.com/mytourbook/mytourbook/issues/893
+  - for better orientation, there is an optional compassrose on the map. https://github.com/mytourbook/mytourbook/pull/899
+
   - Hints:
     - The color must be set to black for a gradient color with opacity 
 
