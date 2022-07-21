@@ -1983,6 +1983,7 @@ public class Messages extends NLS {
    public static String        Slideout_Map25Layer_Checkbox_Layer_Hillshading;
    public static String        Slideout_Map25Layer_Checkbox_Layer_LabelSymbol;
    public static String        Slideout_Map25Layer_Checkbox_Layer_LabelSymbol_IsBehindBuilding;
+   public static String        Slideout_Map25Layer_Checkbox_Layer_Legend;
    public static String        Slideout_Map25Layer_Checkbox_Layer_Satellite;
    public static String        Slideout_Map25Layer_Checkbox_Layer_ScaleBar;
    public static String        Slideout_Map25Layer_Checkbox_Layer_TileInfo;
@@ -2003,6 +2004,8 @@ public class Messages extends NLS {
    public static String        Slideout_Map25Layer_Spinner_SunTime_Coarse;
    public static String        Slideout_Map25Layer_Spinner_SunTime_Fine;
 
+   public static String        Slideout_Map25Options_Checkbox_MapCenter_VerticalPosition;
+   public static String        Slideout_Map25Options_Checkbox_MapCenter_VerticalPosition_Tooltip;
    public static String        Slideout_Map25Options_Checkbox_UseDraggedKeyNavigation;
    public static String        Slideout_Map25Options_Checkbox_UseDraggedKeyNavigation_Tooltip;
    public static String        Slideout_Map25Options_Label_MapOptions;
@@ -2045,14 +2048,22 @@ public class Messages extends NLS {
    public static String        Slideout_Map25Provider_Label_MapProvider_Title;
    public static String        Slideout_Map25Provider_Label_ThemeStyle;
 
+   public static String        Slideout_Map25TrackOptions_Checkbox_Outline;
+   public static String        Slideout_Map25TrackOptions_Checkbox_Outline_Tooltip;
+   public static String        Slideout_Map25TrackOptions_Checkbox_TrackVerticalOffset;
+   public static String        Slideout_Map25TrackOptions_Label_ColorMode;
    public static String        Slideout_Map25TrackOptions_Label_ConfigName_Tooltip;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrows;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip;
+   public static String        Slideout_Map25TrackOptions_Label_LegendUnitLayout;
+   public static String        Slideout_Map25TrackOptions_Label_LegendUnitLayout_Tooltip;
+   public static String        Slideout_Map25TrackOptions_Label_LineColorOpacity;
+   public static String        Slideout_Map25TrackOptions_Label_LineColorOpacity_Tooltip;
+   public static String        Slideout_Map25TrackOptions_Label_LineWidth;
+   public static String        Slideout_Map25TrackOptions_Label_LineWidth_Tooltip;
    public static String        Slideout_Map25TrackOptions_Label_Name;
-   public static String        Slideout_Map25TrackOptions_Label_OutlineColor;
-   public static String        Slideout_Map25TrackOptions_Label_OutlineColor_Tooltip;
-   public static String        Slideout_Map25TrackOptions_Label_OutlineWidth;
-   public static String        Slideout_Map25TrackOptions_Label_OutlineWidth_Tooltip;
+   public static String        Slideout_Map25TrackOptions_Radio_ColorMode_Gradient;
+   public static String        Slideout_Map25TrackOptions_Radio_ColorMode_Solid;
 
    public static String        Slideout_Map2MapOptions_Action_SetTourPaintingModeBasic;
    public static String        Slideout_Map2MapOptions_Dialog_EnhancePaintingWarning_Message;

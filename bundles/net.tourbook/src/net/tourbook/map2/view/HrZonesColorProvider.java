@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -30,95 +30,100 @@ import org.eclipse.swt.graphics.RGB;
  */
 public class HrZonesColorProvider implements IDiscreteColorProvider {
 
-	private MapGraphId					_graphId;
+   private MapGraphId                  _graphId;
 
-	/**
-	 * {@link TourData} which are checked if they contain valid HR zone data
-	 */
-	private TourData					_checkedTourData;
+   /**
+    * {@link TourData} which are checked if they contain valid HR zone data
+    */
+   private TourData                    _checkedTourData;
 
-	private boolean						_isValidHrZoneData;
+   private boolean                     _isValidHrZoneData;
 
-	private ArrayList<TourPersonHRZone>	_personHrZones;
+   private ArrayList<TourPersonHRZone> _personHrZones;
 
-	private HrZoneContext				_hrZoneContext;
-	private float[]						_pulseData;
+   private HrZoneContext               _hrZoneContext;
+   private float[]                     _pulseData;
 
-	public HrZonesColorProvider(final MapGraphId graphId) {
-		_graphId = graphId;
-	}
+   public HrZonesColorProvider(final MapGraphId graphId) {
+      _graphId = graphId;
+   }
 
-	private void checkHrData(final TourData tourData) {
+   private void checkHrData(final TourData tourData) {
 
-		if (tourData != _checkedTourData) {
+      if (tourData != _checkedTourData) {
 
-			// get required data which are needed to get the HR zone color
+         // get required data which are needed to get the HR zone color
 
-			_checkedTourData = tourData;
-			_isValidHrZoneData = TrainingManager.isRequiredHrZoneDataAvailable(tourData);
+         _checkedTourData = tourData;
+         _isValidHrZoneData = TrainingManager.isRequiredHrZoneDataAvailable(tourData);
 
-			if (_isValidHrZoneData) {
-				_personHrZones = tourData.getTourPerson().getHrZonesSorted();
-				_hrZoneContext = tourData.getHrZoneContext();
-				_pulseData = tourData.pulseSerie;
-			}
-		}
-	}
+         if (_isValidHrZoneData) {
+            _personHrZones = tourData.getTourPerson().getHrZonesSorted();
+            _hrZoneContext = tourData.getHrZoneContext();
+            _pulseData = tourData.pulseSerie;
+         }
+      }
+   }
 
-	@Override
-	public int getColorValue(final TourData tourData, final int serieIndex) {
+   @Override
+   public int getColorValue(final TourData tourData, final int serieIndex) {
 
-		checkHrData(tourData);
+      checkHrData(tourData);
 
-		if (_isValidHrZoneData == false) {
-			return 0xffFF0AE3;
-		}
+      if (_isValidHrZoneData == false) {
+         return 0xffFF0AE3;
+      }
 
-		return getHrColor(serieIndex);
-	}
+      return getHrColor(serieIndex);
+   }
 
-	@Override
-	public int getColorValue(final TourData tourData, final int valueIndex, final boolean isDrawLine) {
+   @Override
+   public int getColorValue(final TourData tourData, final int valueIndex, final boolean isDrawLine) {
 
-		checkHrData(tourData);
+      checkHrData(tourData);
 
-		if (_isValidHrZoneData == false) {
-			return 0xFF0AE3;
-		}
+      if (_isValidHrZoneData == false) {
+         return 0xFF0AE3;
+      }
 
-		/**
-		 * Superhack :-) <br>
-		 * Adjust the value index to use the previous data because when a tour is painted as a line,
-		 * it will be painted "to" the value and not "from" the value.<br>
-		 * This is not the best solution but adjusting the tour paint algorithm is much much more
-		 * complex, really !!!
-		 */
-		final int adjustedValueIndex = valueIndex > 0 && isDrawLine ? //
-				valueIndex - 1
-				: valueIndex;
+      /**
+       * Superhack :-)
+       * <p>
+       * Adjust the value index to use the previous data because when a tour is painted as a line,
+       * it will be painted "to" the value and not "from" the value.<br>
+       * This is not the best solution but adjusting the tour paint algorithm is much much more
+       * complex, really !!!
+       */
+      final int adjustedValueIndex = valueIndex > 0 && isDrawLine
+            ? valueIndex - 1
+            : valueIndex;
 
-		return getHrColor(adjustedValueIndex);
-	}
+      return getHrColor(adjustedValueIndex);
+   }
 
-	@Override
-	public MapGraphId getGraphId() {
-		return _graphId;
-	}
+   @Override
+   public MapGraphId getGraphId() {
+      return _graphId;
+   }
 
-	private int getHrColor(final int serieIndex) {
+   /**
+    * @param serieIndex
+    * @return Returns argb (alpha, blue, green, red)
+    */
+   private int getHrColor(final int serieIndex) {
 
-		final float pulse = _pulseData[serieIndex];
-		final int zoneIndex = TrainingManager.getZoneIndex(_hrZoneContext, pulse);
+      final float pulse = _pulseData[serieIndex];
+      final int zoneIndex = TrainingManager.getZoneIndex(_hrZoneContext, pulse);
 
-		final TourPersonHRZone hrZone = _personHrZones.get(zoneIndex);
-		final RGB rgb = hrZone.getColor();
+      final TourPersonHRZone hrZone = _personHrZones.get(zoneIndex);
+      final RGB rgb = hrZone.getColor();
 
-		final int rgbValue = ((rgb.red & 0xFF) << 0) //
-				| ((rgb.green & 0xFF) << 8)
-				| ((rgb.blue & 0xFF) << 16)
-				| ((0xFF) << 24);
+      final int abgr = ((rgb.red & 0xFF) << 0)
+            | ((rgb.green & 0xFF) << 8)
+            | ((rgb.blue & 0xFF) << 16)
+            | ((0xFF) << 24);
 
-		return rgbValue;
-	}
+      return abgr;
+   }
 
 }

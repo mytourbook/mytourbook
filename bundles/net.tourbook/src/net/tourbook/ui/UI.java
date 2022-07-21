@@ -747,6 +747,32 @@ public class UI {
       }
    }
 
+   public static ImageDescriptor getGraphImageDescriptor_Disabled(final MapGraphId graphId) {
+
+      switch (graphId) {
+      case Altitude:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Elevation_Disabled);
+
+      case Gradient:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Gradient_Disabled);
+
+      case Pace:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Pace_Disabled);
+
+      case Pulse:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Heartbeat_Disabled);
+
+      case Speed:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Speed_Disabled);
+
+      case HrZone:
+         return TourbookPlugin.getThemedImageDescriptor(Images.PulseZones_Disabled);
+
+      default:
+         return TourbookPlugin.getThemedImageDescriptor(Images.Graph_Elevation_Disabled);
+      }
+   }
+
    /**
     * @param imageName
     * @return Returns the url for an icon image in the {@link TourbookPlugin} bundle.

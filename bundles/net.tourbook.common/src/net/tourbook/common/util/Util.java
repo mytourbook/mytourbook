@@ -1512,6 +1512,13 @@ public class Util {
       return value;
    }
 
+   /**
+    * @param <E>
+    * @param xml
+    * @param attrName
+    * @param defaultValue
+    * @return
+    */
    public static <E extends Enum<E>> Enum<E> getXmlEnum(final IMemento xml,
                                                         final String attrName,
                                                         final Enum<E> defaultValue) {

@@ -24,6 +24,8 @@ import net.tourbook.common.util.StatusUtil;
  */
 public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 
+   private static final String NL                   = UI.NEW_LINE1;
+
    private static final String PROFILE_NAME_DEFAULT = Messages.Map3_Color_ProfileName_Default;
    public static final String  PROFILE_NAME_NEW     = Messages.Map3_Color_ProfileName_New;
 
@@ -192,12 +194,22 @@ public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 
    @Override
    public String toString() {
-      return String.format(
-            "Map3ColorProfile [_profileId=%s, _profileName=%s, _isActiveColorProfile=%s, _profileImage=%s]", //$NON-NLS-1$
-            _profileId,
-            _profileName,
-            _isActiveColorProfile,
-            _profileImage);
+
+      return UI.EMPTY_STRING
+
+            + "Map3ColorProfile" + NL //                                         //$NON-NLS-1$
+
+            + "[" + NL //                                                        //$NON-NLS-1$
+
+            + "_profileId                 =" + _profileId + NL //                //$NON-NLS-1$
+            + "_profileName               =" + _profileName + NL //              //$NON-NLS-1$
+            + "_isActiveColorProfile      =" + _isActiveColorProfile + NL //     //$NON-NLS-1$
+            + "_isAbsoluteValues          =" + _isAbsoluteValues + NL //         //$NON-NLS-1$
+            + "_isOverwriteLegendValues   =" + _isOverwriteLegendValues + NL //  //$NON-NLS-1$
+            + "_profileImage              =" + _profileImage + NL //             //$NON-NLS-1$
+
+            + "]" + NL //                                                        //$NON-NLS-1$
+      ;
    }
 
 }
