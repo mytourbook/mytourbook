@@ -157,6 +157,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    //
    private static Map25View        _map25View;
    private static LwjglApplication _lwjglApp;
+   private static int              _compassRoseSize                              = 200;
    //
    private Map25Provider           _selectedMapProvider;
    //
@@ -165,8 +166,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private BitmapTileSource        _satelliteSource;
    //
    private int                     _numOfflineMapFiles                           = 0;
+
    //
-   private String                  _mp_key                                       = "80d7bc63-94fe-416f-a63f-7173f81a484c";         //$NON-NLS-1$
+   private String _mp_key = "80d7bc63-94fe-416f-a63f-7173f81a484c"; //$NON-NLS-1$
+
    //
    /**
     * The opacity can be set in the layer but not read. This will keep the state of the hillshading
@@ -192,14 +195,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    //
    private boolean                 _layer_Label_IsVisible;
    private boolean                 _layer_Label_IsBeforeBuilding;
-
    private boolean                 _layer_CompassRose_IsVisible;
-   private int                     _compassRoseSize                              = 200;
 
    //
    private OsmTileLayerMT          _layer_BaseMap;
    private S3DBLayer               _layer_Building_S3DB;
    private GenericLayer            _layer_Building_S3DB_SunUpdate;
+   private CompassRoseLayer     _layer_CompassRose;
    private Layer                   _layer_HillShading_AFTER;
    private BitmapTileLayer         _layer_HillShading_TILE_LOADING;
    private LabelLayerMT            _layer_Label;
@@ -220,7 +222,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private MarkerLayerMT           _layer_TourMarker;
    //
 //   private OpenGLTestLayer         _layer_OpenGLTest;
-   private CompassRoseLayer _layer_CompassRose;
    //
    private OkHttpFactoryMT         _httpFactory;
    //

@@ -37,16 +37,16 @@ public class CompassRoseRenderer extends BucketRenderer {
 
    private Layer         _layer;
 
-   private int           compassRoseSize     = 300;
+   private int           _compassRoseSize;
 
    private MarkerToolkit _compassRoseToolkit = new MarkerToolkit(MarkerShape.COMPASS);
 
    public CompassRoseRenderer(final Layer compassRoseLayer, final int compassSize) {
       super();
 
-      this.compassRoseSize = compassSize;
+      this._compassRoseSize = compassSize;
 
-      final int scaledcompassRoseSize = DPIUtil.autoScaleUp(compassRoseSize);
+      final int scaledcompassRoseSize = DPIUtil.autoScaleUp(_compassRoseSize);
 
       System.out.println("Compass Size: " + " unscaled: " + compassSize + ", scaled: " + scaledcompassRoseSize);
 
@@ -60,7 +60,7 @@ public class CompassRoseRenderer extends BucketRenderer {
       it.billboard = false;
 
       try {
-         it.bitmap = _compassRoseToolkit.drawCompassRose(scaledcompassRoseSize, 0xFFFFFFFF); //AARRGGBB
+         it.bitmap = _compassRoseToolkit.drawCompassRose(scaledcompassRoseSize, _compassRoseToolkit._compassRoseColor); //AARRGGBB
          //it.bitmap = _compassRoseToolkit.getMarkerSymbol().getBitmap();
       } catch (final Exception e) {
          e.printStackTrace();

@@ -50,6 +50,9 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 // private int                  _starColorBorder = 0xFFCBCB1F;
    private int                   _starColorBorder = 0xFFff0000;
 
+   public int                    _compassRoseColor       = 0xFFFFFFFF;              //100 percent white
+   public int                    _compassRoseColorBorder = 0x80000000;              //50 percent black
+
    public MarkerSymbol           _markerSymbol;                              //marker symbol circle or star
 
    private Bitmap                _bitmapCircle;
@@ -77,7 +80,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       if (shape == MarkerShape.CIRCLE) {
          _bitmapClusterSymbol = drawCircle(clusterSymbol_Size);
       } else if (shape == MarkerShape.COMPASS) {
-         _bitmapClusterSymbol = drawCompassRose(clusterSymbol_Size, _starColor);
+         _bitmapClusterSymbol = drawCompassRose(clusterSymbol_Size, _compassRoseColor);
       } else {
          _bitmapClusterSymbol = drawStar(clusterSymbol_Size, _starColor, _starColorBorder);
       }
@@ -341,7 +344,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       if (shape == MarkerShape.CIRCLE) {
          shapeBitmap = drawCircle(symbolSize);
       } else if (shape == MarkerShape.COMPASS) {
-         shapeBitmap = drawCompassRose(symbolSize, _starColor);
+         shapeBitmap = drawCompassRose(symbolSize, _compassRoseColor);
       } else {
          shapeBitmap = drawStar(symbolSize, _starColor, _starColorBorder);
       }
@@ -378,7 +381,7 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       //Outline first
       compassRosePainter.setStrokeWidth(DPIUtil.autoScaleUp(7));
-      compassRosePainter.setColor(0x80000000); //50 percent black
+      compassRosePainter.setColor(_compassRoseColorBorder); //50 percent black
       final float low = bitmapCompassRoseSizeF * 0.2f;
       final float high = bitmapCompassRoseSizeF * 0.8f;
       final float inner = bitmapCompassRoseSizeF * 0.6f;
