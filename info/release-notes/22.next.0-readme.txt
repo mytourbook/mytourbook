@@ -26,18 +26,26 @@ Experimental
 New
 ===
 
-* 
+* 2.5D Map
+  - Draw tour track with a gradient color, the color depends on the track value, e.g. elevation
+                                                            https://github.com/mytourbook/mytourbook/issues/893
+  - Hints:
+    - The color must be set to black for a gradient color with opacity 
 
 Improvements
 ============
 
 * 2D Map
-  - Goto location                         https://github.com/mytourbook/mytourbook/issues/884
-  - Copy location to clipboard
+  - Goto latitude/longitude location                        https://github.com/mytourbook/mytourbook/issues/884
+  - Copy geo location to clipboard
+  
+* 2.5D Map
+  - Paint tour track with a vertical offset                 https://github.com/mytourbook/mytourbook/issues/889
+  - Set vertical position for the map tilt rotation axis    https://github.com/mytourbook/mytourbook/issues/890
+  - Fixed: Track width jumped when the zoom-level changed, now it's width is always the same
 
 * Weather (Frederic)
   - Added a drizzle weather icon          https://github.com/mytourbook/mytourbook/issues/874
-
 
 
 Changes
@@ -46,6 +54,8 @@ Changes
 * Fitlog/FitlogEx Import (Frederic)
   - Compute the average power when power data is provided but average power value is not
 
+* 2.5D Map
+  - Track (line) colors in the color profiles are reset to defaults
 
 Bugfix
 ======

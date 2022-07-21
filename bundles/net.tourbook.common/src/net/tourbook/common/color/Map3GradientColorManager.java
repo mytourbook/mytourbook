@@ -48,13 +48,6 @@ import org.w3c.dom.Element;
 /**
  * Manage gradient colors which are displayed in a 3D map.
  */
-/**
- * @author IBM_ADMIN
- *
- */
-/**
- * @author IBM_ADMIN
- */
 public class Map3GradientColorManager {
 
    private static final char                               NL                              = UI.NEW_LINE;

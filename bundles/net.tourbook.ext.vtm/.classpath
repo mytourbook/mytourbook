@@ -67,12 +67,12 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-backend-lwjgl/1.9.10/bc819db135041daf18548095a4224fdf91128d4c/gdx-backend-lwjgl-1.9.10-sources.jar" kind="lib" path="libs/gdx-backend-lwjgl-1.9.10.jar" exported="true">
+	<classpathentry kind="lib" path="libs/gdx-backend-lwjgl-1.9.10.jar" exported="true" sourcepath="/gdx-backend-lwjgl/src">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.10/37e7ec91522313dabc753c72196dd665ea4a9332/gdx-1.9.10-sources.jar" kind="lib" path="libs/gdx-1.9.10.jar" exported="true">
+	<classpathentry kind="lib" path="libs/gdx-1.9.10.jar" exported="true" sourcepath="/gdx/src">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -87,7 +87,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.lwjgl.lwjgl/lwjgl/2.9.3/34682f36cee6cded40df9829bb352f2bdce5b14e/lwjgl-2.9.3-sources.jar" kind="lib" path="libs/lwjgl-2.9.3.jar" exported="true">
+	<classpathentry kind="lib" path="libs/lwjgl-2.9.3.jar" exported="true" sourcepath="/lwjgl-2.9.3/lwjgl-source-2.9.3.zip">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>

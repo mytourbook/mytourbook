@@ -37,14 +37,15 @@ public class SliderLocation_Layer extends Layer {
 	}
 
 	@Override
-	public void setEnabled(final boolean enabled) {
-		if (enabled == isEnabled()) {
+   public void setEnabled(final boolean isEnabled) {
+
+      if (isEnabled == isEnabled()) {
 			return;
 		}
 
-		super.setEnabled(enabled);
+      super.setEnabled(isEnabled);
 
-		if (!enabled) {
+      if (!isEnabled) {
 			locationRenderer.animate(false);
 		}
 	}

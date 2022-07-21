@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,61 +39,76 @@ import org.eclipse.swt.widgets.ToolItem;
  */
 public abstract class ActionToolbarSlideout extends ContributionItem implements IOpeningDialog {
 
-   private String          _dialogId = getClass().getCanonicalName();
+   private String          _dialogId               = getClass().getCanonicalName();
 
    private ToolBar         _toolBar;
    private ToolItem        _actionToolItem;
 
    private ToolbarSlideout _toolbarSlideout;
 
-   /*
-    * UI controls
-    */
-   private Image _imageEnabled; // this is the default image
-   private Image _imageDisabled;
-
-   // additional enabled images
-   private ArrayList<Image>           _allOtherEnabledImages             = new ArrayList<>();
-   private ArrayList<ImageDescriptor> _allOtherEnabledImages_Descriptors = new ArrayList<>();
-
    /**
     * When <code>true</code> then the action can be toggeled, default is <code>false</code>.
     */
-   protected boolean                  isToggleAction;
+   protected boolean       isToggleAction;
 
    /**
     * When <code>true</code> then the slideout is always displayed when mouse is hovering the
     * action.
     */
-   protected boolean                  isShowSlideoutAlways;
+   protected boolean       isShowSlideoutAlways;
 
    /**
     * This tooltip will be displayed when the action is not selected.
     */
-   protected String                   notSelectedTooltip                 = UI.EMPTY_STRING;
+   protected String        notSelectedTooltip      = UI.EMPTY_STRING;
 
-   private boolean                    _stateActionSelection;
+   private boolean         _stateActionSelection;
+
+   /**
+    * When <code>true</code> then the images must be disposed, otherwise they must not be disposed,
+    * default is <code>true</code>
+    */
+   private boolean         _canDisposeActionImages = true;
+
+   /*
+    * UI controls
+    */
+   private Image _actionImage_Enabled; // this is the default image
+   private Image _actionImage_Disabled;
+
+   // additional enabled images
+   private ArrayList<Image>           _allOtherEnabledImages             = new ArrayList<>();
+   private ArrayList<ImageDescriptor> _allOtherEnabledImages_Descriptors = new ArrayList<>();
 
    public ActionToolbarSlideout() {
 
-      _imageEnabled = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
-      _imageDisabled = CommonActivator.getImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
+      _actionImage_Enabled = CommonActivator.getThemedImageDescriptor(CommonImages.TourOptions).createImage();
+      _actionImage_Disabled = CommonActivator.getImageDescriptor(CommonImages.TourOptions_Disabled).createImage();
+   }
+
+   public ActionToolbarSlideout(final Image graphImage, final Image graphImage_Disabled) {
+
+      _actionImage_Enabled = graphImage;
+      _actionImage_Disabled = graphImage_Disabled;
+
+      // prevent to dispose the provided images
+      _canDisposeActionImages = false;
    }
 
    public ActionToolbarSlideout(final ImageDescriptor actionImage, final ImageDescriptor actionImageDisabled) {
 
-      _imageEnabled = actionImage.createImage();
+      _actionImage_Enabled = actionImage.createImage();
 
       if (actionImageDisabled == null) {
 
-         if (_imageDisabled != null) {
-            _imageDisabled.dispose();
-            _imageDisabled = null;
+         if (_actionImage_Disabled != null) {
+            _actionImage_Disabled.dispose();
+            _actionImage_Disabled = null;
          }
 
       } else {
 
-         _imageDisabled = actionImageDisabled.createImage();
+         _actionImage_Disabled = actionImageDisabled.createImage();
       }
    }
 
@@ -111,8 +126,11 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
    @Override
    public void dispose() {
 
-      Util.disposeResource(_imageEnabled);
-      Util.disposeResource(_imageDisabled);
+      if (_canDisposeActionImages) {
+
+         Util.disposeResource(_actionImage_Enabled);
+         Util.disposeResource(_actionImage_Disabled);
+      }
 
       for (final Image image : _allOtherEnabledImages) {
          Util.disposeResource(image);
@@ -120,8 +138,8 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
       _allOtherEnabledImages.clear();
 
-      _imageEnabled = null;
-      _imageDisabled = null;
+      _actionImage_Enabled = null;
+      _actionImage_Disabled = null;
    }
 
    @Override
@@ -139,8 +157,8 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
             _actionToolItem = new ToolItem(toolbar, SWT.PUSH);
          }
 
-         _actionToolItem.setImage(_imageEnabled);
-         _actionToolItem.setDisabledImage(_imageDisabled);
+         _actionToolItem.setImage(_actionImage_Enabled);
+         _actionToolItem.setDisabledImage(_actionImage_Disabled);
          _actionToolItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -296,7 +314,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
       if (isEnabled && _actionToolItem.getSelection() == false) {
 
          // show default icon
-         _actionToolItem.setImage(_imageEnabled);
+         _actionToolItem.setImage(_actionImage_Enabled);
       }
    }
 
@@ -314,7 +332,7 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
    }
 
    public void showDefaultEnabledImage() {
-      _actionToolItem.setImage(_imageEnabled);
+      _actionToolItem.setImage(_actionImage_Enabled);
    }
 
    /**

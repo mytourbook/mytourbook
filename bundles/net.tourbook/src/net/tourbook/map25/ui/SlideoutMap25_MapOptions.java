@@ -18,24 +18,29 @@ package net.tourbook.map25.ui;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map25.Map25View;
 import net.tourbook.web.WEB;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 
 /**
- * Slideout for 2.5D map
+ * Slideout for 2.5D map options
  */
 public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
@@ -45,14 +50,20 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
 // SET_FORMATTING_ON
 
-   private SelectionListener _defaultSelectionListener;
+   private Map25App           _mapApp;
+
+   private SelectionListener  _defaultSelectionListener;
+   private MouseWheelListener _mouseWheelListener;
 
    /*
     * UI controls
     */
-   private Button _chkUseDraggedKeyboardNavigation;
+   private Button  _chkUseDraggedKeyboardNavigation;
+   private Button  _chkMapCenter_VerticalPosition;
 
-   private Link   _linkKeyboardShortcuts;
+   private Link    _linkKeyboardShortcuts;
+
+   private Spinner _spinnerMapCenter_VerticalPosition;
 
    /**
     * @param ownerControl
@@ -60,9 +71,12 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
     * @param map25View
     */
    public SlideoutMap25_MapOptions(final Control ownerControl,
-                                   final ToolBar toolBar) {
+                                   final ToolBar toolBar,
+                                   final Map25View map25View) {
 
       super(ownerControl, toolBar);
+
+      _mapApp = map25View.getMapApp();
    }
 
    private void createActions() {
@@ -91,9 +105,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
       {
          final Composite container = new Composite(shellContainer, SWT.NONE);
          GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-         GridLayoutFactory
-               .fillDefaults()//
-               .applyTo(container);
+         GridLayoutFactory.fillDefaults().applyTo(container);
 //       container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
          {
             createUI_10_Title(container);
@@ -121,37 +133,67 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory
-            .fillDefaults()
-            .numColumns(1)
+      GridLayoutFactory.fillDefaults()
+            .numColumns(2)
             .applyTo(container);
       {
          {
             /*
+             * Map center vertical position
+             */
+            _chkMapCenter_VerticalPosition = new Button(container, SWT.CHECK);
+            _chkMapCenter_VerticalPosition.setText(Messages.Slideout_Map25Options_Checkbox_MapCenter_VerticalPosition);
+            _chkMapCenter_VerticalPosition.setToolTipText(Messages.Slideout_Map25Options_Checkbox_MapCenter_VerticalPosition_Tooltip);
+            _chkMapCenter_VerticalPosition.addSelectionListener(_defaultSelectionListener);
+
+            _spinnerMapCenter_VerticalPosition = new Spinner(container, SWT.BORDER);
+            _spinnerMapCenter_VerticalPosition.setMinimum((int) -Map25App.MAP_CENTER_VERTICAL_MAX_VALUE);
+            _spinnerMapCenter_VerticalPosition.setMaximum((int) Map25App.MAP_CENTER_VERTICAL_MAX_VALUE);
+            _spinnerMapCenter_VerticalPosition.setIncrement(1);
+            _spinnerMapCenter_VerticalPosition.setPageIncrement(5);
+            _spinnerMapCenter_VerticalPosition.setToolTipText(Messages.Slideout_Map25Options_Checkbox_MapCenter_VerticalPosition_Tooltip);
+
+            _spinnerMapCenter_VerticalPosition.addSelectionListener(_defaultSelectionListener);
+            _spinnerMapCenter_VerticalPosition.addMouseWheelListener(_mouseWheelListener);
+         }
+         {
+            /*
              * Keyboard navigation
              */
-
-            // checkbox
             _chkUseDraggedKeyboardNavigation = new Button(container, SWT.CHECK);
             _chkUseDraggedKeyboardNavigation.setText(Messages.Slideout_Map25Options_Checkbox_UseDraggedKeyNavigation);
             _chkUseDraggedKeyboardNavigation.setToolTipText(Messages.Slideout_Map25Options_Checkbox_UseDraggedKeyNavigation_Tooltip);
             _chkUseDraggedKeyboardNavigation.addSelectionListener(_defaultSelectionListener);
-
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkUseDraggedKeyboardNavigation);
+         }
+         {
+            /*
+             * Keyboard shortcuts
+             */
             _linkKeyboardShortcuts = new Link(container, SWT.NONE);
             _linkKeyboardShortcuts.setText(Messages.Slideout_Map25Options_Link_KeyboardShortcuts);
             _linkKeyboardShortcuts.setToolTipText(MAP_25D_KEYBOARD_SHORTCUTS);
             _linkKeyboardShortcuts.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(MAP_25D_KEYBOARD_SHORTCUTS)));
+            GridDataFactory.fillDefaults().span(2, 1).indent(0, 20).applyTo(_linkKeyboardShortcuts);
          }
       }
    }
 
    private void enableControls() {
 
+      final boolean isMapCenter_VerticalPosition = _chkMapCenter_VerticalPosition.getSelection();
+
+      _spinnerMapCenter_VerticalPosition.setEnabled(isMapCenter_VerticalPosition);
    }
 
    private void initUI(final Composite parent) {
 
       _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
+
+      _mouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onChangeUI();
+      };
    }
 
    private void onChangeUI() {
@@ -164,11 +206,19 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private void restoreState() {
 
       _chkUseDraggedKeyboardNavigation.setSelection(Map25ConfigManager.useDraggedKeyboardNavigation);
+      _chkMapCenter_VerticalPosition.setSelection(_mapApp.getMapCenter_VerticalPosition_IsEnabled());
+      _spinnerMapCenter_VerticalPosition.setSelection(_mapApp.getMapCenter_VerticalPosition());
    }
 
    private void saveState() {
 
+      _mapApp.setMap_VerticalPosition(
+            _chkMapCenter_VerticalPosition.getSelection(),
+            _spinnerMapCenter_VerticalPosition.getSelection());
+
       Map25ConfigManager.useDraggedKeyboardNavigation = _chkUseDraggedKeyboardNavigation.getSelection();
+
+      _mapApp.updateMap();
    }
 
 }

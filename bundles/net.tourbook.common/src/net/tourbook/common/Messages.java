@@ -19,7 +19,7 @@ import org.eclipse.osgi.util.NLS;
 
 public class Messages extends NLS {
 
-   private static final String BUNDLE_NAME = "net.tourbook.common.messages";             //$NON-NLS-1$
+   private static final String BUNDLE_NAME = "net.tourbook.common.messages";               //$NON-NLS-1$
 
    public static String        App_Action_Close_Tooltip;
    public static String        App_Action_New_WithConfirm;
@@ -147,6 +147,7 @@ public class Messages extends NLS {
    public static String        Graph_Label_HeartRateVariability;
    public static String        Graph_Label_HeartRateVariability_Unit;
    public static String        Graph_Label_History;
+   public static String        Graph_Label_HrZone;
    public static String        Graph_Label_Pace;
    public static String        Graph_Label_Pace_Summarized;
    public static String        Graph_Label_Power;
@@ -335,11 +336,20 @@ public class Messages extends NLS {
    public static String        legend_color_keep_color;
    public static String        legend_color_lighten_color;
 
+   public static String        Legend_UnitLayout_BrightBackground_NoShadow;
+   public static String        Legend_UnitLayout_BrightBackground_WithShadow;
+   public static String        Legend_UnitLayout_DarkBackground_NoShadow;
+   public static String        Legend_UnitLayout_DarkBackground_WithShadow;
+
    public static String        rgv_vertex_class_cast_exception;
 
    public static String        Slideout_Dialog_Action_DragSlideout_ToolTip;
    public static String        Slideout_Dialog_Action_KeepSlideoutOpen_Tooltip;
    public static String        Slideout_Dialog_Action_PinSlideoutLocation_Tooltip;
+
+   public static String        Slideout_Map_TrackColors_Label_Title;
+   public static String        Slideout_Map_TrackColors_Label_VisibleColorProfiles;
+   public static String        Slideout_Map_TrackColors_Label_VisibleColorProfiles_Tooltip;
 
    public static String        Swim_Stroke_Backstroke;
    public static String        Swim_Stroke_Breaststroke;

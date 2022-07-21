@@ -111,6 +111,7 @@ public class Messages extends NLS {
    public static String        Pref_Map3Color_Column_Id_Label;
    public static String        Pref_Map3Color_Column_Id_Tooltip;
    public static String        Pref_Map3Color_Column_Legend_Marker;
+   public static String        Pref_Map3Color_Column_Legend_Marker_Detail;
    public static String        Pref_Map3Color_Column_MaxValue_Header;
    public static String        Pref_Map3Color_Column_MaxValue_Label;
    public static String        Pref_Map3Color_Column_MinValue_Header;
@@ -119,11 +120,11 @@ public class Messages extends NLS {
    public static String        Pref_Map3Color_Column_OverwriteLegendMinMax_Label_Tooltip;
    public static String        Pref_Map3Color_Column_ProfileName;
    public static String        Pref_Map3Color_Column_ValueMarker_Absolute;
+   public static String        Pref_Map3Color_Column_ValueMarker_Absolute_Detail;
    public static String        Pref_Map3Color_Column_ValueMarker_Relative;
+   public static String        Pref_Map3Color_Column_ValueMarker_Relative_Detail;
    public static String        Pref_Map3Color_Dialog_RemoveProfile_Message;
    public static String        Pref_Map3Color_Dialog_RemoveProfile_Title;
-   public static String        Pref_Map3Color_Label_NumberOfColors;
-   public static String        Pref_Map3Color_Label_NumberOfColors_Tooltip;
    public static String        Pref_Map3Color_Label_Title;
 
    public static String        Prop_Viewer_Label_AltitudeRange_Tooltip;

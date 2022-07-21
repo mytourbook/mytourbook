@@ -91,8 +91,11 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
    private Button            _chkShowLayer_Satellite;
    private Button            _chkShowLayer_Label;
    private Button            _chkShowLayer_Label_IsBeforeBuilding;
+   private Button            _chkShowLayer_Legend;
    private Button            _chkShowLayer_Scale;
    private Button            _chkShowLayer_TileInfo;
+   
+//   private Button            _chkShowLayer_OpenGLTest;
 
    private Combo             _comboBuilding_SunPosition;
 
@@ -223,6 +226,14 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
+//         {
+//            /*
+//             * Test layer
+//             */
+//            _chkShowLayer_OpenGLTest = new Button(container, SWT.CHECK);
+//            _chkShowLayer_OpenGLTest.setText("TEST Layer"); //$NON-NLS-1$
+//            _chkShowLayer_OpenGLTest.addSelectionListener(_layerSelectionListener);
+//         }
          {
             /*
              * Text label
@@ -248,11 +259,19 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
          {
             /*
-             * Scale
+             * Scale bar
              */
             _chkShowLayer_Scale = new Button(container, SWT.CHECK);
             _chkShowLayer_Scale.setText(Messages.Slideout_Map25Layer_Checkbox_Layer_ScaleBar);
             _chkShowLayer_Scale.addSelectionListener(_layerSelectionListener);
+         }
+         {
+            /*
+             * Legend
+             */
+            _chkShowLayer_Legend = new Button(container, SWT.CHECK);
+            _chkShowLayer_Legend.setText(Messages.Slideout_Map25Layer_Checkbox_Layer_Legend);
+            _chkShowLayer_Legend.addSelectionListener(_layerSelectionListener);
          }
          {
             /*
@@ -722,12 +741,15 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
 // SET_FORMATTING_OFF
 
+//      _chkShowLayer_OpenGLTest               .setSelection(_mapApp.getLayer_OpenGLTest()                 .isEnabled());
+
       _chkShowLayer_Building                 .setSelection(_mapApp.getLayer_Building_S3DB()              .isEnabled());
-      _chkShowLayer_Building_Shadow          .setSelection(_mapApp.getLayer_Building_IsShadow()          == Bool.TRUE);
+      _chkShowLayer_Building_Shadow          .setSelection(_mapApp.getLayer_Building_IsShadow() == Bool.TRUE);
       _chkShowLayer_Cartography              .setSelection(_mapApp.getLayer_BaseMap()                    .isEnabled());
       _chkShowLayer_Hillshading              .setSelection(_mapApp.getLayer_HillShading()                .isEnabled());
       _chkShowLayer_Label                    .setSelection(_mapApp.getLayer_Label()                      .isEnabled());
       _chkShowLayer_Label_IsBeforeBuilding   .setSelection(_mapApp.getLayer_Label_IsBeforeBuilding());
+      _chkShowLayer_Legend                   .setSelection(_mapApp.getLayer_Legend()                     .isEnabled());
       _chkShowLayer_Scale                    .setSelection(_mapApp.getLayer_ScaleBar()                   .isEnabled());
       _chkShowLayer_Satellite                .setSelection(_mapApp.getLayer_Satellite()                  .isEnabled());
       _chkShowLayer_TileInfo                 .setSelection(_mapApp.getLayer_TileInfo()                   .isEnabled());
@@ -742,15 +764,22 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
    private void saveState() {
 
-      _mapApp.getLayer_BaseMap().setEnabled(_chkShowLayer_Cartography.getSelection());
-      _mapApp.getLayer_HillShading().setEnabled(_chkShowLayer_Hillshading.getSelection());
+// SET_FORMATTING_OFF
+
+//      _mapApp.getLayer_OpenGLTest()    .setEnabled(_chkShowLayer_OpenGLTest.getSelection());
+
+      _mapApp.getLayer_BaseMap()       .setEnabled(_chkShowLayer_Cartography.getSelection());
+      _mapApp.getLayer_HillShading()   .setEnabled(_chkShowLayer_Hillshading.getSelection());
 
       // satellite maps
-      _mapApp.getLayer_Satellite().setEnabled(_chkShowLayer_Satellite.getSelection());
+      _mapApp.getLayer_Satellite()     .setEnabled(_chkShowLayer_Satellite.getSelection());
 
-      _mapApp.getLayer_Label().setEnabled(_chkShowLayer_Label.getSelection());
-      _mapApp.getLayer_ScaleBar().setEnabled(_chkShowLayer_Scale.getSelection());
-      _mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
+      _mapApp.getLayer_Label()         .setEnabled(_chkShowLayer_Label.getSelection());
+      _mapApp.getLayer_Legend()        .setEnabled(_chkShowLayer_Legend.getSelection());
+      _mapApp.getLayer_ScaleBar()      .setEnabled(_chkShowLayer_Scale.getSelection());
+      _mapApp.getLayer_TileInfo()      .setEnabled(_chkShowLayer_TileInfo.getSelection());
+
+// SET_FORMATTING_ON
 
       _mapApp.setLayer_Label_Options(
             _chkShowLayer_Label.getSelection(),
