@@ -2,7 +2,7 @@
  * Copyright (C) 2019, 2022 Wolfgang Schramm and Contributors
  * Copyright 2016-2018 devemux86
  * Copyright 2017 nebular
- * Copyright 2019, 2021 Thomas Theussing
+ * Copyright 2019, 2021, 2022 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -76,6 +76,8 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       if (shape == MarkerShape.CIRCLE) {
          _bitmapClusterSymbol = drawCircle(clusterSymbol_Size);
+      } else if (shape == MarkerShape.COMPASS) {
+         _bitmapClusterSymbol = drawCompassRose(clusterSymbol_Size, _starColor);
       } else {
          _bitmapClusterSymbol = drawStar(clusterSymbol_Size, _starColor, _starColorBorder);
       }
@@ -338,6 +340,8 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
 
       if (shape == MarkerShape.CIRCLE) {
          shapeBitmap = drawCircle(symbolSize);
+      } else if (shape == MarkerShape.COMPASS) {
+         shapeBitmap = drawCompassRose(symbolSize, _starColor);
       } else {
          shapeBitmap = drawStar(symbolSize, _starColor, _starColorBorder);
       }
@@ -359,6 +363,39 @@ public class MarkerToolkit implements ItemizedLayer.OnItemGestureListener<Marker
       defaultMarkerCanvas.drawCircle(half, half, half * 0.8f, _linePainter);
 
       return _bitmapCircle;
+   }
+
+   public Bitmap drawCompassRose(final int bitmapCompassRoseSize, final int compassRoseColor) {
+      final float half = bitmapCompassRoseSize / 2;
+
+      //final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+      final Bitmap bitmapCompassRose = CanvasAdapter.newBitmap(bitmapCompassRoseSize, bitmapCompassRoseSize, 0);
+      final float bitmapCompassRoseSizeF = bitmapCompassRoseSize - 1;
+      final Canvas defaultMarkerCanvas = CanvasAdapter.newCanvas();
+      defaultMarkerCanvas.setBitmap(bitmapCompassRose);
+      final Paint compassRosePainter = CanvasAdapter.newPaint();
+      compassRosePainter.setStyle(Paint.Style.STROKE);
+
+      //Outline first
+      compassRosePainter.setStrokeWidth(DPIUtil.autoScaleUp(7));
+      compassRosePainter.setColor(0x80000000); //50 percent black
+      final float low = bitmapCompassRoseSizeF * 0.2f;
+      final float high = bitmapCompassRoseSizeF * 0.8f;
+      final float inner = bitmapCompassRoseSizeF * 0.6f;
+      defaultMarkerCanvas.drawLine(half, low, high, high, compassRosePainter);
+      defaultMarkerCanvas.drawLine(high, high, half, inner, compassRosePainter);
+      defaultMarkerCanvas.drawLine(half, inner, low, high, compassRosePainter);
+      defaultMarkerCanvas.drawLine(low, high, half, low, compassRosePainter);
+
+      //now the thinner line
+      compassRosePainter.setStrokeWidth(DPIUtil.autoScaleUp(5));
+      compassRosePainter.setColor(compassRoseColor);
+      defaultMarkerCanvas.drawLine(half, low, high, high, compassRosePainter);
+      defaultMarkerCanvas.drawLine(high, high, half, inner, compassRosePainter);
+      defaultMarkerCanvas.drawLine(half, inner, low, high, compassRosePainter);
+      defaultMarkerCanvas.drawLine(low, high, half, low, compassRosePainter);
+
+      return bitmapCompassRose;
    }
 
    private Bitmap drawStar(final int bitmapStarSize, final int starColor, final int starColorBorder) {

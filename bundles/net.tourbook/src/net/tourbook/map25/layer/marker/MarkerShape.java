@@ -18,9 +18,11 @@
 package net.tourbook.map25.layer.marker;
 
 import net.tourbook.map25.Map25App;
+import net.tourbook.map25.renderer.CompassRoseRenderer;
 
 /**
- * Tile encoding format. {@link Map25App} and {@link MarkerToolkit} and {@link MarkerRendererMT} and {@link PhotoToolkit} depends on this.
+ * Tile encoding format. {@link Map25App} and {@link MarkerToolkit} and {@link MarkerRendererMT} and
+ * {@link PhotoToolkit} and {@link CompassRoseRenderer} depends on this.
  */
 public enum MarkerShape {
 
@@ -38,5 +40,10 @@ public enum MarkerShape {
     * using arrow for track direction arrows
     */
    ARROW,
+
+   /**
+    * using compass for a compass rose
+    */
+   COMPASS,
 
 }

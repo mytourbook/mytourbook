@@ -165,6 +165,7 @@ public class Map25View extends ViewPart implements
    private static final String           STATE_IS_LAYER_LEGEND_VISIBLE           = "STATE_IS_LAYER_LEGEND_VISIBLE";              //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_MARKER_VISIBLE           = "STATE_IS_LAYER_MARKER_VISIBLE";              //$NON-NLS-1$
 //   private static final String           STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE     = "STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE";        //$NON-NLS-1$
+   private static final String           STATE_IS_LAYER_COMPASS_ROSE_VISIBLE     = "STATE_IS_LAYER_COMPASS_ROSE_VISIBLE";        //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_SATELLITE_VISIBLE        = "STATE_IS_LAYER_SATELLITE_VISIBLE";           //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_SCALE_BAR_VISIBLE        = "STATE_IS_LAYER_SCALE_BAR_VISIBLE";           //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_TILE_INFO_VISIBLE        = "STATE_IS_LAYER_TILE_INFO_VISIBLE";           //$NON-NLS-1$
@@ -1880,6 +1881,7 @@ public class Map25View extends ViewPart implements
       _map25App.getLayer_TileInfo()         .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_TILE_INFO_VISIBLE,     false));
 
 //      _map25App.getLayer_OpenGLTest()       .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE,  false));
+      _map25App.getLayer_CompassRose()      .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_COMPASS_ROSE_VISIBLE, false));
 
       // map is synced with
       _mapSynchedWith = (MapSync) Util.getStateEnum(_state, STATE_MAP_SYNCHED_WITH, MapSync.NONE);
@@ -1992,6 +1994,7 @@ public class Map25View extends ViewPart implements
       _state.put(STATE_IS_LAYER_TOUR_VISIBLE,         _map25App.getLayer_Tour().isEnabled());
 
 //      _state.put(STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE, _map25App.getLayer_OpenGLTest().isEnabled());
+      _state.put(STATE_IS_LAYER_COMPASS_ROSE_VISIBLE, _map25App.getLayer_CompassRose().isEnabled());
 
       // photo layer
       _state.put(STATE_IS_LAYER_PHOTO_VISIBLE,        _map25App.isPhoto_Visible());

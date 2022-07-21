@@ -85,6 +85,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
    private ControlDecoration _decoratorShowLayer_Label;
 
    private Button            _chkShowLayer_Cartography;
+   private Button            _chkShowLayer_CompassRose;
    private Button            _chkShowLayer_Building;
    private Button            _chkShowLayer_Building_Shadow;
    private Button            _chkShowLayer_Hillshading;
@@ -94,7 +95,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
    private Button            _chkShowLayer_Legend;
    private Button            _chkShowLayer_Scale;
    private Button            _chkShowLayer_TileInfo;
-   
+
 //   private Button            _chkShowLayer_OpenGLTest;
 
    private Combo             _comboBuilding_SunPosition;
@@ -234,6 +235,8 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 //            _chkShowLayer_OpenGLTest.setText("TEST Layer"); //$NON-NLS-1$
 //            _chkShowLayer_OpenGLTest.addSelectionListener(_layerSelectionListener);
 //         }
+
+
          {
             /*
              * Text label
@@ -324,6 +327,14 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
                   GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.CENTER).applyTo(_spinnerHillShadingOpacity);
                }
             }
+         }
+         {
+            /*
+             * CompassRose layer
+             */
+            _chkShowLayer_CompassRose = new Button(container, SWT.CHECK);
+            _chkShowLayer_CompassRose.setText("Compass Rose");
+            _chkShowLayer_CompassRose.addSelectionListener(_layerSelectionListener);
          }
          {
             /*
@@ -746,6 +757,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       _chkShowLayer_Building                 .setSelection(_mapApp.getLayer_Building_S3DB()              .isEnabled());
       _chkShowLayer_Building_Shadow          .setSelection(_mapApp.getLayer_Building_IsShadow() == Bool.TRUE);
       _chkShowLayer_Cartography              .setSelection(_mapApp.getLayer_BaseMap()                    .isEnabled());
+      _chkShowLayer_CompassRose              .setSelection(_mapApp.getLayer_CompassRose()                .isEnabled());
       _chkShowLayer_Hillshading              .setSelection(_mapApp.getLayer_HillShading()                .isEnabled());
       _chkShowLayer_Label                    .setSelection(_mapApp.getLayer_Label()                      .isEnabled());
       _chkShowLayer_Label_IsBeforeBuilding   .setSelection(_mapApp.getLayer_Label_IsBeforeBuilding());
@@ -767,7 +779,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 // SET_FORMATTING_OFF
 
 //      _mapApp.getLayer_OpenGLTest()    .setEnabled(_chkShowLayer_OpenGLTest.getSelection());
-
+      _mapApp.getLayer_CompassRose().setEnabled(_chkShowLayer_CompassRose.getSelection());
       _mapApp.getLayer_BaseMap()       .setEnabled(_chkShowLayer_Cartography.getSelection());
       _mapApp.getLayer_HillShading()   .setEnabled(_chkShowLayer_Hillshading.getSelection());
 
