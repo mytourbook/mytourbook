@@ -6,16 +6,14 @@ body:
   - type: markdown
     attributes:
       value: |
-        Examples for AREA:
+        Thanks for taking the time to fill out this bug report!
+        
+        Examples for **AREA**
           - FIT Import
+          - Tour Chart
           - Tour Editor
           - 2D Map
-          - Tour Chart
           - ...
-  - type: markdown
-    attributes:
-      value: |
-        Thanks for taking the time to fill out this bug report!
   - type: textarea
     id: what-happened
     attributes:
