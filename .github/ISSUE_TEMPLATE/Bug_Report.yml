@@ -5,8 +5,13 @@ labels: ["Bug"]
 body:
   - type: markdown
     attributes:
-      value: "Examples for AREA: |
-        * FIT Import"
+      value: |
+        Examples for AREA:
+          - FIT Import
+          - Tour Editor
+          - 2D Map
+          - Tour Chart
+          - ...
   - type: markdown
     attributes:
       value: |
