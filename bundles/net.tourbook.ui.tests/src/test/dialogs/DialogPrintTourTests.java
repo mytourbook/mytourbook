@@ -64,7 +64,7 @@ public class DialogPrintTourTests {
 
       //Kill Acrobat Reader otherwise it could make the subsequent tests fail
       try {
-         final Process toto = Runtime.getRuntime().exec("taskkill /F /IM Acro*.exe"); //$NON-NLS-1$
+         final Process toto = Runtime.getRuntime().exec("taskkill /F /IM Acro*"); //$NON-NLS-1$
          bot.sleep(3000);
          assertEquals(toto.exitValue(), 0);
          assertEquals(toto.pid(), 12);
