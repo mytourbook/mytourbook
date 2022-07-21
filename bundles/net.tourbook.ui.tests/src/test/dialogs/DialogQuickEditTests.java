@@ -30,6 +30,8 @@ public class DialogQuickEditTests {
    @Test
    void testEditWeatherDescription() {
 
+      bot.activeShell();
+
       Utils.showTourBookView(bot);
 
       final SWTBotTreeItem tour = Utils.getTour(bot);
