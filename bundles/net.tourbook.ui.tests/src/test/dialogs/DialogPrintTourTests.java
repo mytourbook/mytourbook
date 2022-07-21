@@ -43,7 +43,7 @@ public class DialogPrintTourTests {
               text(process.parent().map(ProcessHandle::pid)),
               text(process.info().user()),
               text(process.info().startInstant()),
-              text(process.info().commandLine()));
+            text(process.info().command()));
   }
 
   private static String text(final Optional<?> optional) {
