@@ -1,0 +1,27 @@
+name: Feature Request
+description: Request a new Feature
+title: "[FR]: "
+labels: ["Enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this Feature Request!
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  - type: textarea
+    id: what-missed
+    attributes:
+      label: What is missing?
+      description: Tell us youre ideas
+      placeholder: Tell us what you like!
+      value: 
+    validations:
+      required: true
+ 
