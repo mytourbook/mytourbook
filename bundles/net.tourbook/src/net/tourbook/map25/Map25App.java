@@ -201,7 +201,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private OsmTileLayerMT          _layer_BaseMap;
    private S3DBLayer               _layer_Building_S3DB;
    private GenericLayer            _layer_Building_S3DB_SunUpdate;
-   private CompassRoseLayer     _layer_CompassRose;
+   private CompassRoseLayer         _layer_CompassRose;
    private Layer                   _layer_HillShading_AFTER;
    private BitmapTileLayer         _layer_HillShading_TILE_LOADING;
    private LabelLayerMT            _layer_Label;
