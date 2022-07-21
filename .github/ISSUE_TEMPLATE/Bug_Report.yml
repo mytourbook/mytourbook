@@ -25,6 +25,14 @@ body:
       placeholder: 22.xx
     validations:
       required: true
+  - type: input
+    id: os
+    attributes:
+      label: System
+      description: What operating system are you using?
+      placeholder: Windows, Linux
+    validations:
+      required: true
   - type: textarea
     id: logs
     attributes:
