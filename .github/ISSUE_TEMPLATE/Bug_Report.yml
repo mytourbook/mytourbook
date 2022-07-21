@@ -1,12 +1,16 @@
 name: Bug Report
 description: File a bug report
-title: "[Bug : CATEGORY] "
+title: "[Bug : AREA] "
 labels: ["Bug"]
-# assignees: ""
 body:
   - type: markdown
     attributes:
-      value: "## Welcome!"
+      value: Examples for AREA: |
+        * FIT Import
+        * Tour Editor
+        * 2D Map
+        * Tour Chart
+        * ...
   - type: markdown
     attributes:
       value: |
@@ -17,7 +21,6 @@ body:
       label: What happened ?
       description: Also tell us, what did you expect to happen?
       placeholder: Tell us what you see!
-      # value: "A bug happened!"
     validations:
       required: true
   - type: input
