@@ -2517,9 +2517,14 @@ public class TourMapPainter extends Map2Painter {
                                      final Rectangle legendBounds,
                                      final int valueIndex) {
 
-      if (_dataSerie == null || valueIndex >= _dataSerie.length || //
-      // check legend provider type
-            _legendProvider instanceof IGradientColorProvider == false//
+      if (_dataSerie == null
+
+            || valueIndex < 0
+            || valueIndex >= _dataSerie.length
+
+            // check legend provider type
+            || _legendProvider instanceof IGradientColorProvider == false
+
       ) {
          return Integer.MIN_VALUE;
       }
