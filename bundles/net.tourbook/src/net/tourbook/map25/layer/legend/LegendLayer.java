@@ -80,6 +80,10 @@ public class LegendLayer extends Layer {
 
    public void updateLegend(final List<TourData> allTourData) {
 
+      if (allTourData == null) {
+         return;
+      }
+
       _allTourData = allTourData;
 
       // check if layer is visible
