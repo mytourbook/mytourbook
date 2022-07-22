@@ -42,15 +42,16 @@ public class DownloadSRTM3 {
     * Prefix used to identify redirects to URS for the purpose of adding authentication headers. For
     * test, this should be: https://uat.urs.earthdata.nasa.gov for test
     */
-   private static final String           HTTP_URS_EARTHDATA_NASA_GOV = "https://urs.earthdata.nasa.gov"; //$NON-NLS-1$
+   private static final String           HTTP_URS_EARTHDATA_NASA_GOV = "https://urs.earthdata.nasa.gov";                              //$NON-NLS-1$
 
    /**
     * SRTM example file
-    * http://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/N13E016.SRTMGL3.hgt.zip
+    * https://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/N13E016.SRTMGL3.hgt.zip
     */
-   private static final String           URL_BASE_PATH               = "http://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/"; //$NON-NLS-1$
+   private static final String           URL_BASE_PATH               = "https://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/"; //$NON-NLS-1$
 
-   private static final int              MAX_REDIRECTS               = 10;
+   private static final int              CONNECTION_TIMEOUT          = 5000;
+   private static final int              MAX_REDIRECTS               = 5;
    private static final int              MAX_REDIRECTED_LOGS         = MAX_REDIRECTS + 5;
 
    private static int                    _numRedirectedLogs;
@@ -118,6 +119,7 @@ public class DownloadSRTM3 {
          connection.setInstanceFollowRedirects(false);
          connection.setUseCaches(false);
          connection.setDoInput(true);
+         connection.setConnectTimeout(CONNECTION_TIMEOUT);
 
          /*
           * If this is the URS server, add in the authentication header.
