@@ -1976,6 +1976,8 @@ public class Messages extends NLS {
    public static String        Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle;
    public static String        Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle_Tooltip;
 
+   public static String        Slideout_Map25Layer_Checkbox_Cartography_IsLuminance;
+   public static String        Slideout_Map25Layer_Checkbox_Cartography_IsLuminance_Tooltip;
    public static String        Slideout_Map25Layer_Checkbox_Layer_3DBuilding;
    public static String        Slideout_Map25Layer_Checkbox_Layer_Building_IsShowShadow;
    public static String        Slideout_Map25Layer_Checkbox_Layer_Cartography;
@@ -1993,8 +1995,6 @@ public class Messages extends NLS {
    public static String        Slideout_Map25Layer_Decorator_Cartography;
    public static String        Slideout_Map25Layer_Label_BuildingMinZoomLevel;
    public static String        Slideout_Map25Layer_Label_BuildingMinZoomLevel_Tooltip;
-   public static String        Slideout_Map25Layer_Label_CartographyLuminance;
-   public static String        Slideout_Map25Layer_Label_CartographyLuminance_Tooltip;
    public static String        Slideout_Map25Layer_Label_MapLayer;
    public static String        Slideout_Map25Layer_Label_SelectedSunTime_Tooltip;
    public static String        Slideout_Map25Layer_Label_SunPosition;

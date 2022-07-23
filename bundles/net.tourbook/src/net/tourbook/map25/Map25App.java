@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -132,6 +133,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private static final String     STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL           = "STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL";          //$NON-NLS-1$
    private static final String     STATE_LAYER_BUILDING_SUN_DAY_TIME             = "STATE_LAYER_BUILDING_SUN_DAY_TIME";            //$NON-NLS-1$
    private static final String     STATE_LAYER_BUILDING_SUN_RISE_SET_TIME        = "STATE_LAYER_BUILDING_SUN_RISE_SET_TIME";       //$NON-NLS-1$
+   private static final String     STATE_LAYER_CARTOGRAPHY_IS_LUMINANCE          = "STATE_LAYER_CARTOGRAPHY_IS_LUMINANCE";         //$NON-NLS-1$
    private static final String     STATE_LAYER_CARTOGRAPHY_LUMINANCE             = "STATE_LAYER_CARTOGRAPHY_LUMINANCE";            //$NON-NLS-1$
    private static final String     STATE_LAYER_LABEL_IS_VISIBLE                  = "STATE_LAYER_LABEL_IS_VISIBLE";                 //$NON-NLS-1$
    private static final String     STATE_LAYER_LABEL_IS_BEFORE_BUILDING          = "STATE_LAYER_LABEL_IS_BEFORE_BUILDING";         //$NON-NLS-1$
@@ -192,8 +194,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private SunDayTime              _currentBuilding_SunDayTime;
    private float                   _currentBuilding_Sunrise_Sunset_Time;
    //
+   private boolean                 _cartography_IsLuminance;
    private float                   _cartography_Luminance;
-   private float                   _currentCartography_Luminance;
+   private RuleVisitor_Luminance   _ruleVisitor_Luminance                        = new RuleVisitor_Luminance();
    //
    private boolean                 _layer_Label_IsVisible;
    private boolean                 _layer_Label_IsBeforeBuilding;
@@ -265,77 +268,46 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       IS_ONLINE, IS_OFFLINE
    }
 
-   private static class RuleVisitor_Luminence extends RuleVisitor {
+   private class RuleVisitor_Luminance extends RuleVisitor {
 
+      /**
+       * Original colors are cached that the styles must not be reloaded because they are
+       * overwritten when dimmed !!!
+       * <p>
+       * <li>1. Style hashcode</li>
+       * <li>2. Original color</li>
+       */
+      private HashMap<Integer, Integer> __originalStyleColors = new HashMap<>();
 
-//      private int   __counter;
-      private float __cartographyLuminance;
+      private float                     __cartography_Luminance;
 
-      public RuleVisitor_Luminence(final float cartographyLuminance) {
+      public boolean                    __isUseOriginalColor;
 
-         __cartographyLuminance = cartographyLuminance;
-      }
+      public RuleVisitor_Luminance() {}
 
       @Override
       public void apply(final Rule rule) {
 
-//         final boolean isRuleLogged = false;
-//
-//         final String ruleLog = ""
-//               + " " + rule.getClass().getSimpleName()
-//               + " " + ++__counter
-//               + " ";
-//
-//         String name = "";
-//         String color = "";
-//         String hash = "";
-
          for (final RenderStyle<?> style : rule.styles) {
-
-//            boolean isLogStyle = false;
 
             if (style instanceof AreaStyle) {
 
-//               isLogStyle = true;
-//
-//               final AreaStyle areaStyle = (AreaStyle) (style);
-//               name = String.format("%-20s", areaStyle.style);
-//               color = String.format("%08X", areaStyle.color & 0xFFFF_FFFF);
-//               hash = Integer.toString(areaStyle.hashCode());
-
-               setFieldValue(style, "color", __cartographyLuminance);
+               setFieldValue(style, "color", __cartography_Luminance);
+               setFieldValue(style, "blendColor", __cartography_Luminance);
 
             } else if (style instanceof LineStyle) {
 
-//               isLogStyle = true;
-//
-//               final LineStyle lineStyle = (LineStyle) (style);
-//               name = String.format("%-20s", lineStyle.style);
-//               color = String.format("%08X", lineStyle.color & 0xFFFF_FFFF);
-//               hash = Integer.toString(lineStyle.hashCode());
-
-               setFieldValue(style, "color", __cartographyLuminance);
-               setFieldValue(style, "stippleColor", __cartographyLuminance);
+               setFieldValue(style, "color", __cartography_Luminance);
+               setFieldValue(style, "stippleColor", __cartography_Luminance);
             }
-
-//            if (isLogStyle) {
-//
-//               if (isRuleLogged == false) {
-//                  isRuleLogged = true;
-//                  System.out.println(ruleLog);
-//                  // TODO remove SYSTEM.OUT.PRINTLN
-//               }
-//
-//               System.out.println((""
-//                     + "                              " + style.getClass().getSimpleName()
-//                     + "    " + name
-//                     + " " + color
-//                     + " " + hash
-//                     + " "));
-//            }
          }
 
          super.apply(rule);
+      }
+
+      private void clearColorCache() {
+
+         __originalStyleColors.clear();
       }
 
       private int getAdjustedColor(final int fillColor, final float luminance) {
@@ -347,19 +319,25 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
          if (luminance >= 0) {
 
-            // color is brighter
+            // >= 0 --> color is brighter
 
-            red = (int) (red * luminance);
-            green = (int) (green * luminance);
-            blue = (int) (blue * luminance);
+            final float redDiff = 0xff - red;
+            final float greenDiff = 0xff - green;
+            final float blueDiff = 0xff - blue;
+
+            red = (int) (red + luminance * redDiff);
+            green = (int) (green + luminance * greenDiff);
+            blue = (int) (blue + luminance * blueDiff);
 
          } else {
 
-            // color is darker
+            // < 0 --> color is darker
 
-            red = (int) (red * luminance);
-            green = (int) (green * luminance);
-            blue = (int) (blue * luminance);
+            final float luminance01 = 1 + luminance;
+
+            red = (int) (red * luminance01);
+            green = (int) (green * luminance01);
+            blue = (int) (blue * luminance01);
          }
 
          final int fillColorAdjusted = 0
@@ -381,17 +359,44 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
        */
       private void setFieldValue(final RenderStyle<?> style, final String fieldName, final float colorBrightness) {
 
-         final int styleHashCode = style.hashCode();
-
          try {
 
-            final Field colorField = style.getClass().getField(fieldName);
+            final Field styleColorField = style.getClass().getField(fieldName);
 
-            final int colorValue = colorField.getInt(style);
-            final int colorValue_Adjusted = getAdjustedColor(colorValue, colorBrightness);
+            final int colorHashCode = style.hashCode() + fieldName.hashCode();
 
-            colorField.setAccessible(true);
-            colorField.setInt(style, colorValue_Adjusted);
+            final Integer originalCachedColor = __originalStyleColors.get(colorHashCode);
+
+            int fieldColor;
+
+            if (originalCachedColor == null) {
+
+               // no cached color -> get color from the style
+
+               final int styleColorValue = styleColorField.getInt(style);
+
+               // keep original color
+               __originalStyleColors.put(colorHashCode, styleColorValue);
+
+               fieldColor = styleColorValue;
+
+            } else {
+
+               // use cached color
+
+               fieldColor = originalCachedColor;
+            }
+
+            final int fieldColor_Adjusted = __isUseOriginalColor
+
+                  // ignore luminance
+                  ? fieldColor
+
+                  // compute luminance color
+                  : getAdjustedColor(fieldColor, colorBrightness);
+
+            styleColorField.setAccessible(true);
+            styleColorField.setInt(style, fieldColor_Adjusted);
 
          } catch (NoSuchFieldException
                | SecurityException
@@ -1048,6 +1053,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return _building_Sunrise_Sunset_Time;
    }
 
+   public boolean getLayer_Cartography_IsLuminance() {
+      return _cartography_IsLuminance;
+   }
+
    public float getLayer_Cartography_Luminance() {
       return _cartography_Luminance;
    }
@@ -1075,10 +1084,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    public ItemizedLayer getLayer_MapBookmark() {
       return _layer_MapBookmark_VARYING;
    }
-
-//   public OpenGLTestLayer getLayer_OpenGLTest() {
-//      return _layer_OpenGLTest;
-//   }
 
    public ItemizedLayer getLayer_Photo() {
       return _layer_Photo_VARYING;
@@ -1394,7 +1399,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _building_IsShowShadow           = (Bool)       Util.getStateEnum(_state, STATE_LAYER_BUILDING_IS_SHOW_SHADOW,    Bool.TRUE);
       _building_SunDaytime             = (SunDayTime) Util.getStateEnum(_state, STATE_LAYER_BUILDING_SUN_DAY_TIME,      SunDayTime.CURRENT_TIME);
 
-      _cartography_Luminance           = Util.getStateFloat(            _state, STATE_LAYER_CARTOGRAPHY_LUMINANCE,      0);
+      _cartography_IsLuminance         = Util.getStateBoolean( _state, STATE_LAYER_CARTOGRAPHY_IS_LUMINANCE,   false) ;
+      _cartography_Luminance           = Util.getStateFloat(   _state, STATE_LAYER_CARTOGRAPHY_LUMINANCE,      0);
 
       _layer_Label_IsVisible           = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_VISIBLE,           true) ;
       _layer_Label_IsBeforeBuilding    = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_BEFORE_BUILDING,   true) ;
@@ -1436,6 +1442,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _state.put(STATE_MAP_CENTER_VERTICAL_POSITION,                 _mapCenter_VerticalPosition);
 
       // cartography
+      _state.put(STATE_LAYER_CARTOGRAPHY_IS_LUMINANCE,               _cartography_IsLuminance);
       _state.put(STATE_LAYER_CARTOGRAPHY_LUMINANCE,                  _cartography_Luminance);
 
       // building
@@ -1486,7 +1493,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       final RenderTheme modifiedRenderTheme = (RenderTheme) renderTheme;
 
       modifiedRenderTheme.traverseRules(new RuleVisitor_MinZoom(_building_MinZoomLevel));
-
       modifiedRenderTheme.updateStyles();
    }
 
@@ -1544,8 +1550,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       }
    }
 
-   public void setLayer_Cartography_Options(final float luminance) {
+   public void setLayer_Cartography_Options(final boolean isLuminance, final float luminance) {
 
+      _cartography_IsLuminance = isLuminance;
       _cartography_Luminance = luminance;
    }
 
@@ -1580,6 +1587,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     */
    public void setMapProvider(final Map25Provider mapProvider) {
 
+      /*
+       * Reset style colors
+       */
+
+      // clear cached colors
+      _ruleVisitor_Luminance.clearColorCache();
+
+      /*
+       * Set map provider
+       */
       _selectedMapProvider = mapProvider;
 
       if (mapProvider.tileEncoding == TileEncoding.MF) {
@@ -1642,6 +1659,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          mMap.setTheme(loadedRenderTheme, false);
 
          setLayer_Building_MinZoomLevel(loadedRenderTheme);
+         updateLayer_Cartography();
       }
    }
 
@@ -1757,11 +1775,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       }
 
       /*
-       * Adjust building min zoom level
+       * Adjust style values
        */
       if (isThemeSet) {
 
          setLayer_Building_MinZoomLevel(iRenderTheme);
+         updateLayer_Cartography();
       }
    }
 
@@ -1914,40 +1933,35 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    private void updateLayer_Cartography() {
 
-      // TODO Auto-generated method stub
-
-      // check if cartography has changed
-      if (_cartography_Luminance == _currentCartography_Luminance) {
-
-         return;
-      }
-
       if (_layer_BaseMap.isEnabled() == false) {
-
          return;
       }
 
       // luminance is modified
 
-      // keep state to compare it the next time
-      _currentCartography_Luminance = _cartography_Luminance;
-
       final IRenderTheme mapTheme = _layer_BaseMap.getTheme();
 
       if (mapTheme instanceof RenderTheme) {
 
+         if (_cartography_IsLuminance) {
+
+            // set luminance value
+
+            _ruleVisitor_Luminance.__isUseOriginalColor = false;
+            _ruleVisitor_Luminance.__cartography_Luminance = _cartography_Luminance;
+
+         } else {
+
+            // ignore luminance
+
+            _ruleVisitor_Luminance.__isUseOriginalColor = true;
+         }
+
          final RenderTheme renderTheme = (RenderTheme) mapTheme;
 
-         renderTheme.traverseRules(new RuleVisitor_Luminence(_cartography_Luminance));
+         renderTheme.traverseRules(_ruleVisitor_Luminance);
          renderTheme.updateStyles();
-
-//         // force update
-//         _currentOffOnline = null;
-//
-//         // this is necessarry that the new zoom level is applied, otherwise it do not work
-//         setMapProvider(_selectedMapProvider);
       }
-
    }
 
    private void updateLayer_Label() {
