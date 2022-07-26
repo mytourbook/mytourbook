@@ -526,6 +526,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    private int                                        _descriptionNumLines;
 
+   /**
+    * Number of lines for the weather description text.
+    */
+   private int                                        _weatherDescriptionNumLines;
+
    private final NumberFormat                         _nfLatLon                       = NumberFormat.getNumberInstance();
 
    private TourData                                   _tourData;
@@ -8749,19 +8754,25 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       fireTourIsModified();
    }
 
-   void updateUI_DescriptionNumLines(final int numLines) {
+   void updateUI_DescriptionNumLines(final int numTourDescriptionLines,
+                                     final int numWeatherDescriptionLines) {
 
-      if (numLines == _descriptionNumLines) {
+      if (numTourDescriptionLines == _descriptionNumLines ||
+            numWeatherDescriptionLines == _weatherDescriptionNumLines) {
 
          // nothing has changed
          return;
       }
 
-      _descriptionNumLines = numLines;
+      _descriptionNumLines = numTourDescriptionLines;
+      _weatherDescriptionNumLines = numWeatherDescriptionLines;
 
-      // update layout
+      // update layouts
       final GridData gd = (GridData) _txtDescription.getLayoutData();
       gd.heightHint = _pc.convertHeightInCharsToPixels(_descriptionNumLines);
+
+      final GridData weatherGridData = (GridData) _txtWeather.getLayoutData();
+      weatherGridData.heightHint = _pc.convertHeightInCharsToPixels(_weatherDescriptionNumLines);
 
       onResizeTab1();
    }

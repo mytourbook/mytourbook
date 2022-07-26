@@ -266,16 +266,20 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
    private void onSelect_NumDescriptionLines() {
 
-      _state.put(TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES, _spinnerTourDescriptionNumLines.getSelection());
-      _state.put(TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES, _spinnerWeatherDescriptionNumLines.getSelection());
+      final int tourDescriptionNumberOfLines = _spinnerTourDescriptionNumLines.getSelection();
+      final int weatherDescriptionNumberOfLines = _spinnerWeatherDescriptionNumLines.getSelection();
 
-      _tourEditorView.updateUI_DescriptionNumLines(numLines);
+      _state.put(TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES, tourDescriptionNumberOfLines);
+      _state.put(TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES, weatherDescriptionNumberOfLines);
+
+      _tourEditorView.updateUI_DescriptionNumLines(tourDescriptionNumberOfLines, weatherDescriptionNumberOfLines);
    }
 
    @Override
    public void resetToDefaults() {
 
       final int descriptionNumberOfLines = TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT;
+      final int weatherDescriptionNumberOfLines = TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT;
       final int latLonDigits = TourDataEditorView.STATE_LAT_LON_DIGITS_DEFAULT;
       final boolean isRecomputeElevation = TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT;
 
@@ -287,9 +291,10 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       // update UI
       _chkRecomputeElevation.setSelection(isRecomputeElevation);
       _spinnerTourDescriptionNumLines.setSelection(descriptionNumberOfLines);
+      _spinnerWeatherDescriptionNumLines.setSelection(weatherDescriptionNumberOfLines);
       _spinnerLatLonDigits.setSelection(latLonDigits);
 
-      _tourEditorView.updateUI_DescriptionNumLines(descriptionNumberOfLines);
+      _tourEditorView.updateUI_DescriptionNumLines(descriptionNumberOfLines, weatherDescriptionNumberOfLines);
       _tourEditorView.updateUI_LatLonDigits(latLonDigits);
    }
 
@@ -302,6 +307,10 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _spinnerTourDescriptionNumLines.setSelection(Util.getStateInt(_state,
             TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES,
             TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT));
+
+      _spinnerWeatherDescriptionNumLines.setSelection(Util.getStateInt(_state,
+            TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES,
+            TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT));
 
       _spinnerLatLonDigits.setSelection(Util.getStateInt(_state,
             TourDataEditorView.STATE_LAT_LON_DIGITS,
