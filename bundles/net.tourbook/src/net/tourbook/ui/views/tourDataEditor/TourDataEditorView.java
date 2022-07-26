@@ -521,12 +521,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private int                                        _latLonDigits;
 
    /**
-    * Number of lines for the description text.
+    * Number of lines for the tour's description text.
     */
    private int                                        _descriptionNumLines;
 
    /**
-    * Number of lines for the weather description text.
+    * Number of lines for the weather's description text.
     */
    private int                                        _weatherDescriptionNumLines;
 
