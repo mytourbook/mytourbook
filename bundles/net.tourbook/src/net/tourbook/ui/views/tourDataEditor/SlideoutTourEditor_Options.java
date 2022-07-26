@@ -188,8 +188,8 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
          // label
          final Label label = new Label(parent, SWT.NONE);
-         label.setText(Messages.pref_tour_editor_description_height);
-         label.setToolTipText(Messages.pref_tour_editor_description_height_tooltip);
+         label.setText(Messages.Pref_Tour_Editor_WeatherDescription_Height);
+         label.setToolTipText(Messages.Pref_Tour_Editor_WeatherDescription_Height_Tooltip);
          GridDataFactory.fillDefaults()
                .align(SWT.FILL, SWT.CENTER)
                .applyTo(label);
