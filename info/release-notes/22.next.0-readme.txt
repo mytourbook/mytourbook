@@ -47,6 +47,9 @@ Improvements
 * Weather (Frederic)
   - Added a drizzle weather icon          https://github.com/mytourbook/mytourbook/issues/874
 
+* Tour Editor (Frederic)
+  - Added the ability to change the weather description's number of lines https://github.com/mytourbook/mytourbook/issues/897
+
 
 Changes
 =======
