@@ -249,6 +249,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES            = "STATE_DESCRIPTION_NUMBER_OF_LINES";                    //$NON-NLS-1$
    static final int                      STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT    = 3;
+   static final String                   STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES         = "STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES";             //$NON-NLS-1$
+   //TODO FB
+   static final int                      STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT = 3;
    static final String                   STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN         = "STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN";                 //$NON-NLS-1$
    static final boolean                  STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT = true;
    static final String                   STATE_LAT_LON_DIGITS                         = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
@@ -707,7 +710,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutTourEditor_Options(_pageBook, toolbar, _state, TourDataEditorView.this);
+         return new SlideoutTourEditor_Options(_pageBook, toolbar, TourDataEditorView.this);
       }
    }
 
