@@ -528,7 +528,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    /**
     * Number of lines for the weather's description text.
     */
-   private int                                        _weatherDescriptionNumLines;
+   private int                                        weatherDescriptionNumLines;
 
    private final NumberFormat                         _nfLatLon                       = NumberFormat.getNumberInstance();
 
@@ -4060,7 +4060,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   .span(2, 1)
-                  .hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(_weatherDescriptionNumLines))
+                  .hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(weatherDescriptionNumLines))
                   .applyTo(_txtWeather);
          }
          {
@@ -7907,7 +7907,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       setup_LatLonDigits();
 
       _descriptionNumLines = Util.getStateInt(_state, STATE_DESCRIPTION_NUMBER_OF_LINES, STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT);
-      _weatherDescriptionNumLines = Util.getStateInt(_state,
+      weatherDescriptionNumLines = Util.getStateInt(_state,
             STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES,
             STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT);
    }
@@ -8760,21 +8760,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                                      final int numWeatherDescriptionLines) {
 
       if (numTourDescriptionLines == _descriptionNumLines &&
-            numWeatherDescriptionLines == _weatherDescriptionNumLines) {
+            numWeatherDescriptionLines == weatherDescriptionNumLines) {
 
          // nothing has changed
          return;
       }
 
       _descriptionNumLines = numTourDescriptionLines;
-      _weatherDescriptionNumLines = numWeatherDescriptionLines;
+      weatherDescriptionNumLines = numWeatherDescriptionLines;
 
       // update layouts
       final GridData gd = (GridData) _txtDescription.getLayoutData();
       gd.heightHint = _pc.convertHeightInCharsToPixels(_descriptionNumLines);
 
       final GridData weatherGridData = (GridData) _txtWeather.getLayoutData();
-      weatherGridData.heightHint = _pc.convertHeightInCharsToPixels(_weatherDescriptionNumLines);
+      weatherGridData.heightHint = _pc.convertHeightInCharsToPixels(weatherDescriptionNumLines);
 
       onResizeTab1();
    }
