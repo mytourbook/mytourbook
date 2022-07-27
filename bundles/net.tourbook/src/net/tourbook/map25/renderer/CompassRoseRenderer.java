@@ -41,6 +41,10 @@ public class CompassRoseRenderer extends BucketRenderer {
 
    private MarkerToolkit _compassRoseToolkit = new MarkerToolkit(MarkerShape.COMPASS);
 
+//   private GLViewport.Position position            = GLViewport.Position.TOP_LEFT;
+//   private GLMatrix            _tempMatrix         = new GLMatrix();
+//   private MapPosition         _mapPosition        = new MapPosition();
+
    public CompassRoseRenderer(final Layer compassRoseLayer, final int compassSize) {
       super();
 

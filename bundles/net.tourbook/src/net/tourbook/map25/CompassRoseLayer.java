@@ -27,5 +27,6 @@ public class CompassRoseLayer extends Layer {
       super(map);
 
       mRenderer = new CompassRoseRenderer(this, compassSize);
+
    }
 }
