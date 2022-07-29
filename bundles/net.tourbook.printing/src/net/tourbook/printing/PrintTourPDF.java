@@ -159,6 +159,7 @@ public class PrintTourPDF extends PrintTourExtension {
             transformer.transform(xmlSource, res);
 
             // launch the pdf file (will only work if the user has a registered pdf viewer installed)
+            //TODO FB make it optional in the preference
             Program.launch(printSettings.getCompleteFilePath());
 
             try {
