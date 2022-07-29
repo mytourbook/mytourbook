@@ -4060,6 +4060,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             GridDataFactory.fillDefaults()
                   .grab(true, true)
                   .span(2, 1)
+                  //
+                  // SWT.DEFAULT causes lots of problems with the layout therefore the hint is set
+                  //
                   .hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(weatherDescriptionNumLines))
                   .applyTo(_txtWeather);
          }
