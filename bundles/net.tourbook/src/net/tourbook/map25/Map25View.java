@@ -164,6 +164,7 @@ public class Map25View extends ViewPart implements
    private static final String           STATE_IS_LAYER_HILLSHADING_VISIBLE      = "STATE_IS_LAYER_HILLSHADING_VISIBLE";         //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_LEGEND_VISIBLE           = "STATE_IS_LAYER_LEGEND_VISIBLE";              //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_MARKER_VISIBLE           = "STATE_IS_LAYER_MARKER_VISIBLE";              //$NON-NLS-1$
+   private static final String           STATE_IS_LAYER_COMPASS_ROSE_VISIBLE     = "STATE_IS_LAYER_COMPASS_ROSE_VISIBLE";        //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_SATELLITE_VISIBLE        = "STATE_IS_LAYER_SATELLITE_VISIBLE";           //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_SCALE_BAR_VISIBLE        = "STATE_IS_LAYER_SCALE_BAR_VISIBLE";           //$NON-NLS-1$
    private static final String           STATE_IS_LAYER_TILE_INFO_VISIBLE        = "STATE_IS_LAYER_TILE_INFO_VISIBLE";           //$NON-NLS-1$
@@ -1875,6 +1876,7 @@ public class Map25View extends ViewPart implements
       _map25App.getLayer_BaseMap()           .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BASE_MAP_VISIBLE,     true));
 
       // other layers
+      _map25App.getLayer_CompassRose()      .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_COMPASS_ROSE_VISIBLE, false));
       _map25App.getLayer_MapBookmark()      .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_BOOKMARK_VISIBLE,      true));
       _map25App.getLayer_Legend()           .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_LEGEND_VISIBLE,        true));
       _map25App.getLayer_ScaleBar()         .setEnabled(Util.getStateBoolean(_state, STATE_IS_LAYER_SCALE_BAR_VISIBLE,     true));
@@ -1987,6 +1989,7 @@ public class Map25View extends ViewPart implements
 
       // other layers
       _state.put(STATE_IS_LAYER_BOOKMARK_VISIBLE,     _map25App.getLayer_MapBookmark().isEnabled());
+      _state.put(STATE_IS_LAYER_COMPASS_ROSE_VISIBLE, _map25App.getLayer_CompassRose().isEnabled());
       _state.put(STATE_IS_LAYER_LEGEND_VISIBLE,       _map25App.getLayer_Legend().isEnabled());
       _state.put(STATE_IS_LAYER_MARKER_VISIBLE,       _map25App.getLayer_TourMarker().isEnabled());
       _state.put(STATE_IS_LAYER_SATELLITE_VISIBLE,    _map25App.getLayer_Satellite().isEnabled());

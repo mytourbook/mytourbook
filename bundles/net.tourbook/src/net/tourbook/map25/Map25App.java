@@ -40,6 +40,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
+import net.tourbook.map25.layer.compassrose.CompassRoseLayer;
 import net.tourbook.map25.layer.labeling.LabelLayerMT;
 import net.tourbook.map25.layer.legend.LegendLayer;
 import net.tourbook.map25.layer.marker.MapMarker;
@@ -204,6 +205,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private OsmTileLayerMT          _layer_BaseMap;
    private S3DBLayer               _layer_Building_S3DB;
    private GenericLayer            _layer_Building_S3DB_SunUpdate;
+   private CompassRoseLayer        _layer_CompassRose;
    private Layer                   _layer_HillShading_AFTER;
    private BitmapTileLayer         _layer_HillShading_TILE_LOADING;
    private LabelLayerMT            _layer_Label;
@@ -233,7 +235,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private float           _offline_UserScale = 2.50f;
    private float           _online_TextScale  = 0.50f;
    private float           _online_UserScale  = 2.0f;
-
+   //
    private OffOnline       _currentOffOnline;
    private TileSource      _currentOnline_TileSource;
    private TileEncoding    _currentOnline_TileSource_Encoding;
@@ -871,6 +873,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_Legend = new LegendLayer(mMap);
       _layer_Legend.setEnabled(false);
 
+      // compassrose
+      _layer_CompassRose = new CompassRoseLayer(mMap);
+      _layer_CompassRose.setEnabled(false);
+
       /*
        * Add all layers
        */
@@ -887,6 +893,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       allMapLayer.add(_layer_TourMarker);
       allMapLayer.add(_layer_Photo_VARYING);
       allMapLayer.add(_layer_SliderLocation);
+      allMapLayer.add(_layer_CompassRose);
       allMapLayer.add(_layer_ScaleBar);
       allMapLayer.add(_layer_Legend);
       allMapLayer.add(_layer_TileInfo);
@@ -1059,6 +1066,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    public float getLayer_Cartography_Luminance() {
       return _cartography_Luminance;
+   }
+
+   public CompassRoseLayer getLayer_CompassRose() {
+      return _layer_CompassRose;
    }
 
    public BitmapTileLayer getLayer_HillShading() {

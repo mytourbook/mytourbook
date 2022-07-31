@@ -86,6 +86,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
    private Button            _chkShowLayer_Cartography;
    private Button            _chkShowLayer_Cartography_IsLuminance;
+   private Button            _chkShowLayer_CompassRose;
    private Button            _chkShowLayer_Building;
    private Button            _chkShowLayer_Building_Shadow;
    private Button            _chkShowLayer_Hillshading;
@@ -356,6 +357,15 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
                   });
                }
             }
+         }
+         {
+            /*
+             * CompassRose layer
+             */
+            _chkShowLayer_CompassRose = new Button(container, SWT.CHECK);
+            _chkShowLayer_CompassRose.setText(Messages.Slideout_Map25Layer_Checkbox_Layer_CompassRose);
+            _chkShowLayer_CompassRose.addSelectionListener(_layerSelectionListener);
+            _chkShowLayer_CompassRose.setToolTipText(Messages.Slideout_Map25Layer_Checkbox_Layer_CompassRose_Tooltip);
          }
          {
             /*
@@ -786,6 +796,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       _chkShowLayer_Building_Shadow          .setSelection(_mapApp.getLayer_Building_IsShadow() == Bool.TRUE);
       _chkShowLayer_Cartography              .setSelection(_mapApp.getLayer_BaseMap()                    .isEnabled());
       _chkShowLayer_Cartography_IsLuminance  .setSelection(_mapApp.getLayer_Cartography_IsLuminance());
+      _chkShowLayer_CompassRose              .setSelection(_mapApp.getLayer_CompassRose()                .isEnabled());
       _chkShowLayer_Hillshading              .setSelection(_mapApp.getLayer_HillShading()                .isEnabled());
       _chkShowLayer_Label                    .setSelection(_mapApp.getLayer_Label()                      .isEnabled());
       _chkShowLayer_Label_IsBeforeBuilding   .setSelection(_mapApp.getLayer_Label_IsBeforeBuilding());
@@ -808,13 +819,13 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 // SET_FORMATTING_OFF
 
 //      _mapApp.getLayer_OpenGLTest()    .setEnabled(_chkShowLayer_OpenGLTest.getSelection());
-
       _mapApp.getLayer_BaseMap()       .setEnabled(_chkShowLayer_Cartography.getSelection());
       _mapApp.getLayer_HillShading()   .setEnabled(_chkShowLayer_Hillshading.getSelection());
 
       // satellite maps
       _mapApp.getLayer_Satellite()     .setEnabled(_chkShowLayer_Satellite.getSelection());
 
+      _mapApp.getLayer_CompassRose()   .setEnabled(_chkShowLayer_CompassRose.getSelection());
       _mapApp.getLayer_Label()         .setEnabled(_chkShowLayer_Label.getSelection());
       _mapApp.getLayer_Legend()        .setEnabled(_chkShowLayer_Legend.getSelection());
       _mapApp.getLayer_ScaleBar()      .setEnabled(_chkShowLayer_Scale.getSelection());
