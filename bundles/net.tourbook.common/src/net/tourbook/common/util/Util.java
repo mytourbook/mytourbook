@@ -221,7 +221,7 @@ public class Util {
 
    /**
     * @param os
-    * @return Returns <code>false</code> when an exception occures.
+    * @return Returns <code>false</code> when an exception occurs.
     */
    public static boolean close(final OutputStream os) {
 
@@ -294,7 +294,7 @@ public class Util {
 
    /**
     * @param text
-    * @return Returns MD5 for the text or <code>null</code> when an error occures.
+    * @return Returns MD5 for the text or <code>null</code> when an error occurs.
     */
    public static String computeMD5(final String text) {
 
