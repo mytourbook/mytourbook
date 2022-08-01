@@ -99,7 +99,6 @@ public class CompassRoseRenderer extends BucketRenderer {
 
       viewport.getMapPosition(_mapPosition);
 
-      final GLMatrix mvpMatrix = viewport.mvp;
 
       final int viewportWidth = (int) getClassField(viewport, "mWidth");
       final int viewportHeight = (int) getClassField(viewport, "mHeight");
@@ -113,11 +112,21 @@ public class CompassRoseRenderer extends BucketRenderer {
 
       final float invScale = 1f / COORD_SCALE;
 
-      final float tiltScale = 0.9f;
+      final float mapBearing = _mapPosition.bearing;
       final float mapTilt = _mapPosition.tilt;
+
+      // flip when looking map from the underground
+      final float imageBearing = mapTilt <= 90
+            ? mapBearing
+            : (180 - mapBearing);
+
+      // tilt the compass rose less than the map
+      final float tiltScale = 0.9f;
       final float imageTilt = mapTilt <= 90
             ? mapTilt * tiltScale
             : (180 - mapTilt) * tiltScale;
+
+      final GLMatrix mvpMatrix = viewport.mvp;
 
       // set matrix: set it's scale
       mvpMatrix.setScale(invScale, invScale, 1);
@@ -127,7 +136,7 @@ public class CompassRoseRenderer extends BucketRenderer {
       mvpMatrix.multiplyLhs(_tempMatrix);
 
       // multiply: rotate: bearing
-      _tempMatrix.setRotation(_mapPosition.bearing, 0f, 0f, 1f);
+      _tempMatrix.setRotation(imageBearing, 0f, 0f, 1f);
       mvpMatrix.multiplyLhs(_tempMatrix);
 
       // multiply: rotate: tilt
