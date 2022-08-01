@@ -13,7 +13,7 @@ Bundle-ClassPath:
  commons-logging-1.2.jar,
  jaxb-api-2.4.0-b180830.0359.jar,
  jaxb-runtime-4.0.0.jar,
- istack-commons-runtime-4.0.0.jar,
+ istack-commons-runtime-4.1.1.jar,
  activation-1.1.1.jar
 Export-Package: 
  javax.xml.bind,
