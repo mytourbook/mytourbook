@@ -61,7 +61,7 @@ public class PrintTourPDF extends PrintTourExtension {
    private DialogPrintTour     dpt;
 
    /**
-    * plugin extension constructor
+    * Plugin extension constructor
     */
    public PrintTourPDF() {
 
@@ -101,29 +101,26 @@ public class PrintTourPDF extends PrintTourExtension {
          throws FileNotFoundException, FOPException, TransformerException {
 
       boolean canWriteFile = true;
-      FileOutputStream pdfContentStream = null;
-      BufferedOutputStream pdfContent = null;
 
-      try {
-         // setup pdf outpoutStream
-         final File pdfFile = new File(printSettings.getCompleteFilePath());
+      // setup pdf outputStream
+      final File pdfFile = new File(printSettings.getCompleteFilePath());
 
-         if (pdfFile.exists()) {
-            if (printSettings.isOverwriteFiles()) {
-               // overwrite is enabled in the UI
-            } else {
-               final FileCollisionBehavior fileCollisionBehaviour = new FileCollisionBehavior();
-               canWriteFile = net.tourbook.ui.UI.confirmOverwrite(fileCollisionBehaviour, pdfFile);
+      if (pdfFile.exists() && !printSettings.isOverwriteFiles()) {
 
-               if (fileCollisionBehaviour.value == FileCollisionBehavior.DIALOG_IS_CANCELED) {
-                  return;
-               }
-            }
+         // overwrite is enabled in the UI
+         final FileCollisionBehavior fileCollisionBehaviour = new FileCollisionBehavior();
+         canWriteFile = net.tourbook.ui.UI.confirmOverwrite(fileCollisionBehaviour, pdfFile);
+
+         if (fileCollisionBehaviour.value == FileCollisionBehavior.DIALOG_IS_CANCELED) {
+            return;
          }
+      }
+
+      BufferedOutputStream pdfContent = null;
+      try (FileOutputStream pdfContentStream = new FileOutputStream(pdfFile)) {
 
          if (canWriteFile) {
 
-            pdfContentStream = new FileOutputStream(pdfFile);
             pdfContent = new BufferedOutputStream(pdfContentStream);
 
             // setup xml input source
@@ -174,7 +171,7 @@ public class PrintTourPDF extends PrintTourExtension {
             transformer.transform(xmlSource, res);
 
             if (printSettings.isOpenFile()) {
-               // launch the pdf file (will only work if the user has a registered pdf viewer installed)
+               // launch the PDF file (will only work if the user has a registered PDF viewer installed)
                Program.launch(printSettings.getCompleteFilePath());
             }
 
