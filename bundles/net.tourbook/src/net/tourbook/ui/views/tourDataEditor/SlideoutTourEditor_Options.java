@@ -65,9 +65,9 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
    private Button    _chkRecomputeElevation;
 
-   private Spinner   spinnerTourDescriptionNumLines;
-   private Spinner   spinnerWeatherDescriptionNumLines;
    private Spinner   _spinnerLatLonDigits;
+   private Spinner   _spinnerTourDescriptionNumLines;
+   private Spinner   _spinnerWeatherDescriptionNumLines;
 
    public SlideoutTourEditor_Options(final Control ownerControl,
                                      final ToolBar toolBar,
@@ -171,15 +171,15 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
                .applyTo(label);
 
          // spinner
-         spinnerTourDescriptionNumLines = new Spinner(parent, SWT.BORDER);
-         spinnerTourDescriptionNumLines.setMinimum(1);
-         spinnerTourDescriptionNumLines.setMaximum(100);
-         spinnerTourDescriptionNumLines.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_NumDescriptionLines()));
-         spinnerTourDescriptionNumLines.addMouseWheelListener(mouseEvent -> {
+         _spinnerTourDescriptionNumLines = new Spinner(parent, SWT.BORDER);
+         _spinnerTourDescriptionNumLines.setMinimum(1);
+         _spinnerTourDescriptionNumLines.setMaximum(100);
+         _spinnerTourDescriptionNumLines.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_NumDescriptionLines()));
+         _spinnerTourDescriptionNumLines.addMouseWheelListener(mouseEvent -> {
             UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
             onSelect_NumDescriptionLines();
          });
-         spinnerGridData.applyTo(spinnerTourDescriptionNumLines);
+         spinnerGridData.applyTo(_spinnerTourDescriptionNumLines);
       }
       {
          /*
@@ -195,15 +195,15 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
                .applyTo(label);
 
          // spinner
-         spinnerWeatherDescriptionNumLines = new Spinner(parent, SWT.BORDER);
-         spinnerWeatherDescriptionNumLines.setMinimum(1);
-         spinnerWeatherDescriptionNumLines.setMaximum(100);
-         spinnerWeatherDescriptionNumLines.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_NumDescriptionLines()));
-         spinnerWeatherDescriptionNumLines.addMouseWheelListener(mouseEvent -> {
+         _spinnerWeatherDescriptionNumLines = new Spinner(parent, SWT.BORDER);
+         _spinnerWeatherDescriptionNumLines.setMinimum(1);
+         _spinnerWeatherDescriptionNumLines.setMaximum(100);
+         _spinnerWeatherDescriptionNumLines.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_NumDescriptionLines()));
+         _spinnerWeatherDescriptionNumLines.addMouseWheelListener(mouseEvent -> {
             UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
             onSelect_NumDescriptionLines();
          });
-         spinnerGridData.applyTo(spinnerWeatherDescriptionNumLines);
+         spinnerGridData.applyTo(_spinnerWeatherDescriptionNumLines);
       }
       {
          /*
@@ -266,8 +266,8 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
    private void onSelect_NumDescriptionLines() {
 
-      final int tourDescriptionNumberOfLines = spinnerTourDescriptionNumLines.getSelection();
-      final int weatherDescriptionNumberOfLines = spinnerWeatherDescriptionNumLines.getSelection();
+      final int tourDescriptionNumberOfLines = _spinnerTourDescriptionNumLines.getSelection();
+      final int weatherDescriptionNumberOfLines = _spinnerWeatherDescriptionNumLines.getSelection();
 
       _state.put(TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES, tourDescriptionNumberOfLines);
       _state.put(TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES, weatherDescriptionNumberOfLines);
@@ -290,9 +290,9 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
       // update UI
       _chkRecomputeElevation.setSelection(isRecomputeElevation);
-      spinnerTourDescriptionNumLines.setSelection(descriptionNumberOfLines);
-      spinnerWeatherDescriptionNumLines.setSelection(weatherDescriptionNumberOfLines);
       _spinnerLatLonDigits.setSelection(latLonDigits);
+      _spinnerTourDescriptionNumLines.setSelection(descriptionNumberOfLines);
+      _spinnerWeatherDescriptionNumLines.setSelection(weatherDescriptionNumberOfLines);
 
       _tourEditorView.updateUI_DescriptionNumLines(descriptionNumberOfLines, weatherDescriptionNumberOfLines);
       _tourEditorView.updateUI_LatLonDigits(latLonDigits);
@@ -304,17 +304,17 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
             TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,
             TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT));
 
-      spinnerTourDescriptionNumLines.setSelection(Util.getStateInt(_state,
-            TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES,
-            TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT));
-
-      spinnerWeatherDescriptionNumLines.setSelection(Util.getStateInt(_state,
-            TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES,
-            TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT));
-
       _spinnerLatLonDigits.setSelection(Util.getStateInt(_state,
             TourDataEditorView.STATE_LAT_LON_DIGITS,
             TourDataEditorView.STATE_LAT_LON_DIGITS_DEFAULT));
+
+      _spinnerTourDescriptionNumLines.setSelection(Util.getStateInt(_state,
+            TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES,
+            TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT));
+
+      _spinnerWeatherDescriptionNumLines.setSelection(Util.getStateInt(_state,
+            TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES,
+            TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT));
    }
 
    private void saveState() {
