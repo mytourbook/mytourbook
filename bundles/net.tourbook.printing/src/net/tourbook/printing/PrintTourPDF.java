@@ -55,9 +55,7 @@ import org.xml.sax.SAXException;
  */
 public class PrintTourPDF extends PrintTourExtension {
 
-   private static final String TOURDATA_2_FO_XSL = "/printing-templates/tourdata2fo.xsl";                  //$NON-NLS-1$
-
-   private final FopFactory    _fopFactory       = FopFactory.newInstance(new File(UI.SYMBOL_DOT).toURI());
+   private static final String TOURDATA_2_FO_XSL = "/printing-templates/tourdata2fo.xsl"; //$NON-NLS-1$
 
    private DialogPrintTour     dpt;
 
@@ -103,7 +101,7 @@ public class PrintTourPDF extends PrintTourExtension {
 
       boolean canWriteFile = true;
 
-      // setup pdf outputStream
+      // setup PDF outputStream
       final File pdfFile = new File(printSettings.getCompleteFilePath());
 
       if (pdfFile.exists() && !printSettings.isOverwriteFiles()) {
@@ -125,7 +123,7 @@ public class PrintTourPDF extends PrintTourExtension {
 
             pdfContent = new BufferedOutputStream(pdfContentStream);
 
-            // setup xml input source
+            // setup XML input source
             final String xml = object.toXml();
 
 //				  // debug logging
@@ -140,7 +138,7 @@ public class PrintTourPDF extends PrintTourExtension {
 //				  	e.printStackTrace();
 //				  }
 
-            // prepare xsl file for transformation
+            // prepare XSL file for transformation
             final ClassLoader classLoader = getClass().getClassLoader();
             final InputStream xslFile = classLoader.getResourceAsStream(TOURDATA_2_FO_XSL);
 
@@ -153,7 +151,7 @@ public class PrintTourPDF extends PrintTourExtension {
                e.printStackTrace();
             }
 
-            // setup xsl stylesheet source
+            // setup XSL stylesheet source
             final StreamSource xslSource = new StreamSource(xslFile);
 
             // get transformer
@@ -161,9 +159,10 @@ public class PrintTourPDF extends PrintTourExtension {
             final Transformer transformer = tfactory.newTransformer(xslSource);
 
             // setup FOP
-            final FOUserAgent foUserAgent = _fopFactory.newFOUserAgent();
+            final FopFactory fopFactory = FopFactory.newInstance(new File(UI.SYMBOL_DOT).toURI());
+            final FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
             foUserAgent.setProducer(this.getClass().getName());
-            final Fop fop = _fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, pdfContent);
+            final Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, pdfContent);
 
             setTranslationParameters(transformer);
             setTransformationParameters((TourData) object, transformer, printSettings);
@@ -197,64 +196,64 @@ public class PrintTourPDF extends PrintTourExtension {
             tourEndIndex);
       dpt.open();
 
-      // hardcoded pdf output path for development
+      // hardcoded PDF output path for development
       // final File pdfFile = new File(_printOutputPath, "tourdata_" + System.currentTimeMillis() + ".pdf");
    }
 
    /**
-    * configures parameters used in the xsl transformation
+    * configures parameters used in the XSL transformation
     *
-    * @param _tourData
-    * @param _transformer
+    * @param tourData
+    * @param transformer
     */
-   private void setTransformationParameters(final TourData _tourData,
-                                            final Transformer _transformer,
-                                            final PrintSettings _printSettings) {
+   private void setTransformationParameters(final TourData tourData,
+                                            final Transformer transformer,
+                                            final PrintSettings printSettings) {
 
-      _transformer.setParameter("isPrintMarkers", _printSettings.isPrintMarkers()); //$NON-NLS-1$
-      _transformer.setParameter("isPrintDescription", _printSettings.isPrintDescription()); //$NON-NLS-1$
+      transformer.setParameter("isPrintMarkers", printSettings.isPrintMarkers()); //$NON-NLS-1$
+      transformer.setParameter("isPrintDescription", printSettings.isPrintDescription()); //$NON-NLS-1$
 
-      _transformer.setParameter("paperSize", _printSettings.getPaperSize().toString()); //$NON-NLS-1$
-      _transformer.setParameter("paperOrientation", _printSettings.getPaperOrientation().toString()); //$NON-NLS-1$
+      transformer.setParameter("paperSize", printSettings.getPaperSize().toString()); //$NON-NLS-1$
+      transformer.setParameter("paperOrientation", printSettings.getPaperOrientation().toString()); //$NON-NLS-1$
 
-      _transformer.setParameter("startDate", formatStartDate(_tourData)); //$NON-NLS-1$
+      transformer.setParameter("startDate", formatStartDate(tourData)); //$NON-NLS-1$
 
-      _transformer.setParameter("unitAltitude", Double.valueOf(UI.UNIT_VALUE_ELEVATION)); //$NON-NLS-1$
-      _transformer.setParameter("unitDistance", Double.valueOf(UI.UNIT_VALUE_DISTANCE)); //$NON-NLS-1$
-      _transformer.setParameter("unitTemperature", UI.UNIT_VALUE_TEMPERATURE); //$NON-NLS-1$
-      _transformer.setParameter("unitLabelDistance", UI.UNIT_LABEL_DISTANCE); //$NON-NLS-1$
-      _transformer.setParameter("unitLabelSpeed", UI.UNIT_LABEL_SPEED); //$NON-NLS-1$
-      _transformer.setParameter("unitLabelAltitude", UI.UNIT_LABEL_ELEVATION); //$NON-NLS-1$
-      _transformer.setParameter("unitLabelTemperature", UI.UNIT_LABEL_TEMPERATURE); //$NON-NLS-1$
-      _transformer.setParameter("unitLabelHeartBeat", net.tourbook.ui.Messages.Value_Unit_Pulse); //$NON-NLS-1$
-      _transformer.setParameter("unitLabelCadence", net.tourbook.ui.Messages.Value_Unit_Cadence); //$NON-NLS-1$
-      _transformer.setParameter("unitLabelCalories", net.tourbook.ui.Messages.Value_Unit_Calories); //$NON-NLS-1$
+      transformer.setParameter("unitAltitude", Double.valueOf(UI.UNIT_VALUE_ELEVATION)); //$NON-NLS-1$
+      transformer.setParameter("unitDistance", Double.valueOf(UI.UNIT_VALUE_DISTANCE)); //$NON-NLS-1$
+      transformer.setParameter("unitTemperature", UI.UNIT_VALUE_TEMPERATURE); //$NON-NLS-1$
+      transformer.setParameter("unitLabelDistance", UI.UNIT_LABEL_DISTANCE); //$NON-NLS-1$
+      transformer.setParameter("unitLabelSpeed", UI.UNIT_LABEL_SPEED); //$NON-NLS-1$
+      transformer.setParameter("unitLabelAltitude", UI.UNIT_LABEL_ELEVATION); //$NON-NLS-1$
+      transformer.setParameter("unitLabelTemperature", UI.UNIT_LABEL_TEMPERATURE); //$NON-NLS-1$
+      transformer.setParameter("unitLabelHeartBeat", net.tourbook.ui.Messages.Value_Unit_Pulse); //$NON-NLS-1$
+      transformer.setParameter("unitLabelCadence", net.tourbook.ui.Messages.Value_Unit_Cadence); //$NON-NLS-1$
+      transformer.setParameter("unitLabelCalories", net.tourbook.ui.Messages.Value_Unit_Calories); //$NON-NLS-1$
    }
 
-   private void setTranslationParameters(final Transformer _transformer) {
+   private void setTranslationParameters(final Transformer transformer) {
 
-      _transformer.setParameter("lang.Tour_Print_PageTitle", Messages.Tour_Print_PageTitle); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Tour", Messages.Tour_Print_Tour); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Start", Messages.Tour_Print_Start); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Start_Location", Messages.Tour_Print_Start_Location); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_End_Location", Messages.Tour_Print_End_Location); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Time_Distance_Speed", Messages.Tour_Print_Time_Distance_Speed); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Tour_Time", Messages.Tour_Print_Tour_Time); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Tour_Pausing_Time", Messages.Tour_Print_Tour_Pausing_Time); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Tour_Moving_Time", Messages.Tour_Print_Tour_Moving_Time); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Distance", Messages.Tour_Print_Distance); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Maximum_Speed", Messages.Tour_Print_Maximum_Speed); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Personal", Messages.Tour_Print_Personal); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Rest_Pulse", Messages.Tour_Print_Rest_Pulse); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Maximum_Pulse", Messages.Tour_Print_Maximum_Pulse); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Average_Pulse", Messages.Tour_Print_Average_Pulse); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Calories", Messages.Tour_Print_Calories); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Average_Cadence", Messages.Tour_Print_Average_Cadence); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Altitude", Messages.Tour_Print_Altitude); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Highest_Altitude", Messages.Tour_Print_Highest_Altitude); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Meters_Up", Messages.Tour_Print_Meters_Up); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Meters_Down", Messages.Tour_Print_Meters_Down); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_Tour_Markers", Messages.Tour_Print_Tour_Markers); //$NON-NLS-1$
-      _transformer.setParameter("lang.Tour_Print_No_Markers_Found", Messages.Tour_Print_No_Markers_Found); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_PageTitle", Messages.Tour_Print_PageTitle); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Tour", Messages.Tour_Print_Tour); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Start", Messages.Tour_Print_Start); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Start_Location", Messages.Tour_Print_Start_Location); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_End_Location", Messages.Tour_Print_End_Location); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Time_Distance_Speed", Messages.Tour_Print_Time_Distance_Speed); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Tour_Time", Messages.Tour_Print_Tour_Time); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Tour_Pausing_Time", Messages.Tour_Print_Tour_Pausing_Time); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Tour_Moving_Time", Messages.Tour_Print_Tour_Moving_Time); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Distance", Messages.Tour_Print_Distance); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Maximum_Speed", Messages.Tour_Print_Maximum_Speed); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Personal", Messages.Tour_Print_Personal); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Rest_Pulse", Messages.Tour_Print_Rest_Pulse); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Maximum_Pulse", Messages.Tour_Print_Maximum_Pulse); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Average_Pulse", Messages.Tour_Print_Average_Pulse); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Calories", Messages.Tour_Print_Calories); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Average_Cadence", Messages.Tour_Print_Average_Cadence); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Altitude", Messages.Tour_Print_Altitude); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Highest_Altitude", Messages.Tour_Print_Highest_Altitude); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Meters_Up", Messages.Tour_Print_Meters_Up); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Meters_Down", Messages.Tour_Print_Meters_Down); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_Tour_Markers", Messages.Tour_Print_Tour_Markers); //$NON-NLS-1$
+      transformer.setParameter("lang.Tour_Print_No_Markers_Found", Messages.Tour_Print_No_Markers_Found); //$NON-NLS-1$
    }
 }
