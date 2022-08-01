@@ -30,6 +30,7 @@ import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.xmlgraphics.util.MimeConstants;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Display;
 import org.xml.sax.SAXException;
 
@@ -157,9 +158,10 @@ public class PrintTourPDF extends PrintTourExtension {
             final Result res = new SAXResult(fop.getDefaultHandler());
             transformer.transform(xmlSource, res);
 
-            // launch the pdf file (will only work if the user has a registered pdf viewer installed)
-            //TODO FB make it optional in the preference
-            // Program.launch(printSettings.getCompleteFilePath());
+            if (printSettings.isOpenFile()) {
+               // launch the pdf file (will only work if the user has a registered pdf viewer installed)
+               Program.launch(printSettings.getCompleteFilePath());
+            }
 
             try {
                xslFile.close();

@@ -83,6 +83,7 @@ public class DialogPrintTour extends TitleAreaDialog {
    private static final String[]         PAPER_SIZE_ITEMS;
    private static final String[]         PAPER_ORIENTATION_ITEMS;
 
+   private static final String           STATE_IS_OPEN_FILE       = "isOpenFile";               //$NON-NLS-1$
    private static final String           STATE_IS_PRINT_MARKERS   = "isPrintMarkers";           //$NON-NLS-1$
    private static final String           STATE_IS_PRINT_NOTES     = "isPrintNotes";             //$NON-NLS-1$
 
@@ -132,6 +133,7 @@ public class DialogPrintTour extends TitleAreaDialog {
    private Point                    _shellDefaultSize;
    private Composite                _dlgContainer;
 
+   private Button                   _chkOpenFile;
    private Button                   _chkPrintMarkers;
    private Button                   _chkPrintNotes;
 
@@ -392,7 +394,19 @@ public class DialogPrintTour extends TitleAreaDialog {
       {
          createUIOptionPrintMarkers(group);
          createUIOptionPrintNotes(group);
+         createUIOptionOpenFile(group);
       }
+   }
+
+   private void createUIOptionOpenFile(final Composite parent) {
+
+      /*
+       * Checkbox: Open file in PDF reader
+       */
+      _chkOpenFile = new Button(parent, SWT.CHECK);
+      GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_chkOpenFile);
+      _chkOpenFile.setText(Messages.Dialog_Print_Chk_OpenFile);
+      _chkOpenFile.setToolTipText(Messages.Dialog_Print_Chk_OpenFile_Tooltip);
    }
 
    private void createUIOptionPrintMarkers(final Composite parent) {
@@ -520,6 +534,7 @@ public class DialogPrintTour extends TitleAreaDialog {
          break;
       }
 
+      printSettings.setOpenFile(_chkOpenFile.getSelection());
       printSettings.setOverwriteFiles(_chkOverwriteFiles.getSelection());
       printSettings.setPrintMarkers(_chkPrintMarkers.getSelection());
       printSettings.setPrintDescription(_chkPrintNotes.getSelection());
@@ -704,6 +719,7 @@ public class DialogPrintTour extends TitleAreaDialog {
          _comboPaperOrientation.select(0);
       }
 
+      _chkOpenFile.setSelection(_state.getBoolean(STATE_IS_OPEN_FILE));
       _chkPrintMarkers.setSelection(_state.getBoolean(STATE_IS_PRINT_MARKERS));
       _chkPrintNotes.setSelection(_state.getBoolean(STATE_IS_PRINT_NOTES));
 
@@ -723,6 +739,7 @@ public class DialogPrintTour extends TitleAreaDialog {
          _state.put(STATE_PRINT_FILE_NAME, getUniqueItems(_comboFile.getItems(), getPrintFileName()));
       }
 
+      _state.put(STATE_IS_OPEN_FILE, _chkOpenFile.getSelection());
       _state.put(STATE_IS_OVERWRITE_FILES, _chkOverwriteFiles.getSelection());
       _state.put(STATE_IS_PRINT_MARKERS, _chkPrintMarkers.getSelection());
       _state.put(STATE_IS_PRINT_NOTES, _chkPrintNotes.getSelection());
