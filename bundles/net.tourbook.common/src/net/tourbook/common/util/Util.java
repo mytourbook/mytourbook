@@ -170,7 +170,7 @@ public class Util {
    }
 
    /**
-    * Clear all selection providers in all workench pages.
+    * Clear all selection providers in all workbench pages.
     */
    public static void clearSelection() {
 
