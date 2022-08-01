@@ -57,8 +57,6 @@ public class PrintTourPDF extends PrintTourExtension {
 
    private static final String TOURDATA_2_FO_XSL = "/printing-templates/tourdata2fo.xsl"; //$NON-NLS-1$
 
-   private DialogPrintTour     dpt;
-
    /**
     * Plugin extension constructor
     */
@@ -188,7 +186,7 @@ public class PrintTourPDF extends PrintTourExtension {
    @Override
    public void printTours(final ArrayList<TourData> tourDataList, final int tourStartIndex, final int tourEndIndex) {
 
-      dpt = new DialogPrintTour(
+      final DialogPrintTour dpt = new DialogPrintTour(
             Display.getCurrent().getActiveShell(),
             this,
             tourDataList,
