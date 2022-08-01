@@ -18,7 +18,6 @@ package net.tourbook.printing;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -38,7 +37,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.tour.printing.PrintTourExtension;
 import net.tourbook.ui.ImageComboLabel;
 
-import org.apache.fop.apps.FOPException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -499,7 +497,7 @@ public class DialogPrintTour extends TitleAreaDialog {
             new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.Dialog_Print_Error_Title, exception)));
    }
 
-   private void doPrint() throws IOException, FOPException, TransformerException {
+   private void doPrint() throws TransformerException {
 
       // disable button's
       getButton(IDialogConstants.OK_ID).setEnabled(false);
@@ -590,7 +588,7 @@ public class DialogPrintTour extends TitleAreaDialog {
                      printSettings.setCompleteFilePath(filePath.toOSString());
                      try {
                         ((PrintTourPDF) _printExtensionPoint).printPDF(tourData, printSettings);
-                     } catch (final FileNotFoundException | FOPException | TransformerException e) {
+                     } catch (final TransformerException e) {
                         e.printStackTrace();
                         displayErrorMessage(e);
                      }

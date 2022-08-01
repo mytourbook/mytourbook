@@ -35,6 +35,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.IXmlSerializable;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.printing.PrintTourExtension;
@@ -70,13 +71,13 @@ public class PrintTourPDF extends PrintTourExtension {
    /**
     * formats tour startDate and startTime according to the preferences
     *
-    * @param _tourData
+    * @param tourData
     * @return
     */
-   private String formatStartDate(final TourData _tourData) {
+   private String formatStartDate(final TourData tourData) {
 
-      final ZonedDateTime dtTourStart = _tourData.getTourStartTime();
-      final ZonedDateTime dtTourEnd = dtTourStart.plusSeconds(_tourData.getTourDeviceTime_Elapsed());
+      final ZonedDateTime dtTourStart = tourData.getTourStartTime();
+      final ZonedDateTime dtTourEnd = dtTourStart.plusSeconds(tourData.getTourDeviceTime_Elapsed());
 
       return String.format(
             net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime,
@@ -98,7 +99,7 @@ public class PrintTourPDF extends PrintTourExtension {
     * @throws TransformerException
     */
    public void printPDF(final IXmlSerializable object, final PrintSettings printSettings)
-         throws FileNotFoundException, FOPException, TransformerException {
+         throws TransformerException {
 
       boolean canWriteFile = true;
 
@@ -117,8 +118,9 @@ public class PrintTourPDF extends PrintTourExtension {
       }
 
       BufferedOutputStream pdfContent = null;
-      try (FileOutputStream pdfContentStream = new FileOutputStream(pdfFile)) {
+      try {
 
+         final FileOutputStream pdfContentStream = new FileOutputStream(pdfFile);
          if (canWriteFile) {
 
             pdfContent = new BufferedOutputStream(pdfContentStream);
@@ -175,22 +177,12 @@ public class PrintTourPDF extends PrintTourExtension {
                Program.launch(printSettings.getCompleteFilePath());
             }
 
-            try {
-               xslFile.close();
-            } catch (final IOException e) {
-               e.printStackTrace();
-            }
+            Util.close(xslFile);
          }
       } catch (final SAXException | IOException e) {
          e.printStackTrace();
       } finally {
-         if (pdfContent != null) {
-            try {
-               pdfContent.close();
-            } catch (final IOException e) {
-               e.printStackTrace();
-            }
-         }
+         Util.close(pdfContent);
       }
    }
 
