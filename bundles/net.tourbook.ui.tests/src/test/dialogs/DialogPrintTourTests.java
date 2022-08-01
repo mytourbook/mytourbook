@@ -52,7 +52,6 @@ public class DialogPrintTourTests {
       /**
        * TODO FB
        * Print Improvements:
-       * - french mnemonic "I" has a conflict
        * - option to not open the pdf after saving the file (it would fix the unit tests!)
        * - issue when printing emojis in pdf like a checkbox....it is printed as #
        */
