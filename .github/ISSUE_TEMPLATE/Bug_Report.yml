@@ -31,12 +31,15 @@ body:
       placeholder: 22.xx
     validations:
       required: true
-  - type: input
+  - type: dropdown
     id: os
     attributes:
       label: System
       description: What operating system are you using?
-      placeholder: Windows, Linux
+      options: 
+        - Windows
+        - Linux
+        - OSX
     validations:
       required: true
   - type: textarea
