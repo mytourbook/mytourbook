@@ -107,6 +107,7 @@ public class PrintTourPDF extends PrintTourExtension {
 
       if (pdfFile.exists() && !printSettings.isOverwriteFiles()) {
 
+         // overwrite is not enabled in the UI
          final FileCollisionBehavior fileCollisionBehaviour = new FileCollisionBehavior();
          canWriteFile = net.tourbook.ui.UI.confirmOverwrite(fileCollisionBehaviour, pdfFile);
 
