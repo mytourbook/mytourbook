@@ -32,9 +32,9 @@ public class TourTagsViewTests {
 
       Utils.getTour(bot);
 
-      Utils.showView(bot, "Tour Tags");
+      Utils.showView(bot, "Tour Tags"); //$NON-NLS-1$
 
-      final SWTBotTreeItem tag = bot.tree(1).getTreeItem("Shoes 2").select();
+      final SWTBotTreeItem tag = bot.tree(1).getTreeItem("Shoes 2").select(); //$NON-NLS-1$
       assertNotNull(tag);
    }
 }

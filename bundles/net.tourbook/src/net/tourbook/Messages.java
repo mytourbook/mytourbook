@@ -1755,6 +1755,8 @@ public class Messages extends NLS {
    public static String        Pref_Tour_Dialog_TourCacheIsModified_Title;
    public static String        pref_tour_editor_description_height;
    public static String        pref_tour_editor_description_height_tooltip;
+   public static String        Pref_Tour_Editor_WeatherDescription_Height;
+   public static String        Pref_Tour_Editor_WeatherDescription_Height_Tooltip;
    public static String        Pref_Tour_Group_FailedUpdates;
    public static String        Pref_Tour_Group_TourCache;
    public static String        Pref_Tour_Label_FailedUpdateInfo;
@@ -1976,10 +1978,14 @@ public class Messages extends NLS {
    public static String        Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle;
    public static String        Slideout_LinkWithOtherViews_Label_Title_Checkbox_IsShowTourTitle_Tooltip;
 
+   public static String        Slideout_Map25Layer_Checkbox_Cartography_IsLuminance;
+   public static String        Slideout_Map25Layer_Checkbox_Cartography_IsLuminance_Tooltip;
    public static String        Slideout_Map25Layer_Checkbox_Layer_3DBuilding;
    public static String        Slideout_Map25Layer_Checkbox_Layer_Building_IsShowShadow;
    public static String        Slideout_Map25Layer_Checkbox_Layer_Cartography;
    public static String        Slideout_Map25Layer_Checkbox_Layer_Cartography_Tooltip;
+   public static String        Slideout_Map25Layer_Checkbox_Layer_CompassRose;
+   public static String        Slideout_Map25Layer_Checkbox_Layer_CompassRose_Tooltip;
    public static String        Slideout_Map25Layer_Checkbox_Layer_Hillshading;
    public static String        Slideout_Map25Layer_Checkbox_Layer_LabelSymbol;
    public static String        Slideout_Map25Layer_Checkbox_Layer_LabelSymbol_IsBehindBuilding;

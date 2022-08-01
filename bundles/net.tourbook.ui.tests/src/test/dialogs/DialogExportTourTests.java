@@ -15,7 +15,7 @@
  *******************************************************************************/
 package dialogs;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,7 +39,7 @@ public class DialogExportTourTests {
 
       final SWTBotTreeItem tour = Utils.getTour(bot);
 
-      tour.contextMenu(Messages.action_export_tour).menu("GPX").click();
+      tour.contextMenu(Messages.action_export_tour).menu("GPX").click(); //$NON-NLS-1$
 
       bot.checkBox(Messages.Dialog_Export_Checkbox_Description).click();
       bot.checkBox(Messages.dialog_export_chk_exportMarkers).click();
@@ -49,7 +49,7 @@ public class DialogExportTourTests {
       bot.checkBox(Messages.Dialog_Export_Checkbox_WithBarometer).click();
       bot.checkBox(Messages.dialog_export_chk_overwriteFiles).click();
 
-      final String fileName = bot.comboBox(0).getText() + ".gpx";
+      final String fileName = bot.comboBox(0).getText() + ".gpx"; //$NON-NLS-1$
       bot.comboBox(1).setText(Utils.workingDirectory);
       bot.button(Messages.dialog_export_btn_export).click();
 
@@ -65,8 +65,8 @@ public class DialogExportTourTests {
 
       final SWTBotTreeItem tour = Utils.getTour(bot);
 
-      tour.contextMenu(Messages.action_export_tour).menu("MyTourbook (.mt)").click();
-      final String fileName = bot.comboBox(0).getText() + ".mt";
+      tour.contextMenu(Messages.action_export_tour).menu("MyTourbook (.mt)").click(); //$NON-NLS-1$
+      final String fileName = bot.comboBox(0).getText() + ".mt"; //$NON-NLS-1$
       bot.comboBox(1).setText(Utils.workingDirectory);
       bot.button(Messages.dialog_export_btn_export).click();
 
@@ -82,12 +82,12 @@ public class DialogExportTourTests {
 
       final SWTBotTreeItem tour = Utils.getTour(bot);
 
-      tour.contextMenu(Messages.action_export_tour).menu("TCX").click();
+      tour.contextMenu(Messages.action_export_tour).menu("TCX").click(); //$NON-NLS-1$
       bot.radio(Messages.Dialog_Export_Radio_TCX_Activities).click();
       bot.checkBox(Messages.dialog_export_chk_exportNotes).click();
       bot.checkBox(Messages.dialog_export_chk_camouflageSpeed).click();
 
-      final String fileName = bot.comboBox(2).getText() + ".tcx";
+      final String fileName = bot.comboBox(2).getText() + ".tcx"; //$NON-NLS-1$
       bot.comboBox(3).setText(Utils.workingDirectory);
       bot.button(Messages.dialog_export_btn_export).click();
 

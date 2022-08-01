@@ -228,7 +228,7 @@ public class VertexDataMT extends Inlist.List<Chunk> {
       } else {
 
          if (_currentChunk.next != null) {
-            throw new IllegalStateException("seeeked...");
+            throw new IllegalStateException("seeeked..."); //$NON-NLS-1$
          }
 
          _currentChunk._numChunkUsedVertices = SIZE;
@@ -258,7 +258,7 @@ public class VertexDataMT extends Inlist.List<Chunk> {
       _currentChunk._numChunkUsedVertices = _numUsedChunkVertices;
 
       if (_numUsedChunkVertices > SIZE || _numUsedChunkVertices < 0) {
-         throw new IllegalStateException("seeked too far: " + offset + "/" + _numUsedChunkVertices);
+         throw new IllegalStateException("seeked too far: " + offset + "/" + _numUsedChunkVertices); //$NON-NLS-1$ //$NON-NLS-2$
       }
    }
 }

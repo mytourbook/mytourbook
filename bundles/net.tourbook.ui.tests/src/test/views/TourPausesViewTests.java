@@ -29,8 +29,8 @@ public class TourPausesViewTests {
 
       Utils.getTour(bot);
 
-      Utils.showView(bot, "Tour Pauses");
+      Utils.showView(bot, "Tour Pauses"); //$NON-NLS-1$
 
-      bot.table().select("15:40");
+      bot.table().select("15:40"); //$NON-NLS-1$
    }
 }

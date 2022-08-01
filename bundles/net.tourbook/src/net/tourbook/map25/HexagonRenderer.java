@@ -88,36 +88,36 @@ public class HexagonRenderer extends BucketRenderer {
 
       _cellScale = 10 * COORD_SCALE;
 
-      final String VERTEXT_SHADER = ""
+      final String VERTEXT_SHADER = "" //$NON-NLS-1$
 
-            + "#ifdef GLES                                                    " + NL
-            + "precision mediump float;                                       " + NL
-            + "#endif                                                         " + NL
+            + "#ifdef GLES                                                    " + NL //$NON-NLS-1$
+            + "precision mediump float;                                       " + NL //$NON-NLS-1$
+            + "#endif                                                         " + NL //$NON-NLS-1$
 
-            + "uniform mat4 u_mvp;                                            " + NL
-            + "uniform vec2 u_center;                                         " + NL
-            + "attribute vec2 a_pos;                                          " + NL
+            + "uniform mat4 u_mvp;                                            " + NL //$NON-NLS-1$
+            + "uniform vec2 u_center;                                         " + NL //$NON-NLS-1$
+            + "attribute vec2 a_pos;                                          " + NL //$NON-NLS-1$
 
-            + "void main()                                                    " + NL
-            + "{                                                              " + NL
-            + "   gl_Position = u_mvp * vec4(u_center + a_pos, 0.0, 1.0);     " + NL
-            + "}                                                              " + NL
+            + "void main()                                                    " + NL //$NON-NLS-1$
+            + "{                                                              " + NL //$NON-NLS-1$
+            + "   gl_Position = u_mvp * vec4(u_center + a_pos, 0.0, 1.0);     " + NL //$NON-NLS-1$
+            + "}                                                              " + NL //$NON-NLS-1$
 
       ;
 
-      final String FRAGMENT_SHADER = ""
+      final String FRAGMENT_SHADER = "" //$NON-NLS-1$
 
-            + "#ifdef GLES                                                    " + NL
-            + "precision mediump float;                                       " + NL
-            + "#endif                                                         " + NL
+            + "#ifdef GLES                                                    " + NL //$NON-NLS-1$
+            + "precision mediump float;                                       " + NL //$NON-NLS-1$
+            + "#endif                                                         " + NL //$NON-NLS-1$
 
-            + "varying float alpha;                                           " + NL
-            + "uniform vec4 u_color;                                          " + NL
+            + "varying float alpha;                                           " + NL //$NON-NLS-1$
+            + "uniform vec4 u_color;                                          " + NL //$NON-NLS-1$
 
-            + "void main()                                                    " + NL
-            + "{                                                              " + NL
-            + "  gl_FragColor = u_color;                                      " + NL
-            + "}                                                              " + NL
+            + "void main()                                                    " + NL //$NON-NLS-1$
+            + "{                                                              " + NL //$NON-NLS-1$
+            + "  gl_FragColor = u_color;                                      " + NL //$NON-NLS-1$
+            + "}                                                              " + NL //$NON-NLS-1$
 
       ;
 
@@ -129,10 +129,10 @@ public class HexagonRenderer extends BucketRenderer {
       }
 
       // Handle for vertex position in shader
-      _shader_a_pos_VertexPosition = gl.getAttribLocation(programObject, "a_pos");
-      _shader_u_mvp_MatrixPosition = gl.getUniformLocation(programObject, "u_mvp");
-      _shader_u_color_ColorPosition = gl.getUniformLocation(programObject, "u_color");
-      _shader_u_center_CenterPosition = gl.getUniformLocation(programObject, "u_center");
+      _shader_a_pos_VertexPosition = gl.getAttribLocation(programObject, "a_pos"); //$NON-NLS-1$
+      _shader_u_mvp_MatrixPosition = gl.getUniformLocation(programObject, "u_mvp"); //$NON-NLS-1$
+      _shader_u_color_ColorPosition = gl.getUniformLocation(programObject, "u_color"); //$NON-NLS-1$
+      _shader_u_center_CenterPosition = gl.getUniformLocation(programObject, "u_center"); //$NON-NLS-1$
 
       // Store the program object
       _shaderProgram = programObject;
@@ -227,7 +227,7 @@ public class HexagonRenderer extends BucketRenderer {
          }
       }
 
-      GLUtils.checkGlError(getClass().getName() + ": render() end");
+      GLUtils.checkGlError(getClass().getName() + ": render() end"); //$NON-NLS-1$
    }
 
    @Override

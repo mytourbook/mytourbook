@@ -1,6 +1,6 @@
 name: Feature Request
 description: Request a new Feature
-title: "[Feature : LOCATION] "
+title: "[Feature : Location] "
 labels: ["Enhancement"]
 body:
   - type: markdown
@@ -8,7 +8,7 @@ body:
       value: |
         Thanks for taking the time to fill out this Feature Request!
         
-        Replace **LOCATION** in the title where the bug occurred, e.g.        
+        Replace **Location** in the title where the bug occurred, e.g.        
           - FIT Import
           - Tour Book View
           - Tour Chart

@@ -1,6 +1,6 @@
 name: Bug Report
 description: File a bug report
-title: "[Bug : LOCATION] "
+title: "[Bug : Location] "
 labels: ["Bug"]
 body:
   - type: markdown
@@ -8,7 +8,7 @@ body:
       value: |
         Thanks for taking the time to fill out this bug report!
         
-        Replace **LOCATION** in the title where the bug occurred, e.g.        
+        Replace **Location** in the title where the bug occurred, e.g.        
           - FIT Import
           - Tour Book View
           - Tour Chart
@@ -31,12 +31,15 @@ body:
       placeholder: 22.xx
     validations:
       required: true
-  - type: input
+  - type: dropdown
     id: os
     attributes:
       label: System
       description: What operating system are you using?
-      placeholder: Windows, Linux
+      options: 
+        - Windows
+        - Linux
+        - OSX
     validations:
       required: true
   - type: textarea

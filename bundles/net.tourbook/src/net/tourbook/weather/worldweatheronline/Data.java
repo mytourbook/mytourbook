@@ -293,11 +293,11 @@ public class Data {
       case "176": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
          break;
-      case "185":
-      case "263":
-      case "266":
-      case "281":
-      case "284":
+      case "185": //$NON-NLS-1$
+      case "263": //$NON-NLS-1$
+      case "266": //$NON-NLS-1$
+      case "281": //$NON-NLS-1$
+      case "284": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_DRIZZLE;
          break;
       default:

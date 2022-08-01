@@ -39,7 +39,7 @@ import utils.Initializer;
 public class OpenWeatherMapRetrieverTests {
 
    private static final String OPENWEATHERMAP_BASE_URL  = WeatherUtils.HEROKU_APP_URL
-         + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt=";
+         + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
 
    private static final String OPENWEATHERMAP_FILE_PATH =
          FilesUtils.rootPath + "data/weather/openweathermap/files/";                                    //$NON-NLS-1$

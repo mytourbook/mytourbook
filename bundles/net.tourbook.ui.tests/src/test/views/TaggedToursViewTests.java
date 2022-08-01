@@ -36,18 +36,18 @@ public class TaggedToursViewTests {
    void testTaggedToursView() {
 
       //Open the Tagged Tours view
-      final SWTBotMenu otherMenu = bot.menu("Tools ").menu("All Views").menu("Other...").click();
+      final SWTBotMenu otherMenu = bot.menu("Tools ").menu("All Views").menu("Other...").click(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       assertNotNull(otherMenu);
-      bot.tree().getTreeItem("1. Tour Directories").expand().getNode("Tagged Tours").select();
-      bot.button("Open").click();
+      bot.tree().getTreeItem("1. Tour Directories").expand().getNode("Tagged Tours").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      bot.button("Open").click(); //$NON-NLS-1$
 
       Utils.getTour(bot);
 
-      Utils.showView(bot, "Tagged Tours");
+      Utils.showView(bot, "Tagged Tours"); //$NON-NLS-1$
 
-      final SWTBotTreeItem item = bot.tree(1).getTreeItem("Shoes 2   7").select();
+      final SWTBotTreeItem item = bot.tree(1).getTreeItem("Shoes 2   7").select(); //$NON-NLS-1$
       assertNotNull(item);
-      final SWTBotTreeItem node = item.getNode("5/31/15").select();
+      final SWTBotTreeItem node = item.getNode("5/31/15").select(); //$NON-NLS-1$
       assertNotNull(node);
    }
 }
