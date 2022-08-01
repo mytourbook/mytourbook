@@ -58,7 +58,7 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
 
    private static final String          GEO_LOCATION_FORMAT = "%.6f";                                                                 //$NON-NLS-1$
 
-   private static final Pattern         _intOrFloatPattern  = Pattern.compile("\\d*\\.?\\d+");                                        //$NON-NLS-1$
+   private static final Pattern         _intOrFloatPattern  = Pattern.compile("\\d*[\\.,]?\\d+");                                     //$NON-NLS-1$
 
    private static final IDialogSettings _state              = TourbookPlugin.getState("net.tourbook.map.bookmark.DialogGotoLocation");//$NON-NLS-1$
 
@@ -577,8 +577,17 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
       _isCreateMapBookmark = _chkIsCreateMapBookmark.getSelection();
 
       // update map position
-      final float latitude = Float.parseFloat(_txtLatitude.getText().trim());
-      final float longitude = Float.parseFloat(_txtLongitude.getText().trim());
+
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      //
+      // Float.parseFloat() ignores localized strings therefore the databinding converter is used
+      // which provides also a good error message
+      //
+      // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+      final float latitude = StringToNumberConverter.toFloat(true).convert(_txtLatitude.getText().trim());
+      final float longitude = StringToNumberConverter.toFloat(true).convert(_txtLongitude.getText().trim());
+
       _mapPosition.setPosition(latitude, longitude);
    }
 
