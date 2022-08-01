@@ -37,16 +37,16 @@ public class TourDataEditorViewTests {
    @Test
    void testNewTour() {
 
-      bot.toolbarButtonWithTooltip("Create new tour/event (Ctrl+N)").click();
+      bot.toolbarButtonWithTooltip("Create new tour/event (Ctrl+N)").click(); //$NON-NLS-1$
 
       bot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
 
-      final String newTourTitle = "New Tour Title";
+      final String newTourTitle = "New Tour Title"; //$NON-NLS-1$
 
       bot.comboBox().setText(newTourTitle);
-      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click();
+      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
 
-      Utils.showView(bot, "Tour Editor");
+      Utils.showView(bot, "Tour Editor"); //$NON-NLS-1$
 
       final SWTBotCombo titleCombo = bot.comboBox(newTourTitle);
       assertNotNull(titleCombo);
@@ -56,13 +56,13 @@ public class TourDataEditorViewTests {
       tourDateTime.setDate(Date.from(Instant.now()));
       assertNotNull(tourDateTime);
 
-      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click();
+      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
    }
 
    @Test
    void testViewTabs() {
 
-      Utils.showView(bot, "Tour Editor");
+      Utils.showView(bot, "Tour Editor"); //$NON-NLS-1$
 
       bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
       bot.cTabItem(Messages.Tour_Editor_TabLabel_SwimSlices).activate();

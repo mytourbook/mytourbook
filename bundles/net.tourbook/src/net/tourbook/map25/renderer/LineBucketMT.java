@@ -382,8 +382,8 @@ public class LineBucketMT extends RenderBucketMT {
 
       static boolean init() {
 
-         _shaders[SHADER_PROJECTED] = new Shader("line_aa_proj");
-         _shaders[SHADER_FLAT] = new Shader("line_aa");
+         _shaders[SHADER_PROJECTED] = new Shader("line_aa_proj"); //$NON-NLS-1$
+         _shaders[SHADER_FLAT] = new Shader("line_aa"); //$NON-NLS-1$
 
          /*
           * create lookup table as texture for 'length(0..1,0..1)'
@@ -442,21 +442,21 @@ public class LineBucketMT extends RenderBucketMT {
             return;
          }
 
-         shader_a_pos = getAttrib("a_pos");
-         shader_aVertexColor = getAttrib("aVertexColor");
+         shader_a_pos = getAttrib("a_pos"); //$NON-NLS-1$
+         shader_aVertexColor = getAttrib("aVertexColor"); //$NON-NLS-1$
 
-         shader_u_mvp = getUniform("u_mvp");
+         shader_u_mvp = getUniform("u_mvp"); //$NON-NLS-1$
 
-         shader_u_fade = getUniform("u_fade");
-         shader_u_color = getUniform("u_color");
-         shader_u_mode = getUniform("u_mode");
+         shader_u_fade = getUniform("u_fade"); //$NON-NLS-1$
+         shader_u_color = getUniform("u_color"); //$NON-NLS-1$
+         shader_u_mode = getUniform("u_mode"); //$NON-NLS-1$
 
-         shader_u_width = getUniform("u_width");
-         shader_u_height = getUniform("u_height");
+         shader_u_width = getUniform("u_width"); //$NON-NLS-1$
+         shader_u_height = getUniform("u_height"); //$NON-NLS-1$
 
-         shader_uColorMode = getUniform("uColorMode");
-         shader_uOutlineBrightness = getUniform("uOutlineBrightness");
-         shader_uVertexColorAlpha = getUniform("uVertexColorAlpha");
+         shader_uColorMode = getUniform("uColorMode"); //$NON-NLS-1$
+         shader_uOutlineBrightness = getUniform("uOutlineBrightness"); //$NON-NLS-1$
+         shader_uVertexColorAlpha = getUniform("uVertexColorAlpha"); //$NON-NLS-1$
       }
 
       @Override

@@ -304,22 +304,22 @@ public class RenderBucketsAllMT extends TileData {
 
       if (vboSize != vboBuffer.position()) {
 
-         log.debug("wrong vertex buffer size: "
-               + " new size: " + vboSize
-               + " buffer pos: " + vboBuffer.position()
-               + " buffer limit: " + vboBuffer.limit()
-               + " buffer fill: " + vboBuffer.remaining());
+         log.debug("wrong vertex buffer size: " //$NON-NLS-1$
+               + " new size: " + vboSize //$NON-NLS-1$
+               + " buffer pos: " + vboBuffer.position() //$NON-NLS-1$
+               + " buffer limit: " + vboBuffer.limit() //$NON-NLS-1$
+               + " buffer fill: " + vboBuffer.remaining()); //$NON-NLS-1$
 
          return false;
       }
 
       if (iboSize > 0 && iboSize != iboBuffer.position()) {
 
-         log.debug("wrong indice buffer size: "
-               + " new size: " + iboSize
-               + " buffer pos: " + iboBuffer.position()
-               + " buffer limit: " + iboBuffer.limit()
-               + " buffer fill: " + iboBuffer.remaining());
+         log.debug("wrong indice buffer size: " //$NON-NLS-1$
+               + " new size: " + iboSize //$NON-NLS-1$
+               + " buffer pos: " + iboBuffer.position() //$NON-NLS-1$
+               + " buffer limit: " + iboBuffer.limit() //$NON-NLS-1$
+               + " buffer fill: " + iboBuffer.remaining()); //$NON-NLS-1$
 
          return false;
       }
@@ -409,7 +409,7 @@ public class RenderBucketsAllMT extends TileData {
          typedBucket = _currentBucket;
 
          if (typedBucket.type != type) {
-            log.error("BUG wrong bucket {} {} on level {}", typedBucket.type, type, level);
+            log.error("BUG wrong bucket {} {} on level {}", typedBucket.type, type, level); //$NON-NLS-1$
             throw new IllegalArgumentException();
          }
 
@@ -482,7 +482,7 @@ public class RenderBucketsAllMT extends TileData {
 
       /* check if found buckets matches requested type */
       if (typedBucket.type != type) {
-         log.error("BUG wrong bucket {} {} on level {}", typedBucket.type, type, level);
+         log.error("BUG wrong bucket {} {} on level {}", typedBucket.type, type, level); //$NON-NLS-1$
          throw new IllegalArgumentException();
       }
 
@@ -582,7 +582,7 @@ public class RenderBucketsAllMT extends TileData {
    public void setFrom(final RenderBucketsAllMT allBuckets) {
 
       if (allBuckets == this) {
-         throw new IllegalArgumentException("Cannot set from oneself!");
+         throw new IllegalArgumentException("Cannot set from oneself!"); //$NON-NLS-1$
       }
 
       set(allBuckets._firstChainedBucket);

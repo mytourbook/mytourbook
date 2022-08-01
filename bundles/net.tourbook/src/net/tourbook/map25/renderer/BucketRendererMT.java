@@ -147,7 +147,7 @@ public class BucketRendererMT extends LayerRenderer {
 //           break;
 
          default:
-            log.error("Invalid bucket {}", bucket.type);
+            log.error("Invalid bucket {}", bucket.type); //$NON-NLS-1$
             bucket = bucket.next;
             break;
          }

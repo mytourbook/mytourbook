@@ -294,13 +294,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
             if (style instanceof AreaStyle) {
 
-               setFieldValue(style, "color", __cartography_Luminance);
-               setFieldValue(style, "blendColor", __cartography_Luminance);
+               setFieldValue(style, "color", __cartography_Luminance); //$NON-NLS-1$
+               setFieldValue(style, "blendColor", __cartography_Luminance); //$NON-NLS-1$
 
             } else if (style instanceof LineStyle) {
 
-               setFieldValue(style, "color", __cartography_Luminance);
-               setFieldValue(style, "stippleColor", __cartography_Luminance);
+               setFieldValue(style, "color", __cartography_Luminance); //$NON-NLS-1$
+               setFieldValue(style, "stippleColor", __cartography_Luminance); //$NON-NLS-1$
             }
          }
 
@@ -1715,14 +1715,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          if (checkMapFile(new File(offlineMapFilePath))) {
             StatusUtil.logInfo("[2.5D Map] Using map file: " + offlineMapFilePath); //$NON-NLS-1$
          } else {
-            final String errorText = "[2.5D Map] Cannot read map file: " + offlineMapFilePath;
+            final String errorText = "[2.5D Map] Cannot read map file: " + offlineMapFilePath; //$NON-NLS-1$
             StatusUtil.showStatus(errorText);
             throw new IllegalArgumentException(errorText);
          }
 
          tileSource = getAllOfflineMapFiles(offlineMapFilePath);
          if (_numOfflineMapFiles == 0) {
-            final String errorText = "[2.5D Map] Cannot read multiple map files from: " + offlineMapFilePath;
+            final String errorText = "[2.5D Map] Cannot read multiple map files from: " + offlineMapFilePath; //$NON-NLS-1$
             StatusUtil.showStatus(errorText);
             throw new IllegalArgumentException(errorText);
          }

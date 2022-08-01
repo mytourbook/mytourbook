@@ -99,9 +99,9 @@ public class CompassRoseRenderer extends BucketRenderer {
 
       viewport.getMapPosition(_mapPosition);
 
-
-      final int viewportWidth = (int) getClassField(viewport, "mWidth");
-      final int viewportHeight = (int) getClassField(viewport, "mHeight");
+      // hack: get value from a protected field
+      final int viewportWidth = (int) getClassField(viewport, "mWidth"); //$NON-NLS-1$
+      final int viewportHeight = (int) getClassField(viewport, "mHeight"); //$NON-NLS-1$
 
       final float offsetX = -10;
       final float offsetY = 10;

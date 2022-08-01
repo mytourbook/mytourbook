@@ -296,7 +296,7 @@ public final class LineTexBucketMT extends LineBucketMT {
 
       public static void init() {
 
-         shader = new Shader("linetex_layer_tex");
+         shader = new Shader("linetex_layer_tex"); //$NON-NLS-1$
 //       shader = new Shader("linetex_layer");
 
          final int[] vboIds = GLUtils.glGenBuffers(1);
@@ -380,21 +380,21 @@ public final class LineTexBucketMT extends LineBucketMT {
             return;
          }
 
-         uMVP = getUniform("u_mvp");
+         uMVP = getUniform("u_mvp"); //$NON-NLS-1$
 
-         uColor = getUniform("u_color");
-         uWidth = getUniform("u_width");
-         uBgColor = getUniform("u_bgcolor");
-         uMode = getUniform("u_mode");
+         uColor = getUniform("u_color"); //$NON-NLS-1$
+         uWidth = getUniform("u_width"); //$NON-NLS-1$
+         uBgColor = getUniform("u_bgcolor"); //$NON-NLS-1$
+         uMode = getUniform("u_mode"); //$NON-NLS-1$
 
-         uPatternWidth = getUniform("u_pwidth");
-         uPatternScale = getUniform("u_pscale");
+         uPatternWidth = getUniform("u_pwidth"); //$NON-NLS-1$
+         uPatternScale = getUniform("u_pscale"); //$NON-NLS-1$
 
-         aPos0 = getAttrib("a_pos0"); // posX, posY, extrX, extrY
-         aPos1 = getAttrib("a_pos1");
-         aLen0 = getAttrib("a_len0"); // line length, unused
-         aLen1 = getAttrib("a_len1");
-         aFlip = getAttrib("a_flip");
+         aPos0 = getAttrib("a_pos0"); // posX, posY, extrX, extrY //$NON-NLS-1$
+         aPos1 = getAttrib("a_pos1"); //$NON-NLS-1$
+         aLen0 = getAttrib("a_len0"); // line length, unused //$NON-NLS-1$
+         aLen1 = getAttrib("a_len1"); //$NON-NLS-1$
+         aFlip = getAttrib("a_flip"); //$NON-NLS-1$
       }
    }
 

@@ -2995,7 +2995,7 @@ public class RawDataManager {
 
       // during initialization there is no active shell
       if (activeShell == null) {
-         StatusUtil.showStatus(RawDataManager.class.getSimpleName() + ": An active shell is not available");
+         StatusUtil.showStatus(RawDataManager.class.getSimpleName() + ": An active shell is not available"); //$NON-NLS-1$
          return;
       }
 

@@ -49,18 +49,18 @@ public abstract class GLShaderMT {
 
    public static int createProgramDirective(final String vertexSource, final String fragmentSource, final String directives) {
 
-      String defs = "";
+      String defs = ""; //$NON-NLS-1$
       if (directives != null) {
-         defs += directives + "\n";
+         defs += directives + "\n"; //$NON-NLS-1$
       }
 
       if (GLAdapter.GDX_DESKTOP_QUIRKS) {
-         defs += "#define DESKTOP_QUIRKS 1\n";
+         defs += "#define DESKTOP_QUIRKS 1\n"; //$NON-NLS-1$
       } else {
-         defs += "#define GLES 1\n";
+         defs += "#define GLES 1\n"; //$NON-NLS-1$
       }
 
-      defs += "#define GLVERSION " + (GLAdapter.isGL30() ? "30" : "20") + "\n";
+      defs += "#define GLVERSION " + (GLAdapter.isGL30() ? "30" : "20") + "\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
       final int vertexShader = loadShader(GL.VERTEX_SHADER, defs + vertexSource);
       if (vertexShader == 0) {
@@ -75,13 +75,13 @@ public abstract class GLShaderMT {
       int program = gl.createProgram();
       if (program != 0) {
 
-         GLUtils.checkGlError(GLShaderMT.class.getName() + ": glCreateProgram");
+         GLUtils.checkGlError(GLShaderMT.class.getName() + ": glCreateProgram"); //$NON-NLS-1$
          gl.attachShader(program, vertexShader);
 
-         GLUtils.checkGlError(GLShaderMT.class.getName() + ": glAttachShader");
+         GLUtils.checkGlError(GLShaderMT.class.getName() + ": glAttachShader"); //$NON-NLS-1$
          gl.attachShader(program, pixelShader);
 
-         GLUtils.checkGlError(GLShaderMT.class.getName() + ": glAttachShader");
+         GLUtils.checkGlError(GLShaderMT.class.getName() + ": glAttachShader"); //$NON-NLS-1$
          gl.linkProgram(program);
 
          final IntBuffer linkStatus = MapRenderer.getIntBuffer(1);
@@ -89,7 +89,7 @@ public abstract class GLShaderMT {
          linkStatus.position(0);
 
          if (linkStatus.get() != GL.TRUE) {
-            log.error("Could not link program: ");
+            log.error("Could not link program: "); //$NON-NLS-1$
             log.error(gl.getProgramInfoLog(program));
             gl.deleteProgram(program);
             program = 0;
@@ -112,7 +112,7 @@ public abstract class GLShaderMT {
          compiled.position(0);
 
          if (compiled.get() == 0) {
-            log.error("Could not compile shader " + shaderType + ":");
+            log.error("Could not compile shader " + shaderType + ":"); //$NON-NLS-1$ //$NON-NLS-2$
             log.error(gl.getShaderInfoLog(shader));
             gl.deleteShader(shader);
             shader = 0;
@@ -128,17 +128,17 @@ public abstract class GLShaderMT {
 
    public static int loadShaderDirective(final String file, final String directives) {
 
-      final String path = "shaders/" + file + ".glsl";
+      final String path = "shaders/" + file + ".glsl"; //$NON-NLS-1$ //$NON-NLS-2$
       String vs = AssetAdapter.readTextFile(path);
 
       if (vs == null) {
-         throw new IllegalArgumentException("shader file not found: " + path);
+         throw new IllegalArgumentException("shader file not found: " + path); //$NON-NLS-1$
       }
 
       // TODO ...
       final int fsStart = vs.indexOf('$');
       if (fsStart < 0 || vs.charAt(fsStart + 1) != '$') {
-         throw new IllegalArgumentException("not a shader file " + path);
+         throw new IllegalArgumentException("not a shader file " + path); //$NON-NLS-1$
       }
 
       final String fs = vs.substring(fsStart + 2);
@@ -146,7 +146,7 @@ public abstract class GLShaderMT {
 
       final int shader = createProgramDirective(vs, fs, directives);
       if (shader == 0) {
-         System.out.println(vs + " \n\n" + fs);
+         System.out.println(vs + " \n\n" + fs); //$NON-NLS-1$
       }
 
       return shader;
@@ -154,7 +154,7 @@ public abstract class GLShaderMT {
 
    public static int loadShaderDirectiveMT(final String file, final String directives) {
 
-      final String path = "shaders/" + file + ".glsl";
+      final String path = "shaders/" + file + ".glsl"; //$NON-NLS-1$ //$NON-NLS-2$
 //      final String vs = AssetAdapter.readTextFile(path);
 
       final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry(path);
@@ -167,13 +167,13 @@ public abstract class GLShaderMT {
       String vs = Util.readContentFromFile(fileURL);
 
       if (vs == null) {
-         throw new IllegalArgumentException("shader file not found: " + path);
+         throw new IllegalArgumentException("shader file not found: " + path); //$NON-NLS-1$
       }
 
       // TODO ...
       final int fsStart = vs.indexOf('$');
       if (fsStart < 0 || vs.charAt(fsStart + 1) != '$') {
-         throw new IllegalArgumentException("not a shader file " + path);
+         throw new IllegalArgumentException("not a shader file " + path); //$NON-NLS-1$
       }
 
       final String fs = vs.substring(fsStart + 2);
@@ -181,7 +181,7 @@ public abstract class GLShaderMT {
 
       final int shader = createProgramDirective(vs, fs, directives);
       if (shader == 0) {
-         System.out.println(vs + " \n\n" + fs);
+         System.out.println(vs + " \n\n" + fs); //$NON-NLS-1$
       }
 
       return shader;
@@ -215,19 +215,19 @@ public abstract class GLShaderMT {
    }
 
    protected boolean createVersioned(final String fileName, final String version) {
-      program = loadShaderDirective(fileName, version == null ? null : ("#version " + version + "\n"));
+      program = loadShaderDirective(fileName, version == null ? null : ("#version " + version + "\n")); //$NON-NLS-1$ //$NON-NLS-2$
       return program != 0;
    }
 
    protected boolean createVersioned(final String vertexSource, final String fragmentSource, final String version) {
-      program = createProgramDirective(vertexSource, fragmentSource, version == null ? null : ("#version " + version + "\n"));
+      program = createProgramDirective(vertexSource, fragmentSource, version == null ? null : ("#version " + version + "\n")); //$NON-NLS-1$ //$NON-NLS-2$
       return program != 0;
    }
 
    protected int getAttrib(final String name) {
       final int loc = gl.getAttribLocation(program, name);
       if (loc < 0) {
-         log.debug("missing attribute: {}", name);
+         log.debug("missing attribute: {}", name); //$NON-NLS-1$
       }
       return loc;
    }
@@ -235,7 +235,7 @@ public abstract class GLShaderMT {
    protected int getUniform(final String name) {
       final int loc = gl.getUniformLocation(program, name);
       if (loc < 0) {
-         log.debug("missing uniform: {}", name);
+         log.debug("missing uniform: {}", name); //$NON-NLS-1$
       }
       return loc;
    }
