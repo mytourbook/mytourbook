@@ -138,9 +138,7 @@ public class PrintTourPDF extends PrintTourExtension {
          // setup XSL stylesheet source
          final StreamSource xslSource = new StreamSource(xslFile);
 
-         // get transformer
-         final TransformerFactory tfactory = TransformerFactory.newInstance();
-         final Transformer transformer = tfactory.newTransformer(xslSource);
+         final Transformer transformer = TransformerFactory.newInstance().newTransformer(xslSource);
 
          // setup FOP
          final FopFactory fopFactory = FopFactory.newInstance(new File(UI.SYMBOL_DOT).toURI());
