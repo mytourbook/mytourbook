@@ -1755,8 +1755,6 @@ public class Messages extends NLS {
    public static String        Pref_Tour_Dialog_TourCacheIsModified_Title;
    public static String        pref_tour_editor_description_height;
    public static String        pref_tour_editor_description_height_tooltip;
-   public static String        Pref_Tour_Editor_WeatherDescription_Height;
-   public static String        Pref_Tour_Editor_WeatherDescription_Height_Tooltip;
    public static String        Pref_Tour_Group_FailedUpdates;
    public static String        Pref_Tour_Group_TourCache;
    public static String        Pref_Tour_Label_FailedUpdateInfo;
@@ -2228,6 +2226,8 @@ public class Messages extends NLS {
    public static String        Slideout_TourEditor_Label_LatLonDigits;
    public static String        Slideout_TourEditor_Label_LatLonDigits_Tooltip;
    public static String        Slideout_TourEditor_Label_Title;
+   public static String        Slideout_TourEditor_Label_WeatherDescription_Height;
+   public static String        Slideout_TourEditor_Label_WeatherDescription_Height_Tooltip;
 
    public static String        Slideout_TourFilter_Action_ActivateAll;
    public static String        Slideout_TourFilter_Action_ActivateAll_Tooltip;
