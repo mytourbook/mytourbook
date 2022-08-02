@@ -2,8 +2,6 @@ name: Build
 on:
   schedule:
   - cron: "20 7 * * *"
-  pull_request:
-    types: [opened, synchronize, reopened]
 jobs:
   build:
     needs: check_date
