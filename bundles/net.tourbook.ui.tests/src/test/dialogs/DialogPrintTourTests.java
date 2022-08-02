@@ -48,11 +48,5 @@ public class DialogPrintTourTests {
 
       final Path pdfFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(pdfFilePath));
-
-      /**
-       * TODO FB
-       * Print Improvements:
-       * - issue when printing emojis in pdf like a checkbox....it is printed as #
-       */
    }
 }
