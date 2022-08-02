@@ -85,6 +85,7 @@ import org.oscim.renderer.BitmapRenderer;
 import org.oscim.renderer.ExtrusionRenderer;
 import org.oscim.renderer.GLViewport;
 import org.oscim.renderer.LayerRenderer;
+import org.oscim.renderer.MapRenderer;
 import org.oscim.renderer.light.Sun;
 import org.oscim.scalebar.DefaultMapScaleBar;
 import org.oscim.scalebar.MapScaleBar;
@@ -312,45 +313,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          __originalStyleColors.clear();
       }
 
-      private int getAdjustedColor(final int fillColor, final float luminance) {
-
-         final int alpha = ((fillColor & 0xFF000000) >> 24);
-         int red = ((fillColor & 0xFF0000) >> 16);
-         int green = ((fillColor & 0xFF00) >> 8);
-         int blue = ((fillColor & 0xFF) >> 0);
-
-         if (luminance >= 0) {
-
-            // >= 0 --> color is brighter
-
-            final float redDiff = 0xff - red;
-            final float greenDiff = 0xff - green;
-            final float blueDiff = 0xff - blue;
-
-            red = (int) (red + luminance * redDiff);
-            green = (int) (green + luminance * greenDiff);
-            blue = (int) (blue + luminance * blueDiff);
-
-         } else {
-
-            // < 0 --> color is darker
-
-            final float luminance01 = 1 + luminance;
-
-            red = (int) (red * luminance01);
-            green = (int) (green * luminance01);
-            blue = (int) (blue * luminance01);
-         }
-
-         final int fillColorAdjusted = 0
-               | ((alpha & 0xFF) << 24)
-               | ((red & 0xFF) << 16)
-               | ((green & 0xFF) << 8)
-               | ((blue & 0xFF) << 0);
-
-         return fillColorAdjusted;
-      }
-
       /**
        * Using reflection because the zoom field is final and the 2.5D author do not want
        * to modify it https://github.com/mapsforge/vtm/discussions/927#discussioncomment-2735903
@@ -394,8 +356,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
                   // ignore luminance
                   ? fieldColor
 
-                  // compute luminance color
-                  : getAdjustedColor(fieldColor, colorBrightness);
+                  // adjust luminance color
+                  : computeLuminanceColor(fieldColor, colorBrightness);
 
             styleColorField.setAccessible(true);
             styleColorField.setInt(style, fieldColor_Adjusted);
@@ -643,6 +605,51 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       }
 
       return isSuccess;
+   }
+
+   /**
+    * @param color
+    * @param luminance
+    *           Luminance -1 ... +1
+    * @return
+    */
+   private int computeLuminanceColor(final int color, final float luminance) {
+
+      final int alpha = ((color & 0xFF000000) >> 24);
+      int red = ((color & 0xFF0000) >> 16);
+      int green = ((color & 0xFF00) >> 8);
+      int blue = ((color & 0xFF) >> 0);
+
+      if (luminance >= 0) {
+
+         // >= 0 (0...1)  --> color is brighter
+
+         final float redDiff = 0xff - red;
+         final float greenDiff = 0xff - green;
+         final float blueDiff = 0xff - blue;
+
+         red = (int) (red + luminance * redDiff);
+         green = (int) (green + luminance * greenDiff);
+         blue = (int) (blue + luminance * blueDiff);
+
+      } else {
+
+         // < 0 (-1...0) --> color is darker
+
+         final float luminance01 = 1 + luminance;
+
+         red = (int) (red * luminance01);
+         green = (int) (green * luminance01);
+         blue = (int) (blue * luminance01);
+      }
+
+      final int colorAdjusted = 0
+            | ((alpha & 0xFF) << 24)
+            | ((red & 0xFF) << 16)
+            | ((green & 0xFF) << 8)
+            | ((blue & 0xFF) << 0);
+
+      return colorAdjusted;
    }
 
    @Override
@@ -1972,6 +1979,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
          renderTheme.traverseRules(_ruleVisitor_Luminance);
          renderTheme.updateStyles();
+
+         /*
+          * Set map background color
+          */
+         final int mapBackground = mapTheme.getMapBackground();
+         final int adjustedMapBackground = computeLuminanceColor(mapBackground, _cartography_Luminance);
+
+         MapRenderer.setBackgroundColor(adjustedMapBackground);
       }
    }
 

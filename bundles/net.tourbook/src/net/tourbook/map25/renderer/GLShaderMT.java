@@ -155,17 +155,20 @@ public abstract class GLShaderMT {
    public static int loadShaderDirectiveMT(final String file, final String directives) {
 
       final String path = "shaders/" + file + ".glsl"; //$NON-NLS-1$ //$NON-NLS-2$
-//      final String vs = AssetAdapter.readTextFile(path);
 
       final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry(path);
+      if (bundleUrl == null) {
+         throw new IllegalArgumentException("Shader file is not in bundle: " + path); //$NON-NLS-1$
+      }
+
       String fileURL = null;
       try {
          fileURL = NIO.getAbsolutePathFromBundleUrl(bundleUrl);
-      } catch (final IOException e1) {
-         e1.printStackTrace();
+      } catch (final IOException e) {
+         e.printStackTrace();
       }
-      String vs = Util.readContentFromFile(fileURL);
 
+      String vs = Util.readContentFromFile(fileURL);
       if (vs == null) {
          throw new IllegalArgumentException("shader file not found: " + path); //$NON-NLS-1$
       }

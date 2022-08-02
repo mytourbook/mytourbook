@@ -111,7 +111,6 @@ public class Messages extends NLS {
    public static String        Pref_Map3Color_Column_Id_Label;
    public static String        Pref_Map3Color_Column_Id_Tooltip;
    public static String        Pref_Map3Color_Column_Legend_Marker;
-   public static String        Pref_Map3Color_Column_Legend_Marker_Detail;
    public static String        Pref_Map3Color_Column_MaxValue_Header;
    public static String        Pref_Map3Color_Column_MaxValue_Label;
    public static String        Pref_Map3Color_Column_MinValue_Header;

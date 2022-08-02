@@ -100,7 +100,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
    private static final String MAP3_SELECT_COLOR_DIALOG_ACTION_ADD_COLOR_TOOLTIP    = net.tourbook.map3.Messages.Map3SelectColor_Dialog_Action_AddColor_Tooltip;
    private static final String MAP3_SELECT_COLOR_DIALOG_ACTION_EDIT_ALL_COLORS      = net.tourbook.map3.Messages.Map3SelectColor_Dialog_Action_EditAllColors;
    private static final String MAP3_SELECT_COLOR_DIALOG_ACTION_EDIT_SELECTED_COLORS = net.tourbook.map3.Messages.Map3SelectColor_Dialog_Action_EditSelectedColors;
-   private static final String PREF_MAP3_COLOR_COLUMN_LEGEND_MARKER_DETAIL          = net.tourbook.map3.Messages.Pref_Map3Color_Column_Legend_Marker_Detail;
+   private static final String PREF_MAP3_COLOR_COLUMN_OVERWRITE_LEGEND_MIN_MAX      = net.tourbook.map3.Messages.Pref_Map3Color_Column_OverwriteLegendMinMax_Label;
    private static final String PREF_MAP3_COLOR_COLUMN_VALUE_MARKER_ABSOLUTE_DETAIL  = net.tourbook.map3.Messages.Pref_Map3Color_Column_ValueMarker_Absolute_Detail;
    private static final String PREF_MAP3_COLOR_COLUMN_VALUE_MARKER_RELATIVE_DETAIL  = net.tourbook.map3.Messages.Pref_Map3Color_Column_ValueMarker_Relative_Detail;
 
@@ -665,7 +665,7 @@ public class SlideoutMap25_TrackColors extends ToolbarSlideout implements IMap3C
                final Map3ColorProfile colorProfile = ((Map3GradientColorProvider) (element)).getMap3ColorProfile();
 
                if (colorProfile.isAbsoluteValues() && colorProfile.isOverwriteLegendValues()) {
-                  cell.setText(PREF_MAP3_COLOR_COLUMN_LEGEND_MARKER_DETAIL);
+                  cell.setText(PREF_MAP3_COLOR_COLUMN_OVERWRITE_LEGEND_MIN_MAX);
                } else {
                   cell.setText(UI.EMPTY_STRING);
                }
