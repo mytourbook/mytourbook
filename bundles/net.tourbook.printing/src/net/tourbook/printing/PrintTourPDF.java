@@ -18,7 +18,6 @@ package net.tourbook.printing;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +40,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.tour.printing.PrintTourExtension;
 import net.tourbook.ui.FileCollisionBehavior;
 
-import org.apache.fop.apps.FOPException;
 import org.apache.fop.apps.FOUserAgent;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
@@ -90,8 +88,6 @@ public class PrintTourPDF extends PrintTourExtension {
     *
     * @param object
     * @param pdfFile
-    * @throws FileNotFoundException
-    * @throws FOPException
     * @throws TransformerException
     */
    public void printPDF(final IXmlSerializable object, final PrintSettings printSettings)
