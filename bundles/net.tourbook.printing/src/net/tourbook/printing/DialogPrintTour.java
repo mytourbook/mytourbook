@@ -33,6 +33,7 @@ import javax.xml.transform.TransformerException;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.tour.printing.PrintTourExtension;
 import net.tourbook.ui.ImageComboLabel;
@@ -589,7 +590,7 @@ public class DialogPrintTour extends TitleAreaDialog {
                      try {
                         ((PrintTourPDF) _printExtensionPoint).printPDF(tourData, printSettings);
                      } catch (final TransformerException e) {
-                        e.printStackTrace();
+                        StatusUtil.log(e);
                         displayErrorMessage(e);
                      }
                   }
@@ -868,7 +869,6 @@ public class DialogPrintTour extends TitleAreaDialog {
          } catch (final IOException ioe) {
             setError(Messages.Dialog_Print_Msg_FileNameIsInvalid);
          }
-
       }
 
       _txtFilePath.setText(filePath.toOSString());
