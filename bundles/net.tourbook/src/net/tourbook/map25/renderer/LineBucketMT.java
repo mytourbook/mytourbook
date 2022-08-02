@@ -135,7 +135,7 @@ public class LineBucketMT extends RenderBucketMT {
           * Simple line shader does not take forward shortening into
           * account. only used when tilt is 0.
           */
-         int shaderMode = mapPosition.tilt < 1
+         final int shaderMode = mapPosition.tilt < 1
 
                // 1 == not projected
                ? SHADER_FLAT
@@ -143,8 +143,8 @@ public class LineBucketMT extends RenderBucketMT {
                // 0 == projected
                : SHADER_PROJECTED;
 
-         shaderMode = shaderMode;
-//         shaderMode = SHADER_FLAT;
+//       shaderMode = shaderMode;
+//       shaderMode = SHADER_FLAT;
 
          final Shader shader = _shaders[shaderMode];
 
