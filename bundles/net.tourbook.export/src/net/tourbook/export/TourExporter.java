@@ -253,9 +253,9 @@ public class TourExporter {
 // SET_FORMATTING_OFF
 
       vc.put("lap",                                lap                                       ); //$NON-NLS-1$
-      vc.put("tracks",                             tracks                                    ); //$NON-NLS-1$
-      vc.put("wayPoints",                          wayPoints                                 ); //$NON-NLS-1$
-      vc.put("tourMarkers",                        tourMarkers                               ); //$NON-NLS-1$
+      vc.put(VC_TRACKS,                            tracks                                    );
+      vc.put(VC_WAY_POINTS,                        wayPoints                                 );
+      vc.put(VC_TOUR_MARKERS,                      tourMarkers                               );
       vc.put("tourData",                           _tourData                                 ); //$NON-NLS-1$
 
       vc.put("hasTourMarkers",                     Boolean.valueOf(tourMarkers.size() > 0)   ); //$NON-NLS-1$
