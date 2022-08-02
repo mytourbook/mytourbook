@@ -41,8 +41,6 @@ jobs:
         run: powershell -Command "(gc pom.xml) -replace '<skipTests>true</skipTests>', '<skipTests>false</skipTests>' | Out-File -encoding ASCII pom.xml" && cd bundles/net.tourbook.tests && powershell -Command "(gc pom.xml) -replace '<skipTests>true</skipTests>', '<skipTests>false</skipTests>' | Out-File -encoding ASCII pom.xml" && cd ../net.tourbook.ui.tests && powershell -Command "(gc pom.xml) -replace '<skipTests>true</skipTests>', '<skipTests>false</skipTests>' | Out-File -encoding ASCII pom.xml"
       - name: Activate JaCoCo for the code coverage
         run: powershell -Command "(gc pom.xml) -replace '<skip>true</skip>', '<skip>false</skip>' | Out-File -encoding ASCII pom.xml"
-      - name: Install Acrobat Reader for the Tour Printing UI tests
-        run: choco install adobereader
       - name: Build and analyze              
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
