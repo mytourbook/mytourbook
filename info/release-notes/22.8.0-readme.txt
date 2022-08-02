@@ -1,21 +1,11 @@
 22.8.0                                                 ?. August 2022
 
 
-TODO's
-======
-
-* Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
-                    Need to check how to apply it to all projects, must maybe be done with the already existing ant script
-
-                  - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
-                    mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
-
-
 New
 ===
 
 * 2.5D Map
-  - Draw tour track with a gradient color, the color depends on the track value, e.g. elevation
+  - Draw tour track with a gradient color, the color depends on a track value, e.g. elevation
     Hint: The color must be set to black for a gradient color with opacity
                                                             https://github.com/mytourbook/mytourbook/issues/893
   - Show track legend                                       https://github.com/mytourbook/mytourbook/issues/893
@@ -34,7 +24,6 @@ Improvements
 * 2.5D Map
   - Paint tour track with a vertical offset                 https://github.com/mytourbook/mytourbook/issues/889
   - Set vertical position for the map tilt rotation axis    https://github.com/mytourbook/mytourbook/issues/890
-  - Fixed: Track width jumped when the zoom-level changed, now it's width is always the same
 
 * Weather (Frederic)
   - Added a drizzle weather icon          https://github.com/mytourbook/mytourbook/issues/874
@@ -51,6 +40,13 @@ Changes
 
 * 2.5D Map
   - Track (line) colors in the color profiles are reset to defaults
+  
+  
+Bugfix
+======
+
+* 2.5D Map
+  - Track width jumped when the zoom-level changed, now it's width is always the same
 
 
 Translation    
@@ -65,7 +61,7 @@ Translation
 System   
 ======
 
-* Milestone             https://github.com/mytourbook/mytourbook/milestone/5?closed=1
+* MyTourbook Milestone     https://github.com/mytourbook/mytourbook/milestone/5?closed=1
 * Eclipse 2022-06
 * FIT SDK 21.84
-* WorldWind 2.2.1       https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
+* WorldWind 2.2.1          https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
