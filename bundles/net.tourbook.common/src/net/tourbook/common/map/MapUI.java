@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.common.map;
 
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
+import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 
 import org.eclipse.jface.resource.ImageRegistry;
@@ -34,11 +35,11 @@ public class MapUI {
    public static final String MAP_PROVIDER_TRANSPARENT      = "map-provider-transparent";      //$NON-NLS-1$
    public static final String MAP_PROVIDER_TRANSPARENT_HILL = "map-provider-transparent-hill"; //$NON-NLS-1$
 
+// SET_FORMATTING_OFF
+
    static {
 
       final ImageRegistry imageRegistry = UI.IMAGE_REGISTRY;
-
-// SET_FORMATTING_OFF
 
       imageRegistry.put(MAP_PROVIDER_CUSTOM,             CommonActivator.getImageDescriptor(CommonImages.MapProvider_Custom));
       imageRegistry.put(MAP_PROVIDER_CUSTOM_HILL,        CommonActivator.getImageDescriptor(CommonImages.MapProvider_Custom_Hill));
@@ -47,9 +48,37 @@ public class MapUI {
       imageRegistry.put(MAP_PROVIDER_PROFILE_HILL,       CommonActivator.getImageDescriptor(CommonImages.MapProvider_Profile_Hill));
       imageRegistry.put(MAP_PROVIDER_TRANSPARENT,        CommonActivator.getImageDescriptor(CommonImages.MapProvider_Transparent));
       imageRegistry.put(MAP_PROVIDER_TRANSPARENT_HILL,   CommonActivator.getImageDescriptor(CommonImages.MapProvider_Transparent_Hill));
+   }
+
+   public final static LegendUnitLayoutItem[] ALL_LEGEND_UNIT_LAYOUTS = {
+
+         new LegendUnitLayoutItem(Messages.Legend_UnitLayout_DarkBackground_WithShadow,   LegendUnitLayout.DARK_BACKGROUND__WITH_SHADOW),
+         new LegendUnitLayoutItem(Messages.Legend_UnitLayout_BrightBackground_WithShadow, LegendUnitLayout.BRIGHT_BACKGROUND__WITH_SHADOW),
+         new LegendUnitLayoutItem(Messages.Legend_UnitLayout_DarkBackground_NoShadow,     LegendUnitLayout.DARK_BACKGROUND__NO_SHADOW),
+         new LegendUnitLayoutItem(Messages.Legend_UnitLayout_BrightBackground_NoShadow,   LegendUnitLayout.BRIGHT_BACKGROUND__NO_SHADOW),
+   };
 
 // SET_FORMATTING_ON
 
+   public enum LegendUnitLayout {
+
+      DARK_BACKGROUND__WITH_SHADOW, //
+      DARK_BACKGROUND__NO_SHADOW, //
+
+      BRIGHT_BACKGROUND__WITH_SHADOW, //
+      BRIGHT_BACKGROUND__NO_SHADOW, //
+   }
+
+   public static class LegendUnitLayoutItem {
+
+      public String           label;
+      public LegendUnitLayout legendUnitLayout;
+
+      public LegendUnitLayoutItem(final String label, final LegendUnitLayout legendUnitLayout) {
+
+         this.label = label;
+         this.legendUnitLayout = legendUnitLayout;
+      }
    }
 
    /**

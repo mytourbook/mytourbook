@@ -216,68 +216,70 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
-   public static final String            ID                                           = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
+   public static final String            ID                                               = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
-   private static final String           GRAPH_LABEL_HEARTBEAT_UNIT                   = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-   private static final String           VALUE_UNIT_K_CALORIES                        = net.tourbook.ui.Messages.Value_Unit_KCalories;
+   private static final String           GRAPH_LABEL_HEARTBEAT_UNIT                       = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String           VALUE_UNIT_K_CALORIES                            = net.tourbook.ui.Messages.Value_Unit_KCalories;
    //
-   private static final int              COLUMN_SPACING                               = 20;
+   private static final int              COLUMN_SPACING                                   = 20;
    //
-   private static final String           WIDGET_KEY                                   = "widgetKey";                                            //$NON-NLS-1$
-   private static final String           WIDGET_KEY_TOUR_DISTANCE                     = "tourDistance";                                         //$NON-NLS-1$
-   private static final String           WIDGET_KEY_ALTITUDE_UP                       = "altitudeUp";                                           //$NON-NLS-1$
-   private static final String           WIDGET_KEY_ALTITUDE_DOWN                     = "altitudeDown";                                         //$NON-NLS-1$
-   private static final String           WIDGET_KEY_PERSON                            = "tourPerson";                                           //$NON-NLS-1$
+   private static final String           WIDGET_KEY                                       = "widgetKey";                                            //$NON-NLS-1$
+   private static final String           WIDGET_KEY_TOUR_DISTANCE                         = "tourDistance";                                         //$NON-NLS-1$
+   private static final String           WIDGET_KEY_ALTITUDE_UP                           = "altitudeUp";                                           //$NON-NLS-1$
+   private static final String           WIDGET_KEY_ALTITUDE_DOWN                         = "altitudeDown";                                         //$NON-NLS-1$
+   private static final String           WIDGET_KEY_PERSON                                = "tourPerson";                                           //$NON-NLS-1$
    //
-   private static final String           MESSAGE_KEY_ANOTHER_SELECTION                = "anotherSelection";                                     //$NON-NLS-1$
+   private static final String           MESSAGE_KEY_ANOTHER_SELECTION                    = "anotherSelection";                                     //$NON-NLS-1$
    //
    /**
     * shows the busy indicator to load the slice viewer when there are more items as this value
     */
-   private static final int              BUSY_INDICATOR_ITEMS                         = 5000;
+   private static final int              BUSY_INDICATOR_ITEMS                             = 5000;
    //
-   private static final String           STATE_SELECTED_TAB                           = "tourDataEditor.selectedTab";                           //$NON-NLS-1$
-   private static final String           STATE_ROW_EDIT_MODE                          = "tourDataEditor.rowEditMode";                           //$NON-NLS-1$
-   private static final String           STATE_IS_EDIT_MODE                           = "tourDataEditor.isEditMode";                            //$NON-NLS-1$
-   private static final String           STATE_CSV_EXPORT_PATH                        = "tourDataEditor.csvExportPath";                         //$NON-NLS-1$
+   private static final String           STATE_SELECTED_TAB                               = "tourDataEditor.selectedTab";                           //$NON-NLS-1$
+   private static final String           STATE_ROW_EDIT_MODE                              = "tourDataEditor.rowEditMode";                           //$NON-NLS-1$
+   private static final String           STATE_IS_EDIT_MODE                               = "tourDataEditor.isEditMode";                            //$NON-NLS-1$
+   private static final String           STATE_CSV_EXPORT_PATH                            = "tourDataEditor.csvExportPath";                         //$NON-NLS-1$
    //
-   private static final String           STATE_SECTION_CHARACTERISTICS                = "STATE_SECTION_CHARACTERISTICS";                        //$NON-NLS-1$
-   private static final String           STATE_SECTION_DATE_TIME                      = "STATE_SECTION_DATE_TIME";                              //$NON-NLS-1$
-   private static final String           STATE_SECTION_PERSONAL                       = "STATE_SECTION_PERSONAL";                               //$NON-NLS-1$
-   private static final String           STATE_SECTION_TITLE                          = "STATE_SECTION_TITLE";                                  //$NON-NLS-1$
-   private static final String           STATE_SECTION_WEATHER                        = "STATE_SECTION_WEATHER";                                //$NON-NLS-1$
+   private static final String           STATE_SECTION_CHARACTERISTICS                    = "STATE_SECTION_CHARACTERISTICS";                        //$NON-NLS-1$
+   private static final String           STATE_SECTION_DATE_TIME                          = "STATE_SECTION_DATE_TIME";                              //$NON-NLS-1$
+   private static final String           STATE_SECTION_PERSONAL                           = "STATE_SECTION_PERSONAL";                               //$NON-NLS-1$
+   private static final String           STATE_SECTION_TITLE                              = "STATE_SECTION_TITLE";                                  //$NON-NLS-1$
+   private static final String           STATE_SECTION_WEATHER                            = "STATE_SECTION_WEATHER";                                //$NON-NLS-1$
    //
-   static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES            = "STATE_DESCRIPTION_NUMBER_OF_LINES";                    //$NON-NLS-1$
-   static final int                      STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT    = 3;
-   static final String                   STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN         = "STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN";                 //$NON-NLS-1$
-   static final boolean                  STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT = true;
-   static final String                   STATE_LAT_LON_DIGITS                         = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
-   static final int                      STATE_LAT_LON_DIGITS_DEFAULT                 = 5;
+   static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES                = "STATE_DESCRIPTION_NUMBER_OF_LINES";                    //$NON-NLS-1$
+   static final int                      STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT        = 3;
+   static final String                   STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES         = "STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES";             //$NON-NLS-1$
+   static final int                      STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT = 6;
+   static final String                   STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN             = "STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN";                 //$NON-NLS-1$
+   static final boolean                  STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT     = true;
+   static final String                   STATE_LAT_LON_DIGITS                             = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
+   static final int                      STATE_LAT_LON_DIGITS_DEFAULT                     = 5;
    //
-   private static final String           COLUMN_ALTITUDE                              = "ALTITUDE_ALTITUDE";                                    //$NON-NLS-1$
-   private static final String           COLUMN_CADENCE                               = "POWERTRAIN_CADENCE";                                   //$NON-NLS-1$
-   private static final String           COLUMN_DATA_SEQUENCE                         = "DATA_SEQUENCE";                                        //$NON-NLS-1$
-   private static final String           COLUMN_POWER                                 = "POWER";                                                //$NON-NLS-1$
-   private static final String           COLUMN_PACE                                  = "MOTION_PACE";                                          //$NON-NLS-1$
-   private static final String           COLUMN_PULSE                                 = "BODY_PULSE";                                           //$NON-NLS-1$
-   private static final String           COLUMN_TEMPERATURE                           = "WEATHER_TEMPERATURE";                                  //$NON-NLS-1$
+   private static final String           COLUMN_ALTITUDE                                  = "ALTITUDE_ALTITUDE";                                    //$NON-NLS-1$
+   private static final String           COLUMN_CADENCE                                   = "POWERTRAIN_CADENCE";                                   //$NON-NLS-1$
+   private static final String           COLUMN_DATA_SEQUENCE                             = "DATA_SEQUENCE";                                        //$NON-NLS-1$
+   private static final String           COLUMN_POWER                                     = "POWER";                                                //$NON-NLS-1$
+   private static final String           COLUMN_PACE                                      = "MOTION_PACE";                                          //$NON-NLS-1$
+   private static final String           COLUMN_PULSE                                     = "BODY_PULSE";                                           //$NON-NLS-1$
+   private static final String           COLUMN_TEMPERATURE                               = "WEATHER_TEMPERATURE";                                  //$NON-NLS-1$
    //
-   private static final IPreferenceStore _prefStore                                   = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore _prefStore_Common                            = CommonActivator.getPrefStore();
-   private static final IDialogSettings  _state                                       = TourbookPlugin.getState(ID);
-   private static final IDialogSettings  _stateSwimSlice                              = TourbookPlugin.getState(ID + ".swimSlice");             //$NON-NLS-1$
-   private static final IDialogSettings  _stateTimeSlice                              = TourbookPlugin.getState(ID + ".slice");                 //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore                                       = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore_Common                                = CommonActivator.getPrefStore();
+   private static final IDialogSettings  _state                                           = TourbookPlugin.getState(ID);
+   private static final IDialogSettings  _stateSwimSlice                                  = TourbookPlugin.getState(ID + ".swimSlice");             //$NON-NLS-1$
+   private static final IDialogSettings  _stateTimeSlice                                  = TourbookPlugin.getState(ID + ".slice");                 //$NON-NLS-1$
    //
-   private static final boolean          IS_LINUX                                     = UI.IS_LINUX;
-   private static final boolean          IS_OSX                                       = UI.IS_OSX;
-   private static final boolean          IS_DARK_THEME                                = UI.isDarkTheme();
+   private static final boolean          IS_LINUX                                         = UI.IS_LINUX;
+   private static final boolean          IS_OSX                                           = UI.IS_OSX;
+   private static final boolean          IS_DARK_THEME                                    = UI.isDarkTheme();
    /**
     * this width is used as a hint for the width of the description field, this value also
     * influences the width of the columns in this editor
     */
-   private static final int              _hintTextColumnWidth                         = IS_OSX ? 200 : 150;
+   private static final int              _hintTextColumnWidth                             = IS_OSX ? 200 : 150;
    //
-   DecimalFormat                         _temperatureFormat                           = new DecimalFormat("###.0");                             //$NON-NLS-1$
+   DecimalFormat                         _temperatureFormat                               = new DecimalFormat("###.0");                             //$NON-NLS-1$
    //
    private ZonedDateTime                 _tourStartTime;
    //
@@ -519,9 +521,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private int                                        _latLonDigits;
 
    /**
-    * Number of lines for the description text.
+    * Number of lines for the tour's description text.
     */
    private int                                        _descriptionNumLines;
+
+   /**
+    * Number of lines for the weather's description text.
+    */
+   private int                                        weatherDescriptionNumLines;
 
    private final NumberFormat                         _nfLatLon                       = NumberFormat.getNumberInstance();
 
@@ -707,7 +714,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
 
-         return new SlideoutTourEditor_Options(_pageBook, toolbar, _state, TourDataEditorView.this);
+         return new SlideoutTourEditor_Options(_pageBook, toolbar, TourDataEditorView.this);
       }
    }
 
@@ -4041,9 +4048,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _firstColumnControls.add(_linkWeather);
 
             _txtWeather = _tk.createText(
-                  container, //
+                  container,
                   UI.EMPTY_STRING,
-                  SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
+                  SWT.BORDER //
+                        | SWT.WRAP
+                        | SWT.V_SCROLL
+                        | SWT.H_SCROLL//
             );
             _txtWeather.addModifyListener(_modifyListener);
 
@@ -4053,7 +4063,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   //
                   // SWT.DEFAULT causes lots of problems with the layout therefore the hint is set
                   //
-                  .hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(6))
+                  .hint(_hintTextColumnWidth, _pc.convertHeightInCharsToPixels(weatherDescriptionNumLines))
                   .applyTo(_txtWeather);
          }
          {
@@ -7900,6 +7910,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       setup_LatLonDigits();
 
       _descriptionNumLines = Util.getStateInt(_state, STATE_DESCRIPTION_NUMBER_OF_LINES, STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT);
+      weatherDescriptionNumLines = Util.getStateInt(_state,
+            STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES,
+            STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT);
    }
 
    private void restoreState_WithUI() {
@@ -8746,19 +8759,25 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       fireTourIsModified();
    }
 
-   void updateUI_DescriptionNumLines(final int numLines) {
+   void updateUI_DescriptionNumLines(final int numTourDescriptionLines,
+                                     final int numWeatherDescriptionLines) {
 
-      if (numLines == _descriptionNumLines) {
+      if (numTourDescriptionLines == _descriptionNumLines &&
+            numWeatherDescriptionLines == weatherDescriptionNumLines) {
 
          // nothing has changed
          return;
       }
 
-      _descriptionNumLines = numLines;
+      _descriptionNumLines = numTourDescriptionLines;
+      weatherDescriptionNumLines = numWeatherDescriptionLines;
 
-      // update layout
+      // update layouts
       final GridData gd = (GridData) _txtDescription.getLayoutData();
       gd.heightHint = _pc.convertHeightInCharsToPixels(_descriptionNumLines);
+
+      final GridData weatherGridData = (GridData) _txtWeather.getLayoutData();
+      weatherGridData.heightHint = _pc.convertHeightInCharsToPixels(weatherDescriptionNumLines);
 
       onResizeTab1();
    }

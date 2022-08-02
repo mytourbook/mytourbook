@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -39,7 +40,9 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
+import net.tourbook.map25.layer.compassrose.CompassRoseLayer;
 import net.tourbook.map25.layer.labeling.LabelLayerMT;
+import net.tourbook.map25.layer.legend.LegendLayer;
 import net.tourbook.map25.layer.marker.MapMarker;
 import net.tourbook.map25.layer.marker.MarkerConfig;
 import net.tourbook.map25.layer.marker.MarkerLayerMT;
@@ -52,6 +55,7 @@ import net.tourbook.map25.layer.marker.PhotoToolkit;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
+import net.tourbook.map25.renderer.RenderBucketsAllMT;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
@@ -81,6 +85,7 @@ import org.oscim.renderer.BitmapRenderer;
 import org.oscim.renderer.ExtrusionRenderer;
 import org.oscim.renderer.GLViewport;
 import org.oscim.renderer.LayerRenderer;
+import org.oscim.renderer.MapRenderer;
 import org.oscim.renderer.light.Sun;
 import org.oscim.scalebar.DefaultMapScaleBar;
 import org.oscim.scalebar.MapScaleBar;
@@ -97,7 +102,9 @@ import org.oscim.theme.XmlRenderThemeStyleLayer;
 import org.oscim.theme.XmlRenderThemeStyleMenu;
 import org.oscim.theme.rule.Rule;
 import org.oscim.theme.rule.Rule.RuleVisitor;
+import org.oscim.theme.styles.AreaStyle;
 import org.oscim.theme.styles.ExtrusionStyle;
+import org.oscim.theme.styles.LineStyle;
 import org.oscim.theme.styles.RenderStyle;
 import org.oscim.tiling.TileSource;
 import org.oscim.tiling.TileSource.OpenResult;
@@ -121,31 +128,36 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * <b>Before releasing, set this to <code>true</code></b>
     * <p>
     */
-   private static final boolean IS_USING_VTM_PRODUCTION_PLUGIN = true;
-
+   private static final boolean    IS_USING_VTM_PRODUCTION_PLUGIN                = true;
    //
-   private static final String     STATE_LAYER_BUILDING_IS_SHOW_SHADOW    = "STATE_LAYER_BUILDING_IS_SHOW_SHADOW";    //$NON-NLS-1$
-   private static final String     STATE_LAYER_BUILDING_IS_VISIBLE        = "STATE_LAYER_BUILDING_IS_VISIBLE";        //$NON-NLS-1$
-   private static final String     STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL    = "STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL";    //$NON-NLS-1$
-   private static final String     STATE_LAYER_BUILDING_SUN_DAY_TIME      = "STATE_LAYER_BUILDING_SUN_DAY_TIME";      //$NON-NLS-1$
-   private static final String     STATE_LAYER_BUILDING_SUN_RISE_SET_TIME = "STATE_LAYER_BUILDING_SUN_RISE_SET_TIME"; //$NON-NLS-1$
-   private static final String     STATE_LAYER_LABEL_IS_VISIBLE           = "STATE_LAYER_LABEL_IS_VISIBLE";           //$NON-NLS-1$
-   private static final String     STATE_LAYER_LABEL_IS_BEFORE_BUILDING   = "STATE_LAYER_LABEL_IS_BEFORE_BUILDING";   //$NON-NLS-1$
-   private static final String     STATE_MAP_POS_X                        = "STATE_MAP_POS_X";                        //$NON-NLS-1$
-
-   private static final String     STATE_MAP_POS_Y                        = "STATE_MAP_POS_Y";                        //$NON-NLS-1$
-   private static final String     STATE_MAP_POS_ZOOM_LEVEL               = "STATE_MAP_POS_ZOOM_LEVEL";               //$NON-NLS-1$
-   private static final String     STATE_MAP_POS_BEARING                  = "STATE_MAP_POS_BEARING";                  //$NON-NLS-1$
-   private static final String     STATE_MAP_POS_SCALE                    = "STATE_MAP_POS_SCALE";                    //$NON-NLS-1$
-   private static final String     STATE_MAP_POS_TILT                     = "STATE_MAP_POS_TILT";                     //$NON-NLS-1$
-   private static final String     STATE_SELECTED_MAP25_PROVIDER_ID       = "STATE_SELECTED_MAP25_PROVIDER_ID";       //$NON-NLS-1$
-   private static final String     STATE_SUFFIX_MAP_CURRENT_POSITION      = "MapCurrentPosition";                     //$NON-NLS-1$
-   static final String             STATE_SUFFIX_MAP_DEFAULT_POSITION      = "MapDefaultPosition";                     //$NON-NLS-1$
+   private static final String     STATE_LAYER_BUILDING_IS_SHOW_SHADOW           = "STATE_LAYER_BUILDING_IS_SHOW_SHADOW";          //$NON-NLS-1$
+   private static final String     STATE_LAYER_BUILDING_IS_VISIBLE               = "STATE_LAYER_BUILDING_IS_VISIBLE";              //$NON-NLS-1$
+   private static final String     STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL           = "STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL";          //$NON-NLS-1$
+   private static final String     STATE_LAYER_BUILDING_SUN_DAY_TIME             = "STATE_LAYER_BUILDING_SUN_DAY_TIME";            //$NON-NLS-1$
+   private static final String     STATE_LAYER_BUILDING_SUN_RISE_SET_TIME        = "STATE_LAYER_BUILDING_SUN_RISE_SET_TIME";       //$NON-NLS-1$
+   private static final String     STATE_LAYER_CARTOGRAPHY_IS_LUMINANCE          = "STATE_LAYER_CARTOGRAPHY_IS_LUMINANCE";         //$NON-NLS-1$
+   private static final String     STATE_LAYER_CARTOGRAPHY_LUMINANCE             = "STATE_LAYER_CARTOGRAPHY_LUMINANCE";            //$NON-NLS-1$
+   private static final String     STATE_LAYER_LABEL_IS_VISIBLE                  = "STATE_LAYER_LABEL_IS_VISIBLE";                 //$NON-NLS-1$
+   private static final String     STATE_LAYER_LABEL_IS_BEFORE_BUILDING          = "STATE_LAYER_LABEL_IS_BEFORE_BUILDING";         //$NON-NLS-1$
    //
-   public static final String      THEME_STYLE_ALL                        = "theme-style-all";                        //$NON-NLS-1$
+   private static final String     STATE_MAP_CENTER_VERTICAL_POSITION_IS_ENABLED = "STATE_MAP_CENTER_VERTICAL_POSITION_IS_ENABLED";//$NON-NLS-1$
+   private static final String     STATE_MAP_CENTER_VERTICAL_POSITION            = "STATE_MAP_CENTER_VERTICAL_POSITION";           //$NON-NLS-1$
+   private static final String     STATE_MAP_POS_X                               = "STATE_MAP_POS_X";                              //$NON-NLS-1$
+   private static final String     STATE_MAP_POS_Y                               = "STATE_MAP_POS_Y";                              //$NON-NLS-1$
+   private static final String     STATE_MAP_POS_ZOOM_LEVEL                      = "STATE_MAP_POS_ZOOM_LEVEL";                     //$NON-NLS-1$
+   private static final String     STATE_MAP_POS_BEARING                         = "STATE_MAP_POS_BEARING";                        //$NON-NLS-1$
+   private static final String     STATE_MAP_POS_SCALE                           = "STATE_MAP_POS_SCALE";                          //$NON-NLS-1$
+   private static final String     STATE_MAP_POS_TILT                            = "STATE_MAP_POS_TILT";                           //$NON-NLS-1$
+   private static final String     STATE_SELECTED_MAP25_PROVIDER_ID              = "STATE_SELECTED_MAP25_PROVIDER_ID";             //$NON-NLS-1$
+   private static final String     STATE_SUFFIX_MAP_CURRENT_POSITION             = "MapCurrentPosition";                           //$NON-NLS-1$
+   static final String             STATE_SUFFIX_MAP_DEFAULT_POSITION             = "MapDefaultPosition";                           //$NON-NLS-1$
    //
-   public static final float       SUN_TIME_RANGE                         = 10;
-   public static final float       SUN_TIME_DETAIL_RANGE                  = 50;
+   public static final String      THEME_STYLE_ALL                               = "theme-style-all";                              //$NON-NLS-1$
+   //
+   public static final float       SUN_TIME_RANGE                                = 10;
+   public static final float       SUN_TIME_DETAIL_RANGE                         = 50;
+   //
+   public static final float       MAP_CENTER_VERTICAL_MAX_VALUE                 = 100.0f;
    //
    private static IDialogSettings  _state;
    //
@@ -154,13 +166,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    //
    private Map25Provider           _selectedMapProvider;
    //
-   private String                  _mapDefaultLanguage                    = Locale.getDefault().toString();
+   private String                  _mapDefaultLanguage                           = Locale.getDefault().toString();
    private BitmapTileSource        _hillshadingSource;
    private BitmapTileSource        _satelliteSource;
    //
-   private int                     _numOfflineMapFiles                    = 0;
+   private int                     _numOfflineMapFiles                           = 0;
    //
-   private String                  _mp_key                                = "80d7bc63-94fe-416f-a63f-7173f81a484c";   //$NON-NLS-1$
+   private String                  _mp_key                                       = "80d7bc63-94fe-416f-a63f-7173f81a484c";         //$NON-NLS-1$
    //
    /**
     * The opacity can be set in the layer but not read. This will keep the state of the hillshading
@@ -184,15 +196,21 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private SunDayTime              _currentBuilding_SunDayTime;
    private float                   _currentBuilding_Sunrise_Sunset_Time;
    //
+   private boolean                 _cartography_IsLuminance;
+   private float                   _cartography_Luminance;
+   private RuleVisitor_Luminance   _ruleVisitor_Luminance                        = new RuleVisitor_Luminance();
+   //
    private boolean                 _layer_Label_IsVisible;
    private boolean                 _layer_Label_IsBeforeBuilding;
    //
    private OsmTileLayerMT          _layer_BaseMap;
    private S3DBLayer               _layer_Building_S3DB;
    private GenericLayer            _layer_Building_S3DB_SunUpdate;
+   private CompassRoseLayer        _layer_CompassRose;
    private Layer                   _layer_HillShading_AFTER;
    private BitmapTileLayer         _layer_HillShading_TILE_LOADING;
    private LabelLayerMT            _layer_Label;
+   private LegendLayer             _layer_Legend;
    private ItemizedLayer           _layer_MapBookmark_VARYING;
    private ItemizedLayer           _layer_MapBookmark_Clustered;
    private ItemizedLayer           _layer_MapBookmark_NotClustered;
@@ -208,26 +226,31 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private TourLayer               _layer_Tour;
    private MarkerLayerMT           _layer_TourMarker;
    //
-   private OkHttpFactoryMT         _httpFactory;
+//   private OpenGLTestLayer         _layer_OpenGLTest;
    //
-   private long                    _lastRenderTime;
+   private OkHttpFactoryMT _httpFactory;
    //
-   private float                   _offline_TextScale                     = 0.75f;
-   private float                   _offline_UserScale                     = 2.50f;
-   private float                   _online_TextScale                      = 0.50f;
-   private float                   _online_UserScale                      = 2.0f;
-
-   private OffOnline               _currentOffOnline;
-   private TileSource              _currentOnline_TileSource;
-   private TileEncoding            _currentOnline_TileSource_Encoding;
-   private ThemeFile               _currentOnline_MapProviderTheme;
-   private TileSource              _currentOffline_TileSource;
-   private String                  _currentOffline_TileSource_FilePath;
+   private long            _lastRenderTime;
+   //
+   private float           _offline_TextScale = 0.75f;
+   private float           _offline_UserScale = 2.50f;
+   private float           _online_TextScale  = 0.50f;
+   private float           _online_UserScale  = 2.0f;
+   //
+   private OffOnline       _currentOffOnline;
+   private TileSource      _currentOnline_TileSource;
+   private TileEncoding    _currentOnline_TileSource_Encoding;
+   private ThemeFile       _currentOnline_MapProviderTheme;
+   private TileSource      _currentOffline_TileSource;
+   private String          _currentOffline_TileSource_FilePath;
    //
    //
    private MarkerToolkit _mapBookmarkToolkit = new MarkerToolkit(MarkerShape.STAR);
    // MarkerToolkit.modeDemo or MarkerToolkit.modeNormal
    private MarkerMode    _tourMarkerMode     = MarkerMode.NORMAL;
+   //
+   private boolean       _mapCenter_VerticalPosition_IsEnabled;
+   private int           _mapCenter_VerticalPosition;
    //
    /*
     * Photos
@@ -244,11 +267,116 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     */
    private boolean      _isMapItemHit;
 
-   private static class MinZoomRuleVisitor extends RuleVisitor {
+   private static enum OffOnline {
+      IS_ONLINE, IS_OFFLINE
+   }
+
+   private class RuleVisitor_Luminance extends RuleVisitor {
+
+      /**
+       * Original colors are cached that the styles must not be reloaded because they are
+       * overwritten when dimmed !!!
+       * <p>
+       * <li>1. Style hashcode</li>
+       * <li>2. Original color</li>
+       */
+      private HashMap<Integer, Integer> __originalStyleColors = new HashMap<>();
+
+      private float                     __cartography_Luminance;
+
+      public boolean                    __isUseOriginalColor;
+
+      public RuleVisitor_Luminance() {}
+
+      @Override
+      public void apply(final Rule rule) {
+
+         for (final RenderStyle<?> style : rule.styles) {
+
+            if (style instanceof AreaStyle) {
+
+               setFieldValue(style, "color", __cartography_Luminance); //$NON-NLS-1$
+               setFieldValue(style, "blendColor", __cartography_Luminance); //$NON-NLS-1$
+
+            } else if (style instanceof LineStyle) {
+
+               setFieldValue(style, "color", __cartography_Luminance); //$NON-NLS-1$
+               setFieldValue(style, "stippleColor", __cartography_Luminance); //$NON-NLS-1$
+            }
+         }
+
+         super.apply(rule);
+      }
+
+      private void clearColorCache() {
+
+         __originalStyleColors.clear();
+      }
+
+      /**
+       * Using reflection because the zoom field is final and the 2.5D author do not want
+       * to modify it https://github.com/mapsforge/vtm/discussions/927#discussioncomment-2735903
+       *
+       * @param style
+       * @param fieldName
+       * @param colorBrightness
+       */
+      private void setFieldValue(final RenderStyle<?> style, final String fieldName, final float colorBrightness) {
+
+         try {
+
+            final Field styleColorField = style.getClass().getField(fieldName);
+
+            final int colorHashCode = style.hashCode() + fieldName.hashCode();
+
+            final Integer originalCachedColor = __originalStyleColors.get(colorHashCode);
+
+            int fieldColor;
+
+            if (originalCachedColor == null) {
+
+               // no cached color -> get color from the style
+
+               final int styleColorValue = styleColorField.getInt(style);
+
+               // keep original color
+               __originalStyleColors.put(colorHashCode, styleColorValue);
+
+               fieldColor = styleColorValue;
+
+            } else {
+
+               // use cached color
+
+               fieldColor = originalCachedColor;
+            }
+
+            final int fieldColor_Adjusted = __isUseOriginalColor
+
+                  // ignore luminance
+                  ? fieldColor
+
+                  // adjust luminance color
+                  : computeLuminanceColor(fieldColor, colorBrightness);
+
+            styleColorField.setAccessible(true);
+            styleColorField.setInt(style, fieldColor_Adjusted);
+
+         } catch (NoSuchFieldException
+               | SecurityException
+               | IllegalArgumentException
+               | IllegalAccessException e) {
+
+            e.printStackTrace();
+         }
+      }
+   }
+
+   private static class RuleVisitor_MinZoom extends RuleVisitor {
 
       private int _minZoomMask;
 
-      public MinZoomRuleVisitor(final int minZoomLevel) {
+      public RuleVisitor_MinZoom(final int minZoomLevel) {
 
          _minZoomMask = 1 << minZoomLevel;
       }
@@ -284,10 +412,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
          super.apply(rule);
       }
-   }
-
-   private static enum OffOnline {
-      IS_ONLINE, IS_OFFLINE
    }
 
    public enum SunDayTime {
@@ -483,6 +607,51 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return isSuccess;
    }
 
+   /**
+    * @param color
+    * @param luminance
+    *           Luminance -1 ... +1
+    * @return
+    */
+   private int computeLuminanceColor(final int color, final float luminance) {
+
+      final int alpha = ((color & 0xFF000000) >> 24);
+      int red = ((color & 0xFF0000) >> 16);
+      int green = ((color & 0xFF00) >> 8);
+      int blue = ((color & 0xFF) >> 0);
+
+      if (luminance >= 0) {
+
+         // >= 0 (0...1)  --> color is brighter
+
+         final float redDiff = 0xff - red;
+         final float greenDiff = 0xff - green;
+         final float blueDiff = 0xff - blue;
+
+         red = (int) (red + luminance * redDiff);
+         green = (int) (green + luminance * greenDiff);
+         blue = (int) (blue + luminance * blueDiff);
+
+      } else {
+
+         // < 0 (-1...0) --> color is darker
+
+         final float luminance01 = 1 + luminance;
+
+         red = (int) (red * luminance01);
+         green = (int) (green * luminance01);
+         blue = (int) (blue * luminance01);
+      }
+
+      final int colorAdjusted = 0
+            | ((alpha & 0xFF) << 24)
+            | ((red & 0xFF) << 16)
+            | ((green & 0xFF) << 8)
+            | ((blue & 0xFF) << 0);
+
+      return colorAdjusted;
+   }
+
    @Override
    public void create() {
 
@@ -531,6 +700,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       final MapScaleBarLayer layer = new MapScaleBarLayer(mMap, mapScaleBar);
       layer.setEnabled(true);
 
+      // set scale bar position
       final BitmapRenderer renderer = layer.getRenderer();
       renderer.setPosition(GLViewport.Position.BOTTOM_RIGHT);
       renderer.setOffset(5, 0);
@@ -540,6 +710,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    @Override
    public void createLayers() {
+
+      // setup MT shader
+      RenderBucketsAllMT.initRenderer();
 
       _selectedMapProvider = restoreState_MapProvider();
       _map25View.updateUI_SelectedMapProvider(_selectedMapProvider);
@@ -571,7 +744,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       updateLayer_TourMarkers();
 
-      restoreState_MapPosition();
+      restoreState_Map();
 
       // update actions in UI thread, run this AFTER the layers are created
       Display.getDefault().asyncExec(() -> {
@@ -703,6 +876,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_TileInfo = new TileGridLayerMT(mMap);
       _layer_TileInfo.setEnabled(false);
 
+      // legend
+      _layer_Legend = new LegendLayer(mMap);
+      _layer_Legend.setEnabled(false);
+
+      // compassrose
+      _layer_CompassRose = new CompassRoseLayer(mMap);
+      _layer_CompassRose.setEnabled(false);
+
       /*
        * Add all layers
        */
@@ -719,8 +900,17 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       allMapLayer.add(_layer_TourMarker);
       allMapLayer.add(_layer_Photo_VARYING);
       allMapLayer.add(_layer_SliderLocation);
+      allMapLayer.add(_layer_CompassRose);
       allMapLayer.add(_layer_ScaleBar);
+      allMapLayer.add(_layer_Legend);
       allMapLayer.add(_layer_TileInfo);
+
+//      /*
+//       * OpenGL test
+//       */
+//      _layer_OpenGLTest = new OpenGLTestLayer(mMap);
+//      _layer_OpenGLTest.setEnabled(false);
+//      allMapLayer.add(_layer_OpenGLTest);
 
       /*
        * Set static layers which are located after the named layer and which will never be removed,
@@ -877,6 +1067,18 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return _building_Sunrise_Sunset_Time;
    }
 
+   public boolean getLayer_Cartography_IsLuminance() {
+      return _cartography_IsLuminance;
+   }
+
+   public float getLayer_Cartography_Luminance() {
+      return _cartography_Luminance;
+   }
+
+   public CompassRoseLayer getLayer_CompassRose() {
+      return _layer_CompassRose;
+   }
+
    public BitmapTileLayer getLayer_HillShading() {
       return _layer_HillShading_TILE_LOADING;
    }
@@ -891,6 +1093,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    public boolean getLayer_Label_IsBeforeBuilding() {
       return _layer_Label_IsBeforeBuilding;
+   }
+
+   public LegendLayer getLayer_Legend() {
+      return _layer_Legend;
    }
 
    public ItemizedLayer getLayer_MapBookmark() {
@@ -931,6 +1137,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
    Map25View getMap25View() {
       return _map25View;
+   }
+
+   public int getMapCenter_VerticalPosition() {
+      return _mapCenter_VerticalPosition;
+   }
+
+   public boolean getMapCenter_VerticalPosition_IsEnabled() {
+      return _mapCenter_VerticalPosition_IsEnabled;
    }
 
    public int getPhoto_Size() {
@@ -1168,6 +1382,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          return;
       }
 
+      _layer_Legend.updateLegend();
+
       super.resize(w, h);
    }
 
@@ -1177,6 +1393,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     */
    private void restoreMapLayers() {
 
+      updateLayer_Cartography();
       updateLayer_Building();
       updateLayer_Label();
 
@@ -1193,22 +1410,34 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 // SET_FORMATTING_OFF
 
-      _building_IsVisible              = Util.getStateBoolean( _state, STATE_LAYER_BUILDING_IS_VISIBLE,      true);
-      _building_MinZoomLevel           = Util.getStateInt(     _state, STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL,  17);
+      _building_IsVisible              = Util.getStateBoolean( _state, STATE_LAYER_BUILDING_IS_VISIBLE,        true);
+      _building_MinZoomLevel           = Util.getStateInt(     _state, STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL,    17);
       _building_Sunrise_Sunset_Time    = Util.getStateFloat(   _state, STATE_LAYER_BUILDING_SUN_RISE_SET_TIME, 0.5f);
 
       _building_IsShowShadow           = (Bool)       Util.getStateEnum(_state, STATE_LAYER_BUILDING_IS_SHOW_SHADOW,    Bool.TRUE);
       _building_SunDaytime             = (SunDayTime) Util.getStateEnum(_state, STATE_LAYER_BUILDING_SUN_DAY_TIME,      SunDayTime.CURRENT_TIME);
 
-      _layer_Label_IsVisible           = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_VISIBLE,         true) ;
-      _layer_Label_IsBeforeBuilding    = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_BEFORE_BUILDING, true) ;
+      _cartography_IsLuminance         = Util.getStateBoolean( _state, STATE_LAYER_CARTOGRAPHY_IS_LUMINANCE,   false) ;
+      _cartography_Luminance           = Util.getStateFloat(   _state, STATE_LAYER_CARTOGRAPHY_LUMINANCE,      0);
+
+      _layer_Label_IsVisible           = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_VISIBLE,           true) ;
+      _layer_Label_IsBeforeBuilding    = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_BEFORE_BUILDING,   true) ;
 
 // SET_FORMATTING_ON
    }
 
-   private void restoreState_MapPosition() {
+   private void restoreState_Map() {
 
       final MapPosition mapPosition = getStateMapPosition(STATE_SUFFIX_MAP_CURRENT_POSITION);
+
+// SET_FORMATTING_OFF
+
+      _mapCenter_VerticalPosition_IsEnabled  = Util.getStateBoolean( _state, STATE_MAP_CENTER_VERTICAL_POSITION_IS_ENABLED,   false);
+      _mapCenter_VerticalPosition            = Util.getStateInt(     _state, STATE_MAP_CENTER_VERTICAL_POSITION,              0);
+
+// SET_FORMATTING_ON
+
+      updateMap_VericalCenter();
 
       mMap.setMapPosition(mapPosition);
    }
@@ -1227,12 +1456,21 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
 // SET_FORMATTING_OFF
 
+      _state.put(STATE_MAP_CENTER_VERTICAL_POSITION_IS_ENABLED,      _mapCenter_VerticalPosition_IsEnabled);
+      _state.put(STATE_MAP_CENTER_VERTICAL_POSITION,                 _mapCenter_VerticalPosition);
+
+      // cartography
+      _state.put(STATE_LAYER_CARTOGRAPHY_IS_LUMINANCE,               _cartography_IsLuminance);
+      _state.put(STATE_LAYER_CARTOGRAPHY_LUMINANCE,                  _cartography_Luminance);
+
+      // building
       _state.put(STATE_LAYER_BUILDING_IS_VISIBLE,                    _building_IsVisible);
       _state.put(STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL,                _building_MinZoomLevel);
       _state.put(STATE_LAYER_BUILDING_SUN_RISE_SET_TIME,             _building_Sunrise_Sunset_Time);
       Util.setStateEnum(_state, STATE_LAYER_BUILDING_IS_SHOW_SHADOW, _building_IsShowShadow);
       Util.setStateEnum(_state, STATE_LAYER_BUILDING_SUN_DAY_TIME,   _building_SunDaytime);
 
+      // label
       _state.put(STATE_LAYER_LABEL_IS_VISIBLE,                       _layer_Label_IsVisible);
       _state.put(STATE_LAYER_LABEL_IS_BEFORE_BUILDING,               _layer_Label_IsBeforeBuilding);
 
@@ -1272,7 +1510,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       final RenderTheme modifiedRenderTheme = (RenderTheme) renderTheme;
 
-      modifiedRenderTheme.traverseRules(new MinZoomRuleVisitor(_building_MinZoomLevel));
+      modifiedRenderTheme.traverseRules(new RuleVisitor_MinZoom(_building_MinZoomLevel));
       modifiedRenderTheme.updateStyles();
    }
 
@@ -1322,15 +1560,18 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
          final float sunPosition = _building_Sunrise_Sunset_Time + nightAdjustment;
 
-//         System.out.println((System.currentTimeMillis() + " sun: " + sunPosition));
-         // TODO remove SYSTEM.OUT.PRINTLN
-
          final Sun sun = extrusionRenderer.getSun();
 
          sun.setProgress(sunPosition);
          sun.updatePosition();
          sun.updateColor();
       }
+   }
+
+   public void setLayer_Cartography_Options(final boolean isLuminance, final float luminance) {
+
+      _cartography_IsLuminance = isLuminance;
+      _cartography_Luminance = luminance;
    }
 
    public void setLayer_HillShading_Options(final int layer_HillShading_Opacity) {
@@ -1344,6 +1585,19 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_Label_IsBeforeBuilding = isBeforeBuilding;
    }
 
+   public void setMap_VerticalPosition(final boolean isMapCenter_VerticalPosition, final int mapCenter_VerticalPostion) {
+
+      _mapCenter_VerticalPosition_IsEnabled = isMapCenter_VerticalPosition;
+      _mapCenter_VerticalPosition = mapCenter_VerticalPostion;
+
+      updateMap_VericalCenter();
+
+      // update map, this must be run in the "main" thread
+      mMap.post(() -> {
+         mMap.viewport().tiltMap(0.0001f);
+      });
+   }
+
    /**
     * This is called when the map provider, theme or theme style was modified.
     *
@@ -1351,6 +1605,16 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     */
    public void setMapProvider(final Map25Provider mapProvider) {
 
+      /*
+       * Reset style colors
+       */
+
+      // clear cached colors
+      _ruleVisitor_Luminance.clearColorCache();
+
+      /*
+       * Set map provider
+       */
       _selectedMapProvider = mapProvider;
 
       if (mapProvider.tileEncoding == TileEncoding.MF) {
@@ -1413,6 +1677,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          mMap.setTheme(loadedRenderTheme, false);
 
          setLayer_Building_MinZoomLevel(loadedRenderTheme);
+         updateLayer_Cartography();
       }
    }
 
@@ -1457,14 +1722,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          if (checkMapFile(new File(offlineMapFilePath))) {
             StatusUtil.logInfo("[2.5D Map] Using map file: " + offlineMapFilePath); //$NON-NLS-1$
          } else {
-            final String errorText = "[2.5D Map] Cannot read map file: " + offlineMapFilePath;
+            final String errorText = "[2.5D Map] Cannot read map file: " + offlineMapFilePath; //$NON-NLS-1$
             StatusUtil.showStatus(errorText);
             throw new IllegalArgumentException(errorText);
          }
 
          tileSource = getAllOfflineMapFiles(offlineMapFilePath);
          if (_numOfflineMapFiles == 0) {
-            final String errorText = "[2.5D Map] Cannot read multiple map files from: " + offlineMapFilePath;
+            final String errorText = "[2.5D Map] Cannot read multiple map files from: " + offlineMapFilePath; //$NON-NLS-1$
             StatusUtil.showStatus(errorText);
             throw new IllegalArgumentException(errorText);
          }
@@ -1528,11 +1793,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       }
 
       /*
-       * Adjust building min zoom level
+       * Adjust style values
        */
       if (isThemeSet) {
 
          setLayer_Building_MinZoomLevel(iRenderTheme);
+         updateLayer_Cartography();
       }
    }
 
@@ -1680,6 +1946,47 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
          // this is necessarry that the new zoom level is applied, otherwise it do not work
          setMapProvider(_selectedMapProvider);
+      }
+   }
+
+   private void updateLayer_Cartography() {
+
+      if (_layer_BaseMap.isEnabled() == false) {
+         return;
+      }
+
+      // luminance is modified
+
+      final IRenderTheme mapTheme = _layer_BaseMap.getTheme();
+
+      if (mapTheme instanceof RenderTheme) {
+
+         if (_cartography_IsLuminance) {
+
+            // set luminance value
+
+            _ruleVisitor_Luminance.__isUseOriginalColor = false;
+            _ruleVisitor_Luminance.__cartography_Luminance = _cartography_Luminance;
+
+         } else {
+
+            // ignore luminance
+
+            _ruleVisitor_Luminance.__isUseOriginalColor = true;
+         }
+
+         final RenderTheme renderTheme = (RenderTheme) mapTheme;
+
+         renderTheme.traverseRules(_ruleVisitor_Luminance);
+         renderTheme.updateStyles();
+
+         /*
+          * Set map background color
+          */
+         final int mapBackground = mapTheme.getMapBackground();
+         final int adjustedMapBackground = computeLuminanceColor(mapBackground, _cartography_Luminance);
+
+         MapRenderer.setBackgroundColor(adjustedMapBackground);
       }
    }
 
@@ -1837,6 +2144,22 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    public void updateMap() {
 
       mMap.updateMap();
+   }
+
+   /**
+    * Set map vertical center in the map viewport
+    */
+   private void updateMap_VericalCenter() {
+
+      final float newMapCenter_VerticalPosition = _mapCenter_VerticalPosition_IsEnabled
+
+            // -100...100 -> +1...-1  invert sign that the top value is positive and not negative
+            ? _mapCenter_VerticalPosition / -MAP_CENTER_VERTICAL_MAX_VALUE
+
+            // set default value which is about the vertical middle
+            : 0;
+
+      mMap.viewport().setMapViewCenterY(newMapCenter_VerticalPosition);
    }
 
 }

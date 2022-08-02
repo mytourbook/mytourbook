@@ -85,12 +85,15 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
    private ControlDecoration _decoratorShowLayer_Label;
 
    private Button            _chkShowLayer_Cartography;
+   private Button            _chkShowLayer_Cartography_IsLuminance;
+   private Button            _chkShowLayer_CompassRose;
    private Button            _chkShowLayer_Building;
    private Button            _chkShowLayer_Building_Shadow;
    private Button            _chkShowLayer_Hillshading;
    private Button            _chkShowLayer_Satellite;
    private Button            _chkShowLayer_Label;
    private Button            _chkShowLayer_Label_IsBeforeBuilding;
+   private Button            _chkShowLayer_Legend;
    private Button            _chkShowLayer_Scale;
    private Button            _chkShowLayer_TileInfo;
 
@@ -108,7 +111,10 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
    private Spinner           _spinnerBuilding_MinZoomLevel;
    private Spinner           _spinnerBuilding_SunTime_Coarse;
    private Spinner           _spinnerBuilding_SunTime_Fine;
+   private Spinner           _spinnerCartography_Luminance;
    private Spinner           _spinnerHillShadingOpacity;
+
+// private Button            _chkShowLayer_OpenGLTest;
 
    /**
     * Reset spinner value
@@ -223,6 +229,14 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       GridLayoutFactory.swtDefaults().numColumns(1).applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_YELLOW);
       {
+//         {
+//            /*
+//             * Test layer
+//             */
+//            _chkShowLayer_OpenGLTest = new Button(container, SWT.CHECK);
+//            _chkShowLayer_OpenGLTest.setText("TEST Layer"); //$NON-NLS-1$
+//            _chkShowLayer_OpenGLTest.addSelectionListener(_layerSelectionListener);
+//         }
          {
             /*
              * Text label
@@ -248,11 +262,19 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
          {
             /*
-             * Scale
+             * Scale bar
              */
             _chkShowLayer_Scale = new Button(container, SWT.CHECK);
             _chkShowLayer_Scale.setText(Messages.Slideout_Map25Layer_Checkbox_Layer_ScaleBar);
             _chkShowLayer_Scale.addSelectionListener(_layerSelectionListener);
+         }
+         {
+            /*
+             * Legend
+             */
+            _chkShowLayer_Legend = new Button(container, SWT.CHECK);
+            _chkShowLayer_Legend.setText(Messages.Slideout_Map25Layer_Checkbox_Layer_Legend);
+            _chkShowLayer_Legend.addSelectionListener(_layerSelectionListener);
          }
          {
             /*
@@ -262,6 +284,38 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
             _chkShowLayer_Cartography.setText(Messages.Slideout_Map25Layer_Checkbox_Layer_Cartography);
             _chkShowLayer_Cartography.setToolTipText(Messages.Slideout_Map25Layer_Checkbox_Layer_Cartography_Tooltip);
             _chkShowLayer_Cartography.addSelectionListener(_layerSelectionListener);
+
+            {
+               /*
+                * Luminance
+                */
+               final Composite containerLuminance = new Composite(container, SWT.NONE);
+               GridDataFactory.fillDefaults().indent(UI.FORM_FIRST_COLUMN_INDENT, 0).applyTo(containerLuminance);
+               GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerLuminance);
+               {
+                  {
+                     /*
+                      * Show/hide luminance
+                      */
+                     _chkShowLayer_Cartography_IsLuminance = new Button(containerLuminance, SWT.CHECK);
+                     _chkShowLayer_Cartography_IsLuminance.setText(Messages.Slideout_Map25Layer_Checkbox_Cartography_IsLuminance);
+                     _chkShowLayer_Cartography_IsLuminance.setToolTipText(Messages.Slideout_Map25Layer_Checkbox_Cartography_IsLuminance_Tooltip);
+                     _chkShowLayer_Cartography_IsLuminance.addSelectionListener(_layerSelectionListener);
+                     indentGridData.grab(false, false).applyTo(_chkShowLayer_Cartography_IsLuminance);
+                  }
+                  {
+                     _spinnerCartography_Luminance = new Spinner(containerLuminance, SWT.BORDER);
+                     _spinnerCartography_Luminance.setMinimum(-10);
+                     _spinnerCartography_Luminance.setMaximum(10);
+                     _spinnerCartography_Luminance.setIncrement(1);
+                     _spinnerCartography_Luminance.setPageIncrement(5);
+                     _spinnerCartography_Luminance.setToolTipText(Messages.Slideout_Map25Layer_Checkbox_Cartography_IsLuminance_Tooltip);
+
+                     _spinnerCartography_Luminance.addSelectionListener(_layerSelectionListener);
+                     _spinnerCartography_Luminance.addMouseWheelListener(_mouseWheelListener);
+                  }
+               }
+            }
          }
          {
             /*
@@ -276,7 +330,9 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
              * Hillshading
              */
             final Composite containerHillshading = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(containerHillshading);
+            GridDataFactory.fillDefaults()
+//                  .grab(true, false)
+                  .applyTo(containerHillshading);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerHillshading);
             {
                {
@@ -285,26 +341,31 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
                   _chkShowLayer_Hillshading.addSelectionListener(_layerSelectionListener);
                }
                {
-                  /*
-                   * Opacity
-                   */
-
-                  final String tooltipText = NLS.bind(Messages.Slideout_Map25Layer_Spinner_Layer_Hillshading, UI.TRANSFORM_OPACITY_MAX);
-
                   _spinnerHillShadingOpacity = new Spinner(containerHillshading, SWT.BORDER);
                   _spinnerHillShadingOpacity.setMinimum(0);
                   _spinnerHillShadingOpacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
                   _spinnerHillShadingOpacity.setIncrement(1);
                   _spinnerHillShadingOpacity.setPageIncrement(UI.TRANSFORM_OPACITY_MAX / 10);
-                  _spinnerHillShadingOpacity.setToolTipText(tooltipText);
+                  _spinnerHillShadingOpacity.setToolTipText(NLS.bind(
+                        Messages.Slideout_Map25Layer_Spinner_Layer_Hillshading,
+                        UI.TRANSFORM_OPACITY_MAX));
+
                   _spinnerHillShadingOpacity.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModify_HillShadingOpacity()));
                   _spinnerHillShadingOpacity.addMouseWheelListener(mouseEvent -> {
                      UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
                      onModify_HillShadingOpacity();
                   });
-                  GridDataFactory.fillDefaults().grab(true, false).align(SWT.END, SWT.CENTER).applyTo(_spinnerHillShadingOpacity);
                }
             }
+         }
+         {
+            /*
+             * CompassRose layer
+             */
+            _chkShowLayer_CompassRose = new Button(container, SWT.CHECK);
+            _chkShowLayer_CompassRose.setText(Messages.Slideout_Map25Layer_Checkbox_Layer_CompassRose);
+            _chkShowLayer_CompassRose.addSelectionListener(_layerSelectionListener);
+            _chkShowLayer_CompassRose.setToolTipText(Messages.Slideout_Map25Layer_Checkbox_Layer_CompassRose_Tooltip);
          }
          {
             /*
@@ -356,7 +417,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
                _lblBuilding_MinZoomLevel = new Label(containerBuilding, SWT.NONE);
                _lblBuilding_MinZoomLevel.setText(Messages.Slideout_Map25Layer_Label_BuildingMinZoomLevel);
                _lblBuilding_MinZoomLevel.setToolTipText(tooltipText);
-               centerGridData.applyTo(_lblBuilding_MinZoomLevel);
+               centerGridData.grab(false, false).applyTo(_lblBuilding_MinZoomLevel);
             }
             {
                _spinnerBuilding_MinZoomLevel = new Spinner(containerBuilding, SWT.BORDER);
@@ -516,39 +577,46 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
    private void enableControls() {
 
-      final boolean isCartographyVisible = _chkShowLayer_Cartography.getSelection();
-      final boolean isHillShadingVisible = _chkShowLayer_Hillshading.getSelection();
-      final boolean isLabelVisible = _chkShowLayer_Label.getSelection();
+// SET_FORMATTING_OFF
 
-      final boolean isBuilding_Visible = _chkShowLayer_Building.getSelection();
-      final boolean isBuilding_ShowShadow = _chkShowLayer_Building_Shadow.getSelection() && isBuilding_Visible;
+      final boolean isCartographyVisible     = _chkShowLayer_Cartography.getSelection();
+      final boolean isCartographyLuminance   = _chkShowLayer_Cartography_IsLuminance.getSelection();
+      final boolean isHillShadingVisible     = _chkShowLayer_Hillshading.getSelection();
+      final boolean isLabelVisible           = _chkShowLayer_Label.getSelection();
+
+      final boolean isBuilding_Visible       = _chkShowLayer_Building.getSelection();
+      final boolean isBuilding_ShowShadow    = _chkShowLayer_Building_Shadow.getSelection() && isBuilding_Visible;
 
       final SunDayTime selectedSunDayTime = getSelected_SunDayTime();
       final boolean isBuilding_Sunrise_Sunset_Time = (selectedSunDayTime.equals(SunDayTime.DAY_TIME)
             || selectedSunDayTime.equals(SunDayTime.NIGHT_TIME))
             && isBuilding_ShowShadow;
 
-      _actionResetValue_SunTime_Coarse.setEnabled(isBuilding_Sunrise_Sunset_Time);
-      _actionResetValue_SunTime_Fine.setEnabled(isBuilding_Sunrise_Sunset_Time);
+      _actionResetValue_SunTime_Coarse       .setEnabled(isBuilding_Sunrise_Sunset_Time);
+      _actionResetValue_SunTime_Fine         .setEnabled(isBuilding_Sunrise_Sunset_Time);
 
-      _chkShowLayer_Building_Shadow.setEnabled(isBuilding_Visible);
-      _chkShowLayer_Label_IsBeforeBuilding.setEnabled(isLabelVisible && isBuilding_Visible);
+      _chkShowLayer_Building_Shadow          .setEnabled(isBuilding_Visible);
+      _chkShowLayer_Label_IsBeforeBuilding   .setEnabled(isLabelVisible && isBuilding_Visible);
+      _chkShowLayer_Cartography_IsLuminance  .setEnabled(isCartographyVisible);
 
-      _comboBuilding_SunPosition.setEnabled(isBuilding_ShowShadow);
+      _comboBuilding_SunPosition             .setEnabled(isBuilding_ShowShadow);
 
-      _lblBuilding_MinZoomLevel.setEnabled(isBuilding_Visible);
-      _lblBuilding_SunPosition.setEnabled(isBuilding_ShowShadow);
-      _lblBuilding_Sunrise.setEnabled(isBuilding_Sunrise_Sunset_Time);
-      _lblBuilding_Sunset.setEnabled(isBuilding_Sunrise_Sunset_Time);
-      _lblBuilding_SunTime.setEnabled(isBuilding_Sunrise_Sunset_Time);
-      _lblBuilding_SelectedSunTime.setEnabled(isBuilding_Sunrise_Sunset_Time);
+      _lblBuilding_MinZoomLevel              .setEnabled(isBuilding_Visible);
+      _lblBuilding_SunPosition               .setEnabled(isBuilding_ShowShadow);
+      _lblBuilding_Sunrise                   .setEnabled(isBuilding_Sunrise_Sunset_Time);
+      _lblBuilding_Sunset                    .setEnabled(isBuilding_Sunrise_Sunset_Time);
+      _lblBuilding_SunTime                   .setEnabled(isBuilding_Sunrise_Sunset_Time);
+      _lblBuilding_SelectedSunTime           .setEnabled(isBuilding_Sunrise_Sunset_Time);
 
-      _scaleBuilding_SunTime.setEnabled(isBuilding_Sunrise_Sunset_Time);
+      _scaleBuilding_SunTime                 .setEnabled(isBuilding_Sunrise_Sunset_Time);
 
-      _spinnerHillShadingOpacity.setEnabled(isHillShadingVisible);
-      _spinnerBuilding_MinZoomLevel.setEnabled(isBuilding_Visible);
-      _spinnerBuilding_SunTime_Coarse.setEnabled(isBuilding_Sunrise_Sunset_Time);
-      _spinnerBuilding_SunTime_Fine.setEnabled(isBuilding_Sunrise_Sunset_Time);
+      _spinnerBuilding_MinZoomLevel          .setEnabled(isBuilding_Visible);
+      _spinnerBuilding_SunTime_Coarse        .setEnabled(isBuilding_Sunrise_Sunset_Time);
+      _spinnerBuilding_SunTime_Fine          .setEnabled(isBuilding_Sunrise_Sunset_Time);
+      _spinnerCartography_Luminance          .setEnabled(isCartographyVisible && isCartographyLuminance);
+      _spinnerHillShadingOpacity             .setEnabled(isHillShadingVisible);
+
+// SET_FORMATTING_ON
 
       if (isCartographyVisible) {
 
@@ -722,12 +790,17 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
 // SET_FORMATTING_OFF
 
+//      _chkShowLayer_OpenGLTest               .setSelection(_mapApp.getLayer_OpenGLTest()                 .isEnabled());
+
       _chkShowLayer_Building                 .setSelection(_mapApp.getLayer_Building_S3DB()              .isEnabled());
-      _chkShowLayer_Building_Shadow          .setSelection(_mapApp.getLayer_Building_IsShadow()          == Bool.TRUE);
+      _chkShowLayer_Building_Shadow          .setSelection(_mapApp.getLayer_Building_IsShadow() == Bool.TRUE);
       _chkShowLayer_Cartography              .setSelection(_mapApp.getLayer_BaseMap()                    .isEnabled());
+      _chkShowLayer_Cartography_IsLuminance  .setSelection(_mapApp.getLayer_Cartography_IsLuminance());
+      _chkShowLayer_CompassRose              .setSelection(_mapApp.getLayer_CompassRose()                .isEnabled());
       _chkShowLayer_Hillshading              .setSelection(_mapApp.getLayer_HillShading()                .isEnabled());
       _chkShowLayer_Label                    .setSelection(_mapApp.getLayer_Label()                      .isEnabled());
       _chkShowLayer_Label_IsBeforeBuilding   .setSelection(_mapApp.getLayer_Label_IsBeforeBuilding());
+      _chkShowLayer_Legend                   .setSelection(_mapApp.getLayer_Legend()                     .isEnabled());
       _chkShowLayer_Scale                    .setSelection(_mapApp.getLayer_ScaleBar()                   .isEnabled());
       _chkShowLayer_Satellite                .setSelection(_mapApp.getLayer_Satellite()                  .isEnabled());
       _chkShowLayer_TileInfo                 .setSelection(_mapApp.getLayer_TileInfo()                   .isEnabled());
@@ -735,6 +808,7 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
       _comboBuilding_SunPosition             .select(getSunPositionIndex());
 
       _spinnerBuilding_MinZoomLevel          .setSelection(_mapApp.getLayer_Building_MinZoomLevel() + ZOOM_UI_OFFSET);
+      _spinnerCartography_Luminance          .setSelection((int) (_mapApp.getLayer_Cartography_Luminance() * 10));
       _spinnerHillShadingOpacity             .setSelection(UI.transformOpacity_WhenRestored(_mapApp.getLayer_HillShading_Opacity()));
 
 // SET_FORMATTING_ON
@@ -742,15 +816,26 @@ public class SlideoutMap25_MapLayer extends ToolbarSlideout {
 
    private void saveState() {
 
-      _mapApp.getLayer_BaseMap().setEnabled(_chkShowLayer_Cartography.getSelection());
-      _mapApp.getLayer_HillShading().setEnabled(_chkShowLayer_Hillshading.getSelection());
+// SET_FORMATTING_OFF
+
+//      _mapApp.getLayer_OpenGLTest()    .setEnabled(_chkShowLayer_OpenGLTest.getSelection());
+      _mapApp.getLayer_BaseMap()       .setEnabled(_chkShowLayer_Cartography.getSelection());
+      _mapApp.getLayer_HillShading()   .setEnabled(_chkShowLayer_Hillshading.getSelection());
 
       // satellite maps
-      _mapApp.getLayer_Satellite().setEnabled(_chkShowLayer_Satellite.getSelection());
+      _mapApp.getLayer_Satellite()     .setEnabled(_chkShowLayer_Satellite.getSelection());
 
-      _mapApp.getLayer_Label().setEnabled(_chkShowLayer_Label.getSelection());
-      _mapApp.getLayer_ScaleBar().setEnabled(_chkShowLayer_Scale.getSelection());
-      _mapApp.getLayer_TileInfo().setEnabled(_chkShowLayer_TileInfo.getSelection());
+      _mapApp.getLayer_CompassRose()   .setEnabled(_chkShowLayer_CompassRose.getSelection());
+      _mapApp.getLayer_Label()         .setEnabled(_chkShowLayer_Label.getSelection());
+      _mapApp.getLayer_Legend()        .setEnabled(_chkShowLayer_Legend.getSelection());
+      _mapApp.getLayer_ScaleBar()      .setEnabled(_chkShowLayer_Scale.getSelection());
+      _mapApp.getLayer_TileInfo()      .setEnabled(_chkShowLayer_TileInfo.getSelection());
+
+// SET_FORMATTING_ON
+
+      _mapApp.setLayer_Cartography_Options(
+            _chkShowLayer_Cartography_IsLuminance.getSelection(),
+            _spinnerCartography_Luminance.getSelection() / 10.0f);
 
       _mapApp.setLayer_Label_Options(
             _chkShowLayer_Label.getSelection(),

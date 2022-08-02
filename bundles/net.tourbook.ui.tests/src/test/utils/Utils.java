@@ -26,9 +26,9 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 public class Utils {
 
-   private static String tourBookViewTitle = "Tour Book";
+   private static String tourBookViewTitle = "Tour Book"; //$NON-NLS-1$
 
-   public static String  workingDirectory  = System.getProperty("user.dir");
+   public static String  workingDirectory  = System.getProperty("user.dir"); //$NON-NLS-1$
 
    public static SWTBotTreeItem getTour(final SWTWorkbenchBot bot) {
 
@@ -36,8 +36,8 @@ public class Utils {
 
       bot.toolbarButtonWithTooltip(Messages.App_Action_CollapseAll).click();
 
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand()
-            .getNode("Jan   2").expand().select().getNode("31").select();
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand() //$NON-NLS-1$
+            .getNode("Jan   2").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
       return tour;

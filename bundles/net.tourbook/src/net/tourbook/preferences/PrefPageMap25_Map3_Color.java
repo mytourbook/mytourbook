@@ -73,7 +73,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseWheelListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
@@ -85,7 +84,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
@@ -93,9 +91,9 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPreferencePage, IMap3ColorUpdater, ITourViewer, ITreeViewer {
+public class PrefPageMap25_Map3_Color extends PreferencePage implements IWorkbenchPreferencePage, IMap3ColorUpdater, ITourViewer, ITreeViewer {
 
-   public static final String                        ID                               = "net.tourbook.preferences.PrefPageMap3Color";      //$NON-NLS-1$
+   public static final String                        ID                               = "net.tourbook.preferences.PrefPageMap25_Map3_Color"; //$NON-NLS-1$
 
    private static final String                       APP_ACTION_COLUMNS               = net.tourbook.Messages.App_Action_Columns;
    private static final String                       APP_ACTION_DUPLICATE             = net.tourbook.Messages.App_Action_Duplicate;
@@ -106,7 +104,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
    private static int                                PROFILE_IMAGE_HEIGHT;
    private static final int                          PROFILE_IMAGE_MIN_SIZE           = 30;
 
-   private static final String                       STATE_EXPANDED_COLOR_DEFINITIONS = "STATE_EXPANDED_COLOR_DEFINITIONS";                //$NON-NLS-1$
+   private static final String                       STATE_EXPANDED_COLOR_DEFINITIONS = "STATE_EXPANDED_COLOR_DEFINITIONS";                  //$NON-NLS-1$
 
    private final IPreferenceStore                    _prefStore                       = TourbookPlugin.getPrefStore();
    private final IDialogSettings                     _state                           = TourbookPlugin.getState(this.getClass().getName());
@@ -142,8 +140,6 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
    private HashMap<Map3GradientColorProvider, Image> _profileImages                   = new HashMap<>();
 
-   private MouseWheelListener                        _defaultMouseWheelListener;
-
    /*
     * UI controls
     */
@@ -156,15 +152,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
    private Button    _chkShowColorSelector;
 
-   private Label     _lblNumberOfColors;
-
-   private Spinner   _spinNumberOfColors;
-
    private ToolBar   _toolBar;
-
-   {
-      _defaultMouseWheelListener = UI::adjustSpinnerValueOnMouseScroll;
-   }
 
    /**
     * the color content provider has the following structure<br>
@@ -207,7 +195,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
       @Override
       public Object[] getElements(final Object inputElement) {
 
-         if (inputElement instanceof PrefPageMap3Color) {
+         if (inputElement instanceof PrefPageMap25_Map3_Color) {
             return getColorDefinitions();
          }
 
@@ -233,7 +221,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
-   public PrefPageMap3Color() {
+   public PrefPageMap25_Map3_Color() {
 
 //      noDefaultAndApplyButton();
    }
@@ -668,39 +656,6 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
                   .setToolTipText(Messages.Pref_Map3Color_Checkbox_ShowDropDownColorSelector_Tooltip);
             _chkShowColorSelector.addSelectionListener(widgetSelectedAdapter(selectionEvent -> enableControls()));
          }
-
-         final Composite rowContainer = new Composite(container, SWT.NONE);
-         GridDataFactory.fillDefaults().grab(true, false).applyTo(rowContainer);
-         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(rowContainer);
-//         rowContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_MAGENTA));
-         {
-            {
-               /*
-                * Label: Number of colors
-                */
-               _lblNumberOfColors = new Label(rowContainer, SWT.NONE);
-               GridDataFactory.fillDefaults()//
-//                     .indent(16, 0)
-//                     .grab(true, false)
-//                     .align(SWT.END, SWT.CENTER)
-                     .indent(20, 0)
-                     .align(SWT.FILL, SWT.CENTER)
-                     .applyTo(_lblNumberOfColors);
-               _lblNumberOfColors.setText(Messages.Pref_Map3Color_Label_NumberOfColors);
-               _lblNumberOfColors.setToolTipText(Messages.Pref_Map3Color_Label_NumberOfColors_Tooltip);
-            }
-
-            {
-               /*
-                * Spinner: Number of colors
-                */
-               _spinNumberOfColors = new Spinner(rowContainer, SWT.BORDER);
-               _spinNumberOfColors.setMinimum(2);
-               _spinNumberOfColors.setMaximum(50);
-               _spinNumberOfColors.setPageIncrement(5);
-               _spinNumberOfColors.addMouseWheelListener(_defaultMouseWheelListener);
-            }
-         }
       }
    }
 
@@ -1005,7 +960,6 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
       boolean isColorProfileSelected = false;
       boolean canRemoveProfiles = false;
-      final boolean isColorSelectorDisplayed = _chkShowColorSelector.getSelection();
 
       if (firstSelectedItem instanceof Map3GradientColorProvider) {
 
@@ -1024,9 +978,6 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
       _btnEditProfile.setEnabled(isColorProfileSelected);
       _btnDuplicateProfile.setEnabled(isColorProfileSelected);
       _btnRemoveProfile.setEnabled(canRemoveProfiles);
-
-      _lblNumberOfColors.setEnabled(isColorSelectorDisplayed);
-      _spinNumberOfColors.setEnabled(isColorSelectorDisplayed);
    }
 
    private void expandCollapseTreeItem(final Map3ColorDefinition treeItem) {
@@ -1391,11 +1342,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
    @Override
    protected void performDefaults() {
 
-      _chkShowColorSelector.setSelection(//
-            _prefStore.getDefaultBoolean(ITourbookPreferences.MAP3_IS_COLOR_SELECTOR_DISPLAYED));
-
-      _spinNumberOfColors.setSelection(//
-            _prefStore.getDefaultInt(ITourbookPreferences.MAP3_NUMBER_OF_COLOR_SELECTORS));
+      _chkShowColorSelector.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.MAP3_IS_COLOR_SELECTOR_DISPLAYED));
 
       enableControls();
 
@@ -1446,11 +1393,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
    private void restorePrefStore() {
 
-      _chkShowColorSelector.setSelection(//
-            _prefStore.getBoolean(ITourbookPreferences.MAP3_IS_COLOR_SELECTOR_DISPLAYED));
-
-      _spinNumberOfColors.setSelection(//
-            _prefStore.getInt(ITourbookPreferences.MAP3_NUMBER_OF_COLOR_SELECTORS));
+      _chkShowColorSelector.setSelection(_prefStore.getBoolean(ITourbookPreferences.MAP3_IS_COLOR_SELECTOR_DISPLAYED));
    }
 
    private void restoreStateViewer() {
@@ -1475,13 +1418,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
 
    private void savePrefStore() {
 
-      _prefStore.setValue(//
-            ITourbookPreferences.MAP3_IS_COLOR_SELECTOR_DISPLAYED,
-            _chkShowColorSelector.getSelection());
-
-      _prefStore.setValue(//
-            ITourbookPreferences.MAP3_NUMBER_OF_COLOR_SELECTORS,
-            _spinNumberOfColors.getSelection());
+      _prefStore.setValue(ITourbookPreferences.MAP3_IS_COLOR_SELECTOR_DISPLAYED, _chkShowColorSelector.getSelection());
    }
 
    private void saveState() {
@@ -1551,10 +1488,7 @@ public class PrefPageMap3Color extends PreferencePage implements IWorkbenchPrefe
    }
 
    @Override
-   public void updateColumnHeader(final ColumnDefinition colDef) {
-      // TODO Auto-generated method stub
-
-   }
+   public void updateColumnHeader(final ColumnDefinition colDef) {}
 
    private void updateUI_SelectColorProvider(final Map3GradientColorProvider selectedColorProvider) {
 

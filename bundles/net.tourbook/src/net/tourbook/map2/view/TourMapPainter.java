@@ -353,8 +353,8 @@ public class TourMapPainter extends Map2Painter {
       int availableLegendPixels;
       int contentX;
       int contentY;
-      int contentWidth;
-      int contentHeight;
+      int graphWidth;
+      int graphHeight;
 
       if (isDrawVertical) {
 
@@ -365,19 +365,19 @@ public class TourMapPainter extends Map2Painter {
             contentX = borderSize;
             contentY = borderSize + IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
 
-            contentWidth = IMapColorProvider.DEFAULT_LEGEND_GRAPHIC_WIDTH;
-            contentHeight = legendHeight - borderSize2 - 1 - 2 * IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
+            graphWidth = IMapColorProvider.DEFAULT_LEGEND_GRAPHIC_WIDTH;
+            graphHeight = legendHeight - borderSize2 - 1 - 2 * IMapColorProvider.LEGEND_MARGIN_TOP_BOTTOM;
 
          } else {
 
             contentX = borderSize;
             contentY = borderSize;
 
-            contentWidth = legendWidth - borderSize2;
-            contentHeight = legendHeight - borderSize2 - 1;
+            graphWidth = legendWidth - borderSize2;
+            graphHeight = legendHeight - borderSize2 - 1;
          }
 
-         availableLegendPixels = contentHeight;
+         availableLegendPixels = graphHeight;
 
       } else {
 
@@ -386,10 +386,10 @@ public class TourMapPainter extends Map2Painter {
          contentX = borderSize;
          contentY = borderSize;
 
-         contentWidth = legendWidth - borderSize2;
-         contentHeight = legendHeight - borderSize2 - 1;
+         graphWidth = legendWidth - borderSize2;
+         graphHeight = legendHeight - borderSize2 - 1;
 
-         availableLegendPixels = contentWidth;
+         availableLegendPixels = graphWidth;
       }
 
       // pixelValue contains the value for ONE pixel
@@ -434,10 +434,30 @@ public class TourMapPainter extends Map2Painter {
                      } else {
 
                         if (legendFormatDigits == 0) {
+
                            valueText = Integer.toString(unitValue.intValue()) + UI.SPACE + unitText;
+
                         } else {
+
                            // currently only 1 digit is supported
-                           valueText = _nf1.format(unitValue) + UI.SPACE + unitText;
+
+                           final float unitDecimals = unitValue.floatValue() - unitValue.intValue();
+
+                           if (Math.abs(unitDecimals) < 0.1) {
+
+                              // hide ".0" decimals
+
+                              valueText = UI.EMPTY_STRING
+
+                                    // add space to align values in a column, it't not perfect but better than nothing
+                                    + UI.SPACE3
+
+                                    + Integer.toString(unitValue.intValue()) + UI.SPACE + unitText;
+
+                           } else {
+
+                              valueText = _nf1.format(unitValue) + UI.SPACE + unitText;
+                           }
                         }
                      }
 
@@ -446,7 +466,7 @@ public class TourMapPainter extends Map2Painter {
                      // when unitLabels are available, they will overwrite the default labeling
                      valueText = unitLabels.get(unitLabelIndex++);
                   }
-                  final int devXText = contentWidth + 7;
+                  final int devXText = graphWidth + 7;
                   final int devYText = (int) (devValue + lineheight / 2);
 
                   if (isDarkBackground) {
@@ -503,12 +523,12 @@ public class TourMapPainter extends Map2Painter {
          if (isDrawVertical) {
 
             // vertical legend
-            g2d.drawLine(contentX, devValue, contentWidth, devValue);
+            g2d.drawLine(contentX, devValue, graphWidth, devValue);
 
          } else {
 
             // horizontal legend
-            g2d.drawLine(devValue, contentY, devValue, contentHeight);
+            g2d.drawLine(devValue, contentY, devValue, graphHeight);
          }
 
       }
@@ -622,7 +642,7 @@ public class TourMapPainter extends Map2Painter {
                legendWidth,
                legendHeight,
                true, // isVertical
-               false, // isDrawUnits
+               true, // isDrawUnits
                isDarkBackground,
                isDrawUnitShadow);
       }
@@ -1624,10 +1644,10 @@ public class TourMapPainter extends Map2Painter {
          _symbolHoveredMargin2 = _symbolHoveredMargin / 2;
 
          gcTile.setLineWidth(_symbolSize);
-         
+
          int devFrom_WithOffsetX = 0;
          int devFrom_WithOffsetY = 0;
-         
+
          Color lastVisibleColor = null;
 
          for (int serieIndex = 0; serieIndex < longitudeSerie.length; serieIndex++) {
@@ -1781,7 +1801,6 @@ public class TourMapPainter extends Map2Painter {
 
                   lastInsideIndex = serieIndex;
                }
-
 
                // check first outside point
                if (isVisibleDataPoint && serieIndex == lastInsideIndex + 1) {
@@ -2498,9 +2517,14 @@ public class TourMapPainter extends Map2Painter {
                                      final Rectangle legendBounds,
                                      final int valueIndex) {
 
-      if (_dataSerie == null || valueIndex >= _dataSerie.length || //
-      // check legend provider type
-            _legendProvider instanceof IGradientColorProvider == false//
+      if (_dataSerie == null
+
+            || valueIndex < 0
+            || valueIndex >= _dataSerie.length
+
+            // check legend provider type
+            || _legendProvider instanceof IGradientColorProvider == false
+
       ) {
          return Integer.MIN_VALUE;
       }
