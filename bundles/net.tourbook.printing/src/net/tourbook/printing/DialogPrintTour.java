@@ -563,7 +563,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 
                for (final TourData tourData : _tourDataList) {
 
-                  // get filepath
+                  // get file path
                   final IPath filePath = printFilePath
                         .append(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(tourData))
                         .addFileExtension(PDF_FILE_EXTENSION);
@@ -573,7 +573,7 @@ public class DialogPrintTour extends TitleAreaDialog {
                    */
                   Display.getDefault().syncExec(() -> {
 
-                     // display printed filepath
+                     // display printed file path
                      _lblPrintFilePath.setText(NLS.bind(
                            Messages.Dialog_Print_Lbl_PdfFilePath,
                            filePath.toOSString()));
