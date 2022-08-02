@@ -168,7 +168,6 @@ public class TourExporter {
       setIsExportWithBarometer(isExportWithBarometer);
       setIsCamouflageSpeed(isCamouflageSpeed);
       setCamouflageSpeed(camouflageSpeed);
-      _camouflageSpeed = camouflageSpeed;
       _isRange = isRange;
       _tourStartIndex = tourStartIndex;
       _tourEndIndex = tourEndIndex;
@@ -190,7 +189,7 @@ public class TourExporter {
                                    final GarminLap lap,
                                    final String exportFileName) throws IOException {
       /*
-       * Create sorted lists that the comparision of before and after (export and import/export) can
+       * Create sorted lists that the comparison of before and after (export and import/export) can
        * be done easily
        */
       final ArrayList<DeviceSensorValue> allSorted_SensorValues = new ArrayList<>(_tourData.getDeviceSensorValues());
@@ -797,8 +796,8 @@ public class TourExporter {
          }
 
          if (isSpeed) {
-            //todo fb
-            final double speedValue = Math.round(speedSerie[serieIndex] / 3.6f); // speed km/h -> m/s
+            final double speedValueMetersPerSecond = speedSerie[serieIndex] / 3.6; // speed km/h -> m/s
+            final double speedValue = Math.round(speedValueMetersPerSecond * 10.0) / 10.0;
             tpExt.setSpeed(speedValue);
          }
 
