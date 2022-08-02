@@ -17,68 +17,68 @@ package net.tourbook.printing;
 
 public class PrintSettings {
 
-   private PaperSize        paperSize;
-   private PaperOrientation paperOrientation;
-   private String           completeFilePath;
-   private boolean          isPrintMarkers;
-   private boolean          isPrintDescription;
-   private boolean          isOverwriteFiles;
-   private boolean          isOpenFile;
+   private PaperSize        _paperSize;
+   private PaperOrientation _paperOrientation;
+   private String           _completeFilePath;
+   private boolean          _isPrintMarkers;
+   private boolean          _isPrintDescription;
+   private boolean          _isOverwriteFiles;
+   private boolean          _isOpenFile;
 
    public String getCompleteFilePath() {
-      return completeFilePath;
+      return _completeFilePath;
    }
 
    public PaperOrientation getPaperOrientation() {
-      return paperOrientation;
+      return _paperOrientation;
    }
 
    public PaperSize getPaperSize() {
-      return paperSize;
+      return _paperSize;
    }
 
    public boolean isOverwriteFiles() {
-      return isOverwriteFiles;
+      return _isOverwriteFiles;
    }
 
    public boolean isPrintDescription() {
-      return isPrintDescription;
+      return _isPrintDescription;
    }
 
    public boolean isPrintMarkers() {
-      return isPrintMarkers;
+      return _isPrintMarkers;
    }
 
    public void setCompleteFilePath(final String completeFilePath) {
-      this.completeFilePath = completeFilePath;
+      this._completeFilePath = completeFilePath;
    }
 
    public void setOverwriteFiles(final boolean isOverwriteFiles) {
-      this.isOverwriteFiles = isOverwriteFiles;
+      this._isOverwriteFiles = isOverwriteFiles;
    }
 
    public void setPaperOrientation(final PaperOrientation paperOrientation) {
-      this.paperOrientation = paperOrientation;
+      this._paperOrientation = paperOrientation;
    }
 
    public void setPaperSize(final PaperSize paperSize) {
-      this.paperSize = paperSize;
+      this._paperSize = paperSize;
    }
 
    public void setPrintDescription(final boolean isPrintDescription) {
-      this.isPrintDescription = isPrintDescription;
+      this._isPrintDescription = isPrintDescription;
    }
 
    public void setPrintMarkers(final boolean isPrintMarkers) {
-      this.isPrintMarkers = isPrintMarkers;
+      this._isPrintMarkers = isPrintMarkers;
    }
 
    public boolean isOpenFile() {
-      return isOpenFile;
+      return _isOpenFile;
    }
 
    public void setOpenFile(final boolean isOpenFile) {
-      this.isOpenFile = isOpenFile;
+      this._isOpenFile = isOpenFile;
    }
 
 }

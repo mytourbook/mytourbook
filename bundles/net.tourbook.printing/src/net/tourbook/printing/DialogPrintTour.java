@@ -509,29 +509,9 @@ public class DialogPrintTour extends TitleAreaDialog {
       final PrintSettings printSettings = new PrintSettings();
       printSettings.setCompleteFilePath(completeFilePath);
 
-      switch (_comboPaperSize.getSelectionIndex()) {
-      case 0:
-         printSettings.setPaperSize(PaperSize.A4);
-         break;
-      case 1:
-         printSettings.setPaperSize(PaperSize.LETTER);
-         break;
+      setPaperSize(printSettings);
 
-      default:
-         break;
-      }
-
-      switch (_comboPaperOrientation.getSelectionIndex()) {
-      case 0:
-         printSettings.setPaperOrientation(PaperOrientation.PORTRAIT);
-         break;
-      case 1:
-         printSettings.setPaperOrientation(PaperOrientation.LANDSCAPE);
-         break;
-
-      default:
-         break;
-      }
+      setPaperOrientation(printSettings);
 
       printSettings.setOpenFile(_chkOpenFile.getSelection());
       printSettings.setOverwriteFiles(_chkOverwriteFiles.getSelection());
@@ -544,7 +524,8 @@ public class DialogPrintTour extends TitleAreaDialog {
 
          if (_printExtensionPoint instanceof PrintTourPDF) {
             //System.out.println("tour id:"+tourData.getTourId());
-            ((PrintTourPDF) _printExtensionPoint).printPDF(tourData, printSettings);
+
+            printTourPdf(printSettings, tourData);
          }
       } else {
          /*
@@ -587,12 +568,7 @@ public class DialogPrintTour extends TitleAreaDialog {
 
                   if (_printExtensionPoint instanceof PrintTourPDF) {
                      printSettings.setCompleteFilePath(filePath.toOSString());
-                     try {
-                        ((PrintTourPDF) _printExtensionPoint).printPDF(tourData, printSettings);
-                     } catch (final TransformerException e) {
-                        StatusUtil.log(e);
-                        displayErrorMessage(e);
-                     }
+                     printTourPdf(printSettings, tourData);
                   }
                }
 
@@ -709,6 +685,16 @@ public class DialogPrintTour extends TitleAreaDialog {
       }
    }
 
+   private void printTourPdf(final PrintSettings printSettings, final TourData tourData) {
+
+      try {
+         ((PrintTourPDF) _printExtensionPoint).printPDF(tourData, printSettings);
+      } catch (final TransformerException e) {
+         StatusUtil.log(e);
+         displayErrorMessage(e);
+      }
+   }
+
    private void restoreState() {
       try {
          _comboPaperSize.select(_state.getInt(STATE_PAPER_SIZE));
@@ -793,6 +779,36 @@ public class DialogPrintTour extends TitleAreaDialog {
          // display the tour date/time
 
          _comboFile.setText(net.tourbook.ui.UI.format_yyyymmdd_hhmmss(minTourData));
+      }
+   }
+
+   private void setPaperOrientation(final PrintSettings printSettings) {
+
+      switch (_comboPaperOrientation.getSelectionIndex()) {
+      case 0:
+         printSettings.setPaperOrientation(PaperOrientation.PORTRAIT);
+         break;
+      case 1:
+         printSettings.setPaperOrientation(PaperOrientation.LANDSCAPE);
+         break;
+
+      default:
+         break;
+      }
+   }
+
+   private void setPaperSize(final PrintSettings printSettings) {
+
+      switch (_comboPaperSize.getSelectionIndex()) {
+      case 0:
+         printSettings.setPaperSize(PaperSize.A4);
+         break;
+      case 1:
+         printSettings.setPaperSize(PaperSize.LETTER);
+         break;
+
+      default:
+         break;
       }
    }
 

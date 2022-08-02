@@ -31,20 +31,20 @@ import utils.Utils;
 
 public class DialogPrintTourTests {
 
-   private SWTWorkbenchBot bot = new SWTWorkbenchBot();
+   private SWTWorkbenchBot _bot = new SWTWorkbenchBot();
 
    @Test
    void testPrintTour() {
 
-      final SWTBotTreeItem tour = Utils.getTour(bot);
+      final SWTBotTreeItem tour = Utils.getTour(_bot);
 
       tour.contextMenu(net.tourbook.Messages.action_print_tour).menu("PDF").click(); //$NON-NLS-1$
-      bot.checkBox(Messages.Dialog_Print_Chk_PrintMarkers).click();
-      bot.checkBox(Messages.Dialog_Print_Chk_PrintNotes).click();
+      _bot.checkBox(Messages.Dialog_Print_Chk_PrintMarkers).click();
+      _bot.checkBox(Messages.Dialog_Print_Chk_PrintNotes).click();
 
-      final String fileName = bot.comboBox(2).getText() + ".pdf"; //$NON-NLS-1$
-      bot.comboBox(3).setText(Utils.workingDirectory);
-      bot.button(Messages.Dialog_Print_Btn_Print).click();
+      final String fileName = _bot.comboBox(2).getText() + ".pdf"; //$NON-NLS-1$
+      _bot.comboBox(3).setText(Utils.workingDirectory);
+      _bot.button(Messages.Dialog_Print_Btn_Print).click();
 
       final Path pdfFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(pdfFilePath));
