@@ -22,7 +22,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
@@ -113,16 +113,15 @@ public class PrintTourPDF extends PrintTourExtension {
          }
       }
 
-      BufferedOutputStream pdfContent = null;
-      try {
+      if (!canWriteFile) {
+         return;
+      }
 
-         final FileOutputStream pdfContentStream = new FileOutputStream(pdfFile);
-         if (canWriteFile) {
+      try (final FileOutputStream pdfContentStream = new FileOutputStream(pdfFile);
+            BufferedOutputStream pdfContent = new BufferedOutputStream(pdfContentStream)) {
 
-            pdfContent = new BufferedOutputStream(pdfContentStream);
-
-            // setup XML input source
-            final String xml = object.toXml();
+         // setup XML input source
+         final String xml = object.toXml();
 
 //				  // debug logging
 //				  System.err.println("--------------------------------------------------------");
@@ -136,50 +135,39 @@ public class PrintTourPDF extends PrintTourExtension {
 //				  	e.printStackTrace();
 //				  }
 
-            // prepare XSL file for transformation
-            final ClassLoader classLoader = getClass().getClassLoader();
-            final InputStream xslFile = classLoader.getResourceAsStream(TOURDATA_2_FO_XSL);
+         // prepare XSL file for transformation
+         final ClassLoader classLoader = getClass().getClassLoader();
+         final InputStream xslFile = classLoader.getResourceAsStream(TOURDATA_2_FO_XSL);
 
-            StreamSource xmlSource;
-            try {
-               xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes(UI.UTF_8)));
-            } catch (final UnsupportedEncodingException e) {
-               //if UTF-8 fails, try default encoding
-               xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes()));
-               e.printStackTrace();
-            }
+         // setup XSL stylesheet source
+         final StreamSource xslSource = new StreamSource(xslFile);
 
-            // setup XSL stylesheet source
-            final StreamSource xslSource = new StreamSource(xslFile);
+         // get transformer
+         final TransformerFactory tfactory = TransformerFactory.newInstance();
+         final Transformer transformer = tfactory.newTransformer(xslSource);
 
-            // get transformer
-            final TransformerFactory tfactory = TransformerFactory.newInstance();
-            final Transformer transformer = tfactory.newTransformer(xslSource);
+         // setup FOP
+         final FopFactory fopFactory = FopFactory.newInstance(new File(UI.SYMBOL_DOT).toURI());
+         final FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
+         foUserAgent.setProducer(this.getClass().getName());
+         final Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, pdfContent);
 
-            // setup FOP
-            final FopFactory fopFactory = FopFactory.newInstance(new File(UI.SYMBOL_DOT).toURI());
-            final FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
-            foUserAgent.setProducer(this.getClass().getName());
-            final Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, pdfContent);
+         setTranslationParameters(transformer);
+         setTransformationParameters((TourData) object, transformer, printSettings);
 
-            setTranslationParameters(transformer);
-            setTransformationParameters((TourData) object, transformer, printSettings);
+         // perform transformation
+         final Result res = new SAXResult(fop.getDefaultHandler());
+         final StreamSource xmlSource = new StreamSource(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+         transformer.transform(xmlSource, res);
 
-            // perform transformation
-            final Result res = new SAXResult(fop.getDefaultHandler());
-            transformer.transform(xmlSource, res);
-
-            if (printSettings.isOpenFile()) {
-               // launch the PDF file (will only work if the user has a registered PDF viewer installed)
-               Program.launch(printSettings.getCompleteFilePath());
-            }
-
-            Util.close(xslFile);
+         if (printSettings.isOpenFile()) {
+            // launch the PDF file (will only work if the user has a registered PDF viewer installed)
+            Program.launch(printSettings.getCompleteFilePath());
          }
+
+         Util.close(xslFile);
       } catch (final SAXException | IOException e) {
          e.printStackTrace();
-      } finally {
-         Util.close(pdfContent);
       }
    }
 
