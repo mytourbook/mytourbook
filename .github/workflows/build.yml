@@ -42,12 +42,12 @@ jobs:
       - name: Activate JaCoCo for the code coverage
         run: powershell -Command "(gc pom.xml) -replace '<skip>true</skip>', '<skip>false</skip>' | Out-File -encoding ASCII pom.xml"
       - name: Build and analyze              
-        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: cd ./build/build.net.tourbook && ./gradlew mt_10_CreateBuildFiles mt_20_BuildProduct sonarqube --warning-mode all --stacktrace --info
       - name: Upload screenshot of failed tests
+        if: failure()
         uses: actions/upload-artifact@v3
         with:
           name: my-artifact
