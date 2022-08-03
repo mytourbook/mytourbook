@@ -50,7 +50,7 @@ public class UITests {
       assertEquals(250, UI.convertAverageElevationChangeFromMetric(250));
 
       setImperialSystem();
-      //250m/km -> 250ft/mi
+      //250m/km -> 1320ft/mi
       assertEquals(1320.0f, UI.convertAverageElevationChangeFromMetric(250));
    }
 
