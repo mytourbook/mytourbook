@@ -51,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: my-artifact
-          path: ./**/net.tourbook.ui.tests/target/*.png
+          path: D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\**\*.png
 
   check_date:
     runs-on: windows-latest
