@@ -51,7 +51,10 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: UI-Tests-Failures-Artifacts
-          path: ${{ github.workspace }}\**\net.tourbook.ui.tests\target\**\*.png
+          path: |
+            ${{ github.workspace }}\**\net.tourbook.ui.tests\target\**\*.png
+            ${{ github.workspace }}\**\net.tourbook.ui.tests\workspace\.metadata\.log
+
 
   check_date:
     runs-on: windows-latest
