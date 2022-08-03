@@ -8,12 +8,12 @@ body:
       value: |
         Thanks for taking the time to fill out this Feature Request!
         
-        Replace **Location** in the title where the bug occurred, e.g.        
-          - FIT Import
-          - Tour Book View
-          - Tour Chart
-          - Tour Editor
-          - 2D Map
+        Replace **"Location"** in the title where the bug occurred, e.g.        
+          - [Feature : FIT Import] ...] ...
+          - [Feature : Tour Book View] ...
+          - [Feature : Tour Chart] ...
+          - [Feature : Tour Editor] ...
+          - [Feature : 2D Map] ...
           . . .
   - type: textarea
     id: what-missed
