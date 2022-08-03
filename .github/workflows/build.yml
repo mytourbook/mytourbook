@@ -46,6 +46,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: cd ./build/build.net.tourbook && ./gradlew mt_10_CreateBuildFiles mt_20_BuildProduct sonarqube --warning-mode all --stacktrace --info
+      - name: Upload screenshot of failed tests
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: my-artifact
