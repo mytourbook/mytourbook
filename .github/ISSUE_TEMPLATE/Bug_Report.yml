@@ -9,11 +9,11 @@ body:
         Thanks for taking the time to fill out this bug report!
         
         Replace **"Location"** in the title where the bug occurred, e.g.        
-          - FIT Import
-          - Tour Book View
-          - Tour Chart
-          - Tour Editor
-          - 2D Map
+          - [Bug : FIT Import] ...
+          - [Bug : Tour Book View] ...
+          - [Bug : Tour Chart] ...
+          - [Bug : Tour Editor] ...
+          - [Bug : 2D Map] ...
           . . .
   - type: textarea
     id: what-happened
