@@ -168,7 +168,6 @@ public class TourExporter {
       setIsExportWithBarometer(isExportWithBarometer);
       setIsCamouflageSpeed(isCamouflageSpeed);
       setCamouflageSpeed(camouflageSpeed);
-      _camouflageSpeed = camouflageSpeed;
       _isRange = isRange;
       _tourStartIndex = tourStartIndex;
       _tourEndIndex = tourEndIndex;
@@ -190,7 +189,7 @@ public class TourExporter {
                                    final GarminLap lap,
                                    final String exportFileName) throws IOException {
       /*
-       * Create sorted lists that the comparision of before and after (export and import/export) can
+       * Create sorted lists that the comparison of before and after (export and import/export) can
        * be done easily
        */
       final ArrayList<DeviceSensorValue> allSorted_SensorValues = new ArrayList<>(_tourData.getDeviceSensorValues());
@@ -254,9 +253,9 @@ public class TourExporter {
 // SET_FORMATTING_OFF
 
       vc.put("lap",                                lap                                       ); //$NON-NLS-1$
-      vc.put("tracks",                             tracks                                    ); //$NON-NLS-1$
-      vc.put("wayPoints",                          wayPoints                                 ); //$NON-NLS-1$
-      vc.put("tourMarkers",                        tourMarkers                               ); //$NON-NLS-1$
+      vc.put(VC_TRACKS,                            tracks                                    );
+      vc.put(VC_WAY_POINTS,                        wayPoints                                 );
+      vc.put(VC_TOUR_MARKERS,                      tourMarkers                               );
       vc.put("tourData",                           _tourData                                 ); //$NON-NLS-1$
 
       vc.put("hasTourMarkers",                     Boolean.valueOf(tourMarkers.size() > 0)   ); //$NON-NLS-1$
@@ -797,7 +796,8 @@ public class TourExporter {
          }
 
          if (isSpeed) {
-            final double speedValue = Math.round(speedSerie[serieIndex] * 10.0) / 10.0;
+            final double speedValueMetersPerSecond = speedSerie[serieIndex] / 3.6; // speed km/h -> m/s
+            final double speedValue = Math.round(speedValueMetersPerSecond * 10.0) / 10.0;
             tpExt.setSpeed(speedValue);
          }
 

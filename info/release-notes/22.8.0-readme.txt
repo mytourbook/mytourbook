@@ -48,6 +48,9 @@ Bugfix
 * 2.5D Map
   - Track width jumped when the zoom-level changed, now it's width is always the same
 
+* TCX Export (Frederic)
+  - Fixed an issue where the exported speed was in km/h instead of m/s https://github.com/mytourbook/mytourbook/issues/903
+
 
 Translation    
 ===========
