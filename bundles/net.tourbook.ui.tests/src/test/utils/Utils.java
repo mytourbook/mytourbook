@@ -28,7 +28,7 @@ public class Utils {
 
    private static String tourBookViewTitle = "Tour Book"; //$NON-NLS-1$
 
-   public static String  workingDirectory  = System.getProperty("user.dir"); //$NON-NLS-1$
+   public static final String workingDirectory  = System.getProperty("user.dir"); //$NON-NLS-1$
 
    public static SWTBotTreeItem getTour(final SWTWorkbenchBot bot) {
 
