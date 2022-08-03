@@ -24,19 +24,21 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
+import utils.CaptureScreenshotOnFailureExtension;
 import utils.Utils;
 
 public class StatisticsViewTests {
 
    private static final String STATISTICS_VIEW_NAME = "Statistics";
-
-   private SWTWorkbenchBot     bot                  = new SWTWorkbenchBot();
+   private SWTWorkbenchBot     _bot                 = new SWTWorkbenchBot();
 
    @Test
-   void testStatisticsView() {
+   @ExtendWith(CaptureScreenshotOnFailureExtension.class)
+   public void testStatisticsView() {
 
-      final SWTBot tourEditorViewBot = Utils.showView(bot, STATISTICS_VIEW_NAME).bot();
+      final SWTBot tourEditorViewBot = Utils.showView(_bot, STATISTICS_VIEW_NAME).bot();
       final SWTBotCombo statisticsTypeComboBox = tourEditorViewBot.comboBox(0);
       assertEquals(27, statisticsTypeComboBox.itemCount());
       assertNotNull(statisticsTypeComboBox);
