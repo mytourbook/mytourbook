@@ -32,6 +32,7 @@ import utils.Utils;
 public class StatisticsViewTests {
 
    private static final String STATISTICS_VIEW_NAME = "Statistics";
+
    private SWTWorkbenchBot     _bot                 = new SWTWorkbenchBot();
 
    @Test
