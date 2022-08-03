@@ -40,6 +40,8 @@ public class StatisticsViewTests {
    public void testStatisticsView() {
 
       final SWTBot tourEditorViewBot = Utils.showView(_bot, STATISTICS_VIEW_NAME).bot();
+      _bot.sleep(3000);
+
       final SWTBotCombo statisticsTypeComboBox = tourEditorViewBot.comboBox(0);
       assertEquals(27, statisticsTypeComboBox.itemCount());
       assertNotNull(statisticsTypeComboBox);
