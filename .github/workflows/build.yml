@@ -52,8 +52,8 @@ jobs:
         with:
           name: UI-Tests-Failures-Artifacts
           path: |
-            ${{ github.workspace }}\**\net.tourbook.ui.tests\target\**\*.png
-            ${{ github.workspace }}\**\net.tourbook.ui.tests\workspace\.metadata\.log
+            ${{ github.workspace }}..\..\**\net.tourbook.ui.tests\target\**\*.png
+            ${{ github.workspace }}..\..\**\net.tourbook.ui.tests\workspace\.metadata\.log
           retention-days: 5
 
 
