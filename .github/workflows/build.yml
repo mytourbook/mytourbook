@@ -50,8 +50,8 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v3
         with:
-          name: my-artifact
-          path: D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\**\*.png
+          name: UI-Tests-Failures-Artifacts
+          path: ${{ github.workspace }}\**\net.tourbook.ui.tests\target\**\*.png
 
   check_date:
     runs-on: windows-latest
