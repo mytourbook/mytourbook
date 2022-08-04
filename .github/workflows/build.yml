@@ -52,7 +52,7 @@ jobs:
         with:
           name: UI-Tests-Failures-Artifacts
           path: |
-            D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\**\*.png
+            D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\*.png
             D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\workspace\.metadata\.log
           retention-days: 5
 
