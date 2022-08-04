@@ -36,7 +36,7 @@ public class StatisticsViewTests extends UITest {
       bot.sleep(3000);
 
       final SWTBotCombo statisticsTypeComboBox = tourEditorViewBot.comboBox(0);
-      assertEquals(26, statisticsTypeComboBox.itemCount());
+      assertEquals(27, statisticsTypeComboBox.itemCount());
       assertNotNull(statisticsTypeComboBox);
       statisticsTypeComboBox.setSelection(0);
       assertEquals("Daytime", statisticsTypeComboBox.selection());

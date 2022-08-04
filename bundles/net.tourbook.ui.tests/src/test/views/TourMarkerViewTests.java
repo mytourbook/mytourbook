@@ -68,7 +68,7 @@ public class TourMarkerViewTests extends UITest {
       bot.button("Yes").click(); //$NON-NLS-1$
 
       //Make sure that the tour contains 2 markers
-      assertEquals(3, tableMarkers.rowCount());
+      assertEquals(2, tableMarkers.rowCount());
    }
 
 }
