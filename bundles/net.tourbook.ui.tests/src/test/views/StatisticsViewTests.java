@@ -39,6 +39,9 @@ public class StatisticsViewTests {
    @ExtendWith(CaptureScreenshotOnFailureExtension.class)
    public void testStatisticsView() {
 
+      Utils.showViewFromMenu(_bot, "Help", "Error Log"); //$NON-NLS-1$
+      Utils.showView(_bot, "Error Log"); //$NON-NLS-1$
+
       final SWTBot tourEditorViewBot = Utils.showView(_bot, STATISTICS_VIEW_NAME).bot();
       _bot.sleep(3000);
 
