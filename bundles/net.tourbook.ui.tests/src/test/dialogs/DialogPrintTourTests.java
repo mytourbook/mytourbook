@@ -15,42 +15,36 @@
  *******************************************************************************/
 package dialogs;
 
-import net.tourbook.printing.PrintTourPDF;
+import static org.junit.Assert.assertTrue;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import net.tourbook.printing.Messages;
+
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
-public class DialogPrintTourTests {
+import utils.UITest;
+import utils.Utils;
 
-//   private SWTWorkbenchBot bot = new SWTWorkbenchBot();
+public class DialogPrintTourTests extends UITest {
 
-   /**
-    * Test ignored as of today because this line fails on the build machine
-    * as there is probably not a default PDF reader installed.
-    * {@link PrintTourPDF printPDF}
-    * Program.launch(printSettings.getCompleteFilePath());
-    */
    @Test
    void testPrintTour() {
 
-//      final SWTBotTreeItem tour = Utils.getTour(bot);
-//
-//      tour.contextMenu(net.tourbook.Messages.action_print_tour).menu("PDF").click(); //$NON-NLS-1$
-//      bot.checkBox(Messages.Dialog_Print_Chk_PrintMarkers).click();
-//      bot.checkBox(Messages.Dialog_Print_Chk_PrintNotes).click();
-//
-//      final String fileName = bot.comboBox(2).getText() + ".pdf"; //$NON-NLS-1$
-//
-//      bot.comboBox(3).setText(Utils.workingDirectory);
-//      bot.button(Messages.Dialog_Print_Btn_Print).click();
-//
-//      bot.sleep(3000);
-//
-//      final Path pdfFilePath = Paths.get(Utils.workingDirectory, fileName);
-//      assertTrue(Files.exists(pdfFilePath));
-//
-//      bot.sleep(3000);
-//
-//      FilesUtils.deleteIfExists(pdfFilePath);
-//      assertTrue(!Files.exists(pdfFilePath));
+      final SWTBotTreeItem tour = Utils.getTour(bot);
+
+      tour.contextMenu(net.tourbook.Messages.action_print_tour).menu("PDF").click(); //$NON-NLS-1$
+      bot.checkBox(Messages.Dialog_Print_Chk_PrintMarkers).click();
+      bot.checkBox(Messages.Dialog_Print_Chk_PrintNotes).click();
+
+      final String fileName = bot.comboBox(2).getText() + ".pdf"; //$NON-NLS-1$
+      bot.comboBox(3).setText(Utils.workingDirectory);
+      bot.button(Messages.Dialog_Print_Btn_Print).click();
+
+      final Path pdfFilePath = Paths.get(Utils.workingDirectory, fileName);
+      assertTrue(Files.exists(pdfFilePath));
    }
 }

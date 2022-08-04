@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -152,7 +152,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    private static final String       XML_EXTENSION                  = ".xml";                          //$NON-NLS-1$
 
    /**
-    * max lenghth for map provider id and offline folder
+    * max length for map provider id and offline folder
     */
    private static final int          MAX_ID_LENGTH                  = 24;
 
@@ -2126,7 +2126,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
    }
 
    /**
-    * !!!!! Recursive funktion to count files/size !!!!!
+    * !!!!! Recursive function to count files/size !!!!!
     *
     * @param listOfFiles
     */
@@ -2344,13 +2344,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
          StatusUtil.showStatus(e.getMessage(), e);
       } finally {
 
-         try {
-            if (inputStream != null) {
-               inputStream.close();
-            }
-         } catch (final IOException e) {
-            StatusUtil.log(e);
-         }
+         Util.close(inputStream);
       }
 
       return false;
