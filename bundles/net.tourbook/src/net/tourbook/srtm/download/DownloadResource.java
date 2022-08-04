@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,6 @@ import de.byteholder.geoclipse.tileinfo.TileInfoManager;
 
 import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -28,6 +27,7 @@ import java.net.URLConnection;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -52,7 +52,7 @@ public class DownloadResource {
 
             tileInfoMgr.updateSRTMTileInfo(TileEventId.SRTM_DATA_LOADING_MONITOR, remoteFileName, numWritten[0]);
 
-            // rescedule every 200ms
+            // reschedule every 200ms
             this.schedule(200);
 
             return Status.OK_STATUS;
@@ -91,16 +91,8 @@ public class DownloadResource {
                } catch (final Exception e) {
                   e.printStackTrace();
                } finally {
-                  try {
-                     if (inputStream != null) {
-                        inputStream.close();
-                     }
-                     if (outputStream != null) {
-                        outputStream.close();
-                     }
-                  } catch (final IOException ioe) {
-                     ioe.printStackTrace();
-                  }
+                  Util.close(inputStream);
+                  Util.close(outputStream);
                }
 
                System.out.println("get " + remoteFileName + " -> " + localFilePathName + " ..."); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -143,7 +135,7 @@ public class DownloadResource {
          e.printStackTrace();
       }
 
-      // throw exception when it occured during the download
+      // throw exception when it occurred during the download
       final Exception e = (Exception) downloadJob.getResult().getException();
       if (e != null) {
          throw (e);

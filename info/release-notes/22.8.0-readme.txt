@@ -31,6 +31,9 @@ Improvements
 * Tour Editor (Frederic)
   - Added the ability to change the weather description's number of lines https://github.com/mytourbook/mytourbook/issues/897
 
+* Tour printing (Frederic)
+  - Added the ability to enable/disable the opening of the printed tour in the default PDF viewer
+
 
 Changes
 =======

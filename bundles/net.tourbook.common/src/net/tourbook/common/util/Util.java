@@ -98,7 +98,7 @@ public class Util {
    public static final String UNIQUE_ID_SUFFIX_SUUNTOQUEST         = "41502"; //$NON-NLS-1$
 
    /*
-    * Default xml tags
+    * Default XML tags
     */
    private static final String TAG_ITEM   = "item";  //$NON-NLS-1$
    private static final String TAG_LIST   = "list";  //$NON-NLS-1$
@@ -107,7 +107,7 @@ public class Util {
    private static final String ATTR_VALUE = "value"; //$NON-NLS-1$
 
    /*
-    * default xml attributes
+    * default XML attributes
     */
    public static final String ATTR_ROOT_DATETIME          = "Created";                                 //$NON-NLS-1$
    public static final String ATTR_ROOT_VERSION_MAJOR     = "VersionMajor";                            //$NON-NLS-1$
@@ -170,7 +170,7 @@ public class Util {
    }
 
    /**
-    * Clear all selection providers in all workench pages.
+    * Clear all selection providers in all workbench pages.
     */
    public static void clearSelection() {
 
@@ -221,7 +221,7 @@ public class Util {
 
    /**
     * @param os
-    * @return Returns <code>false</code> when an exception occures.
+    * @return Returns <code>false</code> when an exception occurs.
     */
    public static boolean close(final OutputStream os) {
 
@@ -294,7 +294,7 @@ public class Util {
 
    /**
     * @param text
-    * @return Returns MD5 for the text or <code>null</code> when an error occures.
+    * @return Returns MD5 for the text or <code>null</code> when an error occurs.
     */
    public static String computeMD5(final String text) {
 
@@ -1679,7 +1679,7 @@ public class Util {
    }
 
    /**
-    * Get long array from xml list/item tags.
+    * Get long array from XML list/item tags.
     *
     * @param memento
     * @param listKeyName
@@ -2832,7 +2832,7 @@ public class Util {
    }
 
    /**
-    * Set values into xml list/item tags.
+    * Set values into XML list/item tags.
     *
     * @param memento
     * @param listKeyName
