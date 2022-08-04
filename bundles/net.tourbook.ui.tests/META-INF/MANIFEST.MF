@@ -9,7 +9,7 @@ Require-Bundle: net.tourbook,
  net.tourbook.printing,
  org.junit.jupiter.api,
  org.eclipse.swtbot.go,
- net.tourbook.statistics;bundle-version="22.8.0"
+ net.tourbook.statistics
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Vendor: MyTourbook
