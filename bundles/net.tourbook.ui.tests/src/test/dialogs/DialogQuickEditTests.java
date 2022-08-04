@@ -28,9 +28,9 @@ public class DialogQuickEditTests extends UITest {
    @Test
    void testEditWeatherDescription() {
 
-      bot.activeShell();
-
       Utils.showTourBookView(bot);
+
+      bot.toolbarButtonWithTooltip(Messages.App_Action_CollapseAll).click();
 
       final SWTBotTreeItem tour = Utils.getTour(bot);
 
