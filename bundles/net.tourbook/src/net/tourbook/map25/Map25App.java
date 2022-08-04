@@ -1984,7 +1984,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
           * Set map background color
           */
          final int mapBackground = mapTheme.getMapBackground();
-         final int adjustedMapBackground = computeLuminanceColor(mapBackground, _cartography_Luminance);
+         final int adjustedMapBackground = _cartography_IsLuminance
+               ? computeLuminanceColor(mapBackground, _cartography_Luminance)
+               : mapBackground;
 
          MapRenderer.setBackgroundColor(adjustedMapBackground);
       }
