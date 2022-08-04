@@ -20,27 +20,23 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import net.tourbook.Messages;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import utils.CaptureScreenshotOnFailureExtension;
+import utils.UITest;
 import utils.Utils;
 
-public class StatisticsViewTests {
-
-   private static final String STATISTICS_VIEW_NAME = "Statistics";
-
-   private SWTWorkbenchBot     _bot                 = new SWTWorkbenchBot();
+public class StatisticsViewTests extends UITest {
 
    @Test
    @ExtendWith(CaptureScreenshotOnFailureExtension.class)
    public void testStatisticsView() {
 
-      final SWTBot tourEditorViewBot = Utils.showView(_bot, STATISTICS_VIEW_NAME).bot();
-      _bot.sleep(3000);
+      final SWTBot tourEditorViewBot = Utils.showView(bot, STATISTICS_VIEW_NAME).bot();
+      bot.sleep(3000);
 
       final SWTBotCombo statisticsTypeComboBox = tourEditorViewBot.comboBox(0);
       assertEquals(27, statisticsTypeComboBox.itemCount());

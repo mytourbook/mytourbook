@@ -15,14 +15,12 @@
  *******************************************************************************/
 package views;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.junit.jupiter.api.Test;
 
+import utils.UITest;
 import utils.Utils;
 
-public class TourPausesViewTests {
-
-   private SWTWorkbenchBot bot = new SWTWorkbenchBot();
+public class TourPausesViewTests extends UITest {
 
    @Test
    void testTourPausesView() {

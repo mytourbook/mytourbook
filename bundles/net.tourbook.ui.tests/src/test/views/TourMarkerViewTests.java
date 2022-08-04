@@ -20,43 +20,41 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import net.tourbook.Messages;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCTabItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
+import utils.UITest;
 import utils.Utils;
 
-public class TourMarkerViewTests {
-
-   private SWTWorkbenchBot _bot = new SWTWorkbenchBot();
+public class TourMarkerViewTests extends UITest {
 
    @Test
    void testAddAndDeleteTourMarker() {
 
-      Utils.showTourBookView(_bot);
+      Utils.showTourBookView(bot);
 
-      final SWTBotTreeItem tour = _bot.tree().getTreeItem("2020   3").expand() //$NON-NLS-1$
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2020   3").expand() //$NON-NLS-1$
             .getNode("May   2").expand().select().getNode("23").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
-      final SWTBotView tourEditorView = Utils.showView(_bot, "Tour Editor"); //$NON-NLS-1$
+      final SWTBotView tourEditorView = Utils.showView(bot, "Tour Editor"); //$NON-NLS-1$
 
-      final SWTBotCTabItem timeSlicesTab = _bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
+      final SWTBotCTabItem timeSlicesTab = bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
       assertNotNull(timeSlicesTab);
 
       final SWTBotTable timeSlicesTable = tourEditorView.bot().table();
       assertEquals(16775, timeSlicesTable.rowCount());
       timeSlicesTable.select(0);
       timeSlicesTable.contextMenu(Messages.tourCatalog_view_action_create_marker).click();
-      _bot.button("Save ").click(); //$NON-NLS-1$
-      _bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
+      bot.button("Save ").click(); //$NON-NLS-1$
+      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
 
       //Open the Tour Marker View
-      Utils.showView(_bot, "Tour Markers"); //$NON-NLS-1$
-      final SWTBotTable tableMarkers = _bot.table();
+      Utils.showView(bot, "Tour Markers"); //$NON-NLS-1$
+      final SWTBotTable tableMarkers = bot.table();
 
       //Make sure that the tour contains 3 markers
       assertEquals(3, tableMarkers.rowCount());
@@ -67,7 +65,7 @@ public class TourMarkerViewTests {
 
       tableMarkers.select(0);
       tableMarkers.contextMenu(Messages.App_Action_DeleteTourMarker).click();
-      _bot.button("Yes").click(); //$NON-NLS-1$
+      bot.button("Yes").click(); //$NON-NLS-1$
 
       //Make sure that the tour contains 2 markers
       assertEquals(2, tableMarkers.rowCount());

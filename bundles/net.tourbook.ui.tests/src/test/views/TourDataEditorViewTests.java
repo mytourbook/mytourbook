@@ -23,16 +23,14 @@ import java.util.Date;
 
 import net.tourbook.Messages;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotDateTime;
 import org.junit.jupiter.api.Test;
 
+import utils.UITest;
 import utils.Utils;
 
-public class TourDataEditorViewTests {
-
-   private SWTWorkbenchBot bot = new SWTWorkbenchBot();
+public class TourDataEditorViewTests extends UITest {
 
    @Test
    void testNewTour() {
