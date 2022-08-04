@@ -26,9 +26,10 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 public class Utils {
 
-   private static String tourBookViewTitle = "Tour Book"; //$NON-NLS-1$
+   private static final String TOURBOOK_VIEW_NAME   = "Tour Book";                    //$NON-NLS-1$
+   public static final String  STATISTICS_VIEW_NAME = "Statistics";
 
-   public static final String workingDirectory  = System.getProperty("user.dir"); //$NON-NLS-1$
+   public static final String  workingDirectory     = System.getProperty("user.dir"); //$NON-NLS-1$
 
    public static SWTBotTreeItem getTour(final SWTWorkbenchBot bot) {
 
@@ -45,7 +46,7 @@ public class Utils {
 
    public static SWTBotView showTourBookView(final SWTWorkbenchBot bot) {
 
-      return showView(bot, tourBookViewTitle);
+      return showView(bot, TOURBOOK_VIEW_NAME);
    }
 
    public static SWTBotView showView(final SWTWorkbenchBot bot, final String viewName) {

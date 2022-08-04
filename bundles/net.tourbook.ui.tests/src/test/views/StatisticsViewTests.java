@@ -35,7 +35,7 @@ public class StatisticsViewTests extends UITest {
    @ExtendWith(CaptureScreenshotOnFailureExtension.class)
    public void testStatisticsView() {
 
-      final SWTBot tourEditorViewBot = Utils.showView(bot, STATISTICS_VIEW_NAME).bot();
+      final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.STATISTICS_VIEW_NAME).bot();
       bot.sleep(3000);
 
       final SWTBotCombo statisticsTypeComboBox = tourEditorViewBot.comboBox(0);
