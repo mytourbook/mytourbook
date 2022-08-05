@@ -26,9 +26,18 @@ public class NutritionUtils {
 
    public static void testSdk() {
 
-      // perform the search by code
+      // perform the search by name
+      //https://us.openfoodfacts.org/cgi/search.pl?action=process&tagtype_0=brands&tag_contains_0=contains&tag_0=Bobo's&json=true
+
+      //perform the search by code
+
       //get a response
-      final ProductResponse response = null;
+      final ProductResponse response = new ProductResponse();
+      final String productName = response.getProduct().getProductName();
+      final float carbs = response.getProduct().getNutriments().getCarbohydrates();
+      final float sodium = response.getProduct().getNutriments().getSodium();
+      //didn't find the caffeine, ask them ?
+      //it's harder for the fluid because we need to know the size of the flask...
 
    }
 }
