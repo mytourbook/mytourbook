@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -71,14 +71,15 @@ public class CommonImages {
    public static final String TourOptions                  = "tour-options.png";                          //$NON-NLS-1$
    public static final String TourOptions_Disabled         = "tour-options-disabled.png";                 //$NON-NLS-1$
 
-   public static final String Weather_ScatteredShowers     = "weather_showers_scattered.png";             //$NON-NLS-1$
-   public static final String Weather_Severe               = "weather_severe_alert.png";                  //$NON-NLS-1$
-   public static final String Weather_Clouds               = "weather_overcast.png";                      //$NON-NLS-1$
-   public static final String Weather_Cloudy               = "weather_few_clouds.png";                    //$NON-NLS-1$
-   public static final String Weather_Lightning            = "weather_lightning.png";                     //$NON-NLS-1$
-   public static final String Weather_Rain                 = "weather_showers.png";                       //$NON-NLS-1$
-   public static final String Weather_Snow                 = "weather_snow.png";                          //$NON-NLS-1$
-   public static final String Weather_Sunny                = "weather_clear.png";                         //$NON-NLS-1$
+   public static final String Weather_ScatteredShowers     = "weather-scattered-showers.png";             //$NON-NLS-1$
+   public static final String Weather_Severe               = "weather-severe-alert.png";                  //$NON-NLS-1$
+   public static final String Weather_Clouds               = "weather-clouds.png";                        //$NON-NLS-1$
+   public static final String Weather_Cloudy               = "weather-cloudy.png";                        //$NON-NLS-1$
+   public static final String Weather_Lightning            = "weather-lightning.png";                     //$NON-NLS-1$
+   public static final String Weather_Rain                 = "weather-rain.png";                          //$NON-NLS-1$
+   public static final String Weather_Drizzle              = "weather-drizzle.png";                       //$NON-NLS-1$
+   public static final String Weather_Snow                 = "weather-snow.png";                          //$NON-NLS-1$
+   public static final String Weather_Sunny                = "weather-sunny.png";                         //$NON-NLS-1$
 
    private CommonImages() {}
 }

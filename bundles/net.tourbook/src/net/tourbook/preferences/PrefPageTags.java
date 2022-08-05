@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,10 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
+
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
+import static org.eclipse.swt.events.MouseListener.mouseDownAdapter;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -51,7 +55,6 @@ import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandSelection;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -67,15 +70,11 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
@@ -95,12 +94,6 @@ import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.MouseAdapter;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -152,6 +145,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
     */
    private ToolBar _toolBar;
 
+   private Button  _btnDuplicateTag;
    private Button  _btnEditTagOrCategory;
    private Button  _btnNewTag;
    private Button  _btnNewTagCategory;
@@ -192,7 +186,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
    /**
     * Sort the tags and categories
     */
-   private final static class TagViewerComparator extends ViewerComparator {
+   private static final class TagViewerComparator extends ViewerComparator {
       @Override
       public int compare(final Viewer viewer, final Object obj1, final Object obj2) {
          if (obj1 instanceof TVIPrefTag && obj2 instanceof TVIPrefTag) {
@@ -302,23 +296,20 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+         if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-               _tagViewer.getTree().setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+            _tagViewer.getTree().setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-               _tagViewer.refresh();
+            _tagViewer.refresh();
 
-               /*
-                * the tree must be redrawn because the styled text does not display the new color
-                */
-               _tagViewer.getTree().redraw();
-            }
+            /*
+             * the tree must be redrawn because the styled text does not display the new color
+             */
+            _tagViewer.getTree().redraw();
          }
       };
 
@@ -348,6 +339,138 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       addPrefListener();
 
       return ui;
+   }
+
+   private void createNewTourTag(final String tagName, final String tagNotes) {
+
+      TourTag savedTag = null;
+
+      // create new tour tag + item
+      final TourTag tourTag = new TourTag(tagName);
+      tourTag.setNotes(tagNotes);
+      final TVIPrefTag tagItem = new TVIPrefTag(_tagViewer, tourTag);
+
+      final Object parentItem = ((StructuredSelection) _tagViewer.getSelection()).getFirstElement();
+      if (parentItem == null) {
+
+         // a parent is not selected, this will be a root tag
+
+         tourTag.setRoot(true);
+
+         /*
+          * Update model
+          */
+         tagItem.setParentItem(_rootItem);
+         _rootItem.getFetchedChildren().add(tagItem);
+
+         // persist tag
+         savedTag = TourDatabase.saveEntity(tourTag, TourDatabase.ENTITY_IS_NOT_SAVED, TourTag.class);
+
+         if (savedTag != null) {
+
+            // update item
+            tagItem.setTourTag(savedTag);
+
+            /*
+             * Update UI
+             */
+            _tagViewer.add(_rootItem, tagItem);
+         }
+
+      } else if (parentItem instanceof TVIPrefTagCategory) {
+
+         // parent is a category
+
+         final TVIPrefTagCategory parentCategoryItem = (TVIPrefTagCategory) parentItem;
+         TourTagCategory parentTagCategory = parentCategoryItem.getTourTagCategory();
+
+         /*
+          * update model
+          */
+
+         // set parent into tag
+         tagItem.setParentItem(parentCategoryItem);
+
+         /*
+          * persist tag without new category otherwise an exception "detached entity passed to
+          * persist: net.tourbook.data.TourTagCategory" is raised
+          */
+         savedTag = TourDatabase.saveEntity(tourTag, TourDatabase.ENTITY_IS_NOT_SAVED, TourTag.class);
+         if (savedTag != null) {
+
+            // update item
+            tagItem.setTourTag(savedTag);
+
+            // update parent category
+            final EntityManager em = TourDatabase.getInstance().getEntityManager();
+            {
+
+               final TourTagCategory parentTagCategoryEntity = em.find(
+                     TourTagCategory.class,
+                     parentTagCategory.getCategoryId());
+
+               // set new entity
+               parentTagCategory = parentTagCategoryEntity;
+               parentCategoryItem.setTourTagCategory(parentTagCategoryEntity);
+
+               // set tag into parent category
+               final Set<TourTag> lazyTourTags = parentTagCategoryEntity.getTourTags();
+               lazyTourTags.add(tourTag);
+
+               parentTagCategory.setTagCounter(lazyTourTags.size());
+            }
+            em.close();
+
+            // persist parent category
+            final TourTagCategory savedParent = TourDatabase.saveEntity(
+                  parentTagCategory,
+                  parentTagCategory.getCategoryId(),
+                  TourTagCategory.class);
+
+            if (savedParent != null) {
+
+               // update item
+               parentCategoryItem.setTourTagCategory(savedParent);
+
+               // set category in tag,
+// this seems to be not necessary
+//               tourTag.setTagCategory(parentTagCategory);
+
+               // persist tag with category
+               savedTag = TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
+
+            }
+
+         }
+
+         if (savedTag != null) {
+
+            // clear tour tag list
+            TourDatabase.clearTourTags();
+
+            /*
+             * update viewer
+             */
+            parentCategoryItem.clearChildren();
+
+            _tagViewer.add(parentCategoryItem, tagItem);
+            _tagViewer.update(parentCategoryItem, null);
+
+            _tagViewer.expandToLevel(parentCategoryItem, 1);
+         }
+      }
+
+      if (savedTag != null) {
+
+         // show new tag in viewer
+         _tagViewer.reveal(tagItem);
+
+         _isModified = true;
+
+         fireModifyEvent();
+      }
+
+      setFocusToViewer();
    }
 
    private Composite createUI(final Composite parent) {
@@ -421,41 +544,28 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       tree.setHeaderVisible(true);
       tree.setLinesVisible(getPreferenceStore().getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-      tree.addListener(SWT.MouseDoubleClick, event -> onTagTree_DoubleClick(event));
+      tree.addListener(SWT.MouseDoubleClick, this::onTagTree_DoubleClick);
 
-      tree.addKeyListener(new KeyListener() {
+      tree.addKeyListener(keyPressedAdapter(keyEvent -> {
+         _isSelectedWithKeyboard = true;
 
-         @Override
-         public void keyPressed(final KeyEvent e) {
+         switch (keyEvent.keyCode) {
 
-            _isSelectedWithKeyboard = true;
-
-            switch (e.keyCode) {
-
-            case SWT.DEL:
-               // delete tag/category only when the delete action is enabled
-               if (_action_DeleteTag.isEnabled() || _action_DeleteCategory.isEnabled()) {
-                  onAction_DeleteTagOrCategory();
-               }
-
-               break;
-
-            case SWT.F2:
-               onAction_Edit_TagOrCategory();
-               break;
+         case SWT.DEL:
+            // delete tag/category only when the delete action is enabled
+            if (_action_DeleteTag.isEnabled() || _action_DeleteCategory.isEnabled()) {
+               onAction_DeleteTagOrCategory();
             }
-         }
 
-         @Override
-         public void keyReleased(final KeyEvent e) {}
-      });
+            break;
 
-      tree.addMouseListener(new MouseAdapter() {
-         @Override
-         public void mouseDown(final MouseEvent e) {
-            _isMouseContextMenu = e.button == 3;
+         case SWT.F2:
+            onAction_Edit_TagOrCategory();
+            break;
          }
-      });
+      }));
+
+      tree.addMouseListener(mouseDownAdapter(mouseEvent -> _isMouseContextMenu = mouseEvent.button == 3));
 
       _tagViewer = new TreeViewer(tree);
 
@@ -464,19 +574,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       _tagViewer.setComparer(new TagViewerComparer());
       _tagViewer.setUseHashlookup(true);
 
-      _tagViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-            onTagViewer_DoubleClick();
-         }
-      });
+      _tagViewer.addDoubleClickListener(doubleClickEvent -> onTagViewer_DoubleClick());
 
-      _tagViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onTagViewer_Selection(event);
-         }
-      });
+      _tagViewer.addSelectionChangedListener(this::onTagViewer_Selection);
 
       _tagViewer.addDragSupport(
             DND.DROP_MOVE,
@@ -509,7 +609,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
                   //                  System.out.println("dragStart");
                   transfer.setSelection(selection);
-                  transfer.setSelectionSetTime(_dragStartTime = event.time & 0xFFFFFFFFL);
+                  _dragStartTime = event.time & 0xFFFFFFFFL;
+                  transfer.setSelectionSetTime(_dragStartTime);
 
                   event.doit = !selection.isEmpty();
                }
@@ -531,12 +632,9 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       menuManager.setRemoveAllWhenShown(true);
 
-      menuManager.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager manager) {
-            fillContextMenu(manager);
-            enableControls();
-         }
+      menuManager.addMenuListener(menuManager1 -> {
+         fillContextMenu(menuManager1);
+         enableControls();
       });
 
       tree.setMenu(menuManager.createContextMenu(tree));
@@ -553,12 +651,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
             _btnNewTag = new Button(container, SWT.NONE);
             _btnNewTag.setText(Messages.pref_tourtag_btn_new_tag);
-            _btnNewTag.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onAction_NewTag();
-               }
-            });
+            _btnNewTag.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction_NewTag()));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnNewTag);
          }
 
@@ -567,12 +660,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
             _btnNewTagCategory = new Button(container, SWT.NONE);
             _btnNewTagCategory.setText(Messages.pref_tourtag_btn_new_tag_category);
-            _btnNewTagCategory.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onAction_NewCategory();
-               }
-            });
+            _btnNewTagCategory.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction_NewCategory()));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnNewTagCategory);
          }
 
@@ -581,25 +669,25 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
             _btnEditTagOrCategory = new Button(container, SWT.NONE);
             _btnEditTagOrCategory.setText(Messages.Action_TagCategory_EditCategory);
-            _btnEditTagOrCategory.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onAction_Edit_TagOrCategory();
-               }
-            });
+            _btnEditTagOrCategory.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction_Edit_TagOrCategory()));
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnEditTagOrCategory);
          }
+
+         {
+            // Button: Duplicate tag
+
+            _btnDuplicateTag = new Button(container, SWT.NONE);
+            _btnDuplicateTag.setText(Messages.PrefPage_TourTag_Button_DuplicateTag);
+            _btnDuplicateTag.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction_DuplicateTag()));
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_btnDuplicateTag);
+         }
+
          {
             // Button: reset
 
             _btnReset = new Button(container, SWT.NONE);
             _btnReset.setText(Messages.pref_tourtag_btn_reset);
-            _btnReset.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onAction_Reset();
-               }
-            });
+            _btnReset.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction_Reset()));
             GridDataFactory.fillDefaults().grab(true, false).indent(0, 50).applyTo(_btnReset);
          }
       }
@@ -624,12 +712,10 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          final Link link = new Link(container, SWT.WRAP);
          GridDataFactory.swtDefaults().grab(true, false).applyTo(link);
          link.setText(Messages.Pref_TourTag_Link_AppearanceOptions);
-         link.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               PreferencesUtil.createPreferenceDialogOn(getShell(), PrefPageAppearance.ID, null, null);
-            }
-         });
+         link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> PreferencesUtil.createPreferenceDialogOn(getShell(),
+               PrefPageAppearance.ID,
+               null,
+               null)));
       }
    }
 
@@ -770,7 +856,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       int numCategorys = 0;
       int numOtherItems = 0;
 
-      for (Object treeItem : selection) {
+      for (final Object treeItem : selection) {
 
          if (treeItem instanceof TVIPrefTag) {
             numTags++;
@@ -786,6 +872,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       final boolean isSelection = firstElement != null;
 
+      _btnDuplicateTag.setEnabled(isTagSelected && numTags == 1);
       _btnNewTag.setEnabled((isSelection == false || isCategorySelected && isTagSelected == false));
       _btnNewTagCategory.setEnabled((isSelection == false || isCategorySelected && isTagSelected == false));
 
@@ -907,7 +994,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
          final HashMap<Long, TourTag> allTourTags = TourDatabase.getAllTourTags();
 
-         final ArrayList<TourTag> allSelectedTags = new ArrayList<>();
+         final List<TourTag> allSelectedTags = new ArrayList<>();
          for (final Object object : allSelection) {
 
             if (object instanceof TVIPrefTag) {
@@ -943,6 +1030,18 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       setFocusToViewer();
    }
 
+   private void onAction_DuplicateTag() {
+
+      final Object parentItem = ((StructuredSelection) _tagViewer.getStructuredSelection()).getFirstElement();
+      final TourTag tagToDuplicate = ((TVIPrefTag) parentItem).getTourTag();
+
+      //Deselecting the current selection so that the duplicate tag is a root tag
+      _tagViewer.setSelection(null);
+
+      createNewTourTag(tagToDuplicate.getTagName() + UI.SPACE + Messages.PrefPage_TourTag_Label_Duplicate,
+            tagToDuplicate.getNotes());
+   }
+
    /**
     * Edit selected tag/category
     */
@@ -950,7 +1049,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
 
       final Object firstElement = _tagViewer.getStructuredSelection().getFirstElement();
 
-      String dlgMessage = UI.EMPTY_STRING;
+      String dlgMessage;
 
       if (firstElement instanceof TVIPrefTag) {
 
@@ -1150,131 +1249,7 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
          return;
       }
 
-      TourTag savedTag = null;
-
-      // create new tour tag + item
-      final TourTag tourTag = new TourTag(inputDialog.getValue().trim());
-      final TVIPrefTag tagItem = new TVIPrefTag(_tagViewer, tourTag);
-
-      final Object parentItem = ((StructuredSelection) _tagViewer.getSelection()).getFirstElement();
-      if (parentItem == null) {
-
-         // a parent is not selected, this will be a root tag
-
-         tourTag.setRoot(true);
-
-         /*
-          * Update model
-          */
-         tagItem.setParentItem(_rootItem);
-         _rootItem.getFetchedChildren().add(tagItem);
-
-         // persist tag
-         savedTag = TourDatabase.saveEntity(tourTag, TourDatabase.ENTITY_IS_NOT_SAVED, TourTag.class);
-
-         if (savedTag != null) {
-
-            // update item
-            tagItem.setTourTag(savedTag);
-
-            /*
-             * Update UI
-             */
-            _tagViewer.add(_rootItem, tagItem);
-         }
-
-      } else if (parentItem instanceof TVIPrefTagCategory) {
-
-         // parent is a category
-
-         final TVIPrefTagCategory parentCategoryItem = (TVIPrefTagCategory) parentItem;
-         TourTagCategory parentTagCategory = parentCategoryItem.getTourTagCategory();
-
-         /*
-          * update model
-          */
-
-         // set parent into tag
-         tagItem.setParentItem(parentCategoryItem);
-
-         /*
-          * persist tag without new category otherwise an exception "detached entity passed to
-          * persist: net.tourbook.data.TourTagCategory" is raised
-          */
-         savedTag = TourDatabase.saveEntity(tourTag, TourDatabase.ENTITY_IS_NOT_SAVED, TourTag.class);
-         if (savedTag != null) {
-
-            // update item
-            tagItem.setTourTag(savedTag);
-
-            // update parent category
-            final EntityManager em = TourDatabase.getInstance().getEntityManager();
-            {
-
-               final TourTagCategory parentTagCategoryEntity = em.find(
-                     TourTagCategory.class,
-                     parentTagCategory.getCategoryId());
-
-               // set new entity
-               parentTagCategory = parentTagCategoryEntity;
-               parentCategoryItem.setTourTagCategory(parentTagCategoryEntity);
-
-               // set tag into parent category
-               final Set<TourTag> lazyTourTags = parentTagCategoryEntity.getTourTags();
-               lazyTourTags.add(tourTag);
-
-               parentTagCategory.setTagCounter(lazyTourTags.size());
-            }
-            em.close();
-
-            // persist parent category
-            final TourTagCategory savedParent = TourDatabase.saveEntity(
-                  parentTagCategory,
-                  parentTagCategory.getCategoryId(),
-                  TourTagCategory.class);
-
-            if (savedParent != null) {
-
-               // update item
-               parentCategoryItem.setTourTagCategory(savedParent);
-
-               // set category in tag,
-// this seems to be not necessary
-//               tourTag.setTagCategory(parentTagCategory);
-
-               // persist tag with category
-               savedTag = TourDatabase.saveEntity(tourTag, tourTag.getTagId(), TourTag.class);
-
-            }
-
-         }
-
-         if (savedTag != null) {
-
-            // clear tour tag list
-            TourDatabase.clearTourTags();
-
-            /*
-             * update viewer
-             */
-            parentCategoryItem.clearChildren();
-
-            _tagViewer.add(parentCategoryItem, tagItem);
-            _tagViewer.update(parentCategoryItem, null);
-
-            _tagViewer.expandToLevel(parentCategoryItem, 1);
-         }
-      }
-
-      if (savedTag != null) {
-
-         // show new tag in viewer
-         _tagViewer.reveal(tagItem);
-
-         _isModified = true;
-      }
-
-      setFocusToViewer();
+      createNewTourTag(inputDialog.getValue().trim(), UI.EMPTY_STRING);
    }
 
    private void onAction_Reset() {
@@ -1464,7 +1439,8 @@ public class PrefPageTags extends PreferencePage implements IWorkbenchPreference
       {
          final Object[] expandedElements = _tagViewer.getExpandedElements();
 
-         _tagViewer.setInput(_rootItem = new TVIPrefTagRoot(_tagViewer, true));
+         _rootItem = new TVIPrefTagRoot(_tagViewer, true);
+         _tagViewer.setInput(_rootItem);
          _tagViewer.setExpandedElements(expandedElements);
       }
       tree.setRedraw(true);

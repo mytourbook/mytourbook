@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,7 +43,7 @@ public class CSVExport {
 
    private static char         SEPARATOR;
 
-   private static final String NL                                                     = net.tourbook.ui.UI.SYSTEM_NEW_LINE;
+   private static final String NL                                                     = UI.SYSTEM_NEW_LINE;
 
    private static final String CSV_EXPORT_DURATION_HHH_MM_SS                          = "hhh:mm:ss";                                        //$NON-NLS-1$
 
@@ -1284,7 +1284,7 @@ public class CSVExport {
 
       { // HEADER_WEATHER_TEMPERATURE_AVERAGE
 
-         final float dbValue = tviItem.colTemperature_Avg;
+         final float dbValue = tviItem.colTemperature_Average_Device;
 
          if (dbValue != 0) {
             sb.append(_nf1.format(UI.convertTemperatureFromMetric(dbValue)));
@@ -1294,7 +1294,7 @@ public class CSVExport {
 
       { // HEADER_WEATHER_TEMPERATURE_MIN
 
-         final float dbValue = tviItem.colTemperature_Min;
+         final float dbValue = tviItem.colTemperature_Min_Device;
 
          if (dbValue != 0) {
             sb.append(_nf1.format(UI.convertTemperatureFromMetric(dbValue)));
@@ -1304,7 +1304,7 @@ public class CSVExport {
 
       { // HEADER_WEATHER_TEMPERATURE_MAX
 
-         final float dbValue = tviItem.colTemperature_Max;
+         final float dbValue = tviItem.colTemperature_Max_Device;
 
          if (dbValue != 0) {
             sb.append(_nf1.format(UI.convertTemperatureFromMetric(dbValue)));
@@ -1314,7 +1314,7 @@ public class CSVExport {
 
       { // HEADER_WEATHER_WIND_SPEED
 
-         final int windSpeed = (int) (tviItem.colWindSpd / UI.UNIT_VALUE_DISTANCE);
+         final int windSpeed = (int) (tviItem.colWindSpeed / UI.UNIT_VALUE_DISTANCE);
          if (windSpeed != 0) {
             sb.append(Integer.toString(windSpeed));
          }
@@ -1324,7 +1324,7 @@ public class CSVExport {
       { // HEADER_WEATHER_WIND_DIRECTION
 
          if (isTour) {
-            final int windDir = tviItem.colWindDir;
+            final int windDir = tviItem.colWindDirection;
             if (windDir != 0) {
                sb.append(Integer.toString(windDir));
             }

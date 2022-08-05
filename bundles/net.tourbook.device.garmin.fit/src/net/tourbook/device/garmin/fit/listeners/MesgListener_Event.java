@@ -33,8 +33,11 @@ import net.tourbook.device.garmin.fit.FitUtils;
 public class MesgListener_Event extends AbstractMesgListener implements EventMesgListener {
 
    List<GearData>     _gearData;
+
    private List<Long> _pausedTime_Start = new ArrayList<>();
    private List<Long> _pausedTime_End   = new ArrayList<>();
+   private List<Long> _pausedTime_Data  = new ArrayList<>();
+
    private boolean    _isTimerStopped   = true;
 
    public MesgListener_Event(final FitData fitData) {
@@ -42,8 +45,10 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
       super(fitData);
 
       _gearData = fitData.getGearData();
+
       _pausedTime_Start = fitData.getPausedTime_Start();
       _pausedTime_End = fitData.getPausedTime_End();
+      _pausedTime_Data = fitData.getPausedTime_Data();
    }
 
    private void handleTimerStartEvent(final long javaTime) {
@@ -61,8 +66,7 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
          return;
       }
 
-      final long lastPausedTime_Start = _pausedTime_Start.get(
-            numberOfPausedTime_Start - 1);
+      final long lastPausedTime_Start = _pausedTime_Start.get(numberOfPausedTime_Start - 1);
 
       if (javaTime - lastPausedTime_Start >= 1000) {
 
@@ -71,7 +75,8 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
       }
    }
 
-   private void handleTimerStopEvents(final long javaTime) {
+   private void handleTimerStopEvents(final long javaTime, final Long eventData) {
+
       // We need to avoid the cases where stops are consecutive events.
       // In this case, we ignore the stop event if the timer is already stopped.
       if (_isTimerStopped) {
@@ -79,6 +84,8 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
       }
 
       _pausedTime_Start.add(javaTime);
+      _pausedTime_Data.add(eventData);
+
       _isTimerStopped = true;
    }
 
@@ -107,7 +114,13 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
          case STOP:
          case STOP_ALL:
 
-            handleTimerStopEvents(javaTime);
+            /**
+             * eventData == 0: user stop<br>
+             * eventData == 1: auto-stop
+             */
+            final Long eventData = mesg.getData();
+
+            handleTimerStopEvents(javaTime, eventData);
             break;
 
          default:

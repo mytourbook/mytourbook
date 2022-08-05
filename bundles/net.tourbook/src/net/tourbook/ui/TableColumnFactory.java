@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -127,6 +127,7 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory MOTION_SPEED;
    public static final TableColumnFactory MOTION_SPEED_DIFF;
 
+   public static final TableColumnFactory PHOTO_FILE_PATH;
    public static final TableColumnFactory PHOTO_NUMBER_OF_GPS_PHOTOS;
    public static final TableColumnFactory PHOTO_NUMBER_OF_NO_GPS_PHOTOS;
    public static final TableColumnFactory PHOTO_NUMBER_OF_PHOTOS;
@@ -269,6 +270,7 @@ public abstract class TableColumnFactory {
    public static final String             TIME__COMPUTED_BREAK_TIME_RELATIVE_ID              = "TIME__COMPUTED_BREAK_TIME_RELATIVE";              //$NON-NLS-1$
 
    public static final TableColumnFactory TIME_IS_BREAK_TIME;
+   public static final TableColumnFactory TIME_IS_PAUSED_TIME;
    public static final TableColumnFactory TIME_DATE;
    public static final String             TIME_DATE_ID                                       = "TIME_DATE";                                       //$NON-NLS-1$
    public static final TableColumnFactory TIME_TIME_ZONE;
@@ -339,14 +341,26 @@ public abstract class TableColumnFactory {
    public static final TableColumnFactory WEATHER_CLOUDS;
    public static final String             WEATHER_CLOUDS_ID                                  = "WEATHER_CLOUDS";                                  //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_AVG;
-   public static final String             WEATHER_TEMPERATURE_AVG_ID                         = "WEATHER_TEMPERATURE_AVG";                         //$NON-NLS-1$
+   public static final String             WEATHER_TEMPERATURE_AVG_ID                         = "WEATHER_TEMPERATURE_AVG_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory WEATHER_TEMPERATURE_AVG_COMBINED;
+   public static final String             WEATHER_TEMPERATURE_AVG_COMBINED_ID                = "WEATHER_TEMPERATURE_AVG_COMBINED_ID";             //$NON-NLS-1$
+   public static final TableColumnFactory WEATHER_TEMPERATURE_AVG_DEVICE;
+   public static final String             WEATHER_TEMPERATURE_AVG_DEVICE_ID                  = "WEATHER_TEMPERATURE_AVG_DEVICE";                  //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_MIN;
-   public static final String             WEATHER_TEMPERATURE_MIN_ID                         = "WEATHER_TEMPERATURE_MIN";                         //$NON-NLS-1$
+   public static final String             WEATHER_TEMPERATURE_MIN_ID                         = "WEATHER_TEMPERATURE_MIN_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory WEATHER_TEMPERATURE_MIN_COMBINED;
+   public static final String             WEATHER_TEMPERATURE_MIN_COMBINED_ID                = "WEATHER_TEMPERATURE_MIN_COMBINED_ID";             //$NON-NLS-1$
+   public static final TableColumnFactory WEATHER_TEMPERATURE_MIN_DEVICE;
+   public static final String             WEATHER_TEMPERATURE_MIN_DEVICE_ID                  = "WEATHER_TEMPERATURE_MIN_DEVICE";                  //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_MAX;
-   public static final String             WEATHER_TEMPERATURE_MAX_ID                         = "WEATHER_TEMPERATURE_MAX";                         //$NON-NLS-1$
+   public static final String             WEATHER_TEMPERATURE_MAX_ID                         = "WEATHER_TEMPERATURE_MAX_ID";                      //$NON-NLS-1$
+   public static final TableColumnFactory WEATHER_TEMPERATURE_MAX_COMBINED;
+   public static final String             WEATHER_TEMPERATURE_MAX_COMBINED_ID                = "WEATHER_TEMPERATURE_MAX_COMBINED_ID";             //$NON-NLS-1$
+   public static final TableColumnFactory WEATHER_TEMPERATURE_MAX_DEVICE;
+   public static final String             WEATHER_TEMPERATURE_MAX_DEVICE_ID                  = "WEATHER_TEMPERATURE_MAX_DEVICE";                  //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_TEMPERATURE_TIME_SLICE;
    public static final TableColumnFactory WEATHER_WIND_DIR;
-   public static final String             WEATHER_WIND_DIR_ID                                = "WEATHER_WIND_DIR";                                //$NON-NLS-1$
+   public static final String             WEATHER_WIND_DIRECTION_ID                          = "WEATHER_WIND_DIR";                                //$NON-NLS-1$
    public static final TableColumnFactory WEATHER_WIND_SPEED;
    public static final String             WEATHER_WIND_SPEED_ID                              = "WEATHER_WIND_SPEED";                              //$NON-NLS-1$
 
@@ -1714,6 +1728,26 @@ public abstract class TableColumnFactory {
        * Photo
        */
 
+      PHOTO_FILE_PATH = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "PHOTO_FILE_PATH", SWT.LEAD); //$NON-NLS-1$
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Photo);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Photo_FilePath_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Photo_FilePath_Label);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Photo_FilePath_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
+
+            return colDef;
+         }
+      };
+
       PHOTO_NUMBER_OF_GPS_PHOTOS = new TableColumnFactory() {
 
          @Override
@@ -1724,9 +1758,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Photo);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_NumberOfGPSPhotos_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_NumberOfGPSPhotos_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_NumberOfGPSPhotos_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Photo_NumberOfGPSPhotos_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Photo_NumberOfGPSPhotos_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Photo_NumberOfGPSPhotos_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
@@ -1744,9 +1778,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Photo);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_NumberOfNoGPSPhotos_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_NumberOfNoGPSPhotos_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_NumberOfNoGPSPhotos_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Photo_NumberOfNoGPSPhotos_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Photo_NumberOfNoGPSPhotos_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Photo_NumberOfNoGPSPhotos_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
@@ -1764,9 +1798,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Photo);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_NumberOfTourPhotos_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_NumberOfTourPhotos_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_NumberOfTourPhotos_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Photo_NumberOfTourPhotos_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Photo_NumberOfTourPhotos_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Photo_NumberOfTourPhotos_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
 
@@ -1784,9 +1818,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Photo);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_PhotoTimeAdjustment_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_PhotoTimeAdjustment_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_PhotoTimeAdjustment_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Photo_TimeAdjustment_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Photo_TimeAdjustment_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Photo_TimeAdjustment_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11)); // 9 ... 54
 
@@ -1804,9 +1838,9 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Photo);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_TourCamera_Label);
-            colDef.setColumnHeaderText(         Messages.ColumnFactory_TourCamera_Label);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TourCamera_Label_Tooltip);
+            colDef.setColumnLabel(              Messages.ColumnFactory_Photo_TourCamera_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Photo_TourCamera_Label);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Photo_TourCamera_Label_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(20));
 
@@ -2864,7 +2898,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_BatteryState_Level_Label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_BatteryState_Level_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_BatteryState_Level_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_BatteryState_Level_Label);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -2884,7 +2918,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_BatteryState_Status_Label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_BatteryState_Status_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_BatteryState_Status_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_BatteryState_Status_Label);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -2904,7 +2938,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_Sensor_BatteryState_Voltage_Label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_Sensor_BatteryState_Voltage_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_BatteryState_Voltage_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Sensor_BatteryState_Voltage_Label);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
 
@@ -3202,7 +3236,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_TourTimeDiff_Label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_TourTimeDiff_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TourTimeDiff_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TourTimeDiff_Tooltip_2);
             colDef.setColumnUnit(               Messages.ColumnFactory_tour_time);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
@@ -3289,13 +3323,33 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_IS_BREAK_TIME", SWT.TRAIL); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_IS_BREAK_TIME", SWT.CENTER); //$NON-NLS-1$
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
 
             colDef.setColumnLabel(              Messages.ColumnFactory_BreakTime_Label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_BreakTime_Header);
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_BreakTime_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(3));
+
+            return colDef;
+         }
+      };
+
+      TIME_IS_PAUSED_TIME = new TableColumnFactory() {
+
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "TIME_IS_PAUSED_TIME", SWT.CENTER); //$NON-NLS-1$
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Time);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_Time_PausedTime_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_Time_PausedTime_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Time_PausedTime_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(3));
 
@@ -3375,7 +3429,7 @@ public abstract class TableColumnFactory {
 
             colDef.setColumnLabel(              Messages.ColumnFactory_TourTimeDiff_Label);
             colDef.setColumnHeaderText(         Messages.ColumnFactory_TourTimeDiff_Header);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TourTimeDiff_Tooltip);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TourTimeDiff_Tooltip_2);
             colDef.setColumnUnit(               Messages.ColumnFactory_tour_time);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(10));
@@ -4378,86 +4432,59 @@ public abstract class TableColumnFactory {
          }
       };
 
-      WEATHER_TEMPERATURE_AVG = new TableColumnFactory() {
-         @Override
-         public TableColumnDefinition createColumn(final ColumnManager columnManager,
-                                                   final PixelConverter pixelConverter) {
+      WEATHER_TEMPERATURE_AVG = createTableColumnFactory_Temperature(
+            WEATHER_TEMPERATURE_AVG_ID,
+            UI.SYMBOL_AVERAGE,
+            Messages.ColumnFactory_Temperature_Avg_Label,
+            Messages.ColumnFactory_Temperature_Avg_Tooltip);
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_TEMPERATURE_AVG_ID, SWT.TRAIL);
+      WEATHER_TEMPERATURE_AVG_COMBINED = createTableColumnFactory_Temperature(
+            WEATHER_TEMPERATURE_AVG_COMBINED_ID,
+            UI.SYMBOL_AVERAGE,
+            Messages.ColumnFactory_Temperature_Avg_Combined_Label,
+            Messages.ColumnFactory_Temperature_Avg_Combined_Tooltip);
 
-            final String unitLabel = UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_TEMPERATURE;
+      WEATHER_TEMPERATURE_AVG_DEVICE = createTableColumnFactory_Temperature(
+            WEATHER_TEMPERATURE_AVG_DEVICE_ID,
+            UI.SYMBOL_AVERAGE,
+            Messages.ColumnFactory_Temperature_Avg_Device_Label,
+            Messages.ColumnFactory_Temperature_Avg_Device_Tooltip);
 
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
+      WEATHER_TEMPERATURE_MIN = createTableColumnFactory_Temperature(
+            WEATHER_TEMPERATURE_MIN_ID,
+            UI.SYMBOL_MIN,
+            Messages.ColumnFactory_Temperature_Min_Label,
+            Messages.ColumnFactory_Temperature_Min_Tooltip);
 
-            colDef.setColumnLabel(              Messages.ColumnFactory_avg_temperature_label);//Temperature - Average
-            colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_avg_temperature_tooltip);//Average temperature
-            colDef.setColumnUnit(               unitLabel);
+      WEATHER_TEMPERATURE_MIN_COMBINED = createTableColumnFactory_Temperature(
+            WEATHER_TEMPERATURE_MIN_COMBINED_ID,
+            UI.SYMBOL_MIN,
+            Messages.ColumnFactory_Temperature_Min_Combined_Label,
+            Messages.ColumnFactory_Temperature_Min_Combined_Tooltip);
 
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
-            colDef.setValueFormats(
-                  ValueFormatSet.Number,
-                  ValueFormat.NUMBER_1_1,
-                  ValueFormat.NUMBER_1_1,
-                  columnManager);
+      WEATHER_TEMPERATURE_MIN_DEVICE = createTableColumnFactory_Temperature(
+            WEATHER_TEMPERATURE_MIN_DEVICE_ID,
+            UI.SYMBOL_MIN,
+            Messages.ColumnFactory_Temperature_Min_Device_Label,
+            Messages.ColumnFactory_Temperature_Min_Device_Tooltip);
 
-            return colDef;
-         }
-      };
+      WEATHER_TEMPERATURE_MAX = createTableColumnFactory_Temperature(
+            WEATHER_TEMPERATURE_MAX_ID,
+            UI.SYMBOL_MAX,
+            Messages.ColumnFactory_Temperature_Max_Label,
+            Messages.ColumnFactory_Temperature_Max_Tooltip);
 
-      WEATHER_TEMPERATURE_MIN = new TableColumnFactory() {
-         @Override
-         public TableColumnDefinition createColumn(final ColumnManager columnManager,
-                                                   final PixelConverter pixelConverter) {
+      WEATHER_TEMPERATURE_MAX_COMBINED = createTableColumnFactory_Temperature(
+            WEATHER_TEMPERATURE_MAX_COMBINED_ID,
+            UI.SYMBOL_MAX,
+            Messages.ColumnFactory_Temperature_Max_Combined_Label,
+            Messages.ColumnFactory_Temperature_Max_Combined_Tooltip);
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_TEMPERATURE_MIN_ID, SWT.TRAIL);
-
-            final String unitLabel = UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
-
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
-
-            colDef.setColumnLabel(              Messages.ColumnFactory_Temperature_Min_Label);//Temperature - Average
-            colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Temperature_Min_Tooltip);//Average temperature
-            colDef.setColumnUnit(               unitLabel);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
-            colDef.setValueFormats(
-                  ValueFormatSet.Number,
-                  ValueFormat.NUMBER_1_1,
-                  ValueFormat.NUMBER_1_1,
-                  columnManager);
-
-            return colDef;
-         }
-      };
-
-      WEATHER_TEMPERATURE_MAX = new TableColumnFactory() {
-         @Override
-         public TableColumnDefinition createColumn(final ColumnManager columnManager,
-                                                   final PixelConverter pixelConverter) {
-
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_TEMPERATURE_MAX_ID, SWT.TRAIL);
-
-            final String unitLabel = UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
-
-            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
-
-            colDef.setColumnLabel(              Messages.ColumnFactory_Temperature_Max_Label);//Temperature - Average
-            colDef.setColumnHeaderText(         unitLabel);
-            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_Temperature_Max_Tooltip);//Average temperature
-            colDef.setColumnUnit(               unitLabel);
-
-            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
-            colDef.setValueFormats(
-                  ValueFormatSet.Number,
-                  ValueFormat.NUMBER_1_1,
-                  ValueFormat.NUMBER_1_1,
-                  columnManager);
-
-            return colDef;
-         }
-      };
+      WEATHER_TEMPERATURE_MAX_DEVICE = createTableColumnFactory_Temperature(
+            WEATHER_TEMPERATURE_MAX_DEVICE_ID,
+            UI.SYMBOL_MAX,
+            Messages.ColumnFactory_Temperature_Max_Device_Label,
+            Messages.ColumnFactory_Temperature_Max_Device_Tooltip);
 
       WEATHER_TEMPERATURE_TIME_SLICE = new TableColumnFactory() {
 
@@ -4486,7 +4513,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                    final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_WIND_DIR_ID, SWT.TRAIL);
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, WEATHER_WIND_DIRECTION_ID, SWT.TRAIL);
 
             final String unitLabel = UI.UNIT_LABEL_DIRECTION;
 
@@ -4518,6 +4545,39 @@ public abstract class TableColumnFactory {
             colDef.setColumnUnit(               UI.UNIT_LABEL_SPEED);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(11));
+
+            return colDef;
+         }
+      };
+   }
+
+   private static TableColumnFactory createTableColumnFactory_Temperature(final String columnId,
+                                                                          final String symbol,
+                                                                          final String columnLabel,
+                                                                          final String columnHeaderToolTipText) {
+
+      return new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                   final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, columnId, SWT.TRAIL);
+
+            final String unitLabel = symbol + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Weather);
+
+            colDef.setColumnLabel(              columnLabel);
+            colDef.setColumnHeaderText(         unitLabel);
+            colDef.setColumnHeaderToolTipText(  columnHeaderToolTipText);
+            colDef.setColumnUnit(               unitLabel);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+            colDef.setValueFormats(
+                  ValueFormatSet.Number,
+                  ValueFormat.NUMBER_1_1,
+                  ValueFormat.NUMBER_1_1,
+                  columnManager);
 
             return colDef;
          }

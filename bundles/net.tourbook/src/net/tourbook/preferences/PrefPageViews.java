@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.preferences;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 
@@ -25,8 +27,7 @@ import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -38,9 +39,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageViews extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String     VIEW_TIME_LAYOUT_HH_MM                          = "hh_mm";                           //$NON-NLS-1$
-   public static final String     VIEW_TIME_LAYOUT_HH_MM_SS                       = "hh_mm_ss";                        //$NON-NLS-1$
-
    public static final String     VIEW_DOUBLE_CLICK_ACTION_NONE                   = "None";                            //$NON-NLS-1$
    public static final String     VIEW_DOUBLE_CLICK_ACTION_NONE_NO_WARNING        = "NoneNoWarning";                   //$NON-NLS-1$
    public static final String     VIEW_DOUBLE_CLICK_ACTION_QUICK_EDIT             = "QuickEdit";                       //$NON-NLS-1$
@@ -48,6 +46,9 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
    public static final String     VIEW_DOUBLE_CLICK_ACTION_EDIT_MARKER            = "EditMarker";                      //$NON-NLS-1$
    public static final String     VIEW_DOUBLE_CLICK_ACTION_ADJUST_ALTITUDE        = "AdjustAltitude";                  //$NON-NLS-1$
    public static final String     VIEW_DOUBLE_CLICK_ACTION_OPEN_TOUR_IN_EDIT_AREA = "OpenTourSeparately";              //$NON-NLS-1$
+
+   public static final String     VIEW_TEMPERATURE_VALUES_FROM_DEVICE             = "FromDevice";                      //$NON-NLS-1$
+   public static final String     VIEW_TEMPERATURE_VALUES_EXTERNAL                = "External";                        //$NON-NLS-1$
 
    private String[][]             _doubleClickActions                             = new String[][] {
          { Messages.PrefPage_ViewActions_Label_DoubleClick_QuickEdit, VIEW_DOUBLE_CLICK_ACTION_QUICK_EDIT },
@@ -60,13 +61,19 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
          //
    };
 
+   private String[][]             _temperatureValues                              = new String[][] {
+         { Messages.PrefPage_ViewActions_Label_TemperatureValues_FromDevice, VIEW_TEMPERATURE_VALUES_FROM_DEVICE },
+         { Messages.PrefPage_ViewActions_Label_TemperatureValues_External, VIEW_TEMPERATURE_VALUES_EXTERNAL }
+         //
+   };
+
    private final IPreferenceStore _prefStore                                      = TourbookPlugin
          .getDefault()
          .getPreferenceStore();
    private boolean                _isToolTipModified;
 
    /*
-    * UI constrols
+    * UI controls
     */
    private Button _chkTourImport_Date;
    private Button _chkTourImport_Time;
@@ -98,14 +105,9 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
    /*
     * none UI controls
     */
-   private SelectionAdapter _toolTipSelectionAdapter;
+   private SelectionListener _toolTipSelectionListener;
    {
-      _toolTipSelectionAdapter = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            _isToolTipModified = true;
-         }
-      };
+      _toolTipSelectionListener = widgetSelectedAdapter(selectionEvent -> _isToolTipModified = true);
    }
 
    @Override
@@ -125,6 +127,7 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
 
          createUI_10_ViewActions(parent);
          createUI_30_ViewTooltip(parent);
+         createUI_50_ViewTemperatureValues(parent);
       }
    }
 
@@ -241,28 +244,28 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
        */
       _chkTourImport_Date = new Button(container, SWT.CHECK);
       _chkTourImport_Date.setText(Messages.PrefPage_ViewTooltip_Label_Date);
-      _chkTourImport_Date.addSelectionListener(_toolTipSelectionAdapter);
+      _chkTourImport_Date.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * checkbox: time
        */
       _chkTourImport_Time = new Button(container, SWT.CHECK);
       _chkTourImport_Time.setText(Messages.PrefPage_ViewTooltip_Label_Time);
-      _chkTourImport_Time.addSelectionListener(_toolTipSelectionAdapter);
+      _chkTourImport_Time.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * checkbox: title
        */
       _chkTourImport_Title = new Button(container, SWT.CHECK);
       _chkTourImport_Title.setText(Messages.PrefPage_ViewTooltip_Label_Title);
-      _chkTourImport_Title.addSelectionListener(_toolTipSelectionAdapter);
+      _chkTourImport_Title.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * checkbox: tags
        */
       _chkTourImport_Tags = new Button(container, SWT.CHECK);
       _chkTourImport_Tags.setText(Messages.PrefPage_ViewTooltip_Label_Tags);
-      _chkTourImport_Tags.addSelectionListener(_toolTipSelectionAdapter);
+      _chkTourImport_Tags.addSelectionListener(_toolTipSelectionListener);
 
       // spacer
       label = new Label(container, SWT.NONE);
@@ -280,7 +283,7 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
        */
       _chkTourCompareResult_Tour = new Button(container, SWT.CHECK);
       _chkTourCompareResult_Tour.setText(Messages.PrefPage_ViewTooltip_Label_Tour);
-      _chkTourCompareResult_Tour.addSelectionListener(_toolTipSelectionAdapter);
+      _chkTourCompareResult_Tour.addSelectionListener(_toolTipSelectionListener);
 
       // spacer
       label = new Label(container, SWT.NONE);
@@ -298,35 +301,35 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
        */
       _chkTourBook_Date = new Button(container, SWT.CHECK);
       _chkTourBook_Date.setText(Messages.PrefPage_ViewTooltip_Label_Day);
-      _chkTourBook_Date.addSelectionListener(_toolTipSelectionAdapter);
+      _chkTourBook_Date.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * checkbox: time
        */
       _chkTourBook_Time = new Button(container, SWT.CHECK);
       _chkTourBook_Time.setText(Messages.PrefPage_ViewTooltip_Label_Time);
-      _chkTourBook_Time.addSelectionListener(_toolTipSelectionAdapter);
+      _chkTourBook_Time.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * checkbox: title
        */
       _chkTourBook_Title = new Button(container, SWT.CHECK);
       _chkTourBook_Title.setText(Messages.PrefPage_ViewTooltip_Label_Title);
-      _chkTourBook_Title.addSelectionListener(_toolTipSelectionAdapter);
+      _chkTourBook_Title.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * checkbox: tags
        */
       _chkTourBook_Tags = new Button(container, SWT.CHECK);
       _chkTourBook_Tags.setText(Messages.PrefPage_ViewTooltip_Label_Tags);
-      _chkTourBook_Tags.addSelectionListener(_toolTipSelectionAdapter);
+      _chkTourBook_Tags.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * checkbox: weekday
        */
       _chkTourBook_Weekday = new Button(container, SWT.CHECK);
       _chkTourBook_Weekday.setText(Messages.PrefPage_ViewTooltip_Label_WeekDay);
-      _chkTourBook_Weekday.addSelectionListener(_toolTipSelectionAdapter);
+      _chkTourBook_Weekday.addSelectionListener(_toolTipSelectionListener);
    }
 
    private void createUI_35_ToolTip_CollateTour(final Composite container) {
@@ -340,35 +343,35 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
        */
       _chkCollateTour_Date = new Button(container, SWT.CHECK);
       _chkCollateTour_Date.setText(Messages.PrefPage_ViewTooltip_Chkbox_Collation);
-      _chkCollateTour_Date.addSelectionListener(_toolTipSelectionAdapter);
+      _chkCollateTour_Date.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * checkbox: time
        */
       _chkCollateTour_Time = new Button(container, SWT.CHECK);
       _chkCollateTour_Time.setText(Messages.PrefPage_ViewTooltip_Label_Time);
-      _chkCollateTour_Time.addSelectionListener(_toolTipSelectionAdapter);
+      _chkCollateTour_Time.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * checkbox: title
        */
       _chkCollateTour_Title = new Button(container, SWT.CHECK);
       _chkCollateTour_Title.setText(Messages.PrefPage_ViewTooltip_Label_Title);
-      _chkCollateTour_Title.addSelectionListener(_toolTipSelectionAdapter);
+      _chkCollateTour_Title.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * checkbox: tags
        */
       _chkCollateTour_Tags = new Button(container, SWT.CHECK);
       _chkCollateTour_Tags.setText(Messages.PrefPage_ViewTooltip_Label_Tags);
-      _chkCollateTour_Tags.addSelectionListener(_toolTipSelectionAdapter);
+      _chkCollateTour_Tags.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * checkbox: weekday
        */
       _chkCollateTour_Weekday = new Button(container, SWT.CHECK);
       _chkCollateTour_Weekday.setText(Messages.PrefPage_ViewTooltip_Label_WeekDay);
-      _chkCollateTour_Weekday.addSelectionListener(_toolTipSelectionAdapter);
+      _chkCollateTour_Weekday.addSelectionListener(_toolTipSelectionListener);
    }
 
    private void createUI_37_ToolTip_Tagging(final Composite container) {
@@ -382,7 +385,7 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
        */
       _chkTagging_Tag = new Button(container, SWT.CHECK);
       _chkTagging_Tag.setText(Messages.PrefPage_ViewTooltip_Label_TagFirstColumn);
-      _chkTagging_Tag.addSelectionListener(_toolTipSelectionAdapter);
+      _chkTagging_Tag.addSelectionListener(_toolTipSelectionListener);
 
       // spacer
       label = new Label(container, SWT.NONE);
@@ -393,14 +396,14 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
        */
       _chkTagging_Title = new Button(container, SWT.CHECK);
       _chkTagging_Title.setText(Messages.PrefPage_ViewTooltip_Label_Title);
-      _chkTagging_Title.addSelectionListener(_toolTipSelectionAdapter);
+      _chkTagging_Title.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * checkbox: tags
        */
       _chkTagging_Tags = new Button(container, SWT.CHECK);
       _chkTagging_Tags.setText(Messages.PrefPage_ViewTooltip_Label_Tags);
-      _chkTagging_Tags.addSelectionListener(_toolTipSelectionAdapter);
+      _chkTagging_Tags.addSelectionListener(_toolTipSelectionListener);
 
       // spacer
       label = new Label(container, SWT.NONE);
@@ -418,7 +421,7 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
        */
       _chkTourCatalog_RefTour = new Button(container, SWT.CHECK);
       _chkTourCatalog_RefTour.setText(Messages.PrefPage_ViewTooltip_Label_ReferenceTour);
-      _chkTourCatalog_RefTour.addSelectionListener(_toolTipSelectionAdapter);
+      _chkTourCatalog_RefTour.addSelectionListener(_toolTipSelectionListener);
 
       // spacer
       label = new Label(container, SWT.NONE);
@@ -429,18 +432,44 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
        */
       _chkTourCatalog_Title = new Button(container, SWT.CHECK);
       _chkTourCatalog_Title.setText(Messages.PrefPage_ViewTooltip_Label_Title);
-      _chkTourCatalog_Title.addSelectionListener(_toolTipSelectionAdapter);
+      _chkTourCatalog_Title.addSelectionListener(_toolTipSelectionListener);
 
       /*
        * checkbox: tags
        */
       _chkTourCatalog_Tags = new Button(container, SWT.CHECK);
       _chkTourCatalog_Tags.setText(Messages.PrefPage_ViewTooltip_Label_Tags);
-      _chkTourCatalog_Tags.addSelectionListener(_toolTipSelectionAdapter);
+      _chkTourCatalog_Tags.addSelectionListener(_toolTipSelectionListener);
 
       // spacer
       label = new Label(container, SWT.NONE);
       GridDataFactory.fillDefaults().span(1, 1).applyTo(label);
+   }
+
+   private void createUI_50_ViewTemperatureValues(final Composite parent) {
+
+      /*
+       * group: column time format
+       */
+      final Group group = new Group(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, false).applyTo(group);
+      group.setText(Messages.PrefPage_ViewCombinedTemperatures_Group);
+      {
+         /*
+          * Combo
+          */
+
+         addField(new ComboFieldEditor(
+               ITourbookPreferences.VIEW_PREFERRED_TEMPERATURE_VALUE,
+               Messages.PrefPage_ViewCombinedTemperatures_Label_PreferredValue,
+               _temperatureValues,
+               group));
+      }
+      // set group margin after the fields are created
+      final GridLayout gl = (GridLayout) group.getLayout();
+      gl.marginHeight = 5;
+      gl.marginWidth = 5;
+      gl.numColumns = 2;
    }
 
    private void createUI39ToolTipActions(final Composite parent) {
@@ -463,12 +492,7 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
          gd.horizontalAlignment = SWT.END;
 
          btnEnableAll.setText(Messages.PrefPage_ViewTooltip_Button_EnableAll);
-         btnEnableAll.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectEnable(true);
-            }
-         });
+         btnEnableAll.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectEnable(true)));
 
          /*
           * button: disable all
@@ -476,12 +500,7 @@ public class PrefPageViews extends FieldEditorPreferencePage implements IWorkben
          final Button btnDisableAll = new Button(container, SWT.NONE);
          GridDataFactory.fillDefaults().applyTo(btnDisableAll);
          btnDisableAll.setText(Messages.PrefPage_ViewTooltip_Button_DisableAll);
-         btnDisableAll.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectEnable(false);
-            }
-         });
+         btnDisableAll.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectEnable(false)));
       }
    }
 

@@ -33,6 +33,8 @@ import org.eclipse.swt.graphics.RGB;
 @Entity
 public class TourType implements Comparable<Object> {
 
+   private static final char          NL                                    = UI.NEW_LINE;
+
    public static final int            DB_LENGTH_NAME                        = 100;
 
    /** Width/height of the tour type image. */
@@ -292,7 +294,10 @@ public class TourType implements Comparable<Object> {
 
    @Override
    public String toString() {
-      return "TourType [typeId=" + typeId + ", name=" + name + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+      return "TourType [typeId=" + typeId + ", name=" + name + "]" + NL //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+      ;
    }
 
 }

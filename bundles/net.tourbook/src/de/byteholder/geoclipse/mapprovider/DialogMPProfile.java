@@ -16,7 +16,7 @@
 package de.byteholder.geoclipse.mapprovider;
 
 import de.byteholder.geoclipse.Messages;
-import de.byteholder.geoclipse.map.Map;
+import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.map.event.ITileListener;
@@ -108,7 +108,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefaultActions {
 
-   private static final int    MAP_MAX_ZOOM_LEVEL                     = Map.UI_MAX_ZOOM_LEVEL - Map.UI_MIN_ZOOM_LEVEL;
+   private static final int    MAP_MAX_ZOOM_LEVEL                     = Map2.UI_MAX_ZOOM_LEVEL - Map2.UI_MIN_ZOOM_LEVEL;
 
    public static final String  DEFAULT_URL                            = "http://";                                    //$NON-NLS-1$
 
@@ -280,18 +280,21 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
    @Override
    public void actionZoomIn() {
+
       _map.setZoom(_map.getZoom() + 1);
       _map.paint();
    }
 
    @Override
    public void actionZoomOut() {
+
       _map.setZoom(_map.getZoom() - 1);
       _map.paint();
    }
 
    @Override
    public void actionZoomOutToMinZoom() {
+
       _map.setZoom(_map.getMapProvider().getMinimumZoomLevel());
       _map.paint();
    }
@@ -1224,9 +1227,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
             // spinner: min zoom level
             _spinMinZoom = new Spinner(zoomContainer, SWT.BORDER);
             GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(_spinMinZoom);
-            _spinMinZoom.setMinimum(Map.UI_MIN_ZOOM_LEVEL);
-            _spinMinZoom.setMaximum(Map.UI_MAX_ZOOM_LEVEL);
-            _spinMinZoom.setSelection(Map.UI_MIN_ZOOM_LEVEL);
+            _spinMinZoom.setMinimum(Map2.UI_MIN_ZOOM_LEVEL);
+            _spinMinZoom.setMaximum(Map2.UI_MAX_ZOOM_LEVEL);
+            _spinMinZoom.setSelection(Map2.UI_MIN_ZOOM_LEVEL);
             _spinMinZoom.addMouseWheelListener(mouseWheelListener);
             _spinMinZoom.addSelectionListener(new SelectionAdapter() {
                @Override
@@ -1254,9 +1257,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
             // spinner: min zoom level
             _spinMaxZoom = new Spinner(zoomContainer, SWT.BORDER);
             GridDataFactory.fillDefaults().grab(false, true).align(SWT.FILL, SWT.CENTER).applyTo(_spinMaxZoom);
-            _spinMaxZoom.setMinimum(Map.UI_MIN_ZOOM_LEVEL);
-            _spinMaxZoom.setMaximum(Map.UI_MAX_ZOOM_LEVEL);
-            _spinMaxZoom.setSelection(Map.UI_MAX_ZOOM_LEVEL);
+            _spinMaxZoom.setMinimum(Map2.UI_MIN_ZOOM_LEVEL);
+            _spinMaxZoom.setMaximum(Map2.UI_MAX_ZOOM_LEVEL);
+            _spinMaxZoom.setSelection(Map2.UI_MAX_ZOOM_LEVEL);
             _spinMaxZoom.addMouseWheelListener(mouseWheelListener);
             _spinMaxZoom.addSelectionListener(new SelectionAdapter() {
                @Override
@@ -1393,7 +1396,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
                .applyTo(_toolbar);
       }
 
-      _map = new Map(parent, SWT.BORDER | SWT.FLAT, _dialogSettings);
+      _map = new Map2(parent, SWT.BORDER | SWT.FLAT, _dialogSettings);
       GridDataFactory.fillDefaults()//
             .grab(true, true)
             .applyTo(_map);
@@ -1959,13 +1962,13 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
    private void onModifyZoomSpinnerMax() {
 
-      final int mapMinValue = _spinMinZoom.getSelection() - Map.UI_MIN_ZOOM_LEVEL;
-      final int mapMaxValue = _spinMaxZoom.getSelection() - Map.UI_MIN_ZOOM_LEVEL;
+      final int mapMinValue = _spinMinZoom.getSelection() - Map2.UI_MIN_ZOOM_LEVEL;
+      final int mapMaxValue = _spinMaxZoom.getSelection() - Map2.UI_MIN_ZOOM_LEVEL;
 
       _isInitUI = true;
       {
          if (mapMaxValue > MAP_MAX_ZOOM_LEVEL) {
-            _spinMaxZoom.setSelection(Map.UI_MAX_ZOOM_LEVEL);
+            _spinMaxZoom.setSelection(Map2.UI_MAX_ZOOM_LEVEL);
          }
 
          if (mapMaxValue < mapMinValue) {
@@ -2001,8 +2004,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
    private void onModifyZoomSpinnerMin() {
 
-      final int mapMinValue = _spinMinZoom.getSelection() - Map.UI_MIN_ZOOM_LEVEL;
-      final int mapMaxValue = _spinMaxZoom.getSelection() - Map.UI_MIN_ZOOM_LEVEL;
+      final int mapMinValue = _spinMinZoom.getSelection() - Map2.UI_MIN_ZOOM_LEVEL;
+      final int mapMaxValue = _spinMaxZoom.getSelection() - Map2.UI_MIN_ZOOM_LEVEL;
 
       if (mapMinValue > mapMaxValue) {
          _spinMinZoom.setSelection(mapMaxValue + 1);
@@ -2205,6 +2208,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
       final GeoPosition mapCenter = _map.getMapGeoCenter();
 
       if (mapZoom < factoryMinZoom) {
+
          _map.setZoom(factoryMinZoom);
          _map.setMapCenter(mapCenter);
       }
@@ -2388,8 +2392,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
       final int oldZoomLevel = _map.getZoom();
       final GeoPosition mapCenter = _map.getMapGeoCenter();
 
-      final int newFactoryMinZoom = _spinMinZoom.getSelection() - Map.UI_MIN_ZOOM_LEVEL;
-      final int newFactoryMaxZoom = _spinMaxZoom.getSelection() - Map.UI_MIN_ZOOM_LEVEL;
+      final int newFactoryMinZoom = _spinMinZoom.getSelection() - Map2.UI_MIN_ZOOM_LEVEL;
+      final int newFactoryMaxZoom = _spinMaxZoom.getSelection() - Map2.UI_MIN_ZOOM_LEVEL;
 
       // set new zoom level before other map actions are done
       _mpProfile.setZoomLevel(newFactoryMinZoom, newFactoryMaxZoom);
@@ -2577,8 +2581,8 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
          // zoom level
          final int minZoomLevel = _mpProfile.getMinimumZoomLevel();
          final int maxZoomLevel = _mpProfile.getMaximumZoomLevel();
-         _spinMinZoom.setSelection(minZoomLevel + Map.UI_MIN_ZOOM_LEVEL);
-         _spinMaxZoom.setSelection(maxZoomLevel + Map.UI_MIN_ZOOM_LEVEL);
+         _spinMinZoom.setSelection(minZoomLevel + Map2.UI_MIN_ZOOM_LEVEL);
+         _spinMaxZoom.setSelection(maxZoomLevel + Map2.UI_MIN_ZOOM_LEVEL);
 
          final int color = _mpProfile.getBackgroundColor();
          _colorImageBackground.setColorValue(new RGB(

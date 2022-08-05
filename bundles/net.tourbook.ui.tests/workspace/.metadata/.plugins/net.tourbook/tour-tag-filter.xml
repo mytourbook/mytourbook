@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TourTagFilterProfiles Created="2022-06-23T13:42:37.627981200Z[UTC]" VersionMajor="22" VersionMicro="1" VersionMinor="6" VersionQualifier="20220617-1250" tourTagFilterVersion="1">
+<Profile isOrOperator="true" isSelected="true" name="Shoes 2 Profile">
+<list key="tagIds">
+<item value="0"/>
+</list>
+<list key="tagIdsUnchecked"/>
+</Profile>
+</TourTagFilterProfiles>

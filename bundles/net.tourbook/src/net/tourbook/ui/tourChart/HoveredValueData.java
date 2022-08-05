@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,22 +15,38 @@
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
 
+import net.tourbook.common.UI;
+
 public class HoveredValueData {
 
-   public int hoveredValuePointIndex;
+   private static final char NL = UI.NEW_LINE;
 
-   public HoveredValueData(final int hoveredValuePointIndex) {
+   public Long               tourId;
+   public int                hoveredTourSerieIndex;
 
-      this.hoveredValuePointIndex = hoveredValuePointIndex;
+   /**
+    * @param tourId
+    *           Id for a single real tour and not for a multiple tour
+    * @param hoveredTourSerieIndex
+    *           Index into the tour data series
+    */
+   public HoveredValueData(final Long tourId, final int hoveredTourSerieIndex) {
+
+      this.tourId = tourId;
+      this.hoveredTourSerieIndex = hoveredTourSerieIndex;
    }
 
    @Override
    public String toString() {
 
-      return "HoveredValueData\n" //$NON-NLS-1$
-            + "[\n" //$NON-NLS-1$
-            + "hoveredValuePointIndex=" + hoveredValuePointIndex //$NON-NLS-1$
-            + "\n]"; //$NON-NLS-1$
+      return "HoveredValueData" + NL //$NON-NLS-1$
+
+            + "[" + NL//$NON-NLS-1$
+
+            + "tourId                  = " + tourId + NL//$NON-NLS-1$
+            + "hoveredTourSerieIndex   = " + hoveredTourSerieIndex + NL //$NON-NLS-1$
+
+            + "]"; //$NON-NLS-1$
    }
 
 }

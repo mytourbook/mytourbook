@@ -2,18 +2,18 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: External jar's for printing
 Bundle-SymbolicName: net.tourbook.ext.jars.printing;singleton:=true
-Bundle-Version: 21.9.0.qualifier
+Bundle-Version: 22.8.0.qualifier
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ClassPath: 
  batik-all-1.14.jar,
- fop-2.6.jar,
- xmlgraphics-commons-2.6.jar,
- commons-io-2.8.0.jar,
+ fop-2.7.jar,
+ xmlgraphics-commons-2.7.jar,
+ commons-io-2.11.0.jar,
  commons-logging-1.2.jar,
  jaxb-api-2.4.0-b180830.0359.jar,
  jaxb-runtime-2.4.0-b180830.0438.jar,
- istack-commons-runtime-4.0.0.jar,
+ istack-commons-runtime-4.1.1.jar,
  activation-1.1.1.jar
 Export-Package: 
  javax.xml.bind,

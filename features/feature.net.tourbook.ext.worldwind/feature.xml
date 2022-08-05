@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.ext.worldwind"
       label="World Wind Java SDK"
-      version="2.2.20200812"
+      version="2.2.20220607.9ccf6b8"
       plugin="net.tourbook.branding">
 
    <description url="http://worldwind.arc.nasa.gov/java/">
@@ -18,14 +18,14 @@
    </license>
 
    <url>
-      <update label="MyTourbook Update Site" url="http://mytourbook.sourceforge.net/updates/"/>
+      <update label="MyTourbook Update Site" url="https://mytourbook.sourceforge.io/updates/"/>
    </url>
 
    <plugin
          id="net.tourbook.ext.worldwind"
          download-size="0"
          install-size="0"
-         version="2.2.20200812.5250a29"
+         version="2.2.20220607.9ccf6b8"
          unpack="false"/>
 
    <plugin
@@ -34,7 +34,7 @@
          arch="x86_64"
          download-size="0"
          install-size="0"
-         version="2.2.20200812"
+         version="2.2.20220607"
          fragment="true"
          unpack="false"/>
 
@@ -44,7 +44,7 @@
          arch="x86_64"
          download-size="0"
          install-size="0"
-         version="2.2.20200812"
+         version="2.2.20220607"
          fragment="true"
          unpack="false"/>
 
@@ -54,7 +54,7 @@
          arch="x86_64"
          download-size="0"
          install-size="0"
-         version="2.2.20200812"
+         version="2.2.20220607"
          fragment="true"
          unpack="false"/>
 

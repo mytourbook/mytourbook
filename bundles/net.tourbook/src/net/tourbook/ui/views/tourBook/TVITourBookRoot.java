@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -81,7 +81,7 @@ public class TVITourBookRoot extends TVITourBookItem {
 
                   + "   SELECT" + NL //                                                      //$NON-NLS-1$
 
-                  // this is necessary otherwise tours can occure multiple times when a tour contains multiple tags !!!
+                  // this is necessary otherwise tours can occur multiple times when a tour contains multiple tags !!!
                   + "      DISTINCT TourId," + NL //                                         //$NON-NLS-1$
 
                   + "      StartYear," + NL //                                               //$NON-NLS-1$

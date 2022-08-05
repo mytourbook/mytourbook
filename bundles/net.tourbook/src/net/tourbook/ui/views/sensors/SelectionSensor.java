@@ -25,13 +25,14 @@ import org.eclipse.jface.viewers.ISelection;
 public class SelectionSensor implements ISelection {
 
    private DeviceSensor sensor;
-   private long         tourId;
+   private Long         tourId;
 
    /**
     * @param sensor
     * @param tourId
+    *           Could be <code>null</code> when not available
     */
-   public SelectionSensor(final DeviceSensor sensor, final long tourId) {
+   public SelectionSensor(final DeviceSensor sensor, final Long tourId) {
 
       this.sensor = sensor;
       this.tourId = tourId;
@@ -42,7 +43,10 @@ public class SelectionSensor implements ISelection {
       return sensor;
    }
 
-   public long getTourId() {
+   /**
+    * @return Returns the tour id or <code>null</code> when not available
+    */
+   public Long getTourId() {
       return tourId;
    }
 

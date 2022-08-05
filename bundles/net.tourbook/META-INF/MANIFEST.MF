@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Application_Name
 Bundle-SymbolicName: net.tourbook;singleton:=true
-Bundle-Version: 21.9.0.qualifier
+Bundle-Version: 22.8.0.qualifier
 Bundle-Activator: net.tourbook.application.TourbookPlugin
 Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: JavaSE-11
@@ -36,8 +36,8 @@ Require-Bundle: org.eclipse.ui,
  net.tourbook.ext.rxtx_2.2,
  net.tourbook.ext.worldwind,
  net.tourbook.p2,
- net.tourbook.ext.vtm,
- net.tourbook.ext.geoclipse
+ net.tourbook.ext.geoclipse,
+ net.tourbook.ext.vtm
 Export-Package: de.byteholder.geoclipse.map,
  de.byteholder.geoclipse.map.event,
  de.byteholder.geoclipse.mapprovider,
@@ -62,7 +62,11 @@ Export-Package: de.byteholder.geoclipse.map,
  net.tourbook.ui,
  net.tourbook.ui.action,
  net.tourbook.ui.tourChart,
- net.tourbook.ui.views.rawData
+ net.tourbook.ui.views.rawData,
+ net.tourbook.weather,
+ net.tourbook.weather.openweathermap,
+ net.tourbook.weather.weatherapi,
+ net.tourbook.weather.worldweatheronline
 Import-Package: com.fasterxml.jackson.core.type,
  com.fasterxml.jackson.databind,
  com.javadocmd.simplelatlng,
@@ -86,6 +90,8 @@ Import-Package: com.fasterxml.jackson.core.type,
  net.tourbook.common.ui,
  net.tourbook.common.util,
  net.tourbook.common.weather,
+ net.tourbook.weather,
+ net.tourbook.weather.worldweatheronline,
  net.tourbook.common.widgets,
  net.tourbook.photo,
  net.tourbook.photo.internal.gallery.MT20,
@@ -93,6 +99,7 @@ Import-Package: com.fasterxml.jackson.core.type,
  net.tourbook.web.preferences,
  org.apache.commons.collections4,
  org.apache.commons.lang3.text,
+ org.apache.http.client.utils,
  org.eclipse.e4.core.services.events,
  org.geotools.ows,
  org.geotools.ows.wms,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,34 +19,39 @@ import java.util.ArrayList;
 
 public class EasyConfig {
 
-   static final int     ANIMATION_DURATION_DEFAULT                  = 20;   // seconds/10
-   static final int     ANIMATION_DURATION_MIN                      = 0;
-   static final int     ANIMATION_DURATION_MAX                      = 100;  // ->10 seconds
+   static final int     ANIMATION_DURATION_DEFAULT                   = 20;   // seconds/10
+   static final int     ANIMATION_DURATION_MIN                       = 0;
+   static final int     ANIMATION_DURATION_MAX                       = 100;  // ->10 seconds
 
-   static final int     ANIMATION_CRAZINESS_FACTOR_DEFAULT          = 1;
-   static final int     ANIMATION_CRAZINESS_FACTOR_MIN              = -100;
-   static final int     ANIMATION_CRAZINESS_FACTOR_MAX              = 100;
+   static final int     ANIMATION_CRAZINESS_FACTOR_DEFAULT           = 1;
+   static final int     ANIMATION_CRAZINESS_FACTOR_MIN               = -100;
+   static final int     ANIMATION_CRAZINESS_FACTOR_MAX               = 100;
 
-   static final int     BACKGROUND_OPACITY_DEFAULT                  = 5;
-   static final int     BACKGROUND_OPACITY_MIN                      = 0;
-   static final int     BACKGROUND_OPACITY_MAX                      = 100;
+   static final int     BACKGROUND_OPACITY_DEFAULT                   = 5;
+   static final int     BACKGROUND_OPACITY_MIN                       = 0;
+   static final int     BACKGROUND_OPACITY_MAX                       = 100;
 
-   static final int     HORIZONTAL_TILES_DEFAULT                    = 5;
-   static final int     HORIZONTAL_TILES_MIN                        = 1;
-   static final int     HORIZONTAL_TILES_MAX                        = 50;
+   static final int     HORIZONTAL_TILES_DEFAULT                     = 5;
+   static final int     HORIZONTAL_TILES_MIN                         = 1;
+   static final int     HORIZONTAL_TILES_MAX                         = 50;
 
-   static final boolean IS_LIVE_UPDATE_DEFAULT                      = true;
-   static final boolean IS_LOG_DETAILS_DEFAULT                      = false;
+   static final boolean IS_LIVE_UPDATE_DEFAULT                       = true;
+   static final boolean IS_LOG_DETAILS_DEFAULT                       = false;
+   static final boolean IS_SHOW_TILE_CLOUD_APPS_DEFAULT              = true;
+   static final boolean IS_SHOW_TILE_FILES_DEFAULT                   = true;
+   static final boolean IS_SHOW_TILE_FOSSIL_UI_DEFAULT               = true;
+   static final boolean IS_SHOW_TILE_SERIAL_PORT_DEFAULT             = false;
+   static final boolean IS_SHOW_TILE_SERIAL_PORT_WITH_CONFIG_DEFAULT = false;
 
-   static final boolean STATE_TOOLTIP_IS_DISPLAY_ABSOLUTE_FILE_PATH = false;
-   static final int     STATE_TOOLTIP_WIDTH_DEFAULT                 = 500;
+   static final boolean STATE_TOOLTIP_IS_DISPLAY_ABSOLUTE_FILE_PATH  = false;
+   static final int     STATE_TOOLTIP_WIDTH_DEFAULT                  = 500;
 
-   static final int     STATE_TOOLTIP_WIDTH_MIN                     = 300;
-   static final int     STATE_TOOLTIP_WIDTH_MAX                     = 2000;
+   static final int     STATE_TOOLTIP_WIDTH_MIN                      = 300;
+   static final int     STATE_TOOLTIP_WIDTH_MAX                      = 2000;
 
-   static final int     TILE_SIZE_DEFAULT                           = 100;
-   static final int     TILE_SIZE_MIN                               = 20;
-   static final int     TILE_SIZE_MAX                               = 300;
+   static final int     TILE_SIZE_DEFAULT                            = 100;
+   static final int     TILE_SIZE_MIN                                = 20;
+   static final int     TILE_SIZE_MAX                                = 300;
 
    /*
     * Launcher config
@@ -84,6 +89,12 @@ public class EasyConfig {
    public boolean stateToolTipDisplayAbsoluteFilePath = STATE_TOOLTIP_IS_DISPLAY_ABSOLUTE_FILE_PATH;
    public int     stateToolTipWidth                   = STATE_TOOLTIP_WIDTH_DEFAULT;
 
+   public boolean isShowTile_CloudApps                = IS_SHOW_TILE_CLOUD_APPS_DEFAULT;
+   public boolean isShowTile_Files                    = IS_SHOW_TILE_FILES_DEFAULT;
+   public boolean isShowTile_FossilUI                 = IS_SHOW_TILE_FOSSIL_UI_DEFAULT;
+   public boolean isShowTile_SerialPort               = IS_SHOW_TILE_SERIAL_PORT_DEFAULT;
+   public boolean isShowTile_SerialPortWithConfig     = IS_SHOW_TILE_SERIAL_PORT_WITH_CONFIG_DEFAULT;
+
    /*
     * Launcher fields
     */
@@ -106,6 +117,11 @@ public class EasyConfig {
 
    /** Contains files which are available in the backup folder but not in the device folder. */
    public ArrayList<OSFile>         movedFiles;
+
+   /**
+    * This constructor is used to find new instances during development
+    */
+   public EasyConfig() {}
 
    /**
     * @return Returns the active import config which is used when importing tours.

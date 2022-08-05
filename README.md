@@ -11,10 +11,16 @@
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=wolfgang-ch_mytourbook&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=wolfgang-ch_mytourbook)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=wolfgang-ch_mytourbook&metric=coverage)](https://sonarcloud.io/summary/new_code?id=wolfgang-ch_mytourbook)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=wolfgang-ch_mytourbook&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=wolfgang-ch_mytourbook)
-
+   
+<div>
+   <a href="https://github.com/mytourbook/mytourbook/issues/480"><img src="/info/community/oss-open-source-excellence-black.svg" width="150" height="150" /></a>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   <a href="https://github.com/mytourbook/mytourbook/issues/480"><img src="/info/community/oss-community-choice-black.svg" width="150" height="150" /></a>
+</div>
+   
 # MyTourbook
 
-All documentations for this project are available on the website <http://mytourbook.sourceforge.net>
+All documentations for this project are available on the website <https://mytourbook.sourceforge.io/>
 
 **Some contributor links**
 
@@ -54,7 +60,7 @@ _This document will not repeat already written text in the documentation._
 
 **Scramble content/values**
 
-It is scrambeling text and values. This is used to create anynymous screenshots
+This will scramble text and values. This is used to create anonymous screenshots
 
 -DscrambleData
 

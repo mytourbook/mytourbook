@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,6 @@ import java.net.MalformedURLException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -183,9 +182,9 @@ public class MapProviderManager {
    private static final String PART_TYPE_HTML                                = "HTML";               //$NON-NLS-1$
    private static final String PART_TYPE_RANDOM_INTEGER                      = "RANDOM_INTEGER";     //$NON-NLS-1$
    private static final String PART_TYPE_RANDOM_ALPHA                        = "RANDOM_ALPHA";       //$NON-NLS-1$
-   private static final String PART_TYPE_X                                   = "X";                  //$NON-NLS-1$;
-   private static final String PART_TYPE_Y                                   = "Y";                  //$NON-NLS-1$;
-   private static final String PART_TYPE_ZOOM                                = "ZOOM";               //$NON-NLS-1$;
+   private static final String PART_TYPE_X                                   = "X";                  //$NON-NLS-1$
+   private static final String PART_TYPE_Y                                   = "Y";                  //$NON-NLS-1$
+   private static final String PART_TYPE_ZOOM                                = "ZOOM";               //$NON-NLS-1$
 
    /*
     * WMS map provider
@@ -328,7 +327,7 @@ public class MapProviderManager {
          public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
             final String capsUrlFinal = mpWms == null ? //
-            capsUrl
+                  capsUrl
                   : mpWms.getCapabilitiesUrl();
 
             monitor.beginTask(Messages.MP_Manager_Task_GetWms, 1);
@@ -451,7 +450,7 @@ public class MapProviderManager {
             public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
 
                final String taskName = isDeletePartImages ? //
-               Messages.MP_Manager_DeletedOfflineImagesParts_TaskNameParts
+                     Messages.MP_Manager_DeletedOfflineImagesParts_TaskNameParts
                      : Messages.MP_Manager_DeletedOfflineImagesParts_TaskName;
 
                monitor.beginTask(taskName, IProgressMonitor.UNKNOWN);
@@ -1015,7 +1014,7 @@ public class MapProviderManager {
          updatedWmsMapProvider = oldWmsMapProvider;
       }
 
-      // inizialize map provider by setting none UI data
+      // initialize map provider by setting none UI data
       updatedWmsMapProvider.initializeWms(wmsServer, wmsCaps, loadedMtLayers);
 
       /*
@@ -1294,7 +1293,7 @@ public class MapProviderManager {
       for (final MP mp : importedMapProviders) {
 
          /*
-          * ignore plugin map providers, they should be already in the list but can occure in the
+          * ignore plugin map providers, they should be already in the list but can occur in the
           * import file as a map profile wrapper
           */
          if ((mp instanceof MPPlugin) == false) {
@@ -1532,7 +1531,7 @@ public class MapProviderManager {
    /**
     * @param importFilePath
     * @return Returns the imported map providers or <code>null</code> when an import error
-    *         occured<br>
+    *         occurred<br>
     *         <br>
     *         Multiple map providers are returned when a map profile contains map providers which
     *         do not yet exists
@@ -1613,13 +1612,7 @@ public class MapProviderManager {
          logError(e.getMessage(), e);
       } finally {
 
-         if (reader != null) {
-            try {
-               reader.close();
-            } catch (final IOException e) {
-               e.printStackTrace();
-            }
-         }
+         Util.close(reader);
 
          displayError(filename);
       }
@@ -1919,12 +1912,7 @@ public class MapProviderManager {
       }
 
       // sort parts by position
-      Collections.sort(urlParts, new Comparator<UrlPart>() {
-         @Override
-         public int compare(final UrlPart p1, final UrlPart p2) {
-            return p1.getPosition() - p2.getPosition();
-         }
-      });
+      Collections.sort(urlParts, (urlPart1, urlPart2) -> urlPart1.getPosition() - urlPart2.getPosition());
 
       /*
        * update model

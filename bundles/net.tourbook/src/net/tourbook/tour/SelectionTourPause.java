@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,12 +25,20 @@ import org.eclipse.jface.viewers.ISelection;
 public class SelectionTourPause implements ISelection {
 
    private TourData _tourData;
-   private int      _serieIndex;
 
-   public SelectionTourPause(final TourData tourData, final int serieIndex) {
+   private int      _serieIndex;
+   private int      _pauseIndex;
+
+   public SelectionTourPause(final TourData tourData, final int serieIndex, final int pauseIndex) {
 
       _tourData = tourData;
+
       _serieIndex = serieIndex;
+      _pauseIndex = pauseIndex;
+   }
+
+   public int getPauseIndex() {
+      return _pauseIndex;
    }
 
    public int getSerieIndex() {

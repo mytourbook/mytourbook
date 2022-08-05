@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,9 @@
  *******************************************************************************/
 package utils;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -26,7 +29,6 @@ import java.util.Map;
 import net.tourbook.common.util.FilesUtils;
 import net.tourbook.data.TourData;
 
-import org.junit.jupiter.api.Assertions;
 import org.skyscreamer.jsonassert.ArrayValueMatcher;
 import org.skyscreamer.jsonassert.Customization;
 import org.skyscreamer.jsonassert.JSONCompare;
@@ -51,8 +53,6 @@ public class Comparison {
    public static void compareTourDataAgainstControl(final TourData testTourData,
                                                     final String controlFileName) {
 
-      final String controlDocument = readFileContent(controlFileName + JSON);
-
       testTourData.getTourMarkersSorted();
       final String testJson = testTourData.toJson();
 
@@ -70,13 +70,15 @@ public class Comparison {
             new Customization("importFilePathNameText", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("tourId", (o1, o2) -> true)); //$NON-NLS-1$
 
+      final String controlDocument = readFileContent(controlFileName + JSON);
+
       final JSONCompareResult result = JSONCompare.compareJSON(controlDocument, testJson, customArrayValueComparator);
 
       if (result.failed()) {
          writeErroneousFiles(controlFileName + "-GeneratedFromTests" + JSON, testJson); //$NON-NLS-1$
       }
 
-      Assertions.assertTrue(result.passed(), result.getMessage());
+      assertTrue(result.passed(), result.getMessage());
    }
 
    public static void compareXmlAgainstControl(final String controlTourFilePath,
@@ -106,7 +108,7 @@ public class Comparison {
          writeErroneousFiles(controlTourFilePath, testTour);
       }
 
-      Assertions.assertFalse(documentDiff.hasDifferences(), documentDiff.toString());
+      assertFalse(documentDiff.hasDifferences(), documentDiff.toString());
    }
 
    public static String readFileContent(final String controlDocumentFileName) {

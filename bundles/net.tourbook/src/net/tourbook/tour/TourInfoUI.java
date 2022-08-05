@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,17 +57,20 @@ import net.tourbook.ui.views.sensors.SelectionSensor;
 import net.tourbook.ui.views.sensors.SensorChartView;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.LayoutConstants;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -129,19 +132,19 @@ public class TourInfoUI {
       _nf3.setMaximumFractionDigits(3);
    }
 
-   private boolean _hasRecordingDeviceBattery;
-   private boolean _hasDescription;
-   private boolean _hasGears;
-   private boolean _hasRunDyn;
-   private boolean _hasTags;
-   private boolean _hasTourType;
-   private boolean _hasWeather;
+   private boolean        _hasRecordingDeviceBattery;
+   private boolean        _hasDescription;
+   private boolean        _hasGears;
+   private boolean        _hasRunDyn;
+   private boolean        _hasTags;
+   private boolean        _hasTourType;
+   private boolean        _hasWeather;
 
-   private int     _defaultTextWidth;
+   private int            _defaultTextWidth;
 
-   private int     _descriptionLineCount;
-   private int     _descriptionScroll_Lines = 15;
-   private int     _descriptionScroll_Height;
+   private int            _descriptionLineCount;
+   private int            _descriptionScroll_Lines = 15;
+   private int            _descriptionScroll_Height;
 
    /**
     * Part which fired an event
@@ -188,6 +191,8 @@ public class TourInfoUI {
     */
    private Color _bgColor;
    private Color _fgColor;
+
+   private Font  _boldFont = JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT);
 
    /*
     * UI controls
@@ -253,7 +258,8 @@ public class TourInfoUI {
    private Label            _lblRecordedTime;
    private Label            _lblRecordedTime_Unit;
    private Label            _lblRestPulse;
-   private Label            _lblTemperature;
+   private Label            _lblTemperature_Part1;
+   private Label            _lblTemperature_Part2;
    private Label            _lblTimeZone_Value;
    private Label            _lblTimeZoneDifference;
    private Label            _lblTimeZoneDifference_Value;
@@ -306,12 +312,11 @@ public class TourInfoUI {
    private ArrayList<Label> _allSensorValue_Status;
    private ArrayList<Label> _allSensorValue_Voltage;
 
-
    private class ActionCloseTooltip extends Action {
 
       public ActionCloseTooltip() {
 
-         super(null, Action.AS_PUSH_BUTTON);
+         super(null, IAction.AS_PUSH_BUTTON);
 
          setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
@@ -409,6 +414,7 @@ public class TourInfoUI {
          GridLayoutFactory.fillDefaults()
                .margins(SHELL_MARGIN, SHELL_MARGIN)
                .applyTo(_ttContainer);
+//         _ttContainer.setBackground(UI.SYS_COLOR_GREEN);
          {
             createUI_10_UpperPart(_ttContainer);
 
@@ -866,9 +872,8 @@ public class TourInfoUI {
        */
       createUI_Label(parent, Messages.Tour_Tooltip_Label_Temperature);
 
-      _lblTemperature = createUI_LabelValue(parent, SWT.TRAIL);
-
-      createUI_Label(parent, UI.UNIT_LABEL_TEMPERATURE);
+      _lblTemperature_Part1 = createUI_LabelValue(parent, SWT.TRAIL);
+      _lblTemperature_Part2 = createUI_LabelValue(parent, SWT.LEAD);
 
       /*
        * Wind speed
@@ -1108,7 +1113,7 @@ public class TourInfoUI {
       _lowerPartContainer.setBackground(_bgColor);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(_lowerPartContainer);
       GridLayoutFactory.fillDefaults().numColumns(numColumns).spacing(16, 0).applyTo(_lowerPartContainer);
-//      _lowerPartContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
+//      _lowerPartContainer.setBackground(UI.SYS_COLOR_CYAN);
       {
 
          createUI_92_SensorValues(_lowerPartContainer);
@@ -1125,8 +1130,8 @@ public class TourInfoUI {
             _lblTourType_Value = createUI_LabelValue(_lowerPartContainer, SWT.LEAD | SWT.WRAP);
             GridDataFactory.fillDefaults()
                   .span(numColumns - 1, 1)
-                  .grab(true, false)
-                  .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
+//                  .grab(true, false)
+//                  .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
                   .indent(0, 5)
                   .applyTo(_lblTourType_Value);
          }
@@ -1140,8 +1145,8 @@ public class TourInfoUI {
             _lblTourTags_Value = createUI_LabelValue(_lowerPartContainer, SWT.LEAD | SWT.WRAP);
             GridDataFactory.fillDefaults()
                   .span(numColumns - 1, 1)
-                  .grab(true, false)
-                  .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
+//                  .grab(true, false)
+//                  .hint(MAX_DATA_WIDTH, SWT.DEFAULT)
                   .applyTo(_lblTourTags_Value);
          }
          {
@@ -1149,16 +1154,20 @@ public class TourInfoUI {
              * Weather
              */
             _lblWeather = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_Weather);
+            _lblWeather.setFont(_boldFont);
             GridDataFactory.fillDefaults()
                   .span(numColumns, 1)
-                  .indent(0, 5)
+                  .indent(0, 10)
                   .applyTo(_lblWeather);
 
-            _txtWeather = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER);
+            _txtWeather = new Text(_lowerPartContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY
+//                  | SWT.BORDER
+            );
             GridDataFactory.fillDefaults()
                   .span(numColumns, 1)
-                  .grab(true, false)
-                  .hint(_defaultTextWidth, SWT.DEFAULT)
+//                  .indent(-5, 0)
+//                  .grab(true, false)
+//                  .hint(_defaultTextWidth, SWT.DEFAULT)
                   .applyTo(_txtWeather);
 
             _txtWeather.setForeground(_fgColor);
@@ -1171,13 +1180,16 @@ public class TourInfoUI {
 
             // label
             _lblDescription = createUI_Label(_lowerPartContainer, Messages.Tour_Tooltip_Label_Description);
+            _lblDescription.setFont(_boldFont);
             GridDataFactory.fillDefaults()
                   .span(numColumns, 1)
-                  .indent(0, 5)
+                  .indent(0, 10)
                   .applyTo(_lblDescription);
 
             // text field
-            int style = SWT.WRAP | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER;
+            int style = SWT.WRAP | SWT.MULTI | SWT.READ_ONLY
+//                  | SWT.BORDER
+            ;
             _descriptionLineCount = Util.countCharacter(_tourData.getTourDescription(), '\n');
 
             if (_descriptionLineCount > _descriptionScroll_Lines) {
@@ -1187,8 +1199,9 @@ public class TourInfoUI {
             _txtDescription = new Text(_lowerPartContainer, style);
             GridDataFactory.fillDefaults()
                   .span(numColumns, 1)
-                  .grab(true, false)
-                  .hint(_defaultTextWidth, SWT.DEFAULT)
+//                  .indent(-5, 0)
+//                  .grab(true, false)
+//                  .hint(_defaultTextWidth, SWT.DEFAULT)
                   .applyTo(_txtDescription);
 
             if (_descriptionLineCount > _descriptionScroll_Lines) {
@@ -1224,12 +1237,8 @@ public class TourInfoUI {
       final ArrayList<DeviceSensorValue> allSortedSensorValues = new ArrayList<>(allSensorValues);
       Collections.sort(allSortedSensorValues, (sensorValue1, sensorValue2) -> {
 
-         if (sensorValue1.isDataAvailable() && sensorValue2.isDataAvailable()) {
-
-            return sensorValue1.getDeviceSensor().getLabel().compareTo(sensorValue2.getDeviceSensor().getLabel());
-         }
-
-         return 0;
+         return sensorValue1.getDeviceSensor().getLabel().compareTo(
+               sensorValue2.getDeviceSensor().getLabel());
       });
 
       for (final DeviceSensorValue sensorValue : allSortedSensorValues) {
@@ -1245,7 +1254,7 @@ public class TourInfoUI {
          // sensor label/link
          final Link link = createUI_Link(parent, sensor.getLabel());
          link.setData(sensor);
-         link.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_Sensor(selectionEvent)));
+         link.addSelectionListener(widgetSelectedAdapter(this::onSelect_Sensor));
          _allSensorValue_Link.add(link);
 
          _allSensorValue_Level.add(createUI_LabelValue(parent, SWT.LEAD));
@@ -1425,7 +1434,11 @@ public class TourInfoUI {
 
       final PixelConverter pc = new PixelConverter(parent);
 
-      _defaultTextWidth = pc.convertWidthInCharsToPixels(80);
+      /*
+       * !!! It is important that the width value is not too large otherwise empty lines (because of
+       * the default width) are added below the text control when there is a lot of content
+       */
+      _defaultTextWidth = pc.convertWidthInCharsToPixels(75);
       _descriptionScroll_Height = pc.convertHeightInCharsToPixels(_descriptionScroll_Lines);
    }
 
@@ -1730,7 +1743,7 @@ public class TourInfoUI {
          _lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
       }
 
-      int windSpeed = _tourData.getWeatherWindSpeed();
+      int windSpeed = _tourData.getWeather_Wind_Speed();
       windSpeed = (int) (windSpeed / UI.UNIT_VALUE_DISTANCE);
 
       _lblWindSpeed.setText(Integer.toString(windSpeed));
@@ -1741,20 +1754,70 @@ public class TourInfoUI {
                   IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
 
       // wind direction
-      final int weatherWindDirDegree = _tourData.getWeatherWindDir();
-      _lblWindDirection.setText(Integer.toString(weatherWindDirDegree));
+      final int weatherWindDirectionDegree = _tourData.getWeather_Wind_Direction();
+      _lblWindDirection.setText(Integer.toString(weatherWindDirectionDegree));
       _lblWindDirectionUnit.setText(String.format(
             Messages.Tour_Tooltip_Format_WindDirectionUnit,
-            UI.getCardinalDirectionText(weatherWindDirDegree * 10)));
+            UI.getCardinalDirectionText(weatherWindDirectionDegree * 10)));
 
-      // temperature
-      float temperature = _tourData.getAvgTemperature();
-      if (UI.UNIT_IS_TEMPERATURE_FAHRENHEIT) {
-         temperature = temperature
-               * UI.UNIT_FAHRENHEIT_MULTI
-               + UI.UNIT_FAHRENHEIT_ADD;
+      // Average temperature
+      final float temperature_NoDevice = _tourData.getWeather_Temperature_Average();
+      final float temperature_FromDevice = _tourData.getWeather_Temperature_Average_Device();
+
+      final float convertedTemperature_NoDevice = UI.convertTemperatureFromMetric(temperature_NoDevice);
+      final float convertedTemperature_FromDevice = UI.convertTemperatureFromMetric(temperature_FromDevice);
+
+      final String formattedTemperature_NoDevice = _tourData.isMultipleTours()
+            ? FormatManager.formatTemperature_Summary(convertedTemperature_NoDevice)
+            : FormatManager.formatTemperature(convertedTemperature_NoDevice);
+      final String formattedTemperature_FromDevice = _tourData.isMultipleTours()
+            ? FormatManager.formatTemperature_Summary(convertedTemperature_FromDevice)
+            : FormatManager.formatTemperature(convertedTemperature_FromDevice);
+
+      final boolean isTemperature_NoDevice = temperature_NoDevice > 0 || _tourData.isWeatherDataFromProvider();
+      final boolean isTemperature_FromDevice = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0;
+
+      String part1Text = UI.EMPTY_STRING;
+      String part2Text = UI.EMPTY_STRING;
+      String part1Tooltip = UI.EMPTY_STRING;
+      String part2Tooltip = UI.EMPTY_STRING;
+
+      if (isTemperature_NoDevice && isTemperature_FromDevice) {
+
+         // both values are available
+
+         part1Text = formattedTemperature_NoDevice + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+         part2Text = formattedTemperature_FromDevice + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+
+         part1Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_NoDevice;
+         part2Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_FromDevice;
+
+      } else if (isTemperature_NoDevice) {
+
+         // values only from provider or manual
+
+         part1Text = formattedTemperature_NoDevice;
+         part2Text = UI.UNIT_LABEL_TEMPERATURE;
+
+         part1Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_NoDevice;
+         part2Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_NoDevice;
+
+      } else if (isTemperature_FromDevice) {
+
+         // values only from device
+
+         part1Text = formattedTemperature_FromDevice;
+         part2Text = UI.UNIT_LABEL_TEMPERATURE;
+
+         part1Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_FromDevice;
+         part2Tooltip = Messages.Tour_Tooltip_Label_AvgTemperature_FromDevice;
       }
-      _lblTemperature.setText(_nf1.format(temperature));
+
+      _lblTemperature_Part1.setText(part1Text);
+      _lblTemperature_Part1.setToolTipText(part1Tooltip);
+
+      _lblTemperature_Part2.setText(part2Text);
+      _lblTemperature_Part2.setToolTipText(part2Tooltip);
 
       // weather clouds
       final int weatherIndex = _tourData.getWeatherIndex();
@@ -1994,7 +2057,7 @@ public class TourInfoUI {
             batteryLevel += UI.SPACE + UI.SYMBOL_PERCENTAGE;
 
             lblLevel.setText(batteryLevel);
-
+            lblLevel.setToolTipText(Messages.Tour_Tooltip_Label_BatteryLevel_Tooltip);
          }
 
          if (isBatteryStatus) {
@@ -2009,6 +2072,7 @@ public class TourInfoUI {
                   : statusStart_Name + UI.ELLIPSIS_WITH_SPACE + BatteryStatus.getLabelFromValue((short) batteryStatus_End);
 
             lblStatus.setText(batteryStatus);
+            lblStatus.setToolTipText(Messages.Tour_Tooltip_Label_BatteryStatus_Tooltip);
          }
 
          if (isBatteryVoltage) {
@@ -2024,6 +2088,7 @@ public class TourInfoUI {
             batteryVoltage += UI.SPACE + UI.UNIT_VOLT;
 
             lblVoltage.setText(batteryVoltage);
+            lblVoltage.setToolTipText(Messages.Tour_Tooltip_Label_BatteryVoltage_Tooltip);
          }
 
       }

@@ -37,6 +37,6 @@ class ActionDeleteTimeSlices_RemoveTime extends Action {
 
    @Override
    public void run() {
-      _tourDataEditorView.actionDeleteTimeSlices(true, false);
+      _tourDataEditorView.actionDelete_TimeSlices(true, false);
    }
 }

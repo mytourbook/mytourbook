@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -92,6 +92,15 @@ public class ImportLauncher implements Cloneable {
    public float                    tourAvgTemperature            = EasyConfig.TEMPERATURE_AVG_TEMPERATURE_DEFAULT;
 
    private long                    _id;
+
+   /**
+    * When <code>true</code> then elevation from the first time slice is replaced with the value of
+    * the 2nd time slice
+    * <p>
+    * This fixes an issue after updating the Garmin Edge 1030 firmware version to 12.20, sometimes
+    * it has total wrong elevation value for the first time slice
+    */
+   public boolean                  isReplaceFirstTimeSliceElevation;
 
    public ImportLauncher() {
 

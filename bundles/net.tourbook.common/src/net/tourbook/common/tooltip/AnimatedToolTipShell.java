@@ -608,9 +608,10 @@ public abstract class AnimatedToolTipShell {
    }
 
    /**
-    * Is called before the tooltip shell is set hidden.
+    * Is called before the tooltip shell is set hidden, the default is doing nothing.
     */
    protected void beforeHideToolTip() {
+
       // do nothing
    }
 
@@ -982,9 +983,8 @@ public abstract class AnimatedToolTipShell {
       final int margin = 20;
 
       ttShellRect.x -= margin;
-      ttShellRect.y -= margin;
       ttShellRect.width += 2 * margin;
-      ttShellRect.height += 2 * margin;
+      ttShellRect.height += margin;
 
       final Point displayCursorLocation = _display.getCursorLocation();
 
@@ -1018,7 +1018,16 @@ public abstract class AnimatedToolTipShell {
 
                // hide definitively
 
-               ttHide();
+               if (_isShellFadingOut) {
+
+                  // do nothing, wait until it is finally hidden
+
+                  hideNow();
+
+               } else {
+
+                  ttHide();
+               }
 
                isKeepOpened = false;
             }

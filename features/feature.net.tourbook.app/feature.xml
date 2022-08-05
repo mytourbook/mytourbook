@@ -2,7 +2,7 @@
 <feature
       id="feature.net.tourbook.app"
       label="MyTourbook Application"
-      version="21.9.0.qualifier"
+      version="22.8.0.qualifier"
       provider-name="MyTourbook"
       plugin="net.tourbook.branding">
 
@@ -19,10 +19,11 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="http://mytourbook.sourceforge.net/updates/"/>
+      <update label="%updateSiteName" url="https://mytourbook.sourceforge.io/updates/"/>
    </url>
 
    <requires>
+      <import feature="feature.net.tourbook.app.version" version="22.8.0" match="equivalent"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.expressions"/>
@@ -50,7 +51,6 @@
       <import plugin="org.eclipse.equinox.p2.touchpoint.eclipse"/>
       <import plugin="org.eclipse.equinox.p2.transport.ecf"/>
       <import plugin="org.eclipse.equinox.p2.ui"/>
-      <import feature="feature.net.tourbook.app.version" version="21.9.0" match="equivalent"/>
    </requires>
 
    <plugin

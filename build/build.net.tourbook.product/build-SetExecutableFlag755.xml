@@ -2,86 +2,85 @@
 
 <project name="Set Executable Flag 755" default="set-executable-flag">
 
-	<target name="set-executable-flag">
-		
-		<echo message="tycho-path:     '${tycho-path}'"/>
-		<echo message="tycho-version:  '${tycho-version}'"/>
+   <target name="set-executable-flag">
+      
+      <echo message="tycho-path:     '${tycho-path}'"/>
+      <echo message="tycho-version:  '${tycho-version}'"/>
 
-		<!-- Linux 64 bit -->
-		<antcall target="set-755-in-zip-file">
-			<param name="zip-file"				value="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86_64.zip"/>
-			<param name="launcher-filepath"	value="mytourbook/mytourbook"/>
-		</antcall>
-	
-		<!-- MacOS 64 bit -->
-		<antcall target="set-755-in-zip-file">
-			<param name="zip-file"				value="${tycho-path}\products\mytourbook-${tycho-version}-macosx.cocoa.x86_64.zip"/>
-			<param name="launcher-filepath"	value="MyTourbook.app/Contents/MacOS/mytourbook"/>
-		</antcall>
-		
-	</target>
+      <!-- Linux 64 bit -->
+      <antcall target="set-755-in-zip-file">
+         <param name="zip-file"            value="${tycho-path}\products\mytourbook-${tycho-version}-linux.gtk.x86_64.zip"/>
+         <param name="launcher-filepath"   value="mytourbook/mytourbook"/>
+      </antcall>
 
-	
+      <!-- MacOS 64 bit -->
+      <antcall target="set-755-in-zip-file">
+         <param name="zip-file"            value="${tycho-path}\products\mytourbook-${tycho-version}-macosx.cocoa.x86_64.zip"/>
+         <param name="launcher-filepath"   value="MyTourbook.app/Contents/MacOS/mytourbook"/>
+      </antcall>
+
+   </target>
+
+   
     <target name="set-755-in-zip-file">
 
-    	<property name="param-zip-file"				value="${zip-file}"/>
-    	<property name="param-launcher-filepath"	value="${launcher-filepath}"/>
+       <property name="param-zip-file"            value="${zip-file}"/>
+       <property name="param-launcher-filepath"   value="${launcher-filepath}"/>
 
-    	<property name="temp-expanded-zip-dir"		value="./temp"/>
-    	<property name="temp-new-zip-file"			value="temp-new-zip-file"/>
+       <property name="temp-expanded-zip-dir"      value="./temp"/>
+       <property name="temp-new-zip-file"         value="temp-new-zip-file"/>
 
-    	<echo message="Setting executable flag 755 in ${param-zip-file}" />
+       <echo message="Setting executable flag 755 in ${param-zip-file}" />
 
-    	<antcall target="clear-temp-dir"/>
-    	
-    	<!-- extract app launcher -->
-    	<unzip src="${param-zip-file}" dest="${temp-expanded-zip-dir}" >
-    		<patternset>
-    			<include name="${param-launcher-filepath}" />
-    		</patternset>
-    	</unzip>
+       <antcall target="clear-temp-dir"/>
 
-    	<!-- create temp zip without launcher-->
-    	<zip destfile="${temp-new-zip-file}">
-    	    <zipfileset src="${param-zip-file}" excludes="${param-launcher-filepath}"/>
-    	</zip>
+       <!-- extract app launcher -->
+       <unzip src="${param-zip-file}" dest="${temp-expanded-zip-dir}" >
+          <patternset>
+             <include name="${param-launcher-filepath}" />
+          </patternset>
+       </unzip>
 
-    	<!-- 
-    		
-    		Copy launcher and set executable bit 755.
-    		 
-    		This is the trick to get the app executable on Linux, 
-    		it took me a day to find a working solution :-( 
-    		
-    		Setting this bit is currently not supported by tycho 
-    		https://bugs.eclipse.org/bugs/show_bug.cgi?id=355370
-    		
-    	-->
-    	<zip destfile="${temp-new-zip-file}"		update="true">
-    		
-    		<zipfileset 
-    			file		="${temp-expanded-zip-dir}/${param-launcher-filepath}"
-    			fullpath	="${param-launcher-filepath}"
-    			filemode	="755"
-    		/>
-    		
-    	</zip>
-    	
-    	<!-- replace original zip with modified zip -->
-    	<delete file="${param-zip-file}"/>
-    	<move file="${temp-new-zip-file}" tofile="${param-zip-file}"/>
+       <!-- create temp zip without launcher-->
+       <zip destfile="${temp-new-zip-file}">
+           <zipfileset src="${param-zip-file}" excludes="${param-launcher-filepath}"/>
+       </zip>
 
-    	<antcall target="clear-temp-dir"/>
-    	
-    	<echo message="Executable flag 755 is set in ${param-zip-file}" />
+       <!-- 
+
+          Copy launcher and set executable bit 755.
+           
+          This is the trick to get the app executable on Linux, 
+          it took me a day to find a working solution :-( 
+          
+          Setting this bit is currently not supported by tycho 
+          https://bugs.eclipse.org/bugs/show_bug.cgi?id=355370
+          
+       -->
+       <zip destfile="${temp-new-zip-file}"      update="true">
+          
+          <zipfileset 
+             file       ="${temp-expanded-zip-dir}/${param-launcher-filepath}"
+             fullpath   ="${param-launcher-filepath}"
+             filemode   ="755"
+          />
+          
+       </zip>
+       
+       <!-- replace original zip with modified zip -->
+       <delete file="${param-zip-file}"/>
+       <move file="${temp-new-zip-file}" tofile="${param-zip-file}"/>
+
+       <antcall target="clear-temp-dir"/>
+       
+       <echo message="Executable flag 755 is set in ${param-zip-file}" />
 
     </target>
-	
+   
 
-	<target name="clear-temp-dir">
-    	<delete file	="${temp-new-zip-file}"			failonerror="false"/>
-    	<delete dir		="${temp-expanded-zip-dir}"		failonerror="false"/>
+   <target name="clear-temp-dir">
+       <delete file  ="${temp-new-zip-file}"       failonerror="false"/>
+       <delete dir   ="${temp-expanded-zip-dir}"   failonerror="false"/>
     </target>
 
-	
 </project>

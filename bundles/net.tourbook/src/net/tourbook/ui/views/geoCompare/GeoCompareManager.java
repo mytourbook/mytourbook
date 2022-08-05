@@ -236,9 +236,9 @@ public class GeoCompareManager {
 
          final int elapsedTime = tourData.timeSerie[origEndIndex] - tourData.timeSerie[origStartIndex];
          final int movingTime = Math.max(0, elapsedTime - tourData.getBreakTime(origStartIndex, origEndIndex));
+         final int recordedTime = Math.max(0, elapsedTime - tourData.getPausedTime(origStartIndex, origEndIndex));
          comparerItem.elapsedTime = elapsedTime;
          comparerItem.movingTime = movingTime;
-         final int recordedTime = Math.max(0, elapsedTime - tourData.getPausedTime(origStartIndex, origEndIndex));
          comparerItem.recordedTime = recordedTime;
 
          final float distance = tourData.distanceSerie[origEndIndex] - tourData.distanceSerie[origStartIndex];

@@ -54,10 +54,15 @@ public class ValueOverlapChecker {
       }
    }
 
-   public Rectangle getValidRect(final Rectangle textRect,
-                                 final boolean isValueUp,
-                                 final int textHeight,
-                                 final String valueText) {
+   /**
+    * @param textRect
+    * @param isValueUp
+    * @param textHeight
+    * @return Returns none overlapped rectangle or <code>null</code> when it's not available
+    */
+   public Rectangle getNotOverlappedRectangle(final Rectangle textRect,
+                                              final boolean isValueUp,
+                                              final int textHeight) {
 
       Rectangle validRect = null;
 
@@ -102,7 +107,10 @@ public class ValueOverlapChecker {
       return validRect;
    }
 
-   public void setupNext(final Rectangle textRect, final boolean isValueUp) {
+   /**
+    * @param textRect
+    */
+   public void setupNext(final Rectangle textRect) {
 
       for (int rectIndex = _numRects - 1; rectIndex > 0; rectIndex--) {
          _prevValues[rectIndex] = _prevValues[rectIndex - 1];

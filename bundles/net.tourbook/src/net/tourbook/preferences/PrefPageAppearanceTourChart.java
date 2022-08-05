@@ -112,7 +112,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    private Button              _btnDown;
    private Button              _btnUp;
 
-   private Button              _chkGraphAntialiasing;
    private Button              _chkLiveUpdate;
 
    private Button              _chkMoveSlidersWhenZoomed;
@@ -131,7 +130,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    private Button              _rdoShowDistance;
    private Button              _rdoShowTime;
 
-   private Spinner             _spinnerGraphTransparencyLine;
    private Spinner             _spinnerGridHorizontalDistance;
    private Spinner             _spinnerGridVerticalDistance;
 
@@ -353,42 +351,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
       {
-         {
-            /*
-             * label: graph filling transparency
-             */
-            final Label label = new Label(container, SWT.NONE);
-            GridDataFactory.fillDefaults()//
-                  .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(label);
-            label.setText(Messages.Pref_Graphs_Label_GraphTransparencyLine);
-            label.setToolTipText(Messages.Pref_Graphs_Label_GraphTransparencyLine_Tooltip);
 
-            /*
-             * spinner: graph filling transparency
-             */
-            _spinnerGraphTransparencyLine = new Spinner(container, SWT.BORDER);
-            GridDataFactory.fillDefaults() //
-                  .align(SWT.BEGINNING, SWT.FILL)
-                  .applyTo(_spinnerGraphTransparencyLine);
-            _spinnerGraphTransparencyLine.setMinimum(0);
-            _spinnerGraphTransparencyLine.setMaximum(100);
-            _spinnerGraphTransparencyLine.setIncrement(1);
-            _spinnerGraphTransparencyLine.setPageIncrement(10);
-            _spinnerGraphTransparencyLine.setToolTipText(Messages.Pref_Graphs_Label_GraphTransparencyLine_Tooltip);
-            _spinnerGraphTransparencyLine.addMouseWheelListener(_defaultMouseWheelListener);
-            _spinnerGraphTransparencyLine.addSelectionListener(_defaultSelectionListener);
-         }
-         {
-            /*
-             * checkbox: graph antialiasing
-             */
-            _chkGraphAntialiasing = new Button(container, SWT.CHECK);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkGraphAntialiasing);
-            _chkGraphAntialiasing.setText(Messages.Pref_Graphs_Checkbox_GraphAntialiasing);
-            _chkGraphAntialiasing.setToolTipText(Messages.Pref_Graphs_Checkbox_GraphAntialiasing_Tooltip);
-            _chkGraphAntialiasing.addSelectionListener(_defaultSelectionListener);
-         }
       }
    }
 
@@ -879,13 +842,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
        */
       final CTabItem selectedTab = _tabFolder.getItem(_tabFolder.getSelectionIndex());
 
-      if (selectedTab == _tab1_Graphs) {
-
-         _chkGraphAntialiasing.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
-
-         _spinnerGraphTransparencyLine.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
-
-      } else if (selectedTab == _tab2_Grid) {
+      if (selectedTab == _tab2_Grid) {
 
          _spinnerGridHorizontalDistance.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_HORIZONTAL_DISTANCE));
          _spinnerGridVerticalDistance.setSelection(_prefStore.getDefaultInt(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE));
@@ -926,10 +883,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    }
 
    private void restoreState_Tab_1_Graphs() {
-
-      _chkGraphAntialiasing.setSelection(_prefStore.getBoolean(ITourbookPreferences.GRAPH_ANTIALIASING));
-
-      _spinnerGraphTransparencyLine.setSelection(_prefStore.getInt(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE));
 
       restoreState_Tab_1_Graphs_Graphs();
    }
@@ -1032,10 +985,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    }
 
    private void saveState_Tab_1_Graphs() {
-
-      _prefStore.setValue(ITourbookPreferences.GRAPH_ANTIALIASING, _chkGraphAntialiasing.getSelection());
-
-      _prefStore.setValue(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE, _spinnerGraphTransparencyLine.getSelection());
 
       saveState_Tab_1_Graphs_Graphs();
    }

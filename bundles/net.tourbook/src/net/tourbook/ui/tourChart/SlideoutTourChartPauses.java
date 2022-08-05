@@ -26,9 +26,12 @@ import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
+import net.tourbook.common.ui.IChangeUIListener;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tour.TourPauseUI;
 
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -46,53 +49,42 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Tour chart pauses properties slideout.
  */
-public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
+public class SlideoutTourChartPauses extends ToolbarSlideout implements
+      IColorSelectorListener,
+      IActionResetToDefault,
+      IChangeUIListener {
 
    private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
    private SelectionListener      _defaultSelectionListener;
    private FocusListener          _keepOpenListener;
 
-   {
-      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
+   private ActionResetToDefaults  _actionRestoreDefaults;
 
-      _keepOpenListener = new FocusListener() {
-
-         @Override
-         public void focusGained(final FocusEvent focusEvent) {
-
-            /*
-             * This will fix the problem that when the list of a combobox is displayed, then the
-             * slideout will disappear :-(((
-             */
-            setIsAnotherDialogOpened(true);
-         }
-
-         @Override
-         public void focusLost(final FocusEvent focusEvent) {
-            setIsAnotherDialogOpened(false);
-         }
-      };
-   }
-
-   private ActionResetToDefaults _actionRestoreDefaults;
+   private TourPauseUI            _tourPausesUI;
 
    /*
     * UI controls
     */
-   private TourChart _tourChart;
+   private TourChart       _tourChart;
 
-   private Button    _chkShowPauseTooltip;
+   private Button          _chkShowPauseTooltip;
 
-   private Combo     _comboTooltipPosition;
+   private Combo           _comboTooltipPosition;
+
+   private IDialogSettings _state;
 
    public SlideoutTourChartPauses(final Control ownerControl,
                                   final ToolBar toolBar,
-                                  final TourChart tourChart) {
+                                  final TourChart tourChart,
+                                  final IDialogSettings state) {
 
       super(ownerControl, toolBar);
 
       _tourChart = tourChart;
+      _state = state;
+
+      _tourPausesUI = new TourPauseUI(state, this, this);
    }
 
    @Override
@@ -124,12 +116,15 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
    @Override
    protected Composite createToolTipContentArea(final Composite parent) {
 
+      initUI();
+
       createActions();
 
       final Composite ui = createUI(parent);
 
       fillUI();
       restoreState();
+      enableControls();
 
       return ui;
    }
@@ -146,6 +141,11 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
             createUI_10_Header(container);
             createUI_20_Controls(container);
          }
+
+         _tourPausesUI.createContent(shellContainer,
+
+               // this slideout is only displayed when pauses are visible
+               true);
       }
 
       return shellContainer;
@@ -217,28 +217,55 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
       }
    }
 
+   private void enableControls() {
+
+      final boolean isShowPauseTooltip = _chkShowPauseTooltip.getSelection();
+
+      _comboTooltipPosition.setEnabled(isShowPauseTooltip);
+   }
+
    private void fillUI() {
 
       Arrays.asList(ChartPauseToolTip.TOOLTIP_POSITIONS).forEach(tooltipPosition -> _comboTooltipPosition.add(tooltipPosition));
    }
 
+   private void initUI() {
+
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
+
+      _keepOpenListener = new FocusListener() {
+
+         @Override
+         public void focusGained(final FocusEvent focusEvent) {
+
+            /*
+             * This will fix the problem that when the list of a combobox is displayed, then the
+             * slideout will disappear :-(((
+             */
+            setIsAnotherDialogOpened(true);
+         }
+
+         @Override
+         public void focusLost(final FocusEvent focusEvent) {
+            setIsAnotherDialogOpened(false);
+         }
+      };
+   }
+
    private void onChangeUI() {
 
-      final boolean isShowPauseTooltip = _chkShowPauseTooltip.getSelection();
-      final int tooltipPosition = _comboTooltipPosition.getSelectionIndex();
+      saveState();
 
-      _prefStore.setValue(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP, isShowPauseTooltip);
-      _prefStore.setValue(ITourbookPreferences.GRAPH_PAUSES_TOOLTIP_POSITION, tooltipPosition);
-
-      /*
-       * Update chart config
-       */
-      final TourChartConfiguration tourChartConfiguration = _tourChart.getTourChartConfig();
-      tourChartConfiguration.isShowPauseTooltip = isShowPauseTooltip;
-      tourChartConfiguration.pauseTooltipPosition = tooltipPosition;
+      enableControls();
 
       // update chart with new settings
       _tourChart.updateUI_PausesLayer(true);
+   }
+
+   @Override
+   public void onChangeUI_External() {
+
+      onChangeUI();
    }
 
    @Override
@@ -246,6 +273,8 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
 
       _chkShowPauseTooltip.setSelection(_prefStore.getDefaultBoolean(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP));
       _comboTooltipPosition.select(_prefStore.getDefaultInt(ITourbookPreferences.GRAPH_PAUSES_TOOLTIP_POSITION));
+
+      _tourPausesUI.resetToDefaults();
 
       onChangeUI();
    }
@@ -261,6 +290,29 @@ public class SlideoutTourChartPauses extends ToolbarSlideout implements IColorSe
             : tourChartConfiguration.pauseTooltipPosition;
 
       _comboTooltipPosition.select(pauseTooltipPosition);
+
+      _tourPausesUI.restoreState();
    }
 
+   private void saveState() {
+
+      final boolean isShowPauseTooltip = _chkShowPauseTooltip.getSelection();
+      final int tooltipPosition = _comboTooltipPosition.getSelectionIndex();
+
+      _prefStore.setValue(ITourbookPreferences.GRAPH_PAUSES_IS_SHOW_PAUSE_TOOLTIP, isShowPauseTooltip);
+      _prefStore.setValue(ITourbookPreferences.GRAPH_PAUSES_TOOLTIP_POSITION, tooltipPosition);
+
+      /*
+       * Update chart config
+       */
+      final TourChartConfiguration tourChartConfig = _tourChart.getTourChartConfig();
+      tourChartConfig.isShowPauseTooltip = isShowPauseTooltip;
+      tourChartConfig.pauseTooltipPosition = tooltipPosition;
+
+      // 1. Save pause values into the state
+      _tourPausesUI.saveState();
+
+      // 2. Save pause values from the state into the tour chart config
+      tourChartConfig.updateStateValues(_state);
+   }
 }

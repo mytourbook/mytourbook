@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,11 +15,8 @@
  *******************************************************************************/
 package utils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -31,11 +28,10 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.FilesUtils;
-import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourType;
 import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
+import net.tourbook.device.garmin.fit.FitDataReader;
 import net.tourbook.device.gpx.GPX_SAX_Handler;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
@@ -45,82 +41,70 @@ import org.xml.sax.SAXException;
 
 public class Initializer {
 
-   private static ObjectMapper            _mapper                   = new ObjectMapper();
+   public static TourData createManualTour() {
 
-   private static HashMap<String, String> _vendorCredentials        = new HashMap<>();
+      final TourData manualTour = new TourData();
+      manualTour.setTourStartTime(2022, 1, 3, 17, 16, 0);
+      manualTour.setTourDistance(10);
+      manualTour.setTourDeviceTime_Elapsed(3600);
+      manualTour.setTourTitle("Manual Tour"); //$NON-NLS-1$
 
-   private static final String            VendorCredentialsFileName = "Credentials.json";                         //$NON-NLS-1$
-   private static final String            UTIL_FILE_PATH            = utils.FilesUtils.rootPath + "utils/files/"; //$NON-NLS-1$
+      final TourType tourType = new TourType();
+      tourType.setName("Running"); //$NON-NLS-1$
+      manualTour.setTourType(tourType);
 
-   static {
-      deserializeVendorCredentials();
-   }
-
-   public static boolean deserializeVendorCredentials() {
-
-      final String vendorCredentialsFilePath = utils.FilesUtils.getAbsoluteFilePath(
-            UTIL_FILE_PATH + VendorCredentialsFileName);
-
-      final File vendorCredentialsFile = new File(vendorCredentialsFilePath);
-
-      if (!vendorCredentialsFile.exists()) {
-         return false;
-      }
-      final String fileContent = FilesUtils.readFileContentString(vendorCredentialsFilePath);
-      if (StringUtils.isNullOrEmpty(fileContent)) {
-         return false;
-      }
-
-      final TypeReference<HashMap<String, String>> typeReference = new TypeReference<>() {};
-      try {
-         _vendorCredentials = _mapper.readValue(fileContent, typeReference);
-      } catch (final JsonProcessingException e) {
-         StatusUtil.log(e);
-         return false;
-      }
-
-      return true;
-   }
-
-   public static String getCredential(final String vendorName) {
-
-      if (_vendorCredentials.isEmpty()) {
-         return UI.EMPTY_STRING;
-      }
-
-      return _vendorCredentials.get(vendorName);
+      return manualTour;
    }
 
    public static TourData importTour() {
 
-      final SAXParser parser = Initializer.initializeParser();
+      return importTour_GPX(FilesUtils.rootPath + "/utils/files/LongsPeak-Manual.gpx"); //$NON-NLS-1$
+   }
+
+   public static TourData importTour_FIT(final String importFilePath) {
+
+      final DeviceData deviceData = new DeviceData();
+      final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
+      final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
+      final FitDataReader fitDataReader = new FitDataReader();
+
+      fitDataReader.processDeviceData(importFilePath,
+            deviceData,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process());
+
+      return Comparison.retrieveImportedTour(newlyImportedTours);
+   }
+
+   public static TourData importTour_GPX(final String importFilePath) {
+
       final DeviceData deviceData = new DeviceData();
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
       final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
       final GarminTCX_DeviceDataReader deviceDataReader = new GarminTCX_DeviceDataReader();
+      final String testFilePath = FilesUtils.getAbsoluteFilePath(importFilePath);
+      final File file = new File(testFilePath);
 
-      final String IMPORT_FILE_PATH = "/utils/files/LongsPeak-Manual.gpx"; //$NON-NLS-1$
+      try (InputStream in = new FileInputStream(file)) {
 
-      final InputStream gpx = Initializer.class.getResourceAsStream(IMPORT_FILE_PATH);
+         final GPX_SAX_Handler handler = new GPX_SAX_Handler(
+               importFilePath,
+               deviceData,
+               alreadyImportedTours,
+               newlyImportedTours,
+               new ImportState_File(),
+               new ImportState_Process(),
+               deviceDataReader);
 
-      final GPX_SAX_Handler handler = new GPX_SAX_Handler(
-
-            IMPORT_FILE_PATH,
-            deviceData,
-            alreadyImportedTours,
-            newlyImportedTours,
-
-            new ImportState_File(),
-            new ImportState_Process(),
-
-            deviceDataReader);
-
-      if (parser != null) {
-         try {
-            parser.parse(gpx, handler);
-         } catch (SAXException | IOException e) {
-            e.printStackTrace();
+         final SAXParser parser = initializeParser();
+         if (parser != null) {
+            parser.parse(in, handler);
          }
+
+      } catch (final SAXException | IOException e) {
+         e.printStackTrace();
       }
 
       return Comparison.retrieveImportedTour(newlyImportedTours);

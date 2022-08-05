@@ -35,7 +35,7 @@ public class GraphDrawingData {
    public static final int    BAR_POS_CENTER         = 1;
 // public static final int    BAR_POS_CENTER_UNIT_TICK   = 2;                     // center bar in the unit tick
 
-   private ChartDrawingData     chartDrawingData;
+   private ChartDrawingData     _chartDrawingData;
 
    private ChartDataXSerie      _xData;
    private ChartDataXSerie      _xData2nd;
@@ -123,7 +123,7 @@ public class GraphDrawingData {
 
    public GraphDrawingData(final ChartDrawingData chartDrawingData, final ChartType chartType) {
 
-      this.chartDrawingData = chartDrawingData;
+      _chartDrawingData = chartDrawingData;
       _chartType = chartType;
    }
 
@@ -157,7 +157,7 @@ public class GraphDrawingData {
    }
 
    public ChartDrawingData getChartDrawingData() {
-      return chartDrawingData;
+      return _chartDrawingData;
    }
 
    public ChartType getChartType() {
@@ -189,8 +189,8 @@ public class GraphDrawingData {
 
       return getDevYBottom()
             - devGraphHeight
-            - chartDrawingData.devSliderBarHeight
-            - chartDrawingData.devXTitelBarHeight;
+            - _chartDrawingData.devSliderBarHeight
+            - _chartDrawingData.devXTitelBarHeight;
    }
 
    /**

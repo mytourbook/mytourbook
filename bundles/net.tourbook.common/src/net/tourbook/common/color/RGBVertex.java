@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -19,6 +19,7 @@
 package net.tourbook.common.color;
 
 import net.tourbook.common.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.swt.SWT;
@@ -26,150 +27,175 @@ import org.eclipse.swt.graphics.RGB;
 
 public class RGBVertex implements Comparable<Object>, Cloneable {
 
-	private int			_value;
-	private RGB			_rgb;
+   private static final char NL       = UI.NEW_LINE;
 
-	/**
-	 * Opacity 0.0 ... 1.0, default is 1.0 to ensure that color is visible.
-	 */
-	private float		_opacity	= 1.0f;
+   private static int        _sortIdCreator;
 
-	/**
-	 * Created id is needed that vertices can be sorted correctly when the value of two vertices are
-	 * the same. This occures when new vertices are created and the value is not yet set.
-	 */
-	private int			_sortId;
+   private int               _value;
+   private RGB               _rgb;
 
-	private static int	_sortIdCreator;
+   /**
+    * Opacity 0.0 ... 1.0, default is 1.0 to ensure that color is visible.
+    */
+   private float             _opacity = 1.0f;
 
-	public RGBVertex() {
+   /**
+    * Created id is needed that vertices can be sorted correctly when the value of two vertices are
+    * the same. This occures when new vertices are created and the value is not yet set.
+    */
+   private int               _sortId;
 
-		setSortId();
-	}
+   public RGBVertex() {
 
-	public RGBVertex(final int sortId) {
+      setSortId();
+   }
 
-		_sortId = sortId;
+   public RGBVertex(final int sortId) {
 
-		_value = 0;
-		_rgb = new RGB(255, 255, 255); // WHITE
-	}
+      _sortId = sortId;
 
-	public RGBVertex(final int value, final int red, final int green, final int blue) {
+      _value = 0;
+      _rgb = new RGB(255, 255, 255); // WHITE
+   }
 
-		setSortId();
+   public RGBVertex(final int value, final int red, final int green, final int blue) {
 
-		if ((red > 255) || (red < 0) || (green > 255) || (green < 0) || (blue > 255) || (blue < 0)) {
-			SWT.error(SWT.ERROR_INVALID_ARGUMENT);
-		}
+      setSortId();
 
-		_value = value;
-		_rgb = new RGB(red, green, blue);
-	}
+      if ((red > 255) || (red < 0) || (green > 255) || (green < 0) || (blue > 255) || (blue < 0)) {
+         SWT.error(SWT.ERROR_INVALID_ARGUMENT);
+      }
 
-	public RGBVertex(final int value, final int red, final int green, final int blue, final float opacity) {
+      _value = value;
+      _rgb = new RGB(red, green, blue);
+   }
 
-		this(value, red, green, blue);
+   /**
+    * @param value
+    * @param red
+    * @param green
+    * @param blue
+    * @param opacity
+    *           Opacity 0.0 ... 1.0
+    */
+   public RGBVertex(final int value, final int red, final int green, final int blue, final float opacity) {
 
-		_opacity = opacity;
-	}
+      this(value, red, green, blue);
 
-	public RGBVertex(final int value, final RGB rgb, final float opacity) {
+      _opacity = opacity;
+   }
 
-		setSortId();
+   /**
+    * @param value
+    * @param rgb
+    * @param opacity
+    *           Opacity 0.0 ... 1.0
+    */
+   public RGBVertex(final int value, final RGB rgb, final float opacity) {
 
-		_value = value;
-		_rgb = rgb;
-		_opacity = opacity;
-	}
+      setSortId();
 
-	public RGBVertex(final RGB rgb) {
+      _value = value;
+      _rgb = rgb;
+      _opacity = opacity;
+   }
 
-		setSortId();
+   public RGBVertex(final RGB rgb) {
 
-		_value = 0;
-		_rgb = rgb;
-	}
+      setSortId();
 
-	@Override
-	public RGBVertex clone() {
+      _value = 0;
+      _rgb = rgb;
+   }
 
-		RGBVertex clonedObject = null;
+   @Override
+   public RGBVertex clone() {
 
-		try {
+      RGBVertex clonedObject = null;
 
-			clonedObject = (RGBVertex) super.clone();
+      try {
 
-			setSortId();
+         clonedObject = (RGBVertex) super.clone();
 
-			clonedObject._rgb = new RGB(_rgb.red, _rgb.green, _rgb.blue);
+         setSortId();
 
-		} catch (final CloneNotSupportedException e) {
-			StatusUtil.log(e);
-		}
+         clonedObject._rgb = new RGB(_rgb.red, _rgb.green, _rgb.blue);
 
-		return clonedObject;
-	}
+      } catch (final CloneNotSupportedException e) {
+         StatusUtil.log(e);
+      }
 
-	public int compareTo(final Object anotherObject) throws ClassCastException {
+      return clonedObject;
+   }
 
-		if (!(anotherObject instanceof RGBVertex)) {
-			throw new ClassCastException(Messages.rgv_vertex_class_cast_exception);
-		}
+   @Override
+   public int compareTo(final Object anotherObject) throws ClassCastException {
 
-		final RGBVertex anotherRGBVertex = (RGBVertex) anotherObject;
-		final int anotherValue = anotherRGBVertex.getValue();
+      if (!(anotherObject instanceof RGBVertex)) {
+         throw new ClassCastException(Messages.rgv_vertex_class_cast_exception);
+      }
 
-		if (_value == anotherValue) {
+      final RGBVertex anotherRGBVertex = (RGBVertex) anotherObject;
+      final int anotherValue = anotherRGBVertex.getValue();
 
-			// both values are the same, compare/sort by create id
+      if (_value == anotherValue) {
 
-			return _sortId - anotherRGBVertex._sortId;
+         // both values are the same, compare/sort by create id
 
-		} else {
+         return _sortId - anotherRGBVertex._sortId;
 
-			return _value - anotherValue;
-		}
-	}
+      } else {
 
-	public float getOpacity() {
-		return _opacity;
-	}
+         return _value - anotherValue;
+      }
+   }
 
-	public RGB getRGB() {
-		return _rgb;
-	}
+   /**
+    * @return Opacity 0.0 ... 1.0
+    */
+   public float getOpacity() {
+      return _opacity;
+   }
 
-	public int getSortId() {
-		return _sortId;
-	}
+   public RGB getRGB() {
+      return _rgb;
+   }
 
-	public int getValue() {
-		return _value;
-	}
+   public int getSortId() {
+      return _sortId;
+   }
 
-	public void setOpacity(final float opacity) {
-		_opacity = opacity;
-	}
+   public int getValue() {
+      return _value;
+   }
 
-	public void setRGB(final RGB rgb) {
-		_rgb = rgb;
-	}
+   /**
+    * @param opacity
+    *           Opacity 0.0 ... 1.0
+    */
+   public void setOpacity(final float opacity) {
+      _opacity = opacity;
+   }
 
-	/**
-	 * @return Returns a unique id.
-	 */
-	private void setSortId() {
+   public void setRGB(final RGB rgb) {
+      _rgb = rgb;
+   }
 
-		_sortId = ++_sortIdCreator;
-	}
+   /**
+    * @return Returns a unique id.
+    */
+   private void setSortId() {
 
-	public void setValue(final int value) {
-		_value = value;
-	}
+      _sortId = ++_sortIdCreator;
+   }
 
-	@Override
-	public String toString() {
-		return String.format("\n\tRGBVertex [_value=%s, _rgb=%s]", _value, _rgb); //$NON-NLS-1$
-	}
+   public void setValue(final int value) {
+      _value = value;
+   }
+
+   @Override
+   public String toString() {
+      return String.format("\n\tRGBVertex [_value=%s, _rgb=%s, _opacity=%3.1f]", _value, _rgb, _opacity); //$NON-NLS-1$
+   }
+
 }

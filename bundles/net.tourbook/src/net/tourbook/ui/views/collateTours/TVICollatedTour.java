@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.time.TimeTools;
@@ -53,9 +54,10 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
 
             + "AVG( CASE WHEN AVGPULSE = 0         THEN NULL ELSE AVGPULSE END)," + NL //                                     10 //$NON-NLS-1$
             + "AVG( CASE WHEN AVGCADENCE = 0       THEN NULL ELSE AVGCADENCE END )," + NL //                                  11 //$NON-NLS-1$
-            + "AVG( CASE WHEN AvgTemperature = 0   THEN NULL ELSE DOUBLE(AvgTemperature) / TemperatureScale END )," + NL //   12 //$NON-NLS-1$
-            + "AVG( CASE WHEN WEATHERWINDDIR = 0   THEN NULL ELSE WEATHERWINDDIR END )," + NL //                              13 //$NON-NLS-1$
-            + "AVG( CASE WHEN WEATHERWINDSPD = 0   THEN NULL ELSE WEATHERWINDSPD END )," + NL //                              14 //$NON-NLS-1$
+            + "AVG( CASE WHEN weather_Temperature_Average_Device = 0   THEN NULL ELSE DOUBLE(weather_Temperature_Average_Device) / TemperatureScale END )," //$NON-NLS-1$
+            + NL //   12
+            + "AVG( CASE WHEN WEATHER_WIND_DIRECTION = 0 THEN NULL ELSE WEATHER_WIND_DIRECTION END )," + NL //                              13 //$NON-NLS-1$
+            + "AVG( CASE WHEN WEATHER_WIND_SPEED = 0   THEN NULL ELSE WEATHER_WIND_SPEED END )," + NL //                              14 //$NON-NLS-1$
             + "AVG( CASE WHEN RESTPULSE = 0        THEN NULL ELSE RESTPULSE END )," + NL //                                   15 //$NON-NLS-1$
 
             + "SUM( CAST(CALORIES                  AS BIGINT))," + NL //         16 //$NON-NLS-1$
@@ -78,7 +80,7 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
     * Id's for the tags or <code>null</code> when tags are not available.
     */
    private ArrayList<Long>        _tagIds;
-   HashSet<Long>                  sqlTagIds;
+   Set<Long>                      sqlTagIds;
 
    /**
     * Tour start time in ms.
@@ -109,7 +111,7 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
 
    float                          colAvgPulse;
    float                          colAvgCadence;
-   float                          colAvgTemperature;
+   float                          colAvgTemperature_Device;
    int                            colWindSpd;
    int                            colWindDir;
 
@@ -159,7 +161,7 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
 
       colAvgPulse = result.getFloat(startIndex + 10);
       colAvgCadence = result.getFloat(startIndex + 11);
-      colAvgTemperature = result.getFloat(startIndex + 12);
+      colAvgTemperature_Device = result.getFloat(startIndex + 12);
 
       colWindDir = result.getInt(startIndex + 13);
       colWindSpd = result.getInt(startIndex + 14);
@@ -179,7 +181,7 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
       colPausedTime = colElapsedTime - colRecordedTime;
    }
 
-   public ArrayList<Long> getTagIds() {
+   public List<Long> getTagIds() {
 
       if (sqlTagIds != null && _tagIds == null) {
          _tagIds = new ArrayList<>(sqlTagIds);
@@ -193,7 +195,7 @@ public abstract class TVICollatedTour extends TreeViewerItem implements ITourIte
       return null;
    }
 
-   public void setTagIds(final HashSet<Long> tagIds) {
+   public void setTagIds(final Set<Long> tagIds) {
       sqlTagIds = tagIds;
    }
 

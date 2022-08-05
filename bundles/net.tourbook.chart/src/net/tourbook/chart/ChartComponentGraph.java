@@ -231,7 +231,7 @@ public class ChartComponentGraph extends Canvas {
    private boolean                     _isXSliderAreaVisible;
 
    /*
-    * chart slider
+    * Left/right chart sliders
     */
    private final ChartXSlider         _xSliderA;
    private final ChartXSlider         _xSliderB;
@@ -548,7 +548,7 @@ public class ChartComponentGraph extends Canvas {
 
       setSelectedBars(selectedBarItems);
 
-      _chart.fireBarSelectionEvent(_hoveredBarSerieIndex, _hoveredBarValueIndex);
+      _chart.fireEvent_BarSelection(_hoveredBarSerieIndex, _hoveredBarValueIndex);
    }
 
    /**
@@ -2893,11 +2893,16 @@ public class ChartComponentGraph extends Canvas {
           * Draw line to current point
           */
          final long devXPrev_long = (long) devXPrev;
+         final long devY1_long = (long) devY1;
+         final long devY1Prev_long = (long) devY1Prev;
 
          if (devX_long != devXPrev_long
 
                // draw line when is has the same x position but y is larger/smaller than previous value
-               || (devX_long == devXPrev_long && (devY1 >= 0 ? devY1 > devY1Prev : devY1 < devY1Prev))
+               || (devX_long == devXPrev_long
+                     && (devY1_long >= 0
+                           ? devY1_long > devY1Prev_long
+                           : devY1_long < devY1Prev_long))
 
                || graphY1 == 0
                || (isPath2 && graphY2 == 0)) {
@@ -3010,7 +3015,7 @@ public class ChartComponentGraph extends Canvas {
             // add the right part of the rectangle width into the previous rectangle
             prevLineRect.width += devXDiffWidth + 1;
 
-            // check if hovered line is hit, this check is an inline for .contains(...)
+            // check if hovered line is hit
             if (isSetHoveredIndex == false && prevLineRect.contains(_devXMouseMove, _devYMouseMove)) {
                _hoveredValuePointIndex = prevValueIndex;
                isSetHoveredIndex = true;
@@ -3435,7 +3440,7 @@ public class ChartComponentGraph extends Canvas {
                continue;
             }
 
-            final int devBarHeight = (int) (barHeight * scaleY);
+            int devBarHeight = (int) (barHeight * scaleY);
 
             // get the old y position for stacked bars
             int devYPreviousHeight = 0;
@@ -3504,7 +3509,32 @@ public class ChartComponentGraph extends Canvas {
             }
 
             /*
-             * draw bar
+             * Make the bars more visible
+             */
+            if (yData.isShowBarsMoreVisible()) {
+
+               if (devShapeBarWidth < 3 && devBarHeight < 3) {
+
+                  devShapeBarWidth = 3;
+
+                  gcGraph.setLineWidth(3);
+
+               } else {
+
+                  gcGraph.setLineWidth(1);
+               }
+
+               if (devBarHeight < 3) {
+                  devBarHeight = 3;
+               }
+
+            } else {
+
+               gcGraph.setLineWidth(1);
+            }
+
+            /*
+             * Draw bar
              */
             final Rectangle barShapeCanvas = new Rectangle(
                   devXPosShape,
@@ -3532,20 +3562,20 @@ public class ChartComponentGraph extends Canvas {
                      barShapeCanvas.x,
                      barShapeCanvas.y,
                      barShapeCanvas.x,
-                     (barShapeCanvas.y + barShapeCanvas.height));
+                     barShapeCanvas.y + barShapeCanvas.height);
             }
 
-            barRecangles[serieIndex][valueIndex] = new Rectangle( //
+            barRecangles[serieIndex][valueIndex] = new Rectangle(
                   devXPosShape,
                   devYPosChart,
                   devShapeBarWidth,
                   devBarHeight);
 
-            barFocusRecangles[serieIndex][valueIndex] = new Rectangle(//
+            barFocusRecangles[serieIndex][valueIndex] = new Rectangle(
                   devXPosShape - 2,
-                  (devYPosChart - 2),
+                  devYPosChart - 2,
                   devShapeBarWidth + 4,
-                  (devBarHeight + 7));
+                  devBarHeight + 7);
 
             // keep the height for the bar
             devHeightSummary[valueIndex] += devBarHeight;
@@ -6679,7 +6709,7 @@ public class ChartComponentGraph extends Canvas {
       boolean isAdjusted = false;
 
       /*
-       * it happened, that lineDevPos was null
+       * It happened, that lineDevPos was null
        */
       if (lineDevPos == null) {
 
@@ -6716,6 +6746,7 @@ public class ChartComponentGraph extends Canvas {
       }
 
       if (isAdjusted) {
+
          // force repaining
          _isOverlayDirty = true;
       }
@@ -6794,13 +6825,13 @@ public class ChartComponentGraph extends Canvas {
       return _zoomRatioLeftBorder;
    }
 
-   private void handleChartResizeForSliders(final boolean isFireEvent) {
+   private void handleChartResize_ForSliders() {
 
       // update the width in the sliders
       final int visibleGraphHeight = getDevVisibleGraphHeight();
 
-      getLeftSlider().handleChartResize(visibleGraphHeight, isFireEvent);
-      getRightSlider().handleChartResize(visibleGraphHeight, isFireEvent);
+      getLeftSlider().handleChartResize(visibleGraphHeight, false);
+      getRightSlider().handleChartResize(visibleGraphHeight, false);
    }
 
    /**
@@ -7403,6 +7434,12 @@ public class ChartComponentGraph extends Canvas {
 
       if (isMoveSlider) {
 
+         /*
+          * Reset hovered value index otherwise this values is used but is not correctly set, e.g.
+          * when navigating time slices in the tour editor
+          */
+         _hoveredValuePointIndex = -1;
+
          moveXSlider(_selectedXSlider, valueIndex, false, true, true, false);
 
          redraw();
@@ -7437,7 +7474,7 @@ public class ChartComponentGraph extends Canvas {
           * execute the action which is defined when a bar is selected with the left mouse button
           */
 
-         _chart.fireChartDoubleClick(_hoveredBarSerieIndex, _hoveredBarValueIndex);
+         _chart.fireEvent_ChartDoubleClick(_hoveredBarSerieIndex, _hoveredBarValueIndex);
 
       } else {
 
@@ -7993,9 +8030,10 @@ public class ChartComponentGraph extends Canvas {
 
       // fire event for the current hovered value point
       if (_hoveredValuePointIndex != -1) {
-         _chart.fireHoveredValueEvent(_hoveredValuePointIndex);
+         _chart.fireEvent_HoveredValue(_hoveredValuePointIndex);
       }
 
+      // update value point tooltip
       final IHoveredValueTooltipListener hoveredValueTooltipListener = _chart.getHoveredValueTooltipListener();
       if (_isHoveredLineVisible || hoveredValueTooltipListener != null) {
 
@@ -8492,8 +8530,92 @@ public class ChartComponentGraph extends Canvas {
 //      redraw();
    }
 
+   int selectBarItem(final int keyCode) {
+
+      int selectedIndex = Chart.NO_BAR_SELECTION;
+
+      if (_selectedBarItems == null || _selectedBarItems.length == 0) {
+         return selectedIndex;
+      }
+
+      final int numItems = _selectedBarItems.length;
+
+      // find selected index and reset last selected bar item(s)
+      for (int index = 0; index < numItems; index++) {
+
+         if (selectedIndex == Chart.NO_BAR_SELECTION && _selectedBarItems[index]) {
+            selectedIndex = index;
+         }
+
+         _selectedBarItems[index] = false;
+      }
+
+      final int lastIndex = numItems - 1;
+
+      switch (keyCode) {
+
+      case SWT.HOME:
+         selectedIndex = 0;
+         break;
+
+      case SWT.END:
+         selectedIndex = lastIndex;
+         break;
+
+      case SWT.PAGE_UP:
+
+         selectedIndex += 10;
+
+         if (selectedIndex > lastIndex) {
+            selectedIndex = 0;
+         }
+
+         break;
+
+      case SWT.PAGE_DOWN:
+
+         selectedIndex -= 10;
+
+         if (selectedIndex < 0) {
+            selectedIndex = lastIndex;
+         }
+
+         break;
+
+      default:
+         break;
+      }
+
+      // skip first/last value when requested
+      if (_chartDrawingData.chartDataModel.isSkipNavigationForFirstLastValues()) {
+
+         if (numItems > 2) {
+
+            if (selectedIndex == 0) {
+
+               selectedIndex = 1;
+
+            } else if (selectedIndex == lastIndex) {
+
+               selectedIndex = numItems - 2;
+            }
+         }
+      }
+
+      // check bounds, a bounds exception occurred
+      selectedIndex = Math.min(Math.max(0, selectedIndex), lastIndex);
+
+      _selectedBarItems[selectedIndex] = true;
+
+      setChartPosition(selectedIndex);
+
+      redrawSelection();
+
+      return selectedIndex;
+   }
+
    /**
-    * select the next bar item
+    * Select the next bar item
     */
    int selectBarItem_Next() {
 
@@ -8558,7 +8680,7 @@ public class ChartComponentGraph extends Canvas {
    }
 
    /**
-    * select the previous bar item
+    * Select the previous bar item
     */
    int selectBarItem_Previous() {
 
@@ -9125,6 +9247,65 @@ public class ChartComponentGraph extends Canvas {
       _xSliderB.moveToXXDevPosition(xxDevGraphWidth, false, true, false);
    }
 
+   void setHovered_ValuePoint_Index(final int newHoveredValuePointIndex) {
+
+      if (_lineDevPositions.size() == 0
+
+            // this can happen when multiple tours are selected in the map
+            // but only one tour is displayed in the chart
+            // -> needs a fix but is not simple
+            || newHoveredValuePointIndex >= _lineDevPositions.get(0).length
+
+      ) {
+         return;
+      }
+
+      final PointLong[] lineDevPositions = _lineDevPositions.get(0);
+      PointLong lineDevPos = lineDevPositions[newHoveredValuePointIndex];
+
+      /*
+       * When points are skipped because of the same position then lineDevPos is null -> search for
+       * a near position
+       */
+      if (lineDevPos == null) {
+
+         int lineDevIndex = newHoveredValuePointIndex;
+
+         // check forward
+         while (lineDevIndex < lineDevPositions.length - 1) {
+
+            lineDevPos = lineDevPositions[++lineDevIndex];
+
+            if (lineDevPos != null) {
+               _hoveredValuePointIndex = lineDevIndex;
+               break;
+            }
+         }
+
+         if (lineDevPos == null) {
+
+            lineDevIndex = _hoveredValuePointIndex;
+
+            // check backward
+            while (lineDevIndex > 0) {
+
+               lineDevPos = lineDevPositions[--lineDevIndex];
+
+               if (lineDevPos != null) {
+                  _hoveredValuePointIndex = lineDevIndex;
+                  break;
+               }
+            }
+         }
+
+      } else {
+
+         _hoveredValuePointIndex = newHoveredValuePointIndex;
+      }
+
+      redraw();
+   }
+
    /**
     * Check if mouse has moved over a line value and sets {@link #_hoveredValuePointIndex} to the
     * value index or <code>-1</code> when focus rectangle is not hit.
@@ -9174,6 +9355,7 @@ public class ChartComponentGraph extends Canvas {
    }
 
    void setLineSelectionPainter(final ILineSelectionPainter lineSelectionPainter) {
+
       _lineSelectionPainter = lineSelectionPainter;
    }
 
@@ -9720,7 +9902,15 @@ public class ChartComponentGraph extends Canvas {
                   continue;
                }
 
+               final int numYValues = yValueSerie.length;
+
                for (int valueIndex = xValueIndex_Left; valueIndex <= xValueIndex_Right; valueIndex++) {
+
+                  // fixing java.lang.ArrayIndexOutOfBoundsException: Index 1096 out of bounds for length 1096
+                  // https://github.com/mytourbook/mytourbook/issues/497
+                  if (valueIndex >= numYValues) {
+                     break;
+                  }
 
                   final float yValue = yValueSerie[valueIndex];
 
@@ -9899,6 +10089,11 @@ public class ChartComponentGraph extends Canvas {
 
             for (final ChartXSliderLabel topLabel : allTopLabels) {
 
+               // fixed java.lang.IndexOutOfBoundsException
+               if (labelIndex >= allValuePointLabels.size()) {
+                  break;
+               }
+
                final ChartXSliderLabel valuePointLabel = allValuePointLabels.get(labelIndex);
 
                final int topWidth2 = topLabel.width / 2;
@@ -10006,7 +10201,7 @@ public class ChartComponentGraph extends Canvas {
          }
 
          setZoomRatioLeftBorder();
-         handleChartResizeForSliders(false);
+         handleChartResize_ForSliders();
 
          updateVisibleMinMaxValues();
          moveSlidersToBorder();
@@ -10098,7 +10293,7 @@ public class ChartComponentGraph extends Canvas {
          _zoomRatioCenter = devCenterPos / devVirtualWidth;
       }
 
-      handleChartResizeForSliders(false);
+      handleChartResize_ForSliders();
 
       updateVisibleMinMaxValues();
 
@@ -10186,7 +10381,7 @@ public class ChartComponentGraph extends Canvas {
 
          setZoomRatioLeftBorder();
 
-         handleChartResizeForSliders(false);
+         handleChartResize_ForSliders();
          updateVisibleMinMaxValues();
 
          if (isUpdateChart) {
@@ -10204,7 +10399,7 @@ public class ChartComponentGraph extends Canvas {
 
             setZoomRatioLeftBorder();
 
-            handleChartResizeForSliders(false);
+            handleChartResize_ForSliders();
             updateVisibleMinMaxValues();
 
             if (isUpdateChart) {

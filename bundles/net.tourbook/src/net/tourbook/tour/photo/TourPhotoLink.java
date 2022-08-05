@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -65,16 +65,16 @@ public class TourPhotoLink {
    private ZonedDateTime           tourStartDateTime;
    Period                          tourPeriod;
 
-   int                             numberOfGPSPhotos;
-   int                             numberOfNoGPSPhotos;
+   int                             numGPSPhotos;
+   int                             numbNoGPSPhotos;
 
    /**
     * Number of photos which are saved in a real tour.
     */
-   int                             numberOfTourPhotos;
+   int                             numTourPhotos;
 
    /**
-    * Adjusted time in seconds.
+    * Adjusted time in seconds which is saved in the tour
     */
    int                             photoTimeAdjustment;
 
@@ -89,6 +89,11 @@ public class TourPhotoLink {
     * Contains names for all cameras which are used to take pictures for the current tour.
     */
    String                          tourCameras;
+
+   /**
+    * Photo file path from the first photo, other photos are currently ignored -> is simplified
+    */
+   String                          photoFilePath;
 
    /**
     * Constructor for a history tour.
@@ -119,7 +124,7 @@ public class TourPhotoLink {
    TourPhotoLink(final long tourId,
                  final long tourStartTime,
                  final long tourEndTime,
-                 final int numberOfPhotos,
+                 final int numPhotos,
                  final int dbPhotoTimeAdjustment) {
 
       this.tourId = tourId;
@@ -129,7 +134,7 @@ public class TourPhotoLink {
       setTourStartTime(tourStartTime);
       setTourEndTime(tourEndTime);
 
-      numberOfTourPhotos = numberOfPhotos;
+      numTourPhotos = numPhotos;
 
       tourPeriod = new Period(tourStartTime, tourEndTime, _tourPeriodTemplate);
 
@@ -172,7 +177,7 @@ public class TourPhotoLink {
       final long[] historyTimeSerie = new long[timeSerieLength];
 
       for (int photoIndex = 0; photoIndex < timeSerieLength; photoIndex++) {
-         historyTimeSerie[photoIndex] = linkPhotos.get(photoIndex).adjustedTimeLink;
+         historyTimeSerie[photoIndex] = linkPhotos.get(photoIndex).adjustedTime_Camera;
       }
 
       final long tourStart = historyTimeSerie[0];
@@ -274,7 +279,7 @@ public class TourPhotoLink {
             tourEndTime = tourStartTime;
          } else {
             // get time from last photo
-            tourEndTime = linkPhotos.get(photosSize - 1).adjustedTimeLink;
+            tourEndTime = linkPhotos.get(photosSize - 1).adjustedTime_Camera;
          }
 
          finalizeHistoryTour();

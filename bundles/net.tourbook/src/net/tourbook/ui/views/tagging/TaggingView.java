@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -92,7 +92,6 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.IElementComparer;
@@ -124,13 +123,12 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 
 public class TaggingView extends ViewPart implements ITourProvider, ITourViewer, ITreeViewer {
 
-   static public final String        ID                                     = "net.tourbook.views.tagViewID";           //$NON-NLS-1$
+   public static final String        ID                                     = "net.tourbook.views.tagViewID";           //$NON-NLS-1$
 
    private static final String       MEMENTO_TAG_VIEW_LAYOUT                = "tagview.layout";                         //$NON-NLS-1$
 
@@ -176,7 +174,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private int                                 _tagViewLayout                           = TAG_VIEW_LAYOUT_HIERARCHICAL;
    private TreeViewerTourInfoToolTip           _tourInfoToolTip;
-   private TagFilterType                        _tagFilterType                           = TagFilterType.ALL_IS_DISPLAYED;
+   private TagFilterType                       _tagFilterType                           = TagFilterType.ALL_IS_DISPLAYED;
 
    private boolean                             _isToolTipInTag;
    private boolean                             _isToolTipInTitle;
@@ -532,7 +530,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
 
          } else if (element instanceof TVITagView_TagCategory) {
-            
+
             // ignore for now a deep inspection of the category items/subitems
 
             return true;
@@ -617,55 +615,49 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
-               reloadViewer();
+         if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+            reloadViewer();
 
-            } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
+         } else if (property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)) {
 
-               // update viewer
+            // update viewer
 
-               _tagViewer.refresh();
+            _tagViewer.refresh();
 
-            } else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
+         } else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
 
-               updateToolTipState();
+            updateToolTipState();
 
-            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+         } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-               _tagViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+            _tagViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-               _tagViewer.refresh();
+            _tagViewer.refresh();
 
-               /*
-                * the tree must be redrawn because the styled text does not show with the new color
-                */
-               _tagViewer.getTree().redraw();
-            }
+            /*
+             * the tree must be redrawn because the styled text does not show with the new color
+             */
+            _tagViewer.getTree().redraw();
          }
       };
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-               // measurement system has changed
+            // measurement system has changed
 
-               _columnManager.saveState(_state);
-               _columnManager.clearColumns();
-               defineAllColumns();
+            _columnManager.saveState(_state);
+            _columnManager.clearColumns();
+            defineAllColumns();
 
-               _tagViewer = (TreeViewer) recreateViewer(_tagViewer);
-            }
+            _tagViewer = (TreeViewer) recreateViewer(_tagViewer);
          }
       };
 
@@ -677,17 +669,13 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    private void addSelectionListener() {
 
       // this view part is a selection listener
-      _postSelectionListener = new ISelectionListener() {
+      _postSelectionListener = (workbenchPart, selection) -> {
 
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+         if (selection instanceof SelectionDeletedTours) {
 
-            if (selection instanceof SelectionDeletedTours) {
+            final SelectionDeletedTours deletedTourSelection = (SelectionDeletedTours) selection;
 
-               final SelectionDeletedTours deletedTourSelection = (SelectionDeletedTours) selection;
-
-               updateViewerAfterTourIsDeleted(_rootItem, deletedTourSelection.removedTours);
-            }
+            updateViewerAfterTourIsDeleted(_rootItem, deletedTourSelection.removedTours);
          }
       };
 
@@ -697,40 +685,37 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
 
-            if (part == TaggingView.this) {
-               return;
+         if (workbenchPart == TaggingView.this) {
+            return;
+         }
+
+         if (tourEventId == TourEventId.NOTIFY_TAG_VIEW) {
+            if (eventData instanceof ChangedTags) {
+
+               final ChangedTags changedTags = (ChangedTags) eventData;
+
+               final boolean isAddMode = changedTags.isAddMode();
+
+               // get a clone of the modified tours/tags because the tours are removed from the list
+               final ChangedTags changedTagsClone = new ChangedTags(
+                     changedTags.getModifiedTags(),
+                     changedTags.getModifiedTours(),
+                     isAddMode);
+
+               updateViewerAfterTagStructureIsModified(_rootItem, changedTagsClone, isAddMode);
             }
 
-            if (eventId == TourEventId.NOTIFY_TAG_VIEW) {
-               if (eventData instanceof ChangedTags) {
+         } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED || tourEventId == TourEventId.UPDATE_UI) {
 
-                  final ChangedTags changedTags = (ChangedTags) eventData;
+            reloadViewer();
 
-                  final boolean isAddMode = changedTags.isAddMode();
+         } else if (tourEventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-                  // get a clone of the modified tours/tags because the tours are removed from the list
-                  final ChangedTags changedTagsClone = new ChangedTags(
-                        changedTags.getModifiedTags(),
-                        changedTags.getModifiedTours(),
-                        isAddMode);
-
-                  updateViewerAfterTagStructureIsModified(_rootItem, changedTagsClone, isAddMode);
-               }
-
-            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED || eventId == TourEventId.UPDATE_UI) {
-
-               reloadViewer();
-
-            } else if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
-
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-               if (modifiedTours != null) {
-                  updateViewerAfterTourIsModified(_rootItem, modifiedTours);
-               }
+            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            if (modifiedTours != null) {
+               updateViewerAfterTourIsModified(_rootItem, modifiedTours);
             }
          }
       };
@@ -843,11 +828,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       _tagViewer.setUseHashlookup(true);
 
-      _tagViewer.addSelectionChangedListener(selectionChangedEvent -> onTagViewer_Selection(selectionChangedEvent));
+      _tagViewer.addSelectionChangedListener(this::onTagViewer_Selection);
       _tagViewer.addDoubleClickListener(doubleClickEvent -> onTagViewer_DoubleClick());
 
-      tree.addListener(SWT.MouseDoubleClick, event -> onTagTree_DoubleClick(event));
-      tree.addListener(SWT.MouseDown, event -> onTagTree_MouseDown(event));
+      tree.addListener(SWT.MouseDoubleClick, this::onTagTree_DoubleClick);
+      tree.addListener(SWT.MouseDown, this::onTagTree_MouseDown);
 
       tree.addKeyListener(keyPressedAdapter(keyEvent -> {
 
@@ -958,7 +943,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
       defineColumn_Body_MaxPulse();
       defineColumn_Body_AvgPulse();
 
-      defineColumn_Weather_AvgTemperature();
+      defineColumn_Weather_Temperature_Avg_Device();
 
       defineColumn_Powertrain_AvgCadence();
    }
@@ -1522,11 +1507,11 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    }
 
    /**
-    * column: avg temperature
+    * Column: Weather - Average temperature (measured from the device)
     */
-   private void defineColumn_Weather_AvgTemperature() {
+   private void defineColumn_Weather_Temperature_Avg_Device() {
 
-      final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_TEMPERATURE_AVG.createColumn(_columnManager, _pc);
+      final TreeColumnDefinition colDef = TreeColumnFactory.WEATHER_TEMPERATURE_AVG_DEVICE.createColumn(_columnManager, _pc);
       colDef.setLabelProvider(new CellLabelProvider() {
 
          @Override
@@ -1538,7 +1523,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             }
 
             final double temperature = net.tourbook.common.UI.convertTemperatureFromMetric(//
-                  ((TVITagViewItem) element).colAvgTemperature);
+                  ((TVITagViewItem) element).colAvgTemperature_Device);
 
             colDef.printDoubleValue(cell, temperature, element instanceof TVITagView_Tour);
 
@@ -1804,12 +1789,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
       if (tourIds.size() > 1) {
 
-         BusyIndicator.showWhile(Display.getCurrent(), new Runnable() {
-            @Override
-            public void run() {
-               TourManager.getInstance().getTourData(selectedTourData, tourIds);
-            }
-         });
+         BusyIndicator.showWhile(Display.getCurrent(), () -> TourManager.getInstance().getTourData(selectedTourData, tourIds));
 
       } else {
 
@@ -2079,7 +2059,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
             /*
              * expand and select selected folder
              */
-            _tagViewer.setExpandedTreePaths(new TreePath[] { selectedTreePath });
+            _tagViewer.setExpandedTreePaths(selectedTreePath);
             _tagViewer.setSelection(treeSelection, true);
 
             if (_isBehaviour_OnSelect_ExpandCollapse && isExpanded) {

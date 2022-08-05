@@ -238,7 +238,11 @@ public class StatisticTour_Frequency extends TourbookStatistic {
    private void createStatisticData(final TourStatisticData_Day statData_Day) {
 
       final ArrayList<TourType> tourTypeList = TourDatabase.getActiveTourTypes();
-      final int numColors = tourTypeList.size();
+
+      int numColors = tourTypeList.size();
+      if (numColors == 0) {
+         numColors = 1;
+      }
 
       final TourStatisticData_Frequency statData = _statisticData_Frequency;
 

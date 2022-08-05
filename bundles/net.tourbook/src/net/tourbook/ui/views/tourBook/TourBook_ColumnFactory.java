@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -35,6 +35,7 @@ import net.tourbook.data.TourData;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.preferences.PrefPageViews;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.TreeColumnFactory;
@@ -149,6 +150,12 @@ public class TourBook_ColumnFactory {
       defineColumn_Weather_Temperature_Avg();
       defineColumn_Weather_Temperature_Min();
       defineColumn_Weather_Temperature_Max();
+      defineColumn_Weather_Temperature_Avg_Device();
+      defineColumn_Weather_Temperature_Min_Device();
+      defineColumn_Weather_Temperature_Max_Device();
+      defineColumn_Weather_Temperature_Avg_Combined();
+      defineColumn_Weather_Temperature_Min_Combined();
+      defineColumn_Weather_Temperature_Max_Combined();
       defineColumn_Weather_WindSpeed();
       defineColumn_Weather_WindDirection();
 
@@ -3602,7 +3609,7 @@ public class TourBook_ColumnFactory {
    }
 
    /**
-    * Column: Weather - Avg temperature
+    * Column: Weather - Average temperature
     */
    private void defineColumn_Weather_Temperature_Avg() {
 
@@ -3612,7 +3619,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Avg);
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Average);
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -3625,7 +3632,74 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Avg);
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Average);
+
+            colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Weather - Combined Average temperature
+    */
+   private void defineColumn_Weather_Temperature_Avg_Combined() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_AVG_COMBINED.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final float value = getTemperature_Average_Combined(element);
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_TEMPERATURE_AVG_COMBINED
+            .createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final float value = getTemperature_Average_Combined(element);
+
+            colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Weather - Average temperature (measured from the device)
+    */
+   private void defineColumn_Weather_Temperature_Avg_Device() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_AVG_DEVICE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Average_Device);
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_TEMPERATURE_AVG_DEVICE.createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Average_Device);
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -3668,6 +3742,73 @@ public class TourBook_ColumnFactory {
    }
 
    /**
+    * Column: Weather - Combined Max temperature
+    */
+   private void defineColumn_Weather_Temperature_Max_Combined() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_MAX_COMBINED.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final float value = getTemperature_Max_Combined(element);
+
+            return colDef_NatTable.printDoubleValue((value));
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_TEMPERATURE_MAX_COMBINED
+            .createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final float value = getTemperature_Max_Combined(element);
+
+            colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Weather - Max temperature (measured from the device)
+    */
+   private void defineColumn_Weather_Temperature_Max_Device() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_MAX_DEVICE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Max_Device);
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_TEMPERATURE_MAX_DEVICE.createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Max_Device);
+
+            colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
     * Column: Weather - Min temperature
     */
    private void defineColumn_Weather_Temperature_Min() {
@@ -3701,6 +3842,73 @@ public class TourBook_ColumnFactory {
    }
 
    /**
+    * Column: Weather - Combined Min temperature
+    */
+   private void defineColumn_Weather_Temperature_Min_Combined() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_MIN_COMBINED.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final float value = getTemperature_Min_Combined(element);
+
+            return colDef_NatTable.printDoubleValue((value));
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_TEMPERATURE_MIN_COMBINED
+            .createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final float value = getTemperature_Min_Combined(element);
+
+            colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
+    * Column: Weather - Min temperature (measured from the device)
+    */
+   private void defineColumn_Weather_Temperature_Min_Device() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.WEATHER_TEMPERATURE_MIN_DEVICE.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Min_Device);
+
+            return colDef_NatTable.printDoubleValue(value);
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.WEATHER_TEMPERATURE_MIN_DEVICE.createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+
+            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Min_Device);
+
+            colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
+
+            setCellColor(cell, element);
+         }
+      });
+   }
+
+   /**
     * Column: Weather - Wind direction
     */
    private void defineColumn_Weather_WindDirection() {
@@ -3711,7 +3919,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final int windDir = ((TVITourBookItem) element).colWindDir;
+            final int windDir = ((TVITourBookItem) element).colWindDirection;
 
             if (windDir == 0) {
                return UI.EMPTY_STRING;
@@ -3728,7 +3936,7 @@ public class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final int windDir = ((TVITourBookItem) element).colWindDir;
+            final int windDir = ((TVITourBookItem) element).colWindDirection;
 
             if (windDir == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -3752,7 +3960,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final int windSpeed = (int) (((TVITourBookItem) element).colWindSpd / UI.UNIT_VALUE_DISTANCE);
+            final int windSpeed = (int) (((TVITourBookItem) element).colWindSpeed / UI.UNIT_VALUE_DISTANCE);
 
             if (windSpeed == 0) {
                return UI.EMPTY_STRING;
@@ -3769,7 +3977,7 @@ public class TourBook_ColumnFactory {
          public void update(final ViewerCell cell) {
 
             final Object element = cell.getElement();
-            final int windSpeed = (int) (((TVITourBookItem) element).colWindSpd / UI.UNIT_VALUE_DISTANCE);
+            final int windSpeed = (int) (((TVITourBookItem) element).colWindSpeed / UI.UNIT_VALUE_DISTANCE);
 
             if (windSpeed == 0) {
                cell.setText(UI.EMPTY_STRING);
@@ -3784,6 +3992,60 @@ public class TourBook_ColumnFactory {
 
    ColumnDefinition getColDef_TimeZoneOffset_Tree() {
       return _colDef_TimeZoneOffset_Tree;
+   }
+
+   private float getTemperature_Average_Combined(final Object element) {
+
+      final String action = _prefStore.getString(ITourbookPreferences.VIEW_PREFERRED_TEMPERATURE_VALUE);
+      float value = 0;
+
+      final TVITourBookItem tourBookItem = (TVITourBookItem) element;
+
+      if (action.equals(PrefPageViews.VIEW_TEMPERATURE_VALUES_FROM_DEVICE)) {
+
+         value = tourBookItem.colTemperature_Average_Device;
+
+      } else if (action.equals(PrefPageViews.VIEW_TEMPERATURE_VALUES_EXTERNAL)) {
+
+         value = tourBookItem.colTemperature_Average;
+      }
+      return UI.convertTemperatureFromMetric(value);
+   }
+
+   private float getTemperature_Max_Combined(final Object element) {
+
+      final String action = _prefStore.getString(ITourbookPreferences.VIEW_PREFERRED_TEMPERATURE_VALUE);
+      float value = 0;
+
+      final TVITourBookItem tourBookItem = (TVITourBookItem) element;
+
+      if (action.equals(PrefPageViews.VIEW_TEMPERATURE_VALUES_FROM_DEVICE)) {
+
+         value = tourBookItem.colTemperature_Max_Device;
+
+      } else if (action.equals(PrefPageViews.VIEW_TEMPERATURE_VALUES_EXTERNAL)) {
+
+         value = tourBookItem.colTemperature_Max;
+      }
+      return UI.convertTemperatureFromMetric(value);
+   }
+
+   private float getTemperature_Min_Combined(final Object element) {
+
+      final String action = _prefStore.getString(ITourbookPreferences.VIEW_PREFERRED_TEMPERATURE_VALUE);
+      float value = 0;
+
+      final TVITourBookItem tourBookItem = (TVITourBookItem) element;
+
+      if (action.equals(PrefPageViews.VIEW_TEMPERATURE_VALUES_FROM_DEVICE)) {
+
+         value = tourBookItem.colTemperature_Min_Device;
+
+      } else if (action.equals(PrefPageViews.VIEW_TEMPERATURE_VALUES_EXTERNAL)) {
+
+         value = tourBookItem.colTemperature_Min;
+      }
+      return UI.convertTemperatureFromMetric(value);
    }
 
    void setCellColor(final ViewerCell cell, final Object element) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.tour;
 
 import gnu.trove.list.array.TDoubleArrayList;
 import gnu.trove.list.array.TFloatArrayList;
+import gnu.trove.list.array.TLongArrayList;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
@@ -31,7 +32,16 @@ import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -53,6 +63,7 @@ import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringToArrayConverter;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -81,17 +92,18 @@ import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.tourChart.TourChartConfiguration;
 import net.tourbook.ui.tourChart.TourChartView;
 import net.tourbook.ui.tourChart.X_AXIS_START_TIME;
+import net.tourbook.ui.views.IWeatherProvider;
 import net.tourbook.ui.views.TourChartAnalyzerInfo;
 import net.tourbook.ui.views.collateTours.CollatedToursView;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
-import net.tourbook.weather.HistoricalWeatherRetriever;
-import net.tourbook.weather.WeatherData;
+import net.tourbook.weather.TourWeatherRetriever;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -138,9 +150,11 @@ public class TourManager {
    private static final String GRAPH_LABEL_HEARTBEAT                           = net.tourbook.common.Messages.Graph_Label_Heartbeat;
    private static final String GRAPH_LABEL_HEARTBEAT_UNIT                      = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
    private static final String GRAPH_LABEL_PACE                                = net.tourbook.common.Messages.Graph_Label_Pace;
+   private static final String GRAPH_LABEL_PACE_SUMMARIZED                     = net.tourbook.common.Messages.Graph_Label_Pace_Summarized;
    private static final String GRAPH_LABEL_POWER                               = net.tourbook.common.Messages.Graph_Label_Power;
    private static final String GRAPH_LABEL_POWER_UNIT                          = net.tourbook.common.Messages.Graph_Label_Power_Unit;
    private static final String GRAPH_LABEL_SPEED                               = net.tourbook.common.Messages.Graph_Label_Speed;
+   private static final String GRAPH_LABEL_SPEED_SUMMARIZED                    = net.tourbook.common.Messages.Graph_Label_Speed_Summarized;
    private static final String GRAPH_LABEL_TEMPERATURE                         = net.tourbook.common.Messages.Graph_Label_Temperature;
    private static final String GRAPH_LABEL_TOUR_COMPARE                        = net.tourbook.common.Messages.Graph_Label_Tour_Compare;
    private static final String GRAPH_LABEL_TOUR_COMPARE_UNIT                   = net.tourbook.common.Messages.Graph_Label_Tour_Compare_Unit;
@@ -175,9 +189,11 @@ public class TourManager {
    public static final String  CUSTOM_DATA_GRADIENT                            = "gradient";                                                         //$NON-NLS-1$
    public static final String  CUSTOM_DATA_HISTORY                             = "history";                                                          //$NON-NLS-1$
    public static final String  CUSTOM_DATA_PACE                                = "pace";                                                             //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_PACE_SUMMARIZED                     = "pace-summarized";                                                  //$NON-NLS-1$
    public static final String  CUSTOM_DATA_POWER                               = "power";                                                            //$NON-NLS-1$
    public static final String  CUSTOM_DATA_PULSE                               = "pulse";                                                            //$NON-NLS-1$
    public static final String  CUSTOM_DATA_SPEED                               = "speed";                                                            //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_SPEED_SUMMARIZED                    = "speed-summarized";                                                 //$NON-NLS-1$
    public static final String  CUSTOM_DATA_TEMPERATURE                         = "temperature";                                                      //$NON-NLS-1$
    public static final String  CUSTOM_DATA_TIME                                = "time";                                                             //$NON-NLS-1$
    public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME                 = "runDyn_RunDyn_StanceTime";                                         //$NON-NLS-1$
@@ -196,8 +212,9 @@ public class TourManager {
    public static final String  X_AXIS_DISTANCE                                 = "distance";                                                         //$NON-NLS-1$
    //
    private static final String FORMAT_MM_SS                                    = "%d:%02d";                                                          //$NON-NLS-1$
-   public static final String  GEAR_TEETH_FORMAT                               = "%2d:%2d";                                                          //$NON-NLS-1$
-   public static final String  GEAR_VALUE_FORMAT                               = GEAR_TEETH_FORMAT + " - %1.2f";                                     //$NON-NLS-1$
+   public static final String  GEAR_RATIO_FORMAT                               = "%1.2f";                                                            //$NON-NLS-1$
+   public static final String  GEAR_TEETH_FORMAT                               = "%2d : %2d";                                                        //$NON-NLS-1$
+   public static final String  GEAR_VALUE_FORMAT                               = GEAR_TEETH_FORMAT + " - " + GEAR_RATIO_FORMAT;                      //$NON-NLS-1$
    //
    public static final int     GRAPH_ALTITUDE                                  = 1000;
    public static final int     GRAPH_SPEED                                     = 1001;
@@ -209,6 +226,8 @@ public class TourManager {
    public static final int     GRAPH_POWER                                     = 1007;
    public static final int     GRAPH_PACE                                      = 1008;
    public static final int     GRAPH_GEARS                                     = 1009;
+   public static final int     GRAPH_SPEED_SUMMARIZED                          = 1010;
+   public static final int     GRAPH_PACE_SUMMARIZED                           = 1011;
 
    public static final int     GRAPH_RUN_DYN_STANCE_TIME                       = 1100;
    public static final int     GRAPH_RUN_DYN_STANCE_TIME_BALANCED              = 1101;
@@ -234,6 +253,7 @@ public class TourManager {
 
          GRAPH_ALTITUDE,
          GRAPH_SPEED,
+         GRAPH_SPEED_SUMMARIZED,
          GRAPH_ALTIMETER,
          GRAPH_PULSE,
          GRAPH_TEMPERATURE,
@@ -241,6 +261,7 @@ public class TourManager {
          GRAPH_GRADIENT,
          GRAPH_POWER,
          GRAPH_PACE,
+         GRAPH_PACE_SUMMARIZED,
          GRAPH_GEARS,
 
          GRAPH_RUN_DYN_STANCE_TIME,
@@ -283,39 +304,58 @@ public class TourManager {
     * contains the instance of the {@link TourDataEditorView} or <code>null</code> when this part is
     * not opened
     */
-   private static TourDataEditorView      _tourDataEditorInstance;
+   private static TourDataEditorView       _tourDataEditorInstance;
    //
-   private static LabelProviderMMSS       _labelProviderMMSS = new LabelProviderMMSS();
-   private static LabelProviderInt        _labelProviderInt  = new LabelProviderInt();
+   private static LabelProviderMMSS        _labelProviderMMSS = new LabelProviderMMSS();
+   private static LabelProviderInt         _labelProviderInt  = new LabelProviderInt();
    //
-   private static volatile TourData       _joined_TourData;
-   private static int                     _joined_TourIds_Hash;
-   private static volatile List<TourData> _allLoaded_TourData;
-   private static int                     _allLoaded_TourData_Hash;
-   private static long                    _allLoaded_TourData_Key;
-   private static int                     _allLoaded_TourIds_Hash;
+   private static volatile TourData        _joined_TourData;
+   private static int                      _joined_TourIds_Hash;
+   private static volatile List<TourData>  _allLoaded_TourData;
+   private static int                      _allLoaded_TourData_Hash;
+   private static long                     _allLoaded_TourData_Key;
+   private static int                      _allLoaded_TourIds_Hash;
    //
-   private ComputeChartValue              _computeAvg_Altimeter;
-   private ComputeChartValue              _computeAvg_Altitude;
-   private ComputeChartValue              _computeAvg_Cadence;
-   private ComputeChartValue              _computeAvg_Gradient;
-   private ComputeChartValue              _computeAvg_Pace;
-   private ComputeChartValue              _computeAvg_Power;
-   private ComputeChartValue              _computeAvg_Pulse;
-   private ComputeChartValue              _computeAvg_Speed;
+   private static ThreadPoolExecutor       _loadingTour_Executor;
+   private static ArrayBlockingQueue<Long> _loadingTour_Queue = new ArrayBlockingQueue<>(Util.NUMBER_OF_PROCESSORS);
+   private static CountDownLatch           _loadingTour_CountDownLatch;
    //
-   private ComputeChartValue              _computeAvg_RunDyn_StanceTime;
-   private ComputeChartValue              _computeAvg_RunDyn_StanceTimeBalance;
-   private ComputeChartValue              _computeAvg_RunDyn_StepLength;
-   private ComputeChartValue              _computeAvg_RunDyn_VerticalOscillation;
-   private ComputeChartValue              _computeAvg_RunDyn_VerticalRatio;
+   static {
+
+      final ThreadFactory loadingThreadFactory = runnable -> {
+
+         final Thread thread = new Thread(runnable, "Loading tours from DB");//$NON-NLS-1$
+
+         thread.setPriority(Thread.MIN_PRIORITY);
+         thread.setDaemon(true);
+
+         return thread;
+      };
+
+      _loadingTour_Executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(Util.NUMBER_OF_PROCESSORS, loadingThreadFactory);
+   }
    //
-   private final TourDataCache            _tourDataCache;
+   private ComputeChartValue   _computeAvg_Altimeter;
+   private ComputeChartValue   _computeAvg_Altitude;
+   private ComputeChartValue   _computeAvg_Cadence;
+   private ComputeChartValue   _computeAvg_Gradient;
+   private ComputeChartValue   _computeAvg_Pace;
+   private ComputeChartValue   _computeAvg_Power;
+   private ComputeChartValue   _computeAvg_Pulse;
+   private ComputeChartValue   _computeAvg_Speed;
+   //
+   private ComputeChartValue   _computeAvg_RunDyn_StanceTime;
+   private ComputeChartValue   _computeAvg_RunDyn_StanceTimeBalance;
+   private ComputeChartValue   _computeAvg_RunDyn_StepLength;
+   private ComputeChartValue   _computeAvg_RunDyn_VerticalOscillation;
+   private ComputeChartValue   _computeAvg_RunDyn_VerticalRatio;
+   //
+   private final TourDataCache _tourDataCache;
 
    /**
     * tour chart which shows the selected tour
     */
-   private TourChart                      _activeTourChart;
+   private TourChart           _activeTourChart;
 
    public static class LabelProviderInt implements IValueLabelProvider {
 
@@ -371,14 +411,7 @@ public class TourManager {
 
          final String property = propertyChangeEvent.getProperty();
 
-         if (property.equals(ITourbookPreferences.CLEAR_TOURDATA_CACHE)) {
-
-            clearTourDataCache();
-
-            // fire modify event
-            Display.getDefault().asyncExec(() -> fireEvent(TourEventId.UPDATE_UI));
-
-         } else if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
             /*
              * multiple tours can have the wrong person for hr zones
@@ -461,11 +494,11 @@ public class TourManager {
          temperatureSerie[serieIndex] = initialTemperature;
       }
 
-      final float oldAvgTemperature = tourData.getAvgTemperature();
+      final float oldAvgTemperature = tourData.getWeather_Temperature_Average_Device();
 
       tourData.computeAvg_Temperature();
 
-      final float newAvgTemperature = tourData.getAvgTemperature();
+      final float newAvgTemperature = tourData.getWeather_Temperature_Average_Device();
 
       TourLogManager.subLog_OK(String.format(
             LOG_TEMP_ADJUST_003_TOUR_CHANGES,
@@ -580,7 +613,7 @@ public class TourManager {
     * @return Returns <code>true</code> when distance values are computed and {@link TourData} are
     *         updated but not yet saved.
     */
-   public static boolean computeDistanceValuesFromGeoPosition(final ArrayList<TourData> tourDataList) {
+   public static boolean computeDistanceValuesFromGeoPosition(final List<TourData> tourDataList) {
 
       if (tourDataList == null || tourDataList.isEmpty()) {
          return false;
@@ -713,11 +746,12 @@ public class TourManager {
    /**
     * Create a tour chart configuration by reading the settings from the pref store.
     *
+    * @param state
     * @return Returns a new tour chart configuration.
     */
-   public static TourChartConfiguration createDefaultTourChartConfig() {
+   public static TourChartConfiguration createDefaultTourChartConfig(final IDialogSettings state) {
 
-      final TourChartConfiguration tcc = new TourChartConfiguration(true);
+      final TourChartConfiguration tcc = new TourChartConfiguration(true, state);
 
       /*
        * convert graph ids from the preferences into visible graphs in the chart panel configuration
@@ -735,15 +769,6 @@ public class TourManager {
 
       final boolean isTourStartTime = _prefStore.getBoolean(ITourbookPreferences.GRAPH_X_AXIS_STARTTIME);
       tcc.xAxisTime = isTourStartTime ? X_AXIS_START_TIME.TOUR_START_TIME : X_AXIS_START_TIME.START_WITH_0;
-      tcc.isSRTMDataVisible = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SRTM_VISIBLE);
-
-      tcc.isGraphOverlapped = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_GRAPH_OVERLAPPED);
-
-      tcc.isShowTourPhotos = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_VISIBLE);
-      tcc.isShowTourPhotoTooltip = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_TOUR_PHOTO_TOOLTIP_VISIBLE);
-
-      tcc.isShowBreaktimeValues = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_BREAKTIME_VALUES_VISIBLE);
-      tcc.isShowValuePointValue = _prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_VALUE_POINT_VALUE);
 
       tcc.updateZoomOptions();
 
@@ -756,7 +781,7 @@ public class TourManager {
     * @param tourIds
     * @return
     */
-   public static TourData createJoinedTourData(final ArrayList<Long> tourIds) {
+   public static TourData createJoinedTourData(final List<Long> tourIds) {
 
       // check if the requested data are already available
       final int tourIds_Hash = tourIds.hashCode();
@@ -807,40 +832,44 @@ public class TourManager {
       final float[] cadenceSerieData = new float[numTimeSlices];
       joinedTourData.setCadenceSerie(cadenceSerieData);
 
-      final int[] toTimeSerie = joinedTourData.timeSerie = new int[numTimeSlices];
-      final float[] toAltitudeSerie = joinedTourData.altitudeSerie = new float[numTimeSlices];
-      final float[] toCadenceSerie = cadenceSerieData;
-      final float[] toDistanceSerie = joinedTourData.distanceSerie = new float[numTimeSlices];
-      final long[] toGearSerie = joinedTourData.gearSerie = new long[numTimeSlices];
-      final double[] toLatitudeSerie = joinedTourData.latitudeSerie = new double[numTimeSlices];
-      final double[] toLongitudeSerie = joinedTourData.longitudeSerie = new double[numTimeSlices];
-      final float[] toPowerSerie = new float[numTimeSlices];
-      final float[] toPulseSerie = joinedTourData.pulseSerie = new float[numTimeSlices];
-      final float[] toPulseSerie_FromTime = joinedTourData.pulseSerie_FromTime = new float[numTimeSlices];
-      final float[] toTemperaturSerie = joinedTourData.temperatureSerie = new float[numTimeSlices];
+// SET_FORMATTING_OFF
 
-      final short[] toRunDyn_StanceTime = joinedTourData.runDyn_StanceTime = new short[numTimeSlices];
-      final short[] toRunDyn_StanceTimeBalance = joinedTourData.runDyn_StanceTimeBalance = new short[numTimeSlices];
-      final short[] toRunDyn_StepLength = joinedTourData.runDyn_StepLength = new short[numTimeSlices];
-      final short[] toRunDyn_VertOscillation = joinedTourData.runDyn_VerticalOscillation = new short[numTimeSlices];
-      final short[] toRunDyn_VertRatio = joinedTourData.runDyn_VerticalRatio = new short[numTimeSlices];
+      final int[] toTimeSerie                   = joinedTourData.timeSerie                         = new int[numTimeSlices];
+      final float[] toAltitudeSerie             = joinedTourData.altitudeSerie                     = new float[numTimeSlices];
+      final float[] toCadenceSerie              = cadenceSerieData;
+      final float[] toDistanceSerie             = joinedTourData.distanceSerie                     = new float[numTimeSlices];
+      final long[] toGearSerie                  = joinedTourData.gearSerie                         = new long[numTimeSlices];
+      final double[] toLatitudeSerie            = joinedTourData.latitudeSerie                     = new double[numTimeSlices];
+      final double[] toLongitudeSerie           = joinedTourData.longitudeSerie                    = new double[numTimeSlices];
+      final float[] toPowerSerie                = new float[numTimeSlices];
+      final float[] toPulseSerie                = joinedTourData.pulseSerie                        = new float[numTimeSlices];
+      final float[] toPulseSerie_FromTime       = joinedTourData.pulseSerie_FromTime               = new float[numTimeSlices];
+      final float[] toTemperaturSerie           = joinedTourData.temperatureSerie                  = new float[numTimeSlices];
 
-      final short[] toswim_LengthType = joinedTourData.swim_LengthType = new short[numSwimTimeSlices];
-      final short[] toSwim_Cadence = joinedTourData.swim_Cadence = new short[numSwimTimeSlices];
-      final short[] toSwim_Strokes = joinedTourData.swim_Strokes = new short[numSwimTimeSlices];
-      final short[] toSwim_StrokeStyle = joinedTourData.swim_StrokeStyle = new short[numSwimTimeSlices];
-      final int[] toSwim_Time = joinedTourData.swim_Time = new int[numSwimTimeSlices];
+      final short[] toRunDyn_StanceTime         = joinedTourData.runDyn_StanceTime                 = new short[numTimeSlices];
+      final short[] toRunDyn_StanceTimeBalance  = joinedTourData.runDyn_StanceTimeBalance          = new short[numTimeSlices];
+      final short[] toRunDyn_StepLength         = joinedTourData.runDyn_StepLength                 = new short[numTimeSlices];
+      final short[] toRunDyn_VertOscillation    = joinedTourData.runDyn_VerticalOscillation        = new short[numTimeSlices];
+      final short[] toRunDyn_VertRatio          = joinedTourData.runDyn_VerticalRatio              = new short[numTimeSlices];
 
-      final Long[] allTourIds = joinedTourData.multipleTourIds = new Long[numTours];
-      final float[] allTours_CadenceMultiplier = joinedTourData.multipleTours_CadenceMultiplier = new float[numTours];
-      final int[] allStartIndex = joinedTourData.multipleTourStartIndex = new int[numTours];
-      final ZonedDateTime[] allStartTime = joinedTourData.multipleTourZonedStartTime = new ZonedDateTime[numTours];
-      final String[] allTourTitle = joinedTourData.multipleTourTitles = new String[numTours];
-      final ArrayList<TourMarker> allTourMarker = joinedTourData.multiTourMarkers = new ArrayList<>();
-      final int[] allTourMarkerNumbers = joinedTourData.multipleNumberOfMarkers = new int[numTours];
-      final List<List<Long>> allTourPauses = joinedTourData.multiTourPauses = new ArrayList<>();
-      final int[] allTourPausesNumbers = joinedTourData.multipleNumberOfPauses = new int[numTours];
-      final int[] allSwimStartIndex = joinedTourData.multipleSwimStartIndex = new int[numTours];
+      final short[] toswim_LengthType           = joinedTourData.swim_LengthType                   = new short[numSwimTimeSlices];
+      final short[] toSwim_Cadence              = joinedTourData.swim_Cadence                      = new short[numSwimTimeSlices];
+      final short[] toSwim_Strokes              = joinedTourData.swim_Strokes                      = new short[numSwimTimeSlices];
+      final short[] toSwim_StrokeStyle          = joinedTourData.swim_StrokeStyle                  = new short[numSwimTimeSlices];
+      final int[] toSwim_Time                   = joinedTourData.swim_Time                         = new int[numSwimTimeSlices];
+
+      final Long[] allTourIds                   = joinedTourData.multipleTourIds                   = new Long[numTours];
+      final float[] allTours_CadenceMultiplier  = joinedTourData.multipleTours_CadenceMultiplier   = new float[numTours];
+      final int[] allStartIndex                 = joinedTourData.multipleTourStartIndex            = new int[numTours];
+      final ZonedDateTime[] allStartTime        = joinedTourData.multipleTourZonedStartTime        = new ZonedDateTime[numTours];
+      final ArrayList<TourMarker> allTourMarker = joinedTourData.multipleTourMarkers               = new ArrayList<>();
+      final List<List<Long>> allTourPauses      = joinedTourData.multipleTourPauses                = new ArrayList<>();
+      final String[] allTourTitle               = joinedTourData.multipleTourTitles                = new String[numTours];
+      final int[] allTourMarkerNumbers          = joinedTourData.multipleNumberOfMarkers           = new int[numTours];
+      final int[] allTourPausesNumbers          = joinedTourData.multipleNumberOfPauses            = new int[numTours];
+      final int[] allSwimStartIndex             = joinedTourData.multipleSwimStartIndex            = new int[numTours];
+
+// SET_FORMATTING_ON
 
       final HashSet<TourPhoto> allTourPhoto = new HashSet<>();
 
@@ -1075,13 +1104,24 @@ public class TourManager {
          final long[] pausedTime_Start = fromTourData.getPausedTime_Start();
 
          if (pausedTime_Start != null) {
+
             final long[] pausedTime_End = fromTourData.getPausedTime_End();
+            final long[] pausedTime_Data = fromTourData.getPausedTime_Data();
+
             for (int index = 0; index < pausedTime_Start.length; ++index) {
 
                final List<Long> fromTourPausesList = new ArrayList<>();
 
+               final long pauseData = pausedTime_Data == null
+
+                     // pause data are not available -> it will be displayed as an auto-pause
+                     ? -1
+
+                     : pausedTime_Data[index];
+
                fromTourPausesList.add(pausedTime_Start[index]);
                fromTourPausesList.add(pausedTime_End[index]);
+               fromTourPausesList.add(pauseData);
 
                allTourPauses.add(fromTourPausesList);
             }
@@ -1296,7 +1336,7 @@ public class TourManager {
       }
    }
 
-   public static void fireEvent(final TourEventId tourEventId,  final IWorkbenchPart part) {
+   public static void fireEvent(final TourEventId tourEventId, final IWorkbenchPart part) {
 
       final Object[] allListeners = _tourEventListeners.getListeners();
       for (final Object listener : allListeners) {
@@ -1353,7 +1393,6 @@ public class TourManager {
 //                  + ("\tcustomData: " + customData)
 ////            + ("\t: " + )
 //      );
-//// TODO remove SYSTEM.OUT.PRINTLN
 
       final Object[] allListeners = _tourEventListeners.getListeners();
       for (final Object listener : allListeners) {
@@ -1679,6 +1718,10 @@ public class TourManager {
     */
    public static String getTourTitle(final TourData tourData) {
 
+      if (tourData == null) {
+         return UI.EMPTY_STRING;
+      }
+
       return getTourDateLong(tourData.getTourStartTime())//
             + UI.DASH_WITH_SPACE
             + getTourTimeShort(tourData);
@@ -1778,8 +1821,6 @@ public class TourManager {
       }
 
       return true;
-
-//      return tourData.hasGeoData();
    }
 
    /**
@@ -1870,6 +1911,27 @@ public class TourManager {
    }
 
    /**
+    * @return Returns <code>true</code> when a weather provider has been selected
+    *         and properly configured.
+    */
+   public static boolean isWeatherRetrievalActivated() {
+
+      final String weatherProviderId = _prefStore.getString(ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
+
+      switch (weatherProviderId) {
+
+      case IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP_ID:
+      case IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI_ID:
+         return true;
+      case IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_ID:
+         return StringUtils.hasContent(_prefStore.getString(ITourbookPreferences.WEATHER_API_KEY));
+      case IWeatherProvider.Pref_Weather_Provider_None:
+      default:
+         return false;
+      }
+   }
+
+   /**
     * Loads multiple tour data from the database and shows a progressbar when it takes longer.
     *
     * @param allTourIds
@@ -1900,13 +1962,12 @@ public class TourManager {
 
       allTourData.clear();
 
-      final long start = System.currentTimeMillis();
+      final long startTime = System.currentTimeMillis();
       boolean isLongDuration = false;
 
       // create a unique key for all tours
-      final long[] newOverlayKey = { 0 };
+      final AtomicLong newOverlayKey = new AtomicLong();
       final int[] tourIndex = { 0 };
-      final int[] loadCounter = { 0 };
       final int numTourIds = allTourIds.size();
 
       while (tourIndex[0] < numTourIds) {
@@ -1915,10 +1976,10 @@ public class TourManager {
          loadTourData_OneTour(tourId, allTourData, isCheckLatLon, newOverlayKey);
 
          /*
-          * Check if this is a long duration -> run with progress monitor
+          * Check if this is a long duration -> run with progress monitor and concurrent
           */
-         final long runDuration = System.currentTimeMillis() - start;
-         if (runDuration > 500) {
+         final long runDuration = System.currentTimeMillis() - startTime;
+         if (runDuration > 1000) {
             isLongDuration = true;
             ++tourIndex[0];
             break;
@@ -1931,29 +1992,83 @@ public class TourManager {
 
          try {
 
-            final IRunnableWithProgress saveRunnable = new IRunnableWithProgress() {
+            final IRunnableWithProgress runnable = new IRunnableWithProgress() {
                @Override
                public void run(final IProgressMonitor monitor)
                      throws InvocationTargetException, InterruptedException {
+
+                  /*
+                   * Setup concurrency
+                   */
+                  _loadingTour_CountDownLatch = new CountDownLatch(numTourIds - tourIndex[0]);
+                  _loadingTour_Queue.clear();
+
+                  final ConcurrentHashMap<Long, TourData> allTourData_Concurrent = new ConcurrentHashMap<>();
+
+                  /*
+                   * Setup monitor
+                   */
+                  long lastUpdateTime = startTime;
+
+                  final AtomicInteger numWorkedTours = new AtomicInteger(tourIndex[0]);
+                  int numLastWorked = 0;
 
                   monitor.beginTask(Messages.Tour_Data_LoadTourData_Monitor, numTourIds);
 
                   while (tourIndex[0] < numTourIds) {
 
-                     monitor.subTask(NLS.bind(Messages.Tour_Data_LoadTourData_Monitor_SubTask,
-                           ++loadCounter[0],
-                           numTourIds));
-
                      if (monitor.isCanceled()) {
+
+                        /*
+                         * Count down all, that the loading task can finish but process loaded tours
+                         */
+                        long numCounts = _loadingTour_CountDownLatch.getCount();
+                        while (numCounts-- > 0) {
+                           _loadingTour_CountDownLatch.countDown();
+                        }
+
                         break;
                      }
 
-                     final Long tourId = allTourIds.get(tourIndex[0]);
-                     loadTourData_OneTour(tourId, allTourData, isCheckLatLon, newOverlayKey);
+                     /*
+                      * Update monitor
+                      */
+                     final long currentTime = System.currentTimeMillis();
+                     final long timeDiff = currentTime - lastUpdateTime;
 
-                     monitor.worked(1);
+                     // reduce logging
+                     if (timeDiff > 500) {
+
+                        lastUpdateTime = currentTime;
+
+                        final int numWorked = numWorkedTours.get();
+
+                        // "{0} / {1} - {2} % - {3} Δ"
+                        UI.showWorkedInProgressMonitor(monitor, numWorked, numTourIds, numLastWorked);
+
+                        numLastWorked = numWorked;
+                     }
+
+                     final Long tourId = allTourIds.get(tourIndex[0]);
+
+                     loadTourData_Concurrent(
+
+                           tourId,
+                           allTourData_Concurrent,
+                           numWorkedTours,
+                           isCheckLatLon,
+                           newOverlayKey,
+                           monitor);
 
                      ++tourIndex[0];
+                  }
+
+                  // wait until all loadings are performed
+                  _loadingTour_CountDownLatch.await();
+
+                  // add new loaded tours
+                  for (final Entry<Long, TourData> entry : allTourData_Concurrent.entrySet()) {
+                     allTourData.add(entry.getValue());
                   }
                }
             };
@@ -1962,25 +2077,75 @@ public class TourManager {
              * Ensure to run in the app shell that a slideoutshell can get hidden without hiding the
              * progress dialog, complicated !
              */
-            new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, saveRunnable);
+            new ProgressMonitorDialog(TourbookPlugin.getAppShell()).run(true, true, runnable);
 
          } catch (final InvocationTargetException | InterruptedException e) {
             StatusUtil.showStatus(e);
+            Thread.currentThread().interrupt();
          }
       }
 
       _allLoaded_TourIds_Hash = allTourIds.hashCode();
       _allLoaded_TourData = allTourData;
       _allLoaded_TourData_Hash = allTourData.hashCode();
-      _allLoaded_TourData_Key = newOverlayKey[0];
+      _allLoaded_TourData_Key = newOverlayKey.get();
 
       return _allLoaded_TourData_Key;
+   }
+
+   private static void loadTourData_Concurrent(final Long tourId,
+                                               final ConcurrentHashMap<Long, TourData> allTourData_Concurrent,
+                                               final AtomicInteger numWorkedTours,
+                                               final boolean isCheckLatLon,
+                                               final AtomicLong newOverlayKey,
+                                               final IProgressMonitor monitor) {
+
+      try {
+
+         // put tour ID (queue item) into the queue AND wait when it is full
+
+         _loadingTour_Queue.put(tourId);
+
+      } catch (final InterruptedException e) {
+
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      _loadingTour_Executor.submit(() -> {
+
+         try {
+
+            // get last added item
+            final Long queueItem_TourId = _loadingTour_Queue.poll();
+
+            if (queueItem_TourId != null) {
+
+               loadTourData_OneTour_Concurrent(
+
+                     queueItem_TourId,
+                     allTourData_Concurrent,
+                     isCheckLatLon,
+                     newOverlayKey);
+            }
+
+         } finally {
+
+            if (monitor != null) {
+               monitor.worked(1);
+            }
+
+            numWorkedTours.incrementAndGet();
+
+            _loadingTour_CountDownLatch.countDown();
+         }
+      });
    }
 
    private static void loadTourData_OneTour(final Long tourId,
                                             final List<TourData> allTourData,
                                             final boolean isCheckLatLon,
-                                            final long[] newOverlayKey) {
+                                            final AtomicLong newOverlayKey) {
 
       final TourData tourData = getInstance().getTourData(tourId);
 
@@ -1997,7 +2162,31 @@ public class TourManager {
          allTourData.add(tourData);
 
          // update key for all tours
-         newOverlayKey[0] += tourData.getTourId();
+         newOverlayKey.getAndAdd(tourData.getTourId());
+      }
+   }
+
+   private static void loadTourData_OneTour_Concurrent(final Long tourId,
+                                                       final ConcurrentHashMap<Long, TourData> allTourData,
+                                                       final boolean isCheckLatLon,
+                                                       final AtomicLong newOverlayKey) {
+
+      final TourData tourData = getInstance().getTourData(tourId);
+
+      if (tourData == null) {
+
+         // this happened when switching tour type during normal startup but all was not yet loaded
+
+         return;
+      }
+
+      if (isCheckLatLon == false || isLatLonAvailable(tourData)) {
+
+         // keep tour data for each tour id
+         allTourData.put(tourData.getTourId(), tourData);
+
+         // update key for all tours
+         newOverlayKey.getAndAdd(tourData.getTourId());
       }
    }
 
@@ -2068,12 +2257,16 @@ public class TourManager {
                                        final boolean isRemoveTime,
                                        final boolean isAdjustTourStartTime) {
 
-      if (isRemoveTime || (isRemoveTime && isAdjustTourStartTime)) {
+      // this must be done with the original timeSerie
+      removeTourPauses(tourData, firstIndex, lastIndex, isRemoveTime);
 
-         // this must be done before the time series are modified
-
-         removeTimeSlices_TimeAndDistance(tourData, firstIndex, lastIndex, isAdjustTourStartTime);
-      }
+      // this must be done before the time series are modified
+      removeTimeSlices_TimeAndDistance(
+            tourData,
+            firstIndex,
+            lastIndex,
+            isRemoveTime,
+            isAdjustTourStartTime);
 
       short[] shortSerie;
       int[] intSerie;
@@ -2348,25 +2541,32 @@ public class TourManager {
    private static void removeTimeSlices_TimeAndDistance(final TourData tourData,
                                                         final int firstIndex,
                                                         final int lastIndex,
+                                                        final boolean isRemoveTime,
                                                         final boolean isAdjustTourStartTime) {
 
       final int[] timeSerie = tourData.timeSerie;
       final float[] distSerie = tourData.distanceSerie;
 
-      if ((timeSerie == null) || (timeSerie.length == 0)) {
+      if (timeSerie == null || timeSerie.length == 0) {
          return;
       }
 
       /*
-       * check if lastIndex is the last time slice, this will already remove time and distance
+       * Check if lastIndex is the last time slice, this will already remove time and distance
        */
       if (lastIndex == timeSerie.length - 1) {
          return;
       }
 
-      final int timeDiff = timeSerie[lastIndex + 1] - timeSerie[firstIndex];
-      float distDiff = -1;
+      final int timeFirstIndex = timeSerie[firstIndex];
+      final int timeNextIndex = timeSerie[lastIndex + 1];
 
+      int timeDiff = 0;
+      if (isRemoveTime) {
+         timeDiff = timeNextIndex - timeFirstIndex;
+      }
+
+      float distDiff = -1;
       if (distSerie != null) {
          distDiff = distSerie[lastIndex + 1] - distSerie[firstIndex];
       }
@@ -2374,14 +2574,16 @@ public class TourManager {
       // update remaining time and distance data series
       for (int serieIndex = lastIndex + 1; serieIndex < timeSerie.length; serieIndex++) {
 
-         timeSerie[serieIndex] = timeSerie[serieIndex] - timeDiff;
+         if (isRemoveTime) {
+            timeSerie[serieIndex] = timeSerie[serieIndex] - timeDiff;
+         }
 
          if (distDiff != -1) {
             distSerie[serieIndex] = distSerie[serieIndex] - distDiff;
          }
       }
 
-      if (isAdjustTourStartTime) {
+      if (isRemoveTime && isAdjustTourStartTime) {
 
          final ZonedDateTime tourStartTime = tourData.getTourStartTime();
          final ZonedDateTime newTourStartTime = tourStartTime.plusSeconds(timeDiff);
@@ -2411,7 +2613,7 @@ public class TourManager {
       }
 
       /*
-       * remove deleted markers
+       * Remove deleted markers
        */
       final TourMarker[] markerCloneList = allTourMarkers.toArray(new TourMarker[allTourMarkers.size()]);
       for (final TourMarker tourMarker : markerCloneList) {
@@ -2424,7 +2626,7 @@ public class TourManager {
       }
 
       /*
-       * update marker index in the remaining markers
+       * Update marker index in the remaining markers
        */
       final int diffSerieIndex = lastSerieIndex - firstSerieIndex + 1;
       final long tourStartTimeMS = tourData.getTourStartTimeMS();
@@ -2458,49 +2660,136 @@ public class TourManager {
    }
 
    /**
+    * Remove tour pauses and adjust the paused times when <code>isRemoveTime == true</code>
+    *
     * @param tourData
+    * @param firstRemovedIndex
+    *           First index which is removed
+    * @param lastRemovedIndex
+    *           Last index which is removed
+    * @param isRemoveTime
+    */
+   private static void removeTourPauses(final TourData tourData,
+                                        final int firstRemovedIndex,
+                                        final int lastRemovedIndex,
+                                        final boolean isRemoveTime) {
+      // TODO Auto-generated method stub
+
+      final int[] timeSerie = tourData.timeSerie;
+      final long[] allPausedTime_Start = tourData.getPausedTime_Start();
+
+      if (timeSerie == null
+            || timeSerie.length == 0
+            || allPausedTime_Start == null
+            || allPausedTime_Start.length == 0) {
+
+         // there are no time slices or tour pauses -> nothing to do
+
+         return;
+      }
+
+      final int numPauses = allPausedTime_Start.length;
+      final int numTimeSlices = timeSerie.length;
+
+      final long[] allPausedTime_End = tourData.getPausedTime_End();
+      final long tourStartTime = tourData.getTourStartTimeMS();
+
+      final int lastRemovedIndexForDiff = Math.min(lastRemovedIndex + 1, numTimeSlices - 1);
+
+      final long sliceTime_RemoveStart = timeSerie[firstRemovedIndex];
+      final long sliceTime_RemoveEnd = timeSerie[lastRemovedIndex];
+      final long sliceTime_RemoveEndDiff = timeSerie[lastRemovedIndexForDiff];
+
+      final long removedTimeDiff = sliceTime_RemoveEndDiff - sliceTime_RemoveStart;
+
+      final TLongArrayList allPausedTimeAdjusted_Start = new TLongArrayList();
+      final TLongArrayList allPausedTimeAdjusted_End = new TLongArrayList();
+
+      // loop: all pauses
+      for (int pauseIndex = 0; pauseIndex < numPauses; pauseIndex++) {
+
+         final long pauseTime_StartMS = allPausedTime_Start[pauseIndex];
+         final long pauseTime_EndMS = allPausedTime_End[pauseIndex];
+
+         long pauseTime_Start = (pauseTime_StartMS - tourStartTime) / 1000;
+         long pauseTime_End = (pauseTime_EndMS - tourStartTime) / 1000;
+
+         if (pauseTime_Start < sliceTime_RemoveStart) {
+
+            // pauses are before the removed slices -> they will be unmodified
+
+            allPausedTimeAdjusted_Start.add(pauseTime_StartMS);
+            allPausedTimeAdjusted_End.add(pauseTime_EndMS);
+
+         } else if (pauseTime_Start > sliceTime_RemoveEnd) {
+
+            // pauses are after the removed slices -> adjust time when requested
+
+            if (isRemoveTime) {
+
+               pauseTime_Start -= removedTimeDiff;
+               pauseTime_End -= removedTimeDiff;
+            }
+
+            allPausedTimeAdjusted_Start.add(tourStartTime + pauseTime_Start * 1000);
+            allPausedTimeAdjusted_End.add(tourStartTime + pauseTime_End * 1000);
+         }
+      }
+
+      // update model
+      tourData.setPausedTime_Start(allPausedTimeAdjusted_Start.toArray());
+      tourData.setPausedTime_End(allPausedTimeAdjusted_End.toArray());
+   }
+
+   /**
+    * @param tourDataList
     * @return Returns <code>true</code> when the tour is modified, otherwise <code>false</code>.
     */
-   public static boolean retrieveWeatherData(final TourData tourData) {
+   public static List<TourData> retrieveWeatherData(final List<TourData> tourDataList) {
 
-      // ensure data is available
-      if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
+      final List<TourData> modifiedTours = new ArrayList<>();
 
-         TourLogManager.subLog_ERROR(String.format(
-               LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
-               getTourDateTimeShort(tourData)));
-
-         return false;
+      if (tourDataList == null || tourDataList.size() == 0) {
+         return modifiedTours;
       }
 
-      final WeatherData historicalWeatherData = new HistoricalWeatherRetriever(tourData).retrieveHistoricalWeatherData().getHistoricalWeatherData();
-      if (historicalWeatherData == null) {
+      TourLogManager.showLogView();
+      final long start = System.currentTimeMillis();
 
-         TourLogManager.subLog_ERROR(NLS.bind(
-               Messages.Dialog_RetrieveWeather_WeatherDataNotFound,
-               TourManager.getTourDateTimeShort(tourData)));
+      BusyIndicator.showWhile(Display.getCurrent(),
+            () -> {
 
-         return false;
-      }
+               final String weatherProvider = _prefStore.getString(
+                     ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID);
 
-      tourData.setIsWeatherDataFromApi(true);
+               TourLogManager.subLog_INFO(NLS.bind(
+                     LOG_RETRIEVE_WEATHER_DATA_001_START,
+                     weatherProvider));
 
-      tourData.setAvgTemperature(historicalWeatherData.getTemperatureAverage());
-      tourData.setWeatherWindSpeed(historicalWeatherData.getWindSpeed());
-      tourData.setWeatherWindDir(historicalWeatherData.getWindDirection());
-      tourData.setWeather(historicalWeatherData.getWeatherDescription());
-      tourData.setWeatherClouds(historicalWeatherData.getWeatherType());
+               for (final TourData tourData : tourDataList) {
 
-      tourData.setWeather_Humidity((short) historicalWeatherData.getAverageHumidity());
-      tourData.setWeather_Precipitation(historicalWeatherData.getPrecipitation());
-      tourData.setWeather_Pressure((short) historicalWeatherData.getAveragePressure());
-      tourData.setWeather_Temperature_Max(historicalWeatherData.getTemperatureMax());
-      tourData.setWeather_Temperature_Min(historicalWeatherData.getTemperatureMin());
-      tourData.setWeather_Temperature_WindChill(historicalWeatherData.getWindChill());
+                  // ensure data is available
+                  if (tourData.latitudeSerie == null || tourData.longitudeSerie == null) {
 
-      TourLogManager.subLog_OK(getTourDateTimeShort(tourData));
+                     TourLogManager.subLog_ERROR(String.format(
+                           LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE,
+                           getTourDateTimeShort(tourData)));
 
-      return true;
+                     continue;
+                  }
+
+                  if (TourWeatherRetriever.retrieveWeatherData(tourData, weatherProvider)) {
+
+                     modifiedTours.add(tourData);
+                  }
+               }
+            });
+
+      TourLogManager.subLog_INFO(String.format(
+            LOG_RETRIEVE_WEATHER_DATA_002_END,
+            (System.currentTimeMillis() - start) / 1000.0));
+
+      return modifiedTours;
    }
 
    /**
@@ -2551,7 +2840,7 @@ public class TourManager {
     *           modified tours
     * @return Returns a list with all persisted {@link TourData}
     */
-   public static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours) {
+   public static ArrayList<TourData> saveModifiedTours(final List<TourData> modifiedTours) {
       return saveModifiedTours(modifiedTours, true);
    }
 
@@ -2568,7 +2857,7 @@ public class TourManager {
     *           when <code>true</code>, a notification is fired when the data are saved
     * @return a list with all persisted {@link TourData}
     */
-   private static ArrayList<TourData> saveModifiedTours(final ArrayList<TourData> modifiedTours,
+   private static ArrayList<TourData> saveModifiedTours(final List<TourData> modifiedTours,
                                                         final boolean canFireNotification) {
 
       // reset multiple tour data cache
@@ -2623,6 +2912,7 @@ public class TourManager {
 
          } catch (final InvocationTargetException | InterruptedException e) {
             StatusUtil.showStatus(e);
+            Thread.currentThread().interrupt();
          }
       }
 
@@ -2754,7 +3044,7 @@ public class TourManager {
       yData.setRgbBar_Line(new RGB[] { rgbLineColor });
    }
 
-   public static boolean setElevationValuesFromSRTM(final ArrayList<TourData> allTourData) {
+   public static boolean setElevationValuesFromSRTM(final List<TourData> allTourData) {
 
       if (allTourData == null || allTourData.isEmpty()) {
          return false;
@@ -2780,7 +3070,7 @@ public class TourManager {
 
          for (final TourData tourData : allTourData) {
 
-            final boolean isReplaced = tourData.replaceAltitudeWithSRTM();
+            final boolean isReplaced = tourData.replaceAltitudeWithSRTM(true);
 
             returnValue[0] = returnValue[0] || isReplaced;
          }
@@ -2841,7 +3131,7 @@ public class TourManager {
       tourSerieIndex = multipleStartTimeIndex[tourIndex];
       numberOfMultiMarkers = multipleNumberOfMarkers[tourIndex];
 
-      final ArrayList<TourMarker> allTourMarkers = tourData.multiTourMarkers;
+      final ArrayList<TourMarker> allTourMarkers = tourData.multipleTourMarkers;
 
       for (int markerIndex = 0; markerIndex < allTourMarkers.size(); markerIndex++) {
 
@@ -2921,7 +3211,7 @@ public class TourManager {
             final TourPhoto tourPhoto = new TourPhoto(tourData, selectedPhoto);
 
             // set adjusted time / geo location
-            tourPhoto.setAdjustedTime(selectedPhoto.adjustedTimeLink);
+            tourPhoto.setAdjustedTime(selectedPhoto.adjustedTime_Camera);
             tourPhoto.setGeoLocation(
                   selectedPhoto.getLinkLatitude(),
                   selectedPhoto.getLinkLongitude());
@@ -3191,7 +3481,7 @@ public class TourManager {
       if (deviceTimeInterval > 0) {
 
          /*
-          * clipping for constanct time intervals
+          * clipping for constant time intervals
           */
 
          final int slices = Math.max(1, clippingTime / deviceTimeInterval);
@@ -3601,7 +3891,7 @@ public class TourManager {
          tourData.clearComputedSeries();
       }
 
-      tourData.computeSpeedSerie();
+      tourData.computeSpeedSeries();
       tourData.computeAltimeterGradientSerie();
 
       computeValueClipping(tourData);
@@ -3752,18 +4042,20 @@ public class TourManager {
 
 // SET_FORMATTING_OFF
 
-      final ChartDataYSerie yDataElevation      = createModelData_Elevation(  tourData, chartDataModel, chartType, useCustomBackground, tcc);
-      final ChartDataYSerie yDataPulse          = createModelData_Heartbeat(  tourData, chartDataModel, chartType, useCustomBackground, tcc, isShowTimeOnXAxis);
-      final ChartDataYSerie yDataSpeed          = createModelData_Speed(      tourData, chartDataModel, chartType, useCustomBackground);
-      final ChartDataYSerie yDataPace           = createModelData_Pace(       tourData, chartDataModel, chartType, useCustomBackground);
-      final ChartDataYSerie yDataPower          = createModelData_Power(      tourData, chartDataModel, chartType, useCustomBackground);
-      final ChartDataYSerie yDataAltimeter      = createModelData_Altimeter(  tourData, chartDataModel, chartType, useCustomBackground);
-      final ChartDataYSerie yDataGradient       = createModelData_Gradient(   tourData, chartDataModel, chartType, useCustomBackground);
-      final ChartDataYSerie yDataCadence        = createModelData_Cadence(    tourData, chartDataModel, chartType, useCustomBackground);
-      final ChartDataYSerie yDataGears          = createModelData_Gears(      tourData, chartDataModel);
-      final ChartDataYSerie yDataTemperature    = createModelData_Temperature(tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yDataElevation         = createModelData_Elevation(        tourData, chartDataModel, chartType, useCustomBackground, tcc);
+      final ChartDataYSerie yDataPulse             = createModelData_Heartbeat(        tourData, chartDataModel, chartType, useCustomBackground, tcc, isShowTimeOnXAxis);
+      final ChartDataYSerie yDataSpeed             = createModelData_Speed(            tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yDataSpeed_Summarized  = createModelData_Speed_Summarized( tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yDataPace              = createModelData_Pace(             tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yDataPace_Summarized   = createModelData_Pace_Summarized(  tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yDataPower             = createModelData_Power(            tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yDataAltimeter         = createModelData_Altimeter(        tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yDataGradient          = createModelData_Gradient(         tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yDataCadence           = createModelData_Cadence(          tourData, chartDataModel, chartType, useCustomBackground);
+      final ChartDataYSerie yDataGears             = createModelData_Gears(            tourData, chartDataModel);
+      final ChartDataYSerie yDataTemperature       = createModelData_Temperature(      tourData, chartDataModel, chartType, useCustomBackground);
 
-      final ChartDataYSerie yDataTourCompare    = createModelData_TourCompare(tourData, chartDataModel, chartType, tcc);
+      final ChartDataYSerie yDataTourCompare       = createModelData_TourCompare(tourData, chartDataModel, chartType, tcc);
 
       final ChartDataYSerie yData_RunDyn_StanceTime            = createModelData_RunDyn_StanceTime(         tourData, chartDataModel, chartType, useCustomBackground);
       final ChartDataYSerie yData_RunDyn_StanceTimeBalance     = createModelData_RunDyn_StanceTimeBalance(  tourData, chartDataModel, chartType, useCustomBackground);
@@ -3804,10 +4096,24 @@ public class TourManager {
             }
             break;
 
+         case GRAPH_SPEED_SUMMARIZED:
+            if (yDataSpeed != null) {
+               chartDataModel.addYData(yDataSpeed_Summarized);
+               chartDataModel.setCustomData(CUSTOM_DATA_SPEED_SUMMARIZED, yDataSpeed_Summarized);
+            }
+            break;
+
          case GRAPH_PACE:
             if (yDataPace != null) {
                chartDataModel.addYData(yDataPace);
                chartDataModel.setCustomData(CUSTOM_DATA_PACE, yDataPace);
+            }
+            break;
+
+         case GRAPH_PACE_SUMMARIZED:
+            if (yDataPace != null) {
+               chartDataModel.addYData(yDataPace_Summarized);
+               chartDataModel.setCustomData(CUSTOM_DATA_PACE, yDataPace_Summarized);
             }
             break;
 
@@ -3962,10 +4268,24 @@ public class TourManager {
       return new ChartDataYSerie(chartType, dataSerie);
    }
 
+   /**
+    * 0 values will be ignored when computing min/maxvalues.
+    *
+    * @param dataSerie
+    * @param chartType
+    * @return
+    */
    private ChartDataYSerie createChartDataSerieNoZero(final float[] dataSerie, final ChartType chartType) {
       return new ChartDataYSerie(chartType, dataSerie, true);
    }
 
+   /**
+    * 0 values will be ignored when computing min/maxvalues.
+    *
+    * @param dataSerie
+    * @param chartType
+    * @return
+    */
    private ChartDataYSerie createChartDataSerieNoZero(final float[][] dataSerie, final ChartType chartType) {
       return new ChartDataYSerie(chartType, dataSerie, true);
    }
@@ -4117,7 +4437,7 @@ public class TourManager {
 
             if (tcc.isSRTMDataVisible) {
 
-               final float[] srtmDataSerie = tourData.getSRTMSerie();
+               final float[] srtmDataSerie = tourData.getSRTMSerie(tcc.isShowSrtm1Values);
                if (srtmDataSerie != null) {
 
                   // create altitude dataserie and adjust min/max values with with the srtm values
@@ -4134,7 +4454,7 @@ public class TourManager {
          }
 
          if (yDataElevation == null) {
-            yDataElevation = createChartDataSerie(altitudeSerie, chartType);
+            yDataElevation = createChartDataSerieNoZero(altitudeSerie, chartType);
          }
 
          yDataElevation.setYTitle(GRAPH_LABEL_ALTITUDE);
@@ -4323,7 +4643,7 @@ public class TourManager {
             final TFloatArrayList yData_PulseTime = new TFloatArrayList((int) (numRRTimes * 1.05));
 
             /**
-             * Syncronize 2 time series which can contain gaps
+             * Synchronize 2 time series which can contain gaps
              *
              * <pre>
              *
@@ -4630,8 +4950,10 @@ public class TourManager {
                                                 final ChartDataModel chartDataModel,
                                                 final ChartType chartType,
                                                 final boolean useGraphBgStyle) {
-      final float[] paceSerie = tourData.getPaceSerieSeconds();
+
       ChartDataYSerie yDataPace = null;
+
+      final float[] paceSerie = tourData.getPaceSerieSeconds();
       if (paceSerie != null) {
 
          yDataPace = createChartDataSerieNoZero(paceSerie, chartType);
@@ -4643,6 +4965,55 @@ public class TourManager {
          yDataPace.setSliderLabelFormat(ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS);
          yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE);
          yDataPace.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Pace, 1));
+         yDataPace.setYAxisDirection(!_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED));
+
+         if (useGraphBgStyle) {
+            yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+         } else {
+            yDataPace.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+         }
+
+         setGraphColors(yDataPace, GraphColorManager.PREF_GRAPH_PACE);
+         chartDataModel.addXyData(yDataPace);
+
+         // adjust min/max values when it's defined in the pref store
+         setVisibleForcedValues(
+               yDataPace,
+               60,
+               0,
+               ITourbookPreferences.GRAPH_PACE_IS_MIN_ENABLED,
+               ITourbookPreferences.GRAPH_PACE_IS_MAX_ENABLED,
+               ITourbookPreferences.GRAPH_PACE_MIN_VALUE,
+               ITourbookPreferences.GRAPH_PACE_MAX_VALUE);
+      }
+
+      return yDataPace;
+   }
+
+   /**
+    * Pace summarized average
+    */
+   private ChartDataYSerie createModelData_Pace_Summarized(final TourData tourData,
+                                                           final ChartDataModel chartDataModel,
+                                                           final ChartType chartType,
+                                                           final boolean useGraphBgStyle) {
+
+      ChartDataYSerie yDataPace = null;
+
+      final float[] paceSerie = tourData.getPaceSerie_Summarized_Seconds();
+      if (paceSerie != null) {
+
+         final TourChartAnalyzerInfo analyzerInfo = new TourChartAnalyzerInfo(true, false, null, 1);
+
+         yDataPace = createChartDataSerieNoZero(paceSerie, chartType);
+
+         yDataPace.setYTitle(GRAPH_LABEL_PACE_SUMMARIZED);
+         yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
+         yDataPace.setShowYSlider(true);
+         yDataPace.setAxisUnit(ChartDataSerie.AXIS_UNIT_MINUTE_SECOND);
+         yDataPace.setSliderLabelFormat(ChartDataYSerie.SLIDER_LABEL_FORMAT_MM_SS);
+         yDataPace.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PACE_SUMMARIZED);
+         yDataPace.setCustomData(CUSTOM_DATA_ANALYZER_INFO, analyzerInfo);
          yDataPace.setYAxisDirection(!_prefStore.getBoolean(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED));
 
          if (useGraphBgStyle) {
@@ -4943,8 +5314,9 @@ public class TourManager {
                                                  final ChartType chartType,
                                                  final boolean useGraphBgStyle) {
 
-      final float[] speedSerie = tourData.getSpeedSerie();
       ChartDataYSerie yDataSpeed = null;
+
+      final float[] speedSerie = tourData.getSpeedSerie();
       if (speedSerie != null) {
 
          yDataSpeed = createChartDataSerieNoZero(speedSerie, chartType);
@@ -4955,6 +5327,53 @@ public class TourManager {
          yDataSpeed.setDisplayedFractionalDigits(1);
          yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED);
          yDataSpeed.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, true, _computeAvg_Speed, 1));
+
+         if (useGraphBgStyle) {
+            yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
+         } else {
+            yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
+         }
+
+         setGraphColors(yDataSpeed, GraphColorManager.PREF_GRAPH_SPEED);
+         chartDataModel.addXyData(yDataSpeed);
+
+         // adjust  min/max values when it's defined in the pref store
+         setVisibleForcedValues(
+               yDataSpeed,
+               1,
+               0,
+               ITourbookPreferences.GRAPH_SPEED_IS_MIN_ENABLED,
+               ITourbookPreferences.GRAPH_SPEED_IS_MAX_ENABLED,
+               ITourbookPreferences.GRAPH_SPEED_MIN_VALUE,
+               ITourbookPreferences.GRAPH_SPEED_MAX_VALUE);
+      }
+
+      return yDataSpeed;
+   }
+
+   /**
+    * Speed summarized average
+    */
+   private ChartDataYSerie createModelData_Speed_Summarized(final TourData tourData,
+                                                            final ChartDataModel chartDataModel,
+                                                            final ChartType chartType,
+                                                            final boolean useGraphBgStyle) {
+
+      ChartDataYSerie yDataSpeed = null;
+
+      final float[] speedSerie = tourData.getSpeedSerie_Summarized();
+      if (speedSerie != null) {
+
+         final TourChartAnalyzerInfo analyzerInfo = new TourChartAnalyzerInfo(true, true, null, 2);
+
+         yDataSpeed = createChartDataSerieNoZero(speedSerie, chartType);
+
+         yDataSpeed.setYTitle(GRAPH_LABEL_SPEED_SUMMARIZED);
+         yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
+         yDataSpeed.setShowYSlider(true);
+         yDataSpeed.setDisplayedFractionalDigits(2);
+         yDataSpeed.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SPEED_SUMMARIZED);
+         yDataSpeed.setCustomData(CUSTOM_DATA_ANALYZER_INFO, analyzerInfo);
 
          if (useGraphBgStyle) {
             yDataSpeed.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_CUSTOM);
@@ -5145,19 +5564,6 @@ public class TourManager {
    }
 
    /**
-    * Fills a list with {@link TourData} from it's id's.
-    *
-    * @param allTourData
-    * @param tourIds
-    */
-   public void getTourData(final ArrayList<TourData> allTourData, final ArrayList<Long> tourIds) {
-
-      for (final Long tourId : tourIds) {
-         allTourData.add(getTourData(tourId));
-      }
-   }
-
-   /**
     * @param tourIds
     * @return Returns a list with {@link TourData} for all tour ids. <code>Null</code> is returned
     *         when {@link TourData} are not available.
@@ -5174,6 +5580,19 @@ public class TourManager {
       }
 
       return tourDataList.isEmpty() ? null : tourDataList;
+   }
+
+   /**
+    * Fills a list with {@link TourData} from it's id's.
+    *
+    * @param allTourData
+    * @param tourIds
+    */
+   public void getTourData(final List<TourData> allTourData, final List<Long> tourIds) {
+
+      for (final Long tourId : tourIds) {
+         allTourData.add(getTourData(tourId));
+      }
    }
 
    /**
@@ -5506,10 +5925,10 @@ public class TourManager {
 
          } else {
 
-            yData.forceYAxisMaxValue(
-                  maxValue > 0 //
-                        ? maxValue - maxValueAdjustment
-                        : maxValue + maxValueAdjustment);
+            yData.forceYAxisMaxValue(maxValue > 0
+
+                  ? maxValue - maxValueAdjustment
+                  : maxValue + maxValueAdjustment);
          }
       }
    }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,7 +16,6 @@
 package net.tourbook.ui.tourChart;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
@@ -205,7 +204,7 @@ public class ChartPauseToolTip extends AnimatedToolTipShell implements ITourProv
 
       if (_tourData.isMultipleTours()) {
 
-         labelBuilder.append(DateTimeFormatter.ofPattern("yyyy-MM-dd").format(tourZonedDateTime)); //$NON-NLS-1$
+         labelBuilder.append(TimeTools.Formatter_YearMonthDay.format(tourZonedDateTime));
       }
 
       final String format_hh_mm_ss = UI.format_hh_mm_ss(

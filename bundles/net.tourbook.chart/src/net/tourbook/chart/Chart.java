@@ -49,9 +49,7 @@ public class Chart extends ViewForm {
    private static final String                       ACTION_ID_MOVE_RIGHT_SLIDER_HERE = "ACTION_ID_MOVE_RIGHT_SLIDER_HERE"; //$NON-NLS-1$
    private static final String                       ACTION_ID_MOVE_SLIDERS_TO_BORDER = "ACTION_ID_MOVE_SLIDERS_TO_BORDER"; //$NON-NLS-1$
    private static final String                       ACTION_ID_ZOOM_FIT_GRAPH         = "ACTION_ID_ZOOM_FIT_GRAPH";         //$NON-NLS-1$
-   private static final String                       ACTION_ID_ZOOM_IN                = "ACTION_ID_ZOOM_IN";                //$NON-NLS-1$
    private static final String                       ACTION_ID_ZOOM_IN_TO_SLIDER      = "ACTION_ID_ZOOM_IN_TO_SLIDER";      //$NON-NLS-1$
-   private static final String                       ACTION_ID_ZOOM_OUT               = "ACTION_ID_ZOOM_OUT";               //$NON-NLS-1$
 
    static final int                                  NO_BAR_SELECTION                 = -1;
 
@@ -82,6 +80,8 @@ public class Chart extends ViewForm {
    private final ListenerList<ISliderMoveListener>   _sliderMoveListeners             = new ListenerList<>();
 
    private ActionMouseWheelMode                      _action_MouseWheelMode;
+   private ActionZoomIn                              _action_ZoomIn;
+   private ActionZoomOut                             _action_ZoomOut;
 
    private ChartComponents                           _chartComponents;
 
@@ -279,14 +279,14 @@ public class Chart extends ViewForm {
       _allChartActions = new HashMap<>();
 
       _action_MouseWheelMode = new ActionMouseWheelMode(this);
+      _action_ZoomIn = new ActionZoomIn(this);
+      _action_ZoomOut = new ActionZoomOut(this);
 
       _allChartActions.put(ACTION_ID_MOVE_LEFT_SLIDER_HERE, new ActionMoveLeftSliderHere(this));
       _allChartActions.put(ACTION_ID_MOVE_RIGHT_SLIDER_HERE, new ActionMoveRightSliderHere(this));
       _allChartActions.put(ACTION_ID_MOVE_SLIDERS_TO_BORDER, new ActionMoveSlidersToBorder(this));
       _allChartActions.put(ACTION_ID_ZOOM_FIT_GRAPH, new ActionZoomFitGraph(this));
-      _allChartActions.put(ACTION_ID_ZOOM_IN, new ActionZoomIn(this));
       _allChartActions.put(ACTION_ID_ZOOM_IN_TO_SLIDER, new ActionZoomToSlider(this));
-      _allChartActions.put(ACTION_ID_ZOOM_OUT, new ActionZoomOut(this));
 
       enableActions();
    }
@@ -371,8 +371,8 @@ public class Chart extends ViewForm {
       final boolean canZoomOut = chartComponentGraph.getZoomRatio() > 1;
       final boolean canZoomIn = chartComponentGraph.getXXDevGraphWidth() < ChartComponents.CHART_MAX_WIDTH;
 
-      _allChartActions.get(ACTION_ID_ZOOM_IN).setEnabled(canZoomIn);
-      _allChartActions.get(ACTION_ID_ZOOM_OUT).setEnabled(canZoomOut);
+      _action_ZoomIn.setEnabled(canZoomIn);
+      _action_ZoomOut.setEnabled(canZoomOut);
 
       // zoom in to slider has no limits but when there are more than 10000 units, the units are not displayed
       _allChartActions.get(ACTION_ID_ZOOM_IN_TO_SLIDER).setEnabled(true);
@@ -505,8 +505,8 @@ public class Chart extends ViewForm {
 
             tbm.add(new Separator());
 
-            tbm.add(_allChartActions.get(ACTION_ID_ZOOM_IN));
-            tbm.add(_allChartActions.get(ACTION_ID_ZOOM_OUT));
+            tbm.add(_action_ZoomIn);
+            tbm.add(_action_ZoomOut);
          }
 
          if (refreshToolbar) {
@@ -515,7 +515,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   void fireBarSelectionEvent(final int serieIndex, final int valueIndex) {
+   void fireEvent_BarSelection(final int serieIndex, final int valueIndex) {
 
       _barSelectionSerieIndex = serieIndex;
       _barSelectionValueIndex = valueIndex;
@@ -527,7 +527,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   void fireChartDoubleClick(final int serieIndex, final int valueIndex) {
+   void fireEvent_ChartDoubleClick(final int serieIndex, final int valueIndex) {
 
       _barSelectionSerieIndex = serieIndex;
       _barSelectionValueIndex = valueIndex;
@@ -539,7 +539,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   private void fireChartMouseEvent(final ChartMouseEvent mouseEvent) {
+   private void fireEvent_ChartMouse(final ChartMouseEvent mouseEvent) {
 
       final Object[] listeners = _chartMouseListener.getListeners();
       for (final Object listener : listeners) {
@@ -579,7 +579,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   private void fireChartMouseMoveEvent(final ChartMouseEvent mouseEvent) {
+   private void fireEvent_ChartMouseMove(final ChartMouseEvent mouseEvent) {
 
       final Object[] listeners = _chartMouseMoveListener.getListeners();
       for (final Object listener : listeners) {
@@ -592,7 +592,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   void fireHoveredValueEvent(final int hoveredValuePointIndex) {
+   void fireEvent_HoveredValue(final int hoveredValuePointIndex) {
 
       final Object[] allListeners = _chartHoveredValueListener.getListeners();
 
@@ -601,7 +601,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   private void fireKeyEvent(final ChartKeyEvent keyEvent) {
+   private void fireEvent_Key(final ChartKeyEvent keyEvent) {
 
       final Object[] listeners = _chartKeyListener.getListeners();
       for (final Object listener : listeners) {
@@ -621,7 +621,7 @@ public class Chart extends ViewForm {
       }
    }
 
-   public void fireSliderMoveEvent() {
+   public void fireEvent_SliderMove() {
 
       if (_isInUpdateUI) {
          return;
@@ -881,7 +881,7 @@ public class Chart extends ViewForm {
 
    void onExternalChartResize() {
 
-      fireChartMouseEvent(
+      fireEvent_ChartMouse(
             new ChartMouseEvent(//
                   Chart.ChartResized,
                   System.currentTimeMillis(),
@@ -893,7 +893,7 @@ public class Chart extends ViewForm {
 
       final ChartKeyEvent keyEvent = new ChartKeyEvent(Chart.KeyDown, event.keyCode, event.stateMask);
 
-      fireKeyEvent(keyEvent);
+      fireEvent_Key(keyEvent);
 
       return keyEvent;
    }
@@ -906,7 +906,7 @@ public class Chart extends ViewForm {
             devXMouse,
             devYMouse);
 
-      fireChartMouseEvent(event);
+      fireEvent_ChartMouse(event);
 
       return event;
    }
@@ -918,14 +918,14 @@ public class Chart extends ViewForm {
 
       final ChartMouseEvent event = new ChartMouseEvent(Chart.MouseDown, eventTime, devXMouse, devYMouse, stateMask);
 
-      fireChartMouseEvent(event);
+      fireEvent_ChartMouse(event);
 
       return event;
    }
 
    void onExternalMouseExit(final long eventTime) {
 
-      fireChartMouseEvent(new ChartMouseEvent(Chart.MouseExit, eventTime, 0, 0));
+      fireEvent_ChartMouse(new ChartMouseEvent(Chart.MouseExit, eventTime, 0, 0));
    }
 
    ChartMouseEvent onExternalMouseMove(final long eventTime, final int devXMouse, final int devYMouse) {
@@ -936,7 +936,7 @@ public class Chart extends ViewForm {
             devXMouse,
             devYMouse);
 
-      fireChartMouseEvent(event);
+      fireEvent_ChartMouse(event);
 
       return event;
    }
@@ -949,7 +949,7 @@ public class Chart extends ViewForm {
             devXMouse,
             devYMouse);
 
-      fireChartMouseMoveEvent(event);
+      fireEvent_ChartMouseMove(event);
 
       return event;
    }
@@ -962,7 +962,7 @@ public class Chart extends ViewForm {
             devXMouse,
             devYMouse);
 
-      fireChartMouseEvent(event);
+      fireEvent_ChartMouse(event);
 
       return event;
    }
@@ -1135,6 +1135,10 @@ public class Chart extends ViewForm {
       graphTransparencyAdjustment = adjustment;
    }
 
+   public void setHovered_ValuePoint_Index(final int hoveredValuePointIndex) {
+      _chartComponents.getChartComponentGraph().setHovered_ValuePoint_Index(hoveredValuePointIndex);
+   }
+
    /**
     * Set hovered tour in the {@link ChartComponentGraph}.
     *
@@ -1194,7 +1198,7 @@ public class Chart extends ViewForm {
 
       _chartComponents.getChartComponentGraph().setSelectedBars(selectedItems);
 
-      fireBarSelectionEvent(0, _barSelectionValueIndex);
+      fireEvent_BarSelection(0, _barSelectionValueIndex);
    }
 
    public void setSelectedLines(final boolean isSelectionVisible) {
@@ -1321,9 +1325,15 @@ public class Chart extends ViewForm {
     */
    public void setZoomActionsEnabled(final boolean isEnabled) {
 
+      final ChartComponentGraph chartComponentGraph = _chartComponents.getChartComponentGraph();
+
+      final boolean canZoomIn = chartComponentGraph.getXXDevGraphWidth() < ChartComponents.CHART_MAX_WIDTH;
+      final boolean canZoomOut = chartComponentGraph.getZoomRatio() > 1;
+
+      _action_ZoomIn.setEnabled(canZoomIn && isEnabled);
+      _action_ZoomOut.setEnabled(canZoomOut);
+
       _allChartActions.get(ACTION_ID_ZOOM_FIT_GRAPH).setEnabled(isEnabled);
-      _allChartActions.get(ACTION_ID_ZOOM_IN).setEnabled(isEnabled);
-      _allChartActions.get(ACTION_ID_ZOOM_OUT).setEnabled(isEnabled);
    }
 
    public void switchSlidersTo2ndXData() {
@@ -1417,7 +1427,7 @@ public class Chart extends ViewForm {
       }
 
       // update chart info view
-      fireSliderMoveEvent();
+      fireEvent_SliderMove();
    }
 
    /**

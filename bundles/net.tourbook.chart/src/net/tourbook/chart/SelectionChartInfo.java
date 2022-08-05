@@ -15,22 +15,26 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
+import net.tourbook.common.UI;
+
 import org.eclipse.jface.viewers.ISelection;
 
 public class SelectionChartInfo implements ISelection {
 
-   private Chart           _chart;
+   private static final char NL = UI.NEW_LINE;
 
-   public ChartDataModel   chartDataModel;
-   public ChartDrawingData chartDrawingData;
+   private Chart             _chart;
 
-   public int              leftSliderValuesIndex;
-   public int              rightSliderValuesIndex;
+   public ChartDataModel     chartDataModel;
+   public ChartDrawingData   chartDrawingData;
+
+   public int                leftSliderValuesIndex;
+   public int                rightSliderValuesIndex;
 
    /**
     * contains the value index for the slider which is selected
     */
-   public int              selectedSliderValuesIndex;
+   public int                selectedSliderValuesIndex;
 
    @SuppressWarnings("unused")
    private SelectionChartInfo() {}
@@ -50,14 +54,21 @@ public class SelectionChartInfo implements ISelection {
 
    @Override
    public String toString() {
-      return "SelectionChartInfo [" //$NON-NLS-1$
-//				+ ("_chart=" + _chart + ", ")
-//				+ ("chartDataModel=" + chartDataModel + ", ")
-//				+ ("chartDrawingData=" + chartDrawingData + ", ")
-            + ("leftSliderValuesIndex=" + leftSliderValuesIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("rightSliderValuesIndex=" + rightSliderValuesIndex + ", ") //$NON-NLS-1$ //$NON-NLS-2$
-            + ("selectedSliderValuesIndex=" + selectedSliderValuesIndex) //$NON-NLS-1$
-            //
+
+      return UI.EMPTY_STRING
+
+            + "SelectionChartInfo" + NL //$NON-NLS-1$
+
+            + "[" + NL //$NON-NLS-1$
+
+//            + "   _chart                     =" + _chart + "" + NL //$NON-NLS-1$ //$NON-NLS-2$
+//            + "   chartDataModel             =" + chartDataModel + "" + NL //$NON-NLS-1$ //$NON-NLS-2$
+//            + "   chartDrawingData           =" + chartDrawingData + "" + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   leftSliderValuesIndex      =" + leftSliderValuesIndex + "" + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   rightSliderValuesIndex     =" + rightSliderValuesIndex + "" + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + "   selectedSliderValuesIndex  =" + selectedSliderValuesIndex + NL //$NON-NLS-1$
+
             + "]"; //$NON-NLS-1$
    }
+
 }

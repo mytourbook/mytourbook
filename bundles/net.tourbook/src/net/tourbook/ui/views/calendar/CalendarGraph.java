@@ -3152,10 +3152,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
          boolean isInDayArea = false;
 
          // check if mouse is in the areas which contains the days
-         for (final Rectangle dateRectangle : _calendarAllDaysRectangle) {
-            if (dateRectangle.contains(mousePosition)) {
-               isInDayArea = true;
-               break;
+         if (_calendarAllDaysRectangle != null) {
+
+            for (final Rectangle dateRectangle : _calendarAllDaysRectangle) {
+               if (dateRectangle.contains(mousePosition)) {
+                  isInDayArea = true;
+                  break;
+               }
             }
          }
 

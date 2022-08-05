@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2014  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -24,178 +24,192 @@ import net.tourbook.common.util.StatusUtil;
  */
 public class Map3ColorProfile extends MapColorProfile implements Cloneable {
 
-	private static final String	PROFILE_NAME_DEFAULT	= Messages.Map3_Color_ProfileName_Default;
-	public static final String	PROFILE_NAME_NEW		= Messages.Map3_Color_ProfileName_New;
+   private static final String NL                   = UI.NEW_LINE1;
 
-	/**
-	 * Unique id to identify a color profile.
-	 */
-	private int					_profileId;
+   private static final String PROFILE_NAME_DEFAULT = Messages.Map3_Color_ProfileName_Default;
+   public static final String  PROFILE_NAME_NEW     = Messages.Map3_Color_ProfileName_New;
 
-	/**
-	 * Name which is visible in the UI.
-	 */
-	private String				_profileName			= PROFILE_NAME_DEFAULT;
+   private static int          _idCounter           = 0;
 
-	private ProfileImage		_profileImage			= new Map3ProfileImage();
+   /**
+    * Unique id to identify a color profile.
+    */
+   private int                 _profileId;
 
-	/**
-	 * When <code>true</code>, the vertex values in {@link #_profileImage} are absolute, otherwise
-	 * they are relative.
-	 */
-	private boolean				_isAbsoluteValues;
+   /**
+    * Name which is visible in the UI.
+    */
+   private String              _profileName         = PROFILE_NAME_DEFAULT;
 
-	private boolean				_isActiveColorProfile;
-	private boolean				_isOverwriteLegendValues;
+   private ProfileImage        _profileImage        = new Map3ProfileImage();
 
-	private static int			_idCounter				= 0;
+   /**
+    * When <code>true</code>, the vertex values in {@link #_profileImage} are absolute, otherwise
+    * they are relative.
+    */
+   private boolean             _isAbsoluteValues;
 
-	public Map3ColorProfile() {
+   private boolean             _isActiveColorProfile;
+   private boolean             _isOverwriteLegendValues;
 
-		_profileId = createProfileId();
-	}
+   public Map3ColorProfile() {
 
-	/**
-	 * @param isValueAbsolute
-	 * @param rgbVertices
-	 * @param minBrightness
-	 * @param minBrightnessFactor
-	 * @param maxBrightness
-	 * @param maxBrightnessFactor
-	 */
-	public Map3ColorProfile(final String profileName,
-							final boolean isValueAbsolute,
-							final boolean isOverwriteLegendValues,
-							final RGBVertex[] rgbVertices,
-							final int minBrightness,
-							final int minBrightnessFactor,
-							final int maxBrightness,
-							final int maxBrightnessFactor) {
+      _profileId = createProfileId();
+   }
 
-		this();
+   /**
+    * @param profileName
+    * @param isValueAbsolute
+    * @param isOverwriteLegendValues
+    * @param rgbVertices
+    * @param minBrightness
+    * @param minBrightnessFactor
+    * @param maxBrightness
+    * @param maxBrightnessFactor
+    */
+   public Map3ColorProfile(final String profileName,
+                           final boolean isValueAbsolute,
+                           final boolean isOverwriteLegendValues,
+                           final RGBVertex[] rgbVertices,
+                           final int minBrightness,
+                           final int minBrightnessFactor,
+                           final int maxBrightness,
+                           final int maxBrightnessFactor) {
 
-		_profileName = profileName;
+      this();
 
-		_isAbsoluteValues = isValueAbsolute;
-		_isOverwriteLegendValues = isOverwriteLegendValues;
+      _profileName = profileName;
 
-		_profileImage.setVertices(rgbVertices);
+      _isAbsoluteValues = isValueAbsolute;
+      _isOverwriteLegendValues = isOverwriteLegendValues;
 
-		this.minBrightness = minBrightness;
-		this.minBrightnessFactor = minBrightnessFactor;
-		this.maxBrightness = maxBrightness;
-		this.maxBrightnessFactor = maxBrightnessFactor;
-	}
+      _profileImage.setVertices(rgbVertices);
 
-	@Override
-	public Map3ColorProfile clone() {
+      this.minBrightness = minBrightness;
+      this.minBrightnessFactor = minBrightnessFactor;
+      this.maxBrightness = maxBrightness;
+      this.maxBrightnessFactor = maxBrightnessFactor;
+   }
 
-		Map3ColorProfile clonedObject = null;
+   @Override
+   public Map3ColorProfile clone() {
 
-		try {
+      Map3ColorProfile clonedObject = null;
 
-			clonedObject = (Map3ColorProfile) super.clone();
+      try {
 
-			clonedObject._profileId = createProfileId();
-			clonedObject._profileName = new String(_profileName);
+         clonedObject = (Map3ColorProfile) super.clone();
 
-			clonedObject._profileImage = _profileImage.clone();
+         clonedObject._profileId = createProfileId();
+         clonedObject._profileName = new String(_profileName);
 
-		} catch (final CloneNotSupportedException e) {
-			StatusUtil.log(e);
-		}
+         clonedObject._profileImage = _profileImage.clone();
 
-		return clonedObject;
-	}
+      } catch (final CloneNotSupportedException e) {
+         StatusUtil.log(e);
+      }
 
-	/**
-	 * @return Returns a unique id.
-	 */
-	private int createProfileId() {
+      return clonedObject;
+   }
 
-		return ++_idCounter;
-	}
+   /**
+    * @return Returns a unique id.
+    */
+   private int createProfileId() {
 
-	@Override
-	public boolean equals(final Object obj) {
+      return ++_idCounter;
+   }
 
-		if (this == obj) {
-			return true;
-		}
-		if (obj == null) {
-			return false;
-		}
-		if (!(obj instanceof Map3ColorProfile)) {
-			return false;
-		}
-		final Map3ColorProfile other = (Map3ColorProfile) obj;
-		if (_profileId != other._profileId) {
-			return false;
-		}
-		return true;
-	}
+   @Override
+   public boolean equals(final Object obj) {
 
-	public int getProfileId() {
-		return _profileId;
-	}
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (!(obj instanceof Map3ColorProfile)) {
+         return false;
+      }
+      final Map3ColorProfile other = (Map3ColorProfile) obj;
+      if (_profileId != other._profileId) {
+         return false;
+      }
+      return true;
+   }
 
-	public ProfileImage getProfileImage() {
-		return _profileImage;
-	}
+   public int getProfileId() {
+      return _profileId;
+   }
 
-	public String getProfileName() {
-		return _profileName;
-	}
+   public ProfileImage getProfileImage() {
+      return _profileImage;
+   }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + _profileId;
-		return result;
-	}
+   public String getProfileName() {
+      return _profileName;
+   }
 
-	public boolean isAbsoluteValues() {
-		return _isAbsoluteValues;
-	}
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + _profileId;
+      return result;
+   }
 
-	public boolean isActiveColorProfile() {
-		return _isActiveColorProfile;
-	}
+   public boolean isAbsoluteValues() {
+      return _isAbsoluteValues;
+   }
 
-	public boolean isOverwriteLegendValues() {
-		return _isOverwriteLegendValues;
-	}
+   public boolean isActiveColorProfile() {
+      return _isActiveColorProfile;
+   }
 
-	public void setDuplicatedName() {
+   public boolean isOverwriteLegendValues() {
+      return _isOverwriteLegendValues;
+   }
 
-		_profileName = _profileName + UI.SPACE + getProfileId();
-	}
+   public void setDuplicatedName() {
 
-	public void setIsAbsoluteValues(final boolean isAbsoluteValues) {
-		_isAbsoluteValues = isAbsoluteValues;
-	}
+      _profileName = _profileName + UI.SPACE + getProfileId();
+   }
 
-	public void setIsActiveColorProfile(final boolean isActiveColorProfile) {
-		_isActiveColorProfile = isActiveColorProfile;
-	}
+   public void setIsAbsoluteValues(final boolean isAbsoluteValues) {
+      _isAbsoluteValues = isAbsoluteValues;
+   }
 
-	public void setIsOverwriteLegendValues(final boolean isOverwriteLegendValues) {
-		_isOverwriteLegendValues = isOverwriteLegendValues;
-	}
+   public void setIsActiveColorProfile(final boolean isActiveColorProfile) {
+      _isActiveColorProfile = isActiveColorProfile;
+   }
 
-	public void setProfileName(final String name) {
-		_profileName = name;
-	}
+   public void setIsOverwriteLegendValues(final boolean isOverwriteLegendValues) {
+      _isOverwriteLegendValues = isOverwriteLegendValues;
+   }
 
-	@Override
-	public String toString() {
-		return String.format(
-				"Map3ColorProfile [_profileId=%s, _profileName=%s, _isActiveColorProfile=%s, _profileImage=%s]", //$NON-NLS-1$
-				_profileId,
-				_profileName,
-				_isActiveColorProfile,
-				_profileImage);
-	}
+   public void setProfileName(final String name) {
+      _profileName = name;
+   }
+
+   @Override
+   public String toString() {
+
+      return UI.EMPTY_STRING
+
+            + "Map3ColorProfile" + NL //                                         //$NON-NLS-1$
+
+            + "[" + NL //                                                        //$NON-NLS-1$
+
+            + "_profileId                 =" + _profileId + NL //                //$NON-NLS-1$
+            + "_profileName               =" + _profileName + NL //              //$NON-NLS-1$
+            + "_isActiveColorProfile      =" + _isActiveColorProfile + NL //     //$NON-NLS-1$
+            + "_isAbsoluteValues          =" + _isAbsoluteValues + NL //         //$NON-NLS-1$
+            + "_isOverwriteLegendValues   =" + _isOverwriteLegendValues + NL //  //$NON-NLS-1$
+            + "_profileImage              =" + _profileImage + NL //             //$NON-NLS-1$
+
+            + "]" + NL //                                                        //$NON-NLS-1$
+      ;
+   }
 
 }

@@ -8,12 +8,12 @@
    <modelVersion>4.0.0</modelVersion>
 
    <artifactId>mytourbook-bundles</artifactId>     <groupId>net.tourbook</groupId>
-                                                   <version>21.9.0-SNAPSHOT</version>
+                                                   <version>22.8.0-SNAPSHOT</version>
    <packaging>pom</packaging>
 
    <parent>
       <artifactId>mytourbook-app</artifactId>      <groupId>net.tourbook</groupId>
-                                                   <version>21.9.0-SNAPSHOT</version>
+                                                   <version>22.8.0-SNAPSHOT</version>
 
       <relativePath>../../MT/mytourbook/pom.xml</relativePath>
    </parent>
@@ -35,6 +35,7 @@
       <module>net.tourbook.printing</module>
       <module>net.tourbook.statistics</module>
       <module>net.tourbook.tests</module>
+      <module>net.tourbook.ui.tests</module>
       <module>net.tourbook.web</module>
 
       <module>net.tourbook.ext.apache</module>

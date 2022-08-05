@@ -2,99 +2,127 @@
 <classpath>
 	<classpathentry kind="output" path="bin/default"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11/"/>
-	<classpathentry kind="lib" path="libs/vtm-desktop-lwjgl.jar" exported="true" sourcepath="/vtm-desktop-lwjgl"/>
-	<classpathentry kind="lib" path="libs/vtm-desktop.jar" exported="true" sourcepath="/vtm-desktop"/>
-	<classpathentry kind="lib" path="libs/vtm-gdx.jar" exported="true" sourcepath="/vtm-gdx"/>
-	<classpathentry kind="lib" path="libs/vtm-http.jar" exported="true" sourcepath="/vtm-http"/>
-	<classpathentry kind="lib" path="libs/vtm-mvt.jar" exported="true" sourcepath="/vtm-mvt"/>
-	<classpathentry kind="lib" path="libs/vtm-themes.jar" exported="true" sourcepath="/vtm-themes"/>
-	<classpathentry kind="lib" path="libs/vtm.jar" exported="true" sourcepath="/vtm"/>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-simple/1.7.25/af3cd3ad1ea4b08b27b54f12529b4bf343bc5ca1/slf4j-simple-1.7.25-sources.jar" kind="lib" path="libs/slf4j-simple-1.7.25.jar" exported="true">
+	<classpathentry kind="lib" path="libs/vtm-desktop-lwjgl.jar" exported="true" sourcepath="/vtm-parent/vtm-desktop-lwjgl">
+		<attributes>
+			<attribute name="without_test_code" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/vtm-desktop.jar" exported="true" sourcepath="/vtm-parent/vtm-desktop">
+		<attributes>
+			<attribute name="without_test_code" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/vtm-gdx.jar" exported="true" sourcepath="/vtm-parent/vtm-gdx">
+		<attributes>
+			<attribute name="without_test_code" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/vtm-http.jar" exported="true" sourcepath="/vtm-parent/vtm-http">
+		<attributes>
+			<attribute name="without_test_code" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/vtm-mvt.jar" exported="true" sourcepath="/vtm-parent/vtm-mvt">
+		<attributes>
+			<attribute name="without_test_code" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/vtm-themes.jar" exported="true" sourcepath="/vtm-parent/vtm-themes">
+		<attributes>
+			<attribute name="without_test_code" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/vtm.jar" exported="true" sourcepath="/vtm-parent/vtm/src">
+		<attributes>
+			<attribute name="without_test_code" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-simple/1.7.25/af3cd3ad1ea4b08b27b54f12529b4bf343bc5ca1/slf4j-simple-1.7.25-sources.jar" kind="lib" path="libs/slf4j-simple-1.7.25.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/logging-interceptor/3.14.1/cd77025d82d0391206e684bc47a6f7133ec90e45/logging-interceptor-3.14.1-sources.jar" kind="lib" path="libs/logging-interceptor-3.14.1.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/logging-interceptor/3.14.1/cd77025d82d0391206e684bc47a6f7133ec90e45/logging-interceptor-3.14.1-sources.jar" kind="lib" path="libs/logging-interceptor-3.14.1.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/net.sf.kxml/kxml2/2.3.0/309cd2cff7260e465792fda3dcbb063b730d8050/kxml2-2.3.0-sources.jar" kind="lib" path="libs/kxml2-2.3.0.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/net.sf.kxml/kxml2/2.3.0/309cd2cff7260e465792fda3dcbb063b730d8050/kxml2-2.3.0-sources.jar" kind="lib" path="libs/kxml2-2.3.0.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/com.wdtinc/mapbox-vector-tile/3.1.0/1a9e67cc9e1cd590030ec7277560454bfa7ec04d/mapbox-vector-tile-3.1.0-sources.jar" kind="lib" path="libs/mapbox-vector-tile-3.1.0.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.wdtinc/mapbox-vector-tile/3.1.0/1a9e67cc9e1cd590030ec7277560454bfa7ec04d/mapbox-vector-tile-3.1.0-sources.jar" kind="lib" path="libs/mapbox-vector-tile-3.1.0.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.28/6444f3c8fce32e20f621e264807256c5e65f11c9/slf4j-api-1.7.28-sources.jar" kind="lib" path="libs/slf4j-api-1.7.28.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.28/6444f3c8fce32e20f621e264807256c5e65f11c9/slf4j-api-1.7.28-sources.jar" kind="lib" path="libs/slf4j-api-1.7.28.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/com.formdev/svgSalamander/1.1.2.4/97af14bc9e35d3a9a94c40da498ea7f2cfda3b1a/svgSalamander-1.1.2.4-sources.jar" kind="lib" path="libs/svgSalamander-1.1.2.4.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.formdev/svgSalamander/1.1.3/2dbdfd5d9251b87988566cc16f0596c593c94b42/svgSalamander-1.1.3-sources.jar" kind="lib" path="libs/svgSalamander-1.1.3.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-backend-lwjgl/1.9.10/bc819db135041daf18548095a4224fdf91128d4c/gdx-backend-lwjgl-1.9.10-sources.jar" kind="lib" path="libs/gdx-backend-lwjgl-1.9.10.jar" exported="true">
+	<classpathentry kind="lib" path="libs/gdx-backend-lwjgl-1.9.10.jar" exported="true" sourcepath="/gdx-backend-lwjgl/src">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.9.10/37e7ec91522313dabc753c72196dd665ea4a9332/gdx-1.9.10-sources.jar" kind="lib" path="libs/gdx-1.9.10.jar" exported="true">
+	<classpathentry kind="lib" path="libs/gdx-1.9.10.jar" exported="true" sourcepath="/gdx/src">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.14.1/f8319293dad84c8ac79282b26d835f6edb9f637d/okhttp-3.14.1-sources.jar" kind="lib" path="libs/okhttp-3.14.1.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.14.1/f8319293dad84c8ac79282b26d835f6edb9f637d/okhttp-3.14.1-sources.jar" kind="lib" path="libs/okhttp-3.14.1.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/org.lwjgl.lwjgl/lwjgl_util/2.9.3/ca58b77b6393794ca34e12b32e9c6d9c912acb3/lwjgl_util-2.9.3-sources.jar" kind="lib" path="libs/lwjgl_util-2.9.3.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.lwjgl.lwjgl/lwjgl_util/2.9.3/ca58b77b6393794ca34e12b32e9c6d9c912acb3/lwjgl_util-2.9.3-sources.jar" kind="lib" path="libs/lwjgl_util-2.9.3.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/org.lwjgl.lwjgl/lwjgl/2.9.3/34682f36cee6cded40df9829bb352f2bdce5b14e/lwjgl-2.9.3-sources.jar" kind="lib" path="libs/lwjgl-2.9.3.jar" exported="true">
+	<classpathentry kind="lib" path="libs/lwjgl-2.9.3.jar" exported="true" sourcepath="/lwjgl-2.9.3/lwjgl-source-2.9.3.zip">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/com.badlogicgames.jlayer/jlayer/1.0.1-gdx/f1c4ffebc5e4f68be914404faab580c20de8ea1f/jlayer-1.0.1-gdx-sources.jar" kind="lib" path="libs/jlayer-1.0.1-gdx.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.badlogicgames.jlayer/jlayer/1.0.1-gdx/f1c4ffebc5e4f68be914404faab580c20de8ea1f/jlayer-1.0.1-gdx-sources.jar" kind="lib" path="libs/jlayer-1.0.1-gdx.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/org.jcraft/jorbis/0.0.17/5446be5d62e4c6b347c8e6cd28dc00a936417ba2/jorbis-0.0.17-sources.jar" kind="lib" path="libs/jorbis-0.0.17.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.jcraft/jorbis/0.0.17/5446be5d62e4c6b347c8e6cd28dc00a936417ba2/jorbis-0.0.17-sources.jar" kind="lib" path="libs/jorbis-0.0.17.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/com.google.protobuf/protobuf-java/3.5.1/7235a28a13938050e8cd5d9ed5133bebf7a4dca7/protobuf-java-3.5.1-sources.jar" kind="lib" path="libs/protobuf-java-3.5.1.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.google.protobuf/protobuf-java/3.5.1/7235a28a13938050e8cd5d9ed5133bebf7a4dca7/protobuf-java-3.5.1-sources.jar" kind="lib" path="libs/protobuf-java-3.5.1.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/org.locationtech.jts/jts-core/1.15.1/a010464b3384702a79ecda2239ccfa3e9400f9e3/jts-core-1.15.1-sources.jar" kind="lib" path="libs/jts-core-1.15.1.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.locationtech.jts/jts-core/1.15.1/a010464b3384702a79ecda2239ccfa3e9400f9e3/jts-core-1.15.1-sources.jar" kind="lib" path="libs/jts-core-1.15.1.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.17.2/331ecaeba2fd87c06a0766e8ebe718e1e294f27d/okio-1.17.2-sources.jar" kind="lib" path="libs/okio-1.17.2.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.17.2/331ecaeba2fd87c06a0766e8ebe718e1e294f27d/okio-1.17.2-sources.jar" kind="lib" path="libs/okio-1.17.2.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/net.java.jinput/jinput/2.0.5/82604cfeb87b9ab70ed70aa19a137de8ceb21504/jinput-2.0.5-sources.jar" kind="lib" path="libs/jinput-2.0.5.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/net.java.jinput/jinput/2.0.5/82604cfeb87b9ab70ed70aa19a137de8ceb21504/jinput-2.0.5-sources.jar" kind="lib" path="libs/jinput-2.0.5.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="/home/top/.gradle/caches/modules-2/files-2.1/net.java.jutils/jutils/1.0.0/d18678a00b216863206a1bb6190507e02a32971b/jutils-1.0.0-sources.jar" kind="lib" path="libs/jutils-1.0.0.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/net.java.jutils/jutils/1.0.0/d18678a00b216863206a1bb6190507e02a32971b/jutils-1.0.0-sources.jar" kind="lib" path="libs/jutils-1.0.0.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -63,6 +63,7 @@ import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
@@ -80,11 +81,12 @@ import org.xml.sax.Attributes;
 
 public class Util {
 
-   // public static final String UNIQUE_ID_SUFFIX_CICLO_TOUR          = "83582";           //$NON-NLS-1$
+// public static final String UNIQUE_ID_SUFFIX_CICLO_TOUR          = "83582"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GARMIN_FIT          = "12653"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GARMIN_TCX          = "42984"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_GPX                 = "31683"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_MIO_105             = "10500"; //$NON-NLS-1$
+   public static final String UNIQUE_ID_SUFFIX_MT                  = "74953"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_NMEA                = "32481"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_POLAR_HRM           = "63193"; //$NON-NLS-1$
    public static final String UNIQUE_ID_SUFFIX_POLAR_PDD           = "76913"; //$NON-NLS-1$
@@ -96,7 +98,7 @@ public class Util {
    public static final String UNIQUE_ID_SUFFIX_SUUNTOQUEST         = "41502"; //$NON-NLS-1$
 
    /*
-    * Default xml tags
+    * Default XML tags
     */
    private static final String TAG_ITEM   = "item";  //$NON-NLS-1$
    private static final String TAG_LIST   = "list";  //$NON-NLS-1$
@@ -105,7 +107,7 @@ public class Util {
    private static final String ATTR_VALUE = "value"; //$NON-NLS-1$
 
    /*
-    * default xml attributes
+    * default XML attributes
     */
    public static final String ATTR_ROOT_DATETIME          = "Created";                                 //$NON-NLS-1$
    public static final String ATTR_ROOT_VERSION_MAJOR     = "VersionMajor";                            //$NON-NLS-1$
@@ -148,7 +150,7 @@ public class Util {
    }
 
    /**
-    * Revers an array sort order.
+    * Reverse an array sort order.
     *
     * @param arr
     * @return
@@ -168,7 +170,7 @@ public class Util {
    }
 
    /**
-    * Clear all selection providers in all workench pages.
+    * Clear all selection providers in all workbench pages.
     */
    public static void clearSelection() {
 
@@ -219,7 +221,7 @@ public class Util {
 
    /**
     * @param os
-    * @return Returns <code>false</code> when an exception occures.
+    * @return Returns <code>false</code> when an exception occurs.
     */
    public static boolean close(final OutputStream os) {
 
@@ -292,7 +294,7 @@ public class Util {
 
    /**
     * @param text
-    * @return Returns MD5 for the text or <code>null</code> when an error occures.
+    * @return Returns MD5 for the text or <code>null</code> when an error occurs.
     */
    public static String computeMD5(final String text) {
 
@@ -427,7 +429,7 @@ public class Util {
     * @param allTexts
     * @return
     */
-   public static String convertListToString(final ArrayList<String> allTexts) {
+   public static String convertListToString(final List<String> allTexts) {
 
       if (allTexts == null) {
          return UI.EMPTY_STRING;
@@ -474,7 +476,7 @@ public class Util {
    }
 
    /**
-    * Converts a comma-seaparated string into a list of strings.
+    * Converts a comma-separated string into a list of strings.
     *
     * @param text
     * @return
@@ -977,24 +979,6 @@ public class Util {
       sw.flush();
 
       return sw.toString();
-   }
-
-   /**
-    * @param state
-    * @param key
-    * @param defaultValue
-    * @return Returns a string value from {@link IDialogSettings}. When the key is not found, the
-    *         default value is returned.
-    */
-   public static String[] getStateArray(final IDialogSettings state, final String key, final String[] defaultValue) {
-
-      if (state == null) {
-         return defaultValue;
-      }
-
-      final String[] stateValue = state.getArray(key);
-
-      return stateValue == null ? defaultValue : stateValue;
    }
 
    /**
@@ -1528,6 +1512,13 @@ public class Util {
       return value;
    }
 
+   /**
+    * @param <E>
+    * @param xml
+    * @param attrName
+    * @param defaultValue
+    * @return
+    */
    public static <E extends Enum<E>> Enum<E> getXmlEnum(final IMemento xml,
                                                         final String attrName,
                                                         final Enum<E> defaultValue) {
@@ -1688,7 +1679,7 @@ public class Util {
    }
 
    /**
-    * Get long array from xml list/item tags.
+    * Get long array from XML list/item tags.
     *
     * @param memento
     * @param listKeyName
@@ -1851,6 +1842,11 @@ public class Util {
             propertyDescription));
    }
 
+   public static boolean parseBoolean(final String textValue) {
+
+      return Boolean.valueOf(textValue);
+   }
+
    /**
     * Parses SAX attribute
     *
@@ -1872,6 +1868,10 @@ public class Util {
       return Double.MIN_VALUE;
    }
 
+   /**
+    * @param textValue
+    * @return Parsed value or {@link Double#MIN_VALUE} when not available
+    */
    public static double parseDouble(final String textValue) {
 
       try {
@@ -1883,6 +1883,43 @@ public class Util {
 
       } catch (final NumberFormatException e) {
          return Double.MIN_VALUE;
+      }
+   }
+
+   /**
+    * @param textValue
+    * @param defaultValue
+    * @return Parsed value or default when not available
+    */
+   public static double parseDouble(final String textValue, final double defaultValue) {
+
+      try {
+         if (textValue != null) {
+            return Double.parseDouble(textValue);
+         } else {
+            return defaultValue;
+         }
+
+      } catch (final NumberFormatException e) {
+         return defaultValue;
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or 0 when not available
+    */
+   public static double parseDouble_0(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Double.parseDouble(textValue);
+         } else {
+            return 0;
+         }
+
+      } catch (final NumberFormatException e) {
+         return 0;
       }
    }
 
@@ -1907,6 +1944,10 @@ public class Util {
       return Float.MIN_VALUE;
    }
 
+   /**
+    * @param textValue
+    * @return Parsed value or {@link Float#MIN_VALUE} when not available
+    */
    public static float parseFloat(final String textValue) {
 
       try {
@@ -1918,6 +1959,61 @@ public class Util {
 
       } catch (final NumberFormatException e) {
          return Float.MIN_VALUE;
+      }
+   }
+
+   /**
+    * @param textValue
+    * @param defaultValue
+    * @return Parsed value or default when not available
+    */
+   public static float parseFloat(final String textValue, final float defaultValue) {
+
+      try {
+         if (textValue != null) {
+            return Float.parseFloat(textValue);
+         } else {
+            return defaultValue;
+         }
+
+      } catch (final NumberFormatException e) {
+         return defaultValue;
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or 0 when not available
+    */
+   public static float parseFloat_0(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Float.parseFloat(textValue);
+         } else {
+            return 0;
+         }
+
+      } catch (final NumberFormatException e) {
+         return 0;
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or -1 when not available
+    */
+   public static float parseFloat_n1(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Float.parseFloat(textValue);
+         } else {
+            return -1;
+         }
+
+      } catch (final NumberFormatException e) {
+         return -1;
       }
    }
 
@@ -1963,6 +2059,70 @@ public class Util {
    }
 
    /**
+    * @param textValue
+    * @param defaultValue
+    * @return Parsed value or defaultValue when not available
+    */
+   public static int parseInt(final String textValue, final int defaultValue) {
+
+      try {
+         if (textValue != null) {
+            return Integer.parseInt(textValue);
+         } else {
+            return defaultValue;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (int) parseFloat(textValue, defaultValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or 0 when not available
+    */
+   public static int parseInt_0(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Integer.parseInt(textValue);
+         } else {
+            return 0;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (int) parseFloat_0(textValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or -1 when not available
+    */
+   public static int parseInt_n1(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Integer.parseInt(textValue);
+         } else {
+            return -1;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (int) parseFloat_n1(textValue);
+      }
+   }
+
+   /**
     * Parses SAX attribute
     *
     * @param attributes
@@ -2004,6 +2164,111 @@ public class Util {
          // do nothing
       }
       return Long.MIN_VALUE;
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or {@link Long#MIN_VALUE} when not available
+    */
+   public static long parseLong(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Long.parseLong(textValue);
+         } else {
+            return Long.MIN_VALUE;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (long) parseFloat(textValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or 0 when not available
+    */
+   public static long parseLong_0(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Long.parseLong(textValue);
+         } else {
+            return 0;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (long) parseFloat_0(textValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or -1 when not available
+    */
+   public static long parseLong_n1(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Long.parseLong(textValue);
+         } else {
+            return -1;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (long) parseFloat_n1(textValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or 0 when not available
+    */
+   public static short parseShort_0(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Short.parseShort(textValue);
+         } else {
+            return 0;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (short) parseFloat_0(textValue);
+      }
+   }
+
+   /**
+    * @param textValue
+    * @return Parsed value or -1 when not available
+    */
+   public static short parseShort_n1(final String textValue) {
+
+      try {
+         if (textValue != null) {
+            return Short.parseShort(textValue);
+         } else {
+            return -1;
+         }
+
+      } catch (final NumberFormatException e) {
+
+         // try to parse as float value
+
+         return (short) parseFloat_n1(textValue);
+      }
    }
 
    /**
@@ -2504,7 +2769,16 @@ public class Util {
 
    public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
                                                        final String stateKey,
-                                                       final ArrayList<E> allValues) {
+                                                       final Enum<E> value) {
+
+      if (value != null) {
+         state.put(stateKey, value.name());
+      }
+   }
+
+   public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
+                                                       final String stateKey,
+                                                       final List<E> allValues) {
 
       final ArrayList<String> allEnumNames = new ArrayList<>();
 
@@ -2517,15 +2791,6 @@ public class Util {
 
       if (allEnumNames.size() > 0) {
          state.put(stateKey, allEnumNames.toArray(new String[allEnumNames.size()]));
-      }
-   }
-
-   public static <E extends Enum<E>> void setStateEnum(final IDialogSettings state,
-                                                       final String key,
-                                                       final Enum<E> value) {
-
-      if (value != null) {
-         state.put(key, value.name());
       }
    }
 
@@ -2567,7 +2832,7 @@ public class Util {
    }
 
    /**
-    * Set values into xml list/item tags.
+    * Set values into XML list/item tags.
     *
     * @param memento
     * @param listKeyName
@@ -2603,6 +2868,12 @@ public class Util {
       }
 
       return xmlColorTag;
+   }
+
+   public static void showOrHidePassword(final Text text, final boolean showPassword) {
+
+      final char character = showPassword ? '\0' : 0x25cf;
+      text.setEchoChar(character);
    }
 
    /**

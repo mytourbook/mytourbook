@@ -1,0 +1,87 @@
+22.1.0                                                  14. January 2022
+
+
+New
+===
+
+* MyTourbook for Windows is now bundled with a Java runtime as an 
+  additional download. Wrong Java version issues, should now be history 
+  https://github.com/mytourbook/mytourbook/issues/381
+
+
+Improvements
+============
+
+* Tour Chart
+  - Filter tour pauses                             
+    https://github.com/mytourbook/mytourbook/issues/428
+
+  - Stack tour pauses that they don't overlap      
+    https://github.com/mytourbook/mytourbook/issues/428
+  
+                              
+
+* 2D Map
+  - Filter tour pauses                             
+    https://github.com/mytourbook/mytourbook/issues/428
+    
+  - Tour breadcrumbs                               
+    https://github.com/mytourbook/mytourbook/issues/431
+    
+  - Update tour geo filter default location and zoom level 
+    https://github.com/mytourbook/mytourbook/issues/433
+
+* Tour Segmenter
+  - Recompute segments when time in preferences to compute speed/pace is 
+    modified
+
+
+Changes
+=======
+
+* Reverted feature: Repair close button in all views
+
+  The command line parameter "-DsetAllViewsClosable=false" will now 
+  disable the experimental feature which was introduced in version 21.9. 
+  When this value is not set in the command line, then the close button 
+  will be repaired in all views when the application is closing.
+
+
+Bugfix
+======
+
+* Strava Integration: (Frederic)       
+  - Manually created activities use different activity types than 
+    uploaded activities
+    Official activity types list: 
+    https://developers.strava.com/docs/reference/#api-models-ActivityType
+
+* Tour Chart    
+  - Show tour segment values with the correct dark color when dark theme 
+    is used
+    
+* 3D Map
+  - Is now working with Java 17    
+
+* Tour Segmenter
+  - Use selected time in preferences to compute speed and pace, until 
+    now only the moving time was used
+
+* Tour Exporter (Frederic)
+  - Multiple tours are now successfully exported (GPX & TCX formats)
+
+
+Translation    
+===========
+
+- Dutch (Maarten)
+- French (Frederic)
+- German
+- Italian (Doriano)
+
+ 
+System   
+======
+
+* Eclipse 2021-06
+* FIT SDK 21.60

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -499,11 +499,11 @@ public class Map3GradientColorProvider extends MapGradientColorProvider implemen
       b = (255 <= maxB) ? 255 : maxB;
       o = (255 <= maxO) ? 255 : maxO;
 
-      final int rgba = (r & 0xFF) << 0 //
+      final int rgba = (r & 0xFF) << 0
             | (g & 0xFF) << 8
             | (b & 0xFF) << 16
             | (o & 0xff) << 24
-      //
+
       ;
 
       return rgba;

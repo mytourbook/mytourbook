@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Import NMEA files
 Bundle-SymbolicName: net.tourbook.device.nmea;singleton:=true
-Bundle-Version: 21.9.0.qualifier
+Bundle-Version: 22.8.0.qualifier
 Bundle-Activator: net.tourbook.device.nmea.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
@@ -17,3 +17,4 @@ Import-Package: net.tourbook.common.util,
 Bundle-ClassPath: org.opengts.util-MT-2015-02-23.jar,
  .
 Automatic-Module-Name: net.tourbook.device.nmea
+Export-Package: net.tourbook.device.nmea

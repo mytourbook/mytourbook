@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -32,6 +32,7 @@ import net.tourbook.ui.tourChart.ChartMarkerToolTip;
 import net.tourbook.ui.tourChart.ChartPauseToolTip;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.ui.views.ISmoothingAlgorithm;
+import net.tourbook.ui.views.IWeatherProvider;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -164,7 +165,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             + Integer.toString(TourManager.GRAPH_POWER));
 
       store.setDefault(ITourbookPreferences.GRAPH_ANTIALIASING,               true);
-      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE,          100);
+      store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_LINE,          0xff);
       store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING,       70);
       store.setDefault(ITourbookPreferences.GRAPH_TRANSPARENCY_FILLING_DARK,  20);
 
@@ -247,9 +248,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       // the low speeds/high paces at the bottom of the graph
       store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_PACE_GRAPH_INVERTED, true);
 
-      // night section
+      // night sections
       store.setDefault(ITourbookPreferences.GRAPH_IS_SHOW_NIGHT_SECTIONS, true);
-      store.setDefault(ITourbookPreferences.GRAPH_OPACITY_NIGHT_SECTIONS, 50);
+      store.setDefault(ITourbookPreferences.GRAPH_NIGHT_SECTIONS_OPACITY, 0x80);
 
       // graph grid
       store.setDefault(ITourbookPreferences.CHART_GRID_VERTICAL_DISTANCE, 80);
@@ -343,7 +344,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.GRAPH_SWIM_SWOLF_MAX_VALUE, 80);
 
       // value point tool tip
-      store.setDefault(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE, true);
+      store.setDefault(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_CHART, true);
+      store.setDefault(ITourbookPreferences.VALUE_POINT_TOOL_TIP_IS_VISIBLE_MAP2, true);
 
       /*
        * graph smoothing
@@ -385,21 +387,23 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES, false);
 
       /*
-       * map
+       * 2D Map
        */
-      store.setDefault(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE,                PrefPage_Map2_Appearance.DEFAULT_PLOT_TYPE);
-      store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH,             6);
-      store.setDefault(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER,        true);
-      store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH,             1);
-      store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE,        80); // 0...100
+      store.setDefault(ITourbookPreferences.MAP_LAYOUT_IS_ANTIALIAS_PAINTING,       true);
+      store.setDefault(ITourbookPreferences.MAP_LAYOUT_IS_CUT_OFF_LINES_IN_PAUSES,  true);
+      store.setDefault(ITourbookPreferences.MAP_LAYOUT_PLOT_TYPE,                   Map2_Appearance.DEFAULT_PLOT_TYPE);
+      store.setDefault(ITourbookPreferences.MAP_LAYOUT_SYMBOL_WIDTH,                6);
+      store.setDefault(ITourbookPreferences.MAP_LAYOUT_PAINT_WITH_BORDER,           true);
+      store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_WIDTH,                1);
+      store.setDefault(ITourbookPreferences.MAP_LAYOUT_BORDER_DIMM_VALUE,           80); // 0...100
 
       PreferenceConverter.setDefault(store, ITourbookPreferences.MAP_LAYOUT_BORDER_COLOR,    new RGB(0x50, 0x50, 0x50));
-      store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,           PrefPage_Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
+      store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD,           Map2_Appearance.TOUR_PAINT_METHOD_SIMPLE);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_TOUR_PAINT_METHOD_WARNING,   true);
       store.setDefault(ITourbookPreferences.MAP_LAYOUT_LIVE_UPDATE, true);
 
       store.setDefault(ITourbookPreferences.MAP2_LAYOUT_IS_TOUR_TRACK_OPACITY,      false);
-      store.setDefault(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,         70);     // opacity in %
+      store.setDefault(ITourbookPreferences.MAP2_LAYOUT_TOUR_TRACK_OPACITY,         180); // ~70 %
 
 
       /*
@@ -435,6 +439,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       // save actions
       store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_ALTITUDE, false);
       store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_PULSE, false);
+      store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_SPEED, false);
       store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_TEMPERATURE, false);
       store.setDefault(ITourbookPreferences.MERGE_TOUR_MERGE_GRAPH_CADENCE, false);
 
@@ -512,6 +517,11 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       store.setDefault(ITourbookPreferences.VIEW_DOUBLE_CLICK_ACTIONS, PrefPageViews.VIEW_DOUBLE_CLICK_ACTION_QUICK_EDIT);
 
       /*
+       * View: combined temperatures
+       */
+      store.setDefault(ITourbookPreferences.VIEW_PREFERRED_TEMPERATURE_VALUE, PrefPageViews.VIEW_TEMPERATURE_VALUES_EXTERNAL);
+
+      /*
        * Map 2.5D
        */
       store.setDefault(ITourbookPreferences.MAP25_OFFLINE_MAP_IS_DEFAULT_LOCATION, true);
@@ -520,7 +530,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
        * Pref page: Map3 color
        */
       store.setDefault(ITourbookPreferences.MAP3_IS_COLOR_SELECTOR_DISPLAYED, true);
-      store.setDefault(ITourbookPreferences.MAP3_NUMBER_OF_COLOR_SELECTORS, 10);
 
       /*
        * Tour import
@@ -536,8 +545,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       /*
        * Heart rate variability
        */
-      store.setDefault(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE, 20); // milliseconds
-      store.setDefault(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR, false);
+      store.setDefault(ITourbookPreferences.HRV_OPTIONS_2X_ERROR_TOLERANCE,   20); // milliseconds
+      store.setDefault(ITourbookPreferences.HRV_OPTIONS_IS_FIX_2X_ERROR,      false);
 
       /*
        * Time zone
@@ -548,8 +557,17 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
       /*
        * Weather
        */
-      store.setDefault(ITourbookPreferences.WEATHER_USE_WEATHER_RETRIEVAL,false);
       store.setDefault(ITourbookPreferences.WEATHER_API_KEY, UI.EMPTY_STRING);
+      store.setDefault(ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG, false);
+      store.setDefault(ITourbookPreferences.WEATHER_SAVE_LOG_IN_TOUR_WEATHER_DESCRIPTION, false);
+      store.setDefault(ITourbookPreferences.WEATHER_WEATHER_PROVIDER_ID, IWeatherProvider.Pref_Weather_Provider_None);
+
+      /*
+       * Tour Marker View
+       */
+      store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_ELAPSED_TIME,  true);
+      store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_MOVING_TIME,   false);
+      store.setDefault(ITourbookPreferences.TOURMARKERVIEW_USE_RECORDED_TIME, false);
 
 // SET_FORMATTING_ON
    }

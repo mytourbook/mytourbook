@@ -49,6 +49,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
+import org.oscim.core.MapPosition;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -65,28 +66,24 @@ public class MapBookmarkManager {
    private static final int    CONFIG_VERSION   = 1;
 
    // common attributes
-   private static final String ATTR_ID                      = "id";                   //$NON-NLS-1$
+   private static final String ATTR_ID                         = "id";                      //$NON-NLS-1$
 
-   private static final String TAG_ROOT                     = "MapBookmarks";         //$NON-NLS-1$
-   private static final String ATTR_CONFIG_VERSION          = "configVersion";        //$NON-NLS-1$
+   private static final String TAG_ROOT                        = "MapBookmarks";            //$NON-NLS-1$
+   private static final String ATTR_CONFIG_VERSION             = "configVersion";           //$NON-NLS-1$
    //
-   private static final String TAG_ALL_BOOKMARKS            = "AllBookmarks";         //$NON-NLS-1$
-   private static final String TAG_BOOKMARK                 = "Bookmark";             //$NON-NLS-1$
+   private static final String TAG_ALL_BOOKMARKS               = "AllBookmarks";            //$NON-NLS-1$
+   private static final String TAG_BOOKMARK                    = "Bookmark";                //$NON-NLS-1$
    //
-   private static final String TAG_ALL_RECENT_BOOKMARKS     = "AllRecentBookmarks";   //$NON-NLS-1$
-   private static final String TAG_RECENT_BOOKMARK          = "RecentBookmark";       //$NON-NLS-1$
+   private static final String TAG_ALL_RECENT_BOOKMARKS        = "AllRecentBookmarks";      //$NON-NLS-1$
+   private static final String TAG_RECENT_BOOKMARK             = "RecentBookmark";          //$NON-NLS-1$
    //
-   private static final String ATTR_NAME                    = "name";                 //$NON-NLS-1$
-   private static final String ATTR_MAP_POSITION_X          = "mapPositionX";         //$NON-NLS-1$
-   private static final String ATTR_MAP_POSITION_Y          = "mapPositionY";         //$NON-NLS-1$
-   private static final String ATTR_MAP_POSITION_SCALE      = "mapPositionScale";     //$NON-NLS-1$
-   private static final String ATTR_MAP_POSITION_BEARING    = "mapPositionBearing";   //$NON-NLS-1$
-   private static final String ATTR_MAP_POSITION_TILT       = "mapPositionTilt";      //$NON-NLS-1$
-   private static final String ATTR_MAP_POSITION_ZOOM_LEVEL = "mapPositionZoomLevel"; //$NON-NLS-1$
-
-   // for new markerposition function. not fully implemented yet. 20.11.2019
-   private static final String ATTR_MAP_POSITION_MARKER_X      = "mapPositionMarkerX";      //$NON-NLS-1$
-   private static final String ATTR_MAP_POSITION_MARKER_Y      = "mapPositionMarkerY";      //$NON-NLS-1$
+   private static final String ATTR_NAME                       = "name";                    //$NON-NLS-1$
+   private static final String ATTR_MAP_POSITION_X             = "mapPositionX";            //$NON-NLS-1$
+   private static final String ATTR_MAP_POSITION_Y             = "mapPositionY";            //$NON-NLS-1$
+   private static final String ATTR_MAP_POSITION_SCALE         = "mapPositionScale";        //$NON-NLS-1$
+   private static final String ATTR_MAP_POSITION_BEARING       = "mapPositionBearing";      //$NON-NLS-1$
+   private static final String ATTR_MAP_POSITION_TILT          = "mapPositionTilt";         //$NON-NLS-1$
+   private static final String ATTR_MAP_POSITION_ZOOM_LEVEL    = "mapPositionZoomLevel";    //$NON-NLS-1$
    //
    private static final String TAG_OPTIONS                     = "Options";                 //$NON-NLS-1$
    private static final String ATTR_NUMBER_OF_BOOKMARK_ITEMS   = "numberOfBookmarkItems";   //$NON-NLS-1$
@@ -296,20 +293,10 @@ public class MapBookmarkManager {
 //      final double clickedTourPointLongitude = this._mapView.getMap().get_mouseMove_GeoPosition().longitude;
 //      final LatLng clickedTourPoint = new LatLng(clickedTourPointLatitude, clickedTourPointLongitude);
 
-      final MapLocation mapLocation = mapBookmarks.getMapLocation();
+      final MapPosition mapPosition = mapBookmarks.getMapPosition();
+      final String bookmarkName = addDialog.getValue();
 
-      final MapBookmark newBookmark = new MapBookmark();
-
-      newBookmark.name = addDialog.getValue();
-      newBookmark.setMapPosition(mapLocation.getMapPosition());
-//here we need to set mapMarkerPosition
-      newBookmark.setMapPositionMarker(mapLocation.getMapPosition());
-
-      _allBookmarks.add(newBookmark);
-
-      setLastSelectedBookmark(newBookmark);
-
-      onUpdateBookmark(newBookmark);
+      addBookmark(mapPosition, bookmarkName);
    }
 
    private static void actionBookmark_Rename(final IMapBookmarks mapBookmarks) {
@@ -368,14 +355,27 @@ public class MapBookmarkManager {
          if (lastSelectedBookmark != null) {
 
             // update map position
-            final MapLocation mapLocation = mapBookmarks.getMapLocation();
+            final MapPosition mapPosition = mapBookmarks.getMapPosition();
 
-            lastSelectedBookmark.setMapPosition(mapLocation.getMapPosition());
-            //lastSelectedBookmark.setMapPositionMarker(mapLocation.getMapPosition());  //doesnt contain marker
+            lastSelectedBookmark.setMapPosition(mapPosition);
 
             onUpdateBookmark(lastSelectedBookmark);
          }
       }
+   }
+
+   public static void addBookmark(final MapPosition mapPosition, final String bookmarkName) {
+
+      final MapBookmark newMapBookmark = new MapBookmark();
+
+      newMapBookmark.name = bookmarkName;
+      newMapBookmark.setMapPosition(mapPosition);
+
+      _allBookmarks.add(newMapBookmark);
+
+      setLastSelectedBookmark(newMapBookmark);
+
+      onUpdateBookmark(newMapBookmark);
    }
 
    public static void addBookmarkListener(final IMapBookmarkListener listener) {
@@ -632,49 +632,27 @@ public class MapBookmarkManager {
    private static void parse_22_Bookmarks_One(final XMLMemento xmlBookmark, final MapBookmark bookmark) {
 
 // SET_FORMATTING_OFF
-// SET_FORMATTING_ON
 
-      bookmark.id = Util.getXmlString(xmlBookmark, ATTR_ID, Long.toString(System.nanoTime()));
-      bookmark.name = Util.getXmlString(xmlBookmark, ATTR_NAME, UI.EMPTY_STRING);
+      bookmark.id             = Util.getXmlString(xmlBookmark, ATTR_ID, Long.toString(System.nanoTime()));
+      bookmark.name           = Util.getXmlString(xmlBookmark, ATTR_NAME, UI.EMPTY_STRING);
 
       /*
        * Map position
        */
-      //final MapPosition mapPosition = new MapPosition();
-      //TODO renaming mapPosition2 into mapPosition, and removing line above
+      final MapPosition mapPosition = new MapPosition();
 
-      final MapPosition_with_MarkerPosition mapPosition2 = new MapPosition_with_MarkerPosition();
-      //mapPosition needs to be extend with markerPosition
+      mapPosition.x           = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_X, 0.5);
+      mapPosition.y           = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_Y, 0.5);
 
-      mapPosition2.x = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_X, 0.5);
-      mapPosition2.y = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_Y, 0.5);
-      mapPosition2.scale = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_SCALE, 1);
+      mapPosition.zoomLevel   = Util.getXmlInteger(xmlBookmark, ATTR_MAP_POSITION_ZOOM_LEVEL, 1);
+      mapPosition.scale       = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_SCALE, 1);
 
-      /*
-       * version <= 19.10 do not have mapPositionMarkerXY
-       * so if not found set value first to "invalidPosition" and
-       * later to mapposition.xy
-       * should only happen one time, when starting first time after upgrading from version <= 19.10
-       */
-      final Double invalidPosition = 2.0;
-      mapPosition2.mapPositionMarkerX = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_MARKER_X, invalidPosition);
-      mapPosition2.mapPositionMarkerY = Util.getXmlDouble(xmlBookmark, ATTR_MAP_POSITION_MARKER_Y, invalidPosition);
+      mapPosition.bearing     = Util.getXmlFloat(xmlBookmark, ATTR_MAP_POSITION_BEARING, 0f);
+      mapPosition.tilt        = Util.getXmlFloat(xmlBookmark, ATTR_MAP_POSITION_TILT, 0f);
 
-      mapPosition2.bearing = Util.getXmlFloat(xmlBookmark, ATTR_MAP_POSITION_BEARING, 0f);
-      mapPosition2.tilt = Util.getXmlFloat(xmlBookmark, ATTR_MAP_POSITION_TILT, 0f);
-      mapPosition2.zoomLevel = Util.getXmlInteger(xmlBookmark, ATTR_MAP_POSITION_ZOOM_LEVEL, 1);
+// SET_FORMATTING_ON
 
-      if (mapPosition2.mapPositionMarkerX == invalidPosition || mapPosition2.mapPositionMarkerY == invalidPosition) {
-         net.tourbook.map25.Map25App.debugPrint("++++ MapBookmarkManager: parse_22_Bookmarks_One: markerPos not in xml, migrating..."); //$NON-NLS-1$
-         mapPosition2.mapPositionMarkerX = mapPosition2.x;
-         mapPosition2.mapPositionMarkerY = mapPosition2.y;
-      }
-
-      net.tourbook.map25.Map25App.debugPrint("++++ MapBookmarkManager: parse_22_Bookmarks_One: name: " + bookmark.name + " markerpos_x: " //$NON-NLS-1$//$NON-NLS-2$
-            + mapPosition2.mapPositionMarkerX + " pos_x: " + mapPosition2.x); //$NON-NLS-1$
-
-      bookmark.setMapPosition(mapPosition2);
-      bookmark.setMapPositionMarker(mapPosition2);
+      bookmark.setMapPosition(mapPosition);
    }
 
    private static void parse_30_RecentBookmarks(final XMLMemento xmlRoot,
@@ -840,14 +818,11 @@ public class MapBookmarkManager {
             /*
              * Map position
              */
-            final MapPosition_with_MarkerPosition mapPosition = bookmark.getMapPosition();
+            final MapPosition mapPosition = bookmark.getMapPosition();
 
             Util.setXmlDouble(xmlBookmark, ATTR_MAP_POSITION_X, mapPosition.x);
             Util.setXmlDouble(xmlBookmark, ATTR_MAP_POSITION_Y, mapPosition.y);
             Util.setXmlDouble(xmlBookmark, ATTR_MAP_POSITION_SCALE, mapPosition.scale);
-
-            Util.setXmlDouble(xmlBookmark, ATTR_MAP_POSITION_MARKER_X, mapPosition.mapPositionMarkerX);
-            Util.setXmlDouble(xmlBookmark, ATTR_MAP_POSITION_MARKER_Y, mapPosition.mapPositionMarkerY);
 
             xmlBookmark.putFloat(ATTR_MAP_POSITION_BEARING, mapPosition.bearing);
             xmlBookmark.putFloat(ATTR_MAP_POSITION_TILT, mapPosition.tilt);

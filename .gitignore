@@ -13,10 +13,12 @@ repositories/
 **/build/**/build/sonar
 **/*vtm*/**/build/
 
+**/feature.net.tourbook.jre/*/jre
 
 .apt_generated
 .gradle
 .log
+.polyglot.build.properties
 .vs
 
 *.js.map
