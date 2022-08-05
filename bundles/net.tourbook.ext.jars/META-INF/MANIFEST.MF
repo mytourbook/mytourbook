@@ -239,6 +239,7 @@ Export-Package: com.fasterxml.jackson.annotation,
  org.joda.time.tz.data.Pacific,
  org.json,
  org.shredzone.commons.suncalc,
- org.shredzone.commons.suncalc.param
+ org.shredzone.commons.suncalc.param,
+ pl.coderion.model
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: net.tourbook.ext.jars
