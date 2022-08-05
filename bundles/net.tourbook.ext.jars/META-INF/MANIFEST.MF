@@ -21,7 +21,8 @@ Bundle-ClassPath:
  jackson-annotations-2.13.3.jar,
  commons-suncalc-3.4.jar,
  httpclient-4.5.13.jar,
- httpcore-4.4.15.jar
+ httpcore-4.4.15.jar,
+ openfoodfacts-java-wrapper-0.9.3.jar
 Export-Package: com.fasterxml.jackson.annotation,
  com.fasterxml.jackson.core,
  com.fasterxml.jackson.core.async,

@@ -19,5 +19,6 @@
 	<classpathentry exported="true" kind="lib" path="commons-suncalc-3.4.jar"/> <!-- https://mvnrepository.com/artifact/org.shredzone.commons/commons-suncalc -->
 	<classpathentry exported="true" kind="lib" path="httpcore-4.4.15.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->
 	<classpathentry exported="true" kind="lib" path="httpclient-4.5.13.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+	<classpathentry exported="true" kind="lib" path="openfoodfacts-java-wrapper-0.9.3.jar"/> <!-- https://mvnrepository.com/artifact/pl.coderion/openfoodfacts-java-wrapper -->
 	<classpathentry kind="output" path="bin"/>
 </classpath>
