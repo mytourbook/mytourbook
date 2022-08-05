@@ -159,16 +159,16 @@ public class Map25View extends ViewPart implements
 
 // SET_FORMATTING_ON
 
-   private static final String           STATE_IS_LAYER_BASE_MAP_VISIBLE         = "STATE_IS_LAYER_BASE_MAP_VISIBLE";            //$NON-NLS-1$
-   private static final String           STATE_IS_LAYER_BOOKMARK_VISIBLE         = "STATE_IS_LAYER_BOOKMARK_VISIBLE";            //$NON-NLS-1$
-   private static final String           STATE_IS_LAYER_HILLSHADING_VISIBLE      = "STATE_IS_LAYER_HILLSHADING_VISIBLE";         //$NON-NLS-1$
-   private static final String           STATE_IS_LAYER_LEGEND_VISIBLE           = "STATE_IS_LAYER_LEGEND_VISIBLE";              //$NON-NLS-1$
-   private static final String           STATE_IS_LAYER_MARKER_VISIBLE           = "STATE_IS_LAYER_MARKER_VISIBLE";              //$NON-NLS-1$
-   private static final String           STATE_IS_LAYER_COMPASS_ROSE_VISIBLE     = "STATE_IS_LAYER_COMPASS_ROSE_VISIBLE";        //$NON-NLS-1$
-   private static final String           STATE_IS_LAYER_SATELLITE_VISIBLE        = "STATE_IS_LAYER_SATELLITE_VISIBLE";           //$NON-NLS-1$
-   private static final String           STATE_IS_LAYER_SCALE_BAR_VISIBLE        = "STATE_IS_LAYER_SCALE_BAR_VISIBLE";           //$NON-NLS-1$
-   private static final String           STATE_IS_LAYER_TILE_INFO_VISIBLE        = "STATE_IS_LAYER_TILE_INFO_VISIBLE";           //$NON-NLS-1$
-   private static final String           STATE_IS_LAYER_TOUR_VISIBLE             = "STATE_IS_LAYER_TOUR_VISIBLE";                //$NON-NLS-1$
+   private static final String STATE_IS_LAYER_BASE_MAP_VISIBLE     = "STATE_IS_LAYER_BASE_MAP_VISIBLE";     //$NON-NLS-1$
+   private static final String STATE_IS_LAYER_BOOKMARK_VISIBLE     = "STATE_IS_LAYER_BOOKMARK_VISIBLE";     //$NON-NLS-1$
+   private static final String STATE_IS_LAYER_HILLSHADING_VISIBLE  = "STATE_IS_LAYER_HILLSHADING_VISIBLE";  //$NON-NLS-1$
+   private static final String STATE_IS_LAYER_LEGEND_VISIBLE       = "STATE_IS_LAYER_LEGEND_VISIBLE";       //$NON-NLS-1$
+   private static final String STATE_IS_LAYER_MARKER_VISIBLE       = "STATE_IS_LAYER_MARKER_VISIBLE";       //$NON-NLS-1$
+   private static final String STATE_IS_LAYER_COMPASS_ROSE_VISIBLE = "STATE_IS_LAYER_COMPASS_ROSE_VISIBLE"; //$NON-NLS-1$
+   private static final String STATE_IS_LAYER_SATELLITE_VISIBLE    = "STATE_IS_LAYER_SATELLITE_VISIBLE";    //$NON-NLS-1$
+   private static final String STATE_IS_LAYER_SCALE_BAR_VISIBLE    = "STATE_IS_LAYER_SCALE_BAR_VISIBLE";    //$NON-NLS-1$
+   private static final String STATE_IS_LAYER_TILE_INFO_VISIBLE    = "STATE_IS_LAYER_TILE_INFO_VISIBLE";    //$NON-NLS-1$
+   private static final String STATE_IS_LAYER_TOUR_VISIBLE         = "STATE_IS_LAYER_TOUR_VISIBLE";         //$NON-NLS-1$
 // private static final String           STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE     = "STATE_IS_LAYER_OPEN_GL_TEST_VISIBLE";        //$NON-NLS-1$
    //
    private static final String           STATE_LAYER_HILLSHADING_OPACITY         = "STATE_LAYER_HILLSHADING_OPACITY";            //$NON-NLS-1$
@@ -1197,6 +1197,7 @@ public class Map25View extends ViewPart implements
 
       final boolean isTourAvailable = _allTourData.size() > 0;
       final boolean isPhotoAvailable = _allPhotos.size() > 0;
+      final boolean isTourVisible = _actionShowTourOptions.getSelection();
 
       final boolean isPhotoDisplayed = _actionShowPhotoOptions.getSelection();
       final boolean isTourWithPhoto = isTourAvailable && isPhotoAvailable;
@@ -1206,7 +1207,9 @@ public class Map25View extends ViewPart implements
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
       final boolean isGradientColor = trackConfig.lineColorMode == LineColorMode.GRADIENT
-            && trackConfig.isShowDirectionArrow == false;
+            && trackConfig.isShowDirectionArrow == false
+            && canShowTour
+            && isTourVisible;
 
       _actionMapBookmarks.setEnabled(true);
       _actionMapProvider.setEnabled(true);
