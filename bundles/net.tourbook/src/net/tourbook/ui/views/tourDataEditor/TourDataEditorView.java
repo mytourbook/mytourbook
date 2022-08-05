@@ -4690,6 +4690,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
+   private void createUI_Section_160_NutritionReport(final Composite parent) {
+
+   }
+
    private void createUI_SectionSeparator(final Composite parent) {
 
       final Composite sep = _tk.createComposite(parent);
@@ -4728,6 +4732,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             createUI_SectionSeparator(_tourContainer);
 
             createUI_Section_150_Characteristics(_tourContainer);
+            createUI_SectionSeparator(_tourContainer);
+
+            createUI_Section_160_NutritionReport(_tourContainer);
          }
       }
 
