@@ -13,22 +13,23 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package views;
+package utils;
 
-import org.junit.jupiter.api.Test;
+import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.TestWatcher;
 
-import utils.UITest;
-import utils.Utils;
+public class CaptureScreenshotOnFailureExtension implements TestWatcher {
 
-public class TourPausesViewTests extends UITest {
+   private String constructFilename(final ExtensionContext context) {
+      return "./target/"
+            + context.getClass().getCanonicalName() + "."
+            + context.getTestMethod().get().getName() + ".png";
+   }
 
-   @Test
-   void testTourPausesView() {
-
-      Utils.getTour(bot);
-
-      Utils.showView(bot, "Tour Pauses"); //$NON-NLS-1$
-
-      bot.table().select("15:40"); //$NON-NLS-1$
+   @Override
+   public void testFailed(final ExtensionContext context, final Throwable cause) {
+      final String fileName = constructFilename(context);
+      new SWTWorkbenchBot().captureScreenshot(fileName);
    }
 }

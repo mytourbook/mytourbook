@@ -17,15 +17,13 @@ package views;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
+import utils.UITest;
 import utils.Utils;
 
-public class TourTagsViewTests {
-
-   private SWTWorkbenchBot bot = new SWTWorkbenchBot();
+public class TourTagsViewTests extends UITest {
 
    @Test
    void testTourTagsView() {

@@ -24,15 +24,13 @@ import java.nio.file.Paths;
 import net.tourbook.Messages;
 import net.tourbook.common.util.FilesUtils;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
+import utils.UITest;
 import utils.Utils;
 
-public class DialogExportTourTests {
-
-   private SWTWorkbenchBot bot = new SWTWorkbenchBot();
+public class DialogExportTourTests extends UITest {
 
    @Test
    void testExportGpx() {
