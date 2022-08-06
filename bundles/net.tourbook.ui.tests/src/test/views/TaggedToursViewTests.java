@@ -17,16 +17,14 @@ package views;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
+import utils.UITest;
 import utils.Utils;
 
-public class TaggedToursViewTests {
-
-   private SWTWorkbenchBot bot = new SWTWorkbenchBot();
+public class TaggedToursViewTests extends UITest {
 
    /**
     * This test could have caught this bug in the 22.3 release

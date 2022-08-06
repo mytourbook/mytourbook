@@ -17,15 +17,13 @@ package dialogs;
 
 import net.tourbook.Messages;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
+import utils.UITest;
 import utils.Utils;
 
-public class DialogQuickEditTests {
-
-   private SWTWorkbenchBot bot = new SWTWorkbenchBot();
+public class DialogQuickEditTests extends UITest {
 
    @Test
    void testEditWeatherDescription() {

@@ -23,28 +23,26 @@ import java.nio.file.Paths;
 
 import net.tourbook.printing.Messages;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
+import utils.UITest;
 import utils.Utils;
 
-public class DialogPrintTourTests {
-
-   private SWTWorkbenchBot _bot = new SWTWorkbenchBot();
+public class DialogPrintTourTests extends UITest {
 
    @Test
    void testPrintTour() {
 
-      final SWTBotTreeItem tour = Utils.getTour(_bot);
+      final SWTBotTreeItem tour = Utils.getTour(bot);
 
       tour.contextMenu(net.tourbook.Messages.action_print_tour).menu("PDF").click(); //$NON-NLS-1$
-      _bot.checkBox(Messages.Dialog_Print_Chk_PrintMarkers).click();
-      _bot.checkBox(Messages.Dialog_Print_Chk_PrintNotes).click();
+      bot.checkBox(Messages.Dialog_Print_Chk_PrintMarkers).click();
+      bot.checkBox(Messages.Dialog_Print_Chk_PrintNotes).click();
 
-      final String fileName = _bot.comboBox(2).getText() + ".pdf"; //$NON-NLS-1$
-      _bot.comboBox(3).setText(Utils.workingDirectory);
-      _bot.button(Messages.Dialog_Print_Btn_Print).click();
+      final String fileName = bot.comboBox(2).getText() + ".pdf"; //$NON-NLS-1$
+      bot.comboBox(3).setText(Utils.workingDirectory);
+      bot.button(Messages.Dialog_Print_Btn_Print).click();
 
       final Path pdfFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(pdfFilePath));
