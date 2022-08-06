@@ -33,7 +33,6 @@
              <skipTests>true</skipTests>
              <osgiDataDirectory>${project.basedir}/workspace</osgiDataDirectory>
              <deleteOsgiDataDirectory>false</deleteOsgiDataDirectory>
-             <argLine>-Djunit.jupiter.extensions.autodetection.enabled=true</argLine>
          </configuration>
       </plugin>
       
