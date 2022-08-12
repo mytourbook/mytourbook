@@ -20,23 +20,21 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import net.tourbook.Messages;
 
-import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCTabItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
+import utils.UITest;
 import utils.Utils;
 
-public class TourMarkerViewTests {
-
-   private SWTWorkbenchBot bot = new SWTWorkbenchBot();
+public class TourMarkerViewTests extends UITest {
 
    @Test
    void testAddAndDeleteTourMarker() {
 
-      Utils.showView(bot, "Tour Book"); //$NON-NLS-1$
+      Utils.showTourBookView(bot);
 
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2020   3").expand() //$NON-NLS-1$
             .getNode("May   2").expand().select().getNode("23").select(); //$NON-NLS-1$ //$NON-NLS-2$

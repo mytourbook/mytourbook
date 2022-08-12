@@ -78,7 +78,7 @@ public class TourExporter {
    /**
     * This is a special parameter to force elevation values from the device and not from the lat/lon
     * + srtm data
-    * <a href="http://strava.github.io/api/v3/uploads/">http://strava.github.io/api/v3/uploads/</a>.
+    * https://developers.strava.com/docs/uploads/#device-and-elevation-data.
     *
     * @since 15.6
     */
