@@ -707,10 +707,10 @@
             label       ="%View_Name_TourData"
             mnemonic    ="%View_Name_TourData_Mnemonic"/>
             
-         <!-- Tour Nutrition -->
+         <!-- Tour Nutrition TODO FB icons/tour-nutrition.png-->
          <command
             commandId   ="command.net.tourbook.views.TourNutritionView"
-            icon        ="icons/tour-nutrition.png"
+            icon        ="icons/tour-data.png"
             label       ="%View_Name_TourNutrition"
             mnemonic    ="%View_Name_TourNutrition_Mnemonic"/>
 
@@ -1323,6 +1323,12 @@
          name           ="%View_Name_Waypoint"
          defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourWaypoint"
       />
+      
+      <command
+         id             ="command.net.tourbook.views.TourNutritionView"
+         name           ="%View_Name_TourNutrition"
+         defaultHandler ="net.tourbook.ui.views.ActionHandler_OpenView_TourNutrition"
+      />
 
       <command
          id             ="command.net.tourbook.views.HeartRateVariabilityChart"
@@ -1735,6 +1741,14 @@
             class       ="net.tourbook.ui.views.TourDataView"
             icon        ="icons/tour-data.png"
             name        ="%View_Name_TourData"/>
+
+         <view
+            category    ="net.tourbook.category.Tour_Properties"
+            id          ="net.tourbook.ui.views.TourNutritionView"
+            class       ="net.tourbook.ui.views.TourNutritionView"
+            icon        ="icons/tour-data.png"
+            name        ="%View_Name_TourNutrition"/>
+
 
          <!--
             <view
