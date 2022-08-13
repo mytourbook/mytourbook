@@ -18,6 +18,8 @@
  */
 package net.tourbook.map25.renderer;
 
+import gnu.trove.list.array.TShortArrayList;
+
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
@@ -37,7 +39,7 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
 //   public static final byte   BITMAP    = 7;
 //   public static final byte   CIRCLE    = 8;
 
-   static final VertexData      EMPTY = new VertexData();
+   static final VertexData      EMPTY  = new VertexData();
 
    public final byte            type;
 
@@ -58,10 +60,26 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
    protected final VertexDataMT vertexItems;
    protected final VertexData   indiceItems;
 
+   /**
+    * Contains the vertices for direction arrows:
+    * <p>
+    *
+    * <pre>
+    * x1
+    * y2
+    *
+    * x2
+    * y2
+    *
+    * ...
+    * </pre>
+    */
+   protected TShortArrayList    directionArrowVertices;
+
    final boolean                quads;
 
-   protected int                vertexOffset;            // in bytes
-   protected int                indiceOffset;            // in bytes
+   protected int                vertexOffset;             // in bytes
+   protected int                indiceOffset;             // in bytes
 
    protected RenderBucketMT(final byte type, final boolean indexed, final boolean quads) {
 
@@ -76,6 +94,8 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
       }
 
       this.quads = quads;
+
+      directionArrowVertices = new TShortArrayList();
    }
 
    /**
@@ -110,13 +130,12 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
       indiceItems.compile(iboData);
    }
 
-   protected void compileVertexItems(final ShortBuffer vboData, final ByteBuffer colorBuffer) {
+   protected void compileVertexItems(final ShortBuffer vboBuffer, final ByteBuffer colorBuffer) {
 
-      /*
-       * Keep offset of layer data in vbo
-       */
-      vertexOffset = vboData.position() * RenderBuckets.SHORT_BYTES;
-      vertexItems.compile(vboData, colorBuffer);
+      // Keep offset of layer data in vbo
+      vertexOffset = vboBuffer.position() * RenderBuckets.SHORT_BYTES;
+
+      vertexItems.compile(vboBuffer, colorBuffer);
    }
 
    /**

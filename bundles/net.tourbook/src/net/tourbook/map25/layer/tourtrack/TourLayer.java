@@ -20,6 +20,7 @@
  */
 package net.tourbook.map25.layer.tourtrack;
 
+import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
 
 import net.tourbook.common.color.ColorUtil;
@@ -136,7 +137,7 @@ public class TourLayer extends Layer {
          mMapPosition.copy(workerTask.__mapPos);
 
          // compile new layers
-         final RenderBucketMT firstChainedBucket = workerTask.__renderBuckets.get();
+         final RenderBucketMT firstChainedBucket = workerTask.__allRenderBuckets.get();
          allBuckets.set(firstChainedBucket);
 
          compile();
@@ -145,26 +146,26 @@ public class TourLayer extends Layer {
 
    private final static class TourRenderTask {
 
-      RenderBucketsAllMT __renderBuckets = new RenderBucketsAllMT();
-      MapPosition        __mapPos        = new MapPosition();
+      RenderBucketsAllMT __allRenderBuckets = new RenderBucketsAllMT();
+      MapPosition        __mapPos           = new MapPosition();
    }
 
    final class Worker extends SimpleWorker<TourRenderTask> {
 
-      private static final int  MIN_DIST          = 3;
+      private static final int  MIN_DIST               = 3;
 
       /**
        * Visible pixel of a line/tour, all other pixels are clipped with {@link #__lineClipper}
        */
       // limit coords
-      private static final int  MAX_VISIBLE_PIXEL = 2048;
+      private static final int  MAX_VISIBLE_PIXEL      = 2048;
 
       /**
        * Pre-projected points
        * <p>
        * Is projecting -180°...180° => 0...1 by using the {@link MercatorProjection}
        */
-      private double[]          __projectedPoints = new double[2];
+      private double[]          __projectedPoints      = new double[2];
 
       /**
        * Points which are projected (0...1) and then scaled to pixel
@@ -177,14 +178,9 @@ public class TourLayer extends Layer {
       private int[]             __pixelPointColors2;
 
       /**
-       * Contains the index into {@link #__pixelPoints} where direction arrows are painted
+       * Contains the x/y projected pixels where direction arrows are painted
        */
-      private int[]             __pixelPointDirectionArrowIndex;
-
-      /**
-       * Number of direction arrows which are used in {@link #__pixelPointDirectionArrowIndex}
-       */
-      private int               __numDirectionArrowIndices;
+      private TFloatArrayList   __pixelDirectionArrows = new TFloatArrayList();
 
       /**
        * Is clipping line positions between
@@ -209,9 +205,7 @@ public class TourLayer extends Layer {
 
          __pixelPoints = new float[0];
          __pixelPointColors2 = new int[0];
-
-         __numDirectionArrowIndices = 0;
-         __pixelPointDirectionArrowIndex = new int[0];
+         __pixelDirectionArrows.clearQuick();
       }
 
       /**
@@ -235,7 +229,7 @@ public class TourLayer extends Layer {
       @Override
       public void cleanup(final TourRenderTask task) {
 
-         task.__renderBuckets.clear();
+         task.__allRenderBuckets.clear();
       }
 
       @Override
@@ -258,9 +252,7 @@ public class TourLayer extends Layer {
 
                   __pixelPoints = new float[numGeoPoints * 2];
                   __pixelPointColors2 = new int[numGeoPoints];
-
-                  __numDirectionArrowIndices = 0;
-                  __pixelPointDirectionArrowIndex = new int[numGeoPoints];
+                  __pixelDirectionArrows.clearQuick();
                }
 
                for (int pointIndex = 0; pointIndex < numGeoPoints; pointIndex++) {
@@ -269,13 +261,13 @@ public class TourLayer extends Layer {
             }
          }
 
-         _currentTaskRenderBuckets = task.__renderBuckets;
+         _currentTaskRenderBuckets = task.__allRenderBuckets;
 
          if (numGeoPoints == 0) {
 
-            if (task.__renderBuckets.get() != null) {
+            if (task.__allRenderBuckets.get() != null) {
 
-               task.__renderBuckets.clear();
+               task.__allRenderBuckets.clear();
 
                mMap.render();
             }
@@ -293,7 +285,7 @@ public class TourLayer extends Layer {
 
       private void doWork_Rendering(final TourRenderTask task, final int numPoints) {
 
-         final LineBucketMT lineBucket = getLineBucket(task.__renderBuckets);
+         final LineBucketMT lineBucket = getLineBucket(task.__allRenderBuckets);
 
          final MapPosition mapPos = task.__mapPos;
          mMap.getMapPosition(mapPos);
@@ -307,11 +299,10 @@ public class TourLayer extends Layer {
 
          // number of x/y pixels for the whole map at the current zoom level
          final double maxMapPixel = Tile.SIZE * mapPos.scale;
+         final int maxMapPixel2 = Tile.SIZE << (zoomlevel - 1);
 
          // flip around dateline
          int flip = 0;
-
-         final int maxMapPixel2 = Tile.SIZE << (zoomlevel - 1);
 
          int pixelX = (int) ((__projectedPoints[0] - currentMapPosX) * maxMapPixel);
          int pixelY = (int) ((__projectedPoints[1] - currentMapPosY) * maxMapPixel);
@@ -336,13 +327,15 @@ public class TourLayer extends Layer {
 
          final float[] pixelPoints = __pixelPoints;
          final int[] pixelPointColors2 = __pixelPointColors2;
-         final int[] pixelPointDirectionArrowIndex = __pixelPointDirectionArrowIndex;
+
+         __pixelDirectionArrows.clearQuick();
+         final TFloatArrayList allDirectionArrowPixel = __pixelDirectionArrows;
 
          // set first point / color / direction arrow
          int pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
          pixelPointColors2[0] = _allGeoPointColors[0];
-         __numDirectionArrowIndices = 1;
-         pixelPointDirectionArrowIndex[0] = 0;
+         allDirectionArrowPixel.add(pixelX);
+         allDirectionArrowPixel.add(pixelY);
 
          float prevX = pixelX;
          float prevY = pixelY;
@@ -351,11 +344,11 @@ public class TourLayer extends Layer {
 
          float[] segment = null;
 
-         for (int pointIndex = 2; pointIndex < numPoints * 2; pointIndex += 2) {
+         for (int projectedPointIndex = 2; projectedPointIndex < numPoints * 2; projectedPointIndex += 2) {
 
             // convert projected points 0...1 into map pixel
-            pixelX = (int) ((__projectedPoints[pointIndex + 0] - currentMapPosX) * maxMapPixel);
-            pixelY = (int) ((__projectedPoints[pointIndex + 1] - currentMapPosY) * maxMapPixel);
+            pixelX = (int) ((__projectedPoints[projectedPointIndex + 0] - currentMapPosX) * maxMapPixel);
+            pixelY = (int) ((__projectedPoints[projectedPointIndex + 1] - currentMapPosY) * maxMapPixel);
 
             int flipDirection = 0;
 
@@ -381,13 +374,13 @@ public class TourLayer extends Layer {
                __lineClipper.clipStart(pixelX, pixelY);
 
                pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
-               pixelPointColors2[0] = _allGeoPointColors[pointIndex / 2];
+               pixelPointColors2[0] = _allGeoPointColors[projectedPointIndex / 2];
 
                continue;
             }
 
             // ckeck if a new tour starts
-            if (pointIndex >= nextTourStartIndex) {
+            if (projectedPointIndex >= nextTourStartIndex) {
 
                // finish last tour (copied from flip code)
                if (pixelPointIndex > 2) {
@@ -399,7 +392,7 @@ public class TourLayer extends Layer {
 
                __lineClipper.clipStart(pixelX, pixelY);
                pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
-               pixelPointColors2[0] = _allGeoPointColors[pointIndex / 2];
+               pixelPointColors2[0] = _allGeoPointColors[projectedPointIndex / 2];
 
                continue;
             }
@@ -437,7 +430,7 @@ public class TourLayer extends Layer {
                   pixelPoints[pixelPointIndex++] = prevX;
                   pixelPoints[pixelPointIndex++] = prevY;
 
-                  pixelPointColors2[(pixelPointIndex - 1) / 2] = _allGeoPointColors[pointIndex / 2];
+                  pixelPointColors2[(pixelPointIndex - 1) / 2] = _allGeoPointColors[projectedPointIndex / 2];
                }
 
                continue;
@@ -457,26 +450,29 @@ public class TourLayer extends Layer {
                pixelPoints[pixelPointIndex++] = prevX = pixelX;
                pixelPoints[pixelPointIndex++] = prevY = pixelY;
 
-               pixelPointColors2[(pixelPointIndex - 1) / 2] = _allGeoPointColors[pointIndex / 2];
+               pixelPointColors2[(pixelPointIndex - 1) / 2] = _allGeoPointColors[projectedPointIndex / 2];
             }
 
             final float diffXArrow = pixelX - prevXArrow;
             final float diffYArrow = pixelY - prevYArrow;
 
-            if (pixelPointIndex == 0 || FastMath.absMaxCmp(diffXArrow, diffYArrow, 30)) {
+            if (projectedPointIndex == 0 || FastMath.absMaxCmp(diffXArrow, diffYArrow, 70)) {
 
-               // point > min distance == 30
+               // point > min distance
 
                prevXArrow = pixelX;
                prevYArrow = pixelY;
 
-               pixelPointDirectionArrowIndex[__numDirectionArrowIndices++] = pixelPointIndex - 2;
+               allDirectionArrowPixel.add(pixelX);
+               allDirectionArrowPixel.add(pixelY);
             }
          }
 
          if (pixelPointIndex > 2) {
             lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors2);
          }
+
+         lineBucket.setupDirectionArrows(__pixelDirectionArrows);
       }
 
       private int getNextTourStartIndex(final int tourIndex) {
@@ -590,17 +586,17 @@ public class TourLayer extends Layer {
    /**
     * Update linestyle in the bucket
     *
-    * @param renderBuckets
+    * @param allRenderBuckets
     * @return
     */
-   private LineBucketMT getLineBucket(final RenderBucketsAllMT renderBuckets) {
+   private LineBucketMT getLineBucket(final RenderBucketsAllMT allRenderBuckets) {
 
       LineBucketMT lineBucket;
 
       if (_lineStyle.stipple == 0 && _lineStyle.texture == null) {
-         lineBucket = renderBuckets.getLineBucket(0);
+         lineBucket = allRenderBuckets.getLineBucket(0);
       } else {
-         lineBucket = renderBuckets.getLineTexBucket(0);
+         lineBucket = allRenderBuckets.getLineTexBucket(0);
       }
 
       lineBucket.line = _lineStyle;

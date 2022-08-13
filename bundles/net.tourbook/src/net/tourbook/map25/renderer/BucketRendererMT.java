@@ -90,7 +90,7 @@ public class BucketRendererMT extends LayerRenderer {
       GLState.blend(true);
 
       // viewport scale 2 map scale: it is between 1...2
-      final float vp2mpScale = (float) (viewport.pos.scale / mapPosition.scale);
+      final float viewport2mapscale = (float) (viewport.pos.scale / mapPosition.scale);
 
       boolean isProjected = true;
 
@@ -111,12 +111,8 @@ public class BucketRendererMT extends LayerRenderer {
 
          switch (bucket.type) {
 
-//       case POLYGON:
-//           bucket = PolygonBucket.Renderer.draw(bucket, viewport, 1, true);
-//           break;
-
          case LINE:
-            bucket = LineBucketMT.Renderer.draw(bucket, viewport, vp2mpScale, allBuckets);
+            bucket = LineBucketMT.Renderer.draw(bucket, viewport, viewport2mapscale, allBuckets);
             break;
 
          case TEXLINE:
@@ -126,6 +122,14 @@ public class BucketRendererMT extends LayerRenderer {
                   allBuckets);
             break;
 
+//         case CIRCLE:
+//            bucket = CircleBucketMT.Renderer.draw(bucket, viewport);
+//            break;
+//            
+//       case POLYGON:
+//           bucket = PolygonBucket.Renderer.draw(bucket, viewport, 1, true);
+//           break;
+//
 //       case MESH:
 //           bucket = MeshBucket.Renderer.draw(bucket, viewport);
 //           break;
@@ -141,9 +145,6 @@ public class BucketRendererMT extends LayerRenderer {
 //               setMatrix(viewport, isProjected);
 //           }
 //           bucket = TextureBucket.Renderer.draw(bucket, viewport, vp2mpScale);
-//           break;
-//       case CIRCLE:
-//           bucket = CircleBucket.Renderer.draw(bucket, viewport);
 //           break;
 
          default:

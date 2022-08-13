@@ -22,6 +22,8 @@ import static org.oscim.renderer.bucket.RenderBucket.LINE;
 import static org.oscim.renderer.bucket.RenderBucket.POLYGON;
 import static org.oscim.renderer.bucket.RenderBucket.TEXLINE;
 
+import gnu.trove.list.array.TShortArrayList;
+
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
@@ -59,7 +61,11 @@ public class RenderBucketsAllMT extends TileData {
                2,                            // CIRCLE
          };
 
+   /**
+    * Number of bytes for a <b>short</b> value
+    */
    public static final int   SHORT_BYTES = 2;
+
    // public static final int INT_BYTES = 4;
 
    /**
@@ -89,7 +95,6 @@ public class RenderBucketsAllMT extends TileData {
     * ...
     */
    public BufferObject    vbo_BufferObject;
-
    public BufferObject    ibo_BufferObject;
 
    /**
@@ -103,13 +108,22 @@ public class RenderBucketsAllMT extends TileData {
     * <li>2. lines afterwards at lineOffset</li>
     * <li>3. other buckets keep their byte offset in offset</li>
     */
-   public int[]           offset        = { 0, 0 };
+   public int[]           offset                   = { 0, 0 };
 
    private RenderBucketMT _currentBucket;
 
-   public int             vertexColorId = Integer.MIN_VALUE;
-   private ByteBuffer     _vertexColorBuffer;
-   private int            _vertexColorBuffer_Size;
+   int                    vertexColor_BufferId     = Integer.MIN_VALUE;
+   int                    directionArrows_BufferId = Integer.MIN_VALUE;
+
+   private ByteBuffer     _vertexColor_Buffer;
+   private int            _vertexColor_BufferSize;
+   private ShortBuffer    _directionArrow_Buffer;
+   private int            _directionArrow_BufferSize;
+
+   /**
+    * Number of {@link Short}'s used for the direction arrows
+    */
+   int                    numShortsForDirectionArrows;
 
    public RenderBucketsAllMT() {}
 
@@ -123,7 +137,7 @@ public class RenderBucketsAllMT extends TileData {
 //    BitmapBucket.Renderer.init();
 //    MeshBucket.Renderer.init();
 //    HairLineBucket.Renderer.init();
-//    CircleBucket.Renderer.init();
+//    CircleBucketMT.Renderer.init();
    }
 
 //    public CircleBucket addCircleBucket(final int level, final CircleStyle style) {
@@ -245,12 +259,14 @@ public class RenderBucketsAllMT extends TileData {
       }
 
       final int vertexColorSize = vboSize;
+      numShortsForDirectionArrows = countShortsForDirectionArrows();
 
-      final ShortBuffer vboBuffer = MapRenderer.getShortBuffer(vboSize);
-      final ByteBuffer colorBuffer = getColorBuffer(vertexColorSize);
+      final ShortBuffer vboBucketBuffer = MapRenderer.getShortBuffer(vboSize);
+      final ShortBuffer directionArrow_ShortBuffer = getBuffer_DirectionArrow(numShortsForDirectionArrows);
+      final ByteBuffer colorBuffer = getBuffer_Color(vertexColorSize);
 
       if (addFill) {
-         vboBuffer.put(fillShortCoords, 0, TILE_FILL_VERTICES * 2);
+         vboBucketBuffer.put(fillShortCoords, 0, TILE_FILL_VERTICES * 2);
       }
 
       ShortBuffer iboBuffer = null;
@@ -265,50 +281,61 @@ public class RenderBucketsAllMT extends TileData {
       /*
        * Compile polygons
        */
-      for (RenderBucketMT oneBucket = _firstChainedBucket; oneBucket != null; oneBucket = oneBucket.next) {
+      for (RenderBucketMT currentBucket = _firstChainedBucket; currentBucket != null; currentBucket = currentBucket.next) {
 
-         if (oneBucket.type == POLYGON) {
+         if (currentBucket.type == POLYGON) {
 
-            oneBucket.compile(vboBuffer, iboBuffer, null);
-            oneBucket.vertexOffset = vertexOffset;
+            currentBucket.compile(vboBucketBuffer, iboBuffer, null);
+            currentBucket.vertexOffset = vertexOffset;
 
-            vertexOffset += oneBucket.numVertices;
+            vertexOffset += currentBucket.numVertices;
          }
       }
 
       /*
        * Compile lines
        */
-      offset[LINE] = vboBuffer.position() * SHORT_BYTES;
+      offset[LINE] = vboBucketBuffer.position() * SHORT_BYTES;
       vertexOffset = 0;
-      for (RenderBucketMT oneBucket = _firstChainedBucket; oneBucket != null; oneBucket = oneBucket.next) {
+      int directionArrowsOffset = 0;
+      for (RenderBucketMT currentBucket = _firstChainedBucket; currentBucket != null; currentBucket = currentBucket.next) {
 
-         if (oneBucket.type == LINE) {
+         if (currentBucket.type == LINE) {
 
-            oneBucket.compile(vboBuffer, iboBuffer, colorBuffer);
-            oneBucket.vertexOffset = vertexOffset;
+            currentBucket.compile(vboBucketBuffer, iboBuffer, colorBuffer);
+            currentBucket.vertexOffset = vertexOffset;
 
-            vertexOffset += oneBucket.numVertices;
+            vertexOffset += currentBucket.numVertices;
          }
+
+         /*
+          * Append direction arrow shorts into the buffer
+          */
+         final TShortArrayList directionArrowVertices = currentBucket.directionArrowVertices;
+         final int numBucketShorts = directionArrowVertices.size();
+
+         directionArrow_ShortBuffer.put(directionArrowVertices.toArray(), directionArrowsOffset, numBucketShorts);
+
+         directionArrowsOffset += numBucketShorts;
       }
 
       /*
        * Compile others
        */
-      for (RenderBucketMT oneBucket = _firstChainedBucket; oneBucket != null; oneBucket = oneBucket.next) {
+      for (RenderBucketMT currentBucket = _firstChainedBucket; currentBucket != null; currentBucket = currentBucket.next) {
 
-         if (oneBucket.type != LINE && oneBucket.type != POLYGON) {
-            oneBucket.compile(vboBuffer, iboBuffer, null);
+         if (currentBucket.type != LINE && currentBucket.type != POLYGON) {
+            currentBucket.compile(vboBucketBuffer, iboBuffer, null);
          }
       }
 
-      if (vboSize != vboBuffer.position()) {
+      if (vboSize != vboBucketBuffer.position()) {
 
          log.debug("wrong vertex buffer size: " //$NON-NLS-1$
                + " new size: " + vboSize //$NON-NLS-1$
-               + " buffer pos: " + vboBuffer.position() //$NON-NLS-1$
-               + " buffer limit: " + vboBuffer.limit() //$NON-NLS-1$
-               + " buffer fill: " + vboBuffer.remaining()); //$NON-NLS-1$
+               + " buffer pos: " + vboBucketBuffer.position() //$NON-NLS-1$
+               + " buffer limit: " + vboBucketBuffer.limit() //$NON-NLS-1$
+               + " buffer fill: " + vboBucketBuffer.remaining()); //$NON-NLS-1$
 
          return false;
       }
@@ -324,6 +351,17 @@ public class RenderBucketsAllMT extends TileData {
          return false;
       }
 
+      /*
+       * Direction arrows
+       */
+      if (directionArrows_BufferId == Integer.MIN_VALUE) {
+
+         // create buffer id
+         directionArrows_BufferId = gl.genBuffer();
+      }
+      gl.bindBuffer(GL.ARRAY_BUFFER, directionArrows_BufferId);
+      gl.bufferData(GL.ARRAY_BUFFER, numShortsForDirectionArrows * SHORT_BYTES, directionArrow_ShortBuffer.flip(), GL.STATIC_DRAW);
+
       /**
        * Load vertex color into the GPU
        * <p>
@@ -332,14 +370,14 @@ public class RenderBucketsAllMT extends TileData {
        * BUFFER MUST BE BINDED BEFORE VBO/IBO otherwise the map is mostly covered with the vertex
        * color !!!
        */
-      if (vertexColorId == Integer.MIN_VALUE) {
+      if (vertexColor_BufferId == Integer.MIN_VALUE) {
 
          // create buffer id
-         vertexColorId = gl.genBuffer();
+         vertexColor_BufferId = gl.genBuffer();
       }
 
-      gl.bindBuffer(GL.ARRAY_BUFFER, vertexColorId);
-      gl.bufferData(GL.ARRAY_BUFFER, vertexColorSize, _vertexColorBuffer.flip(), GL.STATIC_DRAW);
+      gl.bindBuffer(GL.ARRAY_BUFFER, vertexColor_BufferId);
+      gl.bufferData(GL.ARRAY_BUFFER, vertexColorSize, _vertexColor_Buffer.flip(), GL.STATIC_DRAW);
 
       /*
        * VBO
@@ -349,7 +387,9 @@ public class RenderBucketsAllMT extends TileData {
       }
 
       // Set VBO data to READ mode
-      vbo_BufferObject.loadBufferData(vboBuffer.flip(), vboSize * SHORT_BYTES);
+      // - gl.bindBuffer()
+      // - gl.bufferData()
+      vbo_BufferObject.loadBufferData(vboBucketBuffer.flip(), vboSize * SHORT_BYTES);
 
       /*
        * IBO
@@ -368,6 +408,7 @@ public class RenderBucketsAllMT extends TileData {
    }
 
    private int countIboSize() {
+
       int numIndices = 0;
 
       for (RenderBucketMT bucket = _firstChainedBucket; bucket != null; bucket = bucket.next) {
@@ -375,6 +416,21 @@ public class RenderBucketsAllMT extends TileData {
       }
 
       return numIndices;
+   }
+
+   /**
+    * @return Returns number of {@link Short}'s for the direction arrows
+    */
+   private int countShortsForDirectionArrows() {
+
+      int numShorts = 0;
+
+      for (RenderBucketMT bucket = _firstChainedBucket; bucket != null; bucket = bucket.next) {
+
+         numShorts += bucket.directionArrowVertices.size();
+      }
+
+      return numShorts;
    }
 
    private int countVboSize() {
@@ -449,18 +505,20 @@ public class RenderBucketsAllMT extends TileData {
 
             typedBucket = new LineBucketMT(level);
 
-//       } else if (type == POLYGON) {
-//          bucket = new PolygonBucket(level);
-
          } else if (type == TEXLINE) {
+            
             typedBucket = new LineTexBucketMT(level);
 
+//       } else if (type == POLYGON) {
+//          bucket = new PolygonBucket(level);
 //       } else if (type == MESH) {
 //          bucket = new MeshBucket(level);
 //       } else if (type == HAIRLINE) {
 //          bucket = new HairLineBucket(level);
+//
 //       } else if (type == CIRCLE) {
-//          bucket = new CircleBucket(level);
+//          typedBucket = new CircleBucketMT(level);
+
          }
 
          if (typedBucket == null) {
@@ -491,26 +549,58 @@ public class RenderBucketsAllMT extends TileData {
       return typedBucket;
    }
 
-   private ByteBuffer getColorBuffer(final int requestedColorSize) {
+   private ByteBuffer getBuffer_Color(final int requestedColorSize) {
 
       final int bufferBlockSize = 2048;
       final int numBufferBlocks = requestedColorSize / bufferBlockSize;
       final int roundedBufferSize = (numBufferBlocks + 1) * bufferBlockSize;
 
-      if (_vertexColorBuffer == null || _vertexColorBuffer_Size < roundedBufferSize) {
+      if (_vertexColor_Buffer == null || _vertexColor_BufferSize < roundedBufferSize) {
 
-         _vertexColorBuffer = ByteBuffer.allocateDirect(roundedBufferSize).order(ByteOrder.nativeOrder());
+         _vertexColor_Buffer = ByteBuffer
+               .allocateDirect(roundedBufferSize)
+               .order(ByteOrder.nativeOrder());
 
-         _vertexColorBuffer_Size = roundedBufferSize;
+         _vertexColor_BufferSize = roundedBufferSize;
 
       } else {
 
          // IMPORTANT: reset position to 0 to prevent BufferOverflowException
 
-         _vertexColorBuffer.clear();
+         _vertexColor_Buffer.clear();
       }
 
-      return _vertexColorBuffer;
+      return _vertexColor_Buffer;
+   }
+
+   /**
+    * @param requestedSize
+    *           Number of {@link Short}'s
+    * @return
+    */
+   private ShortBuffer getBuffer_DirectionArrow(final int requestedSize) {
+
+      final int bufferBlockSize = 2048;
+      final int numBufferBlocks = (requestedSize * SHORT_BYTES) / bufferBlockSize;
+      final int roundedBufferSize = (numBufferBlocks + 1) * bufferBlockSize;
+
+      if (_directionArrow_Buffer == null || _directionArrow_BufferSize < roundedBufferSize) {
+
+         _directionArrow_Buffer = ByteBuffer
+               .allocateDirect(roundedBufferSize)
+               .order(ByteOrder.nativeOrder())
+               .asShortBuffer();
+
+         _directionArrow_BufferSize = roundedBufferSize;
+
+      } else {
+
+         // IMPORTANT: reset position to 0 to prevent BufferOverflowException
+
+         _directionArrow_Buffer.clear();
+      }
+
+      return _directionArrow_Buffer;
    }
 
 //    /**

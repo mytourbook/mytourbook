@@ -20,6 +20,8 @@ package net.tourbook.map25.renderer;
 import static org.oscim.backend.GLAdapter.gl;
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
+import gnu.trove.list.array.TFloatArrayList;
+
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 
 import org.oscim.backend.GL;
@@ -27,6 +29,7 @@ import org.oscim.backend.GLAdapter;
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeometryBuffer;
 import org.oscim.core.MapPosition;
+import org.oscim.renderer.BufferObject;
 import org.oscim.renderer.GLState;
 import org.oscim.renderer.GLUtils;
 import org.oscim.renderer.GLViewport;
@@ -92,6 +95,79 @@ public class LineBucketMT extends RenderBucketMT {
 
    private int                tmin             = Integer.MIN_VALUE, tmax = Integer.MAX_VALUE;
 
+   private static class DirectionArrowsShader extends GLShaderMT {
+
+      int shader_a_pos,
+            shader_u_mvp;
+
+      DirectionArrowsShader(final String shaderFile) {
+
+         if (createMT(shaderFile) == false) {
+            return;
+         }
+
+         shader_u_mvp = getUniform("u_mvp"); //$NON-NLS-1$
+         shader_a_pos = getAttrib("a_pos"); //$NON-NLS-1$
+      }
+   }
+
+   private static class LineShader extends GLShaderMT {
+
+      int shader_a_pos,
+            shader_aVertexColor,
+
+            shader_u_mvp,
+
+            shader_u_fade,
+            shader_u_color,
+            shader_u_mode,
+
+            shader_u_width,
+            shader_u_height,
+
+            shader_uColorMode,
+            shader_uOutlineBrightness,
+            shader_uVertexColorAlpha
+
+      ;
+
+      LineShader(final String shaderFile) {
+
+         if (createMT(shaderFile) == false) {
+            return;
+         }
+
+         shader_a_pos = getAttrib("a_pos"); //$NON-NLS-1$
+         shader_aVertexColor = getAttrib("aVertexColor"); //$NON-NLS-1$
+
+         shader_u_mvp = getUniform("u_mvp"); //$NON-NLS-1$
+
+         shader_u_fade = getUniform("u_fade"); //$NON-NLS-1$
+         shader_u_color = getUniform("u_color"); //$NON-NLS-1$
+         shader_u_mode = getUniform("u_mode"); //$NON-NLS-1$
+
+         shader_u_width = getUniform("u_width"); //$NON-NLS-1$
+         shader_u_height = getUniform("u_height"); //$NON-NLS-1$
+
+         shader_uColorMode = getUniform("uColorMode"); //$NON-NLS-1$
+         shader_uOutlineBrightness = getUniform("uOutlineBrightness"); //$NON-NLS-1$
+         shader_uVertexColorAlpha = getUniform("uVertexColorAlpha"); //$NON-NLS-1$
+      }
+
+      @Override
+      public boolean useProgram() {
+
+         if (super.useProgram()) {
+
+            GLState.enableVertexArrays(shader_a_pos, GLState.DISABLED);
+
+            return true;
+         }
+
+         return false;
+      }
+   }
+
    public static final class Renderer {
 
       /*
@@ -102,17 +178,19 @@ public class LineBucketMT extends RenderBucketMT {
       /**
        * Factor to normalize extrusion vector and scale to coord scale
        */
-      private static final float COORD_SCALE_BY_DIR_SCALE = COORD_SCALE / DIR_SCALE;
+      private static final float           COORD_SCALE_BY_DIR_SCALE = COORD_SCALE / DIR_SCALE;
 
-      private static final int   CAP_THIN                 = 0;
-      private static final int   CAP_BUTT                 = 1;
-      private static final int   CAP_ROUND                = 2;
+      private static final int             CAP_THIN                 = 0;
+      private static final int             CAP_BUTT                 = 1;
+      private static final int             CAP_ROUND                = 2;
 
-      private static final int   SHADER_PROJECTED         = 0;
-      private static final int   SHADER_FLAT              = 1;
+      private static final int             SHADER_PROJECTED         = 0;
+      private static final int             SHADER_FLAT              = 1;
 
-      private static int         _textureID;
-      private static Shader[]    _shaders                 = { null, null };
+      private static int                   _textureID;
+
+      private static DirectionArrowsShader _directionArrowShader;
+      private static LineShader[]          _lineShaders             = { null, null };
 
       /**
        * Performs OpenGL drawing commands of the renderBucket(s)
@@ -146,7 +224,7 @@ public class LineBucketMT extends RenderBucketMT {
 //       shaderMode = shaderMode;
 //       shaderMode = SHADER_FLAT;
 
-         final Shader shader = _shaders[shaderMode];
+         final LineShader shader = _lineShaders[shaderMode];
 
          // is calling GL.enableVertexAttribArray() for shader_a_pos
          shader.useProgram();
@@ -188,7 +266,7 @@ public class LineBucketMT extends RenderBucketMT {
          /*
           * Set vertex color
           */
-         gl.bindBuffer(GL.ARRAY_BUFFER, renderBucketsAll.vertexColorId);
+         gl.bindBuffer(GL.ARRAY_BUFFER, renderBucketsAll.vertexColor_BufferId);
          gl.enableVertexAttribArray(shader_aVertexColor);
          gl.vertexAttribPointer(
 
@@ -229,10 +307,10 @@ public class LineBucketMT extends RenderBucketMT {
 
          boolean isBlur = false;
          double width;
+         float arrowScale = 1;
 
          float heightOffset = 0;
          gl.uniform1f(shader_u_height, heightOffset);
-
 
          for (; renderBucket != null && renderBucket.type == LINE; renderBucket = renderBucket.next) {
 
@@ -342,6 +420,8 @@ public class LineBucketMT extends RenderBucketMT {
                width = scale * lineStyle.width / variableScale;
             }
 
+            arrowScale = vp2mpScale;
+
             // disable outline brighness/darkness, this value is multiplied with the color
             gl.uniform1f(shader_uOutlineBrightness, 1.0f);
 
@@ -375,15 +455,64 @@ public class LineBucketMT extends RenderBucketMT {
             gl.drawArrays(GL.TRIANGLE_STRIP, lineBucket.vertexOffset, lineBucket.numVertices);
          }
 
-         gl.disableVertexAttribArray(shader_aVertexColor);
+//         gl.disableVertexAttribArray(shader_aVertexColor);
+
+         draw_DirectionArrows(viewport, renderBucketsAll);
 
          return renderBucket;
       }
 
+      private static void draw_DirectionArrows(final GLViewport viewport, final RenderBucketsAllMT allRenderBuckets) {
+
+//         GLState.enableVertexArrays(GLState.DISABLED, GLState.DISABLED);
+
+         final BufferObject vbo_BufferObject = allRenderBuckets.vbo_BufferObject;
+         if (vbo_BufferObject != null) {
+//            vbo_BufferObject.unbind();
+         }
+
+         final DirectionArrowsShader shader = _directionArrowShader;
+         final int shader_a_pos = shader.shader_a_pos;
+         final int shader_u_mvp = shader.shader_u_mvp;
+
+         shader.useProgram();
+
+         GLState.blend(true);
+
+         // set matrix
+         viewport.mvp.setAsUniform(shader_u_mvp);
+
+         gl.bindBuffer(GL.ARRAY_BUFFER, allRenderBuckets.directionArrows_BufferId);
+         gl.enableVertexAttribArray(shader_a_pos);
+         gl.vertexAttribPointer(
+
+               shader_a_pos, //           index of the vertex attribute that is to be modified
+               2, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
+               GL.SHORT, //               data type of each component in the array
+               false, //                  values should be normalized
+               0, //                      offset in bytes between the beginning of consecutive vertex attributes
+               0 //                       offset in bytes of the first component in the vertex attribute array
+         );
+
+         final int numDirArrowShorts = allRenderBuckets.numShortsForDirectionArrows;
+
+         gl.drawArrays(GL.TRIANGLES,
+               0,
+               numDirArrowShorts);
+
+         GLUtils.checkGlError(Renderer.class.getName());
+      }
+
       static boolean init() {
 
-         _shaders[SHADER_PROJECTED] = new Shader("line_aa_proj"); //$NON-NLS-1$
-         _shaders[SHADER_FLAT] = new Shader("line_aa"); //$NON-NLS-1$
+// SET_FORMATTING_OFF
+
+         _lineShaders[SHADER_PROJECTED]   = new LineShader("line_aa_proj");       //$NON-NLS-1$
+         _lineShaders[SHADER_FLAT]        = new LineShader("line_aa");            //$NON-NLS-1$
+
+         _directionArrowShader            = new DirectionArrowsShader("directionArrows");    //$NON-NLS-1$
+
+// SET_FORMATTING_ON
 
          /*
           * create lookup table as texture for 'length(0..1,0..1)'
@@ -413,63 +542,6 @@ public class LineBucketMT extends RenderBucketMT {
                GL.MIRRORED_REPEAT);
 
          return true;
-      }
-   }
-
-   private static class Shader extends GLShaderMT {
-
-      int shader_a_pos,
-            shader_aVertexColor,
-
-            shader_u_mvp,
-
-            shader_u_fade,
-            shader_u_color,
-            shader_u_mode,
-
-            shader_u_width,
-            shader_u_height,
-
-            shader_uColorMode,
-            shader_uOutlineBrightness,
-            shader_uVertexColorAlpha
-
-      ;
-
-      Shader(final String shaderFile) {
-
-         if (createMT(shaderFile) == false) {
-            return;
-         }
-
-         shader_a_pos = getAttrib("a_pos"); //$NON-NLS-1$
-         shader_aVertexColor = getAttrib("aVertexColor"); //$NON-NLS-1$
-
-         shader_u_mvp = getUniform("u_mvp"); //$NON-NLS-1$
-
-         shader_u_fade = getUniform("u_fade"); //$NON-NLS-1$
-         shader_u_color = getUniform("u_color"); //$NON-NLS-1$
-         shader_u_mode = getUniform("u_mode"); //$NON-NLS-1$
-
-         shader_u_width = getUniform("u_width"); //$NON-NLS-1$
-         shader_u_height = getUniform("u_height"); //$NON-NLS-1$
-
-         shader_uColorMode = getUniform("uColorMode"); //$NON-NLS-1$
-         shader_uOutlineBrightness = getUniform("uOutlineBrightness"); //$NON-NLS-1$
-         shader_uVertexColorAlpha = getUniform("uVertexColorAlpha"); //$NON-NLS-1$
-      }
-
-      @Override
-      public boolean useProgram() {
-
-         if (super.useProgram()) {
-
-            GLState.enableVertexArrays(shader_a_pos, GLState.DISABLED);
-
-            return true;
-         }
-
-         return false;
       }
    }
 
@@ -1035,5 +1107,45 @@ public class LineBucketMT extends RenderBucketMT {
    public void setExtents(final int min, final int max) {
       tmin = min;
       tmax = max;
+
+   }
+
+   /**
+    * @param pixelDirectionArrowsIndices_Raw
+    *           Contains the x/y pixel positions for the direction arrows
+    */
+   public void setupDirectionArrows(final TFloatArrayList pixelDirectionArrowsIndices_Raw) {
+
+      directionArrowVertices.clearQuick();
+
+      final float[] allPixel_DirectionArrows_Indices = pixelDirectionArrowsIndices_Raw.toArray();
+
+      final double arrowSize = 20;
+      final double arrowSize2 = arrowSize / 2;
+
+      for (int pixelIndex = 0; pixelIndex < allPixel_DirectionArrows_Indices.length; pixelIndex = pixelIndex + 2) {
+
+         final float x = allPixel_DirectionArrows_Indices[pixelIndex];
+         final float y = allPixel_DirectionArrows_Indices[pixelIndex + 1];
+
+         final double x2 = x + arrowSize2;
+         final double x3 = x - arrowSize2;
+
+         final double y2 = y + arrowSize * 2;
+         final double y3 = y + arrowSize * 2;
+
+         directionArrowVertices.add((short) (x * COORD_SCALE));
+         directionArrowVertices.add((short) (y * COORD_SCALE));
+
+         directionArrowVertices.add((short) (x2 * COORD_SCALE));
+         directionArrowVertices.add((short) (y2 * COORD_SCALE));
+
+         directionArrowVertices.add((short) (x3 * COORD_SCALE));
+         directionArrowVertices.add((short) (y3 * COORD_SCALE));
+      }
+
+      System.out.println((System.currentTimeMillis() + " arrows:" + directionArrowVertices.size() / 2 / 3));
+      // TODO remove SYSTEM.OUT.PRINTLN
+
    }
 }
