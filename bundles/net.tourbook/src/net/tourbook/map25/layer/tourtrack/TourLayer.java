@@ -472,7 +472,7 @@ public class TourLayer extends Layer {
             lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors2);
          }
 
-         lineBucket.directionArrowsSetup(__pixelDirectionArrows);
+         lineBucket.setupDirectionArrowVertices(__pixelDirectionArrows);
       }
 
       private int getNextTourStartIndex(final int tourIndex) {

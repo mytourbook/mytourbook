@@ -29,7 +29,6 @@ import org.oscim.backend.GLAdapter;
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeometryBuffer;
 import org.oscim.core.MapPosition;
-import org.oscim.renderer.BufferObject;
 import org.oscim.renderer.GLState;
 import org.oscim.renderer.GLUtils;
 import org.oscim.renderer.GLViewport;
@@ -66,8 +65,8 @@ public class LineBucketMT extends RenderBucketMT {
    private static final float MIN_BEVEL        = MIN_DIST * 4;
 
    /**
-    * mask for packing last two bits of extrusion vector with texture
-    * coordinates
+    * Mask for packing last two bits of extrusion vector with texture
+    * coordinates, .... 1111 1100
     */
    private static final int   DIR_MASK         = 0xFFFFFFFC;
 
@@ -101,7 +100,10 @@ public class LineBucketMT extends RenderBucketMT {
    private static class DirectionArrowsShader extends GLShaderMT {
 
       int shader_a_pos,
-            shader_u_mvp;
+            shader_u_mvp,
+            shader_u_width
+
+      ;
 
       DirectionArrowsShader(final String shaderFile) {
 
@@ -111,6 +113,8 @@ public class LineBucketMT extends RenderBucketMT {
 
          shader_u_mvp = getUniform("u_mvp"); //$NON-NLS-1$
          shader_a_pos = getAttrib("a_pos"); //$NON-NLS-1$
+
+         shader_u_width = getUniform("u_width"); //$NON-NLS-1$
       }
    }
 
@@ -310,7 +314,6 @@ public class LineBucketMT extends RenderBucketMT {
 
          boolean isBlur = false;
          double width;
-         float arrowScale = 1;
 
          float heightOffset = 0;
          gl.uniform1f(shader_u_height, heightOffset);
@@ -423,8 +426,6 @@ public class LineBucketMT extends RenderBucketMT {
                width = scale * lineStyle.width / variableScale;
             }
 
-            arrowScale = vp2mpScale;
-
             // disable outline brighness/darkness, this value is multiplied with the color
             gl.uniform1f(shader_uOutlineBrightness, 1.0f);
 
@@ -460,30 +461,33 @@ public class LineBucketMT extends RenderBucketMT {
 
 //         gl.disableVertexAttribArray(shader_aVertexColor);
 
-         draw_DirectionArrows(viewport, renderBucketsAll);
+         draw_DirectionArrows(viewport, renderBucketsAll, vp2mpScale);
 
          return renderBucket;
       }
 
-      private static void draw_DirectionArrows(final GLViewport viewport, final RenderBucketsAllMT allRenderBuckets) {
-
-//         GLState.enableVertexArrays(GLState.DISABLED, GLState.DISABLED);
-
-         final BufferObject vbo_BufferObject = allRenderBuckets.vbo_BufferObject;
-         if (vbo_BufferObject != null) {
-//            vbo_BufferObject.unbind();
-         }
+      private static void draw_DirectionArrows(final GLViewport viewport,
+                                               final RenderBucketsAllMT allRenderBuckets,
+                                               final float vp2mpScale) {
 
          final DirectionArrowsShader shader = _directionArrowShader;
          final int shader_a_pos = shader.shader_a_pos;
          final int shader_u_mvp = shader.shader_u_mvp;
+         final int shader_u_width = shader.shader_u_width;
 
          shader.useProgram();
 
          GLState.blend(true);
 
-         // set matrix
+         // set mvp matrix into the shader
          viewport.mvp.setAsUniform(shader_u_mvp);
+
+         /*
+          * Set outline width
+          */
+         final float width = 10 / vp2mpScale;
+
+         gl.uniform1f(shader_u_width, width * COORD_SCALE_BY_DIR_SCALE);
 
          gl.bindBuffer(GL.ARRAY_BUFFER, allRenderBuckets.directionArrows_BufferId);
          gl.enableVertexAttribArray(shader_a_pos);
@@ -499,11 +503,9 @@ public class LineBucketMT extends RenderBucketMT {
 
          final int numDirArrowShorts = allRenderBuckets.numShortsForDirectionArrows;
 
-         gl.drawArrays(GL.TRIANGLES,
-               0,
-               numDirArrowShorts);
+         gl.drawArrays(GL.TRIANGLES, 0, numDirArrowShorts);
 
-         GLUtils.checkGlError(Renderer.class.getName());
+//       GLUtils.checkGlError(Renderer.class.getName());
       }
 
       static boolean init() {
@@ -884,7 +886,7 @@ public class LineBucketMT extends RenderBucketMT {
          vNextX /= xyDistance;
          vNextY /= xyDistance;
 
-         final double dotp = (vNextX * vPrevX + vNextY * vPrevY);
+         final double dotp = vNextX * vPrevX + vNextY * vPrevY;
 
          //log.debug("acos " + dotp);
          if (dotp > 0.65) {
@@ -1093,98 +1095,6 @@ public class LineBucketMT extends RenderBucketMT {
 // SET_FORMATTING_ON
    }
 
-   private void directionArrows_Add(final float x, final float y) {
-
-      final double x2 = x + _arrowWidth / 2;
-      final double x3 = x - _arrowWidth / 2;
-
-      final double y2 = y + _arrowLeghth;
-      final double y3 = y + _arrowLeghth;
-
-      directionArrow_XYPositions.add((short) (x * COORD_SCALE));
-      directionArrow_XYPositions.add((short) (y * COORD_SCALE));
-
-      directionArrow_XYPositions.add((short) (x2 * COORD_SCALE));
-      directionArrow_XYPositions.add((short) (y2 * COORD_SCALE));
-
-      directionArrow_XYPositions.add((short) (x3 * COORD_SCALE));
-      directionArrow_XYPositions.add((short) (y3 * COORD_SCALE));
-   }
-
-   /**
-    * @param allDirectionArrowPixel_Raw
-    *           Contains the x/y pixel positions for the direction arrows
-    */
-   public void directionArrowsSetup(final TFloatArrayList allDirectionArrowPixel_Raw) {
-
-      directionArrow_XYPositions.clearQuick();
-
-      // at least 2 positions are needed
-      if (allDirectionArrowPixel_Raw.size() < 4) {
-         return;
-      }
-
-      final float[] allDirectionArrowPixel = allDirectionArrowPixel_Raw.toArray();
-
-      _arrowWidth = 6;
-      _arrowLeghth = 50;
-
-      int pixelIndex = 0;
-
-      float p1X = allDirectionArrowPixel[pixelIndex++];
-      float p1Y = allDirectionArrowPixel[pixelIndex++];
-
-      for (; pixelIndex < allDirectionArrowPixel.length;) {
-
-         final float p2X = allDirectionArrowPixel[pixelIndex++];
-         final float p2Y = allDirectionArrowPixel[pixelIndex++];
-
-         // get midpoint between both positions
-         final float middleX = (p1X + p2X) / 2;
-         final float middleY = (p1Y + p2Y) / 2;
-
-         // get direction vector: dir = (P2-P1)/|P2-P1|
-         final float diffX = p2X - p1X;
-         final float diffY = p2Y - p1Y;
-         final double p21Distance = Math.sqrt(diffX * diffX + diffY * diffY);
-
-         // get unit vector
-         final double unitX = diffX / p21Distance;
-         final double unitY = diffY / p21Distance;
-
-         // get perpendicular vector
-         final double ppX = unitY;
-         final double ppY = -unitX;
-
-         final double arrowLength = p21Distance / 1.5;
-         final double arrowWidth = p21Distance / 3;
-         final double arrowWidth2 = arrowWidth / 2;
-
-         final float arr1X = (float) (p2X - (arrowLength * unitX) + (arrowWidth2 * ppX));
-         final float arr1Y = (float) (p2Y - (arrowLength * unitY) + (arrowWidth2 * ppY));
-
-         final float arr2X = (float) (p2X - (arrowLength * unitX) - (arrowWidth2 * ppX));
-         final float arr2Y = (float) (p2Y - (arrowLength * unitY) - (arrowWidth2 * ppY));
-
-         // set arrow positions
-         directionArrow_XYPositions.add((short) (p2X * COORD_SCALE));
-         directionArrow_XYPositions.add((short) (p2Y * COORD_SCALE));
-
-         directionArrow_XYPositions.add((short) (arr1X * COORD_SCALE));
-         directionArrow_XYPositions.add((short) (arr1Y * COORD_SCALE));
-
-         directionArrow_XYPositions.add((short) (arr2X * COORD_SCALE));
-         directionArrow_XYPositions.add((short) (arr2Y * COORD_SCALE));
-
-         // setup next position
-         p1X = p2X;
-         p1Y = p2Y;
-      }
-
-      System.out.println((System.currentTimeMillis() + " num arrows:" + directionArrow_XYPositions.size() / 2 / 3));
-      // TODO remove SYSTEM.OUT.PRINTLN
-   }
-
    /**
     * Default is MIN_DIST * 4 = 1/8 * 4.
     */
@@ -1203,5 +1113,79 @@ public class LineBucketMT extends RenderBucketMT {
       tmin = min;
       tmax = max;
 
+   }
+
+   /**
+    * @param allDirectionArrowPixel_Raw
+    *           Contains the x/y pixel positions for the direction arrows
+    */
+   public void setupDirectionArrowVertices(final TFloatArrayList allDirectionArrowPixel_Raw) {
+
+      directionArrow_XYPositions.clearQuick();
+
+      // at least 2 positions are needed
+      if (allDirectionArrowPixel_Raw.size() < 4) {
+         return;
+      }
+
+      final float[] allDirectionArrowPixel = allDirectionArrowPixel_Raw.toArray();
+
+      _arrowWidth = 16;
+      _arrowLeghth = 20;
+
+      int pixelIndex = 0;
+
+      float p1X = allDirectionArrowPixel[pixelIndex++];
+      float p1Y = allDirectionArrowPixel[pixelIndex++];
+
+      for (; pixelIndex < allDirectionArrowPixel.length;) {
+
+         final float p2X = allDirectionArrowPixel[pixelIndex++];
+         final float p2Y = allDirectionArrowPixel[pixelIndex++];
+
+         // get direction/unit vector: dir = (P2-P1)/|P2-P1|
+         final float diffX = p2X - p1X;
+         final float diffY = p2Y - p1Y;
+
+         // distance between P1 and P2
+         final double p21Distance = Math.sqrt(diffX * diffX + diffY * diffY);
+
+         final double unitX = diffX / p21Distance;
+         final double unitY = diffY / p21Distance;
+
+         // get perpendicular vector
+         final double perpenX = unitY;
+         final double perpenY = -unitX;
+
+         final double arrowLength = Math.min(_arrowLeghth, p21Distance);
+         final double arrowWidth2 = _arrowWidth / 2; // half arrow width
+
+         final double pointOnLineX = p2X - (arrowLength * unitX);
+         final double pointOnLineY = p2Y - (arrowLength * unitY);
+
+         final double arrowVectorX = arrowWidth2 * perpenX;
+         final double arrowVectorY = arrowWidth2 * perpenY;
+
+         // set arrow points which are above/below the line
+         final float arrow1X = (float) (pointOnLineX + arrowVectorX);
+         final float arrow1Y = (float) (pointOnLineY + arrowVectorY);
+
+         final float arrow2X = (float) (pointOnLineX - arrowVectorX);
+         final float arrow2Y = (float) (pointOnLineY - arrowVectorY);
+
+         // set arrow positions
+         directionArrow_XYPositions.add((short) (p2X * COORD_SCALE));
+         directionArrow_XYPositions.add((short) (p2Y * COORD_SCALE));
+
+         directionArrow_XYPositions.add((short) (arrow1X * COORD_SCALE));
+         directionArrow_XYPositions.add((short) (arrow1Y * COORD_SCALE));
+
+         directionArrow_XYPositions.add((short) (arrow2X * COORD_SCALE));
+         directionArrow_XYPositions.add((short) (arrow2Y * COORD_SCALE));
+
+         // setup next position
+         p1X = p2X;
+         p1Y = p2Y;
+      }
    }
 }
