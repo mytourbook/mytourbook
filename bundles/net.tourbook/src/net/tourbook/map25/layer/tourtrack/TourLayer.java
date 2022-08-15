@@ -456,7 +456,7 @@ public class TourLayer extends Layer {
             final float diffXArrow = pixelX - prevXArrow;
             final float diffYArrow = pixelY - prevYArrow;
 
-            if (projectedPointIndex == 0 || FastMath.absMaxCmp(diffXArrow, diffYArrow, 70)) {
+            if (projectedPointIndex == 0 || FastMath.absMaxCmp(diffXArrow, diffYArrow, 30)) {
 
                // point > min distance
 
@@ -472,7 +472,7 @@ public class TourLayer extends Layer {
             lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors2);
          }
 
-         lineBucket.setupDirectionArrows(__pixelDirectionArrows);
+         lineBucket.directionArrowsSetup(__pixelDirectionArrows);
       }
 
       private int getNextTourStartIndex(final int tourIndex) {

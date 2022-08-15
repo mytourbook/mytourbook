@@ -311,7 +311,7 @@ public class RenderBucketsAllMT extends TileData {
          /*
           * Append direction arrow shorts into the buffer
           */
-         final TShortArrayList directionArrowVertices = currentBucket.directionArrowVertices;
+         final TShortArrayList directionArrowVertices = currentBucket.directionArrow_XYPositions;
          final int numBucketShorts = directionArrowVertices.size();
 
          directionArrow_ShortBuffer.put(directionArrowVertices.toArray(), directionArrowsOffset, numBucketShorts);
@@ -427,7 +427,7 @@ public class RenderBucketsAllMT extends TileData {
 
       for (RenderBucketMT bucket = _firstChainedBucket; bucket != null; bucket = bucket.next) {
 
-         numShorts += bucket.directionArrowVertices.size();
+         numShorts += bucket.directionArrow_XYPositions.size();
       }
 
       return numShorts;

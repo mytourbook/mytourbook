@@ -95,6 +95,9 @@ public class LineBucketMT extends RenderBucketMT {
 
    private int                tmin             = Integer.MIN_VALUE, tmax = Integer.MAX_VALUE;
 
+   private int                _arrowWidth;
+   private int                _arrowLeghth;
+
    private static class DirectionArrowsShader extends GLShaderMT {
 
       int shader_a_pos,
@@ -1090,6 +1093,98 @@ public class LineBucketMT extends RenderBucketMT {
 // SET_FORMATTING_ON
    }
 
+   private void directionArrows_Add(final float x, final float y) {
+
+      final double x2 = x + _arrowWidth / 2;
+      final double x3 = x - _arrowWidth / 2;
+
+      final double y2 = y + _arrowLeghth;
+      final double y3 = y + _arrowLeghth;
+
+      directionArrow_XYPositions.add((short) (x * COORD_SCALE));
+      directionArrow_XYPositions.add((short) (y * COORD_SCALE));
+
+      directionArrow_XYPositions.add((short) (x2 * COORD_SCALE));
+      directionArrow_XYPositions.add((short) (y2 * COORD_SCALE));
+
+      directionArrow_XYPositions.add((short) (x3 * COORD_SCALE));
+      directionArrow_XYPositions.add((short) (y3 * COORD_SCALE));
+   }
+
+   /**
+    * @param allDirectionArrowPixel_Raw
+    *           Contains the x/y pixel positions for the direction arrows
+    */
+   public void directionArrowsSetup(final TFloatArrayList allDirectionArrowPixel_Raw) {
+
+      directionArrow_XYPositions.clearQuick();
+
+      // at least 2 positions are needed
+      if (allDirectionArrowPixel_Raw.size() < 4) {
+         return;
+      }
+
+      final float[] allDirectionArrowPixel = allDirectionArrowPixel_Raw.toArray();
+
+      _arrowWidth = 6;
+      _arrowLeghth = 50;
+
+      int pixelIndex = 0;
+
+      float p1X = allDirectionArrowPixel[pixelIndex++];
+      float p1Y = allDirectionArrowPixel[pixelIndex++];
+
+      for (; pixelIndex < allDirectionArrowPixel.length;) {
+
+         final float p2X = allDirectionArrowPixel[pixelIndex++];
+         final float p2Y = allDirectionArrowPixel[pixelIndex++];
+
+         // get midpoint between both positions
+         final float middleX = (p1X + p2X) / 2;
+         final float middleY = (p1Y + p2Y) / 2;
+
+         // get direction vector: dir = (P2-P1)/|P2-P1|
+         final float diffX = p2X - p1X;
+         final float diffY = p2Y - p1Y;
+         final double p21Distance = Math.sqrt(diffX * diffX + diffY * diffY);
+
+         // get unit vector
+         final double unitX = diffX / p21Distance;
+         final double unitY = diffY / p21Distance;
+
+         // get perpendicular vector
+         final double ppX = unitY;
+         final double ppY = -unitX;
+
+         final double arrowLength = p21Distance / 1.5;
+         final double arrowWidth = p21Distance / 3;
+         final double arrowWidth2 = arrowWidth / 2;
+
+         final float arr1X = (float) (p2X - (arrowLength * unitX) + (arrowWidth2 * ppX));
+         final float arr1Y = (float) (p2Y - (arrowLength * unitY) + (arrowWidth2 * ppY));
+
+         final float arr2X = (float) (p2X - (arrowLength * unitX) - (arrowWidth2 * ppX));
+         final float arr2Y = (float) (p2Y - (arrowLength * unitY) - (arrowWidth2 * ppY));
+
+         // set arrow positions
+         directionArrow_XYPositions.add((short) (p2X * COORD_SCALE));
+         directionArrow_XYPositions.add((short) (p2Y * COORD_SCALE));
+
+         directionArrow_XYPositions.add((short) (arr1X * COORD_SCALE));
+         directionArrow_XYPositions.add((short) (arr1Y * COORD_SCALE));
+
+         directionArrow_XYPositions.add((short) (arr2X * COORD_SCALE));
+         directionArrow_XYPositions.add((short) (arr2Y * COORD_SCALE));
+
+         // setup next position
+         p1X = p2X;
+         p1Y = p2Y;
+      }
+
+      System.out.println((System.currentTimeMillis() + " num arrows:" + directionArrow_XYPositions.size() / 2 / 3));
+      // TODO remove SYSTEM.OUT.PRINTLN
+   }
+
    /**
     * Default is MIN_DIST * 4 = 1/8 * 4.
     */
@@ -1107,45 +1202,6 @@ public class LineBucketMT extends RenderBucketMT {
    public void setExtents(final int min, final int max) {
       tmin = min;
       tmax = max;
-
-   }
-
-   /**
-    * @param pixelDirectionArrowsIndices_Raw
-    *           Contains the x/y pixel positions for the direction arrows
-    */
-   public void setupDirectionArrows(final TFloatArrayList pixelDirectionArrowsIndices_Raw) {
-
-      directionArrowVertices.clearQuick();
-
-      final float[] allPixel_DirectionArrows_Indices = pixelDirectionArrowsIndices_Raw.toArray();
-
-      final double arrowSize = 20;
-      final double arrowSize2 = arrowSize / 2;
-
-      for (int pixelIndex = 0; pixelIndex < allPixel_DirectionArrows_Indices.length; pixelIndex = pixelIndex + 2) {
-
-         final float x = allPixel_DirectionArrows_Indices[pixelIndex];
-         final float y = allPixel_DirectionArrows_Indices[pixelIndex + 1];
-
-         final double x2 = x + arrowSize2;
-         final double x3 = x - arrowSize2;
-
-         final double y2 = y + arrowSize * 2;
-         final double y3 = y + arrowSize * 2;
-
-         directionArrowVertices.add((short) (x * COORD_SCALE));
-         directionArrowVertices.add((short) (y * COORD_SCALE));
-
-         directionArrowVertices.add((short) (x2 * COORD_SCALE));
-         directionArrowVertices.add((short) (y2 * COORD_SCALE));
-
-         directionArrowVertices.add((short) (x3 * COORD_SCALE));
-         directionArrowVertices.add((short) (y3 * COORD_SCALE));
-      }
-
-      System.out.println((System.currentTimeMillis() + " arrows:" + directionArrowVertices.size() / 2 / 3));
-      // TODO remove SYSTEM.OUT.PRINTLN
 
    }
 }

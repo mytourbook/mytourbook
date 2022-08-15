@@ -23,6 +23,7 @@ import gnu.trove.list.array.TShortArrayList;
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
+import org.oscim.renderer.MapRenderer;
 import org.oscim.renderer.bucket.RenderBuckets;
 import org.oscim.renderer.bucket.VertexData;
 import org.oscim.utils.pool.Inlist;
@@ -61,7 +62,7 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
    protected final VertexData   indiceItems;
 
    /**
-    * Contains the vertices for direction arrows:
+    * Contains the vertices for direction arrows multiplied with {@link MapRenderer#COORD_SCALE}:
     * <p>
     *
     * <pre>
@@ -74,7 +75,7 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
     * ...
     * </pre>
     */
-   protected TShortArrayList    directionArrowVertices;
+   protected TShortArrayList    directionArrow_XYPositions;
 
    final boolean                quads;
 
@@ -95,7 +96,7 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
 
       this.quads = quads;
 
-      directionArrowVertices = new TShortArrayList();
+      directionArrow_XYPositions = new TShortArrayList();
    }
 
    /**
