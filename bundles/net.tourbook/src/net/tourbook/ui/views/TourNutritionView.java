@@ -397,7 +397,7 @@ public class TourNutritionView extends ViewPart implements Observer {
       if (_searchHistory.contains(searchText) == false) {
 
          // update model
-         _searchHistory.add(searchText);
+         // _searchHistory.add(searchText);
 
          // update viewer
          _queryViewer.add(searchText);
