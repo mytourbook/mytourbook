@@ -30,6 +30,7 @@ import java.util.Observer;
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.e4.ui.di.PersistState;
@@ -403,9 +404,10 @@ public class TourNutritionView extends ViewPart implements Observer {
       }
 
       // start product search
-      final GeoQuery geoQuery = new GeoQuery(searchText);
-      geoQuery.addObserver(TourNutritionView.this);
-      geoQuery.asyncFind();
+//      final GeoQuery geoQuery = new GeoQuery(searchText);
+//      geoQuery.addObserver(TourNutritionView.this);
+//      geoQuery.asyncFind();
+      NutritionUtils.searchProduct(searchText);
    }
 
    private void restoreState() {

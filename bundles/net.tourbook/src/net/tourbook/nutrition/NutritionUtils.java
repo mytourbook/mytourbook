@@ -15,20 +15,57 @@
  *******************************************************************************/
 package net.tourbook.nutrition;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.Duration;
+
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 
 import pl.coderion.model.ProductResponse;
 
 public class NutritionUtils {
 
+   private static final String OPENFOODFACTS_SEARCH_URL =
+         "https://world.openfoodfacts.org/cgi/search.pl?action=process&sort_by=unique_scans_n&page_size=20&json=true&search_terms=nestle concentre"; //$NON-NLS-1$
+
    private static HttpClient _httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
+
+   public static void searchProduct(final String productName)
+   {
+      final HttpRequest request = HttpRequest.newBuilder()
+            .GET()
+            .uri(URI.create(OPENFOODFACTS_SEARCH_URL + productName))
+            .build();
+
+      try {
+         final HttpResponse<String> response = _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+         if (response.statusCode() == HttpURLConnection.HTTP_CREATED && StringUtils.hasContent(response.body())) {
+            final String titi = response.body();
+
+            System.out.println(titi);
+//            final var toto = new ObjectMapper().readValue(response.body(), List<ProductResponse.class>);
+//            System.out.println(toto.getProduct().getProductName())
+         } else {
+            StatusUtil.logError(response.body());
+         }
+      } catch (IOException | InterruptedException e) {
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      // return null;
+   }
 
    public static void testSdk() {
 
       // perform the search by name
-      //https://us.openfoodfacts.org/cgi/search.pl?action=process&tagtype_0=brands&tag_contains_0=contains&tag_0=Bobo's&json=true
-
+      //
       //perform the search by code
 
       //get a response
