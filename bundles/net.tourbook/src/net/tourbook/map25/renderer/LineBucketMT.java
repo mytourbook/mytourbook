@@ -101,6 +101,10 @@ public class LineBucketMT extends RenderBucketMT {
 
       int shader_a_pos,
             shader_u_mvp,
+
+            shader_uArrowColor,
+            shader_uOutlineBrightness,
+
             shader_u_width
 
       ;
@@ -111,10 +115,17 @@ public class LineBucketMT extends RenderBucketMT {
             return;
          }
 
-         shader_u_mvp = getUniform("u_mvp"); //$NON-NLS-1$
-         shader_a_pos = getAttrib("a_pos"); //$NON-NLS-1$
+// SET_FORMATTING_OFF
 
-         shader_u_width = getUniform("u_width"); //$NON-NLS-1$
+         shader_u_mvp               = getUniform("u_mvp"); //$NON-NLS-1$
+         shader_a_pos               = getAttrib("a_pos"); //$NON-NLS-1$
+
+         shader_u_width             = getUniform("u_width"); //$NON-NLS-1$
+
+         shader_uArrowColor         = getUniform("uArrowColor"); //$NON-NLS-1$
+         shader_uOutlineBrightness  = getUniform("uOutlineBrightness"); //$NON-NLS-1$
+
+// SET_FORMATTING_ON
       }
    }
 
@@ -144,21 +155,25 @@ public class LineBucketMT extends RenderBucketMT {
             return;
          }
 
-         shader_a_pos = getAttrib("a_pos"); //$NON-NLS-1$
-         shader_aVertexColor = getAttrib("aVertexColor"); //$NON-NLS-1$
+// SET_FORMATTING_OFF
 
-         shader_u_mvp = getUniform("u_mvp"); //$NON-NLS-1$
+         shader_a_pos               = getAttrib("a_pos"); //$NON-NLS-1$
+         shader_aVertexColor        = getAttrib("aVertexColor"); //$NON-NLS-1$
 
-         shader_u_fade = getUniform("u_fade"); //$NON-NLS-1$
-         shader_u_color = getUniform("u_color"); //$NON-NLS-1$
-         shader_u_mode = getUniform("u_mode"); //$NON-NLS-1$
+         shader_u_mvp               = getUniform("u_mvp"); //$NON-NLS-1$
 
-         shader_u_width = getUniform("u_width"); //$NON-NLS-1$
-         shader_u_height = getUniform("u_height"); //$NON-NLS-1$
+         shader_u_fade              = getUniform("u_fade"); //$NON-NLS-1$
+         shader_u_color             = getUniform("u_color"); //$NON-NLS-1$
+         shader_u_mode              = getUniform("u_mode"); //$NON-NLS-1$
 
-         shader_uColorMode = getUniform("uColorMode"); //$NON-NLS-1$
-         shader_uOutlineBrightness = getUniform("uOutlineBrightness"); //$NON-NLS-1$
-         shader_uVertexColorAlpha = getUniform("uVertexColorAlpha"); //$NON-NLS-1$
+         shader_u_width             = getUniform("u_width"); //$NON-NLS-1$
+         shader_u_height            = getUniform("u_height"); //$NON-NLS-1$
+
+         shader_uColorMode          = getUniform("uColorMode"); //$NON-NLS-1$
+         shader_uOutlineBrightness  = getUniform("uOutlineBrightness"); //$NON-NLS-1$
+         shader_uVertexColorAlpha   = getUniform("uVertexColorAlpha"); //$NON-NLS-1$
+
+// SET_FORMATTING_ON
       }
 
       @Override
@@ -474,6 +489,8 @@ public class LineBucketMT extends RenderBucketMT {
          final int shader_a_pos = shader.shader_a_pos;
          final int shader_u_mvp = shader.shader_u_mvp;
          final int shader_u_width = shader.shader_u_width;
+         final int shader_uArrowColor = shader.shader_uArrowColor;
+         final int shader_uOutlineBrightness = shader.shader_uOutlineBrightness;
 
          shader.useProgram();
 
@@ -482,12 +499,6 @@ public class LineBucketMT extends RenderBucketMT {
          // set mvp matrix into the shader
          viewport.mvp.setAsUniform(shader_u_mvp);
 
-         /*
-          * Set outline width
-          */
-         final float width = 10 / vp2mpScale;
-
-         gl.uniform1f(shader_u_width, width * COORD_SCALE_BY_DIR_SCALE);
 
          gl.bindBuffer(GL.ARRAY_BUFFER, allRenderBuckets.directionArrows_BufferId);
          gl.enableVertexAttribArray(shader_a_pos);
@@ -503,7 +514,27 @@ public class LineBucketMT extends RenderBucketMT {
 
          final int numDirArrowShorts = allRenderBuckets.numShortsForDirectionArrows;
 
+         /*
+          * Draw outline
+          */
+
+         // Set outline width
+         final float width = 10 / vp2mpScale;
+
+         gl.uniform1f(shader_u_width, width * COORD_SCALE_BY_DIR_SCALE);
+
+         gl.uniform1f(shader_uOutlineBrightness, 0.8f);
+         gl.uniform4f(shader_uArrowColor, 1.0f, 0.0f, 0.0f, 1.0f);
+
          gl.drawArrays(GL.TRIANGLES, 0, numDirArrowShorts);
+
+         /*
+          * Draw inner arrow over the outline
+          */
+//         gl.uniform1f(shader_uOutlineBrightness, 1.0f);
+//         gl.uniform4f(shader_uArrowColor, 0.0f, 0.0f, 1.0f, 1.0f);
+//
+//         gl.drawArrays(GL.TRIANGLES, 0, numDirArrowShorts);
 
 //       GLUtils.checkGlError(Renderer.class.getName());
       }
@@ -1130,8 +1161,8 @@ public class LineBucketMT extends RenderBucketMT {
 
       final float[] allDirectionArrowPixel = allDirectionArrowPixel_Raw.toArray();
 
-      _arrowWidth = 16;
-      _arrowLeghth = 20;
+      _arrowWidth = 26;
+      _arrowLeghth = 40;
 
       int pixelIndex = 0;
 
