@@ -17,18 +17,18 @@ package net.tourbook.ui.views;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import de.byteholder.geoclipse.poi.GeoQuery;
 import de.byteholder.gpx.PointOfInterest;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.stream.Stream;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
+import net.tourbook.nutrition.NutritionQuery;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.e4.ui.di.PersistState;
@@ -57,15 +57,13 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.help.IWorkbenchHelpSystem;
 import org.eclipse.ui.part.ViewPart;
 
-public class TourNutritionView extends ViewPart implements Observer {
+public class TourNutritionView extends ViewPart implements PropertyChangeListener {
 
    public static final String            ID                     = "de.byteholder.geoclipse.poi.poiView"; //$NON-NLS-1$
 
-   private static final String           STATE_SEARCHED_QUERIES = "searched.queries";                    //$NON-NLS-1$
+   private static final String           STATE_SEARCHED_NUTRITIONQUERIES = "searched.nutritionQueries";           //$NON-NLS-1$
 
    private static final String           IMG_KEY_ANCHOR         = "anchor";                              //$NON-NLS-1$
    private static final String           IMG_KEY_CAR            = "car";                                 //$NON-NLS-1$
@@ -85,8 +83,6 @@ public class TourNutritionView extends ViewPart implements Observer {
    private PostSelectionProvider         _postSelectionProvider;
 
    private IPropertyChangeListener       _prefChangeListener;
-
-   private IWorkbenchHelpSystem          _wbHelpSystem;
 
    /*
     * UI controls
@@ -242,15 +238,6 @@ public class TourNutritionView extends ViewPart implements Observer {
 
       initImageRegistry();
 
-      //contextHelp for this view.
-      //Clicking F1 while this view has Focus will jump to the associated
-      //helpContext, see de.byteholder.geoclipse.help
-      _wbHelpSystem = PlatformUI.getWorkbench().getHelpSystem();
-
-      //TODO this "forces" of this plug-in to de.byteholder.geoclipse.help ?!
-      final String contextId = "de.byteholder.geoclipse.help.places_view"; //$NON-NLS-1$
-      _wbHelpSystem.setHelp(parent, contextId);
-
       createUI(parent);
 
       addPrefListener();
@@ -403,15 +390,52 @@ public class TourNutritionView extends ViewPart implements Observer {
       }
 
       // start product search
-      final GeoQuery geoQuery = new GeoQuery(searchText);
-      geoQuery.addObserver(TourNutritionView.this);
-      geoQuery.asyncFind();
+      final NutritionQuery nutritionQuery = new NutritionQuery(searchText);
+      nutritionQuery.addPropertyChangeListener(this);
+      nutritionQuery.run();
+   }
+
+   @Override
+   public void propertyChange(final PropertyChangeEvent evt) {
+
+      final List<String> searchResult = (List<String>) evt.getNewValue();
+
+      if (searchResult != null) {
+         _pois = searchResult;
+      }
+
+      Display.getDefault().asyncExec(() -> {
+
+         // check if view is closed
+         if (_btnSearch.isDisposed()) {
+            return;
+         }
+
+         // refresh viewer
+         _poiViewer.setInput(new Object());
+
+         // select first entry, if there is one
+         final Table poiTable = _poiViewer.getTable();
+         if (poiTable.getItemCount() > 0) {
+
+            final Object firstData = poiTable.getItem(0).getData();
+            if (firstData instanceof PointOfInterest) {
+
+               _poiViewer.setSelection(new StructuredSelection(firstData));
+               setViewerFocus();
+            }
+         }
+
+         _cboSearchQuery.setEnabled(true);
+         _btnSearch.setEnabled(true);
+      });
+
    }
 
    private void restoreState() {
 
       // restore old used queries
-      final String[] stateSearchedQueries = _state.getArray(STATE_SEARCHED_QUERIES);
+      final String[] stateSearchedQueries = _state.getArray(STATE_SEARCHED_NUTRITIONQUERIES);
       if (stateSearchedQueries != null) {
          Stream.of(stateSearchedQueries).forEach(query -> _searchHistory.add(query));
       }
@@ -423,7 +447,7 @@ public class TourNutritionView extends ViewPart implements Observer {
    @PersistState
    private void saveState() {
 
-      _state.put(STATE_SEARCHED_QUERIES, _searchHistory.toArray(new String[_searchHistory.size()]));
+      _state.put(STATE_SEARCHED_NUTRITIONQUERIES, _searchHistory.toArray(new String[_searchHistory.size()]));
    }
 
    @Override
@@ -447,50 +471,4 @@ public class TourNutritionView extends ViewPart implements Observer {
       table.setFocus();
    }
 
-   /**
-    * implements update from interface observer
-    */
-   @Override
-   public void update(final Observable observable, final Object arg) {
-
-      if (observable instanceof GeoQuery) {
-
-         final GeoQuery geoQuery = (GeoQuery) observable;
-
-         final List<String> searchResult = geoQuery.getSearchResult();
-         if (searchResult != null) {
-            _pois = searchResult;
-         }
-
-         Display.getDefault().asyncExec(() -> {
-
-            // check if view is closed
-            if (_btnSearch.isDisposed()) {
-               return;
-            }
-
-            // refresh viewer
-            _poiViewer.setInput(new Object());
-
-            // select first entry, if there is one
-            final Table poiTable = _poiViewer.getTable();
-            if (poiTable.getItemCount() > 0) {
-
-               final Object firstData = poiTable.getItem(0).getData();
-               if (firstData instanceof PointOfInterest) {
-
-                  _poiViewer.setSelection(new StructuredSelection(firstData));
-                  setViewerFocus();
-               }
-            }
-
-            _cboSearchQuery.setEnabled(true);
-            _btnSearch.setEnabled(true);
-         });
-
-         if (geoQuery.getException() != null) {
-            throw new RuntimeException(geoQuery.getException());
-         }
-      }
-   }
 }
