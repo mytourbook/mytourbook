@@ -25,10 +25,10 @@ import de.byteholder.gpx.PointOfInterest;
 import de.byteholder.gpx.Waypoint;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.stream.Stream;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
@@ -419,7 +419,7 @@ public class PoiView extends ViewPart implements Observer {
       // restore old used queries
       final String[] stateSearchedQueries = _state.getArray(STATE_SEARCHED_QUERIES);
       if (stateSearchedQueries != null) {
-         _searchHistory = Arrays.asList(stateSearchedQueries);
+         Stream.of(stateSearchedQueries).forEach(query -> _searchHistory.add(query));
       }
 
       // update content in the comboviewer
