@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (C) 2008, 2021 Michael Kanis, Veit Edunjobi and others
+ *  Copyright (C) 2008, 2022 Michael Kanis, Veit Edunjobi and others
  *
  *  This file is part of Geoclipse.
  *
