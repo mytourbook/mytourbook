@@ -83,7 +83,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    private PostSelectionProvider         _postSelectionProvider;
 
    private IPropertyChangeListener       _prefChangeListener;
-
+   final NutritionQuery                  _nutritionQuery                 = new NutritionQuery();
    /*
     * UI controls
     */
@@ -231,6 +231,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       };
 
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+
+      _nutritionQuery.addPropertyChangeListener(this);
    }
 
    @Override
@@ -350,6 +352,7 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
    public void dispose() {
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
+      _nutritionQuery.removePropertyChangeListener(this);
 
       super.dispose();
    }
@@ -390,9 +393,8 @@ public class TourNutritionView extends ViewPart implements PropertyChangeListene
       }
 
       // start product search
-      final NutritionQuery nutritionQuery = new NutritionQuery(searchText);
-      nutritionQuery.addPropertyChangeListener(this);
-      nutritionQuery.run();
+
+      _nutritionQuery.asyncFind(searchText);
    }
 
    @Override

@@ -20,8 +20,7 @@ public class NutritionQuery implements Runnable {
 
    private PropertyChangeSupport support;
 
-   public NutritionQuery(final String query) {
-      _query = query;
+   public NutritionQuery() {
       support = new PropertyChangeSupport(this);
    }
 
@@ -29,7 +28,9 @@ public class NutritionQuery implements Runnable {
       support.addPropertyChangeListener(pcl);
    }
 
-   public void asyncFind() {
+   public void asyncFind(final String productName) {
+
+      _query = productName;
 
       final Job job = new Job("Messages.job_name_searchingPOI") {
 
@@ -55,8 +56,8 @@ public class NutritionQuery implements Runnable {
          support.removePropertyChangeListener(pcl);
      }
 
-   @Override
-   public void run() {
+     @Override
+     public void run() {
 
       final var oldValue = List.copyOf(_searchResult);
       try {
