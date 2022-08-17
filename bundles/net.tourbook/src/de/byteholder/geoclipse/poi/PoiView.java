@@ -86,7 +86,7 @@ public class PoiView extends ViewPart implements Observer {
    private static final IDialogSettings  _state                 = TourbookPlugin.getState("PoiView");    //$NON-NLS-1$
 
    private TableViewer                   _poiViewer;
-   private List<PointOfInterest>         _pois;
+   private List<String>                  _pois;
    private List<String>                  _searchHistory         = new ArrayList<>();
 
    private PostSelectionProvider         _postSelectionProvider;
@@ -224,7 +224,7 @@ public class PoiView extends ViewPart implements Observer {
    public PoiView() {}
 
    public PoiView(final List<PointOfInterest> pois) {
-      _pois = pois;
+      //_pois = pois;
    }
 
    private void addPrefListener() {
@@ -463,7 +463,7 @@ public class PoiView extends ViewPart implements Observer {
 
          final GeoQuery geoQuery = (GeoQuery) observable;
 
-         final List<PointOfInterest> searchResult = geoQuery.getSearchResult();
+         final List<String> searchResult = geoQuery.getSearchResult();
          if (searchResult != null) {
             _pois = searchResult;
          }

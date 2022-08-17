@@ -19,7 +19,6 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import de.byteholder.geoclipse.poi.GeoQuery;
 import de.byteholder.gpx.PointOfInterest;
-import de.byteholder.gpx.Waypoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,6 @@ import java.util.stream.Stream;
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.nutrition.NutritionUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.e4.ui.di.PersistState;
@@ -81,7 +79,7 @@ public class TourNutritionView extends ViewPart implements Observer {
    private static final IDialogSettings  _state                 = TourbookPlugin.getState("PoiView");    //$NON-NLS-1$
 
    private TableViewer                   _poiViewer;
-   private List<PointOfInterest>         _pois;
+   private List<String>                  _pois;
    private List<String>                  _searchHistory         = new ArrayList<>();
 
    private PostSelectionProvider         _postSelectionProvider;
@@ -145,39 +143,40 @@ public class TourNutritionView extends ViewPart implements Observer {
       @Override
       public String getColumnText(final Object obj, final int index) {
 
-         final PointOfInterest poi = (PointOfInterest) obj;
-
-         switch (index) {
-         case 0:
-            return poi.getCategory();
-         case 1:
-
-            final StringBuilder sb = new StringBuilder(poi.getName());
-
-            final List<? extends Waypoint> nearestPlaces = poi.getNearestPlaces();
-            if (nearestPlaces != null && nearestPlaces.size() > 0) {
-
-               // create a string with all nearest waypoints
-               boolean isFirstPoi = true;
-               for (final Waypoint waypoint : nearestPlaces) {
-
-                  if (isFirstPoi) {
-                     isFirstPoi = false;
-                     sb.append("Messages.Poi_View_Label_NearestPlacesPart1");
-                     sb.append("Messages.Poi_View_Label_Near");
-                  } else {
-                     sb.append("Messages.Poi_View_Label_NearestPlacesPart2");
-                  }
-
-                  sb.append("Messages.Poi_View_Label_NearestPlacesPart3");
-                  sb.append(waypoint.getName());
-               }
-               sb.append("Messages.Poi_View_Label_NearestPlacesPart4");
-            }
-            return sb.toString();
-         default:
-            return getText(obj);
-         }
+         return obj.toString();
+//         final PointOfInterest poi = (PointOfInterest) obj;
+//
+//         switch (index) {
+//         case 0:
+//            return poi.getCategory();
+//         case 1:
+//
+//            final StringBuilder sb = new StringBuilder(poi.getName());
+//
+//            final List<? extends Waypoint> nearestPlaces = poi.getNearestPlaces();
+//            if (nearestPlaces != null && nearestPlaces.size() > 0) {
+//
+//               // create a string with all nearest waypoints
+//               boolean isFirstPoi = true;
+//               for (final Waypoint waypoint : nearestPlaces) {
+//
+//                  if (isFirstPoi) {
+//                     isFirstPoi = false;
+//                     sb.append("Messages.Poi_View_Label_NearestPlacesPart1");
+//                     sb.append("Messages.Poi_View_Label_Near");
+//                  } else {
+//                     sb.append("Messages.Poi_View_Label_NearestPlacesPart2");
+//                  }
+//
+//                  sb.append("Messages.Poi_View_Label_NearestPlacesPart3");
+//                  sb.append(waypoint.getName());
+//               }
+//               sb.append("Messages.Poi_View_Label_NearestPlacesPart4");
+//            }
+//            return sb.toString();
+//         default:
+//            return getText(obj);
+//         }
       }
 
       @Override
@@ -218,7 +217,7 @@ public class TourNutritionView extends ViewPart implements Observer {
 
    public TourNutritionView() {}
 
-   public TourNutritionView(final List<PointOfInterest> pois) {
+   public TourNutritionView(final List<String> pois) {
       _pois = pois;
    }
 
@@ -404,10 +403,9 @@ public class TourNutritionView extends ViewPart implements Observer {
       }
 
       // start product search
-//      final GeoQuery geoQuery = new GeoQuery(searchText);
-//      geoQuery.addObserver(TourNutritionView.this);
-//      geoQuery.asyncFind();
-      NutritionUtils.searchProduct(searchText);
+      final GeoQuery geoQuery = new GeoQuery(searchText);
+      geoQuery.addObserver(TourNutritionView.this);
+      geoQuery.asyncFind();
    }
 
    private void restoreState() {
@@ -459,7 +457,7 @@ public class TourNutritionView extends ViewPart implements Observer {
 
          final GeoQuery geoQuery = (GeoQuery) observable;
 
-         final List<PointOfInterest> searchResult = geoQuery.getSearchResult();
+         final List<String> searchResult = geoQuery.getSearchResult();
          if (searchResult != null) {
             _pois = searchResult;
          }

@@ -15,6 +15,10 @@
  *******************************************************************************/
 package net.tourbook.nutrition;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -22,11 +26,11 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.List;
 
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
-
-import pl.coderion.model.ProductResponse;
+import net.tourbook.nutrition.openfoodfacts.Product;
 
 public class NutritionUtils {
 
@@ -35,7 +39,7 @@ public class NutritionUtils {
 
    private static HttpClient _httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
 
-   public static void searchProduct(final String productName)
+   public static List<Product> searchProduct(final String productName)
    {
       final HttpRequest request = HttpRequest.newBuilder()
             .GET()
@@ -46,7 +50,18 @@ public class NutritionUtils {
          final HttpResponse<String> response = _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
          if (response.statusCode() == HttpURLConnection.HTTP_OK && StringUtils.hasContent(response.body())) {
-            // final String titi = response.body();
+
+            //weather
+            final ObjectMapper mapper = new ObjectMapper();
+            final String weatherResults = mapper.readValue(response.body(), JsonNode.class)
+                  .get("products") //$NON-NLS-1$
+                  .toString();
+
+            final var serializedWeatherData = mapper.readValue(weatherResults,
+                  new TypeReference<List<Product>>() {});
+            return serializedWeatherData;
+
+            //      final String titi = response.body();
 
             // System.out.println(titi);
 //            final var toto = new ObjectMapper().readValue(response.body(), List<ProductResponse.class>);
@@ -59,7 +74,7 @@ public class NutritionUtils {
          Thread.currentThread().interrupt();
       }
 
-      // return null;
+      return null;
    }
 
    public static void testSdk() {
@@ -69,10 +84,10 @@ public class NutritionUtils {
       //perform the search by code
 
       //get a response
-      final ProductResponse response = new ProductResponse();
-      final String productName = response.getProduct().getProductName();
-      final float carbs = response.getProduct().getNutriments().getCarbohydrates();
-      final float sodium = response.getProduct().getNutriments().getSodium();
+//      final ProductResponse response = new ProductResponse();
+//      final String productName = response.getProduct().getProductName();
+//      final float carbs = response.getProduct().getNutriments().getCarbohydrates();
+//      final float sodium = response.getProduct().getNutriments().getSodium();
       //didn't find the caffeine, ask them ?
       //it's harder for the fluid because we need to know the size of the flask...
 

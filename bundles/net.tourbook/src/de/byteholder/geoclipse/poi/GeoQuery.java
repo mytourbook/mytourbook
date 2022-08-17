@@ -1,75 +1,73 @@
 package de.byteholder.geoclipse.poi;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
-import javax.xml.parsers.SAXParserFactory;
+import net.tourbook.nutrition.NutritionUtils;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
-import de.byteholder.gpx.PointOfInterest;
-
 public class GeoQuery extends Observable implements Runnable {
 
 //	private final static String			URL				= "http://www.frankieandshadow.com/osm/search.xml?find="; //$NON-NLS-1$
 //	private final static String			SEARCH_URL		= "http://gazetteer.openstreetmap.org/namefinder/search.xml?find="; //$NON-NLS-1$
-	private final static String			SEARCH_URL		= "https://nominatim.openstreetmap.org/search?format=xml&addressdetails=0&q=";	//$NON-NLS-1$
+   private final static String SEARCH_URL    = "https://nominatim.openstreetmap.org/search?format=xml&addressdetails=0&q="; //$NON-NLS-1$
 
-	private ArrayList<PointOfInterest>	_searchResult	= new ArrayList<>();
+   private List<String>        _searchResult = new ArrayList<>();
 
-	private Exception							_exception;
+   private Exception           _exception;
 
-	private String								_query;
+   private String              _query;
 
-	public GeoQuery(final String query) {
-		_query = query;
-	}
+   public GeoQuery(final String query) {
+      _query = query;
+   }
 
-	public void asyncFind() {
+   public void asyncFind() {
 
-		final Job job = new Job(Messages.job_name_searchingPOI) {
+      final Job job = new Job(Messages.job_name_searchingPOI) {
 
-			@Override
-			protected IStatus run(final IProgressMonitor arg0) {
-				GeoQuery.this.run();
-				return Status.OK_STATUS;
-			}
-		};
+         @Override
+         protected IStatus run(final IProgressMonitor arg0) {
+            GeoQuery.this.run();
+            return Status.OK_STATUS;
+         }
+      };
 
-		job.schedule();
-	}
+      job.schedule();
+   }
 
-	public Exception getException() {
-		return _exception;
-	}
+   public Exception getException() {
+      return _exception;
+   }
 
-	public List<PointOfInterest> getSearchResult() {
-		return _searchResult;
-	}
+   public List<String> getSearchResult() {
+      return _searchResult;
+   }
 
-	@Override
-	public void run() {
+   @Override
+   public void run() {
 
-		try {
+      try {
 
-			_searchResult.clear();
+         _searchResult.clear();
+//
+//			final String uri = SEARCH_URL + URLEncoder.encode(_query, "utf8"); //$NON-NLS-1$
+//
+//			SAXParserFactory.newInstance().newSAXParser().parse(uri, new GeoQuerySAXHandler(_searchResult));
+         final var toto = NutritionUtils.searchProduct(_query);
+         toto.stream().forEach(product -> _searchResult.add(product.getProductName()));
+      } catch (final Exception e) {
+         _exception = e;
+      }
 
-			final String uri = SEARCH_URL + URLEncoder.encode(_query, "utf8"); //$NON-NLS-1$
-
-			SAXParserFactory.newInstance().newSAXParser().parse(uri, new GeoQuerySAXHandler(_searchResult));
-
-		} catch (final Exception e) {
-			_exception = e;
-		}
-
-		setChanged();
-		notifyObservers();
-	}
+      setChanged();
+      notifyObservers();
+   }
 
 //	private List<PointOfInterest> find() throws Exception {
 //
