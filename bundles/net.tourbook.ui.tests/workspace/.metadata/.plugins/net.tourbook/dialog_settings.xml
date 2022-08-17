@@ -209,4 +209,10 @@
 	</section>
 	<section name="TourTagsView">
 	</section>
+		<section name="PoiView">
+		<list key="searched.queries">
+			<item value="boulangerie"/>
+			<item value="Mt Blanc"/>
+		</list>
+	</section>
 </section>
