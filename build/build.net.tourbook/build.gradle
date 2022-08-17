@@ -53,7 +53,7 @@ sonarqube {
     property 'sonar.host.url',                       'https://sonarcloud.io'
     property 'sonar.sources',                        'bundles'
     property 'sonar.exclusions',                     'bundles/net.tourbook.ext.jars/**/*'
-    property 'sonar.coverage.exclusions',            'bundles/net.tourbook.tests/**/*.*, **src-test/**/*.*, bundles/net.tourbook.ui.tests/**/*.*, bundles/net.tourbook.p2/**/*.*, bundles/**/Slideout*.java, bundles/**/*_DISABLED.java, bundles/**/*_TEMPLATE_*.java, /bundles/net.tourbook/src/net/tourbook/update/**/*.*'
+    property 'sonar.coverage.exclusions',            'bundles/net.tourbook.tests/**/*.*, **src-test/**/*.*, bundles/net.tourbook.ui.tests/**/*.*, bundles/net.tourbook.p2/**/*.*, bundles/**/Slideout*.java, bundles/**/*_DISABLED.java, bundles/**/*_TEMPLATE_*.java, /bundles/net.tourbook/src/net/tourbook/update/**/*.*, /bundles/net.tourbook/src/net/tourbook/map3/**/*.*'
     property 'sonar.java.binaries',                  '.'
     property 'sonar.java.libraries',                 'bundles/net.tourbook.ext.jars/**/*.jar'
     property 'sonar.coverage.jacoco.xmlReportPaths', '../../mytourbook-BUILD-autocreated/core/net.tourbook.tests/target/site/jacoco-aggregate/jacoco.xml, ../../mytourbook-BUILD-autocreated/core/net.tourbook.ui.tests/target/site/jacoco-aggregate/jacoco.xml'
