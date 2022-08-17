@@ -25,10 +25,10 @@ import de.byteholder.gpx.PointOfInterest;
 import de.byteholder.gpx.Waypoint;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.stream.Stream;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
@@ -86,7 +86,7 @@ public class PoiView extends ViewPart implements Observer {
    private static final IDialogSettings  _state                 = TourbookPlugin.getState("PoiView");    //$NON-NLS-1$
 
    private TableViewer                   _poiViewer;
-   private List<String>                  _pois;
+   private List<PointOfInterest>         _pois;
    private List<String>                  _searchHistory         = new ArrayList<>();
 
    private PostSelectionProvider         _postSelectionProvider;
@@ -224,7 +224,7 @@ public class PoiView extends ViewPart implements Observer {
    public PoiView() {}
 
    public PoiView(final List<PointOfInterest> pois) {
-      //_pois = pois;
+      _pois = pois;
    }
 
    private void addPrefListener() {
@@ -419,7 +419,7 @@ public class PoiView extends ViewPart implements Observer {
       // restore old used queries
       final String[] stateSearchedQueries = _state.getArray(STATE_SEARCHED_QUERIES);
       if (stateSearchedQueries != null) {
-         Stream.of(stateSearchedQueries).forEach(query -> _searchHistory.add(query));
+         _searchHistory = Arrays.asList(stateSearchedQueries);
       }
 
       // update content in the comboviewer
@@ -463,7 +463,7 @@ public class PoiView extends ViewPart implements Observer {
 
          final GeoQuery geoQuery = (GeoQuery) observable;
 
-         final List<String> searchResult = geoQuery.getSearchResult();
+         final List<PointOfInterest> searchResult = geoQuery.getSearchResult();
          if (searchResult != null) {
             _pois = searchResult;
          }
