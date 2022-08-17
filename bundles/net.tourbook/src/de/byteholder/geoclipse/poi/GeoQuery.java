@@ -1,10 +1,13 @@
 package de.byteholder.geoclipse.poi;
 
+import de.byteholder.gpx.PointOfInterest;
+
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
-import net.tourbook.nutrition.NutritionUtils;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -15,13 +18,13 @@ public class GeoQuery extends Observable implements Runnable {
 
 //	private final static String			URL				= "http://www.frankieandshadow.com/osm/search.xml?find="; //$NON-NLS-1$
 //	private final static String			SEARCH_URL		= "http://gazetteer.openstreetmap.org/namefinder/search.xml?find="; //$NON-NLS-1$
-   private final static String SEARCH_URL    = "https://nominatim.openstreetmap.org/search?format=xml&addressdetails=0&q="; //$NON-NLS-1$
+   private final static String        SEARCH_URL    = "https://nominatim.openstreetmap.org/search?format=xml&addressdetails=0&q="; //$NON-NLS-1$
 
-   private List<String>        _searchResult = new ArrayList<>();
+   private ArrayList<PointOfInterest> _searchResult = new ArrayList<>();
 
-   private Exception           _exception;
+   private Exception                  _exception;
 
-   private String              _query;
+   private String                     _query;
 
    public GeoQuery(final String query) {
       _query = query;
@@ -45,7 +48,7 @@ public class GeoQuery extends Observable implements Runnable {
       return _exception;
    }
 
-   public List<String> getSearchResult() {
+   public List<PointOfInterest> getSearchResult() {
       return _searchResult;
    }
 
@@ -55,12 +58,11 @@ public class GeoQuery extends Observable implements Runnable {
       try {
 
          _searchResult.clear();
-//
-//			final String uri = SEARCH_URL + URLEncoder.encode(_query, "utf8"); //$NON-NLS-1$
-//
-//			SAXParserFactory.newInstance().newSAXParser().parse(uri, new GeoQuerySAXHandler(_searchResult));
-         final var toto = NutritionUtils.searchProduct(_query);
-         toto.stream().forEach(product -> _searchResult.add(product.getProductName()));
+
+         final String uri = SEARCH_URL + URLEncoder.encode(_query, "utf8"); //$NON-NLS-1$
+
+         SAXParserFactory.newInstance().newSAXParser().parse(uri, new GeoQuerySAXHandler(_searchResult));
+
       } catch (final Exception e) {
          _exception = e;
       }
