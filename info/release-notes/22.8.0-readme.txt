@@ -1,4 +1,4 @@
-22.8.0                                                 ?. August 2022
+22.8.0                                                   17. August 2022
 
 
 New
@@ -26,10 +26,11 @@ Improvements
   - Set vertical position for the map tilt rotation axis    https://github.com/mytourbook/mytourbook/issues/890
 
 * Weather (Frederic)
-  - Added a drizzle weather icon          https://github.com/mytourbook/mytourbook/issues/874
+  - Added a drizzle weather icon                            https://github.com/mytourbook/mytourbook/issues/874
 
 * Tour Editor (Frederic)
-  - Added the ability to change the weather description's number of lines https://github.com/mytourbook/mytourbook/issues/897
+  - Added the ability to change the weather description's number of lines 
+                                                            https://github.com/mytourbook/mytourbook/issues/897
 
 * Tour printing (Frederic)
   - Added the ability to enable/disable the opening of the printed tour in the default PDF viewer
@@ -52,7 +53,8 @@ Bugfix
   - Track width jumped when the zoom-level changed, now it's width is always the same
 
 * TCX Export (Frederic)
-  - Fixed an issue where the exported speed was in km/h instead of m/s https://github.com/mytourbook/mytourbook/issues/903
+  - Fixed an issue where the exported speed was in km/h instead of m/s 
+                                                            https://github.com/mytourbook/mytourbook/issues/903
 
 
 Translation    
