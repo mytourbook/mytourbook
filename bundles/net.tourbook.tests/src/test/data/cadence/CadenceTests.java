@@ -38,12 +38,11 @@ import utils.FilesUtils;
 
 public class CadenceTests {
 
-   private static final String               GARMIN_IMPORT_PATH      = GarminTCX_DeviceDataReaderTests.IMPORT_PATH;
+   private static final String               GARMIN_IMPORT_PATH      = GarminTCX_DeviceDataReaderTests.FILES_PATH;
    private static final String               SUUNTO_IMPORT_FILE_PATH = FilesUtils.rootPath + "device/suunto/files/"; //$NON-NLS-1$
    private static final String               JSON_GZ                 = ".json.gz";                                   //$NON-NLS-1$
 
    private static HashMap<Long, TourData>    newlyImportedTours;
-   private static HashMap<Long, TourData>    alreadyImportedTours;
    private static GarminTCX_DeviceDataReader garminDeviceDataReader;
    private static Suunto9_DeviceDataReader   suunto9DeviceDataReader;
 
@@ -53,7 +52,6 @@ public class CadenceTests {
    static void initAll() {
 
       newlyImportedTours = new HashMap<>();
-      alreadyImportedTours = new HashMap<>();
       garminDeviceDataReader = new GarminTCX_DeviceDataReader();
       suunto9DeviceDataReader = new Suunto9_DeviceDataReader();
    }
@@ -62,7 +60,6 @@ public class CadenceTests {
    void tearDown() {
 
       newlyImportedTours.clear();
-      alreadyImportedTours.clear();
 
       // Restoring the default values
       _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, false);
@@ -79,7 +76,7 @@ public class CadenceTests {
 
       suunto9DeviceDataReader.processDeviceData(testFilePath,
             null,
-            alreadyImportedTours,
+            new HashMap<>(),
             newlyImportedTours,
             new ImportState_File(),
             new ImportState_Process());
@@ -113,7 +110,7 @@ public class CadenceTests {
 
       suunto9DeviceDataReader.processDeviceData(testFilePath,
             null,
-            alreadyImportedTours,
+            new HashMap<>(),
             newlyImportedTours,
             new ImportState_File(),
             new ImportState_Process());
@@ -141,7 +138,7 @@ public class CadenceTests {
 
       garminDeviceDataReader.processDeviceData(importFileAbsolutePath,
             null,
-            alreadyImportedTours,
+            new HashMap<>(),
             newlyImportedTours,
             new ImportState_File(),
             new ImportState_Process());
@@ -171,7 +168,7 @@ public class CadenceTests {
 
       garminDeviceDataReader.processDeviceData(importFileAbsolutePath,
             null,
-            alreadyImportedTours,
+            new HashMap<>(),
             newlyImportedTours,
             new ImportState_File(),
             new ImportState_Process());

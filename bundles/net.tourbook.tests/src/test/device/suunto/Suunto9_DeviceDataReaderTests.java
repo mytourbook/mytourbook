@@ -36,9 +36,9 @@ import utils.FilesUtils;
 
 class Suunto9_DeviceDataReaderTests {
 
-   private static final String             IMPORT_FILE_PATH = FilesUtils.rootPath + "device/suunto/files/"; //$NON-NLS-1$
+   private static final String             FILES_PATH = FilesUtils.rootPath + "device/suunto/files/"; //$NON-NLS-1$
 
-   private static final String             JSON_GZ          = ".json.gz";                                   //$NON-NLS-1$
+   private static final String             JSON_GZ    = ".json.gz";                                   //$NON-NLS-1$
 
    private static HashMap<Long, TourData>  newlyImportedTours;
    private static HashMap<Long, TourData>  alreadyImportedTours;
@@ -94,7 +94,7 @@ class Suunto9_DeviceDataReaderTests {
    @Test
    void testImportCityOfRocks() {
 
-      final String filePath = IMPORT_FILE_PATH + "1537365846902_183010004848_post_timeline-1"; //$NON-NLS-1$
+      final String filePath = FILES_PATH + "1537365846902_183010004848_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
       deviceDataReader.processDeviceData(testFilePath,
@@ -115,7 +115,7 @@ class Suunto9_DeviceDataReaderTests {
    @Test
    void testImportMaxwell1() {
 
-      final String filePath = IMPORT_FILE_PATH + "Original-1536723722706_183010004848_post_timeline-1"; //$NON-NLS-1$
+      final String filePath = FILES_PATH + "Original-1536723722706_183010004848_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
       deviceDataReader.processDeviceData(testFilePath,
@@ -136,7 +136,7 @@ class Suunto9_DeviceDataReaderTests {
    @Test
    void testImportRRData() {
 
-      final String filePath = IMPORT_FILE_PATH + "1549250450458_183010004848_post_timeline-1"; //$NON-NLS-1$
+      final String filePath = FILES_PATH + "1549250450458_183010004848_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
       deviceDataReader.processDeviceData(testFilePath,
@@ -157,7 +157,7 @@ class Suunto9_DeviceDataReaderTests {
    @Test
    void testImportShoreLineWithLaps() {
 
-      final String filePath = IMPORT_FILE_PATH + "1555291925128_183010004848_post_timeline-1"; //$NON-NLS-1$
+      final String filePath = FILES_PATH + "1555291925128_183010004848_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
       deviceDataReader.processDeviceData(testFilePath,
@@ -189,16 +189,16 @@ class Suunto9_DeviceDataReaderTests {
       // Maxwell, CO (Split manually)
 
       // File #1
-      final String maxWell1FilePath = IMPORT_FILE_PATH + "1536723722706_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
+      final String maxWell1FilePath = FILES_PATH + "1536723722706_183010004848_post_timeline-1.json.gz"; //$NON-NLS-1$
 
       // File #2
-      final String maxWell2FilePath = IMPORT_FILE_PATH + "1536723722706_183010004848_post_timeline-2.json.gz"; //$NON-NLS-1$
+      final String maxWell2FilePath = FILES_PATH + "1536723722706_183010004848_post_timeline-2.json.gz"; //$NON-NLS-1$
 
       // File #3
-      final String maxWell3FilePath = IMPORT_FILE_PATH + "1536723722706_183010004848_post_timeline-3.json.gz"; //$NON-NLS-1$
+      final String maxWell3FilePath = FILES_PATH + "1536723722706_183010004848_post_timeline-3.json.gz"; //$NON-NLS-1$
 
       // File control
-      final String controlDocumentPath = IMPORT_FILE_PATH + "1536723722706_183010004848_post_timeline-1-SplitTests"; //$NON-NLS-1$
+      final String controlDocumentPath = FILES_PATH + "1536723722706_183010004848_post_timeline-1-SplitTests"; //$NON-NLS-1$
 
       // ORDER 1 - 2 - 3
 
@@ -234,7 +234,7 @@ class Suunto9_DeviceDataReaderTests {
    @Test
    void testImportSwimming1() {
 
-      final String filePath = IMPORT_FILE_PATH + "1547628896209_184710003036_post_timeline-1"; //$NON-NLS-1$
+      final String filePath = FILES_PATH + "1547628896209_184710003036_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
       deviceDataReader.processDeviceData(testFilePath,
@@ -255,7 +255,7 @@ class Suunto9_DeviceDataReaderTests {
    @Test
    void testImportSwimming2() {
 
-      final String filePath = IMPORT_FILE_PATH + "1547628897243_184710003036_post_timeline-1"; //$NON-NLS-1$
+      final String filePath = FILES_PATH + "1547628897243_184710003036_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
       deviceDataReader.processDeviceData(testFilePath,
@@ -276,7 +276,7 @@ class Suunto9_DeviceDataReaderTests {
    @Test
    void testImportTinyPause() {
 
-      final String filePath = IMPORT_FILE_PATH + "1594598677631_183010004848_post_timeline-1"; //$NON-NLS-1$
+      final String filePath = FILES_PATH + "1594598677631_183010004848_post_timeline-1"; //$NON-NLS-1$
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
       deviceDataReader.processDeviceData(testFilePath,
