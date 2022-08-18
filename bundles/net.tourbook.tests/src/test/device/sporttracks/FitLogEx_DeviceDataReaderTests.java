@@ -27,7 +27,7 @@ import utils.FilesUtils;
 
 class FitLogEx_DeviceDataReaderTests extends DeviceDataReaderTester {
 
-   private static final String             IMPORT_PATH      = FilesUtils.rootPath + "device/sporttracks/fitlogex/files/"; //$NON-NLS-1$
+   private static final String             FILES_PATH       = FilesUtils.rootPath + "device/sporttracks/fitlogex/files/"; //$NON-NLS-1$
    protected static FitLogDeviceDataReader deviceDataReader = new FitLogDeviceDataReader();
 
    /**
@@ -42,12 +42,12 @@ class FitLogEx_DeviceDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testImportParkCity() {
 
-      testImportFile(deviceDataReader, IMPORT_PATH + "ParkCity", ".fitlogEx");
+      testImportFile(deviceDataReader, FILES_PATH + "ParkCity", ".fitlogEx");
    }
 
    @Test
    void testImportTimothyLake() {
 
-      testImportFile(deviceDataReader, IMPORT_PATH + "TimothyLake", ".fitlogEx");
+      testImportFile(deviceDataReader, FILES_PATH + "TimothyLake", ".fitlogEx");
    }
 }

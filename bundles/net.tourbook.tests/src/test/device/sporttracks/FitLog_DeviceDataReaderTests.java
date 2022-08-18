@@ -24,12 +24,12 @@ import utils.FilesUtils;
 
 public class FitLog_DeviceDataReaderTests extends DeviceDataReaderTester {
 
-   private static final String             IMPORT_PATH      = FilesUtils.rootPath + "device/sporttracks/fitlog/files/"; //$NON-NLS-1$
+   private static final String             FILES_PATH       = FilesUtils.rootPath + "device/sporttracks/fitlog/files/"; //$NON-NLS-1$
    protected static FitLogDeviceDataReader deviceDataReader = new FitLogDeviceDataReader();
 
    @Test
    void testImportTimothyLake() {
 
-      testImportFile(deviceDataReader, IMPORT_PATH + "TimothyLake", ".fitlog");
+      testImportFile(deviceDataReader, FILES_PATH + "TimothyLake", ".fitlog");
    }
 }

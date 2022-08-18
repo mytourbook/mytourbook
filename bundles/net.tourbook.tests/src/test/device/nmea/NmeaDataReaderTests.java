@@ -15,57 +15,22 @@
  *******************************************************************************/
 package device.nmea;
 
-import java.util.HashMap;
-
-import net.tourbook.data.TourData;
 import net.tourbook.device.nmea.NmeaDataReader;
-import net.tourbook.importdata.ImportState_File;
-import net.tourbook.importdata.ImportState_Process;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import utils.Comparison;
+import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
-public class NmeaDataReaderTests {
+public class NmeaDataReaderTests extends DeviceDataReaderTester {
 
-   private static final String            FILES_PATH = FilesUtils.rootPath + "device/nmea/files/"; //$NON-NLS-1$
+   private static final String   FILES_PATH = FilesUtils.rootPath + "device/nmea/files/"; //$NON-NLS-1$
 
-   private static HashMap<Long, TourData> newlyImportedTours;
-   private static HashMap<Long, TourData> alreadyImportedTours;
-   private static NmeaDataReader          nmeaDataReader;
-
-   @BeforeAll
-   static void initAll() {
-
-      newlyImportedTours = new HashMap<>();
-      alreadyImportedTours = new HashMap<>();
-      nmeaDataReader = new NmeaDataReader();
-   }
-
-   @AfterEach
-   void tearDown() {
-      newlyImportedTours.clear();
-      alreadyImportedTours.clear();
-   }
+   private static NmeaDataReader nmeaDataReader;
 
    @Test
    void testNmeaImportBasic() {
 
-      final String filePath = FILES_PATH + "NMEAExample"; //$NON-NLS-1$
-      final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + ".txt");//$NON-NLS-1$
-
-      nmeaDataReader.processDeviceData(testFilePath,
-            null,
-            alreadyImportedTours,
-            newlyImportedTours,
-            new ImportState_File(),
-            new ImportState_Process());
-
-      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
-
-      Comparison.compareTourDataAgainstControl(tour, filePath);
+      testImportFile(nmeaDataReader, FILES_PATH + "NMEAExample", ".txt");
    }
 }

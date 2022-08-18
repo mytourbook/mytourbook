@@ -24,14 +24,14 @@ import utils.FilesUtils;
 
 public class GarminTCX_DeviceDataReaderTests extends DeviceDataReaderTester {
 
-   public static final String                IMPORT_PATH      = FilesUtils.rootPath + "device/garmin/tcx/files/"; //$NON-NLS-1$
+   public static final String                FILES_PATH       = FilesUtils.rootPath + "device/garmin/tcx/files/"; //$NON-NLS-1$
 
    private static GarminTCX_DeviceDataReader deviceDataReader = new GarminTCX_DeviceDataReader();
 
    @Test
    void testTcxImportConeyLake() {
 
-      testImportFile(deviceDataReader, IMPORT_PATH + "Move_2020_05_23_08_55_42_Trail+running", ".tcx");
+      testImportFile(deviceDataReader, FILES_PATH + "Move_2020_05_23_08_55_42_Trail+running", ".tcx");
    }
 
    /**
@@ -40,6 +40,6 @@ public class GarminTCX_DeviceDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testTcxImportLyons() {
 
-      testImportFile(deviceDataReader, IMPORT_PATH + "2021-01-31", ".tcx");
+      testImportFile(deviceDataReader, FILES_PATH + "2021-01-31", ".tcx");
    }
 }

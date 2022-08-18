@@ -56,7 +56,7 @@ class GPX_DeviceDataReaderTests {
     * Resource path to GPX file, generally available from net.tourbook Plugin
     * in test/net.tourbook
     */
-   public static final String             IMPORT_FILE_PATH = FilesUtils.rootPath + "device/gpx/files/test.gpx"; //$NON-NLS-1$
+   public static final String             FILE_PATH = FilesUtils.rootPath + "device/gpx/files/test.gpx"; //$NON-NLS-1$
 
    @BeforeAll
    static void initAll() {
@@ -77,7 +77,7 @@ class GPX_DeviceDataReaderTests {
    @Test
    void testParse() {
 
-      final String testFilePath = FilesUtils.getAbsoluteFilePath(IMPORT_FILE_PATH);
+      final String testFilePath = FilesUtils.getAbsoluteFilePath(FILE_PATH);
 
       deviceDataReader.processDeviceData(testFilePath,
             null,
