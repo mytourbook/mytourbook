@@ -30,11 +30,11 @@ public class XmlUtils {
 
       try {
 
-         final SAXParserFactory factory = SAXParserFactory.newInstance();
-         final SAXParser parser = factory.newSAXParser();
+         final SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
          parser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, UI.EMPTY_STRING);
          parser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, UI.EMPTY_STRING);
          return parser;
+
       } catch (final ParserConfigurationException | SAXException e) {
          e.printStackTrace();
       }
