@@ -15,44 +15,18 @@
  *******************************************************************************/
 package device.sporttracks;
 
-import java.util.HashMap;
-
 import net.tourbook.data.TourData;
-import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
 import utils.FilesUtils;
-import utils.Initializer;
 
-public class FitLog_DeviceDataReaderTests {
+public class FitLog_DeviceDataReaderTests extends FitLog_DeviceDataReaderTester {
 
-   private static final String            IMPORT_PATH = FilesUtils.rootPath + "device/sporttracks/fitlog/files/"; //$NON-NLS-1$
-
-   private static HashMap<Long, TourData> newlyImportedTours;
-   private static HashMap<Long, TourData> alreadyImportedTours;
-   private static FitLogDeviceDataReader  deviceDataReader;
-
-   @BeforeAll
-   static void initAll() {
-
-      Initializer.initializeDatabase();
-      newlyImportedTours = new HashMap<>();
-      alreadyImportedTours = new HashMap<>();
-      deviceDataReader = new FitLogDeviceDataReader();
-   }
-
-   @AfterEach
-   void tearDown() {
-
-      newlyImportedTours.clear();
-      alreadyImportedTours.clear();
-   }
+   private static final String IMPORT_PATH = FilesUtils.rootPath + "device/sporttracks/fitlog/files/"; //$NON-NLS-1$
 
    @Test
    void testImportTimothyLake() {

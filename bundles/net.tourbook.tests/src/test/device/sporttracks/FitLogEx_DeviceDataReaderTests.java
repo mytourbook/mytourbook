@@ -16,45 +16,40 @@
 package device.sporttracks;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import net.tourbook.data.TourData;
-import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
 import utils.Comparison;
 import utils.FilesUtils;
-import utils.Initializer;
 
-class FitLogEx_DeviceDataReaderTests {
+class FitLogEx_DeviceDataReaderTests extends FitLog_DeviceDataReaderTester {
 
-   private static final String           IMPORT_PATH = FilesUtils.rootPath + "device/sporttracks/fitlogex/files/"; //$NON-NLS-1$
+   private static final String IMPORT_PATH = FilesUtils.rootPath + "device/sporttracks/fitlogex/files/"; //$NON-NLS-1$
 
-   private static Map<Long, TourData>    newlyImportedTours;
-   private static Map<Long, TourData>    alreadyImportedTours;
-   private static FitLogDeviceDataReader deviceDataReader;
+   private void testImportFile(final String fileName) {
 
-   @BeforeAll
-   static void initAll() {
+      final String filePathWithoutExtension = IMPORT_PATH + fileName;
+      final String importFilePath = filePathWithoutExtension + ".fitlogEx"; //$NON-NLS-1$
+      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
 
-      Initializer.initializeDatabase();
-      newlyImportedTours = new HashMap<>();
-      alreadyImportedTours = new HashMap<>();
-      deviceDataReader = new FitLogDeviceDataReader();
-   }
+      deviceDataReader.processDeviceData(importFileAbsolutePath,
+            null,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process());
 
-   @AfterEach
-   void tearDown() {
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-      newlyImportedTours.clear();
-      alreadyImportedTours.clear();
+      // set relative path that it works with different OS
+      tour.setImportFilePath(importFilePath);
+
+      Comparison.compareTourDataAgainstControl(tour, filePathWithoutExtension);
    }
 
    /**
@@ -69,44 +64,12 @@ class FitLogEx_DeviceDataReaderTests {
    @Test
    void testImportParkCity() {
 
-      final String filePathWithoutExtension = IMPORT_PATH + "ParkCity"; //$NON-NLS-1$
-      final String importFilePath = filePathWithoutExtension + ".fitlogEx"; //$NON-NLS-1$
-      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
-
-      deviceDataReader.processDeviceData(importFileAbsolutePath,
-            null,
-            alreadyImportedTours,
-            newlyImportedTours,
-            new ImportState_File(),
-            new ImportState_Process());
-
-      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
-
-      // set relative path that it works with different OS
-      tour.setImportFilePath(importFilePath);
-
-      Comparison.compareTourDataAgainstControl(tour, filePathWithoutExtension);
+      testImportFile("ParkCity");
    }
 
    @Test
    void testImportTimothyLake() {
 
-      final String filePathWithoutExtension = IMPORT_PATH + "TimothyLake"; //$NON-NLS-1$
-      final String importFilePath = filePathWithoutExtension + ".fitlogEx"; //$NON-NLS-1$
-      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
-
-      deviceDataReader.processDeviceData(importFileAbsolutePath,
-            null,
-            alreadyImportedTours,
-            newlyImportedTours,
-            new ImportState_File(),
-            new ImportState_Process());
-
-      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
-
-      // set relative path that it works with different OS
-      tour.setImportFilePath(importFilePath);
-
-      Comparison.compareTourDataAgainstControl(tour, filePathWithoutExtension);
+      testImportFile("TimothyLake");
    }
 }
