@@ -27,7 +27,7 @@ import org.junit.jupiter.api.BeforeAll;
 
 public abstract class DeviceDataReaderTester {
 
-   protected static HashMap<Long, TourData> newlyImportedTours;
+   private static HashMap<Long, TourData> newlyImportedTours;
 
    @BeforeAll
    static void initAll() {
