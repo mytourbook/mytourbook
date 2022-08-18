@@ -17,14 +17,18 @@ package device.sporttracks;
 
 import java.io.IOException;
 
+import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
+
 import org.junit.jupiter.api.Test;
 import org.xml.sax.SAXException;
 
+import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
-class FitLogEx_DeviceDataReaderTests extends FitLog_DeviceDataReaderTester {
+class FitLogEx_DeviceDataReaderTests extends DeviceDataReaderTester {
 
-   private static final String IMPORT_PATH = FilesUtils.rootPath + "device/sporttracks/fitlogex/files/"; //$NON-NLS-1$
+   private static final String             IMPORT_PATH      = FilesUtils.rootPath + "device/sporttracks/fitlogex/files/"; //$NON-NLS-1$
+   protected static FitLogDeviceDataReader deviceDataReader = new FitLogDeviceDataReader();
 
    /**
     * This tests parses a file for which the time offset of -7 hours is wrong
@@ -38,12 +42,12 @@ class FitLogEx_DeviceDataReaderTests extends FitLog_DeviceDataReaderTester {
    @Test
    void testImportParkCity() {
 
-      testImportFile(IMPORT_PATH + "ParkCity", ".fitlogEx");
+      testImportFile(deviceDataReader, IMPORT_PATH + "ParkCity", ".fitlogEx");
    }
 
    @Test
    void testImportTimothyLake() {
 
-      testImportFile(IMPORT_PATH + "TimothyLake", ".fitlogEx");
+      testImportFile(deviceDataReader, IMPORT_PATH + "TimothyLake", ".fitlogEx");
    }
 }

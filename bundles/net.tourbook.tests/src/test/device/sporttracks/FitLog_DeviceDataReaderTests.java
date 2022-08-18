@@ -15,17 +15,21 @@
  *******************************************************************************/
 package device.sporttracks;
 
+import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
+
 import org.junit.jupiter.api.Test;
 
+import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
-public class FitLog_DeviceDataReaderTests extends FitLog_DeviceDataReaderTester {
+public class FitLog_DeviceDataReaderTests extends DeviceDataReaderTester {
 
-   private static final String IMPORT_PATH = FilesUtils.rootPath + "device/sporttracks/fitlog/files/"; //$NON-NLS-1$
+   private static final String             IMPORT_PATH      = FilesUtils.rootPath + "device/sporttracks/fitlog/files/"; //$NON-NLS-1$
+   protected static FitLogDeviceDataReader deviceDataReader = new FitLogDeviceDataReader();
 
    @Test
    void testImportTimothyLake() {
 
-      testImportFile(IMPORT_PATH + "TimothyLake", ".fitlog");
+      testImportFile(deviceDataReader, IMPORT_PATH + "TimothyLake", ".fitlog");
    }
 }

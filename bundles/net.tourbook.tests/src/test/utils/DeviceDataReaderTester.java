@@ -13,60 +13,48 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package device.sporttracks;
+package utils;
 
 import java.util.HashMap;
 
 import net.tourbook.data.TourData;
-import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
+import net.tourbook.importdata.TourbookDevice;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 
-import utils.Comparison;
-import utils.FilesUtils;
-import utils.Initializer;
-
-public abstract class FitLog_DeviceDataReaderTester {
+public abstract class DeviceDataReaderTester {
 
    protected static HashMap<Long, TourData> newlyImportedTours;
-   protected static HashMap<Long, TourData> alreadyImportedTours;
-   protected static FitLogDeviceDataReader  deviceDataReader;
 
    @BeforeAll
    static void initAll() {
 
       Initializer.initializeDatabase();
       newlyImportedTours = new HashMap<>();
-      alreadyImportedTours = new HashMap<>();
-      deviceDataReader = new FitLogDeviceDataReader();
    }
 
    @AfterEach
    void tearDown() {
 
       newlyImportedTours.clear();
-      alreadyImportedTours.clear();
    }
 
-   protected void testImportFile(final String filePathWithoutExtension, final String extension) {
+   protected void testImportFile(final TourbookDevice tourbookDevice, final String filePathWithoutExtension, final String extension) {
 
       final String importFilePath = filePathWithoutExtension + extension;
       final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
 
-      deviceDataReader.processDeviceData(importFileAbsolutePath,
+      tourbookDevice.processDeviceData(importFileAbsolutePath,
             null,
-            alreadyImportedTours,
+            new HashMap<>(),
             newlyImportedTours,
             new ImportState_File(),
             new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
-
-      // set relative path that it works with different OS
-      tour.setImportFilePath(importFilePath);
 
       Comparison.compareTourDataAgainstControl(tour, filePathWithoutExtension);
    }
