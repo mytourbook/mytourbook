@@ -15,12 +15,9 @@
  *******************************************************************************/
 package device.sporttracks;
 
-import java.io.IOException;
-
 import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
 
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 
 import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
@@ -36,9 +33,6 @@ class FitLogEx_DeviceDataReaderTests extends DeviceDataReaderTester {
     * <TimeZoneUtcOffset>-25200</TimeZoneUtcOffset> as it is located in the MST
     * zone (-6h or -21600). However, the start time is correct and needs to be
     * kept.
-    *
-    * @throws SAXException
-    * @throws IOException
     */
    @Test
    void testImportParkCity() {

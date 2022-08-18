@@ -18,12 +18,9 @@ package device.gpx;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
@@ -33,7 +30,6 @@ import net.tourbook.importdata.ImportState_Process;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 
 import utils.Comparison;
 import utils.FilesUtils;
@@ -67,10 +63,6 @@ class GPX_DeviceDataReaderTests {
    /**
     * Regression test. Imports GPX into TourData and checks all values of tour1
     * and waypoint1.
-    *
-    * @throws ParserConfigurationException
-    * @throws IOException
-    * @throws SAXException
     */
    @Test
    void testParse() {
