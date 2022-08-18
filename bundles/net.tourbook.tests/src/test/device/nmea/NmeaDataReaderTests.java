@@ -19,7 +19,6 @@ import java.util.HashMap;
 
 import net.tourbook.data.TourData;
 import net.tourbook.device.nmea.NmeaDataReader;
-import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 
@@ -34,14 +33,13 @@ public class NmeaDataReaderTests {
 
    private static final String            FILES_PATH = FilesUtils.rootPath + "device/nmea/files/"; //$NON-NLS-1$
 
-   private static DeviceData              deviceData;
    private static HashMap<Long, TourData> newlyImportedTours;
    private static HashMap<Long, TourData> alreadyImportedTours;
    private static NmeaDataReader          nmeaDataReader;
 
    @BeforeAll
    static void initAll() {
-      deviceData = new DeviceData();
+
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
       nmeaDataReader = new NmeaDataReader();
@@ -60,7 +58,7 @@ public class NmeaDataReaderTests {
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + ".txt");//$NON-NLS-1$
 
       nmeaDataReader.processDeviceData(testFilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),

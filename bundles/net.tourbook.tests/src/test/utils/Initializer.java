@@ -23,7 +23,6 @@ import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.device.garmin.fit.FitDataReader;
 import net.tourbook.device.gpx.GPXDeviceDataReader;
-import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 
@@ -51,13 +50,12 @@ public class Initializer {
 
    public static TourData importTour_FIT(final String importFilePath) {
 
-      final DeviceData deviceData = new DeviceData();
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
       final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
       final FitDataReader fitDataReader = new FitDataReader();
 
       fitDataReader.processDeviceData(importFilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),

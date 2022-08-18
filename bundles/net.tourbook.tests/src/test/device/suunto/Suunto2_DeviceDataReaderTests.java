@@ -19,7 +19,6 @@ import java.util.HashMap;
 
 import net.tourbook.data.TourData;
 import net.tourbook.device.suunto.Suunto2_DeviceDataReader;
-import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 
@@ -33,7 +32,6 @@ class Suunto2_DeviceDataReaderTests {
 
    private static final String             IMPORT_FILE_PATH = FilesUtils.rootPath + "device/suunto/files/"; //$NON-NLS-1$
 
-   private static DeviceData               deviceData;
    private static HashMap<Long, TourData>  newlyImportedTours;
    private static HashMap<Long, TourData>  alreadyImportedTours;
    private static Suunto2_DeviceDataReader deviceDataReader;
@@ -41,7 +39,6 @@ class Suunto2_DeviceDataReaderTests {
    @BeforeAll
    static void initAll() {
 
-      deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
       deviceDataReader = new Suunto2_DeviceDataReader();
@@ -57,7 +54,7 @@ class Suunto2_DeviceDataReaderTests {
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + ".xml"); //$NON-NLS-1$
 
       deviceDataReader.processDeviceData(testFilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),

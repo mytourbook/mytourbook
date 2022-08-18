@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,6 @@ import java.util.Map.Entry;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.device.suunto.Suunto9_DeviceDataReader;
-import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 
@@ -39,16 +38,15 @@ class Suunto9_DeviceDataReaderTests {
 
    private static final String             IMPORT_FILE_PATH = FilesUtils.rootPath + "device/suunto/files/"; //$NON-NLS-1$
 
-   private static final String             JSON_GZ          = ".json.gz";                                        //$NON-NLS-1$
+   private static final String             JSON_GZ          = ".json.gz";                                   //$NON-NLS-1$
 
-   private static DeviceData               deviceData;
    private static HashMap<Long, TourData>  newlyImportedTours;
    private static HashMap<Long, TourData>  alreadyImportedTours;
    private static Suunto9_DeviceDataReader deviceDataReader;
 
    @BeforeAll
    static void initAll() {
-      deviceData = new DeviceData();
+
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
       deviceDataReader = new Suunto9_DeviceDataReader();
@@ -100,7 +98,7 @@ class Suunto9_DeviceDataReaderTests {
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
       deviceDataReader.processDeviceData(testFilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),
@@ -121,7 +119,7 @@ class Suunto9_DeviceDataReaderTests {
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
       deviceDataReader.processDeviceData(testFilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),
@@ -142,7 +140,7 @@ class Suunto9_DeviceDataReaderTests {
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
       deviceDataReader.processDeviceData(testFilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),
@@ -163,7 +161,7 @@ class Suunto9_DeviceDataReaderTests {
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
       deviceDataReader.processDeviceData(testFilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),
@@ -205,21 +203,21 @@ class Suunto9_DeviceDataReaderTests {
       // ORDER 1 - 2 - 3
 
       deviceDataReader.processDeviceData(maxWell1FilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),
             new ImportState_Process().setIsJUnitTest(true));
 
       deviceDataReader.processDeviceData(maxWell2FilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),
             new ImportState_Process().setIsJUnitTest(true));
 
       deviceDataReader.processDeviceData(maxWell3FilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),
@@ -240,7 +238,7 @@ class Suunto9_DeviceDataReaderTests {
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
       deviceDataReader.processDeviceData(testFilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),
@@ -261,7 +259,7 @@ class Suunto9_DeviceDataReaderTests {
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
       deviceDataReader.processDeviceData(testFilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),
@@ -282,7 +280,7 @@ class Suunto9_DeviceDataReaderTests {
 
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
       deviceDataReader.processDeviceData(testFilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),

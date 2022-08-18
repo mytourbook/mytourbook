@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,6 @@ import java.util.HashMap;
 
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.fit.FitDataReader;
-import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 
@@ -34,14 +33,13 @@ public class FitDataReaderTests {
 
    private static final String            FILES_PATH = FilesUtils.rootPath + "device/garmin/fit/files/"; //$NON-NLS-1$
 
-   private static DeviceData              deviceData;
    private static HashMap<Long, TourData> newlyImportedTours;
    private static HashMap<Long, TourData> alreadyImportedTours;
    private static FitDataReader           fitDataReader;
 
    @BeforeAll
    static void initAll() {
-      deviceData = new DeviceData();
+
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
       fitDataReader = new FitDataReader();
@@ -64,7 +62,7 @@ public class FitDataReaderTests {
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + ".fit");//$NON-NLS-1$
 
       fitDataReader.processDeviceData(testFilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),
@@ -86,7 +84,7 @@ public class FitDataReaderTests {
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + ".fit");//$NON-NLS-1$
 
       fitDataReader.processDeviceData(testFilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),

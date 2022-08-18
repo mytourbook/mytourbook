@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,7 +19,6 @@ import java.util.HashMap;
 
 import net.tourbook.data.TourData;
 import net.tourbook.device.suunto.Suunto3_DeviceDataReader;
-import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 
@@ -34,7 +33,6 @@ class Suunto3_DeviceDataReaderTests {
 
    private static final String             IMPORT_FILE_PATH = FilesUtils.rootPath + "device/suunto/files/"; //$NON-NLS-1$
 
-   private static DeviceData               deviceData;
    private static HashMap<Long, TourData>  newlyImportedTours;
    private static HashMap<Long, TourData>  alreadyImportedTours;
    private static Suunto3_DeviceDataReader deviceDataReader;
@@ -42,7 +40,6 @@ class Suunto3_DeviceDataReaderTests {
    @BeforeAll
    static void initAll() {
 
-      deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
       deviceDataReader = new Suunto3_DeviceDataReader();
@@ -64,7 +61,7 @@ class Suunto3_DeviceDataReaderTests {
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + ".sml"); //$NON-NLS-1$
 
       deviceDataReader.processDeviceData(testFilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),
@@ -85,7 +82,7 @@ class Suunto3_DeviceDataReaderTests {
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + ".sml"); //$NON-NLS-1$
 
       deviceDataReader.processDeviceData(testFilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),
