@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,11 +24,11 @@ import java.io.StringWriter;
 import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.common.util.XmlUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
@@ -177,18 +177,18 @@ public class GPXDeviceDataReader extends TourbookDevice {
 
       try {
 
-         final SAXParser saxParser = SAXParserFactory.newInstance().newSAXParser();
+         final SAXParser saxParser = XmlUtils.initializeParser();
 
          final GPX_SAX_Handler handler = new GPX_SAX_Handler(
-               
+
                importFilePath,
                deviceData,
                alreadyImportedTours,
                newlyImportedTours,
-               
+
                importState_File,
                importState_Process,
-               
+
                this);
 
          if (inputStream == null) {
@@ -217,13 +217,9 @@ public class GPXDeviceDataReader extends TourbookDevice {
 
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
 
-         return;
-
       } catch (final Exception e) {
 
          TourLogManager.log_ERROR_CannotReadDataFile(importFilePath, e);
-
-         return;
       }
    }
 

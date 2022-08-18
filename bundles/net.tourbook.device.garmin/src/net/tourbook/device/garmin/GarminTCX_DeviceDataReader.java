@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,9 +18,9 @@ package net.tourbook.device.garmin;
 import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.XmlUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
@@ -90,7 +90,7 @@ public class GarminTCX_DeviceDataReader extends TourbookDevice {
 
       try {
 
-         final SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+         final SAXParser parser = XmlUtils.initializeParser();
 
          parser.parse("file:" + importFilePath, saxHandler);//$NON-NLS-1$
 

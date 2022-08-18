@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard and Contributors
+ * Copyright (C) 2021, 2022 Frédéric Bard and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,11 +21,11 @@ import java.io.InputStreamReader;
 import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.XmlUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.DeviceData;
@@ -128,7 +128,7 @@ public class Cyclo105DeviceDataReader extends TourbookDevice {
 
       try (FileInputStream inputStream = new FileInputStream(importFilePath)) {
 
-         final SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+         final SAXParser parser = XmlUtils.initializeParser();
 
          parser.parse(inputStream, saxHandler);
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,11 +24,11 @@ import java.io.StringWriter;
 import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.common.util.XmlUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.device.InvalidDeviceSAXException;
 import net.tourbook.importdata.DeviceData;
@@ -179,7 +179,7 @@ public class Suunto2_DeviceDataReader extends TourbookDevice {
       try {
 
          final InputStream inputStream = convertIntoWellFormedXml(importFilePath);
-         final SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+         final SAXParser parser = XmlUtils.initializeParser();
 
          parser.parse(inputStream, saxHandler);
 
@@ -187,10 +187,8 @@ public class Suunto2_DeviceDataReader extends TourbookDevice {
 
       } catch (final InvalidDeviceSAXException e) {
          StatusUtil.log(e);
-         return;
       } catch (final Exception e) {
          StatusUtil.log("Error parsing file: " + importFilePath, e); //$NON-NLS-1$
-         return;
       } finally {
 
          saxHandler.dispose();
