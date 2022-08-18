@@ -16,17 +16,12 @@
 package device.garmin;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 
-import javax.xml.parsers.SAXParser;
-
-import net.tourbook.common.util.XmlUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
-import net.tourbook.device.garmin.GarminTCX_SAXHandler;
-import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,10 +33,8 @@ import utils.FilesUtils;
 
 public class GarminTCX_DeviceDataReaderTests {
 
-   private static SAXParser                  parser;
-   public static final String                IMPORT_PATH = "/device/garmin/tcx/files/"; //$NON-NLS-1$
+   public static final String                IMPORT_PATH = FilesUtils.rootPath + "device/garmin/tcx/files/"; //$NON-NLS-1$
 
-   private static DeviceData                 deviceData;
    private static HashMap<Long, TourData>    newlyImportedTours;
    private static HashMap<Long, TourData>    alreadyImportedTours;
    private static GarminTCX_DeviceDataReader deviceDataReader;
@@ -49,8 +42,6 @@ public class GarminTCX_DeviceDataReaderTests {
    @BeforeAll
    static void initAll() {
 
-      parser = XmlUtils.initializeParser();
-      deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
       deviceDataReader = new GarminTCX_DeviceDataReader();
@@ -69,47 +60,43 @@ public class GarminTCX_DeviceDataReaderTests {
     * @throws SAXException
     */
    @Test
-   void testTcxImportConeyLake() throws SAXException, IOException {
+   void testTcxImportConeyLake() {
 
       final String filePathWithoutExtension = IMPORT_PATH + "Move_2020_05_23_08_55_42_Trail+running"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
-      final InputStream tcxFile = GarminTCX_DeviceDataReaderTests.class.getResourceAsStream(importFilePath);
+      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
 
-      final GarminTCX_SAXHandler handler = new GarminTCX_SAXHandler(deviceDataReader,
-            importFilePath,
-            deviceData,
+      deviceDataReader.processDeviceData(importFileAbsolutePath,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_File());
-
-      parser.parse(tcxFile, handler);
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-      Comparison.compareTourDataAgainstControl(tour, FilesUtils.rootPath + filePathWithoutExtension);
+      Comparison.compareTourDataAgainstControl(tour, filePathWithoutExtension);
    }
 
    /**
     * TCX file with pauses
     */
    @Test
-   void testTcxImportLyons() throws SAXException, IOException {
+   void testTcxImportLyons() {
 
       final String filePathWithoutExtension = IMPORT_PATH + "2021-01-31"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
-      final InputStream tcxFile = GarminTCX_DeviceDataReaderTests.class.getResourceAsStream(importFilePath);
+      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
 
-      final GarminTCX_SAXHandler handler = new GarminTCX_SAXHandler(deviceDataReader,
-            importFilePath,
-            deviceData,
+      deviceDataReader.processDeviceData(importFileAbsolutePath,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
-            new ImportState_File());
-
-      parser.parse(tcxFile, handler);
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-      Comparison.compareTourDataAgainstControl(tour, FilesUtils.rootPath + filePathWithoutExtension);
+      Comparison.compareTourDataAgainstControl(tour, filePathWithoutExtension);
    }
 }
