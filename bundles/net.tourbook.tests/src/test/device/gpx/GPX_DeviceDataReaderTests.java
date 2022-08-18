@@ -46,7 +46,7 @@ import utils.FilesUtils;
  *
  * @author Norbert Renner
  */
-class GPX_SAX_HandlerTests {
+class GPX_DeviceDataReaderTests {
 
    private static HashMap<Long, TourData> newlyImportedTours;
    private static HashMap<Long, TourData> alreadyImportedTours;

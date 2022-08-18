@@ -33,7 +33,7 @@ import utils.Comparison;
 import utils.FilesUtils;
 import utils.Initializer;
 
-class FitLogEx_SAXHandlerTests {
+class FitLogEx_DeviceDataReaderTests {
 
    private static final String           IMPORT_PATH = FilesUtils.rootPath + "device/sporttracks/fitlogex/files/"; //$NON-NLS-1$
 
