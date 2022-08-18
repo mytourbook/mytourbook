@@ -498,7 +498,7 @@ public class DialogPrintTour extends TitleAreaDialog {
             new Status(IStatus.ERROR, Activator.PLUGIN_ID, Messages.Dialog_Print_Error_Title, exception)));
    }
 
-   private void doPrint() throws TransformerException {
+   private void doPrint() {
 
       // disable button's
       getButton(IDialogConstants.OK_ID).setEnabled(false);
