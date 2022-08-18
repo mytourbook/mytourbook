@@ -15,12 +15,9 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
-import net.tourbook.common.UI;
 
 import org.xml.sax.SAXException;
 
@@ -30,13 +27,12 @@ public class XmlUtils {
 
       try {
 
-         final SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-         parser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, UI.EMPTY_STRING);
-         parser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, UI.EMPTY_STRING);
-         return parser;
+         final SAXParserFactory factory = SAXParserFactory.newInstance();
+         factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true); //$NON-NLS-1$
+         return factory.newSAXParser();
 
       } catch (final ParserConfigurationException | SAXException e) {
-         e.printStackTrace();
+         StatusUtil.log(e);
       }
 
       return null;
