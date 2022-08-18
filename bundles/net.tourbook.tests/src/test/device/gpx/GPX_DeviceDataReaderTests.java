@@ -49,7 +49,6 @@ import utils.FilesUtils;
 class GPX_DeviceDataReaderTests {
 
    private static HashMap<Long, TourData> newlyImportedTours;
-   private static HashMap<Long, TourData> alreadyImportedTours;
    private static GPXDeviceDataReader     deviceDataReader;
 
    /**
@@ -62,7 +61,6 @@ class GPX_DeviceDataReaderTests {
    static void initAll() {
 
       newlyImportedTours = new HashMap<>();
-      alreadyImportedTours = new HashMap<>();
       deviceDataReader = new GPXDeviceDataReader();
    }
 
@@ -81,7 +79,7 @@ class GPX_DeviceDataReaderTests {
 
       deviceDataReader.processDeviceData(testFilePath,
             null,
-            alreadyImportedTours,
+            new HashMap<>(),
             newlyImportedTours,
             new ImportState_File(),
             new ImportState_Process());
