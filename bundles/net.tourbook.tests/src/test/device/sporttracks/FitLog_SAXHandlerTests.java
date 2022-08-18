@@ -15,23 +15,16 @@
  *******************************************************************************/
 package device.sporttracks;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 
-import javax.xml.parsers.SAXParser;
-
-import net.tourbook.common.util.XmlUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
-import net.tourbook.device.sporttracks.FitLog_SAXHandler;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 
 import utils.Comparison;
 import utils.FilesUtils;
@@ -39,9 +32,8 @@ import utils.Initializer;
 
 public class FitLog_SAXHandlerTests {
 
-   private static final String            IMPORT_PATH = "/device/sporttracks/fitlog/files/"; //$NON-NLS-1$
+   private static final String            IMPORT_PATH = FilesUtils.rootPath + "device/sporttracks/fitlog/files/"; //$NON-NLS-1$
 
-   private static SAXParser               parser;
    private static HashMap<Long, TourData> newlyImportedTours;
    private static HashMap<Long, TourData> alreadyImportedTours;
    private static FitLogDeviceDataReader  deviceDataReader;
@@ -50,7 +42,6 @@ public class FitLog_SAXHandlerTests {
    static void initAll() {
 
       Initializer.initializeDatabase();
-      parser = XmlUtils.initializeParser();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
       deviceDataReader = new FitLogDeviceDataReader();
@@ -64,24 +55,21 @@ public class FitLog_SAXHandlerTests {
    }
 
    @Test
-   void testImportTimothyLake() throws SAXException, IOException {
+   void testImportTimothyLake() {
 
       final String filePathWithoutExtension = IMPORT_PATH + "TimothyLake"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".fitlog"; //$NON-NLS-1$
-      final InputStream fitLogFile = FitLog_SAXHandlerTests.class.getResourceAsStream(importFilePath);
+      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
 
-      final FitLog_SAXHandler handler = new FitLog_SAXHandler(importFilePath,
+      deviceDataReader.processDeviceData(importFileAbsolutePath,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
-            false,
             new ImportState_File(),
-            new ImportState_Process(),
-            deviceDataReader);
-
-      parser.parse(fitLogFile, handler);
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
-      Comparison.compareTourDataAgainstControl(tour, FilesUtils.rootPath + filePathWithoutExtension);
+      Comparison.compareTourDataAgainstControl(tour, filePathWithoutExtension);
    }
 }
