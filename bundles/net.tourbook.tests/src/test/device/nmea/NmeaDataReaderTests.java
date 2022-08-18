@@ -24,9 +24,9 @@ import utils.FilesUtils;
 
 public class NmeaDataReaderTests extends DeviceDataReaderTester {
 
-   private static final String   FILES_PATH = FilesUtils.rootPath + "device/nmea/files/"; //$NON-NLS-1$
+   private static final String FILES_PATH     = FilesUtils.rootPath + "device/nmea/files/"; //$NON-NLS-1$
 
-   private static NmeaDataReader nmeaDataReader;
+   private NmeaDataReader      nmeaDataReader = new NmeaDataReader();
 
    @Test
    void testNmeaImportBasic() {

@@ -27,8 +27,9 @@ import utils.FilesUtils;
 
 class FitLogEx_DeviceDataReaderTests extends DeviceDataReaderTester {
 
-   private static final String             FILES_PATH       = FilesUtils.rootPath + "device/sporttracks/fitlogex/files/"; //$NON-NLS-1$
-   protected static FitLogDeviceDataReader deviceDataReader = new FitLogDeviceDataReader();
+   private static final String      FILES_PATH       = FilesUtils.rootPath + "device/sporttracks/fitlogex/files/"; //$NON-NLS-1$
+
+   protected FitLogDeviceDataReader deviceDataReader = new FitLogDeviceDataReader();
 
    /**
     * This tests parses a file for which the time offset of -7 hours is wrong

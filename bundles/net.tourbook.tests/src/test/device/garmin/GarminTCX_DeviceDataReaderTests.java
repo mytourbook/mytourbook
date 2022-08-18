@@ -24,9 +24,9 @@ import utils.FilesUtils;
 
 public class GarminTCX_DeviceDataReaderTests extends DeviceDataReaderTester {
 
-   public static final String                FILES_PATH       = FilesUtils.rootPath + "device/garmin/tcx/files/"; //$NON-NLS-1$
+   public static final String         FILES_PATH       = FilesUtils.rootPath + "device/garmin/tcx/files/"; //$NON-NLS-1$
 
-   private static GarminTCX_DeviceDataReader deviceDataReader = new GarminTCX_DeviceDataReader();
+   private GarminTCX_DeviceDataReader deviceDataReader = new GarminTCX_DeviceDataReader();
 
    @Test
    void testTcxImportConeyLake() {

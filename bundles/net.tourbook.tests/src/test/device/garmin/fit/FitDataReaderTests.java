@@ -24,9 +24,9 @@ import utils.FilesUtils;
 
 public class FitDataReaderTests extends DeviceDataReaderTester {
 
-   private static final String  FILES_PATH = FilesUtils.rootPath + "device/garmin/fit/files/"; //$NON-NLS-1$
+   private static final String  FILES_PATH    = FilesUtils.rootPath + "device/garmin/fit/files/"; //$NON-NLS-1$
 
-   private static FitDataReader fitDataReader;
+   private FitDataReader       fitDataReader = new FitDataReader();
 
    /**
     * Regression test. This test can be useful when updating the FIT SDK and

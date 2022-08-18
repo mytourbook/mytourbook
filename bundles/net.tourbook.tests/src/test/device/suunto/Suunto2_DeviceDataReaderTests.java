@@ -15,34 +15,18 @@
  *******************************************************************************/
 package device.suunto;
 
-import java.util.HashMap;
-
-import net.tourbook.data.TourData;
 import net.tourbook.device.suunto.Suunto2_DeviceDataReader;
-import net.tourbook.importdata.ImportState_File;
-import net.tourbook.importdata.ImportState_Process;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import utils.Comparison;
+import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
-class Suunto2_DeviceDataReaderTests {
+class Suunto2_DeviceDataReaderTests extends DeviceDataReaderTester {
 
-   private static final String             IMPORT_FILE_PATH = FilesUtils.rootPath + "device/suunto/files/"; //$NON-NLS-1$
+   private static final String      FILES_PATH       = FilesUtils.rootPath + "device/suunto/files/"; //$NON-NLS-1$
 
-   private static HashMap<Long, TourData>  newlyImportedTours;
-   private static HashMap<Long, TourData>  alreadyImportedTours;
-   private static Suunto2_DeviceDataReader deviceDataReader;
-
-   @BeforeAll
-   static void initAll() {
-
-      newlyImportedTours = new HashMap<>();
-      alreadyImportedTours = new HashMap<>();
-      deviceDataReader = new Suunto2_DeviceDataReader();
-   }
+   private Suunto2_DeviceDataReader deviceDataReader = new Suunto2_DeviceDataReader();
 
    /**
     * Forest park, Portland, OR
@@ -50,18 +34,7 @@ class Suunto2_DeviceDataReaderTests {
    @Test
    void testImportForestPark() {
 
-      final String filePath = IMPORT_FILE_PATH + "log-F783095113000500-2013-05-18T11_00_38-0"; //$NON-NLS-1$
-      final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + ".xml"); //$NON-NLS-1$
+      testImportFile(deviceDataReader, FILES_PATH + "log-F783095113000500-2013-05-18T11_00_38-0", ".xml");
 
-      deviceDataReader.processDeviceData(testFilePath,
-            null,
-            alreadyImportedTours,
-            newlyImportedTours,
-            new ImportState_File(),
-            new ImportState_Process());
-
-      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
-
-      Comparison.compareTourDataAgainstControl(tour, filePath);
    }
 }

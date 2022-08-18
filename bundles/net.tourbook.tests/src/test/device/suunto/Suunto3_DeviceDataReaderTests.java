@@ -15,41 +15,18 @@
  *******************************************************************************/
 package device.suunto;
 
-import java.util.HashMap;
-
-import net.tourbook.data.TourData;
 import net.tourbook.device.suunto.Suunto3_DeviceDataReader;
-import net.tourbook.importdata.ImportState_File;
-import net.tourbook.importdata.ImportState_Process;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import utils.Comparison;
+import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
-class Suunto3_DeviceDataReaderTests {
+class Suunto3_DeviceDataReaderTests extends DeviceDataReaderTester {
 
-   private static final String             IMPORT_FILE_PATH = FilesUtils.rootPath + "device/suunto/files/"; //$NON-NLS-1$
+   private static final String      FILES_PATH       = FilesUtils.rootPath + "device/suunto/files/"; //$NON-NLS-1$
 
-   private static HashMap<Long, TourData>  newlyImportedTours;
-   private static HashMap<Long, TourData>  alreadyImportedTours;
-   private static Suunto3_DeviceDataReader deviceDataReader;
-
-   @BeforeAll
-   static void initAll() {
-
-      newlyImportedTours = new HashMap<>();
-      alreadyImportedTours = new HashMap<>();
-      deviceDataReader = new Suunto3_DeviceDataReader();
-   }
-
-   @AfterEach
-   void tearDown() {
-      newlyImportedTours.clear();
-      alreadyImportedTours.clear();
-   }
+   private Suunto3_DeviceDataReader deviceDataReader = new Suunto3_DeviceDataReader();
 
    /**
     * Forest Park, OR with laps
@@ -57,19 +34,7 @@ class Suunto3_DeviceDataReaderTests {
    @Test
    void testImportForestParkLaps() {
 
-      final String filePath = IMPORT_FILE_PATH + "597F0A5112001700-2016-08-27T15_45_41-0"; //$NON-NLS-1$
-      final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + ".sml"); //$NON-NLS-1$
-
-      deviceDataReader.processDeviceData(testFilePath,
-            null,
-            alreadyImportedTours,
-            newlyImportedTours,
-            new ImportState_File(),
-            new ImportState_Process());
-
-      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
-
-      Comparison.compareTourDataAgainstControl(tour, filePath);
+      testImportFile(deviceDataReader, FILES_PATH + "597F0A5112001700-2016-08-27T15_45_41-0", ".sml");
    }
 
    /**
@@ -78,18 +43,6 @@ class Suunto3_DeviceDataReaderTests {
    @Test
    void testImportTimothyLake() {
 
-      final String filePath = IMPORT_FILE_PATH + "F783095113000500-2015-05-31T09_51_13-0"; //$NON-NLS-1$
-      final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + ".sml"); //$NON-NLS-1$
-
-      deviceDataReader.processDeviceData(testFilePath,
-            null,
-            alreadyImportedTours,
-            newlyImportedTours,
-            new ImportState_File(),
-            new ImportState_Process());
-
-      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
-
-      Comparison.compareTourDataAgainstControl(tour, filePath);
+      testImportFile(deviceDataReader, FILES_PATH + "F783095113000500-2015-05-31T09_51_13-0", ".sml");
    }
 }
