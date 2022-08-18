@@ -21,8 +21,8 @@ import javax.persistence.Persistence;
 
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
-import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
 import net.tourbook.device.garmin.fit.FitDataReader;
+import net.tourbook.device.gpx.GPXDeviceDataReader;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
@@ -70,7 +70,7 @@ public class Initializer {
 
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
       final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
-      final GarminTCX_DeviceDataReader deviceDataReader = new GarminTCX_DeviceDataReader();
+      final GPXDeviceDataReader deviceDataReader = new GPXDeviceDataReader();
       final String testFilePath = FilesUtils.getAbsoluteFilePath(importFilePath);
 
       deviceDataReader.processDeviceData(testFilePath,
