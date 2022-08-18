@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Frédéric Bard
+ * Copyright (C) 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,17 +19,21 @@ import java.util.HashMap;
 
 import net.tourbook.data.TourData;
 import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
+import net.tourbook.importdata.ImportState_File;
+import net.tourbook.importdata.ImportState_Process;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 
+import utils.Comparison;
+import utils.FilesUtils;
 import utils.Initializer;
 
 public abstract class FitLog_DeviceDataReaderTester {
 
    protected static HashMap<Long, TourData> newlyImportedTours;
    protected static HashMap<Long, TourData> alreadyImportedTours;
-   protected static FitLogDeviceDataReader deviceDataReader;
+   protected static FitLogDeviceDataReader  deviceDataReader;
 
    @BeforeAll
    static void initAll() {
@@ -45,5 +49,25 @@ public abstract class FitLog_DeviceDataReaderTester {
 
       newlyImportedTours.clear();
       alreadyImportedTours.clear();
+   }
+
+   protected void testImportFile(final String filePathWithoutExtension, final String extension) {
+
+      final String importFilePath = filePathWithoutExtension + extension;
+      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
+
+      deviceDataReader.processDeviceData(importFileAbsolutePath,
+            null,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process());
+
+      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
+
+      // set relative path that it works with different OS
+      tour.setImportFilePath(importFilePath);
+
+      Comparison.compareTourDataAgainstControl(tour, filePathWithoutExtension);
    }
 }

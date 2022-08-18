@@ -15,13 +15,8 @@
  *******************************************************************************/
 package device.sporttracks;
 
-import net.tourbook.data.TourData;
-import net.tourbook.importdata.ImportState_File;
-import net.tourbook.importdata.ImportState_Process;
-
 import org.junit.jupiter.api.Test;
 
-import utils.Comparison;
 import utils.FilesUtils;
 
 public class FitLog_DeviceDataReaderTests extends FitLog_DeviceDataReaderTester {
@@ -31,19 +26,6 @@ public class FitLog_DeviceDataReaderTests extends FitLog_DeviceDataReaderTester 
    @Test
    void testImportTimothyLake() {
 
-      final String filePathWithoutExtension = IMPORT_PATH + "TimothyLake"; //$NON-NLS-1$
-      final String importFilePath = filePathWithoutExtension + ".fitlog"; //$NON-NLS-1$
-      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
-
-      deviceDataReader.processDeviceData(importFileAbsolutePath,
-            null,
-            alreadyImportedTours,
-            newlyImportedTours,
-            new ImportState_File(),
-            new ImportState_Process());
-
-      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
-
-      Comparison.compareTourDataAgainstControl(tour, filePathWithoutExtension);
+      testImportFile(IMPORT_PATH + "TimothyLake", ".fitlog");
    }
 }
