@@ -44,14 +44,14 @@ public class GeoQuery implements Runnable {
 
    private String                _query;
 
-   private PropertyChangeSupport propertyChangeSupport;
+   private PropertyChangeSupport _propertyChangeSupport;
 
    public GeoQuery() {
-      propertyChangeSupport = new PropertyChangeSupport(this);
+      _propertyChangeSupport = new PropertyChangeSupport(this);
    }
 
    public void addPropertyChangeListener(final PropertyChangeListener propertyChangeListener) {
-      propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
+      _propertyChangeSupport.addPropertyChangeListener(propertyChangeListener);
    }
 
    public void asyncFind(final String query) {
@@ -79,7 +79,7 @@ public class GeoQuery implements Runnable {
    }
 
    public void removePropertyChangeListener(final PropertyChangeListener propertyChangeListener) {
-      propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
+      _propertyChangeSupport.removePropertyChangeListener(propertyChangeListener);
    }
 
    @Override
@@ -95,7 +95,7 @@ public class GeoQuery implements Runnable {
 
          final SAXParser parser = XmlUtils.initializeParser();
          parser.parse(uri, new GeoQuerySAXHandler(_searchResult));
-         propertyChangeSupport.firePropertyChange("_searchResult", oldValue, _searchResult); //$NON-NLS-1$
+         _propertyChangeSupport.firePropertyChange("_searchResult", oldValue, _searchResult); //$NON-NLS-1$
 
       } catch (final Exception e) {
          _exception = e;
