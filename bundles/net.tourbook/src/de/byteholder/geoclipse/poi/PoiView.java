@@ -24,10 +24,10 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import de.byteholder.gpx.PointOfInterest;
 import de.byteholder.gpx.Waypoint;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.stream.Stream;
 
 import net.tourbook.Images;
@@ -68,7 +68,7 @@ import org.eclipse.ui.part.ViewPart;
  * @author Michael Kanis
  * @author Veit Edunjobi
  */
-public class PoiView extends ViewPart implements Observer {
+public class PoiView extends ViewPart implements PropertyChangeListener {
 
    public static final String            ID                     = "de.byteholder.geoclipse.poi.poiView"; //$NON-NLS-1$
 
@@ -94,6 +94,8 @@ public class PoiView extends ViewPart implements Observer {
    private IPropertyChangeListener       _prefChangeListener;
 
    private IWorkbenchHelpSystem          _wbHelpSystem;
+
+   private GeoQuery                      _geoQuery              = new GeoQuery();
 
    /*
     * UI controls
@@ -241,6 +243,8 @@ public class PoiView extends ViewPart implements Observer {
       };
 
       _prefStore.addPropertyChangeListener(_prefChangeListener);
+
+      _geoQuery.addPropertyChangeListener(this);
    }
 
    @Override
@@ -370,6 +374,8 @@ public class PoiView extends ViewPart implements Observer {
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
 
+      _geoQuery.removePropertyChangeListener(this);
+
       super.dispose();
    }
 
@@ -409,9 +415,45 @@ public class PoiView extends ViewPart implements Observer {
       }
 
       // start poi search
-      final GeoQuery geoQuery = new GeoQuery(searchText);
-      geoQuery.addObserver(PoiView.this);
-      geoQuery.asyncFind();
+      _geoQuery.asyncFind(searchText);
+   }
+
+   @Override
+   public void propertyChange(final PropertyChangeEvent propertyChangeEvent) {
+
+      @SuppressWarnings("unchecked")
+      final List<PointOfInterest> searchResult = (List<PointOfInterest>) propertyChangeEvent.getNewValue();
+
+      if (searchResult != null) {
+         _pois = searchResult;
+      }
+
+      Display.getDefault().asyncExec(() -> {
+
+         // check if view is closed
+         if (_btnSearch.isDisposed()) {
+            return;
+         }
+
+         // refresh viewer
+         _poiViewer.setInput(new Object());
+
+         // select first entry, if there is one
+         final Table poiTable = _poiViewer.getTable();
+         if (poiTable.getItemCount() > 0) {
+
+            final Object firstData = poiTable.getItem(0).getData();
+            if (firstData instanceof PointOfInterest) {
+
+               _poiViewer.setSelection(new StructuredSelection(firstData));
+               setViewerFocus();
+            }
+         }
+
+         _cboSearchQuery.setEnabled(true);
+         _btnSearch.setEnabled(true);
+      });
+
    }
 
    private void restoreState() {
@@ -453,50 +495,4 @@ public class PoiView extends ViewPart implements Observer {
       table.setFocus();
    }
 
-   /**
-    * implements update from interface observer
-    */
-   @Override
-   public void update(final Observable observable, final Object arg) {
-
-      if (observable instanceof GeoQuery) {
-
-         final GeoQuery geoQuery = (GeoQuery) observable;
-
-         final List<PointOfInterest> searchResult = geoQuery.getSearchResult();
-         if (searchResult != null) {
-            _pois = searchResult;
-         }
-
-         Display.getDefault().asyncExec(() -> {
-
-            // check if view is closed
-            if (_btnSearch.isDisposed()) {
-               return;
-            }
-
-            // refresh viewer
-            _poiViewer.setInput(new Object());
-
-            // select first entry, if there is one
-            final Table poiTable = _poiViewer.getTable();
-            if (poiTable.getItemCount() > 0) {
-
-               final Object firstData = poiTable.getItem(0).getData();
-               if (firstData instanceof PointOfInterest) {
-
-                  _poiViewer.setSelection(new StructuredSelection(firstData));
-                  setViewerFocus();
-               }
-            }
-
-            _cboSearchQuery.setEnabled(true);
-            _btnSearch.setEnabled(true);
-         });
-
-         if (geoQuery.getException() != null) {
-            throw new RuntimeException(geoQuery.getException());
-         }
-      }
-   }
 }

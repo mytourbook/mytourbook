@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.util.Map;
 import javax.xml.parsers.SAXParser;
 
 import net.tourbook.common.NIO;
+import net.tourbook.common.util.XmlUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
 import net.tourbook.device.sporttracks.FitLog_SAXHandler;
@@ -52,7 +53,7 @@ class FitLogEx_SAXHandlerTests {
    static void initAll() {
 
       Initializer.initializeDatabase();
-      parser = Initializer.initializeParser();
+      parser = XmlUtils.initializeParser();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
       deviceDataReader = new FitLogDeviceDataReader();

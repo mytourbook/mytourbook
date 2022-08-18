@@ -22,12 +22,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 
 import javax.persistence.Persistence;
-import javax.xml.XMLConstants;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
-import net.tourbook.common.UI;
+import net.tourbook.common.util.XmlUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
@@ -98,7 +95,7 @@ public class Initializer {
                new ImportState_Process(),
                deviceDataReader);
 
-         final SAXParser parser = initializeParser();
+         final SAXParser parser = XmlUtils.initializeParser();
          if (parser != null) {
             parser.parse(in, handler);
          }
@@ -113,21 +110,5 @@ public class Initializer {
    public static void initializeDatabase() {
 
       Persistence.createEntityManagerFactory("tourdatabase").createEntityManager(); //$NON-NLS-1$
-   }
-
-   public static SAXParser initializeParser() {
-
-      try {
-
-         final SAXParserFactory factory = SAXParserFactory.newInstance();
-         final SAXParser parser = factory.newSAXParser();
-         parser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, UI.EMPTY_STRING);
-         parser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, UI.EMPTY_STRING);
-         return parser;
-      } catch (final ParserConfigurationException | SAXException e) {
-         e.printStackTrace();
-      }
-
-      return null;
    }
 }

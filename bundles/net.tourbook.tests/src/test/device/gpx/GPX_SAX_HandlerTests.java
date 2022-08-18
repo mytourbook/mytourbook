@@ -29,6 +29,7 @@ import java.util.Set;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 
+import net.tourbook.common.util.XmlUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
@@ -43,7 +44,6 @@ import org.xml.sax.SAXException;
 
 import utils.Comparison;
 import utils.FilesUtils;
-import utils.Initializer;
 
 /**
  * GPX device plugin test.
@@ -70,7 +70,7 @@ class GPX_SAX_HandlerTests {
    @BeforeAll
    static void initAll() {
 
-      parser = Initializer.initializeParser();
+      parser = XmlUtils.initializeParser();
       deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();

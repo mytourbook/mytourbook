@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import java.util.HashMap;
 
 import javax.xml.parsers.SAXParser;
 
+import net.tourbook.common.util.XmlUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
 import net.tourbook.device.garmin.GarminTCX_SAXHandler;
@@ -34,7 +35,6 @@ import org.xml.sax.SAXException;
 
 import utils.Comparison;
 import utils.FilesUtils;
-import utils.Initializer;
 
 public class GarminTCX_DeviceDataReaderTests {
 
@@ -48,7 +48,8 @@ public class GarminTCX_DeviceDataReaderTests {
 
    @BeforeAll
    static void initAll() {
-      parser = Initializer.initializeParser();
+
+      parser = XmlUtils.initializeParser();
       deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();

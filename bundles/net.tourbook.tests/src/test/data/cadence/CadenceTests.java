@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.util.HashMap;
 import javax.xml.parsers.SAXParser;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.XmlUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
 import net.tourbook.device.garmin.GarminTCX_SAXHandler;
@@ -42,14 +43,13 @@ import org.xml.sax.SAXException;
 import device.garmin.GarminTCX_DeviceDataReaderTests;
 import utils.Comparison;
 import utils.FilesUtils;
-import utils.Initializer;
 
 public class CadenceTests {
 
    private static SAXParser                  parser;
    private static final String               GARMIN_IMPORT_PATH      = GarminTCX_DeviceDataReaderTests.IMPORT_PATH;
    private static final String               SUUNTO_IMPORT_FILE_PATH = FilesUtils.rootPath + "device/suunto/files/"; //$NON-NLS-1$
-   private static final String               JSON_GZ                 = ".json.gz";                                        //$NON-NLS-1$
+   private static final String               JSON_GZ                 = ".json.gz";                                   //$NON-NLS-1$
 
    private static DeviceData                 deviceData;
    private static HashMap<Long, TourData>    newlyImportedTours;
@@ -62,7 +62,7 @@ public class CadenceTests {
    @BeforeAll
    static void initAll() {
 
-      parser = Initializer.initializeParser();
+      parser = XmlUtils.initializeParser();
       deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
       alreadyImportedTours = new HashMap<>();
