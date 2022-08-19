@@ -28,6 +28,7 @@ public class XmlUtils {
       try {
 
          final SAXParserFactory factory = SAXParserFactory.newInstance();
+         // Address the following security issue: https://rules.sonarsource.com/java/RSPEC-2755
          factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true); //$NON-NLS-1$
          return factory.newSAXParser();
 
