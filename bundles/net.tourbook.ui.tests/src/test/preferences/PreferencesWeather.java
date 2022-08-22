@@ -15,29 +15,43 @@
  *******************************************************************************/
 package preferences;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import net.tourbook.Messages;
 
+import org.eclipse.osgi.util.NLS;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 
 public class PreferencesWeather extends UITest {
 
+   private void testVendorConnection(final String vendorName) {
+
+      bot.comboBox().setSelection(vendorName);
+      bot.button(Messages.Pref_Weather_Button_TestHTTPConnection).click();
+
+      final SWTBotShell shell = bot.shell(Messages.Pref_Weather_CheckHTTPConnection_Message);
+      final String message = NLS.bind(
+            Messages.Pref_Weather_CheckHTTPConnection_OK_Message,
+            vendorName);
+      assertEquals(message, shell.bot().label(message).getText());
+
+      bot.button("OK").click();
+   }
+
    @Test
-   void testVendorConnection() {
+   void testVendorConnections() {
 
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
       bot.tree().getTreeItem("Weather").select();
 
       //OpenWeatherMap
-      bot.comboBox().setSelection("OpenWeatherMap");
-      bot.button(Messages.Pref_Weather_Button_TestHTTPConnection).click();
-      bot.button("OK").click();
+      testVendorConnection("OpenWeatherMap");
 
       //Weather API
-      bot.comboBox().setSelection("Weather API");
-      bot.button(Messages.Pref_Weather_Button_TestHTTPConnection).click();
-      bot.button("OK").click();
+      testVendorConnection("Weather API");
 
       bot.button("Apply and Close").click();
    }
