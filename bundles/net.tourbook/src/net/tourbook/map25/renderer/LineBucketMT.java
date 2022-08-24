@@ -474,7 +474,6 @@ public class LineBucketMT extends RenderBucketMT {
             gl.drawArrays(GL.TRIANGLE_STRIP, lineBucket.vertexOffset, lineBucket.numVertices);
          }
 
-//         gl.disableVertexAttribArray(shader_aVertexColor);
 
          draw_DirectionArrows(viewport, renderBucketsAll, vp2mpScale);
 
@@ -755,8 +754,8 @@ public class LineBucketMT extends RenderBucketMT {
                                    final boolean isClosed) {
 
       float ux, uy;
-      float vPrevX, vPrevY;
-      float vNextX, vNextY;
+      float unitPrevX, unitPrevY;
+      float unitNextX, unitNextY;
       float curX, curY;
       float nextX, nextY;
       double xyDistance;
@@ -784,15 +783,15 @@ public class LineBucketMT extends RenderBucketMT {
       pixelColor = pixelPointColors[pointIndexColor++];
 
       // unit vector to next node
-      vPrevX = nextX - curX;
-      vPrevY = nextY - curY;
-      xyDistance = (float) Math.sqrt(vPrevX * vPrevX + vPrevY * vPrevY);
-      vPrevX /= xyDistance;
-      vPrevY /= xyDistance;
+      unitPrevX = nextX - curX;
+      unitPrevY = nextY - curY;
+      xyDistance = (float) Math.sqrt(unitPrevX * unitPrevX + unitPrevY * unitPrevY);
+      unitPrevX /= xyDistance;
+      unitPrevY /= xyDistance;
 
       // perpendicular on the first segment
-      ux = -vPrevY;
-      uy = vPrevX;
+      ux = -unitPrevY;
+      uy = unitPrevX;
 
       int ddx, ddy;
 
@@ -808,16 +807,16 @@ public class LineBucketMT extends RenderBucketMT {
 
       if (isRounded && isOutside == false) {
 
-         ddx = (int) ((ux - vPrevX) * DIR_SCALE);
-         ddy = (int) ((uy - vPrevY) * DIR_SCALE);
+         ddx = (int) ((ux - unitPrevX) * DIR_SCALE);
+         ddy = (int) ((uy - unitPrevY) * DIR_SCALE);
          dx = (short) (0 | ddx & DIR_MASK);
          dy = (short) (2 | ddy & DIR_MASK);
 
          vertices.add(ox, oy, dx, dy, pixelColor);
          vertices.add(ox, oy, dx, dy, pixelColor);
 
-         ddx = (int) (-(ux + vPrevX) * DIR_SCALE);
-         ddy = (int) (-(uy + vPrevY) * DIR_SCALE);
+         ddx = (int) (-(ux + unitPrevX) * DIR_SCALE);
+         ddy = (int) (-(uy + unitPrevY) * DIR_SCALE);
 
          vertices.add(ox, oy, (short) (2 | ddx & DIR_MASK), (short) (2 | ddy & DIR_MASK), pixelColor);
 
@@ -836,8 +835,8 @@ public class LineBucketMT extends RenderBucketMT {
           * for now, just extend the line a little
           */
 
-         float tx = vPrevX;
-         float ty = vPrevY;
+         float tx = unitPrevX;
+         float ty = unitPrevY;
 
          if (isRounded == false && isSquared == false) {
 
@@ -873,8 +872,8 @@ public class LineBucketMT extends RenderBucketMT {
       curY = nextY;
 
       // unit vector pointing back to previous node
-      vPrevX *= -1;
-      vPrevY *= -1;
+      unitPrevX *= -1;
+      unitPrevY *= -1;
 
       for (final int endIndex = startIndex + numLinePoints;;) {
 
@@ -902,9 +901,9 @@ public class LineBucketMT extends RenderBucketMT {
          }
 
          // unit vector pointing forward to next node
-         vNextX = nextX - curX;
-         vNextY = nextY - curY;
-         xyDistance = Math.sqrt(vNextX * vNextX + vNextY * vNextY);
+         unitNextX = nextX - curX;
+         unitNextY = nextY - curY;
+         xyDistance = Math.sqrt(unitNextX * unitNextX + unitNextY * unitNextY);
 
          // skip too short segments
          if (xyDistance < _minimumDistance) {
@@ -914,10 +913,10 @@ public class LineBucketMT extends RenderBucketMT {
             continue;
          }
 
-         vNextX /= xyDistance;
-         vNextY /= xyDistance;
+         unitNextX /= xyDistance;
+         unitNextY /= xyDistance;
 
-         final double dotp = vNextX * vPrevX + vNextY * vPrevY;
+         final double dotp = unitNextX * unitPrevX + unitNextY * unitPrevY;
 
          //log.debug("acos " + dotp);
          if (dotp > 0.65) {
@@ -934,16 +933,16 @@ public class LineBucketMT extends RenderBucketMT {
             if (dotp > 0.999) {
 
                // 360 degree angle, set points aside
-               ux = vPrevX + vNextX;
-               uy = vPrevY + vNextY;
+               ux = unitPrevX + unitNextX;
+               uy = unitPrevY + unitNextY;
 
-               xyDistance = vNextX * uy - vNextY * ux;
+               xyDistance = unitNextX * uy - unitNextY * ux;
 
                if (xyDistance < 0.1 && xyDistance > -0.1) {
 
                   // almost straight
-                  ux = -vNextY;
-                  uy = vNextX;
+                  ux = -unitNextY;
+                  uy = unitNextX;
 
                } else {
 
@@ -962,47 +961,47 @@ public class LineBucketMT extends RenderBucketMT {
                //log.debug("back");
 
                // go back by min dist
-               px = curX + vPrevX * _minimumBevel;
-               py = curY + vPrevY * _minimumBevel;
+               px = curX + unitPrevX * _minimumBevel;
+               py = curY + unitPrevY * _minimumBevel;
 
                // go forward by min dist
-               curX = curX + vNextX * _minimumBevel;
-               curY = curY + vNextY * _minimumBevel;
+               curX = curX + unitNextX * _minimumBevel;
+               curY = curY + unitNextY * _minimumBevel;
             }
 
             // unit vector pointing forward to next node
-            vNextX = curX - px;
-            vNextY = curY - py;
-            xyDistance = Math.sqrt(vNextX * vNextX + vNextY * vNextY);
-            vNextX /= xyDistance;
-            vNextY /= xyDistance;
+            unitNextX = curX - px;
+            unitNextY = curY - py;
+            xyDistance = Math.sqrt(unitNextX * unitNextX + unitNextY * unitNextY);
+            unitNextX /= xyDistance;
+            unitNextY /= xyDistance;
 
-            addVertex(vertices, px, py, vPrevX, vPrevY, vNextX, vNextY, pixelColor);
+            addVertex(vertices, px, py, unitPrevX, unitPrevY, unitNextX, unitNextY, pixelColor);
 
             // flip unit vector to point back
-            vPrevX = -vNextX;
-            vPrevY = -vNextY;
+            unitPrevX = -unitNextX;
+            unitPrevY = -unitNextY;
 
             // unit vector pointing forward to next node
-            vNextX = nextX - curX;
-            vNextY = nextY - curY;
-            xyDistance = Math.sqrt(vNextX * vNextX + vNextY * vNextY);
-            vNextX /= xyDistance;
-            vNextY /= xyDistance;
+            unitNextX = nextX - curX;
+            unitNextY = nextY - curY;
+            xyDistance = Math.sqrt(unitNextX * unitNextX + unitNextY * unitNextY);
+            unitNextX /= xyDistance;
+            unitNextY /= xyDistance;
          }
 
-         addVertex(vertices, curX, curY, vPrevX, vPrevY, vNextX, vNextY, pixelColor);
+         addVertex(vertices, curX, curY, unitPrevX, unitPrevY, unitNextX, unitNextY, pixelColor);
 
          curX = nextX;
          curY = nextY;
 
          // flip vector to point back
-         vPrevX = -vNextX;
-         vPrevY = -vNextY;
+         unitPrevX = -unitNextX;
+         unitPrevY = -unitNextY;
       }
 
-      ux = vPrevY;
-      uy = -vPrevX;
+      ux = unitPrevY;
+      uy = -unitPrevX;
 
       isOutside = curX < tmin || curX > tmax || curY < tmin || curY > tmax;
 
@@ -1020,14 +1019,14 @@ public class LineBucketMT extends RenderBucketMT {
          vertices.add(ox, oy, (short) (2 | -ddx & DIR_MASK), (short) (1 | -ddy & DIR_MASK), pixelColor);
 
          // for rounded line edges
-         ddx = (int) ((ux - vPrevX) * DIR_SCALE);
-         ddy = (int) ((uy - vPrevY) * DIR_SCALE);
+         ddx = (int) ((ux - unitPrevX) * DIR_SCALE);
+         ddy = (int) ((uy - unitPrevY) * DIR_SCALE);
 
          vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (0 | ddy & DIR_MASK), pixelColor);
 
          // last vertex
-         ddx = (int) (-(ux + vPrevX) * DIR_SCALE);
-         ddy = (int) (-(uy + vPrevY) * DIR_SCALE);
+         ddx = (int) (-(ux + unitPrevX) * DIR_SCALE);
+         ddy = (int) (-(uy + unitPrevY) * DIR_SCALE);
          dx = (short) (2 | ddx & DIR_MASK);
          dy = (short) (0 | ddy & DIR_MASK);
 
@@ -1035,27 +1034,27 @@ public class LineBucketMT extends RenderBucketMT {
 
          if (isRounded == false && isSquared == false) {
 
-            vPrevX = 0;
-            vPrevY = 0;
+            unitPrevX = 0;
+            unitPrevY = 0;
 
          } else if (isRounded) {
 
-            vPrevX *= 0.5;
-            vPrevY *= 0.5;
+            unitPrevX *= 0.5;
+            unitPrevY *= 0.5;
          }
 
          if (isRounded) {
             numVertices -= 2;
          }
 
-         ddx = (int) ((ux - vPrevX) * DIR_SCALE);
-         ddy = (int) ((uy - vPrevY) * DIR_SCALE);
+         ddx = (int) ((ux - unitPrevX) * DIR_SCALE);
+         ddy = (int) ((uy - unitPrevY) * DIR_SCALE);
 
          vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (1 | ddy & DIR_MASK), pixelColor);
 
          // last vertex
-         ddx = (int) (-(ux + vPrevX) * DIR_SCALE);
-         ddy = (int) (-(uy + vPrevY) * DIR_SCALE);
+         ddx = (int) (-(ux + unitPrevX) * DIR_SCALE);
+         ddy = (int) (-(uy + unitPrevY) * DIR_SCALE);
          dx = (short) (2 | ddx & DIR_MASK);
          dy = (short) (1 | ddy & DIR_MASK);
       }
@@ -1083,30 +1082,30 @@ public class LineBucketMT extends RenderBucketMT {
     * @param vertexData
     * @param x
     * @param y
-    * @param vNextX
-    * @param vNextY
-    * @param vPrevX
-    * @param vPrevY
+    * @param unitNextX
+    * @param unitNextY
+    * @param unitPrevX
+    * @param unitPrevY
     * @param pixelColor
     */
    private void addVertex(final VertexDataMT vertexData,
                           final float x,
                           final float y,
-                          final float vNextX,
-                          final float vNextY,
-                          final float vPrevX,
-                          final float vPrevY,
+                          final float unitNextX,
+                          final float unitNextY,
+                          final float unitPrevX,
+                          final float unitPrevY,
                           final int pixelColor) {
 
-      float ux = vNextX + vPrevX;
-      float uy = vNextY + vPrevY;
+      float ux = unitNextX + unitPrevX;
+      float uy = unitNextY + unitPrevY;
 
-      // vPrev times perpendicular of sum(vNext, vPrev)
-      final double a = uy * vPrevX - ux * vPrevY;
+      // vPrev times perpendicular of sum(unitNext, unitPrev)
+      final double a = uy * unitPrevX - ux * unitPrevY;
 
       if (a < 0.01 && a > -0.01) {
-         ux = -vPrevY;
-         uy = vPrevX;
+         ux = -unitPrevY;
+         uy = unitPrevX;
       } else {
          ux /= a;
          uy /= a;
@@ -1184,9 +1183,9 @@ public class LineBucketMT extends RenderBucketMT {
          final double unitX = diffX / p21Distance;
          final double unitY = diffY / p21Distance;
 
-         // get perpendicular vector
-         final double perpenX = unitY;
-         final double perpenY = -unitX;
+         // get perpendicular vector for the arrow head
+         final double headPerpendX = unitY;
+         final double headPerpendY = -unitX;
 
          final double arrowLength = Math.min(_arrowLeghth, p21Distance);
          final double arrowWidth2 = _arrowWidth / 2; // half arrow width
@@ -1194,25 +1193,25 @@ public class LineBucketMT extends RenderBucketMT {
          final double pointOnLineX = p2X - (arrowLength * unitX);
          final double pointOnLineY = p2Y - (arrowLength * unitY);
 
-         final double arrowVectorX = arrowWidth2 * perpenX;
-         final double arrowVectorY = arrowWidth2 * perpenY;
+         final double headVectorX = arrowWidth2 * headPerpendX;
+         final double headVectorY = arrowWidth2 * headPerpendY;
 
          // set arrow points which are above/below the line
-         final float arrow1X = (float) (pointOnLineX + arrowVectorX);
-         final float arrow1Y = (float) (pointOnLineY + arrowVectorY);
+         final float arrowAboveX = (float) (pointOnLineX + headVectorX);
+         final float arrowAboveY = (float) (pointOnLineY + headVectorY);
 
-         final float arrow2X = (float) (pointOnLineX - arrowVectorX);
-         final float arrow2Y = (float) (pointOnLineY - arrowVectorY);
+         final float arrowBelowX = (float) (pointOnLineX - headVectorX);
+         final float arrowBelowY = (float) (pointOnLineY - headVectorY);
 
          // set arrow positions
          directionArrow_XYPositions.add((short) (p2X * COORD_SCALE));
          directionArrow_XYPositions.add((short) (p2Y * COORD_SCALE));
 
-         directionArrow_XYPositions.add((short) (arrow1X * COORD_SCALE));
-         directionArrow_XYPositions.add((short) (arrow1Y * COORD_SCALE));
+         directionArrow_XYPositions.add((short) (arrowAboveX * COORD_SCALE));
+         directionArrow_XYPositions.add((short) (arrowAboveY * COORD_SCALE));
 
-         directionArrow_XYPositions.add((short) (arrow2X * COORD_SCALE));
-         directionArrow_XYPositions.add((short) (arrow2Y * COORD_SCALE));
+         directionArrow_XYPositions.add((short) (arrowBelowX * COORD_SCALE));
+         directionArrow_XYPositions.add((short) (arrowBelowY * COORD_SCALE));
 
          // setup next position
          p1X = p2X;
