@@ -18,6 +18,7 @@ package preferences;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.tourbook.Messages;
+import net.tourbook.ui.views.IWeatherProvider;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -38,22 +39,22 @@ public class PreferencesWeatherTests extends UITest {
             vendorName);
       assertEquals(message, shell.bot().label(message).getText());
 
-      bot.button("OK").click();
+      bot.button("OK").click(); //$NON-NLS-1$
    }
 
    @Test
    void testVendorConnections() {
 
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
-      bot.tree().getTreeItem("Weather").select();
+      bot.tree().getTreeItem("Weather").select(); //$NON-NLS-1$
 
       //OpenWeatherMap
-      testVendorConnection("OpenWeatherMap");
+      testVendorConnection(IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP_ID);
 
       //Weather API
-      testVendorConnection("Weather API");
+      testVendorConnection(IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI_NAME);
 
-      bot.button("Apply and Close").click();
+      bot.button("Apply and Close").click(); //$NON-NLS-1$
    }
 
 }
