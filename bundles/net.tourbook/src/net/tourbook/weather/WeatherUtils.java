@@ -73,6 +73,10 @@ public class WeatherUtils {
                                                    final TourDateTime tourDateTime,
                                                    final boolean isDisplayEmptyValues) {
 
+      if (tourDateTime == null) {
+         return UI.EMPTY_STRING;
+      }
+
       final String tourTime = String.format("%3s", tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME); //$NON-NLS-1$
 
       final String temperature = String.format("%5s", //$NON-NLS-1$
