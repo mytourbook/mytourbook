@@ -60,7 +60,7 @@ jobs:
       - name: Upload JaCoCo file
         uses: actions/upload-artifact@v3
         with:
-          name: UI-Tests-Failures-Artifacts
+          name: Full-JaCoCo-Report
           path: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
           retention-days: 5
           
