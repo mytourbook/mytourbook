@@ -61,7 +61,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: UI-Tests-Failures-Artifacts
-          path: D:\a\mytourbook\mergedJaCoCoReport.exec
+          path: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
           retention-days: 5
           
 
