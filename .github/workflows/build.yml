@@ -55,7 +55,12 @@ jobs:
           path: |
             D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\*.png
             D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\workspace\.metadata\.log
-            D:\a\mytourbook\mergedJaCoCoReport.exec
+          retention-days: 5
+      - name: Upload JaCoCo file
+        uses: actions/upload-artifact@v3
+        with:
+          name: UI-Tests-Failures-Artifacts
+          path: D:\a\mytourbook\mergedJaCoCoReport.exec
           retention-days: 5
 
 
