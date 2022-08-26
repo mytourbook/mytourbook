@@ -201,6 +201,10 @@
                <goals>
                   <goal>prepare-agent</goal>
                </goals>
+	       <configuration> 
+                  <destFile>${session.executionRootDirectory}/mergedJaCoCoReport.exec</destFile> 
+                  <append>true</append> 
+            </configuration> 
             </execution>
             <execution>
                <id>all-tests-report</id>
