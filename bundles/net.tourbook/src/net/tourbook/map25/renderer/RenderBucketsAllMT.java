@@ -114,16 +114,24 @@ public class RenderBucketsAllMT extends TileData {
 
    int                    vertexColor_BufferId     = Integer.MIN_VALUE;
    int                    directionArrows_BufferId = Integer.MIN_VALUE;
+   int                    colorCoords_BufferId     = Integer.MIN_VALUE;
 
    private ByteBuffer     _vertexColor_Buffer;
    private int            _vertexColor_BufferSize;
    private ShortBuffer    _directionArrow_Buffer;
    private int            _directionArrow_BufferSize;
+   private ShortBuffer    _colorCoord_Buffer;
+   private int            _colorCoord_BufferSize;
 
    /**
     * Number of {@link Short}'s used for the direction arrows
     */
    int                    numShortsForDirectionArrows;
+
+   /**
+    * Number of {@link Short}'s used for the color coordinates
+    */
+   int                    numShortsForColorCoords;
 
    public RenderBucketsAllMT() {}
 
@@ -260,9 +268,11 @@ public class RenderBucketsAllMT extends TileData {
 
       final int vertexColorSize = vboSize;
       numShortsForDirectionArrows = countShortsForDirectionArrows();
+      numShortsForColorCoords = countShortsForColorCoords();
 
       final ShortBuffer vboBucketBuffer = MapRenderer.getShortBuffer(vboSize);
       final ShortBuffer directionArrow_ShortBuffer = getBuffer_DirectionArrow(numShortsForDirectionArrows);
+      final ShortBuffer colorCoords_ShortBuffer = getBuffer_ColorCoords(numShortsForColorCoords);
       final ByteBuffer colorBuffer = getBuffer_Color(vertexColorSize);
 
       if (addFill) {
@@ -298,6 +308,7 @@ public class RenderBucketsAllMT extends TileData {
       offset[LINE] = vboBucketBuffer.position() * SHORT_BYTES;
       vertexOffset = 0;
       int directionArrowsOffset = 0;
+      int colorCoordsOffset = 0;
       for (RenderBucketMT currentBucket = _firstChainedBucket; currentBucket != null; currentBucket = currentBucket.next) {
 
          if (currentBucket.type == LINE) {
@@ -311,12 +322,22 @@ public class RenderBucketsAllMT extends TileData {
          /*
           * Append direction arrow shorts into the buffer
           */
-         final TShortArrayList directionArrowVertices = currentBucket.directionArrow_XYPositions;
+         final TShortArrayList directionArrowVertices = currentBucket.directionArrow_XYZPositions;
          final int numBucketShorts = directionArrowVertices.size();
 
          directionArrow_ShortBuffer.put(directionArrowVertices.toArray(), directionArrowsOffset, numBucketShorts);
 
          directionArrowsOffset += numBucketShorts;
+
+         /*
+          * Append color coord shorts into the buffer
+          */
+         final TShortArrayList colorCoordsVertices = currentBucket.colorCoords;
+         final int numColorBucketShorts = colorCoordsVertices.size();
+
+         colorCoords_ShortBuffer.put(colorCoordsVertices.toArray(), colorCoordsOffset, numColorBucketShorts);
+
+         colorCoordsOffset += numColorBucketShorts;
       }
 
       /*
@@ -361,6 +382,14 @@ public class RenderBucketsAllMT extends TileData {
       }
       gl.bindBuffer(GL.ARRAY_BUFFER, directionArrows_BufferId);
       gl.bufferData(GL.ARRAY_BUFFER, numShortsForDirectionArrows * SHORT_BYTES, directionArrow_ShortBuffer.flip(), GL.STATIC_DRAW);
+
+      if (colorCoords_BufferId == Integer.MIN_VALUE) {
+
+         // create buffer id
+         colorCoords_BufferId = gl.genBuffer();
+      }
+      gl.bindBuffer(GL.ARRAY_BUFFER, colorCoords_BufferId);
+      gl.bufferData(GL.ARRAY_BUFFER, numShortsForColorCoords * SHORT_BYTES, colorCoords_ShortBuffer.flip(), GL.STATIC_DRAW);
 
       /**
        * Load vertex color into the GPU
@@ -419,6 +448,21 @@ public class RenderBucketsAllMT extends TileData {
    }
 
    /**
+    * @return Returns number of {@link Short}'s for the color coordinates
+    */
+   private int countShortsForColorCoords() {
+
+      int numShorts = 0;
+
+      for (RenderBucketMT bucket = _firstChainedBucket; bucket != null; bucket = bucket.next) {
+
+         numShorts += bucket.colorCoords.size();
+      }
+
+      return numShorts;
+   }
+
+   /**
     * @return Returns number of {@link Short}'s for the direction arrows
     */
    private int countShortsForDirectionArrows() {
@@ -427,7 +471,7 @@ public class RenderBucketsAllMT extends TileData {
 
       for (RenderBucketMT bucket = _firstChainedBucket; bucket != null; bucket = bucket.next) {
 
-         numShorts += bucket.directionArrow_XYPositions.size();
+         numShorts += bucket.directionArrow_XYZPositions.size();
       }
 
       return numShorts;
@@ -506,7 +550,7 @@ public class RenderBucketsAllMT extends TileData {
             typedBucket = new LineBucketMT(level);
 
          } else if (type == TEXLINE) {
-            
+
             typedBucket = new LineTexBucketMT(level);
 
 //       } else if (type == POLYGON) {
@@ -571,6 +615,36 @@ public class RenderBucketsAllMT extends TileData {
       }
 
       return _vertexColor_Buffer;
+   }
+
+   /**
+    * @param requestedSize
+    *           Number of {@link Short}'s
+    * @return
+    */
+   private ShortBuffer getBuffer_ColorCoords(final int requestedSize) {
+
+      final int bufferBlockSize = 2048;
+      final int numBufferBlocks = (requestedSize * SHORT_BYTES) / bufferBlockSize;
+      final int roundedBufferSize = (numBufferBlocks + 1) * bufferBlockSize;
+
+      if (_colorCoord_Buffer == null || _colorCoord_BufferSize < roundedBufferSize) {
+
+         _colorCoord_Buffer = ByteBuffer
+               .allocateDirect(roundedBufferSize)
+               .order(ByteOrder.nativeOrder())
+               .asShortBuffer();
+
+         _colorCoord_BufferSize = roundedBufferSize;
+
+      } else {
+
+         // IMPORTANT: reset position to 0 to prevent BufferOverflowException
+
+         _colorCoord_Buffer.clear();
+      }
+
+      return _colorCoord_Buffer;
    }
 
    /**

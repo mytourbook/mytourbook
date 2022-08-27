@@ -95,15 +95,16 @@ public class LineBucketMT extends RenderBucketMT {
    private int                tmin             = Integer.MIN_VALUE, tmax = Integer.MAX_VALUE;
 
    private int                _arrowWidth;
-   private int                _arrowLeghth;
+   private int                _arrowLength;
+   private int                _arrowLengthBack;
 
    private static class DirectionArrowsShader extends GLShaderMT {
 
       int shader_a_pos,
+            shader_a_ColorCoord,
             shader_u_mvp,
 
             shader_uArrowColor,
-            shader_uOutlineBrightness,
 
             shader_u_width
 
@@ -117,13 +118,12 @@ public class LineBucketMT extends RenderBucketMT {
 
 // SET_FORMATTING_OFF
 
-         shader_u_mvp               = getUniform("u_mvp"); //$NON-NLS-1$
-         shader_a_pos               = getAttrib("a_pos"); //$NON-NLS-1$
+         shader_u_mvp               = getUniform("u_mvp");        //$NON-NLS-1$
+         shader_a_pos               = getAttrib("a_pos");         //$NON-NLS-1$
+         shader_a_ColorCoord        = getAttrib("a_ColorCoord");  //$NON-NLS-1$
 
-         shader_u_width             = getUniform("u_width"); //$NON-NLS-1$
-
-         shader_uArrowColor         = getUniform("uArrowColor"); //$NON-NLS-1$
-         shader_uOutlineBrightness  = getUniform("uOutlineBrightness"); //$NON-NLS-1$
+//         shader_uArrowColor         = getUniform("uArrowColor");  //$NON-NLS-1$
+         shader_u_width             = getUniform("u_width");      //$NON-NLS-1$
 
 // SET_FORMATTING_ON
       }
@@ -474,7 +474,6 @@ public class LineBucketMT extends RenderBucketMT {
             gl.drawArrays(GL.TRIANGLE_STRIP, lineBucket.vertexOffset, lineBucket.numVertices);
          }
 
-
          draw_DirectionArrows(viewport, renderBucketsAll, vp2mpScale);
 
          return renderBucket;
@@ -486,10 +485,10 @@ public class LineBucketMT extends RenderBucketMT {
 
          final DirectionArrowsShader shader = _directionArrowShader;
          final int shader_a_pos = shader.shader_a_pos;
+         final int shader_a_ColorCoord = shader.shader_a_ColorCoord;
          final int shader_u_mvp = shader.shader_u_mvp;
          final int shader_u_width = shader.shader_u_width;
          final int shader_uArrowColor = shader.shader_uArrowColor;
-         final int shader_uOutlineBrightness = shader.shader_uOutlineBrightness;
 
          shader.useProgram();
 
@@ -498,13 +497,24 @@ public class LineBucketMT extends RenderBucketMT {
          // set mvp matrix into the shader
          viewport.mvp.setAsUniform(shader_u_mvp);
 
-
          gl.bindBuffer(GL.ARRAY_BUFFER, allRenderBuckets.directionArrows_BufferId);
          gl.enableVertexAttribArray(shader_a_pos);
          gl.vertexAttribPointer(
 
                shader_a_pos, //           index of the vertex attribute that is to be modified
-               2, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
+               4, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
+               GL.SHORT, //               data type of each component in the array
+               false, //                  values should be normalized
+               0, //                      offset in bytes between the beginning of consecutive vertex attributes
+               0 //                       offset in bytes of the first component in the vertex attribute array
+         );
+
+         gl.bindBuffer(GL.ARRAY_BUFFER, allRenderBuckets.colorCoords_BufferId);
+         gl.enableVertexAttribArray(shader_a_ColorCoord);
+         gl.vertexAttribPointer(
+
+               shader_a_ColorCoord, //    index of the vertex attribute that is to be modified
+               3, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
                GL.SHORT, //               data type of each component in the array
                false, //                  values should be normalized
                0, //                      offset in bytes between the beginning of consecutive vertex attributes
@@ -514,26 +524,16 @@ public class LineBucketMT extends RenderBucketMT {
          final int numDirArrowShorts = allRenderBuckets.numShortsForDirectionArrows;
 
          /*
-          * Draw outline
+          * Draw direction arrows
           */
 
          // Set outline width
          final float width = 10 / vp2mpScale;
 
          gl.uniform1f(shader_u_width, width * COORD_SCALE_BY_DIR_SCALE);
-
-         gl.uniform1f(shader_uOutlineBrightness, 0.8f);
          gl.uniform4f(shader_uArrowColor, 1.0f, 0.0f, 0.0f, 1.0f);
 
          gl.drawArrays(GL.TRIANGLES, 0, numDirArrowShorts);
-
-         /*
-          * Draw inner arrow over the outline
-          */
-//         gl.uniform1f(shader_uOutlineBrightness, 1.0f);
-//         gl.uniform4f(shader_uArrowColor, 0.0f, 0.0f, 1.0f, 1.0f);
-//
-//         gl.drawArrays(GL.TRIANGLES, 0, numDirArrowShorts);
 
 //       GLUtils.checkGlError(Renderer.class.getName());
       }
@@ -1076,6 +1076,25 @@ public class LineBucketMT extends RenderBucketMT {
       outlines = link;
    }
 
+   private void addPositions(final short p2Xscaled,
+                             final short p2Yscaled,
+                             final short arrowZ,
+                             final short arrowPartWing,
+
+                             final int colorCoord1,
+                             final int colorCoord2,
+                             final int colorCoord3) {
+
+      directionArrow_XYZPositions.add(p2Xscaled);
+      directionArrow_XYZPositions.add(p2Yscaled);
+      directionArrow_XYZPositions.add(arrowZ);
+      directionArrow_XYZPositions.add(arrowPartWing);
+
+      colorCoords.add((short) colorCoord1);
+      colorCoords.add((short) colorCoord2);
+      colorCoords.add((short) colorCoord3);
+   }
+
    /**
     * Adds 2 vertices
     *
@@ -1151,7 +1170,8 @@ public class LineBucketMT extends RenderBucketMT {
     */
    public void setupDirectionArrowVertices(final TFloatArrayList allDirectionArrowPixel_Raw) {
 
-      directionArrow_XYPositions.clearQuick();
+      directionArrow_XYZPositions.clearQuick();
+      colorCoords.clearQuick();
 
       // at least 2 positions are needed
       if (allDirectionArrowPixel_Raw.size() < 4) {
@@ -1160,8 +1180,15 @@ public class LineBucketMT extends RenderBucketMT {
 
       final float[] allDirectionArrowPixel = allDirectionArrowPixel_Raw.toArray();
 
-      _arrowWidth = 26;
-      _arrowLeghth = 40;
+      final short arrowZ = 50;
+
+      _arrowWidth = 40;
+      _arrowLength = 50;
+      _arrowLengthBack = 30;
+
+      final short finHeight = 5;
+      final short finTopZ = arrowZ + finHeight;
+      final short finBottomZ = arrowZ - finHeight;
 
       int pixelIndex = 0;
 
@@ -1178,40 +1205,123 @@ public class LineBucketMT extends RenderBucketMT {
          final float diffY = p2Y - p1Y;
 
          // distance between P1 and P2
-         final double p21Distance = Math.sqrt(diffX * diffX + diffY * diffY);
+         final double p12Distance = Math.sqrt(diffX * diffX + diffY * diffY);
 
-         final double unitX = diffX / p21Distance;
-         final double unitY = diffY / p21Distance;
+         final double p12UnitX = diffX / p12Distance;
+         final double p12UnitY = diffY / p12Distance;
 
          // get perpendicular vector for the arrow head
-         final double headPerpendX = unitY;
-         final double headPerpendY = -unitX;
+         final double unitPerpendX = p12UnitY;
+         final double unitPerpendY = -p12UnitX;
 
-         final double arrowLength = Math.min(_arrowLeghth, p21Distance);
+         final double arrowLength = Math.min(_arrowLength, p12Distance);
+         final double arrowLengthBack = Math.min(_arrowLengthBack, p12Distance);
          final double arrowWidth2 = _arrowWidth / 2; // half arrow width
 
-         final double pointOnLineX = p2X - (arrowLength * unitX);
-         final double pointOnLineY = p2Y - (arrowLength * unitY);
+         // point on line
+         final double pOnLineX = p2X - (arrowLength * p12UnitX);
+         final double pOnLineY = p2Y - (arrowLength * p12UnitY);
+         final double pBackX = p2X - (arrowLengthBack * p12UnitX);
+         final double pBackY = p2Y - (arrowLengthBack * p12UnitY);
 
-         final double headVectorX = arrowWidth2 * headPerpendX;
-         final double headVectorY = arrowWidth2 * headPerpendY;
+         final double vFinX = unitPerpendX * arrowWidth2;
+         final double vFinY = unitPerpendY * arrowWidth2;
 
          // set arrow points which are above/below the line
-         final float arrowAboveX = (float) (pointOnLineX + headVectorX);
-         final float arrowAboveY = (float) (pointOnLineY + headVectorY);
+         final float pLeftX = (float) (pOnLineX + vFinX);
+         final float pLeftY = (float) (pOnLineY + vFinY);
 
-         final float arrowBelowX = (float) (pointOnLineX - headVectorX);
-         final float arrowBelowY = (float) (pointOnLineY - headVectorY);
+         final float pRightX = (float) (pOnLineX - vFinX);
+         final float pRightY = (float) (pOnLineY - vFinY);
 
-         // set arrow positions
-         directionArrow_XYPositions.add((short) (p2X * COORD_SCALE));
-         directionArrow_XYPositions.add((short) (p2Y * COORD_SCALE));
+         /**
+          * <code>
+          *
+          * WING
+          *
+          *                 Pleft
+          *                     #---\
+          *                      -   ---\
+          *                     . -      ---\
+          *                        -         ---\
+          *                     .   -            ---\
+          *                          -               ---\
+          *                     .     -                  ---\
+          *                            -                     ---\
+          *    P1  #------------#-------#------------------------# P2
+          *                 PonLine    - Pback               ---/
+          *                     .     -                  ---/
+          *                          -               ---/
+          *                     .   -            ---/
+          *                        -         ---/
+          *                     . -      ---/
+          *                      -   ---/
+          *                     #---/
+          *                 Pright
+          *
+          * FIN
+          *
+          *                 ZfinTop
+          *                     #---\
+          *                          ---\
+          *                     .        ---\
+          *                                  ---\
+          *                     .                ---\
+          *                                          ---\
+          *                     .                        ---\
+          *                                                  ---\
+          *    P1  #------------#--------------------------------# P2
+          *                 PonLine                          ---/
+          *                     .                        ---/
+          *                                          ---/
+          *                     .                ---/
+          *                                  ---/
+          *                     .        ---/
+          *                          ---/
+          *                     #---/
+          *                 ZfinBottom
+          * </code>
+          */
 
-         directionArrow_XYPositions.add((short) (arrowAboveX * COORD_SCALE));
-         directionArrow_XYPositions.add((short) (arrowAboveY * COORD_SCALE));
+         /*
+          * Set arrow positions
+          */
 
-         directionArrow_XYPositions.add((short) (arrowBelowX * COORD_SCALE));
-         directionArrow_XYPositions.add((short) (arrowBelowY * COORD_SCALE));
+// SET_FORMATTING_OFF
+
+         final short arrowPart_Wing = 0;
+         final short arrowPart_Fin  = 1;
+
+         final short p2X_scaled     = (short) (p2X      * COORD_SCALE);
+         final short p2Y_scaled     = (short) (p2Y      * COORD_SCALE);
+         final short pLeftX_scaled  = (short) (pLeftX   * COORD_SCALE);
+         final short pLeftY_scaled  = (short) (pLeftY   * COORD_SCALE);
+         final short pRight_Xscaled = (short) (pRightX  * COORD_SCALE);
+         final short pRightY_scaled = (short) (pRightY  * COORD_SCALE);
+         final short pBackX_scaled  = (short) (pBackX   * COORD_SCALE);
+         final short pBackY_scaled  = (short) (pBackY   * COORD_SCALE);
+
+         // left wing
+         addPositions(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 1, 0);
+         addPositions(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 0);
+         addPositions(pLeftX_scaled,    pLeftY_scaled,  arrowZ,     arrowPart_Wing, 0, 0, 1);
+
+         // right wing
+         addPositions(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
+         addPositions(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 0);
+         addPositions(pRight_Xscaled,   pRightY_scaled, arrowZ,     arrowPart_Wing, 0, 1, 1);
+
+         // left fin
+         addPositions(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
+         addPositions(pLeftX_scaled,    pLeftY_scaled,  finTopZ,    arrowPart_Fin, 0, 1, 0);
+         addPositions(pLeftX_scaled,    pLeftY_scaled,  finBottomZ, arrowPart_Fin, 0, 0, 1);
+
+         // right fin
+         addPositions(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
+         addPositions(pRight_Xscaled,   pRightY_scaled, finTopZ,    arrowPart_Fin, 0, 1, 0);
+         addPositions(pRight_Xscaled,   pRightY_scaled, finBottomZ, arrowPart_Fin, 0, 0, 1);
+
+// SET_FORMATTING_ON
 
          // setup next position
          p1X = p2X;

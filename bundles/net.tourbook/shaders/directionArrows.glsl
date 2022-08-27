@@ -3,41 +3,28 @@ precision   highp float;
 #endif
 
 uniform     mat4  u_mvp;
-attribute   vec2  a_pos;
+attribute   vec4  a_pos;
+attribute   vec3  a_ColorCoord; 
 
 // factor to increase arrow size relative to scale
 // that the size is not jumping when zoom level is changed
 uniform     float u_width;
 
-// This factor is multiplied with the color when painting the outline
-// the outline is painted first with more width, then the core line with less width
-// coreline = 1.0
-// outline  0...1 is darker
-//          1...2 is brighter
-uniform float     uOutlineBrightness;
-uniform vec4      uArrowColor;
+//uniform     vec4  uArrowColor;
 
 // fragment values
-varying vec2      v_st;
-varying vec4      vFragmentColor;
-
+varying vec2   v_st;
+//varying vec4   vFragmentColor;
+varying vec3   vColorCoord;
+varying float  vArrowPart;
 
 void main() {
    
-   gl_Position   = u_mvp * vec4(a_pos + (u_width * 1.0), 30.0, 1.0);
+   gl_Position   = u_mvp * vec4(a_pos.xyz + u_width, 1.0);
 
-   // 0...2 -> -1...1
-   float outlineBrightness01 = uOutlineBrightness - 1.0;
-   
-   vec3 vertexColorWithBrightness = outlineBrightness01 > 0.0
-         
-         // > 0 -> brighter
-         ? uArrowColor.rgb + outlineBrightness01
-         
-         // < 0 -> darker
-         : uArrowColor.rgb * uOutlineBrightness;
-
-   vFragmentColor = vec4(vertexColorWithBrightness, uArrowColor.a);
+//   vFragmentColor = uArrowColor;
+   vArrowPart     = a_pos.w;
+   vColorCoord    = a_ColorCoord;
 }
 
 $$
@@ -46,13 +33,52 @@ $$
 precision   highp float;
 #endif
 
-varying vec2       v_st;
-varying vec4       vFragmentColor;
+//varying vec2   v_st;
+//varying vec4   vFragmentColor;
+varying vec3   vColorCoord;
+varying float  vArrowPart;
 
 void main() {
    
-//  gl_FragColor  = vec4(0.0, 0.0, 0.0, 1.0);
+   short colorCoordX = vColorCoord.x;
+   float wireValue;
+   
+   if (colorCoordX > 0.0) { 
+      wireValue = 0.9;
+   } else {
+      wireValue = 0.1;
+   }
+   
+   if(vArrowPart == 0) {
+
+      // it's a wing
+
+      if (wireValue > 0.5) {
+         
+         // inside	
+         //gl_FragColor = vec4(0.1, .1, .1, .7);
+         gl_FragColor = vec4(0.91, .1, .1, .8);
+         
+      } else {
+         // border
+         gl_FragColor = vec4(.9, .2, .2, .997);
+      }
+
+   } else {
+
+      // it's a fin
+
+      if (wireValue > 0.5) {
+         
+         // inside	
+         //gl_FragColor = vec4(.2, .2, .2, .7);
+         gl_FragColor = vec4(0.1, .91, .1, .7);
+         
+      } else {
+         // border
+         gl_FragColor = vec4(.8, .8, .8, .997);
+      }
+   }
     
-    gl_FragColor = vFragmentColor;
 
 }

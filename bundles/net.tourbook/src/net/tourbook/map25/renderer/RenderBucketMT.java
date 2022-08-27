@@ -40,7 +40,7 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
 //   public static final byte   BITMAP    = 7;
 //   public static final byte   CIRCLE    = 8;
 
-   static final VertexData      EMPTY  = new VertexData();
+   static final VertexData      EMPTY = new VertexData();
 
    public final byte            type;
 
@@ -68,19 +68,30 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
     * <pre>
     * x1
     * y2
+    * z1
     *
     * x2
     * y2
+    * z2
     *
     * ...
     * </pre>
     */
-   protected TShortArrayList    directionArrow_XYPositions;
+   protected TShortArrayList    directionArrow_XYZPositions;
+
+   /**
+    * Barycentric coordinates are simply (1, 0, 0), (0, 1, 0) and (0, 0, 1) for the three
+    * triangle vertices (the order does not really matter, which makes packing into triangle strips
+    * potentially easier).
+    * 
+    * Source: https://stackoverflow.com/questions/137629/how-do-you-render-primitives-as-wireframes-in-opengl#answer-33004265
+    */
+   protected TShortArrayList    colorCoords;
 
    final boolean                quads;
 
-   protected int                vertexOffset;             // in bytes
-   protected int                indiceOffset;             // in bytes
+   protected int                vertexOffset;               // in bytes
+   protected int                indiceOffset;               // in bytes
 
    protected RenderBucketMT(final byte type, final boolean indexed, final boolean quads) {
 
@@ -96,7 +107,8 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
 
       this.quads = quads;
 
-      directionArrow_XYPositions = new TShortArrayList();
+      directionArrow_XYZPositions = new TShortArrayList();
+      colorCoords = new TShortArrayList();
    }
 
    /**
