@@ -62,7 +62,7 @@ void main() {
       if (wireValue > 0.5) {
          
          // inside	
-         gl_FragColor = vec4(.2, .2, .2, .97);
+         gl_FragColor = vec4(.2, .2, .2, .7);
          
       } else {
          // border

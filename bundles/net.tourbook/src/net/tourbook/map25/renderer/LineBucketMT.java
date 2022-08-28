@@ -499,6 +499,7 @@ public class LineBucketMT extends RenderBucketMT {
 
          GLState.blend(true);
          GLState.test(true, false);
+         gl.depthMask(true);
 
          // set mvp matrix into the shader
          viewport.mvp.setAsUniform(shader_u_mvp);
@@ -540,6 +541,8 @@ public class LineBucketMT extends RenderBucketMT {
 //         gl.uniform4f(shader_uArrowColor, 1.0f, 0.0f, 0.0f, 1.0f);
 
          gl.drawArrays(GL.TRIANGLES, 0, numDirArrowShorts);
+
+         gl.depthMask(false);
 
          GLUtils.checkGlError(Renderer.class.getName());
       }
@@ -1186,11 +1189,11 @@ public class LineBucketMT extends RenderBucketMT {
 
       final float[] allDirectionArrowPixel = allDirectionArrowPixel_Raw.toArray();
 
-      _arrowWidth = 40;
-      _arrowLength = 30;
-      _arrowLengthBack = 20;
+      _arrowWidth = 50;
+      _arrowLength = 50;
+      _arrowLengthBack = 40;
 
-      _finHeight = 15;
+      _finHeight = 20;
 
       final short arrowZ = 20;
       final short finTopZ = (short) (arrowZ + _finHeight);
@@ -1307,10 +1310,10 @@ public class LineBucketMT extends RenderBucketMT {
          final short pBackX_scaled  = (short) (pBackX   * COORD_SCALE);
          final short pBackY_scaled  = (short) (pBackY   * COORD_SCALE);
 
-         // left fin
-         addPositions(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
-         addPositions(pLeftX_scaled,    pLeftY_scaled,  finTopZ,    arrowPart_Fin, 0, 1, 0);
-         addPositions(pLeftX_scaled,    pLeftY_scaled,  finBottomZ, arrowPart_Fin, 0, 0, 1);
+
+         /**
+          * THE ORDER IS VERY IMPORTANT TO FIX Z-FIGHTING
+          */
 
          // left wing
          addPositions(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
@@ -1321,6 +1324,11 @@ public class LineBucketMT extends RenderBucketMT {
          addPositions(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
          addPositions(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
          addPositions(pRight_Xscaled,   pRightY_scaled, arrowZ,     arrowPart_Wing, 0, 0, 1);
+
+         // left fin
+         addPositions(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
+         addPositions(pLeftX_scaled,    pLeftY_scaled,  finTopZ,    arrowPart_Fin, 0, 1, 0);
+         addPositions(pLeftX_scaled,    pLeftY_scaled,  finBottomZ, arrowPart_Fin, 0, 0, 1);
 
          // right fin
          addPositions(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
