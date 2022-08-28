@@ -108,20 +108,20 @@ public class RenderBucketsAllMT extends TileData {
     * <li>2. lines afterwards at lineOffset</li>
     * <li>3. other buckets keep their byte offset in offset</li>
     */
-   public int[]           offset                   = { 0, 0 };
+   public int[]           offset                       = { 0, 0 };
 
    private RenderBucketMT _currentBucket;
 
-   int                    vertexColor_BufferId     = Integer.MIN_VALUE;
-   int                    directionArrows_BufferId = Integer.MIN_VALUE;
-   int                    colorCoords_BufferId     = Integer.MIN_VALUE;
+   int                    vertexColor_BufferId         = Integer.MIN_VALUE;
+   int                    dirArrows_BufferId           = Integer.MIN_VALUE;
+   int                    dirArrows_ColorCoords_BufferId = Integer.MIN_VALUE;
 
    private ByteBuffer     _vertexColor_Buffer;
    private int            _vertexColor_BufferSize;
-   private ShortBuffer    _directionArrow_Buffer;
-   private int            _directionArrow_BufferSize;
-   private ShortBuffer    _colorCoord_Buffer;
-   private int            _colorCoord_BufferSize;
+   private ShortBuffer    _dirArrow_Buffer;
+   private int            _dirArrow_BufferSize;
+   private ShortBuffer    _dirArrow_ColorCoord_Buffer;
+   private int            _dirArrow_ColorCoord_BufferSize;
 
    /**
     * Number of {@link Short}'s used for the direction arrows
@@ -266,14 +266,14 @@ public class RenderBucketsAllMT extends TileData {
          vboSize += TILE_FILL_VERTICES * 2;
       }
 
-      final int vertexColorSize = vboSize;
+      final int vertexColor_Size = vboSize;
       numShortsForDirectionArrows = countShortsForDirectionArrows();
       numShortsForColorCoords = countShortsForColorCoords();
 
       final ShortBuffer vboBucketBuffer = MapRenderer.getShortBuffer(vboSize);
       final ShortBuffer directionArrow_ShortBuffer = getBuffer_DirectionArrow(numShortsForDirectionArrows);
       final ShortBuffer colorCoords_ShortBuffer = getBuffer_ColorCoords(numShortsForColorCoords);
-      final ByteBuffer colorBuffer = getBuffer_Color(vertexColorSize);
+      final ByteBuffer colorBuffer = getBuffer_Color(vertexColor_Size);
 
       if (addFill) {
          vboBucketBuffer.put(fillShortCoords, 0, TILE_FILL_VERTICES * 2);
@@ -375,20 +375,20 @@ public class RenderBucketsAllMT extends TileData {
       /*
        * Direction arrows
        */
-      if (directionArrows_BufferId == Integer.MIN_VALUE) {
+      if (dirArrows_BufferId == Integer.MIN_VALUE) {
 
          // create buffer id
-         directionArrows_BufferId = gl.genBuffer();
+         dirArrows_BufferId = gl.genBuffer();
       }
-      gl.bindBuffer(GL.ARRAY_BUFFER, directionArrows_BufferId);
+      gl.bindBuffer(GL.ARRAY_BUFFER, dirArrows_BufferId);
       gl.bufferData(GL.ARRAY_BUFFER, numShortsForDirectionArrows * SHORT_BYTES, directionArrow_ShortBuffer.flip(), GL.STATIC_DRAW);
 
-      if (colorCoords_BufferId == Integer.MIN_VALUE) {
+      if (dirArrows_ColorCoords_BufferId == Integer.MIN_VALUE) {
 
          // create buffer id
-         colorCoords_BufferId = gl.genBuffer();
+         dirArrows_ColorCoords_BufferId = gl.genBuffer();
       }
-      gl.bindBuffer(GL.ARRAY_BUFFER, colorCoords_BufferId);
+      gl.bindBuffer(GL.ARRAY_BUFFER, dirArrows_ColorCoords_BufferId);
       gl.bufferData(GL.ARRAY_BUFFER, numShortsForColorCoords * SHORT_BYTES, colorCoords_ShortBuffer.flip(), GL.STATIC_DRAW);
 
       /**
@@ -406,7 +406,7 @@ public class RenderBucketsAllMT extends TileData {
       }
 
       gl.bindBuffer(GL.ARRAY_BUFFER, vertexColor_BufferId);
-      gl.bufferData(GL.ARRAY_BUFFER, vertexColorSize, _vertexColor_Buffer.flip(), GL.STATIC_DRAW);
+      gl.bufferData(GL.ARRAY_BUFFER, vertexColor_Size, _vertexColor_Buffer.flip(), GL.STATIC_DRAW);
 
       /*
        * VBO
@@ -628,23 +628,23 @@ public class RenderBucketsAllMT extends TileData {
       final int numBufferBlocks = (requestedSize * SHORT_BYTES) / bufferBlockSize;
       final int roundedBufferSize = (numBufferBlocks + 1) * bufferBlockSize;
 
-      if (_colorCoord_Buffer == null || _colorCoord_BufferSize < roundedBufferSize) {
+      if (_dirArrow_ColorCoord_Buffer == null || _dirArrow_ColorCoord_BufferSize < roundedBufferSize) {
 
-         _colorCoord_Buffer = ByteBuffer
+         _dirArrow_ColorCoord_Buffer = ByteBuffer
                .allocateDirect(roundedBufferSize)
                .order(ByteOrder.nativeOrder())
                .asShortBuffer();
 
-         _colorCoord_BufferSize = roundedBufferSize;
+         _dirArrow_ColorCoord_BufferSize = roundedBufferSize;
 
       } else {
 
          // IMPORTANT: reset position to 0 to prevent BufferOverflowException
 
-         _colorCoord_Buffer.clear();
+         _dirArrow_ColorCoord_Buffer.clear();
       }
 
-      return _colorCoord_Buffer;
+      return _dirArrow_ColorCoord_Buffer;
    }
 
    /**
@@ -658,23 +658,23 @@ public class RenderBucketsAllMT extends TileData {
       final int numBufferBlocks = (requestedSize * SHORT_BYTES) / bufferBlockSize;
       final int roundedBufferSize = (numBufferBlocks + 1) * bufferBlockSize;
 
-      if (_directionArrow_Buffer == null || _directionArrow_BufferSize < roundedBufferSize) {
+      if (_dirArrow_Buffer == null || _dirArrow_BufferSize < roundedBufferSize) {
 
-         _directionArrow_Buffer = ByteBuffer
+         _dirArrow_Buffer = ByteBuffer
                .allocateDirect(roundedBufferSize)
                .order(ByteOrder.nativeOrder())
                .asShortBuffer();
 
-         _directionArrow_BufferSize = roundedBufferSize;
+         _dirArrow_BufferSize = roundedBufferSize;
 
       } else {
 
          // IMPORTANT: reset position to 0 to prevent BufferOverflowException
 
-         _directionArrow_Buffer.clear();
+         _dirArrow_Buffer.clear();
       }
 
-      return _directionArrow_Buffer;
+      return _dirArrow_Buffer;
    }
 
 //    /**
