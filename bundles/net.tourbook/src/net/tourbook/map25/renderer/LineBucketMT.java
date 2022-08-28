@@ -46,29 +46,32 @@ import org.slf4j.LoggerFactory;
  */
 public class LineBucketMT extends RenderBucketMT {
 
-   static final Logger        log              = LoggerFactory.getLogger(LineBucketMT.class);
+   static final Logger        log                = LoggerFactory.getLogger(LineBucketMT.class);
 
    /**
     * Scale factor mapping extrusion vector to short values
     */
-   public static final float  DIR_SCALE        = 2048;
+   public static final float  DIR_SCALE          = 2048;
 
    /**
     * Maximal resolution
     */
-   public static final float  MIN_DIST         = 1 / 8f;
+   public static final float  MIN_DIST           = 1 / 8f;
 
    /**
     * Not quite right.. need to go back so that additional
     * bevel vertices are at least MIN_DIST apart
     */
-   private static final float MIN_BEVEL        = MIN_DIST * 4;
+   private static final float MIN_BEVEL          = MIN_DIST * 4;
+
+   private static float       _outlineWidth_Wing = .1f;
+   private static float       _outlineWidth_Fin  = .1f;
 
    /**
     * Mask for packing last two bits of extrusion vector with texture
     * coordinates, .... 1111 1100
     */
-   private static final int   DIR_MASK         = 0xFFFFFFFC;
+   private static final int   DIR_MASK           = 0xFFFFFFFC;
 
    /**
     * Lines referenced by this outline layer
@@ -84,15 +87,15 @@ public class LineBucketMT extends RenderBucketMT {
 
    public float               testValue;
 
-   public float               scale            = 1;
+   public float               scale              = 1;
 
    private boolean            _isCapRounded;
-   private float              _minimumDistance = MIN_DIST;
-   private float              _minimumBevel    = MIN_BEVEL;
+   private float              _minimumDistance   = MIN_DIST;
+   private float              _minimumBevel      = MIN_BEVEL;
 
    private float              _heightOffset;
 
-   private int                tmin             = Integer.MIN_VALUE, tmax = Integer.MAX_VALUE;
+   private int                tmin               = Integer.MIN_VALUE, tmax = Integer.MAX_VALUE;
 
    private int                _arrowWidth;
    private int                _arrowLength;
@@ -102,10 +105,12 @@ public class LineBucketMT extends RenderBucketMT {
    private static class DirectionArrowsShader extends GLShaderMT {
 
       int shader_a_pos,
-            shader_a_ColorCoord,
+            shader_attrib_ColorCoord,
             shader_u_mvp,
 
             shader_uArrowColor,
+            shader_uni_OutlineWidth_Fin,
+            shader_uni_OutlineWidth_Wing,
 
             shader_u_width
 
@@ -119,12 +124,13 @@ public class LineBucketMT extends RenderBucketMT {
 
 // SET_FORMATTING_OFF
 
-         shader_u_mvp               = getUniform("u_mvp");        //$NON-NLS-1$
-         shader_a_pos               = getAttrib("a_pos");         //$NON-NLS-1$
-         shader_a_ColorCoord        = getAttrib("a_ColorCoord");  //$NON-NLS-1$
+         shader_u_mvp                  = getUniform("u_mvp");                 //$NON-NLS-1$
+         shader_a_pos                  = getAttrib("a_pos");                  //$NON-NLS-1$
+         shader_attrib_ColorCoord      = getAttrib("attrib_ColorCoord");       //$NON-NLS-1$
 
-//         shader_uArrowColor         = getUniform("uArrowColor");  //$NON-NLS-1$
-         shader_u_width             = getUniform("u_width");      //$NON-NLS-1$
+         shader_u_width                = getUniform("u_width");               //$NON-NLS-1$
+         shader_uni_OutlineWidth_Fin   = getUniform("uni_OutlineWidth_Fin");  //$NON-NLS-1$
+         shader_uni_OutlineWidth_Wing  = getUniform("uni_OutlineWidth_Wing"); //$NON-NLS-1$
 
 // SET_FORMATTING_ON
       }
@@ -485,13 +491,15 @@ public class LineBucketMT extends RenderBucketMT {
                                                final float vp2mpScale) {
 // SET_FORMATTING_OFF
 
-         final DirectionArrowsShader shader  = _directionArrowShader;
+         final DirectionArrowsShader shader        = _directionArrowShader;
 
-         final int shader_a_pos              = shader.shader_a_pos;
-         final int shader_a_ColorCoord       = shader.shader_a_ColorCoord;
-         final int shader_u_mvp              = shader.shader_u_mvp;
-         final int shader_u_width            = shader.shader_u_width;
-         final int shader_uArrowColor        = shader.shader_uArrowColor;
+         final int shader_a_pos                    = shader.shader_a_pos;
+         final int shader_attrib_ColorCoord        = shader.shader_attrib_ColorCoord;
+         final int shader_u_mvp                    = shader.shader_u_mvp;
+         final int shader_u_width                  = shader.shader_u_width;
+         final int shader_uArrowColor              = shader.shader_uArrowColor;
+         final int shader_uni_OutlineWidth_Fin     = shader.shader_uni_OutlineWidth_Fin;
+         final int shader_uni_OutlineWidth_Wing    = shader.shader_uni_OutlineWidth_Wing;
 
 // SET_FORMATTING_ON
 
@@ -517,10 +525,10 @@ public class LineBucketMT extends RenderBucketMT {
          );
 
          gl.bindBuffer(GL.ARRAY_BUFFER, allRenderBuckets.dirArrows_ColorCoords_BufferId);
-         gl.enableVertexAttribArray(shader_a_ColorCoord);
+         gl.enableVertexAttribArray(shader_attrib_ColorCoord);
          gl.vertexAttribPointer(
 
-               shader_a_ColorCoord, //    index of the vertex attribute that is to be modified
+               shader_attrib_ColorCoord, //    index of the vertex attribute that is to be modified
                3, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
                GL.SHORT, //               data type of each component in the array
                false, //                  values should be normalized
@@ -534,11 +542,14 @@ public class LineBucketMT extends RenderBucketMT {
           * Draw direction arrows
           */
 
-//         // Set outline width
 //         final float width = 10 / vp2mpScale;
 //
 //         gl.uniform1f(shader_u_width, width * COORD_SCALE_BY_DIR_SCALE);
 //         gl.uniform4f(shader_uArrowColor, 1.0f, 0.0f, 0.0f, 1.0f);
+
+         // set outline width
+         gl.uniform1f(shader_uni_OutlineWidth_Fin, _outlineWidth_Fin);
+         gl.uniform1f(shader_uni_OutlineWidth_Wing, _outlineWidth_Wing);
 
          gl.drawArrays(GL.TRIANGLES, 0, numDirArrowShorts);
 
@@ -597,6 +608,25 @@ public class LineBucketMT extends RenderBucketMT {
 
       super(RenderBucketMT.LINE, false, false);
       this.level = layer;
+   }
+
+   private void addDirArrowPosition(final short p2Xscaled,
+                                    final short p2Yscaled,
+                                    final short arrowZ,
+                                    final short arrowPartWing,
+
+                                    final int colorCoord1,
+                                    final int colorCoord2,
+                                    final int colorCoord3) {
+
+      directionArrow_XYZPositions.add(p2Xscaled);
+      directionArrow_XYZPositions.add(p2Yscaled);
+      directionArrow_XYZPositions.add(arrowZ);
+      directionArrow_XYZPositions.add(arrowPartWing);
+
+      colorCoords.add((short) colorCoord1);
+      colorCoords.add((short) colorCoord2);
+      colorCoords.add((short) colorCoord3);
    }
 
    /**
@@ -1085,25 +1115,6 @@ public class LineBucketMT extends RenderBucketMT {
       outlines = link;
    }
 
-   private void addPositions(final short p2Xscaled,
-                             final short p2Yscaled,
-                             final short arrowZ,
-                             final short arrowPartWing,
-
-                             final int colorCoord1,
-                             final int colorCoord2,
-                             final int colorCoord3) {
-
-      directionArrow_XYZPositions.add(p2Xscaled);
-      directionArrow_XYZPositions.add(p2Yscaled);
-      directionArrow_XYZPositions.add(arrowZ);
-      directionArrow_XYZPositions.add(arrowPartWing);
-
-      colorCoords.add((short) colorCoord1);
-      colorCoords.add((short) colorCoord2);
-      colorCoords.add((short) colorCoord3);
-   }
-
    /**
     * Adds 2 vertices
     *
@@ -1189,11 +1200,14 @@ public class LineBucketMT extends RenderBucketMT {
 
       final float[] allDirectionArrowPixel = allDirectionArrowPixel_Raw.toArray();
 
-      _arrowWidth = 50;
+      _arrowWidth = 30;
       _arrowLength = 50;
       _arrowLengthBack = 40;
 
-      _finHeight = 20;
+      _finHeight = 10;
+
+      _outlineWidth_Fin = .02f;
+      _outlineWidth_Wing = .075f;
 
       final short arrowZ = 20;
       final short finTopZ = (short) (arrowZ + _finHeight);
@@ -1227,7 +1241,7 @@ public class LineBucketMT extends RenderBucketMT {
          final double arrowLengthBack = Math.min(_arrowLengthBack, p12Distance);
          final double arrowWidth2 = _arrowWidth / 2; // half arrow width
 
-         // point on line
+         // point on line between P1 and P2
          final double pOnLineX = p2X - (arrowLength * p12UnitX);
          final double pOnLineY = p2Y - (arrowLength * p12UnitY);
          final double pBackX = p2X - (arrowLengthBack * p12UnitX);
@@ -1236,7 +1250,7 @@ public class LineBucketMT extends RenderBucketMT {
          final double vFinX = unitPerpendX * arrowWidth2;
          final double vFinY = unitPerpendY * arrowWidth2;
 
-         // set arrow points which are above/below the line
+         // set arrow points which are left/right of the line
          final float pLeftX = (float) (pOnLineX + vFinX);
          final float pLeftY = (float) (pOnLineY + vFinY);
 
@@ -1316,24 +1330,24 @@ public class LineBucketMT extends RenderBucketMT {
           */
 
          // left wing
-         addPositions(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
-         addPositions(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
-         addPositions(pLeftX_scaled,    pLeftY_scaled,  arrowZ,     arrowPart_Wing, 0, 0, 1);
+         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
+         addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
+         addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  arrowZ,     arrowPart_Wing, 0, 0, 1);
 
          // right wing
-         addPositions(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
-         addPositions(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
-         addPositions(pRight_Xscaled,   pRightY_scaled, arrowZ,     arrowPart_Wing, 0, 0, 1);
+         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
+         addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
+         addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, arrowZ,     arrowPart_Wing, 0, 0, 1);
 
          // left fin
-         addPositions(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
-         addPositions(pLeftX_scaled,    pLeftY_scaled,  finTopZ,    arrowPart_Fin, 0, 1, 0);
-         addPositions(pLeftX_scaled,    pLeftY_scaled,  finBottomZ, arrowPart_Fin, 0, 0, 1);
+         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
+         addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  finTopZ,    arrowPart_Fin, 0, 1, 0);
+         addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  finBottomZ, arrowPart_Fin, 0, 0, 1);
 
          // right fin
-         addPositions(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
-         addPositions(pRight_Xscaled,   pRightY_scaled, finTopZ,    arrowPart_Fin, 0, 1, 0);
-         addPositions(pRight_Xscaled,   pRightY_scaled, finBottomZ, arrowPart_Fin, 0, 0, 1);
+         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
+         addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, finTopZ,    arrowPart_Fin, 0, 1, 0);
+         addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, finBottomZ, arrowPart_Fin, 0, 0, 1);
 
 // SET_FORMATTING_ON
 

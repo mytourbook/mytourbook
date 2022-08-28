@@ -4,18 +4,24 @@ precision   highp float;
 
 uniform     mat4  u_mvp;
 attribute   vec4  a_pos;
-attribute   vec3  a_ColorCoord; 
+attribute   vec3  attrib_ColorCoord; 
+uniform     float uni_OutlineWidth_Fin;
+uniform     float uni_OutlineWidth_Wing;
 
-// fragment values
-varying vec3   vColorCoord;
-varying float  vArrowPart;
+// passthrough fragment values
+varying vec3   pass_ColorCoord;
+varying float  pass_ArrowPart;
+varying float  pass_OutlineWidth_Fin;
+varying float  pass_OutlineWidth_Wing;
 
 void main() {
    
-   gl_Position   = u_mvp * vec4(a_pos.xyz, 1.0);
+   gl_Position       = u_mvp * vec4(a_pos.xyz, 1.0);
 
-   vArrowPart     = a_pos.w;
-   vColorCoord    = a_ColorCoord;
+   pass_ArrowPart          = a_pos.w;
+   pass_ColorCoord         = attrib_ColorCoord;
+   pass_OutlineWidth_Fin   = uni_OutlineWidth_Fin;
+   pass_OutlineWidth_Wing  = uni_OutlineWidth_Wing;
 }
 
 $$
@@ -24,26 +30,26 @@ $$
 precision   highp float;
 #endif
 
-varying vec3   vColorCoord;
-varying float  vArrowPart;
+varying vec3   pass_ColorCoord;
+varying float  pass_ArrowPart;
+varying float  pass_OutlineWidth_Fin;
+varying float  pass_OutlineWidth_Wing;
 
 void main() {
       
-   vec3 	normal		= vColorCoord;
-   float f_thickness	= 0.0325;
+   vec3 	normal		= pass_ColorCoord;
 
    // see to which edge this pixel is the closest
-   float f_closest_edge = min(normal.x, min(normal.y, normal.z)); 
+   float closestEdge = min(normal.x, min(normal.y, normal.z)); 
    
-   // calculate derivative (divide f_thickness by this to have the line width constant in screen-space)
-   float f_width = fwidth(f_closest_edge); 
-
-    // calculate alpha
-   float wireValue = smoothstep(f_thickness, f_thickness + f_width, f_closest_edge); 
+   // calculate derivative (divide pass_OutlineWidth by this to have the line width constant in screen-space)
+   float closestEdgeWidth = fwidth(closestEdge); 
    
-   if(vArrowPart == 0) {
+   if(pass_ArrowPart == 0) {
 
       // it's a wing
+   
+      float wireValue = smoothstep(pass_OutlineWidth_Wing, pass_OutlineWidth_Wing + closestEdgeWidth, closestEdge); 
 
       if (wireValue > 0.5) {
          
@@ -58,6 +64,8 @@ void main() {
    } else {
 
       // it's a fin
+
+      float wireValue = smoothstep(pass_OutlineWidth_Fin, pass_OutlineWidth_Fin + closestEdgeWidth, closestEdge); 
 
       if (wireValue > 0.5) {
          
