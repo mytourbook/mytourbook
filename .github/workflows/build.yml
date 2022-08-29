@@ -58,7 +58,7 @@ jobs:
             D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\workspace\.metadata\.log
           retention-days: 5
       - name: Upload JaCoCo file
-        if: sucess()
+        if: success()
         uses: actions/upload-artifact@v3
         with:
           name: Full-JaCoCo-Report
