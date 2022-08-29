@@ -2,26 +2,27 @@
 precision   highp float;
 #endif
 
-uniform     mat4  u_mvp;
 attribute   vec4  a_pos;
 attribute   vec3  attrib_ColorCoord; 
-uniform     float uni_OutlineWidth_Fin;
-uniform     float uni_OutlineWidth_Wing;
+
+uniform  mat4  u_mvp;
+uniform  vec4  uni_ArrowColors[4];  // x:wing inside, y:wing border, z:fin inside, w:fin border
+uniform  vec2  uni_OutlineWidth;    // x:Wing, y:Fin
 
 // passthrough fragment values
-varying vec3   pass_ColorCoord;
 varying float  pass_ArrowPart;
-varying float  pass_OutlineWidth_Fin;
-varying float  pass_OutlineWidth_Wing;
+varying vec4   pass_ArrowColors[4];
+varying vec3   pass_ColorCoord;
+varying vec2   pass_OutlineWidth;
 
 void main() {
    
    gl_Position       = u_mvp * vec4(a_pos.xyz, 1.0);
 
-   pass_ArrowPart          = a_pos.w;
-   pass_ColorCoord         = attrib_ColorCoord;
-   pass_OutlineWidth_Fin   = uni_OutlineWidth_Fin;
-   pass_OutlineWidth_Wing  = uni_OutlineWidth_Wing;
+   pass_ArrowPart    = a_pos.w;
+   pass_ColorCoord   = attrib_ColorCoord;
+   pass_OutlineWidth = uni_OutlineWidth;
+   pass_ArrowColors  = uni_ArrowColors;
 }
 
 $$
@@ -30,17 +31,17 @@ $$
 precision   highp float;
 #endif
 
-varying vec3   pass_ColorCoord;
 varying float  pass_ArrowPart;
-varying float  pass_OutlineWidth_Fin;
-varying float  pass_OutlineWidth_Wing;
+varying vec4   pass_ArrowColors[4];
+varying vec3   pass_ColorCoord;        // barycentric coordinate inside the triangle
+varying vec2   pass_OutlineWidth;
 
 void main() {
       
-   vec3 	normal		= pass_ColorCoord;
+   // Source: https://stackoverflow.com/questions/137629/how-do-you-render-primitives-as-wireframes-in-opengl#answer-33004265
 
    // see to which edge this pixel is the closest
-   float closestEdge = min(normal.x, min(normal.y, normal.z)); 
+   float closestEdge = min(pass_ColorCoord.x, min(pass_ColorCoord.y, pass_ColorCoord.z)); 
    
    // calculate derivative (divide pass_OutlineWidth by this to have the line width constant in screen-space)
    float closestEdgeWidth = fwidth(closestEdge); 
@@ -49,32 +50,32 @@ void main() {
 
       // it's a wing
    
-      float wireValue = smoothstep(pass_OutlineWidth_Wing, pass_OutlineWidth_Wing + closestEdgeWidth, closestEdge); 
+      float wireValue = smoothstep(pass_OutlineWidth.x, pass_OutlineWidth.x + closestEdgeWidth, closestEdge); 
 
       if (wireValue > 0.5) {
          
          // inside	
-         gl_FragColor = vec4(.1, .1, .1, .7);
+         gl_FragColor = pass_ArrowColors[0];
          
       } else {
          // border
-         gl_FragColor = vec4(.99, .02, .02, .999);
+         gl_FragColor = pass_ArrowColors[1];
       }
 
    } else {
 
       // it's a fin
 
-      float wireValue = smoothstep(pass_OutlineWidth_Fin, pass_OutlineWidth_Fin + closestEdgeWidth, closestEdge); 
+      float wireValue = smoothstep(pass_OutlineWidth.y, pass_OutlineWidth.y + closestEdgeWidth, closestEdge); 
 
       if (wireValue > 0.5) {
          
          // inside	
-         gl_FragColor = vec4(.2, .2, .2, .7);
+         gl_FragColor = pass_ArrowColors[2];
          
       } else {
          // border
-         gl_FragColor = vec4(.8, .8, .8, .98);
+         gl_FragColor = pass_ArrowColors[3];
       }
    }
 }

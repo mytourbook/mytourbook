@@ -64,6 +64,7 @@ public class LineBucketMT extends RenderBucketMT {
     */
    private static final float MIN_BEVEL          = MIN_DIST * 4;
 
+   private static float[]     _arrowColors;
    private static float       _outlineWidth_Wing = .1f;
    private static float       _outlineWidth_Fin  = .1f;
 
@@ -99,7 +100,7 @@ public class LineBucketMT extends RenderBucketMT {
 
    private int                _arrowWidth;
    private int                _arrowLength;
-   private int                _arrowLengthBack;
+   private int                _arrowLengthMiddle;
    private int                _finHeight;
 
    private static class DirectionArrowsShader extends GLShaderMT {
@@ -108,9 +109,8 @@ public class LineBucketMT extends RenderBucketMT {
             shader_attrib_ColorCoord,
             shader_u_mvp,
 
-            shader_uArrowColor,
-            shader_uni_OutlineWidth_Fin,
-            shader_uni_OutlineWidth_Wing,
+            shader_uni_ArrowColors,
+            shader_uni_OutlineWidth,
 
             shader_u_width
 
@@ -129,8 +129,8 @@ public class LineBucketMT extends RenderBucketMT {
          shader_attrib_ColorCoord      = getAttrib("attrib_ColorCoord");       //$NON-NLS-1$
 
          shader_u_width                = getUniform("u_width");               //$NON-NLS-1$
-         shader_uni_OutlineWidth_Fin   = getUniform("uni_OutlineWidth_Fin");  //$NON-NLS-1$
-         shader_uni_OutlineWidth_Wing  = getUniform("uni_OutlineWidth_Wing"); //$NON-NLS-1$
+         shader_uni_ArrowColors        = getUniform("uni_ArrowColors");       //$NON-NLS-1$
+         shader_uni_OutlineWidth       = getUniform("uni_OutlineWidth");      //$NON-NLS-1$
 
 // SET_FORMATTING_ON
       }
@@ -497,9 +497,8 @@ public class LineBucketMT extends RenderBucketMT {
          final int shader_attrib_ColorCoord        = shader.shader_attrib_ColorCoord;
          final int shader_u_mvp                    = shader.shader_u_mvp;
          final int shader_u_width                  = shader.shader_u_width;
-         final int shader_uArrowColor              = shader.shader_uArrowColor;
-         final int shader_uni_OutlineWidth_Fin     = shader.shader_uni_OutlineWidth_Fin;
-         final int shader_uni_OutlineWidth_Wing    = shader.shader_uni_OutlineWidth_Wing;
+         final int shader_uni_ArrowColors          = shader.shader_uni_ArrowColors;
+         final int shader_uni_OutlineWidth         = shader.shader_uni_OutlineWidth;
 
 // SET_FORMATTING_ON
 
@@ -545,11 +544,12 @@ public class LineBucketMT extends RenderBucketMT {
 //         final float width = 10 / vp2mpScale;
 //
 //         gl.uniform1f(shader_u_width, width * COORD_SCALE_BY_DIR_SCALE);
-//         gl.uniform4f(shader_uArrowColor, 1.0f, 0.0f, 0.0f, 1.0f);
 
-         // set outline width
-         gl.uniform1f(shader_uni_OutlineWidth_Fin, _outlineWidth_Fin);
-         gl.uniform1f(shader_uni_OutlineWidth_Wing, _outlineWidth_Wing);
+         // arrow colors
+         gl.uniform4fv(shader_uni_ArrowColors, _arrowColors.length / 4, _arrowColors, 0);
+
+         // outline width's
+         gl.uniform2f(shader_uni_OutlineWidth, _outlineWidth_Wing, _outlineWidth_Fin);
 
          gl.drawArrays(GL.TRIANGLES, 0, numDirArrowShorts);
 
@@ -1200,16 +1200,30 @@ public class LineBucketMT extends RenderBucketMT {
 
       final float[] allDirectionArrowPixel = allDirectionArrowPixel_Raw.toArray();
 
-      _arrowWidth = 30;
-      _arrowLength = 50;
-      _arrowLengthBack = 40;
+      final float arrowSize = .973f;
 
-      _finHeight = 10;
+      _arrowWidth = (int) (40 * arrowSize);
+      _arrowLength = (int) (50 * arrowSize);
+      _arrowLengthMiddle = (int) (35 * arrowSize);
 
-      _outlineWidth_Fin = .02f;
+      _finHeight = (int) (20 * arrowSize);
+
+      _outlineWidth_Fin = .03f;
       _outlineWidth_Wing = .075f;
 
-      final short arrowZ = 20;
+// SET_FORMATTING_OFF
+      _arrowColors = new float[] {
+
+            .1f,  .1f,  .1f,  .7f,        // wing inside
+            .99f, .02f, .02f, .999f,      // wing border
+
+            .1f,  .1f,  .1f,  .5f,        // fin inside
+            .8f,  .8f,  .8f,  .99f,       // fin border
+
+      };
+// SET_FORMATTING_ON
+
+      final short arrowZ = 40;
       final short finTopZ = (short) (arrowZ + _finHeight);
       final short finBottomZ = (short) (arrowZ - _finHeight);
 
@@ -1238,7 +1252,7 @@ public class LineBucketMT extends RenderBucketMT {
          final double unitPerpendY = -p12UnitX;
 
          final double arrowLength = Math.min(_arrowLength, p12Distance);
-         final double arrowLengthBack = Math.min(_arrowLengthBack, p12Distance);
+         final double arrowLengthBack = Math.min(_arrowLengthMiddle, p12Distance);
          final double arrowWidth2 = _arrowWidth / 2; // half arrow width
 
          // point on line between P1 and P2
@@ -1323,31 +1337,38 @@ public class LineBucketMT extends RenderBucketMT {
          final short pRightY_scaled = (short) (pRightY  * COORD_SCALE);
          final short pBackX_scaled  = (short) (pBackX   * COORD_SCALE);
          final short pBackY_scaled  = (short) (pBackY   * COORD_SCALE);
+         final short pOnLineX_scaled   = (short) (pOnLineX   * COORD_SCALE);
+         final short pOnLineY_scaled   = (short) (pOnLineY   * COORD_SCALE);
 
 
          /**
-          * THE ORDER IS VERY IMPORTANT TO FIX Z-FIGHTING
+          * !!! VERY IMPORTANT !!! THE ORDER, TO FIX Z-FIGHTING
           */
 
-         // left wing
-         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
-         addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
-         addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  arrowZ,     arrowPart_Wing, 0, 0, 1);
+//         // wing: left
+//         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
+//         addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
+//         addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  arrowZ,     arrowPart_Wing, 0, 0, 1);
+//
+//         // wing: right
+//         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
+//         addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
+//         addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, arrowZ,     arrowPart_Wing, 0, 0, 1);
 
-         // right wing
-         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
-         addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
-         addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, arrowZ,     arrowPart_Wing, 0, 0, 1);
+         // fin: middle
+         addDirArrowPosition(p2X_scaled,        p2Y_scaled,       arrowZ,     arrowPart_Fin, 1, 1, 0);
+         addDirArrowPosition(pOnLineX_scaled,   pOnLineY_scaled,  finTopZ,    arrowPart_Fin, 0, 1, 0);
+         addDirArrowPosition(pBackX_scaled,     pBackY_scaled,    arrowZ,     arrowPart_Fin, 0, 0, 1);
 
-         // left fin
-         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
-         addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  finTopZ,    arrowPart_Fin, 0, 1, 0);
-         addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  finBottomZ, arrowPart_Fin, 0, 0, 1);
-
-         // right fin
-         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
-         addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, finTopZ,    arrowPart_Fin, 0, 1, 0);
-         addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, finBottomZ, arrowPart_Fin, 0, 0, 1);
+//         // fin: left
+//         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
+//         addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  arrowZ,    arrowPart_Fin, 0, 1, 0);
+//         addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  finBottomZ, arrowPart_Fin, 0, 0, 1);
+//
+//         // fin: right
+//         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
+//         addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, arrowZ,    arrowPart_Fin, 0, 1, 0);
+//         addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, finBottomZ, arrowPart_Fin, 0, 0, 1);
 
 // SET_FORMATTING_ON
 
