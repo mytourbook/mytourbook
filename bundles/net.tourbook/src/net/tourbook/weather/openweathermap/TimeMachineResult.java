@@ -243,7 +243,7 @@ public class TimeMachineResult {
 
    public String getWeatherType() {
 
-      String weatherType = IWeather.cloudIsNotDefined;
+      String weatherType = UI.EMPTY_STRING;
 
       final Weather currentWeather = getCurrentWeather();
       if (currentWeather == null) {
