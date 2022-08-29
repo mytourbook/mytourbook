@@ -212,6 +212,32 @@
                   <skip>true</skip>
                </configuration>
             </execution>
+	     <execution>
+               <id>merge-all-jacoco</id>
+               <phase>verify</phase>
+               <goals>
+                  <goal>merge</goal>
+               </goals>
+               <configuration>
+                  <destFile>${session.executionRootDirectory}/mergedJaCoCoReport.exec</destFile> 
+                  <append>true</append> 
+                  <skip>true</skip>
+               <fileSets>
+                  <fileSet>
+                  <directory>${project.build.directory}</directory>
+                  <includes>
+                    <include>*.exec</include>
+                  </includes>
+                  </fileSet>
+                  <fileSet>
+                  <directory>${session.executionRootDirectory}</directory>
+                  <includes>
+                    <include>mergedJaCoCoReport.exec</include>
+                  </includes>
+                </fileSet>
+              </fileSets>
+            </configuration> 
+        </execution>
          </executions>
       </plugin>
 
