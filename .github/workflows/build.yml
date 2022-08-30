@@ -64,7 +64,6 @@ jobs:
           path: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
           retention-days: 5
           
-
   check_date:
     runs-on: windows-latest
     name: Check latest commit is less than 24 hours old
