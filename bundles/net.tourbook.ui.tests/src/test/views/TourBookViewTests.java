@@ -15,7 +15,15 @@
  *******************************************************************************/
 package views;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import net.tourbook.Messages;
+
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.junit.jupiter.api.Test;
+
 import utils.UITest;
+import utils.Utils;
 
 public class TourBookViewTests extends UITest {
 
@@ -40,4 +48,22 @@ public class TourBookViewTests extends UITest {
 //      FilesUtils.deleteIfExists(csvFilePath);
 //      assertTrue(!Files.exists(csvFilePath));
 //   }
+
+   @Test
+   void testComputeTourDistance() {
+
+      Utils.showTourBookView(bot);
+
+      //Check the original distance
+      SWTBotTreeItem tour = Utils.getTour(bot);
+      assertEquals("0.542", tour.cell(9)); //$NON-NLS-1$
+
+      //Compute the tour distance
+      tour.contextMenu(Messages.Tour_Action_AdjustTourValues).menu(Messages.TourEditor_Action_ComputeDistanceValuesFromGeoPosition).click();
+      bot.button("OK").click(); //$NON-NLS-1$
+
+      //Check the new computed distance
+      tour = Utils.getTour(bot);
+      assertEquals("0.551", tour.cell(9)); //$NON-NLS-1$
+   }
 }
