@@ -48,6 +48,8 @@ public class PreferencesWeatherTests extends UITest {
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
       bot.tree().getTreeItem("Weather").select(); //$NON-NLS-1$
 
+      bot.comboBox().setSelection(0);
+
       //OpenWeatherMap
       testVendorConnection(IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP_ID);
 
