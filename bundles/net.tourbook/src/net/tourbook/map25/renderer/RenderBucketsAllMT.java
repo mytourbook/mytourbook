@@ -20,7 +20,6 @@ import static org.oscim.backend.GLAdapter.gl;
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 import static org.oscim.renderer.bucket.RenderBucket.LINE;
 import static org.oscim.renderer.bucket.RenderBucket.POLYGON;
-import static org.oscim.renderer.bucket.RenderBucket.TEXLINE;
 
 import gnu.trove.list.array.TShortArrayList;
 
@@ -66,7 +65,7 @@ public class RenderBucketsAllMT extends TileData {
     */
    public static final int   SHORT_BYTES = 2;
 
-   // public static final int INT_BYTES = 4;
+// public static final int INT_BYTES = 4;
 
    /**
     * Number of vertices to fill a tile (represented by a quad).
@@ -108,12 +107,12 @@ public class RenderBucketsAllMT extends TileData {
     * <li>2. lines afterwards at lineOffset</li>
     * <li>3. other buckets keep their byte offset in offset</li>
     */
-   public int[]           offset                       = { 0, 0 };
+   public int[]           offset                         = { 0, 0 };
 
    private RenderBucketMT _currentBucket;
 
-   int                    vertexColor_BufferId         = Integer.MIN_VALUE;
-   int                    dirArrows_BufferId           = Integer.MIN_VALUE;
+   int                    vertexColor_BufferId           = Integer.MIN_VALUE;
+   int                    dirArrows_BufferId             = Integer.MIN_VALUE;
    int                    dirArrows_ColorCoords_BufferId = Integer.MIN_VALUE;
 
    private ByteBuffer     _vertexColor_Buffer;
@@ -138,34 +137,7 @@ public class RenderBucketsAllMT extends TileData {
    public static void initRenderer() {
 
       LineBucketMT.Renderer.init();
-      LineTexBucketMT.Renderer.init();
-
-//    PolygonBucket.Renderer.init();
-//    TextureBucket.Renderer.init();
-//    BitmapBucket.Renderer.init();
-//    MeshBucket.Renderer.init();
-//    HairLineBucket.Renderer.init();
-//    CircleBucketMT.Renderer.init();
    }
-
-//    public CircleBucket addCircleBucket(final int level, final CircleStyle style) {
-//        final CircleBucket l = (CircleBucket) getBucket(level, CIRCLE);
-//        if (l == null) {
-//         return null;
-//      }
-//        l.circle = style;
-//        return l;
-//    }
-//
-//    public HairLineBucket addHairLineBucket(final int level, final LineStyle style) {
-//        final HairLineBucket ll = getHairLineBucket(level);
-//        if (ll == null) {
-//         return null;
-//      }
-//        ll.line = style;
-//
-//        return ll;
-//    }
 
    /**
     * add the LineBucket for a level with a given Line style. Levels are
@@ -181,28 +153,10 @@ public class RenderBucketsAllMT extends TileData {
 
       // FIXME l.scale = style.width;
       lineBucket.scale = 1;
-      lineBucket.line = style;
+      lineBucket.lineStyle = style;
 
       return lineBucket;
    }
-
-//    public MeshBucket addMeshBucket(final int level, final AreaStyle style) {
-//        final MeshBucket l = (MeshBucket) getBucket(level, MESH);
-//        if (l == null) {
-//         return null;
-//      }
-//        l.area = style;
-//        return l;
-//    }
-//
-//    public PolygonBucket addPolygonBucket(final int level, final AreaStyle style) {
-//        final PolygonBucket l = (PolygonBucket) getBucket(level, POLYGON);
-//        if (l == null) {
-//         return null;
-//      }
-//        l.area = style;
-//        return l;
-//    }
 
    /**
     * Binds vbo and ibo
@@ -548,21 +502,6 @@ public class RenderBucketsAllMT extends TileData {
          if (type == LINE) {
 
             typedBucket = new LineBucketMT(level);
-
-         } else if (type == TEXLINE) {
-
-            typedBucket = new LineTexBucketMT(level);
-
-//       } else if (type == POLYGON) {
-//          bucket = new PolygonBucket(level);
-//       } else if (type == MESH) {
-//          bucket = new MeshBucket(level);
-//       } else if (type == HAIRLINE) {
-//          bucket = new HairLineBucket(level);
-//
-//       } else if (type == CIRCLE) {
-//          typedBucket = new CircleBucketMT(level);
-
          }
 
          if (typedBucket == null) {
@@ -677,22 +616,6 @@ public class RenderBucketsAllMT extends TileData {
       return _dirArrow_Buffer;
    }
 
-//    /**
-//     * Get or add the CircleBucket for a level. Levels are ordered from
-//     * bottom (0) to top
-//     */
-//    public CircleBucket getCircleBucket(final int level) {
-//        return (CircleBucket) getBucket(level, CIRCLE);
-//    }
-//
-//    /**
-//     * Get or add the TexLineBucket for a level. Levels are ordered from
-//     * bottom (0) to top
-//     */
-//    public HairLineBucket getHairLineBucket(final int level) {
-//        return (HairLineBucket) getBucket(level, HAIRLINE);
-//    }
-
    /**
     * Get or add the LineBucket for a level. Levels are ordered from
     * bottom (0) to top
@@ -700,30 +623,6 @@ public class RenderBucketsAllMT extends TileData {
    public LineBucketMT getLineBucket(final int level) {
       return (LineBucketMT) getBucket(level, LINE);
    }
-
-   /**
-    * Get or add the TexLineBucket for a level. Levels are ordered from
-    * bottom (0) to top
-    */
-   public LineTexBucketMT getLineTexBucket(final int level) {
-      return (LineTexBucketMT) getBucket(level, TEXLINE);
-   }
-//
-//    /**
-//     * Get or add the MeshBucket for a level. Levels are ordered from
-//     * bottom (0) to top
-//     */
-//    public MeshBucket getMeshBucket(final int level) {
-//        return (MeshBucket) getBucket(level, MESH);
-//    }
-//
-//    /**
-//     * Get or add the PolygonBucket for a level. Levels are ordered from
-//     * bottom (0) to top
-//     */
-//    public PolygonBucket getPolygonBucket(final int level) {
-//        return (PolygonBucket) getBucket(level, POLYGON);
-//    }
 
    public void prepare() {
       for (RenderBucketMT l = _firstChainedBucket; l != null; l = l.next) {

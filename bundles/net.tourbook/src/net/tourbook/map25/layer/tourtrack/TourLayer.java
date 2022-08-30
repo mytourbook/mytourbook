@@ -25,15 +25,12 @@ import gnu.trove.list.array.TIntArrayList;
 
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
-import net.tourbook.map25.layer.marker.MarkerShape;
-import net.tourbook.map25.layer.marker.MarkerToolkit;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig.LineColorMode;
 import net.tourbook.map25.renderer.BucketRendererMT;
 import net.tourbook.map25.renderer.LineBucketMT;
 import net.tourbook.map25.renderer.RenderBucketMT;
 import net.tourbook.map25.renderer.RenderBucketsAllMT;
 
-import org.oscim.backend.canvas.Bitmap;
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
@@ -43,7 +40,6 @@ import org.oscim.layers.Layer;
 //import org.oscim.layers.vector.
 import org.oscim.map.Map;
 import org.oscim.renderer.GLViewport;
-import org.oscim.renderer.bucket.TextureItem;
 import org.oscim.theme.styles.LineStyle;
 import org.oscim.utils.FastMath;
 import org.oscim.utils.async.SimpleWorker;
@@ -59,24 +55,25 @@ import org.oscim.utils.geom.LineClipper;
  */
 public class TourLayer extends Layer {
 
-   private static final int   RENDERING_DELAY = 0;
+   private static final int RENDERING_DELAY = 0;
 
    /**
     * Stores points, converted to the map projection.
     */
-   private GeoPoint[]         _allGeoPoints;
-   private TIntArrayList      _allTourStarts;
+   private GeoPoint[]       _allGeoPoints;
+   private TIntArrayList    _allTourStarts;
 
-   private boolean            _isUpdatePoints;
+   private boolean          _isUpdatePoints;
 
    /**
     * Line style
     */
-   private LineStyle          _lineStyle;
-   private int                _lineColorMode;
-   public boolean             _isShowOutline;
-   private float              _outlineBrightness;
-   private float              _outlineWidth;
+   private LineStyle        _lineStyle;
+
+   /*
+    * Track config values
+    */
+   private int                _config_LineColorMode;
 
    private int                _testValue;
 
@@ -472,7 +469,10 @@ public class TourLayer extends Layer {
             lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors2);
          }
 
-         lineBucket.setupDirectionArrowVertices(__pixelDirectionArrows);
+         if (Map25ConfigManager.getActiveTourTrackConfig().isShowDirectionArrow) {
+
+            lineBucket.setupDirectionArrowVertices(__pixelDirectionArrows);
+         }
       }
 
       private int getNextTourStartIndex(final int tourIndex) {
@@ -503,16 +503,7 @@ public class TourLayer extends Layer {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-      final int lineColor = ColorUtil.getARGB(trackConfig.lineColor, trackConfig.lineOpacity);
-
-      final int trackVerticalOffset = trackConfig.isTrackVerticalOffset
-            ? trackConfig.trackVerticalOffset
-            : 0;
-
-      _isShowOutline = trackConfig.isShowOutline;
-      _outlineBrightness = trackConfig.outlineBrighness;
-      _outlineWidth = trackConfig.outlineWidth;
-      _lineColorMode = trackConfig.lineColorMode == LineColorMode.SOLID
+      _config_LineColorMode = trackConfig.lineColorMode == LineColorMode.SOLID
 
             // solid color
             ? 0
@@ -522,65 +513,37 @@ public class TourLayer extends Layer {
 
       _testValue = trackConfig.testValue;
 
-      if (trackConfig.isShowDirectionArrow) {
+      final int lineColor = ColorUtil.getARGB(trackConfig.lineColor, trackConfig.lineOpacity);
 
-         // create texture from arrow image
-         final MarkerToolkit markertoolkit = new MarkerToolkit(MarkerShape.ARROW);
-         final Bitmap bitmapArrow = markertoolkit.drawTrackArrow(40, lineColor);
-         final TextureItem textureItem = new TextureItem(bitmapArrow);
+      final int trackVerticalOffset = trackConfig.isTrackVerticalOffset
+            ? trackConfig.trackVerticalOffset
+            : 0;
 
-         // width must be not too tiny, otherwise there is no place that the arrow can be painted
-         final float faterOutlineWidth = Math.max(trackConfig.lineWidth * 2, 5f);
+      final LineStyle style = LineStyle.builder()
 
-         final LineStyle style = LineStyle.builder()
+            .strokeWidth(trackConfig.lineWidth)
 
-               .stippleColor(lineColor)
-               .stipple(20)
-               .strokeWidth(faterOutlineWidth)
-               .strokeColor(lineColor)
+            .color(lineColor)
 
-               // this is not working
-               // "u_height" is above the ground -> this is the z axis
-//             .heightOffset(trackVerticalOffset)
+//          .cap(Cap.BUTT)
+//          .cap(Cap.SQUARE)
+            .cap(Cap.ROUND)
 
-               .fixed(true)
-               .texture(textureItem)
-               .randomOffset(false)
-               .color(lineColor)
-               .cap(Cap.BUTT)
+            // I don't know how outline is working
+            // .isOutline(true)
 
-               .build();
+            // "u_height" is above the ground -> this is the z axis
+            .heightOffset(trackVerticalOffset)
 
-         return style;
+            // VERY IMPORTANT: Set fixed=true, otherwise the line width
+            // will jump when the zoom-level is changed !!!
+            .fixed(true)
 
-      } else {
+//          .blur(trackConfig.testValue / 100.0f)
 
-         final LineStyle style = LineStyle.builder()
+            .build();
 
-               .strokeWidth(trackConfig.lineWidth)
-
-               .color(lineColor)
-
-//             .cap(Cap.BUTT)
-//             .cap(Cap.SQUARE)
-               .cap(Cap.ROUND)
-
-               // I don't know how outline is working
-               // .isOutline(true)
-
-               // "u_height" is above the ground -> this is the z axis
-               .heightOffset(trackVerticalOffset)
-
-               // VERY IMPORTANT: Set fixed=true, otherwise the line width
-               // will jump when the zoom-level is changed !!!
-               .fixed(true)
-
-//             .blur(trackConfig.testValue / 100.0f)
-
-               .build();
-
-         return style;
-      }
+      return style;
    }
 
    /**
@@ -593,20 +556,16 @@ public class TourLayer extends Layer {
 
       LineBucketMT lineBucket;
 
-      if (_lineStyle.stipple == 0 && _lineStyle.texture == null) {
-         lineBucket = allRenderBuckets.getLineBucket(0);
-      } else {
-         lineBucket = allRenderBuckets.getLineTexBucket(0);
-      }
+      lineBucket = allRenderBuckets.getLineBucket(0);
 
-      lineBucket.line = _lineStyle;
+// SET_FORMATTING_OFF
 
-      lineBucket.isShowOutline = _isShowOutline;
-      lineBucket.lineColorMode = _lineColorMode;
-      lineBucket.outlineBrightness = _outlineBrightness;
-      lineBucket.outlineWidth = _outlineWidth;
+      lineBucket.lineStyle       = _lineStyle;
+      lineBucket.lineColorMode   = _config_LineColorMode;
 
       lineBucket.testValue = _testValue;
+
+// SET_FORMATTING_ON
 
       return lineBucket;
    }

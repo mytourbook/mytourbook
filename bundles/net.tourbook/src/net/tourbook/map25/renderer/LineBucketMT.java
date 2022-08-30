@@ -22,6 +22,8 @@ import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
 import gnu.trove.list.array.TFloatArrayList;
 
+import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 
 import org.oscim.backend.GL;
@@ -79,12 +81,8 @@ public class LineBucketMT extends RenderBucketMT {
     */
    public LineBucketMT        outlines;
 
-   public LineStyle           line;
-
-   public boolean             isShowOutline;
+   public LineStyle           lineStyle;
    public int                 lineColorMode;
-   public float               outlineBrightness;
-   public float               outlineWidth;
 
    public float               testValue;
 
@@ -236,6 +234,8 @@ public class LineBucketMT extends RenderBucketMT {
                                         final float vp2mpScale,
                                         final RenderBucketsAllMT renderBucketsAll) {
 
+         final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+
          final MapPosition mapPosition = viewport.pos;
 
          /*
@@ -343,13 +343,13 @@ public class LineBucketMT extends RenderBucketMT {
          for (; renderBucket != null && renderBucket.type == LINE; renderBucket = renderBucket.next) {
 
             final LineBucketMT lineBucket = (LineBucketMT) renderBucket;
-            final LineStyle lineStyle = lineBucket.line.current();
+            final LineStyle lineStyle = lineBucket.lineStyle.current();
 
             final float scale = lineBucket.scale;
 
-            final boolean isPaintOutline = lineBucket.isShowOutline;
-            final float outlineWidth = lineBucket.outlineWidth;
-            final float outlineBrightnessRaw = lineBucket.outlineBrightness; // -1.0 ... 1.0
+            final boolean isPaintOutline = trackConfig.isShowOutline;
+            final float outlineWidth = trackConfig.outlineWidth;
+            final float outlineBrightnessRaw = trackConfig.outlineBrighness; // -1.0 ... 1.0
             final float outlineBrightness = outlineBrightnessRaw + 1; // 0...2
 
             gl.uniform1i(shader_uColorMode, lineBucket.lineColorMode);
@@ -481,7 +481,9 @@ public class LineBucketMT extends RenderBucketMT {
             gl.drawArrays(GL.TRIANGLE_STRIP, lineBucket.vertexOffset, lineBucket.numVertices);
          }
 
-         draw_DirectionArrows(viewport, renderBucketsAll, vp2mpScale);
+         if (trackConfig.isShowDirectionArrow) {
+            draw_DirectionArrows(viewport, renderBucketsAll, vp2mpScale);
+         }
 
          return renderBucket;
       }
@@ -669,9 +671,9 @@ public class LineBucketMT extends RenderBucketMT {
       boolean isCapRounded = false;
       boolean isCapSquared = false;
 
-      if (line.cap == Cap.ROUND) {
+      if (lineStyle.cap == Cap.ROUND) {
          isCapRounded = true;
-      } else if (line.cap == Cap.SQUARE) {
+      } else if (lineStyle.cap == Cap.SQUARE) {
          isCapSquared = true;
       }
 
@@ -793,11 +795,11 @@ public class LineBucketMT extends RenderBucketMT {
                                    final boolean isClosed) {
 
       float ux, uy;
-      float unitPrevX, unitPrevY;
-      float unitNextX, unitNextY;
+      float unit1X, unit1Y;
+      float unit2X, unit2Y;
       float curX, curY;
       float nextX, nextY;
-      double xyDistance;
+      double unitDistance;
       int pixelColor;
 
       /*
@@ -822,15 +824,15 @@ public class LineBucketMT extends RenderBucketMT {
       pixelColor = pixelPointColors[pointIndexColor++];
 
       // unit vector to next node
-      unitPrevX = nextX - curX;
-      unitPrevY = nextY - curY;
-      xyDistance = (float) Math.sqrt(unitPrevX * unitPrevX + unitPrevY * unitPrevY);
-      unitPrevX /= xyDistance;
-      unitPrevY /= xyDistance;
+      unit1X = nextX - curX;
+      unit1Y = nextY - curY;
+      unitDistance = (float) Math.sqrt(unit1X * unit1X + unit1Y * unit1Y);
+      unit1X /= unitDistance;
+      unit1Y /= unitDistance;
 
       // perpendicular on the first segment
-      ux = -unitPrevY;
-      uy = unitPrevX;
+      ux = -unit1Y;
+      uy = unit1X;
 
       int ddx, ddy;
 
@@ -846,16 +848,16 @@ public class LineBucketMT extends RenderBucketMT {
 
       if (isRounded && isOutside == false) {
 
-         ddx = (int) ((ux - unitPrevX) * DIR_SCALE);
-         ddy = (int) ((uy - unitPrevY) * DIR_SCALE);
+         ddx = (int) ((ux - unit1X) * DIR_SCALE);
+         ddy = (int) ((uy - unit1Y) * DIR_SCALE);
          dx = (short) (0 | ddx & DIR_MASK);
          dy = (short) (2 | ddy & DIR_MASK);
 
          vertices.add(ox, oy, dx, dy, pixelColor);
          vertices.add(ox, oy, dx, dy, pixelColor);
 
-         ddx = (int) (-(ux + unitPrevX) * DIR_SCALE);
-         ddy = (int) (-(uy + unitPrevY) * DIR_SCALE);
+         ddx = (int) (-(ux + unit1X) * DIR_SCALE);
+         ddy = (int) (-(uy + unit1Y) * DIR_SCALE);
 
          vertices.add(ox, oy, (short) (2 | ddx & DIR_MASK), (short) (2 | ddy & DIR_MASK), pixelColor);
 
@@ -874,8 +876,8 @@ public class LineBucketMT extends RenderBucketMT {
           * for now, just extend the line a little
           */
 
-         float tx = unitPrevX;
-         float ty = unitPrevY;
+         float tx = unit1X;
+         float ty = unit1Y;
 
          if (isRounded == false && isSquared == false) {
 
@@ -911,8 +913,8 @@ public class LineBucketMT extends RenderBucketMT {
       curY = nextY;
 
       // unit vector pointing back to previous node
-      unitPrevX *= -1;
-      unitPrevY *= -1;
+      unit1X *= -1;
+      unit1Y *= -1;
 
       for (final int endIndex = startIndex + numLinePoints;;) {
 
@@ -940,22 +942,22 @@ public class LineBucketMT extends RenderBucketMT {
          }
 
          // unit vector pointing forward to next node
-         unitNextX = nextX - curX;
-         unitNextY = nextY - curY;
-         xyDistance = Math.sqrt(unitNextX * unitNextX + unitNextY * unitNextY);
+         unit2X = nextX - curX;
+         unit2Y = nextY - curY;
+         unitDistance = Math.sqrt(unit2X * unit2X + unit2Y * unit2Y);
 
          // skip too short segments
-         if (xyDistance < _minimumDistance) {
+         if (unitDistance < _minimumDistance) {
 
             numVertices -= 2;
 
             continue;
          }
 
-         unitNextX /= xyDistance;
-         unitNextY /= xyDistance;
+         unit2X /= unitDistance;
+         unit2Y /= unitDistance;
 
-         final double dotp = unitNextX * unitPrevX + unitNextY * unitPrevY;
+         final double dotp = unit2X * unit1X + unit2Y * unit1Y;
 
          //log.debug("acos " + dotp);
          if (dotp > 0.65) {
@@ -972,21 +974,21 @@ public class LineBucketMT extends RenderBucketMT {
             if (dotp > 0.999) {
 
                // 360 degree angle, set points aside
-               ux = unitPrevX + unitNextX;
-               uy = unitPrevY + unitNextY;
+               ux = unit1X + unit2X;
+               uy = unit1Y + unit2Y;
 
-               xyDistance = unitNextX * uy - unitNextY * ux;
+               unitDistance = unit2X * uy - unit2Y * ux;
 
-               if (xyDistance < 0.1 && xyDistance > -0.1) {
+               if (unitDistance < 0.1 && unitDistance > -0.1) {
 
                   // almost straight
-                  ux = -unitNextY;
-                  uy = unitNextX;
+                  ux = -unit2Y;
+                  uy = unit2X;
 
                } else {
 
-                  ux /= xyDistance;
-                  uy /= xyDistance;
+                  ux /= unitDistance;
+                  uy /= unitDistance;
                }
 
                //log.debug("aside " + a + " " + ux + " " + uy);
@@ -1000,47 +1002,47 @@ public class LineBucketMT extends RenderBucketMT {
                //log.debug("back");
 
                // go back by min dist
-               px = curX + unitPrevX * _minimumBevel;
-               py = curY + unitPrevY * _minimumBevel;
+               px = curX + unit1X * _minimumBevel;
+               py = curY + unit1Y * _minimumBevel;
 
                // go forward by min dist
-               curX = curX + unitNextX * _minimumBevel;
-               curY = curY + unitNextY * _minimumBevel;
+               curX = curX + unit2X * _minimumBevel;
+               curY = curY + unit2Y * _minimumBevel;
             }
 
             // unit vector pointing forward to next node
-            unitNextX = curX - px;
-            unitNextY = curY - py;
-            xyDistance = Math.sqrt(unitNextX * unitNextX + unitNextY * unitNextY);
-            unitNextX /= xyDistance;
-            unitNextY /= xyDistance;
+            unit2X = curX - px;
+            unit2Y = curY - py;
+            unitDistance = Math.sqrt(unit2X * unit2X + unit2Y * unit2Y);
+            unit2X /= unitDistance;
+            unit2Y /= unitDistance;
 
-            addVertex(vertices, px, py, unitPrevX, unitPrevY, unitNextX, unitNextY, pixelColor);
+            addVertex(vertices, px, py, unit1X, unit1Y, unit2X, unit2Y, pixelColor);
 
             // flip unit vector to point back
-            unitPrevX = -unitNextX;
-            unitPrevY = -unitNextY;
+            unit1X = -unit2X;
+            unit1Y = -unit2Y;
 
             // unit vector pointing forward to next node
-            unitNextX = nextX - curX;
-            unitNextY = nextY - curY;
-            xyDistance = Math.sqrt(unitNextX * unitNextX + unitNextY * unitNextY);
-            unitNextX /= xyDistance;
-            unitNextY /= xyDistance;
+            unit2X = nextX - curX;
+            unit2Y = nextY - curY;
+            unitDistance = Math.sqrt(unit2X * unit2X + unit2Y * unit2Y);
+            unit2X /= unitDistance;
+            unit2Y /= unitDistance;
          }
 
-         addVertex(vertices, curX, curY, unitPrevX, unitPrevY, unitNextX, unitNextY, pixelColor);
+         addVertex(vertices, curX, curY, unit1X, unit1Y, unit2X, unit2Y, pixelColor);
 
          curX = nextX;
          curY = nextY;
 
          // flip vector to point back
-         unitPrevX = -unitNextX;
-         unitPrevY = -unitNextY;
+         unit1X = -unit2X;
+         unit1Y = -unit2Y;
       }
 
-      ux = unitPrevY;
-      uy = -unitPrevX;
+      ux = unit1Y;
+      uy = -unit1X;
 
       isOutside = curX < tmin || curX > tmax || curY < tmin || curY > tmax;
 
@@ -1058,14 +1060,14 @@ public class LineBucketMT extends RenderBucketMT {
          vertices.add(ox, oy, (short) (2 | -ddx & DIR_MASK), (short) (1 | -ddy & DIR_MASK), pixelColor);
 
          // for rounded line edges
-         ddx = (int) ((ux - unitPrevX) * DIR_SCALE);
-         ddy = (int) ((uy - unitPrevY) * DIR_SCALE);
+         ddx = (int) ((ux - unit1X) * DIR_SCALE);
+         ddy = (int) ((uy - unit1Y) * DIR_SCALE);
 
          vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (0 | ddy & DIR_MASK), pixelColor);
 
          // last vertex
-         ddx = (int) (-(ux + unitPrevX) * DIR_SCALE);
-         ddy = (int) (-(uy + unitPrevY) * DIR_SCALE);
+         ddx = (int) (-(ux + unit1X) * DIR_SCALE);
+         ddy = (int) (-(uy + unit1Y) * DIR_SCALE);
          dx = (short) (2 | ddx & DIR_MASK);
          dy = (short) (0 | ddy & DIR_MASK);
 
@@ -1073,27 +1075,27 @@ public class LineBucketMT extends RenderBucketMT {
 
          if (isRounded == false && isSquared == false) {
 
-            unitPrevX = 0;
-            unitPrevY = 0;
+            unit1X = 0;
+            unit1Y = 0;
 
          } else if (isRounded) {
 
-            unitPrevX *= 0.5;
-            unitPrevY *= 0.5;
+            unit1X *= 0.5;
+            unit1Y *= 0.5;
          }
 
          if (isRounded) {
             numVertices -= 2;
          }
 
-         ddx = (int) ((ux - unitPrevX) * DIR_SCALE);
-         ddy = (int) ((uy - unitPrevY) * DIR_SCALE);
+         ddx = (int) ((ux - unit1X) * DIR_SCALE);
+         ddy = (int) ((uy - unit1Y) * DIR_SCALE);
 
          vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (1 | ddy & DIR_MASK), pixelColor);
 
          // last vertex
-         ddx = (int) (-(ux + unitPrevX) * DIR_SCALE);
-         ddy = (int) (-(uy + unitPrevY) * DIR_SCALE);
+         ddx = (int) (-(ux + unit1X) * DIR_SCALE);
+         ddy = (int) (-(uy + unit1Y) * DIR_SCALE);
          dx = (short) (2 | ddx & DIR_MASK);
          dy = (short) (1 | ddy & DIR_MASK);
       }
@@ -1345,15 +1347,15 @@ public class LineBucketMT extends RenderBucketMT {
           * !!! VERY IMPORTANT !!! THE ORDER, TO FIX Z-FIGHTING
           */
 
-//         // wing: left
-//         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
-//         addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
-//         addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  arrowZ,     arrowPart_Wing, 0, 0, 1);
-//
-//         // wing: right
-//         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
-//         addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
-//         addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, arrowZ,     arrowPart_Wing, 0, 0, 1);
+         // wing: left
+         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
+         addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
+         addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  arrowZ,     arrowPart_Wing, 0, 0, 1);
+
+         // wing: right
+         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
+         addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
+         addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, arrowZ,     arrowPart_Wing, 0, 0, 1);
 
          // fin: middle
          addDirArrowPosition(p2X_scaled,        p2Y_scaled,       arrowZ,     arrowPart_Fin, 1, 1, 0);

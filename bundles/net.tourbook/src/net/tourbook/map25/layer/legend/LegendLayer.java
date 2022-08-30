@@ -93,7 +93,7 @@ public class LegendLayer extends Layer {
 
       // check if line is valid
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-      if (trackConfig.lineColorMode != LineColorMode.GRADIENT || trackConfig.isShowDirectionArrow) {
+      if (trackConfig.lineColorMode != LineColorMode.GRADIENT) {
 
          _legendRenderer.setLegendVisible(false);
 

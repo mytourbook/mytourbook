@@ -665,24 +665,22 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       final boolean isColorMode_Gradient = _rdoColorMode_Gradient.getSelection();
       final boolean isColorMode_Solid = _rdoColorMode_Solid.getSelection();
 
-      final boolean isDirectionArrowsHidden = isShowDirectionArrows == false;
-
-      final boolean isShowGradientColor = isColorMode_Gradient && isDirectionArrowsHidden;
+      final boolean isShowGradientColor = isColorMode_Gradient;
 
       /*
        * Track
        */
-      _chkShowOutline.setEnabled(isDirectionArrowsHidden);
-      _chkTrackVerticalOffset.setEnabled(isDirectionArrowsHidden);
+      _chkShowOutline.setEnabled(true);
+      _chkTrackVerticalOffset.setEnabled(true);
 
-      _spinnerOutline_Brighness.setEnabled(isShowOutline && isDirectionArrowsHidden && isColorMode_Gradient);
-      _spinnerOutline_Width.setEnabled(isShowOutline && isDirectionArrowsHidden);
-      _spinnerTrackVerticalOffset.setEnabled(isTrackVerticalOffset && isDirectionArrowsHidden);
+      _spinnerOutline_Brighness.setEnabled(isShowOutline && isShowGradientColor);
+      _spinnerOutline_Width.setEnabled(isShowOutline);
+      _spinnerTrackVerticalOffset.setEnabled(isTrackVerticalOffset);
 
-      _rdoColorMode_Gradient.setEnabled(isDirectionArrowsHidden);
-      _rdoColorMode_Solid.setEnabled(isDirectionArrowsHidden);
+      _rdoColorMode_Gradient.setEnabled(true);
+      _rdoColorMode_Solid.setEnabled(true);
 
-      _colorLine_SolidColor.setEnabled(isColorMode_Solid || isShowDirectionArrows);
+      _colorLine_SolidColor.setEnabled(isColorMode_Solid);
       _actionGradientColor_Elevation.setEnabled(isShowGradientColor);
       _actionGradientColor_Gradient.setEnabled(isShowGradientColor);
       _actionGradientColor_HrZone.setEnabled(isShowGradientColor);
