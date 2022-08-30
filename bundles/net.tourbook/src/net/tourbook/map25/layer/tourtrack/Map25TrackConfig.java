@@ -17,6 +17,7 @@ package net.tourbook.map25.layer.tourtrack;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.map.MapUI.DirectionArrowDesign;
 import net.tourbook.common.map.MapUI.LegendUnitLayout;
 import net.tourbook.map25.Map25ConfigManager;
 
@@ -38,7 +39,6 @@ public class Map25TrackConfig {
    public String  name                       = Map25ConfigManager.CONFIG_DEFAULT_ID_1;
 
    // line
-   public boolean isShowDirectionArrow       = Map25ConfigManager.LINE_IS_SHOW_DIRECTION_ARROW_DEFAULT;
    public boolean isTrackVerticalOffset      = Map25ConfigManager.LINE_IS_TRACK_VERTICAL_OFFSET_DEFAULT;
 
    public LineColorMode lineColorMode        = Map25ConfigManager.LINE_COLOR_MODE_DEFAULT;
@@ -52,6 +52,12 @@ public class Map25TrackConfig {
    public boolean isShowOutline              = Map25ConfigManager.OUTLINE_IS_SHOW_OUTLINE_DEFAULT;
    public float   outlineBrighness           = Map25ConfigManager.OUTLINE_BRIGHTNESS_DEFAULT;
    public float   outlineWidth               = Map25ConfigManager.OUTLINE_WIDTH_DEFAULT;
+
+   // direction arrow
+   public boolean isShowDirectionArrow       = Map25ConfigManager.ARROW_IS_SHOW_ARROW_DEFAULT;
+   public int     arrowMinimumDistance       = Map25ConfigManager.ARROW_MIN_DISTANCE_DEFAULT;
+   public int     arrowVerticalOffset        = Map25ConfigManager.ARROW_VERTICAL_OFFSET_DEFAULT;
+   public DirectionArrowDesign arrowDesign   = Map25ConfigManager.ARROW_LAYOUT_DEFAULT;
 
    // slider location
    public boolean isShowSliderLocation       = Map25ConfigManager.SLIDER_IS_SHOW_CHART_SLIDER_DEFAULT;
@@ -69,6 +75,9 @@ public class Map25TrackConfig {
 
    // legend
    public LegendUnitLayout legendUnitLayout  = Map25ConfigManager.LEGEND_UNIT_LAYOUT_DEFAULT;
+
+
+
 
 // SET_FORMATTING_ON
 

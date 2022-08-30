@@ -1166,31 +1166,79 @@ public class LineBucketMT extends RenderBucketMT {
 // SET_FORMATTING_ON
    }
 
-   /**
-    * Default is MIN_DIST * 4 = 1/8 * 4.
-    */
-   public void setBevelDistance(final float minBevel) {
-      _minimumBevel = minBevel;
+   private void createArrow_MiddleFin(final short p2X_scaled,
+                                      final short p2Y_scaled,
+                                      final short pBackX_scaled,
+                                      final short pBackY_scaled,
+                                      final short pOnLineX_scaled,
+                                      final short pOnLineY_scaled,
+                                      final short arrowZ,
+                                      final short finTopZ,
+                                      final short arrowPart_Fin) {
+// SET_FORMATTING_OFF
+
+      // fin: middle
+      addDirArrowPosition(p2X_scaled,        p2Y_scaled,       arrowZ,     arrowPart_Fin, 1, 1, 0);
+      addDirArrowPosition(pOnLineX_scaled,   pOnLineY_scaled,  finTopZ,    arrowPart_Fin, 0, 1, 0);
+      addDirArrowPosition(pBackX_scaled,     pBackY_scaled,    arrowZ,     arrowPart_Fin, 0, 0, 1);
+
+// SET_FORMATTING_ON
    }
 
-   /**
-    * For point reduction by minimal distance. Default is 1/8.
-    */
-   public void setDropDistance(final float minDist) {
-      _minimumDistance = minDist;
+   private void createArrow_OuterFins(final short p2X_scaled,
+                                      final short p2Y_scaled,
+                                      final short pLeftX_scaled,
+                                      final short pLeftY_scaled,
+                                      final short pRight_Xscaled,
+                                      final short pRightY_scaled,
+                                      final short arrowZ,
+                                      final short finBottomZ,
+                                      final short arrowPart_Fin) {
+// SET_FORMATTING_OFF
+
+      // fin: left
+      addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
+      addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  arrowZ,     arrowPart_Fin, 0, 1, 0);
+      addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  finBottomZ, arrowPart_Fin, 0, 0, 1);
+
+      // fin: right
+      addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
+      addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, arrowZ,     arrowPart_Fin, 0, 1, 0);
+      addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, finBottomZ, arrowPart_Fin, 0, 0, 1);
+
+// SET_FORMATTING_ON
    }
 
-   public void setExtents(final int min, final int max) {
-      tmin = min;
-      tmax = max;
+   private void createArrow_Wings(final short p2X_scaled,
+                                  final short p2Y_scaled,
+                                  final short pLeftX_scaled,
+                                  final short pLeftY_scaled,
+                                  final short pRight_Xscaled,
+                                  final short pRightY_scaled,
+                                  final short pBackX_scaled,
+                                  final short pBackY_scaled,
+                                  final short arrowZ,
+                                  final short arrowPart_Wing) {
+// SET_FORMATTING_OFF
 
+      // wing: left
+      addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
+      addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
+      addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  arrowZ,     arrowPart_Wing, 0, 0, 1);
+
+      // wing: right
+      addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
+      addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
+      addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, arrowZ,     arrowPart_Wing, 0, 0, 1);
+
+// SET_FORMATTING_ON
    }
 
    /**
     * @param allDirectionArrowPixel_Raw
     *           Contains the x/y pixel positions for the direction arrows
     */
-   public void setupDirectionArrowVertices(final TFloatArrayList allDirectionArrowPixel_Raw) {
+   public void createDirectionArrowVertices(final TFloatArrayList allDirectionArrowPixel_Raw) {
 
       directionArrow_XYZPositions.clearQuick();
       colorCoords.clearQuick();
@@ -1199,6 +1247,8 @@ public class LineBucketMT extends RenderBucketMT {
       if (allDirectionArrowPixel_Raw.size() < 4) {
          return;
       }
+
+      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
       final float[] allDirectionArrowPixel = allDirectionArrowPixel_Raw.toArray();
 
@@ -1254,14 +1304,14 @@ public class LineBucketMT extends RenderBucketMT {
          final double unitPerpendY = -p12UnitX;
 
          final double arrowLength = Math.min(_arrowLength, p12Distance);
-         final double arrowLengthBack = Math.min(_arrowLengthMiddle, p12Distance);
+         final double arrowLengthMiddle = Math.min(_arrowLengthMiddle, p12Distance);
          final double arrowWidth2 = _arrowWidth / 2; // half arrow width
 
          // point on line between P1 and P2
          final double pOnLineX = p2X - (arrowLength * p12UnitX);
          final double pOnLineY = p2Y - (arrowLength * p12UnitY);
-         final double pBackX = p2X - (arrowLengthBack * p12UnitX);
-         final double pBackY = p2Y - (arrowLengthBack * p12UnitY);
+         final double pBackX = p2X - (arrowLengthMiddle * p12UnitX);
+         final double pBackY = p2Y - (arrowLengthMiddle * p12UnitY);
 
          final double vFinX = unitPerpendX * arrowWidth2;
          final double vFinY = unitPerpendY * arrowWidth2;
@@ -1328,49 +1378,96 @@ public class LineBucketMT extends RenderBucketMT {
 
 // SET_FORMATTING_OFF
 
-         final short arrowPart_Wing = 0;
-         final short arrowPart_Fin  = 1;
+         final short arrowPart_Wing    = 0;
+         final short arrowPart_Fin     = 1;
 
-         final short p2X_scaled     = (short) (p2X      * COORD_SCALE);
-         final short p2Y_scaled     = (short) (p2Y      * COORD_SCALE);
-         final short pLeftX_scaled  = (short) (pLeftX   * COORD_SCALE);
-         final short pLeftY_scaled  = (short) (pLeftY   * COORD_SCALE);
-         final short pRight_Xscaled = (short) (pRightX  * COORD_SCALE);
-         final short pRightY_scaled = (short) (pRightY  * COORD_SCALE);
-         final short pBackX_scaled  = (short) (pBackX   * COORD_SCALE);
-         final short pBackY_scaled  = (short) (pBackY   * COORD_SCALE);
+         final short p2X_scaled        = (short) (p2X      * COORD_SCALE);
+         final short p2Y_scaled        = (short) (p2Y      * COORD_SCALE);
+         final short pLeftX_scaled     = (short) (pLeftX   * COORD_SCALE);
+         final short pLeftY_scaled     = (short) (pLeftY   * COORD_SCALE);
+         final short pRight_Xscaled    = (short) (pRightX  * COORD_SCALE);
+         final short pRightY_scaled    = (short) (pRightY  * COORD_SCALE);
+         final short pBackX_scaled     = (short) (pBackX   * COORD_SCALE);
+         final short pBackY_scaled     = (short) (pBackY   * COORD_SCALE);
          final short pOnLineX_scaled   = (short) (pOnLineX   * COORD_SCALE);
          final short pOnLineY_scaled   = (short) (pOnLineY   * COORD_SCALE);
 
 
          /**
-          * !!! VERY IMPORTANT !!! THE ORDER, TO FIX Z-FIGHTING
+          * !!! VERY IMPORTANT !!! <p>
+          *
+          * THE ORDER, TO FIX Z-FIGHTING
           */
 
-         // wing: left
-         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
-         addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
-         addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  arrowZ,     arrowPart_Wing, 0, 0, 1);
+         switch (trackConfig.arrowDesign) {
 
-         // wing: right
-         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
-         addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
-         addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, arrowZ,     arrowPart_Wing, 0, 0, 1);
+         case WINGS_WITH_MIDDLE_FIN:
 
-         // fin: middle
-         addDirArrowPosition(p2X_scaled,        p2Y_scaled,       arrowZ,     arrowPart_Fin, 1, 1, 0);
-         addDirArrowPosition(pOnLineX_scaled,   pOnLineY_scaled,  finTopZ,    arrowPart_Fin, 0, 1, 0);
-         addDirArrowPosition(pBackX_scaled,     pBackY_scaled,    arrowZ,     arrowPart_Fin, 0, 0, 1);
+            createArrow_Wings(      p2X_scaled,       p2Y_scaled,
+                                    pLeftX_scaled,    pLeftY_scaled,
+                                    pRight_Xscaled,   pRightY_scaled,
+                                    pBackX_scaled,    pBackY_scaled,
+                                    arrowZ,
+                                    arrowPart_Wing);
 
-//         // fin: left
-//         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
-//         addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  arrowZ,    arrowPart_Fin, 0, 1, 0);
-//         addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  finBottomZ, arrowPart_Fin, 0, 0, 1);
-//
-//         // fin: right
-//         addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
-//         addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, arrowZ,    arrowPart_Fin, 0, 1, 0);
-//         addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, finBottomZ, arrowPart_Fin, 0, 0, 1);
+            createArrow_MiddleFin(  p2X_scaled,       p2Y_scaled,
+                                    pBackX_scaled,    pBackY_scaled,
+                                    pOnLineX_scaled,  pOnLineY_scaled,
+                                    arrowZ,
+                                    finTopZ,
+                                    arrowPart_Fin);
+
+            break;
+
+         case WINGS_WITH_OUTER_FINS:
+
+            createArrow_Wings(      p2X_scaled,       p2Y_scaled,
+                                    pLeftX_scaled,    pLeftY_scaled,
+                                    pRight_Xscaled,   pRightY_scaled,
+                                    pBackX_scaled,    pBackY_scaled,
+                                    arrowZ,
+                                    arrowPart_Wing);
+
+            createArrow_OuterFins(  p2X_scaled,       p2Y_scaled,
+                                    pLeftX_scaled,    pLeftY_scaled,
+                                    pRight_Xscaled,   pRightY_scaled,
+                                    arrowZ,
+                                    finBottomZ,
+                                    arrowPart_Fin);
+
+            break;
+
+         case MIDDLE_FIN:
+
+            createArrow_MiddleFin(  p2X_scaled,       p2Y_scaled,
+                                    pBackX_scaled,    pBackY_scaled,
+                                    pOnLineX_scaled,  pOnLineY_scaled,
+                                    arrowZ,
+                                    finTopZ,
+                                    arrowPart_Fin);
+            break;
+
+         case OUTER_FINS:
+
+            createArrow_OuterFins(  p2X_scaled,       p2Y_scaled,
+                                    pLeftX_scaled,    pLeftY_scaled,
+                                    pRight_Xscaled,   pRightY_scaled,
+                                    arrowZ,
+                                    finBottomZ,
+                                    arrowPart_Fin);
+
+            break;
+
+         case WINGS:
+         default:
+            createArrow_Wings(      p2X_scaled,       p2Y_scaled,
+                                    pLeftX_scaled,    pLeftY_scaled,
+                                    pRight_Xscaled,   pRightY_scaled,
+                                    pBackX_scaled,    pBackY_scaled,
+                                    arrowZ,
+                                    arrowPart_Wing);
+            break;
+         }
 
 // SET_FORMATTING_ON
 
@@ -1378,5 +1475,25 @@ public class LineBucketMT extends RenderBucketMT {
          p1X = p2X;
          p1Y = p2Y;
       }
+   }
+
+   /**
+    * Default is MIN_DIST * 4 = 1/8 * 4.
+    */
+   public void setBevelDistance(final float minBevel) {
+      _minimumBevel = minBevel;
+   }
+
+   /**
+    * For point reduction by minimal distance. Default is 1/8.
+    */
+   public void setDropDistance(final float minDist) {
+      _minimumDistance = minDist;
+   }
+
+   public void setExtents(final int min, final int max) {
+      tmin = min;
+      tmax = max;
+
    }
 }

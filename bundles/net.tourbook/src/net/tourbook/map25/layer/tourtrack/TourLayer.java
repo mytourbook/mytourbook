@@ -282,6 +282,8 @@ public class TourLayer extends Layer {
 
       private void doWork_Rendering(final TourRenderTask task, final int numPoints) {
 
+         final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+
          final LineBucketMT lineBucket = getLineBucket(task.__allRenderBuckets);
 
          final MapPosition mapPos = task.__mapPos;
@@ -453,7 +455,7 @@ public class TourLayer extends Layer {
             final float diffXArrow = pixelX - prevXArrow;
             final float diffYArrow = pixelY - prevYArrow;
 
-            if (projectedPointIndex == 0 || FastMath.absMaxCmp(diffXArrow, diffYArrow, 50)) {
+            if (projectedPointIndex == 0 || FastMath.absMaxCmp(diffXArrow, diffYArrow, trackConfig.arrowMinimumDistance)) {
 
                // point > min distance
 
@@ -469,9 +471,8 @@ public class TourLayer extends Layer {
             lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors2);
          }
 
-         if (Map25ConfigManager.getActiveTourTrackConfig().isShowDirectionArrow) {
-
-            lineBucket.setupDirectionArrowVertices(__pixelDirectionArrows);
+         if (trackConfig.isShowDirectionArrow) {
+            lineBucket.createDirectionArrowVertices(__pixelDirectionArrows);
          }
       }
 
@@ -570,14 +571,13 @@ public class TourLayer extends Layer {
       return lineBucket;
    }
 
-   public void onModifyConfig(final boolean isLineLayoutModified) {
+   public void onModifyConfig(final boolean isVerticesModified) {
 
       _lineStyle = createLineStyle();
 
-      if (isLineLayoutModified) {
+      if (isVerticesModified) {
 
-         // new buckets needs to be created, otherwise this error occurs
-         // ERROR RenderBucketsAllMT - BUG wrong bucket 1 0 on level 0
+         // vertices structure is modified -> recreate vertices
 
          _simpleWorker.submit(RENDERING_DELAY);
 

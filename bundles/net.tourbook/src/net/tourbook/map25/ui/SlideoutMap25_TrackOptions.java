@@ -26,6 +26,8 @@ import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.map.MapUI;
+import net.tourbook.common.map.MapUI.DirectionArrowDesign;
+import net.tourbook.common.map.MapUI.DirectionArrowLayoutItem;
 import net.tourbook.common.map.MapUI.LegendUnitLayout;
 import net.tourbook.common.map.MapUI.LegendUnitLayoutItem;
 import net.tourbook.common.tooltip.ToolbarSlideout;
@@ -81,7 +83,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
    //
    private int                     _firstColumnIndent;
    //
-   private boolean                 _isLineLayoutModified;
+   private boolean                 _isVerticesModified;
    //
    /*
     * UI controls
@@ -96,9 +98,13 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
    private Button                _rdoColorMode_Gradient;
    private Button                _rdoColorMode_Solid;
    //
+   private Combo                 _comboArrowDesign;
    private Combo                 _comboName;
    private Combo                 _comboLegendUnitLayout;
    //
+   private Label                 _lblArrow_Design;
+   private Label                 _lblArrow_MinimumDistance;
+   private Label                 _lblArrow_VerticalOffset;
    private Label                 _lblConfigName;
    private Label                 _lblLegendUnitLayout;
    private Label                 _lblSliderLocation_Size;
@@ -106,6 +112,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
    private Label                 _lblSliderPath_Width;
    private Label                 _lblSliderPath_Color;
    //
+   private Spinner               _spinnerArrow_MinimumDistance;
+   private Spinner               _spinnerArrow_VerticalOffset;
    private Spinner               _spinnerLine_Opacity;
    private Spinner               _spinnerLine_Width;
    private Spinner               _spinnerOutline_Width;
@@ -336,16 +344,6 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
          }
          {
             /*
-             * Direction arrows
-             */
-            _chkShowDirectionArrows = new Button(group, SWT.CHECK);
-            _chkShowDirectionArrows.setText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows);
-            _chkShowDirectionArrows.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip);
-            _chkShowDirectionArrows.addSelectionListener(_defaultSelectionListener);
-            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowDirectionArrows);
-         }
-         {
-            /*
              * Color
              */
             // label
@@ -421,7 +419,84 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
                {}
             }
          }
+         {
+            /*
+             * Direction arrows
+             */
+            _chkShowDirectionArrows = new Button(group, SWT.CHECK);
+            _chkShowDirectionArrows.setText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows);
+            _chkShowDirectionArrows.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrows_Tooltip);
+            _chkShowDirectionArrows.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkShowDirectionArrows);
+         }
+         {
+            /*
+             * Arrow type
+             */
 
+            // label
+            _lblArrow_Design = new Label(group, SWT.NONE);
+            _lblArrow_Design.setText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrow_Design);
+            GridDataFactory.fillDefaults()
+                  .indent(_firstColumnIndent, SWT.DEFAULT)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(_lblArrow_Design);
+
+            // combo
+            _comboArrowDesign = new Combo(group, SWT.READ_ONLY | SWT.BORDER);
+            _comboArrowDesign.setVisibleItemCount(20);
+            _comboArrowDesign.addFocusListener(_keepOpenListener);
+            _comboArrowDesign.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyConfig()));
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .align(SWT.BEGINNING, SWT.CENTER)
+                  .applyTo(_comboArrowDesign);
+         }
+         {
+            /*
+             * Arrow minimum distance between 2 arrows
+             */
+
+            // label
+            _lblArrow_MinimumDistance = new Label(group, SWT.NONE);
+            _lblArrow_MinimumDistance.setText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrow_MinimumDistance);
+            _lblArrow_MinimumDistance.setToolTipText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrow_MinimumDistance_Tooltip);
+            GridDataFactory.fillDefaults()
+                  .indent(_firstColumnIndent, SWT.DEFAULT)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(_lblArrow_MinimumDistance);
+
+            // spinner
+            _spinnerArrow_MinimumDistance = new Spinner(group, SWT.BORDER);
+            _spinnerArrow_MinimumDistance.setMinimum(0);
+            _spinnerArrow_MinimumDistance.setMaximum(1000);
+            _spinnerArrow_MinimumDistance.setIncrement(5);
+            _spinnerArrow_MinimumDistance.setPageIncrement(20);
+            _spinnerArrow_MinimumDistance.addSelectionListener(_defaultSelectionListener);
+            _spinnerArrow_MinimumDistance.addMouseWheelListener(_defaultMouseWheelListener);
+         }
+         {
+            /*
+             * Arrow vertical offset
+             */
+
+            // label
+            _lblArrow_VerticalOffset = new Label(group, SWT.NONE);
+            _lblArrow_VerticalOffset.setText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrow_VerticalOffset);
+            GridDataFactory.fillDefaults()
+                  .indent(_firstColumnIndent, SWT.DEFAULT)
+                  .align(SWT.FILL, SWT.CENTER)
+                  .applyTo(_lblArrow_VerticalOffset);
+
+            // spinner
+            _spinnerArrow_VerticalOffset = new Spinner(group, SWT.BORDER);
+            _spinnerArrow_VerticalOffset.setMinimum(-1000);
+            _spinnerArrow_VerticalOffset.setMaximum(1000);
+            _spinnerArrow_VerticalOffset.setIncrement(1);
+            _spinnerArrow_VerticalOffset.setPageIncrement(10);
+            _spinnerArrow_VerticalOffset.addSelectionListener(_defaultSelectionListener);
+            _spinnerArrow_VerticalOffset.addMouseWheelListener(_defaultMouseWheelListener);
+         }
 //         {
 //            /*
 //             * TEST value
@@ -689,6 +764,18 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       _actionGradientColor_Speed.setEnabled(isShowGradientColor);
 
       /*
+       * Direction arrows
+       */
+      _lblArrow_Design.setEnabled(isShowDirectionArrows);
+      _lblArrow_MinimumDistance.setEnabled(isShowDirectionArrows);
+      _lblArrow_VerticalOffset.setEnabled(isShowDirectionArrows);
+
+      _comboArrowDesign.setEnabled(isShowDirectionArrows);
+
+      _spinnerArrow_MinimumDistance.setEnabled(isShowDirectionArrows);
+      _spinnerArrow_VerticalOffset.setEnabled(isShowDirectionArrows);
+
+      /*
        * Legend
        */
       _lblLegendUnitLayout.setEnabled(isShowGradientColor);
@@ -730,8 +817,28 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
          for (final LegendUnitLayoutItem layout : MapUI.ALL_LEGEND_UNIT_LAYOUTS) {
             _comboLegendUnitLayout.add(layout.label);
          }
+
+         for (final DirectionArrowLayoutItem layout : MapUI.ALL_DIRECTION_ARROW_DESIGNS) {
+            _comboArrowDesign.add(layout.label);
+         }
       }
       _isUpdateUI = backupIsUpdateUI;
+   }
+
+   private int getDirectionArrowDesignIndex(final DirectionArrowDesign arrowLayout) {
+
+      final DirectionArrowLayoutItem[] allArrowLayouts = MapUI.ALL_DIRECTION_ARROW_DESIGNS;
+
+      for (int layoutIndex = 0; layoutIndex < allArrowLayouts.length; layoutIndex++) {
+
+         final DirectionArrowLayoutItem legendUnitLayoutItem = allArrowLayouts[layoutIndex];
+
+         if (arrowLayout == legendUnitLayoutItem.directionArrowLayout) {
+            return layoutIndex;
+         }
+      }
+
+      return 0;
    }
 
    private int getLegendUnitLayoutIndex(final LegendUnitLayout legendUnitLayout) {
@@ -748,6 +855,14 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       }
 
       return 0;
+   }
+
+   private MapUI.DirectionArrowDesign getSelectedArrowDesign() {
+
+      // get valid index
+      final int selectionIndex = Math.max(0, _comboArrowDesign.getSelectionIndex());
+
+      return MapUI.ALL_DIRECTION_ARROW_DESIGNS[selectionIndex].directionArrowLayout;
    }
 
    private Map25TrackConfig getSelectedConfig() {
@@ -818,7 +933,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       final Map25App mapApp = _map25View.getMapApp();
 
       mapApp.getLayer_Legend().updateLegend();
-      mapApp.getLayer_Tour().onModifyConfig(_isLineLayoutModified);
+      mapApp.getLayer_Tour().onModifyConfig(_isVerticesModified);
       mapApp.getLayer_SliderPath().onModifyConfig();
       mapApp.getLayer_SliderLocation().onModifyConfig();
    }
@@ -855,7 +970,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       Map25ConfigManager.setActiveTrackConfig(selectedConfig);
 
       // force rerendering, new config could change "Show direction arrows"
-      _isLineLayoutModified = true;
+      _isVerticesModified = true;
 
       // update UI
       updateUI_SetActiveConfig();
@@ -895,6 +1010,12 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       _spinnerOutline_Brighness        .setSelection((int) (config.outlineBrighness * 10));
       _spinnerOutline_Width            .setSelection((int) (config.outlineWidth));
 
+      // direction arrows
+      _chkShowDirectionArrows          .setSelection(config.isShowDirectionArrow);
+      _spinnerArrow_MinimumDistance    .setSelection(config.arrowMinimumDistance);
+      _spinnerArrow_VerticalOffset     .setSelection(config.arrowVerticalOffset);
+      _comboArrowDesign                .select(getDirectionArrowDesignIndex(config.arrowDesign));
+
       // legend
       _comboLegendUnitLayout           .select(getLegendUnitLayoutIndex(config.legendUnitLayout));
 
@@ -927,18 +1048,18 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       final Map25TrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
 
       final boolean isShowDirectionArrows = _chkShowDirectionArrows.getSelection();
-//      final int testValue = _spinnerTESTValue.getSelection();
+      final int arrowMinDistance = _spinnerArrow_MinimumDistance.getSelection();
+      final DirectionArrowDesign selectedArrowDesign = getSelectedArrowDesign();
 
-      _isLineLayoutModified = config.isShowDirectionArrow != isShowDirectionArrows
-      //|| config.testValue != testValue
-      ;
+      _isVerticesModified = config.isShowDirectionArrow != isShowDirectionArrows
+            || config.arrowDesign != selectedArrowDesign
+            || config.arrowMinimumDistance != arrowMinDistance;
 
 // SET_FORMATTING_OFF
 
       config.name                         = _textConfigName.getText();
 
       // track line
-      config.isShowDirectionArrow         = isShowDirectionArrows;
       config.lineWidth                    = _spinnerLine_Width.getSelection();
 
       // track color
@@ -954,6 +1075,12 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       // track vertical offset
       config.isTrackVerticalOffset        = _chkTrackVerticalOffset.getSelection();
       config.trackVerticalOffset          = _spinnerTrackVerticalOffset.getSelection();
+
+      // direction arrows
+      config.isShowDirectionArrow         = isShowDirectionArrows;
+      config.arrowDesign                  = selectedArrowDesign;
+      config.arrowMinimumDistance         = _spinnerArrow_MinimumDistance.getSelection();
+      config.arrowVerticalOffset          = _spinnerArrow_VerticalOffset.getSelection();
 
       // legend
       config.legendUnitLayout             = getSelectedLegendUnitLayout();
@@ -1025,7 +1152,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       final Map25App mapApp = _map25View.getMapApp();
 
-      mapApp.getLayer_Tour().onModifyConfig(_isLineLayoutModified);
+      mapApp.getLayer_Tour().onModifyConfig(_isVerticesModified);
       mapApp.getLayer_SliderPath().onModifyConfig();
       mapApp.getLayer_SliderLocation().onModifyConfig();
    }

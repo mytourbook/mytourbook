@@ -122,6 +122,12 @@ public class Messages extends NLS {
    public static String        Color_Chooser_Link_CustomColors_Tooltip;
    public static String        Color_Chooser_SelectedColor_Tooltip;
 
+   public static String        Direction_ArrowDesign_MiddleFin;
+   public static String        Direction_ArrowDesign_Wings;
+   public static String        Direction_ArrowDesign_Wings_MiddleFin;
+   public static String        Direction_ArrowDesign_Wings_OuterFins;
+   public static String        Direction_ArrowLayout_OuterFins;
+   
    public static String        Font_Editor_Label_FontSize;
 
    public static String        Format_hh;
