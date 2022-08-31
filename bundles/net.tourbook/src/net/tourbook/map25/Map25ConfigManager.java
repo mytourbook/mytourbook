@@ -38,6 +38,7 @@ import net.tourbook.map25.layer.tourtrack.Map25TrackConfig.LineColorMode;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.oscim.core.BoundingBox;
@@ -117,19 +118,17 @@ public class Map25ConfigManager {
    /*
     * Tour tracks
     */
-   private static final String TAG_TOUR_TRACKS = "TourTracks"; //$NON-NLS-1$
-   private static final String TAG_TRACK       = "Track";      //$NON-NLS-1$
+   private static final String              TAG_TOUR_TRACKS                       = "TourTracks";                 //$NON-NLS-1$
+   private static final String              TAG_TRACK                             = "Track";                      //$NON-NLS-1$
    //
-   // line
-   private static final String              TAG_LINE                              = "Line";                    //$NON-NLS-1$
-   private static final String              ATTR_LINE_IS_SHOW_DIRECTION_ARROW     = "directionArrow";          //$NON-NLS-1$
-   private static final String              ATTR_LINE_COLOR_MODE                  = "lineColorMode";           //$NON-NLS-1$
-   private static final String              ATTR_LINE_GRADIENT_COLOR_GRAPH_ID     = "gradientColorGraphId";    //$NON-NLS-1$
-   private static final String              ATTR_LINE_OPACITY                     = "lineOpacity";             //$NON-NLS-1$
-   private static final String              ATTR_LINE_WIDTH                       = "lineWidth";               //$NON-NLS-1$
-   private static final String              ATTR_OUTLINE_IS_SHOW_OUTLINE          = "isShowOutline";           //$NON-NLS-1$
-   private static final String              ATTR_OUTLINE_WIDTH                    = "outlineWidth";            //$NON-NLS-1$
-   private static final String              ATTR_OUTLINE_BRIGHTNESS               = "outlineBrightness";       //$NON-NLS-1$
+   private static final String              TAG_LINE                              = "Line";                       //$NON-NLS-1$
+   private static final String              ATTR_LINE_COLOR_MODE                  = "lineColorMode";              //$NON-NLS-1$
+   private static final String              ATTR_LINE_GRADIENT_COLOR_GRAPH_ID     = "gradientColorGraphId";       //$NON-NLS-1$
+   private static final String              ATTR_LINE_OPACITY                     = "lineOpacity";                //$NON-NLS-1$
+   private static final String              ATTR_LINE_WIDTH                       = "lineWidth";                  //$NON-NLS-1$
+   private static final String              ATTR_OUTLINE_IS_SHOW_OUTLINE          = "isShowOutline";              //$NON-NLS-1$
+   private static final String              ATTR_OUTLINE_WIDTH                    = "outlineWidth";               //$NON-NLS-1$
+   private static final String              ATTR_OUTLINE_BRIGHTNESS               = "outlineBrightness";          //$NON-NLS-1$
    //
    public static final boolean              LINE_IS_TRACK_VERTICAL_OFFSET_DEFAULT = false;
    public static final int                  LINE_TRACK_VERTICAL_OFFSET_DEFAULT    = 20;
@@ -138,9 +137,9 @@ public class Map25ConfigManager {
    public static final LineColorMode        LINE_COLOR_MODE_DEFAULT               = LineColorMode.GRADIENT;
    public static final MapGraphId           LINE_GRADIENT_COLOR_GRAPH_ID_DEFAULT  = MapGraphId.Altitude;
    //
-   public static final int                  LINE_OPACITY_MIN                      = 26;                        // 10 %
+   public static final int                  LINE_OPACITY_MIN                      = 26;                           // 10 %
    public static final int                  LINE_OPACITY_MAX                      = 0xff;
-   public static final int                  LINE_OPACITY_DEFAULT                  = 180;                       // 70 %
+   public static final int                  LINE_OPACITY_DEFAULT                  = 180;                          // 70 %
    public static final int                  LINE_WIDTH_MIN                        = 1;
    public static final int                  LINE_WIDTH_MAX                        = 20;
    public static final float                LINE_WIDTH_DEFAULT                    = 2.5f;
@@ -153,13 +152,47 @@ public class Map25ConfigManager {
    public static final int                  OUTLINE_WIDTH_MAX                     = 20;
    public static final float                OUTLINE_WIDTH_DEFAULT                 = 2f;
    //
-   public static final boolean              ARROW_IS_SHOW_ARROW_DEFAULT           = false;
+   private static final String              TAG_DIRECTION_ARROW                   = "DirectionArrow";             //$NON-NLS-1$
+   private static final String              ATTR_ARROW_IS_SHOW_ARROW              = "isShowDirectionArrow";       //$NON-NLS-1$
+   private static final String              ATTR_ARROW_DESIGN                     = "design";                     //$NON-NLS-1$
+   private static final String              ATTR_ARROW_MIN_DISTANCE               = "minDistance";                //$NON-NLS-1$
+   private static final String              ATTR_ARROW_VERTICAL_OFFSET            = "verticalOffset";             //$NON-NLS-1$
+   //
+   private static final String              ATTR_ARROW_SCALE                      = "scale";                      //$NON-NLS-1$
+   private static final String              ATTR_ARROW_LENGTH                     = "length";                     //$NON-NLS-1$
+   private static final String              ATTR_ARROW_LENGTH_CENTER              = "lengthCenter";               //$NON-NLS-1$
+   private static final String              ATTR_ARROW_WIDTH                      = "width";                      //$NON-NLS-1$
+   private static final String              ATTR_ARROW_HEIGHT                     = "height";                     //$NON-NLS-1$
+   //
+   private static final String              ATTR_ARROW_FIN_OUTLINE_WIDTH          = "finOutlineWidth";            //$NON-NLS-1$
+   private static final String              ATTR_ARROW_WING_OUTLINE_WIDTH         = "wingOutlineWidth";           //$NON-NLS-1$
+   //
+   private static final String              TAG_ARROW_FIN_INSIDE_COLOR            = "FinInsideColor";             //$NON-NLS-1$
+   private static final String              TAG_ARROW_FIN_OUTLINE_COLOR           = "FinOutlineColor";            //$NON-NLS-1$
+   private static final String              TAG_ARROW_WING_INSIDE_COLOR           = "wingInsideColor";            //$NON-NLS-1$
+   private static final String              TAG_ARROW_WING_OUTLINE_COLOR          = "wingOutlineColor";           //$NON-NLS-1$
+   //
+   public static final boolean              ARROW_IS_SHOW_ARROW_DEFAULT           = true;
+   public static final DirectionArrowDesign ARROW_DESIGN_DEFAULT                  = DirectionArrowDesign.WINGS;
    public static final int                  ARROW_MIN_DISTANCE_DEFAULT            = 40;
    public static final int                  ARROW_VERTICAL_OFFSET_DEFAULT         = 30;
-   public static final DirectionArrowDesign ARROW_LAYOUT_DEFAULT                  = DirectionArrowDesign.WINGS;
    //
-   private static final String              TAG_LEGEND                            = "Legend";                  //$NON-NLS-1$
-   private static final String              ATTR_LEGEND_UNIT_LAYOUT               = "unitLayout";              //$NON-NLS-1$
+   public static final int                  ARROW_SCALE_DEFAULT                   = 10;
+   public static final int                  ARROW_LENGTH_DEFAULT                  = 50;
+   public static final int                  ARROW_LENGTH_CENTER_DEFAULT           = 40;
+   public static final int                  ARROW_WIDTH_DEFAULT                   = 40;
+   public static final int                  ARROW_HEIGHT_DEFAULT                  = 20;
+   //
+   public static final int                  ARROW_FIN_OUTLINE_WIDTH_DEFAULT       = 30;
+   public static final int                  ARROW_WING_OUTLINE_WIDTH_DEFAULT      = 70;
+   //
+   public static final RGBA                 ARROW_FIN_INSIDE_COLOR_DEFAULT        = new RGBA(25, 25, 25, 25);
+   public static final RGBA                 ARROW_FIN_OUTLINE_COLOR_DEFAULT       = new RGBA(200, 200, 200, 0Xff);
+   public static final RGBA                 ARROW_WING_INSIDE_COLOR_DEFAULT       = new RGBA(25, 25, 25, 175);
+   public static final RGBA                 ARROW_WING_OUTLINE_COLOR_DEFAULT      = new RGBA(0xff, 50, 50, 0xff);
+   //
+   private static final String              TAG_LEGEND                            = "Legend";                     //$NON-NLS-1$
+   private static final String              ATTR_LEGEND_UNIT_LAYOUT               = "unitLayout";                 //$NON-NLS-1$
    //
    // slider location/path
    private static final String TAG_SLIDER_PATH                     = "SliderPath";             //$NON-NLS-1$
@@ -546,7 +579,6 @@ public class Map25ConfigManager {
          // <Line>
          final IMemento xmlLine = Util.setXmlRgb(xmlConfig, TAG_LINE,   config.lineColor);
          {
-            xmlLine.putBoolean(        ATTR_LINE_IS_SHOW_DIRECTION_ARROW,  config.isShowDirectionArrow);
             xmlLine.putFloat(          ATTR_LINE_WIDTH,                    config.lineWidth);
             xmlLine.putInteger(        ATTR_LINE_OPACITY,                  config.lineOpacity);
             Util.setXmlEnum(xmlLine,   ATTR_LINE_COLOR_MODE,               config.lineColorMode);
@@ -555,6 +587,29 @@ public class Map25ConfigManager {
             xmlLine.putBoolean(        ATTR_OUTLINE_IS_SHOW_OUTLINE,       config.isShowOutline);
             xmlLine.putFloat(          ATTR_OUTLINE_BRIGHTNESS,            config.outlineBrighness);
             xmlLine.putFloat(          ATTR_OUTLINE_WIDTH,                 config.outlineWidth);
+         }
+
+         // <DirectionArrow>
+         final IMemento xmlArrow = xmlConfig.createChild(TAG_DIRECTION_ARROW);
+         {
+            xmlArrow.putBoolean(       ATTR_ARROW_IS_SHOW_ARROW,           config.isShowDirectionArrow);
+            Util.setXmlEnum(xmlArrow,  ATTR_ARROW_DESIGN,                  config.arrow_Design);
+            xmlArrow.putInteger(       ATTR_ARROW_MIN_DISTANCE,            config.arrow_MinimumDistance);
+            xmlArrow.putInteger(       ATTR_ARROW_VERTICAL_OFFSET,         config.arrow_VerticalOffset);
+
+            xmlArrow.putInteger(       ATTR_ARROW_SCALE,                   config.arrow_Scale);
+            xmlArrow.putInteger(       ATTR_ARROW_LENGTH,                  config.arrow_Length);
+            xmlArrow.putInteger(       ATTR_ARROW_LENGTH_CENTER,           config.arrow_LengthCenter);
+            xmlArrow.putInteger(       ATTR_ARROW_WIDTH,                   config.arrow_Width);
+            xmlArrow.putInteger(       ATTR_ARROW_HEIGHT,                  config.arrow_Height);
+
+            xmlArrow.putInteger(       ATTR_ARROW_FIN_OUTLINE_WIDTH,       config.arrowFin_OutlineWidth);
+            xmlArrow.putInteger(       ATTR_ARROW_WING_OUTLINE_WIDTH,      config.arrowWing_OutlineWidth);
+
+            Util.setXmlRgba(xmlArrow,  TAG_ARROW_FIN_INSIDE_COLOR,         config.arrowFin_InsideColor);
+            Util.setXmlRgba(xmlArrow,  TAG_ARROW_FIN_OUTLINE_COLOR,        config.arrowFin_OutlineColor);
+            Util.setXmlRgba(xmlArrow,  TAG_ARROW_WING_INSIDE_COLOR,        config.arrowWing_InsideColor);
+            Util.setXmlRgba(xmlArrow,  TAG_ARROW_WING_OUTLINE_COLOR,       config.arrowWing_OutlineColor);
          }
 
          // <Legend>
@@ -761,7 +816,6 @@ public class Map25ConfigManager {
 
          case TAG_LINE:
 
-            config.isShowDirectionArrow   = Util.getXmlBoolean(      xmlConfigChild,         ATTR_LINE_IS_SHOW_DIRECTION_ARROW, ARROW_IS_SHOW_ARROW_DEFAULT);
             config.lineColor              = Util.getXmlRgb(          xmlConfigChild,         LINE_COLOR_DEFAULT);
             config.lineOpacity            = Util.getXmlInteger(      xmlConfigChild,         ATTR_LINE_OPACITY,                  LINE_OPACITY_DEFAULT,         LINE_OPACITY_MIN,          LINE_OPACITY_MAX);
             config.lineWidth              = Util.getXmlFloatFloat(   xmlConfigChild,         ATTR_LINE_WIDTH,                    LINE_WIDTH_DEFAULT,           LINE_WIDTH_MIN,            LINE_WIDTH_MAX);
@@ -771,6 +825,31 @@ public class Map25ConfigManager {
             config.isShowOutline          = Util.getXmlBoolean(xmlConfigChild,      ATTR_OUTLINE_IS_SHOW_OUTLINE, OUTLINE_IS_SHOW_OUTLINE_DEFAULT);
             config.outlineBrighness       = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_OUTLINE_BRIGHTNESS,      OUTLINE_BRIGHTNESS_DEFAULT,   OUTLINE_BRIGHTNESS_MIN,    OUTLINE_BRIGHTNESS_MAX);
             config.outlineWidth           = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_OUTLINE_WIDTH,           OUTLINE_WIDTH_DEFAULT,        OUTLINE_WIDTH_MIN,         OUTLINE_WIDTH_MAX);
+
+            break;
+
+         case TAG_DIRECTION_ARROW:
+
+            config.isShowDirectionArrow   = Util.getXmlBoolean(      xmlConfigChild,      ATTR_ARROW_IS_SHOW_ARROW,        ARROW_IS_SHOW_ARROW_DEFAULT);
+
+            config.isShowDirectionArrow   =  Util.getXmlBoolean(xmlConfigChild,  ATTR_ARROW_IS_SHOW_ARROW,        ARROW_IS_SHOW_ARROW_DEFAULT);
+            config.arrow_MinimumDistance  =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_MIN_DISTANCE,         ARROW_MIN_DISTANCE_DEFAULT);
+            config.arrow_VerticalOffset   =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_VERTICAL_OFFSET,      ARROW_VERTICAL_OFFSET_DEFAULT);
+            config.arrow_Design           =  (DirectionArrowDesign) Util.getXmlEnum(xmlConfigChild,               ATTR_ARROW_DESIGN,ARROW_DESIGN_DEFAULT);
+
+            config.arrow_Scale            =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_SCALE,                ARROW_SCALE_DEFAULT);
+            config.arrow_Length           =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_LENGTH,               ARROW_LENGTH_DEFAULT);
+            config.arrow_LengthCenter     =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_LENGTH_CENTER,        ARROW_LENGTH_CENTER_DEFAULT);
+            config.arrow_Width            =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_WIDTH,                ARROW_WIDTH_DEFAULT);
+            config.arrow_Height           =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_HEIGHT,               ARROW_HEIGHT_DEFAULT);
+
+            config.arrowFin_OutlineWidth  =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_FIN_OUTLINE_WIDTH,    ARROW_FIN_OUTLINE_WIDTH_DEFAULT);
+            config.arrowWing_OutlineWidth =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_WING_OUTLINE_WIDTH,   ARROW_WING_OUTLINE_WIDTH_DEFAULT);
+
+            config.arrowFin_InsideColor   =  Util.getXmlRgba(xmlConfigChild,     ARROW_FIN_INSIDE_COLOR_DEFAULT);
+            config.arrowFin_OutlineColor  =  Util.getXmlRgba(xmlConfigChild,     ARROW_FIN_OUTLINE_COLOR_DEFAULT);
+            config.arrowWing_InsideColor  =  Util.getXmlRgba(xmlConfigChild,     ARROW_WING_INSIDE_COLOR_DEFAULT);
+            config.arrowWing_OutlineColor =  Util.getXmlRgba(xmlConfigChild,     ARROW_WING_OUTLINE_COLOR_DEFAULT);
 
             break;
 

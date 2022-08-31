@@ -455,7 +455,7 @@ public class TourLayer extends Layer {
             final float diffXArrow = pixelX - prevXArrow;
             final float diffYArrow = pixelY - prevYArrow;
 
-            if (projectedPointIndex == 0 || FastMath.absMaxCmp(diffXArrow, diffYArrow, trackConfig.arrowMinimumDistance)) {
+            if (projectedPointIndex == 0 || FastMath.absMaxCmp(diffXArrow, diffYArrow, trackConfig.arrow_MinimumDistance)) {
 
                // point > min distance
 

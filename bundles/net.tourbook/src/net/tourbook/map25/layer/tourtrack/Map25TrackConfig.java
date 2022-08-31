@@ -22,6 +22,7 @@ import net.tourbook.common.map.MapUI.LegendUnitLayout;
 import net.tourbook.map25.Map25ConfigManager;
 
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.RGBA;
 
 public class Map25TrackConfig {
 
@@ -55,9 +56,24 @@ public class Map25TrackConfig {
 
    // direction arrow
    public boolean isShowDirectionArrow       = Map25ConfigManager.ARROW_IS_SHOW_ARROW_DEFAULT;
-   public int     arrowMinimumDistance       = Map25ConfigManager.ARROW_MIN_DISTANCE_DEFAULT;
-   public int     arrowVerticalOffset        = Map25ConfigManager.ARROW_VERTICAL_OFFSET_DEFAULT;
-   public DirectionArrowDesign arrowDesign   = Map25ConfigManager.ARROW_LAYOUT_DEFAULT;
+   public int     arrow_MinimumDistance      = Map25ConfigManager.ARROW_MIN_DISTANCE_DEFAULT;
+   public int     arrow_VerticalOffset       = Map25ConfigManager.ARROW_VERTICAL_OFFSET_DEFAULT;
+   public DirectionArrowDesign arrow_Design  = Map25ConfigManager.ARROW_DESIGN_DEFAULT;
+
+   public int     arrow_Scale                = Map25ConfigManager.ARROW_SCALE_DEFAULT;
+   public int     arrow_Length               = Map25ConfigManager.ARROW_LENGTH_DEFAULT;
+   public int     arrow_LengthCenter         = Map25ConfigManager.ARROW_LENGTH_CENTER_DEFAULT;
+   public int     arrow_Width                = Map25ConfigManager.ARROW_WIDTH_DEFAULT;
+   public int     arrow_Height               = Map25ConfigManager.ARROW_HEIGHT_DEFAULT;
+
+   public int     arrowFin_OutlineWidth      = Map25ConfigManager.ARROW_FIN_OUTLINE_WIDTH_DEFAULT;
+   public int     arrowWing_OutlineWidth     = Map25ConfigManager.ARROW_WING_OUTLINE_WIDTH_DEFAULT;
+
+   public RGBA    arrowFin_InsideColor       = Map25ConfigManager.ARROW_FIN_INSIDE_COLOR_DEFAULT;
+   public RGBA    arrowFin_OutlineColor      = Map25ConfigManager.ARROW_FIN_OUTLINE_COLOR_DEFAULT;
+   public RGBA    arrowWing_InsideColor      = Map25ConfigManager.ARROW_WING_INSIDE_COLOR_DEFAULT;
+   public RGBA    arrowWing_OutlineColor     = Map25ConfigManager.ARROW_WING_OUTLINE_COLOR_DEFAULT;
+
 
    // slider location
    public boolean isShowSliderLocation       = Map25ConfigManager.SLIDER_IS_SHOW_CHART_SLIDER_DEFAULT;
@@ -74,12 +90,14 @@ public class Map25TrackConfig {
    public int     testValue                  = 50;
 
    // legend
-   public LegendUnitLayout legendUnitLayout  = Map25ConfigManager.LEGEND_UNIT_LAYOUT_DEFAULT;
-
-
-
+   public LegendUnitLayout legendUnitLayout = Map25ConfigManager.LEGEND_UNIT_LAYOUT_DEFAULT;
 
 // SET_FORMATTING_ON
+
+   /**
+    * Arrow colors used in the shader
+    */
+   private float[] arrowColors;
 
    public enum LineColorMode {
 
@@ -137,6 +155,17 @@ public class Map25TrackConfig {
       return true;
    }
 
+   public float[] getArrowColors() {
+
+      if (arrowColors != null) {
+         return arrowColors;
+      }
+
+      updateShaderArrowColors();
+
+      return arrowColors;
+   }
+
    @Override
    public int hashCode() {
 
@@ -186,6 +215,46 @@ public class Map25TrackConfig {
 
             + "]" + NL //                                                        //$NON-NLS-1$
       ;
+   }
+
+   public void updateShaderArrowColors() {
+
+      /**
+       * <code>
+       *
+       *  uniform  vec4  uni_ArrowColors[4];  // 1:wing inside,
+       *                                      // 2:wing outline,
+       *                                      // 3:fin inside,
+       *                                      // 4:fin outline
+       * </code>
+       */
+
+// SET_FORMATTING_OFF
+
+      arrowColors = new float[] {
+
+            arrowWing_InsideColor.rgb.red    / 255f,
+            arrowWing_InsideColor.rgb.green  / 255f,
+            arrowWing_InsideColor.rgb.blue   / 255f,
+            arrowWing_InsideColor.alpha      / 255f,
+
+            arrowWing_OutlineColor.rgb.red   / 255f,
+            arrowWing_OutlineColor.rgb.green / 255f,
+            arrowWing_OutlineColor.rgb.blue  / 255f,
+            arrowWing_OutlineColor.alpha     / 255f,
+
+            arrowFin_InsideColor.rgb.red     / 255f,
+            arrowFin_InsideColor.rgb.green   / 255f,
+            arrowFin_InsideColor.rgb.blue    / 255f,
+            arrowFin_InsideColor.alpha       / 255f,
+
+            arrowFin_OutlineColor.rgb.red    / 255f,
+            arrowFin_OutlineColor.rgb.green  / 255f,
+            arrowFin_OutlineColor.rgb.blue   / 255f,
+            arrowFin_OutlineColor.alpha      / 255f,
+      };
+
+// SET_FORMATTING_ON
    }
 
 }

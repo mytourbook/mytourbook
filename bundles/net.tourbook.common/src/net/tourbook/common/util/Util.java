@@ -55,6 +55,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -118,6 +119,7 @@ public class Util {
    public static final String ATTR_COLOR_RED              = "red";                                     //$NON-NLS-1$
    public static final String ATTR_COLOR_GREEN            = "green";                                   //$NON-NLS-1$
    public static final String ATTR_COLOR_BLUE             = "blue";                                    //$NON-NLS-1$
+   public static final String ATTR_COLOR_ALPHA            = "alpha";                                   //$NON-NLS-1$
 
    public static final String CSV_FILE_EXTENSION          = "csv";                                     //$NON-NLS-1$
 
@@ -1757,6 +1759,22 @@ public class Util {
       return defaultRgb;
    }
 
+   /**
+    * @param xmlMemento
+    * @param defaultValue
+    * @return Returns {@link RGBA} from the attributes red, green, blue and alpha attributes.
+    */
+   public static RGBA getXmlRgba(final IMemento xmlMemento, final RGBA defaultValue) {
+
+      final int red = getXmlInteger(xmlMemento, ATTR_COLOR_RED, defaultValue.rgb.red);
+      final int green = getXmlInteger(xmlMemento, ATTR_COLOR_GREEN, defaultValue.rgb.green);
+      final int blue = getXmlInteger(xmlMemento, ATTR_COLOR_BLUE, defaultValue.rgb.blue);
+
+      final int alpha = getXmlInteger(xmlMemento, ATTR_COLOR_ALPHA, defaultValue.alpha);
+
+      return new RGBA(red, green, blue, alpha);
+   }
+
    public static String getXmlString(final IMemento xmlConfig, final String key, final String defaultValue) {
 
       String value = xmlConfig.getString(key);
@@ -2865,6 +2883,28 @@ public class Util {
          xmlColorTag.putInteger(ATTR_COLOR_RED, rgb.red);
          xmlColorTag.putInteger(ATTR_COLOR_GREEN, rgb.green);
          xmlColorTag.putInteger(ATTR_COLOR_BLUE, rgb.blue);
+      }
+
+      return xmlColorTag;
+   }
+
+   /**
+    * Creates a child for the color.
+    *
+    * @param xmlColor
+    * @param tagName
+    * @param rgba
+    * @return
+    */
+   public static IMemento setXmlRgba(final IMemento xmlColor, final String tagName, final RGBA rgba) {
+
+      final IMemento xmlColorTag = xmlColor.createChild(tagName);
+      {
+         xmlColorTag.putInteger(ATTR_COLOR_RED, rgba.rgb.red);
+         xmlColorTag.putInteger(ATTR_COLOR_GREEN, rgba.rgb.green);
+         xmlColorTag.putInteger(ATTR_COLOR_BLUE, rgba.rgb.blue);
+
+         xmlColorTag.putInteger(ATTR_COLOR_ALPHA, rgba.alpha);
       }
 
       return xmlColorTag;

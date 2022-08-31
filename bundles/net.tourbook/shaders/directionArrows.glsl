@@ -6,7 +6,7 @@ attribute   vec4  a_pos;
 attribute   vec3  attrib_ColorCoord; 
 
 uniform  mat4  u_mvp;
-uniform  vec4  uni_ArrowColors[4];  // x:wing inside, y:wing border, z:fin inside, w:fin border
+uniform  vec4  uni_ArrowColors[4];  // 1:wing inside, 2:wing outline, 3:fin inside, 4:fin outline
 uniform  vec2  uni_OutlineWidth;    // x:Wing, y:Fin
 
 // passthrough fragment values

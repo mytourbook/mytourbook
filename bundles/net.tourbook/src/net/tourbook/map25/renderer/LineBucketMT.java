@@ -48,33 +48,29 @@ import org.slf4j.LoggerFactory;
  */
 public class LineBucketMT extends RenderBucketMT {
 
-   static final Logger        log                = LoggerFactory.getLogger(LineBucketMT.class);
+   static final Logger        log              = LoggerFactory.getLogger(LineBucketMT.class);
 
    /**
     * Scale factor mapping extrusion vector to short values
     */
-   public static final float  DIR_SCALE          = 2048;
+   public static final float  DIR_SCALE        = 2048;
 
    /**
     * Maximal resolution
     */
-   public static final float  MIN_DIST           = 1 / 8f;
+   public static final float  MIN_DIST         = 1 / 8f;
 
    /**
     * Not quite right.. need to go back so that additional
     * bevel vertices are at least MIN_DIST apart
     */
-   private static final float MIN_BEVEL          = MIN_DIST * 4;
-
-   private static float[]     _arrowColors;
-   private static float       _outlineWidth_Wing = .1f;
-   private static float       _outlineWidth_Fin  = .1f;
+   private static final float MIN_BEVEL        = MIN_DIST * 4;
 
    /**
     * Mask for packing last two bits of extrusion vector with texture
     * coordinates, .... 1111 1100
     */
-   private static final int   DIR_MASK           = 0xFFFFFFFC;
+   private static final int   DIR_MASK         = 0xFFFFFFFC;
 
    /**
     * Lines referenced by this outline layer
@@ -86,20 +82,15 @@ public class LineBucketMT extends RenderBucketMT {
 
    public float               testValue;
 
-   public float               scale              = 1;
+   public float               scale            = 1;
 
    private boolean            _isCapRounded;
-   private float              _minimumDistance   = MIN_DIST;
-   private float              _minimumBevel      = MIN_BEVEL;
+   private float              _minimumDistance = MIN_DIST;
+   private float              _minimumBevel    = MIN_BEVEL;
 
    private float              _heightOffset;
 
-   private int                tmin               = Integer.MIN_VALUE, tmax = Integer.MAX_VALUE;
-
-   private int                _arrowWidth;
-   private int                _arrowLength;
-   private int                _arrowLengthMiddle;
-   private int                _finHeight;
+   private int                tmin             = Integer.MIN_VALUE, tmax = Integer.MAX_VALUE;
 
    private static class DirectionArrowsShader extends GLShaderMT {
 
@@ -108,9 +99,9 @@ public class LineBucketMT extends RenderBucketMT {
             shader_u_mvp,
 
             shader_uni_ArrowColors,
-            shader_uni_OutlineWidth,
+            shader_uni_OutlineWidth
 
-            shader_u_width
+//          shader_u_width
 
       ;
 
@@ -126,7 +117,7 @@ public class LineBucketMT extends RenderBucketMT {
          shader_a_pos                  = getAttrib("a_pos");                  //$NON-NLS-1$
          shader_attrib_ColorCoord      = getAttrib("attrib_ColorCoord");       //$NON-NLS-1$
 
-         shader_u_width                = getUniform("u_width");               //$NON-NLS-1$
+//       shader_u_width                = getUniform("u_width");               //$NON-NLS-1$
          shader_uni_ArrowColors        = getUniform("uni_ArrowColors");       //$NON-NLS-1$
          shader_uni_OutlineWidth       = getUniform("uni_OutlineWidth");      //$NON-NLS-1$
 
@@ -491,6 +482,9 @@ public class LineBucketMT extends RenderBucketMT {
       private static void draw_DirectionArrows(final GLViewport viewport,
                                                final RenderBucketsAllMT allRenderBuckets,
                                                final float vp2mpScale) {
+
+         final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+
 // SET_FORMATTING_OFF
 
          final DirectionArrowsShader shader        = _directionArrowShader;
@@ -498,7 +492,7 @@ public class LineBucketMT extends RenderBucketMT {
          final int shader_a_pos                    = shader.shader_a_pos;
          final int shader_attrib_ColorCoord        = shader.shader_attrib_ColorCoord;
          final int shader_u_mvp                    = shader.shader_u_mvp;
-         final int shader_u_width                  = shader.shader_u_width;
+//       final int shader_u_width                  = shader.shader_u_width;
          final int shader_uni_ArrowColors          = shader.shader_uni_ArrowColors;
          final int shader_uni_OutlineWidth         = shader.shader_uni_OutlineWidth;
 
@@ -543,15 +537,18 @@ public class LineBucketMT extends RenderBucketMT {
           * Draw direction arrows
           */
 
-//         final float width = 10 / vp2mpScale;
+//       final float width = 10 / vp2mpScale;
 //
-//         gl.uniform1f(shader_u_width, width * COORD_SCALE_BY_DIR_SCALE);
+//       gl.uniform1f(shader_u_width, width * COORD_SCALE_BY_DIR_SCALE);
 
          // arrow colors
-         gl.uniform4fv(shader_uni_ArrowColors, _arrowColors.length / 4, _arrowColors, 0);
+         final float arrowColors[] = trackConfig.getArrowColors();
+         gl.uniform4fv(shader_uni_ArrowColors, arrowColors.length / 4, arrowColors, 0);
 
          // outline width's
-         gl.uniform2f(shader_uni_OutlineWidth, _outlineWidth_Wing, _outlineWidth_Fin);
+         gl.uniform2f(shader_uni_OutlineWidth,
+               trackConfig.arrowWing_OutlineWidth / 200f,
+               trackConfig.arrowFin_OutlineWidth / 200f);
 
          gl.drawArrays(GL.TRIANGLES, 0, numDirArrowShorts);
 
@@ -1252,32 +1249,19 @@ public class LineBucketMT extends RenderBucketMT {
 
       final float[] allDirectionArrowPixel = allDirectionArrowPixel_Raw.toArray();
 
-      final float arrowSize = .973f;
-
-      _arrowWidth = (int) (40 * arrowSize);
-      _arrowLength = (int) (50 * arrowSize);
-      _arrowLengthMiddle = (int) (35 * arrowSize);
-
-      _finHeight = (int) (20 * arrowSize);
-
-      _outlineWidth_Fin = .03f;
-      _outlineWidth_Wing = .075f;
-
 // SET_FORMATTING_OFF
-      _arrowColors = new float[] {
 
-            .1f,  .1f,  .1f,  .7f,        // wing inside
-            .99f, .02f, .02f, .999f,      // wing border
+      final float configArrowScale           = trackConfig.arrow_Scale / 10f;
+      final int   configArrowLength          = (int) (configArrowScale * trackConfig.arrow_Length);
+      final int   configArrowLengthCenter    = (int) (configArrowScale * trackConfig.arrow_LengthCenter);
+      final int   configArrowWidth           = (int) (configArrowScale * trackConfig.arrow_Width);
+      final int   configArrowHeight          = (int) (configArrowScale * trackConfig.arrow_Height);
 
-            .1f,  .1f,  .1f,  .5f,        // fin inside
-            .8f,  .8f,  .8f,  .99f,       // fin border
+      final short arrowZ      = (short) trackConfig.arrow_VerticalOffset;
+      final short finTopZ     = (short) (arrowZ + configArrowHeight);
+      final short finBottomZ  = (short) (arrowZ - configArrowHeight);
 
-      };
 // SET_FORMATTING_ON
-
-      final short arrowZ = 40;
-      final short finTopZ = (short) (arrowZ + _finHeight);
-      final short finBottomZ = (short) (arrowZ - _finHeight);
 
       int pixelIndex = 0;
 
@@ -1303,9 +1287,9 @@ public class LineBucketMT extends RenderBucketMT {
          final double unitPerpendX = p12UnitY;
          final double unitPerpendY = -p12UnitX;
 
-         final double arrowLength = Math.min(_arrowLength, p12Distance);
-         final double arrowLengthMiddle = Math.min(_arrowLengthMiddle, p12Distance);
-         final double arrowWidth2 = _arrowWidth / 2; // half arrow width
+         final double arrowLength = Math.min(configArrowLength, p12Distance);
+         final double arrowLengthMiddle = Math.min(configArrowLengthCenter, p12Distance);
+         final double arrowWidth2 = configArrowWidth / 2; // half arrow width
 
          // point on line between P1 and P2
          final double pOnLineX = p2X - (arrowLength * p12UnitX);
@@ -1381,16 +1365,16 @@ public class LineBucketMT extends RenderBucketMT {
          final short arrowPart_Wing    = 0;
          final short arrowPart_Fin     = 1;
 
-         final short p2X_scaled        = (short) (p2X      * COORD_SCALE);
-         final short p2Y_scaled        = (short) (p2Y      * COORD_SCALE);
-         final short pLeftX_scaled     = (short) (pLeftX   * COORD_SCALE);
-         final short pLeftY_scaled     = (short) (pLeftY   * COORD_SCALE);
-         final short pRight_Xscaled    = (short) (pRightX  * COORD_SCALE);
-         final short pRightY_scaled    = (short) (pRightY  * COORD_SCALE);
-         final short pBackX_scaled     = (short) (pBackX   * COORD_SCALE);
-         final short pBackY_scaled     = (short) (pBackY   * COORD_SCALE);
-         final short pOnLineX_scaled   = (short) (pOnLineX   * COORD_SCALE);
-         final short pOnLineY_scaled   = (short) (pOnLineY   * COORD_SCALE);
+         final short p2X_scaled        = (short) (p2X       * COORD_SCALE);
+         final short p2Y_scaled        = (short) (p2Y       * COORD_SCALE);
+         final short pLeftX_scaled     = (short) (pLeftX    * COORD_SCALE);
+         final short pLeftY_scaled     = (short) (pLeftY    * COORD_SCALE);
+         final short pRight_Xscaled    = (short) (pRightX   * COORD_SCALE);
+         final short pRightY_scaled    = (short) (pRightY   * COORD_SCALE);
+         final short pBackX_scaled     = (short) (pBackX    * COORD_SCALE);
+         final short pBackY_scaled     = (short) (pBackY    * COORD_SCALE);
+         final short pOnLineX_scaled   = (short) (pOnLineX  * COORD_SCALE);
+         final short pOnLineY_scaled   = (short) (pOnLineY  * COORD_SCALE);
 
 
          /**
@@ -1399,7 +1383,7 @@ public class LineBucketMT extends RenderBucketMT {
           * THE ORDER, TO FIX Z-FIGHTING
           */
 
-         switch (trackConfig.arrowDesign) {
+         switch (trackConfig.arrow_Design) {
 
          case WINGS_WITH_MIDDLE_FIN:
 
