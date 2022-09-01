@@ -44,7 +44,9 @@ Changes
 Bugfix
 ======
 
-* 
+* Fit Import (Frederic)
+  - Fixed NPE when pauses data are missing
+    https://sourceforge.net/p/mytourbook/discussion/622811/thread/d52269ce04/
 
 
 Translation    

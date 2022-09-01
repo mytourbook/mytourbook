@@ -24,7 +24,7 @@ import utils.FilesUtils;
 
 public class FitDataReaderTests extends DeviceDataReaderTester {
 
-   private static final String  FILES_PATH    = FilesUtils.rootPath + "device/garmin/fit/files/"; //$NON-NLS-1$
+   private static final String FILES_PATH    = FilesUtils.rootPath + "device/garmin/fit/files/"; //$NON-NLS-1$
 
    private FitDataReader       fitDataReader = new FitDataReader();
 
@@ -46,5 +46,23 @@ public class FitDataReaderTests extends DeviceDataReaderTester {
    void testFitImportNoPauses() {
 
       testImportFile(fitDataReader, FILES_PATH + "1-30-21 3-47 PM", ".fit");
+   }
+
+   /**
+    * Test with a file containing pauses triggered automatically by the device
+    */
+   @Test
+   void testFitImportPauses_Auto() {
+
+      testImportFile(fitDataReader, FILES_PATH + "Hardrock_100_Start_Finish", ".fit");
+   }
+
+   /**
+    * Test with a file containing pauses triggered by the user
+    */
+   @Test
+   void testFitImportPauses_User() {
+
+      testImportFile(fitDataReader, FILES_PATH + "Bye_bye_Silverton", ".fit");
    }
 }
