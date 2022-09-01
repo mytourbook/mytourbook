@@ -74,7 +74,6 @@ public class Map25TrackConfig {
    public RGBA    arrowWing_InsideColor      = Map25ConfigManager.ARROW_WING_INSIDE_COLOR_DEFAULT;
    public RGBA    arrowWing_OutlineColor     = Map25ConfigManager.ARROW_WING_OUTLINE_COLOR_DEFAULT;
 
-
    // slider location
    public boolean isShowSliderLocation       = Map25ConfigManager.SLIDER_IS_SHOW_CHART_SLIDER_DEFAULT;
    public RGB     sliderLocation_Left_Color  = Map25ConfigManager.SLIDER_LOCATION_LEFT_COLOR_DEFAULT;
@@ -185,33 +184,51 @@ public class Map25TrackConfig {
 
             + "[" + NL //                                                        //$NON-NLS-1$
 
-            + "id                         =" + id + NL //                        //$NON-NLS-1$
-            + "defaultId                  =" + defaultId + NL //                 //$NON-NLS-1$
-            + "name                       =" + name + NL //                      //$NON-NLS-1$
-            + "isShowDirectionArrow       =" + isShowDirectionArrow + NL //      //$NON-NLS-1$
-            + "isTrackVerticalOffset      =" + isTrackVerticalOffset + NL //     //$NON-NLS-1$
-            + "lineColor                  =" + lineColor + NL //                 //$NON-NLS-1$
-            + "lineColorMode              =" + lineColorMode + NL //             //$NON-NLS-1$
-            + "lineOpacity                =" + lineOpacity + NL //               //$NON-NLS-1$
-            + "lineWidth                  =" + lineWidth + NL //                 //$NON-NLS-1$
-            + "trackVerticalOffset        =" + trackVerticalOffset + NL //       //$NON-NLS-1$
+            + "id                         = " + id + NL //                        //$NON-NLS-1$
+            + "defaultId                  = " + defaultId + NL //                 //$NON-NLS-1$
+            + "name                       = " + name + NL //                      //$NON-NLS-1$
+            + "isTrackVerticalOffset      = " + isTrackVerticalOffset + NL //     //$NON-NLS-1$
+            + "lineColor                  = " + lineColor + NL //                 //$NON-NLS-1$
+            + "lineColorMode              = " + lineColorMode + NL //             //$NON-NLS-1$
+            + "lineOpacity                = " + lineOpacity + NL //               //$NON-NLS-1$
+            + "lineWidth                  = " + lineWidth + NL //                 //$NON-NLS-1$
+            + "trackVerticalOffset        = " + trackVerticalOffset + NL //       //$NON-NLS-1$
+            + NL
+            + "isShowDirectionArrow       = " + isShowDirectionArrow + NL //      //$NON-NLS-1$
+            + "arrow_MinimumDistance      = " + arrow_MinimumDistance + NL //     //$NON-NLS-1$
+            + "arrow_VerticalOffset       = " + arrow_VerticalOffset + NL //      //$NON-NLS-1$
+            + "arrow_Design               = " + arrow_Design + NL //              //$NON-NLS-1$
 
-            + "isShowOutline              =" + isShowOutline + NL //             //$NON-NLS-1$
-            + "outlineBrighness           =" + outlineBrighness + NL //          //$NON-NLS-1$
-            + "outlineWidth               =" + outlineWidth + NL //              //$NON-NLS-1$
+            + "arrow_Scale                = " + arrow_Scale + NL //               //$NON-NLS-1$
+            + "arrow_Length               = " + arrow_Length + NL //              //$NON-NLS-1$
+            + "arrow_LengthCenter         = " + arrow_LengthCenter + NL //        //$NON-NLS-1$
+            + "arrow_Width                = " + arrow_Width + NL //               //$NON-NLS-1$
+            + "arrow_Height               = " + arrow_Height + NL //              //$NON-NLS-1$
 
-            + "isShowSliderLocation       =" + isShowSliderLocation + NL //      //$NON-NLS-1$
-            + "sliderLocation_Left_Color  =" + sliderLocation_Left_Color + NL // //$NON-NLS-1$
-            + "sliderLocation_Right_Color =" + sliderLocation_Right_Color + NL ////$NON-NLS-1$
-            + "sliderLocation_Opacity     =" + sliderLocation_Opacity + NL //    //$NON-NLS-1$
-            + "sliderLocation_Size        =" + sliderLocation_Size + NL //       //$NON-NLS-1$
+            + "arrowFin_OutlineWidth      = " + arrowFin_OutlineWidth + NL //     //$NON-NLS-1$
+            + "arrowWing_OutlineWidth     = " + arrowWing_OutlineWidth + NL //    //$NON-NLS-1$
 
-            + "isShowSliderPath           =" + isShowSliderPath + NL //          //$NON-NLS-1$
-            + "sliderPath_Color           =" + sliderPath_Color + NL //          //$NON-NLS-1$
-            + "sliderPath_LineWidth       =" + sliderPath_LineWidth + NL //      //$NON-NLS-1$
-            + "sliderPath_Opacity         =" + sliderPath_Opacity + NL //        //$NON-NLS-1$
+            + "arrowFin_InsideColor       = " + arrowFin_InsideColor + NL //      //$NON-NLS-1$
+            + "arrowFin_OutlineColor      = " + arrowFin_OutlineColor + NL //     //$NON-NLS-1$
+            + "arrowWing_InsideColor      = " + arrowWing_InsideColor + NL //     //$NON-NLS-1$
+            + "arrowWing_OutlineColor     = " + arrowWing_OutlineColor + NL //    //$NON-NLS-1$
+            + NL
+            + "isShowOutline              = " + isShowOutline + NL //             //$NON-NLS-1$
+            + "outlineBrighness           = " + outlineBrighness + NL //          //$NON-NLS-1$
+            + "outlineWidth               = " + outlineWidth + NL //              //$NON-NLS-1$
+            + NL
+            + "isShowSliderLocation       = " + isShowSliderLocation + NL //      //$NON-NLS-1$
+            + "sliderLocation_Left_Color  = " + sliderLocation_Left_Color + NL // //$NON-NLS-1$
+            + "sliderLocation_Right_Color = " + sliderLocation_Right_Color + NL ////$NON-NLS-1$
+            + "sliderLocation_Opacity     = " + sliderLocation_Opacity + NL //    //$NON-NLS-1$
+            + "sliderLocation_Size        = " + sliderLocation_Size + NL //       //$NON-NLS-1$
+            + NL
+            + "isShowSliderPath           = " + isShowSliderPath + NL //          //$NON-NLS-1$
+            + "sliderPath_Color           = " + sliderPath_Color + NL //          //$NON-NLS-1$
+            + "sliderPath_LineWidth       = " + sliderPath_LineWidth + NL //      //$NON-NLS-1$
+            + "sliderPath_Opacity         = " + sliderPath_Opacity + NL //        //$NON-NLS-1$
 
-            + "testValue                  =" + testValue + NL //                 //$NON-NLS-1$
+            + "testValue                  = " + testValue + NL //                 //$NON-NLS-1$
 
             + "]" + NL //                                                        //$NON-NLS-1$
       ;

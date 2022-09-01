@@ -500,10 +500,6 @@ public class LineBucketMT extends RenderBucketMT {
 
          shader.useProgram();
 
-         GLState.blend(true);
-         GLState.test(true, false);
-         gl.depthMask(true);
-
          // set mvp matrix into the shader
          viewport.mvp.setAsUniform(shader_u_mvp);
 
@@ -533,10 +529,6 @@ public class LineBucketMT extends RenderBucketMT {
 
          final int numDirArrowShorts = allRenderBuckets.numShortsForDirectionArrows;
 
-         /*
-          * Draw direction arrows
-          */
-
 //       final float width = 10 / vp2mpScale;
 //
 //       gl.uniform1f(shader_u_width, width * COORD_SCALE_BY_DIR_SCALE);
@@ -550,7 +542,19 @@ public class LineBucketMT extends RenderBucketMT {
                trackConfig.arrowWing_OutlineWidth / 200f,
                trackConfig.arrowFin_OutlineWidth / 200f);
 
-         gl.drawArrays(GL.TRIANGLES, 0, numDirArrowShorts);
+         /*
+          * Draw direction arrows
+          */
+
+
+         GLState.test(true, false);
+         gl.depthMask(true);
+
+         gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
+         {
+            gl.drawArrays(GL.TRIANGLES, 0, numDirArrowShorts);
+         }
+         gl.blendFunc(GL.ONE, GL.ONE_MINUS_SRC_ALPHA); // Reset to default func
 
          gl.depthMask(false);
 
@@ -1218,15 +1222,20 @@ public class LineBucketMT extends RenderBucketMT {
                                   final short arrowPart_Wing) {
 // SET_FORMATTING_OFF
 
+      /*
+       * When the head and tail have the same z-value then the overlapping part is flickering
+       */
+      final short arrowHeadZ = (short) (arrowZ+1);
+
       // wing: left
-      addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
-      addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
-      addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  arrowZ,     arrowPart_Wing, 0, 0, 1);
+      addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowHeadZ,    arrowPart_Wing, 1, 0, 0);
+      addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,        arrowPart_Wing, 0, 1, 1);
+      addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  arrowZ,        arrowPart_Wing, 0, 0, 1);
 
       // wing: right
-      addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Wing, 1, 0, 0);
-      addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,     arrowPart_Wing, 0, 1, 1);
-      addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, arrowZ,     arrowPart_Wing, 0, 0, 1);
+      addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowHeadZ,    arrowPart_Wing, 1, 0, 0);
+      addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,        arrowPart_Wing, 0, 1, 1);
+      addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, arrowZ,        arrowPart_Wing, 0, 0, 1);
 
 // SET_FORMATTING_ON
    }

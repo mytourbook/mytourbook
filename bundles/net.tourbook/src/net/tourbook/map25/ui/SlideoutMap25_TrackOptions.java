@@ -49,6 +49,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -64,6 +65,13 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColorSelectorListener {
 
+// SET_FORMATTING_OFF
+
+   private static final String TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT_TOOLTIP   = net.tourbook.map3.Messages.TourTrack_Properties_Button_Default_Tooltip;
+   private static final String TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT           = net.tourbook.map3.Messages.TourTrack_Properties_Button_Default;
+
+// SET_FORMATTING_ON
+
    private Map25View               _map25View;
    //
    private MouseWheelListener      _defaultMouseWheelListener;
@@ -77,6 +85,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
    private ActionTrackColor        _actionGradientColor_Pace;
    private ActionTrackColor        _actionGradientColor_Pulse;
    private ActionTrackColor        _actionGradientColor_Speed;
+   //
    private boolean                 _isUpdateUI;
    //
    private PixelConverter          _pc;
@@ -250,7 +259,6 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
          MTFont.setBannerFont(title);
          GridDataFactory.fillDefaults()
                .align(SWT.BEGINNING, SWT.CENTER)
-               .span(2, 1)
                .applyTo(title);
       }
       {
@@ -269,6 +277,18 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
                // this is too small in linux
                // .hint(_pc.convertHorizontalDLUsToPixels(15 * 4), SWT.DEFAULT)
                .applyTo(_comboName);
+      }
+      {
+         /*
+          * Button: Reset
+          */
+         final Button btnReset = new Button(parent, SWT.PUSH);
+         btnReset.setText(TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT);
+         btnReset.setToolTipText(TOUR_TRACK_PROPERTIES_BUTTON_DEFAULT_TOOLTIP);
+         btnReset.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectConfig_Default(selectionEvent)));
+         GridDataFactory.fillDefaults()
+               .align(SWT.END, SWT.CENTER)
+               .applyTo(btnReset);
       }
    }
 
@@ -515,15 +535,19 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
              * Arrow vertical offset
              */
 
+            final String tooltipText = Messages.Slideout_Map25TrackOptions_Label_DirectionArrow_VerticalOffset_Tooltip;
+
             // label
             _lblArrow_VerticalOffset = new Label(container, SWT.NONE);
             _lblArrow_VerticalOffset.setText(Messages.Slideout_Map25TrackOptions_Label_DirectionArrow_VerticalOffset);
+            _lblArrow_VerticalOffset.setToolTipText(tooltipText);
             GridDataFactory.fillDefaults()
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(_lblArrow_VerticalOffset);
 
             // spinner
             _spinnerArrow_VerticalOffset = new Spinner(container, SWT.BORDER);
+            _spinnerArrow_VerticalOffset.setToolTipText(tooltipText);
             _spinnerArrow_VerticalOffset.setMinimum(-1000);
             _spinnerArrow_VerticalOffset.setMaximum(1000);
             _spinnerArrow_VerticalOffset.setIncrement(5);
@@ -628,6 +652,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
                // opacity
                _spinnerArrow_Wing_Inside_Opacity = new Spinner(colorContainer, SWT.BORDER);
+               _spinnerArrow_Wing_Inside_Opacity.setToolTipText(tooltipText);
                _spinnerArrow_Wing_Inside_Opacity.setMinimum(0);
                _spinnerArrow_Wing_Inside_Opacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
                _spinnerArrow_Wing_Inside_Opacity.setIncrement(1);
@@ -643,6 +668,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
                // opacity
                _spinnerArrow_Wing_Outline_Opacity = new Spinner(colorContainer, SWT.BORDER);
+               _spinnerArrow_Wing_Outline_Opacity.setToolTipText(tooltipText);
                _spinnerArrow_Wing_Outline_Opacity.setMinimum(0);
                _spinnerArrow_Wing_Outline_Opacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
                _spinnerArrow_Wing_Outline_Opacity.setIncrement(1);
@@ -699,6 +725,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
                // opacity
                _spinnerArrow_Fin_Inside_Opacity = new Spinner(colorContainer, SWT.BORDER);
+               _spinnerArrow_Fin_Inside_Opacity.setToolTipText(tooltipText);
                _spinnerArrow_Fin_Inside_Opacity.setMinimum(0);
                _spinnerArrow_Fin_Inside_Opacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
                _spinnerArrow_Fin_Inside_Opacity.setIncrement(1);
@@ -714,6 +741,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
                // opacity
                _spinnerArrow_Fin_Outline_Opacity = new Spinner(colorContainer, SWT.BORDER);
+               _spinnerArrow_Fin_Outline_Opacity.setToolTipText(tooltipText);
                _spinnerArrow_Fin_Outline_Opacity.setMinimum(0);
                _spinnerArrow_Fin_Outline_Opacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
                _spinnerArrow_Fin_Outline_Opacity.setIncrement(1);
@@ -784,6 +812,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
          {
             // opacity
             _spinnerSliderLocation_Opacity = new Spinner(colorContainer, SWT.BORDER);
+            _spinnerSliderLocation_Opacity.setToolTipText(tooltipText);
             _spinnerSliderLocation_Opacity.setMinimum(opacityMin);
             _spinnerSliderLocation_Opacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
             _spinnerSliderLocation_Opacity.setIncrement(1);
@@ -793,11 +822,13 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
             // color: left
             _colorSliderLocation_Left = new ColorSelectorExtended(colorContainer);
+            _colorSliderLocation_Left.setToolTipText(tooltipText);
             _colorSliderLocation_Left.addListener(_defaultPropertyChangeListener);
             _colorSliderLocation_Left.addOpenListener(this);
 
             // color: right
             _colorSliderLocation_Right = new ColorSelectorExtended(colorContainer);
+            _colorSliderLocation_Right.setToolTipText(tooltipText);
             _colorSliderLocation_Right.addListener(_defaultPropertyChangeListener);
             _colorSliderLocation_Right.addOpenListener(this);
          }
@@ -862,6 +893,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
          {
             // opacity
             _spinnerSliderPath_Opacity = new Spinner(container, SWT.BORDER);
+            _spinnerSliderPath_Opacity.setToolTipText(tooltipText);
             _spinnerSliderPath_Opacity.setMinimum(opacityMin);
             _spinnerSliderPath_Opacity.setMaximum(UI.TRANSFORM_OPACITY_MAX);
             _spinnerSliderPath_Opacity.setIncrement(1);
@@ -951,6 +983,27 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       final boolean isShowGradientColor = isColorMode_Gradient;
 
+      boolean isArrowWing = false;
+      boolean isArrowFin = false;
+
+      switch (getSelectedArrowDesign()) {
+      case WINGS:
+         isArrowWing = true;
+         break;
+
+      case WINGS_WITH_MIDDLE_FIN:
+      case WINGS_WITH_OUTER_FINS:
+         isArrowWing = true;
+         isArrowFin = true;
+         break;
+
+      case MIDDLE_FIN:
+      case OUTER_FINS:
+         isArrowFin = true;
+         break;
+      }
+// SET_FORMATTING_OFF
+
       /*
        * Track
        */
@@ -964,46 +1017,46 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       _rdoColorMode_Gradient.setEnabled(true);
       _rdoColorMode_Solid.setEnabled(true);
 
-      _colorLine_SolidColor.setEnabled(isColorMode_Solid);
-      _actionGradientColor_Elevation.setEnabled(isShowGradientColor);
-      _actionGradientColor_Gradient.setEnabled(isShowGradientColor);
-      _actionGradientColor_HrZone.setEnabled(isShowGradientColor);
-      _actionGradientColor_Pace.setEnabled(isShowGradientColor);
-      _actionGradientColor_Pulse.setEnabled(isShowGradientColor);
-      _actionGradientColor_Speed.setEnabled(isShowGradientColor);
+      _colorLine_SolidColor            .setEnabled(isColorMode_Solid);
+      _actionGradientColor_Elevation   .setEnabled(isShowGradientColor);
+      _actionGradientColor_Gradient    .setEnabled(isShowGradientColor);
+      _actionGradientColor_HrZone      .setEnabled(isShowGradientColor);
+      _actionGradientColor_Pace        .setEnabled(isShowGradientColor);
+      _actionGradientColor_Pulse       .setEnabled(isShowGradientColor);
+      _actionGradientColor_Speed       .setEnabled(isShowGradientColor);
 
       /*
        * Direction arrows
        */
-      _lblArrow_Design.setEnabled(isShowDirectionArrows);
-      _lblArrow_Fin.setEnabled(isShowDirectionArrows);
-      _lblArrow_MinimumDistance.setEnabled(isShowDirectionArrows);
-      _lblArrow_VerticalOffset.setEnabled(isShowDirectionArrows);
-      _lblArrow_Wing.setEnabled(isShowDirectionArrows);
-      _lblArrow_Wing_Scale.setEnabled(isShowDirectionArrows);
+      _lblArrow_Design                    .setEnabled(isShowDirectionArrows);
+      _lblArrow_Fin                       .setEnabled(isShowDirectionArrows);
+      _lblArrow_MinimumDistance           .setEnabled(isShowDirectionArrows);
+      _lblArrow_VerticalOffset            .setEnabled(isShowDirectionArrows);
+      _lblArrow_Wing                      .setEnabled(isShowDirectionArrows);
+      _lblArrow_Wing_Scale                .setEnabled(isShowDirectionArrows);
 
-      _comboArrowDesign.setEnabled(isShowDirectionArrows);
+      _comboArrowDesign                   .setEnabled(isShowDirectionArrows);
 
-      _spinnerArrow_MinimumDistance.setEnabled(isShowDirectionArrows);
-      _spinnerArrow_VerticalOffset.setEnabled(isShowDirectionArrows);
-      _spinnerArrow_Scale.setEnabled(isShowDirectionArrows);
+      _spinnerArrow_MinimumDistance       .setEnabled(isShowDirectionArrows);
+      _spinnerArrow_VerticalOffset        .setEnabled(isShowDirectionArrows);
+      _spinnerArrow_Scale                 .setEnabled(isShowDirectionArrows);
 
-      _spinnerArrow_Height.setEnabled(isShowDirectionArrows);
-      _spinnerArrow_Fin_Inside_Opacity.setEnabled(isShowDirectionArrows);
-      _spinnerArrow_Fin_Outline_Opacity.setEnabled(isShowDirectionArrows);
-      _spinnerArrow_Fin_Outline_Width.setEnabled(isShowDirectionArrows);
+      _spinnerArrow_Length                .setEnabled(isShowDirectionArrows);
+      _spinnerArrow_LengthCenter          .setEnabled(isShowDirectionArrows);
+      _spinnerArrow_Width                 .setEnabled(isShowDirectionArrows && isArrowWing);
+      _spinnerArrow_Height                .setEnabled(isShowDirectionArrows && isArrowFin);
 
-      _spinnerArrow_Wing_Inside_Opacity.setEnabled(isShowDirectionArrows);
-      _spinnerArrow_Length.setEnabled(isShowDirectionArrows);
-      _spinnerArrow_LengthCenter.setEnabled(isShowDirectionArrows);
-      _spinnerArrow_Wing_Outline_Opacity.setEnabled(isShowDirectionArrows);
-      _spinnerArrow_Wing_Outline_Width.setEnabled(isShowDirectionArrows);
-      _spinnerArrow_Width.setEnabled(isShowDirectionArrows);
+      _spinnerArrow_Fin_Inside_Opacity    .setEnabled(isShowDirectionArrows && isArrowFin);
+      _spinnerArrow_Fin_Outline_Opacity   .setEnabled(isShowDirectionArrows && isArrowFin);
+      _spinnerArrow_Fin_Outline_Width     .setEnabled(isShowDirectionArrows && isArrowFin);
+      _colorArrow_Fin_Inside              .setEnabled(isShowDirectionArrows && isArrowFin);
+      _colorArrow_Fin_Outline             .setEnabled(isShowDirectionArrows && isArrowFin);
 
-      _colorArrow_Fin_Inside.setEnabled(isShowDirectionArrows);
-      _colorArrow_Fin_Outline.setEnabled(isShowDirectionArrows);
-      _colorArrow_Wing_Inside.setEnabled(isShowDirectionArrows);
-      _colorArrow_Wing_Outline.setEnabled(isShowDirectionArrows);
+      _spinnerArrow_Wing_Inside_Opacity   .setEnabled(isShowDirectionArrows && isArrowWing);
+      _spinnerArrow_Wing_Outline_Opacity  .setEnabled(isShowDirectionArrows && isArrowWing);
+      _spinnerArrow_Wing_Outline_Width    .setEnabled(isShowDirectionArrows && isArrowWing);
+      _colorArrow_Wing_Inside             .setEnabled(isShowDirectionArrows && isArrowWing);
+      _colorArrow_Wing_Outline            .setEnabled(isShowDirectionArrows && isArrowWing);
 
       /*
        * Legend
@@ -1033,6 +1086,8 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       _spinnerSliderPath_LineWidth.setEnabled(isShowSliderPath);
       _spinnerSliderPath_Opacity.setEnabled(isShowSliderPath);
+
+// SET_FORMATTING_ON
    }
 
    private void fillUI() {
@@ -1040,16 +1095,20 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       final boolean backupIsUpdateUI = _isUpdateUI;
       _isUpdateUI = true;
       {
+         _comboName.removeAll();
+         _comboArrowDesign.removeAll();
+         _comboLegendUnitLayout.removeAll();
+
          for (final Map25TrackConfig config : Map25ConfigManager.getAllTourTrackConfigs()) {
             _comboName.add(config.name);
          }
 
-         for (final LegendUnitLayoutItem layout : MapUI.ALL_LEGEND_UNIT_LAYOUTS) {
-            _comboLegendUnitLayout.add(layout.label);
-         }
-
          for (final DirectionArrowLayoutItem layout : MapUI.ALL_DIRECTION_ARROW_DESIGNS) {
             _comboArrowDesign.add(layout.label);
+         }
+
+         for (final LegendUnitLayoutItem layout : MapUI.ALL_LEGEND_UNIT_LAYOUTS) {
+            _comboLegendUnitLayout.add(layout.label);
          }
       }
       _isUpdateUI = backupIsUpdateUI;
@@ -1199,10 +1258,34 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       // update model
       Map25ConfigManager.setActiveTrackConfig(selectedConfig);
 
-      // force rerendering, new config could change "Show direction arrows"
+      // force rerendering, new config could change vertices
       _isVerticesModified = true;
 
-      // update UI
+      // update UI/map
+      updateUI_SetActiveConfig();
+   }
+
+   private void onSelectConfig_Default(final SelectionEvent selectionEvent) {
+
+      if (Util.isCtrlKeyPressed(selectionEvent)) {
+
+         // reset All configurations
+
+         Map25ConfigManager.resetAllTrackConfigurations();
+
+         fillUI();
+
+      } else {
+
+         // reset active config
+
+         Map25ConfigManager.resetActiveTrackConfiguration();
+      }
+
+      // force rerendering, new config could change vertices
+      _isVerticesModified = true;
+
+      // update UI/map
       updateUI_SetActiveConfig();
    }
 
@@ -1389,6 +1472,10 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 // SET_FORMATTING_ON
 
       config.updateShaderArrowColors();
+
+      // dump config which is helpful when setting default values
+//    System.out.println(" [" + getClass().getSimpleName() + "] \n\n" + config); //$NON-NLS-1$ //$NON-NLS-2$
+// TODO remove SYSTEM.OUT.PRINTLN
    }
 
    private void selectGradientColorAction() {

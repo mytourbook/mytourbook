@@ -118,17 +118,17 @@ public class Map25ConfigManager {
    /*
     * Tour tracks
     */
-   private static final String              TAG_TOUR_TRACKS                       = "TourTracks";                 //$NON-NLS-1$
-   private static final String              TAG_TRACK                             = "Track";                      //$NON-NLS-1$
+   private static final String              TAG_TOUR_TRACKS                       = "TourTracks";                    //$NON-NLS-1$
+   private static final String              TAG_TRACK                             = "Track";                         //$NON-NLS-1$
    //
-   private static final String              TAG_LINE                              = "Line";                       //$NON-NLS-1$
-   private static final String              ATTR_LINE_COLOR_MODE                  = "lineColorMode";              //$NON-NLS-1$
-   private static final String              ATTR_LINE_GRADIENT_COLOR_GRAPH_ID     = "gradientColorGraphId";       //$NON-NLS-1$
-   private static final String              ATTR_LINE_OPACITY                     = "lineOpacity";                //$NON-NLS-1$
-   private static final String              ATTR_LINE_WIDTH                       = "lineWidth";                  //$NON-NLS-1$
-   private static final String              ATTR_OUTLINE_IS_SHOW_OUTLINE          = "isShowOutline";              //$NON-NLS-1$
-   private static final String              ATTR_OUTLINE_WIDTH                    = "outlineWidth";               //$NON-NLS-1$
-   private static final String              ATTR_OUTLINE_BRIGHTNESS               = "outlineBrightness";          //$NON-NLS-1$
+   private static final String              TAG_LINE                              = "Line";                          //$NON-NLS-1$
+   private static final String              ATTR_LINE_COLOR_MODE                  = "lineColorMode";                 //$NON-NLS-1$
+   private static final String              ATTR_LINE_GRADIENT_COLOR_GRAPH_ID     = "gradientColorGraphId";          //$NON-NLS-1$
+   private static final String              ATTR_LINE_OPACITY                     = "lineOpacity";                   //$NON-NLS-1$
+   private static final String              ATTR_LINE_WIDTH                       = "lineWidth";                     //$NON-NLS-1$
+   private static final String              ATTR_OUTLINE_IS_SHOW_OUTLINE          = "isShowOutline";                 //$NON-NLS-1$
+   private static final String              ATTR_OUTLINE_WIDTH                    = "outlineWidth";                  //$NON-NLS-1$
+   private static final String              ATTR_OUTLINE_BRIGHTNESS               = "outlineBrightness";             //$NON-NLS-1$
    //
    public static final boolean              LINE_IS_TRACK_VERTICAL_OFFSET_DEFAULT = false;
    public static final int                  LINE_TRACK_VERTICAL_OFFSET_DEFAULT    = 20;
@@ -137,9 +137,9 @@ public class Map25ConfigManager {
    public static final LineColorMode        LINE_COLOR_MODE_DEFAULT               = LineColorMode.GRADIENT;
    public static final MapGraphId           LINE_GRADIENT_COLOR_GRAPH_ID_DEFAULT  = MapGraphId.Altitude;
    //
-   public static final int                  LINE_OPACITY_MIN                      = 26;                           // 10 %
+   public static final int                  LINE_OPACITY_MIN                      = 26;                              // 10 %
    public static final int                  LINE_OPACITY_MAX                      = 0xff;
-   public static final int                  LINE_OPACITY_DEFAULT                  = 180;                          // 70 %
+   public static final int                  LINE_OPACITY_DEFAULT                  = 180;                             // 70 %
    public static final int                  LINE_WIDTH_MIN                        = 1;
    public static final int                  LINE_WIDTH_MAX                        = 20;
    public static final float                LINE_WIDTH_DEFAULT                    = 2.5f;
@@ -152,47 +152,47 @@ public class Map25ConfigManager {
    public static final int                  OUTLINE_WIDTH_MAX                     = 20;
    public static final float                OUTLINE_WIDTH_DEFAULT                 = 2f;
    //
-   private static final String              TAG_DIRECTION_ARROW                   = "DirectionArrow";             //$NON-NLS-1$
-   private static final String              ATTR_ARROW_IS_SHOW_ARROW              = "isShowDirectionArrow";       //$NON-NLS-1$
-   private static final String              ATTR_ARROW_DESIGN                     = "design";                     //$NON-NLS-1$
-   private static final String              ATTR_ARROW_MIN_DISTANCE               = "minDistance";                //$NON-NLS-1$
-   private static final String              ATTR_ARROW_VERTICAL_OFFSET            = "verticalOffset";             //$NON-NLS-1$
+   private static final String              TAG_DIRECTION_ARROW                   = "DirectionArrow";                //$NON-NLS-1$
+   private static final String              ATTR_ARROW_IS_SHOW_ARROW              = "isShowDirectionArrow";          //$NON-NLS-1$
+   private static final String              ATTR_ARROW_DESIGN                     = "design";                        //$NON-NLS-1$
+   private static final String              ATTR_ARROW_MIN_DISTANCE               = "minDistance";                   //$NON-NLS-1$
+   private static final String              ATTR_ARROW_VERTICAL_OFFSET            = "verticalOffset";                //$NON-NLS-1$
    //
-   private static final String              ATTR_ARROW_SCALE                      = "scale";                      //$NON-NLS-1$
-   private static final String              ATTR_ARROW_LENGTH                     = "length";                     //$NON-NLS-1$
-   private static final String              ATTR_ARROW_LENGTH_CENTER              = "lengthCenter";               //$NON-NLS-1$
-   private static final String              ATTR_ARROW_WIDTH                      = "width";                      //$NON-NLS-1$
-   private static final String              ATTR_ARROW_HEIGHT                     = "height";                     //$NON-NLS-1$
+   private static final String              ATTR_ARROW_SCALE                      = "scale";                         //$NON-NLS-1$
+   private static final String              ATTR_ARROW_LENGTH                     = "length";                        //$NON-NLS-1$
+   private static final String              ATTR_ARROW_LENGTH_CENTER              = "lengthCenter";                  //$NON-NLS-1$
+   private static final String              ATTR_ARROW_WIDTH                      = "width";                         //$NON-NLS-1$
+   private static final String              ATTR_ARROW_HEIGHT                     = "height";                        //$NON-NLS-1$
    //
-   private static final String              ATTR_ARROW_FIN_OUTLINE_WIDTH          = "finOutlineWidth";            //$NON-NLS-1$
-   private static final String              ATTR_ARROW_WING_OUTLINE_WIDTH         = "wingOutlineWidth";           //$NON-NLS-1$
+   private static final String              ATTR_ARROW_FIN_OUTLINE_WIDTH          = "finOutlineWidth";               //$NON-NLS-1$
+   private static final String              ATTR_ARROW_WING_OUTLINE_WIDTH         = "wingOutlineWidth";              //$NON-NLS-1$
    //
-   private static final String              TAG_ARROW_FIN_INSIDE_COLOR            = "FinInsideColor";             //$NON-NLS-1$
-   private static final String              TAG_ARROW_FIN_OUTLINE_COLOR           = "FinOutlineColor";            //$NON-NLS-1$
-   private static final String              TAG_ARROW_WING_INSIDE_COLOR           = "wingInsideColor";            //$NON-NLS-1$
-   private static final String              TAG_ARROW_WING_OUTLINE_COLOR          = "wingOutlineColor";           //$NON-NLS-1$
+   private static final String              TAG_ARROW_FIN_INSIDE_COLOR            = "FinInsideColor";                //$NON-NLS-1$
+   private static final String              TAG_ARROW_FIN_OUTLINE_COLOR           = "FinOutlineColor";               //$NON-NLS-1$
+   private static final String              TAG_ARROW_WING_INSIDE_COLOR           = "wingInsideColor";               //$NON-NLS-1$
+   private static final String              TAG_ARROW_WING_OUTLINE_COLOR          = "wingOutlineColor";              //$NON-NLS-1$
    //
    public static final boolean              ARROW_IS_SHOW_ARROW_DEFAULT           = true;
    public static final DirectionArrowDesign ARROW_DESIGN_DEFAULT                  = DirectionArrowDesign.WINGS;
-   public static final int                  ARROW_MIN_DISTANCE_DEFAULT            = 40;
+   public static final int                  ARROW_MIN_DISTANCE_DEFAULT            = 60;
    public static final int                  ARROW_VERTICAL_OFFSET_DEFAULT         = 30;
    //
    public static final int                  ARROW_SCALE_DEFAULT                   = 10;
-   public static final int                  ARROW_LENGTH_DEFAULT                  = 50;
-   public static final int                  ARROW_LENGTH_CENTER_DEFAULT           = 40;
+   public static final int                  ARROW_LENGTH_DEFAULT                  = 40;
+   public static final int                  ARROW_LENGTH_CENTER_DEFAULT           = 30;
    public static final int                  ARROW_WIDTH_DEFAULT                   = 40;
    public static final int                  ARROW_HEIGHT_DEFAULT                  = 20;
    //
-   public static final int                  ARROW_FIN_OUTLINE_WIDTH_DEFAULT       = 30;
-   public static final int                  ARROW_WING_OUTLINE_WIDTH_DEFAULT      = 70;
+   public static final int                  ARROW_FIN_OUTLINE_WIDTH_DEFAULT       = 5;
+   public static final int                  ARROW_WING_OUTLINE_WIDTH_DEFAULT      = 10;
    //
-   public static final RGBA                 ARROW_FIN_INSIDE_COLOR_DEFAULT        = new RGBA(25, 25, 25, 25);
-   public static final RGBA                 ARROW_FIN_OUTLINE_COLOR_DEFAULT       = new RGBA(200, 200, 200, 0Xff);
-   public static final RGBA                 ARROW_WING_INSIDE_COLOR_DEFAULT       = new RGBA(25, 25, 25, 175);
-   public static final RGBA                 ARROW_WING_OUTLINE_COLOR_DEFAULT      = new RGBA(0xff, 50, 50, 0xff);
+   public static final RGBA                 ARROW_FIN_INSIDE_COLOR_DEFAULT        = new RGBA(0x10, 0x10, 0x10, 0x80);
+   public static final RGBA                 ARROW_FIN_OUTLINE_COLOR_DEFAULT       = new RGBA(0xff, 0xff, 0xff, 0xff);
+   public static final RGBA                 ARROW_WING_INSIDE_COLOR_DEFAULT       = new RGBA(0x10, 0x10, 0x10, 0x80);
+   public static final RGBA                 ARROW_WING_OUTLINE_COLOR_DEFAULT      = new RGBA(0xff, 0x20, 0x20, 0xff);
    //
-   private static final String              TAG_LEGEND                            = "Legend";                     //$NON-NLS-1$
-   private static final String              ATTR_LEGEND_UNIT_LAYOUT               = "unitLayout";                 //$NON-NLS-1$
+   private static final String              TAG_LEGEND                            = "Legend";                        //$NON-NLS-1$
+   private static final String              ATTR_LEGEND_UNIT_LAYOUT               = "unitLayout";                    //$NON-NLS-1$
    //
    // slider location/path
    private static final String TAG_SLIDER_PATH                     = "SliderPath";             //$NON-NLS-1$
@@ -214,7 +214,7 @@ public class Map25ConfigManager {
    public static final int     SLIDER_LOCATION_OPACITY_DEFAULT     = 0xff;
    public static final int     SLIDER_LOCATION_SIZE_MIN            = 10;
    public static final int     SLIDER_LOCATION_SIZE_MAX            = 100;
-   public static final int     SLIDER_LOCATION_SIZE_DEFAULT        = 30;
+   public static final int     SLIDER_LOCATION_SIZE_DEFAULT        = 20;
    //
    public static final boolean SLIDER_IS_SHOW_CHART_SLIDER_DEFAULT = true;
    public static final RGB     SLIDER_PATH_COLOR_DEFAULT           = new RGB(0xff, 0xff, 0x0);
@@ -376,70 +376,73 @@ public class Map25ConfigManager {
       final RGB bg4 = new RGB(0xFF, 0xC9, 0x00);
       final RGB bg5 = new RGB(0xFF, 0x00, 0x62);
 
-      config.clusterAlgorithm = ClusterAlgorithm.FirstMarker_Distance;
-      config.markerOutline_Color = fgBlack;
-      config.markerFill_Color = fgWhite;
+// SET_FORMATTING_OFF
+
+      config.clusterAlgorithm       = ClusterAlgorithm.FirstMarker_Distance;
+      config.markerOutline_Color    = fgBlack;
+      config.markerFill_Color       = fgWhite;
 
       switch (configIndex) {
 
       case 1:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_1;
-         config.clusterOutline_Color = fgBlack;
-         config.clusterFill_Color = bg1;
-         config.markerOutline_Color = fgBlack;
-         config.markerFill_Color = bg5;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_1;
+         config.clusterOutline_Color   = fgBlack;
+         config.clusterFill_Color      = bg1;
+         config.markerOutline_Color    = fgBlack;
+         config.markerFill_Color       = bg5;
          break;
       case 2:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_2;
-         config.clusterOutline_Color = fgWhite;
-         config.clusterFill_Color = bg1;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_2;
+         config.clusterOutline_Color   = fgWhite;
+         config.clusterFill_Color      = bg1;
          break;
 
       case 3:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_3;
-         config.clusterOutline_Color = fgBlack;
-         config.clusterFill_Color = bg2;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_3;
+         config.clusterOutline_Color   = fgBlack;
+         config.clusterFill_Color      = bg2;
          break;
       case 4:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_4;
-         config.clusterOutline_Color = fgWhite;
-         config.clusterFill_Color = bg2;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_4;
+         config.clusterOutline_Color   = fgWhite;
+         config.clusterFill_Color      = bg2;
          break;
 
       case 5:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_5;
-         config.clusterOutline_Color = fgBlack;
-         config.clusterFill_Color = bg3;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_5;
+         config.clusterOutline_Color   = fgBlack;
+         config.clusterFill_Color      = bg3;
          break;
       case 6:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_6;
-         config.clusterOutline_Color = fgWhite;
-         config.clusterFill_Color = bg3;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_6;
+         config.clusterOutline_Color   = fgWhite;
+         config.clusterFill_Color      = bg3;
          break;
 
       case 7:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_7;
-         config.clusterOutline_Color = fgBlack;
-         config.clusterFill_Color = bg4;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_7;
+         config.clusterOutline_Color   = fgBlack;
+         config.clusterFill_Color      = bg4;
          break;
       case 8:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_8;
-         config.clusterOutline_Color = fgWhite;
-         config.clusterFill_Color = bg4;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_8;
+         config.clusterOutline_Color   = fgWhite;
+         config.clusterFill_Color      = bg4;
          break;
 
       case 9:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_9;
-         config.clusterOutline_Color = fgBlack;
-         config.clusterFill_Color = bg5;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_9;
+         config.clusterOutline_Color   = fgBlack;
+         config.clusterFill_Color      = bg5;
          break;
       case 10:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_10;
-         config.clusterOutline_Color = fgWhite;
-         config.clusterFill_Color = bg5;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_10;
+         config.clusterOutline_Color   = fgWhite;
+         config.clusterFill_Color      = bg5;
          break;
-
       }
+
+// SET_FORMATTING_ON
 
       return config;
    }
@@ -449,8 +452,8 @@ public class Map25ConfigManager {
       _allTrackConfigs.clear();
 
       // append custom configurations
-      for (int customIndex = 1; customIndex < 11; customIndex++) {
-         _allTrackConfigs.add(createDefaults_Tracks_One(customIndex));
+      for (int configIndex = 1; configIndex <= 10; configIndex++) {
+         _allTrackConfigs.add(createDefaults_Tracks_One(configIndex));
       }
    }
 
@@ -465,59 +468,100 @@ public class Map25ConfigManager {
 
       final Map25TrackConfig config = new Map25TrackConfig();
 
+// SET_FORMATTING_OFF
+
       switch (configIndex) {
 
       case 1:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_1;
-         config.lineWidth = LINE_WIDTH_DEFAULT;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_1;
+         config.lineWidth              = LINE_WIDTH_DEFAULT;
+
+         config.arrow_Design           = DirectionArrowDesign.WINGS;
          break;
 
       case 2:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_2;
-         config.lineWidth = 1;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_2;
+         config.lineWidth              = 1;
+
+         config.arrow_Design           = DirectionArrowDesign.WINGS_WITH_MIDDLE_FIN;
          break;
 
       case 3:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_3;
-         config.lineWidth = 3;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_3;
+         config.lineWidth              = 3;
+
+         config.arrow_Design           = DirectionArrowDesign.WINGS_WITH_OUTER_FINS;
          break;
 
       case 4:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_4;
-         config.lineWidth = 4;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_4;
+         config.lineWidth              = 4;
+
+         config.arrow_Design           = DirectionArrowDesign.MIDDLE_FIN;
          break;
 
       case 5:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_5;
-         config.lineWidth = 5;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_5;
+         config.lineWidth              = 5;
+
+         config.arrow_Design           = DirectionArrowDesign.OUTER_FINS;
+
+         config.isShowSliderLocation   = false;
+         config.isShowSliderPath       = false;
          break;
 
       case 6:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_6;
-         config.lineWidth = 6;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_6;
+         config.lineWidth              = 6;
+
+         config.arrow_Design           = DirectionArrowDesign.WINGS;
+
+         config.isShowSliderLocation   = false;
+         config.isShowSliderPath       = false;
          break;
 
       case 7:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_7;
-         config.lineWidth = 7;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_7;
+         config.lineWidth              = 7;
+
+         config.arrow_Design           = DirectionArrowDesign.WINGS_WITH_MIDDLE_FIN;
+
+         config.isShowSliderLocation   = false;
+         config.isShowSliderPath       = false;
          break;
 
       case 8:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_8;
-         config.lineWidth = 8;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_8;
+         config.lineWidth              = 8;
+
+         config.arrow_Design           = DirectionArrowDesign.WINGS_WITH_OUTER_FINS;
+
+         config.isShowSliderLocation   = false;
+         config.isShowSliderPath       = false;
          break;
 
       case 9:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_9;
-         config.lineWidth = 9;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_9;
+         config.lineWidth              = 9;
+
+         config.arrow_Design           = DirectionArrowDesign.MIDDLE_FIN;
+
+         config.isShowSliderLocation   = false;
+         config.isShowSliderPath       = false;
          break;
 
       case 10:
-         config.name = config.defaultId = CONFIG_DEFAULT_ID_10;
-         config.lineWidth = 10;
-         break;
+         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_10;
+         config.lineWidth              = 10;
 
+         config.arrow_Design           = DirectionArrowDesign.OUTER_FINS;
+
+         config.isShowSliderLocation   = false;
+         config.isShowSliderPath       = false;
+         break;
       }
+
+// SET_FORMATTING_ON
 
       return config;
    }
@@ -998,19 +1042,39 @@ public class Map25ConfigManager {
       // do not replace the name
       final String oldName = _activeMarkerConfig.name;
 
-      final int activeMarkerConfigIndex = getActiveMarkerConfigIndex();
+      final int activeConfigIndex = getActiveMarkerConfigIndex();
 
       // remove old config
       _allMarkerConfigs.remove(_activeMarkerConfig);
 
       // create new config
-      final int configIndex = activeMarkerConfigIndex + 1;
-      final MarkerConfig newConfig = createDefaults_Markers_One(configIndex);
+      final int configID = activeConfigIndex + 1;
+      final MarkerConfig newConfig = createDefaults_Markers_One(configID);
       newConfig.name = oldName;
 
       // update model
       setActiveMarkerConfig(newConfig);
-      _allMarkerConfigs.add(activeMarkerConfigIndex, newConfig);
+      _allMarkerConfigs.add(activeConfigIndex, newConfig);
+   }
+
+   public static void resetActiveTrackConfiguration() {
+
+      // do not replace the name
+      final String oldName = _activeTrackConfig.name;
+
+      final int activeConfigIndex = getActiveTourTrackConfigIndex();
+
+      // remove old config
+      _allTrackConfigs.remove(_activeTrackConfig);
+
+      // create new config
+      final int configID = activeConfigIndex + 1;
+      final Map25TrackConfig newConfig = createDefaults_Tracks_One(configID);
+      newConfig.name = oldName;
+
+      // update model
+      setActiveTrackConfig(newConfig);
+      _allTrackConfigs.add(activeConfigIndex, newConfig);
    }
 
    public static void resetAllMarkerConfigurations() {
@@ -1018,6 +1082,13 @@ public class Map25ConfigManager {
       createDefaults_Markers();
 
       setActiveMarkerConfig(_allMarkerConfigs.get(0));
+   }
+
+   public static void resetAllTrackConfigurations() {
+
+      createDefaults_Tracks();
+
+      setActiveTrackConfig(_allTrackConfigs.get(0));
    }
 
    private static void restoreState_10_Options(final XMLMemento xmlRoot) {

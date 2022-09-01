@@ -2065,6 +2065,7 @@ public class Messages extends NLS {
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrow_Size;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrow_Size_Tooltip;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrow_VerticalOffset;
+   public static String        Slideout_Map25TrackOptions_Label_DirectionArrow_VerticalOffset_Tooltip;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrow_Wing;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrow_Wing_Tooltip;
    public static String        Slideout_Map25TrackOptions_Label_DirectionArrows;
