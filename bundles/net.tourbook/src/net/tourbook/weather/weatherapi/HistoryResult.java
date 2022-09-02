@@ -232,7 +232,7 @@ public class HistoryResult {
 
    public String getWeatherType() {
 
-      String weatherType = IWeather.cloudIsNotDefined;
+      String weatherType = UI.EMPTY_STRING;
 
       if (middleHourData == null) {
          return weatherType;
@@ -305,7 +305,7 @@ public class HistoryResult {
          weatherType = IWeather.WEATHER_ID_DRIZZLE;
          break;
       default:
-         weatherType = IWeather.cloudIsNotDefined;
+         weatherType = UI.EMPTY_STRING;
          break;
       }
 

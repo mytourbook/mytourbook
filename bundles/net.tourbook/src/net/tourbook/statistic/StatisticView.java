@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.statistic;
+
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import gnu.trove.list.array.TIntArrayList;
 
@@ -61,11 +63,8 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -74,7 +73,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -125,14 +123,14 @@ public class StatisticView extends ViewPart implements ITourProvider {
    private Action_StatisticOptions      _action_StatisticOptions;
    private ActionSynchChartScale        _action_SynchChartScale;
 
-   private boolean                      _isInTourSelection;
-   private boolean                      _isSynchScaleEnabled;
-   private boolean                      _isVerticalOrderDisabled;
+//   private boolean                      _isInTourSelection;
+   private boolean        _isSynchScaleEnabled;
+   private boolean        _isVerticalOrderDisabled;
 
-   private int                          _minimumComboWidth;
-   private int                          _maximumComboWidth;
+   private int            _minimumComboWidth;
+   private int            _maximumComboWidth;
 
-   private PixelConverter               _pc;
+   private PixelConverter _pc;
 
    /*
     * UI controls
@@ -243,56 +241,49 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
+      _prefChangeListener = propertyChangeEvent -> {
 
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+         final String property = propertyChangeEvent.getProperty();
 
-            final String property = event.getProperty();
+         /*
+          * set a new chart configuration when the preferences has changed
+          */
 
-            /*
-             * set a new chart configuration when the preferences has changed
-             */
+         if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
+               || property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)
+               || property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)
 
-            if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)
-                  || property.equals(ITourbookPreferences.TOUR_TYPE_LIST_IS_MODIFIED)
-                  || property.equals(ITourbookPreferences.TOUR_PERSON_LIST_IS_MODIFIED)
+         // first day of week has changed
+               || property.equals(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK)
+               || property.equals(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK)) {
 
-            // first day of week has changed
-                  || property.equals(ICommonPreferences.CALENDAR_WEEK_FIRST_DAY_OF_WEEK)
-                  || property.equals(ICommonPreferences.CALENDAR_WEEK_MIN_DAYS_IN_FIRST_WEEK)) {
+            _activePerson = TourbookPlugin.getActivePerson();
+            _activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
 
-               _activePerson = TourbookPlugin.getActivePerson();
-               _activeTourTypeFilter = TourbookPlugin.getActiveTourTypeFilter();
+            updateStatistic();
 
-               updateStatistic();
+         } else if (property.equals(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS)) {
 
-            } else if (property.equals(ITourbookPreferences.STATISTICS_STATISTIC_PROVIDER_IDS)) {
-
-               refreshStatisticProvider();
-            }
+            refreshStatisticProvider();
          }
       };
 
       /*
        * Common preferences
        */
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
+         if (property.equals(ICommonPreferences.TIME_ZONE_LOCAL_ID)) {
 
-               updateStatistic();
+            updateStatistic();
 
-            } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         } else if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-               // measurement system has changed
+            // measurement system has changed
 
-               updateStatistic();
-            }
+            updateStatistic();
          }
       };
 
@@ -304,18 +295,14 @@ public class StatisticView extends ViewPart implements ITourProvider {
    private void addSelectionListener() {
 
       // this view part is a selection listener
-      _postSelectionListener = new ISelectionListener() {
+      _postSelectionListener = (part, selection) -> {
 
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+         if (part == StatisticView.this) {
+            return;
+         }
 
-            if (part == StatisticView.this) {
-               return;
-            }
-
-            if (selection instanceof SelectionDeletedTours) {
-               updateStatistic();
-            }
+         if (selection instanceof SelectionDeletedTours) {
+            updateStatistic();
          }
       };
 
@@ -349,7 +336,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
          } else if ((tourEventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
 
-            onSelectionChanged((ISelection) eventData);
+            //           onSelectionChanged((ISelection) eventData);
 
          } else if (tourEventId == TourEventId.UPDATE_UI ||
                tourEventId == TourEventId.ALL_TOURS_ARE_MODIFIED) {
@@ -402,7 +389,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 
          if (_statContainer.isDisposed()) {
 
-            // this can occure when view is closed (very early) but not yet visible
+            // this can occur when view is closed (very early) but not yet visible
             return;
          }
 
@@ -449,12 +436,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
             _comboStatistics.setToolTipText(Messages.Tour_Book_Combo_statistic_tooltip);
             _comboStatistics.setVisibleItemCount(50);
 
-            _comboStatistics.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelectStatistic();
-               }
-            });
+            _comboStatistics.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectStatistic()));
          }
 
          {
@@ -472,12 +454,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
                   .hint(_pc.convertWidthInCharsToPixels(IS_OSX ? 12 : IS_LINUX ? 12 : 5), SWT.DEFAULT)
                   .applyTo(_comboYear);
 
-            _comboYear.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelectYear(true);
-               }
-            });
+            _comboYear.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectYear(true)));
          }
 
          {
@@ -495,12 +472,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
                   .hint(_pc.convertWidthInCharsToPixels(IS_OSX ? 8 : IS_LINUX ? 8 : 4), SWT.DEFAULT)
                   .applyTo(_comboNumberOfYears);
 
-            _comboNumberOfYears.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelectYear(true);
-               }
-            });
+            _comboNumberOfYears.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectYear(true)));
          }
 
          {
@@ -519,12 +491,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
                   //                .hint(defaultTextSize.x, SWT.DEFAULT)
                   .applyTo(_comboBarVerticalOrder);
 
-            _comboBarVerticalOrder.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelectBarVerticalOrder();
-               }
-            });
+            _comboBarVerticalOrder.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectBarVerticalOrder()));
          }
       }
    }
@@ -691,8 +658,8 @@ public class StatisticView extends ViewPart implements ITourProvider {
       _activeStatistic.setBarVerticalOrder(_comboBarVerticalOrder.getSelectionIndex());
    }
 
-   private void onSelectionChanged(final ISelection selection) {
-      // TODO Auto-generated method stub
+//   private void onSelectionChanged(final ISelection selection) {
+   // TODO Auto-generated method stub
 
 //      if (selection instanceof SelectionTourId) {
 //
@@ -705,7 +672,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
 //
 //         _isInTourSelection = false;
 //      }
-   }
+//   }
 
    private void onSelectStatistic() {
 
@@ -876,7 +843,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
       firstYear--;
 
       /*
-       * Create a continuos sequence of available years otherwise the year can jump when data are
+       * Create a continuous sequence of available years otherwise the year can jump when data are
        * not available for every year
        */
       _comboYear.removeAll();

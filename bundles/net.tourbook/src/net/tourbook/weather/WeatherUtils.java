@@ -34,7 +34,7 @@ public class WeatherUtils {
 
    public static final int    SECONDS_PER_THIRTY_MINUTE = 1800;
 
-   public static final String HEROKU_APP_URL            = "https://passeur-mytourbook-oauthapps.herokuapp.com"; //$NON-NLS-1$
+   public static final String HEROKU_APP_URL            = "https://passeur-mytourbook-oauthapps.cyclic.app"; //$NON-NLS-1$
 
    /**
     * Returns the fully detailed weather data as a human readable string.
@@ -72,6 +72,10 @@ public class WeatherUtils {
                                                    final float snowFallValue,
                                                    final TourDateTime tourDateTime,
                                                    final boolean isDisplayEmptyValues) {
+
+      if (tourDateTime == null) {
+         return UI.EMPTY_STRING;
+      }
 
       final String tourTime = String.format("%3s", tourDateTime.tourZonedDateTime.getHour() + UI.UNIT_LABEL_TIME); //$NON-NLS-1$
 

@@ -140,6 +140,25 @@
 		<item key="Pinned_ToolTip_PinnedLocation" value="TopRight"/>
 		<item key="Pinned_ToolTip_MouseXPositionRelative" value="0"/>
 		<item key="Pinned_ToolTip_IsToolTipAboveValuePoint" value="true"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTITUDE" value="true"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_ALTIMETER" value="true"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_CADENCE" value="true"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_GEARS" value="false"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_GRADIENT" value="true"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE" value="true"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_PACE_SUMMARIZED" value="true"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_POWER" value="true"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_PULSE" value="true"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED" value="true"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_SPEED_SUMMARIZED" value="true"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_TEMPERATURE" value="false"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME" value="false"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STANCE_TIME_BALANCED" value="false"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_STEP_LENGTH" value="true"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_OSCILLATION" value="false"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_RUN_DYN_VERTICAL_RATIO" value="false"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_STROKES" value="true"/>
+		<item key="STATE_IS_SHOW_IN_CHART_TOOLBAR_SWIM_SWOLF" value="false"/>
 	</section>
 	<section name="net.tourbook.views.TourSegmenter">
 	</section>
@@ -176,13 +195,13 @@
 		<item key="XML_STATE_EASY_IMPORT" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;EasyImportConfig&gt;&#x0D;&#x0A;&lt;DashConfig animationCrazyFactor=&quot;1&quot; animationDuration=&quot;20&quot; backgroundOpacity=&quot;5&quot; isLiveUpdate=&quot;true&quot; isLogDetails=&quot;false&quot; isShowTile_CloudApps=&quot;true&quot; isShowTile_Files=&quot;true&quot; isShowTile_FossilUI=&quot;true&quot; isShowTile_SerialPort=&quot;false&quot; isShowTile_SerialPortWithConfig=&quot;false&quot; stateTooltipDisplayAbsoluteFilePath=&quot;false&quot; stateTooltipWidth=&quot;500&quot; tileSize=&quot;100&quot; uiColumns=&quot;5&quot;/&gt;&#x0D;&#x0A;&lt;ImportConfig backupFolder=&quot;&quot; deviceFiles=&quot;*&quot; deviceFolder=&quot;&quot; deviceType=&quot;0&quot; isActiveConfig=&quot;true&quot; isCreateBackup=&quot;true&quot; isDeleteDeviceFiles=&quot;false&quot; isTurnOffWatching=&quot;false&quot; name=&quot;My Tour Recording Device&quot;/&gt;&#x0D;&#x0A;&lt;LauncherConfig description=&quot;Start easy import with this configuration.&quot; isAdjustTemperature=&quot;false&quot; isReplaceFirstTimeSliceElevation=&quot;false&quot; isRetrieveWeatherData=&quot;false&quot; isSaveTour=&quot;false&quot; isSetLastMarker=&quot;false&quot; isSetTourType=&quot;false&quot; isShowInDashBoard=&quot;true&quot; lastMarkerDistance=&quot;0&quot; lastMarkerText=&quot;&quot; name=&quot;Start Import&quot; temperatureAdjustmentDuration=&quot;720&quot; tourAverageTemperature=&quot;15.0&quot;/&gt;&#x0D;&#x0A;&lt;/EasyImportConfig&gt;"/>
 	</section>
 	<section name="net.tourbook.views.tourListView">
-		<item key="STATE_SELECTED_YEAR" value="2020"/>
-		<item key="STATE_SELECTED_MONTH" value="2"/>
+		<item key="STATE_SELECTED_YEAR" value="2015"/>
+		<item key="STATE_SELECTED_MONTH" value="5"/>
 		<item key="STATE_IS_SELECT_YEAR_MONTH_TOURS" value="false"/>
 		<item key="STATE_IS_LINK_WITH_OTHER_VIEWS" value="false"/>
 		<item key="STATE_VIEW_LAYOUT" value="CATEGORY_MONTH"/>
 		<list key="STATE_SELECTED_TOURS">
-			<item value="202022019451223"/>
+			<item value="201553195142998"/>
 		</list>
 		<list key="STATE_SORT_COLUMN_ID">
 			<item value="TIME_DATE"/>
@@ -208,5 +227,11 @@
 	<section name="net.tourbook.ui.views.TourPausesView">
 	</section>
 	<section name="TourTagsView">
+	</section>
+	<section name="PoiView">
+		<list key="searched.queries">
+			<item value="Boulangerie"/>
+			<item value="Mt Blanc"/>
+		</list>
 	</section>
 </section>

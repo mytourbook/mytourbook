@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,18 +17,12 @@ package data.cadence;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
-
-import javax.xml.parsers.SAXParser;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
-import net.tourbook.device.garmin.GarminTCX_SAXHandler;
 import net.tourbook.device.suunto.Suunto9_DeviceDataReader;
-import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.preferences.ITourbookPreferences;
@@ -37,23 +31,18 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 
 import device.garmin.GarminTCX_DeviceDataReaderTests;
 import utils.Comparison;
 import utils.FilesUtils;
-import utils.Initializer;
 
 public class CadenceTests {
 
-   private static SAXParser                  parser;
-   private static final String               GARMIN_IMPORT_PATH      = GarminTCX_DeviceDataReaderTests.IMPORT_PATH;
+   private static final String               GARMIN_IMPORT_PATH      = GarminTCX_DeviceDataReaderTests.FILES_PATH;
    private static final String               SUUNTO_IMPORT_FILE_PATH = FilesUtils.rootPath + "device/suunto/files/"; //$NON-NLS-1$
-   private static final String               JSON_GZ                 = ".json.gz";                                        //$NON-NLS-1$
+   private static final String               JSON_GZ                 = ".json.gz";                                   //$NON-NLS-1$
 
-   private static DeviceData                 deviceData;
    private static HashMap<Long, TourData>    newlyImportedTours;
-   private static HashMap<Long, TourData>    alreadyImportedTours;
    private static GarminTCX_DeviceDataReader garminDeviceDataReader;
    private static Suunto9_DeviceDataReader   suunto9DeviceDataReader;
 
@@ -62,10 +51,7 @@ public class CadenceTests {
    @BeforeAll
    static void initAll() {
 
-      parser = Initializer.initializeParser();
-      deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
-      alreadyImportedTours = new HashMap<>();
       garminDeviceDataReader = new GarminTCX_DeviceDataReader();
       suunto9DeviceDataReader = new Suunto9_DeviceDataReader();
    }
@@ -74,7 +60,6 @@ public class CadenceTests {
    void tearDown() {
 
       newlyImportedTours.clear();
-      alreadyImportedTours.clear();
 
       // Restoring the default values
       _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, false);
@@ -90,8 +75,8 @@ public class CadenceTests {
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
 
       suunto9DeviceDataReader.processDeviceData(testFilePath,
-            deviceData,
-            alreadyImportedTours,
+            null,
+            new HashMap<>(),
             newlyImportedTours,
             new ImportState_File(),
             new ImportState_Process());
@@ -124,8 +109,8 @@ public class CadenceTests {
       final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + JSON_GZ);
 
       suunto9DeviceDataReader.processDeviceData(testFilePath,
-            deviceData,
-            alreadyImportedTours,
+            null,
+            new HashMap<>(),
             newlyImportedTours,
             new ImportState_File(),
             new ImportState_Process());
@@ -145,20 +130,18 @@ public class CadenceTests {
     * TCX file with pauses using the moving time
     */
    @Test
-   void testCadenceZonesTimeWithMovingTime() throws SAXException, IOException {
+   void testCadenceZonesTimeWithMovingTime() {
 
       final String filePathWithoutExtension = GARMIN_IMPORT_PATH + "2021-01-31"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
-      final InputStream tcxFile = GarminTCX_DeviceDataReaderTests.class.getResourceAsStream(importFilePath);
+      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
 
-      final GarminTCX_SAXHandler handler = new GarminTCX_SAXHandler(garminDeviceDataReader,
-            importFilePath,
-            deviceData,
-            alreadyImportedTours,
+      garminDeviceDataReader.processDeviceData(importFileAbsolutePath,
+            null,
+            new HashMap<>(),
             newlyImportedTours,
-            new ImportState_File());
-
-      parser.parse(tcxFile, handler);
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 
@@ -175,22 +158,20 @@ public class CadenceTests {
     * TCX file with pauses using the recorded time
     */
    @Test
-   void testCadenceZonesTimeWithRecordedTime() throws SAXException, IOException {
+   void testCadenceZonesTimeWithRecordedTime() {
 
       _prefStore.setValue(ITourbookPreferences.APPEARANCE_IS_PACEANDSPEED_FROM_RECORDED_TIME, true);
 
       final String filePathWithoutExtension = GARMIN_IMPORT_PATH + "2021-01-31"; //$NON-NLS-1$
       final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
-      final InputStream tcxFile = GarminTCX_DeviceDataReaderTests.class.getResourceAsStream(importFilePath);
+      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
 
-      final GarminTCX_SAXHandler handler = new GarminTCX_SAXHandler(garminDeviceDataReader,
-            importFilePath,
-            deviceData,
-            alreadyImportedTours,
+      garminDeviceDataReader.processDeviceData(importFileAbsolutePath,
+            null,
+            new HashMap<>(),
             newlyImportedTours,
-            new ImportState_File());
-
-      parser.parse(tcxFile, handler);
+            new ImportState_File(),
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 

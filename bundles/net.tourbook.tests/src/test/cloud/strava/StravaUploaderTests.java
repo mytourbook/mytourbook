@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.tourbook.cloud.Activator;
+import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.strava.StravaUploader;
@@ -85,7 +86,7 @@ public class StravaUploaderTests {
 
             // Look at the shell title to see if it is the one we want
 
-            if ("Strava Tour Upload Summary".equals(shell.getText())) { //$NON-NLS-1$
+            if (Messages.Dialog_UploadToursToStrava_Title.equals(shell.getText())) {
                // Close the shell after it has finished initializing
 
                Display.getDefault().asyncExec(shell::close);
