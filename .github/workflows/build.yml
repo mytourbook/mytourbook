@@ -14,9 +14,9 @@ jobs:
       - name: Generate artifact name
         id: generate-name
         run: |
-          echo ::set-output name=artifact::"This PR was auto-generated on $(date +%d-%m-%Y) \
+          echo ::set-output name=artifactFileName::"Full-JaCoCo-Report-$(date +%d-%m-%Y-%H-%M) \
       - name: print env
-        run: echo ${{ steps.generate-name.outputs.artifact }}
+        run: echo ${{ steps.generate-name.outputs.artifactFileName }}
       - name: python version
         env:
            TOXENV: "py${{ matrix.python }}-django${{ matrix.django }}"
