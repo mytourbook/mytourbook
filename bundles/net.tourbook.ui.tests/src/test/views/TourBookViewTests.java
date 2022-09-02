@@ -92,7 +92,7 @@ public class TourBookViewTests extends UITest {
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "5/18/13, 11:00 AM")));//$NON-NLS-1$
+            "1/31/21, 7:15 AM")));//$NON-NLS-1$
 
       //Check that the tour was successfully deleted
       allItems = bot.tree().getAllItems();
