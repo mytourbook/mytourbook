@@ -43,7 +43,7 @@ public class StatisticsViewTests extends UITest {
 
       final SWTBotCombo yearComboBox = tourEditorViewBot.comboBox(2);
       assertNotNull(yearComboBox);
-      assertEquals(9, yearComboBox.itemCount());
+      assertEquals(11, yearComboBox.itemCount());
       yearComboBox.setSelection("9");
       assertEquals("9", yearComboBox.selection());
 
