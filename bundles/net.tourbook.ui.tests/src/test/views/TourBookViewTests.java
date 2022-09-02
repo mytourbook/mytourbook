@@ -73,7 +73,7 @@ public class TourBookViewTests extends UITest {
    }
 
    @Test
-   void testDeleteTour() {
+   void testDuplicateAndDeleteTour() {
 
       Utils.showTourBookView(bot);
 
