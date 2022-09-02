@@ -105,6 +105,7 @@ void main() {
    } else {
 
        // flat cap line
+       
        len = abs(v_st.s);
    }
 

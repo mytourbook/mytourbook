@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,43 +15,18 @@
  *******************************************************************************/
 package device.garmin.fit;
 
-import java.util.HashMap;
-
-import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.fit.FitDataReader;
-import net.tourbook.importdata.DeviceData;
-import net.tourbook.importdata.ImportState_File;
-import net.tourbook.importdata.ImportState_Process;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import utils.Comparison;
+import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
-public class FitDataReaderTests {
+public class FitDataReaderTests extends DeviceDataReaderTester {
 
-   private static final String            FILES_PATH = FilesUtils.rootPath + "device/garmin/fit/files/"; //$NON-NLS-1$
+   private static final String FILES_PATH    = FilesUtils.rootPath + "device/garmin/fit/files/"; //$NON-NLS-1$
 
-   private static DeviceData              deviceData;
-   private static HashMap<Long, TourData> newlyImportedTours;
-   private static HashMap<Long, TourData> alreadyImportedTours;
-   private static FitDataReader           fitDataReader;
-
-   @BeforeAll
-   static void initAll() {
-      deviceData = new DeviceData();
-      newlyImportedTours = new HashMap<>();
-      alreadyImportedTours = new HashMap<>();
-      fitDataReader = new FitDataReader();
-   }
-
-   @AfterEach
-   void tearDown() {
-      newlyImportedTours.clear();
-      alreadyImportedTours.clear();
-   }
+   private FitDataReader       fitDataReader = new FitDataReader();
 
    /**
     * Regression test. This test can be useful when updating the FIT SDK and
@@ -60,19 +35,7 @@ public class FitDataReaderTests {
    @Test
    void testFitImportConeyLake() {
 
-      final String filePath = FILES_PATH + "ConeyLakeMove_2020_05_23_08_55_42_Trail+running"; //$NON-NLS-1$
-      final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + ".fit");//$NON-NLS-1$
-
-      fitDataReader.processDeviceData(testFilePath,
-            deviceData,
-            alreadyImportedTours,
-            newlyImportedTours,
-            new ImportState_File(),
-            new ImportState_Process());
-
-      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
-
-      Comparison.compareTourDataAgainstControl(tour, filePath);
+      testImportFile(fitDataReader, FILES_PATH + "ConeyLakeMove_2020_05_23_08_55_42_Trail+running", ".fit");
    }
 
    /**
@@ -82,18 +45,24 @@ public class FitDataReaderTests {
    @Test
    void testFitImportNoPauses() {
 
-      final String filePath = FILES_PATH + "1-30-21 3-47 PM"; //$NON-NLS-1$
-      final String testFilePath = FilesUtils.getAbsoluteFilePath(filePath + ".fit");//$NON-NLS-1$
+      testImportFile(fitDataReader, FILES_PATH + "1-30-21 3-47 PM", ".fit");
+   }
 
-      fitDataReader.processDeviceData(testFilePath,
-            deviceData,
-            alreadyImportedTours,
-            newlyImportedTours,
-            new ImportState_File(),
-            new ImportState_Process());
+   /**
+    * Test with a file containing pauses triggered automatically by the device
+    */
+   @Test
+   void testFitImportPauses_Auto() {
 
-      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
+      testImportFile(fitDataReader, FILES_PATH + "Hardrock_100_Start_Finish", ".fit");
+   }
 
-      Comparison.compareTourDataAgainstControl(tour, filePath);
+   /**
+    * Test with a file containing pauses triggered by the user
+    */
+   @Test
+   void testFitImportPauses_User() {
+
+      testImportFile(fitDataReader, FILES_PATH + "Bye_bye_Silverton", ".fit");
    }
 }

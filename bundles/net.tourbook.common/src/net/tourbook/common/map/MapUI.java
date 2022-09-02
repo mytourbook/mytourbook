@@ -58,7 +58,37 @@ public class MapUI {
          new LegendUnitLayoutItem(Messages.Legend_UnitLayout_BrightBackground_NoShadow,   LegendUnitLayout.BRIGHT_BACKGROUND__NO_SHADOW),
    };
 
+   public final static DirectionArrowLayoutItem[] ALL_DIRECTION_ARROW_DESIGNS = {
+
+         new DirectionArrowLayoutItem(Messages.Direction_ArrowDesign_Wings,               DirectionArrowDesign.WINGS),
+         new DirectionArrowLayoutItem(Messages.Direction_ArrowDesign_Wings_MiddleFin,     DirectionArrowDesign.WINGS_WITH_MIDDLE_FIN),
+         new DirectionArrowLayoutItem(Messages.Direction_ArrowDesign_Wings_OuterFins,     DirectionArrowDesign.WINGS_WITH_OUTER_FINS),
+         new DirectionArrowLayoutItem(Messages.Direction_ArrowDesign_MiddleFin,           DirectionArrowDesign.MIDDLE_FIN),
+         new DirectionArrowLayoutItem(Messages.Direction_ArrowLayout_OuterFins,           DirectionArrowDesign.OUTER_FINS),
+   };
+
 // SET_FORMATTING_ON
+
+   public enum DirectionArrowDesign {
+
+      WINGS, //
+      WINGS_WITH_MIDDLE_FIN, //
+      WINGS_WITH_OUTER_FINS, //
+      MIDDLE_FIN, //
+      OUTER_FINS, //
+   }
+
+   public static class DirectionArrowLayoutItem {
+
+      public String               label;
+      public DirectionArrowDesign directionArrowLayout;
+
+      public DirectionArrowLayoutItem(final String label, final DirectionArrowDesign directionArrowLayout) {
+
+         this.label = label;
+         this.directionArrowLayout = directionArrowLayout;
+      }
+   }
 
    public enum LegendUnitLayout {
 

@@ -20,7 +20,6 @@ package net.tourbook.map25.renderer;
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 import static org.oscim.renderer.bucket.RenderBucket.LINE;
 import static org.oscim.renderer.bucket.RenderBucket.SYMBOL;
-import static org.oscim.renderer.bucket.RenderBucket.TEXLINE;
 
 import org.oscim.core.MapPosition;
 import org.oscim.core.Tile;
@@ -28,7 +27,6 @@ import org.oscim.renderer.GLMatrix;
 import org.oscim.renderer.GLState;
 import org.oscim.renderer.GLViewport;
 import org.oscim.renderer.LayerRenderer;
-import org.oscim.utils.FastMath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +88,7 @@ public class BucketRendererMT extends LayerRenderer {
       GLState.blend(true);
 
       // viewport scale 2 map scale: it is between 1...2
-      final float vp2mpScale = (float) (viewport.pos.scale / mapPosition.scale);
+      final float viewport2mapscale = (float) (viewport.pos.scale / mapPosition.scale);
 
       boolean isProjected = true;
 
@@ -111,40 +109,9 @@ public class BucketRendererMT extends LayerRenderer {
 
          switch (bucket.type) {
 
-//       case POLYGON:
-//           bucket = PolygonBucket.Renderer.draw(bucket, viewport, 1, true);
-//           break;
-
          case LINE:
-            bucket = LineBucketMT.Renderer.draw(bucket, viewport, vp2mpScale, allBuckets);
+            bucket = LineBucketMT.Renderer.draw(bucket, viewport, viewport2mapscale, allBuckets);
             break;
-
-         case TEXLINE:
-            bucket = LineTexBucketMT.Renderer.draw(bucket,
-                  viewport,
-                  FastMath.pow(mapPosition.zoomLevel - viewport.pos.zoomLevel) * (float) mapPosition.getZoomScale(),
-                  allBuckets);
-            break;
-
-//       case MESH:
-//           bucket = MeshBucket.Renderer.draw(bucket, viewport);
-//           break;
-//       case HAIRLINE:
-//           bucket = HairLineBucket.Renderer.draw(bucket, viewport);
-//           break;
-//       case BITMAP:
-//           bucket = BitmapBucket.Renderer.draw(bucket, viewport, 1, 1);
-//           break;
-//       case SYMBOL:
-//           if (isProjected) {
-//               isProjected = false;
-//               setMatrix(viewport, isProjected);
-//           }
-//           bucket = TextureBucket.Renderer.draw(bucket, viewport, vp2mpScale);
-//           break;
-//       case CIRCLE:
-//           bucket = CircleBucket.Renderer.draw(bucket, viewport);
-//           break;
 
          default:
             log.error("Invalid bucket {}", bucket.type); //$NON-NLS-1$

@@ -30,9 +30,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
-import javax.xml.XMLConstants;
 import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -40,6 +38,7 @@ import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
+import net.tourbook.common.util.XmlUtils;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -395,10 +394,7 @@ public class FitLog_SAXHandler extends DefaultHandler {
 
          try {
 
-            final SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-            parser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, UI.EMPTY_STRING);
-            parser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, UI.EMPTY_STRING);
-
+            final SAXParser parser = XmlUtils.initializeParser();
             parser.parse("file:" + importFilePath, fitLogEx_SaxHandler);//$NON-NLS-1$
 
          } catch (final InvalidDeviceSAXException e) {

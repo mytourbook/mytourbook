@@ -25,6 +25,20 @@ public class Util extends BucketRenderer {
    private static final String NL = UI.NEW_LINE1;
    private static int          _counter;
 
+   /**
+    * Dump matrix values, they are ordered in
+    * <p>
+    *
+    * <pre>
+    * 0  4   8  12
+    * 1  5   9  13
+    * 2  6  10  14
+    * 3  7  11  15
+    * </pre>
+    *
+    * @param matrix
+    * @param isWithCounter
+    */
    public static void dumpMatrix(final GLMatrix matrix, final boolean isWithCounter) {
 
       final float[] matrixValues = new float[16];

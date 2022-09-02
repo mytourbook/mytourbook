@@ -1207,7 +1207,6 @@ public class Map25View extends ViewPart implements
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
       final boolean isGradientColor = trackConfig.lineColorMode == LineColorMode.GRADIENT
-            && trackConfig.isShowDirectionArrow == false
             && canShowTour
             && isTourVisible;
 

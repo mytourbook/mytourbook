@@ -18,9 +18,12 @@
  */
 package net.tourbook.map25.renderer;
 
+import gnu.trove.list.array.TShortArrayList;
+
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
+import org.oscim.renderer.MapRenderer;
 import org.oscim.renderer.bucket.RenderBuckets;
 import org.oscim.renderer.bucket.VertexData;
 import org.oscim.utils.pool.Inlist;
@@ -58,10 +61,37 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
    protected final VertexDataMT vertexItems;
    protected final VertexData   indiceItems;
 
+   /**
+    * Contains the vertices for direction arrows multiplied with {@link MapRenderer#COORD_SCALE}:
+    * <p>
+    *
+    * <pre>
+    * x1
+    * y2
+    * z1
+    *
+    * x2
+    * y2
+    * z2
+    *
+    * ...
+    * </pre>
+    */
+   protected TShortArrayList    directionArrow_XYZPositions;
+
+   /**
+    * Barycentric coordinates are simply (1, 0, 0), (0, 1, 0) and (0, 0, 1) for the three
+    * triangle vertices (the order does not really matter, which makes packing into triangle strips
+    * potentially easier).
+    * 
+    * Source: https://stackoverflow.com/questions/137629/how-do-you-render-primitives-as-wireframes-in-opengl#answer-33004265
+    */
+   protected TShortArrayList    colorCoords;
+
    final boolean                quads;
 
-   protected int                vertexOffset;            // in bytes
-   protected int                indiceOffset;            // in bytes
+   protected int                vertexOffset;               // in bytes
+   protected int                indiceOffset;               // in bytes
 
    protected RenderBucketMT(final byte type, final boolean indexed, final boolean quads) {
 
@@ -76,6 +106,9 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
       }
 
       this.quads = quads;
+
+      directionArrow_XYZPositions = new TShortArrayList();
+      colorCoords = new TShortArrayList();
    }
 
    /**
@@ -110,13 +143,12 @@ public abstract class RenderBucketMT extends Inlist<RenderBucketMT> {
       indiceItems.compile(iboData);
    }
 
-   protected void compileVertexItems(final ShortBuffer vboData, final ByteBuffer colorBuffer) {
+   protected void compileVertexItems(final ShortBuffer vboBuffer, final ByteBuffer colorBuffer) {
 
-      /*
-       * Keep offset of layer data in vbo
-       */
-      vertexOffset = vboData.position() * RenderBuckets.SHORT_BYTES;
-      vertexItems.compile(vboData, colorBuffer);
+      // Keep offset of layer data in vbo
+      vertexOffset = vboBuffer.position() * RenderBuckets.SHORT_BYTES;
+
+      vertexItems.compile(vboBuffer, colorBuffer);
    }
 
    /**

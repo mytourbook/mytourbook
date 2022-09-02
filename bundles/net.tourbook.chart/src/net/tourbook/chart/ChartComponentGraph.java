@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.chart;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import java.io.InputStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -28,8 +30,6 @@ import net.tourbook.common.color.ColorUtil;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.tooltip.IPinned_ToolTip;
 
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -43,9 +43,6 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
@@ -62,7 +59,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
@@ -556,27 +552,24 @@ public class ChartComponentGraph extends Canvas {
     */
    private void addListener() {
 
-      addPaintListener(new PaintListener() {
-         @Override
-         public void paintControl(final PaintEvent event) {
+      addPaintListener(paintEvent -> {
 
-            if (_isChartDragged) {
+         if (_isChartDragged) {
 
-               drawSync_020_MoveCanvas(event.gc);
+            drawSync_020_MoveCanvas(paintEvent.gc);
 
-            } else {
+         } else {
 
 //               final long start = System.nanoTime();
 //               System.out.println();
 //               System.out.println("onPaint\tstart\t");
 //               // TODO remove SYSTEM.OUT.PRINTLN
 
-               drawSync_000_onPaint(event.gc, event.time & 0xFFFFFFFFL);
+            drawSync_000_onPaint(paintEvent.gc, paintEvent.time & 0xFFFFFFFFL);
 
 //               System.out.println("onPaint\tend\t" + (((double) System.nanoTime() - start) / 1000000) + "ms");
 //               System.out.println();
 //               // TODO remove SYSTEM.OUT.PRINTLN
-            }
          }
       });
 
@@ -584,12 +577,7 @@ public class ChartComponentGraph extends Canvas {
       final ScrollBar horizontalBar = getHorizontalBar();
       horizontalBar.setEnabled(false);
       horizontalBar.setVisible(false);
-      horizontalBar.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent event) {
-            onScroll(event);
-         }
-      });
+      horizontalBar.addSelectionListener(widgetSelectedAdapter(this::onScroll));
 
       addMouseMoveListener(mouseEvent -> {
          if (_isGraphVisible) {
@@ -664,20 +652,17 @@ public class ChartComponentGraph extends Canvas {
          }
       });
 
-      addListener(SWT.Traverse, new Listener() {
-         @Override
-         public void handleEvent(final Event event) {
+      addListener(SWT.Traverse, event -> {
 
-            switch (event.detail) {
-            case SWT.TRAVERSE_RETURN:
-            case SWT.TRAVERSE_ESCAPE:
-            case SWT.TRAVERSE_TAB_NEXT:
-            case SWT.TRAVERSE_TAB_PREVIOUS:
-            case SWT.TRAVERSE_PAGE_NEXT:
-            case SWT.TRAVERSE_PAGE_PREVIOUS:
-               event.doit = true;
-               break;
-            }
+         switch (event.detail) {
+         case SWT.TRAVERSE_RETURN:
+         case SWT.TRAVERSE_ESCAPE:
+         case SWT.TRAVERSE_TAB_NEXT:
+         case SWT.TRAVERSE_TAB_PREVIOUS:
+         case SWT.TRAVERSE_PAGE_NEXT:
+         case SWT.TRAVERSE_PAGE_PREVIOUS:
+            event.doit = true;
+            break;
          }
       });
 
@@ -957,30 +942,27 @@ public class ChartComponentGraph extends Canvas {
 
       menuMgr.setRemoveAllWhenShown(true);
 
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager menuMgr) {
+      menuMgr.addMenuListener(menuManager -> {
 
-            actionSelectBars();
+         actionSelectBars();
 
-            _hoveredBar_ToolTip.hide();
+         _hoveredBar_ToolTip.hide();
 
-            hideTooltip();
+         hideTooltip();
 
-            // get cursor location relative to this graph canvas
-            final Point devMouse = toControl(getDisplay().getCursorLocation());
+         // get cursor location relative to this graph canvas
+         final Point devMouse = toControl(getDisplay().getCursorLocation());
 
-            computeSliderForContextMenu(devMouse.x, devMouse.y);
+         computeSliderForContextMenu(devMouse.x, devMouse.y);
 
-            _chart.fillContextMenu(
-                  menuMgr,
-                  _contextLeftSlider,
-                  _contextRightSlider,
-                  _hoveredBarSerieIndex,
-                  _hoveredBarValueIndex,
-                  _devXMouseDown,
-                  _devYMouseDown);
-         }
+         _chart.fillContextMenu(
+               menuManager,
+               _contextLeftSlider,
+               _contextRightSlider,
+               _hoveredBarSerieIndex,
+               _hoveredBarValueIndex,
+               _devXMouseDown,
+               _devYMouseDown);
       });
 
       final Menu contextMenu = menuMgr.createContextMenu(this);

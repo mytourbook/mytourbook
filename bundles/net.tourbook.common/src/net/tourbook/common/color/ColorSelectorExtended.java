@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -44,6 +44,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
@@ -199,6 +200,17 @@ public class ColorSelectorExtended extends EventManager {
 
    public RGB[] getCustomColors() {
       return _allCustomRGBs;
+   }
+
+   /**
+    * Returns the currently displayed color as RGBA
+    *
+    * @param opacity
+    *           Opacity values
+    * @return
+    */
+   public RGBA getRGBA(final int opacity) {
+      return new RGBA(fColorValue.red, fColorValue.green, fColorValue.blue, opacity);
    }
 
    public void open() {

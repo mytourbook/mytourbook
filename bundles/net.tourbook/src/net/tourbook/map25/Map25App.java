@@ -508,9 +508,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       // this setting seems not to work for 4k display
 //    appConfig.useHDPI = true;
 
-      // reduce CPU cycles
+      /*
+       * Reduce CPU cycles
+       */
       appConfig.pauseWhenBackground = true;
-      appConfig.backgroundFPS = 3;
+
+      //  0 = do not sleep
+      // -1 = do not render
+      appConfig.backgroundFPS = 1;
 
       return appConfig;
    }

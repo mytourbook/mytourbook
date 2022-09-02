@@ -20,6 +20,10 @@ package net.tourbook.map25.renderer;
 import static org.oscim.backend.GLAdapter.gl;
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
+import gnu.trove.list.array.TFloatArrayList;
+
+import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.TourLayer;
 
 import org.oscim.backend.GL;
@@ -63,8 +67,8 @@ public class LineBucketMT extends RenderBucketMT {
    private static final float MIN_BEVEL        = MIN_DIST * 4;
 
    /**
-    * mask for packing last two bits of extrusion vector with texture
-    * coordinates
+    * Mask for packing last two bits of extrusion vector with texture
+    * coordinates, .... 1111 1100
     */
    private static final int   DIR_MASK         = 0xFFFFFFFC;
 
@@ -73,12 +77,8 @@ public class LineBucketMT extends RenderBucketMT {
     */
    public LineBucketMT        outlines;
 
-   public LineStyle           line;
-
-   public boolean             isShowOutline;
+   public LineStyle           lineStyle;
    public int                 lineColorMode;
-   public float               outlineBrightness;
-   public float               outlineWidth;
 
    public float               testValue;
 
@@ -92,6 +92,100 @@ public class LineBucketMT extends RenderBucketMT {
 
    private int                tmin             = Integer.MIN_VALUE, tmax = Integer.MAX_VALUE;
 
+   private static class DirectionArrowsShader extends GLShaderMT {
+
+      int shader_a_pos,
+            shader_attrib_ColorCoord,
+            shader_u_mvp,
+
+            shader_uni_ArrowColors,
+            shader_uni_OutlineWidth
+
+//          shader_u_width
+
+      ;
+
+      DirectionArrowsShader(final String shaderFile) {
+
+         if (createMT(shaderFile) == false) {
+            return;
+         }
+
+// SET_FORMATTING_OFF
+
+         shader_u_mvp                  = getUniform("u_mvp");                 //$NON-NLS-1$
+         shader_a_pos                  = getAttrib("a_pos");                  //$NON-NLS-1$
+         shader_attrib_ColorCoord      = getAttrib("attrib_ColorCoord");       //$NON-NLS-1$
+
+//       shader_u_width                = getUniform("u_width");               //$NON-NLS-1$
+         shader_uni_ArrowColors        = getUniform("uni_ArrowColors");       //$NON-NLS-1$
+         shader_uni_OutlineWidth       = getUniform("uni_OutlineWidth");      //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+      }
+   }
+
+   private static class LineShader extends GLShaderMT {
+
+      int shader_a_pos,
+            shader_aVertexColor,
+
+            shader_u_mvp,
+
+            shader_u_fade,
+            shader_u_color,
+            shader_u_mode,
+
+            shader_u_width,
+            shader_u_height,
+
+            shader_uColorMode,
+            shader_uOutlineBrightness,
+            shader_uVertexColorAlpha
+
+      ;
+
+      LineShader(final String shaderFile) {
+
+         if (createMT(shaderFile) == false) {
+            return;
+         }
+
+// SET_FORMATTING_OFF
+
+         shader_a_pos               = getAttrib("a_pos"); //$NON-NLS-1$
+         shader_aVertexColor        = getAttrib("aVertexColor"); //$NON-NLS-1$
+
+         shader_u_mvp               = getUniform("u_mvp"); //$NON-NLS-1$
+
+         shader_u_fade              = getUniform("u_fade"); //$NON-NLS-1$
+         shader_u_color             = getUniform("u_color"); //$NON-NLS-1$
+         shader_u_mode              = getUniform("u_mode"); //$NON-NLS-1$
+
+         shader_u_width             = getUniform("u_width"); //$NON-NLS-1$
+         shader_u_height            = getUniform("u_height"); //$NON-NLS-1$
+
+         shader_uColorMode          = getUniform("uColorMode"); //$NON-NLS-1$
+         shader_uOutlineBrightness  = getUniform("uOutlineBrightness"); //$NON-NLS-1$
+         shader_uVertexColorAlpha   = getUniform("uVertexColorAlpha"); //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+      }
+
+      @Override
+      public boolean useProgram() {
+
+         if (super.useProgram()) {
+
+            GLState.enableVertexArrays(shader_a_pos, GLState.DISABLED);
+
+            return true;
+         }
+
+         return false;
+      }
+   }
+
    public static final class Renderer {
 
       /*
@@ -102,17 +196,19 @@ public class LineBucketMT extends RenderBucketMT {
       /**
        * Factor to normalize extrusion vector and scale to coord scale
        */
-      private static final float COORD_SCALE_BY_DIR_SCALE = COORD_SCALE / DIR_SCALE;
+      private static final float           COORD_SCALE_BY_DIR_SCALE = COORD_SCALE / DIR_SCALE;
 
-      private static final int   CAP_THIN                 = 0;
-      private static final int   CAP_BUTT                 = 1;
-      private static final int   CAP_ROUND                = 2;
+      private static final int             CAP_THIN                 = 0;
+      private static final int             CAP_BUTT                 = 1;
+      private static final int             CAP_ROUND                = 2;
 
-      private static final int   SHADER_PROJECTED         = 0;
-      private static final int   SHADER_FLAT              = 1;
+      private static final int             SHADER_PROJECTED         = 0;
+      private static final int             SHADER_FLAT              = 1;
 
-      private static int         _textureID;
-      private static Shader[]    _shaders                 = { null, null };
+      private static int                   _textureID;
+
+      private static DirectionArrowsShader _directionArrowShader;
+      private static LineShader[]          _lineShaders             = { null, null };
 
       /**
        * Performs OpenGL drawing commands of the renderBucket(s)
@@ -124,10 +220,45 @@ public class LineBucketMT extends RenderBucketMT {
        * @param renderBucketsAll
        * @return
        */
-      public static RenderBucketMT draw(RenderBucketMT renderBucket,
+      public static RenderBucketMT draw(final RenderBucketMT renderBucket,
                                         final GLViewport viewport,
                                         final float vp2mpScale,
                                         final RenderBucketsAllMT renderBucketsAll) {
+
+         final RenderBucketMT[] inoutRenderBucket = new RenderBucketMT[] { renderBucket };
+
+         final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+
+         gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
+         {
+            draw_10_Track(inoutRenderBucket, viewport, vp2mpScale, renderBucketsAll);
+
+            if (trackConfig.isShowDirectionArrow) {
+               draw_20_DirectionArrows(viewport, renderBucketsAll, vp2mpScale);
+            }
+         }
+         gl.blendFunc(GL.ONE, GL.ONE_MINUS_SRC_ALPHA); // reset to map default
+
+         return inoutRenderBucket[0];
+      }
+
+      /**
+       * Performs OpenGL drawing commands of the renderBucket(s)
+       *
+       * @param inoutRenderBucket
+       *           In/out render bucked
+       * @param viewport
+       * @param vp2mpScale
+       *           Viewport scale 2 map scale: it is between 1...2
+       * @param renderBucketsAll
+       * @return
+       */
+      private static void draw_10_Track(final RenderBucketMT[] inoutRenderBucket,
+                                        final GLViewport viewport,
+                                        final float vp2mpScale,
+                                        final RenderBucketsAllMT renderBucketsAll) {
+
+         final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
          final MapPosition mapPosition = viewport.pos;
 
@@ -146,7 +277,7 @@ public class LineBucketMT extends RenderBucketMT {
 //       shaderMode = shaderMode;
 //       shaderMode = SHADER_FLAT;
 
-         final Shader shader = _shaders[shaderMode];
+         final LineShader shader = _lineShaders[shaderMode];
 
          // is calling GL.enableVertexAttribArray() for shader_a_pos
          shader.useProgram();
@@ -188,7 +319,7 @@ public class LineBucketMT extends RenderBucketMT {
          /*
           * Set vertex color
           */
-         gl.bindBuffer(GL.ARRAY_BUFFER, renderBucketsAll.vertexColorId);
+         gl.bindBuffer(GL.ARRAY_BUFFER, renderBucketsAll.vertexColor_BufferId);
          gl.enableVertexAttribArray(shader_aVertexColor);
          gl.vertexAttribPointer(
 
@@ -233,17 +364,16 @@ public class LineBucketMT extends RenderBucketMT {
          float heightOffset = 0;
          gl.uniform1f(shader_u_height, heightOffset);
 
+         for (; inoutRenderBucket[0] != null && inoutRenderBucket[0].type == LINE; inoutRenderBucket[0] = inoutRenderBucket[0].next) {
 
-         for (; renderBucket != null && renderBucket.type == LINE; renderBucket = renderBucket.next) {
-
-            final LineBucketMT lineBucket = (LineBucketMT) renderBucket;
-            final LineStyle lineStyle = lineBucket.line.current();
+            final LineBucketMT lineBucket = (LineBucketMT) inoutRenderBucket[0];
+            final LineStyle lineStyle = lineBucket.lineStyle.current();
 
             final float scale = lineBucket.scale;
 
-            final boolean isPaintOutline = lineBucket.isShowOutline;
-            final float outlineWidth = lineBucket.outlineWidth;
-            final float outlineBrightnessRaw = lineBucket.outlineBrightness; // -1.0 ... 1.0
+            final boolean isPaintOutline = trackConfig.isShowOutline;
+            final float outlineWidth = trackConfig.outlineWidth;
+            final float outlineBrightnessRaw = trackConfig.outlineBrighness; // -1.0 ... 1.0
             final float outlineBrightness = outlineBrightnessRaw + 1; // 0...2
 
             gl.uniform1i(shader_uColorMode, lineBucket.lineColorMode);
@@ -374,16 +504,95 @@ public class LineBucketMT extends RenderBucketMT {
 
             gl.drawArrays(GL.TRIANGLE_STRIP, lineBucket.vertexOffset, lineBucket.numVertices);
          }
+      }
 
-         gl.disableVertexAttribArray(shader_aVertexColor);
+      private static void draw_20_DirectionArrows(final GLViewport viewport,
+                                                  final RenderBucketsAllMT allRenderBuckets,
+                                                  final float vp2mpScale) {
 
-         return renderBucket;
+         final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+
+// SET_FORMATTING_OFF
+
+         final DirectionArrowsShader shader        = _directionArrowShader;
+
+         final int shader_a_pos                    = shader.shader_a_pos;
+         final int shader_attrib_ColorCoord        = shader.shader_attrib_ColorCoord;
+         final int shader_u_mvp                    = shader.shader_u_mvp;
+//       final int shader_u_width                  = shader.shader_u_width;
+         final int shader_uni_ArrowColors          = shader.shader_uni_ArrowColors;
+         final int shader_uni_OutlineWidth         = shader.shader_uni_OutlineWidth;
+
+// SET_FORMATTING_ON
+
+         shader.useProgram();
+
+         // set mvp matrix into the shader
+         viewport.mvp.setAsUniform(shader_u_mvp);
+
+         gl.bindBuffer(GL.ARRAY_BUFFER, allRenderBuckets.dirArrows_BufferId);
+         gl.enableVertexAttribArray(shader_a_pos);
+         gl.vertexAttribPointer(
+
+               shader_a_pos, //           index of the vertex attribute that is to be modified
+               4, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
+               GL.SHORT, //               data type of each component in the array
+               false, //                  values should be normalized
+               0, //                      offset in bytes between the beginning of consecutive vertex attributes
+               0 //                       offset in bytes of the first component in the vertex attribute array
+         );
+
+         gl.bindBuffer(GL.ARRAY_BUFFER, allRenderBuckets.dirArrows_ColorCoords_BufferId);
+         gl.enableVertexAttribArray(shader_attrib_ColorCoord);
+         gl.vertexAttribPointer(
+
+               shader_attrib_ColorCoord, //    index of the vertex attribute that is to be modified
+               3, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
+               GL.SHORT, //               data type of each component in the array
+               false, //                  values should be normalized
+               0, //                      offset in bytes between the beginning of consecutive vertex attributes
+               0 //                       offset in bytes of the first component in the vertex attribute array
+         );
+
+         final int numDirArrowShorts = allRenderBuckets.numShortsForDirectionArrows;
+
+//       final float width = 10 / vp2mpScale;
+//
+//       gl.uniform1f(shader_u_width, width * COORD_SCALE_BY_DIR_SCALE);
+
+         // arrow colors
+         final float arrowColors[] = trackConfig.getArrowColors();
+         gl.uniform4fv(shader_uni_ArrowColors, arrowColors.length / 4, arrowColors, 0);
+
+         // outline width's
+         gl.uniform2f(shader_uni_OutlineWidth,
+               trackConfig.arrowWing_OutlineWidth / 200f,
+               trackConfig.arrowFin_OutlineWidth / 200f);
+
+         /*
+          * Draw direction arrows
+          */
+
+         GLState.test(true, false);
+         gl.depthMask(true);
+         {
+            gl.drawArrays(GL.TRIANGLES, 0, numDirArrowShorts);
+         }
+         gl.depthMask(false);
+
+         GLUtils.checkGlError(Renderer.class.getName());
       }
 
       static boolean init() {
 
-         _shaders[SHADER_PROJECTED] = new Shader("line_aa_proj"); //$NON-NLS-1$
-         _shaders[SHADER_FLAT] = new Shader("line_aa"); //$NON-NLS-1$
+// SET_FORMATTING_OFF
+
+         _lineShaders[SHADER_PROJECTED]   = new LineShader("line_aa_proj");       //$NON-NLS-1$
+         _lineShaders[SHADER_FLAT]        = new LineShader("line_aa");            //$NON-NLS-1$
+
+         _directionArrowShader            = new DirectionArrowsShader("directionArrows");    //$NON-NLS-1$
+
+// SET_FORMATTING_ON
 
          /*
           * create lookup table as texture for 'length(0..1,0..1)'
@@ -416,63 +625,6 @@ public class LineBucketMT extends RenderBucketMT {
       }
    }
 
-   private static class Shader extends GLShaderMT {
-
-      int shader_a_pos,
-            shader_aVertexColor,
-
-            shader_u_mvp,
-
-            shader_u_fade,
-            shader_u_color,
-            shader_u_mode,
-
-            shader_u_width,
-            shader_u_height,
-
-            shader_uColorMode,
-            shader_uOutlineBrightness,
-            shader_uVertexColorAlpha
-
-      ;
-
-      Shader(final String shaderFile) {
-
-         if (createMT(shaderFile) == false) {
-            return;
-         }
-
-         shader_a_pos = getAttrib("a_pos"); //$NON-NLS-1$
-         shader_aVertexColor = getAttrib("aVertexColor"); //$NON-NLS-1$
-
-         shader_u_mvp = getUniform("u_mvp"); //$NON-NLS-1$
-
-         shader_u_fade = getUniform("u_fade"); //$NON-NLS-1$
-         shader_u_color = getUniform("u_color"); //$NON-NLS-1$
-         shader_u_mode = getUniform("u_mode"); //$NON-NLS-1$
-
-         shader_u_width = getUniform("u_width"); //$NON-NLS-1$
-         shader_u_height = getUniform("u_height"); //$NON-NLS-1$
-
-         shader_uColorMode = getUniform("uColorMode"); //$NON-NLS-1$
-         shader_uOutlineBrightness = getUniform("uOutlineBrightness"); //$NON-NLS-1$
-         shader_uVertexColorAlpha = getUniform("uVertexColorAlpha"); //$NON-NLS-1$
-      }
-
-      @Override
-      public boolean useProgram() {
-
-         if (super.useProgram()) {
-
-            GLState.enableVertexArrays(shader_a_pos, GLState.DISABLED);
-
-            return true;
-         }
-
-         return false;
-      }
-   }
-
    LineBucketMT(final byte type, final boolean indexed, final boolean quads) {
       super(type, indexed, quads);
    }
@@ -481,6 +633,25 @@ public class LineBucketMT extends RenderBucketMT {
 
       super(RenderBucketMT.LINE, false, false);
       this.level = layer;
+   }
+
+   private void addDirArrowPosition(final short p2Xscaled,
+                                    final short p2Yscaled,
+                                    final short arrowZ,
+                                    final short arrowPartWing,
+
+                                    final int colorCoord1,
+                                    final int colorCoord2,
+                                    final int colorCoord3) {
+
+      directionArrow_XYZPositions.add(p2Xscaled);
+      directionArrow_XYZPositions.add(p2Yscaled);
+      directionArrow_XYZPositions.add(arrowZ);
+      directionArrow_XYZPositions.add(arrowPartWing);
+
+      colorCoords.add((short) colorCoord1);
+      colorCoords.add((short) colorCoord2);
+      colorCoords.add((short) colorCoord3);
    }
 
    /**
@@ -523,9 +694,9 @@ public class LineBucketMT extends RenderBucketMT {
       boolean isCapRounded = false;
       boolean isCapSquared = false;
 
-      if (line.cap == Cap.ROUND) {
+      if (lineStyle.cap == Cap.ROUND) {
          isCapRounded = true;
-      } else if (line.cap == Cap.SQUARE) {
+      } else if (lineStyle.cap == Cap.SQUARE) {
          isCapSquared = true;
       }
 
@@ -647,11 +818,11 @@ public class LineBucketMT extends RenderBucketMT {
                                    final boolean isClosed) {
 
       float ux, uy;
-      float vPrevX, vPrevY;
-      float vNextX, vNextY;
+      float unit1X, unit1Y;
+      float unit2X, unit2Y;
       float curX, curY;
       float nextX, nextY;
-      double xyDistance;
+      double unitDistance;
       int pixelColor;
 
       /*
@@ -676,15 +847,15 @@ public class LineBucketMT extends RenderBucketMT {
       pixelColor = pixelPointColors[pointIndexColor++];
 
       // unit vector to next node
-      vPrevX = nextX - curX;
-      vPrevY = nextY - curY;
-      xyDistance = (float) Math.sqrt(vPrevX * vPrevX + vPrevY * vPrevY);
-      vPrevX /= xyDistance;
-      vPrevY /= xyDistance;
+      unit1X = nextX - curX;
+      unit1Y = nextY - curY;
+      unitDistance = (float) Math.sqrt(unit1X * unit1X + unit1Y * unit1Y);
+      unit1X /= unitDistance;
+      unit1Y /= unitDistance;
 
       // perpendicular on the first segment
-      ux = -vPrevY;
-      uy = vPrevX;
+      ux = -unit1Y;
+      uy = unit1X;
 
       int ddx, ddy;
 
@@ -700,16 +871,16 @@ public class LineBucketMT extends RenderBucketMT {
 
       if (isRounded && isOutside == false) {
 
-         ddx = (int) ((ux - vPrevX) * DIR_SCALE);
-         ddy = (int) ((uy - vPrevY) * DIR_SCALE);
+         ddx = (int) ((ux - unit1X) * DIR_SCALE);
+         ddy = (int) ((uy - unit1Y) * DIR_SCALE);
          dx = (short) (0 | ddx & DIR_MASK);
          dy = (short) (2 | ddy & DIR_MASK);
 
          vertices.add(ox, oy, dx, dy, pixelColor);
          vertices.add(ox, oy, dx, dy, pixelColor);
 
-         ddx = (int) (-(ux + vPrevX) * DIR_SCALE);
-         ddy = (int) (-(uy + vPrevY) * DIR_SCALE);
+         ddx = (int) (-(ux + unit1X) * DIR_SCALE);
+         ddy = (int) (-(uy + unit1Y) * DIR_SCALE);
 
          vertices.add(ox, oy, (short) (2 | ddx & DIR_MASK), (short) (2 | ddy & DIR_MASK), pixelColor);
 
@@ -728,8 +899,8 @@ public class LineBucketMT extends RenderBucketMT {
           * for now, just extend the line a little
           */
 
-         float tx = vPrevX;
-         float ty = vPrevY;
+         float tx = unit1X;
+         float ty = unit1Y;
 
          if (isRounded == false && isSquared == false) {
 
@@ -765,8 +936,8 @@ public class LineBucketMT extends RenderBucketMT {
       curY = nextY;
 
       // unit vector pointing back to previous node
-      vPrevX *= -1;
-      vPrevY *= -1;
+      unit1X *= -1;
+      unit1Y *= -1;
 
       for (final int endIndex = startIndex + numLinePoints;;) {
 
@@ -794,22 +965,22 @@ public class LineBucketMT extends RenderBucketMT {
          }
 
          // unit vector pointing forward to next node
-         vNextX = nextX - curX;
-         vNextY = nextY - curY;
-         xyDistance = Math.sqrt(vNextX * vNextX + vNextY * vNextY);
+         unit2X = nextX - curX;
+         unit2Y = nextY - curY;
+         unitDistance = Math.sqrt(unit2X * unit2X + unit2Y * unit2Y);
 
          // skip too short segments
-         if (xyDistance < _minimumDistance) {
+         if (unitDistance < _minimumDistance) {
 
             numVertices -= 2;
 
             continue;
          }
 
-         vNextX /= xyDistance;
-         vNextY /= xyDistance;
+         unit2X /= unitDistance;
+         unit2Y /= unitDistance;
 
-         final double dotp = (vNextX * vPrevX + vNextY * vPrevY);
+         final double dotp = unit2X * unit1X + unit2Y * unit1Y;
 
          //log.debug("acos " + dotp);
          if (dotp > 0.65) {
@@ -826,21 +997,21 @@ public class LineBucketMT extends RenderBucketMT {
             if (dotp > 0.999) {
 
                // 360 degree angle, set points aside
-               ux = vPrevX + vNextX;
-               uy = vPrevY + vNextY;
+               ux = unit1X + unit2X;
+               uy = unit1Y + unit2Y;
 
-               xyDistance = vNextX * uy - vNextY * ux;
+               unitDistance = unit2X * uy - unit2Y * ux;
 
-               if (xyDistance < 0.1 && xyDistance > -0.1) {
+               if (unitDistance < 0.1 && unitDistance > -0.1) {
 
                   // almost straight
-                  ux = -vNextY;
-                  uy = vNextX;
+                  ux = -unit2Y;
+                  uy = unit2X;
 
                } else {
 
-                  ux /= xyDistance;
-                  uy /= xyDistance;
+                  ux /= unitDistance;
+                  uy /= unitDistance;
                }
 
                //log.debug("aside " + a + " " + ux + " " + uy);
@@ -854,47 +1025,47 @@ public class LineBucketMT extends RenderBucketMT {
                //log.debug("back");
 
                // go back by min dist
-               px = curX + vPrevX * _minimumBevel;
-               py = curY + vPrevY * _minimumBevel;
+               px = curX + unit1X * _minimumBevel;
+               py = curY + unit1Y * _minimumBevel;
 
                // go forward by min dist
-               curX = curX + vNextX * _minimumBevel;
-               curY = curY + vNextY * _minimumBevel;
+               curX = curX + unit2X * _minimumBevel;
+               curY = curY + unit2Y * _minimumBevel;
             }
 
             // unit vector pointing forward to next node
-            vNextX = curX - px;
-            vNextY = curY - py;
-            xyDistance = Math.sqrt(vNextX * vNextX + vNextY * vNextY);
-            vNextX /= xyDistance;
-            vNextY /= xyDistance;
+            unit2X = curX - px;
+            unit2Y = curY - py;
+            unitDistance = Math.sqrt(unit2X * unit2X + unit2Y * unit2Y);
+            unit2X /= unitDistance;
+            unit2Y /= unitDistance;
 
-            addVertex(vertices, px, py, vPrevX, vPrevY, vNextX, vNextY, pixelColor);
+            addVertex(vertices, px, py, unit1X, unit1Y, unit2X, unit2Y, pixelColor);
 
             // flip unit vector to point back
-            vPrevX = -vNextX;
-            vPrevY = -vNextY;
+            unit1X = -unit2X;
+            unit1Y = -unit2Y;
 
             // unit vector pointing forward to next node
-            vNextX = nextX - curX;
-            vNextY = nextY - curY;
-            xyDistance = Math.sqrt(vNextX * vNextX + vNextY * vNextY);
-            vNextX /= xyDistance;
-            vNextY /= xyDistance;
+            unit2X = nextX - curX;
+            unit2Y = nextY - curY;
+            unitDistance = Math.sqrt(unit2X * unit2X + unit2Y * unit2Y);
+            unit2X /= unitDistance;
+            unit2Y /= unitDistance;
          }
 
-         addVertex(vertices, curX, curY, vPrevX, vPrevY, vNextX, vNextY, pixelColor);
+         addVertex(vertices, curX, curY, unit1X, unit1Y, unit2X, unit2Y, pixelColor);
 
          curX = nextX;
          curY = nextY;
 
          // flip vector to point back
-         vPrevX = -vNextX;
-         vPrevY = -vNextY;
+         unit1X = -unit2X;
+         unit1Y = -unit2Y;
       }
 
-      ux = vPrevY;
-      uy = -vPrevX;
+      ux = unit1Y;
+      uy = -unit1X;
 
       isOutside = curX < tmin || curX > tmax || curY < tmin || curY > tmax;
 
@@ -912,14 +1083,14 @@ public class LineBucketMT extends RenderBucketMT {
          vertices.add(ox, oy, (short) (2 | -ddx & DIR_MASK), (short) (1 | -ddy & DIR_MASK), pixelColor);
 
          // for rounded line edges
-         ddx = (int) ((ux - vPrevX) * DIR_SCALE);
-         ddy = (int) ((uy - vPrevY) * DIR_SCALE);
+         ddx = (int) ((ux - unit1X) * DIR_SCALE);
+         ddy = (int) ((uy - unit1Y) * DIR_SCALE);
 
          vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (0 | ddy & DIR_MASK), pixelColor);
 
          // last vertex
-         ddx = (int) (-(ux + vPrevX) * DIR_SCALE);
-         ddy = (int) (-(uy + vPrevY) * DIR_SCALE);
+         ddx = (int) (-(ux + unit1X) * DIR_SCALE);
+         ddy = (int) (-(uy + unit1Y) * DIR_SCALE);
          dx = (short) (2 | ddx & DIR_MASK);
          dy = (short) (0 | ddy & DIR_MASK);
 
@@ -927,27 +1098,27 @@ public class LineBucketMT extends RenderBucketMT {
 
          if (isRounded == false && isSquared == false) {
 
-            vPrevX = 0;
-            vPrevY = 0;
+            unit1X = 0;
+            unit1Y = 0;
 
          } else if (isRounded) {
 
-            vPrevX *= 0.5;
-            vPrevY *= 0.5;
+            unit1X *= 0.5;
+            unit1Y *= 0.5;
          }
 
          if (isRounded) {
             numVertices -= 2;
          }
 
-         ddx = (int) ((ux - vPrevX) * DIR_SCALE);
-         ddy = (int) ((uy - vPrevY) * DIR_SCALE);
+         ddx = (int) ((ux - unit1X) * DIR_SCALE);
+         ddy = (int) ((uy - unit1Y) * DIR_SCALE);
 
          vertices.add(ox, oy, (short) (0 | ddx & DIR_MASK), (short) (1 | ddy & DIR_MASK), pixelColor);
 
          // last vertex
-         ddx = (int) (-(ux + vPrevX) * DIR_SCALE);
-         ddy = (int) (-(uy + vPrevY) * DIR_SCALE);
+         ddx = (int) (-(ux + unit1X) * DIR_SCALE);
+         ddy = (int) (-(uy + unit1Y) * DIR_SCALE);
          dx = (short) (2 | ddx & DIR_MASK);
          dy = (short) (1 | ddy & DIR_MASK);
       }
@@ -975,30 +1146,30 @@ public class LineBucketMT extends RenderBucketMT {
     * @param vertexData
     * @param x
     * @param y
-    * @param vNextX
-    * @param vNextY
-    * @param vPrevX
-    * @param vPrevY
+    * @param unitNextX
+    * @param unitNextY
+    * @param unitPrevX
+    * @param unitPrevY
     * @param pixelColor
     */
    private void addVertex(final VertexDataMT vertexData,
                           final float x,
                           final float y,
-                          final float vNextX,
-                          final float vNextY,
-                          final float vPrevX,
-                          final float vPrevY,
+                          final float unitNextX,
+                          final float unitNextY,
+                          final float unitPrevX,
+                          final float unitPrevY,
                           final int pixelColor) {
 
-      float ux = vNextX + vPrevX;
-      float uy = vNextY + vPrevY;
+      float ux = unitNextX + unitPrevX;
+      float uy = unitNextY + unitPrevY;
 
-      // vPrev times perpendicular of sum(vNext, vPrev)
-      final double a = uy * vPrevX - ux * vPrevY;
+      // vPrev times perpendicular of sum(unitNext, unitPrev)
+      final double a = uy * unitPrevX - ux * unitPrevY;
 
       if (a < 0.01 && a > -0.01) {
-         ux = -vPrevY;
-         uy = vPrevX;
+         ux = -unitPrevY;
+         uy = unitPrevX;
       } else {
          ux /= a;
          uy /= a;
@@ -1018,6 +1189,309 @@ public class LineBucketMT extends RenderBucketMT {
 // SET_FORMATTING_ON
    }
 
+   private void createArrow_MiddleFin(final short p2X_scaled,
+                                      final short p2Y_scaled,
+                                      final short pBackX_scaled,
+                                      final short pBackY_scaled,
+                                      final short pOnLineX_scaled,
+                                      final short pOnLineY_scaled,
+                                      final short arrowZ,
+                                      final short finTopZ,
+                                      final short arrowPart_Fin) {
+// SET_FORMATTING_OFF
+
+      // fin: middle
+      addDirArrowPosition(p2X_scaled,        p2Y_scaled,       arrowZ,     arrowPart_Fin, 1, 1, 0);
+      addDirArrowPosition(pOnLineX_scaled,   pOnLineY_scaled,  finTopZ,    arrowPart_Fin, 0, 1, 0);
+      addDirArrowPosition(pBackX_scaled,     pBackY_scaled,    arrowZ,     arrowPart_Fin, 0, 0, 1);
+
+// SET_FORMATTING_ON
+   }
+
+   private void createArrow_OuterFins(final short p2X_scaled,
+                                      final short p2Y_scaled,
+                                      final short pLeftX_scaled,
+                                      final short pLeftY_scaled,
+                                      final short pRight_Xscaled,
+                                      final short pRightY_scaled,
+                                      final short arrowZ,
+                                      final short finBottomZ,
+                                      final short arrowPart_Fin) {
+// SET_FORMATTING_OFF
+
+      // fin: left
+      addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
+      addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  arrowZ,     arrowPart_Fin, 0, 1, 0);
+      addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  finBottomZ, arrowPart_Fin, 0, 0, 1);
+
+      // fin: right
+      addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
+      addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, arrowZ,     arrowPart_Fin, 0, 1, 0);
+      addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, finBottomZ, arrowPart_Fin, 0, 0, 1);
+
+// SET_FORMATTING_ON
+   }
+
+   private void createArrow_Wings(final short p2X_scaled,
+                                  final short p2Y_scaled,
+                                  final short pLeftX_scaled,
+                                  final short pLeftY_scaled,
+                                  final short pRight_Xscaled,
+                                  final short pRightY_scaled,
+                                  final short pBackX_scaled,
+                                  final short pBackY_scaled,
+                                  final short arrowZ,
+                                  final short arrowPart_Wing) {
+// SET_FORMATTING_OFF
+
+      /*
+       * When the head and tail have the same z-value then the overlapping part is flickering
+       */
+      final short arrowHeadZ = (short) (arrowZ+1);
+
+      // wing: left
+      addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowHeadZ,    arrowPart_Wing, 1, 0, 0);
+      addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,        arrowPart_Wing, 0, 1, 1);
+      addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  arrowZ,        arrowPart_Wing, 0, 0, 1);
+
+      // wing: right
+      addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowHeadZ,    arrowPart_Wing, 1, 0, 0);
+      addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,        arrowPart_Wing, 0, 1, 1);
+      addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, arrowZ,        arrowPart_Wing, 0, 0, 1);
+
+// SET_FORMATTING_ON
+   }
+
+   /**
+    * @param allDirectionArrowPixel_Raw
+    *           Contains the x/y pixel positions for the direction arrows
+    */
+   public void createDirectionArrowVertices(final TFloatArrayList allDirectionArrowPixel_Raw) {
+
+      directionArrow_XYZPositions.clearQuick();
+      colorCoords.clearQuick();
+
+      // at least 2 positions are needed
+      if (allDirectionArrowPixel_Raw.size() < 4) {
+         return;
+      }
+
+      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+
+      final float[] allDirectionArrowPixel = allDirectionArrowPixel_Raw.toArray();
+
+// SET_FORMATTING_OFF
+
+      final float configArrowScale           = trackConfig.arrow_Scale / 10f;
+      final int   configArrowLength          = (int) (configArrowScale * trackConfig.arrow_Length);
+      final int   configArrowLengthCenter    = (int) (configArrowScale * trackConfig.arrow_LengthCenter);
+      final int   configArrowWidth           = (int) (configArrowScale * trackConfig.arrow_Width);
+      final int   configArrowHeight          = (int) (configArrowScale * trackConfig.arrow_Height);
+
+      final short arrowZ      = (short) trackConfig.arrow_VerticalOffset;
+      final short finTopZ     = (short) (arrowZ + configArrowHeight);
+      final short finBottomZ  = (short) (arrowZ - configArrowHeight);
+
+// SET_FORMATTING_ON
+
+      int pixelIndex = 0;
+
+      float p1X = allDirectionArrowPixel[pixelIndex++];
+      float p1Y = allDirectionArrowPixel[pixelIndex++];
+
+      for (; pixelIndex < allDirectionArrowPixel.length;) {
+
+         final float p2X = allDirectionArrowPixel[pixelIndex++];
+         final float p2Y = allDirectionArrowPixel[pixelIndex++];
+
+         // get direction/unit vector: dir = (P2-P1)/|P2-P1|
+         final float diffX = p2X - p1X;
+         final float diffY = p2Y - p1Y;
+
+         // distance between P1 and P2
+         final double p12Distance = Math.sqrt(diffX * diffX + diffY * diffY);
+
+         final double p12UnitX = diffX / p12Distance;
+         final double p12UnitY = diffY / p12Distance;
+
+         // get perpendicular vector for the arrow head
+         final double unitPerpendX = p12UnitY;
+         final double unitPerpendY = -p12UnitX;
+
+         final double arrowLength = Math.min(configArrowLength, p12Distance);
+         final double arrowLengthMiddle = Math.min(configArrowLengthCenter, p12Distance);
+         final double arrowWidth2 = configArrowWidth / 2; // half arrow width
+
+         // point on line between P1 and P2
+         final double pOnLineX = p2X - (arrowLength * p12UnitX);
+         final double pOnLineY = p2Y - (arrowLength * p12UnitY);
+         final double pBackX = p2X - (arrowLengthMiddle * p12UnitX);
+         final double pBackY = p2Y - (arrowLengthMiddle * p12UnitY);
+
+         final double vFinX = unitPerpendX * arrowWidth2;
+         final double vFinY = unitPerpendY * arrowWidth2;
+
+         // set arrow points which are left/right of the line
+         final float pLeftX = (float) (pOnLineX + vFinX);
+         final float pLeftY = (float) (pOnLineY + vFinY);
+
+         final float pRightX = (float) (pOnLineX - vFinX);
+         final float pRightY = (float) (pOnLineY - vFinY);
+
+         /**
+          * <code>
+          *
+          * WING
+          *
+          *                 Pleft
+          *                     #---\
+          *                      -   ---\
+          *                     . -      ---\
+          *                        -         ---\
+          *                     .   -            ---\
+          *                          -               ---\
+          *                     .     -                  ---\
+          *                            -                     ---\
+          *    P1  #------------#-------#------------------------# P2
+          *                 PonLine    - Pback               ---/
+          *                     .     -                  ---/
+          *                          -               ---/
+          *                     .   -            ---/
+          *                        -         ---/
+          *                     . -      ---/
+          *                      -   ---/
+          *                     #---/
+          *                 Pright
+          *
+          * FIN
+          *
+          *                 ZfinTop
+          *                     #---\
+          *                          ---\
+          *                     .        ---\
+          *                                  ---\
+          *                     .                ---\
+          *                                          ---\
+          *                     .                        ---\
+          *                                                  ---\
+          *    P1  #------------#--------------------------------# P2
+          *                 PonLine                          ---/
+          *                     .                        ---/
+          *                                          ---/
+          *                     .                ---/
+          *                                  ---/
+          *                     .        ---/
+          *                          ---/
+          *                     #---/
+          *                 ZfinBottom
+          * </code>
+          */
+
+         /*
+          * Set arrow positions
+          */
+
+// SET_FORMATTING_OFF
+
+         final short arrowPart_Wing    = 0;
+         final short arrowPart_Fin     = 1;
+
+         final short p2X_scaled        = (short) (p2X       * COORD_SCALE);
+         final short p2Y_scaled        = (short) (p2Y       * COORD_SCALE);
+         final short pLeftX_scaled     = (short) (pLeftX    * COORD_SCALE);
+         final short pLeftY_scaled     = (short) (pLeftY    * COORD_SCALE);
+         final short pRight_Xscaled    = (short) (pRightX   * COORD_SCALE);
+         final short pRightY_scaled    = (short) (pRightY   * COORD_SCALE);
+         final short pBackX_scaled     = (short) (pBackX    * COORD_SCALE);
+         final short pBackY_scaled     = (short) (pBackY    * COORD_SCALE);
+         final short pOnLineX_scaled   = (short) (pOnLineX  * COORD_SCALE);
+         final short pOnLineY_scaled   = (short) (pOnLineY  * COORD_SCALE);
+
+
+         /**
+          * !!! VERY IMPORTANT !!! <p>
+          *
+          * THE ORDER, TO FIX Z-FIGHTING
+          */
+
+         switch (trackConfig.arrow_Design) {
+
+         case WINGS_WITH_MIDDLE_FIN:
+
+            createArrow_Wings(      p2X_scaled,       p2Y_scaled,
+                                    pLeftX_scaled,    pLeftY_scaled,
+                                    pRight_Xscaled,   pRightY_scaled,
+                                    pBackX_scaled,    pBackY_scaled,
+                                    arrowZ,
+                                    arrowPart_Wing);
+
+            createArrow_MiddleFin(  p2X_scaled,       p2Y_scaled,
+                                    pBackX_scaled,    pBackY_scaled,
+                                    pOnLineX_scaled,  pOnLineY_scaled,
+                                    arrowZ,
+                                    finTopZ,
+                                    arrowPart_Fin);
+
+            break;
+
+         case WINGS_WITH_OUTER_FINS:
+
+            createArrow_Wings(      p2X_scaled,       p2Y_scaled,
+                                    pLeftX_scaled,    pLeftY_scaled,
+                                    pRight_Xscaled,   pRightY_scaled,
+                                    pBackX_scaled,    pBackY_scaled,
+                                    arrowZ,
+                                    arrowPart_Wing);
+
+            createArrow_OuterFins(  p2X_scaled,       p2Y_scaled,
+                                    pLeftX_scaled,    pLeftY_scaled,
+                                    pRight_Xscaled,   pRightY_scaled,
+                                    arrowZ,
+                                    finBottomZ,
+                                    arrowPart_Fin);
+
+            break;
+
+         case MIDDLE_FIN:
+
+            createArrow_MiddleFin(  p2X_scaled,       p2Y_scaled,
+                                    pBackX_scaled,    pBackY_scaled,
+                                    pOnLineX_scaled,  pOnLineY_scaled,
+                                    arrowZ,
+                                    finTopZ,
+                                    arrowPart_Fin);
+            break;
+
+         case OUTER_FINS:
+
+            createArrow_OuterFins(  p2X_scaled,       p2Y_scaled,
+                                    pLeftX_scaled,    pLeftY_scaled,
+                                    pRight_Xscaled,   pRightY_scaled,
+                                    arrowZ,
+                                    finBottomZ,
+                                    arrowPart_Fin);
+
+            break;
+
+         case WINGS:
+         default:
+            createArrow_Wings(      p2X_scaled,       p2Y_scaled,
+                                    pLeftX_scaled,    pLeftY_scaled,
+                                    pRight_Xscaled,   pRightY_scaled,
+                                    pBackX_scaled,    pBackY_scaled,
+                                    arrowZ,
+                                    arrowPart_Wing);
+            break;
+         }
+
+// SET_FORMATTING_ON
+
+         // setup next position
+         p1X = p2X;
+         p1Y = p2Y;
+      }
+   }
+
    /**
     * Default is MIN_DIST * 4 = 1/8 * 4.
     */
@@ -1035,5 +1509,6 @@ public class LineBucketMT extends RenderBucketMT {
    public void setExtents(final int min, final int max) {
       tmin = min;
       tmax = max;
+
    }
 }

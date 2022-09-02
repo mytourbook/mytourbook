@@ -914,7 +914,6 @@ public class SlideoutMap25_MarkerOptions extends ToolbarSlideout implements ICol
       Map25ConfigManager.setActiveMarkerConfig(selectedConfig);
 
       restoreState();
-
       enableControls();
 
       updateUI_Map();

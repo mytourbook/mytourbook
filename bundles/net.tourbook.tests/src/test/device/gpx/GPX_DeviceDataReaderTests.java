@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,32 +18,21 @@ package device.gpx;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourWayPoint;
-import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
-import net.tourbook.device.gpx.GPX_SAX_Handler;
-import net.tourbook.importdata.DeviceData;
+import net.tourbook.device.gpx.GPXDeviceDataReader;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 
 import utils.Comparison;
 import utils.FilesUtils;
-import utils.Initializer;
 
 /**
  * GPX device plugin test.
@@ -53,55 +42,39 @@ import utils.Initializer;
  *
  * @author Norbert Renner
  */
-class GPX_SAX_HandlerTests {
+class GPX_DeviceDataReaderTests {
 
-   private static SAXParser                  parser;
-   private static DeviceData                 deviceData;
-   private static HashMap<Long, TourData>    newlyImportedTours;
-   private static HashMap<Long, TourData>    alreadyImportedTours;
-   private static GarminTCX_DeviceDataReader deviceDataReader;
+   private static HashMap<Long, TourData> newlyImportedTours;
+   private static GPXDeviceDataReader     deviceDataReader;
 
    /**
     * Resource path to GPX file, generally available from net.tourbook Plugin
     * in test/net.tourbook
     */
-   public static final String                IMPORT_FILE_PATH = FilesUtils.rootPath + "device/gpx/files/test.gpx"; //$NON-NLS-1$
+   public static final String             FILE_PATH = FilesUtils.rootPath + "device/gpx/files/test.gpx"; //$NON-NLS-1$
 
    @BeforeAll
    static void initAll() {
 
-      parser = Initializer.initializeParser();
-      deviceData = new DeviceData();
       newlyImportedTours = new HashMap<>();
-      alreadyImportedTours = new HashMap<>();
-      deviceDataReader = new GarminTCX_DeviceDataReader();
+      deviceDataReader = new GPXDeviceDataReader();
    }
 
    /**
     * Regression test. Imports GPX into TourData and checks all values of tour1
     * and waypoint1.
-    *
-    * @throws ParserConfigurationException
-    * @throws IOException
-    * @throws SAXException
     */
    @Test
-   void testParse() throws SAXException, IOException {
+   void testParse() {
 
-      final String testFilePath = FilesUtils.getAbsoluteFilePath(IMPORT_FILE_PATH);
-      final File file = new File(testFilePath);
-      final InputStream in = new FileInputStream(file);
+      final String testFilePath = FilesUtils.getAbsoluteFilePath(FILE_PATH);
 
-      final GPX_SAX_Handler handler = new GPX_SAX_Handler(
-            IMPORT_FILE_PATH,
-            deviceData,
-            alreadyImportedTours,
+      deviceDataReader.processDeviceData(testFilePath,
+            null,
+            new HashMap<>(),
             newlyImportedTours,
             new ImportState_File(),
-            new ImportState_Process(),
-            deviceDataReader);
-
-      parser.parse(in, handler);
+            new ImportState_Process());
 
       final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
 

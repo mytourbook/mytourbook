@@ -58,7 +58,7 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
 
    private static final String          GEO_LOCATION_FORMAT = "%.6f";                                                                 //$NON-NLS-1$
 
-   private static final Pattern         _intOrFloatPattern  = Pattern.compile("\\d*[\\.,]?\\d+");                                     //$NON-NLS-1$
+   private static final Pattern         _intOrFloatPattern  = Pattern.compile("[-]?\\d*[\\.,]?\\d+");                                 //$NON-NLS-1$
 
    private static final IDialogSettings _state              = TourbookPlugin.getState("net.tourbook.map.bookmark.DialogGotoLocation");//$NON-NLS-1$
 

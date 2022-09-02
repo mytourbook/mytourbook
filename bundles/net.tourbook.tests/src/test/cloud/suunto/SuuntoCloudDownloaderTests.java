@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import net.tourbook.cloud.Activator;
+import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.suunto.SuuntoCloudDownloader;
@@ -101,7 +102,7 @@ public class SuuntoCloudDownloaderTests {
 
             // Look at the shell title to see if it is the one we want
 
-            if ("Suunto App Workouts Download Summary".equals(shell.getText())) { //$NON-NLS-1$
+            if (Messages.Dialog_DownloadWorkoutsFromSuunto_Title.equals(shell.getText())) {
                // Close the shell after it has finished initializing
 
                Display.getDefault().asyncExec(shell::close);
@@ -147,11 +148,4 @@ public class SuuntoCloudDownloaderTests {
 
       net.tourbook.common.util.FilesUtils.deleteIfExists(Paths.get(downloadedFilename));
    }
-
-   /*
-    * TODO
-    * @Test
-    * void testTourUpload() {
-    * }
-    */
 }

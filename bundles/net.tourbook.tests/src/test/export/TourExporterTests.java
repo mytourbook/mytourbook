@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -36,9 +36,9 @@ import utils.Initializer;
 
 public class TourExporterTests {
 
-   private static final String IMPORT_PATH          = FilesUtils.rootPath + "export/files/"; //$NON-NLS-1$
-   private static final String _testTourFilePathTcx = IMPORT_PATH + "TCXExport.tcx";         //$NON-NLS-1$
-   private static final String _testTourFilePathGpx = IMPORT_PATH + "GPXExport.gpx";         //$NON-NLS-1$
+   private static final String FILES_PATH           = FilesUtils.rootPath + "export/files/"; //$NON-NLS-1$
+   private static final String _testTourFilePathTcx = FILES_PATH + "TCXExport.tcx";          //$NON-NLS-1$
+   private static final String _testTourFilePathGpx = FILES_PATH + "GPXExport.gpx";          //$NON-NLS-1$
 
    private static TourData     _tour;
    private TourExporter        _tourExporter;
@@ -65,7 +65,7 @@ public class TourExporterTests {
 
       final List<String> nodesToFilter = Arrays.asList("Cadence", "mt:tourType", "mt:tourDistance"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       final List<String> attributesToFilter = Arrays.asList("creator"); //$NON-NLS-1$
-      Comparison.compareXmlAgainstControl(IMPORT_PATH + controlTourFileName,
+      Comparison.compareXmlAgainstControl(FILES_PATH + controlTourFileName,
             _testTourFilePathGpx,
             nodesToFilter,
             attributesToFilter);
@@ -77,7 +77,7 @@ public class TourExporterTests {
 
       final List<String> nodesToFilter = Arrays.asList("Cadence", "Author", "Creator"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       final List<String> attributesToFilter = new ArrayList<>();
-      Comparison.compareXmlAgainstControl(IMPORT_PATH + controlTourFileName,
+      Comparison.compareXmlAgainstControl(FILES_PATH + controlTourFileName,
             _testTourFilePathTcx,
             nodesToFilter,
             attributesToFilter);

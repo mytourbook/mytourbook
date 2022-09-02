@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,100 +15,31 @@
  *******************************************************************************/
 package device.garmin;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-
-import javax.xml.parsers.SAXParser;
-
-import net.tourbook.data.TourData;
 import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
-import net.tourbook.device.garmin.GarminTCX_SAXHandler;
-import net.tourbook.importdata.DeviceData;
-import net.tourbook.importdata.ImportState_File;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.xml.sax.SAXException;
 
-import utils.Comparison;
+import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
-import utils.Initializer;
 
-public class GarminTCX_DeviceDataReaderTests {
+public class GarminTCX_DeviceDataReaderTests extends DeviceDataReaderTester {
 
-   private static SAXParser                  parser;
-   public static final String                IMPORT_PATH = "/device/garmin/tcx/files/"; //$NON-NLS-1$
+   public static final String         FILES_PATH       = FilesUtils.rootPath + "device/garmin/tcx/files/"; //$NON-NLS-1$
 
-   private static DeviceData                 deviceData;
-   private static HashMap<Long, TourData>    newlyImportedTours;
-   private static HashMap<Long, TourData>    alreadyImportedTours;
-   private static GarminTCX_DeviceDataReader deviceDataReader;
+   private GarminTCX_DeviceDataReader deviceDataReader = new GarminTCX_DeviceDataReader();
 
-   @BeforeAll
-   static void initAll() {
-      parser = Initializer.initializeParser();
-      deviceData = new DeviceData();
-      newlyImportedTours = new HashMap<>();
-      alreadyImportedTours = new HashMap<>();
-      deviceDataReader = new GarminTCX_DeviceDataReader();
-   }
-
-   @AfterEach
-   void tearDown() {
-      newlyImportedTours.clear();
-      alreadyImportedTours.clear();
-   }
-
-   /**
-    * Regression test
-    *
-    * @throws IOException
-    * @throws SAXException
-    */
    @Test
-   void testTcxImportConeyLake() throws SAXException, IOException {
+   void testTcxImportConeyLake() {
 
-      final String filePathWithoutExtension = IMPORT_PATH + "Move_2020_05_23_08_55_42_Trail+running"; //$NON-NLS-1$
-      final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
-      final InputStream tcxFile = GarminTCX_DeviceDataReaderTests.class.getResourceAsStream(importFilePath);
-
-      final GarminTCX_SAXHandler handler = new GarminTCX_SAXHandler(deviceDataReader,
-            importFilePath,
-            deviceData,
-            alreadyImportedTours,
-            newlyImportedTours,
-            new ImportState_File());
-
-      parser.parse(tcxFile, handler);
-
-      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
-
-      Comparison.compareTourDataAgainstControl(tour, FilesUtils.rootPath + filePathWithoutExtension);
+      testImportFile(deviceDataReader, FILES_PATH + "Move_2020_05_23_08_55_42_Trail+running", ".tcx");
    }
 
    /**
     * TCX file with pauses
     */
    @Test
-   void testTcxImportLyons() throws SAXException, IOException {
+   void testTcxImportLyons() {
 
-      final String filePathWithoutExtension = IMPORT_PATH + "2021-01-31"; //$NON-NLS-1$
-      final String importFilePath = filePathWithoutExtension + ".tcx"; //$NON-NLS-1$
-      final InputStream tcxFile = GarminTCX_DeviceDataReaderTests.class.getResourceAsStream(importFilePath);
-
-      final GarminTCX_SAXHandler handler = new GarminTCX_SAXHandler(deviceDataReader,
-            importFilePath,
-            deviceData,
-            alreadyImportedTours,
-            newlyImportedTours,
-            new ImportState_File());
-
-      parser.parse(tcxFile, handler);
-
-      final TourData tour = Comparison.retrieveImportedTour(newlyImportedTours);
-
-      Comparison.compareTourDataAgainstControl(tour, FilesUtils.rootPath + filePathWithoutExtension);
+      testImportFile(deviceDataReader, FILES_PATH + "2021-01-31", ".tcx");
    }
 }

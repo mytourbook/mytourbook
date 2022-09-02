@@ -95,6 +95,18 @@ public class VertexDataMT extends Inlist.List<Chunk> {
       }
    }
 
+   public void add(final short a, final short b) {
+
+      if (_numUsedChunkVertices == SIZE) {
+         getNext();
+      }
+
+      _currentChunk_Vertices[_numUsedChunkVertices + 0] = a;
+      _currentChunk_Vertices[_numUsedChunkVertices + 1] = b;
+
+      _numUsedChunkVertices += 2;
+   }
+
    public void add(final short a, final short b, final short c, final short d, final int color) {
 
       if (_numUsedChunkVertices == SIZE) {
@@ -112,7 +124,7 @@ public class VertexDataMT extends Inlist.List<Chunk> {
       _numUsedChunkVertices += 4;
 
       /*
-       * Set color components rgb
+       * Set color components, argb -> rgba
        */
       _currentChunk_Colors[_numUsedChunkColors + 0] = (byte) ((color >>> 16) & 0xff); // red
       _currentChunk_Colors[_numUsedChunkColors + 1] = (byte) ((color >>> 8) & 0xff); // green
