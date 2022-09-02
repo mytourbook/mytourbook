@@ -112,5 +112,8 @@ public class WorkbenchTests extends UITest {
 
       bot.toolbarButtonWithTooltip("Search for tours, marker and waypoints (Ctrl+K)").click(); //$NON-NLS-1$
       Utils.showView(bot, "Search Tours"); //$NON-NLS-1$
+
+      Utils.showViewFromMenu(bot, DIRECTORY, "Tour Marker"); //$NON-NLS-1$
+      Utils.showView(bot, "Tour Marker"); //$NON-NLS-1$
    }
 }
