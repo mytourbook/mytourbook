@@ -110,7 +110,7 @@ public class TourBookViewTests extends UITest {
       assertNotNull(tour);
 
       //Check the original calories value
-      assertEquals("11", tour.cell(tourBookView_Temperature_Column_Index)); //$NON-NLS-1$
+      assertEquals("1,073", tour.cell(tourBookView_Temperature_Column_Index)); //$NON-NLS-1$
 
       //Multiply the calories by 1000
       tour.contextMenu(Messages.Tour_Action_AdjustTourValues).menu(Messages.Tour_Action_MultiplyCaloriesBy1000).click();
@@ -120,6 +120,6 @@ public class TourBookViewTests extends UITest {
       tour = bot.tree().getTreeItem("2020   3").expand() //$NON-NLS-1$
             .getNode("May   2").expand().select().getNode("23").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
-      assertEquals("11,000", tour.cell(tourBookView_Temperature_Column_Index)); //$NON-NLS-1$
+      assertEquals("1,073,000", tour.cell(tourBookView_Temperature_Column_Index)); //$NON-NLS-1$
    }
 }
