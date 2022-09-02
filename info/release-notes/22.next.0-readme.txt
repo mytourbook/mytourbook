@@ -26,7 +26,8 @@ Experimental
 New
 ===
 
-* 
+* 2.5D Map
+  - Show direction arrows                 https://github.com/mytourbook/mytourbook/issues/516#issuecomment-1234322325
   
 
 Improvements

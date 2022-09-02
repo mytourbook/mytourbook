@@ -142,12 +142,12 @@ public class Map25ConfigManager {
    public static final int                  LINE_OPACITY_DEFAULT                  = 180;                             // 70 %
    public static final int                  LINE_WIDTH_MIN                        = 1;
    public static final int                  LINE_WIDTH_MAX                        = 20;
-   public static final float                LINE_WIDTH_DEFAULT                    = 2.5f;
+   public static final float                LINE_WIDTH_DEFAULT                    = 10f;
    //
    public static final boolean              OUTLINE_IS_SHOW_OUTLINE_DEFAULT       = true;
    public static final int                  OUTLINE_BRIGHTNESS_MIN                = -10;
    public static final int                  OUTLINE_BRIGHTNESS_MAX                = 10;
-   public static final float                OUTLINE_BRIGHTNESS_DEFAULT            = 0.5f;
+   public static final float                OUTLINE_BRIGHTNESS_DEFAULT            = -0.5f;
    public static final int                  OUTLINE_WIDTH_MIN                     = 0;
    public static final int                  OUTLINE_WIDTH_MAX                     = 20;
    public static final float                OUTLINE_WIDTH_DEFAULT                 = 2f;
@@ -473,91 +473,136 @@ public class Map25ConfigManager {
       switch (configIndex) {
 
       case 1:
-         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_1;
-         config.lineWidth              = LINE_WIDTH_DEFAULT;
+         config.name                         = config.defaultId = CONFIG_DEFAULT_ID_1;
+         config.lineWidth                    = LINE_WIDTH_DEFAULT;
+         config.lineOpacity                  = 255;
 
-         config.arrow_Design           = DirectionArrowDesign.WINGS;
+         config.isShowDirectionArrow         = true;
+         config.arrow_MinimumDistance        = 60;
+         config.arrow_VerticalOffset         = 30;
+         config.arrow_Design                 = DirectionArrowDesign.WINGS;
+         config.arrow_Scale                  = 13;
+         config.arrow_Length                 = 30;
+         config.arrow_LengthCenter           = 30;
+         config.arrow_Width                  = 20;
+         config.arrow_Height                 = 20;
+         config.arrowFin_OutlineWidth        = 5;
+         config.arrowWing_OutlineWidth       = 10;
+         config.arrowFin_InsideColor         = new RGBA(0x10, 0x10, 0x10, 0x80);
+         config.arrowFin_OutlineColor        = new RGBA(0xff, 0xff, 0xff, 0xff);
+         config.arrowWing_InsideColor        = new RGBA(0xff, 0xff, 0xff, 0x80);
+         config.arrowWing_OutlineColor       = new RGBA(0x37, 0x37, 0x37, 0xb3);
+
          break;
 
       case 2:
-         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_2;
-         config.lineWidth              = 1;
+         config.name                         = config.defaultId = CONFIG_DEFAULT_ID_2;
+         config.lineWidth                    = 12;
 
-         config.arrow_Design           = DirectionArrowDesign.WINGS_WITH_MIDDLE_FIN;
+         config.arrow_Design                 = DirectionArrowDesign.WINGS_WITH_MIDDLE_FIN;
          break;
 
       case 3:
-         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_3;
-         config.lineWidth              = 3;
+         config.name                         = config.defaultId = CONFIG_DEFAULT_ID_3;
+         config.lineWidth                    = 13;
 
-         config.arrow_Design           = DirectionArrowDesign.WINGS_WITH_OUTER_FINS;
+         config.arrow_Design                 = DirectionArrowDesign.WINGS_WITH_OUTER_FINS;
          break;
 
       case 4:
-         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_4;
-         config.lineWidth              = 4;
+         config.name                         = config.defaultId = CONFIG_DEFAULT_ID_4;
+         config.lineWidth                    = 14;
 
-         config.arrow_Design           = DirectionArrowDesign.MIDDLE_FIN;
+         config.arrow_Design                 = DirectionArrowDesign.MIDDLE_FIN;
          break;
 
       case 5:
-         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_5;
-         config.lineWidth              = 5;
+         config.name                         = config.defaultId = CONFIG_DEFAULT_ID_5;
+         config.lineWidth                    = 15;
 
-         config.arrow_Design           = DirectionArrowDesign.OUTER_FINS;
+         config.arrow_Design                 = DirectionArrowDesign.OUTER_FINS;
 
-         config.isShowSliderLocation   = false;
-         config.isShowSliderPath       = false;
+         config.isShowSliderLocation         = false;
+         config.isShowSliderPath             = false;
          break;
 
       case 6:
-         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_6;
-         config.lineWidth              = 6;
+         config.name                         = config.defaultId = CONFIG_DEFAULT_ID_6;
+         config.lineWidth                    = 16;
 
-         config.arrow_Design           = DirectionArrowDesign.WINGS;
+         config.isShowSliderLocation         = false;
+         config.isShowSliderPath             = false;
 
-         config.isShowSliderLocation   = false;
-         config.isShowSliderPath       = false;
+         config.isShowDirectionArrow         = true;
+         config.arrow_MinimumDistance        = 60;
+         config.arrow_VerticalOffset         = 30;
+         config.arrow_Design                 = DirectionArrowDesign.WINGS;
+         config.arrow_Scale                  = 10;
+         config.arrow_Length                 = 30;
+         config.arrow_LengthCenter           = 30;
+         config.arrow_Width                  = 25;
+         config.arrow_Height                 = 20;
+         config.arrowFin_OutlineWidth        = 5;
+         config.arrowWing_OutlineWidth       = 15;
+         config.arrowFin_InsideColor         = new RGBA (16, 16, 16, 128);
+         config.arrowFin_OutlineColor        = new RGBA (255, 255, 255, 255);
+         config.arrowWing_InsideColor        = new RGBA (255, 255, 255, 77);
+         config.arrowWing_OutlineColor       = new RGBA (91, 91, 91, 204);
+
          break;
 
       case 7:
-         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_7;
-         config.lineWidth              = 7;
+         config.name                         = config.defaultId = CONFIG_DEFAULT_ID_7;
+         config.lineWidth                    = 17;
 
-         config.arrow_Design           = DirectionArrowDesign.WINGS_WITH_MIDDLE_FIN;
+         config.isShowSliderLocation         = false;
+         config.isShowSliderPath             = false;
 
-         config.isShowSliderLocation   = false;
-         config.isShowSliderPath       = false;
+         config.isShowDirectionArrow         = true;
+         config.arrow_MinimumDistance        = 60;
+         config.arrow_VerticalOffset         = 30;
+         config.arrow_Design                 = DirectionArrowDesign.WINGS_WITH_MIDDLE_FIN;
+         config.arrow_Scale                  = 10;
+         config.arrow_Length                 = 30;
+         config.arrow_LengthCenter           = 30;
+         config.arrow_Width                  = 25;
+         config.arrow_Height                 = 20;
+         config.arrowFin_OutlineWidth        = 10;
+         config.arrowWing_OutlineWidth       = 15;
+         config.arrowFin_InsideColor         = new RGBA (255, 0, 0, 179);
+         config.arrowFin_OutlineColor        = new RGBA (255, 255, 255, 255);
+         config.arrowWing_InsideColor        = new RGBA (255, 255, 255, 77);
+         config.arrowWing_OutlineColor       = new RGBA (91, 91, 91, 204);
          break;
 
       case 8:
-         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_8;
-         config.lineWidth              = 8;
+         config.name                         = config.defaultId = CONFIG_DEFAULT_ID_8;
+         config.lineWidth                    = 18;
 
-         config.arrow_Design           = DirectionArrowDesign.WINGS_WITH_OUTER_FINS;
+         config.arrow_Design                 = DirectionArrowDesign.WINGS_WITH_OUTER_FINS;
 
-         config.isShowSliderLocation   = false;
-         config.isShowSliderPath       = false;
+         config.isShowSliderLocation         = false;
+         config.isShowSliderPath             = false;
          break;
 
       case 9:
-         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_9;
-         config.lineWidth              = 9;
+         config.name                         = config.defaultId = CONFIG_DEFAULT_ID_9;
+         config.lineWidth                    = 19;
 
-         config.arrow_Design           = DirectionArrowDesign.MIDDLE_FIN;
+         config.arrow_Design                 = DirectionArrowDesign.MIDDLE_FIN;
 
-         config.isShowSliderLocation   = false;
-         config.isShowSliderPath       = false;
+         config.isShowSliderLocation         = false;
+         config.isShowSliderPath             = false;
          break;
 
       case 10:
-         config.name                   = config.defaultId = CONFIG_DEFAULT_ID_10;
-         config.lineWidth              = 10;
+         config.name                         = config.defaultId = CONFIG_DEFAULT_ID_10;
+         config.lineWidth                    = 20;
 
-         config.arrow_Design           = DirectionArrowDesign.OUTER_FINS;
+         config.arrow_Design                 = DirectionArrowDesign.OUTER_FINS;
 
-         config.isShowSliderLocation   = false;
-         config.isShowSliderPath       = false;
+         config.isShowSliderLocation         = false;
+         config.isShowSliderPath             = false;
          break;
       }
 

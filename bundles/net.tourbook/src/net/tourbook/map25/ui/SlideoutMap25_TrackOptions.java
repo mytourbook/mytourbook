@@ -1474,7 +1474,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       config.updateShaderArrowColors();
 
       // dump config which is helpful when setting default values
-//    System.out.println(" [" + getClass().getSimpleName() + "] \n\n" + config); //$NON-NLS-1$ //$NON-NLS-2$
+      System.out.println(" [" + getClass().getSimpleName() + "] \n\n" + config.createFormattedCode()); //$NON-NLS-1$ //$NON-NLS-2$
 // TODO remove SYSTEM.OUT.PRINTLN
    }
 

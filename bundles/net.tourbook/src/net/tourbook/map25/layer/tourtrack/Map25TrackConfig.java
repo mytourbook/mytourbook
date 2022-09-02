@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.map25.layer.tourtrack;
 
+import static net.tourbook.common.formatter.CodeFormatter.RGB;
+import static net.tourbook.common.formatter.CodeFormatter.RGBA;
+
 import net.tourbook.common.UI;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.map.MapUI.DirectionArrowDesign;
@@ -126,6 +129,70 @@ public class Map25TrackConfig {
       }
    }
 
+   public String createFormattedCode() {
+
+      final String CONFIG = "config.";//$NON-NLS-1$
+      final String EOL = UI.EMPTY_STRING + UI.SYMBOL_SEMICOLON + NL;
+
+      // used for floating point values
+      final String fEOL = "f" + EOL;//$NON-NLS-1$
+
+      return UI.EMPTY_STRING
+
+            + "Map25TrackConfig" + NL //                                                                 //$NON-NLS-1$
+
+            + "[" + NL //                                                                                //$NON-NLS-1$
+
+            + CONFIG + "id                           = " + id + EOL //                                   //$NON-NLS-1$
+            + CONFIG + "defaultId                    = " + defaultId + EOL //                            //$NON-NLS-1$
+            + CONFIG + "name                         = " + name + EOL //                                 //$NON-NLS-1$
+            + CONFIG + "isTrackVerticalOffset        = " + isTrackVerticalOffset + EOL //                //$NON-NLS-1$
+            + CONFIG + "lineColor                    = " + RGB(lineColor) + EOL //                       //$NON-NLS-1$
+            + CONFIG + "lineColorMode                = " + lineColorMode + EOL //                        //$NON-NLS-1$
+            + CONFIG + "lineOpacity                  = " + lineOpacity + EOL //                          //$NON-NLS-1$
+            + CONFIG + "lineWidth                    = " + lineWidth + EOL //                            //$NON-NLS-1$
+            + CONFIG + "trackVerticalOffset          = " + trackVerticalOffset + EOL //                  //$NON-NLS-1$
+            + NL
+            + CONFIG + "isShowDirectionArrow         = " + isShowDirectionArrow + EOL //                 //$NON-NLS-1$
+            + CONFIG + "arrow_MinimumDistance        = " + arrow_MinimumDistance + EOL //                //$NON-NLS-1$
+            + CONFIG + "arrow_VerticalOffset         = " + arrow_VerticalOffset + EOL //                 //$NON-NLS-1$
+            + CONFIG + "arrow_Design                 = DirectionArrowDesign." + arrow_Design + EOL //    //$NON-NLS-1$
+
+            + CONFIG + "arrow_Scale                  = " + arrow_Scale + EOL //                          //$NON-NLS-1$
+            + CONFIG + "arrow_Length                 = " + arrow_Length + EOL //                         //$NON-NLS-1$
+            + CONFIG + "arrow_LengthCenter           = " + arrow_LengthCenter + EOL //                   //$NON-NLS-1$
+            + CONFIG + "arrow_Width                  = " + arrow_Width + EOL //                          //$NON-NLS-1$
+            + CONFIG + "arrow_Height                 = " + arrow_Height + EOL //                         //$NON-NLS-1$
+
+            + CONFIG + "arrowFin_OutlineWidth        = " + arrowFin_OutlineWidth + EOL //                //$NON-NLS-1$
+            + CONFIG + "arrowWing_OutlineWidth       = " + arrowWing_OutlineWidth + EOL //               //$NON-NLS-1$
+
+            + CONFIG + "arrowFin_InsideColor         = " + RGBA(arrowFin_InsideColor) + EOL //           //$NON-NLS-1$
+            + CONFIG + "arrowFin_OutlineColor        = " + RGBA(arrowFin_OutlineColor) + EOL //          //$NON-NLS-1$
+            + CONFIG + "arrowWing_InsideColor        = " + RGBA(arrowWing_InsideColor) + EOL //          //$NON-NLS-1$
+            + CONFIG + "arrowWing_OutlineColor       = " + RGBA(arrowWing_OutlineColor) + EOL //         //$NON-NLS-1$
+            + NL
+            + CONFIG + "isShowOutline                = " + isShowOutline + EOL //                        //$NON-NLS-1$
+            + CONFIG + "outlineBrighness             = " + outlineBrighness + fEOL //                    //$NON-NLS-1$
+            + CONFIG + "outlineWidth                 = " + outlineWidth + fEOL //                        //$NON-NLS-1$
+            + NL
+            + CONFIG + "isShowSliderLocation         = " + isShowSliderLocation + EOL //                 //$NON-NLS-1$
+            + CONFIG + "sliderLocation_Left_Color    = " + RGB(sliderLocation_Left_Color) + EOL //       //$NON-NLS-1$
+            + CONFIG + "sliderLocation_Right_Color   = " + RGB(sliderLocation_Right_Color) + EOL //      //$NON-NLS-1$
+            + CONFIG + "sliderLocation_Opacity       = " + sliderLocation_Opacity + EOL //               //$NON-NLS-1$
+            + CONFIG + "sliderLocation_Size          = " + sliderLocation_Size + EOL //                  //$NON-NLS-1$
+            + NL
+            + CONFIG + "isShowSliderPath             = " + isShowSliderPath + EOL //                     //$NON-NLS-1$
+            + CONFIG + "sliderPath_Color             = " + RGB(sliderPath_Color) + EOL //                //$NON-NLS-1$
+            + CONFIG + "sliderPath_LineWidth         = " + sliderPath_LineWidth + EOL //                 //$NON-NLS-1$
+            + CONFIG + "sliderPath_Opacity           = " + sliderPath_Opacity + EOL //                   //$NON-NLS-1$
+
+            + CONFIG + "testValue                    = " + testValue + EOL //                            //$NON-NLS-1$
+
+            + "]" + NL //                                                                                //$NON-NLS-1$
+      ;
+   }
+
    @Override
    public boolean equals(final Object obj) {
 
@@ -178,60 +245,7 @@ public class Map25TrackConfig {
    @Override
    public String toString() {
 
-      return UI.EMPTY_STRING
-
-            + "Map25TrackConfig" + NL //                                         //$NON-NLS-1$
-
-            + "[" + NL //                                                        //$NON-NLS-1$
-
-            + "id                         = " + id + NL //                        //$NON-NLS-1$
-            + "defaultId                  = " + defaultId + NL //                 //$NON-NLS-1$
-            + "name                       = " + name + NL //                      //$NON-NLS-1$
-            + "isTrackVerticalOffset      = " + isTrackVerticalOffset + NL //     //$NON-NLS-1$
-            + "lineColor                  = " + lineColor + NL //                 //$NON-NLS-1$
-            + "lineColorMode              = " + lineColorMode + NL //             //$NON-NLS-1$
-            + "lineOpacity                = " + lineOpacity + NL //               //$NON-NLS-1$
-            + "lineWidth                  = " + lineWidth + NL //                 //$NON-NLS-1$
-            + "trackVerticalOffset        = " + trackVerticalOffset + NL //       //$NON-NLS-1$
-            + NL
-            + "isShowDirectionArrow       = " + isShowDirectionArrow + NL //      //$NON-NLS-1$
-            + "arrow_MinimumDistance      = " + arrow_MinimumDistance + NL //     //$NON-NLS-1$
-            + "arrow_VerticalOffset       = " + arrow_VerticalOffset + NL //      //$NON-NLS-1$
-            + "arrow_Design               = " + arrow_Design + NL //              //$NON-NLS-1$
-
-            + "arrow_Scale                = " + arrow_Scale + NL //               //$NON-NLS-1$
-            + "arrow_Length               = " + arrow_Length + NL //              //$NON-NLS-1$
-            + "arrow_LengthCenter         = " + arrow_LengthCenter + NL //        //$NON-NLS-1$
-            + "arrow_Width                = " + arrow_Width + NL //               //$NON-NLS-1$
-            + "arrow_Height               = " + arrow_Height + NL //              //$NON-NLS-1$
-
-            + "arrowFin_OutlineWidth      = " + arrowFin_OutlineWidth + NL //     //$NON-NLS-1$
-            + "arrowWing_OutlineWidth     = " + arrowWing_OutlineWidth + NL //    //$NON-NLS-1$
-
-            + "arrowFin_InsideColor       = " + arrowFin_InsideColor + NL //      //$NON-NLS-1$
-            + "arrowFin_OutlineColor      = " + arrowFin_OutlineColor + NL //     //$NON-NLS-1$
-            + "arrowWing_InsideColor      = " + arrowWing_InsideColor + NL //     //$NON-NLS-1$
-            + "arrowWing_OutlineColor     = " + arrowWing_OutlineColor + NL //    //$NON-NLS-1$
-            + NL
-            + "isShowOutline              = " + isShowOutline + NL //             //$NON-NLS-1$
-            + "outlineBrighness           = " + outlineBrighness + NL //          //$NON-NLS-1$
-            + "outlineWidth               = " + outlineWidth + NL //              //$NON-NLS-1$
-            + NL
-            + "isShowSliderLocation       = " + isShowSliderLocation + NL //      //$NON-NLS-1$
-            + "sliderLocation_Left_Color  = " + sliderLocation_Left_Color + NL // //$NON-NLS-1$
-            + "sliderLocation_Right_Color = " + sliderLocation_Right_Color + NL ////$NON-NLS-1$
-            + "sliderLocation_Opacity     = " + sliderLocation_Opacity + NL //    //$NON-NLS-1$
-            + "sliderLocation_Size        = " + sliderLocation_Size + NL //       //$NON-NLS-1$
-            + NL
-            + "isShowSliderPath           = " + isShowSliderPath + NL //          //$NON-NLS-1$
-            + "sliderPath_Color           = " + sliderPath_Color + NL //          //$NON-NLS-1$
-            + "sliderPath_LineWidth       = " + sliderPath_LineWidth + NL //      //$NON-NLS-1$
-            + "sliderPath_Opacity         = " + sliderPath_Opacity + NL //        //$NON-NLS-1$
-
-            + "testValue                  = " + testValue + NL //                 //$NON-NLS-1$
-
-            + "]" + NL //                                                        //$NON-NLS-1$
-      ;
+      return createFormattedCode();
    }
 
    public void updateShaderArrowColors() {

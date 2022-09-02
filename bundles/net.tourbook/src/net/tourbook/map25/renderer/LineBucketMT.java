@@ -220,7 +220,40 @@ public class LineBucketMT extends RenderBucketMT {
        * @param renderBucketsAll
        * @return
        */
-      public static RenderBucketMT draw(RenderBucketMT renderBucket,
+      public static RenderBucketMT draw(final RenderBucketMT renderBucket,
+                                        final GLViewport viewport,
+                                        final float vp2mpScale,
+                                        final RenderBucketsAllMT renderBucketsAll) {
+
+         final RenderBucketMT[] inoutRenderBucket = new RenderBucketMT[] { renderBucket };
+
+         final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+
+         gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
+         {
+            draw_10_Track(inoutRenderBucket, viewport, vp2mpScale, renderBucketsAll);
+
+            if (trackConfig.isShowDirectionArrow) {
+               draw_20_DirectionArrows(viewport, renderBucketsAll, vp2mpScale);
+            }
+         }
+         gl.blendFunc(GL.ONE, GL.ONE_MINUS_SRC_ALPHA); // reset to map default
+
+         return inoutRenderBucket[0];
+      }
+
+      /**
+       * Performs OpenGL drawing commands of the renderBucket(s)
+       *
+       * @param inoutRenderBucket
+       *           In/out render bucked
+       * @param viewport
+       * @param vp2mpScale
+       *           Viewport scale 2 map scale: it is between 1...2
+       * @param renderBucketsAll
+       * @return
+       */
+      private static void draw_10_Track(final RenderBucketMT[] inoutRenderBucket,
                                         final GLViewport viewport,
                                         final float vp2mpScale,
                                         final RenderBucketsAllMT renderBucketsAll) {
@@ -331,9 +364,9 @@ public class LineBucketMT extends RenderBucketMT {
          float heightOffset = 0;
          gl.uniform1f(shader_u_height, heightOffset);
 
-         for (; renderBucket != null && renderBucket.type == LINE; renderBucket = renderBucket.next) {
+         for (; inoutRenderBucket[0] != null && inoutRenderBucket[0].type == LINE; inoutRenderBucket[0] = inoutRenderBucket[0].next) {
 
-            final LineBucketMT lineBucket = (LineBucketMT) renderBucket;
+            final LineBucketMT lineBucket = (LineBucketMT) inoutRenderBucket[0];
             final LineStyle lineStyle = lineBucket.lineStyle.current();
 
             final float scale = lineBucket.scale;
@@ -471,17 +504,11 @@ public class LineBucketMT extends RenderBucketMT {
 
             gl.drawArrays(GL.TRIANGLE_STRIP, lineBucket.vertexOffset, lineBucket.numVertices);
          }
-
-         if (trackConfig.isShowDirectionArrow) {
-            draw_DirectionArrows(viewport, renderBucketsAll, vp2mpScale);
-         }
-
-         return renderBucket;
       }
 
-      private static void draw_DirectionArrows(final GLViewport viewport,
-                                               final RenderBucketsAllMT allRenderBuckets,
-                                               final float vp2mpScale) {
+      private static void draw_20_DirectionArrows(final GLViewport viewport,
+                                                  final RenderBucketsAllMT allRenderBuckets,
+                                                  final float vp2mpScale) {
 
          final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
@@ -546,16 +573,11 @@ public class LineBucketMT extends RenderBucketMT {
           * Draw direction arrows
           */
 
-
          GLState.test(true, false);
          gl.depthMask(true);
-
-         gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
          {
             gl.drawArrays(GL.TRIANGLES, 0, numDirArrowShorts);
          }
-         gl.blendFunc(GL.ONE, GL.ONE_MINUS_SRC_ALPHA); // Reset to default func
-
          gl.depthMask(false);
 
          GLUtils.checkGlError(Renderer.class.getName());
