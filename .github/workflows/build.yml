@@ -17,7 +17,7 @@ jobs:
         run: |
           ARTIFACT_DATE=${{ env.ARTIFACT_DATE }}
           ARTIFACT_DATE=${ARTIFACT_DATE/:/_} # replace all colons
-          echo ARTIFACT_DATE=${ARTIFACT_DATE} >> $GITHUB_ENV # update GitHub ENV vars
+          echo ARTIFACT_DATE=ARTIFACT_DATE >> $GITHUB_ENV # update GitHub ENV vars
       - name: print env
         run: echo ${{ env.ARTIFACT_DATE }}
       - uses: actions/checkout@v3
