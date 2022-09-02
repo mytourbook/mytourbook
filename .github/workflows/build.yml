@@ -53,7 +53,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v3
         with:
-          name: "Full-JaCoCo-Report$(date +\"%Y%m%d-%H%M%S\")"
+          name: Full-JaCoCo-Report$(date +"%Y%m%d-%H%M%S")
           path: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
           retention-days: 5
           
