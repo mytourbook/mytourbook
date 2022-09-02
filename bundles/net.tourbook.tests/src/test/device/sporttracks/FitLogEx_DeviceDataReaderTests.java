@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2020, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,24 +13,36 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package device.nmea;
+package device.sporttracks;
 
-import net.tourbook.device.nmea.NmeaDataReader;
+import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
 
 import org.junit.jupiter.api.Test;
 
 import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
-public class NmeaDataReaderTests extends DeviceDataReaderTester {
+class FitLogEx_DeviceDataReaderTests extends DeviceDataReaderTester {
 
-   private static final String FILES_PATH     = FilesUtils.rootPath + "device/nmea/files/"; //$NON-NLS-1$
+   private static final String      FILES_PATH       = FilesUtils.rootPath + "device/sporttracks/fitlogex/files/"; //$NON-NLS-1$
 
-   private NmeaDataReader      nmeaDataReader = new NmeaDataReader();
+   protected FitLogDeviceDataReader deviceDataReader = new FitLogDeviceDataReader();
+
+   /**
+    * This tests parses a file for which the time offset of -7 hours is wrong
+    * <TimeZoneUtcOffset>-25200</TimeZoneUtcOffset> as it is located in the MST
+    * zone (-6h or -21600). However, the start time is correct and needs to be
+    * kept.
+    */
+   @Test
+   void testImportParkCity() {
+
+      testImportFile(deviceDataReader, FILES_PATH + "ParkCity", ".fitlogEx");
+   }
 
    @Test
-   void testNmeaImportBasic() {
+   void testImportTimothyLake() {
 
-      testImportFile(nmeaDataReader, FILES_PATH + "NMEAExample", ".txt");
+      testImportFile(deviceDataReader, FILES_PATH + "TimothyLake", ".fitlogEx");
    }
 }

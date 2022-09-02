@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.conconi;
+
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import gnu.trove.list.array.TDoubleArrayList;
 
@@ -55,15 +57,8 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -75,7 +70,6 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.part.PageBook;
@@ -198,25 +192,22 @@ public class ConconiView extends ViewPart {
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            /*
-             * set a new chart configuration when the preferences has changed
-             */
-            if (property.equals(GRID_HORIZONTAL_DISTANCE)
-                  || property.equals(GRID_VERTICAL_DISTANCE)
-                  || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
-                  || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
-            //
-            ) {
+         /*
+          * set a new chart configuration when the preferences has changed
+          */
+         if (property.equals(GRID_HORIZONTAL_DISTANCE)
+               || property.equals(GRID_VERTICAL_DISTANCE)
+               || property.equals(GRID_IS_SHOW_HORIZONTAL_GRIDLINES)
+               || property.equals(GRID_IS_SHOW_VERTICAL_GRIDLINES)
+         //
+         ) {
 
-               // grid has changed, update chart
-               updateChartProperties();
-            }
+            // grid has changed, update chart
+            updateChartProperties();
          }
       };
 
@@ -228,35 +219,28 @@ public class ConconiView extends ViewPart {
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+      _postSelectionListener = (part, selection) -> {
 
-            if (part == ConconiView.this) {
-               return;
-            }
-
-            onSelectionChanged(selection);
+         if (part == ConconiView.this) {
+            return;
          }
+
+         onSelectionChanged(selection);
       };
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
+      _tourEventListener = (part, eventId, eventData) -> {
 
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+         if (part == ConconiView.this) {
+            return;
+         }
 
-            if (part == ConconiView.this) {
-               return;
-            }
+         if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
 
-            if (eventId == TourEventId.TOUR_SELECTION && eventData instanceof ISelection) {
-
-               onSelectionChanged((ISelection) eventData);
-            }
+            onSelectionChanged((ISelection) eventData);
          }
       };
 
@@ -493,7 +477,7 @@ public class ConconiView extends ViewPart {
       _yDataPulse.setRgbBar_Gradient_Dark(allRgbGradient_Dark);
       _yDataPulse.setRgbBar_Gradient_Bright(allRgbGradient_Bright);
       _yDataPulse.setRgbBar_Line(allRgbLine);
-      
+
       _yDataPulse.setRgbGraph_Text(rgbTextColor);
 
 // check x-data visible min value
@@ -668,15 +652,10 @@ public class ConconiView extends ViewPart {
                .grab(true, false)
                .applyTo(_comboTests);
          _comboTests.setVisibleItemCount(20);
-         _comboTests.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectTour();
-            }
-         });
+         _comboTests.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectTour()));
 
          /*
-          * label: deflaction point
+          * label: deflection point
           */
          label = new Label(container, SWT.NONE);
          label.setText(Messages.Conconi_Chart_DeflactionPoint);
@@ -691,12 +670,7 @@ public class ConconiView extends ViewPart {
              */
             _scaleDeflection = new Scale(deflContainer, SWT.HORIZONTAL);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(_scaleDeflection);
-            _scaleDeflection.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onSelectDeflection();
-               }
-            });
+            _scaleDeflection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectDeflection()));
 
             final Composite containerValues = new Composite(deflContainer, SWT.NONE);
             GridDataFactory.fillDefaults().grab(false, false).align(SWT.FILL, SWT.CENTER).applyTo(containerValues);
@@ -750,13 +724,10 @@ public class ConconiView extends ViewPart {
                .applyTo(_chkExtendedScaling);
          _chkExtendedScaling.setText(Messages.Conconi_Chart_Chk_LogScaling);
          _chkExtendedScaling.setToolTipText(Messages.Conconi_Chart_Chk_LogScaling_Tooltip);
-         _chkExtendedScaling.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               enableControls();
-               updateChart_30_NewTour(_selectedTour);
-            }
-         });
+         _chkExtendedScaling.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            enableControls();
+            updateChart_30_NewTour(_selectedTour);
+         }));
 
          /*
           * label: factor
@@ -780,33 +751,24 @@ public class ConconiView extends ViewPart {
          _spinFactor.setMaximum(100);
          _spinFactor.setDigits(1);
 
-         _spinFactor.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(final ModifyEvent e) {
-               if (_isUpdateUI) {
-                  return;
-               }
-               updateChart_30_NewTour(_selectedTour);
+         _spinFactor.addModifyListener(modifyEvent -> {
+            if (_isUpdateUI) {
+               return;
             }
+            updateChart_30_NewTour(_selectedTour);
          });
-         _spinFactor.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               if (_isUpdateUI) {
-                  return;
-               }
-               updateChart_30_NewTour(_selectedTour);
+         _spinFactor.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            if (_isUpdateUI) {
+               return;
             }
-         });
-         _spinFactor.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               Util.adjustSpinnerValueOnMouseScroll(event);
-               if (_isUpdateUI) {
-                  return;
-               }
-               updateChart_30_NewTour(_selectedTour);
+            updateChart_30_NewTour(_selectedTour);
+         }));
+         _spinFactor.addMouseWheelListener(mouseEvent -> {
+            Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
+            if (_isUpdateUI) {
+               return;
             }
+            updateChart_30_NewTour(_selectedTour);
          });
 
       }
@@ -998,26 +960,23 @@ public class ConconiView extends ViewPart {
       _pageBook.showPage(_page_NoTour);
 
       // a tour is not displayed, find a tour provider which provides a tour
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getCurrent().asyncExec(() -> {
 
-            // validate widget
-            if (_pageBook.isDisposed()) {
-               return;
-            }
+         // validate widget
+         if (_pageBook.isDisposed()) {
+            return;
+         }
 
-            /*
-             * check if tour was set from a selection provider
-             */
-            if (_conconiTours != null) {
-               return;
-            }
+         /*
+          * check if tour was set from a selection provider
+          */
+         if (_conconiTours != null) {
+            return;
+         }
 
-            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
-            if (selectedTours != null && selectedTours.size() > 0) {
-               updateChart_22(selectedTours);
-            }
+         final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+         if (selectedTours != null && selectedTours.size() > 0) {
+            updateChart_22(selectedTours);
          }
       });
    }

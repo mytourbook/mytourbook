@@ -114,5 +114,8 @@ public class WorkbenchTests extends UITest {
       Utils.showView(bot, "Photos"); //$NON-NLS-1$
       //Sleeping 3 seconds as the view can be slow to display
       bot.sleep(3000);
+
+      bot.toolbarButtonWithTooltip("Search for tours, marker and waypoints (Ctrl+K)").click(); //$NON-NLS-1$
+      Utils.showView(bot, "Search Tours"); //$NON-NLS-1$
    }
 }

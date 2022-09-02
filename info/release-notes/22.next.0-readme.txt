@@ -44,7 +44,9 @@ Changes
 Bugfix
 ======
 
-* 
+* Fit Import (Frederic)
+  - Fixed NPE when pauses data are missing
+    https://sourceforge.net/p/mytourbook/discussion/622811/thread/d52269ce04/
 
 
 Translation    
@@ -61,5 +63,6 @@ System
 
 * Milestone             https://github.com/mytourbook/mytourbook/milestone/4?closed=1
 * Eclipse 2022-xx
-* FIT SDK 21.84
+* FIT SDK 21.89
 * WorldWind 2.2.1       https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
+* Migrated the app that allows for the cloud integration in MT https://github.com/mytourbook/mytourbook/issues/915

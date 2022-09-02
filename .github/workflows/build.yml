@@ -25,13 +25,6 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-      - name: Cache Gradle packages
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: 6.9
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
       - name: Make gradlew executable
         run: chmod +x ./build/build.net.tourbook/gradlew
       - name: Rename MT to mytourbook
@@ -56,8 +49,14 @@ jobs:
             D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\*.png
             D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\workspace\.metadata\.log
           retention-days: 5
-
-
+      - name: Upload JaCoCo file
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: Full-JaCoCo-Report
+          path: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
+          retention-days: 5
+          
   check_date:
     runs-on: windows-latest
     name: Check latest commit is less than 24 hours old

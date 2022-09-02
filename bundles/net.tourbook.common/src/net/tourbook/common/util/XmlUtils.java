@@ -13,24 +13,30 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package device.nmea;
+package net.tourbook.common.util;
 
-import net.tourbook.device.nmea.NmeaDataReader;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
-import org.junit.jupiter.api.Test;
+import org.xml.sax.SAXException;
 
-import utils.DeviceDataReaderTester;
-import utils.FilesUtils;
+public class XmlUtils {
 
-public class NmeaDataReaderTests extends DeviceDataReaderTester {
+   public static SAXParser initializeParser() {
 
-   private static final String FILES_PATH     = FilesUtils.rootPath + "device/nmea/files/"; //$NON-NLS-1$
+      try {
 
-   private NmeaDataReader      nmeaDataReader = new NmeaDataReader();
+         final SAXParserFactory factory = SAXParserFactory.newInstance();
+         // Address the following security issue: https://rules.sonarsource.com/java/RSPEC-2755
+         factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true); //$NON-NLS-1$
+         return factory.newSAXParser();
 
-   @Test
-   void testNmeaImportBasic() {
+      } catch (final ParserConfigurationException | SAXException e) {
+         StatusUtil.log(e);
+      }
 
-      testImportFile(nmeaDataReader, FILES_PATH + "NMEAExample", ".txt");
+      return null;
    }
+
 }

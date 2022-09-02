@@ -19,17 +19,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.lang.reflect.Field;
-import java.nio.file.Paths;
+import java.net.HttpURLConnection;
+import java.util.Arrays;
 import java.util.List;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
-import net.tourbook.cloud.suunto.SuuntoCloudDownloader;
+import net.tourbook.cloud.suunto.SuuntoRoutesUploader;
+import net.tourbook.data.TourData;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -42,25 +42,23 @@ import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
 import utils.FilesUtils;
+import utils.Initializer;
 
-public class SuuntoCloudDownloaderTests {
+public class SuuntoRoutesUploaderTests {
 
    private static final String           SUUNTO_FILE_PATH = FilesUtils.rootPath + "cloud/suunto/files/"; //$NON-NLS-1$
    private static final IPreferenceStore _prefStore       = Activator.getDefault().getPreferenceStore();
 
    static HttpClientMock                 httpClientMock;
-   static SuuntoCloudDownloader          suuntoCloudDownloader;
+   static SuuntoRoutesUploader           suuntoRoutesUploader;
 
    @BeforeAll
    static void initAll() throws NoSuchFieldException, IllegalAccessException {
 
-      //We set the Suunto account information, otherwise the download can't
+      //We set the Suunto account information, otherwise the upload can't
       //happen
       _prefStore.setValue(
             Preferences.getSuuntoAccessToken_Active_Person_String(),
-            "8888888888888888888888888888888888888888"); //$NON-NLS-1$
-      _prefStore.setValue(
-            Preferences.getSuuntoRefreshToken_Active_Person_String(),
             "8888888888888888888888888888888888888888"); //$NON-NLS-1$
       _prefStore.setValue(
             Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
@@ -68,31 +66,18 @@ public class SuuntoCloudDownloaderTests {
       _prefStore.setValue(
             Preferences.getSuuntoAccessTokenExpiresIn_Active_Person_String(),
             "12609"); //$NON-NLS-1$
-      _prefStore.setValue(
-            Preferences.getSuuntoWorkoutDownloadFolder_Active_Person_String(),
-            "./"); //$NON-NLS-1$
-      _prefStore.setValue(
-            Preferences.getSuuntoWorkoutFilterStartDate_Active_Person_String(),
-            "1293840000000"); //$NON-NLS-1$
-      _prefStore.setValue(
-            Preferences.getSuuntoWorkoutFilterEndDate_Active_Person_String(),
-            "1295049600000"); //$NON-NLS-1$
-      _prefStore.setValue(
-            Preferences.getSuuntoUseWorkoutFilterStartDate_Active_Person_String(),
-            true);
-      _prefStore.setValue(
-            Preferences.getSuuntoUseWorkoutFilterEndDate_Active_Person_String(),
-            true);
-      _prefStore.setValue(Preferences.SUUNTO_FILENAME_COMPONENTS,
-            "{YEAR}{MONTH}{DAY}{USER_TEXT:-}{HOUR}{USER_TEXT:h}{MINUTE}{USER_TEXT:-}{SUUNTO_FILE_NAME}{USER_TEXT:-}{WORKOUT_ID}{USER_TEXT:-}{ACTIVITY_TYPE}{FIT_EXTENSION}"); //$NON-NLS-1$
 
       httpClientMock = new HttpClientMock();
 
-      final Field field = SuuntoCloudDownloader.class.getDeclaredField("_httpClient"); //$NON-NLS-1$
+      final Field field = SuuntoRoutesUploader.class.getDeclaredField("_httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
       field.set(null, httpClientMock);
 
-      suuntoCloudDownloader = new SuuntoCloudDownloader();
+      suuntoRoutesUploader = new SuuntoRoutesUploader();
+
+      final Field activePersonField = suuntoRoutesUploader.getClass().getDeclaredField("_useActivePerson"); //$NON-NLS-1$
+      activePersonField.setAccessible(true);
+      activePersonField.set(suuntoRoutesUploader, true);
 
       Display.getDefault().addFilter(SWT.Activate, event -> {
          // Is this a Shell being activated?
@@ -102,7 +87,7 @@ public class SuuntoCloudDownloaderTests {
 
             // Look at the shell title to see if it is the one we want
 
-            if (Messages.Dialog_DownloadWorkoutsFromSuunto_Title.equals(shell.getText())) {
+            if (Messages.Dialog_UploadRoutesToSuunto_Title.equals(shell.getText())) {
                // Close the shell after it has finished initializing
 
                Display.getDefault().asyncExec(shell::close);
@@ -117,35 +102,22 @@ public class SuuntoCloudDownloaderTests {
    }
 
    @Test
-   void testTourDownload() {
+   void testTourUpload() {
 
       final String workoutsResponse = Comparison.readFileContent(SUUNTO_FILE_PATH
-            + "Workouts-Response.json"); //$NON-NLS-1$
-      httpClientMock.onGet(
-            OAuth2Constants.HEROKU_APP_URL + "/suunto/workouts?since=1293840000000&until=1295049600000") //$NON-NLS-1$
+            + "RouteUpload-Response.json"); //$NON-NLS-1$
+      httpClientMock.onPost(
+            OAuth2Constants.HEROKU_APP_URL + "/suunto/route/import") //$NON-NLS-1$
             .doReturn(workoutsResponse)
-            .withStatus(200);
+            .withStatus(HttpURLConnection.HTTP_CREATED);
 
-      final String filename = "2011-01-13.fit"; //$NON-NLS-1$
-      httpClientMock.onGet(
-            OAuth2Constants.HEROKU_APP_URL + "/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579") //$NON-NLS-1$
-            .doReturn(UI.EMPTY_STRING)
-            .withHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-            .withStatus(200);
+      final TourData tour = Initializer.importTour();
+      suuntoRoutesUploader.uploadTours(Arrays.asList(tour));
 
-      suuntoCloudDownloader.downloadTours();
-
-      httpClientMock.verify().get(OAuth2Constants.HEROKU_APP_URL + "/suunto/workouts?since=1293840000000&until=1295049600000").called(); //$NON-NLS-1$
-      httpClientMock.verify().get(OAuth2Constants.HEROKU_APP_URL + "/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").called(); //$NON-NLS-1$
+      httpClientMock.verify().post(OAuth2Constants.HEROKU_APP_URL + "/suunto/route/import").called(); //$NON-NLS-1$
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "601227a563c46e612c20b579 -> Workout Downloaded to the file:"))); //$NON-NLS-1$
-
-      final String downloadedFilename = "20110112-19h02-2011-01-13-601227a563c46e612c20b579-running.fit"; //$NON-NLS-1$
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            downloadedFilename)));
-
-      net.tourbook.common.util.FilesUtils.deleteIfExists(Paths.get(downloadedFilename));
+            "7/4/20, 5:00 AM -> Uploaded Route Id: \"634f49bf87e35c5a61e64947\""))); //$NON-NLS-1$
    }
 }

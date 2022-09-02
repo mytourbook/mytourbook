@@ -15,29 +15,16 @@
  *******************************************************************************/
 package utils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 
 import javax.persistence.Persistence;
-import javax.xml.XMLConstants;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
-import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
-import net.tourbook.device.garmin.GarminTCX_DeviceDataReader;
 import net.tourbook.device.garmin.fit.FitDataReader;
-import net.tourbook.device.gpx.GPX_SAX_Handler;
-import net.tourbook.importdata.DeviceData;
+import net.tourbook.device.gpx.GPXDeviceDataReader;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
-
-import org.xml.sax.SAXException;
 
 public class Initializer {
 
@@ -63,13 +50,12 @@ public class Initializer {
 
    public static TourData importTour_FIT(final String importFilePath) {
 
-      final DeviceData deviceData = new DeviceData();
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
       final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
       final FitDataReader fitDataReader = new FitDataReader();
 
       fitDataReader.processDeviceData(importFilePath,
-            deviceData,
+            null,
             alreadyImportedTours,
             newlyImportedTours,
             new ImportState_File(),
@@ -80,32 +66,17 @@ public class Initializer {
 
    public static TourData importTour_GPX(final String importFilePath) {
 
-      final DeviceData deviceData = new DeviceData();
       final HashMap<Long, TourData> newlyImportedTours = new HashMap<>();
       final HashMap<Long, TourData> alreadyImportedTours = new HashMap<>();
-      final GarminTCX_DeviceDataReader deviceDataReader = new GarminTCX_DeviceDataReader();
+      final GPXDeviceDataReader deviceDataReader = new GPXDeviceDataReader();
       final String testFilePath = FilesUtils.getAbsoluteFilePath(importFilePath);
-      final File file = new File(testFilePath);
 
-      try (InputStream in = new FileInputStream(file)) {
-
-         final GPX_SAX_Handler handler = new GPX_SAX_Handler(
-               importFilePath,
-               deviceData,
-               alreadyImportedTours,
-               newlyImportedTours,
-               new ImportState_File(),
-               new ImportState_Process(),
-               deviceDataReader);
-
-         final SAXParser parser = initializeParser();
-         if (parser != null) {
-            parser.parse(in, handler);
-         }
-
-      } catch (final SAXException | IOException e) {
-         e.printStackTrace();
-      }
+      deviceDataReader.processDeviceData(testFilePath,
+            null,
+            alreadyImportedTours,
+            newlyImportedTours,
+            new ImportState_File(),
+            new ImportState_Process());
 
       return Comparison.retrieveImportedTour(newlyImportedTours);
    }
@@ -113,21 +84,5 @@ public class Initializer {
    public static void initializeDatabase() {
 
       Persistence.createEntityManagerFactory("tourdatabase").createEntityManager(); //$NON-NLS-1$
-   }
-
-   public static SAXParser initializeParser() {
-
-      try {
-
-         final SAXParserFactory factory = SAXParserFactory.newInstance();
-         final SAXParser parser = factory.newSAXParser();
-         parser.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, UI.EMPTY_STRING);
-         parser.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, UI.EMPTY_STRING);
-         return parser;
-      } catch (final ParserConfigurationException | SAXException e) {
-         e.printStackTrace();
-      }
-
-      return null;
    }
 }
