@@ -49,11 +49,19 @@ jobs:
             D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\*.png
             D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\workspace\.metadata\.log
           retention-days: 5
+      - name: Artifact date
+        env:
+          ARTIFACT_DATE: "echo %${{ github.event.repository.updated_at}}::=_%"
+        run: |
+          ARTIFACT_DATE=${{ env.ARTIFACT_DATE }}
+          echo ARTIFACT_DATE=${ARTIFACT_DATE} >> $GITHUB_ENV # update GitHub ENV vars
+      - name: print env
+        run: echo ${{ env.TOXENV }}
       - name: Upload JaCoCo file
         if: success()
         uses: actions/upload-artifact@v3
         with:
-          name: Full-JaCoCo-Report-${{ github.event.repository.updated_at}}
+          name: Full-JaCoCo-Report-${{ env.ARTIFACT_DATE}}
           path: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
           retention-days: 5
           
