@@ -12,10 +12,14 @@ jobs:
       - name: echo-default-env-variables
         run: echo "github.workspace = ${{ github.workspace }}"
       - name: python version
-        run:
-          RAW_TOXENV="py${{ matrix.python }}-django${{ matrix.django }}"
-          TOXENV=$(echo $RAW_TOXENV | sed 's/\.//')
-          echo "TOXENV=$TOXENV" >> $GITHUB_ENV
+        env:
+           TOXENV: "py${{ matrix.python }}-django${{ matrix.django }}"
+        run: |
+         TOXENV=${{ env.TOXENV }}
+         TOXENV=${TOXENV//.} # replace all dots
+         echo TOXENV=${TOXENV} >> $GITHUB_ENV # update GitHub ENV vars
+      - name: print env
+        run: echo ${{ env.TOXENV }}
       - name: Artifact date
         run: env.ARTIFACT_DATE = ${%github.event.repository.updated_at::=_%}
       - name: print env
