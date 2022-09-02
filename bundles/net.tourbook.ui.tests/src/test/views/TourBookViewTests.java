@@ -73,16 +73,16 @@ public class TourBookViewTests extends UITest {
    }
 
    @Test
-   void testDuplicateAndDeleteTour() {
+   void testDeleteTour() {
 
       Utils.showTourBookView(bot);
 
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
-            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand() //$NON-NLS-1$
+            .getNode("Jan   2").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
       SWTBotTreeItem[] allItems = bot.tree().getAllItems();
-      assertEquals("2013   1", allItems[0].getText());
+      assertEquals("2021   2", allItems[3].getText());
 
       //Delete the tour
       tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
@@ -96,7 +96,7 @@ public class TourBookViewTests extends UITest {
 
       //Check that the tour was successfully deleted
       allItems = bot.tree().getAllItems();
-      assertEquals("2015   1", allItems[0].getText());
+      assertEquals("2021   1", allItems[3].getText());
    }
 
    @Test
