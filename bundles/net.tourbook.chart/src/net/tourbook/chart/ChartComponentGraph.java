@@ -1614,6 +1614,8 @@ public class ChartComponentGraph extends Canvas {
     */
    private void drawAsync_110_GraphImage(final GC gcChart, final GC gcGraph) {
 
+      final boolean isOSX = UI.IS_OSX;
+
       int graphNo = 0;
       final int lastGraphNo = _allGraphDrawingData.size();
 
@@ -1636,6 +1638,21 @@ public class ChartComponentGraph extends Canvas {
       for (final GraphDrawingData graphDrawingData : allGraphDrawingData) {
 
          graphNo++;
+
+         // fix for https://sourceforge.net/p/mytourbook/discussion/622811/thread/95b05d7408/
+         GC gcGraph_WithOSXFix;
+         if (isOSX) {
+
+            // it is not possible to set a second GC for the same image -> dispose gc for the graph image
+            gcGraph.dispose();
+
+            // fix for https://bugs.eclipse.org/bugs/show_bug.cgi?id=543796
+            gcGraph_WithOSXFix = new GC(_chartImage_10_Graphs);
+
+         } else {
+
+            gcGraph_WithOSXFix = gcGraph;
+         }
 
          final boolean isFirstGraph = graphNo == 1;
          final boolean isLastGraph = graphNo == lastGraphNo;
@@ -1664,11 +1681,11 @@ public class ChartComponentGraph extends Canvas {
          // fill background
          if (isDrawBackground) {
 
-            gcGraph.setBackground(_backgroundColor);
-            gcGraph.fillRectangle(graphBounds);
+            gcGraph_WithOSXFix.setBackground(_backgroundColor);
+            gcGraph_WithOSXFix.fillRectangle(graphBounds);
 
             if (_chart.isShowSegmentAlternateColor && chartTitleSegmentConfig.isShowSegmentBackground) {
-               drawAsync_150_SegmentBackground(gcGraph, graphDrawingData);
+               drawAsync_150_SegmentBackground(gcGraph_WithOSXFix, graphDrawingData);
             }
          }
 
@@ -1679,21 +1696,21 @@ public class ChartComponentGraph extends Canvas {
          if (isDrawGrid) {
 
             // draw horizontal grid
-            drawAsync_220_HGrid(gcGraph, graphDrawingData);
+            drawAsync_220_HGrid(gcGraph_WithOSXFix, graphDrawingData);
          }
 
          if (isDrawXUnits) {
 
             if (isLastGraph) {
                // draw the unit label and unit tick for the last graph
-               drawAsync_210_XUnits_And_VerticalGrid(gcChart, gcGraph, graphDrawingData, true);
+               drawAsync_210_XUnits_And_VerticalGrid(gcChart, gcGraph_WithOSXFix, graphDrawingData, true);
             } else {
-               drawAsync_210_XUnits_And_VerticalGrid(gcChart, gcGraph, graphDrawingData, false);
+               drawAsync_210_XUnits_And_VerticalGrid(gcChart, gcGraph_WithOSXFix, graphDrawingData, false);
             }
          }
 
          if (chartTitleSegmentConfig.isShowSegmentSeparator) {
-            drawAsync_240_TourSegments(gcGraph, graphDrawingData);
+            drawAsync_240_TourSegments(gcGraph_WithOSXFix, graphDrawingData);
          }
 
          if (isDrawGraphTitle) {
@@ -1707,49 +1724,52 @@ public class ChartComponentGraph extends Canvas {
 
          if (chartType == ChartType.LINE) {
 
-            drawAsync_500_LineGraph(gcGraph, graphDrawingData, isLastGraph);
-            drawAsync_520_RangeMarker(gcGraph, graphDrawingData);
+            drawAsync_500_LineGraph(gcGraph_WithOSXFix, graphDrawingData, isLastGraph);
+            drawAsync_520_RangeMarker(gcGraph_WithOSXFix, graphDrawingData);
 
          } else if (chartType == ChartType.BAR) {
 
-            drawAsync_530_BarGraph(gcGraph, graphDrawingData);
+            drawAsync_530_BarGraph(gcGraph_WithOSXFix, graphDrawingData);
 
          } else if (chartType == ChartType.LINE_WITH_BARS) {
 
-            drawAsync_540_LineWithBarGraph(gcGraph, graphDrawingData);
+            drawAsync_540_LineWithBarGraph(gcGraph_WithOSXFix, graphDrawingData);
 
          } else if (chartType == ChartType.XY_SCATTER) {
 
-            drawAsync_550_XYScatter(gcGraph, graphDrawingData);
+            drawAsync_550_XYScatter(gcGraph_WithOSXFix, graphDrawingData);
 
          } else if (chartType == ChartType.HORIZONTAL_BAR) {
 
-            drawAsync_560_HorizontalBar(gcGraph, graphDrawingData, isLastGraph);
+            drawAsync_560_HorizontalBar(gcGraph_WithOSXFix, graphDrawingData, isLastGraph);
 
          } else if (chartType == ChartType.DOT) {
 
-            drawAsync_570_Dots(gcGraph, graphDrawingData);
+            drawAsync_570_Dots(gcGraph_WithOSXFix, graphDrawingData);
 
          } else if (chartType == ChartType.VARIABLE_X_AXIS) {
 
-            drawAsync_610_LineGraph_With_VariableXAxis(gcGraph, graphDrawingData, isLastGraph);
+            drawAsync_610_LineGraph_With_VariableXAxis(gcGraph_WithOSXFix, graphDrawingData, isLastGraph);
 
          } else if (chartType == ChartType.VARIABLE_X_AXIS_WITH_2ND_LINE) {
 
-            drawAsync_600_LineGraph_NoBackground(gcGraph, graphDrawingData, isLastGraph);
-            drawAsync_610_LineGraph_With_VariableXAxis(gcGraph, graphDrawingData, isLastGraph);
+            drawAsync_600_LineGraph_NoBackground(gcGraph_WithOSXFix, graphDrawingData, isLastGraph);
+            drawAsync_610_LineGraph_With_VariableXAxis(gcGraph_WithOSXFix, graphDrawingData, isLastGraph);
 
          } else if (chartType == ChartType.HISTORY) {
 
-            drawAsync_900_History(gcGraph, graphDrawingData);
+            drawAsync_900_History(gcGraph_WithOSXFix, graphDrawingData);
          }
 
          // draw only the x-axis, this is drawn lately because the graph can overwrite it
-         drawAsync_230_XAxisLine(gcGraph, graphDrawingData);
+         drawAsync_230_XAxisLine(gcGraph_WithOSXFix, graphDrawingData);
 
          // draw graph image into the chart image
          gcChart.drawImage(_chartImage_10_Graphs, 0, graphDrawingData.getDevYTop());
 
+         if (isOSX) {
+            gcGraph_WithOSXFix.dispose();
+         }
 //         System.out.println("20 <- 10\tdrawAsync110GraphImage");
 //         // TODO remove SYSTEM.OUT.PRINTLN
       }
