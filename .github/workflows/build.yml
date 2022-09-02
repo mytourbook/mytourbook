@@ -14,22 +14,9 @@ jobs:
       - name: Generate artifact name
         id: generate-name
         run: |
-          echo ::set-output name=artifactFileName::"Full-JaCoCo-Report-$(date +%d-%m-%Y-%H-%M)"
+          echo ::set-output name=artifactFileName::"Full-JaCoCo-Report-$(date +%Y-%m-%d-%H_%M)"
       - name: print env
         run: echo ${{ steps.generate-name.outputs.artifactFileName }}
-      - name: python version
-        env:
-           TOXENV: "py${{ matrix.python }}-django${{ matrix.django }}"
-        run: |
-         TOXENV=${{ env.TOXENV }}
-         TOXENV=${TOXENV//.} # replace all dots
-         echo TOXENV=${TOXENV} >> $GITHUB_ENV # update GitHub ENV vars
-      - name: print env
-        run: echo ${{ env.TOXENV }}
-      - name: Artifact date
-        run: env.ARTIFACT_DATE = ${%github.event.repository.updated_at::=_%}
-      - name: print env
-        run: echo ${{ env.ARTIFACT_DATE }}
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
