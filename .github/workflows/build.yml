@@ -12,7 +12,7 @@ jobs:
       - name: echo-default-env-variables
         run: echo "github.workspace = ${{ github.workspace }}"
       - name: Artifact date
-        run: echo "env.ARTIFACT_DATE = ${%github.event.repository.updated_at::=_%}"
+        run: env.ARTIFACT_DATE = ${%github.event.repository.updated_at::=_%}
       - name: print env
         run: echo ${{ env.ARTIFACT_DATE }}
       - uses: actions/checkout@v3
