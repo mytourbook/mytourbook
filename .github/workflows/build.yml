@@ -12,11 +12,11 @@ jobs:
       - name: echo-default-env-variables
         run: echo "github.workspace = ${{ github.workspace }}"
       - name: Generate artifact name
-        id: generate-name
+        id: generate-artifact-name
         run: |
           echo "::set-output name=artifactFileName::Full-JaCoCo-Report-$(date +%Y-%m-%d-%H_%M)"
       - name: print env
-        run: echo ${{ steps.generate-name.outputs.artifactFileName }}
+        run: echo ${{ steps.generate-artifact-name.outputs.artifactFileName }}
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
@@ -59,7 +59,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v3
         with:
-          name: Full-JaCoCo-Report-${{ env.ARTIFACT_DATE}}
+          name: ${{ steps.generate-artifact-name.outputs.artifactFileName }}
           path: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
           retention-days: 5
           
