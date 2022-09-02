@@ -105,8 +105,8 @@ public class TourBookViewTests extends UITest {
       Utils.showTourBookView(bot);
 
       //Select a tour that contains a calories value
-      SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand() //$NON-NLS-1$
-            .getNode("Jan   2").expand().select().getNode("30").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      SWTBotTreeItem tour = bot.tree().getTreeItem("2020   3").expand() //$NON-NLS-1$
+            .getNode("May   2").expand().select().getNode("23").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
       //Check the original calories value
@@ -117,8 +117,8 @@ public class TourBookViewTests extends UITest {
       bot.button(Messages.Tour_Action_MultiplyCaloriesBy1000_Apply).click();
 
       //Check the new calories value
-      tour = bot.tree().getTreeItem("2021   2").expand() //$NON-NLS-1$
-            .getNode("Jan   2").expand().select().getNode("30").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      tour = bot.tree().getTreeItem("2020   3").expand() //$NON-NLS-1$
+            .getNode("May   2").expand().select().getNode("23").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
       assertEquals("11,000", tour.cell(tourBookView_Temperature_Column_Index)); //$NON-NLS-1$
    }
