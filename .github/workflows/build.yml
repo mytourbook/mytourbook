@@ -14,7 +14,7 @@ jobs:
       - name: Generate artifact name
         id: generate-name
         run: |
-          echo ::set-output name=artifactFileName::"Full-JaCoCo-Report-$(date +%Y-%m-%d-%H_%M)"
+          echo ::set-output name=artifactFileName::Full-JaCoCo-Report-$(date +%Y-%m-%d-%H_%M)"
       - name: print env
         run: echo ${{ steps.generate-name.outputs.artifactFileName }}
       - uses: actions/checkout@v3
