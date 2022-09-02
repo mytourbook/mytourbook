@@ -14,7 +14,7 @@ jobs:
       - name: Generate artifact name
         id: generate-name
         run: |
-          echo "::set-output name=artifact::enjrge${{ github.event.repository.updated_at | sed 's/:/_/' }}"
+          echo ::set-output name=artifact::"This PR was auto-generated on $(date +%d-%m-%Y) \
       - name: print env
         run: echo ${{ steps.generate-name.outputs.artifact }}
       - name: python version
