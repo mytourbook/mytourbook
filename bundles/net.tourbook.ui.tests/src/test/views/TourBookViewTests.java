@@ -78,7 +78,7 @@ public class TourBookViewTests extends UITest {
       Utils.showTourBookView(bot);
 
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand() //$NON-NLS-1$
-            .getNode("Jan   2").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
+            .getNode("Jan   2").expand().select().getNode("30").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
       SWTBotTreeItem[] allItems = bot.tree().getAllItems();
