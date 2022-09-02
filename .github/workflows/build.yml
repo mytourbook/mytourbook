@@ -11,6 +11,14 @@ jobs:
     steps:
       - name: echo-default-env-variables
         run: echo "github.workspace = ${{ github.workspace }}"
+      - name: Artifact date
+        env:
+          ARTIFACT_DATE: "echo %${{ github.event.repository.updated_at}}::=_%"
+        run: |
+          ARTIFACT_DATE=${{ env.ARTIFACT_DATE }}
+          echo ARTIFACT_DATE=${ARTIFACT_DATE} >> $GITHUB_ENV # update GitHub ENV vars
+      - name: print env
+        run: echo ${{ env.ARTIFACT_DATE }}
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
@@ -49,14 +57,6 @@ jobs:
             D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\*.png
             D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\workspace\.metadata\.log
           retention-days: 5
-      - name: Artifact date
-        env:
-          ARTIFACT_DATE: "echo %${{ github.event.repository.updated_at}}::=_%"
-        run: |
-          ARTIFACT_DATE=${{ env.ARTIFACT_DATE }}
-          echo ARTIFACT_DATE=${ARTIFACT_DATE} >> $GITHUB_ENV # update GitHub ENV vars
-      - name: print env
-        run: echo ${{ env.TOXENV }}
       - name: Upload JaCoCo file
         if: success()
         uses: actions/upload-artifact@v3
