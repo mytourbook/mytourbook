@@ -16,6 +16,7 @@
 package views;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import net.tourbook.Messages;
 
@@ -56,7 +57,7 @@ public class TourBookViewTests extends UITest {
 
       //Check the original distance
       SWTBotTreeItem tour = Utils.getTour(bot);
-      assertEquals("0.542", tour.cell(9)); //$NON-NLS-1$
+      assertEquals("0.542", tour.cell(tourBookView_Distance_Column_Index)); //$NON-NLS-1$
 
       //Compute the tour distance
       tour.contextMenu(Messages.Tour_Action_AdjustTourValues).menu(Messages.TourEditor_Action_ComputeDistanceValuesFromGeoPosition).click();
@@ -64,6 +65,30 @@ public class TourBookViewTests extends UITest {
 
       //Check the new computed distance
       tour = Utils.getTour(bot);
-      assertEquals("0.551", tour.cell(9)); //$NON-NLS-1$
+      assertEquals("0.551", tour.cell(tourBookView_Distance_Column_Index)); //$NON-NLS-1$
+   }
+
+   @Test
+   void testMultiplyTourCalories() {
+
+      Utils.showTourBookView(bot);
+
+      //Select a tour that contains a calories value
+      SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand() //$NON-NLS-1$
+            .getNode("Jan   2").expand().select().getNode("30").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      //Check the original calories value
+      assertEquals("11", tour.cell(tourBookView_Temperature_Column_Index)); //$NON-NLS-1$
+
+      //Multiply the calories by 1000
+      tour.contextMenu(Messages.Tour_Action_AdjustTourValues).menu(Messages.Tour_Action_MultiplyCaloriesBy1000).click();
+      bot.button(Messages.Tour_Action_MultiplyCaloriesBy1000_Apply).click();
+
+      //Check the new calories value
+      tour = bot.tree().getTreeItem("2021   2").expand() //$NON-NLS-1$
+            .getNode("Jan   2").expand().select().getNode("30").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+      assertEquals("11,000", tour.cell(tourBookView_Temperature_Column_Index)); //$NON-NLS-1$
    }
 }
