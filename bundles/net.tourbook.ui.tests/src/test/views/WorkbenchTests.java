@@ -15,7 +15,10 @@
  *******************************************************************************/
 package views;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.BeforeClass;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +49,9 @@ public class WorkbenchTests extends UITest {
       //Select a tour so that the selected views contain information
       Utils.showTourBookView(bot);
 
-      Utils.getTour(bot);
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
 
       Utils.showView(bot, "Tour Import"); //$NON-NLS-1$
 
