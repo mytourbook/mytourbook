@@ -17,8 +17,12 @@ package views;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
 
 import net.tourbook.Messages;
+import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
@@ -66,6 +70,33 @@ public class TourBookViewTests extends UITest {
       //Check the new computed distance
       tour = Utils.getTour(bot);
       assertEquals("0.551", tour.cell(tourBookView_Distance_Column_Index)); //$NON-NLS-1$
+   }
+
+   @Test
+   void testDeleteTour() {
+
+      Utils.showTourBookView(bot);
+
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      SWTBotTreeItem[] allItems = bot.tree().getAllItems();
+      assertEquals("2013   1", allItems[0].getText());
+
+      //Delete the tour
+      tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
+            Messages.Tour_Book_Action_delete_selected_tours).click();
+      bot.button("OK").click(); //$NON-NLS-1$
+      bot.button("OK").click(); //$NON-NLS-1$
+
+      final List<?> logs = TourLogManager.getLogs();
+      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+            "5/18/13, 11:00 AM")));//$NON-NLS-1$
+
+      //Check that the tour was successfully deleted
+      allItems = bot.tree().getAllItems();
+      assertEquals("2015   1", allItems[0].getText());
    }
 
    @Test
