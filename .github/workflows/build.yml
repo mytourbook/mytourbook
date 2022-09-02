@@ -13,7 +13,7 @@ jobs:
         run: echo "github.workspace = ${{ github.workspace }}"
       - name: Artifact date
         env:
-          ARTIFACT_DATE: "${{ github.event.repository.updated_at}}%"
+          ARTIFACT_DATE: "${{ github.event.repository.updated_at}}"
         run: |
           ARTIFACT_DATE=${{ env.ARTIFACT_DATE }}
           ARTIFACT_DATE=${ARTIFACT_DATE/:/_} # replace all colons
