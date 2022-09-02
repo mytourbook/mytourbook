@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -325,7 +325,7 @@ public abstract class AdvancedSlideoutShell {
 
          final Point shellLocation = fixupDisplayBounds(size, defaultLocation);
 
-         _visibleRRShell.setShellLocation(shellLocation.x, shellLocation.y, 1);
+         _visibleRRShell.setShellLocation(shellLocation.x, shellLocation.y);
 
          reparentShell(_rrShellNoResize);
 
@@ -413,7 +413,7 @@ public abstract class AdvancedSlideoutShell {
 
                _shellStartLocation = _shellEndLocation;
 
-               _visibleRRShell.setShellLocation(_shellStartLocation.x, _shellStartLocation.y, 2);
+               _visibleRRShell.setShellLocation(_shellStartLocation.x, _shellStartLocation.y);
 
                reparentShell(_rrShellNoResize);
 
@@ -517,7 +517,7 @@ public abstract class AdvancedSlideoutShell {
                      final int shellCurrentX = (int) (shellStartX - moveX);
                      final int shellCurrentY = (int) (shellStartY - moveY);
 
-                     _visibleRRShell.setShellLocation(shellCurrentX, shellCurrentY, 3);
+                     _visibleRRShell.setShellLocation(shellCurrentX, shellCurrentY);
                   }
                }
 
@@ -564,7 +564,7 @@ public abstract class AdvancedSlideoutShell {
 
                if (_visibleShell.getAlpha() != newAlpha) {
 
-                  // platform do not support shell alpha, this occured on Ubuntu 12.04
+                  // platform do not support shell alpha, this occurred on Ubuntu 12.04
 
                   if (isLoopBreak) {
                      break;
@@ -989,24 +989,20 @@ public abstract class AdvancedSlideoutShell {
       switch (event.type) {
       case SWT.Deactivate:
 
-         _display.asyncExec(new Runnable() {
+         _display.asyncExec(() -> {
 
-            @Override
-            public void run() {
+            // hide tooltip when another shell is activated
 
-               // hide tooltip when another shell is activated
+            final Shell activeShell = _display.getActiveShell();
 
-               final Shell activeShell = _display.getActiveShell();
+            if (activeShell != _visibleShell) {
 
-               if (activeShell != _visibleShell) {
+               final Shell activeShell_Root = getRootShell(activeShell);
+               final Shell visibleShell_Root = getRootShell(_visibleShell);
 
-                  final Shell activeShell_Root = getRootShell(activeShell);
-                  final Shell visibleShell_Root = getRootShell(_visibleShell);
+               if (activeShell_Root != visibleShell_Root) {
 
-                  if (activeShell_Root != visibleShell_Root) {
-
-                     ttHide_WithAnimation();
-                  }
+                  ttHide_WithAnimation();
                }
             }
          });
@@ -1653,7 +1649,7 @@ public abstract class AdvancedSlideoutShell {
 
       final Point fixedLocation = fixupDisplayBounds(size, newShellLocation);
 
-      _visibleRRShell.setShellLocation(fixedLocation.x, fixedLocation.y, 4);
+      _visibleRRShell.setShellLocation(fixedLocation.x, fixedLocation.y);
    }
 
    protected void setShellMoveSteps(final int shellMoveSteps) {
@@ -1708,7 +1704,7 @@ public abstract class AdvancedSlideoutShell {
       final Point size = _visibleShell.getSize();
       final Point fixedLocation = fixupDisplayBounds(size, getToolTipLocation(size));
 
-      _visibleRRShell.setShellLocation(fixedLocation.x, fixedLocation.y, 4);
+      _visibleRRShell.setShellLocation(fixedLocation.x, fixedLocation.y);
    }
 
    protected boolean showShell() {
@@ -1938,11 +1934,10 @@ public abstract class AdvancedSlideoutShell {
    private void updateUI_Colors() {
 
       final ColorRegistry colorRegistry = JFaceResources.getColorRegistry();
-      final Color fgColor = getShellColor_Foreground(colorRegistry);
       final Color bgColor = getShellColor_Background(colorRegistry);
 
-      _rrShellNoResize.updateColors(fgColor, bgColor);
-      _rrShellWithResize.updateColors(fgColor, bgColor);
+      _rrShellNoResize.updateColors(bgColor);
+      _rrShellWithResize.updateColors(bgColor);
    }
 
 }

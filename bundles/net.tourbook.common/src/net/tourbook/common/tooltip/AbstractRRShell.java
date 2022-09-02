@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2017 Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -17,7 +17,6 @@ package net.tourbook.common.tooltip;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -35,15 +34,15 @@ import org.eclipse.ui.part.PageBook;
  */
 public abstract class AbstractRRShell {
 
-   private boolean      _isResizeable;
+   private boolean _isResizeable;
 
-   private int       _shellTrimWidth;
-   private int       _shellTrimHeight;
+   private int     _shellTrimWidth;
+   private int     _shellTrimHeight;
 
    /*
     * UI resources
     */
-   private Display      _display;
+   private Display   _display;
 
    private Shell     _shell;
 
@@ -101,12 +100,7 @@ public abstract class AbstractRRShell {
 
 //    resizeCanvas.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_CYAN));
 
-      resizeCanvas.addPaintListener(new PaintListener() {
-         @Override
-         public void paintControl(final PaintEvent e) {
-            onPaintShellImage(e);
-         }
-      });
+      resizeCanvas.addPaintListener(this::onPaintShellImage);
 
       return resizeCanvas;
    }
@@ -250,7 +244,7 @@ public abstract class AbstractRRShell {
       setContentSize(size.x, size.y);
    }
 
-   public void setShellLocation(final int x, final int y, final int flag) {
+   public void setShellLocation(final int x, final int y) {
       _shell.setLocation(x, y);
    }
 
@@ -278,7 +272,7 @@ public abstract class AbstractRRShell {
             + ("\t_shell=" + _shell.getText()); //$NON-NLS-1$
    }
 
-   public void updateColors(final Color fgColor, final Color bgColor) {
+   public void updateColors(final Color bgColor) {
 
       _shell.setBackground(bgColor);
    }
