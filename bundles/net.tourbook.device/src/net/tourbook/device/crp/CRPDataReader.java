@@ -443,6 +443,7 @@ public class CRPDataReader extends TourbookDevice {
          }
 
          if (fileHeader.startsWith("HRMProfilDatas") == false) { //$NON-NLS-1$
+            //TODO FB
             return false;
          }
 
