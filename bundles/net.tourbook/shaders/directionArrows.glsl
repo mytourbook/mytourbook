@@ -8,6 +8,7 @@ attribute   vec3  attrib_ColorCoord;
 uniform  mat4  u_mvp;
 uniform  vec4  uni_ArrowColors[4];  // 1:wing inside, 2:wing outline, 3:fin inside, 4:fin outline
 uniform  vec2  uni_OutlineWidth;    // x:Wing, y:Fin
+uniform  float uni_Vp2MpScale;      // viewport to map scale: 1.0...2.0
 
 // passthrough fragment values
 varying float  pass_ArrowPart;
@@ -17,7 +18,7 @@ varying vec2   pass_OutlineWidth;
 
 void main() {
    
-   gl_Position       = u_mvp * vec4(a_pos.xyz, 1.0);
+   gl_Position       = u_mvp * vec4(a_pos.xy, a_pos.z * uni_Vp2MpScale, 1.0);
 
    pass_ArrowPart    = a_pos.w;
    pass_ColorCoord   = attrib_ColorCoord;

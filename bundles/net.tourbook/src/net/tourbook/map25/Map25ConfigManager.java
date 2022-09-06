@@ -142,7 +142,7 @@ public class Map25ConfigManager {
    public static final int           LINE_OPACITY_MAX                     = 0xff;
    public static final int           LINE_OPACITY_DEFAULT                 = 180;                     // 70 %
    public static final int           LINE_WIDTH_MIN                       = 1;
-   public static final int           LINE_WIDTH_MAX                       = 20;
+   public static final int           LINE_WIDTH_MAX                       = 99;
    public static final float         LINE_WIDTH_DEFAULT                   = 10f;
    //
    public static final boolean       OUTLINE_IS_SHOW_OUTLINE_DEFAULT      = true;

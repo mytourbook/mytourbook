@@ -99,7 +99,8 @@ public class LineBucketMT extends RenderBucketMT {
             shader_u_mvp,
 
             shader_uni_ArrowColors,
-            shader_uni_OutlineWidth
+            shader_uni_OutlineWidth,
+            shader_uni_Vp2MpScale
 
 //          shader_u_width
 
@@ -115,11 +116,12 @@ public class LineBucketMT extends RenderBucketMT {
 
          shader_u_mvp                  = getUniform("u_mvp");                 //$NON-NLS-1$
          shader_a_pos                  = getAttrib("a_pos");                  //$NON-NLS-1$
-         shader_attrib_ColorCoord      = getAttrib("attrib_ColorCoord");       //$NON-NLS-1$
+         shader_attrib_ColorCoord      = getAttrib("attrib_ColorCoord");      //$NON-NLS-1$
 
 //       shader_u_width                = getUniform("u_width");               //$NON-NLS-1$
          shader_uni_ArrowColors        = getUniform("uni_ArrowColors");       //$NON-NLS-1$
          shader_uni_OutlineWidth       = getUniform("uni_OutlineWidth");      //$NON-NLS-1$
+         shader_uni_Vp2MpScale         = getUniform("uni_Vp2MpScale");        //$NON-NLS-1$
 
 // SET_FORMATTING_ON
       }
@@ -229,6 +231,7 @@ public class LineBucketMT extends RenderBucketMT {
 
          final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
+         // fix alpha blending
          gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
          {
             draw_10_Track(inoutRenderBucket, viewport, vp2mpScale, renderBucketsAll);
@@ -502,6 +505,13 @@ public class LineBucketMT extends RenderBucketMT {
                gl.uniform1i(shader_u_mode, capMode);
             }
 
+//          GLState.test(true, false);
+//          gl.depthMask(true);
+//          {
+//             gl.drawArrays(GL.TRIANGLE_STRIP, lineBucket.vertexOffset, lineBucket.numVertices);
+//          }
+//          gl.depthMask(false);
+
             gl.drawArrays(GL.TRIANGLE_STRIP, lineBucket.vertexOffset, lineBucket.numVertices);
          }
       }
@@ -522,6 +532,7 @@ public class LineBucketMT extends RenderBucketMT {
 //       final int shader_u_width                  = shader.shader_u_width;
          final int shader_uni_ArrowColors          = shader.shader_uni_ArrowColors;
          final int shader_uni_OutlineWidth         = shader.shader_uni_OutlineWidth;
+         final int shader_uni_Vp2MpScale           = shader.shader_uni_Vp2MpScale;
 
 // SET_FORMATTING_ON
 
@@ -568,6 +579,8 @@ public class LineBucketMT extends RenderBucketMT {
          gl.uniform2f(shader_uni_OutlineWidth,
                trackConfig.arrowWing_OutlineWidth / 200f,
                trackConfig.arrowFin_OutlineWidth / 200f);
+
+         gl.uniform1f(shader_uni_Vp2MpScale, vp2mpScale);
 
          /*
           * Draw direction arrows
