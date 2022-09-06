@@ -116,85 +116,97 @@ public class Map25ConfigManager {
    private static final String ATTR_USE_DRAGGED_KEY_NAVIGATION = "useDraggedKeyboardNavigation"; //$NON-NLS-1$
    //
    /*
-    * Tour tracks
+    * Track
     */
-   private static final String              TAG_TOUR_TRACKS                       = "TourTracks";                    //$NON-NLS-1$
-   private static final String              TAG_TRACK                             = "Track";                         //$NON-NLS-1$
+   private static final String       TAG_TOUR_TRACKS                      = "TourTracks";            //$NON-NLS-1$
+   private static final String       TAG_TRACK                            = "Track";                 //$NON-NLS-1$
    //
-   private static final String              TAG_LINE                              = "Line";                          //$NON-NLS-1$
-   private static final String              ATTR_LINE_COLOR_MODE                  = "lineColorMode";                 //$NON-NLS-1$
-   private static final String              ATTR_LINE_GRADIENT_COLOR_GRAPH_ID     = "gradientColorGraphId";          //$NON-NLS-1$
-   private static final String              ATTR_LINE_OPACITY                     = "lineOpacity";                   //$NON-NLS-1$
-   private static final String              ATTR_LINE_WIDTH                       = "lineWidth";                     //$NON-NLS-1$
-   private static final String              ATTR_OUTLINE_IS_SHOW_OUTLINE          = "isShowOutline";                 //$NON-NLS-1$
-   private static final String              ATTR_OUTLINE_WIDTH                    = "outlineWidth";                  //$NON-NLS-1$
-   private static final String              ATTR_OUTLINE_BRIGHTNESS               = "outlineBrightness";             //$NON-NLS-1$
+   private static final String       TAG_LINE                             = "Line";                  //$NON-NLS-1$
+   private static final String       ATTR_LINE_COLOR_MODE                 = "lineColorMode";         //$NON-NLS-1$
+   private static final String       ATTR_LINE_GRADIENT_COLOR_GRAPH_ID    = "gradientColorGraphId";  //$NON-NLS-1$
+   private static final String       ATTR_LINE_OPACITY                    = "lineOpacity";           //$NON-NLS-1$
+   private static final String       ATTR_LINE_WIDTH                      = "lineWidth";             //$NON-NLS-1$
    //
-   public static final boolean              LINE_IS_TRACK_VERTICAL_OFFSET_DEFAULT = false;
-   public static final int                  LINE_TRACK_VERTICAL_OFFSET_DEFAULT    = 20;
+   private static final String       ATTR_OUTLINE_IS_SHOW_OUTLINE         = "isShowOutline";         //$NON-NLS-1$
+   private static final String       ATTR_OUTLINE_WIDTH                   = "outlineWidth";          //$NON-NLS-1$
+   private static final String       ATTR_OUTLINE_BRIGHTNESS              = "outlineBrightness";     //$NON-NLS-1$
    //
-   public static final RGB                  LINE_COLOR_DEFAULT                    = new RGB(0x80, 0x0, 0x80);
-   public static final LineColorMode        LINE_COLOR_MODE_DEFAULT               = LineColorMode.GRADIENT;
-   public static final MapGraphId           LINE_GRADIENT_COLOR_GRAPH_ID_DEFAULT  = MapGraphId.Altitude;
+   private static final String       ATTR_TRACK_IS_VERTICAL_OFFSET        = "isTrackVerticalOffset"; //$NON-NLS-1$
+   private static final String       ATTR_TRACK_VERTICAL_OFFSET           = "trackVerticalOffset";   //$NON-NLS-1$
    //
-   public static final int                  LINE_OPACITY_MIN                      = 26;                              // 10 %
-   public static final int                  LINE_OPACITY_MAX                      = 0xff;
-   public static final int                  LINE_OPACITY_DEFAULT                  = 180;                             // 70 %
-   public static final int                  LINE_WIDTH_MIN                        = 1;
-   public static final int                  LINE_WIDTH_MAX                        = 20;
-   public static final float                LINE_WIDTH_DEFAULT                    = 10f;
+   public static final RGB           LINE_COLOR_DEFAULT                   = new RGB(0x80, 0x0, 0x80);
+   public static final LineColorMode LINE_COLOR_MODE_DEFAULT              = LineColorMode.GRADIENT;
+   public static final MapGraphId    LINE_GRADIENT_COLOR_GRAPH_ID_DEFAULT = MapGraphId.Altitude;
    //
-   public static final boolean              OUTLINE_IS_SHOW_OUTLINE_DEFAULT       = true;
-   public static final int                  OUTLINE_BRIGHTNESS_MIN                = -10;
-   public static final int                  OUTLINE_BRIGHTNESS_MAX                = 10;
-   public static final float                OUTLINE_BRIGHTNESS_DEFAULT            = -0.5f;
-   public static final int                  OUTLINE_WIDTH_MIN                     = 0;
-   public static final int                  OUTLINE_WIDTH_MAX                     = 20;
-   public static final float                OUTLINE_WIDTH_DEFAULT                 = 2f;
+   public static final int           LINE_OPACITY_MIN                     = 26;                      // 10 %
+   public static final int           LINE_OPACITY_MAX                     = 0xff;
+   public static final int           LINE_OPACITY_DEFAULT                 = 180;                     // 70 %
+   public static final int           LINE_WIDTH_MIN                       = 1;
+   public static final int           LINE_WIDTH_MAX                       = 20;
+   public static final float         LINE_WIDTH_DEFAULT                   = 10f;
    //
-   private static final String              TAG_DIRECTION_ARROW                   = "DirectionArrow";                //$NON-NLS-1$
-   private static final String              ATTR_ARROW_IS_SHOW_ARROW              = "isShowDirectionArrow";          //$NON-NLS-1$
-   private static final String              ATTR_ARROW_DESIGN                     = "design";                        //$NON-NLS-1$
-   private static final String              ATTR_ARROW_MIN_DISTANCE               = "minDistance";                   //$NON-NLS-1$
-   private static final String              ATTR_ARROW_VERTICAL_OFFSET            = "verticalOffset";                //$NON-NLS-1$
+   public static final boolean       OUTLINE_IS_SHOW_OUTLINE_DEFAULT      = true;
+   public static final int           OUTLINE_BRIGHTNESS_MIN               = -10;
+   public static final int           OUTLINE_BRIGHTNESS_MAX               = 10;
+   public static final float         OUTLINE_BRIGHTNESS_DEFAULT           = -0.5f;
+   public static final int           OUTLINE_WIDTH_MIN                    = 0;
+   public static final int           OUTLINE_WIDTH_MAX                    = 20;
+   public static final float         OUTLINE_WIDTH_DEFAULT                = 2f;
    //
-   private static final String              ATTR_ARROW_SCALE                      = "scale";                         //$NON-NLS-1$
-   private static final String              ATTR_ARROW_LENGTH                     = "length";                        //$NON-NLS-1$
-   private static final String              ATTR_ARROW_LENGTH_CENTER              = "lengthCenter";                  //$NON-NLS-1$
-   private static final String              ATTR_ARROW_WIDTH                      = "width";                         //$NON-NLS-1$
-   private static final String              ATTR_ARROW_HEIGHT                     = "height";                        //$NON-NLS-1$
+   public static final boolean       TRACK_IS_VERTICAL_OFFSET_DEFAULT     = false;
+   public static final int           TRACK_VERTICAL_OFFSET_DEFAULT        = 20;
    //
-   private static final String              ATTR_ARROW_FIN_OUTLINE_WIDTH          = "finOutlineWidth";               //$NON-NLS-1$
-   private static final String              ATTR_ARROW_WING_OUTLINE_WIDTH         = "wingOutlineWidth";              //$NON-NLS-1$
+   /*
+    * Direction Arrows
+    */
+   private static final String              TAG_DIRECTION_ARROW              = "DirectionArrow";                //$NON-NLS-1$
+   private static final String              ATTR_ARROW_IS_SHOW_ARROW         = "isShowDirectionArrow";          //$NON-NLS-1$
+   private static final String              ATTR_ARROW_DESIGN                = "design";                        //$NON-NLS-1$
+   private static final String              ATTR_ARROW_MIN_DISTANCE          = "minDistance";                   //$NON-NLS-1$
+   private static final String              ATTR_ARROW_VERTICAL_OFFSET       = "verticalOffset";                //$NON-NLS-1$
    //
-   private static final String              TAG_ARROW_FIN_INSIDE_COLOR            = "FinInsideColor";                //$NON-NLS-1$
-   private static final String              TAG_ARROW_FIN_OUTLINE_COLOR           = "FinOutlineColor";               //$NON-NLS-1$
-   private static final String              TAG_ARROW_WING_INSIDE_COLOR           = "wingInsideColor";               //$NON-NLS-1$
-   private static final String              TAG_ARROW_WING_OUTLINE_COLOR          = "wingOutlineColor";              //$NON-NLS-1$
+   private static final String              ATTR_ARROW_SCALE                 = "scale";                         //$NON-NLS-1$
+   private static final String              ATTR_ARROW_LENGTH                = "length";                        //$NON-NLS-1$
+   private static final String              ATTR_ARROW_LENGTH_CENTER         = "lengthCenter";                  //$NON-NLS-1$
+   private static final String              ATTR_ARROW_WIDTH                 = "width";                         //$NON-NLS-1$
+   private static final String              ATTR_ARROW_HEIGHT                = "height";                        //$NON-NLS-1$
    //
-   public static final boolean              ARROW_IS_SHOW_ARROW_DEFAULT           = true;
-   public static final DirectionArrowDesign ARROW_DESIGN_DEFAULT                  = DirectionArrowDesign.WINGS;
-   public static final int                  ARROW_MIN_DISTANCE_DEFAULT            = 60;
-   public static final int                  ARROW_VERTICAL_OFFSET_DEFAULT         = 30;
+   private static final String              ATTR_ARROW_FIN_OUTLINE_WIDTH     = "finOutlineWidth";               //$NON-NLS-1$
+   private static final String              ATTR_ARROW_WING_OUTLINE_WIDTH    = "wingOutlineWidth";              //$NON-NLS-1$
    //
-   public static final int                  ARROW_SCALE_DEFAULT                   = 10;
-   public static final int                  ARROW_LENGTH_DEFAULT                  = 40;
-   public static final int                  ARROW_LENGTH_CENTER_DEFAULT           = 30;
-   public static final int                  ARROW_WIDTH_DEFAULT                   = 40;
-   public static final int                  ARROW_HEIGHT_DEFAULT                  = 20;
+   private static final String              TAG_ARROW_FIN_INSIDE_COLOR       = "FinInsideColor";                //$NON-NLS-1$
+   private static final String              TAG_ARROW_FIN_OUTLINE_COLOR      = "FinOutlineColor";               //$NON-NLS-1$
+   private static final String              TAG_ARROW_WING_INSIDE_COLOR      = "wingInsideColor";               //$NON-NLS-1$
+   private static final String              TAG_ARROW_WING_OUTLINE_COLOR     = "wingOutlineColor";              //$NON-NLS-1$
    //
-   public static final int                  ARROW_FIN_OUTLINE_WIDTH_DEFAULT       = 5;
-   public static final int                  ARROW_WING_OUTLINE_WIDTH_DEFAULT      = 10;
+   public static final boolean              ARROW_IS_SHOW_ARROW_DEFAULT      = true;
+   public static final DirectionArrowDesign ARROW_DESIGN_DEFAULT             = DirectionArrowDesign.WINGS;
+   public static final int                  ARROW_MIN_DISTANCE_DEFAULT       = 60;
+   public static final int                  ARROW_VERTICAL_OFFSET_DEFAULT    = 30;
    //
-   public static final RGBA                 ARROW_FIN_INSIDE_COLOR_DEFAULT        = new RGBA(0x10, 0x10, 0x10, 0x80);
-   public static final RGBA                 ARROW_FIN_OUTLINE_COLOR_DEFAULT       = new RGBA(0xff, 0xff, 0xff, 0xff);
-   public static final RGBA                 ARROW_WING_INSIDE_COLOR_DEFAULT       = new RGBA(0x10, 0x10, 0x10, 0x80);
-   public static final RGBA                 ARROW_WING_OUTLINE_COLOR_DEFAULT      = new RGBA(0xff, 0x20, 0x20, 0xff);
+   public static final int                  ARROW_SCALE_DEFAULT              = 10;
+   public static final int                  ARROW_LENGTH_DEFAULT             = 40;
+   public static final int                  ARROW_LENGTH_CENTER_DEFAULT      = 30;
+   public static final int                  ARROW_WIDTH_DEFAULT              = 40;
+   public static final int                  ARROW_HEIGHT_DEFAULT             = 20;
    //
-   private static final String              TAG_LEGEND                            = "Legend";                        //$NON-NLS-1$
-   private static final String              ATTR_LEGEND_UNIT_LAYOUT               = "unitLayout";                    //$NON-NLS-1$
+   public static final int                  ARROW_FIN_OUTLINE_WIDTH_DEFAULT  = 5;
+   public static final int                  ARROW_WING_OUTLINE_WIDTH_DEFAULT = 10;
    //
-   // slider location/path
+   public static final RGBA                 ARROW_FIN_INSIDE_COLOR_DEFAULT   = new RGBA(0x10, 0x10, 0x10, 0x80);
+   public static final RGBA                 ARROW_FIN_OUTLINE_COLOR_DEFAULT  = new RGBA(0xff, 0xff, 0xff, 0xff);
+   public static final RGBA                 ARROW_WING_INSIDE_COLOR_DEFAULT  = new RGBA(0x10, 0x10, 0x10, 0x80);
+   public static final RGBA                 ARROW_WING_OUTLINE_COLOR_DEFAULT = new RGBA(0xff, 0x20, 0x20, 0xff);
+   //
+   /*
+    * Legend
+    */
+   private static final String TAG_LEGEND              = "Legend";     //$NON-NLS-1$
+   private static final String ATTR_LEGEND_UNIT_LAYOUT = "unitLayout"; //$NON-NLS-1$
+   //
+   /*
+    * Slider location/path
+    */
    private static final String TAG_SLIDER_PATH                     = "SliderPath";             //$NON-NLS-1$
    private static final String TAG_SLIDER_LOCATION_LEFT            = "SliderLocation_Left";    //$NON-NLS-1$
    private static final String TAG_SLIDER_LOCATION_RIGHT           = "SliderLocation_Right";   //$NON-NLS-1$
@@ -673,6 +685,9 @@ public class Map25ConfigManager {
             Util.setXmlEnum(xmlLine,   ATTR_LINE_COLOR_MODE,               config.lineColorMode);
             Util.setXmlEnum(xmlLine,   ATTR_LINE_GRADIENT_COLOR_GRAPH_ID,  config.gradientColorGraphID);
 
+            xmlLine.putBoolean(        ATTR_TRACK_IS_VERTICAL_OFFSET,      config.isTrackVerticalOffset);
+            xmlLine.putInteger(        ATTR_TRACK_VERTICAL_OFFSET,         config.trackVerticalOffset);
+
             xmlLine.putBoolean(        ATTR_OUTLINE_IS_SHOW_OUTLINE,       config.isShowOutline);
             xmlLine.putFloat(          ATTR_OUTLINE_BRIGHTNESS,            config.outlineBrighness);
             xmlLine.putFloat(          ATTR_OUTLINE_WIDTH,                 config.outlineWidth);
@@ -910,6 +925,9 @@ public class Map25ConfigManager {
             config.lineWidth              = Util.getXmlFloatFloat(   xmlConfigChild,         ATTR_LINE_WIDTH,                    LINE_WIDTH_DEFAULT,           LINE_WIDTH_MIN,            LINE_WIDTH_MAX);
             config.lineColorMode          = (LineColorMode) Util.getXmlEnum(xmlConfigChild,  ATTR_LINE_COLOR_MODE,               LINE_COLOR_MODE_DEFAULT);
             config.gradientColorGraphID   = (MapGraphId)    Util.getXmlEnum(xmlConfigChild,  ATTR_LINE_GRADIENT_COLOR_GRAPH_ID,  LINE_GRADIENT_COLOR_GRAPH_ID_DEFAULT);
+
+            config.isTrackVerticalOffset  = Util.getXmlBoolean(      xmlConfigChild,         ATTR_TRACK_IS_VERTICAL_OFFSET, TRACK_IS_VERTICAL_OFFSET_DEFAULT);
+            config.trackVerticalOffset    = Util.getXmlInteger(      xmlConfigChild,         ATTR_TRACK_VERTICAL_OFFSET,    TRACK_VERTICAL_OFFSET_DEFAULT);
 
             config.isShowOutline          = Util.getXmlBoolean(xmlConfigChild,      ATTR_OUTLINE_IS_SHOW_OUTLINE, OUTLINE_IS_SHOW_OUTLINE_DEFAULT);
             config.outlineBrighness       = Util.getXmlFloatFloat(xmlConfigChild,   ATTR_OUTLINE_BRIGHTNESS,      OUTLINE_BRIGHTNESS_DEFAULT,   OUTLINE_BRIGHTNESS_MIN,    OUTLINE_BRIGHTNESS_MAX);
