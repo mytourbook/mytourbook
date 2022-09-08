@@ -37,7 +37,7 @@ varying vec4   pass_ArrowColors[4];
 varying vec3   pass_ColorCoord;        // barycentric coordinate inside the triangle
 varying vec2   pass_OutlineWidth;
 
-void main() {
+vec4 wingColor() {
       
    // Source: https://stackoverflow.com/questions/137629/how-do-you-render-primitives-as-wireframes-in-opengl#answer-33004265
 
@@ -56,11 +56,11 @@ void main() {
       if (wireValue > 0.5) {
          
          // inside	
-         gl_FragColor = pass_ArrowColors[0];
+         return pass_ArrowColors[0];
          
       } else {
          // border
-         gl_FragColor = pass_ArrowColors[1];
+         return pass_ArrowColors[1];
       }
 
    } else {
@@ -72,11 +72,18 @@ void main() {
       if (wireValue > 0.5) {
          
          // inside	
-         gl_FragColor = pass_ArrowColors[2];
+         return pass_ArrowColors[2];
          
       } else {
+         
          // border
-         gl_FragColor = pass_ArrowColors[3];
+         return pass_ArrowColors[3];
       }
    }
+}
+
+void main() {
+
+   // output color to the default frame buffer default color attachment
+   gl_FragData[0] = wingColor();
 }

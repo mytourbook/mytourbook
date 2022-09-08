@@ -52,6 +52,8 @@ public abstract class GLShaderMT {
       String defs = ""; //$NON-NLS-1$
       if (directives != null) {
          defs += directives + "\n"; //$NON-NLS-1$
+      } else {
+         defs += "#version 120 \n"; //$NON-NLS-1$
       }
 
       if (GLAdapter.GDX_DESKTOP_QUIRKS) {
