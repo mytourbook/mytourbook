@@ -20,7 +20,7 @@ import com.badlogic.gdx.Input.Buttons;
 
 import net.tourbook.map.IMapSyncListener;
 import net.tourbook.map25.layer.labeling.LabelLayerMT;
-import net.tourbook.map25.layer.tourtrack.TourLayer;
+import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
 
 import org.eclipse.swt.widgets.Display;
 import org.oscim.core.GeoPoint;
@@ -214,7 +214,7 @@ public class InputHandlerMT extends InputHandler {
       // Tour
       case Input.Keys.T:
 
-         final TourLayer layerTour = _mapApp.getLayer_Tour();
+         final TourTrack_Layer layerTour = _mapApp.getLayer_Tour();
          layerTour.setEnabled(!layerTour.isEnabled());
 
          _map.render();

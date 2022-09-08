@@ -72,7 +72,7 @@ import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig.LineColorMode;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
-import net.tourbook.map25.layer.tourtrack.TourLayer;
+import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
 import net.tourbook.map25.ui.SlideoutMap25_MapLayer;
 import net.tourbook.map25.ui.SlideoutMap25_MapOptions;
 import net.tourbook.map25.ui.SlideoutMap25_MapProvider;
@@ -1192,7 +1192,7 @@ public class Map25View extends ViewPart implements
     */
    void enableActions() {
 
-      final TourLayer tourLayer = _map25App.getLayer_Tour();
+      final TourTrack_Layer tourLayer = _map25App.getLayer_Tour();
       final boolean isTourLayerVisible = tourLayer == null ? false : tourLayer.isEnabled();
 
       final boolean isTourAvailable = _allTourData.size() > 0;
@@ -1604,7 +1604,7 @@ public class Map25View extends ViewPart implements
       /*
        * Tours
        */
-      final TourLayer tourLayer = _map25App.getLayer_Tour();
+      final TourTrack_Layer tourLayer = _map25App.getLayer_Tour();
       if (tourLayer == null) {
 
          // tour layer is not yet created, this happened

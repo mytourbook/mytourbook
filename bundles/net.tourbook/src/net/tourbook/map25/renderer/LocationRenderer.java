@@ -1,11 +1,12 @@
 /*
  * Original: org.oscim.renderer.LocationRenderer
  */
-package net.tourbook.map25.layer.tourtrack;
+package net.tourbook.map25.renderer;
 
 import static org.oscim.backend.GLAdapter.gl;
 
 import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 
 import org.eclipse.swt.graphics.RGB;
 import org.oscim.backend.CanvasAdapter;
@@ -353,7 +354,7 @@ public class LocationRenderer extends LayerRenderer {
       }
    }
 
-   void updateConfig() {
+   public void updateConfig() {
 
       final Map25TrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
 

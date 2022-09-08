@@ -54,8 +54,8 @@ import net.tourbook.map25.layer.marker.MarkerToolkit;
 import net.tourbook.map25.layer.marker.PhotoToolkit;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
-import net.tourbook.map25.layer.tourtrack.TourLayer;
-import net.tourbook.map25.renderer.RenderBucketsAllMT;
+import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
+import net.tourbook.map25.renderer.TourTrack_AllBuckets;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
@@ -223,7 +223,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private SliderLocation_Layer    _layer_SliderLocation;
    private SliderPath_Layer        _layer_SliderPath;
    private TileGridLayerMT         _layer_TileInfo;
-   private TourLayer               _layer_Tour;
+   private TourTrack_Layer               _layer_Tour;
    private MarkerLayerMT           _layer_TourMarker;
    //
 //   private OpenGLTestLayer         _layer_OpenGLTest;
@@ -717,7 +717,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    public void createLayers() {
 
       // setup MT shader
-      RenderBucketsAllMT.initRenderer();
+      TourTrack_AllBuckets.initRenderer();
 
       _selectedMapProvider = restoreState_MapProvider();
       _map25View.updateUI_SelectedMapProvider(_selectedMapProvider);
@@ -791,7 +791,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_Satellite_TILE_LOADING.setEnabled(false);
 
       // tour
-      _layer_Tour = new TourLayer(mMap);
+      _layer_Tour = new TourTrack_Layer(mMap);
       _layer_Tour.setEnabled(false);
 
       // slider path
@@ -1132,7 +1132,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return _layer_TileInfo;
    }
 
-   public TourLayer getLayer_Tour() {
+   public TourTrack_Layer getLayer_Tour() {
       return _layer_Tour;
    }
 

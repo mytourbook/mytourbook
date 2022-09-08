@@ -1,148 +1,113 @@
-/*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
- * Copyright (C) 2018, 2021 Thomas Theussing
- *
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation version 2 of the License.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation,
- * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
- *******************************************************************************/
-
 /*
- * Original: org.oscim.layers.PathLayer
+ * Copyright 2013 Hannes Janetzek
+ * Copyright 2016 devemux86
+ *
+ * This file is part of the OpenScienceMap project (http://www.opensciencemap.org).
+ *
+ * This program is free software: you can redistribute it and/or modify it under the
+ * terms of the GNU Lesser General Public License as published by the Free Software
+ * Foundation, either version 3 of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+ * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License along with
+ * this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package net.tourbook.map25.layer.tourtrack;
+package net.tourbook.map25.renderer;
+
+import static org.oscim.renderer.MapRenderer.COORD_SCALE;
+import static org.oscim.renderer.bucket.RenderBucket.LINE;
 
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
 
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig.LineColorMode;
-import net.tourbook.map25.renderer.BucketRendererMT;
-import net.tourbook.map25.renderer.LineBucketMT;
-import net.tourbook.map25.renderer.RenderBucketMT;
-import net.tourbook.map25.renderer.RenderBucketsAllMT;
+import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
 
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 import org.oscim.core.Tile;
-import org.oscim.layers.Layer;
-//import org.oscim.layers.vector.
 import org.oscim.map.Map;
+import org.oscim.renderer.GLMatrix;
+import org.oscim.renderer.GLState;
 import org.oscim.renderer.GLViewport;
+import org.oscim.renderer.LayerRenderer;
 import org.oscim.theme.styles.LineStyle;
 import org.oscim.utils.FastMath;
 import org.oscim.utils.async.SimpleWorker;
 import org.oscim.utils.geom.LineClipper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * This class draws a path line in given color or texture.
- * <p>
- * Example to handle track hover/selection
- * org.oscim.layers.marker.ItemizedLayer.activateSelectedItems(MotionEvent, ActiveItem)
- * <p>
- * Original code: org.oscim.layers.PathLayer
+ * Base class to use the renderer.elements for drawing.
+ * <p/>
+ * All methods that modify 'buckets' MUST be synchronized!
  */
-public class TourLayer extends Layer {
+public class TourTrack_LayerRenderer extends LayerRenderer {
 
-   private static final int RENDERING_DELAY = 0;
+   public static final Logger     log               = LoggerFactory.getLogger(TourTrack_LayerRenderer.class);
+
+   private static final int       RENDERING_DELAY   = 0;
+
+   /**
+    * Use mMapPosition.copy(position) to keep the position for which
+    * the Overlay is *compiled*. NOTE: required by setMatrix utility
+    * functions to draw this layer fixed to the map
+    */
+   private MapPosition            mMapPosition;
+   private Map                    _map;
+
+   /**
+    * Wrap around dateline
+    */
+   private boolean                _isFlipOnDateLine = true;
+
+   /**
+    * Buckets for rendering
+    */
+   private final TourTrack_AllBuckets _allBuckets;
+   private TourTrack_AllBuckets       _currentTaskRenderBuckets;
+
+   private boolean                _isUpdateLayer;
+   private boolean                _isUpdatePoints;
 
    /**
     * Stores points, converted to the map projection.
     */
-   private GeoPoint[]       _allGeoPoints;
-   private TIntArrayList    _allTourStarts;
+   private GeoPoint[]             _allGeoPoints;
+   private TIntArrayList          _allTourStarts;
+   private int[]                  _allGeoPointColors;
 
-   private boolean          _isUpdatePoints;
+   private int                    __oldX            = -1;
+   private int                    __oldY            = -1;
+   private int                    __oldZoomScale    = -1;
+
+   private TourTrack_Layer              _tourLayer;
+
+   private final Worker           _simpleWorker;
 
    /**
     * Line style
     */
-   private LineStyle        _lineStyle;
+   private LineStyle              _lineStyle;
 
    /*
     * Track config values
     */
-   private int                _config_LineColorMode;
-
-   private final Worker       _simpleWorker;
-
-   private boolean            _isUpdateLayer;
-   private int[]              _allGeoPointColors;
-
-   private RenderBucketsAllMT _currentTaskRenderBuckets;
-
-   private final class TourRenderer extends BucketRendererMT {
-
-      private int __oldX         = -1;
-      private int __oldY         = -1;
-      private int __oldZoomScale = -1;
-
-      @Override
-      public synchronized void update(final GLViewport viewport) {
-
-         if (isEnabled() == false) {
-            return;
-         }
-
-         final int currentZoomScale = 1 << viewport.pos.zoomLevel;
-         final int currentX = (int) (viewport.pos.x * currentZoomScale);
-         final int currentY = (int) (viewport.pos.y * currentZoomScale);
-
-         // update layers when map moved by at least one tile
-         if (currentX != __oldX || currentY != __oldY || currentZoomScale != __oldZoomScale || _isUpdateLayer) {
-
-            /*
-             * It took me many days to find this solution that a newly selected tour is
-             * displayed after the map position was moved/tilt/rotated. It works but I don't
-             * know exacly why.
-             */
-            if (_isUpdateLayer) {
-               _simpleWorker.cancel(true);
-            }
-
-            _isUpdateLayer = false;
-
-            _simpleWorker.submit(RENDERING_DELAY);
-
-            __oldX = currentX;
-            __oldY = currentY;
-            __oldZoomScale = currentZoomScale;
-         }
-
-         final TourRenderTask workerTask = _simpleWorker.poll();
-
-         if (workerTask == null) {
-
-            // task is done -> nothing to do
-            return;
-         }
-
-         // keep position to render relative to current state
-         mMapPosition.copy(workerTask.__mapPos);
-
-         // compile new layers
-         final RenderBucketMT firstChainedBucket = workerTask.__allRenderBuckets.get();
-         allBuckets.set(firstChainedBucket);
-
-         compile();
-      }
-   }
+   private int _config_LineColorMode;
 
    private final static class TourRenderTask {
 
-      RenderBucketsAllMT __allRenderBuckets = new RenderBucketsAllMT();
-      MapPosition        __mapPos           = new MapPosition();
+      TourTrack_AllBuckets __allRenderBuckets = new TourTrack_AllBuckets();
+      MapPosition      __mapPos           = new MapPosition();
    }
 
    final class Worker extends SimpleWorker<TourRenderTask> {
@@ -282,7 +247,7 @@ public class TourLayer extends Layer {
 
          final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-         final LineBucketMT lineBucket = getLineBucket(task.__allRenderBuckets);
+         final TourTrack_Bucket lineBucket = getLineBucket(task.__allRenderBuckets);
 
          final MapPosition mapPos = task.__mapPos;
          mMap.getMapPosition(mapPos);
@@ -485,17 +450,32 @@ public class TourLayer extends Layer {
 
    }
 
-   public TourLayer(final Map map) {
+   public TourTrack_LayerRenderer(final TourTrack_Layer tourLayer, final Map map) {
 
-      super(map);
+      _tourLayer = tourLayer;
+      _map = map;
 
-      _lineStyle = createLineStyle();
+      _allBuckets = new TourTrack_AllBuckets();
+      mMapPosition = new MapPosition();
 
       _allGeoPoints = new GeoPoint[] {};
       _allTourStarts = new TIntArrayList();
 
-      mRenderer = new TourRenderer();
       _simpleWorker = new Worker(map);
+
+      _lineStyle = createLineStyle();
+   }
+
+   /**
+    * Compile all buckets into one BufferObject. Sets renderer to be ready
+    * when successful. When no data is available (buckets.countVboSize() == 0)
+    * then BufferObject will be released and buckets will not be rendered.
+    */
+   protected synchronized void compile() {
+
+      final boolean isOK = _allBuckets.compile();
+
+      setReady(isOK);
    }
 
    private LineStyle createLineStyle() {
@@ -549,9 +529,9 @@ public class TourLayer extends Layer {
     * @param allRenderBuckets
     * @return
     */
-   private LineBucketMT getLineBucket(final RenderBucketsAllMT allRenderBuckets) {
+   private TourTrack_Bucket getLineBucket(final TourTrack_AllBuckets allRenderBuckets) {
 
-      LineBucketMT lineBucket;
+      TourTrack_Bucket lineBucket;
 
       lineBucket = allRenderBuckets.getLineBucket(0);
 
@@ -581,8 +561,117 @@ public class TourLayer extends Layer {
 
          getLineBucket(_currentTaskRenderBuckets);
 
-         mMap.render();
+         _map.render();
       }
+   }
+
+   /**
+    * Render (do OpenGL drawing) all 'buckets'
+    */
+   @Override
+   public synchronized void render(final GLViewport viewport) {
+
+      final MapPosition mapPosition = mMapPosition;
+
+      GLState.test(false, false);
+      GLState.blend(true);
+
+      // viewport scale 2 map scale: it is between 1...2
+      final float viewport2mapscale = (float) (viewport.pos.scale / mapPosition.scale);
+
+      setMatrix(viewport, true);
+
+      for (TourTrack_Bucket bucket = _allBuckets.get(); bucket != null;) {
+
+         // performs GL.bindBuffer() of the vbo/ibo buffer
+         _allBuckets.bind();
+
+         switch (bucket.bucketType) {
+
+         case LINE:
+            bucket = TourTrack_Shader.paint(bucket, viewport, viewport2mapscale, _allBuckets);
+            break;
+
+         default:
+            log.error("Invalid bucket {}", bucket.bucketType); //$NON-NLS-1$
+            bucket = bucket.next;
+            break;
+         }
+      }
+   }
+
+   public void setIsUpdateLayer(final boolean isUpdateLayer) {
+      _isUpdateLayer = isUpdateLayer;
+   }
+
+   protected void setMatrix(final GLMatrix mvp,
+                            final GLViewport viewport,
+                            final boolean isProjected,
+                            final float coordScale) {
+
+      final MapPosition mapPosition = mMapPosition;
+
+      final double tileScale = Tile.SIZE * viewport.pos.scale;
+
+      double x = mapPosition.x - viewport.pos.x;
+      final double y = mapPosition.y - viewport.pos.y;
+
+      if (_isFlipOnDateLine) {
+
+         //wrap around date-line
+         while (x < 0.5) {
+            x += 1.0;
+         }
+
+         while (x > 0.5) {
+            x -= 1.0;
+         }
+      }
+
+      mvp.setTransScale(
+            (float) (x * tileScale),
+            (float) (y * tileScale),
+            (float) (viewport.pos.scale / mapPosition.scale) / coordScale);
+
+      mvp.multiplyLhs(isProjected
+
+            ? viewport.viewproj
+            : viewport.view);
+   }
+
+   /**
+    * Utility: Set matrices.mvp matrix relative to the difference of current
+    * MapPosition and the last updated Overlay MapPosition and applies
+    * view-projection-matrix.
+    */
+   protected void setMatrix(final GLViewport viewport) {
+
+      setMatrix(viewport, true);
+   }
+
+   /**
+    * Utility: Set matrices.mvp matrix relative to the difference of current
+    * MapPosition and the last updated Overlay MapPosition.
+    * <p>
+    * Use this to 'stick' your layer to the map. Note: Vertex coordinates
+    * are assumed to be scaled by MapRenderer.COORD_SCALE (== 8).
+    *
+    * @param viewport
+    *           GLViewport
+    * @param isProjected
+    *           if true apply view- and projection, or just view otherwise.
+    */
+   protected void setMatrix(final GLViewport viewport,
+                            final boolean isProjected) {
+
+      setMatrix(viewport, isProjected, COORD_SCALE);
+   }
+
+   protected void setMatrix(final GLViewport viewport,
+                            final boolean isProjected,
+                            final float coordScale) {
+
+      setMatrix(viewport.mvp, viewport, isProjected, coordScale);
    }
 
    public void setPoints(final GeoPoint[] allGeoPoints, final int[] allGeoPointColors, final TIntArrayList allTourStarts) {
@@ -599,6 +688,57 @@ public class TourLayer extends Layer {
       _simpleWorker.cancel(true);
 
       _isUpdatePoints = true;
-      _isUpdateLayer = true;
+
+      setIsUpdateLayer(true);
+   }
+
+   @Override
+   public synchronized void update(final GLViewport viewport) {
+
+      if (_tourLayer.isEnabled() == false) {
+         return;
+      }
+
+      final int currentZoomScale = 1 << viewport.pos.zoomLevel;
+      final int currentX = (int) (viewport.pos.x * currentZoomScale);
+      final int currentY = (int) (viewport.pos.y * currentZoomScale);
+
+      // update layers when map moved by at least one tile
+      if (currentX != __oldX || currentY != __oldY || currentZoomScale != __oldZoomScale || _isUpdateLayer) {
+
+         /*
+          * It took me many days to find this solution that a newly selected tour is
+          * displayed after the map position was moved/tilt/rotated. It works but I don't
+          * know exacly why.
+          */
+         if (_isUpdateLayer) {
+            _simpleWorker.cancel(true);
+         }
+
+         _isUpdateLayer = false;
+
+         _simpleWorker.submit(RENDERING_DELAY);
+
+         __oldX = currentX;
+         __oldY = currentY;
+         __oldZoomScale = currentZoomScale;
+      }
+
+      final TourRenderTask workerTask = _simpleWorker.poll();
+
+      if (workerTask == null) {
+
+         // task is done -> nothing to do
+         return;
+      }
+
+      // keep position to render relative to current state
+      mMapPosition.copy(workerTask.__mapPos);
+
+      // compile new layers
+      final TourTrack_Bucket firstChainedBucket = workerTask.__allRenderBuckets.get();
+      _allBuckets.set(firstChainedBucket);
+
+      compile();
    }
 }

@@ -4,6 +4,7 @@
 package net.tourbook.map25.layer.tourtrack;
 
 import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map25.renderer.LocationRenderer;
 
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.core.GeoPoint;

@@ -566,25 +566,27 @@ public class Map25ConfigManager {
       case 7:
          config.name                         = config.defaultId = CONFIG_DEFAULT_ID_7;
          config.lineWidth                    = 17;
+         config.isTrackVerticalOffset        = true;
+         config.trackVerticalOffset          = 10;
 
          config.isShowSliderLocation         = false;
          config.isShowSliderPath             = false;
 
          config.isShowDirectionArrow         = true;
          config.arrow_MinimumDistance        = 60;
-         config.arrow_VerticalOffset         = 30;
+         config.arrow_VerticalOffset         = 20;
          config.arrow_Design                 = DirectionArrowDesign.WINGS_WITH_MIDDLE_FIN;
          config.arrow_Scale                  = 10;
          config.arrow_Length                 = 30;
          config.arrow_LengthCenter           = 30;
          config.arrow_Width                  = 25;
          config.arrow_Height                 = 20;
-         config.arrowFin_OutlineWidth        = 10;
-         config.arrowWing_OutlineWidth       = 15;
-         config.arrowFin_InsideColor         = new RGBA (255, 0, 0, 179);
-         config.arrowFin_OutlineColor        = new RGBA (255, 255, 255, 255);
-         config.arrowWing_InsideColor        = new RGBA (255, 255, 255, 77);
-         config.arrowWing_OutlineColor       = new RGBA (91, 91, 91, 204);
+         config.arrowFin_OutlineWidth        = 5;
+         config.arrowWing_OutlineWidth       = 5;
+         config.arrowFin_InsideColor         = new RGBA(0xff, 0x0, 0x0, 0xb3);
+         config.arrowFin_OutlineColor        = new RGBA(0xff, 0xff, 0xff, 0xff);
+         config.arrowWing_InsideColor        = new RGBA(0xff, 0xff, 0xff, 0x80);
+         config.arrowWing_OutlineColor       = new RGBA(0x5b, 0x5b, 0x5b, 0xff);
          break;
 
       case 8:
