@@ -235,11 +235,10 @@ public class CRPDataReader extends TourbookDevice {
          /*
           * lines: tour description
           */
-         String tourDesc = UI.EMPTY_STRING;
+         final StringBuilder tourDescription = new StringBuilder();
          while ((line = fileReader.readLine()) != null) {
-            tourDesc += line + "\n"; //$NON-NLS-1$
+            tourDescription.append(line + "\n"); //$NON-NLS-1$
          }
-         tourDesc = tourDesc.trim();
 
          LocalDateTime dtTrackPoint_Previous = LocalDateTime.of(
                tourYear,
@@ -258,7 +257,7 @@ public class CRPDataReader extends TourbookDevice {
          tourData.setTourStartTime(tourYear, tourMonth, tourDay, tourHour, tourMinute, 0);
 
          tourData.setTourTitle(tourName);
-         tourData.setTourDescription(tourDesc);
+         tourData.setTourDescription(tourDescription.toString().trim());
 
          tourData.setDeviceMode((short) (tourMode));
          tourData.setDeviceModeName(getDeviceModeName(tourMode));
