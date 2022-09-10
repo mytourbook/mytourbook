@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TimeData;
@@ -35,7 +36,6 @@ import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.SerialParameters;
 import net.tourbook.importdata.TourbookDevice;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 public class CRPDataReader extends TourbookDevice {
@@ -186,7 +186,7 @@ public class CRPDataReader extends TourbookDevice {
       // tour name
       String tourName = UI.EMPTY_STRING;
       if (tokenLine.hasMoreTokens()) {
-         tourName = tokenLine.nextToken("\t"); //$NON-NLS-1$
+         tourName = tokenLine.nextToken(UI.TAB1);
       }
 
       // skip lines
@@ -367,7 +367,7 @@ public class CRPDataReader extends TourbookDevice {
          // get comment for current trackpoint
          String comment = UI.EMPTY_STRING;
          if (tokenLine.hasMoreTokens()) {
-            comment = tokenLine.nextToken("\t"); //$NON-NLS-1$
+            comment = tokenLine.nextToken(UI.TAB1);
          }
 
          /*
