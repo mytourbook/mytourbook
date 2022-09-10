@@ -167,7 +167,8 @@ public class CRPDataReader extends TourbookDevice {
 
          // skip line
          // 4006  568   563   5040  1676  134   162   431   83 68 195   18,0  23,0  0  02:06:00 19,08
-         fileReader.readLine();
+         @SuppressWarnings("unused")
+         String lineToSkip = fileReader.readLine();
 
          /*
           * Line: date/time
@@ -213,8 +214,8 @@ public class CRPDataReader extends TourbookDevice {
          }
 
          // skip lines
-         fileReader.readLine();
-         fileReader.readLine();
+         lineToSkip = fileReader.readLine();
+         lineToSkip = fileReader.readLine();
 
          /*
           * Line: interval/mode
@@ -224,12 +225,12 @@ public class CRPDataReader extends TourbookDevice {
          final int tourMode = Integer.parseInt(tokenLine.nextToken());
 
          // skip empty lines
-         fileReader.readLine();
-         fileReader.readLine();
+         lineToSkip = fileReader.readLine();
+         lineToSkip = fileReader.readLine();
 
          // skip lines
-         fileReader.readLine();
-         fileReader.readLine();
+         lineToSkip = fileReader.readLine();
+         lineToSkip = fileReader.readLine();
 
          /*
           * lines: tour description
@@ -346,7 +347,7 @@ public class CRPDataReader extends TourbookDevice {
             timeDataList.add(timeData);
 
             timeData.altitude = altitudeDiff;
-            timeData.distance = distance - oldDistance;
+            timeData.distance = (distance - oldDistance) * 1f;
             timeData.pulse = pulse;
             timeData.temperature = temperature;
             timeData.time = (int) trackpointTimeDiff;
