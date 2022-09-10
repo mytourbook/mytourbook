@@ -65,7 +65,7 @@ public final class FilesUtils {
 
             fileContent = Files.readString(Paths.get(filePath), StandardCharsets.ISO_8859_1);
 
-         } catch (final IOException iso_8859_1_exception) {
+         } catch (final Exception iso_8859_1_exception) {
             StatusUtil.log(iso_8859_1_exception);
          }
 
