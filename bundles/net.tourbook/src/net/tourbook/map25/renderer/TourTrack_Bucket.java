@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Hannes Janetzek
  * Copyright 2016-2021 devemux86
  *
@@ -71,10 +71,6 @@ public class TourTrack_Bucket extends Inlist<TourTrack_Bucket> {
     */
    private static final int   DIR_MASK         = 0xFFFFFFFC;
 
-   public static final byte   LINE             = 0;
-
-   public final byte          bucketType;
-
    public LineStyle           lineStyle;
    public int                 lineColorMode;
 
@@ -95,11 +91,6 @@ public class TourTrack_Bucket extends Inlist<TourTrack_Bucket> {
    ////////////////////////////////////////////////////////////////////////////////////////////////
    ////////////////////////////////////////////////////////////////////////////////////////////////
    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-   /**
-    * Drawing order from bottom to top.
-    */
-   int                          verticalOrder;
 
    /**
     * Number of vertices for this layer.
@@ -140,10 +131,7 @@ public class TourTrack_Bucket extends Inlist<TourTrack_Bucket> {
 
    protected int                vertexOffset;               // in bytes
 
-   public TourTrack_Bucket(final int verticalLevel) {
-
-      this.verticalOrder = verticalLevel;
-      this.bucketType = LINE;
+   public TourTrack_Bucket() {
 
       vertexItems = new VertexDataMT();
 
@@ -198,7 +186,7 @@ public class TourTrack_Bucket extends Inlist<TourTrack_Bucket> {
     * @param isCapClosed
     * @param pixelPointColors
     */
-   void addLine(final float[] pixelPoints,
+   private void addLine(final float[] pixelPoints,
                 final int[] index,
                 final int numPoints,
                 final boolean isCapClosed,

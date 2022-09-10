@@ -1,3 +1,18 @@
+/*******************************************************************************
+ * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ *
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.map25.renderer;
 
 import static org.oscim.backend.GLAdapter.gl;
@@ -129,50 +144,34 @@ public final class TourTrack_Shader {
       }
    }
 
-   static boolean init() {
-
-// SET_FORMATTING_OFF
-
-         _lineShaders[SHADER_PROJECTED]   = new LineShader("line_aa_proj");       //$NON-NLS-1$
-         _lineShaders[SHADER_FLAT]        = new LineShader("line_aa");            //$NON-NLS-1$
-
-         _directionArrowShader            = new DirectionArrowsShader("directionArrows");    //$NON-NLS-1$
-
-// SET_FORMATTING_ON
-
-//         _dirArrowFrameBuffer = new FrameBuffer();
-
-      return true;
-   }
-
    /**
     * Performs OpenGL drawing commands of the renderBucket(s)
     *
-    * @param renderBucket
+    * @param trackBucket
     * @param viewport
     * @param vp2mpScale
     *           Viewport scale 2 map scale: it is between 1...2
-    * @param renderBucketsAll
+    * @param allRenderBuckets
     * @return
     */
-   public static TourTrack_Bucket paint(final TourTrack_Bucket renderBucket,
+   public static TourTrack_Bucket paint(final TourTrack_Bucket trackBucket,
                                         final GLViewport viewport,
                                         final float vp2mpScale,
-                                        final TourTrack_AllBuckets renderBucketsAll) {
+                                        final TourTrack_AllBuckets allRenderBuckets) {
 
-//         _dirArrowFrameBuffer.updateViewport(viewport, 0.5f);
+//    _dirArrowFrameBuffer.updateViewport(viewport, 0.5f);
 
-      final TourTrack_Bucket[] inoutRenderBucket = new TourTrack_Bucket[] { renderBucket };
+      final TourTrack_Bucket[] inoutRenderBucket = new TourTrack_Bucket[] { trackBucket };
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
       // fix alpha blending
       gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
       {
-         paint_10_Track(inoutRenderBucket, viewport, vp2mpScale, renderBucketsAll);
+         paint_10_Track(inoutRenderBucket, viewport, vp2mpScale, allRenderBuckets);
 
          if (trackConfig.isShowDirectionArrow) {
-            paint_20_DirectionArrows(viewport, renderBucketsAll, vp2mpScale);
+            paint_20_DirectionArrows(viewport, allRenderBuckets, vp2mpScale);
          }
       }
       gl.blendFunc(GL.ONE, GL.ONE_MINUS_SRC_ALPHA); // reset to map default
@@ -237,12 +236,12 @@ public final class TourTrack_Shader {
 
       gl.vertexAttribPointer(
 
-            shader_a_pos, //                    index of the vertex attribute that is to be modified
-            4, //                               number of components per vertex attribute, must be 1, 2, 3, or 4
-            GL.SHORT, //                        data type of each component in the array
-            false, //                           values should be normalized
-            0, //                               offset in bytes between the beginning of consecutive vertex attributes
-            renderBucketsAll.offset[TourTrack_Bucket.LINE] //    offset in bytes of the first component in the vertex attribute array
+            shader_a_pos, //           index of the vertex attribute that is to be modified
+            4, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
+            GL.SHORT, //               data type of each component in the array
+            false, //                  values should be normalized
+            0, //                      offset in bytes between the beginning of consecutive vertex attributes
+            0 //                       offset in bytes of the first component in the vertex attribute array
       );
 
       /*
@@ -293,7 +292,7 @@ public final class TourTrack_Shader {
       float heightOffset = 0;
       gl.uniform1f(shader_u_height, heightOffset);
 
-      for (; inoutRenderBucket[0] != null && inoutRenderBucket[0].bucketType == TourTrack_Bucket.LINE; inoutRenderBucket[0] = inoutRenderBucket[0].next) {
+      for (; inoutRenderBucket[0] != null; inoutRenderBucket[0] = inoutRenderBucket[0].next) {
 
          final TourTrack_Bucket lineBucket = inoutRenderBucket[0];
          final LineStyle lineStyle = lineBucket.lineStyle.current();
@@ -520,5 +519,21 @@ public final class TourTrack_Shader {
       gl.depthMask(false);
 
       GLUtils.checkGlError(TourTrack_Shader.class.getName());
+   }
+
+   public static boolean setupShader() {
+
+// SET_FORMATTING_OFF
+
+      _lineShaders[SHADER_PROJECTED]   = new LineShader("line_aa_proj");       //$NON-NLS-1$
+      _lineShaders[SHADER_FLAT]        = new LineShader("line_aa");            //$NON-NLS-1$
+
+      _directionArrowShader            = new DirectionArrowsShader("directionArrows");    //$NON-NLS-1$
+
+// SET_FORMATTING_ON
+
+//    _dirArrowFrameBuffer = new FrameBuffer();
+
+      return true;
    }
 }

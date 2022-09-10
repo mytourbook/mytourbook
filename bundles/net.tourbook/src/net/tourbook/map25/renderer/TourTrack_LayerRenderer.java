@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2013 Hannes Janetzek
  * Copyright 2016 devemux86
  *
@@ -18,7 +18,6 @@
 package net.tourbook.map25.renderer;
 
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
-import static org.oscim.renderer.bucket.RenderBucket.LINE;
 
 import gnu.trove.list.array.TFloatArrayList;
 import gnu.trove.list.array.TIntArrayList;
@@ -53,51 +52,51 @@ import org.slf4j.LoggerFactory;
  */
 public class TourTrack_LayerRenderer extends LayerRenderer {
 
-   public static final Logger     log               = LoggerFactory.getLogger(TourTrack_LayerRenderer.class);
+   public static final Logger         log               = LoggerFactory.getLogger(TourTrack_LayerRenderer.class);
 
-   private static final int       RENDERING_DELAY   = 0;
+   private static final int           RENDERING_DELAY   = 0;
 
    /**
-    * Use mMapPosition.copy(position) to keep the position for which
+    * Use _mapPosition.copy(position) to keep the position for which
     * the Overlay is *compiled*. NOTE: required by setMatrix utility
     * functions to draw this layer fixed to the map
     */
-   private MapPosition            mMapPosition;
-   private Map                    _map;
+   private MapPosition                _mapPosition;
+   private Map                        _map;
 
    /**
     * Wrap around dateline
     */
-   private boolean                _isFlipOnDateLine = true;
+   private boolean                    _isFlipOnDateLine = true;
 
    /**
     * Buckets for rendering
     */
-   private final TourTrack_AllBuckets _allBuckets;
+   private final TourTrack_AllBuckets _allLayerBuckets;
    private TourTrack_AllBuckets       _currentTaskRenderBuckets;
 
-   private boolean                _isUpdateLayer;
-   private boolean                _isUpdatePoints;
+   private boolean                    _isUpdateLayer;
+   private boolean                    _isUpdatePoints;
 
    /**
     * Stores points, converted to the map projection.
     */
-   private GeoPoint[]             _allGeoPoints;
-   private TIntArrayList          _allTourStarts;
-   private int[]                  _allGeoPointColors;
+   private GeoPoint[]                 _allGeoPoints;
+   private TIntArrayList              _allTourStarts;
+   private int[]                      _allGeoPointColors;
 
-   private int                    __oldX            = -1;
-   private int                    __oldY            = -1;
-   private int                    __oldZoomScale    = -1;
+   private int                        __oldX            = -1;
+   private int                        __oldY            = -1;
+   private int                        __oldZoomScale    = -1;
 
-   private TourTrack_Layer              _tourLayer;
+   private TourTrack_Layer            _tourLayer;
 
-   private final Worker           _simpleWorker;
+   private final Worker               _simpleWorker;
 
    /**
     * Line style
     */
-   private LineStyle              _lineStyle;
+   private LineStyle                  _lineStyle;
 
    /*
     * Track config values
@@ -106,8 +105,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
    private final static class TourRenderTask {
 
-      TourTrack_AllBuckets __allRenderBuckets = new TourTrack_AllBuckets();
-      MapPosition      __mapPos           = new MapPosition();
+      TourTrack_AllBuckets __allWorkerBuckets = new TourTrack_AllBuckets();
+      MapPosition          __mapPos           = new MapPosition();
    }
 
    final class Worker extends SimpleWorker<TourRenderTask> {
@@ -189,7 +188,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       @Override
       public void cleanup(final TourRenderTask task) {
 
-         task.__allRenderBuckets.clear();
+         task.__allWorkerBuckets.clear();
       }
 
       @Override
@@ -221,13 +220,13 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             }
          }
 
-         _currentTaskRenderBuckets = task.__allRenderBuckets;
+         _currentTaskRenderBuckets = task.__allWorkerBuckets;
 
          if (numGeoPoints == 0) {
 
-            if (task.__allRenderBuckets.get() != null) {
+            if (task.__allWorkerBuckets.get() != null) {
 
-               task.__allRenderBuckets.clear();
+               task.__allWorkerBuckets.clear();
 
                mMap.render();
             }
@@ -247,7 +246,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-         final TourTrack_Bucket lineBucket = getLineBucket(task.__allRenderBuckets);
+         final TourTrack_Bucket lineBucket = getTrackBucket(task.__allWorkerBuckets);
 
          final MapPosition mapPos = task.__mapPos;
          mMap.getMapPosition(mapPos);
@@ -455,8 +454,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _tourLayer = tourLayer;
       _map = map;
 
-      _allBuckets = new TourTrack_AllBuckets();
-      mMapPosition = new MapPosition();
+      _allLayerBuckets = new TourTrack_AllBuckets();
+      _mapPosition = new MapPosition();
 
       _allGeoPoints = new GeoPoint[] {};
       _allTourStarts = new TIntArrayList();
@@ -464,18 +463,6 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _simpleWorker = new Worker(map);
 
       _lineStyle = createLineStyle();
-   }
-
-   /**
-    * Compile all buckets into one BufferObject. Sets renderer to be ready
-    * when successful. When no data is available (buckets.countVboSize() == 0)
-    * then BufferObject will be released and buckets will not be rendered.
-    */
-   protected synchronized void compile() {
-
-      final boolean isOK = _allBuckets.compile();
-
-      setReady(isOK);
    }
 
    private LineStyle createLineStyle() {
@@ -526,14 +513,14 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    /**
     * Update linestyle in the bucket
     *
-    * @param allRenderBuckets
+    * @param allTrackBuckets
     * @return
     */
-   private TourTrack_Bucket getLineBucket(final TourTrack_AllBuckets allRenderBuckets) {
+   private TourTrack_Bucket getTrackBucket(final TourTrack_AllBuckets allTrackBuckets) {
 
       TourTrack_Bucket lineBucket;
 
-      lineBucket = allRenderBuckets.getLineBucket(0);
+      lineBucket = allTrackBuckets.getLineBucket();
 
 // SET_FORMATTING_OFF
 
@@ -559,7 +546,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          // do a fast update
 
-         getLineBucket(_currentTaskRenderBuckets);
+         getTrackBucket(_currentTaskRenderBuckets);
 
          _map.render();
       }
@@ -571,7 +558,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    @Override
    public synchronized void render(final GLViewport viewport) {
 
-      final MapPosition mapPosition = mMapPosition;
+      final MapPosition mapPosition = _mapPosition;
 
       GLState.test(false, false);
       GLState.blend(true);
@@ -581,22 +568,12 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
       setMatrix(viewport, true);
 
-      for (TourTrack_Bucket bucket = _allBuckets.get(); bucket != null;) {
+      for (TourTrack_Bucket bucket = _allLayerBuckets.get(); bucket != null;) {
 
          // performs GL.bindBuffer() of the vbo/ibo buffer
-         _allBuckets.bind();
+         _allLayerBuckets.bind();
 
-         switch (bucket.bucketType) {
-
-         case LINE:
-            bucket = TourTrack_Shader.paint(bucket, viewport, viewport2mapscale, _allBuckets);
-            break;
-
-         default:
-            log.error("Invalid bucket {}", bucket.bucketType); //$NON-NLS-1$
-            bucket = bucket.next;
-            break;
-         }
+         bucket = TourTrack_Shader.paint(bucket, viewport, viewport2mapscale, _allLayerBuckets);
       }
    }
 
@@ -604,12 +581,24 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _isUpdateLayer = isUpdateLayer;
    }
 
-   protected void setMatrix(final GLMatrix mvp,
-                            final GLViewport viewport,
-                            final boolean isProjected,
-                            final float coordScale) {
+   /**
+    * Utility: Set matrices.mvp matrix relative to the difference of current
+    * MapPosition and the last updated Overlay MapPosition.
+    * <p>
+    * Use this to 'stick' your layer to the map. Note: Vertex coordinates
+    * are assumed to be scaled by MapRenderer.COORD_SCALE (== 8).
+    *
+    * @param viewport
+    *           GLViewport
+    * @param isProjected
+    *           if true apply view- and projection, or just view otherwise.
+    */
+   private void setMatrix(final GLViewport viewport,
+                          final boolean isProjected) {
 
-      final MapPosition mapPosition = mMapPosition;
+      final float coordScale = COORD_SCALE;
+      final GLMatrix mvp = viewport.mvp;
+      final MapPosition mapPosition = _mapPosition;
 
       final double tileScale = Tile.SIZE * viewport.pos.scale;
 
@@ -637,41 +626,6 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
             ? viewport.viewproj
             : viewport.view);
-   }
-
-   /**
-    * Utility: Set matrices.mvp matrix relative to the difference of current
-    * MapPosition and the last updated Overlay MapPosition and applies
-    * view-projection-matrix.
-    */
-   protected void setMatrix(final GLViewport viewport) {
-
-      setMatrix(viewport, true);
-   }
-
-   /**
-    * Utility: Set matrices.mvp matrix relative to the difference of current
-    * MapPosition and the last updated Overlay MapPosition.
-    * <p>
-    * Use this to 'stick' your layer to the map. Note: Vertex coordinates
-    * are assumed to be scaled by MapRenderer.COORD_SCALE (== 8).
-    *
-    * @param viewport
-    *           GLViewport
-    * @param isProjected
-    *           if true apply view- and projection, or just view otherwise.
-    */
-   protected void setMatrix(final GLViewport viewport,
-                            final boolean isProjected) {
-
-      setMatrix(viewport, isProjected, COORD_SCALE);
-   }
-
-   protected void setMatrix(final GLViewport viewport,
-                            final boolean isProjected,
-                            final float coordScale) {
-
-      setMatrix(viewport.mvp, viewport, isProjected, coordScale);
    }
 
    public void setPoints(final GeoPoint[] allGeoPoints, final int[] allGeoPointColors, final TIntArrayList allTourStarts) {
@@ -733,12 +687,13 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       }
 
       // keep position to render relative to current state
-      mMapPosition.copy(workerTask.__mapPos);
+      _mapPosition.copy(workerTask.__mapPos);
 
       // compile new layers
-      final TourTrack_Bucket firstChainedBucket = workerTask.__allRenderBuckets.get();
-      _allBuckets.set(firstChainedBucket);
+      final TourTrack_Bucket workerBucket = workerTask.__allWorkerBuckets.get();
+      _allLayerBuckets.set(workerBucket);
 
-      compile();
+      final boolean isOK = _allLayerBuckets.compile();
+      setReady(isOK);
    }
 }
