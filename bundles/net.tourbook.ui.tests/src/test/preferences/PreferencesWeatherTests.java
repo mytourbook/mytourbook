@@ -75,7 +75,8 @@ public class PreferencesWeatherTests extends UITest {
       final String message = NLS.bind(
             Messages.Pref_Weather_CheckHTTPConnection_FAILED_Message,
             IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_NAME,
-            401);
+            401,
+            "<?xml version="1.0" encoding="UTF-8"?><data><error><msg>API key has been disabled.</msg></error></data>");
 
       assertEquals(message, shell.bot().label(message).getText());
 
