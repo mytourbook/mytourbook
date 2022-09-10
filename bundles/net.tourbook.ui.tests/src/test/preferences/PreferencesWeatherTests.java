@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.tourbook.Messages;
 import net.tourbook.ui.views.IWeatherProvider;
+import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -67,16 +68,19 @@ public class PreferencesWeatherTests extends UITest {
    private void testWorldWeatherOnlineConnection() {
 
       bot.comboBox().setSelection(IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_NAME);
-      bot.text(1).setText("DUMMY_API_KEY");
+      final String dummyApiKeyValue = "DUMMY_API_KEY";
+      bot.text(1).setText(dummyApiKeyValue);
       bot.button(Messages.Pref_Weather_Button_TestHTTPConnection).click();
 
       final SWTBotShell shell = bot.shell(Messages.Pref_Weather_CheckHTTPConnection_Message);
 
       final String message = NLS.bind(
             Messages.Pref_Weather_CheckHTTPConnection_FAILED_Message,
-            IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_NAME,
-            401,
-            "<?xml version="1.0" encoding="UTF-8"?><data><error><msg>API key has been disabled.</msg></error></data>");
+            new Object[] {
+                  WorldWeatherOnlineRetriever.getApiUrl() + dummyApiKeyValue,
+                  401,
+                  "<?xml version=\"1.0\" encoding=\"UTF-8\"?><data><error><msg>API key has been disabled.</msg></error></data>"
+            });
 
       assertEquals(message, shell.bot().label(message).getText());
 
