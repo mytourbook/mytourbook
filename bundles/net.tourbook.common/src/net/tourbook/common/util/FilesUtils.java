@@ -56,15 +56,21 @@ public final class FilesUtils {
 
       String fileContent = UI.EMPTY_STRING;
       try {
+
          fileContent = Files.readString(Paths.get(filePath), StandardCharsets.UTF_8);
+
       } catch (final MalformedInputException e) {
+
          try {
+
             fileContent = Files.readString(Paths.get(filePath), StandardCharsets.ISO_8859_1);
-         } catch (final IOException ioException) {
-            StatusUtil.log(e);
+
+         } catch (final IOException iso_8859_1_exception) {
+            StatusUtil.log(iso_8859_1_exception);
          }
-      } catch (final IOException e) {
-         StatusUtil.log(e);
+
+      } catch (final IOException utf_8_exception) {
+         StatusUtil.log(utf_8_exception);
       }
       return fileContent;
    }
