@@ -267,22 +267,10 @@ public class CRPDataReader extends TourbookDevice {
                                  final ImportState_File importState_File,
                                  final ImportState_Process importState_Process) {
 
-      // reset tour data list
-      // tourDataList.clear();
-
-      // int tourStartOdoMeter = 0;
-      // int tourStartOdoSec = 0;
-      // int tourStartOdoUp = 0;
-      // int tourStartOdoDown = 0;
-      //
-      // double bikeMass;
-      // double bikerWeight;
-      // double bikerHeight;
-
       // Check if the .crp file starts with the correct header
       //If it doesn't, it might be a compressed crp file and will need to be decompressed first
 
-      String fileContent = FilesUtils.readFileContentString(importFilePath);
+      final String fileContent = FilesUtils.readFileContentString(importFilePath);
       String createTemporaryFile = importFilePath;
       if (!isFileHeaderValid(fileContent)) {
          try {
@@ -290,9 +278,7 @@ public class CRPDataReader extends TourbookDevice {
             ZLibCompression.decompress(new File(importFilePath), new File(createTemporaryFile));
 
          } catch (final IOException e) {
-            fileContent = e.getLocalizedMessage();
             return;
-
          }
       }
 
