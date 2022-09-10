@@ -27,6 +27,7 @@ import java.util.StringTokenizer;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -117,6 +118,38 @@ public class CRPDataReader extends TourbookDevice {
       return null;
    }
 
+   /**
+    * @return If valid, the file path of the raw CRP file
+    */
+   private String getRawFilePath(final String importFilePath) {
+
+      String fileContent = FilesUtils.readFileContentString(importFilePath);
+      String createTemporaryFile = null;
+
+      // Check that the .crp file starts with the correct header
+      if (isFileHeaderValid(fileContent)) {
+
+         createTemporaryFile = importFilePath;
+      } else {
+
+         //If it doesn't, it might be a compressed crp file and will need to be decompressed first
+
+         try {
+
+            createTemporaryFile = FilesUtils.createTemporaryFile("temporaryCRP", "crp"); //$NON-NLS-1$ //$NON-NLS-2$
+            ZLibCompression.decompress(new File(importFilePath), new File(createTemporaryFile));
+
+            fileContent = FilesUtils.readFileContentString(createTemporaryFile);
+            return isFileHeaderValid(fileContent) ? createTemporaryFile : null;
+
+         } catch (final IOException ioException) {
+            StatusUtil.log(ioException);
+         }
+      }
+
+      return createTemporaryFile;
+   }
+
    @Override
    public int getStartSequenceSize() {
       return -1;
@@ -138,7 +171,7 @@ public class CRPDataReader extends TourbookDevice {
       final String fileVersion = tokenLine.nextToken();
 
       // get all trackpoints
-      while ((line = fileReader.readLine()) != null && !line.equals("***")) {
+      while ((line = fileReader.readLine()) != null && !line.equals("***")) { //$NON-NLS-1$
          allTrackPoints.add(line);
       }
 
@@ -267,22 +300,12 @@ public class CRPDataReader extends TourbookDevice {
                                  final ImportState_File importState_File,
                                  final ImportState_Process importState_Process) {
 
-      // Check if the .crp file starts with the correct header
-      //If it doesn't, it might be a compressed crp file and will need to be decompressed first
-
-      final String fileContent = FilesUtils.readFileContentString(importFilePath);
-      String createTemporaryFile = importFilePath;
-      if (!isFileHeaderValid(fileContent)) {
-         try {
-            createTemporaryFile = FilesUtils.createTemporaryFile("temporaryCRP", "crp");
-            ZLibCompression.decompress(new File(importFilePath), new File(createTemporaryFile));
-
-         } catch (final IOException e) {
-            return;
-         }
+      final String rawFilePath = getRawFilePath(importFilePath);
+      if (!StringUtils.hasContent(rawFilePath)) {
+         return;
       }
 
-      try (BufferedReader fileReader = new BufferedReader(new FileReader(createTemporaryFile))) {
+      try (BufferedReader fileReader = new BufferedReader(new FileReader(rawFilePath))) {
 
          final String fileHeader = fileReader.readLine();
          if (!isFileHeaderValid(fileHeader)) {
@@ -456,27 +479,14 @@ public class CRPDataReader extends TourbookDevice {
    }
 
    /**
-    * checks if the data file has a valid .crp data format
+    * Check if the data file has a valid .crp data format
     *
     * @return true for a valid .crp data format
     */
    @Override
    public boolean validateRawData(final String fileName) {
 
-      String fileContent = FilesUtils.readFileContentString(fileName);
-      if (!isFileHeaderValid(fileContent)) {
-
-         try {
-
-            fileContent = ZLibCompression.decompressToString(new File(fileName));
-            return isFileHeaderValid(fileContent);
-
-         } catch (final IOException e) {
-            e.printStackTrace();
-         }
-      }
-
-      return true;
+      return StringUtils.hasContent(getRawFilePath(fileName));
    }
 
 }
