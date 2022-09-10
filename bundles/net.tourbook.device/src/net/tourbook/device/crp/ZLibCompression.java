@@ -21,10 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Scanner;
 import java.util.zip.InflaterInputStream;
-
-import net.tourbook.common.UI;
 
 public class ZLibCompression {
 
@@ -41,8 +38,7 @@ public class ZLibCompression {
       }
    }
 
-   public static void decompress(final File compressed, final File raw)
-         throws IOException {
+   public static void decompress(final File compressed, final File raw) throws IOException {
 
       try (InputStream inputStream =
             new InflaterInputStream(new FileInputStream(compressed));
@@ -51,22 +47,4 @@ public class ZLibCompression {
          copy(inputStream, outputStream);
       }
    }
-
-   public static String decompressToString(final File compressedFile) throws IOException {
-
-      try (InputStream inputStream =
-            new InflaterInputStream(new FileInputStream(compressedFile))) {
-
-         return toString(inputStream);
-      }
-   }
-
-   private static String toString(final InputStream inputStream) {
-
-      try (Scanner scanner = new Scanner(inputStream).useDelimiter("\\A")) { //$NON-NLS-1$
-
-         return scanner.hasNext() ? scanner.next() : UI.EMPTY_STRING;
-      }
-   }
-
 }

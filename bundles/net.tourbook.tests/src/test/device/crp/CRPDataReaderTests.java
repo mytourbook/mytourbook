@@ -29,8 +29,14 @@ public class CRPDataReaderTests extends DeviceDataReaderTester {
    private CRPDataReader      deviceDataReader = new CRPDataReader();
 
    @Test
-   void testCrpImport_Hac5() {
+   void testCrpImport_Hac5_01() {
 
       testImportFile(deviceDataReader, FILES_PATH + "1st_TestTour_Hac5", ".crp");
+   }
+
+   @Test
+   void testCrpImport_Hac5_02() {
+
+      testImportFile(deviceDataReader, FILES_PATH + "2st_TestTour_Hac5", ".crp");
    }
 }

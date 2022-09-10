@@ -34,9 +34,11 @@ public class PreferencesWeatherTests extends UITest {
       bot.button(Messages.Pref_Weather_Button_TestHTTPConnection).click();
 
       final SWTBotShell shell = bot.shell(Messages.Pref_Weather_CheckHTTPConnection_Message);
+
       final String message = NLS.bind(
             Messages.Pref_Weather_CheckHTTPConnection_OK_Message,
             vendorName);
+
       assertEquals(message, shell.bot().label(message).getText());
 
       bot.button("OK").click(); //$NON-NLS-1$
@@ -56,9 +58,28 @@ public class PreferencesWeatherTests extends UITest {
       //Weather API
       testVendorConnection(IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI_NAME);
 
+      //World Weather Online
+      testWorldWeatherOnlineConnection();
+
       bot.button("Apply and Close").click(); //$NON-NLS-1$
    }
 
-   //todo fb test 401 for wwo message
+   private void testWorldWeatherOnlineConnection() {
+
+      bot.comboBox().setSelection(IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_NAME);
+      bot.text().setText("DUMMY_API_KEY");
+      bot.button(Messages.Pref_Weather_Button_TestHTTPConnection).click();
+
+      final SWTBotShell shell = bot.shell(Messages.Pref_Weather_CheckHTTPConnection_Message);
+
+      final String message = NLS.bind(
+            Messages.Pref_Weather_CheckHTTPConnection_FAILED_Message,
+            IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_NAME,
+            401);
+
+      assertEquals(message, shell.bot().label(message).getText());
+
+      bot.button("OK").click(); //$NON-NLS-1$
+   }
 
 }
