@@ -75,8 +75,6 @@ public class TourLayer extends Layer {
     */
    private int                _config_LineColorMode;
 
-   private int                _testValue;
-
    private final Worker       _simpleWorker;
 
    private boolean            _isUpdateLayer;
@@ -512,8 +510,6 @@ public class TourLayer extends Layer {
             // gradient color
             : 1;
 
-      _testValue = trackConfig.testValue;
-
       final int lineColor = ColorUtil.getARGB(trackConfig.lineColor, trackConfig.lineOpacity);
 
       final int trackVerticalOffset = trackConfig.isTrackVerticalOffset
@@ -563,8 +559,6 @@ public class TourLayer extends Layer {
 
       lineBucket.lineStyle       = _lineStyle;
       lineBucket.lineColorMode   = _config_LineColorMode;
-
-      lineBucket.testValue = _testValue;
 
 // SET_FORMATTING_ON
 
