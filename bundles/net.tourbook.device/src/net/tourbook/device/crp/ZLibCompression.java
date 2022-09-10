@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2007  Wolfgang Schramm and Contributors
+ * Copyright (C) 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,8 @@ import java.io.OutputStream;
 import java.util.Scanner;
 import java.util.zip.InflaterInputStream;
 
+import net.tourbook.common.UI;
+
 public class ZLibCompression {
 
    private static void copy(final InputStream inputStream,
@@ -43,22 +45,25 @@ public class ZLibCompression {
       try (InputStream inputStream =
             new InflaterInputStream(new FileInputStream(compressed));
             OutputStream outputStream = new FileOutputStream(raw)) {
+
          copy(inputStream, outputStream);
       }
    }
 
-   public static String decompressToString(final File compressed) throws IOException {
+   public static String decompressToString(final File compressedFile) throws IOException {
 
       try (InputStream inputStream =
-            new InflaterInputStream(new FileInputStream(compressed))) {
+            new InflaterInputStream(new FileInputStream(compressedFile))) {
+
          return toString(inputStream);
       }
    }
 
    private static String toString(final InputStream inputStream) {
 
-      try (Scanner scanner = new Scanner(inputStream).useDelimiter("\\A")) {
-         return scanner.hasNext() ? scanner.next() : "";
+      try (Scanner scanner = new Scanner(inputStream).useDelimiter("\\A")) { //$NON-NLS-1$
+
+         return scanner.hasNext() ? scanner.next() : UI.EMPTY_STRING;
       }
    }
 
