@@ -27,6 +27,8 @@ import net.tourbook.common.UI;
 
 public final class FilesUtils {
 
+   private FilesUtils() {}
+
    public static String createTemporaryFile(final String fileName, final String extension) {
 
       String absoluteFilePath = UI.EMPTY_STRING;
@@ -69,9 +71,10 @@ public final class FilesUtils {
             StatusUtil.log(iso_8859_1_exception);
          }
 
-      } catch (final IOException utf_8_exception) {
-         StatusUtil.log(utf_8_exception);
+      } catch (final IOException ioException) {
+         StatusUtil.log(ioException);
       }
+
       return fileContent;
    }
 
