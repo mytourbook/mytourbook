@@ -78,7 +78,7 @@ public class PreferencesWeatherTests extends UITest {
             Messages.Pref_Weather_CheckHTTPConnection_FAILED_Message,
             new Object[] {
                   WorldWeatherOnlineRetriever.getApiUrl() + dummyApiKeyValue,
-                  401,
+                  400,
                   "<?xml version=\"1.0\" encoding=\"UTF-8\"?><data><error><msg>API key has been disabled.</msg></error></data>"
             });
 
