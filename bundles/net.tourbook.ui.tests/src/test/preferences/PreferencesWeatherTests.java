@@ -67,7 +67,7 @@ public class PreferencesWeatherTests extends UITest {
    private void testWorldWeatherOnlineConnection() {
 
       bot.comboBox().setSelection(IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_NAME);
-      bot.text().setText("DUMMY_API_KEY");
+      bot.text(0).setText("DUMMY_API_KEY");
       bot.button(Messages.Pref_Weather_Button_TestHTTPConnection).click();
 
       final SWTBotShell shell = bot.shell(Messages.Pref_Weather_CheckHTTPConnection_Message);
