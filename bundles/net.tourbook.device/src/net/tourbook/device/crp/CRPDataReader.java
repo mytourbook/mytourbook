@@ -43,7 +43,6 @@ public class CRPDataReader extends TourbookDevice {
    // plugin constructor
    public CRPDataReader() {}
 
-
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
       return null;
@@ -280,13 +279,7 @@ public class CRPDataReader extends TourbookDevice {
 
          int pulse;
          int distance = 0;
-         @SuppressWarnings("unused")
-         int speed;
          int altitude;
-         @SuppressWarnings("unused")
-         int color;
-         @SuppressWarnings("unused")
-         int symbol;
          int temperature;
          String trackpointTime;
 
@@ -308,11 +301,14 @@ public class CRPDataReader extends TourbookDevice {
             tokenLine = new StringTokenizer(trackPoint);
 
             pulse = Integer.parseInt(tokenLine.nextToken());
-            speed = Integer.parseInt(tokenLine.nextToken()); //            [0.1 km/h]
+            @SuppressWarnings("unused")
+            final int speed = Integer.parseInt(tokenLine.nextToken()); //            [0.1 km/h]
             distance = Integer.parseInt(tokenLine.nextToken()) * 10; //    [m]
             altitude = Integer.parseInt(tokenLine.nextToken()); //         [m]
-            color = Integer.parseInt(tokenLine.nextToken()); //            [0..4]
-            symbol = Integer.parseInt(tokenLine.nextToken()); //           [0..42]
+            @SuppressWarnings("unused")
+            final int color = Integer.parseInt(tokenLine.nextToken()); //            [0..4]
+            @SuppressWarnings("unused")
+            final int symbol = Integer.parseInt(tokenLine.nextToken()); //           [0..42]
             temperature = Math.round(Float.parseFloat(tokenLine.nextToken().replace(',', '.'))); // [C]
             trackpointTime = tokenLine.nextToken();
 
@@ -450,6 +446,7 @@ public class CRPDataReader extends TourbookDevice {
          e.printStackTrace();
       }
    }
+
    /**
     * checks if the data file has a valid .crp data format
     *
@@ -460,7 +457,9 @@ public class CRPDataReader extends TourbookDevice {
 
       String fileContent = FilesUtils.readFileContentString(fileName);
       if (!isFileHeaderValid(fileContent)) {
+
          try {
+
             fileContent = ZLibCompression.decompressToString(new File(fileName));
             return isFileHeaderValid(fileContent);
 
