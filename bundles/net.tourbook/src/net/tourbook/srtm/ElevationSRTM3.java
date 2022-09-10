@@ -31,7 +31,7 @@ public final class ElevationSRTM3 extends ElevationBase {
    /**
     * Example for a file name
     * <p>
-    * http://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/N47E008.SRTMGL3.hgt.zip
+    * https://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/N47E008.SRTMGL3.hgt.zip
     */
    private static final String SRTM3_FILE_NAME_PART = ".SRTMGL3"; //$NON-NLS-1$
    private static final String SRTM3_FILE_EXTENSION = ".hgt";     //$NON-NLS-1$
