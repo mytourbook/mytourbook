@@ -16,6 +16,7 @@
 package net.tourbook.device.crp;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.Duration;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import net.tourbook.common.util.FilesUtils;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -39,6 +41,7 @@ public class CRPDataReader extends TourbookDevice {
 
    // plugin constructor
    public CRPDataReader() {}
+
 
    @Override
    public String buildFileNameFromRawData(final String rawDataFileName) {
@@ -97,6 +100,11 @@ public class CRPDataReader extends TourbookDevice {
       return -1;
    }
 
+   private boolean isFileHeaderValid(final String fileHeader) {
+
+      return  fileHeader.startsWith("HRMProfilDatas") ; //$NON-NLS-1$
+   }
+
    @Override
    public void processDeviceData(final String importFilePath,
                                  final DeviceData deviceData,
@@ -117,12 +125,29 @@ public class CRPDataReader extends TourbookDevice {
       // double bikerWeight;
       // double bikerHeight;
 
-      try (BufferedReader fileReader = new BufferedReader(new FileReader(importFilePath))) {
+      // Check if the .crp file starts with the correct header
+      //If it doesn't, it might be a compressed crp file and will need to be decompressed first
+
+      String fileContent = FilesUtils.readFileContentString(importFilePath);
+      String createTemporaryFile = importFilePath;
+      if (!isFileHeaderValid(fileContent)) {
+         try {
+            createTemporaryFile = FilesUtils.createTemporaryFile("temporaryCRP", "crp");
+            ZLibCompression.decompress(new File(importFilePath), new File(createTemporaryFile));
+
+         } catch (final IOException e) {
+            fileContent = e.getLocalizedMessage();
+            return;
+
+         }
+      }
+
+      try (BufferedReader fileReader = new BufferedReader(new FileReader(createTemporaryFile))) {
 
          final String fileHeader = fileReader.readLine();
-         if (fileHeader.startsWith("HRMProfilDatas") == false) { //$NON-NLS-1$
-            return;
-         }
+        if(!isFileHeaderValid(fileHeader)) {
+           return;
+        }
 
          String line;
          StringTokenizer tokenLine;
@@ -425,7 +450,6 @@ public class CRPDataReader extends TourbookDevice {
          e.printStackTrace();
       }
    }
-
    /**
     * checks if the data file has a valid .crp data format
     *
