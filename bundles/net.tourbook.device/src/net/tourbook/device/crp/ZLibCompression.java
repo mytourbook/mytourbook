@@ -28,6 +28,7 @@ public class ZLibCompression {
 
    private static void copy(final InputStream inputStream,
                             final OutputStream outputStream) throws IOException {
+
       final byte[] buffer = new byte[1000];
       int length;
 
@@ -38,6 +39,7 @@ public class ZLibCompression {
 
    public static void decompress(final File compressed, final File raw)
          throws IOException {
+
       try (InputStream inputStream =
             new InflaterInputStream(new FileInputStream(compressed));
             OutputStream outputStream = new FileOutputStream(raw)) {
@@ -46,6 +48,7 @@ public class ZLibCompression {
    }
 
    public static String decompressToString(final File compressed) throws IOException {
+
       try (InputStream inputStream =
             new InflaterInputStream(new FileInputStream(compressed))) {
          return toString(inputStream);
@@ -53,6 +56,7 @@ public class ZLibCompression {
    }
 
    private static String toString(final InputStream inputStream) {
+
       try (Scanner scanner = new Scanner(inputStream).useDelimiter("\\A")) {
          return scanner.hasNext() ? scanner.next() : "";
       }

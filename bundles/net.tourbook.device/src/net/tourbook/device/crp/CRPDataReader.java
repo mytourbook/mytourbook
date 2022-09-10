@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -102,7 +103,7 @@ public class CRPDataReader extends TourbookDevice {
 
    private boolean isFileHeaderValid(final String fileHeader) {
 
-      return  fileHeader.startsWith("HRMProfilDatas") ; //$NON-NLS-1$
+      return StringUtils.hasContent(fileHeader) && fileHeader.startsWith("HRMProfilDatas"); //$NON-NLS-1$
    }
 
    @Override
@@ -458,21 +459,16 @@ public class CRPDataReader extends TourbookDevice {
    @Override
    public boolean validateRawData(final String fileName) {
 
-      try (FileReader fileReader = new FileReader(fileName);
-            BufferedReader bufferedReader = new BufferedReader(fileReader)) {
+      String fileContent = FilesUtils.readFileContentString(fileName);
+      if (!isFileHeaderValid(fileContent)) {
+         try {
+            fileContent = ZLibCompression.decompressToString(new File(fileName));
+            return isFileHeaderValid(fileContent);
 
-         final String fileHeader = bufferedReader.readLine();
-         if (fileHeader == null) {
-            return false;
+         } catch (final IOException e) {
+            e.printStackTrace();
+
          }
-
-         if (fileHeader.startsWith("HRMProfilDatas") == false) { //$NON-NLS-1$
-            //TODO FB
-            return false;
-         }
-
-      } catch (final IOException e) {
-         e.printStackTrace();
       }
 
       return true;
