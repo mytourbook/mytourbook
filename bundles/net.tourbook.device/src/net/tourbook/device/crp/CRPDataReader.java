@@ -250,6 +250,7 @@ public class CRPDataReader extends TourbookDevice {
       final int tourDistance = (int) Math.abs(tourData.getStartDistance());
       final String uniqueId = createUniqueId_Legacy(tourData, tourDistance);
       tourData.createTourId(uniqueId);
+
       return tourData;
    }
 
