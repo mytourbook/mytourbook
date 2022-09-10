@@ -59,4 +59,6 @@ public class PreferencesWeatherTests extends UITest {
       bot.button("Apply and Close").click(); //$NON-NLS-1$
    }
 
+   //todo fb test 401 for wwo message
+
 }
