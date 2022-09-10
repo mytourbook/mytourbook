@@ -28,6 +28,8 @@ import net.tourbook.common.UI;
 
 public class ZLibCompression {
 
+   private ZLibCompression() {}
+
    private static void copy(final InputStream inputStream,
                             final OutputStream outputStream) throws IOException {
 
