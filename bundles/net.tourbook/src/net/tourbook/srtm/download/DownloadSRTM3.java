@@ -46,9 +46,9 @@ public class DownloadSRTM3 {
 
    /**
     * SRTM example file
-    * http://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/N13E016.SRTMGL3.hgt.zip
+    * https://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/N13E016.SRTMGL3.hgt.zip
     */
-   private static final String           URL_BASE_PATH               = "http://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/"; //$NON-NLS-1$
+   private static final String           URL_BASE_PATH               = "https://e4ftl01.cr.usgs.gov/MEASURES/SRTMGL3.003/2000.02.11/"; //$NON-NLS-1$
 
    private static final int              MAX_REDIRECTS               = 10;
    private static final int              MAX_REDIRECTED_LOGS         = MAX_REDIRECTS + 5;
