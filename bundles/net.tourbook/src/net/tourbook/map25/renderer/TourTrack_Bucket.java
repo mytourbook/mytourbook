@@ -31,7 +31,6 @@ import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.renderer.MapRenderer;
 import org.oscim.theme.styles.LineStyle;
-import org.oscim.utils.pool.Inlist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +42,7 @@ import org.slf4j.LoggerFactory;
  * The maximum resolution for coordinates is 0.25 as points will be converted
  * to fixed point values.
  */
-public class TourTrack_Bucket extends Inlist<TourTrack_Bucket> {
+public class TourTrack_Bucket {
 
    static final Logger        log              = LoggerFactory.getLogger(TourTrack_Bucket.class);
 

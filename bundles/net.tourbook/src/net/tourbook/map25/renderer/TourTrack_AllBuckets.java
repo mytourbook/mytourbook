@@ -45,7 +45,6 @@ public class TourTrack_AllBuckets {
    private TourTrack_Bucket    _trackBucket;
    private TourTrack_Bucket    _anotherTrackBucket;
 
-
    private ByteBuffer          _vertexColor_Buffer;
    private int                 _vertexColor_BufferSize;
 
@@ -137,13 +136,7 @@ public class TourTrack_AllBuckets {
 
             // insert at start
 
-            trackBucket.next = _trackBucket;
             _trackBucket = trackBucket;
-
-         } else {
-
-            trackBucket.next = chainedBucked.next;
-            chainedBucked.next = trackBucket;
          }
       }
 
@@ -186,7 +179,9 @@ public class TourTrack_AllBuckets {
     */
    public void set(final TourTrack_Bucket newBucket) {
 
-      for (TourTrack_Bucket previousBucket = _trackBucket; previousBucket != null; previousBucket = previousBucket.next) {
+      final TourTrack_Bucket previousBucket = _trackBucket;
+
+      if (previousBucket != null) {
          previousBucket.clear();
       }
 

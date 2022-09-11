@@ -298,9 +298,14 @@ public final class TourTrack_Shader {
       float heightOffset = 0;
       gl.uniform1f(shader_u_height, heightOffset);
 
-      for (; inoutRenderBucket[0] != null; inoutRenderBucket[0] = inoutRenderBucket[0].next) {
+      final TourTrack_Bucket tourTrack_Bucket = inoutRenderBucket[0];
 
-         final TourTrack_Bucket lineBucket = inoutRenderBucket[0];
+      // there is no next bucket
+      inoutRenderBucket[0] = null;
+
+      if (tourTrack_Bucket != null) {
+
+         final TourTrack_Bucket lineBucket = tourTrack_Bucket;
          final LineStyle lineStyle = lineBucket.lineStyle.current();
 
          final float scale = lineBucket.scale;
@@ -320,7 +325,7 @@ public final class TourTrack_Shader {
 
             heightOffset = lineBucket._heightOffset;
 
-//             final double lineHeight = (heightOffset / groundResolution) / scale;
+//          final double lineHeight = (heightOffset / groundResolution) / scale;
             final double lineHeight = heightOffset * vp2mpScale;
 
             gl.uniform1f(shader_u_height, (float) lineHeight);
@@ -332,7 +337,7 @@ public final class TourTrack_Shader {
 
          } else if (lineStyle.fadeScale > mapPosition.zoomLevel) {
 
-            continue;
+            return;
 
          } else {
 
