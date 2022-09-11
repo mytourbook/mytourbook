@@ -20,10 +20,9 @@
  */
 package net.tourbook.map25.layer.tourtrack;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import net.tourbook.map25.renderer.TourTrack_LayerRenderer;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.oscim.core.GeoPoint;
 import org.oscim.layers.Layer;
 import org.oscim.map.Map;
@@ -52,7 +51,7 @@ public class TourTrack_Layer extends Layer {
       _tourTrackRenderer.onModifyConfig(isVerticesModified);
    }
 
-   public void setPoints(final GeoPoint[] allGeoPoints, final int[] allGeoPointColors, final TIntArrayList allTourStarts) {
+   public void setPoints(final GeoPoint[] allGeoPoints, final int[] allGeoPointColors, final IntArrayList allTourStarts) {
 
       _tourTrackRenderer.setPoints(allGeoPoints, allGeoPointColors, allTourStarts);
    }

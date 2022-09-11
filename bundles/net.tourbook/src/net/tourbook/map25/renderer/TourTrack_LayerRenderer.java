@@ -19,15 +19,14 @@ package net.tourbook.map25.renderer;
 
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TIntArrayList;
-
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig.LineColorMode;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
 
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
@@ -82,7 +81,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
     * Stores points, converted to the map projection.
     */
    private GeoPoint[]                 _allGeoPoints;
-   private TIntArrayList              _allTourStarts;
+   private IntArrayList               _allTourStarts;
    private int[]                      _allGeoPointColors;
 
    private int                        __oldX            = -1;
@@ -139,7 +138,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       /**
        * Contains the x/y projected pixels where direction arrows are painted
        */
-      private TFloatArrayList   __pixelDirectionArrows = new TFloatArrayList();
+      private FloatArrayList    __pixelDirectionArrows = new FloatArrayList();
 
       /**
        * Is clipping line positions between
@@ -164,7 +163,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          __pixelPoints = new float[0];
          __pixelPointColors2 = new int[0];
-         __pixelDirectionArrows.clearQuick();
+         __pixelDirectionArrows.clear();
       }
 
       /**
@@ -211,7 +210,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
                   __pixelPoints = new float[numGeoPoints * 2];
                   __pixelPointColors2 = new int[numGeoPoints];
-                  __pixelDirectionArrows.clearQuick();
+                  __pixelDirectionArrows.clear();
                }
 
                for (int pointIndex = 0; pointIndex < numGeoPoints; pointIndex++) {
@@ -289,8 +288,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          final float[] pixelPoints = __pixelPoints;
          final int[] pixelPointColors2 = __pixelPointColors2;
 
-         __pixelDirectionArrows.clearQuick();
-         final TFloatArrayList allDirectionArrowPixel = __pixelDirectionArrows;
+         __pixelDirectionArrows.clear();
+         final FloatArrayList allDirectionArrowPixel = __pixelDirectionArrows;
 
          // set first point / color / direction arrow
          int pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
@@ -458,7 +457,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _mapPosition = new MapPosition();
 
       _allGeoPoints = new GeoPoint[] {};
-      _allTourStarts = new TIntArrayList();
+      _allTourStarts = new IntArrayList();
 
       _simpleWorker = new Worker(map);
 
@@ -570,9 +569,6 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
       for (TourTrack_Bucket bucket = _allLayerBuckets.get(); bucket != null;) {
 
-         // performs GL.bindBuffer() of the vbo/ibo buffer
-         _allLayerBuckets.bind();
-
          bucket = TourTrack_Shader.paint(bucket, viewport, viewport2mapscale, _allLayerBuckets);
       }
    }
@@ -628,7 +624,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             : viewport.view);
    }
 
-   public void setPoints(final GeoPoint[] allGeoPoints, final int[] allGeoPointColors, final TIntArrayList allTourStarts) {
+   public void setPoints(final GeoPoint[] allGeoPoints, final int[] allGeoPointColors, final IntArrayList allTourStarts) {
 
       synchronized (_allGeoPoints) {
 
@@ -693,7 +689,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       final TourTrack_Bucket workerBucket = workerTask.__allWorkerBuckets.get();
       _allLayerBuckets.set(workerBucket);
 
-      final boolean isOK = _allLayerBuckets.compile();
+      final boolean isOK = _allLayerBuckets.setBufferData();
+
       setReady(isOK);
    }
 }

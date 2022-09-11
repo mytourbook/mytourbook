@@ -45,6 +45,11 @@ public final class TourTrack_Shader {
    private static DirectionArrowsShader _directionArrowShader;
    private static LineShader[]          _lineShaders             = { null, null };
 
+   static int                           bufferId_Vertices;
+   static int                           bufferId_VerticesColor;
+   static int                           bufferId_DirArrows;
+   static int                           bufferId_DirArrows_ColorCoords;
+
    private static class DirectionArrowsShader extends GLShaderMT {
 
       /**
@@ -168,7 +173,7 @@ public final class TourTrack_Shader {
       // fix alpha blending
       gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
       {
-         paint_10_Track(inoutRenderBucket, viewport, vp2mpScale, allRenderBuckets);
+         paint_10_Track(inoutRenderBucket, viewport, vp2mpScale);
 
          if (trackConfig.isShowDirectionArrow) {
             paint_20_DirectionArrows(viewport, allRenderBuckets, vp2mpScale);
@@ -192,8 +197,7 @@ public final class TourTrack_Shader {
     */
    private static void paint_10_Track(final TourTrack_Bucket[] inoutRenderBucket,
                                       final GLViewport viewport,
-                                      final float vp2mpScale,
-                                      final TourTrack_AllBuckets renderBucketsAll) {
+                                      final float vp2mpScale) {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
@@ -234,6 +238,8 @@ public final class TourTrack_Shader {
       final int shader_uOutlineBrightness = shader.shader_uOutlineBrightness;
       final int shader_uVertexColorAlpha = shader.shader_uVertexColorAlpha;
 
+      gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_Vertices);
+      gl.enableVertexAttribArray(shader_a_pos);
       gl.vertexAttribPointer(
 
             shader_a_pos, //           index of the vertex attribute that is to be modified
@@ -247,7 +253,7 @@ public final class TourTrack_Shader {
       /*
        * Set vertex color
        */
-      gl.bindBuffer(GL.ARRAY_BUFFER, renderBucketsAll.vertexColor_BufferId);
+      gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_VerticesColor);
       gl.enableVertexAttribArray(shader_aVertexColor);
       gl.vertexAttribPointer(
 
@@ -386,7 +392,7 @@ public final class TourTrack_Shader {
                gl.uniform1i(shader_u_mode, capMode);
             }
 
-            gl.drawArrays(GL.TRIANGLE_STRIP, lineBucket.vertexOffset, lineBucket.numVertices);
+            gl.drawArrays(GL.TRIANGLE_STRIP, 0, lineBucket.numVertices);
          }
 
          /*
@@ -437,7 +443,7 @@ public final class TourTrack_Shader {
 //          }
 //          gl.depthMask(false);
 
-         gl.drawArrays(GL.TRIANGLE_STRIP, lineBucket.vertexOffset, lineBucket.numVertices);
+         gl.drawArrays(GL.TRIANGLE_STRIP, 0, lineBucket.numVertices);
       }
    }
 
@@ -466,7 +472,7 @@ public final class TourTrack_Shader {
       // set mvp matrix into the shader
       viewport.mvp.setAsUniform(shader_u_mvp);
 
-      gl.bindBuffer(GL.ARRAY_BUFFER, allRenderBuckets.dirArrows_BufferId);
+      gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows);
       gl.enableVertexAttribArray(shader_a_pos);
       gl.vertexAttribPointer(
 
@@ -478,7 +484,7 @@ public final class TourTrack_Shader {
             0 //                       offset in bytes of the first component in the vertex attribute array
       );
 
-      gl.bindBuffer(GL.ARRAY_BUFFER, allRenderBuckets.dirArrows_ColorCoords_BufferId);
+      gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows_ColorCoords);
       gl.enableVertexAttribArray(shader_attrib_ColorCoord);
       gl.vertexAttribPointer(
 
@@ -529,6 +535,12 @@ public final class TourTrack_Shader {
       _lineShaders[SHADER_FLAT]        = new LineShader("line_aa");            //$NON-NLS-1$
 
       _directionArrowShader            = new DirectionArrowsShader("directionArrows");    //$NON-NLS-1$
+
+      // create buffer id's
+      bufferId_DirArrows               = gl.genBuffer();
+      bufferId_DirArrows_ColorCoords   = gl.genBuffer();
+      bufferId_Vertices                = gl.genBuffer();
+      bufferId_VerticesColor           = gl.genBuffer();
 
 // SET_FORMATTING_ON
 

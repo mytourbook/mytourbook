@@ -19,9 +19,6 @@ package net.tourbook.map25.renderer;
 
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TShortArrayList;
-
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
@@ -29,9 +26,10 @@ import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
 
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.renderer.MapRenderer;
-import org.oscim.renderer.bucket.RenderBuckets;
 import org.oscim.theme.styles.LineStyle;
 import org.oscim.utils.pool.Inlist;
 import org.slf4j.Logger;
@@ -95,30 +93,25 @@ public class TourTrack_Bucket extends Inlist<TourTrack_Bucket> {
    /**
     * Number of vertices for this layer.
     */
-   protected int                numVertices;
+   protected int                        numVertices;
 
    /**
     * Temporary list of vertex data.
     */
-   protected final VertexDataMT vertexItems;
+   protected final TourTrack_VertexData vertexItems;
 
    /**
     * Contains the vertices for direction arrows multiplied with {@link MapRenderer#COORD_SCALE}:
     * <p>
     *
     * <pre>
-    * x1
-    * y2
-    * z1
-    *
-    * x2
-    * y2
-    * z2
+    * x1    y2    z1
+    * x2    y2    z2
     *
     * ...
     * </pre>
     */
-   protected TShortArrayList    directionArrow_XYZPositions;
+   protected ShortArrayList             directionArrow_XYZPositions;
 
    /**
     * Barycentric coordinates are simply (1, 0, 0), (0, 1, 0) and (0, 0, 1) for the three
@@ -127,16 +120,14 @@ public class TourTrack_Bucket extends Inlist<TourTrack_Bucket> {
     * Source:
     * https://stackoverflow.com/questions/137629/how-do-you-render-primitives-as-wireframes-in-opengl#answer-33004265
     */
-   protected TShortArrayList    colorCoords;
-
-   protected int                vertexOffset;               // in bytes
+   protected ShortArrayList             colorCoords;
 
    public TourTrack_Bucket() {
 
-      vertexItems = new VertexDataMT();
+      vertexItems = new TourTrack_VertexData();
 
-      directionArrow_XYZPositions = new TShortArrayList();
-      colorCoords = new TShortArrayList();
+      directionArrow_XYZPositions = new ShortArrayList();
+      colorCoords = new ShortArrayList();
    }
 
    private void addDirArrowPosition(final short p2Xscaled,
@@ -187,10 +178,10 @@ public class TourTrack_Bucket extends Inlist<TourTrack_Bucket> {
     * @param pixelPointColors
     */
    private void addLine(final float[] pixelPoints,
-                final int[] index,
-                final int numPoints,
-                final boolean isCapClosed,
-                final int[] pixelPointColors) {
+                        final int[] index,
+                        final int numPoints,
+                        final boolean isCapClosed,
+                        final int[] pixelPointColors) {
 
       // test minimum distance
 //      _minimumDistance = testValue * 2.0f;
@@ -296,7 +287,7 @@ public class TourTrack_Bucket extends Inlist<TourTrack_Bucket> {
     * @param isSquared
     * @param isClosed
     */
-   private void addLine_ToVertices(final VertexDataMT vertices,
+   private void addLine_ToVertices(final TourTrack_VertexData vertices,
                                    final float[] pixelPoints,
                                    final int[] pixelPointColors,
                                    final int startIndex,
@@ -628,7 +619,7 @@ public class TourTrack_Bucket extends Inlist<TourTrack_Bucket> {
     * @param unitPrevY
     * @param pixelColor
     */
-   private void addVertex(final VertexDataMT vertexData,
+   private void addVertex(final TourTrack_VertexData vertexData,
                           final float x,
                           final float y,
                           final float unitNextX,
@@ -673,14 +664,6 @@ public class TourTrack_Bucket extends Inlist<TourTrack_Bucket> {
       vertexItems.dispose();
 
       numVertices = 0;
-   }
-
-   protected void compile(final ShortBuffer vboBuffer, final ByteBuffer colorBuffer) {
-
-      // Keep offset of layer data in vbo
-      vertexOffset = vboBuffer.position() * RenderBuckets.SHORT_BYTES;
-
-      vertexItems.compile(vboBuffer, colorBuffer);
    }
 
    private void createArrow_MiddleFin(final short p2X_scaled,
@@ -760,10 +743,10 @@ public class TourTrack_Bucket extends Inlist<TourTrack_Bucket> {
     * @param allDirectionArrowPixel_Raw
     *           Contains the x/y pixel positions for the direction arrows
     */
-   public void createDirectionArrowVertices(final TFloatArrayList allDirectionArrowPixel_Raw) {
+   public void createDirectionArrowVertices(final FloatArrayList allDirectionArrowPixel_Raw) {
 
-      directionArrow_XYZPositions.clearQuick();
-      colorCoords.clearQuick();
+      directionArrow_XYZPositions.clear();
+      colorCoords.clear();
 
       // at least 2 positions are needed
       if (allDirectionArrowPixel_Raw.size() < 4) {
@@ -986,23 +969,9 @@ public class TourTrack_Bucket extends Inlist<TourTrack_Bucket> {
       }
    }
 
-   /**
-    * Default is MIN_DIST * 4 = 1/8 * 4.
-    */
-   public void setBevelDistance(final float minBevel) {
-      _minimumBevel = minBevel;
+   protected void fillVerticesBuffer(final ShortBuffer vboBuffer, final ByteBuffer colorBuffer) {
+
+      vertexItems.fillVerticesBuffers(vboBuffer, colorBuffer);
    }
 
-   /**
-    * For point reduction by minimal distance. Default is 1/8.
-    */
-   public void setDropDistance(final float minDist) {
-      _minimumDistance = minDist;
-   }
-
-   public void setExtents(final int min, final int max) {
-      _tMin = min;
-      _tMax = max;
-
-   }
 }

@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Frame;
@@ -98,6 +96,7 @@ import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.ui.tourChart.TourChart;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
@@ -233,7 +232,7 @@ public class Map25View extends ViewPart implements
    //
    /** Contains only geo tours */
    private ArrayList<TourData>           _allTourData                            = new ArrayList<>();
-   private TIntArrayList                 _allTourStarts                          = new TIntArrayList();
+   private IntArrayList                  _allTourStarts                          = new IntArrayList();
    private GeoPoint[]                    _allGeoPoints;
    private BoundingBox                   _boundingBox;
    /**
@@ -1642,7 +1641,7 @@ public class Map25View extends ViewPart implements
 
          final TourData tourData = _allTourData.get(0);
 
-         _allTourStarts.add(tourData.multipleTourStartIndex);
+         _allTourStarts.addAll(tourData.multipleTourStartIndex);
 
          final double[] latitudeSerie = tourData.latitudeSerie;
          final double[] longitudeSerie = tourData.longitudeSerie;

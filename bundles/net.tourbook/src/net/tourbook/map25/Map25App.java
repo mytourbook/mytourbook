@@ -55,7 +55,6 @@ import net.tourbook.map25.layer.marker.PhotoToolkit;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
-import net.tourbook.map25.renderer.TourTrack_AllBuckets;
 import net.tourbook.map25.renderer.TourTrack_Shader;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
