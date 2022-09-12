@@ -40,6 +40,8 @@ import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 public class CRPDataReader extends TourbookDevice {
 
+   private int _fileVersion;
+
    // plugin constructor
    public CRPDataReader() {}
 
@@ -160,9 +162,12 @@ public class CRPDataReader extends TourbookDevice {
       StringTokenizer tokenLine;
       final ArrayList<String> allTrackPoints = new ArrayList<>();
 
-      tokenLine = new StringTokenizer(fileReader.readLine());
+      // File header
       @SuppressWarnings("unused")
-      final String fileVersion = tokenLine.nextToken();
+      final String fileHeader = fileReader.readLine();
+
+      tokenLine = new StringTokenizer(fileReader.readLine());
+      _fileVersion = Integer.parseInt(tokenLine.nextToken());
 
       // get all trackpoints
       while ((line = fileReader.readLine()) != null && !line.equals("***")) { //$NON-NLS-1$
@@ -301,9 +306,6 @@ public class CRPDataReader extends TourbookDevice {
 
       try (BufferedReader fileReader = new BufferedReader(new FileReader(rawFilePath))) {
 
-         // File header
-         fileReader.readLine();
-
          final TourData tourData = importTour(fileReader);
 
          tourData.setImportFilePath(importFilePath);
@@ -365,24 +367,22 @@ public class CRPDataReader extends TourbookDevice {
          /*
           * Read track point line
           */
-         final StringTokenizer tokenLine = new StringTokenizer(trackPoint);
+         final String[] dataStrings = trackPoint.split(UI.TAB1);
 
-         pulse = Integer.parseInt(tokenLine.nextToken());
-         @SuppressWarnings("unused")
-         final int speed = Integer.parseInt(tokenLine.nextToken()); //            [0.1 km/h]
-         distance = Integer.parseInt(tokenLine.nextToken()) * 10; //    [m]
-         altitude = Integer.parseInt(tokenLine.nextToken()); //         [m]
-         @SuppressWarnings("unused")
-         final int color = Integer.parseInt(tokenLine.nextToken()); //            [0..4]
-         @SuppressWarnings("unused")
-         final int symbol = Integer.parseInt(tokenLine.nextToken()); //           [0..42]
-         temperature = Math.round(Float.parseFloat(tokenLine.nextToken().replace(',', '.'))); // [C]
-         trackpointTime = tokenLine.nextToken();
+         pulse = Integer.parseInt(dataStrings[0]);
+         distance = Integer.parseInt(dataStrings[2]) * 10; //    [m]
+         altitude = Integer.parseInt(dataStrings[3]); //         [m]
+         temperature = Math.round(Float.parseFloat(dataStrings[6].replace(',', '.'))); // [C]
+         trackpointTime = dataStrings[7];
 
-         // get comment for current trackpoint
          String comment = UI.EMPTY_STRING;
-         if (tokenLine.hasMoreTokens()) {
-            comment = tokenLine.nextToken(UI.TAB1);
+         if (dataStrings.length > 8) {
+            comment = dataStrings[8];
+         }
+
+         int cadence = Integer.MIN_VALUE;
+         if (_fileVersion > 9 && dataStrings.length > 9) {
+            cadence = Integer.parseInt(dataStrings[9]);
          }
 
          /*
@@ -413,6 +413,9 @@ public class CRPDataReader extends TourbookDevice {
          timeDataList.add(timeData);
 
          timeData.altitude = altitudeDiff;
+         if (_fileVersion > 9) {
+            timeData.cadence = cadence;
+         }
          timeData.distance = (distance - oldDistance) * 1f;
          timeData.pulse = pulse;
          timeData.temperature = temperature;
