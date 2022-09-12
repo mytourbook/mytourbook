@@ -29,30 +29,18 @@ public class ZLibCompressionHelper {
 
    private ZLibCompressionHelper() {}
 
-   private static void copy(final InputStream inputStream,
-                            final OutputStream outputStream) {
-
-      final byte[] buffer = new byte[1000];
-      int length;
-
-      try {
-
-         while ((length = inputStream.read(buffer)) > 0) {
-            outputStream.write(buffer, 0, length);
-         }
-
-      } catch (final IOException e) {
-         StatusUtil.log(e);
-      }
-   }
-
    public static void decompress(final File compressed, final File raw) {
 
       try (InputStream inputStream =
             new InflaterInputStream(new FileInputStream(compressed));
             OutputStream outputStream = new FileOutputStream(raw)) {
 
-         copy(inputStream, outputStream);
+         final byte[] buffer = new byte[1000];
+         int length;
+
+         while ((length = inputStream.read(buffer)) > 0) {
+            outputStream.write(buffer, 0, length);
+         }
 
       } catch (final IOException e) {
          StatusUtil.log(e);
