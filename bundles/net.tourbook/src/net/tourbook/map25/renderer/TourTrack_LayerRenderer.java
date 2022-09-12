@@ -140,6 +140,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
        */
       private FloatArrayList    __pixelDirectionArrows = new FloatArrayList();
 
+      int[]                     __allGeoPointColors;
+
       /**
        * Is clipping line positions between
        * <p>
@@ -216,6 +218,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                for (int pointIndex = 0; pointIndex < numGeoPoints; pointIndex++) {
                   MercatorProjection.project(_allGeoPoints[pointIndex], projectedPoints, pointIndex);
                }
+
+               // fix concurrent issue, it does not need to clone the array
+               __allGeoPointColors = _allGeoPointColors;
             }
          }
 
@@ -230,13 +235,13 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                mMap.render();
             }
 
-            return true;
+         } else {
+
+            doWork_Rendering(task, numGeoPoints);
+
+            // trigger redraw to let renderer fetch the result
+            mMap.render();
          }
-
-         doWork_Rendering(task, numGeoPoints);
-
-         // trigger redraw to let renderer fetch the result.
-         mMap.render();
 
          return true;
       }
@@ -293,7 +298,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          // set first point / color / direction arrow
          int pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
-         pixelPointColors2[0] = _allGeoPointColors[0];
+         pixelPointColors2[0] = __allGeoPointColors[0];
          allDirectionArrowPixel.add(pixelX);
          allDirectionArrowPixel.add(pixelY);
 
@@ -334,7 +339,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                __lineClipper.clipStart(pixelX, pixelY);
 
                pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
-               pixelPointColors2[0] = _allGeoPointColors[projectedPointIndex / 2];
+               pixelPointColors2[0] = __allGeoPointColors[projectedPointIndex / 2];
 
                continue;
             }
@@ -352,7 +357,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
                __lineClipper.clipStart(pixelX, pixelY);
                pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
-               pixelPointColors2[0] = _allGeoPointColors[projectedPointIndex / 2];
+               pixelPointColors2[0] = __allGeoPointColors[projectedPointIndex / 2];
 
                continue;
             }
@@ -390,7 +395,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                   pixelPoints[pixelPointIndex++] = prevX;
                   pixelPoints[pixelPointIndex++] = prevY;
 
-                  pixelPointColors2[(pixelPointIndex - 1) / 2] = _allGeoPointColors[projectedPointIndex / 2];
+                  pixelPointColors2[(pixelPointIndex - 1) / 2] = __allGeoPointColors[projectedPointIndex / 2];
                }
 
                continue;
@@ -410,7 +415,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                pixelPoints[pixelPointIndex++] = prevX = pixelX;
                pixelPoints[pixelPointIndex++] = prevY = pixelY;
 
-               pixelPointColors2[(pixelPointIndex - 1) / 2] = _allGeoPointColors[projectedPointIndex / 2];
+               pixelPointColors2[(pixelPointIndex - 1) / 2] = __allGeoPointColors[projectedPointIndex / 2];
             }
 
             final float diffXArrow = pixelX - prevXArrow;

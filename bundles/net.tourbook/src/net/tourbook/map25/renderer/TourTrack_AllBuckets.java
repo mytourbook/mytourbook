@@ -67,7 +67,6 @@ public class TourTrack_AllBuckets {
     */
    public void clear() {
 
-      // NB: set null calls clear() on each bucket!
       set(null);
       _anotherTrackBucket = null;
    }
