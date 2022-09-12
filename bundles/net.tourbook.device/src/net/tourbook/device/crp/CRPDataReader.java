@@ -158,17 +158,16 @@ public class CRPDataReader extends TourbookDevice {
 
    private TourData importTour(final BufferedReader fileReader) throws IOException {
 
-      String line;
-      StringTokenizer tokenLine;
       final ArrayList<String> allTrackPoints = new ArrayList<>();
 
       // File header
       @SuppressWarnings("unused")
       final String fileHeader = fileReader.readLine();
 
-      tokenLine = new StringTokenizer(fileReader.readLine());
+      StringTokenizer tokenLine = new StringTokenizer(fileReader.readLine());
       _fileVersion = Integer.parseInt(tokenLine.nextToken());
 
+      String line;
       // get all trackpoints
       while ((line = fileReader.readLine()) != null && !line.equals("***")) { //$NON-NLS-1$
          allTrackPoints.add(line);
@@ -365,7 +364,7 @@ public class CRPDataReader extends TourbookDevice {
       for (final String trackPoint : allTrackPoints) {
 
          /*
-          * Read track point line
+          * Parse track point line
           */
          final String[] dataStrings = trackPoint.split(UI.TAB1);
 
@@ -376,7 +375,7 @@ public class CRPDataReader extends TourbookDevice {
          trackpointTime = dataStrings[7];
 
          String comment = UI.EMPTY_STRING;
-         if (dataStrings.length > 8) {
+         if (dataStrings.length > 8 && StringUtils.hasContent(dataStrings[8])) {
             comment = dataStrings[8];
          }
 
