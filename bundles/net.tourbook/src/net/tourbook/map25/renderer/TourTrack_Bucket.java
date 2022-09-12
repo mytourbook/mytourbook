@@ -968,7 +968,7 @@ public class TourTrack_Bucket {
 
    protected void fillVerticesBuffer(final ShortBuffer vboBuffer, final ByteBuffer colorBuffer) {
 
-      vertexItems.fillVerticesBuffers(vboBuffer, colorBuffer);
+      vertexItems.fillVerticesBuffer(vboBuffer, colorBuffer);
    }
 
 }

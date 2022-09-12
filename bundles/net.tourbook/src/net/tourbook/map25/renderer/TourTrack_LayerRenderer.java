@@ -51,51 +51,51 @@ import org.slf4j.LoggerFactory;
  */
 public class TourTrack_LayerRenderer extends LayerRenderer {
 
-   public static final Logger         log               = LoggerFactory.getLogger(TourTrack_LayerRenderer.class);
+   public static final Logger            log               = LoggerFactory.getLogger(TourTrack_LayerRenderer.class);
 
-   private static final int           RENDERING_DELAY   = 0;
+   private static final int              RENDERING_DELAY   = 0;
 
    /**
     * Use _mapPosition.copy(position) to keep the position for which
     * the Overlay is *compiled*. NOTE: required by setMatrix utility
     * functions to draw this layer fixed to the map
     */
-   private MapPosition                _mapPosition;
-   private Map                        _map;
+   private MapPosition                   _mapPosition;
+   private Map                           _map;
 
    /**
     * Wrap around dateline
     */
-   private boolean                    _isFlipOnDateLine = true;
+   private boolean                       _isFlipOnDateLine = true;
 
    /**
     * Buckets for rendering
     */
-   private final TourTrack_AllBuckets _allLayerBuckets;
-   private TourTrack_AllBuckets       _currentTaskRenderBuckets;
+   private final TourTrack_BucketManager _trackBucketManager;
+   private TourTrack_BucketManager       _currentTask_BucketManager;
 
-   private boolean                    _isUpdateLayer;
-   private boolean                    _isUpdatePoints;
+   private boolean                       _isUpdateLayer;
+   private boolean                       _isUpdatePoints;
 
    /**
     * Stores points, converted to the map projection.
     */
-   private GeoPoint[]                 _allGeoPoints;
-   private IntArrayList               _allTourStarts;
-   private int[]                      _allGeoPointColors;
+   private GeoPoint[]                    _allGeoPoints;
+   private IntArrayList                  _allTourStarts;
+   private int[]                         _allGeoPointColors;
 
-   private int                        __oldX            = -1;
-   private int                        __oldY            = -1;
-   private int                        __oldZoomScale    = -1;
+   private int                           __oldX            = -1;
+   private int                           __oldY            = -1;
+   private int                           __oldZoomScale    = -1;
 
-   private TourTrack_Layer            _tourLayer;
+   private TourTrack_Layer               _tourLayer;
 
-   private final Worker               _simpleWorker;
+   private final Worker                  _simpleWorker;
 
    /**
     * Line style
     */
-   private LineStyle                  _lineStyle;
+   private LineStyle                     _lineStyle;
 
    /*
     * Track config values
@@ -104,8 +104,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
    private final static class TourRenderTask {
 
-      TourTrack_AllBuckets __allWorkerBuckets = new TourTrack_AllBuckets();
-      MapPosition          __mapPos           = new MapPosition();
+      TourTrack_BucketManager __taskBucketManager = new TourTrack_BucketManager();
+      MapPosition             __mapPos            = new MapPosition();
    }
 
    final class Worker extends SimpleWorker<TourRenderTask> {
@@ -131,16 +131,16 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       private float[]           __pixelPoints;
 
       /**
-       * One {@link #__pixelPointColors2} has two {@link #__pixelPoints}, 2 == Half of items
+       * One {@link #__pixelPointColorsHalf} has two {@link #__pixelPoints}, half == Half of items
        */
-      private int[]             __pixelPointColors2;
+      private int[]             __pixelPointColorsHalf;
 
       /**
        * Contains the x/y projected pixels where direction arrows are painted
        */
       private FloatArrayList    __pixelDirectionArrows = new FloatArrayList();
 
-      int[]                     __allGeoPointColors;
+      private int[]             __allGeoPointColors;
 
       /**
        * Is clipping line positions between
@@ -164,7 +164,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                MAX_VISIBLE_PIXEL);
 
          __pixelPoints = new float[0];
-         __pixelPointColors2 = new int[0];
+         __pixelPointColorsHalf = new int[0];
          __pixelDirectionArrows.clear();
       }
 
@@ -189,7 +189,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       @Override
       public void cleanup(final TourRenderTask task) {
 
-         task.__allWorkerBuckets.clear();
+         task.__taskBucketManager.clear();
       }
 
       @Override
@@ -211,7 +211,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                   projectedPoints = __projectedPoints = new double[numGeoPoints * 2];
 
                   __pixelPoints = new float[numGeoPoints * 2];
-                  __pixelPointColors2 = new int[numGeoPoints];
+                  __pixelPointColorsHalf = new int[numGeoPoints];
                   __pixelDirectionArrows.clear();
                }
 
@@ -224,13 +224,13 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             }
          }
 
-         _currentTaskRenderBuckets = task.__allWorkerBuckets;
+         _currentTask_BucketManager = task.__taskBucketManager;
 
          if (numGeoPoints == 0) {
 
-            if (task.__allWorkerBuckets.get() != null) {
+            if (task.__taskBucketManager.getBucket1() != null) {
 
-               task.__allWorkerBuckets.clear();
+               task.__taskBucketManager.clear();
 
                mMap.render();
             }
@@ -250,7 +250,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-         final TourTrack_Bucket lineBucket = getTrackBucket(task.__allWorkerBuckets);
+         final TourTrack_Bucket trackBucket = getTrackBucket2(task.__taskBucketManager);
 
          final MapPosition mapPos = task.__mapPos;
          mMap.getMapPosition(mapPos);
@@ -291,14 +291,14 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          __lineClipper.clipStart(pixelX, pixelY);
 
          final float[] pixelPoints = __pixelPoints;
-         final int[] pixelPointColors2 = __pixelPointColors2;
+         final int[] pixelPointColorsHalf = __pixelPointColorsHalf;
 
          __pixelDirectionArrows.clear();
          final FloatArrayList allDirectionArrowPixel = __pixelDirectionArrows;
 
          // set first point / color / direction arrow
          int pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
-         pixelPointColors2[0] = __allGeoPointColors[0];
+         pixelPointColorsHalf[0] = __allGeoPointColors[0];
          allDirectionArrowPixel.add(pixelX);
          allDirectionArrowPixel.add(pixelY);
 
@@ -333,13 +333,13 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                flip = flipDirection;
 
                if (pixelPointIndex > 2) {
-                  lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors2);
+                  trackBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
                }
 
                __lineClipper.clipStart(pixelX, pixelY);
 
                pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
-               pixelPointColors2[0] = __allGeoPointColors[projectedPointIndex / 2];
+               pixelPointColorsHalf[0] = __allGeoPointColors[projectedPointIndex / 2];
 
                continue;
             }
@@ -349,7 +349,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
                // finish last tour (copied from flip code)
                if (pixelPointIndex > 2) {
-                  lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors2);
+                  trackBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
                }
 
                // setup next tour
@@ -357,7 +357,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
                __lineClipper.clipStart(pixelX, pixelY);
                pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
-               pixelPointColors2[0] = __allGeoPointColors[projectedPointIndex / 2];
+               pixelPointColorsHalf[0] = __allGeoPointColors[projectedPointIndex / 2];
 
                continue;
             }
@@ -371,14 +371,14 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                 */
 
                if (pixelPointIndex > 2) {
-                  lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors2);
+                  trackBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
                }
 
                if (clipperCode == LineClipper.INTERSECTION) {
 
                   // add line segment
                   segment = __lineClipper.getLine(segment, 0);
-                  lineBucket.addLine(segment, 4, false, pixelPointColors2);
+                  trackBucket.addLine(segment, 4, false, pixelPointColorsHalf);
 
                   // the prev point is the real point not the clipped point
                   // prevX = __lineClipper.outX2;
@@ -395,7 +395,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                   pixelPoints[pixelPointIndex++] = prevX;
                   pixelPoints[pixelPointIndex++] = prevY;
 
-                  pixelPointColors2[(pixelPointIndex - 1) / 2] = __allGeoPointColors[projectedPointIndex / 2];
+                  pixelPointColorsHalf[(pixelPointIndex - 1) / 2] = __allGeoPointColors[projectedPointIndex / 2];
                }
 
                continue;
@@ -415,7 +415,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                pixelPoints[pixelPointIndex++] = prevX = pixelX;
                pixelPoints[pixelPointIndex++] = prevY = pixelY;
 
-               pixelPointColors2[(pixelPointIndex - 1) / 2] = __allGeoPointColors[projectedPointIndex / 2];
+               pixelPointColorsHalf[(pixelPointIndex - 1) / 2] = __allGeoPointColors[projectedPointIndex / 2];
             }
 
             final float diffXArrow = pixelX - prevXArrow;
@@ -434,11 +434,11 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          }
 
          if (pixelPointIndex > 2) {
-            lineBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColors2);
+            trackBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
          }
 
          if (trackConfig.isShowDirectionArrow) {
-            lineBucket.createDirectionArrowVertices(__pixelDirectionArrows);
+            trackBucket.createDirectionArrowVertices(__pixelDirectionArrows);
          }
       }
 
@@ -458,7 +458,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _tourLayer = tourLayer;
       _map = map;
 
-      _allLayerBuckets = new TourTrack_AllBuckets();
+      _trackBucketManager = new TourTrack_BucketManager();
       _mapPosition = new MapPosition();
 
       _allGeoPoints = new GeoPoint[] {};
@@ -517,23 +517,23 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    /**
     * Update linestyle in the bucket
     *
-    * @param allTrackBuckets
+    * @param bucketManager
     * @return
     */
-   private TourTrack_Bucket getTrackBucket(final TourTrack_AllBuckets allTrackBuckets) {
+   private TourTrack_Bucket getTrackBucket2(final TourTrack_BucketManager bucketManager) {
 
-      TourTrack_Bucket lineBucket;
+      TourTrack_Bucket trackBucket;
 
-      lineBucket = allTrackBuckets.getLineBucket();
+      trackBucket = bucketManager.getBucket2();
 
 // SET_FORMATTING_OFF
 
-      lineBucket.lineStyle       = _lineStyle;
-      lineBucket.lineColorMode   = _config_LineColorMode;
+      trackBucket.lineStyle       = _lineStyle;
+      trackBucket.lineColorMode   = _config_LineColorMode;
 
 // SET_FORMATTING_ON
 
-      return lineBucket;
+      return trackBucket;
    }
 
    public void onModifyConfig(final boolean isVerticesModified) {
@@ -550,7 +550,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          // do a fast update
 
-         getTrackBucket(_currentTaskRenderBuckets);
+         getTrackBucket2(_currentTask_BucketManager);
 
          _map.render();
       }
@@ -562,6 +562,11 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    @Override
    public synchronized void render(final GLViewport viewport) {
 
+      final TourTrack_Bucket trackBucket = _trackBucketManager.getBucket1();
+      if (trackBucket == null) {
+         return;
+      }
+
       final MapPosition mapPosition = _mapPosition;
 
       GLState.test(false, false);
@@ -572,10 +577,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
       setMatrix(viewport, true);
 
-      final TourTrack_Bucket bucket = _allLayerBuckets.get();
-      if (bucket != null) {
-         TourTrack_Shader.paint(bucket, viewport, viewport2mapscale, _allLayerBuckets);
-      }
+      TourTrack_Shader.paint(trackBucket, viewport, viewport2mapscale, _trackBucketManager);
    }
 
    public void setIsUpdateLayer(final boolean isUpdateLayer) {
@@ -691,10 +693,10 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _mapPosition.copy(workerTask.__mapPos);
 
       // compile new layers
-      final TourTrack_Bucket workerBucket = workerTask.__allWorkerBuckets.get();
-      _allLayerBuckets.set(workerBucket);
+      final TourTrack_Bucket workerBucket = workerTask.__taskBucketManager.getBucket1();
+      _trackBucketManager.setBucket1(workerBucket);
 
-      final boolean isOK = _allLayerBuckets.setOpenGLBufferData();
+      final boolean isOK = _trackBucketManager.fillOpenGLBufferData();
 
       setReady(isOK);
    }

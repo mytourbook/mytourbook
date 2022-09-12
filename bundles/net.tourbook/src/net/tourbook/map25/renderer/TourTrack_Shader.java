@@ -134,19 +134,6 @@ public final class TourTrack_Shader {
 
    // SET_FORMATTING_ON
       }
-
-      @Override
-      public boolean useProgram() {
-
-         if (super.useProgram()) {
-
-            GLState.enableVertexArrays(shader_a_pos, GLState.DISABLED);
-
-            return true;
-         }
-
-         return false;
-      }
    }
 
    /**
@@ -162,7 +149,7 @@ public final class TourTrack_Shader {
    public static void paint(final TourTrack_Bucket trackBucket,
                             final GLViewport viewport,
                             final float vp2mpScale,
-                            final TourTrack_AllBuckets allRenderBuckets) {
+                            final TourTrack_BucketManager allRenderBuckets) {
 
 //    _dirArrowFrameBuffer.updateViewport(viewport, 0.5f);
 
@@ -436,7 +423,7 @@ public final class TourTrack_Shader {
    }
 
    private static void paint_20_DirectionArrows(final GLViewport viewport,
-                                                final TourTrack_AllBuckets allRenderBuckets,
+                                                final TourTrack_BucketManager allRenderBuckets,
                                                 final float vp2mpScale) {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();

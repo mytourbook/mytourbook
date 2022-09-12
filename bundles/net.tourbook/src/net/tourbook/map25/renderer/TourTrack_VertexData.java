@@ -49,20 +49,14 @@ public class TourTrack_VertexData extends Inlist.List<Chunk> {
    private static final int  MAX_POOL              = 500;
 
    private static final Pool pool                  = new Pool();
-
-   private Chunk             _currentChunk;
-
    /**
     * Set SIZE to get new item on add
     */
    private int               _numUsedChunkVertices = SIZE;
-   private int               _numUsedChunkColors   = SIZE / 4;
+   private int               _numUsedChunkColors;
 
+   private Chunk             _currentChunk;
    private short[]           _currentChunk_Vertices;
-
-   /**
-    * There are 4 color components for 4 chunks
-    */
    private byte[]            _currentChunk_Colors;
 
    public static class Chunk extends Inlist<Chunk> {
@@ -159,7 +153,7 @@ public class TourTrack_VertexData extends Inlist.List<Chunk> {
     * @param colorBuffer
     * @return sum of elements added
     */
-   public int fillVerticesBuffers(final ShortBuffer vertexBuffer, final ByteBuffer colorBuffer) {
+   public int fillVerticesBuffer(final ShortBuffer vertexBuffer, final ByteBuffer colorBuffer) {
 
       if (_currentChunk == null) {
          return 0;
