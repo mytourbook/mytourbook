@@ -301,10 +301,8 @@ public class CRPDataReader extends TourbookDevice {
 
       try (BufferedReader fileReader = new BufferedReader(new FileReader(rawFilePath))) {
 
-         final String fileHeader = fileReader.readLine();
-         if (!isFileHeaderValid(fileHeader)) {
-            return;
-         }
+         // File header
+         fileReader.readLine();
 
          final TourData tourData = importTour(fileReader);
 
