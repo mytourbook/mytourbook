@@ -81,24 +81,23 @@ public class TourBookViewTests extends UITest {
       bot.viewByTitle("Tour Book").show();
 
       // Get a tour that can be duplicated
-      SWTBotTreeItem tour = bot.tree().getTreeItem("2022   3").expand() //$NON-NLS-1$
-            .getNode("Sep   3").expand().select().getNode("2").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      SWTBotTreeItem tour = bot.tree().getTreeItem("2014   1").expand() //$NON-NLS-1$
+            .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
 
       // Duplicate the tour
       tour.contextMenu("Duplicate Tour...").click();
 
       // Set a different date than today's date
-      bot.dateTime(0).setDate(new Date(1420117200));
+      bot.dateTime(0).setDate(new Date(1420117200000L));
+      // Set a different time than today's date
+      bot.dateTime(1).setDate(new Date(1420117200000L));
 
       //Save the tour
       bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click();
 
-      tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
+      tour = bot.tree().getTreeItem("2015   2").expand() //$NON-NLS-1$
             .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
-
-      SWTBotTreeItem[] allItems = bot.tree().getAllItems();
-      assertEquals("2015   1", allItems[1].getText());
 
       //Delete the tour
       tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
@@ -108,11 +107,11 @@ public class TourBookViewTests extends UITest {
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "6/13/14, 11:36 AM")));//$NON-NLS-1$
+            "1/1/15, 1:00 PM")));//$NON-NLS-1$
 
       //Check that the tour was successfully deleted
-      allItems = bot.tree().getAllItems();
-      assertEquals("2015   1", allItems[1].getText());
+      final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
+      assertEquals("2015   1", allItems[2].getText());
    }
 
    @Test
