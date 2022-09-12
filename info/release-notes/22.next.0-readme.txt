@@ -33,7 +33,9 @@ New
 Improvements
 ============
 
-* 
+* CRP Import (Frederic)
+  - Improved CRP import to support compressed files and files for which the version is greater than 9
+    https://github.com/mytourbook/mytourbook/issues/927
 
 
 Changes
