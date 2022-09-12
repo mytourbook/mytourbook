@@ -89,7 +89,7 @@ public class TourBookViewTests extends UITest {
 
       // Set a different date than today's date
       bot.dateTime(0).setDate(new Date(1420117200000L));
-      // Set a different time than today's date
+      // Set a different time than the current's time
       bot.dateTime(1).setDate(new Date(1420117200000L));
 
       //Save the tour
