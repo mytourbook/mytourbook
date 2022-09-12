@@ -42,7 +42,7 @@ import utils.FilesUtils;
  *
  * @author Norbert Renner
  */
-class GPX_DeviceDataReaderTests {
+class GPXDeviceDataReaderTests {
 
    private static HashMap<Long, TourData> newlyImportedTours;
    private static GPXDeviceDataReader     deviceDataReader;
