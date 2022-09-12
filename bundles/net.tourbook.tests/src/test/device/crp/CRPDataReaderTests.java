@@ -48,12 +48,6 @@ public class CRPDataReaderTests extends DeviceDataReaderTester {
    }
 
    @Test
-   void testCrpImport_Feldberg_MTB() {
-
-      testImportFile(deviceDataReader, FILES_PATH + "Feldberg_MTB", ".crp");
-   }
-
-   @Test
    void testCrpImport_Hac4() {
 
       testImportFile(deviceDataReader, FILES_PATH + "Hac4", ".crp");
@@ -63,11 +57,5 @@ public class CRPDataReaderTests extends DeviceDataReaderTester {
    void testCrpImport_Hac5() {
 
       testImportFile(deviceDataReader, FILES_PATH + "1st_TestTour_Hac5", ".crp");
-   }
-
-   @Test
-   void testCrpImport_tztaler() {
-
-      testImportFile(deviceDataReader, FILES_PATH + "tztaler", ".crp");
    }
 }
