@@ -375,7 +375,7 @@ public class CRPDataReader extends TourbookDevice {
          trackpointTime = dataStrings[7];
 
          String comment = UI.EMPTY_STRING;
-         if (dataStrings.length > 8 && StringUtils.hasContent(dataStrings[8])) {
+         if (dataStrings.length > 8) {
             comment = dataStrings[8];
          }
 
@@ -421,7 +421,7 @@ public class CRPDataReader extends TourbookDevice {
          timeData.time = (int) trackpointTimeDiff;
 
          // set marker when a comment is set
-         if (tpIndex > 0 && comment.length() > 0) {
+         if (tpIndex >= 0 && StringUtils.hasContent(comment)) {
 
             timeData.marker = 1;
 
