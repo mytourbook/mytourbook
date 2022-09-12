@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Date;
 import java.util.List;
 
 import net.tourbook.Messages;
@@ -73,16 +74,31 @@ public class TourBookViewTests extends UITest {
    }
 
    @Test
-   void testDeleteTour() {
+   void testDuplicateAndDeleteTour() {
 
       Utils.showTourBookView(bot);
 
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2014   1").expand() //$NON-NLS-1$
-            .getNode("Jun   1").expand().select().getNode("13").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      bot.viewByTitle("Tour Book").show();
+
+      // Get a tour that can be duplicated
+      SWTBotTreeItem tour = bot.tree().getTreeItem("2022   3").expand() //$NON-NLS-1$
+            .getNode("Sep   3").expand().select().getNode("2").select(); //$NON-NLS-1$ //$NON-NLS-2$
+
+      // Duplicate the tour
+      tour.contextMenu("Duplicate Tour...").click();
+
+      // Set a different date than today's date
+      bot.dateTime(0).setDate(new Date(1420117200));
+
+      //Save the tour
+      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click();
+
+      tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
+            .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
       SWTBotTreeItem[] allItems = bot.tree().getAllItems();
-      assertEquals("2014   1", allItems[1].getText());
+      assertEquals("2015   1", allItems[1].getText());
 
       //Delete the tour
       tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
