@@ -120,5 +120,8 @@ public class WorkbenchTests extends UITest {
 
       Utils.showViewFromMenu(bot, DIRECTORY, "Tour Marker"); //$NON-NLS-1$
       Utils.showView(bot, "Tour Marker"); //$NON-NLS-1$
+
+      Utils.showViewFromMenu(bot, DIRECTORY, "Collated Tours"); //$NON-NLS-1$
+      Utils.showView(bot, "Collated Tours"); //$NON-NLS-1$
    }
 }
