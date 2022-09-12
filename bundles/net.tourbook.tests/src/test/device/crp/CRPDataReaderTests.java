@@ -22,21 +22,52 @@ import org.junit.jupiter.api.Test;
 import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
+/**
+ * Samples provided by WRPSoft
+ * https://github.com/mytourbook/mytourbook/discussions/924#discussioncomment-3585694
+ */
 public class CRPDataReaderTests extends DeviceDataReaderTester {
 
    public static final String FILES_PATH       = FilesUtils.rootPath + "device/crp/files/"; //$NON-NLS-1$
 
    private CRPDataReader      deviceDataReader = new CRPDataReader();
 
+   /**
+    * Testing a raw .crp file
+    */
    @Test
-   void testCrpImport_Hac5_01() {
+   void testCrpImport_20100923_Auf_die() {
+
+      testImportFile(deviceDataReader, FILES_PATH + "20100923_Auf_die", ".crp");
+   }
+
+   @Test
+   void testCrpImport_Feldberg_260706() {
+
+      testImportFile(deviceDataReader, FILES_PATH + "Feldberg_260706", ".crp");
+   }
+
+   @Test
+   void testCrpImport_Feldberg_MTB() {
+
+      testImportFile(deviceDataReader, FILES_PATH + "Feldberg_MTB", ".crp");
+   }
+
+   @Test
+   void testCrpImport_Hac4() {
+
+      testImportFile(deviceDataReader, FILES_PATH + "Hac4", ".crp");
+   }
+
+   @Test
+   void testCrpImport_Hac5() {
 
       testImportFile(deviceDataReader, FILES_PATH + "1st_TestTour_Hac5", ".crp");
    }
 
    @Test
-   void testCrpImport_Hac5_02() {
+   void testCrpImport_tztaler() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "2st_TestTour_Hac5", ".crp");
+      testImportFile(deviceDataReader, FILES_PATH + "tztaler", ".crp");
    }
 }
