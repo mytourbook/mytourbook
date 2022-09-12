@@ -41,6 +41,15 @@ public class CRPDataReaderTests extends DeviceDataReaderTester {
       testImportFile(deviceDataReader, FILES_PATH + "20100923_Auf_die", ".crp");
    }
 
+   /**
+    * A version 9 CRP file
+    */
+   @Test
+   void testCrpImport_Crp9() {
+
+      testImportFile(deviceDataReader, FILES_PATH + "crp9", ".crp");
+   }
+
    @Test
    void testCrpImport_Feldberg_260706() {
 
