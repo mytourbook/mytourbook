@@ -195,7 +195,7 @@ public class TourTrack_AllBuckets {
     *           Fill tile (add {@link #TILE_FILL_VERTICES 4} vertices).
     * @return true if compilation succeeded.
     */
-   public boolean setBufferData() {
+   public boolean setOpenGLBufferData() {
 
       final int numVertices = getNumberOfVbo();
       if (numVertices <= 0) {

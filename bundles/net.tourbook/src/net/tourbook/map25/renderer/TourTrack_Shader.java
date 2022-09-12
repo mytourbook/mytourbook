@@ -159,29 +159,25 @@ public final class TourTrack_Shader {
     * @param allRenderBuckets
     * @return
     */
-   public static TourTrack_Bucket paint(final TourTrack_Bucket trackBucket,
-                                        final GLViewport viewport,
-                                        final float vp2mpScale,
-                                        final TourTrack_AllBuckets allRenderBuckets) {
+   public static void paint(final TourTrack_Bucket trackBucket,
+                            final GLViewport viewport,
+                            final float vp2mpScale,
+                            final TourTrack_AllBuckets allRenderBuckets) {
 
 //    _dirArrowFrameBuffer.updateViewport(viewport, 0.5f);
-
-      final TourTrack_Bucket[] inoutRenderBucket = new TourTrack_Bucket[] { trackBucket };
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
       // fix alpha blending
       gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
       {
-         paint_10_Track(inoutRenderBucket, viewport, vp2mpScale);
+         paint_10_Track(trackBucket, viewport, vp2mpScale);
 
          if (trackConfig.isShowDirectionArrow) {
             paint_20_DirectionArrows(viewport, allRenderBuckets, vp2mpScale);
          }
       }
       gl.blendFunc(GL.ONE, GL.ONE_MINUS_SRC_ALPHA); // reset to map default
-
-      return inoutRenderBucket[0];
    }
 
    /**
@@ -195,7 +191,7 @@ public final class TourTrack_Shader {
     * @param renderBucketsAll
     * @return
     */
-   private static void paint_10_Track(final TourTrack_Bucket[] inoutRenderBucket,
+   private static void paint_10_Track(final TourTrack_Bucket lineBucket,
                                       final GLViewport viewport,
                                       final float vp2mpScale) {
 
@@ -298,17 +294,9 @@ public final class TourTrack_Shader {
       float heightOffset = 0;
       gl.uniform1f(shader_u_height, heightOffset);
 
-      final TourTrack_Bucket tourTrack_Bucket = inoutRenderBucket[0];
+      if (lineBucket != null) {
 
-      // there is no next bucket
-      inoutRenderBucket[0] = null;
-
-      if (tourTrack_Bucket != null) {
-
-         final TourTrack_Bucket lineBucket = tourTrack_Bucket;
          final LineStyle lineStyle = lineBucket.lineStyle.current();
-
-         final float scale = lineBucket.scale;
 
          final boolean isPaintOutline = trackConfig.isShowOutline;
          final float outlineWidth = trackConfig.outlineWidth;
@@ -363,14 +351,14 @@ public final class TourTrack_Shader {
             if (lineStyle.fixed) {
                width = Math.max(lineStyle.width, 1) / vp2mpScale;
             } else {
-               width = scale * lineStyle.width / variableScale;
+               width = lineStyle.width / variableScale;
             }
 
             // add outline width
             if (lineStyle.fixed) {
                width += outlineWidth / vp2mpScale;
             } else {
-               width += scale * outlineWidth / variableScale;
+               width += outlineWidth / variableScale;
             }
 
             gl.uniform1f(shader_u_width, (float) (width * COORD_SCALE_BY_DIR_SCALE));
@@ -408,7 +396,7 @@ public final class TourTrack_Shader {
          if (lineStyle.fixed) {
             width = Math.max(lineStyle.width, 1) / vp2mpScale;
          } else {
-            width = scale * lineStyle.width / variableScale;
+            width = lineStyle.width / variableScale;
          }
 
          // disable outline brighness/darkness, this value is multiplied with the color
@@ -426,12 +414,7 @@ public final class TourTrack_Shader {
          }
 
          // cap mode
-         if (scale < 1.0) {
-            if (capMode != CAP_THIN) {
-               capMode = CAP_THIN;
-               gl.uniform1i(shader_u_mode, capMode);
-            }
-         } else if (lineBucket._isCapRounded) {
+         if (lineBucket._isCapRounded) {
             if (capMode != CAP_ROUND) {
                capMode = CAP_ROUND;
                gl.uniform1i(shader_u_mode, capMode);

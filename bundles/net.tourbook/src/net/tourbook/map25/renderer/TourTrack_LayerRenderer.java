@@ -567,9 +567,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
       setMatrix(viewport, true);
 
-      for (TourTrack_Bucket bucket = _allLayerBuckets.get(); bucket != null;) {
-
-         bucket = TourTrack_Shader.paint(bucket, viewport, viewport2mapscale, _allLayerBuckets);
+      final TourTrack_Bucket bucket = _allLayerBuckets.get();
+      if (bucket != null) {
+         TourTrack_Shader.paint(bucket, viewport, viewport2mapscale, _allLayerBuckets);
       }
    }
 
@@ -689,7 +689,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       final TourTrack_Bucket workerBucket = workerTask.__allWorkerBuckets.get();
       _allLayerBuckets.set(workerBucket);
 
-      final boolean isOK = _allLayerBuckets.setBufferData();
+      final boolean isOK = _allLayerBuckets.setOpenGLBufferData();
 
       setReady(isOK);
    }

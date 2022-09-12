@@ -54,7 +54,7 @@ public class TourTrack_Bucket {
    /**
     * Maximal resolution
     */
-   public static final float  MIN_DIST         = 1 / 8f;
+   private static final float MIN_DIST         = 1 / 8f;
 
    /**
     * Not quite right.. need to go back so that additional
@@ -70,8 +70,6 @@ public class TourTrack_Bucket {
 
    public LineStyle           lineStyle;
    public int                 lineColorMode;
-
-   public float               scale            = 1;
 
    private float              _minimumDistance = MIN_DIST;
    private float              _minimumBevel    = MIN_BEVEL;
