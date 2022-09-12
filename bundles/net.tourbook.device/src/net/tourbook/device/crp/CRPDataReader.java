@@ -60,6 +60,7 @@ public class CRPDataReader extends TourbookDevice {
     */
    private void disableDataSeries(final ArrayList<TimeData> timeDataList,
                                   final int sumAltitude,
+                                  final int sumCadence,
                                   final int sumDistance,
                                   final int sumPulse,
                                   final int sumTemperature) {
@@ -67,11 +68,15 @@ public class CRPDataReader extends TourbookDevice {
       if (timeDataList.size() > 0) {
 
          final TimeData firstTimeData = timeDataList.get(0);
-         if (sumDistance == 0) {
-            firstTimeData.distance = Float.MIN_VALUE;
-         }
+
          if (sumAltitude == 0) {
             firstTimeData.altitude = Float.MIN_VALUE;
+         }
+         if (sumCadence == 0) {
+            firstTimeData.cadence = Float.MIN_VALUE;
+         }
+         if (sumDistance == 0) {
+            firstTimeData.distance = Float.MIN_VALUE;
          }
          if (sumPulse == 0) {
             firstTimeData.pulse = Float.MIN_VALUE;
@@ -357,6 +362,7 @@ public class CRPDataReader extends TourbookDevice {
       int tourAltDown = 0;
 
       int sumAltitude = 0;
+      int sumCadence = 0;
       int sumDistance = 0;
       int sumPulse = 0;
       int sumTemperature = 0;
@@ -449,8 +455,9 @@ public class CRPDataReader extends TourbookDevice {
          tourTime += interval;
          tpIndex++;
 
-         sumDistance += timeData.distance;
          sumAltitude += Math.abs(altitude);
+         sumCadence += cadence;
+         sumDistance += timeData.distance;
          sumPulse += pulse;
          sumTemperature += Math.abs(temperature);
       }
@@ -461,7 +468,7 @@ public class CRPDataReader extends TourbookDevice {
        */
       tourData.setStartDistance(distance);
 
-      disableDataSeries(timeDataList, sumAltitude, sumDistance, sumPulse, sumTemperature);
+      disableDataSeries(timeDataList, sumAltitude, sumCadence, sumDistance, sumPulse, sumTemperature);
 
       tourData.setDeviceId(deviceId);
       tourData.setDeviceName(visibleName);
