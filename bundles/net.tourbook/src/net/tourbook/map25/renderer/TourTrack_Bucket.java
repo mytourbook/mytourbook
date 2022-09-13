@@ -127,25 +127,6 @@ public class TourTrack_Bucket {
       colorCoords = new ShortArrayList();
    }
 
-   private void addDirArrowPosition(final short p2Xscaled,
-                                    final short p2Yscaled,
-                                    final short arrowZ,
-                                    final short arrowPartWing,
-
-                                    final int colorCoord1,
-                                    final int colorCoord2,
-                                    final int colorCoord3) {
-
-      directionArrow_XYZPositions.add(p2Xscaled);
-      directionArrow_XYZPositions.add(p2Yscaled);
-      directionArrow_XYZPositions.add(arrowZ);
-      directionArrow_XYZPositions.add(arrowPartWing);
-
-      colorCoords.add((short) colorCoord1);
-      colorCoords.add((short) colorCoord2);
-      colorCoords.add((short) colorCoord3);
-   }
-
    /**
     * This is called from {@link TourTrack_Layer#_simpleWorker}
     *
@@ -663,57 +644,77 @@ public class TourTrack_Bucket {
       numVertices = 0;
    }
 
-   private void createArrow_MiddleFin(final short p2X_scaled,
-                                      final short p2Y_scaled,
-                                      final short pBackX_scaled,
-                                      final short pBackY_scaled,
-                                      final short pOnLineX_scaled,
-                                      final short pOnLineY_scaled,
+   private void createArrow_MiddleFin(final short p2X,
+                                      final short p2Y,
+                                      final short pBackX,
+                                      final short pBackY,
+                                      final short pOnLineX,
+                                      final short pOnLineY,
                                       final short arrowZ,
                                       final short finTopZ,
                                       final short arrowPart_Fin) {
 // SET_FORMATTING_OFF
 
       // fin: middle
-      addDirArrowPosition(p2X_scaled,        p2Y_scaled,       arrowZ,     arrowPart_Fin, 1, 1, 0);
-      addDirArrowPosition(pOnLineX_scaled,   pOnLineY_scaled,  finTopZ,    arrowPart_Fin, 0, 1, 0);
-      addDirArrowPosition(pBackX_scaled,     pBackY_scaled,    arrowZ,     arrowPart_Fin, 0, 0, 1);
+      directionArrow_XYZPositions.addAll(
+
+            p2X,        p2Y,        arrowZ,  arrowPart_Fin,
+            pOnLineX,   pOnLineY,   finTopZ, arrowPart_Fin,
+            pBackX,     pBackY,     arrowZ,  arrowPart_Fin);
+
+      colorCoords.addAll(
+
+            (short) 1, (short) 1, (short) 0,
+            (short) 0, (short) 1, (short) 0,
+            (short) 0, (short) 0, (short) 1);
 
 // SET_FORMATTING_ON
    }
 
-   private void createArrow_OuterFins(final short p2X_scaled,
-                                      final short p2Y_scaled,
-                                      final short pLeftX_scaled,
-                                      final short pLeftY_scaled,
-                                      final short pRight_Xscaled,
-                                      final short pRightY_scaled,
+   private void createArrow_OuterFins(final short p2X,
+                                      final short p2Y,
+                                      final short pLeftX,
+                                      final short pLeftY,
+                                      final short pRightX,
+                                      final short pRightY,
                                       final short arrowZ,
                                       final short finBottomZ,
                                       final short arrowPart_Fin) {
 // SET_FORMATTING_OFF
 
-      // fin: left
-      addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
-      addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  arrowZ,     arrowPart_Fin, 0, 1, 0);
-      addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  finBottomZ, arrowPart_Fin, 0, 0, 1);
+      directionArrow_XYZPositions.addAll(
 
-      // fin: right
-      addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowZ,     arrowPart_Fin, 1, 0, 0);
-      addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, arrowZ,     arrowPart_Fin, 0, 1, 0);
-      addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, finBottomZ, arrowPart_Fin, 0, 0, 1);
+            // fin: left
+            p2X,        p2Y,        arrowZ,     arrowPart_Fin,
+            pLeftX,     pLeftY,     arrowZ,     arrowPart_Fin,
+            pLeftX,     pLeftY,     finBottomZ, arrowPart_Fin,
+
+            // fin: right
+            p2X,        p2Y,        arrowZ,     arrowPart_Fin,
+            pRightX,    pRightY,    arrowZ,     arrowPart_Fin,
+            pRightX,    pRightY,    finBottomZ, arrowPart_Fin);
+
+      colorCoords.addAll(
+
+            (short) 1, (short) 0, (short) 0,
+            (short) 0, (short) 1, (short) 0,
+            (short) 0, (short) 0, (short) 1,
+
+            (short) 0, (short) 1, (short) 0,
+            (short) 1, (short) 0, (short) 0,
+            (short) 0, (short) 0, (short) 1);
 
 // SET_FORMATTING_ON
    }
 
-   private void createArrow_Wings(final short p2X_scaled,
-                                  final short p2Y_scaled,
-                                  final short pLeftX_scaled,
-                                  final short pLeftY_scaled,
-                                  final short pRight_Xscaled,
-                                  final short pRightY_scaled,
-                                  final short pBackX_scaled,
-                                  final short pBackY_scaled,
+   private void createArrow_Wings(final short p2X,
+                                  final short p2Y,
+                                  final short pLeftX,
+                                  final short pLeftY,
+                                  final short pRight,
+                                  final short pRightY,
+                                  final short pBackX,
+                                  final short pBackY,
                                   final short arrowZ,
                                   final short arrowPart_Wing) {
 // SET_FORMATTING_OFF
@@ -723,15 +724,27 @@ public class TourTrack_Bucket {
        */
       final short arrowHeadZ = (short) (arrowZ+1);
 
-      // wing: left
-      addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowHeadZ,    arrowPart_Wing, 1, 0, 0);
-      addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,        arrowPart_Wing, 0, 1, 1);
-      addDirArrowPosition(pLeftX_scaled,    pLeftY_scaled,  arrowZ,        arrowPart_Wing, 0, 0, 1);
+      directionArrow_XYZPositions.addAll(
 
-      // wing: right
-      addDirArrowPosition(p2X_scaled,       p2Y_scaled,     arrowHeadZ,    arrowPart_Wing, 1, 0, 0);
-      addDirArrowPosition(pBackX_scaled,    pBackY_scaled,  arrowZ,        arrowPart_Wing, 0, 1, 1);
-      addDirArrowPosition(pRight_Xscaled,   pRightY_scaled, arrowZ,        arrowPart_Wing, 0, 0, 1);
+            // wing: left
+            p2X,        p2Y,     arrowHeadZ, arrowPart_Wing,
+            pBackX,     pBackY,  arrowZ,     arrowPart_Wing,
+            pLeftX,     pLeftY,  arrowZ,     arrowPart_Wing,
+
+            // wing: right
+            p2X,        p2Y,     arrowHeadZ, arrowPart_Wing,
+            pBackX,     pBackY,  arrowZ,     arrowPart_Wing,
+            pRight,     pRightY, arrowZ,     arrowPart_Wing);
+
+      colorCoords.addAll(
+
+            (short) 1, (short) 0, (short) 0,
+            (short) 0, (short) 1, (short) 1,
+            (short) 0, (short) 0, (short) 1,
+
+            (short) 1, (short) 0, (short) 0,
+            (short) 0, (short) 1, (short) 1,
+            (short) 0, (short) 0, (short) 1);
 
 // SET_FORMATTING_ON
    }
