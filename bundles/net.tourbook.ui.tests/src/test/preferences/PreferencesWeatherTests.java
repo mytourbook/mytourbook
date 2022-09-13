@@ -68,7 +68,7 @@ public class PreferencesWeatherTests extends UITest {
    private void testWorldWeatherOnlineConnection() {
 
       bot.comboBox().setSelection(IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_NAME);
-      final String dummyApiKeyValue = "DUMMY_API_KEY";
+      final String dummyApiKeyValue = "DUMMY_API_KEY"; //$NON-NLS-1$
       bot.text(1).setText(dummyApiKeyValue);
       bot.button(Messages.Pref_Weather_Button_TestHTTPConnection).click();
 
@@ -79,12 +79,14 @@ public class PreferencesWeatherTests extends UITest {
             new Object[] {
                   WorldWeatherOnlineRetriever.getApiUrl() + dummyApiKeyValue,
                   400,
-                  "<?xml version=\"1.0\" encoding=\"UTF-8\"?><data><error><msg>Parameter key is missing from the request URL</msg></error></data>"
+                  "<?xml version=\"1.0\" encoding=\"UTF-8\"?><data><error><msg>Parameter key is missing from the request URL</msg></error></data>" //$NON-NLS-1$
             });
 
       assertEquals(message, shell.bot().label(message).getText());
 
       bot.button("OK").click(); //$NON-NLS-1$
+
+      bot.button("Restore Defaults").click(); //$NON-NLS-1$
    }
 
 }

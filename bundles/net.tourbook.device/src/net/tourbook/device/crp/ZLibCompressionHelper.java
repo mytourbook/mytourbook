@@ -29,11 +29,11 @@ public class ZLibCompressionHelper {
 
    private ZLibCompressionHelper() {}
 
-   public static void decompress(final File compressed, final File raw) {
+   public static void decompress(final File compressedSourceFile, final File rawDestinationFile) {
 
       try (InputStream inputStream =
-            new InflaterInputStream(new FileInputStream(compressed));
-            OutputStream outputStream = new FileOutputStream(raw)) {
+            new InflaterInputStream(new FileInputStream(compressedSourceFile));
+            OutputStream outputStream = new FileOutputStream(rawDestinationFile)) {
 
          final byte[] buffer = new byte[1000];
          int length;
