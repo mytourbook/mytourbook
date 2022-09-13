@@ -145,7 +145,6 @@ public class CRPDataReader extends TourbookDevice {
 
          fileContent = FilesUtils.readFileContentString(createTemporaryFile);
          return isFileHeaderValid(fileContent) ? createTemporaryFile : null;
-
       }
 
       return createTemporaryFile;

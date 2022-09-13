@@ -33,21 +33,21 @@ public class CRPDataReaderTests extends DeviceDataReaderTester {
    private CRPDataReader      deviceDataReader = new CRPDataReader();
 
    /**
+    * A .crp file with cadence values
+    */
+   @Test
+   void testCrpImport_080510() {
+
+      testImportFile(deviceDataReader, FILES_PATH + "080510", ".crp");
+   }
+
+   /**
     * Testing a raw .crp file
     */
    @Test
    void testCrpImport_20100923_Auf_die() {
 
       testImportFile(deviceDataReader, FILES_PATH + "20100923_Auf_die", ".crp");
-   }
-
-   /**
-    * A version 9 CRP file
-    */
-   @Test
-   void testCrpImport_Crp9() {
-
-      testImportFile(deviceDataReader, FILES_PATH + "crp9", ".crp");
    }
 
    @Test
