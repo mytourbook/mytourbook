@@ -19,8 +19,6 @@ import static java.time.temporal.ChronoField.DAY_OF_WEEK;
 
 import com.skedgo.converter.TimezoneMapper;
 
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.Instant;
@@ -48,6 +46,7 @@ import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.preferences.ICommonPreferences;
 
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.joda.time.Period;
@@ -57,46 +56,46 @@ import org.shredzone.commons.suncalc.SunTimes;
 
 public class TimeTools {
 
-   private static final String                    ZERO_0                = ":0";                                 //$NON-NLS-1$
-   private static final String                    ZERO_00_00            = "+00:00";                             //$NON-NLS-1$
-   private static final String                    ZERO_00_00_DEFAULT    = "*";                                  //$NON-NLS-1$
+   private static final String                   ZERO_0                = ":0";                                 //$NON-NLS-1$
+   private static final String                   ZERO_00_00            = "+00:00";                             //$NON-NLS-1$
+   private static final String                   ZERO_00_00_DEFAULT    = "*";                                  //$NON-NLS-1$
 
    /**
     * Cached time zone labels.
     */
-   private static final TIntObjectHashMap<String> _timeZoneOffsetLabels = new TIntObjectHashMap<>();
+   private static final IntObjectHashMap<String> _timeZoneOffsetLabels = new IntObjectHashMap<>();
 
    /** Minutes per hour. */
-   private static final int                       MINUTES_PER_HOUR      = 60;
+   private static final int                      MINUTES_PER_HOUR      = 60;
    /** Seconds per minute. */
-   private static final int                       SECONDS_PER_MINUTE    = 60;
+   private static final int                      SECONDS_PER_MINUTE    = 60;
    /** Seconds per hour. */
-   private static final int                       SECONDS_PER_HOUR      = SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
+   private static final int                      SECONDS_PER_HOUR      = SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
 
-   private static final PeriodFormatter           DURATION_FORMATTER;
+   private static final PeriodFormatter          DURATION_FORMATTER;
 
-   public static final ZoneId                     UTC                   = ZoneId.of("UTC");                     //$NON-NLS-1$
+   public static final ZoneId                    UTC                   = ZoneId.of("UTC");                     //$NON-NLS-1$
 
    /**
     * Calendar week which is defined in the preferences and applied in the whole app.
     */
-   public static WeekFields                       calendarWeek;
+   public static WeekFields                      calendarWeek;
 
    /**
     * Contains the short weekday strings. For example: "Sun", "Mon", etc.
     */
-   public static String[]                         weekDays_Short;
+   public static String[]                        weekDays_Short;
 
    /**
     * Contains the full text, typically the full description. For example, day-of-week Monday might
     * output "Monday".
     */
-   public static String[]                         weekDays_Full;
+   public static String[]                        weekDays_Full;
 
    /**
     * Contains the full text of a month
     */
-   public static String[]                         month_Full;
+   public static String[]                        month_Full;
 
 // SET_FORMATTING_OFF
 

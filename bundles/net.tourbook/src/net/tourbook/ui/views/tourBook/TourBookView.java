@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -99,6 +97,7 @@ import net.tourbook.ui.views.tourBook.natTable.NatTable_SortModel;
 import net.tourbook.ui.views.tourBook.natTable.SingleClickSortConfiguration_MT;
 import net.tourbook.ui.views.tourBook.natTable.TourRowDataProvider;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IMenuListener2;
@@ -2516,7 +2515,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
        */
 
       final Set<Range> allSelectedRowPositions = getNatTable_SelectionModel().getSelectedRowPositions();
-      final TIntArrayList allSelectedRowPos = new TIntArrayList();
+      final IntArrayList allSelectedRowPos = new IntArrayList();
 
       // convert all ranges into a list
       for (final Range rowRange : allSelectedRowPositions) {

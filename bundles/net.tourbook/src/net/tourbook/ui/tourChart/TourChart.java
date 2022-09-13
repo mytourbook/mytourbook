@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,8 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.tourChart;
-
-import gnu.trove.list.array.TIntArrayList;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -101,6 +99,7 @@ import net.tourbook.ui.views.geoCompare.GeoCompareView;
 import net.tourbook.ui.views.tourSegmenter.SelectedTourSegmenterSegments;
 import net.tourbook.ui.views.tourSegmenter.TourSegmenterView;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.action.Action;
@@ -367,9 +366,9 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
    private SegmenterSegment              _selectedSegmenterSegment_1;
    private SegmenterSegment              _selectedSegmenterSegment_2;
    private boolean                       _isRecomputeLineSelection;
-   private TIntArrayList                 _selectedAltitudePoints;
+   private IntArrayList                  _selectedAltitudePoints;
    private ArrayList<RGB>                _selectedAltitudeRGB;
-   private ArrayList<TIntArrayList>      _selectedOtherPoints;
+   private ArrayList<IntArrayList>       _selectedOtherPoints;
    private ArrayList<RGB>                _selectedPathsRGB;
    //
    private boolean                       _isToolbarPack                  = true;
@@ -2615,7 +2614,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       /*
        * Create poline for all selected segments
        */
-      TIntArrayList selectedAltitudePath = null;
+      IntArrayList selectedAltitudePath = null;
       final ArrayList<SegmenterSegment> paintedSegments_Altitude = _layerTourSegmenterAltitude.getPaintedSegments();
       final ArrayList<RGB> selectedAltitudeRGB = new ArrayList<>();
 
@@ -2633,14 +2632,14 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       /*
        *
        */
-      final ArrayList<TIntArrayList> selectedOtherPaths = new ArrayList<>();
+      final ArrayList<IntArrayList> selectedOtherPaths = new ArrayList<>();
       final ArrayList<RGB> selectedPathsRGB = new ArrayList<>();
       final ArrayList<ArrayList<SegmenterSegment>> paintedSegemntsOther = _layerTourSegmenterOther
             .getPaintedSegments();
 
       for (final ArrayList<SegmenterSegment> paintedSegments : paintedSegemntsOther) {
 
-         final TIntArrayList selectedPath = createSelectedLines_Values(
+         final IntArrayList selectedPath = createSelectedLines_Values(
                paintedSegments,
                selectedSegmentIndexStart,
                selectedSegmentIndexEnd,
@@ -2652,12 +2651,12 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
       _selectedPathsRGB = selectedPathsRGB;
    }
 
-   private TIntArrayList createSelectedLines_Values(final ArrayList<SegmenterSegment> paintedSegments,
-                                                    final int selectedSegmentIndexStart,
-                                                    final int selectedSegmentIndexEnd,
-                                                    final ArrayList<RGB> allValueRGBs) {
+   private IntArrayList createSelectedLines_Values(final ArrayList<SegmenterSegment> paintedSegments,
+                                                   final int selectedSegmentIndexStart,
+                                                   final int selectedSegmentIndexEnd,
+                                                   final ArrayList<RGB> allValueRGBs) {
 
-      final TIntArrayList lineSegments = new TIntArrayList();
+      final IntArrayList lineSegments = new IntArrayList();
 
       // check bounds
       final int allLabelSize = paintedSegments.size();
@@ -2879,7 +2878,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          for (int pathIndex = 0; pathIndex < _selectedOtherPoints.size(); pathIndex++) {
 
-            final TIntArrayList graphLine = _selectedOtherPoints.get(pathIndex);
+            final IntArrayList graphLine = _selectedOtherPoints.get(pathIndex);
             if (graphLine.isEmpty()) {
                // can be empty when small values are hidden
                continue;
