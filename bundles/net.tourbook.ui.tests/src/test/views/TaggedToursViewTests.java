@@ -17,7 +17,6 @@ package views;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
@@ -34,8 +33,7 @@ public class TaggedToursViewTests extends UITest {
    void testTaggedToursView() {
 
       //Open the Tagged Tours view
-      final SWTBotMenu otherMenu = bot.menu("Tools ").menu("All Views").menu("Other...").click(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-      assertNotNull(otherMenu);
+      Utils.openOtherMenu(bot);
       bot.tree().getTreeItem("1. Tour Directories").expand().getNode("Tagged Tours").select(); //$NON-NLS-1$ //$NON-NLS-2$
       bot.button("Open").click(); //$NON-NLS-1$
 

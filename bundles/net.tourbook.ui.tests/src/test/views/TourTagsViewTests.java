@@ -30,6 +30,10 @@ public class TourTagsViewTests extends UITest {
 
       Utils.getTour(bot);
 
+      //Open the Tour Tags view
+      Utils.openOtherMenu(bot);
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode("Tour Tags").select(); //$NON-NLS-1$
+      bot.button("Open").click(); //$NON-NLS-1$
       Utils.showView(bot, "Tour Tags"); //$NON-NLS-1$
 
       final SWTBotTreeItem tag = bot.tree(1).getTreeItem("Shoes 2").select(); //$NON-NLS-1$
