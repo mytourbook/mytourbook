@@ -328,4 +328,11 @@
 		<item key="STATE_IS_USE_FAST_APP_TOUR_FILTER" value="false"/>
 		<item key="XML_STATE_COLUMN_MANAGER" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;ColumnProfiles isShowCategory=&quot;true&quot; isShowColumnAnnotation_Formatting=&quot;false&quot; isShowColumnAnnotation_Sorting=&quot;false&quot;&gt;&#x0D;&#x0A;&lt;Profile isActiveProfile=&quot;true&quot; name=&quot;Column Profile&quot; visibleColumnIds=&quot;TOUR_REFTOUR_TOUR,DATA_NUM_TOURS,TOUR_TYPE,TOUR_TITLE,TOUR_TAGS,MOTION_AVG_SPEED,TIME__DEVICE_ELAPSED_TIME,BODY_PULSE_AVG,&quot; visibleColumnIdsAndWidth=&quot;TOUR_REFTOUR_TOUR,120,DATA_NUM_TOURS,48,TOUR_TYPE,30,TOUR_TITLE,120,TOUR_TAGS,120,MOTION_AVG_SPEED,60,TIME__DEVICE_ELAPSED_TIME,60,BODY_PULSE_AVG,60,&quot;&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_REFTOUR_TOUR&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;DATA_NUM_TOURS&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TYPE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TITLE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TAGS&quot;/&gt;&#x0D;&#x0A;&lt;Column categoryFormat=&quot;NUMBER_1_1&quot; columnId=&quot;MOTION_AVG_SPEED&quot; detailFormat=&quot;NUMBER_1_1&quot;/&gt;&#x0D;&#x0A;&lt;Column categoryFormat=&quot;TIME_HH&quot; columnId=&quot;TIME__DEVICE_ELAPSED_TIME&quot; detailFormat=&quot;TIME_HH_MM&quot;/&gt;&#x0D;&#x0A;&lt;Column categoryFormat=&quot;NUMBER_1_1&quot; columnId=&quot;BODY_PULSE_AVG&quot; detailFormat=&quot;NUMBER_1_1&quot;/&gt;&#x0D;&#x0A;&lt;/Profile&gt;&#x0D;&#x0A;&lt;/ColumnProfiles&gt;"/>
 	</section>
+	<section name="net.tourbook.map25.Map25View">
+		<item key="STATE_MAP_SYNCHED_WITH" value="NONE"/>
+	</section>
+	<section name="net.tourbook.map25.Map25View.PhotoFilter">
+	</section>
+	<section name="net.tourbook.map25.action.ActionTourMapMarker">
+	</section>
 </section>
