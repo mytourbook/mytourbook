@@ -34,7 +34,9 @@ Improvements
 ============
 
 * CRP Import (Frederic)
-  - Improved CRP import to support compressed files and files for which the version is greater than 9
+  - Added the ability to import ZLib compressed files
+  - Added the support for file version greater than 9
+  - Added the support for cadence data import (present in file version greater than 9)
     https://github.com/mytourbook/mytourbook/issues/927
 
 
