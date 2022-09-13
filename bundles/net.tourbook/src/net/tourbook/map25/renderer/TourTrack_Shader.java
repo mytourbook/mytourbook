@@ -143,13 +143,13 @@ public final class TourTrack_Shader {
     * @param viewport
     * @param vp2mpScale
     *           Viewport scale 2 map scale: it is between 1...2
-    * @param allRenderBuckets
+    * @param bucketManager
     * @return
     */
    public static void paint(final TourTrack_Bucket trackBucket,
                             final GLViewport viewport,
                             final float vp2mpScale,
-                            final TourTrack_BucketManager allRenderBuckets) {
+                            final TourTrack_BucketManager bucketManager) {
 
 //    _dirArrowFrameBuffer.updateViewport(viewport, 0.5f);
 
@@ -161,7 +161,7 @@ public final class TourTrack_Shader {
          paint_10_Track(trackBucket, viewport, vp2mpScale);
 
          if (trackConfig.isShowDirectionArrow) {
-            paint_20_DirectionArrows(viewport, allRenderBuckets, vp2mpScale);
+            paint_20_DirectionArrows(viewport, bucketManager, vp2mpScale);
          }
       }
       gl.blendFunc(GL.ONE, GL.ONE_MINUS_SRC_ALPHA); // reset to map default
@@ -423,22 +423,22 @@ public final class TourTrack_Shader {
    }
 
    private static void paint_20_DirectionArrows(final GLViewport viewport,
-                                                final TourTrack_BucketManager allRenderBuckets,
+                                                final TourTrack_BucketManager bucketManager,
                                                 final float vp2mpScale) {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
 // SET_FORMATTING_OFF
 
-         final DirectionArrowsShader shader        = _directionArrowShader;
+      final DirectionArrowsShader shader  = _directionArrowShader;
 
-         final int shader_a_pos                    = shader.shader_a_pos;
-         final int shader_attrib_ColorCoord        = shader.shader_attrib_ColorCoord;
-         final int shader_u_mvp                    = shader.shader_u_mvp;
-//       final int shader_u_width                  = shader.shader_u_width;
-         final int shader_uni_ArrowColors          = shader.shader_uni_ArrowColors;
-         final int shader_uni_OutlineWidth         = shader.shader_uni_OutlineWidth;
-         final int shader_uni_Vp2MpScale           = shader.shader_uni_Vp2MpScale;
+      final int shader_a_pos              = shader.shader_a_pos;
+      final int shader_attrib_ColorCoord  = shader.shader_attrib_ColorCoord;
+      final int shader_u_mvp              = shader.shader_u_mvp;
+//    final int shader_u_width            = shader.shader_u_width;
+      final int shader_uni_ArrowColors    = shader.shader_uni_ArrowColors;
+      final int shader_uni_OutlineWidth   = shader.shader_uni_OutlineWidth;
+      final int shader_uni_Vp2MpScale     = shader.shader_uni_Vp2MpScale;
 
 // SET_FORMATTING_ON
 
@@ -471,8 +471,6 @@ public final class TourTrack_Shader {
             0 //                       offset in bytes of the first component in the vertex attribute array
       );
 
-      final int numDirArrowShorts = allRenderBuckets.numShortsForDirectionArrows;
-
 //       final float width = 10 / vp2mpScale;
 //
 //       gl.uniform1f(shader_u_width, width * COORD_SCALE_BY_DIR_SCALE);
@@ -491,11 +489,10 @@ public final class TourTrack_Shader {
       /*
        * Draw direction arrows
        */
-
       GLState.test(true, false);
       gl.depthMask(true);
       {
-         gl.drawArrays(GL.TRIANGLES, 0, numDirArrowShorts);
+         gl.drawArrays(GL.TRIANGLES, 0, bucketManager.numShortsForDirectionArrows);
       }
       gl.depthMask(false);
 

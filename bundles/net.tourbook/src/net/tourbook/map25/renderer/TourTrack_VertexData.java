@@ -23,17 +23,11 @@ import net.tourbook.map25.renderer.TourTrack_VertexData.Chunk;
 
 import org.oscim.utils.pool.Inlist;
 import org.oscim.utils.pool.SyncPool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A linked list of array chunks to hold temporary vertex data.
- * <p/>
- * TODO override append() etc to update internal (cur) state.
  */
 public class TourTrack_VertexData extends Inlist.List<Chunk> {
-
-   static final Logger       log                   = LoggerFactory.getLogger(TourTrack_VertexData.class);
 
    /**
     * Size of array chunks. Must be multiple of:
@@ -41,7 +35,7 @@ public class TourTrack_VertexData extends Inlist.List<Chunk> {
     * 24 (TexLineLayer - one block, i.e. two segments)
     * 24 (TextureLayer)
     */
-   public static final int   SIZE                  = 360;
+   public static final int   SIZE                  = 10_000;
 
    /**
     * Shared chunk pool size.
@@ -49,6 +43,7 @@ public class TourTrack_VertexData extends Inlist.List<Chunk> {
    private static final int  MAX_POOL              = 500;
 
    private static final Pool pool                  = new Pool();
+
    /**
     * Set SIZE to get new item on add
     */
@@ -85,11 +80,16 @@ public class TourTrack_VertexData extends Inlist.List<Chunk> {
 
       @Override
       protected Chunk createItem() {
+
          return new Chunk();
       }
    }
 
-   public void add(final short a, final short b, final short c, final short d, final int color) {
+   public void add(final short a,
+                   final short b,
+                   final short c,
+                   final short d,
+                   final int color) {
 
       if (_numUsedChunkVertices == SIZE) {
          getNext();

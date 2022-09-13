@@ -44,48 +44,40 @@ import org.slf4j.LoggerFactory;
  */
 public class TourTrack_Bucket {
 
-   static final Logger        log              = LoggerFactory.getLogger(TourTrack_Bucket.class);
+   static final Logger                  log              = LoggerFactory.getLogger(TourTrack_Bucket.class);
 
    /**
     * Scale factor mapping extrusion vector to short values
     */
-   public static final float  DIR_SCALE        = 2048;
+   public static final float            DIR_SCALE        = 2048;
 
    /**
     * Maximal resolution
     */
-   private static final float MIN_DIST         = 1 / 8f;
+   private static final float           MIN_DIST         = 1 / 8f;
 
    /**
     * Not quite right.. need to go back so that additional
     * bevel vertices are at least MIN_DIST apart
     */
-   private static final float MIN_BEVEL        = MIN_DIST * 4;
+   private static final float           MIN_BEVEL        = MIN_DIST * 4;
 
    /**
     * Mask for packing last two bits of extrusion vector with texture
     * coordinates, .... 1111 1100
     */
-   private static final int   DIR_MASK         = 0xFFFFFFFC;
+   private static final int             DIR_MASK         = 0xFFFFFFFC;
 
-   public LineStyle           lineStyle;
-   public int                 lineColorMode;
+   public LineStyle                     lineStyle;
+   public int                           lineColorMode;
 
-   private float              _minimumDistance = MIN_DIST;
-   private float              _minimumBevel    = MIN_BEVEL;
+   private float                        _minimumDistance = MIN_DIST;
+   private float                        _minimumBevel    = MIN_BEVEL;
 
-   boolean                    _isCapRounded;
-   float                      _heightOffset;
+   boolean                              _isCapRounded;
+   float                                _heightOffset;
 
-   private int                _tMin            = Integer.MIN_VALUE, _tMax = Integer.MAX_VALUE;
-
-   ////////////////////////////////////////////////////////////////////////////////////////////////
-   ////////////////////////////////////////////////////////////////////////////////////////////////
-   ////////////////////////////////////////////////////////////////////////////////////////////////
-   ////////////////////////////////////////////////////////////////////////////////////////////////
-   ////////////////////////////////////////////////////////////////////////////////////////////////
-   ////////////////////////////////////////////////////////////////////////////////////////////////
-   ////////////////////////////////////////////////////////////////////////////////////////////////
+   private int                          _tMin            = Integer.MIN_VALUE, _tMax = Integer.MAX_VALUE;
 
    /**
     * Number of vertices for this layer.
@@ -104,7 +96,6 @@ public class TourTrack_Bucket {
     * <pre>
     * x1    y2    z1
     * x2    y2    z2
-    *
     * ...
     * </pre>
     */
@@ -117,14 +108,14 @@ public class TourTrack_Bucket {
     * Source:
     * https://stackoverflow.com/questions/137629/how-do-you-render-primitives-as-wireframes-in-opengl#answer-33004265
     */
-   protected ShortArrayList             colorCoords;
+   protected ShortArrayList             directionArrow_colorCoords;
 
    public TourTrack_Bucket() {
 
       vertexItems = new TourTrack_VertexData();
 
       directionArrow_XYZPositions = new ShortArrayList();
-      colorCoords = new ShortArrayList();
+      directionArrow_colorCoords = new ShortArrayList();
    }
 
    /**
@@ -662,7 +653,7 @@ public class TourTrack_Bucket {
             pOnLineX,   pOnLineY,   finTopZ, arrowPart_Fin,
             pBackX,     pBackY,     arrowZ,  arrowPart_Fin);
 
-      colorCoords.addAll(
+      directionArrow_colorCoords.addAll(
 
             (short) 1, (short) 1, (short) 0,
             (short) 0, (short) 1, (short) 0,
@@ -694,7 +685,7 @@ public class TourTrack_Bucket {
             pRightX,    pRightY,    arrowZ,     arrowPart_Fin,
             pRightX,    pRightY,    finBottomZ, arrowPart_Fin);
 
-      colorCoords.addAll(
+      directionArrow_colorCoords.addAll(
 
             (short) 1, (short) 0, (short) 0,
             (short) 0, (short) 1, (short) 0,
@@ -736,7 +727,7 @@ public class TourTrack_Bucket {
             pBackX,     pBackY,  arrowZ,     arrowPart_Wing,
             pRight,     pRightY, arrowZ,     arrowPart_Wing);
 
-      colorCoords.addAll(
+      directionArrow_colorCoords.addAll(
 
             (short) 1, (short) 0, (short) 0,
             (short) 0, (short) 1, (short) 1,
@@ -756,7 +747,7 @@ public class TourTrack_Bucket {
    public void createDirectionArrowVertices(final FloatArrayList allDirectionArrowPixel_Raw) {
 
       directionArrow_XYZPositions.clear();
-      colorCoords.clear();
+      directionArrow_colorCoords.clear();
 
       // at least 2 positions are needed
       if (allDirectionArrowPixel_Raw.size() < 4) {

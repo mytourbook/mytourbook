@@ -71,8 +71,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    /**
     * Buckets for rendering
     */
-   private final TourTrack_BucketManager _trackBucketManager;
-   private TourTrack_BucketManager       _currentTask_BucketManager;
+   private final TourTrack_BucketManager _bucketManager_ForPainting;
+   private TourTrack_BucketManager       _bucketManager_ForWorker;
 
    private boolean                       _isUpdateLayer;
    private boolean                       _isUpdatePoints;
@@ -224,11 +224,11 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             }
          }
 
-         _currentTask_BucketManager = task.__taskBucketManager;
+         _bucketManager_ForWorker = task.__taskBucketManager;
 
          if (numGeoPoints == 0) {
 
-            if (task.__taskBucketManager.getBucket1() != null) {
+            if (task.__taskBucketManager.getBucket_Painter() != null) {
 
                task.__taskBucketManager.clear();
 
@@ -250,7 +250,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-         final TourTrack_Bucket trackBucket = getTrackBucket2(task.__taskBucketManager);
+         final TourTrack_Bucket workerBucket = getWorkerBucket(task.__taskBucketManager);
 
          final MapPosition mapPos = task.__mapPos;
          mMap.getMapPosition(mapPos);
@@ -333,7 +333,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                flip = flipDirection;
 
                if (pixelPointIndex > 2) {
-                  trackBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
+                  workerBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
                }
 
                __lineClipper.clipStart(pixelX, pixelY);
@@ -349,7 +349,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
                // finish last tour (copied from flip code)
                if (pixelPointIndex > 2) {
-                  trackBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
+                  workerBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
                }
 
                // setup next tour
@@ -371,14 +371,14 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                 */
 
                if (pixelPointIndex > 2) {
-                  trackBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
+                  workerBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
                }
 
                if (clipperCode == LineClipper.INTERSECTION) {
 
                   // add line segment
                   segment = __lineClipper.getLine(segment, 0);
-                  trackBucket.addLine(segment, 4, false, pixelPointColorsHalf);
+                  workerBucket.addLine(segment, 4, false, pixelPointColorsHalf);
 
                   // the prev point is the real point not the clipped point
                   // prevX = __lineClipper.outX2;
@@ -434,11 +434,11 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          }
 
          if (pixelPointIndex > 2) {
-            trackBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
+            workerBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
          }
 
          if (trackConfig.isShowDirectionArrow) {
-            trackBucket.createDirectionArrowVertices(__pixelDirectionArrows);
+            workerBucket.createDirectionArrowVertices(__pixelDirectionArrows);
          }
       }
 
@@ -458,7 +458,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _tourLayer = tourLayer;
       _map = map;
 
-      _trackBucketManager = new TourTrack_BucketManager();
+      _bucketManager_ForPainting = new TourTrack_BucketManager();
       _mapPosition = new MapPosition();
 
       _allGeoPoints = new GeoPoint[] {};
@@ -520,11 +520,11 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
     * @param bucketManager
     * @return
     */
-   private TourTrack_Bucket getTrackBucket2(final TourTrack_BucketManager bucketManager) {
+   private TourTrack_Bucket getWorkerBucket(final TourTrack_BucketManager bucketManager) {
 
       TourTrack_Bucket trackBucket;
 
-      trackBucket = bucketManager.getBucket2();
+      trackBucket = bucketManager.getBucket_Worker();
 
 // SET_FORMATTING_OFF
 
@@ -550,7 +550,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          // do a fast update
 
-         getTrackBucket2(_currentTask_BucketManager);
+         getWorkerBucket(_bucketManager_ForWorker);
 
          _map.render();
       }
@@ -562,7 +562,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    @Override
    public synchronized void render(final GLViewport viewport) {
 
-      final TourTrack_Bucket trackBucket = _trackBucketManager.getBucket1();
+      final TourTrack_Bucket trackBucket = _bucketManager_ForPainting.getBucket_Painter();
       if (trackBucket == null) {
          return;
       }
@@ -577,7 +577,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
       setMatrix(viewport, true);
 
-      TourTrack_Shader.paint(trackBucket, viewport, viewport2mapscale, _trackBucketManager);
+      TourTrack_Shader.paint(trackBucket, viewport, viewport2mapscale, _bucketManager_ForPainting);
    }
 
    public void setIsUpdateLayer(final boolean isUpdateLayer) {
@@ -693,11 +693,11 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _mapPosition.copy(workerTask.__mapPos);
 
       // compile new layers
-      final TourTrack_Bucket workerBucket = workerTask.__taskBucketManager.getBucket1();
-      _trackBucketManager.setBucket1(workerBucket);
+      final TourTrack_Bucket workerBucket = workerTask.__taskBucketManager.getBucket_Painter();
+      _bucketManager_ForPainting.setBucket_Painter(workerBucket);
 
-      final boolean isOK = _trackBucketManager.fillOpenGLBufferData();
+      final boolean isDataAvailable = _bucketManager_ForPainting.fillOpenGLBufferData();
 
-      setReady(isOK);
+      setReady(isDataAvailable);
    }
 }

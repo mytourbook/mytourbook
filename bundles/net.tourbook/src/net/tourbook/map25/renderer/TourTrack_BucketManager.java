@@ -35,8 +35,8 @@ public class TourTrack_BucketManager {
     */
    private static final int SHORT_BYTES = 2;
 
-   private TourTrack_Bucket _trackBucket1;
-   private TourTrack_Bucket _trackBucket2;
+   private TourTrack_Bucket _trackBucket_Painter;
+   private TourTrack_Bucket _trackBucket_Worker;
 
    private ByteBuffer       _vertexColor_Buffer;
    private int              _vertexColor_BufferSize;
@@ -46,55 +46,52 @@ public class TourTrack_BucketManager {
     */
    int                      numShortsForDirectionArrows;
 
-   /**
-    * Number of {@link Short}'s used for the color coordinates
-    */
-   private int              numShortsForColorCoords;
 
    public TourTrack_BucketManager() {
 
    }
 
    /**
-    * cleanup only when buckets are not used by tile or bucket anymore!
+    * Cleanup only when buckets are not used by tile or bucket anymore!
     */
    public void clear() {
 
-      setBucket1(null);
-      _trackBucket2 = null;
+      setBucket_Painter(null);
+      _trackBucket_Worker = null;
    }
 
    /**
-    * Compile different types of buckets in one {@link #vbo_BufferObject VBO}.
+    * Fill OpenGL buffer with the vertices/color/direction arrow data.
     *
-    * @param addFill
-    *           Fill tile (add {@link #TILE_FILL_VERTICES 4} vertices).
-    * @return true if compilation succeeded.
+    * @return Returns <code>true</code> when data are available
     */
    public boolean fillOpenGLBufferData() {
 
-      final int numVertices = getNumberOfVertices();
+      final int numVertices = _trackBucket_Painter == null ? 0 : _trackBucket_Painter.numVertices * 4;
       if (numVertices <= 0) {
          return false;
       }
 
-      final int vertexColor_Size = numVertices;
-      numShortsForDirectionArrows = getNumberOfShortsForDirectionArrows();
-      numShortsForColorCoords = getNumberOfShortsForColorCoords();
+      final int numShortsForColorCoords = _trackBucket_Painter.directionArrow_colorCoords.size();
+      numShortsForDirectionArrows = _trackBucket_Painter.directionArrow_XYZPositions.size();
 
-      final ShortBuffer vertices_ShortBuffer = MapRenderer.getShortBuffer(numVertices);
+// SET_FORMATTING_OFF
+
+      final ShortBuffer vertices_ShortBuffer       = MapRenderer.getShortBuffer(numVertices);
       final ShortBuffer directionArrow_ShortBuffer = MapRenderer.getShortBuffer(numShortsForDirectionArrows);
-      final ShortBuffer colorCoords_ShortBuffer = MapRenderer.getShortBuffer(numShortsForColorCoords);
-      final ByteBuffer colorBuffer = getBuffer_Color(vertexColor_Size);
+      final ShortBuffer colorCoords_ShortBuffer    = MapRenderer.getShortBuffer(numShortsForColorCoords);
+      final ByteBuffer  colorBuffer                = getBuffer_Color(numVertices);
 
-      _trackBucket1.fillVerticesBuffer(vertices_ShortBuffer, colorBuffer);
+// SET_FORMATTING_ON
+
+      _trackBucket_Painter.fillVerticesBuffer(vertices_ShortBuffer, colorBuffer);
 
       /*
        * Direction arrows
        */
       {
          // set direction arrow shorts into the buffer
-         final ShortArrayList directionArrowVertices = _trackBucket1.directionArrow_XYZPositions;
+         final ShortArrayList directionArrowVertices = _trackBucket_Painter.directionArrow_XYZPositions;
          final int numBucketShorts = directionArrowVertices.size();
          directionArrow_ShortBuffer.put(directionArrowVertices.toArray(), 0, numBucketShorts);
 
@@ -102,7 +99,7 @@ public class TourTrack_BucketManager {
          gl.bufferData(GL.ARRAY_BUFFER, numShortsForDirectionArrows * SHORT_BYTES, directionArrow_ShortBuffer.flip(), GL.STATIC_DRAW);
 
          // append color coord shorts into the buffer
-         final ShortArrayList colorCoordsVertices = _trackBucket1.colorCoords;
+         final ShortArrayList colorCoordsVertices = _trackBucket_Painter.directionArrow_colorCoords;
          final int numColorBucketShorts = colorCoordsVertices.size();
          colorCoords_ShortBuffer.put(colorCoordsVertices.toArray(), 0, numColorBucketShorts);
 
@@ -124,7 +121,7 @@ public class TourTrack_BucketManager {
           * !!!
           */
          gl.bindBuffer(GL.ARRAY_BUFFER, TourTrack_Shader.bufferId_VerticesColor);
-         gl.bufferData(GL.ARRAY_BUFFER, vertexColor_Size, _vertexColor_Buffer.flip(), GL.STATIC_DRAW);
+         gl.bufferData(GL.ARRAY_BUFFER, numVertices, _vertexColor_Buffer.flip(), GL.STATIC_DRAW);
 
          gl.bindBuffer(GL.ARRAY_BUFFER, TourTrack_Shader.bufferId_Vertices);
          gl.bufferData(GL.ARRAY_BUFFER, numVertices * SHORT_BYTES, vertices_ShortBuffer.flip(), GL.STATIC_DRAW);
@@ -133,23 +130,23 @@ public class TourTrack_BucketManager {
       return true;
    }
 
-   TourTrack_Bucket getBucket1() {
+   TourTrack_Bucket getBucket_Painter() {
 
-      return _trackBucket1;
+      return _trackBucket_Painter;
    }
 
-   TourTrack_Bucket getBucket2() {
+   TourTrack_Bucket getBucket_Worker() {
 
       TourTrack_Bucket trackBucket = null;
 
-      if (_trackBucket2 != null) {
+      if (_trackBucket_Worker != null) {
 
-         trackBucket = _trackBucket2;
+         trackBucket = _trackBucket_Worker;
 
          return trackBucket;
       }
 
-      TourTrack_Bucket chainedBucked = _trackBucket1;
+      TourTrack_Bucket chainedBucked = _trackBucket_Painter;
 
       if (chainedBucked == null) {
 
@@ -158,8 +155,8 @@ public class TourTrack_BucketManager {
 
       } else {
 
-         if (_trackBucket2 != null) {
-            chainedBucked = _trackBucket2;
+         if (_trackBucket_Worker != null) {
+            chainedBucked = _trackBucket_Worker;
          }
       }
 
@@ -171,11 +168,11 @@ public class TourTrack_BucketManager {
 
             // insert at start
 
-            _trackBucket1 = trackBucket;
+            _trackBucket_Painter = trackBucket;
          }
       }
 
-      _trackBucket2 = trackBucket;
+      _trackBucket_Worker = trackBucket;
 
       return trackBucket;
    }
@@ -205,46 +202,17 @@ public class TourTrack_BucketManager {
    }
 
    /**
-    * @return Returns number of {@link Short}'s for the color coordinates
-    */
-   private int getNumberOfShortsForColorCoords() {
-
-      return _trackBucket1 == null
-
-            ? 0
-            : _trackBucket1.colorCoords.size();
-   }
-
-   /**
-    * @return Returns number of {@link Short}'s for the direction arrows
-    */
-   private int getNumberOfShortsForDirectionArrows() {
-
-      return _trackBucket1 == null
-
-            ? 0
-            : _trackBucket1.directionArrow_XYZPositions.size();
-   }
-
-   private int getNumberOfVertices() {
-
-      return _trackBucket1 == null
-            ? 0
-            : _trackBucket1.numVertices * 4;
-   }
-
-   /**
     * Set new bucket and clear previous
     */
-   public void setBucket1(final TourTrack_Bucket newBucket) {
+   public void setBucket_Painter(final TourTrack_Bucket newBucket) {
 
-      final TourTrack_Bucket previousBucket = _trackBucket1;
+      final TourTrack_Bucket previousPainterBucket = _trackBucket_Painter;
 
-      if (previousBucket != null) {
-         previousBucket.clear();
+      if (previousPainterBucket != null) {
+         previousPainterBucket.clear();
       }
 
-      _trackBucket1 = newBucket;
+      _trackBucket_Painter = newBucket;
    }
 
 }
