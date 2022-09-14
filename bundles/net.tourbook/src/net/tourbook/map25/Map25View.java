@@ -1705,7 +1705,7 @@ public class Map25View extends ViewPart implements
          }
       }
 
-      tourLayer.setPoints(_allGeoPoints, allGeoPointColors, _allTourStarts);
+      tourLayer.setupTourPositions(_allGeoPoints, allGeoPointColors, _allTourStarts);
 
       checkSliderIndices();
 

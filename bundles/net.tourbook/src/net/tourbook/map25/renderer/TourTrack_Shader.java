@@ -49,6 +49,11 @@ public final class TourTrack_Shader {
    static int                           bufferId_VerticesColor;
    static int                           bufferId_DirArrows;
    static int                           bufferId_DirArrows_ColorCoords;
+   static int                           bufferId_DirArrows_ArrowIndices;
+
+   static long                          dirArrowAnimation_StartTime;
+   private static float                 _dirArrowAnimation_CurrentArrowIndex;
+   private static long                  _dirArrowAnimation_LastUpdateTime;
 
    private static class DirectionArrowsShader extends GLShaderMT {
 
@@ -57,9 +62,13 @@ public final class TourTrack_Shader {
        */
       int shader_a_pos,
             shader_attrib_ColorCoord,
+            shader_attrib_ArrowIndices,
+
             shader_u_mvp,
 
             shader_uni_ArrowColors,
+            shader_uni_GlowArrowIndex,
+            shader_uni_GlowState,
             shader_uni_OutlineWidth,
             shader_uni_Vp2MpScale
 
@@ -78,11 +87,15 @@ public final class TourTrack_Shader {
             shader_u_mvp                  = getUniform("u_mvp");                 //$NON-NLS-1$
             shader_a_pos                  = getAttrib("a_pos");                  //$NON-NLS-1$
             shader_attrib_ColorCoord      = getAttrib("attrib_ColorCoord");      //$NON-NLS-1$
+            shader_attrib_ArrowIndices    = getAttrib("attrib_ArrowIndices");    //$NON-NLS-1$
 
 //          shader_u_width                = getUniform("u_width");               //$NON-NLS-1$
             shader_uni_ArrowColors        = getUniform("uni_ArrowColors");       //$NON-NLS-1$
             shader_uni_OutlineWidth       = getUniform("uni_OutlineWidth");      //$NON-NLS-1$
             shader_uni_Vp2MpScale         = getUniform("uni_Vp2MpScale");        //$NON-NLS-1$
+
+            shader_uni_GlowArrowIndex     = getUniform("uni_GlowArrowIndex");    //$NON-NLS-1$
+            shader_uni_GlowState          = getUniform("uni_GlowState");         //$NON-NLS-1$
 
    // SET_FORMATTING_ON
       }
@@ -136,6 +149,54 @@ public final class TourTrack_Shader {
       }
    }
 
+   private static float getGlowArrowIndex(final TourTrack_BucketManager bucketManager) {
+
+      // how many arrows are moved in one second
+      final int arrowsPerSecond = 3;
+
+      final long currentTimeMS = System.currentTimeMillis();
+
+      // update sequence in one second
+      final float secondsPerArrowSec = 1f / arrowsPerSecond;
+      final long secondsPerArrowMS = (long) (secondsPerArrowSec * 1000);
+
+      // ensure there not more arrows per second are displayed
+      final long nextUpdateTimeMS = _dirArrowAnimation_LastUpdateTime + secondsPerArrowMS;
+      final long timeDiffMS = nextUpdateTimeMS - currentTimeMS;
+      if (timeDiffMS > 0) {
+         return _dirArrowAnimation_CurrentArrowIndex;
+      }
+
+      // the last arrow is not displayed -> -1
+      final float maxDirArrows = Math.max(0, bucketManager.numDirectionArrows - 1);
+      final float maxLoopTime = maxDirArrows / arrowsPerSecond;
+
+      final float timeDiffSinceFirstRun = (float) ((currentTimeMS - dirArrowAnimation_StartTime) / 1000.0);
+      final float currentTimeIndex = timeDiffSinceFirstRun % maxLoopTime;
+
+      float glowArrowIndex = Math.round(currentTimeIndex * arrowsPerSecond);
+
+      // ensure to not jump back to the start when the end is not yet reached
+      if (glowArrowIndex < maxDirArrows) {
+         glowArrowIndex = _dirArrowAnimation_CurrentArrowIndex + 1;
+      }
+
+      // ensure to move not more than one arrow
+      if (glowArrowIndex > _dirArrowAnimation_CurrentArrowIndex + 1) {
+         glowArrowIndex = _dirArrowAnimation_CurrentArrowIndex + 1;
+      }
+
+      // ensure bounds
+      if (_dirArrowAnimation_CurrentArrowIndex > maxDirArrows - 1) {
+         glowArrowIndex = 0;
+      }
+
+      _dirArrowAnimation_CurrentArrowIndex = glowArrowIndex;
+      _dirArrowAnimation_LastUpdateTime = currentTimeMS;
+
+      return glowArrowIndex;
+   }
+
    /**
     * Performs OpenGL drawing commands of the renderBucket(s)
     *
@@ -178,7 +239,7 @@ public final class TourTrack_Shader {
     * @param renderBucketsAll
     * @return
     */
-   private static void paint_10_Track(final TourTrack_Bucket lineBucket,
+   private static void paint_10_Track(final TourTrack_Bucket trackBucket,
                                       final GLViewport viewport,
                                       final float vp2mpScale) {
 
@@ -281,116 +342,75 @@ public final class TourTrack_Shader {
       float heightOffset = 0;
       gl.uniform1f(shader_u_height, heightOffset);
 
-      if (lineBucket != null) {
+      final LineStyle lineStyle = trackBucket.lineStyle.current();
 
-         final LineStyle lineStyle = lineBucket.lineStyle.current();
+      final boolean isPaintOutline = trackConfig.isShowOutline;
+      final float outlineWidth = trackConfig.outlineWidth;
+      final float outlineBrightnessRaw = trackConfig.outlineBrighness; // -1.0 ... 1.0
+      final float outlineBrightness = outlineBrightnessRaw + 1; // 0...2
 
-         final boolean isPaintOutline = trackConfig.isShowOutline;
-         final float outlineWidth = trackConfig.outlineWidth;
-         final float outlineBrightnessRaw = trackConfig.outlineBrighness; // -1.0 ... 1.0
-         final float outlineBrightness = outlineBrightnessRaw + 1; // 0...2
+      gl.uniform1i(shader_uColorMode, trackBucket.lineColorMode);
 
-         gl.uniform1i(shader_uColorMode, lineBucket.lineColorMode);
+      if (lineStyle.heightOffset != trackBucket._heightOffset) {
+         trackBucket._heightOffset = lineStyle.heightOffset;
+      }
 
-         if (lineStyle.heightOffset != lineBucket._heightOffset) {
-            lineBucket._heightOffset = lineStyle.heightOffset;
-         }
+      if (trackBucket._heightOffset != heightOffset) {
 
-         if (lineBucket._heightOffset != heightOffset) {
-
-            heightOffset = lineBucket._heightOffset;
+         heightOffset = trackBucket._heightOffset;
 
 //          final double lineHeight = (heightOffset / groundResolution) / scale;
-            final double lineHeight = heightOffset * vp2mpScale;
+         final double lineHeight = heightOffset * vp2mpScale;
 
-            gl.uniform1f(shader_u_height, (float) lineHeight);
-         }
+         gl.uniform1f(shader_u_height, (float) lineHeight);
+      }
 
-         if (lineStyle.fadeScale < mapPosition.zoomLevel) {
+      if (lineStyle.fadeScale < mapPosition.zoomLevel) {
 
-            GLUtils.setColor(shader_u_color, lineStyle.color, 1);
+         GLUtils.setColor(shader_u_color, lineStyle.color, 1);
 
-         } else if (lineStyle.fadeScale > mapPosition.zoomLevel) {
+      } else if (lineStyle.fadeScale > mapPosition.zoomLevel) {
 
-            return;
+         return;
 
-         } else {
+      } else {
 
-            final float alpha = (float) (vp2mpScale > 1.2 ? vp2mpScale : 1.2) - 1;
-            GLUtils.setColor(shader_u_color, lineStyle.color, alpha);
-         }
+         final float alpha = (float) (vp2mpScale > 1.2 ? vp2mpScale : 1.2) - 1;
+         GLUtils.setColor(shader_u_color, lineStyle.color, alpha);
+      }
 
-         // set common alpha for the vertex color
-         final float vertexAlpha = ((lineStyle.color >>> 24) & 0xff) / 255f;
-         gl.uniform1f(shader_uVertexColorAlpha, vertexAlpha);
+      // set common alpha for the vertex color
+      final float vertexAlpha = ((lineStyle.color >>> 24) & 0xff) / 255f;
+      gl.uniform1f(shader_uVertexColorAlpha, vertexAlpha);
 
-         if (shaderMode == SHADER_PROJECTED && isBlur && lineStyle.blur == 0) {
-            gl.uniform1f(shader_u_fade, (float) pixel);
-            isBlur = false;
-         }
+      if (shaderMode == SHADER_PROJECTED && isBlur && lineStyle.blur == 0) {
+         gl.uniform1f(shader_u_fade, (float) pixel);
+         isBlur = false;
+      }
 
-         /*
-          * First draw the outline which is afterwards overwritten partly by the core line
-          */
-         if (isPaintOutline) {
+      /*
+       * First draw the outline which is afterwards overwritten partly by the core line
+       */
+      if (isPaintOutline) {
 
-            // core width
-            if (lineStyle.fixed) {
-               width = Math.max(lineStyle.width, 1) / vp2mpScale;
-            } else {
-               width = lineStyle.width / variableScale;
-            }
-
-            // add outline width
-            if (lineStyle.fixed) {
-               width += outlineWidth / vp2mpScale;
-            } else {
-               width += outlineWidth / variableScale;
-            }
-
-            gl.uniform1f(shader_u_width, (float) (width * COORD_SCALE_BY_DIR_SCALE));
-
-            // outline brighness
-            gl.uniform1f(shader_uOutlineBrightness, outlineBrightness);
-
-            // line-edge fade
-            if (lineStyle.blur > 0) {
-               gl.uniform1f(shader_u_fade, lineStyle.blur);
-               isBlur = true;
-            } else if (shaderMode == SHADER_FLAT) {
-               gl.uniform1f(shader_u_fade, (float) (pixel / width));
-            }
-
-            // cap mode
-            if (lineBucket._isCapRounded) {
-               if (capMode != CAP_ROUND) {
-                  capMode = CAP_ROUND;
-                  gl.uniform1i(shader_u_mode, capMode);
-               }
-            } else if (capMode != CAP_BUTT) {
-               capMode = CAP_BUTT;
-               gl.uniform1i(shader_u_mode, capMode);
-            }
-
-            gl.drawArrays(GL.TRIANGLE_STRIP, 0, lineBucket.numVertices);
-         }
-
-         /*
-          * Draw core line over the outline
-          */
-
-         // invert scaling of extrusion vectors so that line width stays the same.
+         // core width
          if (lineStyle.fixed) {
             width = Math.max(lineStyle.width, 1) / vp2mpScale;
          } else {
             width = lineStyle.width / variableScale;
          }
 
-         // disable outline brighness/darkness, this value is multiplied with the color
-         gl.uniform1f(shader_uOutlineBrightness, 1.0f);
+         // add outline width
+         if (lineStyle.fixed) {
+            width += outlineWidth / vp2mpScale;
+         } else {
+            width += outlineWidth / variableScale;
+         }
 
-         // factor to increase line width relative to scale
          gl.uniform1f(shader_u_width, (float) (width * COORD_SCALE_BY_DIR_SCALE));
+
+         // outline brighness
+         gl.uniform1f(shader_uOutlineBrightness, outlineBrightness);
 
          // line-edge fade
          if (lineStyle.blur > 0) {
@@ -401,7 +421,7 @@ public final class TourTrack_Shader {
          }
 
          // cap mode
-         if (lineBucket._isCapRounded) {
+         if (trackBucket._isCapRounded) {
             if (capMode != CAP_ROUND) {
                capMode = CAP_ROUND;
                gl.uniform1i(shader_u_mode, capMode);
@@ -411,80 +431,139 @@ public final class TourTrack_Shader {
             gl.uniform1i(shader_u_mode, capMode);
          }
 
-//          GLState.test(true, false);
-//          gl.depthMask(true);
-//          {
-//             gl.drawArrays(GL.TRIANGLE_STRIP, lineBucket.vertexOffset, lineBucket.numVertices);
-//          }
-//          gl.depthMask(false);
-
-         gl.drawArrays(GL.TRIANGLE_STRIP, 0, lineBucket.numVertices);
+         gl.drawArrays(GL.TRIANGLE_STRIP, 0, trackBucket.numVertices);
       }
+
+      /*
+       * Draw core line over the outline
+       */
+
+      // invert scaling of extrusion vectors so that line width stays the same.
+      if (lineStyle.fixed) {
+         width = Math.max(lineStyle.width, 1) / vp2mpScale;
+      } else {
+         width = lineStyle.width / variableScale;
+      }
+
+      // disable outline brighness/darkness, this value is multiplied with the color
+      gl.uniform1f(shader_uOutlineBrightness, 1.0f);
+
+      // factor to increase line width relative to scale
+      gl.uniform1f(shader_u_width, (float) (width * COORD_SCALE_BY_DIR_SCALE));
+
+      // line-edge fade
+      if (lineStyle.blur > 0) {
+         gl.uniform1f(shader_u_fade, lineStyle.blur);
+         isBlur = true;
+      } else if (shaderMode == SHADER_FLAT) {
+         gl.uniform1f(shader_u_fade, (float) (pixel / width));
+      }
+
+      // cap mode
+      if (trackBucket._isCapRounded) {
+         if (capMode != CAP_ROUND) {
+            capMode = CAP_ROUND;
+            gl.uniform1i(shader_u_mode, capMode);
+         }
+      } else if (capMode != CAP_BUTT) {
+         capMode = CAP_BUTT;
+         gl.uniform1i(shader_u_mode, capMode);
+      }
+
+//       GLState.test(true, false);
+//       gl.depthMask(true);
+//       {
+//          gl.drawArrays(GL.TRIANGLE_STRIP, lineBucket.vertexOffset, lineBucket.numVertices);
+//       }
+//       gl.depthMask(false);
+
+      gl.drawArrays(GL.TRIANGLE_STRIP, 0, trackBucket.numVertices);
    }
 
    private static void paint_20_DirectionArrows(final GLViewport viewport,
                                                 final TourTrack_BucketManager bucketManager,
                                                 final float vp2mpScale) {
 
-      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-
 // SET_FORMATTING_OFF
 
-      final DirectionArrowsShader shader  = _directionArrowShader;
+      final DirectionArrowsShader shader     = _directionArrowShader;
 
-      final int shader_a_pos              = shader.shader_a_pos;
-      final int shader_attrib_ColorCoord  = shader.shader_attrib_ColorCoord;
-      final int shader_u_mvp              = shader.shader_u_mvp;
-//    final int shader_u_width            = shader.shader_u_width;
-      final int shader_uni_ArrowColors    = shader.shader_uni_ArrowColors;
-      final int shader_uni_OutlineWidth   = shader.shader_uni_OutlineWidth;
-      final int shader_uni_Vp2MpScale     = shader.shader_uni_Vp2MpScale;
+      final int shader_a_pos                 = shader.shader_a_pos;
+      final int shader_attrib_ColorCoord     = shader.shader_attrib_ColorCoord;
+      final int shader_attrib_ArrowIndices   = shader.shader_attrib_ArrowIndices;
+
+//    final int shader_u_width               = shader.shader_u_width;
 
 // SET_FORMATTING_ON
 
       shader.useProgram();
 
-      // set mvp matrix into the shader
-      viewport.mvp.setAsUniform(shader_u_mvp);
+      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
+      final float glowState = 1;
+      final float glowArrowIndex = getGlowArrowIndex(bucketManager);
+
+      // set mvp matrix into the shader
+      viewport.mvp.setAsUniform(shader.shader_u_mvp);
+
+      // vertices position
       gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows);
       gl.enableVertexAttribArray(shader_a_pos);
       gl.vertexAttribPointer(
 
-            shader_a_pos, //           index of the vertex attribute that is to be modified
-            4, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
-            GL.SHORT, //               data type of each component in the array
-            false, //                  values should be normalized
-            0, //                      offset in bytes between the beginning of consecutive vertex attributes
-            0 //                       offset in bytes of the first component in the vertex attribute array
+            shader_a_pos, //                 index of the vertex attribute that is to be modified
+            4, //                            number of components per vertex attribute, must be 1, 2, 3, or 4
+            GL.SHORT, //                     data type of each component in the array
+            false, //                        values should be normalized
+            0, //                            offset in bytes between the beginning of consecutive vertex attributes
+            0 //                             offset in bytes of the first component in the vertex attribute array
       );
 
+      // direction arrow color
       gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows_ColorCoords);
       gl.enableVertexAttribArray(shader_attrib_ColorCoord);
       gl.vertexAttribPointer(
 
-            shader_attrib_ColorCoord, //    index of the vertex attribute that is to be modified
-            3, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
-            GL.SHORT, //               data type of each component in the array
-            false, //                  values should be normalized
-            0, //                      offset in bytes between the beginning of consecutive vertex attributes
-            0 //                       offset in bytes of the first component in the vertex attribute array
+            shader_attrib_ColorCoord, //     index of the vertex attribute that is to be modified
+            3, //                            number of components per vertex attribute, must be 1, 2, 3, or 4
+            GL.SHORT, //                     data type of each component in the array
+            false, //                        values should be normalized
+            0, //                            offset in bytes between the beginning of consecutive vertex attributes
+            0 //                             offset in bytes of the first component in the vertex attribute array
       );
 
-//       final float width = 10 / vp2mpScale;
+      // arrow index
+      gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows_ArrowIndices);
+      gl.enableVertexAttribArray(shader_attrib_ArrowIndices);
+      gl.vertexAttribPointer(
+
+            shader_attrib_ArrowIndices, //   index of the vertex attribute that is to be modified
+            1, //                            number of components per vertex attribute, must be 1, 2, 3, or 4
+            GL.FLOAT, //                     data type of each component in the array
+            false, //                        values should be normalized
+            0, //                            offset in bytes between the beginning of consecutive vertex attributes
+            0 //                             offset in bytes of the first component in the vertex attribute array
+      );
+
+//    final float width = 10 / vp2mpScale;
 //
-//       gl.uniform1f(shader_u_width, width * COORD_SCALE_BY_DIR_SCALE);
+//    gl.uniform1f(shader_u_width, width * COORD_SCALE_BY_DIR_SCALE);
 
       // arrow colors
       final float arrowColors[] = trackConfig.getArrowColors();
-      gl.uniform4fv(shader_uni_ArrowColors, arrowColors.length / 4, arrowColors, 0);
+      gl.uniform4fv(shader.shader_uni_ArrowColors, arrowColors.length / 4, arrowColors, 0);
 
       // outline width's
-      gl.uniform2f(shader_uni_OutlineWidth,
+      gl.uniform2f(shader.shader_uni_OutlineWidth,
             trackConfig.arrowWing_OutlineWidth / 200f,
             trackConfig.arrowFin_OutlineWidth / 200f);
 
-      gl.uniform1f(shader_uni_Vp2MpScale, vp2mpScale);
+      // viewport to map scale: 1.0...2.0
+      gl.uniform1f(shader.shader_uni_Vp2MpScale, vp2mpScale);
+
+      // glowing
+      gl.uniform1f(shader.shader_uni_GlowArrowIndex, glowArrowIndex);
+      gl.uniform1f(shader.shader_uni_GlowState, glowState);
 
       /*
        * Draw direction arrows
@@ -492,7 +571,7 @@ public final class TourTrack_Shader {
       GLState.test(true, false);
       gl.depthMask(true);
       {
-         gl.drawArrays(GL.TRIANGLES, 0, bucketManager.numShortsForDirectionArrows);
+         gl.drawArrays(GL.TRIANGLES, 0, bucketManager.numDirectionArrowVertices);
       }
       gl.depthMask(false);
 
@@ -511,6 +590,7 @@ public final class TourTrack_Shader {
       // create buffer id's
       bufferId_DirArrows               = gl.genBuffer();
       bufferId_DirArrows_ColorCoords   = gl.genBuffer();
+      bufferId_DirArrows_ArrowIndices  = gl.genBuffer();
       bufferId_Vertices                = gl.genBuffer();
       bufferId_VerticesColor           = gl.genBuffer();
 

@@ -128,103 +128,104 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * <b>Before releasing, set this to <code>true</code></b>
     * <p>
     */
-   private static final boolean    IS_USING_VTM_PRODUCTION_PLUGIN                = true;
+   private static final boolean                 IS_USING_VTM_PRODUCTION_PLUGIN                = true;
    //
-   private static final String     STATE_LAYER_BUILDING_IS_SHOW_SHADOW           = "STATE_LAYER_BUILDING_IS_SHOW_SHADOW";          //$NON-NLS-1$
-   private static final String     STATE_LAYER_BUILDING_IS_VISIBLE               = "STATE_LAYER_BUILDING_IS_VISIBLE";              //$NON-NLS-1$
-   private static final String     STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL           = "STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL";          //$NON-NLS-1$
-   private static final String     STATE_LAYER_BUILDING_SUN_DAY_TIME             = "STATE_LAYER_BUILDING_SUN_DAY_TIME";            //$NON-NLS-1$
-   private static final String     STATE_LAYER_BUILDING_SUN_RISE_SET_TIME        = "STATE_LAYER_BUILDING_SUN_RISE_SET_TIME";       //$NON-NLS-1$
-   private static final String     STATE_LAYER_CARTOGRAPHY_IS_LUMINANCE          = "STATE_LAYER_CARTOGRAPHY_IS_LUMINANCE";         //$NON-NLS-1$
-   private static final String     STATE_LAYER_CARTOGRAPHY_LUMINANCE             = "STATE_LAYER_CARTOGRAPHY_LUMINANCE";            //$NON-NLS-1$
-   private static final String     STATE_LAYER_LABEL_IS_VISIBLE                  = "STATE_LAYER_LABEL_IS_VISIBLE";                 //$NON-NLS-1$
-   private static final String     STATE_LAYER_LABEL_IS_BEFORE_BUILDING          = "STATE_LAYER_LABEL_IS_BEFORE_BUILDING";         //$NON-NLS-1$
+   private static final String                  STATE_LAYER_BUILDING_IS_SHOW_SHADOW           = "STATE_LAYER_BUILDING_IS_SHOW_SHADOW";          //$NON-NLS-1$
+   private static final String                  STATE_LAYER_BUILDING_IS_VISIBLE               = "STATE_LAYER_BUILDING_IS_VISIBLE";              //$NON-NLS-1$
+   private static final String                  STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL           = "STATE_LAYER_BUILDING_MIN_ZOOM_LEVEL";          //$NON-NLS-1$
+   private static final String                  STATE_LAYER_BUILDING_SUN_DAY_TIME             = "STATE_LAYER_BUILDING_SUN_DAY_TIME";            //$NON-NLS-1$
+   private static final String                  STATE_LAYER_BUILDING_SUN_RISE_SET_TIME        = "STATE_LAYER_BUILDING_SUN_RISE_SET_TIME";       //$NON-NLS-1$
+   private static final String                  STATE_LAYER_CARTOGRAPHY_IS_LUMINANCE          = "STATE_LAYER_CARTOGRAPHY_IS_LUMINANCE";         //$NON-NLS-1$
+   private static final String                  STATE_LAYER_CARTOGRAPHY_LUMINANCE             = "STATE_LAYER_CARTOGRAPHY_LUMINANCE";            //$NON-NLS-1$
+   private static final String                  STATE_LAYER_LABEL_IS_VISIBLE                  = "STATE_LAYER_LABEL_IS_VISIBLE";                 //$NON-NLS-1$
+   private static final String                  STATE_LAYER_LABEL_IS_BEFORE_BUILDING          = "STATE_LAYER_LABEL_IS_BEFORE_BUILDING";         //$NON-NLS-1$
    //
-   private static final String     STATE_MAP_CENTER_VERTICAL_POSITION_IS_ENABLED = "STATE_MAP_CENTER_VERTICAL_POSITION_IS_ENABLED";//$NON-NLS-1$
-   private static final String     STATE_MAP_CENTER_VERTICAL_POSITION            = "STATE_MAP_CENTER_VERTICAL_POSITION";           //$NON-NLS-1$
-   private static final String     STATE_MAP_POS_X                               = "STATE_MAP_POS_X";                              //$NON-NLS-1$
-   private static final String     STATE_MAP_POS_Y                               = "STATE_MAP_POS_Y";                              //$NON-NLS-1$
-   private static final String     STATE_MAP_POS_ZOOM_LEVEL                      = "STATE_MAP_POS_ZOOM_LEVEL";                     //$NON-NLS-1$
-   private static final String     STATE_MAP_POS_BEARING                         = "STATE_MAP_POS_BEARING";                        //$NON-NLS-1$
-   private static final String     STATE_MAP_POS_SCALE                           = "STATE_MAP_POS_SCALE";                          //$NON-NLS-1$
-   private static final String     STATE_MAP_POS_TILT                            = "STATE_MAP_POS_TILT";                           //$NON-NLS-1$
-   private static final String     STATE_SELECTED_MAP25_PROVIDER_ID              = "STATE_SELECTED_MAP25_PROVIDER_ID";             //$NON-NLS-1$
-   private static final String     STATE_SUFFIX_MAP_CURRENT_POSITION             = "MapCurrentPosition";                           //$NON-NLS-1$
-   static final String             STATE_SUFFIX_MAP_DEFAULT_POSITION             = "MapDefaultPosition";                           //$NON-NLS-1$
+   private static final String                  STATE_MAP_CENTER_VERTICAL_POSITION_IS_ENABLED = "STATE_MAP_CENTER_VERTICAL_POSITION_IS_ENABLED";//$NON-NLS-1$
+   private static final String                  STATE_MAP_CENTER_VERTICAL_POSITION            = "STATE_MAP_CENTER_VERTICAL_POSITION";           //$NON-NLS-1$
+   private static final String                  STATE_MAP_POS_X                               = "STATE_MAP_POS_X";                              //$NON-NLS-1$
+   private static final String                  STATE_MAP_POS_Y                               = "STATE_MAP_POS_Y";                              //$NON-NLS-1$
+   private static final String                  STATE_MAP_POS_ZOOM_LEVEL                      = "STATE_MAP_POS_ZOOM_LEVEL";                     //$NON-NLS-1$
+   private static final String                  STATE_MAP_POS_BEARING                         = "STATE_MAP_POS_BEARING";                        //$NON-NLS-1$
+   private static final String                  STATE_MAP_POS_SCALE                           = "STATE_MAP_POS_SCALE";                          //$NON-NLS-1$
+   private static final String                  STATE_MAP_POS_TILT                            = "STATE_MAP_POS_TILT";                           //$NON-NLS-1$
+   private static final String                  STATE_SELECTED_MAP25_PROVIDER_ID              = "STATE_SELECTED_MAP25_PROVIDER_ID";             //$NON-NLS-1$
+   private static final String                  STATE_SUFFIX_MAP_CURRENT_POSITION             = "MapCurrentPosition";                           //$NON-NLS-1$
+   static final String                          STATE_SUFFIX_MAP_DEFAULT_POSITION             = "MapDefaultPosition";                           //$NON-NLS-1$
    //
-   public static final String      THEME_STYLE_ALL                               = "theme-style-all";                              //$NON-NLS-1$
+   public static final String                   THEME_STYLE_ALL                               = "theme-style-all";                              //$NON-NLS-1$
    //
-   public static final float       SUN_TIME_RANGE                                = 10;
-   public static final float       SUN_TIME_DETAIL_RANGE                         = 50;
+   public static final float                    SUN_TIME_RANGE                                = 10;
+   public static final float                    SUN_TIME_DETAIL_RANGE                         = 50;
    //
-   public static final float       MAP_CENTER_VERTICAL_MAX_VALUE                 = 100.0f;
+   public static final float                    MAP_CENTER_VERTICAL_MAX_VALUE                 = 100.0f;
    //
-   private static IDialogSettings  _state;
+   private static IDialogSettings               _state;
    //
-   private static Map25View        _map25View;
-   private static LwjglApplication _lwjglApp;
+   private static Map25View                     _map25View;
+   private static LwjglApplication              _lwjglApp;
+   private static LwjglApplicationConfiguration _appConfig;
    //
-   private Map25Provider           _selectedMapProvider;
+   private Map25Provider                        _selectedMapProvider;
    //
-   private String                  _mapDefaultLanguage                           = Locale.getDefault().toString();
-   private BitmapTileSource        _hillshadingSource;
-   private BitmapTileSource        _satelliteSource;
+   private String                               _mapDefaultLanguage                           = Locale.getDefault().toString();
+   private BitmapTileSource                     _hillshadingSource;
+   private BitmapTileSource                     _satelliteSource;
    //
-   private int                     _numOfflineMapFiles                           = 0;
+   private int                                  _numOfflineMapFiles                           = 0;
    //
-   private String                  _mp_key                                       = "80d7bc63-94fe-416f-a63f-7173f81a484c";         //$NON-NLS-1$
+   private String                               _mp_key                                       = "80d7bc63-94fe-416f-a63f-7173f81a484c";         //$NON-NLS-1$
    //
    /**
     * The opacity can be set in the layer but not read. This will keep the state of the hillshading
     * opacity.
     */
-   private int                     _layer_HillShading_Opacity;
+   private int                                  _layer_HillShading_Opacity;
    //
-   private Bool                    _building_IsShowShadow;
-   private boolean                 _building_IsVisible;
-   private int                     _building_MinZoomLevel;
-   private SunDayTime              _building_SunDaytime;
+   private Bool                                 _building_IsShowShadow;
+   private boolean                              _building_IsVisible;
+   private int                                  _building_MinZoomLevel;
+   private SunDayTime                           _building_SunDaytime;
    //
    /**
     * Relative time <code>0...1</code> between sunset and sunrise
     */
-   private float                   _building_Sunrise_Sunset_Time;
+   private float                                _building_Sunrise_Sunset_Time;
    //
-   private Bool                    _currentBuilding_IsShowShadow;
-   private int                     _currentBuilding_MinZoomLevel;
-   private IRenderTheme            _currentBuilding_RenderTheme;
-   private SunDayTime              _currentBuilding_SunDayTime;
-   private float                   _currentBuilding_Sunrise_Sunset_Time;
+   private Bool                                 _currentBuilding_IsShowShadow;
+   private int                                  _currentBuilding_MinZoomLevel;
+   private IRenderTheme                         _currentBuilding_RenderTheme;
+   private SunDayTime                           _currentBuilding_SunDayTime;
+   private float                                _currentBuilding_Sunrise_Sunset_Time;
    //
-   private boolean                 _cartography_IsLuminance;
-   private float                   _cartography_Luminance;
-   private RuleVisitor_Luminance   _ruleVisitor_Luminance                        = new RuleVisitor_Luminance();
+   private boolean                              _cartography_IsLuminance;
+   private float                                _cartography_Luminance;
+   private RuleVisitor_Luminance                _ruleVisitor_Luminance                        = new RuleVisitor_Luminance();
    //
-   private boolean                 _layer_Label_IsVisible;
-   private boolean                 _layer_Label_IsBeforeBuilding;
+   private boolean                              _layer_Label_IsVisible;
+   private boolean                              _layer_Label_IsBeforeBuilding;
    //
-   private OsmTileLayerMT          _layer_BaseMap;
-   private S3DBLayer               _layer_Building_S3DB;
-   private GenericLayer            _layer_Building_S3DB_SunUpdate;
-   private CompassRoseLayer        _layer_CompassRose;
-   private Layer                   _layer_HillShading_AFTER;
-   private BitmapTileLayer         _layer_HillShading_TILE_LOADING;
-   private LabelLayerMT            _layer_Label;
-   private LegendLayer             _layer_Legend;
-   private ItemizedLayer           _layer_MapBookmark_VARYING;
-   private ItemizedLayer           _layer_MapBookmark_Clustered;
-   private ItemizedLayer           _layer_MapBookmark_NotClustered;
-   private ItemizedLayer           _layer_Photo_VARYING;
-   private ItemizedLayer           _layer_Photo_Clustered;
-   private ItemizedLayer           _layer_Photo_NotCluster;
-   private Layer                   _layer_Satellite_AFTER;
-   private BitmapTileLayer         _layer_Satellite_TILE_LOADING;
-   private MapScaleBarLayer        _layer_ScaleBar;
-   private SliderLocation_Layer    _layer_SliderLocation;
-   private SliderPath_Layer        _layer_SliderPath;
-   private TileGridLayerMT         _layer_TileInfo;
-   private TourTrack_Layer               _layer_Tour;
-   private MarkerLayerMT           _layer_TourMarker;
+   private OsmTileLayerMT                       _layer_BaseMap;
+   private S3DBLayer                            _layer_Building_S3DB;
+   private GenericLayer                         _layer_Building_S3DB_SunUpdate;
+   private CompassRoseLayer                     _layer_CompassRose;
+   private Layer                                _layer_HillShading_AFTER;
+   private BitmapTileLayer                      _layer_HillShading_TILE_LOADING;
+   private LabelLayerMT                         _layer_Label;
+   private LegendLayer                          _layer_Legend;
+   private ItemizedLayer                        _layer_MapBookmark_VARYING;
+   private ItemizedLayer                        _layer_MapBookmark_Clustered;
+   private ItemizedLayer                        _layer_MapBookmark_NotClustered;
+   private ItemizedLayer                        _layer_Photo_VARYING;
+   private ItemizedLayer                        _layer_Photo_Clustered;
+   private ItemizedLayer                        _layer_Photo_NotCluster;
+   private Layer                                _layer_Satellite_AFTER;
+   private BitmapTileLayer                      _layer_Satellite_TILE_LOADING;
+   private MapScaleBarLayer                     _layer_ScaleBar;
+   private SliderLocation_Layer                 _layer_SliderLocation;
+   private SliderPath_Layer                     _layer_SliderPath;
+   private TileGridLayerMT                      _layer_TileInfo;
+   private TourTrack_Layer                      _layer_Tour;
+   private MarkerLayerMT                        _layer_TourMarker;
    //
 //   private OpenGLTestLayer         _layer_OpenGLTest;
    //
@@ -484,7 +485,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       final Map25App mapApp = new Map25App(state);
 
-      _lwjglApp = new LwjglApplication(mapApp, getConfig(), canvas);
+      _appConfig = getConfig();
+      _lwjglApp = new LwjglApplication(mapApp, _appConfig, canvas);
 
       return mapApp;
    }
@@ -500,8 +502,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       appConfig.height = 1000;
       appConfig.stencil = 8;
       appConfig.samples = 2;
-      appConfig.foregroundFPS = 30;
-      appConfig.backgroundFPS = 10;
 
       appConfig.forceExit = false;
 
@@ -511,7 +511,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       /*
        * Reduce CPU cycles
        */
-      appConfig.pauseWhenBackground = true;
+      appConfig.pauseWhenBackground = false;
 
       //  0 = do not sleep
       // -1 = do not render
@@ -661,6 +661,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    public void create() {
 
       super.create();
+
+      // this is necessary for animations
+      _lwjglApp.getGraphics().setContinuousRendering(true);
+      _appConfig.backgroundFPS = 1;
+      _appConfig.foregroundFPS = 20;
 
       /**
        * Overwrite input handler, using own GdxMap.create() method didn't work :-(

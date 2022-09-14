@@ -108,14 +108,17 @@ public class TourTrack_Bucket {
     * Source:
     * https://stackoverflow.com/questions/137629/how-do-you-render-primitives-as-wireframes-in-opengl#answer-33004265
     */
-   protected ShortArrayList             directionArrow_colorCoords;
+   protected ShortArrayList             directionArrow_ColorCoords;
+
+   protected FloatArrayList             directionArrow_ArrowIndices;
 
    public TourTrack_Bucket() {
 
       vertexItems = new TourTrack_VertexData();
 
       directionArrow_XYZPositions = new ShortArrayList();
-      directionArrow_colorCoords = new ShortArrayList();
+      directionArrow_ColorCoords = new ShortArrayList();
+      directionArrow_ArrowIndices = new FloatArrayList();
    }
 
    /**
@@ -643,7 +646,8 @@ public class TourTrack_Bucket {
                                       final short pOnLineY,
                                       final short arrowZ,
                                       final short finTopZ,
-                                      final short arrowPart_Fin) {
+                                      final short arrowPart_Fin,
+                                      final int arrowIndex) {
 // SET_FORMATTING_OFF
 
       // fin: middle
@@ -653,11 +657,17 @@ public class TourTrack_Bucket {
             pOnLineX,   pOnLineY,   finTopZ, arrowPart_Fin,
             pBackX,     pBackY,     arrowZ,  arrowPart_Fin);
 
-      directionArrow_colorCoords.addAll(
+      directionArrow_ColorCoords.addAll(
 
             (short) 1, (short) 1, (short) 0,
             (short) 0, (short) 1, (short) 0,
             (short) 0, (short) 0, (short) 1);
+
+      directionArrow_ArrowIndices.addAll(
+
+            arrowIndex,
+            arrowIndex,
+            arrowIndex);
 
 // SET_FORMATTING_ON
    }
@@ -670,7 +680,8 @@ public class TourTrack_Bucket {
                                       final short pRightY,
                                       final short arrowZ,
                                       final short finBottomZ,
-                                      final short arrowPart_Fin) {
+                                      final short arrowPart_Fin,
+                                      final int arrowIndex) {
 // SET_FORMATTING_OFF
 
       directionArrow_XYZPositions.addAll(
@@ -685,7 +696,7 @@ public class TourTrack_Bucket {
             pRightX,    pRightY,    arrowZ,     arrowPart_Fin,
             pRightX,    pRightY,    finBottomZ, arrowPart_Fin);
 
-      directionArrow_colorCoords.addAll(
+      directionArrow_ColorCoords.addAll(
 
             (short) 1, (short) 0, (short) 0,
             (short) 0, (short) 1, (short) 0,
@@ -694,6 +705,16 @@ public class TourTrack_Bucket {
             (short) 0, (short) 1, (short) 0,
             (short) 1, (short) 0, (short) 0,
             (short) 0, (short) 0, (short) 1);
+
+      directionArrow_ArrowIndices.addAll(
+
+            arrowIndex,
+            arrowIndex,
+            arrowIndex,
+
+            arrowIndex,
+            arrowIndex,
+            arrowIndex);
 
 // SET_FORMATTING_ON
    }
@@ -707,7 +728,8 @@ public class TourTrack_Bucket {
                                   final short pBackX,
                                   final short pBackY,
                                   final short arrowZ,
-                                  final short arrowPart_Wing) {
+                                  final short arrowPart_Wing,
+                                  final int arrowIndex) {
 // SET_FORMATTING_OFF
 
       /*
@@ -727,7 +749,7 @@ public class TourTrack_Bucket {
             pBackX,     pBackY,  arrowZ,     arrowPart_Wing,
             pRight,     pRightY, arrowZ,     arrowPart_Wing);
 
-      directionArrow_colorCoords.addAll(
+      directionArrow_ColorCoords.addAll(
 
             (short) 1, (short) 0, (short) 0,
             (short) 0, (short) 1, (short) 1,
@@ -736,6 +758,16 @@ public class TourTrack_Bucket {
             (short) 1, (short) 0, (short) 0,
             (short) 0, (short) 1, (short) 1,
             (short) 0, (short) 0, (short) 1);
+
+      directionArrow_ArrowIndices.addAll(
+
+            arrowIndex,
+            arrowIndex,
+            arrowIndex,
+
+            arrowIndex,
+            arrowIndex,
+            arrowIndex);
 
 // SET_FORMATTING_ON
    }
@@ -747,7 +779,8 @@ public class TourTrack_Bucket {
    public void createDirectionArrowVertices(final FloatArrayList allDirectionArrowPixel_Raw) {
 
       directionArrow_XYZPositions.clear();
-      directionArrow_colorCoords.clear();
+      directionArrow_ColorCoords.clear();
+      directionArrow_ArrowIndices.clear();
 
       // at least 2 positions are needed
       if (allDirectionArrowPixel_Raw.size() < 4) {
@@ -871,9 +904,6 @@ public class TourTrack_Bucket {
 
 // SET_FORMATTING_OFF
 
-         final short arrowPart_Wing    = 0;
-         final short arrowPart_Fin     = 1;
-
          final short p2X_scaled        = (short) (p2X       * COORD_SCALE);
          final short p2Y_scaled        = (short) (p2Y       * COORD_SCALE);
          final short pLeftX_scaled     = (short) (pLeftX    * COORD_SCALE);
@@ -884,6 +914,11 @@ public class TourTrack_Bucket {
          final short pBackY_scaled     = (short) (pBackY    * COORD_SCALE);
          final short pOnLineX_scaled   = (short) (pOnLineX  * COORD_SCALE);
          final short pOnLineY_scaled   = (short) (pOnLineY  * COORD_SCALE);
+
+         final short arrowPart_Wing    = 0;
+         final short arrowPart_Fin     = 1;
+
+         final int arrowIndex = (pixelIndex - 2) / 2;
 
 
          /**
@@ -901,14 +936,16 @@ public class TourTrack_Bucket {
                                     pRight_Xscaled,   pRightY_scaled,
                                     pBackX_scaled,    pBackY_scaled,
                                     arrowZ,
-                                    arrowPart_Wing);
+                                    arrowPart_Wing,
+                                    arrowIndex);
 
             createArrow_MiddleFin(  p2X_scaled,       p2Y_scaled,
                                     pBackX_scaled,    pBackY_scaled,
                                     pOnLineX_scaled,  pOnLineY_scaled,
                                     arrowZ,
                                     finTopZ,
-                                    arrowPart_Fin);
+                                    arrowPart_Fin,
+                                    arrowIndex);
 
             break;
 
@@ -919,14 +956,16 @@ public class TourTrack_Bucket {
                                     pRight_Xscaled,   pRightY_scaled,
                                     pBackX_scaled,    pBackY_scaled,
                                     arrowZ,
-                                    arrowPart_Wing);
+                                    arrowPart_Wing,
+                                    arrowIndex);
 
             createArrow_OuterFins(  p2X_scaled,       p2Y_scaled,
                                     pLeftX_scaled,    pLeftY_scaled,
                                     pRight_Xscaled,   pRightY_scaled,
                                     arrowZ,
                                     finBottomZ,
-                                    arrowPart_Fin);
+                                    arrowPart_Fin,
+                                    arrowIndex);
 
             break;
 
@@ -937,7 +976,8 @@ public class TourTrack_Bucket {
                                     pOnLineX_scaled,  pOnLineY_scaled,
                                     arrowZ,
                                     finTopZ,
-                                    arrowPart_Fin);
+                                    arrowPart_Fin,
+                                    arrowIndex);
             break;
 
          case OUTER_FINS:
@@ -947,7 +987,8 @@ public class TourTrack_Bucket {
                                     pRight_Xscaled,   pRightY_scaled,
                                     arrowZ,
                                     finBottomZ,
-                                    arrowPart_Fin);
+                                    arrowPart_Fin,
+                                    arrowIndex);
 
             break;
 
@@ -958,7 +999,8 @@ public class TourTrack_Bucket {
                                     pRight_Xscaled,   pRightY_scaled,
                                     pBackX_scaled,    pBackY_scaled,
                                     arrowZ,
-                                    arrowPart_Wing);
+                                    arrowPart_Wing,
+                                    arrowIndex);
             break;
          }
 

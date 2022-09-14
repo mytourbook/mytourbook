@@ -631,7 +631,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             : viewport.view);
    }
 
-   public void setPoints(final GeoPoint[] allGeoPoints, final int[] allGeoPointColors, final IntArrayList allTourStarts) {
+   public void setupTourPositions(final GeoPoint[] allGeoPoints, final int[] allGeoPointColors, final IntArrayList allTourStarts) {
 
       synchronized (_allGeoPoints) {
 
@@ -647,6 +647,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _isUpdatePoints = true;
 
       setIsUpdateLayer(true);
+
+      // set start time for the direction arrow animation
+      TourTrack_Shader.dirArrowAnimation_StartTime = System.currentTimeMillis();
    }
 
    @Override

@@ -51,8 +51,8 @@ public class TourTrack_Layer extends Layer {
       _tourTrackRenderer.onModifyConfig(isVerticesModified);
    }
 
-   public void setPoints(final GeoPoint[] allGeoPoints, final int[] allGeoPointColors, final IntArrayList allTourStarts) {
+   public void setupTourPositions(final GeoPoint[] allGeoPoints, final int[] allGeoPointColors, final IntArrayList allTourStarts) {
 
-      _tourTrackRenderer.setPoints(allGeoPoints, allGeoPointColors, allTourStarts);
+      _tourTrackRenderer.setupTourPositions(allGeoPoints, allGeoPointColors, allTourStarts);
    }
 }

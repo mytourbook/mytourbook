@@ -19,8 +19,10 @@ import static org.oscim.backend.GLAdapter.gl;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.GL;
 import org.oscim.renderer.MapRenderer;
@@ -34,6 +36,7 @@ public class TourTrack_BucketManager {
     * Number of bytes for a <b>short</b> value
     */
    private static final int SHORT_BYTES = 2;
+   private static final int FLOAT_BYTES = 4;
 
    private TourTrack_Bucket _trackBucket_Painter;
    private TourTrack_Bucket _trackBucket_Worker;
@@ -44,8 +47,12 @@ public class TourTrack_BucketManager {
    /**
     * Number of {@link Short}'s used for the direction arrows
     */
-   int                      numShortsForDirectionArrows;
+   int                      numDirectionArrowVertices;
 
+   /**
+    * Number of direction arrows
+    */
+   float                    numDirectionArrows;
 
    public TourTrack_BucketManager() {
 
@@ -67,50 +74,74 @@ public class TourTrack_BucketManager {
     */
    public boolean fillOpenGLBufferData() {
 
-      final int numVertices = _trackBucket_Painter == null ? 0 : _trackBucket_Painter.numVertices * 4;
-      if (numVertices <= 0) {
+      final int numTrackVertices = _trackBucket_Painter == null ? 0 : _trackBucket_Painter.numVertices * 4;
+      if (numTrackVertices <= 0) {
          return false;
       }
 
-      final int numShortsForColorCoords = _trackBucket_Painter.directionArrow_colorCoords.size();
-      numShortsForDirectionArrows = _trackBucket_Painter.directionArrow_XYZPositions.size();
-
 // SET_FORMATTING_OFF
 
-      final ShortBuffer vertices_ShortBuffer       = MapRenderer.getShortBuffer(numVertices);
-      final ShortBuffer directionArrow_ShortBuffer = MapRenderer.getShortBuffer(numShortsForDirectionArrows);
-      final ShortBuffer colorCoords_ShortBuffer    = MapRenderer.getShortBuffer(numShortsForColorCoords);
-      final ByteBuffer  colorBuffer                = getBuffer_Color(numVertices);
+      final ShortArrayList dirArrow_ColorCoords    = _trackBucket_Painter.directionArrow_ColorCoords;
+      final ShortArrayList dirArrow_TrackVertices  = _trackBucket_Painter.directionArrow_XYZPositions;
+      final FloatArrayList dirArrow_ArrowIndices   = _trackBucket_Painter.directionArrow_ArrowIndices;
+
+
+      final int numDirArrow_ColorCoords = dirArrow_ColorCoords.size();
+      final int numDirArrow_WingIndices = dirArrow_ArrowIndices.size();
+
+      numDirectionArrows = numDirArrow_WingIndices == 0 ? 0 : dirArrow_ArrowIndices.getLast();
+      numDirectionArrowVertices = dirArrow_TrackVertices.size();
+
+
+      final ShortBuffer buffer_TrackVertices          = MapRenderer.getShortBuffer(numTrackVertices);
+      final ByteBuffer  buffer_TrackColors            = getBuffer_Color(numTrackVertices);
+
+      final ShortBuffer buffer_DirArrow_Vertices      = MapRenderer.getShortBuffer(numDirectionArrowVertices);
+      final ShortBuffer buffer_DirArrow_ColorCoords   = MapRenderer.getShortBuffer(numDirArrow_ColorCoords);
+      final FloatBuffer buffer_DirArrow_WingIndices   = MapRenderer.getFloatBuffer(numDirArrow_WingIndices);
 
 // SET_FORMATTING_ON
 
-      _trackBucket_Painter.fillVerticesBuffer(vertices_ShortBuffer, colorBuffer);
+      _trackBucket_Painter.fillVerticesBuffer(buffer_TrackVertices, buffer_TrackColors);
 
       /*
        * Direction arrows
        */
       {
+         /*
+          * Vertices
+          */
          // set direction arrow shorts into the buffer
-         final ShortArrayList directionArrowVertices = _trackBucket_Painter.directionArrow_XYZPositions;
-         final int numBucketShorts = directionArrowVertices.size();
-         directionArrow_ShortBuffer.put(directionArrowVertices.toArray(), 0, numBucketShorts);
+         buffer_DirArrow_Vertices.put(dirArrow_TrackVertices.toArray(), 0, numDirectionArrowVertices);
 
          gl.bindBuffer(GL.ARRAY_BUFFER, TourTrack_Shader.bufferId_DirArrows);
-         gl.bufferData(GL.ARRAY_BUFFER, numShortsForDirectionArrows * SHORT_BYTES, directionArrow_ShortBuffer.flip(), GL.STATIC_DRAW);
+         gl.bufferData(GL.ARRAY_BUFFER, numDirectionArrowVertices * SHORT_BYTES, buffer_DirArrow_Vertices.flip(), GL.STATIC_DRAW);
 
+         /*
+          * Color
+          */
          // append color coord shorts into the buffer
-         final ShortArrayList colorCoordsVertices = _trackBucket_Painter.directionArrow_colorCoords;
-         final int numColorBucketShorts = colorCoordsVertices.size();
-         colorCoords_ShortBuffer.put(colorCoordsVertices.toArray(), 0, numColorBucketShorts);
+         buffer_DirArrow_ColorCoords.put(dirArrow_ColorCoords.toArray(), 0, numDirArrow_ColorCoords);
 
          gl.bindBuffer(GL.ARRAY_BUFFER, TourTrack_Shader.bufferId_DirArrows_ColorCoords);
-         gl.bufferData(GL.ARRAY_BUFFER, numShortsForColorCoords * SHORT_BYTES, colorCoords_ShortBuffer.flip(), GL.STATIC_DRAW);
+         gl.bufferData(GL.ARRAY_BUFFER, numDirArrow_ColorCoords * SHORT_BYTES, buffer_DirArrow_ColorCoords.flip(), GL.STATIC_DRAW);
+
+         /*
+          * Wing index
+          */
+         buffer_DirArrow_WingIndices.put(dirArrow_ArrowIndices.toArray(), 0, numDirArrow_WingIndices);
+
+         gl.bindBuffer(GL.ARRAY_BUFFER, TourTrack_Shader.bufferId_DirArrows_ArrowIndices);
+         gl.bufferData(GL.ARRAY_BUFFER, numDirArrow_WingIndices * FLOAT_BYTES, buffer_DirArrow_WingIndices.flip(), GL.STATIC_DRAW);
       }
 
       /*
-       * Track vertices
+       * Track
        */
       {
+         /*
+          * Color
+          */
          /**
           * Load vertex color into the GPU
           * <p>
@@ -121,10 +152,13 @@ public class TourTrack_BucketManager {
           * !!!
           */
          gl.bindBuffer(GL.ARRAY_BUFFER, TourTrack_Shader.bufferId_VerticesColor);
-         gl.bufferData(GL.ARRAY_BUFFER, numVertices, _vertexColor_Buffer.flip(), GL.STATIC_DRAW);
+         gl.bufferData(GL.ARRAY_BUFFER, numTrackVertices, _vertexColor_Buffer.flip(), GL.STATIC_DRAW);
 
+         /*
+          * Vertices
+          */
          gl.bindBuffer(GL.ARRAY_BUFFER, TourTrack_Shader.bufferId_Vertices);
-         gl.bufferData(GL.ARRAY_BUFFER, numVertices * SHORT_BYTES, vertices_ShortBuffer.flip(), GL.STATIC_DRAW);
+         gl.bufferData(GL.ARRAY_BUFFER, numTrackVertices * SHORT_BYTES, buffer_TrackVertices.flip(), GL.STATIC_DRAW);
       }
 
       return true;
