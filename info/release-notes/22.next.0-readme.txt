@@ -27,7 +27,7 @@ New
 ===
 
 * 2.5D Map
-  - Show direction arrows                 https://github.com/mytourbook/mytourbook/issues/516#issuecomment-1234322325
+  - Show direction arrows                       https://github.com/mytourbook/mytourbook/issues/516#issuecomment-1234322325
   
 
 Improvements
@@ -51,8 +51,10 @@ Bugfix
 ======
 
 * Fit Import (Frederic)
-  - Fixed NPE when pauses data are missing
-    https://sourceforge.net/p/mytourbook/discussion/622811/thread/d52269ce04/
+  - Fixed NPE when pauses data are missing      https://sourceforge.net/p/mytourbook/discussion/622811/thread/d52269ce04/
+    
+* 2D Map
+  - Fixed: Can't download SRTM-Data             https://github.com/mytourbook/mytourbook/issues/928
 
 
 Translation    
