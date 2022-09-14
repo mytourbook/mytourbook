@@ -42,6 +42,15 @@ public class CRPDataReaderTests extends DeviceDataReaderTester {
    }
 
    /**
+    * Testing a raw .crp file of version 9
+    */
+   @Test
+   void testCrpImport_20040703() {
+
+      testImportFile(deviceDataReader, FILES_PATH + "2004-07-03", ".crp");
+   }
+
+   /**
     * Testing a raw .crp file
     */
    @Test
