@@ -939,26 +939,26 @@ public class Map25ConfigManager {
 
          case TAG_DIRECTION_ARROW:
 
-            config.isShowDirectionArrow   = Util.getXmlBoolean(      xmlConfigChild,      ATTR_ARROW_IS_SHOW_ARROW,        ARROW_IS_SHOW_ARROW_DEFAULT);
+            config.isShowDirectionArrow   = Util.getXmlBoolean( xmlConfigChild,        ATTR_ARROW_IS_SHOW_ARROW,        ARROW_IS_SHOW_ARROW_DEFAULT);
 
-            config.isShowDirectionArrow   =  Util.getXmlBoolean(xmlConfigChild,  ATTR_ARROW_IS_SHOW_ARROW,        ARROW_IS_SHOW_ARROW_DEFAULT);
-            config.arrow_MinimumDistance  =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_MIN_DISTANCE,         ARROW_MIN_DISTANCE_DEFAULT);
-            config.arrow_VerticalOffset   =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_VERTICAL_OFFSET,      ARROW_VERTICAL_OFFSET_DEFAULT);
-            config.arrow_Design           =  (DirectionArrowDesign) Util.getXmlEnum(xmlConfigChild,               ATTR_ARROW_DESIGN,ARROW_DESIGN_DEFAULT);
+            config.isShowDirectionArrow   =  Util.getXmlBoolean(xmlConfigChild,        ATTR_ARROW_IS_SHOW_ARROW,        ARROW_IS_SHOW_ARROW_DEFAULT);
+            config.arrow_MinimumDistance  =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_MIN_DISTANCE,         ARROW_MIN_DISTANCE_DEFAULT);
+            config.arrow_VerticalOffset   =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_VERTICAL_OFFSET,      ARROW_VERTICAL_OFFSET_DEFAULT);
+            config.arrow_Design           =  (DirectionArrowDesign) Util.getXmlEnum(xmlConfigChild, ATTR_ARROW_DESIGN,  ARROW_DESIGN_DEFAULT);
 
-            config.arrow_Scale            =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_SCALE,                ARROW_SCALE_DEFAULT);
-            config.arrow_Length           =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_LENGTH,               ARROW_LENGTH_DEFAULT);
-            config.arrow_LengthCenter     =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_LENGTH_CENTER,        ARROW_LENGTH_CENTER_DEFAULT);
-            config.arrow_Width            =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_WIDTH,                ARROW_WIDTH_DEFAULT);
-            config.arrow_Height           =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_HEIGHT,               ARROW_HEIGHT_DEFAULT);
+            config.arrow_Scale            =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_SCALE,                ARROW_SCALE_DEFAULT);
+            config.arrow_Length           =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_LENGTH,               ARROW_LENGTH_DEFAULT);
+            config.arrow_LengthCenter     =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_LENGTH_CENTER,        ARROW_LENGTH_CENTER_DEFAULT);
+            config.arrow_Width            =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_WIDTH,                ARROW_WIDTH_DEFAULT);
+            config.arrow_Height           =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_HEIGHT,               ARROW_HEIGHT_DEFAULT);
 
-            config.arrowFin_OutlineWidth  =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_FIN_OUTLINE_WIDTH,    ARROW_FIN_OUTLINE_WIDTH_DEFAULT);
-            config.arrowWing_OutlineWidth =  Util.getXmlInteger(xmlConfigChild,  ATTR_ARROW_WING_OUTLINE_WIDTH,   ARROW_WING_OUTLINE_WIDTH_DEFAULT);
+            config.arrowFin_OutlineWidth  =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_FIN_OUTLINE_WIDTH,    ARROW_FIN_OUTLINE_WIDTH_DEFAULT);
+            config.arrowWing_OutlineWidth =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_WING_OUTLINE_WIDTH,   ARROW_WING_OUTLINE_WIDTH_DEFAULT);
 
-            config.arrowFin_InsideColor   =  Util.getXmlRgba(xmlConfigChild,     ARROW_FIN_INSIDE_COLOR_DEFAULT);
-            config.arrowFin_OutlineColor  =  Util.getXmlRgba(xmlConfigChild,     ARROW_FIN_OUTLINE_COLOR_DEFAULT);
-            config.arrowWing_InsideColor  =  Util.getXmlRgba(xmlConfigChild,     ARROW_WING_INSIDE_COLOR_DEFAULT);
-            config.arrowWing_OutlineColor =  Util.getXmlRgba(xmlConfigChild,     ARROW_WING_OUTLINE_COLOR_DEFAULT);
+            config.arrowFin_InsideColor   =  Util.getXmlRgba_AsParent(xmlConfigChild,  TAG_ARROW_FIN_INSIDE_COLOR,      ARROW_FIN_INSIDE_COLOR_DEFAULT);
+            config.arrowFin_OutlineColor  =  Util.getXmlRgba_AsParent(xmlConfigChild,  TAG_ARROW_FIN_OUTLINE_COLOR,     ARROW_FIN_OUTLINE_COLOR_DEFAULT);
+            config.arrowWing_InsideColor  =  Util.getXmlRgba_AsParent(xmlConfigChild,  TAG_ARROW_WING_INSIDE_COLOR,     ARROW_WING_INSIDE_COLOR_DEFAULT);
+            config.arrowWing_OutlineColor =  Util.getXmlRgba_AsParent(xmlConfigChild,  TAG_ARROW_WING_OUTLINE_COLOR,    ARROW_WING_OUTLINE_COLOR_DEFAULT);
 
             break;
 
