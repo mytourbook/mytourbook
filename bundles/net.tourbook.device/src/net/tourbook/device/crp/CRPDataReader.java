@@ -434,7 +434,7 @@ public class CRPDataReader extends TourbookDevice {
             final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
             tourMarker.setLabel(comment);
             tourMarker.setTime(tourTime, Long.MIN_VALUE);
-            tourMarker.setDistance(timeData.distance);
+            tourMarker.setDistance(distance);
             tourMarker.setSerieIndex(tpIndex);
             tourMarker.setAltitude(altitude);
 
