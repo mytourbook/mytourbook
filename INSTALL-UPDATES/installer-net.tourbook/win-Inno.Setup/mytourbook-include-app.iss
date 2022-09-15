@@ -11,7 +11,7 @@
 
 ;a relative path causes an error because the file pathname is > 255
 ;#define ProductRoot    "..\..\..\..\..\mytourbook-PRODUCT\"
-#define ProductRoot "c:\dat\mytourbook-PRODUCT\"
+#define ProductRoot     "c:\dat\mytourbook-PRODUCT\"
 
 
 [InstallDelete]
