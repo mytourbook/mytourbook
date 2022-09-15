@@ -24,8 +24,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.skedgo.converter.TimezoneMapper;
 
 import gnu.trove.list.array.TIntArrayList;
@@ -12468,7 +12468,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       final ObjectMapper mapper = new ObjectMapper();
       mapper.setSerializationInclusion(Include.NON_NULL);
       mapper.setSerializationInclusion(Include.NON_EMPTY);
-      mapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
+      mapper.setConfig(mapper.getSerializationConfig()
+            .with(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY));
 
       String jsonString = UI.EMPTY_STRING;
       try {
