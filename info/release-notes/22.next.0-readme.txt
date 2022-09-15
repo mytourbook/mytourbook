@@ -38,6 +38,7 @@ Improvements
   - Added the support for file version greater than 9
   - Added the support for cadence data import (present in file version greater than 9)
   - Fixed an issue where the first marker was not created
+  - Fixed an issue where the marker distance values were erroneous
     https://github.com/mytourbook/mytourbook/issues/927
 
 
