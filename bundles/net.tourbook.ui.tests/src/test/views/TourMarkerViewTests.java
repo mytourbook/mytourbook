@@ -53,7 +53,10 @@ public class TourMarkerViewTests extends UITest {
       bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
 
       //Open the Tour Marker View
-      Utils.showView(bot, "Tour Markers"); //$NON-NLS-1$
+      Utils.openOtherMenu(bot);
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode(Utils.TOURMARKERS_VIEW_NAME).select();
+      bot.button("Open").click(); //$NON-NLS-1$
+
       final SWTBotTable tableMarkers = bot.table();
 
       //Make sure that the tour contains 3 markers

@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
-public class FitLog_DeviceDataReaderTests extends DeviceDataReaderTester {
+public class FitLogDeviceDataReaderTests extends DeviceDataReaderTester {
 
    private static final String             FILES_PATH       = FilesUtils.rootPath + "device/sporttracks/fitlog/files/"; //$NON-NLS-1$
    protected static FitLogDeviceDataReader deviceDataReader = new FitLogDeviceDataReader();
