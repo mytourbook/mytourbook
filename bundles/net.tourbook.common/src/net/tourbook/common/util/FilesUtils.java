@@ -17,6 +17,7 @@
 package net.tourbook.common.util;
 
 import java.io.IOException;
+import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,6 +26,8 @@ import java.nio.file.Paths;
 import net.tourbook.common.UI;
 
 public final class FilesUtils {
+
+   private FilesUtils() {}
 
    public static String createTemporaryFile(final String fileName, final String extension) {
 
@@ -55,10 +58,23 @@ public final class FilesUtils {
 
       String fileContent = UI.EMPTY_STRING;
       try {
-         fileContent = Files.readString(Paths.get(filePath), StandardCharsets.US_ASCII);
-      } catch (final IOException e) {
-         StatusUtil.log(e);
+
+         fileContent = Files.readString(Paths.get(filePath), StandardCharsets.UTF_8);
+
+      } catch (final MalformedInputException e) {
+
+         try {
+
+            fileContent = Files.readString(Paths.get(filePath), StandardCharsets.ISO_8859_1);
+
+         } catch (final Exception iso_8859_1_exception) {
+            StatusUtil.log(iso_8859_1_exception);
+         }
+
+      } catch (final IOException ioException) {
+         StatusUtil.log(ioException);
       }
+
       return fileContent;
    }
 

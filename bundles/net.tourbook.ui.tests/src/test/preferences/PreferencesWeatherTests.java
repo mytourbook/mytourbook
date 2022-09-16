@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.tourbook.Messages;
 import net.tourbook.ui.views.IWeatherProvider;
+import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
@@ -34,9 +35,11 @@ public class PreferencesWeatherTests extends UITest {
       bot.button(Messages.Pref_Weather_Button_TestHTTPConnection).click();
 
       final SWTBotShell shell = bot.shell(Messages.Pref_Weather_CheckHTTPConnection_Message);
+
       final String message = NLS.bind(
             Messages.Pref_Weather_CheckHTTPConnection_OK_Message,
             vendorName);
+
       assertEquals(message, shell.bot().label(message).getText());
 
       bot.button("OK").click(); //$NON-NLS-1$
@@ -56,7 +59,38 @@ public class PreferencesWeatherTests extends UITest {
       //Weather API
       testVendorConnection(IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI_NAME);
 
+      //World Weather Online
+      testWorldWeatherOnlineConnection();
+
       bot.button("Apply and Close").click(); //$NON-NLS-1$
+   }
+
+   private void testWorldWeatherOnlineConnection() {
+
+      bot.comboBox().setSelection(IWeatherProvider.WEATHER_PROVIDER_WORLDWEATHERONLINE_NAME);
+
+      bot.checkBox(Messages.Pref_Weather_Checkbox_ShowOrHideApiKey).click();
+
+      final String dummyApiKeyValue = "DUMMY_API_KEY"; //$NON-NLS-1$
+      bot.text(1).setText(dummyApiKeyValue);
+
+      bot.button(Messages.Pref_Weather_Button_TestHTTPConnection).click();
+
+      final SWTBotShell shell = bot.shell(Messages.Pref_Weather_CheckHTTPConnection_Message);
+
+      final String message = NLS.bind(
+            Messages.Pref_Weather_CheckHTTPConnection_FAILED_Message,
+            new Object[] {
+                  WorldWeatherOnlineRetriever.getApiUrl() + dummyApiKeyValue,
+                  400,
+                  "<?xml version=\"1.0\" encoding=\"UTF-8\"?><data><error><msg>Parameter key is missing from the request URL</msg></error></data>" //$NON-NLS-1$
+            });
+
+      assertEquals(message, shell.bot().label(message).getText());
+
+      bot.button("OK").click(); //$NON-NLS-1$
+
+      bot.button("Restore Defaults").click(); //$NON-NLS-1$
    }
 
 }

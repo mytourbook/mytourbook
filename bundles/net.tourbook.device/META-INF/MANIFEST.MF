@@ -11,6 +11,7 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook.ext.rxtx_2.2
 Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.device,
+ net.tourbook.device.crp,
  net.tourbook.device.gpx,
  net.tourbook.device.polar.hrm,
  net.tourbook.device.sporttracks,

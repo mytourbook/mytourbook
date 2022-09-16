@@ -45,9 +45,6 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
     * UI controls
     */
    private Button _btnTestConnection;
-   private Button _chkShowHideApiKey;
-
-   private Label  _labelApiKey;
 
    private Text   _textApiKey_Value;
 
@@ -70,13 +67,13 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
              */
 
             // label
-            _labelApiKey = formToolkit.createLabel(container,
+            final Label labelApiKey = formToolkit.createLabel(container,
                   Messages.Pref_Weather_Label_ApiKey,
                   SWT.WRAP);
             GridDataFactory.fillDefaults()
                   .indent(defaultHIndent, 0)
                   .align(SWT.FILL, SWT.CENTER)
-                  .applyTo(_labelApiKey);
+                  .applyTo(labelApiKey);
 
             // text
             _textApiKey_Value = new Text(container, SWT.PASSWORD | SWT.BORDER);
@@ -91,19 +88,19 @@ public class WeatherProvider_WorldWeatherOnline implements IWeatherProvider {
              * Show/hide API key
              */
 
-            _chkShowHideApiKey = formToolkit.createButton(
+            final Button chkShowHideApiKey = formToolkit.createButton(
                   container,
                   Messages.Pref_Weather_Checkbox_ShowOrHideApiKey,
                   SWT.CHECK);
-            _chkShowHideApiKey.setToolTipText(
+            chkShowHideApiKey.setToolTipText(
                   Messages.Pref_Weather_Checkbox_ShowOrHideApiKey_Tooltip);
-            _chkShowHideApiKey.addSelectionListener(widgetSelectedAdapter(
+            chkShowHideApiKey.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> Util.showOrHidePassword(
                         _textApiKey_Value,
-                        _chkShowHideApiKey.getSelection())));
+                        chkShowHideApiKey.getSelection())));
             GridDataFactory.fillDefaults()
                   .indent(defaultHIndent, 0)
-                  .applyTo(_chkShowHideApiKey);
+                  .applyTo(chkShowHideApiKey);
          }
          {
             /*

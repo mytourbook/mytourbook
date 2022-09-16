@@ -12463,13 +12463,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       _twpWorldPosition.put(projectionHash + zoomLevel, worldPositions);
    }
 
-   @SuppressWarnings("deprecation")
    public String toJson() {
 
       final ObjectMapper mapper = new ObjectMapper();
       mapper.setSerializationInclusion(Include.NON_NULL);
       mapper.setSerializationInclusion(Include.NON_EMPTY);
-      mapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+      mapper.setConfig(mapper.getSerializationConfig()
+            .with(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY));
 
       String jsonString = UI.EMPTY_STRING;
       try {
