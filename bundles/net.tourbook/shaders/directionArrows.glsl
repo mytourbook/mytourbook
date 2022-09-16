@@ -35,7 +35,7 @@ varying vec3   pass_ColorCoord;     // barycentric coordinate inside the triangl
 
 uniform vec4   uni_ArrowColors[4];  // 1:wing inside, 2:wing outline, 3:fin inside, 4:fin outline
 uniform float  uni_GlowArrowIndex;
-uniform float  uni_GlowState;
+uniform float  uni_IsAnimate;
 uniform vec2   uni_OutlineWidth;    // x:Wing, y:Fin
 
 vec4 getWingColor() {
@@ -53,7 +53,7 @@ vec4 getWingColor() {
    float glowIntensity = 1.0;
    float glowVisibility = 1.0;
    
-   if (uni_GlowState > 0) {
+   if (uni_IsAnimate == 1.0) {
       
       // glowing is enabled
       

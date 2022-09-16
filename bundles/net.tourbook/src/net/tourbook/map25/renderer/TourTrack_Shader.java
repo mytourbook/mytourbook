@@ -68,7 +68,7 @@ public final class TourTrack_Shader {
 
             shader_uni_ArrowColors,
             shader_uni_GlowArrowIndex,
-            shader_uni_GlowState,
+            shader_uni_IsAnimate,
             shader_uni_OutlineWidth,
             shader_uni_Vp2MpScale
 
@@ -95,7 +95,7 @@ public final class TourTrack_Shader {
             shader_uni_Vp2MpScale         = getUniform("uni_Vp2MpScale");        //$NON-NLS-1$
 
             shader_uni_GlowArrowIndex     = getUniform("uni_GlowArrowIndex");    //$NON-NLS-1$
-            shader_uni_GlowState          = getUniform("uni_GlowState");         //$NON-NLS-1$
+            shader_uni_IsAnimate          = getUniform("uni_IsAnimate");         //$NON-NLS-1$
 
    // SET_FORMATTING_ON
       }
@@ -500,9 +500,6 @@ public final class TourTrack_Shader {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-      final float glowState = 1;
-      final float glowArrowIndex = getGlowArrowIndex(bucketManager);
-
       // set mvp matrix into the shader
       viewport.mvp.setAsUniform(shader.shader_u_mvp);
 
@@ -562,8 +559,8 @@ public final class TourTrack_Shader {
       gl.uniform1f(shader.shader_uni_Vp2MpScale, vp2mpScale);
 
       // glowing
-      gl.uniform1f(shader.shader_uni_GlowArrowIndex, glowArrowIndex);
-      gl.uniform1f(shader.shader_uni_GlowState, glowState);
+      gl.uniform1f(shader.shader_uni_GlowArrowIndex, getGlowArrowIndex(bucketManager));
+      gl.uniform1f(shader.shader_uni_IsAnimate, trackConfig.arrow_IsAnimate ? 1 : 0);
 
       /*
        * Draw direction arrows
