@@ -1828,6 +1828,8 @@ public class Map25View extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
+      final Map25TrackConfig tourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+
       /*
        * Layer
        */
@@ -1838,7 +1840,7 @@ public class Map25View extends ViewPart implements
       _map25App.getLayer_Tour().setEnabled(_isShowTour);
 
       // track color
-      final MapGraphId trackGraphId = Map25ConfigManager.getActiveTourTrackConfig().gradientColorGraphID;
+      final MapGraphId trackGraphId = tourTrackConfig.gradientColorGraphID;
       restoreState_TrackColorActions(trackGraphId);
       setColorProvider(trackGraphId, false);
 

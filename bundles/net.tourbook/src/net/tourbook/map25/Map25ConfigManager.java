@@ -159,46 +159,50 @@ public class Map25ConfigManager {
    /*
     * Direction Arrows
     */
-   private static final String              TAG_DIRECTION_ARROW              = "DirectionArrow";                //$NON-NLS-1$
-   private static final String              ATTR_ARROW_IS_SHOW_ARROW         = "isShowDirectionArrow";          //$NON-NLS-1$
-   private static final String              ATTR_ARROW_IS_ANIMATE            = "isAnimate";                     //$NON-NLS-1$
-   private static final String              ATTR_ARROW_DESIGN                = "design";                        //$NON-NLS-1$
-   private static final String              ATTR_ARROW_MIN_DISTANCE          = "minDistance";                   //$NON-NLS-1$
-   private static final String              ATTR_ARROW_VERTICAL_OFFSET       = "verticalOffset";                //$NON-NLS-1$
+   private static final String              TAG_DIRECTION_ARROW                     = "DirectionArrow";                //$NON-NLS-1$
+   private static final String              ATTR_ARROW_IS_SHOW_ARROW                = "isShowDirectionArrow";          //$NON-NLS-1$
+   private static final String              ATTR_ARROW_DESIGN                       = "design";                        //$NON-NLS-1$
+   private static final String              ATTR_ARROW_MIN_DISTANCE                 = "minDistance";                   //$NON-NLS-1$
+   private static final String              ATTR_ARROW_VERTICAL_OFFSET              = "verticalOffset";                //$NON-NLS-1$
    //
-   private static final String              ATTR_ARROW_SCALE                 = "scale";                         //$NON-NLS-1$
-   private static final String              ATTR_ARROW_LENGTH                = "length";                        //$NON-NLS-1$
-   private static final String              ATTR_ARROW_LENGTH_CENTER         = "lengthCenter";                  //$NON-NLS-1$
-   private static final String              ATTR_ARROW_WIDTH                 = "width";                         //$NON-NLS-1$
-   private static final String              ATTR_ARROW_HEIGHT                = "height";                        //$NON-NLS-1$
+   private static final String              ATTR_ARROW_IS_ANIMATE                   = "isAnimate";                     //$NON-NLS-1$
+   private static final String              ATTR_ARROW_ANIMATED_ARROWS_PER_SECOND   = "animatedArrowsPerSecond";       //$NON-NLS-1$
    //
-   private static final String              ATTR_ARROW_FIN_OUTLINE_WIDTH     = "finOutlineWidth";               //$NON-NLS-1$
-   private static final String              ATTR_ARROW_WING_OUTLINE_WIDTH    = "wingOutlineWidth";              //$NON-NLS-1$
+   private static final String              ATTR_ARROW_SCALE                        = "scale";                         //$NON-NLS-1$
+   private static final String              ATTR_ARROW_LENGTH                       = "length";                        //$NON-NLS-1$
+   private static final String              ATTR_ARROW_LENGTH_CENTER                = "lengthCenter";                  //$NON-NLS-1$
+   private static final String              ATTR_ARROW_WIDTH                        = "width";                         //$NON-NLS-1$
+   private static final String              ATTR_ARROW_HEIGHT                       = "height";                        //$NON-NLS-1$
    //
-   private static final String              TAG_ARROW_FIN_INSIDE_COLOR       = "FinInsideColor";                //$NON-NLS-1$
-   private static final String              TAG_ARROW_FIN_OUTLINE_COLOR      = "FinOutlineColor";               //$NON-NLS-1$
-   private static final String              TAG_ARROW_WING_INSIDE_COLOR      = "wingInsideColor";               //$NON-NLS-1$
-   private static final String              TAG_ARROW_WING_OUTLINE_COLOR     = "wingOutlineColor";              //$NON-NLS-1$
+   private static final String              ATTR_ARROW_FIN_OUTLINE_WIDTH            = "finOutlineWidth";               //$NON-NLS-1$
+   private static final String              ATTR_ARROW_WING_OUTLINE_WIDTH           = "wingOutlineWidth";              //$NON-NLS-1$
    //
-   public static final boolean              ARROW_IS_SHOW_ARROW_DEFAULT      = true;
-   public static final DirectionArrowDesign ARROW_DESIGN_DEFAULT             = DirectionArrowDesign.WINGS;
-   public static final int                  ARROW_MIN_DISTANCE_DEFAULT       = 60;
-   public static final int                  ARROW_VERTICAL_OFFSET_DEFAULT    = 30;
+   private static final String              TAG_ARROW_FIN_INSIDE_COLOR              = "FinInsideColor";                //$NON-NLS-1$
+   private static final String              TAG_ARROW_FIN_OUTLINE_COLOR             = "FinOutlineColor";               //$NON-NLS-1$
+   private static final String              TAG_ARROW_WING_INSIDE_COLOR             = "wingInsideColor";               //$NON-NLS-1$
+   private static final String              TAG_ARROW_WING_OUTLINE_COLOR            = "wingOutlineColor";              //$NON-NLS-1$
    //
-   public static final int                  ARROW_SCALE_DEFAULT              = 10;
-   public static final int                  ARROW_LENGTH_DEFAULT             = 40;
-   public static final int                  ARROW_LENGTH_CENTER_DEFAULT      = 30;
-   public static final int                  ARROW_WIDTH_DEFAULT              = 40;
-   public static final int                  ARROW_HEIGHT_DEFAULT             = 20;
-   public static final boolean              ARROW_IS_ANIMATE_DEFAULT         = true;
+   public static final boolean              ARROW_IS_SHOW_ARROW_DEFAULT             = true;
+   public static final DirectionArrowDesign ARROW_DESIGN_DEFAULT                    = DirectionArrowDesign.WINGS;
+   public static final int                  ARROW_MIN_DISTANCE_DEFAULT              = 60;
+   public static final int                  ARROW_VERTICAL_OFFSET_DEFAULT           = 30;
    //
-   public static final int                  ARROW_FIN_OUTLINE_WIDTH_DEFAULT  = 5;
-   public static final int                  ARROW_WING_OUTLINE_WIDTH_DEFAULT = 10;
+   public static final int                  ARROW_SCALE_DEFAULT                     = 10;
+   public static final int                  ARROW_LENGTH_DEFAULT                    = 40;
+   public static final int                  ARROW_LENGTH_CENTER_DEFAULT             = 30;
+   public static final int                  ARROW_WIDTH_DEFAULT                     = 40;
+   public static final int                  ARROW_HEIGHT_DEFAULT                    = 20;
    //
-   public static final RGBA                 ARROW_FIN_INSIDE_COLOR_DEFAULT   = new RGBA(0x10, 0x10, 0x10, 0x80);
-   public static final RGBA                 ARROW_FIN_OUTLINE_COLOR_DEFAULT  = new RGBA(0xff, 0xff, 0xff, 0xff);
-   public static final RGBA                 ARROW_WING_INSIDE_COLOR_DEFAULT  = new RGBA(0x10, 0x10, 0x10, 0x80);
-   public static final RGBA                 ARROW_WING_OUTLINE_COLOR_DEFAULT = new RGBA(0xff, 0x20, 0x20, 0xff);
+   public static final boolean              ARROW_IS_ANIMATE_DEFAULT                = true;
+   public static final int                  ARROW_ANIMATE_ARROWS_PER_SECOND_DEFAULT = 5;
+   //
+   public static final int                  ARROW_FIN_OUTLINE_WIDTH_DEFAULT         = 5;
+   public static final int                  ARROW_WING_OUTLINE_WIDTH_DEFAULT        = 10;
+   //
+   public static final RGBA                 ARROW_FIN_INSIDE_COLOR_DEFAULT          = new RGBA(0x10, 0x10, 0x10, 0x80);
+   public static final RGBA                 ARROW_FIN_OUTLINE_COLOR_DEFAULT         = new RGBA(0xff, 0xff, 0xff, 0xff);
+   public static final RGBA                 ARROW_WING_INSIDE_COLOR_DEFAULT         = new RGBA(0x10, 0x10, 0x10, 0x80);
+   public static final RGBA                 ARROW_WING_OUTLINE_COLOR_DEFAULT        = new RGBA(0xff, 0x20, 0x20, 0xff);
    //
    /*
     * Legend
@@ -682,71 +686,73 @@ public class Map25ConfigManager {
 //         xmlConfig.putInteger(ATTR_ANIMATION_TIME, config.animationTime);
 
          // <Line>
-         final IMemento xmlLine = Util.setXmlRgb(xmlConfig, TAG_LINE,   config.lineColor);
+         final IMemento xmlLine = Util.setXmlRgb(xmlConfig, TAG_LINE,         config.lineColor);
          {
-            xmlLine.putFloat(          ATTR_LINE_WIDTH,                    config.lineWidth);
-            xmlLine.putInteger(        ATTR_LINE_OPACITY,                  config.lineOpacity);
-            Util.setXmlEnum(xmlLine,   ATTR_LINE_COLOR_MODE,               config.lineColorMode);
-            Util.setXmlEnum(xmlLine,   ATTR_LINE_GRADIENT_COLOR_GRAPH_ID,  config.gradientColorGraphID);
+            xmlLine.putFloat(          ATTR_LINE_WIDTH,                       config.lineWidth);
+            xmlLine.putInteger(        ATTR_LINE_OPACITY,                     config.lineOpacity);
+            Util.setXmlEnum(xmlLine,   ATTR_LINE_COLOR_MODE,                  config.lineColorMode);
+            Util.setXmlEnum(xmlLine,   ATTR_LINE_GRADIENT_COLOR_GRAPH_ID,     config.gradientColorGraphID);
 
-            xmlLine.putBoolean(        ATTR_TRACK_IS_VERTICAL_OFFSET,      config.isTrackVerticalOffset);
-            xmlLine.putInteger(        ATTR_TRACK_VERTICAL_OFFSET,         config.trackVerticalOffset);
+            xmlLine.putBoolean(        ATTR_TRACK_IS_VERTICAL_OFFSET,         config.isTrackVerticalOffset);
+            xmlLine.putInteger(        ATTR_TRACK_VERTICAL_OFFSET,            config.trackVerticalOffset);
 
-            xmlLine.putBoolean(        ATTR_OUTLINE_IS_SHOW_OUTLINE,       config.isShowOutline);
-            xmlLine.putFloat(          ATTR_OUTLINE_BRIGHTNESS,            config.outlineBrighness);
-            xmlLine.putFloat(          ATTR_OUTLINE_WIDTH,                 config.outlineWidth);
+            xmlLine.putBoolean(        ATTR_OUTLINE_IS_SHOW_OUTLINE,          config.isShowOutline);
+            xmlLine.putFloat(          ATTR_OUTLINE_BRIGHTNESS,               config.outlineBrighness);
+            xmlLine.putFloat(          ATTR_OUTLINE_WIDTH,                    config.outlineWidth);
          }
 
          // <DirectionArrow>
          final IMemento xmlArrow = xmlConfig.createChild(TAG_DIRECTION_ARROW);
          {
-            xmlArrow.putBoolean(       ATTR_ARROW_IS_SHOW_ARROW,           config.isShowDirectionArrow);
-            xmlArrow.putBoolean(       ATTR_ARROW_IS_ANIMATE,              config.arrow_IsAnimate);
-            Util.setXmlEnum(xmlArrow,  ATTR_ARROW_DESIGN,                  config.arrow_Design);
-            xmlArrow.putInteger(       ATTR_ARROW_MIN_DISTANCE,            config.arrow_MinimumDistance);
-            xmlArrow.putInteger(       ATTR_ARROW_VERTICAL_OFFSET,         config.arrow_VerticalOffset);
+            xmlArrow.putBoolean(       ATTR_ARROW_IS_SHOW_ARROW,              config.isShowDirectionArrow);
+            Util.setXmlEnum(xmlArrow,  ATTR_ARROW_DESIGN,                     config.arrow_Design);
+            xmlArrow.putInteger(       ATTR_ARROW_MIN_DISTANCE,               config.arrow_MinimumDistance);
+            xmlArrow.putInteger(       ATTR_ARROW_VERTICAL_OFFSET,            config.arrow_VerticalOffset);
 
-            xmlArrow.putInteger(       ATTR_ARROW_SCALE,                   config.arrow_Scale);
-            xmlArrow.putInteger(       ATTR_ARROW_LENGTH,                  config.arrow_Length);
-            xmlArrow.putInteger(       ATTR_ARROW_LENGTH_CENTER,           config.arrow_LengthCenter);
-            xmlArrow.putInteger(       ATTR_ARROW_WIDTH,                   config.arrow_Width);
-            xmlArrow.putInteger(       ATTR_ARROW_HEIGHT,                  config.arrow_Height);
+            xmlArrow.putBoolean(       ATTR_ARROW_IS_ANIMATE,                 config.arrow_IsAnimate);
+            xmlArrow.putInteger(       ATTR_ARROW_ANIMATED_ARROWS_PER_SECOND, config.arrow_ArrowsPerSecond);
 
-            xmlArrow.putInteger(       ATTR_ARROW_FIN_OUTLINE_WIDTH,       config.arrowFin_OutlineWidth);
-            xmlArrow.putInteger(       ATTR_ARROW_WING_OUTLINE_WIDTH,      config.arrowWing_OutlineWidth);
+            xmlArrow.putInteger(       ATTR_ARROW_SCALE,                      config.arrow_Scale);
+            xmlArrow.putInteger(       ATTR_ARROW_LENGTH,                     config.arrow_Length);
+            xmlArrow.putInteger(       ATTR_ARROW_LENGTH_CENTER,              config.arrow_LengthCenter);
+            xmlArrow.putInteger(       ATTR_ARROW_WIDTH,                      config.arrow_Width);
+            xmlArrow.putInteger(       ATTR_ARROW_HEIGHT,                     config.arrow_Height);
 
-            Util.setXmlRgba(xmlArrow,  TAG_ARROW_FIN_INSIDE_COLOR,         config.arrowFin_InsideColor);
-            Util.setXmlRgba(xmlArrow,  TAG_ARROW_FIN_OUTLINE_COLOR,        config.arrowFin_OutlineColor);
-            Util.setXmlRgba(xmlArrow,  TAG_ARROW_WING_INSIDE_COLOR,        config.arrowWing_InsideColor);
-            Util.setXmlRgba(xmlArrow,  TAG_ARROW_WING_OUTLINE_COLOR,       config.arrowWing_OutlineColor);
+            xmlArrow.putInteger(       ATTR_ARROW_FIN_OUTLINE_WIDTH,          config.arrowFin_OutlineWidth);
+            xmlArrow.putInteger(       ATTR_ARROW_WING_OUTLINE_WIDTH,         config.arrowWing_OutlineWidth);
+
+            Util.setXmlRgba(xmlArrow,  TAG_ARROW_FIN_INSIDE_COLOR,            config.arrowFin_InsideColor);
+            Util.setXmlRgba(xmlArrow,  TAG_ARROW_FIN_OUTLINE_COLOR,           config.arrowFin_OutlineColor);
+            Util.setXmlRgba(xmlArrow,  TAG_ARROW_WING_INSIDE_COLOR,           config.arrowWing_InsideColor);
+            Util.setXmlRgba(xmlArrow,  TAG_ARROW_WING_OUTLINE_COLOR,          config.arrowWing_OutlineColor);
          }
 
          // <Legend>
          final IMemento xmlLegend= xmlConfig.createChild(TAG_LEGEND);
          {
-            Util.setXmlEnum(xmlLegend, ATTR_LEGEND_UNIT_LAYOUT,            config.legendUnitLayout);
+            Util.setXmlEnum(xmlLegend, ATTR_LEGEND_UNIT_LAYOUT,               config.legendUnitLayout);
          }
 
          // <SliderPath>
          final IMemento xmlSliderPath = Util.setXmlRgb(xmlConfig, TAG_SLIDER_PATH, config.sliderPath_Color);
          {
-            xmlSliderPath.putBoolean(  ATTR_IS_SHOW_SLIDER_PATH,           config.isShowSliderPath);
-            xmlSliderPath.putFloat(    ATTR_SLIDER_PATH_LINE_WIDTH,        config.sliderPath_LineWidth);
-            xmlSliderPath.putInteger(  ATTR_SLIDER_PATH_OPACITY,           config.sliderPath_Opacity);
+            xmlSliderPath.putBoolean(  ATTR_IS_SHOW_SLIDER_PATH,              config.isShowSliderPath);
+            xmlSliderPath.putFloat(    ATTR_SLIDER_PATH_LINE_WIDTH,           config.sliderPath_LineWidth);
+            xmlSliderPath.putInteger(  ATTR_SLIDER_PATH_OPACITY,              config.sliderPath_Opacity);
          }
 
          /*
           * Slider location
           */
-         xmlConfig.putBoolean(         ATTR_IS_SHOW_SLIDER_LOCATION,       config.isShowSliderLocation);
-         xmlConfig.putInteger(         ATTR_SLIDER_LOCATION_OPACITY,       config.sliderLocation_Opacity);
-         xmlConfig.putInteger(         ATTR_SLIDER_LOCATION_SIZE,          config.sliderLocation_Size);
+         xmlConfig.putBoolean(         ATTR_IS_SHOW_SLIDER_LOCATION,          config.isShowSliderLocation);
+         xmlConfig.putInteger(         ATTR_SLIDER_LOCATION_OPACITY,          config.sliderLocation_Opacity);
+         xmlConfig.putInteger(         ATTR_SLIDER_LOCATION_SIZE,             config.sliderLocation_Size);
 
          // <SliderLocation_Left>
-         Util.setXmlRgb(xmlConfig,     TAG_SLIDER_LOCATION_LEFT,           config.sliderLocation_Left_Color);
+         Util.setXmlRgb(xmlConfig,     TAG_SLIDER_LOCATION_LEFT,              config.sliderLocation_Left_Color);
 
          // <SliderLocation_Right>
-         Util.setXmlRgb(xmlConfig,     TAG_SLIDER_LOCATION_RIGHT,          config.sliderLocation_Right_Color);
+         Util.setXmlRgb(xmlConfig,     TAG_SLIDER_LOCATION_RIGHT,             config.sliderLocation_Right_Color);
       }
    }
 
@@ -814,7 +820,7 @@ public class Map25ConfigManager {
 
       // this case should not happen but ensure that a correct config is set
 
-      _activeTrackConfig = _allTrackConfigs.get(0);
+      setActiveTrackConfig(_allTrackConfigs.get(0));
 
       return 0;
    }
@@ -944,10 +950,12 @@ public class Map25ConfigManager {
 
             config.isShowDirectionArrow   = Util.getXmlBoolean( xmlConfigChild,        ATTR_ARROW_IS_SHOW_ARROW,        ARROW_IS_SHOW_ARROW_DEFAULT);
 
-            config.arrow_IsAnimate        =  Util.getXmlBoolean(xmlConfigChild,        ATTR_ARROW_IS_ANIMATE,           ARROW_IS_ANIMATE_DEFAULT);
             config.arrow_MinimumDistance  =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_MIN_DISTANCE,         ARROW_MIN_DISTANCE_DEFAULT);
             config.arrow_VerticalOffset   =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_VERTICAL_OFFSET,      ARROW_VERTICAL_OFFSET_DEFAULT);
             config.arrow_Design           =  (DirectionArrowDesign) Util.getXmlEnum(xmlConfigChild, ATTR_ARROW_DESIGN,  ARROW_DESIGN_DEFAULT);
+
+            config.arrow_IsAnimate        =  Util.getXmlBoolean(xmlConfigChild,        ATTR_ARROW_IS_ANIMATE,                 ARROW_IS_ANIMATE_DEFAULT);
+            config.arrow_ArrowsPerSecond  =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_ANIMATED_ARROWS_PER_SECOND, ARROW_ANIMATE_ARROWS_PER_SECOND_DEFAULT);
 
             config.arrow_Scale            =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_SCALE,                ARROW_SCALE_DEFAULT);
             config.arrow_Length           =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_LENGTH,               ARROW_LENGTH_DEFAULT);
@@ -1095,7 +1103,7 @@ public class Map25ConfigManager {
             createDefaults_Markers();
          }
 
-         _activeTrackConfig = getConfig_Track();
+         setActiveTrackConfig(getConfig_Track());
          setActiveMarkerConfig(getConfig_Marker());
 
       } catch (final Exception e) {
@@ -1347,6 +1355,10 @@ public class Map25ConfigManager {
    public static void setActiveTrackConfig(final Map25TrackConfig newConfig) {
 
       _activeTrackConfig = newConfig;
+
+      Map25FPSManager.setAnimationActive(
+            newConfig.arrow_IsAnimate,
+            newConfig.arrow_ArrowsPerSecond);
    }
 
    /**

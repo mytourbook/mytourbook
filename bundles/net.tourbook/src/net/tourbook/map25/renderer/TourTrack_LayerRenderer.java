@@ -249,6 +249,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       private void doWork_Rendering(final TourRenderTask task, final int numPoints) {
 
          final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+         final boolean isShowDirectionArrows = trackConfig.isShowDirectionArrow;
+         final int arrow_MinimumDistance = trackConfig.arrow_MinimumDistance;
 
          final TourTrack_Bucket workerBucket = getWorkerBucket(task.__taskBucketManager);
 
@@ -293,8 +295,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          final float[] pixelPoints = __pixelPoints;
          final int[] pixelPointColorsHalf = __pixelPointColorsHalf;
 
-         __pixelDirectionArrows.clear();
          final FloatArrayList allDirectionArrowPixel = __pixelDirectionArrows;
+         allDirectionArrowPixel.clear();
 
          // set first point / color / direction arrow
          int pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
@@ -421,7 +423,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             final float diffXArrow = pixelX - prevXArrow;
             final float diffYArrow = pixelY - prevYArrow;
 
-            if (projectedPointIndex == 0 || FastMath.absMaxCmp(diffXArrow, diffYArrow, trackConfig.arrow_MinimumDistance)) {
+            if (projectedPointIndex == 0 || FastMath.absMaxCmp(diffXArrow, diffYArrow, arrow_MinimumDistance)) {
 
                // point > min distance
 
@@ -437,7 +439,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             workerBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
          }
 
-         if (trackConfig.isShowDirectionArrow) {
+         if (isShowDirectionArrows) {
             workerBucket.createDirectionArrowVertices(__pixelDirectionArrows);
          }
       }

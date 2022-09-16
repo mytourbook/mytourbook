@@ -52,6 +52,7 @@ import net.tourbook.map25.layer.marker.MarkerRendererMT;
 import net.tourbook.map25.layer.marker.MarkerShape;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
 import net.tourbook.map25.layer.marker.PhotoToolkit;
+import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
@@ -488,6 +489,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _appConfig = getConfig();
       _lwjglApp = new LwjglApplication(mapApp, _appConfig, canvas);
 
+      Map25FPSManager.init(_lwjglApp, _appConfig);
+
       return mapApp;
    }
 
@@ -662,10 +665,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       super.create();
 
-      // this is necessary for animations
-      _lwjglApp.getGraphics().setContinuousRendering(true);
-      _appConfig.backgroundFPS = 1;
-      _appConfig.foregroundFPS = 20;
+      // initially _lwjglApp is not set when the tour track config is restored
+      // -> it is too complicated to set it correctly
+      // -> therefore this post enablement
+      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+      Map25FPSManager.setAnimationActive(trackConfig.arrow_IsAnimate, trackConfig.arrow_ArrowsPerSecond);
 
       /**
        * Overwrite input handler, using own GdxMap.create() method didn't work :-(

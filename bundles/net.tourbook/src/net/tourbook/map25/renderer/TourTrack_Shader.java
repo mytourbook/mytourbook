@@ -151,17 +151,19 @@ public final class TourTrack_Shader {
 
    private static float getGlowArrowIndex(final TourTrack_BucketManager bucketManager) {
 
+      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+
       // how many arrows are moved in one second
-      final int arrowsPerSecond = 3;
+      final int arrowsPerSecond = trackConfig.arrow_ArrowsPerSecond;
 
       final long currentTimeMS = System.currentTimeMillis();
 
       // update sequence in one second
-      final float secondsPerArrowSec = 1f / arrowsPerSecond;
-      final long secondsPerArrowMS = (long) (secondsPerArrowSec * 1000);
+      final float secondsForOneArrowSec = 1f / arrowsPerSecond;
+      final long secondsForOneArrowMS = (long) (secondsForOneArrowSec * 1000);
 
       // ensure there not more arrows per second are displayed
-      final long nextUpdateTimeMS = _dirArrowAnimation_LastUpdateTime + secondsPerArrowMS;
+      final long nextUpdateTimeMS = _dirArrowAnimation_LastUpdateTime + secondsForOneArrowMS;
       final long timeDiffMS = nextUpdateTimeMS - currentTimeMS;
       if (timeDiffMS > 0) {
          return _dirArrowAnimation_CurrentArrowIndex;
