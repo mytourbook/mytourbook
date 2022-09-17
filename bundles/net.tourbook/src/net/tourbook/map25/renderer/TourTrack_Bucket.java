@@ -829,8 +829,8 @@ public class TourTrack_Bucket {
          final double unitPerpendX = p12UnitY;
          final double unitPerpendY = -p12UnitX;
 
-         final double arrowLength = Math.min(configArrowLength, p12Distance);
-         final double arrowLengthMiddle = Math.min(configArrowLengthCenter, p12Distance);
+         final double arrowLength = configArrowLength; //               Math.min(configArrowLength, p12Distance);
+         final double arrowLengthMiddle = configArrowLengthCenter; //   Math.min(configArrowLengthCenter, p12Distance);
          final double arrowWidth2 = configArrowWidth / 2; // half arrow width
 
          // point on line between P1 and P2
@@ -876,7 +876,7 @@ public class TourTrack_Bucket {
           *
           * FIN
           *
-          *                 ZfinTop
+          *                 finTopZ
           *                     #---\
           *                          ---\
           *                     .        ---\
@@ -894,7 +894,7 @@ public class TourTrack_Bucket {
           *                     .        ---/
           *                          ---/
           *                     #---/
-          *                 ZfinBottom
+          *                 finBottomZ
           * </code>
           */
 

@@ -1281,7 +1281,12 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       mapApp.getLayer_SliderPath().onModifyConfig();
       mapApp.getLayer_SliderLocation().onModifyConfig();
 
-      Map25FPSManager.setAnimationFPS(Map25ConfigManager.getActiveTourTrackConfig().arrow_ArrowsPerSecond, true);
+      // update animation
+      final Map25TrackConfig config = Map25ConfigManager.getActiveTourTrackConfig();
+      Map25FPSManager.setAnimation(
+            config.arrow_IsAnimate,
+            config.arrow_ArrowsPerSecond);
+      Map25FPSManager.setBackgroundFPSToAnimationFPS(config.arrow_IsAnimate);
    }
 
    private void onModifyName() {

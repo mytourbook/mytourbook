@@ -31,6 +31,14 @@ public class Map25FPSManager {
 
    private static int                           _animationFPS;
 
+   public static long getBackgroundFPS() {
+      return _appConfig.backgroundFPS;
+   }
+
+   public static long getForegroundFPS() {
+      return _appConfig.foregroundFPS;
+   }
+
    public static void init(final LwjglApplication lwjglApp, final LwjglApplicationConfiguration appConfig) {
 
       _lwjglApp = lwjglApp;
@@ -41,13 +49,14 @@ public class Map25FPSManager {
    }
 
    /**
+    * Set animation parameters.
+    * <p>
     * That an animation is working, it needs contiuous rendering.
     *
     * @param isActive
+    * @param animationFPS
     */
-   public static void setAnimationActive(final boolean isActive, final int animationFPS) {
-
-      _animationFPS = animationFPS;
+   public static void setAnimation(final boolean isActive, final int animationFPS) {
 
       if (_lwjglApp == null) {
 
@@ -56,28 +65,11 @@ public class Map25FPSManager {
          return;
       }
 
-      _lwjglApp.getGraphics().setContinuousRendering(isActive);
-
-      _appConfig.foregroundFPS = isActive
-
-            ? _animationFPS
-
-            : DEFAULT_BACKGROUND_FPS;
-   }
-
-   /**
-    * Set animation FPS
-    *
-    * @param animationFPS
-    * @param isSetBackgroundFPS
-    */
-   public static void setAnimationFPS(final int animationFPS, final boolean isSetBackgroundFPS) {
-
       _animationFPS = animationFPS;
+      _appConfig.foregroundFPS = animationFPS;
 
-      if (isSetBackgroundFPS) {
-         _appConfig.backgroundFPS = _animationFPS;
-      }
+      // disable rendering when not needed
+      _lwjglApp.getGraphics().setContinuousRendering(isActive);
    }
 
    /**

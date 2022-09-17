@@ -669,7 +669,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       // -> it is too complicated to set it correctly
       // -> therefore this post enablement
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-      Map25FPSManager.setAnimationActive(trackConfig.arrow_IsAnimate, trackConfig.arrow_ArrowsPerSecond);
+      Map25FPSManager.setAnimation(trackConfig.arrow_IsAnimate, trackConfig.arrow_ArrowsPerSecond);
 
       /**
        * Overwrite input handler, using own GdxMap.create() method didn't work :-(
