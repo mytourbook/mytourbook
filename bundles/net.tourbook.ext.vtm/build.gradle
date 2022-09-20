@@ -29,13 +29,16 @@ repositories {
 
 dependencies {
 
+   println 'rootProject : ' + rootProject
+   println 'rootDir     : ' + rootDir
+
    compile project(':net.tourbook.ext.vtm.linux')
    compile project(':net.tourbook.ext.vtm.macosx')
    compile project(':net.tourbook.ext.vtm.windows')
    
    compile project(':vtm')
    compile project(':vtm-desktop')
-   compile project(':vtm-desktop-lwjgl')
+   compile project(':vtm-desktop-lwjgl3')
    compile project(':vtm-gdx')
    compile project(':vtm-http')
    compile project(':vtm-mvt')
@@ -269,7 +272,7 @@ eclipse.classpath.file {
          def jarFileName = it.@path.tokenize('/')[-1]
       
          it.@exported   = 'true'
-         it.@path      = 'libs/' + jarFileName
+         it.@path       = 'libs/' + jarFileName
       }
       
       // src from a project dependency is not working, convert it into a jar, jar's are already created :-)
@@ -280,10 +283,10 @@ eclipse.classpath.file {
       
          def srcPath = it.@path
          
-         it.@kind      = 'lib'
+         it.@kind       = 'lib'
          it.@exported   = 'true'
-         it.@path      = 'libs' + srcPath + '.jar'
-         it.@sourcepath   = srcPath
+         it.@path       = 'libs' + srcPath + '.jar'
+         it.@sourcepath = srcPath
    
          println '\tinto:\t' + it
       }
@@ -320,7 +323,8 @@ def createBundleClassPath() {
           
           // skip /natives/ items: linux, osx, windows
           
-       } else if (name.startsWith('net.tourbook') 
+       } else if (
+             name.startsWith('net.tourbook') 
           || name.startsWith('gdx-platform') 
           || name.startsWith('lwjgl-platform') 
           || name.startsWith('jinput-platform')) { 

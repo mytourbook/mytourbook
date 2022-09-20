@@ -71,6 +71,7 @@ import org.oscim.gdx.GdxAssets;
 import org.oscim.gdx.GdxMap;
 import org.oscim.gdx.GestureHandlerImpl;
 import org.oscim.gdx.LwjglGL20;
+import org.oscim.gdx.LwjglGL30;
 import org.oscim.gdx.MotionHandler;
 import org.oscim.layers.GenericLayer;
 import org.oscim.layers.Layer;
@@ -487,7 +488,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       final Map25App mapApp = new Map25App(state);
 
       _appConfig = getConfig();
-      _lwjglApp = new LwjglApplication(mapApp, _appConfig, canvas);
+      _lwjglApp = new Lwjgl3Application(mapApp, _appConfig, canvas);
 
       Map25FPSManager.init(_lwjglApp, _appConfig);
 
@@ -1207,7 +1208,13 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    }
 
    @Override
-   protected void initGLAdapter(final GLVersion arg0) {}
+   protected void initGLAdapter(final GLVersion version) {
+      if (version.getMajorVersion() >= 3) {
+         GLAdapter.init(new LwjglGL30());
+      } else {
+         GLAdapter.init(new LwjglGL20());
+      }
+   }
 
    public boolean isPhoto_Scaled() {
       return _isPhotoScaled;

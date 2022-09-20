@@ -55,5 +55,10 @@
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/pom.xml</locationURI>
 		</link>
+		<link>
+			<name>vtm-settings.gradle</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/bundles/settings.gradle</locationURI>
+		</link>
 	</linkedResources>
 </projectDescription>
