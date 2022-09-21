@@ -47,10 +47,17 @@ public class TourSegmenterViewTests extends UITest {
       tourSegmenterViewBot.comboBox(0).setSelection(Messages.tour_segmenter_type_byDistance);
       assertEquals("0:47", tableSegments.cell(0, 0));
 
-//      bot.comboBox().setSelection("By Break Time");
-//      bot.comboBox().setSelection("By Power (with DP)");
-//      bot.comboBox().setSelection("With Ascending/Descending");
-//      bot.comboBox().setSelection("For Surfing");
+      tourSegmenterViewBot.comboBox(0).setSelection(Messages.Tour_Segmenter_Type_ByBreakTime);
+      assertEquals("0:20", tableSegments.cell(0, 0));
+
+      tourSegmenterViewBot.comboBox(0).setSelection(Messages.tour_segmenter_type_byPower);
+      assertEquals("0:01", tableSegments.cell(0, 0));
+
+      tourSegmenterViewBot.comboBox(0).setSelection(Messages.tour_segmenter_type_byComputedAltiUpDown);
+      assertEquals("0:02", tableSegments.cell(0, 0));
+
+      tourSegmenterViewBot.comboBox(0).setSelection(Messages.Tour_Segmenter_Type_Surfing);
+      assertEquals("0:47", tableSegments.cell(0, 0));
    }
 
 }
