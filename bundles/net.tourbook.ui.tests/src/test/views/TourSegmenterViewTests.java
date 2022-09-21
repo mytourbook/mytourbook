@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import net.tourbook.Messages;
 
 import org.eclipse.swtbot.swt.finder.SWTBot;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.junit.jupiter.api.Test;
 
@@ -38,26 +39,27 @@ public class TourSegmenterViewTests extends UITest {
 
       final SWTBotTable tableSegments = tourSegmenterViewBot.table();
 
-      tourSegmenterViewBot.comboBox(0).setSelection(Messages.tour_segmenter_type_byAltitude);
+      final SWTBotCombo segmenterMethodCombo = tourSegmenterViewBot.comboBox(0);
+
+      segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byAltitude);
       assertEquals("0:01", tableSegments.cell(0, 0));
 
-      tourSegmenterViewBot.comboBox(0).setSelection(Messages.Tour_Segmenter_Type_ByAltitude_Merged);
+      segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_ByAltitude_Merged);
       assertEquals("0:35", tableSegments.cell(0, 0));
 
-      tourSegmenterViewBot.comboBox(0).setSelection(Messages.tour_segmenter_type_byDistance);
+      segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byDistance);
       assertEquals("0:47", tableSegments.cell(0, 0));
 
-      tourSegmenterViewBot.comboBox(0).setSelection(Messages.Tour_Segmenter_Type_ByBreakTime);
+      segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_ByBreakTime);
       assertEquals("0:20", tableSegments.cell(0, 0));
 
-      tourSegmenterViewBot.comboBox(0).setSelection(Messages.tour_segmenter_type_byPower);
+      segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byPower);
       assertEquals("0:01", tableSegments.cell(0, 0));
 
-      tourSegmenterViewBot.comboBox(0).setSelection(Messages.tour_segmenter_type_byComputedAltiUpDown);
+      segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byComputedAltiUpDown);
       assertEquals("0:02", tableSegments.cell(0, 0));
 
-      tourSegmenterViewBot.comboBox(0).setSelection(Messages.Tour_Segmenter_Type_Surfing);
+      segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_Surfing);
       assertEquals("0:47", tableSegments.cell(0, 0));
    }
-
 }
