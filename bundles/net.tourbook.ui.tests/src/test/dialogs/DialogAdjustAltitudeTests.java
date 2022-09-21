@@ -20,11 +20,14 @@ import net.tourbook.Messages;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
+import utils.Utils;
 
 public class DialogAdjustAltitudeTests extends UITest {
 
    @Test
    void testAdjustAltitude() {
+
+      Utils.showTourBookView(bot);
 
       //Select a tour for which we have SRTM3 data
       bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
