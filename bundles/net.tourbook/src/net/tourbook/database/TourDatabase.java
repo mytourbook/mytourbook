@@ -5335,7 +5335,6 @@ public class TourDatabase {
    }
 
    /**
-    * /**
     * Is checking the tour database data is updated to the current {@link #TOURBOOK_DB_VERSION}
     *
     * @param splashManager
