@@ -15,7 +15,8 @@
  *******************************************************************************/
 package dialogs;
 
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import net.tourbook.Messages;
+
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -25,10 +26,15 @@ public class DialogAdjustAltitudeTests extends UITest {
    @Test
    void testAdjustAltitute() {
 
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
+      //Select a tour for which we have SRTM3 data
+      bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
             .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
 
       bot.viewByTitle("Tour Editor").show();
-      bot.toolbarButtonWithTooltip("Ad&just Elevation...").click();
+      bot.toolbarButtonWithTooltip(Messages.app_action_edit_adjust_altitude).click();
+
+      bot.button(Messages.adjust_altitude_btn_update_modified_tour).click();
+      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
+
    }
 }
