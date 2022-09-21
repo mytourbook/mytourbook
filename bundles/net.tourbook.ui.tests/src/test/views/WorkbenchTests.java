@@ -85,6 +85,11 @@ public class WorkbenchTests extends UITest {
       bot.button("Open").click(); //$NON-NLS-1$
       Utils.showView(bot, "Waypoints"); //$NON-NLS-1$
 
+      Utils.openOtherMenu(bot);
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode("Tour Data").select(); //$NON-NLS-1$
+      bot.button("Open").click(); //$NON-NLS-1$
+      Utils.showView(bot, "Tour Data"); //$NON-NLS-1$
+
       Utils.showView(bot, "Tour Editor"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Tour Segmenter"); //$NON-NLS-1$
