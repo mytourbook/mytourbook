@@ -40,5 +40,6 @@ public class DialogAdjustAltitudeTests extends UITest {
       bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
 
       //TODO FB assertions of computed elevation gains
+      Utils.getTour(bot);
    }
 }
