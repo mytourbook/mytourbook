@@ -24,7 +24,7 @@ import utils.UITest;
 public class DialogAdjustAltitudeTests extends UITest {
 
    @Test
-   void testAdjustAltitute() {
+   void testAdjustAltitude() {
 
       //Select a tour for which we have SRTM3 data
       bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
