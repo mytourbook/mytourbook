@@ -59,7 +59,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.generate-artifact-name.outputs.artifactFileName }}
-          path: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
+          path: D:\a\mytourbook\mytourbook-BUILD-autocreated\core\net.tourbook.tests\target\site\jacoco-aggregate\jacoco.xml, D:\a\mytourbook\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\site\jacoco-aggregate/jacoco.xml'
           retention-days: 5
           
   check_date:
