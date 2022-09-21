@@ -42,24 +42,24 @@ public class TourSegmenterViewTests extends UITest {
       final SWTBotCombo segmenterMethodCombo = tourSegmenterViewBot.comboBox(0);
 
       segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byAltitude);
-      assertEquals("0:01", tableSegments.cell(0, 0));
+      assertEquals("0:01", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_ByAltitude_Merged);
-      assertEquals("0:35", tableSegments.cell(0, 0));
+      assertEquals("0:35", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byDistance);
-      assertEquals("0:47", tableSegments.cell(0, 0));
+      assertEquals("0:47", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_ByBreakTime);
-      assertEquals("0:20", tableSegments.cell(0, 0));
+      assertEquals("0:20", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byPower);
-      assertEquals("0:01", tableSegments.cell(0, 0));
+      assertEquals("0:01", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byComputedAltiUpDown);
-      assertEquals("0:02", tableSegments.cell(0, 0));
+      assertEquals("0:02", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_Surfing);
-      assertEquals("0:47", tableSegments.cell(0, 0));
+      assertEquals("0:47", tableSegments.cell(0, 0)); //$NON-NLS-1$
    }
 }
