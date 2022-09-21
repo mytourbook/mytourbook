@@ -5294,9 +5294,12 @@ public class TourDatabase {
 
             sqlStartup_UpgradedDb_1_BeforeDbDesignUpdate(_dbVersion_BeforeDesignUpdate, splashManager);
 
+            if(!_isSilentDatabaseUpdate)
+            {
+               
             if (updateDb__1_Design(_dbVersion_BeforeDesignUpdate, splashManager) == false) {
                return false;
-            }
+            }}
 
          } else if (_dbVersion_BeforeDesignUpdate > TOURBOOK_DB_VERSION) {
 
