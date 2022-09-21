@@ -173,6 +173,10 @@ public class TourDatabase {
     * Milliseconds how log the splash message is delayed before it is updated again.
     */
    private static final int    DELAY_SPLASH_LOGGING                       = 1000;
+   
+   private static final String  SYS_PROP__SILENT_DATABASE_UPDATE = "silentDatabaseUpdate";                                      //$NON-NLS-1$
+   private static final boolean _isSilentDatabaseUpdate          = System.getProperty(SYS_PROP__SILENT_DATABASE_UPDATE) != null;
+
 
    /**
     * <b> !!! Table names are set to uppercase otherwise conn.getMetaData().getColumns() would not
