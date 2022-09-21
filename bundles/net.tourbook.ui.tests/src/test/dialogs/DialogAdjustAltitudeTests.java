@@ -40,6 +40,9 @@ public class DialogAdjustAltitudeTests extends UITest {
       bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
 
       //TODO FB assertions of computed elevation gains
+
+      // This is necessary as otherwise the subsequent tests will fail with
+      // org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException: Could not find menu bar for shell: Shell with text {}
       Utils.getTour(bot);
    }
 }
