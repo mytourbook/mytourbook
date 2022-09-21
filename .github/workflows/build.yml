@@ -61,6 +61,10 @@ jobs:
           name: ${{ steps.generate-artifact-name.outputs.artifactFileName }}
           path: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
           retention-days: 5
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
           
   check_date:
     runs-on: windows-latest
