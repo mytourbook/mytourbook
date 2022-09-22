@@ -4977,7 +4977,8 @@ public class TourDatabase {
             }
             _isDbInDataUpdate = false;
 
-            if (_dbDesignVersion_Old != _dbDesignVersion_New) {
+            if (!_isSilentDatabaseUpdate &&
+                  _dbDesignVersion_Old != _dbDesignVersion_New) {
 
                // display info for the successful update
 
@@ -5293,11 +5294,9 @@ public class TourDatabase {
 
             sqlStartup_UpgradedDb_1_BeforeDbDesignUpdate(_dbVersion_BeforeDesignUpdate, splashManager);
 
-            if (!_isSilentDatabaseUpdate) {
+            if (updateDb__1_Design(_dbVersion_BeforeDesignUpdate, splashManager) == false) {
+               return false;
 
-               if (updateDb__1_Design(_dbVersion_BeforeDesignUpdate, splashManager) == false) {
-                  return false;
-               }
             }
 
          } else if (_dbVersion_BeforeDesignUpdate > TOURBOOK_DB_VERSION) {
@@ -5518,34 +5517,36 @@ public class TourDatabase {
     */
    private boolean updateDb__1_Design(int currentDbVersion, final SplashManager splashManager) {
 
-      /*
-       * Confirm update
-       */
+      if (!_isSilentDatabaseUpdate) {
+         /*
+          * Confirm update
+          */
 
-      // define buttons with default to "Close App"
-      final String[] buttons = new String[] {
-            Messages.Tour_Database_Action_UpdateDatabase,
-            Messages.Tour_Database_Action_CloseApp };
+         // define buttons with default to "Close App"
+         final String[] buttons = new String[] {
+               Messages.Tour_Database_Action_UpdateDatabase,
+               Messages.Tour_Database_Action_CloseApp };
 
-      final String dialogMessage = NLS.bind(Messages.Tour_Database_Dialog_ConfirmUpdate_Message,
-            new Object[] {
-                  currentDbVersion,
-                  TOURBOOK_DB_VERSION,
-                  _databasePath });
+         final String dialogMessage = NLS.bind(Messages.Tour_Database_Dialog_ConfirmUpdate_Message,
+               new Object[] {
+                     currentDbVersion,
+                     TOURBOOK_DB_VERSION,
+                     _databasePath });
 
-      if ((new MessageDialog(
-            splashManager.getShell(),
-            Messages.Tour_Database_Dialog_ConfirmUpdate_Title,
-            null,
-            dialogMessage,
-            MessageDialog.QUESTION,
-            buttons,
-            1).open()) != Window.OK) {
+         if ((new MessageDialog(
+               splashManager.getShell(),
+               Messages.Tour_Database_Dialog_ConfirmUpdate_Title,
+               null,
+               dialogMessage,
+               MessageDialog.QUESTION,
+               buttons,
+               1).open()) != Window.OK) {
 
-         // the user will not update -> close application
-         PlatformUI.getWorkbench().close();
+            // the user will not update -> close application
+            PlatformUI.getWorkbench().close();
 
-         return false;
+            return false;
+         }
       }
 
       /*
