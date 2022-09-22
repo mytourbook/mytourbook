@@ -375,7 +375,7 @@ public class Suunto2_SAXHandler extends DefaultHandler {
          _isInTemperature = false;
 
          final float kelvin = Util.parseFloat(_characters.toString());
-         _sampleData.temperature = (float) (kelvin - Fmath.T_ABS);
+         _sampleData.temperature = (float) (kelvin + Fmath.T_ABS);
 
       } else if (name.equals(TAG_UTC)) {
 

@@ -625,7 +625,7 @@ public class Suunto3_STAXHandler {
             case TAG_SAMPLE_TEMPERATURE:
                data = ((Characters) eventReader.nextEvent()).getData();
                final float kelvin = Util.parseFloat(data);
-               _sampleData.temperature = (float) (kelvin - Fmath.T_ABS);
+               _sampleData.temperature = (float) (kelvin + Fmath.T_ABS);
                break;
 
             case TAG_SAMPLE_UTC:
