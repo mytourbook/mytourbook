@@ -173,10 +173,6 @@ public class TourDatabase {
     * Milliseconds how log the splash message is delayed before it is updated again.
     */
    private static final int    DELAY_SPLASH_LOGGING                       = 1000;
-   
-   private static final String  SYS_PROP__SILENT_DATABASE_UPDATE = "silentDatabaseUpdate";                                      //$NON-NLS-1$
-   private static final boolean _isSilentDatabaseUpdate          = System.getProperty(SYS_PROP__SILENT_DATABASE_UPDATE) != null;
-
 
    /**
     * <b> !!! Table names are set to uppercase otherwise conn.getMetaData().getColumns() would not
@@ -425,6 +421,9 @@ public class TourDatabase {
       SQL_DOUBLE_MIN_VALUE = Double.toString(DEFAULT_DOUBLE);
    }
 
+   private static final String                   SYS_PROP__SILENT_DATABASE_UPDATE = "silentDatabaseUpdate";                                      //$NON-NLS-1$
+   private static final boolean                  _isSilentDatabaseUpdate          = System.getProperty(SYS_PROP__SILENT_DATABASE_UPDATE) != null;
+
    private boolean                               _isDbInitialized;
    private boolean                               _isDbInDataUpdate;
    private boolean                               _isTableChecked;
@@ -434,10 +433,10 @@ public class TourDatabase {
    private int                                   _dbDesignVersion_New;
    private int                                   _dbDesignVersion_Old;
 
-   private final ListenerList<IPropertyListener> _propertyListeners      = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IPropertyListener> _propertyListeners               = new ListenerList<>(ListenerList.IDENTITY);
 
-   private boolean                               _isSQLDesignUpdateError = false;
-   private boolean                               _isSQLDataUpdateError   = false;
+   private boolean                               _isSQLDesignUpdateError          = false;
+   private boolean                               _isSQLDataUpdateError            = false;
 
    /**
     * Database version before a db design update is performed
@@ -5294,12 +5293,12 @@ public class TourDatabase {
 
             sqlStartup_UpgradedDb_1_BeforeDbDesignUpdate(_dbVersion_BeforeDesignUpdate, splashManager);
 
-            if(!_isSilentDatabaseUpdate)
-            {
-               
-            if (updateDb__1_Design(_dbVersion_BeforeDesignUpdate, splashManager) == false) {
-               return false;
-            }}
+            if (!_isSilentDatabaseUpdate) {
+
+               if (updateDb__1_Design(_dbVersion_BeforeDesignUpdate, splashManager) == false) {
+                  return false;
+               }
+            }
 
          } else if (_dbVersion_BeforeDesignUpdate > TOURBOOK_DB_VERSION) {
 
