@@ -33,7 +33,7 @@
              <skipTests>true</skipTests>
              <osgiDataDirectory>${project.basedir}/workspace</osgiDataDirectory>
              <deleteOsgiDataDirectory>false</deleteOsgiDataDirectory>
-             <argLine>${tycho.testArgLine} -Djunit.jupiter.extensions.autodetection.enabled=true</argLine>
+             <argLine>${tycho.testArgLine} -Djunit.jupiter.extensions.autodetection.enabled=true -DsilentDatabaseUpdate</argLine>
          </configuration>
       </plugin>
       
