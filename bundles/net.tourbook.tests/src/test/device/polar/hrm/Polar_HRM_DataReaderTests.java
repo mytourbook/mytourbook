@@ -29,7 +29,7 @@ public class Polar_HRM_DataReaderTests extends DeviceDataReaderTester {
    private Polar_HRM_DataReader deviceDataReader = new Polar_HRM_DataReader();
 
    /**
-    * Sample downloaded from
+    * Sample provided by
     * https://sourceforge.net/projects/hrmedit/files/hrmedit/Sample%20HRM%20files/
     */
    @Test
