@@ -204,9 +204,9 @@
   "weather_Temperature_Average" : 0.0,
   "weather_Temperature_Average_Device" : 23.693726,
   "weather_Temperature_Max" : 0.0,
-  "weather_Temperature_Max_Device" : 29.800018,
+  "weather_Temperature_Max_Device" : 29.800013,
   "weather_Temperature_Min" : 0.0,
-  "weather_Temperature_Min_Device" : 22.200012,
+  "weather_Temperature_Min_Device" : 22.200006,
   "weather_Temperature_WindChill" : 0.0,
   "weather_Wind_Direction" : -1,
   "weather_Wind_Speed" : 0
