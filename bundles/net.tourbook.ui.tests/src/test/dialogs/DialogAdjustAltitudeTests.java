@@ -33,17 +33,21 @@ public class DialogAdjustAltitudeTests extends UITest {
       Utils.showTourBookView(bot);
 
       //Select a tour for which we have SRTM3 data
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
+      SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
             .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertEquals("658", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
 
       bot.viewByTitle("Tour Editor").show();
       bot.toolbarButtonWithTooltip(Messages.app_action_edit_adjust_altitude).click();
 
+      bot.comboBox(0).setSelection(Messages.adjust_altitude_type_start_and_end);
       bot.button(Messages.adjust_altitude_btn_update_modified_tour).click();
       bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
 
       //Check the new elevation gain value
-      assertEquals("0.542", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
+      tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertEquals("687", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
 
       // This is necessary as otherwise the subsequent tests will fail with
       // org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException: Could not find menu bar for shell: Shell with text {}
