@@ -15,8 +15,11 @@
  *******************************************************************************/
 package dialogs;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import net.tourbook.Messages;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -30,7 +33,7 @@ public class DialogAdjustAltitudeTests extends UITest {
       Utils.showTourBookView(bot);
 
       //Select a tour for which we have SRTM3 data
-      bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
             .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
 
       bot.viewByTitle("Tour Editor").show();
@@ -39,7 +42,8 @@ public class DialogAdjustAltitudeTests extends UITest {
       bot.button(Messages.adjust_altitude_btn_update_modified_tour).click();
       bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
 
-      //TODO FB assertions of computed elevation gains
+      //Check the new elevation gain value
+      assertEquals("0.542", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
 
       // This is necessary as otherwise the subsequent tests will fail with
       // org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException: Could not find menu bar for shell: Shell with text {}
