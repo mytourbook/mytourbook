@@ -13,29 +13,28 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package device.polar.hrm;
+package device.hac4;
 
-import net.tourbook.device.polar.hrm.Polar_HRM_DataReader;
+import net.tourbook.device.hac4.HAC4DeviceReader;
 
 import org.junit.jupiter.api.Test;
 
 import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
-public class Polar_HRM_DataReaderTests extends DeviceDataReaderTester {
+/**
+ * Samples provided by cyc1ingsir
+ * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-3714641
+ */
+public class HAC4DeviceReaderTests extends DeviceDataReaderTester {
 
-   public static final String   FILES_PATH       = FilesUtils.rootPath + "device/polar/hrm/files/"; //$NON-NLS-1$
+   public static final String FILES_PATH       = FilesUtils.rootPath + "device/hac4/files/"; //$NON-NLS-1$
 
-   private Polar_HRM_DataReader deviceDataReader = new Polar_HRM_DataReader();
+   private HAC4DeviceReader   deviceDataReader = new HAC4DeviceReader();
 
-   /**
-    * Sample provided by
-    * https://sourceforge.net/projects/hrmedit/files/hrmedit/Sample%20HRM%20files/
-    */
    @Test
-   void testHrmImport_080510() {
+   void testHAC4Import_2006() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "SampleHRM_WithErrorsAtTheEnd", ".hrm");
+      //testImportFile(deviceDataReader, FILES_PATH + "20060327-20060608_Touren", ".dat");
    }
-
 }

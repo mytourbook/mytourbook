@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -103,16 +103,16 @@ public class HAC4DeviceReader extends TourbookDevice {
       /*
        * check if the first 4 bytes are set to AFRO
        */
-      if (byteIndex == 0 & newByte == 'A') {
+      if (byteIndex == 0 && newByte == 'A') {
          return true;
       }
-      if (byteIndex == 1 & newByte == 'F') {
+      if (byteIndex == 1 && newByte == 'F') {
          return true;
       }
-      if (byteIndex == 2 & newByte == 'R') {
+      if (byteIndex == 2 && newByte == 'R') {
          return true;
       }
-      if (byteIndex == 3 & newByte == 'O') {
+      if (byteIndex == 3 && newByte == 'O') {
          return true;
       }
 
@@ -278,7 +278,7 @@ public class HAC4DeviceReader extends TourbookDevice {
             lastTourMonth = (lastTourMonth == 0) ? startBlock.month : lastTourMonth;
 
             /*
-             * because we read the tours in decending order (last tour first), we check if the
+             * because we read the tours in descending order (last tour first), we check if the
              * month of the current tour is higher than from the last tour, if this is the case,
              * we assume to have data from the previous year
              */
@@ -549,7 +549,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 
             /*
              * make sure to end not in an endless loop where the current AA offset is the same
-             * as the first AA offset (this seems to be unlikely but it happend already 2 Month
+             * as the first AA offset (this seems to be unlikely but it happened already 2 Month
              * after the first implementation)
              */
             if (offsetAARecord == initialOffsetAARecord) {
