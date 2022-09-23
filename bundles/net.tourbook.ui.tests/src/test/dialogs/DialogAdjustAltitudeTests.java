@@ -35,6 +35,18 @@ public class DialogAdjustAltitudeTests extends UITest {
       bot.toolbarButtonWithTooltip(Messages.app_action_edit_adjust_altitude).click();
 
       bot.comboBox(0).setSelection(adjustmentMethod);
+
+      bot.button(Messages.adjust_altitude_btn_reset_altitude).click();
+      bot.button(Messages.adjust_altitude_btn_update_altitude).click();
+
+      if (adjustmentMethod.equals(Messages.adjust_altitude_type_adjust_height)) {
+         bot.spinner(2).setSelection(300);
+      } else if (adjustmentMethod.equals(Messages.adjust_altitude_type_adjust_end)) {
+         bot.spinner(1).setSelection(200);
+      } else if (adjustmentMethod.equals(Messages.adjust_altitude_type_adjust_whole_tour)) {
+         bot.spinner(0).setSelection(1000);
+      }
+
       bot.button(Messages.adjust_altitude_btn_update_modified_tour).click();
       bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
 
@@ -56,10 +68,10 @@ public class DialogAdjustAltitudeTests extends UITest {
 
       Utils.showTourBookView(bot);
 
+      adjustAltitude("658", Messages.adjust_altitude_type_adjust_whole_tour); //$NON-NLS-1$
       adjustAltitude("687", Messages.adjust_altitude_type_start_and_end); //$NON-NLS-1$
-      adjustAltitude("687", Messages.adjust_altitude_type_adjust_height); //$NON-NLS-1$
-      adjustAltitude("687", Messages.adjust_altitude_type_adjust_end); //$NON-NLS-1$
-      adjustAltitude("687", Messages.adjust_altitude_type_adjust_whole_tour); //$NON-NLS-1$
+      adjustAltitude("2,960", Messages.adjust_altitude_type_adjust_height); //$NON-NLS-1$
+      adjustAltitude("2,578", Messages.adjust_altitude_type_adjust_end); //$NON-NLS-1$
 
       // This is necessary as otherwise the subsequent tests will fail with
       // org.eclipse.swtbot.swt.finder.exceptions.WidgetNotFoundException: Could not find menu bar for shell: Shell with text {}
