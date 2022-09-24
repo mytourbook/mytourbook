@@ -18,6 +18,7 @@ package utils;
 import java.util.HashMap;
 
 import net.tourbook.data.TourData;
+import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
 import net.tourbook.importdata.ImportState_Process;
 import net.tourbook.importdata.TourbookDevice;
@@ -48,7 +49,7 @@ public abstract class DeviceDataReaderTester {
       final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
 
       tourbookDevice.processDeviceData(importFileAbsolutePath,
-            null,
+            new DeviceData(),
             new HashMap<>(),
             newlyImportedTours,
             new ImportState_File(),
