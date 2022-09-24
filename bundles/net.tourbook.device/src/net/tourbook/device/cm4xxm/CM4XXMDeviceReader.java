@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm, Markus Stipp
+ * Copyright (C) 2005, 2022 Wolfgang Schramm, Markus Stipp
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -98,16 +98,16 @@ public class CM4XXMDeviceReader extends TourbookDevice {
       /*
        * check if the first 4 bytes are set to AFRO
        */
-      if (byteIndex == 0 & newByte == 'A') {
+      if (byteIndex == 0 && newByte == 'A') {
          return true;
       }
-      if (byteIndex == 1 & newByte == 'F') {
+      if (byteIndex == 1 && newByte == 'F') {
          return true;
       }
-      if (byteIndex == 2 & newByte == 'R') {
+      if (byteIndex == 2 && newByte == 'R') {
          return true;
       }
-      if (byteIndex == 3 & newByte == 'O') {
+      if (byteIndex == 3 && newByte == 'O') {
          return true;
       }
 
@@ -636,15 +636,11 @@ public class CM4XXMDeviceReader extends TourbookDevice {
    public boolean validateRawData(final String fileName) {
 
       boolean isValid = false;
+      final File dataFile = new File(fileName);
 
-      BufferedInputStream inStream = null;
-
-      try {
+      try (BufferedInputStream inStream = new BufferedInputStream(new FileInputStream(dataFile))) {
 
          final byte[] buffer = new byte[5];
-
-         final File dataFile = new File(fileName);
-         inStream = new BufferedInputStream(new FileInputStream(dataFile));
 
          inStream.read(buffer);
          if (!"AFRO".equalsIgnoreCase(new String(buffer, 0, 4))) { //$NON-NLS-1$
@@ -680,14 +676,6 @@ public class CM4XXMDeviceReader extends TourbookDevice {
          return false;
       } catch (final Exception e) {
          e.printStackTrace();
-      } finally {
-         if (inStream != null) {
-            try {
-               inStream.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       return isValid;
