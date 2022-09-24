@@ -51,6 +51,10 @@ Changes
 Bugfix
 ======
 
+* Common import
+  - Fixed "Invalid thread access" which occurred when new tour types or tags were created when importing a tour
+    https://github.com/mytourbook/mytourbook/issues/938
+
 * Fit Import (Frederic)
   - Fixed NPE when pauses data are missing      https://sourceforge.net/p/mytourbook/discussion/622811/thread/d52269ce04/
     
