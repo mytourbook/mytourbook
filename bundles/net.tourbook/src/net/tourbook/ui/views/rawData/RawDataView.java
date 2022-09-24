@@ -3063,7 +3063,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             final long time = isPaceAndSpeedFromRecordedTime ? tourData.getTourDeviceTime_Recorded() : tourData.getTourComputedTime_Moving();
 
             final float pace = tourDistance == 0 ? //
-            0
+                  0
                   : time * 1000 / tourDistance * UI.UNIT_VALUE_DISTANCE;
 
             if (pace == 0) {
@@ -4499,7 +4499,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                         canCancelProcess,
                         importState_Process);
 
-                  importState_Process.runPostProcess();
+                  // fix: org.eclipse.swt.SWTException: Invalid thread access
+                  _parent.getDisplay().syncExec(() -> importState_Process.runPostProcess());
                });
 
       } catch (final Exception e) {
