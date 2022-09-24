@@ -13,9 +13,9 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package device.hac4;
+package device.cm4xxm;
 
-import net.tourbook.device.hac4.HAC4DeviceReader;
+import net.tourbook.device.cm4xxm.CM4XXMDeviceReader;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,15 +26,15 @@ import utils.FilesUtils;
  * Samples provided by cyc1ingsir
  * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-3714641
  */
-public class HAC4DeviceReaderTests extends DeviceDataReaderTester {
+public class CM4XXMDeviceReaderTests extends DeviceDataReaderTester {
 
-   public static final String FILES_PATH       = FilesUtils.rootPath + "device/hac4/files/"; //$NON-NLS-1$
+   public static final String FILES_PATH       = FilesUtils.rootPath + "device/cm4xxm/files/"; //$NON-NLS-1$
 
-   private HAC4DeviceReader   deviceDataReader = new HAC4DeviceReader();
+   private CM4XXMDeviceReader deviceDataReader = new CM4XXMDeviceReader();
 
    @Test
    void testHAC4Import_2006() {
 
-      //testImportFile(deviceDataReader, FILES_PATH + "20060327-20060608_Touren", ".dat");
+      testImportFile(deviceDataReader, FILES_PATH + "20060327-20060608_Touren", ".dat");
    }
 }
