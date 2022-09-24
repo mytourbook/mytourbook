@@ -49,6 +49,7 @@ public abstract class DeviceDataReaderTester {
       final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
 
       tourbookDevice.processDeviceData(importFileAbsolutePath,
+            //TODO FB
             new DeviceData(),
             new HashMap<>(),
             newlyImportedTours,

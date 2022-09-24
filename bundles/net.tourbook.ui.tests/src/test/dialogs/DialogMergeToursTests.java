@@ -23,6 +23,7 @@ public class DialogMergeToursTests extends UITest {
 
    @Test
    void testMergeTours() {
+      //TODO FB
 
 //      Utils.showTourBookView(bot);
 
