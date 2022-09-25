@@ -37,6 +37,6 @@ public class CM4XXMDeviceReaderTests extends DeviceDataReaderTester {
    void testCM4XXMImport_2006() {
 
       //todo fb this one fails on github but succeeds locally!?
-      //  testImportFile(deviceDataReader, FILES_PATH + "20060327-20060608_Touren", ".dat");
+     testImportFile(deviceDataReader, FILES_PATH + "20060327-20060608_Touren", ".dat");
    }
 }
