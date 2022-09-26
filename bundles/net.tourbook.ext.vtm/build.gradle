@@ -167,32 +167,32 @@ task extractNatives {
 // copy vtm natives into plugin fragment
 task copyVtmNatives_Linux(type: Copy) {
 
-   from nativesDir_Vtm + '/linux'
-   into nativesDir_Linux
-    include '**/*'
+   from     nativesDir_Vtm + '/linux'
+   into     nativesDir_Linux
+   include  '**/*'
 }
 task copyVtmNatives_MacOS(type: Copy) {
 
-   from nativesDir_Vtm + '/osx'
-   into nativesDir_MacOS
-    include '**/*'
+   from     nativesDir_Vtm + '/osx'
+   into     nativesDir_MacOS
+   include  '**/*'
 }
 task copyVtmNatives_Windows(type: Copy) {
 
-   from nativesDir_Vtm + '/windows'
-   into nativesDir_Windows
-    include '**/*'
+   from     nativesDir_Vtm + '/windows'
+   into     nativesDir_Windows
+   include  '**/*'
 }
 
 // sync will remove old jar's !!!
 task copyDependenciesIntoLibFolder(type: Sync) {
 
    // sync compile jar's (dependencies) into the lib folder
-   into 'libs'
-   from configurations.compile
-    
-   exclude '*natives*.jar'
-   exclude   'net.tourbook.*.jar' 
+   from     configurations.compile
+   into     'libs'
+
+   exclude  '*natives*.jar'
+   exclude  'net.tourbook.*.jar' 
 }
 
 // MUST be set AFTER task declaration !!!
