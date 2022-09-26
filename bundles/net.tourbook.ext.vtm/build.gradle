@@ -138,7 +138,7 @@ task extractNatives {
                include '*.so'
             }
             
-         } else if (file.name.contains('natives-osx')) {
+         } else if (file.name.contains('natives-macos')) {
    
             println "\t$file.name - $file.path"
    
@@ -226,26 +226,28 @@ tasks.classes.dependsOn(
 // Convert created .classpath entries from
 //
 //   <classpathentry 
-//      kind      ="lib" 
-//      path      ="C:/Users/<user>/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.5/6c6c702c89bfff3cd9e80b04d668c5e190d588c6/commons-lang3-3.5.jar"
+//      kind         ="lib" 
+//      path         ="C:/Users/<user>/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.5/6c6c702c89bfff3cd9e80b04d668c5e190d588c6/commons-lang3-3.5.jar"
 //      sourcepath   ="C:/Users/<user>/.gradle/caches/modules-2/files-2.1/org.apache.commons/commons-lang3/3.5/f7d878153e86a1cdddf6b37850e00a9f8bff726f/commons-lang3-3.5-sources.jar" 
 //   />
 //
 // into plugin "local" folders
 //
 //   <classpathentry 
-//      kind      ="lib" 
-//      exported   ="true" 
-//      path      ="libs/commons-lang3-3.5.jar"
+//      kind         ="lib" 
+//      exported     ="true" 
+//      path         ="libs/commons-lang3-3.5.jar"
 //      sourcepath   ="libs/commons-lang3-3.5-sources.jar" 
 //   />
+
 eclipse.classpath.file { 
 
-   // cleanup classpath
+   // cleanup file: .classpath
    whenMerged { classpath ->
 
-      // remove natives classpath entries, they causes errors
+      // remove natives classpath entries, they are causing errors
       classpath.entries.removeAll{ entry -> entry.path.contains('vtm-parent/vtm-desktop/natives') }
+      classpath.entries.removeAll{ entry -> entry.path.contains('-natives-') }
 
       // remove natives which are put into platform features
       classpath.entries.removeAll{ entry -> entry.path.contains('net.tourbook') }
@@ -308,6 +310,7 @@ osgiBndManifest {
    copyTo 'META-INF/MANIFEST.MF'
 }
 
+// Creates the "Bundle-ClassPath" in MANIFEST.MF
 def createBundleClassPath() {
 
     def list = []
@@ -327,7 +330,10 @@ def createBundleClassPath() {
              name.startsWith('net.tourbook') 
           || name.startsWith('gdx-platform') 
           || name.startsWith('lwjgl-platform') 
-          || name.startsWith('jinput-platform')) { 
+          || name.startsWith('jinput-platform')
+          || name.contains  ('-natives')
+          
+       ) { 
        
           // skip dummy jars (net.tourbook) and platform jars
        

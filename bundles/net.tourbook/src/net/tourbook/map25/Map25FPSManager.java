@@ -15,37 +15,29 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 
 /**
  * Manage frame per seconds for the 2.5D map
  */
 public class Map25FPSManager {
 
-   public static int                            DEFAULT_FOREGROUND_FPS = 30;
-   private static int                           DEFAULT_BACKGROUND_FPS = 1;
+   public static int                             DEFAULT_FOREGROUND_FPS = 30;
+   private static int                            DEFAULT_BACKGROUND_FPS = 1;
 
-   private static LwjglApplication              _lwjglApp;
-   private static LwjglApplicationConfiguration _appConfig;
+   private static Lwjgl3Application              _lwjglApp;
+   private static Lwjgl3ApplicationConfiguration _appConfig;
 
-   private static int                           _animationFPS;
+   private static int                            _animationFPS;
 
-   public static long getBackgroundFPS() {
-      return _appConfig.backgroundFPS;
-   }
-
-   public static long getForegroundFPS() {
-      return _appConfig.foregroundFPS;
-   }
-
-   public static void init(final LwjglApplication lwjglApp, final LwjglApplicationConfiguration appConfig) {
+   public static void init(final Lwjgl3Application lwjglApp, final Lwjgl3ApplicationConfiguration appConfig) {
 
       _lwjglApp = lwjglApp;
       _appConfig = appConfig;
 
       _appConfig.foregroundFPS = DEFAULT_FOREGROUND_FPS;
-      _appConfig.backgroundFPS = DEFAULT_BACKGROUND_FPS;
+      _appConfig.setIdleFPS(DEFAULT_BACKGROUND_FPS);
    }
 
    /**
@@ -80,11 +72,11 @@ public class Map25FPSManager {
     */
    public static void setBackgroundFPSToAnimationFPS(final boolean isEnabled) {
 
-      _appConfig.backgroundFPS = isEnabled
+      _appConfig.setIdleFPS(isEnabled
 
             ? _animationFPS
 
-            : DEFAULT_BACKGROUND_FPS;
+            : DEFAULT_BACKGROUND_FPS);
    }
 
 }
