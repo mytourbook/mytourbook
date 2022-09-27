@@ -1356,9 +1356,7 @@ public class Map25ConfigManager {
 
       _activeTrackConfig = newConfig;
 
-      Map25FPSManager.setAnimation(
-            newConfig.arrow_IsAnimate,
-            newConfig.arrow_ArrowsPerSecond);
+      Map25FPSManager.setAnimation(newConfig.arrow_IsAnimate);
    }
 
    /**
