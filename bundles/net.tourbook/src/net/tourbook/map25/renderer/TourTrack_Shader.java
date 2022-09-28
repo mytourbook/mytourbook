@@ -18,6 +18,7 @@ package net.tourbook.map25.renderer;
 import static org.oscim.backend.GLAdapter.gl;
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
+import net.tourbook.common.UI;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 
@@ -78,7 +79,7 @@ public final class TourTrack_Shader {
 
       DirectionArrowsShader(final String shaderFile) {
 
-         if (createMT(shaderFile) == false) {
+         if (create(shaderFile, "#version 330" + UI.NEW_LINE) == false) {
             return;
          }
 
@@ -123,7 +124,7 @@ public final class TourTrack_Shader {
 
       LineShader(final String shaderFile) {
 
-         if (createMT(shaderFile) == false) {
+         if (create(shaderFile, null) == false) {
             return;
          }
 

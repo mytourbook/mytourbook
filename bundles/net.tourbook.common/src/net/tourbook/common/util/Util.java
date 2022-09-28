@@ -130,6 +130,30 @@ public class Util {
     */
    public static final int    NUMBER_OF_PROCESSORS        = Runtime.getRuntime().availableProcessors();
 
+   /**
+    * Prepend a line number to each text line.
+    *
+    * @param text
+    * @return
+    */
+   public static String addLineNumbers(final String text) {
+
+      final String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
+
+      final StringBuilder sb = new StringBuilder();
+
+      for (int lineNumber = 0; lineNumber < lines.length; lineNumber++) {
+
+         final String line = lines[lineNumber];
+
+         sb.append(String.format("%-4d  ", lineNumber + 1)); //$NON-NLS-1$
+         sb.append(line);
+         sb.append(UI.NEW_LINE);
+      }
+
+      return sb.toString();
+   }
+
    public static int adjustScaleValueOnMouseScroll(final MouseEvent event) {
 
       // accelerate with Ctrl + Shift key

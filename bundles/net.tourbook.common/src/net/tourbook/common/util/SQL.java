@@ -33,24 +33,6 @@ public final class SQL {
 
    public static final String SQL_STRING_SEPARATOR = "'"; //$NON-NLS-1$
 
-   private static String addLineNumbers(final String text) {
-
-      final String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
-
-      final StringBuilder sb = new StringBuilder();
-
-      for (int lineNumber = 0; lineNumber < lines.length; lineNumber++) {
-
-         final String line = lines[lineNumber];
-
-         sb.append(String.format("%d   ", lineNumber + 1)); //$NON-NLS-1$
-         sb.append(line);
-         sb.append(UI.NEW_LINE);
-      }
-
-      return sb.toString();
-   }
-
    public static void close(final Connection conn) {
 
       if (conn != null) {
@@ -156,23 +138,19 @@ public final class SQL {
       System.out.println();
       System.out.println(sqlStatement);
 
-      final String sqlStatementWithNumber = addLineNumbers(sqlStatement);
+      final String sqlStatementWithNumber = Util.addLineNumbers(sqlStatement);
 
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      final Display display = Display.getDefault();
+      display.asyncExec(() -> {
 
-            final String message = "SQL statement: " + UI.NEW_LINE2 // //$NON-NLS-1$
-                  + sqlStatementWithNumber + UI.NEW_LINE2
-                  + Util.getSQLExceptionText(exception);
+         final String message = "SQL statement: " + UI.NEW_LINE2 // //$NON-NLS-1$
+               + sqlStatementWithNumber + UI.NEW_LINE2
+               + Util.getSQLExceptionText(exception);
 
-            SQLMessageDialog.openError(Display.getDefault().getActiveShell(),
-                  "SQL Error", //$NON-NLS-1$
-                  message);
+         SQLMessageDialog.openError(display.getActiveShell(), "SQL Error", message); //$NON-NLS-1$
 
-            StatusUtil.logError(message);
-            StatusUtil.log(exception);
-         }
+         StatusUtil.logError(message);
+         StatusUtil.log(exception);
       });
    }
 }
