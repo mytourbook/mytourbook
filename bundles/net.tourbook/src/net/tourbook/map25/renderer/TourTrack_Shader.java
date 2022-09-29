@@ -79,7 +79,7 @@ public final class TourTrack_Shader {
 
       DirectionArrowsShader(final String shaderFile) {
 
-         if (create(shaderFile, "#version 330" + UI.NEW_LINE) == false) {
+         if (loadShader(shaderFile, "#version 330" + UI.NEW_LINE) == false) {
             return;
          }
 
@@ -124,7 +124,7 @@ public final class TourTrack_Shader {
 
       LineShader(final String shaderFile) {
 
-         if (create(shaderFile, null) == false) {
+         if (loadShader(shaderFile, null) == false) {
             return;
          }
 

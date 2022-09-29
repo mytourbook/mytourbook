@@ -23,6 +23,7 @@ import java.nio.IntBuffer;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 
 import org.oscim.backend.GL;
@@ -38,9 +39,41 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class GLShaderMT {
 
-   static final Logger log = LoggerFactory.getLogger(GLShaderMT.class);
+   private static final char NL                   = UI.NEW_LINE;
 
-   private int         _programID;
+   static final Logger       log                  = LoggerFactory.getLogger(GLShaderMT.class);
+
+   private static boolean    IS_LOG_SHADER_SOURCE = false;
+
+   private int               _programID;
+
+   protected int getAttrib(final String name) {
+
+      final int loc = gl.getAttribLocation(_programID, name);
+
+      if (loc < 0) {
+         log.debug("Missing attribute: {}", name); //$NON-NLS-1$
+      }
+
+      return loc;
+   }
+
+   protected int getUniform(final String name) {
+
+      final int loc = gl.getUniformLocation(_programID, name);
+      if (loc < 0) {
+         log.debug("Missing uniform: {}", name); //$NON-NLS-1$
+      }
+
+      return loc;
+   }
+
+   protected boolean loadShader(final String fileName, final String directives) {
+
+      _programID = loadShader_10(fileName, directives);
+
+      return _programID != 0;
+   }
 
    /**
     * Load shader file from the plugin bundle filepath
@@ -49,7 +82,7 @@ public abstract class GLShaderMT {
     * @param directives
     * @return
     */
-   private static int loadShader_10(final String file, final String directives) {
+   private int loadShader_10(final String file, final String directives) {
 
       final String path = "shaders/" + file + ".glsl"; //$NON-NLS-1$ //$NON-NLS-2$
 
@@ -78,7 +111,7 @@ public abstract class GLShaderMT {
       final String fragmentShaderCode = shaderFileContent.substring(fragmentShaderStart + 2);
       shaderFileContent = shaderFileContent.substring(0, fragmentShaderStart);
 
-      final int shaderID = loadShader_20_AttachShader(shaderFileContent, fragmentShaderCode, directives);
+      final int shaderID = loadShader_20_AttachShader(shaderFileContent, fragmentShaderCode, directives, fileURL);
       if (shaderID == 0) {
          System.out.println(shaderFileContent + " \n\n" + fragmentShaderCode); //$NON-NLS-1$
       }
@@ -90,11 +123,13 @@ public abstract class GLShaderMT {
     * @param vertexSource
     * @param fragmentSource
     * @param directives
+    * @param fileURL
     * @return Returns OpenGL program ID
     */
-   private static int loadShader_20_AttachShader(final String vertexSource,
-                                                 final String fragmentSource,
-                                                 final String directives) {
+   private int loadShader_20_AttachShader(final String vertexSource,
+                                          final String fragmentSource,
+                                          final String directives,
+                                          final String fileURL) {
 
       String sourceDefinitions = ""; //$NON-NLS-1$
       if (directives != null) {
@@ -109,28 +144,26 @@ public abstract class GLShaderMT {
          sourceDefinitions += "#define GLES 1\n"; //$NON-NLS-1$
       }
 
-//    sourceDefinitions += "#define GLVERSION " + (GLAdapter.isGL30() ? "30" : "20") + "\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-
-      final int vertexShaderID = loadShader_30_CompileShader(GL.VERTEX_SHADER, sourceDefinitions + vertexSource);
+      final int vertexShaderID = loadShader_30_CompileShader(GL.VERTEX_SHADER, sourceDefinitions + vertexSource, fileURL);
       if (vertexShaderID == 0) {
          return 0;
       }
 
-      final int pixelShaderID = loadShader_30_CompileShader(GL.FRAGMENT_SHADER, sourceDefinitions + fragmentSource);
-      if (pixelShaderID == 0) {
+      final int fragmentShaderID = loadShader_30_CompileShader(GL.FRAGMENT_SHADER, sourceDefinitions + fragmentSource, fileURL);
+      if (fragmentShaderID == 0) {
          return 0;
       }
 
       int programID = gl.createProgram();
+      GLUtils.checkGlError(GLShaderMT.class.getName() + ": glCreateProgram"); //$NON-NLS-1$
+
       if (programID != 0) {
 
-         GLUtils.checkGlError(GLShaderMT.class.getName() + ": glCreateProgram"); //$NON-NLS-1$
-
          gl.attachShader(programID, vertexShaderID);
-         GLUtils.checkGlError(GLShaderMT.class.getName() + ": glAttachShader"); //$NON-NLS-1$
+         GLUtils.checkGlError(GLShaderMT.class.getName() + ": glAttachShader vertex"); //$NON-NLS-1$
 
-         gl.attachShader(programID, pixelShaderID);
-         GLUtils.checkGlError(GLShaderMT.class.getName() + ": glAttachShader"); //$NON-NLS-1$
+         gl.attachShader(programID, fragmentShaderID);
+         GLUtils.checkGlError(GLShaderMT.class.getName() + ": glAttachShader fragment"); //$NON-NLS-1$
 
          gl.linkProgram(programID);
 
@@ -154,9 +187,10 @@ public abstract class GLShaderMT {
    /**
     * @param shaderType
     * @param source
+    * @param fileURL
     * @return Returns OpenGL shader ID
     */
-   private static int loadShader_30_CompileShader(final int shaderType, final String source) {
+   private int loadShader_30_CompileShader(final int shaderType, final String source, final String fileURL) {
 
       int shaderID = gl.createShader(shaderType);
 
@@ -169,46 +203,36 @@ public abstract class GLShaderMT {
          gl.getShaderiv(shaderID, GL.COMPILE_STATUS, compiled);
          compiled.position(0);
 
+         final String shaderLog = gl.getShaderInfoLog(shaderID);
+
          if (compiled.get() == 0) {
 
+            // log errors
+
+            System.out.println(fileURL + NL);
             log.error("Could not compile shader ID " + shaderType); //$NON-NLS-1$
-            log.error(gl.getShaderInfoLog(shaderID));
-            System.out.println(Util.addLineNumbers(source));
+            log.error(NL + shaderLog);
+            System.out.println(Util.addLineNumbers(source, 0));
 
             gl.deleteShader(shaderID);
             shaderID = 0;
+
+         } else if (shaderLog != null && shaderLog.length() > 0) {
+
+            // log warnings
+
+            log.error(NL + shaderLog);
+            System.out.println(fileURL + NL);
+            System.out.println(Util.addLineNumbers(source, 0));
+
+         } else if (IS_LOG_SHADER_SOURCE) {
+
+            System.out.println(fileURL + NL);
+            System.out.println(Util.addLineNumbers(source, 0));
          }
       }
 
       return shaderID;
-   }
-
-   protected boolean create(final String fileName, final String directives) {
-
-      _programID = loadShader_10(fileName, directives);
-
-      return _programID != 0;
-   }
-
-   protected int getAttrib(final String name) {
-
-      final int loc = gl.getAttribLocation(_programID, name);
-
-      if (loc < 0) {
-         log.debug("Missing attribute: {}", name); //$NON-NLS-1$
-      }
-
-      return loc;
-   }
-
-   protected int getUniform(final String name) {
-
-      final int loc = gl.getUniformLocation(_programID, name);
-      if (loc < 0) {
-         log.debug("Missing uniform: {}", name); //$NON-NLS-1$
-      }
-
-      return loc;
    }
 
    public boolean useProgram() {

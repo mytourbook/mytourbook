@@ -138,6 +138,17 @@ public class Util {
     */
    public static String addLineNumbers(final String text) {
 
+      return addLineNumbers(text, 1);
+   }
+
+   /**
+    * Prepend a line number to each text line.
+    *
+    * @param text
+    * @return
+    */
+   public static String addLineNumbers(final String text, final int startLineNumer) {
+
       final String[] lines = text.split("\r\n|\r|\n"); //$NON-NLS-1$
 
       final StringBuilder sb = new StringBuilder();
@@ -146,7 +157,7 @@ public class Util {
 
          final String line = lines[lineNumber];
 
-         sb.append(String.format("%-4d  ", lineNumber + 1)); //$NON-NLS-1$
+         sb.append(String.format("%-4d  ", lineNumber + startLineNumer)); //$NON-NLS-1$
          sb.append(line);
          sb.append(UI.NEW_LINE);
       }
