@@ -13,6 +13,7 @@ Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.device,
  net.tourbook.device.cm4xxm,
  net.tourbook.device.crp,
+ net.tourbook.device.daum.ergobike,
  net.tourbook.device.gpx,
  net.tourbook.device.hac4,
  net.tourbook.device.polar.hrm,
