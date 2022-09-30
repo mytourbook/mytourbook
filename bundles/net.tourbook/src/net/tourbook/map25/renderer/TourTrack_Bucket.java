@@ -44,50 +44,50 @@ import org.slf4j.LoggerFactory;
  */
 public class TourTrack_Bucket {
 
-   static final Logger                  log              = LoggerFactory.getLogger(TourTrack_Bucket.class);
+   static final Logger                log              = LoggerFactory.getLogger(TourTrack_Bucket.class);
 
    /**
     * Scale factor mapping extrusion vector to short values
     */
-   public static final float            DIR_SCALE        = 2048;
+   public static final float          DIR_SCALE        = 2048;
 
    /**
     * Maximal resolution
     */
-   private static final float           MIN_DIST         = 1 / 8f;
+   private static final float         MIN_DIST         = 1 / 8f;
 
    /**
     * Not quite right.. need to go back so that additional
     * bevel vertices are at least MIN_DIST apart
     */
-   private static final float           MIN_BEVEL        = MIN_DIST * 4;
+   private static final float         MIN_BEVEL        = MIN_DIST * 4;
 
    /**
     * Mask for packing last two bits of extrusion vector with texture
     * coordinates, .... 1111 1100
     */
-   private static final int             DIR_MASK         = 0xFFFFFFFC;
+   private static final int           DIR_MASK         = 0xFFFFFFFC;
 
-   public LineStyle                     lineStyle;
-   public int                           lineColorMode;
+   public LineStyle                   lineStyle;
+   public int                         lineColorMode;
 
-   private float                        _minimumDistance = MIN_DIST;
-   private float                        _minimumBevel    = MIN_BEVEL;
+   private float                      _minimumDistance = MIN_DIST;
+   private float                      _minimumBevel    = MIN_BEVEL;
 
-   boolean                              _isCapRounded;
-   float                                _heightOffset;
+   boolean                            _isCapRounded;
+   float                              _heightOffset;
 
-   private int                          _tMin            = Integer.MIN_VALUE, _tMax = Integer.MAX_VALUE;
+   private int                        _tMin            = Integer.MIN_VALUE, _tMax = Integer.MAX_VALUE;
 
    /**
     * Number of vertices for this layer.
     */
-   protected int                        numVertices;
+   protected int                      numTrackVertices;
 
    /**
     * Temporary list of vertex data.
     */
-   protected final TourTrack_VertexData vertexItems;
+   private final TourTrack_VertexData _trackVertices;
 
    /**
     * Contains the vertices for direction arrows multiplied with {@link MapRenderer#COORD_SCALE}:
@@ -99,7 +99,7 @@ public class TourTrack_Bucket {
     * ...
     * </pre>
     */
-   protected ShortArrayList             directionArrow_XYZPositions;
+   protected ShortArrayList           directionArrow_XYZPositions;
 
    /**
     * Barycentric coordinates are simply (1, 0, 0), (0, 1, 0) and (0, 0, 1) for the three
@@ -108,13 +108,13 @@ public class TourTrack_Bucket {
     * Source:
     * https://stackoverflow.com/questions/137629/how-do-you-render-primitives-as-wireframes-in-opengl#answer-33004265
     */
-   protected ShortArrayList             directionArrow_ColorCoords;
+   protected ShortArrayList           directionArrow_ColorCoords;
 
-   protected FloatArrayList             directionArrow_ArrowIndices;
+   protected FloatArrayList           directionArrow_ArrowIndices;
 
    public TourTrack_Bucket() {
 
-      vertexItems = new TourTrack_VertexData();
+      _trackVertices = new TourTrack_VertexData();
 
       directionArrow_XYZPositions = new ShortArrayList();
       directionArrow_ColorCoords = new ShortArrayList();
@@ -169,7 +169,7 @@ public class TourTrack_Bucket {
 
       /*
        * Note: just a hack to save some vertices, when there are
-       * more than 200 lines per type. FIXME make optional!
+       * more than 200 lines per type. Fixme: make optional!
        */
       if (isCapRounded && index != null) {
          int cnt = 0;
@@ -236,7 +236,7 @@ public class TourTrack_Bucket {
 
          addLine_ToVertices(
 
-               vertexItems,
+               _trackVertices,
 
                pixelPoints,
                pixelPointColors,
@@ -282,7 +282,7 @@ public class TourTrack_Bucket {
        * + 4 for round caps
        * + 2 for closing polygons
        */
-      numVertices += numLinePoints
+      numTrackVertices += numLinePoints
             + (isRounded ? 6 : 2)
             + (isClosed ? 2 : 0);
 
@@ -346,7 +346,7 @@ public class TourTrack_Bucket {
 
          /*
           * Outside means line is probably clipped
-          * TODO should align ending with tile boundary
+          * Todo: should align ending with tile boundary
           * for now, just extend the line a little
           */
 
@@ -365,7 +365,7 @@ public class TourTrack_Bucket {
          }
 
          if (isRounded) {
-            numVertices -= 2;
+            numTrackVertices -= 2;
          }
 
          // add first vertex twice
@@ -423,7 +423,7 @@ public class TourTrack_Bucket {
          // skip too short segments
          if (unitDistance < _minimumDistance) {
 
-            numVertices -= 2;
+            numTrackVertices -= 2;
 
             continue;
          }
@@ -437,7 +437,7 @@ public class TourTrack_Bucket {
          if (dotp > 0.65) {
 
             // add bevel join to avoid miter going to infinity
-            numVertices += 2;
+            numTrackVertices += 2;
 
             // dotp = FastMath.clamp(dotp, -1, 1);
             // double cos = Math.acos(dotp);
@@ -559,7 +559,7 @@ public class TourTrack_Bucket {
          }
 
          if (isRounded) {
-            numVertices -= 2;
+            numTrackVertices -= 2;
          }
 
          ddx = (int) ((ux - unit1X) * DIR_SCALE);
@@ -633,9 +633,9 @@ public class TourTrack_Bucket {
     */
    protected void clear() {
 
-      vertexItems.dispose();
+      _trackVertices.dispose();
 
-      numVertices = 0;
+      numTrackVertices = 0;
    }
 
    private void createArrow_MiddleFin(final short p2X,
@@ -1012,9 +1012,9 @@ public class TourTrack_Bucket {
       }
    }
 
-   protected void fillVerticesBuffer(final ShortBuffer vboBuffer, final ByteBuffer colorBuffer) {
+   protected void fillOpenGLBuffer(final ShortBuffer vboBuffer, final ByteBuffer colorBuffer) {
 
-      vertexItems.fillVerticesBuffer(vboBuffer, colorBuffer);
+      _trackVertices.fillVerticesBuffer(vboBuffer, colorBuffer);
    }
 
 }

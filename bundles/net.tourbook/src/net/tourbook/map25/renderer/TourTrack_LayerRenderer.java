@@ -250,7 +250,12 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
          final boolean isShowDirectionArrows = trackConfig.isShowDirectionArrow;
-         final int arrow_MinimumDistance = trackConfig.arrow_MinimumDistance;
+         final int arrow_MinimumDistance = trackConfig.arrow_IsAnimate
+
+               // use a smaller distance when animated to show the moving figure smoothly
+               ? trackConfig.arrow_MinimumDistanceAnimated
+
+               : trackConfig.arrow_MinimumDistance;
 
          final TourTrack_Bucket workerBucket = getWorkerBucket(task.__taskBucketManager);
 
@@ -701,7 +706,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       final TourTrack_Bucket workerBucket = workerTask.__taskBucketManager.getBucket_Painter();
       _bucketManager_ForPainting.setBucket_Painter(workerBucket);
 
-      final boolean isDataAvailable = _bucketManager_ForPainting.fillOpenGLBufferData();
+      final boolean isDataAvailable = _bucketManager_ForPainting.fillOpenGLBuffer();
 
       setReady(isDataAvailable);
    }

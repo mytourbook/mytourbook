@@ -69,7 +69,7 @@ public class Map25FPSManager {
 
    /**
     * Set background FPS to a higher rate. This is helpful when a slideout is opened, then it get's
-    * the focus and the map is nomally running with the background FPS.
+    * the focus and the map is normally running with the background FPS.
     *
     * @param isEnabled
     */

@@ -185,6 +185,7 @@ public class Map25ConfigManager {
    public static final boolean              ARROW_IS_SHOW_ARROW_DEFAULT             = true;
    public static final DirectionArrowDesign ARROW_DESIGN_DEFAULT                    = DirectionArrowDesign.WINGS;
    public static final int                  ARROW_MIN_DISTANCE_DEFAULT              = 60;
+   public static final int                  ARROW_MIN_DISTANCE_ANIMATED_DEFAULT     = 3;
    public static final int                  ARROW_VERTICAL_OFFSET_DEFAULT           = 30;
    //
    public static final int                  ARROW_SCALE_DEFAULT                     = 10;

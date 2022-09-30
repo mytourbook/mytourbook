@@ -61,6 +61,7 @@ public class Map25TrackConfig {
    // direction arrow
    public boolean isShowDirectionArrow          = Map25ConfigManager.ARROW_IS_SHOW_ARROW_DEFAULT;
    public int     arrow_MinimumDistance         = Map25ConfigManager.ARROW_MIN_DISTANCE_DEFAULT;
+   public int     arrow_MinimumDistanceAnimated = Map25ConfigManager.ARROW_MIN_DISTANCE_ANIMATED_DEFAULT;
    public int     arrow_VerticalOffset          = Map25ConfigManager.ARROW_VERTICAL_OFFSET_DEFAULT;
    public DirectionArrowDesign arrow_Design     = Map25ConfigManager.ARROW_DESIGN_DEFAULT;
 

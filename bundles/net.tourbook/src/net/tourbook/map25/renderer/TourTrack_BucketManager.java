@@ -72,9 +72,9 @@ public class TourTrack_BucketManager {
     *
     * @return Returns <code>true</code> when data are available
     */
-   public boolean fillOpenGLBufferData() {
+   public boolean fillOpenGLBuffer() {
 
-      final int numTrackVertices = _trackBucket_Painter == null ? 0 : _trackBucket_Painter.numVertices * 4;
+      final int numTrackVertices = _trackBucket_Painter == null ? 0 : _trackBucket_Painter.numTrackVertices * 4;
       if (numTrackVertices <= 0) {
          return false;
       }
@@ -102,7 +102,7 @@ public class TourTrack_BucketManager {
 
 // SET_FORMATTING_ON
 
-      _trackBucket_Painter.fillVerticesBuffer(buffer_TrackVertices, buffer_TrackColors);
+      _trackBucket_Painter.fillOpenGLBuffer(buffer_TrackVertices, buffer_TrackColors);
 
       /*
        * Direction arrows

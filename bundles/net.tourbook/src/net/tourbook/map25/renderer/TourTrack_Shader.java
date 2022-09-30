@@ -68,12 +68,8 @@ public final class TourTrack_Shader {
             shader_u_mvp,
 
             shader_uni_ArrowColors,
-            shader_uni_GlowArrowIndex,
-            shader_uni_IsAnimate,
             shader_uni_OutlineWidth,
             shader_uni_Vp2MpScale
-
-//          shader_u_width
 
       ;
 
@@ -90,13 +86,9 @@ public final class TourTrack_Shader {
             shader_attrib_ColorCoord      = getAttrib("attrib_ColorCoord");      //$NON-NLS-1$
             shader_attrib_ArrowIndices    = getAttrib("attrib_ArrowIndices");    //$NON-NLS-1$
 
-//          shader_u_width                = getUniform("u_width");               //$NON-NLS-1$
             shader_uni_ArrowColors        = getUniform("uni_ArrowColors");       //$NON-NLS-1$
             shader_uni_OutlineWidth       = getUniform("uni_OutlineWidth");      //$NON-NLS-1$
             shader_uni_Vp2MpScale         = getUniform("uni_Vp2MpScale");        //$NON-NLS-1$
-
-            shader_uni_GlowArrowIndex     = getUniform("uni_GlowArrowIndex");    //$NON-NLS-1$
-            shader_uni_IsAnimate          = getUniform("uni_IsAnimate");         //$NON-NLS-1$
 
    // SET_FORMATTING_ON
       }
@@ -225,7 +217,15 @@ public final class TourTrack_Shader {
          paint_10_Track(trackBucket, viewport, vp2mpScale);
 
          if (trackConfig.isShowDirectionArrow) {
-            paint_20_DirectionArrows(viewport, bucketManager, vp2mpScale);
+
+            if (trackConfig.arrow_IsAnimate) {
+
+               paint_30_Animation(viewport, bucketManager, vp2mpScale);
+
+            } else {
+
+               paint_20_DirectionArrows(viewport, bucketManager, vp2mpScale);
+            }
          }
       }
       gl.blendFunc(GL.ONE, GL.ONE_MINUS_SRC_ALPHA); // reset to map default
@@ -434,7 +434,7 @@ public final class TourTrack_Shader {
             gl.uniform1i(shader_u_mode, capMode);
          }
 
-         gl.drawArrays(GL.TRIANGLE_STRIP, 0, trackBucket.numVertices);
+         gl.drawArrays(GL.TRIANGLE_STRIP, 0, trackBucket.numTrackVertices);
       }
 
       /*
@@ -480,7 +480,7 @@ public final class TourTrack_Shader {
 //       }
 //       gl.depthMask(false);
 
-      gl.drawArrays(GL.TRIANGLE_STRIP, 0, trackBucket.numVertices);
+      gl.drawArrays(GL.TRIANGLE_STRIP, 0, trackBucket.numTrackVertices);
    }
 
    private static void paint_20_DirectionArrows(final GLViewport viewport,
@@ -494,8 +494,6 @@ public final class TourTrack_Shader {
       final int shader_a_pos                 = shader.shader_a_pos;
       final int shader_attrib_ColorCoord     = shader.shader_attrib_ColorCoord;
       final int shader_attrib_ArrowIndices   = shader.shader_attrib_ArrowIndices;
-
-//    final int shader_u_width               = shader.shader_u_width;
 
 // SET_FORMATTING_ON
 
@@ -545,10 +543,6 @@ public final class TourTrack_Shader {
             0 //                             offset in bytes of the first component in the vertex attribute array
       );
 
-//    final float width = 10 / vp2mpScale;
-//
-//    gl.uniform1f(shader_u_width, width * COORD_SCALE_BY_DIR_SCALE);
-
       // arrow colors
       final float arrowColors[] = trackConfig.getArrowColors();
       gl.uniform4fv(shader.shader_uni_ArrowColors, arrowColors.length / 4, arrowColors, 0);
@@ -561,10 +555,6 @@ public final class TourTrack_Shader {
       // viewport to map scale: 1.0...2.0
       gl.uniform1f(shader.shader_uni_Vp2MpScale, vp2mpScale);
 
-      // glowing
-      gl.uniform1f(shader.shader_uni_GlowArrowIndex, getGlowArrowIndex(bucketManager));
-      gl.uniform1f(shader.shader_uni_IsAnimate, trackConfig.arrow_IsAnimate ? 1 : 0);
-
       /*
        * Draw direction arrows
        */
@@ -575,7 +565,12 @@ public final class TourTrack_Shader {
       }
       gl.depthMask(false);
 
-      GLUtils.checkGlError(TourTrack_Shader.class.getName());
+//    GLUtils.checkGlError(TourTrack_Shader.class.getName());
+   }
+
+   private static void paint_30_Animation(final GLViewport viewport, final TourTrack_BucketManager bucketManager, final float vp2mpScale) {
+      // TODO Auto-generated method stub
+
    }
 
    public static boolean setupShader() {
