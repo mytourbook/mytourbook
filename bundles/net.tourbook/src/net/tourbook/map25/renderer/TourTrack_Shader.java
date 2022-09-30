@@ -50,7 +50,6 @@ public final class TourTrack_Shader {
    static int                           bufferId_VerticesColor;
    static int                           bufferId_DirArrows;
    static int                           bufferId_DirArrows_ColorCoords;
-   static int                           bufferId_DirArrows_ArrowIndices;
 
    static long                          dirArrowAnimation_StartTime;
    private static float                 _dirArrowAnimation_CurrentArrowIndex;
@@ -63,7 +62,6 @@ public final class TourTrack_Shader {
        */
       int shader_a_pos,
             shader_attrib_ColorCoord,
-            shader_attrib_ArrowIndices,
 
             shader_u_mvp,
 
@@ -81,14 +79,13 @@ public final class TourTrack_Shader {
 
    // SET_FORMATTING_OFF
 
-            shader_u_mvp                  = getUniform("u_mvp");                 //$NON-NLS-1$
-            shader_a_pos                  = getAttrib("a_pos");                  //$NON-NLS-1$
-            shader_attrib_ColorCoord      = getAttrib("attrib_ColorCoord");      //$NON-NLS-1$
-            shader_attrib_ArrowIndices    = getAttrib("attrib_ArrowIndices");    //$NON-NLS-1$
+         shader_a_pos                  = getAttrib("a_pos");                  //$NON-NLS-1$
+         shader_u_mvp                  = getUniform("u_mvp");                 //$NON-NLS-1$
+         shader_attrib_ColorCoord      = getAttrib("attrib_ColorCoord");      //$NON-NLS-1$
 
-            shader_uni_ArrowColors        = getUniform("uni_ArrowColors");       //$NON-NLS-1$
-            shader_uni_OutlineWidth       = getUniform("uni_OutlineWidth");      //$NON-NLS-1$
-            shader_uni_Vp2MpScale         = getUniform("uni_Vp2MpScale");        //$NON-NLS-1$
+         shader_uni_ArrowColors        = getUniform("uni_ArrowColors");       //$NON-NLS-1$
+         shader_uni_OutlineWidth       = getUniform("uni_OutlineWidth");      //$NON-NLS-1$
+         shader_uni_Vp2MpScale         = getUniform("uni_Vp2MpScale");        //$NON-NLS-1$
 
    // SET_FORMATTING_ON
       }
@@ -163,7 +160,7 @@ public final class TourTrack_Shader {
       }
 
       // the last arrow is not displayed -> -1
-      final float maxDirArrows = Math.max(0, bucketManager.numDirectionArrows - 1);
+      final float maxDirArrows = 33; // --> Math.max(0, bucketManager.numDirectionArrows - 1);
       final float maxLoopTime = maxDirArrows / arrowsPerSecond;
 
       final float timeDiffSinceFirstRun = (float) ((currentTimeMS - dirArrowAnimation_StartTime) / 1000.0);
@@ -493,7 +490,6 @@ public final class TourTrack_Shader {
 
       final int shader_a_pos                 = shader.shader_a_pos;
       final int shader_attrib_ColorCoord     = shader.shader_attrib_ColorCoord;
-      final int shader_attrib_ArrowIndices   = shader.shader_attrib_ArrowIndices;
 
 // SET_FORMATTING_ON
 
@@ -525,19 +521,6 @@ public final class TourTrack_Shader {
             shader_attrib_ColorCoord, //     index of the vertex attribute that is to be modified
             3, //                            number of components per vertex attribute, must be 1, 2, 3, or 4
             GL.SHORT, //                     data type of each component in the array
-            false, //                        values should be normalized
-            0, //                            offset in bytes between the beginning of consecutive vertex attributes
-            0 //                             offset in bytes of the first component in the vertex attribute array
-      );
-
-      // arrow index
-      gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows_ArrowIndices);
-      gl.enableVertexAttribArray(shader_attrib_ArrowIndices);
-      gl.vertexAttribPointer(
-
-            shader_attrib_ArrowIndices, //   index of the vertex attribute that is to be modified
-            1, //                            number of components per vertex attribute, must be 1, 2, 3, or 4
-            GL.FLOAT, //                     data type of each component in the array
             false, //                        values should be normalized
             0, //                            offset in bytes between the beginning of consecutive vertex attributes
             0 //                             offset in bytes of the first component in the vertex attribute array
@@ -585,7 +568,6 @@ public final class TourTrack_Shader {
       // create buffer id's
       bufferId_DirArrows               = gl.genBuffer();
       bufferId_DirArrows_ColorCoords   = gl.genBuffer();
-      bufferId_DirArrows_ArrowIndices  = gl.genBuffer();
       bufferId_Vertices                = gl.genBuffer();
       bufferId_VerticesColor           = gl.genBuffer();
 

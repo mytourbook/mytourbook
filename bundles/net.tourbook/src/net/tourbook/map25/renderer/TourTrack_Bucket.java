@@ -99,7 +99,7 @@ public class TourTrack_Bucket {
     * ...
     * </pre>
     */
-   protected ShortArrayList           directionArrow_XYZPositions;
+   protected ShortArrayList           directionArrow_XYZVertexPositions;
 
    /**
     * Barycentric coordinates are simply (1, 0, 0), (0, 1, 0) and (0, 0, 1) for the three
@@ -110,15 +110,12 @@ public class TourTrack_Bucket {
     */
    protected ShortArrayList           directionArrow_ColorCoords;
 
-   protected FloatArrayList           directionArrow_ArrowIndices;
-
    public TourTrack_Bucket() {
 
       _trackVertices = new TourTrack_VertexData();
 
-      directionArrow_XYZPositions = new ShortArrayList();
+      directionArrow_XYZVertexPositions = new ShortArrayList();
       directionArrow_ColorCoords = new ShortArrayList();
-      directionArrow_ArrowIndices = new FloatArrayList();
    }
 
    /**
@@ -638,149 +635,16 @@ public class TourTrack_Bucket {
       numTrackVertices = 0;
    }
 
-   private void createArrow_MiddleFin(final short p2X,
-                                      final short p2Y,
-                                      final short pBackX,
-                                      final short pBackY,
-                                      final short pOnLineX,
-                                      final short pOnLineY,
-                                      final short arrowZ,
-                                      final short finTopZ,
-                                      final short arrowPart_Fin,
-                                      final int arrowIndex) {
-// SET_FORMATTING_OFF
-
-      // fin: middle
-      directionArrow_XYZPositions.addAll(
-
-            p2X,        p2Y,        arrowZ,  arrowPart_Fin,
-            pOnLineX,   pOnLineY,   finTopZ, arrowPart_Fin,
-            pBackX,     pBackY,     arrowZ,  arrowPart_Fin);
-
-      directionArrow_ColorCoords.addAll(
-
-            (short) 1, (short) 1, (short) 0,
-            (short) 0, (short) 1, (short) 0,
-            (short) 0, (short) 0, (short) 1);
-
-      directionArrow_ArrowIndices.addAll(
-
-            arrowIndex,
-            arrowIndex,
-            arrowIndex);
-
-// SET_FORMATTING_ON
-   }
-
-   private void createArrow_OuterFins(final short p2X,
-                                      final short p2Y,
-                                      final short pLeftX,
-                                      final short pLeftY,
-                                      final short pRightX,
-                                      final short pRightY,
-                                      final short arrowZ,
-                                      final short finBottomZ,
-                                      final short arrowPart_Fin,
-                                      final int arrowIndex) {
-// SET_FORMATTING_OFF
-
-      directionArrow_XYZPositions.addAll(
-
-            // fin: left
-            p2X,        p2Y,        arrowZ,     arrowPart_Fin,
-            pLeftX,     pLeftY,     arrowZ,     arrowPart_Fin,
-            pLeftX,     pLeftY,     finBottomZ, arrowPart_Fin,
-
-            // fin: right
-            p2X,        p2Y,        arrowZ,     arrowPart_Fin,
-            pRightX,    pRightY,    arrowZ,     arrowPart_Fin,
-            pRightX,    pRightY,    finBottomZ, arrowPart_Fin);
-
-      directionArrow_ColorCoords.addAll(
-
-            (short) 1, (short) 0, (short) 0,
-            (short) 0, (short) 1, (short) 0,
-            (short) 0, (short) 0, (short) 1,
-
-            (short) 0, (short) 1, (short) 0,
-            (short) 1, (short) 0, (short) 0,
-            (short) 0, (short) 0, (short) 1);
-
-      directionArrow_ArrowIndices.addAll(
-
-            arrowIndex,
-            arrowIndex,
-            arrowIndex,
-
-            arrowIndex,
-            arrowIndex,
-            arrowIndex);
-
-// SET_FORMATTING_ON
-   }
-
-   private void createArrow_Wings(final short p2X,
-                                  final short p2Y,
-                                  final short pLeftX,
-                                  final short pLeftY,
-                                  final short pRight,
-                                  final short pRightY,
-                                  final short pBackX,
-                                  final short pBackY,
-                                  final short arrowZ,
-                                  final short arrowPart_Wing,
-                                  final int arrowIndex) {
-// SET_FORMATTING_OFF
-
-      /*
-       * When the head and tail have the same z-value then the overlapping part is flickering
-       */
-      final short arrowHeadZ = (short) (arrowZ+1);
-
-      directionArrow_XYZPositions.addAll(
-
-            // wing: left
-            p2X,        p2Y,     arrowHeadZ, arrowPart_Wing,
-            pBackX,     pBackY,  arrowZ,     arrowPart_Wing,
-            pLeftX,     pLeftY,  arrowZ,     arrowPart_Wing,
-
-            // wing: right
-            p2X,        p2Y,     arrowHeadZ, arrowPart_Wing,
-            pBackX,     pBackY,  arrowZ,     arrowPart_Wing,
-            pRight,     pRightY, arrowZ,     arrowPart_Wing);
-
-      directionArrow_ColorCoords.addAll(
-
-            (short) 1, (short) 0, (short) 0,
-            (short) 0, (short) 1, (short) 1,
-            (short) 0, (short) 0, (short) 1,
-
-            (short) 1, (short) 0, (short) 0,
-            (short) 0, (short) 1, (short) 1,
-            (short) 0, (short) 0, (short) 1);
-
-      directionArrow_ArrowIndices.addAll(
-
-            arrowIndex,
-            arrowIndex,
-            arrowIndex,
-
-            arrowIndex,
-            arrowIndex,
-            arrowIndex);
-
-// SET_FORMATTING_ON
-   }
-
    /**
+    * Creates direction arrow vertices from it's x/y position
+    *
     * @param allDirectionArrowPixel_Raw
     *           Contains the x/y pixel positions for the direction arrows
     */
-   public void createDirectionArrowVertices(final FloatArrayList allDirectionArrowPixel_Raw) {
+   public void createArrowVertices(final FloatArrayList allDirectionArrowPixel_Raw) {
 
-      directionArrow_XYZPositions.clear();
+      directionArrow_XYZVertexPositions.clear();
       directionArrow_ColorCoords.clear();
-      directionArrow_ArrowIndices.clear();
 
       // at least 2 positions are needed
       if (allDirectionArrowPixel_Raw.size() < 4) {
@@ -931,76 +795,76 @@ public class TourTrack_Bucket {
 
          case WINGS_WITH_MIDDLE_FIN:
 
-            createArrow_Wings(      p2X_scaled,       p2Y_scaled,
-                                    pLeftX_scaled,    pLeftY_scaled,
-                                    pRight_Xscaled,   pRightY_scaled,
-                                    pBackX_scaled,    pBackY_scaled,
-                                    arrowZ,
-                                    arrowPart_Wing,
-                                    arrowIndex);
+            createArrowVertices_10_Wings(    p2X_scaled,       p2Y_scaled,
+                                             pLeftX_scaled,    pLeftY_scaled,
+                                             pRight_Xscaled,   pRightY_scaled,
+                                             pBackX_scaled,    pBackY_scaled,
+                                             arrowZ,
+                                             arrowPart_Wing,
+                                             arrowIndex);
 
-            createArrow_MiddleFin(  p2X_scaled,       p2Y_scaled,
-                                    pBackX_scaled,    pBackY_scaled,
-                                    pOnLineX_scaled,  pOnLineY_scaled,
-                                    arrowZ,
-                                    finTopZ,
-                                    arrowPart_Fin,
-                                    arrowIndex);
+            createArrowVertices_20_MiddleFin(p2X_scaled,       p2Y_scaled,
+                                             pBackX_scaled,    pBackY_scaled,
+                                             pOnLineX_scaled,  pOnLineY_scaled,
+                                             arrowZ,
+                                             finTopZ,
+                                             arrowPart_Fin,
+                                             arrowIndex);
 
             break;
 
          case WINGS_WITH_OUTER_FINS:
 
-            createArrow_Wings(      p2X_scaled,       p2Y_scaled,
-                                    pLeftX_scaled,    pLeftY_scaled,
-                                    pRight_Xscaled,   pRightY_scaled,
-                                    pBackX_scaled,    pBackY_scaled,
-                                    arrowZ,
-                                    arrowPart_Wing,
-                                    arrowIndex);
+            createArrowVertices_10_Wings(    p2X_scaled,       p2Y_scaled,
+                                             pLeftX_scaled,    pLeftY_scaled,
+                                             pRight_Xscaled,   pRightY_scaled,
+                                             pBackX_scaled,    pBackY_scaled,
+                                             arrowZ,
+                                             arrowPart_Wing,
+                                             arrowIndex);
 
-            createArrow_OuterFins(  p2X_scaled,       p2Y_scaled,
-                                    pLeftX_scaled,    pLeftY_scaled,
-                                    pRight_Xscaled,   pRightY_scaled,
-                                    arrowZ,
-                                    finBottomZ,
-                                    arrowPart_Fin,
-                                    arrowIndex);
+            createArrowVertices_30_OuterFins(p2X_scaled,       p2Y_scaled,
+                                             pLeftX_scaled,    pLeftY_scaled,
+                                             pRight_Xscaled,   pRightY_scaled,
+                                             arrowZ,
+                                             finBottomZ,
+                                             arrowPart_Fin,
+                                             arrowIndex);
 
             break;
 
          case MIDDLE_FIN:
 
-            createArrow_MiddleFin(  p2X_scaled,       p2Y_scaled,
-                                    pBackX_scaled,    pBackY_scaled,
-                                    pOnLineX_scaled,  pOnLineY_scaled,
-                                    arrowZ,
-                                    finTopZ,
-                                    arrowPart_Fin,
-                                    arrowIndex);
+            createArrowVertices_20_MiddleFin(p2X_scaled,       p2Y_scaled,
+                                             pBackX_scaled,    pBackY_scaled,
+                                             pOnLineX_scaled,  pOnLineY_scaled,
+                                             arrowZ,
+                                             finTopZ,
+                                             arrowPart_Fin,
+                                             arrowIndex);
             break;
 
          case OUTER_FINS:
 
-            createArrow_OuterFins(  p2X_scaled,       p2Y_scaled,
-                                    pLeftX_scaled,    pLeftY_scaled,
-                                    pRight_Xscaled,   pRightY_scaled,
-                                    arrowZ,
-                                    finBottomZ,
-                                    arrowPart_Fin,
-                                    arrowIndex);
+            createArrowVertices_30_OuterFins(p2X_scaled,       p2Y_scaled,
+                                             pLeftX_scaled,    pLeftY_scaled,
+                                             pRight_Xscaled,   pRightY_scaled,
+                                             arrowZ,
+                                             finBottomZ,
+                                             arrowPart_Fin,
+                                             arrowIndex);
 
             break;
 
          case WINGS:
          default:
-            createArrow_Wings(      p2X_scaled,       p2Y_scaled,
-                                    pLeftX_scaled,    pLeftY_scaled,
-                                    pRight_Xscaled,   pRightY_scaled,
-                                    pBackX_scaled,    pBackY_scaled,
-                                    arrowZ,
-                                    arrowPart_Wing,
-                                    arrowIndex);
+            createArrowVertices_10_Wings(p2X_scaled,       p2Y_scaled,
+                                         pLeftX_scaled,    pLeftY_scaled,
+                                         pRight_Xscaled,   pRightY_scaled,
+                                         pBackX_scaled,    pBackY_scaled,
+                                         arrowZ,
+                                         arrowPart_Wing,
+                                         arrowIndex);
             break;
          }
 
@@ -1012,7 +876,115 @@ public class TourTrack_Bucket {
       }
    }
 
-   protected void fillOpenGLBuffer(final ShortBuffer vboBuffer, final ByteBuffer colorBuffer) {
+   private void createArrowVertices_10_Wings(final short p2X,
+                                             final short p2Y,
+                                             final short pLeftX,
+                                             final short pLeftY,
+                                             final short pRight,
+                                             final short pRightY,
+                                             final short pBackX,
+                                             final short pBackY,
+                                             final short arrowZ,
+                                             final short arrowPart_Wing,
+                                             final int arrowIndex) {
+// SET_FORMATTING_OFF
+
+      /*
+       * When the head and tail have the same z-value then the overlapping part is flickering
+       */
+      final short arrowHeadZ = (short) (arrowZ+1);
+
+      directionArrow_XYZVertexPositions.addAll(
+
+            // wing: left
+            p2X,        p2Y,     arrowHeadZ, arrowPart_Wing,
+            pBackX,     pBackY,  arrowZ,     arrowPart_Wing,
+            pLeftX,     pLeftY,  arrowZ,     arrowPart_Wing,
+
+            // wing: right
+            p2X,        p2Y,     arrowHeadZ, arrowPart_Wing,
+            pBackX,     pBackY,  arrowZ,     arrowPart_Wing,
+            pRight,     pRightY, arrowZ,     arrowPart_Wing);
+
+      directionArrow_ColorCoords.addAll(
+
+            (short) 1, (short) 0, (short) 0,
+            (short) 0, (short) 1, (short) 1,
+            (short) 0, (short) 0, (short) 1,
+
+            (short) 1, (short) 0, (short) 0,
+            (short) 0, (short) 1, (short) 1,
+            (short) 0, (short) 0, (short) 1);
+
+// SET_FORMATTING_ON
+   }
+
+   private void createArrowVertices_20_MiddleFin(final short p2X,
+                                                 final short p2Y,
+                                                 final short pBackX,
+                                                 final short pBackY,
+                                                 final short pOnLineX,
+                                                 final short pOnLineY,
+                                                 final short arrowZ,
+                                                 final short finTopZ,
+                                                 final short arrowPart_Fin,
+                                                 final int arrowIndex) {
+// SET_FORMATTING_OFF
+
+      // fin: middle
+      directionArrow_XYZVertexPositions.addAll(
+
+            p2X,        p2Y,        arrowZ,  arrowPart_Fin,
+            pOnLineX,   pOnLineY,   finTopZ, arrowPart_Fin,
+            pBackX,     pBackY,     arrowZ,  arrowPart_Fin);
+
+      directionArrow_ColorCoords.addAll(
+
+            (short) 1, (short) 1, (short) 0,
+            (short) 0, (short) 1, (short) 0,
+            (short) 0, (short) 0, (short) 1);
+
+// SET_FORMATTING_ON
+   }
+
+   private void createArrowVertices_30_OuterFins(final short p2X,
+                                                 final short p2Y,
+                                                 final short pLeftX,
+                                                 final short pLeftY,
+                                                 final short pRightX,
+                                                 final short pRightY,
+                                                 final short arrowZ,
+                                                 final short finBottomZ,
+                                                 final short arrowPart_Fin,
+                                                 final int arrowIndex) {
+// SET_FORMATTING_OFF
+
+      directionArrow_XYZVertexPositions.addAll(
+
+            // fin: left
+            p2X,        p2Y,        arrowZ,     arrowPart_Fin,
+            pLeftX,     pLeftY,     arrowZ,     arrowPart_Fin,
+            pLeftX,     pLeftY,     finBottomZ, arrowPart_Fin,
+
+            // fin: right
+            p2X,        p2Y,        arrowZ,     arrowPart_Fin,
+            pRightX,    pRightY,    arrowZ,     arrowPart_Fin,
+            pRightX,    pRightY,    finBottomZ, arrowPart_Fin);
+
+      directionArrow_ColorCoords.addAll(
+
+            (short) 1, (short) 0, (short) 0,
+            (short) 0, (short) 1, (short) 0,
+            (short) 0, (short) 0, (short) 1,
+
+            (short) 0, (short) 1, (short) 0,
+            (short) 1, (short) 0, (short) 0,
+            (short) 0, (short) 0, (short) 1);
+
+// SET_FORMATTING_ON
+   }
+
+   protected void fillDataInfoBuffers(final ShortBuffer vboBuffer, final ByteBuffer colorBuffer) {
 
       _trackVertices.fillVerticesBuffer(vboBuffer, colorBuffer);
    }

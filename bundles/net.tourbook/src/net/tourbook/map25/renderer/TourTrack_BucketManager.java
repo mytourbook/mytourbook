@@ -19,10 +19,8 @@ import static org.oscim.backend.GLAdapter.gl;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
-import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.GL;
 import org.oscim.renderer.MapRenderer;
@@ -48,11 +46,6 @@ public class TourTrack_BucketManager {
     * Number of {@link Short}'s used for the direction arrows
     */
    int                      numDirectionArrowVertices;
-
-   /**
-    * Number of direction arrows
-    */
-   float                    numDirectionArrows;
 
    public TourTrack_BucketManager() {
 
@@ -82,14 +75,10 @@ public class TourTrack_BucketManager {
 // SET_FORMATTING_OFF
 
       final ShortArrayList dirArrow_ColorCoords    = _trackBucket_Painter.directionArrow_ColorCoords;
-      final ShortArrayList dirArrow_TrackVertices  = _trackBucket_Painter.directionArrow_XYZPositions;
-      final FloatArrayList dirArrow_ArrowIndices   = _trackBucket_Painter.directionArrow_ArrowIndices;
+      final ShortArrayList dirArrow_TrackVertices  = _trackBucket_Painter.directionArrow_XYZVertexPositions;
 
 
       final int numDirArrow_ColorCoords = dirArrow_ColorCoords.size();
-      final int numDirArrow_WingIndices = dirArrow_ArrowIndices.size();
-
-      numDirectionArrows = numDirArrow_WingIndices == 0 ? 0 : dirArrow_ArrowIndices.getLast();
       numDirectionArrowVertices = dirArrow_TrackVertices.size();
 
 
@@ -98,11 +87,10 @@ public class TourTrack_BucketManager {
 
       final ShortBuffer buffer_DirArrow_Vertices      = MapRenderer.getShortBuffer(numDirectionArrowVertices);
       final ShortBuffer buffer_DirArrow_ColorCoords   = MapRenderer.getShortBuffer(numDirArrow_ColorCoords);
-      final FloatBuffer buffer_DirArrow_WingIndices   = MapRenderer.getFloatBuffer(numDirArrow_WingIndices);
 
 // SET_FORMATTING_ON
 
-      _trackBucket_Painter.fillOpenGLBuffer(buffer_TrackVertices, buffer_TrackColors);
+      _trackBucket_Painter.fillDataInfoBuffers(buffer_TrackVertices, buffer_TrackColors);
 
       /*
        * Direction arrows
@@ -125,14 +113,6 @@ public class TourTrack_BucketManager {
 
          gl.bindBuffer(GL.ARRAY_BUFFER, TourTrack_Shader.bufferId_DirArrows_ColorCoords);
          gl.bufferData(GL.ARRAY_BUFFER, numDirArrow_ColorCoords * SHORT_BYTES, buffer_DirArrow_ColorCoords.flip(), GL.STATIC_DRAW);
-
-         /*
-          * Wing index
-          */
-         buffer_DirArrow_WingIndices.put(dirArrow_ArrowIndices.toArray(), 0, numDirArrow_WingIndices);
-
-         gl.bindBuffer(GL.ARRAY_BUFFER, TourTrack_Shader.bufferId_DirArrows_ArrowIndices);
-         gl.bufferData(GL.ARRAY_BUFFER, numDirArrow_WingIndices * FLOAT_BYTES, buffer_DirArrow_WingIndices.flip(), GL.STATIC_DRAW);
       }
 
       /*

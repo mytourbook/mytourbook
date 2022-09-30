@@ -110,20 +110,20 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
    final class Worker extends SimpleWorker<TourRenderTask> {
 
-      private static final int  MIN_DIST               = 3;
+      private static final int  MIN_DIST                        = 3;
 
       /**
        * Visible pixel of a line/tour, all other pixels are clipped with {@link #__lineClipper}
        */
       // limit coords
-      private static final int  MAX_VISIBLE_PIXEL      = 2048;
+      private static final int  MAX_VISIBLE_PIXEL               = 2048;
 
       /**
        * Pre-projected points
        * <p>
        * Is projecting -180°...180° => 0...1 by using the {@link MercatorProjection}
        */
-      private double[]          __projectedPoints      = new double[2];
+      private double[]          __projectedPoints               = new double[2];
 
       /**
        * Points which are projected (0...1) and then scaled to pixel
@@ -138,7 +138,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       /**
        * Contains the x/y projected pixels where direction arrows are painted
        */
-      private FloatArrayList    __pixelDirectionArrows = new FloatArrayList();
+      private FloatArrayList    __pixelDirectionArrowPositions = new FloatArrayList();
 
       private int[]             __allGeoPointColors;
 
@@ -165,7 +165,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          __pixelPoints = new float[0];
          __pixelPointColorsHalf = new int[0];
-         __pixelDirectionArrows.clear();
+         __pixelDirectionArrowPositions.clear();
       }
 
       /**
@@ -212,7 +212,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
                   __pixelPoints = new float[numGeoPoints * 2];
                   __pixelPointColorsHalf = new int[numGeoPoints];
-                  __pixelDirectionArrows.clear();
+                  __pixelDirectionArrowPositions.clear();
                }
 
                for (int pointIndex = 0; pointIndex < numGeoPoints; pointIndex++) {
@@ -300,14 +300,14 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          final float[] pixelPoints = __pixelPoints;
          final int[] pixelPointColorsHalf = __pixelPointColorsHalf;
 
-         final FloatArrayList allDirectionArrowPixel = __pixelDirectionArrows;
-         allDirectionArrowPixel.clear();
+         final FloatArrayList allDirectionArrowPixelPosition = __pixelDirectionArrowPositions;
+         allDirectionArrowPixelPosition.clear();
 
          // set first point / color / direction arrow
          int pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
          pixelPointColorsHalf[0] = __allGeoPointColors[0];
-         allDirectionArrowPixel.add(pixelX);
-         allDirectionArrowPixel.add(pixelY);
+         allDirectionArrowPixelPosition.add(pixelX);
+         allDirectionArrowPixelPosition.add(pixelY);
 
          float prevX = pixelX;
          float prevY = pixelY;
@@ -435,8 +435,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                prevXArrow = pixelX;
                prevYArrow = pixelY;
 
-               allDirectionArrowPixel.add(pixelX);
-               allDirectionArrowPixel.add(pixelY);
+               allDirectionArrowPixelPosition.add(pixelX);
+               allDirectionArrowPixelPosition.add(pixelY);
             }
          }
 
@@ -445,7 +445,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          }
 
          if (isShowDirectionArrows) {
-            workerBucket.createDirectionArrowVertices(__pixelDirectionArrows);
+
+            // convert arrow positions into arrow vertices
+            workerBucket.createArrowVertices(__pixelDirectionArrowPositions);
          }
       }
 
