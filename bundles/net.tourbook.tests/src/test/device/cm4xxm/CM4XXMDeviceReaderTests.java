@@ -16,10 +16,6 @@
 package device.cm4xxm;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.List;
 
 import net.tourbook.device.cm4xxm.CM4XXMDeviceReader;
 
@@ -44,12 +40,12 @@ public class CM4XXMDeviceReaderTests extends DeviceDataReaderTester {
 
       //todo fb this one fails on github but succeeds locally!?
 
-      final String importFilePath = FILES_PATH + "20060327-20060608_Touren.dat";
-      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
-
-      final List<String> unixText = Files.readAllLines(Paths.get(importFileAbsolutePath));
-      unixText.forEach(line -> line.replace("\r\n", "\n")); // DOS2UNIX
-      Files.write(Paths.get(importFileAbsolutePath), unixText, Charset.defaultCharset());
+//      final String importFilePath = FILES_PATH + "20060327-20060608_Touren.dat";
+//      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
+//
+//      final List<String> unixText = Files.readAllLines(Paths.get(importFileAbsolutePath));
+//      unixText.forEach(line -> line.replace("\r\n", "\n")); // DOS2UNIX
+//      Files.write(Paths.get(importFileAbsolutePath), unixText, Charset.defaultCharset());
       testImportFile(deviceDataReader, FILES_PATH + "20060327-20060608_Touren", ".dat");
    }
 }
