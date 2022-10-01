@@ -29,7 +29,7 @@ import utils.FilesUtils;
  */
 public class DaumErgoBikeDataReaderTests extends DeviceDataReaderTester {
 
-   public static final String FILES_PATH       = FilesUtils.rootPath + "device/crp/files/"; //$NON-NLS-1$
+   public static final String     FILES_PATH       = FilesUtils.rootPath + "device/daum/ergobike/files/"; //$NON-NLS-1$
 
    private DaumErgoBikeDataReader deviceDataReader = new DaumErgoBikeDataReader();
 
