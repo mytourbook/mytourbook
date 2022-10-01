@@ -43,12 +43,12 @@ public class CM4XXMDeviceReaderTests extends DeviceDataReaderTester {
 
       //todo fb this one fails on github but succeeds locally!?
 
-      final String importFilePath = "20060327-20060608_Touren.dat";
+      final String importFilePath = FILES_PATH + "20060327-20060608_Touren.dat";
       final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
 
       final List<String> unixText = Files.readAllLines(Paths.get(importFileAbsolutePath));
       unixText.forEach(line -> line.replace("\r\n", "\n")); // DOS2UNIX
-      Files.write(Paths.get("20060327-20060608_Touren.dat"), unixText, null);
+      Files.write(Paths.get(importFileAbsolutePath), unixText, null);
       testImportFile(deviceDataReader, FILES_PATH + "20060327-20060608_Touren", ".dat");
    }
 }
