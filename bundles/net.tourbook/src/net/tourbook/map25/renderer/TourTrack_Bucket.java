@@ -1,26 +1,21 @@
-/**
- * Copyright 2013 Hannes Janetzek
- * Copyright 2016-2021 devemux86
+/*******************************************************************************
+ * Copyright (C) 2022 Wolfgang Schramm and Contributors
  *
- * This file is part of the OpenScienceMap project (http://www.opensciencemap.org).
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
  *
- * This program is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU Lesser General License for more details.
- *
- * You should have received a copy of the GNU Lesser General License along with
- * this program. If not, see <http://www.gnu.org/licenses/>.
- */
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.map25.renderer;
 
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
-
-import java.nio.ByteBuffer;
-import java.nio.ShortBuffer;
 
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
@@ -35,59 +30,51 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Note:
- * <p>
- * Coordinates must be in range +/- (Short.MAX_VALUE / COORD_SCALE) if using GL.SHORT
- * <p>
- * The maximum resolution for coordinates is 0.25 as points will be converted
- * to fixed point values.
+ * Original class org.oscim.renderer.bucket.LineBucket but with many modifications
  */
 public class TourTrack_Bucket {
 
-   static final Logger                log              = LoggerFactory.getLogger(TourTrack_Bucket.class);
+   static final Logger        log              = LoggerFactory.getLogger(TourTrack_Bucket.class);
 
    /**
     * Scale factor mapping extrusion vector to short values
     */
-   public static final float          DIR_SCALE        = 2048;
+   public static final float  DIR_SCALE        = 2048;
 
    /**
     * Maximal resolution
     */
-   private static final float         MIN_DIST         = 1 / 8f;
+   private static final float MIN_DIST         = 1 / 8f;
 
    /**
     * Not quite right.. need to go back so that additional
     * bevel vertices are at least MIN_DIST apart
     */
-   private static final float         MIN_BEVEL        = MIN_DIST * 4;
+   private static final float MIN_BEVEL        = MIN_DIST * 4;
 
    /**
     * Mask for packing last two bits of extrusion vector with texture
     * coordinates, .... 1111 1100
     */
-   private static final int           DIR_MASK         = 0xFFFFFFFC;
+   private static final int   DIR_MASK         = 0xFFFFFFFC;
 
-   public LineStyle                   lineStyle;
-   public int                         lineColorMode;
+   public LineStyle           lineStyle;
+   public int                 lineColorMode;
 
-   private float                      _minimumDistance = MIN_DIST;
-   private float                      _minimumBevel    = MIN_BEVEL;
+   boolean                    isCapRounded;
+   float                      heightOffset;
 
-   boolean                            _isCapRounded;
-   float                              _heightOffset;
+   private float              _minimumDistance = MIN_DIST;
+   private float              _minimumBevel    = MIN_BEVEL;
 
-   private int                        _tMin            = Integer.MIN_VALUE, _tMax = Integer.MAX_VALUE;
+   private int                _tMin            = Integer.MIN_VALUE, _tMax = Integer.MAX_VALUE;
 
    /**
     * Number of vertices for this layer.
     */
-   protected int                      numTrackVertices;
+   int                        numTrackVertices;
 
-   /**
-    * Temporary list of vertex data.
-    */
-   private final TourTrack_VertexData _trackVertices;
+   TourTrack_VertexData       trackVertexData;
 
    /**
     * Contains the vertices for direction arrows multiplied with {@link MapRenderer#COORD_SCALE}:
@@ -99,7 +86,7 @@ public class TourTrack_Bucket {
     * ...
     * </pre>
     */
-   protected ShortArrayList           directionArrow_XYZVertexPositions;
+   ShortArrayList             directionArrow_Vertices;
 
    /**
     * Barycentric coordinates are simply (1, 0, 0), (0, 1, 0) and (0, 0, 1) for the three
@@ -108,13 +95,13 @@ public class TourTrack_Bucket {
     * Source:
     * https://stackoverflow.com/questions/137629/how-do-you-render-primitives-as-wireframes-in-opengl#answer-33004265
     */
-   protected ShortArrayList           directionArrow_ColorCoords;
+   ShortArrayList             directionArrow_ColorCoords;
 
    public TourTrack_Bucket() {
 
-      _trackVertices = new TourTrack_VertexData();
+      trackVertexData = new TourTrack_VertexData();
 
-      directionArrow_XYZVertexPositions = new ShortArrayList();
+      directionArrow_Vertices = new ShortArrayList();
       directionArrow_ColorCoords = new ShortArrayList();
    }
 
@@ -180,7 +167,7 @@ public class TourTrack_Bucket {
             }
          }
       }
-      _isCapRounded = isCapRounded;
+      this.isCapRounded = isCapRounded;
 
       int numIndices;
       int numLinePoints = 0;
@@ -233,8 +220,6 @@ public class TourTrack_Bucket {
 
          addLine_ToVertices(
 
-               _trackVertices,
-
                pixelPoints,
                pixelPointColors,
                startIndex,
@@ -246,7 +231,6 @@ public class TourTrack_Bucket {
    }
 
    /**
-    * @param vertices
     * @param pixelPoints
     *           -2048 ... 2048
     * @param pixelPointColors
@@ -256,8 +240,7 @@ public class TourTrack_Bucket {
     * @param isSquared
     * @param isClosed
     */
-   private void addLine_ToVertices(final TourTrack_VertexData vertices,
-                                   final float[] pixelPoints,
+   private void addLine_ToVertices(final float[] pixelPoints,
                                    final int[] pixelPointColors,
                                    final int startIndex,
                                    final int numLinePoints,
@@ -272,6 +255,8 @@ public class TourTrack_Bucket {
       float nextX, nextY;
       double unitDistance;
       int pixelColor;
+
+      final TourTrack_VertexData vertices = trackVertexData;
 
       /*
        * amount of vertices used
@@ -630,42 +615,44 @@ public class TourTrack_Bucket {
     */
    protected void clear() {
 
-      _trackVertices.dispose();
-
       numTrackVertices = 0;
    }
 
    /**
     * Creates direction arrow vertices from it's x/y position
     *
-    * @param allDirectionArrowPixel_Raw
+    * @param allDirectionArrowPixelList
     *           Contains the x/y pixel positions for the direction arrows
     */
-   public void createArrowVertices(final FloatArrayList allDirectionArrowPixel_Raw) {
+   public void createArrowVertices(final FloatArrayList allDirectionArrowPixelList) {
 
-      directionArrow_XYZVertexPositions.clear();
+      directionArrow_Vertices.clear();
       directionArrow_ColorCoords.clear();
 
       // at least 2 positions are needed
-      if (allDirectionArrowPixel_Raw.size() < 4) {
+      if (allDirectionArrowPixelList.size() < 4) {
          return;
       }
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-      final float[] allDirectionArrowPixel = allDirectionArrowPixel_Raw.toArray();
+      final float[] allDirectionArrowPixel = allDirectionArrowPixelList.toArray();
 
 // SET_FORMATTING_OFF
 
-      final float configArrowScale           = trackConfig.arrow_Scale / 10f;
-      final int   configArrowLength          = (int) (configArrowScale * trackConfig.arrow_Length);
-      final int   configArrowLengthCenter    = (int) (configArrowScale * trackConfig.arrow_LengthCenter);
-      final int   configArrowWidth           = (int) (configArrowScale * trackConfig.arrow_Width);
-      final int   configArrowHeight          = (int) (configArrowScale * trackConfig.arrow_Height);
+      final float  configArrowScale          = trackConfig.arrow_Scale / 10f;
+      final int    configArrowLength         = (int) (configArrowScale * trackConfig.arrow_Length);
+      final int    configArrowLengthCenter   = (int) (configArrowScale * trackConfig.arrow_LengthCenter);
+      final int    configArrowWidth          = (int) (configArrowScale * trackConfig.arrow_Width);
+      final int    configArrowHeight         = (int) (configArrowScale * trackConfig.arrow_Height);
 
-      final short arrowZ      = (short) trackConfig.arrow_VerticalOffset;
-      final short finTopZ     = (short) (arrowZ + configArrowHeight);
-      final short finBottomZ  = (short) (arrowZ - configArrowHeight);
+      final short  arrowZ                    = (short) trackConfig.arrow_VerticalOffset;
+      final short  finTopZ                   = (short) (arrowZ + configArrowHeight);
+      final short  finBottomZ                = (short) (arrowZ - configArrowHeight);
+
+      final double arrowLength               = configArrowLength;
+      final double arrowLengthMiddle         = configArrowLengthCenter;
+      final double arrowWidth2               = configArrowWidth / 2; // half arrow width
 
 // SET_FORMATTING_ON
 
@@ -679,23 +666,16 @@ public class TourTrack_Bucket {
          final float p2X = allDirectionArrowPixel[pixelIndex++];
          final float p2Y = allDirectionArrowPixel[pixelIndex++];
 
-         // get direction/unit vector: dir = (P2-P1)/|P2-P1|
+         // get unit (direction) vector: unit = (P2-P1)/|P2-P1|
          final float diffX = p2X - p1X;
          final float diffY = p2Y - p1Y;
-
-         // distance between P1 and P2
-         final double p12Distance = Math.sqrt(diffX * diffX + diffY * diffY);
-
+         final double p12Distance = Math.sqrt(diffX * diffX + diffY * diffY); // distance between P1 and P2
          final double p12UnitX = diffX / p12Distance;
          final double p12UnitY = diffY / p12Distance;
 
          // get perpendicular vector for the arrow head
          final double unitPerpendX = p12UnitY;
          final double unitPerpendY = -p12UnitX;
-
-         final double arrowLength = configArrowLength; //               Math.min(configArrowLength, p12Distance);
-         final double arrowLengthMiddle = configArrowLengthCenter; //   Math.min(configArrowLengthCenter, p12Distance);
-         final double arrowWidth2 = configArrowWidth / 2; // half arrow width
 
          // point on line between P1 and P2
          final double pOnLineX = p2X - (arrowLength * p12UnitX);
@@ -894,7 +874,7 @@ public class TourTrack_Bucket {
        */
       final short arrowHeadZ = (short) (arrowZ+1);
 
-      directionArrow_XYZVertexPositions.addAll(
+      directionArrow_Vertices.addAll(
 
             // wing: left
             p2X,        p2Y,     arrowHeadZ, arrowPart_Wing,
@@ -932,7 +912,7 @@ public class TourTrack_Bucket {
 // SET_FORMATTING_OFF
 
       // fin: middle
-      directionArrow_XYZVertexPositions.addAll(
+      directionArrow_Vertices.addAll(
 
             p2X,        p2Y,        arrowZ,  arrowPart_Fin,
             pOnLineX,   pOnLineY,   finTopZ, arrowPart_Fin,
@@ -959,7 +939,7 @@ public class TourTrack_Bucket {
                                                  final int arrowIndex) {
 // SET_FORMATTING_OFF
 
-      directionArrow_XYZVertexPositions.addAll(
+      directionArrow_Vertices.addAll(
 
             // fin: left
             p2X,        p2Y,        arrowZ,     arrowPart_Fin,
@@ -982,11 +962,6 @@ public class TourTrack_Bucket {
             (short) 0, (short) 0, (short) 1);
 
 // SET_FORMATTING_ON
-   }
-
-   protected void fillDataInfoBuffers(final ShortBuffer vboBuffer, final ByteBuffer colorBuffer) {
-
-      _trackVertices.fillVerticesBuffer(vboBuffer, colorBuffer);
    }
 
 }

@@ -39,11 +39,11 @@ vec4 getWingColor() {
    // calculate derivative (divide uni_OutlineWidth by this to have the line width constant in screen-space)
    float closestEdgeWidth = fwidth(closestEdge); 
    
-   float wireValue = smoothstep(uni_OutlineWidth.x, uni_OutlineWidth.x + closestEdgeWidth, closestEdge);
-
    if (pass_ArrowPart == 0) {
 
      // it's a wing
+
+     float wireValue = smoothstep(uni_OutlineWidth.x, uni_OutlineWidth.x + closestEdgeWidth, closestEdge);
 
      if (wireValue > 0.5) {
 
@@ -59,6 +59,8 @@ vec4 getWingColor() {
    } else {
 
      // it's a fin
+
+      float wireValue = smoothstep(uni_OutlineWidth.y, uni_OutlineWidth.y + closestEdgeWidth, closestEdge);
 
      if (wireValue > 0.5) {
 

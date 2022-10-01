@@ -1,20 +1,18 @@
-/**
- * Copyright 2013 Hannes Janetzek
- * Copyright 2016 devemux86
+/*******************************************************************************
+ * Copyright (C) 2022 Wolfgang Schramm and Contributors
  *
- * This file is part of the OpenScienceMap project (http://www.opensciencemap.org).
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
  *
- * This program is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with
- * this program. If not, see <http://www.gnu.org/licenses/>.
- */
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.map25.renderer;
 
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
@@ -45,9 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base class to use the renderer.elements for drawing.
- * <p/>
- * All methods that modify 'buckets' MUST be synchronized!
+ * Original code: org.oscim.renderer.BucketRenderer
  */
 public class TourTrack_LayerRenderer extends LayerRenderer {
 
@@ -110,20 +106,20 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
    final class Worker extends SimpleWorker<TourRenderTask> {
 
-      private static final int  MIN_DIST                        = 3;
+      private static final int  MIN_DIST                       = 3;
 
       /**
        * Visible pixel of a line/tour, all other pixels are clipped with {@link #__lineClipper}
        */
       // limit coords
-      private static final int  MAX_VISIBLE_PIXEL               = 2048;
+      private static final int  MAX_VISIBLE_PIXEL              = 2048;
 
       /**
        * Pre-projected points
        * <p>
        * Is projecting -180°...180° => 0...1 by using the {@link MercatorProjection}
        */
-      private double[]          __projectedPoints               = new double[2];
+      private double[]          __projectedPoints              = new double[2];
 
       /**
        * Points which are projected (0...1) and then scaled to pixel
@@ -586,7 +582,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
       setMatrix(viewport, true);
 
-      TourTrack_Shader.paint(trackBucket, viewport, viewport2mapscale, _bucketManager_ForPainting);
+      TourTrack_Shader.paint(trackBucket, viewport, viewport2mapscale);
    }
 
    public void setIsUpdateLayer(final boolean isUpdateLayer) {
@@ -640,7 +636,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             : viewport.view);
    }
 
-   public void setupTourPositions(final GeoPoint[] allGeoPoints, final int[] allGeoPointColors, final IntArrayList allTourStarts) {
+   public void setupTourPositions(final GeoPoint[] allGeoPoints,
+                                  final int[] allGeoPointColors,
+                                  final IntArrayList allTourStarts) {
 
       synchronized (_allGeoPoints) {
 
@@ -705,10 +703,10 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _mapPosition.copy(workerTask.__mapPos);
 
       // compile new layers
-      final TourTrack_Bucket workerBucket = workerTask.__taskBucketManager.getBucket_Painter();
-      _bucketManager_ForPainting.setBucket_Painter(workerBucket);
+      final TourTrack_Bucket painterBucket = workerTask.__taskBucketManager.getBucket_Painter();
+      _bucketManager_ForPainting.setBucket_Painter(painterBucket);
 
-      final boolean isDataAvailable = _bucketManager_ForPainting.fillOpenGLBuffer();
+      final boolean isDataAvailable = TourTrack_Shader.bindBufferData(painterBucket);
 
       setReady(isDataAvailable);
    }
