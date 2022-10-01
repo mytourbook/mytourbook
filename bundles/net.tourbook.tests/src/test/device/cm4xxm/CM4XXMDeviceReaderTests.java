@@ -16,6 +16,7 @@
 package device.cm4xxm;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -48,7 +49,7 @@ public class CM4XXMDeviceReaderTests extends DeviceDataReaderTester {
 
       final List<String> unixText = Files.readAllLines(Paths.get(importFileAbsolutePath));
       unixText.forEach(line -> line.replace("\r\n", "\n")); // DOS2UNIX
-      Files.write(Paths.get(importFileAbsolutePath), unixText, null);
+      Files.write(Paths.get(importFileAbsolutePath), unixText, Charset.defaultCharset());
       testImportFile(deviceDataReader, FILES_PATH + "20060327-20060608_Touren", ".dat");
    }
 }
