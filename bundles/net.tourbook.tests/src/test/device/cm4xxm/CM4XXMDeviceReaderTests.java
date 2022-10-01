@@ -16,6 +16,9 @@
 package device.cm4xxm;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import net.tourbook.device.cm4xxm.CM4XXMDeviceReader;
 
@@ -42,12 +45,12 @@ public class CM4XXMDeviceReaderTests extends DeviceDataReaderTester {
       //Converting back the file from dos to unix as the Github Build action converts
       //it from the original in unix to dos.
 
-//      final String importFilePath = FILES_PATH + "20060327-20060608_Touren.dat";
-//      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
-//
-//      final List<String> unixText = Files.readAllLines(Paths.get(importFileAbsolutePath));
-//      unixText.forEach(line -> line.replace("\r\n", "\n")); // DOS2UNIX
-//      Files.write(Paths.get(importFileAbsolutePath), unixText, Charset.defaultCharset());
-      //   testImportFile(deviceDataReader, FILES_PATH + "20060327-20060608_Touren", ".dat");
+      final String importFilePath = FILES_PATH + "20060327-20060608_Touren.dat";
+      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
+
+      String dosText = net.tourbook.common.util.FilesUtils.readFileContentString(importFileAbsolutePath);
+      dosText = dosText.replace("\r\n", "\n");
+      Files.writeString(Paths.get(importFileAbsolutePath), dosText, Charset.defaultCharset());
+      testImportFile(deviceDataReader, FILES_PATH + "20060327-20060608_Touren", ".dat");
    }
 }
