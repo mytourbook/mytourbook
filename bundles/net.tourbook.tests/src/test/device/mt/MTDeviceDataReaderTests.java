@@ -15,7 +15,7 @@
  *******************************************************************************/
 package device.mt;
 
-import net.tourbook.device.crp.CRPDataReader;
+import net.tourbook.device.mt.MTDeviceDataReader;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,10 +26,10 @@ public class MTDeviceDataReaderTests extends DeviceDataReaderTester {
 
    public static final String FILES_PATH       = FilesUtils.rootPath + "device/mt/files/"; //$NON-NLS-1$
 
-   private CRPDataReader      deviceDataReader = new CRPDataReader();
+   private MTDeviceDataReader deviceDataReader = new MTDeviceDataReader();
 
    @Test
-   void testMtImport_XXX() {
+   void testMtImport_20210131() {
 
       testImportFile(deviceDataReader, FILES_PATH + "2021-01-31_07-15-25", ".mt");
    }
