@@ -22,16 +22,16 @@ import org.junit.jupiter.api.Test;
 import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
-/**
- * Samples provided by ovahead
- * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-3723897
- */
 public class TurDeviceReaderTests extends DeviceDataReaderTester {
 
    public static final String FILES_PATH       = FilesUtils.rootPath + "device/tur/files/"; //$NON-NLS-1$
 
    private TurDeviceReader    deviceDataReader = new TurDeviceReader();
 
+   /**
+    * Sample provided by ovahead
+    * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-3723897
+    */
    @Test
    void testTurImport_20200915() {
 

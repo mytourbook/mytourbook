@@ -22,16 +22,16 @@ import org.junit.jupiter.api.Test;
 import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
-/**
- * Samples Wolfgang Schramm
- * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-3730768
- */
 public class DaumErgoBikeDataReaderTests extends DeviceDataReaderTester {
 
    public static final String     FILES_PATH       = FilesUtils.rootPath + "device/daum/ergobike/files/"; //$NON-NLS-1$
 
    private DaumErgoBikeDataReader deviceDataReader = new DaumErgoBikeDataReader();
 
+   /**
+    * Sample provided by Wolfgang Schramm
+    * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-3730768
+    */
    @Test
    void testDaumErgoBikeImport_20071109() {
 

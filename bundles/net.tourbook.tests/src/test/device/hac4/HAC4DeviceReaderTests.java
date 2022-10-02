@@ -22,16 +22,16 @@ import org.junit.jupiter.api.Test;
 import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
-/**
- * Samples provided by ovahead
- * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-3723897
- */
 public class HAC4DeviceReaderTests extends DeviceDataReaderTester {
 
    public static final String FILES_PATH       = FilesUtils.rootPath + "device/hac4/files/"; //$NON-NLS-1$
 
    private HAC4DeviceReader   deviceDataReader = new HAC4DeviceReader();
 
+   /**
+    * Sample provided by ovahead
+    * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-3723897
+    */
    @Test
    void testHAC4Import_Connect7() {
 
