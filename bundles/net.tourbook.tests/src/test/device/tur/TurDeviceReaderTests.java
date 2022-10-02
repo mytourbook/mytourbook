@@ -23,9 +23,8 @@ import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
 /**
- * TODO FB
- * Samples provided by WRPSoft
- * https://github.com/mytourbook/mytourbook/discussions/924#discussioncomment-3585694
+ * Samples provided by ovahead
+ * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-3723897
  */
 public class TurDeviceReaderTests extends DeviceDataReaderTester {
 

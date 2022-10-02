@@ -23,9 +23,8 @@ import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
 /**
- * TODO FB
- * Samples provided by cyc1ingsir
- * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-3714641
+ * Samples provided by ovahead
+ * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-3723897
  */
 public class HAC4DeviceReaderTests extends DeviceDataReaderTester {
 

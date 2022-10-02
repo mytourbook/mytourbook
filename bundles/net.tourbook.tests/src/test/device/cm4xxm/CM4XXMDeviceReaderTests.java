@@ -30,7 +30,6 @@ import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
 /**
- * TODO FB
  * Samples provided by cyc1ingsir
  * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-3714641
  */

@@ -23,9 +23,8 @@ import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
 /**
- * Samples provided by WRPSoft
- * todo fb
- * https://github.com/mytourbook/mytourbook/discussions/924#discussioncomment-3585694
+ * Samples Wolfgang Schramm
+ * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-3730768
  */
 public class DaumErgoBikeDataReaderTests extends DeviceDataReaderTester {
 
