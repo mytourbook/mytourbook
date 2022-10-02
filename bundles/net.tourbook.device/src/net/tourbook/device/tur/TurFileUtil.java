@@ -27,6 +27,7 @@ import net.tourbook.ui.UI;
 public class TurFileUtil {
 
    public static int readByte(final InputStream in) throws IOException {
+
       int val = 0;
       final byte[] buf = new byte[1];
       in.read(buf, 0, 1);
@@ -36,20 +37,20 @@ public class TurFileUtil {
 
    public static String readDescription(final InputStream in, final int lineCount) {
 
-      String resultStr = UI.EMPTY_STRING;
+      final StringBuilder resultStr = new StringBuilder();
       for (int i = 0; i < lineCount; i++) {
-         resultStr = resultStr + readText(in);
+         resultStr.append(readText(in));
          if (i + 1 < lineCount) {
-            resultStr = resultStr + "\n"; //$NON-NLS-1$
+            resultStr.append(UI.NEW_LINE);
          }
       }
 
-      return resultStr;
+      return resultStr.toString();
    }
 
    public static String readText(final InputStream in) {
 
-      String buf = UI.EMPTY_STRING;
+      final StringBuilder buf = new StringBuilder();
       try {
          final byte[] cBuf = new byte[1];
          do {
@@ -57,13 +58,13 @@ public class TurFileUtil {
             if (cBuf[0] == 10) {
                break;
             }
-            buf = buf + (char) unsign(cBuf[0]);
+            buf.append((char) unsign(cBuf[0]));
          }
          while (cBuf[0] != 0);
       } catch (final IOException e) {
-         return buf;
+         return buf.toString();
       }
-      return buf;
+      return buf.toString();
    }
 
    public static int unsign(final byte b) {
