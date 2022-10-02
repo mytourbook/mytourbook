@@ -15,6 +15,8 @@
  *******************************************************************************/
 package device.cm4xxm;
 
+import de.byteholder.geoclipse.map.UI;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -41,16 +43,15 @@ public class CM4XXMDeviceReaderTests extends DeviceDataReaderTester {
    @Test
    void testCM4XXMImport_2006() throws IOException {
 
-      //todo fb this one fails on github but succeeds locally!?
       //Converting back the file from dos to unix as the Github Build action converts
-      //it from the original in unix to dos.
+      //it from the original in unix to dos and makes the unit test fail.
 
-      final String importFilePath = FILES_PATH + "20060327-20060608_Touren.dat";
-      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
+      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(FILES_PATH + "20060327-20060608_Touren.dat");
 
       String dosText = net.tourbook.common.util.FilesUtils.readFileContentString(importFileAbsolutePath);
-      dosText = dosText.replace("\r\n", "\n");
+      dosText = dosText.replace("\r\n", UI.NEW_LINE);//$NON-NLS-1$
       Files.writeString(Paths.get(importFileAbsolutePath), dosText, Charset.defaultCharset());
-      testImportFile(deviceDataReader, FILES_PATH + "20060327-20060608_Touren", ".dat");
+
+      testImportFile(deviceDataReader, FILES_PATH + "20060327-20060608_Touren", ".dat"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }
