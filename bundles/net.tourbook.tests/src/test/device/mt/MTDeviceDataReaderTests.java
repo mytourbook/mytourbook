@@ -30,6 +30,7 @@ public class MTDeviceDataReaderTests extends DeviceDataReaderTester {
 
    @Test
    void testMtImport_XXX() {
+
       testImportFile(deviceDataReader, FILES_PATH + "2021-01-31_07-15-25", ".mt");
    }
 }
