@@ -22,18 +22,14 @@ import org.junit.jupiter.api.Test;
 import utils.DeviceDataReaderTester;
 import utils.FilesUtils;
 
-/**
- * Samples provided by
- */
 public class MTDeviceDataReaderTests extends DeviceDataReaderTester {
 
-   public static final String FILES_PATH       = FilesUtils.rootPath + "device/crp/files/"; //$NON-NLS-1$
+   public static final String FILES_PATH       = FilesUtils.rootPath + "device/mt/files/"; //$NON-NLS-1$
 
    private CRPDataReader      deviceDataReader = new CRPDataReader();
 
    @Test
    void testMtImport_XXX() {
-//todo fb
-      //   testImportFile(deviceDataReader, FILES_PATH + "XXXXX", ".mt");
+      testImportFile(deviceDataReader, FILES_PATH + "2021-01-31_07-15-25", ".mt");
    }
 }
