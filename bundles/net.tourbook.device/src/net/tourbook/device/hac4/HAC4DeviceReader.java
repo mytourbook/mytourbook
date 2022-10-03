@@ -102,16 +102,16 @@ public class HAC4DeviceReader extends TourbookDevice {
       /*
        * check if the first 4 bytes are set to AFRO
        */
-      if (byteIndex == 0 && newByte == 'A') {
+      if (byteIndex == 0 & newByte == 'A') {
          return true;
       }
-      if (byteIndex == 1 && newByte == 'F') {
+      if (byteIndex == 1 & newByte == 'F') {
          return true;
       }
-      if (byteIndex == 2 && newByte == 'R') {
+      if (byteIndex == 2 & newByte == 'R') {
          return true;
       }
-      if (byteIndex == 3 && newByte == 'O') {
+      if (byteIndex == 3 & newByte == 'O') {
          return true;
       }
 
