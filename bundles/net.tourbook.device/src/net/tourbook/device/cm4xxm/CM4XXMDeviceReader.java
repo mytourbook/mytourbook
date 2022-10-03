@@ -22,7 +22,6 @@ package net.tourbook.device.cm4xxm;
 import gnu.io.SerialPort;
 
 import java.io.BufferedInputStream;
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -576,17 +575,6 @@ public class CM4XXMDeviceReader extends TourbookDevice {
       tourData.setStartPulse((short) Integer.parseInt(new String(buffer, 0, 4), 16));
 
       return startBlock;
-   }
-
-   public final int readSummary(final byte[] buffer) throws IOException {
-      final int ch0 = buffer[0];
-      final int ch1 = buffer[1];
-      final int ch2 = buffer[2];
-      final int ch3 = buffer[3];
-      if ((ch0 | ch1 | ch2 | ch3) < 0) {
-         throw new EOFException();
-      }
-      return ((ch1 << 8) + (ch0 << 0)) + ((ch3 << 8) + (ch2 << 0));
    }
 
    /**
