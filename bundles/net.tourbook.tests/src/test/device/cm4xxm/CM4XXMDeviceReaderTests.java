@@ -45,7 +45,7 @@ public class CM4XXMDeviceReaderTests extends DeviceDataReaderTester {
       //Converting back the file from dos to unix as the Github Build action converts
       //it from the original in unix to dos and makes the unit test fail.
 
-      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(FILES_PATH + "20060327-20060608_Touren.dat");
+      final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(FILES_PATH + "20060327-20060608_Touren.dat"); //$NON-NLS-1$
 
       String dosText = net.tourbook.common.util.FilesUtils.readFileContentString(importFileAbsolutePath);
       dosText = dosText.replace("\r\n", UI.NEW_LINE);//$NON-NLS-1$

@@ -35,7 +35,7 @@ public class DaumErgoBikeDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testDaumErgoBikeImport_20071109() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "0009  09_11_2007 21_30_07   34min   14_7km  Manuelles Training (Watt)", ".csv");
+      testImportFile(deviceDataReader, FILES_PATH + "0009  09_11_2007 21_30_07   34min   14_7km  Manuelles Training (Watt)", ".csv"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
 }
