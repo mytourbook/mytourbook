@@ -52,6 +52,9 @@ Changes
 Bugfix
 ======
 
+* Hac4Linux Import (Frederic)
+  - Fixed an issue where tours were not importing anymore since v12.12.0	https://github.com/mytourbook/mytourbook/discussions/939
+    
 * Fit Import (Frederic)
   - Fixed NPE when pauses data are missing      https://sourceforge.net/p/mytourbook/discussion/622811/thread/d52269ce04/
     

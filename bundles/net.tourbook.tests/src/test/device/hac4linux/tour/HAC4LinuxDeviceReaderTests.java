@@ -37,5 +37,4 @@ public class HAC4LinuxDeviceReaderTests extends DeviceDataReaderTester {
 
       testImportFile(deviceDataReader, FILES_PATH + "20060426_Malle_KuestenKlassik_136km", ".tour"); //$NON-NLS-1$ //$NON-NLS-2$
    }
-
 }
