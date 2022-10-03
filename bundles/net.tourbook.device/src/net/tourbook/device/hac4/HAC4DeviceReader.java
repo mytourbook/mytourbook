@@ -661,14 +661,10 @@ public class HAC4DeviceReader extends TourbookDevice {
 
       boolean isValid = false;
 
-      BufferedInputStream inStream = null;
-
-      try {
+      final File dataFile = new File(fileName);
+      try (BufferedInputStream inStream = new BufferedInputStream(new FileInputStream(dataFile))) {
 
          final byte[] buffer = new byte[5];
-
-         final File dataFile = new File(fileName);
-         inStream = new BufferedInputStream(new FileInputStream(dataFile));
 
          inStream.read(buffer);
          if (!"AFRO".equalsIgnoreCase(new String(buffer, 0, 4))) { //$NON-NLS-1$
@@ -714,14 +710,6 @@ public class HAC4DeviceReader extends TourbookDevice {
          return false;
       } catch (final Exception e) {
          e.printStackTrace();
-      } finally {
-         if (inStream != null) {
-            try {
-               inStream.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       return isValid;
@@ -741,7 +729,8 @@ public class HAC4DeviceReader extends TourbookDevice {
             return false;
          }
 
-         int checksum = 0, lastValue = 0;
+         int checksum = 0;
+         int lastValue = 0;
 
          while (file.read(buffer) != -1) {
             checksum = (checksum + lastValue) & 0xFFFF;
