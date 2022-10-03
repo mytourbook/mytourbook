@@ -33,9 +33,9 @@ public class HAC4LinuxDeviceReaderTests extends DeviceDataReaderTester {
     * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-3714641
     */
    @Test
-   void testDaumErgoBikeImport_20071109() {
+   void testHAC4LinuxImport_KuestenKlassik() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "20060426_Malle_KuestenKlassik_136km", ".tour");
+      testImportFile(deviceDataReader, FILES_PATH + "20060426_Malle_KuestenKlassik_136km", ".tour"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
 }
