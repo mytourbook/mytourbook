@@ -1310,7 +1310,6 @@ public class Polar_HRM_Data {
 
          } catch (final Exception e) {
             StatusUtil.log(e);
-            continue;
          }
       }
 
