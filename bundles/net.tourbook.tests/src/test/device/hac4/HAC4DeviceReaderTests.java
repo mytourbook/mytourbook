@@ -35,6 +35,6 @@ public class HAC4DeviceReaderTests extends DeviceDataReaderTester {
    @Test
    void testHAC4Import_Connect7() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "Connect7", ".dat");
+      testImportFile(deviceDataReader, FILES_PATH + "Connect7", ".dat"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }

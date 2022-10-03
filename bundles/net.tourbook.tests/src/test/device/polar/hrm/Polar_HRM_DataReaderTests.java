@@ -37,5 +37,4 @@ public class Polar_HRM_DataReaderTests extends DeviceDataReaderTester {
 
       testImportFile(deviceDataReader, FILES_PATH + "SampleHRM_WithErrorsAtTheEnd", ".hrm");
    }
-
 }
