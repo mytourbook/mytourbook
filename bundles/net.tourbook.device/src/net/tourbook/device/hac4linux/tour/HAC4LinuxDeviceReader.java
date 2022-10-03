@@ -47,6 +47,8 @@ import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 public class HAC4LinuxDeviceReader extends TourbookDevice {
 
+   private static final String CM414AM = "CM414AM"; //$NON-NLS-1$
+
    /*
     * (non-Javadoc) The file to be parsed includes several sections with different information in
     * it. This device reader operates similar to a state machine. Every section possible is
@@ -163,7 +165,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
     * object provided.
     */
    private void deviceTotals(final String device, final short modeId, final String line, final TourData tourData) {
-      if (device.equals("CM414AM")) { //$NON-NLS-1$
+      if (device.equals(CM414AM)) {
          tourData.setDeviceTimeInterval((short) 20);
          char bikeNumber = ' ';
          if (modeId == 46) {
@@ -543,7 +545,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                // no pulse is recorded.
                // the data written always form a sawtooth graph
                // 0-256-0-256....
-               if (tourData.getDeviceName().equals("CM414AM")) { //$NON-NLS-1$
+               if (tourData.getDeviceName().equals(CM414AM)) {
                   timeData.pulse = 0;
                }
                // The first time slice seems to be set to the total
@@ -610,7 +612,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 
             final TimeData firstTimeData = timeDataList.get(0);
 
-            if (tourData.getDeviceName().equals("CM414AM")) { //$NON-NLS-1$
+            if (tourData.getDeviceName().equals(CM414AM)) {
                firstTimeData.pulse = Float.MIN_VALUE;
             }
          }
