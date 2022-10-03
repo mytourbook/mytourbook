@@ -29,8 +29,8 @@ public class HAC4LinuxDeviceReaderTests extends DeviceDataReaderTester {
    private HAC4LinuxDeviceReader deviceDataReader = new HAC4LinuxDeviceReader();
 
    /**
-    * Sample provided by Wolfgang Schramm
-    * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-3730768
+    * Sample provided by cyc1ingsir
+    * https://github.com/mytourbook/mytourbook/discussions/939#discussioncomment-3714641
     */
    @Test
    void testDaumErgoBikeImport_20071109() {
