@@ -15,6 +15,8 @@
  *******************************************************************************/
 package utils;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.HashMap;
 
 import net.tourbook.data.TourData;
@@ -47,6 +49,8 @@ public abstract class DeviceDataReaderTester {
 
       final String importFilePath = filePathWithoutExtension + extension;
       final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(importFilePath);
+
+      assertTrue(tourbookDevice.validateRawData(importFileAbsolutePath));
 
       tourbookDevice.processDeviceData(importFileAbsolutePath,
             new DeviceData(),

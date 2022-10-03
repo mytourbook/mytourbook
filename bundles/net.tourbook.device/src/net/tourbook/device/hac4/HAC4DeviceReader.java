@@ -714,44 +714,4 @@ public class HAC4DeviceReader extends TourbookDevice {
 
       return isValid;
    }
-
-   public boolean validateRawDataNEW(final String fileName) {
-
-      boolean isValid = false;
-
-      try (RandomAccessFile file = new RandomAccessFile(fileName, "r")) {//$NON-NLS-1$
-
-         final byte[] buffer = new byte[5];
-
-         // check header
-         file.read(buffer);
-         if (!"AFRO".equalsIgnoreCase(new String(buffer, 0, 4))) { //$NON-NLS-1$
-            return false;
-         }
-
-         int checksum = 0;
-         int lastValue = 0;
-
-         while (file.read(buffer) != -1) {
-            checksum = (checksum + lastValue) & 0xFFFF;
-
-            lastValue = readSummary(buffer);
-
-            // int lastValueOrig = Integer.parseInt(new String(buffer, 0,
-            // 4), 16);
-            // System.out.println(lastValueOrig + " " + lastValue);
-         }
-
-         if (checksum == lastValue) {
-            isValid = true;
-         }
-
-      } catch (final IOException e) {
-         e.printStackTrace();
-      } catch (final NumberFormatException e) {
-         return false;
-      }
-
-      return isValid;
-   }
 }
