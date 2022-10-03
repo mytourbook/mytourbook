@@ -29,8 +29,6 @@ public class Map25FPSManager {
    private static LwjglApplication              _lwjglApp;
    private static LwjglApplicationConfiguration _appConfig;
 
-   private static int                           _animationFPS;
-
    public static long getBackgroundFPS() {
       return _appConfig.backgroundFPS;
    }
@@ -56,7 +54,7 @@ public class Map25FPSManager {
     * @param isActive
     * @param animationFPS
     */
-   public static void setAnimation(final boolean isActive, final int animationFPS) {
+   public static void setAnimation(final boolean isActive) {
 
       if (_lwjglApp == null) {
 
@@ -65,16 +63,13 @@ public class Map25FPSManager {
          return;
       }
 
-      _animationFPS = animationFPS;
-      _appConfig.foregroundFPS = animationFPS;
-
       // disable rendering when not needed
       _lwjglApp.getGraphics().setContinuousRendering(isActive);
    }
 
    /**
     * Set background FPS to a higher rate. This is helpful when a slideout is opened, then it get's
-    * the focus and the map is running with the background FPS.
+    * the focus and the map is nomally running with the background FPS.
     *
     * @param isEnabled
     */
@@ -82,7 +77,7 @@ public class Map25FPSManager {
 
       _appConfig.backgroundFPS = isEnabled
 
-            ? _animationFPS
+            ? DEFAULT_FOREGROUND_FPS
 
             : DEFAULT_BACKGROUND_FPS;
    }

@@ -55,6 +55,10 @@ Bugfix
 * Hac4Linux Import (Frederic)
   - Fixed an issue where tours were not importing anymore since v12.12.0	https://github.com/mytourbook/mytourbook/discussions/939
     
+* Common import
+  - Fixed "Invalid thread access" which occurred when new tour types or tags were created when importing a tour
+    https://github.com/mytourbook/mytourbook/issues/938
+
 * Fit Import (Frederic)
   - Fixed NPE when pauses data are missing      https://sourceforge.net/p/mytourbook/discussion/622811/thread/d52269ce04/
     
