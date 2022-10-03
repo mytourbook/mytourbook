@@ -56,7 +56,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
     * the Overlay is *compiled*. NOTE: required by setMatrix utility
     * functions to draw this layer fixed to the map
     */
-   private MapPosition                   _mapPosition;
+   private MapPosition                   _mapCompilePosition;
    private Map                           _map;
 
    /**
@@ -249,24 +249,27 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          final int arrow_MinimumDistance = trackConfig.arrow_IsAnimate
 
                // use a smaller distance when animated to show the moving figure smoothly
-               ? trackConfig.arrow_MinimumDistanceAnimated
+               ? 1 // trackConfig.arrow_MinimumDistanceAnimated
 
                : trackConfig.arrow_MinimumDistance;
 
          final TourTrack_Bucket workerBucket = getWorkerBucket(task.__taskBucketManager);
 
-         final MapPosition mapPos = task.__mapPos;
-         mMap.getMapPosition(mapPos);
+         // put current map position into the task map position
+         final MapPosition taskMapPos = task.__mapPos;
+         mMap.getMapPosition(taskMapPos);
 
-         final int zoomlevel = mapPos.zoomLevel;
-         mapPos.scale = 1 << zoomlevel;
+         final int zoomlevel = taskMapPos.zoomLevel;
+
+         // set scale from the zoom level
+         taskMapPos.scale = 1 << zoomlevel;
 
          // current map positions 0...1
-         final double currentMapPosX = mapPos.x; // 0...1, lat == 0 -> 0.5
-         final double currentMapPosY = mapPos.y; // 0...1, lon == 0 -> 0.5
+         final double currentMapPosX = taskMapPos.x; // 0...1, lat == 0 -> 0.5
+         final double currentMapPosY = taskMapPos.y; // 0...1, lon == 0 -> 0.5
 
          // number of x/y pixels for the whole map at the current zoom level
-         final double maxMapPixel = Tile.SIZE * mapPos.scale;
+         final double maxMapPixel = Tile.SIZE * taskMapPos.scale;
          final int maxMapPixel2 = Tile.SIZE << (zoomlevel - 1);
 
          // flip around dateline
@@ -464,7 +467,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _map = map;
 
       _bucketManager_ForPainting = new TourTrack_BucketManager();
-      _mapPosition = new MapPosition();
+      _mapCompilePosition = new MapPosition();
 
       _allGeoPoints = new GeoPoint[] {};
       _allTourStarts = new IntArrayList();
@@ -572,7 +575,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          return;
       }
 
-      final MapPosition mapPosition = _mapPosition;
+      final MapPosition mapPosition = _mapCompilePosition;
 
       GLState.test(false, false);
       GLState.blend(true);
@@ -606,7 +609,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
       final float coordScale = COORD_SCALE;
       final GLMatrix mvp = viewport.mvp;
-      final MapPosition mapPosition = _mapPosition;
+      final MapPosition mapPosition = _mapCompilePosition;
 
       final double tileScale = Tile.SIZE * viewport.pos.scale;
 
@@ -655,8 +658,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
       setIsUpdateLayer(true);
 
-      // set start time for the direction arrow animation
-      TourTrack_Shader.dirArrowAnimation_StartTime = System.currentTimeMillis();
+      // set start time for the animation
+      TourTrack_Shader.animation_StartTime = System.currentTimeMillis();
    }
 
    @Override
@@ -695,14 +698,19 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
       if (workerTask == null) {
 
-         // task is done -> nothing to do
+         // no further tasks -> nothing to do
+
          return;
       }
 
-      // keep position to render relative to current state
-      _mapPosition.copy(workerTask.__mapPos);
+      /*
+       * Compile layer with new map position
+       */
 
-      // compile new layers
+      // copy map position from workerTask.__mapPos INTO _mapCompilePosition
+      _mapCompilePosition.copy(workerTask.__mapPos);
+
+      // compile layer
       final TourTrack_Bucket painterBucket = workerTask.__taskBucketManager.getBucket_Painter();
       _bucketManager_ForPainting.setBucket_Painter(painterBucket);
 

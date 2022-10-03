@@ -30,6 +30,7 @@ import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.GL;
 import org.oscim.core.MapPosition;
+import org.oscim.renderer.GLMatrix;
 import org.oscim.renderer.GLState;
 import org.oscim.renderer.GLUtils;
 import org.oscim.renderer.GLViewport;
@@ -41,37 +42,71 @@ import org.oscim.theme.styles.LineStyle;
  */
 public final class TourTrack_Shader {
 
+   private static final char  NL                       = UI.NEW_LINE;
+
    /**
     * Factor to normalize extrusion vector and scale to coord scale
     */
-   private static final float           COORD_SCALE_BY_DIR_SCALE = COORD_SCALE / TourTrack_Bucket.DIR_SCALE;
+   private static final float COORD_SCALE_BY_DIR_SCALE = COORD_SCALE / TourTrack_Bucket.DIR_SCALE;
 
-   private static final int             CAP_THIN                 = 0;
-   private static final int             CAP_BUTT                 = 1;
-   private static final int             CAP_ROUND                = 2;
+   private static final int   CAP_THIN                 = 0;
+   private static final int   CAP_BUTT                 = 1;
+   private static final int   CAP_ROUND                = 2;
 
-   private static final int             SHADER_PROJECTED         = 0;
-   private static final int             SHADER_FLAT              = 1;
+   private static final int   SHADER_PROJECTED         = 0;
+   private static final int   SHADER_FLAT              = 1;
 
    /**
     * Number of bytes for a <b>short</b> value
     */
-   private static final int             SHORT_BYTES              = 2;
+   private static final int   SHORT_BYTES              = 2;
+// private static final int             FLOAT_BYTES              = 4;
 
+   private static AnimationShader       _animationShader;
    private static DirectionArrowsShader _directionArrowShader;
-   private static LineShader[]          _lineShaders             = { null, null };
+   private static LineShader[]          _lineShaders         = { null, null };
 
-   static int                           bufferId_Vertices;
-   static int                           bufferId_VerticesColor;
-   static int                           bufferId_DirArrows;
-   static int                           bufferId_DirArrows_ColorCoords;
+   private static int                   bufferId_AnimationVertices;
+   private static int                   bufferId_TrackVertices;
+   private static int                   bufferId_TrackVertices_Colors;
+   private static int                   bufferId_DirArrows;
+   private static int                   bufferId_DirArrows_ColorCoords;
 
-   static long                          dirArrowAnimation_StartTime;
-   private static float                 _dirArrowAnimation_CurrentArrowIndex;
-   private static long                  _dirArrowAnimation_LastUpdateTime;
+   static long                          animation_StartTime;
+   private static int                   _animation_CurrentPositionIndex;
+   private static long                  _animation_LastUpdateTime;
 
    private static ByteBuffer            _vertexColor_Buffer;
    private static int                   _vertexColor_BufferSize;
+
+   private static short[]               _animationVertices;
+   private static GLMatrix              _animationMVP        = new GLMatrix();
+   private static GLMatrix              _animationTempMatrix = new GLMatrix();
+
+   private static class AnimationShader extends GLShaderMT {
+
+      /**
+       * Location for a shader variable
+       */
+      int shader_attrib_Pos;
+      int shader_uni_MVP;
+      int shader_uni_Vp2MpScale;
+
+      AnimationShader(final String shaderFile) {
+
+         if (loadShader(shaderFile, "#version 330" + NL) == false) { //$NON-NLS-1$
+            return;
+         }
+
+         // SET_FORMATTING_OFF
+
+         shader_attrib_Pos             = getAttrib ("attrib_Pos");         //$NON-NLS-1$
+         shader_uni_MVP                = getUniform("uni_MVP");            //$NON-NLS-1$
+         shader_uni_Vp2MpScale         = getUniform("uni_Vp2MpScale");     //$NON-NLS-1$
+
+         // SET_FORMATTING_ON
+      }
+   }
 
    private static class DirectionArrowsShader extends GLShaderMT {
 
@@ -91,7 +126,7 @@ public final class TourTrack_Shader {
 
       DirectionArrowsShader(final String shaderFile) {
 
-         if (loadShader(shaderFile, "#version 330" + UI.NEW_LINE) == false) {
+         if (loadShader(shaderFile, "#version 330" + NL) == false) { //$NON-NLS-1$
             return;
          }
 
@@ -172,6 +207,8 @@ public final class TourTrack_Shader {
          return false;
       }
 
+      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+
       /*
        * Track
        */
@@ -181,7 +218,7 @@ public final class TourTrack_Shader {
           */
          final ShortArrayList trackVertices = painterBucket.trackVertexData.tourTrack_Vertices;
          final ShortBuffer buffer1 = MapRenderer.getShortBuffer(numTrackVertices).put(trackVertices.toArray()).flip();
-         gl.bindBuffer(GL.ARRAY_BUFFER, TourTrack_Shader.bufferId_Vertices);
+         gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_TrackVertices);
          gl.bufferData(GL.ARRAY_BUFFER, numTrackVertices * SHORT_BYTES, buffer1, GL.STATIC_DRAW);
 
          /*
@@ -189,34 +226,122 @@ public final class TourTrack_Shader {
           */
          final ByteArrayList trackColors = painterBucket.trackVertexData.tourTrack_Colors;
          final ByteBuffer buffer2 = getBuffer_Color(numTrackVertices).put(trackColors.toArray()).flip();
-         gl.bindBuffer(GL.ARRAY_BUFFER, TourTrack_Shader.bufferId_VerticesColor);
+         gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_TrackVertices_Colors);
          gl.bufferData(GL.ARRAY_BUFFER, numTrackVertices, buffer2, GL.STATIC_DRAW);
       }
 
-      /*
-       * Direction arrows
-       */
-      {
-         /*
-          * Vertices
-          */
-         final ShortArrayList dirArrowVertices = painterBucket.directionArrow_Vertices;
-         final int numVertices = dirArrowVertices.size();
-         final ShortBuffer buffer1 = MapRenderer.getShortBuffer(numVertices).put(dirArrowVertices.toArray()).flip();
-         gl.bindBuffer(GL.ARRAY_BUFFER, TourTrack_Shader.bufferId_DirArrows);
-         gl.bufferData(GL.ARRAY_BUFFER, numVertices * SHORT_BYTES, buffer1, GL.STATIC_DRAW);
+      if (trackConfig.isShowDirectionArrow) {
 
-         /*
-          * Color
-          */
-         final ShortArrayList colorCoords = painterBucket.directionArrow_ColorCoords;
-         final int numColorCoords = colorCoords.size();
-         final ShortBuffer buffer2 = MapRenderer.getShortBuffer(numColorCoords).put(colorCoords.toArray()).flip();
-         gl.bindBuffer(GL.ARRAY_BUFFER, TourTrack_Shader.bufferId_DirArrows_ColorCoords);
-         gl.bufferData(GL.ARRAY_BUFFER, numColorCoords * SHORT_BYTES, buffer2, GL.STATIC_DRAW);
+         if (trackConfig.arrow_IsAnimate) {
+
+            /*
+             * Animation
+             */
+            {
+               /*
+                * Vertices
+                */
+
+// SET_FORMATTING_OFF
+
+               final short size = 100;
+
+               _animationVertices = new short[] {
+                                                   0,     0,  10,
+                                                   0,  size,  10,
+                                                size,  size,   5,
+
+                                                };
+// SET_FORMATTING_ON
+
+               final int numAnimationVertices = _animationVertices.length;
+               final ShortBuffer buffer1 = MapRenderer.getShortBuffer(numAnimationVertices).put(_animationVertices).flip();
+               gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_AnimationVertices);
+               gl.bufferData(GL.ARRAY_BUFFER, numAnimationVertices * SHORT_BYTES, buffer1, GL.STATIC_DRAW);
+            }
+
+         } else {
+
+            /*
+             * Static direction arrows
+             */
+            {
+               /*
+                * Vertices
+                */
+               final ShortArrayList dirArrowVertices = painterBucket.directionArrow_Vertices;
+               final int numVertices = dirArrowVertices.size();
+               final ShortBuffer buffer1 = MapRenderer.getShortBuffer(numVertices).put(dirArrowVertices.toArray()).flip();
+               gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows);
+               gl.bufferData(GL.ARRAY_BUFFER, numVertices * SHORT_BYTES, buffer1, GL.STATIC_DRAW);
+
+               /*
+                * Color
+                */
+               final ShortArrayList colorCoords = painterBucket.directionArrow_ColorCoords;
+               final int numColorCoords = colorCoords.size();
+               final ShortBuffer buffer2 = MapRenderer.getShortBuffer(numColorCoords).put(colorCoords.toArray()).flip();
+               gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows_ColorCoords);
+               gl.bufferData(GL.ARRAY_BUFFER, numColorCoords * SHORT_BYTES, buffer2, GL.STATIC_DRAW);
+            }
+         }
       }
 
       return true;
+   }
+
+   private static int getAnimatedPositionIndex(final ShortArrayList animatedPositions) {
+
+      final long currentTimeMS = System.currentTimeMillis();
+
+      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+
+      // how many arrows are moved in one second
+      final int framesPerSecond = trackConfig.arrow_ArrowsPerSecond;
+
+      // update sequence in one second
+      final float frameDurationSec = 1f / framesPerSecond;
+      final long frameDurationMS = (long) (frameDurationSec * 1000);
+
+      // ensure there not more frames per second are displayed
+      final long nextUpdateTimeMS = _animation_LastUpdateTime + frameDurationMS;
+      final long timeDiffMS = nextUpdateTimeMS - currentTimeMS;
+      if (timeDiffMS > 0) {
+         return _animation_CurrentPositionIndex;
+      }
+
+      // number of position items: x,y -> 2
+      final int numPosSliceItems = 2;
+      final int numPositions = animatedPositions.size();
+
+      // the last frame is not displayed -> -2
+      final int maxFrames = Math.max(0, numPositions / numPosSliceItems - numPosSliceItems);
+      final float maxLoopTime = maxFrames / framesPerSecond;
+
+      final float timeDiffSinceFirstRun = (float) ((currentTimeMS - animation_StartTime) / 1000.0);
+      final float currentTimeIndex = timeDiffSinceFirstRun % maxLoopTime;
+
+      int positionIndex = Math.round(currentTimeIndex * framesPerSecond) * numPosSliceItems;
+
+      // ensure to not jump back to the start when the end is not yet reached
+      if (positionIndex <= numPositions - numPosSliceItems) {
+         positionIndex = _animation_CurrentPositionIndex + numPosSliceItems;
+      }
+
+      // ensure to move not more than one frame
+      if (positionIndex > _animation_CurrentPositionIndex + numPosSliceItems) {
+         positionIndex = _animation_CurrentPositionIndex + numPosSliceItems;
+      }
+
+      // ensure bounds
+      if (positionIndex >= numPositions - numPosSliceItems) {
+         positionIndex = 0;
+      }
+
+      _animation_CurrentPositionIndex = positionIndex;
+      _animation_LastUpdateTime = currentTimeMS;
+
+      return positionIndex;
    }
 
    private static ByteBuffer getBuffer_Color(final int requestedColorSize) {
@@ -241,56 +366,6 @@ public final class TourTrack_Shader {
       }
 
       return _vertexColor_Buffer;
-   }
-
-   private static float getGlowArrowIndex(final TourTrack_BucketManager bucketManager) {
-
-      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-
-      // how many arrows are moved in one second
-      final int arrowsPerSecond = trackConfig.arrow_ArrowsPerSecond;
-
-      final long currentTimeMS = System.currentTimeMillis();
-
-      // update sequence in one second
-      final float secondsForOneArrowSec = 1f / arrowsPerSecond;
-      final long secondsForOneArrowMS = (long) (secondsForOneArrowSec * 1000);
-
-      // ensure there not more arrows per second are displayed
-      final long nextUpdateTimeMS = _dirArrowAnimation_LastUpdateTime + secondsForOneArrowMS;
-      final long timeDiffMS = nextUpdateTimeMS - currentTimeMS;
-      if (timeDiffMS > 0) {
-         return _dirArrowAnimation_CurrentArrowIndex;
-      }
-
-      // the last arrow is not displayed -> -1
-      final float maxDirArrows = 33; // --> Math.max(0, bucketManager.numDirectionArrows - 1);
-      final float maxLoopTime = maxDirArrows / arrowsPerSecond;
-
-      final float timeDiffSinceFirstRun = (float) ((currentTimeMS - dirArrowAnimation_StartTime) / 1000.0);
-      final float currentTimeIndex = timeDiffSinceFirstRun % maxLoopTime;
-
-      float glowArrowIndex = Math.round(currentTimeIndex * arrowsPerSecond);
-
-      // ensure to not jump back to the start when the end is not yet reached
-      if (glowArrowIndex < maxDirArrows) {
-         glowArrowIndex = _dirArrowAnimation_CurrentArrowIndex + 1;
-      }
-
-      // ensure to move not more than one arrow
-      if (glowArrowIndex > _dirArrowAnimation_CurrentArrowIndex + 1) {
-         glowArrowIndex = _dirArrowAnimation_CurrentArrowIndex + 1;
-      }
-
-      // ensure bounds
-      if (_dirArrowAnimation_CurrentArrowIndex > maxDirArrows - 1) {
-         glowArrowIndex = 0;
-      }
-
-      _dirArrowAnimation_CurrentArrowIndex = glowArrowIndex;
-      _dirArrowAnimation_LastUpdateTime = currentTimeMS;
-
-      return glowArrowIndex;
    }
 
    /**
@@ -320,7 +395,7 @@ public final class TourTrack_Shader {
 
             if (trackConfig.arrow_IsAnimate) {
 
-               paint_30_Animation(viewport, vp2mpScale);
+               paint_30_Animation(viewport, vp2mpScale, trackBucket);
 
             } else {
 
@@ -385,7 +460,7 @@ public final class TourTrack_Shader {
       final int shader_uOutlineBrightness = shader.shader_uOutlineBrightness;
       final int shader_uVertexColorAlpha = shader.shader_uVertexColorAlpha;
 
-      gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_Vertices);
+      gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_TrackVertices);
       gl.enableVertexAttribArray(shader_a_pos);
       gl.vertexAttribPointer(
 
@@ -400,7 +475,7 @@ public final class TourTrack_Shader {
       /*
        * Set vertex color
        */
-      gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_VerticesColor);
+      gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_TrackVertices_Colors);
       gl.enableVertexAttribArray(shader_aVertexColor);
       gl.vertexAttribPointer(
 
@@ -654,8 +729,66 @@ public final class TourTrack_Shader {
 //    GLUtils.checkGlError(TourTrack_Shader.class.getName());
    }
 
-   private static void paint_30_Animation(final GLViewport viewport, final float vp2mpScale) {
-      // TODO Auto-generated method stub
+   private static void paint_30_Animation(final GLViewport viewport, final float vp2mpScale, final TourTrack_Bucket trackBucket) {
+
+      final ShortArrayList animatedPositions = trackBucket.animatedPositions;
+
+      final int numPositions = animatedPositions.size();
+      if (numPositions < 1) {
+         return;
+      }
+
+      final AnimationShader shader = _animationShader;
+      shader.useProgram();
+
+      // get animated position
+      final int posIndex = getAnimatedPositionIndex(animatedPositions);
+
+      // ensure bounds -> this case happened during debugging several time
+      if (posIndex >= numPositions - 2) {
+         return;
+      }
+
+      final short posX = animatedPositions.get(posIndex);
+      final short posY = animatedPositions.get(posIndex + 1);
+
+      _animationMVP.copy(viewport.mvp);
+
+      viewport.mvp.setTransScale(posX * 0.5f, posY * 0.5f, 1);
+      viewport.mvp.multiplyMM(viewport.viewproj, viewport.mvp);
+
+      // set mvp matrix into the shader
+      viewport.mvp.setAsUniform(shader.shader_uni_MVP);
+
+      final int shader_Attrib_Pos = shader.shader_attrib_Pos;
+
+      // vertices position
+      gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_AnimationVertices);
+      gl.enableVertexAttribArray(shader_Attrib_Pos);
+      gl.vertexAttribPointer(
+
+            shader_Attrib_Pos, //      index of the vertex attribute that is to be modified
+            3, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
+            GL.SHORT, //               data type of each component in the array
+            false, //                  values should be normalized
+            0, //                      offset in bytes between the beginning of consecutive vertex attributes
+            0 //                       offset in bytes of the first component in the vertex attribute array
+      );
+
+      // viewport to map scale: 1.0...2.0
+      gl.uniform1f(shader.shader_uni_Vp2MpScale, vp2mpScale);
+
+      /*
+       * Draw animation
+       */
+      GLState.test(true, false);
+      gl.depthMask(true);
+      {
+         gl.drawArrays(GL.TRIANGLES, 0, _animationVertices.length);
+      }
+      gl.depthMask(false);
+
+//    GLUtils.checkGlError(TourTrack_Shader.class.getName());
 
    }
 
@@ -663,16 +796,18 @@ public final class TourTrack_Shader {
 
 // SET_FORMATTING_OFF
 
-      _lineShaders[SHADER_PROJECTED]   = new LineShader("line_aa_proj");       //$NON-NLS-1$
-      _lineShaders[SHADER_FLAT]        = new LineShader("line_aa");            //$NON-NLS-1$
+      _lineShaders[SHADER_PROJECTED]   = new LineShader("line_aa_proj");                  //$NON-NLS-1$
+      _lineShaders[SHADER_FLAT]        = new LineShader("line_aa");                       //$NON-NLS-1$
 
+      _animationShader                 = new AnimationShader("animateTrack");             //$NON-NLS-1$
       _directionArrowShader            = new DirectionArrowsShader("directionArrows");    //$NON-NLS-1$
 
       // create buffer id's
+      bufferId_AnimationVertices       = gl.genBuffer();
       bufferId_DirArrows               = gl.genBuffer();
       bufferId_DirArrows_ColorCoords   = gl.genBuffer();
-      bufferId_Vertices                = gl.genBuffer();
-      bufferId_VerticesColor           = gl.genBuffer();
+      bufferId_TrackVertices           = gl.genBuffer();
+      bufferId_TrackVertices_Colors    = gl.genBuffer();
 
 // SET_FORMATTING_ON
 

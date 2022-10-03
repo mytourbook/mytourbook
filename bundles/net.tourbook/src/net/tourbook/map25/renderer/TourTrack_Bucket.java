@@ -81,8 +81,8 @@ public class TourTrack_Bucket {
     * <p>
     *
     * <pre>
-    * x1    y2    z1
-    * x2    y2    z2
+    * x1    y2    z1    arrowPart
+    * x2    y2    z2    arrowPart
     * ...
     * </pre>
     */
@@ -97,9 +97,34 @@ public class TourTrack_Bucket {
     */
    ShortArrayList             directionArrow_ColorCoords;
 
+   /**
+    * X/Y positions
+    *
+    * <pre>
+    * posX1    posY2
+    * posX2    posY2
+    * ...
+    * </pre>
+    */
+   ShortArrayList             animatedPositions;
+
+   /**
+    * X/Y unit (direction) vectors
+    *
+    * <pre>
+    * unitX1    unitY2
+    * unitX2    unitY2
+    * ...
+    * </pre>
+    */
+   FloatArrayList             animatedUnitVectors;
+
    public TourTrack_Bucket() {
 
       trackVertexData = new TourTrack_VertexData();
+
+      animatedPositions = new ShortArrayList();
+      animatedUnitVectors = new FloatArrayList();
 
       directionArrow_Vertices = new ShortArrayList();
       directionArrow_ColorCoords = new ShortArrayList();
@@ -626,6 +651,10 @@ public class TourTrack_Bucket {
     */
    public void createArrowVertices(final FloatArrayList allDirectionArrowPixelList) {
 
+      // create new list to not update currently used list, otherwise a bound exception can occure !!!
+      animatedPositions.clear();
+      animatedUnitVectors.clear();
+
       directionArrow_Vertices.clear();
       directionArrow_ColorCoords.clear();
 
@@ -634,9 +663,18 @@ public class TourTrack_Bucket {
          return;
       }
 
+      final float[] allDirectionArrowPixel = allDirectionArrowPixelList.toArray();
+
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-      final float[] allDirectionArrowPixel = allDirectionArrowPixelList.toArray();
+      if (trackConfig.arrow_IsAnimate) {
+
+         createArrowVertices_50_Animated(allDirectionArrowPixel);
+
+         return;
+      }
+
+      // arrows are not animated, draw static arrows
 
 // SET_FORMATTING_OFF
 
@@ -962,6 +1000,43 @@ public class TourTrack_Bucket {
             (short) 0, (short) 0, (short) 1);
 
 // SET_FORMATTING_ON
+   }
+
+   private void createArrowVertices_50_Animated(final float[] allDirectionArrowPixel) {
+
+      int pixelIndex = 0;
+
+      float p1X = allDirectionArrowPixel[pixelIndex++];
+      float p1Y = allDirectionArrowPixel[pixelIndex++];
+
+      for (; pixelIndex < allDirectionArrowPixel.length;) {
+
+         final float p2X = allDirectionArrowPixel[pixelIndex++];
+         final float p2Y = allDirectionArrowPixel[pixelIndex++];
+
+         // create unit (direction) vector: unit = (P2-P1)/|P2-P1|
+
+         // (P2-P1)
+         final float p21DiffX = p2X - p1X;
+         final float p21DiffY = p2Y - p1Y;
+
+         // |P2-P1| - distance between P1 and P2 - Pythagorean theorem
+         final double p21Distance = Math.sqrt(p21DiffX * p21DiffX + p21DiffY * p21DiffY);
+
+         // unit = (P2-P1)/|P2-P1|
+         final float p12UnitX = (float) (p21DiffX / p21Distance);
+         final float p12UnitY = (float) (p21DiffY / p21Distance);
+
+         final short p2X_scaled = (short) (p2X * COORD_SCALE);
+         final short p2Y_scaled = (short) (p2Y * COORD_SCALE);
+
+         animatedPositions.addAll(p2X_scaled, p2Y_scaled);
+         animatedUnitVectors.addAll(p12UnitX, p12UnitY);
+
+         // setup next position
+         p1X = p2X;
+         p1Y = p2Y;
+      }
    }
 
 }
