@@ -30,8 +30,6 @@ public class WorkbenchTests extends UITest {
    public static final String DIRECTORY       = "Directory";          //$NON-NLS-1$
    public static final String TOUR_PROPERTIES = "2. Tour Properties"; //$NON-NLS-1$
 
-   //todo fb
-   //map2view export current view in image
    @BeforeClass
    public static void beforeClass() {
 
