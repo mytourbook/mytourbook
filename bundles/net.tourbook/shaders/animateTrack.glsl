@@ -13,12 +13,9 @@ out vec3 pass_Color;
 
 void main() {
    
-   pass_Color  = colors[gl_VertexID];
+   gl_Position = uni_MVP * vec4(attrib_Pos.xy, attrib_Pos.z * uni_Vp2MpScale, 1.0);
 
-   gl_Position = uni_MVP * vec4(
-                        attrib_Pos.xy,
-                        attrib_Pos.z * uni_Vp2MpScale,
-                        1.0);
+   pass_Color  = colors[gl_VertexID];
 }
 
 

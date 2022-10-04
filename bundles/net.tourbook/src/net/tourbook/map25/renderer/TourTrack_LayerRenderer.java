@@ -47,22 +47,15 @@ import org.slf4j.LoggerFactory;
  */
 public class TourTrack_LayerRenderer extends LayerRenderer {
 
-   public static final Logger            log               = LoggerFactory.getLogger(TourTrack_LayerRenderer.class);
+   public static final Logger            log             = LoggerFactory.getLogger(TourTrack_LayerRenderer.class);
 
-   private static final int              RENDERING_DELAY   = 0;
+   private static final int              RENDERING_DELAY = 0;
 
    /**
-    * Use _mapPosition.copy(position) to keep the position for which
-    * the Overlay is *compiled*. NOTE: required by setMatrix utility
-    * functions to draw this layer fixed to the map
+    * Map position during compile time
     */
-   private MapPosition                   _mapCompilePosition;
+   private MapPosition                   _compileMapPosition;
    private Map                           _map;
-
-   /**
-    * Wrap around dateline
-    */
-   private boolean                       _isFlipOnDateLine = true;
 
    /**
     * Buckets for rendering
@@ -80,9 +73,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    private IntArrayList                  _allTourStarts;
    private int[]                         _allGeoPointColors;
 
-   private int                           __oldX            = -1;
-   private int                           __oldY            = -1;
-   private int                           __oldZoomScale    = -1;
+   private int                           __oldX          = -1;
+   private int                           __oldY          = -1;
+   private int                           __oldZoomScale  = -1;
 
    private TourTrack_Layer               _tourLayer;
 
@@ -255,7 +248,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          final TourTrack_Bucket workerBucket = getWorkerBucket(task.__taskBucketManager);
 
-         // put current map position into the task map position
+         // set current map position into the task map position
          final MapPosition taskMapPos = task.__mapPos;
          mMap.getMapPosition(taskMapPos);
 
@@ -467,7 +460,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _map = map;
 
       _bucketManager_ForPainting = new TourTrack_BucketManager();
-      _mapCompilePosition = new MapPosition();
+      _compileMapPosition = new MapPosition();
 
       _allGeoPoints = new GeoPoint[] {};
       _allTourStarts = new IntArrayList();
@@ -475,6 +468,49 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _simpleWorker = new Worker(map);
 
       _lineStyle = createLineStyle();
+   }
+
+   /**
+    * Adjust MVP matrix to the difference between the compile time map location and the current map
+    * location.
+    * <p>
+    * <b>Original comment</b>:
+    * <p>
+    * Utility: Set matrices.mvp matrix relative to the difference of current
+    * MapPosition and the last updated Overlay MapPosition.
+    * <p>
+    * Use this to 'stick' your layer to the map. Note: Vertex coordinates
+    * are assumed to be scaled by MapRenderer.COORD_SCALE (== 8).
+    *
+    * @param viewport
+    *           GLViewport
+    */
+   private void adjustMVPMatrix(final GLViewport viewport) {
+
+      final MapPosition viewportMapPosition = viewport.pos;
+
+      double diffX = _compileMapPosition.x - viewportMapPosition.x;
+      final double diffY = _compileMapPosition.y - viewportMapPosition.y;
+
+      //wrap around date-line
+      while (diffX < 0.5) {
+         diffX += 1.0;
+      }
+      while (diffX > 0.5) {
+         diffX -= 1.0;
+      }
+
+      final double tileScale = Tile.SIZE * viewportMapPosition.scale;
+
+      final double scaledDiffX = diffX * tileScale;
+      final double scaledDiffY = diffY * tileScale;
+
+      final double viewport2mapScale = viewportMapPosition.scale / _compileMapPosition.scale;
+      final double diffScale = viewport2mapScale / COORD_SCALE;
+
+      final GLMatrix mvp = viewport.mvp;
+      mvp.setTransScale((float) scaledDiffX, (float) scaledDiffY, (float) diffScale);
+      mvp.multiplyLhs(viewport.viewproj);
    }
 
    private LineStyle createLineStyle() {
@@ -575,68 +611,16 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          return;
       }
 
-      final MapPosition mapPosition = _mapCompilePosition;
-
       GLState.test(false, false);
       GLState.blend(true);
 
-      // viewport scale 2 map scale: it is between 1...2
-      final float viewport2mapscale = (float) (viewport.pos.scale / mapPosition.scale);
+      adjustMVPMatrix(viewport);
 
-      setMatrix(viewport, true);
-
-      TourTrack_Shader.paint(trackBucket, viewport, viewport2mapscale);
+      TourTrack_Shader.paint(trackBucket, viewport, _compileMapPosition);
    }
 
    public void setIsUpdateLayer(final boolean isUpdateLayer) {
       _isUpdateLayer = isUpdateLayer;
-   }
-
-   /**
-    * Utility: Set matrices.mvp matrix relative to the difference of current
-    * MapPosition and the last updated Overlay MapPosition.
-    * <p>
-    * Use this to 'stick' your layer to the map. Note: Vertex coordinates
-    * are assumed to be scaled by MapRenderer.COORD_SCALE (== 8).
-    *
-    * @param viewport
-    *           GLViewport
-    * @param isProjected
-    *           if true apply view- and projection, or just view otherwise.
-    */
-   private void setMatrix(final GLViewport viewport,
-                          final boolean isProjected) {
-
-      final float coordScale = COORD_SCALE;
-      final GLMatrix mvp = viewport.mvp;
-      final MapPosition mapPosition = _mapCompilePosition;
-
-      final double tileScale = Tile.SIZE * viewport.pos.scale;
-
-      double x = mapPosition.x - viewport.pos.x;
-      final double y = mapPosition.y - viewport.pos.y;
-
-      if (_isFlipOnDateLine) {
-
-         //wrap around date-line
-         while (x < 0.5) {
-            x += 1.0;
-         }
-
-         while (x > 0.5) {
-            x -= 1.0;
-         }
-      }
-
-      mvp.setTransScale(
-            (float) (x * tileScale),
-            (float) (y * tileScale),
-            (float) (viewport.pos.scale / mapPosition.scale) / coordScale);
-
-      mvp.multiplyLhs(isProjected
-
-            ? viewport.viewproj
-            : viewport.view);
    }
 
    public void setupTourPositions(final GeoPoint[] allGeoPoints,
@@ -708,7 +692,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
        */
 
       // copy map position from workerTask.__mapPos INTO _mapCompilePosition
-      _mapCompilePosition.copy(workerTask.__mapPos);
+      _compileMapPosition.copy(workerTask.__mapPos);
 
       // compile layer
       final TourTrack_Bucket painterBucket = workerTask.__taskBucketManager.getBucket_Painter();

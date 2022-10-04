@@ -200,14 +200,14 @@ public class LocationRenderer extends LayerRenderer {
          gl.uniform1f(_shader_u_scale, radius);
 
          final Point locationPosition = _render_IndicatorPositions[locationIndex];
-         final double x = locationPosition.x - viewPort_MapPosition.x;
-         final double y = locationPosition.y - viewPort_MapPosition.y;
+         final double diffX = locationPosition.x - viewPort_MapPosition.x;
+         final double diffY = locationPosition.y - viewPort_MapPosition.y;
          final double tileScale = Tile.SIZE * viewPort_MapPosition.scale;
 
-         final float scaledX = (float) (x * tileScale);
-         final float scaledY = (float) (y * tileScale);
+         final float scaledDiffX = (float) (diffX * tileScale);
+         final float scaledDiffY = (float) (diffY * tileScale);
 
-         viewPort.mvp.setTransScale(scaledX, scaledY, 1);
+         viewPort.mvp.setTransScale(scaledDiffX, scaledDiffY, 1);
          viewPort.mvp.multiplyMM(viewPort.viewproj, viewPort.mvp);
          viewPort.mvp.setAsUniform(_shader_u_mvp);
 

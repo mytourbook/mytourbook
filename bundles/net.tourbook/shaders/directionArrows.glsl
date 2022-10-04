@@ -11,7 +11,9 @@ out vec3   pass_ColorCoord;
 
 void main() {
    
-   gl_Position    = u_mvp * vec4(a_pos.xy, a_pos.z * uni_Vp2MpScale, 1.0);
+   gl_Position    = u_mvp * vec4(a_pos.xy,
+                                 a_pos.z  * uni_Vp2MpScale,
+                                 1.0);
 
    pass_ArrowPart  = a_pos.w;
    pass_ColorCoord = attrib_ColorCoord;

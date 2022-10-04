@@ -30,6 +30,7 @@ import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.GL;
 import org.oscim.core.MapPosition;
+import org.oscim.core.Tile;
 import org.oscim.renderer.GLMatrix;
 import org.oscim.renderer.GLState;
 import org.oscim.renderer.GLUtils;
@@ -82,6 +83,11 @@ public final class TourTrack_Shader {
    private static short[]               _animationVertices;
    private static GLMatrix              _animationMVP        = new GLMatrix();
    private static GLMatrix              _animationTempMatrix = new GLMatrix();
+
+   private static double                _prevScaledDiffX;
+   private static short                 _prevAnimationPosX;
+   private static short                 _prevAnimationPosY;
+   private static int                   _prevPosIndex;
 
    private static class AnimationShader extends GLShaderMT {
 
@@ -207,6 +213,10 @@ public final class TourTrack_Shader {
          return false;
       }
 
+      // set start time for the animation
+      animation_StartTime = System.currentTimeMillis();
+      _animation_CurrentPositionIndex = 0;
+
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
       /*
@@ -249,7 +259,7 @@ public final class TourTrack_Shader {
                _animationVertices = new short[] {
                                                    0,     0,  10,
                                                    0,  size,  10,
-                                                size,  size,   5,
+                                                size,  size,  50,
 
                                                 };
 // SET_FORMATTING_ON
@@ -292,56 +302,57 @@ public final class TourTrack_Shader {
 
    private static int getAnimatedPositionIndex(final ShortArrayList animatedPositions) {
 
-      final long currentTimeMS = System.currentTimeMillis();
-
-      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-
-      // how many arrows are moved in one second
-      final int framesPerSecond = trackConfig.arrow_ArrowsPerSecond;
-
-      // update sequence in one second
-      final float frameDurationSec = 1f / framesPerSecond;
-      final long frameDurationMS = (long) (frameDurationSec * 1000);
-
-      // ensure there not more frames per second are displayed
-      final long nextUpdateTimeMS = _animation_LastUpdateTime + frameDurationMS;
-      final long timeDiffMS = nextUpdateTimeMS - currentTimeMS;
-      if (timeDiffMS > 0) {
-         return _animation_CurrentPositionIndex;
-      }
-
-      // number of position items: x,y -> 2
-      final int numPosSliceItems = 2;
-      final int numPositions = animatedPositions.size();
-
-      // the last frame is not displayed -> -2
-      final int maxFrames = Math.max(0, numPositions / numPosSliceItems - numPosSliceItems);
-      final float maxLoopTime = maxFrames / framesPerSecond;
-
-      final float timeDiffSinceFirstRun = (float) ((currentTimeMS - animation_StartTime) / 1000.0);
-      final float currentTimeIndex = timeDiffSinceFirstRun % maxLoopTime;
-
-      int positionIndex = Math.round(currentTimeIndex * framesPerSecond) * numPosSliceItems;
-
-      // ensure to not jump back to the start when the end is not yet reached
-      if (positionIndex <= numPositions - numPosSliceItems) {
-         positionIndex = _animation_CurrentPositionIndex + numPosSliceItems;
-      }
-
-      // ensure to move not more than one frame
-      if (positionIndex > _animation_CurrentPositionIndex + numPosSliceItems) {
-         positionIndex = _animation_CurrentPositionIndex + numPosSliceItems;
-      }
-
-      // ensure bounds
-      if (positionIndex >= numPositions - numPosSliceItems) {
-         positionIndex = 0;
-      }
-
-      _animation_CurrentPositionIndex = positionIndex;
-      _animation_LastUpdateTime = currentTimeMS;
-
-      return positionIndex;
+      return 0;
+//      final long currentTimeMS = System.currentTimeMillis();
+//
+//      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+//
+//      // how many arrows are moved in one second
+//      final int framesPerSecond = trackConfig.arrow_ArrowsPerSecond;
+//
+//      // update sequence in one second
+//      final float frameDurationSec = 1f / framesPerSecond;
+//      final long frameDurationMS = (long) (frameDurationSec * 1000);
+//
+//      // ensure there not more frames per second are displayed
+//      final long nextUpdateTimeMS = _animation_LastUpdateTime + frameDurationMS;
+//      final long timeDiffMS = nextUpdateTimeMS - currentTimeMS;
+//      if (timeDiffMS > 0) {
+//         return _animation_CurrentPositionIndex;
+//      }
+//
+//      // number of position items: x,y -> 2
+//      final int numPosSliceItems = 2;
+//      final int numPositions = animatedPositions.size();
+//
+//      // the last frame is not displayed -> -2
+//      final int maxFrames = Math.max(0, numPositions / numPosSliceItems - numPosSliceItems);
+//      final float maxLoopTime = maxFrames / framesPerSecond;
+//
+//      final float timeDiffSinceFirstRun = (float) ((currentTimeMS - animation_StartTime) / 1000.0);
+//      final float currentTimeIndex = timeDiffSinceFirstRun % maxLoopTime;
+//
+//      int positionIndex = Math.round(currentTimeIndex * framesPerSecond) * numPosSliceItems;
+//
+//      // ensure to not jump back to the start when the end is not yet reached
+//      if (positionIndex <= numPositions - numPosSliceItems) {
+//         positionIndex = _animation_CurrentPositionIndex + numPosSliceItems;
+//      }
+//
+//      // ensure to move not more than one frame
+//      if (positionIndex > _animation_CurrentPositionIndex + numPosSliceItems) {
+//         positionIndex = _animation_CurrentPositionIndex + numPosSliceItems;
+//      }
+//
+//      // ensure bounds
+//      if (positionIndex >= numPositions - numPosSliceItems) {
+//         positionIndex = 0;
+//      }
+//
+//      _animation_CurrentPositionIndex = positionIndex;
+//      _animation_LastUpdateTime = currentTimeMS;
+//
+//      return positionIndex;
    }
 
    private static ByteBuffer getBuffer_Color(final int requestedColorSize) {
@@ -373,33 +384,35 @@ public final class TourTrack_Shader {
     *
     * @param trackBucket
     * @param viewport
-    * @param vp2mpScale
-    *           Viewport scale 2 map scale: it is between 1...2
+    * @param compileMapPosition
     * @param bucketManager
     * @return
     */
    public static void paint(final TourTrack_Bucket trackBucket,
                             final GLViewport viewport,
-                            final float vp2mpScale) {
+                            final MapPosition compileMapPosition) {
 
 //    _dirArrowFrameBuffer.updateViewport(viewport, 0.5f);
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
+      // viewport scale 2 map scale: it's between 1...2
+      final float viewport2mapscale = (float) (viewport.pos.scale / compileMapPosition.scale);
+
       // fix alpha blending
       gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
       {
-         paint_10_Track(trackBucket, viewport, vp2mpScale);
+         paint_10_Track(trackBucket, viewport, viewport2mapscale);
 
          if (trackConfig.isShowDirectionArrow) {
 
             if (trackConfig.arrow_IsAnimate) {
 
-               paint_30_Animation(viewport, vp2mpScale, trackBucket);
+               paint_30_Animation(viewport, compileMapPosition, viewport2mapscale, trackBucket);
 
             } else {
 
-               paint_20_DirectionArrows(viewport, vp2mpScale, trackBucket);
+               paint_20_DirectionArrows(viewport, viewport2mapscale, trackBucket);
             }
          }
       }
@@ -409,13 +422,10 @@ public final class TourTrack_Shader {
    /**
     * Performs OpenGL drawing commands of the renderBucket(s)
     *
-    * @param inoutRenderBucket
-    *           In/out render bucked
+    * @param trackBucket
     * @param viewport
     * @param vp2mpScale
     *           Viewport scale 2 map scale: it is between 1...2
-    * @param renderBucketsAll
-    * @return
     */
    private static void paint_10_Track(final TourTrack_Bucket trackBucket,
                                       final GLViewport viewport,
@@ -423,13 +433,13 @@ public final class TourTrack_Shader {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-      final MapPosition mapPosition = viewport.pos;
+      final MapPosition viewportMapPosition = viewport.pos;
 
       /*
        * Simple line shader does not take forward shortening into
        * account. only used when tilt is 0.
        */
-      final int shaderMode = mapPosition.tilt < 1
+      final int shaderMode = viewportMapPosition.tilt < 1
 
             // 1 == not projected
             ? SHADER_FLAT
@@ -543,11 +553,11 @@ public final class TourTrack_Shader {
          gl.uniform1f(shader_u_height, (float) lineHeight);
       }
 
-      if (lineStyle.fadeScale < mapPosition.zoomLevel) {
+      if (lineStyle.fadeScale < viewportMapPosition.zoomLevel) {
 
          GLUtils.setColor(shader_u_color, lineStyle.color, 1);
 
-      } else if (lineStyle.fadeScale > mapPosition.zoomLevel) {
+      } else if (lineStyle.fadeScale > viewportMapPosition.zoomLevel) {
 
          return;
 
@@ -729,7 +739,10 @@ public final class TourTrack_Shader {
 //    GLUtils.checkGlError(TourTrack_Shader.class.getName());
    }
 
-   private static void paint_30_Animation(final GLViewport viewport, final float vp2mpScale, final TourTrack_Bucket trackBucket) {
+   private static void paint_30_Animation(final GLViewport viewport,
+                                          final MapPosition compileMapPosition,
+                                          final float vp2mpScale,
+                                          final TourTrack_Bucket trackBucket) {
 
       final ShortArrayList animatedPositions = trackBucket.animatedPositions;
 
@@ -749,16 +762,21 @@ public final class TourTrack_Shader {
          return;
       }
 
-      final short posX = animatedPositions.get(posIndex);
-      final short posY = animatedPositions.get(posIndex + 1);
+      final short animationPosX = animatedPositions.get(posIndex);
+      final short animationPosY = animatedPositions.get(posIndex + 1);
+
+      if (posIndex != _prevPosIndex) {
+         System.out.println(" posIndex " + posIndex);
+         // TODO remove SYSTEM.OUT.PRINTLN
+      }
+
+      _prevPosIndex = posIndex;
 
       _animationMVP.copy(viewport.mvp);
-
-      viewport.mvp.setTransScale(posX * 0.5f, posY * 0.5f, 1);
-      viewport.mvp.multiplyMM(viewport.viewproj, viewport.mvp);
-
-      // set mvp matrix into the shader
-      viewport.mvp.setAsUniform(shader.shader_uni_MVP);
+      {
+         paint_30_Animation_AdjustMatrix(viewport, compileMapPosition, animationPosX, animationPosY);
+      }
+      _animationMVP.setAsUniform(shader.shader_uni_MVP); // set mvp matrix into the shader
 
       final int shader_Attrib_Pos = shader.shader_attrib_Pos;
 
@@ -790,6 +808,81 @@ public final class TourTrack_Shader {
 
 //    GLUtils.checkGlError(TourTrack_Shader.class.getName());
 
+   }
+
+   /**
+    * Set MVP matrix {@link #_animationMVP} to the animation position and adjust it to the
+    * difference between the compile time map location and the current map.
+    *
+    * @param viewport
+    * @param compileMapPosition
+    * @param animationPosY
+    * @param animationPosX
+    */
+   private static void paint_30_Animation_AdjustMatrix(final GLViewport viewport,
+                                                       final MapPosition compileMapPosition,
+                                                       final short animationPosX,
+                                                       final short animationPosY) {
+
+      final MapPosition viewportMapPosition = viewport.pos;
+
+      double diffX = compileMapPosition.x - viewportMapPosition.x;
+      final double diffY = compileMapPosition.y - viewportMapPosition.y;
+
+      // wrap around date-line
+      while (diffX < 0.5) {
+         diffX += 1.0;
+      }
+      while (diffX > 0.5) {
+         diffX -= 1.0;
+      }
+
+      final double tileScale = Tile.SIZE * viewportMapPosition.scale;
+
+      final double scaledDiffX = diffX * tileScale;
+      final double scaledDiffY = diffY * tileScale;
+
+      final double viewport2mapScale = viewportMapPosition.scale / compileMapPosition.scale;
+      final double diffScale = viewport2mapScale / COORD_SCALE;
+
+      final double translationX = animationPosX + scaledDiffX;
+      final double translationY = animationPosY + scaledDiffY;
+
+//      _animationMVP.setTransScale((float) translationX, (float) translationY, (float) diffScale);
+      _animationMVP.setTransScale((float) translationX, (float) translationY, 1);
+      _animationMVP.multiplyLhs(viewport.viewproj);
+
+      if (_prevScaledDiffX != scaledDiffX
+            || _prevAnimationPosX != animationPosX
+            || _prevAnimationPosY != animationPosY) {
+
+         System.out.println(
+
+               String.format(UI.EMPTY_STRING
+
+                     + " z %d"
+                     + "  pos %4d / %4d"
+                     + "  diff %5.1f / %5.1f",
+
+                     viewportMapPosition.zoomLevel,
+
+                     animationPosX,
+                     animationPosY,
+
+                     scaledDiffX,
+                     scaledDiffY
+
+               ));
+      }
+
+      _prevScaledDiffX = scaledDiffX;
+      _prevAnimationPosX = animationPosX;
+      _prevAnimationPosY = animationPosY;
+
+      // TODO remove SYSTEM.OUT.PRINTLN
+
+//      _animationMVP.setTransScale(animationPosX + scaledDiffX, animationPosY + scaledDiffY, diffScale * 0.5f);
+//      _animationMVP.multiplyLhs(viewport.viewproj);
    }
 
    public static boolean setupShader() {

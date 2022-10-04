@@ -17,6 +17,7 @@ package net.tourbook.map25.renderer;
 
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
+import net.tourbook.common.UI;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
@@ -669,12 +670,25 @@ public class TourTrack_Bucket {
 
       if (trackConfig.arrow_IsAnimate) {
 
-         createArrowVertices_50_Animated(allDirectionArrowPixel);
+         createArrowVertices_200_Animated(allDirectionArrowPixel);
 
-         return;
+      } else {
+
+         createArrowVertices_100_NotAnimated(allDirectionArrowPixel);
       }
+   }
 
-      // arrows are not animated, draw static arrows
+   /**
+    * Arrows are not animated, draw static arrows
+    *
+    * @param allDirectionArrowPixel
+    */
+   private void createArrowVertices_100_NotAnimated(final float[] allDirectionArrowPixel) {
+
+      System.out.println((System.currentTimeMillis() + " createArrowVertices_100_NotAnimated"));
+      // TODO remove SYSTEM.OUT.PRINTLN
+
+      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
 // SET_FORMATTING_OFF
 
@@ -705,11 +719,11 @@ public class TourTrack_Bucket {
          final float p2Y = allDirectionArrowPixel[pixelIndex++];
 
          // get unit (direction) vector: unit = (P2-P1)/|P2-P1|
-         final float diffX = p2X - p1X;
-         final float diffY = p2Y - p1Y;
-         final double p12Distance = Math.sqrt(diffX * diffX + diffY * diffY); // distance between P1 and P2
-         final double p12UnitX = diffX / p12Distance;
-         final double p12UnitY = diffY / p12Distance;
+         final float p21DiffX = p2X - p1X;
+         final float p21DiffY = p2Y - p1Y;
+         final double p12Distance = Math.sqrt(p21DiffX * p21DiffX + p21DiffY * p21DiffY); // distance between P1 and P2
+         final double p12UnitX = p21DiffX / p12Distance;
+         final double p12UnitY = p21DiffY / p12Distance;
 
          // get perpendicular vector for the arrow head
          final double unitPerpendX = p12UnitY;
@@ -802,6 +816,19 @@ public class TourTrack_Bucket {
 
          final int arrowIndex = (pixelIndex - 2) / 2;
 
+         if (pixelIndex < 30) {
+
+            System.out.println(
+
+                  String.format(UI.EMPTY_STRING
+
+                        + "  pos %4d / %4d",
+
+                        p2X_scaled,
+                        p2Y_scaled
+
+                  ));
+         }
 
          /**
           * !!! VERY IMPORTANT !!! <p>
@@ -813,76 +840,73 @@ public class TourTrack_Bucket {
 
          case WINGS_WITH_MIDDLE_FIN:
 
-            createArrowVertices_10_Wings(    p2X_scaled,       p2Y_scaled,
-                                             pLeftX_scaled,    pLeftY_scaled,
-                                             pRight_Xscaled,   pRightY_scaled,
-                                             pBackX_scaled,    pBackY_scaled,
-                                             arrowZ,
-                                             arrowPart_Wing,
-                                             arrowIndex);
+            createArrowVertices_120_Wings(      p2X_scaled,       p2Y_scaled,
+                                                pLeftX_scaled,    pLeftY_scaled,
+                                                pRight_Xscaled,   pRightY_scaled,
+                                                pBackX_scaled,    pBackY_scaled,
+                                                arrowZ,
+                                                arrowPart_Wing,
+                                                arrowIndex);
 
-            createArrowVertices_20_MiddleFin(p2X_scaled,       p2Y_scaled,
-                                             pBackX_scaled,    pBackY_scaled,
-                                             pOnLineX_scaled,  pOnLineY_scaled,
-                                             arrowZ,
-                                             finTopZ,
-                                             arrowPart_Fin,
-                                             arrowIndex);
-
+            createArrowVertices_130_MiddleFin(  p2X_scaled,       p2Y_scaled,
+                                                pBackX_scaled,    pBackY_scaled,
+                                                pOnLineX_scaled,  pOnLineY_scaled,
+                                                arrowZ,
+                                                finTopZ,
+                                                arrowPart_Fin,
+                                                arrowIndex);
             break;
 
          case WINGS_WITH_OUTER_FINS:
 
-            createArrowVertices_10_Wings(    p2X_scaled,       p2Y_scaled,
-                                             pLeftX_scaled,    pLeftY_scaled,
-                                             pRight_Xscaled,   pRightY_scaled,
-                                             pBackX_scaled,    pBackY_scaled,
-                                             arrowZ,
-                                             arrowPart_Wing,
-                                             arrowIndex);
+            createArrowVertices_120_Wings(      p2X_scaled,       p2Y_scaled,
+                                                pLeftX_scaled,    pLeftY_scaled,
+                                                pRight_Xscaled,   pRightY_scaled,
+                                                pBackX_scaled,    pBackY_scaled,
+                                                arrowZ,
+                                                arrowPart_Wing,
+                                                arrowIndex);
 
-            createArrowVertices_30_OuterFins(p2X_scaled,       p2Y_scaled,
-                                             pLeftX_scaled,    pLeftY_scaled,
-                                             pRight_Xscaled,   pRightY_scaled,
-                                             arrowZ,
-                                             finBottomZ,
-                                             arrowPart_Fin,
-                                             arrowIndex);
-
+            createArrowVertices_140_OuterFins(  p2X_scaled,       p2Y_scaled,
+                                                pLeftX_scaled,    pLeftY_scaled,
+                                                pRight_Xscaled,   pRightY_scaled,
+                                                arrowZ,
+                                                finBottomZ,
+                                                arrowPart_Fin,
+                                                arrowIndex);
             break;
 
          case MIDDLE_FIN:
 
-            createArrowVertices_20_MiddleFin(p2X_scaled,       p2Y_scaled,
-                                             pBackX_scaled,    pBackY_scaled,
-                                             pOnLineX_scaled,  pOnLineY_scaled,
-                                             arrowZ,
-                                             finTopZ,
-                                             arrowPart_Fin,
-                                             arrowIndex);
+            createArrowVertices_130_MiddleFin(  p2X_scaled,       p2Y_scaled,
+                                                pBackX_scaled,    pBackY_scaled,
+                                                pOnLineX_scaled,  pOnLineY_scaled,
+                                                arrowZ,
+                                                finTopZ,
+                                                arrowPart_Fin,
+                                                arrowIndex);
             break;
 
          case OUTER_FINS:
 
-            createArrowVertices_30_OuterFins(p2X_scaled,       p2Y_scaled,
-                                             pLeftX_scaled,    pLeftY_scaled,
-                                             pRight_Xscaled,   pRightY_scaled,
-                                             arrowZ,
-                                             finBottomZ,
-                                             arrowPart_Fin,
-                                             arrowIndex);
-
+            createArrowVertices_140_OuterFins(  p2X_scaled,       p2Y_scaled,
+                                                pLeftX_scaled,    pLeftY_scaled,
+                                                pRight_Xscaled,   pRightY_scaled,
+                                                arrowZ,
+                                                finBottomZ,
+                                                arrowPart_Fin,
+                                                arrowIndex);
             break;
 
          case WINGS:
          default:
-            createArrowVertices_10_Wings(p2X_scaled,       p2Y_scaled,
-                                         pLeftX_scaled,    pLeftY_scaled,
-                                         pRight_Xscaled,   pRightY_scaled,
-                                         pBackX_scaled,    pBackY_scaled,
-                                         arrowZ,
-                                         arrowPart_Wing,
-                                         arrowIndex);
+            createArrowVertices_120_Wings(      p2X_scaled,       p2Y_scaled,
+                                                pLeftX_scaled,    pLeftY_scaled,
+                                                pRight_Xscaled,   pRightY_scaled,
+                                                pBackX_scaled,    pBackY_scaled,
+                                                arrowZ,
+                                                arrowPart_Wing,
+                                                arrowIndex);
             break;
          }
 
@@ -894,17 +918,17 @@ public class TourTrack_Bucket {
       }
    }
 
-   private void createArrowVertices_10_Wings(final short p2X,
-                                             final short p2Y,
-                                             final short pLeftX,
-                                             final short pLeftY,
-                                             final short pRight,
-                                             final short pRightY,
-                                             final short pBackX,
-                                             final short pBackY,
-                                             final short arrowZ,
-                                             final short arrowPart_Wing,
-                                             final int arrowIndex) {
+   private void createArrowVertices_120_Wings(final short p2X,
+                                              final short p2Y,
+                                              final short pLeftX,
+                                              final short pLeftY,
+                                              final short pRight,
+                                              final short pRightY,
+                                              final short pBackX,
+                                              final short pBackY,
+                                              final short arrowZ,
+                                              final short arrowPart_Wing,
+                                              final int arrowIndex) {
 // SET_FORMATTING_OFF
 
       /*
@@ -937,16 +961,16 @@ public class TourTrack_Bucket {
 // SET_FORMATTING_ON
    }
 
-   private void createArrowVertices_20_MiddleFin(final short p2X,
-                                                 final short p2Y,
-                                                 final short pBackX,
-                                                 final short pBackY,
-                                                 final short pOnLineX,
-                                                 final short pOnLineY,
-                                                 final short arrowZ,
-                                                 final short finTopZ,
-                                                 final short arrowPart_Fin,
-                                                 final int arrowIndex) {
+   private void createArrowVertices_130_MiddleFin(final short p2X,
+                                                  final short p2Y,
+                                                  final short pBackX,
+                                                  final short pBackY,
+                                                  final short pOnLineX,
+                                                  final short pOnLineY,
+                                                  final short arrowZ,
+                                                  final short finTopZ,
+                                                  final short arrowPart_Fin,
+                                                  final int arrowIndex) {
 // SET_FORMATTING_OFF
 
       // fin: middle
@@ -965,16 +989,16 @@ public class TourTrack_Bucket {
 // SET_FORMATTING_ON
    }
 
-   private void createArrowVertices_30_OuterFins(final short p2X,
-                                                 final short p2Y,
-                                                 final short pLeftX,
-                                                 final short pLeftY,
-                                                 final short pRightX,
-                                                 final short pRightY,
-                                                 final short arrowZ,
-                                                 final short finBottomZ,
-                                                 final short arrowPart_Fin,
-                                                 final int arrowIndex) {
+   private void createArrowVertices_140_OuterFins(final short p2X,
+                                                  final short p2Y,
+                                                  final short pLeftX,
+                                                  final short pLeftY,
+                                                  final short pRightX,
+                                                  final short pRightY,
+                                                  final short arrowZ,
+                                                  final short finBottomZ,
+                                                  final short arrowPart_Fin,
+                                                  final int arrowIndex) {
 // SET_FORMATTING_OFF
 
       directionArrow_Vertices.addAll(
@@ -1002,7 +1026,10 @@ public class TourTrack_Bucket {
 // SET_FORMATTING_ON
    }
 
-   private void createArrowVertices_50_Animated(final float[] allDirectionArrowPixel) {
+   private void createArrowVertices_200_Animated(final float[] allDirectionArrowPixel) {
+
+      System.out.println((System.currentTimeMillis() + " createArrowVertices_200_Animated"));
+      // TODO remove SYSTEM.OUT.PRINTLN
 
       int pixelIndex = 0;
 
@@ -1036,6 +1063,20 @@ public class TourTrack_Bucket {
          // setup next position
          p1X = p2X;
          p1Y = p2Y;
+
+         if (pixelIndex < 30) {
+
+            System.out.println(
+
+                  String.format(UI.EMPTY_STRING
+
+                        + "  pos %4d / %4d",
+
+                        p2X_scaled,
+                        p2Y_scaled
+
+                  ));
+         }
       }
    }
 
