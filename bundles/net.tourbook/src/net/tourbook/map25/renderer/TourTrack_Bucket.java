@@ -17,7 +17,6 @@ package net.tourbook.map25.renderer;
 
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
-import net.tourbook.common.UI;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
@@ -685,9 +684,6 @@ public class TourTrack_Bucket {
     */
    private void createArrowVertices_100_NotAnimated(final float[] allDirectionArrowPixel) {
 
-      System.out.println((System.currentTimeMillis() + " createArrowVertices_100_NotAnimated"));
-      // TODO remove SYSTEM.OUT.PRINTLN
-
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
 // SET_FORMATTING_OFF
@@ -815,20 +811,6 @@ public class TourTrack_Bucket {
          final short arrowPart_Fin     = 1;
 
          final int arrowIndex = (pixelIndex - 2) / 2;
-
-         if (pixelIndex < 30) {
-
-            System.out.println(
-
-                  String.format(UI.EMPTY_STRING
-
-                        + "  pos %4d / %4d",
-
-                        p2X_scaled,
-                        p2Y_scaled
-
-                  ));
-         }
 
          /**
           * !!! VERY IMPORTANT !!! <p>
@@ -1028,9 +1010,6 @@ public class TourTrack_Bucket {
 
    private void createArrowVertices_200_Animated(final float[] allDirectionArrowPixel) {
 
-      System.out.println((System.currentTimeMillis() + " createArrowVertices_200_Animated"));
-      // TODO remove SYSTEM.OUT.PRINTLN
-
       int pixelIndex = 0;
 
       float p1X = allDirectionArrowPixel[pixelIndex++];
@@ -1063,20 +1042,6 @@ public class TourTrack_Bucket {
          // setup next position
          p1X = p2X;
          p1Y = p2Y;
-
-         if (pixelIndex < 30) {
-
-            System.out.println(
-
-                  String.format(UI.EMPTY_STRING
-
-                        + "  pos %4d / %4d",
-
-                        p2X_scaled,
-                        p2Y_scaled
-
-                  ));
-         }
       }
    }
 
