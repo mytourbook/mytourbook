@@ -94,9 +94,9 @@ public final class TourTrack_Shader {
       /**
        * Location for a shader variable
        */
-      int shader_attrib_Pos;
-      int shader_uni_MVP;
-      int shader_uni_Vp2MpScale;
+      int attrib_Pos;
+      int uni_MVP;
+      int uni_VpScale2MpScale;
 
       AnimationShader(final String shaderFile) {
 
@@ -106,9 +106,9 @@ public final class TourTrack_Shader {
 
          // SET_FORMATTING_OFF
 
-         shader_attrib_Pos             = getAttrib ("attrib_Pos");         //$NON-NLS-1$
-         shader_uni_MVP                = getUniform("uni_MVP");            //$NON-NLS-1$
-         shader_uni_Vp2MpScale         = getUniform("uni_Vp2MpScale");     //$NON-NLS-1$
+         attrib_Pos             = getAttrib ("attrib_Pos");         //$NON-NLS-1$
+         uni_MVP                = getUniform("uni_MVP");            //$NON-NLS-1$
+         uni_VpScale2MpScale    = getUniform("uni_Vp2MpScale");     //$NON-NLS-1$
 
          // SET_FORMATTING_ON
       }
@@ -119,14 +119,14 @@ public final class TourTrack_Shader {
       /**
        * Location for a shader variable
        */
-      int shader_a_pos,
-            shader_attrib_ColorCoord,
+      int a_pos,
+            attrib_ColorCoord,
 
-            shader_u_mvp,
+            u_mvp,
 
-            shader_uni_ArrowColors,
-            shader_uni_OutlineWidth,
-            shader_uni_Vp2MpScale
+            uni_ArrowColors,
+            uni_OutlineWidth,
+            uni_Vp2MpScale
 
       ;
 
@@ -138,13 +138,13 @@ public final class TourTrack_Shader {
 
    // SET_FORMATTING_OFF
 
-         shader_a_pos                  = getAttrib("a_pos");                  //$NON-NLS-1$
-         shader_u_mvp                  = getUniform("u_mvp");                 //$NON-NLS-1$
-         shader_attrib_ColorCoord      = getAttrib("attrib_ColorCoord");      //$NON-NLS-1$
+         a_pos                  = getAttrib("a_pos");                  //$NON-NLS-1$
+         u_mvp                  = getUniform("u_mvp");                 //$NON-NLS-1$
+         attrib_ColorCoord      = getAttrib("attrib_ColorCoord");      //$NON-NLS-1$
 
-         shader_uni_ArrowColors        = getUniform("uni_ArrowColors");       //$NON-NLS-1$
-         shader_uni_OutlineWidth       = getUniform("uni_OutlineWidth");      //$NON-NLS-1$
-         shader_uni_Vp2MpScale         = getUniform("uni_Vp2MpScale");        //$NON-NLS-1$
+         uni_ArrowColors        = getUniform("uni_ArrowColors");       //$NON-NLS-1$
+         uni_OutlineWidth       = getUniform("uni_OutlineWidth");      //$NON-NLS-1$
+         uni_Vp2MpScale         = getUniform("uni_Vp2MpScale");        //$NON-NLS-1$
 
    // SET_FORMATTING_ON
       }
@@ -152,21 +152,21 @@ public final class TourTrack_Shader {
 
    private static class LineShader extends GLShaderMT {
 
-      int shader_a_pos,
-            shader_aVertexColor,
+      int a_pos,
+            aVertexColor,
 
-            shader_u_mvp,
+            u_mvp,
 
-            shader_u_fade,
-            shader_u_color,
-            shader_u_mode,
+            u_fade,
+            u_color,
+            u_mode,
 
-            shader_u_width,
-            shader_u_height,
+            u_width,
+            u_height,
 
-            shader_uColorMode,
-            shader_uOutlineBrightness,
-            shader_uVertexColorAlpha
+            uColorMode,
+            uOutlineBrightness,
+            uVertexColorAlpha
 
       ;
 
@@ -178,21 +178,21 @@ public final class TourTrack_Shader {
 
    // SET_FORMATTING_OFF
 
-            shader_a_pos               = getAttrib("a_pos"); //$NON-NLS-1$
-            shader_aVertexColor        = getAttrib("aVertexColor"); //$NON-NLS-1$
+            a_pos               = getAttrib("a_pos"); //$NON-NLS-1$
+            aVertexColor        = getAttrib("aVertexColor"); //$NON-NLS-1$
 
-            shader_u_mvp               = getUniform("u_mvp"); //$NON-NLS-1$
+            u_mvp               = getUniform("u_mvp"); //$NON-NLS-1$
 
-            shader_u_fade              = getUniform("u_fade"); //$NON-NLS-1$
-            shader_u_color             = getUniform("u_color"); //$NON-NLS-1$
-            shader_u_mode              = getUniform("u_mode"); //$NON-NLS-1$
+            u_fade              = getUniform("u_fade"); //$NON-NLS-1$
+            u_color             = getUniform("u_color"); //$NON-NLS-1$
+            u_mode              = getUniform("u_mode"); //$NON-NLS-1$
 
-            shader_u_width             = getUniform("u_width"); //$NON-NLS-1$
-            shader_u_height            = getUniform("u_height"); //$NON-NLS-1$
+            u_width             = getUniform("u_width"); //$NON-NLS-1$
+            u_height            = getUniform("u_height"); //$NON-NLS-1$
 
-            shader_uColorMode          = getUniform("uColorMode"); //$NON-NLS-1$
-            shader_uOutlineBrightness  = getUniform("uOutlineBrightness"); //$NON-NLS-1$
-            shader_uVertexColorAlpha   = getUniform("uVertexColorAlpha"); //$NON-NLS-1$
+            uColorMode          = getUniform("uColorMode"); //$NON-NLS-1$
+            uOutlineBrightness  = getUniform("uOutlineBrightness"); //$NON-NLS-1$
+            uVertexColorAlpha   = getUniform("uVertexColorAlpha"); //$NON-NLS-1$
 
    // SET_FORMATTING_ON
       }
@@ -457,18 +457,18 @@ public final class TourTrack_Shader {
 
       GLState.blend(true);
 
-      final int shader_a_pos = shader.shader_a_pos;
-      final int shader_aVertexColor = shader.shader_aVertexColor;
+      final int shader_a_pos = shader.a_pos;
+      final int shader_aVertexColor = shader.aVertexColor;
 
-      final int shader_u_fade = shader.shader_u_fade;
-      final int shader_u_mode = shader.shader_u_mode;
-      final int shader_u_color = shader.shader_u_color;
-      final int shader_u_width = shader.shader_u_width;
-      final int shader_u_height = shader.shader_u_height;
+      final int shader_u_fade = shader.u_fade;
+      final int shader_u_mode = shader.u_mode;
+      final int shader_u_color = shader.u_color;
+      final int shader_u_width = shader.u_width;
+      final int shader_u_height = shader.u_height;
 
-      final int shader_uColorMode = shader.shader_uColorMode;
-      final int shader_uOutlineBrightness = shader.shader_uOutlineBrightness;
-      final int shader_uVertexColorAlpha = shader.shader_uVertexColorAlpha;
+      final int shader_uColorMode = shader.uColorMode;
+      final int shader_uOutlineBrightness = shader.uOutlineBrightness;
+      final int shader_uVertexColorAlpha = shader.uVertexColorAlpha;
 
       gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_TrackVertices);
       gl.enableVertexAttribArray(shader_a_pos);
@@ -498,7 +498,7 @@ public final class TourTrack_Shader {
       );
 
       // set matrix
-      viewport.mvp.setAsUniform(shader.shader_u_mvp);
+      viewport.mvp.setAsUniform(shader.u_mvp);
 
 //       final double groundResolution = MercatorProjection.groundResolution(mapPosition);
 
@@ -676,8 +676,8 @@ public final class TourTrack_Shader {
 
       final DirectionArrowsShader shader     = _directionArrowShader;
 
-      final int shader_a_pos                 = shader.shader_a_pos;
-      final int shader_attrib_ColorCoord     = shader.shader_attrib_ColorCoord;
+      final int shader_a_pos                 = shader.a_pos;
+      final int shader_attrib_ColorCoord     = shader.attrib_ColorCoord;
 
 // SET_FORMATTING_ON
 
@@ -686,7 +686,7 @@ public final class TourTrack_Shader {
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
       // set mvp matrix into the shader
-      viewport.mvp.setAsUniform(shader.shader_u_mvp);
+      viewport.mvp.setAsUniform(shader.u_mvp);
 
       // vertices position
       gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows);
@@ -716,15 +716,15 @@ public final class TourTrack_Shader {
 
       // arrow colors
       final float arrowColors[] = trackConfig.getArrowColors();
-      gl.uniform4fv(shader.shader_uni_ArrowColors, arrowColors.length / 4, arrowColors, 0);
+      gl.uniform4fv(shader.uni_ArrowColors, arrowColors.length / 4, arrowColors, 0);
 
       // outline width's
-      gl.uniform2f(shader.shader_uni_OutlineWidth,
+      gl.uniform2f(shader.uni_OutlineWidth,
             trackConfig.arrowWing_OutlineWidth / 200f,
             trackConfig.arrowFin_OutlineWidth / 200f);
 
       // viewport to map scale: 1.0...2.0
-      gl.uniform1f(shader.shader_uni_Vp2MpScale, vp2mpScale);
+      gl.uniform1f(shader.uni_Vp2MpScale, vp2mpScale);
 
       /*
        * Draw direction arrows
@@ -765,10 +765,10 @@ public final class TourTrack_Shader {
       final short animationPosX = animatedPositions.get(posIndex);
       final short animationPosY = animatedPositions.get(posIndex + 1);
 
-      if (posIndex != _prevPosIndex) {
-         System.out.println(" posIndex " + posIndex);
-         // TODO remove SYSTEM.OUT.PRINTLN
-      }
+//      if (posIndex != _prevPosIndex) {
+//         System.out.println(" posIndex " + posIndex);
+//         // TODO remove SYSTEM.OUT.PRINTLN
+//      }
 
       _prevPosIndex = posIndex;
 
@@ -776,9 +776,9 @@ public final class TourTrack_Shader {
       {
          paint_30_Animation_AdjustMatrix(viewport, compileMapPosition, animationPosX, animationPosY);
       }
-      _animationMVP.setAsUniform(shader.shader_uni_MVP); // set mvp matrix into the shader
+      _animationMVP.setAsUniform(shader.uni_MVP); // set mvp matrix into the shader
 
-      final int shader_Attrib_Pos = shader.shader_attrib_Pos;
+      final int shader_Attrib_Pos = shader.attrib_Pos;
 
       // vertices position
       gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_AnimationVertices);
@@ -793,8 +793,8 @@ public final class TourTrack_Shader {
             0 //                       offset in bytes of the first component in the vertex attribute array
       );
 
-      // viewport to map scale: 1.0...2.0
-      gl.uniform1f(shader.shader_uni_Vp2MpScale, vp2mpScale);
+      // viewport scale TO map scale: 1.0...2.0
+      gl.uniform1f(shader.uni_VpScale2MpScale, vp2mpScale);
 
       /*
        * Draw animation
@@ -842,8 +842,8 @@ public final class TourTrack_Shader {
       final double scaledDiffX = diffX * tileScale;
       final double scaledDiffY = diffY * tileScale;
 
-      final double viewport2mapScale = viewportMapPosition.scale / compileMapPosition.scale;
-      final double diffScale = viewport2mapScale / COORD_SCALE;
+      final double vpScale2mapScale = viewportMapPosition.scale / compileMapPosition.scale;
+      final double diffScale = vpScale2mapScale / COORD_SCALE;
 
       final double translationX = animationPosX + scaledDiffX;
       final double translationY = animationPosY + scaledDiffY;
