@@ -931,13 +931,13 @@ public class UI {
    }
 
    /**
-    * Computed the BMI (Body Mass Index) for a given height and weight,
+    * Computes the BMI (Body Mass Index) for a given user's height and weight.
     *
     * @param weight
-    *           The athlete's weight in kilograms or pounds.
+    *           The user's weight in kilograms or pounds.
     * @param height
-    *           The athlete's height in meters or inches.
-    * @return
+    *           The user's height in meters or inches.
+    * @return The BMI value.
     */
    public static float computeBodyMassIndex(double weight, double height) {
 
