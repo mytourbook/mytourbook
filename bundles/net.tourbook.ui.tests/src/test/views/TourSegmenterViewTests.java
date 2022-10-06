@@ -34,8 +34,6 @@ public class TourSegmenterViewTests extends UITest {
    @Test
    void testSegmenterAlgorithms_All() {
 
-      //TOREMOVE
-      Utils.showTourBookView(bot);
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
             .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
