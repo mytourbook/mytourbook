@@ -882,17 +882,17 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    }
 
    /**
-    * field: BMI Body Mass Index)
+    * field: BMI (Body Mass Index)
     */
    private void createUI_57_Field_BodyMassIndex(final Composite parent) {
 
-      Label label = new Label(parent, SWT.NONE);
+      final Label label = new Label(parent, SWT.NONE);
       label.setText(Messages.Pref_People_Label_BodyMassIndex);
       label.setToolTipText(Messages.Pref_People_Label_BodyMassIndex_Tooltip);
 
       final Composite containerHeight = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().applyTo(containerHeight);
-      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(containerHeight);
+      GridLayoutFactory.fillDefaults().applyTo(containerHeight);
       {
          // text: BMI value
          _txtBodyMassIndex = new Text(containerHeight, SWT.BORDER | SWT.READ_ONLY);
@@ -900,9 +900,6 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          GridDataFactory.fillDefaults()
                .align(SWT.BEGINNING, SWT.FILL)
                .applyTo(_txtBodyMassIndex);
-
-         // label: unit
-         label = new Label(containerHeight, SWT.NONE);
       }
 
       // filler
@@ -1634,11 +1631,13 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       _btnCancel.setEnabled(_isPersonModified);
 
       _spinnerMaxHR.setEnabled(getSelectedHrMaxFormulaKey() == TrainingManager.HR_MAX_NOT_COMPUTED);
-      _txtBodyMassIndex.setText("weight or height modified");
 
       _btnModifyHrZones.setEnabled(isHrZoneAvailable);
 //		_btnComputeHrZonesForAllTours.setEnabled(_isPersonModified && isValid);
       _btnComputeHrZonesForAllTours.setEnabled(_isPersonModified == false);
+
+      _txtBodyMassIndex.setText(String.valueOf(
+            UI.computeBodyMassIndex(_spinnerWeight.getSelection() / 10.0, _spinnerHeight.getSelection() / 100.0)));
    }
 
    private void fireModifyEvent() {

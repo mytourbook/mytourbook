@@ -43,6 +43,18 @@ public class UITests {
    }
 
    @Test
+   void testComputeBodyMassIndex() {
+
+      setMetricSystem();
+      //70kg and 1.80m => 21.6 BMI
+      assertEquals(21.6f, UI.computeBodyMassIndex(70, 1.80));
+
+      setImperialSystem();
+      //154.3lbs and 70.9in => 21.6 BMI
+      assertEquals(21.6f, UI.computeBodyMassIndex(154.3, 70.9));
+   }
+
+   @Test
    void testConvertAverageElevationChangeFromMetric() {
 
       setMetricSystem();

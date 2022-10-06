@@ -15,6 +15,8 @@
  *******************************************************************************/
 package preferences;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -31,15 +33,8 @@ public class PrefPagePeopleTests extends UITest {
       bot.spinner(0).setSelection(700);
       //1.80m
       bot.spinner(1).setSelection(180);
-//
-//      //OpenWeatherMap
-//      testVendorConnection(IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP_ID);
-//
-//      //Weather API
-//      testVendorConnection(IWeatherProvider.WEATHER_PROVIDER_WEATHERAPI_NAME);
-//
-//      //World Weather Online
-//      testWorldWeatherOnlineConnection();
+
+      assertEquals("21.6", bot.text(3).getText()); //$NON-NLS-1$
 
       bot.button("Apply and Close").click(); //$NON-NLS-1$
    }

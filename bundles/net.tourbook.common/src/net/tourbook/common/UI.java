@@ -931,6 +931,29 @@ public class UI {
    }
 
    /**
+    * Computed the BMI (Body Mass Index) for a given height and weight,
+    *
+    * @param weight
+    *           The athlete's weight in kilograms or pounds.
+    * @param height
+    *           The athlete's height in meters or inches.
+    * @return
+    */
+   public static float computeBodyMassIndex(double weight, double height) {
+
+      if (UNIT_IS_LENGTH_SMALL_INCH) {
+         height = height / UNIT_INCH / 1000;
+      }
+      if (UNIT_IS_WEIGHT_POUND) {
+         weight /= UNIT_VALUE_WEIGHT;
+      }
+
+      final double bmi = height == 0 ? 0 : weight / Math.pow(height, 2);
+
+      return Math.round(bmi * 10.0) / 10.0f;
+   }
+
+   /**
     * @param averageElevationChange
     *           In m/km
     * @return Returns the average elevation change in the current measurement system.
@@ -1464,17 +1487,6 @@ public class UI {
             second
 
       ).toString();
-   }
-
-   public static String FormatDoubleMinMax(final double value) {
-
-      if (value == -Double.MAX_VALUE) {
-         return SYMBOL_INFINITY_MIN;
-      } else if (value == Double.MAX_VALUE) {
-         return SYMBOL_INFINITY_MAX;
-      }
-
-      return Double.toString(value);
    }
 
    public static String FormatDoubleMinMaxElevationMeter(final double value) {
