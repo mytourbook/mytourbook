@@ -39,6 +39,7 @@ Improvements
   - Added the support for cadence data import (present in file version greater than 9)
   - Fixed an issue where the first marker was not created
   - Fixed an issue where the marker distance values were erroneous
+  - Fixed an issue where the time values were erroneous when an activity overlapped over more than 1 day
     https://github.com/mytourbook/mytourbook/issues/927
 
 
@@ -51,6 +52,9 @@ Changes
 Bugfix
 ======
 
+* Hac4Linux Import (Frederic)
+  - Fixed an issue where tours were not importing anymore since v12.12.0	https://github.com/mytourbook/mytourbook/discussions/939
+    
 * Common import
   - Fixed "Invalid thread access" which occurred when new tour types or tags were created when importing a tour
     https://github.com/mytourbook/mytourbook/issues/938

@@ -6,7 +6,7 @@ Bundle-Version: 22.8.0.qualifier
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ClassPath: 
- batik-all-1.14.jar,
+ batik-all-1.15.jar,
  fop-2.7.jar,
  xmlgraphics-commons-2.7.jar,
  commons-io-2.11.0.jar,

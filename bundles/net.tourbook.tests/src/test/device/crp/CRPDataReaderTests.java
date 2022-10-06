@@ -38,7 +38,7 @@ public class CRPDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testCrpImport_080510() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "080510", ".crp");
+      testImportFile(deviceDataReader, FILES_PATH + "080510", ".crp"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    /**
@@ -47,7 +47,7 @@ public class CRPDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testCrpImport_20040703() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "2004-07-03", ".crp");
+      testImportFile(deviceDataReader, FILES_PATH + "2004-07-03", ".crp"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    /**
@@ -56,24 +56,24 @@ public class CRPDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testCrpImport_20100923_Auf_die() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "20100923_Auf_die", ".crp");
+      testImportFile(deviceDataReader, FILES_PATH + "20100923_Auf_die", ".crp"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    @Test
    void testCrpImport_Feldberg_260706() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "Feldberg_260706", ".crp");
+      testImportFile(deviceDataReader, FILES_PATH + "Feldberg_260706", ".crp"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    @Test
    void testCrpImport_Hac4() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "Hac4", ".crp");
+      testImportFile(deviceDataReader, FILES_PATH + "Hac4", ".crp"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    @Test
    void testCrpImport_Hac5() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "1st_TestTour_Hac5", ".crp");
+      testImportFile(deviceDataReader, FILES_PATH + "1st_TestTour_Hac5", ".crp"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }

@@ -421,6 +421,9 @@ public class TourDatabase {
       SQL_DOUBLE_MIN_VALUE = Double.toString(DEFAULT_DOUBLE);
    }
 
+   private static final String                   SYS_PROP__SILENT_DATABASE_UPDATE = "silentDatabaseUpdate";                                      //$NON-NLS-1$
+   private static final boolean                  _isSilentDatabaseUpdate          = System.getProperty(SYS_PROP__SILENT_DATABASE_UPDATE) != null;
+
    private boolean                               _isDbInitialized;
    private boolean                               _isDbInDataUpdate;
    private boolean                               _isTableChecked;
@@ -430,10 +433,10 @@ public class TourDatabase {
    private int                                   _dbDesignVersion_New;
    private int                                   _dbDesignVersion_Old;
 
-   private final ListenerList<IPropertyListener> _propertyListeners      = new ListenerList<>(ListenerList.IDENTITY);
+   private final ListenerList<IPropertyListener> _propertyListeners               = new ListenerList<>(ListenerList.IDENTITY);
 
-   private boolean                               _isSQLDesignUpdateError = false;
-   private boolean                               _isSQLDataUpdateError   = false;
+   private boolean                               _isSQLDesignUpdateError          = false;
+   private boolean                               _isSQLDataUpdateError            = false;
 
    /**
     * Database version before a db design update is performed
@@ -4974,7 +4977,8 @@ public class TourDatabase {
             }
             _isDbInDataUpdate = false;
 
-            if (_dbDesignVersion_Old != _dbDesignVersion_New) {
+            if (!_isSilentDatabaseUpdate &&
+                  _dbDesignVersion_Old != _dbDesignVersion_New) {
 
                // display info for the successful update
 
@@ -5292,6 +5296,7 @@ public class TourDatabase {
 
             if (updateDb__1_Design(_dbVersion_BeforeDesignUpdate, splashManager) == false) {
                return false;
+
             }
 
          } else if (_dbVersion_BeforeDesignUpdate > TOURBOOK_DB_VERSION) {
@@ -5335,7 +5340,6 @@ public class TourDatabase {
    }
 
    /**
-    * /**
     * Is checking the tour database data is updated to the current {@link #TOURBOOK_DB_VERSION}
     *
     * @param splashManager
@@ -5513,34 +5517,36 @@ public class TourDatabase {
     */
    private boolean updateDb__1_Design(int currentDbVersion, final SplashManager splashManager) {
 
-      /*
-       * Confirm update
-       */
+      if (!_isSilentDatabaseUpdate) {
+         /*
+          * Confirm update
+          */
 
-      // define buttons with default to "Close App"
-      final String[] buttons = new String[] {
-            Messages.Tour_Database_Action_UpdateDatabase,
-            Messages.Tour_Database_Action_CloseApp };
+         // define buttons with default to "Close App"
+         final String[] buttons = new String[] {
+               Messages.Tour_Database_Action_UpdateDatabase,
+               Messages.Tour_Database_Action_CloseApp };
 
-      final String dialogMessage = NLS.bind(Messages.Tour_Database_Dialog_ConfirmUpdate_Message,
-            new Object[] {
-                  currentDbVersion,
-                  TOURBOOK_DB_VERSION,
-                  _databasePath });
+         final String dialogMessage = NLS.bind(Messages.Tour_Database_Dialog_ConfirmUpdate_Message,
+               new Object[] {
+                     currentDbVersion,
+                     TOURBOOK_DB_VERSION,
+                     _databasePath });
 
-      if ((new MessageDialog(
-            splashManager.getShell(),
-            Messages.Tour_Database_Dialog_ConfirmUpdate_Title,
-            null,
-            dialogMessage,
-            MessageDialog.QUESTION,
-            buttons,
-            1).open()) != Window.OK) {
+         if ((new MessageDialog(
+               splashManager.getShell(),
+               Messages.Tour_Database_Dialog_ConfirmUpdate_Title,
+               null,
+               dialogMessage,
+               MessageDialog.QUESTION,
+               buttons,
+               1).open()) != Window.OK) {
 
-         // the user will not update -> close application
-         PlatformUI.getWorkbench().close();
+            // the user will not update -> close application
+            PlatformUI.getWorkbench().close();
 
-         return false;
+            return false;
+         }
       }
 
       /*

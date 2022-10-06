@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
@@ -47,6 +46,8 @@ import net.tourbook.ui.UI;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
 
 public class HAC4LinuxDeviceReader extends TourbookDevice {
+
+   private static final String CM414AM = "CM414AM"; //$NON-NLS-1$
 
    /*
     * (non-Javadoc) The file to be parsed includes several sections with different information in
@@ -164,7 +165,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
     * object provided.
     */
    private void deviceTotals(final String device, final short modeId, final String line, final TourData tourData) {
-      if (device.equals("CM414AM")) { //$NON-NLS-1$
+      if (device.equals(CM414AM)) {
          tourData.setDeviceTimeInterval((short) 20);
          char bikeNumber = ' ';
          if (modeId == 46) {
@@ -299,23 +300,21 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                                  final ImportState_File importState_File,
                                  final ImportState_Process importState_Process) {
 
-      BufferedReader fileHac4LinuxData = null;
+      if (validateRawData(importFilePath) == false) {
+         return;
+      }
 
       final TourType defaultTourType = getTourType();
       Section section = Section.SECTION_NONE;
 
-      try {
-         if (validateRawData(importFilePath) == false) {
-            return;
-         }
+      try (BufferedReader fileHac4LinuxData = new BufferedReader(new FileReader(importFilePath))) {
 
-         fileHac4LinuxData = new BufferedReader(new FileReader(importFilePath));
          final TourData tourData = new TourData();
 //			final TourPerson tourPerson = new TourPerson();
          final Set<TourMarker> allTourMarker = tourData.getTourMarkers();
 
          String line = null;
-         final StringBuffer tourDescription = new StringBuffer();
+         final StringBuilder tourDescription = new StringBuilder();
          final ArrayList<TimeData> timeDataList = new ArrayList<>();
 
          // time in seconds between time slices 20 seconds as the default
@@ -324,6 +323,9 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
          int lastDistance = 0;
          boolean isFirstTimeSlice = true;
          short modeId = 0;
+         int tourYear = 0;
+         int tourMonth = 0;
+         int tourDay = 0;
 
          int friends = -1;
          while ((line = fileHac4LinuxData.readLine()) != null) {
@@ -361,9 +363,6 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                   tourData.setTourTitle(fields[1]);
                }
 
-               int tourYear = 0;
-               int tourMonth = 0;
-               int tourDay = 0;
                int tourHour = 0;
                int tourMinute = 0;
 
@@ -375,9 +374,8 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                if (fields[0].equals("Time")) {//"hh:mm:ss.00" //$NON-NLS-1$
                   tourHour = (Short.parseShort(fields[1].substring(0, 2)));
                   tourMinute = (Short.parseShort(fields[1].substring(3, 5)));
+                  tourData.setTourStartTime(tourYear, tourMonth, tourDay, tourHour, tourMinute, 0);
                }
-
-               tourData.setTourStartTime(tourYear, tourMonth, tourDay, tourHour, tourMinute, 0);
 
                if (fields[0].equals("Mode")) { //$NON-NLS-1$
                   modeId = Short.parseShort(fields[1]);
@@ -547,7 +545,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
                // no pulse is recorded.
                // the data written always form a sawtooth graph
                // 0-256-0-256....
-               if (tourData.getDeviceName().equals("CM414AM")) { //$NON-NLS-1$
+               if (tourData.getDeviceName().equals(CM414AM)) {
                   timeData.pulse = 0;
                }
                // The first time slice seems to be set to the total
@@ -614,7 +612,7 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 
             final TimeData firstTimeData = timeDataList.get(0);
 
-            if (tourData.getDeviceName().equals("CM414AM")) { //$NON-NLS-1$
+            if (tourData.getDeviceName().equals(CM414AM)) {
                firstTimeData.pulse = Float.MIN_VALUE;
             }
          }
@@ -646,15 +644,6 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
 
          e.printStackTrace();
 
-      } finally {
-
-         if (fileHac4LinuxData != null) {
-            try {
-               fileHac4LinuxData.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
    }
 
@@ -720,14 +709,11 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
    public boolean validateRawData(final String fileName) {
       boolean isValid = false;
 
-      BufferedInputStream inStream = null;
+      final File dataFile = new File(fileName);
 
-      try {
+      try (BufferedInputStream inStream = new BufferedInputStream(new FileInputStream(dataFile))) {
 
          final byte[] buffer = new byte[19];
-
-         final File dataFile = new File(fileName);
-         inStream = new BufferedInputStream(new FileInputStream(dataFile));
 
          inStream.read(buffer);
          if (!"HAC4Linux-Tour-File".equalsIgnoreCase(new String(buffer, 0, 19))) { //$NON-NLS-1$
@@ -740,14 +726,6 @@ public class HAC4LinuxDeviceReader extends TourbookDevice {
          return false;
       } catch (final Exception e) {
          e.printStackTrace();
-      } finally {
-         if (inStream != null) {
-            try {
-               inStream.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       return isValid;
