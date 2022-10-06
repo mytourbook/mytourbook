@@ -55,6 +55,9 @@ public class UITests {
 
       //100lbs and 4ft10in (58in) => 20.9 BMI
       assertEquals(20.9f, UI.computeBodyMassIndex(100, 58));
+
+      //100lbs and 0in => 0 BMI
+      assertEquals(0, UI.computeBodyMassIndex(100, 0));
    }
 
    @Test
