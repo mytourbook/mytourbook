@@ -242,8 +242,23 @@
 	<section name="TourStatisticsView">
 	</section>
 	<section name="TourCalendarView">
+		<item key="STATE_IS_LINKED" value="false"/>
+		<item key="STATE_IS_SHOW_TOUR_INFO" value="true"/>
+		<item key="STATE_FIRST_DISPLAYED_EPOCH_DAY" value="15824"/>
+		<item key="STATE_SELECTED_TOURS" value="-1"/>
 	</section>
 	<section name="SlideoutCalendarOptions">
+		<item key="STATE_HORIZ_SLIDEOUT_WIDTH" value="494"/>
+		<item key="STATE_HORIZ_SLIDEOUT_HEIGHT" value="628"/>
+		<item key="STATE_VERT_SLIDEOUT_WIDTH" value="400"/>
+		<item key="STATE_VERT_SLIDEOUT_HEIGHT" value="250"/>
+		<item key="STATE_IS_SLIDEOUT_PINNED" value="false"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_HORIZ_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_X" value="20"/>
+		<item key="STATE_VERT_SLIDEOUT_PIN_LOCATION_Y" value="20"/>
+		<item key="STATE_IS_KEEP_SLIDEOUT_OPEN" value="false"/>
+		<item key="STATE_SELECTED_TAB" value="4"/>
 	</section>
 	<section name="net.tourbook.views.TourWaypointView">
 		<item key="XML_STATE_COLUMN_MANAGER" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;ColumnProfiles isShowCategory=&quot;true&quot; isShowColumnAnnotation_Formatting=&quot;false&quot; isShowColumnAnnotation_Sorting=&quot;false&quot;&gt;&#x0D;&#x0A;&lt;Profile isActiveProfile=&quot;true&quot; name=&quot;Column Profile&quot; visibleColumnIds=&quot;WAYPOINT_NAME,WAYPOINT_DESCRIPTION,WAYPOINT_COMMENT,WAYPOINT_CATEGORY,WAYPOINT_SYMBOL,WAYPOINT_ALTITUDE,WAYPOINT_TIME,WAYPOINT_DATE,MOTION_LATITUDE,MOTION_LONGITUDE,MARKER_URL,WAYPOINT_ID,&quot; visibleColumnIdsAndWidth=&quot;WAYPOINT_NAME,180,WAYPOINT_DESCRIPTION,180,WAYPOINT_COMMENT,180,WAYPOINT_CATEGORY,180,WAYPOINT_SYMBOL,180,WAYPOINT_ALTITUDE,60,WAYPOINT_TIME,90,WAYPOINT_DATE,90,MOTION_LATITUDE,84,MOTION_LONGITUDE,84,MARKER_URL,150,WAYPOINT_ID,60,&quot;&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WAYPOINT_NAME&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WAYPOINT_DESCRIPTION&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WAYPOINT_COMMENT&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WAYPOINT_CATEGORY&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WAYPOINT_SYMBOL&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WAYPOINT_ALTITUDE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WAYPOINT_TIME&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WAYPOINT_DATE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_LATITUDE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MOTION_LONGITUDE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;MARKER_URL&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;WAYPOINT_ID&quot;/&gt;&#x0D;&#x0A;&lt;/Profile&gt;&#x0D;&#x0A;&lt;/ColumnProfiles&gt;"/>

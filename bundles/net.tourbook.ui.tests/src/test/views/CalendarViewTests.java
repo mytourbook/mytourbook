@@ -30,5 +30,6 @@ public class CalendarViewTests extends UITest {
 
       bot.comboBox(0).setSelection("May");
       bot.comboBox(1).setSelection("2013");
+      bot.comboBox(2).setSelection("App : Classic");
    }
 }
