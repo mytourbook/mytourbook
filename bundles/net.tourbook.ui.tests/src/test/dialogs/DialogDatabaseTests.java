@@ -25,7 +25,15 @@ import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 
-public class DialogDatabase_ConsistencyCheckTests extends UITest {
+public class DialogDatabaseTests extends UITest {
+
+   @Test
+   void testCompressDatabase() {
+
+      bot.menu("Help").menu("Compress Database...").click(); //$NON-NLS-1$ //$NON-NLS-2$
+
+      bot.button("Close").click(); //$NON-NLS-1$
+   }
 
    @Test
    void testDatabaseConsistency() {
