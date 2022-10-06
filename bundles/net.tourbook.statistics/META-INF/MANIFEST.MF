@@ -28,6 +28,6 @@ Import-Package: net.tourbook,
  net.tourbook.ui,
  net.tourbook.ui.action,
  org.apache.commons.lang3,
- org.eclipse.collections.impl.list.mutable.primitive;version="10.4.0",
+ org.eclipse.collections.impl.list.mutable.primitive,
  org.eclipse.ui.forms.widgets
 Automatic-Module-Name: net.tourbook.statistics
