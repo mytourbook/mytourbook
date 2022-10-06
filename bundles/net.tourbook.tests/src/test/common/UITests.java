@@ -52,6 +52,9 @@ public class UITests {
       setImperialSystem();
       //154.3lbs and 70.9in => 21.6 BMI
       assertEquals(21.6f, UI.computeBodyMassIndex(154.3, 70.9));
+
+      //100lbs and 4ft10in (58in) => 20.9 BMI
+      assertEquals(20.9f, UI.computeBodyMassIndex(100, 58));
    }
 
    @Test
