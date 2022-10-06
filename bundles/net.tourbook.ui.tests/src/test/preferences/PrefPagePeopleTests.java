@@ -34,6 +34,7 @@ public class PrefPagePeopleTests extends UITest {
       //1.80m
       bot.spinner(1).setSelection(180);
 
+      //21.6 BMI
       assertEquals("21.6", bot.text(3).getText()); //$NON-NLS-1$
 
       bot.button("Apply and Close").click(); //$NON-NLS-1$
