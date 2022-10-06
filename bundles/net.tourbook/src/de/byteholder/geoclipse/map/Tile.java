@@ -11,11 +11,8 @@ package de.byteholder.geoclipse.map;
 import de.byteholder.geoclipse.mapprovider.ImageDataResources;
 import de.byteholder.geoclipse.mapprovider.MP;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.list.array.TLongArrayList;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,6 +22,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourWayPoint;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
+import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -198,15 +198,15 @@ public class Tile extends Observable {
     * The hover rectangles will be set when a tile is painted, the rectangle position is relative to
     * the tile
     */
-   public ArrayList<Rectangle>             allPainted_HoverRectangle    = new ArrayList<>();
-   public TLongArrayList                   allPainted_HoverTourID       = new TLongArrayList();
-   public TIntArrayList                    allPainted_HoverSerieIndices = new TIntArrayList();
+   public List<Rectangle>                  allPainted_HoverRectangle    = new ArrayList<>();
+   public LongArrayList                    allPainted_HoverTourID       = new LongArrayList();
+   public IntArrayList                     allPainted_HoverSerieIndices = new IntArrayList();
 
    /**
     * Hash for all paintings, this is used to optimize performance by reducing number of paintings
     * because there can be millions
     */
-   public TIntHashSet                      allPainted_Hash              = new TIntHashSet();
+   public IntHashSet                       allPainted_Hash              = new IntHashSet();
 
    /**
     * Create a new Tile at the specified tile point and zoom level

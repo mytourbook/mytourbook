@@ -2471,7 +2471,7 @@ public class Map2 extends Canvas {
             return false;
          }
 
-         final ArrayList<Rectangle> allPainted_HoveredRectangle_List = hoveredTile.allPainted_HoverRectangle;
+         final List<Rectangle> allPainted_HoveredRectangle_List = hoveredTile.allPainted_HoverRectangle;
          if (allPainted_HoveredRectangle_List.isEmpty()) {
 
             // nothing is painted in this tile
