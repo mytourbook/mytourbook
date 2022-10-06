@@ -89,12 +89,10 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    private final IDialogSettings   _state                          = TourbookPlugin.getState("TourCalendarView"); //$NON-NLS-1$
 
    private boolean                 _stateIsLinked;
-   private boolean                 _stateIsShowTourInfo;
 
    ColorDefinition[]               _allColorDefinition             = GraphColorManager.getAllColorDefinitions();
 
    private ISelectionListener      _selectionListener;
-   private IPartListener2          _partListener;
    private IPropertyChangeListener _prefChangeListener;
    private IPropertyChangeListener _prefChangeListener_Common;
    private ITourEventListener      _tourEventListener;
@@ -132,7 +130,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
    private void addPartListener() {
 
-      _partListener = new IPartListener2() {
+      final IPartListener2 partListener = new IPartListener2() {
 
          @Override
          public void partActivated(final IWorkbenchPartReference partRef) {}
@@ -174,7 +172,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          public void partVisible(final IWorkbenchPartReference partRef) {}
       };
 
-      getViewSite().getPage().addPartListener(_partListener);
+      getViewSite().getPage().addPartListener(partListener);
    }
 
    private void addPrefListener() {
@@ -614,10 +612,10 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    private void restoreState() {
 
       _stateIsLinked = Util.getStateBoolean(_state, STATE_IS_LINKED, false);
-      _stateIsShowTourInfo = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_INFO, true);
+      final boolean stateIsShowTourInfo = Util.getStateBoolean(_state, STATE_IS_SHOW_TOUR_INFO, true);
 
       _actionSetLinked.setChecked(_stateIsLinked);
-      _actionTourInfo.setSelected(_stateIsShowTourInfo);
+      _actionTourInfo.setSelected(stateIsShowTourInfo);
 
       final long epochDay = Util.getStateLong(_state, STATE_FIRST_DISPLAYED_EPOCH_DAY, Long.MIN_VALUE);
       if (epochDay == Long.MIN_VALUE) {
