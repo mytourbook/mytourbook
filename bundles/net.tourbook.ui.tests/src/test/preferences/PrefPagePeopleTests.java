@@ -27,7 +27,10 @@ public class PrefPagePeopleTests extends UITest {
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
 
-//      bot.comboBox().setSelection(0);
+      //70kg
+      bot.spinner(0).setSelection(700);
+      //1.80m
+      bot.spinner(1).setSelection(180);
 //
 //      //OpenWeatherMap
 //      testVendorConnection(IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP_ID);
