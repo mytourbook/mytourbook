@@ -4209,7 +4209,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return;
       }
 
-      geoGrid = computeGeo_Grid(latitudeSerie, longitudeSerie, 0, latitudeSerie.length).toSortedArray();
+      geoGrid = computeGeo_Grid(latitudeSerie, longitudeSerie, 0, latitudeSerie.length);
    }
 
    /**
@@ -4223,10 +4223,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *           Last index + 1
     * @return Returns all geo partitions or <code>null</code> when geo data are not available.
     */
-   private IntHashSet computeGeo_Grid(final double[] partLatitude,
-                                      final double[] partLongitude,
-                                      final int indexStart,
-                                      final int indexEnd) {
+   private int[] computeGeo_Grid(final double[] partLatitude,
+                                 final double[] partLongitude,
+                                 final int indexStart,
+                                 final int indexEnd) {
 
       if (partLatitude == null || partLongitude == null) {
          return null;
@@ -4290,7 +4290,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 //            (net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //                  + ("\tsize: " + allGeoParts.toArray().length));
 
-      return allGeoParts;
+      return allGeoParts.toSortedArray();
    }
 
    /**
@@ -4304,13 +4304,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          return null;
       }
 
-      final IntHashSet computedGeoParts = computeGeo_Grid(
-            latitudeSerie,
-            longitudeSerie,
-            firstIndex,
-            lastIndex);
-
-      return computedGeoParts.toArray();
+      return computeGeo_Grid(latitudeSerie, longitudeSerie, firstIndex, lastIndex);
    }
 
    public NormalizedGeoData computeGeo_NormalizeLatLon(final int measureStartIndex,
