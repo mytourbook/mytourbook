@@ -33,6 +33,9 @@ New
 Improvements
 ============
 
+* People preference page (Frederic)
+  - Added a BMI (Body Mass Index) field
+
 * CRP Import (Frederic)
   - Added the ability to import ZLib compressed files
   - Added the support for file version greater than 9
