@@ -16,12 +16,14 @@
 package views;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import net.tourbook.Messages;
 
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -32,7 +34,11 @@ public class TourSegmenterViewTests extends UITest {
    @Test
    void testSegmenterAlgorithms_All() {
 
-      Utils.getTour(bot);
+      //TOREMOVE
+      Utils.showTourBookView(bot);
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Tour Segmenter"); //$NON-NLS-1$
       final SWTBot tourSegmenterViewBot = Utils.showView(bot, "Tour Segmenter").bot(); //$NON-NLS-1$
@@ -42,24 +48,33 @@ public class TourSegmenterViewTests extends UITest {
       final SWTBotCombo segmenterMethodCombo = tourSegmenterViewBot.comboBox(0);
 
       segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byAltitude);
-      assertEquals("0:01", tableSegments.cell(0, 0)); //$NON-NLS-1$
+      assertEquals("0:06", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_ByAltitude_Merged);
-      assertEquals("0:35", tableSegments.cell(0, 0)); //$NON-NLS-1$
+      assertEquals("0:17", tableSegments.cell(0, 0)); //$NON-NLS-1$
+
+      segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_ByAltitude_Marker);
+      assertEquals("4:56", tableSegments.cell(0, 0)); //$NON-NLS-1$
+
+      segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byMarker);
+      assertEquals("4:56", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byDistance);
-      assertEquals("0:47", tableSegments.cell(0, 0)); //$NON-NLS-1$
+      assertEquals("0:07", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_ByBreakTime);
-      assertEquals("0:20", tableSegments.cell(0, 0)); //$NON-NLS-1$
+      assertEquals("1:06", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byPower);
-      assertEquals("0:01", tableSegments.cell(0, 0)); //$NON-NLS-1$
+      assertEquals(">0", tableSegments.cell(0, 0)); //$NON-NLS-1$
+
+      segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byPulse);
+      assertEquals(">0", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       segmenterMethodCombo.setSelection(Messages.tour_segmenter_type_byComputedAltiUpDown);
-      assertEquals("0:02", tableSegments.cell(0, 0)); //$NON-NLS-1$
+      assertEquals("0:07", tableSegments.cell(0, 0)); //$NON-NLS-1$
 
       segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_Surfing);
-      assertEquals("0:47", tableSegments.cell(0, 0)); //$NON-NLS-1$
+      assertEquals("0:17", tableSegments.cell(0, 0)); //$NON-NLS-1$
    }
 }
