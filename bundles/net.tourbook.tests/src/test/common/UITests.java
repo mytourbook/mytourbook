@@ -55,6 +55,30 @@ public class UITests {
    }
 
    @Test
+   void testConvertBodyHeightFromMetric() {
+
+      setMetricSystem();
+      //184cm -> 184cm
+      assertEquals(1.84f, UI.convertBodyHeightFromMetric(1.84f));
+
+      setImperialSystem();
+      //184cm -> 72.4409in
+      assertEquals(72.44095f, UI.convertBodyHeightFromMetric(1.84f));
+   }
+
+   @Test
+   void testConvertBodyHeightToMetric() {
+
+      setMetricSystem();
+      //184cm -> 184cm
+      assertEquals(1f, UI.convertBodyHeightToMetric(1f, 0));
+
+      setImperialSystem();
+      //184cm -> 72.4409in
+      assertEquals(1.84f, UI.convertBodyHeightToMetric(72f, 44095));
+   }
+
+   @Test
    void testConvertPrecipitation_FromMetric() {
 
       setMetricSystem();
