@@ -29,7 +29,7 @@ class FitLogExDeviceDataReaderTests extends DeviceDataReaderTester {
    protected FitLogDeviceDataReader deviceDataReader = new FitLogDeviceDataReader();
 
    /**
-    * This tests parses a file for which the time offset of -7 hours is wrong
+    * This test parses a file for which the time offset of -7 hours is wrong
     * <TimeZoneUtcOffset>-25200</TimeZoneUtcOffset> as it is located in the MST
     * zone (-6h or -21600). However, the start time is correct and needs to be
     * kept.

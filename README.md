@@ -75,3 +75,9 @@ This will scramble text and values. This is used to create anonymous screenshots
 This can be used to update default values in the Java code
 
 -DlogColorValues
+
+**Silently update the database in the background at startup**
+
+This can be used to update the database when a new version is available
+
+-DsilentDatabaseUpdate

@@ -20,7 +20,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -53,6 +55,58 @@ public class CRPDataReader extends TourbookDevice {
    @Override
    public boolean checkStartSequence(final int byteIndex, final int newByte) {
       return false;
+   }
+
+   /**
+    * Set marker when a comment is set
+    */
+   private void createMarker(final TourData tourData,
+                             final int tpIndex,
+                             final int tourTime,
+                             final int distance,
+                             final int altitude,
+                             final String comment,
+                             final TimeData timeData) {
+
+      if (tpIndex >= 0 && StringUtils.hasContent(comment)) {
+
+         timeData.marker = 1;
+
+         // create a new marker
+         final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
+         tourMarker.setLabel(comment);
+         tourMarker.setTime(tourTime, Long.MIN_VALUE);
+         tourMarker.setDistance(distance);
+         tourMarker.setSerieIndex(tpIndex);
+         tourMarker.setAltitude(altitude);
+
+         tourData.getTourMarkers().add(tourMarker);
+      }
+   }
+
+   /**
+    * Set TimeData
+    */
+   private TimeData createTimeData(final int pulse,
+                                   final int distance,
+                                   final int temperature,
+                                   final int oldDistance,
+                                   final String[] dataStrings,
+                                   final short altitudeDiff,
+                                   final long trackpointTimeDiff) {
+
+      final TimeData timeData = new TimeData();
+
+      timeData.altitude = altitudeDiff;
+      if (_fileVersion > 9 && dataStrings.length > 9) {
+         timeData.cadence = Integer.parseInt(dataStrings[9]);
+      }
+      timeData.distance = (distance - oldDistance) * 1f;
+      timeData.pulse = pulse;
+      timeData.temperature = temperature;
+      timeData.time = (int) trackpointTimeDiff;
+
+      return timeData;
    }
 
    /**
@@ -279,7 +333,7 @@ public class CRPDataReader extends TourbookDevice {
       // tourData.setStartAltitude((short) DeviceReaderTools.get2ByteData(buffer, 12));
       // tourData.setStartPulse((short) (buffer[14] & 0xff));
 
-      setTimeSeriesFromTrackpoints(allTrackPoints, tourYear, tourMonth, tourDay, interval, dtTrackPoint_Previous, tourData);
+      setTimeSeriesFromTrackpoints(allTrackPoints, tourStartDate, interval, dtTrackPoint_Previous, tourData);
 
       // after all data are added, the tour id can be created
       final int tourDistance = (int) Math.abs(tourData.getStartDistance());
@@ -337,14 +391,10 @@ public class CRPDataReader extends TourbookDevice {
    }
 
    private void setTimeSeriesFromTrackpoints(final ArrayList<String> allTrackPoints,
-                                             final int tourYear,
-                                             final int tourMonth,
-                                             final int tourDay,
+                                             final String tourStartDate,
                                              final int interval,
                                              LocalDateTime dtTrackPoint_Previous,
                                              final TourData tourData) {
-
-      final ArrayList<TimeData> timeDataList = new ArrayList<>();
 
       int tpIndex = 0;
       int tourTime = 0;
@@ -366,6 +416,10 @@ public class CRPDataReader extends TourbookDevice {
       int sumPulse = 0;
       int sumTemperature = 0;
 
+      final ArrayList<TimeData> timeDataList = new ArrayList<>();
+
+      LocalDate tourDate = LocalDate.parse(tourStartDate, DateTimeFormatter.ofPattern("dd.MM.yyyy")); //$NON-NLS-1$
+
       for (final String trackPoint : allTrackPoints) {
 
          /*
@@ -384,11 +438,6 @@ public class CRPDataReader extends TourbookDevice {
             comment = dataStrings[8];
          }
 
-         int cadence = Integer.MIN_VALUE;
-         if (_fileVersion > 9 && dataStrings.length > 9) {
-            cadence = Integer.parseInt(dataStrings[9]);
-         }
-
          /*
           * Prepare TimeData
           */
@@ -397,10 +446,15 @@ public class CRPDataReader extends TourbookDevice {
          final int trackPoint_Hour = Integer.parseInt(trackpointTime.substring(0, 2));
          final int trackPoint_Minute = Integer.parseInt(trackpointTime.substring(3, 5));
          final int trackPoint_Second = Integer.parseInt(trackpointTime.substring(6));
+
+         if (trackpointTime.equals("00:00:00")) { //$NON-NLS-1$
+            tourDate = tourDate.plusDays(1);
+         }
+
          final LocalDateTime dtTrackPoint = LocalDateTime.of(
-               tourYear,
-               tourMonth,
-               tourDay,
+               tourDate.getYear(),
+               tourDate.getMonth(),
+               tourDate.getDayOfMonth(),
                trackPoint_Hour,
                trackPoint_Minute,
                trackPoint_Second,
@@ -409,42 +463,21 @@ public class CRPDataReader extends TourbookDevice {
          final long trackpointTimeDiff = Duration.between(dtTrackPoint_Previous, dtTrackPoint).toSeconds();
          dtTrackPoint_Previous = dtTrackPoint;
 
-         /*
-          * Set TimeData
-          */
-         final TimeData timeData = new TimeData();
-
+         final TimeData timeData = createTimeData(pulse,
+               distance,
+               temperature,
+               oldDistance,
+               dataStrings,
+               altitudeDiff,
+               trackpointTimeDiff);
          timeDataList.add(timeData);
 
-         timeData.altitude = altitudeDiff;
-         if (_fileVersion > 9) {
-            timeData.cadence = cadence;
-         }
-         timeData.distance = (distance - oldDistance) * 1f;
-         timeData.pulse = pulse;
-         timeData.temperature = temperature;
-         timeData.time = (int) trackpointTimeDiff;
-
-         // set marker when a comment is set
-         if (tpIndex >= 0 && StringUtils.hasContent(comment)) {
-
-            timeData.marker = 1;
-
-            // create a new marker
-            final TourMarker tourMarker = new TourMarker(tourData, ChartLabelMarker.MARKER_TYPE_DEVICE);
-            tourMarker.setLabel(comment);
-            tourMarker.setTime(tourTime, Long.MIN_VALUE);
-            tourMarker.setDistance(distance);
-            tourMarker.setSerieIndex(tpIndex);
-            tourMarker.setAltitude(altitude);
-
-            tourData.getTourMarkers().add(tourMarker);
-         }
+         createMarker(tourData, tpIndex, tourTime, distance, altitude, comment, timeData);
 
          // first altitude contains the start altitude and not the difference
          if (tpIndex != 0) {
             tourAltUp += ((altitudeDiff > 0) ? altitudeDiff : 0);
-            tourAltDown += ((timeData.altitude < 0) ? -timeData.altitude : 0);
+            tourAltDown -= ((timeData.altitude < 0) ? timeData.altitude : 0);
          }
 
          oldDistance = distance;
@@ -455,7 +488,7 @@ public class CRPDataReader extends TourbookDevice {
          tpIndex++;
 
          sumAltitude += Math.abs(altitude);
-         sumCadence += cadence;
+         sumCadence += timeData.cadence;
          sumDistance += timeData.distance;
          sumPulse += pulse;
          sumTemperature += Math.abs(temperature);
