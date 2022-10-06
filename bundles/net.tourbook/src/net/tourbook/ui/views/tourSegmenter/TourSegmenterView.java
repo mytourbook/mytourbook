@@ -17,8 +17,6 @@ package net.tourbook.ui.views.tourSegmenter;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.io.File;
 import java.text.NumberFormat;
 import java.time.ZonedDateTime;
@@ -69,6 +67,7 @@ import net.tourbook.ui.TableColumnFactory;
 import net.tourbook.ui.tourChart.TourChart;
 import net.tourbook.web.WEB;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IToolBarManager;
@@ -1416,7 +1415,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          forcedIndex = forcedIndices[forcedIndexIndex];
       }
 
-      final TIntArrayList segmentSerieIndex = new TIntArrayList();
+      final IntArrayList segmentSerieIndex = new IntArrayList();
 
       // set first point
       segmentSerieIndex.add(0);
@@ -1586,7 +1585,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       /*
        * convert recognized breaks into segments
        */
-      final TIntArrayList segmentSerieIndex = new TIntArrayList();
+      final IntArrayList segmentSerieIndex = new IntArrayList();
 
       // set start for first segment
       segmentSerieIndex.add(0);
@@ -1630,7 +1629,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       final int lastDistanceSerieIndex = distanceSerie.length - 1;
 
       final float segmentDistance = getDistance();
-      final TIntArrayList segmentSerieIndex = new TIntArrayList();
+      final IntArrayList segmentSerieIndex = new IntArrayList();
 
       // set first segment start
       segmentSerieIndex.add(0);
@@ -1683,7 +1682,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          return result;
       });
 
-      final TIntArrayList segmenterIndices = new TIntArrayList();
+      final IntArrayList segmenterIndices = new IntArrayList();
 
       int prevSerieIndex = 0;
 
@@ -1715,7 +1714,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
             tourSerieIndices = new int[] { 0, numTimeSlices - 1 };
          }
 
-         final TIntArrayList markerIndices = new TIntArrayList();
+         final IntArrayList markerIndices = new IntArrayList();
 
          // get a list with all marker indices
          for (final TourMarker tourMarker : sortedMarkers) {
@@ -1887,8 +1886,8 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          minDistance = Math.round(minDistance / UNIT_YARD);
       }
 
-      final TIntArrayList segmentSerieIndex = new TIntArrayList();
-      final TIntArrayList segmentSerieFilter = new TIntArrayList();
+      final IntArrayList segmentSerieIndex = new IntArrayList();
+      final IntArrayList segmentSerieFilter = new IntArrayList();
 
       // set first segment start
       segmentSerieIndex.add(0);
@@ -4139,7 +4138,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          return result;
       });
 
-      final TIntArrayList forcedIndices = new TIntArrayList();
+      final IntArrayList forcedIndices = new IntArrayList();
 
       int prevSerieIndex = 0;
 
@@ -4162,7 +4161,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
          tourSerieIndices = new int[] { 0, numTimeSlices - 1 };
       }
 
-      final TIntArrayList markerIndices = new TIntArrayList();
+      final IntArrayList markerIndices = new IntArrayList();
 
       // get a list with all marker indices
       for (final TourMarker tourMarker : sortedMarkers) {

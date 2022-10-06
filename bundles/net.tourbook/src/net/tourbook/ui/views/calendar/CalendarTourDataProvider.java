@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
-import gnu.trove.list.array.TFloatArrayList;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -41,6 +39,8 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
+
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 
 public class CalendarTourDataProvider {
 
@@ -422,8 +422,8 @@ public class CalendarTourDataProvider {
          ArrayList<String> dbTourWeatherClouds = null;
 
          ArrayList<Integer> dbCalories = null;
-         TFloatArrayList dbPowerAvg = null;
-         TFloatArrayList dbPulseAvg = null;
+         FloatArrayList dbPowerAvg = null;
+         FloatArrayList dbPulseAvg = null;
 
          ArrayList<Long> dbTypeIds = null;
          ArrayList<Integer> dbTypeColorIndex = null;
@@ -540,8 +540,8 @@ public class CalendarTourDataProvider {
                   dbTourWeatherClouds = new ArrayList<>();
 
                   dbCalories = new ArrayList<>();
-                  dbPowerAvg = new TFloatArrayList();
-                  dbPulseAvg = new TFloatArrayList();
+                  dbPowerAvg = new FloatArrayList();
+                  dbPulseAvg = new FloatArrayList();
 
                   dbTypeIds = new ArrayList<>();
                   dbTypeColorIndex = new ArrayList<>();

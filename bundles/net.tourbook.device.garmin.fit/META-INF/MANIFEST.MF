@@ -21,6 +21,7 @@ Import-Package: net.tourbook.common,
  net.tourbook.data,
  net.tourbook.importdata,
  net.tourbook.tour,
- net.tourbook.ui.tourChart
+ net.tourbook.ui.tourChart,
+ org.eclipse.collections.impl.list.mutable.primitive;version="10.4.0"
 Automatic-Module-Name: net.tourbook.device.garmin.fit
 Export-Package: net.tourbook.device.garmin.fit

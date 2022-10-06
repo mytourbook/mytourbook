@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,7 @@
  *******************************************************************************/
 package net.tourbook.common.color;
 
-import gnu.trove.map.hash.TIntObjectHashMap;
-
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 
@@ -25,7 +24,7 @@ import org.eclipse.swt.graphics.RGB;
  */
 public class ColorCacheSWT {
 
-   private TIntObjectHashMap<Color> _colors = new TIntObjectHashMap<>();
+   private IntObjectHashMap<Color> _colors = new IntObjectHashMap<>();
 
    public ColorCacheSWT() {}
 
