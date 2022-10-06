@@ -1298,7 +1298,7 @@ public class TourSignView_DISABLED /*extends ViewPart implements ITourViewer */{
 //			return;
 //		}
 //
-//		final LongArrayList expandedItems = new LongArrayList();
+//		final TLongArrayList expandedItems = new TLongArrayList();
 //
 //		final TreePath[] expandedOpenedTreePaths = UI.getExpandedOpenedItems(
 //				visibleExpanded,
