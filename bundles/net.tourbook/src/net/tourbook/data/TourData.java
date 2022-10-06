@@ -2374,7 +2374,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 //
 //         // use custom settings to compute altimeter and gradient
 //
-//         final int computeTimeSlice = prefStore.geInt(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE);
+//         final int computeTimeSlice = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE);
 //         final int slices = computeTimeSlice / deviceTimeInterval;
 //
 //         final int slice2 = slices / 2;
@@ -2472,7 +2472,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 //      if (isCustomProperty) {
 //         // use custom settings to compute altimeter and gradient
-//         minTimeDiff = prefStore.geInt(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE);
+//         minTimeDiff = prefStore.getInt(ITourbookPreferences.GRAPH_PROPERTY_CUSTOM_VALUE_TIMESLICE);
 //      } else {
 //         // use internal algorithm to compute altimeter and gradient
 //         minTimeDiff = 16;
