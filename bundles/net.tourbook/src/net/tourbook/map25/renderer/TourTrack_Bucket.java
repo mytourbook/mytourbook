@@ -17,6 +17,9 @@ package net.tourbook.map25.renderer;
 
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
+import gov.nasa.worldwind.geom.Angle;
+import gov.nasa.worldwind.geom.Vec4;
+
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
@@ -34,47 +37,49 @@ import org.slf4j.LoggerFactory;
  */
 public class TourTrack_Bucket {
 
-   static final Logger        log              = LoggerFactory.getLogger(TourTrack_Bucket.class);
+   static final Logger         log                = LoggerFactory.getLogger(TourTrack_Bucket.class);
 
    /**
     * Scale factor mapping extrusion vector to short values
     */
-   public static final float  DIR_SCALE        = 2048;
+   public static final float   DIR_SCALE          = 2048;
 
    /**
     * Maximal resolution
     */
-   private static final float MIN_DIST         = 1 / 8f;
+   private static final float  MIN_DIST           = 1 / 8f;
 
    /**
     * Not quite right.. need to go back so that additional
     * bevel vertices are at least MIN_DIST apart
     */
-   private static final float MIN_BEVEL        = MIN_DIST * 4;
+   private static final float  MIN_BEVEL          = MIN_DIST * 4;
 
    /**
     * Mask for packing last two bits of extrusion vector with texture
     * coordinates, .... 1111 1100
     */
-   private static final int   DIR_MASK         = 0xFFFFFFFC;
+   private static final int    DIR_MASK           = 0xFFFFFFFC;
 
-   public LineStyle           lineStyle;
-   public int                 lineColorMode;
+   private final static double RADIANS_TO_DEGREES = 180d / Math.PI;
 
-   boolean                    isCapRounded;
-   float                      heightOffset;
+   public LineStyle            lineStyle;
+   public int                  lineColorMode;
 
-   private float              _minimumDistance = MIN_DIST;
-   private float              _minimumBevel    = MIN_BEVEL;
+   boolean                     isCapRounded;
+   float                       heightOffset;
 
-   private int                _tMin            = Integer.MIN_VALUE, _tMax = Integer.MAX_VALUE;
+   private float               _minimumDistance   = MIN_DIST;
+   private float               _minimumBevel      = MIN_BEVEL;
+
+   private int                 _tMin              = Integer.MIN_VALUE, _tMax = Integer.MAX_VALUE;
 
    /**
     * Number of vertices for this layer.
     */
-   int                        numTrackVertices;
+   int                         numTrackVertices;
 
-   TourTrack_VertexData       trackVertexData;
+   TourTrack_VertexData        trackVertexData;
 
    /**
     * Contains the vertices for direction arrows multiplied with {@link MapRenderer#COORD_SCALE}:
@@ -86,7 +91,7 @@ public class TourTrack_Bucket {
     * ...
     * </pre>
     */
-   ShortArrayList             directionArrow_Vertices;
+   ShortArrayList              directionArrow_Vertices;
 
    /**
     * Barycentric coordinates are simply (1, 0, 0), (0, 1, 0) and (0, 0, 1) for the three
@@ -95,7 +100,7 @@ public class TourTrack_Bucket {
     * Source:
     * https://stackoverflow.com/questions/137629/how-do-you-render-primitives-as-wireframes-in-opengl#answer-33004265
     */
-   ShortArrayList             directionArrow_ColorCoords;
+   ShortArrayList              directionArrow_ColorCoords;
 
    /**
     * X/Y positions
@@ -106,7 +111,7 @@ public class TourTrack_Bucket {
     * ...
     * </pre>
     */
-   ShortArrayList             animatedPositions;
+   ShortArrayList              animatedPositions;
 
    /**
     * X/Y unit (direction) vectors
@@ -117,7 +122,7 @@ public class TourTrack_Bucket {
     * ...
     * </pre>
     */
-   FloatArrayList             animatedUnitVectors;
+   FloatArrayList              animatedUnitVectors;
 
    public TourTrack_Bucket() {
 
@@ -1015,10 +1020,25 @@ public class TourTrack_Bucket {
       float p1X = allDirectionArrowPixel[pixelIndex++];
       float p1Y = allDirectionArrowPixel[pixelIndex++];
 
+      float prevP21UnitX = 1;
+      float prevP21UnitY = 1;
+
+      float prevAnimatedAngle = 0;
+      float prevAnimatedUnitX = 1;
+      float prevAnimatedUnitY = 1;
+
+      Vec4 p1Vec = new Vec4(p1X, p1Y);
+
       for (; pixelIndex < allDirectionArrowPixel.length;) {
 
          final float p2X = allDirectionArrowPixel[pixelIndex++];
          final float p2Y = allDirectionArrowPixel[pixelIndex++];
+
+
+         final short p2X_scaled = (short) (p2X * COORD_SCALE);
+         final short p2Y_scaled = (short) (p2Y * COORD_SCALE);
+
+         animatedPositions.addAll(p2X_scaled, p2Y_scaled);
 
          // create unit (direction) vector: unit = (P2-P1)/|P2-P1|
 
@@ -1030,19 +1050,93 @@ public class TourTrack_Bucket {
          final double p21Distance = Math.sqrt(p21DiffX * p21DiffX + p21DiffY * p21DiffY);
 
          // unit = (P2-P1)/|P2-P1|
-         final float p12UnitX = (float) (p21DiffX / p21Distance);
-         final float p12UnitY = (float) (p21DiffY / p21Distance);
+         final float p21UnitX = (float) (p21DiffX / p21Distance);
+         final float p21UnitY = (float) (p21DiffY / p21Distance);
 
-         final short p2X_scaled = (short) (p2X * COORD_SCALE);
-         final short p2Y_scaled = (short) (p2Y * COORD_SCALE);
+//       float[] v2 = normVectors.get(k);
+//       float[] v1 = normVectors.get((k - 1 + size) % size);
+//       float val = v1[0] * v2[0] + v1[1] * v2[1];
+//       float angle = (float) Math.acos(val);
 
-         animatedPositions.addAll(p2X_scaled, p2Y_scaled);
-         animatedUnitVectors.addAll(p12UnitX, p12UnitY);
+         final Vec4 p2Vec = new Vec4(p2X, p2Y);
+         final Angle p21VecAngle = p2Vec.angleBetween3(p1Vec);
+
+//         final float current_dot_Prev = p21UnitX * prevP21UnitX + p21UnitY + prevP21UnitY;
+//         final double angle_InRadiant = Math.acos(current_dot_Prev);
+//         final float angle_Current2PrevUnits = (float) ((float) angle_InRadiant * RADIANS_TO_DEGREES);
+//
+//         final float angleDiff_Current2PrevUnits = angle_Current2PrevUnits - prevAnimatedAngle;
+
+         final float minSmoothAngle = 5;
+
+         float animatedAngle = 0;
+         float animatedUnitX = 1;
+         float animatedUnitY = 1;
+
+         final double p21VecAngleDegrees = p21VecAngle.degrees;
+
+         boolean isLarger = false;
+
+         if (p21VecAngleDegrees < minSmoothAngle) {
+
+            // default angle is smaller than the min smooth angle -> animation is smooth
+
+            animatedAngle = (float) p21VecAngleDegrees;
+            animatedUnitX = p21UnitX;
+            animatedUnitY = p21UnitY;
+
+         } else {
+
+            /**
+             * Default angle is larger than the min smooth angle
+             * <p>
+             * -> compute direction units for the min smooth angle
+             */
+
+            isLarger = true;
+         }
+
+         animatedUnitVectors.addAll(animatedUnitX, animatedUnitY);
+
+         if (/* pixelIndex < 20 || */ isLarger) {
+
+            System.out.println(String.format(""
+
+                  + "%3d:"
+                  + "  P1 %6.3f %6.3f"
+                  + "  angleDiff %6.3f",
+
+                  pixelIndex,
+
+                  p21UnitX,
+                  p21UnitY,
+
+                  p21VecAngleDegrees
+
+            ));
+            // TODO remove SYSTEM.OUT.PRINTLN
+         }
 
          // setup next position
          p1X = p2X;
          p1Y = p2Y;
+
+         prevP21UnitX = p21UnitX;
+         prevP21UnitY = p21UnitY;
+
+         prevAnimatedAngle = animatedAngle;
+         prevAnimatedUnitX = animatedUnitX;
+         prevAnimatedUnitY = animatedUnitY;
+
+         p1Vec = p2Vec;
       }
+
+      System.out.println();
+      System.out.println();
+      System.out.println();
+      // TODO remove SYSTEM.OUT.PRINTLN
+
    }
+
 
 }

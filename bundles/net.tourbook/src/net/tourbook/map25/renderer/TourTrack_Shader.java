@@ -27,6 +27,7 @@ import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.GL;
 import org.oscim.core.MapPosition;
@@ -86,9 +87,11 @@ public final class TourTrack_Shader {
        * Location for a shader variable
        */
       int attrib_Pos;
+
       int uni_AnimationPos;
+      int uni_AnimationUnitVector;
       int uni_MVP;
-      int uni_VpScale2MpScale;
+      int uni_VpScale2CompileScale;
 
       AnimationShader(final String shaderFile) {
 
@@ -98,10 +101,12 @@ public final class TourTrack_Shader {
 
          // SET_FORMATTING_OFF
 
-         attrib_Pos           = getAttrib ("attrib_Pos");         //$NON-NLS-1$
-         uni_AnimationPos     = getUniform("uni_AnimationPos");   //$NON-NLS-1$
-         uni_MVP              = getUniform("uni_MVP");            //$NON-NLS-1$
-         uni_VpScale2MpScale  = getUniform("uni_Vp2MpScale");     //$NON-NLS-1$
+         attrib_Pos                 = getAttrib ("attrib_Pos");                  //$NON-NLS-1$
+
+         uni_AnimationPos           = getUniform("uni_AnimationPos");            //$NON-NLS-1$
+         uni_AnimationUnitVector    = getUniform("uni_AnimationUnitVector");     //$NON-NLS-1$
+         uni_MVP                    = getUniform("uni_MVP");                     //$NON-NLS-1$
+         uni_VpScale2CompileScale   = getUniform("uni_VpScale2CompileScale");    //$NON-NLS-1$
 
          // SET_FORMATTING_ON
       }
@@ -243,12 +248,12 @@ public final class TourTrack_Shader {
 
 // SET_FORMATTING_OFF
 
-               final short size = 200;
+               final short size = 500;
 
                _animationVertices = new short[] {
-                                                   0,     0,  10,
-                                                   0,  size,  10,
-                                                size,  size,  50,
+                                                   0,     0,  0,
+                                                   0,  size,  130,
+                                                size,  size,  130,
 
                                                 };
 // SET_FORMATTING_ON
@@ -679,6 +684,7 @@ public final class TourTrack_Shader {
                                           final TourTrack_Bucket trackBucket) {
 
       final ShortArrayList animatedPositions = trackBucket.animatedPositions;
+      final FloatArrayList animatedUnitVectors = trackBucket.animatedUnitVectors;
 
       final int numPositions = animatedPositions.size();
       if (numPositions < 1) {
@@ -696,14 +702,21 @@ public final class TourTrack_Shader {
          return;
       }
 
+      // set mvp matrix
+      viewport.mvp.setAsUniform(shader.uni_MVP);
+
       // set animation position
       gl.uniform2f(shader.uni_AnimationPos,
             animatedPositions.get(posIndex),
             animatedPositions.get(posIndex + 1));
-      viewport.mvp.setAsUniform(shader.uni_MVP);
+
+      // set animation direction
+      gl.uniform2f(shader.uni_AnimationUnitVector,
+            animatedUnitVectors.get(posIndex),
+            animatedUnitVectors.get(posIndex + 1));
 
       // set viewport scale TO map scale: 1.0...2.0
-      gl.uniform1f(shader.uni_VpScale2MpScale, vp2mpScale);
+      gl.uniform1f(shader.uni_VpScale2CompileScale, vp2mpScale);
 
       // set vertices positions
       final int shader_Attrib_Pos = shader.attrib_Pos;
