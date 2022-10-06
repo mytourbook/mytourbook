@@ -4290,7 +4290,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 //            (net.tourbook.common.UI.timeStampNano() + " [" + getClass().getSimpleName() + "] ")
 //                  + ("\tsize: " + allGeoParts.toArray().length));
 
-      return allGeoParts.toSortedArray();
+      return allGeoParts.toArray();
    }
 
    /**
