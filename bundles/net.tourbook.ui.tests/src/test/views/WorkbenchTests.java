@@ -37,13 +37,6 @@ public class WorkbenchTests extends UITest {
    }
 
    @Test
-   void testOpenPreferences() {
-
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
-   }
-
-   @Test
    void testOpenViews() {
 
       //Select a tour so that the selected views contain information
