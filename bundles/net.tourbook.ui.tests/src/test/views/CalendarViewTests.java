@@ -28,6 +28,6 @@ public class CalendarViewTests extends UITest {
       bot.toolbarButtonWithTooltip("Calendar (Ctrl+Shift+C)").click(); //$NON-NLS-1$
       Utils.showView(bot, "Calendar").bot(); //$NON-NLS-1$
 
-      bot.comboBox(0).setSelection("App : Classic");
+      bot.comboBox(0).setSelection("App : Classic"); //$NON-NLS-1$
    }
 }
