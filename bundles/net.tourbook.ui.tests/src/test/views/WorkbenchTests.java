@@ -52,9 +52,6 @@ public class WorkbenchTests extends UITest {
       bot.toolbarButtonWithTooltip("Statistics (Ctrl+Shift+S)").click(); //$NON-NLS-1$
       Utils.showView(bot, "Statistics"); //$NON-NLS-1$
 
-      bot.toolbarButtonWithTooltip("Calendar (Ctrl+Shift+C)").click(); //$NON-NLS-1$
-      Utils.showView(bot, "Calendar"); //$NON-NLS-1$
-
       bot.toolbarButtonWithTooltip("Shows tour in 2D map").click(); //$NON-NLS-1$
       Utils.showView(bot, "2D Tour Map"); //$NON-NLS-1$
       //Sleeping 3 seconds as the map can be slow to display
