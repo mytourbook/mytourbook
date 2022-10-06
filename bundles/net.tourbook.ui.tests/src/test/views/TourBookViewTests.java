@@ -15,6 +15,7 @@
  *******************************************************************************/
 package views;
 
+import static org.eclipse.swtbot.swt.finder.matchers.WidgetMatcherFactory.widgetOfType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,6 +26,8 @@ import java.util.List;
 import net.tourbook.Messages;
 import net.tourbook.tour.TourLogManager;
 
+import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
@@ -136,5 +139,26 @@ public class TourBookViewTests extends UITest {
             .getNode("May   2").expand().select().getNode("23").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
       assertEquals("1,073,000", tour.cell(tourBookView_Temperature_Column_Index)); //$NON-NLS-1$
+   }
+
+   @Test
+   void testNatTable() {
+
+      bot.viewByTitle("Tour Book").show();
+
+      //Activating the NatTable
+      bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
+      bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
+
+      final SWTBotNatTable botNatTable = new SWTBotNatTable(
+            bot.widget(widgetOfType(NatTable.class)));
+      assertEquals(9, botNatTable.rowCount());
+
+      botNatTable.click(1, 0);
+      botNatTable.click(2, 0);
+      assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4));
+
+      //Deactivating the NatTable
+      bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
    }
 }

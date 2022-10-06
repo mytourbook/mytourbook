@@ -9,9 +9,11 @@ Require-Bundle: net.tourbook,
  net.tourbook.printing,
  org.junit.jupiter.api,
  org.eclipse.swtbot.go,
- net.tourbook.statistics
+ net.tourbook.statistics,
+ org.eclipse.swtbot.nebula.nattable.finder;bundle-version="4.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: net.tourbook.ui.tests
+Import-Package: org.eclipse.nebula.widgets.nattable
