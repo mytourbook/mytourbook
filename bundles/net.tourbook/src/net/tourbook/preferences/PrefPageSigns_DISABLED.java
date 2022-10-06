@@ -1796,7 +1796,7 @@ public class PrefPageSigns_DISABLED /*
 //			return;
 //		}
 //
-//		final LongArrayList expandedItems = new LongArrayList();
+//		final TLongArrayList expandedItems = new TLongArrayList();
 //
 //		final TreePath[] expandedOpenedTreePaths = UI.getExpandedOpenedItems(
 //				visibleExpanded,
