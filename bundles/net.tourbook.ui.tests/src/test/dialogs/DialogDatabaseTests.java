@@ -33,9 +33,9 @@ public class DialogDatabaseTests extends UITest {
 
       bot.menu("Help").menu("Compress Database...").click(); //$NON-NLS-1$ //$NON-NLS-2$
 
-      bot.button(Messages.App_Db_Compress_Button_CompressByCopying).click();
-      bot.button(Messages.App_Db_Compress_Button_CompressDatabase).click();
-      bot.sleep(5000);
+//      bot.button(Messages.App_Db_Compress_Button_CompressByCopying).click();
+//      bot.button(Messages.App_Db_Compress_Button_CompressDatabase).click();
+//      bot.sleep(5000);
 
       bot.button(IDialogConstants.CLOSE_LABEL).click();
    }
