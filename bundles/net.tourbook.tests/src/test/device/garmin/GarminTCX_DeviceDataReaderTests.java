@@ -31,7 +31,7 @@ public class GarminTCX_DeviceDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testTcxImportConeyLake() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "Move_2020_05_23_08_55_42_Trail+running", ".tcx");
+      testImportFile(deviceDataReader, FILES_PATH + "Move_2020_05_23_08_55_42_Trail+running", ".tcx"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    /**
@@ -40,6 +40,6 @@ public class GarminTCX_DeviceDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testTcxImportLyons() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "2021-01-31", ".tcx");
+      testImportFile(deviceDataReader, FILES_PATH + "2021-01-31", ".tcx"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }

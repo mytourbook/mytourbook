@@ -30,6 +30,6 @@ public class FitLogDeviceDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testImportTimothyLake() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "TimothyLake", ".fitlog");
+      testImportFile(deviceDataReader, FILES_PATH + "TimothyLake", ".fitlog"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }
