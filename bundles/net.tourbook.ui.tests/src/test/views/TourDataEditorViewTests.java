@@ -44,7 +44,7 @@ public class TourDataEditorViewTests extends UITest {
       bot.comboBox().setText(newTourTitle);
       bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
 
-      Utils.showView(bot, "Tour Editor"); //$NON-NLS-1$
+      Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
 
       final SWTBotCombo titleCombo = bot.comboBox(newTourTitle);
       assertNotNull(titleCombo);
@@ -58,9 +58,21 @@ public class TourDataEditorViewTests extends UITest {
    }
 
    @Test
+   void testRemoveTimeSlice() {
+
+      Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
+
+      bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
+
+      bot.table().select(3);
+      bot.table().contextMenu(Messages.action_tour_editor_delete_time_slices_keep_time).click();
+      bot.button("OK").click();
+   }
+
+   @Test
    void testViewTabs() {
 
-      Utils.showView(bot, "Tour Editor"); //$NON-NLS-1$
+      Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
 
       bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
       bot.cTabItem(Messages.Tour_Editor_TabLabel_SwimSlices).activate();

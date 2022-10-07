@@ -40,7 +40,7 @@ public class TourMarkerViewTests extends UITest {
             .getNode("May   2").expand().select().getNode("23").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
-      final SWTBotView tourEditorView = Utils.showView(bot, "Tour Editor"); //$NON-NLS-1$
+      final SWTBotView tourEditorView = Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
 
       final SWTBotCTabItem timeSlicesTab = bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
       assertNotNull(timeSlicesTab);

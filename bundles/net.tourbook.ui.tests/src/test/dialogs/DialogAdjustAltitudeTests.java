@@ -31,7 +31,7 @@ public class DialogAdjustAltitudeTests extends UITest {
 
       selectTour();
 
-      bot.viewByTitle("Tour Editor").show();
+      bot.viewByTitle(Utils.TOUREDITOR_VIEW_NAME).show();
       bot.toolbarButtonWithTooltip(Messages.app_action_edit_adjust_altitude).click();
 
       bot.comboBox(0).setSelection(adjustmentMethod);
