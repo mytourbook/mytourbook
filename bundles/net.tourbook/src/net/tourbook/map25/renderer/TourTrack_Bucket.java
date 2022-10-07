@@ -17,9 +17,7 @@ package net.tourbook.map25.renderer;
 
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
-import gov.nasa.worldwind.geom.Angle;
-import gov.nasa.worldwind.geom.Vec4;
-
+import net.tourbook.common.util.MtMath;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
@@ -122,14 +120,14 @@ public class TourTrack_Bucket {
     * ...
     * </pre>
     */
-   FloatArrayList              animatedUnitVectors;
+   FloatArrayList              animatedForwardAngle;
 
    public TourTrack_Bucket() {
 
       trackVertexData = new TourTrack_VertexData();
 
       animatedPositions = new ShortArrayList();
-      animatedUnitVectors = new FloatArrayList();
+      animatedForwardAngle = new FloatArrayList();
 
       directionArrow_Vertices = new ShortArrayList();
       directionArrow_ColorCoords = new ShortArrayList();
@@ -658,7 +656,7 @@ public class TourTrack_Bucket {
 
       // create new list to not update currently used list, otherwise a bound exception can occure !!!
       animatedPositions.clear();
-      animatedUnitVectors.clear();
+      animatedForwardAngle.clear();
 
       directionArrow_Vertices.clear();
       directionArrow_ColorCoords.clear();
@@ -705,7 +703,7 @@ public class TourTrack_Bucket {
 
       final double arrowLength               = configArrowLength;
       final double arrowLengthMiddle         = configArrowLengthCenter;
-      final double arrowWidth2               = configArrowWidth / 2; // half arrow width
+      final double arrowHalfWidth            = configArrowWidth / 2; // half arrow width
 
 // SET_FORMATTING_ON
 
@@ -736,8 +734,8 @@ public class TourTrack_Bucket {
          final double pBackX = p2X - (arrowLengthMiddle * p12UnitX);
          final double pBackY = p2Y - (arrowLengthMiddle * p12UnitY);
 
-         final double vFinX = unitPerpendX * arrowWidth2;
-         final double vFinY = unitPerpendY * arrowWidth2;
+         final double vFinX = unitPerpendX * arrowHalfWidth;
+         final double vFinY = unitPerpendY * arrowHalfWidth;
 
          // set arrow points which are left/right of the line
          final float pLeftX = (float) (pOnLineX + vFinX);
@@ -1020,123 +1018,87 @@ public class TourTrack_Bucket {
       float p1X = allDirectionArrowPixel[pixelIndex++];
       float p1Y = allDirectionArrowPixel[pixelIndex++];
 
-      float prevP21UnitX = 1;
-      float prevP21UnitY = 1;
-
       float prevAnimatedAngle = 0;
-      float prevAnimatedUnitX = 1;
-      float prevAnimatedUnitY = 1;
-
-      Vec4 p1Vec = new Vec4(p1X, p1Y);
 
       for (; pixelIndex < allDirectionArrowPixel.length;) {
 
          final float p2X = allDirectionArrowPixel[pixelIndex++];
          final float p2Y = allDirectionArrowPixel[pixelIndex++];
 
-
          final short p2X_scaled = (short) (p2X * COORD_SCALE);
          final short p2Y_scaled = (short) (p2Y * COORD_SCALE);
 
          animatedPositions.addAll(p2X_scaled, p2Y_scaled);
 
-         // create unit (direction) vector: unit = (P2-P1)/|P2-P1|
+         final float p21Angle = (float) MtMath.angleOf(p1X, p1Y, p2X, p2Y);
 
-         // (P2-P1)
-         final float p21DiffX = p2X - p1X;
-         final float p21DiffY = p2Y - p1Y;
+         final float minSmoothAngle = 10;
 
-         // |P2-P1| - distance between P1 and P2 - Pythagorean theorem
-         final double p21Distance = Math.sqrt(p21DiffX * p21DiffX + p21DiffY * p21DiffY);
+         final float animatedAngle = 0;
 
-         // unit = (P2-P1)/|P2-P1|
-         final float p21UnitX = (float) (p21DiffX / p21Distance);
-         final float p21UnitY = (float) (p21DiffY / p21Distance);
-
-//       float[] v2 = normVectors.get(k);
-//       float[] v1 = normVectors.get((k - 1 + size) % size);
-//       float val = v1[0] * v2[0] + v1[1] * v2[1];
-//       float angle = (float) Math.acos(val);
-
-         final Vec4 p2Vec = new Vec4(p2X, p2Y);
-         final Angle p21VecAngle = p2Vec.angleBetween3(p1Vec);
-
-//         final float current_dot_Prev = p21UnitX * prevP21UnitX + p21UnitY + prevP21UnitY;
-//         final double angle_InRadiant = Math.acos(current_dot_Prev);
-//         final float angle_Current2PrevUnits = (float) ((float) angle_InRadiant * RADIANS_TO_DEGREES);
+//         if (p21Angle < minSmoothAngle) {
 //
-//         final float angleDiff_Current2PrevUnits = angle_Current2PrevUnits - prevAnimatedAngle;
+//            // default angle is smaller than the min smooth angle -> animation is smooth
+//
+//         animatedAngle = (float) p21Angle;
+//         animatedUnitX = p21UnitX;
+//         animatedUnitY = p21UnitY;
+//
+//         } else {
+//
+//            /**
+//             * Default angle is larger than the min smooth angle
+//             * <p>
+//             * -> compute direction units for the min smooth angle
+//             */
+//
+//            animatedAngle = prevAnimatedAngle - minSmoothAngle;
+//
+//            final Matrix angleMatrix = Matrix.fromRotationZ(Angle.fromDegrees(animatedAngle));
+//            p2Vec = p1Vec.transformBy3(angleMatrix);
+//
+////            isLarger = true;
+//         }
 
-         final float minSmoothAngle = 5;
+         animatedForwardAngle.add(p21Angle - 90);
 
-         float animatedAngle = 0;
-         float animatedUnitX = 1;
-         float animatedUnitY = 1;
-
-         final double p21VecAngleDegrees = p21VecAngle.degrees;
-
-         boolean isLarger = false;
-
-         if (p21VecAngleDegrees < minSmoothAngle) {
-
-            // default angle is smaller than the min smooth angle -> animation is smooth
-
-            animatedAngle = (float) p21VecAngleDegrees;
-            animatedUnitX = p21UnitX;
-            animatedUnitY = p21UnitY;
-
-         } else {
-
-            /**
-             * Default angle is larger than the min smooth angle
-             * <p>
-             * -> compute direction units for the min smooth angle
-             */
-
-            isLarger = true;
-         }
-
-         animatedUnitVectors.addAll(animatedUnitX, animatedUnitY);
-
-         if (/* pixelIndex < 20 || */ isLarger) {
-
-            System.out.println(String.format(""
-
-                  + "%3d:"
-                  + "  P1 %6.3f %6.3f"
-                  + "  angleDiff %6.3f",
-
-                  pixelIndex,
-
-                  p21UnitX,
-                  p21UnitY,
-
-                  p21VecAngleDegrees
-
-            ));
-            // TODO remove SYSTEM.OUT.PRINTLN
-         }
+//         if (pixelIndex < 2000) {
+//
+//            System.out.println(String.format(""
+//
+//                  + "%3d"
+//
+//                  + "  P2 %6.0f %6.0f"
+//
+//                  + "  Rot ° %5.1f"
+//                  + "  Axis ° %5.1f"
+//
+//                  ,
+//
+//                  pixelIndex,
+//
+//                  p2X,
+//                  p2Y,
+//
+//                  p21Angle,
+//                  axisAngle
+//
+//            ));
+//            // TODO remove SYSTEM.OUT.PRINTLN
+//         }
 
          // setup next position
          p1X = p2X;
          p1Y = p2Y;
 
-         prevP21UnitX = p21UnitX;
-         prevP21UnitY = p21UnitY;
-
          prevAnimatedAngle = animatedAngle;
-         prevAnimatedUnitX = animatedUnitX;
-         prevAnimatedUnitY = animatedUnitY;
-
-         p1Vec = p2Vec;
       }
 
-      System.out.println();
-      System.out.println();
-      System.out.println();
-      // TODO remove SYSTEM.OUT.PRINTLN
+//      System.out.println();
+//      System.out.println();
+//      System.out.println();
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
    }
-
 
 }

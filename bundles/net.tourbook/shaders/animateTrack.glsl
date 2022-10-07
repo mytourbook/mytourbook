@@ -7,7 +7,7 @@ in vec4 attrib_Pos;
 
 uniform mat4  uni_MVP;
 uniform vec2  uni_AnimationPos;
-uniform vec2  uni_AnimationUnitVector;
+uniform mat4  uni_AnimationMVP;
 
 // current viewport map scale to comile time map scale: 1.0...2.0
 uniform float uni_VpScale2CompileScale;
@@ -17,18 +17,19 @@ out vec3 pass_Color;
 
 void main() {
    
+
+   // rotate model to look into the forward direction
+   vec4 rotatedModel = attrib_Pos * uni_AnimationMVP;
+
    // scale model to current map scale
-   vec3 animationModel = attrib_Pos.xyz * (1.0 / uni_VpScale2CompileScale);
+   vec3 scaledModel = rotatedModel.xyz * (1.0 / uni_VpScale2CompileScale);
 
-   gl_Position = uni_MVP * vec4(animationModel.xy
-
-                                // adjust direction
-                                * uni_AnimationUnitVector
+   gl_Position = uni_MVP * vec4(scaledModel.xy
 
                                 // move (translate) model to the animation position
                                 + uni_AnimationPos,
 
-                                animationModel.z,
+                                scaledModel.z,
                                 1.0);
 
    pass_Color  = colors[gl_VertexID];

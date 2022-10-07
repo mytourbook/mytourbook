@@ -165,7 +165,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
        * @param y
        * @return
        */
-      private int addPoint(final float[] points, int pointIndex, final int x, final int y) {
+      private int addPoint(final float[] points, int pointIndex, final float x, final float y) {
 
          points[pointIndex++] = x;
          points[pointIndex++] = y;
@@ -233,16 +233,25 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          return true;
       }
 
+      /**
+       * Skip all track points which are not visible or are below a minimum distance
+       *
+       * @param task
+       * @param numPoints
+       */
       private void doWork_CompileTrack(final TourCompileTask task, final int numPoints) {
 
          final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
          final boolean isShowDirectionArrows = trackConfig.isShowDirectionArrow;
-         final int arrow_MinimumDistance = trackConfig.arrow_IsAnimate
+         int arrow_MinimumDistance = trackConfig.arrow_IsAnimate
 
                // use a smaller distance when animated to show the moving figure smoothly
-               ? 1 // trackConfig.arrow_MinimumDistanceAnimated
+               ? 1
 
                : trackConfig.arrow_MinimumDistance;
+
+         // this is vor debugging
+         arrow_MinimumDistance = trackConfig.arrow_MinimumDistance;
 
          final TourTrack_Bucket workerBucket = getWorkerBucket(task.__taskBucketManager);
 
@@ -266,8 +275,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          // flip around dateline
          int flip = 0;
 
-         int pixelX = (int) ((__projectedPoints[0] - compileMapPosX) * compileMaxMapPixel);
-         int pixelY = (int) ((__projectedPoints[1] - compileMapPosY) * compileMaxMapPixel);
+         float pixelX = (float) ((__projectedPoints[0] - compileMapPosX) * compileMaxMapPixel);
+         float pixelY = (float) ((__projectedPoints[1] - compileMapPosY) * compileMaxMapPixel);
 
          if (pixelX > maxMapPixel2) {
 
@@ -309,8 +318,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          for (int projectedPointIndex = 2; projectedPointIndex < numPoints * 2; projectedPointIndex += 2) {
 
             // convert projected points 0...1 into map pixel
-            pixelX = (int) ((__projectedPoints[projectedPointIndex + 0] - compileMapPosX) * compileMaxMapPixel);
-            pixelY = (int) ((__projectedPoints[projectedPointIndex + 1] - compileMapPosY) * compileMaxMapPixel);
+            pixelX = (float) ((__projectedPoints[projectedPointIndex + 0] - compileMapPosX) * compileMaxMapPixel);
+            pixelY = (float) ((__projectedPoints[projectedPointIndex + 1] - compileMapPosY) * compileMaxMapPixel);
 
             int flipDirection = 0;
 
@@ -642,7 +651,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       setIsUpdateLayer(true);
 
       // set start time for the animation
-      TourTrack_Shader.animation_StartTime = System.currentTimeMillis();
+      TourTrack_Shader.setAnimationStartTime();
    }
 
    @Override
