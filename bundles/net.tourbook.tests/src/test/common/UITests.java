@@ -89,7 +89,7 @@ public class UITests {
 
       setMetricSystem();
       //184cm -> 184cm
-      assertEquals(1f, UI.convertBodyHeightToMetric(1f, 0));
+      assertEquals(184f, UI.convertBodyHeightToMetric(184f, 0));
 
       setImperialSystem();
       //5ft11 -> 180.34cm
