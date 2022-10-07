@@ -81,14 +81,14 @@ public class TourBookViewTests extends UITest {
 
       Utils.showTourBookView(bot);
 
-      bot.viewByTitle("Tour Book").show();
+      bot.viewByTitle("Tour Book").show(); //$NON-NLS-1$
 
       // Get a tour that can be duplicated
       SWTBotTreeItem tour = bot.tree().getTreeItem("2014   1").expand() //$NON-NLS-1$
             .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
 
       // Duplicate the tour
-      tour.contextMenu("Duplicate Tour...").click();
+      tour.contextMenu("Duplicate Tour...").click(); //$NON-NLS-1$
 
       // Set a different date than today's date
       bot.dateTime(0).setDate(new Date(1420117200000L));
@@ -96,7 +96,7 @@ public class TourBookViewTests extends UITest {
       bot.dateTime(1).setDate(new Date(1420117200000L));
 
       //Save the tour
-      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click();
+      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
 
       tour = bot.tree().getTreeItem("2015   2").expand() //$NON-NLS-1$
             .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
@@ -114,7 +114,7 @@ public class TourBookViewTests extends UITest {
 
       //Check that the tour was successfully deleted
       final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
-      assertEquals("2015   1", allItems[2].getText());
+      assertEquals("2015   1", allItems[2].getText()); //$NON-NLS-1$
    }
 
    @Test
@@ -144,7 +144,7 @@ public class TourBookViewTests extends UITest {
    @Test
    void testNatTable() {
 
-      bot.viewByTitle("Tour Book").show();
+      bot.viewByTitle("Tour Book").show(); //$NON-NLS-1$
 
       //Activating the NatTable
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
@@ -156,7 +156,7 @@ public class TourBookViewTests extends UITest {
 
       botNatTable.click(1, 0);
       botNatTable.click(2, 0);
-      assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4));
+      assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
 
       //Deactivating the NatTable
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
