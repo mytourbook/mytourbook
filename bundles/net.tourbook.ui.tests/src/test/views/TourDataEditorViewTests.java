@@ -69,7 +69,7 @@ public class TourDataEditorViewTests extends UITest {
 
       final SWTBotTable timeSlicesTable = tourEditorViewBot.table();
 
-      assertEquals(9, timeSlicesTable.rowCount());
+      assertEquals(1897, timeSlicesTable.rowCount());
 
       timeSlicesTable.select(3);
 
