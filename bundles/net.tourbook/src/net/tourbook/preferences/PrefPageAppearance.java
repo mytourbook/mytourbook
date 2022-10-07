@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.preferences;
 
 import static org.eclipse.jface.viewers.LabelProvider.createTextProvider;
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
@@ -44,8 +45,7 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -74,7 +74,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
    private int                     _hintDefaultSpinnerWidth;
    private PixelConverter          _pc;
-   private SelectionAdapter        _defaultSelectionAdapter;
+   private SelectionListener       _defaultSelectionListener;
    private MouseWheelListener      _defaultMouseWheelListener;
 
    private ITheme                  _currentTheme;
@@ -146,7 +146,6 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
    }
 
    private void createUI_10_Theme(final Composite parent) {
-      // TODO Auto-generated method stub
 
       final Group group = new Group(parent, SWT.NONE);
       group.setText(Messages.Pref_Appearance_Group_Theme);
@@ -193,7 +192,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          _spinnerRecentTags.setToolTipText(Messages.pref_appearance_number_of_recent_tags_tooltip);
          _spinnerRecentTags.setMinimum(0);
          _spinnerRecentTags.setMaximum(9);
-         _spinnerRecentTags.addSelectionListener(_defaultSelectionAdapter);
+         _spinnerRecentTags.addSelectionListener(_defaultSelectionListener);
          _spinnerRecentTags.addMouseWheelListener(_defaultMouseWheelListener);
          GridDataFactory.fillDefaults()
                .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
@@ -212,7 +211,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 //				}
          _chkAutoOpenTagging = new Button(group, SWT.CHECK);
          _chkAutoOpenTagging.setText(Messages.Pref_Appearance_Check_AutoOpenTagging);
-         _chkAutoOpenTagging.addSelectionListener(_defaultSelectionAdapter);
+         _chkAutoOpenTagging.addSelectionListener(_defaultSelectionListener);
          _chkAutoOpenTagging.setToolTipText(Messages.Pref_Appearance_Label_AutoOpenTagging_Tooltip);
          GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkAutoOpenTagging);
 
@@ -230,7 +229,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
             _spinnerAutoOpenDelay = new Spinner(autoTagContainer, SWT.BORDER);
             _spinnerAutoOpenDelay.setMinimum(0);
             _spinnerAutoOpenDelay.setMaximum(3000);
-            _spinnerAutoOpenDelay.addSelectionListener(_defaultSelectionAdapter);
+            _spinnerAutoOpenDelay.addSelectionListener(_defaultSelectionListener);
             _spinnerAutoOpenDelay.addMouseWheelListener(_defaultMouseWheelListener);
             GridDataFactory.fillDefaults()
                   .hint(_hintDefaultSpinnerWidth, SWT.DEFAULT)
@@ -244,7 +243,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
             // check: show animation
             _chkTaggingAnimation = new Button(autoTagContainer, SWT.CHECK);
             _chkTaggingAnimation.setText(Messages.Pref_Appearance_Check_TaggingAnimation);
-            _chkTaggingAnimation.addSelectionListener(_defaultSelectionAdapter);
+            _chkTaggingAnimation.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().span(3, 1).applyTo(_chkTaggingAnimation);
          }
       }
@@ -294,12 +293,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          _btnResetAllToggleDialogs = new Button(parent, SWT.PUSH);
          _btnResetAllToggleDialogs.setText(Messages.Pref_Appearance_Button_ResetAllToggleDialogs);
          _btnResetAllToggleDialogs.setToolTipText(Messages.Pref_Appearance_Button_ResetAllToggleDialogs_Tooltip);
-         _btnResetAllToggleDialogs.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onResetAllToggleDialogs();
-            }
-         });
+         _btnResetAllToggleDialogs.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onResetAllToggleDialogs()));
          GridDataFactory.fillDefaults()
 //               .indent(0, 10)
                .align(SWT.BEGINNING, SWT.FILL)
@@ -347,13 +341,10 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
       _pc = new PixelConverter(parent);
       _hintDefaultSpinnerWidth = _isLinux ? SWT.DEFAULT : _pc.convertWidthInCharsToPixels(_isOSX ? 10 : 5);
 
-      _defaultSelectionAdapter = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onChangeProperty();
-            enableControls();
-         }
-      };
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> {
+         onChangeProperty();
+         enableControls();
+      });
 
       _defaultMouseWheelListener = mouseEvent -> {
          UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
