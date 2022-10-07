@@ -22,9 +22,9 @@ import org.junit.jupiter.api.extension.TestWatcher;
 public class CaptureScreenshotOnFailureExtension implements TestWatcher {
 
    private String constructFilename(final ExtensionContext context) {
-      return "./target/"
-            + context.getClass().getCanonicalName() + "."
-            + context.getTestMethod().get().getName() + ".png";
+      return "./target/" //$NON-NLS-1$
+            + context.getClass().getCanonicalName() + "." //$NON-NLS-1$
+            + context.getTestMethod().get().getName() + ".png"; //$NON-NLS-1$
    }
 
    @Override

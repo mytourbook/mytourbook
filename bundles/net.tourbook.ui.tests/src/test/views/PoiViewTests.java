@@ -32,13 +32,13 @@ public class PoiViewTests extends UITest {
    void testPoiSearch() {
 
       //Open the POI view
-      bot.toolbarButtonWithTooltip("Search for places and show them on the map (Ctrl+L)").click();
-      final SWTBotView viewByTitle = bot.viewByTitle("Search Places ");
+      bot.toolbarButtonWithTooltip("Search for places and show them on the map (Ctrl+L)").click(); //$NON-NLS-1$
+      final SWTBotView viewByTitle = bot.viewByTitle("Search Places "); //$NON-NLS-1$
       viewByTitle.show();
 
       final SWTBot poiViewBot = viewByTitle.bot();
 
-      poiViewBot.comboBox(0).setText("refuge");
+      poiViewBot.comboBox(0).setText("refuge"); //$NON-NLS-1$
       poiViewBot.button(Messages.Poi_View_Button_Search).click();
 
       bot.sleep(3000);
