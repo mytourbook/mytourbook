@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import net.tourbook.Messages;
 import net.tourbook.ui.UI;
 
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.jupiter.api.Test;
 
@@ -28,17 +27,17 @@ import utils.UITest;
 
 public class DialogDatabaseTests extends UITest {
 
-   @Test
-   void testCompressDatabase() {
-
-      bot.menu("Help").menu("Compress Database...").click(); //$NON-NLS-1$ //$NON-NLS-2$
-
+//   @Test
+//   void testCompressDatabase() {
+//
+//      bot.menu("Help").menu("Compress Database...").click(); //$NON-NLS-1$ //$NON-NLS-2$
+//
 //      bot.button(Messages.App_Db_Compress_Button_CompressByCopying).click();
 //      bot.button(Messages.App_Db_Compress_Button_CompressDatabase).click();
 //      bot.sleep(5000);
-
-      bot.button(IDialogConstants.CLOSE_LABEL).click();
-   }
+//
+//      bot.button(IDialogConstants.CLOSE_LABEL).click();
+//   }
 
    @Test
    void testDatabaseConsistency() {
