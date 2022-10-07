@@ -150,12 +150,12 @@ public class TourBookViewTests extends UITest {
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
 
-      SWTBotNatTable botNatTable = new SWTBotNatTable(
+      final SWTBotNatTable botNatTable = new SWTBotNatTable(
             bot.widget(widgetOfType(NatTable.class)));
       assertEquals(9, botNatTable.rowCount());
 
-      botNatTable.click(1, 0);
-      botNatTable = botNatTable.click(2, 0);
+      //  botNatTable.click(1, 0);
+      // botNatTable = botNatTable.click(2, 0);
       assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
 
       //Deactivating the NatTable
