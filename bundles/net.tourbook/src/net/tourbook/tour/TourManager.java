@@ -2672,7 +2672,6 @@ public class TourManager {
                                         final int firstRemovedIndex,
                                         final int lastRemovedIndex,
                                         final boolean isRemoveTime) {
-      // TODO Auto-generated method stub
 
       final int[] timeSerie = tourData.timeSerie;
       final long[] allPausedTime_Start = tourData.getPausedTime_Start();
