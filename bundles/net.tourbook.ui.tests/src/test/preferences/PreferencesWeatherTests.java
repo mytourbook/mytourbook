@@ -63,7 +63,7 @@ public class PreferencesWeatherTests extends UITest {
       testWorldWeatherOnlineConnection();
 
       //Restore the selection of OpenWeatherMap as the default weather vendor
-      bot.comboBox().setSelection(0);
+      bot.comboBox().setSelection(1);
 
       bot.button("Apply and Close").click(); //$NON-NLS-1$
    }
