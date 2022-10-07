@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import net.tourbook.Messages;
 import net.tourbook.ui.UI;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +37,7 @@ public class DialogDatabaseTests extends UITest {
       bot.button(Messages.App_Db_Compress_Button_CompressDatabase).click();
       bot.sleep(5000);
 
-      bot.button("Close").click(); //$NON-NLS-1$
+      bot.button(IDialogConstants.CLOSE_LABEL).click();
    }
 
    @Test
