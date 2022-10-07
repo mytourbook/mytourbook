@@ -29,8 +29,12 @@ public class DialogDatabaseTests extends UITest {
 
    @Test
    void testCompressDatabase() {
-//todo fb click on the bittons
+
       bot.menu("Help").menu("Compress Database...").click(); //$NON-NLS-1$ //$NON-NLS-2$
+
+      bot.button(Messages.App_Db_Compress_Button_CompressByCopying).click();
+      bot.button(Messages.App_Db_Compress_Button_CompressDatabase).click();
+      bot.sleep(3000);
 
       bot.button("Close").click(); //$NON-NLS-1$
    }
