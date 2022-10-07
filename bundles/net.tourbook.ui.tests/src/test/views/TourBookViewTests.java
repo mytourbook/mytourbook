@@ -157,7 +157,7 @@ public class TourBookViewTests extends UITest {
       botNatTable.click(1, 0);
       botNatTable.click(2, 0);
       //   TourBookViewTests.testNatTable:159 expected: <0:10> but was: <>
-      //assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
+      assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
 
       //Deactivating the NatTable
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
