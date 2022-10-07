@@ -57,17 +57,17 @@ public class TourDataEditorViewTests extends UITest {
       bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
    }
 
-  // @Test
- //  void testRemoveTimeSlice() {
-//todo fb
-     // Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
+   @Test
+   void testRemoveTimeSlice() {
 
-   //   bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
+      Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
 
-    //  bot.table().select(3);
-    //  bot.table().contextMenu(Messages.action_tour_editor_delete_time_slices_keep_time).click();
-    //  bot.button("OK").click();
-   //}
+      bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
+
+      bot.table().select(3);
+      bot.table().contextMenu(Messages.action_tour_editor_delete_time_slices_keep_time).click();
+      bot.button("OK").click();
+   }
 
    @Test
    void testViewTabs() {
