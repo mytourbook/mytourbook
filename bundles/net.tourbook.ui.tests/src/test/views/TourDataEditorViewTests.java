@@ -27,6 +27,7 @@ import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotDateTime;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -62,14 +63,17 @@ public class TourDataEditorViewTests extends UITest {
    @Test
    void testRemoveTimeSlice() {
 
-      Utils.getTour(bot);
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
       final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME).bot();
 
       bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
 
       SWTBotTable timeSlicesTable = tourEditorViewBot.table();
 
-      assertEquals(1897, timeSlicesTable.rowCount());
+      assertEquals(16829, timeSlicesTable.rowCount());
 
       timeSlicesTable.select(3);
 
@@ -82,7 +86,7 @@ public class TourDataEditorViewTests extends UITest {
       bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
 
       //Ensuring that the time slice was deleted
-      assertEquals(1896, timeSlicesTable.rowCount());
+      assertEquals(16828, timeSlicesTable.rowCount());
    }
 
    @Test
