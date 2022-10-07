@@ -150,13 +150,12 @@ public class TourBookViewTests extends UITest {
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
 
-      final SWTBotNatTable botNatTable = new SWTBotNatTable(
+      SWTBotNatTable botNatTable = new SWTBotNatTable(
             bot.widget(widgetOfType(NatTable.class)));
       assertEquals(9, botNatTable.rowCount());
 
       botNatTable.click(1, 0);
-      botNatTable.click(2, 0);
-      //   TourBookViewTests.testNatTable:159 expected: <0:10> but was: <>
+      botNatTable = botNatTable.click(2, 0);
       assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
 
       //Deactivating the NatTable
