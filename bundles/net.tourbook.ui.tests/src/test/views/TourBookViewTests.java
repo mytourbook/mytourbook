@@ -161,4 +161,19 @@ public class TourBookViewTests extends UITest {
       //Deactivating the NatTable
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
    }
+
+   @Test
+   void testRetrieveWeatherData() {
+
+      Utils.showTourBookView(bot);
+      final SWTBotTreeItem tour = Utils.getTour(bot);
+
+      tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
+            .menu(Messages.tour_editor_section_weather)
+            .menu(Messages.Tour_Action_RetrieveWeatherData).click();
+
+      final List<?> logs = TourLogManager.getLogs();
+      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+            "Error while retrieving the weather data: \"{\"cod\":\"400\",\"message\":\"requested time is out of allowed range of 5 days back\"}\"")));//$NON-NLS-1$
+   }
 }
