@@ -73,7 +73,7 @@ public class TourBookViewTests extends UITest {
 
       //Check the new computed distance
       tour = Utils.getTour(bot);
-      assertEquals("0.551", tour.cell(tourBookView_Distance_Column_Index)); //$NON-NLS-1$
+      assertEquals("0.550", tour.cell(tourBookView_Distance_Column_Index)); //$NON-NLS-1$
    }
 
    @Test
