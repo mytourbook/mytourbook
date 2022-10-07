@@ -32,16 +32,16 @@ public class StatisticsViewTests extends UITest {
    @Test
    public void testStatisticsView() {
 
-      final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.STATISTICS_VIEW_NAME).bot();
+      final SWTBot statisticsViewBot = Utils.showView(bot, Utils.STATISTICS_VIEW_NAME).bot();
       bot.sleep(3000);
 
-      final SWTBotCombo statisticsTypeComboBox = tourEditorViewBot.comboBox(0);
+      final SWTBotCombo statisticsTypeComboBox = statisticsViewBot.comboBox(0);
       assertEquals(27, statisticsTypeComboBox.itemCount());
       assertNotNull(statisticsTypeComboBox);
       statisticsTypeComboBox.setSelection(0);
       assertEquals("Daytime", statisticsTypeComboBox.selection());
 
-      final SWTBotCombo yearComboBox = tourEditorViewBot.comboBox(2);
+      final SWTBotCombo yearComboBox = statisticsViewBot.comboBox(2);
       assertNotNull(yearComboBox);
       assertEquals(11, yearComboBox.itemCount());
       yearComboBox.setSelection("9");

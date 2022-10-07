@@ -23,8 +23,10 @@ import java.util.Date;
 
 import net.tourbook.Messages;
 
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotDateTime;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -60,12 +62,18 @@ public class TourDataEditorViewTests extends UITest {
    @Test
    void testRemoveTimeSlice() {
 
-      Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
+      Utils.getTour(bot);
+      final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME).bot();
 
       bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
 
-      bot.table().select(3);
-      bot.table().contextMenu(Messages.action_tour_editor_delete_time_slices_keep_time).click();
+      final SWTBotTable timeSlicesTable = tourEditorViewBot.table();
+
+      assertEquals(9, timeSlicesTable.rowCount());
+
+      timeSlicesTable.select(3);
+
+      timeSlicesTable.contextMenu(Messages.action_tour_editor_delete_time_slices_keep_time).click();
       bot.button("OK").click();
    }
 
