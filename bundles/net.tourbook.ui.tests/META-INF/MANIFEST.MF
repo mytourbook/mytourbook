@@ -3,8 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: GUI tests suite for MyTourbook
 Bundle-SymbolicName: net.tourbook.ui.tests;singleton:=true
 Bundle-Version: 22.8.0.qualifier
-Import-Package: org.eclipse.nebula.widgets,
-org.eclipse.nebula.widgets.nattable
+Import-Package: org.eclipse.nebula.widgets.nattable
 Require-Bundle: net.tourbook,
  net.tourbook.common,
  net.tourbook.export,
@@ -12,7 +11,6 @@ Require-Bundle: net.tourbook,
  org.junit.jupiter.api,
  org.eclipse.swtbot.go,
  net.tourbook.statistics,
- org.eclipse.nebula.widgets.nattable,
  org.eclipse.swtbot.nebula.nattable.finder
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
