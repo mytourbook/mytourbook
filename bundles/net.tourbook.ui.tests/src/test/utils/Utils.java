@@ -17,8 +17,6 @@ package utils;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import net.tourbook.Messages;
-
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
@@ -26,20 +24,21 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 public class Utils {
 
-   private static final String TOURBOOK_VIEW_NAME    = "Tour Book";                    //$NON-NLS-1$
-   public static final String  TOUREDITOR_VIEW_NAME  = "Tour Editor";                  //$NON-NLS-1$
-   public static final String  TOURMARKERS_VIEW_NAME = "Tour Markers";                 //$NON-NLS-1$
-   public static final String  STATISTICS_VIEW_NAME  = "Statistics";                   //$NON-NLS-1$
-   public static final String  TOOLS                 = "Tools ";                       //$NON-NLS-1$
-   public static final String  SAVE_MODIFIED_TOUR    = "Save modified tour (Ctrl+S)";  //$NON-NLS-1$
+   private static final String TOURBOOK_VIEW_NAME      = "Tour Book";                    //$NON-NLS-1$
+   public static final String  TOUREDITOR_VIEW_NAME    = "Tour Editor";                  //$NON-NLS-1$
+   public static final String  TOURMARKERS_VIEW_NAME   = "Tour Markers";                 //$NON-NLS-1$
+   public static final String  TOURSEGMENTER_VIEW_NAME = "Tour Segmenter";               //$NON-NLS-1$
+   public static final String  STATISTICS_VIEW_NAME    = "Statistics";                   //$NON-NLS-1$
+   public static final String  TOOLS                   = "Tools ";                       //$NON-NLS-1$
+   public static final String  SAVE_MODIFIED_TOUR      = "Save modified tour (Ctrl+S)";  //$NON-NLS-1$
 
-   public static final String  workingDirectory      = System.getProperty("user.dir"); //$NON-NLS-1$
+   public static final String  workingDirectory        = System.getProperty("user.dir"); //$NON-NLS-1$
 
    public static SWTBotTreeItem getTour(final SWTWorkbenchBot bot) {
 
       showTourBookView(bot);
 
-      bot.toolbarButtonWithTooltip(Messages.App_Action_CollapseAll).click();
+      // bot.toolbarButtonWithTooltip(Messages.App_Action_CollapseAll).click();
 
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand() //$NON-NLS-1$
             .getNode("Jan   2").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$

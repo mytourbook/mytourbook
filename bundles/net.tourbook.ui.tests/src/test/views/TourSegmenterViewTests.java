@@ -38,8 +38,8 @@ public class TourSegmenterViewTests extends UITest {
             .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
-      Utils.showViewFromMenu(bot, Utils.TOOLS, "Tour Segmenter"); //$NON-NLS-1$
-      final SWTBot tourSegmenterViewBot = Utils.showView(bot, "Tour Segmenter").bot(); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.TOURSEGMENTER_VIEW_NAME);
+      final SWTBot tourSegmenterViewBot = Utils.showView(bot, Utils.TOURSEGMENTER_VIEW_NAME).bot();
 
       final SWTBotTable tableSegments = tourSegmenterViewBot.table();
 
@@ -74,5 +74,20 @@ public class TourSegmenterViewTests extends UITest {
 
       segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_Surfing);
       assertEquals("0:17", tableSegments.cell(0, 0)); //$NON-NLS-1$
+   }
+
+   @Test
+   void testSelectSegments() {
+
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.TOURSEGMENTER_VIEW_NAME);
+      final SWTBot tourSegmenterViewBot = Utils.showView(bot, Utils.TOURSEGMENTER_VIEW_NAME).bot();
+
+      final SWTBotTable tableSegments = tourSegmenterViewBot.table();
+      tableSegments.select(0);
+      tableSegments.select(1);
    }
 }

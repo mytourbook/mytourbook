@@ -80,9 +80,6 @@ public class WorkbenchTests extends UITest {
       bot.button("Open").click(); //$NON-NLS-1$
       Utils.showView(bot, "Tour Data"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, Utils.TOOLS, "Tour Segmenter"); //$NON-NLS-1$
-      Utils.showView(bot, "Tour Segmenter"); //$NON-NLS-1$
-
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Tour Analyzer"); //$NON-NLS-1$
       Utils.showView(bot, "Tour Analyzer"); //$NON-NLS-1$
 
