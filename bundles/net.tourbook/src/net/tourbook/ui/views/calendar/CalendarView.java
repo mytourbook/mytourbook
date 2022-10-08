@@ -605,7 +605,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
       if (null != _calendarGraph) {
 
-         BusyIndicator.showWhile(Display.getCurrent(), () -> _calendarGraph.refreshCalendar());
+         BusyIndicator.showWhile(Display.getCurrent(), _calendarGraph::refreshCalendar);
       }
    }
 
