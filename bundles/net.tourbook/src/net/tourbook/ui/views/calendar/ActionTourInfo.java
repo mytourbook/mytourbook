@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.calendar;
 
-import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
-
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -25,6 +23,12 @@ import net.tourbook.common.tooltip.IOpeningDialog;
 
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -69,9 +73,12 @@ public class ActionTourInfo extends ContributionItem implements IOpeningDialog {
 
       if (_actionToolItem == null && toolbar != null) {
 
-         toolbar.addDisposeListener(disposeEvent -> {
-            _actionToolItem.dispose();
-            _actionToolItem = null;
+         toolbar.addDisposeListener(new DisposeListener() {
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+               _actionToolItem.dispose();
+               _actionToolItem = null;
+            }
          });
 
          _toolBar = toolbar;
@@ -79,18 +86,26 @@ public class ActionTourInfo extends ContributionItem implements IOpeningDialog {
          _actionToolItem = new ToolItem(toolbar, SWT.CHECK);
          _actionToolItem.setImage(_imageEnabled);
          _actionToolItem.setDisabledImage(_imageDisabled);
-         _actionToolItem.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAction()));
+         _actionToolItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+               onAction();
+            }
+         });
 
          if (_stateIsSelected != null) {
             _actionToolItem.setSelection(_stateIsSelected);
          }
 
-         toolbar.addMouseMoveListener(mouseEvent -> {
+         toolbar.addMouseMoveListener(new MouseMoveListener() {
+            @Override
+            public void mouseMove(final MouseEvent e) {
 
-            final Point mousePosition = new Point(mouseEvent.x, mouseEvent.y);
-            final ToolItem hoveredItem = toolbar.getItem(mousePosition);
+               final Point mousePosition = new Point(e.x, e.y);
+               final ToolItem hoveredItem = toolbar.getItem(mousePosition);
 
-            onMouseMove(hoveredItem);
+               onMouseMove(hoveredItem, e);
+            }
          });
 
          _slideoutTourInfo = new SlideoutTourInfo(_parent, _toolBar, _calendarView);
@@ -147,7 +162,7 @@ public class ActionTourInfo extends ContributionItem implements IOpeningDialog {
       }
    }
 
-   private void onMouseMove(final ToolItem item) {
+   private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {
 
       // ignore other items
       if (item != _actionToolItem) {
