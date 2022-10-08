@@ -26,6 +26,13 @@ public class PrefPagePeopleTests extends UITest {
    @Test
    void testPeopleBmi() {
 
+      //todo fb to put in its own file
+      
+      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
+      bot.tree().getTreeItem("Appearance").select(); //$NON-NLS-1$
+            bot.button("Apply and Close").click(); //$NON-NLS-1$
+
+      
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
 
