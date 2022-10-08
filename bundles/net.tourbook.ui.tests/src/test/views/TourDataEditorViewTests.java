@@ -45,6 +45,7 @@ public class TourDataEditorViewTests extends UITest {
       final String newTourTitle = "New Tour Title"; //$NON-NLS-1$
 
       bot.comboBox().setText(newTourTitle);
+//todo fb code smell, define the below string in utils
       bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
 
       Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
