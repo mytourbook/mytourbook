@@ -45,8 +45,7 @@ public class TourDataEditorViewTests extends UITest {
       final String newTourTitle = "New Tour Title"; //$NON-NLS-1$
 
       bot.comboBox().setText(newTourTitle);
-//todo fb code smell, define the below string in utils
-      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
+      bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
       Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
 
@@ -58,7 +57,7 @@ public class TourDataEditorViewTests extends UITest {
       tourDateTime.setDate(Date.from(Instant.now()));
       assertNotNull(tourDateTime);
 
-      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
+      bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
    }
 
    @Test
@@ -85,7 +84,7 @@ public class TourDataEditorViewTests extends UITest {
       timeSlicesTable = tourEditorViewBot.table();
       timeSlicesTable.contextMenu(Messages.action_tour_editor_delete_time_slices_keep_time).click();
 
-      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
+      bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
       //Ensuring that the time slice was deleted
       assertEquals(16828, timeSlicesTable.rowCount());

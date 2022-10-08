@@ -96,7 +96,7 @@ public class TourBookViewTests extends UITest {
       bot.dateTime(1).setDate(new Date(1420117200000L));
 
       //Save the tour
-      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
+      bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
       tour = bot.tree().getTreeItem("2015   2").expand() //$NON-NLS-1$
             .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$

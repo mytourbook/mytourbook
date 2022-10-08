@@ -31,6 +31,7 @@ public class Utils {
    public static final String  TOURMARKERS_VIEW_NAME = "Tour Markers";                 //$NON-NLS-1$
    public static final String  STATISTICS_VIEW_NAME  = "Statistics";                   //$NON-NLS-1$
    public static final String  TOOLS                 = "Tools ";                       //$NON-NLS-1$
+   public static final String  SAVE_MODIFIED_TOUR    = "Save modified tour (Ctrl+S)";  //$NON-NLS-1$
 
    public static final String  workingDirectory      = System.getProperty("user.dir"); //$NON-NLS-1$
 

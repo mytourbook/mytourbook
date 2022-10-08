@@ -50,7 +50,7 @@ public class TourMarkerViewTests extends UITest {
       timeSlicesTable.select(0);
       timeSlicesTable.contextMenu(Messages.tourCatalog_view_action_create_marker).click();
       bot.button("Save ").click(); //$NON-NLS-1$
-      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
+      bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
       //Open the Tour Marker View
       Utils.openOtherMenu(bot);

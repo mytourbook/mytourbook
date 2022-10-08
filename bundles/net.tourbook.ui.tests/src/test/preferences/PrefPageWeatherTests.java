@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 
-public class PreferencesWeatherTests extends UITest {
+public class PrefPageWeatherTests extends UITest {
 
    private void testVendorConnection(final String vendorName) {
 

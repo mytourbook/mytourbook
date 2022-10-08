@@ -15,28 +15,17 @@
  *******************************************************************************/
 package preferences;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 
-public class PrefPagePeopleTests extends UITest {
+public class PrefPageAppearanceTests extends UITest {
 
    @Test
-   void testPeopleBmi() {
+   void testAppearance() {
 
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
-      bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
-
-      //70kg
-      bot.spinner(0).setSelection(700);
-      //1.80m
-      bot.spinner(1).setSelection(180);
-
-      //21.6 BMI
-      assertEquals("21.6", bot.text(3).getText()); //$NON-NLS-1$
-
+      bot.tree().getTreeItem("Appearance").select(); //$NON-NLS-1$
       bot.button("Apply and Close").click(); //$NON-NLS-1$
    }
 }
