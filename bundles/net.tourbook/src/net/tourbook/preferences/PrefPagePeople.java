@@ -1111,7 +1111,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          /*
-          * button: compute speed values for all tours
+          * Button: compute HR zones
           */
          _btnComputeHrZonesForAllTours = new Button(container, SWT.NONE);
          _btnComputeHrZonesForAllTours.setText(Messages.Pref_People_Button_HrZones_ComputeAllTours);
