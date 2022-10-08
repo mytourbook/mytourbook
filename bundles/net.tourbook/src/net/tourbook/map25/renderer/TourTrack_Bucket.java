@@ -1018,7 +1018,7 @@ public class TourTrack_Bucket {
       float p1X = allDirectionArrowPixel[pixelIndex++];
       float p1Y = allDirectionArrowPixel[pixelIndex++];
 
-      float prevAnimatedAngle = 0;
+      float prevAngle = 0;
 
       for (; pixelIndex < allDirectionArrowPixel.length;) {
 
@@ -1032,73 +1032,105 @@ public class TourTrack_Bucket {
 
          final float p21Angle = (float) MtMath.angleOf(p1X, p1Y, p2X, p2Y);
 
+         float animatedAngle = p21Angle; 
+
+         float angleDiff;
+         if (pixelIndex < 5) {
+            // skip first position -> previous angle is undefined
+            angleDiff = 0;
+         } else {
+            angleDiff = getAngleDiff(p21Angle, prevAngle);
+         }
+
          final float minSmoothAngle = 10;
 
-         final float animatedAngle = 0;
+         if (Math.abs(angleDiff) > minSmoothAngle) {
 
-//         if (p21Angle < minSmoothAngle) {
-//
-//            // default angle is smaller than the min smooth angle -> animation is smooth
-//
-//         animatedAngle = (float) p21Angle;
-//         animatedUnitX = p21UnitX;
-//         animatedUnitY = p21UnitY;
-//
-//         } else {
-//
-//            /**
-//             * Default angle is larger than the min smooth angle
-//             * <p>
-//             * -> compute direction units for the min smooth angle
-//             */
-//
-//            animatedAngle = prevAnimatedAngle - minSmoothAngle;
-//
-//            final Matrix angleMatrix = Matrix.fromRotationZ(Angle.fromDegrees(animatedAngle));
-//            p2Vec = p1Vec.transformBy3(angleMatrix);
-//
-////            isLarger = true;
-//         }
+            // default angle is larger than the min smooth angle
+            // -> smoothout the animation with a smallers angle
 
-         animatedForwardAngle.add(p21Angle - 90);
+            /*
+             * Find the smallest angle diff to the current position
+             */
+            final float prevAngle1Smooth = prevAngle + minSmoothAngle;
+            final float prevAngle2Smooth = prevAngle - minSmoothAngle;
 
-//         if (pixelIndex < 2000) {
-//
-//            System.out.println(String.format(""
-//
-//                  + "%3d"
-//
-//                  + "  P2 %6.0f %6.0f"
-//
-//                  + "  Rot ° %5.1f"
-//                  + "  Axis ° %5.1f"
-//
-//                  ,
-//
-//                  pixelIndex,
-//
-//                  p2X,
-//                  p2Y,
-//
-//                  p21Angle,
-//                  axisAngle
-//
-//            ));
-//            // TODO remove SYSTEM.OUT.PRINTLN
-//         }
+            final float angleDiff1 = getShortestAngle(p21Angle, prevAngle1Smooth);
+            final float angleDiff2 = getShortestAngle(p21Angle, prevAngle2Smooth);
+
+            // use the smallest difference
+            animatedAngle = angleDiff1 > angleDiff2
+                  ? prevAngle1Smooth
+                  : prevAngle2Smooth;
+         }
+
+         animatedAngle = animatedAngle % 360;
+
+         animatedForwardAngle.add(animatedAngle - 90);
+
+         if (pixelIndex < 40) {
+
+            System.out.println(String.format(""
+
+                  + "%3d"
+
+                  + "  p21 %5.0f°"
+                  + "  Anim %5.0f°"
+                  + "  Diff %5.0f°"
+
+                  ,
+
+                  pixelIndex,
+
+                  p21Angle,
+                  animatedAngle,
+                  angleDiff
+
+            ));
+            // TODO remove SYSTEM.OUT.PRINTLN
+         }
 
          // setup next position
          p1X = p2X;
          p1Y = p2Y;
 
-         prevAnimatedAngle = animatedAngle;
+         prevAngle = animatedAngle;
       }
 
-//      System.out.println();
-//      System.out.println();
-//      System.out.println();
+      System.out.println();
+      System.out.println();
 //      // TODO remove SYSTEM.OUT.PRINTLN
 
    }
 
+   /**
+    * Source:
+    * https://stackoverflow.com/questions/1878907/how-can-i-find-the-difference-between-two-angles
+    *
+    * @param angle1
+    * @param angle2
+    * @return Returns the difference between two angles 0...360
+    */
+   private float getAngleDiff(final float angle1, final float angle2) {
+
+      float angleDiff = angle1 - angle2;
+
+      angleDiff = (angleDiff + 540) % 360 - 180;
+
+      return angleDiff;
+   }
+
+   /**
+    * Source:
+    * https://stackoverflow.com/questions/2708476/rotation-interpolation
+    *
+    * @param angle1
+    * @param angle2
+    * @return Returns the difference between two angles 0...360
+    */
+   private float getShortestAngle(final float angle1, final float angle2) {
+
+      return ((((angle1 - angle2) % 360) + 540) % 360) - 180;
+
+   }
 }

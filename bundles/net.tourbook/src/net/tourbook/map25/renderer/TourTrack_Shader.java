@@ -243,12 +243,18 @@ public final class TourTrack_Shader {
 
          if (trackConfig.arrow_IsAnimate) {
 
-// for debugging reset position
-//            _animation_CurrentPositionIndex = 0;
-//            setAnimationStartTime();
+            final boolean isDebug = true; 
+            if (isDebug) {
 
-            // set position to the previous relative position
-            _animation_IsUseRelativePosition = true;
+               // for debugging reset position
+               _animation_CurrentPositionIndex = 0;
+               setAnimationStartTime();
+
+            } else {
+
+               // set position to the previous relative position
+               _animation_IsUseRelativePosition = true;
+            }
 
             /*
              * Animation
