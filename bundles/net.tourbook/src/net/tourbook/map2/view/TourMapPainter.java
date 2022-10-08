@@ -3092,8 +3092,7 @@ public class TourMapPainter extends Map2Painter {
     * @param tourData
     * @param mp
     * @param mapZoomLevel
-    * @param latitudeSerie
-    * @param longitudeSerie
+    * @param tourWayPoints
     * @param projectionHash
     * @return
     */
