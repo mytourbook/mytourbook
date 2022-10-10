@@ -189,4 +189,28 @@ public class UITests {
       //10km/h -> 5.4knots
       assertEquals(5.399568f, UI.convertSpeed_FromMetric(10));
    }
+
+   @Test
+   void testConvertTemperatureFromMetric() {
+
+      setMetricSystem();
+      //10C -> 10C
+      assertEquals(10, UI.convertTemperatureFromMetric(10));
+
+      setImperialSystem();
+      //10C -> 50F
+      assertEquals(50f, UI.convertTemperatureFromMetric(10));
+   }
+
+   @Test
+   void testConvertTemperatureToMetric() {
+
+      setMetricSystem();
+      //10C -> 10C
+      assertEquals(10, UI.convertTemperatureToMetric(10));
+
+      setImperialSystem();
+      //50F -> 10C
+      assertEquals(10f, UI.convertTemperatureToMetric(50));
+   }
 }
