@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.preferences.ITourbookPreferences;
 
 import org.eclipse.e4.ui.di.PersistState;
@@ -295,8 +296,8 @@ public class PoiView extends ViewPart implements PropertyChangeListener {
             /*
              * label: POI
              */
-            final Label label = new Label(queryContainer, SWT.NONE);
-            label.setText(Messages.Poi_View_Label_POI);
+
+            final Label label = UI.createLabel(queryContainer, Messages.Poi_View_Label_POI);
             label.setToolTipText(Messages.Poi_View_Label_POI_Tooltip);
          }
          {
