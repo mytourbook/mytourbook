@@ -109,6 +109,18 @@ public class UITests {
    }
 
    @Test
+   void testConvertBodyWeightToMetric() {
+
+      setMetricSystem();
+      //70kg -> 70kg
+      assertEquals(70f, UI.convertBodyWeightToMetric(70));
+
+      setImperialSystem();
+      //154.3lbs -> 70kg
+      assertEquals(70, UI.convertBodyWeightToMetric(154.32361f));
+   }
+
+   @Test
    void testConvertPrecipitation_FromMetric() {
 
       setMetricSystem();
