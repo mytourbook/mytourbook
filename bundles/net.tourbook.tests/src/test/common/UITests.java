@@ -17,6 +17,7 @@ package common;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import net.tourbook.common.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 
@@ -212,5 +213,57 @@ public class UITests {
       setImperialSystem();
       //50F -> 10C
       assertEquals(10f, UI.convertTemperatureToMetric(50));
+   }
+
+   @Test
+   void testGetCardinalDirectionText() {
+
+      //0° -> N
+      assertEquals(Messages.Weather_WindDirection_N, UI.getCardinalDirectionText(0));
+
+      //20° -> NNE
+      assertEquals(Messages.Weather_WindDirection_NNE, UI.getCardinalDirectionText(20));
+
+      //45° -> NE
+      assertEquals(Messages.Weather_WindDirection_NE, UI.getCardinalDirectionText(45));
+
+      //65° -> ENE
+      assertEquals(Messages.Weather_WindDirection_ENE, UI.getCardinalDirectionText(65));
+
+      //90° -> E
+      assertEquals(Messages.Weather_WindDirection_E, UI.getCardinalDirectionText(90));
+
+      //105° -> ESE
+      assertEquals(Messages.Weather_WindDirection_ESE, UI.getCardinalDirectionText(105));
+
+      //130° -> SE
+      assertEquals(Messages.Weather_WindDirection_SE, UI.getCardinalDirectionText(130));
+
+      //150° -> SSE
+      assertEquals(Messages.Weather_WindDirection_SSE, UI.getCardinalDirectionText(150));
+
+      //180° -> S
+      assertEquals(Messages.Weather_WindDirection_S, UI.getCardinalDirectionText(180));
+
+      //200° -> SSW
+      assertEquals(Messages.Weather_WindDirection_SSW, UI.getCardinalDirectionText(200));
+
+      //220° -> SW
+      assertEquals(Messages.Weather_WindDirection_SW, UI.getCardinalDirectionText(220));
+
+      //240° -> WSW
+      assertEquals(Messages.Weather_WindDirection_WSW, UI.getCardinalDirectionText(240));
+
+      //270° -> W
+      assertEquals(Messages.Weather_WindDirection_W, UI.getCardinalDirectionText(270));
+
+      //290° -> WNW
+      assertEquals(Messages.Weather_WindDirection_WNW, UI.getCardinalDirectionText(290));
+
+      //310° -> NW
+      assertEquals(Messages.Weather_WindDirection_NW, UI.getCardinalDirectionText(310));
+
+      //330° -> NNW
+      assertEquals(Messages.Weather_WindDirection_NNW, UI.getCardinalDirectionText(330));
    }
 }

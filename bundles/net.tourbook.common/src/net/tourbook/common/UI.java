@@ -1578,7 +1578,7 @@ public class UI {
 
    /**
     * @param degreeDirection
-    *           The degree value is multiplied by 10, 0°...3600°
+    *           The degree value, 0°...360°
     * @return Returns cardinal direction text
     */
    public static String getCardinalDirectionText(final int degreeDirection) {
@@ -1588,7 +1588,7 @@ public class UI {
 
    /**
     * @param degreeDirection
-    *           The degree value is multiplied by 10, 0°...3600°
+    *           The degree value, 0°...360°
     * @return Returns cardinal direction index for {@link IWeather#windDirectionText}
     */
    public static int getCardinalDirectionTextIndex(final int degreeDirection) {

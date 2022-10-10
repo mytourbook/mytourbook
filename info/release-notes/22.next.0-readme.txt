@@ -68,6 +68,9 @@ Bugfix
 * 2D Map
   - Fixed: Can't download SRTM-Data             https://github.com/mytourbook/mytourbook/issues/928
 
+* Tour Info toolip (Frederic)
+  - Fixed a bug where the wind's cardinal value was erroneous
+
 
 Translation    
 ===========

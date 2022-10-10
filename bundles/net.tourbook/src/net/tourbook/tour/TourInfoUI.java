@@ -1758,7 +1758,7 @@ public class TourInfoUI {
       _lblWindDirection.setText(Integer.toString(weatherWindDirectionDegree));
       _lblWindDirectionUnit.setText(String.format(
             Messages.Tour_Tooltip_Format_WindDirectionUnit,
-            UI.getCardinalDirectionText(weatherWindDirectionDegree * 10)));
+            UI.getCardinalDirectionText(weatherWindDirectionDegree)));
 
       // Average temperature
       final float temperature_NoDevice = _tourData.getWeather_Temperature_Average();
