@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import net.tourbook.Messages;
 
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
@@ -39,7 +40,8 @@ public class TourSegmenterViewTests extends UITest {
       assertNotNull(tour);
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.TOURSEGMENTER_VIEW_NAME);
-      final SWTBot tourSegmenterViewBot = Utils.showView(bot, Utils.TOURSEGMENTER_VIEW_NAME).bot();
+      final SWTBotView tourSegmenterView = Utils.showView(bot, Utils.TOURSEGMENTER_VIEW_NAME);
+      final SWTBot tourSegmenterViewBot = tourSegmenterView.bot();
 
       final SWTBotTable tableSegments = tourSegmenterViewBot.table();
 
@@ -74,6 +76,7 @@ public class TourSegmenterViewTests extends UITest {
 
       segmenterMethodCombo.setSelection(Messages.Tour_Segmenter_Type_Surfing);
       assertEquals("0:17", tableSegments.cell(0, 0)); //$NON-NLS-1$
+      tourSegmenterView.close();
    }
 
    @Test
@@ -84,10 +87,12 @@ public class TourSegmenterViewTests extends UITest {
       assertNotNull(tour);
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, Utils.TOURSEGMENTER_VIEW_NAME);
-      final SWTBot tourSegmenterViewBot = Utils.showView(bot, Utils.TOURSEGMENTER_VIEW_NAME).bot();
+      final SWTBotView tourSegmenterView = Utils.showView(bot, Utils.TOURSEGMENTER_VIEW_NAME);
 
-      final SWTBotTable tableSegments = tourSegmenterViewBot.table();
+      final SWTBotTable tableSegments = tourSegmenterView.bot().table();
       tableSegments.select(0);
       tableSegments.select(1);
+
+      tourSegmenterView.close();
    }
 }
