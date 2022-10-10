@@ -27,6 +27,7 @@ import net.tourbook.Messages;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
@@ -144,19 +145,19 @@ public class TourBookViewTests extends UITest {
    @Test
    void testNatTable() {
 
-      bot.viewByTitle("Tour Book").show(); //$NON-NLS-1$
+      final SWTBotView tourBookView = Utils.showTourBookView(bot);
 
       //Activating the NatTable
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
 
       final SWTBotNatTable botNatTable = new SWTBotNatTable(
-            bot.widget(widgetOfType(NatTable.class)));
+            tourBookView.bot().widget(widgetOfType(NatTable.class)));
       assertEquals(9, botNatTable.rowCount());
 
       botNatTable.click(1, 0);
-      // botNatTable = botNatTable.click(2, 0);
-      //assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
+      botNatTable.click(2, 0);
+      assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
 
       //Deactivating the NatTable
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
