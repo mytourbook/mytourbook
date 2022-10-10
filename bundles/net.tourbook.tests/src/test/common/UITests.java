@@ -155,4 +155,16 @@ public class UITests {
       //1026mbar -> 30.3in
       assertEquals(30.29778f, UI.convertPressure_FromMetric(1026));
    }
+
+   @Test
+   void testConvertPressure_ToMetric() {
+
+      setMetricSystem();
+      //1026mbar -> 1026mbar
+      assertEquals(1026, UI.convertPressure_ToMetric(1026));
+
+      setImperialSystem();
+      //30.3in -> 1026mbar
+      assertEquals(1026, UI.convertPressure_ToMetric(30.29778f));
+   }
 }
