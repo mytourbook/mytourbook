@@ -61,7 +61,7 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
           * OpenWeatherMap webpage
           */
          final Link linkApiSignup = new Link(container, SWT.PUSH);
-         linkApiSignup.setText(UI.LINK_TAG_START + URL_OPENWEATHERMAP_ORG + UI.LINK_TAG_END);
+         linkApiSignup.setText(UI.getLinkFromText(URL_OPENWEATHERMAP_ORG));
          linkApiSignup.setEnabled(true);
          linkApiSignup.addListener(SWT.Selection, event -> WEB.openUrl(URL_OPENWEATHERMAP_ORG));
 

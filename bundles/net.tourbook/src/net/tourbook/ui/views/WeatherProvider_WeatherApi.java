@@ -61,7 +61,7 @@ public class WeatherProvider_WeatherApi implements IWeatherProvider {
           * Weather API webpage
           */
          final Link linkApiSignup = new Link(container, SWT.PUSH);
-         linkApiSignup.setText(UI.LINK_TAG_START + URL_WEATHERAPI_COM + UI.LINK_TAG_END);
+         linkApiSignup.setText(UI.getLinkFromText(URL_WEATHERAPI_COM));
          linkApiSignup.setEnabled(true);
          linkApiSignup.addListener(SWT.Selection, event -> WEB.openUrl(URL_WEATHERAPI_COM));
 
