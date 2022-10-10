@@ -36,6 +36,12 @@ public class UITests {
       UI.updateUnits();
    }
 
+   private void setDistanceNauticalMile() {
+
+      MeasurementSystem_Manager.setActiveSystemProfileIndex(2, true);
+      UI.updateUnits();
+   }
+
    private void setImperialSystem() {
 
       MeasurementSystem_Manager.setActiveSystemProfileIndex(1, true);
@@ -166,5 +172,21 @@ public class UITests {
       setImperialSystem();
       //30.3in -> 1026mbar
       assertEquals(1026, UI.convertPressure_ToMetric(30.29778f));
+   }
+
+   @Test
+   void testConvertSpeed_FromMetric() {
+
+      setMetricSystem();
+      //10km/h -> 10km/h
+      assertEquals(10, UI.convertSpeed_FromMetric(10));
+
+      setImperialSystem();
+      //10km/h -> 6.2mph
+      assertEquals(6.2137117f, UI.convertSpeed_FromMetric(10));
+
+      setDistanceNauticalMile();
+      //10km/h -> 5.4knots
+      assertEquals(5.399568f, UI.convertSpeed_FromMetric(10));
    }
 }
