@@ -66,7 +66,6 @@ import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -282,8 +281,6 @@ public class DialogPrintTour extends TitleAreaDialog {
 
    private void createUIDestination(final Composite parent) {
 
-      Label label;
-
       final ModifyListener filePathModifyListener = modifyEvent -> validateFields();
 
       /*
@@ -297,8 +294,7 @@ public class DialogPrintTour extends TitleAreaDialog {
          /*
           * label: filename
           */
-         label = new Label(group, SWT.NONE);
-         label.setText(Messages.Dialog_Print_Label_FileName);
+         UI.createLabel(group, Messages.Dialog_Print_Label_FileName);
 
          /*
           * combo: path
@@ -327,8 +323,7 @@ public class DialogPrintTour extends TitleAreaDialog {
          /*
           * label: path
           */
-         label = new Label(group, SWT.NONE);
-         label.setText(Messages.Dialog_Print_Label_PrintFilePath);
+         UI.createLabel(group, Messages.Dialog_Print_Label_PrintFilePath);
 
          /*
           * combo: path
@@ -366,8 +361,7 @@ public class DialogPrintTour extends TitleAreaDialog {
          /*
           * label: file path
           */
-         label = new Label(group, SWT.NONE);
-         label.setText(Messages.Dialog_Print_Label_FilePath);
+         UI.createLabel(group, Messages.Dialog_Print_Label_FilePath);
 
          /*
           * text: filename
@@ -444,8 +438,8 @@ public class DialogPrintTour extends TitleAreaDialog {
    }
 
    private void createUIPaperOrientation(final Composite parent) {
-      final Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Dialog_Print_Label_Paper_Orientation);
+
+      UI.createLabel(parent, Messages.Dialog_Print_Label_Paper_Orientation);
       _comboPaperOrientation = new Combo(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
       _comboPaperOrientation.setVisibleItemCount(2);
       _comboPaperOrientation.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
@@ -453,8 +447,8 @@ public class DialogPrintTour extends TitleAreaDialog {
    }
 
    private void createUIPaperSize(final Composite parent) {
-      final Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Dialog_Print_Label_Paper_Size);
+
+      UI.createLabel(parent, Messages.Dialog_Print_Label_Paper_Size);
       _comboPaperSize = new Combo(parent, SWT.READ_ONLY | SWT.DROP_DOWN);
       _comboPaperSize.setVisibleItemCount(2);
       _comboPaperSize.setLayoutData(new GridData(SWT.FILL, SWT.NONE, true, false));
