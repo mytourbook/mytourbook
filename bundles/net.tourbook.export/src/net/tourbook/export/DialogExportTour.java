@@ -816,8 +816,6 @@ public class DialogExportTour extends TitleAreaDialog {
 
    private void createUI_90_ExportFile(final Composite parent) {
 
-      Label label;
-
       final ModifyListener filePathModifyListener = modifyEvent -> validateFields();
 
       /*
@@ -831,7 +829,7 @@ public class DialogExportTour extends TitleAreaDialog {
          /*
           * label: filename
           */
-         label = UI.createLabel(group, Messages.dialog_export_label_fileName);
+         UI.createLabel(group, Messages.dialog_export_label_fileName);
 
          /*
           * combo: path
@@ -860,8 +858,7 @@ public class DialogExportTour extends TitleAreaDialog {
          /*
           * label: path
           */
-         label = new Label(group, SWT.NONE);
-         label.setText(Messages.dialog_export_label_exportFilePath);
+         UI.createLabel(group, Messages.dialog_export_label_exportFilePath);
 
          /*
           * combo: path
@@ -889,7 +886,7 @@ public class DialogExportTour extends TitleAreaDialog {
          /*
           * label: file path
           */
-         label = UI.createLabel(group, Messages.dialog_export_label_filePath);
+         UI.createLabel(group, Messages.dialog_export_label_filePath);
 
          /*
           * text: filename
