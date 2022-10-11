@@ -158,7 +158,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
 
             .applyTo(group);
       {
-         new Label(group, SWT.NONE).setText(Messages.Pref_Appearance_Label_Theme);
+         UI.createLabel(group, Messages.Pref_Appearance_Label_Theme);
 
          _comboThemeId = new ComboViewer(group, SWT.READ_ONLY);
          _comboThemeId.setLabelProvider(createTextProvider(element -> ((ITheme) element).getLabel()));
@@ -183,8 +183,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          /*
           * number of recent tags
           */
-         final Label label = new Label(group, NONE);
-         label.setText(Messages.pref_appearance_number_of_recent_tags);
+         final Label label = UI.createLabel(group, Messages.pref_appearance_number_of_recent_tags);
          label.setToolTipText(Messages.pref_appearance_number_of_recent_tags_tooltip);
 
          // spinner
@@ -221,8 +220,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
          {
 
             // label: delay
-            _lblAutoTagDelay = new Label(autoTagContainer, SWT.NONE);
-            _lblAutoTagDelay.setText(Messages.Pref_Appearance_Label_AutoOpenTaggingDelay);
+            _lblAutoTagDelay = UI.createLabel(autoTagContainer, Messages.Pref_Appearance_Label_AutoOpenTaggingDelay);
             _lblAutoTagDelay.setToolTipText(Messages.Pref_Appearance_Label_AutoOpenTagging_Tooltip);
 
             // spinner
@@ -237,8 +235,7 @@ public class PrefPageAppearance extends PreferencePage implements IWorkbenchPref
                   .applyTo(_spinnerAutoOpenDelay);
 
             // label: ms
-            _lblAutoOpenMS = new Label(autoTagContainer, SWT.NONE);
-            _lblAutoOpenMS.setText(UI.UNIT_MS);
+            _lblAutoOpenMS = UI.createLabel(autoTagContainer, UI.UNIT_MS);
 
             // check: show animation
             _chkTaggingAnimation = new Button(autoTagContainer, SWT.CHECK);
