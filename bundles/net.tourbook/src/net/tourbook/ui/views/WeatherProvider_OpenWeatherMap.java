@@ -101,9 +101,7 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
          /*
           * Label:
           */
-         final Label note = new Label(container, SWT.NONE);
-         note.setText(Messages.Pref_Weather_Label_OpenWeatherMap_FiveDaysLimit);
-
+         final Label note = UI.createLabel(container, Messages.Pref_Weather_Label_OpenWeatherMap_FiveDaysLimit);
          GridDataFactory.fillDefaults()
                .indent(defaultHIndent, 0)
                .align(SWT.BEGINNING, SWT.FILL)
