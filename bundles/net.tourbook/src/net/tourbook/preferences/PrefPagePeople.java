@@ -886,8 +886,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
     */
    private void createUI_57_Field_BodyMassIndex(final Composite parent) {
 
-      final Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Pref_People_Label_BodyMassIndex);
+      final Label label = UI.createLabel(parent, Messages.Pref_People_Label_BodyMassIndex);
       label.setToolTipText(Messages.Pref_People_Label_BodyMassIndex_Tooltip);
 
       final Composite containerHeight = new Composite(parent, SWT.NONE);
@@ -941,8 +940,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
     */
    private void createUI_62_RestingHR(final Composite parent) {
 
-      Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Pref_People_Label_RestingHR);
+      UI.createLabel(parent, Messages.Pref_People_Label_RestingHR);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -962,8 +960,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                .applyTo(_spinnerRestingHR);
 
          // label: unit
-         label = new Label(container, SWT.NONE);
-         label.setText(GRAPH_LABEL_HEARTBEAT_UNIT);
+         UI.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
       }
 
       final Composite containerAge = new Composite(parent, SWT.NONE);
@@ -977,8 +974,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          /*
           * label: age
           */
-         label = new Label(containerAge, SWT.NONE);
-         label.setText(Messages.Pref_People_Label_Age);
+         final Label label = UI.createLabel(containerAge, Messages.Pref_People_Label_Age);
          GridDataFactory.fillDefaults()
                .grab(true, true)
                .align(SWT.END, SWT.CENTER)
@@ -1001,8 +997,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
     */
    private void createUI_64_MaxHR(final Composite parent) {
 
-      Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Pref_People_Label_MaxHR);
+      UI.createLabel(parent, Messages.Pref_People_Label_MaxHR);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -1030,8 +1025,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          /*
           * label: unit
           */
-         label = new Label(container, SWT.NONE);
-         label.setText(GRAPH_LABEL_HEARTBEAT_UNIT);
+         UI.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
 
          /*
           * combo: formula to compute hr max
