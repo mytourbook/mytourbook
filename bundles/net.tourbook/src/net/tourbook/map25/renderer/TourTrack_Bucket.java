@@ -1032,7 +1032,7 @@ public class TourTrack_Bucket {
 
          final float p21Angle = (float) MtMath.angleOf(p1X, p1Y, p2X, p2Y);
 
-         float animatedAngle = p21Angle; 
+         float animatedAngle = p21Angle;
 
          float angleDiff;
          if (pixelIndex < 5) {
@@ -1042,7 +1042,7 @@ public class TourTrack_Bucket {
             angleDiff = getAngleDiff(p21Angle, prevAngle);
          }
 
-         final float minSmoothAngle = 10;
+         final float minSmoothAngle = 3;
 
          if (Math.abs(angleDiff) > minSmoothAngle) {
 
@@ -1059,7 +1059,7 @@ public class TourTrack_Bucket {
             final float angleDiff2 = getShortestAngle(p21Angle, prevAngle2Smooth);
 
             // use the smallest difference
-            animatedAngle = angleDiff1 > angleDiff2
+            animatedAngle = angleDiff1 < angleDiff2
                   ? prevAngle1Smooth
                   : prevAngle2Smooth;
          }
@@ -1074,9 +1074,9 @@ public class TourTrack_Bucket {
 
                   + "%3d"
 
-                  + "  p21 %5.0f°"
-                  + "  Anim %5.0f°"
-                  + "  Diff %5.0f°"
+                  + "  p21 %3.0f°"
+                  + "  Anim %3.0f°"
+                  + "  Diff %4.0f°"
 
                   ,
 
@@ -1130,7 +1130,9 @@ public class TourTrack_Bucket {
     */
    private float getShortestAngle(final float angle1, final float angle2) {
 
-      return ((((angle1 - angle2) % 360) + 540) % 360) - 180;
+      final float angleDiff = ((((angle1 - angle2) % 360) + 540) % 360) - 180;
+
+      return Math.abs(angleDiff);
 
    }
 }
