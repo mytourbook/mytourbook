@@ -37,6 +37,9 @@ public class PrefPagePeopleTests extends UITest {
       //21.6 BMI
       assertEquals("21.6", bot.text(3).getText()); //$NON-NLS-1$
 
+//      bot.cTabItem(Messages.Pref_People_Tab_HRZone).activate();
+//      bot.cTabItem(Messages.Pref_People_Tab_DataTransfer).activate();
+
       bot.button("Apply and Close").click(); //$NON-NLS-1$
    }
 }
