@@ -87,6 +87,6 @@ System
 * Milestone             https://github.com/mytourbook/mytourbook/milestone/4?closed=1
 * Eclipse 2022-06
 * NatTable 2.03         https://www.eclipse.org/nattable/download.php
-* FIT SDK 21.89
+* FIT SDK 21.94
 * WorldWind 2.2.1       https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
 * Migrated the app that allows for the cloud integration in MT https://github.com/mytourbook/mytourbook/issues/915
