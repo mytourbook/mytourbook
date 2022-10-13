@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.search;
+
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 
@@ -43,8 +45,6 @@ import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IPartListener2;
@@ -129,31 +129,28 @@ public class SearchView extends ViewPart implements ISearchView {
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (part, tourEventId, eventData) -> {
 
-            if (part == SearchView.this) {
-               return;
-            }
+         if (part == SearchView.this) {
+            return;
+         }
 
-            if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         if ((tourEventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-               if (modifiedTours != null) {
+            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            if (modifiedTours != null) {
 
-                  // update modified tour
+               // update modified tour
 
 //                  for (final TourData tourData : modifiedTours) {
 //
 //                  }
-               }
-
-            } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
-
-               clearView();
-
             }
+
+         } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+            clearView();
+
          }
       };
 
@@ -260,12 +257,7 @@ public class SearchView extends ViewPart implements ISearchView {
                SearchManager.SEARCH_URL,
                SearchManager.SEARCH_URL));
 
-         linkExternalBrowser.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               WEB.openUrl(SearchManager.SEARCH_URL);
-            }
-         });
+         linkExternalBrowser.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(SearchManager.SEARCH_URL)));
 
          createUI_50_SetupExternalWebbrowser(parent, container);
       }
@@ -290,12 +282,7 @@ public class SearchView extends ViewPart implements ISearchView {
                SearchManager.SEARCH_URL,
                SearchManager.SEARCH_URL));
 
-         linkLinuxBrowser.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               WEB.openUrl(SearchManager.SEARCH_URL);
-            }
-         });
+         linkLinuxBrowser.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(SearchManager.SEARCH_URL)));
 
          createUI_50_SetupExternalWebbrowser(parent, container);
       }
@@ -313,16 +300,13 @@ public class SearchView extends ViewPart implements ISearchView {
 
       linkSetupBrowser.setText(Messages.Search_View_Link_SetupExternalBrowser);
       linkSetupBrowser.setEnabled(true);
-      linkSetupBrowser.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            PreferencesUtil.createPreferenceDialogOn(//
-                  parent.getShell(),
-                  PrefPageWebBrowser.ID,
-                  null,
-                  null).open();
-         }
-      });
+      linkSetupBrowser.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+         PreferencesUtil.createPreferenceDialogOn(//
+               parent.getShell(),
+               PrefPageWebBrowser.ID,
+               null,
+               null).open();
+      }));
    }
 
    @Override

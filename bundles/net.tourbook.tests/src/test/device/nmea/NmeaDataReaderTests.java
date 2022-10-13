@@ -31,6 +31,6 @@ public class NmeaDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testNmeaImportBasic() {
 
-      testImportFile(nmeaDataReader, FILES_PATH + "NMEAExample", ".txt");
+      testImportFile(nmeaDataReader, FILES_PATH + "NMEAExample", ".txt"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }

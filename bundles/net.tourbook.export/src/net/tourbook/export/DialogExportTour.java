@@ -658,8 +658,7 @@ public class DialogExportTour extends TitleAreaDialog {
          _spinnerCamouflageSpeed.addMouseWheelListener(Util::adjustSpinnerValueOnMouseScroll);
 
          // label: unit
-         _lblCamouflageSpeedUnit = new Label(container, SWT.NONE);
-         _lblCamouflageSpeedUnit.setText(UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED);
+         _lblCamouflageSpeedUnit = UI.createLabel(container, UI.SYMBOL_AVERAGE_WITH_SPACE + UI.UNIT_LABEL_SPEED);
          GridDataFactory
                .fillDefaults()
                .grab(true, false)
@@ -675,9 +674,8 @@ public class DialogExportTour extends TitleAreaDialog {
       GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
       {
          // label
-         final Label label = new Label(container, SWT.NONE);
+         final Label label = UI.createLabel(container, Messages.Dialog_Export_Label_GPX_DistanceValues);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(label);
-         label.setText(Messages.Dialog_Export_Label_GPX_DistanceValues);
 
          // radio
          {
@@ -731,9 +729,8 @@ public class DialogExportTour extends TitleAreaDialog {
             /*
              * label: tcx type
              */
-            final Label label = new Label(container, SWT.NONE);
+            final Label label = UI.createLabel(container, Messages.Dialog_Export_Label_TCX_Type);
             GridDataFactory.fillDefaults().applyTo(label);
-            label.setText(Messages.Dialog_Export_Label_TCX_Type);
 
             final Composite containerActivities = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(containerActivities);
@@ -760,8 +757,7 @@ public class DialogExportTour extends TitleAreaDialog {
                /*
                 * label: Activity type
                 */
-               _lblTcxActivityType = new Label(container, SWT.NONE);
-               _lblTcxActivityType.setText(Messages.Dialog_Export_Label_TCX_ActivityType);
+               _lblTcxActivityType = UI.createLabel(container, Messages.Dialog_Export_Label_TCX_ActivityType);
 
                /*
                 * combo: Activity types
@@ -775,9 +771,8 @@ public class DialogExportTour extends TitleAreaDialog {
             /*
              * label: course name from
              */
-            _lblTcxNameFrom = new Label(container, SWT.NONE);
+            _lblTcxNameFrom = UI.createLabel(container, Messages.Dialog_Export_Label_TCX_NameFrom);
             GridDataFactory.fillDefaults().applyTo(_lblTcxNameFrom);
-            _lblTcxNameFrom.setText(Messages.Dialog_Export_Label_TCX_NameFrom);
             _lblTcxNameFrom.setToolTipText(Messages.Dialog_Export_Label_TCX_NameFrom_Tooltip);
 
             final Composite containerNameFrom = new Composite(container, SWT.NONE);
@@ -806,8 +801,7 @@ public class DialogExportTour extends TitleAreaDialog {
             /*
              * label: course name
              */
-            _lblTcxCourseName = new Label(container, SWT.NONE);
-            _lblTcxCourseName.setText(Messages.Dialog_Export_Label_TCX_CourseName);
+            _lblTcxCourseName = UI.createLabel(container, Messages.Dialog_Export_Label_TCX_CourseName);
 
             /*
              * combo: name
@@ -822,8 +816,6 @@ public class DialogExportTour extends TitleAreaDialog {
 
    private void createUI_90_ExportFile(final Composite parent) {
 
-      Label label;
-
       final ModifyListener filePathModifyListener = modifyEvent -> validateFields();
 
       /*
@@ -837,8 +829,7 @@ public class DialogExportTour extends TitleAreaDialog {
          /*
           * label: filename
           */
-         label = new Label(group, SWT.NONE);
-         label.setText(Messages.dialog_export_label_fileName);
+         UI.createLabel(group, Messages.dialog_export_label_fileName);
 
          /*
           * combo: path
@@ -867,8 +858,7 @@ public class DialogExportTour extends TitleAreaDialog {
          /*
           * label: path
           */
-         label = new Label(group, SWT.NONE);
-         label.setText(Messages.dialog_export_label_exportFilePath);
+         UI.createLabel(group, Messages.dialog_export_label_exportFilePath);
 
          /*
           * combo: path
@@ -896,8 +886,7 @@ public class DialogExportTour extends TitleAreaDialog {
          /*
           * label: file path
           */
-         label = new Label(group, SWT.NONE);
-         label.setText(Messages.dialog_export_label_filePath);
+         UI.createLabel(group, Messages.dialog_export_label_filePath);
 
          /*
           * text: filename

@@ -27,7 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 
-public class PreferencesWeatherTests extends UITest {
+public class PrefPageWeatherTests extends UITest {
 
    private void testVendorConnection(final String vendorName) {
 
@@ -61,6 +61,9 @@ public class PreferencesWeatherTests extends UITest {
 
       //World Weather Online
       testWorldWeatherOnlineConnection();
+
+      //Restore the selection of OpenWeatherMap as the default weather vendor
+      bot.comboBox().setSelection(1);
 
       bot.button("Apply and Close").click(); //$NON-NLS-1$
    }

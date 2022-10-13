@@ -15,10 +15,6 @@
  *******************************************************************************/
 package net.tourbook.tour;
 
-import gnu.trove.list.array.TDoubleArrayList;
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TLongArrayList;
-
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -100,6 +96,9 @@ import net.tourbook.ui.views.tourBook.TourBookView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.weather.TourWeatherRetriever;
 
+import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -2673,7 +2672,6 @@ public class TourManager {
                                         final int firstRemovedIndex,
                                         final int lastRemovedIndex,
                                         final boolean isRemoveTime) {
-      // TODO Auto-generated method stub
 
       final int[] timeSerie = tourData.timeSerie;
       final long[] allPausedTime_Start = tourData.getPausedTime_Start();
@@ -2702,8 +2700,8 @@ public class TourManager {
 
       final long removedTimeDiff = sliceTime_RemoveEndDiff - sliceTime_RemoveStart;
 
-      final TLongArrayList allPausedTimeAdjusted_Start = new TLongArrayList();
-      final TLongArrayList allPausedTimeAdjusted_End = new TLongArrayList();
+      final LongArrayList allPausedTimeAdjusted_Start = new LongArrayList();
+      final LongArrayList allPausedTimeAdjusted_End = new LongArrayList();
 
       // loop: all pauses
       for (int pauseIndex = 0; pauseIndex < numPauses; pauseIndex++) {
@@ -4639,8 +4637,8 @@ public class TourManager {
             final int numTimeSlices = timeSerie.length;
             final int numRRTimes = allRRTimesInMilliseconds.length;
 
-            final TDoubleArrayList xData_PulseTime = new TDoubleArrayList((int) (numRRTimes * 1.05));
-            final TFloatArrayList yData_PulseTime = new TFloatArrayList((int) (numRRTimes * 1.05));
+            final DoubleArrayList xData_PulseTime = new DoubleArrayList((int) (numRRTimes * 1.05));
+            final FloatArrayList yData_PulseTime = new FloatArrayList((int) (numRRTimes * 1.05));
 
             /**
              * Synchronize 2 time series which can contain gaps

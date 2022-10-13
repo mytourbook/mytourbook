@@ -26,12 +26,15 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 public class Utils {
 
-   private static final String TOURBOOK_VIEW_NAME    = "Tour Book";                    //$NON-NLS-1$
-   public static final String  TOURMARKERS_VIEW_NAME = "Tour Markers";                 //$NON-NLS-1$
-   public static final String  STATISTICS_VIEW_NAME  = "Statistics";                   //$NON-NLS-1$
-   public static final String  TOOLS                 = "Tools ";                       //$NON-NLS-1$
+   private static final String TOURBOOK_VIEW_NAME      = "Tour Book";                    //$NON-NLS-1$
+   public static final String  TOUREDITOR_VIEW_NAME    = "Tour Editor";                  //$NON-NLS-1$
+   public static final String  TOURMARKERS_VIEW_NAME   = "Tour Markers";                 //$NON-NLS-1$
+   public static final String  TOURSEGMENTER_VIEW_NAME = "Tour Segmenter";               //$NON-NLS-1$
+   public static final String  STATISTICS_VIEW_NAME    = "Statistics";                   //$NON-NLS-1$
+   public static final String  TOOLS                   = "Tools ";                       //$NON-NLS-1$
+   public static final String  SAVE_MODIFIED_TOUR      = "Save modified tour (Ctrl+S)";  //$NON-NLS-1$
 
-   public static final String  workingDirectory      = System.getProperty("user.dir"); //$NON-NLS-1$
+   public static final String  workingDirectory        = System.getProperty("user.dir"); //$NON-NLS-1$
 
    public static SWTBotTreeItem getTour(final SWTWorkbenchBot bot) {
 

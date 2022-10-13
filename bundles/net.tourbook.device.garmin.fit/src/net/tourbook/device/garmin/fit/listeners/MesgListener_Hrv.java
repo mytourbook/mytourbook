@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,11 +18,11 @@ package net.tourbook.device.garmin.fit.listeners;
 import com.garmin.fit.HrvMesg;
 import com.garmin.fit.HrvMesgListener;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.device.garmin.fit.FitData;
+
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 
 /**
  *
@@ -44,7 +44,7 @@ public class MesgListener_Hrv extends AbstractMesgListener implements HrvMesgLis
     */
    private void onMesg_Hrv(final HrvMesg mesg) {
 
-      final TIntArrayList pulseTime = new TIntArrayList();
+      final IntArrayList pulseTime = new IntArrayList();
 
       final Float[] allTimes = mesg.getTime();
 

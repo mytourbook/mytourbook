@@ -23,8 +23,11 @@ import java.util.Date;
 
 import net.tourbook.Messages;
 
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotDateTime;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -42,9 +45,9 @@ public class TourDataEditorViewTests extends UITest {
       final String newTourTitle = "New Tour Title"; //$NON-NLS-1$
 
       bot.comboBox().setText(newTourTitle);
-      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
+      bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
-      Utils.showView(bot, "Tour Editor"); //$NON-NLS-1$
+      Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
 
       final SWTBotCombo titleCombo = bot.comboBox(newTourTitle);
       assertNotNull(titleCombo);
@@ -54,13 +57,43 @@ public class TourDataEditorViewTests extends UITest {
       tourDateTime.setDate(Date.from(Instant.now()));
       assertNotNull(tourDateTime);
 
-      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
+      bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
+   }
+
+   @Test
+   void testRemoveTimeSlice() {
+
+      Utils.showTourBookView(bot);
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME).bot();
+
+      bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
+
+      SWTBotTable timeSlicesTable = tourEditorViewBot.table();
+
+      assertEquals(16829, timeSlicesTable.rowCount());
+
+      timeSlicesTable.select(3);
+
+      timeSlicesTable.contextMenu(Messages.action_tour_editor_delete_time_slices_keep_time).click();
+      bot.button("OK").click(); //$NON-NLS-1$
+
+      timeSlicesTable = tourEditorViewBot.table();
+      timeSlicesTable.contextMenu(Messages.action_tour_editor_delete_time_slices_keep_time).click();
+
+      bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
+
+      //Ensuring that the time slice was deleted
+      assertEquals(16828, timeSlicesTable.rowCount());
    }
 
    @Test
    void testViewTabs() {
 
-      Utils.showView(bot, "Tour Editor"); //$NON-NLS-1$
+      Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
 
       bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
       bot.cTabItem(Messages.Tour_Editor_TabLabel_SwimSlices).activate();

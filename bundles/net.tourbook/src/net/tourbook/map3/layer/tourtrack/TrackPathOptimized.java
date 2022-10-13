@@ -18,8 +18,6 @@ package net.tourbook.map3.layer.tourtrack;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.GL2;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import gov.nasa.worldwind.View;
 import gov.nasa.worldwind.WorldWind;
 import gov.nasa.worldwind.cache.GpuResourceCache;
@@ -41,6 +39,7 @@ import java.util.List;
 import net.tourbook.common.color.ColorUtil;
 import net.tourbook.map3.view.Map3View;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.swt.graphics.RGB;
 
 public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackPath {
@@ -59,7 +58,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
    /** The angle of the arrowhead tip. */
    protected Angle             _arrowAngle        = Angle.fromDegrees(30.0);
 
-   private TIntArrayList       _arrowPositionIndizes;
+   private IntArrayList        _arrowPositionIndizes;
 
    private int                 _arrowPositionVboId;
    private int                 _arrowSurfaceVboId;
@@ -204,7 +203,7 @@ public class TrackPathOptimized extends MTMultiResolutionPath implements ITrackP
       //https://stackoverflow.com/questions/48693695/java-nio-buffer-not-loading-clear-method-on-runtime
 
       if (_arrowPositionIndizes == null || _arrowPositionIndizes.size() < polePositionSize) {
-         _arrowPositionIndizes = new TIntArrayList(polePositionSize);
+         _arrowPositionIndizes = new IntArrayList(polePositionSize);
       }
       _arrowPositionIndizes.clear();
 

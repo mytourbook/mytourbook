@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,8 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tag.tour.filter;
-
-import gnu.trove.set.hash.TLongHashSet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,6 +43,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.ui.action.ActionCollapseAll;
 import net.tourbook.ui.action.ActionExpandAll;
 
+import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -1426,7 +1425,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
    private long[] getTagIds_FromTagCloud_Checked() {
 
-      final TLongHashSet tagIds = new TLongHashSet();
+      final LongHashSet tagIds = new LongHashSet();
 
       final Object[] checkedElements = _tagCloudViewer.getCheckedElements();
 
@@ -1443,7 +1442,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
    private long[] getTagIds_FromTagCloud_Unchecked() {
 
       final Object[] allCheckedTags = _tagCloudViewer.getCheckedElements();
-      final TLongHashSet allUncheckedTagIds = new TLongHashSet();
+      final LongHashSet allUncheckedTagIds = new LongHashSet();
 
       for (final TagCloud tagCloudItem : _tagCloudItems) {
 
@@ -1473,7 +1472,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
 
    private long[] getTagIds_FromTagViewer() {
 
-      final TLongHashSet tagIds = new TLongHashSet();
+      final LongHashSet tagIds = new LongHashSet();
 
       final Object[] checkedElements = _tagViewer.getCheckedElements();
 
@@ -2357,11 +2356,11 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
       /*
        * Update model
        */
-      final TLongHashSet profileTagFilterIds = profile.tagFilterIds;
+      final LongHashSet profileTagFilterIds = profile.tagFilterIds;
       profileTagFilterIds.clear();
       profileTagFilterIds.addAll(tagIds_Checked);
 
-      final TLongHashSet profileTagFilterIds_Unchecked = profile.tagFilterIds_Unchecked;
+      final LongHashSet profileTagFilterIds_Unchecked = profile.tagFilterIds_Unchecked;
       profileTagFilterIds_Unchecked.clear();
       profileTagFilterIds_Unchecked.addAll(tagIds_Unchecked);
 

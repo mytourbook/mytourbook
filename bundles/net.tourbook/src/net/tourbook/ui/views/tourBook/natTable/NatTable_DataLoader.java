@@ -15,9 +15,6 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourBook.natTable;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.list.array.TLongArrayList;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -47,6 +44,8 @@ import net.tourbook.ui.views.tourBook.TVITourBookItem;
 import net.tourbook.ui.views.tourBook.TVITourBookTour;
 import net.tourbook.ui.views.tourBook.TourBookView;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.eclipse.swt.widgets.Display;
@@ -180,7 +179,7 @@ public class NatTable_DataLoader {
          return new int[0];
       }
 
-      final TIntArrayList allRowIndices = new TIntArrayList();
+      final IntArrayList allRowIndices = new IntArrayList();
       final int numAllAvailableTourIds = _allLoadedTourIds.length;
 
       // loop: all requested tour id's
@@ -267,7 +266,7 @@ public class NatTable_DataLoader {
    private void fetchAllTourIds() {
 
       String sql = null;
-      final TLongArrayList allTourIds = new TLongArrayList();
+      final LongArrayList allTourIds = new LongArrayList();
 
       try (Connection conn = TourDatabase.getInstance().getConnection()) {
 

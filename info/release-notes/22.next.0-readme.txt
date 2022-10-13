@@ -33,6 +33,9 @@ New
 Improvements
 ============
 
+* People preference page (Frederic)
+  - Added a BMI (Body Mass Index) field
+
 * CRP Import (Frederic)
   - Added the ability to import ZLib compressed files
   - Added the support for file version greater than 9
@@ -65,6 +68,9 @@ Bugfix
 * 2D Map
   - Fixed: Can't download SRTM-Data             https://github.com/mytourbook/mytourbook/issues/928
 
+* Tour Info toolip (Frederic)
+  - Fixed a bug where the wind's cardinal value was erroneous https://github.com/mytourbook/mytourbook/issues/942
+
 
 Translation    
 ===========
@@ -81,6 +87,6 @@ System
 * Milestone             https://github.com/mytourbook/mytourbook/milestone/4?closed=1
 * Eclipse 2022-06
 * NatTable 2.03         https://www.eclipse.org/nattable/download.php
-* FIT SDK 21.89
+* FIT SDK 21.94
 * WorldWind 2.2.1       https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
 * Migrated the app that allows for the cloud integration in MT https://github.com/mytourbook/mytourbook/issues/915

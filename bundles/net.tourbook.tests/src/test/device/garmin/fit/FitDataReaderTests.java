@@ -35,7 +35,7 @@ public class FitDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testFitImportConeyLake() {
 
-      testImportFile(fitDataReader, FILES_PATH + "ConeyLakeMove_2020_05_23_08_55_42_Trail+running", ".fit");
+      testImportFile(fitDataReader, FILES_PATH + "ConeyLakeMove_2020_05_23_08_55_42_Trail+running", ".fit"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    /**
@@ -45,7 +45,7 @@ public class FitDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testFitImportNoPauses() {
 
-      testImportFile(fitDataReader, FILES_PATH + "1-30-21 3-47 PM", ".fit");
+      testImportFile(fitDataReader, FILES_PATH + "1-30-21 3-47 PM", ".fit"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    /**
@@ -54,7 +54,7 @@ public class FitDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testFitImportPauses_Auto() {
 
-      testImportFile(fitDataReader, FILES_PATH + "Hardrock_100_Start_Finish", ".fit");
+      testImportFile(fitDataReader, FILES_PATH + "Hardrock_100_Start_Finish", ".fit"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    /**
@@ -63,6 +63,6 @@ public class FitDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testFitImportPauses_User() {
 
-      testImportFile(fitDataReader, FILES_PATH + "Bye_bye_Silverton", ".fit");
+      testImportFile(fitDataReader, FILES_PATH + "Bye_bye_Silverton", ".fit"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }

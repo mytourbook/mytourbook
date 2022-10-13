@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Frédéric Bard
+ * Copyright (C) 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,23 +13,19 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package device.sporttracks;
-
-import net.tourbook.device.sporttracks.FitLogDeviceDataReader;
+package preferences;
 
 import org.junit.jupiter.api.Test;
 
-import utils.DeviceDataReaderTester;
-import utils.FilesUtils;
+import utils.UITest;
 
-public class FitLogDeviceDataReaderTests extends DeviceDataReaderTester {
-
-   private static final String             FILES_PATH       = FilesUtils.rootPath + "device/sporttracks/fitlog/files/"; //$NON-NLS-1$
-   protected static FitLogDeviceDataReader deviceDataReader = new FitLogDeviceDataReader();
+public class PrefPageAppearanceTests extends UITest {
 
    @Test
-   void testImportTimothyLake() {
+   void testAppearance() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "TimothyLake", ".fitlog"); //$NON-NLS-1$ //$NON-NLS-2$
+      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
+      bot.tree().getTreeItem("Appearance").select(); //$NON-NLS-1$
+      bot.button("Apply and Close").click(); //$NON-NLS-1$
    }
 }

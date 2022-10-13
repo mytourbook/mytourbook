@@ -35,6 +35,6 @@ public class TurDeviceReaderTests extends DeviceDataReaderTester {
    @Test
    void testTurImport_20200915() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "15.09.2020", ".tur");
+      testImportFile(deviceDataReader, FILES_PATH + "15.09.2020", ".tur"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }
