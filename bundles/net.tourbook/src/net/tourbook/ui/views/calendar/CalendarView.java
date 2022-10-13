@@ -93,6 +93,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    ColorDefinition[]               _allColorDefinition             = GraphColorManager.getAllColorDefinitions();
 
    private ISelectionListener      _selectionListener;
+   private IPartListener2          _partListener;
    private IPropertyChangeListener _prefChangeListener;
    private IPropertyChangeListener _prefChangeListener_Common;
    private ITourEventListener      _tourEventListener;
@@ -130,7 +131,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
 
    private void addPartListener() {
 
-      final IPartListener2 partListener = new IPartListener2() {
+      _partListener = new IPartListener2() {
 
          @Override
          public void partActivated(final IWorkbenchPartReference partRef) {}
@@ -172,7 +173,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
          public void partVisible(final IWorkbenchPartReference partRef) {}
       };
 
-      getViewSite().getPage().addPartListener(partListener);
+      getViewSite().getPage().addPartListener(_partListener);
    }
 
    private void addPrefListener() {
@@ -427,6 +428,7 @@ public class CalendarView extends ViewPart implements ITourProvider, ICalendarPr
    public void dispose() {
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
+      getViewSite().getPage().removePartListener(_partListener);
       getSite().getPage().removePostSelectionListener(_selectionListener);
 
       _prefStore.removePropertyChangeListener(_prefChangeListener);
