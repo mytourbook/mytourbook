@@ -208,6 +208,6 @@ public class TourBookViewTests extends UITest {
       //Check the new elevation value
       tour = selectTour();
       assertNotNull(tour);
-      assertEquals("1,073,000", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
+      assertEquals("1,008", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
    }
 }
