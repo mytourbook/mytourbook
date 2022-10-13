@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,10 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.list.array.TLongArrayList;
-import gnu.trove.list.array.TShortArrayList;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,6 +34,10 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
+
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 
 public class DataProvider_Battery extends DataProvider {
 
@@ -241,20 +241,20 @@ public class DataProvider_Battery extends DataProvider {
                + "ORDER BY TourStartTime" + NL //                                   //$NON-NLS-1$
          ;
 
-         final TLongArrayList allTourIds = new TLongArrayList();
+         final LongArrayList allTourIds = new LongArrayList();
 
-         final TIntArrayList allTourYear = new TIntArrayList();
-         final TIntArrayList allTourMonths = new TIntArrayList();
-         final TIntArrayList allTourDays = new TIntArrayList();
-         final TIntArrayList allYearsDOY = new TIntArrayList(); // DOY...Day Of Year for all years
+         final IntArrayList allTourYear = new IntArrayList();
+         final IntArrayList allTourMonths = new IntArrayList();
+         final IntArrayList allTourDays = new IntArrayList();
+         final IntArrayList allYearsDOY = new IntArrayList(); // DOY...Day Of Year for all years
 
-         final TIntArrayList allTourStartWeek = new TIntArrayList();
+         final IntArrayList allTourStartWeek = new IntArrayList();
 
-         final TShortArrayList allBatteryPercentage_Start = new TShortArrayList();
-         final TShortArrayList allBatteryPercentage_End = new TShortArrayList();
+         final ShortArrayList allBatteryPercentage_Start = new ShortArrayList();
+         final ShortArrayList allBatteryPercentage_End = new ShortArrayList();
 
-         final TLongArrayList allTypeIds = new TLongArrayList();
-         final TIntArrayList allTypeColorIndex = new TIntArrayList();
+         final LongArrayList allTypeIds = new LongArrayList();
+         final IntArrayList allTypeColorIndex = new IntArrayList();
 
          final ArrayList<ZonedDateTime> allTourStartDateTime = new ArrayList<>();
          final ArrayList<String> allTourTimeOffset = new ArrayList<>();

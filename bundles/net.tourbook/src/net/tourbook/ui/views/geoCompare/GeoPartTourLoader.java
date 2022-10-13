@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,8 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.geoCompare;
-
-import gnu.trove.list.array.TLongArrayList;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,6 +30,8 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.NormalizedGeoData;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
+
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 
 public class GeoPartTourLoader {
 
@@ -156,7 +156,7 @@ public class GeoPartTourLoader {
           */
          final ResultSet result = statement.executeQuery();
 
-         final TLongArrayList tourIds = new TLongArrayList();
+         final LongArrayList tourIds = new LongArrayList();
 
          while (result.next()) {
             tourIds.add(result.getLong(1));

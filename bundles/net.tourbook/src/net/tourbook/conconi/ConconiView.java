@@ -17,8 +17,6 @@ package net.tourbook.conconi;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import gnu.trove.list.array.TDoubleArrayList;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,6 +46,7 @@ import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 
+import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -364,8 +363,8 @@ public class ConconiView extends ViewPart {
                && tourPulseSerie != null
                && tourPulseSerie.length != 0) {
 
-            final TDoubleArrayList maxXValues = new TDoubleArrayList();
-            final TDoubleArrayList maxYValues = new TDoubleArrayList();
+            final DoubleArrayList maxXValues = new DoubleArrayList();
+            final DoubleArrayList maxYValues = new DoubleArrayList();
 
             float lastMaxY = Float.MIN_VALUE;
             float currentXValue = tourPowerSerie[0];
@@ -516,8 +515,8 @@ public class ConconiView extends ViewPart {
 
    private ConconiData createConconiData(final double[] powerSerie, final double[] pulseSerie) {
 
-      final TDoubleArrayList maxXValues = new TDoubleArrayList();
-      final TDoubleArrayList maxYValues = new TDoubleArrayList();
+      final DoubleArrayList maxXValues = new DoubleArrayList();
+      final DoubleArrayList maxYValues = new DoubleArrayList();
 
       double lastMaxY = Double.MIN_VALUE;
       double currentXValue = powerSerie[0];

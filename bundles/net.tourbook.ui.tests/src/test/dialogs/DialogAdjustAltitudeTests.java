@@ -31,7 +31,7 @@ public class DialogAdjustAltitudeTests extends UITest {
 
       selectTour();
 
-      bot.viewByTitle("Tour Editor").show();
+      bot.viewByTitle(Utils.TOUREDITOR_VIEW_NAME).show();
       bot.toolbarButtonWithTooltip(Messages.app_action_edit_adjust_altitude).click();
 
       bot.comboBox(0).setSelection(adjustmentMethod);
@@ -48,7 +48,7 @@ public class DialogAdjustAltitudeTests extends UITest {
       }
 
       bot.button(Messages.adjust_altitude_btn_update_modified_tour).click();
-      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
+      bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
       final SWTBotTreeItem tour = selectTour();
       assertEquals(newElevationValue, tour.cell(tourBookView_ElevationGain_Column_Index));

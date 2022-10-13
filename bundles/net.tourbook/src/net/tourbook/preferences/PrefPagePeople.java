@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
+
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.text.NumberFormat;
 import java.time.Period;
@@ -56,16 +58,11 @@ import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -82,13 +79,10 @@ import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -195,6 +189,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    private CTabFolder           _tabFolderPerson;
    private Text                 _txtFirstName;
    private Text                 _txtLastName;
+   private Text                 _txtBodyMassIndex;
    private Combo                _cboSportComputer;
    private Spinner              _spinnerWeight;
    private Spinner              _spinnerHeight;
@@ -236,20 +231,17 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            /*
-             * set a new chart configuration when the preferences has changed
-             */
-            if (property.equals(ITourbookPreferences.HR_ZONES_ARE_MODIFIED)) {
+         /*
+          * set a new chart configuration when the preferences has changed
+          */
+         if (property.equals(ITourbookPreferences.HR_ZONES_ARE_MODIFIED)) {
 
-               onEditHrZonesIsOK(getCurrentPerson());
-               performOK10();
-            }
+            onEditHrZonesIsOK(getCurrentPerson());
+            performOK10();
          }
       };
 
@@ -324,15 +316,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                _tabFolderPerson.setSelection(0);
             }
          } else {
-            Display.getDefault().asyncExec(new Runnable() {
-               @Override
-               public void run() {
-                  if (prefPageData.prefDataSelectHrZones != null && prefPageData.prefDataSelectHrZones.equals(PREF_DATA_SELECT_HR_ZONES)) {
-                     // select hr zones for the given person
-                     _tabFolderPerson.setSelection(1);
-                  } else {
-                     _tabFolderPerson.setSelection(0);
-                  }
+            Display.getDefault().asyncExec(() -> {
+               if (prefPageData.prefDataSelectHrZones != null && prefPageData.prefDataSelectHrZones.equals(PREF_DATA_SELECT_HR_ZONES)) {
+                  // select hr zones for the given person
+                  _tabFolderPerson.setSelection(1);
+               } else {
+                  _tabFolderPerson.setSelection(0);
                }
             });
          }
@@ -589,20 +578,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          }
       });
 
-      _peopleViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            onSelectPerson();
-         }
-      });
+      _peopleViewer.addSelectionChangedListener(selectionChangedEvent -> onSelectPerson());
 
-      _peopleViewer.addDoubleClickListener(new IDoubleClickListener() {
-         @Override
-         public void doubleClick(final DoubleClickEvent event) {
-            _tabFolderPerson.setSelection(0);
-            _txtFirstName.setFocus();
-            _txtFirstName.selectAll();
-         }
+      _peopleViewer.addDoubleClickListener(doubleClickEvent -> {
+         _tabFolderPerson.setSelection(0);
+         _txtFirstName.setFocus();
+         _txtFirstName.selectAll();
       });
 
    }
@@ -620,24 +601,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          _btnAddPerson = new Button(container, SWT.NONE);
          _btnAddPerson.setText(Messages.Pref_People_Action_add_person);
          setButtonLayoutData(_btnAddPerson);
-         _btnAddPerson.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onAddPerson();
-            }
-         });
+         _btnAddPerson.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onAddPerson()));
 
          /*
           * button: update
           */
          _btnSavePerson = new Button(container, SWT.NONE);
          _btnSavePerson.setText(Messages.App_Action_Save);
-         _btnSavePerson.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSavePerson();
-            }
-         });
+         _btnSavePerson.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSavePerson()));
          setButtonLayoutData(_btnSavePerson);
          final GridData gd = (GridData) _btnSavePerson.getLayoutData();
          gd.verticalAlignment = SWT.BOTTOM;
@@ -648,12 +619,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
           */
          _btnCancel = new Button(container, SWT.NONE);
          _btnCancel.setText(Messages.App_Action_Cancel);
-         _btnCancel.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onCancelPerson();
-            }
-         });
+         _btnCancel.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCancelPerson()));
          setButtonLayoutData(_btnCancel);
       }
    }
@@ -698,6 +664,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          createUI_54_Field_Gender(container);
          createUI_55_Field_Weight(container);
          createUI_56_Field_Height(container);
+         createUI_57_Field_BodyMassIndex(container);
       }
       container.layout(true, true);
 
@@ -755,17 +722,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       {
 
          _dtBirthday = new DateTime(container, SWT.DATE | SWT.MEDIUM | SWT.DROP_DOWN | SWT.BORDER);
-         _dtBirthday.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
+         _dtBirthday.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-               if (UI.isLinuxAsyncEvent(e.widget)) {
-                  return;
-               }
-
-               updateUIOnModifiedHrZones();
+            if (UI.isLinuxAsyncEvent(selectionEvent.widget)) {
+               return;
             }
-         });
+
+            updateUIOnModifiedHrZones();
+         }));
          _dtBirthday.addKeyListener(new KeyListener() {
 
             @Override
@@ -917,6 +881,30 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       new Label(parent, SWT.NONE);
    }
 
+   /**
+    * field: BMI (Body Mass Index)
+    */
+   private void createUI_57_Field_BodyMassIndex(final Composite parent) {
+
+      final Label label = UI.createLabel(parent, Messages.Pref_People_Label_BodyMassIndex);
+      label.setToolTipText(Messages.Pref_People_Label_BodyMassIndex_Tooltip);
+
+      final Composite containerHeight = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().applyTo(containerHeight);
+      GridLayoutFactory.fillDefaults().applyTo(containerHeight);
+      {
+         // text: BMI value
+         _txtBodyMassIndex = new Text(containerHeight, SWT.BORDER | SWT.READ_ONLY);
+         _txtBodyMassIndex.setToolTipText(Messages.Pref_People_Label_BodyMassIndex_Tooltip);
+         GridDataFactory.fillDefaults()
+               .align(SWT.BEGINNING, SWT.FILL)
+               .applyTo(_txtBodyMassIndex);
+      }
+
+      // filler
+      new Label(parent, SWT.NONE);
+   }
+
    private Control createUI_60_Tab_HRZone(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -952,8 +940,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
     */
    private void createUI_62_RestingHR(final Composite parent) {
 
-      Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Pref_People_Label_RestingHR);
+      UI.createLabel(parent, Messages.Pref_People_Label_RestingHR);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -973,8 +960,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                .applyTo(_spinnerRestingHR);
 
          // label: unit
-         label = new Label(container, SWT.NONE);
-         label.setText(GRAPH_LABEL_HEARTBEAT_UNIT);
+         UI.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
       }
 
       final Composite containerAge = new Composite(parent, SWT.NONE);
@@ -988,8 +974,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          /*
           * label: age
           */
-         label = new Label(containerAge, SWT.NONE);
-         label.setText(Messages.Pref_People_Label_Age);
+         final Label label = UI.createLabel(containerAge, Messages.Pref_People_Label_Age);
          GridDataFactory.fillDefaults()
                .grab(true, true)
                .align(SWT.END, SWT.CENTER)
@@ -1012,8 +997,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
     */
    private void createUI_64_MaxHR(final Composite parent) {
 
-      Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Pref_People_Label_MaxHR);
+      UI.createLabel(parent, Messages.Pref_People_Label_MaxHR);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -1028,18 +1012,10 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          _spinnerMaxHR = new Spinner(container, SWT.BORDER);
          _spinnerMaxHR.setMinimum(HEART_BEAT_MIN);
          _spinnerMaxHR.setMaximum(HEART_BEAT_MAX);
-         _spinnerMaxHR.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               updateUIOnModifiedHrZones();
-            }
-         });
-         _spinnerMaxHR.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseScrolled(final MouseEvent event) {
-               UI.adjustSpinnerValueOnMouseScroll(event);
-               updateUIOnModifiedHrZones();
-            }
+         _spinnerMaxHR.addSelectionListener(widgetSelectedAdapter(selectionEvent -> updateUIOnModifiedHrZones()));
+         _spinnerMaxHR.addMouseWheelListener(mouseEvent -> {
+            UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+            updateUIOnModifiedHrZones();
          });
          GridDataFactory.fillDefaults()
                .align(SWT.BEGINNING, SWT.FILL)
@@ -1049,20 +1025,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          /*
           * label: unit
           */
-         label = new Label(container, SWT.NONE);
-         label.setText(GRAPH_LABEL_HEARTBEAT_UNIT);
+         UI.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
 
          /*
           * combo: formula to compute hr max
           */
          _cboHrMaxFormula = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
          _cboHrMaxFormula.setVisibleItemCount(20);
-         _cboHrMaxFormula.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               updateUIOnModifiedHrZones();
-            }
-         });
+         _cboHrMaxFormula.addSelectionListener(widgetSelectedAdapter(selectionEvent -> updateUIOnModifiedHrZones()));
          GridDataFactory.fillDefaults()
                .grab(true, false)
                .indent(5, 0)
@@ -1135,24 +1105,22 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          /*
-          * button: compute speed values for all tours
+          * Button: compute HR zones
           */
          _btnComputeHrZonesForAllTours = new Button(container, SWT.NONE);
          _btnComputeHrZonesForAllTours.setText(Messages.Pref_People_Button_HrZones_ComputeAllTours);
          _btnComputeHrZonesForAllTours.setToolTipText(Messages.Pref_People_Button_HrZones_ComputeAllTours_Tooltip);
-         _btnComputeHrZonesForAllTours.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
+         _btnComputeHrZonesForAllTours.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-               if (MessageDialog.openConfirm(
-                     Display.getCurrent().getActiveShell(),
-                     Messages.Compute_HrZones_Dialog_ComputeAllTours_Title,
-                     Messages.Compute_HrZones_Dialog_ComputeAllTours_Title_Message)) {
+            if (MessageDialog.openConfirm(
+                  Display.getCurrent().getActiveShell(),
+                  Messages.Compute_HrZones_Dialog_ComputeAllTours_Title,
+                  Messages.Compute_HrZones_Dialog_ComputeAllTours_Title_Message)) {
 
-                  computeHrZonesForAllTours(false);
-               }
+               computeHrZonesForAllTours(false);
             }
-         });
+
+         }));
          GridDataFactory.fillDefaults().applyTo(_btnComputeHrZonesForAllTours);
 
          /*
@@ -1160,12 +1128,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
           */
          _btnModifyHrZones = new Button(container, SWT.PUSH);
          _btnModifyHrZones.setText(Messages.Dialog_HRZone_Button_EditHrZones);
-         _btnModifyHrZones.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onEditHrZones();
-            }
-         });
+         _btnModifyHrZones.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onEditHrZones()));
          GridDataFactory.fillDefaults()
                .grab(true, false)
                .align(SWT.END, SWT.FILL)
@@ -1177,12 +1140,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          _cboTemplate = new Combo(container, SWT.READ_ONLY | SWT.DROP_DOWN);
          _cboTemplate.setToolTipText(Messages.Pref_People_Label_HrZoneTemplate_Tooltip);
          _cboTemplate.setVisibleItemCount(20);
-         _cboTemplate.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onCreateHrZonesFromTemplate();
-            }
-         });
+         _cboTemplate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onCreateHrZonesFromTemplate()));
          GridDataFactory.fillDefaults()
                .hint(comboWidth, SWT.DEFAULT)
                .applyTo(_cboTemplate);
@@ -1671,6 +1629,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       _btnModifyHrZones.setEnabled(isHrZoneAvailable);
 //		_btnComputeHrZonesForAllTours.setEnabled(_isPersonModified && isValid);
       _btnComputeHrZonesForAllTours.setEnabled(_isPersonModified == false);
+
+      _txtBodyMassIndex.setText(String.valueOf(
+            UI.computeBodyMassIndex(_spinnerWeight.getSelection() / 10.0, _spinnerHeight.getSelection() / 100.0)));
    }
 
    private void fireModifyEvent() {
@@ -1737,27 +1698,14 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
 
       _fontItalic = JFaceResources.getFontRegistry().getItalic(JFaceResources.DIALOG_FONT);
 
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onModifyPerson();
-         }
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onModifyPerson());
+
+      _defaultMouseWheelListener = mouseEvent -> {
+         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
+         onModifyPerson();
       };
 
-      _defaultMouseWheelListener = new MouseWheelListener() {
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
-            UI.adjustSpinnerValueOnMouseScroll(event);
-            onModifyPerson();
-         }
-      };
-
-      _defaultModifyListener = new ModifyListener() {
-         @Override
-         public void modifyText(final ModifyEvent e) {
-            onModifyPerson();
-         }
-      };
+      _defaultModifyListener = modifyEvent -> onModifyPerson();
 
       _hrZoneMouseListener = new MouseListener() {
 

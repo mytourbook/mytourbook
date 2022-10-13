@@ -6,7 +6,6 @@
 	<classpathentry exported="true" kind="lib" path="c3p0-0.9.1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="caffeine-3.0.1.jar"/> <!-- https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine -->
 	<classpathentry exported="true" kind="lib" path="commons-imaging-1.0-alpha1.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-imaging -->
-	<classpathentry exported="true" kind="lib" path="core-3.1.0.jar" sourcepath="jar-sources/core-3.1.0-sources.jar"/> <!-- https://mvnrepository.com/artifact/net.sf.trove4j/core -->
 	<classpathentry exported="true" kind="lib" path="imgscalr-lib-4.2.jar"/> <!-- https://mvnrepository.com/artifact/org.imgscalr/imgscalr-lib -->
 	<classpathentry exported="true" kind="lib" path="jackson-core-2.13.3.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
 	<classpathentry exported="true" kind="lib" path="jackson-databind-2.13.3.jar"/> <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->

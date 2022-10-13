@@ -40,7 +40,7 @@ public class TourMarkerViewTests extends UITest {
             .getNode("May   2").expand().select().getNode("23").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
-      final SWTBotView tourEditorView = Utils.showView(bot, "Tour Editor"); //$NON-NLS-1$
+      final SWTBotView tourEditorView = Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
 
       final SWTBotCTabItem timeSlicesTab = bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
       assertNotNull(timeSlicesTab);
@@ -50,7 +50,7 @@ public class TourMarkerViewTests extends UITest {
       timeSlicesTable.select(0);
       timeSlicesTable.contextMenu(Messages.tourCatalog_view_action_create_marker).click();
       bot.button("Save ").click(); //$NON-NLS-1$
-      bot.toolbarButtonWithTooltip("Save modified tour (Ctrl+S)").click(); //$NON-NLS-1$
+      bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
       //Open the Tour Marker View
       Utils.openOtherMenu(bot);

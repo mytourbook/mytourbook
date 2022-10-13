@@ -34,6 +34,6 @@ class Suunto2_DeviceDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testImportForestPark() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "log-F783095113000500-2013-05-18T11_00_38-0", ".xml");
+      testImportFile(deviceDataReader, FILES_PATH + "log-F783095113000500-2013-05-18T11_00_38-0", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }

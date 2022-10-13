@@ -37,13 +37,6 @@ public class WorkbenchTests extends UITest {
    }
 
    @Test
-   void testOpenPreferences() {
-
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
-   }
-
-   @Test
    void testOpenViews() {
 
       //Select a tour so that the selected views contain information
@@ -58,9 +51,6 @@ public class WorkbenchTests extends UITest {
 
       bot.toolbarButtonWithTooltip("Statistics (Ctrl+Shift+S)").click(); //$NON-NLS-1$
       Utils.showView(bot, "Statistics"); //$NON-NLS-1$
-
-      bot.toolbarButtonWithTooltip("Calendar (Ctrl+Shift+C)").click(); //$NON-NLS-1$
-      Utils.showView(bot, "Calendar"); //$NON-NLS-1$
 
       bot.toolbarButtonWithTooltip("Shows tour in 2D map").click(); //$NON-NLS-1$
       Utils.showView(bot, "2D Tour Map"); //$NON-NLS-1$
@@ -89,11 +79,6 @@ public class WorkbenchTests extends UITest {
       bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode("Tour Data").select(); //$NON-NLS-1$
       bot.button("Open").click(); //$NON-NLS-1$
       Utils.showView(bot, "Tour Data"); //$NON-NLS-1$
-
-      Utils.showView(bot, "Tour Editor"); //$NON-NLS-1$
-
-      Utils.showViewFromMenu(bot, Utils.TOOLS, "Tour Segmenter"); //$NON-NLS-1$
-      Utils.showView(bot, "Tour Segmenter"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Tour Analyzer"); //$NON-NLS-1$
       Utils.showView(bot, "Tour Analyzer"); //$NON-NLS-1$

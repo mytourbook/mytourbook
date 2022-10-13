@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,10 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
-
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.list.array.TLongArrayList;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -44,6 +40,10 @@ import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
 
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
+
 public class DataProvider_Tour_Day extends DataProvider {
 
    private TourStatisticData_Day _tourDayData;
@@ -53,7 +53,7 @@ public class DataProvider_Tour_Day extends DataProvider {
 
    private DurationTime          _durationTime;
 
-   private void adjustValues(final TFloatArrayList dbAllValues,
+   private void adjustValues(final FloatArrayList dbAllValues,
                              final float[] lowValues,
                              final float[] highValues,
                              final int sameDOY_FirstIndex,
@@ -83,7 +83,7 @@ public class DataProvider_Tour_Day extends DataProvider {
       }
    }
 
-   private void adjustValues(final TIntArrayList dbAllTourDuration,
+   private void adjustValues(final IntArrayList dbAllTourDuration,
                              final int[] duration_Low,
                              final int[] duration_High,
                              final int sameDOY_FirstIndex,
@@ -160,9 +160,9 @@ public class DataProvider_Tour_Day extends DataProvider {
       }
    }
 
-   private void adjustValues_Avg(final TIntArrayList dbAllTourDuration,
+   private void adjustValues_Avg(final IntArrayList dbAllTourDuration,
 
-                                 final TFloatArrayList dbAllValues,
+                                 final FloatArrayList dbAllValues,
                                  final float[] lowValues,
                                  final float[] highValues,
 
@@ -342,41 +342,41 @@ public class DataProvider_Tour_Day extends DataProvider {
 
                + "ORDER BY TourStartTime" + NL; //                                              //$NON-NLS-1$
 
-         final TLongArrayList dbAllTourIds = new TLongArrayList();
+         final LongArrayList dbAllTourIds = new LongArrayList();
 
-         final TIntArrayList dbAllYears = new TIntArrayList();
-         final TIntArrayList dbAllMonths = new TIntArrayList();
-         final TIntArrayList dbAllDays = new TIntArrayList();
-         final TIntArrayList dbAllYearsDOY = new TIntArrayList(); // DOY...Day Of Year
+         final IntArrayList dbAllYears = new IntArrayList();
+         final IntArrayList dbAllMonths = new IntArrayList();
+         final IntArrayList dbAllDays = new IntArrayList();
+         final IntArrayList dbAllYearsDOY = new IntArrayList(); // DOY...Day Of Year
 
-         final TIntArrayList dbAllTourStartTime = new TIntArrayList();
-         final TIntArrayList dbAllTourEndTime = new TIntArrayList();
-         final TIntArrayList dbAllTourStartWeek = new TIntArrayList();
+         final IntArrayList dbAllTourStartTime = new IntArrayList();
+         final IntArrayList dbAllTourEndTime = new IntArrayList();
+         final IntArrayList dbAllTourStartWeek = new IntArrayList();
          final ArrayList<ZonedDateTime> dbAllTourStartDateTime = new ArrayList<>();
 
-         final TIntArrayList dbAllTourDeviceTime_Elapsed = new TIntArrayList();
-         final TIntArrayList dbAllTourDeviceTime_Recorded = new TIntArrayList();
-         final TIntArrayList dbAllTourDeviceTime_Paused = new TIntArrayList();
-         final TIntArrayList dbAllTourComputedTime_Moving = new TIntArrayList();
-         final TIntArrayList dbAllTourDurationTimes = new TIntArrayList();
+         final IntArrayList dbAllTourDeviceTime_Elapsed = new IntArrayList();
+         final IntArrayList dbAllTourDeviceTime_Recorded = new IntArrayList();
+         final IntArrayList dbAllTourDeviceTime_Paused = new IntArrayList();
+         final IntArrayList dbAllTourComputedTime_Moving = new IntArrayList();
+         final IntArrayList dbAllTourDurationTimes = new IntArrayList();
 
-         final TFloatArrayList dbAllDistance = new TFloatArrayList();
-         final TFloatArrayList dbAllAvgSpeed = new TFloatArrayList();
-         final TFloatArrayList dbAllAvgPace = new TFloatArrayList();
-         final TFloatArrayList dbAllElevationUp = new TFloatArrayList();
+         final FloatArrayList dbAllDistance = new FloatArrayList();
+         final FloatArrayList dbAllAvgSpeed = new FloatArrayList();
+         final FloatArrayList dbAllAvgPace = new FloatArrayList();
+         final FloatArrayList dbAllElevationUp = new FloatArrayList();
 
-         final TFloatArrayList dbAllTrain_Effect_Aerob = new TFloatArrayList();
-         final TFloatArrayList dbAllTrain_Effect_Anaerob = new TFloatArrayList();
-         final TFloatArrayList dbAllTrain_Performance = new TFloatArrayList();
+         final FloatArrayList dbAllTrain_Effect_Aerob = new FloatArrayList();
+         final FloatArrayList dbAllTrain_Effect_Anaerob = new FloatArrayList();
+         final FloatArrayList dbAllTrain_Performance = new FloatArrayList();
 
-         final TFloatArrayList dbAllBodyWeight = new TFloatArrayList();
-         final TFloatArrayList dbAllBodyFat = new TFloatArrayList();
+         final FloatArrayList dbAllBodyWeight = new FloatArrayList();
+         final FloatArrayList dbAllBodyFat = new FloatArrayList();
 
          final ArrayList<String> dbAllTourTitle = new ArrayList<>();
          final ArrayList<String> dbAllTourDescription = new ArrayList<>();
 
-         final TLongArrayList allTypeIds = new TLongArrayList();
-         final TIntArrayList allTypeColorIndex = new TIntArrayList();
+         final LongArrayList allTypeIds = new LongArrayList();
+         final IntArrayList allTypeColorIndex = new IntArrayList();
 
          final HashMap<Long, ArrayList<Long>> allTagIds = new HashMap<>();
 

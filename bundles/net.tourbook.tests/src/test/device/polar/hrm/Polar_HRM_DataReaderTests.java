@@ -35,6 +35,6 @@ public class Polar_HRM_DataReaderTests extends DeviceDataReaderTester {
    @Test
    void testHrmImport_080510() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "SampleHRM_WithErrorsAtTheEnd", ".hrm");
+      testImportFile(deviceDataReader, FILES_PATH + "SampleHRM_WithErrorsAtTheEnd", ".hrm"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }

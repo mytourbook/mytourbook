@@ -1755,10 +1755,12 @@ public class TourInfoUI {
 
       // wind direction
       final int weatherWindDirectionDegree = _tourData.getWeather_Wind_Direction();
-      _lblWindDirection.setText(Integer.toString(weatherWindDirectionDegree));
-      _lblWindDirectionUnit.setText(String.format(
-            Messages.Tour_Tooltip_Format_WindDirectionUnit,
-            UI.getCardinalDirectionText(weatherWindDirectionDegree * 10)));
+      if (weatherWindDirectionDegree != -1) {
+         _lblWindDirection.setText(Integer.toString(weatherWindDirectionDegree));
+         _lblWindDirectionUnit.setText(String.format(
+               Messages.Tour_Tooltip_Format_WindDirectionUnit,
+               UI.getCardinalDirectionText(weatherWindDirectionDegree)));
+      }
 
       // Average temperature
       final float temperature_NoDevice = _tourData.getWeather_Temperature_Average();

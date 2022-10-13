@@ -31,6 +31,6 @@ public class MTDeviceDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testMtImport_20210131() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "2021-01-31_07-15-25", ".mt");
+      testImportFile(deviceDataReader, FILES_PATH + "2021-01-31_07-15-25", ".mt"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }

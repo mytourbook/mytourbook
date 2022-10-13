@@ -20,9 +20,6 @@ import de.byteholder.geoclipse.map.Map2Painter;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.mapprovider.MP;
 
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.hash.TIntHashSet;
-
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -70,6 +67,8 @@ import net.tourbook.preferences.Map2_Appearance;
 import net.tourbook.tour.filter.TourFilterFieldOperator;
 import net.tourbook.ui.views.tourCatalog.ReferenceTourManager;
 
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
@@ -1069,7 +1068,7 @@ public class TourMapPainter extends Map2Painter {
                   final int projectionHash = mp.getProjection().getId().hashCode();
                   final int mapZoomLevel = map.getZoom();
 
-                  TIntObjectHashMap<Point> allWayPointWorldPixel = tourData.getWorldPositionForWayPoints(
+                  IntObjectHashMap<Point> allWayPointWorldPixel = tourData.getWorldPositionForWayPoints(
                         projectionHash,
                         mapZoomLevel);
 
@@ -1966,7 +1965,7 @@ public class TourMapPainter extends Map2Painter {
       paintingHash = prime * paintingHash + devYFrom;
       paintingHash = prime * paintingHash + devYTo;
 
-      final TIntHashSet allPainted_DotsHash = tile.allPainted_Hash;
+      final IntHashSet allPainted_DotsHash = tile.allPainted_Hash;
       if (allPainted_DotsHash.contains(paintingHash)) {
 
          // dot is already painted
@@ -2006,7 +2005,7 @@ public class TourMapPainter extends Map2Painter {
       paintingHash = prime * paintingHash + paintedDevX;
       paintingHash = prime * paintingHash + paintedDevY;
 
-      final TIntHashSet allPainted_DotsHash = tile.allPainted_Hash;
+      final IntHashSet allPainted_DotsHash = tile.allPainted_Hash;
       if (allPainted_DotsHash.contains(paintingHash)) {
 
          // dot is already painted
@@ -2068,7 +2067,7 @@ public class TourMapPainter extends Map2Painter {
       paintingHash = prime * paintingHash + paintedDevX;
       paintingHash = prime * paintingHash + paintedDevY;
 
-      final TIntHashSet allPainted_DotsHash = tile.allPainted_Hash;
+      final IntHashSet allPainted_DotsHash = tile.allPainted_Hash;
       if (allPainted_DotsHash.contains(paintingHash)) {
 
          // dot is already painted
@@ -2742,7 +2741,7 @@ public class TourMapPainter extends Map2Painter {
       if (latitudeSerie != null && longitudeSerie != null) {
 
          // tiles are cached to optimize performance when multiple tours are selected
-         TIntHashSet tileHashes = tourData.getTileHashes_ForTours(projectionHash, mapZoomLevel);
+         IntHashSet tileHashes = tourData.getTileHashes_ForTours(projectionHash, mapZoomLevel);
 
          if (tileHashes == null) {
 
@@ -2784,7 +2783,7 @@ public class TourMapPainter extends Map2Painter {
       if (tourWayPoints.size() > 0) {
 
          // tiles are cached to optimize performance when multiple tours are selected
-         TIntHashSet tileHashes = tourData.getTileHashes_ForWayPoints(projectionHash, mapZoomLevel);
+         IntHashSet tileHashes = tourData.getTileHashes_ForWayPoints(projectionHash, mapZoomLevel);
 
          if (tileHashes == null) {
 
@@ -3051,14 +3050,14 @@ public class TourMapPainter extends Map2Painter {
     * @param projectionHash
     * @return
     */
-   private TIntHashSet setupTileHashes_Tour(final TourData tourData,
-                                            final MP mp,
-                                            final int mapZoomLevel,
-                                            final double[] latitudeSerie,
-                                            final double[] longitudeSerie,
-                                            final int projectionHash) {
+   private IntHashSet setupTileHashes_Tour(final TourData tourData,
+                                           final MP mp,
+                                           final int mapZoomLevel,
+                                           final double[] latitudeSerie,
+                                           final double[] longitudeSerie,
+                                           final int projectionHash) {
 
-      final TIntHashSet tileHashes = new TIntHashSet();
+      final IntHashSet tileHashes = new IntHashSet();
 
       final int numSlices = latitudeSerie.length;
       final int tileSize = mp.getTileSize();
@@ -3093,18 +3092,17 @@ public class TourMapPainter extends Map2Painter {
     * @param tourData
     * @param mp
     * @param mapZoomLevel
-    * @param latitudeSerie
-    * @param longitudeSerie
+    * @param tourWayPoints
     * @param projectionHash
     * @return
     */
-   private TIntHashSet setupTileHashes_WayPoint(final TourData tourData,
-                                                final MP mp,
-                                                final int mapZoomLevel,
-                                                final Set<TourWayPoint> tourWayPoints,
-                                                final int projectionHash) {
+   private IntHashSet setupTileHashes_WayPoint(final TourData tourData,
+                                               final MP mp,
+                                               final int mapZoomLevel,
+                                               final Set<TourWayPoint> tourWayPoints,
+                                               final int projectionHash) {
 
-      final TIntHashSet tileHashes = new TIntHashSet();
+      final IntHashSet tileHashes = new IntHashSet();
 
       final int tileSize = mp.getTileSize();
 
@@ -3168,14 +3166,14 @@ public class TourMapPainter extends Map2Painter {
       return allTour_WorldPixelPos;
    }
 
-   private TIntObjectHashMap<Point> setupWorldPixel_WayPoint(final TourData tourData,
-                                                             final Set<TourWayPoint> wayPoints,
-                                                             final MP mp,
-                                                             final int projectionHash,
-                                                             final int mapZoomLevel) {
+   private IntObjectHashMap<Point> setupWorldPixel_WayPoint(final TourData tourData,
+                                                            final Set<TourWayPoint> wayPoints,
+                                                            final MP mp,
+                                                            final int projectionHash,
+                                                            final int mapZoomLevel) {
       // world pixels are not yet cached, create them now
 
-      final TIntObjectHashMap<Point> allWayPointWorldPixel = new TIntObjectHashMap<>();
+      final IntObjectHashMap<Point> allWayPointWorldPixel = new IntObjectHashMap<>();
 
       for (final TourWayPoint twp : wayPoints) {
 

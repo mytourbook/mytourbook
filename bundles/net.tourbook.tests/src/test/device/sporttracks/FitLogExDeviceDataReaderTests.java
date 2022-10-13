@@ -37,12 +37,12 @@ class FitLogExDeviceDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testImportParkCity() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "ParkCity", ".fitlogEx");
+      testImportFile(deviceDataReader, FILES_PATH + "ParkCity", ".fitlogEx"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    @Test
    void testImportTimothyLake() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "TimothyLake", ".fitlogEx");
+      testImportFile(deviceDataReader, FILES_PATH + "TimothyLake", ".fitlogEx"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }

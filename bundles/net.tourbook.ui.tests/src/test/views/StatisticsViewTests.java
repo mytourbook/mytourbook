@@ -32,46 +32,46 @@ public class StatisticsViewTests extends UITest {
    @Test
    public void testStatisticsView() {
 
-      final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.STATISTICS_VIEW_NAME).bot();
+      final SWTBot statisticsViewBot = Utils.showView(bot, Utils.STATISTICS_VIEW_NAME).bot();
       bot.sleep(3000);
 
-      final SWTBotCombo statisticsTypeComboBox = tourEditorViewBot.comboBox(0);
+      final SWTBotCombo statisticsTypeComboBox = statisticsViewBot.comboBox(0);
       assertEquals(27, statisticsTypeComboBox.itemCount());
       assertNotNull(statisticsTypeComboBox);
       statisticsTypeComboBox.setSelection(0);
-      assertEquals("Daytime", statisticsTypeComboBox.selection());
+      assertEquals("Daytime", statisticsTypeComboBox.selection()); //$NON-NLS-1$
 
-      final SWTBotCombo yearComboBox = tourEditorViewBot.comboBox(2);
+      final SWTBotCombo yearComboBox = statisticsViewBot.comboBox(2);
       assertNotNull(yearComboBox);
       assertEquals(11, yearComboBox.itemCount());
-      yearComboBox.setSelection("9");
-      assertEquals("9", yearComboBox.selection());
+      yearComboBox.setSelection("9"); //$NON-NLS-1$
+      assertEquals("9", yearComboBox.selection()); //$NON-NLS-1$
 
       statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_DaySummary);
       statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_WeekSummary);
       statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_MonthSummary);
       statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_YearSummary);
       statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_TourFrequency);
-      statisticsTypeComboBox.setSelection("HR Zones - Week");
-      statisticsTypeComboBox.setSelection("HR Zones - Month");
-      statisticsTypeComboBox.setSelection("Training - Line");
-      statisticsTypeComboBox.setSelection("Training - Bar");
-      statisticsTypeComboBox.setSelection("Tour Time - Day");
-      statisticsTypeComboBox.setSelection("Tour Time - Week");
-      statisticsTypeComboBox.setSelection("Tour Time - Month");
-      statisticsTypeComboBox.setSelection("Tour Time - Year");
-      statisticsTypeComboBox.setSelection("Distance - Day");
-      statisticsTypeComboBox.setSelection("Distance - Week");
-      statisticsTypeComboBox.setSelection("Distance - Month");
-      statisticsTypeComboBox.setSelection("Distance - Year");
-      statisticsTypeComboBox.setSelection("Elevation - Day");
-      statisticsTypeComboBox.setSelection("Elevation - Week");
-      statisticsTypeComboBox.setSelection("Elevation - Month");
-      statisticsTypeComboBox.setSelection("Elevation - Year");
-      statisticsTypeComboBox.setSelection("Athlete's Data - Day");
-      statisticsTypeComboBox.setSelection("Athlete's Data - Week");
-      statisticsTypeComboBox.setSelection("Athlete's Data - Month");
-      statisticsTypeComboBox.setSelection("Athlete's Data - Year");
-      statisticsTypeComboBox.setSelection("Battery SoC");
+      statisticsTypeComboBox.setSelection("HR Zones - Week"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("HR Zones - Month"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Training - Line"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Training - Bar"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Tour Time - Day"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Tour Time - Week"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Tour Time - Month"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Tour Time - Year"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Distance - Day"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Distance - Week"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Distance - Month"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Distance - Year"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation - Day"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation - Week"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation - Month"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Elevation - Year"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Athlete's Data - Day"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Athlete's Data - Week"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Athlete's Data - Month"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Athlete's Data - Year"); //$NON-NLS-1$
+      statisticsTypeComboBox.setSelection("Battery SoC"); //$NON-NLS-1$
    }
 }
