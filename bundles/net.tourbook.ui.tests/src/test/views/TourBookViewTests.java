@@ -200,7 +200,7 @@ public class TourBookViewTests extends UITest {
 
       //Set elevation from SRTM
       tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
-            .menu("Elevation")
+            .menu(Messages.Tour_SubMenu_Elevation)
             .menu(Messages.TourEditor_Action_SetAltitudeValuesFromSRTM)
             .click();
       bot.button("OK").click();
