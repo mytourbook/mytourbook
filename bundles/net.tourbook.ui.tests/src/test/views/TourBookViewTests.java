@@ -192,10 +192,21 @@ public class TourBookViewTests extends UITest {
    void testSetElevationValuesFromSRTM() {
 
       Utils.showTourBookView(bot);
-      final SWTBotTreeItem tour = selectTour();
-      tour.contextMenu("Adjust Tour Values").menu("Elevation").menu("Set Elevation values from SRTM...").click();
+      SWTBotTreeItem tour = selectTour();
+
+      //Check the original elevation value
+      assertEquals("1,073", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
+
+      //Set elevation from SRTM
+      tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
+            .menu("Elevation")
+            .menu(Messages.TourEditor_Action_SetAltitudeValuesFromSRTM)
+            .click();
       bot.button("OK").click();
 
-      //assert the new elevation value
+      //Check the new elevation value
+      tour = selectTour();
+      assertNotNull(tour);
+      assertEquals("1,073,000", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
    }
 }
