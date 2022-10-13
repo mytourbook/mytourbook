@@ -22,6 +22,9 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.RawDataManager;
 import net.tourbook.importdata.RawDataManager.TourValueType;
+import net.tourbook.tour.TourLogManager;
+import net.tourbook.tour.TourLogState;
+import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 
@@ -56,7 +59,15 @@ public class ActionSetElevationValuesFromSRTM extends Action {
 
       if (TourManager.setElevationValuesFromSRTM(selectedTours)) {
 
+         TourLogManager.addLog(
+               TourLogState.DEFAULT,
+               "Setting elevation values from SRTM:",
+               TourLogView.CSS_LOG_TITLE);
+
          for (int index = 0; index < selectedTours.size(); ++index) {
+
+            //todo fb add the tour date & time in the log
+
             RawDataManager.displayTourModifiedDataDifferences(
                   TourValueType.TIME_SLICES__ELEVATION,
                   oldTourDataDummyClone.get(index),
