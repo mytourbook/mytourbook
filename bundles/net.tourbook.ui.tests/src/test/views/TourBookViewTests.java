@@ -193,9 +193,10 @@ public class TourBookViewTests extends UITest {
 
       Utils.showTourBookView(bot);
       SWTBotTreeItem tour = selectTour();
+      assertNotNull(tour);
 
       //Check the original elevation value
-      assertEquals("1,073", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
+      assertEquals("658", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
 
       //Set elevation from SRTM
       tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
