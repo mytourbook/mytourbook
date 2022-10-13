@@ -49,6 +49,22 @@ public class Utils {
       return tour;
    }
 
+   /**
+    * Select a tour for which we have SRTM3 data
+    */
+   public static SWTBotTreeItem getTourWithSRTM(final SWTWorkbenchBot bot) {
+
+      showTourBookView(bot);
+
+      bot.toolbarButtonWithTooltip(Messages.App_Action_CollapseAll).click();
+
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      return tour;
+   }
+
    public static void openOtherMenu(final SWTWorkbenchBot bot) {
 
       final SWTBotMenu otherMenu = bot.menu(TOOLS).menu("All Views").menu("Other...").click(); //$NON-NLS-1$ //$NON-NLS-2$

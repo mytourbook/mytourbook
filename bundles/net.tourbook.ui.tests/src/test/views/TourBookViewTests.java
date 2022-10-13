@@ -38,15 +38,6 @@ import utils.Utils;
 public class TourBookViewTests extends UITest {
 
    /**
-    * Select a tour for which we have SRTM3 data
-    */
-   private SWTBotTreeItem selectTour() {
-
-      return bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
-            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
-   }
-
-   /**
     * This test doesn't work because SWTBot doesn't support native dialogs
     * https://wiki.eclipse.org/SWTBot/FAQ#How_do_I_use_SWTBot_to_test_native_dialogs_.28File_Dialogs.2C_Color_Dialogs.2C_etc.29.3F
     */
@@ -192,8 +183,7 @@ public class TourBookViewTests extends UITest {
    void testSetElevationValuesFromSRTM() {
 
       Utils.showTourBookView(bot);
-      SWTBotTreeItem tour = selectTour();
-      assertNotNull(tour);
+      SWTBotTreeItem tour = Utils.getTourWithSRTM(bot);
 
       //Check the original elevation value
       // assertEquals("658", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
@@ -206,8 +196,7 @@ public class TourBookViewTests extends UITest {
       bot.button("OK").click();
 
       //Check the new elevation value
-      tour = selectTour();
-      assertNotNull(tour);
+      tour = Utils.getTourWithSRTM(bot);
       // assertEquals("1,008", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
    }
 }
