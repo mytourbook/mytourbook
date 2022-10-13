@@ -38,6 +38,15 @@ import utils.Utils;
 public class TourBookViewTests extends UITest {
 
    /**
+    * Select a tour for which we have SRTM3 data
+    */
+   private SWTBotTreeItem selectTour() {
+
+      return bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
+   /**
     * This test doesn't work because SWTBot doesn't support native dialogs
     * https://wiki.eclipse.org/SWTBot/FAQ#How_do_I_use_SWTBot_to_test_native_dialogs_.28File_Dialogs.2C_Color_Dialogs.2C_etc.29.3F
     */
@@ -177,5 +186,16 @@ public class TourBookViewTests extends UITest {
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
             "1/31/21, 7:15 AM -> Error while retrieving the weather data: \"{\"cod\":\"400\",\"message\":\"requested time is out of allowed range of 5 days back\"}\"")));//$NON-NLS-1$
+   }
+
+   @Test
+   void testSetElevationValuesFromSRTM() {
+
+      Utils.showTourBookView(bot);
+      final SWTBotTreeItem tour = selectTour();
+      tour.contextMenu("Adjust Tour Values").menu("Elevation").menu("Set Elevation values from SRTM...").click();
+      bot.button("OK").click();
+
+      //assert the new elevation value
    }
 }
