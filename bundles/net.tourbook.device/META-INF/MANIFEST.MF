@@ -11,10 +11,18 @@ Require-Bundle: org.eclipse.core.runtime,
  net.tourbook.ext.rxtx_2.2
 Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.device,
+ net.tourbook.device.cm4xxm,
+ net.tourbook.device.crp,
+ net.tourbook.device.daum.ergobike,
  net.tourbook.device.gpx,
+ net.tourbook.device.hac4,
+ net.tourbook.device.hac4linux.tour,
+ net.tourbook.device.mt,
  net.tourbook.device.polar.hrm,
+ net.tourbook.device.polartrainer,
  net.tourbook.device.sporttracks,
- net.tourbook.device.suunto
+ net.tourbook.device.suunto,
+ net.tourbook.device.tur
 Bundle-Vendor: MyTourbook
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: de.byteholder.geoclipse.map,

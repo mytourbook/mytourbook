@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm, Markus Stipp
+ * Copyright (C) 2005, 2022 Wolfgang Schramm, Markus Stipp
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,6 @@ package net.tourbook.device.cm4xxm;
 import gnu.io.SerialPort;
 
 import java.io.BufferedInputStream;
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -578,17 +577,6 @@ public class CM4XXMDeviceReader extends TourbookDevice {
       return startBlock;
    }
 
-   public final int readSummary(final byte[] buffer) throws IOException {
-      final int ch0 = buffer[0];
-      final int ch1 = buffer[1];
-      final int ch2 = buffer[2];
-      final int ch3 = buffer[3];
-      if ((ch0 | ch1 | ch2 | ch3) < 0) {
-         throw new EOFException();
-      }
-      return ((ch1 << 8) + (ch0 << 0)) + ((ch3 << 8) + (ch2 << 0));
-   }
-
    /**
     * @param timeData
     * @param rawData
@@ -636,15 +624,11 @@ public class CM4XXMDeviceReader extends TourbookDevice {
    public boolean validateRawData(final String fileName) {
 
       boolean isValid = false;
+      final File dataFile = new File(fileName);
 
-      BufferedInputStream inStream = null;
-
-      try {
+      try (BufferedInputStream inStream = new BufferedInputStream(new FileInputStream(dataFile))) {
 
          final byte[] buffer = new byte[5];
-
-         final File dataFile = new File(fileName);
-         inStream = new BufferedInputStream(new FileInputStream(dataFile));
 
          inStream.read(buffer);
          if (!"AFRO".equalsIgnoreCase(new String(buffer, 0, 4))) { //$NON-NLS-1$
@@ -680,14 +664,6 @@ public class CM4XXMDeviceReader extends TourbookDevice {
          return false;
       } catch (final Exception e) {
          e.printStackTrace();
-      } finally {
-         if (inStream != null) {
-            try {
-               inStream.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       return isValid;

@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CalendarProfiles Created="2022-10-06T22:34:37.358003Z[UTC]" VersionMajor="22" VersionMicro="0" VersionMinor="8" VersionQualifier="qualifier" profileVersion="1">
+<CalendarProfile activeProfileId="4036662173800">
+<Calendar dateColumnContent="MONTH" dateColumnFont="1|Segoe UI|15.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" dateColumnWidth="50" dayDateFont="1|Segoe UI|14.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" dayDateFormat="DAY" dayDateMarginLeft="3" dayDateMarginTop="-4" id="4036662173800" isDayContentVertical="true" isDefaultDefaultId="true" isHideDayDateWhenNoTour="true" isShowDateColumn="true" isShowDayDate="true" isShowDayDateWeekendColor="false" isShowSummaryColumn="true" isShowTourContent="true" isShowTourValueUnit="true" isShowWeekValueUnit="true" isShowYearColumns="true" isToggleMonthColor="false" isTruncateTourText="true" isUserParentDefaultId="false" isWeekRowHeight="true" isYearColumnDayWidth="false" profileDefaultDefaultId="DEFAULT" profileName="Default" profileUserDefaultId="" profileUserParentDefaultId="" tourBackground="FILL" tourBackgroundColor1="DARK" tourBackgroundColor2="BRIGHT" tourBackgroundWidth="1" tourBorder="NO_BORDER" tourBorderColor="LINE" tourBorderWidth="3" tourContentColor="CONTRAST" tourContentFont="1|Segoe UI|8.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" tourDraggedColor="CUSTOM" tourHoveredColor="CUSTOM" tourMarginBottom="1" tourMarginLeft="1" tourMarginRight="2" tourMarginTop="-1" tourSelectedColor="CUSTOM" tourTitleColor="CONTRAST" tourTitleFont="1|Segoe UI|10.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" tourTruncatedLines="2" tourValueColor="CONTRAST" tourValueColumns="2" tourValueFont="1|Segoe UI|9.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" useDraggedScrolling="false" weekColumnWidth="100" weekHeight="120" weekMarginBottom="1" weekMarginLeft="1" weekMarginRight="0" weekMarginTop="0" weekRows="10" weekValueColor="BRIGHT" weekValueFont="1|Segoe UI|10.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" yearColumnDayWidth="50" yearColumns="1" yearColumnsSpacing="30" yearColumnsStart="CONTINUOUSLY" yearHeaderFont="1|Segoe UI|25.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI">
+<AlternateMonthRGB blue="60" green="60" red="60"/>
+<AlternateMonth2RGB blue="80" green="80" red="80"/>
+<CalendarBackgroundRGB blue="40" green="40" red="40"/>
+<CalendarForegroundRGB blue="200" green="200" red="200"/>
+<DayHoveredRGB blue="192" green="192" red="192"/>
+<DaySelectedRGB blue="255" green="255" red="255"/>
+<DayTodayRGB blue="0" green="255" red="255"/>
+<weekValueRGB blue="128" green="0" red="255"/>
+<TourBackground1RGB blue="255" green="0" red="64"/>
+<TourBackground2RGB blue="0" green="64" red="128"/>
+<TourBorderRGB blue="0" green="128" red="192"/>
+<TourDraggedRGB blue="0" green="255" red="255"/>
+<TourHoveredRGB blue="192" green="192" red="192"/>
+<TourSelectedRGB blue="255" green="255" red="255"/>
+<TourContentRGB blue="255" green="192" red="255"/>
+<TourTitleRGB blue="203" green="255" red="191"/>
+<TourValueRGB blue="255" green="193" red="191"/>
+<AllTourFormatter>
+<Formatter formatterId="TOUR_TITLE" formatterValueFormat="DUMMY_VALUE" isShowValue="true"/>
+<Formatter formatterId="TOUR_DESCRIPTION" formatterValueFormat="DUMMY_VALUE" isShowValue="true"/>
+<Formatter formatterId="DISTANCE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="TIME_MOVING" formatterValueFormat="TIME_HH_MM" isShowValue="true"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+</AllTourFormatter>
+<AllWeekFormatter>
+<Formatter formatterId="DISTANCE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="SPEED" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="PACE" formatterValueFormat="PACE_MM_SS" isShowValue="true"/>
+<Formatter formatterId="TIME_MOVING" formatterValueFormat="TIME_HH_MM" isShowValue="true"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+</AllWeekFormatter>
+</Calendar>
+<Calendar dateColumnContent="MONTH" dateColumnFont="1|Segoe UI|12.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" dateColumnWidth="50" dayDateFont="1|Segoe UI|10.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" dayDateFormat="DAY" dayDateMarginLeft="2" dayDateMarginTop="-2" id="4036662704200" isDayContentVertical="false" isDefaultDefaultId="true" isHideDayDateWhenNoTour="true" isShowDateColumn="true" isShowDayDate="false" isShowDayDateWeekendColor="false" isShowSummaryColumn="true" isShowTourContent="true" isShowTourValueUnit="false" isShowWeekValueUnit="false" isShowYearColumns="true" isToggleMonthColor="false" isTruncateTourText="false" isUserParentDefaultId="false" isWeekRowHeight="true" isYearColumnDayWidth="false" profileDefaultDefaultId="COMPACT" profileName="Compact" profileUserDefaultId="" profileUserParentDefaultId="" tourBackground="FILL" tourBackgroundColor1="DARK" tourBackgroundColor2="BRIGHT" tourBackgroundWidth="1" tourBorder="NO_BORDER" tourBorderColor="LINE" tourBorderWidth="3" tourContentColor="CONTRAST" tourContentFont="1|Segoe UI|8.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" tourDraggedColor="CUSTOM" tourHoveredColor="CUSTOM" tourMarginBottom="0" tourMarginLeft="1" tourMarginRight="2" tourMarginTop="-2" tourSelectedColor="CUSTOM" tourTitleColor="CONTRAST" tourTitleFont="1|Segoe UI|9.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" tourTruncatedLines="1" tourValueColor="CONTRAST" tourValueColumns="3" tourValueFont="1|Segoe UI|9.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" useDraggedScrolling="false" weekColumnWidth="50" weekHeight="28" weekMarginBottom="1" weekMarginLeft="1" weekMarginRight="0" weekMarginTop="0" weekRows="10" weekValueColor="BRIGHT" weekValueFont="1|Segoe UI|8.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" yearColumnDayWidth="50" yearColumns="1" yearColumnsSpacing="30" yearColumnsStart="CONTINUOUSLY" yearHeaderFont="1|Segoe UI|17.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI">
+<AlternateMonthRGB blue="60" green="60" red="60"/>
+<AlternateMonth2RGB blue="80" green="80" red="80"/>
+<CalendarBackgroundRGB blue="40" green="40" red="40"/>
+<CalendarForegroundRGB blue="200" green="200" red="200"/>
+<DayHoveredRGB blue="192" green="192" red="192"/>
+<DaySelectedRGB blue="255" green="255" red="255"/>
+<DayTodayRGB blue="0" green="255" red="255"/>
+<weekValueRGB blue="128" green="0" red="255"/>
+<TourBackground1RGB blue="255" green="0" red="64"/>
+<TourBackground2RGB blue="0" green="64" red="128"/>
+<TourBorderRGB blue="0" green="128" red="192"/>
+<TourDraggedRGB blue="0" green="255" red="255"/>
+<TourHoveredRGB blue="192" green="192" red="192"/>
+<TourSelectedRGB blue="255" green="255" red="255"/>
+<TourContentRGB blue="255" green="192" red="255"/>
+<TourTitleRGB blue="203" green="255" red="191"/>
+<TourValueRGB blue="255" green="193" red="191"/>
+<AllTourFormatter>
+<Formatter formatterId="TOUR_TITLE" formatterValueFormat="DUMMY_VALUE" isShowValue="true"/>
+<Formatter formatterId="TOUR_DESCRIPTION" formatterValueFormat="DUMMY_VALUE" isShowValue="true"/>
+<Formatter formatterId="DISTANCE" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="ELEVATION" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="TIME_MOVING" formatterValueFormat="TIME_HH_MM" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+</AllTourFormatter>
+<AllWeekFormatter>
+<Formatter formatterId="DISTANCE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="SPEED" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="PACE" formatterValueFormat="PACE_MM_SS" isShowValue="false"/>
+<Formatter formatterId="TIME_MOVING" formatterValueFormat="TIME_HH_MM" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+</AllWeekFormatter>
+</Calendar>
+<Calendar dateColumnContent="MONTH" dateColumnFont="1|Segoe UI|10.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" dateColumnWidth="50" dayDateFont="1|Segoe UI|9.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" dayDateFormat="DAY" dayDateMarginLeft="2" dayDateMarginTop="-1" id="4036663122200" isDayContentVertical="false" isDefaultDefaultId="true" isHideDayDateWhenNoTour="true" isShowDateColumn="true" isShowDayDate="false" isShowDayDateWeekendColor="false" isShowSummaryColumn="true" isShowTourContent="true" isShowTourValueUnit="false" isShowWeekValueUnit="false" isShowYearColumns="true" isToggleMonthColor="false" isTruncateTourText="true" isUserParentDefaultId="false" isWeekRowHeight="true" isYearColumnDayWidth="false" profileDefaultDefaultId="COMPACT_II" profileName="Compact II" profileUserDefaultId="" profileUserParentDefaultId="" tourBackground="FILL" tourBackgroundColor1="DARK" tourBackgroundColor2="BRIGHT" tourBackgroundWidth="1" tourBorder="NO_BORDER" tourBorderColor="LINE" tourBorderWidth="3" tourContentColor="CONTRAST" tourContentFont="1|Segoe UI|8.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" tourDraggedColor="CUSTOM" tourHoveredColor="CUSTOM" tourMarginBottom="0" tourMarginLeft="1" tourMarginRight="2" tourMarginTop="-1" tourSelectedColor="CUSTOM" tourTitleColor="CONTRAST" tourTitleFont="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" tourTruncatedLines="1" tourValueColor="CONTRAST" tourValueColumns="3" tourValueFont="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" useDraggedScrolling="false" weekColumnWidth="50" weekHeight="14" weekMarginBottom="1" weekMarginLeft="1" weekMarginRight="0" weekMarginTop="0" weekRows="10" weekValueColor="BRIGHT" weekValueFont="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" yearColumnDayWidth="50" yearColumns="1" yearColumnsSpacing="30" yearColumnsStart="CONTINUOUSLY" yearHeaderFont="1|Segoe UI|15.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI">
+<AlternateMonthRGB blue="60" green="60" red="60"/>
+<AlternateMonth2RGB blue="80" green="80" red="80"/>
+<CalendarBackgroundRGB blue="40" green="40" red="40"/>
+<CalendarForegroundRGB blue="200" green="200" red="200"/>
+<DayHoveredRGB blue="192" green="192" red="192"/>
+<DaySelectedRGB blue="255" green="255" red="255"/>
+<DayTodayRGB blue="0" green="255" red="255"/>
+<weekValueRGB blue="128" green="0" red="255"/>
+<TourBackground1RGB blue="255" green="0" red="64"/>
+<TourBackground2RGB blue="0" green="64" red="128"/>
+<TourBorderRGB blue="0" green="128" red="192"/>
+<TourDraggedRGB blue="0" green="255" red="255"/>
+<TourHoveredRGB blue="192" green="192" red="192"/>
+<TourSelectedRGB blue="255" green="255" red="255"/>
+<TourContentRGB blue="255" green="192" red="255"/>
+<TourTitleRGB blue="203" green="255" red="191"/>
+<TourValueRGB blue="255" green="193" red="191"/>
+<AllTourFormatter>
+<Formatter formatterId="TOUR_TITLE" formatterValueFormat="DUMMY_VALUE" isShowValue="true"/>
+<Formatter formatterId="TOUR_DESCRIPTION" formatterValueFormat="DUMMY_VALUE" isShowValue="true"/>
+<Formatter formatterId="DISTANCE" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="ELEVATION" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="TIME_MOVING" formatterValueFormat="TIME_HH" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+</AllTourFormatter>
+<AllWeekFormatter>
+<Formatter formatterId="DISTANCE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="SPEED" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="PACE" formatterValueFormat="PACE_MM_SS" isShowValue="false"/>
+<Formatter formatterId="TIME_MOVING" formatterValueFormat="TIME_HH_MM" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+</AllWeekFormatter>
+</Calendar>
+<Calendar dateColumnContent="MONTH" dateColumnFont="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" dateColumnWidth="50" dayDateFont="1|Segoe UI|7.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" dayDateFormat="DAY" dayDateMarginLeft="1" dayDateMarginTop="-2" id="4036664019600" isDayContentVertical="false" isDefaultDefaultId="true" isHideDayDateWhenNoTour="true" isShowDateColumn="true" isShowDayDate="false" isShowDayDateWeekendColor="false" isShowSummaryColumn="true" isShowTourContent="false" isShowTourValueUnit="false" isShowWeekValueUnit="false" isShowYearColumns="true" isToggleMonthColor="false" isTruncateTourText="true" isUserParentDefaultId="false" isWeekRowHeight="true" isYearColumnDayWidth="false" profileDefaultDefaultId="COMPACT_III" profileName="Compact III" profileUserDefaultId="" profileUserParentDefaultId="" tourBackground="FILL" tourBackgroundColor1="DARK" tourBackgroundColor2="BRIGHT" tourBackgroundWidth="1" tourBorder="NO_BORDER" tourBorderColor="LINE" tourBorderWidth="3" tourContentColor="CONTRAST" tourContentFont="1|Segoe UI|7.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" tourDraggedColor="CUSTOM" tourHoveredColor="CUSTOM" tourMarginBottom="0" tourMarginLeft="1" tourMarginRight="2" tourMarginTop="-2" tourSelectedColor="CUSTOM" tourTitleColor="CONTRAST" tourTitleFont="1|Segoe UI|7.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" tourTruncatedLines="1" tourValueColor="CONTRAST" tourValueColumns="3" tourValueFont="1|Segoe UI|7.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" useDraggedScrolling="false" weekColumnWidth="30" weekHeight="10" weekMarginBottom="-1" weekMarginLeft="0" weekMarginRight="0" weekMarginTop="-1" weekRows="10" weekValueColor="BRIGHT" weekValueFont="1|Segoe UI|7.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" yearColumnDayWidth="50" yearColumns="1" yearColumnsSpacing="30" yearColumnsStart="CONTINUOUSLY" yearHeaderFont="1|Segoe UI|15.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI">
+<AlternateMonthRGB blue="60" green="60" red="60"/>
+<AlternateMonth2RGB blue="80" green="80" red="80"/>
+<CalendarBackgroundRGB blue="40" green="40" red="40"/>
+<CalendarForegroundRGB blue="200" green="200" red="200"/>
+<DayHoveredRGB blue="192" green="192" red="192"/>
+<DaySelectedRGB blue="255" green="255" red="255"/>
+<DayTodayRGB blue="0" green="255" red="255"/>
+<weekValueRGB blue="128" green="0" red="255"/>
+<TourBackground1RGB blue="255" green="0" red="64"/>
+<TourBackground2RGB blue="0" green="64" red="128"/>
+<TourBorderRGB blue="0" green="128" red="192"/>
+<TourDraggedRGB blue="0" green="255" red="255"/>
+<TourHoveredRGB blue="192" green="192" red="192"/>
+<TourSelectedRGB blue="255" green="255" red="255"/>
+<TourContentRGB blue="255" green="192" red="255"/>
+<TourTitleRGB blue="203" green="255" red="191"/>
+<TourValueRGB blue="255" green="193" red="191"/>
+<AllTourFormatter>
+<Formatter formatterId="TOUR_TITLE" formatterValueFormat="DUMMY_VALUE" isShowValue="true"/>
+<Formatter formatterId="TOUR_DESCRIPTION" formatterValueFormat="DUMMY_VALUE" isShowValue="true"/>
+<Formatter formatterId="DISTANCE" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="ELEVATION" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="TIME_MOVING" formatterValueFormat="TIME_HH" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+</AllTourFormatter>
+<AllWeekFormatter>
+<Formatter formatterId="DISTANCE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="SPEED" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="PACE" formatterValueFormat="PACE_MM_SS" isShowValue="false"/>
+<Formatter formatterId="TIME_MOVING" formatterValueFormat="TIME_HH_MM" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+</AllWeekFormatter>
+</Calendar>
+<Calendar dateColumnContent="MONTH" dateColumnFont="1|Segoe UI|9.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" dateColumnWidth="15" dayDateFont="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" dayDateFormat="DAY" dayDateMarginLeft="4" dayDateMarginTop="-1" id="4036664320000" isDayContentVertical="true" isDefaultDefaultId="true" isHideDayDateWhenNoTour="true" isShowDateColumn="false" isShowDayDate="false" isShowDayDateWeekendColor="false" isShowSummaryColumn="true" isShowTourContent="false" isShowTourValueUnit="false" isShowWeekValueUnit="false" isShowYearColumns="true" isToggleMonthColor="false" isTruncateTourText="false" isUserParentDefaultId="false" isWeekRowHeight="true" isYearColumnDayWidth="true" profileDefaultDefaultId="YEAR" profileName="Year" profileUserDefaultId="" profileUserParentDefaultId="" tourBackground="CIRCLE" tourBackgroundColor1="DARK" tourBackgroundColor2="BRIGHT" tourBackgroundWidth="1" tourBorder="NO_BORDER" tourBorderColor="LINE" tourBorderWidth="3" tourContentColor="CONTRAST" tourContentFont="1|Segoe UI|8.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" tourDraggedColor="CUSTOM" tourHoveredColor="CUSTOM" tourMarginBottom="0" tourMarginLeft="0" tourMarginRight="-7" tourMarginTop="1" tourSelectedColor="CUSTOM" tourTitleColor="CONTRAST" tourTitleFont="1|Segoe UI|10.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" tourTruncatedLines="1" tourValueColor="CONTRAST" tourValueColumns="1" tourValueFont="1|Segoe UI|9.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" useDraggedScrolling="false" weekColumnWidth="40" weekHeight="14" weekMarginBottom="0" weekMarginLeft="0" weekMarginRight="0" weekMarginTop="-2" weekRows="10" weekValueColor="BRIGHT" weekValueFont="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" yearColumnDayWidth="14" yearColumns="5" yearColumnsSpacing="20" yearColumnsStart="JAN" yearHeaderFont="1|Segoe UI|15.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI">
+<AlternateMonthRGB blue="60" green="60" red="60"/>
+<AlternateMonth2RGB blue="80" green="80" red="80"/>
+<CalendarBackgroundRGB blue="40" green="40" red="40"/>
+<CalendarForegroundRGB blue="200" green="200" red="200"/>
+<DayHoveredRGB blue="192" green="192" red="192"/>
+<DaySelectedRGB blue="255" green="255" red="255"/>
+<DayTodayRGB blue="0" green="255" red="255"/>
+<weekValueRGB blue="128" green="0" red="255"/>
+<TourBackground1RGB blue="255" green="0" red="64"/>
+<TourBackground2RGB blue="0" green="64" red="128"/>
+<TourBorderRGB blue="0" green="128" red="192"/>
+<TourDraggedRGB blue="0" green="255" red="255"/>
+<TourHoveredRGB blue="192" green="192" red="192"/>
+<TourSelectedRGB blue="255" green="255" red="255"/>
+<TourContentRGB blue="255" green="192" red="255"/>
+<TourTitleRGB blue="203" green="255" red="191"/>
+<TourValueRGB blue="255" green="193" red="191"/>
+<AllTourFormatter>
+<Formatter formatterId="TOUR_TITLE" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+<Formatter formatterId="TOUR_DESCRIPTION" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+<Formatter formatterId="ELEVATION" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="DISTANCE" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="TIME_MOVING" formatterValueFormat="TIME_HH_MM" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+</AllTourFormatter>
+<AllWeekFormatter>
+<Formatter formatterId="DISTANCE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="SPEED" formatterValueFormat="NUMBER_1_0" isShowValue="false"/>
+<Formatter formatterId="PACE" formatterValueFormat="PACE_MM_SS" isShowValue="false"/>
+<Formatter formatterId="TIME_MOVING" formatterValueFormat="TIME_HH" isShowValue="false"/>
+<Formatter formatterId="TIME_PAUSED" formatterValueFormat="TIME_HH" isShowValue="false"/>
+</AllWeekFormatter>
+</Calendar>
+<Calendar dateColumnContent="MONTH" dateColumnFont="1|Segoe UI|13.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" dateColumnWidth="50" dayDateFont="1|Segoe UI|10.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" dayDateFormat="DAY" dayDateMarginLeft="0" dayDateMarginTop="0" id="4036664826900" isDayContentVertical="true" isDefaultDefaultId="true" isHideDayDateWhenNoTour="true" isShowDateColumn="false" isShowDayDate="false" isShowDayDateWeekendColor="false" isShowSummaryColumn="false" isShowTourContent="false" isShowTourValueUnit="true" isShowWeekValueUnit="true" isShowYearColumns="true" isToggleMonthColor="false" isTruncateTourText="true" isUserParentDefaultId="false" isWeekRowHeight="true" isYearColumnDayWidth="true" profileDefaultDefaultId="YEAR_II" profileName="Year II" profileUserDefaultId="" profileUserParentDefaultId="" tourBackground="CIRCLE" tourBackgroundColor1="DARK" tourBackgroundColor2="WHITE" tourBackgroundWidth="0" tourBorder="BORDER_ALL" tourBorderColor="DARK" tourBorderWidth="3" tourContentColor="CONTRAST" tourContentFont="1|Segoe UI|8.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" tourDraggedColor="CUSTOM" tourHoveredColor="CUSTOM" tourMarginBottom="1" tourMarginLeft="1" tourMarginRight="-3" tourMarginTop="-3" tourSelectedColor="CUSTOM" tourTitleColor="CONTRAST" tourTitleFont="1|Segoe UI|10.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" tourTruncatedLines="2" tourValueColor="CONTRAST" tourValueColumns="2" tourValueFont="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" useDraggedScrolling="false" weekColumnWidth="60" weekHeight="10" weekMarginBottom="1" weekMarginLeft="1" weekMarginRight="-3" weekMarginTop="-3" weekRows="10" weekValueColor="TEXT" weekValueFont="1|Segoe UI|10.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" yearColumnDayWidth="10" yearColumns="20" yearColumnsSpacing="0" yearColumnsStart="JAN" yearHeaderFont="1|Segoe UI|12.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI">
+<AlternateMonthRGB blue="60" green="60" red="60"/>
+<AlternateMonth2RGB blue="80" green="80" red="80"/>
+<CalendarBackgroundRGB blue="40" green="40" red="40"/>
+<CalendarForegroundRGB blue="200" green="200" red="200"/>
+<DayHoveredRGB blue="192" green="192" red="192"/>
+<DaySelectedRGB blue="255" green="255" red="255"/>
+<DayTodayRGB blue="0" green="255" red="255"/>
+<weekValueRGB blue="128" green="0" red="255"/>
+<TourBackground1RGB blue="255" green="0" red="64"/>
+<TourBackground2RGB blue="0" green="64" red="128"/>
+<TourBorderRGB blue="0" green="128" red="192"/>
+<TourDraggedRGB blue="0" green="255" red="255"/>
+<TourHoveredRGB blue="192" green="192" red="192"/>
+<TourSelectedRGB blue="255" green="255" red="255"/>
+<TourContentRGB blue="255" green="192" red="255"/>
+<TourTitleRGB blue="203" green="255" red="191"/>
+<TourValueRGB blue="255" green="193" red="191"/>
+<AllTourFormatter>
+<Formatter formatterId="TOUR_TITLE" formatterValueFormat="DUMMY_VALUE" isShowValue="true"/>
+<Formatter formatterId="TOUR_DESCRIPTION" formatterValueFormat="DUMMY_VALUE" isShowValue="true"/>
+<Formatter formatterId="DISTANCE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="TIME_MOVING" formatterValueFormat="TIME_HH_MM" isShowValue="true"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+</AllTourFormatter>
+<AllWeekFormatter>
+<Formatter formatterId="DISTANCE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="SPEED" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="PACE" formatterValueFormat="PACE_MM_SS" isShowValue="true"/>
+<Formatter formatterId="TIME_MOVING" formatterValueFormat="TIME_HH_MM" isShowValue="true"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+</AllWeekFormatter>
+</Calendar>
+<Calendar dateColumnContent="MONTH" dateColumnFont="1|Segoe UI|13.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" dateColumnWidth="50" dayDateFont="1|Segoe UI|10.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" dayDateFormat="DAY" dayDateMarginLeft="0" dayDateMarginTop="0" id="4036665128400" isDayContentVertical="true" isDefaultDefaultId="true" isHideDayDateWhenNoTour="true" isShowDateColumn="false" isShowDayDate="false" isShowDayDateWeekendColor="false" isShowSummaryColumn="false" isShowTourContent="false" isShowTourValueUnit="true" isShowWeekValueUnit="true" isShowYearColumns="true" isToggleMonthColor="false" isTruncateTourText="true" isUserParentDefaultId="false" isWeekRowHeight="true" isYearColumnDayWidth="true" profileDefaultDefaultId="YEAR_III" profileName="Year III" profileUserDefaultId="" profileUserParentDefaultId="" tourBackground="FILL" tourBackgroundColor1="DARK" tourBackgroundColor2="WHITE" tourBackgroundWidth="1" tourBorder="BORDER_ALL" tourBorderColor="DARK" tourBorderWidth="3" tourContentColor="CONTRAST" tourContentFont="1|Segoe UI|8.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" tourDraggedColor="CUSTOM" tourHoveredColor="CUSTOM" tourMarginBottom="1" tourMarginLeft="1" tourMarginRight="-3" tourMarginTop="-3" tourSelectedColor="CUSTOM" tourTitleColor="CONTRAST" tourTitleFont="1|Segoe UI|10.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" tourTruncatedLines="2" tourValueColor="CONTRAST" tourValueColumns="2" tourValueFont="1|Segoe UI|9.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" useDraggedScrolling="false" weekColumnWidth="60" weekHeight="5" weekMarginBottom="1" weekMarginLeft="1" weekMarginRight="-3" weekMarginTop="-3" weekRows="10" weekValueColor="TEXT" weekValueFont="1|Segoe UI|10.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" yearColumnDayWidth="5" yearColumns="20" yearColumnsSpacing="0" yearColumnsStart="JAN" yearHeaderFont="1|Segoe UI|8.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI">
+<AlternateMonthRGB blue="60" green="60" red="60"/>
+<AlternateMonth2RGB blue="80" green="80" red="80"/>
+<CalendarBackgroundRGB blue="40" green="40" red="40"/>
+<CalendarForegroundRGB blue="200" green="200" red="200"/>
+<DayHoveredRGB blue="192" green="192" red="192"/>
+<DaySelectedRGB blue="255" green="255" red="255"/>
+<DayTodayRGB blue="0" green="255" red="255"/>
+<weekValueRGB blue="128" green="0" red="255"/>
+<TourBackground1RGB blue="255" green="0" red="64"/>
+<TourBackground2RGB blue="0" green="64" red="128"/>
+<TourBorderRGB blue="0" green="128" red="192"/>
+<TourDraggedRGB blue="0" green="255" red="255"/>
+<TourHoveredRGB blue="192" green="192" red="192"/>
+<TourSelectedRGB blue="255" green="255" red="255"/>
+<TourContentRGB blue="255" green="192" red="255"/>
+<TourTitleRGB blue="203" green="255" red="191"/>
+<TourValueRGB blue="255" green="193" red="191"/>
+<AllTourFormatter>
+<Formatter formatterId="TOUR_TITLE" formatterValueFormat="DUMMY_VALUE" isShowValue="true"/>
+<Formatter formatterId="TOUR_DESCRIPTION" formatterValueFormat="DUMMY_VALUE" isShowValue="true"/>
+<Formatter formatterId="DISTANCE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="TIME_MOVING" formatterValueFormat="TIME_HH_MM" isShowValue="true"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+</AllTourFormatter>
+<AllWeekFormatter>
+<Formatter formatterId="DISTANCE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="SPEED" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="PACE" formatterValueFormat="PACE_MM_SS" isShowValue="true"/>
+<Formatter formatterId="TIME_MOVING" formatterValueFormat="TIME_HH_MM" isShowValue="true"/>
+<Formatter formatterId="EMPTY" formatterValueFormat="DUMMY_VALUE" isShowValue="false"/>
+</AllWeekFormatter>
+</Calendar>
+<Calendar dateColumnContent="WEEK_NUMBER" dateColumnFont="1|Segoe UI|13.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" dateColumnWidth="50" dayDateFont="1|Segoe UI|10.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" dayDateFormat="AUTOMATIC" dayDateMarginLeft="2" dayDateMarginTop="-3" id="4036665631100" isDayContentVertical="true" isDefaultDefaultId="true" isHideDayDateWhenNoTour="false" isShowDateColumn="true" isShowDayDate="true" isShowDayDateWeekendColor="true" isShowSummaryColumn="true" isShowTourContent="true" isShowTourValueUnit="true" isShowWeekValueUnit="true" isShowYearColumns="false" isToggleMonthColor="true" isTruncateTourText="true" isUserParentDefaultId="false" isWeekRowHeight="false" isYearColumnDayWidth="false" profileDefaultDefaultId="CLASSIC" profileName="Classic" profileUserDefaultId="" profileUserParentDefaultId="" tourBackground="FILL" tourBackgroundColor1="DARK" tourBackgroundColor2="BRIGHT" tourBackgroundWidth="1" tourBorder="NO_BORDER" tourBorderColor="LINE" tourBorderWidth="3" tourContentColor="CONTRAST" tourContentFont="1|Segoe UI|8.0|0|WINDOWS|1|-15|0|0|0|0|0|0|0|1|0|0|0|0|Segoe UI" tourDraggedColor="CUSTOM" tourHoveredColor="CUSTOM" tourMarginBottom="1" tourMarginLeft="1" tourMarginRight="-3" tourMarginTop="-2" tourSelectedColor="CUSTOM" tourTitleColor="CONTRAST" tourTitleFont="1|Segoe UI|11.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" tourTruncatedLines="2" tourValueColor="CONTRAST" tourValueColumns="2" tourValueFont="1|Segoe UI|10.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" useDraggedScrolling="false" weekColumnWidth="100" weekHeight="150" weekMarginBottom="1" weekMarginLeft="1" weekMarginRight="-3" weekMarginTop="-5" weekRows="5" weekValueColor="TEXT" weekValueFont="1|Segoe UI|10.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI" yearColumnDayWidth="50" yearColumns="2" yearColumnsSpacing="30" yearColumnsStart="CONTINUOUSLY" yearHeaderFont="1|Segoe UI|19.0|1|WINDOWS|1|-15|0|0|0|700|0|0|0|1|0|0|0|0|Segoe UI">
+<AlternateMonthRGB blue="240" green="240" red="240"/>
+<AlternateMonth2RGB blue="225" green="225" red="225"/>
+<CalendarBackgroundRGB blue="255" green="255" red="255"/>
+<CalendarForegroundRGB blue="0" green="0" red="0"/>
+<DayHoveredRGB blue="153" green="153" red="153"/>
+<DaySelectedRGB blue="77" green="77" red="77"/>
+<DayTodayRGB blue="255" green="0" red="0"/>
+<weekValueRGB blue="128" green="0" red="255"/>
+<TourBackground1RGB blue="255" green="0" red="64"/>
+<TourBackground2RGB blue="0" green="64" red="128"/>
+<TourBorderRGB blue="0" green="128" red="192"/>
+<TourDraggedRGB blue="255" green="0" red="0"/>
+<TourHoveredRGB blue="162" green="162" red="162"/>
+<TourSelectedRGB blue="53" green="53" red="53"/>
+<TourContentRGB blue="255" green="192" red="255"/>
+<TourTitleRGB blue="192" green="255" red="0"/>
+<TourValueRGB blue="64" green="0" red="255"/>
+<AllTourFormatter>
+<Formatter formatterId="TOUR_TITLE" formatterValueFormat="DUMMY_VALUE" isShowValue="true"/>
+<Formatter formatterId="TOUR_DESCRIPTION" formatterValueFormat="DUMMY_VALUE" isShowValue="true"/>
+<Formatter formatterId="ELEVATION" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="DISTANCE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="TIME_MOVING" formatterValueFormat="TIME_HH_MM" isShowValue="true"/>
+<Formatter formatterId="PACE" formatterValueFormat="PACE_MM_SS" isShowValue="true"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="TIME_RECORDED" formatterValueFormat="TIME_HH_MM" isShowValue="true"/>
+</AllTourFormatter>
+<AllWeekFormatter>
+<Formatter formatterId="ELEVATION" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="DISTANCE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="SPEED" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+<Formatter formatterId="PACE" formatterValueFormat="PACE_MM_SS" isShowValue="true"/>
+<Formatter formatterId="TIME_MOVING" formatterValueFormat="TIME_HH_MM" isShowValue="true"/>
+<Formatter formatterId="ELEVATION_CHANGE" formatterValueFormat="NUMBER_1_0" isShowValue="true"/>
+</AllWeekFormatter>
+</Calendar>
+</CalendarProfile>
+</CalendarProfiles>

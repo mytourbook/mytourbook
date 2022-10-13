@@ -60,8 +60,6 @@ import de.byteholder.geoclipse.mapprovider.MapProviderManager;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import de.byteholder.geoclipse.ui.TextWrapPainter;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.io.UnsupportedEncodingException;
@@ -112,6 +110,7 @@ import net.tourbook.ui.IMapToolTipProvider;
 import net.tourbook.ui.MTRectangle;
 
 import org.apache.commons.lang3.text.WordUtils;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.ListenerList;
@@ -509,7 +508,7 @@ public class Map2 extends Canvas {
 
    private ArrayList<Point> _allHoveredDevPoints               = new ArrayList<>();
    private ArrayList<Long>  _allHoveredTourIds                 = new ArrayList<>();
-   private TIntArrayList    _allHoveredSerieIndices            = new TIntArrayList();
+   private IntArrayList     _allHoveredSerieIndices            = new IntArrayList();
 
    private long             _hovered_SelectedTourId            = -1;
    private int              _hovered_SelectedSerieIndex_Front  = -1;
@@ -2471,7 +2470,7 @@ public class Map2 extends Canvas {
             return false;
          }
 
-         final ArrayList<Rectangle> allPainted_HoveredRectangle_List = hoveredTile.allPainted_HoverRectangle;
+         final List<Rectangle> allPainted_HoveredRectangle_List = hoveredTile.allPainted_HoverRectangle;
          if (allPainted_HoveredRectangle_List.isEmpty()) {
 
             // nothing is painted in this tile

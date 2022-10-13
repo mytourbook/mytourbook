@@ -17,8 +17,6 @@ package net.tourbook.statistic;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -54,6 +52,7 @@ import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.UI;
 import net.tourbook.ui.views.sensors.SelectionRecordingDeviceBattery;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
@@ -114,7 +113,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
    /**
     * Contains all years which have tours for the selected tour type and person.
     */
-   private TIntArrayList                _availableYears          = new TIntArrayList();
+   private IntArrayList                 _availableYears          = new IntArrayList();
 
    /**
     * contains the statistics in the same sort order as the statistic combo box
@@ -754,7 +753,7 @@ public class StatisticView extends ViewPart implements ITourProvider {
     */
    private void refreshYearCombobox() {
 
-      final TIntArrayList allAvailableYears = new TIntArrayList();
+      final IntArrayList allAvailableYears = new IntArrayList();
 
       String sql = null;
 

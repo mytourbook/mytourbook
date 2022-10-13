@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2021, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,10 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.ui.views.sensors;
-
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.list.array.TLongArrayList;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -34,6 +30,9 @@ import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.ui.SQLFilter;
 
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.jface.dialogs.IDialogSettings;
 
 public class SensorDataProvider {
@@ -137,22 +136,22 @@ public class SensorDataProvider {
                + "ORDER BY DeviceSensorValue.TourStartTime" + NL //                    //$NON-NLS-1$
          ;
 
-         final TFloatArrayList allDbBatteryLevel_Start = new TFloatArrayList();
-         final TFloatArrayList allDbBatteryLevel_End = new TFloatArrayList();
-         final TFloatArrayList allDbBatteryStatus_Start = new TFloatArrayList();
-         final TFloatArrayList allDbBatteryStatus_End = new TFloatArrayList();
-         final TFloatArrayList allDbBatteryVoltage_Start = new TFloatArrayList();
-         final TFloatArrayList allDbBatteryVoltage_End = new TFloatArrayList();
+         final FloatArrayList allDbBatteryLevel_Start = new FloatArrayList();
+         final FloatArrayList allDbBatteryLevel_End = new FloatArrayList();
+         final FloatArrayList allDbBatteryStatus_Start = new FloatArrayList();
+         final FloatArrayList allDbBatteryStatus_End = new FloatArrayList();
+         final FloatArrayList allDbBatteryVoltage_Start = new FloatArrayList();
+         final FloatArrayList allDbBatteryVoltage_End = new FloatArrayList();
 
-         final TLongArrayList allDbTourIds = new TLongArrayList();
-         final TLongArrayList allDbTourStartTime = new TLongArrayList();
-         final TIntArrayList allDbTypeColorIndices = new TIntArrayList();
+         final LongArrayList allDbTourIds = new LongArrayList();
+         final LongArrayList allDbTourStartTime = new LongArrayList();
+         final IntArrayList allDbTypeColorIndices = new IntArrayList();
 
          boolean isAvailable_Level = false;
          boolean isAvailable_Status = false;
          boolean isAvailable_Voltage = false;
 
-         final TIntArrayList allDbXValues_ByTime = new TIntArrayList();
+         final IntArrayList allDbXValues_ByTime = new IntArrayList();
 
          long firstDateTime = Long.MIN_VALUE;
 
@@ -506,8 +505,8 @@ public class SensorDataProvider {
                                   final float value_Start,
                                   final float value_End,
 
-                                  final TFloatArrayList allBatteryValue_Start,
-                                  final TFloatArrayList allBatteryValue_End) {
+                                  final FloatArrayList allBatteryValue_Start,
+                                  final FloatArrayList allBatteryValue_End) {
 
       float value_1;
       float value_2;

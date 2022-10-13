@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.awt.BorderLayout;
 import java.awt.Canvas;
 import java.awt.Frame;
@@ -72,7 +70,7 @@ import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig.LineColorMode;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
-import net.tourbook.map25.layer.tourtrack.TourLayer;
+import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
 import net.tourbook.map25.ui.SlideoutMap25_MapLayer;
 import net.tourbook.map25.ui.SlideoutMap25_MapOptions;
 import net.tourbook.map25.ui.SlideoutMap25_MapProvider;
@@ -98,6 +96,7 @@ import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoLinkSelection;
 import net.tourbook.ui.tourChart.TourChart;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
@@ -233,7 +232,7 @@ public class Map25View extends ViewPart implements
    //
    /** Contains only geo tours */
    private ArrayList<TourData>           _allTourData                            = new ArrayList<>();
-   private TIntArrayList                 _allTourStarts                          = new TIntArrayList();
+   private IntArrayList                  _allTourStarts                          = new IntArrayList();
    private GeoPoint[]                    _allGeoPoints;
    private BoundingBox                   _boundingBox;
    /**
@@ -1192,7 +1191,7 @@ public class Map25View extends ViewPart implements
     */
    void enableActions() {
 
-      final TourLayer tourLayer = _map25App.getLayer_Tour();
+      final TourTrack_Layer tourLayer = _map25App.getLayer_Tour();
       final boolean isTourLayerVisible = tourLayer == null ? false : tourLayer.isEnabled();
 
       final boolean isTourAvailable = _allTourData.size() > 0;
@@ -1604,7 +1603,7 @@ public class Map25View extends ViewPart implements
       /*
        * Tours
        */
-      final TourLayer tourLayer = _map25App.getLayer_Tour();
+      final TourTrack_Layer tourLayer = _map25App.getLayer_Tour();
       if (tourLayer == null) {
 
          // tour layer is not yet created, this happened
@@ -1642,7 +1641,7 @@ public class Map25View extends ViewPart implements
 
          final TourData tourData = _allTourData.get(0);
 
-         _allTourStarts.add(tourData.multipleTourStartIndex);
+         _allTourStarts.addAll(tourData.multipleTourStartIndex);
 
          final double[] latitudeSerie = tourData.latitudeSerie;
          final double[] longitudeSerie = tourData.longitudeSerie;
@@ -1706,7 +1705,7 @@ public class Map25View extends ViewPart implements
          }
       }
 
-      tourLayer.setPoints(_allGeoPoints, allGeoPointColors, _allTourStarts);
+      tourLayer.setupTourPositions(_allGeoPoints, allGeoPointColors, _allTourStarts);
 
       checkSliderIndices();
 
@@ -1829,6 +1828,8 @@ public class Map25View extends ViewPart implements
 
 // SET_FORMATTING_OFF
 
+      final Map25TrackConfig tourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+
       /*
        * Layer
        */
@@ -1839,7 +1840,7 @@ public class Map25View extends ViewPart implements
       _map25App.getLayer_Tour().setEnabled(_isShowTour);
 
       // track color
-      final MapGraphId trackGraphId = Map25ConfigManager.getActiveTourTrackConfig().gradientColorGraphID;
+      final MapGraphId trackGraphId = tourTrackConfig.gradientColorGraphID;
       restoreState_TrackColorActions(trackGraphId);
       setColorProvider(trackGraphId, false);
 

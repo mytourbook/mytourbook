@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,9 +16,6 @@
 package net.tourbook.database;
 
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
-
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.list.array.TLongArrayList;
 
 import java.lang.reflect.InvocationTargetException;
 import java.sql.CallableStatement;
@@ -37,6 +34,8 @@ import net.tourbook.common.font.MTFont;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -91,9 +90,9 @@ public class DialogCompressDatabase extends Dialog {
    private List<String>                 _allTableNames;
    private List<String>                 _allConglomerateNames;
 
-   private TIntArrayList                _allIndexFlags;
-   private TLongArrayList               _allUsedSpaces_BeforeCompress;
-   private TLongArrayList               _allUsedSpaces_AfterCompress;
+   private IntArrayList                 _allIndexFlags;
+   private LongArrayList                _allUsedSpaces_BeforeCompress;
+   private LongArrayList                _allUsedSpaces_AfterCompress;
 
    private String                       _logText = UI.EMPTY_STRING;
 
@@ -198,13 +197,13 @@ public class DialogCompressDatabase extends Dialog {
       return ui;
    }
 
-   private String createLog_BeforeCompressed(final TLongArrayList allUsedSpaces,
+   private String createLog_BeforeCompressed(final LongArrayList allUsedSpaces,
                                              final ArrayList<String> allNames,
-                                             final TLongArrayList allSpaceSavings,
-                                             final TLongArrayList allAllocatedPages,
-                                             final TLongArrayList allFreePages,
-                                             final TLongArrayList allUnfilledPages,
-                                             final TLongArrayList allPageSize) {
+                                             final LongArrayList allSpaceSavings,
+                                             final LongArrayList allAllocatedPages,
+                                             final LongArrayList allFreePages,
+                                             final LongArrayList allUnfilledPages,
+                                             final LongArrayList allPageSize) {
       // get width of the largest table/index name
       int maxWidth_Name = 0;
       for (final String name : allNames) {
@@ -508,14 +507,14 @@ public class DialogCompressDatabase extends Dialog {
 
    private String getDatabaseSize(final List<String> allConglomerateNames,
                                   final List<String> allTableNames,
-                                  final TLongArrayList allUsedSpaces) {
+                                  final LongArrayList allUsedSpaces) {
 
       final String[] returnData = new String[1];
 
       final boolean[] isSetIndexFlag = { false };
 
       if (_allIndexFlags == null) {
-         _allIndexFlags = new TIntArrayList();
+         _allIndexFlags = new IntArrayList();
          isSetIndexFlag[0] = true;
       }
 
@@ -551,12 +550,12 @@ public class DialogCompressDatabase extends Dialog {
 
                final ArrayList<String> allNames = new ArrayList<>();
 
-               final TLongArrayList allSpaceSavings = new TLongArrayList();
+               final LongArrayList allSpaceSavings = new LongArrayList();
 
-               final TLongArrayList allAllocatedPages = new TLongArrayList();
-               final TLongArrayList allFreePages = new TLongArrayList();
-               final TLongArrayList allUnfilledPages = new TLongArrayList();
-               final TLongArrayList allPageSize = new TLongArrayList();
+               final LongArrayList allAllocatedPages = new LongArrayList();
+               final LongArrayList allFreePages = new LongArrayList();
+               final LongArrayList allUnfilledPages = new LongArrayList();
+               final LongArrayList allPageSize = new LongArrayList();
 
                final ResultSet result = conn.prepareStatement(sql).executeQuery();
 
@@ -729,7 +728,7 @@ public class DialogCompressDatabase extends Dialog {
 
                   _dialogShell.getDisplay().asyncExec(() -> {
 
-                     _allUsedSpaces_AfterCompress = new TLongArrayList();
+                     _allUsedSpaces_AfterCompress = new LongArrayList();
 
                      appendLogText(Messages.App_Db_Compress_LogHeader_After);
                      appendLogText(getDatabaseSize(null, null, _allUsedSpaces_AfterCompress));
@@ -762,7 +761,7 @@ public class DialogCompressDatabase extends Dialog {
       _allConglomerateNames = new ArrayList<>();
       _allTableNames = new ArrayList<>();
 
-      _allUsedSpaces_BeforeCompress = new TLongArrayList();
+      _allUsedSpaces_BeforeCompress = new LongArrayList();
 
       appendLogText(Messages.App_Db_Compress_LogHeader_Before);
       appendLogText(getDatabaseSize(_allConglomerateNames, _allTableNames, _allUsedSpaces_BeforeCompress));

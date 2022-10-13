@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -403,14 +403,11 @@ public class TurDeviceReader extends TourbookDevice {
 
       boolean isValid = false;
 
-      BufferedInputStream inStream = null;
+      final File dataFile = new File(fileName);
 
-      try {
+      try (BufferedInputStream inStream = new BufferedInputStream(new FileInputStream(dataFile))) {
 
          final byte[] buffer = new byte[17];
-
-         final File dataFile = new File(fileName);
-         inStream = new BufferedInputStream(new FileInputStream(dataFile));
 
          inStream.read(buffer);
          if (!"HACtronic - Tour".equalsIgnoreCase(new String(buffer, 0, 16))) { //$NON-NLS-1$
@@ -423,14 +420,6 @@ public class TurDeviceReader extends TourbookDevice {
          return false;
       } catch (final Exception e) {
          e.printStackTrace();
-      } finally {
-         if (inStream != null) {
-            try {
-               inStream.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
       }
 
       return isValid;

@@ -1736,21 +1736,21 @@ public class Util {
    }
 
    /**
-    * RBG values are in child tag as attributes
+    * RBGA values are in child tag as attributes
     *
     * @param xmlConfig
-    * @param childTag
+    * @param childTagName
     * @param defaultRgb
     * @return
     */
-   public static RGB getXmlRgb(final XMLMemento xmlConfig, final String childTag, final RGB defaultRgb) {
+   public static RGB getXmlRgb_AsParent(final XMLMemento xmlConfig, final String childTagName, final RGB defaultRgb) {
 
       for (final IMemento mementoConfigChild : xmlConfig.getChildren()) {
 
          final XMLMemento xmlConfigChild = (XMLMemento) mementoConfigChild;
          final String configTag = xmlConfigChild.getType();
 
-         if (configTag.equals(childTag)) {
+         if (configTag.equals(childTagName)) {
 
             return Util.getXmlRgb(xmlConfigChild, defaultRgb);
          }
@@ -1766,13 +1766,40 @@ public class Util {
     */
    public static RGBA getXmlRgba(final IMemento xmlMemento, final RGBA defaultValue) {
 
-      final int red = getXmlInteger(xmlMemento, ATTR_COLOR_RED, defaultValue.rgb.red);
-      final int green = getXmlInteger(xmlMemento, ATTR_COLOR_GREEN, defaultValue.rgb.green);
-      final int blue = getXmlInteger(xmlMemento, ATTR_COLOR_BLUE, defaultValue.rgb.blue);
+// SET_FORMATTING_OFF
 
-      final int alpha = getXmlInteger(xmlMemento, ATTR_COLOR_ALPHA, defaultValue.alpha);
+      final int red     = getXmlInteger(xmlMemento, ATTR_COLOR_RED,     defaultValue.rgb.red);
+      final int green   = getXmlInteger(xmlMemento, ATTR_COLOR_GREEN,   defaultValue.rgb.green);
+      final int blue    = getXmlInteger(xmlMemento, ATTR_COLOR_BLUE,    defaultValue.rgb.blue);
+      final int alpha   = getXmlInteger(xmlMemento, ATTR_COLOR_ALPHA,   defaultValue.alpha);
+
+// SET_FORMATTING_ON
 
       return new RGBA(red, green, blue, alpha);
+   }
+
+   /**
+    * RBG values are in child tag as attributes
+    *
+    * @param xmlConfig
+    * @param childTagName
+    * @param defaultRgba
+    * @return
+    */
+   public static RGBA getXmlRgba_AsParent(final XMLMemento xmlConfig, final String childTagName, final RGBA defaultRgba) {
+
+      for (final IMemento mementoConfigChild : xmlConfig.getChildren()) {
+
+         final XMLMemento xmlConfigChild = (XMLMemento) mementoConfigChild;
+         final String configTag = xmlConfigChild.getType();
+
+         if (configTag.equals(childTagName)) {
+
+            return Util.getXmlRgba(xmlConfigChild, defaultRgba);
+         }
+      }
+
+      return defaultRgba;
    }
 
    public static String getXmlString(final IMemento xmlConfig, final String key, final String defaultValue) {

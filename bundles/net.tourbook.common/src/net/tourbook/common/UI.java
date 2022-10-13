@@ -931,6 +931,29 @@ public class UI {
    }
 
    /**
+    * Computes the BMI (Body Mass Index) for a given user's height and weight.
+    *
+    * @param weight
+    *           The user's weight in kilograms or pounds.
+    * @param height
+    *           The user's height in meters or inches.
+    * @return The BMI value.
+    */
+   public static float computeBodyMassIndex(double weight, double height) {
+
+      if (UNIT_IS_LENGTH_SMALL_INCH) {
+         height = height / UNIT_INCH / 1000;
+      }
+      if (UNIT_IS_WEIGHT_POUND) {
+         weight /= UNIT_VALUE_WEIGHT;
+      }
+
+      final double bmi = height == 0 ? 0 : weight / Math.pow(height, 2);
+
+      return Math.round(bmi * 10.0) / 10.0f;
+   }
+
+   /**
     * @param averageElevationChange
     *           In m/km
     * @return Returns the average elevation change in the current measurement system.
@@ -1466,17 +1489,6 @@ public class UI {
       ).toString();
    }
 
-   public static String FormatDoubleMinMax(final double value) {
-
-      if (value == -Double.MAX_VALUE) {
-         return SYMBOL_INFINITY_MIN;
-      } else if (value == Double.MAX_VALUE) {
-         return SYMBOL_INFINITY_MAX;
-      }
-
-      return Double.toString(value);
-   }
-
    public static String FormatDoubleMinMaxElevationMeter(final double value) {
 
       if (value == -Double.MAX_VALUE) {
@@ -1566,7 +1578,7 @@ public class UI {
 
    /**
     * @param degreeDirection
-    *           The degree value is multiplied by 10, 0°...3600°
+    *           The degree value, 0°...360°
     * @return Returns cardinal direction text
     */
    public static String getCardinalDirectionText(final int degreeDirection) {
@@ -1576,7 +1588,7 @@ public class UI {
 
    /**
     * @param degreeDirection
-    *           The degree value is multiplied by 10, 0°...3600°
+    *           The degree value, 0°...360°
     * @return Returns cardinal direction index for {@link IWeather#windDirectionText}
     */
    public static int getCardinalDirectionTextIndex(final int degreeDirection) {

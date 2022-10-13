@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,6 +39,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.TourbookDevice;
+import net.tourbook.math.Fmath;
 import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -624,7 +625,7 @@ public class Suunto3_STAXHandler {
             case TAG_SAMPLE_TEMPERATURE:
                data = ((Characters) eventReader.nextEvent()).getData();
                final float kelvin = Util.parseFloat(data);
-               _sampleData.temperature = kelvin - 273.15f;
+               _sampleData.temperature = (float) (kelvin + Fmath.T_ABS);
                break;
 
             case TAG_SAMPLE_UTC:

@@ -61,7 +61,7 @@ public class WeatherProvider_WeatherApi implements IWeatherProvider {
           * Weather API webpage
           */
          final Link linkApiSignup = new Link(container, SWT.PUSH);
-         linkApiSignup.setText(UI.LINK_TAG_START + URL_WEATHERAPI_COM + UI.LINK_TAG_END);
+         linkApiSignup.setText(UI.getLinkFromText(URL_WEATHERAPI_COM));
          linkApiSignup.setEnabled(true);
          linkApiSignup.addListener(SWT.Selection, event -> WEB.openUrl(URL_WEATHERAPI_COM));
 
@@ -96,9 +96,7 @@ public class WeatherProvider_WeatherApi implements IWeatherProvider {
          /*
           * Label:
           */
-         final Label note = new Label(container, SWT.NONE);
-         note.setText(Messages.Pref_Weather_Label_WeatherApi_SevenDaysLimit);
-
+         final Label note = UI.createLabel(container, Messages.Pref_Weather_Label_WeatherApi_SevenDaysLimit);
          GridDataFactory.fillDefaults()
                .indent(defaultHIndent, 0)
                .align(SWT.BEGINNING, SWT.FILL)

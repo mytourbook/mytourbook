@@ -34,7 +34,7 @@ class Suunto3_DeviceDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testImportForestParkLaps() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "597F0A5112001700-2016-08-27T15_45_41-0", ".sml");
+      testImportFile(deviceDataReader, FILES_PATH + "597F0A5112001700-2016-08-27T15_45_41-0", ".sml"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    /**
@@ -43,6 +43,6 @@ class Suunto3_DeviceDataReaderTests extends DeviceDataReaderTester {
    @Test
    void testImportTimothyLake() {
 
-      testImportFile(deviceDataReader, FILES_PATH + "F783095113000500-2015-05-31T09_51_13-0", ".sml");
+      testImportFile(deviceDataReader, FILES_PATH + "F783095113000500-2015-05-31T09_51_13-0", ".sml"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }

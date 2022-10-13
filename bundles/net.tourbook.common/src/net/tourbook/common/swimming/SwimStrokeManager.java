@@ -185,7 +185,7 @@ public class SwimStrokeManager {
 
 						final String swimStrokeName = Util.getXmlString(xmlSwimStyle, ATTR_SWIM_STROKE_NAME, null);
 						final SwimStroke swimStrokeEnum = (SwimStroke) Util.getEnumValue(swimStrokeName, SwimStroke.INVALID);
-						final RGB swimStrokeRGB = Util.getXmlRgb(xmlSwimStyle, TAG_BACKGROUND_COLOR, _strokeStyle_Invalid.getGraphBgColor());
+						final RGB swimStrokeRGB = Util.getXmlRgb_AsParent(xmlSwimStyle, TAG_BACKGROUND_COLOR, _strokeStyle_Invalid.getGraphBgColor());
 
 						if (SwimStroke.INVALID.equals(swimStrokeEnum) == false && swimStrokeRGB != null) {
 

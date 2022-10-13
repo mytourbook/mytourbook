@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<TourTagFilterProfiles Created="2022-06-23T13:42:37.627981200Z[UTC]" VersionMajor="22" VersionMicro="1" VersionMinor="6" VersionQualifier="20220617-1250" tourTagFilterVersion="1">
+<TourTagFilterProfiles Created="2022-09-22T05:44:19.920038900Z[UTC]" VersionMajor="22" VersionMicro="0" VersionMinor="8" VersionQualifier="qualifier" tourTagFilterVersion="1">
 <Profile isOrOperator="true" isSelected="true" name="Shoes 2 Profile">
 <list key="tagIds">
-<item value="0"/>
+<item value="1"/>
 </list>
 <list key="tagIdsUnchecked"/>
 </Profile>

@@ -1,12 +1,10 @@
 offline-map
 derby-database/lucene-index
 derby-database/*.log
-derby-database/tourbook/log/log4.dat
 .metadata/*.log
 .metadata/.plugins/org.eclipse.core.resources/*
 .metadata/.plugins/net.tourbook.common/invalidfiles_to_ignore.txt
 .metadata/.plugins/org.eclipse.jdt.ui/*
-.metadata/.plugins/net.tourbook/calendar-profiles.xml
 .metadata/.plugins/net.tourbook/srtmprofiles.xml
 .metadata/.plugins/net.tourbook/map-bookmarks.xml
 .metadata/.plugins/net.tourbook.photo/*

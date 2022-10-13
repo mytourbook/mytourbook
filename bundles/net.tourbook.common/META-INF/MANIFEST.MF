@@ -44,5 +44,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-ActivationPolicy: lazy
 Import-Package: com.skedgo.converter,
  javax.inject,
+ org.eclipse.collections.impl.list.mutable.primitive,
+ org.eclipse.collections.impl.map.mutable.primitive,
  org.eclipse.e4.core.services.log
 Automatic-Module-Name: net.tourbook.common

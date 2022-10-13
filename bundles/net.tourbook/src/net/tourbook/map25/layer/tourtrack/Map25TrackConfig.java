@@ -38,61 +38,65 @@ public class Map25TrackConfig {
 
 // SET_FORMATTING_OFF
 
-   public String  id                         = Long.toString(System.nanoTime());
-   public String  defaultId                  = Map25ConfigManager.CONFIG_DEFAULT_ID_1;
-   public String  name                       = Map25ConfigManager.CONFIG_DEFAULT_ID_1;
+   public String  id                            = Long.toString(System.nanoTime());
+   public String  defaultId                     = Map25ConfigManager.CONFIG_DEFAULT_ID_1;
+   public String  name                          = Map25ConfigManager.CONFIG_DEFAULT_ID_1;
 
    // line
-   public boolean isTrackVerticalOffset      = Map25ConfigManager.LINE_IS_TRACK_VERTICAL_OFFSET_DEFAULT;
 
-   public LineColorMode lineColorMode        = Map25ConfigManager.LINE_COLOR_MODE_DEFAULT;
-   public MapGraphId    gradientColorGraphID = Map25ConfigManager.LINE_GRADIENT_COLOR_GRAPH_ID_DEFAULT;
-   public RGB           lineColor            = Map25ConfigManager.LINE_COLOR_DEFAULT;
-   public int           lineOpacity          = Map25ConfigManager.LINE_OPACITY_DEFAULT;
-   public float         lineWidth            = Map25ConfigManager.LINE_WIDTH_DEFAULT;
-   public int           trackVerticalOffset  = Map25ConfigManager.LINE_TRACK_VERTICAL_OFFSET_DEFAULT;
+   public LineColorMode lineColorMode           = Map25ConfigManager.LINE_COLOR_MODE_DEFAULT;
+   public MapGraphId    gradientColorGraphID    = Map25ConfigManager.LINE_GRADIENT_COLOR_GRAPH_ID_DEFAULT;
+   public RGB           lineColor               = Map25ConfigManager.LINE_COLOR_DEFAULT;
+   public int           lineOpacity             = Map25ConfigManager.LINE_OPACITY_DEFAULT;
+   public float         lineWidth               = Map25ConfigManager.LINE_WIDTH_DEFAULT;
+
+   public boolean       isTrackVerticalOffset   = Map25ConfigManager.TRACK_IS_VERTICAL_OFFSET_DEFAULT;
+   public int           trackVerticalOffset     = Map25ConfigManager.TRACK_VERTICAL_OFFSET_DEFAULT;
 
    // outline
-   public boolean isShowOutline              = Map25ConfigManager.OUTLINE_IS_SHOW_OUTLINE_DEFAULT;
-   public float   outlineBrighness           = Map25ConfigManager.OUTLINE_BRIGHTNESS_DEFAULT;
-   public float   outlineWidth               = Map25ConfigManager.OUTLINE_WIDTH_DEFAULT;
+   public boolean isShowOutline                 = Map25ConfigManager.OUTLINE_IS_SHOW_OUTLINE_DEFAULT;
+   public float   outlineBrighness              = Map25ConfigManager.OUTLINE_BRIGHTNESS_DEFAULT;
+   public float   outlineWidth                  = Map25ConfigManager.OUTLINE_WIDTH_DEFAULT;
 
    // direction arrow
-   public boolean isShowDirectionArrow       = Map25ConfigManager.ARROW_IS_SHOW_ARROW_DEFAULT;
-   public int     arrow_MinimumDistance      = Map25ConfigManager.ARROW_MIN_DISTANCE_DEFAULT;
-   public int     arrow_VerticalOffset       = Map25ConfigManager.ARROW_VERTICAL_OFFSET_DEFAULT;
-   public DirectionArrowDesign arrow_Design  = Map25ConfigManager.ARROW_DESIGN_DEFAULT;
+   public boolean isShowDirectionArrow          = Map25ConfigManager.ARROW_IS_SHOW_ARROW_DEFAULT;
+   public int     arrow_MinimumDistance         = Map25ConfigManager.ARROW_MIN_DISTANCE_DEFAULT;
+   public int     arrow_VerticalOffset          = Map25ConfigManager.ARROW_VERTICAL_OFFSET_DEFAULT;
+   public DirectionArrowDesign arrow_Design     = Map25ConfigManager.ARROW_DESIGN_DEFAULT;
 
-   public int     arrow_Scale                = Map25ConfigManager.ARROW_SCALE_DEFAULT;
-   public int     arrow_Length               = Map25ConfigManager.ARROW_LENGTH_DEFAULT;
-   public int     arrow_LengthCenter         = Map25ConfigManager.ARROW_LENGTH_CENTER_DEFAULT;
-   public int     arrow_Width                = Map25ConfigManager.ARROW_WIDTH_DEFAULT;
-   public int     arrow_Height               = Map25ConfigManager.ARROW_HEIGHT_DEFAULT;
+   public int     arrow_Scale                   = Map25ConfigManager.ARROW_SCALE_DEFAULT;
+   public int     arrow_Length                  = Map25ConfigManager.ARROW_LENGTH_DEFAULT;
+   public int     arrow_LengthCenter            = Map25ConfigManager.ARROW_LENGTH_CENTER_DEFAULT;
+   public int     arrow_Width                   = Map25ConfigManager.ARROW_WIDTH_DEFAULT;
+   public int     arrow_Height                  = Map25ConfigManager.ARROW_HEIGHT_DEFAULT;
 
-   public int     arrowFin_OutlineWidth      = Map25ConfigManager.ARROW_FIN_OUTLINE_WIDTH_DEFAULT;
-   public int     arrowWing_OutlineWidth     = Map25ConfigManager.ARROW_WING_OUTLINE_WIDTH_DEFAULT;
+   public boolean arrow_IsAnimate               = Map25ConfigManager.ARROW_IS_ANIMATE_DEFAULT;
+   public int     arrow_ArrowsPerSecond         = Map25ConfigManager.ARROW_ANIMATE_ARROWS_PER_SECOND_DEFAULT;
 
-   public RGBA    arrowFin_InsideColor       = Map25ConfigManager.ARROW_FIN_INSIDE_COLOR_DEFAULT;
-   public RGBA    arrowFin_OutlineColor      = Map25ConfigManager.ARROW_FIN_OUTLINE_COLOR_DEFAULT;
-   public RGBA    arrowWing_InsideColor      = Map25ConfigManager.ARROW_WING_INSIDE_COLOR_DEFAULT;
-   public RGBA    arrowWing_OutlineColor     = Map25ConfigManager.ARROW_WING_OUTLINE_COLOR_DEFAULT;
+   public int     arrowFin_OutlineWidth         = Map25ConfigManager.ARROW_FIN_OUTLINE_WIDTH_DEFAULT;
+   public int     arrowWing_OutlineWidth        = Map25ConfigManager.ARROW_WING_OUTLINE_WIDTH_DEFAULT;
+
+   public RGBA    arrowFin_InsideColor          = Map25ConfigManager.ARROW_FIN_INSIDE_COLOR_DEFAULT;
+   public RGBA    arrowFin_OutlineColor         = Map25ConfigManager.ARROW_FIN_OUTLINE_COLOR_DEFAULT;
+   public RGBA    arrowWing_InsideColor         = Map25ConfigManager.ARROW_WING_INSIDE_COLOR_DEFAULT;
+   public RGBA    arrowWing_OutlineColor        = Map25ConfigManager.ARROW_WING_OUTLINE_COLOR_DEFAULT;
+
 
    // slider location
-   public boolean isShowSliderLocation       = Map25ConfigManager.SLIDER_IS_SHOW_CHART_SLIDER_DEFAULT;
-   public RGB     sliderLocation_Left_Color  = Map25ConfigManager.SLIDER_LOCATION_LEFT_COLOR_DEFAULT;
-   public RGB     sliderLocation_Right_Color = Map25ConfigManager.SLIDER_LOCATION_RIGHT_COLOR_DEFAULT;
-   public int     sliderLocation_Opacity     = Map25ConfigManager.SLIDER_LOCATION_OPACITY_DEFAULT;
-   public int     sliderLocation_Size        = Map25ConfigManager.SLIDER_LOCATION_SIZE_DEFAULT;
+   public boolean isShowSliderLocation          = Map25ConfigManager.SLIDER_IS_SHOW_CHART_SLIDER_DEFAULT;
+   public RGB     sliderLocation_Left_Color     = Map25ConfigManager.SLIDER_LOCATION_LEFT_COLOR_DEFAULT;
+   public RGB     sliderLocation_Right_Color    = Map25ConfigManager.SLIDER_LOCATION_RIGHT_COLOR_DEFAULT;
+   public int     sliderLocation_Opacity        = Map25ConfigManager.SLIDER_LOCATION_OPACITY_DEFAULT;
+   public int     sliderLocation_Size           = Map25ConfigManager.SLIDER_LOCATION_SIZE_DEFAULT;
 
    // slider path
-   public boolean isShowSliderPath           = Map25ConfigManager.SLIDER_IS_SHOW_SLIDER_PATH_DEFAULT;
-   public RGB     sliderPath_Color           = Map25ConfigManager.SLIDER_PATH_COLOR_DEFAULT;
-   public float   sliderPath_LineWidth       = Map25ConfigManager.SLIDER_PATH_LINE_WIDTH_DEFAULT;
-   public int     sliderPath_Opacity         = Map25ConfigManager.SLIDER_PATH_OPACITY_DEFAULT;
-   public int     testValue                  = 50;
+   public boolean isShowSliderPath              = Map25ConfigManager.SLIDER_IS_SHOW_SLIDER_PATH_DEFAULT;
+   public RGB     sliderPath_Color              = Map25ConfigManager.SLIDER_PATH_COLOR_DEFAULT;
+   public float   sliderPath_LineWidth          = Map25ConfigManager.SLIDER_PATH_LINE_WIDTH_DEFAULT;
+   public int     sliderPath_Opacity            = Map25ConfigManager.SLIDER_PATH_OPACITY_DEFAULT;
 
    // legend
-   public LegendUnitLayout legendUnitLayout = Map25ConfigManager.LEGEND_UNIT_LAYOUT_DEFAULT;
+   public LegendUnitLayout legendUnitLayout     = Map25ConfigManager.LEGEND_UNIT_LAYOUT_DEFAULT;
 
 // SET_FORMATTING_ON
 
@@ -143,51 +147,52 @@ public class Map25TrackConfig {
 
             + "[" + NL //                                                                                //$NON-NLS-1$
 
-            + CONFIG + "id                           = " + id + EOL //                                   //$NON-NLS-1$
-            + CONFIG + "defaultId                    = " + defaultId + EOL //                            //$NON-NLS-1$
-            + CONFIG + "name                         = " + name + EOL //                                 //$NON-NLS-1$
-            + CONFIG + "isTrackVerticalOffset        = " + isTrackVerticalOffset + EOL //                //$NON-NLS-1$
-            + CONFIG + "lineColor                    = " + RGB(lineColor) + EOL //                       //$NON-NLS-1$
-            + CONFIG + "lineColorMode                = " + lineColorMode + EOL //                        //$NON-NLS-1$
-            + CONFIG + "lineOpacity                  = " + lineOpacity + EOL //                          //$NON-NLS-1$
-            + CONFIG + "lineWidth                    = " + lineWidth + EOL //                            //$NON-NLS-1$
-            + CONFIG + "trackVerticalOffset          = " + trackVerticalOffset + EOL //                  //$NON-NLS-1$
+            + CONFIG + "id                            = " + id + EOL //                                  //$NON-NLS-1$
+            + CONFIG + "defaultId                     = " + defaultId + EOL //                           //$NON-NLS-1$
+            + CONFIG + "name                          = " + name + EOL //                                //$NON-NLS-1$
+            + CONFIG + "isTrackVerticalOffset         = " + isTrackVerticalOffset + EOL //               //$NON-NLS-1$
+            + CONFIG + "lineColor                     = " + RGB(lineColor) + EOL //                      //$NON-NLS-1$
+            + CONFIG + "lineColorMode                 = " + lineColorMode + EOL //                       //$NON-NLS-1$
+            + CONFIG + "lineOpacity                   = " + lineOpacity + EOL //                         //$NON-NLS-1$
+            + CONFIG + "lineWidth                     = " + lineWidth + EOL //                           //$NON-NLS-1$
+            + CONFIG + "trackVerticalOffset           = " + trackVerticalOffset + EOL //                 //$NON-NLS-1$
             + NL
-            + CONFIG + "isShowDirectionArrow         = " + isShowDirectionArrow + EOL //                 //$NON-NLS-1$
-            + CONFIG + "arrow_MinimumDistance        = " + arrow_MinimumDistance + EOL //                //$NON-NLS-1$
-            + CONFIG + "arrow_VerticalOffset         = " + arrow_VerticalOffset + EOL //                 //$NON-NLS-1$
-            + CONFIG + "arrow_Design                 = DirectionArrowDesign." + arrow_Design + EOL //    //$NON-NLS-1$
+            + CONFIG + "isShowDirectionArrow          = " + isShowDirectionArrow + EOL //                //$NON-NLS-1$
+            + CONFIG + "arrow_MinimumDistance         = " + arrow_MinimumDistance + EOL //               //$NON-NLS-1$
+            + CONFIG + "arrow_VerticalOffset          = " + arrow_VerticalOffset + EOL //                //$NON-NLS-1$
+            + CONFIG + "arrow_Design                  = DirectionArrowDesign." + arrow_Design + EOL //   //$NON-NLS-1$
 
-            + CONFIG + "arrow_Scale                  = " + arrow_Scale + EOL //                          //$NON-NLS-1$
-            + CONFIG + "arrow_Length                 = " + arrow_Length + EOL //                         //$NON-NLS-1$
-            + CONFIG + "arrow_LengthCenter           = " + arrow_LengthCenter + EOL //                   //$NON-NLS-1$
-            + CONFIG + "arrow_Width                  = " + arrow_Width + EOL //                          //$NON-NLS-1$
-            + CONFIG + "arrow_Height                 = " + arrow_Height + EOL //                         //$NON-NLS-1$
+            + CONFIG + "arrow_IsAnimate               = " + arrow_IsAnimate + EOL //                     //$NON-NLS-1$
+            + CONFIG + "arrow_AnimatedArrowsPerSecond = " + arrow_ArrowsPerSecond + EOL //               //$NON-NLS-1$
 
-            + CONFIG + "arrowFin_OutlineWidth        = " + arrowFin_OutlineWidth + EOL //                //$NON-NLS-1$
-            + CONFIG + "arrowWing_OutlineWidth       = " + arrowWing_OutlineWidth + EOL //               //$NON-NLS-1$
+            + CONFIG + "arrow_Scale                   = " + arrow_Scale + EOL //                         //$NON-NLS-1$
+            + CONFIG + "arrow_Length                  = " + arrow_Length + EOL //                        //$NON-NLS-1$
+            + CONFIG + "arrow_LengthCenter            = " + arrow_LengthCenter + EOL //                  //$NON-NLS-1$
+            + CONFIG + "arrow_Width                   = " + arrow_Width + EOL //                         //$NON-NLS-1$
+            + CONFIG + "arrow_Height                  = " + arrow_Height + EOL //                        //$NON-NLS-1$
 
-            + CONFIG + "arrowFin_InsideColor         = " + RGBA(arrowFin_InsideColor) + EOL //           //$NON-NLS-1$
-            + CONFIG + "arrowFin_OutlineColor        = " + RGBA(arrowFin_OutlineColor) + EOL //          //$NON-NLS-1$
-            + CONFIG + "arrowWing_InsideColor        = " + RGBA(arrowWing_InsideColor) + EOL //          //$NON-NLS-1$
-            + CONFIG + "arrowWing_OutlineColor       = " + RGBA(arrowWing_OutlineColor) + EOL //         //$NON-NLS-1$
+            + CONFIG + "arrowFin_OutlineWidth         = " + arrowFin_OutlineWidth + EOL //               //$NON-NLS-1$
+            + CONFIG + "arrowWing_OutlineWidth        = " + arrowWing_OutlineWidth + EOL //              //$NON-NLS-1$
+
+            + CONFIG + "arrowFin_InsideColor          = " + RGBA(arrowFin_InsideColor) + EOL //          //$NON-NLS-1$
+            + CONFIG + "arrowFin_OutlineColor         = " + RGBA(arrowFin_OutlineColor) + EOL //         //$NON-NLS-1$
+            + CONFIG + "arrowWing_InsideColor         = " + RGBA(arrowWing_InsideColor) + EOL //         //$NON-NLS-1$
+            + CONFIG + "arrowWing_OutlineColor        = " + RGBA(arrowWing_OutlineColor) + EOL //        //$NON-NLS-1$
             + NL
-            + CONFIG + "isShowOutline                = " + isShowOutline + EOL //                        //$NON-NLS-1$
-            + CONFIG + "outlineBrighness             = " + outlineBrighness + fEOL //                    //$NON-NLS-1$
-            + CONFIG + "outlineWidth                 = " + outlineWidth + fEOL //                        //$NON-NLS-1$
+            + CONFIG + "isShowOutline                 = " + isShowOutline + EOL //                       //$NON-NLS-1$
+            + CONFIG + "outlineBrighness              = " + outlineBrighness + fEOL //                   //$NON-NLS-1$
+            + CONFIG + "outlineWidth                  = " + outlineWidth + fEOL //                       //$NON-NLS-1$
             + NL
-            + CONFIG + "isShowSliderLocation         = " + isShowSliderLocation + EOL //                 //$NON-NLS-1$
-            + CONFIG + "sliderLocation_Left_Color    = " + RGB(sliderLocation_Left_Color) + EOL //       //$NON-NLS-1$
-            + CONFIG + "sliderLocation_Right_Color   = " + RGB(sliderLocation_Right_Color) + EOL //      //$NON-NLS-1$
-            + CONFIG + "sliderLocation_Opacity       = " + sliderLocation_Opacity + EOL //               //$NON-NLS-1$
-            + CONFIG + "sliderLocation_Size          = " + sliderLocation_Size + EOL //                  //$NON-NLS-1$
+            + CONFIG + "isShowSliderLocation          = " + isShowSliderLocation + EOL //                //$NON-NLS-1$
+            + CONFIG + "sliderLocation_Left_Color     = " + RGB(sliderLocation_Left_Color) + EOL //      //$NON-NLS-1$
+            + CONFIG + "sliderLocation_Right_Color    = " + RGB(sliderLocation_Right_Color) + EOL //     //$NON-NLS-1$
+            + CONFIG + "sliderLocation_Opacity        = " + sliderLocation_Opacity + EOL //              //$NON-NLS-1$
+            + CONFIG + "sliderLocation_Size           = " + sliderLocation_Size + EOL //                 //$NON-NLS-1$
             + NL
-            + CONFIG + "isShowSliderPath             = " + isShowSliderPath + EOL //                     //$NON-NLS-1$
-            + CONFIG + "sliderPath_Color             = " + RGB(sliderPath_Color) + EOL //                //$NON-NLS-1$
-            + CONFIG + "sliderPath_LineWidth         = " + sliderPath_LineWidth + EOL //                 //$NON-NLS-1$
-            + CONFIG + "sliderPath_Opacity           = " + sliderPath_Opacity + EOL //                   //$NON-NLS-1$
-
-            + CONFIG + "testValue                    = " + testValue + EOL //                            //$NON-NLS-1$
+            + CONFIG + "isShowSliderPath              = " + isShowSliderPath + EOL //                    //$NON-NLS-1$
+            + CONFIG + "sliderPath_Color              = " + RGB(sliderPath_Color) + EOL //               //$NON-NLS-1$
+            + CONFIG + "sliderPath_LineWidth          = " + sliderPath_LineWidth + EOL //                //$NON-NLS-1$
+            + CONFIG + "sliderPath_Opacity            = " + sliderPath_Opacity + EOL //                  //$NON-NLS-1$
 
             + "]" + NL //                                                                                //$NON-NLS-1$
       ;

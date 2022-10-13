@@ -1635,6 +1635,8 @@ public class Messages extends NLS {
    public static String        Pref_People_Error_path_is_invalid;
    public static String        Pref_People_Label_Age;
    public static String        Pref_People_Label_Birthday;
+   public static String        Pref_People_Label_BodyMassIndex;
+   public static String        Pref_People_Label_BodyMassIndex_Tooltip;
    public static String        Pref_People_Label_DataTransfer;
    public static String        Pref_People_Label_DefaultDataTransferFilePath;
    public static String        Pref_People_Label_DefaultDataTransferFilePath_Tooltip;
@@ -2051,7 +2053,9 @@ public class Messages extends NLS {
    public static String        Slideout_Map25Provider_Label_MapProvider;
    public static String        Slideout_Map25Provider_Label_MapProvider_Title;
    public static String        Slideout_Map25Provider_Label_ThemeStyle;
-
+   public static String        Slideout_Map25TrackOptions_ArrowsPerSecond_Tooltip;
+   public static String        Slideout_Map25TrackOptions_Checkbox_AnimateDirectionArrows;
+   public static String        Slideout_Map25TrackOptions_Checkbox_AnimateDirectionArrows_Tooltip;
    public static String        Slideout_Map25TrackOptions_Checkbox_Outline;
    public static String        Slideout_Map25TrackOptions_Checkbox_Outline_Tooltip;
    public static String        Slideout_Map25TrackOptions_Checkbox_TrackVerticalOffset;

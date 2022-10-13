@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,38 +15,38 @@
  *******************************************************************************/
 package net.tourbook.tag.tour.filter;
 
-import gnu.trove.set.hash.TLongHashSet;
-
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 
+import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
+
 public class TourTagFilterProfile implements Cloneable {
 
-   private static int  _idCounter             = 0;
+   private static int _idCounter             = 0;
 
-   int                 profileId;
+   int                profileId;
 
    /**
     * Profile name
     */
-   String              name                   = Messages.Tour_Filter_Default_ProfileName;
+   String             name                   = Messages.Tour_Filter_Default_ProfileName;
 
    /**
     * Contains all tag id's for this profile
     */
-   public TLongHashSet tagFilterIds           = new TLongHashSet();
+   public LongHashSet tagFilterIds           = new LongHashSet();
 
    /**
     * Keeps tag id's which are unchecked in the tag cloud viewer
     */
-   public TLongHashSet tagFilterIds_Unchecked = new TLongHashSet();
+   public LongHashSet tagFilterIds_Unchecked = new LongHashSet();
 
    /**
     * When <code>true</code> (default) then the tags are combined with OR otherwise they are
     * combined with AND
     */
-   public boolean      isOrOperator           = TourTagFilterManager.ATTR_IS_OR_OPERATOR_DEFAULT;
+   public boolean     isOrOperator           = TourTagFilterManager.ATTR_IS_OR_OPERATOR_DEFAULT;
 
    public TourTagFilterProfile() {
 
@@ -67,8 +67,8 @@ public class TourTagFilterProfile implements Cloneable {
          // create a unique name
          clonedObject.name = name + UI.SPACE + Integer.toString(clonedObject.profileId);
 
-         clonedObject.tagFilterIds = new TLongHashSet(tagFilterIds.toArray());
-         clonedObject.tagFilterIds_Unchecked = new TLongHashSet(tagFilterIds_Unchecked.toArray());
+         clonedObject.tagFilterIds = new LongHashSet(tagFilterIds.toArray());
+         clonedObject.tagFilterIds_Unchecked = new LongHashSet(tagFilterIds_Unchecked.toArray());
 
       } catch (final CloneNotSupportedException e) {
          StatusUtil.log(e);

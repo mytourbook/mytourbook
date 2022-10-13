@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,6 @@ package net.tourbook.device.hac4;
 import gnu.io.SerialPort;
 
 import java.io.BufferedInputStream;
-import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -278,7 +277,7 @@ public class HAC4DeviceReader extends TourbookDevice {
             lastTourMonth = (lastTourMonth == 0) ? startBlock.month : lastTourMonth;
 
             /*
-             * because we read the tours in decending order (last tour first), we check if the
+             * because we read the tours in descending order (last tour first), we check if the
              * month of the current tour is higher than from the last tour, if this is the case,
              * we assume to have data from the previous year
              */
@@ -549,7 +548,7 @@ public class HAC4DeviceReader extends TourbookDevice {
 
             /*
              * make sure to end not in an endless loop where the current AA offset is the same
-             * as the first AA offset (this seems to be unlikely but it happend already 2 Month
+             * as the first AA offset (this seems to be unlikely but it happened already 2 Month
              * after the first implementation)
              */
             if (offsetAARecord == initialOffsetAARecord) {
@@ -602,17 +601,6 @@ public class HAC4DeviceReader extends TourbookDevice {
       return startBlock;
    }
 
-   public final int readSummary(final byte[] buffer) throws IOException {
-      final int ch0 = buffer[0];
-      final int ch1 = buffer[1];
-      final int ch2 = buffer[2];
-      final int ch3 = buffer[3];
-      if ((ch0 | ch1 | ch2 | ch3) < 0) {
-         throw new EOFException();
-      }
-      return ((ch1 << 8) + (ch0 << 0)) + ((ch3 << 8) + (ch2 << 0));
-   }
-
    /**
     * @param timeData
     * @param rawData
@@ -661,14 +649,10 @@ public class HAC4DeviceReader extends TourbookDevice {
 
       boolean isValid = false;
 
-      BufferedInputStream inStream = null;
-
-      try {
+      final File dataFile = new File(fileName);
+      try (BufferedInputStream inStream = new BufferedInputStream(new FileInputStream(dataFile))) {
 
          final byte[] buffer = new byte[5];
-
-         final File dataFile = new File(fileName);
-         inStream = new BufferedInputStream(new FileInputStream(dataFile));
 
          inStream.read(buffer);
          if (!"AFRO".equalsIgnoreCase(new String(buffer, 0, 4))) { //$NON-NLS-1$
@@ -714,53 +698,6 @@ public class HAC4DeviceReader extends TourbookDevice {
          return false;
       } catch (final Exception e) {
          e.printStackTrace();
-      } finally {
-         if (inStream != null) {
-            try {
-               inStream.close();
-            } catch (final IOException e1) {
-               e1.printStackTrace();
-            }
-         }
-      }
-
-      return isValid;
-   }
-
-   public boolean validateRawDataNEW(final String fileName) {
-
-      boolean isValid = false;
-
-      try (RandomAccessFile file = new RandomAccessFile(fileName, "r")) {//$NON-NLS-1$
-
-         final byte[] buffer = new byte[5];
-
-         // check header
-         file.read(buffer);
-         if (!"AFRO".equalsIgnoreCase(new String(buffer, 0, 4))) { //$NON-NLS-1$
-            return false;
-         }
-
-         int checksum = 0, lastValue = 0;
-
-         while (file.read(buffer) != -1) {
-            checksum = (checksum + lastValue) & 0xFFFF;
-
-            lastValue = readSummary(buffer);
-
-            // int lastValueOrig = Integer.parseInt(new String(buffer, 0,
-            // 4), 16);
-            // System.out.println(lastValueOrig + " " + lastValue);
-         }
-
-         if (checksum == lastValue) {
-            isValid = true;
-         }
-
-      } catch (final IOException e) {
-         e.printStackTrace();
-      } catch (final NumberFormatException e) {
-         return false;
       }
 
       return isValid;

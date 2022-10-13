@@ -13,8 +13,7 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Export-Package: net.tourbook.chart
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Import-Package: gnu.trove.list.array,
- net.tourbook.common,
+Import-Package: net.tourbook.common,
  net.tourbook.common.form,
  net.tourbook.common.util,
  org.eclipse.e4.ui.css.swt.theme,

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,8 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.common.util;
-
-import gnu.trove.list.array.TIntArrayList;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -42,6 +40,7 @@ import net.tourbook.common.formatter.ValueFormatter_Time_HHMMSS;
 import net.tourbook.common.formatter.ValueFormatter_Time_SSS;
 import net.tourbook.common.tooltip.AdvancedSlideoutShell;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.AbstractColumnLayout;
@@ -1880,7 +1879,7 @@ public class ColumnManager {
 
          final int numColumns = dataLayer.getColumnCount();
 
-         final TIntArrayList allOrderedColumns = new TIntArrayList();
+         final IntArrayList allOrderedColumns = new IntArrayList();
 
          for (int columnIndex = 0; columnIndex < numColumns; columnIndex++) {
 

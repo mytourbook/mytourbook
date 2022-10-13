@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,10 +14,6 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
-
-import gnu.trove.list.array.TFloatArrayList;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.list.array.TLongArrayList;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,6 +34,10 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.tag.tour.filter.TourTagFilterSqlJoinBuilder;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
+
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 
 public class DataProvider_Tour_Time extends DataProvider {
 
@@ -237,7 +237,6 @@ public class DataProvider_Tour_Time extends DataProvider {
 
          final TourTagFilterSqlJoinBuilder tagFilterSqlJoinBuilder = new TourTagFilterSqlJoinBuilder();
 
-
          sql = UI.EMPTY_STRING
 
                + "SELECT" + NL //                                                   //$NON-NLS-1$
@@ -277,32 +276,32 @@ public class DataProvider_Tour_Time extends DataProvider {
 
                + " ORDER BY TourStartTime"; //                                      //$NON-NLS-1$
 
-         final TLongArrayList allTourIds = new TLongArrayList();
+         final LongArrayList allTourIds = new LongArrayList();
 
-         final TIntArrayList allTourYear = new TIntArrayList();
-         final TIntArrayList allTourMonths = new TIntArrayList();
-         final TIntArrayList allTourDays = new TIntArrayList();
-         final TIntArrayList allYearsDOY = new TIntArrayList(); // DOY...Day Of Year for all years
+         final IntArrayList allTourYear = new IntArrayList();
+         final IntArrayList allTourMonths = new IntArrayList();
+         final IntArrayList allTourDays = new IntArrayList();
+         final IntArrayList allYearsDOY = new IntArrayList(); // DOY...Day Of Year for all years
 
-         final TIntArrayList allTourStartTime = new TIntArrayList();
-         final TIntArrayList allTourEndTime = new TIntArrayList();
-         final TIntArrayList allTourStartWeek = new TIntArrayList();
+         final IntArrayList allTourStartTime = new IntArrayList();
+         final IntArrayList allTourEndTime = new IntArrayList();
+         final IntArrayList allTourStartWeek = new IntArrayList();
          final ArrayList<ZonedDateTime> allTourStartDateTime = new ArrayList<>();
          final ArrayList<String> allTourTimeOffset = new ArrayList<>();
 
-         final TIntArrayList allTourDeviceTime_Elapsed = new TIntArrayList();
-         final TIntArrayList allTourDeviceTime_Recorded = new TIntArrayList();
-         final TIntArrayList allTourDeviceTime_Paused = new TIntArrayList();
-         final TIntArrayList allTourComputedTime_Moving = new TIntArrayList();
+         final IntArrayList allTourDeviceTime_Elapsed = new IntArrayList();
+         final IntArrayList allTourDeviceTime_Recorded = new IntArrayList();
+         final IntArrayList allTourDeviceTime_Paused = new IntArrayList();
+         final IntArrayList allTourComputedTime_Moving = new IntArrayList();
 
-         final TFloatArrayList allDistances = new TFloatArrayList();
-         final TFloatArrayList allElevationUp = new TFloatArrayList();
+         final FloatArrayList allDistances = new FloatArrayList();
+         final FloatArrayList allElevationUp = new FloatArrayList();
 
          final ArrayList<String> allTourTitle = new ArrayList<>();
          final ArrayList<String> allTourDescription = new ArrayList<>();
 
-         final TLongArrayList allTypeIds = new TLongArrayList();
-         final TIntArrayList allTypeColorIndex = new TIntArrayList();
+         final LongArrayList allTypeIds = new LongArrayList();
+         final IntArrayList allTypeColorIndex = new IntArrayList();
 
          final HashMap<Long, ArrayList<Long>> allTagIds = new HashMap<>();
 

@@ -17,8 +17,6 @@ package net.tourbook.ui.views.tagging;
 
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 
-import gnu.trove.list.array.TLongArrayList;
-
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,6 +78,7 @@ import net.tourbook.ui.views.TourInfoToolTipCellLabelProvider;
 import net.tourbook.ui.views.TourInfoToolTipStyledCellLabelProvider;
 import net.tourbook.ui.views.TreeViewerTourInfoToolTip;
 
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
@@ -2493,7 +2492,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
          return;
       }
 
-      final TLongArrayList expandedItems = new TLongArrayList();
+      final LongArrayList expandedItems = new LongArrayList();
 
       final TreePath[] expandedOpenedTreePaths = net.tourbook.common.UI.getExpandedOpenedItems(
             visibleExpanded,
