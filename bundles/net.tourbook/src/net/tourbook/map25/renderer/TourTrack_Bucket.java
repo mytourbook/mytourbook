@@ -35,49 +35,47 @@ import org.slf4j.LoggerFactory;
  */
 public class TourTrack_Bucket {
 
-   static final Logger         log                = LoggerFactory.getLogger(TourTrack_Bucket.class);
+   static final Logger        log              = LoggerFactory.getLogger(TourTrack_Bucket.class);
 
    /**
     * Scale factor mapping extrusion vector to short values
     */
-   public static final float   DIR_SCALE          = 2048;
+   public static final float  DIR_SCALE        = 2048;
 
    /**
     * Maximal resolution
     */
-   private static final float  MIN_DIST           = 1 / 8f;
+   private static final float MIN_DIST         = 1 / 8f;
 
    /**
     * Not quite right.. need to go back so that additional
     * bevel vertices are at least MIN_DIST apart
     */
-   private static final float  MIN_BEVEL          = MIN_DIST * 4;
+   private static final float MIN_BEVEL        = MIN_DIST * 4;
 
    /**
     * Mask for packing last two bits of extrusion vector with texture
     * coordinates, .... 1111 1100
     */
-   private static final int    DIR_MASK           = 0xFFFFFFFC;
+   private static final int   DIR_MASK         = 0xFFFFFFFC;
 
-   private final static double RADIANS_TO_DEGREES = 180d / Math.PI;
+   public LineStyle           lineStyle;
+   public int                 lineColorMode;
 
-   public LineStyle            lineStyle;
-   public int                  lineColorMode;
+   boolean                    isCapRounded;
+   float                      heightOffset;
 
-   boolean                     isCapRounded;
-   float                       heightOffset;
+   private float              _minimumDistance = MIN_DIST;
+   private float              _minimumBevel    = MIN_BEVEL;
 
-   private float               _minimumDistance   = MIN_DIST;
-   private float               _minimumBevel      = MIN_BEVEL;
-
-   private int                 _tMin              = Integer.MIN_VALUE, _tMax = Integer.MAX_VALUE;
+   private int                _tMin            = Integer.MIN_VALUE, _tMax = Integer.MAX_VALUE;
 
    /**
     * Number of vertices for this layer.
     */
-   int                         numTrackVertices;
+   int                        numTrackVertices;
 
-   TourTrack_VertexData        trackVertexData;
+   TourTrack_VertexData       trackVertexData;
 
    /**
     * Contains the vertices for direction arrows multiplied with {@link MapRenderer#COORD_SCALE}:
@@ -89,7 +87,7 @@ public class TourTrack_Bucket {
     * ...
     * </pre>
     */
-   ShortArrayList              directionArrow_Vertices;
+   ShortArrayList             directionArrow_Vertices;
 
    /**
     * Barycentric coordinates are simply (1, 0, 0), (0, 1, 0) and (0, 0, 1) for the three
@@ -98,7 +96,7 @@ public class TourTrack_Bucket {
     * Source:
     * https://stackoverflow.com/questions/137629/how-do-you-render-primitives-as-wireframes-in-opengl#answer-33004265
     */
-   ShortArrayList              directionArrow_ColorCoords;
+   ShortArrayList             directionArrow_ColorCoords;
 
    /**
     * X/Y positions
@@ -109,7 +107,7 @@ public class TourTrack_Bucket {
     * ...
     * </pre>
     */
-   ShortArrayList              animatedPositions;
+   ShortArrayList             animatedPositions;
 
    /**
     * X/Y unit (direction) vectors
@@ -120,7 +118,7 @@ public class TourTrack_Bucket {
     * ...
     * </pre>
     */
-   FloatArrayList              animatedForwardAngle;
+   FloatArrayList             animatedForwardAngle;
 
    public TourTrack_Bucket() {
 
@@ -1042,7 +1040,7 @@ public class TourTrack_Bucket {
             angleDiff = getAngleDiff(p21Angle, prevAngle);
          }
 
-         final float minSmoothAngle = 3;
+         final float minSmoothAngle = 2f;
 
          if (Math.abs(angleDiff) > minSmoothAngle) {
 
@@ -1068,39 +1066,12 @@ public class TourTrack_Bucket {
 
          animatedForwardAngle.add(animatedAngle - 90);
 
-         if (pixelIndex < 40) {
-
-            System.out.println(String.format(""
-
-                  + "%3d"
-
-                  + "  p21 %3.0f°"
-                  + "  Anim %3.0f°"
-                  + "  Diff %4.0f°"
-
-                  ,
-
-                  pixelIndex,
-
-                  p21Angle,
-                  animatedAngle,
-                  angleDiff
-
-            ));
-            // TODO remove SYSTEM.OUT.PRINTLN
-         }
-
          // setup next position
          p1X = p2X;
          p1Y = p2Y;
 
          prevAngle = animatedAngle;
       }
-
-      System.out.println();
-      System.out.println();
-//      // TODO remove SYSTEM.OUT.PRINTLN
-
    }
 
    /**

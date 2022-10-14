@@ -650,7 +650,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
       setIsUpdateLayer(true);
 
-      // set start time for the animation
+      // set start time for a new animation
       TourTrack_Shader.setAnimationStartTime();
    }
 

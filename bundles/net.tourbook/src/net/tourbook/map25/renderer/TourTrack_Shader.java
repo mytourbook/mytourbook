@@ -243,12 +243,12 @@ public final class TourTrack_Shader {
 
          if (trackConfig.arrow_IsAnimate) {
 
-            final boolean isDebug = true; 
+            final boolean isDebug = false;
             if (isDebug) {
 
                // for debugging reset position
                _animation_CurrentPositionIndex = 0;
-               setAnimationStartTime();
+//               setAnimationStartTime();
 
             } else {
 
@@ -266,13 +266,15 @@ public final class TourTrack_Shader {
 
 // SET_FORMATTING_OFF
 
-               final short size = 100;
-               final short size2 = size*3;
+               final short size  = 100;
+               final short size2 = size * 3;
+
+               final short zPos  = (short) (1 + trackBucket.heightOffset);
 
                _animationVertices = new short[] {
-                                                   0,     0,   0,
-                                                size,  size2,  -00,
-                                               -size,  size2,  -00,
+                                                   0,     0,   zPos,
+                                                size,  size2,  zPos,
+                                               -size,  size2,  zPos,
 
                                                 };
 // SET_FORMATTING_ON
@@ -616,14 +618,17 @@ public final class TourTrack_Shader {
          gl.uniform1i(shader_u_mode, capMode);
       }
 
-//       GLState.test(true, false);
-//       gl.depthMask(true);
-//       {
-//          gl.drawArrays(GL.TRIANGLE_STRIP, lineBucket.vertexOffset, lineBucket.numVertices);
-//       }
-//       gl.depthMask(false);
+      /*
+       * Draw track
+       */
+      GLState.test(true, false);
+      gl.depthMask(true);
+      {
+         gl.drawArrays(GL.TRIANGLE_STRIP, 0, trackBucket.numTrackVertices);
+      }
+      gl.depthMask(false);
 
-      gl.drawArrays(GL.TRIANGLE_STRIP, 0, trackBucket.numTrackVertices);
+//      gl.drawArrays(GL.TRIANGLE_STRIP, 0, trackBucket.numTrackVertices);
    }
 
    private static void paint_20_DirectionArrows(final GLViewport viewport,
@@ -705,8 +710,8 @@ public final class TourTrack_Shader {
       final ShortArrayList animatedPositions = trackBucket.animatedPositions;
       final FloatArrayList animatedForwardAngle = trackBucket.animatedForwardAngle;
 
-      final int numPositions = animatedPositions.size();
-      if (numPositions < 1) {
+      final int numAllPositions = animatedPositions.size();
+      if (numAllPositions < 1) {
          return;
       }
 
@@ -714,10 +719,10 @@ public final class TourTrack_Shader {
       shader.useProgram();
 
       // get animated position
-      final int posIndex = paint_32_GetAnimatedPositionIndex(animatedPositions);
+      final int posIndex = paint_32_GetAnimatedPositionIndex(animatedPositions, trackBucket);
 
       // ensure bounds -> this case happened during debugging several time
-      if (posIndex >= numPositions - 2) {
+      if (posIndex >= numAllPositions - 2) {
          return;
       }
 
@@ -730,9 +735,9 @@ public final class TourTrack_Shader {
       viewport.mvp.setAsUniform(shader.uni_MVP);
 
       // set animation position
-      gl.uniform2f(shader.uni_AnimationPos,
-            animatedPositions.get(posIndex),
-            animatedPositions.get(posIndex + 1));
+      final short posX = animatedPositions.get(posIndex);
+      final short posY = animatedPositions.get(posIndex + 1);
+      gl.uniform2f(shader.uni_AnimationPos, posX, posY);
 
       // set viewport scale TO map scale: 1.0...2.0
       gl.uniform1f(shader.uni_VpScale2CompileScale, vp2mpScale);
@@ -765,12 +770,12 @@ public final class TourTrack_Shader {
 
    }
 
-   private static int paint_32_GetAnimatedPositionIndex(final ShortArrayList animatedPositions) {
+   private static int paint_32_GetAnimatedPositionIndex(final ShortArrayList animatedPositions, final TourTrack_Bucket trackBucket) {
 
       final long currentTimeMS = System.currentTimeMillis();
 
-      // number of position items: x,y -> 2
-      final int numPosSliceItems = 2;
+      // number of items for one position: x,y -> 2
+      final int numPosItems = 2;
       final int numAllPositions = animatedPositions.size();
 
       int positionIndex;
@@ -780,6 +785,15 @@ public final class TourTrack_Shader {
          _animation_IsUseRelativePosition = false;
 
          positionIndex = (int) (numAllPositions * _animation_CurrentRelativePosition);
+
+         /**
+          * Very important !!!
+          * <p>
+          * It took me several headaches to debug and find the reason, positionIndex must be an even
+          * number otherwise x and y are exchanged !!!
+          */
+         positionIndex /= 2;
+         positionIndex *= 2;
 
       } else {
 
@@ -796,32 +810,32 @@ public final class TourTrack_Shader {
          final long nextUpdateTimeMS = _animation_LastUpdateTime + frameDurationMS;
          final long timeDiffMS = nextUpdateTimeMS - currentTimeMS;
          if (timeDiffMS > 0) {
+
             return _animation_CurrentPositionIndex;
          }
 
          // the last frame is not displayed -> -2
-         final int maxFrames = Math.max(0, numAllPositions / numPosSliceItems - numPosSliceItems);
+         final int maxFrames = Math.max(0, numAllPositions / numPosItems - numPosItems);
          final float maxLoopTime = maxFrames / framesPerSecond;
 
          final float timeDiffSinceFirstRun = (float) ((currentTimeMS - _animation_StartTime) / 1000.0);
          final float currentTimeIndex = timeDiffSinceFirstRun % maxLoopTime;
 
-         positionIndex = Math.round(currentTimeIndex * framesPerSecond) * numPosSliceItems;
+         positionIndex = Math.round(currentTimeIndex * framesPerSecond) * numPosItems;
 
          // ensure to not jump back to the start when the end is not yet reached
-         if (positionIndex <= numAllPositions - numPosSliceItems) {
-            positionIndex = _animation_CurrentPositionIndex + numPosSliceItems;
+         if (positionIndex <= numAllPositions - numPosItems) {
+            positionIndex = _animation_CurrentPositionIndex + numPosItems;
          }
 
          // ensure to move not more than one frame
-         if (positionIndex > _animation_CurrentPositionIndex + numPosSliceItems) {
-            positionIndex = _animation_CurrentPositionIndex + numPosSliceItems;
+         if (positionIndex > _animation_CurrentPositionIndex + numPosItems) {
+            positionIndex = _animation_CurrentPositionIndex + numPosItems;
          }
-
       }
 
       // ensure bounds
-      if (positionIndex >= numAllPositions - numPosSliceItems) {
+      if (positionIndex >= numAllPositions - numPosItems) {
          positionIndex = 0;
       }
 
