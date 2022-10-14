@@ -110,13 +110,7 @@ public class TourTrack_Bucket {
    ShortArrayList             animatedPositions;
 
    /**
-    * X/Y unit (direction) vectors
-    *
-    * <pre>
-    * unitX1    unitY2
-    * unitX2    unitY2
-    * ...
-    * </pre>
+    * Angle for the forward direction
     */
    FloatArrayList             animatedForwardAngle;
 

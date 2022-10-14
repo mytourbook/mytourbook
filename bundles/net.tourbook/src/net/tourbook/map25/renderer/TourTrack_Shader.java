@@ -248,7 +248,6 @@ public final class TourTrack_Shader {
 
                // for debugging reset position
                _animation_CurrentPositionIndex = 0;
-//               setAnimationStartTime();
 
             } else {
 
@@ -723,7 +722,7 @@ public final class TourTrack_Shader {
 
       // ensure bounds -> this case happened during debugging several time
       if (posIndex >= numAllPositions - 2) {
-         return;
+//         return;
       }
 
       // rotate model to look forward
