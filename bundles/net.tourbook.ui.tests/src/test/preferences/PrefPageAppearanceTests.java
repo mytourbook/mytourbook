@@ -22,6 +22,15 @@ import utils.UITest;
 public class PrefPageAppearanceTests extends UITest {
 
    @Test
+   void openPreferencePage() {
+
+      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
+      bot.tree().getTreeItem("Appearance").expand().getNode("Value Format").select(); //$NON-NLS-1$
+
+      bot.button("Apply and Close").click(); //$NON-NLS-1$
+   }
+
+   @Test
    void testAppearance() {
 
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
