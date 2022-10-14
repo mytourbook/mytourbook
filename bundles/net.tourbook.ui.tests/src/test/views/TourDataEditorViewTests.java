@@ -74,7 +74,8 @@ public class TourDataEditorViewTests extends UITest {
 
       SWTBotTable timeSlicesTable = tourEditorViewBot.table();
 
-      assertEquals(16829, timeSlicesTable.rowCount());
+      final int timeSlicesTableCount = 16829;
+      assertEquals(timeSlicesTableCount, timeSlicesTable.rowCount());
 
       timeSlicesTable.select(3);
 
@@ -87,7 +88,7 @@ public class TourDataEditorViewTests extends UITest {
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
       //Ensuring that the time slice was deleted
-      assertEquals(16828, timeSlicesTable.rowCount());
+      assertEquals(timeSlicesTableCount - 1, timeSlicesTable.rowCount());
    }
 
    @Test
