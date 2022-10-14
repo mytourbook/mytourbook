@@ -30,6 +30,7 @@ public class PrefPageSRTMDataTests extends UITest {
 
       bot.button("Dummy Validation").click();
       bot.button("Validate SRTM Connection").click();
+      bot.button("Dummy Validation").click();
 
       Utils.clickOkButton(bot);
 
