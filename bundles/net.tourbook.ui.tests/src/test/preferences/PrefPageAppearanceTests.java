@@ -25,7 +25,7 @@ public class PrefPageAppearanceTests extends UITest {
    void openPreferencePage() {
 
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
-      bot.tree().getTreeItem("Appearance").expand().getNode("Value Format").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem("Appearance").expand().getNode("Value Format").select(); //$NON-NLS-1$ //$NON-NLS-2$
 
       bot.button("Apply and Close").click(); //$NON-NLS-1$
    }
