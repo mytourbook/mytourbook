@@ -37,9 +37,14 @@ public class Utils {
 
    public static final String  workingDirectory        = System.getProperty("user.dir"); //$NON-NLS-1$
 
-   public static void clickOkButton(final SWTWorkbenchBot bot) {
+   public static void clickCloseButton(final SWTWorkbenchBot bot) {
 
       bot.button(IDialogConstants.CLOSE_LABEL).click();
+   }
+
+   public static void clickOkButton(final SWTWorkbenchBot bot) {
+
+      bot.button(IDialogConstants.OK_LABEL).click();
    }
 
    public static SWTBotTreeItem getTour(final SWTWorkbenchBot bot) {
