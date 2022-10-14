@@ -28,11 +28,11 @@ public class PrefPageSRTMDataTests extends UITest {
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
       bot.tree().getTreeItem("SRTM").expand().getNode("Data").select(); //$NON-NLS-1$
 
-      bot.button("Dummy Validation").click();
       bot.button("Validate SRTM Connection").click();
-      bot.button("Dummy Validation").click();
 
       Utils.clickOkButton(bot);
+
+      bot.button("Dummy Validation").click();
 
       bot.button("Apply and Close").click(); //$NON-NLS-1$
    }
