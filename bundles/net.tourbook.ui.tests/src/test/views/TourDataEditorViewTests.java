@@ -39,7 +39,7 @@ public class TourDataEditorViewTests extends UITest {
    void testNewTour() {
 
       final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME).bot();
-      tourEditorViewBot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
+      bot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
 
       bot.toolbarButtonWithTooltip("Create new tour/event (Ctrl+N)").click(); //$NON-NLS-1$
 
