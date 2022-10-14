@@ -38,14 +38,14 @@ public class TourDataEditorViewTests extends UITest {
    @Test
    void testNewTour() {
 
-      Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
-      bot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
+      final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME).bot();
+      tourEditorViewBot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
 
       bot.toolbarButtonWithTooltip("Create new tour/event (Ctrl+N)").click(); //$NON-NLS-1$
 
       final String newTourTitle = "New Tour Title"; //$NON-NLS-1$
 
-      bot.comboBox().setText(newTourTitle);
+      tourEditorViewBot.comboBox().setText(newTourTitle);
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
       Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
