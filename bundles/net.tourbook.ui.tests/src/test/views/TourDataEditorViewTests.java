@@ -38,7 +38,6 @@ public class TourDataEditorViewTests extends UITest {
    @Test
    void testNewTour() {
 
-      final SWTBot tourEditorViewBot = Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME).bot();
       bot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
 
       bot.toolbarButtonWithTooltip("Create new tour/event (Ctrl+N)").click(); //$NON-NLS-1$
@@ -47,6 +46,8 @@ public class TourDataEditorViewTests extends UITest {
 
       bot.comboBox().setText(newTourTitle);
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
+
+      Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME).bot();
 
       final SWTBotCombo titleCombo = bot.comboBox(newTourTitle);
       assertNotNull(titleCombo);
