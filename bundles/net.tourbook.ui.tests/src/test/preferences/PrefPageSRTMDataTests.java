@@ -23,7 +23,7 @@ import utils.Utils;
 public class PrefPageSRTMDataTests extends UITest {
 
    @Test
-   void testAppearance() {
+   void validateSRTMConnection() {
 
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
       bot.tree().getTreeItem("SRTM").expand().getNode("Data").select(); //$NON-NLS-1$
