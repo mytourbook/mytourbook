@@ -1534,6 +1534,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
    @Override
    public void dispose() {
 
+      getViewSite().getPage().removePartListener(_partListener);
       getSite().getPage().removePostSelectionListener(_postSelectionListener);
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
 
