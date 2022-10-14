@@ -70,7 +70,7 @@ public class TourBookViewTests extends UITest {
 
       //Compute the tour distance
       tour.contextMenu(Messages.Tour_Action_AdjustTourValues).menu(Messages.TourEditor_Action_ComputeDistanceValuesFromGeoPosition).click();
-      bot.button("OK").click(); //$NON-NLS-1$
+      Utils.clickOkButton(bot);
 
       //Check the new computed distance
       tour = Utils.getTour(bot);
@@ -106,8 +106,8 @@ public class TourBookViewTests extends UITest {
       //Delete the tour
       tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
             Messages.Tour_Book_Action_delete_selected_tours).click();
-      bot.button("OK").click(); //$NON-NLS-1$
-      bot.button("OK").click(); //$NON-NLS-1$
+      Utils.clickOkButton(bot);
+      Utils.clickOkButton(bot);
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
@@ -193,7 +193,7 @@ public class TourBookViewTests extends UITest {
             .menu(Messages.Tour_SubMenu_Elevation)
             .menu(Messages.TourEditor_Action_SetAltitudeValuesFromSRTM)
             .click();
-      bot.button("OK").click(); //$NON-NLS-1$
+      Utils.clickOkButton(bot);
 
       //Check the new elevation value
       tour = Utils.getTourWithSRTM(bot);

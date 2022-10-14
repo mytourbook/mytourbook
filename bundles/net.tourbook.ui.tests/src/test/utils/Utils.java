@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import net.tourbook.Messages;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
@@ -35,6 +36,11 @@ public class Utils {
    public static final String  SAVE_MODIFIED_TOUR      = "Save modified tour (Ctrl+S)";  //$NON-NLS-1$
 
    public static final String  workingDirectory        = System.getProperty("user.dir"); //$NON-NLS-1$
+
+   public static void clickOkButton(final SWTWorkbenchBot bot) {
+
+      bot.button(IDialogConstants.CLOSE_LABEL).click();
+   }
 
    public static SWTBotTreeItem getTour(final SWTWorkbenchBot bot) {
 

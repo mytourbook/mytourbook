@@ -18,6 +18,7 @@ package preferences;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
+import utils.Utils;
 
 public class PrefPageSRTMDataTests extends UITest {
 
@@ -29,7 +30,8 @@ public class PrefPageSRTMDataTests extends UITest {
 
       bot.button("Dummy Validation").click();
       bot.button("Validate SRTM Connection").click();
-      bot.button("OK").click();
+
+      Utils.clickOkButton(bot);
 
       bot.button("Apply and Close").click(); //$NON-NLS-1$
    }
