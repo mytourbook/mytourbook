@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
@@ -35,14 +36,19 @@ public class Utils {
 
    public static final String  workingDirectory        = System.getProperty("user.dir"); //$NON-NLS-1$
 
+   private static SWTBotButton clickButton(final String mnemonicText, final SWTWorkbenchBot bot) {
+
+      return bot.button(mnemonicText).click();
+   }
+
    public static void clickCloseButton(final SWTWorkbenchBot bot) {
 
-      bot.button(IDialogConstants.CLOSE_LABEL).click();
+      clickButton(IDialogConstants.CLOSE_LABEL, bot);
    }
 
    public static void clickOkButton(final SWTWorkbenchBot bot) {
 
-      bot.button(IDialogConstants.OK_LABEL).click();
+      clickButton(IDialogConstants.OK_LABEL, bot);
    }
 
    public static SWTBotTreeItem getTour(final SWTWorkbenchBot bot) {
