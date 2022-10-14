@@ -3064,8 +3064,11 @@ public class TourManager {
          return false;
       }
 
+      TourLogManager.showLogView();
+
       TourLogManager.addLog(
             TourLogState.DEFAULT,
+            //todo fb
             "Setting elevation values from SRTM:",
             TourLogView.CSS_LOG_TITLE);
 
@@ -3081,7 +3084,7 @@ public class TourManager {
                   Arrays.asList(TourValueType.TIME_SLICES__ELEVATION),
                   tourData);
 
-            //todo fb add the tour date & time in the log
+            TourLogManager.subLog_OK(TourManager.getTourDateTimeShort(tourData));
 
             final boolean isReplaced = tourData.replaceAltitudeWithSRTM(true);
 
