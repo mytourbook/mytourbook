@@ -193,7 +193,7 @@ public class TourBookViewTests extends UITest {
             .menu(Messages.Tour_SubMenu_Elevation)
             .menu(Messages.TourEditor_Action_SetAltitudeValuesFromSRTM)
             .click();
-      bot.button("OK").click();
+      bot.button("OK").click(); //$NON-NLS-1$
 
       //Check the new elevation value
       tour = Utils.getTourWithSRTM(bot);
