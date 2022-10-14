@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoField;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Formatter;
@@ -67,6 +68,7 @@ import net.tourbook.data.TourPhoto;
 import net.tourbook.database.MyTourbookException;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.importdata.RawDataManager;
+import net.tourbook.importdata.RawDataManager.TourValueType;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoGallery;
 import net.tourbook.photo.PhotoManager;
@@ -3062,13 +3064,31 @@ public class TourManager {
          return false;
       }
 
+      TourLogManager.addLog(
+            TourLogState.DEFAULT,
+            "Setting elevation values from SRTM:",
+            TourLogView.CSS_LOG_TITLE);
+
       final boolean[] returnValue = { false };
 
       BusyIndicator.showWhile(display, () -> {
 
+         TourData oldTourDataDummyClone = null;
+
          for (final TourData tourData : allTourData) {
 
+            oldTourDataDummyClone = RawDataManager.getInstance().createTourDataDummyClone(
+                  Arrays.asList(TourValueType.TIME_SLICES__ELEVATION),
+                  tourData);
+
+            //todo fb add the tour date & time in the log
+
             final boolean isReplaced = tourData.replaceAltitudeWithSRTM(true);
+
+            RawDataManager.displayTourModifiedDataDifferences(
+                  TourValueType.TIME_SLICES__ELEVATION,
+                  oldTourDataDummyClone,
+                  tourData);
 
             returnValue[0] = returnValue[0] || isReplaced;
          }

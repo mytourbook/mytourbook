@@ -439,100 +439,6 @@ public class RawDataManager {
       return newSensor;
    }
 
-   public static TourData createTourDataDummyClone(final List<TourValueType> tourValueTypes, final TourData oldTourData) {
-
-      TourData tourDataDummyClone = null;
-
-      try {
-
-         tourDataDummyClone = (TourData) oldTourData.clone();
-
-         /*
-          * Loop: For each tour value type, we save the associated data for future display
-          * to compare with the new data
-          */
-         for (final TourValueType tourValueType : tourValueTypes) {
-
-            final boolean isEntireTour = tourValueType == TourValueType.ENTIRE_TOUR;
-            final boolean isEntireTour_OR_AllTimeSlices = isEntireTour || tourValueType == TourValueType.ALL_TIME_SLICES;
-
-            /*
-             * Tour values
-             */
-            if (isEntireTour || tourValueType == TourValueType.TOUR__MARKER) {
-
-               tourDataDummyClone.setTourMarkers(new HashSet<>(oldTourData.getTourMarkers()));
-            }
-
-            if (isEntireTour || tourValueType == TourValueType.TOUR__CALORIES) {
-
-               tourDataDummyClone.setCalories(oldTourData.getCalories());
-            }
-
-            if (isEntireTour || tourValueType == TourValueType.TOUR__IMPORT_FILE_LOCATION) {
-
-               tourDataDummyClone.setImportFilePath(oldTourData.getImportFilePathName());
-            }
-
-            /*
-             * Time slice values
-             */
-            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__BATTERY) {
-
-               tourDataDummyClone.setBattery_Percentage_Start(oldTourData.getBattery_Percentage_Start());
-               tourDataDummyClone.setBattery_Percentage_End(oldTourData.getBattery_Percentage_End());
-            }
-
-            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__CADENCE) {
-
-               tourDataDummyClone.setAvgCadence(oldTourData.getAvgCadence());
-               tourDataDummyClone.setCadenceMultiplier(oldTourData.getCadenceMultiplier());
-
-            }
-
-            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__ELEVATION) {
-
-               tourDataDummyClone.setTourAltDown(oldTourData.getTourAltDown());
-               tourDataDummyClone.setTourAltUp(oldTourData.getTourAltUp());
-
-            }
-
-            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__GEAR) {
-
-               tourDataDummyClone.setFrontShiftCount(oldTourData.getFrontShiftCount());
-               tourDataDummyClone.setRearShiftCount(oldTourData.getRearShiftCount());
-            }
-
-            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__POWER_AND_PULSE) {
-
-               tourDataDummyClone.setPower_Avg(oldTourData.getPower_Avg());
-               tourDataDummyClone.setAvgPulse(oldTourData.getAvgPulse());
-            }
-
-            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__POWER_AND_SPEED) {
-
-               tourDataDummyClone.setPower_Avg(oldTourData.getPower_Avg());
-            }
-
-            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
-
-               tourDataDummyClone.setWeather_Temperature_Average_Device(oldTourData.getWeather_Temperature_Average_Device());
-               tourDataDummyClone.setWeather_Temperature_Max_Device(oldTourData.getWeather_Temperature_Max_Device());
-               tourDataDummyClone.setWeather_Temperature_Min_Device(oldTourData.getWeather_Temperature_Min_Device());
-            }
-
-            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TIMER_PAUSES) {
-
-               tourDataDummyClone.setTourDeviceTime_Paused(oldTourData.getTourDeviceTime_Paused());
-            }
-         }
-
-      } catch (final CloneNotSupportedException e) {
-         StatusUtil.log(e);
-      }
-      return tourDataDummyClone;
-   }
-
    /**
     * SYNCHRONIZED: Add new tour tags and save them in the database
     *
@@ -1483,6 +1389,100 @@ public class RawDataManager {
 
    public void clearInvalidFilesList() {
       _allInvalidFiles.clear();
+   }
+
+   public TourData createTourDataDummyClone(final List<TourValueType> tourValueTypes, final TourData oldTourData) {
+
+      TourData tourDataDummyClone = null;
+
+      try {
+
+         tourDataDummyClone = (TourData) oldTourData.clone();
+
+         /*
+          * Loop: For each tour value type, we save the associated data for future display
+          * to compare with the new data
+          */
+         for (final TourValueType tourValueType : tourValueTypes) {
+
+            final boolean isEntireTour = tourValueType == TourValueType.ENTIRE_TOUR;
+            final boolean isEntireTour_OR_AllTimeSlices = isEntireTour || tourValueType == TourValueType.ALL_TIME_SLICES;
+
+            /*
+             * Tour values
+             */
+            if (isEntireTour || tourValueType == TourValueType.TOUR__MARKER) {
+
+               tourDataDummyClone.setTourMarkers(new HashSet<>(oldTourData.getTourMarkers()));
+            }
+
+            if (isEntireTour || tourValueType == TourValueType.TOUR__CALORIES) {
+
+               tourDataDummyClone.setCalories(oldTourData.getCalories());
+            }
+
+            if (isEntireTour || tourValueType == TourValueType.TOUR__IMPORT_FILE_LOCATION) {
+
+               tourDataDummyClone.setImportFilePath(oldTourData.getImportFilePathName());
+            }
+
+            /*
+             * Time slice values
+             */
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__BATTERY) {
+
+               tourDataDummyClone.setBattery_Percentage_Start(oldTourData.getBattery_Percentage_Start());
+               tourDataDummyClone.setBattery_Percentage_End(oldTourData.getBattery_Percentage_End());
+            }
+
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__CADENCE) {
+
+               tourDataDummyClone.setAvgCadence(oldTourData.getAvgCadence());
+               tourDataDummyClone.setCadenceMultiplier(oldTourData.getCadenceMultiplier());
+
+            }
+
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__ELEVATION) {
+
+               tourDataDummyClone.setTourAltDown(oldTourData.getTourAltDown());
+               tourDataDummyClone.setTourAltUp(oldTourData.getTourAltUp());
+
+            }
+
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__GEAR) {
+
+               tourDataDummyClone.setFrontShiftCount(oldTourData.getFrontShiftCount());
+               tourDataDummyClone.setRearShiftCount(oldTourData.getRearShiftCount());
+            }
+
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__POWER_AND_PULSE) {
+
+               tourDataDummyClone.setPower_Avg(oldTourData.getPower_Avg());
+               tourDataDummyClone.setAvgPulse(oldTourData.getAvgPulse());
+            }
+
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__POWER_AND_SPEED) {
+
+               tourDataDummyClone.setPower_Avg(oldTourData.getPower_Avg());
+            }
+
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
+
+               tourDataDummyClone.setWeather_Temperature_Average_Device(oldTourData.getWeather_Temperature_Average_Device());
+               tourDataDummyClone.setWeather_Temperature_Max_Device(oldTourData.getWeather_Temperature_Max_Device());
+               tourDataDummyClone.setWeather_Temperature_Min_Device(oldTourData.getWeather_Temperature_Min_Device());
+            }
+
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TIMER_PAUSES) {
+
+               tourDataDummyClone.setTourDeviceTime_Paused(oldTourData.getTourDeviceTime_Paused());
+            }
+         }
+
+      } catch (final CloneNotSupportedException e) {
+         StatusUtil.log(e);
+      }
+      return tourDataDummyClone;
    }
 
    /**

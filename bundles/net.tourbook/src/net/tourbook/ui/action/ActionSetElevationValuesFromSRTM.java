@@ -16,15 +16,9 @@
 package net.tourbook.ui.action;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import net.tourbook.Messages;
 import net.tourbook.data.TourData;
-import net.tourbook.importdata.RawDataManager;
-import net.tourbook.importdata.RawDataManager.TourValueType;
-import net.tourbook.tour.TourLogManager;
-import net.tourbook.tour.TourLogState;
-import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 
@@ -48,31 +42,8 @@ public class ActionSetElevationValuesFromSRTM extends Action {
 
       final ArrayList<TourData> selectedTours = _tourProvider.getSelectedTours();
 
-      final List<TourValueType> tourValueTypes = new ArrayList<>();
-      tourValueTypes.add(TourValueType.TIME_SLICES__ELEVATION);
-      // create dummy clone BEFORE oldTourData is modified
-      final List<TourData> oldTourDataDummyClone = new ArrayList<>();
-
-      for (final TourData tt : selectedTours) {
-         oldTourDataDummyClone.add(RawDataManager.createTourDataDummyClone(tourValueTypes, tt));
-      }
-
       if (TourManager.setElevationValuesFromSRTM(selectedTours)) {
 
-         TourLogManager.addLog(
-               TourLogState.DEFAULT,
-               "Setting elevation values from SRTM:",
-               TourLogView.CSS_LOG_TITLE);
-
-         for (int index = 0; index < selectedTours.size(); ++index) {
-
-            //todo fb add the tour date & time in the log
-
-            RawDataManager.displayTourModifiedDataDifferences(
-                  TourValueType.TIME_SLICES__ELEVATION,
-                  oldTourDataDummyClone.get(index),
-                  selectedTours.get(index));
-         }
          // save all modified tours
          TourManager.saveModifiedTours(selectedTours);
       }
