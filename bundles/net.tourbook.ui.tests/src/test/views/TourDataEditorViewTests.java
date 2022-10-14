@@ -38,9 +38,10 @@ public class TourDataEditorViewTests extends UITest {
    @Test
    void testNewTour() {
 
-      bot.toolbarButtonWithTooltip("Create new tour/event (Ctrl+N)").click(); //$NON-NLS-1$
-
+      Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
       bot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
+
+      bot.toolbarButtonWithTooltip("Create new tour/event (Ctrl+N)").click(); //$NON-NLS-1$
 
       final String newTourTitle = "New Tour Title"; //$NON-NLS-1$
 

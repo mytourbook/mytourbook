@@ -17,8 +17,6 @@ package utils;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import net.tourbook.Messages;
-
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -51,8 +49,6 @@ public class Utils {
 
       showTourBookView(bot);
 
-      bot.toolbarButtonWithTooltip(Messages.App_Action_CollapseAll).click();
-
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand() //$NON-NLS-1$
             .getNode("Jan   2").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
@@ -66,8 +62,6 @@ public class Utils {
    public static SWTBotTreeItem getTourWithSRTM(final SWTWorkbenchBot bot) {
 
       showTourBookView(bot);
-
-      bot.toolbarButtonWithTooltip(Messages.App_Action_CollapseAll).click();
 
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
             .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
