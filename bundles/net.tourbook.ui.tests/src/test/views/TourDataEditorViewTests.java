@@ -47,7 +47,7 @@ public class TourDataEditorViewTests extends UITest {
       bot.comboBox().setText(newTourTitle);
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
-      Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME).bot();
+      Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME);
 
       final SWTBotCombo titleCombo = bot.comboBox(newTourTitle);
       assertNotNull(titleCombo);
