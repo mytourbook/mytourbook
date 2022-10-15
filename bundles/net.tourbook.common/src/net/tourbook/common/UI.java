@@ -223,6 +223,8 @@ public class UI {
 
    public static final int          FORM_FIRST_COLUMN_INDENT           = 16;
 
+   private static final String      Format_TimeDuration_mmss           = "% 03d:%02d";          //$NON-NLS-1$
+
    /**
     * The ellipsis is the string that is used to represent shortened text.
     *
@@ -1461,6 +1463,30 @@ public class UI {
       final long timeAbs = time < 0 ? 0 - time : time;
 
       return _formatter.format(Messages.Format_TimeDuration_hhmm,
+
+            timeAbs / 60,
+            timeAbs % 60
+
+      ).toString();
+   }
+
+   /**
+    * Format time with {@link #Format_TimeDuration_mmss}
+    *
+    * @param time
+    * @return
+    */
+   public static String format_mm_ss_WithSign(final long time) {
+
+      _formatterSB.setLength(0);
+
+      if (time < 0) {
+         _formatterSB.append(DASH);
+      }
+
+      final long timeAbs = time < 0 ? 0 - time : time;
+
+      return _formatter.format(Format_TimeDuration_mmss,
 
             timeAbs / 60,
             timeAbs % 60

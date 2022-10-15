@@ -23,8 +23,11 @@ import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 
 import net.tourbook.common.UI;
+import net.tourbook.map.player.MapPlayerData;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
+import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourManager;
 
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
@@ -218,6 +221,8 @@ public final class TourTrack_Shader {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
+      final MapPlayerData mapPlayerData = new MapPlayerData();
+
       /*
        * Track
        */
@@ -242,6 +247,13 @@ public final class TourTrack_Shader {
       if (trackConfig.isShowDirectionArrow) {
 
          if (trackConfig.arrow_IsAnimate) {
+
+            final ShortArrayList animatedPositions = trackBucket.animatedPositions;
+            final int numAnimatedPositions = animatedPositions.size() / 2;
+            final int arrowsPerSecond = trackConfig.arrow_ArrowsPerSecond;
+
+            mapPlayerData.isPlayerEnabled = true;
+            mapPlayerData.endTime = numAnimatedPositions / arrowsPerSecond;
 
             final boolean isDebug = false;
             if (isDebug) {
@@ -310,6 +322,8 @@ public final class TourTrack_Shader {
             }
          }
       }
+
+      TourManager.fireEventWithCustomData(TourEventId.MAP_PLAYER, mapPlayerData, null);
 
       return true;
    }
