@@ -1373,7 +1373,7 @@ public class UI {
 
       _formatterSB.setLength(0);
 
-      return _formatter.format(Messages.Format_hh,
+      return _formatter.format(Messages.Format_TimeDuration_hh,
 
             time / 3600
 
@@ -1384,7 +1384,7 @@ public class UI {
 
       _formatterSB.setLength(0);
 
-      return _formatter.format(Messages.Format_hhmm,
+      return _formatter.format(Messages.Format_TimeDuration_hhmm,
 
             time / 3600,
             time % 3600 / 60
@@ -1411,7 +1411,7 @@ public class UI {
 
          // display hours
 
-         return _formatter.format(Messages.Format_hhmmss,
+         return _formatter.format(Messages.Format_TimeDuration_hhmmss,
 
                time / 3600,
                time % 3600 / 60,
@@ -1423,7 +1423,7 @@ public class UI {
 
          // ignore hours
 
-         return _formatter.format(Messages.Format_hhmm,
+         return _formatter.format(Messages.Format_TimeDuration_hhmm,
 
                time % 3600 / 60,
                time % 3600 % 60
@@ -1443,7 +1443,7 @@ public class UI {
 
       _formatterSB.setLength(0);
 
-      return _formatter.format(Messages.Format_hhmmss,
+      return _formatter.format(Messages.Format_TimeDuration_hhmmss,
             time / 3600,
             (time % 3600) / 60,
             (time % 3600) % 60)
@@ -1460,7 +1460,7 @@ public class UI {
 
       final long timeAbs = time < 0 ? 0 - time : time;
 
-      return _formatter.format(Messages.Format_hhmm,
+      return _formatter.format(Messages.Format_TimeDuration_hhmm,
 
             timeAbs / 60,
             timeAbs % 60
@@ -1477,7 +1477,7 @@ public class UI {
 
       _formatterSB.setLength(0);
 
-      return _formatter.format(Messages.Format_yyyymmdd_hhmmss,
+      return _formatter.format(Messages.Format_DateTime_yyyymmdd_hhmmss,
 
             year,
             month,
@@ -1527,7 +1527,7 @@ public class UI {
 
          // display hours
 
-         timeText = _formatter.format(Messages.Format_hhmmss,
+         timeText = _formatter.format(Messages.Format_TimeDuration_hhmmss,
 
                time / 3600,
                time % 3600 / 60,
@@ -1539,7 +1539,7 @@ public class UI {
 
          // ignore hours
 
-         timeText = _formatter.format(Messages.Format_hhmm,
+         timeText = _formatter.format(Messages.Format_TimeDuration_hhmm,
 
                time % 3600 / 60,
                time % 3600 % 60
