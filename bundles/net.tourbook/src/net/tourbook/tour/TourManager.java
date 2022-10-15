@@ -3068,8 +3068,7 @@ public class TourManager {
 
       TourLogManager.addLog(
             TourLogState.DEFAULT,
-            //todo fb
-            "Setting elevation values from SRTM:",
+            Messages.Log_SetAltitudeFromSRTM_01,
             TourLogView.CSS_LOG_TITLE);
 
       final boolean[] returnValue = { false };

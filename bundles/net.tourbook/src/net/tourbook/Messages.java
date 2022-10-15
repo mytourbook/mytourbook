@@ -1204,6 +1204,7 @@ public class Messages extends NLS {
    public static String        Log_SaveTags_Start_RemoveAllTags;
    public static String        Log_SaveTags_Start_RemoveSelectedTags;
    public static String        Log_SaveTags_Start_ReplaceTags;
+   public static String        Log_SetAltitudeFromSRTM_01;
    public static String        Log_SetMinMaxTemperature_NoSuccess;
    public static String        Log_SetMinMaxTemperature_Startup;
    public static String        Log_SetMinMaxTemperature_Success;
