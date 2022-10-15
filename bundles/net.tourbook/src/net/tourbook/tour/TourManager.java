@@ -3068,7 +3068,7 @@ public class TourManager {
 
       TourLogManager.addLog(
             TourLogState.DEFAULT,
-            Messages.Log_SetAltitudeFromSRTM_01,
+            Messages.Log_SetElevationFromSRTM_01,
             TourLogView.CSS_LOG_TITLE);
 
       final boolean[] returnValue = { false };
