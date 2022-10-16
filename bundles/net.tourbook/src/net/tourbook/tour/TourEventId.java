@@ -18,7 +18,6 @@ package net.tourbook.tour;
 import net.tourbook.chart.SelectionChartInfo;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.data.TourData;
-import net.tourbook.map.player.MapPlayerData;
 import net.tourbook.tag.ChangedTags;
 import net.tourbook.ui.tourChart.HoveredValueData;
 import net.tourbook.ui.views.sensors.SelectionRecordingDeviceBattery;
@@ -145,10 +144,4 @@ public enum TourEventId {
     * {@link Selection_StatisticValues}.
     */
    STATISTIC_VALUES,
-
-   /**
-    * This event is fired when new data are displayed in the map, the event data contains
-    * {@link MapPlayerData}
-    */
-   MAP_PLAYER,
 }

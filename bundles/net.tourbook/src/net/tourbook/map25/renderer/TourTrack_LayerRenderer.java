@@ -18,6 +18,7 @@ package net.tourbook.map25.renderer;
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
 import net.tourbook.common.color.ColorUtil;
+import net.tourbook.map.player.MapPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig.LineColorMode;
@@ -583,10 +584,6 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       TourTrack_Shader.paint(trackBucket, viewport, _compileMapPosition);
    }
 
-   public void setIsUpdateLayer(final boolean isUpdateLayer) {
-      _isUpdateLayer = isUpdateLayer;
-   }
-
    /**
     * Adjust MVP matrix to the difference between the compile time map location and the current map
     * location.
@@ -647,11 +644,10 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _trackCompileWorker.cancel(true);
 
       _isUpdatePoints = true;
-
-      setIsUpdateLayer(true);
+      _isUpdateLayer = true;
 
       // set start time for a new animation
-      TourTrack_Shader.setAnimationStartTime();
+      MapPlayerManager.setAnimationStartTime();
    }
 
    @Override

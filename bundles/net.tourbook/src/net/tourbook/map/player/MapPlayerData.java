@@ -23,8 +23,14 @@ public class MapPlayerData {
    public boolean isPlayerEnabled;
 
    /**
-    * Time in seconds when the animation ends
+    * Number of frames when the animation ends
     */
-   public int     endTime;
+   public int     numAnimatedPositions;
+
+   /**
+    * When <code>true</code> then proceed the animation from the current relative position,
+    * otherwise start animation from the beginning
+    */
+   public boolean isAnimateFromRelativePosition;
 
 }

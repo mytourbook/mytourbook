@@ -24,10 +24,9 @@ import java.nio.ShortBuffer;
 
 import net.tourbook.common.UI;
 import net.tourbook.map.player.MapPlayerData;
+import net.tourbook.map.player.MapPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
-import net.tourbook.tour.TourEventId;
-import net.tourbook.tour.TourManager;
 
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
@@ -75,12 +74,6 @@ public final class TourTrack_Shader {
    private static int                   bufferId_TrackVertices_Colors;
    private static int                   bufferId_DirArrows;
    private static int                   bufferId_DirArrows_ColorCoords;
-
-   private static long                  _animation_StartTime;
-   private static int                   _animation_CurrentPositionIndex;
-   private static float                 _animation_CurrentRelativePosition;
-   private static boolean               _animation_IsUseRelativePosition;
-   private static long                  _animation_LastUpdateTime;
 
    private static ByteBuffer            _vertexColor_Buffer;
    private static int                   _vertexColor_BufferSize;
@@ -248,24 +241,9 @@ public final class TourTrack_Shader {
 
          if (trackConfig.arrow_IsAnimate) {
 
-            final ShortArrayList animatedPositions = trackBucket.animatedPositions;
-            final int numAnimatedPositions = animatedPositions.size() / 2;
-            final int arrowsPerSecond = trackConfig.arrow_ArrowsPerSecond;
-
             mapPlayerData.isPlayerEnabled = true;
-            mapPlayerData.endTime = numAnimatedPositions / arrowsPerSecond;
-
-            final boolean isDebug = false;
-            if (isDebug) {
-
-               // for debugging reset position
-               _animation_CurrentPositionIndex = 0;
-
-            } else {
-
-               // set position to the previous relative position
-               _animation_IsUseRelativePosition = true;
-            }
+            mapPlayerData.numAnimatedPositions = trackBucket.animatedPositions.size() / 2;
+            mapPlayerData.isAnimateFromRelativePosition = true;
 
             /*
              * Animation
@@ -323,7 +301,7 @@ public final class TourTrack_Shader {
          }
       }
 
-      TourManager.fireEventWithCustomData(TourEventId.MAP_PLAYER, mapPlayerData, null);
+      MapPlayerManager.setPlayerData(mapPlayerData);
 
       return true;
    }
@@ -732,15 +710,16 @@ public final class TourTrack_Shader {
       shader.useProgram();
 
       // get animated position
-      final int posIndex = paint_32_GetAnimatedPositionIndex(animatedPositions, trackBucket);
+      final int currentFrameNumber = MapPlayerManager.getCurrentFrameNumber();
+      final int xyPosIndex = currentFrameNumber * 2;
 
       // ensure bounds -> this case happened during debugging several time
-      if (posIndex >= numAllPositions - 2) {
+      if (xyPosIndex >= numAllPositions - 2) {
 //         return;
       }
 
       // rotate model to look forward
-      final float angle = animatedForwardAngle.get(posIndex / 2);
+      final float angle = animatedForwardAngle.get(xyPosIndex / 2);
       _animationMatrix.setRotation(angle, 0f, 0f, 1f);
       _animationMatrix.setAsUniform(shader.uni_AnimationMVP);
 
@@ -748,8 +727,8 @@ public final class TourTrack_Shader {
       viewport.mvp.setAsUniform(shader.uni_MVP);
 
       // set animation position
-      final short posX = animatedPositions.get(posIndex);
-      final short posY = animatedPositions.get(posIndex + 1);
+      final short posX = animatedPositions.get(xyPosIndex);
+      final short posY = animatedPositions.get(xyPosIndex + 1);
       gl.uniform2f(shader.uni_AnimationPos, posX, posY);
 
       // set viewport scale TO map scale: 1.0...2.0
@@ -781,87 +760,6 @@ public final class TourTrack_Shader {
 
 //    GLUtils.checkGlError(TourTrack_Shader.class.getName());
 
-   }
-
-   private static int paint_32_GetAnimatedPositionIndex(final ShortArrayList animatedPositions, final TourTrack_Bucket trackBucket) {
-
-      final long currentTimeMS = System.currentTimeMillis();
-
-      // number of items for one position: x,y -> 2
-      final int numPosItems = 2;
-      final int numAllPositions = animatedPositions.size();
-
-      int positionIndex;
-
-      if (_animation_IsUseRelativePosition) {
-
-         _animation_IsUseRelativePosition = false;
-
-         positionIndex = (int) (numAllPositions * _animation_CurrentRelativePosition);
-
-         /**
-          * Very important !!!
-          * <p>
-          * It took me several headaches to debug and find the reason, positionIndex must be an even
-          * number otherwise x and y are exchanged !!!
-          */
-         positionIndex /= 2;
-         positionIndex *= 2;
-
-      } else {
-
-         final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-
-         // how many arrows are moved in one second
-         final int framesPerSecond = trackConfig.arrow_ArrowsPerSecond;
-
-         // update sequence in one second
-         final float frameDurationSec = 1f / framesPerSecond;
-         final long frameDurationMS = (long) (frameDurationSec * 1000);
-
-         // ensure there not more frames per second are displayed
-         final long nextUpdateTimeMS = _animation_LastUpdateTime + frameDurationMS;
-         final long timeDiffMS = nextUpdateTimeMS - currentTimeMS;
-         if (timeDiffMS > 0) {
-
-            return _animation_CurrentPositionIndex;
-         }
-
-         // the last frame is not displayed -> -2
-         final int maxFrames = Math.max(0, numAllPositions / numPosItems - numPosItems);
-         final float maxLoopTime = maxFrames / framesPerSecond;
-
-         final float timeDiffSinceFirstRun = (float) ((currentTimeMS - _animation_StartTime) / 1000.0);
-         final float currentTimeIndex = timeDiffSinceFirstRun % maxLoopTime;
-
-         positionIndex = Math.round(currentTimeIndex * framesPerSecond) * numPosItems;
-
-         // ensure to not jump back to the start when the end is not yet reached
-         if (positionIndex <= numAllPositions - numPosItems) {
-            positionIndex = _animation_CurrentPositionIndex + numPosItems;
-         }
-
-         // ensure to move not more than one frame
-         if (positionIndex > _animation_CurrentPositionIndex + numPosItems) {
-            positionIndex = _animation_CurrentPositionIndex + numPosItems;
-         }
-      }
-
-      // ensure bounds
-      if (positionIndex >= numAllPositions - numPosItems) {
-         positionIndex = 0;
-      }
-
-      _animation_CurrentPositionIndex = positionIndex;
-      _animation_CurrentRelativePosition = positionIndex / (float) numAllPositions;
-      _animation_LastUpdateTime = currentTimeMS;
-
-      return positionIndex;
-   }
-
-   public static void setAnimationStartTime() {
-
-      _animation_StartTime = System.currentTimeMillis();
    }
 
    public static boolean setupShader() {
