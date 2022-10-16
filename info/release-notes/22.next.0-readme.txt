@@ -45,7 +45,7 @@ Improvements
   - Fixed an issue where the time values were erroneous when an activity overlapped over more than 1 day
     https://github.com/mytourbook/mytourbook/issues/927
 
-* [SRTM Download] 
+* SRTM Download 
   - Improved UI when setting tour elevation values from SRTM to display the previous and new elevation gain values
     https://github.com/mytourbook/mytourbook/issues/334
 
