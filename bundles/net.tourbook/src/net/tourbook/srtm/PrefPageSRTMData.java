@@ -262,7 +262,7 @@ public class PrefPageSRTMData extends PreferencePage implements IWorkbenchPrefer
                    */
                   _btnResetValidation = new Button(container, SWT.NONE);
                   _btnResetValidation.setText(Messages.PrefPage_SRTMData_Button_ResetValidation);
-                  _btnValidateDownloadOfSRTMData.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ResetValidation()));
+                  _btnResetValidation.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ResetValidation()));
                }
                {
                   /*
