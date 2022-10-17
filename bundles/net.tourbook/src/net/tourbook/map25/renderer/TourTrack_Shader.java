@@ -301,7 +301,7 @@ public final class TourTrack_Shader {
          }
       }
 
-      MapPlayerManager.setPlayerData(mapPlayerData);
+      MapPlayerManager.setupPlayer(mapPlayerData);
 
       return true;
    }
@@ -710,13 +710,7 @@ public final class TourTrack_Shader {
       shader.useProgram();
 
       // get animated position
-      final int currentFrameNumber = MapPlayerManager.getCurrentFrameNumber();
-      final int xyPosIndex = currentFrameNumber * 2;
-
-      // ensure bounds -> this case happened during debugging several time
-      if (xyPosIndex >= numAllPositions - 2) {
-//         return;
-      }
+      final int xyPosIndex = MapPlayerManager.getCurrentFrameIndex() * 2;
 
       // rotate model to look forward
       final float angle = animatedForwardAngle.get(xyPosIndex / 2);

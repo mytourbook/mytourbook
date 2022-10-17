@@ -22,91 +22,103 @@ public class MapPlayerManager {
 
    private static MapPlayerView _mapPlayerView;
 
-   private static int           _foregroundFPS = 5;
+   private static int           _foregroundFPS   = 20;
+
+   /**
+    * Frame number which is currently displayed, it's in the range from 1...{@link #_numAllFrames}
+    */
+   private static int           _currentFrameNumber;
+
+   /**
+    * Number of frames for an animation
+    */
    private static int           _numAllFrames;
 
    private static long          _animationStartTime;
-   private static int           _currentFrameNumber;
    private static float         _currentRelativePosition;
    private static boolean       _isAnimateFromRelativePosition;
    private static long          _lastUpdateTime;
 
    private static boolean       _isPlayerEnabled;
+   private static boolean       _isPlayerRunning = true;
 
-   public static int getCurrentFrameNumber() {
+   /**
+    * @return Returns an index <code>0...</code>{@link #_numAllFrames}<code> - 1</code> for the
+    *         current frame <code>1...</code>{@link #_numAllFrames}
+    */
+   public static int getCurrentFrameIndex() {
+
+      if (_isPlayerRunning == false
+
+            // exception: compute current frame when relative positions are set,
+            //            this is used when timeline is dragged/selected
+            && _isAnimateFromRelativePosition == false) {
+
+         // player is paused
+
+         return getValidIndex(_currentFrameNumber);
+      }
 
       final long currentTimeMS = System.currentTimeMillis();
 
-      final int numAllFrames = _numAllFrames;
-
-      int currentFrameNumber;
+      int nextFrameNumber = 0;
 
       if (_isAnimateFromRelativePosition) {
 
          _isAnimateFromRelativePosition = false;
 
-         currentFrameNumber = (int) (numAllFrames * _currentRelativePosition);
-
-//         /**
-//          * Very important !!!
-//          * <p>
-//          * It took me several headaches to debug and find the reason, positionIndex must be an even
-//          * number otherwise x and y are exchanged !!!
-//          */
-//         positionIndex /= 2;
-//         positionIndex *= 2;
+         nextFrameNumber = (int) (_numAllFrames * _currentRelativePosition);
 
       } else {
 
-         // how many arrows are moved in one second
-         final int framesPerSecond = _foregroundFPS;
-
-         // update sequence in one second
-         final float frameDurationSec = 1f / framesPerSecond;
+         // get frame duration
+         final float frameDurationSec = 1f / _foregroundFPS;
          final long frameDurationMS = (long) (frameDurationSec * 1000);
 
-         // ensure there not more frames per second are displayed
-         final long nextUpdateTimeMS = _lastUpdateTime + frameDurationMS;
-         final long timeDiffMS = nextUpdateTimeMS - currentTimeMS;
+         // get next frame time
+         final long nextFrameTimeMS = _lastUpdateTime + frameDurationMS;
+         final long timeDiffMS = nextFrameTimeMS - currentTimeMS;
+
+         // ensure that not more frames per second are displayed
          if (timeDiffMS > 0) {
 
-            return _currentFrameNumber;
+            return getValidIndex(_currentFrameNumber);
          }
 
-         // the last frame is not displayed -> -2
-         final int maxFrames = Math.max(0, numAllFrames - 2);
-         final float maxLoopTime = maxFrames / framesPerSecond;
+         final int maxFrames = Math.max(0, _numAllFrames);
+         final float maxLoopTime = maxFrames / _foregroundFPS;
 
          final float timeDiffSinceFirstRun = (float) ((currentTimeMS - _animationStartTime) / 1000.0);
          final float currentTimeIndex = timeDiffSinceFirstRun % maxLoopTime;
 
-         currentFrameNumber = Math.round(currentTimeIndex * framesPerSecond);
+         final int nextFrameByTime = Math.round(currentTimeIndex * _foregroundFPS);
+         nextFrameNumber = nextFrameByTime;
 
          // ensure to not jump back to the start when the end is not yet reached
-         if (currentFrameNumber <= numAllFrames - 1) {
-            currentFrameNumber = _currentFrameNumber + 1;
+         if (nextFrameNumber < _numAllFrames) {
+            nextFrameNumber = _currentFrameNumber + 1;
          }
 
          // ensure to move not more than one frame
-         if (currentFrameNumber > _currentFrameNumber + 1) {
-            currentFrameNumber = _currentFrameNumber + 1;
+         if (nextFrameNumber > _currentFrameNumber + 1) {
+            nextFrameNumber = _currentFrameNumber + 1;
          }
       }
 
       // ensure bounds
-      if (currentFrameNumber >= numAllFrames - 1) {
-         currentFrameNumber = 0;
+      if (nextFrameNumber > _numAllFrames) {
+         nextFrameNumber = _numAllFrames;
       }
 
-      _currentFrameNumber = currentFrameNumber;
-      _currentRelativePosition = currentFrameNumber / (float) numAllFrames;
+      _currentFrameNumber = nextFrameNumber;
+      _currentRelativePosition = nextFrameNumber / (float) _numAllFrames;
       _lastUpdateTime = currentTimeMS;
 
       if (_mapPlayerView != null) {
          _mapPlayerView.updateFrameNumber(_currentFrameNumber);
       }
 
-      return currentFrameNumber;
+      return getValidIndex(nextFrameNumber);
    }
 
    public static int getForegroundFPS() {
@@ -118,12 +130,29 @@ public class MapPlayerManager {
       return _numAllFrames;
    }
 
+   /**
+    * Convert frame number 1...n -> array index 0...n-1
+    *
+    * @param frameNumber
+    * @return
+    */
+   private static int getValidIndex(final int frameNumber) {
+
+      final int arrayIndex = frameNumber == 0 ? 0 : frameNumber - 1;
+
+      return arrayIndex;
+   }
+
    public static boolean isAnimateFromRelativePosition() {
       return _isAnimateFromRelativePosition;
    }
 
    public static boolean isPlayerEnabled() {
       return _isPlayerEnabled;
+   }
+
+   public static boolean isPlayerRunning() {
+      return _isPlayerRunning;
    }
 
    public static void setAnimationStartTime() {
@@ -136,12 +165,35 @@ public class MapPlayerManager {
       _foregroundFPS = foregroundFPS;
    }
 
+   public static void setIsPlayerRunning(final boolean isPlayerRunning) {
+      _isPlayerRunning = isPlayerRunning;
+   }
+
    public static void setMapPlayerViewer(final MapPlayerView mapPlayerView) {
 
       _mapPlayerView = mapPlayerView;
    }
 
-   public static void setPlayerData(final MapPlayerData mapPlayerData) {
+   /**
+    * Move player head to a relative position
+    *
+    * @param relativePosition
+    */
+   public static void setRelativePosition(final float relativePosition) {
+
+      // the next frame will recognize this position
+      _currentRelativePosition = relativePosition;
+
+      // this will also force to compute the frame even when player is paused
+      _isAnimateFromRelativePosition = true;
+   }
+
+   /**
+    * Setup map player with all necessary data to run the animation
+    *
+    * @param mapPlayerData
+    */
+   public static void setupPlayer(final MapPlayerData mapPlayerData) {
 
       _isPlayerEnabled = mapPlayerData.isPlayerEnabled;
       _numAllFrames = mapPlayerData.numAnimatedPositions;

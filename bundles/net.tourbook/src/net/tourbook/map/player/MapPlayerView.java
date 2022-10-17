@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.map.player;
 
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.application.TourbookPlugin;
@@ -26,15 +27,18 @@ import net.tourbook.map25.Map25FPSManager;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
@@ -43,6 +47,8 @@ public class MapPlayerView extends ViewPart {
 
    public static final String           ID                     = "net.tourbook.map.player.MapPlayerView"; //$NON-NLS-1$
    //
+   private static final String          DEFAULT_TIME_00_00     = "   00:00";                              //$NON-NLS-1$
+   //
    private static final String          STATE_IS_SHOW_END_TIME = "STATE_IS_SHOW_END_TIME";                //$NON-NLS-1$
    //
    private static final IDialogSettings _state                 = TourbookPlugin.getState(ID);
@@ -50,29 +56,43 @@ public class MapPlayerView extends ViewPart {
    private IPartListener2               _partListener;
    //
    private Action                       _actionPlayControl_PlayAndPause;
-   private Action                       _actionPlayControl_Stop;
+   private Action                       _actionPlayControl_Loop;
    //
-   private boolean                      _isPlaying;
    private boolean                      _isShow_EndTime_Or_RemainingTime;
    //
-   private int                          _currentTime;
-   private int                          _endTime;
+   private float                        _currentTime;
+   private float                        _endTime;
 
    /*
     * UI controls
     */
-   private Label   _lblTime_Current;
-   private Label   _lblTime_EndOrRemaining;
+   private Composite _parent;
 
-   private Scale   _scaleTimeline;
+   private Label     _lblTime_Current;
+   private Label     _lblTime_EndOrRemaining;
 
-   private Spinner _spinnerFramesPerSecond;
-   private int     _numAllFrames;
+   private Scale     _scaleTimeline;
 
-   private enum PlayControl {
+   private Spinner   _spinnerFramesPerSecond;
+   private int       _numAllFrames;
 
-      PlayOrPause, //
-      Stop
+   private class Action_PlayControl_Loop extends Action {
+
+      Action_PlayControl_Loop() {
+
+         super(null, AS_CHECK_BOX);
+
+         setToolTipText("Click to toggle loop and no loop");
+
+         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.PlayControl_Loop));
+//         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Loop));
+//         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Loop_Disabled));
+      }
+
+      @Override
+      public void run() {
+         onPlayControl_Loop();
+      }
    }
 
    private void addPartListener() {
@@ -126,31 +146,21 @@ public class MapPlayerView extends ViewPart {
          _actionPlayControl_PlayAndPause = new Action() {
             @Override
             public void run() {
-               onSelectPlayControl(PlayControl.PlayOrPause);
+               onPlayControl_PlayOrPause();
             }
          };
 
          _actionPlayControl_PlayAndPause.setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.PlayControl_Play));
          _actionPlayControl_PlayAndPause.setToolTipText("");
       }
-      {
-         /*
-          * Action: Stop
-          */
-         _actionPlayControl_Stop = new Action() {
-            @Override
-            public void run() {
-               onSelectPlayControl(PlayControl.Stop);
-            }
-         };
 
-         _actionPlayControl_Stop.setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.PlayControl_Stop));
-         _actionPlayControl_Stop.setToolTipText("");
-      }
+      _actionPlayControl_Loop = new Action_PlayControl_Loop();
    }
 
    @Override
    public void createPartControl(final Composite parent) {
+
+      _parent = parent;
 
       createActions();
       addPartListener();
@@ -163,10 +173,18 @@ public class MapPlayerView extends ViewPart {
 
       MapPlayerManager.setMapPlayerViewer(this);
 
-      updatePlayer_InUIThread(MapPlayerManager.isPlayerEnabled(),
-            MapPlayerManager.getNumberofAllFrames(),
-            MapPlayerManager.getForegroundFPS(),
-            MapPlayerManager.isAnimateFromRelativePosition());
+      parent.getDisplay().asyncExec(() -> {
+
+         // set default label width
+         _scaleTimeline.getParent().layout(true, true);
+
+         updatePlayer_InUIThread(
+
+               MapPlayerManager.isPlayerEnabled(),
+               MapPlayerManager.getNumberofAllFrames(),
+               MapPlayerManager.getForegroundFPS(),
+               MapPlayerManager.isAnimateFromRelativePosition());
+      });
    }
 
    private void createUI(final Composite parent) {
@@ -182,8 +200,6 @@ public class MapPlayerView extends ViewPart {
 
    private void createUI_10_Timeline(final Composite parent) {
 
-      final String defaultTime = UI.format_mm_ss_WithSign(-1000);
-
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(5).applyTo(container);
@@ -192,7 +208,7 @@ public class MapPlayerView extends ViewPart {
          UI.createSpacer_Horizontal(container, 1);
          {
 
-            _lblTime_Current = UI.createLabel(container, defaultTime);
+            _lblTime_Current = UI.createLabel(container, DEFAULT_TIME_00_00);
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
                   .applyTo(_lblTime_Current);
@@ -200,9 +216,10 @@ public class MapPlayerView extends ViewPart {
          }
          {
             _scaleTimeline = new Scale(container, SWT.HORIZONTAL);
-            _scaleTimeline.setMinimum(0);
+            _scaleTimeline.setMinimum(1);
             _scaleTimeline.setMaximum(10);
-            _scaleTimeline.addSelectionListener(widgetSelectedAdapter(selectionEvent -> updateUI_FromTimeline()));
+            _scaleTimeline.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onTimeline_Selection()));
+            _scaleTimeline.addKeyListener(keyPressedAdapter(keyEvent -> onTimeline_Key(keyEvent)));
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .indent(0, 5)
@@ -210,7 +227,7 @@ public class MapPlayerView extends ViewPart {
 //            _scaleTimeline.setBackground(UI.SYS_COLOR_MAGENTA);
          }
          {
-            _lblTime_EndOrRemaining = UI.createLabel(container, defaultTime);
+            _lblTime_EndOrRemaining = UI.createLabel(container, DEFAULT_TIME_00_00);
             _lblTime_EndOrRemaining.setToolTipText("Total or remaining time\nClick to toggle between total and remaining time");
             _lblTime_EndOrRemaining.addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> onMouseDown_TimeEndOrRemaining()));
             GridDataFactory.fillDefaults()
@@ -220,29 +237,26 @@ public class MapPlayerView extends ViewPart {
          }
          UI.createSpacer_Horizontal(container, 1);
       }
-
-      // set default label width
-      container.layout(true, true);
    }
 
    private void createUI_20_PlayerControls(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(3).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
       {
          UI.createSpacer_Horizontal(container, 1);
-//         {
-//            final ToolBar toolbar = new ToolBar(containerControls, SWT.FLAT);
-//
-//            final ToolBarManager tbm = new ToolBarManager(toolbar);
-//
-//            tbm.add(_actionPlayControl_PlayAndPause);
-//            tbm.add(_actionPlayControl_Stop);
-//
-//            tbm.update(true);
-////            toolbar.setBackground(UI.SYS_COLOR_CYAN);
-//         }
+         {
+            final ToolBar toolbar = new ToolBar(container, SWT.FLAT);
+
+            final ToolBarManager tbm = new ToolBarManager(toolbar);
+
+            tbm.add(_actionPlayControl_PlayAndPause);
+            tbm.add(_actionPlayControl_Loop);
+
+            tbm.update(true);
+//            toolbar.setBackground(UI.SYS_COLOR_CYAN);
+         }
          {
             /*
              * Foreground: Frames per Second
@@ -284,7 +298,7 @@ public class MapPlayerView extends ViewPart {
       _spinnerFramesPerSecond          .setEnabled(isPlayerEnabled);
 
       _actionPlayControl_PlayAndPause  .setEnabled(isPlayerEnabled);
-      _actionPlayControl_Stop          .setEnabled(isPlayerEnabled);
+      _actionPlayControl_Loop          .setEnabled(isPlayerEnabled);
 
 // SET_FORMATTING_ON
    }
@@ -294,6 +308,16 @@ public class MapPlayerView extends ViewPart {
       _isShow_EndTime_Or_RemainingTime = !_isShow_EndTime_Or_RemainingTime;
 
       updateUI_FromTimeline();
+   }
+
+   private void onPlayControl_Loop() {
+      // TODO Auto-generated method stub
+
+   }
+
+   private void onPlayControl_PlayOrPause() {
+
+      togglePlayAndPaused();
    }
 
    private void onSelectFPS() {
@@ -306,43 +330,36 @@ public class MapPlayerView extends ViewPart {
       MapPlayerManager.setForegroundFPS(selectedFPS);
    }
 
-   private void onSelectPlayControl(final PlayControl playControl) {
+   private void onTimeline_Key(final KeyEvent keyEvent) {
 
-      switch (playControl) {
-      case PlayOrPause:
-
-         // toggle play + pause
-
-         if (_isPlaying) {
-
-            // is playing -> pause
-
-            _isPlaying = false;
-
-            _actionPlayControl_PlayAndPause.setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.PlayControl_Play));
-            _actionPlayControl_PlayAndPause.setToolTipText("Play");
-
-         } else {
-
-            // is paused -> play
-
-            _isPlaying = true;
-
-            _actionPlayControl_PlayAndPause.setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.PlayControl_Pause));
-            _actionPlayControl_PlayAndPause.setToolTipText("Pause the playback");
-         }
-         break;
-
-      case Stop:
-         break;
-
+      if (keyEvent.character == ' ') {
+         togglePlayAndPaused();
       }
+   }
+
+   private void onTimeline_Selection() {
+
+      // stop player
+      if (MapPlayerManager.isPlayerRunning()) {
+
+         MapPlayerManager.setIsPlayerRunning(false);
+         updateUI_PlayAndPaused();
+      }
+
+      updateUI_FromTimeline();
+
+      final float timelineSelection = _scaleTimeline.getSelection();
+      final float relativePosition = timelineSelection / _numAllFrames;
+
+      MapPlayerManager.setRelativePosition(relativePosition);
 
    }
 
    private void restoreState() {
 
       _isShow_EndTime_Or_RemainingTime = Util.getStateBoolean(_state, STATE_IS_SHOW_END_TIME, true);
+
+      updateUI_PlayAndPaused();
    }
 
    @PersistState
@@ -357,24 +374,68 @@ public class MapPlayerView extends ViewPart {
       _scaleTimeline.setFocus();
    }
 
+   /**
+    * Toggle play and pause controls
+    */
+   private void togglePlayAndPaused() {
+
+      if (MapPlayerManager.isPlayerRunning()) {
+
+         // is playing -> pause
+
+         MapPlayerManager.setIsPlayerRunning(false);
+
+      } else {
+
+         // is paused -> play
+
+         MapPlayerManager.setIsPlayerRunning(true);
+      }
+
+      updateUI_PlayAndPaused();
+   }
+
+   private void updateCurrentTime(final int currentTime) {
+
+      _currentTime = currentTime;
+
+      /*
+       * Update UI
+       */
+      final float endOrRemainingTime = _isShow_EndTime_Or_RemainingTime
+            ? _endTime
+            : _currentTime - _endTime;
+
+      final String timeCurrentText = UI.format_mm_ss_WithSign(Math.round(_currentTime));
+      final String timeEndOrRemainingText = UI.format_mm_ss_WithSign(Math.round(endOrRemainingTime));
+
+      _lblTime_Current.setText(timeCurrentText);
+      _lblTime_EndOrRemaining.setText(timeEndOrRemainingText);
+
+      // set layout when text length is larger than the default: -00:00
+//    _lblTime_Current.getParent().layout(true, true);
+   }
+
    public void updateFrameNumber(final int currentFrameNumber) {
 
-      final float relativeFrame = (float) currentFrameNumber / _numAllFrames;
-      final int currentTime = (int) (relativeFrame * _endTime);
-
-      if (_currentTime != currentTime) {
-
+      if (_parent.isDisposed()) {
+         return;
       }
-      final int currentTimeInUI = currentTime;
 
-      _lblTime_Current.getDisplay().asyncExec(() -> {
+      final float relativeFrame = (float) currentFrameNumber / _numAllFrames;
+      final float currentTime = relativeFrame * _endTime;
 
-         if (_lblTime_Current.isDisposed()) {
+      final int currentTimeInUI = (int) currentTime;
+
+      _parent.getDisplay().asyncExec(() -> {
+
+         if (_parent.isDisposed()) {
             return;
          }
 
          _scaleTimeline.setSelection(currentFrameNumber);
-         updateUI_CurrentTime(currentTimeInUI);
+
+         updateCurrentTime(currentTimeInUI);
       });
    }
 
@@ -385,9 +446,13 @@ public class MapPlayerView extends ViewPart {
 
       // run in display thread, this method call is started in the shader thread
 
-      _lblTime_Current.getDisplay().asyncExec(() -> {
+      if (_parent.isDisposed()) {
+         return;
+      }
 
-         if (_lblTime_Current.isDisposed()) {
+      _parent.getDisplay().asyncExec(() -> {
+
+         if (_parent.isDisposed()) {
             return;
          }
 
@@ -418,32 +483,28 @@ public class MapPlayerView extends ViewPart {
       enableActions(isPlayerEnabled);
    }
 
-   private void updateUI_CurrentTime(final int currentTime) {
-
-      _currentTime = currentTime;
-
-      final long endOrRemainingTime = _isShow_EndTime_Or_RemainingTime
-            ? _endTime
-            : _currentTime - _endTime;
-
-      final String timeCurrentText = UI.format_mm_ss_WithSign(_currentTime);
-      final String timeEndOrRemainingText = UI.format_mm_ss_WithSign(endOrRemainingTime);
-
-      _lblTime_Current.setText(timeCurrentText);
-      _lblTime_EndOrRemaining.setText(timeEndOrRemainingText);
-
-      // set layout when text length is larger than the default: -00:00
-//    _lblTime_Current.getParent().layout(true, true);
-   }
-
    private void updateUI_FromTimeline() {
 
       final int timelineSelection = _scaleTimeline.getSelection();
 
-      final float relativeTime = (float) timelineSelection / _endTime;
+      final float relativeTime = (float) timelineSelection / _numAllFrames;
       final int currentTime = (int) (relativeTime * _endTime);
 
-      updateUI_CurrentTime(currentTime);
+      updateCurrentTime(currentTime);
+   }
+
+   private void updateUI_PlayAndPaused() {
+
+      if (MapPlayerManager.isPlayerRunning()) {
+
+         _actionPlayControl_PlayAndPause.setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.PlayControl_Play));
+         _actionPlayControl_PlayAndPause.setToolTipText("Play");
+
+      } else {
+
+         _actionPlayControl_PlayAndPause.setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.PlayControl_Pause));
+         _actionPlayControl_PlayAndPause.setToolTipText("Pause the playback");
+      }
    }
 
    private void updateUI_Timeline(final int selectedFPS, final int numAllFrames) {
@@ -451,7 +512,7 @@ public class MapPlayerView extends ViewPart {
       _endTime = numAllFrames / selectedFPS;
 
       _scaleTimeline.setMaximum(numAllFrames);
-      _scaleTimeline.setPageIncrement(numAllFrames);
+      _scaleTimeline.setPageIncrement(numAllFrames / 20);
    }
 
 }
