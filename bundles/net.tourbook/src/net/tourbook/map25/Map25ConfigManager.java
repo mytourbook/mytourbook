@@ -159,50 +159,48 @@ public class Map25ConfigManager {
    /*
     * Direction Arrows
     */
-   private static final String              TAG_DIRECTION_ARROW                     = "DirectionArrow";                //$NON-NLS-1$
-   private static final String              ATTR_ARROW_IS_SHOW_ARROW                = "isShowDirectionArrow";          //$NON-NLS-1$
-   private static final String              ATTR_ARROW_DESIGN                       = "design";                        //$NON-NLS-1$
-   private static final String              ATTR_ARROW_MIN_DISTANCE                 = "minDistance";                   //$NON-NLS-1$
-   private static final String              ATTR_ARROW_VERTICAL_OFFSET              = "verticalOffset";                //$NON-NLS-1$
+   private static final String              TAG_DIRECTION_ARROW                 = "DirectionArrow";                //$NON-NLS-1$
+   private static final String              ATTR_ARROW_IS_SHOW_ARROW            = "isShowDirectionArrow";          //$NON-NLS-1$
+   private static final String              ATTR_ARROW_IS_ANIMATE               = "isAnimate";                     //$NON-NLS-1$
+   private static final String              ATTR_ARROW_DESIGN                   = "design";                        //$NON-NLS-1$
+   private static final String              ATTR_ARROW_MIN_DISTANCE             = "minDistance";                   //$NON-NLS-1$
+   private static final String              ATTR_ARROW_VERTICAL_OFFSET          = "verticalOffset";                //$NON-NLS-1$
    //
-   private static final String              ATTR_ARROW_IS_ANIMATE                   = "isAnimate";                     //$NON-NLS-1$
-   private static final String              ATTR_ARROW_ANIMATED_ARROWS_PER_SECOND   = "animatedArrowsPerSecond";       //$NON-NLS-1$
+   private static final String              ATTR_ARROW_SCALE                    = "scale";                         //$NON-NLS-1$
+   private static final String              ATTR_ARROW_LENGTH                   = "length";                        //$NON-NLS-1$
+   private static final String              ATTR_ARROW_LENGTH_CENTER            = "lengthCenter";                  //$NON-NLS-1$
+   private static final String              ATTR_ARROW_WIDTH                    = "width";                         //$NON-NLS-1$
+   private static final String              ATTR_ARROW_HEIGHT                   = "height";                        //$NON-NLS-1$
    //
-   private static final String              ATTR_ARROW_SCALE                        = "scale";                         //$NON-NLS-1$
-   private static final String              ATTR_ARROW_LENGTH                       = "length";                        //$NON-NLS-1$
-   private static final String              ATTR_ARROW_LENGTH_CENTER                = "lengthCenter";                  //$NON-NLS-1$
-   private static final String              ATTR_ARROW_WIDTH                        = "width";                         //$NON-NLS-1$
-   private static final String              ATTR_ARROW_HEIGHT                       = "height";                        //$NON-NLS-1$
+   private static final String              ATTR_ARROW_FIN_OUTLINE_WIDTH        = "finOutlineWidth";               //$NON-NLS-1$
+   private static final String              ATTR_ARROW_WING_OUTLINE_WIDTH       = "wingOutlineWidth";              //$NON-NLS-1$
    //
-   private static final String              ATTR_ARROW_FIN_OUTLINE_WIDTH            = "finOutlineWidth";               //$NON-NLS-1$
-   private static final String              ATTR_ARROW_WING_OUTLINE_WIDTH           = "wingOutlineWidth";              //$NON-NLS-1$
+   private static final String              TAG_ARROW_FIN_INSIDE_COLOR          = "FinInsideColor";                //$NON-NLS-1$
+   private static final String              TAG_ARROW_FIN_OUTLINE_COLOR         = "FinOutlineColor";               //$NON-NLS-1$
+   private static final String              TAG_ARROW_WING_INSIDE_COLOR         = "wingInsideColor";               //$NON-NLS-1$
+   private static final String              TAG_ARROW_WING_OUTLINE_COLOR        = "wingOutlineColor";              //$NON-NLS-1$
    //
-   private static final String              TAG_ARROW_FIN_INSIDE_COLOR              = "FinInsideColor";                //$NON-NLS-1$
-   private static final String              TAG_ARROW_FIN_OUTLINE_COLOR             = "FinOutlineColor";               //$NON-NLS-1$
-   private static final String              TAG_ARROW_WING_INSIDE_COLOR             = "wingInsideColor";               //$NON-NLS-1$
-   private static final String              TAG_ARROW_WING_OUTLINE_COLOR            = "wingOutlineColor";              //$NON-NLS-1$
+   public static final boolean              ARROW_IS_SHOW_ARROW_DEFAULT         = true;
+   public static final DirectionArrowDesign ARROW_DESIGN_DEFAULT                = DirectionArrowDesign.WINGS;
+   public static final int                  ARROW_MIN_DISTANCE_DEFAULT          = 60;
+   public static final int                  ARROW_MIN_DISTANCE_ANIMATED_DEFAULT = 3;
+   public static final int                  ARROW_VERTICAL_OFFSET_DEFAULT       = 30;
    //
-   public static final boolean              ARROW_IS_SHOW_ARROW_DEFAULT             = true;
-   public static final DirectionArrowDesign ARROW_DESIGN_DEFAULT                    = DirectionArrowDesign.WINGS;
-   public static final int                  ARROW_MIN_DISTANCE_DEFAULT              = 60;
-   public static final int                  ARROW_VERTICAL_OFFSET_DEFAULT           = 30;
+   public static final int                  ARROW_SCALE_DEFAULT                 = 10;
+   public static final int                  ARROW_LENGTH_DEFAULT                = 40;
+   public static final int                  ARROW_LENGTH_CENTER_DEFAULT         = 30;
+   public static final int                  ARROW_WIDTH_DEFAULT                 = 40;
+   public static final int                  ARROW_HEIGHT_DEFAULT                = 20;
    //
-   public static final int                  ARROW_SCALE_DEFAULT                     = 10;
-   public static final int                  ARROW_LENGTH_DEFAULT                    = 40;
-   public static final int                  ARROW_LENGTH_CENTER_DEFAULT             = 30;
-   public static final int                  ARROW_WIDTH_DEFAULT                     = 40;
-   public static final int                  ARROW_HEIGHT_DEFAULT                    = 20;
+   public static final boolean              ARROW_IS_ANIMATE_DEFAULT            = true;
    //
-   public static final boolean              ARROW_IS_ANIMATE_DEFAULT                = true;
-   public static final int                  ARROW_ANIMATE_ARROWS_PER_SECOND_DEFAULT = 5;
+   public static final int                  ARROW_FIN_OUTLINE_WIDTH_DEFAULT     = 5;
+   public static final int                  ARROW_WING_OUTLINE_WIDTH_DEFAULT    = 10;
    //
-   public static final int                  ARROW_FIN_OUTLINE_WIDTH_DEFAULT         = 5;
-   public static final int                  ARROW_WING_OUTLINE_WIDTH_DEFAULT        = 10;
-   //
-   public static final RGBA                 ARROW_FIN_INSIDE_COLOR_DEFAULT          = new RGBA(0x10, 0x10, 0x10, 0x80);
-   public static final RGBA                 ARROW_FIN_OUTLINE_COLOR_DEFAULT         = new RGBA(0xff, 0xff, 0xff, 0xff);
-   public static final RGBA                 ARROW_WING_INSIDE_COLOR_DEFAULT         = new RGBA(0x10, 0x10, 0x10, 0x80);
-   public static final RGBA                 ARROW_WING_OUTLINE_COLOR_DEFAULT        = new RGBA(0xff, 0x20, 0x20, 0xff);
+   public static final RGBA                 ARROW_FIN_INSIDE_COLOR_DEFAULT      = new RGBA(0x10, 0x10, 0x10, 0x80);
+   public static final RGBA                 ARROW_FIN_OUTLINE_COLOR_DEFAULT     = new RGBA(0xff, 0xff, 0xff, 0xff);
+   public static final RGBA                 ARROW_WING_INSIDE_COLOR_DEFAULT     = new RGBA(0x10, 0x10, 0x10, 0x80);
+   public static final RGBA                 ARROW_WING_OUTLINE_COLOR_DEFAULT    = new RGBA(0xff, 0x20, 0x20, 0xff);
    //
    /*
     * Legend
@@ -710,7 +708,6 @@ public class Map25ConfigManager {
             xmlArrow.putInteger(       ATTR_ARROW_VERTICAL_OFFSET,            config.arrow_VerticalOffset);
 
             xmlArrow.putBoolean(       ATTR_ARROW_IS_ANIMATE,                 config.arrow_IsAnimate);
-            xmlArrow.putInteger(       ATTR_ARROW_ANIMATED_ARROWS_PER_SECOND, config.arrow_ArrowsPerSecond);
 
             xmlArrow.putInteger(       ATTR_ARROW_SCALE,                      config.arrow_Scale);
             xmlArrow.putInteger(       ATTR_ARROW_LENGTH,                     config.arrow_Length);
@@ -949,13 +946,11 @@ public class Map25ConfigManager {
          case TAG_DIRECTION_ARROW:
 
             config.isShowDirectionArrow   = Util.getXmlBoolean( xmlConfigChild,        ATTR_ARROW_IS_SHOW_ARROW,        ARROW_IS_SHOW_ARROW_DEFAULT);
+            config.arrow_IsAnimate        =  Util.getXmlBoolean(xmlConfigChild,        ATTR_ARROW_IS_ANIMATE,           ARROW_IS_ANIMATE_DEFAULT);
 
             config.arrow_MinimumDistance  =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_MIN_DISTANCE,         ARROW_MIN_DISTANCE_DEFAULT);
             config.arrow_VerticalOffset   =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_VERTICAL_OFFSET,      ARROW_VERTICAL_OFFSET_DEFAULT);
             config.arrow_Design           =  (DirectionArrowDesign) Util.getXmlEnum(xmlConfigChild, ATTR_ARROW_DESIGN,  ARROW_DESIGN_DEFAULT);
-
-            config.arrow_IsAnimate        =  Util.getXmlBoolean(xmlConfigChild,        ATTR_ARROW_IS_ANIMATE,                 ARROW_IS_ANIMATE_DEFAULT);
-            config.arrow_ArrowsPerSecond  =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_ANIMATED_ARROWS_PER_SECOND, ARROW_ANIMATE_ARROWS_PER_SECOND_DEFAULT);
 
             config.arrow_Scale            =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_SCALE,                ARROW_SCALE_DEFAULT);
             config.arrow_Length           =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_LENGTH,               ARROW_LENGTH_DEFAULT);

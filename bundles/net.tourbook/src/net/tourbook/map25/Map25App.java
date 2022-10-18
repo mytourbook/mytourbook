@@ -70,7 +70,7 @@ import org.oscim.event.Event;
 import org.oscim.gdx.GdxAssets;
 import org.oscim.gdx.GdxMap;
 import org.oscim.gdx.GestureHandlerImpl;
-import org.oscim.gdx.LwjglGL20;
+import org.oscim.gdx.LwjglGL30;
 import org.oscim.gdx.MotionHandler;
 import org.oscim.layers.GenericLayer;
 import org.oscim.layers.Layer;
@@ -552,7 +552,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          GdxAssets.init("resources/assets/"); //$NON-NLS-1$
       }
 
-      GLAdapter.init(new LwjglGL20());
+      GLAdapter.init(new LwjglGL30());
 
       GLAdapter.GDX_DESKTOP_QUIRKS = true;
 

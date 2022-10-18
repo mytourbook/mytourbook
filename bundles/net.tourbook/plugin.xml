@@ -754,9 +754,8 @@
             name        ="sep_Map"
             visible     ="false"/>
 
-         <separator
-            name        ="sep_Bookmarks"
-            visible     ="true"/>
+         <separator  name="sep_Bookmarks"    visible="true"/>
+         <separator  name="sep_Player"       visible="false"/>
 
       </menuContribution>
       
@@ -2363,7 +2362,53 @@
    </extension>
 
 
-   <!-- E4 MODEL FRAGMENT -->
+
+   <!-- 
+   
+    MAP PLAYER  -  MAP PLAYER  -  MAP PLAYER  -  MAP PLAYER  -  MAP PLAYER  -  MAP PLAYER
+   
+   -->
+
+   <extension point="org.eclipse.ui.views">
+
+      <view
+         category    ="net.tourbook.category.map"
+         id          ="net.tourbook.map.player.MapPlayerView"
+         class       ="net.tourbook.map.player.MapPlayerView"
+         icon        ="icons/map-player.png"
+         name        ="%View_Name_MapPlayer"/>
+   
+   </extension>
+
+   <extension point="org.eclipse.ui.commands">
+
+      <command
+         id             ="net.tourbook.map.command.MapPlayerView"
+         name           ="%View_Name_MapPlayer"
+         defaultHandler ="net.tourbook.map.player.ActionHandler_OpenView_MapPlayer"/>
+               
+   </extension>
+
+   <extension point="org.eclipse.ui.menus">
+
+      <menuContribution locationURI="menu:m_Map?after=sep_Player" >
+                  
+         <command 
+            commandId   ="net.tourbook.map.command.MapPlayerView"
+            icon        ="icons/map-player.png"
+            label       ="%View_Name_MapPlayer"
+            mnemonic    ="%View_Name_MapPlayer_Mnemonic"/>
+      
+      </menuContribution>
+
+   </extension>
+
+
+   <!-- 
+      
+      E4 MODEL FRAGMENT 
+      
+   -->
 
    <extension
       id="net.tourbook.fragment"

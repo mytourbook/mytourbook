@@ -61,6 +61,7 @@ public class Map25TrackConfig {
    // direction arrow
    public boolean isShowDirectionArrow          = Map25ConfigManager.ARROW_IS_SHOW_ARROW_DEFAULT;
    public int     arrow_MinimumDistance         = Map25ConfigManager.ARROW_MIN_DISTANCE_DEFAULT;
+   public int     arrow_MinimumDistanceAnimated = Map25ConfigManager.ARROW_MIN_DISTANCE_ANIMATED_DEFAULT;
    public int     arrow_VerticalOffset          = Map25ConfigManager.ARROW_VERTICAL_OFFSET_DEFAULT;
    public DirectionArrowDesign arrow_Design     = Map25ConfigManager.ARROW_DESIGN_DEFAULT;
 
@@ -71,7 +72,6 @@ public class Map25TrackConfig {
    public int     arrow_Height                  = Map25ConfigManager.ARROW_HEIGHT_DEFAULT;
 
    public boolean arrow_IsAnimate               = Map25ConfigManager.ARROW_IS_ANIMATE_DEFAULT;
-   public int     arrow_ArrowsPerSecond         = Map25ConfigManager.ARROW_ANIMATE_ARROWS_PER_SECOND_DEFAULT;
 
    public int     arrowFin_OutlineWidth         = Map25ConfigManager.ARROW_FIN_OUTLINE_WIDTH_DEFAULT;
    public int     arrowWing_OutlineWidth        = Map25ConfigManager.ARROW_WING_OUTLINE_WIDTH_DEFAULT;
@@ -163,7 +163,6 @@ public class Map25TrackConfig {
             + CONFIG + "arrow_Design                  = DirectionArrowDesign." + arrow_Design + EOL //   //$NON-NLS-1$
 
             + CONFIG + "arrow_IsAnimate               = " + arrow_IsAnimate + EOL //                     //$NON-NLS-1$
-            + CONFIG + "arrow_AnimatedArrowsPerSecond = " + arrow_ArrowsPerSecond + EOL //               //$NON-NLS-1$
 
             + CONFIG + "arrow_Scale                   = " + arrow_Scale + EOL //                         //$NON-NLS-1$
             + CONFIG + "arrow_Length                  = " + arrow_Length + EOL //                        //$NON-NLS-1$

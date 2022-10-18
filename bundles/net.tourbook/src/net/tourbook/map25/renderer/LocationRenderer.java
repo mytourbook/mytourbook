@@ -66,6 +66,9 @@ public class LocationRenderer extends LayerRenderer {
     */
    private final boolean     _isLocationVisible[]         = new boolean[2];
 
+   /**
+    * Projected lat/lon -> 0...1
+    */
    private final Point       _locationLatLon[]            = {
          new Point(Double.NaN, Double.NaN),
          new Point(Double.NaN, Double.NaN)
@@ -174,7 +177,7 @@ public class LocationRenderer extends LayerRenderer {
       GLState.enableVertexArrays(_shader_a_pos, -1);
       MapRenderer.bindQuadVertexVBO(_shader_a_pos/* , true */);
 
-      final MapPosition viewPortPosition = viewPort.pos;
+      final MapPosition viewPort_MapPosition = viewPort.pos;
       float radius = _render_CircleSize * _render_Scale;
 
       for (int locationIndex = 0; locationIndex < 2; locationIndex++) {
@@ -187,8 +190,8 @@ public class LocationRenderer extends LayerRenderer {
          final boolean isLocationVisible = _isLocationVisible[locationIndex];
          if (isLocationVisible) {
 
-            if (viewPortPosition.zoomLevel >= _render_ShowAccuracyZoom) {
-               radius = (float) (_render_Radius * viewPortPosition.scale);
+            if (viewPort_MapPosition.zoomLevel >= _render_ShowAccuracyZoom) {
+               radius = (float) (_render_Radius * viewPort_MapPosition.scale);
             }
             radius = Math.max(_render_CircleSize * _render_Scale, radius);
 
@@ -197,11 +200,14 @@ public class LocationRenderer extends LayerRenderer {
          gl.uniform1f(_shader_u_scale, radius);
 
          final Point locationPosition = _render_IndicatorPositions[locationIndex];
-         final double x = locationPosition.x - viewPortPosition.x;
-         final double y = locationPosition.y - viewPortPosition.y;
-         final double tileScale = Tile.SIZE * viewPortPosition.scale;
+         final double diffX = locationPosition.x - viewPort_MapPosition.x;
+         final double diffY = locationPosition.y - viewPort_MapPosition.y;
+         final double tileScale = Tile.SIZE * viewPort_MapPosition.scale;
 
-         viewPort.mvp.setTransScale((float) (x * tileScale), (float) (y * tileScale), 1);
+         final float scaledDiffX = (float) (diffX * tileScale);
+         final float scaledDiffY = (float) (diffY * tileScale);
+
+         viewPort.mvp.setTransScale(scaledDiffX, scaledDiffY, 1);
          viewPort.mvp.multiplyMM(viewPort.viewproj, viewPort.mvp);
          viewPort.mvp.setAsUniform(_shader_u_mvp);
 
@@ -306,8 +312,8 @@ public class LocationRenderer extends LayerRenderer {
 
       setReady(true);
 
-      final int width = _map.getWidth();
-      final int height = _map.getHeight();
+      final int mapWidth = _map.getWidth();
+      final int mapHeight = _map.getHeight();
 
       // clamp location to a position that can be savely translated to screen coordinates
       viewport.getBBox(_viewportBBox, 0);
@@ -317,6 +323,7 @@ public class LocationRenderer extends LayerRenderer {
          double x = _locationLatLon[locationIndex].x;
          double y = _locationLatLon[locationIndex].y;
 
+         // clamp location to viewport
          if (!_viewportBBox.contains(_locationLatLon[locationIndex])) {
             x = FastMath.clamp(x, _viewportBBox.xmin, _viewportBBox.xmax);
             y = FastMath.clamp(y, _viewportBBox.ymin, _viewportBBox.ymax);
@@ -325,22 +332,22 @@ public class LocationRenderer extends LayerRenderer {
          // get position of location in pixel relative to screen center
          viewport.toScreenPoint(x, y, _screenPoint);
 
-         x = _screenPoint.x + width / 2;
-         y = _screenPoint.y + height / 2;
+         x = _screenPoint.x + mapWidth / 2;
+         y = _screenPoint.y + mapHeight / 2;
 
          // clip position to screen boundaries
          int visible = 0;
 
-         if (x > width - 5) {
-            x = width;
+         if (x > mapWidth - 5) {
+            x = mapWidth;
          } else if (x < 5) {
             x = 0;
          } else {
             visible++;
          }
 
-         if (y > height - 5) {
-            y = height;
+         if (y > mapHeight - 5) {
+            y = mapHeight;
          } else if (y < 5) {
             y = 0;
          } else {

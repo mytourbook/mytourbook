@@ -126,7 +126,6 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
    private Label                 _lblSliderPath_Width;
    private Label                 _lblSliderPath_Color;
    //
-   private Spinner               _spinnerArrow_ArrowsPerSecond;
    private Spinner               _spinnerArrow_MinimumDistance;
    private Spinner               _spinnerArrow_Scale;
    private Spinner               _spinnerArrow_VerticalOffset;
@@ -527,15 +526,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
                   .align(SWT.FILL, SWT.CENTER)
                   .applyTo(_chkAnimateDirectionArrows);
 
-            // spinner
-            _spinnerArrow_ArrowsPerSecond = new Spinner(container, SWT.BORDER);
-            _spinnerArrow_ArrowsPerSecond.setToolTipText(Messages.Slideout_Map25TrackOptions_ArrowsPerSecond_Tooltip);
-            _spinnerArrow_ArrowsPerSecond.setMinimum(1);
-            _spinnerArrow_ArrowsPerSecond.setMaximum(Map25FPSManager.DEFAULT_FOREGROUND_FPS);
-            _spinnerArrow_ArrowsPerSecond.setIncrement(1);
-            _spinnerArrow_ArrowsPerSecond.setPageIncrement(5);
-            _spinnerArrow_ArrowsPerSecond.addSelectionListener(_defaultSelectionListener);
-            _spinnerArrow_ArrowsPerSecond.addMouseWheelListener(_defaultMouseWheelListener);
+            UI.createSpacer_Horizontal(container, 1);
          }
          {
             /*
@@ -1018,7 +1009,6 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
 // SET_FORMATTING_OFF
 
-      final boolean isAnimateArrow        = _chkAnimateDirectionArrows.getSelection();
       final boolean isShowSliderPath      = _chkShowSliderPath.getSelection();
       final boolean isShowSliderLocation  = _chkShowSliderLocation.getSelection();
       final boolean isTrackVerticalOffset = _chkTrackVerticalOffset.getSelection();
@@ -1081,7 +1071,6 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       _lblArrow_Wing_Scale                .setEnabled(isShowDirectionArrows);
 
       _chkAnimateDirectionArrows          .setEnabled(isShowDirectionArrows);
-      _spinnerArrow_ArrowsPerSecond       .setEnabled(isShowDirectionArrows && isAnimateArrow);
 
       _comboArrowDesign                   .setEnabled(isShowDirectionArrows);
 
@@ -1389,7 +1378,6 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       _comboArrowDesign                   .select(getDirectionArrowDesignIndex(config.arrow_Design));
 
       _chkAnimateDirectionArrows          .setSelection(config.arrow_IsAnimate);
-      _spinnerArrow_ArrowsPerSecond       .setSelection(config.arrow_ArrowsPerSecond);
 
       _spinnerArrow_Scale                 .setSelection(config.arrow_Scale);
       _spinnerArrow_Length                .setSelection(config.arrow_Length);
@@ -1443,6 +1431,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 // SET_FORMATTING_OFF
 
       final boolean isShowDirectionArrows    = _chkShowDirectionArrows.getSelection();
+      final boolean arrowIsAnimate           = _chkAnimateDirectionArrows.getSelection();
       final int arrowMinDistance             = _spinnerArrow_MinimumDistance.getSelection();
       final int arrowVerticalOffset          = _spinnerArrow_VerticalOffset.getSelection();
 
@@ -1465,6 +1454,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       _isVerticesModified =
 
                config.isShowDirectionArrow   != isShowDirectionArrows
+            || config.arrow_IsAnimate        != arrowIsAnimate
             || config.arrow_Design           != selectedArrowDesign
             || config.arrow_MinimumDistance  != arrowMinDistance
             || config.arrow_VerticalOffset   != arrowVerticalOffset
@@ -1501,8 +1491,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       config.arrow_MinimumDistance           = arrowMinDistance;
       config.arrow_VerticalOffset            = arrowVerticalOffset;
 
-      config.arrow_IsAnimate                 = _chkAnimateDirectionArrows.getSelection();
-      config.arrow_ArrowsPerSecond           = _spinnerArrow_ArrowsPerSecond.getSelection();
+      config.arrow_IsAnimate                 = arrowIsAnimate;
 
       config.arrow_Scale                     = arrowScale;
       config.arrow_Length                    = arrowLength;

@@ -41,7 +41,7 @@ public class MtMath {
     *
 	 * @param   {Number} lat1, lon1: first point in decimal degrees
 	 * @param   {Number} lat2, lon2: second point in decimal degrees
-	 * @returns (Number} distance in metres between points
+    * @returns (Number} distance in metres between points
     *
     *    function distVincenty(lat1, lon1, lat2, lon2) {
     *      var a = 6378137, b = 6356752.314245,  f = 1/298.257223563;  // WGS-84 ellipsoid params
@@ -98,6 +98,16 @@ public class MtMath {
 
    // = 1/298.2572229328709613   1/298.257223563 // ca. (A-B)/A
    private static final double ABPLATTUNG_F = (HALBACHSE_A - HALBACHSE_B) / HALBACHSE_A;
+
+   public static double angleOf(final float x1, final float y1, final float x2, final float y2) {
+
+      final double deltaY = y1 - y2;
+      final double deltaX = x2 - x1;
+
+      final double result = Math.toDegrees(Math.atan2(deltaY, deltaX));
+
+      return (result < 0) ? (360d + result) : result;
+   }
 
    /**
     * Work out the angle from the x horizontal winding anti-clockwise

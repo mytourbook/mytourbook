@@ -127,13 +127,14 @@ public class Messages extends NLS {
    public static String        Direction_ArrowDesign_Wings_MiddleFin;
    public static String        Direction_ArrowDesign_Wings_OuterFins;
    public static String        Direction_ArrowLayout_OuterFins;
-   
+
    public static String        Font_Editor_Label_FontSize;
 
-   public static String        Format_hh;
-   public static String        Format_hhmm;
-   public static String        Format_hhmmss;
-   public static String        Format_yyyymmdd_hhmmss;
+   public static String        Format_DateTime_yyyymmdd_hhmmss;
+
+   public static String        Format_TimeDuration_hh;
+   public static String        Format_TimeDuration_hhmm;
+   public static String        Format_TimeDuration_hhmmss;
 
    public static String        Graph_Label_Altimeter;
    public static String        Graph_Label_Altitude;

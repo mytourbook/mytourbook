@@ -55,6 +55,7 @@ import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
+import net.tourbook.map.player.MapPlayerManager;
 import net.tourbook.map2.view.IDiscreteColorProvider;
 import net.tourbook.map25.action.ActionMap25_PhotoFilter;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
@@ -752,6 +753,7 @@ public class Map25View extends ViewPart implements
             if (partRef.getPart(false) == Map25View.this) {
                _isPartVisible = false;
             }
+            setIsAnimationVisible(partRef, false);
          }
 
          @Override
@@ -764,7 +766,16 @@ public class Map25View extends ViewPart implements
 
          @Override
          public void partVisible(final IWorkbenchPartReference partRef) {
+
             onPartVisible(partRef);
+            setIsAnimationVisible(partRef, true);
+         }
+
+         private void setIsAnimationVisible(final IWorkbenchPartReference partRef, final boolean isAnimationVisible) {
+
+            if (partRef.getPart(false) == Map25View.this) {
+               MapPlayerManager.setIsAnimationVisible(isAnimationVisible);
+            }
          }
       };
       getViewSite().getPage().addPartListener(_partListener);

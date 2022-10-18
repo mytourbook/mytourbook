@@ -223,6 +223,8 @@ public class UI {
 
    public static final int          FORM_FIRST_COLUMN_INDENT           = 16;
 
+   private static final String      Format_TimeDuration_mmss           = "% 03d:%02d";          //$NON-NLS-1$
+
    /**
     * The ellipsis is the string that is used to represent shortened text.
     *
@@ -1373,7 +1375,7 @@ public class UI {
 
       _formatterSB.setLength(0);
 
-      return _formatter.format(Messages.Format_hh,
+      return _formatter.format(Messages.Format_TimeDuration_hh,
 
             time / 3600
 
@@ -1384,7 +1386,7 @@ public class UI {
 
       _formatterSB.setLength(0);
 
-      return _formatter.format(Messages.Format_hhmm,
+      return _formatter.format(Messages.Format_TimeDuration_hhmm,
 
             time / 3600,
             time % 3600 / 60
@@ -1411,7 +1413,7 @@ public class UI {
 
          // display hours
 
-         return _formatter.format(Messages.Format_hhmmss,
+         return _formatter.format(Messages.Format_TimeDuration_hhmmss,
 
                time / 3600,
                time % 3600 / 60,
@@ -1423,7 +1425,7 @@ public class UI {
 
          // ignore hours
 
-         return _formatter.format(Messages.Format_hhmm,
+         return _formatter.format(Messages.Format_TimeDuration_hhmm,
 
                time % 3600 / 60,
                time % 3600 % 60
@@ -1443,7 +1445,7 @@ public class UI {
 
       _formatterSB.setLength(0);
 
-      return _formatter.format(Messages.Format_hhmmss,
+      return _formatter.format(Messages.Format_TimeDuration_hhmmss,
             time / 3600,
             (time % 3600) / 60,
             (time % 3600) % 60)
@@ -1460,7 +1462,31 @@ public class UI {
 
       final long timeAbs = time < 0 ? 0 - time : time;
 
-      return _formatter.format(Messages.Format_hhmm,
+      return _formatter.format(Messages.Format_TimeDuration_hhmm,
+
+            timeAbs / 60,
+            timeAbs % 60
+
+      ).toString();
+   }
+
+   /**
+    * Format time with {@link #Format_TimeDuration_mmss}
+    *
+    * @param time
+    * @return
+    */
+   public static String format_mm_ss_WithSign(final long time) {
+
+      _formatterSB.setLength(0);
+
+      if (time < 0) {
+         _formatterSB.append(DASH);
+      }
+
+      final long timeAbs = time < 0 ? 0 - time : time;
+
+      return _formatter.format(Format_TimeDuration_mmss,
 
             timeAbs / 60,
             timeAbs % 60
@@ -1477,7 +1503,7 @@ public class UI {
 
       _formatterSB.setLength(0);
 
-      return _formatter.format(Messages.Format_yyyymmdd_hhmmss,
+      return _formatter.format(Messages.Format_DateTime_yyyymmdd_hhmmss,
 
             year,
             month,
@@ -1527,7 +1553,7 @@ public class UI {
 
          // display hours
 
-         timeText = _formatter.format(Messages.Format_hhmmss,
+         timeText = _formatter.format(Messages.Format_TimeDuration_hhmmss,
 
                time / 3600,
                time % 3600 / 60,
@@ -1539,7 +1565,7 @@ public class UI {
 
          // ignore hours
 
-         timeText = _formatter.format(Messages.Format_hhmm,
+         timeText = _formatter.format(Messages.Format_TimeDuration_hhmm,
 
                time % 3600 / 60,
                time % 3600 % 60
