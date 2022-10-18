@@ -1406,6 +1406,7 @@ public class RawDataManager {
          for (final TourValueType tourValueType : tourValueTypes) {
 
             final boolean isEntireTour = tourValueType == TourValueType.ENTIRE_TOUR;
+            final boolean isEntireTour_OR_AllTimeSlices = isEntireTour || tourValueType == TourValueType.ALL_TIME_SLICES;
 
             /*
              * Tour values
@@ -1428,68 +1429,60 @@ public class RawDataManager {
             /*
              * Time slice values
              */
-            final boolean isEntireTour_OR_AllTimeSlices = isEntireTour || tourValueType == TourValueType.ALL_TIME_SLICES;
-            createTourDataDummyClone_TimeSliceValues(oldTourData, tourDataDummyClone, tourValueType, isEntireTour_OR_AllTimeSlices);
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__BATTERY) {
+
+               tourDataDummyClone.setBattery_Percentage_Start(oldTourData.getBattery_Percentage_Start());
+               tourDataDummyClone.setBattery_Percentage_End(oldTourData.getBattery_Percentage_End());
+            }
+
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__CADENCE) {
+
+               tourDataDummyClone.setAvgCadence(oldTourData.getAvgCadence());
+               tourDataDummyClone.setCadenceMultiplier(oldTourData.getCadenceMultiplier());
+
+            }
+
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__ELEVATION) {
+
+               tourDataDummyClone.setTourAltDown(oldTourData.getTourAltDown());
+               tourDataDummyClone.setTourAltUp(oldTourData.getTourAltUp());
+
+            }
+
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__GEAR) {
+
+               tourDataDummyClone.setFrontShiftCount(oldTourData.getFrontShiftCount());
+               tourDataDummyClone.setRearShiftCount(oldTourData.getRearShiftCount());
+            }
+
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__POWER_AND_PULSE) {
+
+               tourDataDummyClone.setPower_Avg(oldTourData.getPower_Avg());
+               tourDataDummyClone.setAvgPulse(oldTourData.getAvgPulse());
+            }
+
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__POWER_AND_SPEED) {
+
+               tourDataDummyClone.setPower_Avg(oldTourData.getPower_Avg());
+            }
+
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
+
+               tourDataDummyClone.setWeather_Temperature_Average_Device(oldTourData.getWeather_Temperature_Average_Device());
+               tourDataDummyClone.setWeather_Temperature_Max_Device(oldTourData.getWeather_Temperature_Max_Device());
+               tourDataDummyClone.setWeather_Temperature_Min_Device(oldTourData.getWeather_Temperature_Min_Device());
+            }
+
+            if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TIMER_PAUSES) {
+
+               tourDataDummyClone.setTourDeviceTime_Paused(oldTourData.getTourDeviceTime_Paused());
+            }
          }
 
       } catch (final CloneNotSupportedException e) {
          StatusUtil.log(e);
       }
-
       return tourDataDummyClone;
-   }
-
-   private void createTourDataDummyClone_TimeSliceValues(final TourData oldTourData,
-                                                         final TourData tourDataDummyClone,
-                                                         final TourValueType tourValueType,
-                                                         final boolean isEntireTour_OR_AllTimeSlices) {
-
-      if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__BATTERY) {
-
-         tourDataDummyClone.setBattery_Percentage_Start(oldTourData.getBattery_Percentage_Start());
-         tourDataDummyClone.setBattery_Percentage_End(oldTourData.getBattery_Percentage_End());
-      }
-
-      if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__CADENCE) {
-
-         tourDataDummyClone.setAvgCadence(oldTourData.getAvgCadence());
-         tourDataDummyClone.setCadenceMultiplier(oldTourData.getCadenceMultiplier());
-      }
-
-      if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__ELEVATION) {
-
-         tourDataDummyClone.setTourAltDown(oldTourData.getTourAltDown());
-         tourDataDummyClone.setTourAltUp(oldTourData.getTourAltUp());
-      }
-
-      if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__GEAR) {
-
-         tourDataDummyClone.setFrontShiftCount(oldTourData.getFrontShiftCount());
-         tourDataDummyClone.setRearShiftCount(oldTourData.getRearShiftCount());
-      }
-
-      if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__POWER_AND_PULSE) {
-
-         tourDataDummyClone.setPower_Avg(oldTourData.getPower_Avg());
-         tourDataDummyClone.setAvgPulse(oldTourData.getAvgPulse());
-      }
-
-      if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__POWER_AND_SPEED) {
-
-         tourDataDummyClone.setPower_Avg(oldTourData.getPower_Avg());
-      }
-
-      if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
-
-         tourDataDummyClone.setWeather_Temperature_Average_Device(oldTourData.getWeather_Temperature_Average_Device());
-         tourDataDummyClone.setWeather_Temperature_Max_Device(oldTourData.getWeather_Temperature_Max_Device());
-         tourDataDummyClone.setWeather_Temperature_Min_Device(oldTourData.getWeather_Temperature_Min_Device());
-      }
-
-      if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TIMER_PAUSES) {
-
-         tourDataDummyClone.setTourDeviceTime_Paused(oldTourData.getTourDeviceTime_Paused());
-      }
    }
 
    /**
@@ -4087,7 +4080,7 @@ public class RawDataManager {
     *
     * @param modifiedTours
     */
-   public void updateTourDataModel(final List<TourData> modifiedTours) {
+   public void updateTourDataModel(final ArrayList<TourData> modifiedTours) {
 
       for (final TourData tourData : modifiedTours) {
          if (tourData != null) {
