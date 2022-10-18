@@ -26,6 +26,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 public class MapPlayerManager {
 
    private static final String          STATE_FOREGROUND_FPS = "STATE_FOREGROUND_FPS";                                             //$NON-NLS-1$
+   private static final String          STATE_IS_PLAY_LOOP   = "STATE_IS_PLAY_LOOP";                                               //$NON-NLS-1$
    //
    private static final IDialogSettings _state               = TourbookPlugin.getState("net.tourbook.map.player.MapPlayerManager");//$NON-NLS-1$
 
@@ -134,7 +135,7 @@ public class MapPlayerManager {
       _currentRelativePosition = nextFrameNumber / (float) _numAllFrames;
       _lastUpdateTime = currentTimeMS;
 
-      if (_mapPlayerView != null) {
+      if (isPlayerAvailable()) {
          _mapPlayerView.updateFrameNumber(_currentFrameNumber);
       }
 
@@ -171,6 +172,10 @@ public class MapPlayerManager {
       return _isAnimationVisible;
    }
 
+   private static boolean isPlayerAvailable() {
+      return _mapPlayerView != null;
+   }
+
    public static boolean isPlayerEnabled() {
       return _isPlayerEnabled;
    }
@@ -182,11 +187,13 @@ public class MapPlayerManager {
    public static void restoreState() {
 
       _foregroundFPS = Util.getStateInt(_state, STATE_FOREGROUND_FPS, 10);
+      _isPlayLoop = Util.getStateBoolean(_state, STATE_IS_PLAY_LOOP, false);
    }
 
    public static void saveState() {
 
       _state.put(STATE_FOREGROUND_FPS, _foregroundFPS);
+      _state.put(STATE_IS_PLAY_LOOP, _isPlayLoop);
    }
 
    public static void setAnimationStartTime() {
@@ -203,7 +210,7 @@ public class MapPlayerManager {
 
       _isAnimationVisible = isAnimationVisible;
 
-      if (_mapPlayerView != null) {
+      if (isPlayerAvailable()) {
          _mapPlayerView.updateAnimationVisibility();
       }
    }
@@ -248,7 +255,7 @@ public class MapPlayerManager {
       _numAllFrames = mapPlayerData.numAnimatedPositions;
       _isAnimateFromRelativePosition = mapPlayerData.isAnimateFromRelativePosition;
 
-      if (_mapPlayerView != null) {
+      if (isPlayerAvailable()) {
          _mapPlayerView.updatePlayer();
       }
    }
