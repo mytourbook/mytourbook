@@ -18,6 +18,7 @@ package net.tourbook.map.player;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
@@ -31,6 +32,7 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseListener;
@@ -47,34 +49,45 @@ public class MapPlayerView extends ViewPart {
 
    public static final String           ID                     = "net.tourbook.map.player.MapPlayerView"; //$NON-NLS-1$
    //
-   private static final String          DEFAULT_TIME_00_00     = "   00:00";                              //$NON-NLS-1$
+   private static final String          DEFAULT_TIME_00_00     = ".  00:00";                              //$NON-NLS-1$
    //
    private static final String          STATE_IS_SHOW_END_TIME = "STATE_IS_SHOW_END_TIME";                //$NON-NLS-1$
    //
    private static final IDialogSettings _state                 = TourbookPlugin.getState(ID);
    //
-   private IPartListener2               _partListener;
+// SET_FORMATTING_OFF
+
+   private static final ImageDescriptor _imageDescriptor_Loop              = CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Loop);
+   private static final ImageDescriptor _imageDescriptor_Loop_Disabled     = CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Loop_Disabled);
+   private static final ImageDescriptor _imageDescriptor_Pause             = CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Pause);
+   private static final ImageDescriptor _imageDescriptor_Pause_Disabled    = CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Pause_Disabled);
+   private static final ImageDescriptor _imageDescriptor_Play              = CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Play);
+   private static final ImageDescriptor _imageDescriptor_Play_Disabled     = CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Play_Disabled);
+
+// SET_FORMATTING_ON
    //
-   private Action                       _actionPlayControl_PlayAndPause;
-   private Action                       _actionPlayControl_Loop;
+   private IPartListener2 _partListener;
    //
-   private boolean                      _isShow_EndTime_Or_RemainingTime;
+   private Action         _actionPlayControl_PlayAndPause;
+   private Action         _actionPlayControl_Loop;
    //
-   private float                        _currentTime;
-   private float                        _endTime;
+   private boolean        _isShow_EndTime_Or_RemainingTime;
+   //
+   private float          _currentTime;
+   private float          _endTime;
 
    /*
     * UI controls
     */
    private Composite _parent;
 
+   private Label     _lblFPS;
    private Label     _lblTime_Current;
    private Label     _lblTime_EndOrRemaining;
 
    private Scale     _scaleTimeline;
 
    private Spinner   _spinnerFramesPerSecond;
-   private int       _numAllFrames;
 
    private class Action_PlayControl_Loop extends Action {
 
@@ -82,16 +95,31 @@ public class MapPlayerView extends ViewPart {
 
          super(null, AS_CHECK_BOX);
 
-         setToolTipText("Click to toggle loop and no loop");
+         setToolTipText(Messages.Map_Player_Action_Loop_Tooltip);
 
-         setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.PlayControl_Loop));
-//         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Loop));
-//         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Loop_Disabled));
+         setImageDescriptor(_imageDescriptor_Loop);
+         setDisabledImageDescriptor(_imageDescriptor_Loop_Disabled);
       }
 
       @Override
       public void run() {
          onPlayControl_Loop();
+      }
+   }
+
+   private class Action_PlayControl_PlayAndPause extends Action {
+
+      Action_PlayControl_PlayAndPause() {
+
+         super(null, AS_PUSH_BUTTON);
+
+         setImageDescriptor(_imageDescriptor_Play);
+         setDisabledImageDescriptor(_imageDescriptor_Play_Disabled);
+      }
+
+      @Override
+      public void run() {
+         onPlayControl_PlayOrPause();
       }
    }
 
@@ -139,22 +167,8 @@ public class MapPlayerView extends ViewPart {
 
    private void createActions() {
 
-      {
-         /*
-          * Action: Play/Pause
-          */
-         _actionPlayControl_PlayAndPause = new Action() {
-            @Override
-            public void run() {
-               onPlayControl_PlayOrPause();
-            }
-         };
-
-         _actionPlayControl_PlayAndPause.setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.PlayControl_Play));
-         _actionPlayControl_PlayAndPause.setToolTipText("");
-      }
-
       _actionPlayControl_Loop = new Action_PlayControl_Loop();
+      _actionPlayControl_PlayAndPause = new Action_PlayControl_PlayAndPause();
    }
 
    @Override
@@ -167,7 +181,7 @@ public class MapPlayerView extends ViewPart {
 
       createUI(parent);
 
-      enableActions(false);
+      enableActions();
 
       restoreState();
 
@@ -176,14 +190,9 @@ public class MapPlayerView extends ViewPart {
       parent.getDisplay().asyncExec(() -> {
 
          // set default label width
-         _scaleTimeline.getParent().layout(true, true);
+         _scaleTimeline.getParent().getParent().layout(true, true);
 
-         updatePlayer_InUIThread(
-
-               MapPlayerManager.isPlayerEnabled(),
-               MapPlayerManager.getNumberofAllFrames(),
-               MapPlayerManager.getForegroundFPS(),
-               MapPlayerManager.isAnimateFromRelativePosition());
+         updatePlayer_InUIThread();
       });
    }
 
@@ -228,7 +237,7 @@ public class MapPlayerView extends ViewPart {
          }
          {
             _lblTime_EndOrRemaining = UI.createLabel(container, DEFAULT_TIME_00_00);
-            _lblTime_EndOrRemaining.setToolTipText("Total or remaining time\nClick to toggle between total and remaining time");
+            _lblTime_EndOrRemaining.setToolTipText(Messages.Map_Player_Lable_TimeEndOrRemaining_Tooltip);
             _lblTime_EndOrRemaining.addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> onMouseDown_TimeEndOrRemaining()));
             GridDataFactory.fillDefaults()
                   .align(SWT.END, SWT.CENTER)
@@ -243,7 +252,7 @@ public class MapPlayerView extends ViewPart {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(5).applyTo(container);
       {
          UI.createSpacer_Horizontal(container, 1);
          {
@@ -262,7 +271,7 @@ public class MapPlayerView extends ViewPart {
              * Foreground: Frames per Second
              */
             _spinnerFramesPerSecond = new Spinner(container, SWT.BORDER);
-            _spinnerFramesPerSecond.setToolTipText("Frames per second, when running in the foreground and having the focus");
+            _spinnerFramesPerSecond.setToolTipText(Messages.Map_Player_Spinner_FramesPerSecond_Tooptip);
             _spinnerFramesPerSecond.setMinimum(1);
             _spinnerFramesPerSecond.setMaximum(Map25FPSManager.DEFAULT_FOREGROUND_FPS);
             _spinnerFramesPerSecond.setIncrement(1);
@@ -272,9 +281,14 @@ public class MapPlayerView extends ViewPart {
                Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
                onSelectFPS();
             });
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_spinnerFramesPerSecond);
 
-            UI.createLabel(container, "fps");
+            _lblFPS = UI.createLabel(container, Messages.Map_Player_Label_FramesPerSecond);
          }
+         UI.createSpacer_Horizontal(container, 1);
       }
    }
 
@@ -288,17 +302,21 @@ public class MapPlayerView extends ViewPart {
       super.dispose();
    }
 
-   private void enableActions(final boolean isPlayerEnabled) {
+   private void enableActions() {
+
+      final boolean isEnabled = MapPlayerManager.isPlayerEnabled() && MapPlayerManager.isAnimationVisible();
 
 // SET_FORMATTING_OFF
 
-      _lblTime_Current                 .setEnabled(isPlayerEnabled);
-      _lblTime_EndOrRemaining          .setEnabled(isPlayerEnabled);
-      _scaleTimeline                   .setEnabled(isPlayerEnabled);
-      _spinnerFramesPerSecond          .setEnabled(isPlayerEnabled);
+      _lblFPS                          .setEnabled(isEnabled);
+      _lblTime_Current                 .setEnabled(isEnabled);
+      _lblTime_EndOrRemaining          .setEnabled(isEnabled);
 
-      _actionPlayControl_PlayAndPause  .setEnabled(isPlayerEnabled);
-      _actionPlayControl_Loop          .setEnabled(isPlayerEnabled);
+      _scaleTimeline                   .setEnabled(isEnabled);
+      _spinnerFramesPerSecond          .setEnabled(isEnabled);
+
+      _actionPlayControl_PlayAndPause  .setEnabled(isEnabled);
+      _actionPlayControl_Loop          .setEnabled(isEnabled);
 
 // SET_FORMATTING_ON
    }
@@ -311,8 +329,8 @@ public class MapPlayerView extends ViewPart {
    }
 
    private void onPlayControl_Loop() {
-      // TODO Auto-generated method stub
 
+      MapPlayerManager.setIsPlayLoop(_actionPlayControl_Loop.isChecked());
    }
 
    private void onPlayControl_PlayOrPause() {
@@ -324,10 +342,10 @@ public class MapPlayerView extends ViewPart {
 
       final int selectedFPS = _spinnerFramesPerSecond.getSelection();
 
-      // adjust timeline
-      updateUI_Timeline(selectedFPS, _numAllFrames);
-
       MapPlayerManager.setForegroundFPS(selectedFPS);
+
+      // adjust timeline
+      updateUI_Timeline(selectedFPS);
    }
 
    private void onTimeline_Key(final KeyEvent keyEvent) {
@@ -349,7 +367,7 @@ public class MapPlayerView extends ViewPart {
       updateUI_FromTimeline();
 
       final float timelineSelection = _scaleTimeline.getSelection();
-      final float relativePosition = timelineSelection / _numAllFrames;
+      final float relativePosition = timelineSelection / MapPlayerManager.getNumberofAllFrames();
 
       MapPlayerManager.setRelativePosition(relativePosition);
 
@@ -395,6 +413,11 @@ public class MapPlayerView extends ViewPart {
       updateUI_PlayAndPaused();
    }
 
+   void updateAnimationVisibility() {
+
+      enableActions();
+   }
+
    private void updateCurrentTime(final int currentTime) {
 
       _currentTime = currentTime;
@@ -422,7 +445,7 @@ public class MapPlayerView extends ViewPart {
          return;
       }
 
-      final float relativeFrame = (float) currentFrameNumber / _numAllFrames;
+      final float relativeFrame = (float) currentFrameNumber / MapPlayerManager.getNumberofAllFrames();
       final float currentTime = relativeFrame * _endTime;
 
       final int currentTimeInUI = (int) currentTime;
@@ -439,10 +462,7 @@ public class MapPlayerView extends ViewPart {
       });
    }
 
-   public void updatePlayer(final boolean isPlayerEnabled,
-                            final int numAllFrames,
-                            final int foregroundFPS,
-                            final boolean isAnimateFromRelativePosition) {
+   public void updatePlayer() {
 
       // run in display thread, this method call is started in the shader thread
 
@@ -456,23 +476,20 @@ public class MapPlayerView extends ViewPart {
             return;
          }
 
-         updatePlayer_InUIThread(isPlayerEnabled, numAllFrames, foregroundFPS, isAnimateFromRelativePosition);
+         updatePlayer_InUIThread();
 
       });
    }
 
-   private void updatePlayer_InUIThread(final boolean isPlayerEnabled,
-                                        final int numAllFrames,
-                                        final int foregroundFPS,
-                                        final boolean isAnimateFromRelativePosition) {
+   private void updatePlayer_InUIThread() {
 
-      _numAllFrames = numAllFrames;
+      final int foregroundFPS = MapPlayerManager.getForegroundFPS();
 
-      updateUI_Timeline(foregroundFPS, numAllFrames);
+      updateUI_Timeline(foregroundFPS);
 
       _spinnerFramesPerSecond.setSelection(foregroundFPS);
 
-      if (isAnimateFromRelativePosition == false) {
+      if (MapPlayerManager.isAnimateFromRelativePosition() == false) {
 
          // start from the beginning
          _scaleTimeline.setSelection(0);
@@ -480,14 +497,14 @@ public class MapPlayerView extends ViewPart {
 
       updateUI_FromTimeline();
 
-      enableActions(isPlayerEnabled);
+      enableActions();
    }
 
    private void updateUI_FromTimeline() {
 
       final int timelineSelection = _scaleTimeline.getSelection();
 
-      final float relativeTime = (float) timelineSelection / _numAllFrames;
+      final float relativeTime = (float) timelineSelection / MapPlayerManager.getNumberofAllFrames();
       final int currentTime = (int) (relativeTime * _endTime);
 
       updateCurrentTime(currentTime);
@@ -497,17 +514,23 @@ public class MapPlayerView extends ViewPart {
 
       if (MapPlayerManager.isPlayerRunning()) {
 
-         _actionPlayControl_PlayAndPause.setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.PlayControl_Play));
-         _actionPlayControl_PlayAndPause.setToolTipText("Play");
+         _actionPlayControl_PlayAndPause.setToolTipText(Messages.Map_Player_PlayContol_Play_Tooptip);
+
+         _actionPlayControl_PlayAndPause.setImageDescriptor(_imageDescriptor_Play);
+         _actionPlayControl_PlayAndPause.setDisabledImageDescriptor(_imageDescriptor_Play_Disabled);
 
       } else {
 
-         _actionPlayControl_PlayAndPause.setImageDescriptor(CommonActivator.getImageDescriptor(CommonImages.PlayControl_Pause));
-         _actionPlayControl_PlayAndPause.setToolTipText("Pause the playback");
+         _actionPlayControl_PlayAndPause.setToolTipText(Messages.Map_Player_PlayControl_Pause_Tooltip);
+
+         _actionPlayControl_PlayAndPause.setImageDescriptor(_imageDescriptor_Pause);
+         _actionPlayControl_PlayAndPause.setDisabledImageDescriptor(_imageDescriptor_Pause_Disabled);
       }
    }
 
-   private void updateUI_Timeline(final int selectedFPS, final int numAllFrames) {
+   private void updateUI_Timeline(final int selectedFPS) {
+
+      final int numAllFrames = MapPlayerManager.getNumberofAllFrames();
 
       _endTime = numAllFrames / selectedFPS;
 

@@ -15,32 +15,43 @@
  *******************************************************************************/
 package net.tourbook.map.player;
 
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.util.Util;
+
+import org.eclipse.jface.dialogs.IDialogSettings;
+
 /**
  * Manage map animation player
  */
 public class MapPlayerManager {
 
-   private static MapPlayerView _mapPlayerView;
+   private static final String          STATE_FOREGROUND_FPS = "STATE_FOREGROUND_FPS";                                             //$NON-NLS-1$
+   //
+   private static final IDialogSettings _state               = TourbookPlugin.getState("net.tourbook.map.player.MapPlayerManager");//$NON-NLS-1$
 
-   private static int           _foregroundFPS   = 20;
+   private static MapPlayerView         _mapPlayerView;
+
+   private static int                   _foregroundFPS;
 
    /**
     * Frame number which is currently displayed, it's in the range from 1...{@link #_numAllFrames}
     */
-   private static int           _currentFrameNumber;
+   private static int                   _currentFrameNumber;
 
    /**
     * Number of frames for an animation
     */
-   private static int           _numAllFrames;
+   private static int                   _numAllFrames;
 
-   private static long          _animationStartTime;
-   private static float         _currentRelativePosition;
-   private static boolean       _isAnimateFromRelativePosition;
-   private static long          _lastUpdateTime;
+   private static long                  _animationStartTime;
+   private static float                 _currentRelativePosition;
+   private static boolean               _isAnimateFromRelativePosition;
+   private static long                  _lastUpdateTime;
 
-   private static boolean       _isPlayerEnabled;
-   private static boolean       _isPlayerRunning = true;
+   private static boolean               _isAnimationVisible;
+   private static boolean               _isPlayerEnabled;
+   private static boolean               _isPlayerRunning     = true;
+   private static boolean               _isPlayLoop;
 
    /**
     * @return Returns an index <code>0...</code>{@link #_numAllFrames}<code> - 1</code> for the
@@ -63,45 +74,54 @@ public class MapPlayerManager {
 
       int nextFrameNumber = 0;
 
-      if (_isAnimateFromRelativePosition) {
+      if (_isPlayLoop && _currentFrameNumber >= _numAllFrames) {
 
-         _isAnimateFromRelativePosition = false;
+         // start with a new loop with first frame
 
-         nextFrameNumber = (int) (_numAllFrames * _currentRelativePosition);
+         nextFrameNumber = 1;
 
       } else {
 
-         // get frame duration
-         final float frameDurationSec = 1f / _foregroundFPS;
-         final long frameDurationMS = (long) (frameDurationSec * 1000);
+         if (_isAnimateFromRelativePosition) {
 
-         // get next frame time
-         final long nextFrameTimeMS = _lastUpdateTime + frameDurationMS;
-         final long timeDiffMS = nextFrameTimeMS - currentTimeMS;
+            _isAnimateFromRelativePosition = false;
 
-         // ensure that not more frames per second are displayed
-         if (timeDiffMS > 0) {
+            nextFrameNumber = (int) (_numAllFrames * _currentRelativePosition);
 
-            return getValidIndex(_currentFrameNumber);
-         }
+         } else {
 
-         final int maxFrames = Math.max(0, _numAllFrames);
-         final float maxLoopTime = maxFrames / _foregroundFPS;
+            // get frame duration
+            final float frameDurationSec = 1f / _foregroundFPS;
+            final long frameDurationMS = (long) (frameDurationSec * 1000);
 
-         final float timeDiffSinceFirstRun = (float) ((currentTimeMS - _animationStartTime) / 1000.0);
-         final float currentTimeIndex = timeDiffSinceFirstRun % maxLoopTime;
+            // get next frame time
+            final long nextFrameTimeMS = _lastUpdateTime + frameDurationMS;
+            final long timeDiffMS = nextFrameTimeMS - currentTimeMS;
 
-         final int nextFrameByTime = Math.round(currentTimeIndex * _foregroundFPS);
-         nextFrameNumber = nextFrameByTime;
+            // ensure that not more frames per second are displayed
+            if (timeDiffMS > 0) {
 
-         // ensure to not jump back to the start when the end is not yet reached
-         if (nextFrameNumber < _numAllFrames) {
-            nextFrameNumber = _currentFrameNumber + 1;
-         }
+               return getValidIndex(_currentFrameNumber);
+            }
 
-         // ensure to move not more than one frame
-         if (nextFrameNumber > _currentFrameNumber + 1) {
-            nextFrameNumber = _currentFrameNumber + 1;
+            final int maxFrames = Math.max(0, _numAllFrames);
+            final float maxLoopTime = maxFrames / _foregroundFPS;
+
+            final float timeDiffSinceFirstRun = (float) ((currentTimeMS - _animationStartTime) / 1000.0);
+            final float currentTimeIndex = timeDiffSinceFirstRun % maxLoopTime;
+
+            final int nextFrameByTime = Math.round(currentTimeIndex * _foregroundFPS);
+            nextFrameNumber = nextFrameByTime;
+
+            // ensure to not jump back to the start when the end is not yet reached
+            if (nextFrameNumber < _numAllFrames) {
+               nextFrameNumber = _currentFrameNumber + 1;
+            }
+
+            // ensure to move not more than one frame
+            if (nextFrameNumber > _currentFrameNumber + 1) {
+               nextFrameNumber = _currentFrameNumber + 1;
+            }
          }
       }
 
@@ -138,7 +158,7 @@ public class MapPlayerManager {
     */
    private static int getValidIndex(final int frameNumber) {
 
-      final int arrayIndex = frameNumber == 0 ? 0 : frameNumber - 1;
+      final int arrayIndex = frameNumber <= 0 ? 0 : frameNumber - 1;
 
       return arrayIndex;
    }
@@ -147,12 +167,26 @@ public class MapPlayerManager {
       return _isAnimateFromRelativePosition;
    }
 
+   public static boolean isAnimationVisible() {
+      return _isAnimationVisible;
+   }
+
    public static boolean isPlayerEnabled() {
       return _isPlayerEnabled;
    }
 
    public static boolean isPlayerRunning() {
       return _isPlayerRunning;
+   }
+
+   public static void restoreState() {
+
+      _foregroundFPS = Util.getStateInt(_state, STATE_FOREGROUND_FPS, 10);
+   }
+
+   public static void saveState() {
+
+      _state.put(STATE_FOREGROUND_FPS, _foregroundFPS);
    }
 
    public static void setAnimationStartTime() {
@@ -165,8 +199,23 @@ public class MapPlayerManager {
       _foregroundFPS = foregroundFPS;
    }
 
+   public static void setIsAnimationVisible(final boolean isAnimationVisible) {
+
+      _isAnimationVisible = isAnimationVisible;
+
+      if (_mapPlayerView != null) {
+         _mapPlayerView.updateAnimationVisibility();
+      }
+   }
+
    public static void setIsPlayerRunning(final boolean isPlayerRunning) {
+
       _isPlayerRunning = isPlayerRunning;
+   }
+
+   public static void setIsPlayLoop(final boolean isPlayLoop) {
+
+      _isPlayLoop = isPlayLoop;
    }
 
    public static void setMapPlayerViewer(final MapPlayerView mapPlayerView) {
@@ -200,7 +249,7 @@ public class MapPlayerManager {
       _isAnimateFromRelativePosition = mapPlayerData.isAnimateFromRelativePosition;
 
       if (_mapPlayerView != null) {
-         _mapPlayerView.updatePlayer(_isPlayerEnabled, _numAllFrames, _foregroundFPS, _isAnimateFromRelativePosition);
+         _mapPlayerView.updatePlayer();
       }
    }
 

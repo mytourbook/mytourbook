@@ -75,6 +75,13 @@ public class Map25FPSManager {
     */
    public static void setBackgroundFPSToAnimationFPS(final boolean isEnabled) {
 
+      if (_appConfig == null) {
+
+         // 2.5D map is not yet opened
+
+         return;
+      }
+
       _appConfig.backgroundFPS = isEnabled
 
             ? DEFAULT_FOREGROUND_FPS

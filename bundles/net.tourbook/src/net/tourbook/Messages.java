@@ -1283,6 +1283,13 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Dialog_ValidationAddName;
    public static String        Map_Bookmark_Dialog_ValidationRename;
 
+   public static String        Map_Player_Action_Loop_Tooltip;
+   public static String        Map_Player_Label_FramesPerSecond;
+   public static String        Map_Player_Lable_TimeEndOrRemaining_Tooltip;
+   public static String        Map_Player_PlayContol_Play_Tooptip;
+   public static String        Map_Player_PlayControl_Pause_Tooltip;
+   public static String        Map_Player_Spinner_FramesPerSecond_Tooptip;
+
    public static String        merge_tour_dlg_invalid_serie_data_message;
    public static String        merge_tour_dlg_invalid_tour_data_message;
    public static String        merge_tour_dlg_invalid_tour_message;

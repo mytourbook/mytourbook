@@ -29,6 +29,9 @@ New
 * 2.5D Map
   - Show direction arrows                       https://github.com/mytourbook/mytourbook/issues/516#issuecomment-1234322325
   
+* Map Player
+  - Can play an animation in a map, currently only the 2.5D map is supported
+  
 
 Improvements
 ============
