@@ -37,4 +37,12 @@ public class PrefPageAppearanceTests extends UITest {
       bot.tree().getTreeItem("Appearance").select(); //$NON-NLS-1$
       bot.button("Apply and Close").click(); //$NON-NLS-1$
    }
+
+   @Test
+   void testTourChart() {
+
+      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
+      bot.tree().getTreeItem("Appearance").expand().getNode("Tour Chart").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      bot.button("Apply and Close").click(); //$NON-NLS-1$
+   }
 }

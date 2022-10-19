@@ -340,9 +340,6 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      {
-
-      }
    }
 
    /**
