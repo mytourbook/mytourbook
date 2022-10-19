@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,13 +15,14 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.mapprovider;
 
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
+
 import de.byteholder.geoclipse.Messages;
 import de.byteholder.geoclipse.map.Map2;
 import de.byteholder.geoclipse.map.Tile;
 import de.byteholder.geoclipse.map.UI;
 import de.byteholder.geoclipse.map.event.ITileListener;
 import de.byteholder.geoclipse.map.event.TileEventId;
-import de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers;
 import de.byteholder.geoclipse.ui.ViewerDetailForm;
 
 import java.text.NumberFormat;
@@ -76,8 +77,6 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
@@ -110,13 +109,11 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
    private static final int    MAP_MAX_ZOOM_LEVEL                     = Map2.UI_MAX_ZOOM_LEVEL - Map2.UI_MIN_ZOOM_LEVEL;
 
-   public static final String  DEFAULT_URL                            = "http://";                                    //$NON-NLS-1$
-
-   private static final String DIALOG_SETTINGS_VIEWER_WIDTH           = "ViewerWidth";                                //$NON-NLS-1$
-   private static final String DIALOG_SETTINGS_IS_SHOW_TILE_INFO      = "IsShowTileInfo";                             //$NON-NLS-1$
-   private static final String DIALOG_SETTINGS_IS_LIVE_VIEW           = "IsLiveView";                                 //$NON-NLS-1$
-   private static final String DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG = "IsShowTileImageLogging";                     //$NON-NLS-1$
-   private static final String DIALOG_SETTINGS_IS_PROPERTIES_EXPANDED = "IsPropertiesExpanded";                       //$NON-NLS-1$
+   private static final String DIALOG_SETTINGS_VIEWER_WIDTH           = "ViewerWidth";                                  //$NON-NLS-1$
+   private static final String DIALOG_SETTINGS_IS_SHOW_TILE_INFO      = "IsShowTileInfo";                               //$NON-NLS-1$
+   private static final String DIALOG_SETTINGS_IS_LIVE_VIEW           = "IsLiveView";                                   //$NON-NLS-1$
+   private static final String DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG = "IsShowTileImageLogging";                       //$NON-NLS-1$
+   private static final String DIALOG_SETTINGS_IS_PROPERTIES_EXPANDED = "IsPropertiesExpanded";                         //$NON-NLS-1$
 
    /*
     * UI controls
@@ -257,7 +254,6 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
    }
 
    public DialogMPProfile(final Shell parentShell,
-                          final PrefPage_Map2_Providers prefPageMapProvider,
                           final MPProfile dialogMapProfile) {
 
       super(parentShell, dialogMapProfile);
@@ -959,12 +955,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
          GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkBrightness);
          _chkBrightness.setText(Messages.Dialog_MapProfile_Button_Brightness);
          _chkBrightness.setToolTipText(Messages.Dialog_MapProfile_Button_Brightness_Tooltip);
-         _chkBrightness.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               updateMVBrightness();
-            }
-         });
+         _chkBrightness.addSelectionListener((widgetSelectedAdapter(selectionEvent -> updateMVBrightness())));
 
          // scale: brightness
          _scaleBright = new Scale(group, SWT.NONE);
@@ -972,12 +963,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
          _scaleBright.setMinimum(0);
          _scaleBright.setMaximum(100);
          _scaleBright.setToolTipText(Messages.Dialog_MapProfile_Scale_Brightness_Tooltip);
-         _scaleBright.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onModifyBrightScale();
-            }
-         });
+         _scaleBright.addSelectionListener((widgetSelectedAdapter(selectionEvent -> onModifyBrightScale())));
 
          // spinner: brightness
          _spinBright = new Spinner(group, SWT.BORDER);
@@ -989,14 +975,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
          _spinBright.setMaximum(100);
          _spinBright.setToolTipText(Messages.Dialog_MapProfile_Scale_Brightness_Tooltip);
 
-         _spinBright.addMouseWheelListener(mouseEvent -> Util.adjustSpinnerValueOnMouseScroll(mouseEvent));
+         _spinBright.addMouseWheelListener(Util::adjustSpinnerValueOnMouseScroll);
 
-         _spinBright.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onModifyBrightSpinner();
-            }
-         });
+         _spinBright.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyBrightSpinner()));
 
          _spinBright.addModifyListener(modifyEvent -> onModifyBrightSpinner());
 
@@ -1014,12 +995,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
          _scaleAlpha.setMinimum(0);
          _scaleAlpha.setMaximum(100);
          _scaleAlpha.setToolTipText(Messages.Dialog_CustomConfig_Label_Alpha_Tooltip);
-         _scaleAlpha.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onModifyAlphaScale();
-            }
-         });
+         _scaleAlpha.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyAlphaScale()));
 
          /*
           * this do not work !!!
@@ -1051,12 +1027,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
          _spinAlpha.addMouseWheelListener(Util::adjustSpinnerValueOnMouseScroll);
 
-         _spinAlpha.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onModifyAlphaSpinner();
-            }
-         });
+         _spinAlpha.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyAlphaSpinner()));
 
          _spinAlpha.addModifyListener(modifyEvent -> onModifyAlphaSpinner());
 
@@ -1070,23 +1041,13 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
             _chkTransparentPixel = new Button(containerOptions, SWT.CHECK);
             _chkTransparentPixel.setText(Messages.Dialog_MapConfig_Button_TransparentPixel);
             _chkTransparentPixel.setToolTipText(Messages.Dialog_MapConfig_Button_TransparentPixel_Tooltip);
-            _chkTransparentPixel.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onModifyTransparentColor();
-               }
-            });
+            _chkTransparentPixel.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyTransparentColor()));
 
             // check: is black transparent
             _chkTransparentBlack = new Button(containerOptions, SWT.CHECK);
             _chkTransparentBlack.setText(Messages.Dialog_MapConfig_Button_TransparentBlack);
             _chkTransparentBlack.setToolTipText(Messages.Dialog_MapConfig_Button_TransparentBlack_Tooltip);
-            _chkTransparentBlack.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  onModifyTransparentColor();
-               }
-            });
+            _chkTransparentBlack.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onModifyTransparentColor()));
          }
 
          // ################################################
@@ -1231,15 +1192,12 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
             _spinMinZoom.setMaximum(Map2.UI_MAX_ZOOM_LEVEL);
             _spinMinZoom.setSelection(Map2.UI_MIN_ZOOM_LEVEL);
             _spinMinZoom.addMouseWheelListener(mouseWheelListener);
-            _spinMinZoom.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  if (_isInitUI) {
-                     return;
-                  }
-                  onModifyZoomSpinnerMin();
+            _spinMinZoom.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               if (_isInitUI) {
+                  return;
                }
-            });
+               onModifyZoomSpinnerMin();
+            }));
             _spinMinZoom.addModifyListener(modifyEvent -> {
                if (_isInitUI) {
                   return;
@@ -1261,15 +1219,12 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
             _spinMaxZoom.setMaximum(Map2.UI_MAX_ZOOM_LEVEL);
             _spinMaxZoom.setSelection(Map2.UI_MAX_ZOOM_LEVEL);
             _spinMaxZoom.addMouseWheelListener(mouseWheelListener);
-            _spinMaxZoom.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  if (_isInitUI) {
-                     return;
-                  }
-                  onModifyZoomSpinnerMax();
+            _spinMaxZoom.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+               if (_isInitUI) {
+                  return;
                }
-            });
+               onModifyZoomSpinnerMax();
+            }));
             _spinMaxZoom.addModifyListener(modifyEvent -> {
                if (_isInitUI) {
                   return;
@@ -1313,16 +1268,12 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
                .applyTo(_chkLiveView);
          _chkLiveView.setText(Messages.Dialog_MapConfig_Button_LiveView);
          _chkLiveView.setToolTipText(Messages.Dialog_MapConfig_Button_LiveView_Tooltip);
-         _chkLiveView.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
+         _chkLiveView.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            _isLiveView = _chkLiveView.getSelection();
+            _map.setLiveView(_isLiveView);
 
-               _isLiveView = _chkLiveView.getSelection();
-               _map.setLiveView(_isLiveView);
-
-               updateLiveView();
-            }
-         });
+            updateLiveView();
+         }));
 
          // ################################################
 
@@ -1332,13 +1283,10 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
                .align(SWT.FILL, SWT.END)
                .applyTo(_chkShowTileInfo);
          _chkShowTileInfo.setText(Messages.Dialog_MapConfig_Button_ShowTileInfo);
-         _chkShowTileInfo.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               final boolean isTileInfo = _chkShowTileInfo.getSelection();
-               _map.setShowDebugInfo(isTileInfo, isTileInfo);
-            }
-         });
+         _chkShowTileInfo.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+            final boolean isTileInfo = _chkShowTileInfo.getSelection();
+            _map.setShowDebugInfo(isTileInfo, isTileInfo);
+         }));
 
          // ############################################################
 
@@ -1348,12 +1296,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
                .applyTo(_chkShowTileImageLog);
          _chkShowTileImageLog.setText(Messages.Dialog_MapConfig_Button_ShowTileLog);
          _chkShowTileImageLog.setToolTipText(Messages.Dialog_MapConfig_Button_ShowTileLog_Tooltip);
-         _chkShowTileImageLog.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               enableControls();
-            }
-         });
+         _chkShowTileImageLog.addSelectionListener((widgetSelectedAdapter(selectionEvent -> enableControls())));
       }
    }
 
@@ -1367,12 +1310,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
          _btnShowProfileMap = new Button(toolbarContainer, SWT.NONE);
          _btnShowProfileMap.setText(Messages.Dialog_MapProfile_Button_UpdateMap);
          _btnShowProfileMap.setToolTipText(Messages.Dialog_MapProfile_Button_UpdateMap_Tooltip);
-         _btnShowProfileMap.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectMapProfile();
-            }
-         });
+         _btnShowProfileMap.addSelectionListener((widgetSelectedAdapter(selectionEvent -> onSelectMapProfile())));
 
          // ############################################################
 
@@ -1380,12 +1318,7 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
          _btnShowOsmMap = new Button(toolbarContainer, SWT.NONE);
          _btnShowOsmMap.setText(Messages.Dialog_MapConfig_Button_ShowOsmMap);
          _btnShowOsmMap.setToolTipText(Messages.Dialog_MapConfig_Button_ShowOsmMap_Tooltip);
-         _btnShowOsmMap.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               onSelectMapOSM();
-            }
-         });
+         _btnShowOsmMap.addSelectionListener((widgetSelectedAdapter(selectionEvent -> onSelectMapOSM())));
 
          // ############################################################
 
@@ -1418,9 +1351,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
          double lon = mousePosition.longitude % 360;
          lon = lon > 180 ? //
-         lon - 360
+               lon - 360
                : lon < -180 ? //
-         lon + 360
+                     lon + 360
                      : lon;
 
          _lblMapInfo.setText(NLS.bind(
@@ -1499,16 +1432,14 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
             _formTk.adapt(_cboTileImageLog, true, true);
             _cboTileImageLog.setFont(monoFont);
 
-            _cboTileImageLog.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  // display selected item in the text field below
-                  final int selectionIndex = _cboTileImageLog.getSelectionIndex();
-                  if (selectionIndex != -1) {
-                     _txtLogDetail.setText(_cboTileImageLog.getItem(selectionIndex));
-                  }
+            _cboTileImageLog.addSelectionListener((widgetSelectedAdapter(selectionEvent -> {
+
+               // display selected item in the text field below
+               final int selectionIndex = _cboTileImageLog.getSelectionIndex();
+               if (selectionIndex != -1) {
+                  _txtLogDetail.setText(_cboTileImageLog.getItem(selectionIndex));
                }
-            });
+            })));
 
             // label: selected log entry
             _txtLogDetail = new Text(clientContainer, SWT.READ_ONLY | SWT.BORDER | SWT.MULTI | SWT.WRAP);
@@ -1550,9 +1481,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
          isMpSelected = false;
       }
 
-      final boolean isBrightness = isMpSelected & _chkBrightness.getSelection();
-      final boolean isNoBrightness = isMpSelected & !isBrightness;
-      final boolean isTransparent = isMpSelected & _chkTransparentPixel.getSelection() & !isBrightness;
+      final boolean isBrightness = isMpSelected && _chkBrightness.getSelection();
+      final boolean isNoBrightness = isMpSelected && !isBrightness;
+      final boolean isTransparent = isMpSelected && _chkTransparentPixel.getSelection() && !isBrightness;
 
       _chkBrightness.setEnabled(isMpSelected);
       _spinBright.setEnabled(isBrightness);
@@ -1750,10 +1681,6 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
    long getDragStartTime() {
       return _dragStartTime;
-   }
-
-   MPProfile getMpProfile() {
-      return _mpProfile;
    }
 
    private String getMpUrl(final MP mp) {
