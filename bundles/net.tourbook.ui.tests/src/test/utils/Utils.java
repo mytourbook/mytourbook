@@ -17,10 +17,10 @@ package utils;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import net.tourbook.Messages;
-
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotButton;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotMenu;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
@@ -36,14 +36,41 @@ public class Utils {
 
    public static final String  workingDirectory        = System.getProperty("user.dir"); //$NON-NLS-1$
 
+   private static SWTBotButton clickButton(final String mnemonicText, final SWTWorkbenchBot bot) {
+
+      return bot.button(mnemonicText).click();
+   }
+
+   public static void clickCloseButton(final SWTWorkbenchBot bot) {
+
+      clickButton(IDialogConstants.CLOSE_LABEL, bot);
+   }
+
+   public static void clickOkButton(final SWTWorkbenchBot bot) {
+
+      clickButton(IDialogConstants.OK_LABEL, bot);
+   }
+
    public static SWTBotTreeItem getTour(final SWTWorkbenchBot bot) {
 
       showTourBookView(bot);
 
-      bot.toolbarButtonWithTooltip(Messages.App_Action_CollapseAll).click();
-
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand() //$NON-NLS-1$
             .getNode("Jan   2").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      return tour;
+   }
+
+   /**
+    * Select a tour for which we have SRTM3 data
+    */
+   public static SWTBotTreeItem getTourWithSRTM(final SWTWorkbenchBot bot) {
+
+      showTourBookView(bot);
+
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
       return tour;

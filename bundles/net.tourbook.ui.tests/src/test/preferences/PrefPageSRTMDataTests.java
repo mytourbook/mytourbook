@@ -18,23 +18,22 @@ package preferences;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
+import utils.Utils;
 
-public class PrefPageAppearanceTests extends UITest {
-
-   @Test
-   void openPreferencePage() {
-
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
-      bot.tree().getTreeItem("Appearance").expand().getNode("Value Format").select(); //$NON-NLS-1$ //$NON-NLS-2$
-
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
-   }
+public class PrefPageSRTMDataTests extends UITest {
 
    @Test
-   void testAppearance() {
+   void validateSRTMConnection() {
 
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
-      bot.tree().getTreeItem("Appearance").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem("SRTM").expand().getNode("Data").select(); //$NON-NLS-1$
+
+      bot.button("Validate SRTM Connection").click();
+
+      Utils.clickOkButton(bot);
+
+      bot.button("Dummy Validation").click();
+
       bot.button("Apply and Close").click(); //$NON-NLS-1$
    }
 }

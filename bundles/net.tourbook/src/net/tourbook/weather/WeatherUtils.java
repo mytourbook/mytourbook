@@ -330,7 +330,7 @@ public class WeatherUtils {
     * encompass most of the track to search a weather station as close as possible
     * to the overall course and not just to a specific point.
     */
-   public static LatLng determineWeatherSearchAreaCenter(final TourData tour) {
+   static LatLng determineWeatherSearchAreaCenter(final TourData tour) {
 
       final double[] latitudeSerie = tour.latitudeSerie;
       final double[] longitudeSerie = tour.longitudeSerie;
@@ -444,7 +444,7 @@ public class WeatherUtils {
       return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
    }
 
-   public static String getWindDirectionText(final int degreeDirection) {
+   private static String getWindDirectionText(final int degreeDirection) {
 
       return IWeather.windDirectionText[UI.getCardinalDirectionTextIndex(degreeDirection)];
    }

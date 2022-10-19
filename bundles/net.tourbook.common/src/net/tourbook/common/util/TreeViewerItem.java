@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -100,7 +100,7 @@ public abstract class TreeViewerItem {
    }
 
    /**
-    * Fetches children for this tree item, childs can be added to this tree item with
+    * Fetches children for this tree item, children can be added to this tree item with
     * {@link #addChild(TreeViewerItem)}.
     */
    protected abstract void fetchChildren();
@@ -113,7 +113,7 @@ public abstract class TreeViewerItem {
    }
 
    /**
-    * @return Returns a list with all childrens for this item, when children have not been fetched,
+    * @return Returns a list with all children for this item, when children have not been fetched,
     *         an empty list will be returned.
     */
    public ArrayList<TreeViewerItem> getChildren() {
@@ -126,7 +126,7 @@ public abstract class TreeViewerItem {
    }
 
    /**
-    * @return Returns a list with all fetched children, when childrens are not available, an empty
+    * @return Returns a list with all fetched children, when children are not available, an empty
     *         list will be returned.
     */
    public ArrayList<TreeViewerItem> getFetchedChildren() {
@@ -162,7 +162,7 @@ public abstract class TreeViewerItem {
 
    /**
     * @return Returns a list with all fetched children of this tree item or <code>null</code> when
-    *         childrens are not yet fetched
+    *         children are not yet fetched
     */
    public ArrayList<TreeViewerItem> getUnfetchedChildren() {
       return _children;

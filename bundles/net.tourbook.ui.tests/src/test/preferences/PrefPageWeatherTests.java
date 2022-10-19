@@ -26,6 +26,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
+import utils.Utils;
 
 public class PrefPageWeatherTests extends UITest {
 
@@ -42,7 +43,7 @@ public class PrefPageWeatherTests extends UITest {
 
       assertEquals(message, shell.bot().label(message).getText());
 
-      bot.button("OK").click(); //$NON-NLS-1$
+      Utils.clickOkButton(bot);
    }
 
    @Test
@@ -91,7 +92,7 @@ public class PrefPageWeatherTests extends UITest {
 
       assertEquals(message, shell.bot().label(message).getText());
 
-      bot.button("OK").click(); //$NON-NLS-1$
+      Utils.clickOkButton(bot);
 
       bot.button("Restore Defaults").click(); //$NON-NLS-1$
    }

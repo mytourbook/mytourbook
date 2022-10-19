@@ -1391,7 +1391,7 @@ public class RawDataManager {
       _allInvalidFiles.clear();
    }
 
-   private TourData createTourDataDummyClone(final List<TourValueType> tourValueTypes, final TourData oldTourData) {
+   public TourData createTourDataDummyClone(final List<TourValueType> tourValueTypes, final TourData oldTourData) {
 
       TourData tourDataDummyClone = null;
 

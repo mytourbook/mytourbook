@@ -112,7 +112,7 @@ public class ConconiView extends ViewPart {
    private ChartDataYSerie         _yDataPulse;
    private ConconiData             _conconiDataForSelectedTour;
 
-   protected boolean               _isUpdateUI             = false;
+   private boolean                 _isUpdateUI             = false;
    private boolean                 _isSelectionDisabled    = true;
    private boolean                 _isSaving;
 
