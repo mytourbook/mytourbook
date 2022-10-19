@@ -127,5 +127,8 @@ public class WorkbenchTests extends UITest {
 //      Utils.showViewFromMenu(bot, "Help", "Error Log"); //$NON-NLS-1$ //$NON-NLS-2$
 //      bot.sleep(3000);
 //      Utils.showView(bot, "Error Log"); //$NON-NLS-1$
+
+      //todo fb open photo link view
+      //open tour comparison results view
    }
 }
