@@ -35,7 +35,6 @@ public class ActionSplitTour extends Action {
 
    /**
     * @param tourDataEditor
-    * @param tourProvider
     */
    public ActionSplitTour(final TourDataEditorView tourDataEditor) {
 

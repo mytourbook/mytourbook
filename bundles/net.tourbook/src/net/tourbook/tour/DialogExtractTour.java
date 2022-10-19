@@ -128,7 +128,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
    };
 
    /**
-    * state: tour type splitted tour
+    * state: tour type split
     */
    private static final String[] ALL_STATES_TOUR_TYPE                  = new String[] {
 
@@ -166,13 +166,13 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
    /**
     * Last index in the data serie when tour is extracted. This is set to -1 when the tour is
-    * splitted which extract the tour from the {@link #_extractStartIndex} until the last data
+    * split which extract the tour from the {@link #_extractStartIndex} until the last data
     * serie index.
     */
    private int                   _extractEndIndex;
 
    /**
-    * Is <code>true</code> when tour is splitted otherwise it is extracted and
+    * Is <code>true</code> when tour is split otherwise it is extracted and
     * {@link #_extractEndIndex} contains the last data serie index.
     */
    private boolean               _isSplitTour;
@@ -187,7 +187,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
    private ActionOpenPrefDialog  _actionOpenTourTypePrefs;
 
    private TourPerson[]          _people;
-   protected Point               _shellDefaultSize;
+   private Point                 _shellDefaultSize;
    private TagMenuManager        _tagMenuMgr;
 
    /*
@@ -224,7 +224,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
     * @param tourData
     * @param extractStartIndex
     * @param extractEndIndex
-    *           when -1 the tour is splitted at {@link #_extractStartIndex} otherwise it is
+    *           when -1 the tour is split at {@link #_extractStartIndex} otherwise it is
     *           extracted
     * @param tourDataEditor
     */
@@ -478,7 +478,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
     * tour time
     */
    private void createUI_22_TourTime(final Composite parent,
-                                     final SelectionListener defaultSelectionAdapter) {
+                                     final SelectionListener defaultSelectionListener) {
 
       /*
        * keep original time
@@ -492,7 +492,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       _chkKeepOriginalDateTime = new Button(parent, SWT.CHECK);
       GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkKeepOriginalDateTime);
       _chkKeepOriginalDateTime.setText(Messages.Dialog_SplitTour_Checkbox_KeepTime);
-      _chkKeepOriginalDateTime.addSelectionListener(defaultSelectionAdapter);
+      _chkKeepOriginalDateTime.addSelectionListener(defaultSelectionListener);
 
       //spacer
       new Label(parent, SWT.NONE);
@@ -515,7 +515,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
          _dtTourDate = new org.eclipse.swt.widgets.DateTime(dateContainer, SWT.DATE | SWT.DROP_DOWN | SWT.BORDER);
          GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourDate);
-         _dtTourDate.addSelectionListener(defaultSelectionAdapter);
+         _dtTourDate.addSelectionListener(defaultSelectionListener);
 
          /*
           * tour start: time
@@ -526,14 +526,12 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
          _dtTourTime = new org.eclipse.swt.widgets.DateTime(dateContainer, SWT.TIME | SWT.DROP_DOWN | SWT.BORDER);
          GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourTime);
-         _dtTourTime.addSelectionListener(defaultSelectionAdapter);
+         _dtTourTime.addSelectionListener(defaultSelectionListener);
       }
    }
 
    /**
     * tour type & tags
-    *
-    * @param defaultSelectionAdapter
     */
    private void createUI_30_TypeTags(final Composite parent) {
 
@@ -1079,7 +1077,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
    }
 
    /**
-    * Create {@link TourData} for the splitted/extracted tour
+    * Create {@link TourData} for the split/extracted tour
     */
    private void initTargetTourData() {
 
@@ -1100,7 +1098,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       _tourTitleFromTour = _tourDataSource.getTourTitle();
       _tourTitleFromMarker = UI.EMPTY_STRING;
 
-      // get title from first marker which is within the splitted tour
+      // get title from first marker which is within the split tour
       final ArrayList<TourMarker> sortedMarker = new ArrayList<>(_tourDataSource.getTourMarkers());
       Collections.sort(sortedMarker);
 
