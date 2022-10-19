@@ -19,13 +19,13 @@ import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 
-public class PrefPageSuunto9Tests extends UITest {
+public class PrefPageSuuntoTests extends UITest {
 
    @Test
    void openPreferencePage() {
 
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
-      bot.tree().getTreeItem("Import").expand().getNode("Suunto Spartan/9").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      bot.tree().getTreeItem("Cloud").expand().getNode("Suunto").select(); //$NON-NLS-1$ //$NON-NLS-2$
 
       bot.button("Apply and Close").click(); //$NON-NLS-1$
    }
