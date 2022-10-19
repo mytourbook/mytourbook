@@ -25,10 +25,10 @@ import org.eclipse.jface.dialogs.IDialogSettings;
  */
 public class MapPlayerManager {
 
-   private static final String          STATE_FOREGROUND_FPS = "STATE_FOREGROUND_FPS";                                             //$NON-NLS-1$
-   private static final String          STATE_IS_PLAY_LOOP   = "STATE_IS_PLAY_LOOP";                                               //$NON-NLS-1$
+   private static final String          STATE_FOREGROUND_FPS  = "STATE_FOREGROUND_FPS";                                             //$NON-NLS-1$
+   private static final String          STATE_IS_PLAYING_LOOP = "STATE_IS_PLAYING_LOOP";                                            //$NON-NLS-1$
    //
-   private static final IDialogSettings _state               = TourbookPlugin.getState("net.tourbook.map.player.MapPlayerManager");//$NON-NLS-1$
+   private static final IDialogSettings _state                = TourbookPlugin.getState("net.tourbook.map.player.MapPlayerManager");//$NON-NLS-1$
 
    private static MapPlayerView         _mapPlayerView;
 
@@ -51,14 +51,34 @@ public class MapPlayerManager {
 
    private static boolean               _isAnimationVisible;
    private static boolean               _isPlayerEnabled;
-   private static boolean               _isPlayerRunning     = true;
-   private static boolean               _isPlayLoop;
+   private static boolean               _isPlayerRunning      = true;
+   private static boolean               _isPlayingLoop;
 
    /**
-    * @return Returns an index <code>0...</code>{@link #_numAllFrames}<code> - 1</code> for the
-    *         current frame <code>1...</code>{@link #_numAllFrames}
+    * @return Returns the last computed frame numer
     */
-   public static int getCurrentFrameIndex() {
+   public static int getCurrentFrameNumber() {
+
+      return _currentFrameNumber < 1
+
+            // frames are starting with 1
+            ? 1
+
+            : _currentFrameNumber;
+   }
+
+   public static int getForegroundFPS() {
+
+      return _foregroundFPS;
+   }
+
+   /**
+    * Compute the next frame number which is depending on the time or other parameters
+    *
+    * @return Returns an index <code>0...</code>{@link #_numAllFrames}<code> - 1</code> for the
+    *         next frame <code>1...</code>{@link #_numAllFrames}
+    */
+   public static int getNextFrameIndex() {
 
       if (_isPlayerRunning == false
 
@@ -75,7 +95,17 @@ public class MapPlayerManager {
 
       int nextFrameNumber = 0;
 
-      if (_isPlayLoop && _currentFrameNumber >= _numAllFrames) {
+      if (_isAnimateFromRelativePosition) {
+
+         // 1. Prio: Use relative position
+
+         _isAnimateFromRelativePosition = false;
+
+         nextFrameNumber = Math.round(_numAllFrames * _currentRelativePosition);
+
+      } else if (_isPlayingLoop && _currentFrameNumber >= _numAllFrames) {
+
+         // 2. Prio: Loop animation
 
          // start with a new loop with first frame
 
@@ -83,46 +113,39 @@ public class MapPlayerManager {
 
       } else {
 
-         if (_isAnimateFromRelativePosition) {
+         // 3. Prio: Compute next frame
 
-            _isAnimateFromRelativePosition = false;
+         // get frame duration
+         final float frameDurationSec = 1f / _foregroundFPS;
+         final long frameDurationMS = (long) (frameDurationSec * 1000);
 
-            nextFrameNumber = (int) (_numAllFrames * _currentRelativePosition);
+         // get next frame time
+         final long nextFrameTimeMS = _lastUpdateTime + frameDurationMS;
+         final long timeDiffMS = nextFrameTimeMS - currentTimeMS;
 
-         } else {
+         // ensure that not more frames per second are displayed
+         if (timeDiffMS > 0) {
 
-            // get frame duration
-            final float frameDurationSec = 1f / _foregroundFPS;
-            final long frameDurationMS = (long) (frameDurationSec * 1000);
+            return getValidIndex(_currentFrameNumber);
+         }
 
-            // get next frame time
-            final long nextFrameTimeMS = _lastUpdateTime + frameDurationMS;
-            final long timeDiffMS = nextFrameTimeMS - currentTimeMS;
+         final int maxFrames = Math.max(0, _numAllFrames);
+         final float maxLoopTime = maxFrames / _foregroundFPS;
 
-            // ensure that not more frames per second are displayed
-            if (timeDiffMS > 0) {
+         final float timeDiffSinceFirstRun = (float) ((currentTimeMS - _animationStartTime) / 1000.0);
+         final float currentTimeIndex = timeDiffSinceFirstRun % maxLoopTime;
 
-               return getValidIndex(_currentFrameNumber);
-            }
+         final int nextFrameByTime = Math.round(currentTimeIndex * _foregroundFPS);
+         nextFrameNumber = nextFrameByTime;
 
-            final int maxFrames = Math.max(0, _numAllFrames);
-            final float maxLoopTime = maxFrames / _foregroundFPS;
+         // ensure to not jump back to the start when the end is not yet reached
+         if (nextFrameNumber < _numAllFrames) {
+            nextFrameNumber = _currentFrameNumber + 1;
+         }
 
-            final float timeDiffSinceFirstRun = (float) ((currentTimeMS - _animationStartTime) / 1000.0);
-            final float currentTimeIndex = timeDiffSinceFirstRun % maxLoopTime;
-
-            final int nextFrameByTime = Math.round(currentTimeIndex * _foregroundFPS);
-            nextFrameNumber = nextFrameByTime;
-
-            // ensure to not jump back to the start when the end is not yet reached
-            if (nextFrameNumber < _numAllFrames) {
-               nextFrameNumber = _currentFrameNumber + 1;
-            }
-
-            // ensure to move not more than one frame
-            if (nextFrameNumber > _currentFrameNumber + 1) {
-               nextFrameNumber = _currentFrameNumber + 1;
-            }
+         // ensure to move not more than one frame
+         if (nextFrameNumber > _currentFrameNumber + 1) {
+            nextFrameNumber = _currentFrameNumber + 1;
          }
       }
 
@@ -140,11 +163,6 @@ public class MapPlayerManager {
       }
 
       return getValidIndex(nextFrameNumber);
-   }
-
-   public static int getForegroundFPS() {
-
-      return _foregroundFPS;
    }
 
    public static int getNumberofAllFrames() {
@@ -172,6 +190,11 @@ public class MapPlayerManager {
       return _isAnimationVisible;
    }
 
+   public static boolean isLastFrame() {
+
+      return _currentFrameNumber == _numAllFrames;
+   }
+
    private static boolean isPlayerAvailable() {
       return _mapPlayerView != null;
    }
@@ -184,16 +207,20 @@ public class MapPlayerManager {
       return _isPlayerRunning;
    }
 
+   public static boolean isPlayingLoop() {
+      return _isPlayingLoop;
+   }
+
    public static void restoreState() {
 
       _foregroundFPS = Util.getStateInt(_state, STATE_FOREGROUND_FPS, 10);
-      _isPlayLoop = Util.getStateBoolean(_state, STATE_IS_PLAY_LOOP, false);
+      _isPlayingLoop = Util.getStateBoolean(_state, STATE_IS_PLAYING_LOOP, false);
    }
 
    public static void saveState() {
 
       _state.put(STATE_FOREGROUND_FPS, _foregroundFPS);
-      _state.put(STATE_IS_PLAY_LOOP, _isPlayLoop);
+      _state.put(STATE_IS_PLAYING_LOOP, _isPlayingLoop);
    }
 
    public static void setAnimationStartTime() {
@@ -220,9 +247,9 @@ public class MapPlayerManager {
       _isPlayerRunning = isPlayerRunning;
    }
 
-   public static void setIsPlayLoop(final boolean isPlayLoop) {
+   public static void setIsPlayingLoop(final boolean isPlayingLoop) {
 
-      _isPlayLoop = isPlayLoop;
+      _isPlayingLoop = isPlayingLoop;
    }
 
    public static void setMapPlayerViewer(final MapPlayerView mapPlayerView) {
@@ -231,7 +258,7 @@ public class MapPlayerManager {
    }
 
    /**
-    * Move player head to a relative position
+    * Move player head to a relative position and start playing at this position
     *
     * @param relativePosition
     */
@@ -245,7 +272,9 @@ public class MapPlayerManager {
    }
 
    /**
-    * Setup map player with all necessary data to run the animation
+    * Setup map player with all necessary data to run the animation.
+    * <p>
+    * This method is called when new data are set into the shader buffer data.
     *
     * @param mapPlayerData
     */

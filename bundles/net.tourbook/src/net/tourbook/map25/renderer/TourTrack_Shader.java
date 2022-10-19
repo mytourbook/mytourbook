@@ -710,7 +710,7 @@ public final class TourTrack_Shader {
       shader.useProgram();
 
       // get animated position
-      final int xyPosIndex = MapPlayerManager.getCurrentFrameIndex() * 2;
+      final int xyPosIndex = MapPlayerManager.getNextFrameIndex() * 2;
 
       // rotate model to look forward
       final float angle = animatedForwardAngle.get(xyPosIndex / 2);
