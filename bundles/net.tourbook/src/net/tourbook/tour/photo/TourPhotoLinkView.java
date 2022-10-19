@@ -62,7 +62,6 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.State;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -75,14 +74,11 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -316,7 +312,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
-   public class TableContextMenuProvider implements IContextMenuProvider {
+   private class TableContextMenuProvider implements IContextMenuProvider {
 
       @Override
       public void disposeContextMenu() {
@@ -343,7 +339,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    }
 
-   public static enum TimeAdjustmentType {
+   static enum TimeAdjustmentType {
 
       NO_AJUSTMENT, //
       SAVED_AJUSTMENT, //
@@ -605,42 +601,37 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-               // app filter is modified
+            // app filter is modified
 
-               // sql filter is dirty, force reloading cached start/end
-               _photoMgr.resetTourStartEnd();
+            // sql filter is dirty, force reloading cached start/end
+            _photoMgr.resetTourStartEnd();
 
-               updateUI();
+            updateUI();
 
-            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+         } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-               _tourViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+            _tourViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-               _tourViewer.refresh();
+            _tourViewer.refresh();
 
-               /*
-                * the tree must be redrawn because the styled text does not show with the new color
-                */
-               _tourViewer.getTable().redraw();
-            }
+            /*
+             * the tree must be redrawn because the styled text does not show with the new color
+             */
+            _tourViewer.getTable().redraw();
          }
       };
 
-      _prefChangeListener_Common = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener_Common = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
 //					// measurement system has changed
 //
@@ -652,7 +643,6 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 //					defineAllColumns(_viewerContainer);
 //
 //					_tourViewer = (TableViewer) recreateViewer(_tourViewer);
-            }
          }
       };
 
@@ -665,41 +655,35 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-            if (part == TourPhotoLinkView.this) {
-               return;
-            }
-            onSelectionChanged(selection, part);
+      _postSelectionListener = (workbenchPart, selection) -> {
+         if (workbenchPart == TourPhotoLinkView.this) {
+            return;
          }
+         onSelectionChanged(selection, workbenchPart);
       };
       getViewSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
 
-            if (part == TourPhotoLinkView.this) {
-               return;
+         if (workbenchPart == TourPhotoLinkView.this) {
+            return;
+         }
+
+         if (tourEventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
+
+            // get modified tours
+            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            if (modifiedTours != null) {
+
+               onTourChanged(modifiedTours);
             }
 
-            if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
+         } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
 
-               // get modified tours
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-               if (modifiedTours != null) {
-
-                  onTourChanged(modifiedTours);
-               }
-
-            } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
-
-               clearView();
-            }
+            clearView();
          }
       };
 
@@ -738,12 +722,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       _viewerMenuManager = new MenuManager();
       _viewerMenuManager.setRemoveAllWhenShown(true);
-      _viewerMenuManager.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager menuManager) {
-            fillContextMenu(menuManager);
-         }
-      });
+      _viewerMenuManager.addMenuListener(this::fillContextMenu);
    }
 
    @Override
@@ -929,13 +908,11 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       _tourViewer.setContentProvider(new ContentProvider());
       _tourViewer.setComparator(new ContentComparator());
 
-      _tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         @Override
-         public void selectionChanged(final SelectionChangedEvent event) {
-            final ISelection eventSelection = event.getSelection();
-            if (eventSelection instanceof StructuredSelection) {
-               onSelectTourLink(((StructuredSelection) eventSelection).toArray());
-            }
+      _tourViewer.addSelectionChangedListener(selectionChangedEvent -> {
+
+         final ISelection eventSelection = selectionChangedEvent.getSelection();
+         if (eventSelection instanceof StructuredSelection) {
+            onSelectTourLink(((StructuredSelection) eventSelection).toArray());
          }
       });
 
