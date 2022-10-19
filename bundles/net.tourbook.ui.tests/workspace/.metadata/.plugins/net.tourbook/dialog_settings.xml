@@ -351,4 +351,12 @@
 	</section>
 	<section name="net.tourbook.ui.views.tourCatalog.ReferenceTourManager">
 	</section>
+	<section name="net.tourbook.map.player.MapPlayerManager">
+		<item key="STATE_FOREGROUND_FPS" value="10"/>
+		<item key="STATE_IS_PLAYING_LOOP" value="false"/>
+	</section>
+	<section name="net.tourbook.views.tourCatalog.CompareResultView">
+		<item key="STATE_IS_USE_FAST_APP_TOUR_FILTER" value="false"/>
+		<item key="XML_STATE_COLUMN_MANAGER" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;ColumnProfiles isShowCategory=&quot;true&quot; isShowColumnAnnotation_Formatting=&quot;false&quot; isShowColumnAnnotation_Sorting=&quot;false&quot;&gt;&#x0D;&#x0A;&lt;Profile isActiveProfile=&quot;true&quot; name=&quot;Column Profile&quot; visibleColumnIds=&quot;comparedTour,diff,TOUR_TYPE,speedComputed,speedSaved,speedMoved,motionAltimeter,MOTION_DISTANCE,TIME__COMPUTED_MOVING_TIME,DATA_TIME_INTERVAL,TOUR_TITLE,TOUR_TAGS,&quot; visibleColumnIdsAndWidth=&quot;comparedTour,166,diff,48,TOUR_TYPE,30,speedComputed,48,speedSaved,48,speedMoved,48,motionAltimeter,48,MOTION_DISTANCE,72,TIME__COMPUTED_MOVING_TIME,60,DATA_TIME_INTERVAL,48,TOUR_TITLE,120,TOUR_TAGS,120,&quot;&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;comparedTour&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;diff&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TYPE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;speedComputed&quot; detailFormat=&quot;NUMBER_1_1&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;speedSaved&quot; detailFormat=&quot;NUMBER_1_1&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;speedMoved&quot; detailFormat=&quot;NUMBER_1_1&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;motionAltimeter&quot; detailFormat=&quot;NUMBER_1_0&quot;/&gt;&#x0D;&#x0A;&lt;Column categoryFormat=&quot;NUMBER_1_0&quot; columnId=&quot;MOTION_DISTANCE&quot; detailFormat=&quot;NUMBER_1_3&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TIME__COMPUTED_MOVING_TIME&quot; detailFormat=&quot;TIME_HH&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;DATA_TIME_INTERVAL&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TITLE&quot;/&gt;&#x0D;&#x0A;&lt;Column columnId=&quot;TOUR_TAGS&quot;/&gt;&#x0D;&#x0A;&lt;/Profile&gt;&#x0D;&#x0A;&lt;/ColumnProfiles&gt;"/>
+	</section>
 </section>
