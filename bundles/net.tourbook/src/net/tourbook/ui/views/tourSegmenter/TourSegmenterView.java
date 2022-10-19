@@ -701,7 +701,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       public void inputChanged(final Viewer v, final Object oldInput, final Object newInput) {}
    }
 
-   public class SegmenterFilter extends ViewerFilter {
+   private class SegmenterFilter extends ViewerFilter {
 
       @Override
       public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
@@ -734,7 +734,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
 
    }
 
-   public enum SegmenterType {
+   enum SegmenterType {
 
       ByAltitudeWithDP, //
       ByAltitudeWithDPMerged, //
@@ -792,7 +792,7 @@ public class TourSegmenterView extends ViewPart implements ITourViewer {
       return _state;
    }
 
-   public void actionExportViewCSV() {
+   void actionExportViewCSV() {
 
       /*
        * Get export filename

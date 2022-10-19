@@ -70,7 +70,7 @@ public class TourBookViewTests extends UITest {
 
       //Compute the tour distance
       tour.contextMenu(Messages.Tour_Action_AdjustTourValues).menu(Messages.TourEditor_Action_ComputeDistanceValuesFromGeoPosition).click();
-      bot.button("OK").click(); //$NON-NLS-1$
+      Utils.clickOkButton(bot);
 
       //Check the new computed distance
       tour = Utils.getTour(bot);
@@ -106,8 +106,8 @@ public class TourBookViewTests extends UITest {
       //Delete the tour
       tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
             Messages.Tour_Book_Action_delete_selected_tours).click();
-      bot.button("OK").click(); //$NON-NLS-1$
-      bot.button("OK").click(); //$NON-NLS-1$
+      Utils.clickOkButton(bot);
+      Utils.clickOkButton(bot);
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
@@ -177,5 +177,26 @@ public class TourBookViewTests extends UITest {
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
             "1/31/21, 7:15 AM -> Error while retrieving the weather data: \"{\"cod\":\"400\",\"message\":\"requested time is out of allowed range of 5 days back\"}\"")));//$NON-NLS-1$
+   }
+
+   @Test
+   void testSetElevationValuesFromSRTM() {
+
+      Utils.showTourBookView(bot);
+      SWTBotTreeItem tour = Utils.getTourWithSRTM(bot);
+
+      //Check the original elevation value
+      assertEquals("2,578", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
+
+      //Set elevation from SRTM
+      tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
+            .menu(Messages.Tour_SubMenu_Elevation)
+            .menu(Messages.TourEditor_Action_SetAltitudeValuesFromSRTM)
+            .click();
+      Utils.clickOkButton(bot);
+
+      //Check the new elevation value
+      tour = Utils.getTourWithSRTM(bot);
+      assertEquals("1,008", tour.cell(tourBookView_ElevationGain_Column_Index)); //$NON-NLS-1$
    }
 }

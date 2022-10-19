@@ -13,28 +13,24 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package preferences;
+package device.polartrainer;
+
+import net.tourbook.device.polartrainer.PolarTrainerDataReader;
 
 import org.junit.jupiter.api.Test;
 
-import utils.UITest;
+import utils.DeviceDataReaderTester;
+import utils.FilesUtils;
 
-public class PrefPageAppearanceTests extends UITest {
+public class PolarTrainerDataReaderTests extends DeviceDataReaderTester {
 
-   @Test
-   void openPreferencePage() {
+   public static final String     FILES_PATH       = FilesUtils.rootPath + "device/polartrainer/files/"; //$NON-NLS-1$
 
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
-      bot.tree().getTreeItem("Appearance").expand().getNode("Value Format").select(); //$NON-NLS-1$ //$NON-NLS-2$
-
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
-   }
+   private PolarTrainerDataReader deviceDataReader = new PolarTrainerDataReader();
 
    @Test
-   void testAppearance() {
+   void testPolarTrainerImport_2020() {
 
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
-      bot.tree().getTreeItem("Appearance").select(); //$NON-NLS-1$
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
+      testImportFile(deviceDataReader, FILES_PATH + "user_25.11.2020_export", ".xml"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }

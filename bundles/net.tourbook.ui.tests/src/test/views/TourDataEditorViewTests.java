@@ -74,12 +74,13 @@ public class TourDataEditorViewTests extends UITest {
 
       SWTBotTable timeSlicesTable = tourEditorViewBot.table();
 
-      assertEquals(16829, timeSlicesTable.rowCount());
+      final int timeSlicesTableCount = 16829;
+      assertEquals(timeSlicesTableCount, timeSlicesTable.rowCount());
 
       timeSlicesTable.select(3);
 
       timeSlicesTable.contextMenu(Messages.action_tour_editor_delete_time_slices_keep_time).click();
-      bot.button("OK").click(); //$NON-NLS-1$
+      Utils.clickOkButton(bot);
 
       timeSlicesTable = tourEditorViewBot.table();
       timeSlicesTable.contextMenu(Messages.action_tour_editor_delete_time_slices_keep_time).click();
@@ -87,7 +88,7 @@ public class TourDataEditorViewTests extends UITest {
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
 
       //Ensuring that the time slice was deleted
-      assertEquals(16828, timeSlicesTable.rowCount());
+      assertEquals(timeSlicesTableCount - 1, timeSlicesTable.rowCount());
    }
 
    @Test

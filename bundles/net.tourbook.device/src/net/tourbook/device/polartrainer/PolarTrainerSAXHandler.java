@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -64,7 +64,7 @@ import org.xml.sax.helpers.DefaultHandler;
  *    &lt;/xs:annotation&gt;
  * </pre>
  */
-public class PolarTrainerSAXHandler extends DefaultHandler {
+class PolarTrainerSAXHandler extends DefaultHandler {
 
    private static final String DEVICE_NAME_POLAR_PERSONALTRAINER = "Polar Personal Trainer"; //$NON-NLS-1$
 
@@ -227,12 +227,12 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
 
    }
 
-   public PolarTrainerSAXHandler(final String importFileName,
-                                 final Map<Long, TourData> alreadyImportedTours,
-                                 final Map<Long, TourData> newlyImportedTours,
-                                 final ImportState_File importState_File,
-                                 final ImportState_Process importState_Process,
-                                 final PolarTrainerDataReader polarTrainerSAXHandler) {
+   PolarTrainerSAXHandler(final String importFileName,
+                          final Map<Long, TourData> alreadyImportedTours,
+                          final Map<Long, TourData> newlyImportedTours,
+                          final ImportState_File importState_File,
+                          final ImportState_Process importState_Process,
+                          final PolarTrainerDataReader polarTrainerSAXHandler) {
 
       _importFilePath = importFileName;
       _alreadyImportedTours = alreadyImportedTours;
@@ -267,7 +267,7 @@ public class PolarTrainerSAXHandler extends DefaultHandler {
       }
    }
 
-   public void dispose() {
+   void dispose() {
 
       _laps.clear();
       _timeSlices.clear();
