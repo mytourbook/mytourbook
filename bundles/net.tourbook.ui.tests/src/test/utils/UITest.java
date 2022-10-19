@@ -19,7 +19,7 @@ import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 
 public abstract class UITest {
 
-   protected SWTWorkbenchBot bot                                     = new SWTWorkbenchBot();
+   protected static SWTWorkbenchBot bot                                     = new SWTWorkbenchBot();
 
    protected int             tourBookView_Distance_Column_Index      = 10;
    protected int             tourBookView_ElevationGain_Column_Index = 11;

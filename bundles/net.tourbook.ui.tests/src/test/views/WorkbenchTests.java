@@ -27,8 +27,9 @@ import utils.Utils;
 
 public class WorkbenchTests extends UITest {
 
-   public static final String DIRECTORY       = "Directory";          //$NON-NLS-1$
    public static final String TOUR_PROPERTIES = "2. Tour Properties"; //$NON-NLS-1$
+   public static final String COMPARE_TOURS   = "4. Compare Tours";   //$NON-NLS-1$
+   public static final String PHOTO           = "5. Photo";           //$NON-NLS-1$
 
    @BeforeClass
    public static void beforeClass() {
@@ -101,13 +102,13 @@ public class WorkbenchTests extends UITest {
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Heart Rate Variability"); //$NON-NLS-1$
       Utils.showView(bot, "Heart Rate Variability"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, DIRECTORY, "Sensor"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Sensor"); //$NON-NLS-1$
       Utils.showView(bot, "Sensor"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, DIRECTORY, "Sensor Chart"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Sensor Chart"); //$NON-NLS-1$
       Utils.showView(bot, "Sensor Chart"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, DIRECTORY, "Photos"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Photos"); //$NON-NLS-1$
       Utils.showView(bot, "Photos"); //$NON-NLS-1$
       //Sleeping 3 seconds as the view can be slow to display
       bot.sleep(3000);
@@ -115,20 +116,27 @@ public class WorkbenchTests extends UITest {
       bot.toolbarButtonWithTooltip("Search for tours, marker and waypoints (Ctrl+K)").click(); //$NON-NLS-1$
       Utils.showView(bot, "Search Tours"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, DIRECTORY, "Tour Marker"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Tour Marker"); //$NON-NLS-1$
       Utils.showView(bot, "Tour Marker"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, DIRECTORY, "Collated Tours"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Collated Tours"); //$NON-NLS-1$
       Utils.showView(bot, "Collated Tours"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, DIRECTORY, "Reference Tours"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Reference Tours"); //$NON-NLS-1$
       Utils.showView(bot, "Reference Tours"); //$NON-NLS-1$
 
 //      Utils.showViewFromMenu(bot, "Help", "Error Log"); //$NON-NLS-1$ //$NON-NLS-2$
 //      bot.sleep(3000);
 //      Utils.showView(bot, "Error Log"); //$NON-NLS-1$
 
-      //todo fb open photo link view
-      //open tour comparison results view
+      Utils.openOtherMenu(bot);
+      bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode("Comparison Results").select(); //$NON-NLS-1$
+      bot.button("Open").click(); //$NON-NLS-1$
+      Utils.showView(bot, "Comparison Results"); //$NON-NLS-1$
+
+      Utils.openOtherMenu(bot);
+      bot.tree().getTreeItem(WorkbenchTests.PHOTO).expand().getNode("Photos + Tours").select(); //$NON-NLS-1$
+      bot.button("Open").click(); //$NON-NLS-1$
+      Utils.showView(bot, "Photos + Tours"); //$NON-NLS-1$
    }
 }
