@@ -19,13 +19,13 @@ import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 
-public class PrefPageComputedValuesTests extends UITest {
+public class PrefPageTourTypesTests extends UITest {
 
    @Test
    void openPreferencePage() {
 
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click();
-      bot.tree().getTreeItem("General").getNode("Computed Values").select();
+      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
+      bot.tree().getTreeItem("Tour Type Filter").getNode("Color").select();
 
       bot.button("Apply and Close").click(); //$NON-NLS-1$
    }
