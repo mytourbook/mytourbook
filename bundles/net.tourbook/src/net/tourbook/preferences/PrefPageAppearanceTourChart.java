@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.preferences;
+
+import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,8 +41,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.events.MouseWheelListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -97,7 +97,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
    private ArrayList<Graph>        _viewerGraphs;
 
    private MouseWheelListener      _defaultMouseWheelListener;
-   private SelectionAdapter        _defaultSelectionListener;
+   private SelectionListener       _defaultSelectionListener;
 
    /*
     * UI controls
@@ -312,17 +312,12 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
          setButtonLayoutData(_btnUp);
          _btnUp.setText(Messages.Pref_Graphs_Button_up);
          _btnUp.setEnabled(false);
-         _btnUp.addSelectionListener(new SelectionListener() {
-            @Override
-            public void widgetDefaultSelected(final SelectionEvent e) {}
+         _btnUp.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               moveSelectionUp();
-               enableUpDownActions();
-               doLiveUpdate();
-            }
-         });
+            moveSelectionUp();
+            enableUpDownActions();
+            doLiveUpdate();
+         }));
 
          /*
           * button: down
@@ -331,17 +326,12 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
          setButtonLayoutData(_btnDown);
          _btnDown.setText(Messages.Pref_Graphs_Button_down);
          _btnDown.setEnabled(false);
-         _btnDown.addSelectionListener(new SelectionListener() {
-            @Override
-            public void widgetDefaultSelected(final SelectionEvent e) {}
+         _btnDown.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-               moveSelectionDown();
-               enableUpDownActions();
-               doLiveUpdate();
-            }
-         });
+            moveSelectionDown();
+            enableUpDownActions();
+            doLiveUpdate();
+         }));
       }
    }
 
@@ -646,12 +636,7 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
          onSelection();
       };
 
-      _defaultSelectionListener = new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            onSelection();
-         }
-      };
+      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onSelection());
 
 // SET_FORMATTING_OFF
 
