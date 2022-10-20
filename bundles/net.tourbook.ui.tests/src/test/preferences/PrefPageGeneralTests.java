@@ -38,4 +38,13 @@ public class PrefPageGeneralTests extends UITest {
 
       Utils.clickApplyAndCloseButton(bot);
    }
+
+   @Test
+   void openGeneralPage() {
+
+      Utils.openPreferences(bot);
+      bot.tree().getTreeItem("General").select();
+
+      Utils.clickApplyAndCloseButton(bot);
+   }
 }
