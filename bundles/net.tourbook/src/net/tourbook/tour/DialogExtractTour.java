@@ -128,7 +128,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
    };
 
    /**
-    * state: tour type split
+    * state: tour type splitted tour
     */
    private static final String[] ALL_STATES_TOUR_TYPE                  = new String[] {
 
@@ -166,13 +166,13 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
    /**
     * Last index in the data serie when tour is extracted. This is set to -1 when the tour is
-    * split which extract the tour from the {@link #_extractStartIndex} until the last data
+    * splitted which extract the tour from the {@link #_extractStartIndex} until the last data
     * serie index.
     */
    private int                   _extractEndIndex;
 
    /**
-    * Is <code>true</code> when tour is split otherwise it is extracted and
+    * Is <code>true</code> when tour is splitted otherwise it is extracted and
     * {@link #_extractEndIndex} contains the last data serie index.
     */
    private boolean               _isSplitTour;
@@ -187,7 +187,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
    private ActionOpenPrefDialog  _actionOpenTourTypePrefs;
 
    private TourPerson[]          _people;
-   private Point                 _shellDefaultSize;
+   protected Point               _shellDefaultSize;
    private TagMenuManager        _tagMenuMgr;
 
    /*
@@ -224,7 +224,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
     * @param tourData
     * @param extractStartIndex
     * @param extractEndIndex
-    *           when -1 the tour is split at {@link #_extractStartIndex} otherwise it is
+    *           when -1 the tour is splitted at {@link #_extractStartIndex} otherwise it is
     *           extracted
     * @param tourDataEditor
     */
@@ -277,9 +277,9 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
           * this is not working, the shell is flickering when the shell size is below min
           * size and I found no way to prevent a resize :-(
           */
-//				if (shellSize.x < _shellDefaultSize.x) {
-//					event.doit = false;
-//				}
+//          if (shellSize.x < _shellDefaultSize.x) {
+//             event.doit = false;
+//          }
 
          shellSize.x = shellSize.x < _shellDefaultSize.x ? _shellDefaultSize.x : shellSize.x;
          shellSize.y = _shellDefaultSize.y;
@@ -404,7 +404,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       _dlgInnerContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_dlgInnerContainer);
       GridLayoutFactory.swtDefaults().margins(10, 10).numColumns(3).spacing(10, 8).applyTo(_dlgInnerContainer);
-//		_dlgInnerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//    _dlgInnerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          createUI_10_SplitMethod(_dlgInnerContainer);
          createUI_20_Title(_dlgInnerContainer);
@@ -478,7 +478,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
     * tour time
     */
    private void createUI_22_TourTime(final Composite parent,
-                                     final SelectionListener defaultSelectionListener) {
+                                     final SelectionListener defaultSelectionAdapter) {
 
       /*
        * keep original time
@@ -492,7 +492,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       _chkKeepOriginalDateTime = new Button(parent, SWT.CHECK);
       GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkKeepOriginalDateTime);
       _chkKeepOriginalDateTime.setText(Messages.Dialog_SplitTour_Checkbox_KeepTime);
-      _chkKeepOriginalDateTime.addSelectionListener(defaultSelectionListener);
+      _chkKeepOriginalDateTime.addSelectionListener(defaultSelectionAdapter);
 
       //spacer
       new Label(parent, SWT.NONE);
@@ -515,7 +515,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
          _dtTourDate = new org.eclipse.swt.widgets.DateTime(dateContainer, SWT.DATE | SWT.DROP_DOWN | SWT.BORDER);
          GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourDate);
-         _dtTourDate.addSelectionListener(defaultSelectionListener);
+         _dtTourDate.addSelectionListener(defaultSelectionAdapter);
 
          /*
           * tour start: time
@@ -526,12 +526,14 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
          _dtTourTime = new org.eclipse.swt.widgets.DateTime(dateContainer, SWT.TIME | SWT.DROP_DOWN | SWT.BORDER);
          GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(_dtTourTime);
-         _dtTourTime.addSelectionListener(defaultSelectionListener);
+         _dtTourTime.addSelectionListener(defaultSelectionAdapter);
       }
    }
 
    /**
     * tour type & tags
+    *
+    * @param defaultSelectionAdapter
     */
    private void createUI_30_TypeTags(final Composite parent) {
 
@@ -650,36 +652,36 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       _lblTourType.setEnabled(isCustomTourType);
 
       // enable/disable actions for tags/tour types
-//		TagManager.enableRecentTagActions(true, _tourDataTarget.getTourTags());
+//    TagManager.enableRecentTagActions(true, _tourDataTarget.getTourTags());
    }
 
-//	/**
-//	 * info
-//	 */
-//	private void createUI60Info(final Composite container) {
+// /**
+//  * info
+//  */
+// private void createUI60Info(final Composite container) {
 //
-//		final Label label = new Label(container, SWT.NONE);
-//		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 10).applyTo(label);
-//		label.setText(Messages.Dialog_JoinTours_Label_OtherFields);
+//    final Label label = new Label(container, SWT.NONE);
+//    GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 10).applyTo(label);
+//    label.setText(Messages.Dialog_JoinTours_Label_OtherFields);
 //
-//		// use a bulleted list to display this info
-//		final StyleRange style = new StyleRange();
-//		style.metrics = new GlyphMetrics(0, 0, 10);
-//		final Bullet bullet = new Bullet(style);
+//    // use a bulleted list to display this info
+//    final StyleRange style = new StyleRange();
+//    style.metrics = new GlyphMetrics(0, 0, 10);
+//    final Bullet bullet = new Bullet(style);
 //
-//		final String infoText = Messages.Dialog_SplitTour_Label_OtherFieldsInfo;
-//		final int lineCount = Util.countCharacter(infoText, '\n');
+//    final String infoText = Messages.Dialog_SplitTour_Label_OtherFieldsInfo;
+//    final int lineCount = Util.countCharacter(infoText, '\n');
 //
-//		final StyledText styledText = new StyledText(container, SWT.READ_ONLY);
-//		GridDataFactory.fillDefaults()//
-//				.align(SWT.FILL, SWT.BEGINNING)
-//				.indent(0, 10)
-//				.span(2, 1)
-//				.applyTo(styledText);
-//		styledText.setText(infoText);
-//		styledText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-//		styledText.setLineBullet(0, lineCount + 1, bullet);
-//	}
+//    final StyledText styledText = new StyledText(container, SWT.READ_ONLY);
+//    GridDataFactory.fillDefaults()//
+//          .align(SWT.FILL, SWT.BEGINNING)
+//          .indent(0, 10)
+//          .span(2, 1)
+//          .applyTo(styledText);
+//    styledText.setText(infoText);
+//    styledText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+//    styledText.setLineBullet(0, lineCount + 1, bullet);
+// }
 
    /**
     * Create a new tour with the extracted time slices
@@ -1042,7 +1044,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
       // keep window size and position
       return _state;
-//		return null;
+//    return null;
    }
 
    private TourPerson getSelectedPerson() {
@@ -1077,7 +1079,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
    }
 
    /**
-    * Create {@link TourData} for the split/extracted tour
+    * Create {@link TourData} for the splitted/extracted tour
     */
    private void initTargetTourData() {
 
@@ -1098,7 +1100,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       _tourTitleFromTour = _tourDataSource.getTourTitle();
       _tourTitleFromMarker = UI.EMPTY_STRING;
 
-      // get title from first marker which is within the split tour
+      // get title from first marker which is within the splitted tour
       final ArrayList<TourMarker> sortedMarker = new ArrayList<>(_tourDataSource.getTourMarkers());
       Collections.sort(sortedMarker);
 
