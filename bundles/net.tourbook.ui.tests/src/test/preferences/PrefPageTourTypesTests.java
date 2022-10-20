@@ -15,6 +15,7 @@
  *******************************************************************************/
 package preferences;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -23,10 +24,13 @@ import utils.Utils;
 public class PrefPageTourTypesTests extends UITest {
 
    @Test
-   void openTourTypePage() {
+   void openTourTypePages() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("Tour Type Filter").expand().getNode("Color").select();
+      SWTBotTreeItem TourTypeFilterTreeItem = bot.tree().getTreeItem("Tour Type Filter").select();
+
+      TourTypeFilterTreeItem = TourTypeFilterTreeItem.expand();
+      TourTypeFilterTreeItem.getNode("Color").select();
 
       Utils.clickApplyAndCloseButton(bot);
    }
