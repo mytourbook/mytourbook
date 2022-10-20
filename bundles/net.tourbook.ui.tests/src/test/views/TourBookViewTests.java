@@ -94,6 +94,24 @@ public class TourBookViewTests extends UITest {
    }
 
    @Test
+   void testDeleteTourCalories() {
+
+      _tourBookView = Utils.showTourBookView(bot);
+      SWTBotTreeItem tour = Utils.getTour(bot);
+
+      tour.contextMenu(Messages.Dialog_DeleteTourValues_Action_OpenDialog).click();
+
+      tour.contextMenu("Delete Tour Values...").click();
+      bot.checkBox("Calories").click();
+      bot.button("Delete").click();
+      bot.button("OK").click();
+
+      //Check that the calories were deleted
+      tour = Utils.getTour(bot);
+      assertEquals("0", tour.cell(tourBookView_Calories_Column_Index)); //$NON-NLS-1$
+   }
+
+   @Test
    void testDuplicateAndDeleteTour() {
 
       _tourBookView = Utils.showTourBookView(bot);
@@ -145,7 +163,7 @@ public class TourBookViewTests extends UITest {
       assertNotNull(tour);
 
       //Check the original calories value
-      assertEquals("1,073", tour.cell(tourBookView_Temperature_Column_Index)); //$NON-NLS-1$
+      assertEquals("1,073", tour.cell(tourBookView_Calories_Column_Index)); //$NON-NLS-1$
 
       //Multiply the calories by 1000
       tour.contextMenu(Messages.Tour_Action_AdjustTourValues).menu(Messages.Tour_Action_MultiplyCaloriesBy1000).click();
@@ -155,7 +173,7 @@ public class TourBookViewTests extends UITest {
       tour = bot.tree().getTreeItem("2020   3").expand() //$NON-NLS-1$
             .getNode("May   2").expand().select().getNode("23").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
-      assertEquals("1,073,000", tour.cell(tourBookView_Temperature_Column_Index)); //$NON-NLS-1$
+      assertEquals("1,073,000", tour.cell(tourBookView_Calories_Column_Index)); //$NON-NLS-1$
    }
 
    @Test

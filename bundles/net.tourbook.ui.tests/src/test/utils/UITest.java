@@ -23,5 +23,5 @@ public abstract class UITest {
 
    protected int             tourBookView_Distance_Column_Index      = 10;
    protected int             tourBookView_ElevationGain_Column_Index = 11;
-   protected int             tourBookView_Temperature_Column_Index   = 3;
+   protected int             tourBookView_Calories_Column_Index   = 3;
 }
