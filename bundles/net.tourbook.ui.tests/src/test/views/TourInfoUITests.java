@@ -24,7 +24,7 @@ public class TourInfoUITests extends UITest {
 
    @Test
    void testTourTagsView() {
-
+Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.TOURBOOK_VIEW_NAME);
       Utils.showTourBookView(bot);
       Utils.getTour(bot);
 
