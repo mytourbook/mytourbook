@@ -15,7 +15,11 @@
  *******************************************************************************/
 package preferences;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.junit.jupiter.api.Test;
+
 import utils.UITest;
+import utils.Utils;
 
 public class PrefPageMap3Tests extends UITest {
 
@@ -24,18 +28,18 @@ public class PrefPageMap3Tests extends UITest {
     * java.lang.UnsatisfiedLinkError: Can't load library:
     * D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\natives\windows-amd64\\gluegen_rt.dll
     */
-//   @Test
-//   void openPreferencePage() {
-//
-//      Utils.openPreferences(bot);
-//      SWTBotTreeItem threeDMapTreeItem = bot.tree().getTreeItem("3D Map").select();
-//
-//      threeDMapTreeItem = threeDMapTreeItem.expand();
-//
-//      threeDMapTreeItem.getNode("Layer").select(); //$NON-NLS-1$
-//
-//      bot.sleep(3000);
-//
-//      Utils.clickApplyAndCloseButton(bot);
-//   }
+   @Test
+   void openPreferencePage() {
+
+      Utils.openPreferences(bot);
+      SWTBotTreeItem threeDMapTreeItem = bot.tree().getTreeItem("3D Map").select();
+
+      threeDMapTreeItem = threeDMapTreeItem.expand();
+
+      threeDMapTreeItem.getNode("Layer").select(); //$NON-NLS-1$
+
+      bot.sleep(3000);
+
+      Utils.clickApplyAndCloseButton(bot);
+   }
 }
