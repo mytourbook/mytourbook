@@ -28,7 +28,7 @@ public class PrefPageAppearanceTests extends UITest {
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("Appearance").expand().getNode("Value Format").select(); //$NON-NLS-1$ //$NON-NLS-2$
 
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
+      Utils.clickApplyAndCloseButton(bot);
    }
 
    @Test
@@ -36,7 +36,8 @@ public class PrefPageAppearanceTests extends UITest {
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("Appearance").select(); //$NON-NLS-1$
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
+
+      Utils.clickApplyAndCloseButton(bot);
    }
 
    @Test
@@ -44,6 +45,7 @@ public class PrefPageAppearanceTests extends UITest {
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("Appearance").expand().getNode("Tour Chart").select(); //$NON-NLS-1$ //$NON-NLS-2$
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
+
+      Utils.clickApplyAndCloseButton(bot);
    }
 }
