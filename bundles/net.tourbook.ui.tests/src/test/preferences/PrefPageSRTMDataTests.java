@@ -50,5 +50,4 @@ public class PrefPageSRTMDataTests extends UITest {
 
       Utils.clickApplyAndCloseButton(bot);
    }
-
 }

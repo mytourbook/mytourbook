@@ -28,7 +28,6 @@ public class TourBlogViewTests extends UITest {
 
       Utils.getTour(bot);
 
-      //Open the Tour Info UI view
       bot.menu("Tour").menu("Tour Blog").click(); //$NON-NLS-1$ //$NON-NLS-2$
       final SWTBotView tourBlogView = bot.viewByTitle("Tour Blog");
 
