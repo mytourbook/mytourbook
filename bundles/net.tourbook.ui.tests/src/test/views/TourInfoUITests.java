@@ -33,7 +33,7 @@ public class TourInfoUITests extends UITest {
    static void Initialize() {
 
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.TOURBOOK_VIEW_NAME);
-      Utils.showTourBookView(bot);
+      _tourBookView = Utils.showTourBookView(bot);
    }
 
    @Test

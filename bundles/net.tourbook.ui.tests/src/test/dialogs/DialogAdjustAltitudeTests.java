@@ -37,7 +37,7 @@ public class DialogAdjustAltitudeTests extends UITest {
    static void Initialize() {
 
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.TOURBOOK_VIEW_NAME);
-      Utils.showTourBookView(bot);
+      _tourBookView = Utils.showTourBookView(bot);
    }
 
    private void adjustAltitude(final String newElevationValue, final String adjustmentMethod) {
