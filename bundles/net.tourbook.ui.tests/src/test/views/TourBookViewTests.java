@@ -34,6 +34,7 @@ import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -55,14 +56,18 @@ public class TourBookViewTests extends UITest {
       Utils.showTourBookView(bot);
    }
 
+   @BeforeEach
+   void InitializeEach() {
+
+      _tourBookView = Utils.showTourBookView(bot);
+   }
+
    /**
     * This test doesn't work because SWTBot doesn't support native dialogs
     * https://wiki.eclipse.org/SWTBot/FAQ#How_do_I_use_SWTBot_to_test_native_dialogs_.28File_Dialogs.2C_Color_Dialogs.2C_etc.29.3F
     */
 //   @Test
 //   void testExportTourBookView() {
-//
-//      Utils.showTourBookView(bot);
 //
 //      final SWTBotTreeItem tour = Utils.getTour(bot);
 //
@@ -80,8 +85,6 @@ public class TourBookViewTests extends UITest {
    @Test
    void testComputeTourDistance() {
 
-      _tourBookView = Utils.showTourBookView(bot);
-
       //Check the original distance
       SWTBotTreeItem tour = Utils.getTour(bot);
       assertEquals("0.542", tour.cell(tourBookView_Distance_Column_Index)); //$NON-NLS-1$
@@ -98,8 +101,6 @@ public class TourBookViewTests extends UITest {
    @Test
    void testDeleteTourCalories() {
 
-      _tourBookView = Utils.showTourBookView(bot);
-
       SWTBotTreeItem tour = bot.tree().getTreeItem("2014   1").expand() //$NON-NLS-1$
             .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
@@ -110,8 +111,8 @@ public class TourBookViewTests extends UITest {
       assertNotNull(tour);
       assertEquals("2", tour.cell(tourBookView_Calories_Column_Index));
 
+      //Delete the calories value
       tour.contextMenu(Messages.Dialog_DeleteTourValues_Action_OpenDialog).click();
-
       bot.checkBox(Messages.Dialog_ModifyTours_Checkbox_Calories).click();
       bot.button(Messages.Dialog_DeleteTourValues_Button_Delete).click();
       Utils.clickOkButton(bot);
@@ -130,8 +131,6 @@ public class TourBookViewTests extends UITest {
 
    @Test
    void testDuplicateAndDeleteTour() {
-
-      _tourBookView = Utils.showTourBookView(bot);
 
       bot.viewByTitle("Tour Book").show(); //$NON-NLS-1$
 
@@ -172,8 +171,6 @@ public class TourBookViewTests extends UITest {
    @Test
    void testMultiplyTourCalories() {
 
-      _tourBookView = Utils.showTourBookView(bot);
-
       //Select a tour that contains a calories value
       SWTBotTreeItem tour = bot.tree().getTreeItem("2020   3").expand() //$NON-NLS-1$
             .getNode("May   2").expand().select().getNode("23").select(); //$NON-NLS-1$ //$NON-NLS-2$
@@ -196,8 +193,6 @@ public class TourBookViewTests extends UITest {
    @Test
    void testNatTable() {
 
-      _tourBookView = Utils.showTourBookView(bot);
-
       //Activating the NatTable
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
@@ -218,7 +213,6 @@ public class TourBookViewTests extends UITest {
    @Test
    void testRetrieveWeatherData() {
 
-      _tourBookView = Utils.showTourBookView(bot);
       final SWTBotTreeItem tour = Utils.getTour(bot);
 
       tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
@@ -233,7 +227,6 @@ public class TourBookViewTests extends UITest {
    @Test
    void testSetElevationValuesFromSRTM() {
 
-      _tourBookView = Utils.showTourBookView(bot);
       SWTBotTreeItem tour = Utils.getTourWithSRTM(bot);
 
       //Check the original elevation value
