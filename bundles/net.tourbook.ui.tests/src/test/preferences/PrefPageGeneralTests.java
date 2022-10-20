@@ -15,6 +15,8 @@
  *******************************************************************************/
 package preferences;
 
+import net.tourbook.Messages;
+
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -27,8 +29,12 @@ public class PrefPageGeneralTests extends UITest {
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("General").expand().getNode("Computed Values").select();
-      bot.cTabItem("Smoothing").activate();
-      bot.cTabItem("Break Time").activate();
+      bot.cTabItem(Messages.Compute_Values_Group_Smoothing).activate();
+      bot.cTabItem(Messages.Compute_BreakTime_Group_BreakTime).activate();
+      bot.cTabItem(Messages.Pref_Appearance_Group_PaceAndSpeedDisplay).activate();
+      bot.cTabItem(Messages.compute_tourValueElevation_group_computeTourAltitude).activate();
+      bot.cTabItem(Messages.Compute_CadenceZonesTimes_Group).activate();
+      bot.cTabItem(Messages.Compute_HrZone_Group).activate();
 
       Utils.clickApplyAndCloseButton(bot);
    }
