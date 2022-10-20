@@ -15,12 +15,26 @@
  *******************************************************************************/
 package preferences;
 
+import net.tourbook.srtm.Messages;
+
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
 public class PrefPageSRTMDataTests extends UITest {
+
+   @Test
+   void editSRTMProfile() {
+
+      Utils.openPreferences(bot);
+      bot.tree().getTreeItem("SRTM").select(); //$NON-NLS-1$
+
+      bot.button(Messages.prefPage_srtm_profile_edit).click();
+      Utils.clickCancelButton(bot);
+
+      Utils.clickApplyAndCloseButton(bot);
+   }
 
    @Test
    void validateSRTMConnection() {
@@ -36,4 +50,5 @@ public class PrefPageSRTMDataTests extends UITest {
 
       Utils.clickApplyAndCloseButton(bot);
    }
+
 }

@@ -47,6 +47,10 @@ public class Utils {
       return bot.button(mnemonicText).click();
    }
 
+   public static void clickCancelButton(final SWTWorkbenchBot bot) {
+
+      clickButton(IDialogConstants.CANCEL_LABEL, bot);
+   }
    public static void clickCloseButton(final SWTWorkbenchBot bot) {
 
       clickButton(IDialogConstants.CLOSE_LABEL, bot);
