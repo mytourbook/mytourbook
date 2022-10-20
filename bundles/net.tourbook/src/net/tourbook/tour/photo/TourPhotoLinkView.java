@@ -62,6 +62,7 @@ import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.State;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
@@ -74,11 +75,14 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -312,7 +316,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
-   private class TableContextMenuProvider implements IContextMenuProvider {
+   public class TableContextMenuProvider implements IContextMenuProvider {
 
       @Override
       public void disposeContextMenu() {
@@ -339,7 +343,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    }
 
-   static enum TimeAdjustmentType {
+   public static enum TimeAdjustmentType {
 
       NO_AJUSTMENT, //
       SAVED_AJUSTMENT, //
@@ -601,37 +605,42 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
    private void addPrefListener() {
 
-      _prefChangeListener = propertyChangeEvent -> {
+      _prefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-         final String property = propertyChangeEvent.getProperty();
+            final String property = event.getProperty();
 
-         if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
+            if (property.equals(ITourbookPreferences.APP_DATA_FILTER_IS_MODIFIED)) {
 
-            // app filter is modified
+               // app filter is modified
 
-            // sql filter is dirty, force reloading cached start/end
-            _photoMgr.resetTourStartEnd();
+               // sql filter is dirty, force reloading cached start/end
+               _photoMgr.resetTourStartEnd();
 
-            updateUI();
+               updateUI();
 
-         } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+            } else if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-            _tourViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+               _tourViewer.getTable().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-            _tourViewer.refresh();
+               _tourViewer.refresh();
 
-            /*
-             * the tree must be redrawn because the styled text does not show with the new color
-             */
-            _tourViewer.getTable().redraw();
+               /*
+                * the tree must be redrawn because the styled text does not show with the new color
+                */
+               _tourViewer.getTable().redraw();
+            }
          }
       };
 
-      _prefChangeListener_Common = propertyChangeEvent -> {
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-         final String property = propertyChangeEvent.getProperty();
+            final String property = event.getProperty();
 
-         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
 //					// measurement system has changed
 //
@@ -643,6 +652,7 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 //					defineAllColumns(_viewerContainer);
 //
 //					_tourViewer = (TableViewer) recreateViewer(_tourViewer);
+            }
          }
       };
 
@@ -655,35 +665,41 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = (workbenchPart, selection) -> {
-         if (workbenchPart == TourPhotoLinkView.this) {
-            return;
+      _postSelectionListener = new ISelectionListener() {
+         @Override
+         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+            if (part == TourPhotoLinkView.this) {
+               return;
+            }
+            onSelectionChanged(selection, part);
          }
-         onSelectionChanged(selection, workbenchPart);
       };
       getViewSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = (workbenchPart, tourEventId, eventData) -> {
+      _tourEventListener = new ITourEventListener() {
+         @Override
+         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-         if (workbenchPart == TourPhotoLinkView.this) {
-            return;
-         }
-
-         if (tourEventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
-
-            // get modified tours
-            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-            if (modifiedTours != null) {
-
-               onTourChanged(modifiedTours);
+            if (part == TourPhotoLinkView.this) {
+               return;
             }
 
-         } else if (tourEventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+            if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-            clearView();
+               // get modified tours
+               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               if (modifiedTours != null) {
+
+                  onTourChanged(modifiedTours);
+               }
+
+            } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+               clearView();
+            }
          }
       };
 
@@ -722,7 +738,12 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
 
       _viewerMenuManager = new MenuManager();
       _viewerMenuManager.setRemoveAllWhenShown(true);
-      _viewerMenuManager.addMenuListener(this::fillContextMenu);
+      _viewerMenuManager.addMenuListener(new IMenuListener() {
+         @Override
+         public void menuAboutToShow(final IMenuManager menuManager) {
+            fillContextMenu(menuManager);
+         }
+      });
    }
 
    @Override
@@ -908,11 +929,13 @@ public class TourPhotoLinkView extends ViewPart implements ITourProvider, ITourV
       _tourViewer.setContentProvider(new ContentProvider());
       _tourViewer.setComparator(new ContentComparator());
 
-      _tourViewer.addSelectionChangedListener(selectionChangedEvent -> {
-
-         final ISelection eventSelection = selectionChangedEvent.getSelection();
-         if (eventSelection instanceof StructuredSelection) {
-            onSelectTourLink(((StructuredSelection) eventSelection).toArray());
+      _tourViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+         @Override
+         public void selectionChanged(final SelectionChangedEvent event) {
+            final ISelection eventSelection = event.getSelection();
+            if (eventSelection instanceof StructuredSelection) {
+               onSelectTourLink(((StructuredSelection) eventSelection).toArray());
+            }
          }
       });
 
