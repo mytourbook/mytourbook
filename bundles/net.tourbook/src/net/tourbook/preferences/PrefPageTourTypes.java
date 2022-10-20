@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -210,7 +210,7 @@ public class PrefPageTourTypes extends PreferencePage implements IWorkbenchPrefe
       }
    }
 
-   private class TourTypeComparer implements IElementComparer {
+   public class TourTypeComparer implements IElementComparer {
 
       @Override
       public boolean equals(final Object a, final Object b) {
