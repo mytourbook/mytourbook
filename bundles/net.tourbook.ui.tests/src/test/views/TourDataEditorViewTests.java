@@ -28,26 +28,12 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotCombo;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotDateTime;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
 public class TourDataEditorViewTests extends UITest {
-
-   @AfterAll
-   static void cleanUp() {
-      _tourBookView.close();
-   }
-
-   @BeforeAll
-   static void Initialize() {
-
-      Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.TOURBOOK_VIEW_NAME);
-      _tourBookView = Utils.showTourBookView(bot);
-   }
 
    @Test
    void testNewTour() {

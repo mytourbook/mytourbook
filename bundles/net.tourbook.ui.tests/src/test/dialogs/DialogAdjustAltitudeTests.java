@@ -20,25 +20,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import net.tourbook.Messages;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
 public class DialogAdjustAltitudeTests extends UITest {
-   @AfterAll
-   static void cleanUp() {
-      _tourBookView.close();
-   }
-
-   @BeforeAll
-   static void Initialize() {
-
-      Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.TOURBOOK_VIEW_NAME);
-      _tourBookView = Utils.showTourBookView(bot);
-   }
 
    private void adjustAltitude(final String newElevationValue, final String adjustmentMethod) {
 

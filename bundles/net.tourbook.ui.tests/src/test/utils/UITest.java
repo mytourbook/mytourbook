@@ -17,13 +17,27 @@ package utils;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 
 public abstract class UITest {
 
    protected static SWTWorkbenchBot bot                                     = new SWTWorkbenchBot();
-   protected static SWTBotView      _tourBookView;
+   protected static SWTBotView      tourBookView;
 
    protected int                    tourBookView_Distance_Column_Index      = 10;
    protected int                    tourBookView_ElevationGain_Column_Index = 11;
    protected int                    tourBookView_Calories_Column_Index      = 3;
+
+   @AfterAll
+   static void cleanUp() {
+      tourBookView.close();
+   }
+
+   @BeforeAll
+   static void Initialize() {
+
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.TOURBOOK_VIEW_NAME);
+      tourBookView = Utils.showTourBookView(bot);
+   }
 }

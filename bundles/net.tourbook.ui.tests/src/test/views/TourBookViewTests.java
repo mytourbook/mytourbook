@@ -31,8 +31,6 @@ import net.tourbook.tour.TourLogManager;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -41,22 +39,10 @@ import utils.Utils;
 
 public class TourBookViewTests extends UITest {
 
-   @AfterAll
-   static void cleanUp() {
-      _tourBookView.close();
-   }
-
-   @BeforeAll
-   static void Initialize() {
-
-      Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.TOURBOOK_VIEW_NAME);
-      _tourBookView = Utils.showTourBookView(bot);
-   }
-
    @BeforeEach
    void InitializeEach() {
 
-      _tourBookView = Utils.showTourBookView(bot);
+      tourBookView = Utils.showTourBookView(bot);
    }
 
    /**
@@ -111,7 +97,7 @@ public class TourBookViewTests extends UITest {
       bot.sleep(1000);
 
       //Setting the focus again on the Tourbook view
-      _tourBookView = Utils.showTourBookView(bot);
+      tourBookView = Utils.showTourBookView(bot);
 
       //Check that the calories were deleted
       tour = Utils.getTourWithSRTM(bot);
@@ -187,7 +173,7 @@ public class TourBookViewTests extends UITest {
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
 
       final SWTBotNatTable botNatTable = new SWTBotNatTable(
-            _tourBookView.bot().widget(widgetOfType(NatTable.class)));
+            tourBookView.bot().widget(widgetOfType(NatTable.class)));
       assertEquals(9, botNatTable.rowCount());
 
       botNatTable.click(1, 0);

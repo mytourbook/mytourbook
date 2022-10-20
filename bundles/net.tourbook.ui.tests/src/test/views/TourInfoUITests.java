@@ -15,26 +15,12 @@
  *******************************************************************************/
 package views;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
 public class TourInfoUITests extends UITest {
-
-   @AfterAll
-   static void cleanUp() {
-      _tourBookView.close();
-   }
-
-   @BeforeAll
-   static void Initialize() {
-
-      Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.TOURBOOK_VIEW_NAME);
-      _tourBookView = Utils.showTourBookView(bot);
-   }
 
    @Test
    void testTourInfoView() {
