@@ -65,7 +65,7 @@ public class MapPlayerView extends ViewPart {
    private static final ImageDescriptor _imageDescriptor_Play              = CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Play);
    private static final ImageDescriptor _imageDescriptor_Play_Disabled     = CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Play_Disabled);
 
-// SET_FORMATTING_ON
+   // SET_FORMATTING_ON
    //
    private IPartListener2 _partListener;
    //
@@ -77,7 +77,9 @@ public class MapPlayerView extends ViewPart {
    //
    private float          _currentTime;
    private float          _endTime;
-
+   //
+   private static int[]   _updateCounter = new int[1];
+   //
    /*
     * UI controls
     */
@@ -520,27 +522,42 @@ public class MapPlayerView extends ViewPart {
 
       final int currentTimeInUI = (int) currentTime;
 
+      _updateCounter[0]++;
+
       // update in UI thread
-      _parent.getDisplay().asyncExec(() -> {
+      _parent.getDisplay().asyncExec(new Runnable() {
 
-         if (_parent.isDisposed()) {
-            return;
-         }
+         final int __runnableCounter = _updateCounter[0];
 
-         _scaleTimeline.setSelection(currentFrameNumber);
+         @Override
+         public void run() {
 
-         // this is a very expensive operation: 28 ms for each frame !!!
-//       _scaleTimeline.setToolTipText(Integer.toString(currentFrameNumber));
+            // skip all updates which has not yet been executed
+            if (__runnableCounter != _updateCounter[0]) {
 
-         updateCurrentTime(currentTimeInUI);
+               // a new update occurred
+               return;
+            }
 
-         // stop playing when end of animation is reached
-         final boolean isLastFrame = currentFrameNumber == numAllFrames;
-         if (isLastFrame && MapPlayerManager.isPlayingLoop() == false) {
+            if (_parent.isDisposed()) {
+               return;
+            }
 
-            MapPlayerManager.setIsPlayerRunning(false);
+            _scaleTimeline.setSelection(currentFrameNumber);
 
-            updateUI_PlayAndPaused();
+            // this is a very expensive operation: 28 ms for each frame !!!
+//          _scaleTimeline.setToolTipText(Integer.toString(currentFrameNumber));
+
+            updateCurrentTime(currentTimeInUI);
+
+            // stop playing when end of animation is reached
+            final boolean isLastFrame = currentFrameNumber == numAllFrames;
+            if (isLastFrame && MapPlayerManager.isPlayingLoop() == false) {
+
+               MapPlayerManager.setIsPlayerRunning(false);
+
+               updateUI_PlayAndPaused();
+            }
          }
       });
    }
