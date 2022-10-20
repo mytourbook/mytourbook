@@ -36,6 +36,7 @@ public class ActionExtractTour extends Action {
 
    /**
     * @param tourDataEditor
+    * @param tourProvider
     */
    public ActionExtractTour(final TourDataEditorView tourDataEditor) {
 
