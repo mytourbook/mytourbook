@@ -12,8 +12,7 @@ Require-Bundle: net.tourbook,
  org.eclipse.swtbot.go,
  net.tourbook.statistics,
  org.eclipse.swtbot.nebula.nattable.finder,
- net.tourbook.cloud,
- net.tourbook.ext.worldwind
+ net.tourbook.cloud
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Vendor: MyTourbook
