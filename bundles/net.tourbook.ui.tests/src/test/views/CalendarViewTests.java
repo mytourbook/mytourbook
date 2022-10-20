@@ -23,7 +23,7 @@ import utils.Utils;
 public class CalendarViewTests extends UITest {
 
    @Test
-   void testCalendarView() {
+   void openCalendarView() {
 
       bot.toolbarButtonWithTooltip("Calendar (Ctrl+Shift+C)").click(); //$NON-NLS-1$
       Utils.showView(bot, "Calendar").bot(); //$NON-NLS-1$
