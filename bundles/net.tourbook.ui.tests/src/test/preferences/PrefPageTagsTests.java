@@ -26,7 +26,7 @@ public class PrefPageTagsTests extends UITest {
    void openPreferencePage() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("Taggin").select();
+      bot.tree().getTreeItem("Tagging").select();
 
       Utils.clickApplyAndCloseButton(bot);
    }
