@@ -15,6 +15,7 @@
  *******************************************************************************/
 package preferences;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -25,28 +26,18 @@ public class PrefPageAppearanceTests extends UITest {
    private static final String APPEARANCE = "Appearance"; //$NON-NLS-1$
 
    @Test
-   void openAppearancePage() {
+   void openAppearancePages() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem(APPEARANCE).select();
+      SWTBotTreeItem appearanceTreeItem = bot.tree().getTreeItem(APPEARANCE).select();
 
-      Utils.clickApplyAndCloseButton(bot);
-   }
+      appearanceTreeItem = appearanceTreeItem.expand();
 
-   @Test
-   void openTourChartPage() {
-
-      Utils.openPreferences(bot);
-      bot.tree().getTreeItem(APPEARANCE).expand().getNode("Tour Chart").select(); //$NON-NLS-1$
-
-      Utils.clickApplyAndCloseButton(bot);
-   }
-
-   @Test
-   void openValueFormatPage() {
-
-      Utils.openPreferences(bot);
-      bot.tree().getTreeItem(APPEARANCE).expand().getNode("Value Format").select(); //$NON-NLS-1$
+      appearanceTreeItem.getNode("Colors").select(); //$NON-NLS-1$
+      appearanceTreeItem.getNode("Swimming").select(); //$NON-NLS-1$
+      appearanceTreeItem.getNode("Tour Chart").select(); //$NON-NLS-1$
+      appearanceTreeItem.getNode("Transform Values").select(); //$NON-NLS-1$
+      appearanceTreeItem.getNode("Value Format").select(); //$NON-NLS-1$
 
       Utils.clickApplyAndCloseButton(bot);
    }
