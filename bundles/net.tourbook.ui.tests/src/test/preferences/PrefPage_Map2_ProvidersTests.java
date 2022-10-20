@@ -22,6 +22,22 @@ import utils.Utils;
 
 public class PrefPage_Map2_ProvidersTests extends UITest {
 
+//   @Test
+//   void createProfile() {
+//
+//      Utils.openPreferences(bot);
+//
+//      bot.tree().getTreeItem("2D Map").expand().getNode("Map Provider").select();
+//      bot.button("New Profile").click();
+//      bot.textWithLabel(Messages.Pref_Map_Label_MapProvider).setText("Profile1");
+//      bot.button("Update").click();
+//      bot.button("Edit").click();
+//      bot.tree().getTreeItem("OpenStreetMap").select();
+//      bot.button("Cancel").click();
+//      bot.button("Apply and Close").click();
+//
+//   }
+
    @Test
    void openPreferencePage() {
 
