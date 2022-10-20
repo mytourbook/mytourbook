@@ -103,7 +103,7 @@ public class TourBookViewTests extends UITest {
 
       //Check the initial calories value
       SWTBotTreeItem tour = Utils.getTourWithSRTM(bot);
-      assertEquals("2", tour.cell(tourBookView_Calories_Column_Index));
+      assertEquals("2", tour.cell(tourBookView_Calories_Column_Index)); //$NON-NLS-1$
 
       //Delete the calories value
       tour.contextMenu(Messages.Dialog_DeleteTourValues_Action_OpenDialog).click();
