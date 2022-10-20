@@ -101,12 +101,8 @@ public class TourBookViewTests extends UITest {
    @Test
    void testDeleteTourCalories() {
 
-      SWTBotTreeItem tour = bot.tree().getTreeItem("2014   1").expand() //$NON-NLS-1$
-            .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
-      assertNotNull(tour);
-
       //Check the initial calories value
-      tour = Utils.getTourWithSRTM(bot);
+      SWTBotTreeItem tour = Utils.getTourWithSRTM(bot);
       assertEquals("2", tour.cell(tourBookView_Calories_Column_Index));
 
       //Delete the calories value
