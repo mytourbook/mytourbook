@@ -15,6 +15,8 @@
  *******************************************************************************/
 package preferences;
 
+import de.byteholder.geoclipse.preferences.Messages;
+
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -22,21 +24,21 @@ import utils.Utils;
 
 public class PrefPage_Map2_ProvidersTests extends UITest {
 
-//   @Test
-//   void createProfile() {
-//
-//      Utils.openPreferences(bot);
-//
-//      bot.tree().getTreeItem("2D Map").expand().getNode("Map Provider").select();
-//      bot.button("New Profile").click();
-//      bot.textWithLabel(Messages.Pref_Map_Label_MapProvider).setText("Profile1");
-//      bot.button("Update").click();
-//      bot.button("Edit").click();
-//      bot.tree().getTreeItem("OpenStreetMap").select();
-//      bot.button("Cancel").click();
-//      bot.button("Apply and Close").click();
-//
-//   }
+   @Test
+   void createProfile() {
+
+      Utils.openPreferences(bot);
+
+      bot.tree().getTreeItem("2D Map").expand().getNode("Map Provider").select();
+      bot.button("New Profile").click();
+      bot.textWithLabel(Messages.Pref_Map_Label_MapProvider).setText("Profile1");
+      bot.button(Messages.Pref_Map_Button_UpdateMapProvider).click();
+      bot.button(Messages.Pref_Map_Button_Edit).click();
+      bot.tree().getTreeItem("OpenStreetMap").select();
+      bot.button("Cancel").click();
+
+      Utils.clickApplyAndCloseButton(bot);
+   }
 
    @Test
    void openPreferencePage() {
