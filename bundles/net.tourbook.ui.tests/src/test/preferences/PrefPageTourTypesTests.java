@@ -26,7 +26,7 @@ public class PrefPageTourTypesTests extends UITest {
    void openPreferencePage() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("Tour Type Filter").getNode("Color").select();
+      bot.tree().getTreeItem("Tour Type Filter").expand().getNode("Color").select();
 
       Utils.clickApplyAndCloseButton(bot);
    }
