@@ -26,7 +26,9 @@ public class PrefPageGeneralTests extends UITest {
    void openComputedValuesPage() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("General").getNode("Computed Values").select();
+      bot.tree().getTreeItem("General").expand().getNode("Computed Values").select();
+      bot.cTabItem("Smoothing").activate();
+      bot.cTabItem("Break Time").activate();
 
       Utils.clickApplyAndCloseButton(bot);
    }
