@@ -16,12 +16,14 @@
 package utils;
 
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 
 public abstract class UITest {
 
    protected static SWTWorkbenchBot bot                                     = new SWTWorkbenchBot();
+   protected static SWTBotView      _tourBookView;
 
-   protected int             tourBookView_Distance_Column_Index      = 10;
-   protected int             tourBookView_ElevationGain_Column_Index = 11;
-   protected int             tourBookView_Calories_Column_Index   = 3;
+   protected int                    tourBookView_Distance_Column_Index      = 10;
+   protected int                    tourBookView_ElevationGain_Column_Index = 11;
+   protected int                    tourBookView_Calories_Column_Index      = 3;
 }

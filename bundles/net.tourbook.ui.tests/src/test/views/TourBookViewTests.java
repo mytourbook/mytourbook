@@ -29,7 +29,6 @@ import net.tourbook.Messages;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.AfterAll;
@@ -41,8 +40,6 @@ import utils.UITest;
 import utils.Utils;
 
 public class TourBookViewTests extends UITest {
-
-   private static SWTBotView _tourBookView;
 
    @AfterAll
    static void cleanUp() {
