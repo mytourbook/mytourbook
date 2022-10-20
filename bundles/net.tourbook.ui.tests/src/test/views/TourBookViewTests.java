@@ -107,8 +107,6 @@ public class TourBookViewTests extends UITest {
    @Test
    void testDuplicateAndDeleteTour() {
 
-      bot.viewByTitle("Tour Book").show(); //$NON-NLS-1$
-
       // Get a tour that can be duplicated
       SWTBotTreeItem tour = bot.tree().getTreeItem("2014   1").expand() //$NON-NLS-1$
             .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
