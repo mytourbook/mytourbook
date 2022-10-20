@@ -106,9 +106,7 @@ public class TourBookViewTests extends UITest {
       assertNotNull(tour);
 
       //Check the initial calories value
-      tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
-            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
-      assertNotNull(tour);
+      tour = Utils.getTourWithSRTM(bot);
       assertEquals("2", tour.cell(tourBookView_Calories_Column_Index));
 
       //Delete the calories value
@@ -123,9 +121,7 @@ public class TourBookViewTests extends UITest {
       _tourBookView = Utils.showTourBookView(bot);
 
       //Check that the calories were deleted
-      tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
-            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
-      assertNotNull(tour);
+      tour = Utils.getTourWithSRTM(bot);
       assertEquals(UI.EMPTY_STRING, tour.cell(tourBookView_Calories_Column_Index));
    }
 
