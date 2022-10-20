@@ -190,6 +190,9 @@ public class MapPlayerManager {
       return _isAnimationVisible;
    }
 
+   /**
+    * @return Returns <code>true</code> when the last frame in the animation is reached
+    */
    public static boolean isLastFrame() {
 
       return _currentFrameNumber == _numAllFrames;
