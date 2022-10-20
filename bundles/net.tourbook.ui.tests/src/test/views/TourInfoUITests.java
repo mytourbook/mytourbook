@@ -23,7 +23,7 @@ import utils.Utils;
 public class TourInfoUITests extends UITest {
 
    @Test
-   void testTourInfoView() {
+   void openTourInfoView() {
 
       Utils.getTour(bot);
 
