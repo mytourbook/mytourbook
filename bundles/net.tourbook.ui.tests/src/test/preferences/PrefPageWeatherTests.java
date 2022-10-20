@@ -49,7 +49,7 @@ public class PrefPageWeatherTests extends UITest {
    @Test
    void testVendorConnections() {
 
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
+      Utils.openPreferences(bot);
       bot.tree().getTreeItem("Weather").select(); //$NON-NLS-1$
 
       bot.comboBox().setSelection(0);

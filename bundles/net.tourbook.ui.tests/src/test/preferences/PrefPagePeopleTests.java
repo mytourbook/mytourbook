@@ -27,7 +27,7 @@ public class PrefPagePeopleTests extends UITest {
    @Test
    void testPeopleBmi() {
 
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
+      Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
 
       //70kg

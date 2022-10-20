@@ -88,6 +88,11 @@ public class Utils {
       assertNotNull(otherMenu);
    }
 
+   public static void openPreferences(final SWTWorkbenchBot bot) {
+
+      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click();
+   }
+
    public static SWTBotView showTourBookView(final SWTWorkbenchBot bot) {
 
       return showView(bot, TOURBOOK_VIEW_NAME);

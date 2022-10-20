@@ -18,13 +18,14 @@ package preferences;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
+import utils.Utils;
 
 public class PrefPageAppearanceTests extends UITest {
 
    @Test
    void openPreferencePage() {
 
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
+      Utils.openPreferences(bot);
       bot.tree().getTreeItem("Appearance").expand().getNode("Value Format").select(); //$NON-NLS-1$ //$NON-NLS-2$
 
       bot.button("Apply and Close").click(); //$NON-NLS-1$
@@ -33,7 +34,7 @@ public class PrefPageAppearanceTests extends UITest {
    @Test
    void testAppearance() {
 
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
+      Utils.openPreferences(bot);
       bot.tree().getTreeItem("Appearance").select(); //$NON-NLS-1$
       bot.button("Apply and Close").click(); //$NON-NLS-1$
    }
@@ -41,7 +42,7 @@ public class PrefPageAppearanceTests extends UITest {
    @Test
    void testTourChart() {
 
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
+      Utils.openPreferences(bot);
       bot.tree().getTreeItem("Appearance").expand().getNode("Tour Chart").select(); //$NON-NLS-1$ //$NON-NLS-2$
       bot.button("Apply and Close").click(); //$NON-NLS-1$
    }

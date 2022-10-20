@@ -25,7 +25,7 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
    @Test
    void openPreferencePage() {
 
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
+      Utils.openPreferences(bot);
       bot.tree().getTreeItem("2D Map").expand().getNode("Map Provider").select(); //$NON-NLS-1$
 
       Utils.clickApplyAndCloseButton(bot);

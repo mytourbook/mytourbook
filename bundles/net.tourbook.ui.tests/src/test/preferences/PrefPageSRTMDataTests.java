@@ -25,7 +25,7 @@ public class PrefPageSRTMDataTests extends UITest {
    @Test
    void validateSRTMConnection() {
 
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
+      Utils.openPreferences(bot);
       bot.tree().getTreeItem("SRTM").expand().getNode("Data").select(); //$NON-NLS-1$
 
       bot.button("Validate SRTM Connection").click();

@@ -25,7 +25,7 @@ public class PrefPageSuuntoTests extends UITest {
    @Test
    void openPreferencePage() {
 
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
+      Utils.openPreferences(bot);
       bot.tree().getTreeItem("Cloud").expand().getNode("Suunto").select(); //$NON-NLS-1$ //$NON-NLS-2$
 
       Utils.clickApplyAndCloseButton(bot);

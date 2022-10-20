@@ -20,12 +20,12 @@ import org.junit.jupiter.api.Test;
 import utils.UITest;
 import utils.Utils;
 
-public class PrefPageComputedValuesTests extends UITest {
+public class PrefPageGeneralTests extends UITest {
 
    @Test
-   void openPreferencePage() {
+   void openComputedValuesPage() {
 
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click();
+      Utils.openPreferences(bot);
       bot.tree().getTreeItem("General").getNode("Computed Values").select();
 
       Utils.clickApplyAndCloseButton(bot);
