@@ -33,6 +33,8 @@ public class PrefPageMap3Tests extends UITest {
 
       threeDMapTreeItem.getNode("Layer").select(); //$NON-NLS-1$
 
+      bot.sleep(3000);
+
       Utils.clickApplyAndCloseButton(bot);
    }
 }
