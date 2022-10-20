@@ -66,7 +66,7 @@ public class PrefPageWeatherTests extends UITest {
       //Restore the selection of OpenWeatherMap as the default weather vendor
       bot.comboBox().setSelection(1);
 
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
+      Utils.clickApplyAndCloseButton(bot);
    }
 
    private void testWorldWeatherOnlineConnection() {

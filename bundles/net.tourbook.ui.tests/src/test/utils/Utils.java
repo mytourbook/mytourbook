@@ -37,6 +37,11 @@ public class Utils {
 
    public static final String workingDirectory        = System.getProperty("user.dir"); //$NON-NLS-1$
 
+   public static void clickApplyAndCloseButton(final SWTWorkbenchBot bot) {
+
+      clickButton("Apply and Close", bot);
+   }
+
    private static SWTBotButton clickButton(final String mnemonicText, final SWTWorkbenchBot bot) {
 
       return bot.button(mnemonicText).click();

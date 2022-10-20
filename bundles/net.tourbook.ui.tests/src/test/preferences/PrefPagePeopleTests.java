@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
+import utils.Utils;
 
 public class PrefPagePeopleTests extends UITest {
 
@@ -40,6 +41,6 @@ public class PrefPagePeopleTests extends UITest {
 //      bot.cTabItem(Messages.Pref_People_Tab_HRZone).activate();
 //      bot.cTabItem(Messages.Pref_People_Tab_DataTransfer).activate();
 
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
+      Utils.clickApplyAndCloseButton(bot);
    }
 }

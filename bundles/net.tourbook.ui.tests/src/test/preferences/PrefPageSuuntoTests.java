@@ -18,6 +18,7 @@ package preferences;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
+import utils.Utils;
 
 public class PrefPageSuuntoTests extends UITest {
 
@@ -27,6 +28,6 @@ public class PrefPageSuuntoTests extends UITest {
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
       bot.tree().getTreeItem("Cloud").expand().getNode("Suunto").select(); //$NON-NLS-1$ //$NON-NLS-2$
 
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
+      Utils.clickApplyAndCloseButton(bot);
    }
 }

@@ -34,6 +34,6 @@ public class PrefPageSRTMDataTests extends UITest {
 
       bot.button("Dummy Validation").click();
 
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
+      Utils.clickApplyAndCloseButton(bot);
    }
 }

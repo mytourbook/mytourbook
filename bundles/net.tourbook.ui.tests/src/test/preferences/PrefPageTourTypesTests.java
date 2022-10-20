@@ -18,6 +18,7 @@ package preferences;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
+import utils.Utils;
 
 public class PrefPageTourTypesTests extends UITest {
 
@@ -27,6 +28,6 @@ public class PrefPageTourTypesTests extends UITest {
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
       bot.tree().getTreeItem("Tour Type Filter").getNode("Color").select();
 
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
+      Utils.clickApplyAndCloseButton(bot);
    }
 }

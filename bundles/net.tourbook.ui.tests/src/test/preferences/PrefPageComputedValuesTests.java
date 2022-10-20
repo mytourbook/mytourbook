@@ -18,6 +18,7 @@ package preferences;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
+import utils.Utils;
 
 public class PrefPageComputedValuesTests extends UITest {
 
@@ -27,6 +28,6 @@ public class PrefPageComputedValuesTests extends UITest {
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click();
       bot.tree().getTreeItem("General").getNode("Computed Values").select();
 
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
+      Utils.clickApplyAndCloseButton(bot);
    }
 }
