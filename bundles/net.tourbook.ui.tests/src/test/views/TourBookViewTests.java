@@ -99,7 +99,7 @@ public class TourBookViewTests extends UITest {
    void testDeleteTourCalories() {
 
       _tourBookView = Utils.showTourBookView(bot);
-      bot.viewByTitle("Tour Book").show(); //$NON-NLS-1$
+
       SWTBotTreeItem tour = bot.tree().getTreeItem("2014   1").expand() //$NON-NLS-1$
             .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
@@ -112,13 +112,15 @@ public class TourBookViewTests extends UITest {
 
       tour.contextMenu(Messages.Dialog_DeleteTourValues_Action_OpenDialog).click();
 
-      bot.checkBox("Ca&lories").click();
-      bot.button("Delete").click();
-      bot.button("OK").click();
+      bot.checkBox(Messages.Dialog_ModifyTours_Checkbox_Calories).click();
+      bot.button(Messages.Dialog_DeleteTourValues_Button_Delete).click();
+      Utils.clickOkButton(bot);
 
       bot.sleep(1000);
 
+      //Setting the focus again on the Tourbook view
       _tourBookView = Utils.showTourBookView(bot);
+
       //Check that the calories were deleted
       tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
             .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
