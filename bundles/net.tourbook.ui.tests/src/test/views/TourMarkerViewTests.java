@@ -24,12 +24,25 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCTabItem;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
 public class TourMarkerViewTests extends UITest {
+   @AfterAll
+   static void cleanUp() {
+      _tourBookView.close();
+   }
+
+   @BeforeAll
+   static void Initialize() {
+
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, Utils.TOURBOOK_VIEW_NAME);
+      Utils.showTourBookView(bot);
+   }
 
    @Test
    void testAddAndDeleteTourMarker() {
