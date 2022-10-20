@@ -110,13 +110,13 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
    private static final int    MAP_MAX_ZOOM_LEVEL                     = Map2.UI_MAX_ZOOM_LEVEL - Map2.UI_MIN_ZOOM_LEVEL;
 
-   public static final String  DEFAULT_URL                            = "http://";                                      //$NON-NLS-1$
+   public static final String  DEFAULT_URL                            = "http://";                                    //$NON-NLS-1$
 
-   private static final String DIALOG_SETTINGS_VIEWER_WIDTH           = "ViewerWidth";                                  //$NON-NLS-1$
-   private static final String DIALOG_SETTINGS_IS_SHOW_TILE_INFO      = "IsShowTileInfo";                               //$NON-NLS-1$
-   private static final String DIALOG_SETTINGS_IS_LIVE_VIEW           = "IsLiveView";                                   //$NON-NLS-1$
-   private static final String DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG = "IsShowTileImageLogging";                       //$NON-NLS-1$
-   private static final String DIALOG_SETTINGS_IS_PROPERTIES_EXPANDED = "IsPropertiesExpanded";                         //$NON-NLS-1$
+   private static final String DIALOG_SETTINGS_VIEWER_WIDTH           = "ViewerWidth";                                //$NON-NLS-1$
+   private static final String DIALOG_SETTINGS_IS_SHOW_TILE_INFO      = "IsShowTileInfo";                             //$NON-NLS-1$
+   private static final String DIALOG_SETTINGS_IS_LIVE_VIEW           = "IsLiveView";                                 //$NON-NLS-1$
+   private static final String DIALOG_SETTINGS_IS_SHOW_TILE_IMAGE_LOG = "IsShowTileImageLogging";                     //$NON-NLS-1$
+   private static final String DIALOG_SETTINGS_IS_PROPERTIES_EXPANDED = "IsPropertiesExpanded";                       //$NON-NLS-1$
 
    /*
     * UI controls
@@ -1418,9 +1418,9 @@ public class DialogMPProfile extends DialogMP implements ITileListener, IMapDefa
 
          double lon = mousePosition.longitude % 360;
          lon = lon > 180 ? //
-               lon - 360
+         lon - 360
                : lon < -180 ? //
-                     lon + 360
+         lon + 360
                      : lon;
 
          _lblMapInfo.setText(NLS.bind(

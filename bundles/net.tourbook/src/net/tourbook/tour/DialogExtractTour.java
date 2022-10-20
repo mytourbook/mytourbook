@@ -277,9 +277,9 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
           * this is not working, the shell is flickering when the shell size is below min
           * size and I found no way to prevent a resize :-(
           */
-//          if (shellSize.x < _shellDefaultSize.x) {
-//             event.doit = false;
-//          }
+//				if (shellSize.x < _shellDefaultSize.x) {
+//					event.doit = false;
+//				}
 
          shellSize.x = shellSize.x < _shellDefaultSize.x ? _shellDefaultSize.x : shellSize.x;
          shellSize.y = _shellDefaultSize.y;
@@ -404,7 +404,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       _dlgInnerContainer = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_dlgInnerContainer);
       GridLayoutFactory.swtDefaults().margins(10, 10).numColumns(3).spacing(10, 8).applyTo(_dlgInnerContainer);
-//    _dlgInnerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//		_dlgInnerContainer.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
          createUI_10_SplitMethod(_dlgInnerContainer);
          createUI_20_Title(_dlgInnerContainer);
@@ -652,36 +652,36 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       _lblTourType.setEnabled(isCustomTourType);
 
       // enable/disable actions for tags/tour types
-//    TagManager.enableRecentTagActions(true, _tourDataTarget.getTourTags());
+//		TagManager.enableRecentTagActions(true, _tourDataTarget.getTourTags());
    }
 
-// /**
-//  * info
-//  */
-// private void createUI60Info(final Composite container) {
+//	/**
+//	 * info
+//	 */
+//	private void createUI60Info(final Composite container) {
 //
-//    final Label label = new Label(container, SWT.NONE);
-//    GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 10).applyTo(label);
-//    label.setText(Messages.Dialog_JoinTours_Label_OtherFields);
+//		final Label label = new Label(container, SWT.NONE);
+//		GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 10).applyTo(label);
+//		label.setText(Messages.Dialog_JoinTours_Label_OtherFields);
 //
-//    // use a bulleted list to display this info
-//    final StyleRange style = new StyleRange();
-//    style.metrics = new GlyphMetrics(0, 0, 10);
-//    final Bullet bullet = new Bullet(style);
+//		// use a bulleted list to display this info
+//		final StyleRange style = new StyleRange();
+//		style.metrics = new GlyphMetrics(0, 0, 10);
+//		final Bullet bullet = new Bullet(style);
 //
-//    final String infoText = Messages.Dialog_SplitTour_Label_OtherFieldsInfo;
-//    final int lineCount = Util.countCharacter(infoText, '\n');
+//		final String infoText = Messages.Dialog_SplitTour_Label_OtherFieldsInfo;
+//		final int lineCount = Util.countCharacter(infoText, '\n');
 //
-//    final StyledText styledText = new StyledText(container, SWT.READ_ONLY);
-//    GridDataFactory.fillDefaults()//
-//          .align(SWT.FILL, SWT.BEGINNING)
-//          .indent(0, 10)
-//          .span(2, 1)
-//          .applyTo(styledText);
-//    styledText.setText(infoText);
-//    styledText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-//    styledText.setLineBullet(0, lineCount + 1, bullet);
-// }
+//		final StyledText styledText = new StyledText(container, SWT.READ_ONLY);
+//		GridDataFactory.fillDefaults()//
+//				.align(SWT.FILL, SWT.BEGINNING)
+//				.indent(0, 10)
+//				.span(2, 1)
+//				.applyTo(styledText);
+//		styledText.setText(infoText);
+//		styledText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+//		styledText.setLineBullet(0, lineCount + 1, bullet);
+//	}
 
    /**
     * Create a new tour with the extracted time slices
@@ -1044,7 +1044,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
       // keep window size and position
       return _state;
-//    return null;
+//		return null;
    }
 
    private TourPerson getSelectedPerson() {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -78,6 +78,7 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -277,7 +278,7 @@ public class TourCompareResultView extends ViewPart implements
       public void inputChanged(final Viewer viewer, final Object oldInput, final Object newInput) {}
    }
 
-   private class TourCompareFilter extends ViewerFilter {
+   public class TourCompareFilter extends ViewerFilter {
 
       @Override
       public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
@@ -393,68 +394,71 @@ public class TourCompareResultView extends ViewPart implements
 
    private void addCompareTourPropertyListener() {
 
-      _compareTourPropertyListener = (workbenchPart, tourEventId, propertyData) -> {
+      _compareTourPropertyListener = new ITourEventListener() {
+         @Override
+         public void tourChanged(final IWorkbenchPart part, final TourEventId propertyId, final Object propertyData) {
 
-         if (tourEventId == TourEventId.COMPARE_TOUR_CHANGED
-               && propertyData instanceof TourPropertyCompareTourChanged) {
+            if (propertyId == TourEventId.COMPARE_TOUR_CHANGED
+                  && propertyData instanceof TourPropertyCompareTourChanged) {
 
-            final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
+               final TourPropertyCompareTourChanged compareTourProperty = (TourPropertyCompareTourChanged) propertyData;
 
-            final long compareId = compareTourProperty.compareId;
+               final long compareId = compareTourProperty.compareId;
 
-            final ArrayList<ElevationCompareResult> compareIds = new ArrayList<>();
+               final ArrayList<ElevationCompareResult> compareIds = new ArrayList<>();
 
-            compareIds.add(new ElevationCompareResult(
+               compareIds.add(new ElevationCompareResult(
 
-                  compareId,
-                  compareTourProperty.tourId,
-                  compareTourProperty.refTourId));
+                     compareId,
+                     compareTourProperty.tourId,
+                     compareTourProperty.refTourId));
 
-            if (compareId == -1) {
+               if (compareId == -1) {
 
-               // compare result is not saved
+                  // compare result is not saved
 
-               final Object comparedTourItem = compareTourProperty.comparedTourItem;
+                  final Object comparedTourItem = compareTourProperty.comparedTourItem;
 
-               if (comparedTourItem instanceof TVICompareResultComparedTour) {
+                  if (comparedTourItem instanceof TVICompareResultComparedTour) {
 
-                  final TVICompareResultComparedTour resultItem = (TVICompareResultComparedTour) comparedTourItem;
+                     final TVICompareResultComparedTour resultItem = (TVICompareResultComparedTour) comparedTourItem;
 
-                  resultItem.movedSpeed = compareTourProperty.speed;
+                     resultItem.movedSpeed = compareTourProperty.speed;
 
-                  // update viewer
-                  _tourViewer.update(comparedTourItem, null);
-               }
-
-            } else {
-
-               // compare result is saved
-
-               // find compared tour in the viewer
-               final ArrayList<TVICompareResultComparedTour> comparedTours = new ArrayList<>();
-               getComparedTours(comparedTours, _rootItem, compareIds);
-
-               if (comparedTours.size() > 0) {
-
-                  final TVICompareResultComparedTour compareTourItem = comparedTours.get(0);
-
-                  if (compareTourProperty.isDataSaved) {
-
-                     // compared tour was saved
-
-                     compareTourItem.dbStartIndex = compareTourProperty.startIndex;
-                     compareTourItem.dbEndIndex = compareTourProperty.endIndex;
-
-                     compareTourItem.dbSpeed = compareTourProperty.speed;
-                     compareTourItem.dbElapsedTime = compareTourProperty.tourDeviceTime_Elapsed;
-
-                  } else {
-
-                     compareTourItem.movedSpeed = compareTourProperty.speed;
+                     // update viewer
+                     _tourViewer.update(comparedTourItem, null);
                   }
 
-                  // update viewer
-                  _tourViewer.update(compareTourItem, null);
+               } else {
+
+                  // compare result is saved
+
+                  // find compared tour in the viewer
+                  final ArrayList<TVICompareResultComparedTour> comparedTours = new ArrayList<>();
+                  getComparedTours(comparedTours, _rootItem, compareIds);
+
+                  if (comparedTours.size() > 0) {
+
+                     final TVICompareResultComparedTour compareTourItem = comparedTours.get(0);
+
+                     if (compareTourProperty.isDataSaved) {
+
+                        // compared tour was saved
+
+                        compareTourItem.dbStartIndex = compareTourProperty.startIndex;
+                        compareTourItem.dbEndIndex = compareTourProperty.endIndex;
+
+                        compareTourItem.dbSpeed = compareTourProperty.speed;
+                        compareTourItem.dbElapsedTime = compareTourProperty.tourDeviceTime_Elapsed;
+
+                     } else {
+
+                        compareTourItem.movedSpeed = compareTourProperty.speed;
+                     }
+
+                     // update viewer
+                     _tourViewer.update(compareTourItem, null);
+                  }
                }
             }
          }
@@ -514,39 +518,45 @@ public class TourCompareResultView extends ViewPart implements
 
    private void addPrefListener() {
 
-      _prefChangeListener = propertyChangeEvent -> {
+      _prefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-         final String property = propertyChangeEvent.getProperty();
+            final String property = event.getProperty();
 
-         if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
+            if (property.equals(ITourbookPreferences.VIEW_LAYOUT_CHANGED)) {
 
-            _tourViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
+               _tourViewer.getTree().setLinesVisible(_prefStore.getBoolean(ITourbookPreferences.VIEW_LAYOUT_DISPLAY_LINES));
 
-            _tourViewer.refresh();
+               _tourViewer.refresh();
 
-            /*
-             * the tree must be redrawn because the styled text does not show with the new color
-             */
-            _tourViewer.getTree().redraw();
-         } else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
+               /*
+                * the tree must be redrawn because the styled text does not show with the new color
+                */
+               _tourViewer.getTree().redraw();
+            } else if (property.equals(ITourbookPreferences.VIEW_TOOLTIP_IS_MODIFIED)) {
 
-            updateToolTipState();
+               updateToolTipState();
+            }
          }
       };
 
-      _prefChangeListener_Common = propertyChangeEvent -> {
+      _prefChangeListener_Common = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-         final String property = propertyChangeEvent.getProperty();
+            final String property = event.getProperty();
 
-         if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
+            if (property.equals(ICommonPreferences.MEASUREMENT_SYSTEM)) {
 
-            // measurement system has changed
+               // measurement system has changed
 
-            _columnManager.saveState(_state);
-            _columnManager.clearColumns();
-            defineAllColumns(_viewerContainer);
+               _columnManager.saveState(_state);
+               _columnManager.clearColumns();
+               defineAllColumns(_viewerContainer);
 
-            recreateViewer(null);
+               recreateViewer(null);
+            }
          }
       };
 
@@ -559,7 +569,13 @@ public class TourCompareResultView extends ViewPart implements
     */
    private void addSelectionListeners() {
 
-      _postSelectionListener = this::onSelectionChanged;
+      _postSelectionListener = new ISelectionListener() {
+
+         @Override
+         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+            onSelectionChanged(part, selection);
+         }
+      };
 
       // register selection listener in the page
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
@@ -568,32 +584,35 @@ public class TourCompareResultView extends ViewPart implements
 
    private void addTourEventListener() {
 
-      _tourPropertyListener = (workbenchPart, tourEventId, eventData) -> {
+      _tourPropertyListener = new ITourEventListener() {
+         @Override
+         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
 
-         if (workbenchPart == TourCompareResultView.this) {
-            return;
-         }
-
-         if (tourEventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
-
-            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-            if (modifiedTours != null) {
-               updateTourViewer(_rootItem, modifiedTours);
+            if (part == TourCompareResultView.this) {
+               return;
             }
 
-         } else if (tourEventId == TourEventId.UPDATE_UI) {
+            if (eventId == TourEventId.TOUR_CHANGED && eventData instanceof TourEvent) {
 
-            // ref tour is removed -> remove all compare results
+               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+               if (modifiedTours != null) {
+                  updateTourViewer(_rootItem, modifiedTours);
+               }
 
-            TourCompareManager.clearCompareResult();
+            } else if (eventId == TourEventId.UPDATE_UI) {
 
-            reloadViewer();
+               // ref tour is removed -> remove all compare results
 
-            enableActions();
+               TourCompareManager.clearCompareResult();
 
-         } else if (tourEventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+               reloadViewer();
 
-            reloadViewer();
+               enableActions();
+
+            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+
+               reloadViewer();
+            }
          }
       };
       TourManager.getInstance().addTourEventListener(_tourPropertyListener);
@@ -624,7 +643,7 @@ public class TourCompareResultView extends ViewPart implements
 
       _viewerMenuManager = new MenuManager("#PopupMenu"); //$NON-NLS-1$
       _viewerMenuManager.setRemoveAllWhenShown(true);
-      _viewerMenuManager.addMenuListener(this::fillContextMenu);
+      _viewerMenuManager.addMenuListener(menuManager -> fillContextMenu(menuManager));
    }
 
    @Override
@@ -690,7 +709,7 @@ public class TourCompareResultView extends ViewPart implements
       _tourViewer.setFilters(new TourCompareFilter());
       _tourViewer.setUseHashlookup(true);
 
-      _tourViewer.addSelectionChangedListener(this::onSelect);
+      _tourViewer.addSelectionChangedListener(selectionChangedEvent -> onSelect(selectionChangedEvent));
 
       _tourViewer.addDoubleClickListener(doubleClickEvent -> {
 
@@ -1980,7 +1999,7 @@ public class TourCompareResultView extends ViewPart implements
       }
    }
 
-   void updateViewer() {
+   public void updateViewer() {
 
       // disable filter, show all compared tours
       _compareFilter = CompareFilter.ALL_IS_DISPLAYED;
