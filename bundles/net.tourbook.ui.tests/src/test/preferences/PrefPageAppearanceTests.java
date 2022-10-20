@@ -22,11 +22,13 @@ import utils.Utils;
 
 public class PrefPageAppearanceTests extends UITest {
 
+   private static final String APPEARANCE = "Appearance"; //$NON-NLS-1$
+
    @Test
    void openAppearancePage() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("Appearance").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem(APPEARANCE).select();
 
       Utils.clickApplyAndCloseButton(bot);
    }
@@ -35,7 +37,7 @@ public class PrefPageAppearanceTests extends UITest {
    void openTourChartPage() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("Appearance").expand().getNode("Tour Chart").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      bot.tree().getTreeItem(APPEARANCE).expand().getNode("Tour Chart").select(); //$NON-NLS-1$
 
       Utils.clickApplyAndCloseButton(bot);
    }
@@ -44,7 +46,7 @@ public class PrefPageAppearanceTests extends UITest {
    void openValueFormatPage() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("Appearance").expand().getNode("Value Format").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      bot.tree().getTreeItem(APPEARANCE).expand().getNode("Value Format").select(); //$NON-NLS-1$
 
       Utils.clickApplyAndCloseButton(bot);
    }
