@@ -23,7 +23,7 @@ import utils.Utils;
 public class PrefPageTourTypesTests extends UITest {
 
    @Test
-   void openPreferencePage() {
+   void openTourTypePage() {
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("Tour Type Filter").expand().getNode("Color").select();

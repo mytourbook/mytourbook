@@ -23,7 +23,7 @@ import utils.Utils;
 public class PrefPageSuuntoTests extends UITest {
 
    @Test
-   void openPreferencePage() {
+   void openSuuntoPage() {
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("Cloud").expand().getNode("Suunto").select(); //$NON-NLS-1$ //$NON-NLS-2$
