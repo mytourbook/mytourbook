@@ -85,7 +85,6 @@ public class Utils {
 
    public static SWTBotView showTourBookView(final SWTWorkbenchBot bot) {
 
-      Utils.showViewFromMenu(bot, DIRECTORY, "Tour Marker"); //$NON-NLS-1$
       return showView(bot, TOURBOOK_VIEW_NAME);
    }
 

@@ -20,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.byteholder.geoclipse.map.UI;
+
 import java.util.Date;
 import java.util.List;
 
@@ -97,18 +99,31 @@ public class TourBookViewTests extends UITest {
    void testDeleteTourCalories() {
 
       _tourBookView = Utils.showTourBookView(bot);
-      SWTBotTreeItem tour = Utils.getTour(bot);
+      bot.viewByTitle("Tour Book").show(); //$NON-NLS-1$
+      SWTBotTreeItem tour = bot.tree().getTreeItem("2014   1").expand() //$NON-NLS-1$
+            .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      //Check the initial calories value
+      tour = bot.tree().getTreeItem("2014   1").expand() //$NON-NLS-1$
+            .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+      assertEquals("2", tour.cell(tourBookView_Calories_Column_Index));
 
       tour.contextMenu(Messages.Dialog_DeleteTourValues_Action_OpenDialog).click();
 
-      tour.contextMenu("Delete Tour Values...").click();
-      bot.checkBox("Calories").click();
+      bot.checkBox("Ca&lories").click();
       bot.button("Delete").click();
       bot.button("OK").click();
 
+      bot.sleep(1000);
+
+      _tourBookView = Utils.showTourBookView(bot);
       //Check that the calories were deleted
-      tour = Utils.getTour(bot);
-      assertEquals("0", tour.cell(tourBookView_Calories_Column_Index)); //$NON-NLS-1$
+      tour = bot.tree().getTreeItem("2014   1").expand() //$NON-NLS-1$
+            .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+      assertEquals(UI.EMPTY_STRING, tour.cell(tourBookView_Calories_Column_Index));
    }
 
    @Test
