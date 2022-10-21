@@ -15,6 +15,8 @@
  *******************************************************************************/
 package preferences;
 
+import net.tourbook.cloud.Messages;
+
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -27,6 +29,9 @@ public class PrefPageSuuntoTests extends UITest {
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("Cloud").expand().getNode("Suunto").select(); //$NON-NLS-1$ //$NON-NLS-2$
+
+      bot.cTabItem(Messages.SuuntoCloud_Group_AccountInformation).activate();
+      bot.cTabItem(Messages.SuuntoCloud_Group_FileNameCustomization).activate();
 
       Utils.clickApplyAndCloseButton(bot);
    }
