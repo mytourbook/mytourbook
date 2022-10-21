@@ -27,12 +27,12 @@ public class PrefPagePhotoTests extends UITest {
    void openAppearancePages() {
 
       Utils.openPreferences(bot);
-      final SWTBotTreeItem photoTreeItem = bot.tree().getTreeItem("Photo").select().expand();
+      final SWTBotTreeItem photoTreeItem = bot.tree().getTreeItem("Photo").select().expand(); //$NON-NLS-1$
 
       photoTreeItem.getNode("External Apps").select(); //$NON-NLS-1$
       photoTreeItem.getNode("Photo Directory").select(); //$NON-NLS-1$
       photoTreeItem.getNode("Photo Fullsize Viewer").select(); //$NON-NLS-1$
-      final SWTBotTreeItem systemTreeItem = photoTreeItem.getNode("System").select();
+      final SWTBotTreeItem systemTreeItem = photoTreeItem.getNode("System").select(); //$NON-NLS-1$
       systemTreeItem.expand();
 
       systemTreeItem.getNode("Image Cache").select(); //$NON-NLS-1$
