@@ -81,7 +81,7 @@ public class WorkbenchTests extends UITest {
       Utils.showView(bot, "Tour Analyzer"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Compare Geo Tour"); //$NON-NLS-1$
-      Utils.showView(bot, "Geo Compare"); //$NON-NLS-1$
+      final SWTBotView geoCompareView = Utils.showView(bot, "Geo Compare"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Tour Chart Smoothing"); //$NON-NLS-1$
       Utils.showView(bot, "Tour Chart Smoothing"); //$NON-NLS-1$
@@ -99,7 +99,7 @@ public class WorkbenchTests extends UITest {
       Utils.showView(bot, "Heart Rate Variability"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Photos"); //$NON-NLS-1$
-      Utils.showView(bot, "Photos"); //$NON-NLS-1$
+      final SWTBotView photosView = Utils.showView(bot, "Photos"); //$NON-NLS-1$
       //Sleeping 3 seconds as the view can be slow to display
       bot.sleep(3000);
 
@@ -138,6 +138,8 @@ public class WorkbenchTests extends UITest {
       bot.sleep(3000);
 
       //Close the opened views
+      geoCompareView.close();
+      photosView.close();
       collatedToursView.close();
       referenceToursView.close();
       comparisonResultsView.close();
