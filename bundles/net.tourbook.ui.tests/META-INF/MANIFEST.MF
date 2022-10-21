@@ -13,7 +13,8 @@ Require-Bundle: net.tourbook,
  org.eclipse.swtbot.go,
  net.tourbook.statistics,
  org.eclipse.swtbot.nebula.nattable.finder,
- net.tourbook.cloud
+ net.tourbook.cloud,
+ net.tourbook.device;bundle-version="22.8.0"
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Vendor: MyTourbook
