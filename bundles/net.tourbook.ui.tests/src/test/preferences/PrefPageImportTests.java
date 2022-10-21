@@ -17,18 +17,19 @@ package preferences;
 
 import net.tourbook.device.garmin.fit.Messages;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
-public class PrefPageImportFitTests extends UITest {
+public class PrefPageImportTests extends UITest {
 
-   @Test
-   void openImportFitPage() {
+   private SWTBotTreeItem importTreeItem;
 
-      Utils.openPreferences(bot);
-      bot.tree().getTreeItem("Import").expand().getNode("Fit").select();
+   private void openFitPage() {
+
+      openVendorPage("Fit");
 
       bot.cTabItem(Messages.PrefPage_Fit_Group_Speed).activate();
       bot.cTabItem(Messages.PrefPage_Fit_Group_AdjustTemperature).activate();
@@ -36,7 +37,28 @@ public class PrefPageImportFitTests extends UITest {
       bot.cTabItem(Messages.PrefPage_Fit_Group_ReplaceTimeSlice).activate();
       bot.cTabItem(Messages.PrefPage_Fit_Group_Power).activate();
       bot.cTabItem(Messages.PrefPage_Fit_Group_TourType).activate();
+   }
+
+   @Test
+   void openImportPages() {
+
+      Utils.openPreferences(bot);
+      importTreeItem = bot.tree().getTreeItem("Import").select();
+      importTreeItem.expand();
+
+      openVendorPage("Daum Ergometer");
+      openFitPage();
+      openVendorPage("GPX");
+      openVendorPage("HAC 4/5");
+      openVendorPage("Polar");
+      openVendorPage("Suunto Spartan/9");
+      openVendorPage("TCX");
 
       Utils.clickApplyAndCloseButton(bot);
+   }
+
+   private void openVendorPage(final String vendorName) {
+
+      importTreeItem.getNode(vendorName).select();
    }
 }
