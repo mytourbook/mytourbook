@@ -15,7 +15,6 @@
  *******************************************************************************/
 package preferences;
 
-import org.eclipse.jface.dialogs.IDialogConstants;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -34,8 +33,6 @@ public class PrefPageMap25OfflineMapTests extends UITest {
       Utils.openPreferences(bot);
       openMapProviderPreferencePage();
 
-      Utils.clickApplyAndCloseButton(bot);
-
-      bot.button(IDialogConstants.NO_LABEL).click();
+      Utils.clickCancelButton(bot);
    }
 }
