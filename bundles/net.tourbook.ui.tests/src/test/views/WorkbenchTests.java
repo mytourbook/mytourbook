@@ -134,14 +134,18 @@ public class WorkbenchTests extends UITest {
       bot.tree().getTreeItem(WorkbenchTests.PHOTO).expand().getNode("Photos + Tours").select(); //$NON-NLS-1$
       bot.button("Open").click(); //$NON-NLS-1$
       final SWTBotView photosAndToursView = Utils.showView(bot, "Photos + Tours"); //$NON-NLS-1$
-      photosAndToursView.close();
 
-      Utils.showViewFromMenu(bot, "Tour", "Tour Photos"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, "Tour", "Tour &Photos"); //$NON-NLS-1$
       final SWTBotView tourPhotosView = Utils.showView(bot, "Tour Photos"); //$NON-NLS-1$
-      tourPhotosView.close();
 
-      Utils.showViewFromMenu(bot, "Map", "Map &Bookmarks"); //$NON-NLS-1$
-      final SWTBotView mapBookmarksView = Utils.showView(bot, "Map &Bookmarks"); //$NON-NLS-1$
-      mapBookmarksView.close();
+      // Utils.showViewFromMenu(bot, "Map", "Map &Bookmarks"); //$NON-NLS-1$
+      //  final SWTBotView mapBookmarksView = Utils.showView(bot, "Map Bookmarks"); //$NON-NLS-1$
+
+      bot.sleep(3000);
+
+      //Close the opened views
+      photosAndToursView.close();
+      tourPhotosView.close();
+      //  mapBookmarksView.close();
    }
 }
