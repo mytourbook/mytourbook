@@ -425,13 +425,19 @@ public final class TourTrack_Shader {
       // fix alpha blending
       gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
       {
-         paint_10_Track(trackBucket, viewport, viewport2mapscale);
+         // get animated position
+         final int nextFrameIndex = MapPlayerManager.getNextFrameIndex();
+         final int numAllFrames = MapPlayerManager.getNumberofAllFrames();
+
+         final float relativeVisibleVertices = (float) nextFrameIndex / numAllFrames;
+
+         paint_10_Track(trackBucket, viewport, viewport2mapscale, relativeVisibleVertices);
 
          if (trackConfig.isShowDirectionArrow) {
 
             if (trackConfig.arrow_IsAnimate) {
 
-               paint_30_Animation(viewport, compileMapPosition, viewport2mapscale, trackBucket);
+               paint_30_Animation(viewport, compileMapPosition, viewport2mapscale, trackBucket, nextFrameIndex);
 
             } else {
 
@@ -449,14 +455,24 @@ public final class TourTrack_Shader {
     * @param viewport
     * @param vp2mpScale
     *           Viewport scale 2 map scale: it is between 1...2
+    * @param relativeVisibleVertices
     */
    private static void paint_10_Track(final TourTrack_Bucket trackBucket,
                                       final GLViewport viewport,
-                                      final float vp2mpScale) {
+                                      final float vp2mpScale,
+                                      final float relativeVisibleVertices) {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
       final MapPosition viewportMapPosition = viewport.pos;
+
+      final int numTrackVertices = trackBucket.numTrackVertices;
+      final int numVisibleVertices = MapPlayerManager.isReLivePlaying()
+
+            // re-live shows the vertices from the start until the animation frame
+            ? (int) (relativeVisibleVertices * numTrackVertices)
+
+            : numTrackVertices;
 
       /*
        * Simple line shader does not take forward shortening into
@@ -642,7 +658,7 @@ public final class TourTrack_Shader {
             gl.uniform1i(shader_u_mode, capMode);
          }
 
-         gl.drawArrays(GL.TRIANGLE_STRIP, 0, trackBucket.numTrackVertices);
+         gl.drawArrays(GL.TRIANGLE_STRIP, 0, numVisibleVertices);
       }
 
       /*
@@ -687,7 +703,7 @@ public final class TourTrack_Shader {
       GLState.test(true, false);
       gl.depthMask(true);
       {
-         gl.drawArrays(GL.TRIANGLE_STRIP, 0, trackBucket.numTrackVertices);
+         gl.drawArrays(GL.TRIANGLE_STRIP, 0, numVisibleVertices);
       }
       gl.depthMask(false);
 
@@ -768,7 +784,8 @@ public final class TourTrack_Shader {
    private static void paint_30_Animation(final GLViewport viewport,
                                           final MapPosition compileMapPosition,
                                           final float vp2mpScale,
-                                          final TourTrack_Bucket trackBucket) {
+                                          final TourTrack_Bucket trackBucket,
+                                          final int nextFrameIndex) {
 
       final ShortArrayList animatedPositions = trackBucket.animatedPositions;
 
@@ -781,8 +798,6 @@ public final class TourTrack_Shader {
       shader.useProgram();
 
       // get animated position
-      final int nextFrameIndex = MapPlayerManager.getNextFrameIndex();
-
       final int xyPosIndex = nextFrameIndex * 2;
       final int xyPrevPosIndex = xyPosIndex > 1 ? xyPosIndex - 2 : 0;
 

@@ -25,10 +25,11 @@ import org.eclipse.jface.dialogs.IDialogSettings;
  */
 public class MapPlayerManager {
 
-   private static final String          STATE_FOREGROUND_FPS  = "STATE_FOREGROUND_FPS";                                             //$NON-NLS-1$
-   private static final String          STATE_IS_PLAYING_LOOP = "STATE_IS_PLAYING_LOOP";                                            //$NON-NLS-1$
+   private static final String          STATE_FOREGROUND_FPS    = "STATE_FOREGROUND_FPS";                                             //$NON-NLS-1$
+   private static final String          STATE_IS_PLAYING_LOOP   = "STATE_IS_PLAYING_LOOP";                                            //$NON-NLS-1$
+   private static final String          STATE_IS_RELIVE_PLAYING = "STATE_IS_RELIVE_PLAYING";                                          //$NON-NLS-1$
    //
-   private static final IDialogSettings _state                = TourbookPlugin.getState("net.tourbook.map.player.MapPlayerManager");//$NON-NLS-1$
+   private static final IDialogSettings _state                  = TourbookPlugin.getState("net.tourbook.map.player.MapPlayerManager");//$NON-NLS-1$
 
    private static MapPlayerView         _mapPlayerView;
 
@@ -51,8 +52,9 @@ public class MapPlayerManager {
 
    private static boolean               _isAnimationVisible;
    private static boolean               _isPlayerEnabled;
-   private static boolean               _isPlayerRunning      = true;
+   private static boolean               _isPlayerRunning        = true;
    private static boolean               _isPlayingLoop;
+   private static boolean               _isReLivePlaying;
 
    /**
     * @return Returns the last computed frame numer
@@ -214,16 +216,22 @@ public class MapPlayerManager {
       return _isPlayingLoop;
    }
 
+   public static boolean isReLivePlaying() {
+      return _isReLivePlaying;
+   }
+
    public static void restoreState() {
 
       _foregroundFPS = Util.getStateInt(_state, STATE_FOREGROUND_FPS, 10);
       _isPlayingLoop = Util.getStateBoolean(_state, STATE_IS_PLAYING_LOOP, false);
+      _isReLivePlaying = Util.getStateBoolean(_state, STATE_IS_RELIVE_PLAYING, false);
    }
 
    public static void saveState() {
 
       _state.put(STATE_FOREGROUND_FPS, _foregroundFPS);
       _state.put(STATE_IS_PLAYING_LOOP, _isPlayingLoop);
+      _state.put(STATE_IS_RELIVE_PLAYING, _isReLivePlaying);
    }
 
    public static void setAnimationStartTime() {
@@ -253,6 +261,10 @@ public class MapPlayerManager {
    public static void setIsPlayingLoop(final boolean isPlayingLoop) {
 
       _isPlayingLoop = isPlayingLoop;
+   }
+
+   public static void setIsReLivePlaying(final boolean isReLivePlaying) {
+      _isReLivePlaying = isReLivePlaying;
    }
 
    public static void setMapPlayerViewer(final MapPlayerView mapPlayerView) {
