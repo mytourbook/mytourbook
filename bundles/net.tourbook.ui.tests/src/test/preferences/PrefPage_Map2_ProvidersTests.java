@@ -67,22 +67,8 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
    }
 
-   @Test
-   void openOfflineMapPreferencePage() {
-
-      Utils.openPreferences(bot);
-      selectOfflineMapPreferencePage();
-
-      Utils.clickApplyAndCloseButton(bot);
-   }
-
    private void selectMapProviderPreferencePage() {
 
       bot.tree().getTreeItem("2D Map").expand().getNode("Map Provider").select(); //$NON-NLS-1$
-   }
-
-   private void selectOfflineMapPreferencePage() {
-
-      bot.tree().getTreeItem("2D Map").expand().getNode("Offline Map").select(); //$NON-NLS-1$
    }
 }
