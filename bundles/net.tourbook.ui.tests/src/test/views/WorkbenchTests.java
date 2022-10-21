@@ -128,7 +128,7 @@ public class WorkbenchTests extends UITest {
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode("Comparison Results").select(); //$NON-NLS-1$
       bot.button("Open").click(); //$NON-NLS-1$
-      Utils.showView(bot, "Comparison Results"); //$NON-NLS-1$
+      final SWTBotView comparisonResultsView = Utils.showView(bot, "Comparison Results"); //$NON-NLS-1$
 
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.PHOTO).expand().getNode("Photos + Tours").select(); //$NON-NLS-1$
@@ -144,6 +144,7 @@ public class WorkbenchTests extends UITest {
       bot.sleep(3000);
 
       //Close the opened views
+      comparisonResultsView.close();
       photosAndToursView.close();
       tourPhotosView.close();
       mapBookmarkView.close();
