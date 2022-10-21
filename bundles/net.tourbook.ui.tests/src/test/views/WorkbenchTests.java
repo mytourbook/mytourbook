@@ -15,6 +15,7 @@
  *******************************************************************************/
 package views;
 
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.junit.BeforeClass;
 import org.junit.jupiter.api.Test;
@@ -132,6 +133,11 @@ public class WorkbenchTests extends UITest {
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.PHOTO).expand().getNode("Photos + Tours").select(); //$NON-NLS-1$
       bot.button("Open").click(); //$NON-NLS-1$
-      Utils.showView(bot, "Photos + Tours"); //$NON-NLS-1$
+      final SWTBotView photosAndToursView = Utils.showView(bot, "Photos + Tours"); //$NON-NLS-1$
+      photosAndToursView.close();
+
+      Utils.showViewFromMenu(bot, "Tour", "Tour Photos"); //$NON-NLS-1$
+      final SWTBotView tourPhotosView = Utils.showView(bot, "Tour Photos"); //$NON-NLS-1$
+      tourPhotosView.close();
    }
 }
