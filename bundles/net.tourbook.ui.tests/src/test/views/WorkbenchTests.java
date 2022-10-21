@@ -98,12 +98,6 @@ public class WorkbenchTests extends UITest {
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Heart Rate Variability"); //$NON-NLS-1$
       Utils.showView(bot, "Heart Rate Variability"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Sensor"); //$NON-NLS-1$
-      Utils.showView(bot, "Sensor"); //$NON-NLS-1$
-
-      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Sensor Chart"); //$NON-NLS-1$
-      Utils.showView(bot, "Sensor Chart"); //$NON-NLS-1$
-
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Photos"); //$NON-NLS-1$
       Utils.showView(bot, "Photos"); //$NON-NLS-1$
       //Sleeping 3 seconds as the view can be slow to display
