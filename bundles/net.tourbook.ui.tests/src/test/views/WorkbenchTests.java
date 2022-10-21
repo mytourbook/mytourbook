@@ -139,5 +139,9 @@ public class WorkbenchTests extends UITest {
       Utils.showViewFromMenu(bot, "Tour", "Tour Photos"); //$NON-NLS-1$
       final SWTBotView tourPhotosView = Utils.showView(bot, "Tour Photos"); //$NON-NLS-1$
       tourPhotosView.close();
+
+      Utils.showViewFromMenu(bot, "Map", "Map &Bookmarks"); //$NON-NLS-1$
+      final SWTBotView mapBookmarksView = Utils.showView(bot, "Map &Bookmarks"); //$NON-NLS-1$
+      mapBookmarksView.close();
    }
 }
