@@ -29,7 +29,7 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
 
       Utils.openPreferences(bot);
 
-      openMapProviderPreferencePage();
+      selectMapProviderPreferencePage();
 
       bot.button(Messages.Pref_Map_Button_AddMapProviderCustom).click();
       bot.textWithLabel(Messages.Pref_Map_Label_MapProvider).setText("Custom Profile 1");
@@ -46,7 +46,7 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
 
       Utils.openPreferences(bot);
 
-      openMapProviderPreferencePage();
+      selectMapProviderPreferencePage();
 
       bot.button(Messages.Pref_Map_Button_AddMapProfile).click();
       bot.textWithLabel(Messages.Pref_Map_Label_MapProvider).setText("Profile 1");
@@ -58,17 +58,31 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
    }
 
-   private void openMapProviderPreferencePage() {
+   @Test
+   void openMapProviderPreferencePage() {
+
+      Utils.openPreferences(bot);
+      selectMapProviderPreferencePage();
+
+      Utils.clickApplyAndCloseButton(bot);
+   }
+
+   @Test
+   void openOfflineMapPreferencePage() {
+
+      Utils.openPreferences(bot);
+      selectOfflineMapPreferencePage();
+
+      Utils.clickApplyAndCloseButton(bot);
+   }
+
+   private void selectMapProviderPreferencePage() {
 
       bot.tree().getTreeItem("2D Map").expand().getNode("Map Provider").select(); //$NON-NLS-1$
    }
 
-   @Test
-   void openPreferencePage() {
+   private void selectOfflineMapPreferencePage() {
 
-      Utils.openPreferences(bot);
-      openMapProviderPreferencePage();
-
-      Utils.clickApplyAndCloseButton(bot);
+      bot.tree().getTreeItem("2D Map").expand().getNode("Offline Map").select(); //$NON-NLS-1$
    }
 }
