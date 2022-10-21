@@ -39,8 +39,7 @@ public class PrefPageCloudTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
    }
 
-   @Test
-   void openSuuntoPage(final SWTBotTreeItem cloudTreeItem) {
+   private void openSuuntoPage(final SWTBotTreeItem cloudTreeItem) {
 
       Utils.openVendorPage(cloudTreeItem, "Suunto"); //$NON-NLS-1$
 
