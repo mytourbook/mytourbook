@@ -25,11 +25,9 @@ import utils.Utils;
 
 public class PrefPageImportTests extends UITest {
 
-   private SWTBotTreeItem importTreeItem;
+   private void openFitPage(final SWTBotTreeItem importTreeItem) {
 
-   private void openFitPage() {
-
-      openVendorPage("Fit");
+      Utils.openVendorPage(importTreeItem, "Fit");
 
       bot.cTabItem(Messages.PrefPage_Fit_Group_Speed).activate();
       bot.cTabItem(Messages.PrefPage_Fit_Group_AdjustTemperature).activate();
@@ -43,22 +41,17 @@ public class PrefPageImportTests extends UITest {
    void openImportPages() {
 
       Utils.openPreferences(bot);
-      importTreeItem = bot.tree().getTreeItem("Import").select();
+      final SWTBotTreeItem importTreeItem = bot.tree().getTreeItem("Import").select();
       importTreeItem.expand();
 
-      openVendorPage("Daum Ergometer");
-      openFitPage();
-      openVendorPage("GPX");
-      openVendorPage("HAC 4/5");
-      openVendorPage("Polar");
-      openVendorPage("Suunto Spartan/9");
-      openVendorPage("TCX");
+      Utils.openVendorPage(importTreeItem, "Daum Ergometer");
+      openFitPage(importTreeItem);
+      Utils.openVendorPage(importTreeItem, "GPX");
+      Utils.openVendorPage(importTreeItem, "HAC 4/5");
+      Utils.openVendorPage(importTreeItem, "Polar");
+      Utils.openVendorPage(importTreeItem, "Suunto Spartan/9");
+      Utils.openVendorPage(importTreeItem, "TCX");
 
       Utils.clickApplyAndCloseButton(bot);
-   }
-
-   private void openVendorPage(final String vendorName) {
-
-      importTreeItem.getNode(vendorName).select();
    }
 }

@@ -15,19 +15,36 @@
  *******************************************************************************/
 package preferences;
 
+import net.tourbook.cloud.Messages;
+
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
-public class PrefPageStravaTests extends UITest {
+public class PrefPageCloudTests extends UITest {
 
    @Test
-   void openSuuntoPage() {
+   void openCloudPages() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("Cloud").expand().getNode("Strava").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      final SWTBotTreeItem cloudTreeItem = bot.tree().getTreeItem("Cloud").select();
+      cloudTreeItem.expand();
+
+      Utils.openVendorPage(cloudTreeItem, "Dropbox");
+      openSuuntoPage(cloudTreeItem);
+      Utils.openVendorPage(cloudTreeItem, "Strava");
 
       Utils.clickApplyAndCloseButton(bot);
+   }
+
+   @Test
+   void openSuuntoPage(final SWTBotTreeItem cloudTreeItem) {
+
+      Utils.openVendorPage(cloudTreeItem, "Suunto");
+
+      bot.cTabItem(Messages.SuuntoCloud_Group_AccountInformation).activate();
+      bot.cTabItem(Messages.SuuntoCloud_Group_FileNameCustomization).activate();
    }
 }

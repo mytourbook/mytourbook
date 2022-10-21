@@ -51,6 +51,7 @@ public class Utils {
 
       clickButton(IDialogConstants.CANCEL_LABEL, bot);
    }
+
    public static void clickCloseButton(final SWTWorkbenchBot bot) {
 
       clickButton(IDialogConstants.CLOSE_LABEL, bot);
@@ -95,6 +96,11 @@ public class Utils {
    public static void openPreferences(final SWTWorkbenchBot bot) {
 
       bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click();
+   }
+
+   public static void openVendorPage(final SWTBotTreeItem treeItem, final String vendorName) {
+
+      treeItem.getNode(vendorName).select();
    }
 
    public static SWTBotView showTourBookView(final SWTWorkbenchBot bot) {
