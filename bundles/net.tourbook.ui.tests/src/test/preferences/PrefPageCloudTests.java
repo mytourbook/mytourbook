@@ -29,12 +29,12 @@ public class PrefPageCloudTests extends UITest {
    void openCloudPages() {
 
       Utils.openPreferences(bot);
-      final SWTBotTreeItem cloudTreeItem = bot.tree().getTreeItem("Cloud").select();
+      final SWTBotTreeItem cloudTreeItem = bot.tree().getTreeItem("Cloud").select(); //$NON-NLS-1$
       cloudTreeItem.expand();
 
-      Utils.openVendorPage(cloudTreeItem, "Dropbox");
+      Utils.openVendorPage(cloudTreeItem, "Dropbox"); //$NON-NLS-1$
       openSuuntoPage(cloudTreeItem);
-      Utils.openVendorPage(cloudTreeItem, "Strava");
+      Utils.openVendorPage(cloudTreeItem, "Strava"); //$NON-NLS-1$
 
       Utils.clickApplyAndCloseButton(bot);
    }
@@ -42,7 +42,7 @@ public class PrefPageCloudTests extends UITest {
    @Test
    void openSuuntoPage(final SWTBotTreeItem cloudTreeItem) {
 
-      Utils.openVendorPage(cloudTreeItem, "Suunto");
+      Utils.openVendorPage(cloudTreeItem, "Suunto"); //$NON-NLS-1$
 
       bot.cTabItem(Messages.SuuntoCloud_Group_AccountInformation).activate();
       bot.cTabItem(Messages.SuuntoCloud_Group_FileNameCustomization).activate();
