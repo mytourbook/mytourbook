@@ -43,13 +43,13 @@ public class PrefPageSRTMDataTests extends UITest {
    void validateSRTMConnection() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("SRTM").expand().getNode("Data").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem("SRTM").expand().getNode("Data").select(); //$NON-NLS-1$ //$NON-NLS-2$
 
-      bot.button("Validate SRTM Connection").click();
+      bot.button(Messages.PrefPage_SRTMData_Button_ValidateDownloadOfSrtmData).click();
 
       Utils.clickOkButton(bot);
 
-      bot.button("Dummy Validation").click();
+      bot.button(Messages.PrefPage_SRTMData_Button_SrtmDummyValidation).click();
 
       Utils.clickApplyAndCloseButton(bot);
    }
