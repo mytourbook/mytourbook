@@ -110,10 +110,10 @@ public class WorkbenchTests extends UITest {
       Utils.showView(bot, "Tour Marker"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Collated Tours"); //$NON-NLS-1$
-      Utils.showView(bot, "Collated Tours"); //$NON-NLS-1$
+      final SWTBotView collatedToursView = Utils.showView(bot, "Collated Tours"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Reference Tours"); //$NON-NLS-1$
-      Utils.showView(bot, "Reference Tours"); //$NON-NLS-1$
+      final SWTBotView referenceToursView = Utils.showView(bot, "Reference Tours"); //$NON-NLS-1$
 
 //      Utils.showViewFromMenu(bot, "Help", "Error Log"); //$NON-NLS-1$ //$NON-NLS-2$
 //      bot.sleep(3000);
@@ -138,6 +138,8 @@ public class WorkbenchTests extends UITest {
       bot.sleep(3000);
 
       //Close the opened views
+      collatedToursView.close();
+      referenceToursView.close();
       comparisonResultsView.close();
       photosAndToursView.close();
       tourPhotosView.close();
