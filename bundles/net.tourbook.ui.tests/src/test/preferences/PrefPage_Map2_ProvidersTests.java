@@ -25,13 +25,29 @@ import utils.Utils;
 public class PrefPage_Map2_ProvidersTests extends UITest {
 
    @Test
+   void createCustom() {
+
+      Utils.openPreferences(bot);
+
+      bot.tree().getTreeItem("2D Map").expand().getNode("Map Provider").select();
+      bot.button(Messages.Pref_Map_Button_AddMapProviderCustom).click();
+      bot.textWithLabel(Messages.Pref_Map_Label_MapProvider).setText("Custom Profile 1");
+      bot.button(Messages.Pref_Map_Button_UpdateMapProvider).click();
+      bot.button(Messages.Pref_Map_Button_Edit).click();
+      bot.tree().getTreeItem("OpenStreetMap").select();
+      bot.button("Cancel").click();
+
+      Utils.clickApplyAndCloseButton(bot);
+   }
+
+   @Test
    void createProfile() {
 
       Utils.openPreferences(bot);
 
       bot.tree().getTreeItem("2D Map").expand().getNode("Map Provider").select();
-      bot.button("New Profile").click();
-      bot.textWithLabel(Messages.Pref_Map_Label_MapProvider).setText("Profile1");
+      bot.button(Messages.Pref_Map_Button_AddMapProfile).click();
+      bot.textWithLabel(Messages.Pref_Map_Label_MapProvider).setText("Profile 1");
       bot.button(Messages.Pref_Map_Button_UpdateMapProvider).click();
       bot.button(Messages.Pref_Map_Button_Edit).click();
       bot.tree().getTreeItem("OpenStreetMap").select();
