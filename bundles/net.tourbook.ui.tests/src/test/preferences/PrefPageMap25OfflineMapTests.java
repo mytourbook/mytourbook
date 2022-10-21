@@ -34,8 +34,8 @@ public class PrefPageMap25OfflineMapTests extends UITest {
       Utils.openPreferences(bot);
       openMapProviderPreferencePage();
 
-      bot.button(IDialogConstants.NO_LABEL).click();
-
       Utils.clickApplyAndCloseButton(bot);
+
+      bot.button(IDialogConstants.NO_LABEL).click();
    }
 }
