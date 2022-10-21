@@ -17,6 +17,8 @@ package preferences;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import net.tourbook.Messages;
+
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -25,10 +27,25 @@ import utils.Utils;
 public class PrefPagePeopleTests extends UITest {
 
    @Test
+   void openPeoplePage() {
+
+      Utils.openPreferences(bot);
+      bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
+
+      bot.cTabItem(Messages.Pref_People_Tab_Person).activate();
+      bot.cTabItem(Messages.Pref_People_Tab_HRZone).activate();
+      bot.cTabItem(Messages.Pref_People_Tab_DataTransfer).activate();
+
+      Utils.clickApplyAndCloseButton(bot);
+   }
+
+   @Test
    void testPeopleBmi() {
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
+
+      bot.cTabItem(Messages.Pref_People_Tab_Person).activate();
 
       //70kg
       bot.spinner(0).setSelection(700);
