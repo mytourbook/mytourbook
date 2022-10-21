@@ -30,7 +30,7 @@ public class PrefPageTourTypesTests extends UITest {
       SWTBotTreeItem tourTypeFilterTreeItem = bot.tree().getTreeItem("Tour Type Filter").select(); //$NON-NLS-1$
 
       tourTypeFilterTreeItem = tourTypeFilterTreeItem.expand();
-      tourTypeFilterTreeItem.getNode("Color").select(); //$NON-NLS-1$
+      Utils.openVendorPage(tourTypeFilterTreeItem, "Color"); //$NON-NLS-1$
 
       Utils.clickApplyAndCloseButton(bot);
    }
