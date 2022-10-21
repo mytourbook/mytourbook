@@ -29,6 +29,7 @@ public class PrefPageGeneralTests extends UITest {
 
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("General").expand().getNode("Computed Values").select();
+
       bot.cTabItem(Messages.Compute_Values_Group_Smoothing).activate();
       bot.cTabItem(Messages.Compute_BreakTime_Group_BreakTime).activate();
       bot.cTabItem(Messages.Pref_Appearance_Group_PaceAndSpeedDisplay).activate();
