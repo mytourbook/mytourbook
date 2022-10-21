@@ -24,7 +24,7 @@ public class PrefPageMap25OfflineMapTests extends UITest {
 
    private void openMapProviderPreferencePage() {
 
-      bot.tree().getTreeItem("2.5D Map").expand().getNode("Offline").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem("2.5D Map").expand().getNode("Offline Map").select(); //$NON-NLS-1$
    }
 
    @Test
