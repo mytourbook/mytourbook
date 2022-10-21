@@ -35,8 +35,7 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
       bot.textWithLabel(Messages.Pref_Map_Label_MapProvider).setText("Custom Profile 1");
       bot.button(Messages.Pref_Map_Button_UpdateMapProvider).click();
       bot.button(Messages.Pref_Map_Button_Edit).click();
-      bot.tree().getTreeItem("OpenStreetMap").select();
-      bot.button("Cancel").click();
+      bot.button("&Save").click();
 
       Utils.clickApplyAndCloseButton(bot);
    }
