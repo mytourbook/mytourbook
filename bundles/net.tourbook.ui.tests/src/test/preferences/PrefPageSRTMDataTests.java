@@ -33,6 +33,9 @@ public class PrefPageSRTMDataTests extends UITest {
       bot.button(Messages.prefPage_srtm_profile_edit).click();
       Utils.clickCancelButton(bot);
 
+      bot.button(Messages.prefPage_srtm_btn_adjust_columns).click();
+      Utils.clickCancelButton(bot);
+
       Utils.clickApplyAndCloseButton(bot);
    }
 
