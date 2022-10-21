@@ -14,7 +14,8 @@ Require-Bundle: net.tourbook,
  net.tourbook.statistics,
  org.eclipse.swtbot.nebula.nattable.finder,
  net.tourbook.cloud,
- net.tourbook.device
+ net.tourbook.device,
+ net.tourbook.device.garmin
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-Vendor: MyTourbook
