@@ -46,6 +46,20 @@ public class PrefPageGeneralTests extends UITest {
       Utils.openPreferences(bot);
       bot.tree().getTreeItem("General").select();
 
+      bot.cTabItem(Messages.Pref_general_system_measurement).activate();
+      bot.cTabItem(Messages.Pref_General_Group_TimeZone).activate();
+      bot.cTabItem(Messages.Pref_General_CalendarWeek).activate();
+      bot.cTabItem(Messages.Pref_General_CalendarWeek).activate();
+
+      Utils.clickApplyAndCloseButton(bot);
+   }
+
+   @Test
+   void openTourPage() {
+
+      Utils.openPreferences(bot);
+      bot.tree().getTreeItem("General").expand().getNode("Tour").select();
+
       Utils.clickApplyAndCloseButton(bot);
    }
 }
