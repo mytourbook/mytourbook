@@ -32,7 +32,7 @@ public class SensorViewTests extends UITest {
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Sensor Chart"); //$NON-NLS-1$
       final SWTBotView sensorChartView = Utils.showView(bot, "Sensor Chart"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Sensor"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Se&nsor"); //$NON-NLS-1$
       final SWTBotView sensorView = Utils.showView(bot, "Sensor"); //$NON-NLS-1$
 
       final SWTBotTable sensorViewTable = sensorView.bot().table();
