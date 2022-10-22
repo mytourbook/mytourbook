@@ -38,7 +38,7 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
       bot.textWithLabel(Messages.Pref_Map_Label_MapProvider).setText("Custom Profile 1"); //$NON-NLS-1$
       bot.button(Messages.Pref_Map_Button_UpdateMapProvider).click();
       bot.button(Messages.Pref_Map_Button_Edit).click();
-      bot.button("&Save").click(); //$NON-NLS-1$
+      bot.button(de.byteholder.geoclipse.Messages.Dialog_MapConfig_Button_Save).click();
 
       Utils.clickApplyAndCloseButton(bot);
    }
@@ -55,7 +55,7 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
       bot.button(Messages.Pref_Map_Button_UpdateMapProvider).click();
       bot.button(Messages.Pref_Map_Button_Edit).click();
       bot.tree().getTreeItem("OpenStreetMap").select(); //$NON-NLS-1$
-      bot.button("Cancel").click(); //$NON-NLS-1$
+      Utils.clickCancelButton(bot);
 
       Utils.clickApplyAndCloseButton(bot);
    }
@@ -67,16 +67,20 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
 
       selectMapProviderPreferencePage();
 
+      //Check the number of providers before adding a new one
       SWTBotTable providersTable = bot.table();
-      assertEquals(2, providersTable.rowCount());
+      final int providersTableCount = 2;
+      assertEquals(providersTableCount, providersTable.rowCount());
 
+      //Add a new WMS provider
       bot.button(Messages.Pref_Map_Button_AddMapProviderWms).click();
       bot.textWithLabel(Messages.Pref_Map_Dialog_WmsInput_Message).setText("https://ahocevar.com/geoserver/wms?SERVICE=WMS&REQUEST=GetCapabilities"); //$NON-NLS-1$
       Utils.clickOkButton(bot);
 
       providersTable = bot.table();
 
-      assertEquals(3, providersTable.rowCount());
+      //Check the new number of providers after adding a new one
+      assertEquals(providersTableCount + 1, providersTable.rowCount());
       assertEquals("GeoServer Web Map Service", providersTable.cell(0, 0)); //$NON-NLS-1$
 
       providersTable.select(0);
