@@ -17,6 +17,8 @@ package utils;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import net.tourbook.common.UI;
+
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -39,7 +41,7 @@ public class Utils {
 
    public static void clickApplyAndCloseButton(final SWTWorkbenchBot bot) {
 
-      clickButton("Apply and Close", bot);
+      clickButton("Apply and Close", bot); //$NON-NLS-1$
    }
 
    private static SWTBotButton clickButton(final String mnemonicText, final SWTWorkbenchBot bot) {
@@ -95,7 +97,9 @@ public class Utils {
 
    public static void openPreferences(final SWTWorkbenchBot bot) {
 
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click();
+      final String preferencesTooltip = UI.IS_LINUX ? "Preferences (Shift+Ctrl+P)" //$NON-NLS-1$
+            : "Preferences (Ctrl+Shift+P)"; //$NON-NLS-1$
+      bot.toolbarButtonWithTooltip(preferencesTooltip).click();
    }
 
    public static void openVendorPage(final SWTBotTreeItem treeItem, final String vendorName) {
