@@ -17,6 +17,7 @@ package preferences;
 
 import net.tourbook.Messages;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -24,11 +25,16 @@ import utils.Utils;
 
 public class PrefPageGeneralTests extends UITest {
 
+   private SWTBotTreeItem getGeneralTreeItem() {
+
+      return bot.tree().getTreeItem("General");
+   }
+
    @Test
    void openComputedValuesPage() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("General").expand().getNode("Computed Values").select();
+      getGeneralTreeItem().expand().getNode("Computed Values").select();
 
       bot.cTabItem(Messages.Compute_Values_Group_Smoothing).activate();
       bot.cTabItem(Messages.Compute_BreakTime_Group_BreakTime).activate();
@@ -44,7 +50,7 @@ public class PrefPageGeneralTests extends UITest {
    void openGeneralPage() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("General").select();
+      getGeneralTreeItem().select();
 
       bot.cTabItem(Messages.Pref_general_system_measurement).activate();
       bot.cTabItem(Messages.Pref_General_Group_TimeZone).activate();
@@ -58,7 +64,7 @@ public class PrefPageGeneralTests extends UITest {
    void openTourPage() {
 
       Utils.openPreferences(bot);
-      bot.tree().getTreeItem("General").expand().getNode("Tour").select();
+      getGeneralTreeItem().expand().getNode("Tour").select();
 
       Utils.clickApplyAndCloseButton(bot);
    }
