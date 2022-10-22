@@ -15,8 +15,11 @@
  *******************************************************************************/
 package preferences;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import de.byteholder.geoclipse.preferences.Messages;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -32,10 +35,10 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
       selectMapProviderPreferencePage();
 
       bot.button(Messages.Pref_Map_Button_AddMapProviderCustom).click();
-      bot.textWithLabel(Messages.Pref_Map_Label_MapProvider).setText("Custom Profile 1");
+      bot.textWithLabel(Messages.Pref_Map_Label_MapProvider).setText("Custom Profile 1"); //$NON-NLS-1$
       bot.button(Messages.Pref_Map_Button_UpdateMapProvider).click();
       bot.button(Messages.Pref_Map_Button_Edit).click();
-      bot.button("&Save").click();
+      bot.button("&Save").click(); //$NON-NLS-1$
 
       Utils.clickApplyAndCloseButton(bot);
    }
@@ -48,11 +51,33 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
       selectMapProviderPreferencePage();
 
       bot.button(Messages.Pref_Map_Button_AddMapProfile).click();
-      bot.textWithLabel(Messages.Pref_Map_Label_MapProvider).setText("Profile 1");
+      bot.textWithLabel(Messages.Pref_Map_Label_MapProvider).setText("Profile 1"); //$NON-NLS-1$
       bot.button(Messages.Pref_Map_Button_UpdateMapProvider).click();
       bot.button(Messages.Pref_Map_Button_Edit).click();
-      bot.tree().getTreeItem("OpenStreetMap").select();
-      bot.button("Cancel").click();
+      bot.tree().getTreeItem("OpenStreetMap").select(); //$NON-NLS-1$
+      bot.button("Cancel").click(); //$NON-NLS-1$
+
+      Utils.clickApplyAndCloseButton(bot);
+   }
+
+   @Test
+   void importWMS() {
+
+      Utils.openPreferences(bot);
+
+      selectMapProviderPreferencePage();
+
+      SWTBotTable providersTable = bot.table();
+      assertEquals(2, providersTable.rowCount());
+
+      bot.button(Messages.Pref_Map_Button_AddMapProviderWms).click();
+      bot.textWithLabel(Messages.Pref_Map_Dialog_WmsInput_Message).setText("https://ahocevar.com/geoserver/wms?SERVICE=WMS&REQUEST=GetCapabilities"); //$NON-NLS-1$
+      Utils.clickOkButton(bot);
+
+      providersTable = bot.table();
+
+      assertEquals(3, providersTable.rowCount());
+      assertEquals("GeoServer Web Map Service", providersTable.cell(0, 0)); //$NON-NLS-1$
 
       Utils.clickApplyAndCloseButton(bot);
    }
@@ -77,7 +102,7 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
 
    private void selectMapProviderPreferencePage() {
 
-      bot.tree().getTreeItem("2D Map").expand().getNode("Map Provider").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem("2D Map").expand().getNode("Map Provider").select(); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
 //   private void selectOfflineMapPreferencePage() {
