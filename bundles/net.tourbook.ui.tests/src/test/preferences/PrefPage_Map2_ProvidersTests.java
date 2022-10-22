@@ -79,6 +79,10 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
       assertEquals(3, providersTable.rowCount());
       assertEquals("GeoServer Web Map Service", providersTable.cell(0, 0)); //$NON-NLS-1$
 
+      providersTable.select(0);
+      bot.button(Messages.Pref_Map_Button_Edit).click();
+      Utils.clickCancelButton(bot);
+
       Utils.clickApplyAndCloseButton(bot);
    }
 
