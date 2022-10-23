@@ -16,9 +16,12 @@
 package preferences;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.byteholder.geoclipse.preferences.Messages;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.junit.jupiter.api.Test;
 
@@ -88,9 +91,22 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
 
       final SWTBotTable wmsMapProviderTable = bot.table();
       wmsMapProviderTable.click(0, 0);
+      assertEquals(12, wmsMapProviderTable.rowCount());
       bot.button(de.byteholder.geoclipse.Messages.Dialog_WmsConfig_Button_UpdateMap).click();
       bot.button(de.byteholder.geoclipse.Messages.Dialog_MapConfig_Button_ShowOsmMap).click();
-      assertEquals(12, wmsMapProviderTable.rowCount());
+
+      final SWTBotCheckBox loadTransparentImagesCheckBox = bot.checkBox(de.byteholder.geoclipse.Messages.Dialog_WmsConfig_Button_GetTransparentMap);
+      assertFalse(loadTransparentImagesCheckBox.isChecked());
+      loadTransparentImagesCheckBox.click();
+      assertTrue(loadTransparentImagesCheckBox.isChecked());
+      final SWTBotCheckBox showTileInfoCheckBox = bot.checkBox(de.byteholder.geoclipse.Messages.Dialog_MapConfig_Button_ShowTileInfo);
+      assertFalse(showTileInfoCheckBox.isChecked());
+      showTileInfoCheckBox.click();
+      assertTrue(showTileInfoCheckBox.isChecked());
+      final SWTBotCheckBox showTileLogCheckBox = bot.checkBox(de.byteholder.geoclipse.Messages.Dialog_MapConfig_Button_ShowTileLog);
+      assertFalse(showTileLogCheckBox.isChecked());
+      showTileLogCheckBox.click();
+      assertTrue(showTileLogCheckBox.isChecked());
 
       Utils.clickCancelButton(bot);
 
