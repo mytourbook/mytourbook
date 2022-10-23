@@ -79,6 +79,9 @@ Bugfix
 * Tour Info toolip (Frederic)
   - Fixed a bug where the wind's cardinal value was erroneous https://github.com/mytourbook/mytourbook/issues/942
 
+* 2D Map WMS
+  - Fixed a bug where the import of a WMS provider would result into an exception https://github.com/mytourbook/mytourbook/issues/949
+
 
 Translation    
 ===========
