@@ -7,7 +7,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-11
 Eclipse-BuddyPolicy: registered
 Bundle-ClassPath: lib/gt-main-28-RC.jar,
  lib/gt-wms-28-RC.jar,
- lib/gt-api-20.5.jar,
  lib/gt-metadata-28-RC.jar,
  lib/jdom2-2.0.6.1.jar,
  lib/gt-xml-28-RC.jar,

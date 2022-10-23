@@ -4,7 +4,6 @@
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="lib/gt-main-28-RC.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-main -->
 	<classpathentry exported="true" kind="lib" path="lib/gt-wms-28-RC.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-wms -->
-	<classpathentry exported="true" kind="lib" path="lib/gt-api-20.5.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-api -->
 	<classpathentry exported="true" kind="lib" path="lib/gt-metadata-28-RC.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-metadata -->
 	<classpathentry exported="true" kind="lib" path="lib/jdom2-2.0.6.1.jar"/> <!-- https://mvnrepository.com/artifact/org.jdom/jdom2 -->
 	<classpathentry exported="true" kind="lib" path="lib/gt-xml-28-RC.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-xml -->
