@@ -85,7 +85,18 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
 
       providersTable.select(0);
       bot.button(Messages.Pref_Map_Button_Edit).click();
+
+      final SWTBotTable wmsMapProviderTable = bot.table();
+      wmsMapProviderTable.doubleClick(0, 0);
+      assertEquals(12, wmsMapProviderTable.rowCount());
+
       Utils.clickCancelButton(bot);
+
+      //Deleting the new WMS provider
+      providersTable = bot.table();
+      providersTable.select(0);
+      bot.button(Messages.Pref_Map_Button_DeleteMapProvider).click();
+      Utils.clickOkButton(bot);
 
       Utils.clickApplyAndCloseButton(bot);
    }
