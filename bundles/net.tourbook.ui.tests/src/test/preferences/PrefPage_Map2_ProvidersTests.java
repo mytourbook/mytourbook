@@ -106,10 +106,10 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
 
       //The test below makes the test fail. It seems like the window becomes
       //out of focus and any future action is dismissed
-//      final SWTBotCheckBox loadTransparentImagesCheckBox = bot.checkBox(de.byteholder.geoclipse.Messages.Dialog_WmsConfig_Button_GetTransparentMap);
-//      assertFalse(loadTransparentImagesCheckBox.isChecked());
-//      loadTransparentImagesCheckBox.click();
-//      assertTrue(loadTransparentImagesCheckBox.isChecked());
+      final SWTBotCheckBox loadTransparentImagesCheckBox = bot.checkBox(de.byteholder.geoclipse.Messages.Dialog_WmsConfig_Button_GetTransparentMap);
+      assertFalse(loadTransparentImagesCheckBox.isChecked());
+      loadTransparentImagesCheckBox.click();
+      assertTrue(loadTransparentImagesCheckBox.isChecked());
 
       Utils.clickCancelButton(bot);
 
