@@ -1446,8 +1446,8 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
 //			// TODO remove SYSTEM.OUT.PRINTLN
 
          // center position in the map
-         final double centerX = positionRect.x + positionRect.width / 2;
-         final double centerY = positionRect.y + positionRect.height / 2;
+         final double centerX = positionRect.x + positionRect.width / 2.0;
+         final double centerY = positionRect.y + positionRect.height / 2.0;
          final Point center = new Point((int) centerX, (int) centerY);
 
          final GeoPosition devCenter = mp.pixelToGeo(center, zoom);
