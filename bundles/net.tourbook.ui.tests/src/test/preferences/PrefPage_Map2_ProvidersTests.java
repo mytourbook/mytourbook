@@ -87,7 +87,9 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
       bot.button(Messages.Pref_Map_Button_Edit).click();
 
       final SWTBotTable wmsMapProviderTable = bot.table();
-      wmsMapProviderTable.doubleClick(0, 0);
+      wmsMapProviderTable.click(0, 0);
+      bot.button(de.byteholder.geoclipse.Messages.Dialog_WmsConfig_Button_UpdateMap).click();
+      bot.button(de.byteholder.geoclipse.Messages.Dialog_MapConfig_Button_ShowOsmMap).click();
       assertEquals(12, wmsMapProviderTable.rowCount());
 
       Utils.clickCancelButton(bot);
