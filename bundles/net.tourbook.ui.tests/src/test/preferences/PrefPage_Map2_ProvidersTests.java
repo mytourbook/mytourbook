@@ -90,7 +90,7 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
       bot.button(Messages.Pref_Map_Button_Edit).click();
 
       final SWTBotTable wmsMapProviderTable = bot.table();
-      wmsMapProviderTable.click(0, 0);
+      wmsMapProviderTable.getTableItem("Natural Earth Base Map").check(); //$NON-NLS-1$
       assertEquals(12, wmsMapProviderTable.rowCount());
       bot.button(de.byteholder.geoclipse.Messages.Dialog_WmsConfig_Button_UpdateMap).click();
       bot.button(de.byteholder.geoclipse.Messages.Dialog_MapConfig_Button_ShowOsmMap).click();
