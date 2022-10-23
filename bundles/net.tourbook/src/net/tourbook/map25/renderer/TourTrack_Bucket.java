@@ -17,7 +17,6 @@ package net.tourbook.map25.renderer;
 
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
-import net.tourbook.common.util.MtMath;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
@@ -109,17 +108,11 @@ public class TourTrack_Bucket {
     */
    ShortArrayList             animatedPositions;
 
-   /**
-    * Angle for the forward direction
-    */
-   FloatArrayList             animatedForwardAngle;
-
    public TourTrack_Bucket() {
 
       trackVertexData = new TourTrack_VertexData();
 
       animatedPositions = new ShortArrayList();
-      animatedForwardAngle = new FloatArrayList();
 
       directionArrow_Vertices = new ShortArrayList();
       directionArrow_ColorCoords = new ShortArrayList();
@@ -648,7 +641,6 @@ public class TourTrack_Bucket {
 
       // create new list to not update currently used list, otherwise a bound exception can occure !!!
       animatedPositions.clear();
-      animatedForwardAngle.clear();
 
       directionArrow_Vertices.clear();
       directionArrow_ColorCoords.clear();
@@ -1005,14 +997,7 @@ public class TourTrack_Bucket {
 
    private void createArrowVertices_200_Animated(final float[] allDirectionArrowPixel) {
 
-      int pixelIndex = 0;
-
-      float p1X = allDirectionArrowPixel[pixelIndex++];
-      float p1Y = allDirectionArrowPixel[pixelIndex++];
-
-      float prevAngle = 0;
-
-      for (; pixelIndex < allDirectionArrowPixel.length;) {
+      for (int pixelIndex = 0; pixelIndex < allDirectionArrowPixel.length;) {
 
          final float p2X = allDirectionArrowPixel[pixelIndex++];
          final float p2Y = allDirectionArrowPixel[pixelIndex++];
@@ -1021,83 +1006,7 @@ public class TourTrack_Bucket {
          final short p2Y_scaled = (short) (p2Y * COORD_SCALE);
 
          animatedPositions.addAll(p2X_scaled, p2Y_scaled);
-
-         final float p21Angle = (float) MtMath.angleOf(p1X, p1Y, p2X, p2Y);
-
-         float animatedAngle = p21Angle;
-
-         float angleDiff;
-         if (pixelIndex < 5) {
-            // skip first position -> previous angle is undefined
-            angleDiff = 0;
-         } else {
-            angleDiff = getAngleDiff(p21Angle, prevAngle);
-         }
-
-         final float minSmoothAngle = 2f;
-
-         if (Math.abs(angleDiff) > minSmoothAngle) {
-
-            // default angle is larger than the min smooth angle
-            // -> smoothout the animation with a smallers angle
-
-            /*
-             * Find the smallest angle diff to the current position
-             */
-            final float prevAngle1Smooth = prevAngle + minSmoothAngle;
-            final float prevAngle2Smooth = prevAngle - minSmoothAngle;
-
-            final float angleDiff1 = getShortestAngle(p21Angle, prevAngle1Smooth);
-            final float angleDiff2 = getShortestAngle(p21Angle, prevAngle2Smooth);
-
-            // use the smallest difference
-            animatedAngle = angleDiff1 < angleDiff2
-                  ? prevAngle1Smooth
-                  : prevAngle2Smooth;
-         }
-
-         animatedAngle = animatedAngle % 360;
-
-         animatedForwardAngle.add(animatedAngle - 90);
-
-         // setup next position
-         p1X = p2X;
-         p1Y = p2Y;
-
-         prevAngle = animatedAngle;
       }
    }
 
-   /**
-    * Source:
-    * https://stackoverflow.com/questions/1878907/how-can-i-find-the-difference-between-two-angles
-    *
-    * @param angle1
-    * @param angle2
-    * @return Returns the difference between two angles 0...360
-    */
-   private float getAngleDiff(final float angle1, final float angle2) {
-
-      float angleDiff = angle1 - angle2;
-
-      angleDiff = (angleDiff + 540) % 360 - 180;
-
-      return angleDiff;
-   }
-
-   /**
-    * Source:
-    * https://stackoverflow.com/questions/2708476/rotation-interpolation
-    *
-    * @param angle1
-    * @param angle2
-    * @return Returns the difference between two angles 0...360
-    */
-   private float getShortestAngle(final float angle1, final float angle2) {
-
-      final float angleDiff = ((((angle1 - angle2) % 360) + 540) % 360) - 180;
-
-      return Math.abs(angleDiff);
-
-   }
 }

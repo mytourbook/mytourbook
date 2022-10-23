@@ -646,6 +646,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _isUpdatePoints = true;
       _isUpdateLayer = true;
 
+      TourTrack_Shader.resetAngle();
+
       // set start time for a new animation
       MapPlayerManager.setAnimationStartTime();
    }

@@ -27,6 +27,7 @@ public class TourTrack_VertexData {
                    final short b,
                    final short c,
                    final short d,
+
                    final int color) {
 
       tourTrack_Vertices.addAll(a, b, c, d);

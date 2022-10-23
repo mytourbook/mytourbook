@@ -1285,6 +1285,7 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Dialog_ValidationRename;
 
    public static String        Map_Player_Action_Loop_Tooltip;
+   public static String        Map_Player_Checkbox_IsReLivePlaying;
    public static String        Map_Player_Label_FramesPerSecond;
    public static String        Map_Player_Lable_TimeEndOrRemaining_Tooltip;
    public static String        Map_Player_PlayContol_Play_Tooptip;

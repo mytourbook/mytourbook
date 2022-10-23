@@ -36,6 +36,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseListener;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Scale;
@@ -65,7 +66,7 @@ public class MapPlayerView extends ViewPart {
    private static final ImageDescriptor _imageDescriptor_Play              = CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Play);
    private static final ImageDescriptor _imageDescriptor_Play_Disabled     = CommonActivator.getThemedImageDescriptor(CommonImages.PlayControl_Play_Disabled);
 
-// SET_FORMATTING_ON
+   // SET_FORMATTING_ON
    //
    private IPartListener2 _partListener;
    //
@@ -77,7 +78,9 @@ public class MapPlayerView extends ViewPart {
    //
    private float          _currentTime;
    private float          _endTime;
-
+   //
+   private int[]          _updateCounter = new int[1];
+   //
    /*
     * UI controls
     */
@@ -86,6 +89,8 @@ public class MapPlayerView extends ViewPart {
    private Label     _lblFPS;
    private Label     _lblTime_Current;
    private Label     _lblTime_EndOrRemaining;
+
+   private Button    _chkIsRelivePlaying;
 
    private Scale     _scaleTimeline;
 
@@ -254,7 +259,7 @@ public class MapPlayerView extends ViewPart {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(5).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(6).applyTo(container);
       {
          UI.createSpacer_Horizontal(container, 1);
          {
@@ -267,6 +272,19 @@ public class MapPlayerView extends ViewPart {
 
             tbm.update(true);
 //            toolbar.setBackground(UI.SYS_COLOR_CYAN);
+         }
+         {
+            /*
+             * Relive playing
+             */
+            _chkIsRelivePlaying = new Button(container, SWT.CHECK);
+            _chkIsRelivePlaying.setText(Messages.Map_Player_Checkbox_IsReLivePlaying);
+//            _chkIsRelivePlaying.setToolTipText(Messages.Map_Player_Checkbox_IsReLivePlaying_Tooltip);
+            _chkIsRelivePlaying.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectReLivePlaying()));
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_chkIsRelivePlaying);
          }
          {
             /*
@@ -283,10 +301,7 @@ public class MapPlayerView extends ViewPart {
                Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
                onSelectFPS();
             });
-            GridDataFactory.fillDefaults()
-                  .grab(true, false)
-                  .align(SWT.END, SWT.FILL)
-                  .applyTo(_spinnerFramesPerSecond);
+            GridDataFactory.fillDefaults().applyTo(_spinnerFramesPerSecond);
 
             _lblFPS = UI.createLabel(container, Messages.Map_Player_Label_FramesPerSecond);
          }
@@ -364,6 +379,11 @@ public class MapPlayerView extends ViewPart {
       updateUI_Timeline(selectedFPS);
    }
 
+   private void onSelectReLivePlaying() {
+
+      MapPlayerManager.setIsReLivePlaying(_chkIsRelivePlaying.getSelection());
+   }
+
    private void onTimeline_Key(final KeyEvent keyEvent) {
 
       if (keyEvent.character == ' ') {
@@ -431,6 +451,7 @@ public class MapPlayerView extends ViewPart {
       _isShow_EndTime_Or_RemainingTime = Util.getStateBoolean(_state, STATE_IS_SHOW_END_TIME, true);
 
       _actionPlayControl_Loop.setChecked(MapPlayerManager.isPlayingLoop());
+      _chkIsRelivePlaying.setSelection(MapPlayerManager.isReLivePlaying());
 
       updateUI_PlayAndPaused();
    }
@@ -520,27 +541,42 @@ public class MapPlayerView extends ViewPart {
 
       final int currentTimeInUI = (int) currentTime;
 
+      _updateCounter[0]++;
+
       // update in UI thread
-      _parent.getDisplay().asyncExec(() -> {
+      _parent.getDisplay().asyncExec(new Runnable() {
 
-         if (_parent.isDisposed()) {
-            return;
-         }
+         final int __runnableCounter = _updateCounter[0];
 
-         _scaleTimeline.setSelection(currentFrameNumber);
+         @Override
+         public void run() {
 
-         // this is a very expensive operation: 28 ms for each frame !!!
-//       _scaleTimeline.setToolTipText(Integer.toString(currentFrameNumber));
+            // skip all updates which has not yet been executed
+            if (__runnableCounter != _updateCounter[0]) {
 
-         updateCurrentTime(currentTimeInUI);
+               // a new update occurred
+               return;
+            }
 
-         // stop playing when end of animation is reached
-         final boolean isLastFrame = currentFrameNumber == numAllFrames;
-         if (isLastFrame && MapPlayerManager.isPlayingLoop() == false) {
+            if (_parent.isDisposed()) {
+               return;
+            }
 
-            MapPlayerManager.setIsPlayerRunning(false);
+            _scaleTimeline.setSelection(currentFrameNumber);
 
-            updateUI_PlayAndPaused();
+            // this is a very expensive operation: 28 ms for each frame !!!
+//          _scaleTimeline.setToolTipText(Integer.toString(currentFrameNumber));
+
+            updateCurrentTime(currentTimeInUI);
+
+            // stop playing when end of animation is reached
+            final boolean isLastFrame = currentFrameNumber == numAllFrames;
+            if (isLastFrame && MapPlayerManager.isPlayingLoop() == false) {
+
+               MapPlayerManager.setIsPlayerRunning(false);
+
+               updateUI_PlayAndPaused();
+            }
          }
       });
    }

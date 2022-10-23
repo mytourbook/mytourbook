@@ -23,13 +23,13 @@ import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.MtMath;
 import net.tourbook.map.player.MapPlayerData;
 import net.tourbook.map.player.MapPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
-import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.GL;
 import org.oscim.core.MapPosition;
@@ -45,29 +45,28 @@ import org.oscim.theme.styles.LineStyle;
  */
 public final class TourTrack_Shader {
 
-   private static final char  NL                       = UI.NEW_LINE;
+   private static final char            NL                       = UI.NEW_LINE;
 
    /**
     * Factor to normalize extrusion vector and scale to coord scale
     */
-   private static final float COORD_SCALE_BY_DIR_SCALE = COORD_SCALE / TourTrack_Bucket.DIR_SCALE;
+   private static final float           COORD_SCALE_BY_DIR_SCALE = COORD_SCALE / TourTrack_Bucket.DIR_SCALE;
 
-   private static final int   CAP_THIN                 = 0;
-   private static final int   CAP_BUTT                 = 1;
-   private static final int   CAP_ROUND                = 2;
+   private static final int             CAP_THIN                 = 0;
+   private static final int             CAP_BUTT                 = 1;
+   private static final int             CAP_ROUND                = 2;
 
-   private static final int   SHADER_PROJECTED         = 0;
-   private static final int   SHADER_FLAT              = 1;
+   private static final int             SHADER_PROJECTED         = 0;
+   private static final int             SHADER_FLAT              = 1;
 
    /**
     * Number of bytes for a <b>short</b> value
     */
-   private static final int   SHORT_BYTES              = 2;
-// private static final int             FLOAT_BYTES              = 4;
+   private static final int             SHORT_BYTES              = 2;
 
    private static AnimationShader       _animationShader;
    private static DirectionArrowsShader _directionArrowShader;
-   private static LineShader[]          _lineShaders     = { null, null };
+   private static LineShader[]          _lineShaders             = { null, null };
 
    private static int                   bufferId_AnimationVertices;
    private static int                   bufferId_TrackVertices;
@@ -80,7 +79,9 @@ public final class TourTrack_Shader {
 
    private static short[]               _animationVertices;
 
-   private static GLMatrix              _animationMatrix = new GLMatrix();
+   private static GLMatrix              _animationMatrix         = new GLMatrix();
+
+   private static float                 _previousAngle;
 
    private static class AnimationShader extends GLShaderMT {
 
@@ -306,6 +307,77 @@ public final class TourTrack_Shader {
       return true;
    }
 
+   /**
+    * Source:
+    * https://stackoverflow.com/questions/1878907/how-can-i-find-the-difference-between-two-angles
+    *
+    * @param angle1
+    * @param angle2
+    * @return Returns the difference between two angles 0...360
+    */
+   private static float getAngle_Difference(final float angle1, final float angle2) {
+
+      float angleDiff = angle1 - angle2;
+
+      angleDiff = (angleDiff + 540) % 360 - 180;
+
+      return angleDiff;
+   }
+
+   /**
+    * Source:
+    * https://stackoverflow.com/questions/2708476/rotation-interpolation
+    *
+    * @param angle1
+    * @param angle2
+    * @return Returns the difference between two angles 0...360
+    */
+   private static float getAngle_Shortest(final float angle1, final float angle2) {
+
+      final float angleDiff = ((((angle1 - angle2) % 360) + 540) % 360) - 180;
+
+      return Math.abs(angleDiff);
+   }
+
+   private static float getAnimatedAngle(final short pos1X, final short pos1Y, final short pos2X, final short pos2Y) {
+
+      final float p21Angle = (float) MtMath.angleFromShorts(pos1X, pos1Y, pos2X, pos2Y);
+
+      float animatedAngle = p21Angle;
+
+      final float angleDiff = getAngle_Difference(p21Angle, _previousAngle);
+      final float minSmoothAngle = 2f;
+
+      if (Math.abs(angleDiff) > minSmoothAngle) {
+
+         // default angle is larger than the min smooth angle
+         // -> smoothout the animation with a smallers angle
+
+         /*
+          * Find the smallest angle diff to the current position
+          */
+         final float prevAngle1Smooth = _previousAngle + minSmoothAngle;
+         final float prevAngle2Smooth = _previousAngle - minSmoothAngle;
+
+         final float angleDiff1 = getAngle_Shortest(p21Angle, prevAngle1Smooth);
+         final float angleDiff2 = getAngle_Shortest(p21Angle, prevAngle2Smooth);
+
+         // use the smallest difference
+         animatedAngle = angleDiff1 < angleDiff2
+               ? prevAngle1Smooth
+               : prevAngle2Smooth;
+      }
+
+      animatedAngle = animatedAngle % 360;
+
+      _previousAngle = animatedAngle;
+
+      return animatedAngle
+
+            // must be turned otherwise it looks in the wrong direction
+            - 90;
+   }
+
    private static ByteBuffer getBuffer_Color(final int requestedColorSize) {
 
       final int bufferBlockSize = 2048;
@@ -353,13 +425,19 @@ public final class TourTrack_Shader {
       // fix alpha blending
       gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
       {
-         paint_10_Track(trackBucket, viewport, viewport2mapscale);
+         // get animated position
+         final int nextFrameIndex = MapPlayerManager.getNextFrameIndex();
+         final int numAllFrames = MapPlayerManager.getNumberofAllFrames();
+
+         final float relativeVisibleVertices = (float) nextFrameIndex / numAllFrames;
+
+         paint_10_Track(trackBucket, viewport, viewport2mapscale, relativeVisibleVertices);
 
          if (trackConfig.isShowDirectionArrow) {
 
             if (trackConfig.arrow_IsAnimate) {
 
-               paint_30_Animation(viewport, compileMapPosition, viewport2mapscale, trackBucket);
+               paint_30_Animation(viewport, compileMapPosition, viewport2mapscale, trackBucket, nextFrameIndex);
 
             } else {
 
@@ -377,14 +455,24 @@ public final class TourTrack_Shader {
     * @param viewport
     * @param vp2mpScale
     *           Viewport scale 2 map scale: it is between 1...2
+    * @param relativeVisibleVertices
     */
    private static void paint_10_Track(final TourTrack_Bucket trackBucket,
                                       final GLViewport viewport,
-                                      final float vp2mpScale) {
+                                      final float vp2mpScale,
+                                      final float relativeVisibleVertices) {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
       final MapPosition viewportMapPosition = viewport.pos;
+
+      final int numTrackVertices = trackBucket.numTrackVertices;
+      final int numVisibleVertices = MapPlayerManager.isReLivePlaying()
+
+            // re-live shows the vertices from the start until the animation frame
+            ? (int) (relativeVisibleVertices * numTrackVertices)
+
+            : numTrackVertices;
 
       /*
        * Simple line shader does not take forward shortening into
@@ -570,7 +658,7 @@ public final class TourTrack_Shader {
             gl.uniform1i(shader_u_mode, capMode);
          }
 
-         gl.drawArrays(GL.TRIANGLE_STRIP, 0, trackBucket.numTrackVertices);
+         gl.drawArrays(GL.TRIANGLE_STRIP, 0, numVisibleVertices);
       }
 
       /*
@@ -615,7 +703,7 @@ public final class TourTrack_Shader {
       GLState.test(true, false);
       gl.depthMask(true);
       {
-         gl.drawArrays(GL.TRIANGLE_STRIP, 0, trackBucket.numTrackVertices);
+         gl.drawArrays(GL.TRIANGLE_STRIP, 0, numVisibleVertices);
       }
       gl.depthMask(false);
 
@@ -696,10 +784,10 @@ public final class TourTrack_Shader {
    private static void paint_30_Animation(final GLViewport viewport,
                                           final MapPosition compileMapPosition,
                                           final float vp2mpScale,
-                                          final TourTrack_Bucket trackBucket) {
+                                          final TourTrack_Bucket trackBucket,
+                                          final int nextFrameIndex) {
 
       final ShortArrayList animatedPositions = trackBucket.animatedPositions;
-      final FloatArrayList animatedForwardAngle = trackBucket.animatedForwardAngle;
 
       final int numAllPositions = animatedPositions.size();
       if (numAllPositions < 1) {
@@ -710,10 +798,16 @@ public final class TourTrack_Shader {
       shader.useProgram();
 
       // get animated position
-      final int xyPosIndex = MapPlayerManager.getNextFrameIndex() * 2;
+      final int xyPosIndex = nextFrameIndex * 2;
+      final int xyPrevPosIndex = xyPosIndex > 1 ? xyPosIndex - 2 : 0;
+
+      final short pos1X = animatedPositions.get(xyPrevPosIndex);
+      final short pos1Y = animatedPositions.get(xyPrevPosIndex + 1);
+      final short pos2X = animatedPositions.get(xyPosIndex);
+      final short pos2Y = animatedPositions.get(xyPosIndex + 1);
 
       // rotate model to look forward
-      final float angle = animatedForwardAngle.get(xyPosIndex / 2);
+      final float angle = getAnimatedAngle(pos1X, pos1Y, pos2X, pos2Y);
       _animationMatrix.setRotation(angle, 0f, 0f, 1f);
       _animationMatrix.setAsUniform(shader.uni_AnimationMVP);
 
@@ -721,9 +815,7 @@ public final class TourTrack_Shader {
       viewport.mvp.setAsUniform(shader.uni_MVP);
 
       // set animation position
-      final short posX = animatedPositions.get(xyPosIndex);
-      final short posY = animatedPositions.get(xyPosIndex + 1);
-      gl.uniform2f(shader.uni_AnimationPos, posX, posY);
+      gl.uniform2f(shader.uni_AnimationPos, pos2X, pos2Y);
 
       // set viewport scale TO map scale: 1.0...2.0
       gl.uniform1f(shader.uni_VpScale2CompileScale, vp2mpScale);
@@ -754,6 +846,11 @@ public final class TourTrack_Shader {
 
 //    GLUtils.checkGlError(TourTrack_Shader.class.getName());
 
+   }
+
+   public static void resetAngle() {
+
+      _previousAngle = 0;
    }
 
    public static boolean setupShader() {

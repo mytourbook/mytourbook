@@ -88,7 +88,7 @@ public class MtMath {
     *    }
     *
     *    /* - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  *
-	 * 
+	 *
     * </pre>
     */
 
@@ -98,16 +98,6 @@ public class MtMath {
 
    // = 1/298.2572229328709613   1/298.257223563 // ca. (A-B)/A
    private static final double ABPLATTUNG_F = (HALBACHSE_A - HALBACHSE_B) / HALBACHSE_A;
-
-   public static double angleOf(final float x1, final float y1, final float x2, final float y2) {
-
-      final double deltaY = y1 - y2;
-      final double deltaX = x2 - x1;
-
-      final double result = Math.toDegrees(Math.atan2(deltaY, deltaX));
-
-      return (result < 0) ? (360d + result) : result;
-   }
 
    /**
     * Work out the angle from the x horizontal winding anti-clockwise
@@ -132,6 +122,16 @@ public class MtMath {
       // NOTE: Remember that most math has the Y axis as positive above the X.
       // However, for screens we have Y as positive below. For this reason,
       // the Y values are inverted to get the expected results.
+
+      final double deltaY = y1 - y2;
+      final double deltaX = x2 - x1;
+
+      final double result = Math.toDegrees(Math.atan2(deltaY, deltaX));
+
+      return (result < 0) ? (360d + result) : result;
+   }
+
+   public static double angleFromShorts(final short x1, final short y1, final short x2, final short y2) {
 
       final double deltaY = y1 - y2;
       final double deltaX = x2 - x1;
