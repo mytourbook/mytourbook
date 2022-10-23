@@ -116,6 +116,9 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
          assertTrue(loadTransparentImagesCheckBox.isChecked());
       }
 
+      wmsMapProviderTable.getTableItem("NE1_HR_LC_SR_W_DR").check(); //$NON-NLS-1$
+      bot.comboBox(2).setSelection(0);
+
       Utils.clickCancelButton(bot);
 
       //Deleting the new WMS provider
