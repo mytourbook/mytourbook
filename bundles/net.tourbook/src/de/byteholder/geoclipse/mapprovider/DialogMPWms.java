@@ -833,7 +833,6 @@ public class DialogMPWms extends DialogMP implements ITileListener, IMapDefaultA
          GridLayoutFactory.fillDefaults().applyTo(clientContainer);
 
          clientContainer.setBackground(parentBackground);
-
          {
             // combo: url log
             _cboTileImageLog = new Combo(clientContainer, SWT.READ_ONLY);
