@@ -12,11 +12,9 @@ Bundle-ClassPath: lib/gt-main-28-RC.jar,
  lib/gt-xml-28-RC.jar,
  lib/gt-referencing-28-RC.jar,
  lib/jts-core-1.19.0.jar,
- lib/commons-lang3-3.12.0.jar,
  lib/gt-http-28-RC.jar,
  lib/gt-opengis-28-RC.jar
-Export-Package: org.apache.commons.lang3,
- org.geotools.data.ows,
+Export-Package: org.geotools.data.ows,
  org.geotools.ows;uses:="org.xml.sax",
  org.geotools.ows.wms;
   uses:="org.geotools.geometry.jts,

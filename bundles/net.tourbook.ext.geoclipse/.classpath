@@ -9,7 +9,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/gt-xml-28-RC.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-xml -->
 	<classpathentry exported="true" kind="lib" path="lib/gt-referencing-28-RC.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-referencing -->
 	<classpathentry exported="true" kind="lib" path="lib/jts-core-1.19.0.jar"/> <!-- https://mvnrepository.com/artifact/org.locationtech.jts/jts-core -->
-	<classpathentry exported="true" kind="lib" path="lib/commons-lang3-3.12.0.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
 	<classpathentry exported="true" kind="lib" path="lib/gt-http-28-RC.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-http -->
 	<classpathentry exported="true" kind="lib" path="lib/gt-opengis-28-RC.jar"/> <!-- https://mvnrepository.com/artifact/org.geotools/gt-opengis -->
 	<classpathentry kind="output" path="bin"/>
