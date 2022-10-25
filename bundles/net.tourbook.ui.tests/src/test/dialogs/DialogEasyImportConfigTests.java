@@ -31,6 +31,11 @@ public class DialogEasyImportConfigTests extends UITest {
       Utils.showView(bot, "Tour Import"); //$NON-NLS-1$
 
       bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_SetupEasyImport_Tooltip).click();
+
+      bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Configuration).activate();
+      bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Launcher).activate();
+      bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Options).activate();
+
       Utils.clickOkButton(bot);
    }
 }
