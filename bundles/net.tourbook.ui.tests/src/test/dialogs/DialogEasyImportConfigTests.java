@@ -25,7 +25,7 @@ import utils.Utils;
 public class DialogEasyImportConfigTests extends UITest {
 
    @Test
-   void openEasyImport() {
+   void openEasyImportConfig() {
 
       bot.toolbarButtonWithTooltip("Tour Import (Ctrl+Shift+I)").click(); //$NON-NLS-1$
       Utils.showView(bot, "Tour Import"); //$NON-NLS-1$
