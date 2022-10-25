@@ -15,10 +15,8 @@
  *******************************************************************************/
 package views;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.BeforeClass;
 import org.junit.jupiter.api.Test;
 
@@ -27,8 +25,9 @@ import utils.Utils;
 
 public class WorkbenchTests extends UITest {
 
-   public static final String DIRECTORY       = "Directory";          //$NON-NLS-1$
    public static final String TOUR_PROPERTIES = "2. Tour Properties"; //$NON-NLS-1$
+   public static final String COMPARE_TOURS   = "4. Compare Tours";   //$NON-NLS-1$
+   public static final String PHOTO           = "5. Photo";           //$NON-NLS-1$
 
    @BeforeClass
    public static void beforeClass() {
@@ -42,9 +41,7 @@ public class WorkbenchTests extends UITest {
       //Select a tour so that the selected views contain information
       Utils.showTourBookView(bot);
 
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
-            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
-      assertNotNull(tour);
+      Utils.getTourWithSRTM(bot);
 
       bot.toolbarButtonWithTooltip("Tour Import (Ctrl+Shift+I)").click(); //$NON-NLS-1$
       Utils.showView(bot, "Tour Import"); //$NON-NLS-1$
@@ -84,7 +81,7 @@ public class WorkbenchTests extends UITest {
       Utils.showView(bot, "Tour Analyzer"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Compare Geo Tour"); //$NON-NLS-1$
-      Utils.showView(bot, "Geo Compare"); //$NON-NLS-1$
+      final SWTBotView geoCompareView = Utils.showView(bot, "Geo Compare"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Tour Chart Smoothing"); //$NON-NLS-1$
       Utils.showView(bot, "Tour Chart Smoothing"); //$NON-NLS-1$
@@ -101,31 +98,53 @@ public class WorkbenchTests extends UITest {
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Heart Rate Variability"); //$NON-NLS-1$
       Utils.showView(bot, "Heart Rate Variability"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, DIRECTORY, "Sensor"); //$NON-NLS-1$
-      Utils.showView(bot, "Sensor"); //$NON-NLS-1$
-
-      Utils.showViewFromMenu(bot, DIRECTORY, "Sensor Chart"); //$NON-NLS-1$
-      Utils.showView(bot, "Sensor Chart"); //$NON-NLS-1$
-
-      Utils.showViewFromMenu(bot, DIRECTORY, "Photos"); //$NON-NLS-1$
-      Utils.showView(bot, "Photos"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Photos"); //$NON-NLS-1$
+      final SWTBotView photosView = Utils.showView(bot, "Photos"); //$NON-NLS-1$
       //Sleeping 3 seconds as the view can be slow to display
       bot.sleep(3000);
 
       bot.toolbarButtonWithTooltip("Search for tours, marker and waypoints (Ctrl+K)").click(); //$NON-NLS-1$
       Utils.showView(bot, "Search Tours"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, DIRECTORY, "Tour Marker"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Tour Marker"); //$NON-NLS-1$
       Utils.showView(bot, "Tour Marker"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, DIRECTORY, "Collated Tours"); //$NON-NLS-1$
-      Utils.showView(bot, "Collated Tours"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Collated Tours"); //$NON-NLS-1$
+      final SWTBotView collatedToursView = Utils.showView(bot, "Collated Tours"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, DIRECTORY, "Reference Tours"); //$NON-NLS-1$
-      Utils.showView(bot, "Reference Tours"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Reference Tours"); //$NON-NLS-1$
+      final SWTBotView referenceToursView = Utils.showView(bot, "Reference Tours"); //$NON-NLS-1$
 
 //      Utils.showViewFromMenu(bot, "Help", "Error Log"); //$NON-NLS-1$ //$NON-NLS-2$
 //      bot.sleep(3000);
 //      Utils.showView(bot, "Error Log"); //$NON-NLS-1$
+
+      Utils.openOtherMenu(bot);
+      bot.tree().getTreeItem(WorkbenchTests.COMPARE_TOURS).expand().getNode("Comparison Results").select(); //$NON-NLS-1$
+      bot.button("Open").click(); //$NON-NLS-1$
+      final SWTBotView comparisonResultsView = Utils.showView(bot, "Comparison Results"); //$NON-NLS-1$
+
+      Utils.openOtherMenu(bot);
+      bot.tree().getTreeItem(WorkbenchTests.PHOTO).expand().getNode("Photos + Tours").select(); //$NON-NLS-1$
+      bot.button("Open").click(); //$NON-NLS-1$
+      final SWTBotView photosAndToursView = Utils.showView(bot, "Photos + Tours"); //$NON-NLS-1$
+
+      Utils.showViewFromMenu(bot, "Tour", "Tour &Photos"); //$NON-NLS-1$
+      final SWTBotView tourPhotosView = Utils.showView(bot, "Tour Photos"); //$NON-NLS-1$
+
+      Utils.showViewFromMenu(bot, "Map", "Map &Bookmark"); //$NON-NLS-1$
+      final SWTBotView mapBookmarkView = Utils.showView(bot, "Map Bookmark"); //$NON-NLS-1$
+
+      bot.sleep(3000);
+
+      //Close the opened views
+      geoCompareView.close();
+      photosView.close();
+      collatedToursView.close();
+      referenceToursView.close();
+      comparisonResultsView.close();
+      photosAndToursView.close();
+      tourPhotosView.close();
+      mapBookmarkView.close();
    }
 }

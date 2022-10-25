@@ -17,6 +17,8 @@ package utils;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import net.tourbook.common.UI;
+
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
@@ -26,19 +28,30 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 public class Utils {
 
-   private static final String TOURBOOK_VIEW_NAME      = "Tour Book";                    //$NON-NLS-1$
-   public static final String  TOUREDITOR_VIEW_NAME    = "Tour Editor";                  //$NON-NLS-1$
-   public static final String  TOURMARKERS_VIEW_NAME   = "Tour Markers";                 //$NON-NLS-1$
-   public static final String  TOURSEGMENTER_VIEW_NAME = "Tour Segmenter";               //$NON-NLS-1$
-   public static final String  STATISTICS_VIEW_NAME    = "Statistics";                   //$NON-NLS-1$
-   public static final String  TOOLS                   = "Tools ";                       //$NON-NLS-1$
-   public static final String  SAVE_MODIFIED_TOUR      = "Save modified tour (Ctrl+S)";  //$NON-NLS-1$
+   public static final String TOURBOOK_VIEW_NAME      = "Tour Book";                    //$NON-NLS-1$
+   public static final String TOUREDITOR_VIEW_NAME    = "Tour Editor";                  //$NON-NLS-1$
+   public static final String TOURMARKERS_VIEW_NAME   = "Tour Markers";                 //$NON-NLS-1$
+   public static final String TOURSEGMENTER_VIEW_NAME = "Tour Segmenter";               //$NON-NLS-1$
+   public static final String STATISTICS_VIEW_NAME    = "Statistics";                   //$NON-NLS-1$
+   public static final String TOOLS                   = "Tools ";                       //$NON-NLS-1$
+   public static final String SAVE_MODIFIED_TOUR      = "Save modified tour (Ctrl+S)";  //$NON-NLS-1$
+   public static final String DIRECTORY               = "Directory";                    //$NON-NLS-1$
 
-   public static final String  workingDirectory        = System.getProperty("user.dir"); //$NON-NLS-1$
+   public static final String workingDirectory        = System.getProperty("user.dir"); //$NON-NLS-1$
+
+   public static void clickApplyAndCloseButton(final SWTWorkbenchBot bot) {
+
+      clickButton("Apply and Close", bot); //$NON-NLS-1$
+   }
 
    private static SWTBotButton clickButton(final String mnemonicText, final SWTWorkbenchBot bot) {
 
       return bot.button(mnemonicText).click();
+   }
+
+   public static void clickCancelButton(final SWTWorkbenchBot bot) {
+
+      clickButton(IDialogConstants.CANCEL_LABEL, bot);
    }
 
    public static void clickCloseButton(final SWTWorkbenchBot bot) {
@@ -80,6 +93,18 @@ public class Utils {
 
       final SWTBotMenu otherMenu = bot.menu(TOOLS).menu("All Views").menu("Other...").click(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(otherMenu);
+   }
+
+   public static void openPreferences(final SWTWorkbenchBot bot) {
+
+      final String preferencesTooltip = UI.IS_LINUX ? "Preferences (Shift+Ctrl+P)" //$NON-NLS-1$
+            : "Preferences (Ctrl+Shift+P)"; //$NON-NLS-1$
+      bot.toolbarButtonWithTooltip(preferencesTooltip).click();
+   }
+
+   public static void openVendorPage(final SWTBotTreeItem treeItem, final String vendorName) {
+
+      treeItem.getNode(vendorName).select();
    }
 
    public static SWTBotView showTourBookView(final SWTWorkbenchBot bot) {

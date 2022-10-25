@@ -15,6 +15,8 @@
  *******************************************************************************/
 package preferences;
 
+import net.tourbook.srtm.Messages;
+
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -23,17 +25,32 @@ import utils.Utils;
 public class PrefPageSRTMDataTests extends UITest {
 
    @Test
+   void editSRTMProfile() {
+
+      Utils.openPreferences(bot);
+      bot.tree().getTreeItem("SRTM").select(); //$NON-NLS-1$
+
+      bot.button(Messages.prefPage_srtm_profile_edit).click();
+      Utils.clickCancelButton(bot);
+
+      bot.button(Messages.prefPage_srtm_btn_adjust_columns).click();
+      Utils.clickCancelButton(bot);
+
+      Utils.clickApplyAndCloseButton(bot);
+   }
+
+   @Test
    void validateSRTMConnection() {
 
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
-      bot.tree().getTreeItem("SRTM").expand().getNode("Data").select(); //$NON-NLS-1$
+      Utils.openPreferences(bot);
+      bot.tree().getTreeItem("SRTM").expand().getNode("Data").select(); //$NON-NLS-1$ //$NON-NLS-2$
 
-      bot.button("Validate SRTM Connection").click();
+      bot.button(Messages.PrefPage_SRTMData_Button_ValidateDownloadOfSrtmData).click();
 
       Utils.clickOkButton(bot);
 
-      bot.button("Dummy Validation").click();
+      bot.button(Messages.PrefPage_SRTMData_Button_SrtmDummyValidation).click();
 
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
+      Utils.clickApplyAndCloseButton(bot);
    }
 }

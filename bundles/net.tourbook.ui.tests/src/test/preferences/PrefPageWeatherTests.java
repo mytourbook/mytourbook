@@ -49,7 +49,7 @@ public class PrefPageWeatherTests extends UITest {
    @Test
    void testVendorConnections() {
 
-      bot.toolbarButtonWithTooltip("Preferences (Ctrl+Shift+P)").click(); //$NON-NLS-1$
+      Utils.openPreferences(bot);
       bot.tree().getTreeItem("Weather").select(); //$NON-NLS-1$
 
       bot.comboBox().setSelection(0);
@@ -66,7 +66,7 @@ public class PrefPageWeatherTests extends UITest {
       //Restore the selection of OpenWeatherMap as the default weather vendor
       bot.comboBox().setSelection(1);
 
-      bot.button("Apply and Close").click(); //$NON-NLS-1$
+      Utils.clickApplyAndCloseButton(bot);
    }
 
    private void testWorldWeatherOnlineConnection() {

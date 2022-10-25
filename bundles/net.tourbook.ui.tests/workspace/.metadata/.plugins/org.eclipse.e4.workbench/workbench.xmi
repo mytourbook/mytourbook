@@ -32,11 +32,10 @@
           <tags>persp.actionSet:org.eclipse.search.searchActionSet</tags>
           <tags>persp.actionSet:org.eclipse.text.quicksearch.actionSet</tags>
           <tags>persp.actionSet:org.eclipse.ui.externaltools.ExternalToolsSet</tags>
-          <children xsi:type="basic:PartSashContainer" xmi:id="_nYIBuOKKEeyB59fpdb3pkQ" selectedElement="_nYIBueKKEeyB59fpdb3pkQ" horizontal="true">
+          <children xsi:type="basic:PartSashContainer" xmi:id="_nYIBuOKKEeyB59fpdb3pkQ" selectedElement="_nYIByeKKEeyB59fpdb3pkQ" horizontal="true">
             <children xsi:type="basic:PartSashContainer" xmi:id="_nYIBueKKEeyB59fpdb3pkQ" containerData="4000" selectedElement="_nYIBuuKKEeyB59fpdb3pkQ">
-              <children xsi:type="basic:PartSashContainer" xmi:id="_nYIBuuKKEeyB59fpdb3pkQ" containerData="6000" selectedElement="_nYIBu-KKEeyB59fpdb3pkQ">
+              <children xsi:type="basic:PartSashContainer" xmi:id="_nYIBuuKKEeyB59fpdb3pkQ" containerData="6000" selectedElement="_nYIBwuKKEeyB59fpdb3pkQ">
                 <children xsi:type="basic:PartStack" xmi:id="_nYIBu-KKEeyB59fpdb3pkQ" elementId="list" containerData="6000" selectedElement="_nYIBveKKEeyB59fpdb3pkQ">
-                  <tags>active</tags>
                   <children xsi:type="advanced:Placeholder" xmi:id="_nYIBvOKKEeyB59fpdb3pkQ" elementId="net.tourbook.views.rawData.RawDataView" ref="_nYB7FeKKEeyB59fpdb3pkQ" closeable="true">
                     <tags>View</tags>
                     <tags>categoryTag:1. Tour Directories</tags>
@@ -83,12 +82,20 @@
                     <tags>View</tags>
                     <tags>categoryTag:4. Compare Tours</tags>
                   </children>
+                  <children xsi:type="advanced:Placeholder" xmi:id="_2XvTkFGDEe2BgplfLNzDmg" elementId="net.tourbook.ui.views.sensors.SensorView.ID" toBeRendered="false" ref="_2XusgFGDEe2BgplfLNzDmg" closeable="true">
+                    <tags>View</tags>
+                    <tags>categoryTag:7. Equipment</tags>
+                  </children>
+                  <children xsi:type="advanced:Placeholder" xmi:id="_TPz1oFGFEe2JXuX0m9xQ3Q" elementId="net.tourbook.views.TourSegmenter" toBeRendered="false" ref="_TPzOkFGFEe2JXuX0m9xQ3Q" closeable="true">
+                    <tags>View</tags>
+                    <tags>categoryTag:3. Tools</tags>
+                  </children>
                 </children>
               </children>
               <children xsi:type="advanced:Placeholder" xmi:id="_nYIByOKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.editorss" toBeRendered="false" containerData="4000" ref="_nX70cOKKEeyB59fpdb3pkQ"/>
             </children>
-            <children xsi:type="basic:PartSashContainer" xmi:id="_nYIByeKKEeyB59fpdb3pkQ" containerData="6000" selectedElement="_nYIByuKKEeyB59fpdb3pkQ">
-              <children xsi:type="basic:PartStack" xmi:id="_nYIByuKKEeyB59fpdb3pkQ" elementId="map" containerData="5000" selectedElement="_nYIBzeKKEeyB59fpdb3pkQ">
+            <children xsi:type="basic:PartSashContainer" xmi:id="_nYIByeKKEeyB59fpdb3pkQ" containerData="6000" selectedElement="_nYIBz-KKEeyB59fpdb3pkQ">
+              <children xsi:type="basic:PartStack" xmi:id="_nYIByuKKEeyB59fpdb3pkQ" elementId="map" containerData="5000" selectedElement="_nYIBzuKKEeyB59fpdb3pkQ">
                 <children xsi:type="advanced:Placeholder" xmi:id="_nYIBy-KKEeyB59fpdb3pkQ" elementId="net.tourbook.map2.view.Map2ViewId" ref="_nYB7EOKKEeyB59fpdb3pkQ" closeable="true">
                   <tags>View</tags>
                   <tags>categoryTag:6. Map</tags>
@@ -107,9 +114,16 @@
                 </children>
               </children>
               <children xsi:type="basic:PartStack" xmi:id="_nYIBz-KKEeyB59fpdb3pkQ" elementId="chart" containerData="5000" selectedElement="_nYIB0OKKEeyB59fpdb3pkQ">
+                <tags>7. Equipment</tags>
+                <tags>3. Tools</tags>
+                <tags>active</tags>
                 <children xsi:type="advanced:Placeholder" xmi:id="_nYIB0OKKEeyB59fpdb3pkQ" elementId="net.tourbook.views.TourChartView" ref="_nYB7FOKKEeyB59fpdb3pkQ" closeable="true">
                   <tags>View</tags>
                   <tags>categoryTag:2. Tour Properties</tags>
+                </children>
+                <children xsi:type="advanced:Placeholder" xmi:id="_3EEOEVGDEe2BgplfLNzDmg" elementId="net.tourbook.ui.views.sensors.SensorChartView.ID" toBeRendered="false" ref="_3EEOEFGDEe2BgplfLNzDmg" closeable="true">
+                  <tags>View</tags>
+                  <tags>categoryTag:7. Equipment</tags>
                 </children>
               </children>
             </children>
@@ -183,6 +197,8 @@
       <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
       <tags>View</tags>
       <tags>categoryTag:2. Tour Properties</tags>
+      <tags>active</tags>
+      <tags>activeOnClose</tags>
       <menus xmi:id="_nnQp4OKKEeyB59fpdb3pkQ" elementId="net.tourbook.views.TourChartView">
         <tags>ViewMenu</tags>
         <tags>menuContribution:menu</tags>
@@ -207,8 +223,6 @@
       <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
       <tags>View</tags>
       <tags>categoryTag:1. Tour Directories</tags>
-      <tags>active</tags>
-      <tags>activeOnClose</tags>
       <menus xmi:id="_sKZd4OKKEeyB59fpdb3pkQ" elementId="net.tourbook.views.tourListView">
         <tags>ViewMenu</tags>
         <tags>menuContribution:menu</tags>
@@ -305,6 +319,42 @@
       <tags>View</tags>
       <tags>categoryTag:4. Compare Tours</tags>
     </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_2XusgFGDEe2BgplfLNzDmg" elementId="net.tourbook.ui.views.sensors.SensorView.ID" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Sensor" iconURI="platform:/plugin/net.tourbook/icons/sensor.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.sensors.SensorView"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
+      <tags>View</tags>
+      <tags>categoryTag:7. Equipment</tags>
+      <menus xmi:id="_2X2oUFGDEe2BgplfLNzDmg" elementId="net.tourbook.ui.views.sensors.SensorView.ID">
+        <tags>ViewMenu</tags>
+        <tags>menuContribution:menu</tags>
+      </menus>
+      <toolbar xmi:id="_2X2oUVGDEe2BgplfLNzDmg" elementId="net.tourbook.ui.views.sensors.SensorView.ID" visible="false"/>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_3EEOEFGDEe2BgplfLNzDmg" elementId="net.tourbook.ui.views.sensors.SensorChartView.ID" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Sensor Chart" iconURI="platform:/plugin/net.tourbook/icons/sensor-chart.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.sensors.SensorChartView"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
+      <tags>View</tags>
+      <tags>categoryTag:7. Equipment</tags>
+      <menus xmi:id="_3EK7wFGDEe2BgplfLNzDmg" elementId="net.tourbook.ui.views.sensors.SensorChartView.ID">
+        <tags>ViewMenu</tags>
+        <tags>menuContribution:menu</tags>
+      </menus>
+      <toolbar xmi:id="_3EK7wVGDEe2BgplfLNzDmg" elementId="net.tourbook.ui.views.sensors.SensorChartView.ID" visible="false"/>
+    </sharedElements>
+    <sharedElements xsi:type="basic:Part" xmi:id="_TPzOkFGFEe2JXuX0m9xQ3Q" elementId="net.tourbook.views.TourSegmenter" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView" label="Tour Segmenter" iconURI="platform:/plugin/net.tourbook/icons/tour-segmenter.png" tooltip="" closeable="true">
+      <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+      <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.tourSegmenter.TourSegmenterView"/>
+      <persistedState key="memento" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?>&#xD;&#xA;&lt;view/>"/>
+      <tags>View</tags>
+      <tags>categoryTag:3. Tools</tags>
+      <menus xmi:id="_TP7xcFGFEe2JXuX0m9xQ3Q" elementId="net.tourbook.views.TourSegmenter">
+        <tags>ViewMenu</tags>
+        <tags>menuContribution:menu</tags>
+      </menus>
+      <toolbar xmi:id="_TP8YgFGFEe2JXuX0m9xQ3Q" elementId="net.tourbook.views.TourSegmenter" visible="false"/>
+    </sharedElements>
     <trimBars xmi:id="_mdMqg-KKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.main.toolbar" contributorURI="platform:/plugin/org.eclipse.ui.workbench">
       <children xsi:type="menu:ToolBar" xmi:id="_mr4mwOKKEeyB59fpdb3pkQ" elementId="people">
         <tags>Draggable</tags>
@@ -338,6 +388,9 @@
         <tags>Draggable</tags>
       </children>
       <children xsi:type="menu:ToolBar" xmi:id="_nZMYsOKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.edit.text.actionSet.navigation" visible="false">
+        <tags>Draggable</tags>
+      </children>
+      <children xsi:type="menu:ToolBar" xmi:id="_v_KA4FGDEe2BgplfLNzDmg" elementId="measurementSystem">
         <tags>Draggable</tags>
       </children>
       <children xsi:type="menu:ToolControl" xmi:id="_nWXHIuKKEeyB59fpdb3pkQ" elementId="PerspectiveSpacer" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl">
@@ -1508,6 +1561,12 @@
     <tags>View</tags>
     <tags>categoryTag:SonarLint</tags>
   </descriptors>
+  <descriptors xmi:id="_v9GLYFGDEe2BgplfLNzDmg" elementId="net.tourbook.ui.views.TourData_View" label="Tour Data" iconURI="platform:/plugin/net.tourbook/icons/tour-data.png" tooltip="" category="2. Tour Properties" closeable="true" contributionURI="bundleclass://org.eclipse.ui.workbench/org.eclipse.ui.internal.e4.compatibility.CompatibilityView">
+    <persistedState key="originalCompatibilityViewClass" value="net.tourbook.ui.views.TourData_View"/>
+    <persistedState key="originalCompatibilityViewBundle" value="net.tourbook"/>
+    <tags>View</tags>
+    <tags>categoryTag:2. Tour Properties</tags>
+  </descriptors>
   <trimContributions xmi:id="_2r10UF9tEeO-yojH_y4TJA" elementId="org.eclipse.ui.ide.application.trimcontribution.QuickAccess" contributorURI="platform:/plugin/org.eclipse.ui.ide.application" toBeRendered="false" parentId="org.eclipse.ui.main.toolbar" positionInParent="last">
     <children xsi:type="menu:ToolControl" xmi:id="_76uUAF9tEeO-yojH_y4TJA" elementId="Spacer Glue" contributorURI="platform:/plugin/org.eclipse.ui.ide.application" contributionURI="bundleclass://org.eclipse.e4.ui.workbench.renderers.swt/org.eclipse.e4.ui.workbench.renderers.swt.LayoutModifierToolControl">
       <tags>glue</tags>
@@ -1756,7 +1815,7 @@
     <parameters xmi:id="_mdqlWeKKEeyB59fpdb3pkQ" elementId="importWizardId" name="Import Wizard"/>
   </commands>
   <commands xmi:id="_mdqlWuKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.window.switchToEditor" commandName="Switch to Editor" description="Switch to an editor" category="_mdgzmOKKEeyB59fpdb3pkQ"/>
-  <commands xmi:id="_mdqlW-KKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.help.dynamicHelp" commandName="Show Context Help" description="Open the contextual help" category="_mdgzmuKKEeyB59fpdb3pkQ"/>
+  <commands xmi:id="_mdqlW-KKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.help.dynamicHelp" commandName="Show Contextual Help" description="Open the contextual help" category="_mdgzmuKKEeyB59fpdb3pkQ"/>
   <commands xmi:id="_mdqlXOKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.navigate.nextSubTab" commandName="Next Sub-Tab" description="Switch to the next sub-tab" category="_mdgzk-KKEeyB59fpdb3pkQ"/>
   <commands xmi:id="_mdqlXeKKEeyB59fpdb3pkQ" elementId="org.eclipse.ui.edit.text.toMultiSelection" commandName="To multi-selection" description="Turn current selection into multiple text selections" category="_mdgzlOKKEeyB59fpdb3pkQ"/>
   <commands xmi:id="_mdqlXuKKEeyB59fpdb3pkQ" elementId="command.net.tourbook.views.collatedToursViewID" commandName="Collated Tours" category="_mdgzmeKKEeyB59fpdb3pkQ"/>
@@ -2555,6 +2614,7 @@
   <commands xmi:id="_OZZt6eKfEeyDzbE4k-4UUA" elementId="AUTOGEN:::org.eclipse.jdt.debug.ui.DisplayViewActions/org.eclipse.jdt.debug.ui.displayViewToolbar.Display" commandName="Display" description="Display Result of Evaluating Selected Text" category="_mdgzmeKKEeyB59fpdb3pkQ"/>
   <commands xmi:id="_OZZt6uKfEeyDzbE4k-4UUA" elementId="AUTOGEN:::org.eclipse.jdt.debug.ui.DisplayViewActions/org.eclipse.jdt.debug.ui.displayViewToolbar.Inspect" commandName="Inspect" description="Inspect Result of Evaluating Selected Text" category="_mdgzmeKKEeyB59fpdb3pkQ"/>
   <commands xmi:id="_OZZt6-KfEeyDzbE4k-4UUA" elementId="AUTOGEN:::org.eclipse.pde.ui.logViewActions/org.eclipse.jdt.debug.ui.LogViewActions.showStackTrace" commandName="Show Stack Trace in Console View" description="Show Stack Trace in Console View" category="_mdgzmeKKEeyB59fpdb3pkQ"/>
+  <commands xmi:id="_vt7uAFGDEe2BgplfLNzDmg" elementId="net.tourbook.command.tourCompareWizard" commandName="Tour Compare Wizard" category="_mdgzmeKKEeyB59fpdb3pkQ"/>
   <addons xmi:id="_mdMqj-KKEeyB59fpdb3pkQ" elementId="org.eclipse.e4.core.commands.service" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.e4.core.commands/org.eclipse.e4.core.commands.CommandServiceAddon"/>
   <addons xmi:id="_mdMqkOKKEeyB59fpdb3pkQ" elementId="org.eclipse.e4.ui.contexts.service" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.e4.ui.services/org.eclipse.e4.ui.services.ContextServiceAddon"/>
   <addons xmi:id="_mdMqkeKKEeyB59fpdb3pkQ" elementId="org.eclipse.e4.ui.bindings.service" contributorURI="platform:/plugin/org.eclipse.ui.workbench" contributionURI="bundleclass://org.eclipse.e4.ui.bindings/org.eclipse.e4.ui.bindings.BindingServiceAddon"/>
