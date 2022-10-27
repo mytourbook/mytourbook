@@ -23,7 +23,7 @@ import utils.UITest;
 import utils.Utils;
 
 public class DialogEasyImportConfigTests extends UITest {
-
+//tests
    @Test
    void openEasyImportConfig() {
 
