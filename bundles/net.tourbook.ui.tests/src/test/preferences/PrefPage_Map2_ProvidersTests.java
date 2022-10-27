@@ -79,21 +79,21 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
 
       //Add a new WMS provider
       bot.button(Messages.Pref_Map_Button_AddMapProviderWms).click();
-      bot.textWithLabel(Messages.Pref_Map_Dialog_WmsInput_Message).setText("https://ahocevar.com/geoserver/wms?SERVICE=WMS&REQUEST=GetCapabilities"); //$NON-NLS-1$
+      bot.textWithLabel(Messages.Pref_Map_Dialog_WmsInput_Message).setText("https://www.gmrt.org/services/mapserver/wms_merc?version=1.3.0"); //$NON-NLS-1$
       Utils.clickOkButton(bot);
 
       providersTable = bot.table();
 
       //Check the new number of providers after adding a new one
       assertEquals(providersTableCount + 1, providersTable.rowCount());
-      assertEquals("GeoServer Web Map Service", providersTable.cell(0, 0)); //$NON-NLS-1$
+      assertEquals("Global Multi-Resolution Topography (GMRT), Version 4.0", providersTable.cell(0, 0)); //$NON-NLS-1$
 
       providersTable.select(0);
       bot.button(Messages.Pref_Map_Button_Edit).click();
 
       final SWTBotTable wmsMapProviderTable = bot.table();
-      wmsMapProviderTable.getTableItem("Natural Earth Base Map").check(); //$NON-NLS-1$
-      assertEquals(12, wmsMapProviderTable.rowCount());
+      wmsMapProviderTable.getTableItem(1).check();
+      assertEquals(2, wmsMapProviderTable.rowCount());
       bot.button(de.byteholder.geoclipse.Messages.Dialog_WmsConfig_Button_UpdateMap).click();
       bot.button(de.byteholder.geoclipse.Messages.Dialog_MapConfig_Button_ShowOsmMap).click();
 
@@ -116,7 +116,7 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
          assertTrue(loadTransparentImagesCheckBox.isChecked());
       }
 
-      wmsMapProviderTable.getTableItem("NE1_HR_LC_SR_W_DR").check(); //$NON-NLS-1$
+      wmsMapProviderTable.getTableItem(0).check();
       bot.comboBox(2).setSelection(0);
 
       Utils.clickCancelButton(bot);
