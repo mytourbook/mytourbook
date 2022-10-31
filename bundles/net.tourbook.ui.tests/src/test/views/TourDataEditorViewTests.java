@@ -54,8 +54,8 @@ public class TourDataEditorViewTests extends UITest {
       assertEquals(newTourTitle, titleCombo.getText());
 
       final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.tour_editor_label_tour_date);
-      tourDateTime.setDate(Date.from(Instant.now()));
       assertNotNull(tourDateTime);
+      tourDateTime.setDate(Date.from(Instant.now()));
 
       bot.toolbarButtonWithTooltip(Utils.SAVE_MODIFIED_TOUR).click();
    }
