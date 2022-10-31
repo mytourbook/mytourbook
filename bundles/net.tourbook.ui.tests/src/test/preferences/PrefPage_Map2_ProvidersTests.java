@@ -79,21 +79,33 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
 
       //Add a new WMS provider
       bot.button(Messages.Pref_Map_Button_AddMapProviderWms).click();
-      bot.textWithLabel(Messages.Pref_Map_Dialog_WmsInput_Message).setText("https://www.gmrt.org/services/mapserver/wms_merc?version=1.3.0"); //$NON-NLS-1$
+      String wmsProviderUrl = "https://ahocevar.com/geoserver/wms?SERVICE=WMS&REQUEST=GetCapabilities";
+      String wmsProviderName;
+      int numLayers;
+      if (Utils.isUrlReachable(wmsProviderUrl)) {
+         wmsProviderName = "GeoServer Web Map Service";
+         numLayers = 12;
+      } else {
+         wmsProviderUrl = "https://www.gmrt.org/services/mapserver/wms_merc?version=1.3.0";
+         wmsProviderName = "Global Multi-Resolution Topography (GMRT), Version 4.0";
+         numLayers = 2;
+      }
+
+      bot.textWithLabel(Messages.Pref_Map_Dialog_WmsInput_Message).setText(wmsProviderUrl);
       Utils.clickOkButton(bot);
 
       providersTable = bot.table();
 
       //Check the new number of providers after adding a new one
       assertEquals(providersTableCount + 1, providersTable.rowCount());
-      assertEquals("Global Multi-Resolution Topography (GMRT), Version 4.0", providersTable.cell(0, 0)); //$NON-NLS-1$
+      assertEquals(wmsProviderName, providersTable.cell(0, 1));
 
       providersTable.select(0);
       bot.button(Messages.Pref_Map_Button_Edit).click();
 
       final SWTBotTable wmsMapProviderTable = bot.table();
       wmsMapProviderTable.getTableItem(1).check();
-      assertEquals(2, wmsMapProviderTable.rowCount());
+      assertEquals(numLayers, wmsMapProviderTable.rowCount());
       bot.button(de.byteholder.geoclipse.Messages.Dialog_WmsConfig_Button_UpdateMap).click();
       bot.button(de.byteholder.geoclipse.Messages.Dialog_MapConfig_Button_ShowOsmMap).click();
 
