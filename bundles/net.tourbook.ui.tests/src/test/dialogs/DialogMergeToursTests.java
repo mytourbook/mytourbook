@@ -27,10 +27,10 @@ public class DialogMergeToursTests extends UITest {
    @Test
    void testMergeTours() {
 
-      final var toto = bot.tree().expandNode("2021   3"); //$NON-NLS-1$
-      final var titi = toto.getNode("Feb   1").expand().select(); //$NON-NLS-1$
-      final var tutu = toto.getNode("May   2").expand().select(); //$NON-NLS-1$
-      toto.contextMenu(Messages.App_Action_JoinTours).click();
+      final var yearTreeItem = bot.tree().expandNode("2021   3"); //$NON-NLS-1$
+      yearTreeItem.getNode("Jan   3").expand().select(); //$NON-NLS-1$
+      yearTreeItem.getNode("May   2").expand().select(); //$NON-NLS-1$
+      yearTreeItem.contextMenu(Messages.App_Action_JoinTours).click();
 
       Utils.clickOkButton(bot);
    }
