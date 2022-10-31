@@ -15,29 +15,23 @@
  *******************************************************************************/
 package dialogs;
 
+import net.tourbook.Messages;
+
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
+import utils.Utils;
 
 public class DialogMergeToursTests extends UITest {
 
    @Test
    void testMergeTours() {
 
-//      Utils.showTourBookView(bot);
+      final var toto = bot.tree().expandNode("2021   3"); //$NON-NLS-1$
+      final var titi = toto.getNode("Feb   1").expand().select(); //$NON-NLS-1$
+      final var tutu = toto.getNode("May   2").expand().select(); //$NON-NLS-1$
+      toto.contextMenu(Messages.App_Action_JoinTours).click();
 
-//      bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
-//            .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
-//      bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
-//            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
-//
-//      final SWTBotTree tree = bot.tree();
-//      final SWTBotTreeItem item = tree.expandNode("2015   1");
-//      item.select("ACT", "CL_SCHED", "DEPARTMENT", "EMP_PHOTO", "EMP_RESUME", "EMPLOYEE");
-//      tree.contextMenu("Copy").click();
-//
-//      bot.viewByTitle("Tour Book").show();
-      //bot.contextMenu("Concatenate Tours...").click();
-//      bot.button("OK").click();
+      Utils.clickOkButton(bot);
    }
 }
