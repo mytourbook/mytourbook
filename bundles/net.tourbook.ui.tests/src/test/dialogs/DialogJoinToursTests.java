@@ -39,8 +39,8 @@ public class DialogJoinToursTests extends UITest {
    void testMergeTours() {
 
       final SWTBotTree yearTree = bot.tree();
-      final SWTBotTreeItem monthTreeItem = yearTree.expandNode("2021   3").getNode("Jan   3").expand(); //$NON-NLS-1$
-      monthTreeItem.select("2", "30");
+      final SWTBotTreeItem monthTreeItem = yearTree.expandNode("2021   3").getNode("Jan   3").expand(); //$NON-NLS-1$ //$NON-NLS-2$
+      monthTreeItem.select("2", "30"); //$NON-NLS-1$ //$NON-NLS-2$
 
       //Action
       yearTree.contextMenu(Messages.App_Action_JoinTours).click();
@@ -53,7 +53,7 @@ public class DialogJoinToursTests extends UITest {
       bot.comboBox(0).setSelection(1);
       Utils.clickOkButton(bot);
 
-      //Assert
+      //Check that the concatenated tour exists
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   4").expand() //$NON-NLS-1$
             .getNode("Feb   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
