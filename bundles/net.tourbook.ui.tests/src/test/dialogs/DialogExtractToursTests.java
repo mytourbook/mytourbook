@@ -66,6 +66,7 @@ public class DialogExtractToursTests extends UITest {
       tourEditorViewBot = Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME).bot();
       timeSlicesTable = tourEditorViewBot.table();
       assertEquals(10, timeSlicesTable.rowCount());
+      bot.toolbarToggleButtonWithTooltip(Messages.app_action_edit_rows_tooltip).click();
 
       //Delete the tour
       Utils.showTourBookView(bot);
