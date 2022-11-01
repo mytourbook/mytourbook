@@ -50,8 +50,8 @@ public class DialogJoinToursTests extends UITest {
       final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.Dialog_JoinTours_Label_TourDate);
       assertNotNull(tourDateTime);
       tourDateTime.setDate(new Date(1612221767000L));
+      bot.comboBox(0).setSelection(1);
       Utils.clickOkButton(bot);
-
 
       //Assert
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   4").expand() //$NON-NLS-1$
@@ -65,10 +65,10 @@ public class DialogJoinToursTests extends UITest {
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "2/1/21, 11:22 PM")));//$NON-NLS-1$
+            "2/1/21, 9:11 AM")));//$NON-NLS-1$
 
       //Check that the tour was successfully deleted
       final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
-      assertEquals("2015   1", allItems[2].getText()); //$NON-NLS-1$
+      assertEquals("2021   3", allItems[4].getText()); //$NON-NLS-1$
    }
 }
