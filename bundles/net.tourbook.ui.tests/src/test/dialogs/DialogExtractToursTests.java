@@ -25,39 +25,50 @@ import java.util.List;
 import net.tourbook.Messages;
 import net.tourbook.tour.TourLogManager;
 
+import org.eclipse.swtbot.swt.finder.SWTBot;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotDateTime;
-import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
-public class DialogJoinToursTests extends UITest {
+public class DialogExtractToursTests extends UITest {
 
    @Test
-   void joinTours() {
+   void extractTour() {
 
-      final SWTBotTree yearTree = bot.tree();
-      final SWTBotTreeItem monthTreeItem = yearTree.expandNode("2021   3").getNode("Jan   3").expand(); //$NON-NLS-1$ //$NON-NLS-2$
-      monthTreeItem.select("2", "30"); //$NON-NLS-1$ //$NON-NLS-2$
+      Utils.getTour(bot);
+      SWTBot tourEditorViewBot = Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME).bot();
+      bot.cTabItem(Messages.tour_editor_tabLabel_tour_data).activate();
+      bot.toolbarToggleButtonWithTooltip(Messages.app_action_edit_rows_tooltip).click();
 
-      //Action
-      yearTree.contextMenu(Messages.App_Action_JoinTours).click();
+      //Actions
+      SWTBotTable timeSlicesTable = tourEditorViewBot.table();
+      timeSlicesTable.select(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+      timeSlicesTable.contextMenu(Messages.App_Action_ExtractTour).click();
 
       //Options
       bot.checkBox(Messages.Dialog_SplitTour_Checkbox_KeepTime).click();
       final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.Dialog_JoinTours_Label_TourDate);
       assertNotNull(tourDateTime);
       tourDateTime.setDate(new Date(1612221767000L));
-      bot.comboBox(0).setSelection(1);
+      bot.comboBox(0).setSelection(0);
       Utils.clickOkButton(bot);
 
-      //Check that the concatenated tour exists
+      //Check that the extracted tour exists
+      Utils.showTourBookView(bot);
       final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   4").expand() //$NON-NLS-1$
             .getNode("Feb   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
+      //Check that it contains 10 time slices
+      tourEditorViewBot = Utils.showView(bot, Utils.TOUREDITOR_VIEW_NAME).bot();
+      timeSlicesTable = tourEditorViewBot.table();
+      assertEquals(10, timeSlicesTable.rowCount());
 
+      //Delete the tour
+      Utils.showTourBookView(bot);
       tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
             Messages.Tour_Book_Action_delete_selected_tours).click();
       Utils.clickOkButton(bot);
@@ -65,7 +76,7 @@ public class DialogJoinToursTests extends UITest {
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "2/1/21, 9:11 AM")));//$NON-NLS-1$
+            "2/1/21, 7:15 AM")));//$NON-NLS-1$
 
       //Check that the tour was successfully deleted
       final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
