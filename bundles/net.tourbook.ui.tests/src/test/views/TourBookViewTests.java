@@ -172,7 +172,7 @@ public class TourBookViewTests extends UITest {
 
       final SWTBotNatTable botNatTable = new SWTBotNatTable(
             tourBookView.bot().widget(widgetOfType(NatTable.class)));
-      assertEquals(9, botNatTable.rowCount());
+      assertEquals(10, botNatTable.rowCount());
 
       botNatTable.click(1, 0);
       botNatTable.click(2, 0);
