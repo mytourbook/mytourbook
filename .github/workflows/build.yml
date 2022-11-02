@@ -49,6 +49,8 @@ jobs:
             D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\*.png
             D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\workspace\.metadata\.log
             D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.tests\**\*-GeneratedFromTests.json
+            D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.tests\**\*.xml
+            D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\**\*.xml
           retention-days: 5
       - name: Generate artifact name
         id: generate-artifact-name
@@ -66,7 +68,7 @@ jobs:
         if: success() || failure()
         with:
           name: Unit Tests            # Name of the check run which will be created
-          path: reports/*.xml         # Path to test results
+          path: 'D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.tests\target\*.xml,D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\*.xml'         # Path to test results
           reporter: junit             # Format of test results
           
   check_date:
