@@ -69,7 +69,7 @@ jobs:
         with:
           name: Unit Tests            # Name of the check run which will be created
           path: 'D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.tests\target\*.xml,D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\target\*.xml'         # Path to test results
-          reporter: junit             # Format of test results
+          reporter: java-junit        # Format of test results
           
   check_date:
     runs-on: windows-latest
