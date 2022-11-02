@@ -27,6 +27,21 @@ import utils.Utils;
 public class PrefPagePeopleTests extends UITest {
 
    @Test
+   void addHRZones() {
+
+      Utils.openPreferences(bot);
+      bot.tree().getTreeItem("People").select(); //$NON-NLS-1$
+      bot.cTabItem(Messages.Pref_People_Tab_HRZone).activate();
+
+      bot.comboBox(1).setSelection(1);
+      bot.button(Messages.Dialog_HRZone_Button_EditHrZones).click();
+      Utils.clickOkButton(bot);
+      Utils.clickApplyAndCloseButton(bot);
+      bot.button("Yes").click();
+      Utils.clickOkButton(bot);
+   }
+
+   @Test
    void openPeoplePage() {
 
       Utils.openPreferences(bot);
