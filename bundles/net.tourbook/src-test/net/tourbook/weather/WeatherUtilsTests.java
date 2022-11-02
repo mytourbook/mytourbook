@@ -103,7 +103,7 @@ public class WeatherUtilsTests {
       final double[] windSpeeds = new double[0];
       final int[] windDirections = new int[0];
 
-      final int[] expectedAverageWindSpeedAndDirection = new int[0];
+      final int[] expectedAverageWindSpeedAndDirection = new int[2];
 
       assertArrayEquals(
             expectedAverageWindSpeedAndDirection,
