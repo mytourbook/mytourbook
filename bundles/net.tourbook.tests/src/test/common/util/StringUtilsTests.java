@@ -34,7 +34,7 @@ public class StringUtilsTests {
    void testSanitizeFileNameWindows() {
 
       final String fileName = "/\\:*?\"<>|filename#_.txt"; //$NON-NLS-1$
-      assertEquals("--------TOTO-filename#_.txt", StringUtils.sanitizeFileName(fileName)); //$NON-NLS-1$
+      assertEquals("---------filename#_.txt", StringUtils.sanitizeFileName(fileName)); //$NON-NLS-1$
       assertNull(StringUtils.sanitizeFileName(null));
       assertEquals(UI.EMPTY_STRING, StringUtils.sanitizeFileName(UI.EMPTY_STRING));
    }

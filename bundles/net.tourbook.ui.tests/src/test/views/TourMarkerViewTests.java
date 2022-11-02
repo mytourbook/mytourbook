@@ -60,7 +60,7 @@ public class TourMarkerViewTests extends UITest {
       final SWTBotTable tableMarkers = bot.table();
 
       //Make sure that the tour contains 3 markers
-      assertEquals(3, tableMarkers.rowCount());
+      assertEquals(300000, tableMarkers.rowCount());
 
       tableMarkers.select(0);
       tableMarkers.select(1);
