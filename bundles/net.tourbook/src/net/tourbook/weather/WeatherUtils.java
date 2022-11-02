@@ -283,7 +283,8 @@ public class WeatherUtils {
       final int[] averageWindSpeedAndDirection = new int[2];
 
       final int dataSize = windSpeeds.length;
-      if (dataSize == 0 || dataSize != windDirections.length) {
+      final int windDirectionsLength = windDirections.length;
+      if (dataSize == 0 || windDirectionsLength == 0 || dataSize != windDirectionsLength) {
          return averageWindSpeedAndDirection;
       }
 

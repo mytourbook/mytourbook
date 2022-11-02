@@ -27,7 +27,7 @@ public class WeatherUtilsTests {
       final double[] windSpeeds = new double[] { 30.0, 36.0 };
       final int[] windDirections = new int[] { 360, 350 };
 
-      final int[] expectedAverageWindSpeedAndDirection = new int[] { 33, 355 };
+      final int[] expectedAverageWindSpeedAndDirection = new int[0];
 
       assertArrayEquals(
             expectedAverageWindSpeedAndDirection,
@@ -92,6 +92,19 @@ public class WeatherUtilsTests {
       // Wind Coming From the NW
       windDirections = new int[] { 315 };
       expectedAverageWindSpeedAndDirection = new int[] { 1, 315 };
+      assertArrayEquals(
+            expectedAverageWindSpeedAndDirection,
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
+   }
+
+   @Test
+   void testComputeAverageWindSpeedAndDirection_Empty() {
+
+      final double[] windSpeeds = new double[0];
+      final int[] windDirections = new int[0];
+
+      final int[] expectedAverageWindSpeedAndDirection = new int[] { 33, 355 };
+
       assertArrayEquals(
             expectedAverageWindSpeedAndDirection,
             WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
