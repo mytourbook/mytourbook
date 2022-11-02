@@ -187,6 +187,12 @@ public class TimeToolsTests {
    }
 
    @Test
+   void testGetTimeZoneIndex_Default() {
+
+      assertEquals(596, TimeTools.getTimeZoneIndex_Default());
+   }
+
+   @Test
    void testToEpochMilli_LocalDateTime() {
 
       final LocalDateTime localDateTime = LocalDateTime.of(
