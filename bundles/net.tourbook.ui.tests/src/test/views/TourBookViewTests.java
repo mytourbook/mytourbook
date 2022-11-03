@@ -41,7 +41,7 @@ import utils.Utils;
 public class TourBookViewTests extends UITest {
 
    @Test
-   void adjustTimeZone() {
+   void adustTourValues_SetTimeZone_AllChoices() {
 
       //Select a tour
       SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$

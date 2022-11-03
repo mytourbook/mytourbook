@@ -26,7 +26,7 @@ import utils.Utils;
 public class DialogReimportTourTests extends UITest {
 
    @Test
-   void TourReimport_WhenAllToursAreSelected_FilesCannotBeFound() {
+   void tourReimport_WhenAllToursAreSelected_FilesCannotBeFound() {
 
       final SWTBotTreeItem tour = Utils.getTour(bot);
 
