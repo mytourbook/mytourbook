@@ -32,18 +32,16 @@ public class DialogReimportTourTests extends UITest {
 
       tour.contextMenu(Messages.Dialog_ReimportTours_Action_OpenDialog).click();
 
-      bot.radio(Messages.Dialog_ModifyTours_Radio_SelectedTours).click();
-      bot.button("Unlock").click();
-      bot.radio("All saved tours").click();
-      bot.radio("Entire tour").click();
-      bot.checkBox("Skip tours for which the file is not found").click();
-      bot.checkBox("Do detailed logging, this can significantly increase the time").click();
-      bot.button("Re-import").click();
-      bot.button("Yes").click();
-      bot.button("OK").click();
-      bot.tree().getTreeItem("2015   1").expand();
-      bot.tree().getTreeItem("2015   1").getNode("May   1").expand();
-      bot.tree().getTreeItem("2015   1").expand();
-      bot.tree().getTreeItem("2015   1").getNode("May   1").expand();
+      bot.button(0).click();//Unlock the radio button below
+      bot.radio(Messages.Dialog_ModifyTours_Radio_AllTours).click();
+
+      bot.radio(Messages.Dialog_ReimportTours_Checkbox_EntireTour).click();
+      bot.checkBox(Messages.Dialog_ReimportTours_Checkbox_SkipToursWithImportFileNotFound).click();
+
+      bot.checkBox(Messages.Tour_Log_Checkbox_LogDetails).click();
+      bot.button(Messages.Dialog_ReimportTours_Button_ReImport).click();
+
+      bot.button("Yes").click(); //$NON-NLS-1$
+      Utils.clickOkButton(bot);
    }
 }
