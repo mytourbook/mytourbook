@@ -100,10 +100,23 @@ public class WeatherUtilsTests {
    @Test
    void testComputeAverageWindSpeedAndDirection_Empty() {
 
-      final double[] windSpeeds = new double[0];
-      final int[] windDirections = new int[0];
+      double[] windSpeeds = new double[0];
+      int[] windDirections = new int[0];
 
       final int[] expectedAverageWindSpeedAndDirection = new int[2];
+
+      assertArrayEquals(
+            expectedAverageWindSpeedAndDirection,
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
+
+      windSpeeds = new double[1];
+
+      assertArrayEquals(
+            expectedAverageWindSpeedAndDirection,
+            WeatherUtils.computeAverageWindSpeedAndDirection(windSpeeds, windDirections));
+
+      windSpeeds = new double[] { 13 };
+      windDirections = new int[] { 12, 12 };
 
       assertArrayEquals(
             expectedAverageWindSpeedAndDirection,
