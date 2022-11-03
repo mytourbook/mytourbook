@@ -40,6 +40,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
+import net.tourbook.map25.animation.Map25Animation;
 import net.tourbook.map25.layer.compassrose.CompassRoseLayer;
 import net.tourbook.map25.layer.labeling.LabelLayerMT;
 import net.tourbook.map25.layer.legend.LegendLayer;
@@ -60,6 +61,7 @@ import net.tourbook.map25.renderer.TourTrack_Shader;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
+import org.lwjgl.LWJGLException;
 import org.oscim.awt.AwtGraphics;
 import org.oscim.backend.CanvasAdapter;
 import org.oscim.backend.DateTime;
@@ -163,6 +165,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private static IDialogSettings               _state;
    //
    private static Map25View                     _map25View;
+   private static Map25Animation                _map25Animation;
    private static LwjglApplication              _lwjglApp;
    private static LwjglApplicationConfiguration _appConfig;
    //
@@ -477,53 +480,24 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       restoreState();
    }
 
-   public static Map25App createMap(final Map25View map25View, final IDialogSettings state, final Canvas canvas) {
+   public static Map25App createMap(final Map25View map25View, final IDialogSettings state, final Canvas awtCanvas) {
 
-      init();
+      createMap_10_Init();
 
       _map25View = map25View;
       _state = state;
 
       final Map25App mapApp = new Map25App(state);
 
-      _appConfig = getConfig();
-      _lwjglApp = new LwjglApplication(mapApp, _appConfig, canvas);
+      _appConfig = createMap_20_CreateAppConfig();
+      _lwjglApp = new LwjglApplication(mapApp, _appConfig, awtCanvas);
 
       Map25FPSManager.init(_lwjglApp, _appConfig);
 
       return mapApp;
    }
 
-   private static LwjglApplicationConfiguration getConfig() {
-
-      LwjglApplicationConfiguration.disableAudio = true;
-
-      final LwjglApplicationConfiguration appConfig = new LwjglApplicationConfiguration();
-
-      appConfig.title = Map25App.class.getSimpleName();
-      appConfig.width = 1200;
-      appConfig.height = 1000;
-      appConfig.stencil = 8;
-      appConfig.samples = 2;
-
-      appConfig.forceExit = false;
-
-      // this setting seems not to work for 4k display
-//    appConfig.useHDPI = true;
-
-      /*
-       * Reduce CPU cycles
-       */
-      appConfig.pauseWhenBackground = false;
-
-      //  0 = do not sleep
-      // -1 = do not render
-      appConfig.backgroundFPS = 1;
-
-      return appConfig;
-   }
-
-   public static void init() {
+   private static void createMap_10_Init() {
 
       // load native library
       new SharedLibraryLoader().load("vtm-jni"); //$NON-NLS-1$
@@ -557,6 +531,35 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       GLAdapter.GDX_DESKTOP_QUIRKS = true;
 
       DateTimeAdapter.init(new DateTime());
+   }
+
+   private static LwjglApplicationConfiguration createMap_20_CreateAppConfig() {
+
+      LwjglApplicationConfiguration.disableAudio = true;
+
+      final LwjglApplicationConfiguration appConfig = new LwjglApplicationConfiguration();
+
+      appConfig.title = Map25App.class.getSimpleName();
+      appConfig.width = 1200;
+      appConfig.height = 1000;
+      appConfig.stencil = 8;
+      appConfig.samples = 2;
+
+      appConfig.forceExit = false;
+
+      // this setting seems not to work for 4k display
+//    appConfig.useHDPI = true;
+
+      /*
+       * Reduce CPU cycles
+       */
+      appConfig.pauseWhenBackground = false;
+
+      //  0 = do not sleep
+      // -1 = do not render
+      appConfig.backgroundFPS = 1;
+
+      return appConfig;
    }
 
    /**
@@ -1363,6 +1366,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    @Override
    public void render() {
 
+      /*
+       * Render debug view
+       */
       final long renderTime = System.currentTimeMillis();
       if (renderTime > _lastRenderTime + 1000) {
 
@@ -1377,6 +1383,29 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          }
       }
 
+      /*
+       * Render animation into a texture
+       */
+      try {
+
+//       _map25Animation = new Map25Animation();
+//       _map25Animation.startAnimation();
+
+         final boolean isCurrent = org.lwjgl.opengl.Display.isCurrent();
+
+         if (isCurrent == false) {
+
+            org.lwjgl.opengl.Display.makeCurrent();
+         }
+
+      } catch (final LWJGLException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+
+      /*
+       * Render Map
+       */
       super.render();
    }
 
