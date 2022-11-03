@@ -15,13 +15,31 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+import javax.xml.stream.XMLInputFactory;
 
 import org.xml.sax.SAXException;
 
 public class XmlUtils {
+
+   public static XMLInputFactory initializeFactory() {
+
+      try {
+
+         final XMLInputFactory inputFactory = XMLInputFactory.newInstance();
+         // Address the following security issue: https://rules.sonarsource.com/java/RSPEC-2755
+         inputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+         return inputFactory;
+
+      } catch (final FactoryConfigurationError e) {
+         StatusUtil.log(e);
+      }
+
+      return null;
+   }
 
    public static SAXParser initializeParser() {
 
@@ -38,5 +56,4 @@ public class XmlUtils {
 
       return null;
    }
-
 }
