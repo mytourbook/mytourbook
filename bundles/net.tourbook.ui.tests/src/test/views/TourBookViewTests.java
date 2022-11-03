@@ -52,7 +52,7 @@ public class TourBookViewTests extends UITest {
 
       //Adjust the tour time zone
       tour.contextMenu(Messages.Tour_Action_AdjustTourValues).menu(Messages.Tour_Action_SetTimeZone).click();
-      SWTBotCombo timeZoneComboBox = bot.comboBox(0);
+      final SWTBotCombo timeZoneComboBox = bot.comboBox(0);
       assertEquals(601, timeZoneComboBox.itemCount());
       bot.comboBox().setSelection("-07:00    -06:00    US/Mountain   -   DST - 1 h - N"); //$NON-NLS-1$
       bot.button(Messages.Dialog_SetTimeZone_Button_AdjustTimeZone).click();
@@ -65,16 +65,14 @@ public class TourBookViewTests extends UITest {
 
       //Adjust the tour time zone to the default value set in the preferences
       tour.contextMenu(Messages.Tour_Action_AdjustTourValues).menu(Messages.Tour_Action_SetTimeZone).click();
-      timeZoneComboBox = bot.comboBox(0);
-      assertEquals(601, timeZoneComboBox.itemCount());
-      bot.comboBox().setSelection("-07:00    -06:00    US/Mountain   -   DST - 1 h - N"); //$NON-NLS-1$
+      bot.link(0).click();
       bot.button(Messages.Dialog_SetTimeZone_Button_AdjustTimeZone).click();
 
       //Assert
       tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
             .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
-      assertEquals("10:51 AM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
-      assertEquals("US/Mountain", tour.cell(tourBookView_TimeZone_Column_Index)); //$NON-NLS-1$
+      assertEquals("6:51 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("Europe/Paris", tour.cell(tourBookView_TimeZone_Column_Index)); //$NON-NLS-1$
    }
 
    @BeforeEach
