@@ -52,8 +52,6 @@ public class TourBookViewTests extends UITest {
 
       //Adjust the tour time zone
       tour.contextMenu(Messages.Tour_Action_AdjustTourValues).menu(Messages.Tour_Action_SetTimeZone).click();
-      final SWTBotCombo timeZoneComboBox = bot.comboBox(0);
-      assertEquals(601, timeZoneComboBox.itemCount());
       bot.comboBox().setSelection("-07:00    -06:00    US/Mountain   -   DST - 1 h - N"); //$NON-NLS-1$
       bot.button(Messages.Dialog_SetTimeZone_Button_AdjustTimeZone).click();
 
