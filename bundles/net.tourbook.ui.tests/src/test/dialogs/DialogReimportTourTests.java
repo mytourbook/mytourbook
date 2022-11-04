@@ -43,5 +43,6 @@ public class DialogReimportTourTests extends UITest {
 
       bot.button("Yes").click(); //$NON-NLS-1$
       Utils.clickOkButton(bot);
+      bot.sleep(1000);
    }
 }
