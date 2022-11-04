@@ -140,8 +140,8 @@ public class PrintTourPDF extends PrintTourExtension {
          final StreamSource xslSource = new StreamSource(xslFile);
 
          final TransformerFactory transformerFactory = TransformerFactory.newInstance();
-         transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, UI.EMPTY_STRING);
-         transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, UI.EMPTY_STRING);
+         transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+         transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
          final Transformer transformer = transformerFactory.newTransformer(xslSource);
 
          // setup FOP
