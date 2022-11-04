@@ -38,7 +38,7 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
-   private static final String baseApiUrl        = WeatherUtils.HEROKU_APP_URL + "/openweathermap/timemachine"; //$NON-NLS-1$
+   private static final String baseApiUrl        = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/timemachine"; //$NON-NLS-1$
 
    private TimeMachineResult   timeMachineResult = null;
 

@@ -36,7 +36,7 @@ import utils.Initializer;
 /**
  * Regression tests for the weather retrieval from WeatherAPI.
  */
-public class WeatherAPIRetrieverTests {
+public class WeatherApiRetrieverTests {
 
    private static final String WEATHERAPI_FILE_PATH =
          FilesUtils.rootPath + "data/weather/weatherapi/files/"; //$NON-NLS-1$
@@ -60,7 +60,7 @@ public class WeatherAPIRetrieverTests {
 
       final String weatherApiResponse = Comparison.readFileContent(WEATHERAPI_FILE_PATH
             + "LongsPeak-Manual-WeatherApiResponse-July2022.json"); //$NON-NLS-1$
-      final String url = WeatherUtils.HEROKU_APP_URL
+      final String url = WeatherUtils.OAUTH_PASSEUR_APP_URL
             + "/weatherapi?lat=40.263996&lon=-105.58854099999999&lang=en&dt=2022-07-02"; //$NON-NLS-1$
       httpClientMock.onGet(url)
             .doReturn(weatherApiResponse);
@@ -98,7 +98,7 @@ public class WeatherAPIRetrieverTests {
 
       final String weatherApiResponse = Comparison.readFileContent(WEATHERAPI_FILE_PATH
             + "LongsPeak-Manual-WeatherApiResponse-May2022.json"); //$NON-NLS-1$
-      final String url = WeatherUtils.HEROKU_APP_URL
+      final String url = WeatherUtils.OAUTH_PASSEUR_APP_URL
             + "/weatherapi?lat=40.263996&lon=-105.58854099999999&lang=en&dt=2022-05-10"; //$NON-NLS-1$
       httpClientMock.onGet(url)
             .doReturn(weatherApiResponse);

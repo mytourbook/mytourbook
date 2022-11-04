@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -232,7 +232,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
       try {
          final HttpRequest request = HttpRequest.newBuilder()
-               .uri(URI.create(OAuth2Constants.HEROKU_APP_URL + "/suunto/route/import"))//$NON-NLS-1$
+               .uri(URI.create(OAuth2Constants.OAUTH_PASSEUR_APP_URL + "/suunto/route/import"))//$NON-NLS-1$
                .header(OAuth2Constants.CONTENT_TYPE, "application/json") //$NON-NLS-1$
                .header(HttpHeaders.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken()) //     .timeout(Duration.ofMinutes(5))
                .POST(BodyPublishers.ofString(payload.toString()))

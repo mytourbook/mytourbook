@@ -34,7 +34,7 @@ public class WeatherUtils {
 
    public static final int    SECONDS_PER_THIRTY_MINUTE = 1800;
 
-   public static final String HEROKU_APP_URL            = "https://passeur-mytourbook-oauthapps.cyclic.app"; //$NON-NLS-1$
+   public static final String OAUTH_PASSEUR_APP_URL     = "https://passeur-mytourbook-oauthapps.cyclic.app"; //$NON-NLS-1$
 
    /**
     * Returns the fully detailed weather data as a human readable string.

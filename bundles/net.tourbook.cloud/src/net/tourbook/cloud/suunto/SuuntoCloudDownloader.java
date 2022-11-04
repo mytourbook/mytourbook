@@ -91,7 +91,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    private CompletableFuture<WorkoutDownload> downloadFile(final Payload workoutPayload) {
 
       final HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(OAuth2Constants.HEROKU_APP_URL + "/suunto/workout/exportFit?workoutKey=" + workoutPayload.workoutKey))//$NON-NLS-1$
+            .uri(URI.create(OAuth2Constants.OAUTH_PASSEUR_APP_URL + "/suunto/workout/exportFit?workoutKey=" + workoutPayload.workoutKey))//$NON-NLS-1$
             .header(HttpHeaders.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
             .GET()
             .build();
@@ -359,11 +359,11 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
       try {
 
-         final URI herokuUri = new URI(OAuth2Constants.HEROKU_APP_URL);
+         final URI oAuthPasseurAppUri = new URI(OAuth2Constants.OAUTH_PASSEUR_APP_URL);
 
          final URIBuilder uriBuilder = new URIBuilder()
-               .setScheme(herokuUri.getScheme())
-               .setHost(herokuUri.getHost())
+               .setScheme(oAuthPasseurAppUri.getScheme())
+               .setHost(oAuthPasseurAppUri.getHost())
                .setPath("suunto/workouts"); //$NON-NLS-1$
 
          if (getSuuntoUseWorkoutFilterStartDate()) {

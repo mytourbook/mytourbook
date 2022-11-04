@@ -107,14 +107,14 @@ public class SuuntoRoutesUploaderTests {
       final String workoutsResponse = Comparison.readFileContent(SUUNTO_FILE_PATH
             + "RouteUpload-Response.json"); //$NON-NLS-1$
       httpClientMock.onPost(
-            OAuth2Constants.HEROKU_APP_URL + "/suunto/route/import") //$NON-NLS-1$
+            OAuth2Constants.OAUTH_PASSEUR_APP_URL + "/suunto/route/import") //$NON-NLS-1$
             .doReturn(workoutsResponse)
             .withStatus(HttpURLConnection.HTTP_CREATED);
 
       final TourData tour = Initializer.importTour();
       suuntoRoutesUploader.uploadTours(Arrays.asList(tour));
 
-      httpClientMock.verify().post(OAuth2Constants.HEROKU_APP_URL + "/suunto/route/import").called(); //$NON-NLS-1$
+      httpClientMock.verify().post(OAuth2Constants.OAUTH_PASSEUR_APP_URL + "/suunto/route/import").called(); //$NON-NLS-1$
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(

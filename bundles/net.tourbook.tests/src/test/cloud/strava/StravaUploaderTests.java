@@ -48,7 +48,7 @@ import utils.Initializer;
 
 public class StravaUploaderTests {
 
-   private static final String           HEROKU_APP_URL_TOKEN = OAuth2Constants.HEROKU_APP_URL + "/strava/token"; //$NON-NLS-1$
+   private static final String           OAUTH_PASSEUR_APP_URL_TOKEN = OAuth2Constants.OAUTH_PASSEUR_APP_URL + "/strava/token"; //$NON-NLS-1$
    private static final IPreferenceStore _prefStore           = Activator.getDefault().getPreferenceStore();
 
    private static final String           STRAVA_FILE_PATH     = FilesUtils.rootPath + "cloud/strava/files/";      //$NON-NLS-1$
@@ -68,7 +68,7 @@ public class StravaUploaderTests {
       final String passeurResponse = Comparison.readFileContent(STRAVA_FILE_PATH
             + "PasseurResponse.json"); //$NON-NLS-1$
       httpClientMock.onPost(
-            HEROKU_APP_URL_TOKEN)
+            OAUTH_PASSEUR_APP_URL_TOKEN)
             .doReturn(passeurResponse)
             .withStatus(201);
 
@@ -127,7 +127,7 @@ public class StravaUploaderTests {
       selectedTours.add(tour);
       stravaUploader.uploadTours(selectedTours);
 
-      httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
+      httpClientMock.verify().post(OAUTH_PASSEUR_APP_URL_TOKEN).called();
       httpClientMock
             .verify()
             .post("https://www.strava.com/api/v3/activities") //$NON-NLS-1$
@@ -158,7 +158,7 @@ public class StravaUploaderTests {
       selectedTours.add(tour);
       stravaUploader.uploadTours(selectedTours);
 
-      httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
+      httpClientMock.verify().post(OAUTH_PASSEUR_APP_URL_TOKEN).called();
       httpClientMock
             .verify()
             .post("https://www.strava.com/api/v3/uploads") //$NON-NLS-1$

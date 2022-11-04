@@ -143,7 +143,7 @@ public class StravaUploader extends TourbookCloudUploader {
       return activityUpload;
    }
 
-   public static StravaTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
+   static StravaTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
 
       final JSONObject body = new JSONObject();
       String grantType;
@@ -160,7 +160,7 @@ public class StravaUploader extends TourbookCloudUploader {
       final HttpRequest request = HttpRequest.newBuilder()
             .header(OAuth2Constants.CONTENT_TYPE, "application/json") //$NON-NLS-1$
             .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
-            .uri(URI.create(OAuth2Constants.HEROKU_APP_URL + "/strava/token"))//$NON-NLS-1$
+            .uri(URI.create(OAuth2Constants.OAUTH_PASSEUR_APP_URL + "/strava/token"))//$NON-NLS-1$
             .build();
 
       try {
