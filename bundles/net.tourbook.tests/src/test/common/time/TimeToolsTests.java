@@ -16,7 +16,7 @@
 package common.time;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.DisplayName;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
