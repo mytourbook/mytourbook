@@ -20,8 +20,22 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Current {
+class Current {
 
+   private int           dt;
+   private int           sunrise;
+   private int           sunset;
+   private double        temp;
+   private double        feels_like;
+   private int           pressure;
+   private int           humidity;
+   private double        dew_point;
+   private int           uvi;
+   private int           clouds;
+   private int           visibility;
+   private double        wind_speed;
+   private int           wind_deg;
+   private int           wind_gust;
    private List<Weather> weather;
 
    public List<Weather> getWeather() {

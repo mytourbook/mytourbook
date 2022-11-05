@@ -29,6 +29,8 @@ import net.tourbook.weather.WeatherUtils;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeMachineResult {
 
+   private Current      current;
+
    private List<Hourly> hourly;
 
    private Hourly       middleHourly;
@@ -277,5 +279,9 @@ public class TimeMachineResult {
       }
 
       return weatherType;
+   }
+
+   public Current getCurrent() {
+      return current;
    }
 }
