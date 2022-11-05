@@ -152,6 +152,7 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
    }
 
+   //TODO FB assertAll
    @Test
    @Disabled
    void openOfflineMapPreferencePage() {
