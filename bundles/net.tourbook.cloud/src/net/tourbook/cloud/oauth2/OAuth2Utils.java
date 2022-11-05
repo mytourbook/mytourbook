@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2022 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.cloud.oauth2;
 
+import java.net.URI;
+
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 
@@ -26,6 +28,11 @@ public class OAuth2Utils {
       final long expireAt = accessTokenIssueDateTime + accessTokenExpiresIn;
 
       return (expireAt == 0) ? UI.EMPTY_STRING : TimeTools.getUTCISODateTime(expireAt);
+   }
+
+   public static URI createOAuthPasseurUri(final String uriSuffix) {
+
+      return URI.create(OAuth2Constants.OAUTH_PASSEUR_APP_URL + uriSuffix);
    }
 
    /**

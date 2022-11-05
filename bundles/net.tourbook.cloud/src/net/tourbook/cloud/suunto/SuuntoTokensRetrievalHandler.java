@@ -19,7 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -97,7 +96,7 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
       final HttpRequest request = HttpRequest.newBuilder()
             .header(OAuth2Constants.CONTENT_TYPE, "application/json") //$NON-NLS-1$
             .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
-            .uri(URI.create(OAuth2Constants.OAUTH_PASSEUR_APP_URL + "/suunto/token"))//$NON-NLS-1$
+            .uri(OAuth2Utils.createOAuthPasseurUri("/suunto/token"))//$NON-NLS-1$
             .build();
 
       try {

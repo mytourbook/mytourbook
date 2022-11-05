@@ -160,7 +160,7 @@ public class StravaUploader extends TourbookCloudUploader {
       final HttpRequest request = HttpRequest.newBuilder()
             .header(OAuth2Constants.CONTENT_TYPE, "application/json") //$NON-NLS-1$
             .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
-            .uri(URI.create(OAuth2Constants.OAUTH_PASSEUR_APP_URL + "/strava/token"))//$NON-NLS-1$
+            .uri(OAuth2Utils.createOAuthPasseurUri("/strava/token"))//$NON-NLS-1$
             .build();
 
       try {

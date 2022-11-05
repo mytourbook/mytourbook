@@ -46,6 +46,7 @@ import net.tourbook.cloud.CloudImages;
 import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
+import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.suunto.workouts.Payload;
 import net.tourbook.cloud.suunto.workouts.Workouts;
 import net.tourbook.common.UI;
@@ -91,7 +92,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    private CompletableFuture<WorkoutDownload> downloadFile(final Payload workoutPayload) {
 
       final HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(OAuth2Constants.OAUTH_PASSEUR_APP_URL + "/suunto/workout/exportFit?workoutKey=" + workoutPayload.workoutKey))//$NON-NLS-1$
+            .uri(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=" + workoutPayload.workoutKey))//$NON-NLS-1$
             .header(HttpHeaders.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
             .GET()
             .build();
