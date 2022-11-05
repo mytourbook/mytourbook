@@ -360,7 +360,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
       try {
 
-         final URI oAuthPasseurAppUri = new URI(OAuth2Constants.OAUTH_PASSEUR_APP_URL);
+         final URI oAuthPasseurAppUri = OAuth2Utils.createOAuthPasseurUri(UI.EMPTY_STRING);
 
          final URIBuilder uriBuilder = new URIBuilder()
                .setScheme(oAuthPasseurAppUri.getScheme())
