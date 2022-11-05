@@ -167,6 +167,8 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
             return false;
          }
 
+         //todo fb if tour start time is current (what is the criteria for current?)
+         //then use the current datapoint
          timeMachineResult.addAllHourly(newTimeMachineResult.getHourly());
          final List<Hourly> hourly = timeMachineResult.getHourly();
 
