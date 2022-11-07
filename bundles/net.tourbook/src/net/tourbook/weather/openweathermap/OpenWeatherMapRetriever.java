@@ -201,6 +201,8 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
          final boolean isTourStartWithinTheCurrentHour = isTourStartTimeCurrent(newTimeMachineResult);
 
+         // If the tour start time is within the current hour, we use the
+         // current weather data instead of the historical one.
          if (isTourStartWithinTheCurrentHour) {
 
             setTourWeatherWithCurrentWeather(newTimeMachineResult.getCurrent());
