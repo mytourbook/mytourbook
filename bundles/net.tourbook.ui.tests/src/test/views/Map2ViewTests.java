@@ -15,26 +15,32 @@
  *******************************************************************************/
 package views;
 
+import net.tourbook.Messages;
+
+import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
+import utils.Utils;
 
 public class Map2ViewTests extends UITest {
 
+   @Disabled
    @Test
    public void testExportImageAsImageFile() {
 
-//      Utils.showTourBookView(bot);
-//
-//      bot.toolbarButtonWithTooltip(Messages.App_Action_CollapseAll).click();
-//
-//      Utils.getTour(bot);
-//
-//      bot.toolbarButtonWithTooltip("Shows tour in 2D map").click(); //$NON-NLS-1$
-//      final SWTBotView map2ViewBot = Utils.showView(bot, "2D Tour Map"); //$NON-NLS-1$
-//      //Sleeping 3 seconds as the map can be slow to display
-//      bot.sleep(3000);
-//
-//      map2ViewBot.bot().tree().contextMenu("Export Map").menu("As Imagefile...").click();
+      Utils.showTourBookView(bot);
+
+      bot.toolbarButtonWithTooltip(Messages.App_Action_CollapseAll).click();
+
+      Utils.getTour(bot);
+
+      bot.toolbarButtonWithTooltip("Shows tour in 2D map").click(); //$NON-NLS-1$
+      final SWTBotView map2ViewBot = Utils.showView(bot, "2D Tour Map"); //$NON-NLS-1$
+      //Sleeping 3 seconds as the map can be slow to display
+      bot.sleep(3000);
+
+      map2ViewBot.bot().tree().contextMenu("Export Map").menu("As Imagefile...").click();
    }
 }

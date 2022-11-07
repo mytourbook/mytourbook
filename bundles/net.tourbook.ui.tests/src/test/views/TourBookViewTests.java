@@ -22,16 +22,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.byteholder.geoclipse.map.UI;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 
 import net.tourbook.Messages;
+import net.tourbook.common.util.FilesUtils;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -77,26 +82,6 @@ public class TourBookViewTests extends UITest {
 
       tourBookView = Utils.showTourBookView(bot);
    }
-
-   /**
-    * This test doesn't work because SWTBot doesn't support native dialogs
-    * https://wiki.eclipse.org/SWTBot/FAQ#How_do_I_use_SWTBot_to_test_native_dialogs_.28File_Dialogs.2C_Color_Dialogs.2C_etc.29.3F
-    */
-//   @Test
-//   void testExportTourBookView() {
-//
-//      final SWTBotTreeItem tour = Utils.getTour(bot);
-//
-//      tour.contextMenu(Messages.App_Action_ExportViewCSV).click();
-//
-//      bot.button("Save").click();
-//
-//      final Path csvFilePath = Paths.get(Utils.workingDirectory, "TourBook_2022-08-30_21-39-05.csv");
-//      assertTrue(Files.exists(csvFilePath));
-//
-//      FilesUtils.deleteIfExists(csvFilePath);
-//      assertTrue(!Files.exists(csvFilePath));
-//   }
 
    @Test
    void testComputeTourDistance() {
@@ -174,6 +159,27 @@ public class TourBookViewTests extends UITest {
       assertEquals("2015   1", allItems[2].getText()); //$NON-NLS-1$
    }
 
+   /**
+    * This test doesn't work because SWTBot doesn't support native dialogs
+    * https://wiki.eclipse.org/SWTBot/FAQ#How_do_I_use_SWTBot_to_test_native_dialogs_.28File_Dialogs.2C_Color_Dialogs.2C_etc.29.3F
+    */
+   @Disabled
+   @Test
+   void testExportTourBookView() {
+
+      final SWTBotTreeItem tour = Utils.getTour(bot);
+
+      tour.contextMenu(Messages.App_Action_ExportViewCSV).click();
+
+      bot.button("Save").click();
+
+      final Path csvFilePath = Paths.get(Utils.workingDirectory, "TourBook_2022-08-30_21-39-05.csv");
+      assertTrue(Files.exists(csvFilePath));
+
+      FilesUtils.deleteIfExists(csvFilePath);
+      assertTrue(!Files.exists(csvFilePath));
+   }
+
    @Test
    void testMultiplyTourCalories() {
 
@@ -209,7 +215,7 @@ public class TourBookViewTests extends UITest {
 
       botNatTable.click(1, 0);
       botNatTable.click(2, 0);
-      //TODO FB org.opentest4j.AssertionFailedError: expected: <0:10> but was: <>
+      //FIXME org.opentest4j.AssertionFailedError: expected: <0:10> but was: <>
       //assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
 
       //Deactivating the NatTable
