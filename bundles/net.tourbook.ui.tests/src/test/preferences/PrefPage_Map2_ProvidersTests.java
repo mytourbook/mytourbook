@@ -25,8 +25,8 @@ import net.tourbook.common.UI;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotCheckBox;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
@@ -152,7 +152,6 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
       Utils.clickApplyAndCloseButton(bot);
    }
 
-   //TODO FB assertAll
    @Test
    @Disabled
    void openOfflineMapPreferencePage() {

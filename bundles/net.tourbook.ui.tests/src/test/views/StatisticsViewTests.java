@@ -15,6 +15,7 @@
  *******************************************************************************/
 package views;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -42,8 +43,9 @@ public class StatisticsViewTests extends UITest {
       assertEquals("Daytime", statisticsTypeComboBox.selection()); //$NON-NLS-1$
 
       final SWTBotCombo yearComboBox = statisticsViewBot.comboBox(2);
-      assertNotNull(yearComboBox);
-      assertEquals(11, yearComboBox.itemCount());
+      assertAll(
+            () -> assertNotNull(yearComboBox),
+            () -> assertEquals(11, yearComboBox.itemCount()));
       yearComboBox.setSelection("9"); //$NON-NLS-1$
       assertEquals("9", yearComboBox.selection()); //$NON-NLS-1$
 
