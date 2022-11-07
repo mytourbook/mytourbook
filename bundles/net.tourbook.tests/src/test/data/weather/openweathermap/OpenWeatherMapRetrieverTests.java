@@ -27,6 +27,7 @@ import net.tourbook.weather.WeatherUtils;
 import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
@@ -42,7 +43,7 @@ public class OpenWeatherMapRetrieverTests {
          + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
 
    private static final String OPENWEATHERMAP_FILE_PATH =
-         FilesUtils.rootPath + "data/weather/openweathermap/files/";                                    //$NON-NLS-1$
+         FilesUtils.rootPath + "data/weather/openweathermap/files/";                                     //$NON-NLS-1$
 
    static HttpClientMock       httpClientMock;
    OpenWeatherMapRetriever     openWeatherMapRetriever;
@@ -56,6 +57,18 @@ public class OpenWeatherMapRetrieverTests {
             .getDeclaredField("httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
       field.set(null, httpClientMock);
+   }
+
+   @Test
+   @Disabled //TODO FB
+   void adustTourValues_RetrieveWeatherDataWithOpenWeatherMap_CurrentWeather() {
+
+      //Set the preferred weather provide to OpenWeatherMap
+      //Set the tour start time to be within the current hour
+
+      //Retrieve weather
+
+      //Assert that: the weather was retrieved
    }
 
    @Test
