@@ -191,18 +191,21 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          tourDataDate.set(Calendar.MILLISECOND, 0);
 
          if (timeMachineResultCurrentDate.equals(tourDataDate)) {
-            tour.setWeather(currentWeather.getWeatherDescription());
-            tour.setWeather_Clouds(currentWeather.getWeatherClouds());
 
-            tour.setWeather_Temperature_Average(currentWeather.getTemp());
-            tour.setWeather_Humidity((short) currentWeather.getHumidity());
-            tour.setWeather_Precipitation(currentWeather.getPrecipitation());
-            tour.setWeather_Pressure((short) currentWeather.getPressure());
-            tour.setWeather_Snowfall(currentWeather.getSnowfall());
-            tour.setWeather_Temperature_WindChill(currentWeather.getFeels_like());
+// SET_FORMATTING_OFF
 
-            tour.setWeather_Wind_Speed(currentWeather.getWind_speed());
-            tour.setWeather_Wind_Direction(currentWeather.getWind_deg());
+            tour.setWeather(                       currentWeather.getWeatherDescription());
+            tour.setWeather_Clouds(                currentWeather.getWeatherClouds());
+            tour.setWeather_Temperature_Average(   currentWeather.getTemp());
+            tour.setWeather_Humidity((short)       currentWeather.getHumidity());
+            tour.setWeather_Precipitation(         currentWeather.getPrecipitation());
+            tour.setWeather_Pressure((short)       currentWeather.getPressure());
+            tour.setWeather_Snowfall(              currentWeather.getSnowfall());
+            tour.setWeather_Temperature_WindChill( currentWeather.getFeels_like());
+            tour.setWeather_Wind_Speed(            currentWeather.getWind_speed());
+            tour.setWeather_Wind_Direction(        currentWeather.getWind_deg());
+
+// SET_FORMATTING_ON
          }
 
          timeMachineResult.addAllHourly(newTimeMachineResult.getHourly());

@@ -27,7 +27,7 @@ import net.tourbook.common.weather.IWeather;
 import net.tourbook.weather.WeatherUtils;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class TimeMachineResult {
+class TimeMachineResult {
 
    private int          timezone_offset;
    private Current      current;
@@ -84,7 +84,7 @@ public class TimeMachineResult {
     *
     * @param newHourly
     */
-   public void addAllHourly(final List<Hourly> newHourly) {
+   void addAllHourly(final List<Hourly> newHourly) {
 
       for (final Hourly currentHourly : newHourly) {
          if (!hourly.contains(currentHourly)) {
@@ -93,7 +93,7 @@ public class TimeMachineResult {
       }
    }
 
-   public void computeAverageWindSpeedAndDirection() {
+   void computeAverageWindSpeedAndDirection() {
 
       final double[] windSpeeds = hourly
             .stream()
@@ -117,7 +117,7 @@ public class TimeMachineResult {
     *
     * @return
     */
-   public boolean filterHourlyData(final long tourStartTime, final long tourEndTime) {
+   boolean filterHourlyData(final long tourStartTime, final long tourEndTime) {
 
       final List<Hourly> filteredHourlyData = new ArrayList<>();
 
@@ -145,7 +145,7 @@ public class TimeMachineResult {
     * Finds the hourly that is closest to the middle of the tour. This will be used
     * to determine the weather description of the tour.
     */
-   public void findMiddleHourly(final long tourMiddleTime) {
+   void findMiddleHourly(final long tourMiddleTime) {
 
       middleHourly = null;
 
