@@ -45,6 +45,39 @@ import utils.Utils;
 public class TourBookViewTests extends UITest {
 
    @Test
+   void adustTourValues_RetrieveWeatherData_OutsideOfAllowedRange() {
+
+      final SWTBotTreeItem tour = Utils.getTour(bot);
+
+      tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
+            .menu(Messages.tour_editor_section_weather)
+            .menu(Messages.Tour_Action_RetrieveWeatherData).click();
+
+      final List<?> logs = TourLogManager.getLogs();
+      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+            "1/31/21, 7:15 AM -> Error while retrieving the weather data: \"{\"cod\":\"400\",\"message\":\"requested time is out of allowed range of 5 days back\"}\"")));//$NON-NLS-1$
+   }
+
+   @Test
+   @Disabled //TODO FB
+   void adustTourValues_RetrieveWeatherDataWithOpenWeatherMap_CurrentWeather() {
+
+      //Set the preferred weather provide to OpenWeatherMap
+      //Set the tour start time to be within the current hour
+      final SWTBotTreeItem tour = Utils.getTour(bot);
+
+      //Retrieve weather
+      tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
+            .menu(Messages.tour_editor_section_weather)
+            .menu(Messages.Tour_Action_RetrieveWeatherData).click();
+
+      //Assert that: the weather was retrieved
+      final List<?> logs = TourLogManager.getLogs();
+      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+            "1/31/21, 7:15 AM -> Error while retrieving the weather data: \"{\"cod\":\"400\",\"message\":\"requested time is out of allowed range of 5 days back\"}\"")));//$NON-NLS-1$
+   }
+
+   @Test
    void adustTourValues_SetTimeZone_AllChoices() {
 
       //Select a tour
@@ -220,20 +253,6 @@ public class TourBookViewTests extends UITest {
 
       //Deactivating the NatTable
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
-   }
-
-   @Test
-   void testRetrieveWeatherData() {
-
-      final SWTBotTreeItem tour = Utils.getTour(bot);
-
-      tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
-            .menu(Messages.tour_editor_section_weather)
-            .menu(Messages.Tour_Action_RetrieveWeatherData).click();
-
-      final List<?> logs = TourLogManager.getLogs();
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "1/31/21, 7:15 AM -> Error while retrieving the weather data: \"{\"cod\":\"400\",\"message\":\"requested time is out of allowed range of 5 days back\"}\"")));//$NON-NLS-1$
    }
 
    @Test
