@@ -29,6 +29,7 @@ import net.tourbook.weather.WeatherUtils;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class TimeMachineResult {
 
+   private int          timezone_offset;
    private Current      current;
 
    private List<Hourly> hourly;
@@ -40,6 +41,41 @@ public class TimeMachineResult {
 
    public TimeMachineResult() {
       hourly = new ArrayList<>();
+   }
+
+   /**
+    * Codes : https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
+    *
+    * @param currentWeatherId
+    * @return
+    */
+   static String convertWeatherTypeToMTWeatherClouds(final int currentWeatherId) {
+
+      String weatherType = UI.EMPTY_STRING;
+
+      if (currentWeatherId >= 200 && currentWeatherId < 300) {
+         weatherType = IWeather.WEATHER_ID_LIGHTNING;
+      } else if (currentWeatherId >= 300 && currentWeatherId < 313) {
+         weatherType = IWeather.WEATHER_ID_DRIZZLE;
+      } else if ((currentWeatherId >= 313 && currentWeatherId < 400) ||
+            (currentWeatherId >= 520 && currentWeatherId < 600)) {
+         weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
+      } else if (currentWeatherId >= 500 && currentWeatherId < 520) {
+         weatherType = IWeather.WEATHER_ID_RAIN;
+      } else if (currentWeatherId >= 600 && currentWeatherId < 700) {
+         weatherType = IWeather.WEATHER_ID_SNOW;
+      } else if (currentWeatherId == 800) {
+         weatherType = IWeather.WEATHER_ID_CLEAR;
+      } else if (currentWeatherId == 801 || currentWeatherId == 802) {
+         weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
+      } else if (currentWeatherId == 803 || currentWeatherId == 804) {
+         weatherType = IWeather.WEATHER_ID_OVERCAST;
+      } else if (currentWeatherId == 711 || currentWeatherId == 762 ||
+            currentWeatherId == 771 || currentWeatherId == 781) {
+         weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
+      }
+
+      return weatherType;
    }
 
    /**
@@ -171,18 +207,22 @@ public class TimeMachineResult {
       return averageWindSpeed;
    }
 
-   private Weather getCurrentWeather() {
-
-      final List<Weather> currentWeather = middleHourly.getWeather();
-      if (currentWeather == null || currentWeather.isEmpty()) {
-         return null;
-      }
-
-      return currentWeather.get(0);
+   public Current getCurrent() {
+      return current;
    }
 
    public List<Hourly> getHourly() {
       return hourly;
+   }
+
+   private Weather getMiddleHourlyWeather() {
+
+      final List<Weather> middleHourlyWeather = middleHourly.getWeather();
+      if (middleHourlyWeather == null || middleHourlyWeather.isEmpty()) {
+         return null;
+      }
+
+      return middleHourlyWeather.get(0);
    }
 
    public float getTemperatureAverage() {
@@ -221,6 +261,10 @@ public class TimeMachineResult {
       return 0;
    }
 
+   public int getTimezone_offset() {
+      return timezone_offset;
+   }
+
    public float getTotalPrecipitation() {
 
       return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(Hourly::getRain).sum());
@@ -231,57 +275,27 @@ public class TimeMachineResult {
       return WeatherUtils.roundDoubleToFloat(hourly.stream().mapToDouble(Hourly::getSnow).sum());
    }
 
+   public String getWeatherClouds() {
+
+      final String weatherType = UI.EMPTY_STRING;
+
+      final Weather middleHourlyWeather = getMiddleHourlyWeather();
+      if (middleHourlyWeather == null) {
+         return weatherType;
+      }
+
+      return convertWeatherTypeToMTWeatherClouds(middleHourlyWeather.getId());
+   }
+
    public String getWeatherDescription() {
 
       final String weatherDescription = UI.EMPTY_STRING;
 
-      final Weather currentWeather = getCurrentWeather();
-      if (currentWeather == null) {
+      final Weather middleHourlyWeather = getMiddleHourlyWeather();
+      if (middleHourlyWeather == null) {
          return weatherDescription;
       }
 
-      return currentWeather.getDescription();
-   }
-
-   public String getWeatherType() {
-
-      String weatherType = UI.EMPTY_STRING;
-
-      final Weather currentWeather = getCurrentWeather();
-      if (currentWeather == null) {
-         return weatherType;
-      }
-
-      // Codes : https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
-
-      final int currentWeatherId = currentWeather.getId();
-
-      if (currentWeatherId >= 200 && currentWeatherId < 300) {
-         weatherType = IWeather.WEATHER_ID_LIGHTNING;
-      } else if (currentWeatherId >= 300 && currentWeatherId < 313) {
-         weatherType = IWeather.WEATHER_ID_DRIZZLE;
-      } else if ((currentWeatherId >= 313 && currentWeatherId < 400) ||
-            (currentWeatherId >= 520 && currentWeatherId < 600)) {
-         weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
-      } else if (currentWeatherId >= 500 && currentWeatherId < 520) {
-         weatherType = IWeather.WEATHER_ID_RAIN;
-      } else if (currentWeatherId >= 600 && currentWeatherId < 700) {
-         weatherType = IWeather.WEATHER_ID_SNOW;
-      } else if (currentWeatherId == 800) {
-         weatherType = IWeather.WEATHER_ID_CLEAR;
-      } else if (currentWeatherId == 801 || currentWeatherId == 802) {
-         weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
-      } else if (currentWeatherId == 803 || currentWeatherId == 804) {
-         weatherType = IWeather.WEATHER_ID_OVERCAST;
-      } else if (currentWeatherId == 711 || currentWeatherId == 762 ||
-            currentWeatherId == 771 || currentWeatherId == 781) {
-         weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
-      }
-
-      return weatherType;
-   }
-
-   public Current getCurrent() {
-      return current;
+      return middleHourlyWeather.getDescription();
    }
 }

@@ -21,7 +21,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -169,6 +174,37 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
          //todo fb if tour start time is current (what is the criteria for current?)
          //then use the current datapoint
+
+         final GregorianCalendar timeMachineResultCurrentDate = new GregorianCalendar();
+         final Current currentWeather = newTimeMachineResult.getCurrent();
+         timeMachineResultCurrentDate.setTimeInMillis(currentWeather.getDt() * 1000L);
+         timeMachineResultCurrentDate.set(Calendar.MINUTE, 0);
+         timeMachineResultCurrentDate.set(Calendar.SECOND, 0);
+         timeMachineResultCurrentDate.set(Calendar.MILLISECOND, 0);
+
+         final Instant instant = LocalDateTime.now().atOffset(ZoneOffset.ofTotalSeconds(newTimeMachineResult.getTimezone_offset())).toInstant();
+         final long timeInMillis = instant.toEpochMilli();
+         final GregorianCalendar tourDataDate = new GregorianCalendar();
+         tourDataDate.setTimeInMillis(timeInMillis);
+         tourDataDate.set(Calendar.MINUTE, 0);
+         tourDataDate.set(Calendar.SECOND, 0);
+         tourDataDate.set(Calendar.MILLISECOND, 0);
+
+         if (timeMachineResultCurrentDate.equals(tourDataDate)) {
+            tour.setWeather(currentWeather.getWeatherDescription());
+            tour.setWeather_Clouds(currentWeather.getWeatherClouds());
+
+            tour.setWeather_Temperature_Average(currentWeather.getTemp());
+            tour.setWeather_Humidity((short) currentWeather.getHumidity());
+            tour.setWeather_Precipitation(currentWeather.getPrecipitation());
+            tour.setWeather_Pressure((short) currentWeather.getPressure());
+            tour.setWeather_Snowfall(currentWeather.getSnowfall());
+            tour.setWeather_Temperature_WindChill(currentWeather.getFeels_like());
+
+            tour.setWeather_Wind_Speed(currentWeather.getWind_speed());
+            tour.setWeather_Wind_Direction(currentWeather.getWind_deg());
+         }
+
          timeMachineResult.addAllHourly(newTimeMachineResult.getHourly());
          final List<Hourly> hourly = timeMachineResult.getHourly();
 
@@ -208,7 +244,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       //We look for the weather data in the middle of the tour to populate the weather conditions
       timeMachineResult.findMiddleHourly(tourMiddleTime);
       tour.setWeather(                       timeMachineResult.getWeatherDescription());
-      tour.setWeather_Clouds(                timeMachineResult.getWeatherType());
+      tour.setWeather_Clouds(                timeMachineResult.getWeatherClouds());
 
       tour.setWeather_Temperature_Average(   timeMachineResult.getTemperatureAverage());
       tour.setWeather_Humidity((short)       timeMachineResult.getAverageHumidity());
