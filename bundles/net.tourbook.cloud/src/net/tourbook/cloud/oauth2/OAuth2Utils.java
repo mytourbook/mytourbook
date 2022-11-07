@@ -15,10 +15,19 @@
  *******************************************************************************/
 package net.tourbook.cloud.oauth2;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
+
+import org.json.JSONObject;
 
 public class OAuth2Utils {
 
@@ -33,6 +42,46 @@ public class OAuth2Utils {
    public static URI createOAuthPasseurUri(final String uriSuffix) {
 
       return URI.create(OAuth2Constants.OAUTH_PASSEUR_APP_URL + uriSuffix);
+   }
+
+   public static String getTokens(final HttpClient httpClient,
+                                  final String authorizationCode,
+                                  final boolean isRefreshToken,
+                                  final String refreshToken) {
+
+      final JSONObject body = new JSONObject();
+      String grantType;
+      if (isRefreshToken) {
+         body.put(OAuth2Constants.PARAM_REFRESH_TOKEN, refreshToken);
+         grantType = OAuth2Constants.PARAM_REFRESH_TOKEN;
+      } else {
+         body.put(OAuth2Constants.PARAM_CODE, authorizationCode);
+         grantType = OAuth2Constants.PARAM_AUTHORIZATION_CODE;
+      }
+
+      body.put(OAuth2Constants.PARAM_GRANT_TYPE, grantType);
+
+      final HttpRequest request = HttpRequest.newBuilder()
+            .header(OAuth2Constants.CONTENT_TYPE, "application/json") //$NON-NLS-1$
+            .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
+            .uri(OAuth2Utils.createOAuthPasseurUri("/strava/token"))//$NON-NLS-1$
+            .build();
+
+      try {
+         final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+         final String responseBody = response.body();
+         if (response.statusCode() == HttpURLConnection.HTTP_CREATED && StringUtils.hasContent(responseBody)) {
+            return responseBody;
+         } else {
+            StatusUtil.logError(responseBody);
+         }
+      } catch (IOException | InterruptedException e) {
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      return null;
    }
 
    /**

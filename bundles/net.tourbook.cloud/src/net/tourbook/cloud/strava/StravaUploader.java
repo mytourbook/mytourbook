@@ -145,38 +145,20 @@ public class StravaUploader extends TourbookCloudUploader {
 
    static StravaTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
 
-      final JSONObject body = new JSONObject();
-      String grantType;
-      if (isRefreshToken) {
-         body.put(OAuth2Constants.PARAM_REFRESH_TOKEN, refreshToken);
-         grantType = OAuth2Constants.PARAM_REFRESH_TOKEN;
-      } else {
-         body.put(OAuth2Constants.PARAM_CODE, authorizationCode);
-         grantType = OAuth2Constants.PARAM_AUTHORIZATION_CODE;
+      final String responseBody = OAuth2Utils.getTokens(_httpClient, authorizationCode, isRefreshToken, refreshToken);
+
+      if (StringUtils.isNullOrEmpty(responseBody)) {
+         return null;
       }
 
-      body.put(OAuth2Constants.PARAM_GRANT_TYPE, grantType);
-
-      final HttpRequest request = HttpRequest.newBuilder()
-            .header(OAuth2Constants.CONTENT_TYPE, "application/json") //$NON-NLS-1$
-            .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
-            .uri(OAuth2Utils.createOAuthPasseurUri("/strava/token"))//$NON-NLS-1$
-            .build();
-
+      StravaTokens stravaTokens = null;
       try {
-         final HttpResponse<String> response = _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-         if (response.statusCode() == HttpURLConnection.HTTP_CREATED && StringUtils.hasContent(response.body())) {
-            return new ObjectMapper().readValue(response.body(), StravaTokens.class);
-         } else {
-            StatusUtil.logError(response.body());
-         }
-      } catch (IOException | InterruptedException e) {
+         stravaTokens = new ObjectMapper().readValue(responseBody, StravaTokens.class);
+      } catch (final JsonProcessingException e) {
          StatusUtil.log(e);
-         Thread.currentThread().interrupt();
       }
 
-      return null;
+      return stravaTokens;
    }
 
    private static String gzipFile(final String file) {
