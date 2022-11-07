@@ -60,18 +60,6 @@ public class OpenWeatherMapRetrieverTests {
    }
 
    @Test
-   @Disabled //TODO FB
-   void adustTourValues_RetrieveWeatherDataWithOpenWeatherMap_CurrentWeather() {
-
-      //Set the preferred weather provide to OpenWeatherMap
-      //Set the tour start time to be within the current hour
-
-      //Retrieve weather
-
-      //Assert that: the weather was retrieved
-   }
-
-   @Test
    void testWeatherRetrieval_JulySecond2022() {
 
       final String openWeatherMapResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
@@ -189,5 +177,17 @@ public class OpenWeatherMapRetrieverTests {
       assertEquals(-11.07f,            tour.getWeather_Temperature_WindChill());
 
 // SET_FORMATTING_ON
+   }
+
+   @Test
+   @Disabled //TODO FB
+   void weatherData_CurrentWeather() {
+
+      //Set the preferred weather provide to OpenWeatherMap
+      //Set the tour start time to be within the current hour
+
+      //Retrieve weather
+
+      //Assert that: the weather was retrieved
    }
 }
