@@ -189,6 +189,6 @@ public class SuuntoCloudDownloaderTests {
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "Action aborted due to invalid tokens")));
+            "Action aborted due to invalid tokens"))); //$NON-NLS-1$
    }
 }
