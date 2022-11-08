@@ -174,7 +174,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       currentTimeCalendar.set(Calendar.SECOND, 0);
       currentTimeCalendar.set(Calendar.MILLISECOND, 0);
 
-      return tourStartTimeCalendar.equals(currentTimeCalendar);
+      return tourStartTimeCalendar.compareTo(currentTimeCalendar) == 0;
    }
 
    @Override
