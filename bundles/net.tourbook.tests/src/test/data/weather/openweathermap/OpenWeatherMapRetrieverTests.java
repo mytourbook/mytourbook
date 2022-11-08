@@ -207,17 +207,17 @@ public class OpenWeatherMapRetrieverTests {
 
       assertAll(
             () ->  assertEquals("overcast clouds", tour.getWeather()), //$NON-NLS-1$
-            () ->   assertEquals("weather-clouds", tour.getWeather_Clouds()), //$NON-NLS-1$
-            () ->   assertEquals(14.15f,           tour.getWeather_Temperature_Average()),
-            () ->   assertEquals(3,                tour.getWeather_Wind_Speed()),
-            () ->   assertEquals(140,              tour.getWeather_Wind_Direction()),
-            () ->   assertEquals(51,               tour.getWeather_Humidity()),
-            () ->   assertEquals(0,                tour.getWeather_Precipitation()),
-            () ->   assertEquals(0,                tour.getWeather_Snowfall()),
-            () ->   assertEquals(1008,             tour.getWeather_Pressure()),
-            () ->   assertEquals(0,                tour.getWeather_Temperature_Max()),
-            () ->   assertEquals(0,                tour.getWeather_Temperature_Min()),
-            () ->   assertEquals(12.95f,           tour.getWeather_Temperature_WindChill()));
+            () ->  assertEquals("weather-clouds",  tour.getWeather_Clouds()), //$NON-NLS-1$
+            () ->  assertEquals(14.15f,            tour.getWeather_Temperature_Average()),
+            () ->  assertEquals(3,                 tour.getWeather_Wind_Speed()),
+            () ->  assertEquals(140,               tour.getWeather_Wind_Direction()),
+            () ->  assertEquals(51,                tour.getWeather_Humidity()),
+            () ->  assertEquals(0,                 tour.getWeather_Precipitation()),
+            () ->  assertEquals(0,                 tour.getWeather_Snowfall()),
+            () ->  assertEquals(1008,              tour.getWeather_Pressure()),
+            () ->  assertEquals(0,                 tour.getWeather_Temperature_Max()),
+            () ->  assertEquals(0,                 tour.getWeather_Temperature_Min()),
+            () ->  assertEquals(12.95f,            tour.getWeather_Temperature_WindChill()));
 
 // SET_FORMATTING_ON
    }
