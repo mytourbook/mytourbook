@@ -47,7 +47,8 @@ public class OAuth2Utils {
    public static String getTokens(final HttpClient httpClient,
                                   final String authorizationCode,
                                   final boolean isRefreshToken,
-                                  final String refreshToken) {
+                                  final String refreshToken,
+                                  final URI uri) {
 
       final JSONObject body = new JSONObject();
       String grantType;
@@ -64,7 +65,7 @@ public class OAuth2Utils {
       final HttpRequest request = HttpRequest.newBuilder()
             .header(OAuth2Constants.CONTENT_TYPE, "application/json") //$NON-NLS-1$
             .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
-            .uri(OAuth2Utils.createOAuthPasseurUri("/strava/token"))//$NON-NLS-1$
+            .uri(uri)
             .build();
 
       try {

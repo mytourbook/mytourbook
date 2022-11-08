@@ -145,7 +145,11 @@ public class StravaUploader extends TourbookCloudUploader {
 
    static StravaTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
 
-      final String responseBody = OAuth2Utils.getTokens(_httpClient, authorizationCode, isRefreshToken, refreshToken);
+      final String responseBody = OAuth2Utils.getTokens(_httpClient,
+            authorizationCode,
+            isRefreshToken,
+            refreshToken,
+            OAuth2Utils.createOAuthPasseurUri("/strava/token")); //$NON-NLS-1$
 
       if (StringUtils.isNullOrEmpty(responseBody)) {
          return null;

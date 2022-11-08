@@ -77,7 +77,11 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
 
    public static SuuntoTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
 
-      final String responseBody = OAuth2Utils.getTokens(_httpClient, authorizationCode, isRefreshToken, refreshToken);
+      final String responseBody = OAuth2Utils.getTokens(_httpClient,
+            authorizationCode,
+            isRefreshToken,
+            refreshToken,
+            OAuth2Utils.createOAuthPasseurUri("/suunto/token")); //$NON-NLS-1$
 
       if (StringUtils.isNullOrEmpty(responseBody)) {
          return null;
