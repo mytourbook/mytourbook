@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.weather.openweathermap;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
+//import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import net.tourbook.common.weather.IWeather;
@@ -27,14 +27,22 @@ public class TimeMachineResultTests {
    @Test
    void openWeatherMap_WeatherTypeMapping_AllValues() {
 
-      assertAll(
-            () -> assertEquals(IWeather.WEATHER_ID_LIGHTNING,
-                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(210)),
-            () -> assertEquals(IWeather.WEATHER_ID_SCATTERED_SHOWERS,
-                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(522)),
-            () -> assertEquals(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,
-                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(771)),
-            () -> assertEquals(IWeather.WEATHER_ID_CLEAR,
-                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(800)));
+      assertEquals(IWeather.WEATHER_ID_LIGHTNING,
+                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(210));
+      assertEquals(IWeather.WEATHER_ID_SCATTERED_SHOWERS,
+                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(522));
+      assertEquals(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,
+                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(771));
+      assertEquals(IWeather.WEATHER_ID_CLEAR,
+                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(800));
+//      assertAll(
+//            () -> assertEquals(IWeather.WEATHER_ID_LIGHTNING,
+//                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(210)),
+  //          () -> assertEquals(IWeather.WEATHER_ID_SCATTERED_SHOWERS,
+    //              TimeMachineResult.convertWeatherTypeToMTWeatherClouds(522)),
+      //      () -> assertEquals(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,
+        //          TimeMachineResult.convertWeatherTypeToMTWeatherClouds(771)),
+          //  () -> assertEquals(IWeather.WEATHER_ID_CLEAR,
+            //      TimeMachineResult.convertWeatherTypeToMTWeatherClouds(800)));
    }
 }
