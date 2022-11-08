@@ -177,7 +177,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             //Get the list of workouts
             final Workouts workouts = retrieveWorkoutsList();
-            if (workouts.payload.size() == 0) {
+            if (workouts.payload.isEmpty()) {
                TourLogManager.log_INFO(Messages.Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound);
                return;
             }
