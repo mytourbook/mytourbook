@@ -32,7 +32,7 @@ import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
-public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
+class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
 
    private static HttpClient       _httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
 
@@ -45,37 +45,37 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
       _selectedPersonId = selectedPersonId;
    }
 
-   public static String getAccessToken_ActivePerson() {
+   static String getAccessToken_ActivePerson() {
 
       return _prefStore.getString(Preferences.getSuuntoAccessToken_Active_Person_String());
    }
 
-   public static String getAccessToken_AllPeople() {
+   static String getAccessToken_AllPeople() {
 
       return _prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(UI.EMPTY_STRING));
    }
 
-   public static String getDownloadFolder_ActivePerson() {
+   static String getDownloadFolder_ActivePerson() {
 
       return _prefStore.getString(Preferences.getSuuntoWorkoutDownloadFolder_Active_Person_String());
    }
 
-   public static String getDownloadFolder_AllPeople() {
+   static String getDownloadFolder_AllPeople() {
 
       return _prefStore.getString(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(UI.EMPTY_STRING));
    }
 
-   public static String getRefreshToken_ActivePerson() {
+   static String getRefreshToken_ActivePerson() {
 
       return _prefStore.getString(Preferences.getSuuntoRefreshToken_Active_Person_String());
    }
 
-   public static String getRefreshToken_AllPeople() {
+   static String getRefreshToken_AllPeople() {
 
       return _prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(UI.EMPTY_STRING));
    }
 
-   public static SuuntoTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
+   private static SuuntoTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
 
       final String responseBody = OAuth2Utils.getTokens(_httpClient,
             authorizationCode,
@@ -97,7 +97,7 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
       return suuntoTokens;
    }
 
-   public static boolean getValidTokens(final boolean useActivePerson, final boolean useAllPeople) {
+   static boolean getValidTokens(final boolean useActivePerson, final boolean useAllPeople) {
 
       if (!useActivePerson && !useAllPeople) {
          return false;
@@ -137,25 +137,25 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
       return isTokenValid;
    }
 
-   public static boolean isDownloadReady_ActivePerson() {
+   static boolean isDownloadReady_ActivePerson() {
 
       return isReady_ActivePerson() &&
             StringUtils.hasContent(getDownloadFolder_ActivePerson());
    }
 
-   public static boolean isDownloadReady_AllPeople() {
+   static boolean isDownloadReady_AllPeople() {
 
       return isReady_AllPeople() &&
             StringUtils.hasContent(getDownloadFolder_AllPeople());
    }
 
-   public static boolean isReady_ActivePerson() {
+   static boolean isReady_ActivePerson() {
 
       return StringUtils.hasContent(getAccessToken_ActivePerson()) &&
             StringUtils.hasContent(getRefreshToken_ActivePerson());
    }
 
-   public static boolean isReady_AllPeople() {
+   static boolean isReady_AllPeople() {
 
       return StringUtils.hasContent(getAccessToken_AllPeople()) &&
             StringUtils.hasContent(getRefreshToken_AllPeople());
