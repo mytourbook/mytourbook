@@ -25,7 +25,6 @@ import java.lang.reflect.Field;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.weather.WeatherUtils;
 import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
@@ -192,7 +191,7 @@ public class OpenWeatherMapRetrieverTests {
       //Set the tour start time to be within the current hour
       final ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.systemDefault());
       tour.setTourStartTime(zonedDateTime);
-      tour.setTimeZoneId(UI.TIME_ZONE_UTC);
+      tour.setTimeZoneId(ZoneId.systemDefault().getId());
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 
