@@ -28,7 +28,6 @@ import java.util.List;
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
-import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.suunto.SuuntoCloudDownloader;
 import net.tourbook.cloud.suunto.SuuntoTokensRetrievalHandler;
@@ -133,7 +132,7 @@ public class SuuntoCloudDownloaderTests {
       final String workoutsResponse = Comparison.readFileContent(SUUNTO_FILE_PATH
             + "Workouts-Response.json"); //$NON-NLS-1$
       httpClientMock.onGet(
-            OAuth2Constants.OAUTH_PASSEUR_APP_URL + "/suunto/workouts?since=1293840000000&until=1295049600000") //$NON-NLS-1$
+            OAuth2Utils.createOAuthPasseurUri("/suunto/workouts?since=1293840000000&until=1295049600000").toString()) //$NON-NLS-1$
             .doReturn(workoutsResponse)
             .withStatus(200);
 
@@ -146,7 +145,7 @@ public class SuuntoCloudDownloaderTests {
 
       final String filename = "2011-01-13.fit"; //$NON-NLS-1$
       httpClientMock.onGet(
-            OAuth2Constants.OAUTH_PASSEUR_APP_URL + "/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579") //$NON-NLS-1$
+            OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").toString()) //$NON-NLS-1$
             .doReturn(UI.EMPTY_STRING)
             .withHeader("Content-Disposition", "attachment; filename=\"" + filename + "\"") //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
             .withStatus(200);
@@ -154,8 +153,9 @@ public class SuuntoCloudDownloaderTests {
       suuntoCloudDownloader.downloadTours();
 
       httpClientMock.verify().post(OAuth2Utils.createOAuthPasseurUri("/suunto/token").toString()).called(); //$NON-NLS-1$
-      httpClientMock.verify().get(OAuth2Constants.OAUTH_PASSEUR_APP_URL + "/suunto/workouts?since=1293840000000&until=1295049600000").called(); //$NON-NLS-1$
-      httpClientMock.verify().get(OAuth2Constants.OAUTH_PASSEUR_APP_URL + "/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").called(); //$NON-NLS-1$
+      httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workouts?since=1293840000000&until=1295049600000").toString()).called(); //$NON-NLS-1$
+      httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").toString()) //$NON-NLS-1$
+            .called();
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
