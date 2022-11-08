@@ -45,32 +45,32 @@ class TimeMachineResult {
    /**
     * Codes : https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
     *
-    * @param currentWeatherId
+    * @param weatherId
     * @return
     */
-   static String convertWeatherTypeToMTWeatherClouds(final int currentWeatherId) {
+   static String convertWeatherTypeToMTWeatherClouds(final int weatherId) {
 
       String weatherType = UI.EMPTY_STRING;
 
-      if (currentWeatherId >= 200 && currentWeatherId < 300) {
+      if (weatherId >= 200 && weatherId < 300) {
          weatherType = IWeather.WEATHER_ID_LIGHTNING;
-      } else if (currentWeatherId >= 300 && currentWeatherId < 313) {
+      } else if (weatherId >= 300 && weatherId < 313) {
          weatherType = IWeather.WEATHER_ID_DRIZZLE;
-      } else if ((currentWeatherId >= 313 && currentWeatherId < 400) ||
-            (currentWeatherId >= 520 && currentWeatherId < 600)) {
+      } else if ((weatherId >= 313 && weatherId < 400) ||
+            (weatherId >= 520 && weatherId < 600)) {
          weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
-      } else if (currentWeatherId >= 500 && currentWeatherId < 520) {
+      } else if (weatherId >= 500 && weatherId < 520) {
          weatherType = IWeather.WEATHER_ID_RAIN;
-      } else if (currentWeatherId >= 600 && currentWeatherId < 700) {
+      } else if (weatherId >= 600 && weatherId < 700) {
          weatherType = IWeather.WEATHER_ID_SNOW;
-      } else if (currentWeatherId == 800) {
+      } else if (weatherId == 800) {
          weatherType = IWeather.WEATHER_ID_CLEAR;
-      } else if (currentWeatherId == 801 || currentWeatherId == 802) {
+      } else if (weatherId == 801 || weatherId == 802) {
          weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
-      } else if (currentWeatherId == 803 || currentWeatherId == 804) {
+      } else if (weatherId == 803 || weatherId == 804) {
          weatherType = IWeather.WEATHER_ID_OVERCAST;
-      } else if (currentWeatherId == 711 || currentWeatherId == 762 ||
-            currentWeatherId == 771 || currentWeatherId == 781) {
+      } else if (weatherId == 711 || weatherId == 762 ||
+            weatherId == 771 || weatherId == 781) {
          weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
       }
 
