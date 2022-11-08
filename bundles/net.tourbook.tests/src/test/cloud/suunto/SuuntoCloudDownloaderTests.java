@@ -117,6 +117,8 @@ public class SuuntoCloudDownloaderTests {
 
    @AfterEach
    public void cleanUpEach() {
+
+      httpClientMock.reset();
       TourLogManager.clear();
    }
 
@@ -181,7 +183,6 @@ public class SuuntoCloudDownloaderTests {
             OAuth2Utils.createOAuthPasseurUri("/suunto/token").toString()) //$NON-NLS-1$
             .doReturn(UI.EMPTY_STRING)
             .withStatus(201);
-
       suuntoCloudDownloader.downloadTours();
 
       httpClientMock.verify().post(OAuth2Utils.createOAuthPasseurUri("/suunto/token").toString()).called(); //$NON-NLS-1$
