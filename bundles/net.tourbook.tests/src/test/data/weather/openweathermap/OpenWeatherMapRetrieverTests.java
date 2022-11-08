@@ -200,7 +200,7 @@ public class OpenWeatherMapRetrieverTests {
 
       openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
 
-      assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
+      assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData(), "The weather should be have been retrieved"); //$NON-NLS-1$
       httpClientMock.verify().get(url).called();
 
 // SET_FORMATTING_OFF

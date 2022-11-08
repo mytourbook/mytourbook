@@ -159,7 +159,6 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    private boolean isTourStartTimeCurrent(final long tourStartTime, final String tourTimeZoneId) {
 
       final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();
-
       tourStartTimeCalendar.setTimeInMillis(tourStartTime * 1000L);
       tourStartTimeCalendar.set(Calendar.MINUTE, 0);
       tourStartTimeCalendar.set(Calendar.SECOND, 0);
