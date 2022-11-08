@@ -83,10 +83,6 @@ class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
             refreshToken,
             OAuth2Utils.createOAuthPasseurUri("/suunto/token")); //$NON-NLS-1$
 
-      if (StringUtils.isNullOrEmpty(responseBody)) {
-         return null;
-      }
-
       SuuntoTokens suuntoTokens = null;
       try {
          suuntoTokens = new ObjectMapper().readValue(responseBody, SuuntoTokens.class);
