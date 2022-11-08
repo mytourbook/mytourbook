@@ -46,8 +46,9 @@ import utils.FilesUtils;
 
 public class SuuntoCloudDownloaderTests {
 
-   private static final String           SUUNTO_FILE_PATH = FilesUtils.rootPath + "cloud/suunto/files/"; //$NON-NLS-1$
-   private static final IPreferenceStore _prefStore       = Activator.getDefault().getPreferenceStore();
+   private static final String           OAUTH_PASSEUR_APP_URL_TOKEN = OAuth2Utils.createOAuthPasseurUri("/suunto/token").toString(); //$NON-NLS-1$
+   private static final String           SUUNTO_FILE_PATH            = FilesUtils.rootPath + "cloud/suunto/files/";                   //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore                  = Activator.getDefault().getPreferenceStore();
 
    static HttpClientMock                 httpClientMock;
    static SuuntoCloudDownloader          suuntoCloudDownloader;
@@ -141,7 +142,7 @@ public class SuuntoCloudDownloaderTests {
       final String tokenResponse = Comparison.readFileContent(SUUNTO_FILE_PATH
             + "Token-Response.json"); //$NON-NLS-1$
       httpClientMock.onPost(
-            OAuth2Utils.createOAuthPasseurUri("/suunto/token").toString()) //$NON-NLS-1$
+            OAUTH_PASSEUR_APP_URL_TOKEN)
             .doReturn(tokenResponse)
             .withStatus(201);
 
@@ -154,7 +155,7 @@ public class SuuntoCloudDownloaderTests {
 
       suuntoCloudDownloader.downloadTours();
 
-      httpClientMock.verify().post(OAuth2Utils.createOAuthPasseurUri("/suunto/token").toString()).called(); //$NON-NLS-1$
+      httpClientMock.verify().post(OAUTH_PASSEUR_APP_URL_TOKEN).called();
       httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workouts?since=1293840000000&until=1295049600000").toString()).called(); //$NON-NLS-1$
       httpClientMock.verify().get(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").toString()) //$NON-NLS-1$
             .called();
@@ -180,12 +181,12 @@ public class SuuntoCloudDownloaderTests {
             "973701086000"); //$NON-NLS-1$
 
       httpClientMock.onPost(
-            OAuth2Utils.createOAuthPasseurUri("/suunto/token").toString()) //$NON-NLS-1$
+            OAUTH_PASSEUR_APP_URL_TOKEN)
             .doReturn(UI.EMPTY_STRING)
             .withStatus(201);
       suuntoCloudDownloader.downloadTours();
 
-      httpClientMock.verify().post(OAuth2Utils.createOAuthPasseurUri("/suunto/token").toString()).called(); //$NON-NLS-1$
+      httpClientMock.verify().post(OAUTH_PASSEUR_APP_URL_TOKEN).called();
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
