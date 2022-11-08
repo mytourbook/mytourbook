@@ -29,7 +29,7 @@ class Current {
    private float         feels_like;
    private int           pressure;
    private int           humidity;
-   private int           wind_speed;
+   private float         wind_speed;
    private int           wind_deg;
    private Volume        rain;
    private Volume        snow;
@@ -104,6 +104,6 @@ class Current {
    }
 
    public int getWind_speed() {
-      return wind_speed;
+      return Math.round(wind_speed);
    }
 }

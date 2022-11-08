@@ -23,7 +23,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -153,28 +153,27 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    /**
     * Determines if the tour start time is within the current hour
     *
-    * @param newTimeMachineResult
+    * @param tourStartTime
     * @return
     */
-   private boolean isTourStartTimeCurrent(final TimeMachineResult newTimeMachineResult) {
+   private boolean isTourStartTimeCurrent(final long tourStartTime, final String tourTimeZoneId) {
 
-      final Current currentWeather = newTimeMachineResult.getCurrent();
-      final GregorianCalendar timeMachineResultCurrentDate = new GregorianCalendar();
+      final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();
 
-      timeMachineResultCurrentDate.setTimeInMillis(currentWeather.getDt() * 1000L);
-      timeMachineResultCurrentDate.set(Calendar.MINUTE, 0);
-      timeMachineResultCurrentDate.set(Calendar.SECOND, 0);
-      timeMachineResultCurrentDate.set(Calendar.MILLISECOND, 0);
+      tourStartTimeCalendar.setTimeInMillis(tourStartTime * 1000L);
+      tourStartTimeCalendar.set(Calendar.MINUTE, 0);
+      tourStartTimeCalendar.set(Calendar.SECOND, 0);
+      tourStartTimeCalendar.set(Calendar.MILLISECOND, 0);
 
-      final Instant instant = LocalDateTime.now().atOffset(ZoneOffset.ofTotalSeconds(newTimeMachineResult.getTimezone_offset())).toInstant();
+      final Instant instant = LocalDateTime.now().atZone(ZoneId.of(tourTimeZoneId)).toInstant();
       final long timeInMillis = instant.toEpochMilli();
-      final GregorianCalendar tourDataDate = new GregorianCalendar();
-      tourDataDate.setTimeInMillis(timeInMillis);
-      tourDataDate.set(Calendar.MINUTE, 0);
-      tourDataDate.set(Calendar.SECOND, 0);
-      tourDataDate.set(Calendar.MILLISECOND, 0);
+      final GregorianCalendar currentTimeCalendar = new GregorianCalendar();
+      currentTimeCalendar.setTimeInMillis(timeInMillis);
+      currentTimeCalendar.set(Calendar.MINUTE, 0);
+      currentTimeCalendar.set(Calendar.SECOND, 0);
+      currentTimeCalendar.set(Calendar.MILLISECOND, 0);
 
-      return timeMachineResultCurrentDate.equals(tourDataDate);
+      return tourStartTimeCalendar.equals(currentTimeCalendar);
    }
 
    @Override
@@ -199,13 +198,14 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
             return false;
          }
 
-         final boolean isTourStartWithinTheCurrentHour = isTourStartTimeCurrent(newTimeMachineResult);
+         final boolean isTourStartWithinTheCurrentHour = isTourStartTimeCurrent(tourStartTime, tour.getTimeZoneId());
 
          // If the tour start time is within the current hour, we use the
          // current weather data instead of the historical one.
-         if (isTourStartWithinTheCurrentHour) {
+         final Current currentWeather = newTimeMachineResult.getCurrent();
+         if (isTourStartWithinTheCurrentHour && currentWeather != null) {
 
-            setTourWeatherWithCurrentWeather(newTimeMachineResult.getCurrent());
+            setTourWeatherWithCurrentWeather(currentWeather);
             return true;
          }
 

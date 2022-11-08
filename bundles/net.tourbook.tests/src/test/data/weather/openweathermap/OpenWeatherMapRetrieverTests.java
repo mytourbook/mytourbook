@@ -21,13 +21,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.pgssoft.httpclient.HttpClientMock;
 
 import java.lang.reflect.Field;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.weather.WeatherUtils;
 import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
@@ -180,14 +182,41 @@ public class OpenWeatherMapRetrieverTests {
    }
 
    @Test
-   @Disabled //TODO FB
    void weatherData_CurrentWeather() {
 
-      //Set the preferred weather provide to OpenWeatherMap
+      final String openWeatherMapResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
+            + "LongsPeak-Manual-OpenWeatherMapResponse-1656720000.json"); //$NON-NLS-1$
+
+      final TourData tour = Initializer.importTour();
       //Set the tour start time to be within the current hour
+      final ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of(UI.TIME_ZONE_UTC));
+      tour.setTourStartTime(zonedDateTime);
+      //We set the current time elapsed to trigger the computation of the new end time
+      tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 
-      //Retrieve weather
+      final String url = OPENWEATHERMAP_BASE_URL + tour.getTourStartTimeMS() / 1000;
+      httpClientMock.onGet(url).doReturn(openWeatherMapResponse);
 
-      //Assert that: the weather was retrieved
+      openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
+
+      assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
+      httpClientMock.verify().get(url).called();
+
+// SET_FORMATTING_OFF
+
+      assertEquals("overcast clouds", tour.getWeather()); //$NON-NLS-1$
+      assertEquals("weather-clouds",  tour.getWeather_Clouds()); //$NON-NLS-1$
+      assertEquals(14.15f,            tour.getWeather_Temperature_Average());
+      assertEquals(3,                 tour.getWeather_Wind_Speed());
+      assertEquals(140,               tour.getWeather_Wind_Direction());
+      assertEquals(51,                tour.getWeather_Humidity());
+      assertEquals(0,                 tour.getWeather_Precipitation());
+      assertEquals(0,                 tour.getWeather_Snowfall());
+      assertEquals(1008,              tour.getWeather_Pressure());
+      assertEquals(0,                 tour.getWeather_Temperature_Max());
+      assertEquals(0,                 tour.getWeather_Temperature_Min());
+      assertEquals(12.95f,            tour.getWeather_Temperature_WindChill());
+
+// SET_FORMATTING_ON
    }
 }
