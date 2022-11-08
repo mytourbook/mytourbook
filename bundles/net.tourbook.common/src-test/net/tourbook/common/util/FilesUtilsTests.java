@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
@@ -24,8 +25,8 @@ public class FilesUtilsTests {
    @Test
    void testRemoveExtensions() {
 
-      assertEquals("file.json", FilesUtils.removeExtensions("file.json.gz")); //$NON-NLS-1$ //$NON-NLS-2$
-      assertEquals("file", FilesUtils.removeExtensions("file")); //$NON-NLS-1$ //$NON-NLS-2$
+      assertAll(
+            () -> assertEquals("file.json", FilesUtils.removeExtensions("file.json.gz")), //$NON-NLS-1$ //$NON-NLS-2$
+            () -> assertEquals("file", FilesUtils.removeExtensions("file"))); //$NON-NLS-1$ //$NON-NLS-2$
    }
-
 }
