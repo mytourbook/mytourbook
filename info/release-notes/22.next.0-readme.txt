@@ -32,6 +32,9 @@ New
 * Map Player
   - This player can play an animation in a map, currently only the 2.5D map is supported
                                                 https://github.com/mytourbook/mytourbook/issues/948
+
+* Weather (Frederic)
+  - Retrieve current weather (OpenWeatherMap) https://github.com/mytourbook/mytourbook/issues/494
   
 
 Improvements
