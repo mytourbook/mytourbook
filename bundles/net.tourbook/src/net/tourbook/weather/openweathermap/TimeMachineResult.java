@@ -29,7 +29,6 @@ import net.tourbook.weather.WeatherUtils;
 @JsonIgnoreProperties(ignoreUnknown = true)
 class TimeMachineResult {
 
-   private int          timezone_offset;
    private Current      current;
 
    private List<Hourly> hourly;
@@ -259,10 +258,6 @@ class TimeMachineResult {
       }
 
       return 0;
-   }
-
-   public int getTimezone_offset() {
-      return timezone_offset;
    }
 
    public float getTotalPrecipitation() {
