@@ -190,8 +190,9 @@ public class OpenWeatherMapRetrieverTests {
 
       final TourData tour = Initializer.importTour();
       //Set the tour start time to be within the current hour
-      final ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.of(UI.TIME_ZONE_UTC));
+      final ZonedDateTime zonedDateTime = ZonedDateTime.now(ZoneId.systemDefault());
       tour.setTourStartTime(zonedDateTime);
+      tour.setTimeZoneId(UI.TIME_ZONE_UTC);
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 

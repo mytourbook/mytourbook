@@ -29,6 +29,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -160,11 +161,12 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();
       tourStartTimeCalendar.setTimeInMillis(tourStartTime * 1000L);
+      tourStartTimeCalendar.setTimeZone(TimeZone.getTimeZone(tourTimeZoneId));
       tourStartTimeCalendar.set(Calendar.MINUTE, 0);
       tourStartTimeCalendar.set(Calendar.SECOND, 0);
       tourStartTimeCalendar.set(Calendar.MILLISECOND, 0);
 
-      final Instant instant = LocalDateTime.now().atZone(ZoneId.of(tourTimeZoneId)).toInstant();
+      final Instant instant = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
       final long timeInMillis = instant.toEpochMilli();
       final GregorianCalendar currentTimeCalendar = new GregorianCalendar();
       currentTimeCalendar.setTimeInMillis(timeInMillis);
