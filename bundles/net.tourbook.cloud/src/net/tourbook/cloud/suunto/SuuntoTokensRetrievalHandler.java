@@ -86,7 +86,7 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
       SuuntoTokens suuntoTokens = null;
       try {
          suuntoTokens = new ObjectMapper().readValue(responseBody, SuuntoTokens.class);
-      } catch (final JsonProcessingException e) {
+      } catch (final IllegalArgumentException | JsonProcessingException e) {
          StatusUtil.log(e);
       }
 

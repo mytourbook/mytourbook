@@ -167,4 +167,27 @@ public class SuuntoCloudDownloaderTests {
 
       net.tourbook.common.util.FilesUtils.deleteIfExists(Paths.get(downloadedFilename));
    }
+
+   @Test
+   void tourDownload_TokenRetrieval_NullResponse() {
+
+      //We set the access token issue date time in the past to trigger the retrieval
+      //of a new token.
+      _prefStore.setValue(
+            Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
+            "973701086000"); //$NON-NLS-1$
+
+      httpClientMock.onPost(
+            OAuth2Utils.createOAuthPasseurUri("/suunto/token").toString()) //$NON-NLS-1$
+            .doReturn(UI.EMPTY_STRING)
+            .withStatus(201);
+
+      suuntoCloudDownloader.downloadTours();
+
+      httpClientMock.verify().post(OAuth2Utils.createOAuthPasseurUri("/suunto/token").toString()).called(); //$NON-NLS-1$
+
+      final List<?> logs = TourLogManager.getLogs();
+      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+            "Action aborted due to invalid tokens")));
+   }
 }

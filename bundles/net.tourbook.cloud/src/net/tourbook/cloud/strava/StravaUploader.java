@@ -154,7 +154,7 @@ public class StravaUploader extends TourbookCloudUploader {
       StravaTokens stravaTokens = null;
       try {
          stravaTokens = new ObjectMapper().readValue(responseBody, StravaTokens.class);
-      } catch (final JsonProcessingException e) {
+      } catch (final IllegalArgumentException | JsonProcessingException e) {
          StatusUtil.log(e);
       }
 
