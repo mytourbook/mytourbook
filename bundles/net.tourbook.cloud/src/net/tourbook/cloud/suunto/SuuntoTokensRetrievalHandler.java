@@ -32,7 +32,7 @@ import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
-class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
+public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
 
    private static HttpClient       _httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
 

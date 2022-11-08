@@ -29,7 +29,9 @@ import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
+import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.suunto.SuuntoCloudDownloader;
+import net.tourbook.cloud.suunto.SuuntoTokensRetrievalHandler;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -88,7 +90,10 @@ public class SuuntoCloudDownloaderTests {
 
       httpClientMock = new HttpClientMock();
 
-      final Field field = SuuntoCloudDownloader.class.getDeclaredField("_httpClient"); //$NON-NLS-1$
+      Field field = SuuntoCloudDownloader.class.getDeclaredField("_httpClient"); //$NON-NLS-1$
+      field.setAccessible(true);
+      field.set(null, httpClientMock);
+      field = SuuntoTokensRetrievalHandler.class.getDeclaredField("_httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
       field.set(null, httpClientMock);
 
@@ -119,12 +124,25 @@ public class SuuntoCloudDownloaderTests {
    @Test
    void testTourDownload() {
 
+      //We set the access token issue date time in the past to trigger the retrieval
+      //of a new token.
+      _prefStore.setValue(
+            Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
+            "973701086000"); //$NON-NLS-1$
+
       final String workoutsResponse = Comparison.readFileContent(SUUNTO_FILE_PATH
             + "Workouts-Response.json"); //$NON-NLS-1$
       httpClientMock.onGet(
             OAuth2Constants.OAUTH_PASSEUR_APP_URL + "/suunto/workouts?since=1293840000000&until=1295049600000") //$NON-NLS-1$
             .doReturn(workoutsResponse)
             .withStatus(200);
+
+      final String tokenResponse = Comparison.readFileContent(SUUNTO_FILE_PATH
+            + "Token-Response.json"); //$NON-NLS-1$
+      httpClientMock.onPost(
+            OAuth2Utils.createOAuthPasseurUri("/suunto/token").toString()) //$NON-NLS-1$
+            .doReturn(tokenResponse)
+            .withStatus(201);
 
       final String filename = "2011-01-13.fit"; //$NON-NLS-1$
       httpClientMock.onGet(
@@ -135,6 +153,7 @@ public class SuuntoCloudDownloaderTests {
 
       suuntoCloudDownloader.downloadTours();
 
+      httpClientMock.verify().post(OAuth2Utils.createOAuthPasseurUri("/suunto/token").toString()).called(); //$NON-NLS-1$
       httpClientMock.verify().get(OAuth2Constants.OAUTH_PASSEUR_APP_URL + "/suunto/workouts?since=1293840000000&until=1295049600000").called(); //$NON-NLS-1$
       httpClientMock.verify().get(OAuth2Constants.OAUTH_PASSEUR_APP_URL + "/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").called(); //$NON-NLS-1$
 
