@@ -24,7 +24,6 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 class Current {
 
-   private int           dt;
    private float         temp;
    private float         feels_like;
    private int           pressure;
@@ -34,10 +33,6 @@ class Current {
    private Volume        rain;
    private Volume        snow;
    private List<Weather> weather;
-
-   public int getDt() {
-      return dt;
-   }
 
    public float getFeels_like() {
       return feels_like;
@@ -49,11 +44,11 @@ class Current {
 
    public float getPrecipitation() {
 
-      if (rain == null) {
+      if (getRain() == null) {
          return 0;
       }
 
-      return (float) rain.getOneHour();
+      return (float) getRain().getOneHour();
    }
 
    public int getPressure() {
@@ -83,20 +78,20 @@ class Current {
 
    public String getWeatherClouds() {
 
-      if (weather == null || weather.isEmpty()) {
+      if (getWeather() == null || getWeather().isEmpty()) {
          return UI.EMPTY_STRING;
       }
 
-      return TimeMachineResult.convertWeatherTypeToMTWeatherClouds(weather.get(0).getId());
+      return TimeMachineResult.convertWeatherTypeToMTWeatherClouds(getWeather().get(0).getId());
    }
 
    public String getWeatherDescription() {
 
-      if (weather == null || weather.isEmpty()) {
+      if (getWeather() == null || getWeather().isEmpty()) {
          return UI.EMPTY_STRING;
       }
 
-      return weather.get(0).getDescription();
+      return getWeather().get(0).getDescription();
    }
 
    public int getWind_deg() {
