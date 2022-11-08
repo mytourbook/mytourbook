@@ -187,14 +187,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       while (true) {
 
          //Send an API request as long as we don't have the results covering the entire duration of the tour
-         final String weatherRequestWithParameters = buildWeatherApiRequest(requestedTime);
-
-         final String rawWeatherData = sendWeatherApiRequest(weatherRequestWithParameters);
-         if (StringUtils.isNullOrEmpty(rawWeatherData)) {
-            return false;
-         }
-
-         final TimeMachineResult newTimeMachineResult = deserializeWeatherData(rawWeatherData);
+         final TimeMachineResult newTimeMachineResult = retrieveWeatherData(requestedTime);
          if (newTimeMachineResult == null) {
             return false;
          }
@@ -244,6 +237,18 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       setTourWeatherWithHistoricalWeather();
 
       return true;
+   }
+
+   private TimeMachineResult retrieveWeatherData(final long requestedTime) {
+
+      final String weatherRequestWithParameters = buildWeatherApiRequest(requestedTime);
+
+      final String rawWeatherData = sendWeatherApiRequest(weatherRequestWithParameters);
+      if (StringUtils.isNullOrEmpty(rawWeatherData)) {
+         return null;
+      }
+
+      return deserializeWeatherData(rawWeatherData);
    }
 
    private void setTourWeatherWithCurrentWeather(final Current currentWeather) {
