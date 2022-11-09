@@ -201,7 +201,7 @@ public class TVITourBookTour extends TVITourBookItem implements Comparable<TVITo
             + "[" + NL //                                         //$NON-NLS-1$
 
             + "colDateTimeText   =" + colDateTime_Text + NL //    //$NON-NLS-1$
-            + "colTourDateTime   =" + colTourDateTime + NL //     //$NON-NLS-1$
+//          + "colTourDateTime   =" + colTourDateTime + NL //     //$NON-NLS-1$
             + "colTourTitle      =" + colTourTitle + NL //        //$NON-NLS-1$
 
             + "]" + NL //                                         //$NON-NLS-1$

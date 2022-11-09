@@ -45,11 +45,20 @@ Setup the graddle wrapper in the build folder:
    
 
    Build plugin
+   
    - Check versions in (gdxVersion)          /mytourbook/bundles/build.gradle 
-   - Update VTM files,  run task assemble:   C:\DAT\MT\vtm-parent>gradlew ass
-   - Update VTM plugin, run task assemble:   C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.vtm>gradle ass
-
-   OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD
+   
+   - Update VTM files, run task assemble:   
+   
+      cd C:\DAT\MT\vtm-parent
+      gradlew clean ass
+      
+   - Update VTM plugin, run task assemble:   
+     
+     cd C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.vtm
+     gradle clean ass
+ 
+    OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD OLD
     
       Update manifest.MF
       - Select 'EGradle virtual root project' in 'Package Explorer'

@@ -109,6 +109,7 @@ public class NatTable_DataLoader {
    private TourBookView                                   _tourBookView;
 
    private ColumnManager                                  _columnManager;
+
    /**
     * Contains all tour id's for the current tour filter and tour sorting, this is used
     * to get the row index for a tour.
@@ -347,15 +348,25 @@ public class NatTable_DataLoader {
          }
 
          int rowIndex = 0;
+         long prevTourId = -1;
 
          final ResultSet result = prepStmt.executeQuery();
          while (result.next()) {
 
             final long tourId = result.getLong(1);
 
-            allTourIds.add(tourId);
+            if (tourId == prevTourId) {
 
-            _fetchedTourIndex.put(tourId, rowIndex++);
+               // skip duplicated tour id's
+
+            } else {
+
+               allTourIds.add(tourId);
+
+               _fetchedTourIndex.put(tourId, rowIndex++);
+            }
+
+            prevTourId = tourId;
          }
 
       } catch (final SQLException e) {
