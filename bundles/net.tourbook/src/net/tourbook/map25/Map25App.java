@@ -40,7 +40,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
-import net.tourbook.map25.animation.Map25Animation;
+import net.tourbook.map25.animation.Map25jME_App;
 import net.tourbook.map25.layer.compassrose.CompassRoseLayer;
 import net.tourbook.map25.layer.labeling.LabelLayerMT;
 import net.tourbook.map25.layer.legend.LegendLayer;
@@ -165,7 +165,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private static IDialogSettings               _state;
    //
    private static Map25View                     _map25View;
-   private static Map25Animation                _map25Animation;
+   private static Map25jME_App                _map25Animation;
    private static LwjglApplication              _lwjglApp;
    private static LwjglApplicationConfiguration _appConfig;
    //
@@ -1392,7 +1392,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 //       _map25Animation.startAnimation();
 
          final boolean isCurrent = org.lwjgl.opengl.Display.isCurrent();
-
          if (isCurrent == false) {
 
             org.lwjgl.opengl.Display.makeCurrent();

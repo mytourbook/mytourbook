@@ -1,0 +1,32 @@
+Use jMonkeyEngine with an external main loop 
+
+
+
+
+
+I would like to animated a 3D figure from a gltf model with jME. The 3D figure should be moving along a track on a 2.5D map, like in this video by replacing the moving triangle with a 3d figure.
+
+https://user-images.githubusercontent.com/1283445/200186937-4fae1921-06b0-40d1-bd03-68a821ae1a6c.mp4
+
+This [2.5D map](https://mytourbook.sourceforge.io/mytourbook/index.php/documentation/show-tours/2-5d-map) is based on https://github.com/mapsforge/vtm which is running the Lwjgl 2 main loop  https://github.com/libgdx/libgdx/blob/9f72b0037cc98da57e783f177d7a993501308680/backends/gdx-backend-lwjgl/src/com/badlogic/gdx/backends/lwjgl/LwjglApplication.java#L122-L138
+
+This would be the pseudo code for the 2.5D map Lwjgl main loop to render also the 3D jME animation:
+
+```
+while (running) { 
+
+   switch OpenGL context to jME
+   
+   render animation frame into a 2D texture // performed in jME
+   
+   switch OpenGL context to main loop
+
+   render map frame and blend in the animation from the 2D texture
+}
+```
+
+Does anybody has experience with such an app layout and could provide an example?
+
+
+Why do I not use the libgdx framework to implement the animation?
+A 3D framework animation is very new for me and it looks easier for me to implement it with jME.

@@ -1,0 +1,20 @@
+
+Well I got some help on #LWJGL , ended up I was doing a few minor things wrong. But there a few things 
+I don't quite grasp yet.
+
+The steps I used to make this work are listed as follows
+
+1) I grabbed the drawable (surface?) from within the main thread with Display.getDrawable() 
+   and saved it off into a variable to send to thread2
+2) I released the context from the Display within the main thread with Display.releaseContext()
+3) I then start the new thread (thread2) and then pass it the drawable surface that I had gotten in step 1
+4) within thread2 I used GLContext.useContext(drawable.getContext())
+5) made the context the current context with by calling Display.makeCurrent()
+6) at this point I am now able to render into the window from thread2
+
+I am confused about why this works, it seems I getting the drawable surface from display, 
+then just turning around and re-attaching to Display. I can't quite see how this ties in 
+with the GL11 calls and different threads.
+
+
+Source: http://forum.lwjgl.org/index.php?topic=2579.0#subject_14366
