@@ -55,5 +55,15 @@
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/pom.xml</locationURI>
 		</link>
+		<link>
+			<name>settings-bundles.gradle</name>
+			<type>1</type>
+			<location>C:/DAT/MT/mytourbook/bundles/settings.gradle</location>
+		</link>
+		<link>
+			<name>settings-vtm.gradle</name>
+			<type>1</type>
+			<location>C:/DAT/MT/mytourbook/build/build.net.tourbook/vtm-settings.gradle</location>
+		</link>
 	</linkedResources>
 </projectDescription>
