@@ -44,7 +44,7 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
-   private static final String baseApiUrl        = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/timemachine"; //$NON-NLS-1$
+   private static final String BASE_API_URL      = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/timemachine"; //$NON-NLS-1$
 
    private TimeMachineResult   timeMachineResult = null;
 
@@ -54,7 +54,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    }
 
    public static String getBaseApiUrl() {
-      return baseApiUrl;
+      return BASE_API_URL;
    }
 
    @Override
@@ -100,7 +100,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       String weatherRequestWithParameters = UI.EMPTY_STRING;
 
       try {
-         final URI apiUri = new URI(baseApiUrl);
+         final URI apiUri = new URI(BASE_API_URL);
 
          final URIBuilder uriBuilder = new URIBuilder()
                .setScheme(apiUri.getScheme())
