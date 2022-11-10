@@ -1063,7 +1063,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
             link.addSelectionListener(new SelectionAdapter() {
                @Override
                public void widgetSelected(final SelectionEvent e) {
-                  WEB.openUrl(Messages.External_Link_MapProviders);
+                  WEB.openUrl("https://mytourbook.sourceforge.io/mytourbook/index.php/map-provider");//$NON-NLS-1$
                }
             });
             GridDataFactory.fillDefaults()//
