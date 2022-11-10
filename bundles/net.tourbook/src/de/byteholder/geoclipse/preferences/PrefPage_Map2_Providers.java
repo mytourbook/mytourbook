@@ -15,6 +15,7 @@
  *******************************************************************************/
 package de.byteholder.geoclipse.preferences;
 
+import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import de.byteholder.geoclipse.map.UI;
@@ -102,8 +103,6 @@ import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.dnd.URLTransfer;
-import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -829,27 +828,20 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
       table.setHeaderBackground(bgColor);
       table.setHeaderForeground(fgColor);
 
-      table.addKeyListener(new KeyListener() {
+      table.addKeyListener(keyPressedAdapter(keyEvent -> {
 
-         @Override
-         public void keyPressed(final KeyEvent e) {
+         if (keyEvent.keyCode == SWT.DEL) {
 
-            if (e.keyCode == SWT.DEL) {
+            /*
+             * Delete map provider only when the delete button is enabled, otherwise internal map
+             * providers can be deleted which is not good
+             */
+            if (_btnDeleteMapProvider.isEnabled()) {
 
-               /*
-                * Delete map provider only when the delete button is enabled, otherwise internal map
-                * providers can be deleted which is not good
-                */
-               if (_btnDeleteMapProvider.isEnabled()) {
-
-                  onAction_MapProvider_Delete();
-               }
+               onAction_MapProvider_Delete();
             }
          }
-
-         @Override
-         public void keyReleased(final KeyEvent e) {}
-      });
+      }));
 
       net.tourbook.ui.UI.setTableSelectionColor(table);
 
@@ -1192,12 +1184,7 @@ public class PrefPage_Map2_Providers extends PreferencePage implements IWorkbenc
 
             // link
             _linkOnlineMap = new Link(container, SWT.NONE);
-            _linkOnlineMap.addSelectionListener(new SelectionAdapter() {
-               @Override
-               public void widgetSelected(final SelectionEvent e) {
-                  WEB.openUrl(_txtOnlineMapUrl.getText());
-               }
-            });
+            _linkOnlineMap.addSelectionListener(widgetSelectedAdapter(selectionEvent -> WEB.openUrl(_txtOnlineMapUrl.getText())));
             GridDataFactory.fillDefaults()
                   .span(3, 1)
                   .grab(true, false)
