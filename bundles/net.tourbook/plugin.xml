@@ -850,7 +850,7 @@
             label       ="%Command_App_OpenHomePage"
             mnemonic    ="%Command_App_OpenHomePage_Mnemonic"/>
 
-         <!-- Discussion  -->
+         <!-- Discussions -->
          <command
             commandId   ="net.tourbook.command.OpenDiscussions"
             label       ="%Command_App_OpenDiscussions"
@@ -1453,7 +1453,7 @@
       <command
          id             ="net.tourbook.command.OpenDiscussions"
          name           ="%Command_App_OpenDiscussions"
-         defaultHandler ="net.tourbook.ui.action.ActionHandlerOpenDiscussionss"
+         defaultHandler ="net.tourbook.ui.action.ActionHandlerOpenDiscussions"
       />
       
       <command
