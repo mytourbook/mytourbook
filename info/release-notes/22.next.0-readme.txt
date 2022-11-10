@@ -60,7 +60,8 @@ Improvements
 Changes
 =======
 
-* 
+* Help Menu (Frederic)
+  - Replaced the Forum entry with two Github links https://github.com/mytourbook/mytourbook/issues/951
 
 
 Bugfix
