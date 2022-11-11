@@ -39,7 +39,7 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class WeatherApiRetriever extends HistoricalWeatherRetriever {
 
-   private static final String baseApiUrl    = WeatherUtils.HEROKU_APP_URL + "/weatherapi"; //$NON-NLS-1$
+   private static final String baseApiUrl    = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/weatherapi"; //$NON-NLS-1$
 
    private HistoryResult       historyResult = null;
 

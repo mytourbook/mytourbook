@@ -13,34 +13,37 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package views;
+package dialogs;
 
 import net.tourbook.Messages;
 
-import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
-import org.junit.jupiter.api.Disabled;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
 
-public class Map2ViewTests extends UITest {
+public class DialogReimportTourTests extends UITest {
 
-   @Disabled
    @Test
-   public void testExportImageAsImageFile() {
+   void tourReimport_WhenAllToursAreSelected_FilesCannotBeFound() {
 
-      Utils.showTourBookView(bot);
+      final SWTBotTreeItem tour = Utils.getTour(bot);
 
-      bot.toolbarButtonWithTooltip(Messages.App_Action_CollapseAll).click();
+      tour.contextMenu(Messages.Dialog_ReimportTours_Action_OpenDialog).click();
 
-      Utils.getTour(bot);
+      bot.button(0).click();//Unlock the radio button below
+      bot.radio(Messages.Dialog_ModifyTours_Radio_AllTours).click();
 
-      bot.toolbarButtonWithTooltip("Shows tour in 2D map").click(); //$NON-NLS-1$
-      final SWTBotView map2ViewBot = Utils.showView(bot, "2D Tour Map"); //$NON-NLS-1$
-      //Sleeping 3 seconds as the map can be slow to display
-      bot.sleep(3000);
+      bot.radio(Messages.Dialog_ReimportTours_Checkbox_EntireTour).click();
+      bot.checkBox(Messages.Dialog_ReimportTours_Checkbox_SkipToursWithImportFileNotFound).click();
 
-      map2ViewBot.bot().tree().contextMenu("Export Map").menu("As Imagefile...").click();
+      bot.checkBox(Messages.Tour_Log_Checkbox_LogDetails).click();
+      bot.button(Messages.Dialog_ReimportTours_Button_ReImport).click();
+
+      bot.button("Yes").click(); //$NON-NLS-1$
+      Utils.clickOkButton(bot);
+
+      bot.sleep(10000);
    }
 }

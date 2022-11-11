@@ -18,6 +18,7 @@ package common.time;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import org.junit.jupiter.api.DisplayName;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -30,6 +31,7 @@ import net.tourbook.common.time.TourDateTime;
 
 import org.junit.jupiter.api.Test;
 
+@DisplayName("TimeTools should")
 public class TimeToolsTests {
 
    private double eiffelTowerLat = 48.858093;
@@ -38,6 +40,7 @@ public class TimeToolsTests {
    private String parisZoneId    = "Europe/Paris"; //$NON-NLS-1$
 
    @Test
+   @DisplayName("Create Date Time from a string")
    void testCreateDateTimeFromYMDhms() {
 
       final ZonedDateTime testZonedDateTime = TimeTools.createDateTimeFromYMDhms(20220516165348L);
@@ -184,12 +187,6 @@ public class TimeToolsTests {
       assertEquals(controlTimeZoneData.label, testTimeZoneData.label);
       assertEquals(controlTimeZoneData.zoneId, testTimeZoneData.zoneId);
       assertEquals(controlTimeZoneData.zoneOffsetSeconds, testTimeZoneData.zoneOffsetSeconds);
-   }
-
-   @Test
-   void testGetTimeZoneIndex_Default() {
-
-      assertEquals(596, TimeTools.getTimeZoneIndex_Default());
    }
 
    @Test

@@ -20,7 +20,7 @@
       </dependency>
       <dependency>
          <artifactId>junit-jupiter-engine</artifactId>                  <groupId>org.junit.jupiter</groupId>
-                                                                        <version>5.9.0</version>
+                                                                        <version>5.9.1</version>
          <scope>test</scope>
       </dependency>
    </dependencies>	
@@ -191,6 +191,9 @@
                </goals>
             </execution>
          </executions>
+         <configuration>
+               <release>11</release>
+         </configuration>
       </plugin>
       
       <plugin>

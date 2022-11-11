@@ -850,11 +850,17 @@
             label       ="%Command_App_OpenHomePage"
             mnemonic    ="%Command_App_OpenHomePage_Mnemonic"/>
 
-         <!-- Forum  -->
+         <!-- Discussions -->
          <command
-            commandId   ="net.tourbook.command.OpenForum"
-            label       ="%Command_App_OpenForum"
-            mnemonic    ="%Command_App_OpenForum_Mnemonic"/>
+            commandId   ="net.tourbook.command.OpenDiscussions"
+            label       ="%Command_App_OpenDiscussions"
+            mnemonic    ="%Command_App_OpenDiscussions_Mnemonic"/>
+            
+          <!-- Feature Requests and Bugs  -->
+         <command
+            commandId   ="net.tourbook.command.OpenIssues"
+            label       ="%Command_App_OpenIssues"
+            mnemonic    ="%Command_App_OpenIssues_Mnemonic"/>
 
          <separator
             name        ="g_SoftwareUpdate"
@@ -1445,9 +1451,15 @@
       />
 
       <command
-         id             ="net.tourbook.command.OpenForum"
-         name           ="%Command_App_OpenForum"
-         defaultHandler ="net.tourbook.ui.action.ActionHandlerOpenForum"
+         id             ="net.tourbook.command.OpenDiscussions"
+         name           ="%Command_App_OpenDiscussions"
+         defaultHandler ="net.tourbook.ui.action.ActionHandlerOpenDiscussions"
+      />
+      
+      <command
+         id             ="net.tourbook.command.OpenIssues"
+         name           ="%Command_App_OpenIssues"
+         defaultHandler ="net.tourbook.ui.action.ActionHandlerOpenIssues"
       />
 
       <!--

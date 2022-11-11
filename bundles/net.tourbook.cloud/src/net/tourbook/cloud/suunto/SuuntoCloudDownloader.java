@@ -46,6 +46,7 @@ import net.tourbook.cloud.CloudImages;
 import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
+import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.suunto.workouts.Payload;
 import net.tourbook.cloud.suunto.workouts.Workouts;
 import net.tourbook.common.UI;
@@ -91,7 +92,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
    private CompletableFuture<WorkoutDownload> downloadFile(final Payload workoutPayload) {
 
       final HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(OAuth2Constants.HEROKU_APP_URL + "/suunto/workout/exportFit?workoutKey=" + workoutPayload.workoutKey))//$NON-NLS-1$
+            .uri(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=" + workoutPayload.workoutKey))//$NON-NLS-1$
             .header(HttpHeaders.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
             .GET()
             .build();
@@ -176,7 +177,7 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
             //Get the list of workouts
             final Workouts workouts = retrieveWorkoutsList();
-            if (workouts.payload.size() == 0) {
+            if (workouts.payload.isEmpty()) {
                TourLogManager.log_INFO(Messages.Log_DownloadWorkoutsFromSuunto_002_NewWorkoutsNotFound);
                return;
             }
@@ -359,11 +360,11 @@ public class SuuntoCloudDownloader extends TourbookCloudDownloader {
 
       try {
 
-         final URI herokuUri = new URI(OAuth2Constants.HEROKU_APP_URL);
+         final URI oAuthPasseurAppUri = OAuth2Utils.createOAuthPasseurUri(UI.EMPTY_STRING);
 
          final URIBuilder uriBuilder = new URIBuilder()
-               .setScheme(herokuUri.getScheme())
-               .setHost(herokuUri.getHost())
+               .setScheme(oAuthPasseurAppUri.getScheme())
+               .setHost(oAuthPasseurAppUri.getHost())
                .setPath("suunto/workouts"); //$NON-NLS-1$
 
          if (getSuuntoUseWorkoutFilterStartDate()) {

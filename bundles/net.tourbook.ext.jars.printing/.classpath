@@ -11,8 +11,8 @@
 	<classpathentry exported="true" kind="lib" path="xmlgraphics-commons-2.7.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.xmlgraphics/xmlgraphics-commons -->
 	<classpathentry exported="true" kind="lib" path="commons-io-2.11.0.jar"/> <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
 	<classpathentry exported="true" kind="lib" path="commons-logging-1.2.jar"/> <!-- https://mvnrepository.com/artifact/commons-logging/commons-logging -->
-	<classpathentry exported="true" kind="lib" path="jaxb-api-2.4.0-b180830.0359.jar"/> <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api -->
-	<classpathentry exported="true" kind="lib" path="jaxb-runtime-2.4.0-b180830.0438.jar"/> <!-- https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime -->
+	<classpathentry exported="true" kind="lib" path="jaxb-core-4.0.1.jar"/> <!-- https://mvnrepository.com/artifact/javax.xml.bind/jaxb-core -->
+	<classpathentry exported="true" kind="lib" path="jaxb-runtime-4.0.1.jar"/> <!-- https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime -->
 	<classpathentry exported="true" kind="lib" path="istack-commons-runtime-4.1.1.jar"/> <!-- https://mvnrepository.com/artifact/com.sun.istack/istack-commons-runtime -->
 	<classpathentry exported="true" kind="lib" path="activation-1.1.1.jar"/> <!-- https://mvnrepository.com/artifact/javax.activation/activation -->
 	<classpathentry kind="output" path="bin"/>

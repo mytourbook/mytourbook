@@ -65,20 +65,20 @@ public class WorkbenchTests extends UITest {
       //Sleeping 3 seconds as the map can be slow to display
       //bot.sleep(3000);
 
-      Utils.showView(bot, "Tour Log"); //$NON-NLS-1$
+      final SWTBotView tourLogView = Utils.showView(bot, "Tour Log"); //$NON-NLS-1$
 
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode("Waypoints").select(); //$NON-NLS-1$
       bot.button("Open").click(); //$NON-NLS-1$
-      Utils.showView(bot, "Waypoints"); //$NON-NLS-1$
+      final SWTBotView waypointsView = Utils.showView(bot, "Waypoints"); //$NON-NLS-1$
 
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode("Tour Data").select(); //$NON-NLS-1$
       bot.button("Open").click(); //$NON-NLS-1$
-      Utils.showView(bot, "Tour Data"); //$NON-NLS-1$
+      final SWTBotView tourDataView = Utils.showView(bot, "Tour Data"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Tour Analyzer"); //$NON-NLS-1$
-      Utils.showView(bot, "Tour Analyzer"); //$NON-NLS-1$
+      final SWTBotView tourAnalyzerView = Utils.showView(bot, "Tour Analyzer"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Compare Geo Tour"); //$NON-NLS-1$
       final SWTBotView geoCompareView = Utils.showView(bot, "Geo Compare"); //$NON-NLS-1$
@@ -129,15 +129,19 @@ public class WorkbenchTests extends UITest {
       bot.button("Open").click(); //$NON-NLS-1$
       final SWTBotView photosAndToursView = Utils.showView(bot, "Photos + Tours"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, "Tour", "Tour &Photos"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, "Tour", "Tour &Photos"); //$NON-NLS-1$ //$NON-NLS-2$
       final SWTBotView tourPhotosView = Utils.showView(bot, "Tour Photos"); //$NON-NLS-1$
 
-      Utils.showViewFromMenu(bot, "Map", "Map &Bookmark"); //$NON-NLS-1$
+      Utils.showViewFromMenu(bot, "Map", "Map &Bookmark"); //$NON-NLS-1$ //$NON-NLS-2$
       final SWTBotView mapBookmarkView = Utils.showView(bot, "Map Bookmark"); //$NON-NLS-1$
 
       bot.sleep(3000);
 
       //Close the opened views
+      tourLogView.close();
+      waypointsView.close();
+      tourDataView.close();
+      tourAnalyzerView.close();
       geoCompareView.close();
       photosView.close();
       collatedToursView.close();

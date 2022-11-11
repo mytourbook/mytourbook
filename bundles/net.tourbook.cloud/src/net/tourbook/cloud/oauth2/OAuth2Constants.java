@@ -21,7 +21,7 @@ public class OAuth2Constants {
 
    public static final String CONTENT_TYPE             = "Content-Type";                                    //$NON-NLS-1$
 
-   public static final String HEROKU_APP_URL           = "https://passeur-mytourbook-oauthapps.cyclic.app"; //$NON-NLS-1$
+   static final String        OAUTH_PASSEUR_APP_URL    = "https://passeur-mytourbook-oauthapps.cyclic.app"; //$NON-NLS-1$
 
    public static final String PARAM_AUTHORIZATION_CODE = "authorization_code";                              //$NON-NLS-1$
 

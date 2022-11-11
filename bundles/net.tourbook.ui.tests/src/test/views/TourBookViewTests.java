@@ -22,16 +22,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.byteholder.geoclipse.map.UI;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 
 import net.tourbook.Messages;
+import net.tourbook.common.util.FilesUtils;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.swtbot.nebula.nattable.finder.widgets.SWTBotNatTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -39,31 +44,58 @@ import utils.Utils;
 
 public class TourBookViewTests extends UITest {
 
+   @Test
+   void adustTourValues_RetrieveWeatherData_OutsideOfAllowedRange() {
+
+      final SWTBotTreeItem tour = Utils.getTour(bot);
+
+      tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
+            .menu(Messages.tour_editor_section_weather)
+            .menu(Messages.Tour_Action_RetrieveWeatherData).click();
+
+      final List<?> logs = TourLogManager.getLogs();
+      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+            "1/31/21, 7:15 AM -> Error while retrieving the weather data: \"{\"cod\":\"400\",\"message\":\"requested time is out of allowed range of 5 days back\"}\"")));//$NON-NLS-1$
+   }
+
+   @Test
+   void adustTourValues_SetTimeZone_AllChoices() {
+
+      //Select a tour
+      SWTBotTreeItem tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+      assertEquals("9:51 AM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("America/Los_Angeles", tour.cell(tourBookView_TimeZone_Column_Index)); //$NON-NLS-1$
+
+      //Adjust the tour time zone
+      tour.contextMenu(Messages.Tour_Action_AdjustTourValues).menu(Messages.Tour_Action_SetTimeZone).click();
+      bot.comboBox().setSelection("-07:00    -06:00    US/Mountain   -   DST - 1 h - N"); //$NON-NLS-1$
+      bot.button(Messages.Dialog_SetTimeZone_Button_AdjustTimeZone).click();
+
+      //Assert
+      tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertEquals("10:51 AM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("US/Mountain", tour.cell(tourBookView_TimeZone_Column_Index)); //$NON-NLS-1$
+
+      //Adjust the tour time zone to the default value set in the preferences
+      tour.contextMenu(Messages.Tour_Action_AdjustTourValues).menu(Messages.Tour_Action_SetTimeZone).click();
+      bot.link(0).click();
+      bot.button(Messages.Dialog_SetTimeZone_Button_AdjustTimeZone).click();
+
+      //Assert
+      tour = bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
+            .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertEquals("6:51 PM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("Europe/Paris", tour.cell(tourBookView_TimeZone_Column_Index)); //$NON-NLS-1$
+   }
+
    @BeforeEach
    void InitializeEach() {
 
       tourBookView = Utils.showTourBookView(bot);
    }
-
-   /**
-    * This test doesn't work because SWTBot doesn't support native dialogs
-    * https://wiki.eclipse.org/SWTBot/FAQ#How_do_I_use_SWTBot_to_test_native_dialogs_.28File_Dialogs.2C_Color_Dialogs.2C_etc.29.3F
-    */
-//   @Test
-//   void testExportTourBookView() {
-//
-//      final SWTBotTreeItem tour = Utils.getTour(bot);
-//
-//      tour.contextMenu(Messages.App_Action_ExportViewCSV).click();
-//
-//      bot.button("Save").click();
-//
-//      final Path csvFilePath = Paths.get(Utils.workingDirectory, "TourBook_2022-08-30_21-39-05.csv");
-//      assertTrue(Files.exists(csvFilePath));
-//
-//      FilesUtils.deleteIfExists(csvFilePath);
-//      assertTrue(!Files.exists(csvFilePath));
-//   }
 
    @Test
    void testComputeTourDistance() {
@@ -141,6 +173,27 @@ public class TourBookViewTests extends UITest {
       assertEquals("2015   1", allItems[2].getText()); //$NON-NLS-1$
    }
 
+   /**
+    * This test doesn't work because SWTBot doesn't support native dialogs
+    * https://wiki.eclipse.org/SWTBot/FAQ#How_do_I_use_SWTBot_to_test_native_dialogs_.28File_Dialogs.2C_Color_Dialogs.2C_etc.29.3F
+    */
+   @Disabled
+   @Test
+   void testExportTourBookView() {
+
+      final SWTBotTreeItem tour = Utils.getTour(bot);
+
+      tour.contextMenu(Messages.App_Action_ExportViewCSV).click();
+
+      bot.button("Save").click();
+
+      final Path csvFilePath = Paths.get(Utils.workingDirectory, "TourBook_2022-08-30_21-39-05.csv");
+      assertTrue(Files.exists(csvFilePath));
+
+      FilesUtils.deleteIfExists(csvFilePath);
+      assertTrue(!Files.exists(csvFilePath));
+   }
+
    @Test
    void testMultiplyTourCalories() {
 
@@ -172,29 +225,15 @@ public class TourBookViewTests extends UITest {
 
       final SWTBotNatTable botNatTable = new SWTBotNatTable(
             tourBookView.bot().widget(widgetOfType(NatTable.class)));
-      assertEquals(9, botNatTable.rowCount());
+      assertEquals(10, botNatTable.rowCount());
 
       botNatTable.click(1, 0);
       botNatTable.click(2, 0);
-      //TODO FB org.opentest4j.AssertionFailedError: expected: <0:10> but was: <>
+      //FIXME org.opentest4j.AssertionFailedError: expected: <0:10> but was: <>
       //assertEquals("0:10", botNatTable.getCellDataValueByPosition(2, 4)); //$NON-NLS-1$
 
       //Deactivating the NatTable
       bot.toolbarButtonWithTooltip(Messages.Tour_Book_Action_ToggleViewLayout_Tooltip).click();
-   }
-
-   @Test
-   void testRetrieveWeatherData() {
-
-      final SWTBotTreeItem tour = Utils.getTour(bot);
-
-      tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
-            .menu(Messages.tour_editor_section_weather)
-            .menu(Messages.Tour_Action_RetrieveWeatherData).click();
-
-      final List<?> logs = TourLogManager.getLogs();
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "1/31/21, 7:15 AM -> Error while retrieving the weather data: \"{\"cod\":\"400\",\"message\":\"requested time is out of allowed range of 5 days back\"}\"")));//$NON-NLS-1$
    }
 
    @Test

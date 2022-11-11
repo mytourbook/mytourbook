@@ -17,14 +17,88 @@ package net.tourbook.weather.openweathermap;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import de.byteholder.geoclipse.map.UI;
+
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Current {
+class Current {
 
+   private float         temp;
+   private float         feels_like;
+   private int           pressure;
+   private int           humidity;
+   private float         wind_speed;
+   private int           wind_deg;
+   private Volume        rain;
+   private Volume        snow;
    private List<Weather> weather;
+
+   public float getFeels_like() {
+      return feels_like;
+   }
+
+   public int getHumidity() {
+      return humidity;
+   }
+
+   public float getPrecipitation() {
+
+      if (getRain() == null) {
+         return 0;
+      }
+
+      return (float) getRain().getOneHour();
+   }
+
+   public int getPressure() {
+      return pressure;
+   }
+
+   public Volume getRain() {
+      return rain;
+   }
+
+   public float getSnowfall() {
+
+      if (snow == null) {
+         return 0;
+      }
+
+      return (float) snow.getOneHour();
+   }
+
+   public float getTemp() {
+      return temp;
+   }
 
    public List<Weather> getWeather() {
       return weather;
+   }
+
+   public String getWeatherClouds() {
+
+      if (getWeather() == null || getWeather().isEmpty()) {
+         return UI.EMPTY_STRING;
+      }
+
+      return TimeMachineResult.convertWeatherTypeToMTWeatherClouds(getWeather().get(0).getId());
+   }
+
+   public String getWeatherDescription() {
+
+      if (getWeather() == null || getWeather().isEmpty()) {
+         return UI.EMPTY_STRING;
+      }
+
+      return getWeather().get(0).getDescription();
+   }
+
+   public int getWind_deg() {
+      return wind_deg;
+   }
+
+   public int getWind_speed() {
+      return Math.round(wind_speed);
    }
 }

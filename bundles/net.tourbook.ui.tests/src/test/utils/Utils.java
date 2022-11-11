@@ -17,7 +17,17 @@ package utils;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Duration;
+
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swtbot.eclipse.finder.SWTWorkbenchBot;
@@ -28,16 +38,17 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 
 public class Utils {
 
-   public static final String TOURBOOK_VIEW_NAME      = "Tour Book";                    //$NON-NLS-1$
-   public static final String TOUREDITOR_VIEW_NAME    = "Tour Editor";                  //$NON-NLS-1$
-   public static final String TOURMARKERS_VIEW_NAME   = "Tour Markers";                 //$NON-NLS-1$
-   public static final String TOURSEGMENTER_VIEW_NAME = "Tour Segmenter";               //$NON-NLS-1$
-   public static final String STATISTICS_VIEW_NAME    = "Statistics";                   //$NON-NLS-1$
-   public static final String TOOLS                   = "Tools ";                       //$NON-NLS-1$
-   public static final String SAVE_MODIFIED_TOUR      = "Save modified tour (Ctrl+S)";  //$NON-NLS-1$
-   public static final String DIRECTORY               = "Directory";                    //$NON-NLS-1$
+   private static HttpClient  _httpClient             = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
+   public static final String TOURBOOK_VIEW_NAME      = "Tour Book";                                                          //$NON-NLS-1$
+   public static final String TOUREDITOR_VIEW_NAME    = "Tour Editor";                                                        //$NON-NLS-1$
+   public static final String TOURMARKERS_VIEW_NAME   = "Tour Markers";                                                       //$NON-NLS-1$
+   public static final String TOURSEGMENTER_VIEW_NAME = "Tour Segmenter";                                                     //$NON-NLS-1$
+   public static final String STATISTICS_VIEW_NAME    = "Statistics";                                                         //$NON-NLS-1$
+   public static final String TOOLS                   = "Tools ";                                                             //$NON-NLS-1$
+   public static final String SAVE_MODIFIED_TOUR      = "Save modified tour (Ctrl+S)";                                        //$NON-NLS-1$
+   public static final String DIRECTORY               = "Directory";                                                          //$NON-NLS-1$
 
-   public static final String workingDirectory        = System.getProperty("user.dir"); //$NON-NLS-1$
+   public static final String workingDirectory        = System.getProperty("user.dir");                                       //$NON-NLS-1$
 
    public static void clickApplyAndCloseButton(final SWTWorkbenchBot bot) {
 
@@ -68,8 +79,8 @@ public class Utils {
 
       showTourBookView(bot);
 
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   2").expand() //$NON-NLS-1$
-            .getNode("Jan   2").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   3").expand() //$NON-NLS-1$
+            .getNode("Jan   3").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
       return tour;
@@ -87,6 +98,25 @@ public class Utils {
       assertNotNull(tour);
 
       return tour;
+   }
+
+   public static boolean isUrlReachable(final String url) {
+
+      final HttpRequest request = HttpRequest.newBuilder()
+            .GET()
+            .uri(URI.create(url))
+            .build();
+
+      try {
+         final HttpResponse<String> response = _httpClient.send(request, BodyHandlers.ofString());
+
+         return response.statusCode() == HttpURLConnection.HTTP_OK;
+      } catch (IOException | InterruptedException e) {
+         StatusUtil.log(e);
+         Thread.currentThread().interrupt();
+      }
+
+      return false;
    }
 
    public static void openOtherMenu(final SWTWorkbenchBot bot) {

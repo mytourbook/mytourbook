@@ -15,19 +15,14 @@
  *******************************************************************************/
 package net.tourbook.cloud.suunto;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.time.Duration;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Preferences;
-import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.oauth2.Tokens;
 import net.tourbook.cloud.oauth2.TokensRetrievalHandler;
@@ -36,7 +31,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.json.JSONObject;
 
 public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
 
@@ -51,74 +45,55 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
       _selectedPersonId = selectedPersonId;
    }
 
-   public static String getAccessToken_ActivePerson() {
+   static String getAccessToken_ActivePerson() {
 
       return _prefStore.getString(Preferences.getSuuntoAccessToken_Active_Person_String());
    }
 
-   public static String getAccessToken_AllPeople() {
+   static String getAccessToken_AllPeople() {
 
       return _prefStore.getString(Preferences.getPerson_SuuntoAccessToken_String(UI.EMPTY_STRING));
    }
 
-   public static String getDownloadFolder_ActivePerson() {
+   static String getDownloadFolder_ActivePerson() {
 
       return _prefStore.getString(Preferences.getSuuntoWorkoutDownloadFolder_Active_Person_String());
    }
 
-   public static String getDownloadFolder_AllPeople() {
+   static String getDownloadFolder_AllPeople() {
 
       return _prefStore.getString(Preferences.getPerson_SuuntoWorkoutDownloadFolder_String(UI.EMPTY_STRING));
    }
 
-   public static String getRefreshToken_ActivePerson() {
+   static String getRefreshToken_ActivePerson() {
 
       return _prefStore.getString(Preferences.getSuuntoRefreshToken_Active_Person_String());
    }
 
-   public static String getRefreshToken_AllPeople() {
+   static String getRefreshToken_AllPeople() {
 
       return _prefStore.getString(Preferences.getPerson_SuuntoRefreshToken_String(UI.EMPTY_STRING));
    }
 
-   public static SuuntoTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
+   private static SuuntoTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
 
-      final JSONObject body = new JSONObject();
-      String grantType;
-      if (isRefreshToken) {
-         body.put(OAuth2Constants.PARAM_REFRESH_TOKEN, refreshToken);
-         grantType = OAuth2Constants.PARAM_REFRESH_TOKEN;
-      } else {
-         body.put(OAuth2Constants.PARAM_CODE, authorizationCode);
-         grantType = OAuth2Constants.PARAM_AUTHORIZATION_CODE;
-      }
+      final String responseBody = OAuth2Utils.getTokens(_httpClient,
+            authorizationCode,
+            isRefreshToken,
+            refreshToken,
+            OAuth2Utils.createOAuthPasseurUri("/suunto/token")); //$NON-NLS-1$
 
-      body.put(OAuth2Constants.PARAM_GRANT_TYPE, grantType);
-      final HttpRequest request = HttpRequest.newBuilder()
-            .header(OAuth2Constants.CONTENT_TYPE, "application/json") //$NON-NLS-1$
-            .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
-            .uri(URI.create(OAuth2Constants.HEROKU_APP_URL + "/suunto/token"))//$NON-NLS-1$
-            .build();
-
+      SuuntoTokens suuntoTokens = null;
       try {
-         final HttpResponse<String> response = _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-         if (response.statusCode() == HttpURLConnection.HTTP_CREATED && StringUtils.hasContent(response.body())) {
-            final SuuntoTokens token = new ObjectMapper().readValue(response.body(), SuuntoTokens.class);
-
-            return token;
-         } else {
-            StatusUtil.logError(response.body());
-         }
-      } catch (IOException | InterruptedException e) {
+         suuntoTokens = new ObjectMapper().readValue(responseBody, SuuntoTokens.class);
+      } catch (final IllegalArgumentException | JsonProcessingException e) {
          StatusUtil.log(e);
-         Thread.currentThread().interrupt();
       }
 
-      return null;
+      return suuntoTokens;
    }
 
-   public static boolean getValidTokens(final boolean useActivePerson, final boolean useAllPeople) {
+   static boolean getValidTokens(final boolean useActivePerson, final boolean useAllPeople) {
 
       if (!useActivePerson && !useAllPeople) {
          return false;
@@ -158,25 +133,25 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
       return isTokenValid;
    }
 
-   public static boolean isDownloadReady_ActivePerson() {
+   static boolean isDownloadReady_ActivePerson() {
 
       return isReady_ActivePerson() &&
             StringUtils.hasContent(getDownloadFolder_ActivePerson());
    }
 
-   public static boolean isDownloadReady_AllPeople() {
+   static boolean isDownloadReady_AllPeople() {
 
       return isReady_AllPeople() &&
             StringUtils.hasContent(getDownloadFolder_AllPeople());
    }
 
-   public static boolean isReady_ActivePerson() {
+   static boolean isReady_ActivePerson() {
 
       return StringUtils.hasContent(getAccessToken_ActivePerson()) &&
             StringUtils.hasContent(getRefreshToken_ActivePerson());
    }
 
-   public static boolean isReady_AllPeople() {
+   static boolean isReady_AllPeople() {
 
       return StringUtils.hasContent(getAccessToken_AllPeople()) &&
             StringUtils.hasContent(getRefreshToken_AllPeople());

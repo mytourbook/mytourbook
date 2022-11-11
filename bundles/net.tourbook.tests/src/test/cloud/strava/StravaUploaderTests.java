@@ -28,6 +28,7 @@ import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
+import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.strava.StravaUploader;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.weather.IWeather;
@@ -48,15 +49,15 @@ import utils.Initializer;
 
 public class StravaUploaderTests {
 
-   private static final String           HEROKU_APP_URL_TOKEN = OAuth2Constants.HEROKU_APP_URL + "/strava/token"; //$NON-NLS-1$
-   private static final IPreferenceStore _prefStore           = Activator.getDefault().getPreferenceStore();
+   private static final String           OAUTH_PASSEUR_APP_URL_TOKEN = OAuth2Utils.createOAuthPasseurUri("/strava/token").toString(); //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore                  = Activator.getDefault().getPreferenceStore();
 
-   private static final String           STRAVA_FILE_PATH     = FilesUtils.rootPath + "cloud/strava/files/";      //$NON-NLS-1$
+   private static final String           STRAVA_FILE_PATH            = FilesUtils.rootPath + "cloud/strava/files/";                   //$NON-NLS-1$
 
    static HttpClientMock                 httpClientMock;
    static StravaUploader                 stravaUploader;
 
-   private List<TourData>                selectedTours        = new ArrayList<>();
+   private List<TourData>                selectedTours               = new ArrayList<>();
 
    @BeforeAll
    static void initAll() throws NoSuchFieldException, IllegalAccessException {
@@ -68,7 +69,7 @@ public class StravaUploaderTests {
       final String passeurResponse = Comparison.readFileContent(STRAVA_FILE_PATH
             + "PasseurResponse.json"); //$NON-NLS-1$
       httpClientMock.onPost(
-            HEROKU_APP_URL_TOKEN)
+            OAUTH_PASSEUR_APP_URL_TOKEN)
             .doReturn(passeurResponse)
             .withStatus(201);
 
@@ -127,7 +128,7 @@ public class StravaUploaderTests {
       selectedTours.add(tour);
       stravaUploader.uploadTours(selectedTours);
 
-      httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
+      httpClientMock.verify().post(OAUTH_PASSEUR_APP_URL_TOKEN).called();
       httpClientMock
             .verify()
             .post("https://www.strava.com/api/v3/activities") //$NON-NLS-1$
@@ -158,7 +159,7 @@ public class StravaUploaderTests {
       selectedTours.add(tour);
       stravaUploader.uploadTours(selectedTours);
 
-      httpClientMock.verify().post(HEROKU_APP_URL_TOKEN).called();
+      httpClientMock.verify().post(OAUTH_PASSEUR_APP_URL_TOKEN).called();
       httpClientMock
             .verify()
             .post("https://www.strava.com/api/v3/uploads") //$NON-NLS-1$

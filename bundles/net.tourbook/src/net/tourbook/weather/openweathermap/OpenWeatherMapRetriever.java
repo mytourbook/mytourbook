@@ -21,9 +21,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -38,7 +44,7 @@ import org.apache.http.client.utils.URIBuilder;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
-   private static final String baseApiUrl        = WeatherUtils.HEROKU_APP_URL + "/openweathermap/timemachine"; //$NON-NLS-1$
+   private static final String BASE_API_URL      = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/timemachine"; //$NON-NLS-1$
 
    private TimeMachineResult   timeMachineResult = null;
 
@@ -48,7 +54,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    }
 
    public static String getBaseApiUrl() {
-      return baseApiUrl;
+      return BASE_API_URL;
    }
 
    @Override
@@ -94,7 +100,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       String weatherRequestWithParameters = UI.EMPTY_STRING;
 
       try {
-         final URI apiUri = new URI(baseApiUrl);
+         final URI apiUri = new URI(BASE_API_URL);
 
          final URIBuilder uriBuilder = new URIBuilder()
                .setScheme(apiUri.getScheme())
@@ -145,6 +151,32 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       return newTimeMachineResult;
    }
 
+   /**
+    * Determines if the tour start time is within the current hour
+    *
+    * @param tourStartTime
+    * @return
+    */
+   private boolean isTourStartTimeCurrent(final long tourStartTime, final String tourTimeZoneId) {
+
+      final GregorianCalendar tourStartTimeCalendar = new GregorianCalendar();
+      tourStartTimeCalendar.setTimeInMillis(tourStartTime * 1000L);
+      tourStartTimeCalendar.setTimeZone(TimeZone.getTimeZone(tourTimeZoneId));
+      tourStartTimeCalendar.set(Calendar.MINUTE, 0);
+      tourStartTimeCalendar.set(Calendar.SECOND, 0);
+      tourStartTimeCalendar.set(Calendar.MILLISECOND, 0);
+
+      final Instant instant = LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant();
+      final long timeInMillis = instant.toEpochMilli();
+      final GregorianCalendar currentTimeCalendar = new GregorianCalendar();
+      currentTimeCalendar.setTimeInMillis(timeInMillis);
+      currentTimeCalendar.set(Calendar.MINUTE, 0);
+      currentTimeCalendar.set(Calendar.SECOND, 0);
+      currentTimeCalendar.set(Calendar.MILLISECOND, 0);
+
+      return tourStartTimeCalendar.compareTo(currentTimeCalendar) == 0;
+   }
+
    @Override
    public boolean retrieveHistoricalWeatherData() {
 
@@ -155,16 +187,20 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       while (true) {
 
          //Send an API request as long as we don't have the results covering the entire duration of the tour
-         final String weatherRequestWithParameters = buildWeatherApiRequest(requestedTime);
-
-         final String rawWeatherData = sendWeatherApiRequest(weatherRequestWithParameters);
-         if (StringUtils.isNullOrEmpty(rawWeatherData)) {
+         final TimeMachineResult newTimeMachineResult = retrieveWeatherData(requestedTime);
+         if (newTimeMachineResult == null) {
             return false;
          }
 
-         final TimeMachineResult newTimeMachineResult = deserializeWeatherData(rawWeatherData);
-         if (newTimeMachineResult == null) {
-            return false;
+         final boolean isTourStartWithinTheCurrentHour = isTourStartTimeCurrent(tourStartTime, tour.getTimeZoneId());
+
+         // If the tour start time is within the current hour, we use the
+         // current weather data instead of the historical one.
+         final Current currentWeather = newTimeMachineResult.getCurrent();
+         if (isTourStartWithinTheCurrentHour && currentWeather != null) {
+
+            setTourWeatherWithCurrentWeather(currentWeather);
+            return true;
          }
 
          timeMachineResult.addAllHourly(newTimeMachineResult.getHourly());
@@ -193,20 +229,56 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          }
       }
 
-// SET_FORMATTING_OFF
-
       final boolean hourlyDataExists = timeMachineResult.filterHourlyData(tourStartTime, tourEndTime);
-      if(!hourlyDataExists)
-      {
+      if (!hourlyDataExists) {
          return false;
       }
+
+      setTourWeatherWithHistoricalWeather();
+
+      return true;
+   }
+
+   private TimeMachineResult retrieveWeatherData(final long requestedTime) {
+
+      final String weatherRequestWithParameters = buildWeatherApiRequest(requestedTime);
+
+      final String rawWeatherData = sendWeatherApiRequest(weatherRequestWithParameters);
+      if (StringUtils.isNullOrEmpty(rawWeatherData)) {
+         return null;
+      }
+
+      return deserializeWeatherData(rawWeatherData);
+   }
+
+   private void setTourWeatherWithCurrentWeather(final Current currentWeather) {
+
+// SET_FORMATTING_OFF
+
+      tour.setWeather(                       currentWeather.getWeatherDescription());
+      tour.setWeather_Clouds(                currentWeather.getWeatherClouds());
+      tour.setWeather_Temperature_Average(   currentWeather.getTemp());
+      tour.setWeather_Humidity((short)       currentWeather.getHumidity());
+      tour.setWeather_Precipitation(         currentWeather.getPrecipitation());
+      tour.setWeather_Pressure((short)       currentWeather.getPressure());
+      tour.setWeather_Snowfall(              currentWeather.getSnowfall());
+      tour.setWeather_Temperature_WindChill( currentWeather.getFeels_like());
+      tour.setWeather_Wind_Speed(            currentWeather.getWind_speed());
+      tour.setWeather_Wind_Direction(        currentWeather.getWind_deg());
+
+// SET_FORMATTING_ON
+   }
+
+   private void setTourWeatherWithHistoricalWeather() {
+
+// SET_FORMATTING_OFF
 
       tour.setIsWeatherDataFromProvider(true);
 
       //We look for the weather data in the middle of the tour to populate the weather conditions
-      timeMachineResult.findMiddleHourly(tourMiddleTime);
+      timeMachineResult.findMiddleHourly(    tourMiddleTime);
       tour.setWeather(                       timeMachineResult.getWeatherDescription());
-      tour.setWeather_Clouds(                timeMachineResult.getWeatherType());
+      tour.setWeather_Clouds(                timeMachineResult.getWeatherClouds());
 
       tour.setWeather_Temperature_Average(   timeMachineResult.getTemperatureAverage());
       tour.setWeather_Humidity((short)       timeMachineResult.getAverageHumidity());
@@ -222,7 +294,5 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       tour.setWeather_Wind_Direction(        timeMachineResult.getAverageWindDirection());
 
 // SET_FORMATTING_ON
-
-      return true;
    }
 }

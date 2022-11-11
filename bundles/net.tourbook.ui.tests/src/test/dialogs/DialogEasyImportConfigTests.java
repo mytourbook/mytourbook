@@ -15,29 +15,27 @@
  *******************************************************************************/
 package dialogs;
 
+import net.tourbook.Messages;
+
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
+import utils.Utils;
 
-public class DialogMergeToursTests extends UITest {
+public class DialogEasyImportConfigTests extends UITest {
 
    @Test
-   void testMergeTours() {
+   void openEasyImportConfig() {
 
-//      Utils.showTourBookView(bot);
+      bot.toolbarButtonWithTooltip("Tour Import (Ctrl+Shift+I)").click(); //$NON-NLS-1$
+      Utils.showView(bot, "Tour Import"); //$NON-NLS-1$
 
-//      bot.tree().getTreeItem("2015   1").expand() //$NON-NLS-1$
-//            .getNode("May   1").expand().select().getNode("31").select(); //$NON-NLS-1$ //$NON-NLS-2$
-//      bot.tree().getTreeItem("2013   1").expand() //$NON-NLS-1$
-//            .getNode("May   1").expand().select().getNode("18").select(); //$NON-NLS-1$ //$NON-NLS-2$
-//
-//      final SWTBotTree tree = bot.tree();
-//      final SWTBotTreeItem item = tree.expandNode("2015   1");
-//      item.select("ACT", "CL_SCHED", "DEPARTMENT", "EMP_PHOTO", "EMP_RESUME", "EMPLOYEE");
-//      tree.contextMenu("Copy").click();
-//
-//      bot.viewByTitle("Tour Book").show();
-      //bot.contextMenu("Concatenate Tours...").click();
-//      bot.button("OK").click();
+      bot.toolbarButtonWithTooltip(Messages.Import_Data_Action_SetupEasyImport_Tooltip).click();
+
+      bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Configuration).activate();
+      bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Launcher).activate();
+      bot.cTabItem(Messages.Dialog_ImportConfig_Tab_Options).activate();
+
+      Utils.clickOkButton(bot);
    }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
@@ -17,10 +17,6 @@ import org.eclipse.osgi.util.NLS;
 public class Messages extends NLS {
 
    private static final String BUNDLE_NAME = "de.byteholder.geoclipse.preferences.messages"; //$NON-NLS-1$
-
-   public static String        External_Link_Forum;
-   public static String        External_Link_HomePage;
-   public static String        External_Link_MapProviders;
 
    public static String        Map2Provider_Tooltip_Checkbox_IncludeHillshading;
    public static String        Map2Provider_Tooltip_Checkbox_IsTransparentLayer;

@@ -61,6 +61,13 @@ jobs:
           name: ${{ steps.generate-artifact-name.outputs.artifactFileName }}
           path: D:\a\mytourbook\mytourbook\mergedJaCoCoReport.exec
           retention-days: 5
+      - name: Test Report
+        uses: dorny/test-reporter@v1
+        if: success() || failure()
+        with:
+          name: Tests Report
+          path: 'D:/a/mytourbook-BUILD-autocreated/core/**/target/surefire-reports/*.xml'
+          reporter: java-junit
           
   check_date:
     runs-on: windows-latest

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,20 +13,22 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.util;
+package net.tourbook.ui.action;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import net.tourbook.web.WEB;
 
-import org.junit.jupiter.api.Test;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 
-public class FilesUtilsTests {
+public class ActionHandlerOpenIssues extends AbstractHandler {
 
-   @Test
-   void testRemoveExtensions() {
+   @Override
+   public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-      assertAll(
-            () -> assertEquals("file.json", FilesUtils.removeExtensions("file.json.gz")), //$NON-NLS-1$ //$NON-NLS-2$
-            () -> assertEquals("file", FilesUtils.removeExtensions("file"))); //$NON-NLS-1$ //$NON-NLS-2$
+      WEB.openUrl("https://github.com/mytourbook/mytourbook/issues"); //$NON-NLS-1$
+
+      return null;
    }
+
 }

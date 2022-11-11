@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
+import javax.xml.XMLConstants;
 import javax.xml.transform.Result;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -87,10 +88,10 @@ public class PrintTourPDF extends PrintTourExtension {
     * http://www.ibm.com/developerworks/xml/library/x-xslfo
     *
     * @param object
-    * @param pdfFile
+    * @param printSettings
     * @throws TransformerException
     */
-   public void printPDF(final IXmlSerializable object, final PrintSettings printSettings)
+   void printPDF(final IXmlSerializable object, final PrintSettings printSettings)
          throws TransformerException {
 
       boolean canWriteFile = true;
@@ -138,7 +139,10 @@ public class PrintTourPDF extends PrintTourExtension {
          // setup XSL stylesheet source
          final StreamSource xslSource = new StreamSource(xslFile);
 
-         final Transformer transformer = TransformerFactory.newInstance().newTransformer(xslSource);
+         final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+         transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, UI.EMPTY_STRING);
+         transformerFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, UI.EMPTY_STRING);
+         final Transformer transformer = transformerFactory.newTransformer(xslSource);
 
          // setup FOP
          final FopFactory fopFactory = FopFactory.newInstance(new File(UI.SYMBOL_DOT).toURI());
@@ -185,6 +189,7 @@ public class PrintTourPDF extends PrintTourExtension {
     *
     * @param tourData
     * @param transformer
+    * @param printSettings
     */
    private void setTransformationParameters(final TourData tourData,
                                             final Transformer transformer,

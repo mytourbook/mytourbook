@@ -25,9 +25,11 @@ public abstract class UITest {
    protected static SWTWorkbenchBot bot                                     = new SWTWorkbenchBot();
    protected static SWTBotView      tourBookView;
 
+   protected int                    tourBookView_StartTime_Column_Index     = 2;
+   protected int                    tourBookView_Calories_Column_Index      = 3;
    protected int                    tourBookView_Distance_Column_Index      = 10;
    protected int                    tourBookView_ElevationGain_Column_Index = 11;
-   protected int                    tourBookView_Calories_Column_Index      = 3;
+   protected int                    tourBookView_TimeZone_Column_Index      = 15;
 
    @AfterAll
    static void cleanUp() {
