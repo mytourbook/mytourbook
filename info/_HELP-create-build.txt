@@ -44,7 +44,7 @@ Setup the graddle wrapper in the build folder:
      in C:\Users\Wolfgang\.gradle\gradle.properties
    
 
-   Build plugin
+   Build VTM plugin for MT
    
    - Check versions in (gdxVersion)          /mytourbook/bundles/build.gradle 
    
@@ -68,14 +68,21 @@ Setup the graddle wrapper in the build folder:
       run-playground.cmd
 
 
-   Fat jar
+   - Copy debug files
+   
+      cd C:\DAT\MT\vtm-parent
+      gradlew copyDebugFiles   
+
+
+   - Fat jar
    
       cd C:\DAT\MT\vtm-parent
       gradlew :vtm-playground:fatJar
 
-   Other VTM Tests
+
+   - Other VTM Tests
    
-   - https://github.com/mapsforge/vtm/blob/master/docs/desktop.md   
+     https://github.com/mapsforge/vtm/blob/master/docs/desktop.md   
 
 ###########################
  Update Eclipse NL repo
