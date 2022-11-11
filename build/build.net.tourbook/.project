@@ -7,7 +7,6 @@
 	<buildSpec>
 	</buildSpec>
 	<natures>
-		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
 	</natures>
 	<linkedResources>
 		<link>
@@ -58,12 +57,7 @@
 		<link>
 			<name>settings-bundles.gradle</name>
 			<type>1</type>
-			<location>C:/DAT/MT/mytourbook/bundles/settings.gradle</location>
-		</link>
-		<link>
-			<name>settings-vtm.gradle</name>
-			<type>1</type>
-			<location>C:/DAT/MT/mytourbook/build/build.net.tourbook/vtm-settings.gradle</location>
+			<location>PARENT-2-PROJECT_LOC/bundles/settings.gradle</location>
 		</link>
 	</linkedResources>
 </projectDescription>
