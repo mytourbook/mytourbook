@@ -4,7 +4,7 @@
 <product 
 
    name              ="MyTourbook Product - With Java Runtime" 
-   version           ="22.8.0.qualifier" 
+   version           ="22.11.0.qualifier" 
 
    id                ="net.tourbook.productWithJRE" 
    uid               ="net.tourbook.productWithJRE" 

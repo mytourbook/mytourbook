@@ -15,7 +15,7 @@ Bundle-Name: Vector map from Mapsforge
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-SymbolicName: net.tourbook.ext.vtm
 Bundle-Vendor: MyTourbook
-Bundle-Version: 22.8.0.v20220306-1329
+Bundle-Version: 22.11.0.v20220306-1329
 Export-Package: assets.patterns;version="22.3.0",assets.shaders;versio
  n="22.3.0",assets.symbols;version="22.3.0",assets.symbols.accommodati
  on;version="22.3.0",assets.symbols.amenity;version="22.3.0",assets.sy
