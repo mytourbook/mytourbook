@@ -2,42 +2,42 @@
 <classpath>
 	<classpathentry kind="output" path="bin/default"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-11/"/>
-	<classpathentry kind="lib" path="libs/vtm-desktop-lwjgl.jar" exported="true" sourcepath="/vtm-parent/vtm-desktop-lwjgl">
+	<classpathentry kind="lib" path="libs/vtm-desktop-lwjgl.jar" exported="true" sourcepath="/vtm-desktop-lwjgl">
 		<attributes>
 			<attribute name="without_test_code" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/vtm-desktop.jar" exported="true" sourcepath="/vtm-parent/vtm-desktop">
+	<classpathentry kind="lib" path="libs/vtm-desktop.jar" exported="true" sourcepath="/vtm-desktop">
 		<attributes>
 			<attribute name="without_test_code" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/vtm-gdx.jar" exported="true" sourcepath="/vtm-parent/vtm-gdx">
+	<classpathentry kind="lib" path="libs/vtm-gdx.jar" exported="true" sourcepath="/vtm-gdx">
 		<attributes>
 			<attribute name="without_test_code" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/vtm-http.jar" exported="true" sourcepath="/vtm-parent/vtm-http">
+	<classpathentry kind="lib" path="libs/vtm-http.jar" exported="true" sourcepath="/vtm-http">
 		<attributes>
 			<attribute name="without_test_code" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/vtm-mvt.jar" exported="true" sourcepath="/vtm-parent/vtm-mvt">
+	<classpathentry kind="lib" path="libs/vtm-mvt.jar" exported="true" sourcepath="/vtm-mvt">
 		<attributes>
 			<attribute name="without_test_code" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/vtm-themes.jar" exported="true" sourcepath="/vtm-parent/vtm-themes">
+	<classpathentry kind="lib" path="libs/vtm-themes.jar" exported="true" sourcepath="/vtm-themes">
 		<attributes>
 			<attribute name="without_test_code" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/vtm.jar" exported="true" sourcepath="/vtm-parent/vtm/src">
+	<classpathentry kind="lib" path="libs/vtm.jar" exported="true" sourcepath="/vtm">
 		<attributes>
 			<attribute name="without_test_code" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-simple/1.7.25/af3cd3ad1ea4b08b27b54f12529b4bf343bc5ca1/slf4j-simple-1.7.25-sources.jar" kind="lib" path="libs/slf4j-simple-1.7.25.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-simple/1.7.28/9f6b59e8f211b0d0583e00491db13f009fa03117/slf4j-simple-1.7.28-sources.jar" kind="lib" path="libs/slf4j-simple-1.7.28.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -67,12 +67,12 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/gdx-backend-lwjgl-1.9.10.jar" exported="true" sourcepath="/gdx-backend-lwjgl/src">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-backend-lwjgl/1.11.0/2b0154b4c50bf9e1bb2e53a13b70e0a7594bce2/gdx-backend-lwjgl-1.11.0-sources.jar" kind="lib" path="libs/gdx-backend-lwjgl-1.11.0.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/gdx-1.9.10.jar" exported="true" sourcepath="/gdx/src">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.11.0/ea3e9eccc5c09636f405e345039b62376465a6f4/gdx-1.11.0-sources.jar" kind="lib" path="libs/gdx-1.11.0.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -82,12 +82,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.lwjgl.lwjgl/lwjgl_util/2.9.3/ca58b77b6393794ca34e12b32e9c6d9c912acb3/lwjgl_util-2.9.3-sources.jar" kind="lib" path="libs/lwjgl_util-2.9.3.jar" exported="true">
-		<attributes>
-			<attribute name="gradle_used_by_scope" value="main,test"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="libs/lwjgl-2.9.3.jar" exported="true" sourcepath="/lwjgl-2.9.3/lwjgl-source-2.9.3.zip">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.lwjgl.lwjgl/lwjgl/2.9.3/34682f36cee6cded40df9829bb352f2bdce5b14e/lwjgl-2.9.3-sources.jar" kind="lib" path="libs/lwjgl-2.9.3.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -98,6 +93,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.jcraft/jorbis/0.0.17/5446be5d62e4c6b347c8e6cd28dc00a936417ba2/jorbis-0.0.17-sources.jar" kind="lib" path="libs/jorbis-0.0.17.jar" exported="true">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-jnigen-loader/2.3.1/8228a038af98f2d0fa7b23ea7b4fa330af832305/gdx-jnigen-loader-2.3.1-sources.jar" kind="lib" path="libs/gdx-jnigen-loader-2.3.1.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>

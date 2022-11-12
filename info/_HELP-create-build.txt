@@ -32,7 +32,7 @@ Setup to run gradle:
 
 Setup the graddle wrapper in the build folder:
 
-   gradle wrapper --gradle-version 6.9
+   gradlew wrapper --gradle-version=7.4
 
 
 #################
@@ -56,10 +56,13 @@ Setup the graddle wrapper in the build folder:
       
    - Update VTM plugin, run task assemble:   
      
-     cd C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.vtm
-     gradle clean ass
+      cd C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.vtm
+      gradle clean ass
 
-
+      // The additional java property is needed to fix the issue: 
+      // A Jar can only accept a file or directory that exists: C:\DAT\MT\vtm-parent\vtm-desktop-lwjgl\build\libs\vtm-desktop-lwjgl.jar
+      gradle clean ass -Dorg.gradle.java.compile-classpath-packaging=true
+      
    TEST VTM
    
    - Run playground
