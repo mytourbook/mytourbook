@@ -30,6 +30,10 @@ repositories {
 
 allprojects {
 
+   /*
+    I've struggled with the gdx version, when not setting also in the gdx project file, 
+    then the old 1.9.10 version was used
+   */
    ext.gdxVersion = "1.11.0"
 }
 
@@ -40,26 +44,9 @@ task logAllDeps(type: DependencyReportTask) {}
 dependencies {
 
    println ''
-   println "   Dependencies: gdxVersion: $gdxVersion"
+   println "   gdxVersion: $gdxVersion"
+   println ''
    
-//   api('com.badlogicgames.gdx:gdx:1.11.0') {
-//       force = true
-//   }
-//
-//   api('com.badlogicgames.gdx:gdx-backend-lwjgl:1.11.0') {
-//       force = true
-//   }
-
-   
-//   api 'com.badlogicgames.gdx:gdx:1.11.0'
-//   api 'com.badlogicgames.gdx:gdx-backend-lwjgl:1.11.0'
-
-//   com.badlogicgames.gdx:gdx:1.9.10
-//   com.badlogicgames.gdx:gdx-backend-lwjgl:1.9.10
-
-//   implementation 'com.badlogicgames.gdx:gdx:1.11.1'
-//   implementation 'com.badlogicgames.gdx:gdx-platform:1.11.1:natives-desktop'
-
    api project(':vtm')
    api project(':vtm-desktop')
    api project(':vtm-desktop-lwjgl')
@@ -73,7 +60,7 @@ dependencies {
    api project(':net.tourbook.ext.vtm.windows')
    
    // !!! STRING MUST BE CREATED WITH " OTHERWISE IT IS NOT WORKING !!!
-   api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+//   api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
        
    /*
       This error is fixed with slf4j-simple
@@ -82,7 +69,7 @@ dependencies {
       SLF4J: Defaulting to no-operation (NOP) logger implementation
       SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
    */
-   api 'org.slf4j:slf4j-simple:1.7.28'
+//   api 'org.slf4j:slf4j-simple:1.7.28'
     
    // http logging
    api 'com.squareup.okhttp3:logging-interceptor:3.14.1'
@@ -136,14 +123,18 @@ task extractNatives {
    doLast {
 
       println ''
+      println '   extractNatives'
+      println ''
    
-      configurations.compileClasspath.files.each { file ->
+      configurations.runtimeClasspath.files.each { file ->
       
          def filePathName = sprintf('   %-40s   %s', ["$file.name", "$file.path"])
+
+//         println filePathName
          
          if (file.name.contains('gdx-platform')) {
    
-            println filePathName
+//            println filePathName
    
             // copy gdx linux natives          
             copy {
@@ -168,7 +159,7 @@ task extractNatives {
             
          } else if (file.name.contains('natives-linux')) {
    
-            println filePathName
+//            println filePathName
    
             // copy linux natives          
             copy {
@@ -179,7 +170,7 @@ task extractNatives {
             
          } else if (file.name.contains('natives-osx')) {
    
-            println filePathName
+//            println filePathName
    
             // copy macos natives          
             copy {
@@ -190,7 +181,7 @@ task extractNatives {
             
          } else if (file.name.contains('natives-windows')) {
    
-            println filePathName
+//            println filePathName
    
             // copy windows natives          
             copy {
@@ -219,6 +210,7 @@ task copyVtmNatives_MacOS(type: Copy) {
 
    from nativesDir_Vtm + '/osx'
    into nativesDir_MacOS
+   
    include '**/*'
 }
 
@@ -228,15 +220,19 @@ task copyVtmNatives_Windows(type: Copy) {
 
    from nativesDir_Vtm + '/windows'
    into nativesDir_Windows
+   
    include '**/*'
 }
 
-// sync will remove old jar's !!!
+// "Sync" will also delete old files !!!
 task copyDependenciesIntoLibFolder(type: Sync) {
 
-   // sync compile jar's (dependencies) into the lib folder
-   into 'libs'
-   from configurations.compileClasspath
+   // sync compiled jar's and dependencies into the lib folder
+   
+   from     configurations.runtimeClasspath
+   into     'libs'
+
+   include  '*.jar'
     
    exclude  '*natives*.jar'
    exclude  'net.tourbook.*.jar' 
@@ -245,7 +241,7 @@ task copyDependenciesIntoLibFolder(type: Sync) {
 // MUST be set AFTER task declarations !!!
 tasks.classes.dependsOn(
 
-   logCompileClasspath,
+// logCompileClasspath,
 
    // copy natives into platform plugin fragments
    extractNatives,
@@ -270,7 +266,9 @@ tasks.classes.dependsOn(
    // eclipse, 
 )
 
-// Convert created .classpath entries from
+// Convert created .classpath entries 
+//
+// from
 //
 //   <classpathentry 
 //      kind         ="lib" 
@@ -289,9 +287,10 @@ tasks.classes.dependsOn(
 eclipse.classpath.file { 
 
    // cleanup classpath
+   
    whenMerged { classpath ->
 
-      // remove natives classpath entries, they causes errors
+      // remove natives classpath entries, they are causing errors
       classpath.entries.removeAll{ entry -> entry.path.contains('vtm-parent/vtm-desktop/natives') }
 
       // remove natives which are put into platform features
@@ -307,11 +306,18 @@ eclipse.classpath.file {
       def node = xml.asNode()
 
       // log all classpath items
+      println ''
       println 'All classpathentry items'
+      println ''
       node.classpathentry.each {
-         println '   ' + it
+      
+         println '   item ' + it
       }
    
+      println ''
+      println 'Add "libs/" folder'
+      println ''
+      
       // add 'libs/' folder for jar files
       node.classpathentry.findAll { it.@kind == 'lib'}.each {
       
@@ -319,8 +325,12 @@ eclipse.classpath.file {
          def jarFileName = it.@path.tokenize('/')[-1]
       
          it.@exported   = 'true'
-         it.@path      = 'libs/' + jarFileName
+         it.@path       = 'libs/' + jarFileName
+         
+         println '   ' + jarFileName
       }
+      
+      println ''
       
       // src from a project dependency is not working, convert it into a jar, jar's are already created :-)
       node.findAll { it.@kind == 'src'}.each {
@@ -330,10 +340,10 @@ eclipse.classpath.file {
       
          def srcPath = it.@path
          
-         it.@kind      = 'lib'
+         it.@kind       = 'lib'
          it.@exported   = 'true'
-         it.@path      = 'libs' + srcPath + '.jar'
-         it.@sourcepath   = srcPath
+         it.@path       = 'libs' + srcPath + '.jar'
+         it.@sourcepath = '/vtm-parent' + srcPath
    
          println '   into:   ' + it
       }
@@ -357,14 +367,18 @@ osgiBndManifest {
 
 def createBundleClassPath() {
 
+   println ''
+   println 'createBundleClassPath'
+   println ''
+   
    def list = []
 
    // use only compile time resources and not runtime resources, this trick excludes :sources 
-   configurations.compileClasspath.each {
+   configurations.runtimeClasspath.each {
     
       def name = it.name
        
-//     println '   ' + name
+      println '   ' + it
       
       if(name.equals('linux') || name.equals('osx') || name.equals('windows')){ 
          
@@ -382,11 +396,11 @@ def createBundleClassPath() {
       }
    }
 
-   // add libs/ which contains the vtm natives
-   list += 'libs/'
-
-   // add log4j.properties
-   list += 'resources/'
+//   // add libs/ which contains the vtm natives
+//   list += 'libs/'
+//
+//   // add log4j.properties
+//   list += 'resources/'
 
    return list.join(',')
 }
@@ -409,7 +423,7 @@ jar.manifest.attributes(
    'Bundle-License':                         'http://www.apache.org/licenses/LICENSE-2.0',
    
    // eclipse 4.6 manifest editor creates this property and not 'Require-Capability'
-   'Bundle-RequiredExecutionEnvironment':    'JavaSE-1.8',
+   'Bundle-RequiredExecutionEnvironment':    'JavaSE-11',
 
    // export all packages from all included jar's
    'Export-Package':                         '*',

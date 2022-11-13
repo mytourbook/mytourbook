@@ -61,6 +61,7 @@ Setup the graddle wrapper in the build folder:
 
       // The additional java property is needed to fix the issue: 
       // A Jar can only accept a file or directory that exists: C:\DAT\MT\vtm-parent\vtm-desktop-lwjgl\build\libs\vtm-desktop-lwjgl.jar
+      cd C:\DAT\MT\mytourbook\bundles\net.tourbook.ext.vtm
       gradle clean ass -Dorg.gradle.java.compile-classpath-packaging=true
       
    TEST VTM
