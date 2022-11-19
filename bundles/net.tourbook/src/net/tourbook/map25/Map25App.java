@@ -16,6 +16,7 @@
  *******************************************************************************/
 package net.tourbook.map25;
 
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
@@ -120,6 +121,9 @@ import org.oscim.utils.Parameters;
 
 import okhttp3.Cache;
 
+/**
+ * Extends vtm {@link GdxMap} which implements the gdx {@link ApplicationListener}
+ */
 public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedLayer.OnItemGestureListener<MarkerInterface> {
 
    /**
@@ -665,14 +669,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       super.create();
 
-      // initially _lwjglApp is not set when the tour track config is restored
-      // -> it is too complicated to set it correctly
-      // -> therefore this post enablement
-      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-      Map25FPSManager.setAnimation(trackConfig.arrow_IsAnimate);
-
-      /**
-       * Overwrite input handler, using own GdxMap.create() method didn't work :-(
+      /*
+       * Overwrite default input handler which is done in super.create()
        */
       final InputMultiplexer mux = new InputMultiplexer();
 
@@ -686,6 +684,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       mux.addProcessor(new MotionHandler(mMap));
 
       Gdx.input.setInputProcessor(mux);
+
+      // initially _lwjglApp is not set when the tour track config is restored
+      // -> it is too complicated to set it correctly
+      // -> therefore this post enablement
+      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+      Map25FPSManager.setAnimation(trackConfig.arrow_IsAnimate);
 
       mMap.events.bind(new UpdateListener() {
          @Override

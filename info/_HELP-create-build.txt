@@ -86,7 +86,19 @@ Setup the graddle wrapper in the build folder:
 
    - Other VTM Tests
    
-     https://github.com/mapsforge/vtm/blob/master/docs/desktop.md   
+     https://github.com/mapsforge/vtm/blob/master/docs/desktop.md
+     
+     
+   GDX glTF    
+   
+     https://github.com/mgsx-dev/gdx-gltf/blob/master/demo/README.md
+   
+   - Build Desktop demo
+   
+      cd C:\E\git-repos\GDX\gdx-gltf
+      gradlew distDesktop  
+
+
 
 ###########################
  Update Eclipse NL repo
