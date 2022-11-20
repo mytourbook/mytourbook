@@ -86,7 +86,7 @@
 
       <repository>
          <id>eclipse.nattable.2.0</id>                                  <layout>p2</layout>
-         <url>http://download.eclipse.org/nattable/releases/2.0.0/repository</url>
+         <url>http://download.eclipse.org/nattable/releases/2.0.3/repository</url>
       </repository>   
 
       <!-- IMPORTANT: Keep that tag in a single line as it is commented out during the GitHub build -->
