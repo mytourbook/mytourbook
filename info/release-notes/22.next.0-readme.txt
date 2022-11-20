@@ -59,7 +59,7 @@ Translation
 System   
 ======
 
-* Milestone             https://github.com/mytourbook/mytourbook/milestone/4?closed=1
+* Milestone             https://github.com/mytourbook/mytourbook/milestone/6?closed=1
 * Eclipse 2022-06
 * NatTable 2.03         https://www.eclipse.org/nattable/download.php
 * FIT SDK 21.94
