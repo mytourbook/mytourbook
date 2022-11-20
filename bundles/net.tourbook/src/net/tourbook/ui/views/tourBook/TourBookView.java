@@ -728,8 +728,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
          final Color defaultBackgroundColor_Table = ThemeUtil.getDefaultBackgroundColor_Table();
          final Color defaultBackgroundColor_TableHeader = ThemeUtil.getDefaultBackgroundColor_TableHeader();
 
+//         final Color defaultForegroundColor_Table = ThemeUtil.getDefaultForegroundColor_Table();
+
          this.evenRowBgColor = defaultBackgroundColor_Table;
          this.oddRowBgColor = defaultBackgroundColor_Table;
+
+//         this.evenRowFgColor = defaultForegroundColor_Table;
+//         this.oddRowFgColor = defaultForegroundColor_Table;
 
          // column header styling
          this.cHeaderGradientBgColor = defaultBackgroundColor_TableHeader;
