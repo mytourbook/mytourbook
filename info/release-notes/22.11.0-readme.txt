@@ -1,11 +1,12 @@
-22.11.0                                                 ? November 2022
+22.11.0                                                 20 November 2022
 
 
 New
 ===
 
 * 2.5D Map
-  - Show direction arrows                       https://github.com/mytourbook/mytourbook/issues/516#issuecomment-1234322325
+  - Show direction arrows but this is still work in progress 
+                                                https://github.com/mytourbook/mytourbook/issues/516#issuecomment-1234322325
   
 * Map Player
   - This player can play an animation in a map, currently only the 2.5D map is supported
@@ -24,14 +25,16 @@ Improvements
   - Added the support for cadence data import (present in file version greater than 9)
   - Fixed an issue where the first marker was not created
   - Fixed an issue where the marker distance values were erroneous
-  - Fixed an issue where the time values were erroneous when an activity overlapped over more than 1 day
+  - Fixed an issue where the time values were erroneous when an activity 
+    overlapped over more than 1 day
     https://github.com/mytourbook/mytourbook/issues/927
 
 * People Preference Page (Frederic)
   - Added a BMI (Body Mass Index) field
 
 * SRTM Download 
-  - Improved UI when setting tour elevation values from SRTM to display the previous and new elevation gain values
+  - Improved UI when setting tour elevation values from SRTM to display 
+    the previous and new elevation gain values
     https://github.com/mytourbook/mytourbook/issues/334
 
 * Cloud Integration (Frederic)
@@ -42,8 +45,9 @@ Improvements
 Changes
 =======
 
-* Help Menu (Frederic)
-  - Replaced the Forum entry with two Github links 
+* Forum Link (Frederic)
+  - Replaced the forum entry in the help menu with the new locations for 
+    the discussion forum and bugs/features on Github  
     https://github.com/mytourbook/mytourbook/issues/951
 
 
@@ -51,7 +55,8 @@ Bugfix
 ======
 
 * Common import
-  - Fixed "Invalid thread access" which occurred when new tour types or tags were created during tour import
+  - Fixed "Invalid thread access" which occurred when new tour types or 
+    tags were created during tour import
     https://github.com/mytourbook/mytourbook/issues/938
 
 * Fit Import (Frederic)
@@ -84,8 +89,8 @@ New texts are not translated in this version
 System   
 ======
 
-* Milestone             https://github.com/mytourbook/mytourbook/milestone/4?closed=1
+* MyTourbook Milestone 22.11        https://github.com/mytourbook/mytourbook/milestone/6?closed=1
 * Eclipse 2022-06
-* NatTable 2.03         https://www.eclipse.org/nattable/download.php
+* NatTable 2.03                     https://www.eclipse.org/nattable/download.php
 * FIT SDK 21.94
-* WorldWind 2.2.1       https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
+* WorldWind 2.2.1                   https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
