@@ -34,12 +34,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.tourbook.common.Bool;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
+import net.tourbook.map25.animation.GLTFModelLayer;
 import net.tourbook.map25.layer.compassrose.CompassRoseLayer;
 import net.tourbook.map25.layer.labeling.LabelLayerMT;
 import net.tourbook.map25.layer.legend.LegendLayer;
@@ -82,6 +84,7 @@ import org.oscim.layers.tile.buildings.S3DBLayer;
 import org.oscim.map.Layers;
 import org.oscim.map.Map.UpdateListener;
 import org.oscim.map.ViewController;
+import org.oscim.model.VtmModels;
 import org.oscim.renderer.BitmapRenderer;
 import org.oscim.renderer.ExtrusionRenderer;
 import org.oscim.renderer.GLViewport;
@@ -209,6 +212,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private S3DBLayer                            _layer_Building_S3DB;
    private GenericLayer                         _layer_Building_S3DB_SunUpdate;
    private CompassRoseLayer                     _layer_CompassRose;
+   private GLTFModelLayer                       _layer_GLTFModel;
    private Layer                                _layer_HillShading_AFTER;
    private BitmapTileLayer                      _layer_HillShading_TILE_LOADING;
    private LabelLayerMT                         _layer_Label;
@@ -268,6 +272,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * Is <code>true</code> when a tour marker is hit.
     */
    private boolean      _isMapItemHit;
+   //
+   private SceneAsset   _sceneAsset;
 
    private static enum OffOnline {
       IS_ONLINE, IS_OFFLINE
@@ -694,6 +700,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             _map25View.fireSyncMapEvent(mapPosition, 0);
          }
       });
+
+      _layer_GLTFModel.onAppCreate();
    }
 
    /**
@@ -919,6 +927,15 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       allMapLayer.add(_layer_Legend);
       allMapLayer.add(_layer_TileInfo);
 
+      // add gdx model
+      _layer_GLTFModel = new GLTFModelLayer(mMap);
+      allMapLayer.add(_layer_GLTFModel);
+//      gdxModelLayer.addModel(VtmModels.CAR, 47.275761, 8.624890, -0f);
+      _layer_GLTFModel.addModel(VtmModels.CAR, 47.275535, 8.625080, -0f);
+
+//      _sceneAsset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/pennyfarthest_bicycle/scene.gltf"));
+//      gdxModelLayer.addModel();
+
 //      /*
 //       * OpenGL test
 //       */
@@ -978,7 +995,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       // stop loading tiles
       _layer_BaseMap.getManager().clearJobs();
 
+      _layer_GLTFModel.dispose();
+
       saveState();
+
+      if (_sceneAsset != null) {
+
+         _sceneAsset.dispose();
+      }
 
       super.dispose();
    }

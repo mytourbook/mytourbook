@@ -12,12 +12,22 @@
 			<attribute name="without_test_code" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="libs/vtm-gdx-poi3d.jar" exported="true" sourcepath="/vtm-parent/vtm-gdx-poi3d">
+		<attributes>
+			<attribute name="without_test_code" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="libs/vtm-gdx.jar" exported="true" sourcepath="/vtm-parent/vtm-gdx">
 		<attributes>
 			<attribute name="without_test_code" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="libs/vtm-http.jar" exported="true" sourcepath="/vtm-parent/vtm-http">
+		<attributes>
+			<attribute name="without_test_code" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/vtm-models.jar" exported="true" sourcepath="/vtm-parent/vtm-models">
 		<attributes>
 			<attribute name="without_test_code" value="true"/>
 		</attributes>
@@ -67,12 +77,12 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.14.1/f8319293dad84c8ac79282b26d835f6edb9f637d/okhttp-3.14.1-sources.jar" kind="lib" path="libs/okhttp-3.14.1.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.11.0/ea3e9eccc5c09636f405e345039b62376465a6f4/gdx-1.11.0-sources.jar" kind="lib" path="libs/gdx-1.11.0.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.11.0/ea3e9eccc5c09636f405e345039b62376465a6f4/gdx-1.11.0-sources.jar" kind="lib" path="libs/gdx-1.11.0.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.14.1/f8319293dad84c8ac79282b26d835f6edb9f637d/okhttp-3.14.1-sources.jar" kind="lib" path="libs/okhttp-3.14.1.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -92,6 +102,11 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-jnigen-loader/2.3.1/8228a038af98f2d0fa7b23ea7b4fa330af832305/gdx-jnigen-loader-2.3.1-sources.jar" kind="lib" path="libs/gdx-jnigen-loader-2.3.1.jar" exported="true">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.google.protobuf/protobuf-java/3.5.1/7235a28a13938050e8cd5d9ed5133bebf7a4dca7/protobuf-java-3.5.1-sources.jar" kind="lib" path="libs/protobuf-java-3.5.1.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
@@ -103,11 +118,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.17.2/331ecaeba2fd87c06a0766e8ebe718e1e294f27d/okio-1.17.2-sources.jar" kind="lib" path="libs/okio-1.17.2.jar" exported="true">
-		<attributes>
-			<attribute name="gradle_used_by_scope" value="main,test"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-jnigen-loader/2.3.1/8228a038af98f2d0fa7b23ea7b4fa330af832305/gdx-jnigen-loader-2.3.1-sources.jar" kind="lib" path="libs/gdx-jnigen-loader-2.3.1.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>

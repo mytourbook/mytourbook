@@ -70,7 +70,9 @@ dependencies {
    api project(':vtm-desktop')
    api project(':vtm-desktop-lwjgl')
    api project(':vtm-gdx')
+   api project(':vtm-gdx-poi3d')
    api project(':vtm-http')
+   api project(':vtm-models')
    api project(':vtm-mvt')
    api project(':vtm-themes')
    
