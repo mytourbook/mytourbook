@@ -53,7 +53,8 @@ allprojects {
 //   +    api "com.badlogicgames.gdx:gdx:1.11.0"
 //   +//  api "com.badlogicgames.gdx:gdx:$gdxVersion"
 
-   ext.gdxVersion = "1.11.0"
+   ext.gdxVersion    = "1.11.0"
+   ext.gltfVersion   = '-SNAPSHOT'     // use newest version
 }
 
 // start with: gradlew logAllDeps
@@ -94,6 +95,9 @@ dependencies {
     
     // http logging
    api 'com.squareup.okhttp3:logging-interceptor:3.14.1'
+   
+   // glTF loader
+   api "com.github.mgsx-dev.gdx-gltf:gltf:$gltfVersion"
 }
 
 // -----------------------------------

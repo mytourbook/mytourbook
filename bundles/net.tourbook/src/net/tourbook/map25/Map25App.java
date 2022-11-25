@@ -84,7 +84,6 @@ import org.oscim.layers.tile.buildings.S3DBLayer;
 import org.oscim.map.Layers;
 import org.oscim.map.Map.UpdateListener;
 import org.oscim.map.ViewController;
-import org.oscim.model.VtmModels;
 import org.oscim.renderer.BitmapRenderer;
 import org.oscim.renderer.ExtrusionRenderer;
 import org.oscim.renderer.GLViewport;
@@ -700,8 +699,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
             _map25View.fireSyncMapEvent(mapPosition, 0);
          }
       });
-
-      _layer_GLTFModel.onAppCreate();
    }
 
    /**
@@ -929,9 +926,10 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       // add gdx model
       _layer_GLTFModel = new GLTFModelLayer(mMap);
+      _layer_GLTFModel.setupGLTFModel();
       allMapLayer.add(_layer_GLTFModel);
-//      gdxModelLayer.addModel(VtmModels.CAR, 47.275761, 8.624890, -0f);
-      _layer_GLTFModel.addModel(VtmModels.CAR, 47.275535, 8.625080, -0f);
+//      _layer_GLTFModel.addModel(VtmModels.CAR, 47.275761, 8.624890, -0f);
+//      _layer_GLTFModel.addModel(VtmModels.CAR, 47.275535, 8.625080, -0f);
 
 //      _sceneAsset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/pennyfarthest_bicycle/scene.gltf"));
 //      gdxModelLayer.addModel();
