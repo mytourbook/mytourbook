@@ -10,6 +10,8 @@ import org.oscim.renderer.GLViewport;
 
 /**
  * Using MT version to have access to {@link #mMapPosition}
+ * <p>
+ * Original source {@link org.oscim.gdx.poi3d.MapCamera}
  */
 public class MapCameraMT extends Camera {
 

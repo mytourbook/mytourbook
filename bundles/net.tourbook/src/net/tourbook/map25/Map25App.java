@@ -509,7 +509,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       appConfig.width = 1200;
       appConfig.height = 1000;
       appConfig.stencil = 8;
-      appConfig.samples = 2;
+
+      // Multisample anti-aliasing (MSAA)
+      appConfig.samples = 8; //2;
 
       appConfig.forceExit = false;
 
@@ -926,13 +928,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       // add gdx model
       _layer_GLTFModel = new GLTFModelLayer(mMap);
-      _layer_GLTFModel.setupGLTFModel();
       allMapLayer.add(_layer_GLTFModel);
-//      _layer_GLTFModel.addModel(VtmModels.CAR, 47.275761, 8.624890, -0f);
-//      _layer_GLTFModel.addModel(VtmModels.CAR, 47.275535, 8.625080, -0f);
-
-//      _sceneAsset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/pennyfarthest_bicycle/scene.gltf"));
-//      gdxModelLayer.addModel();
 
 //      /*
 //       * OpenGL test

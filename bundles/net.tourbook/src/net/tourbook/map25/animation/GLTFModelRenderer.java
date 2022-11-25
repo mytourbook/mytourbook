@@ -1,20 +1,18 @@
-/*
- * Copyright 2014 Hannes Janetzek
- * Copyright 2018 Gustl22
+/*******************************************************************************
+ * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
  *
- * This file is part of the OpenScienceMap project (http://www.opensciencemap.org).
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation version 2 of the License.
  *
- * This program is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later version.
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with
- * this program. If not, see <http://www.gnu.org/licenses/>.
- */
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
+ *******************************************************************************/
 package net.tourbook.map25.animation;
 
 import static org.oscim.backend.GLAdapter.gl;
@@ -25,7 +23,9 @@ import com.badlogic.gdx.graphics.Cubemap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.model.Animation;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
 
 import net.mgsx.gltf.loaders.gltf.GLTFLoader;
@@ -37,9 +37,13 @@ import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
 import net.mgsx.gltf.scene3d.scene.SceneSkybox;
 import net.mgsx.gltf.scene3d.utils.IBLBuilder;
+import net.tourbook.map.player.MapPlayerManager;
 
 import org.oscim.backend.GL;
+import org.oscim.core.MapPosition;
+import org.oscim.core.MercatorProjection;
 import org.oscim.core.Tile;
+import org.oscim.gdx.poi3d.ModelPosition;
 import org.oscim.map.Map;
 import org.oscim.map.Viewport;
 import org.oscim.renderer.GLState;
@@ -50,52 +54,50 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Gdx renderer for more complex 3D models.
+ * Original source {@link org.oscim.gdx.poi3d.GdxRenderer3D2}
  */
 public class GLTFModelRenderer extends LayerRenderer {
 
-   static final Logger log = LoggerFactory.getLogger(GLTFModelRenderer.class);
+   static final Logger        log         = LoggerFactory.getLogger(GLTFModelRenderer.class);
 
-   private Map         mMap;
-   public MapCameraMT  mapCamera;
-
-//   private ModelBatch          modelBatch;
-//   private Environment         lights;
-
-//   public Array<ModelInstance> allModelInstances = new Array<>();
+   private Map                _map;
+   private MapCameraMT        _mapCamera;
 
    private Vector3            _tempVector = new Vector3();
 
    float[]                    _mapBox     = new float[8];
 
-   private SceneAsset         sceneAsset;
+   private Scene              _scene;
+   private SceneAsset         _sceneAsset;
+   private SceneManager       _sceneManager;
 
-   Scene                      scene;
-   private SceneManager       sceneManager;
+   private DirectionalLightEx _light;
+   private Cubemap            _environmentCubemap;
+   private Cubemap            _diffuseCubemap;
+   private Cubemap            _specularCubemap;
+   private Texture            _brdfLUT;
+   private SceneSkybox        _skybox;
 
-   private DirectionalLightEx light;
-   private Cubemap            environmentCubemap;
-   private Cubemap            diffuseCubemap;
-   private Cubemap            specularCubemap;
-   private Texture            brdfLUT;
-   private SceneSkybox        skybox;
+   private BoundingBox        _modelBoundingBox;
+   private Vector3            _boundingBoxCenter;
+   private float              _boundingBoxMinMaxDistance;
 
 //   private boolean             loading;
 
    public GLTFModelRenderer(final Map map) {
 
-      mMap = map;
+      _map = map;
    }
 
    private void activateFirstAnimation() {
 
-      final Array<Animation> animations = sceneAsset.scene.model.animations;
+      final Array<Animation> animations = _sceneAsset.scene.model.animations;
 
       if (animations != null && animations.size > 0) {
 
          final String animationID = animations.get(0).id;
 
-         scene.animationController.setAnimation(animationID, -1);
+         _scene.animationController.setAnimation(animationID, -1);
 
          System.out.println("Number of animations: " + animations.size + "  using " + animationID);
       }
@@ -103,26 +105,27 @@ public class GLTFModelRenderer extends LayerRenderer {
 
    public void dispose() {
 
-      sceneManager.dispose();
-      sceneAsset.dispose();
+      if (_sceneManager == null) {
+         return;
+      }
 
-      environmentCubemap.dispose();
-      diffuseCubemap.dispose();
-      specularCubemap.dispose();
+      _sceneManager.dispose();
+      _sceneAsset.dispose();
 
-      brdfLUT.dispose();
-      skybox.dispose();
+      _environmentCubemap.dispose();
+      _diffuseCubemap.dispose();
+      _specularCubemap.dispose();
+
+      _brdfLUT.dispose();
+//      skybox.dispose();
    }
 
    private SceneAsset loadGLTFModel() {
 
       SceneAsset asset = null;
 
-      // slime
-//      asset = new GLTFLoader().load(Gdx.files.internal("models/Alien Slime.gltf"));
-
       // wood truck
-      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/basic_truck/scene.gltf"));
+//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/basic_truck/scene.gltf"));
 
       // wood plane - light reflection
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/basic_plane/scene.gltf"));
@@ -145,16 +148,16 @@ public class GLTFModelRenderer extends LayerRenderer {
       // zeppelin
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/zeppelin_aircraft/scene.gltf"));
 
+      // Locomotive frame
+      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/locomotive/scene.gltf"));
+
       // Alter Anhänger
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/medieval_cart/scene.gltf"));
 
       // z-fighting underneath
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/lawn_mower_low_poly/scene.gltf"));
 
-      // Locomotive frame
-//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/locomotive/scene.gltf"));
-
-      // with z-fighting
+      // has z-fighting
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/toy_truck/scene.gltf"));
 
       // Historic baloon with model issue
@@ -176,17 +179,17 @@ public class GLTFModelRenderer extends LayerRenderer {
    @Override
    public void render(final GLViewport viewport) {
 
-      if (scene == null) {
+      if (_scene == null) {
          return;
       }
 
-      final long start = System.nanoTime();
+//      final long start = System.nanoTime();
 
-      // GLUtils.checkGlError(">" + TAG);
+      final MapPosition viewportPosition = viewport.pos;
 
       gl.depthMask(true);
 
-      if (viewport.pos.zoomLevel < 10) {
+      if (viewportPosition.zoomLevel < 10) {
          gl.clear(GL.DEPTH_BUFFER_BIT);
       }
 
@@ -206,18 +209,18 @@ public class GLTFModelRenderer extends LayerRenderer {
       // flip front face cause of mirror inverted y-axis
       gl.frontFace(GL.CCW);
 
-      mapCamera.update(viewport);
+      _mapCamera.update(viewport);
+      final MapPosition cameraMapPosition = _mapCamera.mMapPosition;
 
       final int numModels = 0;
       int numRendered = 0;
 
-      final Viewport mapViewport = mMap.viewport();
+      final Viewport mapViewport = _map.viewport();
       mapViewport.getMapExtents(_mapBox, 10);
 
-      final float scale = (float) (mapCamera.mMapPosition.scale / viewport.pos.scale);
-
-      final float dx = (float) (mapCamera.mMapPosition.x - viewport.pos.x) * (Tile.SIZE << mapCamera.mMapPosition.zoomLevel);
-      final float dy = (float) (mapCamera.mMapPosition.y - viewport.pos.y) * (Tile.SIZE << mapCamera.mMapPosition.zoomLevel);
+      final float dx = (float) (cameraMapPosition.x - viewportPosition.x) * (Tile.SIZE << cameraMapPosition.zoomLevel);
+      final float dy = (float) (cameraMapPosition.y - viewportPosition.y) * (Tile.SIZE << cameraMapPosition.zoomLevel);
+      final float scale = (float) (cameraMapPosition.scale / viewportPosition.scale);
 
       for (int i = 0; i < 8; i += 2) {
 
@@ -231,7 +234,7 @@ public class GLTFModelRenderer extends LayerRenderer {
 
 //         for (final ModelInstance modelInstance : allModelInstances) {
 
-         final ModelInstance modelInstance = scene.modelInstance;
+         final ModelInstance modelInstance = _scene.modelInstance;
 
          modelInstance.transform.getTranslation(_tempVector);
 
@@ -255,8 +258,8 @@ public class GLTFModelRenderer extends LayerRenderer {
             // render
 //            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
-            sceneManager.update(deltaTime);
-            sceneManager.render();
+            _sceneManager.update(deltaTime);
+            _sceneManager.render();
          }
       }
 
@@ -279,51 +282,46 @@ public class GLTFModelRenderer extends LayerRenderer {
    @Override
    public boolean setup() {
 
-      sceneAsset = loadGLTFModel();
+      _sceneAsset = loadGLTFModel();
 
-      mapCamera = new MapCameraMT(mMap);
+      _scene = new Scene(_sceneAsset.scene);
 
-      scene = new Scene(sceneAsset.scene);
-      sceneManager = new SceneManager();
-      sceneManager.addScene(scene);
+      // get bounding box
+      _modelBoundingBox = new BoundingBox();
+      _scene.modelInstance.calculateBoundingBox(_modelBoundingBox);
+      _boundingBoxMinMaxDistance = _modelBoundingBox.max.dst(_modelBoundingBox.min);
+      _boundingBoxCenter = _modelBoundingBox.getCenter(new Vector3());
 
-      // setup camera (The BoomBox model is very small so you may need to adapt camera settings for your scene)
-//      camera = new PerspectiveCamera(60f, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-//      camera.near = 0.01f;
-//      camera.far = 200000;
+      _sceneManager = new SceneManager();
+      _sceneManager.addScene(_scene);
 
-      sceneManager.setCamera(mapCamera);
-
-//      cameraController = new MyCameraInputController(camera);
-//      Gdx.input.setInputProcessor(cameraController);
-//
-//      // adjust scene to the model bounding box
-//      adjustSceneToBoundingBox();
+      _mapCamera = new MapCameraMT(_map);
+      _sceneManager.setCamera(_mapCamera);
 
       // setup light
-      light = new DirectionalLightEx();
-      light.direction.set(1, -3, 1).nor();
-      light.color.set(Color.WHITE);
-      sceneManager.environment.add(light);
+      _light = new DirectionalLightEx();
+      _light.direction.set(1, -3, 1).nor();
+      _light.color.set(Color.WHITE);
+      _sceneManager.environment.add(_light);
 
       // setup quick IBL (image based lighting)
-      final IBLBuilder iblBuilder = IBLBuilder.createOutdoor(light);
-      environmentCubemap = iblBuilder.buildEnvMap(1024);
-      diffuseCubemap = iblBuilder.buildIrradianceMap(256);
-      specularCubemap = iblBuilder.buildRadianceMap(10);
+      final IBLBuilder iblBuilder = IBLBuilder.createOutdoor(_light);
+      _environmentCubemap = iblBuilder.buildEnvMap(1024);
+      _diffuseCubemap = iblBuilder.buildIrradianceMap(256);
+      _specularCubemap = iblBuilder.buildRadianceMap(10);
       iblBuilder.dispose();
 
       // This texture is provided by the library, no need to have it in your assets.
-      brdfLUT = new Texture(Gdx.files.classpath("net/mgsx/gltf/shaders/brdfLUT.png"));
+      _brdfLUT = new Texture(Gdx.files.classpath("net/mgsx/gltf/shaders/brdfLUT.png"));
 
-      sceneManager.setAmbientLight(1f);
-      sceneManager.environment.set(new PBRTextureAttribute(PBRTextureAttribute.BRDFLUTTexture, brdfLUT));
-      sceneManager.environment.set(PBRCubemapAttribute.createSpecularEnv(specularCubemap));
-      sceneManager.environment.set(PBRCubemapAttribute.createDiffuseEnv(diffuseCubemap));
+      _sceneManager.setAmbientLight(1f);
+      _sceneManager.environment.set(new PBRTextureAttribute(PBRTextureAttribute.BRDFLUTTexture, _brdfLUT));
+      _sceneManager.environment.set(PBRCubemapAttribute.createSpecularEnv(_specularCubemap));
+      _sceneManager.environment.set(PBRCubemapAttribute.createDiffuseEnv(_diffuseCubemap));
 
       // setup skybox
-      skybox = new SceneSkybox(environmentCubemap);
-      sceneManager.setSkyBox(skybox);
+//      skybox = new SceneSkybox(environmentCubemap);
+//      sceneManager.setSkyBox(skybox);
 
       activateFirstAnimation();
 
@@ -333,16 +331,86 @@ public class GLTFModelRenderer extends LayerRenderer {
    @Override
    public synchronized void update(final GLViewport viewport) {
 
-      // if (loading && assets.update())
-      // doneLoading();
+      setReady(true);
 
       if (isReady() == false) {
-//         mapCamera.setPosition(viewport.pos);
+
+         _mapCamera.setPosition(viewport.pos);
+
          setReady(true);
       }
 
-      // if (changed) {
-      // cam.update(position, matrices);
-      // }
+   }
+
+   void updateCamera(final MapPosition mapPosition) {
+
+      if (_scene == null) {
+         return;
+      }
+
+      final ModelInstance modelInstance = _scene.modelInstance;
+      final Matrix4 modelTransform = modelInstance.transform;
+
+      final int currentFrameNumber = MapPlayerManager.getCurrentFrameNumber();
+
+      // lake garda
+//      final ModelPosition modelPosition = new ModelPosition(45.876624, 10.865479, 0);
+
+      // hinwiler autobahn rondell
+      final ModelPosition modelPosition = new ModelPosition(47.288967, 8.818411, 0);
+
+      final int mapZoomLevel = mapPosition.zoomLevel;
+
+      final int mapScale = 1 << mapZoomLevel;
+      final int tileScale = Tile.SIZE << mapZoomLevel;
+
+      final double latitude = MercatorProjection.toLatitude(mapPosition.y);
+      final float groundScale = (float) MercatorProjection.groundResolutionWithScale(latitude, mapScale);
+
+      float modelScale = 1f / groundScale;
+
+      /*
+       * Adjust to a normalized size which depends on the model size because the models can have big
+       * size differences
+       */
+      modelScale /= _boundingBoxMinMaxDistance;
+
+      // increase model size to be more visible
+      modelScale *= 1000;
+
+      /*
+       * Translate glTF model to the map position
+       */
+
+//    // remove if out of visible zoom range
+//    _gltfRenderer.allModelInstances.removeAll(_allModelInstances, true);
+//    if (mapZoomLevel >= 3 /* MIN_ZOOM */) {
+//       _gltfRenderer.allModelInstances.addAll(_allModelInstances);
+//    }
+
+      final float dx = (float) ((modelPosition.x - mapPosition.x) * tileScale);
+      final float dy = (float) ((modelPosition.y - mapPosition.y) * tileScale);
+      final float dxScaled = dx / modelScale;
+      final float dyScaled = dy / modelScale;
+
+      final Vector3 bbMin = _modelBoundingBox.min;
+      final Vector3 bbMax = _modelBoundingBox.max;
+
+      final float bbMinY = bbMin.y;
+      final float bbMaxY = bbMax.y;
+      final float zAdjustment = -bbMinY;// - bbMaxY;
+
+      final Vector3 bboxCenter = _boundingBoxCenter;
+      final float xAdjustment = bboxCenter.x;
+
+      // reset matrix to identity matrix
+      modelTransform.idt();
+
+      modelTransform.scale(modelScale, modelScale, modelScale);
+      modelTransform.translate(dxScaled - xAdjustment, dyScaled, zAdjustment);
+//      modelTransform.translate(dxScaled, dyScaled, 0);
+      modelTransform.rotate(1, 0, 0, 90);
+
+      _mapCamera.setMapPosition(mapPosition.x, mapPosition.y, mapScale);
    }
 }
