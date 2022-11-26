@@ -576,6 +576,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          return;
       }
 
+      MapPlayerManager.setAnimatedPositions(trackBucket.animatedPositions);
+
       GLState.test(false, false);
       GLState.blend(true);
 

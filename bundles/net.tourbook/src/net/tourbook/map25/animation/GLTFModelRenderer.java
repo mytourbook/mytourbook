@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -54,6 +54,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Renderer/shader for the glTF model
+ * <p>
  * Original source {@link org.oscim.gdx.poi3d.GdxRenderer3D2}
  */
 public class GLTFModelRenderer extends LayerRenderer {
@@ -65,6 +67,7 @@ public class GLTFModelRenderer extends LayerRenderer {
 
    private Vector3            _tempVector = new Vector3();
 
+   private MapPosition        _mapPosition;
    float[]                    _mapBox     = new float[8];
 
    private Scene              _scene;
@@ -185,6 +188,10 @@ public class GLTFModelRenderer extends LayerRenderer {
 
 //      final long start = System.nanoTime();
 
+      _mapCamera.update(viewport);
+      render_UpdatePositions();
+
+      final MapPosition cameraMapPosition = _mapCamera.mMapPosition;
       final MapPosition viewportPosition = viewport.pos;
 
       gl.depthMask(true);
@@ -208,9 +215,6 @@ public class GLTFModelRenderer extends LayerRenderer {
       // gl.cullFace(GL.BACK);
       // flip front face cause of mirror inverted y-axis
       gl.frontFace(GL.CCW);
-
-      _mapCamera.update(viewport);
-      final MapPosition cameraMapPosition = _mapCamera.mMapPosition;
 
       final int numModels = 0;
       int numRendered = 0;
@@ -279,6 +283,92 @@ public class GLTFModelRenderer extends LayerRenderer {
 //      // TODO remove SYSTEM.OUT.PRINTLN
    }
 
+   private void render_UpdatePositions() {
+
+      // lago di garda
+//      final ModelPosition modelPosition = new ModelPosition(45.876624, 10.865479, 0);
+
+      // hinwiler autobahn rondell
+      final ModelPosition modelPosition = new ModelPosition(47.288967, 8.818411, 0);
+
+      final ModelInstance modelInstance = _scene.modelInstance;
+      final Matrix4 modelTransform = modelInstance.transform;
+
+      final Object userData = modelInstance.userData;
+      final int currentFrameNumber = MapPlayerManager.getCurrentFrameNumber();
+
+      final int mapZoomLevel = _mapPosition.zoomLevel;
+
+      final int mapScale = 1 << mapZoomLevel;
+      final int tileScale = Tile.SIZE << mapZoomLevel;
+
+      final double latitude = MercatorProjection.toLatitude(_mapPosition.y);
+      final float groundScale = (float) MercatorProjection.groundResolutionWithScale(latitude, mapScale);
+
+      float modelScale = 1f / groundScale;
+
+      /*
+       * Adjust to a normalized size which depends on the model size because the models can have big
+       * size differences
+       */
+      modelScale /= _boundingBoxMinMaxDistance;
+
+      // increase model size to be more visible
+      modelScale *= 1000;
+
+      /*
+       * Translate glTF model to the map position
+       */
+
+//    // remove if out of visible zoom range
+//    _gltfRenderer.allModelInstances.removeAll(_allModelInstances, true);
+//    if (mapZoomLevel >= 3 /* MIN_ZOOM */) {
+//       _gltfRenderer.allModelInstances.addAll(_allModelInstances);
+//    }
+
+      final float dx = (float) ((modelPosition.x - _mapPosition.x) * tileScale);
+      final float dy = (float) ((modelPosition.y - _mapPosition.y) * tileScale);
+      final float dxScaled = dx / modelScale;
+      final float dyScaled = dy / modelScale;
+
+      final Vector3 bbMin = _modelBoundingBox.min;
+      final Vector3 bbMax = _modelBoundingBox.max;
+
+      final float bbMinY = bbMin.y;
+      final float bbMaxY = bbMax.y;
+      final float zAdjustment = -bbMinY;// - bbMaxY;
+
+      final Vector3 bboxCenter = _boundingBoxCenter;
+      final float xAdjustment = bboxCenter.x;
+
+      // reset matrix to identity matrix
+      modelTransform.idt();
+
+      modelTransform.scale(modelScale, modelScale, modelScale);
+      modelTransform.translate(dxScaled - xAdjustment, dyScaled, zAdjustment);
+//      modelTransform.translate(dxScaled, dyScaled, 0);
+      modelTransform.rotate(1, 0, 0, 90);
+
+   }
+
+   void setMapPosition(final MapPosition mapPosition) {
+
+      if (_mapCamera == null) {
+         return;
+      }
+
+      _mapPosition = mapPosition;
+
+      /*
+       * Camera position must be set BEFORE render() method otherwise the old position is used
+       * (maybe for one frame) and it is flickering
+       */
+      final int mapZoomLevel = mapPosition.zoomLevel;
+      final int mapScale = 1 << mapZoomLevel;
+
+      _mapCamera.setMapPosition(mapPosition.x, mapPosition.y, mapScale);
+   }
+
    @Override
    public boolean setup() {
 
@@ -340,77 +430,5 @@ public class GLTFModelRenderer extends LayerRenderer {
          setReady(true);
       }
 
-   }
-
-   void updateCamera(final MapPosition mapPosition) {
-
-      if (_scene == null) {
-         return;
-      }
-
-      final ModelInstance modelInstance = _scene.modelInstance;
-      final Matrix4 modelTransform = modelInstance.transform;
-
-      final int currentFrameNumber = MapPlayerManager.getCurrentFrameNumber();
-
-      // lake garda
-//      final ModelPosition modelPosition = new ModelPosition(45.876624, 10.865479, 0);
-
-      // hinwiler autobahn rondell
-      final ModelPosition modelPosition = new ModelPosition(47.288967, 8.818411, 0);
-
-      final int mapZoomLevel = mapPosition.zoomLevel;
-
-      final int mapScale = 1 << mapZoomLevel;
-      final int tileScale = Tile.SIZE << mapZoomLevel;
-
-      final double latitude = MercatorProjection.toLatitude(mapPosition.y);
-      final float groundScale = (float) MercatorProjection.groundResolutionWithScale(latitude, mapScale);
-
-      float modelScale = 1f / groundScale;
-
-      /*
-       * Adjust to a normalized size which depends on the model size because the models can have big
-       * size differences
-       */
-      modelScale /= _boundingBoxMinMaxDistance;
-
-      // increase model size to be more visible
-      modelScale *= 1000;
-
-      /*
-       * Translate glTF model to the map position
-       */
-
-//    // remove if out of visible zoom range
-//    _gltfRenderer.allModelInstances.removeAll(_allModelInstances, true);
-//    if (mapZoomLevel >= 3 /* MIN_ZOOM */) {
-//       _gltfRenderer.allModelInstances.addAll(_allModelInstances);
-//    }
-
-      final float dx = (float) ((modelPosition.x - mapPosition.x) * tileScale);
-      final float dy = (float) ((modelPosition.y - mapPosition.y) * tileScale);
-      final float dxScaled = dx / modelScale;
-      final float dyScaled = dy / modelScale;
-
-      final Vector3 bbMin = _modelBoundingBox.min;
-      final Vector3 bbMax = _modelBoundingBox.max;
-
-      final float bbMinY = bbMin.y;
-      final float bbMaxY = bbMax.y;
-      final float zAdjustment = -bbMinY;// - bbMaxY;
-
-      final Vector3 bboxCenter = _boundingBoxCenter;
-      final float xAdjustment = bboxCenter.x;
-
-      // reset matrix to identity matrix
-      modelTransform.idt();
-
-      modelTransform.scale(modelScale, modelScale, modelScale);
-      modelTransform.translate(dxScaled - xAdjustment, dyScaled, zAdjustment);
-//      modelTransform.translate(dxScaled, dyScaled, 0);
-      modelTransform.rotate(1, 0, 0, 90);
-
-      _mapCamera.setMapPosition(mapPosition.x, mapPosition.y, mapScale);
    }
 }

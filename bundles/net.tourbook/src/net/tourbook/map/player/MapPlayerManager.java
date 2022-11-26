@@ -18,6 +18,7 @@ package net.tourbook.map.player;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
 
+import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.eclipse.jface.dialogs.IDialogSettings;
 
 /**
@@ -56,8 +57,16 @@ public class MapPlayerManager {
    private static boolean               _isPlayingLoop;
    private static boolean               _isReLivePlaying;
 
+   private static ShortArrayList        _animatedPositions;
+
+   public static ShortArrayList getAnimatedPositions() {
+
+      return _animatedPositions;
+   }
+
    /**
-    * @return Returns the last computed frame numer
+    * @return Returns the last computed frame numer, it's in the range from
+    *         1...{@link #_numAllFrames}
     */
    public static int getCurrentFrameNumber() {
 
@@ -232,6 +241,11 @@ public class MapPlayerManager {
       _state.put(STATE_FOREGROUND_FPS, _foregroundFPS);
       _state.put(STATE_IS_PLAYING_LOOP, _isPlayingLoop);
       _state.put(STATE_IS_RELIVE_PLAYING, _isReLivePlaying);
+   }
+
+   public static void setAnimatedPositions(final ShortArrayList animatedPositions) {
+
+      _animatedPositions = animatedPositions;
    }
 
    public static void setAnimationStartTime() {
