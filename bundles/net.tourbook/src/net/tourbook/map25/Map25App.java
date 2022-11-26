@@ -41,7 +41,7 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
-import net.tourbook.map25.animation.GLTFModelLayer;
+import net.tourbook.map25.animation.GLTFModel_Layer;
 import net.tourbook.map25.layer.compassrose.CompassRoseLayer;
 import net.tourbook.map25.layer.labeling.LabelLayerMT;
 import net.tourbook.map25.layer.legend.LegendLayer;
@@ -211,7 +211,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private S3DBLayer                            _layer_Building_S3DB;
    private GenericLayer                         _layer_Building_S3DB_SunUpdate;
    private CompassRoseLayer                     _layer_CompassRose;
-   private GLTFModelLayer                       _layer_GLTFModel;
+   private GLTFModel_Layer                       _layer_GLTFModel;
    private Layer                                _layer_HillShading_AFTER;
    private BitmapTileLayer                      _layer_HillShading_TILE_LOADING;
    private LabelLayerMT                         _layer_Label;
@@ -927,7 +927,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       allMapLayer.add(_layer_TileInfo);
 
       // add gdx model
-      _layer_GLTFModel = new GLTFModelLayer(mMap);
+      _layer_GLTFModel = new GLTFModel_Layer(mMap);
       allMapLayer.add(_layer_GLTFModel);
 
 //      /*

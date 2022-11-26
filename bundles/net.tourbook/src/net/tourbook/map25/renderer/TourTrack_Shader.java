@@ -261,6 +261,7 @@ public final class TourTrack_Shader {
 
                final short zPos  = (short) (1 + trackBucket.heightOffset);
 
+               // using a simple triangle
                _animationVertices = new short[] {
                                                    0,     0,   zPos,
                                                 size,  size2,  zPos,
@@ -346,7 +347,7 @@ public final class TourTrack_Shader {
       float animatedAngle = p21Angle;
 
       final float angleDiff = getAngle_Difference(p21Angle, _previousAngle);
-      final float minSmoothAngle = 2f;
+      final float minSmoothAngle = 1.0f;
 
       if (Math.abs(angleDiff) > minSmoothAngle) {
 
@@ -810,6 +811,8 @@ public final class TourTrack_Shader {
       final float angle = getAnimatedAngle(pos1X, pos1Y, pos2X, pos2Y);
       _animationMatrix.setRotation(angle, 0f, 0f, 1f);
       _animationMatrix.setAsUniform(shader.uni_AnimationMVP);
+
+      MapPlayerManager.setAnimatedAngle(angle);
 
       // set mvp matrix
       viewport.mvp.setAsUniform(shader.uni_MVP);

@@ -57,6 +57,7 @@ public class MapPlayerManager {
    private static boolean               _isPlayingLoop;
    private static boolean               _isReLivePlaying;
 
+   private static float                 _animatedAngle;
    private static ShortArrayList        _animatedPositions;
 
    public static ShortArrayList getAnimatedPositions() {
@@ -243,6 +244,11 @@ public class MapPlayerManager {
       _state.put(STATE_IS_RELIVE_PLAYING, _isReLivePlaying);
    }
 
+   public static void setAnimatedAngle(final float animatedAngle) {
+
+      _animatedAngle = animatedAngle;
+   }
+
    public static void setAnimatedPositions(final ShortArrayList animatedPositions) {
 
       _animatedPositions = animatedPositions;
@@ -316,6 +322,10 @@ public class MapPlayerManager {
       if (isPlayerAvailable()) {
          _mapPlayerView.updatePlayer();
       }
+   }
+
+   public static float getAnimatedAngle() {
+      return _animatedAngle;
    }
 
 }

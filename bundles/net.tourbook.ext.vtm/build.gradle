@@ -85,13 +85,17 @@ dependencies {
 //   api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
        
    /*
-      This error is fixed with slf4j-simple
+      !!! VERY IMPORTANT !!!
+      
+      When slf4j-simple is not added, then errors are not logged !!!
+      
+      This will also fix
    
       SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
       SLF4J: Defaulting to no-operation (NOP) logger implementation
       SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
    */
-//   api 'org.slf4j:slf4j-simple:1.7.28'
+   api 'org.slf4j:slf4j-simple:2.0.5'
     
     // http logging
    api 'com.squareup.okhttp3:logging-interceptor:3.14.1'

@@ -23,15 +23,15 @@ import org.oscim.map.Map;
 /**
  * Layer for glTF models, original source {@link org.oscim.gdx.poi3d.GdxModelLayer}
  */
-public class GLTFModelLayer extends Layer implements Map.UpdateListener {
+public class GLTFModel_Layer extends Layer implements Map.UpdateListener {
 
-   private GLTFModelRenderer _gltfRenderer;
+   private GLTFModel_Renderer _gltfRenderer;
 
-   public GLTFModelLayer(final Map map) {
+   public GLTFModel_Layer(final Map map) {
 
       super(map);
 
-      mRenderer = _gltfRenderer = new GLTFModelRenderer(mMap);
+      mRenderer = _gltfRenderer = new GLTFModel_Renderer(mMap);
    }
 
    public void dispose() {

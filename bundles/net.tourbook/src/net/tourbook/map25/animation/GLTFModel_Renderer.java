@@ -39,11 +39,11 @@ import net.mgsx.gltf.scene3d.scene.SceneSkybox;
 import net.mgsx.gltf.scene3d.utils.IBLBuilder;
 import net.tourbook.map.player.MapPlayerManager;
 
+import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.GL;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 import org.oscim.core.Tile;
-import org.oscim.gdx.poi3d.ModelPosition;
 import org.oscim.map.Map;
 import org.oscim.map.Viewport;
 import org.oscim.renderer.GLState;
@@ -58,9 +58,9 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Original source {@link org.oscim.gdx.poi3d.GdxRenderer3D2}
  */
-public class GLTFModelRenderer extends LayerRenderer {
+public class GLTFModel_Renderer extends LayerRenderer {
 
-   static final Logger        log         = LoggerFactory.getLogger(GLTFModelRenderer.class);
+   static final Logger        log         = LoggerFactory.getLogger(GLTFModel_Renderer.class);
 
    private Map                _map;
    private MapCameraMT        _mapCamera;
@@ -87,7 +87,7 @@ public class GLTFModelRenderer extends LayerRenderer {
 
 //   private boolean             loading;
 
-   public GLTFModelRenderer(final Map map) {
+   public GLTFModel_Renderer(final Map map) {
 
       _map = map;
    }
@@ -137,7 +137,7 @@ public class GLTFModelRenderer extends LayerRenderer {
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/2d_bike__downloadable_for_first_10_users/scene.gltf"));
 
       // Hochrad - light reflection
-//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/pennyfarthest_bicycle/scene.gltf"));
+      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/pennyfarthest_bicycle/scene.gltf"));
 
       // gears - light reflection
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/gears/scene.gltf"));
@@ -152,7 +152,7 @@ public class GLTFModelRenderer extends LayerRenderer {
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/zeppelin_aircraft/scene.gltf"));
 
       // Locomotive frame
-      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/locomotive/scene.gltf"));
+//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/locomotive/scene.gltf"));
 
       // Alter Anhänger
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/medieval_cart/scene.gltf"));
@@ -182,14 +182,26 @@ public class GLTFModelRenderer extends LayerRenderer {
    @Override
    public void render(final GLViewport viewport) {
 
-      if (_scene == null) {
+      if (_scene == null || _mapPosition == null) {
+         return;
+      }
+
+      final ShortArrayList animatedPositions = MapPlayerManager.getAnimatedPositions();
+      if (animatedPositions == null) {
          return;
       }
 
 //      final long start = System.nanoTime();
 
+//    // remove if out of visible zoom range
+//    _gltfRenderer.allModelInstances.removeAll(_allModelInstances, true);
+//    if (mapZoomLevel >= 3 /* MIN_ZOOM */) {
+//       _gltfRenderer.allModelInstances.addAll(_allModelInstances);
+//    }
+
       _mapCamera.update(viewport);
-      render_UpdatePositions();
+      render_UpdateModelPosition_Static(animatedPositions);
+//      render_UpdateModelPosition(animatedPositions);
 
       final MapPosition cameraMapPosition = _mapCamera.mMapPosition;
       final MapPosition viewportPosition = viewport.pos;
@@ -283,19 +295,30 @@ public class GLTFModelRenderer extends LayerRenderer {
 //      // TODO remove SYSTEM.OUT.PRINTLN
    }
 
-   private void render_UpdatePositions() {
+   /**
+    * Update model position
+    *
+    * @param animatedPositions
+    */
+   private void render_UpdateModelPosition(final ShortArrayList animatedPositions) {
 
-      // lago di garda
-//      final ModelPosition modelPosition = new ModelPosition(45.876624, 10.865479, 0);
-
-      // hinwiler autobahn rondell
-      final ModelPosition modelPosition = new ModelPosition(47.288967, 8.818411, 0);
 
       final ModelInstance modelInstance = _scene.modelInstance;
       final Matrix4 modelTransform = modelInstance.transform;
 
       final Object userData = modelInstance.userData;
       final int currentFrameNumber = MapPlayerManager.getCurrentFrameNumber();
+
+      final int frameIndex = currentFrameNumber - 1;
+
+      // get animated position
+      final int xyPosIndex = frameIndex * 2;
+      final int xyPrevPosIndex = xyPosIndex > 1 ? xyPosIndex - 2 : 0;
+
+      final short pos1X = animatedPositions.get(xyPrevPosIndex);
+      final short pos1Y = animatedPositions.get(xyPrevPosIndex + 1);
+      final short pos2X = animatedPositions.get(xyPosIndex);
+      final short pos2Y = animatedPositions.get(xyPosIndex + 1);
 
       final int mapZoomLevel = _mapPosition.zoomLevel;
 
@@ -314,7 +337,8 @@ public class GLTFModelRenderer extends LayerRenderer {
       modelScale /= _boundingBoxMinMaxDistance;
 
       // increase model size to be more visible
-      modelScale *= 1000;
+//    modelScale *= 500_000;
+      modelScale *= 20000;
 
       /*
        * Translate glTF model to the map position
@@ -326,8 +350,92 @@ public class GLTFModelRenderer extends LayerRenderer {
 //       _gltfRenderer.allModelInstances.addAll(_allModelInstances);
 //    }
 
-      final float dx = (float) ((modelPosition.x - _mapPosition.x) * tileScale);
-      final float dy = (float) ((modelPosition.y - _mapPosition.y) * tileScale);
+      float dx = (float) ((modelPositionX - _mapPosition.x) * tileScale);
+      float dy = (float) ((modelPositionY - _mapPosition.y) * tileScale);
+
+//      dx = pos1X;
+//      dy = pos1Y;
+
+      dx *= 1;
+      dy *= 1;
+
+      final float dxScaled = dx / modelScale;
+      final float dyScaled = dy / modelScale;
+
+      final Vector3 bbMin = _modelBoundingBox.min;
+      final Vector3 bbMax = _modelBoundingBox.max;
+
+      final float bbMinY = bbMin.y;
+      final float bbMaxY = bbMax.y;
+      final float zAdjustment = -bbMinY;// - bbMaxY;
+
+      final Vector3 bboxCenter = _boundingBoxCenter;
+      final float xAdjustment = bboxCenter.x;
+
+      // reset matrix to identity matrix
+      modelTransform.idt();
+
+//      modelTransform.scale(modelScale, modelScale, modelScale);
+//
+//    modelTransform.translate(dxScaled - xAdjustment, dyScaled, zAdjustment);
+//      modelTransform.translate(dxScaled, dyScaled, 0);
+//
+//      modelTransform.rotate(1, 0, 0, 90);
+//      modelTransform.rotate(0, 1, 0, -90 - MapPlayerManager.getAnimatedAngle());
+
+      modelTransform.scale(modelScale, modelScale, modelScale);
+      modelTransform.translate(dxScaled - xAdjustment, dyScaled, zAdjustment);
+      modelTransform.rotate(1, 0, 0, 90);
+      modelTransform.rotate(0, 1, 0, -90 - MapPlayerManager.getAnimatedAngle());
+
+   }
+
+   /**
+    * Update model position
+    *
+    * @param animatedPositions
+    */
+   private void render_UpdateModelPosition_Static(final ShortArrayList animatedPositions) {
+
+      // lago di garda
+//      final ModelPosition modelPosition = new ModelPosition(45.876624, 10.865479, 0);
+
+      // hinwiler autobahn rondell
+//      final double modelPositionX = MercatorProjection.longitudeToX(8.818411);
+//      final double modelPositionY = MercatorProjection.latitudeToY(47.288967);
+
+      // center of Amden tour
+      final double modelPositionX = MercatorProjection.longitudeToX(9.122086);
+      final double modelPositionY = MercatorProjection.latitudeToY(47.199977);
+
+      final ModelInstance modelInstance = _scene.modelInstance;
+      final Matrix4 modelTransform = modelInstance.transform;
+
+      final int mapZoomLevel = _mapPosition.zoomLevel;
+
+      final int mapScale = 1 << mapZoomLevel;
+      final int tileScale = Tile.SIZE << mapZoomLevel;
+
+      final double latitude = MercatorProjection.toLatitude(_mapPosition.y);
+      final float groundScale = (float) MercatorProjection.groundResolutionWithScale(latitude, mapScale);
+
+      float modelScale = 1f / groundScale;
+
+      /*
+       * Adjust to a normalized size which depends on the model size because the models can have big
+       * size differences
+       */
+      modelScale /= _boundingBoxMinMaxDistance;
+
+      // increase model size to be more visible
+      modelScale *= 20000;
+
+      /*
+       * Translate glTF model to the map position
+       */
+      final float dx = (float) ((modelPositionX - _mapPosition.x) * tileScale);
+      final float dy = (float) ((modelPositionY - _mapPosition.y) * tileScale);
+
       final float dxScaled = dx / modelScale;
       final float dyScaled = dy / modelScale;
 
@@ -346,9 +454,8 @@ public class GLTFModelRenderer extends LayerRenderer {
 
       modelTransform.scale(modelScale, modelScale, modelScale);
       modelTransform.translate(dxScaled - xAdjustment, dyScaled, zAdjustment);
-//      modelTransform.translate(dxScaled, dyScaled, 0);
       modelTransform.rotate(1, 0, 0, 90);
-
+      modelTransform.rotate(0, 1, 0, -90 - MapPlayerManager.getAnimatedAngle());
    }
 
    void setMapPosition(final MapPosition mapPosition) {
