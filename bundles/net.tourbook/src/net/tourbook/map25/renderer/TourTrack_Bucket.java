@@ -22,8 +22,10 @@ import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
 
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.canvas.Paint.Cap;
+import org.oscim.core.GeoPoint;
 import org.oscim.renderer.MapRenderer;
 import org.oscim.theme.styles.LineStyle;
 import org.slf4j.Logger;
@@ -108,11 +110,19 @@ public class TourTrack_Bucket {
     */
    ShortArrayList             animatedPositions;
 
+   /**
+    * Indices for {@link #animatedPositions} into the tour track data
+    */
+   IntArrayList               animatedLocationIndices;
+
+   GeoPoint[]                 animatedGeoPoints;
+
    public TourTrack_Bucket() {
 
       trackVertexData = new TourTrack_VertexData();
 
       animatedPositions = new ShortArrayList();
+      animatedLocationIndices = new IntArrayList();
 
       directionArrow_Vertices = new ShortArrayList();
       directionArrow_ColorCoords = new ShortArrayList();
@@ -636,11 +646,17 @@ public class TourTrack_Bucket {
     *
     * @param allDirectionArrowPixelList
     *           Contains the x/y pixel positions for the direction arrows
+    * @param allLocationIndices
+    *           Contains the indices into the tour track data, e.g geo location
+    * @param allGeoPoints
     */
-   public void createArrowVertices(final FloatArrayList allDirectionArrowPixelList) {
+   public void createArrowVertices(final FloatArrayList allDirectionArrowPixelList,
+                                   final IntArrayList allLocationIndices,
+                                   final GeoPoint[] allGeoPoints) {
 
       // create new list to not update currently used list, otherwise a bound exception can occure !!!
       animatedPositions.clear();
+      animatedLocationIndices.clear();
 
       directionArrow_Vertices.clear();
       directionArrow_ColorCoords.clear();
@@ -656,7 +672,7 @@ public class TourTrack_Bucket {
 
       if (trackConfig.arrow_IsAnimate) {
 
-         createArrowVertices_200_Animated(allDirectionArrowPixel);
+         createArrowVertices_200_Animated(allDirectionArrowPixel, allGeoPoints, allLocationIndices);
 
       } else {
 
@@ -995,7 +1011,12 @@ public class TourTrack_Bucket {
 // SET_FORMATTING_ON
    }
 
-   private void createArrowVertices_200_Animated(final float[] allDirectionArrowPixel) {
+   private void createArrowVertices_200_Animated(final float[] allDirectionArrowPixel,
+                                                 final GeoPoint[] allGeoPoints,
+                                                 final IntArrayList allLocationIndices) {
+
+      animatedGeoPoints = allGeoPoints;
+      animatedLocationIndices = allLocationIndices;
 
       for (int pixelIndex = 0; pixelIndex < allDirectionArrowPixel.length;) {
 

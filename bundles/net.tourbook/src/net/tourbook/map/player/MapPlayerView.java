@@ -292,7 +292,7 @@ public class MapPlayerView extends ViewPart {
              */
             _spinnerFramesPerSecond = new Spinner(container, SWT.BORDER);
             _spinnerFramesPerSecond.setToolTipText(Messages.Map_Player_Spinner_FramesPerSecond_Tooptip);
-            _spinnerFramesPerSecond.setMinimum(1);
+            _spinnerFramesPerSecond.setMinimum(-1);
             _spinnerFramesPerSecond.setMaximum(Map25FPSManager.DEFAULT_FOREGROUND_FPS);
             _spinnerFramesPerSecond.setIncrement(1);
             _spinnerFramesPerSecond.setPageIncrement(5);
@@ -647,7 +647,9 @@ public class MapPlayerView extends ViewPart {
       final int numAllFrames = MapPlayerManager.getNumberofAllFrames();
       final float pageIncrement = (float) numAllFrames / 10;
 
-      _endTime = numAllFrames / selectedFPS;
+      _endTime = selectedFPS < 1
+            ? 1
+            : numAllFrames / selectedFPS;
 
       _scaleTimeline.setMaximum(numAllFrames);
       _scaleTimeline.setPageIncrement((int) pageIncrement);

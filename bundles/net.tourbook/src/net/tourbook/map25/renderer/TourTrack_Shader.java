@@ -420,7 +420,7 @@ public final class TourTrack_Shader {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-      // viewport scale 2 map scale: it's between 1...2
+      // viewport scale 2 map scale: is between 1...2
       final float viewport2mapscale = (float) (viewport.pos.scale / compileMapPosition.scale);
 
       // fix alpha blending

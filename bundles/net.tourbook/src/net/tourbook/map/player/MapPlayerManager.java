@@ -18,8 +18,10 @@ package net.tourbook.map.player;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.oscim.core.GeoPoint;
 
 /**
  * Manage map animation player
@@ -60,9 +62,24 @@ public class MapPlayerManager {
    private static float                 _animatedAngle;
    private static ShortArrayList        _animatedPositions;
 
+   /**
+    * Viewport scale 2 map scale: is between 1...2
+    */
+   private static float                 _animatedViewport2mapscale;
+   private static IntArrayList          _animatedLocationIndices;
+   private static GeoPoint[]            _animatedGeoPoints;
+
+   public static float getAnimatedAngle() {
+      return _animatedAngle;
+   }
+
    public static ShortArrayList getAnimatedPositions() {
 
       return _animatedPositions;
+   }
+
+   public static float getAnimatedViewport2mapscale() {
+      return _animatedViewport2mapscale;
    }
 
    /**
@@ -249,9 +266,16 @@ public class MapPlayerManager {
       _animatedAngle = animatedAngle;
    }
 
-   public static void setAnimatedPositions(final ShortArrayList animatedPositions) {
+   public static void setAnimatedPositions(final ShortArrayList animatedPositions,
+                                           final GeoPoint[] animatedGeoPoints,
+                                           final IntArrayList animatedLocationIndices,
+                                           final float viewport2mapscale) {
 
       _animatedPositions = animatedPositions;
+      _animatedGeoPoints = animatedGeoPoints;
+      _animatedLocationIndices = animatedLocationIndices;
+
+      _animatedViewport2mapscale = viewport2mapscale;
    }
 
    public static void setAnimationStartTime() {
@@ -324,8 +348,12 @@ public class MapPlayerManager {
       }
    }
 
-   public static float getAnimatedAngle() {
-      return _animatedAngle;
+   public static IntArrayList getAnimatedLocationIndices() {
+      return _animatedLocationIndices;
+   }
+
+   public static GeoPoint[] getAnimatedGeoPoints() {
+      return _animatedGeoPoints;
    }
 
 }

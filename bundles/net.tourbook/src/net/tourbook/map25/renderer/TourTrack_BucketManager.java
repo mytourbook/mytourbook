@@ -16,7 +16,7 @@
 package net.tourbook.map25.renderer;
 
 /**
- * Original class: org.oscim.renderer.bucket.RenderBuckets
+ * Original class: {@link org.oscim.renderer.bucket.RenderBuckets}
  */
 public class TourTrack_BucketManager {
 
