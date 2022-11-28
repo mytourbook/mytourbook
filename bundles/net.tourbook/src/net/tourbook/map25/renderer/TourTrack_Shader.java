@@ -243,8 +243,11 @@ public final class TourTrack_Shader {
          if (trackConfig.arrow_IsAnimate) {
 
             mapPlayerData.isPlayerEnabled = true;
-            mapPlayerData.numAnimatedPositions = trackBucket.animatedPositions.size() / 2;
             mapPlayerData.isAnimateFromRelativePosition = true;
+
+            mapPlayerData.animatedPositions = trackBucket.animatedPositions;
+            mapPlayerData.animatedGeoPoints = trackBucket.animatedGeoPoints;
+            mapPlayerData.animatedLocationIndices = trackBucket.animatedLocationIndices;
 
             /*
              * Animation

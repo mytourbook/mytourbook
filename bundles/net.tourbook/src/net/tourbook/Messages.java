@@ -1288,6 +1288,8 @@ public class Messages extends NLS {
    public static String        Map_Player_Checkbox_IsReLivePlaying;
    public static String        Map_Player_Label_FramesPerSecond;
    public static String        Map_Player_Lable_TimeEndOrRemaining_Tooltip;
+   public static String        Map_Player_Lable_Timeline_AllFrames;
+   public static String        Map_Player_Lable_Timeline_VisibleFrames;
    public static String        Map_Player_PlayContol_Play_Tooptip;
    public static String        Map_Player_PlayControl_Pause_Tooltip;
    public static String        Map_Player_Spinner_FramesPerSecond_Tooptip;

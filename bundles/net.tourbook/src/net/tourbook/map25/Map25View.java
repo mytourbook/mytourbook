@@ -1657,7 +1657,7 @@ public class Map25View extends ViewPart implements
          final double[] latitudeSerie = tourData.latitudeSerie;
          final double[] longitudeSerie = tourData.longitudeSerie;
 
-         // create vtm geo points
+         // create vtm E6 geo points
          for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++, tourIndex++) {
             _allGeoPoints[geoIndex++] = (new GeoPoint(latitudeSerie[serieIndex], longitudeSerie[serieIndex]));
          }

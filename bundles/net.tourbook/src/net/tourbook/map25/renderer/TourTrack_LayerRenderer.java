@@ -66,7 +66,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    private boolean                       _isUpdatePoints;
 
    /**
-    * Stores points, converted to the map projection.
+    * Contains all geo locations for all selected tours in lat/lon E6 format.
     */
    private GeoPoint[]                    _allGeoPoints;
    private IntArrayList                  _allTourStarts;
@@ -107,14 +107,16 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       private static final int  MAX_VISIBLE_PIXEL               = 2048;
 
       /**
-       * Projected points 0...1
+       * Projected points 0...1 for all geo positions for all selected tours
        * <p>
        * Is projected from -180°...180° ==> 0...1 by using the {@link MercatorProjection}
        */
-      private double[]          __projectedPoints               = new double[2];
+      private double[]          __allProjectedPoints            = new double[2];
 
       /**
-       * Compiled points which are scaled with the current map position to "screen" pixels
+       * Compiled points which are scaled with the current map position to "screen" pixels.
+       * <p>
+       * It contains all geo positions for all selected tours
        */
       private float[]           __pixelPoints;
 
@@ -194,11 +196,11 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                _isUpdatePoints = false;
                __numGeoPoints = numGeoPoints = _allGeoPoints.length;
 
-               double[] projectedPoints = __projectedPoints;
+               double[] projectedPoints = __allProjectedPoints;
 
                if (numGeoPoints * 2 >= projectedPoints.length) {
 
-                  projectedPoints = __projectedPoints = new double[numGeoPoints * 2];
+                  projectedPoints = __allProjectedPoints = new double[numGeoPoints * 2];
 
                   __pixelPoints = new float[numGeoPoints * 2];
                   __pixelPointColorsHalf = new int[numGeoPoints];
@@ -249,12 +251,12 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          final boolean isShowDirectionArrows = trackConfig.isShowDirectionArrow;
          int arrow_MinimumDistance = trackConfig.arrow_IsAnimate
 
-               // use a smaller distance when animated to show the moving figure smoothly
+               // use a smaller distance when animated, to show the moving figure smoothly
                ? 1
 
                : trackConfig.arrow_MinimumDistance;
 
-         // this is vor debugging
+         // this is for debugging
          arrow_MinimumDistance = trackConfig.arrow_MinimumDistance;
 
          final TourTrack_Bucket workerBucket = getWorkerBucket(task.__taskBucketManager);
@@ -279,8 +281,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          // flip around dateline
          int flip = 0;
 
-         float pixelX = (float) ((__projectedPoints[0] - compileMapPosX) * compileMaxMapPixel);
-         float pixelY = (float) ((__projectedPoints[1] - compileMapPosY) * compileMaxMapPixel);
+         float pixelX = (float) ((__allProjectedPoints[0] - compileMapPosX) * compileMaxMapPixel);
+         float pixelY = (float) ((__allProjectedPoints[1] - compileMapPosY) * compileMaxMapPixel);
 
          if (pixelX > maxMapPixel2) {
 
@@ -326,8 +328,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             final int projectedPointIndexHalf = projectedPointIndex / 2;
 
             // convert projected points 0...1 into map pixel
-            pixelX = (float) ((__projectedPoints[projectedPointIndex + 0] - compileMapPosX) * compileMaxMapPixel);
-            pixelY = (float) ((__projectedPoints[projectedPointIndex + 1] - compileMapPosY) * compileMaxMapPixel);
+            pixelX = (float) ((__allProjectedPoints[projectedPointIndex + 0] - compileMapPosX) * compileMaxMapPixel);
+            pixelY = (float) ((__allProjectedPoints[projectedPointIndex + 1] - compileMapPosY) * compileMaxMapPixel);
 
             int flipDirection = 0;
 
@@ -455,8 +457,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
             // convert arrow positions into arrow vertices
             workerBucket.createArrowVertices(
-                  __pixelDirection_ArrowPositions,
-                  __pixelDirection_LocationIndex,
+                  allDirectionArrowPixelPosition,
+                  allDirectionArrow_LocationIndex,
                   _allGeoPoints);
          }
       }
@@ -585,15 +587,6 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       if (trackBucket == null) {
          return;
       }
-
-      // viewport scale 2 map scale: it's between 1...2
-      final float viewport2mapscale = (float) (viewport.pos.scale / _compileMapPosition.scale);
-
-      MapPlayerManager.setAnimatedPositions(
-            trackBucket.animatedPositions,
-            trackBucket.animatedGeoPoints,
-            trackBucket.animatedLocationIndices,
-            viewport2mapscale);
 
       GLState.test(false, false);
       GLState.blend(true);

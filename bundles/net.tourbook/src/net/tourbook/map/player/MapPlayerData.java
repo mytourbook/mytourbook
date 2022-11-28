@@ -15,22 +15,27 @@
  *******************************************************************************/
 package net.tourbook.map.player;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
+import org.oscim.core.GeoPoint;
+
 /**
  * Data for the map animation player
  */
 public class MapPlayerData {
 
-   public boolean isPlayerEnabled;
-
-   /**
-    * Number of frames when the animation ends
-    */
-   public int     numAnimatedPositions;
+   public boolean        isPlayerEnabled;
 
    /**
     * When <code>true</code> then proceed the animation from the current relative position,
     * otherwise start animation from the beginning
     */
-   public boolean isAnimateFromRelativePosition;
+   public boolean        isAnimateFromRelativePosition;
+
+   public ShortArrayList animatedPositions;
+
+   public GeoPoint[]     animatedGeoPoints;
+
+   public IntArrayList   animatedLocationIndices;
 
 }

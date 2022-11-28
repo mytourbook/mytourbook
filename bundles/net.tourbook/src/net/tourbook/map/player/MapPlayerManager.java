@@ -39,14 +39,15 @@ public class MapPlayerManager {
    private static int                   _foregroundFPS;
 
    /**
-    * Frame number which is currently displayed, it's in the range from 1...{@link #_numAllFrames}
+    * Frame number which is currently displayed, it's in the range from
+    * 1...{@link #_numAllVisibleFrames}
     */
    private static int                   _currentFrameNumber;
 
    /**
     * Number of frames for an animation
     */
-   private static int                   _numAllFrames;
+   private static int                   _numAllVisibleFrames;
 
    private static long                  _animationStartTime;
    private static float                 _currentRelativePosition;
@@ -60,17 +61,20 @@ public class MapPlayerManager {
    private static boolean               _isReLivePlaying;
 
    private static float                 _animatedAngle;
-   private static ShortArrayList        _animatedPositions;
-
-   /**
-    * Viewport scale 2 map scale: is between 1...2
-    */
-   private static float                 _animatedViewport2mapscale;
-   private static IntArrayList          _animatedLocationIndices;
    private static GeoPoint[]            _animatedGeoPoints;
+   private static ShortArrayList        _animatedPositions;
+   private static IntArrayList          _animatedLocationIndices;
 
    public static float getAnimatedAngle() {
       return _animatedAngle;
+   }
+
+   public static GeoPoint[] getAnimatedGeoPoints() {
+      return _animatedGeoPoints;
+   }
+
+   public static IntArrayList getAnimatedLocationIndices() {
+      return _animatedLocationIndices;
    }
 
    public static ShortArrayList getAnimatedPositions() {
@@ -78,13 +82,9 @@ public class MapPlayerManager {
       return _animatedPositions;
    }
 
-   public static float getAnimatedViewport2mapscale() {
-      return _animatedViewport2mapscale;
-   }
-
    /**
     * @return Returns the last computed frame numer, it's in the range from
-    *         1...{@link #_numAllFrames}
+    *         1...{@link #_numAllVisibleFrames}
     */
    public static int getCurrentFrameNumber() {
 
@@ -104,8 +104,9 @@ public class MapPlayerManager {
    /**
     * Compute the next frame number which is depending on the time or other parameters
     *
-    * @return Returns an index <code>0...</code>{@link #_numAllFrames}<code> - 1</code> for the
-    *         next frame <code>1...</code>{@link #_numAllFrames}
+    * @return Returns an index <code>0...</code>{@link #_numAllVisibleFrames}<code> - 1</code> for
+    *         the
+    *         next frame <code>1...</code>{@link #_numAllVisibleFrames}
     */
    public static int getNextFrameIndex() {
 
@@ -130,9 +131,9 @@ public class MapPlayerManager {
 
          _isAnimateFromRelativePosition = false;
 
-         nextFrameNumber = Math.round(_numAllFrames * _currentRelativePosition);
+         nextFrameNumber = Math.round(_numAllVisibleFrames * _currentRelativePosition);
 
-      } else if (_isPlayingLoop && _currentFrameNumber >= _numAllFrames) {
+      } else if (_isPlayingLoop && _currentFrameNumber >= _numAllVisibleFrames) {
 
          // 2. Prio: Loop animation
 
@@ -158,7 +159,7 @@ public class MapPlayerManager {
             return getValidIndex(_currentFrameNumber);
          }
 
-         final int maxFrames = Math.max(0, _numAllFrames);
+         final int maxFrames = Math.max(0, _numAllVisibleFrames);
          final float maxLoopTime = maxFrames / _foregroundFPS;
 
          final float timeDiffSinceFirstRun = (float) ((currentTimeMS - _animationStartTime) / 1000.0);
@@ -168,7 +169,7 @@ public class MapPlayerManager {
          nextFrameNumber = nextFrameByTime;
 
          // ensure to not jump back to the start when the end is not yet reached
-         if (nextFrameNumber < _numAllFrames) {
+         if (nextFrameNumber < _numAllVisibleFrames) {
             nextFrameNumber = _currentFrameNumber + 1;
          }
 
@@ -179,12 +180,12 @@ public class MapPlayerManager {
       }
 
       // ensure bounds
-      if (nextFrameNumber > _numAllFrames) {
-         nextFrameNumber = _numAllFrames;
+      if (nextFrameNumber > _numAllVisibleFrames) {
+         nextFrameNumber = _numAllVisibleFrames;
       }
 
       _currentFrameNumber = nextFrameNumber;
-      _currentRelativePosition = nextFrameNumber / (float) _numAllFrames;
+      _currentRelativePosition = nextFrameNumber / (float) _numAllVisibleFrames;
       _lastUpdateTime = currentTimeMS;
 
       if (isPlayerAvailable()) {
@@ -195,7 +196,7 @@ public class MapPlayerManager {
    }
 
    public static int getNumberofAllFrames() {
-      return _numAllFrames;
+      return _numAllVisibleFrames;
    }
 
    /**
@@ -224,7 +225,7 @@ public class MapPlayerManager {
     */
    public static boolean isLastFrame() {
 
-      return _currentFrameNumber == _numAllFrames;
+      return _currentFrameNumber == _numAllVisibleFrames;
    }
 
    private static boolean isPlayerAvailable() {
@@ -266,18 +267,6 @@ public class MapPlayerManager {
       _animatedAngle = animatedAngle;
    }
 
-   public static void setAnimatedPositions(final ShortArrayList animatedPositions,
-                                           final GeoPoint[] animatedGeoPoints,
-                                           final IntArrayList animatedLocationIndices,
-                                           final float viewport2mapscale) {
-
-      _animatedPositions = animatedPositions;
-      _animatedGeoPoints = animatedGeoPoints;
-      _animatedLocationIndices = animatedLocationIndices;
-
-      _animatedViewport2mapscale = viewport2mapscale;
-   }
-
    public static void setAnimationStartTime() {
 
       _animationStartTime = System.currentTimeMillis();
@@ -308,6 +297,7 @@ public class MapPlayerManager {
    }
 
    public static void setIsReLivePlaying(final boolean isReLivePlaying) {
+
       _isReLivePlaying = isReLivePlaying;
    }
 
@@ -320,6 +310,7 @@ public class MapPlayerManager {
     * Move player head to a relative position and start playing at this position
     *
     * @param relativePosition
+    *           Is between 0...1
     */
    public static void setRelativePosition(final float relativePosition) {
 
@@ -328,6 +319,14 @@ public class MapPlayerManager {
 
       // this will also force to compute the frame even when player is paused
       _isAnimateFromRelativePosition = true;
+
+      // fire map position
+//      if ( != null) {
+//
+//      }
+//      final MapPosition mapPosition = new MapPosition(latitude, longitude, scale);
+//      MapManager.fireSyncMapEvent(mapPosition, null, 0);
+
    }
 
    /**
@@ -339,21 +338,22 @@ public class MapPlayerManager {
     */
    public static void setupPlayer(final MapPlayerData mapPlayerData) {
 
-      _isPlayerEnabled = mapPlayerData.isPlayerEnabled;
-      _numAllFrames = mapPlayerData.numAnimatedPositions;
-      _isAnimateFromRelativePosition = mapPlayerData.isAnimateFromRelativePosition;
+// SET_FORMATTING_OFF
+
+      _isPlayerEnabled                 = mapPlayerData.isPlayerEnabled;
+      _isAnimateFromRelativePosition   = mapPlayerData.isAnimateFromRelativePosition;
+
+      _animatedPositions               = mapPlayerData.animatedPositions;
+      _animatedGeoPoints               = mapPlayerData.animatedGeoPoints;
+      _animatedLocationIndices         = mapPlayerData.animatedLocationIndices;
+
+      _numAllVisibleFrames             = _animatedPositions.size() / 2;
+
+// SET_FORMATTING_ON
 
       if (isPlayerAvailable()) {
          _mapPlayerView.updatePlayer();
       }
-   }
-
-   public static IntArrayList getAnimatedLocationIndices() {
-      return _animatedLocationIndices;
-   }
-
-   public static GeoPoint[] getAnimatedGeoPoints() {
-      return _animatedGeoPoints;
    }
 
 }
