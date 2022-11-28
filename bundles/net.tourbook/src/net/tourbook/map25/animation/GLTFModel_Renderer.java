@@ -314,8 +314,9 @@ public class GLTFModel_Renderer extends LayerRenderer {
       final int geoLocationIndex = animatedLocationIndices.get(currentFrameNumber - 1);
       final GeoPoint geoLocation = animatedGeoPoints[geoLocationIndex];
 
-      final double modelPositionX = MercatorProjection.longitudeToX(geoLocation.getLongitude());
-      final double modelPositionY = MercatorProjection.latitudeToY(geoLocation.getLatitude());
+      // lat/lon -> 0...1
+      final double modelProjectedPositionX = MercatorProjection.longitudeToX(geoLocation.getLongitude());
+      final double modelProjectedPositionY = MercatorProjection.latitudeToY(geoLocation.getLatitude());
 
       final ModelInstance modelInstance = _scene.modelInstance;
       final Matrix4 modelTransform = modelInstance.transform;
@@ -330,6 +331,9 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
       float modelScale = 1f / groundScale;
 
+      // viewport scale 2 map scale: is between 1...2
+      final float viewport2mapscale = (float) (_currentMapPosition.scale / MapPlayerManager.getCompileMapPosition().scale);
+
       /*
        * Adjust to a normalized size which depends on the model size because the models can have big
        * size differences
@@ -337,13 +341,19 @@ public class GLTFModel_Renderer extends LayerRenderer {
       modelScale /= _boundingBoxMinMaxDistance;
 
       // increase model size to be more visible
-      modelScale *= 600;
+//      modelScale *= mapScale / viewport2mapscale * 10;
+      modelScale *= 10000;
+
+//      modelScale = 100 / viewport2mapscale;
+
+      System.out.println("vp2mp:" + viewport2mapscale + "");
+      // TODO remove SYSTEM.OUT.PRINTLN
 
       /*
        * Translate glTF model to the map position
        */
-      final float dx = (float) ((modelPositionX - _currentMapPosition.x) * tileScale);
-      final float dy = (float) ((modelPositionY - _currentMapPosition.y) * tileScale);
+      final float dx = (float) ((modelProjectedPositionX - _currentMapPosition.x) * tileScale);
+      final float dy = (float) ((modelProjectedPositionY - _currentMapPosition.y) * tileScale);
 
       final float dxScaled = dx / modelScale;
       final float dyScaled = dy / modelScale;

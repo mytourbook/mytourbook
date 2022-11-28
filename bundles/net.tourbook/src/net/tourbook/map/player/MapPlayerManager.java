@@ -22,6 +22,7 @@ import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.oscim.core.GeoPoint;
+import org.oscim.core.MapPosition;
 
 /**
  * Manage map animation player
@@ -64,6 +65,7 @@ public class MapPlayerManager {
    private static GeoPoint[]            _animatedGeoPoints;
    private static ShortArrayList        _animatedPositions;
    private static IntArrayList          _animatedLocationIndices;
+   private static MapPosition           _compileMapPosition;
 
    public static float getAnimatedAngle() {
       return _animatedAngle;
@@ -80,6 +82,11 @@ public class MapPlayerManager {
    public static ShortArrayList getAnimatedPositions() {
 
       return _animatedPositions;
+   }
+
+   public static MapPosition getCompileMapPosition() {
+      
+      return _compileMapPosition;
    }
 
    /**
@@ -344,8 +351,10 @@ public class MapPlayerManager {
       _isAnimateFromRelativePosition   = mapPlayerData.isAnimateFromRelativePosition;
 
       _animatedPositions               = mapPlayerData.animatedPositions;
-      _animatedGeoPoints               = mapPlayerData.animatedGeoPoints;
+      _animatedGeoPoints               = mapPlayerData.allAvailableGeoPoints;
       _animatedLocationIndices         = mapPlayerData.animatedLocationIndices;
+
+      _compileMapPosition              = mapPlayerData.compileMapPosition;
 
       _numAllVisibleFrames             = _animatedPositions.size() / 2;
 

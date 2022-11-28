@@ -51,7 +51,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    public static final Logger            log            = LoggerFactory.getLogger(TourTrack_LayerRenderer.class);
 
    /**
-    * Map position during compile time
+    * Map position/scale during compile time
     */
    private MapPosition                   _compileMapPosition;
    private Map                           _map;
@@ -66,7 +66,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    private boolean                       _isUpdatePoints;
 
    /**
-    * Contains all geo locations for all selected tours in lat/lon E6 format.
+    * Contains all available geo locations for all selected tours in lat/lon E6 format.
     */
    private GeoPoint[]                    _allGeoPoints;
    private IntArrayList                  _allTourStarts;
@@ -716,7 +716,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       final TourTrack_Bucket painterBucket = workerTask.__taskBucketManager.getBucket_Painter();
       _bucketManager_ForPainting.setBucket_Painter(painterBucket);
 
-      final boolean isDataAvailable = TourTrack_Shader.bindBufferData(painterBucket);
+      final boolean isDataAvailable = TourTrack_Shader.bindBufferData(painterBucket, _compileMapPosition);
 
       setReady(isDataAvailable);
    }

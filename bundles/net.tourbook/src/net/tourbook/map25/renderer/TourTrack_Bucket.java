@@ -115,7 +115,10 @@ public class TourTrack_Bucket {
     */
    IntArrayList               animatedLocationIndices;
 
-   GeoPoint[]                 animatedGeoPoints;
+   /**
+    * Contains all available geo locations for all selected tours
+    */
+   GeoPoint[]                 allAvailableGeoPoints;
 
    public TourTrack_Bucket() {
 
@@ -1015,7 +1018,7 @@ public class TourTrack_Bucket {
                                                  final GeoPoint[] allGeoPoints,
                                                  final IntArrayList allLocationIndices) {
 
-      animatedGeoPoints = allGeoPoints;
+      allAvailableGeoPoints = allGeoPoints;
       animatedLocationIndices = allLocationIndices;
 
       for (int pixelIndex = 0; pixelIndex < allDirectionArrowPixel.length;) {

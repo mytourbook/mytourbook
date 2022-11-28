@@ -201,9 +201,11 @@ public final class TourTrack_Shader {
    /**
     * Fill OpenGL buffer with the vertices/color/direction model data
     *
+    * @param compileMapPosition
+    * @param viewport
     * @return Returns <code>true</code> when data are available
     */
-   public static boolean bindBufferData(final TourTrack_Bucket trackBucket) {
+   public static boolean bindBufferData(final TourTrack_Bucket trackBucket, final MapPosition compileMapPosition) {
 
       final int numTrackVertices = trackBucket == null
             ? 0
@@ -242,12 +244,18 @@ public final class TourTrack_Shader {
 
          if (trackConfig.arrow_IsAnimate) {
 
-            mapPlayerData.isPlayerEnabled = true;
-            mapPlayerData.isAnimateFromRelativePosition = true;
+// SET_FORMATTING_OFF
 
-            mapPlayerData.animatedPositions = trackBucket.animatedPositions;
-            mapPlayerData.animatedGeoPoints = trackBucket.animatedGeoPoints;
-            mapPlayerData.animatedLocationIndices = trackBucket.animatedLocationIndices;
+            mapPlayerData.isPlayerEnabled                = true;
+            mapPlayerData.isAnimateFromRelativePosition  = true;
+
+            mapPlayerData.animatedPositions              = trackBucket.animatedPositions;
+            mapPlayerData.animatedLocationIndices        = trackBucket.animatedLocationIndices;
+            mapPlayerData.allAvailableGeoPoints          = trackBucket.allAvailableGeoPoints;
+
+            mapPlayerData.compileMapPosition             = compileMapPosition;
+
+// SET_FORMATTING_ON
 
             /*
              * Animation
