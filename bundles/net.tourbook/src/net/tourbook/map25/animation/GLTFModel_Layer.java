@@ -42,7 +42,7 @@ public class GLTFModel_Layer extends Layer implements Map.UpdateListener {
    @Override
    public void onMapEvent(final Event event, final MapPosition mapPosition) {
 
-      _gltfRenderer.setMapPosition(mapPosition);
+      _gltfRenderer.onMapEvent(event, mapPosition);
    }
 
 }

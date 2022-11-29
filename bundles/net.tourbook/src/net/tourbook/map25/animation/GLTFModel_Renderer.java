@@ -16,6 +16,7 @@
 package net.tourbook.map25.animation;
 
 import static org.oscim.backend.GLAdapter.gl;
+import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -37,15 +38,17 @@ import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
 import net.mgsx.gltf.scene3d.scene.SceneSkybox;
 import net.mgsx.gltf.scene3d.utils.IBLBuilder;
+import net.tourbook.map.player.MapPlayerData;
 import net.tourbook.map.player.MapPlayerManager;
+import net.tourbook.map25.renderer.TourTrack_Bucket;
 
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
-import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.GL;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 import org.oscim.core.Tile;
+import org.oscim.event.Event;
 import org.oscim.map.Map;
 import org.oscim.map.Viewport;
 import org.oscim.renderer.GLState;
@@ -62,15 +65,17 @@ import org.slf4j.LoggerFactory;
  */
 public class GLTFModel_Renderer extends LayerRenderer {
 
-   static final Logger        log         = LoggerFactory.getLogger(GLTFModel_Renderer.class);
+   private static final float COORD_SCALE_BY_DIR_SCALE = COORD_SCALE / TourTrack_Bucket.DIR_SCALE;
+
+   static final Logger        log                      = LoggerFactory.getLogger(GLTFModel_Renderer.class);
 
    private Map                _map;
    private MapCameraMT        _mapCamera;
 
-   private Vector3            _tempVector = new Vector3();
+   private Vector3            _tempVector              = new Vector3();
 
    private MapPosition        _currentMapPosition;
-   float[]                    _mapBox     = new float[8];
+   float[]                    _mapBox                  = new float[8];
 
    private Scene              _scene;
    private SceneAsset         _sceneAsset;
@@ -86,6 +91,10 @@ public class GLTFModel_Renderer extends LayerRenderer {
    private BoundingBox        _modelBoundingBox;
    private Vector3            _boundingBoxCenter;
    private float              _boundingBoxMinMaxDistance;
+
+   private boolean            _isModelPositionUpdated;
+
+   private int                _prevMapZoomLevel;
 
 //   private boolean             loading;
 
@@ -181,15 +190,39 @@ public class GLTFModel_Renderer extends LayerRenderer {
       return asset;
    }
 
+   /**
+    * Set current map position
+    *
+    * @param mapEvent
+    * @param mapPosition
+    */
+   void onMapEvent(final Event mapEvent, final MapPosition mapPosition) {
+
+      if (_mapCamera == null) {
+         return;
+      }
+
+      _currentMapPosition = mapPosition;
+
+      /*
+       * Camera and model positions must be set BEFORE render() method is called, otherwise the old
+       * position is used (maybe for one frame) and it is flickering
+       */
+      updateModelPosition();
+
+      _isModelPositionUpdated = true;
+
+      final int mapZoomLevel = mapPosition.zoomLevel;
+      final int mapScale = 1 << mapZoomLevel;
+
+      _mapCamera.setMapPosition(mapPosition.x, mapPosition.y, mapScale);
+
+   }
+
    @Override
    public void render(final GLViewport viewport) {
 
       if (_scene == null || _currentMapPosition == null) {
-         return;
-      }
-
-      final ShortArrayList animatedPositions = MapPlayerManager.getAnimatedPositions();
-      if (animatedPositions == null) {
          return;
       }
 
@@ -202,16 +235,22 @@ public class GLTFModel_Renderer extends LayerRenderer {
 //    }
 
       _mapCamera.update(viewport);
-      render_UpdateModelPosition(animatedPositions);
+
+      // optimize model update
+      if (_isModelPositionUpdated) {
+         _isModelPositionUpdated = false;
+      } else {
+         updateModelPosition();
+      }
 
       final MapPosition cameraMapPosition = _mapCamera.mMapPosition;
       final MapPosition viewportPosition = viewport.pos;
 
       gl.depthMask(true);
 
-      if (viewportPosition.zoomLevel < 10) {
-         gl.clear(GL.DEPTH_BUFFER_BIT);
-      }
+//      if (viewportPosition.zoomLevel < 10) {
+//         gl.clear(GL.DEPTH_BUFFER_BIT);
+//      }
 
       // Unbind via GLState to ensure no buffer is replaced by accident
       GLState.bindElementBuffer(GLState.UNBIND);
@@ -296,130 +335,6 @@ public class GLTFModel_Renderer extends LayerRenderer {
 //      // TODO remove SYSTEM.OUT.PRINTLN
    }
 
-   /**
-    * Update model position
-    *
-    * @param animatedPositions
-    */
-   private void render_UpdateModelPosition(final ShortArrayList animatedPositions) {
-
-      final GeoPoint[] animatedGeoPoints = MapPlayerManager.getAnimatedGeoPoints();
-      final int currentFrameNumber = MapPlayerManager.getCurrentFrameNumber();
-      final IntArrayList animatedLocationIndices = MapPlayerManager.getAnimatedLocationIndices();
-
-      if (currentFrameNumber >= animatedLocationIndices.size() - 1) {
-         return;
-      }
-
-      final int geoLocationIndex = animatedLocationIndices.get(currentFrameNumber - 1);
-      final GeoPoint geoLocation = animatedGeoPoints[geoLocationIndex];
-
-      // lat/lon -> 0...1
-      final double modelProjectedPositionX = MercatorProjection.longitudeToX(geoLocation.getLongitude());
-      final double modelProjectedPositionY = MercatorProjection.latitudeToY(geoLocation.getLatitude());
-
-      final ModelInstance modelInstance = _scene.modelInstance;
-      final Matrix4 modelTransform = modelInstance.transform;
-
-      final int mapZoomLevel = _currentMapPosition.zoomLevel;
-
-      final int mapScale = 1 << mapZoomLevel;
-      final int tileScale = Tile.SIZE << mapZoomLevel;
-
-      final double latitude = MercatorProjection.toLatitude(_currentMapPosition.y);
-      final float groundScale = (float) MercatorProjection.groundResolutionWithScale(latitude, mapScale);
-
-      float modelScale = 1f / groundScale;
-
-      // viewport scale 2 map scale: is between 1...2
-      final float viewport2mapscale = (float) (_currentMapPosition.scale / MapPlayerManager.getCompileMapPosition().scale);
-
-      /*
-       * Adjust to a normalized size which depends on the model size because the models can have big
-       * size differences
-       */
-      modelScale /= _boundingBoxMinMaxDistance;
-
-      // increase model size to be more visible
-//      modelScale *= mapScale / viewport2mapscale * 10;
-      modelScale *= 10000;
-
-//      modelScale = 100 / viewport2mapscale;
-
-      System.out.println("vp2mp:" + viewport2mapscale + "");
-      // TODO remove SYSTEM.OUT.PRINTLN
-
-      /*
-       * Translate glTF model to the map position
-       */
-      final float dx = (float) ((modelProjectedPositionX - _currentMapPosition.x) * tileScale);
-      final float dy = (float) ((modelProjectedPositionY - _currentMapPosition.y) * tileScale);
-
-      final float dxScaled = dx / modelScale;
-      final float dyScaled = dy / modelScale;
-
-      final Vector3 bbMin = _modelBoundingBox.min;
-      final Vector3 bbMax = _modelBoundingBox.max;
-      final Vector3 bboxCenter = _boundingBoxCenter;
-
-      final float bbMinY = bbMin.y;
-      final float bbMaxY = bbMax.y;
-
-      final float xAdjustment = 0;//bboxCenter.x - 0f;
-      final float yAdjustment = 0;
-      final float zAdjustment = -bbMinY;// - bbMaxY;
-
-//      System.out.println(String.format(""
-//
-//            + "dx:%5.3f"
-//            + "  dy:%5.3f"
-//            + "  %s"
-//
-//            ,
-//
-//            dxScaled,
-//            dyScaled,
-//            bboxCenter
-//
-//      ));
-
-      // TODO remove SYSTEM.OUT.PRINTLN
-
-      // reset matrix to identity matrix
-      modelTransform.idt();
-
-      modelTransform.scale(modelScale, modelScale, modelScale);
-
-      modelTransform.translate(dxScaled - xAdjustment, dyScaled - yAdjustment, zAdjustment);
-//    modelTransform.translate(dxScaled - xAdjustment, dyScaled, zAdjustment);
-
-      modelTransform.rotate(1, 0, 0, 90);
-      modelTransform.rotate(0, 1, 0, 90 - MapPlayerManager.getAnimatedAngle());
-   }
-
-   /**
-    * Set the current map position
-    *
-    * @param mapPosition
-    */
-   void setMapPosition(final MapPosition mapPosition) {
-
-      if (_mapCamera == null) {
-         return;
-      }
-
-      _currentMapPosition = mapPosition;
-
-      /*
-       * Camera position must be set BEFORE render() method otherwise the old position is used
-       * (maybe for one frame) and it is flickering
-       */
-      final int mapZoomLevel = mapPosition.zoomLevel;
-      final int mapScale = 1 << mapZoomLevel;
-
-      _mapCamera.setMapPosition(mapPosition.x, mapPosition.y, mapScale);
-   }
-
    @Override
    public boolean setup() {
 
@@ -481,5 +396,155 @@ public class GLTFModel_Renderer extends LayerRenderer {
          setReady(true);
       }
 
+   }
+
+   /**
+    * Update model position
+    */
+   private void updateModelPosition() {
+
+      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
+      if (mapPlayerData == null) {
+         return;
+      }
+
+      final int currentFrameNumber = MapPlayerManager.getCurrentFrameNumber();
+      final GeoPoint[] animatedGeoPoints = mapPlayerData.allAvailableGeoPoints;
+      final IntArrayList animatedLocationIndices = mapPlayerData.animatedLocationIndices;
+
+      if (currentFrameNumber >= animatedLocationIndices.size() - 1) {
+         return;
+      }
+
+      final int geoLocationIndex = animatedLocationIndices.get(currentFrameNumber - 1);
+      final GeoPoint geoLocation = animatedGeoPoints[geoLocationIndex];
+
+      // lat/lon -> 0...1
+      final double modelProjectedPositionX = MercatorProjection.longitudeToX(geoLocation.getLongitude());
+      final double modelProjectedPositionY = MercatorProjection.latitudeToY(geoLocation.getLatitude());
+
+      final ModelInstance modelInstance = _scene.modelInstance;
+      final Matrix4 modelTransform = modelInstance.transform;
+
+      final double currentMapScale = _currentMapPosition.scale;
+      final int currentMapZoomLevel = _currentMapPosition.zoomLevel;
+
+      final int mapScale = 1 << currentMapZoomLevel;
+      final int tileScale = Tile.SIZE << currentMapZoomLevel;
+
+      final double latitude = MercatorProjection.toLatitude(_currentMapPosition.y);
+      final float groundScale = (float) MercatorProjection.groundResolutionWithScale(latitude, mapScale);
+
+      float modelScale = 1f / groundScale;
+
+      /*
+       * Adjust to a normalized size which depends on the model size because the models can have big
+       * size differences
+       */
+//      modelScale /= _boundingBoxMinMaxDistance;
+
+      // viewport scale 2 map scale: is between 1...2
+      float vp2mp = (float) (currentMapScale / MapPlayerManager.getAnimationMapScale(currentMapZoomLevel));
+
+      // increase model size to be more visible
+//      modelScale *= mapScale * viewport2mapscale * 30;
+//      modelScale *= 10000;
+//
+//      modelScale = (float) (modelScale / currentMapZoomLevel / Math.sqrt(currentMapZoomLevel));
+
+      if (currentMapZoomLevel != _prevMapZoomLevel) {
+
+         int a = 0;
+         a++;
+
+         vp2mp = (float) (currentMapScale / MapPlayerManager.getAnimationMapScale(currentMapZoomLevel));
+
+         _prevMapZoomLevel = currentMapZoomLevel;
+      }
+
+      final int modelSize = 150;
+
+//      if (vp2mp < 1.0) {
+//
+//         modelScale = modelSize / 2;
+//
+//      } else if (vp2mp > 2.0) {
+//
+//         modelScale = modelSize;
+//
+//      } else {
+//
+         modelScale = modelSize / vp2mp;
+//      }
+
+//      System.out.println(String.format(""
+//
+//            + "   mapzooLvl %3d"
+//            + "   mapScl %10.1f"
+//
+//            + "   modScl %7.3f"
+//            + "   vp2mp %7.3f"
+//
+//            + "%s",
+//
+//            currentMapZoomLevel,
+//            currentMapScale,
+//
+//            modelScale,
+//            vp2mp,
+//
+//            ""
+//
+//      ));
+// TODO remove SYSTEM.OUT.PRINTLN
+
+      /*
+       * Translate glTF model to the map position
+       */
+      final float dx = (float) ((modelProjectedPositionX - _currentMapPosition.x) * tileScale);
+      final float dy = (float) ((modelProjectedPositionY - _currentMapPosition.y) * tileScale);
+
+      final float dxScaled = dx / modelScale;
+      final float dyScaled = dy / modelScale;
+
+      final Vector3 bbMin = _modelBoundingBox.min;
+      final Vector3 bbMax = _modelBoundingBox.max;
+      final Vector3 bboxCenter = _boundingBoxCenter;
+
+      final float bbMinY = bbMin.y;
+      final float bbMaxY = bbMax.y;
+
+      final float xAdjustment = 0;//bboxCenter.x - 0f;
+      final float yAdjustment = 0;
+      final float zAdjustment = -bbMinY;// - bbMaxY;
+
+//      System.out.println(String.format(""
+//
+//            + "dx:%5.3f"
+//            + "  dy:%5.3f"
+//            + "  %s"
+//
+//            ,
+//
+//            dxScaled,
+//            dyScaled,
+//            bboxCenter
+//
+//      ));
+
+      // TODO remove SYSTEM.OUT.PRINTLN
+
+      // reset matrix to identity matrix
+      modelTransform.idt();
+
+      modelTransform.scale(modelScale, modelScale, modelScale);
+
+      modelTransform.translate(
+            dxScaled - xAdjustment,
+            dyScaled - yAdjustment,
+            zAdjustment);
+
+      modelTransform.rotate(1, 0, 0, 90);
+      modelTransform.rotate(0, 1, 0, 90 - MapPlayerManager.getAnimatedAngle());
    }
 }

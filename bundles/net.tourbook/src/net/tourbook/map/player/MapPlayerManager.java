@@ -18,11 +18,7 @@ package net.tourbook.map.player;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.Util;
 
-import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
-import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.oscim.core.GeoPoint;
-import org.oscim.core.MapPosition;
 
 /**
  * Manage map animation player
@@ -62,32 +58,37 @@ public class MapPlayerManager {
    private static boolean               _isReLivePlaying;
 
    private static float                 _animatedAngle;
-   private static GeoPoint[]            _animatedGeoPoints;
-   private static ShortArrayList        _animatedPositions;
-   private static IntArrayList          _animatedLocationIndices;
-   private static MapPosition           _compileMapPosition;
+
+   private static MapPlayerData         _mapPlayerData;
+
+   private static double                _animationMap_Scale;
+//   private static int                   _animationMap_Scale_Previous;
+//   private static int                   _animationMap_ZoomLevel;
+//   private static int                   _animationMap_ZoomLevel_Previous;
 
    public static float getAnimatedAngle() {
+
       return _animatedAngle;
    }
 
-   public static GeoPoint[] getAnimatedGeoPoints() {
-      return _animatedGeoPoints;
+   public static double getAnimationMapScale(final int mapZoomLevel) {
+
+//      if (mapZoomLevel == _animationMap_ZoomLevel) {
+//
+      return _animationMap_Scale;
+//
+//      } else {
+//
+//         // return previous, the current value is not yet updated and would cause flickering
+//
+//         return _animationMap_Scale_Previous;
+//      }
    }
 
-   public static IntArrayList getAnimatedLocationIndices() {
-      return _animatedLocationIndices;
-   }
-
-   public static ShortArrayList getAnimatedPositions() {
-
-      return _animatedPositions;
-   }
-
-   public static MapPosition getCompileMapPosition() {
-      
-      return _compileMapPosition;
-   }
+//   public static int getAnimationZoomLevel() {
+//
+//      return _animationMap_ZoomLevel;
+//   }
 
    /**
     * @return Returns the last computed frame numer, it's in the range from
@@ -106,6 +107,11 @@ public class MapPlayerManager {
    public static int getForegroundFPS() {
 
       return _foregroundFPS;
+   }
+
+   public static MapPlayerData getMapPlayerData() {
+
+      return _mapPlayerData;
    }
 
    /**
@@ -274,6 +280,16 @@ public class MapPlayerManager {
       _animatedAngle = animatedAngle;
    }
 
+   public static void setAnimationMapScale(final double scale) {
+
+      // keep previous values
+//      _animationMap_Scale_Previous = _animationMap_Scale;
+//      _animationMap_ZoomLevel_Previous = _animationMap_ZoomLevel;
+//
+//      _animationMap_ZoomLevel = mapZoomLevel;
+      _animationMap_Scale = scale;
+   }
+
    public static void setAnimationStartTime() {
 
       _animationStartTime = System.currentTimeMillis();
@@ -345,18 +361,15 @@ public class MapPlayerManager {
     */
    public static void setupPlayer(final MapPlayerData mapPlayerData) {
 
+      _mapPlayerData = mapPlayerData;
+
 // SET_FORMATTING_OFF
+
 
       _isPlayerEnabled                 = mapPlayerData.isPlayerEnabled;
       _isAnimateFromRelativePosition   = mapPlayerData.isAnimateFromRelativePosition;
 
-      _animatedPositions               = mapPlayerData.animatedPositions;
-      _animatedGeoPoints               = mapPlayerData.allAvailableGeoPoints;
-      _animatedLocationIndices         = mapPlayerData.animatedLocationIndices;
-
-      _compileMapPosition              = mapPlayerData.compileMapPosition;
-
-      _numAllVisibleFrames             = _animatedPositions.size() / 2;
+      _numAllVisibleFrames             = mapPlayerData.animatedPositions.size() / 2;
 
 // SET_FORMATTING_ON
 

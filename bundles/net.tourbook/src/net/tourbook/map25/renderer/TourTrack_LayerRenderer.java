@@ -671,11 +671,15 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          return;
       }
 
-      final int currentZoomScale = 1 << viewport.pos.zoomLevel;
+      final int zoomLevel = viewport.pos.zoomLevel;
+
+      final int currentZoomScale = 1 << zoomLevel;
       final int currentX = (int) (viewport.pos.x * currentZoomScale);
       final int currentY = (int) (viewport.pos.y * currentZoomScale);
 
-      // update layers when map moved by at least one tile
+      /*
+       * Update layers when map moved by at least one tile or zoomlevel has changed
+       */
       if (currentX != __oldX || currentY != __oldY || currentZoomScale != __oldZoomScale || _isUpdateLayer) {
 
          /*
@@ -689,7 +693,14 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          _isUpdateLayer = false;
 
+         /*
+          * Submit compile task and repeat .poll() in each frame until it returns not null -> then
+          * proceed with new data
+          */
          _trackCompileWorker.submit(0);
+
+//         System.out.println("_trackCompileWorker.submit(0)");
+//         // TODO remove SYSTEM.OUT.PRINTLN
 
          __oldX = currentX;
          __oldY = currentY;
@@ -705,19 +716,27 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          return;
       }
 
+//      System.out.println("workerTask != null");
+//      // TODO remove SYSTEM.OUT.PRINTLN
+
       /*
-       * Compile layer with new map position
+       * Layer is compiled
        */
 
       // copy map position from workerTask.__mapPos -> _mapCompilePosition
       _compileMapPosition.copy(workerTask.__mapPos);
 
-      // compile layer
       final TourTrack_Bucket painterBucket = workerTask.__taskBucketManager.getBucket_Painter();
       _bucketManager_ForPainting.setBucket_Painter(painterBucket);
 
-      final boolean isDataAvailable = TourTrack_Shader.bindBufferData(painterBucket, _compileMapPosition);
+      final boolean isDataAvailable = TourTrack_Shader.bindBufferData(painterBucket);
 
       setReady(isDataAvailable);
+
+      /*
+       * Keep zoomlevel for the animation, otherwise the old zoomlevel would be used which is
+       * causing flickering
+       */
+      MapPlayerManager.setAnimationMapScale(_compileMapPosition.scale);
    }
 }

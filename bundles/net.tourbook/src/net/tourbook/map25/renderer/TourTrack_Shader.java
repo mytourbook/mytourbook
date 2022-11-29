@@ -205,7 +205,7 @@ public final class TourTrack_Shader {
     * @param viewport
     * @return Returns <code>true</code> when data are available
     */
-   public static boolean bindBufferData(final TourTrack_Bucket trackBucket, final MapPosition compileMapPosition) {
+   public static boolean bindBufferData(final TourTrack_Bucket trackBucket) {
 
       final int numTrackVertices = trackBucket == null
             ? 0
@@ -252,8 +252,6 @@ public final class TourTrack_Shader {
             mapPlayerData.animatedPositions              = trackBucket.animatedPositions;
             mapPlayerData.animatedLocationIndices        = trackBucket.animatedLocationIndices;
             mapPlayerData.allAvailableGeoPoints          = trackBucket.allAvailableGeoPoints;
-
-            mapPlayerData.compileMapPosition             = compileMapPosition;
 
 // SET_FORMATTING_ON
 

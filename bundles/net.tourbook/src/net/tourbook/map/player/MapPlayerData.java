@@ -18,7 +18,6 @@ package net.tourbook.map.player;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.core.GeoPoint;
-import org.oscim.core.MapPosition;
 
 /**
  * Data for the map animation player
@@ -41,10 +40,4 @@ public class MapPlayerData {
     * Contains all available geo locations (in E6 format) for all selected tours
     */
    public GeoPoint[]     allAvailableGeoPoints;
-
-   /**
-    * Map position when the tour track was compiled/computed
-    */
-   public MapPosition    compileMapPosition;
-
 }
