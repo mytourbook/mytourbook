@@ -2080,7 +2080,8 @@ public class Map25View extends ViewPart implements
    @Override
    public void setFocus() {
 
-//		_swtContainer.setFocus();
+      // activate map
+      _swtContainer.setFocus();
    }
 
    /**

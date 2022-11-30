@@ -737,6 +737,6 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
        * Keep zoomlevel for the animation, otherwise the old zoomlevel would be used which is
        * causing flickering
        */
-      MapPlayerManager.setAnimationMapScale(_compileMapPosition.scale);
+      MapPlayerManager.setCompileMapScale(_compileMapPosition.scale);
    }
 }

@@ -61,34 +61,21 @@ public class MapPlayerManager {
 
    private static MapPlayerData         _mapPlayerData;
 
-   private static double                _animationMap_Scale;
-//   private static int                   _animationMap_Scale_Previous;
-//   private static int                   _animationMap_ZoomLevel;
-//   private static int                   _animationMap_ZoomLevel_Previous;
+   /**
+    * Map scale with which the tour track was compiled
+    */
+   private static double                _compileMapScale;
+   private static boolean               _isCompileMapScaleSet;
 
    public static float getAnimatedAngle() {
 
       return _animatedAngle;
    }
 
-   public static double getAnimationMapScale(final int mapZoomLevel) {
+   public static double getCompileMapScale() {
 
-//      if (mapZoomLevel == _animationMap_ZoomLevel) {
-//
-      return _animationMap_Scale;
-//
-//      } else {
-//
-//         // return previous, the current value is not yet updated and would cause flickering
-//
-//         return _animationMap_Scale_Previous;
-//      }
+      return _compileMapScale;
    }
-
-//   public static int getAnimationZoomLevel() {
-//
-//      return _animationMap_ZoomLevel;
-//   }
 
    /**
     * @return Returns the last computed frame numer, it's in the range from
@@ -234,6 +221,19 @@ public class MapPlayerManager {
    }
 
    /**
+    * @return Returns <code>true</code> when the {@link #_compileMapScale} was just set. This flag
+    *         is reset after calling this method.
+    */
+   public static boolean isCompileMapScaleModified() {
+
+      final boolean isCompileMapScaleSet = _isCompileMapScaleSet;
+
+      _isCompileMapScaleSet = false;
+
+      return isCompileMapScaleSet;
+   }
+
+   /**
     * @return Returns <code>true</code> when the last frame in the animation is reached
     */
    public static boolean isLastFrame() {
@@ -280,19 +280,16 @@ public class MapPlayerManager {
       _animatedAngle = animatedAngle;
    }
 
-   public static void setAnimationMapScale(final double scale) {
-
-      // keep previous values
-//      _animationMap_Scale_Previous = _animationMap_Scale;
-//      _animationMap_ZoomLevel_Previous = _animationMap_ZoomLevel;
-//
-//      _animationMap_ZoomLevel = mapZoomLevel;
-      _animationMap_Scale = scale;
-   }
-
    public static void setAnimationStartTime() {
 
       _animationStartTime = System.currentTimeMillis();
+   }
+
+   public static void setCompileMapScale(final double scale) {
+
+      _compileMapScale = scale;
+
+      _isCompileMapScaleSet = true;
    }
 
    public static void setForegroundFPS(final int foregroundFPS) {

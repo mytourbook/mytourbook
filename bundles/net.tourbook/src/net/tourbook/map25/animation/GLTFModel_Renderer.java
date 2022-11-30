@@ -16,7 +16,6 @@
 package net.tourbook.map25.animation;
 
 import static org.oscim.backend.GLAdapter.gl;
-import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -40,7 +39,6 @@ import net.mgsx.gltf.scene3d.scene.SceneSkybox;
 import net.mgsx.gltf.scene3d.utils.IBLBuilder;
 import net.tourbook.map.player.MapPlayerData;
 import net.tourbook.map.player.MapPlayerManager;
-import net.tourbook.map25.renderer.TourTrack_Bucket;
 
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.oscim.backend.GL;
@@ -65,38 +63,47 @@ import org.slf4j.LoggerFactory;
  */
 public class GLTFModel_Renderer extends LayerRenderer {
 
-   private static final float COORD_SCALE_BY_DIR_SCALE = COORD_SCALE / TourTrack_Bucket.DIR_SCALE;
-
-   static final Logger        log                      = LoggerFactory.getLogger(GLTFModel_Renderer.class);
+   static final Logger        log               = LoggerFactory.getLogger(GLTFModel_Renderer.class);
 
    private Map                _map;
    private MapCameraMT        _mapCamera;
 
-   private Vector3            _tempVector              = new Vector3();
+   private Vector3            _tempVector       = new Vector3();
 
    private MapPosition        _currentMapPosition;
-   float[]                    _mapBox                  = new float[8];
+   float[]                    _mapBox           = new float[8];
 
    private Scene              _scene;
+
    private SceneAsset         _sceneAsset;
    private SceneManager       _sceneManager;
-
    private DirectionalLightEx _light;
+
    private Cubemap            _environmentCubemap;
    private Cubemap            _diffuseCubemap;
    private Cubemap            _specularCubemap;
    private Texture            _brdfLUT;
    private SceneSkybox        _skybox;
-
    private BoundingBox        _modelBoundingBox;
+
    private Vector3            _boundingBoxCenter;
    private float              _boundingBoxMinMaxDistance;
-
    private boolean            _isModelPositionUpdated;
 
-   private int                _prevMapZoomLevel;
+   /**
+    * Angle that the model is looking forward
+    */
+   private float              _modelForwardAngle;
 
-//   private boolean             loading;
+   private MODEL_Z_ADJUSTMENT _modelZAdjustment = MODEL_Z_ADJUSTMENT.None;
+
+   public enum MODEL_Z_ADJUSTMENT {
+
+      None, //
+
+      BoundingBox_Min_Negative, //
+
+   }
 
    public GLTFModel_Renderer(final Map map) {
 
@@ -138,35 +145,43 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
       SceneAsset asset = null;
 
-      // wood truck
-//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/basic_truck/scene.gltf"));
-
-      // wood plane - light reflection
-//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/basic_plane/scene.gltf"));
-
-      // simple bicycle
+      // simple bicycle with globe
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/2d_bike__downloadable_for_first_10_users/scene.gltf"));
+//      _modelForwardAngle = 90;
+//      _modelZAdjustment = MODEL_Z_ADJUSTMENT.BoundingBox_Min_Negative;
 
       // Hochrad - light reflection
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/pennyfarthest_bicycle/scene.gltf"));
+//      _modelZAdjustment = MODEL_Z_ADJUSTMENT.BoundingBox_Min_Negative;
 
       // gears - light reflection
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/gears/scene.gltf"));
+//      _modelForwardAngle = 90;
+//      _modelZAdjustment = MODEL_Z_ADJUSTMENT.BoundingBox_Min_Negative;
 
       // walking roboter
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/robot-_walk_animation/scene.gltf"));
 
       // skateboard
-      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/skateboard_animated_-_blockbench/scene.gltf"));
+//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/skateboard_animated_-_blockbench/scene.gltf"));
+//      _modelForwardAngle = 90;
+
+      // my first modified blender object
+      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/scateboard/mt-scateboard.gltf"));
+      _modelForwardAngle = 90;
 
       // zeppelin
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/zeppelin_aircraft/scene.gltf"));
+//      _modelForwardAngle = 180;
 
       // Locomotive frame
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/locomotive/scene.gltf"));
+//      _modelForwardAngle = 180;
+//      _modelZAdjustment = MODEL_Z_ADJUSTMENT.BoundingBox_Min_Negative;
 
       // Alter Anhänger
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/medieval_cart/scene.gltf"));
+//      _modelForwardAngle = 180;
 
       // z-fighting underneath
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/lawn_mower_low_poly/scene.gltf"));
@@ -176,6 +191,13 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
       // Historic baloon with model issue
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/steampunk_air_baloon/scene.gltf"));
+
+      // wood truck with position issue
+//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/basic_truck/scene.gltf"));
+
+      // wood plane - light reflection
+//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/basic_plane/scene.gltf"));
+//      _modelZAdjustment = MODEL_Z_ADJUSTMENT.BoundingBox_Min_Negative;
 
 //
 //    WITH EXCEPTION ISSUES
@@ -234,14 +256,21 @@ public class GLTFModel_Renderer extends LayerRenderer {
 //       _gltfRenderer.allModelInstances.addAll(_allModelInstances);
 //    }
 
+      if (MapPlayerManager.isCompileMapScaleModified()) {
+
+         final double mapScale = MapPlayerManager.getCompileMapScale();
+
+         _mapCamera.setMapPosition(_currentMapPosition.x, _currentMapPosition.y, mapScale);
+      }
+
       _mapCamera.update(viewport);
 
       // optimize model update
-      if (_isModelPositionUpdated) {
-         _isModelPositionUpdated = false;
-      } else {
-         updateModelPosition();
-      }
+//      if (_isModelPositionUpdated) {
+//         _isModelPositionUpdated = false;
+//      } else {
+//      }
+      updateModelPosition();
 
       final MapPosition cameraMapPosition = _mapCamera.mMapPosition;
       final MapPosition viewportPosition = viewport.pos;
@@ -435,68 +464,73 @@ public class GLTFModel_Renderer extends LayerRenderer {
       final double latitude = MercatorProjection.toLatitude(_currentMapPosition.y);
       final float groundScale = (float) MercatorProjection.groundResolutionWithScale(latitude, mapScale);
 
-      float modelScale = 1f / groundScale;
+      float modelScale;
 
-      /*
-       * Adjust to a normalized size which depends on the model size because the models can have big
-       * size differences
-       */
-//      modelScale /= _boundingBoxMinMaxDistance;
+      final boolean isFixedSize = true;
 
-      // viewport scale 2 map scale: is between 1...2
-      float vp2mp = (float) (currentMapScale / MapPlayerManager.getAnimationMapScale(currentMapZoomLevel));
+      if (isFixedSize) {
 
-      // increase model size to be more visible
-//      modelScale *= mapScale * viewport2mapscale * 30;
-//      modelScale *= 10000;
-//
-//      modelScale = (float) (modelScale / currentMapZoomLevel / Math.sqrt(currentMapZoomLevel));
+         final int modelSize = 300;
 
-      if (currentMapZoomLevel != _prevMapZoomLevel) {
+         // viewport scale 2 map scale: 1...2
+         final float vp2mp = (float) (currentMapScale / MapPlayerManager.getCompileMapScale());
 
-         int a = 0;
-         a++;
+         final float vp2mpModelSize = modelSize / vp2mp;
 
-         vp2mp = (float) (currentMapScale / MapPlayerManager.getAnimationMapScale(currentMapZoomLevel));
+         /*
+          * This algorithm is not perfect as the model can still be flickering (size is larger or
+          * smaller) but it is better than nothing. I spend 2 full days to get the flickering partly
+          * fixed
+          */
+         if (vp2mp < 1.0) {
 
-         _prevMapZoomLevel = currentMapZoomLevel;
-      }
+            modelScale = vp2mpModelSize / 2;
 
-      final int modelSize = 150;
+         } else if (vp2mp > 2.0) {
 
-//      if (vp2mp < 1.0) {
-//
-//         modelScale = modelSize / 2;
-//
-//      } else if (vp2mp > 2.0) {
-//
-//         modelScale = modelSize;
-//
-//      } else {
-//
-         modelScale = modelSize / vp2mp;
-//      }
+            modelScale = vp2mpModelSize * 2;
 
-//      System.out.println(String.format(""
+         } else {
+
+            modelScale = vp2mpModelSize;
+         }
+
+         modelScale /= _boundingBoxMinMaxDistance;
+
+//         System.out.println(String.format(""
 //
-//            + "   mapzooLvl %3d"
-//            + "   mapScl %10.1f"
+//               + "   mapzooLvl %3d"
+//               + "   mapScl %10.1f"
 //
-//            + "   modScl %7.3f"
-//            + "   vp2mp %7.3f"
+//               + "   modScl %7.3f"
+//               + "   vp2mp %7.3f"
 //
-//            + "%s",
+//               + "%s",
 //
-//            currentMapZoomLevel,
-//            currentMapScale,
+//               currentMapZoomLevel,
+//               currentMapScale,
 //
-//            modelScale,
-//            vp2mp,
+//               modelScale,
+//               vp2mp,
 //
-//            ""
+//               ""
 //
-//      ));
+//         ));
 // TODO remove SYSTEM.OUT.PRINTLN
+
+      } else {
+
+         modelScale = 1f / groundScale;
+
+         /*
+          * Adjust to a normalized size which depends on the model size because the models can have
+          * big size differences
+          */
+         modelScale /= _boundingBoxMinMaxDistance;
+
+         // increase model size to be more visible
+         modelScale *= 100;
+      }
 
       /*
        * Translate glTF model to the map position
@@ -511,40 +545,40 @@ public class GLTFModel_Renderer extends LayerRenderer {
       final Vector3 bbMax = _modelBoundingBox.max;
       final Vector3 bboxCenter = _boundingBoxCenter;
 
-      final float bbMinY = bbMin.y;
-      final float bbMaxY = bbMax.y;
+      final float xAdjustment = bboxCenter.x;
+      final float yAdjustment = bboxCenter.z;
+      float zAdjustment = 0;
 
-      final float xAdjustment = 0;//bboxCenter.x - 0f;
-      final float yAdjustment = 0;
-      final float zAdjustment = -bbMinY;// - bbMaxY;
+      switch (_modelZAdjustment) {
 
-//      System.out.println(String.format(""
-//
-//            + "dx:%5.3f"
-//            + "  dy:%5.3f"
-//            + "  %s"
-//
-//            ,
-//
-//            dxScaled,
-//            dyScaled,
-//            bboxCenter
-//
-//      ));
+      case BoundingBox_Min_Negative:
+         zAdjustment = -bbMin.y;
+         break;
 
-      // TODO remove SYSTEM.OUT.PRINTLN
+      default:
+         break;
+      }
+
+//      zAdjustment = -bbMin.y;
 
       // reset matrix to identity matrix
       modelTransform.idt();
 
       modelTransform.scale(modelScale, modelScale, modelScale);
 
+//      modelTransform.trn(
+//            dxScaled - xAdjustment,
+//            dyScaled - yAdjustment,
+//            zAdjustment);
       modelTransform.translate(
             dxScaled - xAdjustment,
             dyScaled - yAdjustment,
             zAdjustment);
 
+//      modelTransform.trn(0, 10, 0);
+
+//    _modelForwardAngle = 180;
       modelTransform.rotate(1, 0, 0, 90);
-      modelTransform.rotate(0, 1, 0, 90 - MapPlayerManager.getAnimatedAngle());
+      modelTransform.rotate(0, 1, 0, _modelForwardAngle - MapPlayerManager.getAnimatedAngle());
    }
 }
