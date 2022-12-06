@@ -83,6 +83,16 @@ public final class TourTrack_Shader {
 
    private static float                 _previousAngle;
 
+   /**
+    * When <code>true</code> then an animated triangle shows the exact cursor position
+    */
+   private static boolean               _isShowAnimationCursor;
+
+   /**
+    * Angle how much the animated symbols is rotated in the next frame
+    */
+   private static float                 _minSmoothAngle          = 0.5f;
+
    private static class AnimationShader extends GLShaderMT {
 
       /**
@@ -356,9 +366,8 @@ public final class TourTrack_Shader {
       float animatedAngle = p21Angle;
 
       final float angleDiff = getAngle_Difference(p21Angle, _previousAngle);
-      final float minSmoothAngle = 1.0f;
 
-      if (Math.abs(angleDiff) > minSmoothAngle) {
+      if (Math.abs(angleDiff) > _minSmoothAngle) {
 
          // default angle is larger than the min smooth angle
          // -> smoothout the animation with a smallers angle
@@ -366,8 +375,8 @@ public final class TourTrack_Shader {
          /*
           * Find the smallest angle diff to the current position
           */
-         final float prevAngle1Smooth = _previousAngle + minSmoothAngle;
-         final float prevAngle2Smooth = _previousAngle - minSmoothAngle;
+         final float prevAngle1Smooth = _previousAngle + _minSmoothAngle;
+         final float prevAngle2Smooth = _previousAngle - _minSmoothAngle;
 
          final float angleDiff1 = getAngle_Shortest(p21Angle, prevAngle1Smooth);
          final float angleDiff2 = getAngle_Shortest(p21Angle, prevAngle2Smooth);
@@ -823,38 +832,42 @@ public final class TourTrack_Shader {
 
       MapPlayerManager.setAnimatedAngle(angle);
 
-      // set mvp matrix
-      viewport.mvp.setAsUniform(shader.uni_MVP);
+      _isShowAnimationCursor = false;
+      if (_isShowAnimationCursor) {
 
-      // set animation position
-      gl.uniform2f(shader.uni_AnimationPos, pos2X, pos2Y);
+         // set mvp matrix
+         viewport.mvp.setAsUniform(shader.uni_MVP);
 
-      // set viewport scale TO map scale: 1.0...2.0
-      gl.uniform1f(shader.uni_VpScale2CompileScale, vp2mpScale);
+         // set animation position
+         gl.uniform2f(shader.uni_AnimationPos, pos2X, pos2Y);
 
-      // set vertices positions
-      final int shader_Attrib_Pos = shader.attrib_Pos;
-      gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_AnimationVertices);
-      gl.enableVertexAttribArray(shader_Attrib_Pos);
-      gl.vertexAttribPointer(
+         // set viewport scale TO map scale: 1.0...2.0
+         gl.uniform1f(shader.uni_VpScale2CompileScale, vp2mpScale);
 
-            shader_Attrib_Pos, //      index of the vertex attribute that is to be modified
-            3, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
-            GL.SHORT, //               data type of each component in the array
-            false, //                  values should be normalized
-            0, //                      offset in bytes between the beginning of consecutive vertex attributes
-            0 //                       offset in bytes of the first component in the vertex attribute array
-      );
+         // set vertices positions
+         final int shader_Attrib_Pos = shader.attrib_Pos;
+         gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_AnimationVertices);
+         gl.enableVertexAttribArray(shader_Attrib_Pos);
+         gl.vertexAttribPointer(
 
-      /*
-       * Draw animation
-       */
-      GLState.test(true, false);
-      gl.depthMask(true);
-      {
-         gl.drawArrays(GL.TRIANGLES, 0, _animationVertices.length);
+               shader_Attrib_Pos, //      index of the vertex attribute that is to be modified
+               3, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
+               GL.SHORT, //               data type of each component in the array
+               false, //                  values should be normalized
+               0, //                      offset in bytes between the beginning of consecutive vertex attributes
+               0 //                       offset in bytes of the first component in the vertex attribute array
+         );
+
+         /*
+          * Draw animation
+          */
+         GLState.test(true, false);
+         gl.depthMask(true);
+         {
+            gl.drawArrays(GL.TRIANGLES, 0, _animationVertices.length);
+         }
+         gl.depthMask(false);
       }
-      gl.depthMask(false);
 
 //    GLUtils.checkGlError(TourTrack_Shader.class.getName());
 

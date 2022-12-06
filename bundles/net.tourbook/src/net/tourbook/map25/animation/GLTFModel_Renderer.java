@@ -48,7 +48,6 @@ import org.oscim.core.MercatorProjection;
 import org.oscim.core.Tile;
 import org.oscim.event.Event;
 import org.oscim.map.Map;
-import org.oscim.map.Viewport;
 import org.oscim.renderer.GLState;
 import org.oscim.renderer.GLViewport;
 import org.oscim.renderer.LayerRenderer;
@@ -88,7 +87,6 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
    private Vector3            _boundingBoxCenter;
    private float              _boundingBoxMinMaxDistance;
-   private boolean            _isModelPositionUpdated;
 
    /**
     * Angle that the model is looking forward
@@ -96,6 +94,11 @@ public class GLTFModel_Renderer extends LayerRenderer {
    private float              _modelForwardAngle;
 
    private MODEL_Z_ADJUSTMENT _modelZAdjustment = MODEL_Z_ADJUSTMENT.None;
+
+   /**
+    * The model length needs a factor that the top of the symbol is not before the geo location
+    */
+   private double             _modelCenterToForwardFactor;
 
    public enum MODEL_Z_ADJUSTMENT {
 
@@ -145,6 +148,29 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
       SceneAsset asset = null;
 
+      /*
+       * MT models
+       */
+
+      // skateboard
+//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/skateboard/mt-skateboard.gltf"));
+//      _modelForwardAngle = 90;
+//      _modelCenterToForwardFactor=1.4;
+
+      // drawn bicycle
+      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/simple-bicycle/simple-bicycle.gltf"));
+      _modelForwardAngle = 90;
+      _modelCenterToForwardFactor = 5;
+
+      // hochrad
+//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/hochrad/hochrad.gltf"));
+//      _modelForwardAngle = -90;
+//      _modelCenterToForwardFactor = -7;
+
+      /*
+       * sketchfab.com models
+       */
+
       // simple bicycle with globe
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/2d_bike__downloadable_for_first_10_users/scene.gltf"));
 //      _modelForwardAngle = 90;
@@ -152,6 +178,8 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
       // Hochrad - light reflection
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/pennyfarthest_bicycle/scene.gltf"));
+//      _modelForwardAngle = -90;
+//      _modelCenterToForwardFactor = 1;
 //      _modelZAdjustment = MODEL_Z_ADJUSTMENT.BoundingBox_Min_Negative;
 
       // gears - light reflection
@@ -165,10 +193,6 @@ public class GLTFModel_Renderer extends LayerRenderer {
       // skateboard
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/skateboard_animated_-_blockbench/scene.gltf"));
 //      _modelForwardAngle = 90;
-
-      // my first modified blender object
-      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/scateboard/mt-scateboard.gltf"));
-      _modelForwardAngle = 90;
 
       // zeppelin
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/zeppelin_aircraft/scene.gltf"));
@@ -226,19 +250,10 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
       _currentMapPosition = mapPosition;
 
-      /*
-       * Camera and model positions must be set BEFORE render() method is called, otherwise the old
-       * position is used (maybe for one frame) and it is flickering
-       */
-      updateModelPosition();
-
-      _isModelPositionUpdated = true;
-
       final int mapZoomLevel = mapPosition.zoomLevel;
       final int mapScale = 1 << mapZoomLevel;
 
       _mapCamera.setMapPosition(mapPosition.x, mapPosition.y, mapScale);
-
    }
 
    @Override
@@ -258,22 +273,16 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
       if (MapPlayerManager.isCompileMapScaleModified()) {
 
-         final double mapScale = MapPlayerManager.getCompileMapScale();
+         _mapCamera.setMapPosition(
 
-         _mapCamera.setMapPosition(_currentMapPosition.x, _currentMapPosition.y, mapScale);
+               _currentMapPosition.x,
+               _currentMapPosition.y,
+               MapPlayerManager.getCompileMapScale());
       }
 
       _mapCamera.update(viewport);
 
-      // optimize model update
-//      if (_isModelPositionUpdated) {
-//         _isModelPositionUpdated = false;
-//      } else {
-//      }
       updateModelPosition();
-
-      final MapPosition cameraMapPosition = _mapCamera.mMapPosition;
-      final MapPosition viewportPosition = viewport.pos;
 
       gl.depthMask(true);
 
@@ -300,8 +309,10 @@ public class GLTFModel_Renderer extends LayerRenderer {
       final int numModels = 0;
       int numRendered = 0;
 
-      final Viewport mapViewport = _map.viewport();
-      mapViewport.getMapExtents(_mapBox, 10);
+      final MapPosition cameraMapPosition = _mapCamera.mMapPosition;
+      final MapPosition viewportPosition = viewport.pos;
+
+      _map.viewport().getMapExtents(_mapBox, 10);
 
       final float dx = (float) (cameraMapPosition.x - viewportPosition.x) * (Tile.SIZE << cameraMapPosition.zoomLevel);
       final float dy = (float) (cameraMapPosition.y - viewportPosition.y) * (Tile.SIZE << cameraMapPosition.zoomLevel);
@@ -331,8 +342,6 @@ public class GLTFModel_Renderer extends LayerRenderer {
 //          continue;
 //       }
 
-//            modelBatch.render(modelInstance, lights);
-
          numRendered++;
 //         }
 
@@ -341,8 +350,6 @@ public class GLTFModel_Renderer extends LayerRenderer {
             final float deltaTime = Gdx.graphics.getDeltaTime();
 
             // render
-//            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
-
             _sceneManager.update(deltaTime);
             _sceneManager.render();
          }
@@ -428,7 +435,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
    }
 
    /**
-    * Update model position
+    * Update model position, partly copied from {@link org.oscim.gdx.poi3d.GdxModelLayer}
     */
    private void updateModelPosition() {
 
@@ -497,27 +504,6 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
          modelScale /= _boundingBoxMinMaxDistance;
 
-//         System.out.println(String.format(""
-//
-//               + "   mapzooLvl %3d"
-//               + "   mapScl %10.1f"
-//
-//               + "   modScl %7.3f"
-//               + "   vp2mp %7.3f"
-//
-//               + "%s",
-//
-//               currentMapZoomLevel,
-//               currentMapScale,
-//
-//               modelScale,
-//               vp2mp,
-//
-//               ""
-//
-//         ));
-// TODO remove SYSTEM.OUT.PRINTLN
-
       } else {
 
          modelScale = 1f / groundScale;
@@ -538,15 +524,10 @@ public class GLTFModel_Renderer extends LayerRenderer {
       final float dx = (float) ((modelProjectedPositionX - _currentMapPosition.x) * tileScale);
       final float dy = (float) ((modelProjectedPositionY - _currentMapPosition.y) * tileScale);
 
-      final float dxScaled = dx / modelScale;
-      final float dyScaled = dy / modelScale;
-
       final Vector3 bbMin = _modelBoundingBox.min;
       final Vector3 bbMax = _modelBoundingBox.max;
       final Vector3 bboxCenter = _boundingBoxCenter;
 
-      final float xAdjustment = bboxCenter.x;
-      final float yAdjustment = bboxCenter.z;
       float zAdjustment = 0;
 
       switch (_modelZAdjustment) {
@@ -559,26 +540,44 @@ public class GLTFModel_Renderer extends LayerRenderer {
          break;
       }
 
-//      zAdjustment = -bbMin.y;
+      float animationAngle_Degree = -MapPlayerManager.getAnimatedAngle();
+      animationAngle_Degree += _modelForwardAngle;
+
+      /**
+       * Adjust the center of the symbol to be at the top of the symbol, needs some maths with
+       * sinus/cosinus.
+       * <p>
+       * It took me many hours to get this math fixed because this matrix cannot do it as in the
+       * shader code, e.g.
+       * * rotate<br>
+       * * scale<br>
+       * * translate head to center<br>
+       * * translate symbol to geo location<br>
+       */
+
+      final double animationAngle_Rad = Math.toRadians(animationAngle_Degree);
+      final double center2Border_Sin = Math.sin(animationAngle_Rad);
+      final double center2Border_Cos = Math.cos(animationAngle_Rad);
+
+//      _modelCenterToForwardFactor = 5;
+
+      final double halfSize = modelScale / 2;
+      final double center2BorderSize = halfSize * _modelCenterToForwardFactor;
+      final float forwardX = (float) (center2BorderSize * center2Border_Cos);
+      final float forwardY = (float) (center2BorderSize * center2Border_Sin);
 
       // reset matrix to identity matrix
       modelTransform.idt();
 
       modelTransform.scale(modelScale, modelScale, modelScale);
 
-//      modelTransform.trn(
-//            dxScaled - xAdjustment,
-//            dyScaled - yAdjustment,
-//            zAdjustment);
-      modelTransform.translate(
-            dxScaled - xAdjustment,
-            dyScaled - yAdjustment,
-            zAdjustment);
-
-//      modelTransform.trn(0, 10, 0);
-
-//    _modelForwardAngle = 180;
       modelTransform.rotate(1, 0, 0, 90);
-      modelTransform.rotate(0, 1, 0, _modelForwardAngle - MapPlayerManager.getAnimatedAngle());
+      modelTransform.rotate(0, 1, 0, animationAngle_Degree);
+
+      // move to the track position
+      modelTransform.trn(
+            dx + forwardX,
+            dy + forwardY,
+            zAdjustment);
    }
 }

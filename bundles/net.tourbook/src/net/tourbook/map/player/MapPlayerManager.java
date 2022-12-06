@@ -358,6 +358,10 @@ public class MapPlayerManager {
     */
    public static void setupPlayer(final MapPlayerData mapPlayerData) {
 
+      if (mapPlayerData.animatedPositions == null) {
+         return;
+      }
+
       _mapPlayerData = mapPlayerData;
 
 // SET_FORMATTING_OFF
