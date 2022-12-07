@@ -1304,11 +1304,11 @@ public class Map25View extends ViewPart implements
       enableContextMenuActions();
    }
 
-   void fireSyncMapEvent(final MapPosition mapPosition, final int positionFlags) {
+   void fireSyncMapEvent(final MapPosition mapPosition, final SyncParameter syncParameter) {
 
       _lastFiredSyncEventTime = System.currentTimeMillis();
 
-      MapManager.fireSyncMapEvent(mapPosition, this, positionFlags);
+      MapManager.fireSyncMapEvent(mapPosition, this, syncParameter);
 
       updateUI_MapPosition(mapPosition.getLatitude(), mapPosition.getLongitude(), mapPosition.zoomLevel);
    }
@@ -2289,7 +2289,7 @@ public class Map25View extends ViewPart implements
    @Override
    public void syncMapWithOtherMap(final MapPosition mapPosition,
                                    final ViewPart viewPart,
-                                   final int positionFlags) {
+                                   final IMapSyncListener.SyncParameter syncParameter) {
 
       if (_mapSynchedWith != MapSync.WITH_OTHER_MAP) {
 

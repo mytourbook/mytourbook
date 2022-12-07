@@ -2922,7 +2922,7 @@ public class Map2View extends ViewPart implements
             geoCenter.longitude,
             Math.pow(2, zoomLevel - 1));
 
-      MapManager.fireSyncMapEvent(mapPosition, this, 0);
+      MapManager.fireSyncMapEvent(mapPosition, this, null);
    }
 
    private void mapListener_MapSelection(final ISelection selection) {
@@ -4990,7 +4990,7 @@ public class Map2View extends ViewPart implements
    @Override
    public void syncMapWithOtherMap(final MapPosition mapPosition,
                                    final ViewPart viewPart,
-                                   final int positionFlags) {
+                                   final IMapSyncListener.SyncParameter syncParameter) {
 
       if (!_isMapSyncWith_OtherMap) {
 

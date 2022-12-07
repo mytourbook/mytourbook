@@ -269,7 +269,7 @@ public class InputHandlerMT extends InputHandler {
             _map.setMapPosition(mapPosition);
             _map.render();
 
-            _mapView.fireSyncMapEvent(mapPosition, IMapSyncListener.RESET_TILT);
+            _mapView.fireSyncMapEvent(mapPosition, IMapSyncListener.SyncParameter.RESET_TILT);
 
          } else {
 
@@ -281,7 +281,7 @@ public class InputHandlerMT extends InputHandler {
             _map.setMapPosition(mapPosition);
             _map.render();
 
-            _mapView.fireSyncMapEvent(mapPosition, IMapSyncListener.RESET_BEARING);
+            _mapView.fireSyncMapEvent(mapPosition, IMapSyncListener.SyncParameter.RESET_BEARING);
          }
 
          return true;
@@ -588,7 +588,7 @@ public class InputHandlerMT extends InputHandler {
          _isReCenter = false;
 
          // get map center
-			final GeoPoint mapCenter = _viewport.fromScreenPoint(screenX, screenY);
+         final GeoPoint mapCenter = _viewport.fromScreenPoint(screenX, screenY);
 
          _map.animator().animateTo(800, mapCenter, 1, true, Easing.Type.SINE_INOUT);
          _map.updateMap(false);

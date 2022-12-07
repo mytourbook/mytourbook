@@ -698,7 +698,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          @Override
          public void onMapEvent(final Event e, final MapPosition mapPosition) {
 
-            _map25View.fireSyncMapEvent(mapPosition, 0);
+            _map25View.fireSyncMapEvent(mapPosition, null);
          }
       });
    }
