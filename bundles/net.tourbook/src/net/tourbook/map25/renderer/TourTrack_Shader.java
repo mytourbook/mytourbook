@@ -84,11 +84,6 @@ public final class TourTrack_Shader {
    private static float                 _previousAngle;
 
    /**
-    * When <code>true</code> then an animated triangle shows the exact cursor position
-    */
-   private static boolean               _isShowAnimationCursor;
-
-   /**
     * Angle how much the animated symbols is rotated in the next frame
     */
    private static float                 _minSmoothAngle          = 0.5f;
@@ -450,7 +445,7 @@ public final class TourTrack_Shader {
       {
          // get animated position
          final int nextFrameIndex = MapPlayerManager.getNextFrameIndex();
-         final int numAllFrames = MapPlayerManager.getNumberofAllFrames();
+         final int numAllFrames = MapPlayerManager.getNumberofVisibleFrames();
 
          final float relativeVisibleVertices = (float) nextFrameIndex / numAllFrames;
 
@@ -835,8 +830,7 @@ public final class TourTrack_Shader {
 
       MapPlayerManager.setAnimatedAngle(angle);
 
-      _isShowAnimationCursor = true;
-      if (_isShowAnimationCursor) {
+      if (MapPlayerManager.isShowAnimationCursor()) {
 
          // set mvp matrix
          viewport.mvp.setAsUniform(shader.uni_MVP);

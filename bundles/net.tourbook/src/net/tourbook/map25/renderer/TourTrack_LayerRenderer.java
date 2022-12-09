@@ -63,7 +63,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    private TourTrack_BucketManager       _bucketManager_ForWorker;
 
    private boolean                       _isUpdateLayer;
-   private boolean                       _isUpdatePoints;
+   private boolean                       _isUpdateNewPoints;
 
    /**
     * Contains all available geo locations for all selected tours in lat/lon E6 format.
@@ -189,11 +189,15 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          int numGeoPoints = __numGeoPoints;
 
-         if (_isUpdatePoints) {
+         if (_isUpdateNewPoints) {
+
+            /*
+             * Create projected points (0...1) for all geo points
+             */
 
             synchronized (_allGeoPoints) {
 
-               _isUpdatePoints = false;
+               _isUpdateNewPoints = false;
                __numGeoPoints = numGeoPoints = _allGeoPoints.length;
 
                double[] projectedPoints = __allProjectedPoints;
@@ -655,7 +659,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
       _trackCompileWorker.cancel(true);
 
-      _isUpdatePoints = true;
+      _isUpdateNewPoints = true;
       _isUpdateLayer = true;
 
       TourTrack_Shader.resetAngle();
@@ -699,14 +703,14 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
           */
          _trackCompileWorker.submit(0);
 
-//         System.out.println("_trackCompileWorker.submit(0)");
-//         // TODO remove SYSTEM.OUT.PRINTLN
-
          __oldX = currentX;
          __oldY = currentY;
          __oldZoomScale = currentZoomScale;
       }
 
+      /*
+       * workerTask is not null after the track is compiled
+       */
       final TourCompileTask workerTask = _trackCompileWorker.poll();
 
       if (workerTask == null) {
@@ -716,11 +720,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          return;
       }
 
-//      System.out.println("workerTask != null");
-//      // TODO remove SYSTEM.OUT.PRINTLN
-
       /*
-       * Layer is compiled
+       * Layer is compiled (above) in
+       * TourTrack_LayerRenderer.TrackCompileWorker.doWork(TourCompileTask)
        */
 
       // copy map position from workerTask.__mapPos -> _mapCompilePosition

@@ -327,6 +327,7 @@ public class Map25ConfigManager {
    private static Easing.Type   _animationEasingType               = ANIMATION_EASING_TYPE_DEFAULT;
    private static int           _animationTime                     = LOCATION_ANIMATION_TIME_DEFAULT;
    private static boolean       _isAnimateLocation                 = IS_ANIMATE_LOCATION_DEFAULT;
+   private static long          _lastAnimationTime;
    //
    public static boolean        useDraggedKeyboardNavigation       = USE_DRAGGED_KEY_NAVIGATION_DEFAULT;
    //
@@ -1400,18 +1401,25 @@ public class Map25ConfigManager {
 
       if (isRunAnimation) {
 
-//         System.out.println((System.currentTimeMillis() + " setMapLocation_InMapThread"));
-//         // setMapLocation remove SYSTEM.OUT.PRINTLN
+         final long currentTime = System.currentTimeMillis();
+         final long timeDiff = currentTime - _lastAnimationTime;
 
-         final Animator animator = map.animator();
+         if (timeDiff < 400) {
 
-         animator.animateTo(
-               _animationTime,
-               mapPosition,
-               _animationEasingType);
+            // skip too many updates, otherwise the animation is not started
 
-         // updateMap() is very important otherwise the animation is not working
-         map.updateMap(true);
+         } else {
+
+            map.animator().animateTo(
+                  _animationTime,
+                  mapPosition,
+                  _animationEasingType);
+
+            // updateMap() is very important otherwise the animation is not working
+            map.updateMap(true);
+
+            _lastAnimationTime = currentTime;
+         }
 
       } else {
 

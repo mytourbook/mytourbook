@@ -67,6 +67,11 @@ public class MapPlayerManager {
    private static double                _compileMapScale;
    private static boolean               _isCompileMapScaleSet;
 
+   /**
+    * When <code>true</code> then an animated triangle shows the exact cursor position
+    */
+   private static boolean               _isShowAnimationCursor;
+
    public static float getAnimatedAngle() {
 
       return _animatedAngle;
@@ -195,7 +200,8 @@ public class MapPlayerManager {
       return getValidIndex(nextFrameNumber);
    }
 
-   public static int getNumberofAllFrames() {
+   public static int getNumberofVisibleFrames() {
+
       return _numAllVisibleFrames;
    }
 
@@ -261,6 +267,13 @@ public class MapPlayerManager {
       return _isReLivePlaying;
    }
 
+   public static boolean isShowAnimationCursor() {
+
+      _isShowAnimationCursor = true;
+
+      return _isShowAnimationCursor;
+   }
+
    public static void restoreState() {
 
       _foregroundFPS = Util.getStateInt(_state, STATE_FOREGROUND_FPS, 10);
@@ -319,6 +332,10 @@ public class MapPlayerManager {
    public static void setIsReLivePlaying(final boolean isReLivePlaying) {
 
       _isReLivePlaying = isReLivePlaying;
+   }
+
+   public static void setIsShowAnimationCursor(final boolean _isShowAnimationCursor) {
+      MapPlayerManager._isShowAnimationCursor = _isShowAnimationCursor;
    }
 
    public static void setMapPlayerViewer(final MapPlayerView mapPlayerView) {
