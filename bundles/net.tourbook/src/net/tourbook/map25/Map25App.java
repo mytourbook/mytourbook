@@ -68,7 +68,6 @@ import org.oscim.backend.DateTime;
 import org.oscim.backend.DateTimeAdapter;
 import org.oscim.backend.GLAdapter;
 import org.oscim.core.MapPosition;
-import org.oscim.event.Event;
 import org.oscim.gdx.GdxAssets;
 import org.oscim.gdx.GdxMap;
 import org.oscim.gdx.GestureHandlerImpl;
@@ -82,7 +81,7 @@ import org.oscim.layers.marker.MarkerItem;
 import org.oscim.layers.tile.bitmap.BitmapTileLayer;
 import org.oscim.layers.tile.buildings.S3DBLayer;
 import org.oscim.map.Layers;
-import org.oscim.map.Map.UpdateListener;
+import org.oscim.map.Map;
 import org.oscim.map.ViewController;
 import org.oscim.renderer.BitmapRenderer;
 import org.oscim.renderer.ExtrusionRenderer;
@@ -211,7 +210,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private S3DBLayer                            _layer_Building_S3DB;
    private GenericLayer                         _layer_Building_S3DB_SunUpdate;
    private CompassRoseLayer                     _layer_CompassRose;
-   private GLTFModel_Layer                       _layer_GLTFModel;
+   private GLTFModel_Layer                      _layer_GLTFModel;
    private Layer                                _layer_HillShading_AFTER;
    private BitmapTileLayer                      _layer_HillShading_TILE_LOADING;
    private LabelLayerMT                         _layer_Label;
@@ -694,11 +693,25 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       Gdx.input.setInputProcessor(mux);
 
-      mMap.events.bind(new UpdateListener() {
-         @Override
-         public void onMapEvent(final Event e, final MapPosition mapPosition) {
+      mMap.events.bind((event, mapPosition) -> {
 
-            _map25View.fireSyncMapEvent(mapPosition, null);
+         if (event == Map.POSITION_EVENT) {
+
+            // map position is moved
+
+
+            /*
+             * Prevent to "refire" the last sync map position. This is the cheapest solution
+             * otherwise fireSyncMapEvent had to be called on each map position change methods
+             */
+            final long timeDiff = System.currentTimeMillis() - _map25View.getLastReceivedSyncEventTime();
+            if (timeDiff > 2000) {
+
+//               System.out.println((System.currentTimeMillis() + " fire timeDiff:" + timeDiff));
+//               // TODO remove SYSTEM.OUT.PRINTLN
+
+               _map25View.fireSyncMapEvent(mapPosition, null);
+            }
          }
       });
    }

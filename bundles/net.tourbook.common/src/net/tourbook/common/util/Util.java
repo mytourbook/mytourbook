@@ -1701,6 +1701,35 @@ public class Util {
       return value;
    }
 
+   /**
+    * @param xmlMemento
+    * @param key
+    * @param defaultValue
+    * @param minValue
+    *           min value
+    * @param maxValue
+    *           max value
+    * @return
+    */
+   public static int getXmlIntInt(final XMLMemento xmlMemento,
+                                  final String key,
+                                  final int defaultValue,
+                                  final int minValue,
+                                  final int maxValue) {
+
+      final int value = getXmlInteger(xmlMemento, key, defaultValue);
+
+      if (value < minValue) {
+         return minValue;
+      }
+
+      if (value > maxValue) {
+         return maxValue;
+      }
+
+      return value;
+   }
+
    public static Long getXmlLong(final IMemento memento, final String key, final Long defaultValue) {
 
       final String strValue = memento.getString(key);
@@ -1754,6 +1783,35 @@ public class Util {
       }
 
       return values;
+   }
+
+   /**
+    * @param xmlMemento
+    * @param key
+    * @param defaultValue
+    * @param minValue
+    *           min value
+    * @param maxValue
+    *           max value
+    * @return
+    */
+   public static long getXmlLongLong(final XMLMemento xmlMemento,
+                                     final String key,
+                                     final long defaultValue,
+                                     final long minValue,
+                                     final long maxValue) {
+
+      final Long value = getXmlLong(xmlMemento, key, defaultValue);
+
+      if (value < minValue) {
+         return minValue;
+      }
+
+      if (value > maxValue) {
+         return maxValue;
+      }
+
+      return value;
    }
 
    /**

@@ -23,8 +23,8 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
  */
 public class Map25FPSManager {
 
-   public static int                            DEFAULT_FOREGROUND_FPS = 30;
-   private static int                           DEFAULT_BACKGROUND_FPS = 1;
+   public static final int                      DEFAULT_FOREGROUND_FPS = 30;
+   private static final int                     DEFAULT_BACKGROUND_FPS = 1;
 
    private static LwjglApplication              _lwjglApp;
    private static LwjglApplicationConfiguration _appConfig;

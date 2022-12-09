@@ -40,4 +40,9 @@ public class MapPlayerData {
     * Contains all available geo locations (in E6 format) for all selected tours
     */
    public GeoPoint[]     allAvailableGeoPoints;
+
+   /**
+    * Map scale when binding buffer data
+    */
+   public double         mapScale;
 }

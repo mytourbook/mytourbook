@@ -79,6 +79,7 @@ import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map2.view.IDiscreteColorProvider;
 import net.tourbook.map2.view.SelectionMapPosition;
+import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.map3.Messages;
 import net.tourbook.map3.action.ActionMap3Color;
 import net.tourbook.map3.action.ActionOpenMap3StatisticsView;
@@ -586,7 +587,14 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          @Override
          public void partActivated(final IWorkbenchPartReference partRef) {
+
             onPartVisible(partRef);
+
+            if (partRef.getPart(false) == Map3View.this) {
+
+               // ensure that map sync is working
+               Map25FPSManager.setBackgroundFPSToAnimationFPS(true);
+            }
          }
 
          @Override
@@ -598,10 +606,17 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          public void partClosed(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
+         public void partDeactivated(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == Map3View.this) {
+
+               Map25FPSManager.setBackgroundFPSToAnimationFPS(false);
+            }
+         }
 
          @Override
          public void partHidden(final IWorkbenchPartReference partRef) {
+
             if (partRef.getPart(false) == Map3View.this) {
                _isPartVisible = false;
             }
@@ -1521,7 +1536,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    private void moveToMapLocation(final MapPosition mapPosition, final IMapSyncListener.SyncParameter syncParameter) {
 
-      final int zoomLevel = mapPosition.zoomLevel + 0;
+      final int zoomLevel = mapPosition.zoomLevel + 1;
       final double latitude = mapPosition.getLatitude();
       final double longitude = mapPosition.getLongitude();
 

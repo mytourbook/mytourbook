@@ -117,6 +117,7 @@ import net.tourbook.map2.action.ActionZoomOut;
 import net.tourbook.map2.action.ActionZoomShowEntireMap;
 import net.tourbook.map2.action.ActionZoomShowEntireTour;
 import net.tourbook.map2.action.Action_ExportMap_SubMenu;
+import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoEventId;
@@ -452,7 +453,7 @@ public class Map2View extends ViewPart implements
     */
    private MapSyncMode                       _currentMapSyncMode   = MapSyncMode.IsSyncWith_NONE;
    private boolean                           _isInMapSync;
-   private long                              _lastFiredSyncEventTime;
+   private long                              _lastFiredMapSyncEventTime;
    //
    private boolean                           _isMapSyncWith_OtherMap;
    private boolean                           _isMapSyncWith_Photo;
@@ -1380,7 +1381,14 @@ public class Map2View extends ViewPart implements
 
          @Override
          public void partActivated(final IWorkbenchPartReference partRef) {
+
             onPartVisible(partRef);
+
+            if (partRef.getPart(false) == Map2View.this) {
+
+               // ensure that map sync is working
+               Map25FPSManager.setBackgroundFPSToAnimationFPS(true);
+            }
          }
 
          @Override
@@ -1394,7 +1402,12 @@ public class Map2View extends ViewPart implements
          }
 
          @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
+         public void partDeactivated(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == Map2View.this) {
+               Map25FPSManager.setBackgroundFPSToAnimationFPS(false);
+            }
+         }
 
          @Override
          public void partHidden(final IWorkbenchPartReference partRef) {
@@ -2915,7 +2928,7 @@ public class Map2View extends ViewPart implements
          return;
       }
 
-      _lastFiredSyncEventTime = System.currentTimeMillis();
+      _lastFiredMapSyncEventTime = System.currentTimeMillis();
 
       final MapPosition mapPosition = new MapPosition(
             geoCenter.latitude,
@@ -3008,7 +3021,7 @@ public class Map2View extends ViewPart implements
    @Override
    public void moveToMapLocation(final MapBookmark mapBookmark) {
 
-      _lastFiredSyncEventTime = System.currentTimeMillis();
+      _lastFiredMapSyncEventTime = System.currentTimeMillis();
 
       MapBookmarkManager.setLastSelectedBookmark(mapBookmark);
 
@@ -4992,7 +5005,7 @@ public class Map2View extends ViewPart implements
                                    final ViewPart viewPart,
                                    final IMapSyncListener.SyncParameter syncParameter) {
 
-      if (!_isMapSyncWith_OtherMap) {
+      if (_isMapSyncWith_OtherMap == false) {
 
          // sync feature is disabled
 
@@ -5010,7 +5023,7 @@ public class Map2View extends ViewPart implements
          return;
       }
 
-      final long timeDiff = System.currentTimeMillis() - _lastFiredSyncEventTime;
+      final long timeDiff = System.currentTimeMillis() - _lastFiredMapSyncEventTime;
 
       if (timeDiff < 1000) {
          // ignore because it causes LOTS of problems when synching moved map

@@ -729,7 +729,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       final TourTrack_Bucket painterBucket = workerTask.__taskBucketManager.getBucket_Painter();
       _bucketManager_ForPainting.setBucket_Painter(painterBucket);
 
-      final boolean isDataAvailable = TourTrack_Shader.bindBufferData(painterBucket);
+      final boolean isDataAvailable = TourTrack_Shader.bindBufferData(painterBucket, viewport);
 
       setReady(isDataAvailable);
 

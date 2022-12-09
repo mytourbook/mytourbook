@@ -317,16 +317,17 @@ public class Map25ConfigManager {
    // map movement with animation
    private static final Easing.Type ANIMATION_EASING_TYPE_DEFAULT   = Easing.Type.SINE_INOUT;
    private static final boolean     IS_ANIMATE_LOCATION_DEFAULT     = true;
-   private static final float       LOCATION_ANIMATION_TIME_DEFAULT = 3.0f;
-   public static final float        LOCATION_ANIMATION_TIME_MIN     = 0f;
-   public static final float        LOCATION_ANIMATION_TIME_MAX     = 60.0f;
+   private static final int         LOCATION_ANIMATION_TIME_DEFAULT = 500;
+   private static final int         LOCATION_ANIMATION_TIME_MIN     = 0;
+   private static final int         LOCATION_ANIMATION_TIME_MAX     = 60_000;
    //
    // options
    private static final boolean USE_DRAGGED_KEY_NAVIGATION_DEFAULT = false;
    //
-   public static Easing.Type    animationEasingType                = ANIMATION_EASING_TYPE_DEFAULT;
-   public static float          animationTime                      = LOCATION_ANIMATION_TIME_DEFAULT;
-   public static boolean        isAnimateLocation                  = IS_ANIMATE_LOCATION_DEFAULT;
+   private static Easing.Type   _animationEasingType               = ANIMATION_EASING_TYPE_DEFAULT;
+   private static int           _animationTime                     = LOCATION_ANIMATION_TIME_DEFAULT;
+   private static boolean       _isAnimateLocation                 = IS_ANIMATE_LOCATION_DEFAULT;
+   //
    public static boolean        useDraggedKeyboardNavigation       = USE_DRAGGED_KEY_NAVIGATION_DEFAULT;
    //
    // !!! this is a code formatting separator !!!
@@ -1174,14 +1175,14 @@ public class Map25ConfigManager {
          return;
       }
 
-      isAnimateLocation = Util.getXmlBoolean(xmlOptions, ATTR_IS_ANIMATE_LOCATION, IS_ANIMATE_LOCATION_DEFAULT);
+      _isAnimateLocation = Util.getXmlBoolean(xmlOptions, ATTR_IS_ANIMATE_LOCATION, IS_ANIMATE_LOCATION_DEFAULT);
 
-      animationEasingType = (Easing.Type) Util.getXmlEnum(
+      _animationEasingType = (Easing.Type) Util.getXmlEnum(
             xmlOptions,
             ATTR_ANIMATION_EASING_TYPE,
             ANIMATION_EASING_TYPE_DEFAULT);
 
-      animationTime = Util.getXmlFloatFloat(
+      _animationTime = Util.getXmlIntInt(
             xmlOptions,
             ATTR_ANIMATION_TIME,
             LOCATION_ANIMATION_TIME_DEFAULT,
@@ -1318,10 +1319,10 @@ public class Map25ConfigManager {
 
       final IMemento xmlOptions = xmlRoot.createChild(TAG_OPTIONS);
       {
-         xmlOptions.putBoolean(ATTR_IS_ANIMATE_LOCATION, isAnimateLocation);
-         xmlOptions.putFloat(ATTR_ANIMATION_TIME, animationTime);
+         xmlOptions.putBoolean(ATTR_IS_ANIMATE_LOCATION, _isAnimateLocation);
+         xmlOptions.putInteger(ATTR_ANIMATION_TIME, _animationTime);
 
-         Util.setXmlEnum(xmlOptions, ATTR_ANIMATION_EASING_TYPE, animationEasingType);
+         Util.setXmlEnum(xmlOptions, ATTR_ANIMATION_EASING_TYPE, _animationEasingType);
 
          xmlOptions.putBoolean(ATTR_USE_DRAGGED_KEY_NAVIGATION, useDraggedKeyboardNavigation);
       }
@@ -1366,11 +1367,10 @@ public class Map25ConfigManager {
       final Animator animator = map.animator();
 
       // zero will not move the map, set 1 ms
-      if (locationAnimationTime == 0 || isAnimateLocation == false) {
+      if (locationAnimationTime == 0 || _isAnimateLocation == false) {
          locationAnimationTime = 1;
       }
 
-      animator.cancel();
       animator.animateTo(
             locationAnimationTime,
             boundingBox,
@@ -1386,34 +1386,36 @@ public class Map25ConfigManager {
 
       } else {
 
-         map.post(new Runnable() {
-            @Override
-            public void run() {
-
-               setMapLocation_InMapThread(map, mapPosition);
-            }
-         });
+         map.post(() -> setMapLocation_InMapThread(map, mapPosition));
       }
 
    }
 
    private static void setMapLocation_InMapThread(final Map map, final MapPosition mapPosition) {
 
-//      final boolean isAnimation = animationTime != 0 && isAnimateLocation;
-//
-//      if (isAnimation) {
-//
-//         final Animator animator = map.animator();
-//
-//         animator.cancel();
-//         animator.animateTo(
-//               (long) (animationTime * 1000),
-//               mapPosition,
-//               animationEasingType);
-//      } else {
-//
-//      map.setMapPosition(mapPosition);
-      map.setMapPosition(mapPosition);
-//      }
+      _animationTime = 800;
+      _isAnimateLocation = true;
+
+      final boolean isRunAnimation = _animationTime != 0 && _isAnimateLocation;
+
+      if (isRunAnimation) {
+
+//         System.out.println((System.currentTimeMillis() + " setMapLocation_InMapThread"));
+//         // setMapLocation remove SYSTEM.OUT.PRINTLN
+
+         final Animator animator = map.animator();
+
+         animator.animateTo(
+               _animationTime,
+               mapPosition,
+               _animationEasingType);
+
+         // updateMap() is very important otherwise the animation is not working
+         map.updateMap(true);
+
+      } else {
+
+         map.setMapPosition(mapPosition);
+      }
    }
 }

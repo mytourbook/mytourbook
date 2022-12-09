@@ -215,7 +215,7 @@ public final class TourTrack_Shader {
     * @param viewport
     * @return Returns <code>true</code> when data are available
     */
-   public static boolean bindBufferData(final TourTrack_Bucket trackBucket) {
+   public static boolean bindBufferData(final TourTrack_Bucket trackBucket, final GLViewport viewport) {
 
       final int numTrackVertices = trackBucket == null
             ? 0
@@ -262,6 +262,8 @@ public final class TourTrack_Shader {
             mapPlayerData.animatedPositions              = trackBucket.animatedPositions;
             mapPlayerData.animatedLocationIndices        = trackBucket.animatedLocationIndices;
             mapPlayerData.allAvailableGeoPoints          = trackBucket.allAvailableGeoPoints;
+
+            mapPlayerData.mapScale                      = viewport.pos.scale;
 
 // SET_FORMATTING_ON
 
@@ -367,6 +369,8 @@ public final class TourTrack_Shader {
 
       final float angleDiff = getAngle_Difference(p21Angle, _previousAngle);
 
+      _minSmoothAngle = 1f;
+
       if (Math.abs(angleDiff) > _minSmoothAngle) {
 
          // default angle is larger than the min smooth angle
@@ -456,7 +460,7 @@ public final class TourTrack_Shader {
 
             if (trackConfig.arrow_IsAnimate) {
 
-               paint_30_Animation(viewport, compileMapPosition, viewport2mapscale, trackBucket, nextFrameIndex);
+               paint_30_Animation(viewport, viewport2mapscale, trackBucket, nextFrameIndex);
 
             } else {
 
@@ -801,7 +805,6 @@ public final class TourTrack_Shader {
    }
 
    private static void paint_30_Animation(final GLViewport viewport,
-                                          final MapPosition compileMapPosition,
                                           final float vp2mpScale,
                                           final TourTrack_Bucket trackBucket,
                                           final int nextFrameIndex) {
@@ -832,7 +835,7 @@ public final class TourTrack_Shader {
 
       MapPlayerManager.setAnimatedAngle(angle);
 
-      _isShowAnimationCursor = false;
+      _isShowAnimationCursor = true;
       if (_isShowAnimationCursor) {
 
          // set mvp matrix

@@ -23,6 +23,7 @@ import com.badlogic.gdx.graphics.Cubemap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.model.Animation;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
@@ -62,15 +63,15 @@ import org.slf4j.LoggerFactory;
  */
 public class GLTFModel_Renderer extends LayerRenderer {
 
-   static final Logger        log               = LoggerFactory.getLogger(GLTFModel_Renderer.class);
+   static final Logger        log         = LoggerFactory.getLogger(GLTFModel_Renderer.class);
 
    private Map                _map;
    private MapCameraMT        _mapCamera;
 
-   private Vector3            _tempVector       = new Vector3();
+   private Vector3            _tempVector = new Vector3();
 
    private MapPosition        _currentMapPosition;
-   float[]                    _mapBox           = new float[8];
+   float[]                    _mapBox     = new float[8];
 
    private Scene              _scene;
 
@@ -93,20 +94,10 @@ public class GLTFModel_Renderer extends LayerRenderer {
     */
    private float              _modelForwardAngle;
 
-   private MODEL_Z_ADJUSTMENT _modelZAdjustment = MODEL_Z_ADJUSTMENT.None;
-
    /**
     * The model length needs a factor that the top of the symbol is not before the geo location
     */
    private double             _modelCenterToForwardFactor;
-
-   public enum MODEL_Z_ADJUSTMENT {
-
-      None, //
-
-      BoundingBox_Min_Negative, //
-
-   }
 
    public GLTFModel_Renderer(final Map map) {
 
@@ -153,19 +144,27 @@ public class GLTFModel_Renderer extends LayerRenderer {
        */
 
       // skateboard
-//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/skateboard/mt-skateboard.gltf"));
-//      _modelForwardAngle = 90;
-//      _modelCenterToForwardFactor=1.4;
+      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/skateboard/mt-skateboard.gltf"));
+      _modelForwardAngle = 90;
+      _modelCenterToForwardFactor = 1.4;
 
       // drawn bicycle
-      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/simple-bicycle/simple-bicycle.gltf"));
-      _modelForwardAngle = 90;
-      _modelCenterToForwardFactor = 5;
+//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/simple-bicycle/simple-bicycle.gltf"));
+//      _modelForwardAngle = 90;
+//      _modelCenterToForwardFactor = 5;
 
       // hochrad
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/hochrad/hochrad.gltf"));
 //      _modelForwardAngle = -90;
 //      _modelCenterToForwardFactor = -7;
+
+      // wood truck
+//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/wood-truck/wood-truck.gltf"));
+//      _modelForwardAngle = -90;
+//      _modelCenterToForwardFactor = -7;
+
+      // wood plane
+//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/wood-plane/wood-plane.gltf"));
 
       /*
        * sketchfab.com models
@@ -202,6 +201,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/locomotive/scene.gltf"));
 //      _modelForwardAngle = 180;
 //      _modelZAdjustment = MODEL_Z_ADJUSTMENT.BoundingBox_Min_Negative;
+//      _modelCenterToForwardFactor = 5;
 
       // Alter Anhänger
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/sketchfab.com/medieval_cart/scene.gltf"));
@@ -528,20 +528,9 @@ public class GLTFModel_Renderer extends LayerRenderer {
       final Vector3 bbMax = _modelBoundingBox.max;
       final Vector3 bboxCenter = _boundingBoxCenter;
 
-      float zAdjustment = 0;
+      final float zAdjustment = 0;
 
-      switch (_modelZAdjustment) {
-
-      case BoundingBox_Min_Negative:
-         zAdjustment = -bbMin.y;
-         break;
-
-      default:
-         break;
-      }
-
-      float animationAngle_Degree = -MapPlayerManager.getAnimatedAngle();
-      animationAngle_Degree += _modelForwardAngle;
+//      _modelCenterToForwardFactor = 0;
 
       /**
        * Adjust the center of the symbol to be at the top of the symbol, needs some maths with
@@ -549,22 +538,18 @@ public class GLTFModel_Renderer extends LayerRenderer {
        * <p>
        * It took me many hours to get this math fixed because this matrix cannot do it as in the
        * shader code, e.g.
-       * * rotate<br>
-       * * scale<br>
-       * * translate head to center<br>
-       * * translate symbol to geo location<br>
+       * - rotate<br>
+       * - scale<br>
+       * - translate head to center<br>
+       * - translate symbol to geo location<br>
        */
-
-      final double animationAngle_Rad = Math.toRadians(animationAngle_Degree);
-      final double center2Border_Sin = Math.sin(animationAngle_Rad);
-      final double center2Border_Cos = Math.cos(animationAngle_Rad);
-
-//      _modelCenterToForwardFactor = 5;
+      float animationAngle = -MapPlayerManager.getAnimatedAngle();
+      animationAngle += _modelForwardAngle;
 
       final double halfSize = modelScale / 2;
       final double center2BorderSize = halfSize * _modelCenterToForwardFactor;
-      final float forwardX = (float) (center2BorderSize * center2Border_Cos);
-      final float forwardY = (float) (center2BorderSize * center2Border_Sin);
+      final float forwardX = (float) (center2BorderSize * MathUtils.cosDeg(animationAngle));
+      final float forwardY = (float) (center2BorderSize * MathUtils.sinDeg(animationAngle));
 
       // reset matrix to identity matrix
       modelTransform.idt();
@@ -572,7 +557,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
       modelTransform.scale(modelScale, modelScale, modelScale);
 
       modelTransform.rotate(1, 0, 0, 90);
-      modelTransform.rotate(0, 1, 0, animationAngle_Degree);
+      modelTransform.rotate(0, 1, 0, animationAngle);
 
       // move to the track position
       modelTransform.trn(

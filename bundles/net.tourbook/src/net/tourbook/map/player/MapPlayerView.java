@@ -24,8 +24,10 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
+import net.tourbook.map.MapManager;
 import net.tourbook.map25.Map25FPSManager;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -45,6 +47,9 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
+import org.oscim.core.GeoPoint;
+import org.oscim.core.MapPosition;
+import org.oscim.core.MercatorProjection;
 
 public class MapPlayerView extends ViewPart {
 
@@ -396,6 +401,39 @@ public class MapPlayerView extends ViewPart {
 // SET_FORMATTING_ON
    }
 
+   /**
+    * Sync maps with current player position
+    */
+   private void fireMapPlayerPosition() {
+
+      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
+      if (mapPlayerData == null) {
+         return;
+      }
+
+      final int currentFrameNumber = MapPlayerManager.getCurrentFrameNumber();
+      final GeoPoint[] animatedGeoPoints = mapPlayerData.allAvailableGeoPoints;
+      final IntArrayList animatedLocationIndices = mapPlayerData.animatedLocationIndices;
+
+      if (currentFrameNumber >= animatedLocationIndices.size() - 1) {
+         return;
+      }
+
+      final int geoLocationIndex = animatedLocationIndices.get(currentFrameNumber - 1);
+      final GeoPoint geoLocation = animatedGeoPoints[geoLocationIndex];
+
+      // lat/lon -> 0...1
+      final double modelProjectedPositionX = MercatorProjection.longitudeToX(geoLocation.getLongitude());
+      final double modelProjectedPositionY = MercatorProjection.latitudeToY(geoLocation.getLatitude());
+
+      final MapPosition mapPosition = new MapPosition();
+      mapPosition.x = modelProjectedPositionX;
+      mapPosition.y = modelProjectedPositionY;
+      mapPosition.setScale(mapPlayerData.mapScale);
+
+      MapManager.fireSyncMapEvent(mapPosition, this, null);
+   }
+
    private void onMouseDown_TimeEndOrRemaining() {
 
       _isShow_EndTime_Or_RemainingTime = !_isShow_EndTime_Or_RemainingTime;
@@ -502,6 +540,7 @@ public class MapPlayerView extends ViewPart {
 
       MapPlayerManager.setRelativePosition(relativePosition);
 
+      fireMapPlayerPosition();
    }
 
    private void restoreState() {
@@ -703,7 +742,9 @@ public class MapPlayerView extends ViewPart {
    private void updateUI_Timeline(final int selectedFPS) {
 
       final int numAllFrames = MapPlayerManager.getNumberofAllFrames();
-      final float pageIncrement = (float) numAllFrames / 10;
+      
+      // when page increment is too small, e.g. 10 then the map position is not synced, could not yet figure out why this occures
+      final float pageIncrement = (float) numAllFrames / 50;
 
       _endTime = selectedFPS < 1
             ? 1

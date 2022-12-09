@@ -257,6 +257,7 @@ public class Map25View extends ViewPart implements
    private MapSync                       _mapSynchedWith                         = MapSync.NONE;
    //
    private long                          _lastFiredSyncEventTime;
+   private long                          _lastReceivedSyncEventTime;
    //
    private IMapColorProvider             _mapColorProvider;
    //
@@ -659,7 +660,6 @@ public class Map25View extends ViewPart implements
 
          final Animator animator = map25.animator();
 
-         animator.cancel();
          animator.animateZoom(500, _zoomFactor, 0, 0);
          map25.updateMap();
       });
@@ -673,7 +673,6 @@ public class Map25View extends ViewPart implements
 
          final Animator animator = map25.animator();
 
-         animator.cancel();
          animator.animateZoom(500, 1 / _zoomFactor, 0, 0);
          map25.updateMap();
       });
@@ -697,7 +696,6 @@ public class Map25View extends ViewPart implements
 
          final Animator animator = map25.animator();
 
-         animator.cancel();
          animator.animateTo(
                2000,
                _boundingBox,
@@ -1318,6 +1316,10 @@ public class Map25View extends ViewPart implements
       return _filteredPhotos;
    }
 
+   public long getLastReceivedSyncEventTime() {
+      return _lastReceivedSyncEventTime;
+   }
+
    public Map25App getMapApp() {
       return _map25App;
    }
@@ -1396,10 +1398,12 @@ public class Map25View extends ViewPart implements
    }
 
    void onMapPosition(final GeoPoint mapGeoPoint, final int zoomLevel) {
+
       updateUI_MapPosition(mapGeoPoint.getLatitude(), mapGeoPoint.getLongitude(), zoomLevel);
    }
 
    private void onSelectionChanged(final ISelection selection) {
+
       //_mapApp.debugPrint(" Map25View: * onSelectionChanged: tour selection changed");
 
       final int selectionHash = selection.hashCode();
@@ -2305,9 +2309,15 @@ public class Map25View extends ViewPart implements
          return;
       }
 
-      final long timeDiff = System.currentTimeMillis() - _lastFiredSyncEventTime;
+      final long currentTimeMillis = System.currentTimeMillis();
+
+      _lastReceivedSyncEventTime = currentTimeMillis;
+
+      final long timeDiff = currentTimeMillis - _lastFiredSyncEventTime;
+
 
       if (timeDiff < 1000) {
+
          // ignore because it causes LOTS of problems when synching moved map
          return;
       }
