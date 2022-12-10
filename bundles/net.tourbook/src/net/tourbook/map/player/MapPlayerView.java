@@ -37,6 +37,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -296,6 +297,7 @@ public class MapPlayerView extends ViewPart {
             _scaleTimeline_VisibleFrames.setMaximum(10);
             _scaleTimeline_VisibleFrames.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onTimeline_VisibleFrames_Selection()));
             _scaleTimeline_VisibleFrames.addKeyListener(keyPressedAdapter(keyEvent -> onTimeline_VisibleFrames_Key(keyEvent)));
+            _scaleTimeline_VisibleFrames.addMouseWheelListener(mouseEvent -> onTimeline_VisibleFrames_MouseWheel(mouseEvent));
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .indent(0, 5)
@@ -434,6 +436,44 @@ public class MapPlayerView extends ViewPart {
       MapManager.fireSyncMapEvent(mapPosition, this, null);
    }
 
+   private boolean movePlayheadTo_End() {
+
+      final float timelineSelection = _scaleTimeline_VisibleFrames.getSelection();
+
+      if (timelineSelection == _scaleTimeline_VisibleFrames.getMinimum()) {
+
+         // beginning of timeline + moving left -> start from the end
+
+         // prevent selection event
+         _isIgnoreTimelineEvent = true;
+
+         MapPlayerManager.setRelativePosition(1);
+
+         return true;
+      }
+
+      return false;
+   }
+
+   private boolean movePlayheadTo_Start() {
+
+      final float timelineSelection = _scaleTimeline_VisibleFrames.getSelection();
+
+      if (timelineSelection == _scaleTimeline_VisibleFrames.getMaximum()) {
+
+         // end of timeline + moving right -> start from 0
+
+         // prevent selection event
+         _isIgnoreTimelineEvent = true;
+
+         MapPlayerManager.setRelativePosition(0);
+
+         return true;
+      }
+
+      return false;
+   }
+
    private void onMouseDown_TimeEndOrRemaining() {
 
       _isShow_EndTime_Or_RemainingTime = !_isShow_EndTime_Or_RemainingTime;
@@ -506,36 +546,43 @@ public class MapPlayerView extends ViewPart {
 
       } else {
 
+         boolean isMoved = false;
+         boolean isForward = false;
+
          if (keyEvent.keyCode == SWT.ARROW_LEFT
                || keyEvent.keyCode == SWT.PAGE_DOWN) {
 
-            final float timelineSelection = _scaleTimeline_VisibleFrames.getSelection();
-
-            if (timelineSelection == _scaleTimeline_VisibleFrames.getMinimum()) {
-
-               // beginning of timeline + moving left -> start from the end
-
-               // prevent selection event
-               _isIgnoreTimelineEvent = true;
-
-               MapPlayerManager.setRelativePosition(1);
-            }
+            isMoved = movePlayheadTo_End();
 
          } else if (keyEvent.keyCode == SWT.ARROW_RIGHT
                || keyEvent.keyCode == SWT.PAGE_UP) {
 
-            final float timelineSelection = _scaleTimeline_VisibleFrames.getSelection();
-
-            if (timelineSelection == _scaleTimeline_VisibleFrames.getMaximum()) {
-
-               // end of timeline + moving right -> start from 0
-
-               // prevent selection event
-               _isIgnoreTimelineEvent = true;
-
-               MapPlayerManager.setRelativePosition(0);
-            }
+            isMoved = movePlayheadTo_Start();
+            isForward = true;
          }
+
+         if (isMoved == false) {
+
+            // accelerate movement
+
+            UI.adjustScaleValueOnKey(keyEvent, isForward);
+         }
+      }
+   }
+
+   private void onTimeline_VisibleFrames_MouseWheel(final MouseEvent mouseEvent) {
+
+      if (mouseEvent.count < 0) {
+
+         // scrolled down
+
+         movePlayheadTo_End();
+
+      } else {
+
+         // scrolled up
+
+         movePlayheadTo_Start();
       }
    }
 

@@ -72,6 +72,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CTabItem;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
@@ -849,6 +850,40 @@ public class UI {
          }
 
       }));
+   }
+
+   /**
+    * @param event
+    * @param isDirectionUp
+    *           Is <code>true</code> when direction is up, right or forward
+    */
+   public static void adjustScaleValueOnKey(final KeyEvent event, final boolean isDirectionUp) {
+
+      boolean isCtrlKey;
+      boolean isShiftKey;
+
+      if (IS_OSX) {
+         isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+         isShiftKey = (event.stateMask & SWT.MOD3) > 0;
+      } else {
+         isCtrlKey = (event.stateMask & SWT.MOD1) > 0;
+         isShiftKey = (event.stateMask & SWT.MOD2) > 0;
+      }
+
+      // accelerate with Ctrl + Shift key
+      int accelerator = isCtrlKey ? 10 : 1;
+      accelerator *= isShiftKey ? 5 : 1;
+
+      final Scale scale = (Scale) event.widget;
+      final int increment = scale.getIncrement();
+      final int oldValue = scale.getSelection();
+      final int valueDiff = (isDirectionUp
+            ? increment
+            : -increment)
+
+            * accelerator;
+
+      scale.setSelection(oldValue + valueDiff);
    }
 
    public static void adjustScaleValueOnMouseScroll(final MouseEvent event) {

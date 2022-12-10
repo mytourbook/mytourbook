@@ -1396,6 +1396,7 @@ public class Map25ConfigManager {
 
       _animationTime = 800;
       _isAnimateLocation = true;
+      _animationEasingType = Easing.Type.LINEAR;
 
       final boolean isRunAnimation = _animationTime != 0 && _isAnimateLocation;
 
@@ -1404,6 +1405,10 @@ public class Map25ConfigManager {
          final long currentTime = System.currentTimeMillis();
          final long timeDiff = currentTime - _lastAnimationTime;
 
+         /*
+          * timeDiff and _animationTime are connected in some way that the animation is running
+          * and is smooth
+          */
          if (timeDiff < 400) {
 
             // skip too many updates, otherwise the animation is not started
