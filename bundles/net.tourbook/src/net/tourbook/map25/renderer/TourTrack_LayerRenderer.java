@@ -309,15 +309,15 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          final float[] pixelPoints = __pixelPoints;
          final int[] pixelPointColorsHalf = __pixelPointColorsHalf;
 
-         final FloatArrayList allDirectionArrowPixelPosition = __pixelDirection_ArrowPositions;
+         final FloatArrayList allDirectionArrow_PixelPosition = __pixelDirection_ArrowPositions;
          final IntArrayList allDirectionArrow_LocationIndex = __pixelDirection_LocationIndex;
-         allDirectionArrowPixelPosition.clear();
+         allDirectionArrow_PixelPosition.clear();
          allDirectionArrow_LocationIndex.clear();
 
          // set first point / color / direction arrow
          int pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
          pixelPointColorsHalf[0] = __allGeoPointColors[0];
-         allDirectionArrowPixelPosition.addAll(pixelX, pixelY);
+         allDirectionArrow_PixelPosition.addAll(pixelX, pixelY);
          allDirectionArrow_LocationIndex.add(0);
 
          float prevX = pixelX;
@@ -448,7 +448,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                prevXArrow = pixelX;
                prevYArrow = pixelY;
 
-               allDirectionArrowPixelPosition.addAll(pixelX, pixelY);
+               allDirectionArrow_PixelPosition.addAll(pixelX, pixelY);
                allDirectionArrow_LocationIndex.add(projectedPointIndexHalf);
             }
          }
@@ -461,7 +461,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
             // convert arrow positions into arrow vertices
             workerBucket.createArrowVertices(
-                  allDirectionArrowPixelPosition,
+                  allDirectionArrow_PixelPosition,
                   allDirectionArrow_LocationIndex,
                   _allGeoPoints);
          }
@@ -721,11 +721,11 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       }
 
       /*
-       * Layer is compiled (above) in
+       * Layer is just compiled (above) in
        * TourTrack_LayerRenderer.TrackCompileWorker.doWork(TourCompileTask)
        */
 
-      // copy map position from workerTask.__mapPos -> _mapCompilePosition
+      // get compile map position: workerTask.__mapPos -> _mapCompilePosition
       _compileMapPosition.copy(workerTask.__mapPos);
 
       final TourTrack_Bucket painterBucket = workerTask.__taskBucketManager.getBucket_Painter();

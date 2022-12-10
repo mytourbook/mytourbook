@@ -108,12 +108,12 @@ public class TourTrack_Bucket {
     * ...
     * </pre>
     */
-   ShortArrayList             animatedPositions;
+   ShortArrayList             allVisiblePositions;
 
    /**
-    * Indices for {@link #animatedPositions} into the tour track data
+    * Indices for {@link #allVisiblePositions} into the tour track data
     */
-   IntArrayList               animatedLocationIndices;
+   IntArrayList               allGeoLocationIndices;
 
    /**
     * Contains all available geo locations for all selected tours
@@ -124,8 +124,8 @@ public class TourTrack_Bucket {
 
       trackVertexData = new TourTrack_VertexData();
 
-      animatedPositions = new ShortArrayList();
-      animatedLocationIndices = new IntArrayList();
+      allVisiblePositions = new ShortArrayList();
+      allGeoLocationIndices = new IntArrayList();
 
       directionArrow_Vertices = new ShortArrayList();
       directionArrow_ColorCoords = new ShortArrayList();
@@ -658,8 +658,8 @@ public class TourTrack_Bucket {
                                    final GeoPoint[] allGeoPoints) {
 
       // create new list to not update currently used list, otherwise a bound exception can occure !!!
-      animatedPositions.clear();
-      animatedLocationIndices.clear();
+      allVisiblePositions.clear();
+      allGeoLocationIndices.clear();
 
       directionArrow_Vertices.clear();
       directionArrow_ColorCoords.clear();
@@ -1019,7 +1019,7 @@ public class TourTrack_Bucket {
                                                  final IntArrayList allLocationIndices) {
 
       allAvailableGeoPoints = allGeoPoints;
-      animatedLocationIndices = allLocationIndices;
+      allGeoLocationIndices = allLocationIndices;
 
       for (int pixelIndex = 0; pixelIndex < allDirectionArrowPixel.length;) {
 
@@ -1029,7 +1029,7 @@ public class TourTrack_Bucket {
          final short p2X_scaled = (short) (p2X * COORD_SCALE);
          final short p2Y_scaled = (short) (p2Y * COORD_SCALE);
 
-         animatedPositions.addAll(p2X_scaled, p2Y_scaled);
+         allVisiblePositions.addAll(p2X_scaled, p2Y_scaled);
       }
    }
 

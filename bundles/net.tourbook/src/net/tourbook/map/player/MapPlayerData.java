@@ -32,9 +32,12 @@ public class MapPlayerData {
     */
    public boolean        isAnimateFromRelativePosition;
 
-   public ShortArrayList animatedPositions;
+   public ShortArrayList allVisiblePositions;
 
-   public IntArrayList   animatedLocationIndices;
+   /**
+    * Indices for {@link #allVisiblePositions} into the tour track data
+    */
+   public IntArrayList   allGeoLocationIndices;
 
    /**
     * Contains all available geo locations (in E6 format) for all selected tours

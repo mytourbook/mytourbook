@@ -39,7 +39,7 @@ public class MapPlayerManager {
     * Frame number which is currently displayed, it's in the range from
     * 1...{@link #_numAllVisibleFrames}
     */
-   private static int                   _currentFrameNumber;
+   private static int                   _currentVisibleFrameNumber;
 
    /**
     * Number of frames for an animation
@@ -47,6 +47,7 @@ public class MapPlayerManager {
    private static int                   _numAllVisibleFrames;
 
    private static long                  _animationStartTime;
+   private static float                 _animationForwardAngle;
    private static float                 _currentRelativePosition;
    private static boolean               _isAnimateFromRelativePosition;
    private static long                  _lastUpdateTime;
@@ -56,8 +57,6 @@ public class MapPlayerManager {
    private static boolean               _isPlayerRunning        = true;
    private static boolean               _isPlayingLoop;
    private static boolean               _isReLivePlaying;
-
-   private static float                 _animatedAngle;
 
    private static MapPlayerData         _mapPlayerData;
 
@@ -72,9 +71,12 @@ public class MapPlayerManager {
     */
    private static boolean               _isShowAnimationCursor;
 
-   public static float getAnimatedAngle() {
+   /**
+    * @return Returns the angle for the model forward direction
+    */
+   public static float getAnimationForwardAngle() {
 
-      return _animatedAngle;
+      return _animationForwardAngle;
    }
 
    public static double getCompileMapScale() {
@@ -86,14 +88,14 @@ public class MapPlayerManager {
     * @return Returns the last computed frame numer, it's in the range from
     *         1...{@link #_numAllVisibleFrames}
     */
-   public static int getCurrentFrameNumber() {
+   public static int getCurrentVisibleFrameNumber() {
 
-      return _currentFrameNumber < 1
+      return _currentVisibleFrameNumber < 1
 
             // frames are starting with 1
             ? 1
 
-            : _currentFrameNumber;
+            : _currentVisibleFrameNumber;
    }
 
    public static int getForegroundFPS() {
@@ -107,13 +109,12 @@ public class MapPlayerManager {
    }
 
    /**
-    * Compute the next frame number which is depending on the time or other parameters
+    * Compute the next frame number which depends on the time or other parameters
     *
     * @return Returns an index <code>0...</code>{@link #_numAllVisibleFrames}<code> - 1</code> for
-    *         the
-    *         next frame <code>1...</code>{@link #_numAllVisibleFrames}
+    *         the next frame <code>1...</code>{@link #_numAllVisibleFrames}
     */
-   public static int getNextFrameIndex() {
+   public static int getNextVisibleFrameIndex() {
 
       if (_isPlayerRunning == false
 
@@ -123,7 +124,7 @@ public class MapPlayerManager {
 
          // player is paused
 
-         return getValidIndex(_currentFrameNumber);
+         return getValidIndex(_currentVisibleFrameNumber);
       }
 
       final long currentTimeMS = System.currentTimeMillis();
@@ -138,7 +139,7 @@ public class MapPlayerManager {
 
          nextFrameNumber = Math.round(_numAllVisibleFrames * _currentRelativePosition);
 
-      } else if (_isPlayingLoop && _currentFrameNumber >= _numAllVisibleFrames) {
+      } else if (_isPlayingLoop && _currentVisibleFrameNumber >= _numAllVisibleFrames) {
 
          // 2. Prio: Loop animation
 
@@ -161,7 +162,7 @@ public class MapPlayerManager {
          // ensure that not more frames per second are displayed
          if (timeDiffMS > 0) {
 
-            return getValidIndex(_currentFrameNumber);
+            return getValidIndex(_currentVisibleFrameNumber);
          }
 
          final int maxFrames = Math.max(0, _numAllVisibleFrames);
@@ -175,12 +176,12 @@ public class MapPlayerManager {
 
          // ensure to not jump back to the start when the end is not yet reached
          if (nextFrameNumber < _numAllVisibleFrames) {
-            nextFrameNumber = _currentFrameNumber + 1;
+            nextFrameNumber = _currentVisibleFrameNumber + 1;
          }
 
          // ensure to move not more than one frame
-         if (nextFrameNumber > _currentFrameNumber + 1) {
-            nextFrameNumber = _currentFrameNumber + 1;
+         if (nextFrameNumber > _currentVisibleFrameNumber + 1) {
+            nextFrameNumber = _currentVisibleFrameNumber + 1;
          }
       }
 
@@ -189,12 +190,12 @@ public class MapPlayerManager {
          nextFrameNumber = _numAllVisibleFrames;
       }
 
-      _currentFrameNumber = nextFrameNumber;
+      _currentVisibleFrameNumber = nextFrameNumber;
       _currentRelativePosition = nextFrameNumber / (float) _numAllVisibleFrames;
       _lastUpdateTime = currentTimeMS;
 
       if (isPlayerAvailable()) {
-         _mapPlayerView.updateFrameNumber(_currentFrameNumber);
+         _mapPlayerView.updateFrameNumber(_currentVisibleFrameNumber);
       }
 
       return getValidIndex(nextFrameNumber);
@@ -244,7 +245,7 @@ public class MapPlayerManager {
     */
    public static boolean isLastFrame() {
 
-      return _currentFrameNumber == _numAllVisibleFrames;
+      return _currentVisibleFrameNumber == _numAllVisibleFrames;
    }
 
    private static boolean isPlayerAvailable() {
@@ -288,9 +289,9 @@ public class MapPlayerManager {
       _state.put(STATE_IS_RELIVE_PLAYING, _isReLivePlaying);
    }
 
-   public static void setAnimatedAngle(final float animatedAngle) {
+   public static void setAnimationForwardAngle(final float animationForwardAngle) {
 
-      _animatedAngle = animatedAngle;
+      _animationForwardAngle = animationForwardAngle;
    }
 
    public static void setAnimationStartTime() {
@@ -344,6 +345,36 @@ public class MapPlayerManager {
    }
 
    /**
+    * Setup map player with all necessary data to run the animation.
+    * <p>
+    * This method is called when new data are set into the shader buffer data.
+    *
+    * @param mapPlayerData
+    */
+   public static void setPlayerData(final MapPlayerData mapPlayerData) {
+
+      if (mapPlayerData.allVisiblePositions == null) {
+         return;
+      }
+
+      _mapPlayerData = mapPlayerData;
+
+// SET_FORMATTING_OFF
+
+
+      _isPlayerEnabled                 = mapPlayerData.isPlayerEnabled;
+      _isAnimateFromRelativePosition   = mapPlayerData.isAnimateFromRelativePosition;
+
+      _numAllVisibleFrames             = mapPlayerData.allVisiblePositions.size() / 2;
+
+// SET_FORMATTING_ON
+
+      if (isPlayerAvailable()) {
+         _mapPlayerView.updatePlayer();
+      }
+   }
+
+   /**
     * Move player head to a relative position and start playing at this position
     *
     * @param relativePosition
@@ -356,44 +387,6 @@ public class MapPlayerManager {
 
       // this will also force to compute the frame even when player is paused
       _isAnimateFromRelativePosition = true;
-
-      // fire map position
-//      if ( != null) {
-//
-//      }
-//      final MapPosition mapPosition = new MapPosition(latitude, longitude, scale);
-//      MapManager.fireSyncMapEvent(mapPosition, null, 0);
-
-   }
-
-   /**
-    * Setup map player with all necessary data to run the animation.
-    * <p>
-    * This method is called when new data are set into the shader buffer data.
-    *
-    * @param mapPlayerData
-    */
-   public static void setupPlayer(final MapPlayerData mapPlayerData) {
-
-      if (mapPlayerData.animatedPositions == null) {
-         return;
-      }
-
-      _mapPlayerData = mapPlayerData;
-
-// SET_FORMATTING_OFF
-
-
-      _isPlayerEnabled                 = mapPlayerData.isPlayerEnabled;
-      _isAnimateFromRelativePosition   = mapPlayerData.isAnimateFromRelativePosition;
-
-      _numAllVisibleFrames             = mapPlayerData.animatedPositions.size() / 2;
-
-// SET_FORMATTING_ON
-
-      if (isPlayerAvailable()) {
-         _mapPlayerView.updatePlayer();
-      }
    }
 
 }

@@ -36,10 +36,10 @@ import net.mgsx.gltf.scene3d.lights.DirectionalLightEx;
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
-import net.mgsx.gltf.scene3d.scene.SceneSkybox;
 import net.mgsx.gltf.scene3d.utils.IBLBuilder;
 import net.tourbook.map.player.MapPlayerData;
 import net.tourbook.map.player.MapPlayerManager;
+import net.tourbook.map25.Map25ConfigManager;
 
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.oscim.backend.GL;
@@ -52,7 +52,6 @@ import org.oscim.map.Map;
 import org.oscim.renderer.GLState;
 import org.oscim.renderer.GLViewport;
 import org.oscim.renderer.LayerRenderer;
-import org.oscim.utils.geom.GeometryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,21 +82,21 @@ public class GLTFModel_Renderer extends LayerRenderer {
    private Cubemap            _diffuseCubemap;
    private Cubemap            _specularCubemap;
    private Texture            _brdfLUT;
-   private SceneSkybox        _skybox;
+//   private SceneSkybox        _skybox;
    private BoundingBox        _modelBoundingBox;
 
-   private Vector3            _boundingBoxCenter;
-   private float              _boundingBoxMinMaxDistance;
+//   private Vector3            _boundingBoxCenter;
+   private float  _boundingBoxMinMaxDistance;
 
    /**
     * Angle that the model is looking forward
     */
-   private float              _modelForwardAngle;
+   private float  _modelForwardAngle;
 
    /**
     * The model length needs a factor that the top of the symbol is not before the geo location
     */
-   private double             _modelCenterToForwardFactor;
+   private double _modelCenterToForwardFactor;
 
    public GLTFModel_Renderer(final Map map) {
 
@@ -259,6 +258,10 @@ public class GLTFModel_Renderer extends LayerRenderer {
    @Override
    public void render(final GLViewport viewport) {
 
+      if (Map25ConfigManager.getActiveTourTrackConfig().arrow_IsAnimate == false) {
+         return;
+      }
+
       if (_scene == null || _currentMapPosition == null) {
          return;
       }
@@ -306,7 +309,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
       // flip front face cause of mirror inverted y-axis
       gl.frontFace(GL.CCW);
 
-      final int numModels = 0;
+//      final int numModels = 0;
       int numRendered = 0;
 
       final MapPosition cameraMapPosition = _mapCamera.mMapPosition;
@@ -336,7 +339,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
          _tempVector.scl(0.9f, 0.9f, 1);
 
-         final boolean isInMapBox = GeometryUtils.pointInPoly(_tempVector.x, _tempVector.y, _mapBox, 8, 0);
+//         final boolean isInMapBox = GeometryUtils.pointInPoly(_tempVector.x, _tempVector.y, _mapBox, 8, 0);
 
 //       if (isInMapBox == false) {
 //          continue;
@@ -382,7 +385,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
       _modelBoundingBox = new BoundingBox();
       _scene.modelInstance.calculateBoundingBox(_modelBoundingBox);
       _boundingBoxMinMaxDistance = _modelBoundingBox.max.dst(_modelBoundingBox.min);
-      _boundingBoxCenter = _modelBoundingBox.getCenter(new Vector3());
+//      _boundingBoxCenter = _modelBoundingBox.getCenter(new Vector3());
 
       _sceneManager = new SceneManager();
       _sceneManager.addScene(_scene);
@@ -444,9 +447,9 @@ public class GLTFModel_Renderer extends LayerRenderer {
          return;
       }
 
-      final int currentFrameNumber = MapPlayerManager.getCurrentFrameNumber();
+      final int currentFrameNumber = MapPlayerManager.getCurrentVisibleFrameNumber();
       final GeoPoint[] animatedGeoPoints = mapPlayerData.allAvailableGeoPoints;
-      final IntArrayList animatedLocationIndices = mapPlayerData.animatedLocationIndices;
+      final IntArrayList animatedLocationIndices = mapPlayerData.allGeoLocationIndices;
 
       if (currentFrameNumber >= animatedLocationIndices.size() - 1) {
          return;
@@ -458,9 +461,6 @@ public class GLTFModel_Renderer extends LayerRenderer {
       // lat/lon -> 0...1
       final double modelProjectedPositionX = MercatorProjection.longitudeToX(geoLocation.getLongitude());
       final double modelProjectedPositionY = MercatorProjection.latitudeToY(geoLocation.getLatitude());
-
-      final ModelInstance modelInstance = _scene.modelInstance;
-      final Matrix4 modelTransform = modelInstance.transform;
 
       final double currentMapScale = _currentMapPosition.scale;
       final int currentMapZoomLevel = _currentMapPosition.zoomLevel;
@@ -524,9 +524,9 @@ public class GLTFModel_Renderer extends LayerRenderer {
       final float dx = (float) ((modelProjectedPositionX - _currentMapPosition.x) * tileScale);
       final float dy = (float) ((modelProjectedPositionY - _currentMapPosition.y) * tileScale);
 
-      final Vector3 bbMin = _modelBoundingBox.min;
-      final Vector3 bbMax = _modelBoundingBox.max;
-      final Vector3 bboxCenter = _boundingBoxCenter;
+//      final Vector3 bbMin = _modelBoundingBox.min;
+//      final Vector3 bbMax = _modelBoundingBox.max;
+//      final Vector3 bboxCenter = _boundingBoxCenter;
 
       final float zAdjustment = 0;
 
@@ -543,13 +543,15 @@ public class GLTFModel_Renderer extends LayerRenderer {
        * - translate head to center<br>
        * - translate symbol to geo location<br>
        */
-      float animationAngle = -MapPlayerManager.getAnimatedAngle();
+      float animationAngle = -MapPlayerManager.getAnimationForwardAngle();
       animationAngle += _modelForwardAngle;
 
       final double halfSize = modelScale / 2;
       final double center2BorderSize = halfSize * _modelCenterToForwardFactor;
       final float forwardX = (float) (center2BorderSize * MathUtils.cosDeg(animationAngle));
       final float forwardY = (float) (center2BorderSize * MathUtils.sinDeg(animationAngle));
+
+      final Matrix4 modelTransform = _scene.modelInstance.transform;
 
       // reset matrix to identity matrix
       modelTransform.idt();

@@ -939,7 +939,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       allMapLayer.add(_layer_Legend);
       allMapLayer.add(_layer_TileInfo);
 
-      // add gdx model
+      // add gdx models to show animations
       _layer_GLTFModel = new GLTFModel_Layer(mMap);
       allMapLayer.add(_layer_GLTFModel);
 

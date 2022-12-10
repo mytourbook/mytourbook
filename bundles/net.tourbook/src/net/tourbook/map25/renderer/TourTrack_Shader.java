@@ -220,10 +220,6 @@ public final class TourTrack_Shader {
          return false;
       }
 
-      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-
-      final MapPlayerData mapPlayerData = new MapPlayerData();
-
       /*
        * Track
        */
@@ -245,6 +241,9 @@ public final class TourTrack_Shader {
          gl.bufferData(GL.ARRAY_BUFFER, numTrackVertices, buffer2, GL.STATIC_DRAW);
       }
 
+      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+      final MapPlayerData mapPlayerData = new MapPlayerData();
+
       if (trackConfig.isShowDirectionArrow) {
 
          if (trackConfig.arrow_IsAnimate) {
@@ -254,11 +253,11 @@ public final class TourTrack_Shader {
             mapPlayerData.isPlayerEnabled                = true;
             mapPlayerData.isAnimateFromRelativePosition  = true;
 
-            mapPlayerData.animatedPositions              = trackBucket.animatedPositions;
-            mapPlayerData.animatedLocationIndices        = trackBucket.animatedLocationIndices;
+            mapPlayerData.allVisiblePositions            = trackBucket.allVisiblePositions;
             mapPlayerData.allAvailableGeoPoints          = trackBucket.allAvailableGeoPoints;
+            mapPlayerData.allGeoLocationIndices          = trackBucket.allGeoLocationIndices;
 
-            mapPlayerData.mapScale                      = viewport.pos.scale;
+            mapPlayerData.mapScale                       = viewport.pos.scale;
 
 // SET_FORMATTING_ON
 
@@ -277,7 +276,7 @@ public final class TourTrack_Shader {
 
                final short zPos  = (short) (1 + trackBucket.heightOffset);
 
-               // using a simple triangle
+               // paint a simple triangle
                _animationVertices = new short[] {
                                                    0,     0,   zPos,
                                                 size,  size2,  zPos,
@@ -319,7 +318,7 @@ public final class TourTrack_Shader {
          }
       }
 
-      MapPlayerManager.setupPlayer(mapPlayerData);
+      MapPlayerManager.setPlayerData(mapPlayerData);
 
       return true;
    }
@@ -437,17 +436,16 @@ public final class TourTrack_Shader {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-      // viewport scale 2 map scale: is between 1...2
+      // viewport scale 2 compile map scale: is between 1...2
       final float viewport2mapscale = (float) (viewport.pos.scale / compileMapPosition.scale);
 
       // fix alpha blending
       gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
       {
          // get animated position
-         final int nextFrameIndex = MapPlayerManager.getNextFrameIndex();
-         final int numAllFrames = MapPlayerManager.getNumberofVisibleFrames();
-
-         final float relativeVisibleVertices = (float) nextFrameIndex / numAllFrames;
+         final int nextFrameIndex = MapPlayerManager.getNextVisibleFrameIndex();
+         final int numAllVisibleFrames = MapPlayerManager.getNumberofVisibleFrames();
+         final float relativeVisibleVertices = (float) nextFrameIndex / numAllVisibleFrames;
 
          paint_10_Track(trackBucket, viewport, viewport2mapscale, relativeVisibleVertices);
 
@@ -603,8 +601,6 @@ public final class TourTrack_Shader {
       if (trackBucket.heightOffset != heightOffset) {
 
          heightOffset = trackBucket.heightOffset;
-
-//          final double lineHeight = (heightOffset / groundResolution) / scale;
          final double lineHeight = heightOffset * vp2mpScale;
 
          gl.uniform1f(shader_u_height, (float) lineHeight);
@@ -804,7 +800,7 @@ public final class TourTrack_Shader {
                                           final TourTrack_Bucket trackBucket,
                                           final int nextFrameIndex) {
 
-      final ShortArrayList animatedPositions = trackBucket.animatedPositions;
+      final ShortArrayList animatedPositions = trackBucket.allVisiblePositions;
 
       final int numAllPositions = animatedPositions.size();
       if (numAllPositions < 1) {
@@ -828,7 +824,7 @@ public final class TourTrack_Shader {
       _animationMatrix.setRotation(angle, 0f, 0f, 1f);
       _animationMatrix.setAsUniform(shader.uni_AnimationMVP);
 
-      MapPlayerManager.setAnimatedAngle(angle);
+      MapPlayerManager.setAnimationForwardAngle(angle);
 
       if (MapPlayerManager.isShowAnimationCursor()) {
 
