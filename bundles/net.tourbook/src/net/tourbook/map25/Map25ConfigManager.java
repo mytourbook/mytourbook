@@ -1394,8 +1394,8 @@ public class Map25ConfigManager {
 
    private static void setMapLocation_InMapThread(final Map map, final MapPosition mapPosition) {
 
-      _animationTime = 800;
       _isAnimateLocation = true;
+      _animationTime = 600;
       _animationEasingType = Easing.Type.LINEAR;
 
       final boolean isRunAnimation = _animationTime != 0 && _isAnimateLocation;
@@ -1409,7 +1409,7 @@ public class Map25ConfigManager {
           * timeDiff and _animationTime are connected in some way that the animation is running
           * and is smooth
           */
-         if (timeDiff < 400) {
+         if (timeDiff < _animationTime) {
 
             // skip too many updates, otherwise the animation is not started
 
