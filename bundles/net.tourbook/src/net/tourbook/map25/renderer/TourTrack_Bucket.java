@@ -100,7 +100,7 @@ public class TourTrack_Bucket {
    ShortArrayList             directionArrow_ColorCoords;
 
    /**
-    * X/Y positions
+    * Visible X/Y pixel positions which are clipped between -2048...2048
     *
     * <pre>
     * posX1    posY2
@@ -108,24 +108,30 @@ public class TourTrack_Bucket {
     * ...
     * </pre>
     */
-   ShortArrayList             allVisiblePositions;
+   ShortArrayList             allVisiblePixelPositions;
 
    /**
-    * Indices for {@link #allVisiblePositions} into the tour track data
+    * Indices for {@link #allVisiblePixelPositions} into the tour track data
     */
-   IntArrayList               allGeoLocationIndices;
+   IntArrayList               allVisibleGeoLocationIndices;
 
    /**
     * Contains all available geo locations for all selected tours
     */
-   GeoPoint[]                 allAvailableGeoPoints;
+   GeoPoint[]                 anyGeoPoints;
+
+   /**
+    * Contains indices into all geo positions {@link #anyGeoPoints} for all selected tours
+    * which are also outside of the clipper (visible) area -2048...2048
+    */
+   IntArrayList               allNotClipped_GeoLocationIndices;
 
    public TourTrack_Bucket() {
 
       trackVertexData = new TourTrack_VertexData();
 
-      allVisiblePositions = new ShortArrayList();
-      allGeoLocationIndices = new IntArrayList();
+      allVisiblePixelPositions = new ShortArrayList();
+      allVisibleGeoLocationIndices = new IntArrayList();
 
       directionArrow_Vertices = new ShortArrayList();
       directionArrow_ColorCoords = new ShortArrayList();
@@ -647,19 +653,18 @@ public class TourTrack_Bucket {
    /**
     * Creates direction arrow vertices from it's x/y position
     *
-    * @param allDirectionArrowPixelList
+    * @param allDirectionArrow_PixelList
     *           Contains the x/y pixel positions for the direction arrows
-    * @param allLocationIndices
+    * @param allDirectionArrow_LocationIndices
     *           Contains the indices into the tour track data, e.g geo location
-    * @param allGeoPoints
+    * @param allNotClipped_GeoLocationIndices
     */
    public void createArrowVertices(final FloatArrayList allDirectionArrowPixelList,
-                                   final IntArrayList allLocationIndices,
-                                   final GeoPoint[] allGeoPoints) {
+                                   final IntArrayList allLocationIndices) {
 
       // create new list to not update currently used list, otherwise a bound exception can occure !!!
-      allVisiblePositions.clear();
-      allGeoLocationIndices.clear();
+      allVisiblePixelPositions.clear();
+      allVisibleGeoLocationIndices.clear();
 
       directionArrow_Vertices.clear();
       directionArrow_ColorCoords.clear();
@@ -675,7 +680,7 @@ public class TourTrack_Bucket {
 
       if (trackConfig.arrow_IsAnimate) {
 
-         createArrowVertices_200_Animated(allDirectionArrowPixel, allGeoPoints, allLocationIndices);
+         createArrowVertices_200_Animated(allDirectionArrowPixel, allLocationIndices);
 
       } else {
 
@@ -1015,11 +1020,9 @@ public class TourTrack_Bucket {
    }
 
    private void createArrowVertices_200_Animated(final float[] allDirectionArrowPixel,
-                                                 final GeoPoint[] allGeoPoints,
                                                  final IntArrayList allLocationIndices) {
 
-      allAvailableGeoPoints = allGeoPoints;
-      allGeoLocationIndices = allLocationIndices;
+      allVisibleGeoLocationIndices = allLocationIndices;
 
       for (int pixelIndex = 0; pixelIndex < allDirectionArrowPixel.length;) {
 
@@ -1029,7 +1032,7 @@ public class TourTrack_Bucket {
          final short p2X_scaled = (short) (p2X * COORD_SCALE);
          final short p2Y_scaled = (short) (p2Y * COORD_SCALE);
 
-         allVisiblePositions.addAll(p2X_scaled, p2Y_scaled);
+         allVisiblePixelPositions.addAll(p2X_scaled, p2Y_scaled);
       }
    }
 

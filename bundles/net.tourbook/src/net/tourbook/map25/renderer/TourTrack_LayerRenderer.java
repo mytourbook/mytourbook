@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TourTrack_LayerRenderer extends LayerRenderer {
 
-   public static final Logger            log            = LoggerFactory.getLogger(TourTrack_LayerRenderer.class);
+   public static final Logger            log           = LoggerFactory.getLogger(TourTrack_LayerRenderer.class);
 
    /**
     * Map position/scale during compile time
@@ -68,13 +68,13 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    /**
     * Contains all available geo locations for all selected tours in lat/lon E6 format.
     */
-   private GeoPoint[]                    _allGeoPoints;
+   private GeoPoint[]                    _anyGeoPoints;
    private IntArrayList                  _allTourStarts;
    private int[]                         _allGeoPointColors;
 
-   private int                           __oldX         = -1;
-   private int                           __oldY         = -1;
-   private int                           __oldZoomScale = -1;
+   private int                           _oldX         = -1;
+   private int                           _oldY         = -1;
+   private int                           _oldZoomScale = -1;
 
    private TourTrack_Layer               _tourLayer;
 
@@ -107,6 +107,11 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       private static final int  MAX_VISIBLE_PIXEL               = 2048;
 
       /**
+       * Contains all available geo locations for all selected tours in lat/lon E6 format.
+       */
+      private GeoPoint[]        __anyGeoPoints;
+
+      /**
        * Projected points 0...1 for all geo positions for all selected tours
        * <p>
        * Is projected from -180°...180° ==> 0...1 by using the {@link MercatorProjection}
@@ -116,9 +121,15 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       /**
        * Compiled points which are scaled with the current map position to "screen" pixels.
        * <p>
-       * It contains all geo positions for all selected tours
+       * It contains all geo positions for all selected tours within the clipper area
        */
       private float[]           __pixelPoints;
+
+      /**
+       * Contains indices for all geo positions for all selected tours which are also outside of
+       * the clipper area -2048...2048
+       */
+      private IntArrayList      __allNotClipped_LocationIndices = new IntArrayList();
 
       /**
        * One {@link #__pixelPointColorsHalf} has two {@link #__pixelPoints}, half == Half of items
@@ -132,6 +143,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       private IntArrayList      __pixelDirection_LocationIndex  = new IntArrayList();
 
       private int[]             __allGeoPointColors;
+      private IntArrayList      __allTourStarts;
 
       /**
        * Is clipping line positions between
@@ -141,7 +153,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
        */
       private final LineClipper __lineClipper;
 
-      private int               __numGeoPoints;
+      private int               __numAllGeoPoints;
 
       public TrackCompileWorker(final Map map) {
 
@@ -158,6 +170,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          __pixelPointColorsHalf = new int[0];
          __pixelDirection_ArrowPositions.clear();
          __pixelDirection_LocationIndex.clear();
+         __allNotClipped_LocationIndices.clear();
       }
 
       /**
@@ -187,18 +200,20 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       @Override
       public boolean doWork(final TourCompileTask task) {
 
-         int numGeoPoints = __numGeoPoints;
+         int numGeoPoints = __numAllGeoPoints;
 
          if (_isUpdateNewPoints) {
 
             /*
-             * Create projected points (0...1) for all geo points
+             * Create projected points (0...1) for all geo points (lat/long)
              */
 
-            synchronized (_allGeoPoints) {
+            __anyGeoPoints = _anyGeoPoints;
+
+            synchronized (__anyGeoPoints) {
 
                _isUpdateNewPoints = false;
-               __numGeoPoints = numGeoPoints = _allGeoPoints.length;
+               __numAllGeoPoints = numGeoPoints = __anyGeoPoints.length;
 
                double[] projectedPoints = __allProjectedPoints;
 
@@ -210,14 +225,16 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                   __pixelPointColorsHalf = new int[numGeoPoints];
                   __pixelDirection_ArrowPositions.clear();
                   __pixelDirection_LocationIndex.clear();
+                  __allNotClipped_LocationIndices.clear();
                }
 
                for (int pointIndex = 0; pointIndex < numGeoPoints; pointIndex++) {
-                  MercatorProjection.project(_allGeoPoints[pointIndex], projectedPoints, pointIndex);
+                  MercatorProjection.project(__anyGeoPoints[pointIndex], projectedPoints, pointIndex);
                }
 
                // fix concurrent issue, it does not need to clone the array
                __allGeoPointColors = _allGeoPointColors;
+               __allTourStarts = _allTourStarts;
             }
          }
 
@@ -253,6 +270,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
          final boolean isShowDirectionArrows = trackConfig.isShowDirectionArrow;
+
          int arrow_MinimumDistance = trackConfig.arrow_IsAnimate
 
                // use a smaller distance when animated, to show the moving figure smoothly
@@ -309,8 +327,10 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          final float[] pixelPoints = __pixelPoints;
          final int[] pixelPointColorsHalf = __pixelPointColorsHalf;
 
+         final IntArrayList allNotClipped_LocationIndices = __allNotClipped_LocationIndices;
          final FloatArrayList allDirectionArrow_PixelPosition = __pixelDirection_ArrowPositions;
          final IntArrayList allDirectionArrow_LocationIndex = __pixelDirection_LocationIndex;
+         allNotClipped_LocationIndices.clear();
          allDirectionArrow_PixelPosition.clear();
          allDirectionArrow_LocationIndex.clear();
 
@@ -319,9 +339,12 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          pixelPointColorsHalf[0] = __allGeoPointColors[0];
          allDirectionArrow_PixelPosition.addAll(pixelX, pixelY);
          allDirectionArrow_LocationIndex.add(0);
+         allNotClipped_LocationIndices.add(0);
 
          float prevX = pixelX;
          float prevY = pixelY;
+         float prevXNotClipped = pixelX;
+         float prevYNotClipped = pixelY;
          float prevXArrow = pixelX;
          float prevYArrow = pixelY;
 
@@ -382,12 +405,28 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                continue;
             }
 
+            /*
+             * Get points which are not clipped
+             */
+            final float diffXNotClipped = pixelX - prevXNotClipped;
+            final float diffYNotClipped = pixelY - prevYNotClipped;
+
+            if (pixelPointIndex == 0 || FastMath.absMaxCmp(diffXNotClipped, diffYNotClipped, MIN_DIST)) {
+
+               // point > min distance == 3
+
+               allNotClipped_LocationIndices.add(projectedPointIndexHalf);
+
+               prevXNotClipped = pixelX;
+               prevYNotClipped = pixelY;
+            }
+
             final int clipperCode = __lineClipper.clipNext(pixelX, pixelY);
 
             if (clipperCode != LineClipper.INSIDE) {
 
                /*
-                * Point is outside clipper
+                * Point is outside clipper area +-2048 x +-2048
                 */
 
                if (pixelPointIndex > 2) {
@@ -422,7 +461,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             }
 
             /*
-             * Point is inside clipper
+             * Point is inside clipper +-2048 x +-2048
              */
 
             final float diffX = pixelX - prevX;
@@ -462,21 +501,26 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             // convert arrow positions into arrow vertices
             workerBucket.createArrowVertices(
                   allDirectionArrow_PixelPosition,
-                  allDirectionArrow_LocationIndex,
-                  _allGeoPoints);
+                  allDirectionArrow_LocationIndex);
          }
+
+         workerBucket.anyGeoPoints = __anyGeoPoints;
+         workerBucket.allNotClipped_GeoLocationIndices = __allNotClipped_LocationIndices;
       }
 
       private int getNextTourStartIndex(final int tourIndex) {
 
-         if (_allTourStarts.size() > tourIndex + 1) {
-            return _allTourStarts.get(tourIndex + 1) * 2;
+         if (__allTourStarts.size() > tourIndex + 1) {
+
+            return __allTourStarts.get(tourIndex + 1) * 2;
+
          } else {
+
             return Integer.MAX_VALUE;
          }
       }
 
-   }
+   } // class TrackCompileWorker end
 
    public TourTrack_LayerRenderer(final TourTrack_Layer tourLayer, final Map map) {
 
@@ -486,7 +530,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _bucketManager_ForPainting = new TourTrack_BucketManager();
       _compileMapPosition = new MapPosition();
 
-      _allGeoPoints = new GeoPoint[] {};
+      _anyGeoPoints = new GeoPoint[] {};
       _allTourStarts = new IntArrayList();
 
       _trackCompileWorker = new TrackCompileWorker(map);
@@ -648,9 +692,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                                   final int[] allGeoPointColors,
                                   final IntArrayList allTourStarts) {
 
-      synchronized (_allGeoPoints) {
+      synchronized (_anyGeoPoints) {
 
-         _allGeoPoints = allGeoPoints;
+         _anyGeoPoints = allGeoPoints;
          _allGeoPointColors = allGeoPointColors;
 
          _allTourStarts.clear();
@@ -684,7 +728,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       /*
        * Update layers when map moved by at least one tile or zoomlevel has changed
        */
-      if (currentX != __oldX || currentY != __oldY || currentZoomScale != __oldZoomScale || _isUpdateLayer) {
+      if (currentX != _oldX || currentY != _oldY || currentZoomScale != _oldZoomScale || _isUpdateLayer) {
 
          /*
           * It took me many days to find this solution that a newly selected tour is
@@ -703,9 +747,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
           */
          _trackCompileWorker.submit(0);
 
-         __oldX = currentX;
-         __oldY = currentY;
-         __oldZoomScale = currentZoomScale;
+         _oldX = currentX;
+         _oldY = currentY;
+         _oldZoomScale = currentZoomScale;
       }
 
       /*

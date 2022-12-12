@@ -102,7 +102,7 @@ public class MapPlayerView extends ViewPart {
 
    private Button    _chkIsRelivePlaying;
 
-   private Scale     _scaleTimeline_AllFrames;
+   private Scale     _scaleTimeline_AnyFrames;
    private Scale     _scaleTimeline_VisibleFrames;
 
    private Spinner   _spinnerFramesPerSecond;
@@ -255,15 +255,17 @@ public class MapPlayerView extends ViewPart {
 //            _lblTime_Current_AllFrames.setBackground(UI.SYS_COLOR_GREEN);
          }
          {
-            _scaleTimeline_AllFrames = new Scale(container, SWT.HORIZONTAL);
-            _scaleTimeline_AllFrames.setMinimum(1);
-            _scaleTimeline_AllFrames.setMaximum(10);
-            _scaleTimeline_AllFrames.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onTimeline_AllGeoPoints_Selection()));
-            _scaleTimeline_AllFrames.addKeyListener(keyPressedAdapter(keyEvent -> onTimeline_AllGeoPoints_Key(keyEvent)));
+            _scaleTimeline_AnyFrames = new Scale(container, SWT.HORIZONTAL);
+            _scaleTimeline_AnyFrames.setMinimum(1);
+            _scaleTimeline_AnyFrames.setMaximum(10);
+            _scaleTimeline_AnyFrames.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> onTimeline_Selection(_scaleTimeline_AnyFrames, false)));
+            _scaleTimeline_AnyFrames.addKeyListener(keyPressedAdapter(keyEvent -> onTimeline_Key(keyEvent, _scaleTimeline_AnyFrames)));
+            _scaleTimeline_AnyFrames.addMouseWheelListener(mouseEvent -> onTimeline_MouseWheel(mouseEvent, _scaleTimeline_AnyFrames));
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .indent(0, 5)
-                  .applyTo(_scaleTimeline_AllFrames);
+                  .applyTo(_scaleTimeline_AnyFrames);
 //            _scaleTimeline_AllFrames.setBackground(UI.SYS_COLOR_MAGENTA);
          }
          {
@@ -295,9 +297,10 @@ public class MapPlayerView extends ViewPart {
             _scaleTimeline_VisibleFrames = new Scale(container, SWT.HORIZONTAL);
             _scaleTimeline_VisibleFrames.setMinimum(1);
             _scaleTimeline_VisibleFrames.setMaximum(10);
-            _scaleTimeline_VisibleFrames.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onTimeline_VisibleFrames_Selection()));
-            _scaleTimeline_VisibleFrames.addKeyListener(keyPressedAdapter(keyEvent -> onTimeline_VisibleFrames_Key(keyEvent)));
-            _scaleTimeline_VisibleFrames.addMouseWheelListener(mouseEvent -> onTimeline_VisibleFrames_MouseWheel(mouseEvent));
+            _scaleTimeline_VisibleFrames.addSelectionListener(widgetSelectedAdapter(
+                  selectionEvent -> onTimeline_Selection(_scaleTimeline_VisibleFrames, true)));
+            _scaleTimeline_VisibleFrames.addKeyListener(keyPressedAdapter(keyEvent -> onTimeline_Key(keyEvent, _scaleTimeline_VisibleFrames)));
+            _scaleTimeline_VisibleFrames.addMouseWheelListener(mouseEvent -> onTimeline_MouseWheel(mouseEvent, _scaleTimeline_VisibleFrames));
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .indent(0, 5)
@@ -393,7 +396,7 @@ public class MapPlayerView extends ViewPart {
       _lblTimeline_AllFrames                    .setEnabled(isEnabled);
       _lblTimeline_VisibleFrames                .setEnabled(isEnabled);
 
-      _scaleTimeline_AllFrames                  .setEnabled(isEnabled);
+      _scaleTimeline_AnyFrames                  .setEnabled(isEnabled);
       _scaleTimeline_VisibleFrames              .setEnabled(isEnabled);
       _spinnerFramesPerSecond                   .setEnabled(isEnabled);
 
@@ -405,24 +408,43 @@ public class MapPlayerView extends ViewPart {
 
    /**
     * Sync maps with current player position
+    *
+    * @param useVisibleFrames
     */
-   private void fireMapPlayerPosition() {
+   private void fireMapPlayerPosition(final boolean useVisibleFrames) {
 
       final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
       if (mapPlayerData == null) {
          return;
       }
 
-      final int currentFrameNumber = MapPlayerManager.getCurrentVisibleFrameNumber();
-      final GeoPoint[] allGeoPoints = mapPlayerData.allAvailableGeoPoints;
-      final IntArrayList animatedLocationIndices = mapPlayerData.allGeoLocationIndices;
+      final IntArrayList animatedLocationIndices = mapPlayerData.allVisibleGeoLocationIndices;
 
-      if (currentFrameNumber >= animatedLocationIndices.size() - 1) {
-         return;
+      int geoLocationIndex = 0;
+
+      if (useVisibleFrames) {
+
+         final int currentFrameNumber = MapPlayerManager.getCurrentVisibleFrameNumber();
+
+         if (currentFrameNumber >= animatedLocationIndices.size() - 1) {
+            return;
+         }
+
+         geoLocationIndex = animatedLocationIndices.get(currentFrameNumber - 1);
+
+      } else {
+
+         // get frame from relative position
+
+         final IntArrayList allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
+         final float relativePosition = MapPlayerManager.getRelativePosition();
+         final int positionIndex = (int) (allNotClipped_GeoLocationIndices.size() * relativePosition);
+
+         geoLocationIndex = allNotClipped_GeoLocationIndices.get(positionIndex);
       }
 
-      final int geoLocationIndex = animatedLocationIndices.get(currentFrameNumber - 1);
-      final GeoPoint geoLocation = allGeoPoints[geoLocationIndex];
+      final GeoPoint[] anyGeoPoints = mapPlayerData.anyGeoPoints;
+      final GeoPoint geoLocation = anyGeoPoints[geoLocationIndex];
 
       // lat/lon -> 0...1
       final double modelProjectedPositionX = MercatorProjection.longitudeToX(geoLocation.getLongitude());
@@ -436,11 +458,11 @@ public class MapPlayerView extends ViewPart {
       MapManager.fireSyncMapEvent(mapPosition, this, null);
    }
 
-   private boolean movePlayheadTo_End() {
+   private boolean movePlayheadTo_End(final Scale scale) {
 
-      final float timelineSelection = _scaleTimeline_VisibleFrames.getSelection();
+      final float timelineSelection = scale.getSelection();
 
-      if (timelineSelection == _scaleTimeline_VisibleFrames.getMinimum()) {
+      if (timelineSelection == scale.getMinimum()) {
 
          // beginning of timeline + moving left -> start from the end
 
@@ -455,11 +477,11 @@ public class MapPlayerView extends ViewPart {
       return false;
    }
 
-   private boolean movePlayheadTo_Start() {
+   private boolean movePlayheadTo_Start(final Scale scale) {
 
-      final float timelineSelection = _scaleTimeline_VisibleFrames.getSelection();
+      final float timelineSelection = scale.getSelection();
 
-      if (timelineSelection == _scaleTimeline_VisibleFrames.getMaximum()) {
+      if (timelineSelection == scale.getMaximum()) {
 
          // end of timeline + moving right -> start from 0
 
@@ -520,41 +542,7 @@ public class MapPlayerView extends ViewPart {
       MapPlayerManager.setIsReLivePlaying(_chkIsRelivePlaying.getSelection());
    }
 
-   private void onTimeline_AllGeoPoints_Key(final KeyEvent keyEvent) {
-
-      // TODO Auto-generated method stub
-
-   }
-
-   private void onTimeline_AllGeoPoints_Selection() {
-
-      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
-      if (mapPlayerData == null) {
-         return;
-      }
-
-      final int currentFrameNumber = MapPlayerManager.getCurrentVisibleFrameNumber();
-      final GeoPoint[] allGeoPoints = mapPlayerData.allAvailableGeoPoints;
-
-      if (_isIgnoreTimelineEvent) {
-         _isIgnoreTimelineEvent = false;
-         return;
-      }
-
-      // stop player
-      stopPlayerWhenRunning();
-
-//      updateUI_FromTimeline_Visible();
-
-      final float timelineSelection = _scaleTimeline_AllFrames.getSelection();
-      final float relativePosition = timelineSelection / mapPlayerData.allAvailableGeoPoints.length;
-
-      MapPlayerManager.setRelativePosition(relativePosition);
-
-      fireMapPlayerPosition();
-   }
-
-   private void onTimeline_VisibleFrames_Key(final KeyEvent keyEvent) {
+   private void onTimeline_Key(final KeyEvent keyEvent, final Scale scale) {
 
       if (keyEvent.character == ' ') {
 
@@ -570,12 +558,12 @@ public class MapPlayerView extends ViewPart {
          if (eventKeyCode == SWT.ARROW_LEFT
                || eventKeyCode == SWT.PAGE_DOWN) {
 
-            isMoved = movePlayheadTo_End();
+            isMoved = movePlayheadTo_End(scale);
 
          } else if (eventKeyCode == SWT.ARROW_RIGHT
                || eventKeyCode == SWT.PAGE_UP) {
 
-            isMoved = movePlayheadTo_Start();
+            isMoved = movePlayheadTo_Start(scale);
             isForward = true;
          }
 
@@ -588,23 +576,23 @@ public class MapPlayerView extends ViewPart {
       }
    }
 
-   private void onTimeline_VisibleFrames_MouseWheel(final MouseEvent mouseEvent) {
+   private void onTimeline_MouseWheel(final MouseEvent mouseEvent, final Scale scale) {
 
       if (mouseEvent.count < 0) {
 
          // scrolled down
 
-         movePlayheadTo_End();
+         movePlayheadTo_End(scale);
 
       } else {
 
          // scrolled up
 
-         movePlayheadTo_Start();
+         movePlayheadTo_Start(scale);
       }
    }
 
-   private void onTimeline_VisibleFrames_Selection() {
+   private void onTimeline_Selection(final Scale scale, final boolean useVisibleFrames) {
 
       if (_isIgnoreTimelineEvent) {
          _isIgnoreTimelineEvent = false;
@@ -615,12 +603,12 @@ public class MapPlayerView extends ViewPart {
 
       updateUI_FromTimeline_Visible();
 
-      final float timelineSelection = _scaleTimeline_VisibleFrames.getSelection();
-      final float relativePosition = timelineSelection / MapPlayerManager.getNumberofVisibleFrames();
+      final float timelineSelection = scale.getSelection();
+      final float relativePosition = timelineSelection / MapPlayerManager.getNumberOfVisibleFrames();
 
       MapPlayerManager.setRelativePosition(relativePosition);
 
-      fireMapPlayerPosition();
+      fireMapPlayerPosition(useVisibleFrames);
    }
 
    private void restoreState() {
@@ -725,7 +713,7 @@ public class MapPlayerView extends ViewPart {
          return;
       }
 
-      final int numAllFrames = MapPlayerManager.getNumberofVisibleFrames();
+      final int numAllFrames = MapPlayerManager.getNumberOfVisibleFrames();
 
       final float relativeFrame = (float) currentFrameNumber / numAllFrames;
       final float currentTime = relativeFrame * _endTime;
@@ -770,7 +758,7 @@ public class MapPlayerView extends ViewPart {
 
             } else {
 
-               fireMapPlayerPosition();
+               fireMapPlayerPosition(true);
             }
          }
       });
@@ -778,7 +766,7 @@ public class MapPlayerView extends ViewPart {
 
    public void updatePlayer() {
 
-      // run in display thread, this method call is started in the shader thread
+      // run in display thread, this method is called from the shader thread
 
       if (_parent.isDisposed()) {
          return;
@@ -804,6 +792,12 @@ public class MapPlayerView extends ViewPart {
       _spinnerFramesPerSecond.setSelection(foregroundFPS);
       _scaleTimeline_VisibleFrames.setSelection(MapPlayerManager.getCurrentVisibleFrameNumber() - 1);
 
+      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
+      if (mapPlayerData != null && mapPlayerData.allNotClipped_GeoLocationIndices != null) {
+
+         _scaleTimeline_AnyFrames.setMaximum(mapPlayerData.allNotClipped_GeoLocationIndices.size());
+      }
+
       updateUI_FromTimeline_Visible();
 
       enableControls();
@@ -813,7 +807,7 @@ public class MapPlayerView extends ViewPart {
 
       final int timelineSelection = _scaleTimeline_VisibleFrames.getSelection();
 
-      final float relativeTime = (float) timelineSelection / MapPlayerManager.getNumberofVisibleFrames();
+      final float relativeTime = (float) timelineSelection / MapPlayerManager.getNumberOfVisibleFrames();
       final int currentTime = (int) (relativeTime * _endTime);
 
       update_CurrentTime_Visible(currentTime);
@@ -839,17 +833,29 @@ public class MapPlayerView extends ViewPart {
 
    private void updateUI_Timeline(final int selectedFPS) {
 
-      final int numAllFrames = MapPlayerManager.getNumberofVisibleFrames();
-
       // when page increment is too small, e.g. 10 then the map position is not synced, could not yet figure out why this occures
-      final float pageIncrement = (float) numAllFrames / 50;
+      final int minScaleTicks = 50;
+
+      final int numAllVisibleFrames = MapPlayerManager.getNumberOfVisibleFrames();
+      final float visiblePageIncrement = Math.min(minScaleTicks, (float) numAllVisibleFrames / minScaleTicks);
 
       _endTime = selectedFPS < 1
             ? 1
-            : numAllFrames / selectedFPS;
+            : numAllVisibleFrames / selectedFPS;
 
-      _scaleTimeline_VisibleFrames.setMaximum(numAllFrames);
-      _scaleTimeline_VisibleFrames.setPageIncrement((int) pageIncrement);
+      _scaleTimeline_VisibleFrames.setMaximum(numAllVisibleFrames);
+      _scaleTimeline_VisibleFrames.setPageIncrement((int) visiblePageIncrement);
+
+      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
+      if (mapPlayerData == null || mapPlayerData.allNotClipped_GeoLocationIndices == null) {
+         return;
+      }
+
+      final int numAnyFrames = mapPlayerData.allNotClipped_GeoLocationIndices.size();
+      final float anyPageIncrement = Math.min(minScaleTicks, (float) numAnyFrames / minScaleTicks);
+
+      _scaleTimeline_AnyFrames.setMaximum(numAnyFrames);
+      _scaleTimeline_AnyFrames.setPageIncrement((int) anyPageIncrement);
    }
 
 }

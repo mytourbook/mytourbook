@@ -143,19 +143,19 @@ public class GLTFModel_Renderer extends LayerRenderer {
        */
 
       // skateboard
-//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/skateboard/mt-skateboard.gltf"));
-//      _modelForwardAngle = 90;
-//      _modelCenterToForwardFactor = 1.4;
+      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/skateboard/mt-skateboard.gltf"));
+      _modelForwardAngle = 90;
+      _modelCenterToForwardFactor = 1.4;
 
       // painted bicycle
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/simple-bicycle/simple-bicycle.gltf"));
 //      _modelForwardAngle = 90;
 //      _modelCenterToForwardFactor = 5;
 
-      // hochrad
-      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/hochrad/hochrad.gltf"));
-      _modelForwardAngle = -90;
-      _modelCenterToForwardFactor = -7;
+//      // hochrad
+//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/hochrad/hochrad.gltf"));
+//      _modelForwardAngle = -90;
+//      _modelCenterToForwardFactor = -7;
 
       // wood truck
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/wood-truck/wood-truck.gltf"));
@@ -447,16 +447,37 @@ public class GLTFModel_Renderer extends LayerRenderer {
          return;
       }
 
-      final int currentFrameNumber = MapPlayerManager.getCurrentVisibleFrameNumber();
-      final GeoPoint[] animatedGeoPoints = mapPlayerData.allAvailableGeoPoints;
-      final IntArrayList animatedLocationIndices = mapPlayerData.allGeoLocationIndices;
+      int geoLocationIndex;
 
-      if (currentFrameNumber >= animatedLocationIndices.size() - 1) {
-         return;
+      final boolean useVisibleFrames = true;
+
+      if (useVisibleFrames) {
+
+         final IntArrayList animatedLocationIndices = mapPlayerData.allVisibleGeoLocationIndices;
+         final int currentFrameNumber = MapPlayerManager.getCurrentVisibleFrameNumber();
+
+         if (currentFrameNumber >= animatedLocationIndices.size() - 1) {
+            return;
+         }
+
+         geoLocationIndex = animatedLocationIndices.get(currentFrameNumber - 1);
+
+      } else {
+
+         // get frame from relative position
+
+         final IntArrayList allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
+         final float relativePosition = MapPlayerManager.getRelativePosition();
+         final int numGeoLocationIndices = allNotClipped_GeoLocationIndices.size();
+
+         int positionIndex = (int) (numGeoLocationIndices * relativePosition);
+         positionIndex = MathUtils.clamp(positionIndex, 0, numGeoLocationIndices - 1);
+
+         geoLocationIndex = allNotClipped_GeoLocationIndices.get(positionIndex);
       }
 
-      final int geoLocationIndex = animatedLocationIndices.get(currentFrameNumber - 1);
-      final GeoPoint geoLocation = animatedGeoPoints[geoLocationIndex];
+      final GeoPoint[] anyGeoPoints = mapPlayerData.anyGeoPoints;
+      final GeoPoint geoLocation = anyGeoPoints[geoLocationIndex];
 
       // lat/lon -> 0...1
       final double modelProjectedPositionX = MercatorProjection.longitudeToX(geoLocation.getLongitude());

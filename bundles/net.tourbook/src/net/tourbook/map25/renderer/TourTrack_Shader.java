@@ -248,16 +248,21 @@ public final class TourTrack_Shader {
 
          if (trackConfig.arrow_IsAnimate) {
 
+            /*
+             * Update map player
+             */
+
 // SET_FORMATTING_OFF
 
-            mapPlayerData.isPlayerEnabled                = true;
-            mapPlayerData.isAnimateFromRelativePosition  = true;
+            mapPlayerData.isPlayerEnabled                   = true;
+            mapPlayerData.isAnimateFromRelativePosition     = true;
 
-            mapPlayerData.allVisiblePositions            = trackBucket.allVisiblePositions;
-            mapPlayerData.allAvailableGeoPoints          = trackBucket.allAvailableGeoPoints;
-            mapPlayerData.allGeoLocationIndices          = trackBucket.allGeoLocationIndices;
+            mapPlayerData.allVisiblePixelPositions          = trackBucket.allVisiblePixelPositions;
+            mapPlayerData.allVisibleGeoLocationIndices      = trackBucket.allVisibleGeoLocationIndices;
+            mapPlayerData.allNotClipped_GeoLocationIndices  = trackBucket.allNotClipped_GeoLocationIndices;
+            mapPlayerData.anyGeoPoints                      = trackBucket.anyGeoPoints;
 
-            mapPlayerData.mapScale                       = viewport.pos.scale;
+            mapPlayerData.mapScale                          = viewport.pos.scale;
 
 // SET_FORMATTING_ON
 
@@ -444,7 +449,7 @@ public final class TourTrack_Shader {
       {
          // get animated position
          final int nextFrameIndex = MapPlayerManager.getNextVisibleFrameIndex();
-         final int numAllVisibleFrames = MapPlayerManager.getNumberofVisibleFrames();
+         final int numAllVisibleFrames = MapPlayerManager.getNumberOfVisibleFrames();
          final float relativeVisibleVertices = (float) nextFrameIndex / numAllVisibleFrames;
 
          paint_10_Track(trackBucket, viewport, viewport2mapscale, relativeVisibleVertices);
@@ -800,7 +805,7 @@ public final class TourTrack_Shader {
                                           final TourTrack_Bucket trackBucket,
                                           final int nextFrameIndex) {
 
-      final ShortArrayList animatedPositions = trackBucket.allVisiblePositions;
+      final ShortArrayList animatedPositions = trackBucket.allVisiblePixelPositions;
 
       final int numAllPositions = animatedPositions.size();
       if (numAllPositions < 1) {

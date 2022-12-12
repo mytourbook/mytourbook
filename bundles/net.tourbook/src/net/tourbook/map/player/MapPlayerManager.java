@@ -201,9 +201,14 @@ public class MapPlayerManager {
       return getValidIndex(nextFrameNumber);
    }
 
-   public static int getNumberofVisibleFrames() {
+   public static int getNumberOfVisibleFrames() {
 
       return _numAllVisibleFrames;
+   }
+
+   public static float getRelativePosition() {
+      
+      return _currentRelativePosition;
    }
 
    /**
@@ -353,7 +358,7 @@ public class MapPlayerManager {
     */
    public static void setPlayerData(final MapPlayerData mapPlayerData) {
 
-      if (mapPlayerData.allVisiblePositions == null) {
+      if (mapPlayerData.allVisiblePixelPositions == null) {
          return;
       }
 
@@ -365,7 +370,7 @@ public class MapPlayerManager {
       _isPlayerEnabled                 = mapPlayerData.isPlayerEnabled;
       _isAnimateFromRelativePosition   = mapPlayerData.isAnimateFromRelativePosition;
 
-      _numAllVisibleFrames             = mapPlayerData.allVisiblePositions.size() / 2;
+      _numAllVisibleFrames             = mapPlayerData.allVisiblePixelPositions.size() / 2;
 
 // SET_FORMATTING_ON
 

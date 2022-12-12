@@ -32,17 +32,23 @@ public class MapPlayerData {
     */
    public boolean        isAnimateFromRelativePosition;
 
-   public ShortArrayList allVisiblePositions;
+   public ShortArrayList allVisiblePixelPositions;
 
    /**
-    * Indices for {@link #allVisiblePositions} into the tour track data
+    * Indices for {@link #allVisiblePixelPositions} into the tour track data
     */
-   public IntArrayList   allGeoLocationIndices;
+   public IntArrayList   allVisibleGeoLocationIndices;
 
    /**
     * Contains all available geo locations (in E6 format) for all selected tours
     */
-   public GeoPoint[]     allAvailableGeoPoints;
+   public GeoPoint[]     anyGeoPoints;
+
+   /**
+    * Contains indices into all geo positions for all selected tours which are also outside of
+    * the clipper (visible) area -2048...2048
+    */
+   public IntArrayList   allNotClipped_GeoLocationIndices;
 
    /**
     * Map scale when binding buffer data
