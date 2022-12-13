@@ -4748,7 +4748,7 @@ public class Map2 extends Canvas {
           * Combine tour values
           */
          sb.append(NL);
-         sb.append(String.format("%s\t%s\t%s\t%s", //$NON-NLS-1$
+         sb.append(String.format("%s\t%s\t%8s\t%10s", //$NON-NLS-1$
                text_TourDateTime,
                text_TourMovingTime,
                text_TourDistance,
