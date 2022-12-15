@@ -111,7 +111,7 @@ public class Map25ConfigManager {
     */
    private static final String TAG_OPTIONS                     = "Options";                      //$NON-NLS-1$
    private static final String ATTR_ANIMATION_EASING_TYPE      = "animationEasingType";          //$NON-NLS-1$
-   private static final String ATTR_ANIMATION_TIME             = "animationTime";                //$NON-NLS-1$
+   private static final String ATTR_ANIMATION_TIME2            = "animationTime2";               //$NON-NLS-1$
    private static final String ATTR_IS_ANIMATE_LOCATION        = "isAnimateLocation";            //$NON-NLS-1$
    private static final String ATTR_USE_DRAGGED_KEY_NAVIGATION = "useDraggedKeyboardNavigation"; //$NON-NLS-1$
    //
@@ -1185,7 +1185,7 @@ public class Map25ConfigManager {
 
       _animationTime = Util.getXmlIntInt(
             xmlOptions,
-            ATTR_ANIMATION_TIME,
+            ATTR_ANIMATION_TIME2,
             LOCATION_ANIMATION_TIME_DEFAULT,
             LOCATION_ANIMATION_TIME_MIN,
             LOCATION_ANIMATION_TIME_MAX);
@@ -1321,7 +1321,7 @@ public class Map25ConfigManager {
       final IMemento xmlOptions = xmlRoot.createChild(TAG_OPTIONS);
       {
          xmlOptions.putBoolean(ATTR_IS_ANIMATE_LOCATION, _isAnimateLocation);
-         xmlOptions.putInteger(ATTR_ANIMATION_TIME, _animationTime);
+         xmlOptions.putInteger(ATTR_ANIMATION_TIME2, _animationTime);
 
          Util.setXmlEnum(xmlOptions, ATTR_ANIMATION_EASING_TYPE, _animationEasingType);
 
