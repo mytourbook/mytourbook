@@ -62,7 +62,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    private final TourTrack_BucketManager _bucketManager_ForPainting;
    private TourTrack_BucketManager       _bucketManager_ForWorker;
 
-   private boolean                       _isUpdateLayer;
+   private boolean                       _isCancelWorkerTask;
    private boolean                       _isUpdateNewPoints;
 
    /**
@@ -76,6 +76,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    private int                           _oldY         = -1;
    private int                           _oldZoomScale = -1;
 
+   /**
+    * This is the layer for this renderer
+    */
    private TourTrack_Layer               _tourLayer;
 
    private final TrackCompileWorker      _trackCompileWorker;
@@ -228,6 +231,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                   __allNotClipped_LocationIndices.clear();
                }
 
+               // lat/lon -> 0...1
                for (int pointIndex = 0; pointIndex < numGeoPoints; pointIndex++) {
                   MercatorProjection.project(__anyGeoPoints[pointIndex], projectedPoints, pointIndex);
                }
@@ -324,12 +328,17 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          // setup tour clipper
          __lineClipper.clipStart(pixelX, pixelY);
 
-         final float[] pixelPoints = __pixelPoints;
-         final int[] pixelPointColorsHalf = __pixelPointColorsHalf;
+// SET_FORMATTING_OFF
 
-         final IntArrayList allNotClipped_LocationIndices = __allNotClipped_LocationIndices;
-         final FloatArrayList allDirectionArrow_PixelPosition = __pixelDirection_ArrowPositions;
-         final IntArrayList allDirectionArrow_LocationIndex = __pixelDirection_LocationIndex;
+         final float[] pixelPoints                             = __pixelPoints;
+         final int[] pixelPointColorsHalf                      = __pixelPointColorsHalf;
+
+         final IntArrayList allNotClipped_LocationIndices      = __allNotClipped_LocationIndices;
+         final FloatArrayList allDirectionArrow_PixelPosition  = __pixelDirection_ArrowPositions;
+         final IntArrayList allDirectionArrow_LocationIndex    = __pixelDirection_LocationIndex;
+
+// SET_FORMATTING_ON
+
          allNotClipped_LocationIndices.clear();
          allDirectionArrow_PixelPosition.clear();
          allDirectionArrow_LocationIndex.clear();
@@ -411,7 +420,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             final float diffXNotClipped = pixelX - prevXNotClipped;
             final float diffYNotClipped = pixelY - prevYNotClipped;
 
-            if (pixelPointIndex == 0 || FastMath.absMaxCmp(diffXNotClipped, diffYNotClipped, MIN_DIST)) {
+            if (FastMath.absMaxCmp(diffXNotClipped, diffYNotClipped, MIN_DIST)) {
 
                // point > min distance == 3
 
@@ -505,8 +514,12 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          }
 
          workerBucket.anyGeoPoints = __anyGeoPoints;
-         workerBucket.allNotClipped_GeoLocationIndices = __allNotClipped_LocationIndices;
-      }
+         workerBucket.allNotClipped_GeoLocationIndices = allNotClipped_LocationIndices;
+
+//         System.out.println((System.currentTimeMillis() + " not clipped indices:" + allNotClipped_LocationIndices.size()));
+         // TODO remove SYSTEM.OUT.PRINTLN
+
+      } // doWork_CompileTrack end
 
       private int getNextTourStartIndex(final int tourIndex) {
 
@@ -704,7 +717,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _trackCompileWorker.cancel(true);
 
       _isUpdateNewPoints = true;
-      _isUpdateLayer = true;
+      _isCancelWorkerTask = true;
 
       TourTrack_Shader.resetAngle();
 
@@ -728,18 +741,19 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       /*
        * Update layers when map moved by at least one tile or zoomlevel has changed
        */
-      if (currentX != _oldX || currentY != _oldY || currentZoomScale != _oldZoomScale || _isUpdateLayer) {
+      if (currentX != _oldX || currentY != _oldY || currentZoomScale != _oldZoomScale || _isCancelWorkerTask) {
 
          /*
           * It took me many days to find this solution that a newly selected tour is
           * displayed after the map position was moved/tilt/rotated. It works but I don't
           * know exacly why.
           */
-         if (_isUpdateLayer) {
+         if (_isCancelWorkerTask) {
+
+            _isCancelWorkerTask = false;
+
             _trackCompileWorker.cancel(true);
          }
-
-         _isUpdateLayer = false;
 
          /*
           * Submit compile task and repeat .poll() in each frame until it returns not null -> then
@@ -753,7 +767,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       }
 
       /*
-       * workerTask is not null after the track is compiled
+       * workerTask will not be null after the track is compiled
        */
       final TourCompileTask workerTask = _trackCompileWorker.poll();
 

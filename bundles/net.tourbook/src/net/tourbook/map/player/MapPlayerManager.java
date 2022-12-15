@@ -195,7 +195,8 @@ public class MapPlayerManager {
       _lastUpdateTime = currentTimeMS;
 
       if (isPlayerAvailable()) {
-         _mapPlayerView.updateFrameNumber(_currentVisibleFrameNumber);
+// this fires map position         
+//         _mapPlayerView.updateFrameNumber(_currentVisibleFrameNumber);
       }
 
       return getValidIndex(nextFrameNumber);
@@ -207,7 +208,7 @@ public class MapPlayerManager {
    }
 
    public static float getRelativePosition() {
-      
+
       return _currentRelativePosition;
    }
 
@@ -352,7 +353,8 @@ public class MapPlayerManager {
    /**
     * Setup map player with all necessary data to run the animation.
     * <p>
-    * This method is called when new data are set into the shader buffer data.
+    * This method is called when new data are set into the shader buffer data, for a new zoom level
+    * or when map is moved more than a tile
     *
     * @param mapPlayerData
     */

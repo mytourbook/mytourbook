@@ -449,7 +449,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
       int geoLocationIndex;
 
-      final boolean useVisibleFrames = true;
+      final boolean useVisibleFrames = false;
 
       if (useVisibleFrames) {
 
@@ -467,13 +467,21 @@ public class GLTFModel_Renderer extends LayerRenderer {
          // get frame from relative position
 
          final IntArrayList allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
-         final float relativePosition = MapPlayerManager.getRelativePosition();
          final int numGeoLocationIndices = allNotClipped_GeoLocationIndices.size();
 
-         int positionIndex = (int) (numGeoLocationIndices * relativePosition);
-         positionIndex = MathUtils.clamp(positionIndex, 0, numGeoLocationIndices - 1);
+         if (numGeoLocationIndices > 0) {
 
-         geoLocationIndex = allNotClipped_GeoLocationIndices.get(positionIndex);
+            final float relativePosition = MapPlayerManager.getRelativePosition();
+
+            int positionIndex = (int) (numGeoLocationIndices * relativePosition);
+            positionIndex = MathUtils.clamp(positionIndex, 0, numGeoLocationIndices - 1);
+
+            geoLocationIndex = allNotClipped_GeoLocationIndices.get(positionIndex);
+
+         } else {
+
+            geoLocationIndex = 0;
+         }
       }
 
       final GeoPoint[] anyGeoPoints = mapPlayerData.anyGeoPoints;

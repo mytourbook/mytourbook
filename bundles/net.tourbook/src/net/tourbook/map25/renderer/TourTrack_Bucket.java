@@ -657,7 +657,6 @@ public class TourTrack_Bucket {
     *           Contains the x/y pixel positions for the direction arrows
     * @param allDirectionArrow_LocationIndices
     *           Contains the indices into the tour track data, e.g geo location
-    * @param allNotClipped_GeoLocationIndices
     */
    public void createArrowVertices(final FloatArrayList allDirectionArrowPixelList,
                                    final IntArrayList allLocationIndices) {

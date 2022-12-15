@@ -418,12 +418,11 @@ public class MapPlayerView extends ViewPart {
          return;
       }
 
-      final IntArrayList animatedLocationIndices = mapPlayerData.allVisibleGeoLocationIndices;
-
       int geoLocationIndex = 0;
 
       if (useVisibleFrames) {
 
+         final IntArrayList animatedLocationIndices = mapPlayerData.allVisibleGeoLocationIndices;
          final int currentFrameNumber = MapPlayerManager.getCurrentVisibleFrameNumber();
 
          if (currentFrameNumber >= animatedLocationIndices.size() - 1) {
@@ -437,10 +436,23 @@ public class MapPlayerView extends ViewPart {
          // get frame from relative position
 
          final IntArrayList allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
+         final int numNotClippedPositions = allNotClipped_GeoLocationIndices.size();
          final float relativePosition = MapPlayerManager.getRelativePosition();
-         final int positionIndex = (int) (allNotClipped_GeoLocationIndices.size() * relativePosition);
+
+         int positionIndex = (int) (numNotClippedPositions * relativePosition);
+
+         // check bounds
+         positionIndex = positionIndex >= numNotClippedPositions ? numNotClippedPositions - 1 : positionIndex;
 
          geoLocationIndex = allNotClipped_GeoLocationIndices.get(positionIndex);
+
+//         System.out.println((System.currentTimeMillis()
+//
+//               + " posIdx:" + positionIndex
+//               + " geoLocIdx:" + geoLocationIndex
+//
+//         ));
+         // TODO remove SYSTEM.OUT.PRINTLN
       }
 
       final GeoPoint[] anyGeoPoints = mapPlayerData.anyGeoPoints;
@@ -500,7 +512,7 @@ public class MapPlayerView extends ViewPart {
 
       _isShow_EndTime_Or_RemainingTime = !_isShow_EndTime_Or_RemainingTime;
 
-      updateUI_FromTimeline_Visible();
+      updateUI_FromTimeline_VisibleFrames();
    }
 
    private void onPlayControl_Loop() {
@@ -518,7 +530,7 @@ public class MapPlayerView extends ViewPart {
          MapPlayerManager.setIsPlayerRunning(true);
          MapPlayerManager.setRelativePosition(0);
 
-         updateUI_PlayAndPaused();
+         updateUI_PlayAndPausedControls();
       }
    }
 
@@ -534,7 +546,7 @@ public class MapPlayerView extends ViewPart {
       MapPlayerManager.setForegroundFPS(selectedFPS);
 
       // adjust timeline
-      updateUI_Timeline(selectedFPS);
+      updateUI_TimelineMaxValue(selectedFPS);
    }
 
    private void onSelectReLivePlaying() {
@@ -601,10 +613,10 @@ public class MapPlayerView extends ViewPart {
 
       stopPlayerWhenRunning();
 
-      updateUI_FromTimeline_Visible();
+      updateUI_FromTimeline_VisibleFrames();
 
       final float timelineSelection = scale.getSelection();
-      final float relativePosition = timelineSelection / MapPlayerManager.getNumberOfVisibleFrames();
+      final float relativePosition = timelineSelection / scale.getMaximum();
 
       MapPlayerManager.setRelativePosition(relativePosition);
 
@@ -618,7 +630,7 @@ public class MapPlayerView extends ViewPart {
       _actionPlayControl_Loop.setChecked(MapPlayerManager.isPlayingLoop());
       _chkIsRelivePlaying.setSelection(MapPlayerManager.isReLivePlaying());
 
-      updateUI_PlayAndPaused();
+      updateUI_PlayAndPausedControls();
    }
 
    @PersistState
@@ -638,7 +650,7 @@ public class MapPlayerView extends ViewPart {
       if (MapPlayerManager.isPlayerRunning()) {
 
          MapPlayerManager.setIsPlayerRunning(false);
-         updateUI_PlayAndPaused();
+         updateUI_PlayAndPausedControls();
       }
    }
 
@@ -672,10 +684,10 @@ public class MapPlayerView extends ViewPart {
          }
       }
 
-      updateUI_PlayAndPaused();
+      updateUI_PlayAndPausedControls();
    }
 
-   private void update_CurrentTime_Visible(final int currentTime) {
+   private void update_CurrentTime_VisibleFrames(final int currentTime) {
 
       _currentTime_Visible = currentTime;
 
@@ -746,7 +758,7 @@ public class MapPlayerView extends ViewPart {
             // this is a very expensive operation: 28 ms for each frame !!!
 //          _scaleTimeline.setToolTipText(Integer.toString(currentFrameNumber));
 
-            update_CurrentTime_Visible(currentTimeInUI);
+            update_CurrentTime_VisibleFrames(currentTimeInUI);
 
             // stop playing when end of animation is reached
             final boolean isLastFrame = currentFrameNumber == numAllFrames;
@@ -754,7 +766,7 @@ public class MapPlayerView extends ViewPart {
 
                MapPlayerManager.setIsPlayerRunning(false);
 
-               updateUI_PlayAndPaused();
+               updateUI_PlayAndPausedControls();
 
             } else {
 
@@ -787,33 +799,27 @@ public class MapPlayerView extends ViewPart {
 
       final int foregroundFPS = MapPlayerManager.getForegroundFPS();
 
-      updateUI_Timeline(foregroundFPS);
+      updateUI_TimelineMaxValue(foregroundFPS);
 
       _spinnerFramesPerSecond.setSelection(foregroundFPS);
       _scaleTimeline_VisibleFrames.setSelection(MapPlayerManager.getCurrentVisibleFrameNumber() - 1);
 
-      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
-      if (mapPlayerData != null && mapPlayerData.allNotClipped_GeoLocationIndices != null) {
-
-         _scaleTimeline_AnyFrames.setMaximum(mapPlayerData.allNotClipped_GeoLocationIndices.size());
-      }
-
-      updateUI_FromTimeline_Visible();
+      updateUI_FromTimeline_VisibleFrames();
 
       enableControls();
    }
 
-   private void updateUI_FromTimeline_Visible() {
+   private void updateUI_FromTimeline_VisibleFrames() {
 
       final int timelineSelection = _scaleTimeline_VisibleFrames.getSelection();
 
       final float relativeTime = (float) timelineSelection / MapPlayerManager.getNumberOfVisibleFrames();
       final int currentTime = (int) (relativeTime * _endTime);
 
-      update_CurrentTime_Visible(currentTime);
+      update_CurrentTime_VisibleFrames(currentTime);
    }
 
-   private void updateUI_PlayAndPaused() {
+   private void updateUI_PlayAndPausedControls() {
 
       if (MapPlayerManager.isPlayerRunning()) {
 
@@ -831,13 +837,18 @@ public class MapPlayerView extends ViewPart {
       }
    }
 
-   private void updateUI_Timeline(final int selectedFPS) {
+   /**
+    * Update the timelines max and page increment values
+    *
+    * @param selectedFPS
+    */
+   private void updateUI_TimelineMaxValue(final int selectedFPS) {
 
       // when page increment is too small, e.g. 10 then the map position is not synced, could not yet figure out why this occures
       final int minScaleTicks = 50;
 
       final int numAllVisibleFrames = MapPlayerManager.getNumberOfVisibleFrames();
-      final float visiblePageIncrement = Math.min(minScaleTicks, (float) numAllVisibleFrames / minScaleTicks);
+      final float visiblePageIncrement = (float) numAllVisibleFrames / minScaleTicks;
 
       _endTime = selectedFPS < 1
             ? 1
@@ -847,15 +858,14 @@ public class MapPlayerView extends ViewPart {
       _scaleTimeline_VisibleFrames.setPageIncrement((int) visiblePageIncrement);
 
       final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
-      if (mapPlayerData == null || mapPlayerData.allNotClipped_GeoLocationIndices == null) {
-         return;
+      if (mapPlayerData != null && mapPlayerData.allNotClipped_GeoLocationIndices != null) {
+
+         final int numNotClippedFrames = mapPlayerData.allNotClipped_GeoLocationIndices.size();
+         final float notClippedPageIncrement = (float) numNotClippedFrames / minScaleTicks;
+
+         _scaleTimeline_AnyFrames.setMaximum(numNotClippedFrames);
+         _scaleTimeline_AnyFrames.setPageIncrement((int) notClippedPageIncrement);
       }
-
-      final int numAnyFrames = mapPlayerData.allNotClipped_GeoLocationIndices.size();
-      final float anyPageIncrement = Math.min(minScaleTicks, (float) numAnyFrames / minScaleTicks);
-
-      _scaleTimeline_AnyFrames.setMaximum(numAnyFrames);
-      _scaleTimeline_AnyFrames.setPageIncrement((int) anyPageIncrement);
    }
 
 }
