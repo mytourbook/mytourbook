@@ -41,7 +41,6 @@ import net.tourbook.map.player.MapPlayerData;
 import net.tourbook.map.player.MapPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
 
-import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.oscim.backend.GL;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
@@ -453,21 +452,21 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
       if (useVisibleFrames) {
 
-         final IntArrayList animatedLocationIndices = mapPlayerData.allVisibleGeoLocationIndices;
+         final int[] animatedLocationIndices = mapPlayerData.allVisible_GeoLocationIndices;
          final int currentFrameNumber = MapPlayerManager.getCurrentVisibleFrameNumber();
 
-         if (currentFrameNumber >= animatedLocationIndices.size() - 1) {
+         if (currentFrameNumber >= animatedLocationIndices.length - 1) {
             return;
          }
 
-         geoLocationIndex = animatedLocationIndices.get(currentFrameNumber - 1);
+         geoLocationIndex = animatedLocationIndices[currentFrameNumber - 1];
 
       } else {
 
          // get frame from relative position
 
-         final IntArrayList allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
-         final int numGeoLocationIndices = allNotClipped_GeoLocationIndices.size();
+         final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
+         final int numGeoLocationIndices = allNotClipped_GeoLocationIndices.length;
 
          if (numGeoLocationIndices > 0) {
 
@@ -476,7 +475,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
             int positionIndex = (int) (numGeoLocationIndices * relativePosition);
             positionIndex = MathUtils.clamp(positionIndex, 0, numGeoLocationIndices - 1);
 
-            geoLocationIndex = allNotClipped_GeoLocationIndices.get(positionIndex);
+            geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
 
          } else {
 

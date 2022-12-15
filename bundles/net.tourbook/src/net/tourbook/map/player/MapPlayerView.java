@@ -27,7 +27,6 @@ import net.tourbook.common.util.Util;
 import net.tourbook.map.MapManager;
 import net.tourbook.map25.Map25FPSManager;
 
-import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
@@ -422,21 +421,21 @@ public class MapPlayerView extends ViewPart {
 
       if (useVisibleFrames) {
 
-         final IntArrayList animatedLocationIndices = mapPlayerData.allVisibleGeoLocationIndices;
+         final int[] animatedLocationIndices = mapPlayerData.allVisible_GeoLocationIndices;
          final int currentFrameNumber = MapPlayerManager.getCurrentVisibleFrameNumber();
 
-         if (currentFrameNumber >= animatedLocationIndices.size() - 1) {
+         if (currentFrameNumber >= animatedLocationIndices.length - 1) {
             return;
          }
 
-         geoLocationIndex = animatedLocationIndices.get(currentFrameNumber - 1);
+         geoLocationIndex = animatedLocationIndices[currentFrameNumber - 1];
 
       } else {
 
          // get frame from relative position
 
-         final IntArrayList allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
-         final int numNotClippedPositions = allNotClipped_GeoLocationIndices.size();
+         final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
+         final int numNotClippedPositions = allNotClipped_GeoLocationIndices.length;
          final float relativePosition = MapPlayerManager.getRelativePosition();
 
          int positionIndex = (int) (numNotClippedPositions * relativePosition);
@@ -444,7 +443,7 @@ public class MapPlayerView extends ViewPart {
          // check bounds
          positionIndex = positionIndex >= numNotClippedPositions ? numNotClippedPositions - 1 : positionIndex;
 
-         geoLocationIndex = allNotClipped_GeoLocationIndices.get(positionIndex);
+         geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
 
 //         System.out.println((System.currentTimeMillis()
 //
@@ -860,7 +859,7 @@ public class MapPlayerView extends ViewPart {
       final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
       if (mapPlayerData != null && mapPlayerData.allNotClipped_GeoLocationIndices != null) {
 
-         final int numNotClippedFrames = mapPlayerData.allNotClipped_GeoLocationIndices.size();
+         final int numNotClippedFrames = mapPlayerData.allNotClipped_GeoLocationIndices.length;
          final float notClippedPageIncrement = (float) numNotClippedFrames / minScaleTicks;
 
          _scaleTimeline_AnyFrames.setMaximum(numNotClippedFrames);

@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map.player;
 
-import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
-import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.core.GeoPoint;
 
 /**
@@ -24,34 +22,28 @@ import org.oscim.core.GeoPoint;
  */
 public class MapPlayerData {
 
-   public boolean        isPlayerEnabled;
+   public boolean    isPlayerEnabled;
+
+   public short[]    allVisible_PixelPositions;
 
    /**
-    * When <code>true</code> then proceed the animation from the current relative position,
-    * otherwise start animation from the beginning
+    * Indices for {@link #allVisible_PixelPositions} into the tour track data
     */
-   public boolean        isAnimateFromRelativePosition;
-
-   public ShortArrayList allVisiblePixelPositions;
-
-   /**
-    * Indices for {@link #allVisiblePixelPositions} into the tour track data
-    */
-   public IntArrayList   allVisibleGeoLocationIndices;
+   public int[]      allVisible_GeoLocationIndices;
 
    /**
     * Contains all available geo locations (in E6 format) for all selected tours
     */
-   public GeoPoint[]     anyGeoPoints;
+   public GeoPoint[] anyGeoPoints;
 
    /**
     * Contains indices into all geo positions for all selected tours which are also outside of
     * the clipper (visible) area -2048...2048
     */
-   public IntArrayList   allNotClipped_GeoLocationIndices;
+   public int[]      allNotClipped_GeoLocationIndices;
 
    /**
     * Map scale when binding buffer data
     */
-   public double         mapScale;
+   public double     mapScale;
 }

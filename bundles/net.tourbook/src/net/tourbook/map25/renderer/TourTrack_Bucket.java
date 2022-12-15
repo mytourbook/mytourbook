@@ -108,12 +108,12 @@ public class TourTrack_Bucket {
     * ...
     * </pre>
     */
-   ShortArrayList             allVisiblePixelPositions;
+   ShortArrayList             allVisible_PixelPositions;
 
    /**
-    * Indices for {@link #allVisiblePixelPositions} into the tour track data
+    * Indices for {@link #allVisible_PixelPositions} into the tour track data
     */
-   IntArrayList               allVisibleGeoLocationIndices;
+   IntArrayList               allVisible_GeoLocationIndices;
 
    /**
     * Contains all available geo locations for all selected tours
@@ -130,8 +130,8 @@ public class TourTrack_Bucket {
 
       trackVertexData = new TourTrack_VertexData();
 
-      allVisiblePixelPositions = new ShortArrayList();
-      allVisibleGeoLocationIndices = new IntArrayList();
+      allVisible_PixelPositions = new ShortArrayList();
+      allVisible_GeoLocationIndices = new IntArrayList();
 
       directionArrow_Vertices = new ShortArrayList();
       directionArrow_ColorCoords = new ShortArrayList();
@@ -662,8 +662,8 @@ public class TourTrack_Bucket {
                                    final IntArrayList allLocationIndices) {
 
       // create new list to not update currently used list, otherwise a bound exception can occure !!!
-      allVisiblePixelPositions.clear();
-      allVisibleGeoLocationIndices.clear();
+      allVisible_PixelPositions.clear();
+      allVisible_GeoLocationIndices.clear();
 
       directionArrow_Vertices.clear();
       directionArrow_ColorCoords.clear();
@@ -1021,7 +1021,7 @@ public class TourTrack_Bucket {
    private void createArrowVertices_200_Animated(final float[] allDirectionArrowPixel,
                                                  final IntArrayList allLocationIndices) {
 
-      allVisibleGeoLocationIndices = allLocationIndices;
+      allVisible_GeoLocationIndices = allLocationIndices;
 
       for (int pixelIndex = 0; pixelIndex < allDirectionArrowPixel.length;) {
 
@@ -1031,7 +1031,7 @@ public class TourTrack_Bucket {
          final short p2X_scaled = (short) (p2X * COORD_SCALE);
          final short p2Y_scaled = (short) (p2Y * COORD_SCALE);
 
-         allVisiblePixelPositions.addAll(p2X_scaled, p2Y_scaled);
+         allVisible_PixelPositions.addAll(p2X_scaled, p2Y_scaled);
       }
    }
 

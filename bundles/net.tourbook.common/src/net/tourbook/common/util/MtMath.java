@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.common.util;
 
+import java.util.Arrays;
+
 /**
  * MyTourbook Mathematics
  */
@@ -99,6 +101,16 @@ public class MtMath {
    // = 1/298.2572229328709613   1/298.257223563 // ca. (A-B)/A
    private static final double ABPLATTUNG_F = (HALBACHSE_A - HALBACHSE_B) / HALBACHSE_A;
 
+   public static double angleFromShorts(final short x1, final short y1, final short x2, final short y2) {
+
+      final double deltaY = y1 - y2;
+      final double deltaX = x2 - x1;
+
+      final double result = Math.toDegrees(Math.atan2(deltaY, deltaX));
+
+      return (result < 0) ? (360d + result) : result;
+   }
+
    /**
     * Work out the angle from the x horizontal winding anti-clockwise
     * in screen space.
@@ -131,14 +143,41 @@ public class MtMath {
       return (result < 0) ? (360d + result) : result;
    }
 
-   public static double angleFromShorts(final short x1, final short y1, final short x2, final short y2) {
+   /**
+    * Find the nearest values in a sorted array
+    * <p>
+    * Original source<br>
+    * <a href=
+    * "https://stackoverflow.com/questions/30245166/find-the-nearest-closest-value-in-a-sorted-list#30245398">https://stackoverflow.com/questions/30245166/find-the-nearest-closest-value-in-a-sorted-list#30245398</a>
+    *
+    * @param array
+    * @param value
+    * @return Return the index of the nearest value and not the nearest value itself
+    */
+   public static int searchNearestIndex(final int[] array, final int value) {
 
-      final double deltaY = y1 - y2;
-      final double deltaX = x2 - x1;
+      if (value <= array[0]) {
+         return 0;
+      }
 
-      final double result = Math.toDegrees(Math.atan2(deltaY, deltaX));
+      if (value >= array[array.length - 1]) {
+         return array.length - 1;
+      }
 
-      return (result < 0) ? (360d + result) : result;
+      final int result = Arrays.binarySearch(array, value);
+
+      if (result >= 0) {
+         return result;
+      }
+
+      final int insertionPoint = -result - 1;
+
+      final int nearestDiff1 = array[insertionPoint] - value;
+      final int nearestDiff2 = value - array[insertionPoint - 1];
+
+      return nearestDiff1 < nearestDiff2
+            ? insertionPoint
+            : insertionPoint - 1;
    }
 
    /**

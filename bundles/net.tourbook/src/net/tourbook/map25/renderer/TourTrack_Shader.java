@@ -255,11 +255,10 @@ public final class TourTrack_Shader {
 // SET_FORMATTING_OFF
 
             mapPlayerData.isPlayerEnabled                   = true;
-            mapPlayerData.isAnimateFromRelativePosition     = true;
 
-            mapPlayerData.allVisiblePixelPositions          = trackBucket.allVisiblePixelPositions;
-            mapPlayerData.allVisibleGeoLocationIndices      = trackBucket.allVisibleGeoLocationIndices;
-            mapPlayerData.allNotClipped_GeoLocationIndices  = trackBucket.allNotClipped_GeoLocationIndices;
+            mapPlayerData.allVisible_PixelPositions         = trackBucket.allVisible_PixelPositions.toArray();
+            mapPlayerData.allVisible_GeoLocationIndices     = trackBucket.allVisible_GeoLocationIndices.toArray();
+            mapPlayerData.allNotClipped_GeoLocationIndices  = trackBucket.allNotClipped_GeoLocationIndices.toArray();
             mapPlayerData.anyGeoPoints                      = trackBucket.anyGeoPoints;
 
             mapPlayerData.mapScale                          = viewport.pos.scale;
@@ -809,24 +808,28 @@ public final class TourTrack_Shader {
                                           final TourTrack_Bucket trackBucket,
                                           final int nextFrameIndex) {
 
-      final ShortArrayList allVisiblePixelPositions = trackBucket.allVisiblePixelPositions;
+      final ShortArrayList allVisiblePixelPositions = trackBucket.allVisible_PixelPositions;
 
       final int numAllPositions = allVisiblePixelPositions.size();
       if (numAllPositions < 1) {
          return;
       }
 
-      final AnimationShader shader = _animationShader;
-      shader.useProgram();
-
       // get animated position
       final int xyPosIndex = nextFrameIndex * 2;
       final int xyPrevPosIndex = xyPosIndex > 1 ? xyPosIndex - 2 : 0;
+
+      if (xyPosIndex + 1 >= numAllPositions) {
+         return;
+      }
 
       final short pos1X = allVisiblePixelPositions.get(xyPrevPosIndex);
       final short pos1Y = allVisiblePixelPositions.get(xyPrevPosIndex + 1);
       final short pos2X = allVisiblePixelPositions.get(xyPosIndex);
       final short pos2Y = allVisiblePixelPositions.get(xyPosIndex + 1);
+
+      final AnimationShader shader = _animationShader;
+      shader.useProgram();
 
       // rotate model to look forward
       final float angle = getAnimatedAngle(pos1X, pos1Y, pos2X, pos2Y);
