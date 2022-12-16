@@ -21,8 +21,6 @@ import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
 
-import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
-import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeoPoint;
@@ -108,12 +106,12 @@ public class TourTrack_Bucket {
     * ...
     * </pre>
     */
-   ShortArrayList             allVisible_PixelPositions;
+   short[]                    allVisible_PixelPositions;
 
    /**
     * Indices for {@link #allVisible_PixelPositions} into the tour track data
     */
-   IntArrayList               allVisible_GeoLocationIndices;
+   int[]                      allVisible_GeoLocationIndices;
 
    /**
     * Contains all available geo locations for all selected tours
@@ -124,14 +122,11 @@ public class TourTrack_Bucket {
     * Contains indices into all geo positions {@link #anyGeoPoints} for all selected tours
     * which are also outside of the clipper (visible) area -2048...2048
     */
-   IntArrayList               allNotClipped_GeoLocationIndices;
+   int[]                      allNotClipped_GeoLocationIndices;
 
    public TourTrack_Bucket() {
 
       trackVertexData = new TourTrack_VertexData();
-
-      allVisible_PixelPositions = new ShortArrayList();
-      allVisible_GeoLocationIndices = new IntArrayList();
 
       directionArrow_Vertices = new ShortArrayList();
       directionArrow_ColorCoords = new ShortArrayList();
@@ -658,22 +653,16 @@ public class TourTrack_Bucket {
     * @param allDirectionArrow_LocationIndices
     *           Contains the indices into the tour track data, e.g geo location
     */
-   public void createArrowVertices(final FloatArrayList allDirectionArrowPixelList,
-                                   final IntArrayList allLocationIndices) {
-
-      // create new list to not update currently used list, otherwise a bound exception can occure !!!
-      allVisible_PixelPositions.clear();
-      allVisible_GeoLocationIndices.clear();
+   public void createArrowVertices(final float[] allDirectionArrowPixel,
+                                   final int[] allLocationIndices) {
 
       directionArrow_Vertices.clear();
       directionArrow_ColorCoords.clear();
 
       // at least 2 positions are needed
-      if (allDirectionArrowPixelList.size() < 4) {
+      if (allDirectionArrowPixel.length < 4) {
          return;
       }
-
-      final float[] allDirectionArrowPixel = allDirectionArrowPixelList.toArray();
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
@@ -1019,19 +1008,24 @@ public class TourTrack_Bucket {
    }
 
    private void createArrowVertices_200_Animated(final float[] allDirectionArrowPixel,
-                                                 final IntArrayList allLocationIndices) {
+                                                 final int[] allLocationIndices) {
 
       allVisible_GeoLocationIndices = allLocationIndices;
 
-      for (int pixelIndex = 0; pixelIndex < allDirectionArrowPixel.length;) {
+      final int numPixels = allDirectionArrowPixel.length;
 
-         final float p2X = allDirectionArrowPixel[pixelIndex++];
-         final float p2Y = allDirectionArrowPixel[pixelIndex++];
+      allVisible_PixelPositions = new short[numPixels];
+
+      for (int pixelIndex = 0; pixelIndex < numPixels; pixelIndex += 2) {
+
+         final float p2X = allDirectionArrowPixel[pixelIndex];
+         final float p2Y = allDirectionArrowPixel[pixelIndex + 1];
 
          final short p2X_scaled = (short) (p2X * COORD_SCALE);
          final short p2Y_scaled = (short) (p2Y * COORD_SCALE);
 
-         allVisible_PixelPositions.addAll(p2X_scaled, p2Y_scaled);
+         allVisible_PixelPositions[pixelIndex] = p2X_scaled;
+         allVisible_PixelPositions[pixelIndex + 1] = p2Y_scaled;
       }
    }
 

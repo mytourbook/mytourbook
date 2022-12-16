@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.map.player;
 
-import java.util.Arrays;
-
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
@@ -50,9 +48,11 @@ public class MapPlayerManager {
    private static int                   _numAllVisibleFrames;
 
    private static long                  _animationStartTime;
+   private static long                  _lastUpdateTime;
    private static float                 _animationForwardAngle;
    private static float                 _currentRelativePosition;
-   private static long                  _lastUpdateTime;
+   private static int                   _currentNotClippedLocationIndex;
+   private static int                   _currentVisibleIndex;
 
    private static boolean               _isAnimateFromRelativePosition;
    private static boolean               _isAnimationVisible;
@@ -74,7 +74,6 @@ public class MapPlayerManager {
     */
    private static boolean               _isShowAnimationCursor;
 
-   private static int                   _lastNotClippedLocationIndex;
 
    /**
     * @return Returns the angle for the model forward direction
@@ -121,15 +120,16 @@ public class MapPlayerManager {
     */
    public static int getNextVisibleFrameIndex() {
 
-      if (_isPlayerRunning == false
+      if (
 
-            // exception: compute current frame when relative positions are set,
+      // player is paused
+      _isPlayerRunning == false
+
+            // exception: compute current frame when a relative position is set,
             //            this is used when timeline is dragged/selected
             && _isAnimateFromRelativePosition == false) {
 
-         // player is paused
-
-         return getValidIndex(_lastNotClippedLocationIndex);
+         return _currentVisibleIndex;
       }
 
       final int[] allNotClipped_GeoLocationIndices = _mapPlayerData.allNotClipped_GeoLocationIndices;
@@ -140,6 +140,7 @@ public class MapPlayerManager {
       }
 
       int nextFrameNumber = 0;
+      boolean isComputeNextVisibleIndex = false;
 
       if (_isAnimateFromRelativePosition) {
 
@@ -147,43 +148,48 @@ public class MapPlayerManager {
 
          _isAnimateFromRelativePosition = false;
 
-         nextFrameNumber = Math.round(numNotClipped_GeoLocationIndices * _currentRelativePosition);
+         _currentNotClippedLocationIndex = Math.round(numNotClipped_GeoLocationIndices * _currentRelativePosition);
 
-         _lastNotClippedLocationIndex = nextFrameNumber;
+         isComputeNextVisibleIndex = true;
 
-//      } else if (_isPlayingLoop && _currentVisibleFrameNumber >= _numAllVisibleFrames) {
-//
-//         // 2. Prio: Loop animation
-//
-//         // start loop with first frame
-//
-//         nextFrameNumber = 1;
-//
-//         _lastNotClippedLocationIndex = 0;
+      } else if (_isPlayingLoop && _currentVisibleFrameNumber >= _numAllVisibleFrames) {
+
+         // 2. Prio: Loop animation
+
+         // start loop with first frame
+
+         nextFrameNumber = 1;
+
+         _currentNotClippedLocationIndex = 0;
 
       } else {
 
          // 3. Prio: Compute next frame
 
-         final int[] allVisibleGeoLocationIndices = _mapPlayerData.allVisible_GeoLocationIndices;
-
-         if (_lastNotClippedLocationIndex < numNotClipped_GeoLocationIndices - 1) {
-            _lastNotClippedLocationIndex++;
+         if (_currentNotClippedLocationIndex < numNotClipped_GeoLocationIndices - 2) {
+            _currentNotClippedLocationIndex++;
          }
 
-         _currentRelativePosition = _lastNotClippedLocationIndex / (float) numNotClipped_GeoLocationIndices;
+         _currentRelativePosition = _currentNotClippedLocationIndex / (float) numNotClipped_GeoLocationIndices;
+
+         isComputeNextVisibleIndex = true;
+      }
+
+      if (isComputeNextVisibleIndex) {
+
+         /*
+          * Compute visible index from not clipped index
+          */
 
          // ensure bounds
-         if (_lastNotClippedLocationIndex >= numNotClipped_GeoLocationIndices) {
-            _lastNotClippedLocationIndex = numNotClipped_GeoLocationIndices - 1;
+         if (_currentNotClippedLocationIndex >= numNotClipped_GeoLocationIndices) {
+            _currentNotClippedLocationIndex = numNotClipped_GeoLocationIndices - 1;
          }
 
-         final int nextLocationIndex = allNotClipped_GeoLocationIndices[_lastNotClippedLocationIndex];
+         final int[] allVisibleGeoLocationIndices = _mapPlayerData.allVisible_GeoLocationIndices;
+         final int notClippedIndex = allNotClipped_GeoLocationIndices[_currentNotClippedLocationIndex];
 
-         nextFrameNumber = MtMath.searchNearestIndex(allVisibleGeoLocationIndices, nextLocationIndex);
-
-//         _isAnimateFromRelativePosition = true;
-//         _currentRelativePosition = 0.8f;
+         nextFrameNumber = MtMath.searchNearestIndex(allVisibleGeoLocationIndices, notClippedIndex);
       }
 
       // ensure bounds
@@ -191,10 +197,9 @@ public class MapPlayerManager {
          nextFrameNumber = _numAllVisibleFrames;
       }
 
-//      _currentVisibleFrameNumber = nextFrameNumber;
-//      _currentRelativePosition = nextFrameNumber / (float) _numAllVisibleFrames;
+      _currentVisibleIndex = getValidIndex(nextFrameNumber);
 
-      return getValidIndex(nextFrameNumber);
+      return _currentVisibleIndex;
    }
 
    /**

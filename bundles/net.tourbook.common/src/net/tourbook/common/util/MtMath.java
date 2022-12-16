@@ -144,43 +144,6 @@ public class MtMath {
    }
 
    /**
-    * Find the nearest values in a sorted array
-    * <p>
-    * Original source<br>
-    * <a href=
-    * "https://stackoverflow.com/questions/30245166/find-the-nearest-closest-value-in-a-sorted-list#30245398">https://stackoverflow.com/questions/30245166/find-the-nearest-closest-value-in-a-sorted-list#30245398</a>
-    *
-    * @param array
-    * @param value
-    * @return Return the index of the nearest value and not the nearest value itself
-    */
-   public static int searchNearestIndex(final int[] array, final int value) {
-
-      if (value <= array[0]) {
-         return 0;
-      }
-
-      if (value >= array[array.length - 1]) {
-         return array.length - 1;
-      }
-
-      final int result = Arrays.binarySearch(array, value);
-
-      if (result >= 0) {
-         return result;
-      }
-
-      final int insertionPoint = -result - 1;
-
-      final int nearestDiff1 = array[insertionPoint] - value;
-      final int nearestDiff2 = value - array[insertionPoint - 1];
-
-      return nearestDiff1 < nearestDiff2
-            ? insertionPoint
-            : insertionPoint - 1;
-   }
-
-   /**
     * Calculates geodetic distance between two points specified by latitude/longitude using
     * Vincenty inverse formula for ellipsoids
     * <p>
@@ -300,5 +263,42 @@ public class MtMath {
 //
 //      return km * 1000;
 //   }
+
+   /**
+    * Find the nearest values in a sorted array
+    * <p>
+    * Original source<br>
+    * <a href=
+    * "https://stackoverflow.com/questions/30245166/find-the-nearest-closest-value-in-a-sorted-list#30245398">https://stackoverflow.com/questions/30245166/find-the-nearest-closest-value-in-a-sorted-list#30245398</a>
+    *
+    * @param array
+    * @param value
+    * @return Returns the index of the nearest value and not the nearest value itself
+    */
+   public static int searchNearestIndex(final int[] array, final int value) {
+
+      if (array == null || array.length == 0 || value <= array[0]) {
+         return 0;
+      }
+
+      if (value >= array[array.length - 1]) {
+         return array.length - 1;
+      }
+
+      final int result = Arrays.binarySearch(array, value);
+
+      if (result >= 0) {
+         return result;
+      }
+
+      final int insertionPoint = -result - 1;
+
+      final int nearestDiff1 = array[insertionPoint] - value;
+      final int nearestDiff2 = value - array[insertionPoint - 1];
+
+      return nearestDiff1 < nearestDiff2
+            ? insertionPoint
+            : insertionPoint - 1;
+   }
 
 }

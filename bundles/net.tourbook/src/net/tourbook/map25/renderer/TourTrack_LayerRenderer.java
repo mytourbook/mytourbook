@@ -509,15 +509,20 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
             // convert arrow positions into arrow vertices
             workerBucket.createArrowVertices(
-                  allDirectionArrow_PixelPosition,
-                  allDirectionArrow_LocationIndex);
+                  allDirectionArrow_PixelPosition.toArray(),
+                  allDirectionArrow_LocationIndex.toArray());
          }
 
          workerBucket.anyGeoPoints = __anyGeoPoints;
-         workerBucket.allNotClipped_GeoLocationIndices = allNotClipped_LocationIndices;
+         workerBucket.allNotClipped_GeoLocationIndices = allNotClipped_LocationIndices.toArray();
 
-//         System.out.println((System.currentTimeMillis() + " not clipped indices:" + allNotClipped_LocationIndices.size()));
-         // TODO remove SYSTEM.OUT.PRINTLN
+//         System.out.println((System.currentTimeMillis()
+//
+//               + " worker: "
+//               + " num indices:" + allNotClipped_LocationIndices.size()
+//               + "  # " + allNotClipped_LocationIndices.hashCode()));
+//
+//         // TODO remove SYSTEM.OUT.PRINTLN
 
       } // doWork_CompileTrack end
 
@@ -783,7 +788,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
        * TourTrack_LayerRenderer.TrackCompileWorker.doWork(TourCompileTask)
        */
 
-      // get compile map position: workerTask.__mapPos -> _mapCompilePosition
+      // get compile map position: workerTask.__mapPos -> _compileMapPosition
       _compileMapPosition.copy(workerTask.__mapPos);
 
       final TourTrack_Bucket painterBucket = workerTask.__taskBucketManager.getBucket_Painter();

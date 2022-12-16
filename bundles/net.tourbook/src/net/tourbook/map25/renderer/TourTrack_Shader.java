@@ -252,13 +252,23 @@ public final class TourTrack_Shader {
              * Update map player
              */
 
+//            final int[] allNotClipped_LocationIndices = trackBucket.allNotClipped_GeoLocationIndices;
+//
+//            System.out.println((System.currentTimeMillis()
+//
+//                  + " bind:   "
+//                  + " num indices:" + allNotClipped_LocationIndices.length
+//                  + "  # " + allNotClipped_LocationIndices.hashCode()));
+
+            // TODO remove SYSTEM.OUT.PRINTLN
+
 // SET_FORMATTING_OFF
 
             mapPlayerData.isPlayerEnabled                   = true;
 
-            mapPlayerData.allVisible_PixelPositions         = trackBucket.allVisible_PixelPositions.toArray();
-            mapPlayerData.allVisible_GeoLocationIndices     = trackBucket.allVisible_GeoLocationIndices.toArray();
-            mapPlayerData.allNotClipped_GeoLocationIndices  = trackBucket.allNotClipped_GeoLocationIndices.toArray();
+            mapPlayerData.allVisible_PixelPositions         = trackBucket.allVisible_PixelPositions;
+            mapPlayerData.allVisible_GeoLocationIndices     = trackBucket.allVisible_GeoLocationIndices;
+            mapPlayerData.allNotClipped_GeoLocationIndices  = trackBucket.allNotClipped_GeoLocationIndices;
             mapPlayerData.anyGeoPoints                      = trackBucket.anyGeoPoints;
 
             mapPlayerData.mapScale                          = viewport.pos.scale;
@@ -808,9 +818,12 @@ public final class TourTrack_Shader {
                                           final TourTrack_Bucket trackBucket,
                                           final int nextFrameIndex) {
 
-      final ShortArrayList allVisiblePixelPositions = trackBucket.allVisible_PixelPositions;
+      final short[] allVisiblePixelPositions = trackBucket.allVisible_PixelPositions;
+      if (allVisiblePixelPositions == null) {
+         return;
+      }
 
-      final int numAllPositions = allVisiblePixelPositions.size();
+      final int numAllPositions = allVisiblePixelPositions.length;
       if (numAllPositions < 1) {
          return;
       }
@@ -823,12 +836,13 @@ public final class TourTrack_Shader {
          return;
       }
 
-      final short pos1X = allVisiblePixelPositions.get(xyPrevPosIndex);
-      final short pos1Y = allVisiblePixelPositions.get(xyPrevPosIndex + 1);
-      final short pos2X = allVisiblePixelPositions.get(xyPosIndex);
-      final short pos2Y = allVisiblePixelPositions.get(xyPosIndex + 1);
+      final short pos1X = allVisiblePixelPositions[xyPrevPosIndex];
+      final short pos1Y = allVisiblePixelPositions[xyPrevPosIndex + 1];
+      final short pos2X = allVisiblePixelPositions[xyPosIndex];
+      final short pos2Y = allVisiblePixelPositions[xyPosIndex + 1];
 
       final AnimationShader shader = _animationShader;
+
       shader.useProgram();
 
       // rotate model to look forward

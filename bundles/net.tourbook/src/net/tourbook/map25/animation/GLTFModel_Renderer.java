@@ -446,41 +446,20 @@ public class GLTFModel_Renderer extends LayerRenderer {
          return;
       }
 
-      int geoLocationIndex;
+      int geoLocationIndex = 0;
 
-      final boolean useVisibleFrames = false;
+      final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
+      final int numGeoLocationIndices = allNotClipped_GeoLocationIndices.length;
 
-      if (useVisibleFrames) {
-
-         final int[] animatedLocationIndices = mapPlayerData.allVisible_GeoLocationIndices;
-         final int currentFrameNumber = MapPlayerManager.getCurrentVisibleFrameNumber();
-
-         if (currentFrameNumber >= animatedLocationIndices.length - 1) {
-            return;
-         }
-
-         geoLocationIndex = animatedLocationIndices[currentFrameNumber - 1];
-
-      } else {
+      if (numGeoLocationIndices > 0) {
 
          // get frame from relative position
+         final float relativePosition = MapPlayerManager.getRelativePosition();
 
-         final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
-         final int numGeoLocationIndices = allNotClipped_GeoLocationIndices.length;
+         int positionIndex = (int) (numGeoLocationIndices * relativePosition);
+         positionIndex = MathUtils.clamp(positionIndex, 0, numGeoLocationIndices - 1);
 
-         if (numGeoLocationIndices > 0) {
-
-            final float relativePosition = MapPlayerManager.getRelativePosition();
-
-            int positionIndex = (int) (numGeoLocationIndices * relativePosition);
-            positionIndex = MathUtils.clamp(positionIndex, 0, numGeoLocationIndices - 1);
-
-            geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
-
-         } else {
-
-            geoLocationIndex = 0;
-         }
+         geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
       }
 
       final GeoPoint[] anyGeoPoints = mapPlayerData.anyGeoPoints;

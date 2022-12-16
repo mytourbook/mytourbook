@@ -296,10 +296,10 @@ public class MapPlayerView extends ViewPart {
             _scaleTimeline_VisibleFrames = new Scale(container, SWT.HORIZONTAL);
             _scaleTimeline_VisibleFrames.setMinimum(1);
             _scaleTimeline_VisibleFrames.setMaximum(10);
-            _scaleTimeline_VisibleFrames.addSelectionListener(widgetSelectedAdapter(
-                  selectionEvent -> onTimeline_Selection(_scaleTimeline_VisibleFrames, true)));
-            _scaleTimeline_VisibleFrames.addKeyListener(keyPressedAdapter(keyEvent -> onTimeline_Key(keyEvent, _scaleTimeline_VisibleFrames)));
-            _scaleTimeline_VisibleFrames.addMouseWheelListener(mouseEvent -> onTimeline_MouseWheel(mouseEvent, _scaleTimeline_VisibleFrames));
+//            _scaleTimeline_VisibleFrames.addSelectionListener(widgetSelectedAdapter(
+//                  selectionEvent -> onTimeline_Selection(_scaleTimeline_VisibleFrames, true)));
+//            _scaleTimeline_VisibleFrames.addKeyListener(keyPressedAdapter(keyEvent -> onTimeline_Key(keyEvent, _scaleTimeline_VisibleFrames)));
+//            _scaleTimeline_VisibleFrames.addMouseWheelListener(mouseEvent -> onTimeline_MouseWheel(mouseEvent, _scaleTimeline_VisibleFrames));
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .indent(0, 5)
@@ -436,6 +436,11 @@ public class MapPlayerView extends ViewPart {
 
          final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
          final int numNotClippedPositions = allNotClipped_GeoLocationIndices.length;
+
+         if (numNotClippedPositions == 0) {
+            return;
+         }
+
          final float relativePosition = MapPlayerManager.getRelativePosition();
 
          int positionIndex = (int) (numNotClippedPositions * relativePosition);
@@ -641,7 +646,8 @@ public class MapPlayerView extends ViewPart {
    @Override
    public void setFocus() {
 
-      _scaleTimeline_VisibleFrames.setFocus();
+      _scaleTimeline_AnyFrames.setFocus();
+//      _scaleTimeline_VisibleFrames.setFocus();
    }
 
    private void stopPlayerWhenRunning() {
@@ -752,7 +758,8 @@ public class MapPlayerView extends ViewPart {
                return;
             }
 
-            _scaleTimeline_VisibleFrames.setSelection(currentFrameNumber);
+//            _scaleTimeline_VisibleFrames.setSelection(currentFrameNumber);
+//            _scaleTimeline_VisibleFrames.setSelection();
 
             // this is a very expensive operation: 28 ms for each frame !!!
 //          _scaleTimeline.setToolTipText(Integer.toString(currentFrameNumber));
@@ -801,7 +808,7 @@ public class MapPlayerView extends ViewPart {
       updateUI_TimelineMaxValue(foregroundFPS);
 
       _spinnerFramesPerSecond.setSelection(foregroundFPS);
-      _scaleTimeline_VisibleFrames.setSelection(MapPlayerManager.getCurrentVisibleFrameNumber() - 1);
+//      _scaleTimeline_VisibleFrames.setSelection(MapPlayerManager.getCurrentVisibleFrameNumber() - 1);
 
       updateUI_FromTimeline_VisibleFrames();
 
@@ -810,12 +817,12 @@ public class MapPlayerView extends ViewPart {
 
    private void updateUI_FromTimeline_VisibleFrames() {
 
-      final int timelineSelection = _scaleTimeline_VisibleFrames.getSelection();
-
-      final float relativeTime = (float) timelineSelection / MapPlayerManager.getNumberOfVisibleFrames();
-      final int currentTime = (int) (relativeTime * _endTime);
-
-      update_CurrentTime_VisibleFrames(currentTime);
+//      final int timelineSelection = _scaleTimeline_VisibleFrames.getSelection();
+//
+//      final float relativeTime = (float) timelineSelection / MapPlayerManager.getNumberOfVisibleFrames();
+//      final int currentTime = (int) (relativeTime * _endTime);
+//
+//      update_CurrentTime_VisibleFrames(currentTime);
    }
 
    private void updateUI_PlayAndPausedControls() {
@@ -853,8 +860,8 @@ public class MapPlayerView extends ViewPart {
             ? 1
             : numAllVisibleFrames / selectedFPS;
 
-      _scaleTimeline_VisibleFrames.setMaximum(numAllVisibleFrames);
-      _scaleTimeline_VisibleFrames.setPageIncrement((int) visiblePageIncrement);
+//      _scaleTimeline_VisibleFrames.setMaximum(numAllVisibleFrames);
+//      _scaleTimeline_VisibleFrames.setPageIncrement((int) visiblePageIncrement);
 
       final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
       if (mapPlayerData != null && mapPlayerData.allNotClipped_GeoLocationIndices != null) {
