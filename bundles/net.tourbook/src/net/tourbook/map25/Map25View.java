@@ -2313,10 +2313,8 @@ public class Map25View extends ViewPart implements
 
       _lastReceivedSyncEventTime = currentTimeMillis;
 
-      final long timeDiff = currentTimeMillis - _lastFiredSyncEventTime;
-
-
-      if (timeDiff < 1000) {
+      final long timeDiffLastFiredSync = currentTimeMillis - _lastFiredSyncEventTime;
+      if (timeDiffLastFiredSync < 1000) {
 
          // ignore because it causes LOTS of problems when synching moved map
          return;

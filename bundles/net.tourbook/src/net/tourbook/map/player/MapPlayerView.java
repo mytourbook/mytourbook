@@ -258,7 +258,7 @@ public class MapPlayerView extends ViewPart {
             _scaleTimeline_AnyFrames.setMinimum(1);
             _scaleTimeline_AnyFrames.setMaximum(10);
             _scaleTimeline_AnyFrames.addSelectionListener(widgetSelectedAdapter(
-                  selectionEvent -> onTimeline_Selection(_scaleTimeline_AnyFrames, false)));
+                  selectionEvent -> onTimeline_Selection(_scaleTimeline_AnyFrames)));
             _scaleTimeline_AnyFrames.addKeyListener(keyPressedAdapter(keyEvent -> onTimeline_Key(keyEvent, _scaleTimeline_AnyFrames)));
             _scaleTimeline_AnyFrames.addMouseWheelListener(mouseEvent -> onTimeline_MouseWheel(mouseEvent, _scaleTimeline_AnyFrames));
             GridDataFactory.fillDefaults()
@@ -410,7 +410,7 @@ public class MapPlayerView extends ViewPart {
     *
     * @param useVisibleFrames
     */
-   private void fireMapPlayerPosition(final boolean useVisibleFrames) {
+   private void fireMapPlayerPosition() {
 
       final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
       if (mapPlayerData == null) {
@@ -419,36 +419,21 @@ public class MapPlayerView extends ViewPart {
 
       int geoLocationIndex = 0;
 
-      if (useVisibleFrames) {
+      final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
+      final int numNotClippedPositions = allNotClipped_GeoLocationIndices.length;
 
-         final int[] animatedLocationIndices = mapPlayerData.allVisible_GeoLocationIndices;
-         final int currentFrameNumber = MapPlayerManager.getCurrentVisibleFrameNumber();
+      if (numNotClippedPositions == 0) {
+         return;
+      }
 
-         if (currentFrameNumber >= animatedLocationIndices.length - 1) {
-            return;
-         }
+      final float relativePosition = MapPlayerManager.getRelativePosition();
 
-         geoLocationIndex = animatedLocationIndices[currentFrameNumber - 1];
+      int positionIndex = (int) (numNotClippedPositions * relativePosition);
 
-      } else {
+      // check bounds
+      positionIndex = positionIndex >= numNotClippedPositions ? numNotClippedPositions - 1 : positionIndex;
 
-         // get frame from relative position
-
-         final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
-         final int numNotClippedPositions = allNotClipped_GeoLocationIndices.length;
-
-         if (numNotClippedPositions == 0) {
-            return;
-         }
-
-         final float relativePosition = MapPlayerManager.getRelativePosition();
-
-         int positionIndex = (int) (numNotClippedPositions * relativePosition);
-
-         // check bounds
-         positionIndex = positionIndex >= numNotClippedPositions ? numNotClippedPositions - 1 : positionIndex;
-
-         geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
+      geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
 
 //         System.out.println((System.currentTimeMillis()
 //
@@ -456,8 +441,7 @@ public class MapPlayerView extends ViewPart {
 //               + " geoLocIdx:" + geoLocationIndex
 //
 //         ));
-         // TODO remove SYSTEM.OUT.PRINTLN
-      }
+      // TODO remove SYSTEM.OUT.PRINTLN
 
       final GeoPoint[] anyGeoPoints = mapPlayerData.anyGeoPoints;
       final GeoPoint geoLocation = anyGeoPoints[geoLocationIndex];
@@ -608,7 +592,7 @@ public class MapPlayerView extends ViewPart {
       }
    }
 
-   private void onTimeline_Selection(final Scale scale, final boolean useVisibleFrames) {
+   private void onTimeline_Selection(final Scale scale) {
 
       if (_isIgnoreTimelineEvent) {
          _isIgnoreTimelineEvent = false;
@@ -624,7 +608,7 @@ public class MapPlayerView extends ViewPart {
 
       MapPlayerManager.setRelativePosition(relativePosition);
 
-      fireMapPlayerPosition(useVisibleFrames);
+      fireMapPlayerPosition();
    }
 
    private void restoreState() {
@@ -776,7 +760,7 @@ public class MapPlayerView extends ViewPart {
 
             } else {
 
-               fireMapPlayerPosition(true);
+//               fireMapPlayerPosition(true);
             }
          }
       });

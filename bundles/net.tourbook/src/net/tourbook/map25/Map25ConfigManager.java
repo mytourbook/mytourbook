@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -39,13 +40,13 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.RGBA;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.MapPosition;
 import org.oscim.map.Animator;
 import org.oscim.map.Map;
-import org.oscim.utils.ThreadUtils;
 import org.oscim.utils.animation.Easing;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
@@ -322,14 +323,15 @@ public class Map25ConfigManager {
    private static final int         LOCATION_ANIMATION_TIME_MAX     = 60_000;
    //
    // options
-   private static final boolean USE_DRAGGED_KEY_NAVIGATION_DEFAULT = false;
+   private static final boolean       USE_DRAGGED_KEY_NAVIGATION_DEFAULT = false;
    //
-   private static Easing.Type   _animationEasingType               = ANIMATION_EASING_TYPE_DEFAULT;
-   private static int           _animationTime                     = LOCATION_ANIMATION_TIME_DEFAULT;
-   private static boolean       _isAnimateLocation                 = IS_ANIMATE_LOCATION_DEFAULT;
-   private static long          _lastAnimationTime;
+   private static final AtomicInteger _asyncCounter                      = new AtomicInteger();
+   private static int                 _animationDuration                 = LOCATION_ANIMATION_TIME_DEFAULT;
+   private static Easing.Type         _animationEasingType               = ANIMATION_EASING_TYPE_DEFAULT;
+   private static boolean             _isAnimateLocation                 = IS_ANIMATE_LOCATION_DEFAULT;
+   private static long                _lastAnimationTime;
    //
-   public static boolean        useDraggedKeyboardNavigation       = USE_DRAGGED_KEY_NAVIGATION_DEFAULT;
+   public static boolean              useDraggedKeyboardNavigation       = USE_DRAGGED_KEY_NAVIGATION_DEFAULT;
    //
    // !!! this is a code formatting separator !!!
    static {}
@@ -1183,7 +1185,7 @@ public class Map25ConfigManager {
             ATTR_ANIMATION_EASING_TYPE,
             ANIMATION_EASING_TYPE_DEFAULT);
 
-      _animationTime = Util.getXmlIntInt(
+      _animationDuration = Util.getXmlIntInt(
             xmlOptions,
             ATTR_ANIMATION_TIME2,
             LOCATION_ANIMATION_TIME_DEFAULT,
@@ -1321,7 +1323,7 @@ public class Map25ConfigManager {
       final IMemento xmlOptions = xmlRoot.createChild(TAG_OPTIONS);
       {
          xmlOptions.putBoolean(ATTR_IS_ANIMATE_LOCATION, _isAnimateLocation);
-         xmlOptions.putInteger(ATTR_ANIMATION_TIME2, _animationTime);
+         xmlOptions.putInteger(ATTR_ANIMATION_TIME2, _animationDuration);
 
          Util.setXmlEnum(xmlOptions, ATTR_ANIMATION_EASING_TYPE, _animationEasingType);
 
@@ -1375,60 +1377,101 @@ public class Map25ConfigManager {
       animator.animateTo(
             locationAnimationTime,
             boundingBox,
-            Easing.Type.SINE_INOUT,
+            Easing.Type.LINEAR,
             Animator.ANIM_MOVE | Animator.ANIM_SCALE);
    }
 
    public static void setMapLocation(final Map map, final MapPosition mapPosition) {
 
-      if (ThreadUtils.isMainThread()) {
+      _isAnimateLocation = true;
+      _animationDuration = 800;
+      _animationEasingType = Easing.Type.SINE_OUT;
 
-         setMapLocation_InMapThread(map, mapPosition);
-
-      } else {
-
-         map.post(() -> setMapLocation_InMapThread(map, mapPosition));
-      }
-
+      map.post(() -> setMapLocation_InMapThread(map, mapPosition));
    }
 
    private static void setMapLocation_InMapThread(final Map map, final MapPosition mapPosition) {
 
-      _isAnimateLocation = true;
-      _animationTime = 600;
-      _animationEasingType = Easing.Type.LINEAR;
+      final boolean isRunAnimation = _isAnimateLocation && _animationDuration > 0;
 
-      final boolean isRunAnimation = _animationTime != 0 && _isAnimateLocation;
+      if (isRunAnimation == false) {
 
-      if (isRunAnimation) {
+         /*
+          * No animation
+          */
 
-         final long currentTime = System.currentTimeMillis();
-         final long timeDiff = currentTime - _lastAnimationTime;
+         map.setMapPosition(mapPosition);
+
+         return;
+      }
+
+      /*
+       * Run animation
+       */
+
+      final long timeDiff = System.currentTimeMillis() - _lastAnimationTime;
+
+      if (timeDiff > 100) {
+
+         // next drawing is overdue
+
+//         System.out.println((System.currentTimeMillis() + " overdue"));
+//         // TODO remove SYSTEM.OUT.PRINTLN
+
+         setMapLocation_StartAnimation(map, mapPosition);
+
+      } else {
 
          /*
           * timeDiff and _animationTime are connected in some way that the animation is running
           * and is smooth
           */
-         if (timeDiff < _animationTime) {
 
-            // skip too many updates, otherwise the animation is not started
+         final Runnable runnable = new Runnable() {
 
-         } else {
+            final int __asynchRunnableCounter = _asyncCounter.incrementAndGet();
 
-            map.animator().animateTo(
-                  _animationTime,
-                  mapPosition,
-                  _animationEasingType);
+            @Override
+            public void run() {
 
-            // updateMap() is very important otherwise the animation is not working
-            map.updateMap(true);
+               // check if a newer runnable is available
+               if (__asynchRunnableCounter != _asyncCounter.get()) {
 
-            _lastAnimationTime = currentTime;
-         }
+                  // a newer event is available
+                  return;
+               }
 
-      } else {
+//               System.out.println((System.currentTimeMillis() + " scheduled"));
+//               // TODO remove SYSTEM.OUT.PRINTLN
 
-         map.setMapPosition(mapPosition);
+               map.post(() -> setMapLocation_StartAnimation(map, mapPosition));
+            }
+         };
+
+         // schedule animation
+         final int nextScheduleMS = (int) (_animationDuration - timeDiff);
+
+         final Display display = Display.getDefault();
+         display.asyncExec(() -> {
+
+            // !!! timerExec() cannot be run from a none UI thread
+
+            display.timerExec(nextScheduleMS, runnable);
+         });
       }
+
+   }
+
+   private static void setMapLocation_StartAnimation(final Map map, final MapPosition mapPosition) {
+
+      map.animator().animateTo(
+            _animationDuration,
+            mapPosition,
+            _animationEasingType);
+
+      // updateMap() is very important otherwise the animation is not working
+      map.updateMap(true);
+
+      _lastAnimationTime = System.currentTimeMillis();
    }
 }
