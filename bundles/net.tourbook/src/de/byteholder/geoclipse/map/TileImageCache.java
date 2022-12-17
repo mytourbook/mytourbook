@@ -149,32 +149,35 @@ public class TileImageCache {
    /**
     * Dispose all cached images and clear the cache.
     */
-   public synchronized void dispose() {
+   public void dispose() {
 
-      final Collection<Image> allImages = _imageCache.values();
+      synchronized (_allImages) {
 
-      for (final Image image : allImages) {
-         if (image != null) {
-            try {
-               image.dispose();
-            } catch (final Exception e) {
-               // ignore, another thread can have set the image to null
+         final Collection<Image> allImages = _imageCache.values();
+
+         for (final Image image : allImages) {
+            if (image != null) {
+               try {
+                  image.dispose();
+               } catch (final Exception e) {
+                  // ignore, another thread can have set the image to null
+               }
             }
          }
-      }
 
-      for (final Image image : _allImages) {
-         if (image != null) {
-            try {
-               image.dispose();
-            } catch (final Exception e) {}
+         for (final Image image : _allImages) {
+            if (image != null) {
+               try {
+                  image.dispose();
+               } catch (final Exception e) {}
+            }
          }
+
+         _imageCache.clear();
+         _imageCacheFifo.clear();
+
+         _allImages.clear();
       }
-
-      _imageCache.clear();
-      _imageCacheFifo.clear();
-
-      _allImages.clear();
    }
 
    /**
