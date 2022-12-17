@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
@@ -40,14 +39,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.RGBA;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
-import org.oscim.core.BoundingBox;
-import org.oscim.core.MapPosition;
-import org.oscim.map.Animator;
-import org.oscim.map.Map;
-import org.oscim.utils.animation.Easing;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -111,10 +104,14 @@ public class Map25ConfigManager {
     * Tour options
     */
    private static final String TAG_OPTIONS                     = "Options";                      //$NON-NLS-1$
-   private static final String ATTR_ANIMATION_EASING_TYPE      = "animationEasingType";          //$NON-NLS-1$
-   private static final String ATTR_ANIMATION_TIME2            = "animationTime2";               //$NON-NLS-1$
-   private static final String ATTR_IS_ANIMATE_LOCATION        = "isAnimateLocation";            //$NON-NLS-1$
    private static final String ATTR_USE_DRAGGED_KEY_NAVIGATION = "useDraggedKeyboardNavigation"; //$NON-NLS-1$
+   //
+   /*
+    * Animation
+    */
+//   private static final String ATTR_ANIMATION_DURATION         = "animationDuration";            //$NON-NLS-1$
+//   private static final String ATTR_ANIMATION_EASING_TYPE      = "animationEasingType";          //$NON-NLS-1$
+//   private static final String ATTR_IS_ANIMATE_LOCATION        = "isAnimateLocation";            //$NON-NLS-1$
    //
    /*
     * Track
@@ -316,22 +313,16 @@ public class Map25ConfigManager {
    public static final int   DEFAULT_MARKER_OUTLINE_OPACITY  = 200;                      // 80%;
    //
    // map movement with animation
-   private static final Easing.Type ANIMATION_EASING_TYPE_DEFAULT   = Easing.Type.SINE_INOUT;
-   private static final boolean     IS_ANIMATE_LOCATION_DEFAULT     = true;
-   private static final int         LOCATION_ANIMATION_TIME_DEFAULT = 500;
-   private static final int         LOCATION_ANIMATION_TIME_MIN     = 0;
-   private static final int         LOCATION_ANIMATION_TIME_MAX     = 60_000;
+//   private static final Easing.Type ANIMATION_EASING_TYPE_DEFAULT   = Easing.Type.SINE_INOUT;
+//   private static final boolean     IS_ANIMATE_LOCATION_DEFAULT     = true;
+//   private static final int         LOCATION_ANIMATION_TIME_DEFAULT = 500;
+//   private static final int         LOCATION_ANIMATION_TIME_MIN     = 0;
+//   private static final int         LOCATION_ANIMATION_TIME_MAX     = 60_000;
    //
    // options
-   private static final boolean       USE_DRAGGED_KEY_NAVIGATION_DEFAULT = false;
+   private static final boolean USE_DRAGGED_KEY_NAVIGATION_DEFAULT = false;
    //
-   private static final AtomicInteger _asyncCounter                      = new AtomicInteger();
-   private static int                 _animationDuration                 = LOCATION_ANIMATION_TIME_DEFAULT;
-   private static Easing.Type         _animationEasingType               = ANIMATION_EASING_TYPE_DEFAULT;
-   private static boolean             _isAnimateLocation                 = IS_ANIMATE_LOCATION_DEFAULT;
-   private static long                _lastAnimationTime;
-   //
-   public static boolean              useDraggedKeyboardNavigation       = USE_DRAGGED_KEY_NAVIGATION_DEFAULT;
+   public static boolean        useDraggedKeyboardNavigation       = USE_DRAGGED_KEY_NAVIGATION_DEFAULT;
    //
    // !!! this is a code formatting separator !!!
    static {}
@@ -1178,19 +1169,19 @@ public class Map25ConfigManager {
          return;
       }
 
-      _isAnimateLocation = Util.getXmlBoolean(xmlOptions, ATTR_IS_ANIMATE_LOCATION, IS_ANIMATE_LOCATION_DEFAULT);
-
-      _animationEasingType = (Easing.Type) Util.getXmlEnum(
-            xmlOptions,
-            ATTR_ANIMATION_EASING_TYPE,
-            ANIMATION_EASING_TYPE_DEFAULT);
-
-      _animationDuration = Util.getXmlIntInt(
-            xmlOptions,
-            ATTR_ANIMATION_TIME2,
-            LOCATION_ANIMATION_TIME_DEFAULT,
-            LOCATION_ANIMATION_TIME_MIN,
-            LOCATION_ANIMATION_TIME_MAX);
+//      _isAnimateLocation = Util.getXmlBoolean(xmlOptions, ATTR_IS_ANIMATE_LOCATION, IS_ANIMATE_LOCATION_DEFAULT);
+//
+//      _animationEasingType = (Easing.Type) Util.getXmlEnum(
+//            xmlOptions,
+//            ATTR_ANIMATION_EASING_TYPE,
+//            ANIMATION_EASING_TYPE_DEFAULT);
+//
+//      _animationDuration = Util.getXmlIntInt(
+//            xmlOptions,
+//            ATTR_ANIMATION_DURATION,
+//            LOCATION_ANIMATION_TIME_DEFAULT,
+//            LOCATION_ANIMATION_TIME_MIN,
+//            LOCATION_ANIMATION_TIME_MAX);
 
       // other
       useDraggedKeyboardNavigation = Util.getXmlBoolean(
@@ -1322,10 +1313,9 @@ public class Map25ConfigManager {
 
       final IMemento xmlOptions = xmlRoot.createChild(TAG_OPTIONS);
       {
-         xmlOptions.putBoolean(ATTR_IS_ANIMATE_LOCATION, _isAnimateLocation);
-         xmlOptions.putInteger(ATTR_ANIMATION_TIME2, _animationDuration);
-
-         Util.setXmlEnum(xmlOptions, ATTR_ANIMATION_EASING_TYPE, _animationEasingType);
+//         xmlOptions.putBoolean(ATTR_IS_ANIMATE_LOCATION, _isAnimateLocation);
+//         xmlOptions.putInteger(ATTR_ANIMATION_DURATION, _animationDuration);
+//         Util.setXmlEnum(xmlOptions, ATTR_ANIMATION_EASING_TYPE, _animationEasingType);
 
          xmlOptions.putBoolean(ATTR_USE_DRAGGED_KEY_NAVIGATION, useDraggedKeyboardNavigation);
       }
@@ -1356,122 +1346,5 @@ public class Map25ConfigManager {
       _activeTrackConfig = newConfig;
 
       Map25FPSManager.setAnimation(newConfig.arrow_IsAnimate);
-   }
-
-   /**
-    * Set map location with or without animation
-    *
-    * @param map
-    * @param boundingBox
-    * @param locationAnimationTime
-    */
-   public static void setMapLocation(final Map map, final BoundingBox boundingBox, int locationAnimationTime) {
-
-      final Animator animator = map.animator();
-
-      // zero will not move the map, set 1 ms
-      if (locationAnimationTime == 0 || _isAnimateLocation == false) {
-         locationAnimationTime = 1;
-      }
-
-      animator.animateTo(
-            locationAnimationTime,
-            boundingBox,
-            Easing.Type.LINEAR,
-            Animator.ANIM_MOVE | Animator.ANIM_SCALE);
-   }
-
-   public static void setMapLocation(final Map map, final MapPosition mapPosition) {
-
-      _isAnimateLocation = true;
-      _animationDuration = 800;
-      _animationEasingType = Easing.Type.SINE_OUT;
-
-      map.post(() -> setMapLocation_InMapThread(map, mapPosition));
-   }
-
-   private static void setMapLocation_InMapThread(final Map map, final MapPosition mapPosition) {
-
-      final boolean isRunAnimation = _isAnimateLocation && _animationDuration > 0;
-
-      if (isRunAnimation == false) {
-
-         /*
-          * No animation
-          */
-
-         map.setMapPosition(mapPosition);
-
-         return;
-      }
-
-      /*
-       * Run animation
-       */
-
-      final long timeDiff = System.currentTimeMillis() - _lastAnimationTime;
-
-      if (timeDiff > 100) {
-
-         // next drawing is overdue
-
-//         System.out.println((System.currentTimeMillis() + " overdue"));
-//         // TODO remove SYSTEM.OUT.PRINTLN
-
-         setMapLocation_StartAnimation(map, mapPosition);
-
-      } else {
-
-         /*
-          * timeDiff and _animationTime are connected in some way that the animation is running
-          * and is smooth
-          */
-
-         final Runnable runnable = new Runnable() {
-
-            final int __asynchRunnableCounter = _asyncCounter.incrementAndGet();
-
-            @Override
-            public void run() {
-
-               // check if a newer runnable is available
-               if (__asynchRunnableCounter != _asyncCounter.get()) {
-
-                  // a newer event is available
-                  return;
-               }
-
-//               System.out.println((System.currentTimeMillis() + " scheduled"));
-//               // TODO remove SYSTEM.OUT.PRINTLN
-
-               map.post(() -> setMapLocation_StartAnimation(map, mapPosition));
-            }
-         };
-
-         // schedule animation
-         final int nextScheduleMS = (int) (_animationDuration - timeDiff);
-
-         final Display display = Display.getDefault();
-         display.asyncExec(() -> {
-
-            // !!! timerExec() cannot be run from a none UI thread
-
-            display.timerExec(nextScheduleMS, runnable);
-         });
-      }
-
-   }
-
-   private static void setMapLocation_StartAnimation(final Map map, final MapPosition mapPosition) {
-
-      map.animator().animateTo(
-            _animationDuration,
-            mapPosition,
-            _animationEasingType);
-
-      // updateMap() is very important otherwise the animation is not working
-      map.updateMap(true);
-
-      _lastAnimationTime = System.currentTimeMillis();
    }
 }
