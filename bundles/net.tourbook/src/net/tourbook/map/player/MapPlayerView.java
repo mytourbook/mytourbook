@@ -408,9 +408,10 @@ public class MapPlayerView extends ViewPart {
    /**
     * Sync maps with current player position
     *
+    * @param relativePosition
     * @param useVisibleFrames
     */
-   private void fireMapPlayerPosition() {
+   private void fireMapPlayerPosition(final float relativePosition) {
 
       final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
       if (mapPlayerData == null) {
@@ -425,8 +426,6 @@ public class MapPlayerView extends ViewPart {
       if (numNotClippedPositions == 0) {
          return;
       }
-
-      final float relativePosition = MapPlayerManager.getRelativePosition();
 
       int positionIndex = (int) (numNotClippedPositions * relativePosition);
 
@@ -454,6 +453,8 @@ public class MapPlayerView extends ViewPart {
       mapPosition.x = modelProjectedPositionX;
       mapPosition.y = modelProjectedPositionY;
       mapPosition.setScale(mapPlayerData.mapScale);
+
+      MapPlayerManager.setRelativePosition(relativePosition);
 
       MapManager.fireSyncMapEvent(mapPosition, this, null);
    }
@@ -606,9 +607,7 @@ public class MapPlayerView extends ViewPart {
       final float timelineSelection = scale.getSelection();
       final float relativePosition = timelineSelection / scale.getMaximum();
 
-      MapPlayerManager.setRelativePosition(relativePosition);
-
-      fireMapPlayerPosition();
+      fireMapPlayerPosition(relativePosition);
    }
 
    private void restoreState() {

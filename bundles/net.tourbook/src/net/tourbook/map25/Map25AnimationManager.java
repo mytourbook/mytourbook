@@ -17,7 +17,6 @@ package net.tourbook.map25;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.eclipse.swt.widgets.Display;
 import org.oscim.core.BoundingBox;
 import org.oscim.core.MapPosition;
 import org.oscim.map.Animator;
@@ -59,7 +58,7 @@ public class Map25AnimationManager {
 
       _isAnimateLocation = true;
       _animationDuration = 800;
-      _animationEasingType = Easing.Type.SINE_OUT;
+      _animationEasingType = Easing.Type.SINE_INOUT;
 
       map.post(() -> setMapLocation_InMapThread(map, mapPosition));
    }
@@ -97,8 +96,7 @@ public class Map25AnimationManager {
       } else {
 
          /*
-          * timeDiff and _animationTime are connected in some way that the animation is running
-          * and is smooth
+          * Schedule next drawing
           */
 
          final Runnable runnable = new Runnable() {
@@ -123,18 +121,12 @@ public class Map25AnimationManager {
          };
 
          // schedule animation
-         final int nextScheduleMS = (int) (_animationDuration - timeDiff);
+         final long nextScheduleMS = _animationDuration - timeDiff;
 
-         System.out.println((System.currentTimeMillis() + " nextScheduleMS: " + nextScheduleMS));
-         // TODO remove SYSTEM.OUT.PRINTLN
+//         System.out.println((System.currentTimeMillis() + " nextScheduleMS: " + nextScheduleMS));
+//         // TODO remove SYSTEM.OUT.PRINTLN
 
-         final Display display = Display.getDefault();
-         display.asyncExec(() -> {
-
-            // !!! timerExec() cannot be run from a none UI thread
-
-            display.timerExec(nextScheduleMS, runnable);
-         });
+         map.postDelayed(runnable, 200);
       }
 
    }

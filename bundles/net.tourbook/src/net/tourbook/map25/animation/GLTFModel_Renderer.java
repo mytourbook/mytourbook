@@ -242,6 +242,12 @@ public class GLTFModel_Renderer extends LayerRenderer {
     */
    void onMapEvent(final Event mapEvent, final MapPosition mapPosition) {
 
+      if (mapEvent != Map.POSITION_EVENT && mapEvent != Map.SCALE_EVENT) {
+
+         // ignore other events
+         return;
+      }
+
       if (_mapCamera == null) {
          return;
       }
@@ -446,6 +452,12 @@ public class GLTFModel_Renderer extends LayerRenderer {
          return;
       }
 
+      final double currentMapScale = _currentMapPosition.scale;
+      final int currentMapZoomLevel = _currentMapPosition.zoomLevel;
+
+      final int mapScale = 1 << currentMapZoomLevel;
+      final int tileScale = Tile.SIZE << currentMapZoomLevel;
+
       int geoLocationIndex = 0;
 
       final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
@@ -469,16 +481,20 @@ public class GLTFModel_Renderer extends LayerRenderer {
       final double modelProjectedPositionX = MercatorProjection.longitudeToX(geoLocation.getLongitude());
       final double modelProjectedPositionY = MercatorProjection.latitudeToY(geoLocation.getLatitude());
 
-      final double currentMapScale = _currentMapPosition.scale;
-      final int currentMapZoomLevel = _currentMapPosition.zoomLevel;
+      /*
+       * Translate glTF model to the map position
+       */
+      final float dx = (float) ((modelProjectedPositionX - _currentMapPosition.x) * tileScale);
+      final float dy = (float) ((modelProjectedPositionY - _currentMapPosition.y) * tileScale);
+      final float zAdjustment = 0;
 
-      final int mapScale = 1 << currentMapZoomLevel;
-      final int tileScale = Tile.SIZE << currentMapZoomLevel;
+      /*
+       * Compute model scale
+       */
+      float modelScale;
 
       final double latitude = MercatorProjection.toLatitude(_currentMapPosition.y);
       final float groundScale = (float) MercatorProjection.groundResolutionWithScale(latitude, mapScale);
-
-      float modelScale;
 
       final boolean isFixedSize = true;
 
@@ -524,20 +540,6 @@ public class GLTFModel_Renderer extends LayerRenderer {
          // increase model size to be more visible
          modelScale *= 100;
       }
-
-      /*
-       * Translate glTF model to the map position
-       */
-      final float dx = (float) ((modelProjectedPositionX - _currentMapPosition.x) * tileScale);
-      final float dy = (float) ((modelProjectedPositionY - _currentMapPosition.y) * tileScale);
-
-//      final Vector3 bbMin = _modelBoundingBox.min;
-//      final Vector3 bbMax = _modelBoundingBox.max;
-//      final Vector3 bboxCenter = _boundingBoxCenter;
-
-      final float zAdjustment = 0;
-
-//      _modelCenterToForwardFactor = 0;
 
       /**
        * Adjust the center of the symbol to be at the top of the symbol, needs some maths with
