@@ -16,54 +16,55 @@ public class SliderLocation_Layer extends Layer {
 
    private final LocationRenderer _locationRenderer;
 
-	public SliderLocation_Layer(final Map map) {
+   public SliderLocation_Layer(final Map map) {
 
-		this(map, CanvasAdapter.getScale());
-	}
+      this(map, CanvasAdapter.getScale());
+   }
 
-	public SliderLocation_Layer(final Map map, final float scale) {
+   public SliderLocation_Layer(final Map map, final float scale) {
 
-		super(map);
+      super(map);
 
       mRenderer = _locationRenderer = new LocationRenderer(mMap, this, scale);
-	}
+   }
 
-	public void onModifyConfig() {
+   public void onModifyConfig() {
 
-		final Map25TrackConfig activeTourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+      final Map25TrackConfig activeTourTrackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-		setEnabled(activeTourTrackConfig.isShowSliderLocation);
+      setEnabled(activeTourTrackConfig.isShowSliderLocation);
 
       _locationRenderer.updateConfig();
-	}
+   }
 
-	@Override
+   @Override
    public void setEnabled(final boolean isEnabled) {
 
       if (isEnabled == isEnabled()) {
-			return;
-		}
+         return;
+      }
 
       super.setEnabled(isEnabled);
 
-      if (!isEnabled) {
+      if (isEnabled == false) {
          _locationRenderer.animate(false);
-		}
-	}
+      }
 
-	public void setPosition(final GeoPoint leftGeoPoint, final GeoPoint rightGeoPoint) {
+   }
 
-		final double radius = 10 / MercatorProjection.groundResolutionWithScale(leftGeoPoint.getLatitude(), 1);
+   public void setPosition(final GeoPoint leftGeoPoint, final GeoPoint rightGeoPoint) {
+
+      final double radius = 10 / MercatorProjection.groundResolutionWithScale(leftGeoPoint.getLatitude(), 1);
 
       _locationRenderer.setLocation(
 
-				MercatorProjection.longitudeToX(leftGeoPoint.getLongitude()),
-				MercatorProjection.latitudeToY(leftGeoPoint.getLatitude()),
+            MercatorProjection.longitudeToX(leftGeoPoint.getLongitude()),
+            MercatorProjection.latitudeToY(leftGeoPoint.getLatitude()),
 
-				MercatorProjection.longitudeToX(rightGeoPoint.getLongitude()),
-				MercatorProjection.latitudeToY(rightGeoPoint.getLatitude()),
+            MercatorProjection.longitudeToX(rightGeoPoint.getLongitude()),
+            MercatorProjection.latitudeToY(rightGeoPoint.getLatitude()),
 
-				radius);
+            radius);
 
-	}
+   }
 }

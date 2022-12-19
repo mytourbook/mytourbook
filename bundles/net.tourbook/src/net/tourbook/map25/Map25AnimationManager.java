@@ -57,7 +57,7 @@ public class Map25AnimationManager {
    public static void setMapLocation(final Map map, final MapPosition mapPosition) {
 
       _isAnimateLocation = true;
-      _animationDuration = 800;
+      _animationDuration = 2000;
       _animationEasingType = Easing.Type.SINE_INOUT;
 
       map.post(() -> setMapLocation_InMapThread(map, mapPosition));

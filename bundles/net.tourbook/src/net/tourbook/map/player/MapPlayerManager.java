@@ -15,11 +15,14 @@
  *******************************************************************************/
 package net.tourbook.map.player;
 
+import static org.oscim.utils.FastMath.clamp;
+
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.oscim.renderer.MapRenderer;
 
 /**
  * Manage map animation player
@@ -47,10 +50,15 @@ public class MapPlayerManager {
     */
    private static int                   _numAllVisibleFrames;
 
-   private static long                  _animationStartTime;
+   private static long                  _animationDuration      = 1000;
+   private static long                  _animationEndTime;
    private static long                  _lastUpdateTime;
    private static float                 _animationForwardAngle;
+
    private static float                 _currentRelativePosition;
+   private static float                 _nextRelativePosition;
+   private static float                 _startRelativePosition;
+
    private static int                   _currentNotClippedLocationIndex;
    private static int                   _currentVisibleIndex;
 
@@ -73,7 +81,6 @@ public class MapPlayerManager {
     * When <code>true</code> then an animated triangle shows the exact cursor position
     */
    private static boolean               _isShowAnimationCursor;
-
 
    /**
     * @return Returns the angle for the model forward direction
@@ -113,7 +120,7 @@ public class MapPlayerManager {
    }
 
    /**
-    * Compute the next frame number which depends on the time or other parameters
+    * Compute the next visible frame number
     *
     * @return Returns an index <code>0...</code>{@link #_numAllVisibleFrames}<code> - 1</code> for
     *         the next frame <code>1...</code>{@link #_numAllVisibleFrames}
@@ -130,6 +137,10 @@ public class MapPlayerManager {
             && _isAnimateFromRelativePosition == false) {
 
          return _currentVisibleIndex;
+      }
+
+      if (_mapPlayerData == null || _mapPlayerData.allNotClipped_GeoLocationIndices == null) {
+         return 0;
       }
 
       final int[] allNotClipped_GeoLocationIndices = _mapPlayerData.allNotClipped_GeoLocationIndices;
@@ -182,9 +193,7 @@ public class MapPlayerManager {
           */
 
          // ensure bounds
-         if (_currentNotClippedLocationIndex >= numNotClipped_GeoLocationIndices) {
-            _currentNotClippedLocationIndex = numNotClipped_GeoLocationIndices - 1;
-         }
+         _currentNotClippedLocationIndex = clamp(_currentNotClippedLocationIndex, 0, numNotClipped_GeoLocationIndices - 1);
 
          final int[] allVisibleGeoLocationIndices = _mapPlayerData.allVisible_GeoLocationIndices;
          final int notClippedIndex = allNotClipped_GeoLocationIndices[_currentNotClippedLocationIndex];
@@ -208,95 +217,6 @@ public class MapPlayerManager {
     * @return Returns an index <code>0...</code>{@link #_numAllVisibleFrames}<code> - 1</code> for
     *         the next frame <code>1...</code>{@link #_numAllVisibleFrames}
     */
-   public static int getNextVisibleFrameIndex_OLD() {
-
-      return 0;
-
-//      if (_isPlayerRunning == false
-//
-//            // exception: compute current frame when relative positions are set,
-//            //            this is used when timeline is dragged/selected
-//            && _isAnimateFromRelativePosition == false) {
-//
-//         // player is paused
-//
-//         return getValidIndex(_currentVisibleFrameNumber);
-//      }
-//
-//      final long currentTimeMS = System.currentTimeMillis();
-//
-//      int nextFrameNumber = 0;
-//
-//      if (_isAnimateFromRelativePosition) {
-//
-//         // 1. Prio: Use relative position
-//
-//         _isAnimateFromRelativePosition = false;
-//
-//         nextFrameNumber = Math.round(_numAllVisibleFrames * _currentRelativePosition);
-//
-//      } else if (_isPlayingLoop && _currentVisibleFrameNumber >= _numAllVisibleFrames) {
-//
-//         // 2. Prio: Loop animation
-//
-//         // start with a new loop with first frame
-//
-//         nextFrameNumber = 1;
-//
-//      } else {
-//
-//         // 3. Prio: Compute next frame
-//
-//         // get frame duration
-//         final float frameDurationSec = 1f / _foregroundFPS;
-//         final long frameDurationMS = (long) (frameDurationSec * 1000);
-//
-//         // get next frame time
-//         final long nextFrameTimeMS = _lastUpdateTime + frameDurationMS;
-//         final long timeDiffMS = nextFrameTimeMS - currentTimeMS;
-//
-//         // ensure that not more frames per second are displayed
-//         if (timeDiffMS > 0) {
-//
-//            return getValidIndex(_currentVisibleFrameNumber);
-//         }
-//
-//         final int maxFrames = Math.max(0, _numAllVisibleFrames);
-//         final float maxLoopTime = maxFrames / _foregroundFPS;
-//
-//         final float timeDiffSinceFirstRun = (float) ((currentTimeMS - _animationStartTime) / 1000.0);
-//         final float currentTimeIndex = timeDiffSinceFirstRun % maxLoopTime;
-//
-//         final int nextFrameByTime = Math.round(currentTimeIndex * _foregroundFPS);
-//         nextFrameNumber = nextFrameByTime;
-//
-//         // ensure to not jump back to the start when the end is not yet reached
-//         if (nextFrameNumber < _numAllVisibleFrames) {
-//            nextFrameNumber = _currentVisibleFrameNumber + 1;
-//         }
-//
-//         // ensure to move not more than one frame
-//         if (nextFrameNumber > _currentVisibleFrameNumber + 1) {
-//            nextFrameNumber = _currentVisibleFrameNumber + 1;
-//         }
-//      }
-//
-//      // ensure bounds
-//      if (nextFrameNumber > _numAllVisibleFrames) {
-//         nextFrameNumber = _numAllVisibleFrames;
-//      }
-//
-//      _currentVisibleFrameNumber = nextFrameNumber;
-//      _currentRelativePosition = nextFrameNumber / (float) _numAllVisibleFrames;
-//      _lastUpdateTime = currentTimeMS;
-//
-//      if (isPlayerAvailable()) {
-//// this fires map position
-////         _mapPlayerView.updateFrameNumber(_currentVisibleFrameNumber);
-//      }
-//
-//      return getValidIndex(nextFrameNumber);
-   }
 
    public static int getNumberOfVisibleFrames() {
 
@@ -304,6 +224,26 @@ public class MapPlayerManager {
    }
 
    public static float getRelativePosition() {
+
+      final long currentFrameTime = MapRenderer.frametime;
+      final long leftDuration = _animationEndTime - currentFrameTime;
+
+      if (leftDuration <= 0) {
+         return _currentRelativePosition;
+      }
+
+      _animationDuration = 2_000;
+
+      final float relativeRemainingDuration = (float) leftDuration / _animationDuration;
+      final float advance = clamp(1.0f - relativeRemainingDuration, 1E-6f, 1);
+
+      final float positionDelta = _nextRelativePosition - _startRelativePosition;
+      final float positionDiff = positionDelta * advance;
+      final float currentRelativePosition = _startRelativePosition + positionDiff;
+
+      _currentRelativePosition = clamp(currentRelativePosition, 0, 1);
+
+      _isAnimateFromRelativePosition = true;
 
       return _currentRelativePosition;
    }
@@ -392,11 +332,6 @@ public class MapPlayerManager {
       _animationForwardAngle = animationForwardAngle;
    }
 
-   public static void setAnimationStartTime() {
-
-      _animationStartTime = System.currentTimeMillis();
-   }
-
    public static void setCompileMapScale(final double scale) {
 
       _compileMapScale = scale;
@@ -469,13 +404,19 @@ public class MapPlayerManager {
    /**
     * Move player head to a relative position and start playing at this position
     *
-    * @param relativePosition
+    * @param newRelativePosition
     *           Is between 0...1
     */
-   public static void setRelativePosition(final float relativePosition) {
+   public static void setRelativePosition(final float newRelativePosition) {
+
+      final long currentFrameTime = MapRenderer.frametime;
+      _animationEndTime = currentFrameTime + _animationDuration;
+
+      // keep current position
+      _startRelativePosition = _currentRelativePosition;
 
       // the next frame will recognize this position
-      _currentRelativePosition = relativePosition;
+      _nextRelativePosition = newRelativePosition;
 
       // this will also force to compute the frame even when player is paused
       _isAnimateFromRelativePosition = true;
