@@ -466,7 +466,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
       if (numGeoLocationIndices > 0) {
 
          // get frame from relative position
-         final float relativePosition = MapPlayerManager.getRelativePosition();
+         final double relativePosition = MapPlayerManager.getRelativePosition();
 
          int positionIndex = (int) (numGeoLocationIndices * relativePosition);
          positionIndex = MathUtils.clamp(positionIndex, 0, numGeoLocationIndices - 1);

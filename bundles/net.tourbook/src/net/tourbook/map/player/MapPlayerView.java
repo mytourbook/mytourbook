@@ -81,9 +81,6 @@ public class MapPlayerView extends ViewPart {
    private boolean        _isIgnoreTimelineEvent;
    private boolean        _isShow_EndTime_Or_RemainingTime;
    //
-   private float          _currentTime_Visible;
-   private float          _endTime;
-   //
    private int[]          _updateCounter = new int[1];
    //
    /*
@@ -255,7 +252,7 @@ public class MapPlayerView extends ViewPart {
          }
          {
             _scaleTimeline_AnyFrames = new Scale(container, SWT.HORIZONTAL);
-            _scaleTimeline_AnyFrames.setMinimum(1);
+            _scaleTimeline_AnyFrames.setMinimum(0);
             _scaleTimeline_AnyFrames.setMaximum(10);
             _scaleTimeline_AnyFrames.addSelectionListener(widgetSelectedAdapter(
                   selectionEvent -> onTimeline_Selection(_scaleTimeline_AnyFrames)));
@@ -294,7 +291,7 @@ public class MapPlayerView extends ViewPart {
          }
          {
             _scaleTimeline_VisibleFrames = new Scale(container, SWT.HORIZONTAL);
-            _scaleTimeline_VisibleFrames.setMinimum(1);
+            _scaleTimeline_VisibleFrames.setMinimum(0);
             _scaleTimeline_VisibleFrames.setMaximum(10);
 //            _scaleTimeline_VisibleFrames.addSelectionListener(widgetSelectedAdapter(
 //                  selectionEvent -> onTimeline_Selection(_scaleTimeline_VisibleFrames, true)));
@@ -411,7 +408,7 @@ public class MapPlayerView extends ViewPart {
     * @param relativePosition
     * @param useVisibleFrames
     */
-   private void fireMapPlayerPosition(final float relativePosition) {
+   private void fireMapPlayerPosition(final double relativePosition) {
 
       final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
       if (mapPlayerData == null) {
@@ -469,6 +466,7 @@ public class MapPlayerView extends ViewPart {
 
          // prevent selection event
          _isIgnoreTimelineEvent = true;
+         _scaleTimeline_AnyFrames.setSelection(_scaleTimeline_AnyFrames.getMaximum());
 
          MapPlayerManager.setRelativePosition(1);
 
@@ -488,6 +486,7 @@ public class MapPlayerView extends ViewPart {
 
          // prevent selection event
          _isIgnoreTimelineEvent = true;
+         _scaleTimeline_AnyFrames.setSelection(0);
 
          MapPlayerManager.setRelativePosition(0);
 
@@ -501,7 +500,7 @@ public class MapPlayerView extends ViewPart {
 
       _isShow_EndTime_Or_RemainingTime = !_isShow_EndTime_Or_RemainingTime;
 
-      updateUI_FromTimeline_VisibleFrames();
+//      updateUI_FromTimeline_VisibleFrames();
    }
 
    private void onPlayControl_Loop() {
@@ -515,6 +514,9 @@ public class MapPlayerView extends ViewPart {
             && MapPlayerManager.isLastFrame()) {
 
          // start new anmimation
+
+         _isIgnoreTimelineEvent = true;
+         _scaleTimeline_AnyFrames.setSelection(0);
 
          MapPlayerManager.setIsPlayerRunning(true);
          MapPlayerManager.setRelativePosition(0);
@@ -602,10 +604,9 @@ public class MapPlayerView extends ViewPart {
 
       stopPlayerWhenRunning();
 
-      updateUI_FromTimeline_VisibleFrames();
-
-      final float timelineSelection = scale.getSelection();
-      final float relativePosition = timelineSelection / scale.getMaximum();
+      final double timelineSelection = scale.getSelection();
+      final int scaleMaximum = scale.getMaximum();
+      final double relativePosition = timelineSelection / scaleMaximum;
 
       fireMapPlayerPosition(relativePosition);
    }
@@ -653,6 +654,9 @@ public class MapPlayerView extends ViewPart {
 
          // start new anmimation
 
+         _isIgnoreTimelineEvent = true;
+         _scaleTimeline_AnyFrames.setSelection(0);
+
          MapPlayerManager.setIsPlayerRunning(true);
          MapPlayerManager.setRelativePosition(0);
 
@@ -675,96 +679,14 @@ public class MapPlayerView extends ViewPart {
       updateUI_PlayAndPausedControls();
    }
 
-   private void update_CurrentTime_VisibleFrames(final int currentTime) {
-
-      _currentTime_Visible = currentTime;
-
-      /*
-       * Update UI
-       */
-      final float endOrRemainingTime = _isShow_EndTime_Or_RemainingTime
-            ? _endTime
-            : _currentTime_Visible - _endTime;
-
-      final String currentTimeText = UI.format_mm_ss_WithSign(Math.round(_currentTime_Visible));
-      final String timeEndOrRemainingText = UI.format_mm_ss_WithSign(Math.round(endOrRemainingTime));
-      final int currentFrameNumber = MapPlayerManager.getCurrentVisibleFrameNumber();
-
-      _lblTime_Current_VisibleFrames.setText(currentTimeText);
-      _lblTime_EndOrRemaining_VisibleFrames.setText(timeEndOrRemainingText + UI.SPACE2 + Integer.toString(currentFrameNumber));
-
-      // set layout when text length is larger than the default: -00:00
-//    _lblTime_Current.getParent().layout(true, true);
-   }
-
    void updateAnimationVisibility() {
 
       enableControls();
    }
 
    /**
-    * This is called when the player is running
-    *
-    * @param currentFrameNumber
+    * This is called when new data are set into the shader
     */
-   public void updateFrameNumber(final int currentFrameNumber) {
-
-      if (_parent.isDisposed()) {
-         return;
-      }
-
-      final int numAllFrames = MapPlayerManager.getNumberOfVisibleFrames();
-
-      final float relativeFrame = (float) currentFrameNumber / numAllFrames;
-      final float currentTime = relativeFrame * _endTime;
-
-      final int currentTimeInUI = (int) currentTime;
-
-      _updateCounter[0]++;
-
-      // update in UI thread
-      _parent.getDisplay().asyncExec(new Runnable() {
-
-         final int __runnableCounter = _updateCounter[0];
-
-         @Override
-         public void run() {
-
-            // skip all updates which has not yet been executed
-            if (__runnableCounter != _updateCounter[0]) {
-
-               // a new update occurred
-               return;
-            }
-
-            if (_parent.isDisposed()) {
-               return;
-            }
-
-//            _scaleTimeline_VisibleFrames.setSelection(currentFrameNumber);
-//            _scaleTimeline_VisibleFrames.setSelection();
-
-            // this is a very expensive operation: 28 ms for each frame !!!
-//          _scaleTimeline.setToolTipText(Integer.toString(currentFrameNumber));
-
-            update_CurrentTime_VisibleFrames(currentTimeInUI);
-
-            // stop playing when end of animation is reached
-            final boolean isLastFrame = currentFrameNumber == numAllFrames;
-            if (isLastFrame && MapPlayerManager.isPlayingLoop() == false) {
-
-               MapPlayerManager.setIsPlayerRunning(false);
-
-               updateUI_PlayAndPausedControls();
-
-            } else {
-
-//               fireMapPlayerPosition(true);
-            }
-         }
-      });
-   }
-
    public void updatePlayer() {
 
       // run in display thread, this method is called from the shader thread
@@ -784,6 +706,10 @@ public class MapPlayerView extends ViewPart {
       });
    }
 
+   /**
+    * This is called when new data are set into the shader, data are available from
+    * {@link MapPlayerManager#getMapPlayerData()}
+    */
    private void updatePlayer_InUIThread() {
 
       final int foregroundFPS = MapPlayerManager.getForegroundFPS();
@@ -791,21 +717,8 @@ public class MapPlayerView extends ViewPart {
       updateUI_TimelineMaxValue(foregroundFPS);
 
       _spinnerFramesPerSecond.setSelection(foregroundFPS);
-//      _scaleTimeline_VisibleFrames.setSelection(MapPlayerManager.getCurrentVisibleFrameNumber() - 1);
-
-      updateUI_FromTimeline_VisibleFrames();
 
       enableControls();
-   }
-
-   private void updateUI_FromTimeline_VisibleFrames() {
-
-//      final int timelineSelection = _scaleTimeline_VisibleFrames.getSelection();
-//
-//      final float relativeTime = (float) timelineSelection / MapPlayerManager.getNumberOfVisibleFrames();
-//      final int currentTime = (int) (relativeTime * _endTime);
-//
-//      update_CurrentTime_VisibleFrames(currentTime);
    }
 
    private void updateUI_PlayAndPausedControls() {
@@ -833,27 +746,31 @@ public class MapPlayerView extends ViewPart {
     */
    private void updateUI_TimelineMaxValue(final int selectedFPS) {
 
-      // when page increment is too small, e.g. 10 then the map position is not synced, could not yet figure out why this occures
-      final int minScaleTicks = 50;
-
-      final int numAllVisibleFrames = MapPlayerManager.getNumberOfVisibleFrames();
-      final float visiblePageIncrement = (float) numAllVisibleFrames / minScaleTicks;
-
-      _endTime = selectedFPS < 1
-            ? 1
-            : numAllVisibleFrames / selectedFPS;
-
-//      _scaleTimeline_VisibleFrames.setMaximum(numAllVisibleFrames);
-//      _scaleTimeline_VisibleFrames.setPageIncrement((int) visiblePageIncrement);
+      final int minScaleTicks = 70;
 
       final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
       if (mapPlayerData != null && mapPlayerData.allNotClipped_GeoLocationIndices != null) {
 
+         final int lastMaximum = _scaleTimeline_AnyFrames.getMaximum();
          final int numNotClippedFrames = mapPlayerData.allNotClipped_GeoLocationIndices.length;
-         final float notClippedPageIncrement = (float) numNotClippedFrames / minScaleTicks;
 
-         _scaleTimeline_AnyFrames.setMaximum(numNotClippedFrames);
-         _scaleTimeline_AnyFrames.setPageIncrement((int) notClippedPageIncrement);
+         if (lastMaximum != numNotClippedFrames) {
+
+            // update max only when changed
+
+            final int lastSelection = _scaleTimeline_AnyFrames.getSelection();
+            final float lastRelativeSelection = (float) lastSelection / lastMaximum;
+
+            final float notClippedPageIncrement = (float) numNotClippedFrames / minScaleTicks;
+            final float relativeSelection = numNotClippedFrames * lastRelativeSelection;
+
+            _scaleTimeline_AnyFrames.setMaximum(numNotClippedFrames);
+            _scaleTimeline_AnyFrames.setPageIncrement((int) notClippedPageIncrement);
+
+            // reselect last position
+            _isIgnoreTimelineEvent = true;
+            _scaleTimeline_AnyFrames.setSelection((int) relativeSelection);
+         }
       }
    }
 

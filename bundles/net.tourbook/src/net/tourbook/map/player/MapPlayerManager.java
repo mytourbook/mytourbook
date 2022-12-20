@@ -50,14 +50,16 @@ public class MapPlayerManager {
     */
    private static int                   _numAllVisibleFrames;
 
-   private static long                  _animationDuration      = 1000;
+   public static long                   animationDuration       = 1000;
+
    private static long                  _animationEndTime;
    private static long                  _lastUpdateTime;
    private static float                 _animationForwardAngle;
+   private static double                _lastLeftDuration;
 
-   private static float                 _currentRelativePosition;
-   private static float                 _nextRelativePosition;
-   private static float                 _startRelativePosition;
+   private static double                _currentRelativePosition;
+   private static double                _nextRelativePosition;
+   private static double                _startRelativePosition;
 
    private static int                   _currentNotClippedLocationIndex;
    private static int                   _currentVisibleIndex;
@@ -81,6 +83,8 @@ public class MapPlayerManager {
     * When <code>true</code> then an animated triangle shows the exact cursor position
     */
    private static boolean               _isShowAnimationCursor;
+
+   private static Object                RELATIVE_POSITION       = new Object();
 
    /**
     * @return Returns the angle for the model forward direction
@@ -159,7 +163,7 @@ public class MapPlayerManager {
 
          _isAnimateFromRelativePosition = false;
 
-         _currentNotClippedLocationIndex = Math.round(numNotClipped_GeoLocationIndices * _currentRelativePosition);
+         _currentNotClippedLocationIndex = (int) Math.round(numNotClipped_GeoLocationIndices * _currentRelativePosition);
 
          isComputeNextVisibleIndex = true;
 
@@ -181,7 +185,7 @@ public class MapPlayerManager {
             _currentNotClippedLocationIndex++;
          }
 
-         _currentRelativePosition = _currentNotClippedLocationIndex / (float) numNotClipped_GeoLocationIndices;
+         _currentRelativePosition = (double) _currentNotClippedLocationIndex / numNotClipped_GeoLocationIndices;
 
          isComputeNextVisibleIndex = true;
       }
@@ -223,27 +227,48 @@ public class MapPlayerManager {
       return _numAllVisibleFrames;
    }
 
-   public static float getRelativePosition() {
+   public static double getRelativePosition() {
 
-      final long currentFrameTime = MapRenderer.frametime;
-      final long leftDuration = _animationEndTime - currentFrameTime;
+//      synchronized (RELATIVE_POSITION)
+      {
 
-      if (leftDuration <= 0) {
-         return _currentRelativePosition;
+         final long currentFrameTime = MapRenderer.frametime;
+         final float leftDuration = _animationEndTime - currentFrameTime;
+
+         if (leftDuration < 0) {
+
+            /*
+             * Fix rounding, otherwise the requested relative position is mostly not exactly set
+             * which causes the model to be not at the requested position. This can be easily
+             * checked with the start and end position (Home/End button).
+             */
+            _currentRelativePosition = _nextRelativePosition;
+
+            if (_lastLeftDuration > 0) {
+
+               _lastLeftDuration = 0;
+
+               // redraw
+               _isAnimateFromRelativePosition = true;
+            }
+
+            return _currentRelativePosition;
+         }
+
+         final float relativeRemainingDuration = leftDuration / animationDuration;
+         final float advance = clamp(1.0f - relativeRemainingDuration, 0, 1);
+
+         final double positionDelta = _nextRelativePosition - _startRelativePosition;
+         final double positionDiff = positionDelta * advance;
+         final double currentRelativePosition = _startRelativePosition + positionDiff;
+
+         _currentRelativePosition = clamp(currentRelativePosition, 0, 1);
+
+         // redraw
+         _isAnimateFromRelativePosition = true;
+
+         _lastLeftDuration = leftDuration;
       }
-
-      _animationDuration = 2_000;
-
-      final float relativeRemainingDuration = (float) leftDuration / _animationDuration;
-      final float advance = clamp(1.0f - relativeRemainingDuration, 1E-6f, 1);
-
-      final float positionDelta = _nextRelativePosition - _startRelativePosition;
-      final float positionDiff = positionDelta * advance;
-      final float currentRelativePosition = _startRelativePosition + positionDiff;
-
-      _currentRelativePosition = clamp(currentRelativePosition, 0, 1);
-
-      _isAnimateFromRelativePosition = true;
 
       return _currentRelativePosition;
    }
@@ -407,18 +432,24 @@ public class MapPlayerManager {
     * @param newRelativePosition
     *           Is between 0...1
     */
-   public static void setRelativePosition(final float newRelativePosition) {
+   public static void setRelativePosition(final double newRelativePosition) {
 
-      final long currentFrameTime = MapRenderer.frametime;
-      _animationEndTime = currentFrameTime + _animationDuration;
+//      synchronized (RELATIVE_POSITION)
+      {
 
-      // keep current position
-      _startRelativePosition = _currentRelativePosition;
+         animationDuration = 2000;
 
-      // the next frame will recognize this position
-      _nextRelativePosition = newRelativePosition;
+         final long currentFrameTime = MapRenderer.frametime;
+         _animationEndTime = currentFrameTime + animationDuration;
 
-      // this will also force to compute the frame even when player is paused
-      _isAnimateFromRelativePosition = true;
+         // keep current position
+         _startRelativePosition = _currentRelativePosition;
+
+         // the next frame will recognize this position
+         _nextRelativePosition = newRelativePosition;
+
+         // this will also force to compute the frame even when player is paused
+         _isAnimateFromRelativePosition = true;
+      }
    }
 }

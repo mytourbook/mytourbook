@@ -17,6 +17,8 @@ package net.tourbook.map25;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.tourbook.map.player.MapPlayerManager;
+
 import org.oscim.core.BoundingBox;
 import org.oscim.core.MapPosition;
 import org.oscim.map.Animator;
@@ -26,7 +28,6 @@ import org.oscim.utils.animation.Easing;
 public class Map25AnimationManager {
 
    private static final AtomicInteger _asyncCounter        = new AtomicInteger();
-   private static int                 _animationDuration   = 500;
    private static Easing.Type         _animationEasingType = Easing.Type.LINEAR;
    private static boolean             _isAnimateLocation   = true;
    private static long                _lastAnimationTime;
@@ -57,15 +58,15 @@ public class Map25AnimationManager {
    public static void setMapLocation(final Map map, final MapPosition mapPosition) {
 
       _isAnimateLocation = true;
-      _animationDuration = 2000;
-      _animationEasingType = Easing.Type.SINE_INOUT;
+      _animationEasingType = Easing.Type.LINEAR;
+//      _animationEasingType = Easing.Type.SINE_INOUT;
 
       map.post(() -> setMapLocation_InMapThread(map, mapPosition));
    }
 
    private static void setMapLocation_InMapThread(final Map map, final MapPosition mapPosition) {
 
-      final boolean isRunAnimation = _isAnimateLocation && _animationDuration > 0;
+      final boolean isRunAnimation = _isAnimateLocation && MapPlayerManager.animationDuration > 0;
 
       if (isRunAnimation == false) {
 
@@ -82,16 +83,16 @@ public class Map25AnimationManager {
        * Run animation
        */
 
-      final long timeDiff = System.currentTimeMillis() - _lastAnimationTime;
+      final long timeDiffLastRun = System.currentTimeMillis() - _lastAnimationTime;
 
-      if (timeDiff > 400) {
+      if (timeDiffLastRun > MapPlayerManager.animationDuration / 2) {
 
          // next drawing is overdue
 
-//         System.out.println((System.currentTimeMillis() + " overdue"));
-//         // TODO remove SYSTEM.OUT.PRINTLN
+         System.out.println((System.currentTimeMillis() + " overdue"));
+         // TODO remove SYSTEM.OUT.PRINTLN
 
-         setMapLocation_StartAnimation(map, mapPosition);
+         setMapLocation_StartAnimation(map, mapPosition, 0);
 
       } else {
 
@@ -109,32 +110,41 @@ public class Map25AnimationManager {
                // check if a newer runnable is available
                if (__asynchRunnableCounter != _asyncCounter.get()) {
 
+                  System.out.println((System.currentTimeMillis()
+                        + " skip schedule: " + __asynchRunnableCounter));
+                  // TODO remove SYSTEM.OUT.PRINTLN
+
                   // a newer event is available
                   return;
                }
 
-//               System.out.println((System.currentTimeMillis() + " scheduled"));
-//               // TODO remove SYSTEM.OUT.PRINTLN
+               System.out.println((System.currentTimeMillis()
+                     + " scheduled:        " + __asynchRunnableCounter));
+               // TODO remove SYSTEM.OUT.PRINTLN
 
-               map.post(() -> setMapLocation_StartAnimation(map, mapPosition));
+               map.post(() -> setMapLocation_StartAnimation(map, mapPosition, __asynchRunnableCounter));
             }
          };
 
          // schedule animation
-         final long nextScheduleMS = _animationDuration - timeDiff;
+//         final long nextScheduleMS = MapPlayerManager.animationDuration - timeDiffLastRun;
+         final long nextScheduleMS = MapPlayerManager.animationDuration / 2;
 
-//         System.out.println((System.currentTimeMillis() + " nextScheduleMS: " + nextScheduleMS));
-//         // TODO remove SYSTEM.OUT.PRINTLN
+         System.out.println((System.currentTimeMillis() + " nextScheduleMS: " + nextScheduleMS));
+         // TODO remove SYSTEM.OUT.PRINTLN
 
-         map.postDelayed(runnable, 200);
+         map.postDelayed(runnable, nextScheduleMS);
       }
 
    }
 
-   private static void setMapLocation_StartAnimation(final Map map, final MapPosition mapPosition) {
+   private static void setMapLocation_StartAnimation(final Map map, final MapPosition mapPosition, final int runnableCounter) {
+
+      System.out.println((System.currentTimeMillis() + " Start animation: " + runnableCounter));
+      // TODO remove SYSTEM.OUT.PRINTLN
 
       map.animator().animateTo(
-            _animationDuration,
+            MapPlayerManager.animationDuration,
             mapPosition,
             _animationEasingType);
 
