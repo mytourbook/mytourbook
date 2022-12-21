@@ -2745,7 +2745,7 @@ public class UI {
    }
 
    public static String timeStampNano() {
-      return (new Timestamp()).toString();
+      return (new Timestamp()).logWithNano();
    }
 
    /**
