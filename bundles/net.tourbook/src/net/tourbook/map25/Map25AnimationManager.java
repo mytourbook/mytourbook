@@ -17,6 +17,7 @@ package net.tourbook.map25;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.tourbook.common.UI;
 import net.tourbook.map.player.MapPlayerManager;
 
 import org.oscim.core.BoundingBox;
@@ -89,8 +90,8 @@ public class Map25AnimationManager {
 
          // next drawing is overdue
 
-         System.out.println((System.currentTimeMillis() + " overdue"));
-         // TODO remove SYSTEM.OUT.PRINTLN
+         System.out.println((UI.timeStamp() + " overdue"));
+//          TODO remove SYSTEM.OUT.PRINTLN
 
          setMapLocation_StartAnimation(map, mapPosition, 0);
 
@@ -110,16 +111,14 @@ public class Map25AnimationManager {
                // check if a newer runnable is available
                if (__asynchRunnableCounter != _asyncCounter.get()) {
 
-                  System.out.println((System.currentTimeMillis()
-                        + " skip schedule: " + __asynchRunnableCounter));
+//                  System.out.println((UI.timeStamp() + " skip schedule: " + __asynchRunnableCounter));
                   // TODO remove SYSTEM.OUT.PRINTLN
 
                   // a newer event is available
                   return;
                }
 
-               System.out.println((System.currentTimeMillis()
-                     + " scheduled:        " + __asynchRunnableCounter));
+//               System.out.println((UI.timeStamp() + " scheduled:        " + __asynchRunnableCounter));
                // TODO remove SYSTEM.OUT.PRINTLN
 
                map.post(() -> setMapLocation_StartAnimation(map, mapPosition, __asynchRunnableCounter));
@@ -130,7 +129,7 @@ public class Map25AnimationManager {
 //         final long nextScheduleMS = MapPlayerManager.animationDuration - timeDiffLastRun;
          final long nextScheduleMS = MapPlayerManager.animationDuration / 2;
 
-         System.out.println((System.currentTimeMillis() + " nextScheduleMS: " + nextScheduleMS));
+//         System.out.println((UI.timeStamp() + " nextScheduleMS: " + nextScheduleMS));
          // TODO remove SYSTEM.OUT.PRINTLN
 
          map.postDelayed(runnable, nextScheduleMS);
@@ -140,8 +139,8 @@ public class Map25AnimationManager {
 
    private static void setMapLocation_StartAnimation(final Map map, final MapPosition mapPosition, final int runnableCounter) {
 
-      System.out.println((System.currentTimeMillis() + " Start animation: " + runnableCounter));
-      // TODO remove SYSTEM.OUT.PRINTLN
+      System.out.println((UI.timeStamp() + " Start animation: " + runnableCounter));
+//       TODO remove SYSTEM.OUT.PRINTLN
 
       map.animator().animateTo(
             MapPlayerManager.animationDuration,
