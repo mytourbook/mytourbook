@@ -856,8 +856,10 @@ public class UI {
     * @param event
     * @param isDirectionUp
     *           Is <code>true</code> when direction is up, right or forward
+    * @return Returns <code>true</code> when the scale value was adjusted, otherwise
+    *         <code>false</code>
     */
-   public static void adjustScaleValueOnKey(final KeyEvent event, final boolean isDirectionUp) {
+   public static boolean adjustScaleValueOnKey(final KeyEvent event, final boolean isDirectionUp) {
 
       boolean isCtrlKey;
       boolean isShiftKey;
@@ -872,7 +874,7 @@ public class UI {
 
       // skip when not accelerated otherwise it would add at least 1 which increments by 2 as minimum
       if (isCtrlKey == false && isShiftKey == false) {
-         return;
+         return false;
       }
 
       // accelerate with Ctrl + Shift key
@@ -889,6 +891,8 @@ public class UI {
             * accelerator;
 
       scale.setSelection(oldValue + valueDiff);
+
+      return true;
    }
 
    public static void adjustScaleValueOnMouseScroll(final MouseEvent event) {
@@ -979,7 +983,6 @@ public class UI {
     *           The user's weight in kilograms or pounds.
     * @param height
     *           The user's height in meters or inches.
-    * 
     * @return The BMI value.
     */
    public static float computeBodyMassIndex(double weight, double height) {
@@ -999,7 +1002,6 @@ public class UI {
    /**
     * @param averageElevationChange
     *           In m/km
-    * 
     * @return Returns the average elevation change in the current measurement system.
     */
    public static float convertAverageElevationChangeFromMetric(final float averageElevationChange) {
@@ -1031,7 +1033,6 @@ public class UI {
 
    /**
     * @param bodyWeight
-    * 
     * @return Returns the weight in the current measurement system.
     */
    public static float convertBodyWeightFromMetric(final float bodyWeight) {
@@ -1045,7 +1046,6 @@ public class UI {
 
    /**
     * @param weight
-    * 
     * @return Returns the weight from the current measurement system converted into metric
     *         system.
     */
@@ -1073,9 +1073,7 @@ public class UI {
     *           used in performing the conversion
     * @param dlus
     *           the number of horizontal dialog units
-    * 
     * @return the number of pixels
-    * 
     * @since 2.0
     */
    private static int convertHorizontalDLUsToPixels(final FontMetrics fontMetrics, final int dlus) {
@@ -1096,7 +1094,6 @@ public class UI {
     *
     * @param dlus
     *           the number of horizontal dialog units
-    * 
     * @return the number of pixels
     */
    private static int convertHorizontalDLUsToPixels(final int dlus) {
@@ -1113,7 +1110,6 @@ public class UI {
    /**
     * @param precipitation
     *           in mm or inch
-    * 
     * @return Returns the precipitation amount in the current measurement system.
     */
    public static float convertPrecipitation_FromMetric(final float precipitation) {
@@ -1128,7 +1124,6 @@ public class UI {
    /**
     * @param precipitation
     *           in mm or inch
-    * 
     * @return Returns the precipitation amount in the current measurement system.
     */
    public static float convertPrecipitation_ToMetric(final float precipitation) {
@@ -1142,7 +1137,6 @@ public class UI {
 
    /**
     * @param weatherPressure
-    * 
     * @return Returns the atmospheric pressure value in the current measurement system.
     */
    public static float convertPressure_FromMetric(final float weatherPressure) {
@@ -1156,7 +1150,6 @@ public class UI {
 
    /**
     * @param weatherPressure
-    * 
     * @return Returns the atmospheric pressure value in the current measurement system.
     */
    public static float convertPressure_ToMetric(final float weatherPressure) {
@@ -1170,7 +1163,6 @@ public class UI {
 
    /**
     * @param speed
-    * 
     * @return Returns the speed value in the current measurement system.
     */
    public static float convertSpeed_FromMetric(final float speed) {
@@ -1190,7 +1182,6 @@ public class UI {
 
    /**
     * @param temperature
-    * 
     * @return Returns the temperature in the current measurement system.
     */
    public static float convertTemperatureFromMetric(final float temperature) {
@@ -1204,7 +1195,6 @@ public class UI {
 
    /**
     * @param temperature
-    * 
     * @return Returns the temperature from the current measurement system converted into metric
     *         system.
     */
@@ -1221,7 +1211,6 @@ public class UI {
     * Create a cursor resource from an image descriptor. Cursor must be disposed.
     *
     * @param imageName
-    * 
     * @return
     */
    public static Cursor createCursorFromImage(final ImageDescriptor imageDescriptor) {
@@ -1262,7 +1251,6 @@ public class UI {
     *
     * @param parent
     * @param text
-    * 
     * @return
     */
    public static Label createLabel(final Composite parent, final String text) {
@@ -1310,7 +1298,6 @@ public class UI {
     * @param imageHeight
     * @param existingImage
     * @param gcPainter
-    * 
     * @return Returns create image or reused image
     */
    public static Image createTransparentImage(final int imageWidth,
@@ -1394,7 +1381,6 @@ public class UI {
     * disposes a resource
     *
     * @param image
-    * 
     * @return
     */
    public static Image disposeResource(final Image resource) {
@@ -1457,7 +1443,6 @@ public class UI {
     *
     * @param time
     *           in seconds
-    * 
     * @return
     */
    public static String format_hh_mm_ss(final long time) {
@@ -1498,7 +1483,6 @@ public class UI {
     *
     * @param time
     *           in seconds
-    * 
     * @return
     */
    public static String format_hhh_mm_ss(final long time) {
@@ -1534,7 +1518,6 @@ public class UI {
     * Format time with {@link #Format_TimeDuration_mmss}
     *
     * @param time
-    * 
     * @return
     */
    public static String format_mm_ss_WithSign(final long time) {
@@ -1592,7 +1575,6 @@ public class UI {
     *
     * @param time
     *           Time in seconds.
-    * 
     * @return
     */
    public static String formatHhMmSs(long time) {
@@ -1646,7 +1628,6 @@ public class UI {
     * @param imageHeight
     * @param canvasWidth
     * @param canvasHeight
-    * 
     * @return
     */
    public static Point getBestFitCanvasSize(final int imageWidth,
@@ -1668,7 +1649,6 @@ public class UI {
    /**
     * @param degreeDirection
     *           The degree value, 0°...360°
-    * 
     * @return Returns cardinal direction text
     */
    public static String getCardinalDirectionText(final int degreeDirection) {
@@ -1679,7 +1659,6 @@ public class UI {
    /**
     * @param degreeDirection
     *           The degree value, 0°...360°
-    * 
     * @return Returns cardinal direction index for {@link IWeather#windDirectionText}
     */
    public static int getCardinalDirectionTextIndex(final int degreeDirection) {
@@ -1734,7 +1713,6 @@ public class UI {
    /**
     * @param allVisibleItems
     * @param allExpandedItems
-    * 
     * @return Returns {@link TreePath}'s which are expanded and open (not hidden).
     */
    public static TreePath[] getExpandedOpenedItems(final Object[] allVisibleItems, final TreePath[] allExpandedItems) {
@@ -1794,7 +1772,6 @@ public class UI {
 
    /**
     * @param url
-    * 
     * @return Returns the url with surrounding < a > tags which can be used for the {@link Link}
     *         control.
     */
@@ -1846,7 +1823,6 @@ public class UI {
 
    /**
     * @param event
-    * 
     * @return Returns <code>true</code> when <Ctrl> key is pressed.
     */
    public static boolean isCtrlKey(final Event event) {
@@ -2601,7 +2577,6 @@ public class UI {
     * @param text
     * @param width
     * @param isUseEllipses
-    * 
     * @return
     */
    public static String shortenText(final GC gc, final String text, final int width, final boolean isUseEllipses) {
@@ -2645,9 +2620,7 @@ public class UI {
     *           the original string or <code>null</code>
     * @param control
     *           the control the string will be displayed on
-    * 
     * @return the string to display, or <code>null</code> if null was passed in
-    * 
     * @since 3.0
     */
    public static String shortenText(final String textValue, final Control control) {
@@ -2770,7 +2743,6 @@ public class UI {
     * Converts {@link java.awt.Point} into {@link org.eclipse.swt.graphics.Point}
     *
     * @param awtPoint
-    * 
     * @return
     */
    public static Point SWT_Point(final java.awt.Point awtPoint) {
@@ -2789,7 +2761,6 @@ public class UI {
     * Transform from 0...255 to {@link #TRANSFORM_OPACITY_MAX}
     *
     * @param opacity
-    * 
     * @return
     */
    public static int transformOpacity_WhenRestored(final int opacity) {
@@ -2808,7 +2779,6 @@ public class UI {
     * Transform value from {@link #TRANSFORM_OPACITY_MAX} to 0...255
     *
     * @param opacity
-    * 
     * @return
     */
    public static int transformOpacity_WhenSaved(final int opacity) {

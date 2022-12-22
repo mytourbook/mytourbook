@@ -29,14 +29,14 @@ import org.oscim.renderer.MapRenderer;
  */
 public class MapPlayerManager {
 
-   private static final int             DEFAULT_MOVING_SPEED     = 10;
-
    /**
     * Max value for the scale control which cannot have negative values but the speed can be
     * negative.
     */
    static final int                     SPEED_JOG_WHEEL_MAX      = 50;
    static final int                     SPEED_JOG_WHEEL_MAX_HALF = SPEED_JOG_WHEEL_MAX / 2;
+
+   private static final int             DEFAULT_MOVING_SPEED     = 10;
 
    private static final String          STATE_FOREGROUND_FPS     = "STATE_FOREGROUND_FPS";                                             //$NON-NLS-1$
    private static final String          STATE_IS_PLAYING_LOOP    = "STATE_IS_PLAYING_LOOP";                                            //$NON-NLS-1$
@@ -65,7 +65,6 @@ public class MapPlayerManager {
    private static int                   _movingSpeed             = DEFAULT_MOVING_SPEED;
 
    private static long                  _animationEndTime;
-   private static long                  _lastUpdateTime;
    private static float                 _animationForwardAngle;
    private static double                _lastLeftDuration;
 
@@ -128,6 +127,17 @@ public class MapPlayerManager {
    public static int getForegroundFPS() {
 
       return _foregroundFPS;
+   }
+
+   /**
+    * @return Returns the moving speed value for the jog wheel control (scale)
+    */
+   public static int getJogWheelSpeed() {
+
+      return _movingSpeed
+
+            // adjust to the center of the scale control
+            + SPEED_JOG_WHEEL_MAX_HALF;
    }
 
    public static MapPlayerData getMapPlayerData() {
@@ -270,7 +280,7 @@ public class MapPlayerManager {
             return _currentRelativePosition;
          }
 
-         final float relativeRemainingDuration = leftDuration / animationDuration;
+         final float relativeRemainingDuration = leftDuration / animationDuration; // 0...1
          final float advance = clamp(1.0f - relativeRemainingDuration, 0, 1);
 
          final double positionDelta = _nextRelativePosition - _startRelativePosition;
@@ -299,17 +309,6 @@ public class MapPlayerManager {
       final int arrayIndex = frameNumber <= 0 ? 0 : frameNumber - 1;
 
       return arrayIndex;
-   }
-
-   /**
-    * @return Returns the speed value for the wobbler control (scale)
-    */
-   public static int getWobblerSpeedValue() {
-
-      return _movingSpeed
-
-            // adjust to the center of the scale control
-            + SPEED_JOG_WHEEL_MAX_HALF;
    }
 
    public static boolean isAnimationVisible() {
@@ -457,14 +456,13 @@ public class MapPlayerManager {
     */
    public static void setPlayerData(final MapPlayerData mapPlayerData) {
 
-      if (mapPlayerData.allVisible_PixelPositions == null) {
-         return;
-      }
-
       _mapPlayerData = mapPlayerData;
 
       _isPlayerEnabled = mapPlayerData.isPlayerEnabled;
-      _numAllVisibleFrames = mapPlayerData.allVisible_PixelPositions.length / 2;
+
+      _numAllVisibleFrames = mapPlayerData.allVisible_PixelPositions == null
+            ? 0
+            : mapPlayerData.allVisible_PixelPositions.length / 2;
 
       if (isPlayerAvailable()) {
          _mapPlayerView.updatePlayer();

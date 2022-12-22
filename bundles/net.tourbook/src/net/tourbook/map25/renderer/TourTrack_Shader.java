@@ -212,11 +212,16 @@ public final class TourTrack_Shader {
     */
    public static boolean bindBufferData(final TourTrack_Bucket trackBucket, final GLViewport viewport) {
 
+      setMapPlayerData(trackBucket, viewport);
+
       final int numTrackVertices = trackBucket == null
             ? 0
             : trackBucket.numTrackVertices * 4;
 
       if (numTrackVertices <= 0) {
+
+         // there is nothing to be displayed
+
          return false;
       }
 
@@ -242,7 +247,6 @@ public final class TourTrack_Shader {
       }
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-      final MapPlayerData mapPlayerData = new MapPlayerData();
 
       if (trackConfig.isShowDirectionArrow) {
 
@@ -261,19 +265,6 @@ public final class TourTrack_Shader {
 //                  + "  # " + allNotClipped_LocationIndices.hashCode()));
 
             // TODO remove SYSTEM.OUT.PRINTLN
-
-// SET_FORMATTING_OFF
-
-            mapPlayerData.isPlayerEnabled                   = true;
-
-            mapPlayerData.allVisible_PixelPositions         = trackBucket.allVisible_PixelPositions;
-            mapPlayerData.allVisible_GeoLocationIndices     = trackBucket.allVisible_GeoLocationIndices;
-            mapPlayerData.allNotClipped_GeoLocationIndices  = trackBucket.allNotClipped_GeoLocationIndices;
-            mapPlayerData.anyGeoPoints                      = trackBucket.anyGeoPoints;
-
-            mapPlayerData.mapScale                          = viewport.pos.scale;
-
-// SET_FORMATTING_ON
 
             /*
              * Animation
@@ -331,8 +322,6 @@ public final class TourTrack_Shader {
             }
          }
       }
-
-      MapPlayerManager.setPlayerData(mapPlayerData);
 
       return true;
    }
@@ -895,6 +884,31 @@ public final class TourTrack_Shader {
    public static void resetAngle() {
 
       _previousAngle = 0;
+   }
+
+   private static void setMapPlayerData(final TourTrack_Bucket trackBucket, final GLViewport viewport) {
+
+      if (trackBucket == null) {
+         return;
+      }
+
+      final MapPlayerData mapPlayerData = new MapPlayerData();
+
+// SET_FORMATTING_OFF
+
+      mapPlayerData.isPlayerEnabled                   = true;
+
+      mapPlayerData.allVisible_PixelPositions         = trackBucket.allVisible_PixelPositions;
+      mapPlayerData.allVisible_GeoLocationIndices     = trackBucket.allVisible_GeoLocationIndices;
+
+      mapPlayerData.allNotClipped_GeoLocationIndices  = trackBucket.allNotClipped_GeoLocationIndices;
+      mapPlayerData.anyGeoPoints                      = trackBucket.anyGeoPoints;
+
+      mapPlayerData.mapScale                          = viewport.pos.scale;
+
+// SET_FORMATTING_ON
+
+      MapPlayerManager.setPlayerData(mapPlayerData);
    }
 
    public static boolean setupShader() {

@@ -25,6 +25,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 import net.tourbook.map.MapManager;
 import net.tourbook.map25.Map25FPSManager;
+import net.tourbook.map25.renderer.TourTrack_Bucket;
 
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
@@ -49,12 +50,12 @@ import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
+import org.oscim.renderer.GLViewport;
 
 public class MapPlayerView extends ViewPart {
 
    public static final String           ID                     = "net.tourbook.map.player.MapPlayerView"; //$NON-NLS-1$
    //
-   private static final String          DEFAULT_TIME_START     = ".  00:00";                              //$NON-NLS-1$
    private static final String          DEFAULT_TIME_END       = ".  00:00          .";                   //$NON-NLS-1$
    //
    private static final String          STATE_IS_SHOW_END_TIME = "STATE_IS_SHOW_END_TIME";                //$NON-NLS-1$
@@ -77,10 +78,8 @@ public class MapPlayerView extends ViewPart {
    private Action         _actionPlayControl_PlayAndPause;
    private Action         _actionPlayControl_Loop;
    //
-   private boolean        _isIgnoreTimelineEvent;
+   private boolean        _isIgnoreTimelineSelectionEvent;
    private boolean        _isShow_EndTime_Or_RemainingTime;
-   //
-   private int[]          _updateCounter = new int[1];
    //
    /*
     * UI controls
@@ -88,12 +87,10 @@ public class MapPlayerView extends ViewPart {
    private Composite _parent;
 
    private Label     _lblFPS;
-   private Label     _lblTimeline_Current;
-   private Label     _lblWobbleNavi_Current;
-   private Label     _lblTime_EndOrRemaining_AllFrames;
-   private Label     _lblTime_EndOrRemaining_VisibleFrames;
+   private Label     _lblTimeline_EndOrRemaining;
+   private Label     _lblSpeedJogWheel_2;
    private Label     _lblTimeline;
-   private Label     _lblSpeedWobbler;
+   private Label     _lblSpeedJogWheel;
 
    private Button    _chkIsRelivePlaying;
 
@@ -230,7 +227,7 @@ public class MapPlayerView extends ViewPart {
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
       GridLayoutFactory.fillDefaults()
-            .numColumns(6)
+            .numColumns(5)
             .spacing(5, 0)
             .applyTo(container);
 //      container.setBackground(UI.SYS_COLOR_YELLOW);
@@ -243,11 +240,6 @@ public class MapPlayerView extends ViewPart {
             _lblTimeline = UI.createLabel(container, "&Timeline");
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblTimeline);
 //            _lblTimeline_AllFrames.setBackground(UI.SYS_COLOR_GREEN);
-         }
-         {
-            _lblTimeline_Current = UI.createLabel(container, DEFAULT_TIME_START);
-            gridDataAlignEndCenter.applyTo(_lblTimeline_Current);
-//            _lblTime_Current_AllFrames.setBackground(UI.SYS_COLOR_GREEN);
          }
          {
             _scaleTimeline = new Scale(container, SWT.HORIZONTAL);
@@ -263,29 +255,24 @@ public class MapPlayerView extends ViewPart {
 //            _scaleTimeline_AllFrames.setBackground(UI.SYS_COLOR_MAGENTA);
          }
          {
-            _lblTime_EndOrRemaining_AllFrames = UI.createLabel(container, DEFAULT_TIME_END);
-            _lblTime_EndOrRemaining_AllFrames.setToolTipText("Total or remaining time Click to toggle between total and remaining time");
-            _lblTime_EndOrRemaining_AllFrames.addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> onMouseDown_TimeEndOrRemaining()));
-            gridDataAlignEndCenter.applyTo(_lblTime_EndOrRemaining_AllFrames);
+            _lblTimeline_EndOrRemaining = UI.createLabel(container, DEFAULT_TIME_END);
+            _lblTimeline_EndOrRemaining.setToolTipText("Total or remaining time Click to toggle between total and remaining time");
+            _lblTimeline_EndOrRemaining.addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> onMouseDown_TimeEndOrRemaining()));
+            gridDataAlignEndCenter.applyTo(_lblTimeline_EndOrRemaining);
 //            _lblTime_EndOrRemaining_AllFrames.setBackground(UI.SYS_COLOR_CYAN);
          }
          UI.createSpacer_Horizontal(container, 1);
       }
 
       /*
-       * Timeline for visible frames
+       * Jog wheel to set the model speed
        */
       {
          UI.createSpacer_Horizontal(container, 1);
          {
-            _lblSpeedWobbler = UI.createLabel(container, "&Speed");
-            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblSpeedWobbler);
+            _lblSpeedJogWheel = UI.createLabel(container, "&Speed");
+            GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblSpeedJogWheel);
 //            _lblTimeline_VisibleFrames.setBackground(UI.SYS_COLOR_GREEN);
-         }
-         {
-            _lblWobbleNavi_Current = UI.createLabel(container, DEFAULT_TIME_START);
-            gridDataAlignEndCenter.applyTo(_lblWobbleNavi_Current);
-//            _lblTime_Current_VisibleFrames.setBackground(UI.SYS_COLOR_GREEN);
          }
          {
             _scaleSpeedJogWheel = new Scale(container, SWT.HORIZONTAL);
@@ -302,10 +289,10 @@ public class MapPlayerView extends ViewPart {
 //            _scaleTimeline_VisibleFrames.setBackground(UI.SYS_COLOR_MAGENTA);
          }
          {
-            _lblTime_EndOrRemaining_VisibleFrames = UI.createLabel(container, DEFAULT_TIME_END);
-            _lblTime_EndOrRemaining_VisibleFrames.setToolTipText("Total or remaining time Click to toggle between total and remaining time");
-            _lblTime_EndOrRemaining_VisibleFrames.addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> onMouseDown_TimeEndOrRemaining()));
-            gridDataAlignEndCenter.applyTo(_lblTime_EndOrRemaining_VisibleFrames);
+            _lblSpeedJogWheel_2 = UI.createLabel(container, DEFAULT_TIME_END);
+            _lblSpeedJogWheel_2.setToolTipText("Total or remaining time Click to toggle between total and remaining time");
+            _lblSpeedJogWheel_2.addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> onMouseDown_TimeEndOrRemaining()));
+            gridDataAlignEndCenter.applyTo(_lblSpeedJogWheel_2);
 //            _lblTime_EndOrRemaining_VisibleFrames.setBackground(UI.SYS_COLOR_CYAN);
          }
          UI.createSpacer_Horizontal(container, 1);
@@ -382,21 +369,19 @@ public class MapPlayerView extends ViewPart {
 
 // SET_FORMATTING_OFF
 
-      _lblFPS                                .setEnabled(isEnabled);
-      _lblTimeline_Current                   .setEnabled(isEnabled);
-      _lblWobbleNavi_Current                 .setEnabled(isEnabled);
-      _lblTime_EndOrRemaining_AllFrames      .setEnabled(isEnabled);
-      _lblTime_EndOrRemaining_VisibleFrames  .setEnabled(isEnabled);
-      _lblTimeline                           .setEnabled(isEnabled);
-      _lblSpeedWobbler                       .setEnabled(isEnabled);
+      _lblFPS                             .setEnabled(isEnabled);
+      _lblTimeline_EndOrRemaining         .setEnabled(isEnabled);
+      _lblSpeedJogWheel_2                 .setEnabled(isEnabled);
+      _lblTimeline                        .setEnabled(isEnabled);
+      _lblSpeedJogWheel                   .setEnabled(isEnabled);
 
-      _scaleSpeedJogWheel                     .setEnabled(isEnabled);
-      _scaleTimeline                         .setEnabled(isEnabled);
+      _scaleSpeedJogWheel                 .setEnabled(isEnabled);
+      _scaleTimeline                      .setEnabled(isEnabled);
 
-      _spinnerFramesPerSecond                   .setEnabled(isEnabled);
+      _spinnerFramesPerSecond             .setEnabled(isEnabled);
 
-      _actionPlayControl_PlayAndPause           .setEnabled(isEnabled);
-      _actionPlayControl_Loop                   .setEnabled(isEnabled);
+      _actionPlayControl_PlayAndPause     .setEnabled(isEnabled);
+      _actionPlayControl_Loop             .setEnabled(isEnabled);
 
 // SET_FORMATTING_ON
    }
@@ -430,14 +415,6 @@ public class MapPlayerView extends ViewPart {
 
       geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
 
-//         System.out.println((System.currentTimeMillis()
-//
-//               + " posIdx:" + positionIndex
-//               + " geoLocIdx:" + geoLocationIndex
-//
-//         ));
-      // TODO remove SYSTEM.OUT.PRINTLN
-
       final GeoPoint[] anyGeoPoints = mapPlayerData.anyGeoPoints;
       final GeoPoint geoLocation = anyGeoPoints[geoLocationIndex];
 
@@ -455,7 +432,7 @@ public class MapPlayerView extends ViewPart {
       MapManager.fireSyncMapEvent(mapPosition, this, null);
    }
 
-   private boolean movePlayheadTo_End() {
+   private boolean moveTimelinePlayheadTo_End() {
 
       final float timelineSelection = _scaleTimeline.getSelection();
 
@@ -463,11 +440,21 @@ public class MapPlayerView extends ViewPart {
 
          // beginning of timeline + moving left -> start from the end
 
-         // prevent selection event
-         _isIgnoreTimelineEvent = true;
-         _scaleTimeline.setSelection(_scaleTimeline.getMaximum());
+         /*
+          * Run async otherwise the selection is not at the correct position when scale was moved
+          * with the mouse wheel. The mouse event do not have a doit property to prevent the
+          * wrong selection.
+          */
+         _scaleTimeline.getDisplay().asyncExec(() -> {
 
-         MapPlayerManager.setRelativePosition(1);
+            // prevent selection event
+            _isIgnoreTimelineSelectionEvent = true;
+            _scaleTimeline.setSelection(_scaleTimeline.getMaximum());
+
+            setTimeline_Tooltip();
+
+            MapPlayerManager.setRelativePosition(1);
+         });
 
          return true;
       }
@@ -475,7 +462,7 @@ public class MapPlayerView extends ViewPart {
       return false;
    }
 
-   private boolean movePlayheadTo_Start() {
+   private boolean moveTimelinePlayheadTo_Start() {
 
       final float timelineSelection = _scaleTimeline.getSelection();
 
@@ -483,11 +470,16 @@ public class MapPlayerView extends ViewPart {
 
          // end of timeline + moving right -> start from 0
 
-         // prevent selection event
-         _isIgnoreTimelineEvent = true;
-         _scaleTimeline.setSelection(0);
+         _scaleTimeline.getDisplay().asyncExec(() -> {
 
-         MapPlayerManager.setRelativePosition(0);
+            // prevent selection event
+            _isIgnoreTimelineSelectionEvent = true;
+            _scaleTimeline.setSelection(0);
+
+            setTimeline_Tooltip();
+
+            MapPlayerManager.setRelativePosition(0);
+         });
 
          return true;
       }
@@ -514,7 +506,7 @@ public class MapPlayerView extends ViewPart {
 
          // start new anmimation
 
-         _isIgnoreTimelineEvent = true;
+         _isIgnoreTimelineSelectionEvent = true;
          _scaleTimeline.setSelection(0);
 
          MapPlayerManager.setIsPlayerRunning(true);
@@ -546,13 +538,15 @@ public class MapPlayerView extends ViewPart {
 
    private void onSpeedJogWheel_Key(final KeyEvent keyEvent) {
 
-      boolean isMoved = false;
-      boolean isForward = false;
+//      final boolean isMoved = false;
+//      final boolean isForward = false;
 
       final int eventKeyCode = keyEvent.keyCode;
 
       final int jogWheelSelection = _scaleSpeedJogWheel.getSelection();
       final int jogWheelSpeed = jogWheelSelection - MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF;
+
+      boolean isKeyEventDoIt = true;
 
       if (eventKeyCode == SWT.HOME) {
 
@@ -562,17 +556,17 @@ public class MapPlayerView extends ViewPart {
 
             // select speed 0
 
-            _scaleSpeedJogWheel.setSelection(MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF);
+            setJogWheel_Value(MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF);
 
-            keyEvent.doit = false;
+            isKeyEventDoIt = false;
 
          } else if (jogWheelSpeed < 0 && jogWheelSelection > 0) {
 
             // select speed -max
 
-            _scaleSpeedJogWheel.setSelection(0);
+            setJogWheel_Value(0);
 
-            keyEvent.doit = false;
+            isKeyEventDoIt = false;
          }
 
       } else if (eventKeyCode == SWT.END) {
@@ -583,49 +577,70 @@ public class MapPlayerView extends ViewPart {
 
             // select speed 0
 
-            _scaleSpeedJogWheel.setSelection(MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF);
+            setJogWheel_Value(MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF);
 
-            keyEvent.doit = false;
+            isKeyEventDoIt = false;
 
          } else if (jogWheelSpeed > 0 && jogWheelSpeed < MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF) {
 
             // select speed max
 
-            _scaleSpeedJogWheel.setSelection(MapPlayerManager.SPEED_JOG_WHEEL_MAX);
+            setJogWheel_Value(MapPlayerManager.SPEED_JOG_WHEEL_MAX);
 
-            keyEvent.doit = false;
+            isKeyEventDoIt = false;
          }
 
-      } else if (eventKeyCode == SWT.ARROW_LEFT
-            || eventKeyCode == SWT.PAGE_DOWN) {
-
-         isMoved = movePlayheadTo_End();
-
-      } else if (eventKeyCode == SWT.ARROW_RIGHT
-            || eventKeyCode == SWT.PAGE_UP) {
-
-         isMoved = movePlayheadTo_Start();
-         isForward = true;
+//      } else if (eventKeyCode == SWT.ARROW_LEFT
+//            || eventKeyCode == SWT.PAGE_DOWN) {
+//
+//         isMoved = movePlayheadTo_End();
+//
+//      } else if (eventKeyCode == SWT.ARROW_RIGHT
+//            || eventKeyCode == SWT.PAGE_UP) {
+//
+//         isMoved = movePlayheadTo_Start();
+//         isForward = true;
       }
 
-      if (isMoved == false) {
+//      if (isMoved == false) {
+//
+//         // accelerate movement
+//
+//         if (UI.adjustScaleValueOnKey(keyEvent, isForward)) {
+//
+//            // stop key event when scale was modified
+//            isKeyEventDoIt = false;
+//         }
+//
+//         setJogWheel_Tooltip(_scaleSpeedJogWheel.getSelection());
+//      }
 
-         // accelerate movement
-
-         UI.adjustScaleValueOnKey(keyEvent, isForward);
-      }
+      keyEvent.doit = isKeyEventDoIt;
    }
 
    private void onSpeedJogWheel_MouseWheel(final MouseEvent mouseEvent) {
 
+      final int speedSelection = _scaleSpeedJogWheel.getSelection();
+
+      setJogWheel_Tooltip(speedSelection);
    }
 
    private void onSpeedJogWheel_Selection() {
 
-      MapPlayerManager.setMovingSpeedFromJogWheel(_scaleSpeedJogWheel.getSelection());
+      final int speedSelection = _scaleSpeedJogWheel.getSelection();
+
+      setJogWheel_Tooltip(speedSelection);
+
+      MapPlayerManager.setMovingSpeedFromJogWheel(speedSelection);
    }
 
    private void onTimeline_Key(final KeyEvent keyEvent) {
+
+      /*
+       * It's complicated but when this is not reset then the sequence end-key, arrow-right,
+       * arrow-right do not display the correct timeline tooltip value
+       */
+      _isIgnoreTimelineSelectionEvent = false;
 
       if (keyEvent.character == ' ') {
 
@@ -641,48 +656,63 @@ public class MapPlayerView extends ViewPart {
          if (eventKeyCode == SWT.ARROW_LEFT
                || eventKeyCode == SWT.PAGE_DOWN) {
 
-            isMoved = movePlayheadTo_End();
+            isMoved = moveTimelinePlayheadTo_End();
 
          } else if (eventKeyCode == SWT.ARROW_RIGHT
                || eventKeyCode == SWT.PAGE_UP) {
 
-            isMoved = movePlayheadTo_Start();
+            isMoved = moveTimelinePlayheadTo_Start();
             isForward = true;
          }
 
-         if (isMoved == false) {
+         if (isMoved) {
+
+            keyEvent.doit = false;
+
+         } else {
 
             // accelerate movement
 
-            UI.adjustScaleValueOnKey(keyEvent, isForward);
+            if (UI.adjustScaleValueOnKey(keyEvent, isForward)) {
+
+               keyEvent.doit = false;
+            }
          }
+
+         setTimeline_Tooltip();
       }
    }
 
    private void onTimeline_MouseWheel(final MouseEvent mouseEvent) {
 
+      _isIgnoreTimelineSelectionEvent = false;
+
       if (mouseEvent.count < 0) {
 
          // scrolled down
 
-         movePlayheadTo_End();
+         moveTimelinePlayheadTo_End();
 
       } else {
 
          // scrolled up
 
-         movePlayheadTo_Start();
+         moveTimelinePlayheadTo_Start();
       }
    }
 
    private void onTimeline_Selection() {
 
-      if (_isIgnoreTimelineEvent) {
-         _isIgnoreTimelineEvent = false;
+      if (_isIgnoreTimelineSelectionEvent) {
+
+         _isIgnoreTimelineSelectionEvent = false;
+
          return;
       }
 
       stopPlayerWhenRunning();
+
+      setTimeline_Tooltip();
 
       final double timelineSelection = _scaleTimeline.getSelection();
       final int scaleMaximum = _scaleTimeline.getMaximum();
@@ -698,7 +728,7 @@ public class MapPlayerView extends ViewPart {
       _actionPlayControl_Loop.setChecked(MapPlayerManager.isPlayingLoop());
       _chkIsRelivePlaying.setSelection(MapPlayerManager.isReLivePlaying());
 
-      _scaleSpeedJogWheel.setSelection(MapPlayerManager.getWobblerSpeedValue());
+      setJogWheel_Value(MapPlayerManager.getJogWheelSpeed());
 
       updateUI_PlayAndPausedControls();
    }
@@ -714,6 +744,32 @@ public class MapPlayerView extends ViewPart {
 
       _scaleTimeline.setFocus();
 //      _scaleTimeline_VisibleFrames.setFocus();
+   }
+
+   /**
+    * Set jog wheel tooltip to the scale value speed
+    *
+    * @param jogWheelValue
+    */
+   private void setJogWheel_Tooltip(final int jogWheelValue) {
+
+      final int movingSpeed = jogWheelValue - MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF;
+
+      _scaleSpeedJogWheel.setToolTipText(Integer.toString(movingSpeed));
+   }
+
+   private void setJogWheel_Value(final int jogWheelValue) {
+
+      _scaleSpeedJogWheel.setSelection(jogWheelValue);
+
+      setJogWheel_Tooltip(jogWheelValue);
+   }
+
+   private void setTimeline_Tooltip() {
+
+      final int selection = _scaleTimeline.getSelection();
+
+      _scaleTimeline.setToolTipText(Integer.toString(selection));
    }
 
    private void stopPlayerWhenRunning() {
@@ -736,7 +792,7 @@ public class MapPlayerView extends ViewPart {
 
          // start new anmimation
 
-         _isIgnoreTimelineEvent = true;
+         _isIgnoreTimelineSelectionEvent = true;
          _scaleTimeline.setSelection(0);
 
          MapPlayerManager.setIsPlayerRunning(true);
@@ -767,7 +823,8 @@ public class MapPlayerView extends ViewPart {
    }
 
    /**
-    * This is called when new data are set into the shader
+    * This is called when new data are set into the shader in
+    * {@link net.tourbook.map25.renderer.TourTrack_Shader#bindBufferData(TourTrack_Bucket, GLViewport)}
     */
    public void updatePlayer() {
 
@@ -822,15 +879,16 @@ public class MapPlayerView extends ViewPart {
    }
 
    /**
-    * Update the timelines max and page increment values
+    * Update the timeline values when a new tour is selected
     *
     * @param selectedFPS
     */
    private void updateUI_TimelineMaxValue(final int selectedFPS) {
 
-      final int minScaleTicks = 100;
+      final int minScaleTicks = 50;
 
       final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
+
       if (mapPlayerData != null && mapPlayerData.allNotClipped_GeoLocationIndices != null) {
 
          final int lastMaximum = _scaleTimeline.getMaximum();
@@ -846,12 +904,11 @@ public class MapPlayerView extends ViewPart {
             final float notClippedPageIncrement = (float) numNotClippedFrames / minScaleTicks;
             final float relativeSelection = numNotClippedFrames * lastRelativeSelection;
 
-            _scaleTimeline.setIncrement(1);
             _scaleTimeline.setPageIncrement((int) notClippedPageIncrement);
             _scaleTimeline.setMaximum(numNotClippedFrames);
 
             // reselect last position
-            _isIgnoreTimelineEvent = true;
+            _isIgnoreTimelineSelectionEvent = true;
             _scaleTimeline.setSelection((int) relativeSelection);
          }
       }
