@@ -180,6 +180,54 @@ public class MapPlayerView extends ViewPart {
       _actionPlayControl_PlayAndPause = new Action_PlayControl_PlayAndPause();
    }
 
+   /**
+    * @param isStart
+    *           When <code>true</code> then the map position is from the tour start, otherwise from
+    *           the tour end.
+    * @return
+    */
+   private MapPosition createMapPosition(final boolean isStart) {
+
+      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
+      if (mapPlayerData == null) {
+         return null;
+      }
+
+      final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
+      final int numNotClippedPositions = allNotClipped_GeoLocationIndices.length;
+
+      if (numNotClippedPositions == 0) {
+         return null;
+      }
+
+      final int positionIndex = isStart
+            ? 0
+            : numNotClippedPositions - 1;
+
+      final int geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
+
+      final GeoPoint[] anyGeoPoints = mapPlayerData.anyGeoPoints;
+      final GeoPoint geoLocation = anyGeoPoints[geoLocationIndex];
+
+      final MapPosition mapPosition = createMapPosition_Projected(geoLocation, mapPlayerData.mapScale);
+
+      return mapPosition;
+   }
+
+   private MapPosition createMapPosition_Projected(final GeoPoint geoLocation, final double mapScale) {
+
+      // lat/lon -> 0...1
+      final double modelProjectedPositionX = MercatorProjection.longitudeToX(geoLocation.getLongitude());
+      final double modelProjectedPositionY = MercatorProjection.latitudeToY(geoLocation.getLatitude());
+
+      final MapPosition mapPosition = new MapPosition();
+      mapPosition.x = modelProjectedPositionX;
+      mapPosition.y = modelProjectedPositionY;
+      mapPosition.setScale(mapScale);
+
+      return mapPosition;
+   }
+
    @Override
    public void createPartControl(final Composite parent) {
 
@@ -416,14 +464,7 @@ public class MapPlayerView extends ViewPart {
       final GeoPoint[] anyGeoPoints = mapPlayerData.anyGeoPoints;
       final GeoPoint geoLocation = anyGeoPoints[geoLocationIndex];
 
-      // lat/lon -> 0...1
-      final double modelProjectedPositionX = MercatorProjection.longitudeToX(geoLocation.getLongitude());
-      final double modelProjectedPositionY = MercatorProjection.latitudeToY(geoLocation.getLatitude());
-
-      final MapPosition mapPosition = new MapPosition();
-      mapPosition.x = modelProjectedPositionX;
-      mapPosition.y = modelProjectedPositionY;
-      mapPosition.setScale(mapPlayerData.mapScale);
+      final MapPosition mapPosition = createMapPosition_Projected(geoLocation, mapPlayerData.mapScale);
 
       MapManager.fireSyncMapEvent(mapPosition, this, null);
    }
@@ -456,7 +497,7 @@ public class MapPlayerView extends ViewPart {
             }
 
             setTimelineSelection(1);
-            setMapAndModelPosition(1);
+            setMapAndModelPosition(1, createMapPosition(false));
          });
 
          return true;
@@ -480,7 +521,7 @@ public class MapPlayerView extends ViewPart {
             }
 
             setTimelineSelection(0);
-            setMapAndModelPosition(0);
+            setMapAndModelPosition(0, createMapPosition(true));
          });
 
          return true;
@@ -509,7 +550,7 @@ public class MapPlayerView extends ViewPart {
          // start new anmimation
 
          setTimelineSelection(0);
-         setMapAndModelPosition(0);
+         setMapAndModelPosition(0, null);
 
          MapPlayerManager.setIsPlayerRunning(true);
 
@@ -672,7 +713,7 @@ public class MapPlayerView extends ViewPart {
 
                   isPlayheadMoved = true;
 
-                  setMapAndModelPosition(getTimelineRelativePosition());
+                  setMapAndModelPosition(getTimelineRelativePosition(), null);
                }
             }
          }
@@ -711,7 +752,7 @@ public class MapPlayerView extends ViewPart {
 //      System.out.println(UI.timeStamp() + " onTimeline_Selection: " + _scaleTimeline.getSelection());
 //      // TODO remove SYSTEM.OUT.PRINTLN
 
-      setMapAndModelPosition(getTimelineRelativePosition());
+      setMapAndModelPosition(getTimelineRelativePosition(), null);
    }
 
    private void restoreState() {
@@ -761,14 +802,17 @@ public class MapPlayerView extends ViewPart {
     * Fire map position and start model animation
     *
     * @param relativePosition
+    * @param shortestDistanceMapPosition
+    *           When this is not <code>null</code> then move the model to this map position by using
+    *           the shortest distance
     */
-   private void setMapAndModelPosition(final double relativePosition) {
+   private void setMapAndModelPosition(final double relativePosition, final MapPosition shortestDistanceMapPosition) {
 
       setTimeline_Tooltip();
 
       fireMapPosition();
 
-      MapPlayerManager.setRelativePosition(relativePosition);
+      MapPlayerManager.setRelativePosition(relativePosition, shortestDistanceMapPosition);
    }
 
    private void setTimeline_Tooltip() {
@@ -812,7 +856,7 @@ public class MapPlayerView extends ViewPart {
          _scaleTimeline.setSelection(0);
 
          MapPlayerManager.setIsPlayerRunning(true);
-         MapPlayerManager.setRelativePosition(0);
+         MapPlayerManager.setRelativePosition(0, null);
 
       } else {
 

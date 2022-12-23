@@ -290,7 +290,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
       _mapCamera.update(viewport);
 
-      updateModelPosition();
+      render_UpdateModelPosition();
 
       gl.depthMask(true);
 
@@ -379,73 +379,10 @@ public class GLTFModel_Renderer extends LayerRenderer {
 //      // TODO remove SYSTEM.OUT.PRINTLN
    }
 
-   @Override
-   public boolean setup() {
-
-      _sceneAsset = loadGLTFModel();
-
-      _scene = new Scene(_sceneAsset.scene);
-
-      // get bounding box
-      _modelBoundingBox = new BoundingBox();
-      _scene.modelInstance.calculateBoundingBox(_modelBoundingBox);
-      _boundingBoxMinMaxDistance = _modelBoundingBox.max.dst(_modelBoundingBox.min);
-//      _boundingBoxCenter = _modelBoundingBox.getCenter(new Vector3());
-
-      _sceneManager = new SceneManager();
-      _sceneManager.addScene(_scene);
-
-      _mapCamera = new MapCameraMT(_map);
-      _sceneManager.setCamera(_mapCamera);
-
-      // setup light
-      _light = new DirectionalLightEx();
-      _light.direction.set(1, -3, 1).nor();
-      _light.color.set(Color.WHITE);
-      _sceneManager.environment.add(_light);
-
-      // setup quick IBL (image based lighting)
-      final IBLBuilder iblBuilder = IBLBuilder.createOutdoor(_light);
-      _environmentCubemap = iblBuilder.buildEnvMap(1024);
-      _diffuseCubemap = iblBuilder.buildIrradianceMap(256);
-      _specularCubemap = iblBuilder.buildRadianceMap(10);
-      iblBuilder.dispose();
-
-      // This texture is provided by the library, no need to have it in your assets.
-      _brdfLUT = new Texture(Gdx.files.classpath("net/mgsx/gltf/shaders/brdfLUT.png"));
-
-      _sceneManager.setAmbientLight(1f);
-      _sceneManager.environment.set(new PBRTextureAttribute(PBRTextureAttribute.BRDFLUTTexture, _brdfLUT));
-      _sceneManager.environment.set(PBRCubemapAttribute.createSpecularEnv(_specularCubemap));
-      _sceneManager.environment.set(PBRCubemapAttribute.createDiffuseEnv(_diffuseCubemap));
-
-      // setup skybox
-//      skybox = new SceneSkybox(environmentCubemap);
-//      sceneManager.setSkyBox(skybox);
-
-      activateFirstAnimation();
-
-      return true;
-   }
-
-   @Override
-   public synchronized void update(final GLViewport viewport) {
-
-      setReady(true);
-
-      if (isReady() == false) {
-
-         _mapCamera.setPosition(viewport.pos);
-
-         setReady(true);
-      }
-
-   }
-
    /**
     * Update model position, partly copied from {@link org.oscim.gdx.poi3d.GdxModelLayer}
     */
-   private void updateModelPosition() {
+   private void render_UpdateModelPosition() {
 
       final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
       if (mapPlayerData == null) {
@@ -458,35 +395,49 @@ public class GLTFModel_Renderer extends LayerRenderer {
       final int mapScale = 1 << currentMapZoomLevel;
       final int tileScale = Tile.SIZE << currentMapZoomLevel;
 
-      int geoLocationIndex = 0;
+      float dx = 0;
+      float dy = 0;
 
-      final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
-      final int numGeoLocationIndices = allNotClipped_GeoLocationIndices.length;
+      final MapPosition shortestDistanaceMapPosition = MapPlayerManager.getShortestDistanaceMapPosition();
 
-      if (numGeoLocationIndices > 0) {
+      if (shortestDistanaceMapPosition != null) {
 
-         // get frame from relative position
-         final double relativePosition = MapPlayerManager.getRelativePosition();
+         // move model by using the shortest distance
 
-         int positionIndex = (int) (numGeoLocationIndices * relativePosition);
-         positionIndex = MathUtils.clamp(positionIndex, 0, numGeoLocationIndices - 1);
+      } else {
 
-         geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
+         // move model along the tour track
+
+         int geoLocationIndex = 0;
+
+         final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
+         final int numGeoLocationIndices = allNotClipped_GeoLocationIndices.length;
+
+         if (numGeoLocationIndices > 0) {
+
+            // get frame from relative position
+            final double relativePosition = MapPlayerManager.getRelativePosition();
+
+            int positionIndex = (int) (numGeoLocationIndices * relativePosition);
+            positionIndex = MathUtils.clamp(positionIndex, 0, numGeoLocationIndices - 1);
+
+            geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
+         }
+
+         final GeoPoint[] anyGeoPoints = mapPlayerData.anyGeoPoints;
+         final GeoPoint geoLocation = anyGeoPoints[geoLocationIndex];
+
+         // lat/lon -> 0...1
+         final double modelProjectedPositionX = MercatorProjection.longitudeToX(geoLocation.getLongitude());
+         final double modelProjectedPositionY = MercatorProjection.latitudeToY(geoLocation.getLatitude());
+
+         /*
+          * Translate glTF model to the map position
+          */
+         dx = (float) ((modelProjectedPositionX - _currentMapPosition.x) * tileScale);
+         dy = (float) ((modelProjectedPositionY - _currentMapPosition.y) * tileScale);
       }
 
-      final GeoPoint[] anyGeoPoints = mapPlayerData.anyGeoPoints;
-      final GeoPoint geoLocation = anyGeoPoints[geoLocationIndex];
-
-      // lat/lon -> 0...1
-      final double modelProjectedPositionX = MercatorProjection.longitudeToX(geoLocation.getLongitude());
-      final double modelProjectedPositionY = MercatorProjection.latitudeToY(geoLocation.getLatitude());
-
-      /*
-       * Translate glTF model to the map position
-       */
-      final float dx = (float) ((modelProjectedPositionX - _currentMapPosition.x) * tileScale);
-      final float dy = (float) ((modelProjectedPositionY - _currentMapPosition.y) * tileScale);
-      final float zAdjustment = 0;
 
       /*
        * Compute model scale
@@ -574,6 +525,69 @@ public class GLTFModel_Renderer extends LayerRenderer {
       modelTransform.trn(
             dx + forwardX,
             dy + forwardY,
-            zAdjustment);
+            0);
+   }
+
+   @Override
+   public boolean setup() {
+
+      _sceneAsset = loadGLTFModel();
+
+      _scene = new Scene(_sceneAsset.scene);
+
+      // get bounding box
+      _modelBoundingBox = new BoundingBox();
+      _scene.modelInstance.calculateBoundingBox(_modelBoundingBox);
+      _boundingBoxMinMaxDistance = _modelBoundingBox.max.dst(_modelBoundingBox.min);
+//      _boundingBoxCenter = _modelBoundingBox.getCenter(new Vector3());
+
+      _sceneManager = new SceneManager();
+      _sceneManager.addScene(_scene);
+
+      _mapCamera = new MapCameraMT(_map);
+      _sceneManager.setCamera(_mapCamera);
+
+      // setup light
+      _light = new DirectionalLightEx();
+      _light.direction.set(1, -3, 1).nor();
+      _light.color.set(Color.WHITE);
+      _sceneManager.environment.add(_light);
+
+      // setup quick IBL (image based lighting)
+      final IBLBuilder iblBuilder = IBLBuilder.createOutdoor(_light);
+      _environmentCubemap = iblBuilder.buildEnvMap(1024);
+      _diffuseCubemap = iblBuilder.buildIrradianceMap(256);
+      _specularCubemap = iblBuilder.buildRadianceMap(10);
+      iblBuilder.dispose();
+
+      // This texture is provided by the library, no need to have it in your assets.
+      _brdfLUT = new Texture(Gdx.files.classpath("net/mgsx/gltf/shaders/brdfLUT.png"));
+
+      _sceneManager.setAmbientLight(1f);
+      _sceneManager.environment.set(new PBRTextureAttribute(PBRTextureAttribute.BRDFLUTTexture, _brdfLUT));
+      _sceneManager.environment.set(PBRCubemapAttribute.createSpecularEnv(_specularCubemap));
+      _sceneManager.environment.set(PBRCubemapAttribute.createDiffuseEnv(_diffuseCubemap));
+
+      // setup skybox
+//      skybox = new SceneSkybox(environmentCubemap);
+//      sceneManager.setSkyBox(skybox);
+
+      activateFirstAnimation();
+
+      return true;
+   }
+
+   @Override
+   public synchronized void update(final GLViewport viewport) {
+
+      setReady(true);
+
+      if (isReady() == false) {
+
+         _mapCamera.setPosition(viewport.pos);
+
+         setReady(true);
+      }
+
    }
 }
