@@ -17,7 +17,6 @@ package net.tourbook.map25;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import net.tourbook.common.UI;
 import net.tourbook.map.player.MapPlayerManager;
 
 import org.oscim.core.BoundingBox;
@@ -26,7 +25,10 @@ import org.oscim.map.Animator;
 import org.oscim.map.Map;
 import org.oscim.utils.animation.Easing;
 
-public class Map25AnimationManager {
+/**
+ * Manage map location requests
+ */
+public class Map25LocationManager {
 
    private static final AtomicInteger _asyncCounter        = new AtomicInteger();
    private static Easing.Type         _animationEasingType = Easing.Type.LINEAR;
@@ -34,7 +36,7 @@ public class Map25AnimationManager {
    private static long                _lastAnimationTime;
 
    /**
-    * Set map location with or without animation
+    * Set map location with animation
     *
     * @param map
     * @param boundingBox
@@ -59,8 +61,7 @@ public class Map25AnimationManager {
    public static void setMapLocation(final Map map, final MapPosition mapPosition) {
 
       _isAnimateLocation = true;
-      _animationEasingType = Easing.Type.LINEAR;
-//      _animationEasingType = Easing.Type.SINE_INOUT;
+      _animationEasingType = Easing.Type.SINE_INOUT;
 
       map.post(() -> setMapLocation_InMapThread(map, mapPosition));
    }
@@ -90,7 +91,7 @@ public class Map25AnimationManager {
 
          // next drawing is overdue
 
-         System.out.println((UI.timeStamp() + " overdue"));
+//         System.out.println((UI.timeStamp() + " overdue"));
 //          TODO remove SYSTEM.OUT.PRINTLN
 
          setMapLocation_StartAnimation(map, mapPosition, 0);
@@ -139,7 +140,7 @@ public class Map25AnimationManager {
 
    private static void setMapLocation_StartAnimation(final Map map, final MapPosition mapPosition, final int runnableCounter) {
 
-      System.out.println((UI.timeStamp() + " Start animation: " + runnableCounter));
+//      System.out.println((UI.timeStamp() + " Start animation: " + runnableCounter));
 //       TODO remove SYSTEM.OUT.PRINTLN
 
       map.animator().animateTo(

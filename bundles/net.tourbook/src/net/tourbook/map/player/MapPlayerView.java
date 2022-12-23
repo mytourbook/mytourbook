@@ -78,7 +78,6 @@ public class MapPlayerView extends ViewPart {
    private Action         _actionPlayControl_PlayAndPause;
    private Action         _actionPlayControl_Loop;
    //
-   private boolean        _isIgnoreTimelineSelectionEvent;
    private boolean        _isShow_EndTime_Or_RemainingTime;
    //
    /*
@@ -389,17 +388,14 @@ public class MapPlayerView extends ViewPart {
    /**
     * Sync maps with current player position
     *
-    * @param relativePosition
     * @param useVisibleFrames
     */
-   private void fireMapPlayerPosition(final double relativePosition) {
+   private void fireMapPosition() {
 
       final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
       if (mapPlayerData == null) {
          return;
       }
-
-      int geoLocationIndex = 0;
 
       final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
       final int numNotClippedPositions = allNotClipped_GeoLocationIndices.length;
@@ -408,12 +404,14 @@ public class MapPlayerView extends ViewPart {
          return;
       }
 
-      int positionIndex = (int) (numNotClippedPositions * relativePosition);
+      int positionIndex = (int) (numNotClippedPositions * getTimelineRelativePosition());
 
       // check bounds
-      positionIndex = positionIndex >= numNotClippedPositions ? numNotClippedPositions - 1 : positionIndex;
+      positionIndex = positionIndex >= numNotClippedPositions
+            ? numNotClippedPositions - 1
+            : positionIndex;
 
-      geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
+      final int geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
 
       final GeoPoint[] anyGeoPoints = mapPlayerData.anyGeoPoints;
       final GeoPoint geoLocation = anyGeoPoints[geoLocationIndex];
@@ -427,9 +425,15 @@ public class MapPlayerView extends ViewPart {
       mapPosition.y = modelProjectedPositionY;
       mapPosition.setScale(mapPlayerData.mapScale);
 
-      MapPlayerManager.setRelativePosition(relativePosition);
-
       MapManager.fireSyncMapEvent(mapPosition, this, null);
+   }
+
+   /**
+    * @return Returns the timeline relative position 0...1
+    */
+   private double getTimelineRelativePosition() {
+
+      return _scaleTimeline.getSelection() / (double) _scaleTimeline.getMaximum();
    }
 
    private boolean moveTimelinePlayheadTo_End() {
@@ -445,15 +449,14 @@ public class MapPlayerView extends ViewPart {
           * with the mouse wheel. The mouse event do not have a doit property to prevent the
           * wrong selection.
           */
-         _scaleTimeline.getDisplay().asyncExec(() -> {
+         _parent.getDisplay().asyncExec(() -> {
 
-            // prevent selection event
-            _isIgnoreTimelineSelectionEvent = true;
-            _scaleTimeline.setSelection(_scaleTimeline.getMaximum());
+            if (_parent.isDisposed()) {
+               return;
+            }
 
-            setTimeline_Tooltip();
-
-            MapPlayerManager.setRelativePosition(1);
+            setTimelineSelection(1);
+            setMapAndModelPosition(1);
          });
 
          return true;
@@ -470,15 +473,14 @@ public class MapPlayerView extends ViewPart {
 
          // end of timeline + moving right -> start from 0
 
-         _scaleTimeline.getDisplay().asyncExec(() -> {
+         _parent.getDisplay().asyncExec(() -> {
 
-            // prevent selection event
-            _isIgnoreTimelineSelectionEvent = true;
-            _scaleTimeline.setSelection(0);
+            if (_parent.isDisposed()) {
+               return;
+            }
 
-            setTimeline_Tooltip();
-
-            MapPlayerManager.setRelativePosition(0);
+            setTimelineSelection(0);
+            setMapAndModelPosition(0);
          });
 
          return true;
@@ -506,11 +508,10 @@ public class MapPlayerView extends ViewPart {
 
          // start new anmimation
 
-         _isIgnoreTimelineSelectionEvent = true;
-         _scaleTimeline.setSelection(0);
+         setTimelineSelection(0);
+         setMapAndModelPosition(0);
 
          MapPlayerManager.setIsPlayerRunning(true);
-         MapPlayerManager.setRelativePosition(0);
 
          updateUI_PlayAndPausedControls();
       }
@@ -528,7 +529,7 @@ public class MapPlayerView extends ViewPart {
       MapPlayerManager.setForegroundFPS(selectedFPS);
 
       // adjust timeline
-      updateUI_TimelineMaxValue(selectedFPS);
+      updateUI_TimelineMaxValue();
    }
 
    private void onSelectReLivePlaying() {
@@ -636,19 +637,13 @@ public class MapPlayerView extends ViewPart {
 
    private void onTimeline_Key(final KeyEvent keyEvent) {
 
-      /*
-       * It's complicated but when this is not reset then the sequence end-key, arrow-right,
-       * arrow-right do not display the correct timeline tooltip value
-       */
-      _isIgnoreTimelineSelectionEvent = false;
-
       if (keyEvent.character == ' ') {
 
          togglePlayAndPaused();
 
       } else {
 
-         boolean isMoved = false;
+         boolean isPlayheadMoved = false;
          boolean isForward = false;
 
          final int eventKeyCode = keyEvent.keyCode;
@@ -656,46 +651,54 @@ public class MapPlayerView extends ViewPart {
          if (eventKeyCode == SWT.ARROW_LEFT
                || eventKeyCode == SWT.PAGE_DOWN) {
 
-            isMoved = moveTimelinePlayheadTo_End();
+            isPlayheadMoved = moveTimelinePlayheadTo_End();
 
          } else if (eventKeyCode == SWT.ARROW_RIGHT
                || eventKeyCode == SWT.PAGE_UP) {
 
-            isMoved = moveTimelinePlayheadTo_Start();
+            isPlayheadMoved = moveTimelinePlayheadTo_Start();
             isForward = true;
          }
 
-         if (isMoved) {
-
-            keyEvent.doit = false;
-
-         } else {
+         if (isPlayheadMoved == false) {
 
             // accelerate movement
 
-            if (UI.adjustScaleValueOnKey(keyEvent, isForward)) {
+            if (eventKeyCode == SWT.ARROW_LEFT || eventKeyCode == SWT.ARROW_RIGHT) {
 
-               keyEvent.doit = false;
+               if (UI.adjustScaleValueOnKey(keyEvent, isForward)) {
+
+                  // timeline scale is selected with new value -> do other selection actions
+
+                  isPlayheadMoved = true;
+
+                  setMapAndModelPosition(getTimelineRelativePosition());
+               }
             }
          }
 
-         setTimeline_Tooltip();
+         if (isPlayheadMoved) {
+
+            // playhead is moved with all other selection actions -> prevent default action
+
+            keyEvent.doit = false;
+         }
       }
    }
 
    private void onTimeline_MouseWheel(final MouseEvent mouseEvent) {
 
-      _isIgnoreTimelineSelectionEvent = false;
+      stopPlayerWhenRunning();
 
       if (mouseEvent.count < 0) {
 
-         // scrolled down
+         // mouse is scrolled down
 
          moveTimelinePlayheadTo_End();
 
       } else {
 
-         // scrolled up
+         // mouse is scrolled up
 
          moveTimelinePlayheadTo_Start();
       }
@@ -703,22 +706,12 @@ public class MapPlayerView extends ViewPart {
 
    private void onTimeline_Selection() {
 
-      if (_isIgnoreTimelineSelectionEvent) {
-
-         _isIgnoreTimelineSelectionEvent = false;
-
-         return;
-      }
-
       stopPlayerWhenRunning();
 
-      setTimeline_Tooltip();
+//      System.out.println(UI.timeStamp() + " onTimeline_Selection: " + _scaleTimeline.getSelection());
+//      // TODO remove SYSTEM.OUT.PRINTLN
 
-      final double timelineSelection = _scaleTimeline.getSelection();
-      final int scaleMaximum = _scaleTimeline.getMaximum();
-      final double relativePosition = timelineSelection / scaleMaximum;
-
-      fireMapPlayerPosition(relativePosition);
+      setMapAndModelPosition(getTimelineRelativePosition());
    }
 
    private void restoreState() {
@@ -743,7 +736,6 @@ public class MapPlayerView extends ViewPart {
    public void setFocus() {
 
       _scaleTimeline.setFocus();
-//      _scaleTimeline_VisibleFrames.setFocus();
    }
 
    /**
@@ -765,11 +757,36 @@ public class MapPlayerView extends ViewPart {
       setJogWheel_Tooltip(jogWheelValue);
    }
 
+   /**
+    * Fire map position and start model animation
+    *
+    * @param relativePosition
+    */
+   private void setMapAndModelPosition(final double relativePosition) {
+
+      setTimeline_Tooltip();
+
+      fireMapPosition();
+
+      MapPlayerManager.setRelativePosition(relativePosition);
+   }
+
    private void setTimeline_Tooltip() {
 
       final int selection = _scaleTimeline.getSelection();
 
       _scaleTimeline.setToolTipText(Integer.toString(selection));
+   }
+
+   /**
+    * Select timeline from a relative position
+    *
+    * @param relativePosition
+    */
+   private void setTimelineSelection(final double relativePosition) {
+
+      final int timelineValue = (int) (_scaleTimeline.getMaximum() * relativePosition);
+      _scaleTimeline.setSelection(timelineValue);
    }
 
    private void stopPlayerWhenRunning() {
@@ -792,7 +809,6 @@ public class MapPlayerView extends ViewPart {
 
          // start new anmimation
 
-         _isIgnoreTimelineSelectionEvent = true;
          _scaleTimeline.setSelection(0);
 
          MapPlayerManager.setIsPlayerRunning(true);
@@ -853,7 +869,7 @@ public class MapPlayerView extends ViewPart {
 
       final int foregroundFPS = MapPlayerManager.getForegroundFPS();
 
-      updateUI_TimelineMaxValue(foregroundFPS);
+      updateUI_TimelineMaxValue();
 
       _spinnerFramesPerSecond.setSelection(foregroundFPS);
 
@@ -880,10 +896,8 @@ public class MapPlayerView extends ViewPart {
 
    /**
     * Update the timeline values when a new tour is selected
-    *
-    * @param selectedFPS
     */
-   private void updateUI_TimelineMaxValue(final int selectedFPS) {
+   private void updateUI_TimelineMaxValue() {
 
       final int minScaleTicks = 50;
 
@@ -908,7 +922,6 @@ public class MapPlayerView extends ViewPart {
             _scaleTimeline.setMaximum(numNotClippedFrames);
 
             // reselect last position
-            _isIgnoreTimelineSelectionEvent = true;
             _scaleTimeline.setSelection((int) relativeSelection);
          }
       }

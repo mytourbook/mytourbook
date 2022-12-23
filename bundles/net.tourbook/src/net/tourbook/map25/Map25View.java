@@ -1383,7 +1383,7 @@ public class Map25View extends ViewPart implements
       final Map map = _map25App.getMap();
       final MapPosition mapPosition = selectedBookmark.getMapPosition();
 
-      Map25AnimationManager.setMapLocation(map, mapPosition);
+      Map25LocationManager.setMapLocation(map, mapPosition);
    }
 
    @Override
@@ -1799,9 +1799,9 @@ public class Map25View extends ViewPart implements
 
             if (_mapSynchedWith == MapSync.WITH_TOUR) {
 
-//						final int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
+//					final int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
                final int animationTime = Map25ConfigManager.DEFAULT_ANIMATION_TIME;
-               Map25AnimationManager.setMapLocation(map25, _boundingBox, animationTime);
+               Map25LocationManager.setMapLocation(map25, _boundingBox, animationTime);
             }
 
             map25.updateMap();
@@ -2285,7 +2285,7 @@ public class Map25View extends ViewPart implements
                   return;
                }
 
-               Map25AnimationManager.setMapLocation(map25, sliderBBox, 500);
+               Map25LocationManager.setMapLocation(map25, sliderBBox, 500);
             }
          });
       }
@@ -2338,7 +2338,7 @@ public class Map25View extends ViewPart implements
          mapPosition.tilt = currentMapPos.tilt;
       }
 
-      Map25AnimationManager.setMapLocation(map, mapPosition);
+      Map25LocationManager.setMapLocation(map, mapPosition);
    }
 
    private void updateFilteredPhotos() {
