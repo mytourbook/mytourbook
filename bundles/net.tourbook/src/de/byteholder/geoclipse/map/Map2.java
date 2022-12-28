@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -80,6 +80,7 @@ import java.util.regex.Pattern;
 
 import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.DPITools;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ColorCacheSWT;
 import net.tourbook.common.color.ThemeUtil;
@@ -698,14 +699,18 @@ public class Map2 extends Canvas {
 
       grid_UpdatePaintingStateData();
 
-      _cursorCross = new Cursor(_display, SWT.CURSOR_CROSS);
-      _cursorDefault = new Cursor(_display, SWT.CURSOR_ARROW);
-      _cursorHand = new Cursor(_display, SWT.CURSOR_HAND);
-      _cursorPan = new Cursor(_display, SWT.CURSOR_SIZEALL);
+// SET_FORMATTING_OFF
 
-      _cursorSearchTour = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchTours_ByLocation));
-      _cursorSearchTour_Scroll = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.SearchTours_ByLocation_Scroll));
-      _cursorSelect = UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(Images.Cursor_Select));
+      _cursorCross               = new Cursor(_display, SWT.CURSOR_CROSS);
+      _cursorDefault             = new Cursor(_display, SWT.CURSOR_ARROW);
+      _cursorHand                = new Cursor(_display, SWT.CURSOR_HAND);
+      _cursorPan                 = new Cursor(_display, SWT.CURSOR_SIZEALL);
+
+      _cursorSearchTour          = createCursorFromImage(Images.SearchTours_ByLocation);
+      _cursorSearchTour_Scroll   = createCursorFromImage(Images.SearchTours_ByLocation_Scroll);
+      _cursorSelect              = createCursorFromImage(Images.Cursor_Select);
+
+// SET_FORMATTING_ON
 
       _transparentColor = new Color(MAP_TRANSPARENT_RGB);
 
@@ -1089,6 +1094,13 @@ public class Map2 extends Canvas {
       });
 
       setMenu(menuMgr.createContextMenu(this));
+   }
+
+   private Cursor createCursorFromImage(final String imageName) {
+
+      final String imageName4k = DPITools.get4kImageName(imageName);
+
+      return UI.createCursorFromImage(TourbookPlugin.getImageDescriptor(imageName4k));
    }
 
    /**
