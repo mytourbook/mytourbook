@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import net.tourbook.common.DPITools;
 import net.tourbook.common.PointLong;
 import net.tourbook.common.RectangleLong;
 import net.tourbook.common.UI;
@@ -990,12 +991,14 @@ public class ChartComponentGraph extends Canvas {
     */
    private Cursor createCursorFromImage(final String imageName) {
 
+      final String imageName4K = DPITools.get4kImageName(imageName);
+
       Image cursorImage = null;
-      final ImageDescriptor imageDescriptor = ChartActivator.getThemedImageDescriptor(imageName);
+      final ImageDescriptor imageDescriptor = ChartActivator.getThemedImageDescriptor(imageName4K);
 
       if (imageDescriptor == null) {
 
-         final String resourceName = "icons/" + imageName;//$NON-NLS-1$
+         final String resourceName = "icons/" + imageName4K;//$NON-NLS-1$
 
          final ClassLoader classLoader = getClass().getClassLoader();
 

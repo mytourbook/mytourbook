@@ -1,4 +1,4 @@
-22.next.0                                                 ?. Month 2022
+23.next.0                                                 ?. Month 2023
 
 
 TODO's
@@ -32,7 +32,8 @@ New
 Improvements
 ============
 
-* 
+* 4k Display
+  - Increased cursor size in Tour Chart and 2D Map, when displayed on 4k displays
 
 
 Changes
