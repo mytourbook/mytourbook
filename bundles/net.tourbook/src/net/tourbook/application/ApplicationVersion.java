@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,7 @@ public class ApplicationVersion {
    /**
     * Copyright year which is displayed in the splash screen.
     */
-   public static final String SPLASH_COPYRIGHT_YEAR = "2022"; //$NON-NLS-1$
+   public static final String SPLASH_COPYRIGHT_YEAR = "2023"; //$NON-NLS-1$
 
 // X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
    private static final String DEVELOPMENT_VERSION_TEXT = UI.EMPTY_STRING;
@@ -32,14 +32,14 @@ public class ApplicationVersion {
    private static String       _subVersion              = UI.EMPTY_STRING;
 
 //// X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-//   private static final String   DEVELOPMENT_VERSION_TEXT   = "DEVELOPMENT";                           //$NON-NLS-1$
-//   private static final String   DEV_WINDOW_TITLE         = UI.DASH_WITH_SPACE + DEVELOPMENT_VERSION_TEXT;
-//   private static String      _subVersion               = " improvements";                           //$NON-NLS-1$
+//   private static final String DEVELOPMENT_VERSION_TEXT   = "DEVELOPMENT";                           //$NON-NLS-1$
+//   private static final String DEV_WINDOW_TITLE           = UI.DASH_WITH_SPACE + DEVELOPMENT_VERSION_TEXT;
+//   private static String       _subVersion                = " improvements";                           //$NON-NLS-1$
 
 // X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X X
-//   private static final String   DEVELOPMENT_VERSION_TEXT   = "WEB 2.0";                              //$NON-NLS-1$
-//   private static final String   DEV_WINDOW_TITLE         = UI.DASH_WITH_SPACE + DEVELOPMENT_VERSION_TEXT;
-//   private static String      _subVersion               = UI.EMPTY_STRING;
+//   private static final String DEVELOPMENT_VERSION_TEXT   = "WEB 2.0";                              //$NON-NLS-1$
+//   private static final String DEV_WINDOW_TITLE           = UI.DASH_WITH_SPACE + DEVELOPMENT_VERSION_TEXT;
+//   private static String       _subVersion                = UI.EMPTY_STRING;
 
    private static String  _versionFull;
    private static String  _versionSimple;
