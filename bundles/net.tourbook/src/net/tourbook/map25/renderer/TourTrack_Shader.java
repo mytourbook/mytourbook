@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -898,11 +898,12 @@ public final class TourTrack_Shader {
 
       mapPlayerData.isPlayerEnabled                   = true;
 
+      mapPlayerData.allProjectedPoints                = trackBucket.allProjectedPoints;
+      
       mapPlayerData.allVisible_PixelPositions         = trackBucket.allVisible_PixelPositions;
       mapPlayerData.allVisible_GeoLocationIndices     = trackBucket.allVisible_GeoLocationIndices;
 
       mapPlayerData.allNotClipped_GeoLocationIndices  = trackBucket.allNotClipped_GeoLocationIndices;
-      mapPlayerData.anyGeoPoints                      = trackBucket.anyGeoPoints;
 
       mapPlayerData.mapScale                          = viewport.pos.scale;
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -513,7 +513,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                   allDirectionArrow_LocationIndex.toArray());
          }
 
-         workerBucket.anyGeoPoints = __anyGeoPoints;
+         workerBucket.allProjectedPoints = __allProjectedPoints;
          workerBucket.allNotClipped_GeoLocationIndices = allNotClipped_LocationIndices.toArray();
 
 //         System.out.println((System.currentTimeMillis()

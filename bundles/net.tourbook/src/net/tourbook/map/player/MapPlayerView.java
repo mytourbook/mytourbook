@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -47,9 +47,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
-import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
-import org.oscim.core.MercatorProjection;
 import org.oscim.renderer.GLViewport;
 
 public class MapPlayerView extends ViewPart {
@@ -181,12 +179,12 @@ public class MapPlayerView extends ViewPart {
    }
 
    /**
-    * @param isStart
+    * @param isStartPosition
     *           When <code>true</code> then the map position is from the tour start, otherwise from
     *           the tour end.
     * @return
     */
-   private MapPosition createMapPosition(final boolean isStart) {
+   private MapPosition createMapPosition(final boolean isStartPosition) {
 
       final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
       if (mapPlayerData == null) {
@@ -200,30 +198,29 @@ public class MapPlayerView extends ViewPart {
          return null;
       }
 
-      final int positionIndex = isStart
+      final int positionIndex = isStartPosition
             ? 0
             : numNotClippedPositions - 1;
 
       final int geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
 
-      final GeoPoint[] anyGeoPoints = mapPlayerData.anyGeoPoints;
-      final GeoPoint geoLocation = anyGeoPoints[geoLocationIndex];
-
-      final MapPosition mapPosition = createMapPosition_Projected(geoLocation, mapPlayerData.mapScale);
+      final MapPosition mapPosition = createMapPosition_Projected(mapPlayerData, geoLocationIndex);
 
       return mapPosition;
    }
 
-   private MapPosition createMapPosition_Projected(final GeoPoint geoLocation, final double mapScale) {
+   private MapPosition createMapPosition_Projected(final MapPlayerData mapPlayerData, final int geoLocationIndex) {
 
-      // lat/lon -> 0...1
-      final double modelProjectedPositionX = MercatorProjection.longitudeToX(geoLocation.getLongitude());
-      final double modelProjectedPositionY = MercatorProjection.latitudeToY(geoLocation.getLatitude());
+      final int projectedIndex = geoLocationIndex * 2;
+
+      final double projectedPositionX = mapPlayerData.allProjectedPoints[projectedIndex];
+      final double projectedPositionY = mapPlayerData.allProjectedPoints[projectedIndex + 1];
 
       final MapPosition mapPosition = new MapPosition();
-      mapPosition.x = modelProjectedPositionX;
-      mapPosition.y = modelProjectedPositionY;
-      mapPosition.setScale(mapScale);
+
+      mapPosition.x = projectedPositionX;
+      mapPosition.y = projectedPositionY;
+      mapPosition.setScale(mapPlayerData.mapScale);
 
       return mapPosition;
    }
@@ -460,11 +457,7 @@ public class MapPlayerView extends ViewPart {
             : positionIndex;
 
       final int geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
-
-      final GeoPoint[] anyGeoPoints = mapPlayerData.anyGeoPoints;
-      final GeoPoint geoLocation = anyGeoPoints[geoLocationIndex];
-
-      final MapPosition mapPosition = createMapPosition_Projected(geoLocation, mapPlayerData.mapScale);
+      final MapPosition mapPosition = createMapPosition_Projected(mapPlayerData, geoLocationIndex);
 
       MapManager.fireSyncMapEvent(mapPosition, this, null);
    }

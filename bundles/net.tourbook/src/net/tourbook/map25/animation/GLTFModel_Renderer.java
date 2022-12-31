@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,7 +42,6 @@ import net.tourbook.map.player.MapPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
 
 import org.oscim.backend.GL;
-import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
 import org.oscim.core.Tile;
@@ -424,20 +423,16 @@ public class GLTFModel_Renderer extends LayerRenderer {
             geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
          }
 
-         final GeoPoint[] anyGeoPoints = mapPlayerData.anyGeoPoints;
-         final GeoPoint geoLocation = anyGeoPoints[geoLocationIndex];
-
-         // lat/lon -> 0...1
-         final double modelProjectedPositionX = MercatorProjection.longitudeToX(geoLocation.getLongitude());
-         final double modelProjectedPositionY = MercatorProjection.latitudeToY(geoLocation.getLatitude());
+         final int projectedIndex = geoLocationIndex * 2;
+         final double projectedPositionX = mapPlayerData.allProjectedPoints[projectedIndex];
+         final double projectedPositionY = mapPlayerData.allProjectedPoints[projectedIndex + 1];
 
          /*
           * Translate glTF model to the map position
           */
-         dx = (float) ((modelProjectedPositionX - _currentMapPosition.x) * tileScale);
-         dy = (float) ((modelProjectedPositionY - _currentMapPosition.y) * tileScale);
+         dx = (float) ((projectedPositionX - _currentMapPosition.x) * tileScale);
+         dy = (float) ((projectedPositionY - _currentMapPosition.y) * tileScale);
       }
-
 
       /*
        * Compute model scale

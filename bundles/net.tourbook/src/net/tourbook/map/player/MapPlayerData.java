@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,7 @@ package net.tourbook.map.player;
 
 import de.byteholder.geoclipse.map.UI;
 
-import org.oscim.core.GeoPoint;
+import org.oscim.core.MercatorProjection;
 
 /**
  * Data for the map animation player
@@ -36,9 +36,11 @@ public class MapPlayerData {
    public int[]                allVisible_GeoLocationIndices;
 
    /**
-    * Contains all available geo locations (in E6 format) for all selected tours
+    * Projected points 0...1 for all geo positions for all selected tours
+    * <p>
+    * Is projected from -180°...180° ==> 0...1 by using the {@link MercatorProjection}
     */
-   public GeoPoint[]           anyGeoPoints;
+   public double[]             allProjectedPoints;
 
    /**
     * Contains indices into all geo positions for all selected tours which can be also outside of
@@ -51,7 +53,6 @@ public class MapPlayerData {
     */
    public double               mapScale;
 
-
    @Override
    public String toString() {
 
@@ -62,9 +63,9 @@ public class MapPlayerData {
             + "[" + NL //                                                                       //$NON-NLS-1$
 
             + "isPlayerEnabled                  = " + isPlayerEnabled + NL //                   //$NON-NLS-1$
+            + "allProjectedPoints               = " + allProjectedPoints + NL //                //$NON-NLS-1$
             + "allVisible_PixelPositions        = " + allVisible_PixelPositions + NL //         //$NON-NLS-1$
             + "allVisible_GeoLocationIndices    = " + allVisible_GeoLocationIndices + NL //     //$NON-NLS-1$
-            + "anyGeoPoints                     = " + anyGeoPoints + NL //                      //$NON-NLS-1$
             + "allNotClipped_GeoLocationIndices = " + allNotClipped_GeoLocationIndices + NL //  //$NON-NLS-1$
             + "mapScale                         = " + mapScale + NL //                          //$NON-NLS-1$
 

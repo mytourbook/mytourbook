@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -114,15 +114,12 @@ public class TourTrack_Bucket {
    int[]                      allVisible_GeoLocationIndices;
 
    /**
-    * Contains all available geo locations for all selected tours
-    */
-   GeoPoint[]                 anyGeoPoints;
-
-   /**
     * Contains indices into all geo positions {@link #anyGeoPoints} for all selected tours
     * which are also outside of the clipper (visible) area -2048...2048
     */
    int[]                      allNotClipped_GeoLocationIndices;
+
+   double[]                   allProjectedPoints;
 
    public TourTrack_Bucket() {
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -153,7 +153,8 @@ public class MapPlayerManager {
    }
 
    /**
-    * Compute the next visible frame number
+    * Compute the next visible frame number, called from
+    * {@link net.tourbook.map25.renderer.TourTrack_Shader#paint}
     *
     * @return Returns an index <code>0...</code>{@link #_numAllVisibleFrames}<code> - 1</code> for
     *         the next frame <code>1...</code>{@link #_numAllVisibleFrames}
@@ -256,6 +257,12 @@ public class MapPlayerManager {
       return _numAllVisibleFrames;
    }
 
+   /**
+    * This is called from
+    * {@link net.tourbook.map25.animation.GLTFModel_Renderer#render_UpdateModelPosition()}
+    *
+    * @return
+    */
    public static double getRelativePosition() {
 
       synchronized (RELATIVE_POSITION) {
@@ -264,6 +271,8 @@ public class MapPlayerManager {
          final float leftDuration = _animationEndTime - currentFrameTime;
 
          if (leftDuration < 0) {
+
+            // animation has finished
 
             /*
              * Fix rounding, otherwise the requested relative position is mostly not exactly set
@@ -282,6 +291,8 @@ public class MapPlayerManager {
 
             return _currentRelativePosition;
          }
+
+         // advance to the next animated position
 
          final float relativeRemainingDuration = leftDuration / animationDuration; // 0...1
          final float advance = clamp(1.0f - relativeRemainingDuration, 0, 1);
@@ -302,7 +313,7 @@ public class MapPlayerManager {
    }
 
    public static MapPosition getShortestDistanaceMapPosition() {
-      
+
       return _shortestDistanceMapPosition;
    }
 
@@ -438,7 +449,7 @@ public class MapPlayerManager {
    }
 
    public static void setIsShowAnimationCursor(final boolean isShowAnimationCursor) {
-      
+
       _isShowAnimationCursor = isShowAnimationCursor;
    }
 
@@ -501,7 +512,7 @@ public class MapPlayerManager {
          // keep current position
          _startRelativePosition = _currentRelativePosition;
 
-         // the next frame will recognize this position
+         // the next painted frame will recognize this position
          _nextRelativePosition = newRelativePosition;
 
          // this will also force to compute the frame even when player is paused
