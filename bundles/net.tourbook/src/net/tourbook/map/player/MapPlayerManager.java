@@ -22,7 +22,6 @@ import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.oscim.core.MapPosition;
 import org.oscim.renderer.MapRenderer;
 
 /**
@@ -97,8 +96,6 @@ public class MapPlayerManager {
    private static boolean               _isShowAnimationCursor;
 
    private static Object                RELATIVE_POSITION        = new Object();
-
-   private static MapPosition           _shortestDistanceMapPosition;
 
    /**
     * @return Returns the angle for the model forward direction
@@ -303,6 +300,9 @@ public class MapPlayerManager {
 
          _currentRelativePosition = clamp(currentRelativePosition, 0, 1);
 
+//         System.out.println(UI.timeStamp() + " getRelativePosition: " + _currentRelativePosition);
+//         // TODO remove SYSTEM.OUT.PRINTLN
+
          // redraw
          _isAnimateFromRelativePosition = true;
 
@@ -310,11 +310,6 @@ public class MapPlayerManager {
       }
 
       return _currentRelativePosition;
-   }
-
-   public static MapPosition getShortestDistanaceMapPosition() {
-
-      return _shortestDistanceMapPosition;
    }
 
    /**
@@ -494,17 +489,12 @@ public class MapPlayerManager {
     *
     * @param newRelativePosition
     *           Is between 0...1
-    * @param shortestDistanceMapPosition
-    *           When this is not <code>null</code> then move the model to this map position by using
-    *           the shortest distance
     */
-   public static void setRelativePosition(final double newRelativePosition, final MapPosition shortestDistanceMapPosition) {
+   public static void setRelativePosition(final double newRelativePosition) {
 
       synchronized (RELATIVE_POSITION) {
 
          animationDuration = 1000;
-
-         _shortestDistanceMapPosition = shortestDistanceMapPosition;
 
          final long currentFrameTime = MapRenderer.frametime;
          _animationEndTime = currentFrameTime + animationDuration;

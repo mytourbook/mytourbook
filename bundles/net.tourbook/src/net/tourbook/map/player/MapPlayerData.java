@@ -43,6 +43,11 @@ public class MapPlayerData {
    public double[]             allProjectedPoints;
 
    /**
+    * Projected points 0...1 from the geo end point of the tour to the geo start point
+    */
+   public double[]             allProjectedPoints_ReturnTrack;
+
+   /**
     * Contains indices into all geo positions for all selected tours which can be also outside of
     * the clipper (visible) area -2048...2048
     */

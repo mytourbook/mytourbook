@@ -30,6 +30,7 @@ import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.core.GeoPoint;
 import org.oscim.core.MapPosition;
 import org.oscim.core.MercatorProjection;
+import org.oscim.core.Point;
 import org.oscim.core.Tile;
 import org.oscim.map.Map;
 import org.oscim.renderer.GLMatrix;
@@ -109,6 +110,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       // limit coords
       private static final int  MAX_VISIBLE_PIXEL               = 2048;
 
+      private static final int  NUM_POINTS_END_2_START          = 10;
+
       /**
        * Contains all available geo locations for all selected tours in lat/lon E6 format.
        */
@@ -120,6 +123,11 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
        * Is projected from -180°...180° ==> 0...1 by using the {@link MercatorProjection}
        */
       private double[]          __allProjectedPoints            = new double[2];
+
+      /**
+       * Projected points 0...1 from the geo end point of the tour to the geo start point
+       */
+      private double[]          __allProjectedPoints_ReturnTrack;
 
       /**
        * Compiled points which are scaled with the current map position to "screen" pixels.
@@ -272,6 +280,13 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
        */
       private void doWork_CompileTrack(final TourCompileTask task, final int numPoints) {
 
+         // set current map position into the task map position
+         final MapPosition compileMapPos = task.__mapPos;
+         mMap.getMapPosition(compileMapPos);
+
+         final int zoomlevel = compileMapPos.zoomLevel;
+         final double mapScale = compileMapPos.scale = 1 << zoomlevel;
+
          final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
          final boolean isShowDirectionArrows = trackConfig.isShowDirectionArrow;
 
@@ -287,22 +302,13 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          final TourTrack_Bucket workerBucket = getWorkerBucket(task.__taskBucketManager);
 
-         // set current map position into the task map position
-         final MapPosition compileMapPos = task.__mapPos;
-         mMap.getMapPosition(compileMapPos);
-
-         final int zoomlevel = compileMapPos.zoomLevel;
-
-         // set scale from the zoom level
-         compileMapPos.scale = 1 << zoomlevel;
-
          // current map positions 0...1
          final double compileMapPosX = compileMapPos.x; // 0...1, lat == 0 -> 0.5
          final double compileMapPosY = compileMapPos.y; // 0...1, lon == 0 -> 0.5
 
          // number of x/y pixels for the whole map at the current zoom level
-         final double compileMaxMapPixel = Tile.SIZE * compileMapPos.scale;
-         final int maxMapPixel2 = Tile.SIZE << (zoomlevel - 1);
+         final double compileMaxMapPixel = Tile.SIZE * mapScale;
+         final int maxMapPixel = Tile.SIZE << (zoomlevel - 1);
 
          // flip around dateline
          int flip = 0;
@@ -310,14 +316,14 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          float pixelX = (float) ((__allProjectedPoints[0] - compileMapPosX) * compileMaxMapPixel);
          float pixelY = (float) ((__allProjectedPoints[1] - compileMapPosY) * compileMaxMapPixel);
 
-         if (pixelX > maxMapPixel2) {
+         if (pixelX > maxMapPixel) {
 
-            pixelX -= maxMapPixel2 * 2;
+            pixelX -= maxMapPixel * 2;
             flip = -1;
 
-         } else if (pixelX < -maxMapPixel2) {
+         } else if (pixelX < -maxMapPixel) {
 
-            pixelX += maxMapPixel2 * 2;
+            pixelX += maxMapPixel * 2;
             flip = 1;
          }
 
@@ -369,14 +375,14 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
             int flipDirection = 0;
 
-            if (pixelX > maxMapPixel2) {
+            if (pixelX > maxMapPixel) {
 
-               pixelX -= maxMapPixel2 * 2;
+               pixelX -= maxMapPixel * 2;
                flipDirection = -1;
 
-            } else if (pixelX < -maxMapPixel2) {
+            } else if (pixelX < -maxMapPixel) {
 
-               pixelX += maxMapPixel2 * 2;
+               pixelX += maxMapPixel * 2;
                flipDirection = 1;
             }
 
@@ -513,18 +519,50 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                   allDirectionArrow_LocationIndex.toArray());
          }
 
+         doWork_CreateReturnTrack(mapScale);
+
          workerBucket.allProjectedPoints = __allProjectedPoints;
+         workerBucket.allProjectedPoints_ReturnTrack = __allProjectedPoints_ReturnTrack;
          workerBucket.allNotClipped_GeoLocationIndices = allNotClipped_LocationIndices.toArray();
 
-//         System.out.println((System.currentTimeMillis()
-//
-//               + " worker: "
-//               + " num indices:" + allNotClipped_LocationIndices.size()
-//               + "  # " + allNotClipped_LocationIndices.hashCode()));
-//
-//         // TODO remove SYSTEM.OUT.PRINTLN
-
       } // doWork_CompileTrack end
+
+      /**
+       * Create end to start locations
+       */
+      private void doWork_CreateReturnTrack(final double mapScale) {
+
+         final GeoPoint geoPointStart = _anyGeoPoints[0];
+         final GeoPoint geoPointEnd = _anyGeoPoints[__numAllGeoPoints - 1];
+
+         final Point projectedStart = MercatorProjection.project(geoPointStart, null);
+         final Point projectedEnd = MercatorProjection.project(geoPointEnd, null);
+
+         final double projectedEnd2StartDiffX = projectedEnd.x - projectedStart.x;
+         final double projectedEnd2StartDiffY = projectedEnd.y - projectedStart.y;
+
+         int numPointsEnd2Start = NUM_POINTS_END_2_START;
+
+         // distance in meters between start and end
+         final double sphericalDistance = geoPointStart.sphericalDistance(geoPointEnd);
+
+         // compute number of return track points
+         numPointsEnd2Start = numPointsEnd2Start;
+
+         final double projectedEnd2StartIntervalX = projectedEnd2StartDiffX / numPointsEnd2Start;
+         final double projectedEnd2StartIntervalY = projectedEnd2StartDiffY / numPointsEnd2Start;
+
+         __allProjectedPoints_ReturnTrack = new double[numPointsEnd2Start];
+
+         for (int pointIndex = 0; pointIndex < numPointsEnd2Start; pointIndex += 2) {
+
+            final double diffX = projectedEnd2StartIntervalX * pointIndex / 2;
+            final double diffY = projectedEnd2StartIntervalY * pointIndex / 2;
+
+            __allProjectedPoints_ReturnTrack[pointIndex] = diffX;
+            __allProjectedPoints_ReturnTrack[pointIndex + 1] = diffY;
+         }
+      }
 
       private int getNextTourStartIndex(final int tourIndex) {
 

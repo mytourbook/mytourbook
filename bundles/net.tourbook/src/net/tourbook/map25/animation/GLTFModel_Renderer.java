@@ -397,42 +397,33 @@ public class GLTFModel_Renderer extends LayerRenderer {
       float dx = 0;
       float dy = 0;
 
-      final MapPosition shortestDistanaceMapPosition = MapPlayerManager.getShortestDistanaceMapPosition();
+      // move model along the tour track
 
-      if (shortestDistanaceMapPosition != null) {
+      int geoLocationIndex = 0;
 
-         // move model by using the shortest distance
+      final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
+      final int numGeoLocationIndices = allNotClipped_GeoLocationIndices.length;
 
-      } else {
+      if (numGeoLocationIndices > 0) {
 
-         // move model along the tour track
+         // compute frame position from relative position
+         final double relativePosition = MapPlayerManager.getRelativePosition();
 
-         int geoLocationIndex = 0;
+         int positionIndex = (int) (numGeoLocationIndices * relativePosition);
+         positionIndex = MathUtils.clamp(positionIndex, 0, numGeoLocationIndices - 1);
 
-         final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
-         final int numGeoLocationIndices = allNotClipped_GeoLocationIndices.length;
-
-         if (numGeoLocationIndices > 0) {
-
-            // get frame from relative position
-            final double relativePosition = MapPlayerManager.getRelativePosition();
-
-            int positionIndex = (int) (numGeoLocationIndices * relativePosition);
-            positionIndex = MathUtils.clamp(positionIndex, 0, numGeoLocationIndices - 1);
-
-            geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
-         }
-
-         final int projectedIndex = geoLocationIndex * 2;
-         final double projectedPositionX = mapPlayerData.allProjectedPoints[projectedIndex];
-         final double projectedPositionY = mapPlayerData.allProjectedPoints[projectedIndex + 1];
-
-         /*
-          * Translate glTF model to the map position
-          */
-         dx = (float) ((projectedPositionX - _currentMapPosition.x) * tileScale);
-         dy = (float) ((projectedPositionY - _currentMapPosition.y) * tileScale);
+         geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
       }
+
+      final int projectedIndex = geoLocationIndex * 2;
+      final double projectedPositionX = mapPlayerData.allProjectedPoints[projectedIndex];
+      final double projectedPositionY = mapPlayerData.allProjectedPoints[projectedIndex + 1];
+
+      /*
+       * Translate glTF model to the map position
+       */
+      dx = (float) ((projectedPositionX - _currentMapPosition.x) * tileScale);
+      dy = (float) ((projectedPositionY - _currentMapPosition.y) * tileScale);
 
       /*
        * Compute model scale

@@ -178,36 +178,6 @@ public class MapPlayerView extends ViewPart {
       _actionPlayControl_PlayAndPause = new Action_PlayControl_PlayAndPause();
    }
 
-   /**
-    * @param isStartPosition
-    *           When <code>true</code> then the map position is from the tour start, otherwise from
-    *           the tour end.
-    * @return
-    */
-   private MapPosition createMapPosition(final boolean isStartPosition) {
-
-      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
-      if (mapPlayerData == null) {
-         return null;
-      }
-
-      final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
-      final int numNotClippedPositions = allNotClipped_GeoLocationIndices.length;
-
-      if (numNotClippedPositions == 0) {
-         return null;
-      }
-
-      final int positionIndex = isStartPosition
-            ? 0
-            : numNotClippedPositions - 1;
-
-      final int geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
-
-      final MapPosition mapPosition = createMapPosition_Projected(mapPlayerData, geoLocationIndex);
-
-      return mapPosition;
-   }
 
    private MapPosition createMapPosition_Projected(final MapPlayerData mapPlayerData, final int geoLocationIndex) {
 
@@ -490,7 +460,7 @@ public class MapPlayerView extends ViewPart {
             }
 
             setTimelineSelection(1);
-            setMapAndModelPosition(1, createMapPosition(false));
+            setMapAndModelPosition(1);
          });
 
          return true;
@@ -514,7 +484,7 @@ public class MapPlayerView extends ViewPart {
             }
 
             setTimelineSelection(0);
-            setMapAndModelPosition(0, createMapPosition(true));
+            setMapAndModelPosition(0);
          });
 
          return true;
@@ -543,7 +513,7 @@ public class MapPlayerView extends ViewPart {
          // start new anmimation
 
          setTimelineSelection(0);
-         setMapAndModelPosition(0, null);
+         setMapAndModelPosition(0);
 
          MapPlayerManager.setIsPlayerRunning(true);
 
@@ -706,7 +676,7 @@ public class MapPlayerView extends ViewPart {
 
                   isPlayheadMoved = true;
 
-                  setMapAndModelPosition(getTimelineRelativePosition(), null);
+                  setMapAndModelPosition(getTimelineRelativePosition());
                }
             }
          }
@@ -745,7 +715,7 @@ public class MapPlayerView extends ViewPart {
 //      System.out.println(UI.timeStamp() + " onTimeline_Selection: " + _scaleTimeline.getSelection());
 //      // TODO remove SYSTEM.OUT.PRINTLN
 
-      setMapAndModelPosition(getTimelineRelativePosition(), null);
+      setMapAndModelPosition(getTimelineRelativePosition());
    }
 
    private void restoreState() {
@@ -799,13 +769,13 @@ public class MapPlayerView extends ViewPart {
     *           When this is not <code>null</code> then move the model to this map position by using
     *           the shortest distance
     */
-   private void setMapAndModelPosition(final double relativePosition, final MapPosition shortestDistanceMapPosition) {
+   private void setMapAndModelPosition(final double relativePosition) {
 
       setTimeline_Tooltip();
 
       fireMapPosition();
 
-      MapPlayerManager.setRelativePosition(relativePosition, shortestDistanceMapPosition);
+      MapPlayerManager.setRelativePosition(relativePosition);
    }
 
    private void setTimeline_Tooltip() {
@@ -849,7 +819,7 @@ public class MapPlayerView extends ViewPart {
          _scaleTimeline.setSelection(0);
 
          MapPlayerManager.setIsPlayerRunning(true);
-         MapPlayerManager.setRelativePosition(0, null);
+         MapPlayerManager.setRelativePosition(0);
 
       } else {
 

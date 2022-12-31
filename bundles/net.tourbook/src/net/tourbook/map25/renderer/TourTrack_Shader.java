@@ -899,7 +899,8 @@ public final class TourTrack_Shader {
       mapPlayerData.isPlayerEnabled                   = true;
 
       mapPlayerData.allProjectedPoints                = trackBucket.allProjectedPoints;
-      
+      mapPlayerData.allProjectedPoints_ReturnTrack    = trackBucket.allProjectedPoints_ReturnTrack;
+
       mapPlayerData.allVisible_PixelPositions         = trackBucket.allVisible_PixelPositions;
       mapPlayerData.allVisible_GeoLocationIndices     = trackBucket.allVisible_GeoLocationIndices;
 

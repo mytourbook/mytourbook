@@ -23,7 +23,6 @@ import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
 
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.canvas.Paint.Cap;
-import org.oscim.core.GeoPoint;
 import org.oscim.renderer.MapRenderer;
 import org.oscim.theme.styles.LineStyle;
 import org.slf4j.Logger;
@@ -120,6 +119,8 @@ public class TourTrack_Bucket {
    int[]                      allNotClipped_GeoLocationIndices;
 
    double[]                   allProjectedPoints;
+
+   double[]                   allProjectedPoints_ReturnTrack;
 
    public TourTrack_Bucket() {
 
