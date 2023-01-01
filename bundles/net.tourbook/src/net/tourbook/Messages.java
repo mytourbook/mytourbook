@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -2878,6 +2878,8 @@ public class Messages extends NLS {
    public static String        Tour_Filter_Operator_IsEmpty;
    public static String        Tour_Filter_Operator_IsNotAvailable;
    public static String        Tour_Filter_Operator_IsNotEmpty;
+   public static String        Tour_Filter_Operator_LastDuration;
+
    public static String        Tour_Filter_Operator_LessThan;
    public static String        Tour_Filter_Operator_LessThanOrEqual;
    public static String        Tour_Filter_Operator_NotBetween;
