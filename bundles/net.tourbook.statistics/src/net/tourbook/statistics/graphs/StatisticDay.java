@@ -188,7 +188,7 @@ public abstract class StatisticDay extends TourbookStatistic implements IBarSele
 
       _chart.addBarSelectionListener((serieIndex, valueIndex) -> {
 
-         if (_statisticData_Day.allTypeIds.length > 0) {
+         if (_statisticData_Day.allTypeIds.length > 0 && valueIndex < _statisticData_Day.allTourIds.length) {
 
             _selectedTourId = _statisticData_Day.allTourIds[valueIndex];
             _tourInfoToolTipProvider.setTourId(_selectedTourId);

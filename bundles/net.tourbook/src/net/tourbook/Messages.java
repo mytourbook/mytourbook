@@ -2868,6 +2868,10 @@ public class Messages extends NLS {
    public static String        Tour_Filter_Field_TourLocation_Start;
    public static String        Tour_Filter_Field_TourStartTime;
    public static String        Tour_Filter_Field_TourTitle;
+   public static String        Tour_Filter_MostRecent_Days;
+   public static String        Tour_Filter_MostRecent_Months;
+   public static String        Tour_Filter_MostRecent_Weeks;
+   public static String        Tour_Filter_MostRecent_Years;
    public static String        Tour_Filter_Operator_And;
    public static String        Tour_Filter_Operator_Between;
    public static String        Tour_Filter_Operator_EndsWith;
@@ -2878,8 +2882,7 @@ public class Messages extends NLS {
    public static String        Tour_Filter_Operator_IsEmpty;
    public static String        Tour_Filter_Operator_IsNotAvailable;
    public static String        Tour_Filter_Operator_IsNotEmpty;
-   public static String        Tour_Filter_Operator_LastDuration;
-
+   public static String        Tour_Filter_Operator_MostRecent;
    public static String        Tour_Filter_Operator_LessThan;
    public static String        Tour_Filter_Operator_LessThanOrEqual;
    public static String        Tour_Filter_Operator_NotBetween;

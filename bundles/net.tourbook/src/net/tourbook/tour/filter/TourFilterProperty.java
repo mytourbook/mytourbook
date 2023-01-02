@@ -72,37 +72,32 @@ public class TourFilterProperty implements Cloneable {
    String        textValue2 = UI.EMPTY_STRING;
 
    /*
-    * UI controls, not all of them are used, depending on the selected field type and operator
+    * UI controls, not all of them are used, it depends on the selected field type and operator
     */
 
-   Button    checkboxIsPropertyEnabled;
+   Button       checkboxIsPropertyEnabled;
 
-   Combo     comboFieldName;
-   Combo     comboFieldOperator;
+   Combo        comboFieldName;
+   Combo        comboFieldOperator;
 
-   Composite fieldDetailContainer;
-
-   // ---------------------------------------------------------------------
+   Composite    fieldDetailContainer;
 
    DateTime     uiDateTime1;
    DateTime     uiDateTime2;
    TimeDuration uiDuration1;
    TimeDuration uiDuration2;
 
-   // last duration
-   Combo uiCombo_LastDuration;
+   Combo        uiCombo_MostRecent;
+   Combo        uiCombo_SeasonMonth1;
+   Combo        uiCombo_SeasonMonth2;
 
-   // season
-   Combo   uiCombo_SeasonMonth1;
-   Combo   uiCombo_SeasonMonth2;
-   Spinner uiSpinner_SeasonDay1;
-   Spinner uiSpinner_SeasonDay2;
+   Spinner      uiSpinner_Number1;
+   Spinner      uiSpinner_Number2;
+   Spinner      uiSpinner_SeasonDay1;
+   Spinner      uiSpinner_SeasonDay2;
 
-   Spinner uiSpinner_Number1;
-   Spinner uiSpinner_Number2;
-
-   Text    uiText1;
-   Text    uiText2;
+   Text         uiText1;
+   Text         uiText2;
 
    public TourFilterProperty() {}
 
@@ -145,7 +140,7 @@ public class TourFilterProperty implements Cloneable {
       uiDuration1 = null;
       uiDuration2 = null;
 
-      uiCombo_LastDuration = null;
+      uiCombo_MostRecent = null;
       uiCombo_SeasonMonth1 = null;
       uiCombo_SeasonMonth2 = null;
       uiSpinner_SeasonDay1 = null;

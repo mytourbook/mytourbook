@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -65,12 +65,19 @@ public class TimeTools {
     */
    private static final IntObjectHashMap<String> _timeZoneOffsetLabels = new IntObjectHashMap<>();
 
-   /** Minutes per hour. */
+   /** Minutes per hour */
    private static final int                      MINUTES_PER_HOUR      = 60;
-   /** Seconds per minute. */
+
+   /** Seconds per minute */
    private static final int                      SECONDS_PER_MINUTE    = 60;
-   /** Seconds per hour. */
+
+   /** Seconds per hour */
    private static final int                      SECONDS_PER_HOUR      = SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
+
+   /**
+    * Number of millisecond for one day
+    */
+   public static final int                       DAY_MILLISECONDS      = 86400_000;
 
    private static final PeriodFormatter          DURATION_FORMATTER;
 
