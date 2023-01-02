@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.MonthDay;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -118,6 +119,7 @@ public class TourFilterManager {
    private static final String ATTR_NAME                         = "name";                                                          //$NON-NLS-1$
    private static final String ATTR_SEASON_DAY                   = "seasonDay";                                                     //$NON-NLS-1$
    private static final String ATTR_SEASON_MONTH                 = "seasonMonth";                                                   //$NON-NLS-1$
+   private static final String ATTR_TEXT                         = "text";                                                          //$NON-NLS-1$
    private static final String ATTR_TOUR_FILTER_VERSION          = "tourFilterVersion";                                             //$NON-NLS-1$
    private static final String ATTR_VALUE                        = "value";                                                         //$NON-NLS-1$
 
@@ -172,11 +174,26 @@ public class TourFilterManager {
       new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_MONTH,                         Messages.Tour_Filter_Operator_Season_Month),
       new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_TODAY_UNTIL_YEAR_END,          Messages.Tour_Filter_Operator_Season_Today_Until_YearEnd),
       new TourFilterFieldOperatorConfig(TourFilterFieldOperator.SEASON_TODAY_UNTIL_DATE,              Messages.Tour_Filter_Operator_Season_Today_Until_Date),
+
+      new TourFilterFieldOperatorConfig(TourFilterFieldOperator.MOST_RECENT,                          Messages.Tour_Filter_Operator_MostRecent),
    };
 
 // SET_FORMATTING_ON
 
-   public static final TourFilterFieldOperator[] FILTER_OPERATORS_DATE_TIME      = {
+   private static final TourFilterFieldOperator[] FILTER_OPERATORS_DATE           = {
+
+         TourFilterFieldOperator.LESS_THAN,
+         TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
+         TourFilterFieldOperator.GREATER_THAN,
+         TourFilterFieldOperator.GREATER_THAN_OR_EQUAL,
+         TourFilterFieldOperator.EQUALS,
+         TourFilterFieldOperator.NOT_EQUALS,
+         TourFilterFieldOperator.BETWEEN,
+         TourFilterFieldOperator.NOT_BETWEEN,
+         TourFilterFieldOperator.MOST_RECENT,
+   };
+
+   private static final TourFilterFieldOperator[] FILTER_OPERATORS_TIME           = {
 
          TourFilterFieldOperator.LESS_THAN,
          TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
@@ -188,7 +205,7 @@ public class TourFilterManager {
          TourFilterFieldOperator.NOT_BETWEEN,
    };
 
-   public static final TourFilterFieldOperator[] FILTER_OPERATORS_NUMBER         = {
+   static final TourFilterFieldOperator[]         FILTER_OPERATORS_NUMBER         = {
 
          TourFilterFieldOperator.LESS_THAN,
          TourFilterFieldOperator.LESS_THAN_OR_EQUAL,
@@ -200,7 +217,7 @@ public class TourFilterManager {
          TourFilterFieldOperator.NOT_BETWEEN,
    };
 
-   public static final TourFilterFieldOperator[] FILTER_OPERATORS_SEASON         = {
+   private static final TourFilterFieldOperator[] FILTER_OPERATORS_SEASON         = {
 
          TourFilterFieldOperator.SEASON_UNTIL_TODAY_FROM_YEAR_START,
          TourFilterFieldOperator.SEASON_UNTIL_TODAY_FROM_DATE,
@@ -213,26 +230,26 @@ public class TourFilterManager {
          TourFilterFieldOperator.NOT_BETWEEN,
    };
 
-   public static final TourFilterFieldOperator[] FILTER_OPERATORS_TEXT           = {
+   private static final TourFilterFieldOperator[] FILTER_OPERATORS_TEXT           = {
 
          TourFilterFieldOperator.IS_EMPTY,
          TourFilterFieldOperator.IS_NOT_EMPTY,
    };
 
-   public static final TourFilterFieldOperator[] FILTER_OPERATORS_BOOLEAN        = {
+   private static final TourFilterFieldOperator[] FILTER_OPERATORS_BOOLEAN        = {
 
          TourFilterFieldOperator.IS_AVAILABLE,
          TourFilterFieldOperator.IS_NOT_AVAILABLE,
    };
 
-   private static FieldValueConverter            _fieldValueProvider_Altitude    = new FieldValueProvider_Altitude();
-   private static FieldValueConverter            _fieldValueProvider_Distance    = new FieldValueProvider_Distance();
-   private static FieldValueConverter            _fieldValueProvider_Temperature = new FieldValueProvider_Temperature();
+   private static FieldValueConverter             _fieldValueProvider_Altitude    = new FieldValueProvider_Altitude();
+   private static FieldValueConverter             _fieldValueProvider_Distance    = new FieldValueProvider_Distance();
+   private static FieldValueConverter             _fieldValueProvider_Temperature = new FieldValueProvider_Temperature();
 
    /**
     * This is also the sequence how the fields are displayed in the UI
     */
-   public static final TourFilterFieldConfig[]   FILTER_FIELD_CONFIG;
+   public static final TourFilterFieldConfig[]    FILTER_FIELD_CONFIG;
 
    static {
 
@@ -311,17 +328,39 @@ public class TourFilterManager {
       FILTER_FIELD_CONFIG = allConfigs.toArray(new TourFilterFieldConfig[allConfigs.size()]);
    }
 
-   private static final Bundle            _bundle           = TourbookPlugin.getDefault().getBundle();
-   private static final IPath             _stateLocation    = Platform.getStateLocation(_bundle);
+   /**
+    * Must be in sync with {@link #MOST_RECENT_UNITS}
+    */
+   static final String                    MOST_RECENT_LABELS[] = {
 
-   private static final IPreferenceStore  _prefStore        = TourbookPlugin.getPrefStore();
-   private static final IPreferenceStore  _prefStore_Common = CommonActivator.getPrefStore();
+         Messages.Tour_Filter_MostRecent_Days,
+         Messages.Tour_Filter_MostRecent_Weeks,
+         Messages.Tour_Filter_MostRecent_Months,
+         Messages.Tour_Filter_MostRecent_Years
+   };
+
+   /**
+    * Must be in sync with {@link #MOST_RECENT_LABELS}
+    */
+   static final MostRecent                MOST_RECENT_UNITS[]  = {
+
+         MostRecent.DAYS,
+         MostRecent.WEEKS,
+         MostRecent.MONTHS,
+         MostRecent.YEARS
+   };
+
+   private static final Bundle            _bundle              = TourbookPlugin.getDefault().getBundle();
+   private static final IPath             _stateLocation       = Platform.getStateLocation(_bundle);
+
+   private static final IPreferenceStore  _prefStore           = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore  _prefStore_Common    = CommonActivator.getPrefStore();
 
    private static IPropertyChangeListener _prefChangeListener_Common;
 
    static {
 
-      // load unit very early
+      // load units very early
       updateUnits();
 
       _prefChangeListener_Common = propertyChangeEvent -> {
@@ -431,7 +470,7 @@ public class TourFilterManager {
       allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_MOTION, TourFilterFieldId.MOTION_DISTANCE));
 
       allConfigs.add(
-            TourFilterFieldConfig//
+            TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_Distance)
                   .fieldId(TourFilterFieldId.MOTION_DISTANCE)
                   .fieldType(TourFilterFieldType.NUMBER_FLOAT)
@@ -491,7 +530,7 @@ public class TourFilterManager {
    }
 
    private static void createConfig_Powertrain(final ArrayList<TourFilterFieldConfig> allConfigs) {
-      //
+
 //      // Powertrain - Antrieb/Pedal
 //      defineColumn_Powertrain_AvgCadence();
 //      defineColumn_Powertrain_CadenceMultiplier();
@@ -506,7 +545,7 @@ public class TourFilterManager {
       allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_POWERTRAIN, TourFilterFieldId.POWERTRAIN_AVG_CADENCE));
 
       allConfigs.add(
-            TourFilterFieldConfig//
+            TourFilterFieldConfig
                   .name(LABEL_POWERTRAIN_AVG_CADENCE)
                   .fieldId(TourFilterFieldId.POWERTRAIN_AVG_CADENCE)
                   .fieldType(TourFilterFieldType.NUMBER_FLOAT)
@@ -515,13 +554,13 @@ public class TourFilterManager {
                   .numDigits(1));
 
       allConfigs.add(
-            TourFilterFieldConfig//
+            TourFilterFieldConfig
                   .name(LABEL_POWERTRAIN_GEAR_FRONT_SHIFT)
                   .fieldId(TourFilterFieldId.POWERTRAIN_GEAR_FRONT_SHIFT_COUNT)
                   .defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
 
       allConfigs.add(
-            TourFilterFieldConfig//
+            TourFilterFieldConfig
                   .name(LABEL_POWERTRAIN_GEAR_REAR_SHIFT)
                   .fieldId(TourFilterFieldId.POWERTRAIN_GEAR_REAR_SHIFT_COUNT)
                   .defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
@@ -546,23 +585,24 @@ public class TourFilterManager {
       allConfigs.add(new TourFilterFieldConfig(LABEL_CATEGORY_TIME, TourFilterFieldId.TIME_TOUR_DATE));
 
       allConfigs.add(
-            TourFilterFieldConfig //
+            TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_TourDate)
                   .fieldId(TourFilterFieldId.TIME_TOUR_DATE)
                   .fieldType(TourFilterFieldType.DATE)
-                  .fieldOperators(FILTER_OPERATORS_DATE_TIME)
+                  .fieldOperators(FILTER_OPERATORS_DATE)
+                  .maxValue(9999) //                                             9999 days/weeks/months/years
                   .defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
 
       allConfigs.add(
-            TourFilterFieldConfig //
+            TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_TourStartTime)
                   .fieldId(TourFilterFieldId.TIME_TOUR_TIME)
                   .fieldType(TourFilterFieldType.TIME)
-                  .fieldOperators(FILTER_OPERATORS_DATE_TIME)
+                  .fieldOperators(FILTER_OPERATORS_TIME)
                   .defaultFieldOperator(TourFilterFieldOperator.GREATER_THAN));
 
       allConfigs.add(
-            TourFilterFieldConfig //
+            TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_Season)
                   .fieldId(TourFilterFieldId.TIME_SEASON_DATE)
                   .fieldType(TourFilterFieldType.SEASON)
@@ -570,7 +610,7 @@ public class TourFilterManager {
                   .defaultFieldOperator(TourFilterFieldOperator.LESS_THAN_OR_EQUAL));
 
       allConfigs.add(
-            TourFilterFieldConfig //
+            TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_DeviceTime_Elapsed)
                   .fieldId(TourFilterFieldId.TIME_ELAPSED_TIME)
                   .fieldType(TourFilterFieldType.DURATION)
@@ -578,7 +618,7 @@ public class TourFilterManager {
                   .pageIncrement(60));
 
       allConfigs.add(
-            TourFilterFieldConfig //
+            TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_ComputedTime_Moving)
                   .fieldId(TourFilterFieldId.TIME_MOVING_TIME)
                   .fieldType(TourFilterFieldType.DURATION)
@@ -586,7 +626,7 @@ public class TourFilterManager {
                   .pageIncrement(60));
 
       allConfigs.add(
-            TourFilterFieldConfig //
+            TourFilterFieldConfig
                   .name(Messages.Tour_Filter_Field_ComputedTime_Break)
                   .fieldId(TourFilterFieldId.TIME_BREAK_TIME)
                   .fieldType(TourFilterFieldType.DURATION)
@@ -928,15 +968,22 @@ public class TourFilterManager {
 
             sql = TOUR_DATA_TOUR_START_TIME;
 
-            value1 = (LocalDate
-                  .of(dateTime1.getYear(), dateTime1.getMonthValue(), dateTime1.getDayOfMonth())
-                  .toEpochDay()) * 86400_000;
+            if (fieldOperator.equals(TourFilterFieldOperator.MOST_RECENT)) {
 
-            value2 = (LocalDate
-                  .of(dateTime2.getYear(), dateTime2.getMonthValue(), dateTime2.getDayOfMonth())
-                  .toEpochDay() + 1) * 86400_000;
+               getSQL__FieldOperators_MostRecent(sqlWhere, sqlParameters, fieldOperator, sql, filterProperty);
 
-            getSQL__FieldOperators_DateTime(sqlWhere, sqlParameters, fieldOperator, sql, value1, value2);
+            } else {
+
+               value1 = (LocalDate
+                     .of(dateTime1.getYear(), dateTime1.getMonthValue(), dateTime1.getDayOfMonth())
+                     .toEpochDay()) * TimeTools.DAY_MILLISECONDS;
+
+               value2 = (LocalDate
+                     .of(dateTime2.getYear(), dateTime2.getMonthValue(), dateTime2.getDayOfMonth())
+                     .toEpochDay() + 1) * TimeTools.DAY_MILLISECONDS;
+
+               getSQL__FieldOperators_DateTime(sqlWhere, sqlParameters, fieldOperator, sql, value1, value2);
+            }
             break;
 
          case TIME_TOUR_TIME:
@@ -1081,17 +1128,18 @@ public class TourFilterManager {
                                                        final Long value2) {
 
       switch (fieldOperator) {
+
       case LESS_THAN:
          getSQL_LessThan(sqlWhere, sqlParameters, sqlField, value1, OP_AND);
          break;
       case LESS_THAN_OR_EQUAL:
          //To be less than or equal, we include the next day (i.e.: + 86400_000)
-         getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1 + 86400_000);
+         getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1 + TimeTools.DAY_MILLISECONDS);
          break;
 
       case GREATER_THAN:
          //To be greater than, we go to the next day (i.e.: + 86400_000)
-         getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1 + 86400_000, OP_AND);
+         getSQL_GreaterThan(sqlWhere, sqlParameters, sqlField, value1 + TimeTools.DAY_MILLISECONDS, OP_AND);
          break;
       case GREATER_THAN_OR_EQUAL:
          getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
@@ -1099,10 +1147,10 @@ public class TourFilterManager {
 
       case EQUALS:
          getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
-         getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1 + 86400_000);
+         getSQL_LessThanOrEqual(sqlWhere, sqlParameters, sqlField, value1 + TimeTools.DAY_MILLISECONDS);
          break;
       case NOT_EQUALS:
-         getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value1 + 86400_000, false);
+         getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value1 + TimeTools.DAY_MILLISECONDS, false);
          break;
 
       case BETWEEN:
@@ -1112,6 +1160,52 @@ public class TourFilterManager {
          getSQL_Between(sqlWhere, sqlParameters, sqlField, value1, value2, false);
          break;
       }
+   }
+
+   private static void getSQL__FieldOperators_MostRecent(final StringBuilder sqlWhere,
+                                                         final ArrayList<Object> sqlParameters,
+                                                         final TourFilterFieldOperator fieldOperator,
+                                                         final String sqlField,
+                                                         final TourFilterProperty filterProperty) {
+
+      final int mostRecentValue = filterProperty.intValue1;
+      final String mostRecentEnumName = filterProperty.textValue1;
+
+      final MostRecent mostRecentUnit = (MostRecent) Util.getEnumValue(mostRecentEnumName, MostRecent.YEARS);
+
+      ZonedDateTime sqlDate = TimeTools.now();
+
+      switch (mostRecentUnit) {
+
+      case DAYS:
+         sqlDate = sqlDate.minusDays(mostRecentValue);
+         break;
+
+      case WEEKS:
+         sqlDate = sqlDate.minusWeeks(mostRecentValue);
+         break;
+
+      case MONTHS:
+         sqlDate = sqlDate.minusMonths(mostRecentValue);
+         break;
+
+      case YEARS:
+         sqlDate = sqlDate.minusYears(mostRecentValue);
+         break;
+      }
+
+      final long value1 =
+
+            (LocalDate
+                  .of(sqlDate.getYear(),
+                        sqlDate.getMonthValue(),
+                        sqlDate.getDayOfMonth())
+                  .toEpochDay()
+
+            ) * TimeTools.DAY_MILLISECONDS;
+
+      getSQL_GreaterThanOrEqual(sqlWhere, sqlParameters, sqlField, value1);
+
    }
 
    @SuppressWarnings("incomplete-switch")
@@ -1153,6 +1247,7 @@ public class TourFilterManager {
       }
    }
 
+   @SuppressWarnings("incomplete-switch")
    private static void getSQL__FieldOperators_SeasonDate(final StringBuilder sqlWhere,
                                                          final ArrayList<Object> sqlParameters,
                                                          final TourFilterProperty filterProperty,
@@ -1178,6 +1273,7 @@ public class TourFilterManager {
       final String sqlMonth = "TourData.startMonth";//$NON-NLS-1$
 
       switch (filterProperty.fieldOperator) {
+
       case SEASON_UNTIL_TODAY_FROM_YEAR_START:
          sqlWhere.append(OP_AND + sql + OP_LESS_THAN_OR_EQUAL);
          sqlParameters.add(todayValue);
@@ -1191,6 +1287,7 @@ public class TourFilterManager {
       case SEASON_UNTIL_TODAY_FROM_DATE:
 
          sqlWhere.append(
+
                OP_AND
                      + (sql + OP_GREATER_THAN_OR_EQUAL) // date
                      + OP_AND
@@ -1205,6 +1302,7 @@ public class TourFilterManager {
       case SEASON_TODAY_UNTIL_DATE:
 
          sqlWhere.append(
+
                OP_AND
                      + (sql + OP_GREATER_THAN_OR_EQUAL) // date
                      + OP_AND
@@ -1219,6 +1317,7 @@ public class TourFilterManager {
       case SEASON_CURRENT_DAY:
 
          sqlWhere.append(
+
                OP_AND
                      + (sql + OP_EQUALS) // today
          );
@@ -1244,6 +1343,7 @@ public class TourFilterManager {
       case BETWEEN:
 
          sqlWhere.append(
+
                OP_AND
 
                      + sql
@@ -1259,6 +1359,7 @@ public class TourFilterManager {
       case NOT_BETWEEN:
 
          sqlWhere.append(
+
                OP_AND
 
                      + sql
@@ -1271,24 +1372,6 @@ public class TourFilterManager {
 
          sqlParameters.add(dateValue1);
          sqlParameters.add(dateValue2);
-         break;
-
-      case STARTS_WITH:
-      case EXCLUDE_ALL:
-      case NOT_LIKE:
-      case NOT_EQUALS:
-      case LIKE:
-      case LESS_THAN_OR_EQUAL:
-      case LESS_THAN:
-      case IS_EMPTY:
-      case IS_NOT_EMPTY:
-      case IS_AVAILABLE:
-      case IS_NOT_AVAILABLE:
-      case INCLUDE_ANY:
-      case ENDS_WITH:
-      case EQUALS:
-      case GREATER_THAN:
-      case GREATER_THAN_OR_EQUAL:
          break;
       }
    }
@@ -1323,6 +1406,7 @@ public class TourFilterManager {
       final String op = isBetween ? OP_BETWEEN : OP_NOT_BETWEEN;
 
       sqlWhere.append(
+
             OP_AND
 
                   + sqlField
@@ -1331,7 +1415,7 @@ public class TourFilterManager {
                   + OP_PARAMETER
                   + OP_AND
                   + OP_PARAMETER
-      //
+
       );
 
       sqlParameters.add(value1);
@@ -1345,7 +1429,8 @@ public class TourFilterManager {
       if (isOp) {
 
          sqlWhere.append(
-               OP_AND //
+
+               OP_AND
 
                      + OP_BR_OPEN
 
@@ -1358,7 +1443,8 @@ public class TourFilterManager {
       } else {
 
          sqlWhere.append(
-               OP_AND //
+
+               OP_AND
 
                      + (sqlField + OP_NOT_NULL)
                      + OP_AND
@@ -1535,6 +1621,7 @@ public class TourFilterManager {
       }
    }
 
+   @SuppressWarnings("incomplete-switch")
    private static void readFilterProfile_10_PropertyDetail(final XMLMemento xmlProperty,
                                                            final TourFilterProperty filterProperty) {
 
@@ -1543,6 +1630,7 @@ public class TourFilterManager {
       final TourFilterFieldType fieldType = fieldConfig.fieldType;
 
       switch (fieldOperator) {
+
       case GREATER_THAN:
       case GREATER_THAN_OR_EQUAL:
       case LESS_THAN:
@@ -1627,22 +1715,9 @@ public class TourFilterManager {
          readXml_Season(xmlProperty, filterProperty, 1);
          break;
 
-      case STARTS_WITH:
-      case EXCLUDE_ALL:
-      case NOT_LIKE:
-      case LIKE:
-      case IS_EMPTY:
-      case IS_NOT_EMPTY:
-      case IS_AVAILABLE:
-      case IS_NOT_AVAILABLE:
-      case INCLUDE_ANY:
-      case ENDS_WITH:
-      case SEASON_UNTIL_TODAY_FROM_YEAR_START:
-      case SEASON_CURRENT_MONTH:
-      case SEASON_CURRENT_DAY:
-      case SEASON_MONTH:
-      case SEASON_TODAY_UNTIL_YEAR_END:
-         // no additional controls
+      case MOST_RECENT:
+         readXml_Number_Integer(xmlProperty, filterProperty, 1);
+         readXml_Text(xmlProperty, filterProperty, 1);
          break;
       }
    }
@@ -1720,6 +1795,19 @@ public class TourFilterManager {
          filterProperty.monthDay1 = monthDay;
       } else {
          filterProperty.monthDay2 = monthDay;
+      }
+   }
+
+   private static void readXml_Text(final IMemento xmlProperty,
+                                    final TourFilterProperty filterProperty,
+                                    final int fieldNo) {
+
+      final String value = Util.getXmlString(xmlProperty, ATTR_TEXT + fieldNo, UI.EMPTY_STRING);
+
+      if (fieldNo == 1) {
+         filterProperty.textValue1 = value;
+      } else {
+         filterProperty.textValue2 = value;
       }
    }
 
@@ -1872,6 +1960,7 @@ public class TourFilterManager {
       return xmlRoot;
    }
 
+   @SuppressWarnings("incomplete-switch")
    private static void writeFilterProfile_20_PropertyDetail(final IMemento xmlProperty,
                                                             final TourFilterProperty filterProperty) {
 
@@ -1891,7 +1980,10 @@ public class TourFilterManager {
       final double doubleValue1 = filterProperty.doubleValue1;
       final double doubleValue2 = filterProperty.doubleValue2;
 
+      final String textValue1 = filterProperty.textValue1;
+
       switch (fieldOperator) {
+
       case GREATER_THAN:
       case GREATER_THAN_OR_EQUAL:
       case LESS_THAN:
@@ -1968,21 +2060,11 @@ public class TourFilterManager {
          writeXml_Season(xmlProperty, monthDay1, 1);
          break;
 
-      case STARTS_WITH:
-      case EXCLUDE_ALL:
-      case NOT_LIKE:
-      case LIKE:
-      case IS_EMPTY:
-      case IS_NOT_EMPTY:
-      case IS_AVAILABLE:
-      case IS_NOT_AVAILABLE:
-      case INCLUDE_ANY:
-      case ENDS_WITH:
-      case SEASON_UNTIL_TODAY_FROM_YEAR_START:
-      case SEASON_CURRENT_MONTH:
-      case SEASON_CURRENT_DAY:
-      case SEASON_TODAY_UNTIL_YEAR_END:
-         // no additional controls
+      case MOST_RECENT:
+
+         writeXml_Number_Integer(xmlProperty, intValue1, 1);
+         writeXml_Text(xmlProperty, textValue1, 1);
+
          break;
       }
    }
@@ -2008,6 +2090,11 @@ public class TourFilterManager {
 
       xmlProperty.putInteger(ATTR_SEASON_MONTH + fieldNo, monthDay.getMonthValue());
       xmlProperty.putInteger(ATTR_SEASON_DAY + fieldNo, monthDay.getDayOfMonth());
+   }
+
+   private static void writeXml_Text(final IMemento xmlProperty, final String value, final int fieldNo) {
+
+      xmlProperty.putString(ATTR_TEXT + fieldNo, value);
    }
 
    private static void writeXml_Time(final IMemento xmlProperty, final LocalDateTime dateTime, final int fieldNo) {
