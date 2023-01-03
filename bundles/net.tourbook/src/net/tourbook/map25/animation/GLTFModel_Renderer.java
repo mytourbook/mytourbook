@@ -397,9 +397,8 @@ public class GLTFModel_Renderer extends LayerRenderer {
       float dx = 0;
       float dy = 0;
 
-      // move model along the tour track
-
       int geoLocationIndex = 0;
+      double[] allProjectedPoints = mapPlayerData.allProjectedPoints;
 
       final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
       final int numGeoLocationIndices = allNotClipped_GeoLocationIndices.length;
@@ -409,15 +408,44 @@ public class GLTFModel_Renderer extends LayerRenderer {
          // compute frame position from relative position
          final double relativePosition = MapPlayerManager.getRelativePosition();
 
-         int positionIndex = (int) (numGeoLocationIndices * relativePosition);
-         positionIndex = MathUtils.clamp(positionIndex, 0, numGeoLocationIndices - 1);
+         if (relativePosition > 1 || relativePosition < 0) {
 
-         geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
+            // move model on return track
+
+            final double relativeReturnPosition = relativePosition > 1
+
+                  // >1: end...start
+                  ? relativePosition - 1.0
+
+                  // <0: start...end
+                  : relativePosition + 1.0;
+
+            final double[] allProjectedPoints_ReturnTrack = mapPlayerData.allProjectedPoints_ReturnTrack;
+
+            allProjectedPoints = allProjectedPoints_ReturnTrack;
+
+            final int numReturnPositions = allProjectedPoints.length / 2;
+
+            int positionIndex = (int) (numReturnPositions * relativeReturnPosition);
+            positionIndex = MathUtils.clamp(positionIndex, 0, numReturnPositions - 1);
+
+            geoLocationIndex = positionIndex;
+
+         } else {
+
+            // move model between start and end
+
+            int positionIndex = (int) (numGeoLocationIndices * relativePosition);
+            positionIndex = MathUtils.clamp(positionIndex, 0, numGeoLocationIndices - 1);
+
+            geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
+         }
       }
 
+      // move model along the tour track
       final int projectedIndex = geoLocationIndex * 2;
-      final double projectedPositionX = mapPlayerData.allProjectedPoints[projectedIndex];
-      final double projectedPositionY = mapPlayerData.allProjectedPoints[projectedIndex + 1];
+      final double projectedPositionX = allProjectedPoints[projectedIndex];
+      final double projectedPositionY = allProjectedPoints[projectedIndex + 1];
 
       /*
        * Translate glTF model to the map position

@@ -835,11 +835,11 @@ public final class TourTrack_Shader {
       shader.useProgram();
 
       // rotate model to look forward
-      final float angle = getAnimatedAngle(pos1X, pos1Y, pos2X, pos2Y);
-      _animationMatrix.setRotation(angle, 0f, 0f, 1f);
+      final float forwardAngle = getAnimatedAngle(pos1X, pos1Y, pos2X, pos2Y);
+      _animationMatrix.setRotation(forwardAngle, 0f, 0f, 1f);
       _animationMatrix.setAsUniform(shader.uni_AnimationMVP);
 
-      MapPlayerManager.setAnimationForwardAngle(angle);
+      MapPlayerManager.setAnimationForwardAngle(forwardAngle);
 
       if (MapPlayerManager.isShowAnimationCursor()) {
 

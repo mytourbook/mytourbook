@@ -110,7 +110,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       // limit coords
       private static final int  MAX_VISIBLE_PIXEL               = 2048;
 
-      private static final int  NUM_POINTS_END_2_START          = 10;
+      private static final int  NUM_POINTS_END_2_START          = 50;
 
       /**
        * Contains all available geo locations for all selected tours in lat/lon E6 format.
@@ -559,8 +559,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             final double diffX = projectedEnd2StartIntervalX * pointIndex / 2;
             final double diffY = projectedEnd2StartIntervalY * pointIndex / 2;
 
-            __allProjectedPoints_ReturnTrack[pointIndex] = diffX;
-            __allProjectedPoints_ReturnTrack[pointIndex + 1] = diffY;
+            __allProjectedPoints_ReturnTrack[pointIndex] = projectedEnd.x - diffX;
+            __allProjectedPoints_ReturnTrack[pointIndex + 1] = projectedEnd.y - diffY;
          }
       }
 

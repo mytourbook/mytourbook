@@ -69,6 +69,7 @@ public class MapPlayerData {
 
             + "isPlayerEnabled                  = " + isPlayerEnabled + NL //                   //$NON-NLS-1$
             + "allProjectedPoints               = " + allProjectedPoints + NL //                //$NON-NLS-1$
+            + "allProjectedPoints_ReturnTrack   = " + allProjectedPoints_ReturnTrack + NL //    //$NON-NLS-1$
             + "allVisible_PixelPositions        = " + allVisible_PixelPositions + NL //         //$NON-NLS-1$
             + "allVisible_GeoLocationIndices    = " + allVisible_GeoLocationIndices + NL //     //$NON-NLS-1$
             + "allNotClipped_GeoLocationIndices = " + allNotClipped_GeoLocationIndices + NL //  //$NON-NLS-1$

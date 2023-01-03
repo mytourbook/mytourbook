@@ -71,12 +71,17 @@ public class MapPlayerView extends ViewPart {
 
    // SET_FORMATTING_ON
    //
-   private IPartListener2 _partListener;
+   private static final int RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END = -1;
+   private static final int RELATIVE_MODEL_POSITION_ON_RETURN_PATH_END_TO_START = 2;
    //
-   private Action         _actionPlayControl_PlayAndPause;
-   private Action         _actionPlayControl_Loop;
+   private IPartListener2   _partListener;
    //
-   private boolean        _isShow_EndTime_Or_RemainingTime;
+   private Action           _actionPlayControl_PlayAndPause;
+   private Action           _actionPlayControl_Loop;
+   //
+   private boolean          _isShow_EndTime_Or_RemainingTime;
+   //
+   private double           _previousRelativePosition;
    //
    /*
     * UI controls
@@ -177,7 +182,6 @@ public class MapPlayerView extends ViewPart {
       _actionPlayControl_Loop = new Action_PlayControl_Loop();
       _actionPlayControl_PlayAndPause = new Action_PlayControl_PlayAndPause();
    }
-
 
    private MapPosition createMapPosition_Projected(final MapPlayerData mapPlayerData, final int geoLocationIndex) {
 
@@ -437,12 +441,15 @@ public class MapPlayerView extends ViewPart {
     */
    private double getTimelineRelativePosition() {
 
-      return _scaleTimeline.getSelection() / (double) _scaleTimeline.getMaximum();
+      final int timelineSelection = _scaleTimeline.getSelection();
+      final double newRelativePosition = timelineSelection / (double) _scaleTimeline.getMaximum();
+
+      return newRelativePosition;
    }
 
    private boolean moveTimelinePlayheadTo_End() {
 
-      final float timelineSelection = _scaleTimeline.getSelection();
+      final int timelineSelection = _scaleTimeline.getSelection();
 
       if (timelineSelection == _scaleTimeline.getMinimum()) {
 
@@ -460,7 +467,7 @@ public class MapPlayerView extends ViewPart {
             }
 
             setTimelineSelection(1);
-            setMapAndModelPosition(1);
+            setMapAndModelPosition(RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END);
          });
 
          return true;
@@ -471,7 +478,7 @@ public class MapPlayerView extends ViewPart {
 
    private boolean moveTimelinePlayheadTo_Start() {
 
-      final float timelineSelection = _scaleTimeline.getSelection();
+      final int timelineSelection = _scaleTimeline.getSelection();
 
       if (timelineSelection == _scaleTimeline.getMaximum()) {
 
@@ -484,7 +491,7 @@ public class MapPlayerView extends ViewPart {
             }
 
             setTimelineSelection(0);
-            setMapAndModelPosition(0);
+            setMapAndModelPosition(RELATIVE_MODEL_POSITION_ON_RETURN_PATH_END_TO_START);
          });
 
          return true;
@@ -764,18 +771,23 @@ public class MapPlayerView extends ViewPart {
    /**
     * Fire map position and start model animation
     *
-    * @param relativePosition
+    * @param relativeModelPosition
     * @param shortestDistanceMapPosition
     *           When this is not <code>null</code> then move the model to this map position by using
     *           the shortest distance
     */
-   private void setMapAndModelPosition(final double relativePosition) {
+   private void setMapAndModelPosition(final double relativeModelPosition) {
+
+      // when moving forward then this value is positive
+      final double movingDiff = relativeModelPosition - _previousRelativePosition;
+
+      _previousRelativePosition = relativeModelPosition;
 
       setTimeline_Tooltip();
 
       fireMapPosition();
 
-      MapPlayerManager.setRelativePosition(relativePosition);
+      MapPlayerManager.setRelativePosition(relativeModelPosition, movingDiff);
    }
 
    private void setTimeline_Tooltip() {
@@ -819,7 +831,7 @@ public class MapPlayerView extends ViewPart {
          _scaleTimeline.setSelection(0);
 
          MapPlayerManager.setIsPlayerRunning(true);
-         MapPlayerManager.setRelativePosition(0);
+         MapPlayerManager.setRelativePosition(0, 1);
 
       } else {
 
