@@ -412,13 +412,23 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
             // move model on return track
 
-            final double relativeReturnPosition = relativePosition > 1
+            final double relativeReturnPosition;
 
-                  // >1: end...start
-                  ? relativePosition - 1.0
+            if (relativePosition > 2) {
 
-                  // <0: start...end
-                  : relativePosition + 1.0;
+               // end...start + forward
+
+               relativeReturnPosition = relativePosition - 2;
+
+            } else if (relativePosition > 1) {
+
+               // end...start
+               relativeReturnPosition = relativePosition - 1;
+
+            } else {
+               // start...end
+               relativeReturnPosition = relativePosition + 1;
+            }
 
             final double[] allProjectedPoints_ReturnTrack = mapPlayerData.allProjectedPoints_ReturnTrack;
 

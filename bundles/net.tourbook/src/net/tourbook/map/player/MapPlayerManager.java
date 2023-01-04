@@ -256,10 +256,10 @@ public class MapPlayerManager {
    }
 
    /**
-    * Move player head to a relative position and start playing at this position. This is called
-    * from {@link net.tourbook.map.player.MapPlayerView#setMapAndModelPosition(double)}
+    * Move player head to a relative position and start playing to this position, it is called
+    * {@link net.tourbook.map25.animation.GLTFModel_Renderer#render_UpdateModelPosition()}
     * <p>
-    * Relative position in this moving loop, start and end must not be at the same position:
+    * The relative position is for this moving loop, start and end must not be at the same position:
     *
     * <pre>
     *
@@ -275,13 +275,11 @@ public class MapPlayerManager {
     *                      0       RETURN >>    -1
     * </pre>
     * <p>
-    * This is called from
-    * {@link net.tourbook.map25.animation.GLTFModel_Renderer#render_UpdateModelPosition()}
     *
     * @return Returns {@link #_currentRelativePosition} whis is between <br>
     *         0 ... 1 start...end for the normal model movement<br>
-    *         1 ... 2 return path end...start<br>
-    *         0 ...-1 return path start...end
+    *         1 ... 2 return track end...start<br>
+    *         0 ...-1 return track start...end
     */
    public static double getRelativePosition() {
 
@@ -290,19 +288,20 @@ public class MapPlayerManager {
          final long currentFrameTime = MapRenderer.frametime;
          final float remainingDuration = _animationEndTime - currentFrameTime;
 
+         // check if animation has finished
          if (remainingDuration < 0) {
 
             // animation has finished
 
             if (_nextRelativePosition < 0) {
 
-               // model is moving on the return path from start...end -> set to normal end
+               // model was moving on the return track from start...end -> set to normal end
 
                _nextRelativePosition = 1;
 
             } else if (_nextRelativePosition > 1) {
 
-               // model is moving on the return path from end...start -> set to normal start
+               // model was moving on the return track from end...start -> set to normal start
 
                _nextRelativePosition = 0;
             }
@@ -333,7 +332,7 @@ public class MapPlayerManager {
 
          if (_nextRelativePosition < 0) {
 
-            // model is moving on the return path from start...end
+            // model is moving on the return track from start...end
 
             final double positionDelta = _nextRelativePosition - _startRelativePosition;
             final double positionDiff = positionDelta * advance;
@@ -343,7 +342,7 @@ public class MapPlayerManager {
 
          } else if (_nextRelativePosition > 1) {
 
-            // model is moving on the return path from end...start
+            // model is moving on the return track from end...start
 
             final double positionDelta = _nextRelativePosition - _startRelativePosition;
             final double positionDiff = positionDelta * advance;
@@ -353,13 +352,30 @@ public class MapPlayerManager {
 
          } else {
 
-            // model is moving between start and end
+            // _nextRelativePosition: 0...1 -> model is now normal moving between start...end
 
-            final double positionDelta = _nextRelativePosition - _startRelativePosition;
-            final double positionDiff = positionDelta * advance;
-            final double currentRelativePosition = _startRelativePosition + positionDiff;
+            if (_currentRelativePosition < 0) {
 
-            _currentRelativePosition = clamp(currentRelativePosition, 0, 1);
+               // model was moving on the return track from start...end -> 0...-1
+
+            } else if (_currentRelativePosition > 1) {
+
+               // model was moving on the return track from end...start -> 1...2
+
+               final double positionDelta = _nextRelativePosition - _startRelativePosition;
+               final double positionDiff = positionDelta * advance;
+               final double currentRelativePosition = _startRelativePosition + positionDiff;
+
+               _currentRelativePosition = clamp(currentRelativePosition, 0, 1);
+
+            } else {
+
+               final double positionDelta = _nextRelativePosition - _startRelativePosition;
+               final double positionDiff = positionDelta * advance;
+               final double currentRelativePosition = _startRelativePosition + positionDiff;
+
+               _currentRelativePosition = clamp(currentRelativePosition, 0, 1);
+            }
          }
 
          // redraw
@@ -544,7 +560,7 @@ public class MapPlayerManager {
    }
 
    /**
-    * Move player head to a relative position and start playing at this position. This is called
+    * Move player head to a relative position and start playing at this position, it is called
     * from {@link net.tourbook.map.player.MapPlayerView#setMapAndModelPosition(double)}
     * <p>
     * Relative position in this moving loop, start and end must not be at the same position:
@@ -566,8 +582,8 @@ public class MapPlayerManager {
     * @param newRelativePosition
     *           Is between <br>
     *           0 ... 1 start...end for the normal model movement<br>
-    *           1 ... 2 return path end...start<br>
-    *           0 ...-1 return path start...end
+    *           1 ... 2 return track end...start<br>
+    *           0 ...-1 return track start...end
     * @param movingDiff
     *           This value is positive when moving forward
     */

@@ -110,7 +110,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       // limit coords
       private static final int  MAX_VISIBLE_PIXEL               = 2048;
 
-      private static final int  NUM_POINTS_END_2_START          = 50;
+      private static final int  NUM_RETURN_TRACK_POSITIONS      = 30;
 
       /**
        * Contains all available geo locations for all selected tours in lat/lon E6 format.
@@ -208,6 +208,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          task.__taskBucketManager.clear();
       }
 
+      /**
+       * This method is initiated from {@link TourTrack_LayerRenderer#update}
+       */
       @Override
       public boolean doWork(final TourCompileTask task) {
 
@@ -528,33 +531,32 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       } // doWork_CompileTrack end
 
       /**
-       * Create end to start locations
+       * Create return track from end...start or start...end
        */
       private void doWork_CreateReturnTrack(final double mapScale) {
 
          final GeoPoint geoPointStart = _anyGeoPoints[0];
          final GeoPoint geoPointEnd = _anyGeoPoints[__numAllGeoPoints - 1];
 
+// optimize return track by reducing/increasing number of geo positions
+         // distance in meters between start and end
+         // final double sphericalDistance = geoPointStart.sphericalDistance(geoPointEnd);
+
          final Point projectedStart = MercatorProjection.project(geoPointStart, null);
          final Point projectedEnd = MercatorProjection.project(geoPointEnd, null);
 
-         final double projectedEnd2StartDiffX = projectedEnd.x - projectedStart.x;
-         final double projectedEnd2StartDiffY = projectedEnd.y - projectedStart.y;
+         final double projectedReturnTrack_DiffX = projectedEnd.x - projectedStart.x;
+         final double projectedReturnTrack_DiffY = projectedEnd.y - projectedStart.y;
 
-         int numPointsEnd2Start = NUM_POINTS_END_2_START;
+         final int numReturnTrackPositions = NUM_RETURN_TRACK_POSITIONS;
+         final int numReturnTrackPoints = NUM_RETURN_TRACK_POSITIONS * 2;
 
-         // distance in meters between start and end
-         final double sphericalDistance = geoPointStart.sphericalDistance(geoPointEnd);
+         final double projectedEnd2StartIntervalX = projectedReturnTrack_DiffX / numReturnTrackPositions;
+         final double projectedEnd2StartIntervalY = projectedReturnTrack_DiffY / numReturnTrackPositions;
 
-         // compute number of return track points
-         numPointsEnd2Start = numPointsEnd2Start;
+         __allProjectedPoints_ReturnTrack = new double[numReturnTrackPoints];
 
-         final double projectedEnd2StartIntervalX = projectedEnd2StartDiffX / numPointsEnd2Start;
-         final double projectedEnd2StartIntervalY = projectedEnd2StartDiffY / numPointsEnd2Start;
-
-         __allProjectedPoints_ReturnTrack = new double[numPointsEnd2Start];
-
-         for (int pointIndex = 0; pointIndex < numPointsEnd2Start; pointIndex += 2) {
+         for (int pointIndex = 0; pointIndex < numReturnTrackPoints; pointIndex += 2) {
 
             final double diffX = projectedEnd2StartIntervalX * pointIndex / 2;
             final double diffY = projectedEnd2StartIntervalY * pointIndex / 2;
@@ -781,7 +783,20 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       /*
        * Update layers when map moved by at least one tile or zoomlevel has changed
        */
-      if (currentX != _oldX || currentY != _oldY || currentZoomScale != _oldZoomScale || _isCancelWorkerTask) {
+      final boolean isDiffX = currentX != _oldX;
+      final boolean isDiffY = currentY != _oldY;
+      final boolean isDiffScale = currentZoomScale != _oldZoomScale;
+
+      if (isDiffX || isDiffY || isDiffScale || _isCancelWorkerTask) {
+
+//         System.out.println(UI.timeStamp()
+//
+//               + "  isDiffX:" + isDiffX
+//               + "  isDiffY:" + isDiffY
+//               + "  isDiffScale:" + isDiffScale
+//
+//         );
+//// TODO remove SYSTEM.OUT.PRINTLN
 
          /*
           * It took me many days to find this solution that a newly selected tour is
