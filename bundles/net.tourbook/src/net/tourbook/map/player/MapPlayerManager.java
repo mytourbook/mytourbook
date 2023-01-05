@@ -256,7 +256,7 @@ public class MapPlayerManager {
    }
 
    /**
-    * Move player head to a relative position and start playing to this position, it is called
+    * Move player head to a relative position and start playing to this position, it is called from
     * {@link net.tourbook.map25.animation.GLTFModel_Renderer#render_UpdateModelPosition()}
     * <p>
     * The relative position is for this moving loop, start and end must not be at the same position:
@@ -291,7 +291,7 @@ public class MapPlayerManager {
          // check if animation has finished
          if (remainingDuration < 0) {
 
-            // animation has finished
+            // animation time has expired, return last position
 
             if (_relativePosition_EndFrame < 0) {
 
@@ -328,6 +328,14 @@ public class MapPlayerManager {
             return _relativePosition_CurrentFrame;
          }
 
+//         System.out.println(UI.timeStamp()
+//               + "  Current:" + String.format("%7.4f", _relativePosition_CurrentFrame)
+//               + "  End:" + String.format("%7.4f", _relativePosition_EndFrame)
+//               + " 1"
+////               + "  remaining:" + remainingDuration
+//         );
+//// TODO remove SYSTEM.OUT.PRINTLN
+
          // advance to the next animated frame
 
          final float relativeRemaining = remainingDuration / animationDuration; // 0...1
@@ -335,23 +343,25 @@ public class MapPlayerManager {
 
          if (_relativePosition_EndFrame < 0) {
 
-            // model is moving on the RETURN TRACK -> start...end
+            // model is moving on the RETURN TRACK -> start...end -> 0...-1
 
-            final double positionDelta = _relativePosition_EndFrame - _relativePosition_StartFrame;
-            final double positionDiff = positionDelta * relativeAdvance;
-            final double currentRelativePosition = _relativePosition_StartFrame + positionDiff;
+            final double startEndDiff = _relativePosition_EndFrame - _relativePosition_StartFrame;
+            final double startEndAdvance = startEndDiff * relativeAdvance;
+            final double currentRelativePosition = _relativePosition_StartFrame + startEndAdvance;
 
             _relativePosition_CurrentFrame = clamp(currentRelativePosition, -1, 0);
+//            _relativePosition_CurrentFrame = currentRelativePosition;
 
          } else if (_relativePosition_EndFrame > 1) {
 
-            // model is moving on the RETURN TRACK -> end...start
+            // model is moving on the RETURN TRACK -> end...start -> 1...2
 
-            final double positionDelta = _relativePosition_EndFrame - _relativePosition_StartFrame;
-            final double positionDiff = positionDelta * relativeAdvance;
-            final double currentRelativePosition = _relativePosition_StartFrame + positionDiff;
+            final double startEndDiff = _relativePosition_EndFrame - _relativePosition_StartFrame;
+            final double startEndAdvance = startEndDiff * relativeAdvance;
+            final double currentRelativePosition = _relativePosition_StartFrame + startEndAdvance;
 
             _relativePosition_CurrentFrame = clamp(currentRelativePosition, 1, 2);
+//            _relativePosition_CurrentFrame = currentRelativePosition;
 
          } else {
 
@@ -364,9 +374,9 @@ public class MapPlayerManager {
                final double remainingStartFrame = 1 + _relativePosition_StartFrame;
                final double remainingEndFrame = 1 - _relativePosition_EndFrame;
 
-               final double positionDelta = remainingStartFrame + remainingEndFrame;
-               final double positionDiff = positionDelta * relativeAdvance;
-               double currentRelativePosition = _relativePosition_StartFrame - positionDiff;
+               final double startEndDiff = remainingStartFrame + remainingEndFrame;
+               final double startEndAdvance = startEndDiff * relativeAdvance;
+               double currentRelativePosition = _relativePosition_StartFrame - startEndAdvance;
 
                // check if model in on the NORMAL or RETURN TRACK
                if (currentRelativePosition < -1) {
@@ -389,9 +399,9 @@ public class MapPlayerManager {
 
                // model is still moving on the RETURN TRACK from end...start -> 1...2
 
-               final double positionDelta = 2 - _relativePosition_StartFrame + _relativePosition_EndFrame;
-               final double positionDiff = positionDelta * relativeAdvance;
-               double currentRelativePosition = _relativePosition_StartFrame + positionDiff;
+               final double startEndDiff = 2 - _relativePosition_StartFrame + _relativePosition_EndFrame;
+               final double startEndAdvance = startEndDiff * relativeAdvance;
+               double currentRelativePosition = _relativePosition_StartFrame + startEndAdvance;
 
                // check if model in on the NORMAL or RETURN TRACK
                if (currentRelativePosition > 2) {
@@ -414,9 +424,9 @@ public class MapPlayerManager {
 
                // _relativePosition_CurrentFrame: 0...1 -> model is moving on the NORMAL TRACK -> start...end
 
-               final double positionDelta = _relativePosition_EndFrame - _relativePosition_StartFrame;
-               final double positionDiff = positionDelta * relativeAdvance;
-               final double currentRelativePosition = _relativePosition_StartFrame + positionDiff;
+               final double startEndDiff = _relativePosition_EndFrame - _relativePosition_StartFrame;
+               final double startEndAdvance = startEndDiff * relativeAdvance;
+               final double currentRelativePosition = _relativePosition_StartFrame + startEndAdvance;
 
                _relativePosition_CurrentFrame = clamp(currentRelativePosition, 0, 1);
             }
@@ -426,7 +436,16 @@ public class MapPlayerManager {
          _isAnimateFromRelativePosition = true;
 
          _lastRemainingDuration = remainingDuration;
+
+//         System.out.println(UI.timeStamp()
+//               + "  Current:" + String.format("%7.4f", _relativePosition_CurrentFrame)
+//               + "  End:" + String.format("%7.4f", _relativePosition_EndFrame)
+////               + "  remaining:" + remainingDuration
+//         );
+//// TODO remove SYSTEM.OUT.PRINTLN
+
       }
+
 
       return _relativePosition_CurrentFrame;
    }
@@ -652,8 +671,8 @@ public class MapPlayerManager {
 
 //         System.out.println(UI.timeStamp()
 //
-//               + "  Start:" + String.format("%6.3f", _relativePosition_StartFrame)
-//               + "  End:" + String.format("%6.3f", newRelativePosition)
+//               + "    Start:" + String.format("%7.4f", _relativePosition_StartFrame)
+//               + "  End:" + String.format("%7.4f", newRelativePosition)
 //
 //         );
 //// TODO remove SYSTEM.OUT.PRINTLN
