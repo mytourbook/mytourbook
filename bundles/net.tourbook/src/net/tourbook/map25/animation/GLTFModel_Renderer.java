@@ -406,7 +406,14 @@ public class GLTFModel_Renderer extends LayerRenderer {
       if (numGeoLocationIndices > 0) {
 
          // compute frame position from relative position
-         final double relativePosition = MapPlayerManager.getRelativePosition();
+         double relativePosition = MapPlayerManager.getRelativePosition();
+
+         if (relativePosition > 2) {
+
+            // end...start + forward
+
+            relativePosition = relativePosition - 2;
+         }
 
          if (relativePosition > 1 || relativePosition < 0) {
 
@@ -414,18 +421,13 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
             final double relativeReturnPosition;
 
-            if (relativePosition > 2) {
-
-               // end...start + forward
-
-               relativeReturnPosition = relativePosition - 2;
-
-            } else if (relativePosition > 1) {
+            if (relativePosition > 1) {
 
                // end...start
                relativeReturnPosition = relativePosition - 1;
 
             } else {
+               
                // start...end
                relativeReturnPosition = relativePosition + 1;
             }
