@@ -349,8 +349,8 @@ public class MapPlayerManager {
             final double startEndAdvance = startEndDiff * relativeAdvance;
             final double currentRelativePosition = _relativePosition_StartFrame + startEndAdvance;
 
-            _relativePosition_CurrentFrame = clamp(currentRelativePosition, -1, 0);
-//            _relativePosition_CurrentFrame = currentRelativePosition;
+//            _relativePosition_CurrentFrame = clamp(currentRelativePosition, -1, 0);
+            _relativePosition_CurrentFrame = currentRelativePosition;
 
          } else if (_relativePosition_EndFrame > 1) {
 
@@ -360,8 +360,8 @@ public class MapPlayerManager {
             final double startEndAdvance = startEndDiff * relativeAdvance;
             final double currentRelativePosition = _relativePosition_StartFrame + startEndAdvance;
 
-            _relativePosition_CurrentFrame = clamp(currentRelativePosition, 1, 2);
-//            _relativePosition_CurrentFrame = currentRelativePosition;
+//            _relativePosition_CurrentFrame = clamp(currentRelativePosition, 1, 2);
+            _relativePosition_CurrentFrame = currentRelativePosition;
 
          } else {
 
@@ -445,7 +445,6 @@ public class MapPlayerManager {
 //// TODO remove SYSTEM.OUT.PRINTLN
 
       }
-
 
       return _relativePosition_CurrentFrame;
    }
@@ -659,12 +658,50 @@ public class MapPlayerManager {
          final long currentFrameTime = MapRenderer.frametime;
          _animationEndTime = currentFrameTime + animationDuration;
 
-         // set new start position from current position
+         // set new start position from the current position
          _relativePosition_StartFrame = _relativePosition_CurrentFrame;
          _movingDiff = movingDiff;
 
-         // the next painted frame will recognize this new position
-         _relativePosition_EndFrame = newRelativePosition;
+         /**
+          * !!! Complicated !!!
+          * <p>
+          * This adjustment is necessary that the model in not moving on the NORMAL TRACK in reverse
+          * direction to skip the RETURN TRACK
+          */
+         if (true
+
+// THIS IS PARTLY WORKING
+
+               // the current model movement should be on the RETURN TRACK
+               && _relativePosition_EndFrame == 2
+
+               // but the model has not yet left the NORMAL TRACK
+               && _relativePosition_CurrentFrame < 1
+
+               // however the model should be moving again on the NORMAL TRACK
+               && newRelativePosition < 1) {
+
+            _relativePosition_EndFrame = 2 + newRelativePosition;
+
+// THIS IS NOT WORKING
+//
+//         } else if (true
+//
+//               // the current model movement should be on the RETURN TRACK
+//               && _relativePosition_EndFrame == -1
+//
+//               // but the model has not yet left the NORMAL TRACK
+//               && _relativePosition_CurrentFrame > 0
+//
+//               // however the model should be moving again on the NORMAL TRACK
+//               && newRelativePosition < 1) {
+//
+//            _relativePosition_EndFrame = -1 + newRelativePosition;
+
+         } else {
+
+            _relativePosition_EndFrame = newRelativePosition;
+         }
 
          // this will also force to compute the frame even when player is paused
          _isAnimateFromRelativePosition = true;
