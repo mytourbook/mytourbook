@@ -540,7 +540,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
 // optimize return track by reducing/increasing number of geo positions
          // distance in meters between start and end
-         // final double sphericalDistance = geoPointStart.sphericalDistance(geoPointEnd);
+         final double sphericalDistance = geoPointStart.sphericalDistance(geoPointEnd);
+         final int numReturnTrackPositions = 10;//NUM_RETURN_TRACK_POSITIONS;
 
          final Point projectedStart = MercatorProjection.project(geoPointStart, null);
          final Point projectedEnd = MercatorProjection.project(geoPointEnd, null);
@@ -548,8 +549,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          final double projectedReturnTrack_DiffX = projectedEnd.x - projectedStart.x;
          final double projectedReturnTrack_DiffY = projectedEnd.y - projectedStart.y;
 
-         final int numReturnTrackPositions = NUM_RETURN_TRACK_POSITIONS;
-         final int numReturnTrackPoints = NUM_RETURN_TRACK_POSITIONS * 2;
+         final int numReturnTrackPoints = numReturnTrackPositions * 2;
 
          final double projectedEnd2StartIntervalX = projectedReturnTrack_DiffX / numReturnTrackPositions;
          final double projectedEnd2StartIntervalY = projectedReturnTrack_DiffY / numReturnTrackPositions;
