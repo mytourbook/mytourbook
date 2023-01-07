@@ -276,7 +276,7 @@ public class MapPlayerManager {
     * </pre>
     * <p>
     *
-    * @return Returns {@link #_relativePosition_CurrentFrame} whis is between <br>
+    * @return Returns {@link #_relativePosition_CurrentFrame} which is between <br>
     *         0 ... 1 start...end for the normal model movement<br>
     *         1 ... 2 return track end...start<br>
     *         0 ...-1 return track start...end
@@ -509,7 +509,7 @@ public class MapPlayerManager {
 
    public static boolean isShowAnimationCursor() {
 
-      _isShowAnimationCursor = true;
+      _isShowAnimationCursor = false;
 
       return _isShowAnimationCursor;
    }
@@ -642,7 +642,7 @@ public class MapPlayerManager {
     * </pre>
     *
     * @param newRelativePosition
-    *           Is between <br>
+    *           which is between <br>
     *           0 ... 1 start...end for the normal model movement<br>
     *           1 ... 2 return track end...start<br>
     *           0 ...-1 return track start...end

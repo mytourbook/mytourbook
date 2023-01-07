@@ -366,7 +366,7 @@ public final class TourTrack_Shader {
 
       final float angleDiff = getAngle_Difference(p21Angle, _previousAngle);
 
-      _minSmoothAngle = 1f;
+      _minSmoothAngle = 0.5f;
 
       if (Math.abs(angleDiff) > _minSmoothAngle) {
 
