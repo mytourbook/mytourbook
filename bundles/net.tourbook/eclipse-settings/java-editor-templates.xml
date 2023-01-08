@@ -87,7 +87,8 @@ ${imp:import(org.eclipse.swt.SWT)}${cursor}</template><template autoinsert="true
 	${line_selection}${cursor}
 } while (${condition:var(boolean)});</template><template autoinsert="true" context="postfix" deleted="false" description="Creates a do-while loop" enabled="true" id="org.eclipse.jdt.postfixcompletion.dowhile" name="dowhile">do {&#13;
 	${cursor}&#13;
-} while (${i:inner_expression(boolean)});</template><template autoinsert="false" context="java-statements" deleted="false" description="else block" enabled="true" id="org.eclipse.jdt.ui.templates.else" name="else">else {
+} while (${i:inner_expression(boolean)});</template><template autoinsert="true" context="java-statements" deleted="false" description="Creates code where a breakpoint can be set" enabled="true" name="dummyBreakpoint">int a = 0;&#13;
+a++;</template><template autoinsert="false" context="java-statements" deleted="false" description="else block" enabled="true" id="org.eclipse.jdt.ui.templates.else" name="else">else {
 	${cursor}
 }</template><template autoinsert="true" context="postfix" deleted="false" description="Creates a negated if statement" enabled="true" id="org.eclipse.jdt.postfixcompletion.else" name="else">if (!${i:inner_expression(boolean)}${}) {&#13;
 	${cursor}&#13;
