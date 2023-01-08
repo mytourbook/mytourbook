@@ -37,6 +37,7 @@ import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
 import net.mgsx.gltf.scene3d.utils.IBLBuilder;
+import net.tourbook.common.UI;
 import net.tourbook.map.player.MapPlayerData;
 import net.tourbook.map.player.MapPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
@@ -98,7 +99,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
    private float  _prevDx;
    private float  _prevDy;
-   private int    _prevPositionIndex;
+   private double _prevRelativePosition;
 
    public GLTFModel_Renderer(final Map map) {
 
@@ -393,10 +394,17 @@ public class GLTFModel_Renderer extends LayerRenderer {
       }
 
       final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
-      final int numGeoLocationIndices = allNotClipped_GeoLocationIndices.length;
+      final int lastGeoLocationIndex = allNotClipped_GeoLocationIndices.length - 1;
 
-      if (numGeoLocationIndices <= 0) {
+      if (lastGeoLocationIndex < 0) {
          return;
+      }
+
+      double relativePosition = MapPlayerManager.getRelativePosition();
+
+      if (relativePosition == _prevRelativePosition) {
+// This would need a reset option for a new tour
+//         return;
       }
 
       final double currentMapScale = _currentMapPosition.scale;
@@ -405,16 +413,15 @@ public class GLTFModel_Renderer extends LayerRenderer {
       final int mapScale = 1 << currentMapZoomLevel;
       final int tileScale = Tile.SIZE << currentMapZoomLevel;
 
+      double[] allProjectedPoints;
+      int numProjectedPoints;
       int geoLocationIndex_0 = 0;
       int geoLocationIndex_1 = 0;
-      double[] allProjectedPoints = mapPlayerData.allProjectedPoints;
-      int numProjectedPoints = allProjectedPoints.length;
       int positionIndex_0;
       int positionIndex_1;
-      double exactPositionIndex = 0;
+      double exactLocationIndex = 0;
 
       // compute frame position from relative position
-      double relativePosition = MapPlayerManager.getRelativePosition();
 
       if (relativePosition > 2) {
 
@@ -445,8 +452,8 @@ public class GLTFModel_Renderer extends LayerRenderer {
          numProjectedPoints = allProjectedPoints.length;
          final int numReturnPositions = numProjectedPoints / 2;
 
-         exactPositionIndex = numReturnPositions * relativeReturnPosition;
-         positionIndex_0 = (int) exactPositionIndex;
+         exactLocationIndex = numReturnPositions * relativeReturnPosition;
+         positionIndex_0 = (int) exactLocationIndex;
          positionIndex_0 = MathUtils.clamp(positionIndex_0, 0, numReturnPositions - 1);
 
          geoLocationIndex_0 = positionIndex_0;
@@ -456,43 +463,40 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
       } else {
 
-         // move model between start and end -> 0...1
+         // relativePosition >= 0 && <= 1 # move model between start and end # 0...1
 
-         exactPositionIndex = numGeoLocationIndices * relativePosition;
-         positionIndex_0 = (int) exactPositionIndex;
-         positionIndex_0 = MathUtils.clamp(positionIndex_0, 0, numGeoLocationIndices - 1);
+         allProjectedPoints = mapPlayerData.allProjectedPoints_NormalTrack;
+         numProjectedPoints = allProjectedPoints.length;
 
-         positionIndex_1 = positionIndex_0 <= numGeoLocationIndices - 2
+         // adjust last index by -1 that positionIndex_1 points to the last index
+         final int locationIndex = lastGeoLocationIndex > 0
+               ? lastGeoLocationIndex - 1
+               : lastGeoLocationIndex;
+
+         exactLocationIndex = locationIndex * relativePosition;
+
+         positionIndex_0 = (int) exactLocationIndex;
+         positionIndex_1 = positionIndex_0 <= locationIndex
                ? positionIndex_0 + 1
                : positionIndex_0;
 
+         if (positionIndex_0 == lastGeoLocationIndex - 1) {
+            int a = 0;
+            a++;
+         }
+
          geoLocationIndex_0 = allNotClipped_GeoLocationIndices[positionIndex_0];
          geoLocationIndex_1 = allNotClipped_GeoLocationIndices[positionIndex_1];
-
-//         System.out.println(UI.timeStamp()
-//
-//               + " positionIndex: " + positionIndex
-//               + "  exactPositionIndex:" + String.format("%7.4f", exactPositionIndex)
-//
-////                  + "  relativePosition:" + String.format("%7.4f", relativePosition)
-//
-//         );
-// TODO remove SYSTEM.OUT.PRINTLN
-
       }
 
-      // move model along the tour track
-
+      /*
+       * Do micro movements according to the exact relative position
+       */
       final int projectedIndex_0 = geoLocationIndex_0 * 2;
       final int projectedIndex_1 = geoLocationIndex_1 * 2;
-      double projectedPositionX = allProjectedPoints[projectedIndex_0];
-      double projectedPositionY = allProjectedPoints[projectedIndex_0 + 1];
 
-      /*
-       * Do micro movements according to the exactly relative position
-       */
-      final double projectedPositionX_0 = projectedPositionX;
-      final double projectedPositionY_0 = projectedPositionY;
+      final double projectedPositionX_0 = allProjectedPoints[projectedIndex_0];
+      final double projectedPositionY_0 = allProjectedPoints[projectedIndex_0 + 1];
       final double projectedPositionX_1 = allProjectedPoints[projectedIndex_1];
       final double projectedPositionY_1 = allProjectedPoints[projectedIndex_1 + 1];
 
@@ -500,39 +504,45 @@ public class GLTFModel_Renderer extends LayerRenderer {
       final double projectedPositionY_Diff = projectedPositionY_1 - projectedPositionY_0;
 
       // 0...1
-      final double microIndex = exactPositionIndex - (int) exactPositionIndex;
+      final double microIndex = exactLocationIndex - (int) exactLocationIndex;
 
       final double advanceX = projectedPositionX_Diff * microIndex;
       final double advanceY = projectedPositionY_Diff * microIndex;
 
-      projectedPositionX = projectedPositionX_0 + advanceX;
-      projectedPositionY = projectedPositionY_0 + advanceY;
-
-//         if (positionIndex_0 != _prevPositionIndex) {
-//
-//            _prevPositionIndex = positionIndex_0;
-//
-//            System.out.println();
-//            System.out.println(UI.timeStamp()
-//
-//                  + "  PositionX_0:" + String.format("%11.8f", projectedPositionX_0)
-//                  + "  PositionX_Diff:" + String.format("%13.10f", projectedPositionX_Diff)
-//                  + "  advanceX:" + String.format("%13.10f", advanceX)
-//                  + "  PositionX:" + String.format("%13.10f", projectedPositionX)
-//
-//                  + "  index:" + String.format("%6d", positionIndex_0)
-//                  + "  microIndex:" + String.format("%6.4f", microIndex)
-//
-//            );
-//         }
-//TODO remove SYSTEM.OUT.PRINTLN
+      final double projectedPositionX = projectedPositionX_0 + advanceX;
+      final double projectedPositionY = projectedPositionY_0 + advanceY;
 
       /*
        * Translate glTF model to the map position
        */
-      final float dx = (float) ((projectedPositionX - _currentMapPosition.x) * tileScale);
-      final float dy = (float) ((projectedPositionY - _currentMapPosition.y) * tileScale);
+      final float dX = (float) ((projectedPositionX - _currentMapPosition.x) * tileScale);
+      final float dY = (float) ((projectedPositionY - _currentMapPosition.y) * tileScale);
 
+      if (dX != _prevDx || dY != _prevDy || relativePosition != _prevRelativePosition) {
+
+         _prevDx = dX;
+         _prevDy = dY;
+         _prevRelativePosition = relativePosition;
+
+         System.out.println(UI.timeStamp()
+
+               + "  dx:" + String.format("%10.2f", dX)
+               + "  dy:" + String.format("%10.2f", dY)
+
+//               + "  modelX:" + String.format("%10.4f", modelPosX)
+//               + "  modelY:" + String.format("%10.4f", modelPosY)
+
+               + "  index_0:" + String.format("%6d", positionIndex_0)
+               + "  microIndex:" + String.format("%6.4f", microIndex)
+
+         );
+//TODO remove SYSTEM.OUT.PRINTLN
+
+         if (microIndex < 0.0001 || microIndex > 0.9999) {
+            System.out.println();
+         }
+//TODO remove SYSTEM.OUT.PRINTLN
+      }
       /*
        * Compute model scale
        */
@@ -616,32 +626,9 @@ public class GLTFModel_Renderer extends LayerRenderer {
       modelTransform.rotate(0, 1, 0, animationAngle);
 
       // move to the track position
-      final float modelPosX = dx + forwardX;
-      final float modelPosY = dy + forwardY;
+      final float modelPosX = dX + forwardX;
+      final float modelPosY = dY + forwardY;
       modelTransform.trn(modelPosX, modelPosY, 0);
-
-//      if (dx != _prevDx || dy != _prevDy) {
-//
-//         _prevDx = dx;
-//         _prevDy = dy;
-//
-//         System.out.println(UI.timeStamp()
-//
-//               + "  dx:" + String.format("%10.2f", dx)
-//               + "  dy:" + String.format("%10.2f", dy)
-//               + "  modelX:" + String.format("%10.4f", modelPosX)
-//               + "  modelY:" + String.format("%10.4f", modelPosY)
-//               + "  index:" + String.format("%6d", (int) exactPositionIndex)
-//               + "  microIndex:" + String.format("%6.4f", microIndex)
-//
-//         );
-////TODO remove SYSTEM.OUT.PRINTLN
-//
-//         if (microIndex < 0.0001 || microIndex > 0.9999) {
-//            System.out.println();
-//         }
-////TODO remove SYSTEM.OUT.PRINTLN
-//      }
    }
 
    @Override

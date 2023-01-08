@@ -40,7 +40,7 @@ public class MapPlayerData {
     * <p>
     * Is projected from -180°...180° ==> 0...1 by using the {@link MercatorProjection}
     */
-   public double[]             allProjectedPoints;
+   public double[]             allProjectedPoints_NormalTrack;
 
    /**
     * Projected points 0...1 from the geo end point of the tour to the geo start point
@@ -61,19 +61,29 @@ public class MapPlayerData {
    @Override
    public String toString() {
 
+// SET_FORMATTING_OFF
+
+      final int allProjectedPoints_NormalTrack_Length    = allProjectedPoints_NormalTrack    == null ? 0 : allProjectedPoints_NormalTrack.length;
+      final int allProjectedPoints_ReturnTrack_Length    = allProjectedPoints_ReturnTrack    == null ? 0 : allProjectedPoints_ReturnTrack.length;
+      final int allVisible_PixelPositions_Length         = allVisible_PixelPositions         == null ? 0 : allVisible_PixelPositions.length;
+      final int allVisible_GeoLocationIndices_Length     = allVisible_GeoLocationIndices     == null ? 0 : allVisible_GeoLocationIndices.length;
+      final int allNotClipped_GeoLocationIndices_Length  = allNotClipped_GeoLocationIndices  == null ? 0 : allNotClipped_GeoLocationIndices.length;
+
+// SET_FORMATTING_ON
+
       return UI.EMPTY_STRING
 
-            + "MapPlayerData" + NL //                                                           //$NON-NLS-1$
+            + "MapPlayerData" + NL //                                                                 //$NON-NLS-1$
 
-            + "[" + NL //                                                                       //$NON-NLS-1$
+            + "[" + NL //                                                                             //$NON-NLS-1$
 
-            + "isPlayerEnabled                  = " + isPlayerEnabled + NL //                   //$NON-NLS-1$
-            + "allProjectedPoints               = " + allProjectedPoints + NL //                //$NON-NLS-1$
-            + "allProjectedPoints_ReturnTrack   = " + allProjectedPoints_ReturnTrack + NL //    //$NON-NLS-1$
-            + "allVisible_PixelPositions        = " + allVisible_PixelPositions + NL //         //$NON-NLS-1$
-            + "allVisible_GeoLocationIndices    = " + allVisible_GeoLocationIndices + NL //     //$NON-NLS-1$
-            + "allNotClipped_GeoLocationIndices = " + allNotClipped_GeoLocationIndices + NL //  //$NON-NLS-1$
-            + "mapScale                         = " + mapScale + NL //                          //$NON-NLS-1$
+            + "isPlayerEnabled                  = " + isPlayerEnabled + NL //                         //$NON-NLS-1$
+            + "allProjectedPoints_NormalTrack   = " + allProjectedPoints_NormalTrack_Length + NL //   //$NON-NLS-1$
+            + "allProjectedPoints_ReturnTrack   = " + allProjectedPoints_ReturnTrack_Length + NL //   //$NON-NLS-1$
+            + "allVisible_PixelPositions        = " + allVisible_PixelPositions_Length + NL //        //$NON-NLS-1$
+            + "allVisible_GeoLocationIndices    = " + allVisible_GeoLocationIndices_Length + NL //    //$NON-NLS-1$
+            + "allNotClipped_GeoLocationIndices = " + allNotClipped_GeoLocationIndices_Length + NL // //$NON-NLS-1$
+            + "mapScale                         = " + mapScale + NL //                                //$NON-NLS-1$
 
             + "]"; //$NON-NLS-1$
    }

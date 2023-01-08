@@ -187,8 +187,8 @@ public class MapPlayerView extends ViewPart {
 
       final int projectedIndex = geoLocationIndex * 2;
 
-      final double projectedPositionX = mapPlayerData.allProjectedPoints[projectedIndex];
-      final double projectedPositionY = mapPlayerData.allProjectedPoints[projectedIndex + 1];
+      final double projectedPositionX = mapPlayerData.allProjectedPoints_NormalTrack[projectedIndex];
+      final double projectedPositionY = mapPlayerData.allProjectedPoints_NormalTrack[projectedIndex + 1];
 
       final MapPosition mapPosition = new MapPosition();
 
@@ -785,7 +785,7 @@ public class MapPlayerView extends ViewPart {
 
       setTimeline_Tooltip();
 
-      fireMapPosition();
+//      fireMapPosition();
 
       MapPlayerManager.setRelativePosition(relativeModelPosition, movingDiff);
    }
@@ -925,23 +925,25 @@ public class MapPlayerView extends ViewPart {
       if (mapPlayerData != null && mapPlayerData.allNotClipped_GeoLocationIndices != null) {
 
          final int lastMaximum = _scaleTimeline.getMaximum();
-         final int numNotClippedFrames = mapPlayerData.allNotClipped_GeoLocationIndices.length;
+         final int newMaximum = mapPlayerData.allNotClipped_GeoLocationIndices.length - 1;
 
-         if (lastMaximum != numNotClippedFrames) {
+         if (lastMaximum != newMaximum) {
 
             // update max only when changed
 
             final int lastSelection = _scaleTimeline.getSelection();
             final float lastRelativeSelection = (float) lastSelection / lastMaximum;
 
-            final float notClippedPageIncrement = (float) numNotClippedFrames / minScaleTicks;
-            final float relativeSelection = numNotClippedFrames * lastRelativeSelection;
+            final float pageIncrement = (float) newMaximum / minScaleTicks;
+            final float relativeSelection = newMaximum * lastRelativeSelection;
 
-            _scaleTimeline.setPageIncrement((int) notClippedPageIncrement);
-            _scaleTimeline.setMaximum(numNotClippedFrames);
+            _scaleTimeline.setPageIncrement((int) pageIncrement);
+            _scaleTimeline.setMaximum(newMaximum);
 
             // reselect last position
             _scaleTimeline.setSelection((int) relativeSelection);
+
+            setTimeline_Tooltip();
          }
       }
    }

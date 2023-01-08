@@ -18,6 +18,7 @@ package net.tourbook.map.player;
 import static org.oscim.utils.FastMath.clamp;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 
@@ -276,7 +277,8 @@ public class MapPlayerManager {
     * </pre>
     * <p>
     *
-    * @return Returns {@link #_relativePosition_CurrentFrame} which is between <br>
+    * @return Returns the relative position {@link #_relativePosition_CurrentFrame} which depends on
+    *         the remaining animation time, it is between <br>
     *         0 ... 1 start...end for the normal model movement<br>
     *         1 ... 2 return track end...start<br>
     *         0 ...-1 return track start...end
@@ -327,14 +329,6 @@ public class MapPlayerManager {
 
             return _relativePosition_CurrentFrame;
          }
-
-//         System.out.println(UI.timeStamp()
-//               + "  Current:" + String.format("%7.4f", _relativePosition_CurrentFrame)
-//               + "  End:" + String.format("%7.4f", _relativePosition_EndFrame)
-//               + " 1"
-////               + "  remaining:" + remainingDuration
-//         );
-//// TODO remove SYSTEM.OUT.PRINTLN
 
          // advance to the next animated frame
 
@@ -438,11 +432,12 @@ public class MapPlayerManager {
          _lastRemainingDuration = remainingDuration;
 
 //         System.out.println(UI.timeStamp()
+//               + " getPosition   "
 //               + "  Current:" + String.format("%7.4f", _relativePosition_CurrentFrame)
 //               + "  End:" + String.format("%7.4f", _relativePosition_EndFrame)
 ////               + "  remaining:" + remainingDuration
 //         );
-//// TODO remove SYSTEM.OUT.PRINTLN
+// TODO remove SYSTEM.OUT.PRINTLN
 
       }
 
@@ -509,7 +504,7 @@ public class MapPlayerManager {
 
    public static boolean isShowAnimationCursor() {
 
-      _isShowAnimationCursor = false;
+      _isShowAnimationCursor = true;
 
       return _isShowAnimationCursor;
    }
@@ -666,53 +661,51 @@ public class MapPlayerManager {
           * !!! Complicated !!!
           * <p>
           * This adjustment is necessary that the model in not moving on the NORMAL TRACK in reverse
-          * direction to skip the RETURN TRACK
+          * direction by skipping the RETURN TRACK
           */
          if (true
-
-// THIS IS PARTLY WORKING
 
                // the current model movement should be on the RETURN TRACK
                && _relativePosition_EndFrame == 2
 
                // but the model has not yet left the NORMAL TRACK
-               && _relativePosition_CurrentFrame < 1
+               && _relativePosition_CurrentFrame <= 1
 
                // however the model should be moving again on the NORMAL TRACK
                && newRelativePosition < 1) {
 
-            _relativePosition_EndFrame = 2 + newRelativePosition;
+            // skip until the _relativePosition_CurrentFrame is >1
 
-// THIS IS NOT WORKING
-//
-//         } else if (true
-//
-//               // the current model movement should be on the RETURN TRACK
-//               && _relativePosition_EndFrame == -1
-//
-//               // but the model has not yet left the NORMAL TRACK
-//               && _relativePosition_CurrentFrame > 0
-//
-//               // however the model should be moving again on the NORMAL TRACK
-//               && newRelativePosition < 1) {
-//
-//            _relativePosition_EndFrame = -1 + newRelativePosition;
+            return;
 
-         } else {
+         } else if (true
 
-            _relativePosition_EndFrame = newRelativePosition;
+               // the current model movement should be on the RETURN TRACK
+               && _relativePosition_EndFrame == -1
+
+               // but the model has not yet left the NORMAL TRACK
+               && _relativePosition_CurrentFrame >= 0
+
+               // however the model should be moving again on the NORMAL TRACK
+               && newRelativePosition < 1) {
+
+            // skip until the _relativePosition_CurrentFrame is <0
+
+            return;
          }
+
+         _relativePosition_EndFrame = newRelativePosition;
 
          // this will also force to compute the frame even when player is paused
          _isAnimateFromRelativePosition = true;
 
-//         System.out.println(UI.timeStamp()
-//
-//               + "    Start:" + String.format("%7.4f", _relativePosition_StartFrame)
-//               + "  End:" + String.format("%7.4f", newRelativePosition)
-//
-//         );
-//// TODO remove SYSTEM.OUT.PRINTLN
+         System.out.println(UI.timeStamp()
+
+               + "  Start:" + String.format("%7.4f", _relativePosition_StartFrame)
+               + "  End:" + String.format("%7.4f", newRelativePosition)
+
+         );
+// TODO remove SYSTEM.OUT.PRINTLN
       }
    }
 }
