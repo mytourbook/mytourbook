@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -3195,13 +3195,20 @@ public class Map2View extends ViewPart implements
                final TourData tourData = TourManager.getInstance().getTourData((Long) tourId);
                if (tourData != null) {
 
-                  final int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
+                  final int beforeLeftSliderIndex = xSliderPos.getBeforeLeftSliderIndex();
+                  int leftSliderValueIndex = xSliderPos.getLeftSliderValueIndex();
                   int rightSliderValueIndex = xSliderPos.getRightSliderValueIndex();
 
-                  rightSliderValueIndex =
-                        rightSliderValueIndex == SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION
-                              ? leftSliderValueIndex
-                              : rightSliderValueIndex;
+                  /*
+                   * These values are tested with the selection from the tour editor
+                   */
+                  if (beforeLeftSliderIndex != SelectionChartXSliderPosition.IGNORE_SLIDER_POSITION) {
+
+                     // one slice is selected
+
+                     leftSliderValueIndex = beforeLeftSliderIndex;
+                     rightSliderValueIndex = leftSliderValueIndex;
+                  }
 
                   positionMapTo_0_TourSliders(
                         tourData,
