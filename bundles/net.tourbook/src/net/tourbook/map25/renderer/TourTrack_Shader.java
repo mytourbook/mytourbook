@@ -366,7 +366,7 @@ public final class TourTrack_Shader {
 
       final float angleDiff = getAngle_Difference(p21Angle, _previousAngle);
 
-      _minSmoothAngle = 0.5f;
+      _minSmoothAngle = .2f;
 
       if (Math.abs(angleDiff) > _minSmoothAngle) {
 
@@ -898,7 +898,7 @@ public final class TourTrack_Shader {
 
       mapPlayerData.isPlayerEnabled                   = true;
 
-      mapPlayerData.allProjectedPoints_NormalTrack                = trackBucket.allProjectedPoints;
+      mapPlayerData.allProjectedPoints_NormalTrack    = trackBucket.allProjectedPoints;
       mapPlayerData.allProjectedPoints_ReturnTrack    = trackBucket.allProjectedPoints_ReturnTrack;
 
       mapPlayerData.allVisible_PixelPositions         = trackBucket.allVisible_PixelPositions;

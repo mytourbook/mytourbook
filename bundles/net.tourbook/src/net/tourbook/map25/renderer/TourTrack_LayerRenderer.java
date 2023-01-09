@@ -531,7 +531,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       } // doWork_CompileTrack end
 
       /**
-       * Create return track from end...start or start...end
+       * Create RETURN TRACK from end...start or start...end, it is using the shortest distance
+       *
+       * @param mapScale
        */
       private void doWork_CreateReturnTrack(final double mapScale) {
 
@@ -542,7 +544,14 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          // distance in meters between start and end
          final double sphericalDistance = geoPointStart.sphericalDistance(geoPointEnd);
 
-         final int numReturnTrackPositions = 10;//NUM_RETURN_TRACK_POSITIONS;
+         /**
+          * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          * <p>
+          * The model is partly jumping when number of return track points are about smaller than 20
+          * <p>
+          * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          */
+         final int numReturnTrackPositions = 20;//NUM_RETURN_TRACK_POSITIONS;
 
          final Point projectedStart = MercatorProjection.project(geoPointStart, null);
          final Point projectedEnd = MercatorProjection.project(geoPointEnd, null);

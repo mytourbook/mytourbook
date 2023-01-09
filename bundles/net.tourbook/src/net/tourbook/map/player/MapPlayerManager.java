@@ -18,7 +18,6 @@ package net.tourbook.map.player;
 import static org.oscim.utils.FastMath.clamp;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 
@@ -646,6 +645,11 @@ public class MapPlayerManager {
     */
    public static void setRelativePosition(final double newRelativePosition, final double movingDiff) {
 
+      // ignore the same position otherwise it would slow down the movement when not looping
+      if (newRelativePosition == _relativePosition_EndFrame) {
+         return;
+      }
+
       synchronized (RELATIVE_POSITION) {
 
          animationDuration = 1000;
@@ -671,7 +675,7 @@ public class MapPlayerManager {
                // but the model has not yet left the NORMAL TRACK
                && _relativePosition_CurrentFrame <= 1
 
-               // however the model should be moving again on the NORMAL TRACK
+               // the model should be moving again on the NORMAL TRACK
                && newRelativePosition < 1) {
 
             // skip until the _relativePosition_CurrentFrame is >1
@@ -686,7 +690,7 @@ public class MapPlayerManager {
                // but the model has not yet left the NORMAL TRACK
                && _relativePosition_CurrentFrame >= 0
 
-               // however the model should be moving again on the NORMAL TRACK
+               // the model should be moving again on the NORMAL TRACK
                && newRelativePosition < 1) {
 
             // skip until the _relativePosition_CurrentFrame is <0
@@ -699,12 +703,12 @@ public class MapPlayerManager {
          // this will also force to compute the frame even when player is paused
          _isAnimateFromRelativePosition = true;
 
-         System.out.println(UI.timeStamp()
-
-               + "  Start:" + String.format("%7.4f", _relativePosition_StartFrame)
-               + "  End:" + String.format("%7.4f", newRelativePosition)
-
-         );
+//         System.out.println(UI.timeStamp()
+//
+//               + "  Start:" + String.format("%7.4f", _relativePosition_StartFrame)
+//               + "  End:" + String.format("%7.4f", newRelativePosition)
+//
+//         );
 // TODO remove SYSTEM.OUT.PRINTLN
       }
    }

@@ -451,7 +451,10 @@ public class MapPlayerView extends ViewPart {
 
       final int timelineSelection = _scaleTimeline.getSelection();
 
-      if (timelineSelection == _scaleTimeline.getMinimum()) {
+      if (timelineSelection == _scaleTimeline.getMinimum()
+
+            // loop only when looping is selected
+            && _actionPlayControl_Loop.isChecked()) {
 
          // beginning of timeline + moving left -> start from the end
 
@@ -480,7 +483,10 @@ public class MapPlayerView extends ViewPart {
 
       final int timelineSelection = _scaleTimeline.getSelection();
 
-      if (timelineSelection == _scaleTimeline.getMaximum()) {
+      if (timelineSelection == _scaleTimeline.getMaximum()
+
+            // loop only when looping is selected
+            && _actionPlayControl_Loop.isChecked()) {
 
          // end of timeline + moving right -> start from 0
 
