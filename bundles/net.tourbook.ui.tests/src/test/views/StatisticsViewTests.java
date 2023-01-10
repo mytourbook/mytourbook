@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -42,12 +42,15 @@ public class StatisticsViewTests extends UITest {
       statisticsTypeComboBox.setSelection(0);
       assertEquals("Daytime", statisticsTypeComboBox.selection()); //$NON-NLS-1$
 
-      final SWTBotCombo yearComboBox = statisticsViewBot.comboBox(2);
+      final SWTBotCombo yearComboBox = statisticsViewBot.comboBox(1);
+
+      final SWTBotCombo numYearComboBox = statisticsViewBot.comboBox(2);
       assertAll(
-            () -> assertNotNull(yearComboBox),
-            () -> assertEquals(11, yearComboBox.itemCount()));
-      yearComboBox.setSelection("9"); //$NON-NLS-1$
-      assertEquals("9", yearComboBox.selection()); //$NON-NLS-1$
+            () -> assertNotNull(numYearComboBox),
+            () -> assertEquals(yearComboBox.itemCount(), numYearComboBox.itemCount()));
+
+      numYearComboBox.setSelection("9"); //$NON-NLS-1$
+      assertEquals("9", numYearComboBox.selection()); //$NON-NLS-1$
 
       statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_DaySummary);
       statisticsTypeComboBox.setSelection(Messages.Pref_Statistic_Group_WeekSummary);
