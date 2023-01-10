@@ -71,6 +71,7 @@ public class MapPlayerManager {
    private static double                _relativePosition_StartFrame;
    private static double                _relativePosition_EndFrame;
    private static double                _relativePosition_CurrentFrame;
+   private static long                  _relativePosition_CurrentFrame_Time;
    private static double                _movingDiff;
 
    private static int                   _currentNotClippedLocationIndex;
@@ -185,11 +186,11 @@ public class MapPlayerManager {
       int nextFrameNumber = 0;
       boolean isComputeNextVisibleIndex = false;
 
+      _isAnimateFromRelativePosition = true;
+
       if (_isAnimateFromRelativePosition) {
 
          // 1. Prio: Use relative position
-
-         _isAnimateFromRelativePosition = false;
 
          _currentNotClippedLocationIndex = (int) Math.round(numNotClipped_GeoLocationIndices * _relativePosition_CurrentFrame);
 
@@ -256,7 +257,7 @@ public class MapPlayerManager {
    }
 
    /**
-    * Move player head to a relative position and start playing to this position, it is called from
+    * Compute relative position for the play head, it is called from
     * {@link net.tourbook.map25.animation.GLTFModel_Renderer#render_UpdateModelPosition()}
     * <p>
     * The relative position is for this moving loop, start and end must not be at the same position:
@@ -284,9 +285,15 @@ public class MapPlayerManager {
     */
    public static double getRelativePosition() {
 
+      final long currentFrameTime = MapRenderer.frametime;
+
+      // check if position is already computed
+      if (_relativePosition_CurrentFrame_Time == currentFrameTime) {
+         return _relativePosition_CurrentFrame;
+      }
+
       synchronized (RELATIVE_POSITION) {
 
-         final long currentFrameTime = MapRenderer.frametime;
          final float remainingDuration = _animationEndTime - currentFrameTime;
 
          // check if animation has finished
@@ -326,6 +333,8 @@ public class MapPlayerManager {
                _isAnimateFromRelativePosition = true;
             }
 
+            _relativePosition_CurrentFrame_Time = currentFrameTime;
+
             return _relativePosition_CurrentFrame;
          }
 
@@ -342,7 +351,6 @@ public class MapPlayerManager {
             final double startEndAdvance = startEndDiff * relativeAdvance;
             final double currentRelativePosition = _relativePosition_StartFrame + startEndAdvance;
 
-//            _relativePosition_CurrentFrame = clamp(currentRelativePosition, -1, 0);
             _relativePosition_CurrentFrame = currentRelativePosition;
 
          } else if (_relativePosition_EndFrame > 1) {
@@ -353,7 +361,6 @@ public class MapPlayerManager {
             final double startEndAdvance = startEndDiff * relativeAdvance;
             final double currentRelativePosition = _relativePosition_StartFrame + startEndAdvance;
 
-//            _relativePosition_CurrentFrame = clamp(currentRelativePosition, 1, 2);
             _relativePosition_CurrentFrame = currentRelativePosition;
 
          } else {
@@ -439,6 +446,8 @@ public class MapPlayerManager {
 // TODO remove SYSTEM.OUT.PRINTLN
 
       }
+
+      _relativePosition_CurrentFrame_Time = currentFrameTime;
 
       return _relativePosition_CurrentFrame;
    }

@@ -37,6 +37,7 @@ import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
 import net.mgsx.gltf.scene3d.utils.IBLBuilder;
+import net.tourbook.common.UI;
 import net.tourbook.map.player.MapPlayerData;
 import net.tourbook.map.player.MapPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
@@ -393,7 +394,8 @@ public class GLTFModel_Renderer extends LayerRenderer {
       }
 
       final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
-      final int lastGeoLocationIndex = allNotClipped_GeoLocationIndices.length - 1;
+      final int numGeoLocations = allNotClipped_GeoLocationIndices.length;
+      final int lastGeoLocationIndex = numGeoLocations - 1;
 
       if (lastGeoLocationIndex < 0) {
          return;
@@ -475,17 +477,21 @@ public class GLTFModel_Renderer extends LayerRenderer {
          allProjectedPoints = mapPlayerData.allProjectedPoints_NormalTrack;
          numProjectedPoints = allProjectedPoints.length;
 
-         // adjust last index by -1 that positionIndex_1 points to the last index
-         final int locationIndex = lastGeoLocationIndex > 0
+         // adjust last index by -1 that positionIndex_1 can point to the last index
+         final int lastAdjusted_GeoLocationIndex = lastGeoLocationIndex > 0
                ? lastGeoLocationIndex - 1
                : lastGeoLocationIndex;
 
          exactLocationIndex = lastGeoLocationIndex * relativePosition;
 
          positionIndex_0 = (int) exactLocationIndex;
-         positionIndex_1 = positionIndex_0 <= locationIndex
-               ? positionIndex_0 + 1
-               : positionIndex_0;
+         positionIndex_1 = positionIndex_0 <= lastAdjusted_GeoLocationIndex
+
+               // check bounds
+               && positionIndex_0 <= lastGeoLocationIndex - 1
+
+                     ? positionIndex_0 + 1
+                     : positionIndex_0;
 
          geoLocationIndex_0 = allNotClipped_GeoLocationIndices[positionIndex_0];
          geoLocationIndex_1 = allNotClipped_GeoLocationIndices[positionIndex_1];
@@ -519,6 +525,12 @@ public class GLTFModel_Renderer extends LayerRenderer {
        */
       final float dX = (float) ((projectedPositionX - _currentMapPosition.x) * tileScale);
       final float dY = (float) ((projectedPositionY - _currentMapPosition.y) * tileScale);
+
+//      if ((dX > TourTrack_LayerRenderer.MAX_VISIBLE_PIXEL || dX < TourTrack_LayerRenderer.MAX_VISIBLE_PIXEL)
+//            && (dY > TourTrack_LayerRenderer.MAX_VISIBLE_PIXEL || dY < TourTrack_LayerRenderer.MAX_VISIBLE_PIXEL)) {
+//// this is not working
+////         return;
+//      }
 
 //      if (dX != _prevDx || dY != _prevDy || relativePosition != _prevRelativePosition) {
 //

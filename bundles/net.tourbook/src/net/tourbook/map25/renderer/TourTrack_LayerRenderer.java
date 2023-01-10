@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TourTrack_LayerRenderer extends LayerRenderer {
 
-   public static final Logger            log           = LoggerFactory.getLogger(TourTrack_LayerRenderer.class);
+   public static final Logger            log               = LoggerFactory.getLogger(TourTrack_LayerRenderer.class);
 
    /**
     * Map position/scale during compile time
@@ -73,9 +73,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    private IntArrayList                  _allTourStarts;
    private int[]                         _allGeoPointColors;
 
-   private int                           _oldX         = -1;
-   private int                           _oldY         = -1;
-   private int                           _oldZoomScale = -1;
+   private int                           _oldX             = -1;
+   private int                           _oldY             = -1;
+   private int                           _oldZoomScale     = -1;
 
    /**
     * This is the layer for this renderer
@@ -547,11 +547,12 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          /**
           * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           * <p>
-          * The model is partly jumping when number of return track points are about smaller than 20
+          * The model is partly jumping when number of return track points are about smaller than
+          * 30, maybe caused by the FPS
           * <p>
           * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           */
-         final int numReturnTrackPositions = 20;//NUM_RETURN_TRACK_POSITIONS;
+         final int numReturnTrackPositions = 30;//NUM_RETURN_TRACK_POSITIONS;
 
          final Point projectedStart = MercatorProjection.project(geoPointStart, null);
          final Point projectedEnd = MercatorProjection.project(geoPointEnd, null);
