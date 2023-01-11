@@ -33,6 +33,7 @@ import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.GL;
 import org.oscim.core.MapPosition;
+import org.oscim.core.Tile;
 import org.oscim.renderer.GLMatrix;
 import org.oscim.renderer.GLState;
 import org.oscim.renderer.GLUtils;
@@ -64,7 +65,7 @@ public final class TourTrack_Shader {
     */
    private static final int             SHORT_BYTES              = 2;
 
-   private static AnimationShader       _animationShader;
+   private static ModelCursorShader     _modelCursorShader;
    private static DirectionArrowsShader _directionArrowShader;
    private static LineShader[]          _lineShaders             = { null, null };
 
@@ -88,36 +89,7 @@ public final class TourTrack_Shader {
     */
    private static float                 _minSmoothAngle          = 0.5f;
 
-   private static class AnimationShader extends GLShaderMT {
-
-      /**
-       * Location for a shader variable
-       */
-      int attrib_Pos;
-
-      int uni_AnimationPos;
-      int uni_AnimationMVP;
-      int uni_MVP;
-      int uni_VpScale2CompileScale;
-
-      AnimationShader(final String shaderFile) {
-
-         if (loadShader(shaderFile, "#version 330" + NL) == false) { //$NON-NLS-1$
-            return;
-         }
-
-         // SET_FORMATTING_OFF
-
-         attrib_Pos                 = getAttrib ("attrib_Pos");                  //$NON-NLS-1$
-
-         uni_AnimationPos           = getUniform("uni_AnimationPos");            //$NON-NLS-1$
-         uni_AnimationMVP           = getUniform("uni_AnimationMVP");            //$NON-NLS-1$
-         uni_MVP                    = getUniform("uni_MVP");                     //$NON-NLS-1$
-         uni_VpScale2CompileScale   = getUniform("uni_VpScale2CompileScale");    //$NON-NLS-1$
-
-         // SET_FORMATTING_ON
-      }
-   }
+   private static double                _prevValue;
 
    private static class DirectionArrowsShader extends GLShaderMT {
 
@@ -200,6 +172,37 @@ public final class TourTrack_Shader {
             uVertexColorAlpha   = getUniform("uVertexColorAlpha"); //$NON-NLS-1$
 
    // SET_FORMATTING_ON
+      }
+   }
+
+   private static class ModelCursorShader extends GLShaderMT {
+
+      /**
+       * Location for a shader variable
+       */
+      int attrib_Pos;
+
+      int uni_ModelCursorPos;
+      int uni_AnimationMVP;
+      int uni_MVP;
+      int uni_VpScale2CompileScale;
+
+      ModelCursorShader(final String shaderFile) {
+
+         if (loadShader(shaderFile, "#version 330" + NL) == false) { //$NON-NLS-1$
+            return;
+         }
+
+         // SET_FORMATTING_OFF
+
+         attrib_Pos                 = getAttrib ("attrib_Pos");                  //$NON-NLS-1$
+
+         uni_ModelCursorPos         = getUniform("uni_ModelCursorPos");            //$NON-NLS-1$
+         uni_AnimationMVP           = getUniform("uni_AnimationMVP");            //$NON-NLS-1$
+         uni_MVP                    = getUniform("uni_MVP");                     //$NON-NLS-1$
+         uni_VpScale2CompileScale   = getUniform("uni_VpScale2CompileScale");    //$NON-NLS-1$
+
+         // SET_FORMATTING_ON
       }
    }
 
@@ -358,7 +361,31 @@ public final class TourTrack_Shader {
       return Math.abs(angleDiff);
    }
 
-   private static float getAnimatedAngle(final short pos1X, final short pos1Y, final short pos2X, final short pos2Y) {
+   private static ByteBuffer getBuffer_Color(final int requestedColorSize) {
+
+      final int bufferBlockSize = 2048;
+      final int numBufferBlocks = requestedColorSize / bufferBlockSize;
+      final int roundedBufferSize = (numBufferBlocks + 1) * bufferBlockSize;
+
+      if (_vertexColor_Buffer == null || _vertexColor_BufferSize < roundedBufferSize) {
+
+         _vertexColor_Buffer = ByteBuffer
+               .allocateDirect(roundedBufferSize)
+               .order(ByteOrder.nativeOrder());
+
+         _vertexColor_BufferSize = roundedBufferSize;
+
+      } else {
+
+         // IMPORTANT: reset position to 0 to prevent BufferOverflowException
+
+         _vertexColor_Buffer.clear();
+      }
+
+      return _vertexColor_Buffer;
+   }
+
+   private static float getModelAngle(final short pos1X, final short pos1Y, final short pos2X, final short pos2Y) {
 
       final float p21Angle = (float) MtMath.angleFromShorts(pos1X, pos1Y, pos2X, pos2Y);
 
@@ -366,7 +393,7 @@ public final class TourTrack_Shader {
 
       final float angleDiff = getAngle_Difference(p21Angle, _previousAngle);
 
-      _minSmoothAngle = .2f;
+      _minSmoothAngle = .5f;
 
       if (Math.abs(angleDiff) > _minSmoothAngle) {
 
@@ -396,30 +423,6 @@ public final class TourTrack_Shader {
 
             // must be turned otherwise it looks in the wrong direction
             - 90;
-   }
-
-   private static ByteBuffer getBuffer_Color(final int requestedColorSize) {
-
-      final int bufferBlockSize = 2048;
-      final int numBufferBlocks = requestedColorSize / bufferBlockSize;
-      final int roundedBufferSize = (numBufferBlocks + 1) * bufferBlockSize;
-
-      if (_vertexColor_Buffer == null || _vertexColor_BufferSize < roundedBufferSize) {
-
-         _vertexColor_Buffer = ByteBuffer
-               .allocateDirect(roundedBufferSize)
-               .order(ByteOrder.nativeOrder());
-
-         _vertexColor_BufferSize = roundedBufferSize;
-
-      } else {
-
-         // IMPORTANT: reset position to 0 to prevent BufferOverflowException
-
-         _vertexColor_Buffer.clear();
-      }
-
-      return _vertexColor_Buffer;
    }
 
    /**
@@ -456,7 +459,7 @@ public final class TourTrack_Shader {
 
             if (trackConfig.arrow_IsAnimate) {
 
-               paint_30_Animation(viewport, viewport2mapscale, trackBucket, nextFrameIndex);
+               paint_30_ModelCursor(viewport, viewport2mapscale, trackBucket, nextFrameIndex);
 
             } else {
 
@@ -802,10 +805,10 @@ public final class TourTrack_Shader {
 //    GLUtils.checkGlError(TourTrack_Shader.class.getName());
    }
 
-   private static void paint_30_Animation(final GLViewport viewport,
-                                          final float vp2mpScale,
-                                          final TourTrack_Bucket trackBucket,
-                                          final int nextFrameIndex) {
+   private static void paint_30_ModelCursor(final GLViewport viewport,
+                                            final float vp2mpScale,
+                                            final TourTrack_Bucket trackBucket,
+                                            final int nextFrameIndex) {
 
       final short[] allVisiblePixelPositions = trackBucket.allVisible_PixelPositions;
       if (allVisiblePixelPositions == null) {
@@ -830,12 +833,68 @@ public final class TourTrack_Shader {
       final short pos2X = allVisiblePixelPositions[xyPosIndex];
       final short pos2Y = allVisiblePixelPositions[xyPosIndex + 1];
 
-      final AnimationShader shader = _animationShader;
+      float dX = pos2X;
+      float dY = pos2Y;
+      final double[] projectedPositionXY = MapPlayerManager.getProjectedPosition();
+
+      if (projectedPositionXY != null) {
+
+         final MapPosition currentMapPosition = viewport.pos;
+
+         final double compileMapScale = MapPlayerManager.getCompileMapScale();
+
+         final double currentMapPosX = currentMapPosition.x;
+         final double currentMapPosY = currentMapPosition.y;
+
+         final double diffX = MapPlayerManager.getCompileMapX() - currentMapPosX;
+         final double diffY = MapPlayerManager.getCompileMapY() - currentMapPosY;
+
+         final int currentMapZoomLevel = currentMapPosition.zoomLevel;
+         final int tileScale = Tile.SIZE << currentMapZoomLevel;
+
+         dX = (float) ((projectedPositionXY[0] - currentMapPosX - diffX) * tileScale) * COORD_SCALE;
+         dY = (float) ((projectedPositionXY[1] - currentMapPosY - diffY) * tileScale) * COORD_SCALE;
+
+         /*
+          * Prevent flickering, this code is created by logging dX/dY to see the differences, cannot
+          * tell why this works with these adjustments
+          */
+         if (vp2mpScale < 1.0) {
+
+            dX = dX * 2;
+            dY = dY * 2;
+
+         } else if (vp2mpScale > 2.0) {
+
+            dX = dX / 2;
+            dY = dY / 2;
+         }
+
+//         if (vp2mpScale != _prevValue) {
+//
+//            System.out.println(UI.timeStamp()
+//
+//                  + " vp2mpScale: " + String.format("%6.4f", vp2mpScale)
+//
+//                  + "  dX: " + String.format("%10.4f", dX)
+//                  + "  dY: " + String.format("%10.4f", dY)
+//
+//                  + "  diffX: " + String.format("%13.10f", diffX)
+//                  + "  diffY: " + String.format("%13.10f", diffY)
+//
+//            );
+//// TODO remove SYSTEM.OUT.PRINTLN
+//
+//            _prevValue = vp2mpScale;
+//         }
+      }
+
+      final ModelCursorShader shader = _modelCursorShader;
 
       shader.useProgram();
 
       // rotate model to look forward
-      final float forwardAngle = getAnimatedAngle(pos1X, pos1Y, pos2X, pos2Y);
+      final float forwardAngle = getModelAngle(pos1X, pos1Y, pos2X, pos2Y);
       _animationMatrix.setRotation(forwardAngle, 0f, 0f, 1f);
       _animationMatrix.setAsUniform(shader.uni_AnimationMVP);
 
@@ -847,7 +906,7 @@ public final class TourTrack_Shader {
          viewport.mvp.setAsUniform(shader.uni_MVP);
 
          // set animation position
-         gl.uniform2f(shader.uni_AnimationPos, pos2X, pos2Y);
+         gl.uniform2f(shader.uni_ModelCursorPos, dX, dY);
 
          // set viewport scale TO map scale: 1.0...2.0
          gl.uniform1f(shader.uni_VpScale2CompileScale, vp2mpScale);
@@ -920,7 +979,7 @@ public final class TourTrack_Shader {
       _lineShaders[SHADER_PROJECTED]   = new LineShader("line_aa_proj");                  //$NON-NLS-1$
       _lineShaders[SHADER_FLAT]        = new LineShader("line_aa");                       //$NON-NLS-1$
 
-      _animationShader                 = new AnimationShader("animateTrack");             //$NON-NLS-1$
+      _modelCursorShader               = new ModelCursorShader("modelCursor");            //$NON-NLS-1$
       _directionArrowShader            = new DirectionArrowsShader("directionArrows");    //$NON-NLS-1$
 
       // create buffer id's

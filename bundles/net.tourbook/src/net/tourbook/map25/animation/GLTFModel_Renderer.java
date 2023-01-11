@@ -37,8 +37,6 @@ import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
 import net.mgsx.gltf.scene3d.utils.IBLBuilder;
-import net.tourbook.common.UI;
-import net.tourbook.map.player.MapPlayerData;
 import net.tourbook.map.player.MapPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
 
@@ -146,19 +144,19 @@ public class GLTFModel_Renderer extends LayerRenderer {
        */
 
       // skateboard
-      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/skateboard/mt-skateboard.gltf"));
-      _modelForwardAngle = 90;
-      _modelCenterToForwardFactor = 1.4;
+//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/skateboard/mt-skateboard.gltf"));
+//      _modelForwardAngle = 90;
+//      _modelCenterToForwardFactor = 1.4;
 
       // painted bicycle
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/simple-bicycle/simple-bicycle.gltf"));
 //      _modelForwardAngle = 90;
 //      _modelCenterToForwardFactor = 5;
 
-//      // hochrad
-//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/hochrad/hochrad.gltf"));
-//      _modelForwardAngle = -90;
-//      _modelCenterToForwardFactor = -7;
+      // hochrad
+      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/hochrad/hochrad.gltf"));
+      _modelForwardAngle = -90;
+      _modelCenterToForwardFactor = -7;
 
       // wood truck
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/wood-truck/wood-truck.gltf"));
@@ -388,143 +386,26 @@ public class GLTFModel_Renderer extends LayerRenderer {
     */
    private void render_UpdateModelPosition() {
 
-      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
-      if (mapPlayerData == null) {
+      final double[] projectedPositionXY = MapPlayerManager.getProjectedPosition();
+
+      if (projectedPositionXY == null) {
          return;
       }
 
-      final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
-      final int numGeoLocations = allNotClipped_GeoLocationIndices.length;
-      final int lastGeoLocationIndex = numGeoLocations - 1;
+//      System.out.println(UI.timeStamp() + " model:  " + _currentMapPosition.scale);
+//// TODO remove SYSTEM.OUT.PRINTLN
 
-      if (lastGeoLocationIndex < 0) {
-         return;
-      }
-
-      double relativePosition = MapPlayerManager.getRelativePosition();
-
-//      if (relativePosition == _prevRelativePosition) {
-//// This would need a reset option for a new tour
-////         return;
-//      }
-
+      /*
+       * Translate glTF model to the map position
+       */
       final double currentMapScale = _currentMapPosition.scale;
       final int currentMapZoomLevel = _currentMapPosition.zoomLevel;
 
       final int mapScale = 1 << currentMapZoomLevel;
       final int tileScale = Tile.SIZE << currentMapZoomLevel;
 
-      double[] allProjectedPoints;
-      int numProjectedPoints;
-      int geoLocationIndex_0 = 0;
-      int geoLocationIndex_1 = 0;
-      int positionIndex_0;
-      int positionIndex_1;
-      double exactLocationIndex = 0;
-
-      // compute frame position from relative position
-
-      if (relativePosition > 2) {
-
-         // end...start + forward
-
-         relativePosition = relativePosition - 2;
-      }
-
-      if (relativePosition > 1 || relativePosition < 0) {
-
-         // move model on RETURN TRACK
-
-         final double relativeReturnPosition;
-
-         if (relativePosition > 1) {
-
-            // end...start
-            relativeReturnPosition = relativePosition - 1;
-
-         } else {
-
-            // relativePosition < 0
-
-            // start...end
-            relativeReturnPosition = relativePosition + 1;
-         }
-
-         allProjectedPoints = mapPlayerData.allProjectedPoints_ReturnTrack;
-
-         numProjectedPoints = allProjectedPoints.length;
-         final int numReturnPositions = numProjectedPoints / 2;
-         final int lastReturnIndex = numReturnPositions - 1;
-
-         exactLocationIndex = lastReturnIndex * relativeReturnPosition;
-
-         positionIndex_0 = (int) exactLocationIndex;
-
-         geoLocationIndex_0 = positionIndex_0;
-         geoLocationIndex_1 = positionIndex_0 <= lastReturnIndex - 1
-               ? positionIndex_0 + 1
-               : positionIndex_0;
-
-      } else {
-
-         // relativePosition is >= 0 && <= 1 -> move model on NORMAL TRACK
-
-//         if (relativePosition > 0.95) {
-//            int a = 0;
-//            a++;
-//         }
-
-         allProjectedPoints = mapPlayerData.allProjectedPoints_NormalTrack;
-         numProjectedPoints = allProjectedPoints.length;
-
-         // adjust last index by -1 that positionIndex_1 can point to the last index
-         final int lastAdjusted_GeoLocationIndex = lastGeoLocationIndex > 0
-               ? lastGeoLocationIndex - 1
-               : lastGeoLocationIndex;
-
-         exactLocationIndex = lastGeoLocationIndex * relativePosition;
-
-         positionIndex_0 = (int) exactLocationIndex;
-         positionIndex_1 = positionIndex_0 <= lastAdjusted_GeoLocationIndex
-
-               // check bounds
-               && positionIndex_0 <= lastGeoLocationIndex - 1
-
-                     ? positionIndex_0 + 1
-                     : positionIndex_0;
-
-         geoLocationIndex_0 = allNotClipped_GeoLocationIndices[positionIndex_0];
-         geoLocationIndex_1 = allNotClipped_GeoLocationIndices[positionIndex_1];
-      }
-
-      /*
-       * Do micro movements according to the exact relative position
-       */
-      final int projectedIndex_0 = geoLocationIndex_0 * 2;
-      final int projectedIndex_1 = geoLocationIndex_1 * 2;
-
-      final double projectedPositionX_0 = allProjectedPoints[projectedIndex_0];
-      final double projectedPositionY_0 = allProjectedPoints[projectedIndex_0 + 1];
-      final double projectedPositionX_1 = allProjectedPoints[projectedIndex_1];
-      final double projectedPositionY_1 = allProjectedPoints[projectedIndex_1 + 1];
-
-      final double projectedPositionX_Diff = projectedPositionX_1 - projectedPositionX_0;
-      final double projectedPositionY_Diff = projectedPositionY_1 - projectedPositionY_0;
-
-      // 0...1
-      final double microIndex = exactLocationIndex - (int) exactLocationIndex;
-
-      final double advanceX = projectedPositionX_Diff * microIndex;
-      final double advanceY = projectedPositionY_Diff * microIndex;
-
-      final double projectedPositionX = projectedPositionX_0 + advanceX;
-      final double projectedPositionY = projectedPositionY_0 + advanceY;
-
-      /*
-       * Translate glTF model to the map position
-       */
-      final float dX = (float) ((projectedPositionX - _currentMapPosition.x) * tileScale);
-      final float dY = (float) ((projectedPositionY - _currentMapPosition.y) * tileScale);
+      final float dX = (float) ((projectedPositionXY[0] - _currentMapPosition.x) * tileScale);
+      final float dY = (float) ((projectedPositionXY[1] - _currentMapPosition.y) * tileScale);
 
 //      if ((dX > TourTrack_LayerRenderer.MAX_VISIBLE_PIXEL || dX < TourTrack_LayerRenderer.MAX_VISIBLE_PIXEL)
 //            && (dY > TourTrack_LayerRenderer.MAX_VISIBLE_PIXEL || dY < TourTrack_LayerRenderer.MAX_VISIBLE_PIXEL)) {
@@ -574,7 +455,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
          final float vp2mpModelSize = modelSize / vp2mp;
 
-         /*
+         /**
           * This algorithm is not perfect as the model can still be flickering (size is larger or
           * smaller) but it is better than nothing. I spend 2 full days to get the flickering partly
           * fixed

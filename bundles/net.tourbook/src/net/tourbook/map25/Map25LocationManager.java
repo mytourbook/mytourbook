@@ -61,11 +61,15 @@ public class Map25LocationManager {
    public static void setMapLocation(final Map map, final MapPosition mapPosition) {
 
       _isAnimateLocation = true;
-      _animationEasingType = Easing.Type.SINE_INOUT;
+
       _animationEasingType = Easing.Type.SINE_OUT;
-      _animationEasingType = Easing.Type.SINE_IN;
-      _animationEasingType = Easing.Type.QUINT_INOUT;
       _animationEasingType = Easing.Type.LINEAR;
+      _animationEasingType = Easing.Type.SINE_IN;
+
+      _animationEasingType = Easing.Type.QUART_INOUT;
+      _animationEasingType = Easing.Type.QUINT_INOUT;
+      _animationEasingType = Easing.Type.SINE_INOUT;
+      _animationEasingType = Easing.Type.QUAD_INOUT;
 
       map.post(() -> setMapLocation_InMapThread(map, mapPosition));
    }

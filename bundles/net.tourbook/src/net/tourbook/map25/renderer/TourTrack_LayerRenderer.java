@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TourTrack_LayerRenderer extends LayerRenderer {
 
-   public static final Logger            log               = LoggerFactory.getLogger(TourTrack_LayerRenderer.class);
+   public static final Logger            log           = LoggerFactory.getLogger(TourTrack_LayerRenderer.class);
 
    /**
     * Map position/scale during compile time
@@ -73,9 +73,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    private IntArrayList                  _allTourStarts;
    private int[]                         _allGeoPointColors;
 
-   private int                           _oldX             = -1;
-   private int                           _oldY             = -1;
-   private int                           _oldZoomScale     = -1;
+   private int                           _oldX         = -1;
+   private int                           _oldY         = -1;
+   private int                           _oldZoomScale = -1;
 
    /**
     * This is the layer for this renderer
@@ -864,6 +864,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
        * Keep zoomlevel for the animation, otherwise the old zoomlevel would be used which is
        * causing flickering
        */
-      MapPlayerManager.setCompileMapScale(_compileMapPosition.scale);
+      MapPlayerManager.setCompileMapScale(
+            _compileMapPosition.x,
+            _compileMapPosition.y,
+            _compileMapPosition.scale);
    }
 }

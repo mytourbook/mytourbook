@@ -1,12 +1,14 @@
-
-const vec3 colors[] = vec3[]( vec3( 1.0, 1.0, 1.0),
-                              vec3( 0.0, 1.0, 0.0),
-                              vec3( 0.0, 0.0, 1.0));
+/*
+ * Shows a cursor (e.g. point or triangle) for the model on the track
+ */
+const vec3 colors[] = vec3[]( vec3( 0.2, 1.0, 0.2),
+                              vec3( 1.0,  .2, 0.0),
+                              vec3( 1.0,  .2, 0.0));
 
 in vec4 attrib_Pos;
 
 uniform mat4  uni_MVP;
-uniform vec2  uni_AnimationPos;
+uniform vec2  uni_ModelCursorPos;
 uniform mat4  uni_AnimationMVP;
 
 // current viewport map scale to comile time map scale: 1.0...2.0
@@ -27,7 +29,7 @@ void main() {
    gl_Position = uni_MVP * vec4(scaledModel.xy
 
                                 // move (translate) model to the animation position
-                                + uni_AnimationPos,
+                                + uni_ModelCursorPos,
 
                                 scaledModel.z,
                                 1.0);

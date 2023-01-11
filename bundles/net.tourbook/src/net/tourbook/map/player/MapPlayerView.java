@@ -725,9 +725,6 @@ public class MapPlayerView extends ViewPart {
 
       stopPlayerWhenRunning();
 
-//      System.out.println(UI.timeStamp() + " onTimeline_Selection: " + _scaleTimeline.getSelection());
-//      // TODO remove SYSTEM.OUT.PRINTLN
-
       setMapAndModelPosition(getTimelineRelativePosition());
    }
 
@@ -791,7 +788,7 @@ public class MapPlayerView extends ViewPart {
 
       setTimeline_Tooltip();
 
-//      fireMapPosition();
+      fireMapPosition();
 
       MapPlayerManager.setRelativePosition(relativeModelPosition, movingDiff);
    }

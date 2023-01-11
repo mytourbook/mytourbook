@@ -68,10 +68,12 @@ public class MapPlayerManager {
    private static float                 _animationForwardAngle;
    private static double                _lastRemainingDuration;
 
+   private static double[]              _projectedPosition       = new double[2];
+   private static long                  _projectedPosition_Time;
+
    private static double                _relativePosition_StartFrame;
    private static double                _relativePosition_EndFrame;
    private static double                _relativePosition_CurrentFrame;
-   private static long                  _relativePosition_CurrentFrame_Time;
    private static double                _movingDiff;
 
    private static int                   _currentNotClippedLocationIndex;
@@ -92,6 +94,9 @@ public class MapPlayerManager {
    private static double                _compileMapScale;
    private static boolean               _isCompileMapScaleSet;
 
+   private static double                _compileMapX;
+   private static double                _compileMapY;
+
    /**
     * When <code>true</code> then an animated triangle shows the exact cursor position
     */
@@ -110,6 +115,16 @@ public class MapPlayerManager {
    public static double getCompileMapScale() {
 
       return _compileMapScale;
+   }
+
+   public static double getCompileMapX() {
+
+      return _compileMapX;
+   }
+
+   public static double getCompileMapY() {
+
+      return _compileMapY;
    }
 
    /**
@@ -257,6 +272,152 @@ public class MapPlayerManager {
    }
 
    /**
+    * @return Returns the projected position of the animated model for the current frame
+    */
+   public static double[] getProjectedPosition() {
+
+      final long currentFrameTime = MapRenderer.frametime;
+
+      // check if position is already computed
+      if (_projectedPosition_Time == currentFrameTime) {
+         return _projectedPosition;
+      }
+
+      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
+      if (mapPlayerData == null) {
+         return null;
+      }
+
+      final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
+      final int numGeoLocations = allNotClipped_GeoLocationIndices.length;
+      final int lastGeoLocationIndex = numGeoLocations - 1;
+
+      if (lastGeoLocationIndex < 0) {
+         return null;
+      }
+
+      double relativePosition = getRelativePosition();
+
+//      if (relativePosition == _prevRelativePosition) {
+//// This would need a reset option for a new tour
+////         return;
+//      }
+
+      double[] allProjectedPoints;
+      int numProjectedPoints;
+      int geoLocationIndex_0 = 0;
+      int geoLocationIndex_1 = 0;
+      int positionIndex_0;
+      int positionIndex_1;
+      double exactLocationIndex = 0;
+
+      // compute frame position from relative position
+
+      if (relativePosition > 2) {
+
+         // end...start + forward
+
+         relativePosition = relativePosition - 2;
+      }
+
+      if (relativePosition > 1 || relativePosition < 0) {
+
+         // move model on RETURN TRACK
+
+         final double relativeReturnPosition;
+
+         if (relativePosition > 1) {
+
+            // end...start
+            relativeReturnPosition = relativePosition - 1;
+
+         } else {
+
+            // relativePosition < 0
+
+            // start...end
+            relativeReturnPosition = relativePosition + 1;
+         }
+
+         allProjectedPoints = mapPlayerData.allProjectedPoints_ReturnTrack;
+
+         numProjectedPoints = allProjectedPoints.length;
+         final int numReturnPositions = numProjectedPoints / 2;
+         final int lastReturnIndex = numReturnPositions - 1;
+
+         exactLocationIndex = lastReturnIndex * relativeReturnPosition;
+
+         positionIndex_0 = (int) exactLocationIndex;
+
+         geoLocationIndex_0 = positionIndex_0;
+         geoLocationIndex_1 = positionIndex_0 <= lastReturnIndex - 1
+               ? positionIndex_0 + 1
+               : positionIndex_0;
+
+      } else {
+
+         // relativePosition is >= 0 && <= 1 -> move model on NORMAL TRACK
+
+//         if (relativePosition > 0.95) {
+//            int a = 0;
+//            a++;
+//         }
+
+         allProjectedPoints = mapPlayerData.allProjectedPoints_NormalTrack;
+         numProjectedPoints = allProjectedPoints.length;
+
+         // adjust last index by -1 that positionIndex_1 can point to the last index
+         final int lastAdjusted_GeoLocationIndex = lastGeoLocationIndex > 0
+               ? lastGeoLocationIndex - 1
+               : lastGeoLocationIndex;
+
+         exactLocationIndex = lastGeoLocationIndex * relativePosition;
+
+         positionIndex_0 = (int) exactLocationIndex;
+         positionIndex_1 = positionIndex_0 <= lastAdjusted_GeoLocationIndex
+
+               // check bounds
+               && positionIndex_0 <= lastGeoLocationIndex - 1
+
+                     ? positionIndex_0 + 1
+                     : positionIndex_0;
+
+         geoLocationIndex_0 = allNotClipped_GeoLocationIndices[positionIndex_0];
+         geoLocationIndex_1 = allNotClipped_GeoLocationIndices[positionIndex_1];
+      }
+
+      /*
+       * Do micro movements according to the exact relative position
+       */
+      final int projectedIndex_0 = geoLocationIndex_0 * 2;
+      final int projectedIndex_1 = geoLocationIndex_1 * 2;
+
+      final double projectedPositionX_0 = allProjectedPoints[projectedIndex_0];
+      final double projectedPositionY_0 = allProjectedPoints[projectedIndex_0 + 1];
+      final double projectedPositionX_1 = allProjectedPoints[projectedIndex_1];
+      final double projectedPositionY_1 = allProjectedPoints[projectedIndex_1 + 1];
+
+      final double projectedPositionX_Diff = projectedPositionX_1 - projectedPositionX_0;
+      final double projectedPositionY_Diff = projectedPositionY_1 - projectedPositionY_0;
+
+      // 0...1
+      final double microIndex = exactLocationIndex - (int) exactLocationIndex;
+
+      final double advanceX = projectedPositionX_Diff * microIndex;
+      final double advanceY = projectedPositionY_Diff * microIndex;
+
+      final double projectedPositionX = projectedPositionX_0 + advanceX;
+      final double projectedPositionY = projectedPositionY_0 + advanceY;
+
+      _projectedPosition[0] = projectedPositionX;
+      _projectedPosition[1] = projectedPositionY;
+
+      _projectedPosition_Time = currentFrameTime;
+
+      return _projectedPosition;
+   }
+
+   /**
     * Compute relative position for the play head, it is called from
     * {@link net.tourbook.map25.animation.GLTFModel_Renderer#render_UpdateModelPosition()}
     * <p>
@@ -283,14 +444,9 @@ public class MapPlayerManager {
     *         1 ... 2 return track end...start<br>
     *         0 ...-1 return track start...end
     */
-   public static double getRelativePosition() {
+   private static double getRelativePosition() {
 
       final long currentFrameTime = MapRenderer.frametime;
-
-      // check if position is already computed
-      if (_relativePosition_CurrentFrame_Time == currentFrameTime) {
-         return _relativePosition_CurrentFrame;
-      }
 
       synchronized (RELATIVE_POSITION) {
 
@@ -332,8 +488,6 @@ public class MapPlayerManager {
                // redraw
                _isAnimateFromRelativePosition = true;
             }
-
-            _relativePosition_CurrentFrame_Time = currentFrameTime;
 
             return _relativePosition_CurrentFrame;
          }
@@ -447,8 +601,6 @@ public class MapPlayerManager {
 
       }
 
-      _relativePosition_CurrentFrame_Time = currentFrameTime;
-
       return _relativePosition_CurrentFrame;
    }
 
@@ -547,8 +699,10 @@ public class MapPlayerManager {
       _animationForwardAngle = animationForwardAngle;
    }
 
-   public static void setCompileMapScale(final double scale) {
+   public static void setCompileMapScale(final double x, final double y, final double scale) {
 
+      _compileMapX = x;
+      _compileMapY = y;
       _compileMapScale = scale;
 
       _isCompileMapScaleSet = true;
