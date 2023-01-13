@@ -144,9 +144,9 @@ public class GLTFModel_Renderer extends LayerRenderer {
        */
 
       // skateboard
-//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/skateboard/mt-skateboard.gltf"));
-//      _modelForwardAngle = 90;
-//      _modelCenterToForwardFactor = 1.4;
+      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/skateboard/mt-skateboard.gltf"));
+      _modelForwardAngle = 90;
+      _modelCenterToForwardFactor = 1.4;
 
       // painted bicycle
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/simple-bicycle/simple-bicycle.gltf"));
@@ -154,9 +154,9 @@ public class GLTFModel_Renderer extends LayerRenderer {
 //      _modelCenterToForwardFactor = 5;
 
       // hochrad
-      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/hochrad/hochrad.gltf"));
-      _modelForwardAngle = -90;
-      _modelCenterToForwardFactor = -7;
+//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/hochrad/hochrad.gltf"));
+//      _modelForwardAngle = -90;
+//      _modelCenterToForwardFactor = -7;
 
       // wood truck
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/wood-truck/wood-truck.gltf"));

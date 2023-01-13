@@ -89,7 +89,7 @@ public final class TourTrack_Shader {
     */
    private static float                 _minSmoothAngle          = 0.5f;
 
-   private static double                _prevValue;
+// private static double                _prevValue;
 
    private static class DirectionArrowsShader extends GLShaderMT {
 
@@ -841,8 +841,6 @@ public final class TourTrack_Shader {
 
          final MapPosition currentMapPosition = viewport.pos;
 
-         final double compileMapScale = MapPlayerManager.getCompileMapScale();
-
          final double currentMapPosX = currentMapPosition.x;
          final double currentMapPosY = currentMapPosition.y;
 
@@ -959,6 +957,7 @@ public final class TourTrack_Shader {
 
       mapPlayerData.allProjectedPoints_NormalTrack    = trackBucket.allProjectedPoints;
       mapPlayerData.allProjectedPoints_ReturnTrack    = trackBucket.allProjectedPoints_ReturnTrack;
+      mapPlayerData.trackEnd2StartPixelDistance       = trackBucket.trackEnd2StartPixelDistance;
 
       mapPlayerData.allVisible_PixelPositions         = trackBucket.allVisible_PixelPositions;
       mapPlayerData.allVisible_GeoLocationIndices     = trackBucket.allVisible_GeoLocationIndices;

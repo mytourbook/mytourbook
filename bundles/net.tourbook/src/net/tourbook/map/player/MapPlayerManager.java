@@ -22,6 +22,7 @@ import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.swt.widgets.Display;
 import org.oscim.renderer.MapRenderer;
 
 /**
@@ -60,7 +61,7 @@ public class MapPlayerManager {
     */
    private static int                   _numAllVisibleFrames;
 
-   public static long                   animationDuration        = 1000;
+   private static long                  _animationDuration       = 1000;
 
    private static int                   _movingSpeed             = DEFAULT_MOVING_SPEED;
 
@@ -74,7 +75,6 @@ public class MapPlayerManager {
    private static double                _relativePosition_StartFrame;
    private static double                _relativePosition_EndFrame;
    private static double                _relativePosition_CurrentFrame;
-   private static double                _movingDiff;
 
    private static int                   _currentNotClippedLocationIndex;
    private static int                   _currentVisibleIndex;
@@ -103,6 +103,26 @@ public class MapPlayerManager {
    private static boolean               _isShowAnimationCursor;
 
    private static Object                RELATIVE_POSITION        = new Object();
+
+   private static int[]                 _scheduleCounter         = new int[1];
+
+   private static double                _nextPosition_OnNormalTrack;
+   private static double                _nextPosition_OnReturnTrack;
+   private static TrackState            _trackState_NormalTrack;
+   private static TrackState            _trackState_ReturnTrack;
+   private static TrackState            _prevTrackState_NormalTrack;
+   private static TrackState            _prevTrackState_ReturnTrack;
+
+   enum TrackState {
+
+      MOVING, //
+      SCHEDULED, //
+      IDLE, //
+   }
+
+   public static long getAnimationDuration() {
+      return _animationDuration;
+   }
 
    /**
     * @return Returns the angle for the model forward direction
@@ -455,17 +475,20 @@ public class MapPlayerManager {
          // check if animation has finished
          if (remainingDuration < 0) {
 
-            // animation time has expired, return last position
+            // animation time is over, return last position
 
+            /*
+             * Ensure that the model is on the NORMAL TRACK
+             */
             if (_relativePosition_EndFrame < 0) {
 
-               // model was moving on the return track from start...end -> set to normal end
+               // model was moving on the RETURN TRACK from start...end -> set to normal end
 
                _relativePosition_EndFrame = 1;
 
             } else if (_relativePosition_EndFrame > 1) {
 
-               // model was moving on the return track from end...start -> set to normal start
+               // model was moving on the RETURN TRACK from end...start -> set to normal start
 
                _relativePosition_EndFrame = 0;
             }
@@ -478,7 +501,6 @@ public class MapPlayerManager {
             if (_relativePosition_CurrentFrame != _relativePosition_EndFrame) {
 
                _relativePosition_CurrentFrame = _relativePosition_EndFrame;
-               _relativePosition_CurrentFrame = clamp(_relativePosition_CurrentFrame, 0, 1);
             }
 
             if (_lastRemainingDuration > 0) {
@@ -489,12 +511,48 @@ public class MapPlayerManager {
                _isAnimateFromRelativePosition = true;
             }
 
+//            if (_trackState_NormalTrack != _prevTrackState_NormalTrack
+//                  || _trackState_ReturnTrack != _prevTrackState_ReturnTrack
+//
+//                  || _trackState_NormalTrack != TrackState.IDLE
+//                  || _trackState_ReturnTrack != TrackState.IDLE) {
+//
+//               System.out.println(UI.timeStamp()
+//                     + " GET"
+//                     + "  n." + _trackState_NormalTrack
+//                     + "  r." + _trackState_ReturnTrack
+//
+//               );
+//// TODO remove SYSTEM.OUT.PRINTLN
+//
+//               _prevTrackState_NormalTrack = _trackState_NormalTrack;
+//               _prevTrackState_ReturnTrack = _trackState_ReturnTrack;
+//            }
+
+            /*
+             * Update track state
+             */
+            if (_trackState_ReturnTrack != TrackState.IDLE) {
+
+               _trackState_ReturnTrack = TrackState.IDLE;
+            }
+
+            // move on NORMAL TRACK when after the RETURN TRACK is IDLE
+            if (_trackState_NormalTrack == TrackState.SCHEDULED) {
+
+               setRelativePosition_ScheduleNewPosition_Task();
+
+            } else {
+
+               _trackState_NormalTrack = TrackState.IDLE;
+            }
+
             return _relativePosition_CurrentFrame;
          }
 
          // advance to the next animated frame
 
-         final float relativeRemaining = remainingDuration / animationDuration; // 0...1
+         final float relativeRemaining = remainingDuration / _animationDuration; // 0...1
          final float relativeAdvance = clamp(1.0f - relativeRemaining, 0, 1);
 
          if (_relativePosition_EndFrame < 0) {
@@ -779,10 +837,10 @@ public class MapPlayerManager {
    }
 
    /**
-    * Move player head to a relative position and start playing at this position, it is called
+    * Move player head to a relative position and start playing to this position, it is called
     * from {@link net.tourbook.map.player.MapPlayerView#setMapAndModelPosition(double)}
     * <p>
-    * Relative position in this moving loop, start and end must not be at the same position:
+    * The relative position is in this moving loop, start and end must not be at the same position:
     *
     * <pre>
     *
@@ -815,64 +873,190 @@ public class MapPlayerManager {
 
       synchronized (RELATIVE_POSITION) {
 
-         animationDuration = 1000;
-
-         final long currentFrameTime = MapRenderer.frametime;
-         _animationEndTime = currentFrameTime + animationDuration;
-
-         // set new start position from the current position
-         _relativePosition_StartFrame = _relativePosition_CurrentFrame;
-         _movingDiff = movingDiff;
-
          /**
           * !!! Complicated !!!
           * <p>
-          * This adjustment is necessary that the model in not moving on the NORMAL TRACK in reverse
+          * The track state is necessary that the model in not moving on the NORMAL TRACK in reverse
           * direction by skipping the RETURN TRACK
           */
-         if (true
 
-               // the current model movement should be on the RETURN TRACK
-               && _relativePosition_EndFrame == 2
+         final boolean isSetNormalTrack = newRelativePosition >= 0 && newRelativePosition <= 1;
+         final boolean isCurrentlyOnNormalTrack = _relativePosition_CurrentFrame >= 0 && _relativePosition_CurrentFrame <= 1;
 
-               // but the model has not yet left the NORMAL TRACK
-               && _relativePosition_CurrentFrame <= 1
+         if (isSetNormalTrack && isCurrentlyOnNormalTrack
+               && _trackState_ReturnTrack == TrackState.IDLE
+               && _trackState_NormalTrack == TrackState.IDLE) {
 
-               // the model should be moving again on the NORMAL TRACK
-               && newRelativePosition < 1) {
+            // model is
+            // moving on the NORMAL TRACK
+            // and keeps moving on the NORMAL TRACK
+            // and nothing is scheduled
 
-            // skip until the _relativePosition_CurrentFrame is >1
-
-            return;
-
-         } else if (true
-
-               // the current model movement should be on the RETURN TRACK
-               && _relativePosition_EndFrame == -1
-
-               // but the model has not yet left the NORMAL TRACK
-               && _relativePosition_CurrentFrame >= 0
-
-               // the model should be moving again on the NORMAL TRACK
-               && newRelativePosition < 1) {
-
-            // skip until the _relativePosition_CurrentFrame is <0
-
-            return;
-         }
-
-         _relativePosition_EndFrame = newRelativePosition;
-
-         // this will also force to compute the frame even when player is paused
-         _isAnimateFromRelativePosition = true;
-
-//         System.out.println(UI.timeStamp()
+//            System.out.println(UI.timeStamp()
 //
-//               + "  Start:" + String.format("%7.4f", _relativePosition_StartFrame)
-//               + "  End:" + String.format("%7.4f", newRelativePosition)
+//                  + " SET NORM " + String.format("%4.1f", newRelativePosition)
+//                  + "  n." + _trackState_NormalTrack
+//                  + "  r." + _trackState_ReturnTrack
 //
-//         );
+//            );
 // TODO remove SYSTEM.OUT.PRINTLN
+
+            setRelativePosition_0(newRelativePosition);
+
+         } else {
+
+//            System.out.println(UI.timeStamp()
+//
+//                  + " SET SCHED " + String.format("%4.1f", newRelativePosition)
+//                  + "  n." + _trackState_NormalTrack
+//                  + "  r." + _trackState_ReturnTrack
+//
+//            );
+// TODO remove SYSTEM.OUT.PRINTLN
+
+            setRelativePosition_ScheduleNewPosition(newRelativePosition);
+         }
       }
    }
+
+   private static void setRelativePosition_0(final double newRelativePosition) {
+
+      _animationDuration = setRelativePosition_GetAnimationTime(newRelativePosition);
+
+      _animationEndTime = MapRenderer.frametime + _animationDuration;
+
+      // set new start position from the current position
+      _relativePosition_StartFrame = _relativePosition_CurrentFrame;
+
+      _relativePosition_EndFrame = newRelativePosition;
+
+      // this will also force to compute the frame even when player is paused
+      _isAnimateFromRelativePosition = true;
+   }
+
+   /**
+    * @param newRelativePosition
+    * @return Returns the animation time for the next position
+    */
+   private static int setRelativePosition_GetAnimationTime(final double newRelativePosition) {
+
+      final int defaultAnimationTime = 1000;
+
+      // move number of pixels in one second
+      final int pixelPerSecond = 200;
+
+      if (newRelativePosition >= 0 && newRelativePosition <= 1) {
+
+         // 0...1 -> model is moving on the NORMAL TRACK
+
+         // return default animation time
+         return defaultAnimationTime;
+      }
+
+      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
+      if (mapPlayerData == null) {
+         return defaultAnimationTime;
+      }
+
+      final double pixelDistance = mapPlayerData.trackEnd2StartPixelDistance;
+
+      final double animationTime = defaultAnimationTime * (pixelDistance / pixelPerSecond);
+
+//      System.out.println(UI.timeStamp() + " animationTime: " + animationTime);
+//// TODO remove SYSTEM.OUT.PRINTLN
+
+      return (int) clamp(animationTime, 1, defaultAnimationTime);
+   }
+
+   private static void setRelativePosition_ScheduleNewPosition(final double newRelativePosition) {
+
+      final long currentFrameTime = MapRenderer.frametime;
+
+      // set scheduled time which is after the last animation
+      final long remainingAnimationTime = _animationEndTime - currentFrameTime;
+      final long nextScheduledTime = remainingAnimationTime > 0
+
+            // start schedule at the end of the current animation
+            ? remainingAnimationTime
+
+            : 0;
+
+      final boolean isSetNormalTrack = newRelativePosition >= 0 && newRelativePosition <= 1;
+      final boolean isSetReturnTrack = isSetNormalTrack == false;
+
+      if (isSetReturnTrack) {
+
+         // set RETURN TRACK
+
+         _nextPosition_OnReturnTrack = newRelativePosition;
+
+         _trackState_ReturnTrack = TrackState.SCHEDULED;
+
+         // a RETURN TRACK overwrites the NORMAL TRACK
+         _trackState_NormalTrack = TrackState.IDLE;
+
+      } else {
+
+         // set NORMAL TRACK
+
+         _nextPosition_OnNormalTrack = newRelativePosition;
+
+         _trackState_NormalTrack = TrackState.SCHEDULED;
+      }
+
+      if (nextScheduledTime == 0) {
+
+         // run task now
+
+         setRelativePosition_ScheduleNewPosition_Task();
+
+      } else {
+
+         // schedule task
+
+         _scheduleCounter[0]++;
+
+         final Display display = Display.getDefault();
+
+         // timerExec MUST be run from the display thread, otherwise org.eclipse.swt.SWTException: Invalid thread access
+         display.syncExec(() -> {
+
+            display.timerExec((int) nextScheduledTime, new Runnable() {
+
+               final int __runnableCounter = _scheduleCounter[0];
+
+               @Override
+               public void run() {
+
+                  // skip all events which has not yet been executed
+                  if (__runnableCounter != _scheduleCounter[0]) {
+
+                     // a newer event occurred
+
+                     return;
+                  }
+
+                  setRelativePosition_ScheduleNewPosition_Task();
+               }
+            });
+         });
+      }
+   }
+
+   private static void setRelativePosition_ScheduleNewPosition_Task() {
+
+      if (_trackState_ReturnTrack == TrackState.SCHEDULED) {
+
+         _trackState_ReturnTrack = TrackState.MOVING;
+
+         setRelativePosition_0(_nextPosition_OnReturnTrack);
+
+      } else if (_trackState_NormalTrack == TrackState.SCHEDULED) {
+
+         _trackState_NormalTrack = TrackState.MOVING;
+
+         setRelativePosition_0(_nextPosition_OnNormalTrack);
+      }
+   }
+
 }

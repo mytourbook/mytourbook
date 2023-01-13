@@ -110,8 +110,6 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       // limit coords
       private static final int  MAX_VISIBLE_PIXEL               = 2048;
 
-      private static final int  NUM_RETURN_TRACK_POSITIONS      = 30;
-
       /**
        * Contains all available geo locations for all selected tours in lat/lon E6 format.
        */
@@ -155,6 +153,11 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
       private int[]             __allGeoPointColors;
       private IntArrayList      __allTourStarts;
+
+      /**
+       * Distance in pixel between the end and start point of the track for the current map scale
+       */
+      private double            __trackEnd2StartPixelDistance;
 
       /**
        * Is clipping line positions between
@@ -522,37 +525,38 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                   allDirectionArrow_LocationIndex.toArray());
          }
 
-         doWork_CreateReturnTrack(mapScale);
+         doWork_CreateReturnTrack(compileMapPos, mapScale, compileMaxMapPixel);
 
          workerBucket.allProjectedPoints = __allProjectedPoints;
          workerBucket.allProjectedPoints_ReturnTrack = __allProjectedPoints_ReturnTrack;
          workerBucket.allNotClipped_GeoLocationIndices = allNotClipped_LocationIndices.toArray();
+         workerBucket.trackEnd2StartPixelDistance = __trackEnd2StartPixelDistance;
 
       } // doWork_CompileTrack end
 
       /**
        * Create RETURN TRACK from end...start or start...end, it is using the shortest distance
        *
+       * @param compileMapPos
        * @param mapScale
+       * @param compileMaxMapPixel
        */
-      private void doWork_CreateReturnTrack(final double mapScale) {
+      private void doWork_CreateReturnTrack(final MapPosition compileMapPos,
+                                            final double mapScale,
+                                            final double compileMaxMapPixel) {
 
          final GeoPoint geoPointStart = _anyGeoPoints[0];
          final GeoPoint geoPointEnd = _anyGeoPoints[__numAllGeoPoints - 1];
 
-// optimize return track by reducing/increasing number of geo positions
-         // distance in meters between start and end
-         final double sphericalDistance = geoPointStart.sphericalDistance(geoPointEnd);
-
          /**
           * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           * <p>
-          * The model is partly jumping when number of return track points are about smaller than
-          * 30, maybe caused by the FPS
+          * The model is partly jumping when the number of return track points are about smaller
+          * than 30, maybe caused by the FPS
           * <p>
           * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           */
-         final int numReturnTrackPositions = 30;//NUM_RETURN_TRACK_POSITIONS;
+         final int numReturnTrackPositions = 30;
 
          final Point projectedStart = MercatorProjection.project(geoPointStart, null);
          final Point projectedEnd = MercatorProjection.project(geoPointEnd, null);
@@ -575,6 +579,21 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             __allProjectedPoints_ReturnTrack[pointIndex] = projectedEnd.x - diffX;
             __allProjectedPoints_ReturnTrack[pointIndex + 1] = projectedEnd.y - diffY;
          }
+
+         /*
+          * Compute distance in pixel between the end and start point
+          */
+         final float startPixelX = (float) ((projectedStart.x - compileMapPos.x) * compileMaxMapPixel);
+         final float startPixelY = (float) ((projectedStart.y - compileMapPos.y) * compileMaxMapPixel);
+         final float endPixelX = (float) ((projectedEnd.x - compileMapPos.x) * compileMaxMapPixel);
+         final float endPixelY = (float) ((projectedEnd.y - compileMapPos.y) * compileMaxMapPixel);
+
+         final float diffX = endPixelX - startPixelX;
+         final float diffY = endPixelY - startPixelY;
+
+         final double pixelDistance = Math.sqrt(diffX * diffX + diffY * diffY);
+
+         __trackEnd2StartPixelDistance = pixelDistance;
       }
 
       private int getNextTourStartIndex(final int tourIndex) {

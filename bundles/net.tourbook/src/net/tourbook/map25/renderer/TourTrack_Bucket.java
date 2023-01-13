@@ -122,6 +122,11 @@ public class TourTrack_Bucket {
 
    double[]                   allProjectedPoints_ReturnTrack;
 
+   /**
+    * Distance in pixel between the end and start point of the track for the current map scale
+    */
+   double                     trackEnd2StartPixelDistance;
+
    public TourTrack_Bucket() {
 
       trackVertexData = new TourTrack_VertexData();

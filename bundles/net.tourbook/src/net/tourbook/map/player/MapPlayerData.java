@@ -54,6 +54,11 @@ public class MapPlayerData {
    public int[]                allNotClipped_GeoLocationIndices;
 
    /**
+    * Distance in pixel between the end and start point of the track for the current map scale
+    */
+   public double               trackEnd2StartPixelDistance;
+
+   /**
     * Map scale when binding buffer data
     */
    public double               mapScale;

@@ -62,21 +62,23 @@ public class Map25LocationManager {
 
       _isAnimateLocation = true;
 
-      _animationEasingType = Easing.Type.SINE_OUT;
-      _animationEasingType = Easing.Type.LINEAR;
-      _animationEasingType = Easing.Type.SINE_IN;
 
       _animationEasingType = Easing.Type.QUART_INOUT;
       _animationEasingType = Easing.Type.QUINT_INOUT;
-      _animationEasingType = Easing.Type.SINE_INOUT;
       _animationEasingType = Easing.Type.QUAD_INOUT;
+      _animationEasingType = Easing.Type.SINE_INOUT;
+      _animationEasingType = Easing.Type.SINE_IN;
+      _animationEasingType = Easing.Type.SINE_OUT;
+      _animationEasingType = Easing.Type.LINEAR;
 
       map.post(() -> setMapLocation_InMapThread(map, mapPosition));
    }
 
    private static void setMapLocation_InMapThread(final Map map, final MapPosition mapPosition) {
 
-      final boolean isRunAnimation = _isAnimateLocation && MapPlayerManager.animationDuration > 0;
+      final long animationDuration = MapPlayerManager.getAnimationDuration();
+
+      final boolean isRunAnimation = _isAnimateLocation && animationDuration > 0;
 
       if (isRunAnimation == false) {
 
@@ -95,7 +97,7 @@ public class Map25LocationManager {
 
       final long timeDiffLastRun = System.currentTimeMillis() - _lastAnimationTime;
 
-      if (timeDiffLastRun > MapPlayerManager.animationDuration / 2) {
+      if (timeDiffLastRun > animationDuration / 2) {
 
          // next drawing is overdue
 
@@ -136,7 +138,7 @@ public class Map25LocationManager {
 
          // schedule animation
 //         final long nextScheduleMS = MapPlayerManager.animationDuration - timeDiffLastRun;
-         final long nextScheduleMS = MapPlayerManager.animationDuration / 2;
+         final long nextScheduleMS = animationDuration / 2;
 
 //         System.out.println((UI.timeStamp() + " nextScheduleMS: " + nextScheduleMS));
          // TODO remove SYSTEM.OUT.PRINTLN
@@ -152,7 +154,7 @@ public class Map25LocationManager {
 //       TODO remove SYSTEM.OUT.PRINTLN
 
       map.animator().animateTo(
-            MapPlayerManager.animationDuration,
+            MapPlayerManager.getAnimationDuration(),
             mapPosition,
             _animationEasingType);
 
