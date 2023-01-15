@@ -48,8 +48,8 @@ public class MapPlayerData {
    public double[]             allProjectedPoints_ReturnTrack;
 
    /**
-    * Contains indices into all geo positions for all selected tours which can be also outside of
-    * the clipper (visible) area -2048...2048
+    * Contains indices into all geo positions for all selected tours but are optimized for a minimum
+    * distance, so they can be also outside of the clipper (visible) area -2048...2048
     */
    public int[]                allNotClipped_GeoLocationIndices;
 

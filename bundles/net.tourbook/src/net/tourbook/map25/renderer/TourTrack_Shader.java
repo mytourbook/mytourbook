@@ -451,6 +451,8 @@ public final class TourTrack_Shader {
          // get animated position
          final int nextFrameIndex = MapPlayerManager.getNextVisibleFrameIndex();
          final int numAllVisibleFrames = MapPlayerManager.getNumberOfVisibleFrames();
+
+// "relativeVisibleVertices" is used for relive playing -> needs to be improved when not all points are visible
          final float relativeVisibleVertices = (float) nextFrameIndex / numAllVisibleFrames;
 
          paint_10_Track(trackBucket, viewport, viewport2mapscale, relativeVisibleVertices);

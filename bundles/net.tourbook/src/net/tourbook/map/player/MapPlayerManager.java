@@ -69,6 +69,13 @@ public class MapPlayerManager {
    private static float                 _animationForwardAngle;
    private static double                _lastRemainingDuration;
 
+   /**
+    * Projected position 0...1 of the model in the current frame, it also includes the micro
+    * movements according to the exact relative position
+    * <p>
+    * {@link #_projectedPosition}[0] = x<br>
+    * {@link #_projectedPosition}[1] = y<br>
+    */
    private static double[]              _projectedPosition       = new double[2];
    private static long                  _projectedPosition_Time;
 
@@ -227,7 +234,8 @@ public class MapPlayerManager {
 
          // 1. Prio: Use relative position
 
-         _currentNotClippedLocationIndex = (int) Math.round(numNotClipped_GeoLocationIndices * _relativePosition_CurrentFrame);
+         final double rawIndex = numNotClipped_GeoLocationIndices * _relativePosition_CurrentFrame;
+         _currentNotClippedLocationIndex = (int) Math.round(rawIndex);
 
          isComputeNextVisibleIndex = true;
 
@@ -257,7 +265,7 @@ public class MapPlayerManager {
       if (isComputeNextVisibleIndex) {
 
          /*
-          * Compute visible index from not clipped index
+          * Get visible index from not clipped index
           */
 
          // ensure bounds
@@ -292,7 +300,7 @@ public class MapPlayerManager {
    }
 
    /**
-    * @return Returns the projected position of the animated model for the current frame
+    * @return Returns the {@link #_projectedPosition} of the animated model for the current frame
     */
    public static double[] getProjectedPosition() {
 
@@ -325,6 +333,7 @@ public class MapPlayerManager {
 
       double[] allProjectedPoints;
       int numProjectedPoints;
+
       int geoLocationIndex_0 = 0;
       int geoLocationIndex_1 = 0;
       int positionIndex_0;
@@ -866,7 +875,7 @@ public class MapPlayerManager {
     */
    public static void setRelativePosition(final double newRelativePosition, final double movingDiff) {
 
-      // ignore the same position otherwise it would slow down the movement when not looping
+      // ignore the same position
       if (newRelativePosition == _relativePosition_EndFrame) {
          return;
       }

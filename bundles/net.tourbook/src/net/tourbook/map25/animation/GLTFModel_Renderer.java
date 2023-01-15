@@ -407,11 +407,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
       final float dX = (float) ((projectedPositionXY[0] - _currentMapPosition.x) * tileScale);
       final float dY = (float) ((projectedPositionXY[1] - _currentMapPosition.y) * tileScale);
 
-//      if ((dX > TourTrack_LayerRenderer.MAX_VISIBLE_PIXEL || dX < TourTrack_LayerRenderer.MAX_VISIBLE_PIXEL)
-//            && (dY > TourTrack_LayerRenderer.MAX_VISIBLE_PIXEL || dY < TourTrack_LayerRenderer.MAX_VISIBLE_PIXEL)) {
-//// this is not working
-////         return;
-//      }
+//TODO dX/dY could be optimized for invisible positions
 
 //      if (dX != _prevDx || dY != _prevDy || relativePosition != _prevRelativePosition) {
 //
@@ -436,6 +432,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
 //         }
 ////TODO remove SYSTEM.OUT.PRINTLN
 //      }
+
       /*
        * Compute model scale
        */
