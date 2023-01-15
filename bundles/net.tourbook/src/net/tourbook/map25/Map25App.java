@@ -699,7 +699,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
             // map position is moved
 
-
             /*
              * Prevent to "refire" the last sync map position. This is the cheapest solution
              * otherwise fireSyncMapEvent had to be called on each map position change methods
@@ -762,7 +761,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
          // offline map
 
-         setMapProvider_02_Offline(_selectedMapProvider);
+         try {
+
+            setMapProvider_02_Offline(_selectedMapProvider);
+
+         } catch (final Exception e) {
+
+            setMapProvider_01_Online(Map25ProviderManager.getDefaultMapProvider());
+         }
       }
 
       createLayers_SetupLayers();
@@ -1666,8 +1672,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
          // offline map
 
-         setMapProvider_02_Offline(mapProvider);
+         try {
 
+            setMapProvider_02_Offline(_selectedMapProvider);
+
+         } catch (final Exception e) {
+
+            setMapProvider_01_Online(Map25ProviderManager.getDefaultMapProvider());
+         }
       } else {
 
          // online map
@@ -1730,8 +1742,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
     * Setup offline map for mapsforge
     *
     * @param mapProvider
+    * @throws Exception
     */
-   private void setMapProvider_02_Offline(final Map25Provider mapProvider) {
+   private void setMapProvider_02_Offline(final Map25Provider mapProvider) throws Exception {
 
       // check if off/online has changed
       final boolean isUpdateAll = isUpdateAll(OffOnline.IS_OFFLINE);
@@ -1769,14 +1782,14 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
          } else {
             final String errorText = "[2.5D Map] Cannot read map file: " + offlineMapFilePath; //$NON-NLS-1$
             StatusUtil.showStatus(errorText);
-            throw new IllegalArgumentException(errorText);
+            throw new Exception(errorText);
          }
 
          tileSource = getAllOfflineMapFiles(offlineMapFilePath);
          if (_numOfflineMapFiles == 0) {
             final String errorText = "[2.5D Map] Cannot read multiple map files from: " + offlineMapFilePath; //$NON-NLS-1$
             StatusUtil.showStatus(errorText);
-            throw new IllegalArgumentException(errorText);
+            throw new Exception(errorText);
          }
 
          _currentOffline_TileSource = tileSource;
