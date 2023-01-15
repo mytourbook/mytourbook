@@ -20,6 +20,7 @@ import static org.oscim.utils.FastMath.clamp;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
+import net.tourbook.map25.Map25FPSManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
@@ -34,7 +35,7 @@ public class MapPlayerManager {
     * Max value for the scale control which cannot have negative values but the speed can be
     * negative.
     */
-   static final int                     SPEED_JOG_WHEEL_MAX      = 50;
+   static final int                     SPEED_JOG_WHEEL_MAX      = 200;
    static final int                     SPEED_JOG_WHEEL_MAX_HALF = SPEED_JOG_WHEEL_MAX / 2;
 
    private static final int             DEFAULT_MOVING_SPEED     = 10;
@@ -61,8 +62,19 @@ public class MapPlayerManager {
     */
    private static int                   _numAllVisibleFrames;
 
-   private static long                  _animationDuration       = 1000;
+   /**
+    * Default animation time in milliseconds
+    */
+   private static int                   _defaultAnimationTime    = 1000;
 
+   /**
+    * Model speed when moving on the RETURN TRACK
+    */
+   private static int                   _returnTrackSpeed_PixelPerSecond;
+
+   /**
+    * Is between - {@value #SPEED_JOG_WHEEL_MAX_HALF} ... + {@value #SPEED_JOG_WHEEL_MAX_HALF}
+    */
    private static int                   _movingSpeed             = DEFAULT_MOVING_SPEED;
 
    private static long                  _animationEndTime;
@@ -128,7 +140,7 @@ public class MapPlayerManager {
    }
 
    public static long getAnimationDuration() {
-      return _animationDuration;
+      return _defaultAnimationTime;
    }
 
    /**
@@ -475,10 +487,13 @@ public class MapPlayerManager {
     */
    private static double getRelativePosition() {
 
-      final long currentFrameTime = MapRenderer.frametime;
-
       synchronized (RELATIVE_POSITION) {
 
+         if (_isPlayerRunning) {
+            return getRelativePosition_Autoplay();
+         }
+
+         final long currentFrameTime = MapRenderer.frametime;
          final float remainingDuration = _animationEndTime - currentFrameTime;
 
          // check if animation has finished
@@ -561,7 +576,7 @@ public class MapPlayerManager {
 
          // advance to the next animated frame
 
-         final float relativeRemaining = remainingDuration / _animationDuration; // 0...1
+         final float relativeRemaining = remainingDuration / _defaultAnimationTime; // 0...1
          final float relativeAdvance = clamp(1.0f - relativeRemaining, 0, 1);
 
          if (_relativePosition_EndFrame < 0) {
@@ -657,16 +672,64 @@ public class MapPlayerManager {
          _isAnimateFromRelativePosition = true;
 
          _lastRemainingDuration = remainingDuration;
-
-//         System.out.println(UI.timeStamp()
-//               + " getPosition   "
-//               + "  Current:" + String.format("%7.4f", _relativePosition_CurrentFrame)
-//               + "  End:" + String.format("%7.4f", _relativePosition_EndFrame)
-////               + "  remaining:" + remainingDuration
-//         );
-// TODO remove SYSTEM.OUT.PRINTLN
-
       }
+
+      return _relativePosition_CurrentFrame;
+   }
+
+   /**
+    * Compute relative position for the play head when in autoplay mode.
+    * <p>
+    * The relative position is for this moving loop, start and end must not be at the same position:
+    *
+    * <pre>
+    *
+    *             >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    *           /\                                        \/
+    *          /\                                          \/
+    *          /\                                          \/
+    *          /\          0       NORMAL >>     1         \/
+    *           /\                                        \/
+    *             <<<<<< START  << RETURN >>    END <<<<<<
+    *
+    *                      2    << RETURN        1
+    *                      0       RETURN >>    -1
+    * </pre>
+    * <p>
+    *
+    * @return Returns the relative position {@link #_relativePosition_CurrentFrame} which depends on
+    *         the remaining animation time, it is between <br>
+    *         0 ... 1 start...end for the normal model movement<br>
+    *         1 ... 2 return track end...start<br>
+    *         0 ...-1 return track start...end
+    */
+   private static double getRelativePosition_Autoplay() {
+
+      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
+      if (mapPlayerData == null) {
+         return 0;
+      }
+
+      final double positionDiff = (double) _movingSpeed / SPEED_JOG_WHEEL_MAX_HALF;
+
+      final long foregroundFPS = Map25FPSManager.getForegroundFPS();
+
+      final double end2StartPixelDistance = mapPlayerData.trackEnd2StartPixelDistance;
+
+      final double animationTime = _defaultAnimationTime * (end2StartPixelDistance / _returnTrackSpeed_PixelPerSecond);
+
+      _relativePosition_CurrentFrame += positionDiff / 100;
+
+      if (_relativePosition_CurrentFrame < -1) {
+
+         _relativePosition_CurrentFrame = 1;
+
+      } else if (_relativePosition_CurrentFrame > 2) {
+
+         _relativePosition_CurrentFrame = 0;
+      }
+
+      _relativePosition_CurrentFrame = clamp(_relativePosition_CurrentFrame, -1, 2);
 
       return _relativePosition_CurrentFrame;
    }
@@ -740,11 +803,10 @@ public class MapPlayerManager {
 
 // SET_FORMATTING_OFF
 
-      _foregroundFPS    = Util.getStateInt(_state, STATE_FOREGROUND_FPS, 10);
-      _isPlayingLoop    = Util.getStateBoolean(_state, STATE_IS_PLAYING_LOOP, false);
-      _isReLivePlaying  = Util.getStateBoolean(_state, STATE_IS_RELIVE_PLAYING, false);
-
-      _movingSpeed      = Util.getStateInt(_state, STATE_DIRECTION_SPEED, DEFAULT_MOVING_SPEED);
+      _foregroundFPS    = Util.getStateInt(     _state, STATE_FOREGROUND_FPS,    10);
+      _isPlayingLoop    = Util.getStateBoolean( _state, STATE_IS_PLAYING_LOOP,   false);
+      _isReLivePlaying  = Util.getStateBoolean( _state, STATE_IS_RELIVE_PLAYING, false);
+      _movingSpeed      = Util.getStateInt(     _state, STATE_DIRECTION_SPEED,   DEFAULT_MOVING_SPEED);
 
 // SET_FORMATTING_ON
    }
@@ -870,10 +932,8 @@ public class MapPlayerManager {
     *           0 ... 1 start...end for the normal model movement<br>
     *           1 ... 2 return track end...start<br>
     *           0 ...-1 return track start...end
-    * @param movingDiff
-    *           This value is positive when moving forward
     */
-   public static void setRelativePosition(final double newRelativePosition, final double movingDiff) {
+   public static void setRelativePosition(final double newRelativePosition) {
 
       // ignore the same position
       if (newRelativePosition == _relativePosition_EndFrame) {
@@ -930,9 +990,9 @@ public class MapPlayerManager {
 
    private static void setRelativePosition_0(final double newRelativePosition) {
 
-      _animationDuration = setRelativePosition_GetAnimationTime(newRelativePosition);
+      final int animationTime = setRelativePosition_GetAnimationTime(newRelativePosition);
 
-      _animationEndTime = MapRenderer.frametime + _animationDuration;
+      _animationEndTime = MapRenderer.frametime + animationTime;
 
       // set new start position from the current position
       _relativePosition_StartFrame = _relativePosition_CurrentFrame;
@@ -949,32 +1009,37 @@ public class MapPlayerManager {
     */
    private static int setRelativePosition_GetAnimationTime(final double newRelativePosition) {
 
-      final int defaultAnimationTime = 1000;
+      _defaultAnimationTime = 1000;
 
       // move number of pixels in one second
-      final int pixelPerSecond = 200;
+      _returnTrackSpeed_PixelPerSecond = 200;
 
       if (newRelativePosition >= 0 && newRelativePosition <= 1) {
 
          // 0...1 -> model is moving on the NORMAL TRACK
 
          // return default animation time
-         return defaultAnimationTime;
+         return _defaultAnimationTime;
       }
 
       final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
       if (mapPlayerData == null) {
-         return defaultAnimationTime;
+         return _defaultAnimationTime;
       }
 
       final double pixelDistance = mapPlayerData.trackEnd2StartPixelDistance;
 
-      final double animationTime = defaultAnimationTime * (pixelDistance / pixelPerSecond);
+      final double animationTime = _defaultAnimationTime * (pixelDistance / _returnTrackSpeed_PixelPerSecond);
 
-//      System.out.println(UI.timeStamp() + " animationTime: " + animationTime);
-//// TODO remove SYSTEM.OUT.PRINTLN
+//      System.out.println(UI.timeStamp()
+//
+//            + " pixelDistance: " + pixelDistance
+//            + " animationTime: " + animationTime
+//
+//      );
+// TODO remove SYSTEM.OUT.PRINTLN
 
-      return (int) clamp(animationTime, 1, defaultAnimationTime);
+      return (int) clamp(animationTime, 1, _defaultAnimationTime);
    }
 
    private static void setRelativePosition_ScheduleNewPosition(final double newRelativePosition) {

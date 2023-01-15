@@ -62,7 +62,6 @@ public class Map25LocationManager {
 
       _isAnimateLocation = true;
 
-
       _animationEasingType = Easing.Type.QUART_INOUT;
       _animationEasingType = Easing.Type.QUINT_INOUT;
       _animationEasingType = Easing.Type.QUAD_INOUT;
@@ -101,9 +100,6 @@ public class Map25LocationManager {
 
          // next drawing is overdue
 
-//         System.out.println((UI.timeStamp() + " overdue"));
-//          TODO remove SYSTEM.OUT.PRINTLN
-
          setMapLocation_StartAnimation(map, mapPosition, 0);
 
       } else {
@@ -122,26 +118,17 @@ public class Map25LocationManager {
                // check if a newer runnable is available
                if (__asynchRunnableCounter != _asyncCounter.get()) {
 
-//                  System.out.println((UI.timeStamp() + " skip schedule: " + __asynchRunnableCounter));
-                  // TODO remove SYSTEM.OUT.PRINTLN
-
                   // a newer event is available
                   return;
                }
-
-//               System.out.println((UI.timeStamp() + " scheduled:        " + __asynchRunnableCounter));
-               // TODO remove SYSTEM.OUT.PRINTLN
 
                map.post(() -> setMapLocation_StartAnimation(map, mapPosition, __asynchRunnableCounter));
             }
          };
 
          // schedule animation
-//         final long nextScheduleMS = MapPlayerManager.animationDuration - timeDiffLastRun;
+//       final long nextScheduleMS = MapPlayerManager.animationDuration - timeDiffLastRun;
          final long nextScheduleMS = animationDuration / 2;
-
-//         System.out.println((UI.timeStamp() + " nextScheduleMS: " + nextScheduleMS));
-         // TODO remove SYSTEM.OUT.PRINTLN
 
          map.postDelayed(runnable, nextScheduleMS);
       }
@@ -149,9 +136,6 @@ public class Map25LocationManager {
    }
 
    private static void setMapLocation_StartAnimation(final Map map, final MapPosition mapPosition, final int runnableCounter) {
-
-//      System.out.println((UI.timeStamp() + " Start animation: " + runnableCounter));
-//       TODO remove SYSTEM.OUT.PRINTLN
 
       map.animator().animateTo(
             MapPlayerManager.getAnimationDuration(),

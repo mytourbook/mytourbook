@@ -296,7 +296,7 @@ public class MapPlayerView extends ViewPart {
             _scaleSpeedJogWheel = new Scale(container, SWT.HORIZONTAL);
             _scaleSpeedJogWheel.setMinimum(0);
             _scaleSpeedJogWheel.setMaximum(MapPlayerManager.SPEED_JOG_WHEEL_MAX);
-            _scaleSpeedJogWheel.setPageIncrement(5);
+            _scaleSpeedJogWheel.setPageIncrement(10);
             _scaleSpeedJogWheel.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSpeedJogWheel_Selection()));
             _scaleSpeedJogWheel.addKeyListener(keyPressedAdapter(keyEvent -> onSpeedJogWheel_Key(keyEvent)));
             _scaleSpeedJogWheel.addMouseWheelListener(mouseEvent -> onSpeedJogWheel_MouseWheel(mouseEvent));
@@ -564,9 +564,17 @@ public class MapPlayerView extends ViewPart {
       final int jogWheelSelection = _scaleSpeedJogWheel.getSelection();
       final int jogWheelSpeed = jogWheelSelection - MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF;
 
-      boolean isKeyEventDoIt = true;
+      boolean isJogWheelSelected = false;
 
-      if (eventKeyCode == SWT.HOME) {
+      if (eventKeyCode == ' ') {
+
+         // select speed 0
+
+         setJogWheel_Value(MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF);
+
+         isJogWheelSelected = true;
+
+      } else if (eventKeyCode == SWT.HOME) {
 
          // move to the left
 
@@ -576,7 +584,7 @@ public class MapPlayerView extends ViewPart {
 
             setJogWheel_Value(MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF);
 
-            isKeyEventDoIt = false;
+            isJogWheelSelected = true;
 
          } else if (jogWheelSpeed < 0 && jogWheelSelection > 0) {
 
@@ -584,7 +592,7 @@ public class MapPlayerView extends ViewPart {
 
             setJogWheel_Value(0);
 
-            isKeyEventDoIt = false;
+            isJogWheelSelected = true;
          }
 
       } else if (eventKeyCode == SWT.END) {
@@ -597,7 +605,7 @@ public class MapPlayerView extends ViewPart {
 
             setJogWheel_Value(MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF);
 
-            isKeyEventDoIt = false;
+            isJogWheelSelected = true;
 
          } else if (jogWheelSpeed > 0 && jogWheelSpeed < MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF) {
 
@@ -605,7 +613,7 @@ public class MapPlayerView extends ViewPart {
 
             setJogWheel_Value(MapPlayerManager.SPEED_JOG_WHEEL_MAX);
 
-            isKeyEventDoIt = false;
+            isJogWheelSelected = true;
          }
 
 //      } else if (eventKeyCode == SWT.ARROW_LEFT
@@ -633,7 +641,14 @@ public class MapPlayerView extends ViewPart {
 //         setJogWheel_Tooltip(_scaleSpeedJogWheel.getSelection());
 //      }
 
-      keyEvent.doit = isKeyEventDoIt;
+      if (isJogWheelSelected) {
+
+         keyEvent.doit = false;
+
+         // fire selection
+         _scaleSpeedJogWheel.getDisplay().asyncExec(this::onSpeedJogWheel_Selection);
+      }
+
    }
 
    private void onSpeedJogWheel_MouseWheel(final MouseEvent mouseEvent) {
@@ -648,6 +663,13 @@ public class MapPlayerView extends ViewPart {
       final int speedSelection = _scaleSpeedJogWheel.getSelection();
 
       setJogWheel_Tooltip(speedSelection);
+
+      // start playing when jog wheel is modified
+      if (MapPlayerManager.isPlayerRunning() == false) {
+
+         MapPlayerManager.setIsPlayerRunning(true);
+         updateUI_PlayAndPausedControls();
+      }
 
       MapPlayerManager.setMovingSpeedFromJogWheel(speedSelection);
    }
@@ -782,7 +804,8 @@ public class MapPlayerView extends ViewPart {
    private void setMapAndModelPosition(final double relativeModelPosition) {
 
       // when moving forward then this value is positive
-      final double movingDiff = relativeModelPosition - _previousRelativePosition;
+//      final double movingDiff = relativeModelPosition - _previousRelativePosition;
+//      final double movingDiffAdjusted = movingDiff > 1 || movingDiff < -1 ? -movingDiff : movingDiff;
 
       _previousRelativePosition = relativeModelPosition;
 
@@ -790,7 +813,7 @@ public class MapPlayerView extends ViewPart {
 
       fireMapPosition();
 
-      MapPlayerManager.setRelativePosition(relativeModelPosition, movingDiff);
+      MapPlayerManager.setRelativePosition(relativeModelPosition);
    }
 
    private void setTimeline_Tooltip() {
@@ -834,7 +857,7 @@ public class MapPlayerView extends ViewPart {
          _scaleTimeline.setSelection(0);
 
          MapPlayerManager.setIsPlayerRunning(true);
-         MapPlayerManager.setRelativePosition(0, 1);
+         MapPlayerManager.setRelativePosition(0);
 
       } else {
 
