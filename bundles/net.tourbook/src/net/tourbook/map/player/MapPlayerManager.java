@@ -20,7 +20,6 @@ import static org.oscim.utils.FastMath.clamp;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
-import net.tourbook.map25.Map25FPSManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
@@ -91,9 +90,30 @@ public class MapPlayerManager {
    private static double[]              _projectedPosition       = new double[2];
    private static long                  _projectedPosition_Time;
 
+   /**
+    * Relative position for the current frame
+    *
+    * <pre>
+    *
+    *             >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    *           /\                                        \/
+    *          /\                                          \/
+    *          /\                                          \/
+    *          /\          0       NORMAL >>     1         \/
+    *           /\                                        \/
+    *             <<<<<< START  << RETURN >>    END <<<<<<
+    *
+    *                      2    << RETURN        1
+    *                      0       RETURN >>    -1
+    * </pre>
+    * <p>
+    * 0 ... 1 start...end for the NORMAL TRACK model movement<br>
+    * 1 ... 2 RETURN TRACK from end...start<br>
+    * 0 ...-1 RETURN TRACK from start...end
+    */
+   private static double                _relativePosition_CurrentFrame;
    private static double                _relativePosition_StartFrame;
    private static double                _relativePosition_EndFrame;
-   private static double                _relativePosition_CurrentFrame;
 
    private static int                   _currentNotClippedLocationIndex;
    private static int                   _currentVisibleIndex;
@@ -102,6 +122,12 @@ public class MapPlayerManager {
    private static boolean               _isAnimationVisible;
    private static boolean               _isPlayerEnabled;
    private static boolean               _isPlayerRunning         = true;
+
+   /**
+    * When <code>true</code> then the model can be moving on the RETURN TRACK when it is between
+    * end...start (1...2) or start...end (0...-1) otherwise the model is only on the NORMAL TRACK
+    * (0...1)
+    */
    private static boolean               _isPlayingLoop;
    private static boolean               _isReLivePlaying;
 
@@ -131,6 +157,8 @@ public class MapPlayerManager {
    private static TrackState            _trackState_ReturnTrack;
    private static TrackState            _prevTrackState_NormalTrack;
    private static TrackState            _prevTrackState_ReturnTrack;
+
+   private static long                  _lastTimelineUpdateTime;
 
    enum TrackState {
 
@@ -480,7 +508,8 @@ public class MapPlayerManager {
     * <p>
     *
     * @return Returns the relative position {@link #_relativePosition_CurrentFrame} which depends on
-    *         the remaining animation time, it is between <br>
+    *         the remaining animation time, it is between
+    *         <p>
     *         0 ... 1 start...end for the normal model movement<br>
     *         1 ... 2 return track end...start<br>
     *         0 ...-1 return track start...end
@@ -697,41 +726,103 @@ public class MapPlayerManager {
     * </pre>
     * <p>
     *
-    * @return Returns the relative position {@link #_relativePosition_CurrentFrame} which depends on
-    *         the remaining animation time, it is between <br>
+    * @return Returns the relative position {@link #_relativePosition_CurrentFrame}, it is between
+    *         <p>
     *         0 ... 1 start...end for the normal model movement<br>
     *         1 ... 2 return track end...start<br>
     *         0 ...-1 return track start...end
     */
    private static double getRelativePosition_Autoplay() {
 
-      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
-      if (mapPlayerData == null) {
-         return 0;
+      double nextPosition;
+
+      if (_relativePosition_CurrentFrame >= 0 && _relativePosition_CurrentFrame <= 1) {
+
+         // model is moving on the NORMAL TRACK
+
+         // get next position on the NORMAL TRACK
+         final double positionDiff = (double) _movingSpeed / SPEED_JOG_WHEEL_MAX_HALF;
+
+         final double positionDiff_Adjusted = positionDiff / 100;
+
+         nextPosition = _relativePosition_CurrentFrame + positionDiff_Adjusted;
+
+      } else {
+
+         // model is moving on the RETURN TRACK
+
+//         final long foregroundFPS = Map25FPSManager.getForegroundFPS();
+//         final float frameDurationMS = 1000f / foregroundFPS;
+//         final double end2StartPixelDistance = mapPlayerData.trackEnd2StartPixelDistance;
+//         final double end2Start_AnimationTime = _defaultAnimationTime * (end2StartPixelDistance / _returnTrackSpeed_PixelPerSecond);
+//
+
+         final double returnSpeed = 0.05;
+
+         final double positionDiff = _movingSpeed > 0
+               ? returnSpeed
+               : -returnSpeed;
+
+         nextPosition = _relativePosition_CurrentFrame + positionDiff;
       }
 
-      final double positionDiff = (double) _movingSpeed / SPEED_JOG_WHEEL_MAX_HALF;
+      _relativePosition_CurrentFrame = getRelativePosition_CheckStartEnd(nextPosition);
 
-      final long foregroundFPS = Map25FPSManager.getForegroundFPS();
+      // !!! must also update the relative end position otherwise the model would jump when timeline is selected !!!
+      _relativePosition_EndFrame = _relativePosition_CurrentFrame;
 
-      final double end2StartPixelDistance = mapPlayerData.trackEnd2StartPixelDistance;
+      /*
+       * Show moved model position in the player time line
+       */
+      if (isPlayerAvailable()) {
 
-      final double animationTime = _defaultAnimationTime * (end2StartPixelDistance / _returnTrackSpeed_PixelPerSecond);
+         final long frametime = MapRenderer.frametime;
+         final long updateTimeDiff = frametime - _lastTimelineUpdateTime;
 
-      _relativePosition_CurrentFrame += positionDiff / 100;
+         // reduce time line updates, 100ms == 10 / second
+         if (updateTimeDiff > 100) {
 
-      if (_relativePosition_CurrentFrame < -1) {
+            _lastTimelineUpdateTime = frametime;
 
-         _relativePosition_CurrentFrame = 1;
-
-      } else if (_relativePosition_CurrentFrame > 2) {
-
-         _relativePosition_CurrentFrame = 0;
+            _mapPlayerView.updatePlayer_Timeline(_relativePosition_CurrentFrame);
+         }
       }
-
-      _relativePosition_CurrentFrame = clamp(_relativePosition_CurrentFrame, -1, 2);
 
       return _relativePosition_CurrentFrame;
+   }
+
+   private static double getRelativePosition_CheckStartEnd(final double nextPosition) {
+
+      if (_isPlayingLoop) {
+
+         if (nextPosition < -1) {
+
+            // was on 0...-1 but is now back on the NORMAL TRACK -> 0...1
+
+            return 1;
+
+         } else if (nextPosition > 2) {
+
+            // was on 1...2 but is now back on the NORMAL TRACK -> 0...1
+
+            return 0;
+         }
+
+      } else {
+
+         // model is not looping
+
+         if (nextPosition < 0) {
+
+            return 0;
+
+         } else if (nextPosition > 1) {
+
+            return 1;
+         }
+      }
+
+      return nextPosition;
    }
 
    /**
@@ -928,7 +1019,8 @@ public class MapPlayerManager {
     * </pre>
     *
     * @param newRelativePosition
-    *           which is between <br>
+    *           which is between
+    *           <p>
     *           0 ... 1 start...end for the normal model movement<br>
     *           1 ... 2 return track end...start<br>
     *           0 ...-1 return track start...end
