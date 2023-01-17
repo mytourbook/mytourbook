@@ -81,6 +81,8 @@ public class MapPlayerView extends ViewPart {
    //
    private IPartListener2     _partListener;
    //
+   private MapPosition        _mapPosition                                        = new MapPosition();
+   //
    private Action             _actionPlayControl_PlayAndPause;
    private Action             _actionPlayControl_Loop;
    //
@@ -201,13 +203,11 @@ public class MapPlayerView extends ViewPart {
       final double projectedPositionX = mapPlayerData.allProjectedPoints_NormalTrack[projectedIndex];
       final double projectedPositionY = mapPlayerData.allProjectedPoints_NormalTrack[projectedIndex + 1];
 
-      final MapPosition mapPosition = new MapPosition();
+      _mapPosition.x = projectedPositionX;
+      _mapPosition.y = projectedPositionY;
+      _mapPosition.setScale(mapPlayerData.mapScale);
 
-      mapPosition.x = projectedPositionX;
-      mapPosition.y = projectedPositionY;
-      mapPosition.setScale(mapPlayerData.mapScale);
-
-      return mapPosition;
+      return _mapPosition;
    }
 
    @Override
@@ -744,6 +744,8 @@ public class MapPlayerView extends ViewPart {
             // playhead is moved with all other selection actions -> prevent default action
 
             keyEvent.doit = false;
+
+            updateUI_TimelineValue(_scaleTimeline.getSelection());
          }
       }
    }

@@ -20,9 +20,12 @@ import static org.oscim.utils.FastMath.clamp;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
+import net.tourbook.map.IMapSyncListener.SyncParameter;
+import net.tourbook.map.MapManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
+import org.oscim.core.MapPosition;
 import org.oscim.renderer.MapRenderer;
 
 /**
@@ -155,10 +158,10 @@ public class MapPlayerManager {
    private static double                _nextPosition_OnReturnTrack;
    private static TrackState            _trackState_NormalTrack;
    private static TrackState            _trackState_ReturnTrack;
-   private static TrackState            _prevTrackState_NormalTrack;
-   private static TrackState            _prevTrackState_ReturnTrack;
 
    private static long                  _lastTimelineUpdateTime;
+
+   private static MapPosition           _mapPosition             = new MapPosition();
 
    enum TrackState {
 
@@ -340,9 +343,11 @@ public class MapPlayerManager {
    }
 
    /**
-    * @return Returns the {@link #_projectedPosition} of the animated model for the current frame
+    * @param _currentMapPosition
+    * @return Returns the {@link #_projectedPosition} of the animated model for the current frame or
+    *         <code>null</code> when data are missing
     */
-   public static double[] getProjectedPosition() {
+   public static double[] getProjectedPosition(final MapPosition currentMapPosition) {
 
       final long currentFrameTime = MapRenderer.frametime;
 
@@ -364,12 +369,31 @@ public class MapPlayerManager {
          return null;
       }
 
-      double relativePosition = getRelativePosition();
+      // set projected position into "_projectedPosition"
+      getProjectedPosition_Compute(mapPlayerData, allNotClipped_GeoLocationIndices, lastGeoLocationIndex);
 
-//      if (relativePosition == _prevRelativePosition) {
-//// This would need a reset option for a new tour
-////         return;
-//      }
+      _projectedPosition_Time = currentFrameTime;
+
+      if (_isPlayerRunning) {
+
+         // set map center to the current model position
+
+         _mapPosition.x = _projectedPosition[0];
+         _mapPosition.y = _projectedPosition[1];
+
+         _mapPosition.scale = currentMapPosition.scale;
+
+         MapManager.fireSyncMapEvent(_mapPosition, null, SyncParameter.SHOW_MAP_POSITION_WITHOUT_ANIMATION);
+      }
+
+      return _projectedPosition;
+   }
+
+   private static void getProjectedPosition_Compute(final MapPlayerData mapPlayerData,
+                                                    final int[] allNotClipped_GeoLocationIndices,
+                                                    final int lastGeoLocationIndex) {
+
+      double relativePosition = getRelativePosition();
 
       double[] allProjectedPoints;
       int numProjectedPoints;
@@ -427,11 +451,6 @@ public class MapPlayerManager {
 
          // relativePosition is >= 0 && <= 1 -> move model on NORMAL TRACK
 
-//         if (relativePosition > 0.95) {
-//            int a = 0;
-//            a++;
-//         }
-
          allProjectedPoints = mapPlayerData.allProjectedPoints_NormalTrack;
          numProjectedPoints = allProjectedPoints.length;
 
@@ -480,10 +499,6 @@ public class MapPlayerManager {
 
       _projectedPosition[0] = projectedPositionX;
       _projectedPosition[1] = projectedPositionY;
-
-      _projectedPosition_Time = currentFrameTime;
-
-      return _projectedPosition;
    }
 
    /**
@@ -563,24 +578,6 @@ public class MapPlayerManager {
                // redraw
                _isAnimateFromRelativePosition = true;
             }
-
-//            if (_trackState_NormalTrack != _prevTrackState_NormalTrack
-//                  || _trackState_ReturnTrack != _prevTrackState_ReturnTrack
-//
-//                  || _trackState_NormalTrack != TrackState.IDLE
-//                  || _trackState_ReturnTrack != TrackState.IDLE) {
-//
-//               System.out.println(UI.timeStamp()
-//                     + " GET"
-//                     + "  n." + _trackState_NormalTrack
-//                     + "  r." + _trackState_ReturnTrack
-//
-//               );
-//// TODO remove SYSTEM.OUT.PRINTLN
-//
-//               _prevTrackState_NormalTrack = _trackState_NormalTrack;
-//               _prevTrackState_ReturnTrack = _trackState_ReturnTrack;
-//            }
 
             /*
              * Update track state
@@ -738,26 +735,29 @@ public class MapPlayerManager {
 
       if (_relativePosition_CurrentFrame >= 0 && _relativePosition_CurrentFrame <= 1) {
 
-         // model is moving on the NORMAL TRACK
+         // model is moving on the NORMAL TRACK, get next position
 
-         // get next position on the NORMAL TRACK
-         final double positionDiff = (double) _movingSpeed / SPEED_JOG_WHEEL_MAX_HALF;
+         final int speedFactor = 2;
 
-         final double positionDiff_Adjusted = positionDiff / 100;
+         final double mapScale = _mapPlayerData.mapScale;
 
-         nextPosition = _relativePosition_CurrentFrame + positionDiff_Adjusted;
+         final double speedValue = (double) _movingSpeed / SPEED_JOG_WHEEL_MAX_HALF;
+
+         final double speedValue_Scaled = speedValue / mapScale * speedFactor;
+
+         nextPosition = _relativePosition_CurrentFrame + speedValue_Scaled;
 
       } else {
 
          // model is moving on the RETURN TRACK
+
+         final double returnSpeed = 0.05;
 
 //         final long foregroundFPS = Map25FPSManager.getForegroundFPS();
 //         final float frameDurationMS = 1000f / foregroundFPS;
 //         final double end2StartPixelDistance = mapPlayerData.trackEnd2StartPixelDistance;
 //         final double end2Start_AnimationTime = _defaultAnimationTime * (end2StartPixelDistance / _returnTrackSpeed_PixelPerSecond);
 //
-
-         final double returnSpeed = 0.05;
 
          final double positionDiff = _movingSpeed > 0
                ? returnSpeed
@@ -774,7 +774,7 @@ public class MapPlayerManager {
       /*
        * Show moved model position in the player time line
        */
-      if (isPlayerAvailable()) {
+      if (isPlayerViewAvailable()) {
 
          final long frametime = MapRenderer.frametime;
          final long updateTimeDiff = frametime - _lastTimelineUpdateTime;
@@ -863,16 +863,16 @@ public class MapPlayerManager {
       return _currentVisibleFrameNumber == _numAllVisibleFrames;
    }
 
-   private static boolean isPlayerAvailable() {
-      return _mapPlayerView != null;
-   }
-
    public static boolean isPlayerEnabled() {
       return _isPlayerEnabled;
    }
 
    public static boolean isPlayerRunning() {
       return _isPlayerRunning;
+   }
+
+   private static boolean isPlayerViewAvailable() {
+      return _mapPlayerView != null;
    }
 
    public static boolean isPlayingLoop() {
@@ -937,7 +937,7 @@ public class MapPlayerManager {
 
       _isAnimationVisible = isAnimationVisible;
 
-      if (isPlayerAvailable()) {
+      if (isPlayerViewAvailable()) {
          _mapPlayerView.updateAnimationVisibility();
       }
    }
@@ -993,7 +993,7 @@ public class MapPlayerManager {
             ? 0
             : mapPlayerData.allVisible_PixelPositions.length / 2;
 
-      if (isPlayerAvailable()) {
+      if (isPlayerViewAvailable()) {
          _mapPlayerView.updatePlayer();
       }
    }

@@ -66,7 +66,11 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
    private Vector3            _tempVector = new Vector3();
 
+   /**
+    * Map position for the current frame
+    */
    private MapPosition        _currentMapPosition;
+
    float[]                    _mapBox     = new float[8];
 
    private Scene              _scene;
@@ -160,7 +164,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
       // wood truck
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/wood-truck/wood-truck.gltf"));
-//      _modelForwardAngle = -90;
+//      _modelForwardAngle = -0;
 //      _modelCenterToForwardFactor = -7;
 
       // wood plane
@@ -386,7 +390,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
     */
    private void render_UpdateModelPosition() {
 
-      final double[] projectedPositionXY = MapPlayerManager.getProjectedPosition();
+      final double[] projectedPositionXY = MapPlayerManager.getProjectedPosition(_currentMapPosition);
 
       if (projectedPositionXY == null) {
          return;
@@ -445,7 +449,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
       if (isFixedSize) {
 
-         final int modelSize = 300;
+         final int modelSize = 400;
 
          // viewport scale 2 map scale: 1...2
          final float vp2mp = (float) (currentMapScale / MapPlayerManager.getCompileMapScale());

@@ -153,7 +153,7 @@ public final class TourTrack_Shader {
             return;
          }
 
-   // SET_FORMATTING_OFF
+// SET_FORMATTING_OFF
 
             a_pos               = getAttrib("a_pos"); //$NON-NLS-1$
             aVertexColor        = getAttrib("aVertexColor"); //$NON-NLS-1$
@@ -171,7 +171,7 @@ public final class TourTrack_Shader {
             uOutlineBrightness  = getUniform("uOutlineBrightness"); //$NON-NLS-1$
             uVertexColorAlpha   = getUniform("uVertexColorAlpha"); //$NON-NLS-1$
 
-   // SET_FORMATTING_ON
+// SET_FORMATTING_ON
       }
    }
 
@@ -193,16 +193,16 @@ public final class TourTrack_Shader {
             return;
          }
 
-         // SET_FORMATTING_OFF
+// SET_FORMATTING_OFF
 
          attrib_Pos                 = getAttrib ("attrib_Pos");                  //$NON-NLS-1$
 
-         uni_ModelCursorPos         = getUniform("uni_ModelCursorPos");            //$NON-NLS-1$
+         uni_ModelCursorPos         = getUniform("uni_ModelCursorPos");          //$NON-NLS-1$
          uni_AnimationMVP           = getUniform("uni_AnimationMVP");            //$NON-NLS-1$
          uni_MVP                    = getUniform("uni_MVP");                     //$NON-NLS-1$
          uni_VpScale2CompileScale   = getUniform("uni_VpScale2CompileScale");    //$NON-NLS-1$
 
-         // SET_FORMATTING_ON
+// SET_FORMATTING_ON
       }
    }
 
@@ -837,11 +837,12 @@ public final class TourTrack_Shader {
 
       float dX = pos2X;
       float dY = pos2Y;
-      final double[] projectedPositionXY = MapPlayerManager.getProjectedPosition();
+
+      final MapPosition currentMapPosition = viewport.pos;
+
+      final double[] projectedPositionXY = MapPlayerManager.getProjectedPosition(currentMapPosition);
 
       if (projectedPositionXY != null) {
-
-         final MapPosition currentMapPosition = viewport.pos;
 
          final double currentMapPosX = currentMapPosition.x;
          final double currentMapPosY = currentMapPosition.y;
@@ -869,24 +870,6 @@ public final class TourTrack_Shader {
             dX = dX / 2;
             dY = dY / 2;
          }
-
-//         if (vp2mpScale != _prevValue) {
-//
-//            System.out.println(UI.timeStamp()
-//
-//                  + " vp2mpScale: " + String.format("%6.4f", vp2mpScale)
-//
-//                  + "  dX: " + String.format("%10.4f", dX)
-//                  + "  dY: " + String.format("%10.4f", dY)
-//
-//                  + "  diffX: " + String.format("%13.10f", diffX)
-//                  + "  diffY: " + String.format("%13.10f", diffY)
-//
-//            );
-//// TODO remove SYSTEM.OUT.PRINTLN
-//
-//            _prevValue = vp2mpScale;
-//         }
       }
 
       final ModelCursorShader shader = _modelCursorShader;

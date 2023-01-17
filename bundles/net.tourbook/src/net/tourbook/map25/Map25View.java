@@ -255,6 +255,7 @@ public class Map25View extends ViewPart implements
    private int                           _hashTourId;
    private int                           _hashTourData;
    //
+   private MapPosition                   _currentMapPosition                     = new MapPosition();
    private MapSync                       _mapSynchedWith                         = MapSync.NONE;
    //
    private long                          _lastFiredSyncEventTime;
@@ -2325,20 +2326,34 @@ public class Map25View extends ViewPart implements
       }
 
       final Map map = _map25App.getMap();
+      map.getMapPosition(_currentMapPosition);
 
-      /**
-       * Keep current tilt/bearing
-       */
-      final MapPosition currentMapPos = map.getMapPosition();
-      if (mapPosition.bearing == 0) {
-         mapPosition.bearing = currentMapPos.bearing;
+      if (syncParameter == SyncParameter.SHOW_MAP_POSITION_WITHOUT_ANIMATION) {
+
+         // set map position without animation
+
+         _currentMapPosition.x = mapPosition.x;
+         _currentMapPosition.y = mapPosition.y;
+
+         _map25App.getMap().setMapPosition(_currentMapPosition);
+
+      } else {
+
+         // sync map with animation
+
+         /**
+          * Keep current tilt/bearing
+          */
+         if (mapPosition.bearing == 0) {
+            mapPosition.bearing = _currentMapPosition.bearing;
+         }
+
+         if (mapPosition.tilt == 0) {
+            mapPosition.tilt = _currentMapPosition.tilt;
+         }
+
+         Map25LocationManager.setMapLocation(map, mapPosition);
       }
-
-      if (mapPosition.tilt == 0) {
-         mapPosition.tilt = currentMapPos.tilt;
-      }
-
-      Map25LocationManager.setMapLocation(map, mapPosition);
    }
 
    private void updateFilteredPhotos() {
