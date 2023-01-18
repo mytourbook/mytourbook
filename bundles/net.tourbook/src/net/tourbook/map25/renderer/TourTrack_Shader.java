@@ -23,7 +23,6 @@ import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.MtMath;
 import net.tourbook.map.player.MapPlayerData;
 import net.tourbook.map.player.MapPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
@@ -81,13 +80,6 @@ public final class TourTrack_Shader {
    private static short[]               _animationVertices;
 
    private static GLMatrix              _animationMatrix         = new GLMatrix();
-
-   private static float                 _previousAngle;
-
-   /**
-    * Angle how much the animated symbols is rotated in the next frame
-    */
-   private static float                 _minSmoothAngle          = 0.5f;
 
 // private static double                _prevValue;
 
@@ -329,38 +321,6 @@ public final class TourTrack_Shader {
       return true;
    }
 
-   /**
-    * Source:
-    * https://stackoverflow.com/questions/1878907/how-can-i-find-the-difference-between-two-angles
-    *
-    * @param angle1
-    * @param angle2
-    * @return Returns the difference between two angles 0...360
-    */
-   private static float getAngle_Difference(final float angle1, final float angle2) {
-
-      float angleDiff = angle1 - angle2;
-
-      angleDiff = (angleDiff + 540) % 360 - 180;
-
-      return angleDiff;
-   }
-
-   /**
-    * Source:
-    * https://stackoverflow.com/questions/2708476/rotation-interpolation
-    *
-    * @param angle1
-    * @param angle2
-    * @return Returns the difference between two angles 0...360
-    */
-   private static float getAngle_Shortest(final float angle1, final float angle2) {
-
-      final float angleDiff = ((((angle1 - angle2) % 360) + 540) % 360) - 180;
-
-      return Math.abs(angleDiff);
-   }
-
    private static ByteBuffer getBuffer_Color(final int requestedColorSize) {
 
       final int bufferBlockSize = 2048;
@@ -383,46 +343,6 @@ public final class TourTrack_Shader {
       }
 
       return _vertexColor_Buffer;
-   }
-
-   private static float getModelAngle(final short pos1X, final short pos1Y, final short pos2X, final short pos2Y) {
-
-      final float p21Angle = (float) MtMath.angleFromShorts(pos1X, pos1Y, pos2X, pos2Y);
-
-      float animatedAngle = p21Angle;
-
-      final float angleDiff = getAngle_Difference(p21Angle, _previousAngle);
-
-      _minSmoothAngle = .5f;
-
-      if (Math.abs(angleDiff) > _minSmoothAngle) {
-
-         // default angle is larger than the min smooth angle
-         // -> smoothout the animation with a smallers angle
-
-         /*
-          * Find the smallest angle diff to the current position
-          */
-         final float prevAngle1Smooth = _previousAngle + _minSmoothAngle;
-         final float prevAngle2Smooth = _previousAngle - _minSmoothAngle;
-
-         final float angleDiff1 = getAngle_Shortest(p21Angle, prevAngle1Smooth);
-         final float angleDiff2 = getAngle_Shortest(p21Angle, prevAngle2Smooth);
-
-         // use the smallest difference
-         animatedAngle = angleDiff1 < angleDiff2
-               ? prevAngle1Smooth
-               : prevAngle2Smooth;
-      }
-
-      animatedAngle = animatedAngle % 360;
-
-      _previousAngle = animatedAngle;
-
-      return animatedAngle
-
-            // must be turned otherwise it looks in the wrong direction
-            - 90;
    }
 
    /**
@@ -877,11 +797,8 @@ public final class TourTrack_Shader {
       shader.useProgram();
 
       // rotate model to look forward
-      final float forwardAngle = getModelAngle(pos1X, pos1Y, pos2X, pos2Y);
-      _animationMatrix.setRotation(forwardAngle, 0f, 0f, 1f);
+      _animationMatrix.setRotation(MapPlayerManager.getModelAngle(), 0f, 0f, 1f);
       _animationMatrix.setAsUniform(shader.uni_AnimationMVP);
-
-      MapPlayerManager.setAnimationForwardAngle(forwardAngle);
 
       if (MapPlayerManager.isShowAnimationCursor()) {
 
@@ -921,11 +838,6 @@ public final class TourTrack_Shader {
 
 //    GLUtils.checkGlError(TourTrack_Shader.class.getName());
 
-   }
-
-   public static void resetAngle() {
-
-      _previousAngle = 0;
    }
 
    private static void setMapPlayerData(final TourTrack_Bucket trackBucket, final GLViewport viewport) {

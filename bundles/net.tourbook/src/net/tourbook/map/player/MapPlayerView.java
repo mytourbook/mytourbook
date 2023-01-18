@@ -91,9 +91,8 @@ public class MapPlayerView extends ViewPart {
    //
    private int                _currentTimelineMaxValue;
    private int                _currentTimelineValue;
-// private double             _previousRelativePosition;
    //
-   private PixelConverter _pc;
+   private PixelConverter     _pc;
    //
    /*
     * UI controls
@@ -823,12 +822,6 @@ public class MapPlayerView extends ViewPart {
     *           the shortest distance
     */
    private void setMapAndModelPosition(final double relativeModelPosition) {
-
-      // when moving forward then this value is positive
-//      final double movingDiff = relativeModelPosition - _previousRelativePosition;
-//      final double movingDiffAdjusted = movingDiff > 1 || movingDiff < -1 ? -movingDiff : movingDiff;
-//
-//      _previousRelativePosition = relativeModelPosition;
 
       setTimeline_Tooltip();
 

@@ -17,6 +17,8 @@ package net.tourbook.map.player;
 
 import static org.oscim.utils.FastMath.clamp;
 
+import com.badlogic.gdx.math.MathUtils;
+
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
@@ -37,17 +39,17 @@ public class MapPlayerManager {
     * Max value for the scale control which cannot have negative values but the speed can be
     * negative.
     */
-   static final int                     SPEED_JOG_WHEEL_MAX      = 200;
-   static final int                     SPEED_JOG_WHEEL_MAX_HALF = SPEED_JOG_WHEEL_MAX / 2;
+   static final int                     SPEED_JOG_WHEEL_MAX              = 200;
+   static final int                     SPEED_JOG_WHEEL_MAX_HALF         = SPEED_JOG_WHEEL_MAX / 2;
 
-   private static final int             DEFAULT_MOVING_SPEED     = 10;
+   private static final int             DEFAULT_MOVING_SPEED             = 10;
 
-   private static final String          STATE_FOREGROUND_FPS     = "STATE_FOREGROUND_FPS";                                             //$NON-NLS-1$
-   private static final String          STATE_IS_PLAYING_LOOP    = "STATE_IS_PLAYING_LOOP";                                            //$NON-NLS-1$
-   private static final String          STATE_IS_RELIVE_PLAYING  = "STATE_IS_RELIVE_PLAYING";                                          //$NON-NLS-1$
-   private static final String          STATE_DIRECTION_SPEED    = "STATE_DIRECTION_SPEED";                                            //$NON-NLS-1$
+   private static final String          STATE_FOREGROUND_FPS             = "STATE_FOREGROUND_FPS";                                             //$NON-NLS-1$
+   private static final String          STATE_IS_PLAYING_LOOP            = "STATE_IS_PLAYING_LOOP";                                            //$NON-NLS-1$
+   private static final String          STATE_IS_RELIVE_PLAYING          = "STATE_IS_RELIVE_PLAYING";                                          //$NON-NLS-1$
+   private static final String          STATE_DIRECTION_SPEED            = "STATE_DIRECTION_SPEED";                                            //$NON-NLS-1$
    //
-   private static final IDialogSettings _state                   = TourbookPlugin.getState("net.tourbook.map.player.MapPlayerManager");//$NON-NLS-1$
+   private static final IDialogSettings _state                           = TourbookPlugin.getState("net.tourbook.map.player.MapPlayerManager");//$NON-NLS-1$
 
    private static MapPlayerView         _mapPlayerView;
 
@@ -65,22 +67,11 @@ public class MapPlayerManager {
    private static int                   _numAllVisibleFrames;
 
    /**
-    * Default animation time in milliseconds
-    */
-   private static int                   _defaultAnimationTime    = 1000;
-
-   /**
-    * Model speed when moving on the RETURN TRACK
-    */
-   private static int                   _returnTrackSpeed_PixelPerSecond;
-
-   /**
     * Is between - {@value #SPEED_JOG_WHEEL_MAX_HALF} ... + {@value #SPEED_JOG_WHEEL_MAX_HALF}
     */
-   private static int                   _movingSpeed             = DEFAULT_MOVING_SPEED;
+   private static int                   _autoplayMovingSpeed             = DEFAULT_MOVING_SPEED;
 
    private static long                  _animationEndTime;
-   private static float                 _animationForwardAngle;
    private static double                _lastRemainingDuration;
 
    /**
@@ -90,7 +81,7 @@ public class MapPlayerManager {
     * {@link #_projectedPosition}[0] = x<br>
     * {@link #_projectedPosition}[1] = y<br>
     */
-   private static double[]              _projectedPosition       = new double[2];
+   private static double[]              _projectedPosition               = new double[2];
    private static long                  _projectedPosition_Time;
 
    /**
@@ -124,7 +115,7 @@ public class MapPlayerManager {
    private static boolean               _isAnimateFromRelativePosition;
    private static boolean               _isAnimationVisible;
    private static boolean               _isPlayerEnabled;
-   private static boolean               _isPlayerRunning         = true;
+   private static boolean               _isPlayerRunning                 = true;
 
    /**
     * When <code>true</code> then the model can be moving on the RETURN TRACK when it is between
@@ -150,9 +141,9 @@ public class MapPlayerManager {
     */
    private static boolean               _isShowAnimationCursor;
 
-   private static Object                RELATIVE_POSITION        = new Object();
+   private static Object                RELATIVE_POSITION                = new Object();
 
-   private static int[]                 _scheduleCounter         = new int[1];
+   private static int[]                 _scheduleCounter                 = new int[1];
 
    private static double                _nextPosition_OnNormalTrack;
    private static double                _nextPosition_OnReturnTrack;
@@ -161,7 +152,36 @@ public class MapPlayerManager {
 
    private static long                  _lastTimelineUpdateTime;
 
-   private static MapPosition           _mapPosition             = new MapPosition();
+   private static MapPosition           _mapPosition                     = new MapPosition();
+
+   /**
+    * Default animation time in milliseconds
+    */
+   private static int                   _defaultAnimationTime            = 1000;
+
+   /**
+    * Model speed when moving on the RETURN TRACK
+    */
+   private static int                   _returnTrackSpeed_PixelPerSecond = 200;
+
+   private static int                   _autoplaySpeedFactor             = 50;
+
+   /**
+    * Size of the moving model when the size is not scaled according to the map
+    */
+   public static int                    fixedModelSize                   = 400;
+
+   /**
+    * Angle how much the animated model is rotated in the next frame
+    */
+   private static float                 _modelTurningAngle               = 0.5f;
+
+   private static boolean               _isModelMovingForward;
+   private static float                 _modelForwardAngle;
+   private static float                 _previousAngle;
+   private static double                _previousRelativePosition;
+   private static double                _previousProjectedPositionX;
+   private static double                _previousProjectedPositionY;
 
    enum TrackState {
 
@@ -172,14 +192,6 @@ public class MapPlayerManager {
 
    public static long getAnimationDuration() {
       return _defaultAnimationTime;
-   }
-
-   /**
-    * @return Returns the angle for the model forward direction
-    */
-   public static float getAnimationForwardAngle() {
-
-      return _animationForwardAngle;
    }
 
    public static double getCompileMapScale() {
@@ -221,7 +233,7 @@ public class MapPlayerManager {
     */
    public static int getJogWheelSpeed() {
 
-      return _movingSpeed
+      return _autoplayMovingSpeed
 
             // adjust to the center of the scale control
             + SPEED_JOG_WHEEL_MAX_HALF;
@@ -232,8 +244,17 @@ public class MapPlayerManager {
       return _mapPlayerData;
    }
 
+   /**
+    * @return Returns the angle for the model forward direction
+    */
+   public static float getModelAngle() {
+
+      return _modelForwardAngle;
+   }
+
    public static int getMovingSpeed() {
-      return _movingSpeed;
+
+      return _autoplayMovingSpeed;
    }
 
    /**
@@ -369,17 +390,35 @@ public class MapPlayerManager {
          return null;
       }
 
+      _previousProjectedPositionX = _projectedPosition[0];
+      _previousProjectedPositionY = _projectedPosition[1];
+
+      /*
+       * Compute position
+       */
       // set projected position into "_projectedPosition"
       getProjectedPosition_Compute(mapPlayerData, allNotClipped_GeoLocationIndices, lastGeoLocationIndex);
 
+      // keep time when position was computed
       _projectedPosition_Time = currentFrameTime;
 
+      /*
+       * Set model angle
+       */
+      final double projectedPositionX = _projectedPosition[0];
+      final double projectedPositionY = _projectedPosition[1];
+
+      setModelAngle(projectedPositionX, projectedPositionY, _previousProjectedPositionX, _previousProjectedPositionY);
+
+      /*
+       * Fire map position
+       */
       if (_isPlayerRunning) {
 
          // set map center to the current model position
 
-         _mapPosition.x = _projectedPosition[0];
-         _mapPosition.y = _projectedPosition[1];
+         _mapPosition.x = projectedPositionX;
+         _mapPosition.y = projectedPositionY;
 
          _mapPosition.scale = currentMapPosition.scale;
 
@@ -737,13 +776,13 @@ public class MapPlayerManager {
 
          // model is moving on the NORMAL TRACK, get next position
 
-         final int speedFactor = 2;
+         _autoplaySpeedFactor = 10;
 
          final double mapScale = _mapPlayerData.mapScale;
 
-         final double speedValue = (double) _movingSpeed / SPEED_JOG_WHEEL_MAX_HALF;
+         final double speedValue = (double) _autoplayMovingSpeed / SPEED_JOG_WHEEL_MAX_HALF;
 
-         final double speedValue_Scaled = speedValue / mapScale * speedFactor;
+         final double speedValue_Scaled = speedValue / mapScale * _autoplaySpeedFactor;
 
          nextPosition = _relativePosition_CurrentFrame + speedValue_Scaled;
 
@@ -759,7 +798,7 @@ public class MapPlayerManager {
 //         final double end2Start_AnimationTime = _defaultAnimationTime * (end2StartPixelDistance / _returnTrackSpeed_PixelPerSecond);
 //
 
-         final double positionDiff = _movingSpeed > 0
+         final double positionDiff = _autoplayMovingSpeed > 0
                ? returnSpeed
                : -returnSpeed;
 
@@ -779,7 +818,7 @@ public class MapPlayerManager {
          final long frametime = MapRenderer.frametime;
          final long updateTimeDiff = frametime - _lastTimelineUpdateTime;
 
-         // reduce time line updates, 100ms == 10 / second
+         // reduce timeline updates, 100ms == 10 / second
          if (updateTimeDiff > 100) {
 
             _lastTimelineUpdateTime = frametime;
@@ -894,10 +933,10 @@ public class MapPlayerManager {
 
 // SET_FORMATTING_OFF
 
-      _foregroundFPS    = Util.getStateInt(     _state, STATE_FOREGROUND_FPS,    10);
-      _isPlayingLoop    = Util.getStateBoolean( _state, STATE_IS_PLAYING_LOOP,   false);
-      _isReLivePlaying  = Util.getStateBoolean( _state, STATE_IS_RELIVE_PLAYING, false);
-      _movingSpeed      = Util.getStateInt(     _state, STATE_DIRECTION_SPEED,   DEFAULT_MOVING_SPEED);
+      _foregroundFPS       = Util.getStateInt(     _state, STATE_FOREGROUND_FPS,    10);
+      _isPlayingLoop       = Util.getStateBoolean( _state, STATE_IS_PLAYING_LOOP,   false);
+      _isReLivePlaying     = Util.getStateBoolean( _state, STATE_IS_RELIVE_PLAYING, false);
+      _autoplayMovingSpeed = Util.getStateInt(     _state, STATE_DIRECTION_SPEED,   DEFAULT_MOVING_SPEED);
 
 // SET_FORMATTING_ON
    }
@@ -909,14 +948,9 @@ public class MapPlayerManager {
       _state.put(STATE_FOREGROUND_FPS,    _foregroundFPS);
       _state.put(STATE_IS_PLAYING_LOOP,   _isPlayingLoop);
       _state.put(STATE_IS_RELIVE_PLAYING, _isReLivePlaying);
-      _state.put(STATE_DIRECTION_SPEED,   _movingSpeed);
+      _state.put(STATE_DIRECTION_SPEED,   _autoplayMovingSpeed);
 
 // SET_FORMATTING_ON
-   }
-
-   public static void setAnimationForwardAngle(final float animationForwardAngle) {
-
-      _animationForwardAngle = animationForwardAngle;
    }
 
    public static void setCompileMapScale(final double x, final double y, final double scale) {
@@ -967,12 +1001,138 @@ public class MapPlayerManager {
       _mapPlayerView = mapPlayerView;
    }
 
+   /**
+    * Set the angle between two positions into {@link #_modelForwardAngle}
+    *
+    * @param projectedX1
+    * @param projectedY1
+    * @param projectedX2
+    * @param projectedY2
+    */
+   private static void setModelAngle(final double projectedX1, final double projectedY1, final double projectedX2, final double projectedY2) {
+
+      if (projectedX1 == projectedX2 && projectedY1 == projectedY2) {
+         return;
+      }
+
+      final float p21Angle = setModelAngle_GetAngleFromPositions(projectedX1, projectedY1, projectedX2, projectedY2);
+
+      float p21AngleSmoothed = p21Angle;
+
+      final float angleDiff = setModelAngle_Difference(p21Angle, _previousAngle);
+
+      _modelTurningAngle = 2.f;
+
+      if (Math.abs(angleDiff) > _modelTurningAngle) {
+
+         // default angle is larger than the min smooth angle
+         // -> smoothout the animation with a smallers angle
+
+         /*
+          * Find the smallest angle diff to the current position
+          */
+         final float prevAngle1Smooth = _previousAngle + _modelTurningAngle;
+         final float prevAngle2Smooth = _previousAngle - _modelTurningAngle;
+
+         final float angleDiff1 = setModelAngle_Shortest(p21Angle, prevAngle1Smooth);
+         final float angleDiff2 = setModelAngle_Shortest(p21Angle, prevAngle2Smooth);
+
+         // use the smallest difference
+         p21AngleSmoothed = angleDiff1 < angleDiff2
+               ? prevAngle1Smooth
+               : prevAngle2Smooth;
+      }
+
+      p21AngleSmoothed = p21AngleSmoothed % 360;
+
+      final float angleDiffLog = _previousAngle - p21AngleSmoothed;
+      if (angleDiffLog > 0.1) {
+
+//         System.out.println(""
+//
+//               + " prev: " + String.format("%6.1f", _previousAngle)
+//               + " p21Angle: " + String.format("%6.1f", p21Angle)
+//
+//         );
+// TODO remove SYSTEM.OUT.PRINTLN
+      }
+
+      _previousAngle = p21AngleSmoothed;
+
+      final float modelForwardAngle = p21AngleSmoothed
+
+            // must be turned otherwise it looks in the wrong direction
+            + 90
+
+      ;
+
+      _modelForwardAngle = modelForwardAngle % 360;
+   }
+
+   /**
+    * Source:
+    * https://stackoverflow.com/questions/1878907/how-can-i-find-the-difference-between-two-angles
+    *
+    * @param angle1
+    * @param angle2
+    * @return Returns the difference between two angles 0...360
+    */
+   private static float setModelAngle_Difference(final float angle1, final float angle2) {
+
+      float angleDiff = angle1 - angle2;
+
+      angleDiff = (angleDiff + 540) % 360 - 180;
+
+      return angleDiff;
+   }
+
+   private static float setModelAngle_GetAngleFromPositions(final double x1, final double y1, final double x2, final double y2) {
+
+      double deltaXDouble;
+      double deltaYDouble;
+
+      if (_isModelMovingForward) {
+
+         deltaXDouble = x2 - x1;
+         deltaYDouble = y1 - y2;
+
+      } else {
+
+         deltaXDouble = x1 - x2;
+         deltaYDouble = y2 - y1;
+      }
+
+      final float deltaX = (float) deltaXDouble;
+      final float deltaY = (float) deltaYDouble;
+
+      final double angleDegree = Math.toDegrees(MathUtils.atan2(deltaY, deltaX));
+
+      return (float) ((angleDegree < 0) ? (360d + angleDegree) : angleDegree);
+   }
+
+   /**
+    * Source:
+    * https://stackoverflow.com/questions/2708476/rotation-interpolation
+    *
+    * @param angle1
+    * @param angle2
+    * @return Returns the difference between two angles 0...360
+    */
+   private static float setModelAngle_Shortest(final float angle1, final float angle2) {
+
+      final float angleDiff = ((((angle1 - angle2) % 360) + 540) % 360) - 180;
+
+      return Math.abs(angleDiff);
+   }
+
    public static void setMovingSpeedFromJogWheel(final int jogWheelSpeed) {
 
-      _movingSpeed = jogWheelSpeed
+      _autoplayMovingSpeed = jogWheelSpeed
 
             // adjust to the center of the scale control
             - SPEED_JOG_WHEEL_MAX_HALF;
+
+      _isModelMovingForward = _autoplayMovingSpeed >= 0;
    }
 
    /**
@@ -1044,6 +1204,22 @@ public class MapPlayerManager {
          final boolean isSetNormalTrack = newRelativePosition >= 0 && newRelativePosition <= 1;
          final boolean isCurrentlyOnNormalTrack = _relativePosition_CurrentFrame >= 0 && _relativePosition_CurrentFrame <= 1;
 
+         /*
+          * Set forward flag
+          */
+         _isModelMovingForward = true;
+         if (isSetNormalTrack) {
+            _isModelMovingForward = newRelativePosition >= _previousRelativePosition;
+         } else {
+            if (newRelativePosition == 2) {
+               _isModelMovingForward = false;
+            }
+         }
+         _previousRelativePosition = newRelativePosition;
+
+         /*
+          * Set position
+          */
          if (isSetNormalTrack && isCurrentlyOnNormalTrack
                && _trackState_ReturnTrack == TrackState.IDLE
                && _trackState_NormalTrack == TrackState.IDLE) {
@@ -1053,27 +1229,9 @@ public class MapPlayerManager {
             // and keeps moving on the NORMAL TRACK
             // and nothing is scheduled
 
-//            System.out.println(UI.timeStamp()
-//
-//                  + " SET NORM " + String.format("%4.1f", newRelativePosition)
-//                  + "  n." + _trackState_NormalTrack
-//                  + "  r." + _trackState_ReturnTrack
-//
-//            );
-// TODO remove SYSTEM.OUT.PRINTLN
-
             setRelativePosition_0(newRelativePosition);
 
          } else {
-
-//            System.out.println(UI.timeStamp()
-//
-//                  + " SET SCHED " + String.format("%4.1f", newRelativePosition)
-//                  + "  n." + _trackState_NormalTrack
-//                  + "  r." + _trackState_ReturnTrack
-//
-//            );
-// TODO remove SYSTEM.OUT.PRINTLN
 
             setRelativePosition_ScheduleNewPosition(newRelativePosition);
          }

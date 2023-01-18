@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Display;
 public class Map25FPSManager {
 
    public static final int                      DEFAULT_FOREGROUND_FPS = 30;
-   private static final int                     DEFAULT_BACKGROUND_FPS = 5;
+   private static final int                     DEFAULT_BACKGROUND_FPS = 2;
 
    private static LwjglApplication              _lwjglApp;
    private static LwjglApplicationConfiguration _appConfig;

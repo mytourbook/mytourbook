@@ -83,11 +83,11 @@ public class GLTFModel_Renderer extends LayerRenderer {
    private Cubemap            _diffuseCubemap;
    private Cubemap            _specularCubemap;
    private Texture            _brdfLUT;
-//   private SceneSkybox        _skybox;
+// private SceneSkybox        _skybox;
    private BoundingBox        _modelBoundingBox;
 
-//   private Vector3            _boundingBoxCenter;
-   private float  _boundingBoxMinMaxDistance;
+   private float              _boundingBoxMinMaxDistance;
+// private Vector3            _boundingBoxCenter;
 
    /**
     * Angle that the model is looking forward
@@ -99,9 +99,9 @@ public class GLTFModel_Renderer extends LayerRenderer {
     */
    private double _modelCenterToForwardFactor;
 
-   private float  _prevDx;
-   private float  _prevDy;
-   private double _prevRelativePosition;
+//   private float  _prevDx;
+//   private float  _prevDy;
+//   private double _prevRelativePosition;
 
    public GLTFModel_Renderer(final Map map) {
 
@@ -396,9 +396,6 @@ public class GLTFModel_Renderer extends LayerRenderer {
          return;
       }
 
-//      System.out.println(UI.timeStamp() + " model:  " + _currentMapPosition.scale);
-//// TODO remove SYSTEM.OUT.PRINTLN
-
       /*
        * Translate glTF model to the map position
        */
@@ -425,7 +422,6 @@ public class GLTFModel_Renderer extends LayerRenderer {
 //               + "  microIndex:" + String.format("%6.4f", microIndex)
 //
 //         );
-////TODO remove SYSTEM.OUT.PRINTLN
 //
 //         _prevDx = dX;
 //         _prevDy = dY;
@@ -449,12 +445,13 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
       if (isFixedSize) {
 
-         final int modelSize = 400;
+         int fixedModelSize = MapPlayerManager.fixedModelSize;
+         fixedModelSize = 200;
 
          // viewport scale 2 map scale: 1...2
          final float vp2mp = (float) (currentMapScale / MapPlayerManager.getCompileMapScale());
 
-         final float vp2mpModelSize = modelSize / vp2mp;
+         final float vp2mpModelSize = fixedModelSize / vp2mp;
 
          /**
           * This algorithm is not perfect as the model can still be flickering (size is larger or
@@ -501,7 +498,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
        * - translate head to center<br>
        * - translate symbol to geo location<br>
        */
-      float animationAngle = -MapPlayerManager.getAnimationForwardAngle();
+      float animationAngle = -MapPlayerManager.getModelAngle();
       animationAngle += _modelForwardAngle;
 
       final double halfSize = modelScale / 2;

@@ -290,8 +290,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          final MapPosition compileMapPos = task.__mapPos;
          mMap.getMapPosition(compileMapPos);
 
-         final int zoomlevel = compileMapPos.zoomLevel;
-         final double mapScale = compileMapPos.scale = 1 << zoomlevel;
+         final int compileMapZoomlevel = compileMapPos.zoomLevel;
+         final double compileMapScale = compileMapPos.scale = 1 << compileMapZoomlevel;
 
          final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
          final boolean isShowDirectionArrows = trackConfig.isShowDirectionArrow;
@@ -313,8 +313,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          final double compileMapPosY = compileMapPos.y; // 0...1, lon == 0 -> 0.5
 
          // number of x/y pixels for the whole map at the current zoom level
-         final double compileMaxMapPixel = Tile.SIZE * mapScale;
-         final int maxMapPixel = Tile.SIZE << (zoomlevel - 1);
+         final double compileMaxMapPixel = Tile.SIZE * compileMapScale;
+         final int maxMapPixel = Tile.SIZE << (compileMapZoomlevel - 1);
 
          // flip around dateline
          int flip = 0;
@@ -525,7 +525,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                   allDirectionArrow_LocationIndex.toArray());
          }
 
-         doWork_CreateReturnTrack(compileMapPos, mapScale, compileMaxMapPixel);
+         doWork_CreateReturnTrack(compileMapPos, compileMapScale, compileMaxMapPixel);
 
          workerBucket.allProjectedPoints = __allProjectedPoints;
          workerBucket.allProjectedPoints_ReturnTrack = __allProjectedPoints_ReturnTrack;
@@ -793,8 +793,6 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
       _isUpdateNewPoints = true;
       _isCancelWorkerTask = true;
-
-      TourTrack_Shader.resetAngle();
    }
 
    @Override
