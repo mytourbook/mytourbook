@@ -2293,7 +2293,7 @@ public class Map25View extends ViewPart implements
    }
 
    @Override
-   public void syncMapWithOtherMap(final MapPosition mapPosition,
+   public void syncMapWithOtherMap(final MapPosition syncMapPosition,
                                    final ViewPart viewPart,
                                    final IMapSyncListener.SyncParameter syncParameter) {
 
@@ -2332,8 +2332,9 @@ public class Map25View extends ViewPart implements
 
          // set map position without animation
 
-         _currentMapPosition.x = mapPosition.x;
-         _currentMapPosition.y = mapPosition.y;
+         // update only map position x/y values and keep any other values from the current map position
+         _currentMapPosition.x = syncMapPosition.x;
+         _currentMapPosition.y = syncMapPosition.y;
 
          _map25App.getMap().setMapPosition(_currentMapPosition);
 
@@ -2342,17 +2343,21 @@ public class Map25View extends ViewPart implements
          // sync map with animation
 
          /**
-          * Keep current tilt/bearing
+          * Set values which are not set
           */
-         if (mapPosition.bearing == 0) {
-            mapPosition.bearing = _currentMapPosition.bearing;
+         if (syncMapPosition.scale <= 1) {
+            syncMapPosition.setScale(_currentMapPosition.scale);
          }
 
-         if (mapPosition.tilt == 0) {
-            mapPosition.tilt = _currentMapPosition.tilt;
+         if (syncMapPosition.bearing == 0) {
+            syncMapPosition.bearing = _currentMapPosition.bearing;
          }
 
-         Map25LocationManager.setMapLocation(map, mapPosition);
+         if (syncMapPosition.tilt == 0) {
+            syncMapPosition.tilt = _currentMapPosition.tilt;
+         }
+
+         Map25LocationManager.setMapLocation(map, syncMapPosition);
       }
    }
 

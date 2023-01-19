@@ -420,8 +420,6 @@ public class MapPlayerManager {
          _mapPosition.x = projectedPositionX;
          _mapPosition.y = projectedPositionY;
 
-         _mapPosition.scale = currentMapPosition.scale;
-
          MapManager.fireSyncMapEvent(_mapPosition, null, SyncParameter.SHOW_MAP_POSITION_WITHOUT_ANIMATION);
       }
 
@@ -1021,7 +1019,7 @@ public class MapPlayerManager {
 
       final float angleDiff = setModelAngle_Difference(p21Angle, _previousAngle);
 
-      _modelTurningAngle = 2.f;
+      _modelTurningAngle = 5.f;
 
       if (Math.abs(angleDiff) > _modelTurningAngle) {
 
@@ -1255,31 +1253,32 @@ public class MapPlayerManager {
 
    /**
     * @param newRelativePosition
-    * @return Returns the animation time for the next position
+    * @return Returns the animation duration time for the next position
     */
    private static int setRelativePosition_GetAnimationTime(final double newRelativePosition) {
 
       _defaultAnimationTime = 1000;
 
-      // move number of pixels in one second
       _returnTrackSpeed_PixelPerSecond = 200;
 
       if (newRelativePosition >= 0 && newRelativePosition <= 1) {
 
          // 0...1 -> model is moving on the NORMAL TRACK
 
-         // return default animation time
          return _defaultAnimationTime;
-      }
 
-      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
-      if (mapPlayerData == null) {
-         return _defaultAnimationTime;
-      }
+      } else {
 
-      final double pixelDistance = mapPlayerData.trackEnd2StartPixelDistance;
+         // model is moving on the RETURN TRACK
 
-      final double animationTime = _defaultAnimationTime * (pixelDistance / _returnTrackSpeed_PixelPerSecond);
+         final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
+         if (mapPlayerData == null) {
+            return _defaultAnimationTime;
+         }
+
+         final double pixelDistance = mapPlayerData.trackEnd2StartPixelDistance;
+
+         final double animationTime = _defaultAnimationTime * (pixelDistance / _returnTrackSpeed_PixelPerSecond);
 
 //      System.out.println(UI.timeStamp()
 //
@@ -1289,7 +1288,8 @@ public class MapPlayerManager {
 //      );
 // TODO remove SYSTEM.OUT.PRINTLN
 
-      return (int) clamp(animationTime, 1, _defaultAnimationTime);
+         return (int) clamp(animationTime, 1, _defaultAnimationTime);
+      }
    }
 
    private static void setRelativePosition_ScheduleNewPosition(final double newRelativePosition) {

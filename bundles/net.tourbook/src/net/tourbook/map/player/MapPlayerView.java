@@ -81,8 +81,6 @@ public class MapPlayerView extends ViewPart {
    //
    private IPartListener2     _partListener;
    //
-   private MapPosition        _mapPosition                                        = new MapPosition();
-   //
    private Action             _actionPlayControl_PlayAndPause;
    private Action             _actionPlayControl_Loop;
    //
@@ -202,11 +200,12 @@ public class MapPlayerView extends ViewPart {
       final double projectedPositionX = mapPlayerData.allProjectedPoints_NormalTrack[projectedIndex];
       final double projectedPositionY = mapPlayerData.allProjectedPoints_NormalTrack[projectedIndex + 1];
 
-      _mapPosition.x = projectedPositionX;
-      _mapPosition.y = projectedPositionY;
-      _mapPosition.setScale(mapPlayerData.mapScale);
+      final MapPosition mapPosition = new MapPosition();
 
-      return _mapPosition;
+      mapPosition.x = projectedPositionX;
+      mapPosition.y = projectedPositionY;
+
+      return mapPosition;
    }
 
    @Override
