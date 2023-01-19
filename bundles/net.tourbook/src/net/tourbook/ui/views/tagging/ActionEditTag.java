@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,7 +27,6 @@ import net.tourbook.tag.Dialog_TourTag_Category;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -39,11 +38,11 @@ import org.eclipse.swt.widgets.Display;
 /**
  * Action to edit {@link TourTag} or {@link TourTagCategory}
  */
-public class ActionEditTag extends Action {
+class ActionEditTag extends Action {
 
    private ITourViewer _tourViewer;
 
-   public ActionEditTag(final ITourViewer tourViewer) {
+   ActionEditTag(final ITourViewer tourViewer) {
 
       super(Messages.Action_Tag_Edit, AS_PUSH_BUTTON);
 
@@ -52,7 +51,7 @@ public class ActionEditTag extends Action {
 
    void editTag(final Object viewerCellData) {
 
-      String dlgMessage = UI.EMPTY_STRING;
+      String dlgMessage;
 
       final TourTag[] finalTourTag = { null };
       final TourTagCategory[] finalTagCategory = { null };

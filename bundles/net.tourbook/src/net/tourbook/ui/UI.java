@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,12 +20,16 @@ import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Images;
@@ -33,13 +37,16 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.ImageUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
@@ -547,6 +554,39 @@ public class UI {
       }
    }
 
+   public static int fetchTourTagsAccumulationString() {
+
+      final String sql = "SELECT" + NEW_LINE //                                                                        //$NON-NLS-1$
+            + "jTdataTtag.TOURTAG_TAGID," + NEW_LINE //
+            + "SUM(tourData.TOURDISTANCE) AS TOTALDISTANCE," + NEW_LINE //
+            + "SUM(tourData.TOURDEVICETIME_RECORDED) AS TOTALRECORDEDTIME" + NEW_LINE //                                                                   //$NON-NLS-1$
+            + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NEW_LINE //                                                                        //$NON-NLS-1$
+            + "INNER JOIN " + TourDatabase.TABLE_TOUR_DATA + NEW_LINE //                                                       //$NON-NLS-1$
+            + "ON jTdataTtag.TOURDATA_TOURID = tourData.TOURID" + NEW_LINE //                                                                       //$NON-NLS-1$
+            + "GROUP BY jTdataTtag.TOURTAG_TAGID" + NEW_LINE; //$NON-NLS-1$
+
+      try (Connection connection = TourDatabase.getInstance().getConnection();
+            final PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+
+         final ResultSet result = preparedStatement.executeQuery();
+
+         // get first result
+         result.next();
+
+         // get first value
+         final int numTours = result.getInt(2);
+
+         return numTours;
+
+//       TourDatabase.disableRuntimeStatistic(conn);
+
+      } catch (final SQLException e) {
+         SQL.showException(e, sql);
+      }
+
+      return 0;
+   }
+
    public static String format_yyyymmdd_hhmmss(final TourData tourData) {
 
       if (tourData == null) {
@@ -570,6 +610,7 @@ public class UI {
    }
 
    public static ColumnPixelData getColumnPixelWidth(final PixelConverter pixelConverter, final int width) {
+
       return new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(width), false);
    }
 
@@ -828,6 +869,37 @@ public class UI {
       }
 
       return UI.EMPTY_STRING;
+   }
+
+   public static Image prepareTagImage(final String imageFilePath) {
+
+      if (StringUtils.isNullOrEmpty(imageFilePath)) {
+         return null;
+      }
+
+      Image image = new Image(Display.getDefault(), imageFilePath);
+
+      final int imageWidth = image.getBounds().width;
+      final int imageHeight = image.getBounds().height;
+
+      float newimageWidth = 70;
+      float newimageHeight = 70;
+
+      if (imageWidth > imageHeight) {
+
+         newimageWidth = 70;
+         newimageHeight = newimageWidth * imageHeight / imageWidth;
+
+      } else if (imageWidth < imageHeight) {
+
+         newimageHeight = 70;
+         newimageWidth = newimageHeight * imageWidth / imageHeight;
+
+      }
+
+      image = ImageUtils.resize(Display.getDefault(), image, Math.round(newimageWidth), Math.round(newimageHeight));
+
+      return image;
    }
 
    public static ImageData rotate(final ImageData srcData, final int direction) {
@@ -1144,6 +1216,46 @@ public class UI {
 
          tourTagLabel.setText(tagLabels);
          tourTagLabel.setToolTipText(tagLabels);
+      }
+   }
+
+   public static void updateUI_TagsWithImage(final Set<TourTag> tourTags, final Composite tourTagsComposite, final List<CLabel> tagsLabels) {
+
+      //Retrieve the accumulation values for each tag
+      //todo fb
+      // tourTags.forEach(tourTag -> computeTagAccumulationValues(tourTag));
+
+      // We dispose the current tags labels
+      tagsLabels.forEach(tagLabel -> {
+
+         if (tagLabel != null && !tagLabel.isDisposed()) {
+
+            net.tourbook.common.UI.disposeResource(tagLabel.getImage());
+            tagLabel.dispose();
+         }
+      });
+      tagsLabels.clear();
+
+      if (tourTags == null || tourTags.isEmpty()) {
+
+         tourTagsComposite.setData(null);
+
+      } else {
+
+         UI.fetchTourTagsAccumulationString();
+
+         for (final TourTag tag : tourTags) {
+
+            final CLabel label = new CLabel(tourTagsComposite, SWT.NONE);
+            label.setText(tag.getTagName() + UI.NEW_LINE + "23 miles" + UI.NEW_LINE + "2h");
+            final Image image = UI.prepareTagImage(tag.getImageFilePath());
+            if (image != null) {
+               label.setImage(image);
+            }
+            tagsLabels.add(label);
+         }
+
+         tourTagsComposite.layout();
       }
    }
 

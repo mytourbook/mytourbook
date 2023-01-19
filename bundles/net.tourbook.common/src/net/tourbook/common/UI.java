@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1334,12 +1334,13 @@ public class UI {
    }
 
    /**
-    * disposes a resource
+    * Disposes a resource
     *
-    * @param image
+    * @param resource
     * @return
     */
    public static Image disposeResource(final Image resource) {
+
       if ((resource != null) && !resource.isDisposed()) {
          resource.dispose();
       }

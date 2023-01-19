@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,16 +17,18 @@ package net.tourbook.photo;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
+import java.io.InputStream;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.StatusUtil;
 
 import org.apache.commons.imaging.Imaging;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -48,50 +50,62 @@ public class ImageUtils {
 
    static {
 
-      final IPropertyChangeListener _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      final IPropertyChangeListener prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(IPhotoPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY)) {
-               _isRotateImageAutomatically = (Boolean) event.getNewValue();
-            }
+         if (property.equals(IPhotoPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY)) {
+            _isRotateImageAutomatically = (Boolean) propertyChangeEvent.getNewValue();
          }
       };
 
-      _prefStore.addPropertyChangeListener(_prefChangeListener);
+      _prefStore.addPropertyChangeListener(prefChangeListener);
+   }
+
+   public static Image convertByteArrayToImage(final byte[] imageArray) {
+
+      if (imageArray == null) {
+         return null;
+      }
+
+      Image image = null;
+      try (final InputStream inputStream = new ByteArrayInputStream(imageArray)) {
+
+         image = new Image(Display.getCurrent(), inputStream);
+
+      } catch (final IOException e) {
+         StatusUtil.log(e);
+      }
+
+      return image;
    }
 
    public static FileFilter createImageFileFilter() {
 
-      return new FileFilter() {
-         @Override
-         public boolean accept(final File pathname) {
+      return pathname -> {
 
-            if (pathname.isDirectory()) {
-               return false;
-            }
-
-            if (pathname.isHidden()) {
-               return false;
-            }
-
-            final String name = pathname.getName();
-            if (name == null || name.length() == 0) {
-               return false;
-            }
-
-            if (name.startsWith(UI.SYMBOL_DOT)) {
-               return false;
-            }
-
-            if (Imaging.hasImageFileExtension(pathname)) {
-               return true;
-            }
-
+         if (pathname.isDirectory()) {
             return false;
          }
+
+         if (pathname.isHidden()) {
+            return false;
+         }
+
+         final String name = pathname.getName();
+         if (name == null || name.length() == 0) {
+            return false;
+         }
+
+         if (name.startsWith(UI.SYMBOL_DOT)) {
+            return false;
+         }
+
+         if (Imaging.hasImageFileExtension(pathname)) {
+            return true;
+         }
+
+         return false;
       };
    }
 
@@ -130,7 +144,7 @@ public class ImageUtils {
       return bas.toByteArray();
    }
 
-   public static double getBestRatio(final int originalX, final int originalY, final int maxX, final int maxY) {
+   private static double getBestRatio(final int originalX, final int originalY, final int maxX, final int maxY) {
 
       final double widthRatio = (double) originalX / (double) maxX;
       final double heightRatio = (double) originalY / (double) maxY;
@@ -156,24 +170,28 @@ public class ImageUtils {
       return getBestSize(original.x, original.y, max.x, max.y);
    }
 
-   public static boolean isResizeRequired(final Image image, final int width, final int height) {
+   @SuppressWarnings("unused")
+   private static boolean isResizeRequired(final Image image, final int width, final int height) {
       final Rectangle bounds = image.getBounds();
       return !(bounds.width == width && bounds.height == height);
    }
 
-   public static boolean isResizeRequiredAWT(final BufferedImage img, final int width, final int height) {
+   @SuppressWarnings("unused")
+   private static boolean isResizeRequiredAWT(final BufferedImage img, final int width, final int height) {
       return !(img.getWidth() == width && img.getHeight() == height);
    }
 
    /**
     * Returns a new scaled image. new Image must be disposed after use.
     *
+    * @param display
     * @param image
     * @param width
     * @param height
     * @return
     */
-   private static Image resize(final Display display, final Image image, final int width, final int height) {
+   public static Image resize(final Display display, final Image image, final int width, final int height) {
+
       return resize(display, image, width, height, SWT.ON, SWT.HIGH, null);
    }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2022 Frédéric Bard
+ * Copyright (C) 2021, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,6 @@ package net.tourbook.cloud.suunto;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -44,7 +43,6 @@ import net.tourbook.database.PersonManager;
 import net.tourbook.importdata.DialogEasyImportConfig;
 import net.tourbook.web.WEB;
 
-import org.apache.http.client.utils.URIBuilder;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -80,11 +78,11 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
    private static final String     PARAMETER_TRAILING_CHAR          = "}";                                                   //$NON-NLS-1$
    private static final String     PARAMETER_LEADING_CHAR           = "{";                                                   //$NON-NLS-1$
    private static final String     _suuntoApp_WebPage_Link          = "https://www.suunto.com/suunto-app/suunto-app/";       //$NON-NLS-1$
-   public static final String      ID                               = "net.tourbook.cloud.PrefPageSuunto";                   //$NON-NLS-1$
+   static final String             ID                               = "net.tourbook.cloud.PrefPageSuunto";                   //$NON-NLS-1$
 
-   public static final String      ClientId                         = "d8f3e53f-6c20-4d17-9a4e-a4930c8667e8";                //$NON-NLS-1$
+   private static final String     ClientId                         = "d8f3e53f-6c20-4d17-9a4e-a4930c8667e8";                //$NON-NLS-1$
 
-   public static final int         CALLBACK_PORT                    = 4919;
+   private static final int        CALLBACK_PORT                    = 4919;
 
    private static final String     STATE_SUUNTO_CLOUD_SELECTED_TAB  = "suuntoCloud.selectedTab";                             //$NON-NLS-1$
 
@@ -849,26 +847,17 @@ public class PrefPageSuunto extends PreferencePage implements IWorkbenchPreferen
          return;
       }
 
-      final URIBuilder authorizeUrlBuilder = new URIBuilder();
-      authorizeUrlBuilder.setScheme("https"); //$NON-NLS-1$
-      authorizeUrlBuilder.setHost("cloudapi-oauth.suunto.com"); //$NON-NLS-1$
-      authorizeUrlBuilder.setPath("/oauth/authorize"); //$NON-NLS-1$
-      authorizeUrlBuilder.addParameter(
-            OAuth2Constants.PARAM_RESPONSE_TYPE,
-            OAuth2Constants.PARAM_CODE);
-      authorizeUrlBuilder.addParameter(
-            OAuth2Constants.PARAM_CLIENT_ID,
-            ClientId);
-      authorizeUrlBuilder.addParameter(
-            OAuth2Constants.PARAM_REDIRECT_URI,
-            "http://localhost:" + CALLBACK_PORT); //$NON-NLS-1$
-      try {
-         final String authorizeUrl = authorizeUrlBuilder.build().toString();
+      final StringBuilder authorizeUrl = new StringBuilder("https://cloudapi-oauth.suunto.com/oauth/authorize" + UI.SYMBOL_QUESTION_MARK); //$NON-NLS-1$
 
-         Display.getDefault().syncExec(() -> WEB.openUrl(authorizeUrl));
-      } catch (final URISyntaxException e) {
-         StatusUtil.log(e);
-      }
+// SET_FORMATTING_OFF
+
+      authorizeUrl.append(      OAuth2Constants.PARAM_RESPONSE_TYPE + "=" + OAuth2Constants.PARAM_CODE); //$NON-NLS-1$
+      authorizeUrl.append("&" + OAuth2Constants.PARAM_CLIENT_ID +     "=" + ClientId); //$NON-NLS-1$ //$NON-NLS-2$
+      authorizeUrl.append("&" + OAuth2Constants.PARAM_REDIRECT_URI +  "=" + "http://localhost:" + CALLBACK_PORT); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+// SET_FORMATTING_ON
+
+      Display.getDefault().syncExec(() -> WEB.openUrl(authorizeUrl.toString()));
    }
 
    private void onSelectBrowseDirectory() {

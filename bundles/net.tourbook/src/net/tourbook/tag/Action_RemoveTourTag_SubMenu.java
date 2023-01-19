@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package net.tourbook.tag;
 
+import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,12 +27,13 @@ import net.tourbook.Messages;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -38,7 +41,8 @@ import org.eclipse.swt.widgets.MenuItem;
 /**
  * Removes a tag from the selected tours
  */
-public class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator {
+//todo fb dispose image
+class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator {
 
    private TagMenuManager      _tagMenuMgr;
    private Menu                _menu;
@@ -57,6 +61,10 @@ public class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator
       public ActionTourTag(final TourTag tourTag) {
 
          super(tourTag.getTagName(), AS_CHECK_BOX);
+         final Image image = UI.prepareTagImage(tourTag.getImageFilePath());
+         if (image != null) {
+            setImageDescriptor(ImageDescriptor.createFromImage(image));
+         }
 
          _tourTag = tourTag;
       }
@@ -67,7 +75,7 @@ public class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator
       }
    }
 
-   public Action_RemoveTourTag_SubMenu(final TagMenuManager tagMenuManager) {
+   Action_RemoveTourTag_SubMenu(final TagMenuManager tagMenuManager) {
 
       super(Messages.action_tag_remove, AS_DROP_DOWN_MENU);
 
@@ -141,12 +149,7 @@ public class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator
       _menu = new Menu(parent);
 
       // Add listener to repopulate the menu each time
-      _menu.addMenuListener(new MenuAdapter() {
-         @Override
-         public void menuShown(final MenuEvent e) {
-            onFillMenu((Menu) e.widget);
-         }
-      });
+      _menu.addMenuListener(menuShownAdapter(menuEvent -> onFillMenu((Menu) menuEvent.widget)));
 
       return _menu;
    }
@@ -159,12 +162,7 @@ public class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator
       _menu = new Menu(parent);
 
       // Add listener to repopulate the menu each time
-      _menu.addMenuListener(new MenuAdapter() {
-         @Override
-         public void menuShown(final MenuEvent e) {
-            onFillMenu((Menu) e.widget);
-         }
-      });
+      _menu.addMenuListener(menuShownAdapter(menuEvent -> onFillMenu((Menu) menuEvent.widget)));
 
       return _menu;
    }

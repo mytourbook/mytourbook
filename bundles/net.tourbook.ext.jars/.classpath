@@ -17,7 +17,5 @@
 	<classpathentry exported="true" kind="lib" path="net.sf.swtaddons_0.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="simplelatlng-1.4.0.jar"/> <!-- https://mvnrepository.com/artifact/com.javadocmd/simplelatlng -->
 	<classpathentry exported="true" kind="lib" path="commons-suncalc-3.4.jar"/> <!-- https://mvnrepository.com/artifact/org.shredzone.commons/commons-suncalc -->
-	<classpathentry exported="true" kind="lib" path="httpcore-4.4.15.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->
-	<classpathentry exported="true" kind="lib" path="httpclient-4.5.13.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
 	<classpathentry kind="output" path="bin"/>
 </classpath>

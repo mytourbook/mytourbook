@@ -176,6 +176,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -605,8 +606,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    private ComboViewerCadence _comboCadence;
    //
-   private CLabel             _lblCloudIcon;
    private CLabel             _lblTourType;
+   private List<CLabel>       _tagsLabels = new ArrayList<>();
    //
    private ControlDecoration  _decoTimeZone;
    //
@@ -617,17 +618,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Combo              _comboWeather_Wind_DirectionText;
    private Combo              _comboWeather_WindSpeedText;
    //
+   private Composite          _compositeTags;
+   //
    private DateTime           _dtStartTime;
    private DateTime           _dtTourDate;
    //
    private Label              _lblAltitudeUpUnit;
    private Label              _lblAltitudeDownUnit;
+   private Label              _lblCloudIcon;
    private Label              _lblDistanceUnit;
    private Label              _lblPerson_BodyWeightUnit;
    private Label              _lblPerson_BodyFatUnit;
    private Label              _lblSpeedUnit;
    private Label              _lblStartTime;
-   private Label              _lblTags;
    private Label              _lblTimeZone;
    private Label              _lblWeather_PrecipitationUnit;
    private Label              _lblWeather_PressureUnit;
@@ -4079,7 +4082,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                label.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
 
                // icon: clouds
-               _lblCloudIcon = new CLabel(cloudContainer, SWT.NONE);
+               _lblCloudIcon = new Label(cloudContainer, SWT.NONE);
                GridDataFactory
                      .fillDefaults()//
                      .align(SWT.END, SWT.FILL)
@@ -4631,7 +4634,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _tk.adapt(_linkTag, true, true);
             _firstColumnControls.add(_linkTag);
 
-            _lblTags = _tk.createLabel(container, UI.EMPTY_STRING, SWT.WRAP);
+            _compositeTags = new Composite(container, SWT.NONE);
+            final RowLayout layout = new RowLayout();
+            layout.wrap = true;
+            _compositeTags.setLayout(layout);
+            _compositeTags.setLayoutData(layout);
+
             GridDataFactory
                   .fillDefaults()//
                   .grab(true, true)
@@ -4640,7 +4648,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                    */
                   .hint(2 * _hintTextColumnWidth, SWT.DEFAULT)
                   .span(3, 1)
-                  .applyTo(_lblTags);
+                  .applyTo(_compositeTags);
          }
 
          {
@@ -6139,6 +6147,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        * app is asking to save the tour!
        */
       setTourClean();
+
 
       super.dispose();
    }
@@ -9213,7 +9222,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // tour type/tags
       net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
-      net.tourbook.ui.UI.updateUI_Tags(_tourData, _lblTags);
+      net.tourbook.ui.UI.updateUI_TagsWithImage(_tourData.getTourTags(), _compositeTags, _tagsLabels);
 
       // measurement system
       _lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
@@ -9502,7 +9511,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // tour type/tags
       net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
-      net.tourbook.ui.UI.updateUI_Tags(_tourData, _lblTags);
+      net.tourbook.ui.UI.updateUI_TagsWithImage(_tourData.getTourTags(), _compositeTags, _tagsLabels);
 
       // reflow layout that the tags are aligned correctly
       _tourContainer.layout(true);

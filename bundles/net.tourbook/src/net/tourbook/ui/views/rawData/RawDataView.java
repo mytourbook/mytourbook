@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,12 +18,16 @@ package net.tourbook.ui.views.rawData;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_DELETE;
 import static net.tourbook.ui.UI.getIconUrl;
+import static org.eclipse.swt.browser.LocationListener.changedAdapter;
+import static org.eclipse.swt.browser.LocationListener.changingAdapter;
+import static org.eclipse.swt.browser.ProgressListener.completedAdapter;
+import static org.eclipse.swt.events.MenuListener.menuHiddenAdapter;
+import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -167,13 +171,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.BrowserFunction;
-import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.browser.ProgressAdapter;
-import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
@@ -395,11 +394,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private ActionToggleFossilOrEasyImport _actionToggleFossilOrEasyImportUI;
    private ActionUpload                   _actionUploadTour;
    //
-   protected TourPerson                   _activePerson;
-   protected TourPerson                   _newActivePerson;
+   private TourPerson                     _activePerson;
+   private TourPerson                     _newActivePerson;
    //
-   protected boolean                      _isPartVisible                  = false;
-   protected boolean                      _isViewerPersonDataDirty        = false;
+   private boolean                        _isPartVisible                  = false;
+   private boolean                        _isViewerPersonDataDirty        = false;
    //
    private final NumberFormat             _nf1;
    private final NumberFormat             _nf3;
@@ -688,7 +687,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
-   public class TableContextMenuProvider implements IContextMenuProvider {
+   private class TableContextMenuProvider implements IContextMenuProvider {
 
       @Override
       public void disposeContextMenu() {
@@ -1184,7 +1183,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                   + "   opacity:                " + (float) opacity / 100 + ";" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
                   + "}" + NL; //                                                          //$NON-NLS-1$
 
-         } catch (IOException | URISyntaxException e) {
+         } catch (final Exception e) {
             TourLogManager.log_EXCEPTION_WithStacktrace(e);
          }
       }
@@ -2342,6 +2341,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       enableActions();
       restoreState();
 
+      //todo fb download ytours
+      //  _cloudDownloadersList.stream()
+            // .filter(cd -> cd.getId().equals(hrefAction))
+      //       .forEach(TourbookCloudDownloader::downloadTours);
+
       // the part visible listener shows the top page also
       updateUI_1_TopPage(true);
    }
@@ -2452,7 +2456,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          _imageUrl_DeviceFolder_NotChecked = getIconUrl(Images.RawData_DeviceFolder_NotChecked);
          _imageUrl_DeviceFolder_NotSetup = getIconUrl(Images.RawData_DeviceFolder_NotSetup);
 
-      } catch (final IOException | URISyntaxException e) {
+      } catch (final Exception e) {
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
    }
@@ -2685,29 +2689,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             new JS_OnSelectImportConfig(_browser, JS_FUNCTION_ON_SELECT_IMPORT_CONFIG);
 
-            _browser.addLocationListener(new LocationAdapter() {
+            _browser.addLocationListener(changedAdapter(locationEvent -> {
+//             _browser.removeLocationListener(this);
+//             function.dispose();
+            }));
+            _browser.addLocationListener(changingAdapter(this::onBrowser_LocationChanging));
 
-               @Override
-               public void changed(final LocationEvent event) {
-
-//                  _browser.removeLocationListener(this);
-//                  function.dispose();
-               }
-
-               @Override
-               public void changing(final LocationEvent event) {
-                  onBrowser_LocationChanging(event);
-               }
-            });
-
-            _browser.addProgressListener(new ProgressAdapter() {
-               @Override
-               public void completed(final ProgressEvent event) {
-
-                  onBrowser_Completed();
-
-               }
-            });
+            _browser.addProgressListener(completedAdapter(progressEvent -> onBrowser_Completed()));
          }
 
       } catch (final SWTError e) {
@@ -2805,17 +2793,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final Table table = (Table) _tourViewer.getControl();
       final Menu tableContextMenu = _viewerMenuManager.createContextMenu(table);
 
-      tableContextMenu.addMenuListener(new MenuAdapter() {
-         @Override
-         public void menuHidden(final MenuEvent e) {
-            _tagMenuManager.onHideMenu();
-         }
-
-         @Override
-         public void menuShown(final MenuEvent menuEvent) {
-            _tagMenuManager.onShowMenu(menuEvent, table, Display.getCurrent().getCursorLocation(), _tourInfoToolTip);
-         }
-      });
+      tableContextMenu.addMenuListener(menuHiddenAdapter(menuEvent -> _tagMenuManager.onHideMenu()));
+      tableContextMenu.addMenuListener(menuShownAdapter(menuEvent -> _tagMenuManager.onShowMenu(menuEvent,
+            table,
+            Display.getCurrent().getCursorLocation(),
+            _tourInfoToolTip)));
 
       return tableContextMenu;
    }
