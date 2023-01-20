@@ -105,14 +105,12 @@ public class MapPlayerManager {
     * 1 ... 2 RETURN TRACK from end...start<br>
     * 0 ...-1 RETURN TRACK from start...end
     */
-   private static double                _relativePosition_CurrentFrame;
-   private static double                _relativePosition_StartFrame;
-   private static double                _relativePosition_EndFrame;
+   private static double                _relativePosition_Current;
+   private static double                _relativePosition_Start;
+   private static double                _relativePosition_End;
 
-   private static int                   _currentNotClippedLocationIndex;
    private static int                   _currentVisibleIndex;
 
-   private static boolean               _isAnimateFromRelativePosition;
    private static boolean               _isAnimationVisible;
    private static boolean               _isPlayerEnabled;
    private static boolean               _isPlayerRunning                 = true;
@@ -157,7 +155,12 @@ public class MapPlayerManager {
    /**
     * Default animation time in milliseconds
     */
-   private static int                   _defaultAnimationTime            = 1000;
+   private static int                   _modelAnimationTime              = 1000;
+
+   /**
+    * Model speed when moving on the NORMAL TRACK in units per second
+    */
+   private static int                   _normalTrackSpeed                = 200;
 
    /**
     * Model speed when moving on the RETURN TRACK
@@ -180,6 +183,7 @@ public class MapPlayerManager {
    private static float                 _modelForwardAngle;
    private static float                 _previousAngle;
    private static double                _previousRelativePosition;
+// private static double                _previousRelativePositionTest;
    private static double                _previousProjectedPositionX;
    private static double                _previousProjectedPositionY;
 
@@ -191,7 +195,7 @@ public class MapPlayerManager {
    }
 
    public static long getAnimationDuration() {
-      return _defaultAnimationTime;
+      return _modelAnimationTime;
    }
 
    public static double getCompileMapScale() {
@@ -266,15 +270,9 @@ public class MapPlayerManager {
     */
    public static int getNextVisibleFrameIndex() {
 
-      if (
+      if (_isPlayerRunning == false) {
 
-      // player is paused
-      _isPlayerRunning == false
-
-            // exception: compute current frame when a relative position is set,
-            //            this is used when timeline is dragged/selected
-            && _isAnimateFromRelativePosition == false) {
-
+         // player is paused
          return _currentVisibleIndex;
       }
 
@@ -289,57 +287,19 @@ public class MapPlayerManager {
          return 0;
       }
 
-      int nextFrameNumber = 0;
-      boolean isComputeNextVisibleIndex = false;
+      /*
+       * Get visible index from not clipped index
+       */
+      final double rawIndex = numNotClipped_GeoLocationIndices * _relativePosition_Current;
+      int notClippedLocationIndex = (int) Math.round(rawIndex);
 
-      _isAnimateFromRelativePosition = true;
+      // ensure bounds
+      notClippedLocationIndex = clamp(notClippedLocationIndex, 0, numNotClipped_GeoLocationIndices - 1);
 
-      if (_isAnimateFromRelativePosition) {
+      final int[] allVisibleGeoLocationIndices = _mapPlayerData.allVisible_GeoLocationIndices;
+      final int notClippedIndex = allNotClipped_GeoLocationIndices[notClippedLocationIndex];
 
-         // 1. Prio: Use relative position
-
-         final double rawIndex = numNotClipped_GeoLocationIndices * _relativePosition_CurrentFrame;
-         _currentNotClippedLocationIndex = (int) Math.round(rawIndex);
-
-         isComputeNextVisibleIndex = true;
-
-      } else if (_isPlayingLoop && _currentVisibleFrameNumber >= _numAllVisibleFrames) {
-
-         // 2. Prio: Loop animation
-
-         // start loop with first frame
-
-         nextFrameNumber = 1;
-
-         _currentNotClippedLocationIndex = 0;
-
-      } else {
-
-         // 3. Prio: Compute next frame
-
-         if (_currentNotClippedLocationIndex < numNotClipped_GeoLocationIndices - 2) {
-            _currentNotClippedLocationIndex++;
-         }
-
-         _relativePosition_CurrentFrame = (double) _currentNotClippedLocationIndex / numNotClipped_GeoLocationIndices;
-
-         isComputeNextVisibleIndex = true;
-      }
-
-      if (isComputeNextVisibleIndex) {
-
-         /*
-          * Get visible index from not clipped index
-          */
-
-         // ensure bounds
-         _currentNotClippedLocationIndex = clamp(_currentNotClippedLocationIndex, 0, numNotClipped_GeoLocationIndices - 1);
-
-         final int[] allVisibleGeoLocationIndices = _mapPlayerData.allVisible_GeoLocationIndices;
-         final int notClippedIndex = allNotClipped_GeoLocationIndices[_currentNotClippedLocationIndex];
-
-         nextFrameNumber = MtMath.searchNearestIndex(allVisibleGeoLocationIndices, notClippedIndex);
-      }
+      int nextFrameNumber = MtMath.searchNearestIndex(allVisibleGeoLocationIndices, notClippedIndex);
 
       // ensure bounds
       if (nextFrameNumber > _numAllVisibleFrames) {
@@ -364,11 +324,10 @@ public class MapPlayerManager {
    }
 
    /**
-    * @param _currentMapPosition
     * @return Returns the {@link #_projectedPosition} of the animated model for the current frame or
     *         <code>null</code> when data are missing
     */
-   public static double[] getProjectedPosition(final MapPosition currentMapPosition) {
+   public static double[] getProjectedPosition() {
 
       final long currentFrameTime = MapRenderer.frametime;
 
@@ -433,7 +392,6 @@ public class MapPlayerManager {
       double relativePosition = getRelativePosition();
 
       double[] allProjectedPoints;
-      int numProjectedPoints;
 
       int geoLocationIndex_0 = 0;
       int geoLocationIndex_1 = 0;
@@ -471,7 +429,7 @@ public class MapPlayerManager {
 
          allProjectedPoints = mapPlayerData.allProjectedPoints_ReturnTrack;
 
-         numProjectedPoints = allProjectedPoints.length;
+         final int numProjectedPoints = allProjectedPoints.length;
          final int numReturnPositions = numProjectedPoints / 2;
          final int lastReturnIndex = numReturnPositions - 1;
 
@@ -486,10 +444,9 @@ public class MapPlayerManager {
 
       } else {
 
-         // relativePosition is >= 0 && <= 1 -> move model on NORMAL TRACK
+         // move model on NORMAL TRACK, relativePosition is >= 0 && <= 1
 
          allProjectedPoints = mapPlayerData.allProjectedPoints_NormalTrack;
-         numProjectedPoints = allProjectedPoints.length;
 
          // adjust last index by -1 that positionIndex_1 can point to the last index
          final int lastAdjusted_GeoLocationIndex = lastGeoLocationIndex > 0
@@ -559,8 +516,8 @@ public class MapPlayerManager {
     * </pre>
     * <p>
     *
-    * @return Returns the relative position {@link #_relativePosition_CurrentFrame} which depends on
-    *         the remaining animation time, it is between
+    * @return Returns the relative position {@link #_relativePosition_Current} which depends
+    *         on the remaining animation time, it is between
     *         <p>
     *         0 ... 1 start...end for the normal model movement<br>
     *         1 ... 2 return track end...start<br>
@@ -585,17 +542,17 @@ public class MapPlayerManager {
             /*
              * Ensure that the model is on the NORMAL TRACK
              */
-            if (_relativePosition_EndFrame < 0) {
+            if (_relativePosition_End < 0) {
 
                // model was moving on the RETURN TRACK from start...end -> set to normal end
 
-               _relativePosition_EndFrame = 1;
+               _relativePosition_End = 1;
 
-            } else if (_relativePosition_EndFrame > 1) {
+            } else if (_relativePosition_End > 1) {
 
                // model was moving on the RETURN TRACK from end...start -> set to normal start
 
-               _relativePosition_EndFrame = 0;
+               _relativePosition_End = 0;
             }
 
             /*
@@ -603,17 +560,14 @@ public class MapPlayerManager {
              * which causes the model to be not at the requested position. This can be easily
              * checked with the start and end position (Home/End button).
              */
-            if (_relativePosition_CurrentFrame != _relativePosition_EndFrame) {
+            if (_relativePosition_Current != _relativePosition_End) {
 
-               _relativePosition_CurrentFrame = _relativePosition_EndFrame;
+               _relativePosition_Current = _relativePosition_End;
             }
 
             if (_lastRemainingDuration > 0) {
 
                _lastRemainingDuration = 0;
-
-               // redraw
-               _isAnimateFromRelativePosition = true;
             }
 
             /*
@@ -634,48 +588,48 @@ public class MapPlayerManager {
                _trackState_NormalTrack = TrackState.IDLE;
             }
 
-            return _relativePosition_CurrentFrame;
+            return _relativePosition_Current;
          }
 
          // advance to the next animated frame
 
-         final float relativeRemaining = remainingDuration / _defaultAnimationTime; // 0...1
+         final float relativeRemaining = remainingDuration / _modelAnimationTime; // 0...1
          final float relativeAdvance = clamp(1.0f - relativeRemaining, 0, 1);
 
-         if (_relativePosition_EndFrame < 0) {
+         if (_relativePosition_End < 0) {
 
             // model is moving on the RETURN TRACK -> start...end -> 0...-1
 
-            final double startEndDiff = _relativePosition_EndFrame - _relativePosition_StartFrame;
+            final double startEndDiff = _relativePosition_End - _relativePosition_Start;
             final double startEndAdvance = startEndDiff * relativeAdvance;
-            final double currentRelativePosition = _relativePosition_StartFrame + startEndAdvance;
+            final double currentRelativePosition = _relativePosition_Start + startEndAdvance;
 
-            _relativePosition_CurrentFrame = currentRelativePosition;
+            _relativePosition_Current = currentRelativePosition;
 
-         } else if (_relativePosition_EndFrame > 1) {
+         } else if (_relativePosition_End > 1) {
 
             // model is moving on the RETURN TRACK -> end...start -> 1...2
 
-            final double startEndDiff = _relativePosition_EndFrame - _relativePosition_StartFrame;
+            final double startEndDiff = _relativePosition_End - _relativePosition_Start;
             final double startEndAdvance = startEndDiff * relativeAdvance;
-            final double currentRelativePosition = _relativePosition_StartFrame + startEndAdvance;
+            final double currentRelativePosition = _relativePosition_Start + startEndAdvance;
 
-            _relativePosition_CurrentFrame = currentRelativePosition;
+            _relativePosition_Current = currentRelativePosition;
 
          } else {
 
             // _relativePosition_EndFrame: 0...1 -> model is moving on the NORMAL TRACK -> start...end
 
-            if (_relativePosition_CurrentFrame < 0) {
+            if (_relativePosition_Current < 0) {
 
                // model is still moving on the RETURN TRACK from start...end -> 0...-1
 
-               final double remainingStartFrame = 1 + _relativePosition_StartFrame;
-               final double remainingEndFrame = 1 - _relativePosition_EndFrame;
+               final double remainingStartFrame = 1 + _relativePosition_Start;
+               final double remainingEndFrame = 1 - _relativePosition_End;
 
                final double startEndDiff = remainingStartFrame + remainingEndFrame;
                final double startEndAdvance = startEndDiff * relativeAdvance;
-               double currentRelativePosition = _relativePosition_StartFrame - startEndAdvance;
+               double currentRelativePosition = _relativePosition_Start - startEndAdvance;
 
                // check if model in on the NORMAL or RETURN TRACK
                if (currentRelativePosition < -1) {
@@ -684,23 +638,23 @@ public class MapPlayerManager {
 
                   currentRelativePosition += 2;
 
-                  _relativePosition_StartFrame = _relativePosition_StartFrame + 2;
-                  _relativePosition_CurrentFrame = clamp(currentRelativePosition, 0, 1);
+                  _relativePosition_Start = _relativePosition_Start + 2;
+                  _relativePosition_Current = clamp(currentRelativePosition, 0, 1);
 
                } else {
 
                   // model is still on the RETURN TRACK -> 0...-1
 
-                  _relativePosition_CurrentFrame = clamp(currentRelativePosition, -1, 0);
+                  _relativePosition_Current = clamp(currentRelativePosition, -1, 0);
                }
 
-            } else if (_relativePosition_CurrentFrame > 1) {
+            } else if (_relativePosition_Current > 1) {
 
                // model is still moving on the RETURN TRACK from end...start -> 1...2
 
-               final double startEndDiff = 2 - _relativePosition_StartFrame + _relativePosition_EndFrame;
+               final double startEndDiff = 2 - _relativePosition_Start + _relativePosition_End;
                final double startEndAdvance = startEndDiff * relativeAdvance;
-               double currentRelativePosition = _relativePosition_StartFrame + startEndAdvance;
+               double currentRelativePosition = _relativePosition_Start + startEndAdvance;
 
                // check if model in on the NORMAL or RETURN TRACK
                if (currentRelativePosition > 2) {
@@ -709,35 +663,32 @@ public class MapPlayerManager {
 
                   currentRelativePosition -= 2;
 
-                  _relativePosition_StartFrame = _relativePosition_StartFrame - 2;
-                  _relativePosition_CurrentFrame = clamp(currentRelativePosition, 0, 1);
+                  _relativePosition_Start = _relativePosition_Start - 2;
+                  _relativePosition_Current = clamp(currentRelativePosition, 0, 1);
 
                } else {
 
                   // model is still on the RETURN TRACK -> 1...2
 
-                  _relativePosition_CurrentFrame = clamp(currentRelativePosition, 1, 2);
+                  _relativePosition_Current = clamp(currentRelativePosition, 1, 2);
                }
 
             } else {
 
                // _relativePosition_CurrentFrame: 0...1 -> model is moving on the NORMAL TRACK -> start...end
 
-               final double startEndDiff = _relativePosition_EndFrame - _relativePosition_StartFrame;
+               final double startEndDiff = _relativePosition_End - _relativePosition_Start;
                final double startEndAdvance = startEndDiff * relativeAdvance;
-               final double currentRelativePosition = _relativePosition_StartFrame + startEndAdvance;
+               final double currentRelativePosition = _relativePosition_Start + startEndAdvance;
 
-               _relativePosition_CurrentFrame = clamp(currentRelativePosition, 0, 1);
+               _relativePosition_Current = clamp(currentRelativePosition, 0, 1);
             }
          }
-
-         // redraw
-         _isAnimateFromRelativePosition = true;
 
          _lastRemainingDuration = remainingDuration;
       }
 
-      return _relativePosition_CurrentFrame;
+      return _relativePosition_Current;
    }
 
    /**
@@ -760,7 +711,7 @@ public class MapPlayerManager {
     * </pre>
     * <p>
     *
-    * @return Returns the relative position {@link #_relativePosition_CurrentFrame}, it is between
+    * @return Returns the relative position {@link #_relativePosition_Current}, it is between
     *         <p>
     *         0 ... 1 start...end for the normal model movement<br>
     *         1 ... 2 return track end...start<br>
@@ -770,7 +721,7 @@ public class MapPlayerManager {
 
       double nextPosition;
 
-      if (_relativePosition_CurrentFrame >= 0 && _relativePosition_CurrentFrame <= 1) {
+      if (_relativePosition_Current >= 0 && _relativePosition_Current <= 1) {
 
          // model is moving on the NORMAL TRACK, get next position
 
@@ -782,13 +733,13 @@ public class MapPlayerManager {
 
          final double speedValue_Scaled = speedValue / mapScale * _autoplaySpeedFactor;
 
-         nextPosition = _relativePosition_CurrentFrame + speedValue_Scaled;
+         nextPosition = _relativePosition_Current + speedValue_Scaled;
 
       } else {
 
          // model is moving on the RETURN TRACK
 
-         final double returnSpeed = 0.05;
+         final double returnSpeed = 0.02;
 
 //         final long foregroundFPS = Map25FPSManager.getForegroundFPS();
 //         final float frameDurationMS = 1000f / foregroundFPS;
@@ -800,13 +751,13 @@ public class MapPlayerManager {
                ? returnSpeed
                : -returnSpeed;
 
-         nextPosition = _relativePosition_CurrentFrame + positionDiff;
+         nextPosition = _relativePosition_Current + positionDiff;
       }
 
-      _relativePosition_CurrentFrame = getRelativePosition_CheckStartEnd(nextPosition);
+      _relativePosition_Current = getRelativePosition_CheckStartEnd(nextPosition);
 
       // !!! must also update the relative end position otherwise the model would jump when timeline is selected !!!
-      _relativePosition_EndFrame = _relativePosition_CurrentFrame;
+      _relativePosition_End = _relativePosition_Current;
 
       /*
        * Show moved model position in the player time line
@@ -821,11 +772,18 @@ public class MapPlayerManager {
 
             _lastTimelineUpdateTime = frametime;
 
-            _mapPlayerView.updatePlayer_Timeline(_relativePosition_CurrentFrame);
+            _mapPlayerView.updatePlayer_Timeline(_relativePosition_Current);
          }
       }
 
-      return _relativePosition_CurrentFrame;
+//      final double positionDiff = _relativePosition_CurrentFrame - _previousRelativePositionTest;
+//
+//      System.out.println(UI.timeStamp() + " diff: " + positionDiff);
+//// TODO remove SYSTEM.OUT.PRINTLN
+//
+//      _previousRelativePositionTest = _relativePosition_CurrentFrame;
+
+      return _relativePosition_Current;
    }
 
    private static double getRelativePosition_CheckStartEnd(final double nextPosition) {
@@ -1007,7 +965,10 @@ public class MapPlayerManager {
     * @param projectedX2
     * @param projectedY2
     */
-   private static void setModelAngle(final double projectedX1, final double projectedY1, final double projectedX2, final double projectedY2) {
+   private static void setModelAngle(final double projectedX1,
+                                     final double projectedY1,
+                                     final double projectedX2,
+                                     final double projectedY2) {
 
       if (projectedX1 == projectedX2 && projectedY1 == projectedY2) {
          return;
@@ -1186,7 +1147,7 @@ public class MapPlayerManager {
    public static void setRelativePosition(final double newRelativePosition) {
 
       // ignore the same position
-      if (newRelativePosition == _relativePosition_EndFrame) {
+      if (newRelativePosition == _relativePosition_End) {
          return;
       }
 
@@ -1200,7 +1161,7 @@ public class MapPlayerManager {
           */
 
          final boolean isSetNormalTrack = newRelativePosition >= 0 && newRelativePosition <= 1;
-         final boolean isCurrentlyOnNormalTrack = _relativePosition_CurrentFrame >= 0 && _relativePosition_CurrentFrame <= 1;
+         final boolean isCurrentlyOnNormalTrack = _relativePosition_Current >= 0 && _relativePosition_Current <= 1;
 
          /*
           * Set forward flag
@@ -1243,12 +1204,9 @@ public class MapPlayerManager {
       _animationEndTime = MapRenderer.frametime + animationTime;
 
       // set new start position from the current position
-      _relativePosition_StartFrame = _relativePosition_CurrentFrame;
+      _relativePosition_Start = _relativePosition_Current;
 
-      _relativePosition_EndFrame = newRelativePosition;
-
-      // this will also force to compute the frame even when player is paused
-      _isAnimateFromRelativePosition = true;
+      _relativePosition_End = newRelativePosition;
    }
 
    /**
@@ -1257,28 +1215,30 @@ public class MapPlayerManager {
     */
    private static int setRelativePosition_GetAnimationTime(final double newRelativePosition) {
 
-      _defaultAnimationTime = 1000;
+      _modelAnimationTime = 1000;
 
       _returnTrackSpeed_PixelPerSecond = 200;
+
+      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
+      if (mapPlayerData == null) {
+         return _modelAnimationTime;
+      }
 
       if (newRelativePosition >= 0 && newRelativePosition <= 1) {
 
          // 0...1 -> model is moving on the NORMAL TRACK
 
-         return _defaultAnimationTime;
+         final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
+
+         return _modelAnimationTime;
 
       } else {
 
          // model is moving on the RETURN TRACK
 
-         final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
-         if (mapPlayerData == null) {
-            return _defaultAnimationTime;
-         }
-
          final double pixelDistance = mapPlayerData.trackEnd2StartPixelDistance;
 
-         final double animationTime = _defaultAnimationTime * (pixelDistance / _returnTrackSpeed_PixelPerSecond);
+         final double animationTime = _modelAnimationTime * (pixelDistance / _returnTrackSpeed_PixelPerSecond);
 
 //      System.out.println(UI.timeStamp()
 //
@@ -1288,11 +1248,14 @@ public class MapPlayerManager {
 //      );
 // TODO remove SYSTEM.OUT.PRINTLN
 
-         return (int) clamp(animationTime, 1, _defaultAnimationTime);
+         return (int) clamp(animationTime, 1, _modelAnimationTime);
       }
    }
 
    private static void setRelativePosition_ScheduleNewPosition(final double newRelativePosition) {
+
+//      System.out.println(UI.timeStamp() + " scheduled: " + newRelativePosition);
+//// TODO remove SYSTEM.OUT.PRINTLN
 
       final long currentFrameTime = MapRenderer.frametime;
 

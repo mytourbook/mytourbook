@@ -1644,7 +1644,7 @@ public class Map25View extends ViewPart implements
          numAllTimeSlices += tourData.latitudeSerie.length;
       }
 
-      // use array to optimize performance when millions of points are created
+      // use an array to optimize performance when millions of points are created
       _allGeoPoints = new GeoPoint[numAllTimeSlices];
       _allTourStarts.clear();
       final int[] allGeoPointColors = new int[numAllTimeSlices];
@@ -1652,11 +1652,17 @@ public class Map25View extends ViewPart implements
       int tourIndex = 0;
       int geoIndex = 0;
 
+      int[] allTimeSeries;
+      float[] allDistanceSeries;
+
       if (_allTourData.size() == 1 && _allTourData.get(0).isMultipleTours()) {
 
          // one tourdata contains multiple tours
 
          final TourData tourData = _allTourData.get(0);
+
+         allTimeSeries = tourData.timeSerie;
+         allDistanceSeries = tourData.distanceSerie;
 
          _allTourStarts.addAll(tourData.multipleTourStartIndex);
 
@@ -1670,16 +1676,35 @@ public class Map25View extends ViewPart implements
 
       } else {
 
+         allTimeSeries = new int[numAllTimeSlices];
+         allDistanceSeries = new float[numAllTimeSlices];
+
          for (final TourData tourData : _allTourData) {
 
             _allTourStarts.add(tourIndex);
 
+            /*
+             * Create time/distance series
+             */
+            final int[] oneTourTimeSerie = tourData.timeSerie;
+            final float[] oneTourDistanceSerie = tourData.distanceSerie;
+
+            if (oneTourTimeSerie != null) {
+               System.arraycopy(oneTourTimeSerie, 0, allTimeSeries, geoIndex, oneTourTimeSerie.length);
+            }
+
+            if (oneTourDistanceSerie != null) {
+               System.arraycopy(oneTourDistanceSerie, 0, allDistanceSeries, geoIndex, oneTourDistanceSerie.length);
+            }
+
+            /*
+             * Create vtm geo points and colors
+             */
             final double[] latitudeSerie = tourData.latitudeSerie;
             final double[] longitudeSerie = tourData.longitudeSerie;
 
             final float[] valueSerie = getValueSerie(tourData);
 
-            // create vtm geo points and colors
             for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++, tourIndex++) {
 
                _allGeoPoints[geoIndex] = (new GeoPoint(latitudeSerie[serieIndex], longitudeSerie[serieIndex]));
@@ -1722,7 +1747,7 @@ public class Map25View extends ViewPart implements
          }
       }
 
-      tourLayer.setupTourPositions(_allGeoPoints, allGeoPointColors, _allTourStarts);
+      tourLayer.setupTourPositions(_allGeoPoints, allGeoPointColors, _allTourStarts, allTimeSeries, allDistanceSeries);
 
       checkSliderIndices();
 

@@ -760,7 +760,7 @@ public final class TourTrack_Shader {
 
       final MapPosition currentMapPosition = viewport.pos;
 
-      final double[] projectedPositionXY = MapPlayerManager.getProjectedPosition(currentMapPosition);
+      final double[] projectedPositionXY = MapPlayerManager.getProjectedPosition();
 
       if (projectedPositionXY != null) {
 
@@ -854,13 +854,16 @@ public final class TourTrack_Shader {
 
       mapPlayerData.allProjectedPoints_NormalTrack    = trackBucket.allProjectedPoints;
       mapPlayerData.allProjectedPoints_ReturnTrack    = trackBucket.allProjectedPoints_ReturnTrack;
-      mapPlayerData.trackEnd2StartPixelDistance       = trackBucket.trackEnd2StartPixelDistance;
+      mapPlayerData.allTimeSeries                     = trackBucket.allTimeSeries;
+      mapPlayerData.allDistanceSeries                 = trackBucket.allDistanceSeries;
+
 
       mapPlayerData.allVisible_PixelPositions         = trackBucket.allVisible_PixelPositions;
       mapPlayerData.allVisible_GeoLocationIndices     = trackBucket.allVisible_GeoLocationIndices;
 
       mapPlayerData.allNotClipped_GeoLocationIndices  = trackBucket.allNotClipped_GeoLocationIndices;
 
+      mapPlayerData.trackEnd2StartPixelDistance       = trackBucket.trackEnd2StartPixelDistance;
       mapPlayerData.mapScale                          = viewport.pos.scale;
 
 // SET_FORMATTING_ON

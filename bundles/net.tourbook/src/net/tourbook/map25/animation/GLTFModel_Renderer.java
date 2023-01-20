@@ -152,6 +152,9 @@ public class GLTFModel_Renderer extends LayerRenderer {
       _modelForwardAngle = 90;
       _modelCenterToForwardFactor = 1.4;
 
+      // wood plane
+//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/wood-plane/wood-plane.gltf"));
+
       // painted bicycle
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/simple-bicycle/simple-bicycle.gltf"));
 //      _modelForwardAngle = 90;
@@ -166,9 +169,6 @@ public class GLTFModel_Renderer extends LayerRenderer {
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/wood-truck/wood-truck.gltf"));
 //      _modelForwardAngle = -0;
 //      _modelCenterToForwardFactor = -7;
-
-      // wood plane
-//      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/wood-plane/wood-plane.gltf"));
 
       /*
        * sketchfab.com models
@@ -390,7 +390,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
     */
    private void render_UpdateModelPosition() {
 
-      final double[] projectedPositionXY = MapPlayerManager.getProjectedPosition(_currentMapPosition);
+      final double[] projectedPositionXY = MapPlayerManager.getProjectedPosition();
 
       if (projectedPositionXY == null) {
          return;

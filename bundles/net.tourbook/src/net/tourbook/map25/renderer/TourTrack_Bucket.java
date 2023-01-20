@@ -113,8 +113,8 @@ public class TourTrack_Bucket {
    int[]                      allVisible_GeoLocationIndices;
 
    /**
-    * Contains indices into all geo positions {@link #anyGeoPoints} for all selected tours
-    * which are also outside of the clipper (visible) area -2048...2048
+    * Contains indices into all geo positions for all selected tours. They are optimized for a
+    * minimum distance, so they can be also outside of the clipper (visible) area -2048...2048
     */
    int[]                      allNotClipped_GeoLocationIndices;
 
@@ -126,6 +126,9 @@ public class TourTrack_Bucket {
     * Distance in pixel between the end and start point of the track for the current map scale
     */
    double                     trackEnd2StartPixelDistance;
+
+   int[]                      allTimeSeries;
+   float[]                    allDistanceSeries;
 
    public TourTrack_Bucket() {
 

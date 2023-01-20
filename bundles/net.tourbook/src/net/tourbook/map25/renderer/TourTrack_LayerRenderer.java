@@ -69,9 +69,11 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
    /**
     * Contains all available geo locations for all selected tours in lat/lon E6 format.
     */
-   private GeoPoint[]                    _anyGeoPoints;
+   private GeoPoint[]                    _allGeoPoints;
    private IntArrayList                  _allTourStarts;
    private int[]                         _allGeoPointColors;
+   private int[]                         _allTimeSeries;
+   private float[]                       _allDistanceSeries;
 
    private int                           _oldX         = -1;
    private int                           _oldY         = -1;
@@ -113,7 +115,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       /**
        * Contains all available geo locations for all selected tours in lat/lon E6 format.
        */
-      private GeoPoint[]        __anyGeoPoints;
+      private GeoPoint[]        __allGeoPoints;
 
       /**
        * Projected points 0...1 for all geo positions for all selected tours
@@ -135,8 +137,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       private float[]           __pixelPoints;
 
       /**
-       * Contains indices for all geo positions for all selected tours which are also outside of
-       * the clipper area -2048...2048
+       * Contains indices into all geo positions for all selected tours. They are optimized for a
+       * minimum distance, so they can be also outside of the clipper (visible) area -2048...2048
        */
       private IntArrayList      __allNotClipped_LocationIndices = new IntArrayList();
 
@@ -153,6 +155,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
       private int[]             __allGeoPointColors;
       private IntArrayList      __allTourStarts;
+
+      private int[]             __allTimeSeries;
+      private float[]           __allDistanceSeries;
 
       /**
        * Distance in pixel between the end and start point of the track for the current map scale
@@ -225,12 +230,12 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
              * Create projected points (0...1) for all geo points (lat/long)
              */
 
-            __anyGeoPoints = _anyGeoPoints;
+            __allGeoPoints = _allGeoPoints;
 
-            synchronized (__anyGeoPoints) {
+            synchronized (__allGeoPoints) {
 
                _isUpdateNewPoints = false;
-               __numAllGeoPoints = numGeoPoints = __anyGeoPoints.length;
+               __numAllGeoPoints = numGeoPoints = __allGeoPoints.length;
 
                double[] projectedPoints = __allProjectedPoints;
 
@@ -247,12 +252,15 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
                // lat/lon -> 0...1
                for (int pointIndex = 0; pointIndex < numGeoPoints; pointIndex++) {
-                  MercatorProjection.project(__anyGeoPoints[pointIndex], projectedPoints, pointIndex);
+                  MercatorProjection.project(__allGeoPoints[pointIndex], projectedPoints, pointIndex);
                }
 
                // fix concurrent issue, it does not need to clone the array
                __allGeoPointColors = _allGeoPointColors;
                __allTourStarts = _allTourStarts;
+
+               __allTimeSeries = _allTimeSeries;
+               __allDistanceSeries = _allDistanceSeries;
             }
          }
 
@@ -530,6 +538,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          workerBucket.allProjectedPoints = __allProjectedPoints;
          workerBucket.allProjectedPoints_ReturnTrack = __allProjectedPoints_ReturnTrack;
          workerBucket.allNotClipped_GeoLocationIndices = allNotClipped_LocationIndices.toArray();
+         workerBucket.allTimeSeries = __allTimeSeries;
+         workerBucket.allDistanceSeries = __allDistanceSeries;
          workerBucket.trackEnd2StartPixelDistance = __trackEnd2StartPixelDistance;
 
       } // doWork_CompileTrack end
@@ -545,8 +555,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                                             final double mapScale,
                                             final double compileMaxMapPixel) {
 
-         final GeoPoint geoPointStart = _anyGeoPoints[0];
-         final GeoPoint geoPointEnd = _anyGeoPoints[__numAllGeoPoints - 1];
+         final GeoPoint geoPointStart = _allGeoPoints[0];
+         final GeoPoint geoPointEnd = _allGeoPoints[__numAllGeoPoints - 1];
 
          /**
           * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -618,7 +628,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       _bucketManager_ForPainting = new TourTrack_BucketManager();
       _compileMapPosition = new MapPosition();
 
-      _anyGeoPoints = new GeoPoint[] {};
+      _allGeoPoints = new GeoPoint[] {};
       _allTourStarts = new IntArrayList();
 
       _trackCompileWorker = new TrackCompileWorker(map);
@@ -778,15 +788,20 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
    public void setupTourPositions(final GeoPoint[] allGeoPoints,
                                   final int[] allGeoPointColors,
-                                  final IntArrayList allTourStarts) {
+                                  final IntArrayList allTourStarts,
+                                  final int[] allTimeSeries,
+                                  final float[] allDistanceSeries) {
 
-      synchronized (_anyGeoPoints) {
+      synchronized (_allGeoPoints) {
 
-         _anyGeoPoints = allGeoPoints;
+         _allGeoPoints = allGeoPoints;
          _allGeoPointColors = allGeoPointColors;
 
          _allTourStarts.clear();
          _allTourStarts.addAll(allTourStarts);
+
+         _allTimeSeries = allTimeSeries;
+         _allDistanceSeries = allDistanceSeries;
       }
 
       _trackCompileWorker.cancel(true);
