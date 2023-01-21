@@ -20,6 +20,7 @@ import static org.oscim.utils.FastMath.clamp;
 import com.badlogic.gdx.math.MathUtils;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.map.IMapSyncListener.SyncParameter;
@@ -186,6 +187,7 @@ public class MapPlayerManager {
 // private static double                _previousRelativePositionTest;
    private static double                _previousProjectedPositionX;
    private static double                _previousProjectedPositionY;
+   private static int                   _prevValue;
 
    enum TrackState {
 
@@ -336,12 +338,11 @@ public class MapPlayerManager {
          return _projectedPosition;
       }
 
-      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
-      if (mapPlayerData == null) {
+      if (_mapPlayerData == null) {
          return null;
       }
 
-      final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
+      final int[] allNotClipped_GeoLocationIndices = _mapPlayerData.allNotClipped_GeoLocationIndices;
       final int numGeoLocations = allNotClipped_GeoLocationIndices.length;
       final int lastGeoLocationIndex = numGeoLocations - 1;
 
@@ -356,7 +357,7 @@ public class MapPlayerManager {
        * Compute position
        */
       // set projected position into "_projectedPosition"
-      getProjectedPosition_Compute(mapPlayerData, allNotClipped_GeoLocationIndices, lastGeoLocationIndex);
+      getProjectedPosition_Compute(allNotClipped_GeoLocationIndices, lastGeoLocationIndex);
 
       // keep time when position was computed
       _projectedPosition_Time = currentFrameTime;
@@ -385,8 +386,7 @@ public class MapPlayerManager {
       return _projectedPosition;
    }
 
-   private static void getProjectedPosition_Compute(final MapPlayerData mapPlayerData,
-                                                    final int[] allNotClipped_GeoLocationIndices,
+   private static void getProjectedPosition_Compute(final int[] allNotClipped_GeoLocationIndices,
                                                     final int lastGeoLocationIndex) {
 
       double relativePosition = getRelativePosition();
@@ -427,7 +427,7 @@ public class MapPlayerManager {
             relativeReturnPosition = relativePosition + 1;
          }
 
-         allProjectedPoints = mapPlayerData.allProjectedPoints_ReturnTrack;
+         allProjectedPoints = _mapPlayerData.allProjectedPoints_ReturnTrack;
 
          final int numProjectedPoints = allProjectedPoints.length;
          final int numReturnPositions = numProjectedPoints / 2;
@@ -446,7 +446,19 @@ public class MapPlayerManager {
 
          // move model on NORMAL TRACK, relativePosition is >= 0 && <= 1
 
-         allProjectedPoints = mapPlayerData.allProjectedPoints_NormalTrack;
+         final float[] allDistanceSeries = _mapPlayerData.allDistanceSeries;
+         final float totalDistance = allDistanceSeries[allDistanceSeries.length - 1];
+
+         final float positionDistance = (float) (relativePosition * totalDistance);
+
+         final int newDistanceIndex = MtMath.searchNearestIndex(allDistanceSeries, positionDistance);
+         final int distanceGeoIndex = MtMath.searchNearestIndex(allNotClipped_GeoLocationIndices, newDistanceIndex);
+         final int distanceGeoLocation = allNotClipped_GeoLocationIndices[distanceGeoIndex];
+
+         /*
+          *
+          */
+         allProjectedPoints = _mapPlayerData.allProjectedPoints_NormalTrack;
 
          // adjust last index by -1 that positionIndex_1 can point to the last index
          final int lastAdjusted_GeoLocationIndex = lastGeoLocationIndex > 0
@@ -466,6 +478,21 @@ public class MapPlayerManager {
 
          geoLocationIndex_0 = allNotClipped_GeoLocationIndices[positionIndex_0];
          geoLocationIndex_1 = allNotClipped_GeoLocationIndices[positionIndex_1];
+
+         if (geoLocationIndex_0 != _prevValue) {
+
+            _prevValue = geoLocationIndex_0;
+
+            System.out.println(UI.timeStamp()
+
+                  + " diff: " + String.format("%5d", distanceGeoLocation - newDistanceIndex)
+//                  + "  geoIndex: " + String.format("%5d", geoLocationIndex_0)
+                  + "  distance geoIndex: " + String.format("%5d", distanceGeoLocation)
+                  + "  distanceIndex: " + String.format("%5d", newDistanceIndex)
+
+            );
+// TODO remove SYSTEM.OUT.PRINTLN
+         }
       }
 
       /*
@@ -528,165 +555,175 @@ public class MapPlayerManager {
       synchronized (RELATIVE_POSITION) {
 
          if (_isPlayerRunning) {
-            return getRelativePosition_10_JogWheel();
-         }
 
-         final long currentFrameTime = MapRenderer.frametime;
-         final float remainingDuration = _animationEndTime - currentFrameTime;
-
-         // check if animation has finished
-         if (remainingDuration < 0) {
-
-            // animation time is over, return last position
-
-            /*
-             * Ensure that the model is on the NORMAL TRACK
-             */
-            if (_relativePosition_End < 0) {
-
-               // model was moving on the RETURN TRACK from start...end -> set to normal end
-
-               _relativePosition_End = 1;
-
-            } else if (_relativePosition_End > 1) {
-
-               // model was moving on the RETURN TRACK from end...start -> set to normal start
-
-               _relativePosition_End = 0;
-            }
-
-            /*
-             * Fix rounding, otherwise the requested relative position is mostly not exactly set
-             * which causes the model to be not at the requested position. This can be easily
-             * checked with the start and end position (Home/End button).
-             */
-            if (_relativePosition_Current != _relativePosition_End) {
-
-               _relativePosition_Current = _relativePosition_End;
-            }
-
-            if (_lastRemainingDuration > 0) {
-
-               _lastRemainingDuration = 0;
-            }
-
-            /*
-             * Update track state
-             */
-            if (_trackState_ReturnTrack != TrackState.IDLE) {
-
-               _trackState_ReturnTrack = TrackState.IDLE;
-            }
-
-            // move on NORMAL TRACK when after the RETURN TRACK is IDLE
-            if (_trackState_NormalTrack == TrackState.SCHEDULED) {
-
-               setRelativePosition_ScheduleNewPosition_Task();
-
-            } else {
-
-               _trackState_NormalTrack = TrackState.IDLE;
-            }
-
-            return _relativePosition_Current;
-         }
-
-         // advance to the next animated frame
-
-         final float relativeRemaining = remainingDuration / _modelAnimationTime; // 0...1
-         final float relativeAdvance = clamp(1.0f - relativeRemaining, 0, 1);
-
-         if (_relativePosition_End < 0) {
-
-            // model is moving on the RETURN TRACK -> start...end -> 0...-1
-
-            final double startEndDiff = _relativePosition_End - _relativePosition_Start;
-            final double startEndAdvance = startEndDiff * relativeAdvance;
-            final double currentRelativePosition = _relativePosition_Start + startEndAdvance;
-
-            _relativePosition_Current = currentRelativePosition;
-
-         } else if (_relativePosition_End > 1) {
-
-            // model is moving on the RETURN TRACK -> end...start -> 1...2
-
-            final double startEndDiff = _relativePosition_End - _relativePosition_Start;
-            final double startEndAdvance = startEndDiff * relativeAdvance;
-            final double currentRelativePosition = _relativePosition_Start + startEndAdvance;
-
-            _relativePosition_Current = currentRelativePosition;
+            return getRelativePosition_20_FromJogWheel();
 
          } else {
 
-            // _relativePosition_EndFrame: 0...1 -> model is moving on the NORMAL TRACK -> start...end
+            // player is not running, it was a manual selection on the timeline
 
-            if (_relativePosition_Current < 0) {
+            return getRelativePosition_10_FromTimeline();
+         }
+      }
+   }
 
-               // model is still moving on the RETURN TRACK from start...end -> 0...-1
+   private static double getRelativePosition_10_FromTimeline() {
 
-               final double remainingStartFrame = 1 + _relativePosition_Start;
-               final double remainingEndFrame = 1 - _relativePosition_End;
+      final long currentFrameTime = MapRenderer.frametime;
+      final float remainingDuration = _animationEndTime - currentFrameTime;
 
-               final double startEndDiff = remainingStartFrame + remainingEndFrame;
-               final double startEndAdvance = startEndDiff * relativeAdvance;
-               double currentRelativePosition = _relativePosition_Start - startEndAdvance;
+      // check if animation has finished
+      if (remainingDuration < 0) {
 
-               // check if model in on the NORMAL or RETURN TRACK
-               if (currentRelativePosition < -1) {
+         // animation time is over, return last position
 
-                  // model is now back on the NORMAL TRACK -> 0...1
+         /*
+          * Ensure that the model is on the NORMAL TRACK
+          */
+         if (_relativePosition_End < 0) {
 
-                  currentRelativePosition += 2;
+            // model was moving on the RETURN TRACK from start...end -> set to normal end
 
-                  _relativePosition_Start = _relativePosition_Start + 2;
-                  _relativePosition_Current = clamp(currentRelativePosition, 0, 1);
+            _relativePosition_End = 1;
 
-               } else {
+         } else if (_relativePosition_End > 1) {
 
-                  // model is still on the RETURN TRACK -> 0...-1
+            // model was moving on the RETURN TRACK from end...start -> set to normal start
 
-                  _relativePosition_Current = clamp(currentRelativePosition, -1, 0);
-               }
+            _relativePosition_End = 0;
+         }
 
-            } else if (_relativePosition_Current > 1) {
+         /*
+          * Fix rounding, otherwise the requested relative position is mostly not exactly set
+          * which causes the model to be not at the requested position. This can be easily
+          * checked with the start and end position (Home/End button).
+          */
+         if (_relativePosition_Current != _relativePosition_End) {
 
-               // model is still moving on the RETURN TRACK from end...start -> 1...2
+            _relativePosition_Current = _relativePosition_End;
+         }
 
-               final double startEndDiff = 2 - _relativePosition_Start + _relativePosition_End;
-               final double startEndAdvance = startEndDiff * relativeAdvance;
-               double currentRelativePosition = _relativePosition_Start + startEndAdvance;
+         if (_lastRemainingDuration > 0) {
 
-               // check if model in on the NORMAL or RETURN TRACK
-               if (currentRelativePosition > 2) {
+            _lastRemainingDuration = 0;
+         }
 
-                  // model is now back on the NORMAL TRACK -> 0...1
+         /*
+          * Update track state
+          */
+         if (_trackState_ReturnTrack != TrackState.IDLE) {
 
-                  currentRelativePosition -= 2;
+            _trackState_ReturnTrack = TrackState.IDLE;
+         }
 
-                  _relativePosition_Start = _relativePosition_Start - 2;
-                  _relativePosition_Current = clamp(currentRelativePosition, 0, 1);
+         // move on NORMAL TRACK when after the RETURN TRACK is IDLE
+         if (_trackState_NormalTrack == TrackState.SCHEDULED) {
 
-               } else {
+            setRelativePosition_ScheduleNewPosition_Task();
 
-                  // model is still on the RETURN TRACK -> 1...2
+         } else {
 
-                  _relativePosition_Current = clamp(currentRelativePosition, 1, 2);
-               }
+            _trackState_NormalTrack = TrackState.IDLE;
+         }
+
+         return _relativePosition_Current;
+      }
+
+      // advance to the next animated frame
+
+      final float relativeRemaining = remainingDuration / _modelAnimationTime; // 0...1
+      final float relativeAdvance = clamp(1.0f - relativeRemaining, 0, 1);
+
+      if (_relativePosition_End < 0) {
+
+         // model is moving on the RETURN TRACK -> start...end -> 0...-1
+
+         final double startEndDiff = _relativePosition_End - _relativePosition_Start;
+         final double startEndAdvance = startEndDiff * relativeAdvance;
+         final double currentRelativePosition = _relativePosition_Start + startEndAdvance;
+
+         _relativePosition_Current = currentRelativePosition;
+
+      } else if (_relativePosition_End > 1) {
+
+         // model is moving on the RETURN TRACK -> end...start -> 1...2
+
+         final double startEndDiff = _relativePosition_End - _relativePosition_Start;
+         final double startEndAdvance = startEndDiff * relativeAdvance;
+         final double currentRelativePosition = _relativePosition_Start + startEndAdvance;
+
+         _relativePosition_Current = currentRelativePosition;
+
+      } else {
+
+         // _relativePosition_EndFrame: 0...1 -> model is moving on the NORMAL TRACK -> start...end
+
+         if (_relativePosition_Current < 0) {
+
+            // model is still moving on the RETURN TRACK from start...end -> 0...-1
+
+            final double remainingStartFrame = 1 + _relativePosition_Start;
+            final double remainingEndFrame = 1 - _relativePosition_End;
+
+            final double startEndDiff = remainingStartFrame + remainingEndFrame;
+            final double startEndAdvance = startEndDiff * relativeAdvance;
+            double currentRelativePosition = _relativePosition_Start - startEndAdvance;
+
+            // check if model in on the NORMAL or RETURN TRACK
+            if (currentRelativePosition < -1) {
+
+               // model is now back on the NORMAL TRACK -> 0...1
+
+               currentRelativePosition += 2;
+
+               _relativePosition_Start = _relativePosition_Start + 2;
+               _relativePosition_Current = clamp(currentRelativePosition, 0, 1);
 
             } else {
 
-               // _relativePosition_CurrentFrame: 0...1 -> model is moving on the NORMAL TRACK -> start...end
+               // model is still on the RETURN TRACK -> 0...-1
 
-               final double startEndDiff = _relativePosition_End - _relativePosition_Start;
-               final double startEndAdvance = startEndDiff * relativeAdvance;
-               final double currentRelativePosition = _relativePosition_Start + startEndAdvance;
-
-               _relativePosition_Current = clamp(currentRelativePosition, 0, 1);
+               _relativePosition_Current = clamp(currentRelativePosition, -1, 0);
             }
-         }
 
-         _lastRemainingDuration = remainingDuration;
+         } else if (_relativePosition_Current > 1) {
+
+            // model is still moving on the RETURN TRACK from end...start -> 1...2
+
+            final double startEndDiff = 2 - _relativePosition_Start + _relativePosition_End;
+            final double startEndAdvance = startEndDiff * relativeAdvance;
+            double currentRelativePosition = _relativePosition_Start + startEndAdvance;
+
+            // check if model in on the NORMAL or RETURN TRACK
+            if (currentRelativePosition > 2) {
+
+               // model is now back on the NORMAL TRACK -> 0...1
+
+               currentRelativePosition -= 2;
+
+               _relativePosition_Start = _relativePosition_Start - 2;
+               _relativePosition_Current = clamp(currentRelativePosition, 0, 1);
+
+            } else {
+
+               // model is still on the RETURN TRACK -> 1...2
+
+               _relativePosition_Current = clamp(currentRelativePosition, 1, 2);
+            }
+
+         } else {
+
+            // _relativePosition_CurrentFrame: 0...1 -> model is moving on the NORMAL TRACK -> start...end
+
+            final double startEndDiff = _relativePosition_End - _relativePosition_Start;
+            final double startEndAdvance = startEndDiff * relativeAdvance;
+            final double currentRelativePosition = _relativePosition_Start + startEndAdvance;
+
+            _relativePosition_Current = clamp(currentRelativePosition, 0, 1);
+         }
       }
+
+      _lastRemainingDuration = remainingDuration;
 
       return _relativePosition_Current;
    }
@@ -717,7 +754,7 @@ public class MapPlayerManager {
     *         1 ... 2 return track end...start<br>
     *         0 ...-1 return track start...end
     */
-   private static double getRelativePosition_10_JogWheel() {
+   private static double getRelativePosition_20_FromJogWheel() {
 
       double nextPosition;
 
@@ -757,7 +794,7 @@ public class MapPlayerManager {
          nextPosition = _relativePosition_Current + positionDiff;
       }
 
-      _relativePosition_Current = getRelativePosition_20_CheckStartEnd(nextPosition);
+      _relativePosition_Current = getRelativePosition_30_CheckStartEnd(nextPosition);
 
       // !!! must also update the relative end position otherwise the model would jump when timeline is selected !!!
       _relativePosition_End = _relativePosition_Current;
@@ -789,7 +826,7 @@ public class MapPlayerManager {
       return _relativePosition_Current;
    }
 
-   private static double getRelativePosition_20_CheckStartEnd(final double nextPosition) {
+   private static double getRelativePosition_30_CheckStartEnd(final double nextPosition) {
 
       if (_isPlayingLoop) {
 
@@ -1154,6 +1191,10 @@ public class MapPlayerManager {
          return;
       }
 
+      if (_mapPlayerData == null) {
+         return;
+      }
+
       synchronized (RELATIVE_POSITION) {
 
          /**
@@ -1187,9 +1228,9 @@ public class MapPlayerManager {
                && _trackState_NormalTrack == TrackState.IDLE) {
 
             // model is
-            // moving on the NORMAL TRACK
-            // and keeps moving on the NORMAL TRACK
-            // and nothing is scheduled
+            // - moving on the NORMAL TRACK
+            // - keeps moving on the NORMAL TRACK
+            // - nothing is scheduled
 
             setRelativePosition_0(newRelativePosition);
 
@@ -1222,8 +1263,7 @@ public class MapPlayerManager {
 
       _returnTrackSpeed_PixelPerSecond = 200;
 
-      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
-      if (mapPlayerData == null) {
+      if (_mapPlayerData == null) {
          return _modelAnimationTime;
       }
 
@@ -1231,15 +1271,13 @@ public class MapPlayerManager {
 
          // 0...1 -> model is moving on the NORMAL TRACK
 
-         final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
-
          return _modelAnimationTime;
 
       } else {
 
          // model is moving on the RETURN TRACK
 
-         final double pixelDistance = mapPlayerData.trackEnd2StartPixelDistance;
+         final double pixelDistance = _mapPlayerData.trackEnd2StartPixelDistance;
 
          final double animationTime = _modelAnimationTime * (pixelDistance / _returnTrackSpeed_PixelPerSecond);
 

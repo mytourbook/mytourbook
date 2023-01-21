@@ -264,28 +264,17 @@ public class MtMath {
 //      return km * 1000;
 //   }
 
-   /**
-    * Find the nearest values in a sorted array
-    * <p>
-    * Original source<br>
-    * <a href=
-    * "https://stackoverflow.com/questions/30245166/find-the-nearest-closest-value-in-a-sorted-list#30245398">https://stackoverflow.com/questions/30245166/find-the-nearest-closest-value-in-a-sorted-list#30245398</a>
-    *
-    * @param array
-    * @param value
-    * @return Returns the index of the nearest value and not the nearest value itself
-    */
-   public static int searchNearestIndex(final int[] array, final int value) {
+   public static int searchNearestIndex(final float[] allValues, final float value) {
 
-      if (array == null || array.length == 0 || value <= array[0]) {
+      if (allValues == null || allValues.length == 0 || value <= allValues[0]) {
          return 0;
       }
 
-      if (value >= array[array.length - 1]) {
-         return array.length - 1;
+      if (value >= allValues[allValues.length - 1]) {
+         return allValues.length - 1;
       }
 
-      final int result = Arrays.binarySearch(array, value);
+      final int result = Arrays.binarySearch(allValues, value);
 
       if (result >= 0) {
          return result;
@@ -293,8 +282,45 @@ public class MtMath {
 
       final int insertionPoint = -result - 1;
 
-      final int nearestDiff1 = array[insertionPoint] - value;
-      final int nearestDiff2 = value - array[insertionPoint - 1];
+      final float nearestDiff1 = allValues[insertionPoint] - value;
+      final float nearestDiff2 = value - allValues[insertionPoint - 1];
+
+      return nearestDiff1 < nearestDiff2
+            ? insertionPoint
+            : insertionPoint - 1;
+   }
+
+   /**
+    * Find the nearest values in a sorted array
+    * <p>
+    * Original source<br>
+    * <a href=
+    * "https://stackoverflow.com/questions/30245166/find-the-nearest-closest-value-in-a-sorted-list#30245398">https://stackoverflow.com/questions/30245166/find-the-nearest-closest-value-in-a-sorted-list#30245398</a>
+    *
+    * @param allValues
+    * @param value
+    * @return Returns the index of the nearest value and not the nearest value itself
+    */
+   public static int searchNearestIndex(final int[] allValues, final int value) {
+
+      if (allValues == null || allValues.length == 0 || value <= allValues[0]) {
+         return 0;
+      }
+
+      if (value >= allValues[allValues.length - 1]) {
+         return allValues.length - 1;
+      }
+
+      final int result = Arrays.binarySearch(allValues, value);
+
+      if (result >= 0) {
+         return result;
+      }
+
+      final int insertionPoint = -result - 1;
+
+      final int nearestDiff1 = allValues[insertionPoint] - value;
+      final int nearestDiff2 = value - allValues[insertionPoint - 1];
 
       return nearestDiff1 < nearestDiff2
             ? insertionPoint

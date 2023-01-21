@@ -393,13 +393,13 @@ public class MapPlayerView extends ViewPart {
 
             _spinnerSpeedMultiplier = new Spinner(container, SWT.BORDER);
             _spinnerSpeedMultiplier.setToolTipText("The speed value is multiplied with this value");
-            _spinnerSpeedMultiplier.setMinimum(0);
-            _spinnerSpeedMultiplier.setMaximum(100);
+            _spinnerSpeedMultiplier.setMinimum(1);
+            _spinnerSpeedMultiplier.setMaximum(1000);
             _spinnerSpeedMultiplier.setIncrement(1);
             _spinnerSpeedMultiplier.setPageIncrement(5);
             _spinnerSpeedMultiplier.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_SpeedMultiplier()));
             _spinnerSpeedMultiplier.addMouseWheelListener(mouseEvent -> {
-               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 2);
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 5);
                onSelect_SpeedMultiplier();
             });
             GridDataFactory.fillDefaults().applyTo(_spinnerSpeedMultiplier);
@@ -604,9 +604,6 @@ public class MapPlayerView extends ViewPart {
 
    private void onSpeedJogWheel_Key(final KeyEvent keyEvent) {
 
-//      final boolean isMoved = false;
-//      final boolean isForward = false;
-
       final int eventKeyCode = keyEvent.keyCode;
 
       final int jogWheelSelection = _scaleSpeedJogWheel.getSelection();
@@ -663,31 +660,7 @@ public class MapPlayerView extends ViewPart {
 
             isJogWheelSelected = true;
          }
-
-//      } else if (eventKeyCode == SWT.ARROW_LEFT
-//            || eventKeyCode == SWT.PAGE_DOWN) {
-//
-//         isMoved = movePlayheadTo_End();
-//
-//      } else if (eventKeyCode == SWT.ARROW_RIGHT
-//            || eventKeyCode == SWT.PAGE_UP) {
-//
-//         isMoved = movePlayheadTo_Start();
-//         isForward = true;
       }
-
-//      if (isMoved == false) {
-//
-//         // accelerate movement
-//
-//         if (UI.adjustScaleValueOnKey(keyEvent, isForward)) {
-//
-//            // stop key event when scale was modified
-//            isKeyEventDoIt = false;
-//         }
-//
-//         setJogWheel_Tooltip(_scaleSpeedJogWheel.getSelection());
-//      }
 
       if (isJogWheelSelected) {
 
