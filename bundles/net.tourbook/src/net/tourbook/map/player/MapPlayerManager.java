@@ -44,7 +44,7 @@ public class MapPlayerManager {
 
    private static final int             DEFAULT_MOVING_SPEED             = 10;
 
-   private static final String          STATE_FOREGROUND_FPS             = "STATE_FOREGROUND_FPS";                                             //$NON-NLS-1$
+   private static final String          STATE_JOG_WHEEL_SPEED_MULTIPLIER = "STATE_JOG_WHEEL_SPEED_MULTIPLIER";                                 //$NON-NLS-1$
    private static final String          STATE_IS_PLAYING_LOOP            = "STATE_IS_PLAYING_LOOP";                                            //$NON-NLS-1$
    private static final String          STATE_IS_RELIVE_PLAYING          = "STATE_IS_RELIVE_PLAYING";                                          //$NON-NLS-1$
    private static final String          STATE_DIRECTION_SPEED            = "STATE_DIRECTION_SPEED";                                            //$NON-NLS-1$
@@ -52,8 +52,6 @@ public class MapPlayerManager {
    private static final IDialogSettings _state                           = TourbookPlugin.getState("net.tourbook.map.player.MapPlayerManager");//$NON-NLS-1$
 
    private static MapPlayerView         _mapPlayerView;
-
-   private static int                   _foregroundFPS;
 
    /**
     * Frame number which is currently displayed, it's in the range from
@@ -69,7 +67,7 @@ public class MapPlayerManager {
    /**
     * Is between - {@value #SPEED_JOG_WHEEL_MAX_HALF} ... + {@value #SPEED_JOG_WHEEL_MAX_HALF}
     */
-   private static int                   _autoplayMovingSpeed             = DEFAULT_MOVING_SPEED;
+   private static int                   _jogWheelSpeed                   = DEFAULT_MOVING_SPEED;
 
    private static long                  _animationEndTime;
    private static double                _lastRemainingDuration;
@@ -167,7 +165,8 @@ public class MapPlayerManager {
     */
    private static int                   _returnTrackSpeed_PixelPerSecond = 200;
 
-   private static int                   _autoplaySpeedFactor             = 50;
+   private static int                   _jogWheelSpeedFactor             = 50;
+   private static int                   _jogWheelSpeedMultiplier         = 1;
 
    /**
     * Size of the moving model when the size is not scaled according to the map
@@ -227,17 +226,12 @@ public class MapPlayerManager {
             : _currentVisibleFrameNumber;
    }
 
-   public static int getForegroundFPS() {
-
-      return _foregroundFPS;
-   }
-
    /**
     * @return Returns the moving speed value for the jog wheel control (scale)
     */
    public static int getJogWheelSpeed() {
 
-      return _autoplayMovingSpeed
+      return _jogWheelSpeed
 
             // adjust to the center of the scale control
             + SPEED_JOG_WHEEL_MAX_HALF;
@@ -258,7 +252,7 @@ public class MapPlayerManager {
 
    public static int getMovingSpeed() {
 
-      return _autoplayMovingSpeed;
+      return _jogWheelSpeed;
    }
 
    /**
@@ -528,7 +522,7 @@ public class MapPlayerManager {
       synchronized (RELATIVE_POSITION) {
 
          if (_isPlayerRunning) {
-            return getRelativePosition_Autoplay();
+            return getRelativePosition_10_JogWheel();
          }
 
          final long currentFrameTime = MapRenderer.frametime;
@@ -692,7 +686,7 @@ public class MapPlayerManager {
    }
 
    /**
-    * Compute relative position for the play head when in autoplay mode.
+    * Compute relative position for the play head when in jog wheel mode.
     * <p>
     * The relative position is for this moving loop, start and end must not be at the same position:
     *
@@ -717,7 +711,7 @@ public class MapPlayerManager {
     *         1 ... 2 return track end...start<br>
     *         0 ...-1 return track start...end
     */
-   private static double getRelativePosition_Autoplay() {
+   private static double getRelativePosition_10_JogWheel() {
 
       double nextPosition;
 
@@ -725,13 +719,16 @@ public class MapPlayerManager {
 
          // model is moving on the NORMAL TRACK, get next position
 
-         _autoplaySpeedFactor = 10;
+         _jogWheelSpeedFactor = 10
+
+               // this needs to be improved then depending on the track length, the speed is different
+               * _jogWheelSpeedMultiplier;
 
          final double mapScale = _mapPlayerData.mapScale;
 
-         final double speedValue = (double) _autoplayMovingSpeed / SPEED_JOG_WHEEL_MAX_HALF;
+         final double speedValue = (double) _jogWheelSpeed / SPEED_JOG_WHEEL_MAX_HALF;
 
-         final double speedValue_Scaled = speedValue / mapScale * _autoplaySpeedFactor;
+         final double speedValue_Scaled = speedValue / mapScale * _jogWheelSpeedFactor;
 
          nextPosition = _relativePosition_Current + speedValue_Scaled;
 
@@ -747,14 +744,14 @@ public class MapPlayerManager {
 //         final double end2Start_AnimationTime = _defaultAnimationTime * (end2StartPixelDistance / _returnTrackSpeed_PixelPerSecond);
 //
 
-         final double positionDiff = _autoplayMovingSpeed > 0
+         final double positionDiff = _jogWheelSpeed > 0
                ? returnSpeed
                : -returnSpeed;
 
          nextPosition = _relativePosition_Current + positionDiff;
       }
 
-      _relativePosition_Current = getRelativePosition_CheckStartEnd(nextPosition);
+      _relativePosition_Current = getRelativePosition_20_CheckStartEnd(nextPosition);
 
       // !!! must also update the relative end position otherwise the model would jump when timeline is selected !!!
       _relativePosition_End = _relativePosition_Current;
@@ -786,7 +783,7 @@ public class MapPlayerManager {
       return _relativePosition_Current;
    }
 
-   private static double getRelativePosition_CheckStartEnd(final double nextPosition) {
+   private static double getRelativePosition_20_CheckStartEnd(final double nextPosition) {
 
       if (_isPlayingLoop) {
 
@@ -818,6 +815,11 @@ public class MapPlayerManager {
       }
 
       return nextPosition;
+   }
+
+   public static int getSpeedMultiplier() {
+
+      return _jogWheelSpeedMultiplier;
    }
 
    /**
@@ -889,10 +891,10 @@ public class MapPlayerManager {
 
 // SET_FORMATTING_OFF
 
-      _foregroundFPS       = Util.getStateInt(     _state, STATE_FOREGROUND_FPS,    10);
-      _isPlayingLoop       = Util.getStateBoolean( _state, STATE_IS_PLAYING_LOOP,   false);
-      _isReLivePlaying     = Util.getStateBoolean( _state, STATE_IS_RELIVE_PLAYING, false);
-      _autoplayMovingSpeed = Util.getStateInt(     _state, STATE_DIRECTION_SPEED,   DEFAULT_MOVING_SPEED);
+      _jogWheelSpeed       = Util.getStateInt(     _state, STATE_DIRECTION_SPEED,            DEFAULT_MOVING_SPEED);
+      _jogWheelSpeedMultiplier   = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED_MULTIPLIER,  1);
+      _isPlayingLoop             = Util.getStateBoolean( _state, STATE_IS_PLAYING_LOOP,            false);
+      _isReLivePlaying           = Util.getStateBoolean( _state, STATE_IS_RELIVE_PLAYING,          false);
 
 // SET_FORMATTING_ON
    }
@@ -901,10 +903,10 @@ public class MapPlayerManager {
 
 // SET_FORMATTING_OFF
 
-      _state.put(STATE_FOREGROUND_FPS,    _foregroundFPS);
-      _state.put(STATE_IS_PLAYING_LOOP,   _isPlayingLoop);
-      _state.put(STATE_IS_RELIVE_PLAYING, _isReLivePlaying);
-      _state.put(STATE_DIRECTION_SPEED,   _autoplayMovingSpeed);
+      _state.put(STATE_JOG_WHEEL_SPEED_MULTIPLIER,  _jogWheelSpeedMultiplier);
+      _state.put(STATE_IS_PLAYING_LOOP,            _isPlayingLoop);
+      _state.put(STATE_IS_RELIVE_PLAYING,          _isReLivePlaying);
+      _state.put(STATE_DIRECTION_SPEED,            _jogWheelSpeed);
 
 // SET_FORMATTING_ON
    }
@@ -916,11 +918,6 @@ public class MapPlayerManager {
       _compileMapScale = scale;
 
       _isCompileMapScaleSet = true;
-   }
-
-   public static void setForegroundFPS(final int foregroundFPS) {
-
-      _foregroundFPS = foregroundFPS;
    }
 
    public static void setIsAnimationVisible(final boolean isAnimationVisible) {
@@ -1086,12 +1083,12 @@ public class MapPlayerManager {
 
    public static void setMovingSpeedFromJogWheel(final int jogWheelSpeed) {
 
-      _autoplayMovingSpeed = jogWheelSpeed
+      _jogWheelSpeed = jogWheelSpeed
 
             // adjust to the center of the scale control
             - SPEED_JOG_WHEEL_MAX_HALF;
 
-      _isModelMovingForward = _autoplayMovingSpeed >= 0;
+      _isModelMovingForward = _jogWheelSpeed >= 0;
    }
 
    /**
@@ -1344,6 +1341,11 @@ public class MapPlayerManager {
 
          setRelativePosition_0(_nextPosition_OnNormalTrack);
       }
+   }
+
+   public static void setSpeedMultiplier(final int value) {
+
+      _jogWheelSpeedMultiplier = value;
    }
 
 }

@@ -98,18 +98,18 @@ public class MapPlayerView extends ViewPart {
    private Display   _display;
    private Composite _parent;
 
-   private Label     _lblFPS;
-   private Label     _lblTimeline_Value;
+   private Label     _lblSpeedMultiplier;
+   private Label     _lblSpeedJogWheel;
    private Label     _lblSpeedJogWheel_Value;
    private Label     _lblTimeline;
-   private Label     _lblSpeedJogWheel;
+   private Label     _lblTimeline_Value;
 
    private Button    _chkIsRelivePlaying;
 
    private Scale     _scaleTimeline;
    private Scale     _scaleSpeedJogWheel;
 
-   private Spinner   _spinnerFramesPerSecond;
+   private Spinner   _spinnerSpeedMultiplier;
 
    private class Action_PlayControl_Loop extends Action {
 
@@ -367,20 +367,20 @@ public class MapPlayerView extends ViewPart {
             /*
              * Foreground: Frames per Second
              */
-            _spinnerFramesPerSecond = new Spinner(container, SWT.BORDER);
-            _spinnerFramesPerSecond.setToolTipText("Frames per second, when running in the foreground and having the focus");
-            _spinnerFramesPerSecond.setMinimum(-1);
-            _spinnerFramesPerSecond.setMaximum(Map25FPSManager.DEFAULT_FOREGROUND_FPS);
-            _spinnerFramesPerSecond.setIncrement(1);
-            _spinnerFramesPerSecond.setPageIncrement(5);
-            _spinnerFramesPerSecond.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectFPS()));
-            _spinnerFramesPerSecond.addMouseWheelListener(mouseEvent -> {
+            _spinnerSpeedMultiplier = new Spinner(container, SWT.BORDER);
+            _spinnerSpeedMultiplier.setToolTipText("Frames per second, when running in the foreground and having the focus");
+            _spinnerSpeedMultiplier.setMinimum(0);
+            _spinnerSpeedMultiplier.setMaximum(100);
+            _spinnerSpeedMultiplier.setIncrement(1);
+            _spinnerSpeedMultiplier.setPageIncrement(5);
+            _spinnerSpeedMultiplier.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectSpeedMultiplier()));
+            _spinnerSpeedMultiplier.addMouseWheelListener(mouseEvent -> {
                Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
-               onSelectFPS();
+               onSelectSpeedMultiplier();
             });
-            GridDataFactory.fillDefaults().applyTo(_spinnerFramesPerSecond);
+            GridDataFactory.fillDefaults().applyTo(_spinnerSpeedMultiplier);
 
-            _lblFPS = UI.createLabel(container, "fps");
+            _lblSpeedMultiplier = UI.createLabel(container, "Speed Multiplier");
          }
          UI.createSpacer_Horizontal(container, 1);
       }
@@ -402,16 +402,16 @@ public class MapPlayerView extends ViewPart {
 
 // SET_FORMATTING_OFF
 
-      _lblFPS                             .setEnabled(isEnabled);
-      _lblTimeline_Value                  .setEnabled(isEnabled);
+      _lblSpeedMultiplier                 .setEnabled(isEnabled);
+      _lblSpeedJogWheel                   .setEnabled(isEnabled);
       _lblSpeedJogWheel_Value             .setEnabled(isEnabled);
       _lblTimeline                        .setEnabled(isEnabled);
-      _lblSpeedJogWheel                   .setEnabled(isEnabled);
+      _lblTimeline_Value                  .setEnabled(isEnabled);
 
       _scaleSpeedJogWheel                 .setEnabled(isEnabled);
       _scaleTimeline                      .setEnabled(isEnabled);
 
-      _spinnerFramesPerSecond             .setEnabled(isEnabled);
+      _spinnerSpeedMultiplier             .setEnabled(isEnabled);
 
       _actionPlayControl_PlayAndPause     .setEnabled(isEnabled);
       _actionPlayControl_Loop             .setEnabled(isEnabled);
@@ -560,19 +560,19 @@ public class MapPlayerView extends ViewPart {
       togglePlayAndPaused();
    }
 
-   private void onSelectFPS() {
-
-      final int selectedFPS = _spinnerFramesPerSecond.getSelection();
-
-      MapPlayerManager.setForegroundFPS(selectedFPS);
-
-      // adjust timeline
-      updateUI_TimelineMaxValue();
-   }
-
    private void onSelectReLivePlaying() {
 
       MapPlayerManager.setIsReLivePlaying(_chkIsRelivePlaying.getSelection());
+   }
+
+   private void onSelectSpeedMultiplier() {
+
+      final int selectedValue = _spinnerSpeedMultiplier.getSelection();
+
+      MapPlayerManager.setSpeedMultiplier(selectedValue);
+
+      // adjust timeline
+      updateUI_TimelineMaxValue();
    }
 
    private void onSpeedJogWheel_Key(final KeyEvent keyEvent) {
@@ -928,11 +928,11 @@ public class MapPlayerView extends ViewPart {
     */
    private void updatePlayer_InUIThread() {
 
-      final int foregroundFPS = MapPlayerManager.getForegroundFPS();
+      final int value = MapPlayerManager.getSpeedMultiplier();
 
       updateUI_TimelineMaxValue();
 
-      _spinnerFramesPerSecond.setSelection(foregroundFPS);
+      _spinnerSpeedMultiplier.setSelection(value);
 
       enableControls();
    }
