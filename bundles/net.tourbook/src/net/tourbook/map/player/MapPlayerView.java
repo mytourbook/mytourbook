@@ -103,6 +103,7 @@ public class MapPlayerView extends ViewPart {
    private Label     _lblSpeedJogWheel_Value;
    private Label     _lblTimeline;
    private Label     _lblTimeline_Value;
+   private Label     _lblTurningAngle;
 
    private Button    _chkIsRelivePlaying;
 
@@ -110,6 +111,7 @@ public class MapPlayerView extends ViewPart {
    private Scale     _scaleSpeedJogWheel;
 
    private Spinner   _spinnerSpeedMultiplier;
+   private Spinner   _spinnerTurningAngle;
 
    private class Action_PlayControl_Loop extends Action {
 
@@ -336,7 +338,7 @@ public class MapPlayerView extends ViewPart {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(6).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(8).applyTo(container);
       {
          UI.createSpacer_Horizontal(container, 1);
          {
@@ -357,7 +359,7 @@ public class MapPlayerView extends ViewPart {
             _chkIsRelivePlaying = new Button(container, SWT.CHECK);
             _chkIsRelivePlaying.setText("&Re-live playing");
 //            _chkIsRelivePlaying.setToolTipText(Messages.Map_Player_Checkbox_IsReLivePlaying_Tooltip);
-            _chkIsRelivePlaying.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectReLivePlaying()));
+            _chkIsRelivePlaying.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ReLivePlaying()));
             GridDataFactory.fillDefaults()
                   .grab(true, false)
                   .align(SWT.END, SWT.FILL)
@@ -365,22 +367,42 @@ public class MapPlayerView extends ViewPart {
          }
          {
             /*
-             * Foreground: Frames per Second
+             * Turning angle
              */
+            _lblTurningAngle = UI.createLabel(container, "Turning Angle");
+
+            _spinnerTurningAngle = new Spinner(container, SWT.BORDER);
+            _spinnerTurningAngle.setToolTipText("This is the angle in degrees in one frame when the model is turning on the track");
+            _spinnerTurningAngle.setDigits(1);
+            _spinnerTurningAngle.setMinimum(0);
+            _spinnerTurningAngle.setMaximum(100);
+            _spinnerTurningAngle.setIncrement(1);
+            _spinnerTurningAngle.setPageIncrement(10);
+            _spinnerTurningAngle.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TurningAngle()));
+            _spinnerTurningAngle.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 5);
+               onSelect_TurningAngle();
+            });
+            GridDataFactory.fillDefaults().applyTo(_spinnerTurningAngle);
+         }
+         {
+            /*
+             * Speed multiplier
+             */
+            _lblSpeedMultiplier = UI.createLabel(container, "Speed Multiplier");
+
             _spinnerSpeedMultiplier = new Spinner(container, SWT.BORDER);
-            _spinnerSpeedMultiplier.setToolTipText("Frames per second, when running in the foreground and having the focus");
+            _spinnerSpeedMultiplier.setToolTipText("The speed value is multiplied with this value");
             _spinnerSpeedMultiplier.setMinimum(0);
             _spinnerSpeedMultiplier.setMaximum(100);
             _spinnerSpeedMultiplier.setIncrement(1);
             _spinnerSpeedMultiplier.setPageIncrement(5);
-            _spinnerSpeedMultiplier.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectSpeedMultiplier()));
+            _spinnerSpeedMultiplier.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_SpeedMultiplier()));
             _spinnerSpeedMultiplier.addMouseWheelListener(mouseEvent -> {
-               Util.adjustSpinnerValueOnMouseScroll(mouseEvent);
-               onSelectSpeedMultiplier();
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 2);
+               onSelect_SpeedMultiplier();
             });
             GridDataFactory.fillDefaults().applyTo(_spinnerSpeedMultiplier);
-
-            _lblSpeedMultiplier = UI.createLabel(container, "Speed Multiplier");
          }
          UI.createSpacer_Horizontal(container, 1);
       }
@@ -407,11 +429,13 @@ public class MapPlayerView extends ViewPart {
       _lblSpeedJogWheel_Value             .setEnabled(isEnabled);
       _lblTimeline                        .setEnabled(isEnabled);
       _lblTimeline_Value                  .setEnabled(isEnabled);
+      _lblTurningAngle                    .setEnabled(isEnabled);
 
       _scaleSpeedJogWheel                 .setEnabled(isEnabled);
       _scaleTimeline                      .setEnabled(isEnabled);
 
       _spinnerSpeedMultiplier             .setEnabled(isEnabled);
+      _spinnerTurningAngle                .setEnabled(isEnabled);
 
       _actionPlayControl_PlayAndPause     .setEnabled(isEnabled);
       _actionPlayControl_Loop             .setEnabled(isEnabled);
@@ -560,19 +584,22 @@ public class MapPlayerView extends ViewPart {
       togglePlayAndPaused();
    }
 
-   private void onSelectReLivePlaying() {
+   private void onSelect_ReLivePlaying() {
 
       MapPlayerManager.setIsReLivePlaying(_chkIsRelivePlaying.getSelection());
    }
 
-   private void onSelectSpeedMultiplier() {
+   private void onSelect_SpeedMultiplier() {
 
-      final int selectedValue = _spinnerSpeedMultiplier.getSelection();
-
-      MapPlayerManager.setSpeedMultiplier(selectedValue);
+      MapPlayerManager.setSpeedMultiplier(_spinnerSpeedMultiplier.getSelection());
 
       // adjust timeline
       updateUI_TimelineMaxValue();
+   }
+
+   private void onSelect_TurningAngle() {
+
+      MapPlayerManager.setTurningAngle(_spinnerTurningAngle.getSelection() / 10f);
    }
 
    private void onSpeedJogWheel_Key(final KeyEvent keyEvent) {
@@ -928,11 +955,12 @@ public class MapPlayerView extends ViewPart {
     */
    private void updatePlayer_InUIThread() {
 
-      final int value = MapPlayerManager.getSpeedMultiplier();
-
       updateUI_TimelineMaxValue();
 
-      _spinnerSpeedMultiplier.setSelection(value);
+      final float modelTurningAngle = MapPlayerManager.getModelTurningAngle();
+
+      _spinnerSpeedMultiplier.setSelection(MapPlayerManager.getSpeedMultiplier());
+      _spinnerTurningAngle.setSelection((int) (modelTurningAngle * 10));
 
       enableControls();
    }

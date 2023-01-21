@@ -44,10 +44,11 @@ public class MapPlayerManager {
 
    private static final int             DEFAULT_MOVING_SPEED             = 10;
 
-   private static final String          STATE_JOG_WHEEL_SPEED_MULTIPLIER = "STATE_JOG_WHEEL_SPEED_MULTIPLIER";                                 //$NON-NLS-1$
    private static final String          STATE_IS_PLAYING_LOOP            = "STATE_IS_PLAYING_LOOP";                                            //$NON-NLS-1$
    private static final String          STATE_IS_RELIVE_PLAYING          = "STATE_IS_RELIVE_PLAYING";                                          //$NON-NLS-1$
-   private static final String          STATE_DIRECTION_SPEED            = "STATE_DIRECTION_SPEED";                                            //$NON-NLS-1$
+   private static final String          STATE_JOG_WHEEL_SPEED            = "STATE_JOG_WHEEL_SPEED";                                            //$NON-NLS-1$
+   private static final String          STATE_JOG_WHEEL_SPEED_MULTIPLIER = "STATE_JOG_WHEEL_SPEED_MULTIPLIER";                                 //$NON-NLS-1$
+   private static final String          STATE_MODEL_TURNING_ANGLE        = "STATE_MODEL_TURNING_ANGLE";                                        //$NON-NLS-1$
    //
    private static final IDialogSettings _state                           = TourbookPlugin.getState("net.tourbook.map.player.MapPlayerManager");//$NON-NLS-1$
 
@@ -248,6 +249,11 @@ public class MapPlayerManager {
    public static float getModelAngle() {
 
       return _modelForwardAngle;
+   }
+
+   public static float getModelTurningAngle() {
+
+      return _modelTurningAngle;
    }
 
    public static int getMovingSpeed() {
@@ -891,10 +897,11 @@ public class MapPlayerManager {
 
 // SET_FORMATTING_OFF
 
-      _jogWheelSpeed       = Util.getStateInt(     _state, STATE_DIRECTION_SPEED,            DEFAULT_MOVING_SPEED);
-      _jogWheelSpeedMultiplier   = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED_MULTIPLIER,  1);
       _isPlayingLoop             = Util.getStateBoolean( _state, STATE_IS_PLAYING_LOOP,            false);
       _isReLivePlaying           = Util.getStateBoolean( _state, STATE_IS_RELIVE_PLAYING,          false);
+      _jogWheelSpeed             = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED,            DEFAULT_MOVING_SPEED);
+      _jogWheelSpeedMultiplier   = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED_MULTIPLIER, 1);
+      _modelTurningAngle         = Util.getStateFloat(   _state, STATE_MODEL_TURNING_ANGLE,        5.0f);
 
 // SET_FORMATTING_ON
    }
@@ -903,10 +910,11 @@ public class MapPlayerManager {
 
 // SET_FORMATTING_OFF
 
-      _state.put(STATE_JOG_WHEEL_SPEED_MULTIPLIER,  _jogWheelSpeedMultiplier);
       _state.put(STATE_IS_PLAYING_LOOP,            _isPlayingLoop);
       _state.put(STATE_IS_RELIVE_PLAYING,          _isReLivePlaying);
-      _state.put(STATE_DIRECTION_SPEED,            _jogWheelSpeed);
+      _state.put(STATE_JOG_WHEEL_SPEED,            _jogWheelSpeed);
+      _state.put(STATE_JOG_WHEEL_SPEED_MULTIPLIER, _jogWheelSpeedMultiplier);
+      _state.put(STATE_MODEL_TURNING_ANGLE,        _modelTurningAngle);
 
 // SET_FORMATTING_ON
    }
@@ -976,8 +984,6 @@ public class MapPlayerManager {
       float p21AngleSmoothed = p21Angle;
 
       final float angleDiff = setModelAngle_Difference(p21Angle, _previousAngle);
-
-      _modelTurningAngle = 5.f;
 
       if (Math.abs(angleDiff) > _modelTurningAngle) {
 
@@ -1343,9 +1349,14 @@ public class MapPlayerManager {
       }
    }
 
-   public static void setSpeedMultiplier(final int value) {
+   public static void setSpeedMultiplier(final int speedMultiplier) {
 
-      _jogWheelSpeedMultiplier = value;
+      _jogWheelSpeedMultiplier = speedMultiplier;
+   }
+
+   public static void setTurningAngle(final float modelTurningAngle) {
+
+      _modelTurningAngle = modelTurningAngle;
    }
 
 }
