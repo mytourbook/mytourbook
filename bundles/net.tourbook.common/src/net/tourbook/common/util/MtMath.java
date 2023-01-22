@@ -264,7 +264,13 @@ public class MtMath {
 //      return km * 1000;
 //   }
 
-   public static int searchNearestIndex(final float[] allValues, final float value) {
+   /**
+    * @param allValues
+    * @param value
+    * @return Returns the index for the searched value which is the exact index or the index before
+    *         the searched value
+    */
+   public static int searchIndex(final float[] allValues, final float value) {
 
       if (allValues == null || allValues.length == 0 || value <= allValues[0]) {
          return 0;
@@ -281,13 +287,9 @@ public class MtMath {
       }
 
       final int insertionPoint = -result - 1;
+      final int indexBeforeInsertionPoint = insertionPoint - 1;
 
-      final float nearestDiff1 = allValues[insertionPoint] - value;
-      final float nearestDiff2 = value - allValues[insertionPoint - 1];
-
-      return nearestDiff1 < nearestDiff2
-            ? insertionPoint
-            : insertionPoint - 1;
+      return indexBeforeInsertionPoint;
    }
 
    /**

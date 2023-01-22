@@ -445,13 +445,10 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
       if (isFixedSize) {
 
-         int fixedModelSize = MapPlayerManager.fixedModelSize;
-         fixedModelSize = 200;
-
          // viewport scale 2 map scale: 1...2
          final float vp2mp = (float) (currentMapScale / MapPlayerManager.getCompileMapScale());
 
-         final float vp2mpModelSize = fixedModelSize / vp2mp;
+         final float vp2mpModelSize = MapPlayerManager.getFixedModelSize() / vp2mp;
 
          /**
           * This algorithm is not perfect as the model can still be flickering (size is larger or

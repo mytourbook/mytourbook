@@ -98,6 +98,7 @@ public class MapPlayerView extends ViewPart {
    private Display   _display;
    private Composite _parent;
 
+   private Label     _lblModelSize;
    private Label     _lblSpeedMultiplier;
    private Label     _lblSpeedJogWheel;
    private Label     _lblSpeedJogWheel_Value;
@@ -110,6 +111,7 @@ public class MapPlayerView extends ViewPart {
    private Scale     _scaleTimeline;
    private Scale     _scaleSpeedJogWheel;
 
+   private Spinner   _spinnerModelSize;
    private Spinner   _spinnerSpeedMultiplier;
    private Spinner   _spinnerTurningAngle;
 
@@ -338,7 +340,7 @@ public class MapPlayerView extends ViewPart {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(8).applyTo(container);
+      GridLayoutFactory.fillDefaults().numColumns(10).applyTo(container);
       {
          UI.createSpacer_Horizontal(container, 1);
          {
@@ -367,9 +369,28 @@ public class MapPlayerView extends ViewPart {
          }
          {
             /*
-             * Turning angle
+             * Model size
              */
-            _lblTurningAngle = UI.createLabel(container, "Turning Angle");
+            _lblModelSize = UI.createLabel(container, "Model size");
+
+            _spinnerModelSize = new Spinner(container, SWT.BORDER);
+            _spinnerModelSize.setToolTipText("");
+            _spinnerModelSize.setMinimum(20);
+            _spinnerModelSize.setMaximum(1000);
+            _spinnerModelSize.setIncrement(10);
+            _spinnerModelSize.setPageIncrement(50);
+            _spinnerModelSize.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ModelSize()));
+            _spinnerModelSize.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+               onSelect_ModelSize();
+            });
+            GridDataFactory.fillDefaults().applyTo(_spinnerModelSize);
+         }
+         {
+            /*
+             * Model turning angle
+             */
+            _lblTurningAngle = UI.createLabel(container, "Turning angle");
 
             _spinnerTurningAngle = new Spinner(container, SWT.BORDER);
             _spinnerTurningAngle.setToolTipText("This is the angle in degrees in one frame when the model is turning on the track");
@@ -389,7 +410,7 @@ public class MapPlayerView extends ViewPart {
             /*
              * Speed multiplier
              */
-            _lblSpeedMultiplier = UI.createLabel(container, "Speed Multiplier");
+            _lblSpeedMultiplier = UI.createLabel(container, "Speed multiplier");
 
             _spinnerSpeedMultiplier = new Spinner(container, SWT.BORDER);
             _spinnerSpeedMultiplier.setToolTipText("The speed value is multiplied with this value");
@@ -424,6 +445,7 @@ public class MapPlayerView extends ViewPart {
 
 // SET_FORMATTING_OFF
 
+      _lblModelSize                       .setEnabled(isEnabled);
       _lblSpeedMultiplier                 .setEnabled(isEnabled);
       _lblSpeedJogWheel                   .setEnabled(isEnabled);
       _lblSpeedJogWheel_Value             .setEnabled(isEnabled);
@@ -434,6 +456,7 @@ public class MapPlayerView extends ViewPart {
       _scaleSpeedJogWheel                 .setEnabled(isEnabled);
       _scaleTimeline                      .setEnabled(isEnabled);
 
+      _spinnerModelSize                   .setEnabled(isEnabled);
       _spinnerSpeedMultiplier             .setEnabled(isEnabled);
       _spinnerTurningAngle                .setEnabled(isEnabled);
 
@@ -582,6 +605,11 @@ public class MapPlayerView extends ViewPart {
    private void onPlayControl_PlayOrPause() {
 
       togglePlayAndPaused();
+   }
+
+   private void onSelect_ModelSize() {
+
+      MapPlayerManager.setModelSize(_spinnerModelSize.getSelection());
    }
 
    private void onSelect_ReLivePlaying() {
@@ -787,6 +815,7 @@ public class MapPlayerView extends ViewPart {
 
       _actionPlayControl_Loop.setChecked(MapPlayerManager.isPlayingLoop());
       _chkIsRelivePlaying.setSelection(MapPlayerManager.isReLivePlaying());
+      _spinnerModelSize.setSelection(MapPlayerManager.getFixedModelSize());
 
       setJogWheel_Value(MapPlayerManager.getJogWheelSpeed());
 
@@ -1030,18 +1059,17 @@ public class MapPlayerView extends ViewPart {
 
       _currentTimelineMaxValue = newMaximum;
 
-      final int lastSelection = _scaleTimeline.getSelection();
-      final float lastRelativeSelection = (float) lastSelection / newMaximum;
-
       final float pageIncrement = (float) newMaximum / minScaleTicks;
-      final float relativeSelection = newMaximum * lastRelativeSelection;
+      final float relativeSelection = (float) (newMaximum * MapPlayerManager.getCurrentRelativePosition());
+      final int timelineValue = (int) relativeSelection;
 
       _scaleTimeline.setPageIncrement((int) pageIncrement);
       _scaleTimeline.setMaximum(newMaximum);
 
       // reselect last position
-      _scaleTimeline.setSelection((int) relativeSelection);
+      _scaleTimeline.setSelection(timelineValue);
 
+      updateUI_TimelineValue(timelineValue);
       setTimeline_Tooltip();
    }
 
