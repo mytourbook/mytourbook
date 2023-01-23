@@ -84,6 +84,7 @@ public class Messages extends NLS {
    public static String        action_tourType_modify_tourTypes;
 
    public static String        action_tour_editor_delete_time_slices_keep_time;
+   public static String        action_tour_editor_delete_time_slices_keep_time_and_distance;
    public static String        action_tour_editor_delete_time_slices_remove_time;
 
    public static String        adjust_altitude_action_create_spline_point;

@@ -35,6 +35,10 @@ Improvements
 Tour Filter
   - Filter tours by "Most Recent", e.g. show tours for the last 15 months
     https://github.com/mytourbook/mytourbook/issues/976
+
+Tour Editor
+  - Keep distance values when time slices are deleted
+    https://github.com/mytourbook/mytourbook/issues/986
   
 * 4k Display
   - Increased cursor size in Tour Chart and 2D Map, when displayed on 4k displays
