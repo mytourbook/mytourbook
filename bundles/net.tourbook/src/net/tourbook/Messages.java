@@ -2245,8 +2245,13 @@ public class Messages extends NLS {
    public static String        Slideout_TourChartOptions_Radio_SRTM3;
    public static String        Slideout_TourChartSmoothing_Label_Title;
 
+   public static String        Slideout_TourEditor_Checkbox_KeepDistance;
+   public static String        Slideout_TourEditor_Checkbox_KeepDistance_Tooltip;
+   public static String        Slideout_TourEditor_Checkbox_KeepTime;
+   public static String        Slideout_TourEditor_Checkbox_KeepTime_Tooltip;
    public static String        Slideout_TourEditor_Checkbox_RecomputeElevationUpDown;
    public static String        Slideout_TourEditor_Checkbox_RecomputeElevationUpDown_Tooltip;
+   public static String        Slideout_TourEditor_Label_DeleteTimeSlices;
    public static String        Slideout_TourEditor_Label_LatLonDigits;
    public static String        Slideout_TourEditor_Label_LatLonDigits_Tooltip;
    public static String        Slideout_TourEditor_Label_Title;

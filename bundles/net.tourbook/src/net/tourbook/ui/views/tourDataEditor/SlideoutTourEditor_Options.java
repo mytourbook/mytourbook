@@ -242,21 +242,20 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText("When deleting time slices with the DEL Key");
-            label.setToolTipText("");
+            label.setText(Messages.Slideout_TourEditor_Label_DeleteTimeSlices);
             GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
 
             // checkbox: Keep time
             _chkDelete_KeepTime = new Button(container, SWT.CHECK);
-            _chkDelete_KeepTime.setText("Keep time");
-            _chkDelete_KeepTime.setToolTipText("");
+            _chkDelete_KeepTime.setText(Messages.Slideout_TourEditor_Checkbox_KeepTime);
+            _chkDelete_KeepTime.setToolTipText(Messages.Slideout_TourEditor_Checkbox_KeepTime_Tooltip);
             _chkDelete_KeepTime.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults().indent(16, 0).applyTo(_chkDelete_KeepTime);
 
             // radio: solid
             _chkDelete_KeepDistance = new Button(container, SWT.CHECK);
-            _chkDelete_KeepDistance.setText("Keep distance");
-            _chkDelete_KeepDistance.setToolTipText("");
+            _chkDelete_KeepDistance.setText(Messages.Slideout_TourEditor_Checkbox_KeepDistance);
+            _chkDelete_KeepDistance.setToolTipText(Messages.Slideout_TourEditor_Checkbox_KeepDistance_Tooltip);
             _chkDelete_KeepDistance.addSelectionListener(_defaultSelectionListener);
          }
       }
