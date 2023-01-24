@@ -81,6 +81,8 @@ public final class TourTrack_Shader {
 
    private static GLMatrix              _animationMatrix         = new GLMatrix();
 
+   private static int                   _prevValue;
+
 // private static double                _prevValue;
 
    private static class DirectionArrowsShader extends GLShaderMT {
@@ -368,20 +370,16 @@ public final class TourTrack_Shader {
       // fix alpha blending
       gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
       {
-         // get animated position
-         final int nextFrameIndex = MapPlayerManager.getNextVisibleFrameIndex();
-         final int numAllVisibleFrames = MapPlayerManager.getNumberOfVisibleFrames();
+         // get model position
+         final int nextVisibleFrameIndex = MapPlayerManager.getNextVisibleFrameIndex();
 
-// "relativeVisibleVertices" is used for relive playing -> needs to be improved when not all points are visible
-         final float relativeVisibleVertices = (float) nextFrameIndex / numAllVisibleFrames;
-
-         paint_10_Track(trackBucket, viewport, viewport2mapscale, relativeVisibleVertices);
+         paint_10_Track(trackBucket, viewport, viewport2mapscale, nextVisibleFrameIndex);
 
          if (trackConfig.isShowDirectionArrow) {
 
             if (trackConfig.arrow_IsAnimate) {
 
-               paint_30_ModelCursor(viewport, viewport2mapscale, trackBucket, nextFrameIndex);
+               paint_30_ModelCursor(viewport, viewport2mapscale, trackBucket, nextVisibleFrameIndex);
 
             } else {
 
@@ -404,7 +402,7 @@ public final class TourTrack_Shader {
    private static void paint_10_Track(final TourTrack_Bucket trackBucket,
                                       final GLViewport viewport,
                                       final float vp2mpScale,
-                                      final float relativeVisibleVertices) {
+                                      final int nextVisibleFrameIndex) {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
@@ -415,12 +413,41 @@ public final class TourTrack_Shader {
        * current position and not until the end
        */
       final int numTrackVertices = trackBucket.numTrackVertices;
-      final int numVisibleVertices = MapPlayerManager.isReLivePlaying()
 
-            // re-live shows the vertices from the start until the animation frame
-            ? (int) (relativeVisibleVertices * numTrackVertices)
+      int numVisibleVertices = numTrackVertices;
 
-            : numTrackVertices;
+      if (MapPlayerManager.isReLivePlaying()) {
+
+         // show only the first part of the track which the model has already moved
+
+         final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
+         if (mapPlayerData != null) {
+
+//            final int[] allVisible_GeoLocationIndices = mapPlayerData.allVisible_GeoLocationIndices;
+//            numVisibleVertices = MtMath.searchNearestIndex(allVisible_GeoLocationIndices, nextVisibleFrameIndex);
+
+//            final int numAllVisibleFrames = MapPlayerManager.getNumberOfVisibleFrames();
+//            final float relativeVisibleVertices = (float) nextVisibleFrameIndex / numAllVisibleFrames;
+//            numVisibleVertices = (int) (relativeVisibleVertices * numTrackVertices);
+
+//            numVisibleVertices = nextVisibleFrameIndex;
+
+            numVisibleVertices = MapPlayerManager.getVisibleGeoLocationIndex();
+
+//            if (nextVisibleFrameIndex != _prevValue) {
+//
+//               _prevValue = nextVisibleFrameIndex;
+//
+//               System.out.println(UI.timeStamp()
+//
+//                     + " next Idx: " + nextVisibleFrameIndex
+//
+//               );
+//// TODO remove SYSTEM.OUT.PRINTLN
+//
+//            }
+         }
+      }
 
       /*
        * Simple line shader does not take forward shortening into
@@ -730,33 +757,27 @@ public final class TourTrack_Shader {
    private static void paint_30_ModelCursor(final GLViewport viewport,
                                             final float vp2mpScale,
                                             final TourTrack_Bucket trackBucket,
-                                            final int nextFrameIndex) {
+                                            final int nextVisibleFrameIndex) {
 
       final short[] allVisiblePixelPositions = trackBucket.allVisible_PixelPositions;
       if (allVisiblePixelPositions == null) {
          return;
       }
 
-      final int numAllPositions = allVisiblePixelPositions.length;
-      if (numAllPositions < 1) {
+      final int numAllVisiblePositions = allVisiblePixelPositions.length;
+      if (numAllVisiblePositions < 1) {
          return;
       }
 
       // get animated position
-      final int xyPosIndex = nextFrameIndex * 2;
-      final int xyPrevPosIndex = xyPosIndex > 1 ? xyPosIndex - 2 : 0;
+      final int xyPosIndex = nextVisibleFrameIndex * 2;
 
-      if (xyPosIndex + 1 >= numAllPositions) {
+      if (xyPosIndex + 1 >= numAllVisiblePositions) {
          return;
       }
 
-      final short pos1X = allVisiblePixelPositions[xyPrevPosIndex];
-      final short pos1Y = allVisiblePixelPositions[xyPrevPosIndex + 1];
-      final short pos2X = allVisiblePixelPositions[xyPosIndex];
-      final short pos2Y = allVisiblePixelPositions[xyPosIndex + 1];
-
-      float dX = pos2X;
-      float dY = pos2Y;
+      float dX = allVisiblePixelPositions[xyPosIndex];
+      float dY = allVisiblePixelPositions[xyPosIndex + 1];
 
       final MapPosition currentMapPosition = viewport.pos;
 

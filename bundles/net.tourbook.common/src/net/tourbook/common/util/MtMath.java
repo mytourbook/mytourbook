@@ -293,6 +293,34 @@ public class MtMath {
    }
 
    /**
+    * @param allValues
+    * @param value
+    * @return Returns the index for the searched value which is the exact index or the index before
+    *         the searched value
+    */
+   public static int searchIndex(final int[] allValues, final int value) {
+
+      if (allValues == null || allValues.length == 0 || value <= allValues[0]) {
+         return 0;
+      }
+
+      if (value >= allValues[allValues.length - 1]) {
+         return allValues.length - 1;
+      }
+
+      final int result = Arrays.binarySearch(allValues, value);
+
+      if (result >= 0) {
+         return result;
+      }
+
+      final int insertionPoint = -result - 1;
+      final int indexBeforeInsertionPoint = insertionPoint - 1;
+
+      return indexBeforeInsertionPoint;
+   }
+
+   /**
     * Find the nearest values in a sorted array
     * <p>
     * Original source<br>

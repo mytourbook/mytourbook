@@ -357,7 +357,7 @@ public class MapPlayerView extends ViewPart {
             /*
              * Model size
              */
-            _lblModelSize = UI.createLabel(container, "Model size");
+            _lblModelSize = UI.createLabel(container, "Model &size");
 
             _spinnerModelSize = new Spinner(container, SWT.BORDER);
             _spinnerModelSize.setToolTipText("");
@@ -376,7 +376,7 @@ public class MapPlayerView extends ViewPart {
             /*
              * Model turning angle
              */
-            _lblTurningAngle = UI.createLabel(container, "Turning angle");
+            _lblTurningAngle = UI.createLabel(container, "Turning &angle");
 
             _spinnerTurningAngle = new Spinner(container, SWT.BORDER);
             _spinnerTurningAngle.setToolTipText("This is the angle in degrees in one frame when the model is turning on the track");
@@ -396,7 +396,7 @@ public class MapPlayerView extends ViewPart {
             /*
              * Speed multiplier
              */
-            _lblSpeedMultiplier = UI.createLabel(container, "Speed multiplier");
+            _lblSpeedMultiplier = UI.createLabel(container, "Speed &multiplier");
 
             _spinnerSpeedMultiplier = new Spinner(container, SWT.BORDER);
             _spinnerSpeedMultiplier.setToolTipText("The speed value is multiplied with this value");

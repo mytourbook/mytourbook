@@ -56,11 +56,7 @@ public class MapPlayerManager {
 
    private static MapPlayerView         _mapPlayerView;
 
-   /**
-    * Frame number which is currently displayed, it's in the range from
-    * 1...{@link #_numAllVisibleFrames}
-    */
-   private static int                   _currentVisibleFrameNumber;
+   private static int                   _currentVisibleIndex;
 
    /**
     * Number of frames for an animation
@@ -86,6 +82,13 @@ public class MapPlayerManager {
    private static long                  _projectedPosition_Time;
 
    /**
+    * Geo location index of the model in the current frame, it also includes the micro
+    * movements according to the exact relative position
+    * <p>
+    */
+   private static int                   _visibleGeoLocationIndex;
+
+   /**
     * Relative position for the current frame
     *
     * <pre>
@@ -109,8 +112,6 @@ public class MapPlayerManager {
    private static double                _relativePosition_Current;
    private static double                _relativePosition_Start;
    private static double                _relativePosition_End;
-
-   private static int                   _currentVisibleIndex;
 
    private static boolean               _isAnimationVisible;
    private static boolean               _isPlayerEnabled;
@@ -158,39 +159,38 @@ public class MapPlayerManager {
     */
    private static int                   _modelAnimationTime              = 1000;
 
-//   /**
-//    * Model speed when moving on the NORMAL TRACK in units per second
-//    */
-//   private static int                   _normalTrackSpeed                = 200;
-
    /**
     * Model speed when moving on the RETURN TRACK
     */
-   private static int     _returnTrackSpeed_PixelPerSecond = 200;
+   private static int                   _returnTrackSpeed_PixelPerSecond = 200;
 
-   private static int     _jogWheelSpeedFactor             = 50;
-   private static int     _jogWheelSpeedMultiplier         = 1;
+   private static int                   _jogWheelSpeedFactor             = 50;
+   private static int                   _jogWheelSpeedMultiplier         = 1;
 
    /**
     * Size of the moving model when the size is not scaled according to the map
     */
-   private static int     _modelSize_Fixed;
+   private static int                   _modelSize_Fixed;
 
    /**
     * Angle how much the animated model is rotated in the next frame
     */
-   private static float   _modelTurningAngle;
+   private static float                 _modelTurningAngle;
 
-   private static boolean _isModelMovingForward;
-   private static float   _modelForwardAngle;
-   private static float   _previousAngle;
-   private static double  _previousRelativePosition;
-// private static double                _previousRelativePositionTest;
-   private static double  _previousProjectedPositionX;
-   private static double  _previousProjectedPositionY;
+   private static boolean               _isModelMovingForward;
+   private static float                 _modelForwardAngle;
+   private static float                 _previousAngle;
+   private static double                _previousRelativePosition;
+   private static double                _previousProjectedPositionX;
+   private static double                _previousProjectedPositionY;
 
-   private static double  _debugPrevValue;
-   private static String  _debugTimeStamp                  = UI.timeStamp();
+   private static double                _debugPrevValue;
+   private static String                _debugTimeStamp                  = UI.timeStamp();
+
+//   /**
+//    * Model speed when moving on the NORMAL TRACK in units per second
+//    */
+//   private static int                   _normalTrackSpeed                = 200;
 
    enum TrackState {
 
@@ -221,20 +221,6 @@ public class MapPlayerManager {
    public static double getCurrentRelativePosition() {
 
       return _relativePosition_Current;
-   }
-
-   /**
-    * @return Returns the last computed frame numer, it's in the range from
-    *         1...{@link #_numAllVisibleFrames}
-    */
-   public static int getCurrentVisibleFrameNumber() {
-
-      return _currentVisibleFrameNumber < 1
-
-            // frames are starting with 1
-            ? 1
-
-            : _currentVisibleFrameNumber;
    }
 
    public static int getFixedModelSize() {
@@ -280,13 +266,14 @@ public class MapPlayerManager {
     * {@link net.tourbook.map25.renderer.TourTrack_Shader#paint}
     *
     * @return Returns an index <code>0...</code>{@link #_numAllVisibleFrames}<code> - 1</code> for
-    *         the next frame <code>1...</code>{@link #_numAllVisibleFrames}
+    *         the next frame
     */
    public static int getNextVisibleFrameIndex() {
 
       if (_isPlayerRunning == false) {
 
          // player is paused
+
          return _currentVisibleIndex;
       }
 
@@ -313,14 +300,14 @@ public class MapPlayerManager {
       final int[] allVisibleGeoLocationIndices = _mapPlayerData.allVisible_GeoLocationIndices;
       final int notClippedIndex = allNotClipped_GeoLocationIndices[notClippedLocationIndex];
 
-      int nextFrameNumber = MtMath.searchNearestIndex(allVisibleGeoLocationIndices, notClippedIndex);
+      int nextFrameIndex = MtMath.searchNearestIndex(allVisibleGeoLocationIndices, notClippedIndex);
 
       // ensure bounds
-      if (nextFrameNumber > _numAllVisibleFrames) {
-         nextFrameNumber = _numAllVisibleFrames;
+      if (nextFrameIndex >= _numAllVisibleFrames) {
+         nextFrameIndex = _numAllVisibleFrames - 1;
       }
 
-      _currentVisibleIndex = getValidIndex(nextFrameNumber);
+      _currentVisibleIndex = nextFrameIndex;
 
       return _currentVisibleIndex;
    }
@@ -532,6 +519,8 @@ public class MapPlayerManager {
 
       _projectedPosition[0] = projectedPositionX;
       _projectedPosition[1] = projectedPositionY;
+
+      _visibleGeoLocationIndex = MtMath.searchIndex(_mapPlayerData.allVisible_GeoLocationIndices, geoLocationIndex_0);
    }
 
    /**
@@ -870,17 +859,9 @@ public class MapPlayerManager {
       return _jogWheelSpeedMultiplier;
    }
 
-   /**
-    * Convert frame number 1...n -> array index 0...n-1
-    *
-    * @param frameNumber
-    * @return
-    */
-   private static int getValidIndex(final int frameNumber) {
+   public static int getVisibleGeoLocationIndex() {
 
-      final int arrayIndex = frameNumber <= 0 ? 0 : frameNumber - 1;
-
-      return arrayIndex;
+      return _visibleGeoLocationIndex;
    }
 
    public static boolean isAnimationVisible() {
@@ -905,7 +886,7 @@ public class MapPlayerManager {
     */
    public static boolean isLastFrame() {
 
-      return _currentVisibleFrameNumber == _numAllVisibleFrames;
+      return _currentVisibleIndex == _numAllVisibleFrames - 1;
    }
 
    public static boolean isPlayerEnabled() {
