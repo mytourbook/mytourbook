@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -63,6 +63,8 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
     */
    private Composite _shellContainer;
 
+   private Button    _chkDelete_KeepDistance;
+   private Button    _chkDelete_KeepTime;
    private Button    _chkRecomputeElevation;
 
    private Spinner   _spinnerLatLonDigits;
@@ -231,6 +233,34 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       }
       {
          /*
+          * DEL key actions
+          */
+         final Composite container = new Composite(parent, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(container);
+         GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+         {
+
+            // label
+            final Label label = new Label(container, SWT.NONE);
+            label.setText(Messages.Slideout_TourEditor_Label_DeleteTimeSlices);
+            GridDataFactory.fillDefaults().span(2, 1).applyTo(label);
+
+            // checkbox: Keep time
+            _chkDelete_KeepTime = new Button(container, SWT.CHECK);
+            _chkDelete_KeepTime.setText(Messages.Slideout_TourEditor_Checkbox_KeepTime);
+            _chkDelete_KeepTime.setToolTipText(Messages.Slideout_TourEditor_Checkbox_KeepTime_Tooltip);
+            _chkDelete_KeepTime.addSelectionListener(_defaultSelectionListener);
+            GridDataFactory.fillDefaults().indent(16, 0).applyTo(_chkDelete_KeepTime);
+
+            // radio: solid
+            _chkDelete_KeepDistance = new Button(container, SWT.CHECK);
+            _chkDelete_KeepDistance.setText(Messages.Slideout_TourEditor_Checkbox_KeepDistance);
+            _chkDelete_KeepDistance.setToolTipText(Messages.Slideout_TourEditor_Checkbox_KeepDistance_Tooltip);
+            _chkDelete_KeepDistance.addSelectionListener(_defaultSelectionListener);
+         }
+      }
+      {
+         /*
           * Recompute elevation up/down when saved
           */
          _chkRecomputeElevation = new Button(parent, SWT.CHECK);
@@ -278,27 +308,46 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
    @Override
    public void resetToDefaults() {
 
-      final int descriptionNumberOfLines = TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT;
+// SET_FORMATTING_OFF
+
+      final int descriptionNumberOfLines        = TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT;
+      final int latLonDigits                    = TourDataEditorView.STATE_LAT_LON_DIGITS_DEFAULT;
       final int weatherDescriptionNumberOfLines = TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT;
-      final int latLonDigits = TourDataEditorView.STATE_LAT_LON_DIGITS_DEFAULT;
-      final boolean isRecomputeElevation = TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT;
+
+      final boolean isDeleteKeepDistance        = TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT;
+      final boolean isDeleteKeepTime            = TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT;
+      final boolean isRecomputeElevation        = TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT;
 
       // update model
-      _state.put(TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES, descriptionNumberOfLines);
-      _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN, isRecomputeElevation);
-      _state.put(TourDataEditorView.STATE_LAT_LON_DIGITS, latLonDigits);
+      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,         isDeleteKeepDistance);
+      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,             isDeleteKeepTime);
+      _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,  isRecomputeElevation);
+      _state.put(TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES,     descriptionNumberOfLines);
+      _state.put(TourDataEditorView.STATE_LAT_LON_DIGITS,                  latLonDigits);
 
       // update UI
-      _chkRecomputeElevation.setSelection(isRecomputeElevation);
-      _spinnerLatLonDigits.setSelection(latLonDigits);
-      _spinnerTourDescriptionNumLines.setSelection(descriptionNumberOfLines);
-      _spinnerWeatherDescriptionNumLines.setSelection(weatherDescriptionNumberOfLines);
+      _chkDelete_KeepDistance             .setSelection(isDeleteKeepDistance);
+      _chkDelete_KeepTime                 .setSelection(isDeleteKeepTime);
+      _chkRecomputeElevation              .setSelection(isRecomputeElevation);
+      _spinnerLatLonDigits                .setSelection(latLonDigits);
+      _spinnerTourDescriptionNumLines     .setSelection(descriptionNumberOfLines);
+      _spinnerWeatherDescriptionNumLines  .setSelection(weatherDescriptionNumberOfLines);
+
+// SET_FORMATTING_ON
 
       _tourEditorView.updateUI_DescriptionNumLines(descriptionNumberOfLines, weatherDescriptionNumberOfLines);
       _tourEditorView.updateUI_LatLonDigits(latLonDigits);
    }
 
    private void restoreState() {
+
+      _chkDelete_KeepDistance.setSelection(Util.getStateBoolean(_state,
+            TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,
+            TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT));
+
+      _chkDelete_KeepTime.setSelection(Util.getStateBoolean(_state,
+            TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,
+            TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT));
 
       _chkRecomputeElevation.setSelection(Util.getStateBoolean(_state,
             TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,
@@ -319,6 +368,8 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
    private void saveState() {
 
+      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE, _chkDelete_KeepDistance.getSelection());
+      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME, _chkDelete_KeepTime.getSelection());
       _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN, _chkRecomputeElevation.getSelection());
    }
 

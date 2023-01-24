@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1029,7 +1029,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
       // check if time slices should be removed
       if (getStateSplitMethod().equals(STATE_EXTRACT_METHOD_REMOVE)) {
 
-         TourManager.removeTimeSlices(_tourDataSource, _extractStartIndex, _extractEndIndex, true, false);
+         TourManager.removeTimeSlices(_tourDataSource, _extractStartIndex, _extractEndIndex, true, true, false);
 
          _tourDataEditor.updateUI(_tourDataSource, true);
 
