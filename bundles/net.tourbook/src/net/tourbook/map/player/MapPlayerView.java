@@ -23,6 +23,7 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.map.MapManager;
 import net.tourbook.map25.Map25FPSManager;
@@ -195,21 +196,6 @@ public class MapPlayerView extends ViewPart {
 
       _actionPlayControl_Loop = new Action_PlayControl_Loop();
       _actionPlayControl_PlayAndPause = new Action_PlayControl_PlayAndPause();
-   }
-
-   private MapPosition createMapPosition_Projected(final MapPlayerData mapPlayerData, final int geoLocationIndex) {
-
-      final int projectedIndex = geoLocationIndex * 2;
-
-      final double projectedPositionX = mapPlayerData.allProjectedPoints_NormalTrack[projectedIndex];
-      final double projectedPositionY = mapPlayerData.allProjectedPoints_NormalTrack[projectedIndex + 1];
-
-      final MapPosition mapPosition = new MapPosition();
-
-      mapPosition.x = projectedPositionX;
-      mapPosition.y = projectedPositionY;
-
-      return mapPosition;
    }
 
    @Override
@@ -485,17 +471,34 @@ public class MapPlayerView extends ViewPart {
          return;
       }
 
-      int positionIndex = (int) (numNotClippedPositions * getTimelineRelativePosition());
+      final double relativePosition = getTimelineRelativePosition();
 
-      // check bounds
-      positionIndex = positionIndex >= numNotClippedPositions
-            ? numNotClippedPositions - 1
-            : positionIndex;
+      final float[] allDistanceSeries = mapPlayerData.allDistanceSeries;
+      final int lastDistanceIndex = allDistanceSeries.length - 1;
 
-      final int geoLocationIndex = allNotClipped_GeoLocationIndices[positionIndex];
-      final MapPosition mapPosition = createMapPosition_Projected(mapPlayerData, geoLocationIndex);
+      final float totalDistance = allDistanceSeries[lastDistanceIndex];
+      final float positionDistance = (float) (relativePosition * totalDistance);
+
+      final int distanceIndex = MtMath.searchIndex(allDistanceSeries, positionDistance);
+
+      final MapPosition mapPosition = fireMapPosition_CreateProjectedMapPosition(mapPlayerData, distanceIndex);
 
       MapManager.fireSyncMapEvent(mapPosition, this, null);
+   }
+
+   private MapPosition fireMapPosition_CreateProjectedMapPosition(final MapPlayerData mapPlayerData, final int geoLocationIndex) {
+
+      final int projectedIndex = geoLocationIndex * 2;
+
+      final double projectedPositionX = mapPlayerData.allProjectedPoints_NormalTrack[projectedIndex];
+      final double projectedPositionY = mapPlayerData.allProjectedPoints_NormalTrack[projectedIndex + 1];
+
+      final MapPosition mapPosition = new MapPosition();
+
+      mapPosition.x = projectedPositionX;
+      mapPosition.y = projectedPositionY;
+
+      return mapPosition;
    }
 
    /**
@@ -504,9 +507,9 @@ public class MapPlayerView extends ViewPart {
    private double getTimelineRelativePosition() {
 
       final int timelineSelection = _scaleTimeline.getSelection();
-      final double newRelativePosition = timelineSelection / (double) _scaleTimeline.getMaximum();
+      final double relativePosition = timelineSelection / (double) _scaleTimeline.getMaximum();
 
-      return newRelativePosition;
+      return relativePosition;
    }
 
    private void initUI() {

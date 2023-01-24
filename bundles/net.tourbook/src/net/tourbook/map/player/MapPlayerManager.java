@@ -20,6 +20,7 @@ import static org.oscim.utils.FastMath.clamp;
 import com.badlogic.gdx.math.MathUtils;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.map.IMapSyncListener.SyncParameter;
@@ -157,37 +158,39 @@ public class MapPlayerManager {
     */
    private static int                   _modelAnimationTime              = 1000;
 
-   /**
-    * Model speed when moving on the NORMAL TRACK in units per second
-    */
-   private static int                   _normalTrackSpeed                = 200;
+//   /**
+//    * Model speed when moving on the NORMAL TRACK in units per second
+//    */
+//   private static int                   _normalTrackSpeed                = 200;
 
    /**
     * Model speed when moving on the RETURN TRACK
     */
-   private static int                   _returnTrackSpeed_PixelPerSecond = 200;
+   private static int     _returnTrackSpeed_PixelPerSecond = 200;
 
-   private static int                   _jogWheelSpeedFactor             = 50;
-   private static int                   _jogWheelSpeedMultiplier         = 1;
+   private static int     _jogWheelSpeedFactor             = 50;
+   private static int     _jogWheelSpeedMultiplier         = 1;
 
    /**
     * Size of the moving model when the size is not scaled according to the map
     */
-   private static int                   _modelSize_Fixed;
+   private static int     _modelSize_Fixed;
 
    /**
     * Angle how much the animated model is rotated in the next frame
     */
-   private static float                 _modelTurningAngle;
+   private static float   _modelTurningAngle;
 
-   private static boolean               _isModelMovingForward;
-   private static float                 _modelForwardAngle;
-   private static float                 _previousAngle;
-   private static double                _previousRelativePosition;
+   private static boolean _isModelMovingForward;
+   private static float   _modelForwardAngle;
+   private static float   _previousAngle;
+   private static double  _previousRelativePosition;
 // private static double                _previousRelativePositionTest;
-   private static double                _previousProjectedPositionX;
-   private static double                _previousProjectedPositionY;
-   private static double                _prevValue;
+   private static double  _previousProjectedPositionX;
+   private static double  _previousProjectedPositionY;
+
+   private static double  _debugPrevValue;
+   private static String  _debugTimeStamp                  = UI.timeStamp();
 
    enum TrackState {
 
@@ -408,7 +411,7 @@ public class MapPlayerManager {
       double exactLocationIndex = 0;
 
       // 0...1
-      double microIndex;
+      double subIndex;
 
       // compute frame position from relative position
 
@@ -446,7 +449,7 @@ public class MapPlayerManager {
 
          exactLocationIndex = lastReturnIndex * relativeReturnPosition;
 
-         microIndex = exactLocationIndex - (int) exactLocationIndex;
+         subIndex = exactLocationIndex - (int) exactLocationIndex;
 
          positionIndex_0 = (int) exactLocationIndex;
 
@@ -462,17 +465,15 @@ public class MapPlayerManager {
          allProjectedPoints = _mapPlayerData.allProjectedPoints_NormalTrack;
 
          final float[] allDistanceSeries = _mapPlayerData.allDistanceSeries;
-         final int numAllPositions = allDistanceSeries.length;
-         final int lastPositionIndex = numAllPositions - 1;
+         final int lastDistanceIndex = allDistanceSeries.length - 1;
 
-         final float totalDistance = allDistanceSeries[lastPositionIndex];
+         final float totalDistance = allDistanceSeries[lastDistanceIndex];
+         final float positionDistance = (float) (relativePosition * totalDistance);
 
-         final float exactPositionDistance = (float) (relativePosition * totalDistance);
-
-         final int distanceIndex = MtMath.searchIndex(allDistanceSeries, exactPositionDistance);
+         final int distanceIndex = MtMath.searchIndex(allDistanceSeries, positionDistance);
 
          geoLocationIndex_0 = distanceIndex;
-         geoLocationIndex_1 = geoLocationIndex_0 <= lastPositionIndex - 1
+         geoLocationIndex_1 = geoLocationIndex_0 <= lastDistanceIndex - 1
 
                ? geoLocationIndex_0 + 1
                : geoLocationIndex_0;
@@ -481,25 +482,31 @@ public class MapPlayerManager {
          final float distance_1 = allDistanceSeries[geoLocationIndex_1];
 
          final float distanceDiff = distance_1 - distance_0;
-         final float microDiff = exactPositionDistance - distance_0;
+         final float subDiff = positionDistance - distance_0;
 
-         microIndex = microDiff / distanceDiff;
+         subIndex = distanceDiff == 0 ? 0 : subDiff / distanceDiff;
 
-//         if (_prevValue != microIndex) {
-//
-//            _prevValue = microIndex;
+//         if (_debugPrevValue != relativePosition) {
 //
 //            System.out.println(UI.timeStamp()
 //
 ////                  + " diff: " + String.format("%5d", geoLocationIndex_0 - distanceIndex)
 //
 //                  + "  geoIndex: " + String.format("%5d", geoLocationIndex_0)
-//                  + "  microIndex: " + String.format("%6.3f", microIndex)
+//
+//                  + "  relPos: " + String.format("%6.3f", relativePosition)
+//                  + "  relDiff: " + String.format("%9.6f", relativePosition - _debugPrevValue)
+//
+////
+////                  + "  subIndex: " + String.format("%6.3f", subIndex)
+////                  + "  indexDiff: " + String.format("%6.3f", subIndex - _prevValue)
 //
 ////                  + "  distanceIndex: " + String.format("%5d", distanceIndex)
 //
 //            );
 //// TODO remove SYSTEM.OUT.PRINTLN
+//
+//            _debugPrevValue = relativePosition;
 //         }
       }
 
@@ -517,8 +524,8 @@ public class MapPlayerManager {
       final double projectedPositionX_Diff = projectedPositionX_1 - projectedPositionX_0;
       final double projectedPositionY_Diff = projectedPositionY_1 - projectedPositionY_0;
 
-      final double advanceX = projectedPositionX_Diff * microIndex;
-      final double advanceY = projectedPositionY_Diff * microIndex;
+      final double advanceX = projectedPositionX_Diff * subIndex;
+      final double advanceY = projectedPositionY_Diff * subIndex;
 
       final double projectedPositionX = projectedPositionX_0 + advanceX;
       final double projectedPositionY = projectedPositionY_0 + advanceY;
@@ -821,13 +828,6 @@ public class MapPlayerManager {
          }
       }
 
-//      final double positionDiff = _relativePosition_CurrentFrame - _previousRelativePositionTest;
-//
-//      System.out.println(UI.timeStamp() + " diff: " + positionDiff);
-//// TODO remove SYSTEM.OUT.PRINTLN
-//
-//      _previousRelativePositionTest = _relativePosition_CurrentFrame;
-
       return _relativePosition_Current;
    }
 
@@ -1051,26 +1051,12 @@ public class MapPlayerManager {
 
       p21AngleSmoothed = p21AngleSmoothed % 360;
 
-      final float angleDiffLog = _previousAngle - p21AngleSmoothed;
-      if (angleDiffLog > 0.1) {
-
-//         System.out.println(""
-//
-//               + " prev: " + String.format("%6.1f", _previousAngle)
-//               + " p21Angle: " + String.format("%6.1f", p21Angle)
-//
-//         );
-// TODO remove SYSTEM.OUT.PRINTLN
-      }
-
       _previousAngle = p21AngleSmoothed;
 
       final float modelForwardAngle = p21AngleSmoothed
 
             // must be turned otherwise it looks in the wrong direction
-            + 90
-
-      ;
+            + 90;
 
       _modelForwardAngle = modelForwardAngle % 360;
    }
@@ -1293,22 +1279,11 @@ public class MapPlayerManager {
 
          final double animationTime = _modelAnimationTime * (pixelDistance / _returnTrackSpeed_PixelPerSecond);
 
-//      System.out.println(UI.timeStamp()
-//
-//            + " pixelDistance: " + pixelDistance
-//            + " animationTime: " + animationTime
-//
-//      );
-// TODO remove SYSTEM.OUT.PRINTLN
-
          return (int) clamp(animationTime, 1, _modelAnimationTime);
       }
    }
 
    private static void setRelativePosition_ScheduleNewPosition(final double newRelativePosition) {
-
-//      System.out.println(UI.timeStamp() + " scheduled: " + newRelativePosition);
-//// TODO remove SYSTEM.OUT.PRINTLN
 
       final long currentFrameTime = MapRenderer.frametime;
 
