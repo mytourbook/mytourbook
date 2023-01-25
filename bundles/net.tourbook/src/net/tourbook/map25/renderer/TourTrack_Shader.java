@@ -250,20 +250,6 @@ public final class TourTrack_Shader {
          if (trackConfig.arrow_IsAnimate) {
 
             /*
-             * Update map player
-             */
-
-//            final int[] allNotClipped_LocationIndices = trackBucket.allNotClipped_GeoLocationIndices;
-//
-//            System.out.println((System.currentTimeMillis()
-//
-//                  + " bind:   "
-//                  + " num indices:" + allNotClipped_LocationIndices.length
-//                  + "  # " + allNotClipped_LocationIndices.hashCode()));
-
-            // TODO remove SYSTEM.OUT.PRINTLN
-
-            /*
              * Animation
              */
             {
@@ -273,8 +259,8 @@ public final class TourTrack_Shader {
 
 // SET_FORMATTING_OFF
 
-               final short size  = 100;
-               final short size2 = size * 3;
+               final short size              = MapPlayerManager.getModelCursorSize();
+               final short size2             = (short) (size * 3);
 
                final short zPos  = (short) (1 + trackBucket.heightOffset);
 
@@ -282,7 +268,7 @@ public final class TourTrack_Shader {
                _animationVertices = new short[] {
                                                    0,     0,   zPos,
                                                 size,  size2,  zPos,
-                                               -size,  size2,  zPos,
+                                               (short) -size,  size2,  zPos,
 
                                                 };
 // SET_FORMATTING_ON
@@ -370,16 +356,13 @@ public final class TourTrack_Shader {
       // fix alpha blending
       gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
       {
-         // get model position
-         final int nextVisibleFrameIndex = MapPlayerManager.getCurrentVisibleFrameIndex();
-
-         paint_10_Track(trackBucket, viewport, viewport2mapscale, nextVisibleFrameIndex);
+         paint_10_Track(trackBucket, viewport, viewport2mapscale);
 
          if (trackConfig.isShowDirectionArrow) {
 
             if (trackConfig.arrow_IsAnimate) {
 
-               paint_30_ModelCursor(viewport, viewport2mapscale, trackBucket, nextVisibleFrameIndex);
+               paint_30_ModelCursor(viewport, viewport2mapscale);
 
             } else {
 
@@ -401,8 +384,7 @@ public final class TourTrack_Shader {
     */
    private static void paint_10_Track(final TourTrack_Bucket trackBucket,
                                       final GLViewport viewport,
-                                      final float vp2mpScale,
-                                      final int nextVisibleFrameIndex) {
+                                      final float vp2mpScale) {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
@@ -420,6 +402,28 @@ public final class TourTrack_Shader {
 
          // show only the first part of the track which the model has already moved
 
+         // get model position
+         final int currentVisiblePositionIndex = MapPlayerManager.getCurrentVisiblePositionIndex();
+
+         numVisibleVertices = MapPlayerManager.getCurrentVisibleGeoLocationIndex() * 1 + 6;
+
+//         if (numVisibleVertices != _prevValue) {
+//
+//            _prevValue = numVisibleVertices;
+//
+//            System.out.println(UI.EMPTY_STRING
+//
+////                     UI.timeStamp()
+//
+////                     + " next idx: " + nextVisibleFrameIndex
+//                  + " visible verts: " + numVisibleVertices
+//                  + " all verts: " + numTrackVertices
+//
+//            );
+//// TODO remove SYSTEM.OUT.PRINTLN
+//
+//         }
+
          final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
          if (mapPlayerData != null) {
 
@@ -435,25 +439,7 @@ public final class TourTrack_Shader {
 
 //            numVisibleVertices = nextVisibleFrameIndex;
 
-            MapPlayerManager.getCurrentVisibleFrameIndex();
-            numVisibleVertices = MapPlayerManager.getVisibleGeoLocationIndex() * 1 + 6;
-
-            if (numVisibleVertices != _prevValue) {
-
-               _prevValue = numVisibleVertices;
-
-               System.out.println(UI.EMPTY_STRING
-
-//                     UI.timeStamp()
-
-//                     + " next idx: " + nextVisibleFrameIndex
-                     + " visible verts: " + numVisibleVertices
-                     + " all verts: " + numTrackVertices
-
-               );
-// TODO remove SYSTEM.OUT.PRINTLN
-
-            }
+            MapPlayerManager.getCurrentVisiblePositionIndex();
          }
       }
 
@@ -763,62 +749,41 @@ public final class TourTrack_Shader {
    }
 
    private static void paint_30_ModelCursor(final GLViewport viewport,
-                                            final float vp2mpScale,
-                                            final TourTrack_Bucket trackBucket,
-                                            final int nextVisibleFrameIndex) {
-
-      final short[] allVisiblePixelPositions = trackBucket.allVisible_PixelPositions;
-      if (allVisiblePixelPositions == null) {
-         return;
-      }
-
-      final int numAllVisiblePositions = allVisiblePixelPositions.length;
-      if (numAllVisiblePositions < 1) {
-         return;
-      }
-
-      // get animated position
-      final int xyPosIndex = nextVisibleFrameIndex * 2;
-
-      if (xyPosIndex + 1 >= numAllVisiblePositions) {
-         return;
-      }
-
-      float dX = allVisiblePixelPositions[xyPosIndex];
-      float dY = allVisiblePixelPositions[xyPosIndex + 1];
-
-      final MapPosition currentMapPosition = viewport.pos;
+                                            final float vp2mpScale) {
 
       final double[] projectedPositionXY = MapPlayerManager.getCurrentProjectedPosition();
 
-      if (projectedPositionXY != null) {
+      if (projectedPositionXY == null) {
+         return;
+      }
 
-         final double currentMapPosX = currentMapPosition.x;
-         final double currentMapPosY = currentMapPosition.y;
+      final MapPosition currentMapPosition = viewport.pos;
 
-         final double diffX = MapPlayerManager.getCompileMapX() - currentMapPosX;
-         final double diffY = MapPlayerManager.getCompileMapY() - currentMapPosY;
+      final double currentMapPosX = currentMapPosition.x;
+      final double currentMapPosY = currentMapPosition.y;
+      final int currentMapZoomLevel = currentMapPosition.zoomLevel;
 
-         final int currentMapZoomLevel = currentMapPosition.zoomLevel;
-         final int tileScale = Tile.SIZE << currentMapZoomLevel;
+      final int tileScale = Tile.SIZE << currentMapZoomLevel;
 
-         dX = (float) ((projectedPositionXY[0] - currentMapPosX - diffX) * tileScale) * COORD_SCALE;
-         dY = (float) ((projectedPositionXY[1] - currentMapPosY - diffY) * tileScale) * COORD_SCALE;
+      final double diffX = MapPlayerManager.getCompileMapX() - currentMapPosX;
+      final double diffY = MapPlayerManager.getCompileMapY() - currentMapPosY;
 
-         /*
-          * Prevent flickering, this code is created by logging dX/dY to see the differences, cannot
-          * tell why this works with these adjustments
-          */
-         if (vp2mpScale < 1.0) {
+      float dX = (float) ((projectedPositionXY[0] - currentMapPosX - diffX) * tileScale) * COORD_SCALE;
+      float dY = (float) ((projectedPositionXY[1] - currentMapPosY - diffY) * tileScale) * COORD_SCALE;
 
-            dX = dX * 2;
-            dY = dY * 2;
+      /*
+       * Prevent flickering, this code is created by logging dX/dY to see the differences, cannot
+       * tell why this works with these adjustments
+       */
+      if (vp2mpScale < 1.0) {
 
-         } else if (vp2mpScale > 2.0) {
+         dX = dX * 2;
+         dY = dY * 2;
 
-            dX = dX / 2;
-            dY = dY / 2;
-         }
+      } else if (vp2mpScale > 2.0) {
+
+         dX = dX / 2;
+         dY = dY / 2;
       }
 
       final ModelCursorShader shader = _modelCursorShader;

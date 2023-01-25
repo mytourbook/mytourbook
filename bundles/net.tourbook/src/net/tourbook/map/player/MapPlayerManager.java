@@ -49,6 +49,7 @@ public class MapPlayerManager {
    private static final String          STATE_IS_RELIVE_PLAYING          = "STATE_IS_RELIVE_PLAYING";                                          //$NON-NLS-1$
    private static final String          STATE_JOG_WHEEL_SPEED            = "STATE_JOG_WHEEL_SPEED";                                            //$NON-NLS-1$
    private static final String          STATE_JOG_WHEEL_SPEED_MULTIPLIER = "STATE_JOG_WHEEL_SPEED_MULTIPLIER";                                 //$NON-NLS-1$
+   private static final String          STATE_MODEL_CURSOR_SIZE          = "STATE_MODEL_CURSOR_SIZE";                                          //$NON-NLS-1$
    private static final String          STATE_MODEL_SIZE_FIXED           = "STATE_MODEL_SIZE_FIXED";                                           //$NON-NLS-1$
    private static final String          STATE_MODEL_TURNING_ANGLE        = "STATE_MODEL_TURNING_ANGLE";                                        //$NON-NLS-1$
    //
@@ -56,7 +57,7 @@ public class MapPlayerManager {
 
    private static MapPlayerView         _mapPlayerView;
 
-   private static int                   _currentVisibleIndex;
+   private static int                   _currentVisiblePositionIndex;
 
    /**
     * Number of frames for an animation
@@ -75,16 +76,16 @@ public class MapPlayerManager {
     * Projected position 0...1 of the model in the current frame, it also includes the micro
     * movements according to the exact relative position
     * <p>
-    * {@link #_projectedPosition}[0] = x<br>
-    * {@link #_projectedPosition}[1] = y<br>
+    * {@link #_currentProjectedPosition}[0] = x<br>
+    * {@link #_currentProjectedPosition}[1] = y<br>
     */
-   private static double[]              _projectedPosition               = new double[2];
-   private static long                  _projectedPosition_Time;
+   private static double[]              _currentProjectedPosition        = new double[2];
+   private static long                  _currentProjectedPosition_Time;
 
    /**
-    * Geo location index of the model in the current frame
+    * Geo location index of the model in the current position
     */
-   private static int                   _visibleGeoLocationIndex;
+   private static int                   _currentVisibleGeoLocationIndex;
 
    /**
     * Relative position for the current frame
@@ -175,6 +176,8 @@ public class MapPlayerManager {
     */
    private static float                 _modelTurningAngle;
 
+   private static int                   _modelCursorSize;
+
    private static boolean               _isModelMovingForward;
    private static float                 _modelForwardAngle;
    private static float                 _previousAngle;
@@ -217,16 +220,16 @@ public class MapPlayerManager {
    }
 
    /**
-    * @return Returns the {@link #_projectedPosition} of the animated model for the current frame or
-    *         <code>null</code> when data are missing
+    * @return Returns the {@link #_currentProjectedPosition} of the animated model for the current
+    *         frame or <code>null</code> when data are missing
     */
    public static double[] getCurrentProjectedPosition() {
 
       final long currentFrameTime = MapRenderer.frametime;
 
       // check if position is already computed
-      if (_projectedPosition_Time == currentFrameTime) {
-         return _projectedPosition;
+      if (_currentProjectedPosition_Time == currentFrameTime) {
+         return _currentProjectedPosition;
       }
 
       if (_mapPlayerData == null) {
@@ -241,8 +244,8 @@ public class MapPlayerManager {
          return null;
       }
 
-      _previousProjectedPositionX = _projectedPosition[0];
-      _previousProjectedPositionY = _projectedPosition[1];
+      _previousProjectedPositionX = _currentProjectedPosition[0];
+      _previousProjectedPositionY = _currentProjectedPosition[1];
 
       /*
        * Compute position
@@ -251,13 +254,13 @@ public class MapPlayerManager {
       getCurrentProjectedPosition_ComputePosition(allNotClipped_GeoLocationIndices, lastGeoLocationIndex);
 
       // keep time when position was computed
-      _projectedPosition_Time = currentFrameTime;
+      _currentProjectedPosition_Time = currentFrameTime;
 
       /*
        * Set model angle
        */
-      final double projectedPositionX = _projectedPosition[0];
-      final double projectedPositionY = _projectedPosition[1];
+      final double projectedPositionX = _currentProjectedPosition[0];
+      final double projectedPositionY = _currentProjectedPosition[1];
 
       setModelAngle(projectedPositionX, projectedPositionY, _previousProjectedPositionX, _previousProjectedPositionY);
 
@@ -274,11 +277,11 @@ public class MapPlayerManager {
          MapManager.fireSyncMapEvent(_mapPosition, null, SyncParameter.SHOW_MAP_POSITION_WITHOUT_ANIMATION);
       }
 
-      return _projectedPosition;
+      return _currentProjectedPosition;
    }
 
    private static void getCurrentProjectedPosition_ComputePosition(final int[] allNotClipped_GeoLocationIndices,
-                                                            final int lastGeoLocationIndex) {
+                                                                   final int lastGeoLocationIndex) {
 
       double relativePosition = getRelativePosition();
 
@@ -409,10 +412,10 @@ public class MapPlayerManager {
       final double projectedPositionX = projectedPositionX_0 + advanceX;
       final double projectedPositionY = projectedPositionY_0 + advanceY;
 
-      _projectedPosition[0] = projectedPositionX;
-      _projectedPosition[1] = projectedPositionY;
+      _currentProjectedPosition[0] = projectedPositionX;
+      _currentProjectedPosition[1] = projectedPositionY;
 
-      _visibleGeoLocationIndex = MtMath.searchIndex(_mapPlayerData.allVisible_GeoLocationIndices, geoLocationIndex_0);
+      _currentVisibleGeoLocationIndex = MtMath.searchIndex(_mapPlayerData.allVisible_GeoLocationIndices, geoLocationIndex_0);
    }
 
    public static double getCurrentRelativePosition() {
@@ -421,20 +424,28 @@ public class MapPlayerManager {
    }
 
    /**
-    * Compute the next visible frame number, called from
+    * @return Returns the geo location index for the {@link #_currentProjectedPosition} into
+    *         {@link MapPlayerData#allVisible_GeoLocationIndices}
+    */
+   public static int getCurrentVisibleGeoLocationIndex() {
+
+      return _currentVisibleGeoLocationIndex;
+   }
+
+   /**
+    * Compute the current visible frame, called from
     * {@link net.tourbook.map25.renderer.TourTrack_Shader#paint}
     *
     * @return Returns an index <code>0...</code>{@link #_numAllVisiblePositions}<code> - 1</code>
-    *         for
-    *         the next frame
+    *         for the current position
     */
-   public static int getCurrentVisibleFrameIndex() {
+   public static int getCurrentVisiblePositionIndex() {
 
       if (_isPlayerRunning == false) {
 
          // player is paused
 
-         return _currentVisibleIndex;
+         return _currentVisiblePositionIndex;
       }
 
       if (_mapPlayerData == null || _mapPlayerData.allNotClipped_GeoLocationIndices == null) {
@@ -460,16 +471,16 @@ public class MapPlayerManager {
       final int[] allVisibleGeoLocationIndices = _mapPlayerData.allVisible_GeoLocationIndices;
       final int notClippedIndex = allNotClipped_GeoLocationIndices[notClippedLocationIndex];
 
-      int nextFrameIndex = MtMath.searchNearestIndex(allVisibleGeoLocationIndices, notClippedIndex);
+      int currentPositionIndex = MtMath.searchNearestIndex(allVisibleGeoLocationIndices, notClippedIndex);
 
       // ensure bounds
-      if (nextFrameIndex >= _numAllVisiblePositions) {
-         nextFrameIndex = _numAllVisiblePositions - 1;
+      if (currentPositionIndex >= _numAllVisiblePositions) {
+         currentPositionIndex = _numAllVisiblePositions - 1;
       }
 
-      _currentVisibleIndex = nextFrameIndex;
+      _currentVisiblePositionIndex = currentPositionIndex;
 
-      return _currentVisibleIndex;
+      return _currentVisiblePositionIndex;
    }
 
    public static int getFixedModelSize() {
@@ -498,6 +509,10 @@ public class MapPlayerManager {
    public static float getModelAngle() {
 
       return _modelForwardAngle;
+   }
+
+   public static short getModelCursorSize() {
+      return (short) _modelCursorSize;
    }
 
    public static float getModelTurningAngle() {
@@ -846,15 +861,6 @@ public class MapPlayerManager {
       return _jogWheelSpeedMultiplier;
    }
 
-   /**
-    * @return Returns the geo location index of the model in the current frame into the visible
-    *         positions
-    */
-   public static int getVisibleGeoLocationIndex() {
-
-      return _visibleGeoLocationIndex;
-   }
-
    public static boolean isAnimationVisible() {
       return _isAnimationVisible;
    }
@@ -877,7 +883,7 @@ public class MapPlayerManager {
     */
    public static boolean isLastFrame() {
 
-      return _currentVisibleIndex == _numAllVisiblePositions - 1;
+      return _currentVisiblePositionIndex == _numAllVisiblePositions - 1;
    }
 
    public static boolean isPlayerEnabled() {
@@ -916,6 +922,7 @@ public class MapPlayerManager {
       _jogWheelSpeed             = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED,            DEFAULT_MOVING_SPEED);
       _jogWheelSpeedMultiplier   = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED_MULTIPLIER, 1);
       _modelSize_Fixed           = Util.getStateInt(     _state, STATE_MODEL_SIZE_FIXED,           200);
+      _modelCursorSize           = Util.getStateInt(     _state, STATE_MODEL_CURSOR_SIZE,          200);
       _modelTurningAngle         = Util.getStateFloat(   _state, STATE_MODEL_TURNING_ANGLE,        2.0f);
 
 // SET_FORMATTING_ON
@@ -930,6 +937,7 @@ public class MapPlayerManager {
       _state.put(STATE_JOG_WHEEL_SPEED,            _jogWheelSpeed);
       _state.put(STATE_JOG_WHEEL_SPEED_MULTIPLIER, _jogWheelSpeedMultiplier);
       _state.put(STATE_MODEL_SIZE_FIXED,           _modelSize_Fixed);
+      _state.put(STATE_MODEL_CURSOR_SIZE,          _modelCursorSize);
       _state.put(STATE_MODEL_TURNING_ANGLE,        _modelTurningAngle);
 
 // SET_FORMATTING_ON
@@ -1087,6 +1095,11 @@ public class MapPlayerManager {
       final float angleDiff = ((((angle1 - angle2) % 360) + 540) % 360) - 180;
 
       return Math.abs(angleDiff);
+   }
+
+   public static void setModelCursorSize(final int value) {
+
+      _modelCursorSize = value;
    }
 
    public static void setModelSize(final int modelSize) {

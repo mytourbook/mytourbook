@@ -1016,11 +1016,10 @@ public class TourTrack_Bucket {
    private void createArrowVertices_200_Animated(final float[] allDirectionArrowPixel,
                                                  final int[] allVisibleGeoLocationIndices) {
 
-      allVisible_GeoLocationIndices = allVisibleGeoLocationIndices;
-
       final int numPixels = allDirectionArrowPixel.length;
 
       allVisible_PixelPositions = new short[numPixels];
+      allVisible_GeoLocationIndices = allVisibleGeoLocationIndices;
 
       for (int pixelIndex = 0; pixelIndex < numPixels; pixelIndex += 2) {
 
