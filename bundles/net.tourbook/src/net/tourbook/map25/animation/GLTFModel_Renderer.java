@@ -390,7 +390,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
     */
    private void render_UpdateModelPosition() {
 
-      final double[] projectedPositionXY = MapPlayerManager.getProjectedPosition();
+      final double[] projectedPositionXY = MapPlayerManager.getCurrentProjectedPosition();
 
       if (projectedPositionXY == null) {
          return;

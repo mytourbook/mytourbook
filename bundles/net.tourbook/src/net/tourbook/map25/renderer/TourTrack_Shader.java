@@ -371,7 +371,7 @@ public final class TourTrack_Shader {
       gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
       {
          // get model position
-         final int nextVisibleFrameIndex = MapPlayerManager.getNextVisibleFrameIndex();
+         final int nextVisibleFrameIndex = MapPlayerManager.getCurrentVisibleFrameIndex();
 
          paint_10_Track(trackBucket, viewport, viewport2mapscale, nextVisibleFrameIndex);
 
@@ -424,28 +424,36 @@ public final class TourTrack_Shader {
          if (mapPlayerData != null) {
 
 //            final int[] allVisible_GeoLocationIndices = mapPlayerData.allVisible_GeoLocationIndices;
-//            numVisibleVertices = MtMath.searchNearestIndex(allVisible_GeoLocationIndices, nextVisibleFrameIndex);
-
-//            final int numAllVisibleFrames = MapPlayerManager.getNumberOfVisibleFrames();
-//            final float relativeVisibleVertices = (float) nextVisibleFrameIndex / numAllVisibleFrames;
-//            numVisibleVertices = (int) (relativeVisibleVertices * numTrackVertices);
+//            if (allVisible_GeoLocationIndices != null) {
+//
+////            numVisibleVertices = MtMath.searchNearestIndex(allVisible_GeoLocationIndices, nextVisibleFrameIndex);
+//
+//               final int numAllVisibleFrames = allVisible_GeoLocationIndices.length;
+//               final float relativeVisibleVertices = (float) nextVisibleFrameIndex / numAllVisibleFrames;
+//               numVisibleVertices = (int) (relativeVisibleVertices * numTrackVertices);
+//            }
 
 //            numVisibleVertices = nextVisibleFrameIndex;
 
-            numVisibleVertices = MapPlayerManager.getVisibleGeoLocationIndex();
+            MapPlayerManager.getCurrentVisibleFrameIndex();
+            numVisibleVertices = MapPlayerManager.getVisibleGeoLocationIndex() * 1 + 6;
 
-//            if (nextVisibleFrameIndex != _prevValue) {
-//
-//               _prevValue = nextVisibleFrameIndex;
-//
-//               System.out.println(UI.timeStamp()
-//
-//                     + " next Idx: " + nextVisibleFrameIndex
-//
-//               );
-//// TODO remove SYSTEM.OUT.PRINTLN
-//
-//            }
+            if (numVisibleVertices != _prevValue) {
+
+               _prevValue = numVisibleVertices;
+
+               System.out.println(UI.EMPTY_STRING
+
+//                     UI.timeStamp()
+
+//                     + " next idx: " + nextVisibleFrameIndex
+                     + " visible verts: " + numVisibleVertices
+                     + " all verts: " + numTrackVertices
+
+               );
+// TODO remove SYSTEM.OUT.PRINTLN
+
+            }
          }
       }
 
@@ -781,7 +789,7 @@ public final class TourTrack_Shader {
 
       final MapPosition currentMapPosition = viewport.pos;
 
-      final double[] projectedPositionXY = MapPlayerManager.getProjectedPosition();
+      final double[] projectedPositionXY = MapPlayerManager.getCurrentProjectedPosition();
 
       if (projectedPositionXY != null) {
 

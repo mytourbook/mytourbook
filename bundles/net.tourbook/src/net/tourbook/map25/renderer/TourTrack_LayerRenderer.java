@@ -535,12 +535,16 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          doWork_CreateReturnTrack(compileMapPos, compileMapScale, compileMaxMapPixel);
 
-         workerBucket.allProjectedPoints = __allProjectedPoints;
-         workerBucket.allProjectedPoints_ReturnTrack = __allProjectedPoints_ReturnTrack;
-         workerBucket.allNotClipped_GeoLocationIndices = allNotClipped_LocationIndices.toArray();
-         workerBucket.allTimeSeries = __allTimeSeries;
-         workerBucket.allDistanceSeries = __allDistanceSeries;
-         workerBucket.trackEnd2StartPixelDistance = __trackEnd2StartPixelDistance;
+// SET_FORMATTING_OFF
+
+         workerBucket.allProjectedPoints                 = __allProjectedPoints;
+         workerBucket.allProjectedPoints_ReturnTrack     = __allProjectedPoints_ReturnTrack;
+         workerBucket.allNotClipped_GeoLocationIndices   = allNotClipped_LocationIndices.toArray();
+         workerBucket.allTimeSeries                      = __allTimeSeries;
+         workerBucket.allDistanceSeries                  = __allDistanceSeries;
+         workerBucket.trackEnd2StartPixelDistance        = __trackEnd2StartPixelDistance;
+
+// SET_FORMATTING_ON
 
       } // doWork_CompileTrack end
 

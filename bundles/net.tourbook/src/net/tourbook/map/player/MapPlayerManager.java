@@ -61,7 +61,7 @@ public class MapPlayerManager {
    /**
     * Number of frames for an animation
     */
-   private static int                   _numAllVisibleFrames;
+   private static int                   _numAllVisiblePositions;
 
    /**
     * Is between - {@value #SPEED_JOG_WHEEL_MAX_HALF} ... + {@value #SPEED_JOG_WHEEL_MAX_HALF}
@@ -82,9 +82,7 @@ public class MapPlayerManager {
    private static long                  _projectedPosition_Time;
 
    /**
-    * Geo location index of the model in the current frame, it also includes the micro
-    * movements according to the exact relative position
-    * <p>
+    * Geo location index of the model in the current frame
     */
    private static int                   _visibleGeoLocationIndex;
 
@@ -218,117 +216,11 @@ public class MapPlayerManager {
       return _compileMapY;
    }
 
-   public static double getCurrentRelativePosition() {
-
-      return _relativePosition_Current;
-   }
-
-   public static int getFixedModelSize() {
-      return _modelSize_Fixed;
-   }
-
-   /**
-    * @return Returns the moving speed value for the jog wheel control (scale)
-    */
-   public static int getJogWheelSpeed() {
-
-      return _jogWheelSpeed
-
-            // adjust to the center of the scale control
-            + SPEED_JOG_WHEEL_MAX_HALF;
-   }
-
-   public static MapPlayerData getMapPlayerData() {
-
-      return _mapPlayerData;
-   }
-
-   /**
-    * @return Returns the angle for the model forward direction
-    */
-   public static float getModelAngle() {
-
-      return _modelForwardAngle;
-   }
-
-   public static float getModelTurningAngle() {
-
-      return _modelTurningAngle;
-   }
-
-   public static int getMovingSpeed() {
-
-      return _jogWheelSpeed;
-   }
-
-   /**
-    * Compute the next visible frame number, called from
-    * {@link net.tourbook.map25.renderer.TourTrack_Shader#paint}
-    *
-    * @return Returns an index <code>0...</code>{@link #_numAllVisibleFrames}<code> - 1</code> for
-    *         the next frame
-    */
-   public static int getNextVisibleFrameIndex() {
-
-      if (_isPlayerRunning == false) {
-
-         // player is paused
-
-         return _currentVisibleIndex;
-      }
-
-      if (_mapPlayerData == null || _mapPlayerData.allNotClipped_GeoLocationIndices == null) {
-         return 0;
-      }
-
-      final int[] allNotClipped_GeoLocationIndices = _mapPlayerData.allNotClipped_GeoLocationIndices;
-      final int numNotClipped_GeoLocationIndices = allNotClipped_GeoLocationIndices.length;
-
-      if (numNotClipped_GeoLocationIndices == 0) {
-         return 0;
-      }
-
-      /*
-       * Get visible index from not clipped index
-       */
-      final double rawIndex = numNotClipped_GeoLocationIndices * _relativePosition_Current;
-      int notClippedLocationIndex = (int) Math.round(rawIndex);
-
-      // ensure bounds
-      notClippedLocationIndex = clamp(notClippedLocationIndex, 0, numNotClipped_GeoLocationIndices - 1);
-
-      final int[] allVisibleGeoLocationIndices = _mapPlayerData.allVisible_GeoLocationIndices;
-      final int notClippedIndex = allNotClipped_GeoLocationIndices[notClippedLocationIndex];
-
-      int nextFrameIndex = MtMath.searchNearestIndex(allVisibleGeoLocationIndices, notClippedIndex);
-
-      // ensure bounds
-      if (nextFrameIndex >= _numAllVisibleFrames) {
-         nextFrameIndex = _numAllVisibleFrames - 1;
-      }
-
-      _currentVisibleIndex = nextFrameIndex;
-
-      return _currentVisibleIndex;
-   }
-
-   /**
-    * Compute the next frame number which depends on the time or other parameters
-    *
-    * @return Returns an index <code>0...</code>{@link #_numAllVisibleFrames}<code> - 1</code> for
-    *         the next frame <code>1...</code>{@link #_numAllVisibleFrames}
-    */
-
-   public static int getNumberOfVisibleFrames() {
-
-      return _numAllVisibleFrames;
-   }
-
    /**
     * @return Returns the {@link #_projectedPosition} of the animated model for the current frame or
     *         <code>null</code> when data are missing
     */
-   public static double[] getProjectedPosition() {
+   public static double[] getCurrentProjectedPosition() {
 
       final long currentFrameTime = MapRenderer.frametime;
 
@@ -356,7 +248,7 @@ public class MapPlayerManager {
        * Compute position
        */
       // set projected position into "_projectedPosition"
-      getProjectedPosition_ComputePosition(allNotClipped_GeoLocationIndices, lastGeoLocationIndex);
+      getCurrentProjectedPosition_ComputePosition(allNotClipped_GeoLocationIndices, lastGeoLocationIndex);
 
       // keep time when position was computed
       _projectedPosition_Time = currentFrameTime;
@@ -385,7 +277,7 @@ public class MapPlayerManager {
       return _projectedPosition;
    }
 
-   private static void getProjectedPosition_ComputePosition(final int[] allNotClipped_GeoLocationIndices,
+   private static void getCurrentProjectedPosition_ComputePosition(final int[] allNotClipped_GeoLocationIndices,
                                                             final int lastGeoLocationIndex) {
 
       double relativePosition = getRelativePosition();
@@ -460,7 +352,7 @@ public class MapPlayerManager {
          final int distanceIndex = MtMath.searchIndex(allDistanceSeries, positionDistance);
 
          geoLocationIndex_0 = distanceIndex;
-         geoLocationIndex_1 = geoLocationIndex_0 <= lastDistanceIndex - 1
+         geoLocationIndex_1 = geoLocationIndex_0 < lastDistanceIndex
 
                ? geoLocationIndex_0 + 1
                : geoLocationIndex_0;
@@ -521,6 +413,101 @@ public class MapPlayerManager {
       _projectedPosition[1] = projectedPositionY;
 
       _visibleGeoLocationIndex = MtMath.searchIndex(_mapPlayerData.allVisible_GeoLocationIndices, geoLocationIndex_0);
+   }
+
+   public static double getCurrentRelativePosition() {
+
+      return _relativePosition_Current;
+   }
+
+   /**
+    * Compute the next visible frame number, called from
+    * {@link net.tourbook.map25.renderer.TourTrack_Shader#paint}
+    *
+    * @return Returns an index <code>0...</code>{@link #_numAllVisiblePositions}<code> - 1</code>
+    *         for
+    *         the next frame
+    */
+   public static int getCurrentVisibleFrameIndex() {
+
+      if (_isPlayerRunning == false) {
+
+         // player is paused
+
+         return _currentVisibleIndex;
+      }
+
+      if (_mapPlayerData == null || _mapPlayerData.allNotClipped_GeoLocationIndices == null) {
+         return 0;
+      }
+
+      final int[] allNotClipped_GeoLocationIndices = _mapPlayerData.allNotClipped_GeoLocationIndices;
+      final int numNotClipped_GeoLocationIndices = allNotClipped_GeoLocationIndices.length;
+
+      if (numNotClipped_GeoLocationIndices == 0) {
+         return 0;
+      }
+
+      /*
+       * Get visible index from not clipped index
+       */
+      final double rawIndex = numNotClipped_GeoLocationIndices * _relativePosition_Current;
+      int notClippedLocationIndex = (int) Math.round(rawIndex);
+
+      // ensure bounds
+      notClippedLocationIndex = clamp(notClippedLocationIndex, 0, numNotClipped_GeoLocationIndices - 1);
+
+      final int[] allVisibleGeoLocationIndices = _mapPlayerData.allVisible_GeoLocationIndices;
+      final int notClippedIndex = allNotClipped_GeoLocationIndices[notClippedLocationIndex];
+
+      int nextFrameIndex = MtMath.searchNearestIndex(allVisibleGeoLocationIndices, notClippedIndex);
+
+      // ensure bounds
+      if (nextFrameIndex >= _numAllVisiblePositions) {
+         nextFrameIndex = _numAllVisiblePositions - 1;
+      }
+
+      _currentVisibleIndex = nextFrameIndex;
+
+      return _currentVisibleIndex;
+   }
+
+   public static int getFixedModelSize() {
+      return _modelSize_Fixed;
+   }
+
+   /**
+    * @return Returns the moving speed value for the jog wheel control (scale)
+    */
+   public static int getJogWheelSpeed() {
+
+      return _jogWheelSpeed
+
+            // adjust to the center of the scale control
+            + SPEED_JOG_WHEEL_MAX_HALF;
+   }
+
+   public static MapPlayerData getMapPlayerData() {
+
+      return _mapPlayerData;
+   }
+
+   /**
+    * @return Returns the angle for the model forward direction
+    */
+   public static float getModelAngle() {
+
+      return _modelForwardAngle;
+   }
+
+   public static float getModelTurningAngle() {
+
+      return _modelTurningAngle;
+   }
+
+   public static int getMovingSpeed() {
+
+      return _jogWheelSpeed;
    }
 
    /**
@@ -859,6 +846,10 @@ public class MapPlayerManager {
       return _jogWheelSpeedMultiplier;
    }
 
+   /**
+    * @return Returns the geo location index of the model in the current frame into the visible
+    *         positions
+    */
    public static int getVisibleGeoLocationIndex() {
 
       return _visibleGeoLocationIndex;
@@ -886,7 +877,7 @@ public class MapPlayerManager {
     */
    public static boolean isLastFrame() {
 
-      return _currentVisibleIndex == _numAllVisibleFrames - 1;
+      return _currentVisibleIndex == _numAllVisiblePositions - 1;
    }
 
    public static boolean isPlayerEnabled() {
@@ -1127,9 +1118,9 @@ public class MapPlayerManager {
 
       _isPlayerEnabled = mapPlayerData.isPlayerEnabled;
 
-      _numAllVisibleFrames = mapPlayerData.allVisible_PixelPositions == null
+      _numAllVisiblePositions = mapPlayerData.allVisible_GeoLocationIndices == null
             ? 0
-            : mapPlayerData.allVisible_PixelPositions.length / 2;
+            : mapPlayerData.allVisible_GeoLocationIndices.length;
 
       if (isPlayerViewAvailable()) {
          _mapPlayerView.updatePlayer();

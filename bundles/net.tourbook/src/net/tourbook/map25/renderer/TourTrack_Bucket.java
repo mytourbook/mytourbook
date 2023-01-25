@@ -660,7 +660,7 @@ public class TourTrack_Bucket {
     *           Contains the indices into the tour track data, e.g geo location
     */
    public void createArrowVertices(final float[] allDirectionArrowPixel,
-                                   final int[] allLocationIndices) {
+                                   final int[] allVisibleGeoLocationIndices) {
 
       directionArrow_Vertices.clear();
       directionArrow_ColorCoords.clear();
@@ -674,7 +674,7 @@ public class TourTrack_Bucket {
 
       if (trackConfig.arrow_IsAnimate) {
 
-         createArrowVertices_200_Animated(allDirectionArrowPixel, allLocationIndices);
+         createArrowVertices_200_Animated(allDirectionArrowPixel, allVisibleGeoLocationIndices);
 
       } else {
 
@@ -1014,9 +1014,9 @@ public class TourTrack_Bucket {
    }
 
    private void createArrowVertices_200_Animated(final float[] allDirectionArrowPixel,
-                                                 final int[] allLocationIndices) {
+                                                 final int[] allVisibleGeoLocationIndices) {
 
-      allVisible_GeoLocationIndices = allLocationIndices;
+      allVisible_GeoLocationIndices = allVisibleGeoLocationIndices;
 
       final int numPixels = allDirectionArrowPixel.length;
 
