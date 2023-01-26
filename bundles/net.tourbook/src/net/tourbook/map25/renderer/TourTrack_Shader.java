@@ -401,9 +401,7 @@ public final class TourTrack_Shader {
       final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
       if (mapPlayerData != null) {
 
-         final int[] allVisible_GeoLocationIndices = mapPlayerData.allVisible_GeoLocationIndices;
-
-         final int numAllVisibleFrames = allVisible_GeoLocationIndices.length;
+         final int numAllVisibleFrames = mapPlayerData.allVisible_GeoLocationIndices.length;
          final int currentVisiblePositionIndex = MapPlayerManager.getCurrentVisibleGeoLocationIndex();
 
          final float relativeVisibleVertices = (float) currentVisiblePositionIndex / numAllVisibleFrames;

@@ -255,7 +255,6 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                   MercatorProjection.project(__allGeoPoints[pointIndex], projectedPoints, pointIndex);
                }
 
-               // fix concurrent issue, it does not need to clone the array
                __allGeoPointColors = _allGeoPointColors;
                __allTourStarts = _allTourStarts;
 

@@ -447,6 +447,9 @@ public class MapPlayerManager {
             + SPEED_JOG_WHEEL_MAX_HALF;
    }
 
+   /**
+    * @return Returns the track data for the currently played tour
+    */
    public static MapPlayerData getMapPlayerData() {
 
       return _mapPlayerData;
