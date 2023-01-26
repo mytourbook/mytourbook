@@ -259,9 +259,8 @@ public final class TourTrack_Shader {
 
 // SET_FORMATTING_OFF
 
-               final short size              = MapPlayerManager.getModelCursorSize();
-               final short size2             = (short) (size * 3);
-
+               final short size  = MapPlayerManager.getModelCursorSize();
+               final short size2 = (short) (size * 3);
                final short zPos  = (short) (1 + trackBucket.heightOffset);
 
                // paint a simple triangle
@@ -397,50 +396,39 @@ public final class TourTrack_Shader {
       final int numTrackVertices = trackBucket.numTrackVertices;
 
       int numVisibleVertices = numTrackVertices;
+      int numVisibleVertices_Debug = 0;
+
+      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
+      if (mapPlayerData != null) {
+
+         final int[] allVisible_GeoLocationIndices = mapPlayerData.allVisible_GeoLocationIndices;
+
+         final int numAllVisibleFrames = allVisible_GeoLocationIndices.length;
+         final int currentVisiblePositionIndex = MapPlayerManager.getCurrentVisibleGeoLocationIndex();
+
+         final float relativeVisibleVertices = (float) currentVisiblePositionIndex / numAllVisibleFrames;
+         numVisibleVertices_Debug = (int) (relativeVisibleVertices * numTrackVertices);
+
+//         if (numVisibleVertices_Debug != _prevValue) {
+//
+//            _prevValue = numVisibleVertices_Debug;
+//
+//            System.out.println(UI.EMPTY_STRING
+//
+//                  + "  all verts: " + numTrackVertices
+//                  + "  visible verts: " + numVisibleVertices_Debug
+//                  + "  currPosIdx: " + currentVisiblePositionIndex
+//
+//            );
+//// TODO remove SYSTEM.OUT.PRINTLN
+//         }
+      }
 
       if (MapPlayerManager.isReLivePlaying()) {
 
          // show only the first part of the track which the model has already moved
 
-         // get model position
-         final int currentVisiblePositionIndex = MapPlayerManager.getCurrentVisiblePositionIndex();
-
-         numVisibleVertices = MapPlayerManager.getCurrentVisibleGeoLocationIndex() * 1 + 6;
-
-//         if (numVisibleVertices != _prevValue) {
-//
-//            _prevValue = numVisibleVertices;
-//
-//            System.out.println(UI.EMPTY_STRING
-//
-////                     UI.timeStamp()
-//
-////                     + " next idx: " + nextVisibleFrameIndex
-//                  + " visible verts: " + numVisibleVertices
-//                  + " all verts: " + numTrackVertices
-//
-//            );
-//// TODO remove SYSTEM.OUT.PRINTLN
-//
-//         }
-
-         final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
-         if (mapPlayerData != null) {
-
-//            final int[] allVisible_GeoLocationIndices = mapPlayerData.allVisible_GeoLocationIndices;
-//            if (allVisible_GeoLocationIndices != null) {
-//
-////            numVisibleVertices = MtMath.searchNearestIndex(allVisible_GeoLocationIndices, nextVisibleFrameIndex);
-//
-//               final int numAllVisibleFrames = allVisible_GeoLocationIndices.length;
-//               final float relativeVisibleVertices = (float) nextVisibleFrameIndex / numAllVisibleFrames;
-//               numVisibleVertices = (int) (relativeVisibleVertices * numTrackVertices);
-//            }
-
-//            numVisibleVertices = nextVisibleFrameIndex;
-
-            MapPlayerManager.getCurrentVisiblePositionIndex();
-         }
+         numVisibleVertices = numVisibleVertices_Debug;
       }
 
       /*

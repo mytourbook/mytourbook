@@ -432,57 +432,6 @@ public class MapPlayerManager {
       return _currentVisibleGeoLocationIndex;
    }
 
-   /**
-    * Compute the current visible frame, called from
-    * {@link net.tourbook.map25.renderer.TourTrack_Shader#paint}
-    *
-    * @return Returns an index <code>0...</code>{@link #_numAllVisiblePositions}<code> - 1</code>
-    *         for the current position
-    */
-   public static int getCurrentVisiblePositionIndex() {
-
-      if (_isPlayerRunning == false) {
-
-         // player is paused
-
-         return _currentVisiblePositionIndex;
-      }
-
-      if (_mapPlayerData == null || _mapPlayerData.allNotClipped_GeoLocationIndices == null) {
-         return 0;
-      }
-
-      final int[] allNotClipped_GeoLocationIndices = _mapPlayerData.allNotClipped_GeoLocationIndices;
-      final int numNotClipped_GeoLocationIndices = allNotClipped_GeoLocationIndices.length;
-
-      if (numNotClipped_GeoLocationIndices == 0) {
-         return 0;
-      }
-
-      /*
-       * Get visible index from not clipped index
-       */
-      final double rawIndex = numNotClipped_GeoLocationIndices * _relativePosition_Current;
-      int notClippedLocationIndex = (int) Math.round(rawIndex);
-
-      // ensure bounds
-      notClippedLocationIndex = clamp(notClippedLocationIndex, 0, numNotClipped_GeoLocationIndices - 1);
-
-      final int[] allVisibleGeoLocationIndices = _mapPlayerData.allVisible_GeoLocationIndices;
-      final int notClippedIndex = allNotClipped_GeoLocationIndices[notClippedLocationIndex];
-
-      int currentPositionIndex = MtMath.searchNearestIndex(allVisibleGeoLocationIndices, notClippedIndex);
-
-      // ensure bounds
-      if (currentPositionIndex >= _numAllVisiblePositions) {
-         currentPositionIndex = _numAllVisiblePositions - 1;
-      }
-
-      _currentVisiblePositionIndex = currentPositionIndex;
-
-      return _currentVisiblePositionIndex;
-   }
-
    public static int getFixedModelSize() {
       return _modelSize_Fixed;
    }

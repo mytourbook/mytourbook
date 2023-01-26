@@ -361,7 +361,6 @@ public class MapPlayerView extends ViewPart {
             _lblModelSize = UI.createLabel(container, "Model si&ze");
 
             _spinnerModelSize = new Spinner(container, SWT.BORDER);
-            _spinnerModelSize.setToolTipText("");
             _spinnerModelSize.setMinimum(20);
             _spinnerModelSize.setMaximum(1000);
             _spinnerModelSize.setIncrement(10);
@@ -419,6 +418,11 @@ public class MapPlayerView extends ViewPart {
             _chkIsRelivePlaying = new Button(container, SWT.CHECK);
             _chkIsRelivePlaying.setText("&Re-live playing");
             _chkIsRelivePlaying.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ReLivePlaying()));
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .align(SWT.END, SWT.FILL)
+                  .applyTo(_chkIsRelivePlaying);
+
          }
       }
    }
@@ -432,6 +436,7 @@ public class MapPlayerView extends ViewPart {
 
       super.dispose();
    }
+
    private void enableControls() {
 
       final boolean isEnabled = MapPlayerManager.isPlayerEnabled() && MapPlayerManager.isAnimationVisible();
