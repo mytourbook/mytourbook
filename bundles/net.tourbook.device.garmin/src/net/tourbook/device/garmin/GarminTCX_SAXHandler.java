@@ -84,6 +84,7 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
    private static final String    TAG_NS3_WATTS               = "ns3:Watts";                                                  //$NON-NLS-1$
 
    private static final String    TAG_TPX                     = "TPX";                                                        //$NON-NLS-1$
+   private static final String    TAG_TPX_AVERAGEWATTS        = "AverageWatts";                                               //$NON-NLS-1$
    private static final String    TAG_TPX_SPEED               = "Speed";                                                      //$NON-NLS-1$
    private static final String    TAG_TPX_WATTS               = "Watts";                                                      //$NON-NLS-1$
 
@@ -150,6 +151,7 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
    private boolean             _isInNs3_Watts;
 
    private boolean             _isInTPX;
+   private boolean             _isInTPX_AverageWatts;
    private boolean             _isInTPX_Speed;
    private boolean             _isInTPX_Watts;
 
@@ -189,6 +191,7 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
    private StringBuilder       _characters       = new StringBuilder();
 
    private Sport               _sport;
+   private float               _tourAveragePower;
    private String              _tourNotes;
    private String              _tourTitle;
 
@@ -490,6 +493,7 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
             || _isInNs3_Speed
             || _isInNs3_Watts
 
+            || _isInTPX_AverageWatts
             || _isInTPX_Speed
             || _isInTPX_Watts
 
@@ -566,7 +570,7 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
 
             try {
                /* every lap has a calorie value */
-               _lapCalories += Float.parseFloat(_characters.toString());
+               _lapCalories += Util.parseFloat(_characters.toString());
                _characters.delete(0, _characters.length());
 
             } catch (final NumberFormatException e) {}
@@ -648,6 +652,7 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
 
       tourData.setDeviceModeName(_activitySport);
       tourData.setCalories(Math.round(_tourCalories * 1000));
+      tourData.setPower_Avg(_tourAveragePower);
 
       final String deviceName = _sport.creatorName;
       final String majorVersion = _sport.creatorVersionMajor;
@@ -879,6 +884,11 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
       } else if (name.equals(TAG_TPX)) {
 
          _isInTPX = true;
+      }
+      else if (_isInTPX && name.equals(TAG_TPX_AVERAGEWATTS)) {
+
+         _isInTPX_AverageWatts = true;
+         _characters.delete(0, _characters.length());
 
       } else if (_isInTPX && name.equals(TAG_TPX_SPEED)) {
 
@@ -995,6 +1005,12 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
       } else if (TAG_TPX.equals(name)) {
 
          _isInTPX = false;
+
+      } else if (_isInTPX && TAG_TPX_AVERAGEWATTS.equals(name)) {
+
+         _isInTPX_AverageWatts = false;
+
+         _tourAveragePower = Util.parseFloat(_characters.toString());
 
       } else if (_isInTPX && TAG_TPX_SPEED.equals(name)) {
 
@@ -1161,6 +1177,12 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
                if (_isInLap) {
 
                   if (name.equals(TAG_CALORIES)) {
+
+                     _isInCalories = true;
+                     _characters.delete(0, _characters.length());
+                  }
+
+                  if (name.equals(TAG_TPX_SPEED)) {
 
                      _isInCalories = true;
                      _characters.delete(0, _characters.length());
