@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -181,8 +181,8 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
 
    private long                _currentTime;
    private String              _activitySport;
-   private int                 _tourCalories;
-   private int                 _lapCalories;
+   private float               _tourCalories;
+   private float               _lapCalories;
    private boolean             _isDistanceFromSensor;
    private boolean             _isFromStrideSensor;
 
@@ -505,7 +505,7 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
       }
    }
 
-   public void dispose() {
+   void dispose() {
 
       _allLapStart.clear();
       _allTimeData.clear();
@@ -566,7 +566,7 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
 
             try {
                /* every lap has a calorie value */
-               _lapCalories += Integer.parseInt(_characters.toString());
+               _lapCalories += Float.parseFloat(_characters.toString());
                _characters.delete(0, _characters.length());
 
             } catch (final NumberFormatException e) {}
@@ -647,7 +647,7 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
       tourData.setImportFilePath(_importFilePath);
 
       tourData.setDeviceModeName(_activitySport);
-      tourData.setCalories(_tourCalories);
+      tourData.setCalories(Math.round(_tourCalories * 1000));
 
       final String deviceName = _sport.creatorName;
       final String majorVersion = _sport.creatorVersionMajor;
@@ -1159,6 +1159,12 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
             if (_isInActivity) {
 
                if (_isInLap) {
+
+                  if (name.equals(TAG_CALORIES)) {
+
+                     _isInCalories = true;
+                     _characters.delete(0, _characters.length());
+                  }
 
                   if (_isInTrack) {
 
