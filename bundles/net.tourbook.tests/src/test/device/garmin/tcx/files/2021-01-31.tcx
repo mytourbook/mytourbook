@@ -21,6 +21,11 @@
 				<Calories>120.19</Calories>
 				<Intensity>Active</Intensity>
 				<TriggerMethod>Manual</TriggerMethod>
+				<Extensions>
+					<TPX xmlns="http://www.garmin.com/xmlschemas/ActivityExtension/v2">
+						<AverageWatts>130.51</AverageWatts>
+					</TPX>
+				</Extensions>
 				<Track>
 					<Trackpoint>
 						<Time>2021-01-31T14:15:25Z</Time>
