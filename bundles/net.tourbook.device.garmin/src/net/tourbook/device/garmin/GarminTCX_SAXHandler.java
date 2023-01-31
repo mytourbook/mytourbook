@@ -692,6 +692,20 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
                               ? UI.EMPTY_STRING
                               : UI.SYMBOL_DOT + minorVersion));
 
+      /*
+       * In the case where the power was retrieved from the extension field, the
+       * file didn't contain the average power and we need to compute it ourselves.
+       */
+      if (_isComputeAveragePower) {
+
+         final float[] powerSerie = tourData.getPowerSerie();
+         if (powerSerie != null) {
+            tourData.setPower_Avg(tourData.computeAvg_FromValues(powerSerie, 0, powerSerie.length - 1));
+         }
+      } else {
+         tourData.setPower_Avg(_totalLapAverageWatts / _lapCounter);
+      }
+
       tourData.createTimeSeries(_allTimeData, true);
 
       // after all data are added, the tour id can be created
@@ -723,19 +737,6 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
          tourData.computeTourMovingTime();
          tourData.computeComputedValues();
 
-         /*
-          * In the case where the power was retrieved from the extension field, the
-          * file didn't contain the average power and we need to compute it ourselves.
-          */
-         if (_isComputeAveragePower) {
-
-            final float[] powerSerie = tourData.getPowerSerie();
-            if (powerSerie != null) {
-               tourData.setPower_Avg(tourData.computeAvg_FromValues(powerSerie, 0, powerSerie.length - 1));
-            }
-         } else {
-            tourData.setPower_Avg(_totalLapAverageWatts / _lapCounter);
-         }
       }
 
       _importState_File.isFileImportedWithValidData = true;
