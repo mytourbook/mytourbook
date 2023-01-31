@@ -201,7 +201,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    private Combo                            _cboTourMarker;
 
    private Combo                            _cboPerson;
-   protected Point                          _shellDefaultSize;
+   private Point                            _shellDefaultSize;
 
    public DialogJoinTours(final Shell parentShell, final List<TourData> selectedTours) {
 
