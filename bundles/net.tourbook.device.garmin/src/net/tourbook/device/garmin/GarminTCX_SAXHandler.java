@@ -183,14 +183,14 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
    private boolean             _isSetLapStartTime;
    private ArrayList<Long>     _allLapStart      = new ArrayList<>();
 
-   private long                _currentTime;
    private String              _activitySport;
-   private float               _tourCalories;
-   private float               _lapAverageWatts;
-   private float               _lapCalories;
+   private long                _currentTime;
    private boolean             _isDistanceFromSensor;
    private boolean             _isFromStrideSensor;
+   private float               _lapAverageWatts;
+   private float               _lapCalories;
    private float               _totalLapAverageWatts;
+   private float               _tourCalories;
 
    private StringBuilder       _characters       = new StringBuilder();
 
