@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,5 +41,14 @@ public class GarminTCX_DeviceDataReaderTests extends DeviceDataReaderTester {
    void testTcxImportLyons() {
 
       testImportFile(deviceDataReader, FILES_PATH + "2021-01-31", ".tcx"); //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
+   /**
+    * TCX file with power values
+    */
+   @Test
+   void testTcxPeloton() {
+
+      testImportFile(deviceDataReader, FILES_PATH + "45_min_HIIT_Hills_Ride_with_Robin_Arz_n", ".tcx"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }

@@ -18,14 +18,9 @@
 				<TotalTimeSeconds>2836</TotalTimeSeconds>
 				<DistanceMeters>545</DistanceMeters>
 				<MaximumSpeed>2.08</MaximumSpeed>
-				<Calories>120.19</Calories>
+				<Calories>0</Calories>
 				<Intensity>Active</Intensity>
 				<TriggerMethod>Manual</TriggerMethod>
-				<Extensions>
-					<TPX xmlns="http://www.garmin.com/xmlschemas/ActivityExtension/v2">
-						<AverageWatts>130.51</AverageWatts>
-					</TPX>
-				</Extensions>
 				<Track>
 					<Trackpoint>
 						<Time>2021-01-31T14:15:25Z</Time>
