@@ -775,6 +775,20 @@ public class Messages extends NLS {
    public static String        Dialog_Label_Description;
    public static String        Dialog_Label_Name;
 
+   public static String        Dialog_MapModel_Dialog_ModelFilepath_Title;
+   public static String        Dialog_MapModel_Label_Description;
+   public static String        Dialog_MapModel_Label_ForwardAngle;
+   public static String        Dialog_MapModel_Label_ForwardAngle_Tooltip;
+   public static String        Dialog_MapModel_Label_ModelFilepath;
+   public static String        Dialog_MapModel_Label_ModelLengthFactor;
+   public static String        Dialog_MapModel_Label_ModelLengthFactor_Tooltip;
+   public static String        Dialog_MapModel_Label_Name;
+   public static String        Dialog_MapModel_Title;
+   public static String        Dialog_MapModel_Title_Add;
+   public static String        Dialog_MapModel_Title_Edit;
+   public static String        Dialog_MapModel_Title_Message_Add;
+   public static String        Dialog_MapModel_Title_Message_Edit;
+
    public static String        Dialog_ModifyTours_Button_LockMultipleToursSelection_Text;
    public static String        Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text;
    public static String        Dialog_ModifyTours_Checkbox_BatteryValues;
@@ -2158,6 +2172,11 @@ public class Messages extends NLS {
    public static String        Slideout_Map_TourColors_Label_Title;
    public static String        Slideout_Map_TrackOptions_Label_Title;
    public static String        Slideout_Map_TrackOptions_Label_Title_Tooltip;
+
+   public static String        Slideout_MapModel_Column_Name;
+   public static String        Slideout_MapModel_Label_NumModelListItems;
+   public static String        Slideout_MapModel_Label_NumModelListItems_Tooltip;
+   public static String        Slideout_MapModel_Label_Title;
 
    public static String        Slideout_RefTour_YearStatisticOptions_Label_Title;
 

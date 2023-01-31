@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -72,9 +72,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.part.PageBook;
 import org.oscim.theme.VtmThemes;
 
-public class PrefPage_Map25Provider extends PreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageMap25_Provider extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String              ID                               = "net.tourbook.preferences.PrefPage_Map25_Provider"; //$NON-NLS-1$
+   public static final String              ID                               = "net.tourbook.preferences.PrefPageMap25_Provider"; //$NON-NLS-1$
 
    private static final String             STATE_LAST_SELECTED_MAP_PROVIDER = "STATE_LAST_SELECTED_MAP_PROVIDER";                 //$NON-NLS-1$
 

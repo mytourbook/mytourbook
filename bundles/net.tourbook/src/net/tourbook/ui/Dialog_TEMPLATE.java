@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * This is a template for a title area dialog
  */
-public class DialogTemplate extends TitleAreaDialog {
+public class Dialog_TEMPLATE extends TitleAreaDialog {
 
    private static final String    ID         = "net.tourbook.ui.DialogTemplate"; //$NON-NLS-1$
 
@@ -39,7 +39,7 @@ public class DialogTemplate extends TitleAreaDialog {
    @SuppressWarnings("unused")
    private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
-   public DialogTemplate(final Shell parentShell) {
+   public Dialog_TEMPLATE(final Shell parentShell) {
 
       super(parentShell);
 

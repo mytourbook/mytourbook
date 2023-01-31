@@ -18,14 +18,21 @@ package net.tourbook.map.player;
 import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
+import net.tourbook.Images;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
+import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ICloseOpenedDialogs;
+import net.tourbook.common.tooltip.IOpeningDialog;
+import net.tourbook.common.tooltip.OpenDialogManager;
+import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.map.MapManager;
+import net.tourbook.map.model.SlideoutMapModel;
 import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.map25.renderer.TourTrack_Bucket;
 
@@ -48,13 +55,14 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.MapPosition;
 import org.oscim.renderer.GLViewport;
 
-public class MapPlayerView extends ViewPart {
+public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
    public static final String           ID                     = "net.tourbook.map.player.MapPlayerView"; //$NON-NLS-1$
    //
@@ -73,24 +81,27 @@ public class MapPlayerView extends ViewPart {
 
    // SET_FORMATTING_ON
    //
-   private static final Color JOG_WHEEL_COLOR_GREATER_0                           = new Color(26, 142, 26);
-   private static final Color JOG_WHEEL_COLOR_LESS_0                              = new Color(227, 64, 23);
+   private static final Color      JOG_WHEEL_COLOR_GREATER_0                           = new Color(26, 142, 26);
+   private static final Color      JOG_WHEEL_COLOR_LESS_0                              = new Color(227, 64, 23);
    //
-   private static final int   RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END = -1;
-   private static final int   RELATIVE_MODEL_POSITION_ON_RETURN_PATH_END_TO_START = 2;
+   private static final int        RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END = -1;
+   private static final int        RELATIVE_MODEL_POSITION_ON_RETURN_PATH_END_TO_START = 2;
    //
-   private IPartListener2     _partListener;
+   private IPartListener2          _partListener;
    //
-   private Action             _actionPlayControl_PlayAndPause;
-   private Action             _actionPlayControl_Loop;
+   private Action                  _actionPlayControl_PlayAndPause;
+   private Action                  _actionPlayControl_Loop;
+   private Action_SlideoutMapModel _actionSlideoutMapModel;
    //
-   private boolean            _isInUpdateTimeline;
-   private boolean            _isShow_EndTime_Or_RemainingTime;
+   private boolean                 _isInUpdateTimeline;
+   private boolean                 _isShow_EndTime_Or_RemainingTime;
    //
-   private int                _currentTimelineMaxValue;
-   private int                _currentTimelineValue;
+   private int                     _currentTimelineMaxValue;
+   private int                     _currentTimelineValue;
    //
-   private PixelConverter     _pc;
+   private OpenDialogManager       _openDialogManager                                  = new OpenDialogManager();
+   //
+   private PixelConverter          _pc;
    //
    /*
     * UI controls
@@ -151,6 +162,30 @@ public class MapPlayerView extends ViewPart {
       }
    }
 
+   private class Action_SlideoutMapModel extends ActionToolbarSlideout {
+
+      private SlideoutMapModel __slideoutMapModel;
+
+      public Action_SlideoutMapModel() {
+
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapProvider),
+               TourbookPlugin.getThemedImageDescriptor(Images.MapProvider));
+      }
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         __slideoutMapModel = new SlideoutMapModel(_parent, toolbar, _state);
+
+         return __slideoutMapModel;
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+   }
+
    private void addPartListener() {
 
       _partListener = new IPartListener2() {
@@ -193,10 +228,23 @@ public class MapPlayerView extends ViewPart {
       getViewSite().getPage().addPartListener(_partListener);
    }
 
+   /**
+    * Close all opened dialogs except the opening dialog.
+    *
+    * @param openingDialog
+    */
+   @Override
+   public void closeOpenedDialogs(final IOpeningDialog openingDialog) {
+      _openDialogManager.closeOpenedDialogs(openingDialog);
+   }
+
    private void createActions() {
 
       _actionPlayControl_Loop = new Action_PlayControl_Loop();
       _actionPlayControl_PlayAndPause = new Action_PlayControl_PlayAndPause();
+
+      _actionSlideoutMapModel = new Action_SlideoutMapModel();
+
    }
 
    @Override
@@ -380,7 +428,7 @@ public class MapPlayerView extends ViewPart {
 
             _spinnerModelCursorSize = new Spinner(container, SWT.BORDER);
             _spinnerModelCursorSize.setToolTipText("Map must be rescaled or relocated to see the modified model cursor size");
-            _spinnerModelCursorSize.setMinimum(20);
+            _spinnerModelCursorSize.setMinimum(10);
             _spinnerModelCursorSize.setMaximum(1000);
             _spinnerModelCursorSize.setIncrement(10);
             _spinnerModelCursorSize.setPageIncrement(50);
@@ -443,6 +491,10 @@ public class MapPlayerView extends ViewPart {
 
 // SET_FORMATTING_OFF
 
+      _actionPlayControl_PlayAndPause     .setEnabled(isEnabled);
+      _actionPlayControl_Loop             .setEnabled(isEnabled);
+//      _actionSlideoutMapModel             .setEnabled(isEnabled);
+
       _lblModelCursorSize                 .setEnabled(isEnabled);
       _lblModelSize                       .setEnabled(isEnabled);
       _lblSpeedMultiplier                 .setEnabled(isEnabled);
@@ -452,6 +504,8 @@ public class MapPlayerView extends ViewPart {
       _lblTimeline_Value                  .setEnabled(isEnabled);
       _lblTurningAngle                    .setEnabled(isEnabled);
 
+      _chkIsRelivePlaying                 .setEnabled(isEnabled);
+
       _scaleSpeedJogWheel                 .setEnabled(isEnabled);
       _scaleTimeline                      .setEnabled(isEnabled);
 
@@ -460,8 +514,6 @@ public class MapPlayerView extends ViewPart {
       _spinnerSpeedMultiplier             .setEnabled(isEnabled);
       _spinnerTurningAngle                .setEnabled(isEnabled);
 
-      _actionPlayControl_PlayAndPause     .setEnabled(isEnabled);
-      _actionPlayControl_Loop             .setEnabled(isEnabled);
 
 // SET_FORMATTING_ON
    }
@@ -469,12 +521,14 @@ public class MapPlayerView extends ViewPart {
    private void fillActionBars() {
 
       /*
-       * fill view toolbar
+       * Fill view toolbar
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
       tbm.add(_actionPlayControl_PlayAndPause);
       tbm.add(_actionPlayControl_Loop);
+
+      tbm.add(_actionSlideoutMapModel);
    }
 
    /**

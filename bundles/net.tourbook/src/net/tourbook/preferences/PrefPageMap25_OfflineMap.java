@@ -45,7 +45,7 @@ import org.eclipse.ui.PlatformUI;
 /**
  * Cache for offline map tiles
  */
-public class PrefPageMap25OfflineMap extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+public class PrefPageMap25_OfflineMap extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
    private IPreferenceStore _prefStore               = TourbookPlugin.getPrefStore();
 

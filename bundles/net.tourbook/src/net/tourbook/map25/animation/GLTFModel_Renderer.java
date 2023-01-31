@@ -90,14 +90,14 @@ public class GLTFModel_Renderer extends LayerRenderer {
 // private Vector3            _boundingBoxCenter;
 
    /**
-    * Angle that the model is looking forward
+    * Angle in degrees that the model is looking forward
     */
    private float  _modelForwardAngle;
 
    /**
     * The model length needs a factor that the top of the symbol is not before the geo location
     */
-   private double _modelCenterToForwardFactor;
+   private float _modelCenterToForwardFactor;
 
 //   private float  _prevDx;
 //   private float  _prevDy;
@@ -150,7 +150,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
       // skateboard
       asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/skateboard/mt-skateboard.gltf"));
       _modelForwardAngle = 90;
-      _modelCenterToForwardFactor = 1.4;
+      _modelCenterToForwardFactor = 1.4f;
 
       // wood plane
 //      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/wood-plane/wood-plane.gltf"));

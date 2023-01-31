@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,26 +13,35 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.map.bookmark;
+package net.tourbook.map.model;
 
 import java.util.UUID;
 
 import net.tourbook.common.UI;
 
-import org.oscim.core.MapPosition;
-
-public class MapBookmark {
+/**
+ * Animated map model
+ */
+public class MapModel {
 
    private static final char NL = UI.NEW_LINE;
 
    public String             id = UUID.randomUUID().toString();
 
    public String             name;
+   public String             description;
 
-   private double            _latitude;
-   private double            _longitude;
+   public String             filepath;
 
-   private MapPosition       _mapPosition;
+   /**
+    * Angle in degrees that the model is looking forward
+    */
+   public int                modelForwardAngle;
+
+   /**
+    * The model length needs a factor that the top of the symbol is not before the geo location
+    */
+   public float              modelCenterToForwardFactor;
 
    @Override
    public boolean equals(final Object obj) {
@@ -49,7 +58,7 @@ public class MapBookmark {
          return false;
       }
 
-      final MapBookmark other = (MapBookmark) obj;
+      final MapModel other = (MapModel) obj;
 
       if (id == null) {
          if (other.id != null) {
@@ -60,18 +69,6 @@ public class MapBookmark {
       }
 
       return true;
-   }
-
-   public double getLatitude() {
-      return _latitude;
-   }
-
-   public double getLongitude() {
-      return _longitude;
-   }
-
-   public MapPosition getMapPosition() {
-      return _mapPosition;
    }
 
    @Override
@@ -85,27 +82,19 @@ public class MapBookmark {
       return result;
    }
 
-   public void setMapPosition(final MapPosition mapPosition) {
-
-      _mapPosition = mapPosition;
-
-      _latitude = mapPosition.getLatitude();
-      _longitude = mapPosition.getLongitude();
-   }
-
    @Override
    public String toString() {
 
       return UI.EMPTY_STRING
 
-            + "MapBookmark" + NL //                            //$NON-NLS-1$
+            + "MapModel" + NL //                                                       //$NON-NLS-1$
 
-            + "id       =" + id + NL //                        //$NON-NLS-1$
-            + "name     =" + name + NL //                      //$NON-NLS-1$
-            + "latitude =" + _latitude + NL //                 //$NON-NLS-1$
-            + "longitude=" + _longitude + NL //                //$NON-NLS-1$
-            + "bearing  =" + _mapPosition.bearing + NL //      //$NON-NLS-1$
+            + "  name                 =" + name + NL //                                //$NON-NLS-1$
+            + "  description          =" + description + NL //                         //$NON-NLS-1$
+            + "  filepath             =" + filepath + NL //                            //$NON-NLS-1$
+
+            + "  modelForwardAngle           =" + modelForwardAngle + NL //            //$NON-NLS-1$
+            + "  modelCenterToForwardFactor  =" + modelCenterToForwardFactor + NL //   //$NON-NLS-1$
       ;
    }
-
 }

@@ -18,7 +18,7 @@ package net.tourbook.map25.action;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.map2.Messages;
-import net.tourbook.preferences.PrefPage_Map25Provider;
+import net.tourbook.preferences.PrefPageMap25_Provider;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
@@ -38,7 +38,7 @@ public class ActionManageMap25Providers extends Action {
 
       PreferencesUtil.createPreferenceDialogOn(
             Display.getCurrent().getActiveShell(),
-            PrefPage_Map25Provider.ID,
+            PrefPageMap25_Provider.ID,
             null,
             null)
             .open();

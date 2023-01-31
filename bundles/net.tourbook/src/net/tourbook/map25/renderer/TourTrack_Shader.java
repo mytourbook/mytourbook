@@ -396,10 +396,10 @@ public final class TourTrack_Shader {
       final int numTrackVertices = trackBucket.numTrackVertices;
 
       int numVisibleVertices = numTrackVertices;
-      int numVisibleVertices_Debug = 0;
+      int numVisibleVertices_Debug = numTrackVertices;
 
       final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
-      if (mapPlayerData != null) {
+      if (mapPlayerData != null && mapPlayerData.allVisible_GeoLocationIndices != null) {
 
          final int numAllVisibleFrames = mapPlayerData.allVisible_GeoLocationIndices.length;
          final int currentVisiblePositionIndex = MapPlayerManager.getCurrentVisibleGeoLocationIndex();
