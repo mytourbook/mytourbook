@@ -693,8 +693,9 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
                               : UI.SYMBOL_DOT + minorVersion));
 
       /*
-       * In the case where the power was retrieved from the extension field, the
-       * file didn't contain the average power and we need to compute it ourselves.
+       * In the case where the power was retrieved from the trackpoint's
+       * extension field and the file didn't contain the average power value, we
+       * need to compute it ourselves.
        */
       if (_isComputeAveragePower) {
 
@@ -702,7 +703,8 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
          if (powerSerie != null) {
             tourData.setPower_Avg(tourData.computeAvg_FromValues(powerSerie, 0, powerSerie.length - 1));
          }
-      } else {
+
+      } else if (_totalLapAverageWatts > 0 && _lapCounter > 0) {
          tourData.setPower_Avg(_totalLapAverageWatts / _lapCounter);
       }
 
