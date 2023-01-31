@@ -266,7 +266,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       Image image = null;
       if (!Files.exists(Paths.get(imageFilePath))) {
-         image = TourbookPlugin.getImageDescriptor(net.tourbook.Images.App_Trash_Themed).createImage();
+         image = TourbookPlugin.getImageDescriptor(net.tourbook.Images.State_Error).createImage();
       } else {
          _imageFilePath = imageFilePath;
          image = net.tourbook.ui.UI.prepareTagImage(_imageFilePath);
