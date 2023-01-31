@@ -52,7 +52,8 @@ Changes
 Bugfix
 ======
 
-* 
+* Concatenate Tours (Frederic)
+  - Fixed a bug where the markers in the concatenated tour had erroneous time values
 
 
 Translation    
