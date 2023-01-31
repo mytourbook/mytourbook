@@ -69,7 +69,6 @@ public class Dialog_TourTag extends TitleAreaDialog {
    /*
     * UI controls
     */
-   private Button      _btnSelectImage;
    private ImageCanvas _canvasTagImage;
    private Text        _txtNotes;
    private Text        _txtName;
@@ -143,7 +142,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
-      GridLayoutFactory.swtDefaults().numColumns(3).applyTo(container);
+      GridLayoutFactory.swtDefaults().numColumns(4).applyTo(container);
       {
          {
             // Text: Name
@@ -153,7 +152,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
             _txtName = new Text(container, SWT.BORDER);
-            GridDataFactory.fillDefaults().span(2, 1).grab(true, false).applyTo(_txtName);
+            GridDataFactory.fillDefaults().span(3, 1).grab(true, false).applyTo(_txtName);
          }
          {
             // Text: Image File Path
@@ -166,12 +165,19 @@ public class Dialog_TourTag extends TitleAreaDialog {
                   .hint(_pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
                   .applyTo(_canvasTagImage);
 
-            _btnSelectImage = new Button(container, SWT.PUSH);
-            _btnSelectImage.setText(Messages.app_btn_browse);
-            _btnSelectImage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectImage()));
+            final Button btnSelectImage = new Button(container, SWT.PUSH);
+            btnSelectImage.setText(Messages.app_btn_browse);
+            btnSelectImage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectImage()));
             GridDataFactory.fillDefaults()
                   .align(SWT.LEFT, SWT.CENTER)
-                  .applyTo(_btnSelectImage);
+                  .applyTo(btnSelectImage);
+
+            final Button btnDeleteImage = new Button(container, SWT.PUSH);
+            btnDeleteImage.setImage(TourbookPlugin.getImageDescriptor(net.tourbook.Images.App_Trash_Themed).createImage());
+            btnDeleteImage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectImage()));
+            GridDataFactory.fillDefaults()
+                  .align(SWT.LEFT, SWT.CENTER)
+                  .applyTo(btnDeleteImage);
 
          }
          {
@@ -183,7 +189,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
             _txtNotes = new Text(container, SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
             GridDataFactory.fillDefaults()
-                  .span(2, 1)
+                  .span(3, 1)
                   .grab(true, true)
                   .hint(convertWidthInCharsToPixels(100), convertHeightInCharsToPixels(20))
                   .applyTo(_txtNotes);
@@ -254,13 +260,18 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
    private void setTagImage(final String imageFilePath) {
 
-      if (StringUtils.isNullOrEmpty(imageFilePath) || !Files.exists(Paths.get(imageFilePath))) {
+      if (StringUtils.isNullOrEmpty(imageFilePath)) {
          return;
       }
 
-      _imageFilePath = imageFilePath;
+      Image image = null;
+      if (!Files.exists(Paths.get(imageFilePath))) {
+         image = TourbookPlugin.getImageDescriptor(net.tourbook.Images.App_Trash_Themed).createImage();
+      } else {
+         _imageFilePath = imageFilePath;
+         image = net.tourbook.ui.UI.prepareTagImage(_imageFilePath);
+      }
 
-      final Image image = net.tourbook.ui.UI.prepareTagImage(_imageFilePath);
       _canvasTagImage.setImage(image);
    }
 }
