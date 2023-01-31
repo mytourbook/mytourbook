@@ -873,7 +873,8 @@ public class UI {
 
    public static Image prepareTagImage(final String imageFilePath) {
 
-      if (StringUtils.isNullOrEmpty(imageFilePath)) {
+      if (StringUtils.isNullOrEmpty(imageFilePath) ||
+            !new File(imageFilePath).exists()) {
          return null;
       }
 

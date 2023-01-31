@@ -215,6 +215,11 @@ public class Dialog_TourTag extends TitleAreaDialog {
    }
 
    private void onDispose() {
+
+      if (_canvasTagImage == null || _canvasTagImage.isDisposed()) {
+         return;
+      }
+
       _canvasTagImage.dispose();
    }
 
