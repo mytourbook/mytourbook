@@ -1122,7 +1122,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
                if (isJoinTime) {
                   final int relativeTourTime = joinedTimeSerie[joinMarkerIndex];
-                  tourMarker.setTime(//
+                  clonedMarker.setTime(//
                         relativeTourTime,
                         joinedTourStart.toInstant().toEpochMilli() + (relativeTourTime * 1000));
                }
@@ -1131,11 +1131,11 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
                }
 
                if (isJoinAltitude) {
-                  tourMarker.setAltitude(joinedAltitudeSerie[joinMarkerIndex]);
+                  clonedMarker.setAltitude(joinedAltitudeSerie[joinMarkerIndex]);
                }
 
                if (isJoinLat && isJoinLon) {
-                  tourMarker.setGeoPosition(
+                  clonedMarker.setGeoPosition(
                         joinedLatitudeSerie[joinMarkerIndex],
                         joinedLongitudeSerie[joinMarkerIndex]);
                }
@@ -1295,6 +1295,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             }
 
             if (_chkInsertPauses.getSelection()) {
+
                // As it's not the first tour, we add the time difference between this tour's start time
                // and the previous tour end time as a pause.
 
@@ -1315,6 +1316,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          }
 
          if (_chkInsertPauses.getSelection()) {
+
             /*
              * Pauses
              */
