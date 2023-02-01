@@ -27,12 +27,14 @@ import net.tourbook.Messages;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotDateTime;
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTable;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
 import utils.Utils;
+import views.WorkbenchTests;
 
 public class DialogJoinToursTests extends UITest {
 
@@ -77,6 +79,7 @@ public class DialogJoinToursTests extends UITest {
 
       bot.checkBox(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints).select();
       bot.checkBox(Messages.Dialog_JoinTours_Checkbox_InsertPauses).select();
+      bot.checkBox(Messages.Dialog_JoinTours_Checkbox_CreateTourMarker).select();
 
       bot.comboBox(1).setSelection(Messages.Dialog_JoinTours_ComboText_TourTitleCustom);
       assertTrue(bot.textWithTooltip(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip).isEnabled());
@@ -92,6 +95,19 @@ public class DialogJoinToursTests extends UITest {
       assertNotNull(tour);
 
       //Check that the markers exist and that their time values are correct
+
+      //Open the Tour Marker View
+      Utils.openOtherMenu(bot);
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode(Utils.TOURMARKERS_VIEW_NAME).select();
+      bot.button("Open").click(); //$NON-NLS-1$
+
+      final SWTBotTable tableMarkers = bot.table();
+
+      //Make sure that the tour contains 3 markers
+      assertEquals(2, tableMarkers.rowCount());
+
+      assertEquals("0:00", tableMarkers.cell(0, 1)); //$NON-NLS-1$
+      assertEquals("4:15:46", tableMarkers.cell(1, 1)); //$NON-NLS-1$
 
       deleteConcatenatedTour(tour);
    }
