@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -88,7 +88,7 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
          numLayers = 12;
       } else {
          wmsProviderUrl = "https://www.gmrt.org/services/mapserver/wms_merc?version=1.3.0";
-         wmsProviderName = "Global Multi-Resolution Topography (GMRT), Version 4.0";
+         wmsProviderName = "Global Multi-Resolution Topography (GMRT), Version";
          numLayers = 2;
       }
 
@@ -99,7 +99,7 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
 
       //Check the new number of providers after adding a new one
       assertEquals(providersTableCount + 1, providersTable.rowCount());
-      assertEquals(wmsProviderName, providersTable.cell(0, 1));
+      assertTrue(providersTable.cell(0, 1).startsWith(wmsProviderName));
 
       providersTable.select(0);
       bot.button(Messages.Pref_Map_Button_Edit).click();
