@@ -1299,6 +1299,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          final Long[] pausedTime_Start = ArrayUtils.toObject(tourData.getPausedTime_Start());
          if (pausedTime_Start != null) {
 
+            //If a new tour start time is set, we need to offset the tour pause times
             if (!isOriginalTime) {
 
                offsetPausedTimes(tourData.getTourStartTimeMS(), joinedTourStart.toInstant().toEpochMilli(), pausedTime_Start);
@@ -1309,6 +1310,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          final Long[] pausedTime_End = ArrayUtils.toObject(tourData.getPausedTime_End());
          if (pausedTime_End != null) {
 
+            //If a new tour start time is set, we need to offset the tour pause times
             if (!isOriginalTime) {
 
                offsetPausedTimes(tourData.getTourStartTimeMS(), joinedTourStart.toInstant().toEpochMilli(), pausedTime_End);
@@ -1328,8 +1330,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
             Arrays.asList(pausedTime_Start).forEach(pausedTime -> joinedPausedTime_Data.add(0L));
          }
-
-         //If a new tour start time is set, we need to offset the tour pause times
 
          joinedPausedTime += tourData.getTourDeviceTime_Paused();
 
