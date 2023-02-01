@@ -1302,7 +1302,11 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             //If a new tour start time is set, we need to offset the tour pause times
             if (!isOriginalTime) {
 
-               offsetPausedTimes(tourData.getTourStartTimeMS(), joinedTourStart.toInstant().toEpochMilli(), pausedTime_Start);
+               offsetPausedTimes(
+                     tourData.getTourStartTimeMS(),
+                     joinedTourStart.toInstant().toEpochMilli(),
+                     previousTourData,
+                     pausedTime_Start);
             }
 
             joinedPausedTime_Start.addAll(Arrays.asList(pausedTime_Start));
@@ -1313,7 +1317,11 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             //If a new tour start time is set, we need to offset the tour pause times
             if (!isOriginalTime) {
 
-               offsetPausedTimes(tourData.getTourStartTimeMS(), joinedTourStart.toInstant().toEpochMilli(), pausedTime_End);
+               offsetPausedTimes(
+                     tourData.getTourStartTimeMS(),
+                     joinedTourStart.toInstant().toEpochMilli(),
+                     previousTourData,
+                     pausedTime_End);
             }
             joinedPausedTime_End.addAll(Arrays.asList(pausedTime_End));
          }
@@ -1457,11 +1465,17 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       return true;
    }
 
-   private void offsetPausedTimes(final long previousTourStartTime, final long newTourStartTime, final Long[] pausedTime) {
+   private void offsetPausedTimes(final long previousTourStartTime,
+                                  final long newTourStartTime,
+                                  final TourData previousTourData,
+                                  final Long[] pausedTime) {
 
       for (int index = 0; index < pausedTime.length; ++index) {
 
-         final long relativePausedTimeStart = pausedTime[index] - previousTourStartTime;
+         long relativePausedTimeStart = pausedTime[index] - previousTourStartTime;
+         if (previousTourData != null) {
+            relativePausedTimeStart += previousTourData.getTourDeviceTime_Elapsed() * 1000;
+         }
          pausedTime[index] = newTourStartTime + relativePausedTimeStart;
       }
    }
