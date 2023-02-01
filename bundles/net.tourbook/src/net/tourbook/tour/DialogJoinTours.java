@@ -1292,25 +1292,31 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             }
          }
 
-         if (isOriginalTime) {
-
-            /*
-             * Pauses
-             */
-            final Long[] pausedTime_Start = ArrayUtils.toObject(tourData.getPausedTime_Start());
-            if (pausedTime_Start != null) {
-               joinedPausedTime_Start.addAll(Arrays.asList(pausedTime_Start));
-            }
-            final Long[] pausedTime_End = ArrayUtils.toObject(tourData.getPausedTime_End());
-            if (pausedTime_End != null) {
-               joinedPausedTime_End.addAll(Arrays.asList(pausedTime_End));
-            }
-            final Long[] pausedTime_Data = ArrayUtils.toObject(tourData.getPausedTime_Data());
-            if (pausedTime_Data != null) {
-               joinedPausedTime_Data.addAll(Arrays.asList(pausedTime_Data));
-            }
-            joinedPausedTime += tourData.getTourDeviceTime_Paused();
+         /*
+          * Pauses
+          */
+         final Long[] pausedTime_Start = ArrayUtils.toObject(tourData.getPausedTime_Start());
+         if (pausedTime_Start != null) {
+            joinedPausedTime_Start.addAll(Arrays.asList(pausedTime_Start));
          }
+         final Long[] pausedTime_End = ArrayUtils.toObject(tourData.getPausedTime_End());
+         if (pausedTime_End != null) {
+            joinedPausedTime_End.addAll(Arrays.asList(pausedTime_End));
+         }
+         final Long[] pausedTime_Data = ArrayUtils.toObject(tourData.getPausedTime_Data());
+         if (pausedTime_Data != null) {
+
+            joinedPausedTime_Data.addAll(Arrays.asList(pausedTime_Data));
+
+         } else if (pausedTime_Start != null && pausedTime_End != null) {
+
+            //The case can happen that a tour has pause data but no paused time
+            //data (i.e.: All file formats except FIT imported prior to 22.1.0).
+            //In this case, we need t add default paused time data
+
+            Arrays.asList(pausedTime_Start).forEach(pausedTime -> joinedPausedTime_Data.add(0L));
+         }
+         joinedPausedTime += tourData.getTourDeviceTime_Paused();
 
          /*
           * summarize other fields
