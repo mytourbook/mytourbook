@@ -60,7 +60,6 @@ public class DialogJoinToursTests extends UITest {
       openDialogJoinTours();
 
       bot.checkBox(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints).deselect();
-      bot.checkBox(Messages.Dialog_JoinTours_Checkbox_InsertPauses).deselect();
 
       Utils.clickOkButton(bot);
 
@@ -78,7 +77,6 @@ public class DialogJoinToursTests extends UITest {
       openDialogJoinTours();
 
       bot.checkBox(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints).select();
-      bot.checkBox(Messages.Dialog_JoinTours_Checkbox_InsertPauses).select();
 
       bot.comboBox(1).setSelection(Messages.Dialog_JoinTours_ComboText_TourTitleCustom);
       assertTrue(bot.textWithTooltip(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip).isEnabled());
@@ -123,11 +121,9 @@ public class DialogJoinToursTests extends UITest {
       yearTree.contextMenu(Messages.App_Action_JoinTours).click();
 
       //Options
-      bot.checkBox(Messages.Dialog_SplitTour_Checkbox_KeepTime).deselect();
-
+      bot.comboBox(0).setSelection(Messages.Dialog_JoinTours_ComboText_ConcatenateTime);
       final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.Dialog_JoinTours_Label_TourDate);
       assertNotNull(tourDateTime);
       tourDateTime.setDate(new Date(1612221767000L));
-      bot.comboBox(0).setSelection(Messages.Dialog_JoinTours_ComboText_ConcatenateTime);
    }
 }
