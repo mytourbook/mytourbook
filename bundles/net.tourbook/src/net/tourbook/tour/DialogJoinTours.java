@@ -718,7 +718,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       final boolean isCustomTourType = getStateTourTypeSource().equals(STATE_TYPE_SOURCE_CUSTOM);
       final boolean isCreateMarker = _chkCreateTourMarker.getSelection();
 
-      _txtTourTitle.setEditable(isCustomTourTitle);
+      _txtTourTitle.setEnabled(isCustomTourTitle);
 
       _dtTourDate.setEnabled(isCustomTime);
       _dtTourTime.setEnabled(isCustomTime);
