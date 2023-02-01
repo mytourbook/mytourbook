@@ -102,11 +102,13 @@ public class DialogJoinToursTests extends UITest {
 
       final SWTBotTable tableMarkers = bot.table();
 
-      //Make sure that the tour contains 3 markers
+      //Make sure that the tour contains all the markers
       assertEquals(4, tableMarkers.rowCount());
 
-      /// assertEquals("0:00", tableMarkers.cell(0, 1)); //$NON-NLS-1$
-      // assertEquals("4:15:46", tableMarkers.cell(1, 1)); //$NON-NLS-1$
+      assertEquals("1:14:02", tableMarkers.cell(0, 1)); //$NON-NLS-1$
+      assertEquals("3:09:41", tableMarkers.cell(1, 1)); //$NON-NLS-1$
+      assertEquals("678:40:18", tableMarkers.cell(1, 1)); //$NON-NLS-1$
+      assertEquals("678:44:14", tableMarkers.cell(1, 1)); //$NON-NLS-1$
 
       deleteConcatenatedTour(tour);
    }
