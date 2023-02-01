@@ -55,29 +55,13 @@ public class DialogJoinToursTests extends UITest {
    }
 
    @Test
-   void joinTours() {
-
-      openDialogJoinTours();
-
-      bot.checkBox(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints).deselect();
-
-      Utils.clickOkButton(bot);
-
-      //Check that the concatenated tour exists
-      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   4").expand() //$NON-NLS-1$
-            .getNode("Feb   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
-      assertNotNull(tour);
-
-      deleteConcatenatedTour(tour);
-   }
-
-   @Test
-   void joinTours_WithMarkersAndPauses() {
+   void joinTours_WithMarkers() {
 
       openDialogJoinTours();
 
       bot.checkBox(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints).select();
 
+      //Assert the UI behavior
       bot.comboBox(1).setSelection(Messages.Dialog_JoinTours_ComboText_TourTitleCustom);
       assertTrue(bot.textWithTooltip(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip).isEnabled());
 
@@ -111,6 +95,53 @@ public class DialogJoinToursTests extends UITest {
       deleteConcatenatedTour(tour);
    }
 
+   @Test
+   void joinTours_WithoutMarkers() {
+
+      openDialogJoinTours();
+
+      bot.checkBox(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints).deselect();
+
+      //Assert the UI behavior
+      bot.comboBox(0).setSelection(Messages.Dialog_JoinTours_ComboText_KeepTime);
+      assertFalse(bot.label(Messages.Dialog_JoinTours_Label_TourDate).isEnabled());
+      assertFalse(bot.dateTime(0).isEnabled());
+      assertFalse(bot.label(Messages.Dialog_JoinTours_Label_TourTime).isEnabled());
+      assertFalse(bot.dateTime(1).isEnabled());
+
+      bot.comboBox(0).setSelection(Messages.Dialog_JoinTours_ComboText_ConcatenateTime);
+      assertTrue(bot.label(Messages.Dialog_JoinTours_Label_TourDate).isEnabled());
+      assertTrue(bot.dateTime(0).isEnabled());
+      assertTrue(bot.label(Messages.Dialog_JoinTours_Label_TourTime).isEnabled());
+      assertTrue(bot.dateTime(1).isEnabled());
+
+      setNewTourTime();
+
+      bot.comboBox(1).setSelection(Messages.Dialog_JoinTours_ComboText_TourTitleCustom);
+
+      bot.comboBox(1).setSelection(Messages.Dialog_JoinTours_ComboText_TourTitleFromTour);
+      assertFalse(bot.textWithTooltip(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip).isEnabled());
+
+      Utils.clickOkButton(bot);
+
+      //Check that the concatenated tour exists
+      final SWTBotTreeItem tour = bot.tree().getTreeItem("2021   4").expand() //$NON-NLS-1$
+            .getNode("Feb   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
+      assertNotNull(tour);
+
+      //Open the Tour Marker View
+      Utils.openOtherMenu(bot);
+      bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode(Utils.TOURMARKERS_VIEW_NAME).select();
+      bot.button("Open").click(); //$NON-NLS-1$
+
+      final SWTBotTable tableMarkers = bot.table();
+
+      //Make sure that the tour doesn't contain any markers
+      assertEquals(0, tableMarkers.rowCount());
+
+      deleteConcatenatedTour(tour);
+   }
+
    private void openDialogJoinTours() {
 
       final SWTBotTree yearTree = bot.tree();
@@ -121,6 +152,10 @@ public class DialogJoinToursTests extends UITest {
       yearTree.contextMenu(Messages.App_Action_JoinTours).click();
 
       //Options
+      setNewTourTime();
+   }
+
+   private void setNewTourTime() {
       bot.comboBox(0).setSelection(Messages.Dialog_JoinTours_ComboText_ConcatenateTime);
       final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.Dialog_JoinTours_Label_TourDate);
       assertNotNull(tourDateTime);
