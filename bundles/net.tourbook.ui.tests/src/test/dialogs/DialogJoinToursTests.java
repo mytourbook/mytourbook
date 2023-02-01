@@ -36,6 +36,22 @@ import utils.Utils;
 
 public class DialogJoinToursTests extends UITest {
 
+   private void deleteConcatenatedTour(final SWTBotTreeItem tour) {
+
+      tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
+            Messages.Tour_Book_Action_delete_selected_tours).click();
+      Utils.clickOkButton(bot);
+      Utils.clickOkButton(bot);
+
+      final List<?> logs = TourLogManager.getLogs();
+      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+            "2/1/21, 9:11 AM")));//$NON-NLS-1$
+
+      //Check that the tour was successfully deleted
+      final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
+      assertEquals("2021   3", allItems[4].getText()); //$NON-NLS-1$
+   }
+
    @Test
    void joinTours() {
 
@@ -51,18 +67,7 @@ public class DialogJoinToursTests extends UITest {
             .getNode("Feb   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
-      tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
-            Messages.Tour_Book_Action_delete_selected_tours).click();
-      Utils.clickOkButton(bot);
-      Utils.clickOkButton(bot);
-
-      final List<?> logs = TourLogManager.getLogs();
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "2/1/21, 9:11 AM")));//$NON-NLS-1$
-
-      //Check that the tour was successfully deleted
-      final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
-      assertEquals("2021   3", allItems[4].getText()); //$NON-NLS-1$
+      deleteConcatenatedTour(tour);
    }
 
    @Test
@@ -88,18 +93,7 @@ public class DialogJoinToursTests extends UITest {
 
       //Check that the markers exist and that their time values are correct
 
-      tour.contextMenu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(Messages.Tour_Book_Action_delete_selected_tours_menu).menu(
-            Messages.Tour_Book_Action_delete_selected_tours).click();
-      Utils.clickOkButton(bot);
-      Utils.clickOkButton(bot);
-
-      final List<?> logs = TourLogManager.getLogs();
-      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "2/1/21, 9:11 AM")));//$NON-NLS-1$
-
-      //Check that the tour was successfully deleted
-      final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
-      assertEquals("2021   3", allItems[4].getText()); //$NON-NLS-1$
+      deleteConcatenatedTour(tour);
    }
 
    private void openDialogJoinTours() {
@@ -117,6 +111,6 @@ public class DialogJoinToursTests extends UITest {
       final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.Dialog_JoinTours_Label_TourDate);
       assertNotNull(tourDateTime);
       tourDateTime.setDate(new Date(1612221767000L));
-      bot.comboBox(0).setSelection(1);
+      bot.comboBox(0).setSelection(Messages.Dialog_JoinTours_ComboText_ConcatenateTime);
    }
 }
