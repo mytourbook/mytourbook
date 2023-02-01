@@ -1312,7 +1312,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
             //The case can happen that a tour has pause data but no paused time
             //data (i.e.: All file formats except FIT imported prior to 22.1.0).
-            //In this case, we need t add default paused time data
+            //In this case, we need to add default paused time data
 
             Arrays.asList(pausedTime_Start).forEach(pausedTime -> joinedPausedTime_Data.add(0L));
          }
