@@ -79,10 +79,10 @@ public class DialogJoinToursTests extends UITest {
       bot.checkBox(Messages.Dialog_JoinTours_Checkbox_InsertPauses).select();
 
       bot.comboBox(1).setSelection(Messages.Dialog_JoinTours_ComboText_TourTitleCustom);
-      assertTrue(bot.checkBoxWithTooltip(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip).isEnabled());
+      assertTrue(bot.textWithTooltip(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip).isEnabled());
 
       bot.comboBox(1).setSelection(Messages.Dialog_JoinTours_ComboText_TourTitleFromTour);
-      assertFalse(bot.checkBoxWithTooltip(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip).isEnabled());
+      assertFalse(bot.textWithTooltip(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip).isEnabled());
 
       Utils.clickOkButton(bot);
 
