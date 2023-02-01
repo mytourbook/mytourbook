@@ -543,36 +543,44 @@ public class GLTFModel_Renderer extends LayerRenderer {
 //    skybox = new SceneSkybox(environmentCubemap);
 //    sceneManager.setSkyBox(skybox);
 
-      setupScene();
+      setupScene_RunningInGLThread(MapModelManager.getActiveModel());
 
       return true;
    }
 
-   public void setupModel(final MapModel selectedModel) {
-      // TODO Auto-generated method stub
+   public void setupScene(final MapModel mapModel) {
 
+      _map.post(() -> {
+         setupScene_RunningInGLThread(mapModel);
+      });
    }
 
-   private void setupScene() {
+   private void setupScene_RunningInGLThread(final MapModel mapModel) {
 
       /*
        * Cleanup previous scene
        */
-      if (_sceneAsset != null) {
-         _sceneAsset.dispose();
-      }
-
       if (_scene != null) {
          _sceneManager.removeScene(_scene);
       }
 
+      if (_sceneAsset != null) {
+         _sceneAsset.dispose();
+      }
+
       /*
-       * Setup new scene
+       * Load GLTF model
        */
-      _sceneAsset = loadGLTFModel();
+      _sceneAsset = new GLTFLoader().load(Gdx.files.absolute(mapModel.filepath));
+
+      _modelForwardAngle = mapModel.forwardAngle;
+      _modelCenterToForwardFactor = mapModel.headPositionFactor;
 
       final SceneModel sceneModel = _sceneAsset.scene;
 
+      /*
+       * Setup new scene
+       */
       _scene = new Scene(sceneModel);
 
       // get model bounding box

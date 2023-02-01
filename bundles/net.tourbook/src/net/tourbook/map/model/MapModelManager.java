@@ -98,7 +98,21 @@ public class MapModelManager {
       return xmlRoot;
    }
 
+   public static MapModel getActiveModel() {
+
+      if (_activeModel == null) {
+
+         _activeModel = getAllModels().get(0);
+      }
+
+      return _activeModel;
+   }
+
    public static ArrayList<MapModel> getAllModels() {
+
+      if (_allMapModels.size() == 0) {
+         restoreState();
+      }
 
       return _allMapModels;
    }
@@ -110,7 +124,7 @@ public class MapModelManager {
       return xmlFile;
    }
 
-   public static void restoreState() {
+   private static void restoreState() {
 
       InputStreamReader reader = null;
 
@@ -232,16 +246,26 @@ public class MapModelManager {
       }
    }
 
+   /**
+    * This is called from {@link net.tourbook.map25.animation.GLTFModel_Renderer#GLTFModel_Renderer}
+    *
+    * @param gltfModelRenderer
+    */
    public static void setGLTFRenderer(final GLTFModel_Renderer gltfModelRenderer) {
 
       _gltfModelRenderer = gltfModelRenderer;
    }
 
+   /**
+    * This is called from {@link net.tourbook.map.model.SlideoutMapModel#onModel_Select}
+    *
+    * @param selectedModel
+    */
    public static void setSelectedModel(final MapModel selectedModel) {
 
       _activeModel = selectedModel;
 
-      _gltfModelRenderer.setupModel(selectedModel);
+      _gltfModelRenderer.setupScene(selectedModel);
    }
 
 }

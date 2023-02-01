@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.tourbook.common.Bool;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
@@ -266,13 +265,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private boolean      _isPhotoScaled    = false;
    //
    private int          _photoSize;
+   
    /**
     * Is <code>true</code> when a tour marker is hit.
     */
    private boolean      _isMapItemHit;
    //
-   private SceneAsset   _sceneAsset;
-
    private static enum OffOnline {
       IS_ONLINE, IS_OFFLINE
    }
@@ -1011,11 +1009,6 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _layer_GLTFModel.dispose();
 
       saveState();
-
-      if (_sceneAsset != null) {
-
-         _sceneAsset.dispose();
-      }
 
       super.dispose();
    }

@@ -22,6 +22,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
+import net.tourbook.map25.Map25FPSManager;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -163,6 +164,9 @@ public class SlideoutMapModel extends ToolbarSlideout {
       _modelViewer.setInput(new Object());
 
       enableActions();
+
+      // ensure that the animation is running when map is in background
+      Map25FPSManager.setBackgroundFPSToAnimationFPS(true);
 
       return ui;
    }
@@ -425,6 +429,13 @@ public class SlideoutMapModel extends ToolbarSlideout {
 
       // set slideout size with new visible rows
       _parent.getShell().pack(true);
+   }
+
+   @Override
+   protected void onDispose() {
+
+      // reset to default background FPS
+      Map25FPSManager.setBackgroundFPSToAnimationFPS(false);
    }
 
    private void onModel_Add() {

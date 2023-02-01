@@ -880,7 +880,6 @@ public class MapPlayerManager {
 
 // SET_FORMATTING_ON
 
-      MapModelManager.restoreState();
    }
 
    public static void saveState() {
