@@ -107,8 +107,8 @@ public class DialogJoinToursTests extends UITest {
 
       assertEquals("1:14:02", tableMarkers.cell(0, 1)); //$NON-NLS-1$
       assertEquals("3:09:41", tableMarkers.cell(1, 1)); //$NON-NLS-1$
-      assertEquals("678:40:18", tableMarkers.cell(2, 1)); //$NON-NLS-1$
-      assertEquals("678:44:14", tableMarkers.cell(3, 1)); //$NON-NLS-1$
+      assertEquals("4:19:34", tableMarkers.cell(2, 1)); //$NON-NLS-1$
+      assertEquals("4:23:30", tableMarkers.cell(3, 1)); //$NON-NLS-1$
 
       deleteConcatenatedTour(tour);
    }
