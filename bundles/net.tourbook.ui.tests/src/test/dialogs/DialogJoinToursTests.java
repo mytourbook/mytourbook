@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 
 import net.tourbook.Messages;
+import net.tourbook.common.UI;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotDateTime;
@@ -129,6 +130,11 @@ public class DialogJoinToursTests extends UITest {
             .getNode("Feb   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
       assertNotNull(tour);
 
+      assertEquals("9:11 AM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("4:26", tour.cell(tourBookView_ElapsedTime_Column_Index)); //$NON-NLS-1$
+      assertEquals("4:26", tour.cell(tourBookView_RecordedTime_Column_Index)); //$NON-NLS-1$
+      assertEquals(UI.EMPTY_STRING, tour.cell(tourBookView_PausedTime_Column_Index));
+
       //Open the Tour Marker View
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode(Utils.TOURMARKERS_VIEW_NAME).select();
@@ -156,6 +162,7 @@ public class DialogJoinToursTests extends UITest {
    }
 
    private void setNewTourTime() {
+
       bot.comboBox(0).setSelection(Messages.Dialog_JoinTours_ComboText_ConcatenateTime);
       final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.Dialog_JoinTours_Label_TourDate);
       assertNotNull(tourDateTime);
