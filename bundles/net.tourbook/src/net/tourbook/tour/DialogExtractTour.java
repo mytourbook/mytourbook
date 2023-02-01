@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -109,7 +109,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
          Messages.Dialog_SplitTour_ComboText_TourTitleFromTour,
          Messages.Dialog_SplitTour_ComboText_TourTitleFromFirstMarker,
-         Messages.Dialog_SplitTour_ComboText_TourTileCustom,
+         Messages.Dialog_SplitTour_ComboText_TourTitleCustom,
    };
 
    /**
@@ -187,7 +187,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
    private ActionOpenPrefDialog  _actionOpenTourTypePrefs;
 
    private TourPerson[]          _people;
-   protected Point               _shellDefaultSize;
+   private Point                 _shellDefaultSize;
    private TagMenuManager        _tagMenuMgr;
 
    /*

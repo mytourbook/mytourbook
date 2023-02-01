@@ -122,7 +122,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    };
    private static final String[] STATE_COMBO_TEXT_TOUR_TITLE_SOURCE     = new String[] {
          Messages.Dialog_JoinTours_ComboText_TourTitleFromTour,
-         Messages.Dialog_JoinTours_ComboText_TourTileCustom,
+         Messages.Dialog_JoinTours_ComboText_TourTitleCustom,
          //
    };
 

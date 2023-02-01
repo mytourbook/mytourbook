@@ -745,7 +745,7 @@ public class Messages extends NLS {
    public static String        Dialog_JoinTours_ComboText_ConcatenateTime;
    public static String        Dialog_JoinTours_ComboText_KeepTime;
    public static String        Dialog_JoinTours_ComboText_MarkerTourTime;
-   public static String        Dialog_JoinTours_ComboText_TourTileCustom;
+   public static String        Dialog_JoinTours_ComboText_TourTitleCustom;
    public static String        Dialog_JoinTours_ComboText_TourTitleFromTour;
    public static String        Dialog_JoinTours_ComboText_TourTypeCustom;
    public static String        Dialog_JoinTours_ComboText_TourTypeFromTour;
@@ -861,7 +861,7 @@ public class Messages extends NLS {
    public static String        Dialog_SplitTour_Checkbox_KeepTime;
    public static String        Dialog_SplitTour_ComboText_KeepSlices;
    public static String        Dialog_SplitTour_ComboText_RemoveSlices;
-   public static String        Dialog_SplitTour_ComboText_TourTileCustom;
+   public static String        Dialog_SplitTour_ComboText_TourTitleCustom;
    public static String        Dialog_SplitTour_ComboText_TourTitleFromFirstMarker;
    public static String        Dialog_SplitTour_ComboText_TourTitleFromTour;
    public static String        Dialog_SplitTour_ComboText_TourTypeCustom;
