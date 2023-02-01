@@ -779,15 +779,14 @@ public class Messages extends NLS {
    public static String        Dialog_MapModel_Label_Description;
    public static String        Dialog_MapModel_Label_ForwardAngle;
    public static String        Dialog_MapModel_Label_ForwardAngle_Tooltip;
+   public static String        Dialog_MapModel_Label_HeadPositionFactor;
+   public static String        Dialog_MapModel_Label_HeadPositionFactor_Tooltip;
    public static String        Dialog_MapModel_Label_ModelFilepath;
-   public static String        Dialog_MapModel_Label_ModelLengthFactor;
-   public static String        Dialog_MapModel_Label_ModelLengthFactor_Tooltip;
    public static String        Dialog_MapModel_Label_Name;
    public static String        Dialog_MapModel_Title;
    public static String        Dialog_MapModel_Title_Add;
    public static String        Dialog_MapModel_Title_Edit;
    public static String        Dialog_MapModel_Title_Message_Add;
-   public static String        Dialog_MapModel_Title_Message_Edit;
 
    public static String        Dialog_ModifyTours_Button_LockMultipleToursSelection_Text;
    public static String        Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text;

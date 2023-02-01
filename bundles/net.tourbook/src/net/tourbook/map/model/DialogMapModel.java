@@ -64,7 +64,7 @@ public class DialogMapModel extends TitleAreaDialog {
    private Button  _btnBrowseModelFilepath;
 
    private Spinner _spinnerForwardAngle;
-   private Spinner _spinnerModelLengthFactor;
+   private Spinner _spinnerHeadPositionFactor;
 
    private Text    _txtDescription;
    private Text    _txtModelFilepath;
@@ -99,7 +99,7 @@ public class DialogMapModel extends TitleAreaDialog {
       } else {
 
          setTitle(Messages.Dialog_MapModel_Title_Edit);
-         setMessage(Messages.Dialog_MapModel_Title_Message_Edit);
+         setMessage(_mapModel_Editing.name);
       }
    }
 
@@ -135,15 +135,15 @@ public class DialogMapModel extends TitleAreaDialog {
       GridLayoutFactory.swtDefaults().numColumns(2).spacing(10, 8).applyTo(container);
 //      dlgContainer(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
       {
-
          {
             /*
              * Model name
              */
-            UI.createLabel(container, Messages.Dialog_MapModel_Label_Name);
+            final Label label = UI.createLabel(container, Messages.Dialog_MapModel_Label_Name);
+            GridDataFactory.fillDefaults().grab(true, false).indent(0, 5).applyTo(label);
 
             _txtModelName = new Text(container, SWT.BORDER);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtModelName);
+            GridDataFactory.fillDefaults().grab(true, false).indent(0, 5).applyTo(_txtModelName);
          }
          {
             /*
@@ -161,7 +161,6 @@ public class DialogMapModel extends TitleAreaDialog {
                   _txtModelFilepath.addModifyListener(modifyEvent -> onModelFile_Modify());
                   GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtModelFilepath);
                }
-
                {
                   /*
                    * Button: Browse...
@@ -185,25 +184,25 @@ public class DialogMapModel extends TitleAreaDialog {
             _spinnerForwardAngle.setMinimum(-360);
             _spinnerForwardAngle.setMaximum(360);
             _spinnerForwardAngle.setIncrement(1);
-            _spinnerForwardAngle.setPageIncrement(10);
+            _spinnerForwardAngle.setPageIncrement(5);
             _spinnerForwardAngle.setToolTipText(Messages.Dialog_MapModel_Label_ForwardAngle_Tooltip);
-            _spinnerForwardAngle.addMouseWheelListener(mouseEvent -> UI.adjustSpinnerValueOnMouseScroll(mouseEvent));
+            _spinnerForwardAngle.addMouseWheelListener(mouseEvent -> UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 5));
          }
          {
             /*
-             * Model length factor
+             * Head position factor
              */
-            final Label label = UI.createLabel(container, Messages.Dialog_MapModel_Label_ModelLengthFactor);
+            final Label label = UI.createLabel(container, Messages.Dialog_MapModel_Label_HeadPositionFactor);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
 
-            _spinnerModelLengthFactor = new Spinner(container, SWT.BORDER);
-            _spinnerModelLengthFactor.setDigits(1);
-            _spinnerModelLengthFactor.setMinimum(-1000);
-            _spinnerModelLengthFactor.setMaximum(1000);
-            _spinnerModelLengthFactor.setIncrement(1);
-            _spinnerModelLengthFactor.setPageIncrement(10);
-            _spinnerModelLengthFactor.setToolTipText(Messages.Dialog_MapModel_Label_ModelLengthFactor_Tooltip);
-            _spinnerModelLengthFactor.addMouseWheelListener(mouseEvent -> UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10));
+            _spinnerHeadPositionFactor = new Spinner(container, SWT.BORDER);
+            _spinnerHeadPositionFactor.setDigits(1);
+            _spinnerHeadPositionFactor.setMinimum(-1000);
+            _spinnerHeadPositionFactor.setMaximum(1000);
+            _spinnerHeadPositionFactor.setIncrement(1);
+            _spinnerHeadPositionFactor.setPageIncrement(10);
+            _spinnerHeadPositionFactor.setToolTipText(Messages.Dialog_MapModel_Label_HeadPositionFactor_Tooltip);
+            _spinnerHeadPositionFactor.addMouseWheelListener(mouseEvent -> UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10));
          }
          {
             /*
@@ -299,8 +298,8 @@ public class DialogMapModel extends TitleAreaDialog {
       _txtDescription            .setText(_mapModel_Editing.description);
       _txtModelFilepath          .setText(_mapModel_Editing.filepath);
 
-      _spinnerForwardAngle       .setSelection(_mapModel_Editing.modelForwardAngle);
-      _spinnerModelLengthFactor  .setSelection((int) (_mapModel_Editing.modelCenterToForwardFactor*10));
+      _spinnerForwardAngle       .setSelection(_mapModel_Editing.forwardAngle);
+      _spinnerHeadPositionFactor .setSelection((int) (_mapModel_Editing.headPositionFactor*10));
 
 // SET_FORMATTING_ON
    }
@@ -326,12 +325,12 @@ public class DialogMapModel extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-      mapModel.name                       = _txtModelName               .getText().strip();
-      mapModel.description                = _txtDescription             .getText().strip();
-      mapModel.filepath                   = _txtModelFilepath           .getText().strip();
+      mapModel.name                    = _txtModelName               .getText().strip();
+      mapModel.description             = _txtDescription             .getText().strip();
+      mapModel.filepath                = _txtModelFilepath           .getText().strip();
 
-      mapModel.modelForwardAngle          = _spinnerForwardAngle        .getSelection();
-      mapModel.modelCenterToForwardFactor = _spinnerModelLengthFactor   .getSelection() / 10.0f;
+      mapModel.forwardAngle       = _spinnerForwardAngle        .getSelection();
+      mapModel.headPositionFactor = _spinnerHeadPositionFactor  .getSelection() / 10.0f;
 
 // SET_FORMATTING_ON
 

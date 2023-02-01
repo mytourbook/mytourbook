@@ -493,9 +493,6 @@ public class SlideoutMapModel extends ToolbarSlideout {
          return;
       }
 
-      // update model
-//      MapModelManager.onUpdateModel(selectedModel);
-
       updateUI_ModelViewer(selectedModel);
    }
 
@@ -508,6 +505,8 @@ public class SlideoutMapModel extends ToolbarSlideout {
          // this happened when deleting a model
          return;
       }
+
+      MapModelManager.setSelectedModel(selectedModel);
 
       enableActions();
    }

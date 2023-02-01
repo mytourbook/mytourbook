@@ -25,6 +25,7 @@ import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.map.IMapSyncListener.SyncParameter;
 import net.tourbook.map.MapManager;
+import net.tourbook.map.model.MapModelManager;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
@@ -878,6 +879,8 @@ public class MapPlayerManager {
       _modelTurningAngle         = Util.getStateFloat(   _state, STATE_MODEL_TURNING_ANGLE,        2.0f);
 
 // SET_FORMATTING_ON
+
+      MapModelManager.restoreState();
    }
 
    public static void saveState() {
@@ -893,6 +896,8 @@ public class MapPlayerManager {
       _state.put(STATE_MODEL_TURNING_ANGLE,        _modelTurningAngle);
 
 // SET_FORMATTING_ON
+
+      MapModelManager.saveState();
    }
 
    public static void setCompileMapScale(final double x, final double y, final double scale) {

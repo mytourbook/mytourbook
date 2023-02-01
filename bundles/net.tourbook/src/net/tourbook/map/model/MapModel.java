@@ -36,12 +36,12 @@ public class MapModel {
    /**
     * Angle in degrees that the model is looking forward
     */
-   public int                modelForwardAngle;
+   public int                forwardAngle;
 
    /**
     * The model length needs a factor that the top of the symbol is not before the geo location
     */
-   public float              modelCenterToForwardFactor;
+   public float              headPositionFactor;
 
    @Override
    public boolean equals(final Object obj) {
@@ -87,14 +87,14 @@ public class MapModel {
 
       return UI.EMPTY_STRING
 
-            + "MapModel" + NL //                                                       //$NON-NLS-1$
+            + "MapModel" + NL //                                     //$NON-NLS-1$
 
-            + "  name                 =" + name + NL //                                //$NON-NLS-1$
-            + "  description          =" + description + NL //                         //$NON-NLS-1$
-            + "  filepath             =" + filepath + NL //                            //$NON-NLS-1$
+            + "  name               =" + name + NL //                //$NON-NLS-1$
+            + "  description        =" + description + NL //         //$NON-NLS-1$
+            + "  filepath           =" + filepath + NL //            //$NON-NLS-1$
 
-            + "  modelForwardAngle           =" + modelForwardAngle + NL //            //$NON-NLS-1$
-            + "  modelCenterToForwardFactor  =" + modelCenterToForwardFactor + NL //   //$NON-NLS-1$
+            + "  forwardAngle       =" + forwardAngle + NL //        //$NON-NLS-1$
+            + "  headPositionFactor =" + headPositionFactor + NL //  //$NON-NLS-1$
       ;
    }
 }

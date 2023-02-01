@@ -36,7 +36,10 @@ import net.mgsx.gltf.scene3d.lights.DirectionalLightEx;
 import net.mgsx.gltf.scene3d.scene.Scene;
 import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
+import net.mgsx.gltf.scene3d.scene.SceneModel;
 import net.mgsx.gltf.scene3d.utils.IBLBuilder;
+import net.tourbook.map.model.MapModel;
+import net.tourbook.map.model.MapModelManager;
 import net.tourbook.map.player.MapPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
 
@@ -74,25 +77,23 @@ public class GLTFModel_Renderer extends LayerRenderer {
    float[]                    _mapBox     = new float[8];
 
    private Scene              _scene;
-
    private SceneAsset         _sceneAsset;
    private SceneManager       _sceneManager;
+
    private DirectionalLightEx _light;
+
+   private float              _modelBoundingBox_MinMaxDistance;
 
    private Cubemap            _environmentCubemap;
    private Cubemap            _diffuseCubemap;
    private Cubemap            _specularCubemap;
    private Texture            _brdfLUT;
 // private SceneSkybox        _skybox;
-   private BoundingBox        _modelBoundingBox;
-
-   private float              _boundingBoxMinMaxDistance;
-// private Vector3            _boundingBoxCenter;
 
    /**
     * Angle in degrees that the model is looking forward
     */
-   private float  _modelForwardAngle;
+   private float _modelForwardAngle;
 
    /**
     * The model length needs a factor that the top of the symbol is not before the geo location
@@ -106,20 +107,8 @@ public class GLTFModel_Renderer extends LayerRenderer {
    public GLTFModel_Renderer(final Map map) {
 
       _map = map;
-   }
 
-   private void activateFirstAnimation() {
-
-      final Array<Animation> animations = _sceneAsset.scene.model.animations;
-
-      if (animations != null && animations.size > 0) {
-
-         final String animationID = animations.get(0).id;
-
-         _scene.animationController.setAnimation(animationID, -1);
-
-         System.out.println("Number of animations: " + animations.size + "  using " + animationID);
-      }
+      MapModelManager.setGLTFRenderer(this);
    }
 
    public void dispose() {
@@ -468,7 +457,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
             modelScale = vp2mpModelSize;
          }
 
-         modelScale /= _boundingBoxMinMaxDistance;
+         modelScale /= _modelBoundingBox_MinMaxDistance;
 
       } else {
 
@@ -478,7 +467,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
           * Adjust to a normalized size which depends on the model size because the models can have
           * big size differences
           */
-         modelScale /= _boundingBoxMinMaxDistance;
+         modelScale /= _modelBoundingBox_MinMaxDistance;
 
          // increase model size to be more visible
          modelScale *= 100;
@@ -499,7 +488,9 @@ public class GLTFModel_Renderer extends LayerRenderer {
       animationAngle += _modelForwardAngle;
 
       final double halfSize = modelScale / 2;
-      final double center2BorderSize = halfSize * _modelCenterToForwardFactor;
+      final float modelCenterToForwardFactor = _modelCenterToForwardFactor == 0 ? 1 : _modelCenterToForwardFactor;
+
+      final double center2BorderSize = halfSize * modelCenterToForwardFactor;
       final float forwardX = (float) (center2BorderSize * MathUtils.cosDeg(animationAngle));
       final float forwardY = (float) (center2BorderSize * MathUtils.sinDeg(animationAngle));
 
@@ -522,18 +513,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
    @Override
    public boolean setup() {
 
-      _sceneAsset = loadGLTFModel();
-
-      _scene = new Scene(_sceneAsset.scene);
-
-      // get bounding box
-      _modelBoundingBox = new BoundingBox();
-      _scene.modelInstance.calculateBoundingBox(_modelBoundingBox);
-      _boundingBoxMinMaxDistance = _modelBoundingBox.max.dst(_modelBoundingBox.min);
-//      _boundingBoxCenter = _modelBoundingBox.getCenter(new Vector3());
-
       _sceneManager = new SceneManager();
-      _sceneManager.addScene(_scene);
 
       _mapCamera = new MapCameraMT(_map);
       _sceneManager.setCamera(_mapCamera);
@@ -560,12 +540,57 @@ public class GLTFModel_Renderer extends LayerRenderer {
       _sceneManager.environment.set(PBRCubemapAttribute.createDiffuseEnv(_diffuseCubemap));
 
       // setup skybox
-//      skybox = new SceneSkybox(environmentCubemap);
-//      sceneManager.setSkyBox(skybox);
+//    skybox = new SceneSkybox(environmentCubemap);
+//    sceneManager.setSkyBox(skybox);
 
-      activateFirstAnimation();
+      setupScene();
 
       return true;
+   }
+
+   public void setupModel(final MapModel selectedModel) {
+      // TODO Auto-generated method stub
+
+   }
+
+   private void setupScene() {
+
+      /*
+       * Cleanup previous scene
+       */
+      if (_sceneAsset != null) {
+         _sceneAsset.dispose();
+      }
+
+      if (_scene != null) {
+         _sceneManager.removeScene(_scene);
+      }
+
+      /*
+       * Setup new scene
+       */
+      _sceneAsset = loadGLTFModel();
+
+      final SceneModel sceneModel = _sceneAsset.scene;
+
+      _scene = new Scene(sceneModel);
+
+      // get model bounding box
+      final BoundingBox modelBoundingBox = new BoundingBox();
+      _scene.modelInstance.calculateBoundingBox(modelBoundingBox);
+      _modelBoundingBox_MinMaxDistance = modelBoundingBox.max.dst(modelBoundingBox.min);
+
+      _sceneManager.addScene(_scene);
+
+      final Array<Animation> allModelAnimations = sceneModel.model.animations;
+      if (allModelAnimations != null && allModelAnimations.size > 0) {
+
+         final String animationID = allModelAnimations.get(0).id;
+
+         _scene.animationController.setAnimation(animationID, -1);
+
+         System.out.println("Number of animations: " + allModelAnimations.size + "  using " + animationID);
+      }
    }
 
    @Override
