@@ -16,6 +16,7 @@
 package dialogs;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -40,12 +41,9 @@ public class DialogJoinToursTests extends UITest {
 
       openDialogJoinTours();
 
-      //Options
-      bot.checkBox(Messages.Dialog_SplitTour_Checkbox_KeepTime).click();
-      final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.Dialog_JoinTours_Label_TourDate);
-      assertNotNull(tourDateTime);
-      tourDateTime.setDate(new Date(1612221767000L));
-      bot.comboBox(0).setSelection(1);
+      bot.checkBox(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints).deselect();
+      bot.checkBox(Messages.Dialog_JoinTours_Checkbox_InsertPauses).deselect();
+
       Utils.clickOkButton(bot);
 
       //Check that the concatenated tour exists
@@ -72,14 +70,15 @@ public class DialogJoinToursTests extends UITest {
 
       openDialogJoinTours();
 
-      //Options
-      bot.checkBox(Messages.Dialog_SplitTour_Checkbox_KeepTime).click();
+      bot.checkBox(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints).select();
+      bot.checkBox(Messages.Dialog_JoinTours_Checkbox_InsertPauses).select();
+
       bot.comboBox(1).setSelection(Messages.Dialog_JoinTours_ComboText_TourTitleCustom);
+      assertTrue(bot.checkBoxWithTooltip(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip).isEnabled());
+
       bot.comboBox(1).setSelection(Messages.Dialog_JoinTours_ComboText_TourTitleFromTour);
-      final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.Dialog_JoinTours_Label_TourDate);
-      assertNotNull(tourDateTime);
-      tourDateTime.setDate(new Date(1612221767000L));
-      bot.comboBox(0).setSelection(1);
+      assertFalse(bot.checkBoxWithTooltip(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip).isEnabled());
+
       Utils.clickOkButton(bot);
 
       //Check that the concatenated tour exists
@@ -111,5 +110,13 @@ public class DialogJoinToursTests extends UITest {
 
       //Action
       yearTree.contextMenu(Messages.App_Action_JoinTours).click();
+
+      //Options
+      bot.checkBox(Messages.Dialog_SplitTour_Checkbox_KeepTime).deselect();
+
+      final SWTBotDateTime tourDateTime = bot.dateTimeWithLabel(Messages.Dialog_JoinTours_Label_TourDate);
+      assertNotNull(tourDateTime);
+      tourDateTime.setDate(new Date(1612221767000L));
+      bot.comboBox(0).setSelection(1);
    }
 }
