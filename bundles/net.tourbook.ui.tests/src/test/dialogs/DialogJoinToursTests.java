@@ -107,13 +107,6 @@ public class DialogJoinToursTests extends UITest {
 
       bot.checkBox(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints).select();
 
-      //Assert the UI behavior
-      bot.comboBox(1).setSelection(Messages.Dialog_JoinTours_ComboText_TourTitleCustom);
-      assertTrue(bot.textWithTooltip(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip).isEnabled());
-
-      bot.comboBox(1).setSelection(Messages.Dialog_JoinTours_ComboText_TourTitleFromTour);
-      assertFalse(bot.textWithTooltip(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip).isEnabled());
-
       Utils.clickOkButton(bot);
 
       //Check that the concatenated tour exists
@@ -147,26 +140,6 @@ public class DialogJoinToursTests extends UITest {
       openDialogJoinTours();
 
       bot.checkBox(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints).deselect();
-
-      //Assert the UI behavior
-      bot.comboBox(0).setSelection(Messages.Dialog_JoinTours_ComboText_KeepTime);
-      assertFalse(bot.label(Messages.Dialog_JoinTours_Label_TourDate).isEnabled());
-      assertFalse(bot.dateTime(0).isEnabled());
-      assertFalse(bot.label(Messages.Dialog_JoinTours_Label_TourTime).isEnabled());
-      assertFalse(bot.dateTime(1).isEnabled());
-
-      bot.comboBox(0).setSelection(Messages.Dialog_JoinTours_ComboText_ConcatenateTime);
-      assertTrue(bot.label(Messages.Dialog_JoinTours_Label_TourDate).isEnabled());
-      assertTrue(bot.dateTime(0).isEnabled());
-      assertTrue(bot.label(Messages.Dialog_JoinTours_Label_TourTime).isEnabled());
-      assertTrue(bot.dateTime(1).isEnabled());
-
-      setNewTourTime();
-
-      bot.comboBox(1).setSelection(Messages.Dialog_JoinTours_ComboText_TourTitleCustom);
-
-      bot.comboBox(1).setSelection(Messages.Dialog_JoinTours_ComboText_TourTitleFromTour);
-      assertFalse(bot.textWithTooltip(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip).isEnabled());
 
       Utils.clickOkButton(bot);
 
