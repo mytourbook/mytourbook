@@ -141,7 +141,7 @@ public class DialogMapModel extends TitleAreaDialog {
       restoreState();
 
       // enable actions after the UI is created
-      parent.getDisplay().asyncExec(() -> enableActions());
+      parent.getDisplay().asyncExec(() -> enableControls());
 
       return dlgContainer;
    }
@@ -270,13 +270,13 @@ public class DialogMapModel extends TitleAreaDialog {
       }
    }
 
-   private void enableActions() {
-
-      final boolean isLiveUpdate = _chkLiveUpdate.getSelection();
-      final boolean isNormalEditing = isLiveUpdate == false;
-      final boolean isEditModel = _mapModel_Editing != null;
+   private void enableControls() {
 
 // SET_FORMATTING_OFF
+
+      final boolean isLiveUpdate    = _chkLiveUpdate.getSelection();
+      final boolean isNormalEditing = isLiveUpdate == false;
+      final boolean isEditModel     = _mapModel_Editing != null;
 
       _btnBrowseModelFilepath    .setEnabled(isNormalEditing);
 
@@ -326,7 +326,7 @@ public class DialogMapModel extends TitleAreaDialog {
 
       updateUI_DialogActions();
 
-      enableActions();
+      enableControls();
    }
 
    private void onModelFile_Modify() {

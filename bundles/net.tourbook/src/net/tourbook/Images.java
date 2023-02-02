@@ -172,11 +172,12 @@ public class Images {
    public static final String MapBookmark_New                            = "map-bookmark-new.png";                                //$NON-NLS-1$
    public static final String MapLayer                                   = "map-layer.png";                                       //$NON-NLS-1$
    public static final String MapLayer_Dark                              = "map-layer-dark.png";                                  //$NON-NLS-1$
+   public static final String MapModel                                   = "map-model.png";                                       //$NON-NLS-1$
+   public static final String MapModel_Disabled                          = "map-model-disabled.png";                              //$NON-NLS-1$
    public static final String MapOptions                                 = "map-options.png";                                     //$NON-NLS-1$
    public static final String MapOptions_Dark                            = "map-options-dark.png";                                //$NON-NLS-1$
    public static final String MapOptions_Disabled                        = "map-options-disabled.png";                            //$NON-NLS-1$
    public static final String MapPlayer                                  = "map-player.png";                                      //$NON-NLS-1$
-   public static final String MapPlayer_Dark                             = "map-player-dark.png";                                 //$NON-NLS-1$
    public static final String MapProvider                                = "change-map-provider.png";                             //$NON-NLS-1$
    public static final String MergeTours                                 = "merge-tours.png";                                     //$NON-NLS-1$
    public static final String MyTourbook16                               = "tourbook16.png";                                      //$NON-NLS-1$

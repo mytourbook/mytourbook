@@ -168,8 +168,8 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       public Action_SlideoutMapModel() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.MapProvider),
-               TourbookPlugin.getThemedImageDescriptor(Images.MapProvider));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapModel),
+               TourbookPlugin.getThemedImageDescriptor(Images.MapModel_Disabled));
       }
 
       @Override
@@ -244,7 +244,6 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       _actionPlayControl_PlayAndPause = new Action_PlayControl_PlayAndPause();
 
       _actionSlideoutMapModel = new Action_SlideoutMapModel();
-
    }
 
    @Override
@@ -493,7 +492,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       _actionPlayControl_PlayAndPause     .setEnabled(isEnabled);
       _actionPlayControl_Loop             .setEnabled(isEnabled);
-//      _actionSlideoutMapModel             .setEnabled(isEnabled);
+      _actionSlideoutMapModel             .setEnabled(isEnabled);
 
       _lblModelCursorSize                 .setEnabled(isEnabled);
       _lblModelSize                       .setEnabled(isEnabled);
