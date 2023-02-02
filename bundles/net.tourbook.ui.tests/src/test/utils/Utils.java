@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,14 +39,15 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 public class Utils {
 
    private static HttpClient  _httpClient             = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
+   public static final String DIRECTORY               = "Directory";                                                          //$NON-NLS-1$
+   public static final String SAVE_MODIFIED_TOUR      = "Save modified tour (Ctrl+S)";                                        //$NON-NLS-1$
+   public static final String STATISTICS_VIEW_NAME    = "Statistics";                                                         //$NON-NLS-1$
+   public static final String TOOLS                   = "Tools ";                                                             //$NON-NLS-1$
    public static final String TOURBOOK_VIEW_NAME      = "Tour Book";                                                          //$NON-NLS-1$
    public static final String TOUREDITOR_VIEW_NAME    = "Tour Editor";                                                        //$NON-NLS-1$
    public static final String TOURMARKERS_VIEW_NAME   = "Tour Markers";                                                       //$NON-NLS-1$
+   public static final String TOURPAUSES_VIEW_NAME    = "Tour Pauses";                                                        //$NON-NLS-1$
    public static final String TOURSEGMENTER_VIEW_NAME = "Tour Segmenter";                                                     //$NON-NLS-1$
-   public static final String STATISTICS_VIEW_NAME    = "Statistics";                                                         //$NON-NLS-1$
-   public static final String TOOLS                   = "Tools ";                                                             //$NON-NLS-1$
-   public static final String SAVE_MODIFIED_TOUR      = "Save modified tour (Ctrl+S)";                                        //$NON-NLS-1$
-   public static final String DIRECTORY               = "Directory";                                                          //$NON-NLS-1$
 
    public static final String workingDirectory        = System.getProperty("user.dir");                                       //$NON-NLS-1$
 
