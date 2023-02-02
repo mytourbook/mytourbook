@@ -56,6 +56,32 @@ public class DialogJoinToursTests extends UITest {
    }
 
    @Test
+   void joinTours_TestDialog() {
+
+      openDialogJoinTours();
+
+      bot.checkBox(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints).deselect();
+
+      //Assert the UI behavior
+      bot.comboBox(0).setSelection(Messages.Dialog_JoinTours_ComboText_KeepTime);
+      assertFalse(bot.label(Messages.Dialog_JoinTours_Label_TourDate).isEnabled());
+      assertFalse(bot.dateTime(0).isEnabled());
+      assertFalse(bot.label(Messages.Dialog_JoinTours_Label_TourTime).isEnabled());
+      assertFalse(bot.dateTime(1).isEnabled());
+
+      bot.comboBox(0).setSelection(Messages.Dialog_JoinTours_ComboText_ConcatenateTime);
+      assertTrue(bot.label(Messages.Dialog_JoinTours_Label_TourDate).isEnabled());
+      assertTrue(bot.dateTime(0).isEnabled());
+      assertTrue(bot.label(Messages.Dialog_JoinTours_Label_TourTime).isEnabled());
+      assertTrue(bot.dateTime(1).isEnabled());
+
+      bot.comboBox(1).setSelection(Messages.Dialog_JoinTours_ComboText_TourTitleFromTour);
+      assertFalse(bot.textWithTooltip(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip).isEnabled());
+
+      Utils.clickCancelButton(bot);
+   }
+
+   @Test
    void joinTours_WithMarkers() {
 
       openDialogJoinTours();
