@@ -98,14 +98,6 @@ public class MapModelManager {
       return xmlRoot;
    }
 
-   /**
-    * Perform live update for the {@link #_activeModel}
-    */
-   public static void doLiveUpdate() {
-
-      _gltfModelRenderer.doLiveUpdate(_activeModel);
-   }
-
    public static MapModel getActiveModel() {
 
       if (_activeModel == null) {
@@ -281,6 +273,14 @@ public class MapModelManager {
       _activeModel = selectedModel;
 
       _gltfModelRenderer.setupScene(selectedModel);
+   }
+
+   /**
+    * Update UI from the {@link #_activeModel}
+    */
+   public static void updateUI() {
+
+      _gltfModelRenderer.updateUI_ModelProperties(_activeModel);
    }
 
 }

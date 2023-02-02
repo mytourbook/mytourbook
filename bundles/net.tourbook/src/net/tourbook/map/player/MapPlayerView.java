@@ -446,7 +446,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
             _lblTurningAngle = UI.createLabel(container, "Turning &angle");
 
             _spinnerTurningAngle = new Spinner(container, SWT.BORDER);
-            _spinnerTurningAngle.setToolTipText("This is the angle in degrees in one frame when the model is turning on the track");
+            _spinnerTurningAngle.setToolTipText("Angle in degrees in one frame when the model is turning on the track");
             _spinnerTurningAngle.setDigits(1);
             _spinnerTurningAngle.setMinimum(0);
             _spinnerTurningAngle.setMaximum(100);

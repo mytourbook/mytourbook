@@ -189,11 +189,6 @@ public class MapPlayerManager {
    private static double                _debugPrevValue;
    private static String                _debugTimeStamp                  = UI.timeStamp();
 
-//   /**
-//    * Model speed when moving on the NORMAL TRACK in units per second
-//    */
-//   private static int                   _normalTrackSpeed                = 200;
-
    enum TrackState {
 
       MOVING, //
@@ -737,12 +732,6 @@ public class MapPlayerManager {
 
          final double returnSpeed = 0.02;
 
-//         final long foregroundFPS = Map25FPSManager.getForegroundFPS();
-//         final float frameDurationMS = 1000f / foregroundFPS;
-//         final double end2StartPixelDistance = mapPlayerData.trackEnd2StartPixelDistance;
-//         final double end2Start_AnimationTime = _defaultAnimationTime * (end2StartPixelDistance / _returnTrackSpeed_PixelPerSecond);
-//
-
          final double positionDiff = _jogWheelSpeed > 0
                ? returnSpeed
                : -returnSpeed;
@@ -880,6 +869,7 @@ public class MapPlayerManager {
 
 // SET_FORMATTING_ON
 
+      setIsModelMovingForward(_jogWheelSpeed >= 0);
    }
 
    public static void saveState() {
@@ -915,6 +905,11 @@ public class MapPlayerManager {
       if (isPlayerViewAvailable()) {
          _mapPlayerView.updateAnimationVisibility();
       }
+   }
+
+   private static void setIsModelMovingForward(final boolean isModelMovingForward) {
+
+      _isModelMovingForward = isModelMovingForward;
    }
 
    public static void setIsPlayerRunning(final boolean isPlayerRunning) {
@@ -1070,7 +1065,7 @@ public class MapPlayerManager {
             // adjust to the center of the scale control
             - SPEED_JOG_WHEEL_MAX_HALF;
 
-      _isModelMovingForward = _jogWheelSpeed >= 0;
+      setIsModelMovingForward(_jogWheelSpeed >= 0);
    }
 
    /**
@@ -1149,14 +1144,18 @@ public class MapPlayerManager {
          /*
           * Set forward flag
           */
-         _isModelMovingForward = true;
+         boolean isModelMovingForward = true;
+
          if (isSetNormalTrack) {
-            _isModelMovingForward = newRelativePosition >= _previousRelativePosition;
+            isModelMovingForward = newRelativePosition >= _previousRelativePosition;
          } else {
             if (newRelativePosition == 2) {
-               _isModelMovingForward = false;
+               isModelMovingForward = false;
             }
          }
+
+         setIsModelMovingForward(isModelMovingForward);
+
          _previousRelativePosition = newRelativePosition;
 
          /*

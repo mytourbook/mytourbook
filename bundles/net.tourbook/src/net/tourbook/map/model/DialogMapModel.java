@@ -70,6 +70,7 @@ public class DialogMapModel extends TitleAreaDialog {
    private Label   _labelDescription;
    private Label   _labelFilepath;
    private Label   _labelForwardAngle;
+   private Label   _labelForwardAngleUnit;
    private Label   _labelHeadPositionFactor;
    private Label   _labelName;
 
@@ -79,6 +80,7 @@ public class DialogMapModel extends TitleAreaDialog {
    private Text    _txtDescription;
    private Text    _txtFilepath;
    private Text    _txtName;
+
 
    public DialogMapModel(final Shell parentShell) {
 
@@ -196,17 +198,25 @@ public class DialogMapModel extends TitleAreaDialog {
             _labelForwardAngle = UI.createLabel(container, Messages.Dialog_MapModel_Label_ForwardAngle);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_labelForwardAngle);
 
-            _spinnerForwardAngle = new Spinner(container, SWT.BORDER);
-            _spinnerForwardAngle.setMinimum(-360);
-            _spinnerForwardAngle.setMaximum(360);
-            _spinnerForwardAngle.setIncrement(1);
-            _spinnerForwardAngle.setPageIncrement(5);
-            _spinnerForwardAngle.setToolTipText(Messages.Dialog_MapModel_Label_ForwardAngle_Tooltip);
-            _spinnerForwardAngle.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_LiveUpdateControls()));
-            _spinnerForwardAngle.addMouseWheelListener(mouseEvent -> {
-               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 5);
-               onSelect_LiveUpdateControls();
-            });
+            final Composite angleContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(angleContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(angleContainer);
+            {
+               _spinnerForwardAngle = new Spinner(angleContainer, SWT.BORDER);
+               _spinnerForwardAngle.setMinimum(-360);
+               _spinnerForwardAngle.setMaximum(360);
+               _spinnerForwardAngle.setIncrement(1);
+               _spinnerForwardAngle.setPageIncrement(5);
+               _spinnerForwardAngle.setToolTipText(Messages.Dialog_MapModel_Label_ForwardAngle_Tooltip);
+               _spinnerForwardAngle.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_LiveUpdateControls()));
+               _spinnerForwardAngle.addMouseWheelListener(mouseEvent -> {
+                  UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 5);
+                  onSelect_LiveUpdateControls();
+               });
+
+               _labelForwardAngleUnit = UI.createLabel(angleContainer, UI.SYMBOL_DEGREE);
+               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_labelForwardAngleUnit);
+            }
          }
          {
             /*
@@ -373,7 +383,7 @@ public class DialogMapModel extends TitleAreaDialog {
       saveState_LiveUpdateControls(_mapModel_Editing);
 
       // update UI
-      MapModelManager.doLiveUpdate();
+      MapModelManager.updateUI();
    }
 
    private void restoreState() {
@@ -418,6 +428,9 @@ public class DialogMapModel extends TitleAreaDialog {
          _mapModel_New = mapModel;
       }
 
+      /*
+       * Update model
+       */
 // SET_FORMATTING_OFF
 
       mapModel.name        = _txtName        .getText().strip();
@@ -427,6 +440,9 @@ public class DialogMapModel extends TitleAreaDialog {
 // SET_FORMATTING_ON
 
       saveState_LiveUpdateControls(mapModel);
+
+      // update UI
+      MapModelManager.updateUI();
    }
 
    private void saveState_LiveUpdate() {

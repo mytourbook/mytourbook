@@ -128,17 +128,6 @@ public class GLTFModel_Renderer extends LayerRenderer {
 //      skybox.dispose();
    }
 
-   /**
-    * Update model properties immediately
-    *
-    * @param mapModel
-    */
-   public void doLiveUpdate(final MapModel mapModel) {
-
-      _modelForwardAngle = mapModel.forwardAngle;
-      _modelCenterToForwardFactor = mapModel.headPositionFactor;
-   }
-
    private SceneAsset loadGLTFModel() {
 
       SceneAsset asset = null;
@@ -584,7 +573,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
        */
       _sceneAsset = new GLTFLoader().load(Gdx.files.absolute(mapModel.filepath));
 
-      doLiveUpdate(mapModel);
+      updateUI_ModelProperties(mapModel);
 
       final SceneModel sceneModel = _sceneAsset.scene;
 
@@ -623,5 +612,16 @@ public class GLTFModel_Renderer extends LayerRenderer {
          setReady(true);
       }
 
+   }
+
+   /**
+    * Update model properties
+    *
+    * @param mapModel
+    */
+   public void updateUI_ModelProperties(final MapModel mapModel) {
+
+      _modelForwardAngle = mapModel.forwardAngle;
+      _modelCenterToForwardFactor = mapModel.headPositionFactor;
    }
 }
