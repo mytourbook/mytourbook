@@ -68,27 +68,27 @@ public class SlideoutMapModel extends ToolbarSlideout {
    private static final int    NUM_VISIBLE_MODEL_ITEMS_MIN     = 3;
    private static final int    NUM_VISIBLE_MODEL_ITEMS_MAX     = 100;
 
+   private IDialogSettings     _state;
+
    private TableViewer         _modelViewer;
 
-//   private SelectionListener  _defaultSelectionListener;
-//   private MouseWheelListener _defaultMouseWheelListener;
+   private int                 _numVisibleModelItems;
 
-   private PixelConverter _pc;
+   private boolean             _isInUpdateUI;
+
+   private PixelConverter      _pc;
 
    /*
     * UI controls
     */
-   private Composite       _parent;
+   private Composite _parent;
+   private Composite _viewerLayoutContainer;
 
-   private Button          _btnAdd;
-   private Button          _btnDelete;
-   private Button          _btnEdit;
+   private Button    _btnAdd;
+   private Button    _btnDelete;
+   private Button    _btnEdit;
 
-   private Spinner         _spinnerNumModelItems;
-
-   private Composite       _viewerLayoutContainer;
-   private IDialogSettings _state;
-   private int             _numVisibleModelItems;
+   private Spinner   _spinnerNumModelItems;
 
    private class ModelComparator extends ViewerComparator {
 
@@ -158,15 +158,13 @@ public class SlideoutMapModel extends ToolbarSlideout {
 
       final Composite ui = createUI(parent);
 
-      restoreState();
-
       // fill viewer
       _modelViewer.setInput(new Object());
 
-      enableActions();
-
       // ensure that the animation is running when map is in background
       Map25FPSManager.setBackgroundFPSToAnimationFPS(true);
+
+      restoreState();
 
       return ui;
    }
@@ -256,7 +254,7 @@ public class SlideoutMapModel extends ToolbarSlideout {
 
          @Override
          public void selectionChanged(final SelectionChangedEvent event) {
-            onModel_Select();
+            onModel_Selected();
          }
       });
 
@@ -507,7 +505,11 @@ public class SlideoutMapModel extends ToolbarSlideout {
       updateUI_ModelViewer(selectedModel);
    }
 
-   private void onModel_Select() {
+   private void onModel_Selected() {
+
+      if (_isInUpdateUI) {
+         return;
+      }
 
       final MapModel selectedModel = getSelectedModel();
 
@@ -525,6 +527,14 @@ public class SlideoutMapModel extends ToolbarSlideout {
    private void restoreState() {
 
       _spinnerNumModelItems.setSelection(_numVisibleModelItems);
+
+      _isInUpdateUI = true;
+      {
+         updateUI_ModelViewer(MapModelManager.getActiveModel());
+      }
+      _isInUpdateUI = false;
+
+      enableActions();
    }
 
    private void restoreState_BeforeUI() {

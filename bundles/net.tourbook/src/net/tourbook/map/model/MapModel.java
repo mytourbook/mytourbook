@@ -90,11 +90,12 @@ public class MapModel {
             + "MapModel" + NL //                                     //$NON-NLS-1$
 
             + "  name               =" + name + NL //                //$NON-NLS-1$
-            + "  description        =" + description + NL //         //$NON-NLS-1$
             + "  filepath           =" + filepath + NL //            //$NON-NLS-1$
 
             + "  forwardAngle       =" + forwardAngle + NL //        //$NON-NLS-1$
             + "  headPositionFactor =" + headPositionFactor + NL //  //$NON-NLS-1$
+
+//          + "  description        =" + description + NL //         //$NON-NLS-1$
       ;
    }
 }

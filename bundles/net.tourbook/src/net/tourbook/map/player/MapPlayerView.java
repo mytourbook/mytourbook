@@ -919,6 +919,8 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
    @Override
    public void setFocus() {
 
+      Map25FPSManager.setBackgroundFPSToAnimationFPS(true);
+
       _scaleTimeline.setFocus();
    }
 

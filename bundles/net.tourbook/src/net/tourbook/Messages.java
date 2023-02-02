@@ -122,6 +122,7 @@ public class Messages extends NLS {
    public static String        app_action_button_down;
    public static String        app_action_button_up;
    public static String        App_Action_Cancel;
+   public static String        App_Action_Close;
    public static String        App_Action_Close_ToolTip;
    public static String        App_Action_CollapseAll;
    public static String        app_action_collapse_others_tooltip;
@@ -774,6 +775,10 @@ public class Messages extends NLS {
 
    public static String        Dialog_Label_Description;
    public static String        Dialog_Label_Name;
+
+   public static String        Dialog_MapModel_Checkbox_IsLiveUpdate;
+
+   public static String        Dialog_MapModel_Checkbox_IsLiveUpdate_Tooltip;
 
    public static String        Dialog_MapModel_Dialog_ModelFilepath_Title;
    public static String        Dialog_MapModel_Label_Description;

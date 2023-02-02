@@ -98,6 +98,14 @@ public class MapModelManager {
       return xmlRoot;
    }
 
+   /**
+    * Perform live update for the {@link #_activeModel}
+    */
+   public static void doLiveUpdate() {
+
+      _gltfModelRenderer.doLiveUpdate(_activeModel);
+   }
+
    public static MapModel getActiveModel() {
 
       if (_activeModel == null) {
@@ -262,6 +270,13 @@ public class MapModelManager {
     * @param selectedModel
     */
    public static void setSelectedModel(final MapModel selectedModel) {
+
+      if (_activeModel == selectedModel) {
+
+         // model is already selected -> nothing to do
+
+         return;
+      }
 
       _activeModel = selectedModel;
 

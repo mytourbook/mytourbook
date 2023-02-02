@@ -128,6 +128,17 @@ public class GLTFModel_Renderer extends LayerRenderer {
 //      skybox.dispose();
    }
 
+   /**
+    * Update model properties immediately
+    *
+    * @param mapModel
+    */
+   public void doLiveUpdate(final MapModel mapModel) {
+
+      _modelForwardAngle = mapModel.forwardAngle;
+      _modelCenterToForwardFactor = mapModel.headPositionFactor;
+   }
+
    private SceneAsset loadGLTFModel() {
 
       SceneAsset asset = null;
@@ -488,7 +499,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
       animationAngle += _modelForwardAngle;
 
       final double halfSize = modelScale / 2;
-      final float modelCenterToForwardFactor = _modelCenterToForwardFactor == 0 ? 1 : _modelCenterToForwardFactor;
+      final float modelCenterToForwardFactor = _modelCenterToForwardFactor == 0 ? 0.001f : _modelCenterToForwardFactor;
 
       final double center2BorderSize = halfSize * modelCenterToForwardFactor;
       final float forwardX = (float) (center2BorderSize * MathUtils.cosDeg(animationAngle));
@@ -573,8 +584,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
        */
       _sceneAsset = new GLTFLoader().load(Gdx.files.absolute(mapModel.filepath));
 
-      _modelForwardAngle = mapModel.forwardAngle;
-      _modelCenterToForwardFactor = mapModel.headPositionFactor;
+      doLiveUpdate(mapModel);
 
       final SceneModel sceneModel = _sceneAsset.scene;
 

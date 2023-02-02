@@ -23,6 +23,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -44,9 +45,11 @@ import org.eclipse.swt.widgets.Text;
  */
 public class DialogMapModel extends TitleAreaDialog {
 
-   private static final String   ID     = "net.tourbook.map.model.DialogMapModel"; //$NON-NLS-1$
+   private static final String   ID                   = "net.tourbook.map.model.DialogMapModel"; //$NON-NLS-1$
 
-   private final IDialogSettings _state = TourbookPlugin.getState(ID);
+   private static final String   STATE_IS_LIVE_UPDATE = "STATE_IS_LIVE_UPDATE";                  //$NON-NLS-1$
+
+   private final IDialogSettings _state               = TourbookPlugin.getState(ID);
 
    /**
     * When not <code>null</code> then this model is edited, otherwise a new model is created
@@ -62,13 +65,20 @@ public class DialogMapModel extends TitleAreaDialog {
     * UI controls
     */
    private Button  _btnBrowseModelFilepath;
+   private Button  _chkLiveUpdate;
+
+   private Label   _labelDescription;
+   private Label   _labelFilepath;
+   private Label   _labelForwardAngle;
+   private Label   _labelHeadPositionFactor;
+   private Label   _labelName;
 
    private Spinner _spinnerForwardAngle;
    private Spinner _spinnerHeadPositionFactor;
 
    private Text    _txtDescription;
-   private Text    _txtModelFilepath;
-   private Text    _txtModelName;
+   private Text    _txtFilepath;
+   private Text    _txtName;
 
    public DialogMapModel(final Shell parentShell) {
 
@@ -76,6 +86,14 @@ public class DialogMapModel extends TitleAreaDialog {
 
       // make dialog resizable
       setShellStyle(getShellStyle() | SWT.RESIZE);
+   }
+
+   @Override
+   public boolean close() {
+
+      saveState_LiveUpdate();
+
+      return super.close();
    }
 
    @Override
@@ -108,12 +126,7 @@ public class DialogMapModel extends TitleAreaDialog {
 
       super.createButtonsForButtonBar(parent);
 
-      // set text for the OK button
-      if (_mapModel_Editing == null) {
-         getButton(IDialogConstants.OK_ID).setText(Messages.App_Action_Add);
-      } else {
-         getButton(IDialogConstants.OK_ID).setText(Messages.App_Action_Save);
-      }
+      updateUI_DialogActions();
    }
 
    @Override
@@ -124,6 +137,9 @@ public class DialogMapModel extends TitleAreaDialog {
       createUI(dlgContainer);
 
       restoreState();
+
+      // enable actions after the UI is created
+      parent.getDisplay().asyncExec(() -> enableActions());
 
       return dlgContainer;
    }
@@ -139,27 +155,27 @@ public class DialogMapModel extends TitleAreaDialog {
             /*
              * Model name
              */
-            final Label label = UI.createLabel(container, Messages.Dialog_MapModel_Label_Name);
-            GridDataFactory.fillDefaults().grab(true, false).indent(0, 5).applyTo(label);
+            _labelName = UI.createLabel(container, Messages.Dialog_MapModel_Label_Name);
+            GridDataFactory.fillDefaults().grab(true, false).indent(0, 5).applyTo(_labelName);
 
-            _txtModelName = new Text(container, SWT.BORDER);
-            GridDataFactory.fillDefaults().grab(true, false).indent(0, 5).applyTo(_txtModelName);
+            _txtName = new Text(container, SWT.BORDER);
+            GridDataFactory.fillDefaults().grab(true, false).indent(0, 5).applyTo(_txtName);
          }
          {
             /*
              * Model file path
              */
-            final Label label = UI.createLabel(container, Messages.Dialog_MapModel_Label_ModelFilepath);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+            _labelFilepath = UI.createLabel(container, Messages.Dialog_MapModel_Label_ModelFilepath);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_labelFilepath);
 
             final Composite containerModelFile = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults().grab(true, false).applyTo(containerModelFile);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(containerModelFile);
             {
                {
-                  _txtModelFilepath = new Text(containerModelFile, SWT.BORDER);
-                  _txtModelFilepath.addModifyListener(modifyEvent -> onModelFile_Modify());
-                  GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtModelFilepath);
+                  _txtFilepath = new Text(containerModelFile, SWT.BORDER);
+                  _txtFilepath.addModifyListener(modifyEvent -> onModelFile_Modify());
+                  GridDataFactory.fillDefaults().grab(true, false).applyTo(_txtFilepath);
                }
                {
                   /*
@@ -177,8 +193,8 @@ public class DialogMapModel extends TitleAreaDialog {
             /*
              * Forward angle
              */
-            final Label label = UI.createLabel(container, Messages.Dialog_MapModel_Label_ForwardAngle);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+            _labelForwardAngle = UI.createLabel(container, Messages.Dialog_MapModel_Label_ForwardAngle);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_labelForwardAngle);
 
             _spinnerForwardAngle = new Spinner(container, SWT.BORDER);
             _spinnerForwardAngle.setMinimum(-360);
@@ -186,14 +202,18 @@ public class DialogMapModel extends TitleAreaDialog {
             _spinnerForwardAngle.setIncrement(1);
             _spinnerForwardAngle.setPageIncrement(5);
             _spinnerForwardAngle.setToolTipText(Messages.Dialog_MapModel_Label_ForwardAngle_Tooltip);
-            _spinnerForwardAngle.addMouseWheelListener(mouseEvent -> UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 5));
+            _spinnerForwardAngle.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_LiveUpdateControls()));
+            _spinnerForwardAngle.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 5);
+               onSelect_LiveUpdateControls();
+            });
          }
          {
             /*
              * Head position factor
              */
-            final Label label = UI.createLabel(container, Messages.Dialog_MapModel_Label_HeadPositionFactor);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
+            _labelHeadPositionFactor = UI.createLabel(container, Messages.Dialog_MapModel_Label_HeadPositionFactor);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_labelHeadPositionFactor);
 
             _spinnerHeadPositionFactor = new Spinner(container, SWT.BORDER);
             _spinnerHeadPositionFactor.setDigits(1);
@@ -202,22 +222,66 @@ public class DialogMapModel extends TitleAreaDialog {
             _spinnerHeadPositionFactor.setIncrement(1);
             _spinnerHeadPositionFactor.setPageIncrement(10);
             _spinnerHeadPositionFactor.setToolTipText(Messages.Dialog_MapModel_Label_HeadPositionFactor_Tooltip);
-            _spinnerHeadPositionFactor.addMouseWheelListener(mouseEvent -> UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10));
+            _spinnerHeadPositionFactor.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_LiveUpdateControls()));
+            _spinnerHeadPositionFactor.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 5);
+               onSelect_LiveUpdateControls();
+            });
          }
          {
             /*
              * Description
              */
-            final Label label = UI.createLabel(container, Messages.Dialog_MapModel_Label_Description);
+            _labelDescription = UI.createLabel(container, Messages.Dialog_MapModel_Label_Description);
             GridDataFactory.fillDefaults()
                   .grab(false, false)
                   .align(SWT.FILL, SWT.BEGINNING)
-                  .applyTo(label);
+                  .applyTo(_labelDescription);
 
             _txtDescription = new Text(container, SWT.BORDER | SWT.WRAP | SWT.V_SCROLL | SWT.H_SCROLL);
             GridDataFactory.fillDefaults().grab(true, true).applyTo(_txtDescription);
          }
+         {
+            /*
+             * Live update
+             */
+            _chkLiveUpdate = new Button(container, SWT.CHECK);
+            _chkLiveUpdate.setText(Messages.Dialog_MapModel_Checkbox_IsLiveUpdate);
+            _chkLiveUpdate.setToolTipText(Messages.Dialog_MapModel_Checkbox_IsLiveUpdate_Tooltip);
+            _chkLiveUpdate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onLiveUpdate()));
+
+            GridDataFactory.fillDefaults()
+                  .grab(true, false)
+                  .span(2, 1)
+                  .align(SWT.END, SWT.FILL)
+                  .indent(0, 20)
+                  .applyTo(_chkLiveUpdate);
+         }
       }
+   }
+
+   private void enableActions() {
+
+      final boolean isLiveUpdate = _chkLiveUpdate.getSelection();
+      final boolean isNormalEditing = isLiveUpdate == false;
+      final boolean isEditModel = _mapModel_Editing != null;
+
+// SET_FORMATTING_OFF
+
+      _btnBrowseModelFilepath    .setEnabled(isNormalEditing);
+
+      _chkLiveUpdate             .setEnabled(isEditModel);
+
+      _labelDescription          .setEnabled(isNormalEditing);
+      _labelFilepath             .setEnabled(isNormalEditing);
+      _labelName                 .setEnabled(isNormalEditing);
+
+      _txtDescription            .setEnabled(isNormalEditing);
+      _txtFilepath               .setEnabled(isNormalEditing);
+      _txtName                   .setEnabled(isNormalEditing);
+
+
+// SET_FORMATTING_ON
    }
 
    @Override
@@ -227,11 +291,17 @@ public class DialogMapModel extends TitleAreaDialog {
       return _state;
 
       // for debugging
-//    return null;
+      // return null;
    }
 
    public MapModel getNewMapModel() {
+
       return _mapModel_New;
+   }
+
+   private boolean isLiveUpdate() {
+
+      return _chkLiveUpdate != null && _chkLiveUpdate.getSelection();
    }
 
    @Override
@@ -242,6 +312,13 @@ public class DialogMapModel extends TitleAreaDialog {
       super.okPressed();
    }
 
+   private void onLiveUpdate() {
+
+      updateUI_DialogActions();
+
+      enableActions();
+   }
+
    private void onModelFile_Modify() {
 
    }
@@ -250,7 +327,7 @@ public class DialogMapModel extends TitleAreaDialog {
 
       String mapFile_Foldername = null;
 
-      final String userPathname = _txtModelFilepath.getText();
+      final String userPathname = _txtFilepath.getText();
       final Path mapFilepath = NIO.getPath(userPathname);
 
       if (mapFilepath != null) {
@@ -282,26 +359,44 @@ public class DialogMapModel extends TitleAreaDialog {
          setErrorMessage(null);
 
          // update UI
-         _txtModelFilepath.setText(selectedFilepath);
+         _txtFilepath.setText(selectedFilepath);
       }
+   }
+
+   private void onSelect_LiveUpdateControls() {
+
+      if (isLiveUpdate() == false) {
+         return;
+      }
+
+      // update model
+      saveState_LiveUpdateControls(_mapModel_Editing);
+
+      // update UI
+      MapModelManager.doLiveUpdate();
    }
 
    private void restoreState() {
 
       if (_mapModel_Editing == null) {
+
+         // a new model is being added
+
          return;
       }
 
 // SET_FORMATTING_OFF
 
-      _txtModelName              .setText(_mapModel_Editing.name);
+      _txtName                   .setText(_mapModel_Editing.name);
       _txtDescription            .setText(_mapModel_Editing.description);
-      _txtModelFilepath          .setText(_mapModel_Editing.filepath);
+      _txtFilepath               .setText(_mapModel_Editing.filepath);
 
       _spinnerForwardAngle       .setSelection(_mapModel_Editing.forwardAngle);
-      _spinnerHeadPositionFactor .setSelection((int) (_mapModel_Editing.headPositionFactor*10));
+      _spinnerHeadPositionFactor .setSelection((int) (_mapModel_Editing.headPositionFactor * 10));
 
 // SET_FORMATTING_ON
+
+      _chkLiveUpdate.setSelection(Util.getStateBoolean(_state, STATE_IS_LIVE_UPDATE, false));
    }
 
    private void saveState() {
@@ -325,15 +420,28 @@ public class DialogMapModel extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
-      mapModel.name                    = _txtModelName               .getText().strip();
-      mapModel.description             = _txtDescription             .getText().strip();
-      mapModel.filepath                = _txtModelFilepath           .getText().strip();
-
-      mapModel.forwardAngle       = _spinnerForwardAngle        .getSelection();
-      mapModel.headPositionFactor = _spinnerHeadPositionFactor  .getSelection() / 10.0f;
+      mapModel.name        = _txtName        .getText().strip();
+      mapModel.description = _txtDescription .getText().strip();
+      mapModel.filepath    = _txtFilepath    .getText().strip();
 
 // SET_FORMATTING_ON
 
+      saveState_LiveUpdateControls(mapModel);
+   }
+
+   private void saveState_LiveUpdate() {
+
+      _state.put(STATE_IS_LIVE_UPDATE, _chkLiveUpdate.getSelection());
+   }
+
+   private void saveState_LiveUpdateControls(final MapModel mapModel) {
+
+// SET_FORMATTING_OFF
+
+      mapModel.forwardAngle         = _spinnerForwardAngle.getSelection();
+      mapModel.headPositionFactor   = _spinnerHeadPositionFactor.getSelection() / 10.0f;
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -344,5 +452,36 @@ public class DialogMapModel extends TitleAreaDialog {
    public void setMapModel(final MapModel mapModel) {
 
       _mapModel_Editing = mapModel;
+   }
+
+   private void updateUI_DialogActions() {
+
+      final Button okButton = getButton(IDialogConstants.OK_ID);
+      final Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
+
+      if (isLiveUpdate()) {
+
+         okButton.setVisible(false);
+
+         cancelButton.setText(Messages.App_Action_Close);
+
+      } else {
+
+         okButton.setVisible(true);
+
+         // set text for the OK button
+         if (_mapModel_Editing == null) {
+
+            // a new model is added
+            okButton.setText(Messages.App_Action_Add);
+
+         } else {
+
+            // existing model is edited
+            okButton.setText(Messages.App_Action_Save);
+         }
+
+         cancelButton.setText(Messages.App_Action_Cancel);
+      }
    }
 }
