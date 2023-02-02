@@ -27,6 +27,7 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StringUtils;
@@ -42,7 +43,6 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.ui.ITourProvider2;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
 
@@ -398,9 +398,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       _cboJoinMethod.addSelectionListener(defaultSelectionListener);
 
       // fill combo
-      for (final String timeText : STATE_TEXT_JOIN_METHOD) {
-         _cboJoinMethod.add(timeText);
-      }
+      Arrays.asList(STATE_TEXT_JOIN_METHOD).forEach(timeText -> _cboJoinMethod.add(timeText));
    }
 
 //   /**
@@ -552,7 +550,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             .align(SWT.BEGINNING, SWT.FILL)
             .applyTo(_linkTag);
       _linkTag.addSelectionListener(widgetSelectedAdapter(
-            selectionEvent -> net.tourbook.common.UI.openControlMenu(_linkTag)));
+            selectionEvent -> UI.openControlMenu(_linkTag)));
 
       _lblTourTags = new Label(parent, SWT.WRAP);
       GridDataFactory.fillDefaults()//
@@ -1220,7 +1218,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
                joinedDescription.append(UI.NEW_LINE2);
             }
 
-            joinedDescription.append(Messages.Dialog_JoinTours_Label_Tour + UI.COLON_SPACE);
+            joinedDescription.append(Messages.Dialog_JoinTours_Label_Tour + net.tourbook.ui.UI.COLON_SPACE);
             joinedDescription.append(TourManager.getTourTitleDetailed(tourData));
 
             final String tourDescription = tourData.getTourDescription();
@@ -1291,7 +1289,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
                }
             }
          }
-         //todo fb need to offset the pauses when new tour start time
 
          /*
           * Pauses
@@ -1728,8 +1725,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    private void updateUITourTypeTags() {
 
       // tour type/tags
-      UI.updateUI_TourType(_joinedTourData, _lblTourType, true);
-      UI.updateUI_Tags(_joinedTourData, _lblTourTags);
+      net.tourbook.ui.UI.updateUI_TourType(_joinedTourData, _lblTourType, true);
+      net.tourbook.ui.UI.updateUI_Tags(_joinedTourData, _lblTourTags);
 
       // reflow layout that the tags are aligned correctly
       _dlgInnerContainer.layout(true);
