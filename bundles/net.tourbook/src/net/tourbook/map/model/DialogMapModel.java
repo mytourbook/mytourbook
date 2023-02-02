@@ -81,7 +81,6 @@ public class DialogMapModel extends TitleAreaDialog {
    private Text    _txtFilepath;
    private Text    _txtName;
 
-
    public DialogMapModel(final Shell parentShell) {
 
       super(parentShell);
@@ -151,14 +150,14 @@ public class DialogMapModel extends TitleAreaDialog {
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.swtDefaults().numColumns(2).spacing(10, 8).applyTo(container);
-//      dlgContainer(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
+//      container.setBackground(UI.SYS_COLOR_BLUE);
       {
          {
             /*
              * Model name
              */
             _labelName = UI.createLabel(container, Messages.Dialog_MapModel_Label_Name);
-            GridDataFactory.fillDefaults().grab(true, false).indent(0, 5).applyTo(_labelName);
+            GridDataFactory.fillDefaults().indent(0, 5).applyTo(_labelName);
 
             _txtName = new Text(container, SWT.BORDER);
             GridDataFactory.fillDefaults().grab(true, false).indent(0, 5).applyTo(_txtName);
@@ -244,7 +243,6 @@ public class DialogMapModel extends TitleAreaDialog {
              */
             _labelDescription = UI.createLabel(container, Messages.Dialog_MapModel_Label_Description);
             GridDataFactory.fillDefaults()
-                  .grab(false, false)
                   .align(SWT.FILL, SWT.BEGINNING)
                   .applyTo(_labelDescription);
 
@@ -255,6 +253,8 @@ public class DialogMapModel extends TitleAreaDialog {
             /*
              * Live update
              */
+            UI.createSpacer_Horizontal(container, 1);
+
             _chkLiveUpdate = new Button(container, SWT.CHECK);
             _chkLiveUpdate.setText(Messages.Dialog_MapModel_Checkbox_IsLiveUpdate);
             _chkLiveUpdate.setToolTipText(Messages.Dialog_MapModel_Checkbox_IsLiveUpdate_Tooltip);
@@ -262,9 +262,8 @@ public class DialogMapModel extends TitleAreaDialog {
 
             GridDataFactory.fillDefaults()
                   .grab(true, false)
-                  .span(2, 1)
-                  .align(SWT.END, SWT.FILL)
-                  .indent(0, 20)
+                  .align(SWT.BEGINNING, SWT.FILL)
+                  .indent(0, 10)
                   .applyTo(_chkLiveUpdate);
          }
       }
@@ -274,22 +273,35 @@ public class DialogMapModel extends TitleAreaDialog {
 
 // SET_FORMATTING_OFF
 
+      final Button okButton = getButton(IDialogConstants.OK_ID);
+
+      final boolean isExistingModel = _mapModel_Editing != null;
       final boolean isLiveUpdate    = _chkLiveUpdate.getSelection();
-      final boolean isNormalEditing = isLiveUpdate == false;
-      final boolean isEditModel     = _mapModel_Editing != null;
+
+      final boolean isDefaultModel  = isExistingModel && _mapModel_Editing.isDefaultModel;
+      final boolean isUserModel     = isDefaultModel == false;
+      final boolean isNormalEditing = isLiveUpdate == false  && isUserModel;
 
       _btnBrowseModelFilepath    .setEnabled(isNormalEditing);
 
-      _chkLiveUpdate             .setEnabled(isEditModel);
+      _chkLiveUpdate             .setEnabled(isExistingModel && isUserModel);
 
-      _labelDescription          .setEnabled(isNormalEditing);
+      _labelDescription          .setEnabled(true);
       _labelFilepath             .setEnabled(isNormalEditing);
       _labelName                 .setEnabled(isNormalEditing);
 
-      _txtDescription            .setEnabled(isNormalEditing);
+      _labelForwardAngle         .setEnabled(isUserModel);
+      _labelForwardAngleUnit     .setEnabled(isUserModel);
+      _labelHeadPositionFactor   .setEnabled(isUserModel);
+
+      _spinnerForwardAngle       .setEnabled(isUserModel);
+      _spinnerHeadPositionFactor .setEnabled(isUserModel);
+
+      _txtDescription            .setEnabled(true);
       _txtFilepath               .setEnabled(isNormalEditing);
       _txtName                   .setEnabled(isNormalEditing);
 
+      okButton                   .setEnabled(isUserModel);
 
 // SET_FORMATTING_ON
    }
@@ -475,7 +487,10 @@ public class DialogMapModel extends TitleAreaDialog {
       final Button okButton = getButton(IDialogConstants.OK_ID);
       final Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
 
-      if (isLiveUpdate()) {
+      final boolean isExistingModel = _mapModel_Editing != null;
+      final boolean isDefaultModel = isExistingModel && _mapModel_Editing.isDefaultModel;
+
+      if (isLiveUpdate() || isDefaultModel) {
 
          okButton.setVisible(false);
 

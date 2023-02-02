@@ -26,8 +26,6 @@ public class MapModel {
 
    private static final char NL = UI.NEW_LINE;
 
-   public String             id = UUID.randomUUID().toString();
-
    public String             name;
    public String             description;
 
@@ -42,6 +40,13 @@ public class MapModel {
     * The model length needs a factor that the top of the symbol is not before the geo location
     */
    public float              headPositionFactor;
+
+   /**
+    * Is <code>true</code> when this model is a default model which is provided by MT
+    */
+   public boolean            isDefaultModel;
+
+   public String             id = UUID.randomUUID().toString();
 
    @Override
    public boolean equals(final Object obj) {
@@ -94,6 +99,8 @@ public class MapModel {
 
             + "  forwardAngle       =" + forwardAngle + NL //        //$NON-NLS-1$
             + "  headPositionFactor =" + headPositionFactor + NL //  //$NON-NLS-1$
+
+            + "  isDefaultModel     =" + isDefaultModel + NL //      //$NON-NLS-1$
 
 //          + "  description        =" + description + NL //         //$NON-NLS-1$
       ;
