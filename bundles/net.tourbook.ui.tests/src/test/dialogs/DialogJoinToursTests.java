@@ -162,7 +162,7 @@ public class DialogJoinToursTests extends UITest {
       //Make sure that the tour doesn't contain any markers
       assertEquals(0, tableMarkers.rowCount());
 
-      //Open the Tour Marker View
+      //Open the Tour Pauses View
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode(Utils.TOURPAUSES_VIEW_NAME).select();
       bot.button("Open").click(); //$NON-NLS-1$
