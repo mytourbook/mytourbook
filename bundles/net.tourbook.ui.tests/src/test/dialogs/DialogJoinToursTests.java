@@ -105,6 +105,7 @@ public class DialogJoinToursTests extends UITest {
       openDialogJoinTours();
 
       bot.checkBox(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints).select();
+      bot.checkBox(Messages.Dialog_JoinTours_Checkbox_CreateTourMarker).select();
 
       Utils.clickOkButton(bot);
 
@@ -125,10 +126,10 @@ public class DialogJoinToursTests extends UITest {
       //Make sure that the tour contains all the markers
       assertEquals(4, tableMarkers.rowCount());
 
-      assertEquals("1:14:02", tableMarkers.cell(0, 1)); //$NON-NLS-1$
-      assertEquals("3:09:41", tableMarkers.cell(1, 1)); //$NON-NLS-1$
-      assertEquals("4:19:34", tableMarkers.cell(2, 1)); //$NON-NLS-1$
-      assertEquals("4:23:30", tableMarkers.cell(3, 1)); //$NON-NLS-1$
+      assertEquals("0:00", tableMarkers.cell(0, 1)); //$NON-NLS-1$
+      assertEquals("4:15:48", tableMarkers.cell(1, 1)); //$NON-NLS-1$
+      assertEquals("4:19:36", tableMarkers.cell(2, 1)); //$NON-NLS-1$
+      assertEquals("4:23:32", tableMarkers.cell(3, 1)); //$NON-NLS-1$
 
       deleteConcatenatedTour(tour);
    }
@@ -139,6 +140,7 @@ public class DialogJoinToursTests extends UITest {
       openDialogJoinTours();
 
       bot.checkBox(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints).deselect();
+      bot.checkBox(Messages.Dialog_JoinTours_Checkbox_CreateTourMarker).deselect();
 
       Utils.clickOkButton(bot);
 
