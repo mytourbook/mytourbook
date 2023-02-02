@@ -60,9 +60,9 @@ public class DialogJoinToursTests extends UITest {
 
       openDialogJoinTours();
 
-      bot.checkBox(Messages.Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints).deselect();
-
       //Assert the UI behavior
+
+      //Concatenate method
       bot.comboBox(0).setSelection(Messages.Dialog_JoinTours_ComboText_KeepTime);
       assertFalse(bot.label(Messages.Dialog_JoinTours_Label_TourDate).isEnabled());
       assertFalse(bot.dateTime(0).isEnabled());
@@ -75,8 +75,27 @@ public class DialogJoinToursTests extends UITest {
       assertTrue(bot.label(Messages.Dialog_JoinTours_Label_TourTime).isEnabled());
       assertTrue(bot.dateTime(1).isEnabled());
 
+      //Title
       bot.comboBox(1).setSelection(Messages.Dialog_JoinTours_ComboText_TourTitleFromTour);
       assertFalse(bot.textWithTooltip(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip).isEnabled());
+
+      bot.comboBox(1).setSelection(Messages.Dialog_JoinTours_ComboText_TourTitleCustom);
+      assertTrue(bot.textWithTooltip(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip).isEnabled());
+
+      //Tour Type
+      bot.comboBox(2).setSelection(Messages.Dialog_JoinTours_ComboText_TourTypeFromTour);
+      assertFalse(bot.link(0).isEnabled());
+      bot.comboBox(2).setSelection(Messages.Dialog_JoinTours_ComboText_TourTypePrevious);
+      assertFalse(bot.link(0).isEnabled());
+      bot.comboBox(2).setSelection(Messages.Dialog_JoinTours_ComboText_TourTypeCustom);
+      assertTrue(bot.link(0).isEnabled());
+
+      //Create marker at the start of each tour
+      bot.checkBox(Messages.Dialog_JoinTours_Checkbox_CreateTourMarker).select();
+      assertTrue(bot.comboBox(4).isEnabled());
+      assertEquals(3, bot.comboBox(4).itemCount());
+      bot.checkBox(Messages.Dialog_JoinTours_Checkbox_CreateTourMarker).deselect();
+      assertFalse(bot.comboBox(4).isEnabled());
 
       Utils.clickCancelButton(bot);
    }
