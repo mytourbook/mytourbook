@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,11 +24,11 @@ import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
-import net.tourbook.common.tooltip.ActionToolbarSlideout;
+import net.tourbook.common.tooltip.ActionToolbarSlideoutAdv;
+import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.common.tooltip.ICloseOpenedDialogs;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
-import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.map.MapManager;
@@ -55,7 +55,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Scale;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.ViewPart;
@@ -162,7 +162,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       }
    }
 
-   private class Action_SlideoutMapModel extends ActionToolbarSlideout {
+   private class Action_SlideoutMapModel extends ActionToolbarSlideoutAdv {
 
       private SlideoutMapModel __slideoutMapModel;
 
@@ -173,9 +173,9 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       }
 
       @Override
-      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+      protected AdvancedSlideout createSlideout(final ToolItem toolItem) {
 
-         __slideoutMapModel = new SlideoutMapModel(_parent, toolbar, _state);
+         __slideoutMapModel = new SlideoutMapModel(toolItem, _state);
 
          return __slideoutMapModel;
       }

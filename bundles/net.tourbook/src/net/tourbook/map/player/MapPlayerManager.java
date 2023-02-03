@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -46,6 +46,7 @@ public class MapPlayerManager {
 
    private static final int             DEFAULT_MOVING_SPEED             = 10;
 
+   private static final String          STATE_IS_PLAYER_RUNNING          = "STATE_IS_PLAYER_RUNNING";                                          //$NON-NLS-1$
    private static final String          STATE_IS_PLAYING_LOOP            = "STATE_IS_PLAYING_LOOP";                                            //$NON-NLS-1$
    private static final String          STATE_IS_RELIVE_PLAYING          = "STATE_IS_RELIVE_PLAYING";                                          //$NON-NLS-1$
    private static final String          STATE_JOG_WHEEL_SPEED            = "STATE_JOG_WHEEL_SPEED";                                            //$NON-NLS-1$
@@ -115,7 +116,7 @@ public class MapPlayerManager {
 
    private static boolean               _isAnimationVisible;
    private static boolean               _isPlayerEnabled;
-   private static boolean               _isPlayerRunning                 = true;
+   private static boolean               _isPlayerRunning;
 
    /**
     * When <code>true</code> then the model can be moving on the RETURN TRACK when it is between
@@ -859,6 +860,7 @@ public class MapPlayerManager {
 
 // SET_FORMATTING_OFF
 
+      _isPlayerRunning           = Util.getStateBoolean( _state, STATE_IS_PLAYER_RUNNING,          true);
       _isPlayingLoop             = Util.getStateBoolean( _state, STATE_IS_PLAYING_LOOP,            false);
       _isReLivePlaying           = Util.getStateBoolean( _state, STATE_IS_RELIVE_PLAYING,          false);
       _jogWheelSpeed             = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED,            DEFAULT_MOVING_SPEED);
@@ -876,6 +878,7 @@ public class MapPlayerManager {
 
 // SET_FORMATTING_OFF
 
+      _state.put(STATE_IS_PLAYER_RUNNING,          _isPlayerRunning);
       _state.put(STATE_IS_PLAYING_LOOP,            _isPlayingLoop);
       _state.put(STATE_IS_RELIVE_PLAYING,          _isReLivePlaying);
       _state.put(STATE_JOG_WHEEL_SPEED,            _jogWheelSpeed);

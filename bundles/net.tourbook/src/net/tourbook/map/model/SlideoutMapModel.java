@@ -19,9 +19,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
-import net.tourbook.common.font.MTFont;
-import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.util.Util;
+import net.tourbook.common.tooltip.AdvancedSlideout;
 import net.tourbook.map25.Map25FPSManager;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -48,35 +46,26 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 
 /**
  * Slideout for map models
  */
-public class SlideoutMapModel extends ToolbarSlideout {
+public class SlideoutMapModel extends AdvancedSlideout {
 
-   private static final String NUMBER_OF_VISIBLE_MODEL_ITEMS   = "NUMBER_OF_VISIBLE_MODEL_ITEMS";//$NON-NLS-1$
+   private TableViewer    _modelViewer;
 
-   private static final int    NUM_VISIBLE_MODEL_ITEMS_DEFAULT = 20;
-   private static final int    NUM_VISIBLE_MODEL_ITEMS_MIN     = 3;
-   private static final int    NUM_VISIBLE_MODEL_ITEMS_MAX     = 100;
+   private boolean        _isInUpdateUI;
 
-   private IDialogSettings     _state;
+   private ToolItem       _toolItem;
 
-   private TableViewer         _modelViewer;
-
-   private int                 _numVisibleModelItems;
-
-   private boolean             _isInUpdateUI;
-
-   private PixelConverter      _pc;
+   private PixelConverter _pc;
 
    /*
     * UI controls
@@ -87,8 +76,6 @@ public class SlideoutMapModel extends ToolbarSlideout {
    private Button    _btnAdd;
    private Button    _btnDelete;
    private Button    _btnEdit;
-
-   private Spinner   _spinnerNumModelItems;
 
    private class ModelComparator extends ViewerComparator {
 
@@ -132,31 +119,27 @@ public class SlideoutMapModel extends ToolbarSlideout {
     * @param toolBar
     * @param state
     */
-   public SlideoutMapModel(final Control ownerControl,
-                           final ToolBar toolBar,
+   public SlideoutMapModel(final ToolItem toolItem,
                            final IDialogSettings state) {
 
-      super(ownerControl, toolBar);
+      super(toolItem.getParent(), state, new int[] { 300, 200 });
 
-      _state = state;
-   }
+      _toolItem = toolItem;
 
-   private void createActions() {
+      setTitleText(Messages.Slideout_MapModel_Label_Title);
 
+      // prevent that the opened slideout is partly hidden
+      setIsForceBoundsToBeInsideOfViewport(true);
    }
 
    @Override
-   protected Composite createToolTipContentArea(final Composite parent) {
+   protected void createSlideoutContent(final Composite parent) {
 
       _parent = parent;
 
       initUI(parent);
 
-      createActions();
-
-      restoreState_BeforeUI();
-
-      final Composite ui = createUI(parent);
+      createUI(parent);
 
       // fill viewer
       _modelViewer.setInput(new Object());
@@ -165,47 +148,27 @@ public class SlideoutMapModel extends ToolbarSlideout {
       Map25FPSManager.setBackgroundFPSToAnimationFPS(true);
 
       restoreState();
-
-      return ui;
    }
 
-   private Composite createUI(final Composite parent) {
+   private void createUI(final Composite parent) {
 
-      final Composite shellContainer = new Composite(parent, SWT.NONE);
-      GridLayoutFactory.swtDefaults().applyTo(shellContainer);
+      final Composite container = new Composite(parent, SWT.NONE);
+      GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
+      GridLayoutFactory.fillDefaults().applyTo(container);
+//      container.setBackground(UI.SYS_COLOR_GREEN);
       {
-         final Composite container = new Composite(shellContainer, SWT.NONE);
-         GridDataFactory.fillDefaults().applyTo(container);
-         GridLayoutFactory.fillDefaults().applyTo(container);
-//			container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-         {
-            createUI_10_Title(container);
-
-            createUI_50_ModelViewer(container);
-            createUI_60_ModelActions(container);
-
-            createUI_70_Options(container);
-
-         }
+         createUI_20_ModelViewer(container);
+         createUI_30_ModelActions(container);
       }
-
-      return shellContainer;
    }
 
-   private void createUI_10_Title(final Composite parent) {
-
-      /*
-       * Label: Slideout title
-       */
-      final Label label = new Label(parent, SWT.NONE);
-      label.setText(Messages.Slideout_MapModel_Label_Title);
-      MTFont.setBannerFont(label);
-   }
-
-   private void createUI_50_ModelViewer(final Composite parent) {
+   private void createUI_20_ModelViewer(final Composite parent) {
 
       _viewerLayoutContainer = new Composite(parent, SWT.NONE);
-      updateUI_ViewerContainerLayout(_viewerLayoutContainer);
+      GridDataFactory.fillDefaults()
+            .grab(true, true)
+            .hint(_pc.convertWidthInCharsToPixels(50), _pc.convertHeightInCharsToPixels(10))
+            .applyTo(_viewerLayoutContainer);
 
       final TableColumnLayout tableLayout = new TableColumnLayout();
       _viewerLayoutContainer.setLayout(tableLayout);
@@ -291,7 +254,7 @@ public class SlideoutMapModel extends ToolbarSlideout {
       });
    }
 
-   private void createUI_60_ModelActions(final Composite parent) {
+   private void createUI_30_ModelActions(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults()
@@ -336,58 +299,29 @@ public class SlideoutMapModel extends ToolbarSlideout {
       }
    }
 
-   private void createUI_70_Options(final Composite parent) {
-
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory
-            .fillDefaults()//
-            .grab(true, false)
-            .indent(0, 10)
-            .applyTo(container);
-      GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-//		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_YELLOW));
-      {
-         createUI_74_Options_NumItems(container);
-      }
-   }
-
-   private void createUI_74_Options_NumItems(final Composite parent) {
-
-      {
-         /*
-          * Number of model list entries
-          */
-
-         // Label
-         final Label label = new Label(parent, SWT.NONE);
-         label.setText(Messages.Slideout_MapModel_Label_NumModelListItems);
-         label.setToolTipText(Messages.Slideout_MapModel_Label_NumModelListItems_Tooltip);
-
-         // Spinner
-         _spinnerNumModelItems = new Spinner(parent, SWT.BORDER);
-         _spinnerNumModelItems.setMinimum(NUM_VISIBLE_MODEL_ITEMS_MIN);
-         _spinnerNumModelItems.setMaximum(NUM_VISIBLE_MODEL_ITEMS_MAX);
-         _spinnerNumModelItems.setPageIncrement(5);
-
-         _spinnerNumModelItems.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onChangeUI_ViewerLayout()));
-         _spinnerNumModelItems.addMouseWheelListener(mouseEvent -> {
-
-            UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
-
-            onChangeUI_ViewerLayout();
-         });
-      }
-   }
-
    private void enableActions() {
 
       final MapModel selectedModel = getSelectedModel();
 
       final boolean isModelSelected = selectedModel != null;
+      final boolean isDefaultModel = isModelSelected && selectedModel.isDefaultModel;
+      final boolean isUserModel = isDefaultModel == false;
 
       _btnAdd.setEnabled(true);
-      _btnDelete.setEnabled(isModelSelected);
+      _btnDelete.setEnabled(isModelSelected && isUserModel);
       _btnEdit.setEnabled(isModelSelected);
+   }
+
+   @Override
+   protected Rectangle getParentBounds() {
+
+      final Rectangle itemBounds = _toolItem.getBounds();
+      final Point itemDisplayPosition = _toolItem.getParent().toDisplay(itemBounds.x, itemBounds.y);
+
+      itemBounds.x = itemDisplayPosition.x;
+      itemBounds.y = itemDisplayPosition.y;
+
+      return itemBounds;
    }
 
    private MapModel getSelectedModel() {
@@ -401,32 +335,6 @@ public class SlideoutMapModel extends ToolbarSlideout {
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
-
-//      _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
-//
-//      _defaultMouseWheelListener = mouseEvent -> {
-//
-//         UI.adjustSpinnerValueOnMouseScroll(mouseEvent);
-//
-//         onChangeUI();;
-//      };
-   }
-
-   private void onChangeUI() {
-
-      saveState();
-
-      enableActions();
-   }
-
-   private void onChangeUI_ViewerLayout() {
-
-      onChangeUI();
-
-      updateUI_ViewerContainerLayout(_viewerLayoutContainer);
-
-      // set slideout size with new visible rows
-      _parent.getShell().pack(true);
    }
 
    @Override
@@ -434,6 +342,14 @@ public class SlideoutMapModel extends ToolbarSlideout {
 
       // reset to default background FPS
       Map25FPSManager.setBackgroundFPSToAnimationFPS(false);
+   }
+
+   @Override
+   protected void onFocus() {
+
+      Map25FPSManager.setBackgroundFPSToAnimationFPS(true);
+
+      _modelViewer.getTable().setFocus();
    }
 
    private void onModel_Add() {
@@ -526,8 +442,6 @@ public class SlideoutMapModel extends ToolbarSlideout {
 
    private void restoreState() {
 
-      _spinnerNumModelItems.setSelection(_numVisibleModelItems);
-
       _isInUpdateUI = true;
       {
          updateUI_ModelViewer(MapModelManager.getActiveModel());
@@ -537,16 +451,11 @@ public class SlideoutMapModel extends ToolbarSlideout {
       enableActions();
    }
 
-   private void restoreState_BeforeUI() {
+   @Override
+   protected void saveState() {
 
-      _numVisibleModelItems = Util.getStateInt(_state, NUMBER_OF_VISIBLE_MODEL_ITEMS, NUM_VISIBLE_MODEL_ITEMS_DEFAULT);
-   }
-
-   private void saveState() {
-
-      _numVisibleModelItems = _spinnerNumModelItems.getSelection();
-
-      _state.put(NUMBER_OF_VISIBLE_MODEL_ITEMS, _numVisibleModelItems);
+      // save slideout position/size
+      super.saveState();
    }
 
    private void updateUI_ModelViewer(final MapModel selectedModel) {
@@ -556,17 +465,6 @@ public class SlideoutMapModel extends ToolbarSlideout {
 
       // reselect model
       _modelViewer.setSelection(new StructuredSelection(selectedModel), true);
-   }
-
-   private void updateUI_ViewerContainerLayout(final Composite viewerLayoutContainer) {
-
-      GridDataFactory.fillDefaults()
-
-            .hint(
-                  _pc.convertWidthInCharsToPixels(50),
-                  _pc.convertHeightInCharsToPixels((int) (_numVisibleModelItems * 1.4)))
-
-            .applyTo(viewerLayoutContainer);
    }
 
 }
