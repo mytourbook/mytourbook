@@ -543,7 +543,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
 //    skybox = new SceneSkybox(environmentCubemap);
 //    sceneManager.setSkyBox(skybox);
 
-      setupScene_RunningInGLThread(MapModelManager.getActiveModel());
+      setupScene_RunningInGLThread(MapModelManager.getSelectedModel());
 
       return true;
    }

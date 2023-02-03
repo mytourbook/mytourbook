@@ -63,7 +63,15 @@ public class MapModelManager {
    private static final String        ATTR_IS_DEFAULT_MODEL         = "isDefaultModel";                       //$NON-NLS-1$
    private static final String        ATTR_NAME                     = "name";                                 //$NON-NLS-1$
 
+   private static final String        TAG_OPTIONS                   = "Options";                              //$NON-NLS-1$
+   private static final String        ATTR_SELECTED_MODEL_ID        = "selectedModelId";                      //$NON-NLS-1$
+
    public static final String         MAP_MODEL_FILE_EXTENTION      = "gltf";                                 //$NON-NLS-1$
+
+   /**
+    * Model ID for the skateboard model
+    */
+   private static final String        DEFAULT_DEFAULT_MODEL_ID      = "35417da1-d92a-4c33-8d0f-41e2d81d94bd"; //$NON-NLS-1$
 
    private static final Bundle        _bundle                       = TourbookPlugin.getDefault().getBundle();
    private static final IPath         _stateLocation                = Platform.getStateLocation(_bundle);
@@ -73,7 +81,7 @@ public class MapModelManager {
     */
    private static ArrayList<MapModel> _allMapModels                 = new ArrayList<>();
 
-   private static MapModel            _activeModel;
+   private static MapModel            _selectedModel;
 
    private static GLTFModel_Renderer  _gltfModelRenderer;
 
@@ -127,16 +135,6 @@ public class MapModelManager {
       return null;
    }
 
-   public static MapModel getActiveModel() {
-
-      if (_activeModel == null) {
-
-         _activeModel = getAllModels().get(0);
-      }
-
-      return _activeModel;
-   }
-
    public static ArrayList<MapModel> getAllModels() {
 
       if (_allMapModels.size() == 0) {
@@ -144,6 +142,17 @@ public class MapModelManager {
       }
 
       return _allMapModels;
+   }
+
+   public static MapModel getSelectedModel() {
+
+      if (_selectedModel == null) {
+
+         // load models and set the selected model
+         getAllModels();
+      }
+
+      return _selectedModel;
    }
 
    private static File getUserConfigFile() {
@@ -192,7 +201,8 @@ public class MapModelManager {
          }
 
          // parse xml
-         restoreState_20_ParseMapModels(xmlRoot);
+         restoreState_50_ParseMapModels(xmlRoot);
+         restoreState_60_ParseOptions(xmlRoot);
 
       } catch (final Exception e) {
          StatusUtil.log(e);
@@ -205,7 +215,7 @@ public class MapModelManager {
     * @param xmlRoot
     *           Can be <code>null</code> when not available
     */
-   private static void restoreState_20_ParseMapModels(final XMLMemento xmlRoot) {
+   private static void restoreState_50_ParseMapModels(final XMLMemento xmlRoot) {
 
       final XMLMemento xmlAllModels = (XMLMemento) xmlRoot.getChild(TAG_ALL_MAP_MODELS);
 
@@ -261,16 +271,39 @@ public class MapModelManager {
       }
    }
 
+   private static void restoreState_60_ParseOptions(final XMLMemento xmlRoot) {
+
+      final XMLMemento xmlOptions = (XMLMemento) xmlRoot.getChild(TAG_OPTIONS);
+
+      String xmlModelId = null;
+
+      if (xmlOptions != null) {
+
+         xmlModelId = Util.getXmlString(xmlOptions, ATTR_SELECTED_MODEL_ID, DEFAULT_DEFAULT_MODEL_ID);
+      }
+
+      setSelectedModel(xmlModelId);
+   }
+
    public static void saveState() {
 
       final XMLMemento xmlRoot = create_Root();
 
-      saveState_MapModels(xmlRoot);
+      saveState_10_Options(xmlRoot);
+      saveState_20_MapModels(xmlRoot);
 
       Util.writeXml(xmlRoot, getUserConfigFile());
    }
 
-   private static void saveState_MapModels(final XMLMemento xmlRoot) {
+   private static void saveState_10_Options(final XMLMemento xmlRoot) {
+
+      // <Options>
+      final IMemento xmlOptions = xmlRoot.createChild(TAG_OPTIONS);
+
+      xmlOptions.putString(ATTR_SELECTED_MODEL_ID, getSelectedModel().id);
+   }
+
+   private static void saveState_20_MapModels(final XMLMemento xmlRoot) {
 
       // <AllMapModels>
       final IMemento xmlAllMapModels = xmlRoot.createChild(TAG_ALL_MAP_MODELS);
@@ -317,24 +350,50 @@ public class MapModelManager {
     */
    public static void setSelectedModel(final MapModel selectedModel) {
 
-      if (_activeModel == selectedModel) {
+      if (_selectedModel == selectedModel) {
 
          // model is already selected -> nothing to do
 
          return;
       }
 
-      _activeModel = selectedModel;
+      _selectedModel = selectedModel;
 
       _gltfModelRenderer.setupScene(selectedModel);
    }
 
+   private static void setSelectedModel(final String selectedModelId) {
+
+      for (final MapModel mapModel : _allMapModels) {
+
+         if (mapModel.id.equals(selectedModelId)) {
+            _selectedModel = mapModel;
+            break;
+         }
+      }
+
+      if (_selectedModel == null) {
+
+         for (final MapModel mapModel : _allMapModels) {
+
+            if (mapModel.id.equals(DEFAULT_DEFAULT_MODEL_ID)) {
+               _selectedModel = mapModel;
+               break;
+            }
+         }
+
+         if (_selectedModel == null) {
+            throw new RuntimeException("[MapModelManager] The default default model is not available");
+         }
+      }
+   }
+
    /**
-    * Update UI from the {@link #_activeModel}
+    * Update UI from the {@link #_selectedModel}
     */
    public static void updateUI() {
 
-      _gltfModelRenderer.updateUI_ModelProperties(_activeModel);
+      _gltfModelRenderer.updateUI_ModelProperties(_selectedModel);
    }
 
 }

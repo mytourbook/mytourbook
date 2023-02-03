@@ -444,7 +444,7 @@ public class SlideoutMapModel extends AdvancedSlideout {
 
       _isInUpdateUI = true;
       {
-         updateUI_ModelViewer(MapModelManager.getActiveModel());
+         updateUI_ModelViewer(MapModelManager.getSelectedModel());
       }
       _isInUpdateUI = false;
 
