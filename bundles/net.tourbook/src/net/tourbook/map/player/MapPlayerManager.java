@@ -41,7 +41,7 @@ public class MapPlayerManager {
     * Max value for the scale control which cannot have negative values but the speed can be
     * negative.
     */
-   static final int                     SPEED_JOG_WHEEL_MAX              = 200;
+   static final int                     SPEED_JOG_WHEEL_MAX              = 2 * 100;
    static final int                     SPEED_JOG_WHEEL_MAX_HALF         = SPEED_JOG_WHEEL_MAX / 2;
 
    private static final int             DEFAULT_MOVING_SPEED             = 10;
@@ -54,6 +54,7 @@ public class MapPlayerManager {
    private static final String          STATE_MODEL_CURSOR_SIZE          = "STATE_MODEL_CURSOR_SIZE";                                          //$NON-NLS-1$
    private static final String          STATE_MODEL_SIZE_FIXED           = "STATE_MODEL_SIZE_FIXED";                                           //$NON-NLS-1$
    private static final String          STATE_MODEL_TURNING_ANGLE        = "STATE_MODEL_TURNING_ANGLE";                                        //$NON-NLS-1$
+   private static final String          STATE_RELATIVE_POSITION          = "STATE_RELATIVE_POSITION";                                          //$NON-NLS-1$
    //
    private static final IDialogSettings _state                           = TourbookPlugin.getState("net.tourbook.map.player.MapPlayerManager");//$NON-NLS-1$
 
@@ -868,6 +869,7 @@ public class MapPlayerManager {
       _modelSize_Fixed           = Util.getStateInt(     _state, STATE_MODEL_SIZE_FIXED,           200);
       _modelCursorSize           = Util.getStateInt(     _state, STATE_MODEL_CURSOR_SIZE,          200);
       _modelTurningAngle         = Util.getStateFloat(   _state, STATE_MODEL_TURNING_ANGLE,        2.0f);
+      _relativePosition_Current  = Util.getStateDouble(  _state, STATE_RELATIVE_POSITION,          0);
 
 // SET_FORMATTING_ON
 
@@ -886,6 +888,7 @@ public class MapPlayerManager {
       _state.put(STATE_MODEL_SIZE_FIXED,           _modelSize_Fixed);
       _state.put(STATE_MODEL_CURSOR_SIZE,          _modelCursorSize);
       _state.put(STATE_MODEL_TURNING_ANGLE,        _modelTurningAngle);
+      _state.put(STATE_RELATIVE_POSITION,          _relativePosition_Current);
 
 // SET_FORMATTING_ON
 
@@ -965,7 +968,7 @@ public class MapPlayerManager {
 
       if (Math.abs(angleDiff) > _modelTurningAngle) {
 
-         // default angle is larger than the min smooth angle
+         // the next angle is larger than the min smooth angle
          // -> smoothout the animation with a smallers angle
 
          /*

@@ -427,7 +427,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
       /*
        * Compute model scale
        */
-      float modelScale;
+      float modelSize;
 
       final double latitude = MercatorProjection.toLatitude(_currentMapPosition.y);
       final float groundScale = (float) MercatorProjection.groundResolutionWithScale(latitude, mapScale);
@@ -448,31 +448,31 @@ public class GLTFModel_Renderer extends LayerRenderer {
           */
          if (vp2mp < 1.0) {
 
-            modelScale = vp2mpModelSize / 2;
+            modelSize = vp2mpModelSize / 2;
 
          } else if (vp2mp > 2.0) {
 
-            modelScale = vp2mpModelSize * 2;
+            modelSize = vp2mpModelSize * 2;
 
          } else {
 
-            modelScale = vp2mpModelSize;
+            modelSize = vp2mpModelSize;
          }
 
-         modelScale /= _modelBoundingBox_MinMaxDistance;
+         modelSize /= _modelBoundingBox_MinMaxDistance;
 
       } else {
 
-         modelScale = 1f / groundScale;
+         modelSize = 1f / groundScale;
 
          /*
           * Adjust to a normalized size which depends on the model size because the models can have
           * big size differences
           */
-         modelScale /= _modelBoundingBox_MinMaxDistance;
+         modelSize /= _modelBoundingBox_MinMaxDistance;
 
          // increase model size to be more visible
-         modelScale *= 100;
+         modelSize *= 100;
       }
 
       /**
@@ -489,10 +489,11 @@ public class GLTFModel_Renderer extends LayerRenderer {
       float animationAngle = -MapPlayerManager.getModelAngle();
       animationAngle += _modelForwardAngle;
 
-      final double halfSize = modelScale / 2;
+      final double modelHalfSize = modelSize / 2;
       final float modelCenterToForwardFactor = _modelCenterToForwardFactor == 0 ? 0.001f : _modelCenterToForwardFactor;
 
-      final double center2BorderSize = halfSize * modelCenterToForwardFactor;
+      final double center2BorderSize = modelHalfSize * modelCenterToForwardFactor;
+
       final float forwardX = (float) (center2BorderSize * MathUtils.cosDeg(animationAngle));
       final float forwardY = (float) (center2BorderSize * MathUtils.sinDeg(animationAngle));
 
@@ -501,7 +502,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
       // reset matrix to identity matrix
       modelTransform.idt();
 
-      modelTransform.scale(modelScale, modelScale, modelScale);
+      modelTransform.scale(modelSize, modelSize, modelSize);
 
       modelTransform.rotate(1, 0, 0, 90);
       modelTransform.rotate(0, 1, 0, animationAngle);

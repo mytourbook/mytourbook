@@ -317,7 +317,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
          {
             _scaleTimeline = new Scale(container, SWT.HORIZONTAL);
             _scaleTimeline.setMinimum(0);
-            _scaleTimeline.setMaximum(10);
+            _scaleTimeline.setMaximum(100);
             _scaleTimeline.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onTimeline_Selection()));
             _scaleTimeline.addKeyListener(keyPressedAdapter(keyEvent -> onTimeline_Key(keyEvent)));
             _scaleTimeline.addMouseWheelListener(mouseEvent -> onTimeline_MouseWheel(mouseEvent));
@@ -351,7 +351,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
             _scaleSpeedJogWheel = new Scale(container, SWT.HORIZONTAL);
             _scaleSpeedJogWheel.setMinimum(0);
             _scaleSpeedJogWheel.setMaximum(MapPlayerManager.SPEED_JOG_WHEEL_MAX);
-            _scaleSpeedJogWheel.setPageIncrement(10);
+            _scaleSpeedJogWheel.setPageIncrement(4);
             _scaleSpeedJogWheel.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSpeedJogWheel_Selection()));
             _scaleSpeedJogWheel.addKeyListener(keyPressedAdapter(keyEvent -> onSpeedJogWheel_Key(keyEvent)));
             _scaleSpeedJogWheel.addMouseWheelListener(mouseEvent -> onSpeedJogWheel_MouseWheel(mouseEvent));
