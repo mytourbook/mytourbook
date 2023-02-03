@@ -461,6 +461,17 @@ public class Util {
    }
 
    /**
+    * Convert Java newline into \n.
+    *
+    * @param text
+    * @return
+    */
+   public static String convertLineBreaks(final String text) {
+
+      return text.replaceAll("\\r\\n|\\r|\\n", "\\\n"); //$NON-NLS-1$ //$NON-NLS-2$
+   }
+
+   /**
     * Converts a list of strings into a comma-separated string.
     *
     * @param allTexts

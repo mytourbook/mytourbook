@@ -144,6 +144,19 @@ public class MapModelManager {
       return _allMapModels;
    }
 
+   public static MapModel getDefaultDefaultModel() {
+
+      for (final MapModel mapModel : getAllModels()) {
+
+         if (mapModel.id.equals(DEFAULT_DEFAULT_MODEL_ID)) {
+            return mapModel;
+         }
+      }
+
+      // this should not happen
+      throw new RuntimeException("The default default model is not available"); //$NON-NLS-1$
+   }
+
    public static MapModel getSelectedModel() {
 
       if (_selectedModel == null) {
@@ -383,7 +396,7 @@ public class MapModelManager {
          }
 
          if (_selectedModel == null) {
-            throw new RuntimeException("[MapModelManager] The default default model is not available");
+            throw new RuntimeException("The default default model is not available");
          }
       }
    }

@@ -38,6 +38,8 @@ import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
 import net.mgsx.gltf.scene3d.scene.SceneModel;
 import net.mgsx.gltf.scene3d.utils.IBLBuilder;
+import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.Util;
 import net.tourbook.map.model.MapModel;
 import net.tourbook.map.model.MapModelManager;
 import net.tourbook.map.player.MapPlayerManager;
@@ -571,7 +573,28 @@ public class GLTFModel_Renderer extends LayerRenderer {
       /*
        * Load GLTF model
        */
-      _sceneAsset = new GLTFLoader().load(Gdx.files.absolute(mapModel.filepath));
+      try {
+
+         _sceneAsset = new GLTFLoader().load(Gdx.files.absolute(mapModel.filepath));
+
+      } catch (final Exception e) {
+
+         // model could not be loaded -> load default default model
+
+         String stackTrace = Util.getStackTrace(e);
+         stackTrace = Util.convertLineBreaks(stackTrace);
+
+         StatusUtil.showStatus(String.format(
+
+               "Model \"%s\" with file path \"%s\"could not be loaded, using now the default default model\n\n%s", //$NON-NLS-1$
+               mapModel.name,
+               mapModel.filepath,
+               stackTrace));
+
+         final MapModel defaultModel = MapModelManager.getDefaultDefaultModel();
+
+         _sceneAsset = new GLTFLoader().load(Gdx.files.absolute(defaultModel.filepath));
+      }
 
       updateUI_ModelProperties(mapModel);
 
