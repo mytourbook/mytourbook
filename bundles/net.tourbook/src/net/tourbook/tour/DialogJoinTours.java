@@ -27,6 +27,8 @@ import java.util.Set;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
 import net.tourbook.common.time.TimeTools;
@@ -45,6 +47,7 @@ import net.tourbook.tag.TagMenuManager;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
+import net.tourbook.ui.views.rawData.DialogUtils;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.jface.action.MenuManager;
@@ -59,12 +62,15 @@ import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DateTime;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
@@ -73,42 +79,42 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
-   private static final String   STATE_TOUR_TITLE                       = "Title";                         //$NON-NLS-1$
-   private static final String   STATE_TOUR_TYPE_ID                     = "TourTypeId";                    //$NON-NLS-1$
-   private static final String   STATE_PERSON_ID                        = "PersonId";                      //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE                       = "Title";                                                          //$NON-NLS-1$
+   private static final String   STATE_TOUR_TYPE_ID                     = "TourTypeId";                                                     //$NON-NLS-1$
+   private static final String   STATE_PERSON_ID                        = "PersonId";                                                       //$NON-NLS-1$
 
-   private static final String   STATE_IS_INCLUDE_DESCRIPTION           = "isIncludeDescription";          //$NON-NLS-1$
-   private static final String   STATE_IS_INCLUDE_MARKER_WAYPOINTS      = "isIncludeMarkerWaypoints";      //$NON-NLS-1$
-   private static final String   STATE_IS_CREATE_TOUR_MARKER            = "isCreateTourMarker";            //$NON-NLS-1$
+   private static final String   STATE_IS_INCLUDE_DESCRIPTION           = "isIncludeDescription";                                           //$NON-NLS-1$
+   private static final String   STATE_IS_INCLUDE_MARKER_WAYPOINTS      = "isIncludeMarkerWaypoints";                                       //$NON-NLS-1$
+   private static final String   STATE_IS_CREATE_TOUR_MARKER            = "isCreateTourMarker";                                             //$NON-NLS-1$
 
-   private static final String   STATE_JOIN_METHOD                      = "JoinMethod";                    //$NON-NLS-1$
-   private static final String   STATE_JOIN_METHOD_ORIGINAL             = "original";                      //$NON-NLS-1$
-   private static final String   STATE_JOIN_METHOD_CONCATENATED         = "concatenated";                  //$NON-NLS-1$
+   private static final String   STATE_JOIN_METHOD                      = "JoinMethod";                                                     //$NON-NLS-1$
+   private static final String   STATE_JOIN_METHOD_ORIGINAL             = "original";                                                       //$NON-NLS-1$
+   private static final String   STATE_JOIN_METHOD_CONCATENATED         = "concatenated";                                                   //$NON-NLS-1$
 
-   private static final String   STATE_TOUR_TITLE_SOURCE                = "TourTitleSource";               //$NON-NLS-1$
-   private static final String   STATE_TOUR_TITLE_SOURCE_FROM_TOUR      = "fromTour";                      //$NON-NLS-1$
-   private static final String   STATE_TOUR_TITLE_SOURCE_CUSTOM         = "custom";                        //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE_SOURCE                = "TourTitleSource";                                                //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE_SOURCE_FROM_TOUR      = "fromTour";                                                       //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE_SOURCE_CUSTOM         = "custom";                                                         //$NON-NLS-1$
 
-   private static final String   STATE_TYPE_SOURCE                      = "TourTypeSource";                //$NON-NLS-1$
-   private static final String   STATE_TYPE_SOURCE_FROM_SELECTED_TOURS  = "fromTour";                      //$NON-NLS-1$
-   private static final String   STATE_TYPE_SOURCE_PREVIOUS_JOINED_TOUR = "previous";                      //$NON-NLS-1$
-   private static final String   STATE_TYPE_SOURCE_CUSTOM               = "custom";                        //$NON-NLS-1$
+   private static final String   STATE_TYPE_SOURCE                      = "TourTypeSource";                                                 //$NON-NLS-1$
+   private static final String   STATE_TYPE_SOURCE_FROM_SELECTED_TOURS  = "fromTour";                                                       //$NON-NLS-1$
+   private static final String   STATE_TYPE_SOURCE_PREVIOUS_JOINED_TOUR = "previous";                                                       //$NON-NLS-1$
+   private static final String   STATE_TYPE_SOURCE_CUSTOM               = "custom";                                                         //$NON-NLS-1$
 
-   private static final String   STATE_MARKER_TYPE                      = "TourMarkerType";                //$NON-NLS-1$
-   private static final String   STATE_MARKER_TYPE_SMALL                = "small";                         //$NON-NLS-1$
-   private static final String   STATE_MARKER_TYPE_MEDIUM               = "medium";                        //$NON-NLS-1$
-   private static final String   STATE_MARKER_TYPE_LARGE                = "large";                         //$NON-NLS-1$
+   private static final String   STATE_MARKER_TYPE                      = "TourMarkerType";                                                 //$NON-NLS-1$
+   private static final String   STATE_MARKER_TYPE_SMALL                = "small";                                                          //$NON-NLS-1$
+   private static final String   STATE_MARKER_TYPE_MEDIUM               = "medium";                                                         //$NON-NLS-1$
+   private static final String   STATE_MARKER_TYPE_LARGE                = "large";                                                          //$NON-NLS-1$
 
    /**
     * state: join method
     */
    private static final String[] ALL_STATES_JOIN_METHOD                 = new String[] {
          STATE_JOIN_METHOD_ORIGINAL,
-         STATE_JOIN_METHOD_CONCATENATED                                                                    //
+         STATE_JOIN_METHOD_CONCATENATED                                                                                                     //
    };
    private static final String[] STATE_TEXT_JOIN_METHOD                 = new String[] {
          Messages.Dialog_JoinTours_ComboText_KeepTime,
-         Messages.Dialog_JoinTours_ComboText_ConcatenateTime                                               //
+         Messages.Dialog_JoinTours_ComboText_ConcatenateTime                                                                                //
    };
 
    /**
@@ -116,7 +122,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
     */
    private static final String[] ALL_STATES_TOUR_TILE_SOURCE            = new String[] {
          STATE_TOUR_TITLE_SOURCE_FROM_TOUR,
-         STATE_TOUR_TITLE_SOURCE_CUSTOM,                                                                   //
+         STATE_TOUR_TITLE_SOURCE_CUSTOM,                                                                                                    //
    };
    private static final String[] STATE_COMBO_TEXT_TOUR_TITLE_SOURCE     = new String[] {
          Messages.Dialog_JoinTours_ComboText_TourTitleFromTour,
@@ -130,12 +136,12 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    private static final String[] ALL_STATES_TOUR_TYPE                   = new String[] {
          STATE_TYPE_SOURCE_FROM_SELECTED_TOURS,
          STATE_TYPE_SOURCE_PREVIOUS_JOINED_TOUR,
-         STATE_TYPE_SOURCE_CUSTOM                                                                          //
+         STATE_TYPE_SOURCE_CUSTOM                                                                                                           //
    };
    private static final String[] STATE_TEXT_TOUR_TYPE_SOURCE            = new String[] {
          Messages.Dialog_JoinTours_ComboText_TourTypeFromTour,
          Messages.Dialog_JoinTours_ComboText_TourTypePrevious,
-         Messages.Dialog_JoinTours_ComboText_TourTypeCustom                                                //
+         Messages.Dialog_JoinTours_ComboText_TourTypeCustom                                                                                 //
    };
 
    /**
@@ -144,11 +150,11 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    private static final String[] ALL_STATES_TOUR_MARKER                 = new String[] {
          STATE_MARKER_TYPE_SMALL,
          STATE_MARKER_TYPE_MEDIUM,
-         STATE_MARKER_TYPE_LARGE                                                                           //
+         STATE_MARKER_TYPE_LARGE                                                                                                            //
    };
 
    private final IDialogSettings _state                                 = TourbookPlugin
-         .getState("DialogJoinTours");                                                                     //$NON-NLS-1$
+         .getState("DialogJoinTours");                                                                                                      //$NON-NLS-1$
 
    private TagMenuManager        _tagMenuMgr;
    private ActionOpenPrefDialog  _actionOpenTourTypePrefs;
@@ -168,36 +174,43 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
    private ITourEventListener    _tourEventListener;
 
+   private Image                 _imageLock_Closed                      = CommonActivator.getThemedImageDescriptor(CommonImages.Lock_Closed)
+         .createImage();
+
    /*
     * UI controls
     */
-   private Composite                        _dlgInnerContainer;
+   private Button    _btnUnlockDeleteSourceToursSelection;
 
-   private Combo                            _cboJoinMethod;
+   private Button    _chkCreateTourMarker;
+   private Button    _chkDeleteSourceTours;
+   private Button    _chkIncludeDescription;
+   private Button    _chkIncludeMarkerWaypoints;
 
-   private Combo                            _cboTourTitleSource;
-   private Text                             _txtTourTitle;
+   private Combo     _cboPerson;
+   private Combo     _cboTourMarker;
+   private Combo     _cboJoinMethod;
+   private Combo     _cboTourTitleSource;
+   private Combo     _cboTourType;
 
-   private Label                            _lblTourStartDate;
-   private Label                            _lblTourStartTime;
-   private org.eclipse.swt.widgets.DateTime _dtTourDate;
-   private org.eclipse.swt.widgets.DateTime _dtTourTime;
+   private Composite _dlgInnerContainer;
+   private DateTime  _dtTourDate;
+   private DateTime  _dtTourTime;
 
-   private Combo                            _cboTourType;
-   private Link                             _linkTourType;
-   private CLabel                           _lblTourType;
+   private Label     _lblMarkerText;
+   private Label     _lblTourStartDate;
+   private Label     _lblTourStartTime;
+   private Label     _lblTourTags;
+   private CLabel    _lblTourType;
 
-   private Link                             _linkTag;
-   private Label                            _lblTourTags;
+   private Link      _linkTag;
+   private Link      _linkTourType;
 
-   private Button                           _chkIncludeDescription;
-   private Button                           _chkIncludeMarkerWaypoints;
-   private Button                           _chkCreateTourMarker;
-   private Label                            _lblMarkerText;
-   private Combo                            _cboTourMarker;
+   private Composite _parent;
 
-   private Combo                            _cboPerson;
-   private Point                            _shellDefaultSize;
+   private Point     _shellDefaultSize;
+
+   private Text      _txtTourTitle;
 
    public DialogJoinTours(final Shell parentShell, final List<TourData> selectedTours) {
 
@@ -275,6 +288,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    @Override
    protected Control createDialogArea(final Composite parent) {
 
+      _parent = parent;
+
       final Composite dlgContainer = (Composite) super.createDialogArea(parent);
 
       initTourData();
@@ -291,6 +306,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
       createActions();
       createMenus();
+
+      // must be run async because the dark theme is overwriting colors after calling createDialogArea()
+      parent.getDisplay().asyncExec(this::updateUI_LockUnlockButton);
 
       return dlgContainer;
    }
@@ -373,6 +391,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
          createUI30TypeTags(_dlgInnerContainer);
          createUI40Person(_dlgInnerContainer);
          createUI50DescriptionMarker(_dlgInnerContainer, defaultSelectionListener);
+         createUI60DeleteSourceTours(_dlgInnerContainer);
       }
    }
 
@@ -400,20 +419,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       // fill combo
       Arrays.asList(STATE_TEXT_JOIN_METHOD).forEach(timeText -> _cboJoinMethod.add(timeText));
    }
-
-//   /**
-//    * tour title
-//    */
-//   private void createUI20Title(final Composite parent) {
-//
-//      final Label label = new Label(parent, SWT.NONE);
-//      label.setText(Messages.Dialog_JoinTours_Label_Title);
-//      label.setToolTipText(Messages.Dialog_JoinTours_Label_Title_Tooltip);
-//
-//      _txtJoinedTitle = new Text(parent, SWT.BORDER);
-//      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_txtJoinedTitle);
-//      _txtJoinedTitle.setToolTipText(Messages.Dialog_JoinTours_Label_Title_Tooltip);
-//   }
 
    /**
     * tour time
@@ -496,6 +501,20 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             .applyTo(_txtTourTitle);
       _txtTourTitle.setToolTipText(Messages.Dialog_SplitTour_Label_TourTitle_Tooltip);
    }
+
+//   /**
+//    * tour title
+//    */
+//   private void createUI20Title(final Composite parent) {
+//
+//      final Label label = new Label(parent, SWT.NONE);
+//      label.setText(Messages.Dialog_JoinTours_Label_Title);
+//      label.setToolTipText(Messages.Dialog_JoinTours_Label_Title_Tooltip);
+//
+//      _txtJoinedTitle = new Text(parent, SWT.BORDER);
+//      GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(_txtJoinedTitle);
+//      _txtJoinedTitle.setToolTipText(Messages.Dialog_JoinTours_Label_Title_Tooltip);
+//   }
 
    /**
     * tour type & tags
@@ -654,33 +673,33 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       }
    }
 
-//   /**
-//    * info
-//    */
-//   private void createUI50Info(final Composite container) {
-//
-//      final Label label = new Label(container, SWT.NONE);
-//      GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 10).applyTo(label);
-//      label.setText(Messages.Dialog_JoinTours_Label_OtherFields);
-//
-//      // use a bulleted list to display this info
-//      final StyleRange style = new StyleRange();
-//      style.metrics = new GlyphMetrics(0, 0, 10);
-//      final Bullet bullet = new Bullet(style);
-//
-//      final String infoText = Messages.Dialog_JoinTours_Label_OtherFieldsInfo;
-//      final int lineCount = Util.countCharacter(infoText, '\n');
-//
-//      final StyledText styledText = new StyledText(container, SWT.READ_ONLY);
-//      GridDataFactory.fillDefaults()//
-//            .align(SWT.FILL, SWT.BEGINNING)
-//            .indent(0, 10)
-//            .span(2, 1)
-//            .applyTo(styledText);
-//      styledText.setText(infoText);
-//      styledText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-//      styledText.setLineBullet(0, lineCount + 1, bullet);
-//   }
+   /**
+    * Checkbox to specify if the source tours should be deleted after they are
+    * concatenated into a new tour
+    */
+   private void createUI60DeleteSourceTours(final Composite parent) {
+
+//      final Composite deleteSourceToursContainer = new Composite(parent, SWT.NONE);
+//      GridDataFactory.fillDefaults()
+//            .grab(true, false)//
+//            .applyTo(deleteSourceToursContainer);
+      {
+         _chkDeleteSourceTours = new Button(parent, SWT.CHECK);
+         GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkDeleteSourceTours);
+         _chkDeleteSourceTours.setText("Messages.Dialog_JoinTours_Checkbox_InsertPauses");
+         _chkDeleteSourceTours.setEnabled(false);
+         _chkDeleteSourceTours.addSelectionListener(
+               widgetSelectedAdapter(selectionEvent -> onSelect_DeleteSourceTours()));
+      }
+      {
+         _btnUnlockDeleteSourceToursSelection = new Button(parent, SWT.PUSH);
+         _btnUnlockDeleteSourceToursSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+         _btnUnlockDeleteSourceToursSelection.setImage(_imageLock_Closed);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).grab(true, false).applyTo(_btnUnlockDeleteSourceToursSelection);
+         _btnUnlockDeleteSourceToursSelection.addSelectionListener(
+               widgetSelectedAdapter(selectionEvent -> onSelect_Unlock_DeleteSourceTours()));
+      }
+   }
 
    private void enableControls() {
 
@@ -714,6 +733,34 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       return _state;
 //      return null;
    }
+
+//   /**
+//    * info
+//    */
+//   private void createUI50Info(final Composite container) {
+//
+//      final Label label = new Label(container, SWT.NONE);
+//      GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 10).applyTo(label);
+//      label.setText(Messages.Dialog_JoinTours_Label_OtherFields);
+//
+//      // use a bulleted list to display this info
+//      final StyleRange style = new StyleRange();
+//      style.metrics = new GlyphMetrics(0, 0, 10);
+//      final Bullet bullet = new Bullet(style);
+//
+//      final String infoText = Messages.Dialog_JoinTours_Label_OtherFieldsInfo;
+//      final int lineCount = Util.countCharacter(infoText, '\n');
+//
+//      final StyledText styledText = new StyledText(container, SWT.READ_ONLY);
+//      GridDataFactory.fillDefaults()//
+//            .align(SWT.FILL, SWT.BEGINNING)
+//            .indent(0, 10)
+//            .span(2, 1)
+//            .applyTo(styledText);
+//      styledText.setText(infoText);
+//      styledText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+//      styledText.setLineBullet(0, lineCount + 1, bullet);
+//   }
 
    private TourPerson getSelectedPerson() {
 
@@ -1495,6 +1542,29 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
    }
 
+   private void onSelect_DeleteSourceTours() {
+
+      // final ActionDeleteTour actionDeleteTours = new ActionDeleteTour();
+      // actionDeleteTours.performToursDeletion(_selectedTours, false);
+   }
+
+   private void onSelect_Unlock_DeleteSourceTours() {
+
+      _chkDeleteSourceTours.setEnabled(!_chkDeleteSourceTours.isEnabled());
+
+      final boolean isEnabled = _chkDeleteSourceTours.isEnabled();
+
+      _btnUnlockDeleteSourceToursSelection.setText(isEnabled
+            ? Messages.Dialog_ModifyTours_Button_LockMultipleToursSelection_Text
+            : Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+
+      if (!isEnabled) {
+         _chkDeleteSourceTours.setSelection(false);
+      }
+
+      updateUI_LockUnlockButton();
+   }
+
    private void onSelectTourTitleSource() {
 
       updateUIFromModel();
@@ -1649,6 +1719,19 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
       // tour type or tags can have been changed within this dialog
       updateUITourTypeTags();
+   }
+
+   private void updateUI_LockUnlockButton() {
+
+      final boolean isDarkTheme = net.tourbook.common.UI.isDarkTheme();
+
+      // get default foreground color
+      final Color unlockColor = _parent.getForeground();
+      final Color lockColor = isDarkTheme ? DialogUtils.LOCK_COLOR_DARK : DialogUtils.LOCK_COLOR_LIGHT;
+
+      _btnUnlockDeleteSourceToursSelection.setForeground(_chkDeleteSourceTours.isEnabled()
+            ? unlockColor
+            : lockColor);
    }
 
    private void updateUIFromModel() {
