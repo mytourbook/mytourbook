@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,14 +34,6 @@ public class Map25FPSManager {
    private static boolean                       _isBackgroundToAnimationFPS;
 
    private static int[]                         _eventCounter          = new int[1];
-
-   public static long getBackgroundFPS() {
-      return _appConfig.backgroundFPS;
-   }
-
-   public static long getForegroundFPS() {
-      return _appConfig.foregroundFPS;
-   }
 
    public static void init(final LwjglApplication lwjglApp, final LwjglApplicationConfiguration appConfig) {
 
@@ -96,31 +88,34 @@ public class Map25FPSManager {
 
       } else {
 
-         // delay background FPS that switching between different maps do not stop and restart the animation
+         if (Map25App.isBackgroundFPS()) {
 
-         _eventCounter[0]++;
+            // delay background FPS that switching between different maps do not stop and restart the animation
 
-         Display.getDefault().timerExec(2000, new Runnable() {
+            _eventCounter[0]++;
 
-            final int __runnableCounter = _eventCounter[0];
+            Display.getDefault().timerExec(2000, new Runnable() {
 
-            @Override
-            public void run() {
+               final int __runnableCounter = _eventCounter[0];
 
-               // skip all events which has not yet been executed
-               if (__runnableCounter != _eventCounter[0]) {
+               @Override
+               public void run() {
 
-                  // a newer event occurred
+                  // skip all events which has not yet been executed
+                  if (__runnableCounter != _eventCounter[0]) {
 
-                  return;
+                     // a newer event occurred
+
+                     return;
+                  }
+
+                  if (_isBackgroundToAnimationFPS == false) {
+
+                     _appConfig.backgroundFPS = Map25App.getBackgroundFPS();
+                  }
                }
-
-               if (_isBackgroundToAnimationFPS == false) {
-
-                  _appConfig.backgroundFPS = DEFAULT_BACKGROUND_FPS;
-               }
-            }
-         });
+            });
+         }
       }
    }
 }

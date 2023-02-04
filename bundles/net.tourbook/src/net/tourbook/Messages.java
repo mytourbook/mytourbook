@@ -2043,6 +2043,8 @@ public class Messages extends NLS {
    public static String        Slideout_Map25Layer_Spinner_SunTime_Coarse;
    public static String        Slideout_Map25Layer_Spinner_SunTime_Fine;
 
+   public static String        Slideout_Map25Options_Checkbox_BackgroundFPS;
+   public static String        Slideout_Map25Options_Checkbox_BackgroundFPS_Tooltip;
    public static String        Slideout_Map25Options_Checkbox_MapCenter_VerticalPosition;
    public static String        Slideout_Map25Options_Checkbox_MapCenter_VerticalPosition_Tooltip;
    public static String        Slideout_Map25Options_Checkbox_UseDraggedKeyNavigation;

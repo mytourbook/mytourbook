@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  * Copyright (C) 2018, 2021 Thomas Theussing
  *
  * This program is free software; you can redistribute it and/or modify it under
@@ -153,6 +153,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private static final String                  STATE_SUFFIX_MAP_CURRENT_POSITION             = "MapCurrentPosition";                           //$NON-NLS-1$
    static final String                          STATE_SUFFIX_MAP_DEFAULT_POSITION             = "MapDefaultPosition";                           //$NON-NLS-1$
    //
+   private static final String                  STATE_IS_BACKGROUND_FPS                       = "STATE_IS_BACKGROUND_FPS";                      //$NON-NLS-1$
+   private static final String                  STATE_BACKGROUND_FPS                          = "STATE_BACKGROUND_FPS";                         //$NON-NLS-1$
+   //
    public static final String                   THEME_STYLE_ALL                               = "theme-style-all";                              //$NON-NLS-1$
    //
    public static final float                    SUN_TIME_RANGE                                = 10;
@@ -165,6 +168,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private static Map25View                     _map25View;
    private static LwjglApplication              _lwjglApp;
    private static LwjglApplicationConfiguration _appConfig;
+   //
+   private static boolean                       _isBackgroundFPS;
+   private static int                           _backgroundFPS;
    //
    private Map25Provider                        _selectedMapProvider;
    //
@@ -265,11 +271,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private boolean      _isPhotoScaled    = false;
    //
    private int          _photoSize;
-   
+
    /**
     * Is <code>true</code> when a tour marker is hit.
     */
    private boolean      _isMapItemHit;
+
    //
    private static enum OffOnline {
       IS_ONLINE, IS_OFFLINE
@@ -496,6 +503,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       return mapApp;
    }
 
+   public static int getBackgroundFPS() {
+
+      return _backgroundFPS;
+   }
+
    private static LwjglApplicationConfiguration getConfig() {
 
       LwjglApplicationConfiguration.disableAudio = true;
@@ -561,6 +573,11 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       GLAdapter.GDX_DESKTOP_QUIRKS = true;
 
       DateTimeAdapter.init(new DateTime());
+   }
+
+   public static boolean isBackgroundFPS() {
+
+      return _isBackgroundFPS;
    }
 
    /**
@@ -1461,11 +1478,15 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _building_IsShowShadow           = (Bool)       Util.getStateEnum(_state, STATE_LAYER_BUILDING_IS_SHOW_SHADOW,    Bool.TRUE);
       _building_SunDaytime             = (SunDayTime) Util.getStateEnum(_state, STATE_LAYER_BUILDING_SUN_DAY_TIME,      SunDayTime.CURRENT_TIME);
 
-      _cartography_IsLuminance         = Util.getStateBoolean( _state, STATE_LAYER_CARTOGRAPHY_IS_LUMINANCE,   false) ;
+      _cartography_IsLuminance         = Util.getStateBoolean( _state, STATE_LAYER_CARTOGRAPHY_IS_LUMINANCE,   false);
       _cartography_Luminance           = Util.getStateFloat(   _state, STATE_LAYER_CARTOGRAPHY_LUMINANCE,      0);
 
-      _layer_Label_IsVisible           = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_VISIBLE,           true) ;
-      _layer_Label_IsBeforeBuilding    = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_BEFORE_BUILDING,   true) ;
+      _layer_Label_IsVisible           = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_VISIBLE,           true);
+      _layer_Label_IsBeforeBuilding    = Util.getStateBoolean( _state, STATE_LAYER_LABEL_IS_BEFORE_BUILDING,   true);
+
+      // currently this is not working properly -> default is false
+      _isBackgroundFPS                 = Util.getStateBoolean( _state,  STATE_IS_BACKGROUND_FPS,               false);
+      _backgroundFPS                   = Util.getStateInt(     _state,  STATE_BACKGROUND_FPS,                  5);
 
 // SET_FORMATTING_ON
    }
@@ -1499,6 +1520,9 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    private void saveState() {
 
 // SET_FORMATTING_OFF
+
+      _state.put(STATE_IS_BACKGROUND_FPS,                            _isBackgroundFPS);
+      _state.put(STATE_BACKGROUND_FPS,                               _backgroundFPS);
 
       _state.put(STATE_MAP_CENTER_VERTICAL_POSITION_IS_ENABLED,      _mapCenter_VerticalPosition_IsEnabled);
       _state.put(STATE_MAP_CENTER_VERTICAL_POSITION,                 _mapCenter_VerticalPosition);
@@ -1541,6 +1565,12 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       _state.put(STATE_MAP_POS_ZOOM_LEVEL + stateSuffixName, mapPosition.zoomLevel);
 
 // SET_FORMATTING_ON
+   }
+
+   public void setBackgroundFPS(final boolean isBackgroundFPS, final int backgroundFPS) {
+
+      _isBackgroundFPS = isBackgroundFPS;
+      _backgroundFPS = backgroundFPS;
    }
 
    /**

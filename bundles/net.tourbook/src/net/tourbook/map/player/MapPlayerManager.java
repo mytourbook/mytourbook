@@ -44,8 +44,6 @@ public class MapPlayerManager {
    static final int                     SPEED_JOG_WHEEL_MAX              = 2 * 100;
    static final int                     SPEED_JOG_WHEEL_MAX_HALF         = SPEED_JOG_WHEEL_MAX / 2;
 
-   private static final int             DEFAULT_MOVING_SPEED             = 10;
-
    private static final String          STATE_IS_PLAYER_RUNNING          = "STATE_IS_PLAYER_RUNNING";                                          //$NON-NLS-1$
    private static final String          STATE_IS_PLAYING_LOOP            = "STATE_IS_PLAYING_LOOP";                                            //$NON-NLS-1$
    private static final String          STATE_IS_RELIVE_PLAYING          = "STATE_IS_RELIVE_PLAYING";                                          //$NON-NLS-1$
@@ -70,7 +68,7 @@ public class MapPlayerManager {
    /**
     * Is between - {@value #SPEED_JOG_WHEEL_MAX_HALF} ... + {@value #SPEED_JOG_WHEEL_MAX_HALF}
     */
-   private static int                   _jogWheelSpeed                   = DEFAULT_MOVING_SPEED;
+   private static int                   _jogWheelSpeed                   = 10;
 
    private static long                  _animationEndTime;
    private static double                _lastRemainingDuration;
@@ -864,7 +862,7 @@ public class MapPlayerManager {
       _isPlayerRunning           = Util.getStateBoolean( _state, STATE_IS_PLAYER_RUNNING,          true);
       _isPlayingLoop             = Util.getStateBoolean( _state, STATE_IS_PLAYING_LOOP,            false);
       _isReLivePlaying           = Util.getStateBoolean( _state, STATE_IS_RELIVE_PLAYING,          false);
-      _jogWheelSpeed             = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED,            DEFAULT_MOVING_SPEED);
+      _jogWheelSpeed             = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED,            10);
       _jogWheelSpeedMultiplier   = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED_MULTIPLIER, 1);
       _modelSize_Fixed           = Util.getStateInt(     _state, STATE_MODEL_SIZE_FIXED,           200);
       _modelCursorSize           = Util.getStateInt(     _state, STATE_MODEL_CURSOR_SIZE,          200);
