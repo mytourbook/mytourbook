@@ -24,6 +24,7 @@ import net.tourbook.map25.Map25FPSManager;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
@@ -43,6 +44,7 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
@@ -378,19 +380,55 @@ public class SlideoutMapModel extends AdvancedSlideout {
 
    private void onModel_Delete() {
 
-//      final MapModel selectedModel = getSelectedModel();
-//
-//      if (selectedModel == null) {
-//         return;
-//      }
-//
-//      // update model
-//      MapModelManager.onDeleteModel(selectedModel);
-//
-//      // update UI
-//      _modelViewer.refresh();
-//
-//      enableActions();
+      final MapModel selectedModel = getSelectedModel();
+
+      setIsAnotherDialogOpened(true);
+      int returnCode;
+      {
+         returnCode = new MessageDialog(
+               getToolTipShell(),
+               Messages.Slideout_MapModel_Dialog_DeleteModel_Title,
+
+               null, // image
+
+               String.format(Messages.Slideout_MapModel_Dialog_DeleteModel_Message, selectedModel.name),
+               MessageDialog.QUESTION,
+
+               0, // default index
+
+               Messages.App_Action_Delete,
+               IDialogConstants.CANCEL_LABEL
+
+         ).open();
+
+      }
+      setIsAnotherDialogOpened(true);
+
+      if (returnCode != Window.OK) {
+         return;
+      }
+
+      // get map model which will be selected when the current will be removed
+      final int selectionIndex = _modelViewer.getTable().getSelectionIndex();
+      Object nextSelectedMapModel = _modelViewer.getElementAt(selectionIndex + 1);
+      if (nextSelectedMapModel == null) {
+         nextSelectedMapModel = _modelViewer.getElementAt(selectionIndex - 1);
+      }
+
+      // update model
+      MapModelManager.getAllModels().remove(selectedModel);
+
+      // update UI
+      _modelViewer.remove(selectedModel);
+
+      // select another map model at the same position
+      if (nextSelectedMapModel != null) {
+
+         _modelViewer.setSelection(new StructuredSelection(nextSelectedMapModel));
+
+         // set focus back to the viewer
+         _modelViewer.getTable().setFocus();
+      }
    }
 
    private void onModel_Edit(final boolean isOpenedWithMouse) {

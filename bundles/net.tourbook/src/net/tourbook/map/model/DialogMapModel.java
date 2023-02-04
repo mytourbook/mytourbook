@@ -127,7 +127,7 @@ public class DialogMapModel extends TitleAreaDialog {
 
       super.createButtonsForButtonBar(parent);
 
-      updateUI_DialogActions();
+      updateUI_DialogButtons();
    }
 
    @Override
@@ -258,7 +258,7 @@ public class DialogMapModel extends TitleAreaDialog {
             _chkLiveUpdate = new Button(container, SWT.CHECK);
             _chkLiveUpdate.setText(Messages.Dialog_MapModel_Checkbox_IsLiveUpdate);
             _chkLiveUpdate.setToolTipText(Messages.Dialog_MapModel_Checkbox_IsLiveUpdate_Tooltip);
-            _chkLiveUpdate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onLiveUpdate()));
+            _chkLiveUpdate.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_LiveUpdate()));
 
             GridDataFactory.fillDefaults()
                   .grab(true, false)
@@ -334,13 +334,6 @@ public class DialogMapModel extends TitleAreaDialog {
       super.okPressed();
    }
 
-   private void onLiveUpdate() {
-
-      updateUI_DialogActions();
-
-      enableControls();
-   }
-
    private void onModelFile_Modify() {
 
    }
@@ -383,6 +376,18 @@ public class DialogMapModel extends TitleAreaDialog {
          // update UI
          _txtFilepath.setText(selectedFilepath);
       }
+   }
+
+   private void onSelect_LiveUpdate() {
+
+      // save current settings
+      if (_chkLiveUpdate.getSelection() == true) {
+         saveState();
+      }
+
+      updateUI_DialogButtons();
+
+      enableControls();
    }
 
    private void onSelect_LiveUpdateControls() {
@@ -482,7 +487,7 @@ public class DialogMapModel extends TitleAreaDialog {
       _mapModel_Editing = mapModel;
    }
 
-   private void updateUI_DialogActions() {
+   private void updateUI_DialogButtons() {
 
       final Button okButton = getButton(IDialogConstants.OK_ID);
       final Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
