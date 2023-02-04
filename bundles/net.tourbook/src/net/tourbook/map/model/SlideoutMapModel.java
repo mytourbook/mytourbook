@@ -476,6 +476,8 @@ public class SlideoutMapModel extends AdvancedSlideout {
       MapModelManager.setSelectedModel(selectedModel);
 
       enableActions();
+
+      Map25FPSManager.setBackgroundFPSToAnimationFPS(true);
    }
 
    private void restoreState() {

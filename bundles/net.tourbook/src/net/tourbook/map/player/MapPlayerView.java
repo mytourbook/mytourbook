@@ -450,7 +450,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
             _spinnerTurningAngle.setMinimum(0);
             _spinnerTurningAngle.setMaximum(100);
             _spinnerTurningAngle.setIncrement(1);
-            _spinnerTurningAngle.setPageIncrement(10);
+            _spinnerTurningAngle.setPageIncrement(5);
             _spinnerTurningAngle.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TurningAngle()));
             _spinnerTurningAngle.addMouseWheelListener(mouseEvent -> {
                UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 5);
@@ -727,7 +727,27 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       if (eventKeyCode == ' ') {
 
+         if (MapPlayerManager.isPlayerRunning()) {
+
+            // stop running
+
+            MapPlayerManager.setIsPlayerRunning(false);
+
+         } else {
+
+            // start running
+
+            MapPlayerManager.setIsPlayerRunning(true);
+         }
+
+         updateUI_PlayAndPausedControls();
+
+      } else if (eventKeyCode == '0') {
+
          // select speed 0
+
+         MapPlayerManager.setIsPlayerRunning(false);
+         updateUI_PlayAndPausedControls();
 
          setJogWheel_Value(MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF);
 
@@ -796,11 +816,12 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
    private void onSpeedJogWheel_Selection() {
 
       final int selectedSpeed = _scaleSpeedJogWheel.getSelection();
+      final int movingSpeed = selectedSpeed - MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF;
 
       updateUI_JogWheel(selectedSpeed);
 
       // start playing when jog wheel is modified
-      if (MapPlayerManager.isPlayerRunning() == false) {
+      if (movingSpeed != 0 && MapPlayerManager.isPlayerRunning() == false) {
 
          MapPlayerManager.setIsPlayerRunning(true);
          updateUI_PlayAndPausedControls();
