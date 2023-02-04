@@ -1536,6 +1536,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       // state must be set after the tour is saved because the tour type id is set when the tour is saved
       saveState();
 
+
+      getShell().setVisible(false);
+
       if (_chkDeleteSourceTours.isEnabled() &&
             _chkDeleteSourceTours.getSelection()) {
          if (_tourProvider instanceof TourBookView) {
