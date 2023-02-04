@@ -44,10 +44,13 @@ import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TagMenuManager;
+import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.action.ActionSetTourTypeMenu;
 import net.tourbook.ui.tourChart.ChartLabelMarker;
 import net.tourbook.ui.views.rawData.DialogUtils;
+import net.tourbook.ui.views.tourBook.ActionDeleteTour;
+import net.tourbook.ui.views.tourBook.TourBookView;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.jface.action.MenuManager;
@@ -212,10 +215,13 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
    private Text      _txtTourTitle;
 
-   public DialogJoinTours(final Shell parentShell, final List<TourData> selectedTours) {
+   ITourProvider     _tourProvider;
+
+   public DialogJoinTours(final Shell parentShell, final ITourProvider tourProvider, final List<TourData> selectedTours) {
 
       super(parentShell);
 
+      _tourProvider = tourProvider;
       // sort tours by date/time
       Collections.sort(selectedTours);
 
@@ -679,26 +685,22 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
     */
    private void createUI60DeleteSourceTours(final Composite parent) {
 
-//      final Composite deleteSourceToursContainer = new Composite(parent, SWT.NONE);
-//      GridDataFactory.fillDefaults()
-//            .grab(true, false)//
-//            .applyTo(deleteSourceToursContainer);
-      {
-         _chkDeleteSourceTours = new Button(parent, SWT.CHECK);
-         GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkDeleteSourceTours);
-         _chkDeleteSourceTours.setText("Messages.Dialog_JoinTours_Checkbox_InsertPauses");
-         _chkDeleteSourceTours.setEnabled(false);
-         _chkDeleteSourceTours.addSelectionListener(
-               widgetSelectedAdapter(selectionEvent -> onSelect_DeleteSourceTours()));
-      }
-      {
-         _btnUnlockDeleteSourceToursSelection = new Button(parent, SWT.PUSH);
-         _btnUnlockDeleteSourceToursSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
-         _btnUnlockDeleteSourceToursSelection.setImage(_imageLock_Closed);
-         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).grab(true, false).applyTo(_btnUnlockDeleteSourceToursSelection);
-         _btnUnlockDeleteSourceToursSelection.addSelectionListener(
-               widgetSelectedAdapter(selectionEvent -> onSelect_Unlock_DeleteSourceTours()));
-      }
+      _chkDeleteSourceTours = new Button(parent, SWT.CHECK);
+      GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkDeleteSourceTours);
+      _chkDeleteSourceTours.setText("Delete source tours");//"Messages.Dialog_JoinTours_Checkbox_InsertPauses");
+      _chkDeleteSourceTours.setEnabled(false);
+
+      _btnUnlockDeleteSourceToursSelection = new Button(parent, SWT.PUSH);
+      _btnUnlockDeleteSourceToursSelection.setText(
+            Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+      _btnUnlockDeleteSourceToursSelection.setImage(_imageLock_Closed);
+      GridDataFactory
+            .fillDefaults()
+            .align(SWT.BEGINNING, SWT.CENTER)
+            .grab(true, false)
+            .applyTo(_btnUnlockDeleteSourceToursSelection);
+      _btnUnlockDeleteSourceToursSelection.addSelectionListener(
+            widgetSelectedAdapter(selectionEvent -> onSelect_Unlock_DeleteSourceTours()));
    }
 
    private void enableControls() {
@@ -1534,18 +1536,24 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       // state must be set after the tour is saved because the tour type id is set when the tour is saved
       saveState();
 
+      if (_chkDeleteSourceTours.isEnabled() &&
+            _chkDeleteSourceTours.getSelection()) {
+         if (_tourProvider instanceof TourBookView) {
+
+            final ActionDeleteTour actionDeleteTours = new ActionDeleteTour((TourBookView) _tourProvider);
+            actionDeleteTours.run();
+            return;
+         }
+
+         //use TOurDatabase.delete(tourId)
+      }
+
       super.okPressed();
    }
 
    private void onDispose() {
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
-   }
-
-   private void onSelect_DeleteSourceTours() {
-
-      // final ActionDeleteTour actionDeleteTours = new ActionDeleteTour();
-      // actionDeleteTours.performToursDeletion(_selectedTours, false);
    }
 
    private void onSelect_Unlock_DeleteSourceTours() {
@@ -1732,6 +1740,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       _btnUnlockDeleteSourceToursSelection.setForeground(_chkDeleteSourceTours.isEnabled()
             ? unlockColor
             : lockColor);
+
+      // ensure the modified text is fully visible
+      _dlgInnerContainer.layout(true, true);
    }
 
    private void updateUIFromModel() {
@@ -1751,7 +1762,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
       // update ui
       _txtTourTitle.setText(tourTitle);
-
    }
 
    /**
