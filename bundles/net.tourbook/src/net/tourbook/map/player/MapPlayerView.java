@@ -19,6 +19,7 @@ import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Images;
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
@@ -134,7 +135,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
          super(null, AS_CHECK_BOX);
 
-         setToolTipText("Click to toggle loop and no loop");
+         setToolTipText(Messages.Map_Player_Button_PlayLoop_Tooltip);
 
          setImageDescriptor(_imageDescriptor_Loop);
          setDisabledImageDescriptor(_imageDescriptor_Loop_Disabled);
@@ -310,7 +311,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       {
          UI.createSpacer_Horizontal(container, 1);
          {
-            _lblTimeline = UI.createLabel(container, "&Timeline");
+            _lblTimeline = UI.createLabel(container, Messages.Map_Player_Label_Timeline);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblTimeline);
 //            _lblTimeline_AllFrames.setBackground(UI.SYS_COLOR_GREEN);
          }
@@ -329,7 +330,6 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
          }
          {
             _lblTimeline_Value = new Label(container, SWT.CENTER);
-            _lblTimeline_Value.setToolTipText("Total or remaining time Click to toggle between total and remaining time");
             _lblTimeline_Value.addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> onMouseDown_TimeEndOrRemaining()));
             gridDataAlignEndCenter.applyTo(_lblTimeline_Value);
 //            _lblTimeline_Value.setBackground(UI.SYS_COLOR_CYAN);
@@ -343,7 +343,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       {
          UI.createSpacer_Horizontal(container, 1);
          {
-            _lblSpeedJogWheel = UI.createLabel(container, "&Speed");
+            _lblSpeedJogWheel = UI.createLabel(container, Messages.Map_Player_Label_Speed);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblSpeedJogWheel);
 //            _lblTimeline_VisibleFrames.setBackground(UI.SYS_COLOR_GREEN);
          }
@@ -363,7 +363,6 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
          }
          {
             _lblSpeedJogWheel_Value = new Label(container, SWT.CENTER);
-            _lblSpeedJogWheel_Value.setToolTipText("Total or remaining time Click to toggle between total and remaining time");
             _lblSpeedJogWheel_Value.addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> onMouseDown_TimeEndOrRemaining()));
             gridDataAlignEndCenter.applyTo(_lblSpeedJogWheel_Value);
 //            _lblSpeedJogWheel_Value.setBackground(UI.SYS_COLOR_CYAN);
@@ -386,10 +385,10 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
             /*
              * Speed multiplier
              */
-            _lblSpeedMultiplier = UI.createLabel(container, "Speed &multiplier");
+            _lblSpeedMultiplier = UI.createLabel(container, Messages.Map_Player_Label_SpeedMultiplier);
 
             _spinnerSpeedMultiplier = new Spinner(container, SWT.BORDER);
-            _spinnerSpeedMultiplier.setToolTipText("The speed value is multiplied with this value");
+            _spinnerSpeedMultiplier.setToolTipText(Messages.Map_Player_Label_SpeedMultiplier_Tooltip);
             _spinnerSpeedMultiplier.setMinimum(1);
             _spinnerSpeedMultiplier.setMaximum(1000);
             _spinnerSpeedMultiplier.setIncrement(1);
@@ -405,7 +404,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
             /*
              * Model size
              */
-            _lblModelSize = UI.createLabel(container, "Model si&ze");
+            _lblModelSize = UI.createLabel(container, Messages.Map_Player_Label_ModelSize);
 
             _spinnerModelSize = new Spinner(container, SWT.BORDER);
             _spinnerModelSize.setMinimum(20);
@@ -423,10 +422,10 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
             /*
              * Model cursor size
              */
-            _lblModelCursorSize = UI.createLabel(container, "Model &cursor size");
+            _lblModelCursorSize = UI.createLabel(container, Messages.Map_Player_Label_ModelCursorSize);
 
             _spinnerModelCursorSize = new Spinner(container, SWT.BORDER);
-            _spinnerModelCursorSize.setToolTipText("Map must be rescaled or relocated to see the modified model cursor size");
+            _spinnerModelCursorSize.setToolTipText(Messages.Map_Player_Label_ModelCursorSize_Tooltip);
             _spinnerModelCursorSize.setMinimum(10);
             _spinnerModelCursorSize.setMaximum(1000);
             _spinnerModelCursorSize.setIncrement(10);
@@ -442,10 +441,10 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
             /*
              * Model turning angle
              */
-            _lblTurningAngle = UI.createLabel(container, "Turning &angle");
+            _lblTurningAngle = UI.createLabel(container, Messages.Map_Player_Label_TurningAngle);
 
             _spinnerTurningAngle = new Spinner(container, SWT.BORDER);
-            _spinnerTurningAngle.setToolTipText("Angle in degrees in one frame when the model is turning on the track");
+            _spinnerTurningAngle.setToolTipText(Messages.Map_Player_Label_TurningAngle_Tooltip);
             _spinnerTurningAngle.setDigits(1);
             _spinnerTurningAngle.setMinimum(0);
             _spinnerTurningAngle.setMaximum(100);
@@ -463,7 +462,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
              * Relive playing
              */
             _chkIsRelivePlaying = new Button(container, SWT.CHECK);
-            _chkIsRelivePlaying.setText("&Re-live playing");
+            _chkIsRelivePlaying.setText(Messages.Map_Player_Checkbox_ReLivePlaying);
             _chkIsRelivePlaying.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ReLivePlaying()));
             GridDataFactory.fillDefaults()
                   .grab(true, false)
@@ -1133,14 +1132,14 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       if (MapPlayerManager.isPlayerRunning()) {
 
-         _actionPlayControl_PlayAndPause.setToolTipText("Pause the playback");
+         _actionPlayControl_PlayAndPause.setToolTipText(Messages.Map_Player_Button_Pause_Tooltip);
 
          _actionPlayControl_PlayAndPause.setImageDescriptor(_imageDescriptor_Pause);
          _actionPlayControl_PlayAndPause.setDisabledImageDescriptor(_imageDescriptor_Pause_Disabled);
 
       } else {
 
-         _actionPlayControl_PlayAndPause.setToolTipText("Play");
+         _actionPlayControl_PlayAndPause.setToolTipText(Messages.Map_Player_Button_Play_Tooltip);
 
          _actionPlayControl_PlayAndPause.setImageDescriptor(_imageDescriptor_Play);
          _actionPlayControl_PlayAndPause.setDisabledImageDescriptor(_imageDescriptor_Play_Disabled);

@@ -396,7 +396,7 @@ public class MapModelManager {
          }
 
          if (_selectedModel == null) {
-            throw new RuntimeException("The default default model is not available");
+            throw new RuntimeException("The default default model is not available"); //$NON-NLS-1$
          }
       }
    }

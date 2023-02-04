@@ -777,9 +777,7 @@ public class Messages extends NLS {
    public static String        Dialog_Label_Name;
 
    public static String        Dialog_MapModel_Checkbox_IsLiveUpdate;
-
    public static String        Dialog_MapModel_Checkbox_IsLiveUpdate_Tooltip;
-
    public static String        Dialog_MapModel_Dialog_ModelFilepath_Title;
    public static String        Dialog_MapModel_Label_Description;
    public static String        Dialog_MapModel_Label_ForwardAngle;
@@ -1302,6 +1300,21 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Dialog_RenameBookmark_Title;
    public static String        Map_Bookmark_Dialog_ValidationAddName;
    public static String        Map_Bookmark_Dialog_ValidationRename;
+
+   public static String        Map_Player_Button_Pause_Tooltip;
+   public static String        Map_Player_Button_Play_Tooltip;
+   public static String        Map_Player_Button_PlayLoop_Tooltip;
+   public static String        Map_Player_Checkbox_ReLivePlaying;
+   public static String        Map_Player_Error_InvalidModelFilepath;
+   public static String        Map_Player_Label_ModelCursorSize;
+   public static String        Map_Player_Label_ModelCursorSize_Tooltip;
+   public static String        Map_Player_Label_ModelSize;
+   public static String        Map_Player_Label_Speed;
+   public static String        Map_Player_Label_SpeedMultiplier;
+   public static String        Map_Player_Label_SpeedMultiplier_Tooltip;
+   public static String        Map_Player_Label_Timeline;
+   public static String        Map_Player_Label_TurningAngle;
+   public static String        Map_Player_Label_TurningAngle_Tooltip;
 
    public static String        merge_tour_dlg_invalid_serie_data_message;
    public static String        merge_tour_dlg_invalid_tour_data_message;

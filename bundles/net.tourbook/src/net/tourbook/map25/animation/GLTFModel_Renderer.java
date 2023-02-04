@@ -38,6 +38,7 @@ import net.mgsx.gltf.scene3d.scene.SceneAsset;
 import net.mgsx.gltf.scene3d.scene.SceneManager;
 import net.mgsx.gltf.scene3d.scene.SceneModel;
 import net.mgsx.gltf.scene3d.utils.IBLBuilder;
+import net.tourbook.Messages;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.map.model.MapModel;
 import net.tourbook.map.model.MapModelManager;
@@ -138,7 +139,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
        */
 
       // skateboard
-      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/skateboard/mt-skateboard.gltf"));
+      asset = new GLTFLoader().load(Gdx.files.absolute("C:/DAT/glTF/MT/skateboard/mt-skateboard.gltf")); //$NON-NLS-1$
       _modelForwardAngle = 90;
       _modelCenterToForwardFactor = 1.4f;
 
@@ -310,7 +311,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
       // flip front face cause of mirror inverted y-axis
       gl.frontFace(GL.CCW);
 
-//      final int numModels = 0;
+//    final int numModels = 0;
       int numRendered = 0;
 
       final MapPosition cameraMapPosition = _mapCamera.mMapPosition;
@@ -534,7 +535,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
       iblBuilder.dispose();
 
       // This texture is provided by the library, no need to have it in your assets.
-      _brdfLUT = new Texture(Gdx.files.classpath("net/mgsx/gltf/shaders/brdfLUT.png"));
+      _brdfLUT = new Texture(Gdx.files.classpath("net/mgsx/gltf/shaders/brdfLUT.png")); //$NON-NLS-1$
 
       _sceneManager.setAmbientLight(1f);
       _sceneManager.environment.set(new PBRTextureAttribute(PBRTextureAttribute.BRDFLUTTexture, _brdfLUT));
@@ -583,7 +584,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
          StatusUtil.showStatus(String.format(
 
-               "The model \"%s\" with the file path \"%s\"could not be loaded, a default model is displayed instead.",
+               Messages.Map_Player_Error_InvalidModelFilepath,
                mapModel.name,
                mapModel.filepath),
 
@@ -617,7 +618,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
          _scene.animationController.setAnimation(animationID, -1);
 
-         System.out.println("Number of animations: " + allModelAnimations.size + "  using " + animationID);
+         System.out.println("Number of animations: " + allModelAnimations.size + "  using " + animationID); //$NON-NLS-1$ //$NON-NLS-2$
       }
    }
 
