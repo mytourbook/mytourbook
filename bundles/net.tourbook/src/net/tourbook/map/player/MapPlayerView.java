@@ -92,6 +92,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
    //
    private Action                  _actionPlayControl_PlayAndPause;
    private Action                  _actionPlayControl_Loop;
+   private Action_ShowMapModel     _actionShowMapModel;
    private Action_SlideoutMapModel _actionSlideoutMapModel;
    //
    private boolean                 _isInUpdateTimeline;
@@ -163,14 +164,36 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       }
    }
 
+   private class Action_ShowMapModel extends Action {
+
+      Action_ShowMapModel() {
+
+         super(null, AS_CHECK_BOX);
+
+         setToolTipText(Messages.Map_Player_Button_MapModel_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapModel));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapModel_Disabled));
+      }
+
+      @Override
+      public void run() {
+
+         MapPlayerManager.setIsMapModelVisible(this.isChecked());
+
+         enableControls();
+      }
+
+   }
+
    private class Action_SlideoutMapModel extends ActionToolbarSlideoutAdv {
 
       private SlideoutMapModel __slideoutMapModel;
 
       public Action_SlideoutMapModel() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.MapModel),
-               TourbookPlugin.getThemedImageDescriptor(Images.MapModel_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapModelList),
+               TourbookPlugin.getThemedImageDescriptor(Images.MapModelList_Disabled));
       }
 
       @Override
@@ -241,10 +264,14 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
    private void createActions() {
 
-      _actionPlayControl_Loop = new Action_PlayControl_Loop();
-      _actionPlayControl_PlayAndPause = new Action_PlayControl_PlayAndPause();
+// SET_FORMATTING_OFF
 
-      _actionSlideoutMapModel = new Action_SlideoutMapModel();
+      _actionPlayControl_Loop          = new Action_PlayControl_Loop();
+      _actionPlayControl_PlayAndPause  = new Action_PlayControl_PlayAndPause();
+      _actionShowMapModel              = new Action_ShowMapModel();
+      _actionSlideoutMapModel          = new Action_SlideoutMapModel();
+
+// SET_FORMATTING_ON
    }
 
    @Override
@@ -485,32 +512,34 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
    private void enableControls() {
 
-      final boolean isEnabled = MapPlayerManager.isPlayerEnabled() && MapPlayerManager.isAnimationVisible();
+      final boolean canShowMapModel = MapPlayerManager.canShowMapModel();
+      final boolean isModelVisible = canShowMapModel && MapPlayerManager.isMapModelVisible();
 
 // SET_FORMATTING_OFF
 
-      _actionPlayControl_PlayAndPause     .setEnabled(isEnabled);
-      _actionPlayControl_Loop             .setEnabled(isEnabled);
-      _actionSlideoutMapModel             .setEnabled(isEnabled);
+      _actionPlayControl_PlayAndPause     .setEnabled(isModelVisible);
+      _actionPlayControl_Loop             .setEnabled(isModelVisible);
+      _actionShowMapModel                 .setEnabled(canShowMapModel);
+      _actionSlideoutMapModel             .setEnabled(isModelVisible);
 
-      _lblModelCursorSize                 .setEnabled(isEnabled);
-      _lblModelSize                       .setEnabled(isEnabled);
-      _lblSpeedMultiplier                 .setEnabled(isEnabled);
-      _lblSpeedJogWheel                   .setEnabled(isEnabled);
-      _lblSpeedJogWheel_Value             .setEnabled(isEnabled);
-      _lblTimeline                        .setEnabled(isEnabled);
-      _lblTimeline_Value                  .setEnabled(isEnabled);
-      _lblTurningAngle                    .setEnabled(isEnabled);
+      _lblModelCursorSize                 .setEnabled(isModelVisible);
+      _lblModelSize                       .setEnabled(isModelVisible);
+      _lblSpeedMultiplier                 .setEnabled(isModelVisible);
+      _lblSpeedJogWheel                   .setEnabled(isModelVisible);
+      _lblSpeedJogWheel_Value             .setEnabled(isModelVisible);
+      _lblTimeline                        .setEnabled(isModelVisible);
+      _lblTimeline_Value                  .setEnabled(isModelVisible);
+      _lblTurningAngle                    .setEnabled(isModelVisible);
 
-      _chkIsRelivePlaying                 .setEnabled(isEnabled);
+      _chkIsRelivePlaying                 .setEnabled(isModelVisible);
 
-      _scaleSpeedJogWheel                 .setEnabled(isEnabled);
-      _scaleTimeline                      .setEnabled(isEnabled);
+      _scaleSpeedJogWheel                 .setEnabled(isModelVisible);
+      _scaleTimeline                      .setEnabled(isModelVisible);
 
-      _spinnerModelCursorSize             .setEnabled(isEnabled);
-      _spinnerModelSize                   .setEnabled(isEnabled);
-      _spinnerSpeedMultiplier             .setEnabled(isEnabled);
-      _spinnerTurningAngle                .setEnabled(isEnabled);
+      _spinnerModelCursorSize             .setEnabled(isModelVisible);
+      _spinnerModelSize                   .setEnabled(isModelVisible);
+      _spinnerSpeedMultiplier             .setEnabled(isModelVisible);
+      _spinnerTurningAngle                .setEnabled(isModelVisible);
 
 
 // SET_FORMATTING_ON
@@ -522,6 +551,8 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
        * Fill view toolbar
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
+
+      tbm.add(_actionShowMapModel);
 
       tbm.add(_actionPlayControl_PlayAndPause);
       tbm.add(_actionPlayControl_Loop);
@@ -1032,7 +1063,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       updateUI_PlayAndPausedControls();
    }
 
-   void updateAnimationVisibility() {
+   void updateMapModelVisibility() {
 
       enableControls();
    }

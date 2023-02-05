@@ -113,8 +113,14 @@ public class MapPlayerManager {
    private static double                _relativePosition_Start;
    private static double                _relativePosition_End;
 
-   private static boolean               _isAnimationVisible;
-   private static boolean               _isPlayerEnabled;
+   private static boolean               _canShowMapModel;
+   private static boolean               _isMapModelVisible;
+
+   /**
+    * When <code>true</code> then an animated triangle shows the exact cursor position
+    */
+   private static boolean               _isMapModelCursorVisible;
+
    private static boolean               _isPlayerRunning;
 
    /**
@@ -135,11 +141,6 @@ public class MapPlayerManager {
 
    private static double                _compileMapX;
    private static double                _compileMapY;
-
-   /**
-    * When <code>true</code> then an animated triangle shows the exact cursor position
-    */
-   private static boolean               _isShowAnimationCursor;
 
    private static Object                RELATIVE_POSITION                = new Object();
 
@@ -194,6 +195,11 @@ public class MapPlayerManager {
       MOVING, //
       SCHEDULED, //
       IDLE, //
+   }
+
+   public static boolean canShowMapModel() {
+
+      return _canShowMapModel;
    }
 
    public static long getAnimationDuration() {
@@ -803,10 +809,6 @@ public class MapPlayerManager {
       return _jogWheelSpeedMultiplier;
    }
 
-   public static boolean isAnimationVisible() {
-      return _isAnimationVisible;
-   }
-
    /**
     * @return Returns <code>true</code> when the {@link #_compileMapScale} was just set. This flag
     *         is reset after calling this method.
@@ -828,8 +830,16 @@ public class MapPlayerManager {
       return _currentVisiblePositionIndex == _numAllVisiblePositions - 1;
    }
 
-   public static boolean isPlayerEnabled() {
-      return _isPlayerEnabled;
+   public static boolean isMapModelCursorVisible() {
+
+      // this needs a UI to customize it
+      _isMapModelCursorVisible = true;
+
+      return _isMapModelCursorVisible;
+   }
+
+   public static boolean isMapModelVisible() {
+      return _isMapModelVisible;
    }
 
    public static boolean isPlayerRunning() {
@@ -846,13 +856,6 @@ public class MapPlayerManager {
 
    public static boolean isReLivePlaying() {
       return _isReLivePlaying;
-   }
-
-   public static boolean isShowAnimationCursor() {
-
-      _isShowAnimationCursor = true;
-
-      return _isShowAnimationCursor;
    }
 
    public static void restoreState() {
@@ -893,6 +896,15 @@ public class MapPlayerManager {
       MapModelManager.saveState();
    }
 
+   public static void setCanShowMapModel(final boolean canShowMapModel) {
+
+      _canShowMapModel = canShowMapModel;
+
+      if (isPlayerViewAvailable()) {
+         _mapPlayerView.updateMapModelVisibility();
+      }
+   }
+
    public static void setCompileMapScale(final double x, final double y, final double scale) {
 
       _compileMapX = x;
@@ -902,13 +914,14 @@ public class MapPlayerManager {
       _isCompileMapScaleSet = true;
    }
 
-   public static void setIsAnimationVisible(final boolean isAnimationVisible) {
+   public static void setIsMapModelCursorVisible(final boolean isMapModelCursorVisible) {
 
-      _isAnimationVisible = isAnimationVisible;
+      _isMapModelCursorVisible = isMapModelCursorVisible;
+   }
 
-      if (isPlayerViewAvailable()) {
-         _mapPlayerView.updateAnimationVisibility();
-      }
+   public static void setIsMapModelVisible(final boolean isMapModelVisible) {
+
+      _isMapModelVisible = isMapModelVisible;
    }
 
    private static void setIsModelMovingForward(final boolean isModelMovingForward) {
@@ -929,11 +942,6 @@ public class MapPlayerManager {
    public static void setIsReLivePlaying(final boolean isReLivePlaying) {
 
       _isReLivePlaying = isReLivePlaying;
-   }
-
-   public static void setIsShowAnimationCursor(final boolean isShowAnimationCursor) {
-
-      _isShowAnimationCursor = isShowAnimationCursor;
    }
 
    public static void setMapPlayerViewer(final MapPlayerView mapPlayerView) {
@@ -1083,8 +1091,6 @@ public class MapPlayerManager {
    public static void setPlayerData(final MapPlayerData mapPlayerData) {
 
       _mapPlayerData = mapPlayerData;
-
-      _isPlayerEnabled = mapPlayerData.isPlayerEnabled;
 
       _numAllVisiblePositions = mapPlayerData.allVisible_GeoLocationIndices == null
             ? 0
@@ -1327,5 +1333,6 @@ public class MapPlayerManager {
 
       _modelTurningAngle = modelTurningAngle;
    }
+
 
 }

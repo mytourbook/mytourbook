@@ -780,7 +780,7 @@ public final class TourTrack_Shader {
       _animationMatrix.setRotation(MapPlayerManager.getModelAngle(), 0f, 0f, 1f);
       _animationMatrix.setAsUniform(shader.uni_AnimationMVP);
 
-      if (MapPlayerManager.isShowAnimationCursor()) {
+      if (MapPlayerManager.isMapModelCursorVisible()) {
 
          // set mvp matrix
          viewport.mvp.setAsUniform(shader.uni_MVP);
@@ -829,8 +829,6 @@ public final class TourTrack_Shader {
       final MapPlayerData mapPlayerData = new MapPlayerData();
 
 // SET_FORMATTING_OFF
-
-      mapPlayerData.isPlayerEnabled                   = true;
 
       mapPlayerData.allProjectedPoints_NormalTrack    = trackBucket.allProjectedPoints;
       mapPlayerData.allProjectedPoints_ReturnTrack    = trackBucket.allProjectedPoints_ReturnTrack;

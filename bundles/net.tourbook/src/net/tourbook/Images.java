@@ -174,6 +174,8 @@ public class Images {
    public static final String MapLayer_Dark                              = "map-layer-dark.png";                                  //$NON-NLS-1$
    public static final String MapModel                                   = "map-model.png";                                       //$NON-NLS-1$
    public static final String MapModel_Disabled                          = "map-model-disabled.png";                              //$NON-NLS-1$
+   public static final String MapModelList                               = "map-model-list.png";                                  //$NON-NLS-1$
+   public static final String MapModelList_Disabled                      = "map-model-list-disabled.png";                         //$NON-NLS-1$
    public static final String MapOptions                                 = "map-options.png";                                     //$NON-NLS-1$
    public static final String MapOptions_Dark                            = "map-options-dark.png";                                //$NON-NLS-1$
    public static final String MapOptions_Disabled                        = "map-options-disabled.png";                            //$NON-NLS-1$

@@ -753,7 +753,8 @@ public class Map25View extends ViewPart implements
             if (partRef.getPart(false) == Map25View.this) {
                _isPartVisible = false;
             }
-            setIsAnimationVisible(partRef, false);
+
+            setCanShowMapModel(partRef, false);
          }
 
          @Override
@@ -768,13 +769,15 @@ public class Map25View extends ViewPart implements
          public void partVisible(final IWorkbenchPartReference partRef) {
 
             onPartVisible(partRef);
-            setIsAnimationVisible(partRef, true);
+
+            setCanShowMapModel(partRef, true);
          }
 
-         private void setIsAnimationVisible(final IWorkbenchPartReference partRef, final boolean isAnimationVisible) {
+         private void setCanShowMapModel(final IWorkbenchPartReference partRef, final boolean canShowMapModel) {
 
             if (partRef.getPart(false) == Map25View.this) {
-               MapPlayerManager.setIsAnimationVisible(isAnimationVisible);
+
+               MapPlayerManager.setCanShowMapModel(canShowMapModel);
             }
          }
       };
