@@ -408,7 +408,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
             _spinnerModelSize = new Spinner(container, SWT.BORDER);
             _spinnerModelSize.setMinimum(20);
-            _spinnerModelSize.setMaximum(1000);
+            _spinnerModelSize.setMaximum(10000);
             _spinnerModelSize.setIncrement(10);
             _spinnerModelSize.setPageIncrement(50);
             _spinnerModelSize.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ModelSize()));
@@ -427,7 +427,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
             _spinnerModelCursorSize = new Spinner(container, SWT.BORDER);
             _spinnerModelCursorSize.setToolTipText(Messages.Map_Player_Label_ModelCursorSize_Tooltip);
             _spinnerModelCursorSize.setMinimum(10);
-            _spinnerModelCursorSize.setMaximum(1000);
+            _spinnerModelCursorSize.setMaximum(10000);
             _spinnerModelCursorSize.setIncrement(10);
             _spinnerModelCursorSize.setPageIncrement(50);
             _spinnerModelCursorSize.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ModelCursorSize()));
