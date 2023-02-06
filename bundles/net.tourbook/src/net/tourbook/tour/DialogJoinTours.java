@@ -686,8 +686,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    private void createUI60DeleteSourceTours(final Composite parent) {
 
       _chkDeleteSourceTours = new Button(parent, SWT.CHECK);
-      GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkDeleteSourceTours);
-      _chkDeleteSourceTours.setText("Delete source tours");//"Messages.Dialog_JoinTours_Checkbox_InsertPauses");
+      GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).span(2, 1).applyTo(_chkDeleteSourceTours);
+      _chkDeleteSourceTours.setText(Messages.Dialog_JoinTours_Checkbox_DeleteSourceTours);
       _chkDeleteSourceTours.setEnabled(false);
 
       _btnUnlockDeleteSourceToursSelection = new Button(parent, SWT.PUSH);
@@ -1536,20 +1536,22 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       // state must be set after the tour is saved because the tour type id is set when the tour is saved
       saveState();
 
-
-      getShell().setVisible(false);
-
       if (_chkDeleteSourceTours.isEnabled() &&
             _chkDeleteSourceTours.getSelection()) {
          if (_tourProvider instanceof TourBookView) {
 
-            final ActionDeleteTour actionDeleteTours = new ActionDeleteTour((TourBookView) _tourProvider);
-            actionDeleteTours.run();
-            return;
-         }
+         super.close();
 
+         //todo fb add boolean to specify no dialog messages ?
+         //that way, there is no need for super.close!
+         final ActionDeleteTour actionDeleteTours = new ActionDeleteTour((TourBookView) _tourProvider);
+         actionDeleteTours.run();
+      }
+      else {
+         //todo fb do it manually
          //use TOurDatabase.delete(tourId)
       }
+   }
 
       super.okPressed();
    }

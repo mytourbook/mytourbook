@@ -739,6 +739,7 @@ public class Messages extends NLS {
    public static String        dialog_is_tour_editor_modified_title;
 
    public static String        Dialog_JoinTours_Checkbox_CreateTourMarker;
+   public static String        Dialog_JoinTours_Checkbox_DeleteSourceTours;
    public static String        Dialog_JoinTours_Checkbox_IncludeDescription;
    public static String        Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints;
    public static String        Dialog_JoinTours_ComboText_ConcatenateTime;

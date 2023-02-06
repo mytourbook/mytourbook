@@ -96,6 +96,17 @@ public class DialogJoinToursTests extends UITest {
       bot.checkBox(Messages.Dialog_JoinTours_Checkbox_CreateTourMarker).deselect();
       assertFalse(bot.comboBox(4).isEnabled());
 
+      //Delete source tours
+      assertFalse(bot.checkBox(Messages.Dialog_JoinTours_Checkbox_DeleteSourceTours).isEnabled());
+
+      bot.button(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text).click();
+      assertTrue(bot.checkBox(Messages.Dialog_JoinTours_Checkbox_DeleteSourceTours).isEnabled());
+
+      bot.checkBox(Messages.Dialog_JoinTours_Checkbox_DeleteSourceTours).select();
+
+      bot.button(Messages.Dialog_ModifyTours_Button_LockMultipleToursSelection_Text).click();
+      assertFalse(bot.checkBox(Messages.Dialog_JoinTours_Checkbox_DeleteSourceTours).isEnabled());
+
       Utils.clickCancelButton(bot);
    }
 
