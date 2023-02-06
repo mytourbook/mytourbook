@@ -4492,7 +4492,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                         importState_Process);
 
                   // fix: org.eclipse.swt.SWTException: Invalid thread access
-                  _parent.getDisplay().syncExec(() -> importState_Process.runPostProcess());
+                  _parent.getDisplay().syncExec(importState_Process::runPostProcess);
                });
 
       } catch (final Exception e) {
