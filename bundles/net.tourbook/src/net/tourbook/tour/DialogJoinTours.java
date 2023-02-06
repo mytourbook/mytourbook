@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -122,7 +122,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    };
    private static final String[] STATE_COMBO_TEXT_TOUR_TITLE_SOURCE     = new String[] {
          Messages.Dialog_JoinTours_ComboText_TourTitleFromTour,
-         Messages.Dialog_JoinTours_ComboText_TourTileCustom,
+         Messages.Dialog_JoinTours_ComboText_TourTitleCustom,
          //
    };
 

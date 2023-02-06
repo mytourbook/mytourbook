@@ -109,7 +109,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
          Messages.Dialog_SplitTour_ComboText_TourTitleFromTour,
          Messages.Dialog_SplitTour_ComboText_TourTitleFromFirstMarker,
-         Messages.Dialog_SplitTour_ComboText_TourTileCustom,
+         Messages.Dialog_SplitTour_ComboText_TourTitleCustom,
    };
 
    /**
