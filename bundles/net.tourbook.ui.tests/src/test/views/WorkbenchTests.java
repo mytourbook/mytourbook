@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package views;
+
+import net.tourbook.Messages;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
@@ -66,6 +68,7 @@ public class WorkbenchTests extends UITest {
       //bot.sleep(3000);
 
       final SWTBotView tourLogView = Utils.showView(bot, "Tour Log"); //$NON-NLS-1$
+      bot.toolbarButtonWithTooltip(Messages.Tour_Log_Action_TourLogLayout_Tooltip).click();
 
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode("Waypoints").select(); //$NON-NLS-1$
