@@ -160,7 +160,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    public static final float                    SUN_TIME_RANGE                                = 10;
    public static final float                    SUN_TIME_DETAIL_RANGE                         = 50;
    //
-   public static final float                    MAP_CENTER_VERTICAL_MAX_VALUE                 = 200.0f;
+   public static final float                    MAP_CENTER_VERTICAL_MAX_VALUE                 = 1000.0f;
    //
    private static IDialogSettings               _state;
    //

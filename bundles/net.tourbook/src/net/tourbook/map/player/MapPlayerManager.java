@@ -835,15 +835,10 @@ public class MapPlayerManager {
    }
 
    private static boolean isMap25ViewAvailable() {
-
       return _map25View != null;
    }
 
    public static boolean isMapModelCursorVisible() {
-
-      // this needs a UI to customize it
-      _isMapModelCursorVisible = true;
-
       return _isMapModelCursorVisible;
    }
 

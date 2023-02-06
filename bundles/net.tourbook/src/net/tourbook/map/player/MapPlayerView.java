@@ -39,6 +39,7 @@ import net.tourbook.map25.renderer.TourTrack_Bucket;
 import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -78,27 +79,28 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
    // SET_FORMATTING_ON
    //
-   private static final Color      JOG_WHEEL_COLOR_GREATER_0                           = new Color(26, 142, 26);
-   private static final Color      JOG_WHEEL_COLOR_LESS_0                              = new Color(227, 64, 23);
+   private static final Color        JOG_WHEEL_COLOR_GREATER_0                           = new Color(26, 142, 26);
+   private static final Color        JOG_WHEEL_COLOR_LESS_0                              = new Color(227, 64, 23);
    //
-   private static final int        RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END = -1;
-   private static final int        RELATIVE_MODEL_POSITION_ON_RETURN_PATH_END_TO_START = 2;
+   private static final int          RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END = -1;
+   private static final int          RELATIVE_MODEL_POSITION_ON_RETURN_PATH_END_TO_START = 2;
    //
-   private IPartListener2          _partListener;
+   private IPartListener2            _partListener;
    //
-   private Action                  _actionPlayControl_PlayAndPause;
-   private Action                  _actionPlayControl_Loop;
-   private Action_ShowMapModel     _actionShowMapModel;
-   private Action_SlideoutMapModel _actionSlideoutMapModel;
+   private Action                    _actionPlayControl_PlayAndPause;
+   private Action                    _actionPlayControl_Loop;
+   private Action_ShowMapModel       _actionShowMapModel;
+   private Action_ShowMapModelCursor _actionShowMapModelCursor;
+   private Action_SlideoutMapModel   _actionSlideoutMapModel;
    //
-   private boolean                 _isInUpdateTimeline;
+   private boolean                   _isInUpdateTimeline;
    //
-   private int                     _currentTimelineMaxValue;
-   private int                     _currentTimelineValue;
+   private int                       _currentTimelineMaxValue;
+   private int                       _currentTimelineValue;
    //
-   private OpenDialogManager       _openDialogManager                                  = new OpenDialogManager();
+   private OpenDialogManager         _openDialogManager                                  = new OpenDialogManager();
    //
-   private PixelConverter          _pc;
+   private PixelConverter            _pc;
    //
    /*
     * UI controls
@@ -175,6 +177,28 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       public void run() {
 
          MapPlayerManager.setIsMapModelVisible(this.isChecked());
+
+         enableControls();
+      }
+
+   }
+
+   private class Action_ShowMapModelCursor extends Action {
+
+      Action_ShowMapModelCursor() {
+
+         super(null, AS_CHECK_BOX);
+
+         setToolTipText(Messages.Map_Player_Button_MapModelCursor_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapModelCursor));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapModelCursor_Disabled));
+      }
+
+      @Override
+      public void run() {
+
+         MapPlayerManager.setIsMapModelCursorVisible(this.isChecked());
 
          enableControls();
       }
@@ -264,6 +288,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       _actionPlayControl_Loop          = new Action_PlayControl_Loop();
       _actionPlayControl_PlayAndPause  = new Action_PlayControl_PlayAndPause();
       _actionShowMapModel              = new Action_ShowMapModel();
+      _actionShowMapModelCursor        = new Action_ShowMapModelCursor();
       _actionSlideoutMapModel          = new Action_SlideoutMapModel();
 
 // SET_FORMATTING_ON
@@ -511,6 +536,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       _actionPlayControl_Loop             .setEnabled(isModelVisible);
       _actionPlayControl_PlayAndPause     .setEnabled(isModelVisible);
       _actionShowMapModel                 .setEnabled(canShowMapModel);
+      _actionShowMapModelCursor           .setEnabled(canShowMapModel);
       _actionSlideoutMapModel             .setEnabled(isModelVisible);
 
       _lblModelCursorSize                 .setEnabled(isModelVisible);
@@ -544,9 +570,14 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
       tbm.add(_actionShowMapModel);
+      tbm.add(_actionShowMapModelCursor);
+
+      tbm.add(new Separator());
 
       tbm.add(_actionPlayControl_PlayAndPause);
       tbm.add(_actionPlayControl_Loop);
+
+      tbm.add(new Separator());
 
       tbm.add(_actionSlideoutMapModel);
    }
@@ -936,6 +967,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       _actionPlayControl_Loop    .setChecked(MapPlayerManager.isPlayingLoop());
       _actionShowMapModel        .setChecked(MapPlayerManager.isMapModelVisible());
+      _actionShowMapModelCursor  .setChecked(MapPlayerManager.isMapModelCursorVisible());
 
       _chkIsRelivePlaying        .setSelection(MapPlayerManager.isReLivePlaying());
 
