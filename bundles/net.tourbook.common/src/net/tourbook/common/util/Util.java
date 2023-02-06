@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -458,6 +458,17 @@ public class Util {
       }
 
       return floatValues;
+   }
+
+   /**
+    * Convert Java newline into \n.
+    *
+    * @param text
+    * @return
+    */
+   public static String convertLineBreaks(final String text) {
+
+      return text.replaceAll("\\r\\n|\\r|\\n", "\\\n"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    /**
@@ -1701,6 +1712,35 @@ public class Util {
       return value;
    }
 
+   /**
+    * @param xmlMemento
+    * @param key
+    * @param defaultValue
+    * @param minValue
+    *           min value
+    * @param maxValue
+    *           max value
+    * @return
+    */
+   public static int getXmlIntInt(final XMLMemento xmlMemento,
+                                  final String key,
+                                  final int defaultValue,
+                                  final int minValue,
+                                  final int maxValue) {
+
+      final int value = getXmlInteger(xmlMemento, key, defaultValue);
+
+      if (value < minValue) {
+         return minValue;
+      }
+
+      if (value > maxValue) {
+         return maxValue;
+      }
+
+      return value;
+   }
+
    public static Long getXmlLong(final IMemento memento, final String key, final Long defaultValue) {
 
       final String strValue = memento.getString(key);
@@ -1754,6 +1794,35 @@ public class Util {
       }
 
       return values;
+   }
+
+   /**
+    * @param xmlMemento
+    * @param key
+    * @param defaultValue
+    * @param minValue
+    *           min value
+    * @param maxValue
+    *           max value
+    * @return
+    */
+   public static long getXmlLongLong(final XMLMemento xmlMemento,
+                                     final String key,
+                                     final long defaultValue,
+                                     final long minValue,
+                                     final long maxValue) {
+
+      final Long value = getXmlLong(xmlMemento, key, defaultValue);
+
+      if (value < minValue) {
+         return minValue;
+      }
+
+      if (value > maxValue) {
+         return maxValue;
+      }
+
+      return value;
    }
 
    /**

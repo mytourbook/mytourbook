@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -56,6 +56,7 @@ import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map.player.MapPlayerManager;
+import net.tourbook.map.player.MapPlayerView;
 import net.tourbook.map2.view.IDiscreteColorProvider;
 import net.tourbook.map25.action.ActionMap25_PhotoFilter;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
@@ -254,9 +255,11 @@ public class Map25View extends ViewPart implements
    private int                           _hashTourId;
    private int                           _hashTourData;
    //
+   private MapPosition                   _currentMapPosition                     = new MapPosition();
    private MapSync                       _mapSynchedWith                         = MapSync.NONE;
    //
    private long                          _lastFiredSyncEventTime;
+   private long                          _lastReceivedSyncEventTime;
    //
    private IMapColorProvider             _mapColorProvider;
    //
@@ -659,7 +662,6 @@ public class Map25View extends ViewPart implements
 
          final Animator animator = map25.animator();
 
-         animator.cancel();
          animator.animateZoom(500, _zoomFactor, 0, 0);
          map25.updateMap();
       });
@@ -673,7 +675,6 @@ public class Map25View extends ViewPart implements
 
          final Animator animator = map25.animator();
 
-         animator.cancel();
          animator.animateZoom(500, 1 / _zoomFactor, 0, 0);
          map25.updateMap();
       });
@@ -697,7 +698,6 @@ public class Map25View extends ViewPart implements
 
          final Animator animator = map25.animator();
 
-         animator.cancel();
          animator.animateTo(
                2000,
                _boundingBox,
@@ -1304,11 +1304,11 @@ public class Map25View extends ViewPart implements
       enableContextMenuActions();
    }
 
-   void fireSyncMapEvent(final MapPosition mapPosition, final int positionFlags) {
+   void fireSyncMapEvent(final MapPosition mapPosition, final SyncParameter syncParameter) {
 
       _lastFiredSyncEventTime = System.currentTimeMillis();
 
-      MapManager.fireSyncMapEvent(mapPosition, this, positionFlags);
+      MapManager.fireSyncMapEvent(mapPosition, this, syncParameter);
 
       updateUI_MapPosition(mapPosition.getLatitude(), mapPosition.getLongitude(), mapPosition.zoomLevel);
    }
@@ -1316,6 +1316,10 @@ public class Map25View extends ViewPart implements
    @Override
    public List<Photo> getFilteredPhotos() {
       return _filteredPhotos;
+   }
+
+   public long getLastReceivedSyncEventTime() {
+      return _lastReceivedSyncEventTime;
    }
 
    public Map25App getMapApp() {
@@ -1380,7 +1384,7 @@ public class Map25View extends ViewPart implements
       final Map map = _map25App.getMap();
       final MapPosition mapPosition = selectedBookmark.getMapPosition();
 
-      Map25ConfigManager.setMapLocation(map, mapPosition);
+      Map25LocationManager.setMapLocation(map, mapPosition);
    }
 
    @Override
@@ -1396,10 +1400,12 @@ public class Map25View extends ViewPart implements
    }
 
    void onMapPosition(final GeoPoint mapGeoPoint, final int zoomLevel) {
+
       updateUI_MapPosition(mapGeoPoint.getLatitude(), mapGeoPoint.getLongitude(), zoomLevel);
    }
 
    private void onSelectionChanged(final ISelection selection) {
+
       //_mapApp.debugPrint(" Map25View: * onSelectionChanged: tour selection changed");
 
       final int selectionHash = selection.hashCode();
@@ -1638,7 +1644,7 @@ public class Map25View extends ViewPart implements
          numAllTimeSlices += tourData.latitudeSerie.length;
       }
 
-      // use array to optimize performance when millions of points are created
+      // use an array to optimize performance when millions of points are created
       _allGeoPoints = new GeoPoint[numAllTimeSlices];
       _allTourStarts.clear();
       final int[] allGeoPointColors = new int[numAllTimeSlices];
@@ -1646,34 +1652,59 @@ public class Map25View extends ViewPart implements
       int tourIndex = 0;
       int geoIndex = 0;
 
+      int[] allTimeSeries;
+      float[] allDistanceSeries;
+
       if (_allTourData.size() == 1 && _allTourData.get(0).isMultipleTours()) {
 
          // one tourdata contains multiple tours
 
          final TourData tourData = _allTourData.get(0);
 
+         allTimeSeries = tourData.timeSerie;
+         allDistanceSeries = tourData.distanceSerie;
+
          _allTourStarts.addAll(tourData.multipleTourStartIndex);
 
          final double[] latitudeSerie = tourData.latitudeSerie;
          final double[] longitudeSerie = tourData.longitudeSerie;
 
-         // create vtm geo points
+         // create vtm E6 geo points
          for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++, tourIndex++) {
             _allGeoPoints[geoIndex++] = (new GeoPoint(latitudeSerie[serieIndex], longitudeSerie[serieIndex]));
          }
 
       } else {
 
+         allTimeSeries = new int[numAllTimeSlices];
+         allDistanceSeries = new float[numAllTimeSlices];
+
          for (final TourData tourData : _allTourData) {
 
             _allTourStarts.add(tourIndex);
 
+            /*
+             * Create time/distance series
+             */
+            final int[] oneTourTimeSerie = tourData.timeSerie;
+            final float[] oneTourDistanceSerie = tourData.distanceSerie;
+
+            if (oneTourTimeSerie != null) {
+               System.arraycopy(oneTourTimeSerie, 0, allTimeSeries, geoIndex, oneTourTimeSerie.length);
+            }
+
+            if (oneTourDistanceSerie != null) {
+               System.arraycopy(oneTourDistanceSerie, 0, allDistanceSeries, geoIndex, oneTourDistanceSerie.length);
+            }
+
+            /*
+             * Create vtm geo points and colors
+             */
             final double[] latitudeSerie = tourData.latitudeSerie;
             final double[] longitudeSerie = tourData.longitudeSerie;
 
             final float[] valueSerie = getValueSerie(tourData);
 
-            // create vtm geo points and colors
             for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++, tourIndex++) {
 
                _allGeoPoints[geoIndex] = (new GeoPoint(latitudeSerie[serieIndex], longitudeSerie[serieIndex]));
@@ -1716,7 +1747,7 @@ public class Map25View extends ViewPart implements
          }
       }
 
-      tourLayer.setupTourPositions(_allGeoPoints, allGeoPointColors, _allTourStarts);
+      tourLayer.setupTourPositions(_allGeoPoints, allGeoPointColors, _allTourStarts, allTimeSeries, allDistanceSeries);
 
       checkSliderIndices();
 
@@ -1794,9 +1825,9 @@ public class Map25View extends ViewPart implements
 
             if (_mapSynchedWith == MapSync.WITH_TOUR) {
 
-//						final int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
+//					final int animationTime = Map25ConfigManager.getActiveTourTrackConfig().animationTime;
                final int animationTime = Map25ConfigManager.DEFAULT_ANIMATION_TIME;
-               Map25ConfigManager.setMapLocation(map25, _boundingBox, animationTime);
+               Map25LocationManager.setMapLocation(map25, _boundingBox, animationTime);
             }
 
             map25.updateMap();
@@ -2080,7 +2111,8 @@ public class Map25View extends ViewPart implements
    @Override
    public void setFocus() {
 
-//		_swtContainer.setFocus();
+      // activate map
+      _swtContainer.setFocus();
    }
 
    /**
@@ -2279,16 +2311,16 @@ public class Map25View extends ViewPart implements
                   return;
                }
 
-               Map25ConfigManager.setMapLocation(map25, sliderBBox, 500);
+               Map25LocationManager.setMapLocation(map25, sliderBBox, 500);
             }
          });
       }
    }
 
    @Override
-   public void syncMapWithOtherMap(final MapPosition mapPosition,
+   public void syncMapWithOtherMap(final MapPosition syncMapPosition,
                                    final ViewPart viewPart,
-                                   final int positionFlags) {
+                                   final IMapSyncListener.SyncParameter syncParameter) {
 
       if (_mapSynchedWith != MapSync.WITH_OTHER_MAP) {
 
@@ -2304,28 +2336,54 @@ public class Map25View extends ViewPart implements
          return;
       }
 
-      final long timeDiff = System.currentTimeMillis() - _lastFiredSyncEventTime;
+      final long currentTimeMillis = System.currentTimeMillis();
 
-      if (timeDiff < 1000) {
+      _lastReceivedSyncEventTime = currentTimeMillis;
+
+      final long timeDiffLastFiredSync = currentTimeMillis - _lastFiredSyncEventTime;
+      if (timeDiffLastFiredSync < 1000
+
+            // accept all sync events from the map player
+            && (viewPart instanceof MapPlayerView) == false) {
+
          // ignore because it causes LOTS of problems when synching moved map
          return;
       }
 
       final Map map = _map25App.getMap();
+      map.getMapPosition(_currentMapPosition);
 
-      /**
-       * Keep current tilt/bearing
-       */
-      final MapPosition currentMapPos = map.getMapPosition();
-      if (mapPosition.bearing == 0) {
-         mapPosition.bearing = currentMapPos.bearing;
+      if (syncParameter == SyncParameter.SHOW_MAP_POSITION_WITHOUT_ANIMATION) {
+
+         // set map position without animation
+
+         // update only map position x/y values and keep any other values from the current map position
+         _currentMapPosition.x = syncMapPosition.x;
+         _currentMapPosition.y = syncMapPosition.y;
+
+         _map25App.getMap().setMapPosition(_currentMapPosition);
+
+      } else {
+
+         // sync map with animation
+
+         /**
+          * Set values which are not set
+          */
+         if (syncMapPosition.scale <= 1) {
+            syncMapPosition.setScale(_currentMapPosition.scale);
+         }
+
+         if (syncMapPosition.bearing == 0) {
+            syncMapPosition.bearing = _currentMapPosition.bearing;
+         }
+
+         if (syncMapPosition.tilt == 0) {
+            syncMapPosition.tilt = _currentMapPosition.tilt;
+         }
+
+         Map25LocationManager.setMapLocation(map, syncMapPosition);
       }
-
-      if (mapPosition.tilt == 0) {
-         mapPosition.tilt = currentMapPos.tilt;
-      }
-
-      Map25ConfigManager.setMapLocation(map, mapPosition);
    }
 
    private void updateFilteredPhotos() {

@@ -29,7 +29,7 @@ import org.oscim.utils.math.Interpolation;
 public class LocationRenderer extends LayerRenderer {
 
    private static final long ANIM_RATE                    = 50;
-   private static final long INTERVAL                     = 2000;
+   private static final long ANIMATION_DURATION           = 2000;                        // milliseconds
 
    private static final int  SHOW_ACCURACY_ZOOM           = 16;
 
@@ -115,32 +115,36 @@ public class LocationRenderer extends LayerRenderer {
          return;
       }
 
-      final Runnable action = new Runnable() {
-         private long lastRun;
+      final Runnable animationRunnable = new Runnable() {
+
+         private long __lastRun;
 
          @Override
          public void run() {
+
             if (!_isAnimationEnabled) {
                return;
             }
 
-            final long diff = System.currentTimeMillis() - lastRun;
-            _map.postDelayed(this, Math.min(ANIM_RATE, diff));
+            final long timeDiff = System.currentTimeMillis() - __lastRun;
+
+            _map.postDelayed(this, Math.min(ANIM_RATE, timeDiff));
 
             if (_isLocationVisible[0] == false || _isLocationVisible[1] == false) {
                _map.render();
             }
 
-            lastRun = System.currentTimeMillis();
+            __lastRun = System.currentTimeMillis();
          }
       };
 
       _animStart = System.currentTimeMillis();
-      _map.postDelayed(action, ANIM_RATE);
+      _map.postDelayed(animationRunnable, ANIM_RATE);
    }
 
    private float animPhase() {
-      return (float) ((MapRenderer.frametime - _animStart) % INTERVAL) / INTERVAL;
+
+      return (float) ((MapRenderer.frametime - _animStart) % ANIMATION_DURATION) / ANIMATION_DURATION;
    }
 
    private boolean initShader() {
@@ -184,7 +188,7 @@ public class LocationRenderer extends LayerRenderer {
 
          boolean isViewShed = false;
 
-         // reduce CPU cycles
+// reduce CPU cycles, this could be improved by making it customizable
 //			animate(true);
 
          final boolean isLocationVisible = _isLocationVisible[locationIndex];

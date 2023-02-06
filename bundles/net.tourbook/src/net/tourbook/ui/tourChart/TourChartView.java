@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,6 +29,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.map2.view.SelectionMapSelection;
+import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.photo.IPhotoEventListener;
 import net.tourbook.photo.Photo;
 import net.tourbook.photo.PhotoEventId;
@@ -139,7 +140,8 @@ public class TourChartView extends ViewPart implements
          public void partActivated(final IWorkbenchPartReference partRef) {
 
             if (partRef.getPart(false) == TourChartView.this) {
-//               _isPartActive = true;
+
+               Map25FPSManager.setBackgroundFPSToAnimationFPS(true);
             }
          }
 
@@ -153,7 +155,8 @@ public class TourChartView extends ViewPart implements
          public void partDeactivated(final IWorkbenchPartReference partRef) {
 
             if (partRef.getPart(false) == TourChartView.this) {
-//               _isPartActive = false;
+
+               Map25FPSManager.setBackgroundFPSToAnimationFPS(false);
             }
 
             // ensure that at EACH part deactivation the photo tooltip gets hidden

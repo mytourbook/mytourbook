@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,12 +41,6 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.RGBA;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.XMLMemento;
-import org.oscim.core.BoundingBox;
-import org.oscim.core.MapPosition;
-import org.oscim.map.Animator;
-import org.oscim.map.Map;
-import org.oscim.utils.ThreadUtils;
-import org.oscim.utils.animation.Easing;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
 
@@ -110,10 +104,14 @@ public class Map25ConfigManager {
     * Tour options
     */
    private static final String TAG_OPTIONS                     = "Options";                      //$NON-NLS-1$
-   private static final String ATTR_ANIMATION_EASING_TYPE      = "animationEasingType";          //$NON-NLS-1$
-   private static final String ATTR_ANIMATION_TIME             = "animationTime";                //$NON-NLS-1$
-   private static final String ATTR_IS_ANIMATE_LOCATION        = "isAnimateLocation";            //$NON-NLS-1$
    private static final String ATTR_USE_DRAGGED_KEY_NAVIGATION = "useDraggedKeyboardNavigation"; //$NON-NLS-1$
+   //
+   /*
+    * Animation
+    */
+//   private static final String ATTR_ANIMATION_DURATION         = "animationDuration";            //$NON-NLS-1$
+//   private static final String ATTR_ANIMATION_EASING_TYPE      = "animationEasingType";          //$NON-NLS-1$
+//   private static final String ATTR_IS_ANIMATE_LOCATION        = "isAnimateLocation";            //$NON-NLS-1$
    //
    /*
     * Track
@@ -315,18 +313,15 @@ public class Map25ConfigManager {
    public static final int   DEFAULT_MARKER_OUTLINE_OPACITY  = 200;                      // 80%;
    //
    // map movement with animation
-   private static final Easing.Type ANIMATION_EASING_TYPE_DEFAULT   = Easing.Type.SINE_INOUT;
-   private static final boolean     IS_ANIMATE_LOCATION_DEFAULT     = true;
-   private static final float       LOCATION_ANIMATION_TIME_DEFAULT = 3.0f;
-   public static final float        LOCATION_ANIMATION_TIME_MIN     = 0f;
-   public static final float        LOCATION_ANIMATION_TIME_MAX     = 60.0f;
+//   private static final Easing.Type ANIMATION_EASING_TYPE_DEFAULT   = Easing.Type.SINE_INOUT;
+//   private static final boolean     IS_ANIMATE_LOCATION_DEFAULT     = true;
+//   private static final int         LOCATION_ANIMATION_TIME_DEFAULT = 500;
+//   private static final int         LOCATION_ANIMATION_TIME_MIN     = 0;
+//   private static final int         LOCATION_ANIMATION_TIME_MAX     = 60_000;
    //
    // options
    private static final boolean USE_DRAGGED_KEY_NAVIGATION_DEFAULT = false;
    //
-   public static Easing.Type    animationEasingType                = ANIMATION_EASING_TYPE_DEFAULT;
-   public static float          animationTime                      = LOCATION_ANIMATION_TIME_DEFAULT;
-   public static boolean        isAnimateLocation                  = IS_ANIMATE_LOCATION_DEFAULT;
    public static boolean        useDraggedKeyboardNavigation       = USE_DRAGGED_KEY_NAVIGATION_DEFAULT;
    //
    // !!! this is a code formatting separator !!!
@@ -1174,19 +1169,19 @@ public class Map25ConfigManager {
          return;
       }
 
-      isAnimateLocation = Util.getXmlBoolean(xmlOptions, ATTR_IS_ANIMATE_LOCATION, IS_ANIMATE_LOCATION_DEFAULT);
-
-      animationEasingType = (Easing.Type) Util.getXmlEnum(
-            xmlOptions,
-            ATTR_ANIMATION_EASING_TYPE,
-            ANIMATION_EASING_TYPE_DEFAULT);
-
-      animationTime = Util.getXmlFloatFloat(
-            xmlOptions,
-            ATTR_ANIMATION_TIME,
-            LOCATION_ANIMATION_TIME_DEFAULT,
-            LOCATION_ANIMATION_TIME_MIN,
-            LOCATION_ANIMATION_TIME_MAX);
+//      _isAnimateLocation = Util.getXmlBoolean(xmlOptions, ATTR_IS_ANIMATE_LOCATION, IS_ANIMATE_LOCATION_DEFAULT);
+//
+//      _animationEasingType = (Easing.Type) Util.getXmlEnum(
+//            xmlOptions,
+//            ATTR_ANIMATION_EASING_TYPE,
+//            ANIMATION_EASING_TYPE_DEFAULT);
+//
+//      _animationDuration = Util.getXmlIntInt(
+//            xmlOptions,
+//            ATTR_ANIMATION_DURATION,
+//            LOCATION_ANIMATION_TIME_DEFAULT,
+//            LOCATION_ANIMATION_TIME_MIN,
+//            LOCATION_ANIMATION_TIME_MAX);
 
       // other
       useDraggedKeyboardNavigation = Util.getXmlBoolean(
@@ -1318,10 +1313,9 @@ public class Map25ConfigManager {
 
       final IMemento xmlOptions = xmlRoot.createChild(TAG_OPTIONS);
       {
-         xmlOptions.putBoolean(ATTR_IS_ANIMATE_LOCATION, isAnimateLocation);
-         xmlOptions.putFloat(ATTR_ANIMATION_TIME, animationTime);
-
-         Util.setXmlEnum(xmlOptions, ATTR_ANIMATION_EASING_TYPE, animationEasingType);
+//         xmlOptions.putBoolean(ATTR_IS_ANIMATE_LOCATION, _isAnimateLocation);
+//         xmlOptions.putInteger(ATTR_ANIMATION_DURATION, _animationDuration);
+//         Util.setXmlEnum(xmlOptions, ATTR_ANIMATION_EASING_TYPE, _animationEasingType);
 
          xmlOptions.putBoolean(ATTR_USE_DRAGGED_KEY_NAVIGATION, useDraggedKeyboardNavigation);
       }
@@ -1352,68 +1346,5 @@ public class Map25ConfigManager {
       _activeTrackConfig = newConfig;
 
       Map25FPSManager.setAnimation(newConfig.arrow_IsAnimate);
-   }
-
-   /**
-    * Set map location with or without animation
-    *
-    * @param map
-    * @param boundingBox
-    * @param locationAnimationTime
-    */
-   public static void setMapLocation(final Map map, final BoundingBox boundingBox, int locationAnimationTime) {
-
-      final Animator animator = map.animator();
-
-      // zero will not move the map, set 1 ms
-      if (locationAnimationTime == 0 || isAnimateLocation == false) {
-         locationAnimationTime = 1;
-      }
-
-      animator.cancel();
-      animator.animateTo(
-            locationAnimationTime,
-            boundingBox,
-            Easing.Type.SINE_INOUT,
-            Animator.ANIM_MOVE | Animator.ANIM_SCALE);
-   }
-
-   public static void setMapLocation(final Map map, final MapPosition mapPosition) {
-
-      if (ThreadUtils.isMainThread()) {
-
-         setMapLocation_InMapThread(map, mapPosition);
-
-      } else {
-
-         map.post(new Runnable() {
-            @Override
-            public void run() {
-
-               setMapLocation_InMapThread(map, mapPosition);
-            }
-         });
-      }
-
-   }
-
-   private static void setMapLocation_InMapThread(final Map map, final MapPosition mapPosition) {
-
-//      final boolean isAnimation = animationTime != 0 && isAnimateLocation;
-//
-//      if (isAnimation) {
-//
-//         final Animator animator = map.animator();
-//
-//         animator.cancel();
-//         animator.animateTo(
-//               (long) (animationTime * 1000),
-//               mapPosition,
-//               animationEasingType);
-//      } else {
-//
-//      map.setMapPosition(mapPosition);
-      map.setMapPosition(mapPosition);
-//      }
    }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -79,6 +79,7 @@ import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
 import net.tourbook.map2.view.IDiscreteColorProvider;
 import net.tourbook.map2.view.SelectionMapPosition;
+import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.map3.Messages;
 import net.tourbook.map3.action.ActionMap3Color;
 import net.tourbook.map3.action.ActionOpenMap3StatisticsView;
@@ -586,7 +587,14 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          @Override
          public void partActivated(final IWorkbenchPartReference partRef) {
+
             onPartVisible(partRef);
+
+            if (partRef.getPart(false) == Map3View.this) {
+
+               // ensure that map sync is working
+               Map25FPSManager.setBackgroundFPSToAnimationFPS(true);
+            }
          }
 
          @Override
@@ -598,10 +606,17 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          public void partClosed(final IWorkbenchPartReference partRef) {}
 
          @Override
-         public void partDeactivated(final IWorkbenchPartReference partRef) {}
+         public void partDeactivated(final IWorkbenchPartReference partRef) {
+
+            if (partRef.getPart(false) == Map3View.this) {
+
+               Map25FPSManager.setBackgroundFPSToAnimationFPS(false);
+            }
+         }
 
          @Override
          public void partHidden(final IWorkbenchPartReference partRef) {
+
             if (partRef.getPart(false) == Map3View.this) {
                _isPartVisible = false;
             }
@@ -1516,12 +1531,12 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    @Override
    public void moveToMapLocation(final MapBookmark mapBookmark) {
 
-      moveToMapLocation(mapBookmark.getMapPosition(), 0);
+      moveToMapLocation(mapBookmark.getMapPosition(), null);
    }
 
-   private void moveToMapLocation(final MapPosition mapPosition, final int positionFlags) {
+   private void moveToMapLocation(final MapPosition mapPosition, final IMapSyncListener.SyncParameter syncParameter) {
 
-      final int zoomLevel = mapPosition.zoomLevel + 0;
+      final int zoomLevel = mapPosition.zoomLevel + 1;
       final double latitude = mapPosition.getLatitude();
       final double longitude = mapPosition.getLongitude();
 
@@ -1541,8 +1556,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          final float bearingMapPos = mapPosition.bearing;
          final float tiltMapPos = mapPosition.tilt;
 
-         final boolean isResetBearing = (positionFlags & IMapSyncListener.RESET_BEARING) != 0;
-         final boolean isResetTilt = (positionFlags & IMapSyncListener.RESET_TILT) != 0;
+         final boolean isResetBearing = syncParameter == IMapSyncListener.SyncParameter.RESET_BEARING;
+         final boolean isResetTilt = syncParameter == IMapSyncListener.SyncParameter.RESET_TILT;
 
          if (isResetBearing) {
 
@@ -1601,7 +1616,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
       _lastFiredSyncEventTime = System.currentTimeMillis();
 
-      MapManager.fireSyncMapEvent(mapPosition, this, 0);
+      MapManager.fireSyncMapEvent(mapPosition, this, null);
    }
 
    @Override
@@ -2417,7 +2432,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    @Override
    public void syncMapWithOtherMap(final MapPosition mapPosition,
                                    final ViewPart viewPart,
-                                   final int positionFlags) {
+                                   final IMapSyncListener.SyncParameter syncParameter) {
 
       if (!_isMapSynched_WithOtherMap) {
 
@@ -2440,7 +2455,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          return;
       }
 
-      moveToMapLocation(mapPosition, positionFlags);
+      moveToMapLocation(mapPosition, syncParameter);
    }
 
    private void updateModifiedTours(final ArrayList<TourData> modifiedTours) {

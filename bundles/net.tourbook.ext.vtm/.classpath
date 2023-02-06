@@ -12,12 +12,22 @@
 			<attribute name="without_test_code" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="libs/vtm-gdx-poi3d.jar" exported="true" sourcepath="/vtm-parent/vtm-gdx-poi3d">
+		<attributes>
+			<attribute name="without_test_code" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="lib" path="libs/vtm-gdx.jar" exported="true" sourcepath="/vtm-parent/vtm-gdx">
 		<attributes>
 			<attribute name="without_test_code" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="libs/vtm-http.jar" exported="true" sourcepath="/vtm-parent/vtm-http">
+		<attributes>
+			<attribute name="without_test_code" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/vtm-models.jar" exported="true" sourcepath="/vtm-parent/vtm-models">
 		<attributes>
 			<attribute name="without_test_code" value="true"/>
 		</attributes>
@@ -32,17 +42,22 @@
 			<attribute name="without_test_code" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/vtm.jar" exported="true" sourcepath="/vtm-parent/vtm/src">
+	<classpathentry kind="lib" path="libs/vtm.jar" exported="true" sourcepath="/vtm-parent/vtm">
 		<attributes>
 			<attribute name="without_test_code" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-simple/1.7.25/af3cd3ad1ea4b08b27b54f12529b4bf343bc5ca1/slf4j-simple-1.7.25-sources.jar" kind="lib" path="libs/slf4j-simple-1.7.25.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-simple/2.0.5/c54eb6a14b163e9951f9ce7cf5e768852203504/slf4j-simple-2.0.5-sources.jar" kind="lib" path="libs/slf4j-simple-2.0.5.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/logging-interceptor/3.14.1/cd77025d82d0391206e684bc47a6f7133ec90e45/logging-interceptor-3.14.1-sources.jar" kind="lib" path="libs/logging-interceptor-3.14.1.jar" exported="true">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.github.mgsx-dev.gdx-gltf/gltf/-SNAPSHOT/9ebc3bd76b53e805fe336b71454667611feda6f5/gltf--SNAPSHOT-sources.jar" kind="lib" path="libs/gltf--SNAPSHOT.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -57,7 +72,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/1.7.28/6444f3c8fce32e20f621e264807256c5e65f11c9/slf4j-api-1.7.28-sources.jar" kind="lib" path="libs/slf4j-api-1.7.28.jar" exported="true">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.slf4j/slf4j-api/2.0.5/1dacbf7761ce7b4062b1582f2fdef203f5ac471c/slf4j-api-2.0.5-sources.jar" kind="lib" path="libs/slf4j-api-2.0.5.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -67,12 +82,12 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/gdx-backend-lwjgl-1.9.10.jar" exported="true" sourcepath="/gdx-backend-lwjgl/src">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-backend-lwjgl/1.11.0/2b0154b4c50bf9e1bb2e53a13b70e0a7594bce2/gdx-backend-lwjgl-1.11.0-sources.jar" kind="lib" path="libs/gdx-backend-lwjgl-1.11.0.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="libs/gdx-1.9.10.jar" exported="true" sourcepath="/gdx/src">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.11.0/ea3e9eccc5c09636f405e345039b62376465a6f4/gdx-1.11.0-sources.jar" kind="lib" path="libs/gdx-1.11.0.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -82,12 +97,7 @@
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.lwjgl.lwjgl/lwjgl_util/2.9.3/ca58b77b6393794ca34e12b32e9c6d9c912acb3/lwjgl_util-2.9.3-sources.jar" kind="lib" path="libs/lwjgl_util-2.9.3.jar" exported="true">
-		<attributes>
-			<attribute name="gradle_used_by_scope" value="main,test"/>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="libs/lwjgl-2.9.3.jar" exported="true" sourcepath="/lwjgl-2.9.3/lwjgl-source-2.9.3.zip">
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.lwjgl.lwjgl/lwjgl/2.9.3/34682f36cee6cded40df9829bb352f2bdce5b14e/lwjgl-2.9.3-sources.jar" kind="lib" path="libs/lwjgl-2.9.3.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>
@@ -98,6 +108,11 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/org.jcraft/jorbis/0.0.17/5446be5d62e4c6b347c8e6cd28dc00a936417ba2/jorbis-0.0.17-sources.jar" kind="lib" path="libs/jorbis-0.0.17.jar" exported="true">
+		<attributes>
+			<attribute name="gradle_used_by_scope" value="main,test"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry sourcepath="C:/Users/Wolfgang/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-jnigen-loader/2.3.1/8228a038af98f2d0fa7b23ea7b4fa330af832305/gdx-jnigen-loader-2.3.1-sources.jar" kind="lib" path="libs/gdx-jnigen-loader-2.3.1.jar" exported="true">
 		<attributes>
 			<attribute name="gradle_used_by_scope" value="main,test"/>
 		</attributes>

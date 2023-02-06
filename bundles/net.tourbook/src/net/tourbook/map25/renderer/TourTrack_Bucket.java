@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,6 @@ import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
 
-import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.canvas.Paint.Cap;
 import org.oscim.renderer.MapRenderer;
@@ -98,7 +97,7 @@ public class TourTrack_Bucket {
    ShortArrayList             directionArrow_ColorCoords;
 
    /**
-    * X/Y positions
+    * Visible X/Y pixel positions which are clipped between -2048...2048
     *
     * <pre>
     * posX1    posY2
@@ -106,13 +105,34 @@ public class TourTrack_Bucket {
     * ...
     * </pre>
     */
-   ShortArrayList             animatedPositions;
+   short[]                    allVisible_PixelPositions;
+
+   /**
+    * Indices for {@link #allVisible_PixelPositions} into the tour track data
+    */
+   int[]                      allVisible_GeoLocationIndices;
+
+   /**
+    * Contains indices into all geo positions for all selected tours. They are optimized for a
+    * minimum distance, so they can be also outside of the clipper (visible) area -2048...2048
+    */
+   int[]                      allNotClipped_GeoLocationIndices;
+
+   double[]                   allProjectedPoints;
+
+   double[]                   allProjectedPoints_ReturnTrack;
+
+   /**
+    * Distance in pixel between the end and start point of the track for the current map scale
+    */
+   double                     trackEnd2StartPixelDistance;
+
+   int[]                      allTimeSeries;
+   float[]                    allDistanceSeries;
 
    public TourTrack_Bucket() {
 
       trackVertexData = new TourTrack_VertexData();
-
-      animatedPositions = new ShortArrayList();
 
       directionArrow_Vertices = new ShortArrayList();
       directionArrow_ColorCoords = new ShortArrayList();
@@ -634,29 +654,27 @@ public class TourTrack_Bucket {
    /**
     * Creates direction arrow vertices from it's x/y position
     *
-    * @param allDirectionArrowPixelList
+    * @param allDirectionArrow_PixelList
     *           Contains the x/y pixel positions for the direction arrows
+    * @param allDirectionArrow_LocationIndices
+    *           Contains the indices into the tour track data, e.g geo location
     */
-   public void createArrowVertices(final FloatArrayList allDirectionArrowPixelList) {
-
-      // create new list to not update currently used list, otherwise a bound exception can occure !!!
-      animatedPositions.clear();
+   public void createArrowVertices(final float[] allDirectionArrowPixel,
+                                   final int[] allVisibleGeoLocationIndices) {
 
       directionArrow_Vertices.clear();
       directionArrow_ColorCoords.clear();
 
       // at least 2 positions are needed
-      if (allDirectionArrowPixelList.size() < 4) {
+      if (allDirectionArrowPixel.length < 4) {
          return;
       }
-
-      final float[] allDirectionArrowPixel = allDirectionArrowPixelList.toArray();
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
       if (trackConfig.arrow_IsAnimate) {
 
-         createArrowVertices_200_Animated(allDirectionArrowPixel);
+         createArrowVertices_200_Animated(allDirectionArrowPixel, allVisibleGeoLocationIndices);
 
       } else {
 
@@ -995,17 +1013,24 @@ public class TourTrack_Bucket {
 // SET_FORMATTING_ON
    }
 
-   private void createArrowVertices_200_Animated(final float[] allDirectionArrowPixel) {
+   private void createArrowVertices_200_Animated(final float[] allDirectionArrowPixel,
+                                                 final int[] allVisibleGeoLocationIndices) {
 
-      for (int pixelIndex = 0; pixelIndex < allDirectionArrowPixel.length;) {
+      final int numPixels = allDirectionArrowPixel.length;
 
-         final float p2X = allDirectionArrowPixel[pixelIndex++];
-         final float p2Y = allDirectionArrowPixel[pixelIndex++];
+      allVisible_PixelPositions = new short[numPixels];
+      allVisible_GeoLocationIndices = allVisibleGeoLocationIndices;
+
+      for (int pixelIndex = 0; pixelIndex < numPixels; pixelIndex += 2) {
+
+         final float p2X = allDirectionArrowPixel[pixelIndex];
+         final float p2Y = allDirectionArrowPixel[pixelIndex + 1];
 
          final short p2X_scaled = (short) (p2X * COORD_SCALE);
          final short p2Y_scaled = (short) (p2Y * COORD_SCALE);
 
-         animatedPositions.addAll(p2X_scaled, p2Y_scaled);
+         allVisible_PixelPositions[pixelIndex] = p2X_scaled;
+         allVisible_PixelPositions[pixelIndex + 1] = p2Y_scaled;
       }
    }
 

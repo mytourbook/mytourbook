@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,6 @@ import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.MtMath;
 import net.tourbook.map.player.MapPlayerData;
 import net.tourbook.map.player.MapPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
@@ -33,6 +32,7 @@ import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.oscim.backend.GL;
 import org.oscim.core.MapPosition;
+import org.oscim.core.Tile;
 import org.oscim.renderer.GLMatrix;
 import org.oscim.renderer.GLState;
 import org.oscim.renderer.GLUtils;
@@ -64,7 +64,7 @@ public final class TourTrack_Shader {
     */
    private static final int             SHORT_BYTES              = 2;
 
-   private static AnimationShader       _animationShader;
+   private static ModelCursorShader     _modelCursorShader;
    private static DirectionArrowsShader _directionArrowShader;
    private static LineShader[]          _lineShaders             = { null, null };
 
@@ -81,38 +81,9 @@ public final class TourTrack_Shader {
 
    private static GLMatrix              _animationMatrix         = new GLMatrix();
 
-   private static float                 _previousAngle;
+   private static int                   _prevValue;
 
-   private static class AnimationShader extends GLShaderMT {
-
-      /**
-       * Location for a shader variable
-       */
-      int attrib_Pos;
-
-      int uni_AnimationPos;
-      int uni_AnimationMVP;
-      int uni_MVP;
-      int uni_VpScale2CompileScale;
-
-      AnimationShader(final String shaderFile) {
-
-         if (loadShader(shaderFile, "#version 330" + NL) == false) { //$NON-NLS-1$
-            return;
-         }
-
-         // SET_FORMATTING_OFF
-
-         attrib_Pos                 = getAttrib ("attrib_Pos");                  //$NON-NLS-1$
-
-         uni_AnimationPos           = getUniform("uni_AnimationPos");            //$NON-NLS-1$
-         uni_AnimationMVP           = getUniform("uni_AnimationMVP");            //$NON-NLS-1$
-         uni_MVP                    = getUniform("uni_MVP");                     //$NON-NLS-1$
-         uni_VpScale2CompileScale   = getUniform("uni_VpScale2CompileScale");    //$NON-NLS-1$
-
-         // SET_FORMATTING_ON
-      }
-   }
+// private static double                _prevValue;
 
    private static class DirectionArrowsShader extends GLShaderMT {
 
@@ -176,7 +147,7 @@ public final class TourTrack_Shader {
             return;
          }
 
-   // SET_FORMATTING_OFF
+// SET_FORMATTING_OFF
 
             a_pos               = getAttrib("a_pos"); //$NON-NLS-1$
             aVertexColor        = getAttrib("aVertexColor"); //$NON-NLS-1$
@@ -194,28 +165,62 @@ public final class TourTrack_Shader {
             uOutlineBrightness  = getUniform("uOutlineBrightness"); //$NON-NLS-1$
             uVertexColorAlpha   = getUniform("uVertexColorAlpha"); //$NON-NLS-1$
 
-   // SET_FORMATTING_ON
+// SET_FORMATTING_ON
+      }
+   }
+
+   private static class ModelCursorShader extends GLShaderMT {
+
+      /**
+       * Location for a shader variable
+       */
+      int attrib_Pos;
+
+      int uni_ModelCursorPos;
+      int uni_AnimationMVP;
+      int uni_MVP;
+      int uni_VpScale2CompileScale;
+
+      ModelCursorShader(final String shaderFile) {
+
+         if (loadShader(shaderFile, "#version 330" + NL) == false) { //$NON-NLS-1$
+            return;
+         }
+
+// SET_FORMATTING_OFF
+
+         attrib_Pos                 = getAttrib ("attrib_Pos");                  //$NON-NLS-1$
+
+         uni_ModelCursorPos         = getUniform("uni_ModelCursorPos");          //$NON-NLS-1$
+         uni_AnimationMVP           = getUniform("uni_AnimationMVP");            //$NON-NLS-1$
+         uni_MVP                    = getUniform("uni_MVP");                     //$NON-NLS-1$
+         uni_VpScale2CompileScale   = getUniform("uni_VpScale2CompileScale");    //$NON-NLS-1$
+
+// SET_FORMATTING_ON
       }
    }
 
    /**
     * Fill OpenGL buffer with the vertices/color/direction model data
     *
+    * @param compileMapPosition
+    * @param viewport
     * @return Returns <code>true</code> when data are available
     */
-   public static boolean bindBufferData(final TourTrack_Bucket trackBucket) {
+   public static boolean bindBufferData(final TourTrack_Bucket trackBucket, final GLViewport viewport) {
+
+      setMapPlayerData(trackBucket, viewport);
 
       final int numTrackVertices = trackBucket == null
             ? 0
             : trackBucket.numTrackVertices * 4;
 
       if (numTrackVertices <= 0) {
+
+         // there is nothing to be displayed
+
          return false;
       }
-
-      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-
-      final MapPlayerData mapPlayerData = new MapPlayerData();
 
       /*
        * Track
@@ -238,13 +243,11 @@ public final class TourTrack_Shader {
          gl.bufferData(GL.ARRAY_BUFFER, numTrackVertices, buffer2, GL.STATIC_DRAW);
       }
 
+      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+
       if (trackConfig.isShowDirectionArrow) {
 
          if (trackConfig.arrow_IsAnimate) {
-
-            mapPlayerData.isPlayerEnabled = true;
-            mapPlayerData.numAnimatedPositions = trackBucket.animatedPositions.size() / 2;
-            mapPlayerData.isAnimateFromRelativePosition = true;
 
             /*
              * Animation
@@ -256,15 +259,15 @@ public final class TourTrack_Shader {
 
 // SET_FORMATTING_OFF
 
-               final short size  = 100;
-               final short size2 = size * 3;
-
+               final short size  = MapPlayerManager.getModelCursorSize();
+               final short size2 = (short) (size * 3);
                final short zPos  = (short) (1 + trackBucket.heightOffset);
 
+               // paint a simple triangle
                _animationVertices = new short[] {
                                                    0,     0,   zPos,
                                                 size,  size2,  zPos,
-                                               -size,  size2,  zPos,
+                                               (short) -size,  size2,  zPos,
 
                                                 };
 // SET_FORMATTING_ON
@@ -302,80 +305,7 @@ public final class TourTrack_Shader {
          }
       }
 
-      MapPlayerManager.setupPlayer(mapPlayerData);
-
       return true;
-   }
-
-   /**
-    * Source:
-    * https://stackoverflow.com/questions/1878907/how-can-i-find-the-difference-between-two-angles
-    *
-    * @param angle1
-    * @param angle2
-    * @return Returns the difference between two angles 0...360
-    */
-   private static float getAngle_Difference(final float angle1, final float angle2) {
-
-      float angleDiff = angle1 - angle2;
-
-      angleDiff = (angleDiff + 540) % 360 - 180;
-
-      return angleDiff;
-   }
-
-   /**
-    * Source:
-    * https://stackoverflow.com/questions/2708476/rotation-interpolation
-    *
-    * @param angle1
-    * @param angle2
-    * @return Returns the difference between two angles 0...360
-    */
-   private static float getAngle_Shortest(final float angle1, final float angle2) {
-
-      final float angleDiff = ((((angle1 - angle2) % 360) + 540) % 360) - 180;
-
-      return Math.abs(angleDiff);
-   }
-
-   private static float getAnimatedAngle(final short pos1X, final short pos1Y, final short pos2X, final short pos2Y) {
-
-      final float p21Angle = (float) MtMath.angleFromShorts(pos1X, pos1Y, pos2X, pos2Y);
-
-      float animatedAngle = p21Angle;
-
-      final float angleDiff = getAngle_Difference(p21Angle, _previousAngle);
-      final float minSmoothAngle = 2f;
-
-      if (Math.abs(angleDiff) > minSmoothAngle) {
-
-         // default angle is larger than the min smooth angle
-         // -> smoothout the animation with a smallers angle
-
-         /*
-          * Find the smallest angle diff to the current position
-          */
-         final float prevAngle1Smooth = _previousAngle + minSmoothAngle;
-         final float prevAngle2Smooth = _previousAngle - minSmoothAngle;
-
-         final float angleDiff1 = getAngle_Shortest(p21Angle, prevAngle1Smooth);
-         final float angleDiff2 = getAngle_Shortest(p21Angle, prevAngle2Smooth);
-
-         // use the smallest difference
-         animatedAngle = angleDiff1 < angleDiff2
-               ? prevAngle1Smooth
-               : prevAngle2Smooth;
-      }
-
-      animatedAngle = animatedAngle % 360;
-
-      _previousAngle = animatedAngle;
-
-      return animatedAngle
-
-            // must be turned otherwise it looks in the wrong direction
-            - 90;
    }
 
    private static ByteBuffer getBuffer_Color(final int requestedColorSize) {
@@ -419,25 +349,19 @@ public final class TourTrack_Shader {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
-      // viewport scale 2 map scale: it's between 1...2
+      // viewport scale 2 compile map scale: is between 1...2
       final float viewport2mapscale = (float) (viewport.pos.scale / compileMapPosition.scale);
 
       // fix alpha blending
       gl.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
       {
-         // get animated position
-         final int nextFrameIndex = MapPlayerManager.getNextFrameIndex();
-         final int numAllFrames = MapPlayerManager.getNumberofAllFrames();
-
-         final float relativeVisibleVertices = (float) nextFrameIndex / numAllFrames;
-
-         paint_10_Track(trackBucket, viewport, viewport2mapscale, relativeVisibleVertices);
+         paint_10_Track(trackBucket, viewport, viewport2mapscale);
 
          if (trackConfig.isShowDirectionArrow) {
 
             if (trackConfig.arrow_IsAnimate) {
 
-               paint_30_Animation(viewport, compileMapPosition, viewport2mapscale, trackBucket, nextFrameIndex);
+               paint_30_ModelCursor(viewport, viewport2mapscale);
 
             } else {
 
@@ -459,20 +383,51 @@ public final class TourTrack_Shader {
     */
    private static void paint_10_Track(final TourTrack_Bucket trackBucket,
                                       final GLViewport viewport,
-                                      final float vp2mpScale,
-                                      final float relativeVisibleVertices) {
+                                      final float vp2mpScale) {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
       final MapPosition viewportMapPosition = viewport.pos;
 
+      /*
+       * Get number of visible vertices, re-live playing shows vertices only from start until
+       * current position and not until the end
+       */
       final int numTrackVertices = trackBucket.numTrackVertices;
-      final int numVisibleVertices = MapPlayerManager.isReLivePlaying()
 
-            // re-live shows the vertices from the start until the animation frame
-            ? (int) (relativeVisibleVertices * numTrackVertices)
+      int numVisibleVertices = numTrackVertices;
+      int numVisibleVertices_Debug = numTrackVertices;
 
-            : numTrackVertices;
+      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
+      if (mapPlayerData != null && mapPlayerData.allVisible_GeoLocationIndices != null) {
+
+         final int numAllVisibleFrames = mapPlayerData.allVisible_GeoLocationIndices.length;
+         final int currentVisiblePositionIndex = MapPlayerManager.getCurrentVisibleGeoLocationIndex();
+
+         final float relativeVisibleVertices = (float) currentVisiblePositionIndex / numAllVisibleFrames;
+         numVisibleVertices_Debug = (int) (relativeVisibleVertices * numTrackVertices);
+
+//         if (numVisibleVertices_Debug != _prevValue) {
+//
+//            _prevValue = numVisibleVertices_Debug;
+//
+//            System.out.println(UI.EMPTY_STRING
+//
+//                  + "  all verts: " + numTrackVertices
+//                  + "  visible verts: " + numVisibleVertices_Debug
+//                  + "  currPosIdx: " + currentVisiblePositionIndex
+//
+//            );
+//// TODO remove SYSTEM.OUT.PRINTLN
+//         }
+      }
+
+      if (MapPlayerManager.isReLivePlaying()) {
+
+         // show only the first part of the track which the model has already moved
+
+         numVisibleVertices = numVisibleVertices_Debug;
+      }
 
       /*
        * Simple line shader does not take forward shortening into
@@ -585,8 +540,6 @@ public final class TourTrack_Shader {
       if (trackBucket.heightOffset != heightOffset) {
 
          heightOffset = trackBucket.heightOffset;
-
-//          final double lineHeight = (heightOffset / groundResolution) / scale;
          final double lineHeight = heightOffset * vp2mpScale;
 
          gl.uniform1f(shader_u_height, (float) lineHeight);
@@ -781,76 +734,121 @@ public final class TourTrack_Shader {
 //    GLUtils.checkGlError(TourTrack_Shader.class.getName());
    }
 
-   private static void paint_30_Animation(final GLViewport viewport,
-                                          final MapPosition compileMapPosition,
-                                          final float vp2mpScale,
-                                          final TourTrack_Bucket trackBucket,
-                                          final int nextFrameIndex) {
+   private static void paint_30_ModelCursor(final GLViewport viewport,
+                                            final float vp2mpScale) {
 
-      final ShortArrayList animatedPositions = trackBucket.animatedPositions;
+      final double[] projectedPositionXY = MapPlayerManager.getCurrentProjectedPosition();
 
-      final int numAllPositions = animatedPositions.size();
-      if (numAllPositions < 1) {
+      if (projectedPositionXY == null) {
          return;
       }
 
-      final AnimationShader shader = _animationShader;
-      shader.useProgram();
+      final MapPosition currentMapPosition = viewport.pos;
 
-      // get animated position
-      final int xyPosIndex = nextFrameIndex * 2;
-      final int xyPrevPosIndex = xyPosIndex > 1 ? xyPosIndex - 2 : 0;
+      final double currentMapPosX = currentMapPosition.x;
+      final double currentMapPosY = currentMapPosition.y;
+      final int currentMapZoomLevel = currentMapPosition.zoomLevel;
 
-      final short pos1X = animatedPositions.get(xyPrevPosIndex);
-      final short pos1Y = animatedPositions.get(xyPrevPosIndex + 1);
-      final short pos2X = animatedPositions.get(xyPosIndex);
-      final short pos2Y = animatedPositions.get(xyPosIndex + 1);
+      final int tileScale = Tile.SIZE << currentMapZoomLevel;
 
-      // rotate model to look forward
-      final float angle = getAnimatedAngle(pos1X, pos1Y, pos2X, pos2Y);
-      _animationMatrix.setRotation(angle, 0f, 0f, 1f);
-      _animationMatrix.setAsUniform(shader.uni_AnimationMVP);
+      final double diffX = MapPlayerManager.getCompileMapX() - currentMapPosX;
+      final double diffY = MapPlayerManager.getCompileMapY() - currentMapPosY;
 
-      // set mvp matrix
-      viewport.mvp.setAsUniform(shader.uni_MVP);
-
-      // set animation position
-      gl.uniform2f(shader.uni_AnimationPos, pos2X, pos2Y);
-
-      // set viewport scale TO map scale: 1.0...2.0
-      gl.uniform1f(shader.uni_VpScale2CompileScale, vp2mpScale);
-
-      // set vertices positions
-      final int shader_Attrib_Pos = shader.attrib_Pos;
-      gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_AnimationVertices);
-      gl.enableVertexAttribArray(shader_Attrib_Pos);
-      gl.vertexAttribPointer(
-
-            shader_Attrib_Pos, //      index of the vertex attribute that is to be modified
-            3, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
-            GL.SHORT, //               data type of each component in the array
-            false, //                  values should be normalized
-            0, //                      offset in bytes between the beginning of consecutive vertex attributes
-            0 //                       offset in bytes of the first component in the vertex attribute array
-      );
+      float dX = (float) ((projectedPositionXY[0] - currentMapPosX - diffX) * tileScale) * COORD_SCALE;
+      float dY = (float) ((projectedPositionXY[1] - currentMapPosY - diffY) * tileScale) * COORD_SCALE;
 
       /*
-       * Draw animation
+       * Prevent flickering, this code is created by logging dX/dY to see the differences, cannot
+       * tell why this works with these adjustments
        */
-      GLState.test(true, false);
-      gl.depthMask(true);
-      {
-         gl.drawArrays(GL.TRIANGLES, 0, _animationVertices.length);
+      if (vp2mpScale < 1.0) {
+
+         dX = dX * 2;
+         dY = dY * 2;
+
+      } else if (vp2mpScale > 2.0) {
+
+         dX = dX / 2;
+         dY = dY / 2;
       }
-      gl.depthMask(false);
+
+      final ModelCursorShader shader = _modelCursorShader;
+
+      shader.useProgram();
+
+      // rotate model to look forward
+      _animationMatrix.setRotation(MapPlayerManager.getModelAngle(), 0f, 0f, 1f);
+      _animationMatrix.setAsUniform(shader.uni_AnimationMVP);
+
+      if (MapPlayerManager.isShowAnimationCursor()) {
+
+         // set mvp matrix
+         viewport.mvp.setAsUniform(shader.uni_MVP);
+
+         // set animation position
+         gl.uniform2f(shader.uni_ModelCursorPos, dX, dY);
+
+         // set viewport scale TO map scale: 1.0...2.0
+         gl.uniform1f(shader.uni_VpScale2CompileScale, vp2mpScale);
+
+         // set vertices positions
+         final int shader_Attrib_Pos = shader.attrib_Pos;
+         gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_AnimationVertices);
+         gl.enableVertexAttribArray(shader_Attrib_Pos);
+         gl.vertexAttribPointer(
+
+               shader_Attrib_Pos, //      index of the vertex attribute that is to be modified
+               3, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
+               GL.SHORT, //               data type of each component in the array
+               false, //                  values should be normalized
+               0, //                      offset in bytes between the beginning of consecutive vertex attributes
+               0 //                       offset in bytes of the first component in the vertex attribute array
+         );
+
+         /*
+          * Draw animation
+          */
+         GLState.test(true, false);
+         gl.depthMask(true);
+         {
+            gl.drawArrays(GL.TRIANGLES, 0, _animationVertices.length);
+         }
+         gl.depthMask(false);
+      }
 
 //    GLUtils.checkGlError(TourTrack_Shader.class.getName());
 
    }
 
-   public static void resetAngle() {
+   private static void setMapPlayerData(final TourTrack_Bucket trackBucket, final GLViewport viewport) {
 
-      _previousAngle = 0;
+      if (trackBucket == null) {
+         return;
+      }
+
+      final MapPlayerData mapPlayerData = new MapPlayerData();
+
+// SET_FORMATTING_OFF
+
+      mapPlayerData.isPlayerEnabled                   = true;
+
+      mapPlayerData.allProjectedPoints_NormalTrack    = trackBucket.allProjectedPoints;
+      mapPlayerData.allProjectedPoints_ReturnTrack    = trackBucket.allProjectedPoints_ReturnTrack;
+      mapPlayerData.allTimeSeries                     = trackBucket.allTimeSeries;
+      mapPlayerData.allDistanceSeries                 = trackBucket.allDistanceSeries;
+
+
+      mapPlayerData.allVisible_PixelPositions         = trackBucket.allVisible_PixelPositions;
+      mapPlayerData.allVisible_GeoLocationIndices     = trackBucket.allVisible_GeoLocationIndices;
+
+      mapPlayerData.allNotClipped_GeoLocationIndices  = trackBucket.allNotClipped_GeoLocationIndices;
+
+      mapPlayerData.trackEnd2StartPixelDistance       = trackBucket.trackEnd2StartPixelDistance;
+      mapPlayerData.mapScale                          = viewport.pos.scale;
+
+// SET_FORMATTING_ON
+
+      MapPlayerManager.setPlayerData(mapPlayerData);
    }
 
    public static boolean setupShader() {
@@ -860,7 +858,7 @@ public final class TourTrack_Shader {
       _lineShaders[SHADER_PROJECTED]   = new LineShader("line_aa_proj");                  //$NON-NLS-1$
       _lineShaders[SHADER_FLAT]        = new LineShader("line_aa");                       //$NON-NLS-1$
 
-      _animationShader                 = new AnimationShader("animateTrack");             //$NON-NLS-1$
+      _modelCursorShader               = new ModelCursorShader("modelCursor");            //$NON-NLS-1$
       _directionArrowShader            = new DirectionArrowsShader("directionArrows");    //$NON-NLS-1$
 
       // create buffer id's

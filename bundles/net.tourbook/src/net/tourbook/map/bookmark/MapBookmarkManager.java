@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2019 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -67,6 +67,7 @@ public class MapBookmarkManager {
 
    // common attributes
    private static final String ATTR_ID                         = "id";                      //$NON-NLS-1$
+   private static final String ATTR_NAME                       = "name";                    //$NON-NLS-1$
 
    private static final String TAG_ROOT                        = "MapBookmarks";            //$NON-NLS-1$
    private static final String ATTR_CONFIG_VERSION             = "configVersion";           //$NON-NLS-1$
@@ -77,7 +78,6 @@ public class MapBookmarkManager {
    private static final String TAG_ALL_RECENT_BOOKMARKS        = "AllRecentBookmarks";      //$NON-NLS-1$
    private static final String TAG_RECENT_BOOKMARK             = "RecentBookmark";          //$NON-NLS-1$
    //
-   private static final String ATTR_NAME                       = "name";                    //$NON-NLS-1$
    private static final String ATTR_MAP_POSITION_X             = "mapPositionX";            //$NON-NLS-1$
    private static final String ATTR_MAP_POSITION_Y             = "mapPositionY";            //$NON-NLS-1$
    private static final String ATTR_MAP_POSITION_SCALE         = "mapPositionScale";        //$NON-NLS-1$
@@ -827,7 +827,6 @@ public class MapBookmarkManager {
             xmlBookmark.putFloat(ATTR_MAP_POSITION_BEARING, mapPosition.bearing);
             xmlBookmark.putFloat(ATTR_MAP_POSITION_TILT, mapPosition.tilt);
             xmlBookmark.putInteger(ATTR_MAP_POSITION_ZOOM_LEVEL, mapPosition.zoomLevel);
-
          }
       }
    }

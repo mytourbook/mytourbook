@@ -190,20 +190,20 @@
       -->
       
       <page
-         name="%pref_page_map"
-         id="de.byteholder.geoclipse.preferences.map"
-         class="de.byteholder.geoclipse.preferences.PrefPage_Map2"
+         name     ="%pref_page_map"
+         id       ="de.byteholder.geoclipse.preferences.map"
+         class    ="de.byteholder.geoclipse.preferences.PrefPage_Map2"
       />
          <page
             name="%pref_page_provider"
-            id="de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers"
-            class="de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers"
+            id          ="de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers"
+            class       ="de.byteholder.geoclipse.preferences.PrefPage_Map2_Providers"
             category    ="de.byteholder.geoclipse.preferences.map"
          />
          <page
             name="%pref_page_cache"
-            id="de.byteholder.geoclipse.preferences.PrefPageCache"
-            class="de.byteholder.geoclipse.preferences.PrefPage_Map2_Cache"
+            id          ="de.byteholder.geoclipse.preferences.PrefPageCache"
+            class       ="de.byteholder.geoclipse.preferences.PrefPage_Map2_Cache"
             category    ="de.byteholder.geoclipse.preferences.map"
          />
 
@@ -213,21 +213,22 @@
       -->
       
       <page
-         name="%Pref_Page_Map25"
-         id="net.tourbook.preferences.PrefPage_Map25"
-         class="net.tourbook.preferences.PrefPageMap25"
+         name     ="%Pref_Page_Map25"
+         id       ="net.tourbook.preferences.PrefPageMap25"
+         class    ="net.tourbook.preferences.PrefPageMap25"
       />
          <page
-            name="%Pref_Page_Map25_MapProvider"
-            id="net.tourbook.preferences.PrefPage_Map25_Provider"
-            class="net.tourbook.preferences.PrefPage_Map25Provider"
-            category    ="net.tourbook.preferences.PrefPage_Map25"
+            name     ="%Pref_Page_Map25_MapProvider"
+            id       ="net.tourbook.preferences.PrefPageMap25_Provider"
+            class    ="net.tourbook.preferences.PrefPageMap25_Provider"
+            category ="net.tourbook.preferences.PrefPageMap25"
          />
+         
          <page
-            name="%Pref_Page_Map25_OfflineMap"
-            id="net.tourbook.preferences.PrefPage_Map25_OfflineMap"
-            class="net.tourbook.preferences.PrefPageMap25OfflineMap"
-            category    ="net.tourbook.preferences.PrefPage_Map25"
+            name     ="%Pref_Page_Map25_OfflineMap"
+            id       ="net.tourbook.preferences.PrefPageMap25_OfflineMap"
+            class    ="net.tourbook.preferences.PrefPageMap25_OfflineMap"
+            category ="net.tourbook.preferences.PrefPageMap25"
          />
 
 

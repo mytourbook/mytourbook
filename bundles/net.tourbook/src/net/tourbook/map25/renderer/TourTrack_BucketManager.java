@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2022, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,7 +16,7 @@
 package net.tourbook.map25.renderer;
 
 /**
- * Original class: org.oscim.renderer.bucket.RenderBuckets
+ * Original class: {@link org.oscim.renderer.bucket.RenderBuckets}
  */
 public class TourTrack_BucketManager {
 

@@ -250,12 +250,16 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    static final String                   STATE_DESCRIPTION_NUMBER_OF_LINES                = "STATE_DESCRIPTION_NUMBER_OF_LINES";                    //$NON-NLS-1$
    static final int                      STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT        = 3;
-   static final String                   STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES         = "STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES";             //$NON-NLS-1$
-   static final int                      STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT = 6;
+   static final String                   STATE_IS_DELETE_KEEP_DISTANCE                    = "STATE_IS_DELETE_KEEP_DISTANCE";                        //$NON-NLS-1$
+   static final boolean                  STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT            = false;
+   static final String                   STATE_IS_DELETE_KEEP_TIME                        = "STATE_IS_DELETE_KEEP_TIME";                            //$NON-NLS-1$
+   static final boolean                  STATE_IS_DELETE_KEEP_TIME_DEFAULT                = false;
    static final String                   STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN             = "STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN";                 //$NON-NLS-1$
    static final boolean                  STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT     = true;
    static final String                   STATE_LAT_LON_DIGITS                             = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
    static final int                      STATE_LAT_LON_DIGITS_DEFAULT                     = 5;
+   static final String                   STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES         = "STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES";             //$NON-NLS-1$
+   static final int                      STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT = 6;
    //
    private static final String           COLUMN_ALTITUDE                                  = "ALTITUDE_ALTITUDE";                                    //$NON-NLS-1$
    private static final String           COLUMN_CADENCE                                   = "POWERTRAIN_CADENCE";                                   //$NON-NLS-1$
@@ -500,6 +504,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private ActionDeleteDistanceValues                 _actionDeleteDistanceValues;
    private ActionDeleteTimeSlices_AdjustTourStartTime _actionDeleteTimeSlices_AdjustTourStartTime;
    private ActionDeleteTimeSlices_KeepTime            _actionDeleteTimeSlices_KeepTime;
+   private ActionDeleteTimeSlices_KeepTimeAndDistance _actionDeleteTimeSlices_KeepTimeAndDistance;
    private ActionDeleteTimeSlices_RemoveTime          _actionDeleteTimeSlices_RemoveTime;
    private ActionEditTimeSlicesValues                 _actionEditTimeSlicesValues;
    private ActionExport                               _actionExportTour;
@@ -2227,9 +2232,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     * delete selected time slices
     *
     * @param isRemoveTime
+    * @param isRemoveDistance
     * @param isAdjustTourStartTime
     */
-   void actionDelete_TimeSlices(final boolean isRemoveTime, final boolean isAdjustTourStartTime) {
+   void actionDelete_TimeSlices(final boolean isRemoveTime, final boolean isRemoveDistance, final boolean isAdjustTourStartTime) {
 
       // a tour with reference tours is currently not supported
       if (_isReferenceTourAvailable) {
@@ -2317,7 +2323,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       Arrays.sort(selectionIndices);
       final int lastTopIndex = selectionIndices[0];
 
-      TourManager.removeTimeSlices(_tourData, firstIndex, lastIndex, isRemoveTime, isAdjustTourStartTime);
+      TourManager.removeTimeSlices(_tourData, firstIndex, lastIndex, isRemoveTime, isRemoveDistance, isAdjustTourStartTime);
 
       getDataSeriesFromTourData();
 
@@ -2907,28 +2913,33 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void createActions() {
 
-      _actionEditTimeSlicesValues = new ActionEditTimeSlicesValues(this);
+// SET_FORMATTING_OFF
 
-      _actionDeleteDistanceValues = new ActionDeleteDistanceValues(this);
-      _actionComputeDistanceValues = new ActionComputeDistanceValues(this);
-      _actionToggleRowSelectMode = new ActionToggleRowSelectMode(this);
-      _actionToggleReadEditMode = new ActionToggleReadEditMode(this);
-      _actionSetStartDistanceTo_0 = new ActionSetStartDistanceTo0(this);
+      _actionEditTimeSlicesValues      = new ActionEditTimeSlicesValues(this);
 
-      _actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this, true);
-      _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, false);
+      _actionDeleteDistanceValues      = new ActionDeleteDistanceValues(this);
+      _actionComputeDistanceValues     = new ActionComputeDistanceValues(this);
+      _actionToggleRowSelectMode       = new ActionToggleRowSelectMode(this);
+      _actionToggleReadEditMode        = new ActionToggleReadEditMode(this);
+      _actionSetStartDistanceTo_0      = new ActionSetStartDistanceTo0(this);
 
-      _actionDeleteTimeSlices_AdjustTourStartTime = new ActionDeleteTimeSlices_AdjustTourStartTime(this);
-      _actionDeleteTimeSlices_KeepTime = new ActionDeleteTimeSlices_KeepTime(this);
-      _actionDeleteTimeSlices_RemoveTime = new ActionDeleteTimeSlices_RemoveTime(this);
+      _actionOpenAdjustAltitudeDialog  = new ActionOpenAdjustAltitudeDialog(this, true);
+      _actionOpenMarkerDialog          = new ActionOpenMarkerDialog(this, false);
 
-      _actionCreateTourMarker = new ActionCreateTourMarker(this);
-      _actionExportTour = new ActionExport(this);
-      _actionCsvTimeSliceExport = new ActionCSVTimeSliceExport(this);
-      _actionSplitTour = new ActionSplitTour(this);
-      _actionExtractTour = new ActionExtractTour(this);
+      _actionCreateTourMarker          = new ActionCreateTourMarker(this);
+      _actionExportTour                = new ActionExport(this);
+      _actionCsvTimeSliceExport        = new ActionCSVTimeSliceExport(this);
+      _actionSplitTour                 = new ActionSplitTour(this);
+      _actionExtractTour               = new ActionExtractTour(this);
 
-      _actionViewSettings = new ActionViewSettings();
+      _actionViewSettings              = new ActionViewSettings();
+
+      _actionDeleteTimeSlices_AdjustTourStartTime  = new ActionDeleteTimeSlices_AdjustTourStartTime(this);
+      _actionDeleteTimeSlices_KeepTime             = new ActionDeleteTimeSlices_KeepTime(this);
+      _actionDeleteTimeSlices_KeepTimeAndDistance  = new ActionDeleteTimeSlices_KeepTimeAndDistance(this);
+      _actionDeleteTimeSlices_RemoveTime           = new ActionDeleteTimeSlices_RemoveTime(this);
+
+// SET_FORMATTING_ON
 
       _tagMenuMgr = new TagMenuManager(this, false);
 
@@ -4818,7 +4829,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
 
          if (keyEvent.keyCode == SWT.DEL) {
-            actionDelete_TimeSlices(true, false);
+
+            final boolean isKeepDistance = Util.getStateBoolean(_state,
+                  TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,
+                  TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT);
+
+            final boolean isKeepTime = Util.getStateBoolean(_state,
+                  TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,
+                  TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT);
+
+            final boolean isRemoveDistance = isKeepDistance == false;
+            final boolean isRemoveTime = isKeepTime == false;
+
+            actionDelete_TimeSlices(isRemoveTime, isRemoveDistance, false);
          }
       }));
 
@@ -4833,19 +4856,23 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       final TextCellEditor textCellEditor = new CellEditor_Text_Customized(_timeSlice_Viewer.getTable());
 
-      _timeSlice_AltitudeEditingSupport = new SliceEditingSupport_Float(textCellEditor, _serieAltitude);
-      _timeSlice_PulseEditingSupport = new SliceEditingSupport_Float(textCellEditor, _seriePulse);
-      _timeSlice_TemperatureEditingSupport = new SliceEditingSupport_Float(textCellEditor, _serieTemperature);
-      _timeSlice_CadenceEditingSupport = new SliceEditingSupport_Float(textCellEditor, _serieCadence);
-      _timeSlice_LatitudeEditingSupport = new SliceEditingSupport_Double(textCellEditor, _serieLatitude);
-      _timeSlice_LongitudeEditingSupport = new SliceEditingSupport_Double(textCellEditor, _serieLongitude);
+// SET_FORMATTING_OFF
 
-      _timeSlice_ColDef_Altitude.setEditingSupport(_timeSlice_AltitudeEditingSupport);
-      _timeSlice_ColDef_Pulse.setEditingSupport(_timeSlice_PulseEditingSupport);
-      _timeSlice_ColDef_Temperature.setEditingSupport(_timeSlice_TemperatureEditingSupport);
-      _timeSlice_ColDef_Cadence.setEditingSupport(_timeSlice_CadenceEditingSupport);
-      _timeSlice_ColDef_Latitude.setEditingSupport(_timeSlice_LatitudeEditingSupport);
-      _timeSlice_ColDef_Longitude.setEditingSupport(_timeSlice_LongitudeEditingSupport);
+      _timeSlice_AltitudeEditingSupport      = new SliceEditingSupport_Float(textCellEditor,    _serieAltitude);
+      _timeSlice_PulseEditingSupport         = new SliceEditingSupport_Float(textCellEditor,    _seriePulse);
+      _timeSlice_TemperatureEditingSupport   = new SliceEditingSupport_Float(textCellEditor,    _serieTemperature);
+      _timeSlice_CadenceEditingSupport       = new SliceEditingSupport_Float(textCellEditor,    _serieCadence);
+      _timeSlice_LatitudeEditingSupport      = new SliceEditingSupport_Double(textCellEditor,   _serieLatitude);
+      _timeSlice_LongitudeEditingSupport     = new SliceEditingSupport_Double(textCellEditor,   _serieLongitude);
+
+      _timeSlice_ColDef_Altitude    .setEditingSupport(_timeSlice_AltitudeEditingSupport);
+      _timeSlice_ColDef_Pulse       .setEditingSupport(_timeSlice_PulseEditingSupport);
+      _timeSlice_ColDef_Temperature .setEditingSupport(_timeSlice_TemperatureEditingSupport);
+      _timeSlice_ColDef_Cadence     .setEditingSupport(_timeSlice_CadenceEditingSupport);
+      _timeSlice_ColDef_Latitude    .setEditingSupport(_timeSlice_LatitudeEditingSupport);
+      _timeSlice_ColDef_Longitude   .setEditingSupport(_timeSlice_LongitudeEditingSupport);
+
+// SET_FORMATTING_ON
 
       _timeSlice_ColumnManager.createColumns(_timeSlice_Viewer);
 
@@ -6450,15 +6477,20 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       // select marker
       _actionOpenMarkerDialog.setTourMarker(selectedMarker);
 
-      _actionDeleteTimeSlices_AdjustTourStartTime.setEnabled(canDeleteTimeSliced);
-      _actionDeleteTimeSlices_KeepTime.setEnabled(canDeleteTimeSliced);
-      _actionDeleteTimeSlices_RemoveTime.setEnabled(canDeleteTimeSliced);
+// SET_FORMATTING_OFF
+      
+      _actionDeleteTimeSlices_AdjustTourStartTime  .setEnabled(canDeleteTimeSliced);
+      _actionDeleteTimeSlices_KeepTime             .setEnabled(canDeleteTimeSliced);
+      _actionDeleteTimeSlices_KeepTimeAndDistance  .setEnabled(canDeleteTimeSliced);
+      _actionDeleteTimeSlices_RemoveTime           .setEnabled(canDeleteTimeSliced);
 
-      _actionExportTour.setEnabled(true);
-      _actionCsvTimeSliceExport.setEnabled(isSliceSelected);
+      _actionExportTour          .setEnabled(true);
+      _actionCsvTimeSliceExport  .setEnabled(isSliceSelected);
 
-      _actionSplitTour.setEnabled(isOneSliceSelected);
-      _actionExtractTour.setEnabled(numberOfSelectedSlices >= 2);
+      _actionSplitTour           .setEnabled(isOneSliceSelected);
+      _actionExtractTour         .setEnabled(numberOfSelectedSlices >= 2);
+      
+// SET_FORMATTING_ON
 
       // set start/end position into the actions
       if (isSliceSelected) {
@@ -6624,6 +6656,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       menuMgr.add(new Separator());
       menuMgr.add(_actionDeleteTimeSlices_RemoveTime);
       menuMgr.add(_actionDeleteTimeSlices_KeepTime);
+      menuMgr.add(_actionDeleteTimeSlices_KeepTimeAndDistance);
       menuMgr.add(_actionDeleteTimeSlices_AdjustTourStartTime);
 
       menuMgr.add(new Separator());

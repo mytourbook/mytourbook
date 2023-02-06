@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,7 +31,7 @@ import net.tourbook.map25.Map25Provider;
 import net.tourbook.map25.Map25ProviderManager;
 import net.tourbook.map25.Map25View;
 import net.tourbook.preferences.MapsforgeThemeStyle;
-import net.tourbook.preferences.PrefPage_Map25Provider;
+import net.tourbook.preferences.PrefPageMap25_Provider;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -97,7 +97,7 @@ public class SlideoutMap25_MapProvider extends ToolbarSlideout implements IMapPr
 
       _actionPrefDialog = new ActionOpenPrefDialog(
             Messages.Pref_Map25_Action_EditMapProviderPreferences_Tooltip,
-            PrefPage_Map25Provider.ID);
+            PrefPageMap25_Provider.ID);
 
       _actionPrefDialog.closeThisTooltip(this);
       _actionPrefDialog.setShell(_parent.getShell());
