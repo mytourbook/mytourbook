@@ -245,7 +245,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       _imageFilePath = null;
 
-      _canvasTagImage.setImage(null);
+      setTagImage(null);
 
       enableControls();
    }
@@ -272,6 +272,11 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       // open file dialog
       final String imageFilePath = fileDialog.open();
+
+      // check if user canceled the dialog
+      if (imageFilePath == null) {
+         return;
+      }
 
       setTagImage(imageFilePath);
 
@@ -302,10 +307,13 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       if (StringUtils.isNullOrEmpty(imageFilePath)) {
 
-         image = TourbookPlugin.getImageDescriptor(net.tourbook.Images.Camera).createImage();
+         image = net.tourbook.ui.UI.resizeTagImageToDefaults(
+               TourbookPlugin.getImageDescriptor(net.tourbook.Images.Camera).createImage());
+
       } else if (!Files.exists(Paths.get(imageFilePath))) {
 
-         image = TourbookPlugin.getImageDescriptor(net.tourbook.Images.State_Error).createImage();
+         image = net.tourbook.ui.UI.resizeTagImageToDefaults(
+               TourbookPlugin.getImageDescriptor(net.tourbook.Images.State_Error).createImage());
          //todo fb messages.
          _lblInvalidImageError.setText("The following image file couldn't be found: '" +
                imageFilePath + "'.");

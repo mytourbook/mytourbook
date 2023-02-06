@@ -98,6 +98,9 @@ import org.eclipse.ui.menus.UIElement;
 
 public class UI {
 
+   private static final int              TAG_IMAGE_WIDTH               = 70;
+   private static final int              TAG_IMAGE_HEIGHT              = 70;
+
    private static final String           ICONS_PATH                    = "/icons/";                    //$NON-NLS-1$
 
    public static final String            EMPTY_STRING                  = "";                           //$NON-NLS-1$
@@ -528,6 +531,35 @@ public class UI {
       return container;
    }
 
+   public static Image prepareTagImage(final String imageFilePath) {
+
+      if (StringUtils.isNullOrEmpty(imageFilePath) ||
+            !new File(imageFilePath).exists()) {
+         return null;
+      }
+
+      Image image = new Image(Display.getDefault(), imageFilePath);
+
+      final int imageWidth = image.getBounds().width;
+      final int imageHeight = image.getBounds().height;
+
+      int newimageWidth = TAG_IMAGE_WIDTH;
+      int newimageHeight = TAG_IMAGE_HEIGHT;
+
+      if (imageWidth > imageHeight) {
+
+         newimageHeight = Math.round(newimageWidth * imageHeight / (imageWidth*1f));
+
+      } else if (imageWidth < imageHeight) {
+
+         newimageWidth = Math.round(newimageHeight * imageWidth / (imageHeight*1f));
+      }
+
+      image = ImageUtils.resize(Display.getDefault(), image, newimageWidth, newimageHeight);
+
+      return image;
+   }
+
    /**
     * Disables all controls and their children
     */
@@ -871,34 +903,9 @@ public class UI {
       return UI.EMPTY_STRING;
    }
 
-   public static Image prepareTagImage(final String imageFilePath) {
+   public static Image resizeTagImageToDefaults(final Image imageToResize) {
 
-      if (StringUtils.isNullOrEmpty(imageFilePath) ||
-            !new File(imageFilePath).exists()) {
-         return null;
-      }
-
-      Image image = new Image(Display.getDefault(), imageFilePath);
-
-      final int imageWidth = image.getBounds().width;
-      final int imageHeight = image.getBounds().height;
-
-      float newimageWidth = 70;
-      float newimageHeight = 70;
-
-      if (imageWidth > imageHeight) {
-
-         newimageWidth = 70;
-         newimageHeight = newimageWidth * imageHeight / imageWidth;
-
-      } else if (imageWidth < imageHeight) {
-
-         newimageHeight = 70;
-         newimageWidth = newimageHeight * imageWidth / imageHeight;
-
-      }
-
-      image = ImageUtils.resize(Display.getDefault(), image, Math.round(newimageWidth), Math.round(newimageHeight));
+      final Image image = ImageUtils.resize(Display.getDefault(), imageToResize, TAG_IMAGE_WIDTH, TAG_IMAGE_HEIGHT);
 
       return image;
    }
