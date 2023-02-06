@@ -54,13 +54,6 @@ public final class FilesUtils {
       }
    }
 
-   //todo fb unit test
-   public static boolean isValidFilePath(final String filePath) {
-
-      return StringUtils.hasContent(filePath) &&
-            Files.exists(Paths.get(filePath));
-   }
-
    public static String readFileContentString(final String filePath) {
 
       String fileContent = UI.EMPTY_STRING;

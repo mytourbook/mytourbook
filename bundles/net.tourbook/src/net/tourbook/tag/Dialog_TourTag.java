@@ -23,7 +23,6 @@ import java.nio.file.Paths;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.widgets.ImageCanvas;
 import net.tourbook.data.TourTag;
@@ -58,6 +57,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
    private final IDialogSettings         _state            = TourbookPlugin.getState(ID);
 
    private String                        _dlgMessage;
+   private String                        _imageFilePath;
    private TourTag                       _tourTag_Original;
 
    private TourTag                       _tourTag_Clone;
@@ -71,11 +71,13 @@ public class Dialog_TourTag extends TitleAreaDialog {
     * UI controls
     */
    private Button      _btnDeleteImage;
+
    private ImageCanvas _canvasTagImage;
+
+   private Label       _lblInvalidImageError;
+
    private Text        _txtNotes;
    private Text        _txtName;
-
-   private String      _imageFilePath;
 
    public Dialog_TourTag(final Shell parentShell, final String dlgMessage, final TourTag tourTag) {
 
@@ -183,9 +185,8 @@ public class Dialog_TourTag extends TitleAreaDialog {
                      .align(SWT.LEFT, SWT.CENTER)
                      .applyTo(btnSelectImage);
 
-               final Label label2 = UI.createLabel(imageContainer, UI.EMPTY_STRING);
-               label2.setText("error message when it happens with border ?");
-               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).span(1, 2).applyTo(label2);
+               _lblInvalidImageError = UI.createLabel(imageContainer, UI.EMPTY_STRING);
+               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).span(1, 2).applyTo(_lblInvalidImageError);
 
                _btnDeleteImage = new Button(imageContainer, SWT.PUSH);
                _btnDeleteImage.setImage(TourbookPlugin.getImageDescriptor(net.tourbook.Images.App_Trash_Themed).createImage());
@@ -214,7 +215,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
    private void enableControls() {
 
-      _btnDeleteImage.setEnabled(FilesUtils.isValidFilePath(_imageFilePath));
+      _btnDeleteImage.setEnabled(StringUtils.hasContent(_imageFilePath));
    }
 
    @Override
@@ -297,12 +298,19 @@ public class Dialog_TourTag extends TitleAreaDialog {
    private void setTagImage(final String imageFilePath) {
 
       Image image = null;
+      _lblInvalidImageError.setText(UI.EMPTY_STRING);
 
       if (StringUtils.isNullOrEmpty(imageFilePath)) {
+
          image = TourbookPlugin.getImageDescriptor(net.tourbook.Images.Camera).createImage();
       } else if (!Files.exists(Paths.get(imageFilePath))) {
+
          image = TourbookPlugin.getImageDescriptor(net.tourbook.Images.State_Error).createImage();
+         //todo fb messages.
+         _lblInvalidImageError.setText("The following image file couldn't be found: '" +
+               imageFilePath + "'.");
       } else {
+
          _imageFilePath = imageFilePath;
          image = net.tourbook.ui.UI.prepareTagImage(_imageFilePath);
       }
