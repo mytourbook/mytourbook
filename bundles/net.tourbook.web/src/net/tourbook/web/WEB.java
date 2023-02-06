@@ -512,10 +512,10 @@ public class WEB {
 
          commands.add("/usr/bin/open"); //$NON-NLS-1$
          commands.add("-a"); //$NON-NLS-1$
+
          for (final String appCmd : appCmdLines) {
             commands.add(appCmd);
          }
-
          commands.add(encodedUrl);
 
       } else if (UI.IS_LINUX) {
