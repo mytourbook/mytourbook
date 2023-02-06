@@ -25,7 +25,6 @@ import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import net.tourbook.common.ReplacingOutputStream;
 import net.tourbook.common.UI;
@@ -513,7 +512,9 @@ public class WEB {
 
          commands.add("/usr/bin/open"); //$NON-NLS-1$
          commands.add("-a"); //$NON-NLS-1$
-         commands.addAll(Arrays.asList(appCmdLines));
+         for (final String appCmd : appCmdLines) {
+            commands.add(appCmd);
+         }
 
          commands.add(encodedUrl);
 
@@ -521,7 +522,9 @@ public class WEB {
 
          final String[] appCmdLines = externalWebBrowser.split("[\\r\\n\\s]+"); //$NON-NLS-1$
 
-         commands.addAll(Arrays.asList(appCmdLines));
+         for (final String appCmd : appCmdLines) {
+            commands.add(appCmd);
+         }
          commands.add(encodedUrl);
       }
 
