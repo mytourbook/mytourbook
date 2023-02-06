@@ -1559,6 +1559,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
             //todo fb add boolean to specify no dialog messages ?
             //that way, there is no need for super.close!
+
             final ActionDeleteTour actionDeleteTours = new ActionDeleteTour((TourBookView) _tourProvider);
             actionDeleteTours.run();
          } else {
