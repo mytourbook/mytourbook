@@ -5234,6 +5234,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
       } catch (InvocationTargetException | InterruptedException e) {
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
+         Thread.currentThread().interrupt();
       }
 
       // show delete state in UI
@@ -5648,6 +5649,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
             }
          } catch (final InterruptedException e) {
             TourLogManager.log_EXCEPTION_WithStacktrace(e);
+            Thread.currentThread().interrupt();
          }
       }
    }
@@ -5954,6 +5956,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
                } catch (final InterruptedException e) {
                   TourLogManager.log_EXCEPTION_WithStacktrace(e);
+                  Thread.currentThread().interrupt();
                } finally {
                   _watchingStoresThread = null;
                }
