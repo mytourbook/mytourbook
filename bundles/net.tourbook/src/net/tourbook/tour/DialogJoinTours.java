@@ -217,7 +217,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
    ITourProvider     _tourProvider;
 
-   public DialogJoinTours(final Shell parentShell, final ITourProvider tourProvider, final List<TourData> selectedTours) {
+   public DialogJoinTours(final Shell parentShell,
+                          final ITourProvider tourProvider,
+                          final List<TourData> selectedTours) {
 
       super(parentShell);
 
@@ -1563,8 +1565,9 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             final ActionDeleteTour actionDeleteTours = new ActionDeleteTour((TourBookView) _tourProvider);
             actionDeleteTours.run();
          } else {
-            //todo fb do it manually
-            //use TOurDatabase.delete(tourId)
+
+            //todo fb open log view and log tour hour deleted...
+            _selectedTours.forEach(tour -> TourDatabase.deleteTour(tour.getTourId()));
          }
       }
 

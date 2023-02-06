@@ -258,9 +258,6 @@ public class TourBlogView extends ViewPart {
 
                // update modified tour
 
-               //to reproduce and fix
-               //todo fb
-
                if (_tourData == null) {
                   return;
                }
@@ -415,8 +412,6 @@ public class TourBlogView extends ViewPart {
 
       String tourTitle = _tourData.getTourTitle();
       String tourDescription = _tourData.getTourDescription();
-      //todo fb
-      //_prefStore.getString(ITourbookPreferences.VIEW_PREFERRED_TEMPERATURE_VALUE);
       String tourWeather = WeatherUtils.buildWeatherDataString(_tourData, true, true, true);
 
       final boolean isDescription = tourDescription.length() > 0;

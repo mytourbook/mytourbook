@@ -2341,11 +2341,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       enableActions();
       restoreState();
 
-      //todo fb download ytours
-      //  _cloudDownloadersList.stream()
-            // .filter(cd -> cd.getId().equals(hrefAction))
-      //       .forEach(TourbookCloudDownloader::downloadTours);
-
       // the part visible listener shows the top page also
       updateUI_1_TopPage(true);
    }
@@ -4858,7 +4853,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           * 6. Adjust elevation
           */
          if (importLauncher.isReplaceFirstTimeSliceElevation) {
-            runEasyImport_006_ReplaceFirstTimeSliceElevation(importLauncher, importedTours);
+            runEasyImport_006_ReplaceFirstTimeSliceElevation(importedTours);
          }
 
          /*
@@ -5019,8 +5014,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
-   private void runEasyImport_006_ReplaceFirstTimeSliceElevation(final ImportLauncher importLauncher,
-                                                                 final ArrayList<TourData> importedTours) {
+   private void runEasyImport_006_ReplaceFirstTimeSliceElevation(final ArrayList<TourData> importedTours) {
+
       // "6. Replace first time slice elevation value"
       TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_006_ADJUST_ELEVATION);
 

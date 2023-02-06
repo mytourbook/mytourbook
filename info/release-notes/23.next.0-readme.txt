@@ -26,7 +26,8 @@ Experimental
 New
 ===
 
-* 
+* Concatenate Tours (Frederic)
+  - Added the ability to delete the source tours
   
 
 Improvements
@@ -57,7 +58,7 @@ Bugfix
 ======
 
 * Concatenate Tours (Frederic)
-  - Fixed a bug where the markers in the concatenated tour had erroneous time values
+  - Fixed a bug where the markers and pause times in the concatenated tour had erroneous time values
 
 
 Translation    
