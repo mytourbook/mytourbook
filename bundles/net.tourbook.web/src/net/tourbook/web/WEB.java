@@ -351,8 +351,6 @@ public class WEB {
    /**
     * @param filePathName
     * @return Returns a file from the WebContent folder, this folder is the root for path names.
-    * @throws IOException
-    * @throws URISyntaxException
     */
    public static File getFile(final String filePathName) {
 
