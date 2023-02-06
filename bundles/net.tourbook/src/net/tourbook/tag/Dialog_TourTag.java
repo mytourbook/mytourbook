@@ -137,7 +137,6 @@ public class Dialog_TourTag extends TitleAreaDialog {
    /**
     * create the drop down menus, this must be created after the parent control is created
     */
-
    private void createUI(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
@@ -174,7 +173,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
             final Button btnDeleteImage = new Button(container, SWT.PUSH);
             btnDeleteImage.setImage(TourbookPlugin.getImageDescriptor(net.tourbook.Images.App_Trash_Themed).createImage());
-            btnDeleteImage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectImage()));
+            btnDeleteImage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onDeleteImage()));
             GridDataFactory.fillDefaults()
                   .align(SWT.LEFT, SWT.CENTER)
                   .applyTo(btnDeleteImage);
@@ -220,6 +219,13 @@ public class Dialog_TourTag extends TitleAreaDialog {
       super.okPressed();
    }
 
+   private void onDeleteImage() {
+
+      _imageFilePath = null;
+
+      _canvasTagImage.dispose();
+   }
+
    private void onDispose() {
 
       if (_canvasTagImage == null || _canvasTagImage.isDisposed()) {
@@ -249,6 +255,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
       _txtName.setText(_tourTag_Clone.getTagName());
       _txtNotes.setText(_tourTag_Clone.getNotes());
       setTagImage(_tourTag_Clone.getImageFilePath());
+      //TODO FB save the folder where the image was last retrieved from
    }
 
    private void saveState() {
