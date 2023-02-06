@@ -525,6 +525,7 @@ public class WEB {
          for (final String appCmd : appCmdLines) {
             commands.add(appCmd);
          }
+
          commands.add(encodedUrl);
       }
 
