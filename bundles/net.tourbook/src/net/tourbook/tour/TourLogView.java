@@ -303,7 +303,7 @@ public class TourLogView extends ViewPart {
 
          final StringBuilder sb = new StringBuilder();
 
-         final boolean isFirst[] = { false };
+         final boolean[] isFirst = { false };
 
          allSimple.forEach((logMessage) -> {
 
