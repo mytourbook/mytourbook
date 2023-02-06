@@ -821,6 +821,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
       // get title from first tour which contains a title
       for (final TourData tourData : _selectedTours) {
+
          final String tourTitle = tourData.getTourTitle();
          if (tourTitle.length() > 0) {
             _tourTitleFromTour = tourTitle;
@@ -870,6 +871,58 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
       _joinedTourData.setTourType(TourDatabase.getTourType(joinedTourTypeId));
       _joinedTourData.setTourTags(joinedTourTags);
+   }
+
+   private void joinPausedTimes(final boolean isOriginalTime,
+                                final ArrayList<Long> joinedPausedTime_Start,
+                                final ArrayList<Long> joinedPausedTime_End,
+                                final ArrayList<Long> joinedPausedTime_Data,
+                                final ZonedDateTime joinedTourStart,
+                                final TourData previousTourData,
+                                final TourData tourData) {
+
+      final Long[] pausedTime_Start = ArrayUtils.toObject(tourData.getPausedTime_Start());
+      if (pausedTime_Start != null) {
+
+         //If a new tour start time is set, we need to offset the tour pause times
+         if (!isOriginalTime) {
+
+            offsetPausedTimes(
+                  tourData.getTourStartTimeMS(),
+                  joinedTourStart.toInstant().toEpochMilli(),
+                  previousTourData,
+                  pausedTime_Start);
+         }
+
+         joinedPausedTime_Start.addAll(Arrays.asList(pausedTime_Start));
+      }
+      final Long[] pausedTime_End = ArrayUtils.toObject(tourData.getPausedTime_End());
+      if (pausedTime_End != null) {
+
+         //If a new tour start time is set, we need to offset the tour pause times
+         if (!isOriginalTime) {
+
+            offsetPausedTimes(
+                  tourData.getTourStartTimeMS(),
+                  joinedTourStart.toInstant().toEpochMilli(),
+                  previousTourData,
+                  pausedTime_End);
+         }
+         joinedPausedTime_End.addAll(Arrays.asList(pausedTime_End));
+      }
+      final Long[] pausedTime_Data = ArrayUtils.toObject(tourData.getPausedTime_Data());
+      if (pausedTime_Data != null) {
+
+         joinedPausedTime_Data.addAll(Arrays.asList(pausedTime_Data));
+
+      } else if (pausedTime_Start != null && pausedTime_End != null) {
+
+         //The case can happen that a tour has pause data but no paused time
+         //data (i.e.: All file formats except FIT imported prior to 22.1.0).
+         //In this case, we need to add default paused time data
+
+         Arrays.asList(pausedTime_Start).forEach(pausedTime -> joinedPausedTime_Data.add(0L));
+      }
    }
 
    /**
@@ -1339,51 +1392,13 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             }
          }
 
-         /*
-          * Pauses
-          */
-         final Long[] pausedTime_Start = ArrayUtils.toObject(tourData.getPausedTime_Start());
-         if (pausedTime_Start != null) {
-
-            //If a new tour start time is set, we need to offset the tour pause times
-            if (!isOriginalTime) {
-
-               offsetPausedTimes(
-                     tourData.getTourStartTimeMS(),
-                     joinedTourStart.toInstant().toEpochMilli(),
-                     previousTourData,
-                     pausedTime_Start);
-            }
-
-            joinedPausedTime_Start.addAll(Arrays.asList(pausedTime_Start));
-         }
-         final Long[] pausedTime_End = ArrayUtils.toObject(tourData.getPausedTime_End());
-         if (pausedTime_End != null) {
-
-            //If a new tour start time is set, we need to offset the tour pause times
-            if (!isOriginalTime) {
-
-               offsetPausedTimes(
-                     tourData.getTourStartTimeMS(),
-                     joinedTourStart.toInstant().toEpochMilli(),
-                     previousTourData,
-                     pausedTime_End);
-            }
-            joinedPausedTime_End.addAll(Arrays.asList(pausedTime_End));
-         }
-         final Long[] pausedTime_Data = ArrayUtils.toObject(tourData.getPausedTime_Data());
-         if (pausedTime_Data != null) {
-
-            joinedPausedTime_Data.addAll(Arrays.asList(pausedTime_Data));
-
-         } else if (pausedTime_Start != null && pausedTime_End != null) {
-
-            //The case can happen that a tour has pause data but no paused time
-            //data (i.e.: All file formats except FIT imported prior to 22.1.0).
-            //In this case, we need to add default paused time data
-
-            Arrays.asList(pausedTime_Start).forEach(pausedTime -> joinedPausedTime_Data.add(0L));
-         }
+         joinPausedTimes(isOriginalTime,
+               joinedPausedTime_Start,
+               joinedPausedTime_End,
+               joinedPausedTime_Data,
+               joinedTourStart,
+               previousTourData,
+               tourData);
 
          joinedPausedTime += tourData.getTourDeviceTime_Paused();
 
@@ -1540,18 +1555,17 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             _chkDeleteSourceTours.getSelection()) {
          if (_tourProvider instanceof TourBookView) {
 
-         super.close();
+            super.close();
 
-         //todo fb add boolean to specify no dialog messages ?
-         //that way, there is no need for super.close!
-         final ActionDeleteTour actionDeleteTours = new ActionDeleteTour((TourBookView) _tourProvider);
-         actionDeleteTours.run();
+            //todo fb add boolean to specify no dialog messages ?
+            //that way, there is no need for super.close!
+            final ActionDeleteTour actionDeleteTours = new ActionDeleteTour((TourBookView) _tourProvider);
+            actionDeleteTours.run();
+         } else {
+            //todo fb do it manually
+            //use TOurDatabase.delete(tourId)
+         }
       }
-      else {
-         //todo fb do it manually
-         //use TOurDatabase.delete(tourId)
-      }
-   }
 
       super.okPressed();
    }
