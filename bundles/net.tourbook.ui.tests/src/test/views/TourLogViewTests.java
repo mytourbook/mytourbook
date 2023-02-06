@@ -34,20 +34,27 @@ public class TourLogViewTests extends UITest {
 
       final SWTBotTreeItem tour = Utils.getTour(bot);
 
-      tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
-            .menu(Messages.tour_editor_section_weather)
-            .menu(Messages.Tour_Action_RetrieveWeatherData).click();
+      triggerTourAction(tour);
 
       //Switching to a different layout
       bot.toolbarButtonWithTooltip(Messages.Tour_Log_Action_TourLogLayout_Tooltip).click();
 
-      tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
-            .menu(Messages.tour_editor_section_weather)
-            .menu(Messages.Tour_Action_RetrieveWeatherData).click();
+      triggerTourAction(tour);
 
       //Clearing the log view
       bot.toolbarButtonWithTooltip(Messages.Tour_Log_Action_Clear_Tooltip).click();
 
+      //Reverting to the original layout
+      bot.toolbarButtonWithTooltip(Messages.Tour_Log_Action_TourLogLayout_Tooltip).click();
+
       tourLogView.close();
+   }
+
+   //Triggering an action to display an entry in the log view
+   private void triggerTourAction(final SWTBotTreeItem tour) {
+
+      tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
+            .menu(Messages.tour_editor_section_weather)
+            .menu(Messages.Tour_Action_RetrieveWeatherData).click();
    }
 }
