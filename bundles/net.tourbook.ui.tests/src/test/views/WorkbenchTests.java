@@ -15,8 +15,6 @@
  *******************************************************************************/
 package views;
 
-import net.tourbook.Messages;
-
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.junit.BeforeClass;
@@ -66,9 +64,6 @@ public class WorkbenchTests extends UITest {
       //My hunch is that the build machine has no 3D graphics capabilities
       //Sleeping 3 seconds as the map can be slow to display
       //bot.sleep(3000);
-
-      final SWTBotView tourLogView = Utils.showView(bot, "Tour Log"); //$NON-NLS-1$
-      bot.toolbarButtonWithTooltip(Messages.Tour_Log_Action_TourLogLayout_Tooltip).click();
 
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode("Waypoints").select(); //$NON-NLS-1$
@@ -141,7 +136,6 @@ public class WorkbenchTests extends UITest {
       bot.sleep(3000);
 
       //Close the opened views
-      tourLogView.close();
       waypointsView.close();
       tourDataView.close();
       tourAnalyzerView.close();
