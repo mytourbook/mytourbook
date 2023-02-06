@@ -53,7 +53,6 @@ import net.tourbook.map25.layer.marker.MarkerRendererMT;
 import net.tourbook.map25.layer.marker.MarkerShape;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
 import net.tourbook.map25.layer.marker.PhotoToolkit;
-import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
@@ -161,7 +160,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    public static final float                    SUN_TIME_RANGE                                = 10;
    public static final float                    SUN_TIME_DETAIL_RANGE                         = 50;
    //
-   public static final float                    MAP_CENTER_VERTICAL_MAX_VALUE                 = 100.0f;
+   public static final float                    MAP_CENTER_VERTICAL_MAX_VALUE                 = 200.0f;
    //
    private static IDialogSettings               _state;
    //
@@ -689,8 +688,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       // initially _lwjglApp is not set when the tour track config is restored
       // -> it is too complicated to set it correctly
       // -> therefore this post enablement
-      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-      Map25FPSManager.setAnimation(trackConfig.arrow_IsAnimate);
+//      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+//      Map25FPSManager.setAnimation(trackConfig.arrow_IsAnimate);
 
       /**
        * Overwrite input handler, using own GdxMap.create() method didn't work :-(

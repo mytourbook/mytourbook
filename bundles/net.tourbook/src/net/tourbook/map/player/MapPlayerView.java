@@ -31,7 +31,6 @@ import net.tourbook.common.tooltip.ICloseOpenedDialogs;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.MtMath;
-import net.tourbook.common.util.Util;
 import net.tourbook.map.MapManager;
 import net.tourbook.map.model.SlideoutMapModel;
 import net.tourbook.map25.Map25FPSManager;
@@ -48,7 +47,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -65,11 +63,9 @@ import org.oscim.renderer.GLViewport;
 
 public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
-   public static final String           ID                     = "net.tourbook.map.player.MapPlayerView"; //$NON-NLS-1$
+   public static final String           ID     = "net.tourbook.map.player.MapPlayerView"; //$NON-NLS-1$
    //
-   private static final String          STATE_IS_SHOW_END_TIME = "STATE_IS_SHOW_END_TIME";                //$NON-NLS-1$
-   //
-   private static final IDialogSettings _state                 = TourbookPlugin.getState(ID);
+   private static final IDialogSettings _state = TourbookPlugin.getState(ID);
    //
 // SET_FORMATTING_OFF
 
@@ -96,7 +92,6 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
    private Action_SlideoutMapModel _actionSlideoutMapModel;
    //
    private boolean                 _isInUpdateTimeline;
-   private boolean                 _isShow_EndTime_Or_RemainingTime;
    //
    private int                     _currentTimelineMaxValue;
    private int                     _currentTimelineValue;
@@ -289,17 +284,14 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       createUI(parent);
 
-      enableControls();
-
       parent.getDisplay().asyncExec(() -> {
 
          // run async because the theme may not yet been initialized
          restoreState();
 
-         MapPlayerManager.setMapPlayerViewer(this);
+         enableControls();
 
-         // set default label width
-//         _scaleWobbleNaviagator.getParent().getParent().layout(true, true);
+         MapPlayerManager.setMapPlayerView(this);
 
          updatePlayer_InUIThread();
       });
@@ -357,7 +349,6 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
          }
          {
             _lblTimeline_Value = new Label(container, SWT.CENTER);
-            _lblTimeline_Value.addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> onMouseDown_TimeEndOrRemaining()));
             gridDataAlignEndCenter.applyTo(_lblTimeline_Value);
 //            _lblTimeline_Value.setBackground(UI.SYS_COLOR_CYAN);
          }
@@ -390,7 +381,6 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
          }
          {
             _lblSpeedJogWheel_Value = new Label(container, SWT.CENTER);
-            _lblSpeedJogWheel_Value.addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> onMouseDown_TimeEndOrRemaining()));
             gridDataAlignEndCenter.applyTo(_lblSpeedJogWheel_Value);
 //            _lblSpeedJogWheel_Value.setBackground(UI.SYS_COLOR_CYAN);
          }
@@ -505,7 +495,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       getViewSite().getPage().removePartListener(_partListener);
 
-      MapPlayerManager.setMapPlayerViewer(null);
+      MapPlayerManager.setMapPlayerView(null);
 
       super.dispose();
    }
@@ -513,12 +503,13 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
    private void enableControls() {
 
       final boolean canShowMapModel = MapPlayerManager.canShowMapModel();
-      final boolean isModelVisible = canShowMapModel && MapPlayerManager.isMapModelVisible();
+      final boolean isModelVisible = canShowMapModel
+            && (MapPlayerManager.isMapModelVisible() || MapPlayerManager.isMapModelCursorVisible());
 
 // SET_FORMATTING_OFF
 
-      _actionPlayControl_PlayAndPause     .setEnabled(isModelVisible);
       _actionPlayControl_Loop             .setEnabled(isModelVisible);
+      _actionPlayControl_PlayAndPause     .setEnabled(isModelVisible);
       _actionShowMapModel                 .setEnabled(canShowMapModel);
       _actionSlideoutMapModel             .setEnabled(isModelVisible);
 
@@ -683,13 +674,6 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       }
 
       return false;
-   }
-
-   private void onMouseDown_TimeEndOrRemaining() {
-
-      _isShow_EndTime_Or_RemainingTime = !_isShow_EndTime_Or_RemainingTime;
-
-//      updateUI_FromTimeline_VisibleFrames();
    }
 
    private void onPlayControl_Loop() {
@@ -948,12 +932,17 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
    private void restoreState() {
 
-      _isShow_EndTime_Or_RemainingTime = Util.getStateBoolean(_state, STATE_IS_SHOW_END_TIME, true);
+// SET_FORMATTING_OFF
 
-      _actionPlayControl_Loop.setChecked(MapPlayerManager.isPlayingLoop());
-      _chkIsRelivePlaying.setSelection(MapPlayerManager.isReLivePlaying());
-      _spinnerModelCursorSize.setSelection(MapPlayerManager.getModelCursorSize());
-      _spinnerModelSize.setSelection(MapPlayerManager.getFixedModelSize());
+      _actionPlayControl_Loop    .setChecked(MapPlayerManager.isPlayingLoop());
+      _actionShowMapModel        .setChecked(MapPlayerManager.isMapModelVisible());
+
+      _chkIsRelivePlaying        .setSelection(MapPlayerManager.isReLivePlaying());
+
+      _spinnerModelCursorSize    .setSelection(MapPlayerManager.getModelCursorSize());
+      _spinnerModelSize          .setSelection(MapPlayerManager.getFixedModelSize());
+
+// SET_FORMATTING_ON
 
       setJogWheel_Value(MapPlayerManager.getJogWheelSpeed());
 
@@ -963,7 +952,6 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
    @PersistState
    private void saveState() {
 
-      _state.put(STATE_IS_SHOW_END_TIME, _isShow_EndTime_Or_RemainingTime);
    }
 
    @Override

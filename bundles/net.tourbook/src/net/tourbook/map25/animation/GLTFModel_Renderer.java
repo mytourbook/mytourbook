@@ -43,7 +43,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.map.model.MapModel;
 import net.tourbook.map.model.MapModelManager;
 import net.tourbook.map.player.MapPlayerManager;
-import net.tourbook.map25.Map25ConfigManager;
 
 import org.oscim.backend.GL;
 import org.oscim.core.MapPosition;
@@ -260,7 +259,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
    @Override
    public void render(final GLViewport viewport) {
 
-      if (Map25ConfigManager.getActiveTourTrackConfig().arrow_IsAnimate == false) {
+      if (MapPlayerManager.isMapModelVisible() == false) {
          return;
       }
 

@@ -17,6 +17,7 @@ package net.tourbook.map25.renderer;
 
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
+import net.tourbook.map.player.MapPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
@@ -670,15 +671,14 @@ public class TourTrack_Bucket {
          return;
       }
 
-      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-
-      if (trackConfig.arrow_IsAnimate) {
-
-         createArrowVertices_200_Animated(allDirectionArrowPixel, allVisibleGeoLocationIndices);
-
-      } else {
+      if (Map25ConfigManager.getActiveTourTrackConfig().isShowDirectionArrow) {
 
          createArrowVertices_100_NotAnimated(allDirectionArrowPixel);
+      }
+
+      if (MapPlayerManager.isMapModelVisible() || MapPlayerManager.isMapModelCursorVisible()) {
+
+         createArrowVertices_200_Animated(allDirectionArrowPixel, allVisibleGeoLocationIndices);
       }
    }
 

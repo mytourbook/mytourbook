@@ -754,7 +754,7 @@ public class Map25View extends ViewPart implements
                _isPartVisible = false;
             }
 
-            setCanShowMapModel(partRef, false);
+            setIsMap25Available(partRef, null);
          }
 
          @Override
@@ -770,14 +770,14 @@ public class Map25View extends ViewPart implements
 
             onPartVisible(partRef);
 
-            setCanShowMapModel(partRef, true);
+            setIsMap25Available(partRef, Map25View.this);
          }
 
-         private void setCanShowMapModel(final IWorkbenchPartReference partRef, final boolean canShowMapModel) {
+         private void setIsMap25Available(final IWorkbenchPartReference partRef, final Map25View map25View) {
 
             if (partRef.getPart(false) == Map25View.this) {
 
-               MapPlayerManager.setCanShowMapModel(canShowMapModel);
+               MapPlayerManager.setMap25View(map25View);
             }
          }
       };

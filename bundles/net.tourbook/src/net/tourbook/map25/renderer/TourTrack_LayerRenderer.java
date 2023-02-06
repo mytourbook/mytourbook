@@ -301,17 +301,11 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          final double compileMapScale = compileMapPos.scale = 1 << compileMapZoomlevel;
 
          final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-         final boolean isShowDirectionArrows = trackConfig.isShowDirectionArrow;
+         final int arrow_MinimumDistance = trackConfig.arrow_MinimumDistance;
 
-         int arrow_MinimumDistance = trackConfig.arrow_IsAnimate
-
-               // use a smaller distance when animated, to show the moving figure smoothly
-               ? 1
-
-               : trackConfig.arrow_MinimumDistance;
-
-         // this is for debugging
-         arrow_MinimumDistance = trackConfig.arrow_MinimumDistance;
+         final boolean isShowDirectionArrowsOrMapModels = trackConfig.isShowDirectionArrow
+               || MapPlayerManager.isMapModelVisible()
+               || MapPlayerManager.isMapModelCursorVisible();
 
          final TourTrack_Bucket workerBucket = getWorkerBucket(task.__taskBucketManager);
 
@@ -524,7 +518,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             workerBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
          }
 
-         if (isShowDirectionArrows) {
+         if (isShowDirectionArrowsOrMapModels) {
 
             // convert arrow positions into arrow vertices
             workerBucket.createArrowVertices(

@@ -245,64 +245,58 @@ public final class TourTrack_Shader {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
+      /*
+       * Static direction arrows
+       */
       if (trackConfig.isShowDirectionArrow) {
 
-         if (trackConfig.arrow_IsAnimate) {
+         /*
+          * Vertices
+          */
+         final ShortArrayList dirArrowVertices = trackBucket.directionArrow_Vertices;
+         final int numVertices = dirArrowVertices.size();
+         final ShortBuffer buffer1 = MapRenderer.getShortBuffer(numVertices).put(dirArrowVertices.toArray()).flip();
+         gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows);
+         gl.bufferData(GL.ARRAY_BUFFER, numVertices * SHORT_BYTES, buffer1, GL.STATIC_DRAW);
 
-            /*
-             * Animation
-             */
-            {
-               /*
-                * Vertices
-                */
+         /*
+          * Color
+          */
+         final ShortArrayList colorCoords = trackBucket.directionArrow_ColorCoords;
+         final int numColorCoords = colorCoords.size();
+         final ShortBuffer buffer2 = MapRenderer.getShortBuffer(numColorCoords).put(colorCoords.toArray()).flip();
+         gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows_ColorCoords);
+         gl.bufferData(GL.ARRAY_BUFFER, numColorCoords * SHORT_BYTES, buffer2, GL.STATIC_DRAW);
+      }
 
-// SET_FORMATTING_OFF
+      /*
+       * Map model cursor
+       */
+      if (MapPlayerManager.isMapModelCursorVisible()) {
 
-               final short size  = MapPlayerManager.getModelCursorSize();
-               final short size2 = (short) (size * 3);
-               final short zPos  = (short) (1 + trackBucket.heightOffset);
+         /*
+          * Vertices
+          */
 
-               // paint a simple triangle
-               _animationVertices = new short[] {
-                                                   0,     0,   zPos,
-                                                size,  size2,  zPos,
-                                               (short) -size,  size2,  zPos,
+//SET_FORMATTING_OFF
 
-                                                };
-// SET_FORMATTING_ON
+         final short size  = MapPlayerManager.getModelCursorSize();
+         final short size2 = (short) (size * 3);
+         final short zPos  = (short) (1 + trackBucket.heightOffset);
 
-               final int numAnimationVertices = _animationVertices.length;
-               final ShortBuffer buffer1 = MapRenderer.getShortBuffer(numAnimationVertices).put(_animationVertices).flip();
-               gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_AnimationVertices);
-               gl.bufferData(GL.ARRAY_BUFFER, numAnimationVertices * SHORT_BYTES, buffer1, GL.STATIC_DRAW);
-            }
+         // paint a simple triangle
+         _animationVertices = new short[] {
+                                             0,     0,   zPos,
+                                          size,  size2,  zPos,
+                                         (short) -size,  size2,  zPos,
 
-         } else {
+                                          };
+//SET_FORMATTING_ON
 
-            /*
-             * Static direction arrows
-             */
-            {
-               /*
-                * Vertices
-                */
-               final ShortArrayList dirArrowVertices = trackBucket.directionArrow_Vertices;
-               final int numVertices = dirArrowVertices.size();
-               final ShortBuffer buffer1 = MapRenderer.getShortBuffer(numVertices).put(dirArrowVertices.toArray()).flip();
-               gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows);
-               gl.bufferData(GL.ARRAY_BUFFER, numVertices * SHORT_BYTES, buffer1, GL.STATIC_DRAW);
-
-               /*
-                * Color
-                */
-               final ShortArrayList colorCoords = trackBucket.directionArrow_ColorCoords;
-               final int numColorCoords = colorCoords.size();
-               final ShortBuffer buffer2 = MapRenderer.getShortBuffer(numColorCoords).put(colorCoords.toArray()).flip();
-               gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows_ColorCoords);
-               gl.bufferData(GL.ARRAY_BUFFER, numColorCoords * SHORT_BYTES, buffer2, GL.STATIC_DRAW);
-            }
-         }
+         final int numAnimationVertices = _animationVertices.length;
+         final ShortBuffer buffer1 = MapRenderer.getShortBuffer(numAnimationVertices).put(_animationVertices).flip();
+         gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_AnimationVertices);
+         gl.bufferData(GL.ARRAY_BUFFER, numAnimationVertices * SHORT_BYTES, buffer1, GL.STATIC_DRAW);
       }
 
       return true;
@@ -359,14 +353,12 @@ public final class TourTrack_Shader {
 
          if (trackConfig.isShowDirectionArrow) {
 
-            if (trackConfig.arrow_IsAnimate) {
+            paint_20_DirectionArrows(viewport, viewport2mapscale, trackBucket);
+         }
 
-               paint_30_ModelCursor(viewport, viewport2mapscale);
+         if (MapPlayerManager.isMapModelCursorVisible()) {
 
-            } else {
-
-               paint_20_DirectionArrows(viewport, viewport2mapscale, trackBucket);
-            }
+            paint_30_ModelCursor(viewport, viewport2mapscale);
          }
       }
       gl.blendFunc(GL.ONE, GL.ONE_MINUS_SRC_ALPHA); // reset to map default
