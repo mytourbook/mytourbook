@@ -305,7 +305,7 @@ public class TourLogView extends ViewPart {
 
          final boolean[] isFirst = { false };
 
-         allSimple.forEach((logMessage) -> {
+         allSimple.forEach(logMessage -> {
 
             if (isFirst[0] == false) {
                isFirst[0] = true;
