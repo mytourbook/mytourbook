@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,9 +15,10 @@
  *******************************************************************************/
 package net.tourbook.ui.views;
 
+import static org.eclipse.swt.browser.LocationListener.changingAdapter;
+import static org.eclipse.swt.browser.ProgressListener.completedAdapter;
+
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,6 +57,7 @@ import net.tourbook.ui.views.tourCatalog.SelectionTourCatalogView;
 import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import net.tourbook.ui.views.tourCatalog.TVICatalogRefTourItem;
 import net.tourbook.ui.views.tourCatalog.TVICompareResultComparedTour;
+import net.tourbook.weather.WeatherUtils;
 import net.tourbook.web.WEB;
 
 import org.eclipse.jface.action.IToolBarManager;
@@ -65,7 +67,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
@@ -73,17 +74,13 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.LocationAdapter;
 import org.eclipse.swt.browser.LocationEvent;
-import org.eclipse.swt.browser.ProgressAdapter;
-import org.eclipse.swt.browser.ProgressEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.ISelectionListener;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -219,16 +216,13 @@ public class TourBlogView extends ViewPart {
 
    private void addPrefListener() {
 
-      _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
+         if (property.equals(ITourbookPreferences.GRAPH_MARKER_IS_MODIFIED)) {
 
-               updateUI();
-            }
+            updateUI();
          }
       };
 
@@ -240,74 +234,72 @@ public class TourBlogView extends ViewPart {
     */
    private void addSelectionListener() {
 
-      _postSelectionListener = new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-            if (part == TourBlogView.this) {
-               return;
-            }
-            onSelectionChanged(selection);
+      _postSelectionListener = (workbenchPart, selection) -> {
+         if (workbenchPart == TourBlogView.this) {
+            return;
          }
+         onSelectionChanged(selection);
       };
       getSite().getPage().addPostSelectionListener(_postSelectionListener);
    }
 
    private void addTourEventListener() {
 
-      _tourEventListener = new ITourEventListener() {
-         @Override
-         public void tourChanged(final IWorkbenchPart part, final TourEventId eventId, final Object eventData) {
+      _tourEventListener = (workbenchPart, eventId, eventData) -> {
 
-            if (part == TourBlogView.this) {
-               return;
-            }
+         if (workbenchPart == TourBlogView.this) {
+            return;
+         }
 
-            if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
+         if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-               final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
-               if (modifiedTours != null) {
+            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            if (modifiedTours != null) {
 
-                  // update modified tour
+               // update modified tour
 
-                  final long viewTourId = _tourData.getTourId();
-
-                  for (final TourData tourData : modifiedTours) {
-                     if (tourData.getTourId() == viewTourId) {
-
-                        // get modified tour
-                        _tourData = tourData;
-
-                        // removed old tour data from the selection provider
-                        _postSelectionProvider.clearSelection();
-
-                        updateUI();
-
-                        // nothing more to do, the view contains only one tour
-                        return;
-                     }
-                  }
+               if (_tourData == null) {
+                  return;
                }
 
-            } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+               final long viewTourId = _tourData.getTourId();
 
-               clearView();
+               for (final TourData tourData : modifiedTours) {
+                  if (tourData.getTourId() == viewTourId) {
 
-            } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
-
-               onSelectionChanged((ISelection) eventData);
-
-            } else if (eventId == TourEventId.MARKER_SELECTION) {
-
-               if (eventData instanceof SelectionTourMarker) {
-
-                  final TourData tourData = ((SelectionTourMarker) eventData).getTourData();
-
-                  if (tourData != _tourData) {
-
+                     // get modified tour
                      _tourData = tourData;
 
+                     // removed old tour data from the selection provider
+                     _postSelectionProvider.clearSelection();
+
                      updateUI();
+
+                     // nothing more to do, the view contains only one tour
+                     return;
                   }
+               }
+            }
+
+         } else if (eventId == TourEventId.CLEAR_DISPLAYED_TOUR) {
+
+            clearView();
+
+         } else if ((eventId == TourEventId.TOUR_SELECTION) && eventData instanceof ISelection) {
+
+            onSelectionChanged((ISelection) eventData);
+
+         } else if (eventId == TourEventId.MARKER_SELECTION) {
+
+            if (eventData instanceof SelectionTourMarker) {
+
+               final TourData tourData = ((SelectionTourMarker) eventData).getTourData();
+
+               if (tourData != _tourData) {
+
+                  _tourData = tourData;
+
+                  updateUI();
                }
             }
          }
@@ -420,7 +412,7 @@ public class TourBlogView extends ViewPart {
 
       String tourTitle = _tourData.getTourTitle();
       String tourDescription = _tourData.getTourDescription();
-      String tourWeather = _tourData.getWeather();
+      String tourWeather = WeatherUtils.buildWeatherDataString(_tourData, true, true, true);
 
       final boolean isDescription = tourDescription.length() > 0;
       final boolean isTitle = tourTitle.length() > 0;
@@ -447,7 +439,7 @@ public class TourBlogView extends ViewPart {
                   }
                }
 
-               final String hoverEdit = NLS.bind(Messages.Tour_Blog_Action_EditTour_Tooltip, tourTitle);
+               final String hoverEdit = WEB.escapeSingleQuote(NLS.bind(Messages.Tour_Blog_Action_EditTour_Tooltip, tourTitle));
 
                final String hrefEditTour = HTTP_DUMMY + HREF_EDIT_TOUR;
 
@@ -523,10 +515,10 @@ public class TourBlogView extends ViewPart {
       final String hrefHideMarker = HTTP_DUMMY + HREF_HIDE_MARKER + markerId;
       final String hrefShowMarker = HTTP_DUMMY + HREF_SHOW_MARKER + markerId;
 
-      final String hoverEditMarker = NLS.bind(Messages.Tour_Blog_Action_EditMarker_Tooltip, markerLabel);
-      final String hoverHideMarker = NLS.bind(Messages.Tour_Blog_Action_HideMarker_Tooltip, markerLabel);
-      final String hoverOpenMarker = NLS.bind(Messages.Tour_Blog_Action_OpenMarker_Tooltip, markerLabel);
-      final String hoverShowMarker = NLS.bind(Messages.Tour_Blog_Action_ShowMarker_Tooltip, markerLabel);
+      final String hoverEditMarker = WEB.escapeSingleQuote(NLS.bind(Messages.Tour_Blog_Action_EditMarker_Tooltip, markerLabel));
+      final String hoverHideMarker = WEB.escapeSingleQuote(NLS.bind(Messages.Tour_Blog_Action_HideMarker_Tooltip, markerLabel));
+      final String hoverOpenMarker = WEB.escapeSingleQuote(NLS.bind(Messages.Tour_Blog_Action_OpenMarker_Tooltip, markerLabel));
+      final String hoverShowMarker = WEB.escapeSingleQuote(NLS.bind(Messages.Tour_Blog_Action_ShowMarker_Tooltip, markerLabel));
 
       /*
        * get color by priority
@@ -720,19 +712,9 @@ public class TourBlogView extends ViewPart {
 
          GridDataFactory.fillDefaults().grab(true, true).applyTo(_browser);
 
-         _browser.addLocationListener(new LocationAdapter() {
-            @Override
-            public void changing(final LocationEvent event) {
-               onBrowserLocationChanging(event);
-            }
-         });
+         _browser.addLocationListener(changingAdapter(this::onBrowserLocationChanging));
 
-         _browser.addProgressListener(new ProgressAdapter() {
-            @Override
-            public void completed(final ProgressEvent event) {
-               onBrowserCompleted(event);
-            }
-         });
+         _browser.addProgressListener(completedAdapter(progressEvent -> onBrowserCompleted()));
 
       } catch (final SWTError e) {
 
@@ -886,13 +868,13 @@ public class TourBlogView extends ViewPart {
          _imageUrl_ActionHideMarker = net.tourbook.ui.UI.getIconUrl(ThemeUtil.getThemedImageName(Images.App_Hide));
          _imageUrl_ActionShowMarker = net.tourbook.ui.UI.getIconUrl(ThemeUtil.getThemedImageName(Images.App_Show));
 
-      } catch (final IOException | URISyntaxException e) {
+      } catch (final Exception e) {
          StatusUtil.showStatus(e);
       }
 
    }
 
-   private void onBrowserCompleted(final ProgressEvent event) {
+   private void onBrowserCompleted() {
 
       if (_reloadedTourMarkerId == null) {
          return;
@@ -904,14 +886,11 @@ public class TourBlogView extends ViewPart {
       /*
        * This must be run async otherwise an endless loop will happen
        */
-      _browser.getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      _browser.getDisplay().asyncExec(() -> {
 
-            final String href = "location.href='" + createHtml_MarkerName(reloadedTourMarkerId) + "'"; //$NON-NLS-1$ //$NON-NLS-2$
+         final String href = "location.href='" + createHtml_MarkerName(reloadedTourMarkerId) + "'"; //$NON-NLS-1$ //$NON-NLS-2$
 
-            _browser.execute(href);
-         }
+         _browser.execute(href);
       });
 
       _reloadedTourMarkerId = null;
@@ -1099,12 +1078,7 @@ public class TourBlogView extends ViewPart {
       /*
        * Run async because a tour save will fire a tour change event.
        */
-      _parent.getDisplay().asyncExec(new Runnable() {
-         @Override
-         public void run() {
-            TourManager.saveModifiedTour(_tourData);
-         }
-      });
+      _parent.getDisplay().asyncExec(() -> TourManager.saveModifiedTour(_tourData));
    }
 
    @Override
@@ -1122,27 +1096,24 @@ public class TourBlogView extends ViewPart {
       showInvalidPage();
 
       // a tour is not displayed, find a tour provider which provides a tour
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getCurrent().asyncExec(() -> {
 
-            // validate widget
-            if (_pageBook.isDisposed()) {
-               return;
-            }
+         // validate widget
+         if (_pageBook.isDisposed()) {
+            return;
+         }
 
-            /*
-             * check if tour was set from a selection provider
-             */
-            if (_tourData != null) {
-               return;
-            }
+         /*
+          * check if tour was set from a selection provider
+          */
+         if (_tourData != null) {
+            return;
+         }
 
-            final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+         final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
 
-            if ((selectedTours != null) && (selectedTours.size() > 0)) {
-               onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
-            }
+         if ((selectedTours != null) && (selectedTours.size() > 0)) {
+            onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
          }
       });
    }
