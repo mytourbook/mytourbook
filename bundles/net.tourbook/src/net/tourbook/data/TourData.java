@@ -576,6 +576,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    private float                 weather_Temperature_WindChill;                        // db-version 39
 
+   /**
+    * Air Quality Index
+    */
+   private float                 weather_AirQualityIndex;                                     // db-version XX
+
+   //TODO FB
+   //https://openweathermap.org/api/air-pollution
+
+   //add the DB field
+   //add the field as readonly under the temperatures in the tour data editor view (number ? combo ? both ? text as in "Good" "poor"...?
+   //add tool tip of quality definitions
+   //add it in the string to strava as "Air Quality: Good"
 
    // ############################################# POWER #############################################
 
