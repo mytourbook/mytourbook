@@ -1166,26 +1166,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           * Show image only when it is visible, opacity > 0
           */
 
-         File webFile;
-         try {
+         final File webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE);
+         final String webContent = Util.readContentFromFile(webFile.getAbsolutePath());
+         final String base64Encoded = Base64.getEncoder().encodeToString(webContent.getBytes());
 
-            webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE);
-            final String webContent = Util.readContentFromFile(webFile.getAbsolutePath());
-            final String base64Encoded = Base64.getEncoder().encodeToString(webContent.getBytes());
+         bgImage = CSS_IMPORT_BACKGROUND + NL
 
-            bgImage = CSS_IMPORT_BACKGROUND + NL
-
-                  + "{" + NL //                                                           //$NON-NLS-1$
-                  + "   background:             url('data:image/svg+xml;base64," + base64Encoded + "');" + NL //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   background-repeat:      no-repeat;" + NL //                       //$NON-NLS-1$
-                  + "   background-size:        contain;" + NL //                         //$NON-NLS-1$
-                  + "   background-position:    center center;" + NL //                   //$NON-NLS-1$
-                  + "   opacity:                " + (float) opacity / 100 + ";" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
-                  + "}" + NL; //                                                          //$NON-NLS-1$
-
-         } catch (final Exception e) {
-            TourLogManager.log_EXCEPTION_WithStacktrace(e);
-         }
+               + "{" + NL //                                                           //$NON-NLS-1$
+               + "   background:             url('data:image/svg+xml;base64," + base64Encoded + "');" + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + "   background-repeat:      no-repeat;" + NL //                       //$NON-NLS-1$
+               + "   background-size:        contain;" + NL //                         //$NON-NLS-1$
+               + "   background-position:    center center;" + NL //                   //$NON-NLS-1$
+               + "   opacity:                " + (float) opacity / 100 + ";" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+               + "}" + NL; //                                                          //$NON-NLS-1$
       }
 
       String animation = UI.EMPTY_STRING;
@@ -2451,7 +2444,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          _imageUrl_DeviceFolder_NotChecked = getIconUrl(Images.RawData_DeviceFolder_NotChecked);
          _imageUrl_DeviceFolder_NotSetup = getIconUrl(Images.RawData_DeviceFolder_NotSetup);
 
-      } catch (final Exception e) {
+      } catch (final IOException e) {
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
    }
@@ -5561,7 +5554,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
-   void selectLastTour() {
+   private void selectLastTour() {
 
       final Collection<TourData> tourDataCollection = _rawDataMgr.getImportedTours().values();
 

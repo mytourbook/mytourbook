@@ -19,11 +19,9 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -351,8 +349,6 @@ public class WEB {
    /**
     * @param filePathName
     * @return Returns a file from the WebContent folder, this folder is the root for path names.
-    * @throws IOException
-    * @throws URISyntaxException
     */
    public static File getFile(final String filePathName) {
 
@@ -413,8 +409,6 @@ public class WEB {
    /**
     * @param fileName
     * @return Returns a file from the resource folder {@value #RESOURCE_PATH}.
-    * @throws IOException
-    * @throws URISyntaxException
     */
    public static File getResourceFile(final String fileName) {
 

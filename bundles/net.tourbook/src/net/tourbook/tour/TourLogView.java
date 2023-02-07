@@ -193,7 +193,7 @@ public class TourLogView extends ViewPart {
 
       if (isBrowserAvailable() && _isBrowserCompleted == false) {
 
-         // this occures when the view is opening but not yet ready
+         // this occurs when the view is opening but not yet ready
          return;
       }
 
@@ -803,23 +803,16 @@ public class TourLogView extends ViewPart {
       /*
        * Webpage css
        */
-      try {
+      final File webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_LOG_CSS);
+      final String cssFromFile = Util.readContentFromFile(webFile.getAbsolutePath());
 
-         final File webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_LOG_CSS);
-         final String cssFromFile = Util.readContentFromFile(webFile.getAbsolutePath());
+      _tourLogCSS = UI.EMPTY_STRING
 
-         _tourLogCSS = UI.EMPTY_STRING
-
-               + "<style>" + NL //              //$NON-NLS-1$
-               + WEB.createCSS_Scrollbar()
-               + cssFromFile
-               + "</style>" + NL //             //$NON-NLS-1$
-         ;
-
-      } catch (final Exception e) {
-         TourLogManager.log_EXCEPTION_WithStacktrace(e);
-      }
-
+            + "<style>" + NL //              //$NON-NLS-1$
+            + WEB.createCSS_Scrollbar()
+            + cssFromFile
+            + "</style>" + NL //             //$NON-NLS-1$
+      ;
    }
 
    private boolean isBrowserAvailable() {
