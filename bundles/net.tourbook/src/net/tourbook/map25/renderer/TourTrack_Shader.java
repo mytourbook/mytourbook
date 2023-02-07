@@ -77,12 +77,11 @@ public final class TourTrack_Shader {
    private static ByteBuffer            _vertexColor_Buffer;
    private static int                   _vertexColor_BufferSize;
 
-   private static short[]               _animationVertices;
+   private static short[]               _mapModelCursorVertices;
 
    private static GLMatrix              _animationMatrix         = new GLMatrix();
 
-   private static int                   _prevValue;
-
+// private static int                   _prevValue;
 // private static double                _prevValue;
 
    private static class DirectionArrowsShader extends GLShaderMT {
@@ -285,7 +284,7 @@ public final class TourTrack_Shader {
          final short zPos  = (short) (1 + trackBucket.heightOffset);
 
          // paint a simple triangle
-         _animationVertices = new short[] {
+         _mapModelCursorVertices = new short[] {
                                              0,     0,   zPos,
                                           size,  size2,  zPos,
                                          (short) -size,  size2,  zPos,
@@ -293,8 +292,8 @@ public final class TourTrack_Shader {
                                           };
 //SET_FORMATTING_ON
 
-         final int numAnimationVertices = _animationVertices.length;
-         final ShortBuffer buffer1 = MapRenderer.getShortBuffer(numAnimationVertices).put(_animationVertices).flip();
+         final int numAnimationVertices = _mapModelCursorVertices.length;
+         final ShortBuffer buffer1 = MapRenderer.getShortBuffer(numAnimationVertices).put(_mapModelCursorVertices).flip();
          gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_AnimationVertices);
          gl.bufferData(GL.ARRAY_BUFFER, numAnimationVertices * SHORT_BYTES, buffer1, GL.STATIC_DRAW);
       }
@@ -803,7 +802,7 @@ public final class TourTrack_Shader {
          GLState.test(true, false);
          gl.depthMask(true);
          {
-            gl.drawArrays(GL.TRIANGLES, 0, _animationVertices.length);
+            gl.drawArrays(GL.TRIANGLES, 0, _mapModelCursorVertices.length);
          }
          gl.depthMask(false);
       }
