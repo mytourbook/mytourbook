@@ -448,7 +448,7 @@ public class WEB {
 
       } else if (href.startsWith("http") == false) { //$NON-NLS-1$
 
-         // Ensure that a protocol is set otherwise a MalformedURLException exception occures
+         // Ensure that a protocol is set otherwise a MalformedURLException exception occurs
          href = PROTOCOL_HTTP + href;
       }
 
