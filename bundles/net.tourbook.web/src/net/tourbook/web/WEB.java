@@ -260,7 +260,7 @@ public class WEB {
 
       if (urlString != null) {
 
-         final char[] ch = new char[urlString.length()];
+         final char ch[] = new char[urlString.length()];
 
          urlString.getChars(0, urlString.length(), ch, 0);
 
@@ -448,7 +448,7 @@ public class WEB {
       } else if (href.startsWith("http") == false) { //$NON-NLS-1$
 
          // Ensure that a protocol is set otherwise a MalformedURLException exception occurs
-         href = PROTOCOL_HTTP + href;
+         href = "http://" + href; //$NON-NLS-1$
       }
 
       final boolean useExternalWebBrowser = _state_WEB.getBoolean(STATE_USE_EXTERNAL_WEB_BROWSER);
