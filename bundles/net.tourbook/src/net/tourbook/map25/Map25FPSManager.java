@@ -52,7 +52,7 @@ public class Map25FPSManager {
     * @param isActive
     * @param animationFPS
     */
-   public static void setAnimation(final boolean isActive) {
+   public static void setContinuousRendering(final boolean isActive) {
 
       if (_lwjglApp == null) {
 

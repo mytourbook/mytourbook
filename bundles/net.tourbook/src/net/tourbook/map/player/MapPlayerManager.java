@@ -82,8 +82,10 @@ public class MapPlayerManager {
     * Projected position 0...1 of the model in the current frame, it also includes the micro
     * movements according to the exact relative position
     * <p>
-    * {@link #_currentProjectedPosition}[0] = x<br>
-    * {@link #_currentProjectedPosition}[1] = y<br>
+    * <code>
+    * _currentProjectedPosition[0] = x<br>
+    * _currentProjectedPosition[1] = y<br>
+    * </code>
     */
    private static double[]              _currentProjectedPosition         = new double[2];
    private static long                  _currentProjectedPosition_Time;
@@ -880,7 +882,7 @@ public class MapPlayerManager {
 
 // SET_FORMATTING_ON
 
-      Map25FPSManager.setAnimation(_isMapModelVisible || _isMapModelCursorVisible);
+      Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible);
       setIsModelMovingForward(_jogWheelSpeed >= 0);
    }
 
@@ -917,18 +919,15 @@ public class MapPlayerManager {
    public static void setIsMapModelCursorVisible(final boolean isMapModelCursorVisible) {
 
       _isMapModelCursorVisible = isMapModelCursorVisible;
+
+      updateContinuousRendering();
    }
 
    public static void setIsMapModelVisible(final boolean isMapModelVisible) {
 
       _isMapModelVisible = isMapModelVisible;
 
-      Map25FPSManager.setAnimation(_isMapModelVisible || _isMapModelCursorVisible);
-
-      if (isMap25ViewAvailable()) {
-
-         _map25View.getMapApp().getMap().updateMap();
-      }
+      updateContinuousRendering();
    }
 
    private static void setIsModelMovingForward(final boolean isModelMovingForward) {
@@ -1362,6 +1361,16 @@ public class MapPlayerManager {
    public static void setTurningAngle(final float modelTurningAngle) {
 
       _modelTurningAngle = modelTurningAngle;
+   }
+
+   private static void updateContinuousRendering() {
+
+      Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible);
+
+      if (isMap25ViewAvailable()) {
+
+         _map25View.getMapApp().getMap().updateMap();
+      }
    }
 
 }

@@ -771,41 +771,38 @@ public final class TourTrack_Shader {
       _animationMatrix.setRotation(MapPlayerManager.getModelAngle(), 0f, 0f, 1f);
       _animationMatrix.setAsUniform(shader.uni_AnimationMVP);
 
-      if (MapPlayerManager.isMapModelCursorVisible()) {
+      // set mvp matrix
+      viewport.mvp.setAsUniform(shader.uni_MVP);
 
-         // set mvp matrix
-         viewport.mvp.setAsUniform(shader.uni_MVP);
+      // set animation position
+      gl.uniform2f(shader.uni_ModelCursorPos, dX, dY);
 
-         // set animation position
-         gl.uniform2f(shader.uni_ModelCursorPos, dX, dY);
+      // set viewport scale TO map scale: 1.0...2.0
+      gl.uniform1f(shader.uni_VpScale2CompileScale, vp2mpScale);
 
-         // set viewport scale TO map scale: 1.0...2.0
-         gl.uniform1f(shader.uni_VpScale2CompileScale, vp2mpScale);
+      // set vertices positions
+      final int shader_Attrib_Pos = shader.attrib_Pos;
+      gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_AnimationVertices);
+      gl.enableVertexAttribArray(shader_Attrib_Pos);
+      gl.vertexAttribPointer(
 
-         // set vertices positions
-         final int shader_Attrib_Pos = shader.attrib_Pos;
-         gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_AnimationVertices);
-         gl.enableVertexAttribArray(shader_Attrib_Pos);
-         gl.vertexAttribPointer(
+            shader_Attrib_Pos, //      index of the vertex attribute that is to be modified
+            3, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
+            GL.SHORT, //               data type of each component in the array
+            false, //                  values should be normalized
+            0, //                      offset in bytes between the beginning of consecutive vertex attributes
+            0 //                       offset in bytes of the first component in the vertex attribute array
+      );
 
-               shader_Attrib_Pos, //      index of the vertex attribute that is to be modified
-               3, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
-               GL.SHORT, //               data type of each component in the array
-               false, //                  values should be normalized
-               0, //                      offset in bytes between the beginning of consecutive vertex attributes
-               0 //                       offset in bytes of the first component in the vertex attribute array
-         );
-
-         /*
-          * Draw animation
-          */
-         GLState.test(true, false);
-         gl.depthMask(true);
-         {
-            gl.drawArrays(GL.TRIANGLES, 0, _mapModelCursorVertices.length);
-         }
-         gl.depthMask(false);
+      /*
+       * Draw animation
+       */
+      GLState.test(true, false);
+      gl.depthMask(true);
+      {
+         gl.drawArrays(GL.TRIANGLES, 0, _mapModelCursorVertices.length);
       }
+      gl.depthMask(false);
 
 //    GLUtils.checkGlError(TourTrack_Shader.class.getName());
 
