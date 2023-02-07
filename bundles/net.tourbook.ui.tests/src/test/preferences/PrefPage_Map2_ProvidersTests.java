@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -80,15 +80,15 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
 
       //Add a new WMS provider
       bot.button(Messages.Pref_Map_Button_AddMapProviderWms).click();
-      String wmsProviderUrl = "https://ahocevar.com/geoserver/wms?SERVICE=WMS&REQUEST=GetCapabilities";
+      String wmsProviderUrl = "https://ahocevar.com/geoserver/wms?SERVICE=WMS&REQUEST=GetCapabilities"; //$NON-NLS-1$
       String wmsProviderName;
       int numLayers;
       if (Utils.isUrlReachable(wmsProviderUrl)) {
-         wmsProviderName = "GeoServer Web Map Service";
+         wmsProviderName = "GeoServer Web Map Service"; //$NON-NLS-1$
          numLayers = 12;
       } else {
-         wmsProviderUrl = "https://www.gmrt.org/services/mapserver/wms_merc?version=1.3.0";
-         wmsProviderName = "Global Multi-Resolution Topography (GMRT), Version 4.0";
+         wmsProviderUrl = "https://www.gmrt.org/services/mapserver/wms_merc?version=1.3.0"; //$NON-NLS-1$
+         wmsProviderName = "Global Multi-Resolution Topography (GMRT)"; //$NON-NLS-1$
          numLayers = 2;
       }
 
@@ -99,7 +99,7 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
 
       //Check the new number of providers after adding a new one
       assertEquals(providersTableCount + 1, providersTable.rowCount());
-      assertEquals(wmsProviderName, providersTable.cell(0, 1));
+      assertTrue(providersTable.cell(0, 1).startsWith(wmsProviderName));
 
       providersTable.select(0);
       bot.button(Messages.Pref_Map_Button_Edit).click();
@@ -169,6 +169,6 @@ public class PrefPage_Map2_ProvidersTests extends UITest {
 
    private void selectOfflineMapPreferencePage() {
 
-      bot.tree().getTreeItem("2D Map").expand().getNode("Offline Map").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem("2D Map").expand().getNode("Offline Map").select(); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }

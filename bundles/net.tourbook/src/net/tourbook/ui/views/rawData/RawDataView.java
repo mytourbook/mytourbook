@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,6 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
 import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
@@ -395,11 +394,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
    private ActionToggleFossilOrEasyImport _actionToggleFossilOrEasyImportUI;
    private ActionUpload                   _actionUploadTour;
    //
-   protected TourPerson                   _activePerson;
-   protected TourPerson                   _newActivePerson;
+   private TourPerson                     _activePerson;
+   private TourPerson                     _newActivePerson;
    //
-   protected boolean                      _isPartVisible                  = false;
-   protected boolean                      _isViewerPersonDataDirty        = false;
+   private boolean                        _isPartVisible                  = false;
+   private boolean                        _isViewerPersonDataDirty        = false;
    //
    private final NumberFormat             _nf1;
    private final NumberFormat             _nf3;
@@ -688,7 +687,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
-   public class TableContextMenuProvider implements IContextMenuProvider {
+   private class TableContextMenuProvider implements IContextMenuProvider {
 
       @Override
       public void disposeContextMenu() {
@@ -1167,26 +1166,19 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           * Show image only when it is visible, opacity > 0
           */
 
-         File webFile;
-         try {
+         final File webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE);
+         final String webContent = Util.readContentFromFile(webFile.getAbsolutePath());
+         final String base64Encoded = Base64.getEncoder().encodeToString(webContent.getBytes());
 
-            webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_BG_IMAGE);
-            final String webContent = Util.readContentFromFile(webFile.getAbsolutePath());
-            final String base64Encoded = Base64.getEncoder().encodeToString(webContent.getBytes());
+         bgImage = CSS_IMPORT_BACKGROUND + NL
 
-            bgImage = CSS_IMPORT_BACKGROUND + NL
-
-                  + "{" + NL //                                                           //$NON-NLS-1$
-                  + "   background:             url('data:image/svg+xml;base64," + base64Encoded + "');" + NL //$NON-NLS-1$ //$NON-NLS-2$
-                  + "   background-repeat:      no-repeat;" + NL //                       //$NON-NLS-1$
-                  + "   background-size:        contain;" + NL //                         //$NON-NLS-1$
-                  + "   background-position:    center center;" + NL //                   //$NON-NLS-1$
-                  + "   opacity:                " + (float) opacity / 100 + ";" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
-                  + "}" + NL; //                                                          //$NON-NLS-1$
-
-         } catch (IOException | URISyntaxException e) {
-            TourLogManager.log_EXCEPTION_WithStacktrace(e);
-         }
+               + "{" + NL //                                                           //$NON-NLS-1$
+               + "   background:             url('data:image/svg+xml;base64," + base64Encoded + "');" + NL //$NON-NLS-1$ //$NON-NLS-2$
+               + "   background-repeat:      no-repeat;" + NL //                       //$NON-NLS-1$
+               + "   background-size:        contain;" + NL //                         //$NON-NLS-1$
+               + "   background-position:    center center;" + NL //                   //$NON-NLS-1$
+               + "   opacity:                " + (float) opacity / 100 + ";" + NL //   //$NON-NLS-1$ //$NON-NLS-2$
+               + "}" + NL; //                                                          //$NON-NLS-1$
       }
 
       String animation = UI.EMPTY_STRING;
@@ -2452,7 +2444,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          _imageUrl_DeviceFolder_NotChecked = getIconUrl(Images.RawData_DeviceFolder_NotChecked);
          _imageUrl_DeviceFolder_NotSetup = getIconUrl(Images.RawData_DeviceFolder_NotSetup);
 
-      } catch (final IOException | URISyntaxException e) {
+      } catch (final IOException e) {
          TourLogManager.log_EXCEPTION_WithStacktrace(e);
       }
    }
@@ -5039,6 +5031,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
    private void runEasyImport_006_ReplaceFirstTimeSliceElevation(final ImportLauncher importLauncher,
                                                                  final ArrayList<TourData> importedTours) {
+
       // "6. Replace first time slice elevation value"
       TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_006_ADJUST_ELEVATION);
 
@@ -5584,7 +5577,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
-   void selectLastTour() {
+   private void selectLastTour() {
 
       final Collection<TourData> tourDataCollection = _rawDataMgr.getImportedTours().values();
 
