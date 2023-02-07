@@ -4492,7 +4492,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
                         importState_Process);
 
                   // fix: org.eclipse.swt.SWTException: Invalid thread access
-                  _parent.getDisplay().syncExec(importState_Process::runPostProcess);
+                  _parent.getDisplay().syncExec(() -> importState_Process.runPostProcess());
                });
 
       } catch (final Exception e) {
@@ -4868,7 +4868,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
           * 6. Adjust elevation
           */
          if (importLauncher.isReplaceFirstTimeSliceElevation) {
-            runEasyImport_006_ReplaceFirstTimeSliceElevation(importedTours);
+            runEasyImport_006_ReplaceFirstTimeSliceElevation(importLauncher, importedTours);
          }
 
          /*
@@ -5029,7 +5029,8 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
-   private void runEasyImport_006_ReplaceFirstTimeSliceElevation(final ArrayList<TourData> importedTours) {
+   private void runEasyImport_006_ReplaceFirstTimeSliceElevation(final ImportLauncher importLauncher,
+                                                                 final ArrayList<TourData> importedTours) {
 
       // "6. Replace first time slice elevation value"
       TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_006_ADJUST_ELEVATION);
