@@ -1164,18 +1164,32 @@ public class MapPlayerManager {
           * direction by skipping the RETURN TRACK
           */
 
-         final boolean isSetNormalTrack = newRelativePosition >= 0 && newRelativePosition <= 1;
-         final boolean isCurrentlyOnNormalTrack = _relativePosition_Current >= 0 && _relativePosition_Current <= 1;
+         final boolean isNewPositionOnNormalTrack = newRelativePosition >= 0 && newRelativePosition <= 1;
+         final boolean isCurrentPositionOnNormalTrack = _relativePosition_Current >= 0 && _relativePosition_Current <= 1;
 
          /*
           * Set forward flag
           */
          boolean isModelMovingForward = true;
 
-         if (isSetNormalTrack) {
-            isModelMovingForward = newRelativePosition >= _previousRelativePosition;
+         if (isNewPositionOnNormalTrack) {
+
+            isModelMovingForward = _previousRelativePosition == MapPlayerView.RELATIVE_MODEL_POSITION_ON_RETURN_PATH_END_TO_START
+
+                  // model moved from the end to the start
+                  ? true
+
+                  : _previousRelativePosition == MapPlayerView.RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END
+
+                        // model moved from the start to the end
+                        ? false
+
+                        : newRelativePosition >= _previousRelativePosition;
+
          } else {
-            if (newRelativePosition == 2) {
+
+            if (newRelativePosition == MapPlayerView.RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END) {
+
                isModelMovingForward = false;
             }
          }
@@ -1187,7 +1201,7 @@ public class MapPlayerManager {
          /*
           * Set position
           */
-         if (isSetNormalTrack && isCurrentlyOnNormalTrack
+         if (isNewPositionOnNormalTrack && isCurrentPositionOnNormalTrack
                && _trackState_ReturnTrack == TrackState.IDLE
                && _trackState_NormalTrack == TrackState.IDLE) {
 

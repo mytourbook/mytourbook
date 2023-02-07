@@ -82,8 +82,8 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
    private static final Color        JOG_WHEEL_COLOR_GREATER_0                           = new Color(26, 142, 26);
    private static final Color        JOG_WHEEL_COLOR_LESS_0                              = new Color(227, 64, 23);
    //
-   private static final int          RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END = -1;
-   private static final int          RELATIVE_MODEL_POSITION_ON_RETURN_PATH_END_TO_START = 2;
+   static final int                  RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END = -1;
+   static final int                  RELATIVE_MODEL_POSITION_ON_RETURN_PATH_END_TO_START = 2;
    //
    private IPartListener2            _partListener;
    //
@@ -491,10 +491,10 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
             _spinnerTurningAngle.setMinimum(0);
             _spinnerTurningAngle.setMaximum(100);
             _spinnerTurningAngle.setIncrement(1);
-            _spinnerTurningAngle.setPageIncrement(5);
+            _spinnerTurningAngle.setPageIncrement(2);
             _spinnerTurningAngle.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TurningAngle()));
             _spinnerTurningAngle.addMouseWheelListener(mouseEvent -> {
-               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 5);
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 2);
                onSelect_TurningAngle();
             });
 //            GridDataFactory.fillDefaults().applyTo(_spinnerTurningAngle);
