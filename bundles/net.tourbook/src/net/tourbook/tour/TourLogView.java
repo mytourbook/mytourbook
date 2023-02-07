@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,8 +18,6 @@ package net.tourbook.tour;
 import static net.tourbook.ui.UI.getIconUrl;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -88,7 +86,7 @@ public class TourLogView extends ViewPart {
 
    private static final String            STATE_IS_UI_COLORFULL            = "STATE_IS_UI_COLORFULL";                //$NON-NLS-1$
 
-   public static final String             CSS_LOG_INFO                     = "info";                                 //$NON-NLS-1$
+   static final String                    CSS_LOG_INFO                     = "info";                                 //$NON-NLS-1$
    private static final String            CSS_LOG_ITEM                     = "logItem";                              //$NON-NLS-1$
    private static final String            CSS_LOG_SUB_ITEM                 = "subItem";                              //$NON-NLS-1$
    public static final String             CSS_LOG_TITLE                    = "title";                                //$NON-NLS-1$
@@ -189,13 +187,13 @@ public class TourLogView extends ViewPart {
       }
    }
 
-   public void addLog(final TourLog tourLog) {
+   void addLog(final TourLog tourLog) {
 
       _tourLog_Queue.add(tourLog);
 
       if (isBrowserAvailable() && _isBrowserCompleted == false) {
 
-         // this occures when the view is opening but not yet ready
+         // this occurs when the view is opening but not yet ready
          return;
       }
 
@@ -305,9 +303,9 @@ public class TourLogView extends ViewPart {
 
          final StringBuilder sb = new StringBuilder();
 
-         final boolean isFirst[] = { false };
+         final boolean[] isFirst = { false };
 
-         allSimple.forEach((logMessage) -> {
+         allSimple.forEach(logMessage -> {
 
             if (isFirst[0] == false) {
                isFirst[0] = true;
@@ -405,7 +403,7 @@ public class TourLogView extends ViewPart {
    /**
     * Clear logs.
     */
-   public void clear() {
+   void clear() {
 
       _noBrowserLog = UI.EMPTY_STRING;
       _txtNoBrowser.setText(UI.EMPTY_STRING);
@@ -805,23 +803,16 @@ public class TourLogView extends ViewPart {
       /*
        * Webpage css
        */
-      try {
+      final File webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_LOG_CSS);
+      final String cssFromFile = Util.readContentFromFile(webFile.getAbsolutePath());
 
-         final File webFile = WEB.getResourceFile(WEB_RESOURCE_TOUR_IMPORT_LOG_CSS);
-         final String cssFromFile = Util.readContentFromFile(webFile.getAbsolutePath());
+      _tourLogCSS = UI.EMPTY_STRING
 
-         _tourLogCSS = UI.EMPTY_STRING
-
-               + "<style>" + NL //              //$NON-NLS-1$
-               + WEB.createCSS_Scrollbar()
-               + cssFromFile
-               + "</style>" + NL //             //$NON-NLS-1$
-         ;
-
-      } catch (IOException | URISyntaxException e) {
-         TourLogManager.log_EXCEPTION_WithStacktrace(e);
-      }
-
+            + "<style>" + NL //              //$NON-NLS-1$
+            + WEB.createCSS_Scrollbar()
+            + cssFromFile
+            + "</style>" + NL //             //$NON-NLS-1$
+      ;
    }
 
    private boolean isBrowserAvailable() {

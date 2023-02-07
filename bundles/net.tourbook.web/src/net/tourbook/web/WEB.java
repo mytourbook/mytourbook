@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,11 +19,9 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -190,7 +188,7 @@ public class WEB {
     */
    public static String convertHTML_Into_JavaLineBreaks(final String text) {
 
-      return text.replaceAll(HTML_ELEMENT_BR, UI.NEW_LINE1);
+      return text.replace(HTML_ELEMENT_BR, UI.NEW_LINE1);
    }
 
    /**
@@ -240,9 +238,9 @@ public class WEB {
 
       String escaped;
 
-      escaped = urlString.replaceAll(URL_SPACE, URL_SPACE_REPLACEMENT);
-      escaped = escaped.replaceAll(URL_SQB_OPEN, URL_SQB_OPEN_REPLACEMENT);
-      escaped = escaped.replaceAll(URL_SQB_CLOSE, URL_SQB_CLOSE_REPLACEMENT);
+      escaped = urlString.replace(URL_SPACE, URL_SPACE_REPLACEMENT);
+      escaped = escaped.replace(URL_SQB_OPEN, URL_SQB_OPEN_REPLACEMENT);
+      escaped = escaped.replace(URL_SQB_CLOSE, URL_SQB_CLOSE_REPLACEMENT);
 
       return escaped;
    }
@@ -283,6 +281,19 @@ public class WEB {
       }
 
       return sb.toString();
+   }
+
+   /**
+    * See the SO answer here that explains why we can't use the Apache Commons
+    * library to perform the escaping of a single quote
+    * https://stackoverflow.com/a/30626898/7066681
+    *
+    * @param htmlAttribute
+    * @return
+    */
+   public static String escapeSingleQuote(final String htmlAttribute) {
+
+      return htmlAttribute.replace("'", "&#39;"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    /**
@@ -337,10 +348,8 @@ public class WEB {
    /**
     * @param filePathName
     * @return Returns a file from the WebContent folder, this folder is the root for path names.
-    * @throws IOException
-    * @throws URISyntaxException
     */
-   public static File getFile(final String filePathName) throws IOException, URISyntaxException {
+   public static File getFile(final String filePathName) {
 
       final String bundleFileName = WEB_CONTENT_FOLDER + filePathName;
 
@@ -389,7 +398,7 @@ public class WEB {
             webContent = replacePath(webContent, fromHtmlFirebugPath, toSystemFirebugPath);
          }
 
-      } catch (IOException | URISyntaxException e) {
+      } catch (final Exception e) {
          StatusUtil.showStatus(e);
       }
 
@@ -399,10 +408,8 @@ public class WEB {
    /**
     * @param fileName
     * @return Returns a file from the resource folder {@value #RESOURCE_PATH}.
-    * @throws IOException
-    * @throws URISyntaxException
     */
-   public static File getResourceFile(final String fileName) throws IOException, URISyntaxException {
+   public static File getResourceFile(final String fileName) {
 
       final String bundleFileName = WEB_CONTENT_FOLDER + RESOURCE_PATH + fileName;
 
@@ -440,7 +447,7 @@ public class WEB {
 
       } else if (href.startsWith("http") == false) { //$NON-NLS-1$
 
-         // Ensure that a protocol is set otherwise a MalformedURLException exception occures
+         // Ensure that a protocol is set otherwise a MalformedURLException exception occurs
          href = "http://" + href; //$NON-NLS-1$
       }
 

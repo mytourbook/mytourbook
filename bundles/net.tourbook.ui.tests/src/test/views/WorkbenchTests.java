@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -64,8 +64,6 @@ public class WorkbenchTests extends UITest {
       //My hunch is that the build machine has no 3D graphics capabilities
       //Sleeping 3 seconds as the map can be slow to display
       //bot.sleep(3000);
-
-      final SWTBotView tourLogView = Utils.showView(bot, "Tour Log"); //$NON-NLS-1$
 
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode("Waypoints").select(); //$NON-NLS-1$
@@ -138,7 +136,6 @@ public class WorkbenchTests extends UITest {
       bot.sleep(3000);
 
       //Close the opened views
-      tourLogView.close();
       waypointsView.close();
       tourDataView.close();
       tourAnalyzerView.close();
