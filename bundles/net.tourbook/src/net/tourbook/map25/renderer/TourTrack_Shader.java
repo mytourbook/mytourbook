@@ -200,7 +200,8 @@ public final class TourTrack_Shader {
    }
 
    /**
-    * Fill OpenGL buffer with the vertices/color/direction model data
+    * Fill OpenGL buffer with the vertices/color/direction model data, this is called from
+    * {@link net.tourbook.map25.renderer.TourTrack_LayerRenderer#update()}
     *
     * @param compileMapPosition
     * @param viewport

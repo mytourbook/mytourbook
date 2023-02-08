@@ -26,6 +26,7 @@ import net.tourbook.common.util.Util;
 import net.tourbook.map.IMapSyncListener.SyncParameter;
 import net.tourbook.map.MapManager;
 import net.tourbook.map.model.MapModelManager;
+import net.tourbook.map25.Map25App;
 import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.map25.Map25View;
 
@@ -882,6 +883,11 @@ public class MapPlayerManager {
 
 // SET_FORMATTING_ON
 
+      if (isPlayerViewAvailable()) {
+
+         Display.getDefault().syncExec(() -> _mapPlayerView.restoreState());
+      }
+
       Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible);
       setIsModelMovingForward(_jogWheelSpeed >= 0);
    }
@@ -920,14 +926,14 @@ public class MapPlayerManager {
 
       _isMapModelCursorVisible = isMapModelCursorVisible;
 
-      updateContinuousRendering();
+      updateUI_MapModelOrCursor();
    }
 
    public static void setIsMapModelVisible(final boolean isMapModelVisible) {
 
       _isMapModelVisible = isMapModelVisible;
 
-      updateContinuousRendering();
+      updateUI_MapModelOrCursor();
    }
 
    private static void setIsModelMovingForward(final boolean isModelMovingForward) {
@@ -1078,6 +1084,12 @@ public class MapPlayerManager {
    public static void setModelCursorSize(final int value) {
 
       _modelCursorSize = value;
+
+      if (isMap25ViewAvailable()) {
+
+         // this could be optimized, that not the whole track is recomputed, only the map model cursor size
+         _map25View.getMapApp().getLayer_Tour().getTourTrackRenderer().onModifyMapModelOrCursor();
+      }
    }
 
    public static void setModelSize(final int modelSize) {
@@ -1363,14 +1375,24 @@ public class MapPlayerManager {
       _modelTurningAngle = modelTurningAngle;
    }
 
-   private static void updateContinuousRendering() {
+   private static void updateUI_MapModelOrCursor() {
+
+      if (isMap25ViewAvailable() == false) {
+         return;
+      }
+
+      final Map25App map25App = _map25View.getMapApp();
+
+      if (_isMapModelVisible || _isMapModelCursorVisible) {
+
+         // setup data when map model + cursor is displayed
+
+         map25App.getLayer_Tour().getTourTrackRenderer().onModifyMapModelOrCursor();
+      }
 
       Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible);
 
-      if (isMap25ViewAvailable()) {
-
-         _map25View.getMapApp().getMap().updateMap();
-      }
+      map25App.getMap().updateMap();
    }
 
 }

@@ -36,7 +36,6 @@ import net.tourbook.map.model.SlideoutMapModel;
 import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.map25.renderer.TourTrack_Bucket;
 
-import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -527,11 +526,14 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
    private void enableControls() {
 
-      final boolean canShowMapModel = MapPlayerManager.canShowMapModel();
-      final boolean isModelVisible = canShowMapModel
-            && (MapPlayerManager.isMapModelVisible() || MapPlayerManager.isMapModelCursorVisible());
-
 // SET_FORMATTING_OFF
+
+      final boolean canShowMapModel          = MapPlayerManager.canShowMapModel();
+      final boolean isMapModelVisible        = MapPlayerManager.isMapModelVisible();
+      final boolean isMapModelCursorVisible  = MapPlayerManager.isMapModelCursorVisible();
+
+      final boolean isModelVisible           = canShowMapModel && (isMapModelVisible || isMapModelCursorVisible);
+
 
       _actionPlayControl_Loop             .setEnabled(isModelVisible);
       _actionPlayControl_PlayAndPause     .setEnabled(isModelVisible);
@@ -539,8 +541,8 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       _actionShowMapModelCursor           .setEnabled(canShowMapModel);
       _actionSlideoutMapModel             .setEnabled(isModelVisible);
 
-      _lblModelCursorSize                 .setEnabled(isModelVisible);
-      _lblModelSize                       .setEnabled(isModelVisible);
+      _lblModelCursorSize                 .setEnabled(isModelVisible && isMapModelCursorVisible);
+      _lblModelSize                       .setEnabled(isModelVisible && isMapModelVisible);
       _lblSpeedMultiplier                 .setEnabled(isModelVisible);
       _lblSpeedJogWheel                   .setEnabled(isModelVisible);
       _lblSpeedJogWheel_Value             .setEnabled(isModelVisible);
@@ -553,8 +555,8 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       _scaleSpeedJogWheel                 .setEnabled(isModelVisible);
       _scaleTimeline                      .setEnabled(isModelVisible);
 
-      _spinnerModelCursorSize             .setEnabled(isModelVisible);
-      _spinnerModelSize                   .setEnabled(isModelVisible);
+      _spinnerModelCursorSize             .setEnabled(isModelVisible && isMapModelCursorVisible);
+      _spinnerModelSize                   .setEnabled(isModelVisible && isMapModelVisible);
       _spinnerSpeedMultiplier             .setEnabled(isModelVisible);
       _spinnerTurningAngle                .setEnabled(isModelVisible);
 
@@ -961,7 +963,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       setMapAndModelPosition(getTimelineRelativePosition());
    }
 
-   private void restoreState() {
+   void restoreState() {
 
 // SET_FORMATTING_OFF
 
@@ -979,11 +981,6 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       setJogWheel_Value(MapPlayerManager.getJogWheelSpeed());
 
       updateUI_PlayAndPausedControls();
-   }
-
-   @PersistState
-   private void saveState() {
-
    }
 
    @Override

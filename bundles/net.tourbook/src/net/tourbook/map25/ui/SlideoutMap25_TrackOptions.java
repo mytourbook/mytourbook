@@ -1249,7 +1249,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
       final Map25App mapApp = _map25View.getMapApp();
 
       mapApp.getLayer_Legend().updateLegend();
-      mapApp.getLayer_Tour().onModifyConfig(_isVerticesModified);
+      mapApp.getLayer_Tour().getTourTrackRenderer().onModifyConfig(_isVerticesModified);
       mapApp.getLayer_SliderPath().onModifyConfig();
       mapApp.getLayer_SliderLocation().onModifyConfig();
    }
@@ -1553,7 +1553,7 @@ public class SlideoutMap25_TrackOptions extends ToolbarSlideout implements IColo
 
       final Map25App mapApp = _map25View.getMapApp();
 
-      mapApp.getLayer_Tour().onModifyConfig(_isVerticesModified);
+      mapApp.getLayer_Tour().getTourTrackRenderer().onModifyConfig(_isVerticesModified);
       mapApp.getLayer_SliderPath().onModifyConfig();
       mapApp.getLayer_SliderLocation().onModifyConfig();
    }

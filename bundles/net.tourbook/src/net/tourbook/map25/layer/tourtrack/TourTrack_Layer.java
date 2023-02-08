@@ -46,9 +46,9 @@ public class TourTrack_Layer extends Layer {
       mRenderer = _tourTrackRenderer = new TourTrack_LayerRenderer(this, map);
    }
 
-   public void onModifyConfig(final boolean isVerticesModified) {
+   public TourTrack_LayerRenderer getTourTrackRenderer() {
 
-      _tourTrackRenderer.onModifyConfig(isVerticesModified);
+      return _tourTrackRenderer;
    }
 
    public void setupTourPositions(final GeoPoint[] allGeoPoints,
@@ -57,7 +57,9 @@ public class TourTrack_Layer extends Layer {
                                   final int[] allTimeSeries,
                                   final float[] allDistanceSeries) {
 
-      _tourTrackRenderer.setupTourPositions(allGeoPoints,
+      _tourTrackRenderer.setupTourPositions(
+
+            allGeoPoints,
             allGeoPointColors,
             allTourStarts,
             allTimeSeries,
