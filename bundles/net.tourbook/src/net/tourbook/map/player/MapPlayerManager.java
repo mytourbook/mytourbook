@@ -183,7 +183,7 @@ public class MapPlayerManager {
    /**
     * Angle how much the animated model is rotated in the next frame
     */
-   private static float                 _modelTurningAngle;
+   private static int                   _modelTurningFactor;
 
    private static int                   _modelCursorSize;
 
@@ -476,9 +476,9 @@ public class MapPlayerManager {
       return (short) _modelCursorSize;
    }
 
-   public static float getModelTurningAngle() {
+   public static int getModelTurningAngle() {
 
-      return _modelTurningAngle;
+      return _modelTurningFactor;
    }
 
    public static int getMovingSpeed() {
@@ -878,7 +878,7 @@ public class MapPlayerManager {
       _jogWheelSpeedMultiplier   = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED_MULTIPLIER,    1);
       _modelSize_Fixed           = Util.getStateInt(     _state, STATE_MODEL_SIZE_FIXED,              200);
       _modelCursorSize           = Util.getStateInt(     _state, STATE_MODEL_CURSOR_SIZE,             200);
-      _modelTurningAngle         = Util.getStateFloat(   _state, STATE_MODEL_TURNING_ANGLE,           2.0f);
+      _modelTurningFactor        = Util.getStateInt(     _state, STATE_MODEL_TURNING_ANGLE,           10);
       _relativePosition_Current  = Util.getStateDouble(  _state, STATE_RELATIVE_POSITION,             0);
 
 // SET_FORMATTING_ON
@@ -905,7 +905,7 @@ public class MapPlayerManager {
       _state.put(STATE_JOG_WHEEL_SPEED_MULTIPLIER,    _jogWheelSpeedMultiplier);
       _state.put(STATE_MODEL_SIZE_FIXED,              _modelSize_Fixed);
       _state.put(STATE_MODEL_CURSOR_SIZE,             _modelCursorSize);
-      _state.put(STATE_MODEL_TURNING_ANGLE,           _modelTurningAngle);
+      _state.put(STATE_MODEL_TURNING_ANGLE,           _modelTurningFactor);
       _state.put(STATE_RELATIVE_POSITION,             _relativePosition_Current);
 
 // SET_FORMATTING_ON
@@ -992,17 +992,20 @@ public class MapPlayerManager {
       float p21AngleSmoothed = p21Angle;
 
       final float angleDiff = setModelAngle_Difference(p21Angle, _previousAngle);
+      final float angleDiffAbs = Math.abs(angleDiff);
 
-      if (Math.abs(angleDiff) > _modelTurningAngle) {
+      if (angleDiffAbs > 0.1) {
 
          // the next angle is larger than the min smooth angle
          // -> smoothout the animation with a smallers angle
 
+         final float modelTurningAngle = (float) (angleDiffAbs * 0.01 * _modelTurningFactor);
+
          /*
           * Find the smallest angle diff to the current position
           */
-         final float prevAngle1Smooth = _previousAngle + _modelTurningAngle;
-         final float prevAngle2Smooth = _previousAngle - _modelTurningAngle;
+         final float prevAngle1Smooth = _previousAngle + modelTurningAngle;
+         final float prevAngle2Smooth = _previousAngle - modelTurningAngle;
 
          final float angleDiff1 = setModelAngle_Shortest(p21Angle, prevAngle1Smooth);
          final float angleDiff2 = setModelAngle_Shortest(p21Angle, prevAngle2Smooth);
@@ -1370,9 +1373,9 @@ public class MapPlayerManager {
       _jogWheelSpeedMultiplier = speedMultiplier;
    }
 
-   public static void setTurningAngle(final float modelTurningAngle) {
+   public static void setTurningAngle(final int modelTurningFactor) {
 
-      _modelTurningAngle = modelTurningAngle;
+      _modelTurningFactor = modelTurningFactor;
    }
 
    private static void updateUI_MapModelOrCursor() {

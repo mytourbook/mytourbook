@@ -124,7 +124,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
    private Spinner   _spinnerModelCursorSize;
    private Spinner   _spinnerModelSize;
    private Spinner   _spinnerSpeedMultiplier;
-   private Spinner   _spinnerTurningAngle;
+   private Spinner   _spinnerTurningMultiplier;
 
    private class Action_PlayControl_Loop extends Action {
 
@@ -484,16 +484,15 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
              */
             _lblTurningAngle = UI.createLabel(container, Messages.Map_Player_Label_TurningAngle);
 
-            _spinnerTurningAngle = new Spinner(container, SWT.BORDER);
-            _spinnerTurningAngle.setToolTipText(Messages.Map_Player_Label_TurningAngle_Tooltip);
-            _spinnerTurningAngle.setDigits(1);
-            _spinnerTurningAngle.setMinimum(0);
-            _spinnerTurningAngle.setMaximum(100);
-            _spinnerTurningAngle.setIncrement(1);
-            _spinnerTurningAngle.setPageIncrement(2);
-            _spinnerTurningAngle.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TurningAngle()));
-            _spinnerTurningAngle.addMouseWheelListener(mouseEvent -> {
-               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 2);
+            _spinnerTurningMultiplier = new Spinner(container, SWT.BORDER);
+            _spinnerTurningMultiplier.setToolTipText(Messages.Map_Player_Label_TurningAngle_Tooltip);
+            _spinnerTurningMultiplier.setMinimum(0);
+            _spinnerTurningMultiplier.setMaximum(50);
+            _spinnerTurningMultiplier.setIncrement(1);
+            _spinnerTurningMultiplier.setPageIncrement(5);
+            _spinnerTurningMultiplier.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TurningAngle()));
+            _spinnerTurningMultiplier.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 1);
                onSelect_TurningAngle();
             });
 //            GridDataFactory.fillDefaults().applyTo(_spinnerTurningAngle);
@@ -558,7 +557,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       _spinnerModelCursorSize             .setEnabled(isModelVisible && isMapModelCursorVisible);
       _spinnerModelSize                   .setEnabled(isModelVisible && isMapModelVisible);
       _spinnerSpeedMultiplier             .setEnabled(isModelVisible);
-      _spinnerTurningAngle                .setEnabled(isModelVisible);
+      _spinnerTurningMultiplier           .setEnabled(isModelVisible);
 
 
 // SET_FORMATTING_ON
@@ -760,7 +759,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
    private void onSelect_TurningAngle() {
 
-      MapPlayerManager.setTurningAngle(_spinnerTurningAngle.getSelection() / 10f);
+      MapPlayerManager.setTurningAngle(_spinnerTurningMultiplier.getSelection());
    }
 
    private void onSpeedJogWheel_Key(final KeyEvent keyEvent) {
@@ -1116,10 +1115,8 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       updateUI_TimelineMaxValue();
 
-      final float modelTurningAngle = MapPlayerManager.getModelTurningAngle();
-
       _spinnerSpeedMultiplier.setSelection(MapPlayerManager.getSpeedMultiplier());
-      _spinnerTurningAngle.setSelection((int) (modelTurningAngle * 10));
+      _spinnerTurningMultiplier.setSelection((MapPlayerManager.getModelTurningAngle()));
 
       enableControls();
    }
