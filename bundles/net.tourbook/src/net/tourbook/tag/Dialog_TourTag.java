@@ -34,6 +34,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
@@ -79,7 +80,9 @@ public class Dialog_TourTag extends TitleAreaDialog {
    private Text        _txtNotes;
    private Text        _txtName;
 
-   public Dialog_TourTag(final Shell parentShell, final String dlgMessage, final TourTag tourTag) {
+   public Dialog_TourTag(final Shell parentShell,
+                         final String dlgMessage,
+                         final TourTag tourTag) {
 
       super(parentShell);
 
@@ -308,16 +311,17 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
    private void setTagImage(final String imageFilePath) {
 
-      Image image = TourbookPlugin.getImageDescriptor(net.tourbook.Images.Camera).createImage();
+      Image image =
+            TourbookPlugin.getImageDescriptor(net.tourbook.Images.Camera).createImage();
       _lblInvalidImageError.setText(UI.EMPTY_STRING);
 
       if (StringUtils.hasContent(imageFilePath)) {
 
          if (!Files.exists(Paths.get(imageFilePath))) {
 
-            //todo fb messages.
-            _lblInvalidImageError.setText("The following image file couldn't be found: '" +
-                  imageFilePath + "'.");
+            _lblInvalidImageError.setText(NLS.bind(
+                  Messages.Dialog_TourTag_Label_ImageNotFound,
+                  imageFilePath));
          } else {
 
             _imageFilePath = imageFilePath;
