@@ -308,6 +308,16 @@ public class TourBlogView extends ViewPart {
       TourManager.getInstance().addTourEventListener(_tourEventListener);
    }
 
+   private String buildTourWeatherDescription() {
+
+      if (_tourData.weatherDataExist())
+      {
+         return UI.EMPTY_STRING;
+      }
+
+     return  WeatherUtils.buildWeatherDataString(_tourData, true, true, true);
+   }
+
    private void clearView() {
 
       _tourData = null;
@@ -410,12 +420,13 @@ public class TourBlogView extends ViewPart {
 
    private void create_24_Tour(final StringBuilder sb) {
 
-      String tourTitle = _tourData.getTourTitle();
       String tourDescription = _tourData.getTourDescription();
-      String tourWeather = WeatherUtils.buildWeatherDataString(_tourData, true, true, true);
-
       final boolean isDescription = tourDescription.length() > 0;
+
+      String tourTitle = _tourData.getTourTitle();
       final boolean isTitle = tourTitle.length() > 0;
+
+      String tourWeather = buildTourWeatherDescription();
       final boolean isWeather = tourWeather.length() > 0;
 
       if (isDescription || isTitle || isWeather) {

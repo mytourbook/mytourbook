@@ -4,7 +4,7 @@
    inkscape:export-xdpi="90"
    inkscape:export-filename="C:\DAT\ws_mt-with-GIT\mytourbook\net.tourbook\icon-factory\common.png"
    sodipodi:docname="common.svg"
-   inkscape:version="1.2 (dc2aedaf03, 2022-05-15)"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
    version="1.1"
    id="svg2985"
    height="1052.3622047"
@@ -10066,13 +10066,13 @@
        id="path8356-2-5-9-4-1-22-5-9-7-2" /><path
        id="rect54"
        style="fill:#d0ec86;fill-opacity:1;stroke:#969696;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 319.83892,332.73316 c -1.80162,0 -3.25198,1.52165 -3.25198,3.4117 v 5.44343 c 0,1.89006 1.45036,3.41171 3.25198,3.41171 h 8.90898 c 1.80162,0 3.2521,-1.52165 3.2521,-3.41171 v -5.44343 c 0,-1.89005 -1.45048,-3.4117 -3.2521,-3.4117 z m 4.54301,2.72317 a 2.9823212,3.1871545 0 0 1 0.002,0 2.9823212,3.1871545 0 0 1 2.98236,3.18723 2.9823212,3.1871545 0 0 1 -2.98236,3.18712 2.9823212,3.1871545 0 0 1 -2.98236,-3.18712 2.9823212,3.1871545 0 0 1 2.98057,-3.18723 z"
+       d="m 231.35614,563.41293 c -8.18224,0 -14.7692,6.91073 -14.7692,15.49458 v 24.7219 c 0,8.5839 6.58696,15.49463 14.7692,15.49463 h 40.46105 c 8.18224,0 14.76975,-6.91073 14.76975,-15.49463 v -24.7219 c 0,-8.58385 -6.58751,-15.49458 -14.76975,-15.49458 z m 20.63255,12.36756 a 13.544518,14.47479 0 0 1 0.009,0 13.544518,14.47479 0 0 1 13.5447,14.47513 13.544518,14.47479 0 0 1 -13.5447,14.47463 13.544518,14.47479 0 0 1 -13.54469,-14.47463 13.544518,14.47479 0 0 1 13.53656,-14.47513 z"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook.common\icons\camera.png"
-       inkscape:export-xdpi="99.660004"
-       inkscape:export-ydpi="99.660004" /><path
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" /><path
        id="path63"
        style="fill:#d0ec86;fill-opacity:1;stroke:#969696;stroke-width:0;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m 322,330 c -1.18341,0 -2.13612,1.54683 -2.13612,3.46821 0,10e-4 1.3e-4,0.002 1.3e-4,0.003 l 8.62274,-0.008 c -0.002,-1.91894 -0.95353,-3.46308 -2.13585,-3.46308 z"
+       d="m 241.17091,551 c -5.37458,0 -9.70141,7.02509 -9.70141,15.75123 0,0.005 5.9e-4,0.009 5.9e-4,0.0136 l 39.16106,-0.0363 c -0.009,-8.71507 -4.33055,-15.72794 -9.70018,-15.72794 z"
        inkscape:export-filename="C:\DAT\MT\mytourbook\bundles\net.tourbook.common\icons\camera.png"
        inkscape:export-xdpi="99.660004"
        inkscape:export-ydpi="99.660004" /></g></svg>

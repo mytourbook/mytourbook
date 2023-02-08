@@ -49,12 +49,12 @@ import org.eclipse.swt.widgets.Text;
  */
 public class Dialog_TourTag extends TitleAreaDialog {
 
-   private static final String           ID                = "net.tourbook.tag.Dialog_TourTag"; //$NON-NLS-1$
+   private static final String           ID                       = "net.tourbook.tag.Dialog_TourTag";      //$NON-NLS-1$
 
-   private static final IPreferenceStore _prefStore        = TourbookPlugin.getPrefStore();
-   private static final String           IMPORT_IMAGE_PATH = "Dialog_TourTag_ImportImagePath";  //$NON-NLS-1$
+   private static final IPreferenceStore _prefStore               = TourbookPlugin.getPrefStore();
+   private static final String           IMAGE_LAST_SELECTED_PATH = "Dialog_TourTag_ImageLastSelectedPath"; //$NON-NLS-1$
 
-   private final IDialogSettings         _state            = TourbookPlugin.getState(ID);
+   private final IDialogSettings         _state                   = TourbookPlugin.getState(ID);
 
    private String                        _dlgMessage;
    private String                        _imageFilePath;
@@ -165,18 +165,18 @@ public class Dialog_TourTag extends TitleAreaDialog {
             label.setText(Messages.Dialog_TourTag_Label_Image);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 
-            _canvasTagImage = new ImageCanvas(container, SWT.DOUBLE_BUFFERED);
+            _canvasTagImage = new ImageCanvas(container, SWT.DOUBLE_BUFFERED | SWT.CENTER);
             GridDataFactory.fillDefaults()//
                   .hint(_pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
                   .applyTo(_canvasTagImage);
-            {
 
                final Composite imageContainer = new Composite(container, SWT.NONE);
                GridDataFactory.fillDefaults()//
                      .span(2, 1)
                      .indent(0, -5)
                      .applyTo(imageContainer);
-               GridLayoutFactory.fillDefaults().numColumns(2).applyTo(imageContainer);
+               GridLayoutFactory.fillDefaults().numColumns(1).applyTo(imageContainer);
+               {
 
                final Button btnSelectImage = new Button(imageContainer, SWT.PUSH);
                btnSelectImage.setText(Messages.app_btn_browse);
@@ -185,9 +185,6 @@ public class Dialog_TourTag extends TitleAreaDialog {
                      .align(SWT.LEFT, SWT.CENTER)
                      .applyTo(btnSelectImage);
 
-               _lblInvalidImageError = UI.createLabel(imageContainer, UI.EMPTY_STRING);
-               GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).span(1, 2).applyTo(_lblInvalidImageError);
-
                _btnDeleteImage = new Button(imageContainer, SWT.PUSH);
                _btnDeleteImage.setImage(TourbookPlugin.getImageDescriptor(net.tourbook.Images.App_Trash_Themed).createImage());
                _btnDeleteImage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onDeleteImage()));
@@ -195,6 +192,13 @@ public class Dialog_TourTag extends TitleAreaDialog {
                      .align(SWT.LEFT, SWT.CENTER)
                      .applyTo(_btnDeleteImage);
             }
+         }
+         {
+            // Text: Image File Path
+            UI.createLabel(container, UI.EMPTY_STRING);
+
+            _lblInvalidImageError = UI.createLabel(container, UI.EMPTY_STRING);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).span(3, 1).applyTo(_lblInvalidImageError);
          }
          {
             // Text: Notes
@@ -266,7 +270,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
       final FileDialog fileDialog = new FileDialog(getShell(), SWT.OPEN);
 
       fileDialog.setText(Messages.Dialog_TourTag_ImportImage_Title);
-      fileDialog.setFilterPath(_prefStore.getString(IMPORT_IMAGE_PATH));
+      fileDialog.setFilterPath(_prefStore.getString(IMAGE_LAST_SELECTED_PATH));
       fileDialog.setFilterNames(new String[] { Messages.Dialog_TourTag_FileDialog_ImageFiles });
       fileDialog.setFilterExtensions(new String[] { "*.bmp;*.gif;*.png;*.jpg" });//$NON-NLS-1$
 
@@ -280,6 +284,11 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       setTagImage(imageFilePath);
 
+      final String filePathFolder = Paths.get(imageFilePath).getParent().toString();
+
+      // keep last selected path
+      _prefStore.putValue(IMAGE_LAST_SELECTED_PATH, filePathFolder);
+
       enableControls();
    }
 
@@ -289,8 +298,6 @@ public class Dialog_TourTag extends TitleAreaDialog {
       _txtNotes.setText(_tourTag_Clone.getNotes());
       _imageFilePath = _tourTag_Clone.getImageFilePath();
       setTagImage(_imageFilePath);
-
-      //TODO FB save the folder where the image was last retrieved from
    }
 
    private void saveState() {
@@ -302,18 +309,11 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
    private void setTagImage(final String imageFilePath) {
 
-      Image image = null;
+      Image image = TourbookPlugin.getImageDescriptor(net.tourbook.Images.Camera).createImage();
       _lblInvalidImageError.setText(UI.EMPTY_STRING);
 
-      if (StringUtils.isNullOrEmpty(imageFilePath)) {
+      if (!Files.exists(Paths.get(imageFilePath))) {
 
-         image = net.tourbook.ui.UI.resizeTagImageToDefaults(
-               TourbookPlugin.getImageDescriptor(net.tourbook.Images.Camera).createImage());
-
-      } else if (!Files.exists(Paths.get(imageFilePath))) {
-
-         image = net.tourbook.ui.UI.resizeTagImageToDefaults(
-               TourbookPlugin.getImageDescriptor(net.tourbook.Images.State_Error).createImage());
          //todo fb messages.
          _lblInvalidImageError.setText("The following image file couldn't be found: '" +
                imageFilePath + "'.");

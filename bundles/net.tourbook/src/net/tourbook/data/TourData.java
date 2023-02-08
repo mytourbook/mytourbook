@@ -12542,4 +12542,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          pausedTime_End[index] += startTimeOffset;
       }
    }
+
+   public boolean weatherDataExist() {
+      //TODO FB
+      return true;
+   }
 }
