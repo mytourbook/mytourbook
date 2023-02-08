@@ -165,40 +165,39 @@ public class Dialog_TourTag extends TitleAreaDialog {
             label.setText(Messages.Dialog_TourTag_Label_Image);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 
-            _canvasTagImage = new ImageCanvas(container, SWT.DOUBLE_BUFFERED | SWT.CENTER);
+            _canvasTagImage = new ImageCanvas(container, SWT.DOUBLE_BUFFERED);
             GridDataFactory.fillDefaults()//
                   .hint(_pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
                   .applyTo(_canvasTagImage);
 
-               final Composite imageContainer = new Composite(container, SWT.NONE);
-               GridDataFactory.fillDefaults()//
-                     .span(2, 1)
-                     .indent(0, -5)
-                     .applyTo(imageContainer);
-               GridLayoutFactory.fillDefaults().numColumns(1).applyTo(imageContainer);
-               {
-
+            final Composite imageContainer = new Composite(container, SWT.NONE);
+            GridDataFactory.fillDefaults()//
+                  .span(2, 1)
+                  .applyTo(imageContainer);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(imageContainer);
+            {
                final Button btnSelectImage = new Button(imageContainer, SWT.PUSH);
                btnSelectImage.setText(Messages.app_btn_browse);
-               btnSelectImage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectImage()));
+               btnSelectImage.addSelectionListener(widgetSelectedAdapter(
+                     selectionEvent -> onSelectImage()));
                GridDataFactory.fillDefaults()
                      .align(SWT.LEFT, SWT.CENTER)
                      .applyTo(btnSelectImage);
 
+               _lblInvalidImageError = new Label(imageContainer, SWT.WRAP);
+               GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.BEGINNING)
+                     .hint(_pc.convertWidthInCharsToPixels(75), SWT.DEFAULT)
+                     .span(1, 2).applyTo(_lblInvalidImageError);
+
                _btnDeleteImage = new Button(imageContainer, SWT.PUSH);
-               _btnDeleteImage.setImage(TourbookPlugin.getImageDescriptor(net.tourbook.Images.App_Trash_Themed).createImage());
-               _btnDeleteImage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onDeleteImage()));
+               _btnDeleteImage.setImage(TourbookPlugin.getImageDescriptor(
+                     net.tourbook.Images.App_Trash_Themed).createImage());
+               _btnDeleteImage.addSelectionListener(widgetSelectedAdapter(
+                     selectionEvent -> onDeleteImage()));
                GridDataFactory.fillDefaults()
                      .align(SWT.LEFT, SWT.CENTER)
                      .applyTo(_btnDeleteImage);
             }
-         }
-         {
-            // Text: Image File Path
-            UI.createLabel(container, UI.EMPTY_STRING);
-
-            _lblInvalidImageError = UI.createLabel(container, UI.EMPTY_STRING);
-            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).span(3, 1).applyTo(_lblInvalidImageError);
          }
          {
             // Text: Notes
@@ -312,15 +311,18 @@ public class Dialog_TourTag extends TitleAreaDialog {
       Image image = TourbookPlugin.getImageDescriptor(net.tourbook.Images.Camera).createImage();
       _lblInvalidImageError.setText(UI.EMPTY_STRING);
 
-      if (!Files.exists(Paths.get(imageFilePath))) {
+      if (StringUtils.hasContent(imageFilePath)) {
 
-         //todo fb messages.
-         _lblInvalidImageError.setText("The following image file couldn't be found: '" +
-               imageFilePath + "'.");
-      } else {
+         if (!Files.exists(Paths.get(imageFilePath))) {
 
-         _imageFilePath = imageFilePath;
-         image = net.tourbook.ui.UI.prepareTagImage(_imageFilePath);
+            //todo fb messages.
+            _lblInvalidImageError.setText("The following image file couldn't be found: '" +
+                  imageFilePath + "'.");
+         } else {
+
+            _imageFilePath = imageFilePath;
+            image = net.tourbook.ui.UI.prepareTagImage(_imageFilePath);
+         }
       }
 
       _canvasTagImage.setImage(image);
