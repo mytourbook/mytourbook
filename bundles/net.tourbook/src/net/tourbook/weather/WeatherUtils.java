@@ -167,7 +167,7 @@ public class WeatherUtils {
          }
       }
 
-      if (temperaturesExist(tourData)) {
+      // if (temperaturesExist(tourData)) {
 
          // Average temperature
          final float averageTemperature = tourData.getWeather_Temperature_Average();
@@ -208,7 +208,7 @@ public class WeatherUtils {
                         FormatManager.formatTemperature(UI.convertTemperatureFromMetric(temperatureWindChill)) +
                         UI.UNIT_LABEL_TEMPERATURE);
          }
-      }
+         //    }
 
       // Wind
       final int windSpeed = tourData.getWeather_Wind_Speed();
