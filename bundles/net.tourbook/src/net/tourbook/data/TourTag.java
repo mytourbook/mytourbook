@@ -115,7 +115,7 @@ public class TourTag implements Cloneable, Comparable<Object> {
    @Transient
    private long                _createId = 0;
 
-   private String              imageFilePath;
+   private String              _imageFilePath;
 
    public TourTag() {}
 
@@ -188,7 +188,7 @@ public class TourTag implements Cloneable, Comparable<Object> {
    }
 
    public String getImageFilePath() {
-      return imageFilePath;
+      return _imageFilePath;
    }
 
    /**
@@ -272,14 +272,14 @@ public class TourTag implements Cloneable, Comparable<Object> {
        * Check: Image file path
        */
       fieldValidation = TourDatabase.isFieldValidForSave(
-            imageFilePath,
+            _imageFilePath,
             DB_LENGTH_FILE_PATH,
             Messages.Db_Field_TourTag_ImageFilePath);
 
       if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
          return false;
       } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
-         imageFilePath = imageFilePath.substring(0, DB_LENGTH_FILE_PATH);
+         _imageFilePath = _imageFilePath.substring(0, DB_LENGTH_FILE_PATH);
       }
 
       return true;
@@ -290,7 +290,7 @@ public class TourTag implements Cloneable, Comparable<Object> {
    }
 
    public void setImageFilePath(final String imageFilePath) {
-      this.imageFilePath = imageFilePath;
+      this._imageFilePath = imageFilePath;
    }
 
    public void setNotes(final String notes) {
@@ -333,7 +333,7 @@ public class TourTag implements Cloneable, Comparable<Object> {
 
             + "   _createId     =" + _createId + NL //     //$NON-NLS-1$
 
-            + "   imageFilePath =" + imageFilePath + NL //     //$NON-NLS-1$
+            + "   imageFilePath =" + _imageFilePath + NL //     //$NON-NLS-1$
 
 //          + "   tourData      =" + tourData + NL //      //$NON-NLS-1$
 
@@ -350,6 +350,6 @@ public class TourTag implements Cloneable, Comparable<Object> {
 
       name = modifiedTourTag.name;
       notes = modifiedTourTag.notes;
-      imageFilePath = modifiedTourTag.imageFilePath;
+      _imageFilePath = modifiedTourTag._imageFilePath;
    }
 }
