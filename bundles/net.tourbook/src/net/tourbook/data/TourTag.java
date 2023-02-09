@@ -115,7 +115,7 @@ public class TourTag implements Cloneable, Comparable<Object> {
    @Transient
    private long                _createId = 0;
 
-   private String imageFilePath;
+   private String              imageFilePath;
 
    public TourTag() {}
 
@@ -266,6 +266,20 @@ public class TourTag implements Cloneable, Comparable<Object> {
          return false;
       } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
          notes = notes.substring(0, DB_LENGTH_NOTES);
+      }
+
+      /*
+       * Check: Image file path
+       */
+      fieldValidation = TourDatabase.isFieldValidForSave(
+            imageFilePath,
+            DB_LENGTH_FILE_PATH,
+            Messages.Db_Field_TourTag_ImageFilePath);
+
+      if (fieldValidation == FIELD_VALIDATION.IS_INVALID) {
+         return false;
+      } else if (fieldValidation == FIELD_VALIDATION.TRUNCATE) {
+         imageFilePath = imageFilePath.substring(0, DB_LENGTH_FILE_PATH);
       }
 
       return true;
