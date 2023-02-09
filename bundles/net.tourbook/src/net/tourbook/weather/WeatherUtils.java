@@ -167,44 +167,47 @@ public class WeatherUtils {
          }
       }
 
-      // Average temperature
-      final float averageTemperature = tourData.getWeather_Temperature_Average();
-      if (averageTemperature != Float.MIN_VALUE) {
-         weatherDataList.add(FormatManager.formatTemperature(UI.convertTemperatureFromMetric(averageTemperature)) +
-               UI.UNIT_LABEL_TEMPERATURE);
-      }
+      if (temperaturesExist(tourData)) {
 
-      // Maximum temperature
-      if (displayMaximumTemperature) {
+         // Average temperature
+         final float averageTemperature = tourData.getWeather_Temperature_Average();
+         if (averageTemperature != Float.MIN_VALUE) {
+            weatherDataList.add(FormatManager.formatTemperature(UI.convertTemperatureFromMetric(averageTemperature)) +
+                  UI.UNIT_LABEL_TEMPERATURE);
+         }
 
-         weatherDataList.add(
-               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max +
-                     UI.SPACE +
-                     FormatManager.formatTemperature(
-                           UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max())) +
-                     UI.UNIT_LABEL_TEMPERATURE);
-      }
+         // Maximum temperature
+         if (displayMaximumTemperature) {
 
-      // Minimum temperature
-      if (displayMinimumTemperature) {
+            weatherDataList.add(
+                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max +
+                        UI.SPACE +
+                        FormatManager.formatTemperature(
+                              UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max())) +
+                        UI.UNIT_LABEL_TEMPERATURE);
+         }
 
-         weatherDataList.add(
-               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min +
-                     UI.SPACE +
-                     FormatManager.formatTemperature(
-                           UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min())) +
-                     UI.UNIT_LABEL_TEMPERATURE);
-      }
+         // Minimum temperature
+         if (displayMinimumTemperature) {
 
-      // Wind chill
-      final float temperatureWindChill = tourData.getWeather_Temperature_WindChill();
-      if (temperatureWindChill != Float.MIN_VALUE) {
+            weatherDataList.add(
+                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min +
+                        UI.SPACE +
+                        FormatManager.formatTemperature(
+                              UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min())) +
+                        UI.UNIT_LABEL_TEMPERATURE);
+         }
 
-         weatherDataList.add(
-               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
-                     UI.SPACE +
-                     FormatManager.formatTemperature(UI.convertTemperatureFromMetric(temperatureWindChill)) +
-                     UI.UNIT_LABEL_TEMPERATURE);
+         // Wind chill
+         final float temperatureWindChill = tourData.getWeather_Temperature_WindChill();
+         if (temperatureWindChill != Float.MIN_VALUE) {
+
+            weatherDataList.add(
+                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
+                        UI.SPACE +
+                        FormatManager.formatTemperature(UI.convertTemperatureFromMetric(temperatureWindChill)) +
+                        UI.UNIT_LABEL_TEMPERATURE);
+         }
       }
 
       // Wind
@@ -480,5 +483,13 @@ public class WeatherUtils {
    public static float roundDoubleToFloat(final double value) {
 
       return Math.round(value * 100.0) / 100.0f;
+   }
+
+   private static boolean temperaturesExist(final TourData tourData) {
+
+      return tourData.getWeather_Temperature_Average() != 0 &&
+            tourData.getWeather_Temperature_Max() != 0 &&
+            tourData.getWeather_Temperature_Min() != 0 &&
+            tourData.getWeather_Temperature_WindChill() != 0;
    }
 }
