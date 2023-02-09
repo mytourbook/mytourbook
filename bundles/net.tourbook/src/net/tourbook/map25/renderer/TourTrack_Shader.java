@@ -81,8 +81,7 @@ public final class TourTrack_Shader {
 
    private static GLMatrix              _animationMatrix         = new GLMatrix();
 
-// private static int                   _prevValue;
-// private static double                _prevValue;
+   private static double                _prevValue;
 
    private static class DirectionArrowsShader extends GLShaderMT {
 
@@ -399,9 +398,9 @@ public final class TourTrack_Shader {
          final float relativeVisibleVertices = (float) currentVisiblePositionIndex / numAllVisibleFrames;
          numVisibleVertices_Debug = (int) (relativeVisibleVertices * numTrackVertices);
 
-//         if (numVisibleVertices_Debug != _prevValue) {
+//         if (currentVisiblePositionIndex != _prevValue) {
 //
-//            _prevValue = numVisibleVertices_Debug;
+//            _prevValue = currentVisiblePositionIndex;
 //
 //            System.out.println(UI.EMPTY_STRING
 //

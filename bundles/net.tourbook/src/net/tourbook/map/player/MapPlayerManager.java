@@ -996,7 +996,7 @@ public class MapPlayerManager {
 
       if (angleDiffAbs > 0.1) {
 
-         // the next angle is larger than the min smooth angle
+         // the next angle is larger than a min smooth angle
          // -> smoothout the animation with a smallers angle
 
          final float modelTurningAngle = (float) (angleDiffAbs * 0.01 * _modelTurningFactor);
