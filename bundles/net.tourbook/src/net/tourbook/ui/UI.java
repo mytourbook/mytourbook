@@ -565,7 +565,7 @@ public class UI {
             + "jTdataTtag.TOURTAG_TAGID," + NEW_LINE // //$NON-NLS-1$
             + "SUM(tourData.TOURDISTANCE) AS TOTALDISTANCE," + NEW_LINE // //$NON-NLS-1$
             + "SUM(tourData.TOURDEVICETIME_RECORDED) AS TOTALRECORDEDTIME" + NEW_LINE //                                                                   //$NON-NLS-1$
-            + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NEW_LINE //                                                                        //$NON-NLS-1$ //$NON-NLS-2$
+            + "FROM " +  TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NEW_LINE //                                                                        //$NON-NLS-1$ //$NON-NLS-2$
             + "INNER JOIN " + TourDatabase.TABLE_TOUR_DATA + NEW_LINE //                                                       //$NON-NLS-1$
             + "ON jTdataTtag.TOURDATA_TOURID = tourData.TOURID" + NEW_LINE //                                                                       //$NON-NLS-1$
             + "GROUP BY jTdataTtag.TOURTAG_TAGID"; //$NON-NLS-1$
@@ -573,8 +573,8 @@ public class UI {
       final Map<Long, String> tourTagsAccumulatedValues = new HashMap<>();
 
       try (Connection connection = TourDatabase.getInstance().getConnection();
-            final PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-
+           final PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+  
          final ResultSet result = preparedStatement.executeQuery();
 
          while (result.next()) {
