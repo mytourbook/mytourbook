@@ -9379,7 +9379,8 @@ public class TourDatabase {
       return newDbVersion;
    }
 
-   private int updateDb_048_To_049(final Connection conn, final SplashManager splashManager) throws SQLException {
+   private int updateDb_048_To_049(final Connection connection,
+                                   final SplashManager splashManager) throws SQLException {
 
       final int newDbVersion = 49;
 
@@ -9387,7 +9388,7 @@ public class TourDatabase {
 
       updateMonitor(splashManager, newDbVersion);
 
-      final Statement stmt = conn.createStatement();
+      final Statement stmt = connection.createStatement();
       {
          SQL.AddColumn_VarCar(stmt, TABLE_TOUR_TAG, "imageFilePath", TourTag.DB_LENGTH_FILE_PATH); //$NON-NLS-1$
       }
