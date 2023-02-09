@@ -22,6 +22,7 @@ import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Images;
@@ -36,6 +37,7 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.CSS;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -253,7 +255,7 @@ public class TourBlogView extends ViewPart {
 
          if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
             if (modifiedTours != null) {
 
                // update modified tour
@@ -361,7 +363,7 @@ public class TourBlogView extends ViewPart {
       final StringBuilder sb = new StringBuilder();
 
       final Set<TourMarker> tourMarkers = _tourData.getTourMarkers();
-      final ArrayList<TourMarker> allMarker = new ArrayList<>(tourMarkers);
+      final List<TourMarker> allMarker = new ArrayList<>(tourMarkers);
       Collections.sort(allMarker);
 
       create_22_BlogHeader(sb);
@@ -411,13 +413,13 @@ public class TourBlogView extends ViewPart {
    private void create_24_Tour(final StringBuilder sb) {
 
       String tourDescription = _tourData.getTourDescription();
-      final boolean isDescription = tourDescription.length() > 0;
+      final boolean isDescription = StringUtils.hasContent(tourDescription);
 
       String tourTitle = _tourData.getTourTitle();
-      final boolean isTitle = tourTitle.length() > 0;
+      final boolean isTitle = StringUtils.hasContent(tourTitle);
 
       String tourWeather = WeatherUtils.buildWeatherDataString(_tourData, true, true, true);
-      final boolean isWeather = tourWeather.length() > 0;
+      final boolean isWeather = StringUtils.hasContent(tourWeather);
 
       if (isDescription || isTitle || isWeather) {
 
@@ -1017,7 +1019,7 @@ public class TourBlogView extends ViewPart {
 
       } else if (selection instanceof SelectionTourIds) {
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
          if ((tourIds != null) && (tourIds.size() > 0)) {
             _tourChart = null;
             tourId = tourIds.get(0);
@@ -1111,7 +1113,7 @@ public class TourBlogView extends ViewPart {
             return;
          }
 
-         final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+         final List<TourData> selectedTours = TourManager.getSelectedTours();
 
          if ((selectedTours != null) && (selectedTours.size() > 0)) {
             onSelectionChanged(new SelectionTourData(selectedTours.get(0)));
