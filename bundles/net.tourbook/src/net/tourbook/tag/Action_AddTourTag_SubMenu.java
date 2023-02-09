@@ -371,6 +371,7 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
    public void dispose() {
 
       if (_menu != null) {
+         //todo fb
          final var toto = _menu.getItems();
          _menu.getItems()[0].dispose();
          _menu.dispose();
