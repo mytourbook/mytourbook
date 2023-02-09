@@ -1261,12 +1261,15 @@ public class UI {
 
       }
 
-      final Map<Long, String> tourTagsAccumulatedValues = UI.fetchTourTagsAccumulatedValues();
+      final Map<Long, String> tourTagsAccumulatedValues =
+            UI.fetchTourTagsAccumulatedValues();
 
       for (final TourTag tag : tourTags) {
 
          final CLabel label = new CLabel(tourTagsComposite, SWT.NONE);
-         label.setText(tag.getTagName() + UI.NEW_LINE + tourTagsAccumulatedValues.get(tag.getTagId()));
+         label.setText(tag.getTagName() + UI.NEW_LINE +
+               tourTagsAccumulatedValues.get(tag.getTagId()));
+
          final Image image = UI.prepareTagImage(tag.getImageFilePath());
          if (image != null) {
             label.setImage(image);
