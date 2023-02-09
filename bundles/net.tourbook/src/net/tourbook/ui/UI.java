@@ -573,10 +573,11 @@ public class UI {
       final Map<Long, String> tourTagsAccumulatedValues = new HashMap<>();
 
       try (Connection connection = TourDatabase.getInstance().getConnection();
-            final PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
          
-         preparedStatement.setString(1, TourDatabase.JOINTABLE__TOURDATA__TOURTAG);
-                  preparedStatement.setString(2, TourDatabase.TABLE_TOUR_DATA);
+         int index = 0;
+         preparedStatement.setString(++index, TourDatabase.JOINTABLE__TOURDATA__TOURTAG);
+         preparedStatement.setString(++index, TourDatabase.TABLE_TOUR_DATA);
 
          final ResultSet result = preparedStatement.executeQuery();
 
