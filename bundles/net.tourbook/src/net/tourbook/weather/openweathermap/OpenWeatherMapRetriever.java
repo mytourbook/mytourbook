@@ -255,8 +255,6 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
 // SET_FORMATTING_OFF
 
-      tour.setIsWeatherDataFromProvider(true);
-
       //We look for the weather data in the middle of the tour to populate the weather conditions
       timeMachineResult.findMiddleHourly(    tourMiddleTime);
       tour.setWeather(                       timeMachineResult.getWeatherDescription());

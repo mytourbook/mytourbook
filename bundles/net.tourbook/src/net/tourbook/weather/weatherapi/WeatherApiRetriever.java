@@ -183,8 +183,6 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
          return false;
       }
 
-      tour.setIsWeatherDataFromProvider(true);
-
       //We look for the weather data in the middle of the tour to populate the weather conditions
       historyResult.findMiddleHour(tourMiddleTime);
 
