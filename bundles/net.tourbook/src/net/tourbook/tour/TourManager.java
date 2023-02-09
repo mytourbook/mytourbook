@@ -2761,7 +2761,7 @@ public class TourManager {
 
       final List<TourData> modifiedTours = new ArrayList<>();
 
-      if (tourDataList == null || tourDataList.isEmpty()) {
+      if (tourDataList == null || tourDataList.size() == 0) {
          return modifiedTours;
       }
 
