@@ -29,7 +29,9 @@ import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.tourbook.Images;
@@ -531,35 +533,6 @@ public class UI {
       return container;
    }
 
-   public static Image prepareTagImage(final String imageFilePath) {
-
-      if (StringUtils.isNullOrEmpty(imageFilePath) ||
-            !new File(imageFilePath).exists()) {
-         return null;
-      }
-
-      Image image = new Image(Display.getDefault(), imageFilePath);
-
-      final int imageWidth = image.getBounds().width;
-      final int imageHeight = image.getBounds().height;
-
-      int newimageWidth = TAG_IMAGE_WIDTH;
-      int newimageHeight = TAG_IMAGE_HEIGHT;
-
-      if (imageWidth > imageHeight) {
-
-         newimageHeight = Math.round(newimageWidth * imageHeight / (imageWidth*1f));
-
-      } else if (imageWidth < imageHeight) {
-
-         newimageWidth = Math.round(newimageHeight * imageWidth / (imageHeight*1f));
-      }
-
-      image = ImageUtils.resize(Display.getDefault(), image, newimageWidth, newimageHeight);
-
-      return image;
-   }
-
    /**
     * Disables all controls and their children
     */
@@ -586,37 +559,49 @@ public class UI {
       }
    }
 
-   public static int fetchTourTagsAccumulationString() {
+   private static Map<Long, String> fetchTourTagsAccumulatedValues() {
 
       final String sql = "SELECT" + NEW_LINE //                                                                        //$NON-NLS-1$
-            + "jTdataTtag.TOURTAG_TAGID," + NEW_LINE //
-            + "SUM(tourData.TOURDISTANCE) AS TOTALDISTANCE," + NEW_LINE //
+            + "jTdataTtag.TOURTAG_TAGID," + NEW_LINE // //$NON-NLS-1$
+            + "SUM(tourData.TOURDISTANCE) AS TOTALDISTANCE," + NEW_LINE // //$NON-NLS-1$
             + "SUM(tourData.TOURDEVICETIME_RECORDED) AS TOTALRECORDEDTIME" + NEW_LINE //                                                                   //$NON-NLS-1$
-            + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NEW_LINE //                                                                        //$NON-NLS-1$
+            + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NEW_LINE //                                                                        //$NON-NLS-1$ //$NON-NLS-2$
             + "INNER JOIN " + TourDatabase.TABLE_TOUR_DATA + NEW_LINE //                                                       //$NON-NLS-1$
             + "ON jTdataTtag.TOURDATA_TOURID = tourData.TOURID" + NEW_LINE //                                                                       //$NON-NLS-1$
-            + "GROUP BY jTdataTtag.TOURTAG_TAGID" + NEW_LINE; //$NON-NLS-1$
+            + "GROUP BY jTdataTtag.TOURTAG_TAGID"; //$NON-NLS-1$
+
+      final Map<Long, String> tourTagsAccumulatedValues = new HashMap<>();
 
       try (Connection connection = TourDatabase.getInstance().getConnection();
             final PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
          final ResultSet result = preparedStatement.executeQuery();
 
-         // get first result
-         result.next();
+         while (result.next()) {
 
-         // get first value
-         final int numTours = result.getInt(2);
+            final long tourTagId = result.getLong(1);
+            float usedMiles = result.getInt(2);
+            final long usedHours = result.getInt(3);
 
-         return numTours;
+            final StringBuilder tagAccumulatedValues = new StringBuilder();
 
-//       TourDatabase.disableRuntimeStatistic(conn);
+            tagAccumulatedValues.append(Math.round(usedHours / 3600f));
+            tagAccumulatedValues.append(Messages.tour_editor_label_time_unit);
+
+            tagAccumulatedValues.append(UI.NEW_LINE);
+
+            usedMiles = usedMiles / 1000 / net.tourbook.common.UI.UNIT_VALUE_DISTANCE;
+            tagAccumulatedValues.append(Math.round(usedMiles));
+            tagAccumulatedValues.append(net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
+
+            tourTagsAccumulatedValues.put(tourTagId, tagAccumulatedValues.toString());
+         }
 
       } catch (final SQLException e) {
+
          SQL.showException(e, sql);
       }
-
-      return 0;
+      return tourTagsAccumulatedValues;
    }
 
    public static String format_yyyymmdd_hhmmss(final TourData tourData) {
@@ -901,6 +886,35 @@ public class UI {
       }
 
       return UI.EMPTY_STRING;
+   }
+
+   public static Image prepareTagImage(final String imageFilePath) {
+
+      if (StringUtils.isNullOrEmpty(imageFilePath) ||
+            !new File(imageFilePath).exists()) {
+         return null;
+      }
+
+      Image image = new Image(Display.getDefault(), imageFilePath);
+
+      final int imageWidth = image.getBounds().width;
+      final int imageHeight = image.getBounds().height;
+
+      int newimageWidth = TAG_IMAGE_WIDTH;
+      int newimageHeight = TAG_IMAGE_HEIGHT;
+
+      if (imageWidth > imageHeight) {
+
+         newimageHeight = Math.round(newimageWidth * imageHeight / (imageWidth * 1f));
+
+      } else if (imageWidth < imageHeight) {
+
+         newimageWidth = Math.round(newimageHeight * imageWidth / (imageHeight * 1f));
+      }
+
+      image = ImageUtils.resize(Display.getDefault(), image, newimageWidth, newimageHeight);
+
+      return image;
    }
 
    public static Image resizeTagImageToDefaults(final Image imageToResize) {
@@ -1229,10 +1243,6 @@ public class UI {
 
    public static void updateUI_TagsWithImage(final Set<TourTag> tourTags, final Composite tourTagsComposite, final List<CLabel> tagsLabels) {
 
-      //Retrieve the accumulation values for each tag
-      //todo fb
-      // tourTags.forEach(tourTag -> computeTagAccumulationValues(tourTag));
-
       // We dispose the current tags labels
       tagsLabels.forEach(tagLabel -> {
 
@@ -1244,27 +1254,27 @@ public class UI {
       });
       tagsLabels.clear();
 
-      if (tourTags == null || tourTags.isEmpty()) {
+      if (tourTags.isEmpty()) {
 
          tourTagsComposite.setData(null);
+         return;
 
-      } else {
-
-         UI.fetchTourTagsAccumulationString();
-
-         for (final TourTag tag : tourTags) {
-
-            final CLabel label = new CLabel(tourTagsComposite, SWT.NONE);
-            label.setText(tag.getTagName() + UI.NEW_LINE + "23 miles" + UI.NEW_LINE + "2h");
-            final Image image = UI.prepareTagImage(tag.getImageFilePath());
-            if (image != null) {
-               label.setImage(image);
-            }
-            tagsLabels.add(label);
-         }
-
-         tourTagsComposite.layout();
       }
+
+      final Map<Long, String> tourTagsAccumulatedValues = UI.fetchTourTagsAccumulatedValues();
+
+      for (final TourTag tag : tourTags) {
+
+         final CLabel label = new CLabel(tourTagsComposite, SWT.NONE);
+         label.setText(tag.getTagName() + UI.NEW_LINE + tourTagsAccumulatedValues.get(tag.getTagId()));
+         final Image image = UI.prepareTagImage(tag.getImageFilePath());
+         if (image != null) {
+            label.setImage(image);
+         }
+         tagsLabels.add(label);
+      }
+
+      tourTagsComposite.layout();
    }
 
    /**
