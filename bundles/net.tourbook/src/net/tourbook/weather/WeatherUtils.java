@@ -167,7 +167,7 @@ public class WeatherUtils {
          }
       }
 
-      // if (temperaturesExist(tourData)) {
+      if (tourData.temperaturesExist()) {
 
          // Average temperature
          final float averageTemperature = tourData.getWeather_Temperature_Average();
@@ -208,7 +208,7 @@ public class WeatherUtils {
                         FormatManager.formatTemperature(UI.convertTemperatureFromMetric(temperatureWindChill)) +
                         UI.UNIT_LABEL_TEMPERATURE);
          }
-         //    }
+      }
 
       // Wind
       final int windSpeed = tourData.getWeather_Wind_Speed();
@@ -484,13 +484,5 @@ public class WeatherUtils {
    public static float roundDoubleToFloat(final double value) {
 
       return Math.round(value * 100.0) / 100.0f;
-   }
-
-   private static boolean temperaturesExist(final TourData tourData) {
-
-      return tourData.getWeather_Temperature_Average() != 0 &&
-            tourData.getWeather_Temperature_Max() != 0 &&
-            tourData.getWeather_Temperature_Min() != 0 &&
-            tourData.getWeather_Temperature_WindChill() != 0;
    }
 }

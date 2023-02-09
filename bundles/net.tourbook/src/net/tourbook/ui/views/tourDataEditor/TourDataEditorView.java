@@ -6478,7 +6478,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _actionOpenMarkerDialog.setTourMarker(selectedMarker);
 
 // SET_FORMATTING_OFF
-      
+
       _actionDeleteTimeSlices_AdjustTourStartTime  .setEnabled(canDeleteTimeSliced);
       _actionDeleteTimeSlices_KeepTime             .setEnabled(canDeleteTimeSliced);
       _actionDeleteTimeSlices_KeepTimeAndDistance  .setEnabled(canDeleteTimeSliced);
@@ -6489,7 +6489,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _actionSplitTour           .setEnabled(isOneSliceSelected);
       _actionExtractTour         .setEnabled(numberOfSelectedSlices >= 2);
-      
+
 // SET_FORMATTING_ON
 
       // set start/end position into the actions
@@ -9058,10 +9058,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       displayCloudIcon();
 
       final boolean isTourTemperatureDeviceValid = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0;
-      final boolean isTourTemperatureValid = _tourData.getWeather_Temperature_Average() != 0 ||
-            _tourData.getWeather_Temperature_Max() != 0 ||
-            _tourData.getWeather_Temperature_Min() != 0 ||
-            _tourData.isWeatherDataFromProvider();
+      final boolean temperaturesExist = _tourData.temperaturesExist();
+
       /*
        * Avg temperature from Device
        */
@@ -9094,7 +9092,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Temperature_Average.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_Average.setDigits(1);
       int avgTemperatureValue = 0;
-      if (isTourTemperatureValid) {
+      if (temperaturesExist) {
          avgTemperatureValue = Math.round(avgTemperature * 10);
 
       }
@@ -9108,7 +9106,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Temperature_Min.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_Min.setDigits(1);
       int minTemperatureValue = 0;
-      if (isTourTemperatureValid) {
+      if (temperaturesExist) {
          minTemperatureValue = Math.round(minTemperature * 10);
 
       }
@@ -9122,7 +9120,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Temperature_Max.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_Max.setDigits(1);
       int maxTemperatureValue = 0;
-      if (isTourTemperatureValid) {
+      if (temperaturesExist) {
          maxTemperatureValue = Math.round(maxTemperature * 10);
 
       }
@@ -9136,7 +9134,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Temperature_WindChill.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_WindChill.setDigits(1);
       int avgWindChillValue = 0;
-      if (isTourTemperatureValid) {
+      if (temperaturesExist) {
          avgWindChillValue = Math.round(avgWindChill * 10);
 
       }
