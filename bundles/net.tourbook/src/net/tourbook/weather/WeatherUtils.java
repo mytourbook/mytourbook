@@ -212,7 +212,7 @@ public class WeatherUtils {
 
       // Wind
       final int windSpeed = tourData.getWeather_Wind_Speed();
-      if (windSpeed != Float.MIN_VALUE) {
+      if (windSpeed > 0) {
 
          final String windDirection = tourData.getWeather_Wind_Direction() != -1
                ? UI.SPACE +
@@ -227,7 +227,7 @@ public class WeatherUtils {
 
       // Humidity
       final float humidity = tourData.getWeather_Humidity();
-      if (humidity != Float.MIN_VALUE) {
+      if (humidity > 0) {
 
          weatherDataList.add((int) humidity +
                UI.SYMBOL_PERCENTAGE +
@@ -236,9 +236,10 @@ public class WeatherUtils {
       }
 
       // Pressure
-      if (displayPressure) {
+      final float weatherPressure = tourData.getWeather_Pressure();
+      if (weatherPressure > 0 && displayPressure) {
 
-         weatherDataList.add(roundDoubleToFloat(tourData.getWeather_Pressure()) +
+         weatherDataList.add(roundDoubleToFloat(weatherPressure) +
                UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG +
                UI.SPACE +
                Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Pressure);
