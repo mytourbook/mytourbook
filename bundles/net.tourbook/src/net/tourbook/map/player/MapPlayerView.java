@@ -31,15 +31,14 @@ import net.tourbook.common.tooltip.ICloseOpenedDialogs;
 import net.tourbook.common.tooltip.IOpeningDialog;
 import net.tourbook.common.tooltip.OpenDialogManager;
 import net.tourbook.common.util.MtMath;
-import net.tourbook.common.util.Util;
 import net.tourbook.map.MapManager;
 import net.tourbook.map.model.SlideoutMapModel;
 import net.tourbook.map25.Map25FPSManager;
 import net.tourbook.map25.renderer.TourTrack_Bucket;
 
-import org.eclipse.e4.ui.di.PersistState;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -48,7 +47,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -65,11 +63,9 @@ import org.oscim.renderer.GLViewport;
 
 public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
-   public static final String           ID                     = "net.tourbook.map.player.MapPlayerView"; //$NON-NLS-1$
+   public static final String           ID     = "net.tourbook.map.player.MapPlayerView"; //$NON-NLS-1$
    //
-   private static final String          STATE_IS_SHOW_END_TIME = "STATE_IS_SHOW_END_TIME";                //$NON-NLS-1$
-   //
-   private static final IDialogSettings _state                 = TourbookPlugin.getState(ID);
+   private static final IDialogSettings _state = TourbookPlugin.getState(ID);
    //
 // SET_FORMATTING_OFF
 
@@ -82,27 +78,28 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
    // SET_FORMATTING_ON
    //
-   private static final Color      JOG_WHEEL_COLOR_GREATER_0                           = new Color(26, 142, 26);
-   private static final Color      JOG_WHEEL_COLOR_LESS_0                              = new Color(227, 64, 23);
+   private static final Color        JOG_WHEEL_COLOR_GREATER_0                           = new Color(26, 142, 26);
+   private static final Color        JOG_WHEEL_COLOR_LESS_0                              = new Color(227, 64, 23);
    //
-   private static final int        RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END = -1;
-   private static final int        RELATIVE_MODEL_POSITION_ON_RETURN_PATH_END_TO_START = 2;
+   static final int                  RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END = -1;
+   static final int                  RELATIVE_MODEL_POSITION_ON_RETURN_PATH_END_TO_START = 2;
    //
-   private IPartListener2          _partListener;
+   private IPartListener2            _partListener;
    //
-   private Action                  _actionPlayControl_PlayAndPause;
-   private Action                  _actionPlayControl_Loop;
-   private Action_SlideoutMapModel _actionSlideoutMapModel;
+   private Action                    _actionPlayControl_PlayAndPause;
+   private Action                    _actionPlayControl_Loop;
+   private Action_ShowMapModel       _actionShowMapModel;
+   private Action_ShowMapModelCursor _actionShowMapModelCursor;
+   private Action_SlideoutMapModel   _actionSlideoutMapModel;
    //
-   private boolean                 _isInUpdateTimeline;
-   private boolean                 _isShow_EndTime_Or_RemainingTime;
+   private boolean                   _isInUpdateTimeline;
    //
-   private int                     _currentTimelineMaxValue;
-   private int                     _currentTimelineValue;
+   private int                       _currentTimelineMaxValue;
+   private int                       _currentTimelineValue;
    //
-   private OpenDialogManager       _openDialogManager                                  = new OpenDialogManager();
+   private OpenDialogManager         _openDialogManager                                  = new OpenDialogManager();
    //
-   private PixelConverter          _pc;
+   private PixelConverter            _pc;
    //
    /*
     * UI controls
@@ -127,7 +124,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
    private Spinner   _spinnerModelCursorSize;
    private Spinner   _spinnerModelSize;
    private Spinner   _spinnerSpeedMultiplier;
-   private Spinner   _spinnerTurningAngle;
+   private Spinner   _spinnerTurningMultiplier;
 
    private class Action_PlayControl_Loop extends Action {
 
@@ -163,14 +160,58 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       }
    }
 
+   private class Action_ShowMapModel extends Action {
+
+      Action_ShowMapModel() {
+
+         super(null, AS_CHECK_BOX);
+
+         setToolTipText(Messages.Map_Player_Button_MapModel_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapModel));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapModel_Disabled));
+      }
+
+      @Override
+      public void run() {
+
+         MapPlayerManager.setIsMapModelVisible(this.isChecked());
+
+         enableControls();
+      }
+
+   }
+
+   private class Action_ShowMapModelCursor extends Action {
+
+      Action_ShowMapModelCursor() {
+
+         super(null, AS_CHECK_BOX);
+
+         setToolTipText(Messages.Map_Player_Button_MapModelCursor_Tooltip);
+
+         setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapModelCursor));
+         setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapModelCursor_Disabled));
+      }
+
+      @Override
+      public void run() {
+
+         MapPlayerManager.setIsMapModelCursorVisible(this.isChecked());
+
+         enableControls();
+      }
+
+   }
+
    private class Action_SlideoutMapModel extends ActionToolbarSlideoutAdv {
 
       private SlideoutMapModel __slideoutMapModel;
 
       public Action_SlideoutMapModel() {
 
-         super(TourbookPlugin.getThemedImageDescriptor(Images.MapModel),
-               TourbookPlugin.getThemedImageDescriptor(Images.MapModel_Disabled));
+         super(TourbookPlugin.getThemedImageDescriptor(Images.MapModelList),
+               TourbookPlugin.getThemedImageDescriptor(Images.MapModelList_Disabled));
       }
 
       @Override
@@ -241,10 +282,15 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
    private void createActions() {
 
-      _actionPlayControl_Loop = new Action_PlayControl_Loop();
-      _actionPlayControl_PlayAndPause = new Action_PlayControl_PlayAndPause();
+// SET_FORMATTING_OFF
 
-      _actionSlideoutMapModel = new Action_SlideoutMapModel();
+      _actionPlayControl_Loop          = new Action_PlayControl_Loop();
+      _actionPlayControl_PlayAndPause  = new Action_PlayControl_PlayAndPause();
+      _actionShowMapModel              = new Action_ShowMapModel();
+      _actionShowMapModelCursor        = new Action_ShowMapModelCursor();
+      _actionSlideoutMapModel          = new Action_SlideoutMapModel();
+
+// SET_FORMATTING_ON
    }
 
    @Override
@@ -262,17 +308,14 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       createUI(parent);
 
-      enableControls();
-
       parent.getDisplay().asyncExec(() -> {
 
          // run async because the theme may not yet been initialized
          restoreState();
 
-         MapPlayerManager.setMapPlayerViewer(this);
+         enableControls();
 
-         // set default label width
-//         _scaleWobbleNaviagator.getParent().getParent().layout(true, true);
+         MapPlayerManager.setMapPlayerView(this);
 
          updatePlayer_InUIThread();
       });
@@ -330,7 +373,6 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
          }
          {
             _lblTimeline_Value = new Label(container, SWT.CENTER);
-            _lblTimeline_Value.addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> onMouseDown_TimeEndOrRemaining()));
             gridDataAlignEndCenter.applyTo(_lblTimeline_Value);
 //            _lblTimeline_Value.setBackground(UI.SYS_COLOR_CYAN);
          }
@@ -363,7 +405,6 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
          }
          {
             _lblSpeedJogWheel_Value = new Label(container, SWT.CENTER);
-            _lblSpeedJogWheel_Value.addMouseListener(MouseListener.mouseDownAdapter(mouseEvent -> onMouseDown_TimeEndOrRemaining()));
             gridDataAlignEndCenter.applyTo(_lblSpeedJogWheel_Value);
 //            _lblSpeedJogWheel_Value.setBackground(UI.SYS_COLOR_CYAN);
          }
@@ -443,16 +484,15 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
              */
             _lblTurningAngle = UI.createLabel(container, Messages.Map_Player_Label_TurningAngle);
 
-            _spinnerTurningAngle = new Spinner(container, SWT.BORDER);
-            _spinnerTurningAngle.setToolTipText(Messages.Map_Player_Label_TurningAngle_Tooltip);
-            _spinnerTurningAngle.setDigits(1);
-            _spinnerTurningAngle.setMinimum(0);
-            _spinnerTurningAngle.setMaximum(100);
-            _spinnerTurningAngle.setIncrement(1);
-            _spinnerTurningAngle.setPageIncrement(5);
-            _spinnerTurningAngle.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TurningAngle()));
-            _spinnerTurningAngle.addMouseWheelListener(mouseEvent -> {
-               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 5);
+            _spinnerTurningMultiplier = new Spinner(container, SWT.BORDER);
+            _spinnerTurningMultiplier.setToolTipText(Messages.Map_Player_Label_TurningAngle_Tooltip);
+            _spinnerTurningMultiplier.setMinimum(0);
+            _spinnerTurningMultiplier.setMaximum(50);
+            _spinnerTurningMultiplier.setIncrement(1);
+            _spinnerTurningMultiplier.setPageIncrement(5);
+            _spinnerTurningMultiplier.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TurningAngle()));
+            _spinnerTurningMultiplier.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 1);
                onSelect_TurningAngle();
             });
 //            GridDataFactory.fillDefaults().applyTo(_spinnerTurningAngle);
@@ -478,39 +518,46 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       getViewSite().getPage().removePartListener(_partListener);
 
-      MapPlayerManager.setMapPlayerViewer(null);
+      MapPlayerManager.setMapPlayerView(null);
 
       super.dispose();
    }
 
    private void enableControls() {
 
-      final boolean isEnabled = MapPlayerManager.isPlayerEnabled() && MapPlayerManager.isAnimationVisible();
-
 // SET_FORMATTING_OFF
 
-      _actionPlayControl_PlayAndPause     .setEnabled(isEnabled);
-      _actionPlayControl_Loop             .setEnabled(isEnabled);
-      _actionSlideoutMapModel             .setEnabled(isEnabled);
+      final boolean canShowMapModel          = MapPlayerManager.canShowMapModel();
+      final boolean isMapModelVisible        = MapPlayerManager.isMapModelVisible();
+      final boolean isMapModelCursorVisible  = MapPlayerManager.isMapModelCursorVisible();
 
-      _lblModelCursorSize                 .setEnabled(isEnabled);
-      _lblModelSize                       .setEnabled(isEnabled);
-      _lblSpeedMultiplier                 .setEnabled(isEnabled);
-      _lblSpeedJogWheel                   .setEnabled(isEnabled);
-      _lblSpeedJogWheel_Value             .setEnabled(isEnabled);
-      _lblTimeline                        .setEnabled(isEnabled);
-      _lblTimeline_Value                  .setEnabled(isEnabled);
-      _lblTurningAngle                    .setEnabled(isEnabled);
+      final boolean isModelVisible           = canShowMapModel && (isMapModelVisible || isMapModelCursorVisible);
 
-      _chkIsRelivePlaying                 .setEnabled(isEnabled);
 
-      _scaleSpeedJogWheel                 .setEnabled(isEnabled);
-      _scaleTimeline                      .setEnabled(isEnabled);
+      _actionPlayControl_Loop             .setEnabled(isModelVisible);
+      _actionPlayControl_PlayAndPause     .setEnabled(isModelVisible);
+      _actionShowMapModel                 .setEnabled(canShowMapModel);
+      _actionShowMapModelCursor           .setEnabled(canShowMapModel);
+      _actionSlideoutMapModel             .setEnabled(isModelVisible);
 
-      _spinnerModelCursorSize             .setEnabled(isEnabled);
-      _spinnerModelSize                   .setEnabled(isEnabled);
-      _spinnerSpeedMultiplier             .setEnabled(isEnabled);
-      _spinnerTurningAngle                .setEnabled(isEnabled);
+      _lblModelCursorSize                 .setEnabled(isModelVisible && isMapModelCursorVisible);
+      _lblModelSize                       .setEnabled(isModelVisible && isMapModelVisible);
+      _lblSpeedMultiplier                 .setEnabled(isModelVisible);
+      _lblSpeedJogWheel                   .setEnabled(isModelVisible);
+      _lblSpeedJogWheel_Value             .setEnabled(isModelVisible);
+      _lblTimeline                        .setEnabled(isModelVisible);
+      _lblTimeline_Value                  .setEnabled(isModelVisible);
+      _lblTurningAngle                    .setEnabled(isModelVisible);
+
+      _chkIsRelivePlaying                 .setEnabled(isModelVisible);
+
+      _scaleSpeedJogWheel                 .setEnabled(isModelVisible);
+      _scaleTimeline                      .setEnabled(isModelVisible);
+
+      _spinnerModelCursorSize             .setEnabled(isModelVisible && isMapModelCursorVisible);
+      _spinnerModelSize                   .setEnabled(isModelVisible && isMapModelVisible);
+      _spinnerSpeedMultiplier             .setEnabled(isModelVisible);
+      _spinnerTurningMultiplier           .setEnabled(isModelVisible);
 
 
 // SET_FORMATTING_ON
@@ -523,8 +570,15 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
        */
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
+      tbm.add(_actionShowMapModel);
+      tbm.add(_actionShowMapModelCursor);
+
+      tbm.add(new Separator());
+
       tbm.add(_actionPlayControl_PlayAndPause);
       tbm.add(_actionPlayControl_Loop);
+
+      tbm.add(new Separator());
 
       tbm.add(_actionSlideoutMapModel);
    }
@@ -654,13 +708,6 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       return false;
    }
 
-   private void onMouseDown_TimeEndOrRemaining() {
-
-      _isShow_EndTime_Or_RemainingTime = !_isShow_EndTime_Or_RemainingTime;
-
-//      updateUI_FromTimeline_VisibleFrames();
-   }
-
    private void onPlayControl_Loop() {
 
       final boolean isPlayingLoop = _actionPlayControl_Loop.isChecked();
@@ -712,7 +759,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
    private void onSelect_TurningAngle() {
 
-      MapPlayerManager.setTurningAngle(_spinnerTurningAngle.getSelection() / 10f);
+      MapPlayerManager.setTurningAngle(_spinnerTurningMultiplier.getSelection());
    }
 
    private void onSpeedJogWheel_Key(final KeyEvent keyEvent) {
@@ -915,24 +962,24 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       setMapAndModelPosition(getTimelineRelativePosition());
    }
 
-   private void restoreState() {
+   void restoreState() {
 
-      _isShow_EndTime_Or_RemainingTime = Util.getStateBoolean(_state, STATE_IS_SHOW_END_TIME, true);
+// SET_FORMATTING_OFF
 
-      _actionPlayControl_Loop.setChecked(MapPlayerManager.isPlayingLoop());
-      _chkIsRelivePlaying.setSelection(MapPlayerManager.isReLivePlaying());
-      _spinnerModelCursorSize.setSelection(MapPlayerManager.getModelCursorSize());
-      _spinnerModelSize.setSelection(MapPlayerManager.getFixedModelSize());
+      _actionPlayControl_Loop    .setChecked(MapPlayerManager.isPlayingLoop());
+      _actionShowMapModel        .setChecked(MapPlayerManager.isMapModelVisible());
+      _actionShowMapModelCursor  .setChecked(MapPlayerManager.isMapModelCursorVisible());
+
+      _chkIsRelivePlaying        .setSelection(MapPlayerManager.isReLivePlaying());
+
+      _spinnerModelCursorSize    .setSelection(MapPlayerManager.getModelCursorSize());
+      _spinnerModelSize          .setSelection(MapPlayerManager.getFixedModelSize());
+
+// SET_FORMATTING_ON
 
       setJogWheel_Value(MapPlayerManager.getJogWheelSpeed());
 
       updateUI_PlayAndPausedControls();
-   }
-
-   @PersistState
-   private void saveState() {
-
-      _state.put(STATE_IS_SHOW_END_TIME, _isShow_EndTime_Or_RemainingTime);
    }
 
    @Override
@@ -1032,7 +1079,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       updateUI_PlayAndPausedControls();
    }
 
-   void updateAnimationVisibility() {
+   void updateMapModelVisibility() {
 
       enableControls();
    }
@@ -1068,10 +1115,8 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       updateUI_TimelineMaxValue();
 
-      final float modelTurningAngle = MapPlayerManager.getModelTurningAngle();
-
       _spinnerSpeedMultiplier.setSelection(MapPlayerManager.getSpeedMultiplier());
-      _spinnerTurningAngle.setSelection((int) (modelTurningAngle * 10));
+      _spinnerTurningMultiplier.setSelection((MapPlayerManager.getModelTurningAngle()));
 
       enableControls();
    }

@@ -43,7 +43,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.map.model.MapModel;
 import net.tourbook.map.model.MapModelManager;
 import net.tourbook.map.player.MapPlayerManager;
-import net.tourbook.map25.Map25ConfigManager;
 
 import org.oscim.backend.GL;
 import org.oscim.core.MapPosition;
@@ -239,9 +238,14 @@ public class GLTFModel_Renderer extends LayerRenderer {
     */
    void onMapEvent(final Event mapEvent, final MapPosition mapPosition) {
 
-      if (mapEvent != Map.POSITION_EVENT && mapEvent != Map.SCALE_EVENT) {
+      if (mapPosition != null && _currentMapPosition == null) {
+
+         // ensure that the initial map position is set, otherwise the model is not rendered
+
+      } else if (mapEvent != Map.POSITION_EVENT && mapEvent != Map.SCALE_EVENT) {
 
          // ignore other events
+
          return;
       }
 
@@ -260,7 +264,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
    @Override
    public void render(final GLViewport viewport) {
 
-      if (Map25ConfigManager.getActiveTourTrackConfig().arrow_IsAnimate == false) {
+      if (MapPlayerManager.isMapModelVisible() == false) {
          return;
       }
 

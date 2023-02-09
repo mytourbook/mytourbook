@@ -159,7 +159,6 @@ public class Map25ConfigManager {
     */
    private static final String              TAG_DIRECTION_ARROW                 = "DirectionArrow";                //$NON-NLS-1$
    private static final String              ATTR_ARROW_IS_SHOW_ARROW            = "isShowDirectionArrow";          //$NON-NLS-1$
-   private static final String              ATTR_ARROW_IS_ANIMATE               = "isAnimate";                     //$NON-NLS-1$
    private static final String              ATTR_ARROW_DESIGN                   = "design";                        //$NON-NLS-1$
    private static final String              ATTR_ARROW_MIN_DISTANCE             = "minDistance";                   //$NON-NLS-1$
    private static final String              ATTR_ARROW_VERTICAL_OFFSET          = "verticalOffset";                //$NON-NLS-1$
@@ -189,8 +188,6 @@ public class Map25ConfigManager {
    public static final int                  ARROW_LENGTH_CENTER_DEFAULT         = 30;
    public static final int                  ARROW_WIDTH_DEFAULT                 = 40;
    public static final int                  ARROW_HEIGHT_DEFAULT                = 20;
-   //
-   public static final boolean              ARROW_IS_ANIMATE_DEFAULT            = true;
    //
    public static final int                  ARROW_FIN_OUTLINE_WIDTH_DEFAULT     = 5;
    public static final int                  ARROW_WING_OUTLINE_WIDTH_DEFAULT    = 10;
@@ -701,9 +698,6 @@ public class Map25ConfigManager {
             Util.setXmlEnum(xmlArrow,  ATTR_ARROW_DESIGN,                     config.arrow_Design);
             xmlArrow.putInteger(       ATTR_ARROW_MIN_DISTANCE,               config.arrow_MinimumDistance);
             xmlArrow.putInteger(       ATTR_ARROW_VERTICAL_OFFSET,            config.arrow_VerticalOffset);
-
-            xmlArrow.putBoolean(       ATTR_ARROW_IS_ANIMATE,                 config.arrow_IsAnimate);
-
             xmlArrow.putInteger(       ATTR_ARROW_SCALE,                      config.arrow_Scale);
             xmlArrow.putInteger(       ATTR_ARROW_LENGTH,                     config.arrow_Length);
             xmlArrow.putInteger(       ATTR_ARROW_LENGTH_CENTER,              config.arrow_LengthCenter);
@@ -941,7 +935,6 @@ public class Map25ConfigManager {
          case TAG_DIRECTION_ARROW:
 
             config.isShowDirectionArrow   = Util.getXmlBoolean( xmlConfigChild,        ATTR_ARROW_IS_SHOW_ARROW,        ARROW_IS_SHOW_ARROW_DEFAULT);
-            config.arrow_IsAnimate        =  Util.getXmlBoolean(xmlConfigChild,        ATTR_ARROW_IS_ANIMATE,           ARROW_IS_ANIMATE_DEFAULT);
 
             config.arrow_MinimumDistance  =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_MIN_DISTANCE,         ARROW_MIN_DISTANCE_DEFAULT);
             config.arrow_VerticalOffset   =  Util.getXmlInteger(xmlConfigChild,        ATTR_ARROW_VERTICAL_OFFSET,      ARROW_VERTICAL_OFFSET_DEFAULT);
@@ -1344,7 +1337,5 @@ public class Map25ConfigManager {
    public static void setActiveTrackConfig(final Map25TrackConfig newConfig) {
 
       _activeTrackConfig = newConfig;
-
-      Map25FPSManager.setAnimation(newConfig.arrow_IsAnimate);
    }
 }

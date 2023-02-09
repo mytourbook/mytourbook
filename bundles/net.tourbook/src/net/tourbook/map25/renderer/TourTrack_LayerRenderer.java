@@ -301,19 +301,13 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          final double compileMapScale = compileMapPos.scale = 1 << compileMapZoomlevel;
 
          final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-         final boolean isShowDirectionArrows = trackConfig.isShowDirectionArrow;
+         final int arrow_MinimumDistance = trackConfig.arrow_MinimumDistance;
 
-         int arrow_MinimumDistance = trackConfig.arrow_IsAnimate
+         final boolean isShowDirectionArrowsOrMapModels = trackConfig.isShowDirectionArrow
+               || MapPlayerManager.isMapModelVisible()
+               || MapPlayerManager.isMapModelCursorVisible();
 
-               // use a smaller distance when animated, to show the moving figure smoothly
-               ? 1
-
-               : trackConfig.arrow_MinimumDistance;
-
-         // this is for debugging
-         arrow_MinimumDistance = trackConfig.arrow_MinimumDistance;
-
-         final TourTrack_Bucket workerBucket = getWorkerBucket(task.__taskBucketManager);
+         final TourTrack_Bucket workerBucket = updateLineStyleInWorkerBucket(task.__taskBucketManager);
 
          // current map positions 0...1
          final double compileMapPosX = compileMapPos.x; // 0...1, lat == 0 -> 0.5
@@ -524,7 +518,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             workerBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
          }
 
-         if (isShowDirectionArrows) {
+         if (isShowDirectionArrowsOrMapModels) {
 
             // convert arrow positions into arrow vertices
             workerBucket.createArrowVertices(
@@ -684,28 +678,6 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       return style;
    }
 
-   /**
-    * Update linestyle in the bucket
-    *
-    * @param bucketManager
-    * @return
-    */
-   private TourTrack_Bucket getWorkerBucket(final TourTrack_BucketManager bucketManager) {
-
-      TourTrack_Bucket trackBucket;
-
-      trackBucket = bucketManager.getBucket_Worker();
-
-// SET_FORMATTING_OFF
-
-      trackBucket.lineStyle       = _lineStyle;
-      trackBucket.lineColorMode   = _config_LineColorMode;
-
-// SET_FORMATTING_ON
-
-      return trackBucket;
-   }
-
    public void onModifyConfig(final boolean isVerticesModified) {
 
       _lineStyle = createLineStyle();
@@ -720,10 +692,17 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          // do a fast update
 
-         getWorkerBucket(_bucketManager_ForWorker);
+         updateLineStyleInWorkerBucket(_bucketManager_ForWorker);
 
          _map.render();
       }
+   }
+
+   public void onModifyMapModelOrCursor() {
+
+      // update shader data finally in TourTrack_Shader.bindBufferData()
+
+      _trackCompileWorker.submit(0);
    }
 
    /**
@@ -835,15 +814,6 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
       if (isDiffX || isDiffY || isDiffScale || _isCancelWorkerTask) {
 
-//         System.out.println(UI.timeStamp()
-//
-//               + "  isDiffX:" + isDiffX
-//               + "  isDiffY:" + isDiffY
-//               + "  isDiffScale:" + isDiffScale
-//
-//         );
-//// TODO remove SYSTEM.OUT.PRINTLN
-
          /*
           * It took me many days to find this solution that a newly selected tour is
           * displayed after the map position was moved/tilt/rotated. It works but I don't
@@ -868,7 +838,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       }
 
       /*
-       * workerTask will not be null after the track is compiled
+       * workerTask is not be null after the track is compiled OR
+       * with _trackCompileWorker.submit(0);
        */
       final TourCompileTask workerTask = _trackCompileWorker.poll();
 
@@ -880,7 +851,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       }
 
       /*
-       * Layer is just compiled (above) in
+       * Layer is (above) just compiled with
        * TourTrack_LayerRenderer.TrackCompileWorker.doWork(TourCompileTask)
        */
 
@@ -903,5 +874,27 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
             _compileMapPosition.x,
             _compileMapPosition.y,
             _compileMapPosition.scale);
+   }
+
+   /**
+    * Update linestyle in the bucket
+    *
+    * @param bucketManager
+    * @return
+    */
+   private TourTrack_Bucket updateLineStyleInWorkerBucket(final TourTrack_BucketManager bucketManager) {
+
+      TourTrack_Bucket trackBucket;
+
+      trackBucket = bucketManager.getBucket_Worker();
+
+// SET_FORMATTING_OFF
+
+      trackBucket.lineStyle       = _lineStyle;
+      trackBucket.lineColorMode   = _config_LineColorMode;
+
+// SET_FORMATTING_ON
+
+      return trackBucket;
    }
 }

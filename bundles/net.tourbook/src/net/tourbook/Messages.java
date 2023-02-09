@@ -1306,6 +1306,8 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Dialog_ValidationAddName;
    public static String        Map_Bookmark_Dialog_ValidationRename;
 
+   public static String        Map_Player_Button_MapModel_Tooltip;
+   public static String        Map_Player_Button_MapModelCursor_Tooltip;
    public static String        Map_Player_Button_Pause_Tooltip;
    public static String        Map_Player_Button_Play_Tooltip;
    public static String        Map_Player_Button_PlayLoop_Tooltip;
@@ -2093,8 +2095,6 @@ public class Messages extends NLS {
    public static String        Slideout_Map25Provider_Label_MapProvider;
    public static String        Slideout_Map25Provider_Label_MapProvider_Title;
    public static String        Slideout_Map25Provider_Label_ThemeStyle;
-   public static String        Slideout_Map25TrackOptions_Checkbox_AnimateDirectionArrows;
-   public static String        Slideout_Map25TrackOptions_Checkbox_AnimateDirectionArrows_Tooltip;
    public static String        Slideout_Map25TrackOptions_Checkbox_Outline;
    public static String        Slideout_Map25TrackOptions_Checkbox_Outline_Tooltip;
    public static String        Slideout_Map25TrackOptions_Checkbox_TrackVerticalOffset;

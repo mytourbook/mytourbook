@@ -45,27 +45,6 @@ public class Map25FPSManager {
    }
 
    /**
-    * Set animation parameters.
-    * <p>
-    * That an animation is working, it needs contiuous rendering.
-    *
-    * @param isActive
-    * @param animationFPS
-    */
-   public static void setAnimation(final boolean isActive) {
-
-      if (_lwjglApp == null) {
-
-         // map is not yet setup
-
-         return;
-      }
-
-      // disable rendering when not needed
-      _lwjglApp.getGraphics().setContinuousRendering(isActive);
-   }
-
-   /**
     * Set background FPS to a higher rate. This is helpful when a slideout is opened, then it get's
     * the focus and the map is normally running with the background FPS.
     *
@@ -117,5 +96,24 @@ public class Map25FPSManager {
             });
          }
       }
+   }
+
+   /**
+    * That an animation is working, it needs continuous rendering otherwise the model is only
+    * rendered e.g. during the mouse movement
+    *
+    * @param isActive
+    */
+   public static void setContinuousRendering(final boolean isActive) {
+
+      if (_lwjglApp == null) {
+
+         // map is not yet setup
+
+         return;
+      }
+
+      // disable continuous rendering when not needed
+      _lwjglApp.getGraphics().setContinuousRendering(isActive);
    }
 }

@@ -26,8 +26,6 @@ public class MapPlayerData {
 
    private static final String NL = UI.NEW_LINE;
 
-   public boolean              isPlayerEnabled;
-
    public short[]              allVisible_PixelPositions;
 
    /**
@@ -85,7 +83,6 @@ public class MapPlayerData {
 
             + "[" + NL //                                                                             //$NON-NLS-1$
 
-            + "isPlayerEnabled                  = " + isPlayerEnabled + NL //                         //$NON-NLS-1$
             + "allProjectedPoints_NormalTrack   = " + allProjectedPoints_NormalTrack_Length + NL //   //$NON-NLS-1$
             + "allProjectedPoints_ReturnTrack   = " + allProjectedPoints_ReturnTrack_Length + NL //   //$NON-NLS-1$
             + "allVisible_PixelPositions        = " + allVisible_PixelPositions_Length + NL //        //$NON-NLS-1$

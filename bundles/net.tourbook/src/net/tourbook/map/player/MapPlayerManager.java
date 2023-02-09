@@ -26,6 +26,9 @@ import net.tourbook.common.util.Util;
 import net.tourbook.map.IMapSyncListener.SyncParameter;
 import net.tourbook.map.MapManager;
 import net.tourbook.map.model.MapModelManager;
+import net.tourbook.map25.Map25App;
+import net.tourbook.map25.Map25FPSManager;
+import net.tourbook.map25.Map25View;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.swt.widgets.Display;
@@ -41,21 +44,24 @@ public class MapPlayerManager {
     * Max value for the scale control which cannot have negative values but the speed can be
     * negative.
     */
-   static final int                     SPEED_JOG_WHEEL_MAX              = 2 * 100;
-   static final int                     SPEED_JOG_WHEEL_MAX_HALF         = SPEED_JOG_WHEEL_MAX / 2;
+   static final int                     SPEED_JOG_WHEEL_MAX               = 2 * 100;
+   static final int                     SPEED_JOG_WHEEL_MAX_HALF          = SPEED_JOG_WHEEL_MAX / 2;
 
-   private static final String          STATE_IS_PLAYER_RUNNING          = "STATE_IS_PLAYER_RUNNING";                                          //$NON-NLS-1$
-   private static final String          STATE_IS_PLAYING_LOOP            = "STATE_IS_PLAYING_LOOP";                                            //$NON-NLS-1$
-   private static final String          STATE_IS_RELIVE_PLAYING          = "STATE_IS_RELIVE_PLAYING";                                          //$NON-NLS-1$
-   private static final String          STATE_JOG_WHEEL_SPEED            = "STATE_JOG_WHEEL_SPEED";                                            //$NON-NLS-1$
-   private static final String          STATE_JOG_WHEEL_SPEED_MULTIPLIER = "STATE_JOG_WHEEL_SPEED_MULTIPLIER";                                 //$NON-NLS-1$
-   private static final String          STATE_MODEL_CURSOR_SIZE          = "STATE_MODEL_CURSOR_SIZE";                                          //$NON-NLS-1$
-   private static final String          STATE_MODEL_SIZE_FIXED           = "STATE_MODEL_SIZE_FIXED";                                           //$NON-NLS-1$
-   private static final String          STATE_MODEL_TURNING_ANGLE        = "STATE_MODEL_TURNING_ANGLE";                                        //$NON-NLS-1$
-   private static final String          STATE_RELATIVE_POSITION          = "STATE_RELATIVE_POSITION";                                          //$NON-NLS-1$
+   private static final String          STATE_IS_MAP_MODEL_VISIBLE        = "STATE_IS_MAP_MODEL_VISIBLE";                                       //$NON-NLS-1$
+   private static final String          STATE_IS_MAP_MODEL_CURSOR_VISIBLE = "STATE_IS_MAP_MODEL_CURSOR_VISIBLE";                                //$NON-NLS-1$
+   private static final String          STATE_IS_PLAYER_RUNNING           = "STATE_IS_PLAYER_RUNNING";                                          //$NON-NLS-1$
+   private static final String          STATE_IS_PLAYING_LOOP             = "STATE_IS_PLAYING_LOOP";                                            //$NON-NLS-1$
+   private static final String          STATE_IS_RELIVE_PLAYING           = "STATE_IS_RELIVE_PLAYING";                                          //$NON-NLS-1$
+   private static final String          STATE_JOG_WHEEL_SPEED             = "STATE_JOG_WHEEL_SPEED";                                            //$NON-NLS-1$
+   private static final String          STATE_JOG_WHEEL_SPEED_MULTIPLIER  = "STATE_JOG_WHEEL_SPEED_MULTIPLIER";                                 //$NON-NLS-1$
+   private static final String          STATE_MODEL_CURSOR_SIZE           = "STATE_MODEL_CURSOR_SIZE";                                          //$NON-NLS-1$
+   private static final String          STATE_MODEL_SIZE_FIXED            = "STATE_MODEL_SIZE_FIXED";                                           //$NON-NLS-1$
+   private static final String          STATE_MODEL_TURNING_ANGLE         = "STATE_MODEL_TURNING_ANGLE";                                        //$NON-NLS-1$
+   private static final String          STATE_RELATIVE_POSITION           = "STATE_RELATIVE_POSITION";                                          //$NON-NLS-1$
    //
-   private static final IDialogSettings _state                           = TourbookPlugin.getState("net.tourbook.map.player.MapPlayerManager");//$NON-NLS-1$
+   private static final IDialogSettings _state                            = TourbookPlugin.getState("net.tourbook.map.player.MapPlayerManager");//$NON-NLS-1$
 
+   private static Map25View             _map25View;
    private static MapPlayerView         _mapPlayerView;
 
    private static int                   _currentVisiblePositionIndex;
@@ -68,7 +74,7 @@ public class MapPlayerManager {
    /**
     * Is between - {@value #SPEED_JOG_WHEEL_MAX_HALF} ... + {@value #SPEED_JOG_WHEEL_MAX_HALF}
     */
-   private static int                   _jogWheelSpeed                   = 10;
+   private static int                   _jogWheelSpeed                    = 10;
 
    private static long                  _animationEndTime;
    private static double                _lastRemainingDuration;
@@ -77,10 +83,12 @@ public class MapPlayerManager {
     * Projected position 0...1 of the model in the current frame, it also includes the micro
     * movements according to the exact relative position
     * <p>
-    * {@link #_currentProjectedPosition}[0] = x<br>
-    * {@link #_currentProjectedPosition}[1] = y<br>
+    * <code>
+    * _currentProjectedPosition[0] = x<br>
+    * _currentProjectedPosition[1] = y<br>
+    * </code>
     */
-   private static double[]              _currentProjectedPosition        = new double[2];
+   private static double[]              _currentProjectedPosition         = new double[2];
    private static long                  _currentProjectedPosition_Time;
 
    /**
@@ -113,8 +121,13 @@ public class MapPlayerManager {
    private static double                _relativePosition_Start;
    private static double                _relativePosition_End;
 
-   private static boolean               _isAnimationVisible;
-   private static boolean               _isPlayerEnabled;
+   private static boolean               _isMapModelVisible;
+
+   /**
+    * When <code>true</code> then an animated triangle shows the exact cursor position
+    */
+   private static boolean               _isMapModelCursorVisible;
+
    private static boolean               _isPlayerRunning;
 
    /**
@@ -136,14 +149,9 @@ public class MapPlayerManager {
    private static double                _compileMapX;
    private static double                _compileMapY;
 
-   /**
-    * When <code>true</code> then an animated triangle shows the exact cursor position
-    */
-   private static boolean               _isShowAnimationCursor;
+   private static Object                RELATIVE_POSITION                 = new Object();
 
-   private static Object                RELATIVE_POSITION                = new Object();
-
-   private static int[]                 _scheduleCounter                 = new int[1];
+   private static int[]                 _scheduleCounter                  = new int[1];
 
    private static double                _nextPosition_OnNormalTrack;
    private static double                _nextPosition_OnReturnTrack;
@@ -152,20 +160,20 @@ public class MapPlayerManager {
 
    private static long                  _lastTimelineUpdateTime;
 
-   private static MapPosition           _mapPosition                     = new MapPosition();
+   private static MapPosition           _mapPosition                      = new MapPosition();
 
    /**
     * Default animation time in milliseconds
     */
-   private static int                   _modelAnimationTime              = 1000;
+   private static int                   _modelAnimationTime               = 1000;
 
    /**
     * Model speed when moving on the RETURN TRACK
     */
-   private static int                   _returnTrackSpeed_PixelPerSecond = 200;
+   private static int                   _returnTrackSpeed_PixelPerSecond  = 200;
 
-   private static int                   _jogWheelSpeedFactor             = 50;
-   private static int                   _jogWheelSpeedMultiplier         = 1;
+   private static int                   _jogWheelSpeedFactor              = 50;
+   private static int                   _jogWheelSpeedMultiplier          = 1;
 
    /**
     * Size of the moving model when the size is not scaled according to the map
@@ -175,7 +183,7 @@ public class MapPlayerManager {
    /**
     * Angle how much the animated model is rotated in the next frame
     */
-   private static float                 _modelTurningAngle;
+   private static int                   _modelTurningFactor;
 
    private static int                   _modelCursorSize;
 
@@ -187,13 +195,18 @@ public class MapPlayerManager {
    private static double                _previousProjectedPositionY;
 
    private static double                _debugPrevValue;
-   private static String                _debugTimeStamp                  = UI.timeStamp();
+   private static String                _debugTimeStamp                   = UI.timeStamp();
 
    enum TrackState {
 
       MOVING, //
       SCHEDULED, //
       IDLE, //
+   }
+
+   public static boolean canShowMapModel() {
+
+      return isMap25ViewAvailable();
    }
 
    public static long getAnimationDuration() {
@@ -463,9 +476,9 @@ public class MapPlayerManager {
       return (short) _modelCursorSize;
    }
 
-   public static float getModelTurningAngle() {
+   public static int getModelTurningAngle() {
 
-      return _modelTurningAngle;
+      return _modelTurningFactor;
    }
 
    public static int getMovingSpeed() {
@@ -803,10 +816,6 @@ public class MapPlayerManager {
       return _jogWheelSpeedMultiplier;
    }
 
-   public static boolean isAnimationVisible() {
-      return _isAnimationVisible;
-   }
-
    /**
     * @return Returns <code>true</code> when the {@link #_compileMapScale} was just set. This flag
     *         is reset after calling this method.
@@ -828,8 +837,16 @@ public class MapPlayerManager {
       return _currentVisiblePositionIndex == _numAllVisiblePositions - 1;
    }
 
-   public static boolean isPlayerEnabled() {
-      return _isPlayerEnabled;
+   private static boolean isMap25ViewAvailable() {
+      return _map25View != null;
+   }
+
+   public static boolean isMapModelCursorVisible() {
+      return _isMapModelCursorVisible;
+   }
+
+   public static boolean isMapModelVisible() {
+      return _isMapModelVisible;
    }
 
    public static boolean isPlayerRunning() {
@@ -848,29 +865,30 @@ public class MapPlayerManager {
       return _isReLivePlaying;
    }
 
-   public static boolean isShowAnimationCursor() {
-
-      _isShowAnimationCursor = true;
-
-      return _isShowAnimationCursor;
-   }
-
    public static void restoreState() {
 
 // SET_FORMATTING_OFF
 
-      _isPlayerRunning           = Util.getStateBoolean( _state, STATE_IS_PLAYER_RUNNING,          true);
-      _isPlayingLoop             = Util.getStateBoolean( _state, STATE_IS_PLAYING_LOOP,            false);
-      _isReLivePlaying           = Util.getStateBoolean( _state, STATE_IS_RELIVE_PLAYING,          false);
-      _jogWheelSpeed             = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED,            10);
-      _jogWheelSpeedMultiplier   = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED_MULTIPLIER, 1);
-      _modelSize_Fixed           = Util.getStateInt(     _state, STATE_MODEL_SIZE_FIXED,           200);
-      _modelCursorSize           = Util.getStateInt(     _state, STATE_MODEL_CURSOR_SIZE,          200);
-      _modelTurningAngle         = Util.getStateFloat(   _state, STATE_MODEL_TURNING_ANGLE,        2.0f);
-      _relativePosition_Current  = Util.getStateDouble(  _state, STATE_RELATIVE_POSITION,          0);
+      _isMapModelVisible         = Util.getStateBoolean( _state, STATE_IS_MAP_MODEL_VISIBLE,          true);
+      _isMapModelCursorVisible   = Util.getStateBoolean( _state, STATE_IS_MAP_MODEL_CURSOR_VISIBLE,   true);
+      _isPlayerRunning           = Util.getStateBoolean( _state, STATE_IS_PLAYER_RUNNING,             true);
+      _isPlayingLoop             = Util.getStateBoolean( _state, STATE_IS_PLAYING_LOOP,               false);
+      _isReLivePlaying           = Util.getStateBoolean( _state, STATE_IS_RELIVE_PLAYING,             false);
+      _jogWheelSpeed             = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED,               10);
+      _jogWheelSpeedMultiplier   = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED_MULTIPLIER,    1);
+      _modelSize_Fixed           = Util.getStateInt(     _state, STATE_MODEL_SIZE_FIXED,              200);
+      _modelCursorSize           = Util.getStateInt(     _state, STATE_MODEL_CURSOR_SIZE,             200);
+      _modelTurningFactor        = Util.getStateInt(     _state, STATE_MODEL_TURNING_ANGLE,           10);
+      _relativePosition_Current  = Util.getStateDouble(  _state, STATE_RELATIVE_POSITION,             0);
 
 // SET_FORMATTING_ON
 
+      if (isPlayerViewAvailable()) {
+
+         Display.getDefault().syncExec(() -> _mapPlayerView.restoreState());
+      }
+
+      Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible);
       setIsModelMovingForward(_jogWheelSpeed >= 0);
    }
 
@@ -878,15 +896,17 @@ public class MapPlayerManager {
 
 // SET_FORMATTING_OFF
 
-      _state.put(STATE_IS_PLAYER_RUNNING,          _isPlayerRunning);
-      _state.put(STATE_IS_PLAYING_LOOP,            _isPlayingLoop);
-      _state.put(STATE_IS_RELIVE_PLAYING,          _isReLivePlaying);
-      _state.put(STATE_JOG_WHEEL_SPEED,            _jogWheelSpeed);
-      _state.put(STATE_JOG_WHEEL_SPEED_MULTIPLIER, _jogWheelSpeedMultiplier);
-      _state.put(STATE_MODEL_SIZE_FIXED,           _modelSize_Fixed);
-      _state.put(STATE_MODEL_CURSOR_SIZE,          _modelCursorSize);
-      _state.put(STATE_MODEL_TURNING_ANGLE,        _modelTurningAngle);
-      _state.put(STATE_RELATIVE_POSITION,          _relativePosition_Current);
+      _state.put(STATE_IS_MAP_MODEL_VISIBLE,          _isMapModelVisible);
+      _state.put(STATE_IS_MAP_MODEL_CURSOR_VISIBLE,   _isMapModelCursorVisible);
+      _state.put(STATE_IS_PLAYER_RUNNING,             _isPlayerRunning);
+      _state.put(STATE_IS_PLAYING_LOOP,               _isPlayingLoop);
+      _state.put(STATE_IS_RELIVE_PLAYING,             _isReLivePlaying);
+      _state.put(STATE_JOG_WHEEL_SPEED,               _jogWheelSpeed);
+      _state.put(STATE_JOG_WHEEL_SPEED_MULTIPLIER,    _jogWheelSpeedMultiplier);
+      _state.put(STATE_MODEL_SIZE_FIXED,              _modelSize_Fixed);
+      _state.put(STATE_MODEL_CURSOR_SIZE,             _modelCursorSize);
+      _state.put(STATE_MODEL_TURNING_ANGLE,           _modelTurningFactor);
+      _state.put(STATE_RELATIVE_POSITION,             _relativePosition_Current);
 
 // SET_FORMATTING_ON
 
@@ -902,13 +922,18 @@ public class MapPlayerManager {
       _isCompileMapScaleSet = true;
    }
 
-   public static void setIsAnimationVisible(final boolean isAnimationVisible) {
+   public static void setIsMapModelCursorVisible(final boolean isMapModelCursorVisible) {
 
-      _isAnimationVisible = isAnimationVisible;
+      _isMapModelCursorVisible = isMapModelCursorVisible;
 
-      if (isPlayerViewAvailable()) {
-         _mapPlayerView.updateAnimationVisibility();
-      }
+      updateUI_MapModelOrCursor();
+   }
+
+   public static void setIsMapModelVisible(final boolean isMapModelVisible) {
+
+      _isMapModelVisible = isMapModelVisible;
+
+      updateUI_MapModelOrCursor();
    }
 
    private static void setIsModelMovingForward(final boolean isModelMovingForward) {
@@ -931,12 +956,16 @@ public class MapPlayerManager {
       _isReLivePlaying = isReLivePlaying;
    }
 
-   public static void setIsShowAnimationCursor(final boolean isShowAnimationCursor) {
+   public static void setMap25View(final Map25View map25View) {
 
-      _isShowAnimationCursor = isShowAnimationCursor;
+      _map25View = map25View;
+
+      if (isPlayerViewAvailable()) {
+         _mapPlayerView.updateMapModelVisibility();
+      }
    }
 
-   public static void setMapPlayerViewer(final MapPlayerView mapPlayerView) {
+   public static void setMapPlayerView(final MapPlayerView mapPlayerView) {
 
       _mapPlayerView = mapPlayerView;
    }
@@ -963,17 +992,20 @@ public class MapPlayerManager {
       float p21AngleSmoothed = p21Angle;
 
       final float angleDiff = setModelAngle_Difference(p21Angle, _previousAngle);
+      final float angleDiffAbs = Math.abs(angleDiff);
 
-      if (Math.abs(angleDiff) > _modelTurningAngle) {
+      if (angleDiffAbs > 0.1) {
 
          // the next angle is larger than the min smooth angle
          // -> smoothout the animation with a smallers angle
 
+         final float modelTurningAngle = (float) (angleDiffAbs * 0.01 * _modelTurningFactor);
+
          /*
           * Find the smallest angle diff to the current position
           */
-         final float prevAngle1Smooth = _previousAngle + _modelTurningAngle;
-         final float prevAngle2Smooth = _previousAngle - _modelTurningAngle;
+         final float prevAngle1Smooth = _previousAngle + modelTurningAngle;
+         final float prevAngle2Smooth = _previousAngle - modelTurningAngle;
 
          final float angleDiff1 = setModelAngle_Shortest(p21Angle, prevAngle1Smooth);
          final float angleDiff2 = setModelAngle_Shortest(p21Angle, prevAngle2Smooth);
@@ -1055,6 +1087,12 @@ public class MapPlayerManager {
    public static void setModelCursorSize(final int value) {
 
       _modelCursorSize = value;
+
+      if (isMap25ViewAvailable()) {
+
+         // this could be optimized, that not the whole track is recomputed, only the map model cursor size
+         _map25View.getMapApp().getLayer_Tour().getTourTrackRenderer().onModifyMapModelOrCursor();
+      }
    }
 
    public static void setModelSize(final int modelSize) {
@@ -1083,8 +1121,6 @@ public class MapPlayerManager {
    public static void setPlayerData(final MapPlayerData mapPlayerData) {
 
       _mapPlayerData = mapPlayerData;
-
-      _isPlayerEnabled = mapPlayerData.isPlayerEnabled;
 
       _numAllVisiblePositions = mapPlayerData.allVisible_GeoLocationIndices == null
             ? 0
@@ -1142,18 +1178,32 @@ public class MapPlayerManager {
           * direction by skipping the RETURN TRACK
           */
 
-         final boolean isSetNormalTrack = newRelativePosition >= 0 && newRelativePosition <= 1;
-         final boolean isCurrentlyOnNormalTrack = _relativePosition_Current >= 0 && _relativePosition_Current <= 1;
+         final boolean isNewPositionOnNormalTrack = newRelativePosition >= 0 && newRelativePosition <= 1;
+         final boolean isCurrentPositionOnNormalTrack = _relativePosition_Current >= 0 && _relativePosition_Current <= 1;
 
          /*
           * Set forward flag
           */
          boolean isModelMovingForward = true;
 
-         if (isSetNormalTrack) {
-            isModelMovingForward = newRelativePosition >= _previousRelativePosition;
+         if (isNewPositionOnNormalTrack) {
+
+            isModelMovingForward = _previousRelativePosition == MapPlayerView.RELATIVE_MODEL_POSITION_ON_RETURN_PATH_END_TO_START
+
+                  // model moved from the end to the start
+                  ? true
+
+                  : _previousRelativePosition == MapPlayerView.RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END
+
+                        // model moved from the start to the end
+                        ? false
+
+                        : newRelativePosition >= _previousRelativePosition;
+
          } else {
-            if (newRelativePosition == 2) {
+
+            if (newRelativePosition == MapPlayerView.RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END) {
+
                isModelMovingForward = false;
             }
          }
@@ -1165,7 +1215,7 @@ public class MapPlayerManager {
          /*
           * Set position
           */
-         if (isSetNormalTrack && isCurrentlyOnNormalTrack
+         if (isNewPositionOnNormalTrack && isCurrentPositionOnNormalTrack
                && _trackState_ReturnTrack == TrackState.IDLE
                && _trackState_NormalTrack == TrackState.IDLE) {
 
@@ -1323,9 +1373,29 @@ public class MapPlayerManager {
       _jogWheelSpeedMultiplier = speedMultiplier;
    }
 
-   public static void setTurningAngle(final float modelTurningAngle) {
+   public static void setTurningAngle(final int modelTurningFactor) {
 
-      _modelTurningAngle = modelTurningAngle;
+      _modelTurningFactor = modelTurningFactor;
+   }
+
+   private static void updateUI_MapModelOrCursor() {
+
+      if (isMap25ViewAvailable() == false) {
+         return;
+      }
+
+      final Map25App map25App = _map25View.getMapApp();
+
+      if (_isMapModelVisible || _isMapModelCursorVisible) {
+
+         // setup data when map model + cursor is displayed
+
+         map25App.getLayer_Tour().getTourTrackRenderer().onModifyMapModelOrCursor();
+      }
+
+      Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible);
+
+      map25App.getMap().updateMap();
    }
 
 }

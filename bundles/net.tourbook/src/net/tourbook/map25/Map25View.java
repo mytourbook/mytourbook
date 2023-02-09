@@ -753,7 +753,8 @@ public class Map25View extends ViewPart implements
             if (partRef.getPart(false) == Map25View.this) {
                _isPartVisible = false;
             }
-            setIsAnimationVisible(partRef, false);
+
+            setIsMap25Available(partRef, null);
          }
 
          @Override
@@ -768,13 +769,15 @@ public class Map25View extends ViewPart implements
          public void partVisible(final IWorkbenchPartReference partRef) {
 
             onPartVisible(partRef);
-            setIsAnimationVisible(partRef, true);
+
+            setIsMap25Available(partRef, Map25View.this);
          }
 
-         private void setIsAnimationVisible(final IWorkbenchPartReference partRef, final boolean isAnimationVisible) {
+         private void setIsMap25Available(final IWorkbenchPartReference partRef, final Map25View map25View) {
 
             if (partRef.getPart(false) == Map25View.this) {
-               MapPlayerManager.setIsAnimationVisible(isAnimationVisible);
+
+               MapPlayerManager.setMap25View(map25View);
             }
          }
       };
@@ -2064,6 +2067,7 @@ public class Map25View extends ViewPart implements
 
       Map25ConfigManager.saveState();
       Map3GradientColorManager.saveColors();
+      MapPlayerManager.saveState();
    }
 
    /**

@@ -460,8 +460,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       TourFilterManager.restoreState();
       TourGeoFilter_Manager.restoreState();
       TourTagFilterManager.restoreState();
-
-      MapPlayerManager.restoreState();
    }
 
    @Override
