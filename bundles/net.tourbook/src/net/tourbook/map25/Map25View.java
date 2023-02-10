@@ -1682,6 +1682,9 @@ public class Map25View extends ViewPart implements
          allTimeSeries = new int[numAllTimeSlices];
          allDistanceSeries = new float[numAllTimeSlices];
 
+         int prevTourTimes = 0;
+         float prevTourDistances = 0;
+
          for (final TourData tourData : _allTourData) {
 
             _allTourStarts.add(tourIndex);
@@ -1692,13 +1695,8 @@ public class Map25View extends ViewPart implements
             final int[] oneTourTimeSerie = tourData.timeSerie;
             final float[] oneTourDistanceSerie = tourData.distanceSerie;
 
-            if (oneTourTimeSerie != null) {
-               System.arraycopy(oneTourTimeSerie, 0, allTimeSeries, geoIndex, oneTourTimeSerie.length);
-            }
-
-            if (oneTourDistanceSerie != null) {
-               System.arraycopy(oneTourDistanceSerie, 0, allDistanceSeries, geoIndex, oneTourDistanceSerie.length);
-            }
+            final boolean isTourDistanceAvailable = oneTourDistanceSerie != null && oneTourDistanceSerie.length > 0;
+            final boolean isTourTimeAvailable = oneTourTimeSerie != null && oneTourTimeSerie.length > 0;
 
             /*
              * Create vtm geo points and colors
@@ -1709,6 +1707,14 @@ public class Map25View extends ViewPart implements
             final float[] valueSerie = getValueSerie(tourData);
 
             for (int serieIndex = 0; serieIndex < latitudeSerie.length; serieIndex++, tourIndex++) {
+
+               if (isTourTimeAvailable) {
+                  allTimeSeries[geoIndex] = prevTourTimes + oneTourTimeSerie[serieIndex];
+               }
+
+               if (isTourDistanceAvailable) {
+                  allDistanceSeries[geoIndex] = prevTourDistances + oneTourDistanceSerie[serieIndex];
+               }
 
                _allGeoPoints[geoIndex] = (new GeoPoint(latitudeSerie[serieIndex], longitudeSerie[serieIndex]));
 
@@ -1746,6 +1752,16 @@ public class Map25View extends ViewPart implements
                allGeoPointColors[geoIndex] = colorValue;
 
                geoIndex++;
+            }
+
+            /*
+             * Summarize tour times and distances
+             */
+            if (isTourTimeAvailable) {
+               prevTourTimes += oneTourTimeSerie[oneTourTimeSerie.length - 1];
+            }
+            if (isTourDistanceAvailable) {
+               prevTourDistances += oneTourDistanceSerie[oneTourDistanceSerie.length - 1];
             }
          }
       }

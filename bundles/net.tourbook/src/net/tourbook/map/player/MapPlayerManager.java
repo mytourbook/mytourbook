@@ -36,7 +36,7 @@ import org.oscim.core.MapPosition;
 import org.oscim.renderer.MapRenderer;
 
 /**
- * Manage map animation player
+ * Is managing the movement of the map model and cursor
  */
 public class MapPlayerManager {
 
@@ -92,7 +92,7 @@ public class MapPlayerManager {
    private static long                  _currentProjectedPosition_Time;
 
    /**
-    * Geo location index of the model in the current position
+    * Geo location index for the current position of the model/cursor
     */
    private static int                   _currentVisibleGeoLocationIndex;
 

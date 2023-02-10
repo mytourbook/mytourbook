@@ -281,12 +281,12 @@ public final class TourTrack_Shader {
 
          final short size  = MapPlayerManager.getModelCursorSize();
          final short size2 = (short) (size * 3);
-         final short zPos  = (short) (1 + trackBucket.heightOffset);
+         final short zPos  = (short) (+1 + trackBucket.heightOffset);
 
          // paint a simple triangle
          _mapModelCursorVertices = new short[] {
-                                             0,     0,   zPos,
-                                          size,  size2,  zPos,
+                                                     0,      0,  zPos,
+                                                  size,  size2,  zPos,
                                          (short) -size,  size2,  zPos,
 
                                           };
@@ -398,15 +398,19 @@ public final class TourTrack_Shader {
          final float relativeVisibleVertices = (float) currentVisiblePositionIndex / numAllVisibleFrames;
          numVisibleVertices_Debug = (int) (relativeVisibleVertices * numTrackVertices);
 
-//         if (currentVisiblePositionIndex != _prevValue) {
+//         if (currentVisiblePositionIndex != _prevValue
+//
+////               || true
+//
+//         ) {
 //
 //            _prevValue = currentVisiblePositionIndex;
 //
 //            System.out.println(UI.EMPTY_STRING
 //
-//                  + "  all verts: " + numTrackVertices
-//                  + "  visible verts: " + numVisibleVertices_Debug
-//                  + "  currPosIdx: " + currentVisiblePositionIndex
+//                  + "  all verts: " + String.format("%5d", numTrackVertices)
+//                  + "  visible verts: " + String.format("%5d", numVisibleVertices_Debug)
+//                  + "  currPosIdx: " + String.format("%5d", currentVisiblePositionIndex)
 //
 //            );
 //// TODO remove SYSTEM.OUT.PRINTLN
@@ -823,11 +827,8 @@ public final class TourTrack_Shader {
       mapPlayerData.allTimeSeries                     = trackBucket.allTimeSeries;
       mapPlayerData.allDistanceSeries                 = trackBucket.allDistanceSeries;
 
-
-      mapPlayerData.allVisible_PixelPositions         = trackBucket.allVisible_PixelPositions;
-      mapPlayerData.allVisible_GeoLocationIndices     = trackBucket.allVisible_GeoLocationIndices;
-
       mapPlayerData.allNotClipped_GeoLocationIndices  = trackBucket.allNotClipped_GeoLocationIndices;
+      mapPlayerData.allVisible_GeoLocationIndices     = trackBucket.allVisible_GeoLocationIndices;
 
       mapPlayerData.trackEnd2StartPixelDistance       = trackBucket.trackEnd2StartPixelDistance;
       mapPlayerData.mapScale                          = viewport.pos.scale;

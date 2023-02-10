@@ -26,10 +26,8 @@ public class MapPlayerData {
 
    private static final String NL = UI.NEW_LINE;
 
-   public short[]              allVisible_PixelPositions;
-
    /**
-    * Indices for {@link #allVisible_PixelPositions} into the tour track data
+    * Indices for all visible positions into the tour track data
     */
    public int[]                allVisible_GeoLocationIndices;
 
@@ -71,9 +69,8 @@ public class MapPlayerData {
 
       final int allProjectedPoints_NormalTrack_Length    = allProjectedPoints_NormalTrack    == null ? 0 : allProjectedPoints_NormalTrack.length;
       final int allProjectedPoints_ReturnTrack_Length    = allProjectedPoints_ReturnTrack    == null ? 0 : allProjectedPoints_ReturnTrack.length;
-      final int allVisible_PixelPositions_Length         = allVisible_PixelPositions         == null ? 0 : allVisible_PixelPositions.length;
-      final int allVisible_GeoLocationIndices_Length     = allVisible_GeoLocationIndices     == null ? 0 : allVisible_GeoLocationIndices.length;
       final int allNotClipped_GeoLocationIndices_Length  = allNotClipped_GeoLocationIndices  == null ? 0 : allNotClipped_GeoLocationIndices.length;
+      final int allVisible_GeoLocationIndices_Length     = allVisible_GeoLocationIndices     == null ? 0 : allVisible_GeoLocationIndices.length;
 
 // SET_FORMATTING_ON
 
@@ -85,9 +82,8 @@ public class MapPlayerData {
 
             + "allProjectedPoints_NormalTrack   = " + allProjectedPoints_NormalTrack_Length + NL //   //$NON-NLS-1$
             + "allProjectedPoints_ReturnTrack   = " + allProjectedPoints_ReturnTrack_Length + NL //   //$NON-NLS-1$
-            + "allVisible_PixelPositions        = " + allVisible_PixelPositions_Length + NL //        //$NON-NLS-1$
-            + "allVisible_GeoLocationIndices    = " + allVisible_GeoLocationIndices_Length + NL //    //$NON-NLS-1$
             + "allNotClipped_GeoLocationIndices = " + allNotClipped_GeoLocationIndices_Length + NL // //$NON-NLS-1$
+            + "allVisible_GeoLocationIndices    = " + allVisible_GeoLocationIndices_Length + NL //    //$NON-NLS-1$
             + "mapScale                         = " + mapScale + NL //                                //$NON-NLS-1$
 
             + "]"; //$NON-NLS-1$
