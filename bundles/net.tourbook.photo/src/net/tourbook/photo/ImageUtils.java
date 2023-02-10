@@ -335,10 +335,6 @@ public class ImageUtils {
             BufferedImage.TYPE_INT_ARGB);
       final Graphics2D graphics2D = newResizedImage.createGraphics();
 
-      // background transparent
-//      graphics2D.setComposite(AlphaComposite.Src);
-//      graphics2D.fillRect(0, 0, newWidth, newHeight);
-
       graphics2D.setRenderingHint(
             RenderingHints.KEY_ANTIALIASING,
             RenderingHints.VALUE_ANTIALIAS_ON);
