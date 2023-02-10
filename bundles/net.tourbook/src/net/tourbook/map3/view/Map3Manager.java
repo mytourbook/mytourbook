@@ -372,7 +372,7 @@ public class Map3Manager {
        * create UI model layer
        */
       final String layerId = MarkerLayer.MAP3_LAYER_ID;
-      final TVIMap3Layer tviLayer = new TVIMap3Layer(layerId, _wwLayer_Marker, Messages.Custom_Layer_TourMarker);
+      final TVIMap3Layer tviLayer = new TVIMap3Layer(layerId, _wwLayer_Marker, Messages.Custom_Layer_TourMarkers);
 
       final boolean isVisible = true;
 
