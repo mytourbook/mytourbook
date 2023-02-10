@@ -17,14 +17,10 @@ package net.tourbook.photo;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileFilter;
-import java.io.IOException;
-import java.io.InputStream;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.StatusUtil;
 
 import org.apache.commons.imaging.Imaging;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -60,24 +56,6 @@ public class ImageUtils {
       };
 
       _prefStore.addPropertyChangeListener(prefChangeListener);
-   }
-
-   public static Image convertByteArrayToImage(final byte[] imageArray) {
-
-      if (imageArray == null) {
-         return null;
-      }
-
-      Image image = null;
-      try (final InputStream inputStream = new ByteArrayInputStream(imageArray)) {
-
-         image = new Image(Display.getCurrent(), inputStream);
-
-      } catch (final IOException e) {
-         StatusUtil.log(e);
-      }
-
-      return image;
    }
 
    public static FileFilter createImageFileFilter() {
