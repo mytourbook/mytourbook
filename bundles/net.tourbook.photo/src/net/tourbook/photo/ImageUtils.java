@@ -15,12 +15,15 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.FileFilter;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.ImageConverter;
 
 import org.apache.commons.imaging.Imaging;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -316,24 +319,41 @@ public class ImageUtils {
    /**
     * Resizes an image while keeping the existing transparency
     *
-    * @param newWidth
+    * @param image
     * @param newHeight
     * @param image
     * @return
     */
-   public static Image resize(final int newWidth, final int newHeight, final Image image) {
+   public static Image resize(final Image image,
+                              final int newWidth,
+                              final int newHeight) {
 
-      final Image newImage = new Image(Display.getDefault(), newWidth, newHeight);
-      final GC gc = new GC(newImage);
-      {
-         gc.setAntialias(SWT.ON);
-         gc.setInterpolation(SWT.HIGH);
-         gc.drawImage(image, 0, 0, image.getBounds().width, image.getBounds().height, 0, 0, newWidth, newHeight);
-      }
-      gc.dispose();
-      image.dispose();
+      // read an image to BufferedImage for processing
+      final BufferedImage originalImage = ImageConverter.convertIntoAWT(image);
 
-      return newImage;
+      // create a new BufferedImage for drawing
+      final BufferedImage newResizedImage = new BufferedImage(
+            newWidth,
+            newHeight,
+            BufferedImage.TYPE_INT_ARGB);
+      final Graphics2D graphics2D = newResizedImage.createGraphics();
+
+      // background transparent
+//      graphics2D.setComposite(AlphaComposite.Src);
+//      graphics2D.fillRect(0, 0, newWidth, newHeight);
+
+      graphics2D.setRenderingHint(
+            RenderingHints.KEY_ANTIALIASING,
+            RenderingHints.VALUE_ANTIALIAS_ON);
+      graphics2D.setRenderingHint(
+            RenderingHints.KEY_RENDERING,
+            RenderingHints.VALUE_RENDER_QUALITY);
+
+      // puts the original image into the newResizedImage
+      graphics2D.drawImage(originalImage, 0, 0, newWidth, newHeight, null);
+      graphics2D.dispose();
+
+      return ImageConverter.convertIntoSWT(newResizedImage);
    }
 
    /**
