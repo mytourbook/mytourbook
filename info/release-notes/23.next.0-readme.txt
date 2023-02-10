@@ -51,6 +51,9 @@ Tour Editor
 * TCX Import (Frederic)
   - Import of calories and average power values
 
+* Tour Blog (Frederic)
+  - Display of the weather summary
+
 
 Changes
 =======
