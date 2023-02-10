@@ -151,12 +151,12 @@ public class ImageUtils {
       return getBestSize(original.x, original.y, max.x, max.y);
    }
 
-   private static boolean isResizeRequired(final Image image, final int width, final int height) {
+   public static boolean isResizeRequired(final Image image, final int width, final int height) {
       final Rectangle bounds = image.getBounds();
       return !(bounds.width == width && bounds.height == height);
    }
 
-   private static boolean isResizeRequiredAWT(final BufferedImage img, final int width, final int height) {
+   public static boolean isResizeRequiredAWT(final BufferedImage img, final int width, final int height) {
       return !(img.getWidth() == width && img.getHeight() == height);
    }
 
