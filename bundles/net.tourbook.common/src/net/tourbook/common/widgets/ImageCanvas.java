@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,21 +19,23 @@
  */
 package net.tourbook.common.widgets;
 
-import static org.eclipse.swt.events.FocusListener.focusGainedAdapter;
-import static org.eclipse.swt.events.FocusListener.focusLostAdapter;
-import static org.eclipse.swt.events.KeyListener.keyPressedAdapter;
-import static org.eclipse.swt.events.MouseListener.mouseDownAdapter;
-import static org.eclipse.swt.events.MouseTrackListener.mouseEnterAdapter;
-import static org.eclipse.swt.events.MouseTrackListener.mouseExitAdapter;
-
 import net.tourbook.common.UI;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -68,51 +70,81 @@ public class ImageCanvas extends Canvas implements PaintListener {
 
       addPaintListener(this);
 
-      addTraverseListener(traverseEvent -> {
+      addTraverseListener(new TraverseListener() {
+         @Override
+         public void keyTraversed(final TraverseEvent e) {
 
-         switch (traverseEvent.detail) {
+            switch (e.detail) {
 
-         case SWT.TRAVERSE_TAB_NEXT:
-         case SWT.TRAVERSE_TAB_PREVIOUS:
+            case SWT.TRAVERSE_TAB_NEXT:
+            case SWT.TRAVERSE_TAB_PREVIOUS:
 
-         case SWT.TRAVERSE_ESCAPE: // esc allows to close a dialog
+            case SWT.TRAVERSE_ESCAPE: // esc allows to close a dialog
 
-            traverseEvent.doit = true; // enable traversal
-            break;
+               e.doit = true; // enable traversal
+               break;
+            }
          }
       });
 
-      addKeyListener(keyPressedAdapter(keyEvent -> {
+      addKeyListener(new KeyAdapter() {
+         @Override
+         public void keyPressed(final KeyEvent e) {
 
-         // key listener enables traversal out
+            // key listener enables traversal out
 
-         // fire selection
-         if (keyEvent.keyCode == ' ' || keyEvent.keyCode == SWT.CR) {
-            fireSelection();
+            // fire selection
+            if (e.keyCode == ' ' || e.keyCode == SWT.CR) {
+               fireSelection();
+            }
          }
-      }));
+      });
 
       final Cursor cursor = getDisplay().getSystemCursor(SWT.CURSOR_IBEAM);
 
-      addMouseTrackListener(mouseEnterAdapter(mouseEvent -> setCursor(cursor)));
-      addMouseTrackListener(mouseExitAdapter(mouseEvent -> setCursor(null)));
+      addMouseTrackListener(new MouseTrackListener() {
 
-      addFocusListener(focusGainedAdapter(focusEvent -> {
-         _isFocusGained = true;
+         @Override
+         public void mouseEnter(final MouseEvent e) {
+            setCursor(cursor);
+         }
 
-         redraw();
-      }));
-      addFocusListener(focusLostAdapter(focusEvent -> {
-         _isFocusGained = false;
+         @Override
+         public void mouseExit(final MouseEvent e) {
+            setCursor(null);
+         }
 
-         redraw();
-      }));
+         @Override
+         public void mouseHover(final MouseEvent e) {}
+      });
 
-      addMouseListener(mouseDownAdapter(mouseEvent -> {
+      addFocusListener(new FocusAdapter() {
+         @Override
+         public void focusGained(final FocusEvent e) {
 
-         setFocus();
-         fireSelection();
-      }));
+            _isFocusGained = true;
+
+            redraw();
+         }
+
+         @Override
+         public void focusLost(final FocusEvent e) {
+
+            _isFocusGained = false;
+
+            redraw();
+         }
+      });
+
+      addMouseListener(new MouseAdapter() {
+         @Override
+         public void mouseDown(final MouseEvent e) {
+
+            setFocus();
+
+            fireSelection();
+         }
+      });
    }
 
    public void addSelectionListener(final SelectionListener listener) {
