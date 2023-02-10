@@ -24,7 +24,6 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
-import net.tourbook.common.widgets.ImageCanvas;
 import net.tourbook.data.TourTag;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -73,7 +72,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
     */
    private Button      _btnDeleteImage;
 
-   private ImageCanvas _canvasTagImage;
+   private Label  _canvasTagImage;
 
    private Label       _lblInvalidImageError;
 
@@ -168,9 +167,8 @@ public class Dialog_TourTag extends TitleAreaDialog {
             label.setText(Messages.Dialog_TourTag_Label_Image);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 
-            _canvasTagImage = new ImageCanvas(container, SWT.DOUBLE_BUFFERED);
+            _canvasTagImage = new Label(container, SWT.TRANSPARENCY_ALPHA);
             GridDataFactory.fillDefaults()//
-                  .hint(_pc.convertWidthInCharsToPixels(10), SWT.DEFAULT)
                   .applyTo(_canvasTagImage);
 
             final Composite imageContainer = new Composite(container, SWT.NONE);
@@ -204,7 +202,6 @@ public class Dialog_TourTag extends TitleAreaDialog {
          }
          {
             // Text: Notes
-
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Dialog_TourTag_Label_Notes);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);

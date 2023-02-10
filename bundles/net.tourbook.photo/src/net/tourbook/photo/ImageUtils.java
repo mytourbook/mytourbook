@@ -314,6 +314,29 @@ public class ImageUtils {
    }
 
    /**
+    * Resizes an image while keeping the existing transparency
+    *
+    * @param newWidth
+    * @param newHeight
+    * @param image
+    * @return
+    */
+   public static Image resize(final int newWidth, final int newHeight, final Image image) {
+
+      final Image newImage = new Image(Display.getDefault(), newWidth, newHeight);
+      final GC gc = new GC(newImage);
+      {
+         gc.setAntialias(SWT.ON);
+         gc.setInterpolation(SWT.HIGH);
+         gc.drawImage(image, 0, 0, image.getBounds().width, image.getBounds().height, 0, 0, newWidth, newHeight);
+      }
+      gc.dispose();
+      image.dispose();
+
+      return newImage;
+   }
+
+   /**
     * Resize an image to the best fitting size. Old and new Image (result)must be disposed after
     * use.
     *
@@ -336,22 +359,6 @@ public class ImageUtils {
 
       // Resize image
       return ImageUtils.resize(display, img, newSize.x, newSize.y);
-   }
-
-   @SuppressWarnings("unused")
-   private Image resize(final int w, final int h, final Image img) {
-
-      final Image newImage = new Image(Display.getDefault(), w, h);
-      final GC gc = new GC(newImage);
-      {
-         gc.setAntialias(SWT.ON);
-         gc.setInterpolation(SWT.HIGH);
-         gc.drawImage(img, 0, 0, img.getBounds().width, img.getBounds().height, 0, 0, w, h);
-      }
-      gc.dispose();
-      img.dispose();
-
-      return newImage;
    }
 
 }

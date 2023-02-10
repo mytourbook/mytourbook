@@ -17,6 +17,10 @@ package net.tourbook.ui;
 
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
+import java.awt.AlphaComposite;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -34,11 +38,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
+
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.common.color.MapGraphId;
+import net.tourbook.common.util.ImageConverter;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
@@ -48,7 +55,6 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.IPhotoPreferences;
-import net.tourbook.photo.ImageUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
@@ -895,7 +901,8 @@ public class UI {
          return null;
       }
 
-      Image image = new Image(Display.getDefault(), imageFilePath);
+
+      final Image image = new Image(Display.getDefault(), imageFilePath);
 
       final int imageWidth = image.getBounds().width;
       final int imageHeight = image.getBounds().height;
@@ -912,16 +919,56 @@ public class UI {
          newimageWidth = Math.round(newimageHeight * imageWidth / (imageHeight * 1f));
       }
 
-      //todo fb keep transparency
-      image = new Image(Display.getDefault(),
-            ImageUtils.resize(
-            Display.getDefault(),
-            image.getImageData(),
-            newimageWidth,
-            newimageHeight,
-            true));
+      // read an image to BufferedImage for processing
+      BufferedImage originalImage = null;
+      try {
+         originalImage = ImageIO.read(new File(imageFilePath));
+      } catch (final IOException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
 
-      return image;
+      // create a new BufferedImage for drawing
+      final BufferedImage newResizedImage = new BufferedImage(newimageWidth, newimageHeight, BufferedImage.TYPE_INT_ARGB);
+      final Graphics2D g = newResizedImage.createGraphics();
+
+      //g.setBackground(Color.WHITE);
+      //g.setPaint(Color.WHITE);
+
+      // background transparent
+      g.setComposite(AlphaComposite.Src);
+      g.fillRect(0, 0, newimageWidth, newimageHeight);
+
+      /*
+       * try addRenderingHints()
+       * // VALUE_RENDER_DEFAULT = good tradeoff of performance vs quality
+       * // VALUE_RENDER_SPEED = prefer speed
+       * // VALUE_RENDER_QUALITY = prefer quality
+       * g.setRenderingHint(RenderingHints.KEY_RENDERING,
+       * RenderingHints.VALUE_RENDER_QUALITY);
+       * // controls how image pixels are filtered or resampled
+       * g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+       * RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+       * // antialiasing, on
+       * g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+       * RenderingHints.VALUE_ANTIALIAS_ON);
+       */
+
+      final Map<RenderingHints.Key, Object> hints = new HashMap<>();
+      hints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+      hints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+      hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+      g.addRenderingHints(hints);
+
+      // puts the original image into the newResizedImage
+      g.drawImage(originalImage, 0, 0, newimageWidth, newimageHeight, null);
+      g.dispose();
+
+      //todo fb keep transparency
+      //   image = ImageUtils.resize(newimageWidth, newimageHeight, image);
+
+      return ImageConverter.convertIntoSWT(newResizedImage);
+      //return originalImage;
    }
 
    public static ImageData rotate(final ImageData srcData, final int direction) {
