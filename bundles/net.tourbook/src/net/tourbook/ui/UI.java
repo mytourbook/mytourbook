@@ -912,6 +912,7 @@ public class UI {
          newimageWidth = Math.round(newimageHeight * imageWidth / (imageHeight * 1f));
       }
 
+      //todo fb keep transparency
       image = ImageUtils.resize(Display.getDefault(), image, newimageWidth, newimageHeight);
 
       return image;

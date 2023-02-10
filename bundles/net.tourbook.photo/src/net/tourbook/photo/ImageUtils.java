@@ -272,7 +272,7 @@ public class ImageUtils {
                destHeight);
       } finally {
 
-         // ensure resources are disposed when an error occures
+         // ensure resources are disposed when an error occurs
 
          gc.dispose();
 
