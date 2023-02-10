@@ -20,6 +20,7 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileFilter;
 
 import net.tourbook.common.UI;
@@ -28,6 +29,7 @@ import net.tourbook.common.util.ImageConverter;
 import org.apache.commons.imaging.Imaging;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -49,44 +51,50 @@ public class ImageUtils {
 
    static {
 
-      final IPropertyChangeListener prefChangeListener = propertyChangeEvent -> {
+      final IPropertyChangeListener _prefChangeListener = new IPropertyChangeListener() {
+         @Override
+         public void propertyChange(final PropertyChangeEvent event) {
 
-         final String property = propertyChangeEvent.getProperty();
+            final String property = event.getProperty();
 
-         if (property.equals(IPhotoPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY)) {
-            _isRotateImageAutomatically = (Boolean) propertyChangeEvent.getNewValue();
+            if (property.equals(IPhotoPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY)) {
+               _isRotateImageAutomatically = (Boolean) event.getNewValue();
+            }
          }
       };
 
-      _prefStore.addPropertyChangeListener(prefChangeListener);
+      _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
    public static FileFilter createImageFileFilter() {
 
-      return pathname -> {
+      return new FileFilter() {
+         @Override
+         public boolean accept(final File pathname) {
 
-         if (pathname.isDirectory()) {
+            if (pathname.isDirectory()) {
+               return false;
+            }
+
+            if (pathname.isHidden()) {
+               return false;
+            }
+
+            final String name = pathname.getName();
+            if (name == null || name.length() == 0) {
+               return false;
+            }
+
+            if (name.startsWith(UI.SYMBOL_DOT)) {
+               return false;
+            }
+
+            if (Imaging.hasImageFileExtension(pathname)) {
+               return true;
+            }
+
             return false;
          }
-
-         if (pathname.isHidden()) {
-            return false;
-         }
-
-         final String name = pathname.getName();
-         if (name == null || name.length() == 0) {
-            return false;
-         }
-
-         if (name.startsWith(UI.SYMBOL_DOT)) {
-            return false;
-         }
-
-         if (Imaging.hasImageFileExtension(pathname)) {
-            return true;
-         }
-
-         return false;
       };
    }
 
