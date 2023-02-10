@@ -171,7 +171,7 @@ public class ImageUtils {
     * @param height
     * @return
     */
-   public static Image resize(final Display display, final Image image, final int width, final int height) {
+   private static Image resize(final Display display, final Image image, final int width, final int height) {
 
       return resize(display, image, width, height, SWT.ON, SWT.HIGH, null);
    }
