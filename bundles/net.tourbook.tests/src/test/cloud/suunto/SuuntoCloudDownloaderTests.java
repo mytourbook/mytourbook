@@ -18,10 +18,17 @@ package cloud.suunto;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
+import com.sun.net.httpserver.HttpServer;
 
 import de.byteholder.geoclipse.map.UI;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.net.InetSocketAddress;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -43,7 +50,6 @@ import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
 import utils.FilesUtils;
-
 public class SuuntoCloudDownloaderTests {
 
    private static final String           OAUTH_PASSEUR_APP_URL_TOKEN = OAuth2Utils.createOAuthPasseurUri("/suunto/token").toString(); //$NON-NLS-1$
@@ -53,8 +59,11 @@ public class SuuntoCloudDownloaderTests {
    static HttpClientMock                 httpClientMock;
    static SuuntoCloudDownloader          suuntoCloudDownloader;
 
+   private static final String           _tokenResponse               = Comparison.readFileContent(SUUNTO_FILE_PATH
+         + "Token-Response.json"); //$NON-NLS-1$
+
    @BeforeAll
-   static void initAll() throws NoSuchFieldException, IllegalAccessException {
+   static void initAll() throws NoSuchFieldException, IllegalAccessException, IOException {
 
       //We set the Suunto account information, otherwise the download can't
       //happen
@@ -89,6 +98,30 @@ public class SuuntoCloudDownloaderTests {
             "{YEAR}{MONTH}{DAY}{USER_TEXT:-}{HOUR}{USER_TEXT:h}{MINUTE}{USER_TEXT:-}{SUUNTO_FILE_NAME}{USER_TEXT:-}{WORKOUT_ID}{USER_TEXT:-}{ACTIVITY_TYPE}{FIT_EXTENSION}"); //$NON-NLS-1$
 
       httpClientMock = new HttpClientMock();
+
+      httpClientMock.onPost(
+            OAUTH_PASSEUR_APP_URL_TOKEN)
+            .doReturn(_tokenResponse)
+            .withStatus(201);
+
+      // create the HttpServer
+      final InetSocketAddress address = new InetSocketAddress(4919);
+      final HttpServer httpServer = HttpServer.create(address, 0);
+      final SuuntoTokensRetrievalHandler tokensRetrievalHandler =
+            new SuuntoTokensRetrievalHandler(UI.EMPTY_STRING);
+      httpServer.createContext("/", tokensRetrievalHandler);
+
+      // start the server
+      httpServer.start();
+
+      // verify our client code
+      final URL url = new URL("http://localhost:4919/?code=12345");
+      final URLConnection conn = url.openConnection();
+      new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+      // stop the server
+      httpServer.stop(0);
+
 
       Field field = SuuntoCloudDownloader.class.getDeclaredField("_httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
@@ -146,6 +179,7 @@ public class SuuntoCloudDownloaderTests {
             .doReturn(tokenResponse)
             .withStatus(201);
 
+
       final String filename = "2011-01-13.fit"; //$NON-NLS-1$
       httpClientMock.onGet(
             OAuth2Utils.createOAuthPasseurUri("/suunto/workout/exportFit?workoutKey=601227a563c46e612c20b579").toString()) //$NON-NLS-1$
@@ -169,6 +203,8 @@ public class SuuntoCloudDownloaderTests {
             downloadedFilename)));
 
       net.tourbook.common.util.FilesUtils.deleteIfExists(Paths.get(downloadedFilename));
+
+
    }
 
    @Test
@@ -193,3 +229,4 @@ public class SuuntoCloudDownloaderTests {
             "Action aborted due to invalid tokens"))); //$NON-NLS-1$
    }
 }
+

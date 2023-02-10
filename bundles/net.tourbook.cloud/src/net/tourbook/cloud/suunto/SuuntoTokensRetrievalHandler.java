@@ -40,7 +40,7 @@ public class SuuntoTokensRetrievalHandler extends TokensRetrievalHandler {
 
    private String                  _selectedPersonId;
 
-   protected SuuntoTokensRetrievalHandler(final String selectedPersonId) {
+   public SuuntoTokensRetrievalHandler(final String selectedPersonId) {
 
       _selectedPersonId = selectedPersonId;
    }
