@@ -627,7 +627,6 @@ public class UI {
    }
 
    public static ColumnPixelData getColumnPixelWidth(final PixelConverter pixelConverter, final int width) {
-
       return new ColumnPixelData(pixelConverter.convertWidthInCharsToPixels(width), false);
    }
 
