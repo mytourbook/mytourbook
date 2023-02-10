@@ -154,14 +154,19 @@ public class SuuntoCloudDownloaderTests {
       httpClientMock.reset();
    }
 
-   @Test
-   void testTourDownload() {
-
-      //We set the access token issue date time in the past to trigger the retrieval
-      //of a new token.
+   private void setTokenRetrievalDateInThePast() {
       _prefStore.setValue(
             Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
             "973701086000"); //$NON-NLS-1$
+   }
+
+   //We set the access token issue date time in the past to trigger the retrieval
+   //of a new token.
+
+   @Test
+   void testTourDownload() {
+
+      setTokenRetrievalDateInThePast();
 
       final String workoutsResponse = Comparison.readFileContent(SUUNTO_FILE_PATH
             + "Workouts-Response.json"); //$NON-NLS-1$
@@ -203,11 +208,7 @@ public class SuuntoCloudDownloaderTests {
    @Test
    void tourDownload_TokenRetrieval_NullResponse() {
 
-      //We set the access token issue date time in the past to trigger the retrieval
-      //of a new token.
-      _prefStore.setValue(
-            Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
-            "973701086000"); //$NON-NLS-1$
+      setTokenRetrievalDateInThePast();
 
       httpClientMock.onPost(
             OAUTH_PASSEUR_APP_URL_TOKEN)
