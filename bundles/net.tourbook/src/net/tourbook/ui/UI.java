@@ -917,13 +917,6 @@ public class UI {
       return image;
    }
 
-   public static Image resizeTagImageToDefaults(final Image imageToResize) {
-
-      final Image image = ImageUtils.resize(Display.getDefault(), imageToResize, TAG_IMAGE_WIDTH, TAG_IMAGE_HEIGHT);
-
-      return image;
-   }
-
    public static ImageData rotate(final ImageData srcData, final int direction) {
 
       final int bytesPerPixel = srcData.bytesPerLine / srcData.width;
