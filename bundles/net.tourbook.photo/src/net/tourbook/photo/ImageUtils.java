@@ -125,7 +125,7 @@ public class ImageUtils {
       return bas.toByteArray();
    }
 
-   private static double getBestRatio(final int originalX, final int originalY, final int maxX, final int maxY) {
+   public static double getBestRatio(final int originalX, final int originalY, final int maxX, final int maxY) {
 
       final double widthRatio = (double) originalX / (double) maxX;
       final double heightRatio = (double) originalY / (double) maxY;
@@ -163,14 +163,12 @@ public class ImageUtils {
    /**
     * Returns a new scaled image. new Image must be disposed after use.
     *
-    * @param display
     * @param image
     * @param width
     * @param height
     * @return
     */
    private static Image resize(final Display display, final Image image, final int width, final int height) {
-
       return resize(display, image, width, height, SWT.ON, SWT.HIGH, null);
    }
 
