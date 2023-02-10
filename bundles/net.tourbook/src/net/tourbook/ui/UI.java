@@ -913,7 +913,13 @@ public class UI {
       }
 
       //todo fb keep transparency
-      image = ImageUtils.resize(Display.getDefault(), image, newimageWidth, newimageHeight);
+      image = new Image(Display.getDefault(),
+            ImageUtils.resize(
+            Display.getDefault(),
+            image.getImageData(),
+            newimageWidth,
+            newimageHeight,
+            true));
 
       return image;
    }

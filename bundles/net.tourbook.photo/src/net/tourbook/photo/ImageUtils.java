@@ -284,8 +284,7 @@ public class ImageUtils {
       return scaledImage;
    }
 
-   @SuppressWarnings("unused")
-   private static ImageData resize(final Display display,
+   public static ImageData resize(final Display display,
                                    final ImageData imageData,
                                    final int width,
                                    final int height,
