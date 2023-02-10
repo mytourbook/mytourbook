@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
@@ -144,8 +145,13 @@ public class SuuntoCloudDownloaderTests {
    @AfterEach
    public void cleanUpEach() {
 
-      httpClientMock.reset();
       TourLogManager.clear();
+   }
+
+   @BeforeEach
+   void InitializeEach() {
+
+      httpClientMock.reset();
    }
 
    @Test
