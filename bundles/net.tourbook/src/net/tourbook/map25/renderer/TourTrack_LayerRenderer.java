@@ -721,7 +721,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
    public void onModifyMapModelOrCursor() {
 
-      // update shader data finally in TourTrack_Shader.bindBufferData()
+      // update shader data, this is done finally in TourTrack_Shader.bindBufferData()
 
       _trackCompileWorker.submit(0);
    }

@@ -338,7 +338,8 @@ public final class TourTrack_Shader {
                             final GLViewport viewport,
                             final MapPosition compileMapPosition) {
 
-//    _dirArrowFrameBuffer.updateViewport(viewport, 0.5f);
+      // update current model position that re-Live has the correct number of vertices
+      MapPlayerManager.getCurrentProjectedPosition();
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
@@ -387,20 +388,16 @@ public final class TourTrack_Shader {
       final int numTrackVertices = trackBucket.numTrackVertices;
 
       int numVisibleVertices = numTrackVertices;
-      int numVisibleVertices_Debug = numTrackVertices;
+      int numVisibleVertices_ReLive = numTrackVertices;
 
       final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
       if (mapPlayerData != null && mapPlayerData.allVisible_GeoLocationIndices != null) {
 
-         final int numAllVisibleFrames = mapPlayerData.allVisible_GeoLocationIndices.length;
-         final int currentVisiblePositionIndex = MapPlayerManager.getCurrentVisibleGeoLocationIndex();
-
-         final float relativeVisibleVertices = (float) currentVisiblePositionIndex / numAllVisibleFrames;
-         numVisibleVertices_Debug = (int) (relativeVisibleVertices * numTrackVertices);
+         numVisibleVertices_ReLive = MapPlayerManager.getCurrentVisibleGeoLocationIndex() * 2;
 
 //         if (currentVisiblePositionIndex != _prevValue
 //
-////               || true
+//               || true
 //
 //         ) {
 //
@@ -408,9 +405,10 @@ public final class TourTrack_Shader {
 //
 //            System.out.println(UI.EMPTY_STRING
 //
-//                  + "  all verts: " + String.format("%5d", numTrackVertices)
-//                  + "  visible verts: " + String.format("%5d", numVisibleVertices_Debug)
-//                  + "  currPosIdx: " + String.format("%5d", currentVisiblePositionIndex)
+//                  + "  numVerts: " + String.format("%4d", numTrackVertices)
+//                  + "  visible: " + String.format("%4d", numVisibleVertices_ReLive)
+//                  + "  currPosIdx: " + String.format("%4d", currentVisiblePositionIndex)
+//                  + "  vp2mpScale: " + String.format("%5.2f", vp2mpScale)
 //
 //            );
 //// TODO remove SYSTEM.OUT.PRINTLN
@@ -421,7 +419,7 @@ public final class TourTrack_Shader {
 
          // show only the first part of the track which the model has already moved
 
-         numVisibleVertices = numVisibleVertices_Debug;
+         numVisibleVertices = numVisibleVertices_ReLive;
       }
 
       /*
