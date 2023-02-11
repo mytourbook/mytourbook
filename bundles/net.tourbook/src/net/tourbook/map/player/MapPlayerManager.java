@@ -172,7 +172,7 @@ public class MapPlayerManager {
     */
    private static int                   _returnTrackSpeed_PixelPerSecond  = 200;
 
-   private static int                   _jogWheelSpeedFactor              = 50;
+   private static float                 _jogWheelSpeedFactor              = 1;
    private static int                   _jogWheelSpeedMultiplier          = 1;
 
    /**
@@ -726,7 +726,7 @@ public class MapPlayerManager {
 
          // model is moving on the NORMAL TRACK, get next position
 
-         _jogWheelSpeedFactor = 10
+         _jogWheelSpeedFactor = 0.1f
 
                // this needs to be improved then depending on the track length, the speed is different
                * _jogWheelSpeedMultiplier;

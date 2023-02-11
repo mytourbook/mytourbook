@@ -143,9 +143,6 @@ public class TourTrack_Bucket {
                 final boolean isCapClosed,
                 final int[] pixelPointColors) {
 
-//      System.out.println(UI.timeStamp() + " addLine: " + numPoints);
-//// TODO remove SYSTEM.OUT.PRINTLN
-
       if (numPoints < 4) {
          return;
       }

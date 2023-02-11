@@ -199,6 +199,41 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          __allVisible_GeoLocationIndices.clear();
       }
 
+      private void addLine(final float[] pixelPoints,
+                           final int numPoints,
+                           final boolean isCapClosed,
+                           final int[] pixelPointColorsHalf,
+
+                           final TourTrack_Bucket workerBucket,
+
+                           final int geoLocationIndex) {
+
+         workerBucket.addLine(pixelPoints, numPoints, isCapClosed, pixelPointColorsHalf);
+
+         final int numGeo = __allVisible_GeoLocationIndices.size();
+         final int numTrackVertices_After = workerBucket.numTrackVertices / 2;
+
+         final int geoDiff = numTrackVertices_After - numGeo;
+
+         /*
+          * That the track end in re-Live is displayed at the correct position, the number of
+          * vertices/2 and number of geo indices MUST be the same !!!
+          */
+         for (int missingValues = 0; missingValues < geoDiff; missingValues++) {
+            __allVisible_GeoLocationIndices.add(geoLocationIndex);
+         }
+
+//         System.out.println(""
+//
+//               + "  addLine " + String.format("%5d", numPoints)
+//               + "  numVert " + String.format("%5d", numTrackVertices_After)
+//               + "  numGeo " + String.format("%5d", numGeo)
+//               + "  geoDiff " + geoDiff
+//
+//         );
+//         // TODO remove SYSTEM.OUT.PRINTLN
+      }
+
       /**
        * Adds a point (2 points: x,y) which are in the range of the {@link #__lineClipper},
        * -2048...+2048
@@ -211,7 +246,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
        */
       private int addPoint(final float[] points, int pointIndex, final float x, final float y) {
 
-//         System.out.println(UI.timeStamp() + " addPoint - idx: " + pointIndex);
+//         System.out.println("" + " addPoint - idx: " + pointIndex);
 //// TODO remove SYSTEM.OUT.PRINTLN
 
          points[pointIndex++] = x;
@@ -388,11 +423,12 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          float prevXArrow = pixelX;
          float prevYArrow = pixelY;
 
+         int geoLocationIndex = 0;
          float[] segment = null;
 
          for (int projectedPointIndex = 2; projectedPointIndex < numPoints * 2; projectedPointIndex += 2) {
 
-            final int geoLocationIndex = projectedPointIndex / 2;
+            geoLocationIndex = projectedPointIndex / 2;
 
             // convert projected points 0...1 into map pixel
             pixelX = (float) ((__allProjectedPoints[projectedPointIndex + 0] - compileMapPosX) * compileMaxMapPixel);
@@ -416,7 +452,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                flip = flipDirection;
 
                if (pixelPointIndex > 2) {
-                  workerBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
+                  addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf, workerBucket, geoLocationIndex);
                }
 
                __lineClipper.clipStart(pixelX, pixelY);
@@ -433,7 +469,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
                // finish last tour (copied from flip code)
                if (pixelPointIndex > 2) {
-                  workerBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
+                  addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf, workerBucket, geoLocationIndex);
                }
 
                // setup next tour
@@ -472,14 +508,14 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                 */
 
                if (pixelPointIndex > 2) {
-                  workerBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
+                  addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf, workerBucket, geoLocationIndex);
                }
 
                if (clipperCode == LineClipper.INTERSECTION) {
 
                   // add line segment
                   segment = __lineClipper.getLine(segment, 0);
-                  workerBucket.addLine(segment, 4, false, pixelPointColorsHalf);
+                  addLine(segment, 4, false, pixelPointColorsHalf, workerBucket, geoLocationIndex);
 
                   // the prev point is the real point not the clipped point
                   // prevX = __lineClipper.outX2;
@@ -537,7 +573,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          }
 
          if (pixelPointIndex > 2) {
-            workerBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
+            addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf, workerBucket, geoLocationIndex);
          }
 
          if (isShowDirectionArrows) {
