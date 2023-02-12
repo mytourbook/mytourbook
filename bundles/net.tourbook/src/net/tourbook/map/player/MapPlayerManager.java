@@ -202,6 +202,9 @@ public class MapPlayerManager {
       IDLE, //
    }
 
+   /**
+    * @return Returns <code>true</code> when 2.5D map is displayed
+    */
    public static boolean canShowMapModel() {
 
       return isMap25ViewAvailable();
@@ -888,7 +891,8 @@ public class MapPlayerManager {
          Display.getDefault().syncExec(() -> _mapPlayerView.restoreState());
       }
 
-      Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible);
+      Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible || _isPlayerRunning);
+
       setIsModelMovingForward(_jogWheelSpeed >= 0);
    }
 
@@ -944,6 +948,8 @@ public class MapPlayerManager {
    public static void setIsPlayerRunning(final boolean isPlayerRunning) {
 
       _isPlayerRunning = isPlayerRunning;
+
+      updateUI_MapModelOrCursor();
    }
 
    public static void setIsPlayingLoop(final boolean isPlayingLoop) {
@@ -1386,14 +1392,14 @@ public class MapPlayerManager {
 
       final Map25App map25App = _map25View.getMapApp();
 
-      if (_isMapModelVisible || _isMapModelCursorVisible) {
+      if (_isMapModelVisible || _isMapModelCursorVisible || _isPlayerRunning) {
 
          // setup data when map model + cursor is displayed
 
          map25App.getLayer_Tour().getTourTrackRenderer().onModifyMapModelOrCursor();
       }
 
-      Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible);
+      Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible || _isPlayerRunning);
 
       map25App.getMap().updateMap();
    }
