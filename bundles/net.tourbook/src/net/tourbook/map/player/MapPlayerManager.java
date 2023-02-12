@@ -20,7 +20,6 @@ import static org.oscim.utils.FastMath.clamp;
 import com.badlogic.gdx.math.MathUtils;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.map.IMapSyncListener.SyncParameter;
@@ -172,7 +171,6 @@ public class MapPlayerManager {
     */
    private static int                   _returnTrackSpeed_PixelPerSecond  = 200;
 
-   private static float                 _jogWheelSpeedFactor              = 1;
    private static int                   _jogWheelSpeedMultiplier          = 1;
 
    /**
@@ -194,8 +192,8 @@ public class MapPlayerManager {
    private static double                _previousProjectedPositionX;
    private static double                _previousProjectedPositionY;
 
-   private static double                _debugPrevValue;
-   private static String                _debugTimeStamp                   = UI.timeStamp();
+//   private static double                _debugPrevValue;
+//   private static String                _debugTimeStamp                   = UI.timeStamp();
 
    enum TrackState {
 
@@ -726,18 +724,20 @@ public class MapPlayerManager {
 
          // model is moving on the NORMAL TRACK, get next position
 
-         _jogWheelSpeedFactor = 0.1f
+         final float[] allDistanceSeries = _mapPlayerData.allDistanceSeries;
+         final float totalDistance = allDistanceSeries[allDistanceSeries.length - 1];
 
-               // this needs to be improved then depending on the track length, the speed is different
-               * _jogWheelSpeedMultiplier;
+         final float distanceFactor = totalDistance == 0
+               ? 1
+               : 100_000 / totalDistance;
 
+         final double jogWheelSpeed = (double) _jogWheelSpeed / SPEED_JOG_WHEEL_MAX_HALF;
          final double mapScale = _mapPlayerData.mapScale;
+         final float jogWheelSpeedFactor = distanceFactor * _jogWheelSpeedMultiplier;
 
-         final double speedValue = (double) _jogWheelSpeed / SPEED_JOG_WHEEL_MAX_HALF;
+         final double scaledSpeedValue = jogWheelSpeed / mapScale * jogWheelSpeedFactor;
 
-         final double speedValue_Scaled = speedValue / mapScale * _jogWheelSpeedFactor;
-
-         nextPosition = _relativePosition_Current + speedValue_Scaled;
+         nextPosition = _relativePosition_Current + scaledSpeedValue;
 
       } else {
 
