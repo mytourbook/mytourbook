@@ -728,6 +728,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
       _linkTourType.setEnabled(isCustomTourType);
       _lblTourType.setEnabled(isCustomTourType);
+
+      _btnUnlockDeleteSourceToursSelection.setEnabled(_tourProvider instanceof TourBookView);
    }
 
    @Override
@@ -1554,29 +1556,13 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       saveState();
 
       if (_chkDeleteSourceTours.isEnabled() &&
-            _chkDeleteSourceTours.getSelection()) {
-         if (_tourProvider instanceof TourBookView) {
+            _chkDeleteSourceTours.getSelection() &&
+            _tourProvider instanceof TourBookView) {
 
-            super.close();
+         super.close();
 
-            //todo fb add boolean to specify no dialog messages ?
-            //that way, there is no need for super.close!
-
-            final ActionDeleteTour actionDeleteTours = new ActionDeleteTour((TourBookView) _tourProvider);
-            actionDeleteTours.run();
-         } else {
-
-            TourLogManager.showLogView();
-
-            //todo fb open log view and log tour hour deleted...
-            _selectedTours.forEach(tour -> {
-               if (TourDatabase.deleteTour(tour.getTourId())) {
-
-                  // log deletion
-                  TourLogManager.addSubLog(TourLogState.TOUR_DELETED, TourManager.getTourDateTimeShort(tour));
-               }
-            });
-         }
+         final ActionDeleteTour actionDeleteTours = new ActionDeleteTour((TourBookView) _tourProvider);
+         actionDeleteTours.run();
       }
 
       super.okPressed();
