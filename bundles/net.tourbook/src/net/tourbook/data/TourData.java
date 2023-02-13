@@ -12456,7 +12456,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       _twpWorldPosition.put(projectionHash + zoomLevel, worldPositions);
    }
 
-   public boolean temperaturesExist() {
+   public boolean isTemperatureAvailable() {
 
       return getWeather_Temperature_Average() != 0 ||
             getWeather_Temperature_Max() != 0 ||

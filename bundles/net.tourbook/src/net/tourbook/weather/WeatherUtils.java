@@ -167,7 +167,7 @@ public class WeatherUtils {
          }
       }
 
-      if (tourData.temperaturesExist()) {
+      if (tourData.isTemperatureAvailable()) {
 
          // Average temperature
          final float averageTemperature = tourData.getWeather_Temperature_Average();

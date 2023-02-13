@@ -9058,7 +9058,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       displayCloudIcon();
 
       final boolean isTourTemperatureDeviceValid = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0;
-      final boolean temperaturesExist = _tourData.temperaturesExist();
+      final boolean temperaturesExist = _tourData.isTemperatureAvailable();
 
       /*
        * Avg temperature from Device
