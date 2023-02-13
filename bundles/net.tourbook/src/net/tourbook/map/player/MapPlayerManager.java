@@ -20,7 +20,6 @@ import static org.oscim.utils.FastMath.clamp;
 import com.badlogic.gdx.math.MathUtils;
 
 import net.tourbook.application.TourbookPlugin;
-import net.tourbook.common.UI;
 import net.tourbook.common.util.MtMath;
 import net.tourbook.common.util.Util;
 import net.tourbook.map.IMapSyncListener.SyncParameter;
@@ -36,7 +35,7 @@ import org.oscim.core.MapPosition;
 import org.oscim.renderer.MapRenderer;
 
 /**
- * Manage map animation player
+ * Is managing the movement of the map model and cursor
  */
 public class MapPlayerManager {
 
@@ -92,7 +91,7 @@ public class MapPlayerManager {
    private static long                  _currentProjectedPosition_Time;
 
    /**
-    * Geo location index of the model in the current position
+    * Geo location index for the current position of the model/cursor
     */
    private static int                   _currentVisibleGeoLocationIndex;
 
@@ -172,7 +171,6 @@ public class MapPlayerManager {
     */
    private static int                   _returnTrackSpeed_PixelPerSecond  = 200;
 
-   private static int                   _jogWheelSpeedFactor              = 50;
    private static int                   _jogWheelSpeedMultiplier          = 1;
 
    /**
@@ -194,8 +192,8 @@ public class MapPlayerManager {
    private static double                _previousProjectedPositionX;
    private static double                _previousProjectedPositionY;
 
-   private static double                _debugPrevValue;
-   private static String                _debugTimeStamp                   = UI.timeStamp();
+//   private static double                _debugPrevValue;
+//   private static String                _debugTimeStamp                   = UI.timeStamp();
 
    enum TrackState {
 
@@ -204,6 +202,9 @@ public class MapPlayerManager {
       IDLE, //
    }
 
+   /**
+    * @return Returns <code>true</code> when 2.5D map is displayed
+    */
    public static boolean canShowMapModel() {
 
       return isMap25ViewAvailable();
@@ -229,7 +230,7 @@ public class MapPlayerManager {
    }
 
    /**
-    * @return Returns the {@link #_currentProjectedPosition} of the animated model for the current
+    * @return Returns {@link #_currentProjectedPosition} of the animated model for the current
     *         frame or <code>null</code> when data are missing
     */
    public static double[] getCurrentProjectedPosition() {
@@ -276,7 +277,7 @@ public class MapPlayerManager {
       /*
        * Fire map position
        */
-      if (_isPlayerRunning) {
+      if (_isPlayerRunning || _isReLivePlaying) {
 
          // set map center to the current model position
 
@@ -726,18 +727,20 @@ public class MapPlayerManager {
 
          // model is moving on the NORMAL TRACK, get next position
 
-         _jogWheelSpeedFactor = 10
+         final float[] allDistanceSeries = _mapPlayerData.allDistanceSeries;
+         final float totalDistance = allDistanceSeries[allDistanceSeries.length - 1];
 
-               // this needs to be improved then depending on the track length, the speed is different
-               * _jogWheelSpeedMultiplier;
+         final float distanceFactor = totalDistance == 0
+               ? 1
+               : 100_000 / totalDistance;
 
+         final double jogWheelSpeed = (double) _jogWheelSpeed / SPEED_JOG_WHEEL_MAX_HALF;
          final double mapScale = _mapPlayerData.mapScale;
+         final float jogWheelSpeedFactor = distanceFactor * _jogWheelSpeedMultiplier;
 
-         final double speedValue = (double) _jogWheelSpeed / SPEED_JOG_WHEEL_MAX_HALF;
+         final double scaledSpeedValue = jogWheelSpeed / mapScale * jogWheelSpeedFactor;
 
-         final double speedValue_Scaled = speedValue / mapScale * _jogWheelSpeedFactor;
-
-         nextPosition = _relativePosition_Current + speedValue_Scaled;
+         nextPosition = _relativePosition_Current + scaledSpeedValue;
 
       } else {
 
@@ -888,7 +891,8 @@ public class MapPlayerManager {
          Display.getDefault().syncExec(() -> _mapPlayerView.restoreState());
       }
 
-      Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible);
+      Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible || _isPlayerRunning);
+
       setIsModelMovingForward(_jogWheelSpeed >= 0);
    }
 
@@ -926,14 +930,14 @@ public class MapPlayerManager {
 
       _isMapModelCursorVisible = isMapModelCursorVisible;
 
-      updateUI_MapModelOrCursor();
+      updateUI_Map();
    }
 
    public static void setIsMapModelVisible(final boolean isMapModelVisible) {
 
       _isMapModelVisible = isMapModelVisible;
 
-      updateUI_MapModelOrCursor();
+      updateUI_Map();
    }
 
    private static void setIsModelMovingForward(final boolean isModelMovingForward) {
@@ -944,6 +948,8 @@ public class MapPlayerManager {
    public static void setIsPlayerRunning(final boolean isPlayerRunning) {
 
       _isPlayerRunning = isPlayerRunning;
+
+      updateUI_Map();
    }
 
    public static void setIsPlayingLoop(final boolean isPlayingLoop) {
@@ -954,6 +960,8 @@ public class MapPlayerManager {
    public static void setIsReLivePlaying(final boolean isReLivePlaying) {
 
       _isReLivePlaying = isReLivePlaying;
+
+      updateUI_Map();
    }
 
    public static void setMap25View(final Map25View map25View) {
@@ -996,7 +1004,7 @@ public class MapPlayerManager {
 
       if (angleDiffAbs > 0.1) {
 
-         // the next angle is larger than the min smooth angle
+         // the next angle is larger than a min smooth angle
          // -> smoothout the animation with a smallers angle
 
          final float modelTurningAngle = (float) (angleDiffAbs * 0.01 * _modelTurningFactor);
@@ -1378,7 +1386,7 @@ public class MapPlayerManager {
       _modelTurningFactor = modelTurningFactor;
    }
 
-   private static void updateUI_MapModelOrCursor() {
+   private static void updateUI_Map() {
 
       if (isMap25ViewAvailable() == false) {
          return;
@@ -1386,14 +1394,14 @@ public class MapPlayerManager {
 
       final Map25App map25App = _map25View.getMapApp();
 
-      if (_isMapModelVisible || _isMapModelCursorVisible) {
+      if (_isMapModelVisible || _isMapModelCursorVisible || _isPlayerRunning || _isReLivePlaying) {
 
          // setup data when map model + cursor is displayed
 
          map25App.getLayer_Tour().getTourTrackRenderer().onModifyMapModelOrCursor();
       }
 
-      Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible);
+      Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible || _isPlayerRunning || _isReLivePlaying);
 
       map25App.getMap().updateMap();
    }

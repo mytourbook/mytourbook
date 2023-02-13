@@ -32,6 +32,10 @@ New
 * Tour Tags (Frederic)
   - Added the ability to add an image to a tag and display its accumulated values in the Tour Data Editor View
     https://github.com/mytourbook/mytourbook/issues/805
+    
+2.5D Map
+  - Show an animated 3D model which is moving along the tour track
+  - A new map model player is managing the moving model
   
 
 Improvements
@@ -45,7 +49,7 @@ Tour Editor
   - Keep distance values when time slices are deleted
     https://github.com/mytourbook/mytourbook/issues/986
   
-* 4k Display
+4k Display
   - Increased cursor size in Tour Chart and 2D Map, when displayed on 4k displays
 
 * TCX Import (Frederic)

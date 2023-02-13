@@ -17,7 +17,6 @@ package net.tourbook.map25.renderer;
 
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
-import net.tourbook.map.player.MapPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
@@ -98,17 +97,6 @@ public class TourTrack_Bucket {
    ShortArrayList             directionArrow_ColorCoords;
 
    /**
-    * Visible X/Y pixel positions which are clipped between -2048...2048
-    *
-    * <pre>
-    * posX1    posY2
-    * posX2    posY2
-    * ...
-    * </pre>
-    */
-   short[]                    allVisible_PixelPositions;
-
-   /**
     * Indices for {@link #allVisible_PixelPositions} into the tour track data
     */
    int[]                      allVisible_GeoLocationIndices;
@@ -144,34 +132,20 @@ public class TourTrack_Bucket {
     *
     * @param pixelPoints
     *           -2048 ... 2048
+    * @param index
     * @param numPoints
     * @param isCapClosed
     * @param pixelPointColors
     *           One {@link #pixelPointColors} has two {@link #pixelPoints}
     */
-   public void addLine(final float[] pixelPoints,
-                       final int numPoints,
-                       final boolean isCapClosed,
-                       final int[] pixelPointColors) {
+   void addLine(final float[] pixelPoints,
+                final int numPoints,
+                final boolean isCapClosed,
+                final int[] pixelPointColors) {
 
-      if (numPoints >= 4) {
-         addLine(pixelPoints, null, numPoints, isCapClosed, pixelPointColors);
+      if (numPoints < 4) {
+         return;
       }
-   }
-
-   /**
-    * @param pixelPoints
-    *           -2048 ... 2048
-    * @param index
-    * @param numPoints
-    * @param isCapClosed
-    * @param pixelPointColors
-    */
-   private void addLine(final float[] pixelPoints,
-                        final int[] index,
-                        final int numPoints,
-                        final boolean isCapClosed,
-                        final int[] pixelPointColors) {
 
       // test minimum distance
 //      _minimumDistance = testValue * 2.0f;
@@ -185,43 +159,19 @@ public class TourTrack_Bucket {
          isCapSquared = true;
       }
 
-      /*
-       * Note: just a hack to save some vertices, when there are
-       * more than 200 lines per type. Fixme: make optional!
-       */
-      if (isCapRounded && index != null) {
-         int cnt = 0;
-         for (int i = 0, n = index.length; i < n; i++, cnt++) {
-            if (index[i] < 0) {
-               break;
-            }
-            if (cnt > 400) {
-               isCapRounded = false;
-               break;
-            }
-         }
-      }
       this.isCapRounded = isCapRounded;
 
       int numIndices;
       int numLinePoints = 0;
 
-      if (index == null) {
-         numIndices = 1;
-         if (numPoints > 0) {
-            numLinePoints = numPoints;
-         } else {
-            numLinePoints = pixelPoints.length;
-         }
+      numIndices = 1;
+      if (numPoints > 0) {
+         numLinePoints = numPoints;
       } else {
-         numIndices = index.length;
+         numLinePoints = pixelPoints.length;
       }
 
       for (int indexIndex = 0, pos = 0; indexIndex < numIndices; indexIndex++) {
-
-         if (index != null) {
-            numLinePoints = index[indexIndex];
-         }
 
          /* check end-marker in indices */
          if (numLinePoints < 0) {
@@ -660,8 +610,7 @@ public class TourTrack_Bucket {
     * @param allDirectionArrow_LocationIndices
     *           Contains the indices into the tour track data, e.g geo location
     */
-   public void createArrowVertices(final float[] allDirectionArrowPixel,
-                                   final int[] allVisibleGeoLocationIndices) {
+   public void createArrowVertices(final float[] allDirectionArrowPixel) {
 
       directionArrow_Vertices.clear();
       directionArrow_ColorCoords.clear();
@@ -674,11 +623,6 @@ public class TourTrack_Bucket {
       if (Map25ConfigManager.getActiveTourTrackConfig().isShowDirectionArrow) {
 
          createArrowVertices_100_NotAnimated(allDirectionArrowPixel);
-      }
-
-      if (MapPlayerManager.isMapModelVisible() || MapPlayerManager.isMapModelCursorVisible()) {
-
-         createArrowVertices_200_Animated(allDirectionArrowPixel, allVisibleGeoLocationIndices);
       }
    }
 
@@ -1011,27 +955,6 @@ public class TourTrack_Bucket {
             (short) 0, (short) 0, (short) 1);
 
 // SET_FORMATTING_ON
-   }
-
-   private void createArrowVertices_200_Animated(final float[] allDirectionArrowPixel,
-                                                 final int[] allVisibleGeoLocationIndices) {
-
-      final int numPixels = allDirectionArrowPixel.length;
-
-      allVisible_PixelPositions = new short[numPixels];
-      allVisible_GeoLocationIndices = allVisibleGeoLocationIndices;
-
-      for (int pixelIndex = 0; pixelIndex < numPixels; pixelIndex += 2) {
-
-         final float p2X = allDirectionArrowPixel[pixelIndex];
-         final float p2Y = allDirectionArrowPixel[pixelIndex + 1];
-
-         final short p2X_scaled = (short) (p2X * COORD_SCALE);
-         final short p2Y_scaled = (short) (p2Y * COORD_SCALE);
-
-         allVisible_PixelPositions[pixelIndex] = p2X_scaled;
-         allVisible_PixelPositions[pixelIndex + 1] = p2Y_scaled;
-      }
    }
 
 }

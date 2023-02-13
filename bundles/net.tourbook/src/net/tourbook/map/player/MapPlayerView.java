@@ -339,7 +339,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       final GridDataFactory gridDataAlignEndCenter = GridDataFactory.fillDefaults()
             .align(SWT.CENTER, SWT.CENTER)
-            .hint(_pc.convertWidthInCharsToPixels(6), SWT.DEFAULT);
+            .hint(_pc.convertWidthInCharsToPixels(8), SWT.DEFAULT);
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -431,7 +431,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
             _spinnerSpeedMultiplier = new Spinner(container, SWT.BORDER);
             _spinnerSpeedMultiplier.setToolTipText(Messages.Map_Player_Label_SpeedMultiplier_Tooltip);
             _spinnerSpeedMultiplier.setMinimum(1);
-            _spinnerSpeedMultiplier.setMaximum(1000);
+            _spinnerSpeedMultiplier.setMaximum(10_000_000);
             _spinnerSpeedMultiplier.setIncrement(1);
             _spinnerSpeedMultiplier.setPageIncrement(5);
             _spinnerSpeedMultiplier.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_SpeedMultiplier()));
@@ -531,34 +531,35 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       final boolean isMapModelVisible        = MapPlayerManager.isMapModelVisible();
       final boolean isMapModelCursorVisible  = MapPlayerManager.isMapModelCursorVisible();
 
-      final boolean isModelVisible           = canShowMapModel && (isMapModelVisible || isMapModelCursorVisible);
+      final boolean canEditMapModel          = canShowMapModel && isMapModelVisible;
+      final boolean canEditMapModelCursor    = canShowMapModel && isMapModelCursorVisible;
+      final boolean canEditModelOrCursor     = canShowMapModel && (isMapModelVisible || isMapModelCursorVisible);
 
 
-      _actionPlayControl_Loop             .setEnabled(isModelVisible);
-      _actionPlayControl_PlayAndPause     .setEnabled(isModelVisible);
+      _actionPlayControl_Loop             .setEnabled(canShowMapModel);
+      _actionPlayControl_PlayAndPause     .setEnabled(canShowMapModel);
       _actionShowMapModel                 .setEnabled(canShowMapModel);
       _actionShowMapModelCursor           .setEnabled(canShowMapModel);
-      _actionSlideoutMapModel             .setEnabled(isModelVisible);
+      _actionSlideoutMapModel             .setEnabled(canEditModelOrCursor);
 
-      _lblModelCursorSize                 .setEnabled(isModelVisible && isMapModelCursorVisible);
-      _lblModelSize                       .setEnabled(isModelVisible && isMapModelVisible);
-      _lblSpeedMultiplier                 .setEnabled(isModelVisible);
-      _lblSpeedJogWheel                   .setEnabled(isModelVisible);
-      _lblSpeedJogWheel_Value             .setEnabled(isModelVisible);
-      _lblTimeline                        .setEnabled(isModelVisible);
-      _lblTimeline_Value                  .setEnabled(isModelVisible);
-      _lblTurningAngle                    .setEnabled(isModelVisible);
+      _lblModelCursorSize                 .setEnabled(canEditMapModelCursor);
+      _lblModelSize                       .setEnabled(canEditMapModel);
+      _lblSpeedMultiplier                 .setEnabled(canShowMapModel);
+      _lblSpeedJogWheel                   .setEnabled(canShowMapModel);
+      _lblSpeedJogWheel_Value             .setEnabled(canShowMapModel);
+      _lblTimeline                        .setEnabled(canShowMapModel);
+      _lblTimeline_Value                  .setEnabled(canShowMapModel);
+      _lblTurningAngle                    .setEnabled(canEditModelOrCursor);
 
-      _chkIsRelivePlaying                 .setEnabled(isModelVisible);
+      _chkIsRelivePlaying                 .setEnabled(canShowMapModel);
 
-      _scaleSpeedJogWheel                 .setEnabled(isModelVisible);
-      _scaleTimeline                      .setEnabled(isModelVisible);
+      _scaleSpeedJogWheel                 .setEnabled(canShowMapModel);
+      _scaleTimeline                      .setEnabled(canShowMapModel);
 
-      _spinnerModelCursorSize             .setEnabled(isModelVisible && isMapModelCursorVisible);
-      _spinnerModelSize                   .setEnabled(isModelVisible && isMapModelVisible);
-      _spinnerSpeedMultiplier             .setEnabled(isModelVisible);
-      _spinnerTurningMultiplier           .setEnabled(isModelVisible);
-
+      _spinnerModelCursorSize             .setEnabled(canEditMapModelCursor);
+      _spinnerModelSize                   .setEnabled(canEditMapModel);
+      _spinnerSpeedMultiplier             .setEnabled(canShowMapModel);
+      _spinnerTurningMultiplier           .setEnabled(canEditModelOrCursor);
 
 // SET_FORMATTING_ON
    }
