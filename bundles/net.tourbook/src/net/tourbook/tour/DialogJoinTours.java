@@ -1566,8 +1566,16 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             actionDeleteTours.run();
          } else {
 
+            TourLogManager.showLogView();
+
             //todo fb open log view and log tour hour deleted...
-            _selectedTours.forEach(tour -> TourDatabase.deleteTour(tour.getTourId()));
+            _selectedTours.forEach(tour -> {
+               if (TourDatabase.deleteTour(tour.getTourId())) {
+
+                  // log deletion
+                  TourLogManager.addSubLog(TourLogState.TOUR_DELETED, TourManager.getTourDateTimeShort(tour));
+               }
+            });
          }
       }
 
