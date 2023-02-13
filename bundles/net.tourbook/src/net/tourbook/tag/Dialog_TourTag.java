@@ -168,7 +168,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
             label.setText(Messages.Dialog_TourTag_Label_Image);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 
-            _canvasTagImage = new Label(container, SWT.TRANSPARENCY_ALPHA);
+            _canvasTagImage = new Label(container, SWT.NONE);
             GridDataFactory.fillDefaults()//
                   .applyTo(_canvasTagImage);
 
