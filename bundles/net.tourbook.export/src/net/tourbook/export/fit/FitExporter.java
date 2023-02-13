@@ -18,14 +18,17 @@ package net.tourbook.export.fit;
 import com.garmin.fit.FileEncoder;
 import com.garmin.fit.FileIdMesg;
 import com.garmin.fit.Fit;
+import com.garmin.fit.Fit.ProtocolVersion;
 import com.garmin.fit.FitRuntimeException;
 import com.garmin.fit.Gender;
 import com.garmin.fit.Manufacturer;
 import com.garmin.fit.UserProfileMesg;
 
+//todo fb: Add unit test -> convert to csv and use it for comparison
 public class FitExporter {
 
    public void export(final String filePath) {
+
       System.out.printf("FIT Encode Example Application - Protocol %d.%d Profile %.2f %s\n",
             Fit.PROTOCOL_VERSION_MAJOR,
             Fit.PROTOCOL_VERSION_MINOR,
@@ -35,7 +38,7 @@ public class FitExporter {
       FileEncoder encode;
 
       try {
-         encode = new FileEncoder(new java.io.File(filePath));
+         encode = new FileEncoder(new java.io.File(filePath), ProtocolVersion.V2_0);
       } catch (final FitRuntimeException e) {
          System.err.println("Error opening file ExampleSettings.fit");
          return;
@@ -45,8 +48,8 @@ public class FitExporter {
       final FileIdMesg fileIdMesg = new FileIdMesg(); // Every FIT file MUST contain a 'File ID' message as the first message
       fileIdMesg.setManufacturer(Manufacturer.DYNASTREAM);
       //fileIdMesg.setType(File.SETTINGS);
-      fileIdMesg.setProduct(1000);
-      fileIdMesg.setSerialNumber(12345L);
+      //fileIdMesg.setProduct(1000);
+      // fileIdMesg.setSerialNumber(12345L);
 
       encode.write(fileIdMesg); // Encode the FileIDMesg
 
