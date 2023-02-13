@@ -313,6 +313,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     *         {@link ITourbookPreferences#GRAPH_MARKER_SIGN_IMAGE_SIZE} is used. This size is
     *         converted into pixel with the vertical DLU's.
     */
+   @SuppressWarnings("unused")
    private static int getSignImageMaxSize(final PixelConverter pc) {
 
       if (_defaultSignImageMaxSize == -1) {
