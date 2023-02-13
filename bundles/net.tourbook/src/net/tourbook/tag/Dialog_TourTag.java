@@ -57,9 +57,10 @@ public class Dialog_TourTag extends TitleAreaDialog {
    private final IDialogSettings         _state                   = TourbookPlugin.getState(ID);
 
    private String                        _dlgMessage;
-   private String                        _imageFilePath;
-   private TourTag                       _tourTag_Original;
 
+   private String                        _imageFilePath;
+
+   private TourTag                       _tourTag_Original;
    private TourTag                       _tourTag_Clone;
 
    /*
