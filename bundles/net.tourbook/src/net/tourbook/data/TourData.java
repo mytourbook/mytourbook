@@ -10180,6 +10180,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return surfing_IsMinDistance;
    }
 
+   @JsonIgnore
+   public boolean isTemperatureAvailable() {
+
+      return getWeather_Temperature_Average() != 0 ||
+            getWeather_Temperature_Max() != 0 ||
+            getWeather_Temperature_Min() != 0 ||
+            getWeather_Temperature_WindChill() != 0 ||
+            isWeatherDataFromProvider();
+   }
+
    public boolean isTimeSerieWithTimeZoneAdjustment() {
 
       if (timeSerieWithTimeZoneAdjustment == null) {
@@ -12454,15 +12464,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
                                          final int projectionHash) {
 
       _twpWorldPosition.put(projectionHash + zoomLevel, worldPositions);
-   }
-
-   public boolean isTemperatureAvailable() {
-
-      return getWeather_Temperature_Average() != 0 ||
-            getWeather_Temperature_Max() != 0 ||
-            getWeather_Temperature_Min() != 0 ||
-            getWeather_Temperature_WindChill() != 0 ||
-            isWeatherDataFromProvider();
    }
 
    public String toJson() {
