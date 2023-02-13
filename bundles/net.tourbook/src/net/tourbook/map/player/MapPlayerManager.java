@@ -230,7 +230,7 @@ public class MapPlayerManager {
    }
 
    /**
-    * @return Returns the {@link #_currentProjectedPosition} of the animated model for the current
+    * @return Returns {@link #_currentProjectedPosition} of the animated model for the current
     *         frame or <code>null</code> when data are missing
     */
    public static double[] getCurrentProjectedPosition() {
@@ -277,7 +277,7 @@ public class MapPlayerManager {
       /*
        * Fire map position
        */
-      if (_isPlayerRunning) {
+      if (_isPlayerRunning || _isReLivePlaying) {
 
          // set map center to the current model position
 
@@ -930,14 +930,14 @@ public class MapPlayerManager {
 
       _isMapModelCursorVisible = isMapModelCursorVisible;
 
-      updateUI_MapModelOrCursor();
+      updateUI_Map();
    }
 
    public static void setIsMapModelVisible(final boolean isMapModelVisible) {
 
       _isMapModelVisible = isMapModelVisible;
 
-      updateUI_MapModelOrCursor();
+      updateUI_Map();
    }
 
    private static void setIsModelMovingForward(final boolean isModelMovingForward) {
@@ -949,7 +949,7 @@ public class MapPlayerManager {
 
       _isPlayerRunning = isPlayerRunning;
 
-      updateUI_MapModelOrCursor();
+      updateUI_Map();
    }
 
    public static void setIsPlayingLoop(final boolean isPlayingLoop) {
@@ -960,6 +960,8 @@ public class MapPlayerManager {
    public static void setIsReLivePlaying(final boolean isReLivePlaying) {
 
       _isReLivePlaying = isReLivePlaying;
+
+      updateUI_Map();
    }
 
    public static void setMap25View(final Map25View map25View) {
@@ -1384,7 +1386,7 @@ public class MapPlayerManager {
       _modelTurningFactor = modelTurningFactor;
    }
 
-   private static void updateUI_MapModelOrCursor() {
+   private static void updateUI_Map() {
 
       if (isMap25ViewAvailable() == false) {
          return;
@@ -1392,14 +1394,14 @@ public class MapPlayerManager {
 
       final Map25App map25App = _map25View.getMapApp();
 
-      if (_isMapModelVisible || _isMapModelCursorVisible || _isPlayerRunning) {
+      if (_isMapModelVisible || _isMapModelCursorVisible || _isPlayerRunning || _isReLivePlaying) {
 
          // setup data when map model + cursor is displayed
 
          map25App.getLayer_Tour().getTourTrackRenderer().onModifyMapModelOrCursor();
       }
 
-      Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible || _isPlayerRunning);
+      Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible || _isPlayerRunning || _isReLivePlaying);
 
       map25App.getMap().updateMap();
    }
