@@ -738,7 +738,6 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
          tourData.computeAltitudeUpDown();
          tourData.computeTourMovingTime();
          tourData.computeComputedValues();
-
       }
 
       _importState_File.isFileImportedWithValidData = true;
