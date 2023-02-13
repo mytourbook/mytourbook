@@ -15,6 +15,10 @@
  *******************************************************************************/
 package net.tourbook.export.fit;
 
+import com.garmin.fit.Activity;
+import com.garmin.fit.ActivityMesg;
+import com.garmin.fit.Field;
+import com.garmin.fit.File;
 import com.garmin.fit.FileEncoder;
 import com.garmin.fit.FileIdMesg;
 import com.garmin.fit.Fit;
@@ -22,6 +26,7 @@ import com.garmin.fit.Fit.ProtocolVersion;
 import com.garmin.fit.FitRuntimeException;
 import com.garmin.fit.Gender;
 import com.garmin.fit.Manufacturer;
+import com.garmin.fit.RecordMesg;
 import com.garmin.fit.UserProfileMesg;
 
 //todo fb: Add unit test -> convert to csv and use it for comparison
@@ -47,9 +52,25 @@ public class FitExporter {
       //Generate FileIdMessage
       final FileIdMesg fileIdMesg = new FileIdMesg(); // Every FIT file MUST contain a 'File ID' message as the first message
       fileIdMesg.setManufacturer(Manufacturer.DYNASTREAM);
-      //fileIdMesg.setType(File.SETTINGS);
+      fileIdMesg.setType(File.ACTIVITY);
       //fileIdMesg.setProduct(1000);
       // fileIdMesg.setSerialNumber(12345L);
+
+      final RecordMesg recordMesg = new RecordMesg();
+      final Field field = new Field("timestamp",
+            978538286,
+            0,
+            "position_lat",
+            "480457070",
+            "semicircles",
+            "position_long",
+            "-1259320222",
+            "semicircles");
+      recordMesg.addField(field);
+
+      final ActivityMesg toto = new ActivityMesg();
+      toto.setType(Activity.MANUAL);
+      encode.write(toto); // Encode the FileIDMesg
 
       encode.write(fileIdMesg); // Encode the FileIDMesg
 
