@@ -25,6 +25,13 @@
          fileextension  ="mt"
       />
       
+      <export
+         id             ="net.tourbook.export.fit"
+         class          ="net.tourbook.export.ExportTourFIT"
+         name           ="FIT"
+         fileextension  ="fit"
+      />
+      
    </extension>
 
 </plugin>

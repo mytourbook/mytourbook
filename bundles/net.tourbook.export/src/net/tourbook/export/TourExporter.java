@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.export;
 
+///TODO FB: Idea: Have a single "Export Tour" contextual menu that opens a single dialog
+//where a top combo will contain all the possible formats (TCX, GPX, MT, FIT) and
+//when each combo is selected, then the dialogs below it will get drawn
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,6 +52,7 @@ import net.tourbook.data.TourPhoto;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.export.fit.FitExporter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
@@ -131,6 +135,7 @@ public class TourExporter {
    private boolean      _useActivityType;
    private boolean      _useDescription;
 
+   private boolean      _isFIT;
    private boolean      _isGPX;
    private boolean      _isTCX;
 
@@ -138,8 +143,13 @@ public class TourExporter {
 
       _formatTemplate = formatTemplate;
 
-      _isGPX = formatTemplate.toLowerCase().contains("gpx"); //$NON-NLS-1$
-      _isTCX = formatTemplate.toLowerCase().contains("tcx"); //$NON-NLS-1$
+      if (net.tourbook.common.util.StringUtils.hasContent(formatTemplate)) {
+         _isGPX = formatTemplate.toLowerCase().contains("gpx"); //$NON-NLS-1$
+         _isTCX = formatTemplate.toLowerCase().contains("tcx"); //$NON-NLS-1$
+      }
+      else {
+         _isFIT = true;
+      }
 
       // .tcx files always contain absolute distances
       if (_isTCX) {
@@ -231,6 +241,7 @@ public class TourExporter {
          serieData = _tourData.getSerieData();
       }
 
+      if (_isGPX || _isTCX) {
       /*
        * Setup context
        */
@@ -321,6 +332,11 @@ public class TourExporter {
          StatusUtil.showStatus(e);
          return false;
       }
+   } else if (_isFIT) {
+
+      final FitExporter fitExporter = new FitExporter();
+      fitExporter.export(exportFileName);
+   }
 
       return true;
    }

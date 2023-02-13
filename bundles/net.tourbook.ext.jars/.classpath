@@ -19,5 +19,6 @@
 	<classpathentry exported="true" kind="lib" path="commons-suncalc-3.4.jar"/> <!-- https://mvnrepository.com/artifact/org.shredzone.commons/commons-suncalc -->
 	<classpathentry exported="true" kind="lib" path="httpcore-4.4.15.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpcore -->
 	<classpathentry exported="true" kind="lib" path="httpclient-4.5.13.jar"/> <!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+	<classpathentry exported="true" kind="lib" path="fit-21.101.00.jar" sourcepath="/FIT SDK/FitSDKRelease/java"/> <!-- https://developer.garmin.com/fit/download/ https://forums.garmin.com/developer/fit-sdk/b/news-announcements/posts/fit-sdk-21-101-00-release -->
 	<classpathentry kind="output" path="bin"/>
 </classpath>
