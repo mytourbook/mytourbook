@@ -997,6 +997,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       int joinedMovingTime = 0;
       float joinedDistance = 0;
       int joinedCalories = 0;
+      float joinedCadenceMultiplier = 0;
       boolean isJoinedDistanceFromSensor = false;
       boolean isJoinedPowerFromSensor = false;
       boolean isJoinedPulseFromSensor = false;
@@ -1343,6 +1344,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             isJoinedPowerFromSensor = tourData.isPowerSensorPresent();
             isJoinedPulseFromSensor = tourData.isPulseSensorPresent();
 
+            joinedCadenceMultiplier = tourData.getCadenceMultiplier();
+
             joinedDeviceTimeInterval = tourData.getDeviceTimeInterval();
 
             joinedWeather = tourData.getWeather();
@@ -1450,6 +1453,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       _joinedTourData.setDeviceTimeInterval(joinedDeviceTimeInterval);
 
       _joinedTourData.setCalories(joinedCalories);
+      _joinedTourData.setCadenceMultiplier(joinedCadenceMultiplier);
       _joinedTourData.setRestPulse(joinedRestPulse);
 
       _joinedTourData.setWeather(joinedWeather);
