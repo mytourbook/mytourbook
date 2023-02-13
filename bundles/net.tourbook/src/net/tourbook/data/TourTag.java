@@ -84,6 +84,8 @@ public class TourTag implements Cloneable, Comparable<Object> {
     */
    private int    expandType = EXPAND_TYPE_FLAT;
 
+   private String imageFilePath;
+
 //   /**
 //    * A tag belongs to <b>ONE</b> category and not to many as it was implemented in version 14.4
 //    * and before.
@@ -114,8 +116,6 @@ public class TourTag implements Cloneable, Comparable<Object> {
     */
    @Transient
    private long                _createId = 0;
-
-   private String              imageFilePath;
 
    public TourTag() {}
 
