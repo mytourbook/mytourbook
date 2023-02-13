@@ -70,14 +70,14 @@ public class Dialog_TourTag extends TitleAreaDialog {
    /*
     * UI controls
     */
-   private Button      _btnDeleteImage;
+   private Button _btnDeleteImage;
 
    private Label  _canvasTagImage;
 
-   private Label       _lblInvalidImageError;
+   private Label  _lblInvalidImageError;
 
-   private Text        _txtNotes;
-   private Text        _txtName;
+   private Text   _txtNotes;
+   private Text   _txtName;
 
    public Dialog_TourTag(final Shell parentShell,
                          final String dlgMessage,
@@ -185,11 +185,6 @@ public class Dialog_TourTag extends TitleAreaDialog {
                      .align(SWT.LEFT, SWT.CENTER)
                      .applyTo(btnSelectImage);
 
-               _lblInvalidImageError = new Label(imageContainer, SWT.WRAP);
-               GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.BEGINNING)
-                     .hint(_pc.convertWidthInCharsToPixels(75), SWT.DEFAULT)
-                     .span(1, 2).applyTo(_lblInvalidImageError);
-
                _btnDeleteImage = new Button(imageContainer, SWT.PUSH);
                _btnDeleteImage.setImage(TourbookPlugin.getImageDescriptor(
                      net.tourbook.Images.App_Trash_Themed).createImage());
@@ -198,6 +193,12 @@ public class Dialog_TourTag extends TitleAreaDialog {
                GridDataFactory.fillDefaults()
                      .align(SWT.LEFT, SWT.CENTER)
                      .applyTo(_btnDeleteImage);
+
+               _lblInvalidImageError = new Label(imageContainer, SWT.WRAP);
+               GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.BEGINNING)
+                     .hint(_pc.convertWidthInCharsToPixels(75), SWT.DEFAULT)
+                     .span(2, 1)
+                     .applyTo(_lblInvalidImageError);
             }
          }
          {
