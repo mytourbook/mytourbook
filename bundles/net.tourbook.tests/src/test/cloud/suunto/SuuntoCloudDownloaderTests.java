@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,7 +30,6 @@ import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.suunto.SuuntoCloudDownloader;
-import net.tourbook.cloud.suunto.SuuntoTokensRetrievalHandler;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -90,10 +89,7 @@ public class SuuntoCloudDownloaderTests {
 
       httpClientMock = new HttpClientMock();
 
-      Field field = SuuntoCloudDownloader.class.getDeclaredField("_httpClient"); //$NON-NLS-1$
-      field.setAccessible(true);
-      field.set(null, httpClientMock);
-      field = SuuntoTokensRetrievalHandler.class.getDeclaredField("_httpClient"); //$NON-NLS-1$
+      final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
       field.set(null, httpClientMock);
 

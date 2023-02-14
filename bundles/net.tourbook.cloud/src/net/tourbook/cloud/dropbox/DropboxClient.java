@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2021 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,14 +26,12 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,11 +51,10 @@ import org.osgi.framework.Version;
 
 public class DropboxClient {
 
-   private static HttpClient     _httpClient        = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(1)).build();
    private static DbxClientV2    _dropboxClient;
 
-   private static final String   DropboxApiBaseUrl  = "https://api.dropboxapi.com";                                         //$NON-NLS-1$
-   public static final String    DropboxCallbackUrl = "http://localhost:" + PrefPageDropbox.CALLBACK_PORT + "/";            //$NON-NLS-1$ //$NON-NLS-2$
+   private static final String   DropboxApiBaseUrl  = "https://api.dropboxapi.com";                              //$NON-NLS-1$
+   public static final String    DropboxCallbackUrl = "http://localhost:" + PrefPageDropbox.CALLBACK_PORT + "/"; //$NON-NLS-1$ //$NON-NLS-2$
 
    static final IPreferenceStore _prefStore         = Activator.getDefault().getPreferenceStore();
 
@@ -194,7 +191,7 @@ public class DropboxClient {
 
       DropboxTokens token = new DropboxTokens();
       try {
-         final HttpResponse<String> response = _httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+         final HttpResponse<String> response = OAuth2Utils.httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
          if (response.statusCode() == HttpURLConnection.HTTP_OK && StringUtils.hasContent(response.body())) {
             token = new ObjectMapper().readValue(response.body(), DropboxTokens.class);

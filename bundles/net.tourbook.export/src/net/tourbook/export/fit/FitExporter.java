@@ -105,7 +105,7 @@ public class FitExporter {
       fileEncoder.write(fileIdMesg);
       fileEncoder.write(deviceInfoMesg);
 
-      messages.forEach(message -> fileEncoder.write(message));
+      messages.forEach(fileEncoder::write);
 
       // Close the output stream
       try {

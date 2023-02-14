@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package export;
 
+import de.byteholder.geoclipse.map.UI;
+
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +30,7 @@ import net.tourbook.export.TourExporter;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
@@ -81,6 +84,25 @@ public class TourExporterTests {
             _testTourFilePathTcx,
             nodesToFilter,
             attributesToFilter);
+   }
+
+   @DisplayName("TimeTools tests")
+   @Test
+   void exportTour_Fit() {
+//todo fb
+      initializeTourExporterFit();
+
+      _tourExporter.setUseActivityType(true);
+      _tourExporter.setActivityType("Hiking"); //$NON-NLS-1$
+
+      //  final String controlTourFileName = "XXX.fit"; //$NON-NLS-1$
+      //  executeTcxTest(controlTourFileName);
+   }
+
+   private void initializeTourExporterFit() {
+
+      _tourExporter = new TourExporter(UI.EMPTY_STRING).useTourData(_tour);
+      _tourExporter.setActivityType(_tour.getTourType().getName());
    }
 
    private void initializeTourExporterGpx() {
@@ -165,15 +187,15 @@ public class TourExporterTests {
       executeTcxTest(controlTourFileName);
    }
 
-   @Test
-   void testTcxExportHikingActivity() {
+@Test
+void testTcxExportHikingActivity() {
 
-      initializeTourExporterTcx();
+   initializeTourExporterTcx();
 
-      _tourExporter.setUseActivityType(true);
-      _tourExporter.setActivityType("Hiking"); //$NON-NLS-1$
+   _tourExporter.setUseActivityType(true);
+   _tourExporter.setActivityType("Hiking"); //$NON-NLS-1$
 
-      final String controlTourFileName = "LongsPeak-HikingActivity.tcx"; //$NON-NLS-1$
-      executeTcxTest(controlTourFileName);
-   }
+   final String controlTourFileName = "LongsPeak-HikingActivity.tcx"; //$NON-NLS-1$
+   executeTcxTest(controlTourFileName);
+}
 }

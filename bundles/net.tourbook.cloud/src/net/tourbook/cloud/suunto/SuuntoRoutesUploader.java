@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2022 Frédéric Bard
+ * Copyright (C) 2021, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,12 +20,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
-import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.nio.file.Paths;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -64,7 +62,6 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
    private static final String LOG_CLOUDACTION_END           = net.tourbook.cloud.Messages.Log_CloudAction_End;
    private static final String LOG_CLOUDACTION_INVALIDTOKENS = net.tourbook.cloud.Messages.Log_CloudAction_InvalidTokens;
 
-   private static HttpClient   _httpClient                   = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
    private static TourExporter _tourExporter                 = new TourExporter(ExportTourGPX.GPX_1_0_TEMPLATE);
 
    private boolean             _useActivePerson;
@@ -211,7 +208,9 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
    private CompletableFuture<RouteUpload> sendAsyncRequest(final String tourStartTime, final HttpRequest request) {
 
-      final CompletableFuture<RouteUpload> routeUpload = _httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+      final CompletableFuture<RouteUpload> routeUpload = OAuth2Utils.httpClient.sendAsync(
+            request,
+            HttpResponse.BodyHandlers.ofString())
             .thenApply(routeUploadResponse -> convertResponseToUpload(routeUploadResponse, tourStartTime))
             .exceptionally(e -> {
                final RouteUpload errorUpload = new RouteUpload();

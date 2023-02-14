@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2022 Frédéric Bard
+ * Copyright (C) 2021, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -30,6 +31,8 @@ import net.tourbook.common.util.StringUtils;
 import org.json.JSONObject;
 
 public class OAuth2Utils {
+
+   public static HttpClient httpClient = HttpClient.newBuilder().connectTimeout(Duration.ofMinutes(5)).build();
 
    public static String computeAccessTokenExpirationDate(final long accessTokenIssueDateTime,
                                                          final long accessTokenExpiresIn) {
@@ -44,8 +47,7 @@ public class OAuth2Utils {
       return URI.create(OAuth2Constants.OAUTH_PASSEUR_APP_URL + uriSuffix);
    }
 
-   public static String getTokens(final HttpClient httpClient,
-                                  final String authorizationCode,
+   public static String getTokens(final String authorizationCode,
                                   final boolean isRefreshToken,
                                   final String refreshToken,
                                   final URI uri) {

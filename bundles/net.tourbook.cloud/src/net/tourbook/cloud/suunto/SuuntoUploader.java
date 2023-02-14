@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2023 Frédéric Bard
+ * Copyright (C) 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,7 +13,7 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.cloud.strava;
+package net.tourbook.cloud.suunto;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -44,6 +44,8 @@ import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.MultiPartBodyPublisher;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
+import net.tourbook.cloud.strava.ActivityUpload;
+import net.tourbook.cloud.strava.StravaTokens;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.StatusUtil;
@@ -51,7 +53,6 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.export.DialogExportTour;
-import net.tourbook.export.ExportTourTCX;
 import net.tourbook.export.TourExporter;
 import net.tourbook.ext.velocity.VelocityService;
 import net.tourbook.extension.upload.TourbookCloudUploader;
@@ -72,15 +73,12 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.json.JSONObject;
 
-//todo fb use the fit export instead so that activity types can be better mapped
-public class StravaUploader extends TourbookCloudUploader {
-
-   private static final String     StravaBaseUrl     = "https://www.strava.com/api/v3";                                      //$NON-NLS-1$
+public class SuuntoUploader extends TourbookCloudUploader {
 
    private static IPreferenceStore _prefStore        = Activator.getDefault().getPreferenceStore();
-   private static TourExporter     _tourExporter     = new TourExporter(ExportTourTCX.TCX_2_0_TEMPLATE);
+   private static TourExporter     _tourExporter     = new TourExporter(UI.EMPTY_STRING);
 
-   private static String           CLOUD_UPLOADER_ID = "Strava";                                                             //$NON-NLS-1$
+   private static String           CLOUD_UPLOADER_ID = "Suunto";                                   //$NON-NLS-1$
 
    // Source : https://developers.strava.com/docs/reference/#api-models-ActivityType
    private static final List<String> StravaManualActivityTypes       = List.of(
@@ -114,7 +112,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
    private String                    STRAVA_TOURTYPEFILTERSET_PREFIX = CLOUD_UPLOADER_ID + UI.SYMBOL_COLON;
 
-   public StravaUploader() {
+   public SuuntoUploader() {
 
       super(CLOUD_UPLOADER_ID, Messages.VendorName_Strava);
 
@@ -466,7 +464,8 @@ public class StravaUploader extends TourbookCloudUploader {
 
       final String tourDate = TourManager.getTourDateTimeShort(tour);
 
-      final CompletableFuture<ActivityUpload> activityUpload = OAuth2Utils.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+      final CompletableFuture<ActivityUpload> activityUpload =
+            OAuth2Utils.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
             .thenApply(name -> convertResponseToUpload(name, tourDate))
             .exceptionally(e -> {
                final ActivityUpload errorUpload = new ActivityUpload();
@@ -510,7 +509,7 @@ public class StravaUploader extends TourbookCloudUploader {
       publisher.addPart("description", description); //$NON-NLS-1$
 
       final HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(StravaBaseUrl + "/uploads")) //$NON-NLS-1$
+            .uri(URI.create("URL" + "/uploads")) //$NON-NLS-1$
             .header(HttpHeaders.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
             .header(OAuth2Constants.CONTENT_TYPE, "multipart/form-data; boundary=" + publisher.getBoundary()) //$NON-NLS-1$
             .timeout(Duration.ofMinutes(5))
@@ -547,7 +546,7 @@ public class StravaUploader extends TourbookCloudUploader {
       body.put("description", description); //$NON-NLS-1$
 
       final HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(StravaBaseUrl + "/activities")) //$NON-NLS-1$
+            .uri(URI.create("URL" + "/activities")) //$NON-NLS-1$
             .header(HttpHeaders.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
             .header(OAuth2Constants.CONTENT_TYPE, "application/json") //$NON-NLS-1$
             .timeout(Duration.ofMinutes(5))
