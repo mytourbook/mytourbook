@@ -45,7 +45,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.TimeZone;
 
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
@@ -53,9 +52,9 @@ import net.tourbook.data.TourData;
 //todo fb: Add unit test -> convert to csv and use it for comparison
 public class FitExporter {
 
-   private static void createActivityFile(final List<Mesg> messages,
-                                          final String filename,
-                                          final DateTime startTime) {
+   private static void createFitFile(final List<Mesg> messages,
+                                     final String filename,
+                                     final DateTime startTime) {
 
       // The combination of file type, manufacturer id, product id, and serial number should be unique.
       // When available, a non-random serial number should be used.
@@ -106,9 +105,7 @@ public class FitExporter {
       fileEncoder.write(fileIdMesg);
       fileEncoder.write(deviceInfoMesg);
 
-      for (final Mesg message : messages) {
-         fileEncoder.write(message);
-      }
+      messages.forEach(message -> fileEncoder.write(message));
 
       // Close the output stream
       try {
@@ -170,6 +167,7 @@ public class FitExporter {
 
       // Every FIT ACTIVITY file MUST contain Record messages
       final DateTime timestamp = new DateTime(startTime);
+      final int previousTimeSerieValue = 0;
 
       // Create one hour (3600 seconds) of Record data
       for (int index = 0; index < tourData.timeSerie.length; ++index) {
@@ -180,7 +178,7 @@ public class FitExporter {
 
          // Fake Record Data of Various Signal Patterns
          recordMesg.setDistance(tourData.distanceSerie[index]);
-         recordMesg.setSpeed(tourData.getSpeedSerie()[index]);
+         recordMesg.setSpeed(tourData.getSpeedSerieMetric()[index]);
          recordMesg.setHeartRate((short) tourData.pulseSerie[index]); // Sine
          recordMesg.setCadence((short) tourData.getCadenceSerie()[index]); // Sawtooth
          recordMesg.setPower((int) tourData.getPowerSerie()[index]); //Square
@@ -196,10 +194,12 @@ public class FitExporter {
          // Write the Record message to the output stream
          messages.add(recordMesg);
 
-         // Increment the timestamp by one second
-         timestamp.add(1);
+         // Increment the timestamp by the number of seconds between the previous
+         // timestamp and the current one
+         timestamp.add(tourData.timeSerie[index] - previousTimeSerieValue);
       }
 
+      //todo fb thats where we add the pauses?
       // Timer Events are a BEST PRACTICE for FIT ACTIVITY files
       final EventMesg eventMesgStop = new EventMesg();
       eventMesgStop.setTimestamp(timestamp);
@@ -221,12 +221,13 @@ public class FitExporter {
       sessionMesg.setMessageIndex(0);
       sessionMesg.setTimestamp(timestamp);
       sessionMesg.setStartTime(startTime);
-      sessionMesg.setTotalElapsedTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
-      sessionMesg.setTotalTimerTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
+      sessionMesg.setTotalElapsedTime((float) tourData.getTourDeviceTime_Elapsed());
+      sessionMesg.setTotalTimerTime((float) tourData.getTourDeviceTime_Recorded());
+      //do a map function with the tour type and by default use generic
       sessionMesg.setSport(Sport.STAND_UP_PADDLEBOARDING);
       // sessionMesg.setSubSport(SubSport.GENERIC);
       sessionMesg.setFirstLapIndex(0);
-      sessionMesg.setNumLaps(1);
+      sessionMesg.setNumLaps(tourData.getTourMarkers().size());
       messages.add(sessionMesg);
 
       // Add a Developer Field to the Session message
@@ -236,15 +237,15 @@ public class FitExporter {
 
       // Every FIT ACTIVITY file MUST contain EXACTLY one Activity message
       final ActivityMesg activityMesg = new ActivityMesg();
-      activityMesg.setTimestamp(timestamp);
+      // activityMesg.setTimestamp(timestamp);
       activityMesg.setNumSessions(1);
-      final TimeZone timeZone = TimeZone.getTimeZone(tourData.getTimeZoneId());
-      final long timezoneOffset = (timeZone.getRawOffset() + timeZone.getDSTSavings()) / 1000;
-      activityMesg.setLocalTimestamp(timestamp.getTimestamp() + timezoneOffset);
-      activityMesg.setTotalTimerTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
+      // final TimeZone timeZone = TimeZone.getTimeZone(tourData.getTimeZoneId());
+      //  final long timezoneOffset = (timeZone.getRawOffset() + timeZone.getDSTSavings()) / 1000;
+      //  activityMesg.setLocalTimestamp(timestamp.getTimestamp() + timezoneOffset);
+      //  activityMesg.setTotalTimerTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
       messages.add(activityMesg);
 
-      createActivityFile(messages, exportFilePath, startTime);
+      createFitFile(messages, exportFilePath, startTime);
    }
 
    public void export(final TourData _tourData, final String exportFilePath) {
