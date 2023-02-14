@@ -1309,7 +1309,6 @@ public class Messages extends NLS {
    public static String        Map_Player_Checkbox_ReLivePlaying;
    public static String        Map_Player_Error_InvalidModelFilepath;
    public static String        Map_Player_Label_ModelCursorSize;
-   public static String        Map_Player_Label_ModelCursorSize_Tooltip;
    public static String        Map_Player_Label_ModelSize;
    public static String        Map_Player_Label_Speed;
    public static String        Map_Player_Label_SpeedMultiplier;

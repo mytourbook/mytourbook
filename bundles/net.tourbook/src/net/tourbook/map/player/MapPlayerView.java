@@ -427,6 +427,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
              * Speed multiplier
              */
             _lblSpeedMultiplier = UI.createLabel(container, Messages.Map_Player_Label_SpeedMultiplier);
+            _lblSpeedMultiplier.setToolTipText(Messages.Map_Player_Label_SpeedMultiplier_Tooltip);
 
             _spinnerSpeedMultiplier = new Spinner(container, SWT.BORDER);
             _spinnerSpeedMultiplier.setToolTipText(Messages.Map_Player_Label_SpeedMultiplier_Tooltip);
@@ -466,7 +467,6 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
             _lblModelCursorSize = UI.createLabel(container, Messages.Map_Player_Label_ModelCursorSize);
 
             _spinnerModelCursorSize = new Spinner(container, SWT.BORDER);
-            _spinnerModelCursorSize.setToolTipText(Messages.Map_Player_Label_ModelCursorSize_Tooltip);
             _spinnerModelCursorSize.setMinimum(10);
             _spinnerModelCursorSize.setMaximum(10000);
             _spinnerModelCursorSize.setIncrement(10);
@@ -483,6 +483,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
              * Model turning angle
              */
             _lblTurningAngle = UI.createLabel(container, Messages.Map_Player_Label_TurningAngle);
+            _lblTurningAngle.setToolTipText(Messages.Map_Player_Label_TurningAngle_Tooltip);
 
             _spinnerTurningMultiplier = new Spinner(container, SWT.BORDER);
             _spinnerTurningMultiplier.setToolTipText(Messages.Map_Player_Label_TurningAngle_Tooltip);
@@ -540,7 +541,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       _actionPlayControl_PlayAndPause     .setEnabled(canShowMapModel);
       _actionShowMapModel                 .setEnabled(canShowMapModel);
       _actionShowMapModelCursor           .setEnabled(canShowMapModel);
-      _actionSlideoutMapModel             .setEnabled(canEditModelOrCursor);
+      _actionSlideoutMapModel             .setEnabled(canEditMapModel);
 
       _lblModelCursorSize                 .setEnabled(canEditMapModelCursor);
       _lblModelSize                       .setEnabled(canEditMapModel);
@@ -1160,12 +1161,17 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       Color bgColor;
 
       if (movingSpeed == 0) {
+
          fgColor = ThemeUtil.getDefaultForegroundColor_Shell();
          bgColor = ThemeUtil.getDefaultBackgroundColor_Table();
+
       } else if (movingSpeed > 0) {
+
          fgColor = UI.SYS_COLOR_WHITE;
          bgColor = JOG_WHEEL_COLOR_GREATER_0;
+
       } else {
+
          fgColor = UI.SYS_COLOR_WHITE;
          bgColor = JOG_WHEEL_COLOR_LESS_0;
       }
