@@ -1743,15 +1743,15 @@ public class TourInfoUI {
          _lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
       }
 
-      int windSpeed = _tourData.getWeather_Wind_Speed();
-      windSpeed = (int) (windSpeed / UI.UNIT_VALUE_DISTANCE);
-
-      _lblWindSpeed.setText(Integer.toString(windSpeed));
-      _lblWindSpeedUnit.setText(
-            String.format(
-                  Messages.Tour_Tooltip_Format_WindSpeedUnit,
-                  UI.UNIT_LABEL_SPEED,
-                  IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
+      final int windSpeed = (int) (_tourData.getWeather_Wind_Speed() / UI.UNIT_VALUE_DISTANCE);
+      if (windSpeed > 0) {
+         _lblWindSpeed.setText(Integer.toString(windSpeed));
+         _lblWindSpeedUnit.setText(
+               String.format(
+                     Messages.Tour_Tooltip_Format_WindSpeedUnit,
+                     UI.UNIT_LABEL_SPEED,
+                     IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
+      }
 
       // wind direction
       final int weatherWindDirectionDegree = _tourData.getWeather_Wind_Direction();
