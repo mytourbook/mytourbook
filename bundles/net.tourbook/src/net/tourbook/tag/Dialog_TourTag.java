@@ -79,8 +79,6 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
    private Label  _canvasTagImage;
 
-   private Label  _lblInvalidImageError;
-
    private Text   _txtNotes;
    private Text   _txtName;
 
@@ -201,12 +199,6 @@ public class Dialog_TourTag extends TitleAreaDialog {
                GridDataFactory.fillDefaults()
                      .align(SWT.LEFT, SWT.CENTER)
                      .applyTo(_btnDeleteImage);
-
-               _lblInvalidImageError = new Label(imageContainer, SWT.WRAP);
-               GridDataFactory.fillDefaults().align(SWT.LEFT, SWT.BEGINNING)
-                     .hint(_pc.convertWidthInCharsToPixels(75), SWT.DEFAULT)
-                     .span(2, 1)
-                     .applyTo(_lblInvalidImageError);
             }
          }
          {
@@ -326,13 +318,12 @@ public class Dialog_TourTag extends TitleAreaDialog {
    private void setTagImage(final String imageFilePath) {
 
       Image image = _imageCamera;
-      _lblInvalidImageError.setText(UI.EMPTY_STRING);
 
       if (StringUtils.hasContent(imageFilePath)) {
 
          if (!Files.exists(Paths.get(imageFilePath))) {
 
-            _lblInvalidImageError.setText(NLS.bind(
+            setErrorMessage(NLS.bind(
                   Messages.Dialog_TourTag_Label_ImageNotFound,
                   imageFilePath));
          } else {
