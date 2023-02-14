@@ -20,10 +20,12 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourTag;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -67,6 +69,8 @@ public class Dialog_TourTag extends TitleAreaDialog {
     * UI resources
     */
    private PixelConverter _pc;
+   private Image          _imageCamera;
+   private Image          _imageTrash;
 
    /*
     * UI controls
@@ -103,7 +107,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
       // set window title
       shell.setText(Messages.Dialog_TourTag_Title);
 
-      shell.addDisposeListener(disposeEvent -> onDispose());
+      shell.addDisposeListener(disposeEvent -> dispose());
    }
 
    @Override
@@ -130,6 +134,9 @@ public class Dialog_TourTag extends TitleAreaDialog {
       _pc = new PixelConverter(parent);
 
       final Composite dlgContainer = (Composite) super.createDialogArea(parent);
+
+      _imageCamera = TourbookPlugin.getImageDescriptor(Images.Camera).createImage();
+      _imageTrash = TourbookPlugin.getImageDescriptor(Images.App_Trash_Themed).createImage();
 
       createUI(dlgContainer);
 
@@ -170,6 +177,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
             _canvasTagImage = new Label(container, SWT.NONE);
             GridDataFactory.fillDefaults()//
+                  .hint(_pc.convertWidthInCharsToPixels(12), _pc.convertWidthInCharsToPixels(12))
                   .applyTo(_canvasTagImage);
 
             final Composite imageContainer = new Composite(container, SWT.NONE);
@@ -187,8 +195,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
                      .applyTo(btnSelectImage);
 
                _btnDeleteImage = new Button(imageContainer, SWT.PUSH);
-               _btnDeleteImage.setImage(TourbookPlugin.getImageDescriptor(
-                     net.tourbook.Images.App_Trash_Themed).createImage());
+               _btnDeleteImage.setImage(_imageTrash);
                _btnDeleteImage.addSelectionListener(widgetSelectedAdapter(
                      selectionEvent -> onDeleteImage()));
                GridDataFactory.fillDefaults()
@@ -216,6 +223,23 @@ public class Dialog_TourTag extends TitleAreaDialog {
                   .applyTo(_txtNotes);
          }
       }
+   }
+
+   private void dispose() {
+
+      disposeCanvasTagImage();
+
+      Util.disposeResource(_imageCamera);
+      Util.disposeResource(_imageTrash);
+   }
+
+   private void disposeCanvasTagImage() {
+
+      if (_canvasTagImage == null ||
+            _canvasTagImage.getImage() == _imageCamera) {
+         return;
+      }
+      Util.disposeResource(_canvasTagImage.getImage());
    }
 
    private void enableControls() {
@@ -250,20 +274,11 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       _imageFilePath = null;
 
+      disposeCanvasTagImage();
+
       setTagImage(null);
 
       enableControls();
-   }
-
-   private void onDispose() {
-
-      if (_canvasTagImage == null ||
-            _canvasTagImage.getImage() == null ||
-            _canvasTagImage.isDisposed()) {
-         return;
-      }
-
-      _canvasTagImage.dispose();
    }
 
    private void onSelectImage() {
@@ -310,8 +325,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
    private void setTagImage(final String imageFilePath) {
 
-      Image image =
-            TourbookPlugin.getImageDescriptor(net.tourbook.Images.Camera).createImage();
+      Image image = _imageCamera;
       _lblInvalidImageError.setText(UI.EMPTY_STRING);
 
       if (StringUtils.hasContent(imageFilePath)) {
@@ -327,6 +341,10 @@ public class Dialog_TourTag extends TitleAreaDialog {
             image = net.tourbook.ui.UI.prepareTagImage(_imageFilePath);
          }
       }
+
+      //Before setting a new image, we make sure that the previous one was
+      //disposed
+      disposeCanvasTagImage();
 
       _canvasTagImage.setImage(image);
    }

@@ -20,7 +20,6 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileFilter;
 
 import net.tourbook.common.UI;
@@ -29,7 +28,6 @@ import net.tourbook.common.util.ImageConverter;
 import org.apache.commons.imaging.Imaging;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -51,15 +49,12 @@ public class ImageUtils {
 
    static {
 
-      final IPropertyChangeListener _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      final IPropertyChangeListener _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(IPhotoPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY)) {
-               _isRotateImageAutomatically = (Boolean) event.getNewValue();
-            }
+         if (property.equals(IPhotoPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY)) {
+            _isRotateImageAutomatically = (Boolean) propertyChangeEvent.getNewValue();
          }
       };
 
@@ -68,33 +63,30 @@ public class ImageUtils {
 
    public static FileFilter createImageFileFilter() {
 
-      return new FileFilter() {
-         @Override
-         public boolean accept(final File pathname) {
+      return pathname -> {
 
-            if (pathname.isDirectory()) {
-               return false;
-            }
-
-            if (pathname.isHidden()) {
-               return false;
-            }
-
-            final String name = pathname.getName();
-            if (name == null || name.length() == 0) {
-               return false;
-            }
-
-            if (name.startsWith(UI.SYMBOL_DOT)) {
-               return false;
-            }
-
-            if (Imaging.hasImageFileExtension(pathname)) {
-               return true;
-            }
-
+         if (pathname.isDirectory()) {
             return false;
          }
+
+         if (pathname.isHidden()) {
+            return false;
+         }
+
+         final String name = pathname.getName();
+         if (name == null || name.length() == 0) {
+            return false;
+         }
+
+         if (name.startsWith(UI.SYMBOL_DOT)) {
+            return false;
+         }
+
+         if (Imaging.hasImageFileExtension(pathname)) {
+            return true;
+         }
+
+         return false;
       };
    }
 
@@ -353,6 +345,8 @@ public class ImageUtils {
       // puts the original image into the newResizedImage
       graphics2D.drawImage(originalImage, 0, 0, newWidth, newHeight, null);
       graphics2D.dispose();
+
+      image.dispose();
 
       return ImageConverter.convertIntoSWT(newResizedImage);
    }

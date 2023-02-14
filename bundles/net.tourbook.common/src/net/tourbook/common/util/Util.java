@@ -652,6 +652,7 @@ public class Util {
    }
 
    public static Resource disposeResource(final Resource resource) {
+
       if (resource != null && !resource.isDisposed()) {
          resource.dispose();
       }
