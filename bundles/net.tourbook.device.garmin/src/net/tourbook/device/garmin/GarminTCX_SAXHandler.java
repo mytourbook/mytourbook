@@ -1230,10 +1230,6 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
                         _isInDistance = true;
                         _characters.delete(0, _characters.length());
 
-                     } else if (name.equals(TAG_CALORIES)) {
-
-                        _isInCalories = true;
-                        _characters.delete(0, _characters.length());
                      }
                   } else if (name.equals(TAG_TRACK)) {
 
