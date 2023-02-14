@@ -15,7 +15,6 @@
  *******************************************************************************/
 package net.tourbook.export.fit;
 
-import com.garmin.fit.Activity;
 import com.garmin.fit.ActivityMesg;
 import com.garmin.fit.DateTime;
 import com.garmin.fit.DeveloperDataIdMesg;
@@ -30,7 +29,6 @@ import com.garmin.fit.File;
 import com.garmin.fit.FileEncoder;
 import com.garmin.fit.FileIdMesg;
 import com.garmin.fit.Fit;
-import com.garmin.fit.Fit.ProtocolVersion;
 import com.garmin.fit.FitBaseType;
 import com.garmin.fit.FitRuntimeException;
 import com.garmin.fit.Gender;
@@ -53,7 +51,10 @@ import java.util.TimeZone;
 //todo fb: Add unit test -> convert to csv and use it for comparison
 public class FitExporter {
 
-   public static void CreateActivityFile(final List<Mesg> messages, final String filename, final DateTime startTime) {
+   private static void CreateActivityFile(final List<Mesg> messages,
+                                          final String filename,
+                                          final DateTime startTime) {
+
       // The combination of file type, manufacturer id, product id, and serial number should be unique.
       // When available, a non-random serial number should be used.
       final File fileType = File.ACTIVITY;
@@ -93,6 +94,13 @@ public class FitExporter {
           return;
       }
 
+      final UserProfileMesg userProfileMesg = new UserProfileMesg();
+      userProfileMesg.setGender(Gender.FEMALE);
+      userProfileMesg.setWeight(63.1F);
+      userProfileMesg.setAge((short) 99);
+      userProfileMesg.setFriendlyName("TestUser");
+      encode.write(userProfileMesg);
+
       encode.write(fileIdMesg);
       encode.write(deviceInfoMesg);
 
@@ -111,10 +119,10 @@ public class FitExporter {
       System.out.println("Encoded FIT Activity file " + filename);
   }
 
-   private void example() {
+   private void example(final String filePath) {
+
       final double twoPI = Math.PI * 2.0;
       final double semiCirclesPerMeter = 107.173;
-      final String filename = "ActivityEncodeRecipe.fit";
 
       final List<Mesg> messages = new ArrayList<>();
 
@@ -180,8 +188,8 @@ public class FitExporter {
          recordMesg.setCadence((short) (i % 255)); // Sawtooth
          recordMesg.setPower(((short) (i % 255) < 157 ? 150 : 250)); //Square
          recordMesg.setAltitude((float) (Math.abs(i % 255.0) - 127.0)); // Triangle
-         recordMesg.setPositionLat(0);
-         recordMesg.setPositionLong((int) Math.round(i * semiCirclesPerMeter));
+         recordMesg.setPositionLat(480457070 + i);
+         recordMesg.setPositionLong((int) Math.round(i * semiCirclesPerMeter) + -1259320222);
 
          // Add a Developer Field to the Record Message
          final DeveloperField hrDevField = new DeveloperField(hrFieldDescMesg, developerIdMesg);
@@ -239,67 +247,11 @@ public class FitExporter {
       activityMesg.setTotalTimerTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
       messages.add(activityMesg);
 
-      CreateActivityFile(messages, filename, startTime);
+      CreateActivityFile(messages, filePath, startTime);
    }
 
    public void export(final String filePath) {
 
-      System.out.printf("FIT Encode Example Application - Protocol %d.%d Profile %.2f %s\n",
-            Fit.PROTOCOL_VERSION_MAJOR,
-            Fit.PROTOCOL_VERSION_MINOR,
-            Fit.PROFILE_VERSION / 100.0,
-            Fit.PROFILE_TYPE);
-
-      FileEncoder encode;
-
-      try {
-         encode = new FileEncoder(new java.io.File(filePath), ProtocolVersion.V2_0);
-      } catch (final FitRuntimeException e) {
-         System.err.println("Error opening file ExampleSettings.fit");
-         return;
-      }
-
-      //Generate FileIdMessage
-      final FileIdMesg fileIdMesg = new FileIdMesg(); // Every FIT file MUST contain a 'File ID' message as the first message
-      fileIdMesg.setManufacturer(Manufacturer.DYNASTREAM);
-      fileIdMesg.setType(File.ACTIVITY);
-      //fileIdMesg.setProduct(1000);
-      // fileIdMesg.setSerialNumber(12345L);
-
-//      final RecordMesg recordMesg = new RecordMesg();
-//      final Field field = new Field("timestamp",
-//            978538286,
-//            0,
-//            "position_lat",
-//            "480457070",
-//            "semicircles",
-//            "position_long",
-//            "-1259320222",
-//            "semicircles");
-//      recordMesg.addField(field);
-
-      final ActivityMesg toto = new ActivityMesg();
-      toto.setType(Activity.MANUAL);
-      encode.write(toto); // Encode the FileIDMesg
-
-      encode.write(fileIdMesg); // Encode the FileIDMesg
-
-      //Generate UserProfileMesg
-      final UserProfileMesg userProfileMesg = new UserProfileMesg();
-      userProfileMesg.setGender(Gender.FEMALE);
-      userProfileMesg.setWeight(63.1F);
-      userProfileMesg.setAge((short) 99);
-      userProfileMesg.setFriendlyName("TestUser");
-
-      encode.write(userProfileMesg); // Encode the UserProfileMesg
-
-      try {
-         encode.close();
-      } catch (final FitRuntimeException e) {
-         System.err.println("Error closing encode.");
-         return;
-      }
-
-      System.out.println("Encoded FIT file ExampleSettings.fit.");
+     example(filePath);
    }
 }
