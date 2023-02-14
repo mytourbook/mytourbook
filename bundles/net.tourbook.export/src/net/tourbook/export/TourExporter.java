@@ -335,7 +335,7 @@ public class TourExporter {
    } else if (_isFIT) {
 
       final FitExporter fitExporter = new FitExporter();
-      fitExporter.export(exportFileName);
+      fitExporter.export(_tourData, exportFileName);
    }
 
       return true;
