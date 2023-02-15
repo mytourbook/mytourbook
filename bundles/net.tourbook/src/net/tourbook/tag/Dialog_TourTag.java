@@ -181,6 +181,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
             final Composite imageContainer = new Composite(container, SWT.NONE);
             GridDataFactory.fillDefaults()//
                   .span(2, 1)
+                  .align(SWT.RIGHT, SWT.TOP)
                   .applyTo(imageContainer);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(imageContainer);
             {
@@ -189,7 +190,6 @@ public class Dialog_TourTag extends TitleAreaDialog {
                btnSelectImage.addSelectionListener(widgetSelectedAdapter(
                      selectionEvent -> onSelectImage()));
                GridDataFactory.fillDefaults()
-                     .align(SWT.LEFT, SWT.CENTER)
                      .applyTo(btnSelectImage);
 
                _btnDeleteImage = new Button(imageContainer, SWT.PUSH);
@@ -197,7 +197,6 @@ public class Dialog_TourTag extends TitleAreaDialog {
                _btnDeleteImage.addSelectionListener(widgetSelectedAdapter(
                      selectionEvent -> onDeleteImage()));
                GridDataFactory.fillDefaults()
-                     .align(SWT.LEFT, SWT.CENTER)
                      .applyTo(_btnDeleteImage);
             }
          }
@@ -316,6 +315,8 @@ public class Dialog_TourTag extends TitleAreaDialog {
    }
 
    private void setTagImage(final String imageFilePath) {
+
+      setErrorMessage(null);
 
       Image image = _imageCamera;
 
