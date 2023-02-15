@@ -573,20 +573,18 @@ public class GarminTCX_SAXHandler extends DefaultHandler {
 
             _isInCalories = false;
 
-               /* every lap has a calorie value */
-               _lapCalories += Util.parseFloat(_characters.toString());
-               _characters.delete(0, _characters.length());
-
+            /* every lap has a calorie value */
+            _lapCalories += Util.parseFloat(_characters.toString());
+            _characters.delete(0, _characters.length());
 
          } else if (name.equals(TAG_TPX_AVERAGEWATTS)) {
 
             _isInTPX_AverageWatts = false;
 
+            _lapAverageWatts += Util.parseFloat(_characters.toString());
+            _characters.delete(0, _characters.length());
 
-               _lapAverageWatts += Util.parseFloat(_characters.toString());
-               _characters.delete(0, _characters.length());
-
-               _isComputeAveragePower = false;
+            _isComputeAveragePower = false;
 
          } else if (name.equals(TAG_TRACK)) {
 
