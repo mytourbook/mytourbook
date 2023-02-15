@@ -982,17 +982,28 @@ public class UI {
     * @param weight
     *           The user's weight in kilograms or pounds.
     * @param height
-    *           The user's height in meters or inches.
+    *           The user's height in meters or feet.
+    * @param heightInches
+    *           The second part of the user's height in inches if the measurement
+    *           system is in inches.
     * @return The BMI value.
     */
-   public static float computeBodyMassIndex(double weight, double height) {
+   public static float computeBodyMassIndex(double weight, double height, final int heightInches) {
 
       if (UNIT_IS_LENGTH_SMALL_INCH) {
-         height = height / UNIT_INCH / 1000;
+
+         height *= 12;
+         height += heightInches;
+         height = height / UNIT_INCH / 10;
+         height = Math.round(height * 10 / 10);
       }
       if (UNIT_IS_WEIGHT_POUND) {
+
          weight /= UNIT_VALUE_WEIGHT;
+         weight = Math.round(weight * 10 / 10);
       }
+
+      height = height / 100;
 
       final double bmi = height == 0 ? 0 : weight / Math.pow(height, 2);
 

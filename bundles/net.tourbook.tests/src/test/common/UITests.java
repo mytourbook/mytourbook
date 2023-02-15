@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public class UITests {
@@ -50,21 +51,22 @@ public class UITests {
    }
 
    @Test
+   @DisplayName("Body Mass Index for all the measurement systems")
    void testComputeBodyMassIndex() {
 
       setMetricSystem();
       //70kg and 1.80m => 21.6 BMI
-      assertEquals(21.6f, UI.computeBodyMassIndex(70, 1.80));
+      assertEquals(21.6f, UI.computeBodyMassIndex(70, 180, 0));
 
       setImperialSystem();
       //154.3lbs and 70.9in => 21.6 BMI
-      assertEquals(21.6f, UI.computeBodyMassIndex(154.3, 70.9));
+      assertEquals(22.9f, UI.computeBodyMassIndex(154.3, 5, 9));
 
       //100lbs and 4ft10in (58in) => 20.9 BMI
-      assertEquals(20.9f, UI.computeBodyMassIndex(100, 58));
+      assertEquals(20.8f, UI.computeBodyMassIndex(100, 4, 10));
 
       //100lbs and 0in => 0 BMI
-      assertEquals(0, UI.computeBodyMassIndex(100, 0));
+      assertEquals(0, UI.computeBodyMassIndex(100, 0, 0));
    }
 
    @Test

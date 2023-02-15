@@ -71,6 +71,9 @@ Bugfix
 * Concatenate Tours (Frederic)
   - Fixed a bug where the markers and pause times in the concatenated tour had erroneous time values
 
+* People Preference Page (Frederic)
+  - Fixed an issue where the BMI (Body Mass Index) would be erroneous whenever the measurement system is not in metric
+
 
 Translation    
 ===========
