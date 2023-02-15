@@ -1306,6 +1306,10 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Dialog_ValidationAddName;
    public static String        Map_Bookmark_Dialog_ValidationRename;
 
+   public static String        Map_Model_Name_Bicycle;
+   public static String        Map_Model_Name_HighWheeler;
+   public static String        Map_Model_Name_Skateboard;
+
    public static String        Map_Player_Button_MapModel_Tooltip;
    public static String        Map_Player_Button_MapModelCursor_Tooltip;
    public static String        Map_Player_Button_Pause_Tooltip;

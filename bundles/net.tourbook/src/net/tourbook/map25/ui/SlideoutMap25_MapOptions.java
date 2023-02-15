@@ -206,7 +206,9 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private void enableControls() {
 
       final boolean isMapCenter_VerticalPosition = _chkMapCenter_VerticalPosition.getSelection();
+      final boolean isBackgroundFPS = _chkIsBackgroundFPS.getSelection();
 
+      _spinnerBackgroundFPS.setEnabled(isBackgroundFPS);
       _spinnerMapCenter_VerticalPosition.setEnabled(isMapCenter_VerticalPosition);
    }
 
