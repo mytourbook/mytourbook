@@ -27,7 +27,7 @@
           />
 <MapModel 
           isDefaultModel      ="true"
-          name                ="Pictured bicycle"
+          name                ="Painted bicycle"
           description         ="Info for the original model which was modified for MyTourbook&#x0D;&#x0A;&#x0D;&#x0A;Model Information:&#x0D;&#x0A;* title:&#x09;2D Bike | Downloadable for first 10 users&#x0D;&#x0A;* source:&#x09;https://sketchfab.com/3d-models/2d-bike-downloadable-for-first-10-users-b2cf1d7d284f46e4b90def4889c4da24&#x0D;&#x0A;* author:&#x09;Sumit Chavan (https://sketchfab.com/sumit.chavan)&#x0D;&#x0A;&#x0D;&#x0A;Model License:&#x0D;&#x0A;* license type:&#x09;CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)&#x0D;&#x0A;* requirements:&#x09;Author must be credited. Commercial use is allowed.&#x0D;&#x0A;&#x0D;&#x0A;If you use this 3D model in your project be sure to copy paste this credit wherever you share it:&#x0D;&#x0A;This work is based on &quot;2D Bike | Downloadable for first 10 users&quot; (https://sketchfab.com/3d-models/2d-bike-downloadable-for-first-10-users-b2cf1d7d284f46e4b90def4889c4da24) by Sumit Chavan (https://sketchfab.com/sumit.chavan) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)"
           filePath            ="/map-models/simple-bicycle/simple-bicycle.gltf"
           forwardAngle        ="95"
