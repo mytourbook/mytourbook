@@ -21,6 +21,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.measurement_system.MeasurementSystem_Manager;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -28,6 +29,11 @@ import utils.UITest;
 import utils.Utils;
 
 public class PrefPagePeopleTests extends UITest {
+
+   @AfterAll
+   static void cleanUp() {
+      setMetricSystem();
+   }
 
    private static void setMetricSystem() {
 
