@@ -1,4 +1,4 @@
-23.3.0                                                 ?. March 2023
+23.next.0                                                 ?. March 2023
 
 
 TODO's
@@ -26,25 +26,14 @@ Experimental
 New
 ===
 
-2.5D Map
-  - Show an animated 3D model which is moving along the tour track
-  - A new map model player is managing the moving model
+*
   
   
 
 Improvements
 ============
 
-Tour Filter
-  - Filter tours by "Most Recent", e.g. show tours for the last 15 months
-    https://github.com/mytourbook/mytourbook/issues/976
-
-Tour Editor
-  - Keep distance values when time slices are deleted
-    https://github.com/mytourbook/mytourbook/issues/986
-  
-4k Display
-  - Increased cursor size in Tour Chart and 2D Map, when displayed on 4k displays
+*
 
 
 Changes
