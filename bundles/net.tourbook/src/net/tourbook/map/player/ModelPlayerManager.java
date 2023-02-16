@@ -454,14 +454,6 @@ public class ModelPlayerManager {
    }
 
    /**
-    * @return Returns the track data for the currently played tour
-    */
-   public static ModelPlayerData getModelPlayerData() {
-
-      return _modelPlayerData;
-   }
-
-   /**
     * @return Returns the angle for the model forward direction
     */
    public static float getModelAngle() {
@@ -471,6 +463,14 @@ public class ModelPlayerManager {
 
    public static short getModelCursorSize() {
       return (short) _modelCursorSize;
+   }
+
+   /**
+    * @return Returns the track data for the currently played tour
+    */
+   public static ModelPlayerData getModelPlayerData() {
+
+      return _modelPlayerData;
    }
 
    public static int getModelSize() {
@@ -1119,7 +1119,7 @@ public class ModelPlayerManager {
    }
 
    /**
-    * Setup map player with all necessary data to run the animation.
+    * Setup model player with all necessary data to run the animation.
     * <p>
     * This method is called when new data are set into the shader buffer data, for a new zoom level
     * or when map is moved more than a tile

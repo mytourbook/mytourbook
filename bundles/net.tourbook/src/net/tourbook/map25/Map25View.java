@@ -2363,7 +2363,7 @@ public class Map25View extends ViewPart implements
       final long timeDiffLastFiredSync = currentTimeMillis - _lastFiredSyncEventTime;
       if (timeDiffLastFiredSync < 1000
 
-            // accept all sync events from the map player
+            // accept all sync events from the model player
             && (viewPart instanceof ModelPlayerView) == false) {
 
          // ignore because it causes LOTS of problems when synching moved map
