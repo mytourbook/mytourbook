@@ -37,7 +37,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.map.bookmark.MapBookmarkManager;
-import net.tourbook.map.player.MapPlayerManager;
+import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.map3.view.Map3State;
 import net.tourbook.photo.PhotoUI;
@@ -542,7 +542,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       TourGeoFilter_Manager.saveState();
       TourPhotoManager.saveState();
       MapBookmarkManager.saveState();
-      MapPlayerManager.saveState();
+      ModelPlayerManager.saveState();
       SwimStrokeManager.saveState();
 
       FTSearchManager.closeIndexReaderSuggester();

@@ -22,7 +22,7 @@ import org.oscim.core.MercatorProjection;
 /**
  * Data for the map animation player
  */
-public class MapPlayerData {
+public class ModelPlayerData {
 
    private static final String NL = UI.NEW_LINE;
 
@@ -76,7 +76,7 @@ public class MapPlayerData {
 
       return UI.EMPTY_STRING
 
-            + "MapPlayerData" + NL //                                                                 //$NON-NLS-1$
+            + "ModelPlayerData" + NL //                                                                 //$NON-NLS-1$
 
             + "[" + NL //                                                                             //$NON-NLS-1$
 

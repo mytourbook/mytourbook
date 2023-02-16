@@ -27,12 +27,12 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.commands.IElementUpdater;
 import org.eclipse.ui.menus.UIElement;
 
-public class ActionHandler_OpenView_MapPlayer extends AbstractHandler implements IElementUpdater {
+public class ActionHandler_OpenView_ModelPlayer extends AbstractHandler implements IElementUpdater {
 
    @Override
    public Object execute(final ExecutionEvent event) throws ExecutionException {
 
-      Util.showView(MapPlayerView.ID, true);
+      Util.showView(ModelPlayerView.ID, true);
 
       return null;
    }
@@ -41,6 +41,6 @@ public class ActionHandler_OpenView_MapPlayer extends AbstractHandler implements
    @Override
    public void updateElement(final UIElement uiElement, final Map parameters) {
 
-      UI.setThemedIcon(uiElement, Images.MapPlayer);
+      UI.setThemedIcon(uiElement, Images.ModelPlayer);
    }
 }

@@ -61,9 +61,9 @@ import org.eclipse.ui.part.ViewPart;
 import org.oscim.core.MapPosition;
 import org.oscim.renderer.GLViewport;
 
-public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
+public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
-   public static final String           ID     = "net.tourbook.map.player.MapPlayerView"; //$NON-NLS-1$
+   public static final String           ID     = "net.tourbook.map.player.ModelPlayerView"; //$NON-NLS-1$
    //
    private static final IDialogSettings _state = TourbookPlugin.getState(ID);
    //
@@ -175,7 +175,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       @Override
       public void run() {
 
-         MapPlayerManager.setIsMapModelVisible(this.isChecked());
+         ModelPlayerManager.setIsMapModelVisible(this.isChecked());
 
          enableControls();
       }
@@ -197,7 +197,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       @Override
       public void run() {
 
-         MapPlayerManager.setIsMapModelCursorVisible(this.isChecked());
+         ModelPlayerManager.setIsMapModelCursorVisible(this.isChecked());
 
          enableControls();
       }
@@ -235,7 +235,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
          @Override
          public void partActivated(final IWorkbenchPartReference partRef) {
 
-            if (partRef.getPart(false) == MapPlayerView.this) {
+            if (partRef.getPart(false) == ModelPlayerView.this) {
                Map25FPSManager.setBackgroundFPSToAnimationFPS(true);
             }
          }
@@ -249,7 +249,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
          @Override
          public void partDeactivated(final IWorkbenchPartReference partRef) {
 
-            if (partRef.getPart(false) == MapPlayerView.this) {
+            if (partRef.getPart(false) == ModelPlayerView.this) {
                Map25FPSManager.setBackgroundFPSToAnimationFPS(false);
             }
          }
@@ -315,7 +315,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
          enableControls();
 
-         MapPlayerManager.setMapPlayerView(this);
+         ModelPlayerManager.setModelPlayerView(this);
 
          updatePlayer_InUIThread();
       });
@@ -392,7 +392,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
          {
             _scaleSpeedJogWheel = new Scale(container, SWT.HORIZONTAL);
             _scaleSpeedJogWheel.setMinimum(0);
-            _scaleSpeedJogWheel.setMaximum(MapPlayerManager.SPEED_JOG_WHEEL_MAX);
+            _scaleSpeedJogWheel.setMaximum(ModelPlayerManager.SPEED_JOG_WHEEL_MAX);
             _scaleSpeedJogWheel.setPageIncrement(4);
             _scaleSpeedJogWheel.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSpeedJogWheel_Selection()));
             _scaleSpeedJogWheel.addKeyListener(keyPressedAdapter(keyEvent -> onSpeedJogWheel_Key(keyEvent)));
@@ -519,7 +519,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       getViewSite().getPage().removePartListener(_partListener);
 
-      MapPlayerManager.setMapPlayerView(null);
+      ModelPlayerManager.setModelPlayerView(null);
 
       super.dispose();
    }
@@ -528,9 +528,9 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
 // SET_FORMATTING_OFF
 
-      final boolean canShowMapModel          = MapPlayerManager.canShowMapModel();
-      final boolean isMapModelVisible        = MapPlayerManager.isMapModelVisible();
-      final boolean isMapModelCursorVisible  = MapPlayerManager.isMapModelCursorVisible();
+      final boolean canShowMapModel          = ModelPlayerManager.canShowMapModel();
+      final boolean isMapModelVisible        = ModelPlayerManager.isMapModelVisible();
+      final boolean isMapModelCursorVisible  = ModelPlayerManager.isMapModelCursorVisible();
 
       final boolean canEditMapModel          = canShowMapModel && isMapModelVisible;
       final boolean canEditMapModelCursor    = canShowMapModel && isMapModelCursorVisible;
@@ -592,12 +592,12 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
     */
    private void fireMapPosition() {
 
-      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
-      if (mapPlayerData == null) {
+      final ModelPlayerData modelPlayerData = ModelPlayerManager.getModelPlayerData();
+      if (modelPlayerData == null) {
          return;
       }
 
-      final int[] allNotClipped_GeoLocationIndices = mapPlayerData.allNotClipped_GeoLocationIndices;
+      final int[] allNotClipped_GeoLocationIndices = modelPlayerData.allNotClipped_GeoLocationIndices;
       final int numNotClippedPositions = allNotClipped_GeoLocationIndices.length;
 
       if (numNotClippedPositions == 0) {
@@ -606,7 +606,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       final double relativePosition = getTimelineRelativePosition();
 
-      final float[] allDistanceSeries = mapPlayerData.allDistanceSeries;
+      final float[] allDistanceSeries = modelPlayerData.allDistanceSeries;
       final int lastDistanceIndex = allDistanceSeries.length - 1;
 
       final float totalDistance = allDistanceSeries[lastDistanceIndex];
@@ -614,17 +614,17 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       final int distanceIndex = MtMath.searchIndex(allDistanceSeries, positionDistance);
 
-      final MapPosition mapPosition = fireMapPosition_CreateProjectedMapPosition(mapPlayerData, distanceIndex);
+      final MapPosition mapPosition = fireMapPosition_CreateProjectedMapPosition(modelPlayerData, distanceIndex);
 
       MapManager.fireSyncMapEvent(mapPosition, this, null);
    }
 
-   private MapPosition fireMapPosition_CreateProjectedMapPosition(final MapPlayerData mapPlayerData, final int geoLocationIndex) {
+   private MapPosition fireMapPosition_CreateProjectedMapPosition(final ModelPlayerData modelPlayerData, final int geoLocationIndex) {
 
       final int projectedIndex = geoLocationIndex * 2;
 
-      final double projectedPositionX = mapPlayerData.allProjectedPoints_NormalTrack[projectedIndex];
-      final double projectedPositionY = mapPlayerData.allProjectedPoints_NormalTrack[projectedIndex + 1];
+      final double projectedPositionX = modelPlayerData.allProjectedPoints_NormalTrack[projectedIndex];
+      final double projectedPositionY = modelPlayerData.allProjectedPoints_NormalTrack[projectedIndex + 1];
 
       final MapPosition mapPosition = new MapPosition();
 
@@ -714,18 +714,18 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       final boolean isPlayingLoop = _actionPlayControl_Loop.isChecked();
 
-      MapPlayerManager.setIsPlayingLoop(isPlayingLoop);
+      ModelPlayerManager.setIsPlayingLoop(isPlayingLoop);
 
       if (isPlayingLoop
-            && MapPlayerManager.isPlayerRunning() == false
-            && MapPlayerManager.isLastFrame()) {
+            && ModelPlayerManager.isPlayerRunning() == false
+            && ModelPlayerManager.isLastFrame()) {
 
          // start new anmimation
 
          setTimelineSelection(0);
          setMapAndModelPosition(0);
 
-         MapPlayerManager.setIsPlayerRunning(true);
+         ModelPlayerManager.setIsPlayerRunning(true);
 
          updateUI_PlayAndPausedControls();
       }
@@ -738,22 +738,22 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
    private void onSelect_ModelCursorSize() {
 
-      MapPlayerManager.setModelCursorSize(_spinnerModelCursorSize.getSelection());
+      ModelPlayerManager.setModelCursorSize(_spinnerModelCursorSize.getSelection());
    }
 
    private void onSelect_ModelSize() {
 
-      MapPlayerManager.setModelSize(_spinnerModelSize.getSelection());
+      ModelPlayerManager.setModelSize(_spinnerModelSize.getSelection());
    }
 
    private void onSelect_ReLivePlaying() {
 
-      MapPlayerManager.setIsReLivePlaying(_chkIsRelivePlaying.getSelection());
+      ModelPlayerManager.setIsReLivePlaying(_chkIsRelivePlaying.getSelection());
    }
 
    private void onSelect_SpeedMultiplier() {
 
-      MapPlayerManager.setSpeedMultiplier(_spinnerSpeedMultiplier.getSelection());
+      ModelPlayerManager.setSpeedMultiplier(_spinnerSpeedMultiplier.getSelection());
 
       // adjust timeline
       updateUI_TimelineMaxValue();
@@ -761,7 +761,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
    private void onSelect_TurningAngle() {
 
-      MapPlayerManager.setTurningAngle(_spinnerTurningMultiplier.getSelection());
+      ModelPlayerManager.setTurningAngle(_spinnerTurningMultiplier.getSelection());
    }
 
    private void onSpeedJogWheel_Key(final KeyEvent keyEvent) {
@@ -769,23 +769,23 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       final int eventKeyCode = keyEvent.keyCode;
 
       final int jogWheelSelection = _scaleSpeedJogWheel.getSelection();
-      final int jogWheelSpeed = jogWheelSelection - MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF;
+      final int jogWheelSpeed = jogWheelSelection - ModelPlayerManager.SPEED_JOG_WHEEL_MAX_HALF;
 
       boolean isJogWheelSelected = false;
 
       if (eventKeyCode == ' ') {
 
-         if (MapPlayerManager.isPlayerRunning()) {
+         if (ModelPlayerManager.isPlayerRunning()) {
 
             // stop running
 
-            MapPlayerManager.setIsPlayerRunning(false);
+            ModelPlayerManager.setIsPlayerRunning(false);
 
          } else {
 
             // start running
 
-            MapPlayerManager.setIsPlayerRunning(true);
+            ModelPlayerManager.setIsPlayerRunning(true);
          }
 
          updateUI_PlayAndPausedControls();
@@ -794,10 +794,10 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
          // select speed 0
 
-         MapPlayerManager.setIsPlayerRunning(false);
+         ModelPlayerManager.setIsPlayerRunning(false);
          updateUI_PlayAndPausedControls();
 
-         setJogWheel_Value(MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF);
+         setJogWheel_Value(ModelPlayerManager.SPEED_JOG_WHEEL_MAX_HALF);
 
          isJogWheelSelected = true;
 
@@ -809,7 +809,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
             // select speed 0
 
-            setJogWheel_Value(MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF);
+            setJogWheel_Value(ModelPlayerManager.SPEED_JOG_WHEEL_MAX_HALF);
 
             isJogWheelSelected = true;
 
@@ -830,15 +830,15 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
             // select speed 0
 
-            setJogWheel_Value(MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF);
+            setJogWheel_Value(ModelPlayerManager.SPEED_JOG_WHEEL_MAX_HALF);
 
             isJogWheelSelected = true;
 
-         } else if (jogWheelSpeed > 0 && jogWheelSpeed < MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF) {
+         } else if (jogWheelSpeed > 0 && jogWheelSpeed < ModelPlayerManager.SPEED_JOG_WHEEL_MAX_HALF) {
 
             // select speed max
 
-            setJogWheel_Value(MapPlayerManager.SPEED_JOG_WHEEL_MAX);
+            setJogWheel_Value(ModelPlayerManager.SPEED_JOG_WHEEL_MAX);
 
             isJogWheelSelected = true;
          }
@@ -864,18 +864,18 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
    private void onSpeedJogWheel_Selection() {
 
       final int selectedSpeed = _scaleSpeedJogWheel.getSelection();
-      final int movingSpeed = selectedSpeed - MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF;
+      final int movingSpeed = selectedSpeed - ModelPlayerManager.SPEED_JOG_WHEEL_MAX_HALF;
 
       updateUI_JogWheel(selectedSpeed);
 
       // start playing when jog wheel is modified
-      if (movingSpeed != 0 && MapPlayerManager.isPlayerRunning() == false) {
+      if (movingSpeed != 0 && ModelPlayerManager.isPlayerRunning() == false) {
 
-         MapPlayerManager.setIsPlayerRunning(true);
+         ModelPlayerManager.setIsPlayerRunning(true);
          updateUI_PlayAndPausedControls();
       }
 
-      MapPlayerManager.setMovingSpeedFromJogWheel(selectedSpeed);
+      ModelPlayerManager.setMovingSpeedFromJogWheel(selectedSpeed);
    }
 
    private void onTimeline_Key(final KeyEvent keyEvent) {
@@ -968,18 +968,18 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
 // SET_FORMATTING_OFF
 
-      _actionPlayControl_Loop    .setChecked(MapPlayerManager.isPlayingLoop());
-      _actionShowMapModel        .setChecked(MapPlayerManager.isMapModelVisible());
-      _actionShowMapModelCursor  .setChecked(MapPlayerManager.isMapModelCursorVisible());
+      _actionPlayControl_Loop    .setChecked(ModelPlayerManager.isPlayingLoop());
+      _actionShowMapModel        .setChecked(ModelPlayerManager.isMapModelVisible());
+      _actionShowMapModelCursor  .setChecked(ModelPlayerManager.isMapModelCursorVisible());
 
-      _chkIsRelivePlaying        .setSelection(MapPlayerManager.isReLivePlaying());
+      _chkIsRelivePlaying        .setSelection(ModelPlayerManager.isReLivePlaying());
 
-      _spinnerModelCursorSize    .setSelection(MapPlayerManager.getModelCursorSize());
-      _spinnerModelSize          .setSelection(MapPlayerManager.getFixedModelSize());
+      _spinnerModelCursorSize    .setSelection(ModelPlayerManager.getModelCursorSize());
+      _spinnerModelSize          .setSelection(ModelPlayerManager.getModelSize());
 
 // SET_FORMATTING_ON
 
-      setJogWheel_Value(MapPlayerManager.getJogWheelSpeed());
+      setJogWheel_Value(ModelPlayerManager.getJogWheelSpeed());
 
       updateUI_PlayAndPausedControls();
    }
@@ -1013,7 +1013,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       fireMapPosition();
 
-      MapPlayerManager.setRelativePosition(relativeModelPosition);
+      ModelPlayerManager.setRelativePosition(relativeModelPosition);
    }
 
    private void setTimeline_Tooltip() {
@@ -1039,9 +1039,9 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
    private void stopPlayerWhenRunning() {
 
-      if (MapPlayerManager.isPlayerRunning()) {
+      if (ModelPlayerManager.isPlayerRunning()) {
 
-         MapPlayerManager.setIsPlayerRunning(false);
+         ModelPlayerManager.setIsPlayerRunning(false);
          updateUI_PlayAndPausedControls();
       }
    }
@@ -1051,16 +1051,16 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
     */
    private void togglePlayAndPaused() {
 
-      final boolean isPlayerRunning = MapPlayerManager.isPlayerRunning();
+      final boolean isPlayerRunning = ModelPlayerManager.isPlayerRunning();
 
-      if (isPlayerRunning == false && MapPlayerManager.isLastFrame()) {
+      if (isPlayerRunning == false && ModelPlayerManager.isLastFrame()) {
 
          // start new anmimation
 
          _scaleTimeline.setSelection(0);
 
-         MapPlayerManager.setIsPlayerRunning(true);
-         MapPlayerManager.setRelativePosition(0);
+         ModelPlayerManager.setIsPlayerRunning(true);
+         ModelPlayerManager.setRelativePosition(0);
 
       } else {
 
@@ -1068,13 +1068,13 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
             // is playing -> pause
 
-            MapPlayerManager.setIsPlayerRunning(false);
+            ModelPlayerManager.setIsPlayerRunning(false);
 
          } else {
 
             // is paused -> play
 
-            MapPlayerManager.setIsPlayerRunning(true);
+            ModelPlayerManager.setIsPlayerRunning(true);
          }
       }
 
@@ -1111,14 +1111,14 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
    /**
     * This is called when new data are set into the shader, data are available from
-    * {@link MapPlayerManager#getMapPlayerData()}
+    * {@link ModelPlayerManager#getModelPlayerData()}
     */
    private void updatePlayer_InUIThread() {
 
       updateUI_TimelineMaxValue();
 
-      _spinnerSpeedMultiplier.setSelection(MapPlayerManager.getSpeedMultiplier());
-      _spinnerTurningMultiplier.setSelection((MapPlayerManager.getModelTurningAngle()));
+      _spinnerSpeedMultiplier.setSelection(ModelPlayerManager.getSpeedMultiplier());
+      _spinnerTurningMultiplier.setSelection((ModelPlayerManager.getModelTurningAngle()));
 
       enableControls();
    }
@@ -1150,7 +1150,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
     */
    private void updateUI_JogWheel(final int jogWheelValue) {
 
-      final int movingSpeed = jogWheelValue - MapPlayerManager.SPEED_JOG_WHEEL_MAX_HALF;
+      final int movingSpeed = jogWheelValue - ModelPlayerManager.SPEED_JOG_WHEEL_MAX_HALF;
 
       final String speedValue = Integer.toString(movingSpeed);
 
@@ -1182,7 +1182,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
    private void updateUI_PlayAndPausedControls() {
 
-      if (MapPlayerManager.isPlayerRunning()) {
+      if (ModelPlayerManager.isPlayerRunning()) {
 
          _actionPlayControl_PlayAndPause.setToolTipText(Messages.Map_Player_Button_Pause_Tooltip);
 
@@ -1205,13 +1205,13 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       final int minScaleTicks = 50;
 
-      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
+      final ModelPlayerData modelPlayerData = ModelPlayerManager.getModelPlayerData();
 
-      if (mapPlayerData == null || mapPlayerData.allNotClipped_GeoLocationIndices == null) {
+      if (modelPlayerData == null || modelPlayerData.allNotClipped_GeoLocationIndices == null) {
          return;
       }
 
-      final int newMaximum = mapPlayerData.allNotClipped_GeoLocationIndices.length - 1;
+      final int newMaximum = modelPlayerData.allNotClipped_GeoLocationIndices.length - 1;
 
       // update only when modified
       if (newMaximum == _currentTimelineMaxValue) {
@@ -1221,7 +1221,7 @@ public class MapPlayerView extends ViewPart implements ICloseOpenedDialogs {
       _currentTimelineMaxValue = newMaximum;
 
       final float pageIncrement = (float) newMaximum / minScaleTicks;
-      final float relativeSelection = (float) (newMaximum * MapPlayerManager.getCurrentRelativePosition());
+      final float relativeSelection = (float) (newMaximum * ModelPlayerManager.getCurrentRelativePosition());
       final int timelineValue = (int) relativeSelection;
 
       _scaleTimeline.setPageIncrement((int) pageIncrement);

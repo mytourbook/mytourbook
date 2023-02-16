@@ -17,7 +17,7 @@ package net.tourbook.map25;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import net.tourbook.map.player.MapPlayerManager;
+import net.tourbook.map.player.ModelPlayerManager;
 
 import org.oscim.core.BoundingBox;
 import org.oscim.core.MapPosition;
@@ -76,7 +76,7 @@ public class Map25LocationManager {
 
    private static void setMapLocation_InMapThread(final Map map, final MapPosition mapPosition) {
 
-      final long animationDuration = MapPlayerManager.getAnimationDuration();
+      final long animationDuration = ModelPlayerManager.getAnimationDuration();
 
       final boolean isRunAnimation = _isAnimateLocation && animationDuration > 0;
 
@@ -128,7 +128,7 @@ public class Map25LocationManager {
          };
 
          // schedule animation
-//       final long nextScheduleMS = MapPlayerManager.animationDuration - timeDiffLastRun;
+//       final long nextScheduleMS = ModelPlayerManager.animationDuration - timeDiffLastRun;
          final long nextScheduleMS = animationDuration / 2;
 
          map.postDelayed(runnable, nextScheduleMS);
@@ -139,7 +139,7 @@ public class Map25LocationManager {
    private static void setMapLocation_StartAnimation(final Map map, final MapPosition mapPosition, final int runnableCounter) {
 
       map.animator().animateTo(
-            MapPlayerManager.getAnimationDuration(),
+            ModelPlayerManager.getAnimationDuration(),
             mapPosition,
             _animationEasingType);
 
