@@ -730,6 +730,12 @@ public final class TourTrack_Shader {
    private static void paint_30_ModelCursor(final GLViewport viewport,
                                             final float vp2mpScale) {
 
+      if (_mapModelCursorVertices == null) {
+
+         // model is not yet fully setup, sometimes a NPE occurred
+         return;
+      }
+
       final double[] projectedPositionXY = ModelPlayerManager.getCurrentProjectedPosition();
 
       if (projectedPositionXY == null) {
