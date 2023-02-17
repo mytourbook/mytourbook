@@ -323,7 +323,8 @@ public class ImageUtils {
     */
    public static Image resize(final Image image,
                               final int newWidth,
-                              final int newHeight) {
+                              final int newHeight,
+                              final int rotation) {
 
       // read an image to BufferedImage for processing
       final BufferedImage originalImage = ImageConverter.convertIntoAWT(image);
@@ -345,6 +346,9 @@ public class ImageUtils {
       // puts the original image into the newResizedImage
       graphics2D.drawImage(originalImage, 0, 0, newWidth, newHeight, null);
       graphics2D.dispose();
+      if (rotation > 0) {
+         graphics2D.rotate(Math.toRadians(rotation));
+      }
 
       image.dispose();
 

@@ -59,6 +59,12 @@ import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.web.WEB;
 
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.common.ImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
+import org.apache.commons.imaging.formats.tiff.TiffField;
+import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -895,6 +901,31 @@ public class UI {
       }
 
       final Image image = new Image(Display.getDefault(), imageFilePath);
+      int rotation = 0;
+      try {
+
+         final ImageMetadata imageMetadata = Imaging.getMetadata(new File(imageFilePath), null);
+         if (imageMetadata instanceof JpegImageMetadata) {
+
+            final JpegImageMetadata jpegMetadata = (JpegImageMetadata) imageMetadata;
+            final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(
+                  TiffTagConstants.TIFF_TAG_ORIENTATION);
+            if (field != null) {
+
+               final int orientation = field.getIntValue();
+
+               if (orientation == 6) {
+
+                  rotation = 90;
+               } else if (orientation == 8) {
+
+                  rotation = -90;
+               }
+            }
+         }
+      } catch (ImageReadException | IOException e) {
+         StatusUtil.log(e);
+      }
 
       final int imageWidth = image.getBounds().width;
       final int imageHeight = image.getBounds().height;
@@ -911,7 +942,7 @@ public class UI {
          newimageWidth = Math.round(newimageHeight * imageWidth / (imageHeight * 1f));
       }
 
-      return ImageUtils.resize(image, newimageWidth, newimageHeight);
+      return ImageUtils.resize(image, newimageWidth, newimageHeight, rotation);
    }
 
    public static ImageData rotate(final ImageData srcData, final int direction) {
