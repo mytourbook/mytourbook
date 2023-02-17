@@ -615,6 +615,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    private ControlDecoration  _decoTimeZone;
    //
+   private Combo              _comboWeather_AirQualityIndex;
    private Combo              _comboLocation_Start;
    private Combo              _comboLocation_End;
    private Combo              _comboTimeZone;
@@ -4029,6 +4030,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          createUI_Section_147_Weather_Other_Col1(container);
          createUI_Section_148_Weather_Other_Col2(container);
+
+         createUI_Section_149_Weather_Other_Col1(container);
       }
    }
 
@@ -4618,6 +4621,46 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          // label: mm, inches
          _lblWeather_SnowfallUnit = _tk.createLabel(container, UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+      }
+   }
+
+   private void createUI_Section_149_Weather_Other_Col1(final Composite parent) {
+
+      final Composite container = _tk.createComposite(parent);
+      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+      _firstColumnContainerControls.add(container);
+      {
+         /*
+          * Air Quality Index
+          */
+         // label
+         final Label label = _tk.createLabel(container, "Air Quality Index");//Messages.Tour_Editor_Label_AirPressure);
+         label.setToolTipText(Messages.Tour_Editor_Label_AirPressure_Tooltip);
+         _firstColumnControls.add(label);
+
+         // combo: clouds
+         _comboWeather_AirQualityIndex = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboWeather_AirQualityIndex);
+         _tk.adapt(_comboWeather_AirQualityIndex, true, false);
+         _comboWeather_AirQualityIndex.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
+         _comboWeather_AirQualityIndex.setVisibleItemCount(10);
+         _comboWeather_AirQualityIndex.addModifyListener(_modifyListener);
+         _comboWeather_AirQualityIndex.addSelectionListener(widgetSelectedAdapter(selectionEvent -> displayCloudIcon()));
+
+         // fill combobox
+         for (final String cloudText : IWeather.cloudText) {
+            _comboWeather_AirQualityIndex.add(cloudText);
+         }
+
+         _comboWeather_AirQualityIndex.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+         // force the icon to be displayed to ensure the width is correctly set when the size is computed
+         _isSetField = true;
+         {
+            _comboWeather_AirQualityIndex.select(0);
+            //displayCloudIcon();
+         }
+         _isSetField = false;
       }
    }
 
@@ -6469,7 +6512,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _actionOpenMarkerDialog.setTourMarker(selectedMarker);
 
 // SET_FORMATTING_OFF
-      
+
       _actionDeleteTimeSlices_AdjustTourStartTime  .setEnabled(canDeleteTimeSliced);
       _actionDeleteTimeSlices_KeepTime             .setEnabled(canDeleteTimeSliced);
       _actionDeleteTimeSlices_KeepTimeAndDistance  .setEnabled(canDeleteTimeSliced);
@@ -6480,7 +6523,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _actionSplitTour           .setEnabled(isOneSliceSelected);
       _actionExtractTour         .setEnabled(numberOfSelectedSlices >= 2);
-      
+
 // SET_FORMATTING_ON
 
       // set start/end position into the actions

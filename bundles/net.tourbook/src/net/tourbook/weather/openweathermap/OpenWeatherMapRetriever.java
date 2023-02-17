@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -184,6 +184,8 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       long requestedTime = tourStartTime;
 
+      //retrieve the weather info
+
       while (true) {
 
          //Send an API request as long as we don't have the results covering the entire duration of the tour
@@ -235,6 +237,11 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       }
 
       setTourWeatherWithHistoricalWeather();
+
+      //retrieve the air quality
+
+      //todo fb make sure that even if the weather is not retrieved (example :> 5 days)
+      //try to retrieve the aqi because it goes back to 2020
 
       return true;
    }
