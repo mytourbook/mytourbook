@@ -272,8 +272,6 @@ public class TagMenuManager {
    public static void dispose() {
 
       _tagImagesCache.values().forEach(Util::disposeResource);
-
-      _tagImagesCache.clear();
    }
 
    static void enableRecentTagActions(final boolean isAddTagEnabled, final Set<Long> existingTagIds) {
