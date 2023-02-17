@@ -37,7 +37,7 @@ import org.oscim.renderer.MapRenderer;
 /**
  * Is managing the movement of the map model and cursor
  */
-public class MapPlayerManager {
+public class ModelPlayerManager {
 
    /**
     * Max value for the scale control which cannot have negative values but the speed can be
@@ -46,22 +46,22 @@ public class MapPlayerManager {
    static final int                     SPEED_JOG_WHEEL_MAX               = 2 * 100;
    static final int                     SPEED_JOG_WHEEL_MAX_HALF          = SPEED_JOG_WHEEL_MAX / 2;
 
-   private static final String          STATE_IS_MAP_MODEL_VISIBLE        = "STATE_IS_MAP_MODEL_VISIBLE";                                       //$NON-NLS-1$
-   private static final String          STATE_IS_MAP_MODEL_CURSOR_VISIBLE = "STATE_IS_MAP_MODEL_CURSOR_VISIBLE";                                //$NON-NLS-1$
-   private static final String          STATE_IS_PLAYER_RUNNING           = "STATE_IS_PLAYER_RUNNING";                                          //$NON-NLS-1$
-   private static final String          STATE_IS_PLAYING_LOOP             = "STATE_IS_PLAYING_LOOP";                                            //$NON-NLS-1$
-   private static final String          STATE_IS_RELIVE_PLAYING           = "STATE_IS_RELIVE_PLAYING";                                          //$NON-NLS-1$
-   private static final String          STATE_JOG_WHEEL_SPEED             = "STATE_JOG_WHEEL_SPEED";                                            //$NON-NLS-1$
-   private static final String          STATE_JOG_WHEEL_SPEED_MULTIPLIER  = "STATE_JOG_WHEEL_SPEED_MULTIPLIER";                                 //$NON-NLS-1$
-   private static final String          STATE_MODEL_CURSOR_SIZE           = "STATE_MODEL_CURSOR_SIZE";                                          //$NON-NLS-1$
-   private static final String          STATE_MODEL_SIZE_FIXED            = "STATE_MODEL_SIZE_FIXED";                                           //$NON-NLS-1$
-   private static final String          STATE_MODEL_TURNING_ANGLE         = "STATE_MODEL_TURNING_ANGLE";                                        //$NON-NLS-1$
-   private static final String          STATE_RELATIVE_POSITION           = "STATE_RELATIVE_POSITION";                                          //$NON-NLS-1$
+   private static final String          STATE_IS_MAP_MODEL_VISIBLE        = "STATE_IS_MAP_MODEL_VISIBLE";                                         //$NON-NLS-1$
+   private static final String          STATE_IS_MAP_MODEL_CURSOR_VISIBLE = "STATE_IS_MAP_MODEL_CURSOR_VISIBLE";                                  //$NON-NLS-1$
+   private static final String          STATE_IS_PLAYER_RUNNING           = "STATE_IS_PLAYER_RUNNING";                                            //$NON-NLS-1$
+   private static final String          STATE_IS_PLAYING_LOOP             = "STATE_IS_PLAYING_LOOP";                                              //$NON-NLS-1$
+   private static final String          STATE_IS_RELIVE_PLAYING           = "STATE_IS_RELIVE_PLAYING";                                            //$NON-NLS-1$
+   private static final String          STATE_JOG_WHEEL_SPEED             = "STATE_JOG_WHEEL_SPEED";                                              //$NON-NLS-1$
+   private static final String          STATE_JOG_WHEEL_SPEED_MULTIPLIER  = "STATE_JOG_WHEEL_SPEED_MULTIPLIER";                                   //$NON-NLS-1$
+   private static final String          STATE_MODEL_CURSOR_SIZE           = "STATE_MODEL_CURSOR_SIZE";                                            //$NON-NLS-1$
+   private static final String          STATE_MODEL_SIZE                  = "STATE_MODEL_SIZE";                                                   //$NON-NLS-1$
+   private static final String          STATE_MODEL_TURNING_ANGLE         = "STATE_MODEL_TURNING_ANGLE";                                          //$NON-NLS-1$
+   private static final String          STATE_RELATIVE_POSITION           = "STATE_RELATIVE_POSITION";                                            //$NON-NLS-1$
    //
-   private static final IDialogSettings _state                            = TourbookPlugin.getState("net.tourbook.map.player.MapPlayerManager");//$NON-NLS-1$
+   private static final IDialogSettings _state                            = TourbookPlugin.getState("net.tourbook.map.player.ModelPlayerManager");//$NON-NLS-1$
 
    private static Map25View             _map25View;
-   private static MapPlayerView         _mapPlayerView;
+   private static ModelPlayerView       _modelPlayerView;
 
    private static int                   _currentVisiblePositionIndex;
 
@@ -137,7 +137,7 @@ public class MapPlayerManager {
    private static boolean               _isPlayingLoop;
    private static boolean               _isReLivePlaying;
 
-   private static MapPlayerData         _mapPlayerData;
+   private static ModelPlayerData       _modelPlayerData;
 
    /**
     * Map scale with which the tour track was compiled
@@ -176,7 +176,7 @@ public class MapPlayerManager {
    /**
     * Size of the moving model when the size is not scaled according to the map
     */
-   private static int                   _modelSize_Fixed;
+   private static int                   _modelSize;
 
    /**
     * Angle how much the animated model is rotated in the next frame
@@ -242,11 +242,11 @@ public class MapPlayerManager {
          return _currentProjectedPosition;
       }
 
-      if (_mapPlayerData == null) {
+      if (_modelPlayerData == null) {
          return null;
       }
 
-      final int[] allNotClipped_GeoLocationIndices = _mapPlayerData.allNotClipped_GeoLocationIndices;
+      final int[] allNotClipped_GeoLocationIndices = _modelPlayerData.allNotClipped_GeoLocationIndices;
       final int numGeoLocations = allNotClipped_GeoLocationIndices.length;
       final int lastGeoLocationIndex = numGeoLocations - 1;
 
@@ -333,7 +333,7 @@ public class MapPlayerManager {
             relativeReturnPosition = relativePosition + 1;
          }
 
-         allProjectedPoints = _mapPlayerData.allProjectedPoints_ReturnTrack;
+         allProjectedPoints = _modelPlayerData.allProjectedPoints_ReturnTrack;
 
          final int numProjectedPoints = allProjectedPoints.length;
          final int numReturnPositions = numProjectedPoints / 2;
@@ -354,9 +354,9 @@ public class MapPlayerManager {
 
          // move model on NORMAL TRACK, relativePosition is >= 0 && <= 1
 
-         allProjectedPoints = _mapPlayerData.allProjectedPoints_NormalTrack;
+         allProjectedPoints = _modelPlayerData.allProjectedPoints_NormalTrack;
 
-         final float[] allDistanceSeries = _mapPlayerData.allDistanceSeries;
+         final float[] allDistanceSeries = _modelPlayerData.allDistanceSeries;
          final int lastDistanceIndex = allDistanceSeries.length - 1;
 
          final float totalDistance = allDistanceSeries[lastDistanceIndex];
@@ -425,7 +425,7 @@ public class MapPlayerManager {
       _currentProjectedPosition[0] = projectedPositionX;
       _currentProjectedPosition[1] = projectedPositionY;
 
-      _currentVisibleGeoLocationIndex = MtMath.searchIndex(_mapPlayerData.allVisible_GeoLocationIndices, geoLocationIndex_0);
+      _currentVisibleGeoLocationIndex = MtMath.searchIndex(_modelPlayerData.allVisible_GeoLocationIndices, geoLocationIndex_0);
    }
 
    public static double getCurrentRelativePosition() {
@@ -435,15 +435,11 @@ public class MapPlayerManager {
 
    /**
     * @return Returns the geo location index for the {@link #_currentProjectedPosition} into
-    *         {@link MapPlayerData#allVisible_GeoLocationIndices}
+    *         {@link ModelPlayerData#allVisible_GeoLocationIndices}
     */
    public static int getCurrentVisibleGeoLocationIndex() {
 
       return _currentVisibleGeoLocationIndex;
-   }
-
-   public static int getFixedModelSize() {
-      return _modelSize_Fixed;
    }
 
    /**
@@ -458,14 +454,6 @@ public class MapPlayerManager {
    }
 
    /**
-    * @return Returns the track data for the currently played tour
-    */
-   public static MapPlayerData getMapPlayerData() {
-
-      return _mapPlayerData;
-   }
-
-   /**
     * @return Returns the angle for the model forward direction
     */
    public static float getModelAngle() {
@@ -475,6 +463,18 @@ public class MapPlayerManager {
 
    public static short getModelCursorSize() {
       return (short) _modelCursorSize;
+   }
+
+   /**
+    * @return Returns the track data for the currently played tour
+    */
+   public static ModelPlayerData getModelPlayerData() {
+
+      return _modelPlayerData;
+   }
+
+   public static int getModelSize() {
+      return _modelSize;
    }
 
    public static int getModelTurningAngle() {
@@ -727,7 +727,7 @@ public class MapPlayerManager {
 
          // model is moving on the NORMAL TRACK, get next position
 
-         final float[] allDistanceSeries = _mapPlayerData.allDistanceSeries;
+         final float[] allDistanceSeries = _modelPlayerData.allDistanceSeries;
          final float totalDistance = allDistanceSeries[allDistanceSeries.length - 1];
 
          final float distanceFactor = totalDistance == 0
@@ -735,7 +735,7 @@ public class MapPlayerManager {
                : 100_000 / totalDistance;
 
          final double jogWheelSpeed = (double) _jogWheelSpeed / SPEED_JOG_WHEEL_MAX_HALF;
-         final double mapScale = _mapPlayerData.mapScale;
+         final double mapScale = _modelPlayerData.mapScale;
          final float jogWheelSpeedFactor = distanceFactor * _jogWheelSpeedMultiplier;
 
          final double scaledSpeedValue = jogWheelSpeed / mapScale * jogWheelSpeedFactor;
@@ -773,7 +773,7 @@ public class MapPlayerManager {
 
             _lastTimelineUpdateTime = frametime;
 
-            _mapPlayerView.updatePlayer_Timeline(_relativePosition_Current);
+            _modelPlayerView.updatePlayer_Timeline(_relativePosition_Current);
          }
       }
 
@@ -857,7 +857,7 @@ public class MapPlayerManager {
    }
 
    private static boolean isPlayerViewAvailable() {
-      return _mapPlayerView != null;
+      return _modelPlayerView != null;
    }
 
    public static boolean isPlayingLoop() {
@@ -879,7 +879,7 @@ public class MapPlayerManager {
       _isReLivePlaying           = Util.getStateBoolean( _state, STATE_IS_RELIVE_PLAYING,             false);
       _jogWheelSpeed             = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED,               10);
       _jogWheelSpeedMultiplier   = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED_MULTIPLIER,    1);
-      _modelSize_Fixed           = Util.getStateInt(     _state, STATE_MODEL_SIZE_FIXED,              200);
+      _modelSize                 = Util.getStateInt(     _state, STATE_MODEL_SIZE,              200);
       _modelCursorSize           = Util.getStateInt(     _state, STATE_MODEL_CURSOR_SIZE,             200);
       _modelTurningFactor        = Util.getStateInt(     _state, STATE_MODEL_TURNING_ANGLE,           10);
       _relativePosition_Current  = Util.getStateDouble(  _state, STATE_RELATIVE_POSITION,             0);
@@ -888,7 +888,7 @@ public class MapPlayerManager {
 
       if (isPlayerViewAvailable()) {
 
-         Display.getDefault().syncExec(() -> _mapPlayerView.restoreState());
+         Display.getDefault().syncExec(() -> _modelPlayerView.restoreState());
       }
 
       Map25FPSManager.setContinuousRendering(_isMapModelVisible || _isMapModelCursorVisible || _isPlayerRunning);
@@ -907,7 +907,7 @@ public class MapPlayerManager {
       _state.put(STATE_IS_RELIVE_PLAYING,             _isReLivePlaying);
       _state.put(STATE_JOG_WHEEL_SPEED,               _jogWheelSpeed);
       _state.put(STATE_JOG_WHEEL_SPEED_MULTIPLIER,    _jogWheelSpeedMultiplier);
-      _state.put(STATE_MODEL_SIZE_FIXED,              _modelSize_Fixed);
+      _state.put(STATE_MODEL_SIZE,              _modelSize);
       _state.put(STATE_MODEL_CURSOR_SIZE,             _modelCursorSize);
       _state.put(STATE_MODEL_TURNING_ANGLE,           _modelTurningFactor);
       _state.put(STATE_RELATIVE_POSITION,             _relativePosition_Current);
@@ -969,13 +969,8 @@ public class MapPlayerManager {
       _map25View = map25View;
 
       if (isPlayerViewAvailable()) {
-         _mapPlayerView.updateMapModelVisibility();
+         _modelPlayerView.updateMapModelVisibility();
       }
-   }
-
-   public static void setMapPlayerView(final MapPlayerView mapPlayerView) {
-
-      _mapPlayerView = mapPlayerView;
    }
 
    /**
@@ -1103,9 +1098,14 @@ public class MapPlayerManager {
       }
    }
 
+   public static void setModelPlayerView(final ModelPlayerView modelPlayerView) {
+
+      _modelPlayerView = modelPlayerView;
+   }
+
    public static void setModelSize(final int modelSize) {
 
-      _modelSize_Fixed = modelSize;
+      _modelSize = modelSize;
    }
 
    public static void setMovingSpeedFromJogWheel(final int jogWheelSpeed) {
@@ -1119,29 +1119,29 @@ public class MapPlayerManager {
    }
 
    /**
-    * Setup map player with all necessary data to run the animation.
+    * Setup model player with all necessary data to run the animation.
     * <p>
     * This method is called when new data are set into the shader buffer data, for a new zoom level
     * or when map is moved more than a tile
     *
-    * @param mapPlayerData
+    * @param modelPlayerData
     */
-   public static void setPlayerData(final MapPlayerData mapPlayerData) {
+   public static void setPlayerData(final ModelPlayerData modelPlayerData) {
 
-      _mapPlayerData = mapPlayerData;
+      _modelPlayerData = modelPlayerData;
 
-      _numAllVisiblePositions = mapPlayerData.allVisible_GeoLocationIndices == null
+      _numAllVisiblePositions = modelPlayerData.allVisible_GeoLocationIndices == null
             ? 0
-            : mapPlayerData.allVisible_GeoLocationIndices.length;
+            : modelPlayerData.allVisible_GeoLocationIndices.length;
 
       if (isPlayerViewAvailable()) {
-         _mapPlayerView.updatePlayer();
+         _modelPlayerView.updatePlayer();
       }
    }
 
    /**
     * Move player head to a relative position and start playing to this position, it is called
-    * from {@link net.tourbook.map.player.MapPlayerView#setMapAndModelPosition(double)}
+    * from {@link net.tourbook.map.player.ModelPlayerView#setMapAndModelPosition(double)}
     * <p>
     * The relative position is in this moving loop, start and end must not be at the same position:
     *
@@ -1173,7 +1173,7 @@ public class MapPlayerManager {
          return;
       }
 
-      if (_mapPlayerData == null) {
+      if (_modelPlayerData == null) {
          return;
       }
 
@@ -1196,12 +1196,12 @@ public class MapPlayerManager {
 
          if (isNewPositionOnNormalTrack) {
 
-            isModelMovingForward = _previousRelativePosition == MapPlayerView.RELATIVE_MODEL_POSITION_ON_RETURN_PATH_END_TO_START
+            isModelMovingForward = _previousRelativePosition == ModelPlayerView.RELATIVE_MODEL_POSITION_ON_RETURN_PATH_END_TO_START
 
                   // model moved from the end to the start
                   ? true
 
-                  : _previousRelativePosition == MapPlayerView.RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END
+                  : _previousRelativePosition == ModelPlayerView.RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END
 
                         // model moved from the start to the end
                         ? false
@@ -1210,7 +1210,7 @@ public class MapPlayerManager {
 
          } else {
 
-            if (newRelativePosition == MapPlayerView.RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END) {
+            if (newRelativePosition == ModelPlayerView.RELATIVE_MODEL_POSITION_ON_RETURN_PATH_START_TO_END) {
 
                isModelMovingForward = false;
             }
@@ -1263,7 +1263,7 @@ public class MapPlayerManager {
 
       _returnTrackSpeed_PixelPerSecond = 200;
 
-      if (_mapPlayerData == null) {
+      if (_modelPlayerData == null) {
          return _modelAnimationTime;
       }
 
@@ -1277,7 +1277,7 @@ public class MapPlayerManager {
 
          // model is moving on the RETURN TRACK
 
-         final double pixelDistance = _mapPlayerData.trackEnd2StartPixelDistance;
+         final double pixelDistance = _modelPlayerData.trackEnd2StartPixelDistance;
 
          final double animationTime = _modelAnimationTime * (pixelDistance / _returnTrackSpeed_PixelPerSecond);
 

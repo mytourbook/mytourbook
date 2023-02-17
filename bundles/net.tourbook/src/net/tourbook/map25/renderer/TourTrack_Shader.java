@@ -23,8 +23,8 @@ import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 
 import net.tourbook.common.UI;
-import net.tourbook.map.player.MapPlayerData;
-import net.tourbook.map.player.MapPlayerManager;
+import net.tourbook.map.player.ModelPlayerData;
+import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 
@@ -81,7 +81,7 @@ public final class TourTrack_Shader {
 
    private static GLMatrix              _animationMatrix         = new GLMatrix();
 
-   private static double                _prevValue;
+// private static double                _prevValue;
 
    private static class DirectionArrowsShader extends GLShaderMT {
 
@@ -208,7 +208,7 @@ public final class TourTrack_Shader {
     */
    public static boolean bindBufferData(final TourTrack_Bucket trackBucket, final GLViewport viewport) {
 
-      setMapPlayerData(trackBucket, viewport);
+      setModelPlayerData(trackBucket, viewport);
 
       final int numTrackVertices = trackBucket == null
             ? 0
@@ -271,7 +271,7 @@ public final class TourTrack_Shader {
       /*
        * Map model cursor
        */
-      if (MapPlayerManager.isMapModelCursorVisible()) {
+      if (ModelPlayerManager.isMapModelCursorVisible()) {
 
          /*
           * Vertices
@@ -279,7 +279,7 @@ public final class TourTrack_Shader {
 
 //SET_FORMATTING_OFF
 
-         final short size  = MapPlayerManager.getModelCursorSize();
+         final short size  = ModelPlayerManager.getModelCursorSize();
          final short size2 = (short) (size * 3);
          final short zPos  = (short) (+1 + trackBucket.heightOffset);
 
@@ -339,7 +339,7 @@ public final class TourTrack_Shader {
                             final MapPosition compileMapPosition) {
 
       // update current model position that re-Live has the correct number of vertices
-      MapPlayerManager.getCurrentProjectedPosition();
+      ModelPlayerManager.getCurrentProjectedPosition();
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
@@ -356,7 +356,7 @@ public final class TourTrack_Shader {
             paint_20_DirectionArrows(viewport, viewport2mapscale, trackBucket);
          }
 
-         if (MapPlayerManager.isMapModelCursorVisible()) {
+         if (ModelPlayerManager.isMapModelCursorVisible()) {
 
             paint_30_ModelCursor(viewport, viewport2mapscale);
          }
@@ -390,10 +390,10 @@ public final class TourTrack_Shader {
       int numVisibleVertices = numTrackVertices;
       int numVisibleVertices_ReLive = numTrackVertices;
 
-      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
-      if (mapPlayerData != null && mapPlayerData.allVisible_GeoLocationIndices != null) {
+      final ModelPlayerData modelPlayerData = ModelPlayerManager.getModelPlayerData();
+      if (modelPlayerData != null && modelPlayerData.allVisible_GeoLocationIndices != null) {
 
-         numVisibleVertices_ReLive = MapPlayerManager.getCurrentVisibleGeoLocationIndex() * 2;
+         numVisibleVertices_ReLive = ModelPlayerManager.getCurrentVisibleGeoLocationIndex() * 2;
 
 //         if (currentVisiblePositionIndex != _prevValue
 //
@@ -415,7 +415,7 @@ public final class TourTrack_Shader {
 //         }
       }
 
-      if (MapPlayerManager.isReLivePlaying()) {
+      if (ModelPlayerManager.isReLivePlaying()) {
 
          // show only the first part of the track which the model has already moved
 
@@ -730,7 +730,13 @@ public final class TourTrack_Shader {
    private static void paint_30_ModelCursor(final GLViewport viewport,
                                             final float vp2mpScale) {
 
-      final double[] projectedPositionXY = MapPlayerManager.getCurrentProjectedPosition();
+      if (_mapModelCursorVertices == null) {
+
+         // model is not yet fully setup, sometimes a NPE occurred
+         return;
+      }
+
+      final double[] projectedPositionXY = ModelPlayerManager.getCurrentProjectedPosition();
 
       if (projectedPositionXY == null) {
          return;
@@ -744,8 +750,8 @@ public final class TourTrack_Shader {
 
       final int tileScale = Tile.SIZE << currentMapZoomLevel;
 
-      final double diffX = MapPlayerManager.getCompileMapX() - currentMapPosX;
-      final double diffY = MapPlayerManager.getCompileMapY() - currentMapPosY;
+      final double diffX = ModelPlayerManager.getCompileMapX() - currentMapPosX;
+      final double diffY = ModelPlayerManager.getCompileMapY() - currentMapPosY;
 
       float dX = (float) ((projectedPositionXY[0] - currentMapPosX - diffX) * tileScale) * COORD_SCALE;
       float dY = (float) ((projectedPositionXY[1] - currentMapPosY - diffY) * tileScale) * COORD_SCALE;
@@ -770,7 +776,7 @@ public final class TourTrack_Shader {
       shader.useProgram();
 
       // rotate model to look forward
-      _animationMatrix.setRotation(MapPlayerManager.getModelAngle(), 0f, 0f, 1f);
+      _animationMatrix.setRotation(ModelPlayerManager.getModelAngle(), 0f, 0f, 1f);
       _animationMatrix.setAsUniform(shader.uni_AnimationMVP);
 
       // set mvp matrix
@@ -810,30 +816,30 @@ public final class TourTrack_Shader {
 
    }
 
-   private static void setMapPlayerData(final TourTrack_Bucket trackBucket, final GLViewport viewport) {
+   private static void setModelPlayerData(final TourTrack_Bucket trackBucket, final GLViewport viewport) {
 
       if (trackBucket == null) {
          return;
       }
 
-      final MapPlayerData mapPlayerData = new MapPlayerData();
+      final ModelPlayerData modelPlayerData = new ModelPlayerData();
 
 // SET_FORMATTING_OFF
 
-      mapPlayerData.allProjectedPoints_NormalTrack    = trackBucket.allProjectedPoints;
-      mapPlayerData.allProjectedPoints_ReturnTrack    = trackBucket.allProjectedPoints_ReturnTrack;
-      mapPlayerData.allTimeSeries                     = trackBucket.allTimeSeries;
-      mapPlayerData.allDistanceSeries                 = trackBucket.allDistanceSeries;
+      modelPlayerData.allProjectedPoints_NormalTrack    = trackBucket.allProjectedPoints;
+      modelPlayerData.allProjectedPoints_ReturnTrack    = trackBucket.allProjectedPoints_ReturnTrack;
+      modelPlayerData.allTimeSeries                     = trackBucket.allTimeSeries;
+      modelPlayerData.allDistanceSeries                 = trackBucket.allDistanceSeries;
 
-      mapPlayerData.allNotClipped_GeoLocationIndices  = trackBucket.allNotClipped_GeoLocationIndices;
-      mapPlayerData.allVisible_GeoLocationIndices     = trackBucket.allVisible_GeoLocationIndices;
+      modelPlayerData.allNotClipped_GeoLocationIndices  = trackBucket.allNotClipped_GeoLocationIndices;
+      modelPlayerData.allVisible_GeoLocationIndices     = trackBucket.allVisible_GeoLocationIndices;
 
-      mapPlayerData.trackEnd2StartPixelDistance       = trackBucket.trackEnd2StartPixelDistance;
-      mapPlayerData.mapScale                          = viewport.pos.scale;
+      modelPlayerData.trackEnd2StartPixelDistance       = trackBucket.trackEnd2StartPixelDistance;
+      modelPlayerData.mapScale                          = viewport.pos.scale;
 
 // SET_FORMATTING_ON
 
-      MapPlayerManager.setPlayerData(mapPlayerData);
+      ModelPlayerManager.setPlayerData(modelPlayerData);
    }
 
    public static boolean setupShader() {

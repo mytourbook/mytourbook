@@ -38,7 +38,7 @@ import net.tourbook.common.Bool;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
-import net.tourbook.map.player.MapPlayerManager;
+import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
 import net.tourbook.map25.animation.GLTFModel_Layer;
@@ -687,7 +687,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       super.create();
 
       // !!! restore it after super.create() !!!
-      MapPlayerManager.restoreState();
+      ModelPlayerManager.restoreState();
 
       /**
        * Overwrite input handler, using own GdxMap.create() method didn't work :-(

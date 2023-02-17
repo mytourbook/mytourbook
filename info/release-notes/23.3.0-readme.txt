@@ -1,69 +1,50 @@
-23.next.0                                                 ?. March 2023
-
-
-TODO's
-======
-
-* Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
-                    Need to check how to apply it to all projects, must maybe be done with the already existing ant script
-
-                  - Style rule for actions, use "Title Case" https://en.wikipedia.org/wiki/Title_case
-                    mainly e.g. 'at', 'of', ... should be lowercase otherwise it looks ugly
-
-
-Issues
-======
-
-*
-
-
-Experimental
-============
-
-* 
-
+23.3.0                                                 ?. March 2023
 
 New
 ===
 
-* Concatenate Tours (Frederic)
+Concatenate Tours (Frederic)
   - Added the ability to delete the source tours
 
-* Tour Tags (Frederic)
+Tour Tags (Frederic)
   - Added the ability to add an image to a tag and display its accumulated values in the Tour Data Editor View
     https://github.com/mytourbook/mytourbook/issues/805
     
 2.5D Map
   - Show an animated 3D model which is moving along the tour track
   - A new map model player is managing the moving model
-  
+    
 
 Improvements
 ============
 
-*
+Tour Filter
+  - Filter tours by "Most Recent", e.g. show tours for the last 15 months
+    https://github.com/mytourbook/mytourbook/issues/976
 
-* TCX Import (Frederic)
+Tour Editor
+  - Keep distance values when time slices are deleted
+    https://github.com/mytourbook/mytourbook/issues/986
+  
+4k Display
+  - Increased cursor size in Tour Chart and 2D Map, when displayed on 4k displays
+
+TCX Import (Frederic)
   - Import of calories and average power values
 
-* Tour Blog (Frederic)
+Tour Blog (Frederic)
   - Display of the weather summary
-
-
-Changes
-=======
-
-* 
 
 
 Bugfix
 ======
 
-* Concatenate Tours (Frederic)
+Concatenate Tours (Frederic)
   - Fixed a bug where the markers and pause times in the concatenated tour had erroneous time values
 
-* People Preference Page (Frederic)
+People Preference Page (Frederic)
   - Fixed an issue where the BMI (Body Mass Index) would be erroneous whenever the measurement system is not in metric
+
 
 
 Translation    
