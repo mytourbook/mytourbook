@@ -1268,10 +1268,9 @@ public class UI {
       // We dispose the current tags labels
       tagsLabels.forEach(tagLabel -> {
 
-         if (tagLabel != null && !tagLabel.isDisposed()) {
+         if (tagLabel != null) {
 
             net.tourbook.common.UI.disposeResource(tagLabel.getImage());
-            tagLabel.dispose();
          }
       });
       tagsLabels.clear();

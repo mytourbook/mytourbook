@@ -1396,7 +1396,7 @@ public class UI {
     */
    public static Image disposeResource(final Image resource) {
 
-      if ((resource != null) && !resource.isDisposed()) {
+      if (resource != null && !resource.isDisposed()) {
          resource.dispose();
       }
       return null;
