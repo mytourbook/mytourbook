@@ -2126,7 +2126,7 @@ public abstract class TreeColumnFactory {
             final TreeColumnDefinition colDef = new TreeColumnDefinition(
                   columnManager,
                   "TOUR_TAG_IMAGE_FILE_PATH",
-                  SWT.TRAIL);
+                  SWT.LEAD);
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
 
