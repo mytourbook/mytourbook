@@ -317,8 +317,9 @@ public class ImageUtils {
     * Resizes an image while keeping the existing transparency
     *
     * @param image
+    * @param newWidth
     * @param newHeight
-    * @param image
+    * @param rotation
     * @return
     */
    public static Image resize(final Image image,

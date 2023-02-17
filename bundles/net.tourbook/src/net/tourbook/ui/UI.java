@@ -901,6 +901,7 @@ public class UI {
       }
 
       final Image image = new Image(Display.getDefault(), imageFilePath);
+
       int rotation = 0;
       try {
 
