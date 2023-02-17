@@ -2298,10 +2298,10 @@ public class TourDatabase {
 
    /**
     * @param tagId
-    * @return Returns the tag notes
-    *         <code>null</code>
+    * @param tagPropertyId
+    * @return Returns the tag's specified property
     */
-   public static String getTagNotes(final Long tagId) {
+   public static String getTagPropertyValue(final Long tagId, final String tagPropertyId) {
 
       if (tagId == null) {
          return UI.EMPTY_STRING;
@@ -2311,12 +2311,23 @@ public class TourDatabase {
       final TourTag tag = hashAllTags.get(tagId);
 
       if (tag != null) {
-         return tag.getNotes();
+
+         switch (tagPropertyId) {
+
+         case "TOUR_TAG_IMAGE_FILE_PATH": //$NON-NLS-1$
+            return tag.getImageFilePath();
+
+         case "TOUR_TAG_AND_CATEGORY_NOTES": //$NON-NLS-1$
+            return tag.getNotes();
+
+         default:
+            return UI.EMPTY_STRING;
+         }
       } else {
          try {
             throw new MyTourbookException("tag id '" + tagId + "' is not available"); //$NON-NLS-1$ //$NON-NLS-2$
          } catch (final MyTourbookException e) {
-            e.printStackTrace();
+            StatusUtil.log(e);
          }
       }
 
@@ -4438,7 +4449,7 @@ public class TourDatabase {
 
             // version 49 start
 
-            + "   imageFilePath        VARCHAR(" + TourTag.DB_LENGTH_FILE_PATH + ")       " + NL //$NON-NLS-1$
+            + "   imageFilePath        VARCHAR(" + TourTag.DB_LENGTH_FILE_PATH + ")       " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 49 end ---------
 
