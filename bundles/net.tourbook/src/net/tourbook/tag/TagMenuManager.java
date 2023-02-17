@@ -60,56 +60,56 @@ import org.eclipse.swt.widgets.Menu;
 
 public class TagMenuManager {
 
-   private static final String            SETTINGS_SECTION_RECENT_TAGS = "TagManager.RecentTags";                              //$NON-NLS-1$
-   private static final String            STATE_RECENT_TAGS            = "tagId";                                              //$NON-NLS-1$
-   private static final String            STATE_PREVIOUS_TAGS          = UI.EMPTY_STRING;
+   private static final String             SETTINGS_SECTION_RECENT_TAGS = "TagManager.RecentTags";                              //$NON-NLS-1$
+   private static final String             STATE_RECENT_TAGS            = "tagId";                                              //$NON-NLS-1$
+   private static final String             STATE_PREVIOUS_TAGS          = UI.EMPTY_STRING;
 
-   private static final IPreferenceStore  _prefStore                   = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings   _state                       = TourbookPlugin.getState(SETTINGS_SECTION_RECENT_TAGS);
+   private static final IPreferenceStore   _prefStore                   = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings    _state                       = TourbookPlugin.getState(SETTINGS_SECTION_RECENT_TAGS);
 
-   private static IPropertyChangeListener _prefChangeListener;
+   private static IPropertyChangeListener  _prefChangeListener;
 
-   private static TagMenuManager          _currentInstance;
+   private static TagMenuManager           _currentInstance;
 
-   private static boolean                 _isAdvMenu;
-   private static ActionRecentTag[]       _actionsRecentTags;
+   private static boolean                  _isAdvMenu;
+   private static ActionRecentTag[]        _actionsRecentTags;
 
-   private static ActionAllPreviousTags   _actionAllPreviousTags;
+   private static ActionAllPreviousTags    _actionAllPreviousTags;
    /**
     * number of tags which are displayed in the context menu or saved in the dialog settings, it's
     * max number is 9 to have a unique accelerator key
     */
-   private static LinkedList<TourTag>     _recentTags                  = new LinkedList<>();
+   private static LinkedList<TourTag>      _recentTags                  = new LinkedList<>();
 
    /**
     * Contains all tags which are added by the last add action
     */
-   private static HashMap<Long, TourTag>  _allPreviousTags             = new HashMap<>();
+   private static HashMap<Long, TourTag>   _allPreviousTags             = new HashMap<>();
 
-   private static int                     _maxRecentActions            = -1;
+   private static int                      _maxRecentActions            = -1;
 
    /**
     * Contains tag id's for all selected tours
     */
-   private static HashSet<Long>           _allTourTagIds;
+   private static HashSet<Long>            _allTourTagIds;
 
-   private static boolean                 _isEnableRecentTagActions;
-   private static int                     _taggingAutoOpenDelay;
+   private static boolean                  _isEnableRecentTagActions;
+   private static int                      _taggingAutoOpenDelay;
 
-   private static boolean                 _isTaggingAutoOpen;
-   private static boolean                 _isTaggingAnimation;
-   public static final Map<String, Image> _imageCache                  = new HashMap<>();
+   private static boolean                  _isTaggingAutoOpen;
+   private static boolean                  _isTaggingAnimation;
+   private static final Map<String, Image> _tagImagesCache              = new HashMap<>();
 
-   private boolean                        _isSaveTour;
-   private ITourProvider                  _tourProvider;
+   private boolean                         _isSaveTour;
+   private ITourProvider                   _tourProvider;
 
-   private ActionContributionItem         _actionAddTagAdvanced;
-   private Action_AddTourTag_SubMenu      _actionAddTag;
-   private Action_RemoveTourTag_SubMenu   _actionRemoveTag;
-   private Action_RemoveAllTags           _actionRemoveAllTags;
-   private Action_SetTags                 _actionSetTags;
+   private ActionContributionItem          _actionAddTagAdvanced;
+   private Action_AddTourTag_SubMenu       _actionAddTag;
+   private Action_RemoveTourTag_SubMenu    _actionRemoveTag;
+   private Action_RemoveAllTags            _actionRemoveAllTags;
+   private Action_SetTags                  _actionSetTags;
 
-   private AdvancedMenuForActions         _advancedMenuToAddTags;
+   private AdvancedMenuForActions          _advancedMenuToAddTags;
 
    /**
     * Removes all tags
@@ -240,6 +240,7 @@ public class TagMenuManager {
 
       // create pref listener
       _prefChangeListener = propertyChangeEvent -> {
+
          final String property = propertyChangeEvent.getProperty();
 
          // check if the number of recent tags has changed
@@ -270,9 +271,9 @@ public class TagMenuManager {
     */
    public static void dispose() {
 
-      _imageCache.values().forEach(tagImage -> Util.disposeResource(tagImage));
+      _tagImagesCache.values().forEach(Util::disposeResource);
 
-      _imageCache.clear();
+      _tagImagesCache.clear();
    }
 
    static void enableRecentTagActions(final boolean isAddTagEnabled, final Set<Long> existingTagIds) {
@@ -347,15 +348,17 @@ public class TagMenuManager {
 
    public static Image getTagImage(final String imageFilePath) {
 
-      var toto = TagMenuManager._imageCache.get(imageFilePath);
-      if (toto == null) {
-         toto = UI.prepareTagImage(imageFilePath);
-         if (toto != null) {
-            TagMenuManager._imageCache.put(imageFilePath, toto);
+      var tagImage = TagMenuManager._tagImagesCache.get(imageFilePath);
+
+      if (tagImage == null) {
+
+         tagImage = UI.prepareTagImage(imageFilePath);
+         if (tagImage != null) {
+            TagMenuManager._tagImagesCache.put(imageFilePath, tagImage);
          }
       }
 
-      return toto;
+      return tagImage;
    }
 
    private static void restoreAutoOpen() {
