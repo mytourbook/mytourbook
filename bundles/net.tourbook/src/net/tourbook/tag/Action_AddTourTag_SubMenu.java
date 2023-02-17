@@ -36,19 +36,16 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.PrefPageTags;
-import net.tourbook.ui.UI;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
-//TODO FB dispose the image
 /**
  * Add tag(s) from the selected tours
  */
@@ -148,23 +145,19 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
    private class ActionTourTag extends Action {
 
       private final TourTag __tourTag;
-      private Image         __tourTagImage;
 
       public ActionTourTag(final TourTag tourTag) {
 
          super(tourTag.getTagName(), AS_CHECK_BOX);
-         __tourTagImage = UI.prepareTagImage(tourTag.getImageFilePath());
-         if (__tourTagImage != null) {
-            setImageDescriptor(ImageDescriptor.createFromImage(__tourTagImage));
+         final var toto = TagMenuManager.getTagImage(tourTag.getImageFilePath());
+         if (toto != null) {
+            setImageDescriptor(ImageDescriptor.createFromImage(toto));
          }
 
          __tourTag = tourTag;
       }
 
-      public void dispose() {
 
-         net.tourbook.common.UI.disposeResource(__tourTagImage);
-      }
 
       @Override
       public void run() {
@@ -372,8 +365,6 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
 
       if (_menu != null) {
          //todo fb
-         final var toto = _menu.getItems();
-         _menu.getItems()[0].dispose();
          _menu.dispose();
          _menu = null;
       }

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.tourbook.Images;
@@ -51,6 +52,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -68,11 +70,11 @@ public class TagMenuManager {
    private static IPropertyChangeListener _prefChangeListener;
 
    private static TagMenuManager          _currentInstance;
+
    private static boolean                 _isAdvMenu;
-
    private static ActionRecentTag[]       _actionsRecentTags;
-   private static ActionAllPreviousTags   _actionAllPreviousTags;
 
+   private static ActionAllPreviousTags   _actionAllPreviousTags;
    /**
     * number of tags which are displayed in the context menu or saved in the dialog settings, it's
     * max number is 9 to have a unique accelerator key
@@ -90,11 +92,13 @@ public class TagMenuManager {
     * Contains tag id's for all selected tours
     */
    private static HashSet<Long>           _allTourTagIds;
-   private static boolean                 _isEnableRecentTagActions;
 
+   private static boolean                 _isEnableRecentTagActions;
    private static int                     _taggingAutoOpenDelay;
+
    private static boolean                 _isTaggingAutoOpen;
    private static boolean                 _isTaggingAnimation;
+   public static final Map<String, Image> _imageCache                  = new HashMap<>();
 
    private boolean                        _isSaveTour;
    private ITourProvider                  _tourProvider;
@@ -261,6 +265,16 @@ public class TagMenuManager {
       _recentTags.clear();
    }
 
+   /**
+    * Dispose images
+    */
+   public static void dispose() {
+
+      _imageCache.values().forEach(tagImage -> Util.disposeResource(tagImage));
+
+      _imageCache.clear();
+   }
+
    static void enableRecentTagActions(final boolean isAddTagEnabled, final Set<Long> existingTagIds) {
 
       if (_actionsRecentTags == null) {
@@ -329,6 +343,19 @@ public class TagMenuManager {
          _actionAllPreviousTags.setEnabled(false);
       }
 
+   }
+
+   public static Image getTagImage(final String imageFilePath) {
+
+      var toto = TagMenuManager._imageCache.get(imageFilePath);
+      if (toto == null) {
+         toto = UI.prepareTagImage(imageFilePath);
+         if (toto != null) {
+            TagMenuManager._imageCache.put(imageFilePath, toto);
+         }
+      }
+
+      return toto;
    }
 
    private static void restoreAutoOpen() {
