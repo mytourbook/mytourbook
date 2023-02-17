@@ -97,6 +97,8 @@ class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator {
       }
 
       //Preload the tag images
+      //Note that the hourglass is only displayed on Windows (it doesn't seem
+      //to work on Linux)
       BusyIndicator.showWhile(Display.getCurrent(), () -> allTourTags.forEach(tourTag -> TagMenuManager.getTagImage(tourTag.getImageFilePath())));
 
       // add tag items
