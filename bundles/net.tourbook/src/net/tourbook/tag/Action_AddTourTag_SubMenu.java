@@ -42,7 +42,9 @@ import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
@@ -299,6 +301,9 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
       if (allTourTags == null) {
          return;
       }
+
+      //Preload the tag images
+      BusyIndicator.showWhile(Display.getCurrent(), () -> allTourTags.forEach(tourTag -> TagMenuManager.getTagImage(tourTag.getImageFilePath())));
 
       // add tag items
       for (final TourTag menuTourTag : allTourTags) {

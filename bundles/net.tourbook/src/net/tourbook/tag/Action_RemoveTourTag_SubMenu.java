@@ -32,7 +32,9 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
@@ -89,13 +91,16 @@ class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator {
 
    private void createTagActions(final TagCollection tagCollection, final Menu menu) {
 
-      final ArrayList<TourTag> tourTags = tagCollection.tourTags;
-      if (tourTags == null) {
+      final ArrayList<TourTag> allTourTags = tagCollection.tourTags;
+      if (allTourTags == null) {
          return;
       }
 
+      //Preload the tag images
+      BusyIndicator.showWhile(Display.getCurrent(), () -> allTourTags.forEach(tourTag -> TagMenuManager.getTagImage(tourTag.getImageFilePath())));
+
       // add tag items
-      for (final TourTag menuTourTag : tourTags) {
+      for (final TourTag menuTourTag : allTourTags) {
 
          // check the tag when it's set in the tour
          final ActionTourTag actionTourTag = new ActionTourTag(menuTourTag);
