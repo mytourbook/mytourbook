@@ -37,10 +37,12 @@ import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -318,7 +320,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       setErrorMessage(null);
 
-      Image image = _imageCamera;
+      final Image[] image = new Image[] { _imageCamera };
 
       if (StringUtils.hasContent(imageFilePath)) {
 
@@ -330,7 +332,8 @@ public class Dialog_TourTag extends TitleAreaDialog {
          } else {
 
             _imageFilePath = imageFilePath;
-            image = net.tourbook.ui.UI.prepareTagImage(_imageFilePath);
+            BusyIndicator.showWhile(Display.getCurrent(),
+                  () -> image[0] = net.tourbook.ui.UI.prepareTagImage(_imageFilePath));
          }
       }
 
@@ -338,6 +341,6 @@ public class Dialog_TourTag extends TitleAreaDialog {
       //disposed
       disposeCanvasTagImage();
 
-      _canvasTagImage.setImage(image);
+      _canvasTagImage.setImage(image[0]);
    }
 }
