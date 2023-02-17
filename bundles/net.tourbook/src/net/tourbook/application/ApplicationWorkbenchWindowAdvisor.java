@@ -358,6 +358,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       try (Connection conn = TourDatabase.getInstance().getConnection();
             final PreparedStatement statement = conn.prepareStatement(sqlString)) {
+
          final ResultSet result = statement.executeQuery();
 
          if (result.next()) {
