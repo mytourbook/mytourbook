@@ -238,7 +238,7 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
    }
 
    /**
-    * @param Messages.Action_Tag_Add
+    * @param tagMenuManager
     */
    Action_AddTourTag_SubMenu(final TagMenuManager tagMenuManager) {
 

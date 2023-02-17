@@ -344,6 +344,14 @@ public class TagMenuManager {
 
    }
 
+   /**
+    * For a given image file path, try to retrieve the already created
+    * Image resource from the cache.
+    * Otherwise, create an image resource, and put it in the cache
+    *
+    * @param imageFilePath
+    * @return
+    */
    public static Image getTagImage(final String imageFilePath) {
 
       var tagImage = TagMenuManager._tagImagesCache.get(imageFilePath);
