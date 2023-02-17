@@ -149,15 +149,13 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
       public ActionTourTag(final TourTag tourTag) {
 
          super(tourTag.getTagName(), AS_CHECK_BOX);
-         final var toto = TagMenuManager.getTagImage(tourTag.getImageFilePath());
-         if (toto != null) {
-            setImageDescriptor(ImageDescriptor.createFromImage(toto));
+         final var tagImage = TagMenuManager.getTagImage(tourTag.getImageFilePath());
+         if (tagImage != null) {
+            setImageDescriptor(ImageDescriptor.createFromImage(tagImage));
          }
 
          __tourTag = tourTag;
       }
-
-
 
       @Override
       public void run() {
@@ -364,7 +362,6 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
    public void dispose() {
 
       if (_menu != null) {
-         //todo fb
          _menu.dispose();
          _menu = null;
       }

@@ -58,9 +58,9 @@ class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator {
       public ActionTourTag(final TourTag tourTag) {
 
          super(tourTag.getTagName(), AS_CHECK_BOX);
-         final var toto = TagMenuManager.getTagImage(tourTag.getImageFilePath());
-         if (toto != null) {
-            setImageDescriptor(ImageDescriptor.createFromImage(toto));
+         final var tagImage = TagMenuManager.getTagImage(tourTag.getImageFilePath());
+         if (tagImage != null) {
+            setImageDescriptor(ImageDescriptor.createFromImage(tagImage));
          }
 
          _tourTag = tourTag;
