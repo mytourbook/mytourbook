@@ -219,7 +219,9 @@ public class ImageUtils {
 
          destData.alphaData = new byte[destData.width * destData.height];
          for (int destRow = 0; destRow < destData.height; destRow++) {
+
             for (int destCol = 0; destCol < destData.width; destCol++) {
+
                final int origRow = destRow * origData.height / destData.height;
                final int origCol = destCol * origData.width / destData.width;
                final int o = origRow * origData.width + origCol;
