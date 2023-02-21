@@ -181,11 +181,6 @@ public class ImageUtils {
          return null;
       }
 
-      final Rectangle origBounds = srcImage.getBounds();
-      if (origBounds.width == newWidth && origBounds.height == newHeight) {
-         return srcImage;
-      }
-
       final Rectangle originalImageBounds = srcImage.getBounds();
       final int originalWidth = originalImageBounds.width;
       final int originalHeight = originalImageBounds.height;
