@@ -213,6 +213,7 @@ public class ImageUtils {
       final ImageData origData = srcImage.getImageData();
       final ImageData destData = new ImageData(imgWidth, imgHeight, origData.depth, origData.palette);
       if (origData.alphaData != null) {
+
          destData.alphaData = new byte[destData.width * destData.height];
          for (int destRow = 0; destRow < destData.height; destRow++) {
             for (int destCol = 0; destCol < destData.width; destCol++) {
@@ -227,7 +228,6 @@ public class ImageUtils {
 
       //Resize the image
       final Image scaledImage = new Image(display, destData);
-
       final GC gc = new GC(scaledImage);
       Transform transformation = null;
       try {
