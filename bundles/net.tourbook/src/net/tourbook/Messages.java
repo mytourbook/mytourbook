@@ -1755,6 +1755,7 @@ public class Messages extends NLS {
    public static String        pref_tourtag_btn_new_tag;
    public static String        pref_tourtag_btn_new_tag_category;
    public static String        pref_tourtag_btn_reset;
+   public static String        Pref_TourTag_Column_ImageFilePath;
    public static String        Pref_TourTag_Column_Notes;
    public static String        Pref_TourTag_Column_TagsAndCategories;
    public static String        pref_tourtag_dlg_new_tag_category_message;
