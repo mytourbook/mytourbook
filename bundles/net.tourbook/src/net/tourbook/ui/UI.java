@@ -1274,7 +1274,7 @@ public class UI {
 
          if (tagLabel != null) {
 
-            net.tourbook.common.UI.disposeResource(tagLabel.getImage());
+            Util.disposeResource(tagLabel.getImage());
          }
       });
       tagsLabels.clear();
@@ -1283,7 +1283,6 @@ public class UI {
 
          tourTagsComposite.setData(null);
          return;
-
       }
 
       final Map<Long, String> tourTagsAccumulatedValues =

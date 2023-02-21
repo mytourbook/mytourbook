@@ -212,8 +212,8 @@ public class ImageUtils {
          }
       }
 
-      //For images with a transparent layer, this will keep the existing
-      //transparency
+      // For images with a transparent layer, this will keep the existing
+      // transparency.
       // Source: https://stackoverflow.com/a/63703052
       final ImageData origData = srcImage.getImageData();
       final ImageData destData = new ImageData(imgWidth, imgHeight, origData.depth, origData.palette);
