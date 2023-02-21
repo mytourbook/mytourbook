@@ -207,12 +207,15 @@ public class ImageUtils {
          }
       }
 
+      Image scaledImage = new Image(display, imgWidth, imgHeight);
+
       // For images with a transparent layer, this will keep the existing
       // transparency.
       // Source: https://stackoverflow.com/a/63703052
       final ImageData origData = srcImage.getImageData();
-      final ImageData destData = new ImageData(imgWidth, imgHeight, origData.depth, origData.palette);
       if (origData.alphaData != null) {
+
+         final ImageData destData = new ImageData(imgWidth, imgHeight, origData.depth, origData.palette);
 
          destData.alphaData = new byte[destData.width * destData.height];
          for (int destRow = 0; destRow < destData.height; destRow++) {
@@ -224,10 +227,10 @@ public class ImageUtils {
                destData.alphaData[d] = origData.alphaData[o];
             }
          }
+         scaledImage = new Image(display, destData);
       }
 
       //Resize the image
-      final Image scaledImage = new Image(display, destData);
       final GC gc = new GC(scaledImage);
       Transform transformation = null;
       try {
