@@ -103,6 +103,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.menus.UIElement;
+import org.imgscalr.Scalr.Rotation;
 
 public class UI {
 
@@ -902,7 +903,7 @@ public class UI {
 
       final Image image = new Image(Display.getDefault(), imageFilePath);
 
-      int rotation = 0;
+      Rotation rotation = null;
       try {
 
          final ImageMetadata imageMetadata = Imaging.getMetadata(new File(imageFilePath), null);
@@ -917,10 +918,13 @@ public class UI {
 
                if (orientation == 6) {
 
-                  rotation = 90;
+                  rotation = Rotation.CW_90;
+               } else if (orientation == 3) {
+
+                  rotation = Rotation.CW_180;
                } else if (orientation == 8) {
 
-                  rotation = -90;
+                  rotation = Rotation.CW_270;
                }
             }
          }
@@ -943,7 +947,7 @@ public class UI {
          newimageWidth = Math.round(newimageHeight * imageWidth / (imageHeight * 1f));
       }
 
-      return ImageUtils.resize(image, newimageWidth, newimageHeight, rotation);
+      return ImageUtils.resize(Display.getDefault(), image, newimageWidth, newimageHeight, 1, 1, rotation);
    }
 
    public static ImageData rotate(final ImageData srcData, final int direction) {

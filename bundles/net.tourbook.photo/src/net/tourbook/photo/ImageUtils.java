@@ -15,15 +15,12 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
-import java.awt.Graphics2D;
 import java.awt.Point;
-import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.FileFilter;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.ImageConverter;
 
 import org.apache.commons.imaging.Imaging;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -184,6 +181,11 @@ public class ImageUtils {
          return null;
       }
 
+      final Rectangle origBounds = srcImage.getBounds();
+      if (origBounds.width == newWidth && origBounds.height == newHeight) {
+         return srcImage;
+      }
+
       final Rectangle originalImageBounds = srcImage.getBounds();
       final int originalWidth = originalImageBounds.width;
       final int originalHeight = originalImageBounds.height;
@@ -210,7 +212,27 @@ public class ImageUtils {
          }
       }
 
-      final Image scaledImage = new Image(display, imgWidth, imgHeight);
+      //For images with a transparent layer, this will keep the existing
+      //transparency
+      // Source: https://stackoverflow.com/a/63703052
+      final ImageData origData = srcImage.getImageData();
+      final ImageData destData = new ImageData(imgWidth, imgHeight, origData.depth, origData.palette);
+      if (origData.alphaData != null) {
+         destData.alphaData = new byte[destData.width * destData.height];
+         for (int destRow = 0; destRow < destData.height; destRow++) {
+            for (int destCol = 0; destCol < destData.width; destCol++) {
+               final int origRow = destRow * origData.height / destData.height;
+               final int origCol = destCol * origData.width / destData.width;
+               final int o = origRow * origData.width + origCol;
+               final int d = destRow * destData.width + destCol;
+               destData.alphaData[d] = origData.alphaData[o];
+            }
+         }
+      }
+
+      //Resize the image
+      final Image scaledImage = new Image(display, destData);
+
       final GC gc = new GC(scaledImage);
       Transform transformation = null;
       try {
@@ -218,8 +240,8 @@ public class ImageUtils {
 
          gc.setAntialias(antialias);
          gc.setInterpolation(interpolation);
-//			gc.setAntialias(SWT.ON);
-//			gc.setInterpolation(SWT.LOW);
+//       gc.setAntialias(SWT.ON);
+//       gc.setInterpolation(SWT.LOW);
 
          int destX = 0;
          int destY = 0;
@@ -314,49 +336,6 @@ public class ImageUtils {
    }
 
    /**
-    * Resizes an image while keeping the existing transparency
-    *
-    * @param image
-    * @param newWidth
-    * @param newHeight
-    * @param rotation
-    * @return
-    */
-   public static Image resize(final Image image,
-                              final int newWidth,
-                              final int newHeight,
-                              final int rotation) {
-
-      // read an image to BufferedImage for processing
-      final BufferedImage originalImage = ImageConverter.convertIntoAWT(image);
-
-      // create a new BufferedImage for drawing
-      final BufferedImage newResizedImage = new BufferedImage(
-            newWidth,
-            newHeight,
-            BufferedImage.TYPE_INT_ARGB);
-      final Graphics2D graphics2D = newResizedImage.createGraphics();
-
-      graphics2D.setRenderingHint(
-            RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_ON);
-      graphics2D.setRenderingHint(
-            RenderingHints.KEY_RENDERING,
-            RenderingHints.VALUE_RENDER_QUALITY);
-
-      // puts the original image into the newResizedImage
-      graphics2D.drawImage(originalImage, 0, 0, newWidth, newHeight, null);
-      graphics2D.dispose();
-      if (rotation > 0) {
-         graphics2D.rotate(Math.toRadians(rotation));
-      }
-
-      image.dispose();
-
-      return ImageConverter.convertIntoSWT(newResizedImage);
-   }
-
-   /**
     * Resize an image to the best fitting size. Old and new Image (result)must be disposed after
     * use.
     *
@@ -381,4 +360,19 @@ public class ImageUtils {
       return ImageUtils.resize(display, img, newSize.x, newSize.y);
    }
 
+   @SuppressWarnings("unused")
+   private Image resize(final int w, final int h, final Image img) {
+
+      final Image newImage = new Image(Display.getDefault(), w, h);
+      final GC gc = new GC(newImage);
+      {
+         gc.setAntialias(SWT.ON);
+         gc.setInterpolation(SWT.HIGH);
+         gc.drawImage(img, 0, 0, img.getBounds().width, img.getBounds().height, 0, 0, w, h);
+      }
+      gc.dispose();
+      img.dispose();
+
+      return newImage;
+   }
 }
