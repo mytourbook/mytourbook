@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,12 +29,12 @@ public class TimeMachineResultTests {
 
       assertAll(
             () -> assertEquals(IWeather.WEATHER_ID_LIGHTNING,
-                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(210)),
+                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds("11d")),
             () -> assertEquals(IWeather.WEATHER_ID_SCATTERED_SHOWERS,
-                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(522)),
+                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds("09d")),
             () -> assertEquals(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,
-                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(771)),
+                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds("50d")),
             () -> assertEquals(IWeather.WEATHER_ID_CLEAR,
-                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(800)));
+                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds("01d")));
    }
 }

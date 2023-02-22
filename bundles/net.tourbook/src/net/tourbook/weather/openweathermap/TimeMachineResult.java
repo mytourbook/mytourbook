@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.weather.WeatherUtils;
 
@@ -52,26 +53,27 @@ class TimeMachineResult {
 //todo fb
       String weatherType = UI.EMPTY_STRING;
 
-      if (weatherId >= 200 && weatherId < 300) {
-         weatherType = IWeather.WEATHER_ID_LIGHTNING;
-      } else if (weatherId >= 300 && weatherId < 313) {
-         weatherType = IWeather.WEATHER_ID_DRIZZLE;
-      } else if ((weatherId >= 313 && weatherId < 400) ||
-            (weatherId >= 520 && weatherId < 600)) {
-         weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
-      } else if (weatherId >= 500 && weatherId < 520) {
-         weatherType = IWeather.WEATHER_ID_RAIN;
-      } else if (weatherId >= 600 && weatherId < 700) {
-         weatherType = IWeather.WEATHER_ID_SNOW;
-      } else if (weatherId == 800) {
+      if (StringUtils.isNullOrEmpty(weatherIcon)) {
+         return weatherType;
+      }
+
+      if (weatherIcon.startsWith("01")) {
          weatherType = IWeather.WEATHER_ID_CLEAR;
-      } else if (weatherId == 801 || weatherId == 802) {
+      } else if (weatherIcon.startsWith("02") ||
+            weatherIcon.startsWith("04")) {
          weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
-      } else if (weatherId == 803 || weatherId == 804) {
+      } else if (weatherIcon.startsWith("03")) {
          weatherType = IWeather.WEATHER_ID_OVERCAST;
-      } else if (weatherId == 711 || weatherId == 762 ||
-            weatherId == 771 || weatherId == 781) {
-         weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
+      } else if (weatherIcon.startsWith("09")) {
+         weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
+      } else if (weatherIcon.startsWith("10")) {
+         weatherType = IWeather.WEATHER_ID_RAIN;
+      } else if (weatherIcon.startsWith("11")) {
+         weatherType = IWeather.WEATHER_ID_LIGHTNING;
+      } else if (weatherIcon.startsWith("13")) {
+         weatherType = IWeather.WEATHER_ID_SNOW;
+      } else if (weatherIcon.startsWith("50")) {
+         weatherType = IWeather.WEATHER_ID_DRIZZLE;
       }
 
       return weatherType;
