@@ -70,11 +70,11 @@ public class TagMenuManager {
    private static IPropertyChangeListener  _prefChangeListener;
 
    private static TagMenuManager           _currentInstance;
-
    private static boolean                  _isAdvMenu;
-   private static ActionRecentTag[]        _actionsRecentTags;
 
+   private static ActionRecentTag[]        _actionsRecentTags;
    private static ActionAllPreviousTags    _actionAllPreviousTags;
+
    /**
     * number of tags which are displayed in the context menu or saved in the dialog settings, it's
     * max number is 9 to have a unique accelerator key
