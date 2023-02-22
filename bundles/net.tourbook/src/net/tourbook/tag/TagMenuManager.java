@@ -92,10 +92,9 @@ public class TagMenuManager {
     * Contains tag id's for all selected tours
     */
    private static HashSet<Long>            _allTourTagIds;
-
    private static boolean                  _isEnableRecentTagActions;
-   private static int                      _taggingAutoOpenDelay;
 
+   private static int                      _taggingAutoOpenDelay;
    private static boolean                  _isTaggingAutoOpen;
    private static boolean                  _isTaggingAnimation;
    private static final Map<String, Image> _tagImagesCache              = new HashMap<>();
