@@ -37,7 +37,6 @@ import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.CSS;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
@@ -412,14 +411,13 @@ public class TourBlogView extends ViewPart {
 
    private void create_24_Tour(final StringBuilder sb) {
 
-      String tourDescription = _tourData.getTourDescription();
-      final boolean isDescription = StringUtils.hasContent(tourDescription);
-
       String tourTitle = _tourData.getTourTitle();
-      final boolean isTitle = StringUtils.hasContent(tourTitle);
-
+      String tourDescription = _tourData.getTourDescription();
       String tourWeather = WeatherUtils.buildWeatherDataString(_tourData, true, true, true);
-      final boolean isWeather = StringUtils.hasContent(tourWeather);
+
+      final boolean isDescription = tourDescription.length() > 0;
+      final boolean isTitle = tourTitle.length() > 0;
+      final boolean isWeather = tourWeather.length() > 0;
 
       if (isDescription || isTitle || isWeather) {
 
