@@ -149,7 +149,6 @@ import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -643,7 +642,7 @@ public class Map2 extends Canvas {
    private int               _prefOptions_LineWidth;
    private List<Long>        _allTourIds;
 
-   private static enum HoveredPoint_PaintMode {
+   private enum HoveredPoint_PaintMode {
 
       IS_HOVERED, //
       IS_SELECTED, //
@@ -1170,13 +1169,6 @@ public class Map2 extends Canvas {
       _overlayImageCache.dispose();
 
       grid_UpdatePaintingStateData();
-   }
-
-   private void disposeResource(final Resource resource) {
-
-      if ((resource != null) && !resource.isDisposed()) {
-         resource.dispose();
-      }
    }
 
    public void disposeTiles() {
@@ -2731,19 +2723,19 @@ public class Map2 extends Canvas {
          _dropTarget.dispose();
       }
 
-      disposeResource(_mapImage);
-      disposeResource(_poiImage);
+      Util.disposeResource(_mapImage);
+      Util.disposeResource(_poiImage);
 
-      disposeResource(_9PartImage);
-      disposeResource(_9PartGC);
+      Util.disposeResource(_9PartImage);
+      Util.disposeResource(_9PartGC);
 
-      disposeResource(_cursorCross);
-      disposeResource(_cursorDefault);
-      disposeResource(_cursorHand);
-      disposeResource(_cursorPan);
-      disposeResource(_cursorSearchTour);
-      disposeResource(_cursorSearchTour_Scroll);
-      disposeResource(_cursorSelect);
+      Util.disposeResource(_cursorCross);
+      Util.disposeResource(_cursorDefault);
+      Util.disposeResource(_cursorHand);
+      Util.disposeResource(_cursorPan);
+      Util.disposeResource(_cursorSearchTour);
+      Util.disposeResource(_cursorSearchTour_Scroll);
+      Util.disposeResource(_cursorSelect);
 
       // dispose resources in the overlay plugins
       for (final Map2Painter overlay : _allMapPainter) {
@@ -2759,7 +2751,7 @@ public class Map2 extends Canvas {
 
       // dispose legend image
       if (_mapLegend != null) {
-         disposeResource(_mapLegend.getImage());
+         Util.disposeResource(_mapLegend.getImage());
       }
 
       if (_poi_Tooltip != null) {
@@ -6795,7 +6787,7 @@ public class Map2 extends Canvas {
       if ((legend == null) && (_mapLegend != null)) {
 
          // dispose legend image
-         disposeResource(_mapLegend.getImage());
+         Util.disposeResource(_mapLegend.getImage());
       }
 
       _mapLegend = legend;

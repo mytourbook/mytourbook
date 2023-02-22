@@ -651,10 +651,19 @@ public class Util {
       }
    }
 
+   /**
+    * Disposes a resource
+    *
+    * @param resource
+    * @return <code>null</code>
+    */
+
    public static Resource disposeResource(final Resource resource) {
+
       if (resource != null && !resource.isDisposed()) {
          resource.dispose();
       }
+
       return null;
    }
 

@@ -823,10 +823,10 @@ public class TourMapPainter extends Map2Painter {
    @Override
    protected void dispose() {
 
-      Util.disposeResource(_tourEndMarker);
-      Util.disposeResource(_tourStartMarker);
+      net.tourbook.common.util.Util.disposeResource(_tourEndMarker);
+      net.tourbook.common.util.Util.disposeResource(_tourStartMarker);
 
-      Util.disposeResource(_tourWayPointImage);
+      net.tourbook.common.util.Util.disposeResource(_tourWayPointImage);
 
       _isImageAvailable = false;
    }

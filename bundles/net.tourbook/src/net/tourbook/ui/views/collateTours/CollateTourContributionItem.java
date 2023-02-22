@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
+import net.tourbook.common.util.Util;
 import net.tourbook.data.TourType;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TourTypeFilter;
@@ -271,14 +272,14 @@ class CollateTourContributionItem extends ControlContribution {
 	@Override
 	public void dispose() {
 
-		UI.disposeResource(_cursorHand);
+      Util.disposeResource(_cursorHand);
 
 		super.dispose();
 	}
 
 	/**
 	 * Fills the tour type filter context menu.
-	 * 
+	 *
 	 * @param menuMgr
 	 */
 	private void fillContextMenu(final IMenuManager menuMgr) {

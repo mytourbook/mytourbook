@@ -460,7 +460,7 @@ public class ChartComponentAxis extends Canvas {
 
    private void onDispose() {
 
-      _axisImage = Util.disposeResource(_axisImage);
+      _axisImage = net.tourbook.common.util.Util.disposeResource(_axisImage);
    }
 
    private void onMouseDown() {

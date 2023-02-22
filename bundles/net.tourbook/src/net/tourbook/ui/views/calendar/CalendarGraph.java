@@ -811,13 +811,13 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
    private void disposeFonts() {
 
-      _fontDateColumn = UI.disposeResource(_fontDateColumn);
-      _fontDayHeader = UI.disposeResource(_fontDayHeader);
-      _fontTourContent = UI.disposeResource(_fontTourContent);
-      _fontTourTitle = UI.disposeResource(_fontTourTitle);
-      _fontTourValue = UI.disposeResource(_fontTourValue);
-      _fontWeekValue = UI.disposeResource(_fontWeekValue);
-      _fontYearHeader = UI.disposeResource(_fontYearHeader);
+      _fontDateColumn = Util.disposeResource(_fontDateColumn);
+      _fontDayHeader = Util.disposeResource(_fontDayHeader);
+      _fontTourContent = Util.disposeResource(_fontTourContent);
+      _fontTourTitle = Util.disposeResource(_fontTourTitle);
+      _fontTourValue = Util.disposeResource(_fontTourValue);
+      _fontWeekValue = Util.disposeResource(_fontWeekValue);
+      _fontYearHeader = Util.disposeResource(_fontYearHeader);
    }
 
    void draw() {
