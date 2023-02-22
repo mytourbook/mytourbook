@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,6 +29,12 @@ public interface IWeather {
    public static final String   WEATHER_ID_SNOW                 = "weather-snow";              //$NON-NLS-1$
    public static final String   WEATHER_ID_SEVERE_WEATHER_ALERT = "weather-severe";            //$NON-NLS-1$
    public static final String   WEATHER_ID_SCATTERED_SHOWERS    = "weather-showers-scattered"; //$NON-NLS-1$
+
+   public static final String   WEATHER_AIR_QUALITY_ID_GOOD     = "weather-airquality-good";   //$NON-NLS-1$
+   public static final String   WEATHER_AIR_QUALITY_ID_FAIR      = "weather-airquality-fair";      //$NON-NLS-1$
+   public static final String   WEATHER_AIR_QUALITY_ID_MODERATE  = "weather-airquality-moderate";  //$NON-NLS-1$
+   public static final String   WEATHER_AIR_QUALITY_ID_POOR      = "weather-airquality-poor";      //$NON-NLS-1$
+   public static final String   WEATHER_AIR_QUALITY_ID_VERY_POOR = "weather-airquality-very-poor"; //$NON-NLS-1$
 
    public static final String   windDirectionIsNotDefined       = UI.EMPTY_STRING;
 
@@ -211,6 +217,22 @@ public interface IWeather {
          WEATHER_ID_LIGHTNING,
          WEATHER_ID_SNOW,
          WEATHER_ID_SEVERE_WEATHER_ALERT,
+         WEATHER_AIR_QUALITY_ID_GOOD,
+
+   };
+
+   /**
+    * Icons for the air quality
+    */
+   public static final String[] airQualityIcon = new String[] {
+
+         UI.IMAGE_EMPTY_16,
+
+         WEATHER_AIR_QUALITY_ID_GOOD,
+         WEATHER_AIR_QUALITY_ID_FAIR,
+         WEATHER_AIR_QUALITY_ID_MODERATE,
+         WEATHER_AIR_QUALITY_ID_POOR,
+         WEATHER_AIR_QUALITY_ID_VERY_POOR
 
    };
 
