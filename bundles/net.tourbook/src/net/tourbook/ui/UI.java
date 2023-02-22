@@ -20,16 +20,12 @@ import de.byteholder.geoclipse.preferences.IMappingPreferences;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Formatter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,7 +35,6 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.common.color.MapGraphId;
-import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
@@ -50,6 +45,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageUtils;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
@@ -564,51 +560,6 @@ public class UI {
 
          child.setEnabled(false);
       }
-   }
-
-   private static Map<Long, String> fetchTourTagsAccumulatedValues() {
-
-      final String sqlQuery = "SELECT" + NEW_LINE //                                                                        //$NON-NLS-1$
-            + "jTdataTtag.TOURTAG_TAGID," + NEW_LINE // //$NON-NLS-1$
-            + "SUM(tourData.TOURDISTANCE) AS TOTALDISTANCE," + NEW_LINE // //$NON-NLS-1$
-            + "SUM(tourData.TOURDEVICETIME_RECORDED) AS TOTALRECORDEDTIME" + NEW_LINE //                                                                   //$NON-NLS-1$
-            + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NEW_LINE //                                                                        //$NON-NLS-1$ //$NON-NLS-2$
-            + "INNER JOIN " + TourDatabase.TABLE_TOUR_DATA + NEW_LINE //                                                       //$NON-NLS-1$
-            + "ON jTdataTtag.TOURDATA_TOURID = tourData.TOURID" + NEW_LINE //                                                                       //$NON-NLS-1$
-            + "GROUP BY jTdataTtag.TOURTAG_TAGID"; //$NON-NLS-1$
-
-      final Map<Long, String> tourTagsAccumulatedValues = new HashMap<>();
-
-      try (Connection connection = TourDatabase.getInstance().getConnection();
-            final PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
-
-         final ResultSet result = preparedStatement.executeQuery();
-
-         while (result.next()) {
-
-            final long tourTagId = result.getLong(1);
-            float usedMiles = result.getInt(2);
-            final long usedHours = result.getInt(3);
-
-            final StringBuilder tagAccumulatedValues = new StringBuilder();
-
-            tagAccumulatedValues.append(Math.round(usedHours / 3600f));
-            tagAccumulatedValues.append(Messages.tour_editor_label_time_unit);
-
-            tagAccumulatedValues.append(UI.NEW_LINE);
-
-            usedMiles = usedMiles / 1000 / net.tourbook.common.UI.UNIT_VALUE_DISTANCE;
-            tagAccumulatedValues.append(Math.round(usedMiles));
-            tagAccumulatedValues.append(net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
-
-            tourTagsAccumulatedValues.put(tourTagId, tagAccumulatedValues.toString());
-         }
-
-      } catch (final SQLException e) {
-
-         SQL.showException(e, sqlQuery);
-      }
-      return tourTagsAccumulatedValues;
    }
 
    public static String format_yyyymmdd_hhmmss(final TourData tourData) {
@@ -1286,7 +1237,7 @@ public class UI {
       }
 
       final Map<Long, String> tourTagsAccumulatedValues =
-            UI.fetchTourTagsAccumulatedValues();
+            TagManager.fetchTourTagsAccumulatedValues();
 
       for (final TourTag tag : tourTags) {
 
