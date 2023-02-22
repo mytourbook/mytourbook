@@ -46,7 +46,7 @@ class TimeMachineResult {
    /**
     * Codes : https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
     *
-    * @param weatherId
+    * @param weatherIcon
     * @return
     */
    static String convertWeatherTypeToMTWeatherClouds(final String weatherIcon) {
@@ -57,22 +57,22 @@ class TimeMachineResult {
          return weatherType;
       }
 
-      if (weatherIcon.startsWith("01")) {
+      if (weatherIcon.startsWith("01")) { //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_CLEAR;
-      } else if (weatherIcon.startsWith("02") ||
-            weatherIcon.startsWith("04")) {
+      } else if (weatherIcon.startsWith("02") || //$NON-NLS-1$
+            weatherIcon.startsWith("04")) { //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
-      } else if (weatherIcon.startsWith("03")) {
+      } else if (weatherIcon.startsWith("03")) { //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_OVERCAST;
-      } else if (weatherIcon.startsWith("09")) {
+      } else if (weatherIcon.startsWith("09")) { //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
-      } else if (weatherIcon.startsWith("10")) {
+      } else if (weatherIcon.startsWith("10")) { //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_RAIN;
-      } else if (weatherIcon.startsWith("11")) {
+      } else if (weatherIcon.startsWith("11")) { //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_LIGHTNING;
-      } else if (weatherIcon.startsWith("13")) {
+      } else if (weatherIcon.startsWith("13")) { //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_SNOW;
-      } else if (weatherIcon.startsWith("50")) {
+      } else if (weatherIcon.startsWith("50")) { //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_DRIZZLE;
       }
 

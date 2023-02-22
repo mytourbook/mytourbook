@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Weather {
 
-   private String main;
    private String description;
    private String icon;
 
@@ -30,9 +29,5 @@ public class Weather {
 
    public String getIcon() {
       return icon;
-   }
-
-   public String getMain() {
-      return main;
    }
 }

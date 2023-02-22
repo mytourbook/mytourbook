@@ -234,6 +234,7 @@ public class Data {
          return weatherType;
       }
 
+      //todo fb
       // Codes : http://www.worldweatheronline.com/feed/wwoConditionCodes.xml
       switch (middleHourly.getWeatherCode()) {
       case "122": //$NON-NLS-1$
