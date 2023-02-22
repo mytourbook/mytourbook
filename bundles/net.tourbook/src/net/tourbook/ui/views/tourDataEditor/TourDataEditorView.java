@@ -4647,7 +4647,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             _compositeTags = new Composite(container, SWT.NONE);
             final RowLayout layout = new RowLayout();
-            layout.wrap = true;
+            layout.fill = true;
             _compositeTags.setLayout(layout);
             _compositeTags.setLayoutData(layout);
 
