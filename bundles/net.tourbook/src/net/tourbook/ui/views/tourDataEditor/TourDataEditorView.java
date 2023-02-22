@@ -612,7 +612,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private ComboViewerCadence _comboCadence;
    //
    private CLabel             _lblTourType;
-   private Map<Long, CLabel>  _tagsLabels = new HashMap<>();
    //
    private ControlDecoration  _decoTimeZone;
    //
@@ -9252,7 +9251,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // tour type/tags
       net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
-      net.tourbook.ui.UI.updateUI_TagsWithImage(_pc, _tourData.getTourTags(), _compositeTags, _tagsLabels);
+      net.tourbook.ui.UI.updateUI_TagsWithImage(_pc, _tourData.getTourTags(), _compositeTags);
 
       // measurement system
       _lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
@@ -9541,7 +9540,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // tour type/tags
       net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
-      net.tourbook.ui.UI.updateUI_TagsWithImage(_pc, _tourData.getTourTags(), _compositeTags, _tagsLabels);
+      net.tourbook.ui.UI.updateUI_TagsWithImage(_pc, _tourData.getTourTags(), _compositeTags);
 
       // reflow layout that the tags are aligned correctly
       _tourContainer.layout(true);

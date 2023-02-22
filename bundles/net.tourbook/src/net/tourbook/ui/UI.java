@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -274,6 +275,8 @@ public class UI {
       TAG_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_TITLE, null);
       TAG_SUB_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
    }
+
+   private static Map<Long, CLabel> _tagsLabels = new HashMap<>();
 
    // pref store var cannot be set from a static field because it can be null !!!
 // private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
@@ -1224,12 +1227,11 @@ public class UI {
 
    public static void updateUI_TagsWithImage(final PixelConverter pc,
                                              final Set<TourTag> tourTags,
-                                             final Composite tourTagsComposite,
-                                             final Map<Long, CLabel> tagsLabels) {
+                                             final Composite tourTagsComposite) {
 
       // We dispose the tags labels that are not present in the current
       // tour tags list
-      tagsLabels.forEach((key, value) -> {
+      _tagsLabels.forEach((key, value) -> {
 
          boolean isTourTagPresent = false;
 
@@ -1246,7 +1248,7 @@ public class UI {
          }
       });
       // We remove the disposed tag labels.
-      tagsLabels.entrySet().removeIf(entry -> entry.getValue().isDisposed());
+      _tagsLabels.entrySet().removeIf(entry -> entry.getValue().isDisposed());
 
       if (tourTags.isEmpty()) {
 
@@ -1261,7 +1263,7 @@ public class UI {
 
          // If the tag is already present in the UI, there is no need to create
          // it again.
-         if (tagsLabels.containsKey(tag.getTagId())) {
+         if (_tagsLabels.containsKey(tag.getTagId())) {
             continue;
          }
 
@@ -1274,7 +1276,7 @@ public class UI {
          if (image != null) {
             label.setImage(image);
          }
-         tagsLabels.put(tag.getTagId(), label);
+         _tagsLabels.put(tag.getTagId(), label);
       }
 
       tourTagsComposite.layout();
