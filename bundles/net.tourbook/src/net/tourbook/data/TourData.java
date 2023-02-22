@@ -599,6 +599,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    //add the feature to re-import Weather (description and clouds)
 
+   //OWM: Broken clouds mapping is wrongDo the apping with the icon datapoint instead!
+
+//WWO: Patchy light rain mapping wrong (review ALL mappings)Also review mappings for OWM and WeatherApi and if anything is wrong with OWM, then reimport weather from march 6 2022 to today after I fix it in MT ?
+//
+//https://github.com/mytourbook/mytourbook/issues/874
+//
+//refactor all the duplicated disposeResource
+
+
    // ############################################# POWER #############################################
 
    /** Unit is Watt */
