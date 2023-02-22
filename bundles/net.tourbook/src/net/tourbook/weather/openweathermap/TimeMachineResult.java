@@ -48,8 +48,8 @@ class TimeMachineResult {
     * @param weatherId
     * @return
     */
-   static String convertWeatherTypeToMTWeatherClouds(final int weatherId) {
-
+   static String convertWeatherTypeToMTWeatherClouds(final String weatherIcon) {
+//todo fb
       String weatherType = UI.EMPTY_STRING;
 
       if (weatherId >= 200 && weatherId < 300) {
@@ -279,7 +279,7 @@ class TimeMachineResult {
          return weatherType;
       }
 
-      return convertWeatherTypeToMTWeatherClouds(middleHourlyWeather.getId());
+      return convertWeatherTypeToMTWeatherClouds(middleHourlyWeather.getIcon());
    }
 
    public String getWeatherDescription() {

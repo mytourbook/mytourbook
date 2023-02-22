@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,16 +20,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Weather {
 
-   private int    id;
    private String main;
    private String description;
+   private String icon;
 
    public String getDescription() {
       return description;
    }
 
-   public int getId() {
-      return id;
+   public String getIcon() {
+      return icon;
    }
 
    public String getMain() {

@@ -596,6 +596,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    //add tool tip of quality definitions
    //add it in the string to strava as "Air Quality: Good"
 
+   //add the feature to re-import Weather (description and clouds)
+
    // ############################################# POWER #############################################
 
    /** Unit is Watt */
