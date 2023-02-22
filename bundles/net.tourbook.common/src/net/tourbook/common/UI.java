@@ -1382,13 +1382,12 @@ public class UI {
    }
 
    /**
-    * Disposes a resource
+    * disposes a resource
     *
-    * @param resource
+    * @param image
     * @return
     */
    public static Image disposeResource(final Image resource) {
-
       if (resource != null && !resource.isDisposed()) {
          resource.dispose();
       }
