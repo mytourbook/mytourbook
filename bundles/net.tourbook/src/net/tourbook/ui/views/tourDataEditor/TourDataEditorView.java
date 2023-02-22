@@ -612,7 +612,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private ComboViewerCadence _comboCadence;
    //
    private CLabel             _lblTourType;
-   private List<CLabel>       _tagsLabels = new ArrayList<>();
+   private Map<Long, CLabel>  _tagsLabels = new HashMap<>();
    //
    private ControlDecoration  _decoTimeZone;
    //

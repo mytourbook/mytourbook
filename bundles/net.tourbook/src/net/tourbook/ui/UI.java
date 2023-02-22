@@ -26,7 +26,6 @@ import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Formatter;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -97,7 +96,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -1227,12 +1225,28 @@ public class UI {
    public static void updateUI_TagsWithImage(final PixelConverter pc,
                                              final Set<TourTag> tourTags,
                                              final Composite tourTagsComposite,
-                                             final List<CLabel> tagsLabels) {
+                                             final Map<Long, CLabel> tagsLabels) {
 
-      // We dispose the current tags labels
-      tagsLabels.forEach(Widget::dispose);
+      // We dispose the tags labels that are not present in the current
+      // tour tags list
+      tagsLabels.forEach((key, value) -> {
 
-      tagsLabels.clear();
+         boolean isTourTagPresent = false;
+
+         for (final TourTag tourTag : tourTags) {
+
+            if (tourTag.getTagId() == key) {
+               isTourTagPresent = true;
+               break;
+            }
+         }
+
+         if (!isTourTagPresent) {
+            value.dispose();
+         }
+      });
+      // We remove the disposed tag labels.
+      tagsLabels.entrySet().removeIf(entry -> entry.getValue().isDisposed());
 
       if (tourTags.isEmpty()) {
 
@@ -1245,6 +1259,12 @@ public class UI {
 
       for (final TourTag tag : tourTags) {
 
+         // If the tag is already present in the UI, there is no need to create
+         // it again.
+         if (tagsLabels.containsKey(tag.getTagId())) {
+            continue;
+         }
+
          final CLabel label = new CLabel(tourTagsComposite, SWT.NONE);
          label.setLayoutData(new RowData(pc.convertWidthInCharsToPixels(35), pc.convertWidthInCharsToPixels(12)));
          label.setText(tag.getTagName() + UI.NEW_LINE +
@@ -1254,7 +1274,7 @@ public class UI {
          if (image != null) {
             label.setImage(image);
          }
-         tagsLabels.add(label);
+         tagsLabels.put(tag.getTagId(), label);
       }
 
       tourTagsComposite.layout();
