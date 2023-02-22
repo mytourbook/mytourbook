@@ -1744,18 +1744,18 @@ public class TourInfoUI {
       }
 
       final int windSpeed = (int) (_tourData.getWeather_Wind_Speed() / UI.UNIT_VALUE_DISTANCE);
-      if (windSpeed > 0) {
+      final int weatherWindDirectionDegree = _tourData.getWeather_Wind_Direction();
+      if (windSpeed > 0 && weatherWindDirectionDegree != -1) {
+
+         // Wind speed
          _lblWindSpeed.setText(Integer.toString(windSpeed));
          _lblWindSpeedUnit.setText(
                String.format(
                      Messages.Tour_Tooltip_Format_WindSpeedUnit,
                      UI.UNIT_LABEL_SPEED,
                      IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
-      }
 
-      // wind direction
-      final int weatherWindDirectionDegree = _tourData.getWeather_Wind_Direction();
-      if (weatherWindDirectionDegree != -1) {
+         // Wind direction
          _lblWindDirection.setText(Integer.toString(weatherWindDirectionDegree));
          _lblWindDirectionUnit.setText(String.format(
                Messages.Tour_Tooltip_Format_WindDirectionUnit,
