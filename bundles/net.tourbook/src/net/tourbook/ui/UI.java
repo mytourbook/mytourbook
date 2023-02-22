@@ -46,6 +46,7 @@ import net.tourbook.photo.IPhotoPreferences;
 import net.tourbook.photo.ImageUtils;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.tag.TagManager;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
@@ -95,6 +96,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -1221,13 +1223,8 @@ public class UI {
    public static void updateUI_TagsWithImage(final Set<TourTag> tourTags, final Composite tourTagsComposite, final List<CLabel> tagsLabels) {
 
       // We dispose the current tags labels
-      tagsLabels.forEach(tagLabel -> {
+      tagsLabels.forEach(Widget::dispose);
 
-         if (tagLabel != null) {
-
-            Util.disposeResource(tagLabel.getImage());
-         }
-      });
       tagsLabels.clear();
 
       if (tourTags.isEmpty()) {
@@ -1245,7 +1242,7 @@ public class UI {
          label.setText(tag.getTagName() + UI.NEW_LINE +
                tourTagsAccumulatedValues.get(tag.getTagId()));
 
-         final Image image = UI.prepareTagImage(tag.getImageFilePath());
+         final Image image = TagMenuManager.getTagImage(tag.getImageFilePath());
          if (image != null) {
             label.setImage(image);
          }

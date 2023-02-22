@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileFilter;
 
 import net.tourbook.common.UI;
+import net.tourbook.common.util.Util;
 
 import org.apache.commons.imaging.Imaging;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -229,6 +230,7 @@ public class ImageUtils {
                destData.alphaData[d] = origData.alphaData[o];
             }
          }
+         Util.disposeResource(scaledImage);
          scaledImage = new Image(display, destData);
       }
 
@@ -297,9 +299,8 @@ public class ImageUtils {
 
          gc.dispose();
 
-         if (transformation != null) {
-            transformation.dispose();
-         }
+         Util.disposeResource(transformation);
+         Util.disposeResource(srcImage);
       }
 
       return scaledImage;
