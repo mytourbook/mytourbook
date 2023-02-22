@@ -4646,10 +4646,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _firstColumnControls.add(_linkTag);
 
             _compositeTags = new Composite(container, SWT.NONE);
-            final RowLayout layout = new RowLayout();
-            layout.fill = true;
-            _compositeTags.setLayout(layout);
-            _compositeTags.setLayoutData(layout);
+            final RowLayout rowLayout = new RowLayout();
+            rowLayout.fill = true;
+            _compositeTags.setLayout(rowLayout);
+            _compositeTags.setLayoutData(rowLayout);
 
             GridDataFactory
                   .fillDefaults()//
@@ -9252,7 +9252,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // tour type/tags
       net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
-      net.tourbook.ui.UI.updateUI_TagsWithImage(_tourData.getTourTags(), _compositeTags, _tagsLabels);
+      net.tourbook.ui.UI.updateUI_TagsWithImage(_pc, _tourData.getTourTags(), _compositeTags, _tagsLabels);
 
       // measurement system
       _lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
@@ -9541,7 +9541,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // tour type/tags
       net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
-      net.tourbook.ui.UI.updateUI_TagsWithImage(_tourData.getTourTags(), _compositeTags, _tagsLabels);
+      net.tourbook.ui.UI.updateUI_TagsWithImage(_pc, _tourData.getTourTags(), _compositeTags, _tagsLabels);
 
       // reflow layout that the tags are aligned correctly
       _tourContainer.layout(true);

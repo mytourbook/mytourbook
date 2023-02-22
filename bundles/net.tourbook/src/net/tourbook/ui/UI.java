@@ -89,6 +89,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -1223,7 +1224,10 @@ public class UI {
       }
    }
 
-   public static void updateUI_TagsWithImage(final Set<TourTag> tourTags, final Composite tourTagsComposite, final List<CLabel> tagsLabels) {
+   public static void updateUI_TagsWithImage(final PixelConverter pc,
+                                             final Set<TourTag> tourTags,
+                                             final Composite tourTagsComposite,
+                                             final List<CLabel> tagsLabels) {
 
       // We dispose the current tags labels
       tagsLabels.forEach(Widget::dispose);
@@ -1242,6 +1246,7 @@ public class UI {
       for (final TourTag tag : tourTags) {
 
          final CLabel label = new CLabel(tourTagsComposite, SWT.NONE);
+         label.setLayoutData(new RowData(pc.convertWidthInCharsToPixels(35), pc.convertWidthInCharsToPixels(12)));
          label.setText(tag.getTagName() + UI.NEW_LINE +
                tourTagsAccumulatedValues.get(tag.getTagId()));
 
