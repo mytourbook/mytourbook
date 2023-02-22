@@ -176,6 +176,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    private String                _tourTitleFromCustom;
 
    private ITourEventListener    _tourEventListener;
+   private ITourProvider         _tourProvider;
 
    private Image                 _imageLock_Closed                      = CommonActivator.getThemedImageDescriptor(CommonImages.Lock_Closed)
          .createImage();
@@ -214,8 +215,6 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    private Point     _shellDefaultSize;
 
    private Text      _txtTourTitle;
-
-   ITourProvider     _tourProvider;
 
    public DialogJoinTours(final Shell parentShell,
                           final ITourProvider tourProvider,
