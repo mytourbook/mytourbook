@@ -1374,6 +1374,13 @@ public class UI {
       return pageNoData;
    }
 
+   public static Color disposeResource(final Color resource) {
+      if ((resource != null) && !resource.isDisposed()) {
+         resource.dispose();
+      }
+      return null;
+   }
+
    public static Cursor disposeResource(final Cursor resource) {
       if ((resource != null) && !resource.isDisposed()) {
          resource.dispose();
@@ -1388,7 +1395,7 @@ public class UI {
     * @return
     */
    public static Image disposeResource(final Image resource) {
-      if (resource != null && !resource.isDisposed()) {
+      if ((resource != null) && !resource.isDisposed()) {
          resource.dispose();
       }
       return null;
