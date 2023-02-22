@@ -2068,7 +2068,7 @@ public abstract class TreeColumnFactory {
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, TreeColumnFactory.TOUR_TAG_AND_CATEGORY_NOTES_ID, SWT.LEAD);
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, TOUR_TAG_AND_CATEGORY_NOTES_ID, SWT.LEAD);
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
 
@@ -2127,7 +2127,7 @@ public abstract class TreeColumnFactory {
 
             final TreeColumnDefinition colDef = new TreeColumnDefinition(
                   columnManager,
-                  TreeColumnFactory.TOUR_TAG_IMAGE_FILE_PATH_ID,
+                  TOUR_TAG_IMAGE_FILE_PATH_ID,
                   SWT.LEAD);
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
