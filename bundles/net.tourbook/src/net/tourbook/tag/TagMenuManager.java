@@ -354,7 +354,7 @@ public class TagMenuManager {
     */
    public static Image getTagImage(final String imageFilePath) {
 
-      var tagImage = TagMenuManager._tagImagesCache.get(imageFilePath);
+      var tagImage = _tagImagesCache.get(imageFilePath);
 
       if (tagImage == null) {
 
