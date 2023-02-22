@@ -183,8 +183,8 @@ public class FitExporter {
          recordMesg.setCadence((short) tourData.getCadenceSerie()[index]); // Sawtooth
          recordMesg.setPower((int) tourData.getPowerSerie()[index]); //Square
          recordMesg.setAltitude(tourData.altitudeSerie[index]);
-         recordMesg.setPositionLat((int) Math.round(tourData.latitudeSerie[index] * 11930465));
-         recordMesg.setPositionLong((int) Math.round(tourData.longitudeSerie[index] * 11930465));
+         recordMesg.setPositionLat(DataConverters.convertDegreesToSemicircles(tourData.latitudeSerie[index]));
+         recordMesg.setPositionLong(DataConverters.convertDegreesToSemicircles(tourData.longitudeSerie[index]));
 
          // Add a Developer Field to the Record Message
          final DeveloperField hrDevField = new DeveloperField(hrFieldDescMesg, developerIdMesg);
