@@ -1373,7 +1373,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
                final TVITagView_Tag tagItem = (TVITagView_Tag) viewItem;
 
-               cell.setText(TourDatabase.getTagPropertyValue((tagItem).tagId, "TOUR_TAG_AND_CATEGORY_NOTES")); //$NON-NLS-1$
+               cell.setText(TourDatabase.getTagPropertyValue((tagItem).tagId, TreeColumnFactory.TOUR_TAG_AND_CATEGORY_NOTES_ID));
 
             } else if (viewItem instanceof TVITagView_TagCategory) {
 
@@ -1440,7 +1440,7 @@ public class TaggingView extends ViewPart implements ITourProvider, ITourViewer,
 
                cell.setText(TourDatabase.getTagPropertyValue(
                      (tagItem).tagId,
-                     "TOUR_TAG_IMAGE_FILE_PATH")); //$NON-NLS-1$
+                     TreeColumnFactory.TOUR_TAG_IMAGE_FILE_PATH_ID));
             }
          }
       });

@@ -81,6 +81,7 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.SQLFilter;
 import net.tourbook.ui.TourTypeFilter;
+import net.tourbook.ui.TreeColumnFactory;
 import net.tourbook.ui.UI;
 
 import org.apache.derby.drda.NetworkServerControl;
@@ -2314,10 +2315,10 @@ public class TourDatabase {
 
          switch (tagPropertyId) {
 
-         case "TOUR_TAG_IMAGE_FILE_PATH": //$NON-NLS-1$
+         case TreeColumnFactory.TOUR_TAG_IMAGE_FILE_PATH_ID:
             return tag.getImageFilePath();
 
-         case "TOUR_TAG_AND_CATEGORY_NOTES": //$NON-NLS-1$
+         case TreeColumnFactory.TOUR_TAG_AND_CATEGORY_NOTES_ID:
             return tag.getNotes();
 
          default:
