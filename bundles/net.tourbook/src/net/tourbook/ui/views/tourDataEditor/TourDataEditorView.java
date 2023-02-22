@@ -6175,7 +6175,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
        */
       setTourClean();
 
-
       super.dispose();
    }
 
