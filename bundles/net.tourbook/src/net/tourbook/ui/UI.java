@@ -900,7 +900,10 @@ public class UI {
          newimageWidth = Math.round(newimageHeight * imageWidth / (imageHeight * 1f));
       }
 
-      return ImageUtils.resize(Display.getDefault(), image, newimageWidth, newimageHeight, 1, 1, rotation);
+      final Image resizedImage = ImageUtils.resize(Display.getDefault(), image, newimageWidth, newimageHeight, 1, 1, rotation);
+      Util.disposeResource(image);
+
+      return resizedImage;
    }
 
    public static ImageData rotate(final ImageData srcData, final int direction) {
