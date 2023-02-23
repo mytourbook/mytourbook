@@ -32,7 +32,7 @@ public class TimeMachineResultTests {
                   TimeMachineResult.convertWeatherTypeToMTWeatherClouds("11d")),
             () -> assertEquals(IWeather.WEATHER_ID_SCATTERED_SHOWERS,
                   TimeMachineResult.convertWeatherTypeToMTWeatherClouds("09d")),
-            () -> assertEquals(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,
+            () -> assertEquals(IWeather.WEATHER_ID_DRIZZLE,
                   TimeMachineResult.convertWeatherTypeToMTWeatherClouds("50d")),
             () -> assertEquals(IWeather.WEATHER_ID_CLEAR,
                   TimeMachineResult.convertWeatherTypeToMTWeatherClouds("01d")));
