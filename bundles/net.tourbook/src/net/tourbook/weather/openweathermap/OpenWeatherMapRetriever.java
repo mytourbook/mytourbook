@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,8 +19,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -39,8 +37,6 @@ import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WeatherUtils;
-
-import org.apache.http.client.utils.URIBuilder;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
@@ -97,33 +93,19 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
    private String buildWeatherApiRequest(final long date) {
 
-      String weatherRequestWithParameters = UI.EMPTY_STRING;
+      final StringBuilder weatherRequestWithParameters = new StringBuilder(BASE_API_URL + UI.SYMBOL_QUESTION_MARK);
 
-      try {
-         final URI apiUri = new URI(BASE_API_URL);
+// SET_FORMATTING_OFF
 
-         final URIBuilder uriBuilder = new URIBuilder()
-               .setScheme(apiUri.getScheme())
-               .setHost(apiUri.getHost())
-               .setPath(apiUri.getPath());
+      weatherRequestWithParameters.append(      "units" + "=" + "metric"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      weatherRequestWithParameters.append("&" + "lat"   + "=" + searchAreaCenter.getLatitude()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      weatherRequestWithParameters.append("&" + "lon"   + "=" + searchAreaCenter.getLongitude()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      weatherRequestWithParameters.append("&" + "lang"  + "=" + Locale.getDefault().getLanguage()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      weatherRequestWithParameters.append("&" + "dt"    + "=" + date); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
-         uriBuilder.setParameter("units", "metric"); //$NON-NLS-1$ //$NON-NLS-2$
-         uriBuilder.setParameter("lat", String.valueOf(searchAreaCenter.getLatitude())); //$NON-NLS-1$
-         uriBuilder.setParameter("lon", String.valueOf(searchAreaCenter.getLongitude())); //$NON-NLS-1$
-         uriBuilder.setParameter("lang", Locale.getDefault().getLanguage()); //$NON-NLS-1$
-         uriBuilder.setParameter("dt", String.valueOf(date)); //$NON-NLS-1$
-         weatherRequestWithParameters = uriBuilder.build().toString();
+// SET_FORMATTING_ON
 
-         return weatherRequestWithParameters;
-
-      } catch (final URISyntaxException e) {
-
-         StatusUtil.logError(
-               "OpenWeatherMapRetriever.buildWeatherApiRequest : Error while " + //$NON-NLS-1$
-                     "building the historical weather request:" //$NON-NLS-1$
-                     + e.getMessage());
-         return UI.EMPTY_STRING;
-      }
+      return weatherRequestWithParameters.toString();
    }
 
    private TimeMachineResult deserializeWeatherData(final String weatherDataResponse) {
@@ -272,8 +254,6 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    private void setTourWeatherWithHistoricalWeather() {
 
 // SET_FORMATTING_OFF
-
-      tour.setIsWeatherDataFromProvider(true);
 
       //We look for the weather data in the middle of the tour to populate the weather conditions
       timeMachineResult.findMiddleHourly(    tourMiddleTime);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,9 +20,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.tourbook.Messages;
+import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourTag;
@@ -372,6 +375,51 @@ public class TagManager {
       }
 
       return returnResult;
+   }
+
+   public static Map<Long, String> fetchTourTagsAccumulatedValues() {
+
+      final String sqlQuery = "SELECT" + UI.NEW_LINE //                                                                        //$NON-NLS-1$
+            + "jTdataTtag.TOURTAG_TAGID," + UI.NEW_LINE // //$NON-NLS-1$
+            + "SUM(tourData.TOURDISTANCE) AS TOTALDISTANCE," + UI.NEW_LINE // //$NON-NLS-1$
+            + "SUM(tourData.TOURDEVICETIME_RECORDED) AS TOTALRECORDEDTIME" + UI.NEW_LINE //                                                                   //$NON-NLS-1$
+            + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + UI.NEW_LINE //                                                                        //$NON-NLS-1$ //$NON-NLS-2$
+            + "INNER JOIN " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE //                                                       //$NON-NLS-1$
+            + "ON jTdataTtag.TOURDATA_TOURID = tourData.TOURID" + UI.NEW_LINE //                                                                       //$NON-NLS-1$
+            + "GROUP BY jTdataTtag.TOURTAG_TAGID"; //$NON-NLS-1$
+
+      final Map<Long, String> tourTagsAccumulatedValues = new HashMap<>();
+
+      try (Connection connection = TourDatabase.getInstance().getConnection();
+            final PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+
+         final ResultSet result = preparedStatement.executeQuery();
+
+         while (result.next()) {
+
+            final long tourTagId = result.getLong(1);
+            float usedMiles = result.getInt(2);
+            final long usedHours = result.getInt(3);
+
+            final StringBuilder tagAccumulatedValues = new StringBuilder();
+
+            tagAccumulatedValues.append(Math.round(usedHours / 3600f));
+            tagAccumulatedValues.append(Messages.tour_editor_label_time_unit);
+
+            tagAccumulatedValues.append(UI.NEW_LINE);
+
+            usedMiles = usedMiles / 1000 / net.tourbook.common.UI.UNIT_VALUE_DISTANCE;
+            tagAccumulatedValues.append(Math.round(usedMiles));
+            tagAccumulatedValues.append(net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
+
+            tourTagsAccumulatedValues.put(tourTagId, tagAccumulatedValues.toString());
+         }
+
+      } catch (final SQLException e) {
+
+         SQL.showException(e, sqlQuery);
+      }
+      return tourTagsAccumulatedValues;
    }
 
    private static void fireChangeEvent() {

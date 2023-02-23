@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -372,7 +372,7 @@ public class Map3Manager {
        * create UI model layer
        */
       final String layerId = MarkerLayer.MAP3_LAYER_ID;
-      final TVIMap3Layer tviLayer = new TVIMap3Layer(layerId, _wwLayer_Marker, Messages.Custom_Layer_TourMarker);
+      final TVIMap3Layer tviLayer = new TVIMap3Layer(layerId, _wwLayer_Marker, Messages.Custom_Layer_TourMarkers);
 
       final boolean isVisible = true;
 

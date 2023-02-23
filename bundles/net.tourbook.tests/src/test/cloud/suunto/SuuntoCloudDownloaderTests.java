@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,10 +18,17 @@ package cloud.suunto;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
+import com.sun.net.httpserver.HttpServer;
 
 import de.byteholder.geoclipse.map.UI;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
+import java.net.InetSocketAddress;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Paths;
 import java.util.List;
 
@@ -39,6 +46,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import utils.Comparison;
@@ -53,23 +61,34 @@ public class SuuntoCloudDownloaderTests {
    static HttpClientMock                 httpClientMock;
    static SuuntoCloudDownloader          suuntoCloudDownloader;
 
+   private static final String           _validTokenResponse         = Comparison.readFileContent(SUUNTO_FILE_PATH
+         + "Token-Response.json");                                                                                                    //$NON-NLS-1$
+
+   private static void authorize() throws IOException {
+
+      // create the HttpServer
+      final HttpServer httpServer = HttpServer.create(new InetSocketAddress(4919), 0);
+      final SuuntoTokensRetrievalHandler tokensRetrievalHandler =
+            new SuuntoTokensRetrievalHandler(UI.EMPTY_STRING);
+      httpServer.createContext("/", tokensRetrievalHandler); //$NON-NLS-1$
+
+      // start the server
+      httpServer.start();
+
+      // authorize and retrieve the tokens
+      final URL url = new URL("http://localhost:4919/?code=12345"); //$NON-NLS-1$
+      final URLConnection conn = url.openConnection();
+      new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+      // stop the server
+      httpServer.stop(0);
+   }
+
    @BeforeAll
-   static void initAll() throws NoSuchFieldException, IllegalAccessException {
+   static void initAll() throws NoSuchFieldException, IllegalAccessException, IOException {
 
       //We set the Suunto account information, otherwise the download can't
       //happen
-      _prefStore.setValue(
-            Preferences.getSuuntoAccessToken_Active_Person_String(),
-            "8888888888888888888888888888888888888888"); //$NON-NLS-1$
-      _prefStore.setValue(
-            Preferences.getSuuntoRefreshToken_Active_Person_String(),
-            "8888888888888888888888888888888888888888"); //$NON-NLS-1$
-      _prefStore.setValue(
-            Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
-            "4071156189000"); //$NON-NLS-1$
-      _prefStore.setValue(
-            Preferences.getSuuntoAccessTokenExpiresIn_Active_Person_String(),
-            "12609"); //$NON-NLS-1$
       _prefStore.setValue(
             Preferences.getSuuntoWorkoutDownloadFolder_Active_Person_String(),
             "./"); //$NON-NLS-1$
@@ -97,7 +116,14 @@ public class SuuntoCloudDownloaderTests {
       field.setAccessible(true);
       field.set(null, httpClientMock);
 
+      httpClientMock.onPost(
+            OAUTH_PASSEUR_APP_URL_TOKEN)
+            .doReturn(_validTokenResponse)
+            .withStatus(201);
+
       suuntoCloudDownloader = new SuuntoCloudDownloader();
+
+      authorize();
 
       Display.getDefault().addFilter(SWT.Activate, event -> {
          // Is this a Shell being activated?
@@ -119,18 +145,28 @@ public class SuuntoCloudDownloaderTests {
    @AfterEach
    public void cleanUpEach() {
 
-      httpClientMock.reset();
       TourLogManager.clear();
    }
+
+   @BeforeEach
+   void InitializeEach() {
+
+      httpClientMock.reset();
+   }
+
+   private void setTokenRetrievalDateInThePast() {
+      _prefStore.setValue(
+            Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
+            "973701086000"); //$NON-NLS-1$
+   }
+
+   //We set the access token issue date time in the past to trigger the retrieval
+   //of a new token.
 
    @Test
    void testTourDownload() {
 
-      //We set the access token issue date time in the past to trigger the retrieval
-      //of a new token.
-      _prefStore.setValue(
-            Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
-            "973701086000"); //$NON-NLS-1$
+      setTokenRetrievalDateInThePast();
 
       final String workoutsResponse = Comparison.readFileContent(SUUNTO_FILE_PATH
             + "Workouts-Response.json"); //$NON-NLS-1$
@@ -139,11 +175,9 @@ public class SuuntoCloudDownloaderTests {
             .doReturn(workoutsResponse)
             .withStatus(200);
 
-      final String tokenResponse = Comparison.readFileContent(SUUNTO_FILE_PATH
-            + "Token-Response.json"); //$NON-NLS-1$
       httpClientMock.onPost(
             OAUTH_PASSEUR_APP_URL_TOKEN)
-            .doReturn(tokenResponse)
+            .doReturn(_validTokenResponse)
             .withStatus(201);
 
       final String filename = "2011-01-13.fit"; //$NON-NLS-1$
@@ -174,11 +208,7 @@ public class SuuntoCloudDownloaderTests {
    @Test
    void tourDownload_TokenRetrieval_NullResponse() {
 
-      //We set the access token issue date time in the past to trigger the retrieval
-      //of a new token.
-      _prefStore.setValue(
-            Preferences.getSuuntoAccessTokenIssueDateTime_Active_Person_String(),
-            "973701086000"); //$NON-NLS-1$
+      setTokenRetrievalDateInThePast();
 
       httpClientMock.onPost(
             OAUTH_PASSEUR_APP_URL_TOKEN)

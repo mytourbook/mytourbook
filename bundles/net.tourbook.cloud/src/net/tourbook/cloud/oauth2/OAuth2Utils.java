@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021, 2022 Frédéric Bard
+ * Copyright (C) 2021, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.weather.WeatherUtils;
 
 import org.json.JSONObject;
 
@@ -41,7 +42,7 @@ public class OAuth2Utils {
 
    public static URI createOAuthPasseurUri(final String uriSuffix) {
 
-      return URI.create(OAuth2Constants.OAUTH_PASSEUR_APP_URL + uriSuffix);
+      return URI.create(WeatherUtils.OAUTH_PASSEUR_APP_URL + uriSuffix);
    }
 
    public static String getTokens(final HttpClient httpClient,

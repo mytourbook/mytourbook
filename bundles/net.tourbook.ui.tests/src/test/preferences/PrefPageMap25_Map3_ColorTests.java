@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,7 +27,7 @@ public class PrefPageMap25_Map3_ColorTests extends UITest {
 
       Utils.openPreferences(bot);
 
-      bot.tree().getTreeItem("2.5D + 3D Map").expand().getNode("Color").select();
+      bot.tree().getTreeItem("2.5D + 3D Map").expand().getNode("Color").select(); //$NON-NLS-1$ //$NON-NLS-2$
 
       Utils.clickApplyAndCloseButton(bot);
    }

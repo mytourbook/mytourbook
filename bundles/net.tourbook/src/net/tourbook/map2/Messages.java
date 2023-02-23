@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -114,7 +114,7 @@ public class Messages extends NLS {
    public static String map_action_synch_with_tour;
    public static String map_action_tour_color_altitude_tooltip;
    public static String map_action_tour_color_gradient_tooltip;
-   public static String map_action_tour_color_pase_tooltip;
+   public static String map_action_tour_color_pace_tooltip;
    public static String map_action_tour_color_pulse_tooltip;
    public static String map_action_tour_color_speed_tooltip;
    public static String map_action_zoom_in;

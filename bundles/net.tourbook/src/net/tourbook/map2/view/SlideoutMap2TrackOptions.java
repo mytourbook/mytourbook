@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -58,7 +58,7 @@ import org.eclipse.swt.widgets.ToolBar;
 /**
  * Slideout for 2D map track options
  */
-public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
+class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
    private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
    private IDialogSettings               _state;
@@ -152,10 +152,10 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
     * @param map2View
     * @param map2State
     */
-   public SlideoutMap2TrackOptions(final Control ownerControl,
-                                   final ToolBar toolBar,
-                                   final Map2View map2View,
-                                   final IDialogSettings map2State) {
+   SlideoutMap2TrackOptions(final Control ownerControl,
+                            final ToolBar toolBar,
+                            final Map2View map2View,
+                            final IDialogSettings map2State) {
 
       super(ownerControl, toolBar);
 
@@ -811,7 +811,7 @@ public class SlideoutMap2TrackOptions extends ToolbarSlideout implements IColorS
 
             // label
             _lblSliderPath_Segments = new Label(container, SWT.NONE);
-            _lblSliderPath_Segments.setText(Messages.Slideout_Map_Options_Label_SliderPath_Segements);
+            _lblSliderPath_Segments.setText(Messages.Slideout_Map_Options_Label_SliderPath_Segments);
             _firstColoumLayoutData.span(1, 1).applyTo(_lblSliderPath_Segments);
 
             // spinner

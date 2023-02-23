@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -14,6 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.tag;
+
+import static org.eclipse.swt.events.MenuListener.menuShownAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,22 +36,22 @@ import net.tourbook.data.TourTag;
 import net.tourbook.data.TourTagCategory;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.PrefPageTags;
-import net.tourbook.tour.TourManager;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 /**
  * Add tag(s) from the selected tours
  */
-public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvancedMenuForActions {
+class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvancedMenuForActions {
 
    private static final String    SPACE_PRE_TAG     = "   ";          //$NON-NLS-1$
 
@@ -123,7 +125,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
          super(Messages.Action_Tag_Add_AutoOpen_ModifiedTags);
 
          // this action is only for info
-         setEnabled(false);
+         super.setEnabled(false);
       }
    }
 
@@ -149,6 +151,10 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
       public ActionTourTag(final TourTag tourTag) {
 
          super(tourTag.getTagName(), AS_CHECK_BOX);
+         final var tagImage = TagMenuManager.getTagImage(tourTag.getImageFilePath());
+         if (tagImage != null) {
+            setImageDescriptor(ImageDescriptor.createFromImage(tagImage));
+         }
 
          __tourTag = tourTag;
       }
@@ -212,39 +218,31 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
          __categoryMenu = new Menu(parent);
 
          // Add listener to repopulate the menu each time
-         __categoryMenu.addMenuListener(new MenuAdapter() {
-            @Override
-            public void menuShown(final MenuEvent e) {
+         __categoryMenu.addMenuListener(menuShownAdapter(menuEvent -> {
 
-               final Menu menu = (Menu) e.widget;
+            final Menu menu = (Menu) menuEvent.widget;
 
-               // dispose old items
-               final MenuItem[] items = menu.getItems();
-               for (final MenuItem item : items) {
-                  item.dispose();
-               }
-
-               final TagCollection tagCollection = TourDatabase.getTagEntries(__tagCategory.getCategoryId());
-
-               // add actions
-               __actionAddTourTag.createCategoryActions(tagCollection, __categoryMenu);
-               __actionAddTourTag.createTagActions(tagCollection, __categoryMenu);
+            // dispose old items
+            final MenuItem[] items = menu.getItems();
+            for (final MenuItem item : items) {
+               item.dispose();
             }
-         });
+
+            final TagCollection tagCollection = TourDatabase.getTagEntries(__tagCategory.getCategoryId());
+
+            // add actions
+            __actionAddTourTag.createCategoryActions(tagCollection, __categoryMenu);
+            __actionAddTourTag.createTagActions(tagCollection, __categoryMenu);
+         }));
 
          return __categoryMenu;
       }
    }
 
    /**
-    * @param tourProvider
-    * @param isAddMode
-    * @param isSaveTour
-    *           when <code>true</code> the tour will be saved and a
-    *           {@link TourManager#TOUR_CHANGED} event is fired, otherwise the {@link TourData}
-    *           from the tour provider is only updated
+    * @param tagMenuManager
     */
-   public Action_AddTourTag_SubMenu(final TagMenuManager tagMenuManager) {
+   Action_AddTourTag_SubMenu(final TagMenuManager tagMenuManager) {
 
       super(Messages.action_tag_add, AS_DROP_DOWN_MENU);
 
@@ -261,7 +259,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
     *           This parameter is ignored but it indicates that the menu auto open behavior is
     *           used.
     */
-   public Action_AddTourTag_SubMenu(final TagMenuManager tagMenuMgr, final Object isAutoOpen) {
+   Action_AddTourTag_SubMenu(final TagMenuManager tagMenuMgr, final Object isAutoOpen) {
 
       super(Messages.Action_Tag_Add_AutoOpen, AS_PUSH_BUTTON);
 
@@ -303,6 +301,11 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
       if (allTourTags == null) {
          return;
       }
+
+      //Preload the tag images
+      //Note that the hourglass is only displayed on Windows (it doesn't seem
+      //to work on Linux)
+      BusyIndicator.showWhile(Display.getCurrent(), () -> allTourTags.forEach(tourTag -> TagMenuManager.getTagImage(tourTag.getImageFilePath())));
 
       // add tag items
       for (final TourTag menuTourTag : allTourTags) {
@@ -495,12 +498,7 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
       _menu = new Menu(parent);
 
       // Add listener to repopulate the menu each time
-      _menu.addMenuListener(new MenuAdapter() {
-         @Override
-         public void menuShown(final MenuEvent e) {
-            fillMenu((Menu) e.widget);
-         }
-      });
+      _menu.addMenuListener(menuShownAdapter(menuEvent -> fillMenu((Menu) menuEvent.widget)));
 
       return _menu;
    }
@@ -515,15 +513,12 @@ public class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, I
       _menu = new Menu(parent);
 
       // Add listener to repopulate the menu each time
-      _menu.addMenuListener(new MenuAdapter() {
-         @Override
-         public void menuShown(final MenuEvent e) {
+      _menu.addMenuListener(menuShownAdapter(menuEvent -> {
 
-            resetData();
+         resetData();
 
-            fillMenu((Menu) e.widget);
-         }
-      });
+         fillMenu((Menu) menuEvent.widget);
+      }));
 
       return _menu;
    }

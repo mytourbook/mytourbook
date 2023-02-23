@@ -461,6 +461,7 @@ public class Messages extends NLS {
    public static String        Db_Field_TourData_Weather;
    public static String        Db_Field_TourMarker_UrlAddress;
    public static String        Db_Field_TourMarker_UrlText;
+   public static String        Db_Field_TourTag_ImageFilePath;
    public static String        Db_Field_TourTag_Name;
    public static String        Db_Field_TourTag_Notes;
 
@@ -740,9 +741,9 @@ public class Messages extends NLS {
    public static String        dialog_is_tour_editor_modified_title;
 
    public static String        Dialog_JoinTours_Checkbox_CreateTourMarker;
+   public static String        Dialog_JoinTours_Checkbox_DeleteSourceTours;
    public static String        Dialog_JoinTours_Checkbox_IncludeDescription;
    public static String        Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints;
-   public static String        Dialog_JoinTours_Checkbox_InsertPauses;
    public static String        Dialog_JoinTours_ComboText_ConcatenateTime;
    public static String        Dialog_JoinTours_ComboText_KeepTime;
    public static String        Dialog_JoinTours_ComboText_MarkerTourTime;
@@ -900,6 +901,10 @@ public class Messages extends NLS {
    public static String        Dialog_TourTagCategory_Title;
    public static String        Dialog_TourTag_EditTag_Message;
    public static String        Dialog_TourTag_EditTag_Title;
+   public static String        Dialog_TourTag_FileDialog_ImageFiles;
+   public static String        Dialog_TourTag_ImportImage_Title;
+   public static String        Dialog_TourTag_Label_Image;
+   public static String        Dialog_TourTag_Label_ImageNotFound;
    public static String        Dialog_TourTag_Label_Notes;
    public static String        Dialog_TourTag_Label_TagName;
    public static String        Dialog_TourTag_Title;
@@ -1750,6 +1755,7 @@ public class Messages extends NLS {
    public static String        pref_tourtag_btn_new_tag;
    public static String        pref_tourtag_btn_new_tag_category;
    public static String        pref_tourtag_btn_reset;
+   public static String        Pref_TourTag_Column_ImageFilePath;
    public static String        Pref_TourTag_Column_Notes;
    public static String        Pref_TourTag_Column_TagsAndCategories;
    public static String        pref_tourtag_dlg_new_tag_category_message;
@@ -2177,7 +2183,7 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Label_SliderLocation_Size;
    public static String        Slideout_Map_Options_Label_SliderPath_Color;
    public static String        Slideout_Map_Options_Label_SliderPath_Color_Tooltip;
-   public static String        Slideout_Map_Options_Label_SliderPath_Segements;
+   public static String        Slideout_Map_Options_Label_SliderPath_Segments;
    public static String        Slideout_Map_Options_Label_SliderPath_Width;
    public static String        Slideout_Map_Options_Label_Title;
    public static String        Slideout_Map_Options_Label_TourDirection_DistanceBetweenMarkers;

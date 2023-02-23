@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -125,6 +125,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
    private static final String        STATE_SORT_COLUMN_ID                      = "STATE_SORT_COLUMN_ID";                        //$NON-NLS-1$
 
    private static final String        COLUMN_ID                                 = "id";                                          //$NON-NLS-1$
+   private static final String        COLUMN_IMAGEFILEPATH                      = "imageFilePath";                               //$NON-NLS-1$
    private static final String        COLUMN_NOTES                              = "notes";                                       //$NON-NLS-1$
    private static final String        COLUMN_TAGS                               = "tags";                                        //$NON-NLS-1$
 
@@ -393,6 +394,10 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
             case COLUMN_ID:
                rc = tourTag1.getTagId() - tourTag2.getTagId();
+               break;
+
+            case COLUMN_IMAGEFILEPATH:
+               rc = tourTag1.getImageFilePath().compareTo(tourTag2.getImageFilePath());
                break;
 
             case COLUMN_TAGS:
@@ -883,6 +888,7 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
 
       defineColumn_10_Tags();
       defineColumn_20_Notes();
+      defineColumn_30_ImageFilePath();
       defineColumn_99_ID();
    }
 
@@ -992,6 +998,33 @@ public class TourTags_View extends ViewPart implements ITreeViewer, ITourViewer,
             final String shortedNotes = UI.shortenText(notes, 200, true);
 
             cell.setText(shortedNotes);
+         }
+      });
+   }
+
+   private void defineColumn_30_ImageFilePath() {
+
+      final TreeColumnDefinition colDef = TreeColumnFactory.TOUR_TAG_IMAGE_FILE_PATH
+            .createColumn(_columnManager, _pc);
+
+      colDef.setColumnId(COLUMN_IMAGEFILEPATH);
+      colDef.setColumnSelectionListener(_columnSortListener);
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof TVIPrefTag) {
+
+               final TourTag tourTag = ((TVIPrefTag) element).getTourTag();
+
+               cell.setText(tourTag.getImageFilePath());
+            } else {
+
+               cell.setText(UI.EMPTY_STRING);
+            }
          }
       });
    }

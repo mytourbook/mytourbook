@@ -83,6 +83,7 @@ public class Images {
    public static final String ArrowUp_Blue                               = "arrow-up-blue.png";                                   //$NON-NLS-1$
    public static final String ArrowUp_Blue_Disabled                      = "arrow-up-blue-disabled.png";                          //$NON-NLS-1$
    public static final String Calendar                                   = "calendar.png";                                        //$NON-NLS-1$
+   public static final String Camera                                     = "camera.png";                                          //$NON-NLS-1$
    public static final String Checkbox_Checked                           = "checkbox-checked.png";                                //$NON-NLS-1$
    public static final String Checkbox_Checked_Disabled                  = "checkbox-checked-disabled.png";                       //$NON-NLS-1$
    public static final String Checkbox_Uncheck                           = "checkbox-unchecked.png";                              //$NON-NLS-1$
