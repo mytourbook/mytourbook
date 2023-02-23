@@ -16,7 +16,6 @@
 package net.tourbook.common.font;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.Util;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -26,6 +25,8 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.StringConverter;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseWheelListener;
@@ -129,7 +130,12 @@ public class SimpleFontEditor extends Composite {
             _lblSelectedFont = new Label(container, SWT.LEFT);
             _lblSelectedFont.setFont(container.getFont());
 
-            _lblSelectedFont.addDisposeListener(disposeEvent -> Util.disposeResource(_selectedFont));
+            _lblSelectedFont.addDisposeListener(new DisposeListener() {
+               @Override
+               public void widgetDisposed(final DisposeEvent e) {
+                  UI.disposeResource(_selectedFont);
+               }
+            });
 
             _lblSelectedFont.addMouseListener(new MouseAdapter() {
 
@@ -294,7 +300,7 @@ public class SimpleFontEditor extends Composite {
          _lblSelectedFont.setText(fontText);
          _lblSelectedFont.setToolTipText(fontText);
 
-         Util.disposeResource(_selectedFont);
+         UI.disposeResource(_selectedFont);
 
          _selectedFont = new Font(getDisplay(), _selectedFontData);
          _lblSelectedFont.setFont(_selectedFont);

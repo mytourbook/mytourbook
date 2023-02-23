@@ -642,7 +642,7 @@ public class Map2 extends Canvas {
    private int               _prefOptions_LineWidth;
    private List<Long>        _allTourIds;
 
-   private enum HoveredPoint_PaintMode {
+   private static enum HoveredPoint_PaintMode {
 
       IS_HOVERED, //
       IS_SELECTED, //
@@ -2724,8 +2724,8 @@ public class Map2 extends Canvas {
          _dropTarget.dispose();
       }
 
-      Util.disposeResource(_mapImage);
-      Util.disposeResource(_poiImage);
+      UI.disposeResource(_mapImage);
+      UI.disposeResource(_poiImage);
 
       UI.disposeResource(_9PartImage);
       UI.disposeResource(_9PartGC);

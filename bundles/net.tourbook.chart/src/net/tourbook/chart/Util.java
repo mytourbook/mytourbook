@@ -21,10 +21,6 @@ import java.util.Formatter;
 
 import net.tourbook.common.UI;
 
-<<<<<<< HEAD
-import org.eclipse.swt.graphics.Cursor;
-=======
->>>>>>> refs/remotes/Wolfgang/main
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;

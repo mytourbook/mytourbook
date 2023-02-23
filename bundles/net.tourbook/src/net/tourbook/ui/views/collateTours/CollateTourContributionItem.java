@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import net.tourbook.Messages;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourType;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.TourTypeFilter;
@@ -272,7 +271,7 @@ class CollateTourContributionItem extends ControlContribution {
 	@Override
 	public void dispose() {
 
-      Util.disposeResource(_cursorHand);
+      UI.disposeResource(_cursorHand);
 
 		super.dispose();
 	}

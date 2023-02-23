@@ -1276,8 +1276,8 @@ public class SlideoutMap2_MapProvider extends AdvancedSlideout implements ITourV
    @Override
    protected void onDispose() {
 
-      Util.disposeResource(_imageYes);
-      Util.disposeResource(_imageNo);
+      UI.disposeResource(_imageYes);
+      UI.disposeResource(_imageNo);
 
       MapProviderManager.getInstance().removeMapProviderListener(this);
 

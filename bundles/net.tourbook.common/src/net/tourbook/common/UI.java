@@ -1376,6 +1376,48 @@ public class UI {
       return pageNoData;
    }
 
+   public static Cursor disposeResource(final Cursor resource) {
+
+      if (resource != null) {
+         resource.dispose();
+      }
+
+      return null;
+   }
+
+   /**
+    * Disposes an image resource
+    *
+    * @param image
+    * @return
+    */
+   public static Image disposeResource(final Image resource) {
+
+      if (resource != null) {
+         resource.dispose();
+      }
+
+      return null;
+   }
+
+   public static org.eclipse.swt.graphics.Font disposeResource(final org.eclipse.swt.graphics.Font font) {
+
+      if (font != null) {
+         font.dispose();
+      }
+
+      return null;
+   }
+
+   public static Resource disposeResource(final Resource resource) {
+
+      if (resource != null) {
+         resource.dispose();
+      }
+
+      return null;
+   }
+
    public static void dumpSuperClasses(final Object o) {
 
       Class<?> subclass = o.getClass();

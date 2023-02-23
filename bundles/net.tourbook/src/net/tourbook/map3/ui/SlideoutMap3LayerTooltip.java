@@ -287,7 +287,7 @@ public class SlideoutMap3LayerTooltip extends AnimatedToolTipShell {
    @Override
    protected void onDispose() {
 
-      _cursorHand = net.tourbook.chart.Util.disposeResource(_cursorHand);
+      _cursorHand = UI.disposeResource(_cursorHand);
    }
 
    public void setLayerVisibility(final TVIMap3Layer mapLayer, final boolean isUpdateUI) {

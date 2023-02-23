@@ -30,7 +30,6 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ProfileImage;
 import net.tourbook.common.color.RGBVertex;
-import net.tourbook.common.util.Util;
 import net.tourbook.common.widgets.ColorChooser;
 import net.tourbook.common.widgets.IProfileColors;
 import net.tourbook.common.widgets.ImageCanvas;
@@ -738,7 +737,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
 
    private void onDispose() {
 
-      Util.disposeResource(_profileImage);
+      UI.disposeResource(_profileImage);
    }
 
    private void onField_MouseDown(final MouseEvent e) {
@@ -898,7 +897,7 @@ public class DialogSelectSRTMColors extends TitleAreaDialog implements IProfileC
    private void paintProfileImage() {
 
       // force a redraw
-      Util.disposeResource(_profileImage);
+      UI.disposeResource(_profileImage);
 
       final Rectangle imageBounds = _canvasProfileImage.getBounds();
       _profileImage = _dialogProfile.createImage(imageBounds.width, imageBounds.height, false);

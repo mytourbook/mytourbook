@@ -1123,7 +1123,7 @@ public class DialogMap3ColorEditor extends TitleAreaDialog implements IProfileCo
 
    private void onDispose() {
 
-      Util.disposeResource(_profileImage);
+      UI.disposeResource(_profileImage);
    }
 
    /**

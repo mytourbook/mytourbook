@@ -25,7 +25,6 @@ import net.tourbook.common.color.ColorValue;
 import net.tourbook.common.color.IGradientColorProvider;
 import net.tourbook.common.color.Map2ColorProfile;
 import net.tourbook.common.color.MapColorProfile;
-import net.tourbook.common.util.Util;
 import net.tourbook.map2.Messages;
 import net.tourbook.preferences.PrefPageAppearanceColors;
 
@@ -195,7 +194,7 @@ public class DialogMap2ColorEditor extends TitleAreaDialog {
    private void createLegendImage() {
 
       // dispose old image
-      Util.disposeResource(_imageMappingColor);
+      UI.disposeResource(_imageMappingColor);
 
       final Point canvasSize = _canvasMappingColor.getSize();
 
