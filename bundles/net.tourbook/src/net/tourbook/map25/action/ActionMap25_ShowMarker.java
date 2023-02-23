@@ -142,8 +142,8 @@ public class ActionMap25_ShowMarker extends ContributionItem implements IOpening
 
    private void onDispose() {
 
-      Util.disposeResource(_imageEnabled);
-      Util.disposeResource(_imageDisabled);
+      UI.disposeResource(_imageEnabled);
+      UI.disposeResource(_imageDisabled);
    }
 
    private void onMouseMove(final ToolItem item, final MouseEvent mouseEvent) {

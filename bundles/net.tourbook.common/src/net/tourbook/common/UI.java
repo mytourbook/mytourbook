@@ -87,6 +87,7 @@ import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.graphics.TextLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -137,6 +138,7 @@ public class UI {
    public static final String       DASH_WITH_DOUBLE_SPACE             = "   -   ";             //$NON-NLS-1$
    public static final String       DIMENSION                          = " x ";                 //$NON-NLS-1$
    public static final String       EMPTY_STRING                       = "";                    //$NON-NLS-1$
+   public static final String       MNEMONIC                           = "&";                   //$NON-NLS-1$
    public static final String       NEW_LINE_TEXT_WIDGET               = "\r\n";                //$NON-NLS-1$
    public static final String       NEW_LINE1                          = "\n";                  //$NON-NLS-1$
    public static final String       NEW_LINE2                          = "\n\n";                //$NON-NLS-1$
@@ -1374,30 +1376,27 @@ public class UI {
       return pageNoData;
    }
 
-   public static Color disposeResource(final Color resource) {
-      if ((resource != null) && !resource.isDisposed()) {
-         resource.dispose();
-      }
-      return null;
-   }
-
    public static Cursor disposeResource(final Cursor resource) {
-      if ((resource != null) && !resource.isDisposed()) {
+
+      if (resource != null && resource.isDisposed() == false) {
          resource.dispose();
       }
+
       return null;
    }
 
    /**
-    * disposes a resource
+    * Disposes an image resource
     *
     * @param image
     * @return
     */
    public static Image disposeResource(final Image resource) {
-      if ((resource != null) && !resource.isDisposed()) {
+
+      if (resource != null && resource.isDisposed() == false) {
          resource.dispose();
       }
+
       return null;
    }
 
@@ -1405,6 +1404,15 @@ public class UI {
 
       if (font != null && font.isDisposed() == false) {
          font.dispose();
+      }
+
+      return null;
+   }
+
+   public static Resource disposeResource(final Resource resource) {
+
+      if (resource != null && resource.isDisposed() == false) {
+         resource.dispose();
       }
 
       return null;

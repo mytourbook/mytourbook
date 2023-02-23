@@ -152,10 +152,10 @@ public class DialogDropboxFolderBrowser extends TitleAreaDialog {
       }
 
       parent.addDisposeListener(disposeEvent -> {
-         Util.disposeResource(_imageDropboxLogo);
-         Util.disposeResource(_imageDropboxParentFolder);
-         Util.disposeResource(_imageDropboxFolder);
-         Util.disposeResource(_imageDropboxFile);
+         UI.disposeResource(_imageDropboxLogo);
+         UI.disposeResource(_imageDropboxParentFolder);
+         UI.disposeResource(_imageDropboxFolder);
+         UI.disposeResource(_imageDropboxFile);
       });
 
       return dialogAreaContainer;

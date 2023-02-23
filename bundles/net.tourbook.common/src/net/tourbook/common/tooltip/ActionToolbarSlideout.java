@@ -128,12 +128,12 @@ public abstract class ActionToolbarSlideout extends ContributionItem implements 
 
       if (_canDisposeActionImages) {
 
-         Util.disposeResource(_actionImage_Enabled);
-         Util.disposeResource(_actionImage_Disabled);
+         UI.disposeResource(_actionImage_Enabled);
+         UI.disposeResource(_actionImage_Disabled);
       }
 
       for (final Image image : _allOtherEnabledImages) {
-         Util.disposeResource(image);
+         UI.disposeResource(image);
       }
 
       _allOtherEnabledImages.clear();

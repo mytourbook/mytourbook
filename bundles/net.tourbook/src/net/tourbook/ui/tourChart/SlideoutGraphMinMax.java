@@ -939,40 +939,40 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
    @Override
    public void onDispose() {
 
-      Util.disposeResource(_imageAltimeter);
-      Util.disposeResource(_imageAltimeterDisabled);
-      Util.disposeResource(_imageAltitude);
-      Util.disposeResource(_imageAltitudeDisabled);
-      Util.disposeResource(_imageCadence);
-      Util.disposeResource(_imageCadenceDisabled);
-      Util.disposeResource(_imageGradient);
-      Util.disposeResource(_imageGradientDisabled);
-      Util.disposeResource(_imagePace);
-      Util.disposeResource(_imagePaceDisabled);
-      Util.disposeResource(_imagePower);
-      Util.disposeResource(_imagePowerDisabled);
-      Util.disposeResource(_imagePulse);
-      Util.disposeResource(_imagePulseDisabled);
-      Util.disposeResource(_imageSpeed);
-      Util.disposeResource(_imageSpeedDisabled);
-      Util.disposeResource(_imageTemperature);
-      Util.disposeResource(_imageTemperatureDisabled);
+      UI.disposeResource(_imageAltimeter);
+      UI.disposeResource(_imageAltimeterDisabled);
+      UI.disposeResource(_imageAltitude);
+      UI.disposeResource(_imageAltitudeDisabled);
+      UI.disposeResource(_imageCadence);
+      UI.disposeResource(_imageCadenceDisabled);
+      UI.disposeResource(_imageGradient);
+      UI.disposeResource(_imageGradientDisabled);
+      UI.disposeResource(_imagePace);
+      UI.disposeResource(_imagePaceDisabled);
+      UI.disposeResource(_imagePower);
+      UI.disposeResource(_imagePowerDisabled);
+      UI.disposeResource(_imagePulse);
+      UI.disposeResource(_imagePulseDisabled);
+      UI.disposeResource(_imageSpeed);
+      UI.disposeResource(_imageSpeedDisabled);
+      UI.disposeResource(_imageTemperature);
+      UI.disposeResource(_imageTemperatureDisabled);
 
-      Util.disposeResource(_imageRunDyn_StanceTime);
-      Util.disposeResource(_imageRunDyn_StanceTime_Disabled);
-      Util.disposeResource(_imageRunDyn_StanceTimeBalance);
-      Util.disposeResource(_imageRunDyn_StanceTimeBalance_Disabled);
-      Util.disposeResource(_imageRunDyn_StepLength);
-      Util.disposeResource(_imageRunDyn_StepLength_Disabled);
-      Util.disposeResource(_imageRunDyn_VerticalOscillation);
-      Util.disposeResource(_imageRunDyn_VerticalOscillation_Disabled);
-      Util.disposeResource(_imageRunDyn_VerticalRatio);
-      Util.disposeResource(_imageRunDyn_VerticalRatio_Disabled);
+      UI.disposeResource(_imageRunDyn_StanceTime);
+      UI.disposeResource(_imageRunDyn_StanceTime_Disabled);
+      UI.disposeResource(_imageRunDyn_StanceTimeBalance);
+      UI.disposeResource(_imageRunDyn_StanceTimeBalance_Disabled);
+      UI.disposeResource(_imageRunDyn_StepLength);
+      UI.disposeResource(_imageRunDyn_StepLength_Disabled);
+      UI.disposeResource(_imageRunDyn_VerticalOscillation);
+      UI.disposeResource(_imageRunDyn_VerticalOscillation_Disabled);
+      UI.disposeResource(_imageRunDyn_VerticalRatio);
+      UI.disposeResource(_imageRunDyn_VerticalRatio_Disabled);
 
-      Util.disposeResource(_imageSwim_Strokes);
-      Util.disposeResource(_imageSwim_Strokes_Disabled);
-      Util.disposeResource(_imageSwim_Swolf);
-      Util.disposeResource(_imageSwim_Swolf_Disabled);
+      UI.disposeResource(_imageSwim_Strokes);
+      UI.disposeResource(_imageSwim_Strokes_Disabled);
+      UI.disposeResource(_imageSwim_Swolf);
+      UI.disposeResource(_imageSwim_Swolf_Disabled);
    }
 
    private void prefRestoreDefault(final Button button, final String prefName) {

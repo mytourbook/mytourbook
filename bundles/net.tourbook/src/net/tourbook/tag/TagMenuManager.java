@@ -28,6 +28,7 @@ import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.ICommandIds;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.AdvancedMenuForActions;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.common.util.Util;
@@ -40,7 +41,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tagging.TourTags_View;
 
 import org.eclipse.jface.action.Action;
@@ -152,7 +152,7 @@ public class TagMenuManager {
    private static class ActionAllPreviousTags extends Action {
 
       public ActionAllPreviousTags() {
-         super(UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
+         super(net.tourbook.ui.UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
       }
 
       @Override
@@ -179,7 +179,7 @@ public class TagMenuManager {
       private TourTag _tag;
 
       public ActionRecentTag() {
-         super(UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
+         super(net.tourbook.ui.UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
       }
 
       @Override
@@ -270,7 +270,7 @@ public class TagMenuManager {
     */
    public static void dispose() {
 
-      _tagImagesCache.values().forEach(Util::disposeResource);
+      _tagImagesCache.values().forEach(UI::disposeResource);
    }
 
    static void enableRecentTagActions(final boolean isAddTagEnabled, final Set<Long> existingTagIds) {
@@ -357,7 +357,7 @@ public class TagMenuManager {
 
       if (tagImage == null) {
 
-         tagImage = UI.prepareTagImage(imageFilePath);
+         tagImage = net.tourbook.ui.UI.prepareTagImage(imageFilePath);
          if (tagImage != null) {
             TagMenuManager._tagImagesCache.put(imageFilePath, tagImage);
          }

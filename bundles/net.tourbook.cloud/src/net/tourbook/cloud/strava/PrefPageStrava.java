@@ -346,7 +346,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    @Override
    public void dispose() {
 
-      Util.disposeResource(_imageStravaConnect);
+      UI.disposeResource(_imageStravaConnect);
 
       super.dispose();
    }

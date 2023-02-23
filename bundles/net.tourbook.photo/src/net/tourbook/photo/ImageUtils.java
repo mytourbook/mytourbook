@@ -230,7 +230,7 @@ public class ImageUtils {
                destData.alphaData[d] = origData.alphaData[o];
             }
          }
-         Util.disposeResource(scaledImage);
+         UI.disposeResource(scaledImage);
          scaledImage = new Image(display, destData);
       }
 
@@ -299,8 +299,8 @@ public class ImageUtils {
 
          gc.dispose();
 
-         Util.disposeResource(transformation);
-         Util.disposeResource(srcImage);
+         UI.disposeResource(transformation);
+         UI.disposeResource(srcImage);
       }
 
       return scaledImage;

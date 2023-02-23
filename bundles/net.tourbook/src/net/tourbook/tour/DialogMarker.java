@@ -1286,7 +1286,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       _firstColumnControls.clear();
 
-      Util.disposeResource(_imagePaste);
+      UI.disposeResource(_imagePaste);
    }
 
    private void enableControls() {

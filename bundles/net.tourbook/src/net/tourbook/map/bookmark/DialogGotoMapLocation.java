@@ -235,7 +235,7 @@ public class DialogGotoMapLocation extends TitleAreaDialog {
 
    private void dispose() {
 
-      Util.disposeResource(_imagePaste);
+      UI.disposeResource(_imagePaste);
    }
 
    private void enableControls() {

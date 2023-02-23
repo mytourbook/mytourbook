@@ -4035,7 +4035,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       // keep image in the cache
       final Image oldImage = _configImages.put(configId, image);
 
-      Util.disposeResource(oldImage);
+      UI.disposeResource(oldImage);
 
       _configImageHash.put(configId, importConfig.imageHash);
 

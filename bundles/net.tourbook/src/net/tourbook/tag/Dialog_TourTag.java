@@ -222,8 +222,8 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
       disposeCanvasTagImage();
 
-      Util.disposeResource(_imageCamera);
-      Util.disposeResource(_imageTrash);
+      UI.disposeResource(_imageCamera);
+      UI.disposeResource(_imageTrash);
    }
 
    private void disposeCanvasTagImage() {
@@ -232,7 +232,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
             _canvasTagImage.getImage() == _imageCamera) {
          return;
       }
-      Util.disposeResource(_canvasTagImage.getImage());
+      UI.disposeResource(_canvasTagImage.getImage());
    }
 
    private void enableControls() {

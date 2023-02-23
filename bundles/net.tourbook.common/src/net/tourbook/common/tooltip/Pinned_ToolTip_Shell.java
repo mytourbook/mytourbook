@@ -16,6 +16,7 @@
 package net.tourbook.common.tooltip;
 
 import net.tourbook.common.PointLong;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
 
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -567,8 +568,8 @@ public abstract class Pinned_ToolTip_Shell {
 
    protected void onDispose() {
 
-      _cursorDragged = (Cursor) Util.disposeResource(_cursorDragged);
-      _cursorHand = (Cursor) Util.disposeResource(_cursorHand);
+      _cursorDragged = UI.disposeResource(_cursorDragged);
+      _cursorHand = UI.disposeResource(_cursorHand);
 
       removeOwnerControlListener();
    }

@@ -1571,7 +1571,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
    private void onDispose() {
 
-      Util.disposeResource(_imageLock_Closed);
+      UI.disposeResource(_imageLock_Closed);
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
    }

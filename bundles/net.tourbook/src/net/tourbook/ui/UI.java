@@ -122,7 +122,6 @@ public class UI {
    public static final String            DASH_WITH_DOUBLE_SPACE        = "   -   ";                    //$NON-NLS-1$
    public static final String            SLASH_WITH_SPACE              = " / ";                        //$NON-NLS-1$
    public static final String            EMPTY_STRING_FORMAT           = "%s";                         //$NON-NLS-1$
-   public static final String            MNEMONIC                      = "&";                          //$NON-NLS-1$
 
    /**
     * contains a new line
@@ -903,7 +902,8 @@ public class UI {
       }
 
       final Image resizedImage = ImageUtils.resize(Display.getDefault(), image, newimageWidth, newimageHeight, 1, 1, rotation);
-      Util.disposeResource(image);
+
+      net.tourbook.common.UI.disposeResource(image);
 
       return resizedImage;
    }
