@@ -114,9 +114,10 @@ public class TourDatabase {
     */
    private static final int TOURBOOK_DB_VERSION = 49;
 
-//   private static final int TOURBOOK_DB_VERSION = 49; // 22.X ??
+//   private static final int TOURBOOK_DB_VERSION = 50; // 23.x ??????
 
-//   private static final int TOURBOOK_DB_VERSION = 48; // 22.X ??
+//   private static final int TOURBOOK_DB_VERSION = 49; // 23.3
+//   private static final int TOURBOOK_DB_VERSION = 48; // 22.6
 //   private static final int TOURBOOK_DB_VERSION = 47; // 22.3
 //   private static final int TOURBOOK_DB_VERSION = 46; // 21.12
 //   private static final int TOURBOOK_DB_VERSION = 45; // 21.9
@@ -5823,12 +5824,12 @@ public class TourDatabase {
             currentDbVersion = _dbDesignVersion_New = updateDb_046_To_047(conn, splashManager);
          }
 
-         // 47 -> 48    22.X ??
+         // 47 -> 48    22.6
          if (currentDbVersion == 47) {
             currentDbVersion = _dbDesignVersion_New = updateDb_047_To_048(conn, splashManager);
          }
 
-         // 48 -> 49    23.X ??
+         // 48 -> 49    23.3
          if (currentDbVersion == 48) {
             currentDbVersion = _dbDesignVersion_New = updateDb_048_To_049(conn, splashManager);
          }
