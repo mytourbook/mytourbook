@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -75,7 +75,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Shell;
 
-public class DialogReimportTours extends TitleAreaDialog {
+class DialogReimportTours extends TitleAreaDialog {
 
    private static final String STATE_REIMPORT_TOURS_ALL                           = "STATE_REIMPORT_TOURS_ALL";                           //$NON-NLS-1$
    private static final String STATE_REIMPORT_TOURS_SELECTED                      = "STATE_REIMPORT_TOURS_SELECTED";                      //$NON-NLS-1$
@@ -171,6 +171,7 @@ public class DialogReimportTours extends TitleAreaDialog {
    private Button    _chkData_TimeSlice_Training;
    private Button    _chkData_Tour_Markers;
    private Button    _chkData_TimeSlice_TourTimerPauses;
+   private Button    _chkData_Tour_WeatherInformation;
 
    private Button    _chkLogDetails;
    private Button    _chkSkipTours_With_ImportFile_NotFound;
@@ -186,11 +187,8 @@ public class DialogReimportTours extends TitleAreaDialog {
 
    private Group     _groupTours;
 
-   /**
-    * @param parentShell
-    */
-   public DialogReimportTours(final Shell parentShell,
-                              final ITourViewer3 tourViewer) {
+   DialogReimportTours(final Shell parentShell,
+                       final ITourViewer3 tourViewer) {
 
       super(parentShell);
 
@@ -867,7 +865,7 @@ public class DialogReimportTours extends TitleAreaDialog {
 
       } finally {
 
-         // do post save actions for all re-imported tours, simalar to
+         // do post save actions for all re-imported tours, similar to
          // net.tourbook.database.TourDatabase.saveTour_PostSaveActions(TourData)
 
          TourDatabase.saveTour_PostSaveActions_Concurrent_2_ForAllTours(
@@ -888,7 +886,7 @@ public class DialogReimportTours extends TitleAreaDialog {
             Messages.Log_Reimport_PreviousFiles_End,
             (System.currentTimeMillis() - start) / 1000.0));
 
-      doReimport_70_FireModifyEvents(importState_Process);
+      doReimport_70_FireModifyEvents();
    }
 
    private void doReimport_60_RunConcurrent(final long tourId,
@@ -950,7 +948,7 @@ public class DialogReimportTours extends TitleAreaDialog {
       });
    }
 
-   private void doReimport_70_FireModifyEvents(final ImportState_Process importState_Process) {
+   private void doReimport_70_FireModifyEvents() {
 
       TourManager.getInstance().removeAllToursFromCache();
       TourManager.fireEvent(TourEventId.CLEAR_DISPLAYED_TOUR);
