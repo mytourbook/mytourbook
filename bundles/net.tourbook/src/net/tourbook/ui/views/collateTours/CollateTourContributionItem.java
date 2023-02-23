@@ -59,501 +59,502 @@ import org.eclipse.swt.widgets.Menu;
 
 class CollateTourContributionItem extends ControlContribution {
 
-   private static final String  ID                = "net.tourbook.tourTypeFilter"; //$NON-NLS-1$
+	private static final String		ID					= "net.tourbook.tourTypeFilter";	//$NON-NLS-1$
 
-   private CollatedToursView    _collatedToursView;
+	private CollatedToursView		_collatedToursView;
 
-   private MouseListener        _mouseListener;
-   private MouseTrackListener   _mouseTrackListener;
-   private MouseWheelListener   _mouseWheelListener;
+	private MouseListener			_mouseListener;
+	private MouseTrackListener		_mouseTrackListener;
+	private MouseWheelListener		_mouseWheelListener;
 
-   private ActionOpenPrefDialog _actionOpenTourTypePrefs;
+	private ActionOpenPrefDialog	_actionOpenTourTypePrefs;
 
-   private int                  _collateNameWidth;
+	private int						_collateNameWidth;
 
-   private boolean              _isUIUpdating;
-   private boolean              _isContextOpening = false;
+	private boolean					_isUIUpdating;
+	private boolean					_isContextOpening	= false;
 
-   private TourTypeFilter       _selectCollateFilter;
+	private TourTypeFilter			_selectCollateFilter;
 
-   /*
-    * UI controls
-    */
-   private Menu   _contextMenu;
-   private Cursor _cursorHand;
+	/*
+	 * UI controls
+	 */
+	private Menu					_contextMenu;
+	private Cursor					_cursorHand;
 
-   private Label  _lblFilterIcon;
-   private Link   _lnkFilterText;
+	private Label					_lblFilterIcon;
+	private Link					_lnkFilterText;
 
-   private class ActionTTFilter extends Action {
+	private class ActionTTFilter extends Action {
 
-      private TourTypeFilter  __ttFilter;
-      private ImageDescriptor __filterImageDescriptor;
+		private TourTypeFilter	__ttFilter;
+		private ImageDescriptor	__filterImageDescriptor;
 
-      public ActionTTFilter(final TourTypeFilter ttFilter) {
+		public ActionTTFilter(final TourTypeFilter ttFilter) {
 
-         super(ttFilter.getFilterName(), AS_PUSH_BUTTON);
+			super(ttFilter.getFilterName(), AS_PUSH_BUTTON);
 
-         __ttFilter = ttFilter;
-         __filterImageDescriptor = TourTypeFilter.getFilterImageDescriptor(ttFilter);
-      }
+			__ttFilter = ttFilter;
+			__filterImageDescriptor = TourTypeFilter.getFilterImageDescriptor(ttFilter);
+		}
 
-      @Override
-      public void run() {
+		@Override
+		public void run() {
 
-         selectCollateFilter(__ttFilter);
-      }
+			selectCollateFilter(__ttFilter);
+		}
 
-      @Override
-      public String toString() {
-         return __ttFilter.toString();
-      }
-   }
+		@Override
+		public String toString() {
+			return __ttFilter.toString();
+		}
+	}
 
-   public CollateTourContributionItem(final CollatedToursView collatedToursView) {
+	public CollateTourContributionItem(final CollatedToursView collatedToursView) {
 
-      super(ID);
+		super(ID);
 
-      _collatedToursView = collatedToursView;
-   }
+		_collatedToursView = collatedToursView;
+	}
 
-   private void createActions() {
+	private void createActions() {
 
-      _actionOpenTourTypePrefs = new ActionOpenPrefDialog(
-            Messages.Action_TourType_ModifyTourTypeFilter,
-            ITourbookPreferences.PREF_PAGE_TOUR_TYPE_FILTER);
+		_actionOpenTourTypePrefs = new ActionOpenPrefDialog(
+				Messages.Action_TourType_ModifyTourTypeFilter,
+				ITourbookPreferences.PREF_PAGE_TOUR_TYPE_FILTER);
 
-      _actionOpenTourTypePrefs.setShell(_collatedToursView.getShell());
-   }
+		_actionOpenTourTypePrefs.setShell(_collatedToursView.getShell());
+	}
 
-   @Override
-   protected Control createControl(final Composite parent) {
+	@Override
+	protected Control createControl(final Composite parent) {
 
-      initUI(parent);
+		initUI(parent);
 
-      final Composite ui = createUI(parent);
+		final Composite ui = createUI(parent);
 
-      createActions();
+		createActions();
 
-      restoreState();
+		restoreState();
 
-      return ui;
-   }
+		return ui;
+	}
 
-   private Composite createUI(final Composite parent) {
+	private Composite createUI(final Composite parent) {
 
-      final Composite container = new Composite(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
-            .grab(true, true)
-            .applyTo(container);
-      GridLayoutFactory.fillDefaults()//
-            .numColumns(2)
-            .spacing(0, 0)
-            .applyTo(container);
+		final Composite container = new Composite(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, true)
+				.applyTo(container);
+		GridLayoutFactory.fillDefaults()//
+				.numColumns(2)
+				.spacing(0, 0)
+				.applyTo(container);
 
-      container.addMouseListener(_mouseListener);
-      container.addMouseTrackListener(_mouseTrackListener);
-      container.addMouseWheelListener(_mouseWheelListener);
+		container.addMouseListener(_mouseListener);
+		container.addMouseTrackListener(_mouseTrackListener);
+		container.addMouseWheelListener(_mouseWheelListener);
 //		container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
-      {
-         createUI_32_FilterIcon(container);
-         createUI_34_FilterText(container);
-         createUI_36_ContextMenu();
-      }
+		{
+			createUI_32_FilterIcon(container);
+			createUI_34_FilterText(container);
+			createUI_36_ContextMenu();
+		}
 
-      return container;
-   }
+		return container;
+	}
 
-   private void createUI_32_FilterIcon(final Composite parent) {
+	private void createUI_32_FilterIcon(final Composite parent) {
 
-      _lblFilterIcon = new Label(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
-            .hint(16, 16)
-            .align(SWT.FILL, SWT.CENTER)
-            .applyTo(_lblFilterIcon);
+		_lblFilterIcon = new Label(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.hint(16, 16)
+				.align(SWT.FILL, SWT.CENTER)
+				.applyTo(_lblFilterIcon);
 
-      _lblFilterIcon.addMouseListener(_mouseListener);
-      _lblFilterIcon.addMouseTrackListener(_mouseTrackListener);
-      _lblFilterIcon.addMouseWheelListener(_mouseWheelListener);
-   }
+		_lblFilterIcon.addMouseListener(_mouseListener);
+		_lblFilterIcon.addMouseTrackListener(_mouseTrackListener);
+		_lblFilterIcon.addMouseWheelListener(_mouseWheelListener);
+	}
 
-   private void createUI_34_FilterText(final Composite parent) {
+	private void createUI_34_FilterText(final Composite parent) {
 
-      _lnkFilterText = new Link(parent, SWT.NONE);
-      GridDataFactory.fillDefaults()//
-            .grab(true, true)
-            .hint(_collateNameWidth, SWT.DEFAULT)
-            .align(SWT.FILL, SWT.CENTER)
-            .applyTo(_lnkFilterText);
+		_lnkFilterText = new Link(parent, SWT.NONE);
+		GridDataFactory.fillDefaults()//
+				.grab(true, true)
+				.hint(_collateNameWidth, SWT.DEFAULT)
+				.align(SWT.FILL, SWT.CENTER)
+				.applyTo(_lnkFilterText);
 //		_lnkFilterText.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_RED));
 
-      _lnkFilterText.addMouseListener(_mouseListener);
-      _lnkFilterText.addMouseTrackListener(_mouseTrackListener);
-      _lnkFilterText.addMouseWheelListener(_mouseWheelListener);
+		_lnkFilterText.addMouseListener(_mouseListener);
+		_lnkFilterText.addMouseTrackListener(_mouseTrackListener);
+		_lnkFilterText.addMouseWheelListener(_mouseWheelListener);
 
-      _lnkFilterText.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(final SelectionEvent e) {
-            openContextMenu();
-         }
-      });
+		_lnkFilterText.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				openContextMenu();
+			}
+		});
 
-      _lnkFilterText.addKeyListener(new KeyListener() {
-         @Override
-         public void keyPressed(final KeyEvent e) {
-            switch (e.keyCode) {
+		_lnkFilterText.addKeyListener(new KeyListener() {
+			@Override
+			public void keyPressed(final KeyEvent e) {
+				switch (e.keyCode) {
 
-            case SWT.ARROW_UP:
-               selectCollateFilter_Next(false);
-               break;
+				case SWT.ARROW_UP:
+					selectCollateFilter_Next(false);
+					break;
 
-            case SWT.ARROW_DOWN:
-               selectCollateFilter_Next(true);
-               break;
+				case SWT.ARROW_DOWN:
+					selectCollateFilter_Next(true);
+					break;
 
-            /*
-             * These keys must be set because when the context menu is close, these keys are not
-             * working any more. They are working after the controls gets the focus
-             */
-            case SWT.CR:
-            case ' ':
-               openContextMenu();
-               break;
+				/*
+				 * These keys must be set because when the context menu is close, these keys are not
+				 * working any more. They are working after the controls gets the focus
+				 */
+				case SWT.CR:
+				case ' ':
+					openContextMenu();
+					break;
 
-            default:
-               break;
-            }
-         }
+				default:
+					break;
+				}
+			}
 
-         @Override
-         public void keyReleased(final KeyEvent e) {}
-      });
-   }
+			@Override
+			public void keyReleased(final KeyEvent e) {}
+		});
+	}
 
-   /**
-    * create tour type filter context menu
-    */
-   private void createUI_36_ContextMenu() {
+	/**
+	 * create tour type filter context menu
+	 */
+	private void createUI_36_ContextMenu() {
 
-      final MenuManager menuMgr = new MenuManager();
+		final MenuManager menuMgr = new MenuManager();
 
-      menuMgr.setRemoveAllWhenShown(true);
-      menuMgr.addMenuListener(new IMenuListener() {
-         @Override
-         public void menuAboutToShow(final IMenuManager menuMgr) {
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			@Override
+			public void menuAboutToShow(final IMenuManager menuMgr) {
 
-            // set all menu items
-            fillContextMenu(menuMgr);
-         }
-      });
+				// set all menu items
+				fillContextMenu(menuMgr);
+			}
+		});
 
-      // set context menu and set the parent to the tour type filter icon
-      _contextMenu = menuMgr.createContextMenu(_lblFilterIcon);
+		// set context menu and set the parent to the tour type filter icon
+		_contextMenu = menuMgr.createContextMenu(_lblFilterIcon);
 
-      _contextMenu.addMenuListener(new MenuListener() {
+		_contextMenu.addMenuListener(new MenuListener() {
 
-         @Override
-         public void menuHidden(final MenuEvent e) {
+			@Override
+			public void menuHidden(final MenuEvent e) {
 //				int a = 0;
 //				a++;
-         }
+			}
 
-         @Override
-         public void menuShown(final MenuEvent e) {
+			@Override
+			public void menuShown(final MenuEvent e) {
 //				int a = 0;
 //				a++;
-         }
-      });
+			}
+		});
 
-      _lblFilterIcon.setMenu(_contextMenu);
-   }
+		_lblFilterIcon.setMenu(_contextMenu);
+	}
 
-   @Override
-   public void dispose() {
+	@Override
+	public void dispose() {
 
-      UI.disposeResource(_cursorHand);
+		UI.disposeResource(_cursorHand);
 
-      super.dispose();
-   }
+		super.dispose();
+	}
 
-   /**
-    * Fills the tour type filter context menu.
-    *
-    * @param menuMgr
-    */
-   private void fillContextMenu(final IMenuManager menuMgr) {
+	/**
+	 * Fills the tour type filter context menu.
+	 * 
+	 * @param menuMgr
+	 */
+	private void fillContextMenu(final IMenuManager menuMgr) {
 
-      final ArrayList<TourTypeFilter> _tourTypeFilters = CollateTourManager.getAllCollateFilters();
+		final ArrayList<TourTypeFilter> _tourTypeFilters = CollateTourManager.getAllCollateFilters();
 
-      for (final TourTypeFilter tourTypeFilter : _tourTypeFilters) {
+		for (final TourTypeFilter tourTypeFilter : _tourTypeFilters) {
 
-         final ActionTTFilter ttFilterAction = new ActionTTFilter(tourTypeFilter);
+			final ActionTTFilter ttFilterAction = new ActionTTFilter(tourTypeFilter);
 
-         // check filter which is currently selected in the UI
-         final boolean isChecked = _selectCollateFilter == ttFilterAction.__ttFilter;
+			// check filter which is currently selected in the UI
+			final boolean isChecked = _selectCollateFilter == ttFilterAction.__ttFilter;
 
-         ttFilterAction.setChecked(isChecked);
-         ttFilterAction.setEnabled(isChecked == false);
+			ttFilterAction.setChecked(isChecked);
+			ttFilterAction.setEnabled(isChecked == false);
 
-         String filterName;
+			String filterName;
 
-         if (isChecked) {
-            filterName = ">>> " + ttFilterAction.__ttFilter.getFilterName() + " <<<";//$NON-NLS-1$ //$NON-NLS-2$
-         } else {
-            filterName = ttFilterAction.__ttFilter.getFilterName();
-         }
+			if (isChecked) {
+				filterName = ">>> " + ttFilterAction.__ttFilter.getFilterName() + " <<<";//$NON-NLS-1$ //$NON-NLS-2$
+			} else {
+				filterName = ttFilterAction.__ttFilter.getFilterName();
+			}
 
-         ttFilterAction.setText(filterName);
+			ttFilterAction.setText(filterName);
 
-         // disabled filter image is hidden because it look ugly on win32
-         ttFilterAction.setImageDescriptor(isChecked ? null : ttFilterAction.__filterImageDescriptor);
+			// disabled filter image is hidden because it look ugly on win32
+			ttFilterAction.setImageDescriptor(isChecked ? null : ttFilterAction.__filterImageDescriptor);
 
-         menuMgr.add(ttFilterAction);
-      }
+			menuMgr.add(ttFilterAction);
+		}
 
-      menuMgr.add(new Separator());
-      menuMgr.add(_actionOpenTourTypePrefs);
-   }
+		menuMgr.add(new Separator());
+		menuMgr.add(_actionOpenTourTypePrefs);
+	}
 
-   private void initUI(final Composite parent) {
+	private void initUI(final Composite parent) {
 
-      final PixelConverter pc = new PixelConverter(parent);
+		final PixelConverter pc = new PixelConverter(parent);
 
-      _cursorHand = new Cursor(parent.getDisplay(), SWT.CURSOR_HAND);
+		_cursorHand = new Cursor(parent.getDisplay(), SWT.CURSOR_HAND);
 
-      _collateNameWidth = pc.convertWidthInCharsToPixels(20);
+		_collateNameWidth = pc.convertWidthInCharsToPixels(20);
 
-      _mouseWheelListener = new MouseWheelListener() {
+		_mouseWheelListener = new MouseWheelListener() {
 
-         private int __lastEventTime;
+			private int	__lastEventTime;
 
-         @Override
-         public void mouseScrolled(final MouseEvent event) {
+			@Override
+			public void mouseScrolled(final MouseEvent event) {
 
-            if (event.time == __lastEventTime) {
-               // prevent doing the same for the same event, this occured when mouse is scrolled -> the event is fired 2x times
-               return;
-            }
+				if (event.time == __lastEventTime) {
+					// prevent doing the same for the same event, this occured when mouse is scrolled -> the event is fired 2x times
+					return;
+				}
 
-            if (_contextMenu.isDisposed()) {
-               return;
-            }
-            _contextMenu.setVisible(false);
-            _lnkFilterText.setFocus();
+				if (_contextMenu.isDisposed()) {
+					return;
+				}
+				_contextMenu.setVisible(false);
+				_lnkFilterText.setFocus();
 
-            __lastEventTime = event.time;
+				__lastEventTime = event.time;
 
-            selectCollateFilter_Next(event.count < 0);
-         }
-      };
+				selectCollateFilter_Next(event.count < 0);
+			}
+		};
 
-      _mouseListener = new MouseListener() {
-         @Override
-         public void mouseDoubleClick(final MouseEvent e) {}
+		_mouseListener = new MouseListener() {
+			@Override
+			public void mouseDoubleClick(final MouseEvent e) {}
 
-         @Override
-         public void mouseDown(final MouseEvent e) {
-            _lnkFilterText.setFocus();
-            openContextMenu();
-         }
+			@Override
+			public void mouseDown(final MouseEvent e) {
+				_lnkFilterText.setFocus();
+				openContextMenu();
+			}
 
-         @Override
-         public void mouseUp(final MouseEvent e) {}
-      };
+			@Override
+			public void mouseUp(final MouseEvent e) {}
+		};
 
-      _mouseTrackListener = new MouseTrackListener() {
-         @Override
-         public void mouseEnter(final MouseEvent e) {
-            if (e.widget instanceof Control) {
+		_mouseTrackListener = new MouseTrackListener() {
+			@Override
+			public void mouseEnter(final MouseEvent e) {
+				if (e.widget instanceof Control) {
 
-               final Control control = (Control) e.widget;
+					final Control control = (Control) e.widget;
 
-               if (control.isDisposed()) {
+					if (control.isDisposed()) {
 
-                  /**
-                   * This error occures when the customized dialog for the perspective is
-                   * opened -> needs to be fixed.
-                   */
+						/**
+						 * This error occures when the customized dialog for the perspective is
+						 * opened -> needs to be fixed.
+						 */
 
-                  return;
-               }
+						return;
+					}
 
-               control.setCursor(_cursorHand);
-            }
-         }
+					control.setCursor(_cursorHand);
+				}
+			}
 
-         @Override
-         public void mouseExit(final MouseEvent e) {
-            if (e.widget instanceof Control) {
+			@Override
+			public void mouseExit(final MouseEvent e) {
+				if (e.widget instanceof Control) {
 
-               final Control control = (Control) e.widget;
-               control.setCursor(null);
-            }
-         }
+					final Control control = (Control) e.widget;
+					control.setCursor(null);
+				}
+			}
 
-         @Override
-         public void mouseHover(final MouseEvent e) {}
-      };
-   }
+			@Override
+			public void mouseHover(final MouseEvent e) {}
+		};
+	}
 
-   private void openContextMenu() {
+	private void openContextMenu() {
 
-      if (_contextMenu.isVisible() || _isContextOpening) {
-         return;
-      }
+		if (_contextMenu.isVisible() || _isContextOpening) {
+			return;
+		}
 
-      _isContextOpening = true;
+		_isContextOpening = true;
 
-      final Rectangle rect = _lblFilterIcon.getBounds();
-      Point pt = new Point(rect.x, rect.y + rect.height);
-      pt = _lblFilterIcon.getParent().toDisplay(pt);
+		final Rectangle rect = _lblFilterIcon.getBounds();
+		Point pt = new Point(rect.x, rect.y + rect.height);
+		pt = _lblFilterIcon.getParent().toDisplay(pt);
 
-      _contextMenu.setLocation(pt.x, pt.y);
-      _contextMenu.setVisible(true);
+		_contextMenu.setLocation(pt.x, pt.y);
+		_contextMenu.setVisible(true);
 
-      _isContextOpening = false;
-   }
+		_isContextOpening = false;
+	}
 
-   private void restoreState() {
 
-      _selectCollateFilter = CollateTourManager.getSelectedCollateFilter();
+	private void restoreState() {
 
-      // try to reselect the last tour type filter
-      updateUI(_selectCollateFilter);
-   }
+		_selectCollateFilter = CollateTourManager.getSelectedCollateFilter();
 
-   private void selectCollateFilter(final TourTypeFilter ttFilter) {
+		// try to reselect the last tour type filter
+		updateUI(_selectCollateFilter);
+	}
 
-      _selectCollateFilter = ttFilter;
+	private void selectCollateFilter(final TourTypeFilter ttFilter) {
 
-      updateUI(ttFilter);
+		_selectCollateFilter = ttFilter;
 
-      CollateTourManager.setSelectedCollateFilter(ttFilter);
+		updateUI(ttFilter);
 
-      // run async that the UI is updated before a longer job to get the data from the db
-      Display.getCurrent().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+		CollateTourManager.setSelectedCollateFilter(ttFilter);
 
-            if (_cursorHand.isDisposed()) {
-               return;
-            }
+		// run async that the UI is updated before a longer job to get the data from the db
+		Display.getCurrent().asyncExec(new Runnable() {
+			@Override
+			public void run() {
 
-            // the tree root items gets the selected tour type filter from the collate manager
-            _collatedToursView.reloadViewer();
-         }
-      });
-   }
+				if (_cursorHand.isDisposed()) {
+					return;
+				}
 
-   private void selectCollateFilter_Next(final boolean isNext) {
+				// the tree root items gets the selected tour type filter from the collate manager
+				_collatedToursView.reloadViewer();
+			}
+		});
+	}
 
-      final ArrayList<TourTypeFilter> collateFilters = CollateTourManager.getAllCollateFilters();
+	private void selectCollateFilter_Next(final boolean isNext) {
 
-      int selectedFilterIndex = 0;
+		final ArrayList<TourTypeFilter> collateFilters = CollateTourManager.getAllCollateFilters();
 
-      // get filter which is currently selected
-      for (final TourTypeFilter collateFilter : collateFilters) {
+		int selectedFilterIndex = 0;
 
-         if (collateFilter == _selectCollateFilter) {
-            break;
-         }
+		// get filter which is currently selected
+		for (final TourTypeFilter collateFilter : collateFilters) {
 
-         selectedFilterIndex++;
-      }
+			if (collateFilter == _selectCollateFilter) {
+				break;
+			}
 
-      if (isNext && selectedFilterIndex < collateFilters.size() - 1) {
+			selectedFilterIndex++;
+		}
 
-         // select next filter
+		if (isNext && selectedFilterIndex < collateFilters.size() - 1) {
 
-         selectCollateFilter(collateFilters.get(++selectedFilterIndex));
+			// select next filter
 
-      } else if (isNext == false && selectedFilterIndex > 0) {
+			selectCollateFilter(collateFilters.get(++selectedFilterIndex));
 
-         // select previous filter
+		} else if (isNext == false && selectedFilterIndex > 0) {
 
-         selectCollateFilter(collateFilters.get(--selectedFilterIndex));
-      }
-   }
+			// select previous filter
 
-   private void updateUI(final TourTypeFilter ttFilter) {
+			selectCollateFilter(collateFilters.get(--selectedFilterIndex));
+		}
+	}
 
-      // prevent endless loops
-      if (_isUIUpdating) {
-         return;
-      }
+	private void updateUI(final TourTypeFilter ttFilter) {
 
-      _isUIUpdating = true;
-      {
-         final boolean isTTFilter = ttFilter != null;
+		// prevent endless loops
+		if (_isUIUpdating) {
+			return;
+		}
 
-         final String filterName = isTTFilter //
-               ? ttFilter.getFilterName()
-               : Messages.Collate_Tours_Link_SelectTourType;
+		_isUIUpdating = true;
+		{
+			final boolean isTTFilter = ttFilter != null;
 
-         final String shortFilterName = UI.shortenText(filterName, _lnkFilterText, _collateNameWidth, true);
+			final String filterName = isTTFilter //
+					? ttFilter.getFilterName()
+					: Messages.Collate_Tours_Link_SelectTourType;
 
-         final String filterTooltip = isTTFilter
-               ? updateUI_TooltipText(ttFilter, filterName)
-               : Messages.Collate_Tours_Link_SelectTourType_Tooltip;
+			final String shortFilterName = UI.shortenText(filterName, _lnkFilterText, _collateNameWidth, true);
 
-         _lnkFilterText.setText("<a>" + shortFilterName + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$
-         _lnkFilterText.setToolTipText(filterTooltip);
+			final String filterTooltip = isTTFilter
+					? updateUI_TooltipText(ttFilter, filterName)
+					: Messages.Collate_Tours_Link_SelectTourType_Tooltip;
 
-         if (isTTFilter) {
-            _lblFilterIcon.setImage(TourTypeFilter.getFilterImage(ttFilter));
-         }
-      }
-      _isUIUpdating = false;
-   }
+			_lnkFilterText.setText("<a>" + shortFilterName + "</a>"); //$NON-NLS-1$ //$NON-NLS-2$
+			_lnkFilterText.setToolTipText(filterTooltip);
 
-   /**
-    * Create filter tooltip.
-    */
-   private String updateUI_TooltipText(final TourTypeFilter ttFilter, final String filterName) {
+			if (isTTFilter) {
+				_lblFilterIcon.setImage(TourTypeFilter.getFilterImage(ttFilter));
+			}
+		}
+		_isUIUpdating = false;
+	}
 
-      String filterTooltip;
+	/**
+	 * Create filter tooltip.
+	 */
+	private String updateUI_TooltipText(final TourTypeFilter ttFilter, final String filterName) {
 
-      final int filterType = ttFilter.getFilterType();
+		String filterTooltip;
 
-      if (filterType == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET) {
+		final int filterType = ttFilter.getFilterType();
 
-         final StringBuilder sb = new StringBuilder();
-         sb.append(Messages.Collate_Tours_Label_TooltipHeader_Multiple);
-         sb.append(filterName);
-         sb.append(UI.NEW_LINE2);
-         sb.append(Messages.App_TourType_ToolTip);
+		if (filterType == TourTypeFilter.FILTER_TYPE_TOURTYPE_SET) {
 
-         final TourTypeFilterSet ttSet = ttFilter.getTourTypeSet();
-         if (ttSet != null) {
+			final StringBuilder sb = new StringBuilder();
+			sb.append(Messages.Collate_Tours_Label_TooltipHeader_Multiple);
+			sb.append(filterName);
+			sb.append(UI.NEW_LINE2);
+			sb.append(Messages.App_TourType_ToolTip);
 
-            int counter = 0;
+			final TourTypeFilterSet ttSet = ttFilter.getTourTypeSet();
+			if (ttSet != null) {
 
-            for (final Object ttItem : ttSet.getTourTypes()) {
-               if (ttItem instanceof TourType) {
-                  final TourType ttFilterFromSet = (TourType) ttItem;
+				int counter = 0;
 
-                  if (counter > 0) {
-                     sb.append("\n\t\t"); //$NON-NLS-1$
-                  }
+				for (final Object ttItem : ttSet.getTourTypes()) {
+					if (ttItem instanceof TourType) {
+						final TourType ttFilterFromSet = (TourType) ttItem;
 
-                  sb.append("\t"); //$NON-NLS-1$
-                  sb.append(ttFilterFromSet.getName());
+						if (counter > 0) {
+							sb.append("\n\t\t"); //$NON-NLS-1$
+						}
 
-                  counter++;
-               }
-            }
-         }
-         filterTooltip = sb.toString();
+						sb.append("\t"); //$NON-NLS-1$
+						sb.append(ttFilterFromSet.getName());
 
-      } else if (filterType == TourTypeFilter.FILTER_TYPE_DB) {
+						counter++;
+					}
+				}
+			}
+			filterTooltip = sb.toString();
 
-         filterTooltip = NLS.bind(Messages.Collate_Tours_Label_TooltipHeader_Single, filterName);
+		} else if (filterType == TourTypeFilter.FILTER_TYPE_DB) {
 
-      } else {
+			filterTooltip = NLS.bind(Messages.Collate_Tours_Label_TooltipHeader_Single, filterName);
 
-         filterTooltip = filterName;
-      }
+		} else {
 
-      return filterTooltip;
-   }
+			filterTooltip = filterName;
+		}
+
+		return filterTooltip;
+	}
 }
