@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
+import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -251,7 +252,7 @@ public abstract class TourbookDevice implements IRawDataReader {
     */
    protected boolean isValidXMLFile(final String importFilePath, final String deviceTag) {
 
-      return isValidXMLFile(importFilePath, deviceTag, false);
+      return isValidXMLFile(importFilePath, deviceTag, false, true);
    }
 
    /**
@@ -263,9 +264,21 @@ public abstract class TourbookDevice implements IRawDataReader {
     *           When <code>true</code> the BOM (Byte Order Mark) is removed from the file.
     * @return Returns <code>true</code> when the file contains content with the requested tag.
     */
-   protected boolean isValidXMLFile(final String importFilePath, final String deviceTag, final boolean isRemoveBOM) {
+   protected boolean isValidXMLFile(final String importFilePath,
+                                    final String deviceTag,
+                                    final boolean isRemoveBOM,
+                                    final boolean isTrimXmlDeclaration) {
 
       final String deviceTagLower = deviceTag.toLowerCase();
+
+      if (isTrimXmlDeclaration) {
+
+         try {
+            FilesUtils.trimXmlDeclaration(importFilePath, XML_START_ID);
+         } catch (final IOException e) {
+            // just ignore it
+         }
+      }
 
       try (FileInputStream inputStream = new FileInputStream(importFilePath);
             BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {

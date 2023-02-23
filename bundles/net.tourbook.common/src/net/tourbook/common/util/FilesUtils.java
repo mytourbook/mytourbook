@@ -22,6 +22,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 import net.tourbook.common.UI;
 
@@ -85,5 +87,33 @@ public final class FilesUtils {
          fileName = fileName.substring(0, extensionPosition);
       }
       return fileName;
+   }
+
+   public static void trimXmlDeclaration(final String importFilePath, final String xmlStartId) throws IOException {
+
+      final Path filePath = Paths.get(importFilePath);
+
+      final List<String> fileContent = new ArrayList<>(
+            Files.readAllLines(filePath, StandardCharsets.UTF_8));
+
+      if (fileContent.isEmpty()) {
+         return;
+      }
+
+      boolean isXmlDeclarationTrimmed = false;
+      for (int index = 0; index < fileContent.size(); ++index) {
+         final String currentLine = fileContent.get(index);
+
+         if (currentLine.toLowerCase().contains(xmlStartId)) {
+
+            fileContent.set(index, currentLine.trim());
+            isXmlDeclarationTrimmed = true;
+            break;
+         }
+      }
+
+      if (isXmlDeclarationTrimmed) {
+         Files.write(filePath, fileContent, StandardCharsets.UTF_8);
+      }
    }
 }

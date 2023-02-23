@@ -105,6 +105,6 @@ public class GarminTCX_DeviceDataReader extends TourbookDevice {
 
    @Override
    public boolean validateRawData(final String fileName) {
-      return isValidXMLFile(fileName, XML_GARMIN_TAG);
+      return isValidXMLFile(fileName, XML_GARMIN_TAG, false, true);
    }
 }
