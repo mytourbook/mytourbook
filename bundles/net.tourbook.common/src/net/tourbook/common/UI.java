@@ -1378,7 +1378,7 @@ public class UI {
 
    public static Cursor disposeResource(final Cursor resource) {
 
-      if (resource != null && resource.isDisposed() == false) {
+      if (resource != null) {
          resource.dispose();
       }
 
@@ -1393,7 +1393,7 @@ public class UI {
     */
    public static Image disposeResource(final Image resource) {
 
-      if (resource != null && resource.isDisposed() == false) {
+      if (resource != null) {
          resource.dispose();
       }
 
@@ -1402,7 +1402,7 @@ public class UI {
 
    public static org.eclipse.swt.graphics.Font disposeResource(final org.eclipse.swt.graphics.Font font) {
 
-      if (font != null && font.isDisposed() == false) {
+      if (font != null) {
          font.dispose();
       }
 
@@ -1411,7 +1411,7 @@ public class UI {
 
    public static Resource disposeResource(final Resource resource) {
 
-      if (resource != null && resource.isDisposed() == false) {
+      if (resource != null) {
          resource.dispose();
       }
 
