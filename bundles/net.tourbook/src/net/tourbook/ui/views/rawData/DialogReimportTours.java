@@ -90,6 +90,7 @@ class DialogReimportTours extends TitleAreaDialog {
    private static final String STATE_IS_IMPORT_TOUR__CALORIES                     = "STATE_IS_IMPORT_TOUR__CALORIES";                     //$NON-NLS-1$
    private static final String STATE_IS_IMPORT_TOUR__FILE_LOCATION                = "STATE_IS_IMPORT_TOUR__FILE_LOCATION";                //$NON-NLS-1$
    private static final String STATE_IS_IMPORT_TOUR__MARKERS                      = "STATE_IS_IMPORT_TOUR__MARKERS";                      //$NON-NLS-1$
+   private static final String STATE_IS_IMPORT_TOUR__WEATHER                      = "STATE_IS_IMPORT_TOUR__WEATHER";                      //$NON-NLS-1$
 
    private static final String STATE_IS_IMPORT_TIME_SLICE__BATTERY                = "STATE_IS_IMPORT_TIME_SLICE__BATTERY";                //$NON-NLS-1$
    private static final String STATE_IS_IMPORT_TIME_SLICE__CADENCE                = "STATE_IS_IMPORT_TIME_SLICE__CADENCE";                //$NON-NLS-1$
@@ -171,7 +172,7 @@ class DialogReimportTours extends TitleAreaDialog {
    private Button    _chkData_TimeSlice_Training;
    private Button    _chkData_Tour_Markers;
    private Button    _chkData_TimeSlice_TourTimerPauses;
-   private Button    _chkData_Tour_WeatherInformation;
+   private Button    _chkData_Tour_Weather;
 
    private Button    _chkLogDetails;
    private Button    _chkSkipTours_With_ImportFile_NotFound;
@@ -439,6 +440,15 @@ class DialogReimportTours extends TitleAreaDialog {
             _chkData_Tour_Markers.setText(Messages.Dialog_ModifyTours_Checkbox_TourMarkers);
             _chkData_Tour_Markers.addSelectionListener(_defaultListener);
             gridDataItem.applyTo(_chkData_Tour_Markers);
+         }
+         {
+            /*
+             * Weather (description and clouds)
+             */
+            _chkData_Tour_Weather = new Button(containerTour, SWT.CHECK);
+            _chkData_Tour_Weather.setText("Weather (description and clouds)");//Messages.Dialog_ModifyTours_Checkbox_TrainingValues);
+            _chkData_Tour_Weather.addSelectionListener(_defaultListener);
+            gridDataItem.applyTo(_chkData_Tour_Weather);
          }
       }
 
@@ -996,7 +1006,8 @@ class DialogReimportTours extends TitleAreaDialog {
 
             _chkData_Tour_Calories.getSelection() ||
             _chkData_Tour_ImportFileLocation.getSelection() ||
-            _chkData_Tour_Markers.getSelection();
+            _chkData_Tour_Markers.getSelection() ||
+            _chkData_Tour_Weather.getSelection();
 
       final boolean isDataSelected = false ||
 
@@ -1011,6 +1022,7 @@ class DialogReimportTours extends TitleAreaDialog {
       _chkData_Tour_ImportFileLocation.setEnabled(isPartOfATourSelected);
       _chkData_Tour_Markers.setEnabled(isPartOfATourSelected);
       _chkData_Tour_Calories.setEnabled(isPartOfATourSelected);
+      _chkData_Tour_Weather.setEnabled(isPartOfATourSelected);
 
       _chkData_TimeSlice_Battery.setEnabled(isTimeSlice);
       _chkData_TimeSlice_Cadence.setEnabled(isTimeSlice);
@@ -1125,6 +1137,7 @@ class DialogReimportTours extends TitleAreaDialog {
             DialogUtils.addTourValueTypeFromCheckbox(_chkData_Tour_Calories,           TourValueType.TOUR__CALORIES,             tourValueTypes);
             DialogUtils.addTourValueTypeFromCheckbox(_chkData_Tour_Markers,            TourValueType.TOUR__MARKER,               tourValueTypes);
             DialogUtils.addTourValueTypeFromCheckbox(_chkData_Tour_ImportFileLocation, TourValueType.TOUR__IMPORT_FILE_LOCATION, tourValueTypes);
+            DialogUtils.addTourValueTypeFromCheckbox(_chkData_Tour_Weather,            TourValueType.TOUR__WEATHER,              tourValueTypes);
 
 // SET_FORMATTING_ON
          }
@@ -1143,6 +1156,7 @@ class DialogReimportTours extends TitleAreaDialog {
       _chkData_Tour_Calories.setSelection(false);
       _chkData_Tour_ImportFileLocation.setSelection(false);
       _chkData_Tour_Markers.setSelection(false);
+      _chkData_Tour_Weather.setSelection(false);
 
       _chkData_TimeSlice_Battery.setSelection(false);
       _chkData_TimeSlice_Cadence.setSelection(false);
@@ -1227,6 +1241,7 @@ class DialogReimportTours extends TitleAreaDialog {
       _chkData_Tour_Calories                  .setSelection(_state.getBoolean(STATE_IS_IMPORT_TOUR__CALORIES));
       _chkData_Tour_ImportFileLocation        .setSelection(_state.getBoolean(STATE_IS_IMPORT_TOUR__FILE_LOCATION));
       _chkData_Tour_Markers                   .setSelection(_state.getBoolean(STATE_IS_IMPORT_TOUR__MARKERS));
+      _chkData_Tour_Weather                   .setSelection(_state.getBoolean(STATE_IS_IMPORT_TOUR__WEATHER));
 
       _chkData_TimeSlice_Battery              .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__BATTERY));
       _chkData_TimeSlice_Cadence              .setSelection(_state.getBoolean(STATE_IS_IMPORT_TIME_SLICE__CADENCE));
@@ -1267,6 +1282,7 @@ class DialogReimportTours extends TitleAreaDialog {
       _state.put(STATE_IS_IMPORT_TOUR__CALORIES,               _chkData_Tour_Calories.getSelection());
       _state.put(STATE_IS_IMPORT_TOUR__FILE_LOCATION,          _chkData_Tour_ImportFileLocation.getSelection());
       _state.put(STATE_IS_IMPORT_TOUR__MARKERS,                _chkData_Tour_Markers.getSelection());
+      _state.put(STATE_IS_IMPORT_TOUR__WEATHER,                _chkData_Tour_Weather.getSelection());
 
       _state.put(STATE_IS_IMPORT_ALL_TIME_SLICES,                    _chkData_AllTimeSlices.getSelection());
       _state.put(STATE_IS_IMPORT_TIME_SLICE__BATTERY,                _chkData_TimeSlice_Battery.getSelection());
