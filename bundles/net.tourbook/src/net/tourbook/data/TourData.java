@@ -9905,6 +9905,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return weather == null ? UI.EMPTY_STRING : weather;
    }
 
+   public String getWeather_AirQuality() {
+      return weather_AirQuality;
+   }
+
    /**
     * @return Returns the {@link IWeather#WEATHER_ID_}... or <code>null</code> when weather is not
     *         set.
@@ -9981,6 +9985,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public int getWeather_Wind_Speed() {
       return weather_Wind_Speed;
+   }
+
+   /**
+    * @return Returns the index for the cloud values in {@link IWeather#cloudIcon} and
+    *         {@link IWeather#cloudText} or 0 when the clouds are not defined
+    */
+   public int getWeatherAirQualityIndex() {
+
+      return WeatherUtils.getWeatherAirQualityIndex(weather_AirQuality);
    }
 
    /**
@@ -12392,6 +12405,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public void setWeather(final String weather) {
       this.weather = weather;
+   }
+
+   public void setWeather_AirQuality(final String weather_AirQuality) {
+      this.weather_AirQuality = weather_AirQuality;
    }
 
    /**

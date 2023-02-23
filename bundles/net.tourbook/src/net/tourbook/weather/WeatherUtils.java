@@ -371,6 +371,23 @@ public class WeatherUtils {
       return searchAreaCenter;
    }
 
+   public static int getWeatherAirQualityIndex(final String weatherQuality) {
+
+      int weatherCloudsIndex = -1;
+
+      if (StringUtils.hasContent(weatherQuality)) {
+         // binary search cannot be done because it requires sorting which we cannot...
+         for (int cloudIndex = 0; cloudIndex < IWeather.airQualityText.length; ++cloudIndex) {
+            if (IWeather.cloudIcon[cloudIndex].equalsIgnoreCase(weatherQuality)) {
+               weatherCloudsIndex = cloudIndex;
+               break;
+            }
+         }
+      }
+
+      return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
+   }
+
    /**
     * Returns an appropriate weather Emoji based on the tour weather icon.
     * To obtain the string representation of the icons in Unicode 7.0,

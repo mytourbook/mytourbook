@@ -260,6 +260,23 @@ public abstract class TourbookDevice implements IRawDataReader {
     *
     * @param importFilePath
     * @param deviceTag
+    *           The deviceTag starts on the second line of a xml file.
+    * @param isRemoveBOM
+    *           When <code>true</code> the BOM (Byte Order Mark) is removed from the file.
+    * @return Returns <code>true</code> when the file contains content with the requested tag.
+    */
+   protected boolean isValidXMLFile(final String importFilePath,
+                                    final String deviceTag,
+                                    final boolean isRemoveBOM) {
+
+      return isValidXMLFile(importFilePath, deviceTag, isRemoveBOM, false);
+   }
+
+   /**
+    * Check if the file is a valid device xml file.
+    *
+    * @param importFilePath
+    * @param deviceTag
     * @param isRemoveBOM
     *           When <code>true</code> the BOM (Byte Order Mark) is removed from the file.
     * @return Returns <code>true</code> when the file contains content with the requested tag.

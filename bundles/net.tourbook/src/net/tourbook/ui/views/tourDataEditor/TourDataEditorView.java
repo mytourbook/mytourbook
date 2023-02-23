@@ -8696,6 +8696,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _tourData.setWeather_Temperature_WindChill(UI.convertTemperatureToMetric(temperature_WindChill));
          }
 
+         // Air Quality
+         final int airQualityIndex = _comboWeather_AirQuality.getSelectionIndex();
+         String airQualityValue = IWeather.airQualityText[airQualityIndex];
+         if (airQualityValue.equals(IWeather.airQualityIsNotDefined)) {
+            // replace invalid cloud key
+            airQualityValue = UI.EMPTY_STRING;
+         }
+         _tourData.setWeather_AirQuality(airQualityValue);
+
          /*
           * Time
           */
@@ -9249,6 +9258,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _spinWeather_PressureValue.setSelection(Math.round(pressure * 100));
       }
       _spinWeather_PressureValue.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
+
+      // Air Quality
+      _comboWeather_AirQuality.select(_tourData.getWeatherAirQualityIndex());
 
       /*
        * Time

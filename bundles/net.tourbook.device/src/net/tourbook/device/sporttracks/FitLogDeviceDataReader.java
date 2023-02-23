@@ -81,10 +81,10 @@ public class FitLogDeviceDataReader extends TourbookDevice {
       final boolean isFitLogExFile =
 
             // check "<FitnessWorkbookEx "
-            isValidXMLFile(importFilePath, XML_FIT_LOG_EX_TAG, true, false)
+            isValidXMLFile(importFilePath, XML_FIT_LOG_EX_TAG, true)
 
                   // check "<FitnessWorkbookExFree "
-                  || isValidXMLFile(importFilePath, XML_FIT_LOG_EX_FREE_TAG, true, false);
+                  || isValidXMLFile(importFilePath, XML_FIT_LOG_EX_FREE_TAG, true);
 
       if (isValidXMLFile(importFilePath, XML_FIT_LOG_TAG, true, false) == false
             && !isFitLogExFile) {
@@ -126,12 +126,12 @@ public class FitLogDeviceDataReader extends TourbookDevice {
       return
 
       // check "<FitnessWorkbook "
-      isValidXMLFile(fileName, XML_FIT_LOG_TAG, true, false)
+      isValidXMLFile(fileName, XML_FIT_LOG_TAG, true)
 
             // check "<FitnessWorkbookEx "
-            || isValidXMLFile(fileName, XML_FIT_LOG_EX_TAG, true, false)
+            || isValidXMLFile(fileName, XML_FIT_LOG_EX_TAG, true)
 
             // check "<FitnessWorkbookExFree "
-            || isValidXMLFile(fileName, XML_FIT_LOG_EX_FREE_TAG, true, false);
+            || isValidXMLFile(fileName, XML_FIT_LOG_EX_FREE_TAG, true);
    }
 }
