@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1819,14 +1819,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * An array containing the start time of each pause (in milliseconds)
-    * A timer pause is a device event, triggered by the user or automatically triggerd by the device.
+    * A timer pause is a device event, triggered by the user or automatically triggered by the device.
     */
    @Transient
    private long[]       pausedTime_Start;
 
    /**
     * An array containing the end time of each pause (in milliseconds)
-    * A timer pause is a device event, triggered by the user or automatically triggerd by the device.
+    * A timer pause is a device event, triggered by the user or automatically triggered by the device.
     */
    @Transient
    private long[]       pausedTime_End;
@@ -10209,6 +10209,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public boolean isSurfing_IsMinDistance() {
       return surfing_IsMinDistance;
+   }
+
+   @JsonIgnore
+   public boolean isTemperatureAvailable() {
+
+      return getWeather_Temperature_Average() != 0 ||
+            getWeather_Temperature_Max() != 0 ||
+            getWeather_Temperature_Min() != 0 ||
+            getWeather_Temperature_WindChill() != 0 ||
+            isWeatherDataFromProvider();
    }
 
    public boolean isTimeSerieWithTimeZoneAdjustment() {

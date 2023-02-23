@@ -1730,7 +1730,7 @@ public class Map2View extends ViewPart implements
       _actionTourColor_Pace = new ActionTourColor(
             this,
             MapGraphId.Pace,
-            Messages.map_action_tour_color_pase_tooltip,
+            Messages.map_action_tour_color_pace_tooltip,
             Images.Graph_Pace,
             Images.Graph_Pace_Disabled);
 

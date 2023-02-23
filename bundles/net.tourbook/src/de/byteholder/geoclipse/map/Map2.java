@@ -1172,6 +1172,7 @@ public class Map2 extends Canvas {
    }
 
    public void disposeTiles() {
+
       _mp.disposeTiles();
    }
 
@@ -2726,16 +2727,16 @@ public class Map2 extends Canvas {
       Util.disposeResource(_mapImage);
       Util.disposeResource(_poiImage);
 
-      Util.disposeResource(_9PartImage);
-      Util.disposeResource(_9PartGC);
+      UI.disposeResource(_9PartImage);
+      UI.disposeResource(_9PartGC);
 
-      Util.disposeResource(_cursorCross);
-      Util.disposeResource(_cursorDefault);
-      Util.disposeResource(_cursorHand);
-      Util.disposeResource(_cursorPan);
-      Util.disposeResource(_cursorSearchTour);
-      Util.disposeResource(_cursorSearchTour_Scroll);
-      Util.disposeResource(_cursorSelect);
+      UI.disposeResource(_cursorCross);
+      UI.disposeResource(_cursorDefault);
+      UI.disposeResource(_cursorHand);
+      UI.disposeResource(_cursorPan);
+      UI.disposeResource(_cursorSearchTour);
+      UI.disposeResource(_cursorSearchTour_Scroll);
+      UI.disposeResource(_cursorSelect);
 
       // dispose resources in the overlay plugins
       for (final Map2Painter overlay : _allMapPainter) {
@@ -2751,7 +2752,7 @@ public class Map2 extends Canvas {
 
       // dispose legend image
       if (_mapLegend != null) {
-         Util.disposeResource(_mapLegend.getImage());
+         UI.disposeResource(_mapLegend.getImage());
       }
 
       if (_poi_Tooltip != null) {
@@ -6784,10 +6785,10 @@ public class Map2 extends Canvas {
     */
    public void setLegend(final MapLegend legend) {
 
-      if ((legend == null) && (_mapLegend != null)) {
+      if (legend == null && _mapLegend != null) {
 
          // dispose legend image
-         Util.disposeResource(_mapLegend.getImage());
+         UI.disposeResource(_mapLegend.getImage());
       }
 
       _mapLegend = legend;

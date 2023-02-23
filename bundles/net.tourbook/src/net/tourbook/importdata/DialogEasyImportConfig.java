@@ -3250,8 +3250,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _configImages.clear();
       _configImageHash.clear();
 
-      Util.disposeResource(_imageFileSystem);
-      Util.disposeResource(_imageAppOptions);
+      UI.disposeResource(_imageFileSystem);
+      UI.disposeResource(_imageAppOptions);
    }
 
    /**
@@ -4144,7 +4144,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       String deviceFolder = _selectedIC.getDeviceFolder();
 
       //We update the file system icon
-      Util.disposeResource(_imageFileSystem);
+      UI.disposeResource(_imageFileSystem);
       if (isDeviceLocal) {
          _imageFileSystem = TourbookPlugin.getImageDescriptor(Images.EasyImport_Harddrive).createImage();
       } else if (NIO.isTourBookFileSystem(_comboIC_DeviceType.getText())) {

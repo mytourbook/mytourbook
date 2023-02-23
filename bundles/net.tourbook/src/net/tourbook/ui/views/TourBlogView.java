@@ -22,6 +22,7 @@ import java.io.File;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Images;
@@ -253,7 +254,7 @@ public class TourBlogView extends ViewPart {
 
          if ((eventId == TourEventId.TOUR_CHANGED) && (eventData instanceof TourEvent)) {
 
-            final ArrayList<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
+            final List<TourData> modifiedTours = ((TourEvent) eventData).getModifiedTours();
             if (modifiedTours != null) {
 
                // update modified tour
@@ -361,7 +362,7 @@ public class TourBlogView extends ViewPart {
       final StringBuilder sb = new StringBuilder();
 
       final Set<TourMarker> tourMarkers = _tourData.getTourMarkers();
-      final ArrayList<TourMarker> allMarker = new ArrayList<>(tourMarkers);
+      final List<TourMarker> allMarker = new ArrayList<>(tourMarkers);
       Collections.sort(allMarker);
 
       create_22_BlogHeader(sb);
@@ -1016,7 +1017,7 @@ public class TourBlogView extends ViewPart {
 
       } else if (selection instanceof SelectionTourIds) {
 
-         final ArrayList<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
+         final List<Long> tourIds = ((SelectionTourIds) selection).getTourIds();
          if ((tourIds != null) && (tourIds.size() > 0)) {
             _tourChart = null;
             tourId = tourIds.get(0);
@@ -1110,7 +1111,7 @@ public class TourBlogView extends ViewPart {
             return;
          }
 
-         final ArrayList<TourData> selectedTours = TourManager.getSelectedTours();
+         final List<TourData> selectedTours = TourManager.getSelectedTours();
 
          if ((selectedTours != null) && (selectedTours.size() > 0)) {
             onSelectionChanged(new SelectionTourData(selectedTours.get(0)));

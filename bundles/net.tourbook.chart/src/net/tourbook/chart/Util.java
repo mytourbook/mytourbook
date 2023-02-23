@@ -21,7 +21,10 @@ import java.util.Formatter;
 
 import net.tourbook.common.UI;
 
+<<<<<<< HEAD
 import org.eclipse.swt.graphics.Cursor;
+=======
+>>>>>>> refs/remotes/Wolfgang/main
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
@@ -102,13 +105,6 @@ public class Util {
       }
 
       return new Image(display, rect.width, rect.height);
-   }
-
-   public static Cursor disposeResource(final Cursor resource) {
-      if ((resource != null) && !resource.isDisposed()) {
-         resource.dispose();
-      }
-      return null;
    }
 
    public static String format_hh_mm(final long time) {

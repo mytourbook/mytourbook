@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1229,7 +1229,7 @@ public class TourInfoUI {
       _allSensorValue_Voltage = new ArrayList<>();
 
       final Set<DeviceSensorValue> allSensorValues = _tourData.getDeviceSensorValues();
-      if (allSensorValues.size() == 0) {
+      if (allSensorValues.isEmpty()) {
          return;
       }
 
@@ -1743,19 +1743,19 @@ public class TourInfoUI {
          _lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
       }
 
-      int windSpeed = _tourData.getWeather_Wind_Speed();
-      windSpeed = (int) (windSpeed / UI.UNIT_VALUE_DISTANCE);
-
-      _lblWindSpeed.setText(Integer.toString(windSpeed));
-      _lblWindSpeedUnit.setText(
-            String.format(
-                  Messages.Tour_Tooltip_Format_WindSpeedUnit,
-                  UI.UNIT_LABEL_SPEED,
-                  IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
-
-      // wind direction
+      final int windSpeed = (int) (_tourData.getWeather_Wind_Speed() / UI.UNIT_VALUE_DISTANCE);
       final int weatherWindDirectionDegree = _tourData.getWeather_Wind_Direction();
-      if (weatherWindDirectionDegree != -1) {
+      if (windSpeed > 0 && weatherWindDirectionDegree != -1) {
+
+         // Wind speed
+         _lblWindSpeed.setText(Integer.toString(windSpeed));
+         _lblWindSpeedUnit.setText(
+               String.format(
+                     Messages.Tour_Tooltip_Format_WindSpeedUnit,
+                     UI.UNIT_LABEL_SPEED,
+                     IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
+
+         // Wind direction
          _lblWindDirection.setText(Integer.toString(weatherWindDirectionDegree));
          _lblWindDirectionUnit.setText(String.format(
                Messages.Tour_Tooltip_Format_WindDirectionUnit,

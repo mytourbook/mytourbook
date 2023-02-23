@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,6 +26,8 @@ import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Formatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import net.tourbook.Images;
@@ -34,13 +36,17 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.IPhotoPreferences;
+import net.tourbook.photo.ImageUtils;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.TagManager;
+import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
@@ -50,6 +56,12 @@ import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.web.WEB;
 
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.common.ImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
+import org.apache.commons.imaging.formats.tiff.TiffField;
+import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -77,6 +89,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -88,8 +101,12 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.menus.UIElement;
+import org.imgscalr.Scalr.Rotation;
 
 public class UI {
+
+   private static final int              TAG_IMAGE_WIDTH               = 70;
+   private static final int              TAG_IMAGE_HEIGHT              = 70;
 
    private static final String           ICONS_PATH                    = "/icons/";                    //$NON-NLS-1$
 
@@ -105,7 +122,6 @@ public class UI {
    public static final String            DASH_WITH_DOUBLE_SPACE        = "   -   ";                    //$NON-NLS-1$
    public static final String            SLASH_WITH_SPACE              = " / ";                        //$NON-NLS-1$
    public static final String            EMPTY_STRING_FORMAT           = "%s";                         //$NON-NLS-1$
-   public static final String            MNEMONIC                      = "&";                          //$NON-NLS-1$
 
    /**
     * contains a new line
@@ -258,6 +274,8 @@ public class UI {
       TAG_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_TITLE, null);
       TAG_SUB_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
    }
+
+   private static Map<Long, CLabel> _tagsLabels = new HashMap<>();
 
    // pref store var cannot be set from a static field because it can be null !!!
 // private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
@@ -830,6 +848,66 @@ public class UI {
       return UI.EMPTY_STRING;
    }
 
+   public static Image prepareTagImage(final String imageFilePath) {
+
+      if (StringUtils.isNullOrEmpty(imageFilePath) ||
+            !new File(imageFilePath).exists()) {
+         return null;
+      }
+
+      final Image image = new Image(Display.getDefault(), imageFilePath);
+
+      Rotation rotation = null;
+      try {
+
+         final ImageMetadata imageMetadata = Imaging.getMetadata(new File(imageFilePath), null);
+         if (imageMetadata instanceof JpegImageMetadata) {
+
+            final JpegImageMetadata jpegMetadata = (JpegImageMetadata) imageMetadata;
+            final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(
+                  TiffTagConstants.TIFF_TAG_ORIENTATION);
+            if (field != null) {
+
+               final int orientation = field.getIntValue();
+
+               if (orientation == 6) {
+
+                  rotation = Rotation.CW_90;
+               } else if (orientation == 3) {
+
+                  rotation = Rotation.CW_180;
+               } else if (orientation == 8) {
+
+                  rotation = Rotation.CW_270;
+               }
+            }
+         }
+      } catch (ImageReadException | IOException e) {
+         StatusUtil.log(e);
+      }
+
+      final int imageWidth = image.getBounds().width;
+      final int imageHeight = image.getBounds().height;
+
+      int newimageWidth = TAG_IMAGE_WIDTH;
+      int newimageHeight = TAG_IMAGE_HEIGHT;
+
+      if (imageWidth > imageHeight) {
+
+         newimageHeight = Math.round(newimageWidth * imageHeight / (imageWidth * 1f));
+
+      } else if (imageWidth < imageHeight) {
+
+         newimageWidth = Math.round(newimageHeight * imageWidth / (imageHeight * 1f));
+      }
+
+      final Image resizedImage = ImageUtils.resize(Display.getDefault(), image, newimageWidth, newimageHeight, 1, 1, rotation);
+
+      net.tourbook.common.UI.disposeResource(image);
+
+      return resizedImage;
+   }
+
    public static ImageData rotate(final ImageData srcData, final int direction) {
 
       final int bytesPerPixel = srcData.bytesPerLine / srcData.width;
@@ -1145,6 +1223,63 @@ public class UI {
          tourTagLabel.setText(tagLabels);
          tourTagLabel.setToolTipText(tagLabels);
       }
+   }
+
+   public static void updateUI_TagsWithImage(final PixelConverter pc,
+                                             final Set<TourTag> tourTags,
+                                             final Composite tourTagsComposite) {
+
+      // We dispose the tags labels that are not present in the current
+      // tour tags list
+      _tagsLabels.forEach((key, value) -> {
+
+         boolean isTourTagPresent = false;
+
+         for (final TourTag tourTag : tourTags) {
+
+            if (tourTag.getTagId() == key) {
+               isTourTagPresent = true;
+               break;
+            }
+         }
+
+         if (!isTourTagPresent) {
+            value.dispose();
+         }
+      });
+      // We remove the disposed tag labels.
+      _tagsLabels.entrySet().removeIf(entry -> entry.getValue().isDisposed());
+
+      if (tourTags.isEmpty()) {
+
+         tourTagsComposite.setData(null);
+         return;
+      }
+
+      final Map<Long, String> tourTagsAccumulatedValues =
+            TagManager.fetchTourTagsAccumulatedValues();
+
+      for (final TourTag tag : tourTags) {
+
+         // If the tag is already present in the UI, there is no need to create
+         // it again.
+         if (_tagsLabels.containsKey(tag.getTagId())) {
+            continue;
+         }
+
+         final CLabel label = new CLabel(tourTagsComposite, SWT.NONE);
+         label.setLayoutData(new RowData(pc.convertWidthInCharsToPixels(35), pc.convertWidthInCharsToPixels(12)));
+         label.setText(tag.getTagName() + UI.NEW_LINE +
+               tourTagsAccumulatedValues.get(tag.getTagId()));
+
+         final Image image = TagMenuManager.getTagImage(tag.getImageFilePath());
+         if (image != null) {
+            label.setImage(image);
+         }
+         _tagsLabels.put(tag.getTagId(), label);
+      }
+
+      tourTagsComposite.layout();
    }
 
    /**

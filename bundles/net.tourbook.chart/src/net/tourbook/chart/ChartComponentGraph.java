@@ -7259,29 +7259,29 @@ public class ChartComponentGraph extends Canvas {
 
 // SET_FORMATTING_OFF
 
-      _cursorResizeLeftRight           = Util.disposeResource(_cursorResizeLeftRight);
-      _cursorResizeTopDown             = Util.disposeResource(_cursorResizeTopDown);
-      _cursorDragged                   = Util.disposeResource(_cursorDragged);
-      _cursorArrow                     = Util.disposeResource(_cursorArrow);
-      _cursorModeSlider                = Util.disposeResource(_cursorModeSlider);
-      _cursorModeZoom                  = Util.disposeResource(_cursorModeZoom);
-      _cursorModeZoomMove              = Util.disposeResource(_cursorModeZoomMove);
-      _cursorDragXSlider_ModeZoom      = Util.disposeResource(_cursorDragXSlider_ModeZoom);
-      _cursorDragXSlider_ModeSlider    = Util.disposeResource(_cursorDragXSlider_ModeSlider);
+      _cursorResizeLeftRight           = UI.disposeResource(_cursorResizeLeftRight);
+      _cursorResizeTopDown             = UI.disposeResource(_cursorResizeTopDown);
+      _cursorDragged                   = UI.disposeResource(_cursorDragged);
+      _cursorArrow                     = UI.disposeResource(_cursorArrow);
+      _cursorModeSlider                = UI.disposeResource(_cursorModeSlider);
+      _cursorModeZoom                  = UI.disposeResource(_cursorModeZoom);
+      _cursorModeZoomMove              = UI.disposeResource(_cursorModeZoomMove);
+      _cursorDragXSlider_ModeZoom      = UI.disposeResource(_cursorDragXSlider_ModeZoom);
+      _cursorDragXSlider_ModeSlider    = UI.disposeResource(_cursorDragXSlider_ModeSlider);
 
-      _cursorMove1x                    = Util.disposeResource(_cursorMove1x);
-      _cursorMove2x                    = Util.disposeResource(_cursorMove2x);
-      _cursorMove3x                    = Util.disposeResource(_cursorMove3x);
-      _cursorMove4x                    = Util.disposeResource(_cursorMove4x);
-      _cursorMove5x                    = Util.disposeResource(_cursorMove5x);
+      _cursorMove1x                    = UI.disposeResource(_cursorMove1x);
+      _cursorMove2x                    = UI.disposeResource(_cursorMove2x);
+      _cursorMove3x                    = UI.disposeResource(_cursorMove3x);
+      _cursorMove4x                    = UI.disposeResource(_cursorMove4x);
+      _cursorMove5x                    = UI.disposeResource(_cursorMove5x);
 
-      _cursorXSliderLeft               = Util.disposeResource(_cursorXSliderLeft);
-      _cursorXSliderRight              = Util.disposeResource(_cursorXSliderRight);
+      _cursorXSliderLeft               = UI.disposeResource(_cursorXSliderLeft);
+      _cursorXSliderRight              = UI.disposeResource(_cursorXSliderRight);
 
-      _chartImage_20_Chart             = Util.disposeResource(_chartImage_20_Chart);
-      _chartImage_10_Graphs            = Util.disposeResource(_chartImage_10_Graphs);
-      _chartImage_40_Overlay           = Util.disposeResource(_chartImage_40_Overlay);
-      _chartImage_30_Custom            = Util.disposeResource(_chartImage_30_Custom);
+      _chartImage_20_Chart             = UI.disposeResource(_chartImage_20_Chart);
+      _chartImage_10_Graphs            = UI.disposeResource(_chartImage_10_Graphs);
+      _chartImage_40_Overlay           = UI.disposeResource(_chartImage_40_Overlay);
+      _chartImage_30_Custom            = UI.disposeResource(_chartImage_30_Custom);
 
 // SET_FORMATTING_ON
 

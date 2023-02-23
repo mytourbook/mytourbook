@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,12 +21,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
 import net.tourbook.application.ICommandIds;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.AdvancedMenuForActions;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.common.util.Util;
@@ -39,7 +41,6 @@ import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
-import net.tourbook.ui.UI;
 import net.tourbook.ui.views.tagging.TourTags_View;
 
 import org.eclipse.jface.action.Action;
@@ -51,6 +52,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -58,54 +60,55 @@ import org.eclipse.swt.widgets.Menu;
 
 public class TagMenuManager {
 
-   private static final String            SETTINGS_SECTION_RECENT_TAGS = "TagManager.RecentTags";                              //$NON-NLS-1$
-   private static final String            STATE_RECENT_TAGS            = "tagId";                                              //$NON-NLS-1$
-   private static final String            STATE_PREVIOUS_TAGS          = UI.EMPTY_STRING;
+   private static final String             SETTINGS_SECTION_RECENT_TAGS = "TagManager.RecentTags";                              //$NON-NLS-1$
+   private static final String             STATE_RECENT_TAGS            = "tagId";                                              //$NON-NLS-1$
+   private static final String             STATE_PREVIOUS_TAGS          = UI.EMPTY_STRING;
 
-   private static final IPreferenceStore  _prefStore                   = TourbookPlugin.getPrefStore();
-   private static final IDialogSettings   _state                       = TourbookPlugin.getState(SETTINGS_SECTION_RECENT_TAGS);
+   private static final IPreferenceStore   _prefStore                   = TourbookPlugin.getPrefStore();
+   private static final IDialogSettings    _state                       = TourbookPlugin.getState(SETTINGS_SECTION_RECENT_TAGS);
 
-   private static IPropertyChangeListener _prefChangeListener;
+   private static IPropertyChangeListener  _prefChangeListener;
 
-   private static TagMenuManager          _currentInstance;
-   private static boolean                 _isAdvMenu;
+   private static TagMenuManager           _currentInstance;
+   private static boolean                  _isAdvMenu;
 
-   private static ActionRecentTag[]       _actionsRecentTags;
-   private static ActionAllPreviousTags   _actionAllPreviousTags;
+   private static ActionRecentTag[]        _actionsRecentTags;
+   private static ActionAllPreviousTags    _actionAllPreviousTags;
 
    /**
     * number of tags which are displayed in the context menu or saved in the dialog settings, it's
     * max number is 9 to have a unique accelerator key
     */
-   private static LinkedList<TourTag>     _recentTags                  = new LinkedList<>();
+   private static LinkedList<TourTag>      _recentTags                  = new LinkedList<>();
 
    /**
     * Contains all tags which are added by the last add action
     */
-   private static HashMap<Long, TourTag>  _allPreviousTags             = new HashMap<>();
+   private static HashMap<Long, TourTag>   _allPreviousTags             = new HashMap<>();
 
-   private static int                     _maxRecentActions            = -1;
+   private static int                      _maxRecentActions            = -1;
 
    /**
     * Contains tag id's for all selected tours
     */
-   private static HashSet<Long>           _allTourTagIds;
-   private static boolean                 _isEnableRecentTagActions;
+   private static HashSet<Long>            _allTourTagIds;
+   private static boolean                  _isEnableRecentTagActions;
 
-   private static int                     _taggingAutoOpenDelay;
-   private static boolean                 _isTaggingAutoOpen;
-   private static boolean                 _isTaggingAnimation;
+   private static int                      _taggingAutoOpenDelay;
+   private static boolean                  _isTaggingAutoOpen;
+   private static boolean                  _isTaggingAnimation;
+   private static final Map<String, Image> _tagImagesCache              = new HashMap<>();
 
-   private boolean                        _isSaveTour;
-   private ITourProvider                  _tourProvider;
+   private boolean                         _isSaveTour;
+   private ITourProvider                   _tourProvider;
 
-   private ActionContributionItem         _actionAddTagAdvanced;
-   private Action_AddTourTag_SubMenu      _actionAddTag;
-   private Action_RemoveTourTag_SubMenu   _actionRemoveTag;
-   private Action_RemoveAllTags           _actionRemoveAllTags;
-   private Action_SetTags                 _actionSetTags;
+   private ActionContributionItem          _actionAddTagAdvanced;
+   private Action_AddTourTag_SubMenu       _actionAddTag;
+   private Action_RemoveTourTag_SubMenu    _actionRemoveTag;
+   private Action_RemoveAllTags            _actionRemoveAllTags;
+   private Action_SetTags                  _actionSetTags;
 
-   private AdvancedMenuForActions         _advancedMenuToAddTags;
+   private AdvancedMenuForActions          _advancedMenuToAddTags;
 
    /**
     * Removes all tags
@@ -149,7 +152,7 @@ public class TagMenuManager {
    private static class ActionAllPreviousTags extends Action {
 
       public ActionAllPreviousTags() {
-         super(UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
+         super(net.tourbook.ui.UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
       }
 
       @Override
@@ -176,7 +179,7 @@ public class TagMenuManager {
       private TourTag _tag;
 
       public ActionRecentTag() {
-         super(UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
+         super(net.tourbook.ui.UI.IS_NOT_INITIALIZED, AS_CHECK_BOX);
       }
 
       @Override
@@ -236,6 +239,7 @@ public class TagMenuManager {
 
       // create pref listener
       _prefChangeListener = propertyChangeEvent -> {
+
          final String property = propertyChangeEvent.getProperty();
 
          // check if the number of recent tags has changed
@@ -259,6 +263,14 @@ public class TagMenuManager {
 
       _allPreviousTags.clear();
       _recentTags.clear();
+   }
+
+   /**
+    * Dispose images
+    */
+   public static void dispose() {
+
+      _tagImagesCache.values().forEach(UI::disposeResource);
    }
 
    static void enableRecentTagActions(final boolean isAddTagEnabled, final Set<Long> existingTagIds) {
@@ -329,6 +341,29 @@ public class TagMenuManager {
          _actionAllPreviousTags.setEnabled(false);
       }
 
+   }
+
+   /**
+    * For a given image file path, try to retrieve the already created
+    * Image resource from the cache.
+    * Otherwise, create an image resource, and put it in the cache
+    *
+    * @param imageFilePath
+    * @return
+    */
+   public static Image getTagImage(final String imageFilePath) {
+
+      var tagImage = _tagImagesCache.get(imageFilePath);
+
+      if (tagImage == null) {
+
+         tagImage = net.tourbook.ui.UI.prepareTagImage(imageFilePath);
+         if (tagImage != null) {
+            TagMenuManager._tagImagesCache.put(imageFilePath, tagImage);
+         }
+      }
+
+      return tagImage;
    }
 
    private static void restoreAutoOpen() {

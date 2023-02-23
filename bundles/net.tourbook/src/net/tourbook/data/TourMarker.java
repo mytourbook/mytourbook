@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -313,7 +313,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     *         {@link ITourbookPreferences#GRAPH_MARKER_SIGN_IMAGE_SIZE} is used. This size is
     *         converted into pixel with the vertical DLU's.
     */
-   public static int getSignImageMaxSize(final PixelConverter pc) {
+   @SuppressWarnings("unused")
+   private static int getSignImageMaxSize(final PixelConverter pc) {
 
       if (_defaultSignImageMaxSize == -1) {
          _defaultSignImageMaxSize = pc.convertHeightInCharsToPixels(3);
@@ -337,8 +338,8 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    }
 
    /**
-    * Creates a clone of another marker but set's new {@link TourData} and set's the state that the
-    * marker is not yet saved
+    * Creates a clone of a marker but sets it in the new {@link TourData} and
+    * sets the state that the marker as not yet saved
     *
     * @param newTourData
     * @return
@@ -999,7 +1000,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    /**
     * Convert fields from old to new data type.
     */
-   public void updateDatabase_019_to_020() {
+   void updateDatabase_019_to_020() {
 
       if (distance > 0) {
 
