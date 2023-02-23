@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -283,6 +283,13 @@ public class Messages extends NLS {
    public static String        Pref_System_Option_SmallLength_Millimeter;
    public static String        Pref_System_Option_Temperature_Celsius;
    public static String        Pref_System_Option_Temperature_Fahrenheit;
+
+   public static String        Weather_AirQuality_Good;
+   public static String        Weather_AirQuality_Fair;
+   public static String        Weather_AirQuality_IsNotDefined;
+   public static String        Weather_AirQuality_Moderate;
+   public static String        Weather_AirQuality_Poor;
+   public static String        Weather_AirQuality_VeryPoor;
 
    public static String        Weather_Clouds_Clouds;
    public static String        Weather_Clouds_Cloudy;

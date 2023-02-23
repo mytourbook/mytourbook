@@ -615,10 +615,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    private ControlDecoration  _decoTimeZone;
    //
-   private Combo              _comboWeather_AirQualityIndex;
    private Combo              _comboLocation_Start;
    private Combo              _comboLocation_End;
    private Combo              _comboTimeZone;
+   private Combo              _comboWeather_AirQuality;
    private Combo              _comboWeather_Clouds;
    private Combo              _comboWeather_Wind_DirectionText;
    private Combo              _comboWeather_WindSpeedText;
@@ -4634,33 +4634,29 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _firstColumnContainerControls.add(container);
       {
          /*
-          * Air Quality Index
+          * Air Quality
           */
          // label
-         final Label label = _tk.createLabel(container, "Air Quality Index");//Messages.Tour_Editor_Label_AirPressure);
-         label.setToolTipText(Messages.Tour_Editor_Label_AirPressure_Tooltip);
+         final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_AirQuality);
+         label.setToolTipText(Messages.Tour_Editor_Label_AirQuality_Tooltip);
          _firstColumnControls.add(label);
 
          // combo: clouds
-         _comboWeather_AirQualityIndex = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboWeather_AirQualityIndex);
-         _tk.adapt(_comboWeather_AirQualityIndex, true, false);
-         _comboWeather_AirQualityIndex.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
-         _comboWeather_AirQualityIndex.setVisibleItemCount(10);
-         _comboWeather_AirQualityIndex.addModifyListener(_modifyListener);
-         _comboWeather_AirQualityIndex.addSelectionListener(widgetSelectedAdapter(selectionEvent -> displayCloudIcon()));
+         _comboWeather_AirQuality = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboWeather_AirQuality);
+         _tk.adapt(_comboWeather_AirQuality, true, false);
+         _comboWeather_AirQuality.setToolTipText(Messages.Tour_Editor_Label_AirQuality_Tooltip);
+         _comboWeather_AirQuality.setVisibleItemCount(10);
+         _comboWeather_AirQuality.addModifyListener(_modifyListener);
+         _comboWeather_AirQuality.addSelectionListener(widgetSelectedAdapter(selectionEvent -> displayAirQualityBackground()));
 
          // fill combobox
-         for (final String cloudText : IWeather.cloudText) {
-            _comboWeather_AirQualityIndex.add(cloudText);
-         }
+         Arrays.asList(IWeather.airQualityText).forEach(airQualityText -> _comboWeather_AirQuality.add(airQualityText));
 
-         _comboWeather_AirQualityIndex.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
          // force the icon to be displayed to ensure the width is correctly set when the size is computed
          _isSetField = true;
          {
-            _comboWeather_AirQualityIndex.select(0);
-            //displayCloudIcon();
+            _comboWeather_AirQuality.select(0);
          }
          _isSetField = false;
       }
@@ -6103,6 +6099,39 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       if (_tourData == null) {
          displaySelectedTour();
       }
+   }
+
+   private void displayAirQualityBackground() {
+
+      final int selectionIndex = _comboWeather_AirQuality.getSelectionIndex();
+
+      int color;
+      switch (selectionIndex) {
+      //Good
+      case 1:
+         color = SWT.COLOR_GREEN;
+         break;
+      //Fair
+      case 2:
+         color = SWT.COLOR_YELLOW;
+         break;
+      //Moderate
+      case 3:
+         color = SWT.COLOR_DARK_YELLOW;
+         break;
+      //Poor
+      case 4:
+         color = SWT.COLOR_RED;
+         break;
+      //Very poor
+      case 5:
+         color = SWT.COLOR_DARK_GRAY;
+         break;
+      default:
+         color = SWT.COLOR_WHITE;
+         break;
+      }
+      _comboWeather_AirQuality.setBackground(Display.getCurrent().getSystemColor(color));
    }
 
    private void displayCloudIcon() {

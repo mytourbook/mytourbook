@@ -30,12 +30,6 @@ public interface IWeather {
    public static final String   WEATHER_ID_SEVERE_WEATHER_ALERT = "weather-severe";            //$NON-NLS-1$
    public static final String   WEATHER_ID_SCATTERED_SHOWERS    = "weather-showers-scattered"; //$NON-NLS-1$
 
-   public static final String   WEATHER_AIR_QUALITY_ID_GOOD     = "weather-airquality-good";   //$NON-NLS-1$
-   public static final String   WEATHER_AIR_QUALITY_ID_FAIR      = "weather-airquality-fair";      //$NON-NLS-1$
-   public static final String   WEATHER_AIR_QUALITY_ID_MODERATE  = "weather-airquality-moderate";  //$NON-NLS-1$
-   public static final String   WEATHER_AIR_QUALITY_ID_POOR      = "weather-airquality-poor";      //$NON-NLS-1$
-   public static final String   WEATHER_AIR_QUALITY_ID_VERY_POOR = "weather-airquality-very-poor"; //$NON-NLS-1$
-
    public static final String   windDirectionIsNotDefined       = UI.EMPTY_STRING;
 
    public static final String[] windDirectionText               = new String[] {
@@ -201,6 +195,23 @@ public interface IWeather {
 
    };
 
+   public static final String   airQualityIsNotDefined = Messages.Weather_AirQuality_IsNotDefined;
+
+   /**
+    * Text for the weather's air quality
+    */
+   public static final String[] airQualityText = new String[] {
+
+         airQualityIsNotDefined,
+
+         Messages.Weather_AirQuality_Good,
+         Messages.Weather_AirQuality_Fair,
+         Messages.Weather_AirQuality_Moderate,
+         Messages.Weather_AirQuality_Poor,
+         Messages.Weather_AirQuality_VeryPoor
+
+   };
+
    /**
     * Icons for the weather
     */
@@ -216,23 +227,7 @@ public interface IWeather {
          WEATHER_ID_RAIN,
          WEATHER_ID_LIGHTNING,
          WEATHER_ID_SNOW,
-         WEATHER_ID_SEVERE_WEATHER_ALERT,
-         WEATHER_AIR_QUALITY_ID_GOOD,
-
-   };
-
-   /**
-    * Icons for the air quality
-    */
-   public static final String[] airQualityIcon = new String[] {
-
-         UI.IMAGE_EMPTY_16,
-
-         WEATHER_AIR_QUALITY_ID_GOOD,
-         WEATHER_AIR_QUALITY_ID_FAIR,
-         WEATHER_AIR_QUALITY_ID_MODERATE,
-         WEATHER_AIR_QUALITY_ID_POOR,
-         WEATHER_AIR_QUALITY_ID_VERY_POOR
+         WEATHER_ID_SEVERE_WEATHER_ALERT
 
    };
 
