@@ -82,42 +82,42 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
-   private static final String   STATE_TOUR_TITLE                       = "Title";                                                          //$NON-NLS-1$
-   private static final String   STATE_TOUR_TYPE_ID                     = "TourTypeId";                                                     //$NON-NLS-1$
-   private static final String   STATE_PERSON_ID                        = "PersonId";                                                       //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE                       = "Title";                                    //$NON-NLS-1$
+   private static final String   STATE_TOUR_TYPE_ID                     = "TourTypeId";                               //$NON-NLS-1$
+   private static final String   STATE_PERSON_ID                        = "PersonId";                                 //$NON-NLS-1$
 
-   private static final String   STATE_IS_INCLUDE_DESCRIPTION           = "isIncludeDescription";                                           //$NON-NLS-1$
-   private static final String   STATE_IS_INCLUDE_MARKER_WAYPOINTS      = "isIncludeMarkerWaypoints";                                       //$NON-NLS-1$
-   private static final String   STATE_IS_CREATE_TOUR_MARKER            = "isCreateTourMarker";                                             //$NON-NLS-1$
+   private static final String   STATE_IS_INCLUDE_DESCRIPTION           = "isIncludeDescription";                     //$NON-NLS-1$
+   private static final String   STATE_IS_INCLUDE_MARKER_WAYPOINTS      = "isIncludeMarkerWaypoints";                 //$NON-NLS-1$
+   private static final String   STATE_IS_CREATE_TOUR_MARKER            = "isCreateTourMarker";                       //$NON-NLS-1$
 
-   private static final String   STATE_JOIN_METHOD                      = "JoinMethod";                                                     //$NON-NLS-1$
-   private static final String   STATE_JOIN_METHOD_ORIGINAL             = "original";                                                       //$NON-NLS-1$
-   private static final String   STATE_JOIN_METHOD_CONCATENATED         = "concatenated";                                                   //$NON-NLS-1$
+   private static final String   STATE_JOIN_METHOD                      = "JoinMethod";                               //$NON-NLS-1$
+   private static final String   STATE_JOIN_METHOD_ORIGINAL             = "original";                                 //$NON-NLS-1$
+   private static final String   STATE_JOIN_METHOD_CONCATENATED         = "concatenated";                             //$NON-NLS-1$
 
-   private static final String   STATE_TOUR_TITLE_SOURCE                = "TourTitleSource";                                                //$NON-NLS-1$
-   private static final String   STATE_TOUR_TITLE_SOURCE_FROM_TOUR      = "fromTour";                                                       //$NON-NLS-1$
-   private static final String   STATE_TOUR_TITLE_SOURCE_CUSTOM         = "custom";                                                         //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE_SOURCE                = "TourTitleSource";                          //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE_SOURCE_FROM_TOUR      = "fromTour";                                 //$NON-NLS-1$
+   private static final String   STATE_TOUR_TITLE_SOURCE_CUSTOM         = "custom";                                   //$NON-NLS-1$
 
-   private static final String   STATE_TYPE_SOURCE                      = "TourTypeSource";                                                 //$NON-NLS-1$
-   private static final String   STATE_TYPE_SOURCE_FROM_SELECTED_TOURS  = "fromTour";                                                       //$NON-NLS-1$
-   private static final String   STATE_TYPE_SOURCE_PREVIOUS_JOINED_TOUR = "previous";                                                       //$NON-NLS-1$
-   private static final String   STATE_TYPE_SOURCE_CUSTOM               = "custom";                                                         //$NON-NLS-1$
+   private static final String   STATE_TYPE_SOURCE                      = "TourTypeSource";                           //$NON-NLS-1$
+   private static final String   STATE_TYPE_SOURCE_FROM_SELECTED_TOURS  = "fromTour";                                 //$NON-NLS-1$
+   private static final String   STATE_TYPE_SOURCE_PREVIOUS_JOINED_TOUR = "previous";                                 //$NON-NLS-1$
+   private static final String   STATE_TYPE_SOURCE_CUSTOM               = "custom";                                   //$NON-NLS-1$
 
-   private static final String   STATE_MARKER_TYPE                      = "TourMarkerType";                                                 //$NON-NLS-1$
-   private static final String   STATE_MARKER_TYPE_SMALL                = "small";                                                          //$NON-NLS-1$
-   private static final String   STATE_MARKER_TYPE_MEDIUM               = "medium";                                                         //$NON-NLS-1$
-   private static final String   STATE_MARKER_TYPE_LARGE                = "large";                                                          //$NON-NLS-1$
+   private static final String   STATE_MARKER_TYPE                      = "TourMarkerType";                           //$NON-NLS-1$
+   private static final String   STATE_MARKER_TYPE_SMALL                = "small";                                    //$NON-NLS-1$
+   private static final String   STATE_MARKER_TYPE_MEDIUM               = "medium";                                   //$NON-NLS-1$
+   private static final String   STATE_MARKER_TYPE_LARGE                = "large";                                    //$NON-NLS-1$
 
    /**
     * state: join method
     */
    private static final String[] ALL_STATES_JOIN_METHOD                 = new String[] {
          STATE_JOIN_METHOD_ORIGINAL,
-         STATE_JOIN_METHOD_CONCATENATED                                                                                                     //
+         STATE_JOIN_METHOD_CONCATENATED                                                                               //
    };
    private static final String[] STATE_TEXT_JOIN_METHOD                 = new String[] {
          Messages.Dialog_JoinTours_ComboText_KeepTime,
-         Messages.Dialog_JoinTours_ComboText_ConcatenateTime                                                                                //
+         Messages.Dialog_JoinTours_ComboText_ConcatenateTime                                                          //
    };
 
    /**
@@ -125,7 +125,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
     */
    private static final String[] ALL_STATES_TOUR_TILE_SOURCE            = new String[] {
          STATE_TOUR_TITLE_SOURCE_FROM_TOUR,
-         STATE_TOUR_TITLE_SOURCE_CUSTOM,                                                                                                    //
+         STATE_TOUR_TITLE_SOURCE_CUSTOM,                                                                              //
    };
    private static final String[] STATE_COMBO_TEXT_TOUR_TITLE_SOURCE     = new String[] {
          Messages.Dialog_JoinTours_ComboText_TourTitleFromTour,
@@ -139,12 +139,12 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    private static final String[] ALL_STATES_TOUR_TYPE                   = new String[] {
          STATE_TYPE_SOURCE_FROM_SELECTED_TOURS,
          STATE_TYPE_SOURCE_PREVIOUS_JOINED_TOUR,
-         STATE_TYPE_SOURCE_CUSTOM                                                                                                           //
+         STATE_TYPE_SOURCE_CUSTOM                                                                                     //
    };
    private static final String[] STATE_TEXT_TOUR_TYPE_SOURCE            = new String[] {
          Messages.Dialog_JoinTours_ComboText_TourTypeFromTour,
          Messages.Dialog_JoinTours_ComboText_TourTypePrevious,
-         Messages.Dialog_JoinTours_ComboText_TourTypeCustom                                                                                 //
+         Messages.Dialog_JoinTours_ComboText_TourTypeCustom                                                           //
    };
 
    /**
@@ -153,11 +153,10 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    private static final String[] ALL_STATES_TOUR_MARKER                 = new String[] {
          STATE_MARKER_TYPE_SMALL,
          STATE_MARKER_TYPE_MEDIUM,
-         STATE_MARKER_TYPE_LARGE                                                                                                            //
+         STATE_MARKER_TYPE_LARGE                                                                                      //
    };
 
-   private final IDialogSettings _state                                 = TourbookPlugin
-         .getState("DialogJoinTours");                                                                                                      //$NON-NLS-1$
+   private final IDialogSettings _state                                 = TourbookPlugin.getState("DialogJoinTours"); //$NON-NLS-1$
 
    private TagMenuManager        _tagMenuMgr;
    private ActionOpenPrefDialog  _actionOpenTourTypePrefs;
@@ -178,8 +177,10 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    private ITourEventListener    _tourEventListener;
    private ITourProvider         _tourProvider;
 
-   private Image                 _imageLock_Closed                      = CommonActivator.getThemedImageDescriptor(CommonImages.Lock_Closed)
-         .createImage();
+   /*
+    * UI resources
+    */
+   private Image _imageLock_Closed = CommonActivator.getThemedImageDescriptor(CommonImages.Lock_Closed).createImage();
 
    /*
     * UI controls
@@ -687,21 +688,18 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    private void createUI60DeleteSourceTours(final Composite parent) {
 
       _chkDeleteSourceTours = new Button(parent, SWT.CHECK);
-      GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).span(2, 1).applyTo(_chkDeleteSourceTours);
       _chkDeleteSourceTours.setText(Messages.Dialog_JoinTours_Checkbox_DeleteSourceTours);
       _chkDeleteSourceTours.setEnabled(false);
+      GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).span(2, 1).applyTo(_chkDeleteSourceTours);
 
       _btnUnlockDeleteSourceToursSelection = new Button(parent, SWT.PUSH);
-      _btnUnlockDeleteSourceToursSelection.setText(
-            Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
+      _btnUnlockDeleteSourceToursSelection.setText(Messages.Dialog_ModifyTours_Button_UnlockMultipleToursSelection_Text);
       _btnUnlockDeleteSourceToursSelection.setImage(_imageLock_Closed);
-      GridDataFactory
-            .fillDefaults()
+      _btnUnlockDeleteSourceToursSelection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_Unlock_DeleteSourceTours()));
+      GridDataFactory.fillDefaults()
             .align(SWT.BEGINNING, SWT.CENTER)
             .grab(true, false)
             .applyTo(_btnUnlockDeleteSourceToursSelection);
-      _btnUnlockDeleteSourceToursSelection.addSelectionListener(
-            widgetSelectedAdapter(selectionEvent -> onSelect_Unlock_DeleteSourceTours()));
    }
 
    private void enableControls() {
@@ -1572,6 +1570,8 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
    }
 
    private void onDispose() {
+
+      Util.disposeResource(_imageLock_Closed);
 
       TourManager.getInstance().removeTourEventListener(_tourEventListener);
    }
