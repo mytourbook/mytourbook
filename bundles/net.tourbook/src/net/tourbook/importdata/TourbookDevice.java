@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -77,7 +77,7 @@ public abstract class TourbookDevice implements IRawDataReader {
    /**
     * Sort priority (since version 10.11), default will sort devices to the end.
     */
-   public int    extensionSortPriority = Integer.MAX_VALUE;
+   int           extensionSortPriority = Integer.MAX_VALUE;
 
 // disabled in version 10.10, it seems to be not used anymore
 //   /**
@@ -96,32 +96,32 @@ public abstract class TourbookDevice implements IRawDataReader {
     * When set to {@link RawDataManager#ADJUST_IMPORT_YEAR_IS_DISABLED} this is ignored otherwise
     * this year is used as the import year.
     */
-   public int     importYear           = RawDataManager.ADJUST_IMPORT_YEAR_IS_DISABLED;
+   public int      importYear           = RawDataManager.ADJUST_IMPORT_YEAR_IS_DISABLED;
 
    /**
     * When <code>true</code> the tracks in one file will be merged into one track, a marker is
     * created for each track.
     */
-   public boolean isMergeTracks        = false;
+   public boolean  isMergeTracks        = false;
 
    /**
     * when <code>true</code> validate the checksum when importing data
     */
-   public boolean isChecksumValidation = true;
+   public boolean  isChecksumValidation = true;
 
    /**
     * A tour id will be created with elapsed time when <code>true</code>.
     */
-   public boolean isCreateTourIdWithElapsedTime;
+   private boolean isCreateTourIdWithElapsedTime;
 
    /**
     * When <code>true</code> imported waypoints will be converted into {@link TourMarker}.
     */
-   public boolean isConvertWayPoints;
+   public boolean  isConvertWayPoints;
 
-   public TourbookDevice() {}
+   protected TourbookDevice() {}
 
-   public TourbookDevice(final String deviceName) {
+   protected TourbookDevice(final String deviceName) {
       visibleName = deviceName;
    }
 
@@ -156,10 +156,10 @@ public abstract class TourbookDevice implements IRawDataReader {
 
       if (_isCreateRandomTourId) {
 
-         final Double randomNumber = Double.valueOf(Math.random());
+         final double randomNumber = Math.random();
 
          //We remove the "0." as it creates issues when, later, parsing back into a long
-         return randomNumber.toString().substring(2);
+         return Double.toString(randomNumber).substring(2);
       }
 
       String uniqueKey;
