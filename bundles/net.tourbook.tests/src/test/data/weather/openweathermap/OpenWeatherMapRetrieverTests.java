@@ -84,7 +84,7 @@ public class OpenWeatherMapRetrieverTests {
 // SET_FORMATTING_OFF
 
       assertEquals("broken clouds",   tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-drizzle", tour.getWeather_Clouds()); //$NON-NLS-1$
+      assertEquals("weather-cloudy", tour.getWeather_Clouds()); //$NON-NLS-1$
       assertEquals(7.58f,             tour.getWeather_Temperature_Average());
       assertEquals(3,                 tour.getWeather_Wind_Speed());
       assertEquals(240,               tour.getWeather_Wind_Direction());
@@ -122,7 +122,7 @@ public class OpenWeatherMapRetrieverTests {
 // SET_FORMATTING_OFF
 
       assertEquals("overcast clouds", tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-rain",    tour.getWeather_Clouds()); //$NON-NLS-1$
+      assertEquals("weather-cloudy",    tour.getWeather_Clouds()); //$NON-NLS-1$
       assertEquals(8.35f,             tour.getWeather_Temperature_Average());
       assertEquals(3,                 tour.getWeather_Wind_Speed());
       assertEquals(268,               tour.getWeather_Wind_Direction());
@@ -166,7 +166,7 @@ public class OpenWeatherMapRetrieverTests {
 // SET_FORMATTING_OFF
 
       assertEquals("scattered clouds", tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-cloudy",   tour.getWeather_Clouds()); //$NON-NLS-1$
+      assertEquals("weather-clouds",   tour.getWeather_Clouds()); //$NON-NLS-1$
       assertEquals(-5.91f,             tour.getWeather_Temperature_Average());
       assertEquals(11,                 tour.getWeather_Wind_Speed());
       assertEquals(280,                tour.getWeather_Wind_Direction());
