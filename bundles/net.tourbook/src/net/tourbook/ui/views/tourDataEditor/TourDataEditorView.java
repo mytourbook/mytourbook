@@ -6109,7 +6109,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       switch (selectionIndex) {
       //Good
       case 1:
-         color = SWT.COLOR_GREEN;
+         color = SWT.COLOR_DARK_GREEN;
          break;
       //Fair
       case 2:
@@ -6121,7 +6121,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          break;
       //Poor
       case 4:
-         color = SWT.COLOR_RED;
+         color = SWT.COLOR_DARK_RED;
          break;
       //Very poor
       case 5:
