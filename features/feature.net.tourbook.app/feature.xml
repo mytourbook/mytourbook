@@ -59,7 +59,7 @@
          install-size="0"
          version="0.0.0"
          unpack="false"/>
-      
+
    <plugin
          id="net.tourbook.cloud"
          download-size="0"
@@ -153,6 +153,12 @@
 
    <plugin
          id="net.tourbook.branding"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="net.tourbook.model"
          download-size="0"
          install-size="0"
          version="0.0.0"/>
