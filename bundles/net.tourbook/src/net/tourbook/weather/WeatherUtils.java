@@ -20,6 +20,7 @@ import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.util.LengthUnit;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.tourbook.Messages;
@@ -371,21 +372,12 @@ public class WeatherUtils {
       return searchAreaCenter;
    }
 
-   public static int getWeatherAirQualityIndex(final String weatherQuality) {
+   public static int getWeather_AirQualityIndex_TextIndex(final String weather_AirQualityIndex) {
 
-      int weatherCloudsIndex = -1;
+      final int weather_AirQualityIndex_TextIndex =
+            Arrays.asList(IWeather.airQualityIndexText).indexOf(weather_AirQualityIndex);
 
-      if (StringUtils.hasContent(weatherQuality)) {
-         // binary search cannot be done because it requires sorting which we cannot...
-         for (int cloudIndex = 0; cloudIndex < IWeather.airQualityText.length; ++cloudIndex) {
-            if (IWeather.cloudIcon[cloudIndex].equalsIgnoreCase(weatherQuality)) {
-               weatherCloudsIndex = cloudIndex;
-               break;
-            }
-         }
-      }
-
-      return weatherCloudsIndex < 0 ? 0 : weatherCloudsIndex;
+      return weather_AirQualityIndex_TextIndex < 0 ? 0 : weather_AirQualityIndex_TextIndex;
    }
 
    /**

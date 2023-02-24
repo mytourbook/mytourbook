@@ -14,10 +14,8 @@
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.data;
-//todo fb reduce the number of lines in the quick edit tour dialog
 
-//      NPE TourMerger.java line 289 
-
+//todo fb
 //tour filter starttime with a value of 12:00am doesn't work
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
@@ -148,7 +146,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public static final int               DB_LENGTH_TIME_ZONE_ID            = 255;
 
    public static final int               DB_LENGTH_WEATHER                 = 1000;
-   public static final int               DB_LENGTH_WEATHER_AIRQUALITY      = 255;
+   public static final int               DB_LENGTH_WEATHER_AIRQUALITYINDEX = 255;
    public static final int               DB_LENGTH_WEATHER_V48             = 32000;
    public static final int               DB_LENGTH_WEATHER_CLOUDS          = 255;
 
@@ -586,7 +584,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Air Quality Index
     */
    //todo fb rename ALL to air quality index
- private String                 weather_AirQuality;                                     // db-version XX
+ private String                 weather_AirQualityIndex;                                     // db-version XX
 
    //TODO FB
    //https://openweathermap.org/api/air-pollution
@@ -9910,8 +9908,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return weather == null ? UI.EMPTY_STRING : weather;
    }
 
-   public String getWeather_AirQuality() {
-      return weather_AirQuality;
+   public String getWeather_AirQualityIndex() {
+      return weather_AirQualityIndex;
+   }
+
+   /**
+    * @return Returns the index for the air quality values in {@link IWeather#airQualityIndexText}
+    *         and
+    *         {@link IWeather#cloudText} or 0 when the clouds are not defined
+    */
+   @JsonIgnore
+   public int getWeather_AirQualityIndex_TextIndex() {
+
+      return WeatherUtils.getWeather_AirQualityIndex_TextIndex(weather_AirQualityIndex);
    }
 
    /**
@@ -9990,15 +9999,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public int getWeather_Wind_Speed() {
       return weather_Wind_Speed;
-   }
-
-   /**
-    * @return Returns the index for the cloud values in {@link IWeather#cloudIcon} and
-    *         {@link IWeather#cloudText} or 0 when the clouds are not defined
-    */
-   public int getWeatherAirQualityIndex() {
-
-      return WeatherUtils.getWeatherAirQualityIndex(weather_AirQuality);
    }
 
    /**
@@ -12412,8 +12412,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       this.weather = weather;
    }
 
-   public void setWeather_AirQuality(final String weather_AirQuality) {
-      this.weather_AirQuality = weather_AirQuality;
+   public void setWeather_AirQualityIndex(final String weather_AirQualityIndex) {
+      this.weather_AirQualityIndex = weather_AirQualityIndex;
    }
 
    /**
