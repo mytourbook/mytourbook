@@ -157,6 +157,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
+import org.eclipse.nebula.widgets.tablecombo.TableCombo;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -618,7 +619,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Combo              _comboLocation_Start;
    private Combo              _comboLocation_End;
    private Combo              _comboTimeZone;
-   private Combo              _comboWeather_AirQualityIndex;
    private Combo              _comboWeather_Clouds;
    private Combo              _comboWeather_Wind_DirectionText;
    private Combo              _comboWeather_WindSpeedText;
@@ -670,6 +670,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Spinner            _spinWeather_Temperature_WindChill;
    private Spinner            _spinWeather_Wind_DirectionValue;
    private Spinner            _spinWeather_Wind_SpeedValue;
+   //
+   private TableCombo         _tableComboWeather_AirQualityIndex;
    //
    private Text               _txtAltitudeDown;
    private Text               _txtAltitudeUp;
@@ -4642,21 +4644,69 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _firstColumnControls.add(label);
 
          // combo: air quality index
-         _comboWeather_AirQualityIndex = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
-         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboWeather_AirQualityIndex);
-         _tk.adapt(_comboWeather_AirQualityIndex, true, false);
-         _comboWeather_AirQualityIndex.setToolTipText(Messages.Tour_Editor_Label_AirQualityIndex_Tooltip);
-         _comboWeather_AirQualityIndex.setVisibleItemCount(10);
-         _comboWeather_AirQualityIndex.addModifyListener(_modifyListener);
-         _comboWeather_AirQualityIndex.addSelectionListener(widgetSelectedAdapter(selectionEvent -> displayAirQualityIndexBackground()));
+         _tableComboWeather_AirQualityIndex = new TableCombo(container, SWT.READ_ONLY | SWT.BORDER);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_tableComboWeather_AirQualityIndex);
+         _tk.adapt(_tableComboWeather_AirQualityIndex, true, false);
+         _tableComboWeather_AirQualityIndex.setToolTipText(Messages.Tour_Editor_Label_AirQualityIndex_Tooltip);
+         _tableComboWeather_AirQualityIndex.addModifyListener(_modifyListener);
+         _tableComboWeather_AirQualityIndex.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-         // fill combobox
-         Arrays.asList(IWeather.airQualityIndexText).forEach(airQualityText -> _comboWeather_AirQualityIndex.add(airQualityText));
+            //todo fb put that in a function
+            // We update the model in the selection listener as the selected
+            // index value comes back with -1 in the modify listener
+            final int airQualityIndex_SelectionIndex = _tableComboWeather_AirQualityIndex.getSelectionIndex();
+            String airQualityIndexValue = IWeather.airQualityIndexText[airQualityIndex_SelectionIndex];
+            if (airQualityIndexValue.equals(IWeather.airQualityIndexIsNotDefined)) {
+               // replace invalid value
+               airQualityIndexValue = UI.EMPTY_STRING;
+            }
+            _tourData.setWeather_AirQualityIndex(airQualityIndexValue);
+
+         }));
+         _tableComboWeather_AirQualityIndex.setShowTableHeader(false);
+         _tableComboWeather_AirQualityIndex.defineColumns(1);
+         // fill combobox todo fb put in a separate function
+
+         for (int index = 0; index < IWeather.airQualityIndexText.length; index++) {
+
+            final TableItem tableItem = new TableItem(_tableComboWeather_AirQualityIndex.getTable(), SWT.NONE);
+
+            // set the column text
+            tableItem.setText(IWeather.airQualityIndexText[index]);
+
+            int color;
+            switch (index) {
+            //Good
+            case 1:
+               color = SWT.COLOR_DARK_GREEN;
+               break;
+            //Fair
+            case 2:
+               color = SWT.COLOR_YELLOW;
+               break;
+            //Moderate
+            case 3:
+               color = SWT.COLOR_DARK_YELLOW;
+               break;
+            //Poor
+            case 4:
+               color = SWT.COLOR_DARK_RED;
+               break;
+            //Very poor
+            case 5:
+               color = SWT.COLOR_DARK_GRAY;
+               break;
+            default:
+               color = SWT.COLOR_WHITE;
+               break;
+            }
+            tableItem.setBackground(Display.getCurrent().getSystemColor(color));
+         }
 
          // force the icon to be displayed to ensure the width is correctly set when the size is computed
          _isSetField = true;
          {
-            _comboWeather_AirQualityIndex.select(0);
+            _tableComboWeather_AirQualityIndex.select(0);
          }
          _isSetField = false;
       }
@@ -6101,38 +6151,38 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
-   private void displayAirQualityIndexBackground() {
-
-      final int selectionIndex = _comboWeather_AirQualityIndex.getSelectionIndex();
-
-      int color;
-      switch (selectionIndex) {
-      //Good
-      case 1:
-         color = SWT.COLOR_DARK_GREEN;
-         break;
-      //Fair
-      case 2:
-         color = SWT.COLOR_YELLOW;
-         break;
-      //Moderate
-      case 3:
-         color = SWT.COLOR_DARK_YELLOW;
-         break;
-      //Poor
-      case 4:
-         color = SWT.COLOR_DARK_RED;
-         break;
-      //Very poor
-      case 5:
-         color = SWT.COLOR_DARK_GRAY;
-         break;
-      default:
-         color = SWT.COLOR_WHITE;
-         break;
-      }
-      _comboWeather_AirQualityIndex.setBackground(Display.getCurrent().getSystemColor(color));
-   }
+//   private void displayAirQualityIndexBackground() {
+//
+//      final int selectionIndex = _tableComboWeather_AirQualityIndex.getSelectionIndex();
+//
+//      int color;
+//      switch (selectionIndex) {
+//      //Good
+//      case 1:
+//         color = SWT.COLOR_DARK_GREEN;
+//         break;
+//      //Fair
+//      case 2:
+//         color = SWT.COLOR_YELLOW;
+//         break;
+//      //Moderate
+//      case 3:
+//         color = SWT.COLOR_DARK_YELLOW;
+//         break;
+//      //Poor
+//      case 4:
+//         color = SWT.COLOR_DARK_RED;
+//         break;
+//      //Very poor
+//      case 5:
+//         color = SWT.COLOR_DARK_GRAY;
+//         break;
+//      default:
+//         color = SWT.COLOR_WHITE;
+//         break;
+//      }
+//      _tableComboWeather_AirQualityIndex.setBackground(Display.getCurrent().getSystemColor(color));
+//   }
 
    private void displayCloudIcon() {
 
@@ -6654,7 +6704,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       //Weather
       _linkWeather.setEnabled(canEdit && isWeatherRetrievalActivated);
-      _comboWeather_AirQualityIndex.setEnabled(canEdit);
+      _tableComboWeather_AirQualityIndex.setEnabled(canEdit);
       _comboWeather_Clouds.setEnabled(canEdit);
       _comboWeather_Wind_DirectionText.setEnabled(canEdit);
       _comboWeather_WindSpeedText.setEnabled(canEdit);
@@ -8698,13 +8748,13 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          }
 
          // Air Quality Index
-         final int airQualityIndex_SelectionIndex = _comboWeather_AirQualityIndex.getSelectionIndex();
-         String airQualityIndexValue = IWeather.airQualityIndexText[airQualityIndex_SelectionIndex];
-         if (airQualityIndexValue.equals(IWeather.airQualityIndexIsNotDefined)) {
-            // replace invalid value
-            airQualityIndexValue = UI.EMPTY_STRING;
-         }
-         _tourData.setWeather_AirQualityIndex(airQualityIndexValue);
+//         final int airQualityIndex_SelectionIndex = _tableComboWeather_AirQualityIndex.getSelectionIndex();
+//         String airQualityIndexValue = IWeather.airQualityIndexText[airQualityIndex_SelectionIndex];
+//         if (airQualityIndexValue.equals(IWeather.airQualityIndexIsNotDefined)) {
+//            // replace invalid value
+//            airQualityIndexValue = UI.EMPTY_STRING;
+//         }
+//         _tourData.setWeather_AirQualityIndex(airQualityIndexValue);
 
          /*
           * Time
@@ -9261,10 +9311,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_PressureValue.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
 
       // Air Quality Index
-      _comboWeather_AirQualityIndex.select(_tourData.getWeather_AirQualityIndex_TextIndex());
+      _tableComboWeather_AirQualityIndex.select(_tourData.getWeather_AirQualityIndex_TextIndex());
 
       // background must be displayed after the combobox entry is selected
-      displayAirQualityIndexBackground();
+      //  displayAirQualityIndexBackground();
 
       /*
        * Time
