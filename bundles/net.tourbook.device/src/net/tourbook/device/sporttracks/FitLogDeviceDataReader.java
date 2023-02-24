@@ -86,7 +86,7 @@ public class FitLogDeviceDataReader extends TourbookDevice {
                   // check "<FitnessWorkbookExFree "
                   || isValidXMLFile(importFilePath, XML_FIT_LOG_EX_FREE_TAG, true);
 
-      if (isValidXMLFile(importFilePath, XML_FIT_LOG_TAG, true, false) == false
+      if (isValidXMLFile(importFilePath, XML_FIT_LOG_TAG, true) == false
             && !isFitLogExFile) {
 
          return;
