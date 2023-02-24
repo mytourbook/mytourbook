@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.data;
 //todo fb reduce the number of lines in the quick edit tour dialog
+//      NPE TourMerger.java line 289 
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 
