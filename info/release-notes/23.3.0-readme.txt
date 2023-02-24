@@ -5,6 +5,7 @@ New
     
 2.5D Map
   - Show an animated 3D model which is moving along the tour track
+  - The installation file of MyTourbook is about 50 MByte larger because of the 3 default models
   - A new map model player is managing the moving model
 
 Tour Tags (Frederic)
