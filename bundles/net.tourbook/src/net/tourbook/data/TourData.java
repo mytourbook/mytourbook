@@ -26,8 +26,8 @@ package net.tourbook.data;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -749,6 +749,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * when a tour is merged with another tour, {@link #mergeSourceTourId} contains the tour id of
     * the tour which is merged into this tour
     */
+   @JsonProperty
    private Long                  mergeSourceTourId;                                    // db-version 7
 
    /**
@@ -7811,7 +7812,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns {@link ZonedDateTime} when the tour was created or <code>null</code> when
     *         date/time is not available
     */
-   @JsonIgnore
    public ZonedDateTime getDateTimeCreated() {
 
       if (_dateTimeCreated != null || dateTimeCreated == 0) {
@@ -7827,7 +7827,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns {@link ZonedDateTime} when the tour was modified or <code>null</code> when
     *         date/time is not available
     */
-   @JsonIgnore
    public ZonedDateTime getDateTimeModified() {
 
       if (_dateTimeModified != null || dateTimeModified == 0) {
@@ -8091,7 +8090,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
+
    public int getHrZone0() {
       return hrZone0;
    }
@@ -8101,7 +8100,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
+
    public int getHrZone1() {
       return hrZone1;
    }
@@ -8111,7 +8110,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getHrZone2() {
       return hrZone2;
    }
@@ -8121,7 +8119,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getHrZone3() {
       return hrZone3;
    }
@@ -8131,7 +8128,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getHrZone4() {
       return hrZone4;
    }
@@ -8141,7 +8137,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
+
    public int getHrZone5() {
       return hrZone5;
    }
@@ -8151,7 +8147,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
+
    public int getHrZone6() {
       return hrZone6;
    }
@@ -8161,7 +8157,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
+
    public int getHrZone7() {
       return hrZone7;
    }
@@ -8171,7 +8167,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
+
    public int getHrZone8() {
       return hrZone8;
    }
@@ -8181,7 +8177,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
+
    public int getHrZone9() {
       return hrZone9;
    }
@@ -8282,7 +8278,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
+
    public short getIsDistanceFromSensor() {
       return isDistanceFromSensor;
    }
@@ -8292,7 +8288,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
+
    public int getIsPowerSensorPresent() {
       return isPowerSensorPresent;
    }
@@ -8302,7 +8298,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
+
    public int getIsPulseSensorPresent() {
       return isPulseSensorPresent;
    }
@@ -8312,7 +8308,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
+
    public short getIsStrideSensorPresent() {
       return isStrideSensorPresent;
    }
@@ -8414,7 +8410,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
+
    public int getNumberOfPhotos() {
       return numberOfPhotos;
    }
@@ -8583,7 +8579,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return pausedTime_Start;
    }
 
-   @JsonIgnore
+
    public boolean[] getPausedTimeSerie() {
 
       if (pausedTimeSerie == null) {
@@ -8854,7 +8850,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return pulseSerie_FromTime;
    }
 
-   @JsonIgnore
+
    public String[] getPulse_RRIntervals() {
 
       if (pulseTime_TimeIndex == null) {
@@ -9190,7 +9186,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
+
    public SerieData getSerieData() {
       return serieData;
    }
@@ -9303,7 +9299,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns SRTM metric or imperial data serie depending on the active measurement or
     *         <code>null</code> when SRTM data serie is not available
     */
-   @JsonIgnore
+
    public float[] getSRTMSerie(final boolean isUseSRTM1Values) {
 
       if (latitudeSerie == null) {
@@ -9347,7 +9343,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *         <p>
     *         or <code>null</code> when SRTM data serie is not available
     */
-   @JsonIgnore
+
    public float[][] getSRTMValues(final boolean isUseSRTM1Values) {
 
       if (latitudeSerie == null) {
@@ -9400,7 +9396,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return startWeekYear;
    }
 
-   @JsonIgnore
+
    public short getStartYear() {
       return startYear;
    }
@@ -9478,7 +9474,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
+
    public int getTemperatureScale() {
       return temperatureScale;
    }
@@ -9646,7 +9642,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns the tour time zone id, when the tour time zone is not set in the tour, then
     *         the default time zone is returned which is defined in the preferences.
     */
-   @JsonIgnore
+
    public ZoneId getTimeZoneIdWithDefault() {
 
       final String zoneIdRaw = timeZoneId == null //
@@ -9703,7 +9699,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * !!! THIS VALUE IS NOT CACHED BECAUSE WHEN THE DEFAULT TIME ZONE IS CHANGING THEN THIS VALUE IS
     * WRONG !!!
     */
-   @JsonIgnore
+
    public TourDateTime getTourDateTime() {
 
       return TimeTools.createTourDateTime(tourStartTime, timeZoneId);
@@ -9770,7 +9766,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns a set with all {@link TourMarker} for the tour or an empty set when markers
     *         are not available.
     */
-   @JsonIgnore
+
    public Set<TourMarker> getTourMarkers() {
       return tourMarkers;
    }
@@ -9825,7 +9821,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns the tour start date time with the tour time zone, when not available with the
     *         default time zone.
     */
-   @JsonIgnore
+
    public ZonedDateTime getTourStartTime() {
 
       if (_zonedStartTime == null) {
@@ -9923,7 +9919,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *         {@link IWeather#airQualityIndexTexts} or 0 when the air quality
     *         index is not defined
     */
-   @JsonIgnore
+
    public int getWeather_AirQualityIndex_TextIndex() {
 
       return WeatherUtils.getWeather_AirQualityIndex_TextIndex(weather_AirQualityIndex);
@@ -10199,7 +10195,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *         Returns <code>true</code> then {@link #srtmSerie} contains SRTM 1 values or partly,
     *         otherwise SRTM 3 values
     */
-   @JsonIgnore
+
    public boolean isSRTM1Values() {
       return _isSRTM1Values;
    }
@@ -10235,7 +10231,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return surfing_IsMinDistance;
    }
 
-   @JsonIgnore
+
    public boolean isTemperatureAvailable() {
 
       return getWeather_Temperature_Average() != 0 ||
@@ -12532,6 +12528,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       mapper.setSerializationInclusion(Include.NON_EMPTY);
       mapper.setConfig(mapper.getSerializationConfig()
             .with(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY));
+      mapper.setVisibility(mapper.getSerializationConfig().getDefaultVisibilityChecker()
+            .withCreatorVisibility(Visibility.NONE)
+            .withFieldVisibility(Visibility.NONE)
+            .withGetterVisibility(Visibility.NONE)
+            .withIsGetterVisibility(Visibility.NONE)
+            .withSetterVisibility(Visibility.NONE));
 
       String jsonString = UI.EMPTY_STRING;
       try {
