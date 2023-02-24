@@ -168,7 +168,6 @@
   "validForSave" : true,
   "visiblePointsSaved_ForSurfing" : false,
   "weather" : "Sunny with clouds",
-  "weather_AirQualityIndex" : 0,
   "weatherDataFromProvider" : false,
   "weatherIndex" : 2,
   "weather_Clouds" : "weather-cloudy",

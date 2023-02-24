@@ -143,7 +143,6 @@
   "training_TrainingPerformance" : 0.0,
   "validForSave" : true,
   "visiblePointsSaved_ForSurfing" : false,
-  "weather_AirQualityIndex" : 0,
   "weatherDataFromProvider" : false,
   "weatherIndex" : 0,
   "weather_Humidity" : 0,
