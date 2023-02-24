@@ -4651,57 +4651,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _tableComboWeather_AirQualityIndex.addModifyListener(_modifyListener);
          _tableComboWeather_AirQualityIndex.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-            //todo fb put that in a function
             // We update the model in the selection listener as the selected
             // index value comes back with -1 in the modify listener
-            final int airQualityIndex_SelectionIndex = _tableComboWeather_AirQualityIndex.getSelectionIndex();
-            String airQualityIndexValue = IWeather.airQualityIndexText[airQualityIndex_SelectionIndex];
-            if (airQualityIndexValue.equals(IWeather.airQualityIndexIsNotDefined)) {
-               // replace invalid value
-               airQualityIndexValue = UI.EMPTY_STRING;
-            }
-            _tourData.setWeather_AirQualityIndex(airQualityIndexValue);
+            onSelect_AirQualityIndex();
 
          }));
          _tableComboWeather_AirQualityIndex.setShowTableHeader(false);
          _tableComboWeather_AirQualityIndex.defineColumns(1);
-         // fill combobox todo fb put in a separate function
 
-         for (int index = 0; index < IWeather.airQualityIndexText.length; index++) {
-
-            final TableItem tableItem = new TableItem(_tableComboWeather_AirQualityIndex.getTable(), SWT.NONE);
-
-            // set the column text
-            tableItem.setText(IWeather.airQualityIndexText[index]);
-
-            int color;
-            switch (index) {
-            //Good
-            case 1:
-               color = SWT.COLOR_DARK_GREEN;
-               break;
-            //Fair
-            case 2:
-               color = SWT.COLOR_YELLOW;
-               break;
-            //Moderate
-            case 3:
-               color = SWT.COLOR_DARK_YELLOW;
-               break;
-            //Poor
-            case 4:
-               color = SWT.COLOR_DARK_RED;
-               break;
-            //Very poor
-            case 5:
-               color = SWT.COLOR_DARK_GRAY;
-               break;
-            default:
-               color = SWT.COLOR_WHITE;
-               break;
-            }
-            tableItem.setBackground(Display.getCurrent().getSystemColor(color));
-         }
+         fillAirQualityIndexCombo();
 
          // force the icon to be displayed to ensure the width is correctly set when the size is computed
          _isSetField = true;
@@ -6151,39 +6109,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
-//   private void displayAirQualityIndexBackground() {
-//
-//      final int selectionIndex = _tableComboWeather_AirQualityIndex.getSelectionIndex();
-//
-//      int color;
-//      switch (selectionIndex) {
-//      //Good
-//      case 1:
-//         color = SWT.COLOR_DARK_GREEN;
-//         break;
-//      //Fair
-//      case 2:
-//         color = SWT.COLOR_YELLOW;
-//         break;
-//      //Moderate
-//      case 3:
-//         color = SWT.COLOR_DARK_YELLOW;
-//         break;
-//      //Poor
-//      case 4:
-//         color = SWT.COLOR_DARK_RED;
-//         break;
-//      //Very poor
-//      case 5:
-//         color = SWT.COLOR_DARK_GRAY;
-//         break;
-//      default:
-//         color = SWT.COLOR_WHITE;
-//         break;
-//      }
-//      _tableComboWeather_AirQualityIndex.setBackground(Display.getCurrent().getSystemColor(color));
-//   }
-
    private void displayCloudIcon() {
 
       final int selectionIndex = _comboWeather_Clouds.getSelectionIndex();
@@ -6228,6 +6153,39 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          });
       }
    }
+
+//   private void displayAirQualityIndexBackground() {
+//
+//      final int selectionIndex = _tableComboWeather_AirQualityIndex.getSelectionIndex();
+//
+//      int color;
+//      switch (selectionIndex) {
+//      //Good
+//      case 1:
+//         color = SWT.COLOR_DARK_GREEN;
+//         break;
+//      //Fair
+//      case 2:
+//         color = SWT.COLOR_YELLOW;
+//         break;
+//      //Moderate
+//      case 3:
+//         color = SWT.COLOR_DARK_YELLOW;
+//         break;
+//      //Poor
+//      case 4:
+//         color = SWT.COLOR_DARK_RED;
+//         break;
+//      //Very poor
+//      case 5:
+//         color = SWT.COLOR_DARK_GRAY;
+//         break;
+//      default:
+//         color = SWT.COLOR_WHITE;
+//         break;
+//      }
+//      _tableComboWeather_AirQualityIndex.setBackground(Display.getCurrent().getSystemColor(color));
+//   }
 
    private void displayTour(final Long tourId) {
 
@@ -6751,6 +6709,45 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _linkTourType.setEnabled(canEdit);
 
       timeSliceTable.setEnabled(isDeviceTour);
+   }
+
+   private void fillAirQualityIndexCombo() {
+
+      for (int index = 0; index < IWeather.airQualityIndexTexts.length; index++) {
+
+         final TableItem tableItem = new TableItem(_tableComboWeather_AirQualityIndex.getTable(), SWT.NONE);
+
+         // set the column text
+         tableItem.setText(IWeather.airQualityIndexTexts[index]);
+
+         int color;
+         switch (index) {
+         //Good
+         case 1:
+            color = SWT.COLOR_DARK_GREEN;
+            break;
+         //Fair
+         case 2:
+            color = SWT.COLOR_YELLOW;
+            break;
+         //Moderate
+         case 3:
+            color = SWT.COLOR_DARK_YELLOW;
+            break;
+         //Poor
+         case 4:
+            color = SWT.COLOR_DARK_RED;
+            break;
+         //Very poor
+         case 5:
+            color = SWT.COLOR_DARK_GRAY;
+            break;
+         default:
+            color = SWT.COLOR_WHITE;
+            break;
+         }
+         tableItem.setBackground(Display.getCurrent().getSystemColor(color));
+      }
    }
 
    private void fillContextMenu_SwimSlice(final IMenuManager menuMgr) {
@@ -7538,6 +7535,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void onResizeTab1() {
       _tab1Container.setMinSize(_tourContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+   }
+
+   private void onSelect_AirQualityIndex() {
+
+      final int airQualityIndex_SelectionIndex = _tableComboWeather_AirQualityIndex.getSelectionIndex();
+      String airQualityIndexValue = IWeather.airQualityIndexTexts[airQualityIndex_SelectionIndex];
+      if (airQualityIndexValue.equals(IWeather.airQualityIndexIsNotDefined)) {
+         // replace invalid value
+         airQualityIndexValue = UI.EMPTY_STRING;
+      }
+      _tourData.setWeather_AirQualityIndex(airQualityIndexValue);
    }
 
    private void onSelect_Slice(final SelectionChangedEvent selectionChangedEvent) {

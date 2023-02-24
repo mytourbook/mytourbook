@@ -200,7 +200,7 @@ public interface IWeather {
    /**
     * Text for the weather's air quality index
     */
-   public static final String[] airQualityIndexText         = new String[] {
+   public static final String[] airQualityIndexTexts         = new String[] {
 
          airQualityIndexIsNotDefined,
 

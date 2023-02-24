@@ -17,6 +17,12 @@ package net.tourbook.data;
 
 //todo fb
 //tour filter starttime with a value of 12:00am doesn't work
+
+// redo all the unit tests json files to only contain the database fields and
+// not the computed ones
+
+// when feels like below 32F, add the cold emoji 🥶
+// and when above 90 the hot emoji 🥵
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 
@@ -9914,7 +9920,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * @return Returns the index for the air quality index values in
-    *         {@link IWeather#airQualityIndexText} or 0 when the air quality
+    *         {@link IWeather#airQualityIndexTexts} or 0 when the air quality
     *         index is not defined
     */
    @JsonIgnore

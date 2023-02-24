@@ -375,7 +375,7 @@ public class WeatherUtils {
    public static int getWeather_AirQualityIndex_TextIndex(final String weather_AirQualityIndex) {
 
       final int weather_AirQualityIndex_TextIndex =
-            Arrays.asList(IWeather.airQualityIndexText).indexOf(weather_AirQualityIndex);
+            Arrays.asList(IWeather.airQualityIndexTexts).indexOf(weather_AirQualityIndex);
 
       return weather_AirQualityIndex_TextIndex < 0 ? 0 : weather_AirQualityIndex_TextIndex;
    }
