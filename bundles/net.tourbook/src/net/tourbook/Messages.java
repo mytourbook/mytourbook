@@ -1310,21 +1310,21 @@ public class Messages extends NLS {
    public static String        Map_Model_Name_HighWheeler;
    public static String        Map_Model_Name_Skateboard;
 
-   public static String        Map_Player_Button_MapModel_Tooltip;
-   public static String        Map_Player_Button_MapModelCursor_Tooltip;
-   public static String        Map_Player_Button_Pause_Tooltip;
-   public static String        Map_Player_Button_Play_Tooltip;
-   public static String        Map_Player_Button_PlayLoop_Tooltip;
-   public static String        Map_Player_Checkbox_ReLivePlaying;
-   public static String        Map_Player_Error_InvalidModelFilepath;
-   public static String        Map_Player_Label_ModelCursorSize;
-   public static String        Map_Player_Label_ModelSize;
-   public static String        Map_Player_Label_Speed;
-   public static String        Map_Player_Label_SpeedMultiplier;
-   public static String        Map_Player_Label_SpeedMultiplier_Tooltip;
-   public static String        Map_Player_Label_Timeline;
-   public static String        Map_Player_Label_TurningAngle;
-   public static String        Map_Player_Label_TurningAngle_Tooltip;
+   public static String        Model_Player_Button_MapModel_Tooltip;
+   public static String        Model_Player_Button_MapModelCursor_Tooltip;
+   public static String        Model_Player_Button_Pause_Tooltip;
+   public static String        Model_Player_Button_Play_Tooltip;
+   public static String        Model_Player_Button_PlayLoop_Tooltip;
+   public static String        Model_Player_Checkbox_ReLivePlaying;
+   public static String        Model_Player_Error_InvalidModelFilepath;
+   public static String        Model_Player_Label_ModelCursorSize;
+   public static String        Model_Player_Label_ModelSize;
+   public static String        Model_Player_Label_Speed;
+   public static String        Model_Player_Label_SpeedMultiplier;
+   public static String        Model_Player_Label_SpeedMultiplier_Tooltip;
+   public static String        Model_Player_Label_Timeline;
+   public static String        Model_Player_Label_TurningAngle;
+   public static String        Model_Player_Label_TurningAngle_Tooltip;
 
    public static String        merge_tour_dlg_invalid_serie_data_message;
    public static String        merge_tour_dlg_invalid_tour_data_message;

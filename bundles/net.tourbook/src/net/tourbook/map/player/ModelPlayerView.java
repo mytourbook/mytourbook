@@ -132,7 +132,7 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
          super(null, AS_CHECK_BOX);
 
-         setToolTipText(Messages.Map_Player_Button_PlayLoop_Tooltip);
+         setToolTipText(Messages.Model_Player_Button_PlayLoop_Tooltip);
 
          setImageDescriptor(_imageDescriptor_Loop);
          setDisabledImageDescriptor(_imageDescriptor_Loop_Disabled);
@@ -166,7 +166,7 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
          super(null, AS_CHECK_BOX);
 
-         setToolTipText(Messages.Map_Player_Button_MapModel_Tooltip);
+         setToolTipText(Messages.Model_Player_Button_MapModel_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapModel));
          setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapModel_Disabled));
@@ -188,7 +188,7 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
          super(null, AS_CHECK_BOX);
 
-         setToolTipText(Messages.Map_Player_Button_MapModelCursor_Tooltip);
+         setToolTipText(Messages.Model_Player_Button_MapModelCursor_Tooltip);
 
          setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapModelCursor));
          setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.MapModelCursor_Disabled));
@@ -354,7 +354,7 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
       {
          UI.createSpacer_Horizontal(container, 1);
          {
-            _lblTimeline = UI.createLabel(container, Messages.Map_Player_Label_Timeline);
+            _lblTimeline = UI.createLabel(container, Messages.Model_Player_Label_Timeline);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblTimeline);
 //            _lblTimeline_AllFrames.setBackground(UI.SYS_COLOR_GREEN);
          }
@@ -385,7 +385,7 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
       {
          UI.createSpacer_Horizontal(container, 1);
          {
-            _lblSpeedJogWheel = UI.createLabel(container, Messages.Map_Player_Label_Speed);
+            _lblSpeedJogWheel = UI.createLabel(container, Messages.Model_Player_Label_Speed);
             GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.CENTER).applyTo(_lblSpeedJogWheel);
 //            _lblTimeline_VisibleFrames.setBackground(UI.SYS_COLOR_GREEN);
          }
@@ -426,11 +426,11 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
             /*
              * Speed multiplier
              */
-            _lblSpeedMultiplier = UI.createLabel(container, Messages.Map_Player_Label_SpeedMultiplier);
-            _lblSpeedMultiplier.setToolTipText(Messages.Map_Player_Label_SpeedMultiplier_Tooltip);
+            _lblSpeedMultiplier = UI.createLabel(container, Messages.Model_Player_Label_SpeedMultiplier);
+            _lblSpeedMultiplier.setToolTipText(Messages.Model_Player_Label_SpeedMultiplier_Tooltip);
 
             _spinnerSpeedMultiplier = new Spinner(container, SWT.BORDER);
-            _spinnerSpeedMultiplier.setToolTipText(Messages.Map_Player_Label_SpeedMultiplier_Tooltip);
+            _spinnerSpeedMultiplier.setToolTipText(Messages.Model_Player_Label_SpeedMultiplier_Tooltip);
             _spinnerSpeedMultiplier.setMinimum(1);
             _spinnerSpeedMultiplier.setMaximum(10_000_000);
             _spinnerSpeedMultiplier.setIncrement(1);
@@ -446,7 +446,7 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
             /*
              * Model size
              */
-            _lblModelSize = UI.createLabel(container, Messages.Map_Player_Label_ModelSize);
+            _lblModelSize = UI.createLabel(container, Messages.Model_Player_Label_ModelSize);
 
             _spinnerModelSize = new Spinner(container, SWT.BORDER);
             _spinnerModelSize.setMinimum(20);
@@ -464,7 +464,7 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
             /*
              * Model cursor size
              */
-            _lblModelCursorSize = UI.createLabel(container, Messages.Map_Player_Label_ModelCursorSize);
+            _lblModelCursorSize = UI.createLabel(container, Messages.Model_Player_Label_ModelCursorSize);
 
             _spinnerModelCursorSize = new Spinner(container, SWT.BORDER);
             _spinnerModelCursorSize.setMinimum(10);
@@ -482,11 +482,11 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
             /*
              * Model turning angle
              */
-            _lblTurningAngle = UI.createLabel(container, Messages.Map_Player_Label_TurningAngle);
-            _lblTurningAngle.setToolTipText(Messages.Map_Player_Label_TurningAngle_Tooltip);
+            _lblTurningAngle = UI.createLabel(container, Messages.Model_Player_Label_TurningAngle);
+            _lblTurningAngle.setToolTipText(Messages.Model_Player_Label_TurningAngle_Tooltip);
 
             _spinnerTurningMultiplier = new Spinner(container, SWT.BORDER);
-            _spinnerTurningMultiplier.setToolTipText(Messages.Map_Player_Label_TurningAngle_Tooltip);
+            _spinnerTurningMultiplier.setToolTipText(Messages.Model_Player_Label_TurningAngle_Tooltip);
             _spinnerTurningMultiplier.setMinimum(0);
             _spinnerTurningMultiplier.setMaximum(50);
             _spinnerTurningMultiplier.setIncrement(1);
@@ -503,7 +503,7 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
              * Relive playing
              */
             _chkIsRelivePlaying = new Button(container, SWT.CHECK);
-            _chkIsRelivePlaying.setText(Messages.Map_Player_Checkbox_ReLivePlaying);
+            _chkIsRelivePlaying.setText(Messages.Model_Player_Checkbox_ReLivePlaying);
             _chkIsRelivePlaying.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ReLivePlaying()));
             GridDataFactory.fillDefaults()
                   .grab(true, false)
@@ -1184,14 +1184,14 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       if (ModelPlayerManager.isPlayerRunning()) {
 
-         _actionPlayControl_PlayAndPause.setToolTipText(Messages.Map_Player_Button_Pause_Tooltip);
+         _actionPlayControl_PlayAndPause.setToolTipText(Messages.Model_Player_Button_Pause_Tooltip);
 
          _actionPlayControl_PlayAndPause.setImageDescriptor(_imageDescriptor_Pause);
          _actionPlayControl_PlayAndPause.setDisabledImageDescriptor(_imageDescriptor_Pause_Disabled);
 
       } else {
 
-         _actionPlayControl_PlayAndPause.setToolTipText(Messages.Map_Player_Button_Play_Tooltip);
+         _actionPlayControl_PlayAndPause.setToolTipText(Messages.Model_Player_Button_Play_Tooltip);
 
          _actionPlayControl_PlayAndPause.setImageDescriptor(_imageDescriptor_Play);
          _actionPlayControl_PlayAndPause.setDisabledImageDescriptor(_imageDescriptor_Play_Disabled);
