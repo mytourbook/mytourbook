@@ -12530,7 +12530,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
             .with(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY));
       mapper.setVisibility(mapper.getSerializationConfig().getDefaultVisibilityChecker()
             .withCreatorVisibility(Visibility.NONE)
-            .withFieldVisibility(Visibility.NONE)
+            .withFieldVisibility(Visibility.ANY)
             .withGetterVisibility(Visibility.NONE)
             .withIsGetterVisibility(Visibility.NONE)
             .withSetterVisibility(Visibility.NONE));
