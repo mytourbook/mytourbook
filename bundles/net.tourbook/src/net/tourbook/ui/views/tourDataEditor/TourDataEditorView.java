@@ -4637,7 +4637,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
           * Air Quality
           */
          // label
-         final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_AirQuality);
+         final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_AirQualityIndex);
          label.setToolTipText(Messages.Tour_Editor_Label_AirQualityIndex_Tooltip);
          _firstColumnControls.add(label);
 
@@ -4647,8 +4647,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _tk.adapt(_comboWeather_AirQualityIndex, true, false);
          _comboWeather_AirQualityIndex.setToolTipText(Messages.Tour_Editor_Label_AirQualityIndex_Tooltip);
          _comboWeather_AirQualityIndex.setVisibleItemCount(10);
-         _comboWeather_AirQualityIndex.addModifyListener(_modifyListener);
-         _comboWeather_AirQualityIndex.addSelectionListener(widgetSelectedAdapter(selectionEvent -> displayAirQualityIndexBackground()));
+         _comboWeather_AirQualityIndex.addModifyListener(modifyEvent -> {
+
+            if (_isSetField || _isSavingInProgress) {
+               return;
+            }
+
+            displayAirQualityIndexBackground();
+
+            updateModel_FromUI();
+            setTourDirty();
+         });
+         //  _comboWeather_AirQualityIndex.addSelectionListener(widgetSelectedAdapter(selectionEvent -> displayAirQualityIndexBackground()));
 
          // fill combobox
          Arrays.asList(IWeather.airQualityIndexText).forEach(airQualityText -> _comboWeather_AirQualityIndex.add(airQualityText));
