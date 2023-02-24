@@ -544,7 +544,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Is <code>true</code> when the weather data below is from the weather API and not
     * manually entered or from the device.
     */
-   private boolean               isWeatherDataFromProvider;
+   private boolean               isWeatherDataFromProvider; //todo fb db-version ????
 
    private int                   weather_Wind_Direction  = -1;                         // db-version 8
 
@@ -1164,9 +1164,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float[]               speedSerie;
 
    @Transient
+   @JsonIgnore
    private float[]               speedSerie_Mile;
 
    @Transient
+   @JsonIgnore
    private float[]               speedSerie_NauticalMile;
 
    /**
@@ -1176,9 +1178,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float[]               speedSerie_Summarized;
 
    @Transient
+   @JsonIgnore
    private float[]               speedSerie_Summarized_Mile;
 
    @Transient
+   @JsonIgnore
    private float[]               speedSerie_Summarized_NauticalMile;
 
    /**
@@ -1186,6 +1190,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * computed. Speed data are normally available from an ergometer and not from a bike computer
     */
    @Transient
+   @JsonIgnore
    private boolean               isSpeedSerieFromDevice               = false;
 
    /**
@@ -1248,6 +1253,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * computed. Power data source can be an ergometer or a power sensor
     */
    @Transient
+   @JsonIgnore
    private boolean               isPowerSerieFromDevice               = false;
 
    @Transient
@@ -1360,6 +1366,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private NormalizedGeoData  _rasterizedLatLon;
 
    @Transient
+   @JsonIgnore
    private int                _normalizedGeoAccuracy;
 
    /**
@@ -1613,6 +1620,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * multiple tours are selected to be displayed in the {@link TourChart}.
     */
    @Transient
+   @JsonIgnore
    private boolean            isMultipleTours;
 
    /**
