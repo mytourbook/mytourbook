@@ -589,8 +589,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Air Quality Index
     */
-   //todo fb rename ALL to air quality index
- private String                 weather_AirQualityIndex;                                     // db-version XX
+   private String                 weather_AirQualityIndex;                             // db-version 50
 
    //TODO FB
    //https://openweathermap.org/api/air-pollution
@@ -8579,7 +8578,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return pausedTime_Start;
    }
 
-
    public boolean[] getPausedTimeSerie() {
 
       if (pausedTimeSerie == null) {
@@ -8849,7 +8847,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       return pulseSerie_FromTime;
    }
-
 
    public String[] getPulse_RRIntervals() {
 
@@ -9395,7 +9392,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public short getStartWeekYear() {
       return startWeekYear;
    }
-
 
    public short getStartYear() {
       return startYear;
@@ -10230,7 +10226,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public boolean isSurfing_IsMinDistance() {
       return surfing_IsMinDistance;
    }
-
 
    public boolean isTemperatureAvailable() {
 
