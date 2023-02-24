@@ -4647,18 +4647,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _tk.adapt(_comboWeather_AirQualityIndex, true, false);
          _comboWeather_AirQualityIndex.setToolTipText(Messages.Tour_Editor_Label_AirQualityIndex_Tooltip);
          _comboWeather_AirQualityIndex.setVisibleItemCount(10);
-         _comboWeather_AirQualityIndex.addModifyListener(modifyEvent -> {
-
-            if (_isSetField || _isSavingInProgress) {
-               return;
-            }
-
-            displayAirQualityIndexBackground();
-
-            updateModel_FromUI();
-            setTourDirty();
-         });
-         //  _comboWeather_AirQualityIndex.addSelectionListener(widgetSelectedAdapter(selectionEvent -> displayAirQualityIndexBackground()));
+         _comboWeather_AirQualityIndex.addModifyListener(_modifyListener);
+         _comboWeather_AirQualityIndex.addSelectionListener(widgetSelectedAdapter(selectionEvent -> displayAirQualityIndexBackground()));
 
          // fill combobox
          Arrays.asList(IWeather.airQualityIndexText).forEach(airQualityText -> _comboWeather_AirQualityIndex.add(airQualityText));
@@ -9272,6 +9262,9 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // Air Quality Index
       _comboWeather_AirQualityIndex.select(_tourData.getWeather_AirQualityIndex_TextIndex());
+
+      // background must be displayed after the combobox entry is selected
+      displayAirQualityIndexBackground();
 
       /*
        * Time
