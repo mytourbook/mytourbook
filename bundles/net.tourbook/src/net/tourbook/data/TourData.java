@@ -397,6 +397,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private int                   restPulse;                                             // db-version 8
 
    @XmlElement
+   //todo fb why this non primitive type is not serialized
    private Integer               calories;                                             // db-version 4
 
    private float                 bodyWeight;                                          // db-version 4
@@ -544,7 +545,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Is <code>true</code> when the weather data below is from the weather API and not
     * manually entered or from the device.
     */
-   private boolean               isWeatherDataFromProvider; //todo fb db-version ????
+   private boolean               isWeatherDataFromProvider;                            // db-version 39
 
    private int                   weather_Wind_Direction  = -1;                         // db-version 8
 
@@ -794,7 +795,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Number of photos.
     */
-   private int                   numberOfPhotos;
+   private int                   numberOfPhotos;                                       // db-version 23
 
    /**
     * Time adjustment in seconds, this is an average value for all photos.
@@ -1050,6 +1051,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Smoothed elevation serie is used to display the tour chart when not <code>null</code>
     */
    @Transient
+   @JsonIgnore
    private float[]            altitudeSerieSmoothed;
 
    /**
@@ -1223,6 +1225,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Summarized average pace in sec/km from the first time slice
     */
    @Transient
+   @JsonIgnore
    private float[]               paceSerie_Summarized_Seconds;
 
    /**
