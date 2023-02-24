@@ -198,17 +198,17 @@ public interface IWeather {
    public static final String   airQualityIsNotDefined = Messages.Weather_AirQuality_IsNotDefined;
 
    /**
-    * Text for the weather's air quality
+    * Text for the weather's air quality index
     */
    public static final String[] airQualityIndexText    = new String[] {
 
          airQualityIsNotDefined,
 
-         Messages.Weather_AirQuality_Good,
-         Messages.Weather_AirQuality_Fair,
-         Messages.Weather_AirQuality_Moderate,
-         Messages.Weather_AirQuality_Poor,
-         Messages.Weather_AirQuality_VeryPoor
+         Messages.Weather_AirQualityIndex_Good,
+         Messages.Weather_AirQualityIndex_Fair,
+         Messages.Weather_AirQualityIndex_Moderate,
+         Messages.Weather_AirQualityIndex_Poor,
+         Messages.Weather_AirQualityIndex_VeryPoor
 
    };
 
