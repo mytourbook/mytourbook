@@ -286,7 +286,7 @@ public class Messages extends NLS {
 
    public static String        Weather_AirQualityIndex_Good;
    public static String        Weather_AirQualityIndex_Fair;
-   public static String        Weather_AirQuality_IsNotDefined;
+   public static String        Weather_AirQualityIndex_IsNotDefined;
    public static String        Weather_AirQualityIndex_Moderate;
    public static String        Weather_AirQualityIndex_Poor;
    public static String        Weather_AirQualityIndex_VeryPoor;

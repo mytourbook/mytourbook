@@ -179,7 +179,7 @@ public interface IWeather {
    /**
     * Text for the weather
     */
-   public static final String[] cloudText = new String[] {
+   public static final String[] cloudText                   = new String[] {
 
          cloudIsNotDefined,
 
@@ -195,14 +195,14 @@ public interface IWeather {
 
    };
 
-   public static final String   airQualityIsNotDefined = Messages.Weather_AirQuality_IsNotDefined;
+   public static final String   airQualityIndexIsNotDefined = Messages.Weather_AirQualityIndex_IsNotDefined;
 
    /**
     * Text for the weather's air quality index
     */
-   public static final String[] airQualityIndexText    = new String[] {
+   public static final String[] airQualityIndexText         = new String[] {
 
-         airQualityIsNotDefined,
+         airQualityIndexIsNotDefined,
 
          Messages.Weather_AirQualityIndex_Good,
          Messages.Weather_AirQualityIndex_Fair,
@@ -215,7 +215,7 @@ public interface IWeather {
    /**
     * Icons for the weather
     */
-   public static final String[] cloudIcon = new String[] {
+   public static final String[] cloudIcon                   = new String[] {
 
          UI.IMAGE_EMPTY_16,
 

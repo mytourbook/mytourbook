@@ -8700,7 +8700,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // Air Quality Index
          final int airQualityIndex_SelectionIndex = _comboWeather_AirQualityIndex.getSelectionIndex();
          String airQualityIndexValue = IWeather.airQualityIndexText[airQualityIndex_SelectionIndex];
-         if (airQualityIndexValue.equals(IWeather.airQualityIsNotDefined)) {
+         if (airQualityIndexValue.equals(IWeather.airQualityIndexIsNotDefined)) {
             // replace invalid value
             airQualityIndexValue = UI.EMPTY_STRING;
          }
