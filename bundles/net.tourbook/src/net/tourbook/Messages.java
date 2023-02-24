@@ -2794,7 +2794,7 @@ public class Messages extends NLS {
    public static String        Tour_Editor_Label_AirPressure;
    public static String        Tour_Editor_Label_AirPressure_Tooltip;
    public static String        Tour_Editor_Label_AirQuality;
-   public static String        Tour_Editor_Label_AirQuality_Tooltip;
+   public static String        Tour_Editor_Label_AirQualityIndex_Tooltip;
    public static String        Tour_Editor_Label_AltitudeDown;
    public static String        Tour_Editor_Label_AltitudeUp;
    public static String        Tour_Editor_Label_BodyFat;

@@ -4638,14 +4638,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
           */
          // label
          final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_AirQuality);
-         label.setToolTipText(Messages.Tour_Editor_Label_AirQuality_Tooltip);
+         label.setToolTipText(Messages.Tour_Editor_Label_AirQualityIndex_Tooltip);
          _firstColumnControls.add(label);
 
          // combo: clouds
          _comboWeather_AirQualityIndex = new Combo(container, SWT.READ_ONLY | SWT.BORDER);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_comboWeather_AirQualityIndex);
          _tk.adapt(_comboWeather_AirQualityIndex, true, false);
-         _comboWeather_AirQualityIndex.setToolTipText(Messages.Tour_Editor_Label_AirQuality_Tooltip);
+         _comboWeather_AirQualityIndex.setToolTipText(Messages.Tour_Editor_Label_AirQualityIndex_Tooltip);
          _comboWeather_AirQualityIndex.setVisibleItemCount(10);
          _comboWeather_AirQualityIndex.addModifyListener(_modifyListener);
          _comboWeather_AirQualityIndex.addSelectionListener(widgetSelectedAdapter(selectionEvent -> displayAirQualityIndexBackground()));

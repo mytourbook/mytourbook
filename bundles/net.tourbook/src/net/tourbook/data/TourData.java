@@ -9913,9 +9913,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * @return Returns the index for the air quality values in {@link IWeather#airQualityIndexText}
-    *         and
-    *         {@link IWeather#cloudText} or 0 when the clouds are not defined
+    * @return Returns the index for the air quality index values in
+    *         {@link IWeather#airQualityIndexText} or 0 when the air quality
+    *         index is not defined
     */
    @JsonIgnore
    public int getWeather_AirQualityIndex_TextIndex() {
