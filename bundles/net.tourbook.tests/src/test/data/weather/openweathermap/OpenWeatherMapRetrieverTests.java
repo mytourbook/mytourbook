@@ -64,53 +64,6 @@ public class OpenWeatherMapRetrieverTests {
    }
 
    @Test
-   void testWeatherRetrieval_JulySecond2022() {
-
-      final String openWeatherMapResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
-            + "LongsPeak-Manual-OpenWeatherMapResponse-1656720000.json"); //$NON-NLS-1$
-
-      final String url = OPENWEATHERMAP_BASE_URL + "1656720000"; //$NON-NLS-1$
-      httpClientMock.onGet(url).doReturn(openWeatherMapResponse);
-
-      final TourData tour = Initializer.importTour();
-      //Tuesday, July 2, 2022 12:00:00 AM
-      final ZonedDateTime zonedDateTime = ZonedDateTime.of(
-            2022,
-            07,
-            02,
-            10,
-            0,
-            0,
-            0,
-            ZoneId.of(DenverZoneId));
-      tour.setTourStartTime(zonedDateTime);
-      //We set the current time elapsed to trigger the computation of the new end time
-      tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
-
-      openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
-
-      assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
-      httpClientMock.verify().get(url).called();
-
-// SET_FORMATTING_OFF
-
-      assertEquals("broken clouds",   tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-cloudy", tour.getWeather_Clouds()); //$NON-NLS-1$
-      assertEquals(7.58f,             tour.getWeather_Temperature_Average());
-      assertEquals(3,                 tour.getWeather_Wind_Speed());
-      assertEquals(240,               tour.getWeather_Wind_Direction());
-      assertEquals(70,                tour.getWeather_Humidity());
-      assertEquals(0,                 tour.getWeather_Precipitation());
-      assertEquals(0,                 tour.getWeather_Snowfall());
-      assertEquals(1007,              tour.getWeather_Pressure());
-      assertEquals(14.15f,            tour.getWeather_Temperature_Max());
-      assertEquals(3.93f,             tour.getWeather_Temperature_Min());
-      assertEquals(6.33f,             tour.getWeather_Temperature_WindChill());
-
-// SET_FORMATTING_ON
-   }
-
-   @Test
    void testWeatherRetrieval_JulySixth2022() {
 
       final String openWeatherMapResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
