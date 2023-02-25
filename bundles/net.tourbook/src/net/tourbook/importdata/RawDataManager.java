@@ -676,6 +676,7 @@ public class RawDataManager {
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TOUR__WEATHER) {
 
          previousData.add(
+               "Description: " + oldTourData.getWeather() + ". Clouds icon: " + oldTourData.getWeather_Clouds() + "." +
                UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
                      UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Max())) + UI.UNIT_LABEL_TEMPERATURE
@@ -685,6 +686,7 @@ public class RawDataManager {
                      UI.SYMBOL_TILDE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_WindChill()))
                      + UI.UNIT_LABEL_TEMPERATURE);
          newData.add(
+               "Description: " + newTourData.getWeather() + ". Clouds icon: " + newTourData.getWeather_Clouds() + "." +
                UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
                      UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Max()))
@@ -1426,6 +1428,12 @@ public class RawDataManager {
                tourDataDummyClone.setImportFilePath(oldTourData.getImportFilePathName());
             }
 
+            if (isEntireTour || tourValueType == TourValueType.TOUR__WEATHER) {
+
+               tourDataDummyClone.setWeather(oldTourData.getWeather());
+               tourDataDummyClone.setWeather_Clouds(oldTourData.getWeather_Clouds());
+            }
+
             /*
              * Time slice values
              */
@@ -1551,7 +1559,7 @@ public class RawDataManager {
             dataToModifyDetails.add(Messages.Tour_Data_Text_SwimmingValues);
          }
 
-         // Temperature
+         // Weather values
          if (isAllTimeSlices || tourValueType == TourValueType.TOUR__WEATHER) {
             dataToModifyDetails.add(Messages.Tour_Data_Text_WeatherValues);
          }
@@ -3372,6 +3380,12 @@ public class RawDataManager {
                // update device name which is also not set in older versions
                oldTourData.setDeviceName(reimportedTourData.getDevicePluginName());
                oldTourData.setDeviceFirmwareVersion(reimportedTourData.getDeviceFirmwareVersion());
+            }
+
+            if (tourValueTypes.contains(TourValueType.TOUR__WEATHER)) {
+
+               oldTourData.setWeather(reimportedTourData.getWeather());
+               oldTourData.setWeather_Clouds(reimportedTourData.getWeather_Clouds());
             }
 
             newTourData = oldTourData;

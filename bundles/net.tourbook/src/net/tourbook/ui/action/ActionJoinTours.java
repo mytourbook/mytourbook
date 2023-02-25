@@ -1,14 +1,14 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2011  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
@@ -46,7 +46,7 @@ public class ActionJoinTours extends Action {
 	/**
 	 * Checks if the tour data can be joined. At least, the data series for time, distance or
 	 * latitude must be available. All tours must have data for the required data series.
-	 * 
+	 *
 	 * @return Return <code>null</code> when data are OK or an error message.
 	 */
 	private String checkTourData() {
@@ -153,7 +153,7 @@ public class ActionJoinTours extends Action {
 		if (checkMessage != null) {
 			showMessage(checkMessage);
 		} else {
-			new DialogJoinTours(Display.getCurrent().getActiveShell(), selectedTours).open();
+         new DialogJoinTours(Display.getCurrent().getActiveShell(), _tourProvider, selectedTours).open();
 		}
 	}
 

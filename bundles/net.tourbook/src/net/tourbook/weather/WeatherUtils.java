@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.util.LengthUnit;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.tourbook.Messages;
@@ -167,49 +168,52 @@ public class WeatherUtils {
          }
       }
 
-      // Average temperature
-      final float averageTemperature = tourData.getWeather_Temperature_Average();
-      if (averageTemperature != Float.MIN_VALUE) {
-         weatherDataList.add(FormatManager.formatTemperature(UI.convertTemperatureFromMetric(averageTemperature)) +
-               UI.UNIT_LABEL_TEMPERATURE);
-      }
+      if (tourData.isTemperatureAvailable()) {
 
-      // Maximum temperature
-      if (displayMaximumTemperature) {
+         // Average temperature
+         final float averageTemperature = tourData.getWeather_Temperature_Average();
+         if (averageTemperature != Float.MIN_VALUE) {
+            weatherDataList.add(FormatManager.formatTemperature(UI.convertTemperatureFromMetric(averageTemperature)) +
+                  UI.UNIT_LABEL_TEMPERATURE);
+         }
 
-         weatherDataList.add(
-               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max +
-                     UI.SPACE +
-                     FormatManager.formatTemperature(
-                           UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max())) +
-                     UI.UNIT_LABEL_TEMPERATURE);
-      }
+         // Maximum temperature
+         if (displayMaximumTemperature) {
 
-      // Minimum temperature
-      if (displayMinimumTemperature) {
+            weatherDataList.add(
+                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max +
+                        UI.SPACE +
+                        FormatManager.formatTemperature(
+                              UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max())) +
+                        UI.UNIT_LABEL_TEMPERATURE);
+         }
 
-         weatherDataList.add(
-               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min +
-                     UI.SPACE +
-                     FormatManager.formatTemperature(
-                           UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min())) +
-                     UI.UNIT_LABEL_TEMPERATURE);
-      }
+         // Minimum temperature
+         if (displayMinimumTemperature) {
 
-      // Wind chill
-      final float temperatureWindChill = tourData.getWeather_Temperature_WindChill();
-      if (temperatureWindChill != Float.MIN_VALUE) {
+            weatherDataList.add(
+                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min +
+                        UI.SPACE +
+                        FormatManager.formatTemperature(
+                              UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min())) +
+                        UI.UNIT_LABEL_TEMPERATURE);
+         }
 
-         weatherDataList.add(
-               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
-                     UI.SPACE +
-                     FormatManager.formatTemperature(UI.convertTemperatureFromMetric(temperatureWindChill)) +
-                     UI.UNIT_LABEL_TEMPERATURE);
+         // Wind chill
+         final float temperatureWindChill = tourData.getWeather_Temperature_WindChill();
+         if (temperatureWindChill != Float.MIN_VALUE) {
+
+            weatherDataList.add(
+                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
+                        UI.SPACE +
+                        FormatManager.formatTemperature(UI.convertTemperatureFromMetric(temperatureWindChill)) +
+                        UI.UNIT_LABEL_TEMPERATURE);
+         }
       }
 
       // Wind
       final int windSpeed = tourData.getWeather_Wind_Speed();
-      if (windSpeed != Float.MIN_VALUE) {
+      if (windSpeed > 0) {
 
          final String windDirection = tourData.getWeather_Wind_Direction() != -1
                ? UI.SPACE +
@@ -224,7 +228,7 @@ public class WeatherUtils {
 
       // Humidity
       final float humidity = tourData.getWeather_Humidity();
-      if (humidity != Float.MIN_VALUE) {
+      if (humidity > 0) {
 
          weatherDataList.add((int) humidity +
                UI.SYMBOL_PERCENTAGE +
@@ -233,9 +237,10 @@ public class WeatherUtils {
       }
 
       // Pressure
-      if (displayPressure) {
+      final float weatherPressure = tourData.getWeather_Pressure();
+      if (weatherPressure > 0 && displayPressure) {
 
-         weatherDataList.add(roundDoubleToFloat(tourData.getWeather_Pressure()) +
+         weatherDataList.add(roundDoubleToFloat(weatherPressure) +
                UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG +
                UI.SPACE +
                Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Pressure);
@@ -365,6 +370,14 @@ public class WeatherUtils {
             LatLngTool.travel(startPoint, bearingBetweenPoint, distanceFromStart / 2, LengthUnit.METER);
 
       return searchAreaCenter;
+   }
+
+   public static int getWeather_AirQualityIndex_TextIndex(final String weather_AirQualityIndex) {
+
+      final int weather_AirQualityIndex_TextIndex =
+            Arrays.asList(IWeather.airQualityIndexTexts).indexOf(weather_AirQualityIndex);
+
+      return weather_AirQualityIndex_TextIndex < 0 ? 0 : weather_AirQualityIndex_TextIndex;
    }
 
    /**

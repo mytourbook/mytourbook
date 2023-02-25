@@ -38,6 +38,7 @@ import net.tourbook.common.Bool;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
+import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map25.Map25TileSource.Builder;
 import net.tourbook.map25.OkHttpEngineMT.OkHttpFactoryMT;
 import net.tourbook.map25.animation.GLTFModel_Layer;
@@ -53,7 +54,6 @@ import net.tourbook.map25.layer.marker.MarkerRendererMT;
 import net.tourbook.map25.layer.marker.MarkerShape;
 import net.tourbook.map25.layer.marker.MarkerToolkit;
 import net.tourbook.map25.layer.marker.PhotoToolkit;
-import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.SliderLocation_Layer;
 import net.tourbook.map25.layer.tourtrack.SliderPath_Layer;
 import net.tourbook.map25.layer.tourtrack.TourTrack_Layer;
@@ -161,7 +161,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
    public static final float                    SUN_TIME_RANGE                                = 10;
    public static final float                    SUN_TIME_DETAIL_RANGE                         = 50;
    //
-   public static final float                    MAP_CENTER_VERTICAL_MAX_VALUE                 = 100.0f;
+   public static final float                    MAP_CENTER_VERTICAL_MAX_VALUE                 = 1000.0f;
    //
    private static IDialogSettings               _state;
    //
@@ -686,11 +686,8 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
 
       super.create();
 
-      // initially _lwjglApp is not set when the tour track config is restored
-      // -> it is too complicated to set it correctly
-      // -> therefore this post enablement
-      final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
-      Map25FPSManager.setAnimation(trackConfig.arrow_IsAnimate);
+      // !!! restore it after super.create() !!!
+      ModelPlayerManager.restoreState();
 
       /**
        * Overwrite input handler, using own GdxMap.create() method didn't work :-(

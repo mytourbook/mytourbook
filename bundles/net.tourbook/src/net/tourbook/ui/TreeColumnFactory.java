@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -26,7 +26,7 @@ import org.eclipse.swt.SWT;
 
 public abstract class TreeColumnFactory {
 
-   private static final String           APP_UNIT_SECONDS_SMALL      = net.tourbook.Messages.App_Unit_Seconds_Small;
+   private static final String           APP_UNIT_SECONDS_SMALL         = net.tourbook.Messages.App_Unit_Seconds_Small;
 
    public static final TreeColumnFactory ALTITUDE_AVG_CHANGE;
    public static final TreeColumnFactory ALTITUDE_DOWN;
@@ -48,9 +48,9 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory DATA_TIME_INTERVAL;
 
    public static final TreeColumnFactory DEVICE_BATTERY_SOC_END;
-   public static final String            DEVICE_BATTERY_SOC_END_ID   = "DEVICE_BATTERY_SOC_END_ID";                 //$NON-NLS-1$
+   public static final String            DEVICE_BATTERY_SOC_END_ID      = "DEVICE_BATTERY_SOC_END_ID";                 //$NON-NLS-1$
    public static final TreeColumnFactory DEVICE_BATTERY_SOC_START;
-   public static final String            DEVICE_BATTERY_SOC_START_ID = "DEVICE_BATTERY_SOC_START_ID";               //$NON-NLS-1$
+   public static final String            DEVICE_BATTERY_SOC_START_ID    = "DEVICE_BATTERY_SOC_START_ID";               //$NON-NLS-1$
    public static final TreeColumnFactory DEVICE_DISTANCE;
    public static final TreeColumnFactory DEVICE_NAME;
 
@@ -122,8 +122,11 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TOUR_NUM_PHOTOS;
    public static final TreeColumnFactory TOUR_REFTOUR_TOUR;
    public static final TreeColumnFactory TOUR_TAG_AND_CATEGORY_NOTES;
+   public static final String            TOUR_TAG_AND_CATEGORY_NOTES_ID = "TOUR_TAG_AND_CATEGORY_NOTES";
    public static final TreeColumnFactory TOUR_TAG_AND_TAGS;
    public static final TreeColumnFactory TOUR_TAG_ID;
+   public static final TreeColumnFactory TOUR_TAG_IMAGE_FILE_PATH;
+   public static final String            TOUR_TAG_IMAGE_FILE_PATH_ID    = "TOUR_TAG_IMAGE_FILE_PATH";
    public static final TreeColumnFactory TOUR_TAGS;
    public static final TreeColumnFactory TOUR_TITLE;
    public static final TreeColumnFactory TOUR_TYPE;
@@ -2065,7 +2068,7 @@ public abstract class TreeColumnFactory {
          public TreeColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "TOUR_TAG_AND_CATEGORY_NOTES", SWT.LEAD); //$NON-NLS-1$
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, TOUR_TAG_AND_CATEGORY_NOTES_ID, SWT.LEAD);
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
 
@@ -2112,6 +2115,28 @@ public abstract class TreeColumnFactory {
             colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TagID_Tooltip);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(5));
+
+            return colDef;
+         }
+      };
+
+      TOUR_TAG_IMAGE_FILE_PATH = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(
+                  columnManager,
+                  TOUR_TAG_IMAGE_FILE_PATH_ID,
+                  SWT.LEAD);
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Tour);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_TagImageFilePath_Label);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_TagImageFilePath_Header);
+            colDef.setColumnHeaderToolTipText(  Messages.ColumnFactory_TagImageFilePath_Tooltip);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(25));
 
             return colDef;
          }

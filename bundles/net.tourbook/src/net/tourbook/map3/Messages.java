@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,7 @@ public class Messages extends NLS {
    public static String        Custom_Layer_Status;
    public static String        Custom_Layer_TerrainProfile;
    public static String        Custom_Layer_TourLegend;
-   public static String        Custom_Layer_TourMarker;
+   public static String        Custom_Layer_TourMarkers;
    public static String        Custom_Layer_TourTrack;
    public static String        Custom_Layer_TrackSlider;
    public static String        Custom_Layer_ViewerController;
@@ -55,7 +55,7 @@ public class Messages extends NLS {
    public static String        Map3_Action_SetTrackSliderPositionLeft;
    public static String        Map3_Action_SetTrackSliderPositionRight;
    public static String        Map3_Action_ShowLegend;
-   public static String        Map3_Action_ShowMarker;
+   public static String        Map3_Action_ShowMarkers;
    public static String        Map3_Action_ShowOpenGLVersion_Tooltip;
    public static String        Map3_Action_ShowTrackSlider;
    public static String        Map3_Action_TrackColor;

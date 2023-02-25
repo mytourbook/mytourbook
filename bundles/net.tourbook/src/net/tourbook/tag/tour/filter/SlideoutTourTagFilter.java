@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -57,7 +57,6 @@ import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
-import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -651,7 +650,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
                      : Integer.toString(numTags));
             }
          });
-         tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(6), false));
+         tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 6));
       }
       {
          // Column: Number of unchecked tags
@@ -672,7 +671,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
                      : Integer.toString(numUncheckedTags));
             }
          });
-         tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(6), false));
+         tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 6));
       }
       {
          // Column: Combine tags with OR or AND
@@ -700,7 +699,7 @@ public class SlideoutTourTagFilter extends AdvancedSlideout implements ITreeView
                      : UI.EMPTY_STRING);
             }
          });
-         tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(10), false));
+         tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 10));
       }
 
       /*

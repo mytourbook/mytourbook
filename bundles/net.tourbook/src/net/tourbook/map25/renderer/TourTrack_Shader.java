@@ -23,8 +23,8 @@ import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 
 import net.tourbook.common.UI;
-import net.tourbook.map.player.MapPlayerData;
-import net.tourbook.map.player.MapPlayerManager;
+import net.tourbook.map.player.ModelPlayerData;
+import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 
@@ -77,11 +77,9 @@ public final class TourTrack_Shader {
    private static ByteBuffer            _vertexColor_Buffer;
    private static int                   _vertexColor_BufferSize;
 
-   private static short[]               _animationVertices;
+   private static short[]               _mapModelCursorVertices;
 
    private static GLMatrix              _animationMatrix         = new GLMatrix();
-
-   private static int                   _prevValue;
 
 // private static double                _prevValue;
 
@@ -201,7 +199,8 @@ public final class TourTrack_Shader {
    }
 
    /**
-    * Fill OpenGL buffer with the vertices/color/direction model data
+    * Fill OpenGL buffer with the vertices/color/direction model data, this is called from
+    * {@link net.tourbook.map25.renderer.TourTrack_LayerRenderer#update()}
     *
     * @param compileMapPosition
     * @param viewport
@@ -209,7 +208,7 @@ public final class TourTrack_Shader {
     */
    public static boolean bindBufferData(final TourTrack_Bucket trackBucket, final GLViewport viewport) {
 
-      setMapPlayerData(trackBucket, viewport);
+      setModelPlayerData(trackBucket, viewport);
 
       final int numTrackVertices = trackBucket == null
             ? 0
@@ -245,64 +244,58 @@ public final class TourTrack_Shader {
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
+      /*
+       * Static direction arrows
+       */
       if (trackConfig.isShowDirectionArrow) {
 
-         if (trackConfig.arrow_IsAnimate) {
+         /*
+          * Vertices
+          */
+         final ShortArrayList dirArrowVertices = trackBucket.directionArrow_Vertices;
+         final int numVertices = dirArrowVertices.size();
+         final ShortBuffer buffer1 = MapRenderer.getShortBuffer(numVertices).put(dirArrowVertices.toArray()).flip();
+         gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows);
+         gl.bufferData(GL.ARRAY_BUFFER, numVertices * SHORT_BYTES, buffer1, GL.STATIC_DRAW);
 
-            /*
-             * Animation
-             */
-            {
-               /*
-                * Vertices
-                */
+         /*
+          * Color
+          */
+         final ShortArrayList colorCoords = trackBucket.directionArrow_ColorCoords;
+         final int numColorCoords = colorCoords.size();
+         final ShortBuffer buffer2 = MapRenderer.getShortBuffer(numColorCoords).put(colorCoords.toArray()).flip();
+         gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows_ColorCoords);
+         gl.bufferData(GL.ARRAY_BUFFER, numColorCoords * SHORT_BYTES, buffer2, GL.STATIC_DRAW);
+      }
 
-// SET_FORMATTING_OFF
+      /*
+       * Map model cursor
+       */
+      if (ModelPlayerManager.isMapModelCursorVisible()) {
 
-               final short size  = MapPlayerManager.getModelCursorSize();
-               final short size2 = (short) (size * 3);
-               final short zPos  = (short) (1 + trackBucket.heightOffset);
+         /*
+          * Vertices
+          */
 
-               // paint a simple triangle
-               _animationVertices = new short[] {
-                                                   0,     0,   zPos,
-                                                size,  size2,  zPos,
-                                               (short) -size,  size2,  zPos,
+//SET_FORMATTING_OFF
 
-                                                };
-// SET_FORMATTING_ON
+         final short size  = ModelPlayerManager.getModelCursorSize();
+         final short size2 = (short) (size * 3);
+         final short zPos  = (short) (+1 + trackBucket.heightOffset);
 
-               final int numAnimationVertices = _animationVertices.length;
-               final ShortBuffer buffer1 = MapRenderer.getShortBuffer(numAnimationVertices).put(_animationVertices).flip();
-               gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_AnimationVertices);
-               gl.bufferData(GL.ARRAY_BUFFER, numAnimationVertices * SHORT_BYTES, buffer1, GL.STATIC_DRAW);
-            }
+         // paint a simple triangle
+         _mapModelCursorVertices = new short[] {
+                                                     0,      0,  zPos,
+                                                  size,  size2,  zPos,
+                                         (short) -size,  size2,  zPos,
 
-         } else {
+                                          };
+//SET_FORMATTING_ON
 
-            /*
-             * Static direction arrows
-             */
-            {
-               /*
-                * Vertices
-                */
-               final ShortArrayList dirArrowVertices = trackBucket.directionArrow_Vertices;
-               final int numVertices = dirArrowVertices.size();
-               final ShortBuffer buffer1 = MapRenderer.getShortBuffer(numVertices).put(dirArrowVertices.toArray()).flip();
-               gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows);
-               gl.bufferData(GL.ARRAY_BUFFER, numVertices * SHORT_BYTES, buffer1, GL.STATIC_DRAW);
-
-               /*
-                * Color
-                */
-               final ShortArrayList colorCoords = trackBucket.directionArrow_ColorCoords;
-               final int numColorCoords = colorCoords.size();
-               final ShortBuffer buffer2 = MapRenderer.getShortBuffer(numColorCoords).put(colorCoords.toArray()).flip();
-               gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_DirArrows_ColorCoords);
-               gl.bufferData(GL.ARRAY_BUFFER, numColorCoords * SHORT_BYTES, buffer2, GL.STATIC_DRAW);
-            }
-         }
+         final int numAnimationVertices = _mapModelCursorVertices.length;
+         final ShortBuffer buffer1 = MapRenderer.getShortBuffer(numAnimationVertices).put(_mapModelCursorVertices).flip();
+         gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_AnimationVertices);
+         gl.bufferData(GL.ARRAY_BUFFER, numAnimationVertices * SHORT_BYTES, buffer1, GL.STATIC_DRAW);
       }
 
       return true;
@@ -345,7 +338,8 @@ public final class TourTrack_Shader {
                             final GLViewport viewport,
                             final MapPosition compileMapPosition) {
 
-//    _dirArrowFrameBuffer.updateViewport(viewport, 0.5f);
+      // update current model position that re-Live has the correct number of vertices
+      ModelPlayerManager.getCurrentProjectedPosition();
 
       final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
 
@@ -359,14 +353,12 @@ public final class TourTrack_Shader {
 
          if (trackConfig.isShowDirectionArrow) {
 
-            if (trackConfig.arrow_IsAnimate) {
+            paint_20_DirectionArrows(viewport, viewport2mapscale, trackBucket);
+         }
 
-               paint_30_ModelCursor(viewport, viewport2mapscale);
+         if (ModelPlayerManager.isMapModelCursorVisible()) {
 
-            } else {
-
-               paint_20_DirectionArrows(viewport, viewport2mapscale, trackBucket);
-            }
+            paint_30_ModelCursor(viewport, viewport2mapscale);
          }
       }
       gl.blendFunc(GL.ONE, GL.ONE_MINUS_SRC_ALPHA); // reset to map default
@@ -396,37 +388,38 @@ public final class TourTrack_Shader {
       final int numTrackVertices = trackBucket.numTrackVertices;
 
       int numVisibleVertices = numTrackVertices;
-      int numVisibleVertices_Debug = numTrackVertices;
+      int numVisibleVertices_ReLive = numTrackVertices;
 
-      final MapPlayerData mapPlayerData = MapPlayerManager.getMapPlayerData();
-      if (mapPlayerData != null && mapPlayerData.allVisible_GeoLocationIndices != null) {
+      final ModelPlayerData modelPlayerData = ModelPlayerManager.getModelPlayerData();
+      if (modelPlayerData != null && modelPlayerData.allVisible_GeoLocationIndices != null) {
 
-         final int numAllVisibleFrames = mapPlayerData.allVisible_GeoLocationIndices.length;
-         final int currentVisiblePositionIndex = MapPlayerManager.getCurrentVisibleGeoLocationIndex();
+         numVisibleVertices_ReLive = ModelPlayerManager.getCurrentVisibleGeoLocationIndex() * 2;
 
-         final float relativeVisibleVertices = (float) currentVisiblePositionIndex / numAllVisibleFrames;
-         numVisibleVertices_Debug = (int) (relativeVisibleVertices * numTrackVertices);
-
-//         if (numVisibleVertices_Debug != _prevValue) {
+//         if (currentVisiblePositionIndex != _prevValue
 //
-//            _prevValue = numVisibleVertices_Debug;
+//               || true
+//
+//         ) {
+//
+//            _prevValue = currentVisiblePositionIndex;
 //
 //            System.out.println(UI.EMPTY_STRING
 //
-//                  + "  all verts: " + numTrackVertices
-//                  + "  visible verts: " + numVisibleVertices_Debug
-//                  + "  currPosIdx: " + currentVisiblePositionIndex
+//                  + "  numVerts: " + String.format("%4d", numTrackVertices)
+//                  + "  visible: " + String.format("%4d", numVisibleVertices_ReLive)
+//                  + "  currPosIdx: " + String.format("%4d", currentVisiblePositionIndex)
+//                  + "  vp2mpScale: " + String.format("%5.2f", vp2mpScale)
 //
 //            );
 //// TODO remove SYSTEM.OUT.PRINTLN
 //         }
       }
 
-      if (MapPlayerManager.isReLivePlaying()) {
+      if (ModelPlayerManager.isReLivePlaying()) {
 
          // show only the first part of the track which the model has already moved
 
-         numVisibleVertices = numVisibleVertices_Debug;
+         numVisibleVertices = numVisibleVertices_ReLive;
       }
 
       /*
@@ -737,7 +730,13 @@ public final class TourTrack_Shader {
    private static void paint_30_ModelCursor(final GLViewport viewport,
                                             final float vp2mpScale) {
 
-      final double[] projectedPositionXY = MapPlayerManager.getCurrentProjectedPosition();
+      if (_mapModelCursorVertices == null) {
+
+         // model is not yet fully setup, sometimes a NPE occurred
+         return;
+      }
+
+      final double[] projectedPositionXY = ModelPlayerManager.getCurrentProjectedPosition();
 
       if (projectedPositionXY == null) {
          return;
@@ -751,8 +750,8 @@ public final class TourTrack_Shader {
 
       final int tileScale = Tile.SIZE << currentMapZoomLevel;
 
-      final double diffX = MapPlayerManager.getCompileMapX() - currentMapPosX;
-      final double diffY = MapPlayerManager.getCompileMapY() - currentMapPosY;
+      final double diffX = ModelPlayerManager.getCompileMapX() - currentMapPosX;
+      final double diffY = ModelPlayerManager.getCompileMapY() - currentMapPosY;
 
       float dX = (float) ((projectedPositionXY[0] - currentMapPosX - diffX) * tileScale) * COORD_SCALE;
       float dY = (float) ((projectedPositionXY[1] - currentMapPosY - diffY) * tileScale) * COORD_SCALE;
@@ -777,78 +776,70 @@ public final class TourTrack_Shader {
       shader.useProgram();
 
       // rotate model to look forward
-      _animationMatrix.setRotation(MapPlayerManager.getModelAngle(), 0f, 0f, 1f);
+      _animationMatrix.setRotation(ModelPlayerManager.getModelAngle(), 0f, 0f, 1f);
       _animationMatrix.setAsUniform(shader.uni_AnimationMVP);
 
-      if (MapPlayerManager.isShowAnimationCursor()) {
+      // set mvp matrix
+      viewport.mvp.setAsUniform(shader.uni_MVP);
 
-         // set mvp matrix
-         viewport.mvp.setAsUniform(shader.uni_MVP);
+      // set animation position
+      gl.uniform2f(shader.uni_ModelCursorPos, dX, dY);
 
-         // set animation position
-         gl.uniform2f(shader.uni_ModelCursorPos, dX, dY);
+      // set viewport scale TO map scale: 1.0...2.0
+      gl.uniform1f(shader.uni_VpScale2CompileScale, vp2mpScale);
 
-         // set viewport scale TO map scale: 1.0...2.0
-         gl.uniform1f(shader.uni_VpScale2CompileScale, vp2mpScale);
+      // set vertices positions
+      final int shader_Attrib_Pos = shader.attrib_Pos;
+      gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_AnimationVertices);
+      gl.enableVertexAttribArray(shader_Attrib_Pos);
+      gl.vertexAttribPointer(
 
-         // set vertices positions
-         final int shader_Attrib_Pos = shader.attrib_Pos;
-         gl.bindBuffer(GL.ARRAY_BUFFER, bufferId_AnimationVertices);
-         gl.enableVertexAttribArray(shader_Attrib_Pos);
-         gl.vertexAttribPointer(
+            shader_Attrib_Pos, //      index of the vertex attribute that is to be modified
+            3, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
+            GL.SHORT, //               data type of each component in the array
+            false, //                  values should be normalized
+            0, //                      offset in bytes between the beginning of consecutive vertex attributes
+            0 //                       offset in bytes of the first component in the vertex attribute array
+      );
 
-               shader_Attrib_Pos, //      index of the vertex attribute that is to be modified
-               3, //                      number of components per vertex attribute, must be 1, 2, 3, or 4
-               GL.SHORT, //               data type of each component in the array
-               false, //                  values should be normalized
-               0, //                      offset in bytes between the beginning of consecutive vertex attributes
-               0 //                       offset in bytes of the first component in the vertex attribute array
-         );
-
-         /*
-          * Draw animation
-          */
-         GLState.test(true, false);
-         gl.depthMask(true);
-         {
-            gl.drawArrays(GL.TRIANGLES, 0, _animationVertices.length);
-         }
-         gl.depthMask(false);
+      /*
+       * Draw animation
+       */
+      GLState.test(true, false);
+      gl.depthMask(true);
+      {
+         gl.drawArrays(GL.TRIANGLES, 0, _mapModelCursorVertices.length);
       }
+      gl.depthMask(false);
 
 //    GLUtils.checkGlError(TourTrack_Shader.class.getName());
 
    }
 
-   private static void setMapPlayerData(final TourTrack_Bucket trackBucket, final GLViewport viewport) {
+   private static void setModelPlayerData(final TourTrack_Bucket trackBucket, final GLViewport viewport) {
 
       if (trackBucket == null) {
          return;
       }
 
-      final MapPlayerData mapPlayerData = new MapPlayerData();
+      final ModelPlayerData modelPlayerData = new ModelPlayerData();
 
 // SET_FORMATTING_OFF
 
-      mapPlayerData.isPlayerEnabled                   = true;
+      modelPlayerData.allProjectedPoints_NormalTrack    = trackBucket.allProjectedPoints;
+      modelPlayerData.allProjectedPoints_ReturnTrack    = trackBucket.allProjectedPoints_ReturnTrack;
+      modelPlayerData.allTimeSeries                     = trackBucket.allTimeSeries;
+      modelPlayerData.allDistanceSeries                 = trackBucket.allDistanceSeries;
 
-      mapPlayerData.allProjectedPoints_NormalTrack    = trackBucket.allProjectedPoints;
-      mapPlayerData.allProjectedPoints_ReturnTrack    = trackBucket.allProjectedPoints_ReturnTrack;
-      mapPlayerData.allTimeSeries                     = trackBucket.allTimeSeries;
-      mapPlayerData.allDistanceSeries                 = trackBucket.allDistanceSeries;
+      modelPlayerData.allNotClipped_GeoLocationIndices  = trackBucket.allNotClipped_GeoLocationIndices;
+      modelPlayerData.allVisible_GeoLocationIndices     = trackBucket.allVisible_GeoLocationIndices;
 
-
-      mapPlayerData.allVisible_PixelPositions         = trackBucket.allVisible_PixelPositions;
-      mapPlayerData.allVisible_GeoLocationIndices     = trackBucket.allVisible_GeoLocationIndices;
-
-      mapPlayerData.allNotClipped_GeoLocationIndices  = trackBucket.allNotClipped_GeoLocationIndices;
-
-      mapPlayerData.trackEnd2StartPixelDistance       = trackBucket.trackEnd2StartPixelDistance;
-      mapPlayerData.mapScale                          = viewport.pos.scale;
+      modelPlayerData.trackEnd2StartPixelDistance       = trackBucket.trackEnd2StartPixelDistance;
+      modelPlayerData.mapScale                          = viewport.pos.scale;
 
 // SET_FORMATTING_ON
 
-      MapPlayerManager.setPlayerData(mapPlayerData);
+      ModelPlayerManager.setPlayerData(modelPlayerData);
    }
 
    public static boolean setupShader() {

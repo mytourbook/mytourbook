@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -110,27 +110,20 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
    public static final String  ID                         = "net.tourbook.preferences.PrefPagePeopleId";            //$NON-NLS-1$
 
    //
-   private static final String    STATE_SELECTED_PERSON               = "selectedPersonId";           //$NON-NLS-1$
-   private static final String    STATE_SELECTED_TAB_FOLDER           = "selectedTabFolder";          //$NON-NLS-1$
+   private static final String    STATE_SELECTED_PERSON     = "selectedPersonId";           //$NON-NLS-1$
+   private static final String    STATE_SELECTED_TAB_FOLDER = "selectedTabFolder";          //$NON-NLS-1$
 
-   public static final int        HEART_BEAT_MIN                      = 10;
-   public static final int        HEART_BEAT_MAX                      = 300;
+   private static final int       HEART_BEAT_MIN            = 10;
+   public static final int        HEART_BEAT_MAX            = 300;
 
    /**
     * Id to indicate that the hr zones should be displayed for the active person when the pref
     * dialog is opened
     */
-   public static final String     PREF_DATA_SELECT_HR_ZONES           = "SelectHrZones";              //$NON-NLS-1$
+   public static final String     PREF_DATA_SELECT_HR_ZONES = "SelectHrZones";              //$NON-NLS-1$
 
-   /**
-    * Id to indicate that the person's information should be displayed for the active person when
-    * the pref
-    * dialog is opened
-    */
-   public static final String     PREF_DATA_SELECT_PERSON_INFORMATION = "SelectPersonInformation";    //$NON-NLS-1$
-
-   private final IPreferenceStore _prefStore                          = TourbookPlugin.getPrefStore();
-   private final IDialogSettings  _state                              = TourbookPlugin.getState(ID);
+   private final IPreferenceStore _prefStore                = TourbookPlugin.getPrefStore();
+   private final IDialogSettings  _state                    = TourbookPlugin.getState(ID);
 
    // REMOVED BIKES 30.4.2011
 
@@ -1631,7 +1624,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       _btnComputeHrZonesForAllTours.setEnabled(_isPersonModified == false);
 
       _txtBodyMassIndex.setText(String.valueOf(
-            UI.computeBodyMassIndex(_spinnerWeight.getSelection() / 10.0, _spinnerHeight.getSelection() / 100.0)));
+            UI.computeBodyMassIndex(_spinnerWeight.getSelection() / 10.0,
+                  _spinnerHeight.getSelection(),
+                  _spinnerHeightInches.getSelection())));
    }
 
    private void fireModifyEvent() {
@@ -2219,8 +2214,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          if (UI.UNIT_IS_ELEVATION_METER) {
             _spinnerHeight.setSelection(Math.round(bodyHeight * 100));
          } else {
-            _spinnerHeight.setSelection((int) Math.floor(bodyHeight / 12));
-            _spinnerHeightInches.setSelection((int) bodyHeight % 12);
+            final float heightFeetInches = bodyHeight / 12;
+            final int heightFeet = (int) Math.floor(heightFeetInches);
+            final int heightInches = (int) ((heightFeetInches - heightFeet) * 10);
+
+            _spinnerHeight.setSelection(heightFeet);
+            _spinnerHeightInches.setSelection(heightInches);
          }
 
          _rawDataPathEditor.setStringValue(person.getRawDataPath());

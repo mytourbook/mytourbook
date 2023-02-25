@@ -157,6 +157,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.Window;
+import org.eclipse.nebula.widgets.tablecombo.TableCombo;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -176,6 +177,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -610,7 +612,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    private ComboViewerCadence _comboCadence;
    //
-   private CLabel             _lblCloudIcon;
    private CLabel             _lblTourType;
    //
    private ControlDecoration  _decoTimeZone;
@@ -622,17 +623,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Combo              _comboWeather_Wind_DirectionText;
    private Combo              _comboWeather_WindSpeedText;
    //
+   private Composite          _compositeTags;
+   //
    private DateTime           _dtStartTime;
    private DateTime           _dtTourDate;
    //
    private Label              _lblAltitudeUpUnit;
    private Label              _lblAltitudeDownUnit;
+   private Label              _lblCloudIcon;
    private Label              _lblDistanceUnit;
    private Label              _lblPerson_BodyWeightUnit;
    private Label              _lblPerson_BodyFatUnit;
    private Label              _lblSpeedUnit;
    private Label              _lblStartTime;
-   private Label              _lblTags;
    private Label              _lblTimeZone;
    private Label              _lblWeather_PrecipitationUnit;
    private Label              _lblWeather_PressureUnit;
@@ -667,6 +670,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Spinner            _spinWeather_Temperature_WindChill;
    private Spinner            _spinWeather_Wind_DirectionValue;
    private Spinner            _spinWeather_Wind_SpeedValue;
+   //
+   private TableCombo         _tableComboWeather_AirQualityIndex;
    //
    private Text               _txtAltitudeDown;
    private Text               _txtAltitudeUp;
@@ -4029,6 +4034,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          createUI_Section_147_Weather_Other_Col1(container);
          createUI_Section_148_Weather_Other_Col2(container);
+
+         createUI_Section_149_Weather_Other_Col1(container);
       }
    }
 
@@ -4090,7 +4097,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                label.setToolTipText(Messages.tour_editor_label_clouds_Tooltip);
 
                // icon: clouds
-               _lblCloudIcon = new CLabel(cloudContainer, SWT.NONE);
+               _lblCloudIcon = new Label(cloudContainer, SWT.NONE);
                GridDataFactory
                      .fillDefaults()//
                      .align(SWT.END, SWT.FILL)
@@ -4621,6 +4628,48 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
+   private void createUI_Section_149_Weather_Other_Col1(final Composite parent) {
+
+      final Composite container = _tk.createComposite(parent);
+      GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
+//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
+      _firstColumnContainerControls.add(container);
+      {
+         /*
+          * Air Quality Index
+          */
+         // label
+         final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_AirQualityIndex);
+         label.setToolTipText(Messages.Tour_Editor_Label_AirQualityIndex_Tooltip);
+         _firstColumnControls.add(label);
+
+         // combo: air quality index
+         _tableComboWeather_AirQualityIndex = new TableCombo(container, SWT.READ_ONLY | SWT.BORDER);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_tableComboWeather_AirQualityIndex);
+         _tk.adapt(_tableComboWeather_AirQualityIndex, true, false);
+         _tableComboWeather_AirQualityIndex.setToolTipText(Messages.Tour_Editor_Label_AirQualityIndex_Tooltip);
+         _tableComboWeather_AirQualityIndex.addModifyListener(_modifyListener);
+         _tableComboWeather_AirQualityIndex.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+
+            // We update the model in the selection listener as the selected
+            // index value comes back with -1 in the modify listener
+            onSelect_AirQualityIndex();
+
+         }));
+         _tableComboWeather_AirQualityIndex.setShowTableHeader(false);
+         _tableComboWeather_AirQualityIndex.defineColumns(1);
+
+         fillAirQualityIndexCombo();
+
+         // force the icon to be displayed to ensure the width is correctly set when the size is computed
+         _isSetField = true;
+         {
+            _tableComboWeather_AirQualityIndex.select(0);
+         }
+         _isSetField = false;
+      }
+   }
+
    private void createUI_Section_150_Characteristics(final Composite parent) {
 
       _sectionCharacteristics = createSection(parent, _tk, Messages.tour_editor_section_characteristics, false, true);
@@ -4642,7 +4691,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _tk.adapt(_linkTag, true, true);
             _firstColumnControls.add(_linkTag);
 
-            _lblTags = _tk.createLabel(container, UI.EMPTY_STRING, SWT.WRAP);
+            _compositeTags = new Composite(container, SWT.NONE);
+            final RowLayout rowLayout = new RowLayout();
+            rowLayout.fill = true;
+            _compositeTags.setLayout(rowLayout);
+            _compositeTags.setLayoutData(rowLayout);
+
             GridDataFactory
                   .fillDefaults()//
                   .grab(true, true)
@@ -4651,7 +4705,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                    */
                   .hint(2 * _hintTextColumnWidth, SWT.DEFAULT)
                   .span(3, 1)
-                  .applyTo(_lblTags);
+                  .applyTo(_compositeTags);
          }
 
          {
@@ -6100,6 +6154,39 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
    }
 
+//   private void displayAirQualityIndexBackground() {
+//
+//      final int selectionIndex = _tableComboWeather_AirQualityIndex.getSelectionIndex();
+//
+//      int color;
+//      switch (selectionIndex) {
+//      //Good
+//      case 1:
+//         color = SWT.COLOR_DARK_GREEN;
+//         break;
+//      //Fair
+//      case 2:
+//         color = SWT.COLOR_YELLOW;
+//         break;
+//      //Moderate
+//      case 3:
+//         color = SWT.COLOR_DARK_YELLOW;
+//         break;
+//      //Poor
+//      case 4:
+//         color = SWT.COLOR_DARK_RED;
+//         break;
+//      //Very poor
+//      case 5:
+//         color = SWT.COLOR_DARK_GRAY;
+//         break;
+//      default:
+//         color = SWT.COLOR_WHITE;
+//         break;
+//      }
+//      _tableComboWeather_AirQualityIndex.setBackground(Display.getCurrent().getSystemColor(color));
+//   }
+
    private void displayTour(final Long tourId) {
 
       if (tourId == null) {
@@ -6469,7 +6556,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _actionOpenMarkerDialog.setTourMarker(selectedMarker);
 
 // SET_FORMATTING_OFF
-      
+
       _actionDeleteTimeSlices_AdjustTourStartTime  .setEnabled(canDeleteTimeSliced);
       _actionDeleteTimeSlices_KeepTime             .setEnabled(canDeleteTimeSliced);
       _actionDeleteTimeSlices_KeepTimeAndDistance  .setEnabled(canDeleteTimeSliced);
@@ -6480,7 +6567,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       _actionSplitTour           .setEnabled(isOneSliceSelected);
       _actionExtractTour         .setEnabled(numberOfSelectedSlices >= 2);
-      
+
 // SET_FORMATTING_ON
 
       // set start/end position into the actions
@@ -6575,6 +6662,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       //Weather
       _linkWeather.setEnabled(canEdit && isWeatherRetrievalActivated);
+      _tableComboWeather_AirQualityIndex.setEnabled(canEdit);
       _comboWeather_Clouds.setEnabled(canEdit);
       _comboWeather_Wind_DirectionText.setEnabled(canEdit);
       _comboWeather_WindSpeedText.setEnabled(canEdit);
@@ -6621,6 +6709,45 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _linkTourType.setEnabled(canEdit);
 
       timeSliceTable.setEnabled(isDeviceTour);
+   }
+
+   private void fillAirQualityIndexCombo() {
+
+      for (int index = 0; index < IWeather.airQualityIndexTexts.length; index++) {
+
+         final TableItem tableItem = new TableItem(_tableComboWeather_AirQualityIndex.getTable(), SWT.NONE);
+
+         // set the column text
+         tableItem.setText(IWeather.airQualityIndexTexts[index]);
+
+         int color;
+         switch (index) {
+         //Good
+         case 1:
+            color = SWT.COLOR_DARK_GREEN;
+            break;
+         //Fair
+         case 2:
+            color = SWT.COLOR_YELLOW;
+            break;
+         //Moderate
+         case 3:
+            color = SWT.COLOR_DARK_YELLOW;
+            break;
+         //Poor
+         case 4:
+            color = SWT.COLOR_DARK_RED;
+            break;
+         //Very poor
+         case 5:
+            color = SWT.COLOR_DARK_GRAY;
+            break;
+         default:
+            color = SWT.COLOR_WHITE;
+            break;
+         }
+         tableItem.setBackground(Display.getCurrent().getSystemColor(color));
+      }
    }
 
    private void fillContextMenu_SwimSlice(final IMenuManager menuMgr) {
@@ -7408,6 +7535,17 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void onResizeTab1() {
       _tab1Container.setMinSize(_tourContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+   }
+
+   private void onSelect_AirQualityIndex() {
+
+      final int airQualityIndex_SelectionIndex = _tableComboWeather_AirQualityIndex.getSelectionIndex();
+      String airQualityIndexValue = IWeather.airQualityIndexTexts[airQualityIndex_SelectionIndex];
+      if (airQualityIndexValue.equals(IWeather.airQualityIndexIsNotDefined)) {
+         // replace invalid value
+         airQualityIndexValue = UI.EMPTY_STRING;
+      }
+      _tourData.setWeather_AirQualityIndex(airQualityIndexValue);
    }
 
    private void onSelect_Slice(final SelectionChangedEvent selectionChangedEvent) {
@@ -8617,6 +8755,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _tourData.setWeather_Temperature_WindChill(UI.convertTemperatureToMetric(temperature_WindChill));
          }
 
+         // Air Quality Index
+//         final int airQualityIndex_SelectionIndex = _tableComboWeather_AirQualityIndex.getSelectionIndex();
+//         String airQualityIndexValue = IWeather.airQualityIndexText[airQualityIndex_SelectionIndex];
+//         if (airQualityIndexValue.equals(IWeather.airQualityIndexIsNotDefined)) {
+//            // replace invalid value
+//            airQualityIndexValue = UI.EMPTY_STRING;
+//         }
+//         _tourData.setWeather_AirQualityIndex(airQualityIndexValue);
+
          /*
           * Time
           */
@@ -9049,10 +9196,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       displayCloudIcon();
 
       final boolean isTourTemperatureDeviceValid = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0;
-      final boolean isTourTemperatureValid = _tourData.getWeather_Temperature_Average() != 0 ||
-            _tourData.getWeather_Temperature_Max() != 0 ||
-            _tourData.getWeather_Temperature_Min() != 0 ||
-            _tourData.isWeatherDataFromProvider();
+      final boolean temperaturesExist = _tourData.isTemperatureAvailable();
+
       /*
        * Avg temperature from Device
        */
@@ -9085,7 +9230,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Temperature_Average.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_Average.setDigits(1);
       int avgTemperatureValue = 0;
-      if (isTourTemperatureValid) {
+      if (temperaturesExist) {
          avgTemperatureValue = Math.round(avgTemperature * 10);
 
       }
@@ -9099,7 +9244,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Temperature_Min.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_Min.setDigits(1);
       int minTemperatureValue = 0;
-      if (isTourTemperatureValid) {
+      if (temperaturesExist) {
          minTemperatureValue = Math.round(minTemperature * 10);
 
       }
@@ -9113,7 +9258,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Temperature_Max.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_Max.setDigits(1);
       int maxTemperatureValue = 0;
-      if (isTourTemperatureValid) {
+      if (temperaturesExist) {
          maxTemperatureValue = Math.round(maxTemperature * 10);
 
       }
@@ -9127,7 +9272,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Temperature_WindChill.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_WindChill.setDigits(1);
       int avgWindChillValue = 0;
-      if (isTourTemperatureValid) {
+      if (temperaturesExist) {
          avgWindChillValue = Math.round(avgWindChill * 10);
 
       }
@@ -9172,6 +9317,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _spinWeather_PressureValue.setSelection(Math.round(pressure * 100));
       }
       _spinWeather_PressureValue.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
+
+      // Air Quality Index
+      _tableComboWeather_AirQualityIndex.select(_tourData.getWeather_AirQualityIndex_TextIndex());
+
+      // background must be displayed after the combobox entry is selected
+      //  displayAirQualityIndexBackground();
 
       /*
        * Time
@@ -9246,7 +9397,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // tour type/tags
       net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
-      net.tourbook.ui.UI.updateUI_Tags(_tourData, _lblTags);
+      net.tourbook.ui.UI.updateUI_TagsWithImage(_pc, _tourData.getTourTags(), _compositeTags);
 
       // measurement system
       _lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
@@ -9535,7 +9686,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // tour type/tags
       net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
-      net.tourbook.ui.UI.updateUI_Tags(_tourData, _lblTags);
+      net.tourbook.ui.UI.updateUI_TagsWithImage(_pc, _tourData.getTourTags(), _compositeTags);
 
       // reflow layout that the tags are aligned correctly
       _tourContainer.layout(true);

@@ -1,4 +1,4 @@
-23.next.0                                                 ?. Month 2023
+23.next.0                                                 ?. March 2023
 
 
 TODO's
@@ -26,22 +26,14 @@ Experimental
 New
 ===
 
-* 
+*
+  
   
 
 Improvements
 ============
 
-Tour Filter
-  - Filter tours by "Most Recent", e.g. show tours for the last 15 months
-    https://github.com/mytourbook/mytourbook/issues/976
-
-Tour Editor
-  - Keep distance values when time slices are deleted
-    https://github.com/mytourbook/mytourbook/issues/986
-  
-* 4k Display
-  - Increased cursor size in Tour Chart and 2D Map, when displayed on 4k displays
+*
 
 
 Changes
@@ -68,8 +60,8 @@ Translation
 System   
 ======
 
-* Milestone             https://github.com/mytourbook/mytourbook/milestone/6?closed=1
+* MyTourbook Milestone 23.3   https://github.com/mytourbook/mytourbook/milestone/6?closed=1
 * Eclipse 2022-06
-* NatTable 2.03         https://www.eclipse.org/nattable/download.php
-* FIT SDK 21.94
-* WorldWind 2.2.1       https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1
+* NatTable 2.03               https://www.eclipse.org/nattable/download.php
+* FIT SDK 21.105
+* WorldWind 2.2.1             https://github.com/NASAWorldWind/WorldWindJava/releases/tag/v2.2.1

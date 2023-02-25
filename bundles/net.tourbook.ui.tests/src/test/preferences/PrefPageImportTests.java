@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -27,7 +27,7 @@ public class PrefPageImportTests extends UITest {
 
    private void openFitPage(final SWTBotTreeItem importTreeItem) {
 
-      Utils.openVendorPage(importTreeItem, "Fit");
+      Utils.openVendorPage(importTreeItem, "Fit"); //$NON-NLS-1$
 
       bot.cTabItem(Messages.PrefPage_Fit_Group_Speed).activate();
       bot.cTabItem(Messages.PrefPage_Fit_Group_AdjustTemperature).activate();
@@ -41,16 +41,16 @@ public class PrefPageImportTests extends UITest {
    void openImportPages() {
 
       Utils.openPreferences(bot);
-      final SWTBotTreeItem importTreeItem = bot.tree().getTreeItem("Import").select();
+      final SWTBotTreeItem importTreeItem = bot.tree().getTreeItem("Import").select(); //$NON-NLS-1$
       importTreeItem.expand();
 
-      Utils.openVendorPage(importTreeItem, "Daum Ergometer");
+      Utils.openVendorPage(importTreeItem, "Daum Ergometer"); //$NON-NLS-1$
       openFitPage(importTreeItem);
-      Utils.openVendorPage(importTreeItem, "GPX");
-      Utils.openVendorPage(importTreeItem, "HAC 4/5");
-      Utils.openVendorPage(importTreeItem, "Polar");
-      Utils.openVendorPage(importTreeItem, "Suunto Spartan/9");
-      Utils.openVendorPage(importTreeItem, "TCX");
+      Utils.openVendorPage(importTreeItem, "GPX"); //$NON-NLS-1$
+      Utils.openVendorPage(importTreeItem, "HAC 4/5"); //$NON-NLS-1$
+      Utils.openVendorPage(importTreeItem, "Polar"); //$NON-NLS-1$
+      Utils.openVendorPage(importTreeItem, "Suunto Spartan/9"); //$NON-NLS-1$
+      Utils.openVendorPage(importTreeItem, "TCX"); //$NON-NLS-1$
 
       Utils.clickApplyAndCloseButton(bot);
    }

@@ -461,6 +461,7 @@ public class Messages extends NLS {
    public static String        Db_Field_TourData_Weather;
    public static String        Db_Field_TourMarker_UrlAddress;
    public static String        Db_Field_TourMarker_UrlText;
+   public static String        Db_Field_TourTag_ImageFilePath;
    public static String        Db_Field_TourTag_Name;
    public static String        Db_Field_TourTag_Notes;
 
@@ -740,13 +741,13 @@ public class Messages extends NLS {
    public static String        dialog_is_tour_editor_modified_title;
 
    public static String        Dialog_JoinTours_Checkbox_CreateTourMarker;
+   public static String        Dialog_JoinTours_Checkbox_DeleteSourceTours;
    public static String        Dialog_JoinTours_Checkbox_IncludeDescription;
    public static String        Dialog_JoinTours_Checkbox_IncludeMarkerWaypoints;
-   public static String        Dialog_JoinTours_Checkbox_InsertPauses;
    public static String        Dialog_JoinTours_ComboText_ConcatenateTime;
    public static String        Dialog_JoinTours_ComboText_KeepTime;
    public static String        Dialog_JoinTours_ComboText_MarkerTourTime;
-   public static String        Dialog_JoinTours_ComboText_TourTileCustom;
+   public static String        Dialog_JoinTours_ComboText_TourTitleCustom;
    public static String        Dialog_JoinTours_ComboText_TourTitleFromTour;
    public static String        Dialog_JoinTours_ComboText_TourTypeCustom;
    public static String        Dialog_JoinTours_ComboText_TourTypeFromTour;
@@ -877,7 +878,7 @@ public class Messages extends NLS {
    public static String        Dialog_SplitTour_Checkbox_KeepTime;
    public static String        Dialog_SplitTour_ComboText_KeepSlices;
    public static String        Dialog_SplitTour_ComboText_RemoveSlices;
-   public static String        Dialog_SplitTour_ComboText_TourTileCustom;
+   public static String        Dialog_SplitTour_ComboText_TourTitleCustom;
    public static String        Dialog_SplitTour_ComboText_TourTitleFromFirstMarker;
    public static String        Dialog_SplitTour_ComboText_TourTitleFromTour;
    public static String        Dialog_SplitTour_ComboText_TourTypeCustom;
@@ -900,6 +901,10 @@ public class Messages extends NLS {
    public static String        Dialog_TourTagCategory_Title;
    public static String        Dialog_TourTag_EditTag_Message;
    public static String        Dialog_TourTag_EditTag_Title;
+   public static String        Dialog_TourTag_FileDialog_ImageFiles;
+   public static String        Dialog_TourTag_ImportImage_Title;
+   public static String        Dialog_TourTag_Label_Image;
+   public static String        Dialog_TourTag_Label_ImageNotFound;
    public static String        Dialog_TourTag_Label_Notes;
    public static String        Dialog_TourTag_Label_TagName;
    public static String        Dialog_TourTag_Title;
@@ -1301,13 +1306,18 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Dialog_ValidationAddName;
    public static String        Map_Bookmark_Dialog_ValidationRename;
 
+   public static String        Map_Model_Name_Bicycle;
+   public static String        Map_Model_Name_HighWheeler;
+   public static String        Map_Model_Name_Skateboard;
+
+   public static String        Map_Player_Button_MapModel_Tooltip;
+   public static String        Map_Player_Button_MapModelCursor_Tooltip;
    public static String        Map_Player_Button_Pause_Tooltip;
    public static String        Map_Player_Button_Play_Tooltip;
    public static String        Map_Player_Button_PlayLoop_Tooltip;
    public static String        Map_Player_Checkbox_ReLivePlaying;
    public static String        Map_Player_Error_InvalidModelFilepath;
    public static String        Map_Player_Label_ModelCursorSize;
-   public static String        Map_Player_Label_ModelCursorSize_Tooltip;
    public static String        Map_Player_Label_ModelSize;
    public static String        Map_Player_Label_Speed;
    public static String        Map_Player_Label_SpeedMultiplier;
@@ -1745,6 +1755,7 @@ public class Messages extends NLS {
    public static String        pref_tourtag_btn_new_tag;
    public static String        pref_tourtag_btn_new_tag_category;
    public static String        pref_tourtag_btn_reset;
+   public static String        Pref_TourTag_Column_ImageFilePath;
    public static String        Pref_TourTag_Column_Notes;
    public static String        Pref_TourTag_Column_TagsAndCategories;
    public static String        pref_tourtag_dlg_new_tag_category_message;
@@ -2088,8 +2099,6 @@ public class Messages extends NLS {
    public static String        Slideout_Map25Provider_Label_MapProvider;
    public static String        Slideout_Map25Provider_Label_MapProvider_Title;
    public static String        Slideout_Map25Provider_Label_ThemeStyle;
-   public static String        Slideout_Map25TrackOptions_Checkbox_AnimateDirectionArrows;
-   public static String        Slideout_Map25TrackOptions_Checkbox_AnimateDirectionArrows_Tooltip;
    public static String        Slideout_Map25TrackOptions_Checkbox_Outline;
    public static String        Slideout_Map25TrackOptions_Checkbox_Outline_Tooltip;
    public static String        Slideout_Map25TrackOptions_Checkbox_TrackVerticalOffset;
@@ -2174,7 +2183,7 @@ public class Messages extends NLS {
    public static String        Slideout_Map_Options_Label_SliderLocation_Size;
    public static String        Slideout_Map_Options_Label_SliderPath_Color;
    public static String        Slideout_Map_Options_Label_SliderPath_Color_Tooltip;
-   public static String        Slideout_Map_Options_Label_SliderPath_Segements;
+   public static String        Slideout_Map_Options_Label_SliderPath_Segments;
    public static String        Slideout_Map_Options_Label_SliderPath_Width;
    public static String        Slideout_Map_Options_Label_Title;
    public static String        Slideout_Map_Options_Label_TourDirection_DistanceBetweenMarkers;
@@ -2784,6 +2793,8 @@ public class Messages extends NLS {
    public static String        tour_editor_dlg_save_tour_title;
    public static String        Tour_Editor_Label_AirPressure;
    public static String        Tour_Editor_Label_AirPressure_Tooltip;
+   public static String        Tour_Editor_Label_AirQualityIndex;
+   public static String        Tour_Editor_Label_AirQualityIndex_Tooltip;
    public static String        Tour_Editor_Label_AltitudeDown;
    public static String        Tour_Editor_Label_AltitudeUp;
    public static String        Tour_Editor_Label_BodyFat;

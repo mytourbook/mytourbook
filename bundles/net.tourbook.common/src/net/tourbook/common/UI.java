@@ -87,6 +87,7 @@ import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.graphics.TextLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
@@ -137,6 +138,7 @@ public class UI {
    public static final String       DASH_WITH_DOUBLE_SPACE             = "   -   ";             //$NON-NLS-1$
    public static final String       DIMENSION                          = " x ";                 //$NON-NLS-1$
    public static final String       EMPTY_STRING                       = "";                    //$NON-NLS-1$
+   public static final String       MNEMONIC                           = "&";                   //$NON-NLS-1$
    public static final String       NEW_LINE_TEXT_WIDGET               = "\r\n";                //$NON-NLS-1$
    public static final String       NEW_LINE1                          = "\n";                  //$NON-NLS-1$
    public static final String       NEW_LINE2                          = "\n\n";                //$NON-NLS-1$
@@ -982,17 +984,28 @@ public class UI {
     * @param weight
     *           The user's weight in kilograms or pounds.
     * @param height
-    *           The user's height in meters or inches.
+    *           The user's height in meters or feet.
+    * @param heightInches
+    *           The second part of the user's height in inches if the measurement
+    *           system is in inches.
     * @return The BMI value.
     */
-   public static float computeBodyMassIndex(double weight, double height) {
+   public static float computeBodyMassIndex(double weight, double height, final int heightInches) {
 
       if (UNIT_IS_LENGTH_SMALL_INCH) {
-         height = height / UNIT_INCH / 1000;
+
+         height *= 12;
+         height += heightInches;
+         height = height / UNIT_INCH / 10;
+         height = Math.round(height * 10 / 10);
       }
       if (UNIT_IS_WEIGHT_POUND) {
+
          weight /= UNIT_VALUE_WEIGHT;
+         weight = Math.round(weight * 10 / 10);
       }
+
+      height = height / 100;
 
       final double bmi = height == 0 ? 0 : weight / Math.pow(height, 2);
 
@@ -1363,37 +1376,43 @@ public class UI {
       return pageNoData;
    }
 
-   public static Color disposeResource(final Color resource) {
-      if ((resource != null) && !resource.isDisposed()) {
-         resource.dispose();
-      }
-      return null;
-   }
-
    public static Cursor disposeResource(final Cursor resource) {
-      if ((resource != null) && !resource.isDisposed()) {
+
+      if (resource != null) {
          resource.dispose();
       }
+
       return null;
    }
 
    /**
-    * disposes a resource
+    * Disposes an image resource
     *
     * @param image
     * @return
     */
    public static Image disposeResource(final Image resource) {
-      if ((resource != null) && !resource.isDisposed()) {
+
+      if (resource != null) {
          resource.dispose();
       }
+
       return null;
    }
 
    public static org.eclipse.swt.graphics.Font disposeResource(final org.eclipse.swt.graphics.Font font) {
 
-      if (font != null && font.isDisposed() == false) {
+      if (font != null) {
          font.dispose();
+      }
+
+      return null;
+   }
+
+   public static Resource disposeResource(final Resource resource) {
+
+      if (resource != null) {
+         resource.dispose();
       }
 
       return null;

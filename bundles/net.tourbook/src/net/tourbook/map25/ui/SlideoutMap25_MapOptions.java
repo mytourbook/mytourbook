@@ -111,7 +111,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
 //       container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_BLUE));
          {
             createUI_10_Title(container);
-            createUI_80_Controls(container);
+            createUI_20_Controls(container);
          }
       }
 
@@ -131,7 +131,7 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             .applyTo(label);
    }
 
-   private void createUI_80_Controls(final Composite parent) {
+   private void createUI_20_Controls(final Composite parent) {
 
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, false).applyTo(container);
@@ -152,11 +152,14 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
             _spinnerMapCenter_VerticalPosition.setMinimum((int) -Map25App.MAP_CENTER_VERTICAL_MAX_VALUE);
             _spinnerMapCenter_VerticalPosition.setMaximum((int) Map25App.MAP_CENTER_VERTICAL_MAX_VALUE);
             _spinnerMapCenter_VerticalPosition.setIncrement(1);
-            _spinnerMapCenter_VerticalPosition.setPageIncrement(5);
+            _spinnerMapCenter_VerticalPosition.setPageIncrement(10);
             _spinnerMapCenter_VerticalPosition.setToolTipText(Messages.Slideout_Map25Options_Checkbox_MapCenter_VerticalPosition_Tooltip);
 
             _spinnerMapCenter_VerticalPosition.addSelectionListener(_defaultSelectionListener);
-            _spinnerMapCenter_VerticalPosition.addMouseWheelListener(_mouseWheelListener);
+            _spinnerMapCenter_VerticalPosition.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+               onChangeUI();
+            });
          }
          {
             /*
@@ -203,7 +206,9 @@ public class SlideoutMap25_MapOptions extends ToolbarSlideout {
    private void enableControls() {
 
       final boolean isMapCenter_VerticalPosition = _chkMapCenter_VerticalPosition.getSelection();
+      final boolean isBackgroundFPS = _chkIsBackgroundFPS.getSelection();
 
+      _spinnerBackgroundFPS.setEnabled(isBackgroundFPS);
       _spinnerMapCenter_VerticalPosition.setEnabled(isMapCenter_VerticalPosition);
    }
 

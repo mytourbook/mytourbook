@@ -42,8 +42,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.map.model.MapModel;
 import net.tourbook.map.model.MapModelManager;
-import net.tourbook.map.player.MapPlayerManager;
-import net.tourbook.map25.Map25ConfigManager;
+import net.tourbook.map.player.ModelPlayerManager;
 
 import org.oscim.backend.GL;
 import org.oscim.core.MapPosition;
@@ -239,9 +238,14 @@ public class GLTFModel_Renderer extends LayerRenderer {
     */
    void onMapEvent(final Event mapEvent, final MapPosition mapPosition) {
 
-      if (mapEvent != Map.POSITION_EVENT && mapEvent != Map.SCALE_EVENT) {
+      if (mapPosition != null && _currentMapPosition == null) {
+
+         // ensure that the initial map position is set, otherwise the model is not rendered
+
+      } else if (mapEvent != Map.POSITION_EVENT && mapEvent != Map.SCALE_EVENT) {
 
          // ignore other events
+
          return;
       }
 
@@ -260,7 +264,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
    @Override
    public void render(final GLViewport viewport) {
 
-      if (Map25ConfigManager.getActiveTourTrackConfig().arrow_IsAnimate == false) {
+      if (ModelPlayerManager.isMapModelVisible() == false) {
          return;
       }
 
@@ -276,13 +280,13 @@ public class GLTFModel_Renderer extends LayerRenderer {
 //       _gltfRenderer.allModelInstances.addAll(_allModelInstances);
 //    }
 
-      if (MapPlayerManager.isCompileMapScaleModified()) {
+      if (ModelPlayerManager.isCompileMapScaleModified()) {
 
          _mapCamera.setMapPosition(
 
                _currentMapPosition.x,
                _currentMapPosition.y,
-               MapPlayerManager.getCompileMapScale());
+               ModelPlayerManager.getCompileMapScale());
       }
 
       _mapCamera.update(viewport);
@@ -381,7 +385,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
     */
    private void render_UpdateModelPosition() {
 
-      final double[] projectedPositionXY = MapPlayerManager.getCurrentProjectedPosition();
+      final double[] projectedPositionXY = ModelPlayerManager.getCurrentProjectedPosition();
 
       if (projectedPositionXY == null) {
          return;
@@ -437,9 +441,9 @@ public class GLTFModel_Renderer extends LayerRenderer {
       if (isFixedSize) {
 
          // viewport scale 2 map scale: 1...2
-         final float vp2mp = (float) (currentMapScale / MapPlayerManager.getCompileMapScale());
+         final float vp2mp = (float) (currentMapScale / ModelPlayerManager.getCompileMapScale());
 
-         final float vp2mpModelSize = MapPlayerManager.getFixedModelSize() / vp2mp;
+         final float vp2mpModelSize = ModelPlayerManager.getModelSize() / vp2mp;
 
          /**
           * This algorithm is not perfect as the model can still be flickering (size is larger or
@@ -486,7 +490,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
        * - translate head to center<br>
        * - translate symbol to geo location<br>
        */
-      float animationAngle = -MapPlayerManager.getModelAngle();
+      float animationAngle = -ModelPlayerManager.getModelAngle();
       animationAngle += _modelForwardAngle;
 
       final double modelHalfSize = modelSize / 2;

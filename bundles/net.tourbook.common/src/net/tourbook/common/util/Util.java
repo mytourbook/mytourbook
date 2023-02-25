@@ -56,7 +56,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.RGBA;
-import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -649,13 +648,6 @@ public class Util {
       } catch (final SecurityException e) {
          StatusUtil.showStatus(String.format("Temp file cannot be deleted: %s", tempFile.getAbsolutePath())); //$NON-NLS-1$
       }
-   }
-
-   public static Resource disposeResource(final Resource resource) {
-      if (resource != null && !resource.isDisposed()) {
-         resource.dispose();
-      }
-      return null;
    }
 
    public static void dumpChildren(final Control parent, final int indent) {

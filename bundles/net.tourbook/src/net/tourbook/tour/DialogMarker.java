@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -1087,7 +1087,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
             cell.setText(description.length() == 0 ? UI.EMPTY_STRING : UI.SYMBOL_STAR);
          }
       });
-      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(4), false));
+
+      tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 4));
    }
 
    /**
@@ -1119,7 +1120,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
             }
          }
       });
-      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(11), false));
+      tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 11));
    }
 
    /**
@@ -1145,7 +1146,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
                   : Messages.App_Label_BooleanNo);
          }
       });
-      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(8), false));
+      tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 8));
    }
 
    /**
@@ -1188,7 +1189,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
             cell.setText(Integer.toString(tourMarker.getLabelXOffset()));
          }
       });
-      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(6), false));
+      tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 6));
    }
 
    /**
@@ -1210,7 +1211,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
             cell.setText(Integer.toString(tourMarker.getLabelYOffset()));
          }
       });
-      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(6), false));
+      tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 6));
    }
 
    /**
@@ -1237,7 +1238,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
                   : UI.EMPTY_STRING);
          }
       });
-      tableLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(4), false));
+      tableLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 4));
    }
 
    private void deleteTourMarker(final TourMarker tourMarker) {
@@ -1285,7 +1286,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
 
       _firstColumnControls.clear();
 
-      Util.disposeResource(_imagePaste);
+      UI.disposeResource(_imagePaste);
    }
 
    private void enableControls() {

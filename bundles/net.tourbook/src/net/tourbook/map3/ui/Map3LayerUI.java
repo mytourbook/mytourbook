@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,7 +37,6 @@ import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
-import org.eclipse.jface.viewers.ColumnPixelData;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ICellEditorListener;
@@ -67,7 +66,7 @@ public class Map3LayerUI {
 
    private static final String        OPACITY_CAN_NOT_BE_SET = "....";                               //$NON-NLS-1$
 
-   public static final Double         DEFAULT_OPACITY        = Double.valueOf(1.0);
+   private static final Double        DEFAULT_OPACITY        = Double.valueOf(1.0);
 
    private ContainerCheckedTreeViewer _layerViewer;
    private SlideoutMap3LayerTooltip   _propToolTip;
@@ -415,7 +414,7 @@ public class Map3LayerUI {
             }
          }
       });
-      treeLayout.setColumnData(tc, new ColumnPixelData(_pc.convertWidthInCharsToPixels(8), false));
+      treeLayout.setColumnData(tc, net.tourbook.ui.UI.getColumnPixelWidth(_pc, 8));
    }
 
    private void initUI(final Composite parent) {
@@ -574,13 +573,13 @@ public class Map3LayerUI {
       Map3Manager.saveUIState(_layerViewer.getCheckedElements(), _layerViewer.getExpandedElements());
    }
 
-   public void setLayerVisible(final TVIMap3Layer tviLayer, final boolean isVisible) {
+   void setLayerVisible(final TVIMap3Layer tviLayer, final boolean isVisible) {
 
       // update viewer
       _layerViewer.setChecked(tviLayer, isVisible);
    }
 
-   public void setLayerVisible_TourTrack(final TVIMap3Layer tviLayer, final boolean isTrackVisible) {
+   void setLayerVisible_TourTrack(final TVIMap3Layer tviLayer, final boolean isTrackVisible) {
 
       setLayerVisible_TourTrack(tviLayer, isTrackVisible, true, false);
    }
@@ -639,7 +638,7 @@ public class Map3LayerUI {
       _layerViewer.update(tviLayer, null);
    }
 
-   public void updateUI_NewLayer(final ArrayList<TVIMap3Layer> insertedLayers) {
+   void updateUI_NewLayer(final ArrayList<TVIMap3Layer> insertedLayers) {
 
       // get a set of unique parents
       final HashSet<TreeViewerItem> parentItems = new HashSet<>();

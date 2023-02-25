@@ -36,6 +36,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 
@@ -172,7 +173,8 @@ public class DirectMappingPainter implements IDirectPainter {
          alpha = opacity;
       }
 
-      final Color lineColor = new Color(gc.getDevice(), _sliderPathPaintingData.color);
+      //todo fb
+      final Color lineColor = new Color(gc.getDevice(), new RGB(97, 93, 93));
 
       gc.setLineWidth(_sliderPathPaintingData.lineWidth);
       gc.setLineCap(SWT.CAP_ROUND);

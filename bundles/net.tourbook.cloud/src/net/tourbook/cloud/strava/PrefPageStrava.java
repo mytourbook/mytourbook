@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,7 +17,6 @@ package net.tourbook.cloud.strava;
 
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,13 +28,11 @@ import net.tourbook.cloud.oauth2.LocalHostServer;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.preferences.PrefPageTourTypeFilterList;
 import net.tourbook.web.WEB;
 
-import org.apache.http.client.utils.URIBuilder;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
@@ -349,7 +346,7 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
    @Override
    public void dispose() {
 
-      Util.disposeResource(_imageStravaConnect);
+      UI.disposeResource(_imageStravaConnect);
 
       super.dispose();
    }
@@ -425,21 +422,18 @@ public class PrefPageStrava extends FieldEditorPreferencePage implements IWorkbe
          return;
       }
 
-      final URIBuilder authorizeUrlBuilder = new URIBuilder();
-      authorizeUrlBuilder.setScheme("https"); //$NON-NLS-1$
-      authorizeUrlBuilder.setHost("www.strava.com"); //$NON-NLS-1$
-      authorizeUrlBuilder.setPath("/oauth/authorize"); //$NON-NLS-1$
-      authorizeUrlBuilder.addParameter(OAuth2Constants.PARAM_RESPONSE_TYPE, OAuth2Constants.PARAM_CODE);
-      authorizeUrlBuilder.addParameter(OAuth2Constants.PARAM_CLIENT_ID, ClientId);
-      authorizeUrlBuilder.addParameter(OAuth2Constants.PARAM_REDIRECT_URI, "http://localhost:" + CALLBACK_PORT); //$NON-NLS-1$
-      authorizeUrlBuilder.addParameter("scope", "read,activity:write"); //$NON-NLS-1$ //$NON-NLS-2$
-      try {
-         final String authorizeUrl = authorizeUrlBuilder.build().toString();
+      final StringBuilder authorizeUrl = new StringBuilder(_stravaApp_WebPage_Link + "/oauth/authorize" + UI.SYMBOL_QUESTION_MARK); //$NON-NLS-1$
 
-         Display.getDefault().syncExec(() -> WEB.openUrl(authorizeUrl));
-      } catch (final URISyntaxException e) {
-         StatusUtil.log(e);
-      }
+// SET_FORMATTING_OFF
+
+      authorizeUrl.append(      OAuth2Constants.PARAM_RESPONSE_TYPE + "=" + OAuth2Constants.PARAM_CODE); //$NON-NLS-1$
+      authorizeUrl.append("&" + OAuth2Constants.PARAM_CLIENT_ID +     "=" + ClientId); //$NON-NLS-1$ //$NON-NLS-2$
+      authorizeUrl.append("&" + OAuth2Constants.PARAM_REDIRECT_URI +  "=" + "http://localhost:" + CALLBACK_PORT); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      authorizeUrl.append("&" + "scope" +                             "=" + "read,activity:write"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+
+// SET_FORMATTING_ON
+
+      Display.getDefault().syncExec(() -> WEB.openUrl(authorizeUrl.toString()));
    }
 
    @Override

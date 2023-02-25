@@ -149,7 +149,6 @@ import org.eclipse.swt.graphics.Path;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.graphics.Transform;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -1172,14 +1171,8 @@ public class Map2 extends Canvas {
       grid_UpdatePaintingStateData();
    }
 
-   private void disposeResource(final Resource resource) {
-
-      if ((resource != null) && !resource.isDisposed()) {
-         resource.dispose();
-      }
-   }
-
    public void disposeTiles() {
+
       _mp.disposeTiles();
    }
 
@@ -2731,19 +2724,19 @@ public class Map2 extends Canvas {
          _dropTarget.dispose();
       }
 
-      disposeResource(_mapImage);
-      disposeResource(_poiImage);
+      UI.disposeResource(_mapImage);
+      UI.disposeResource(_poiImage);
 
-      disposeResource(_9PartImage);
-      disposeResource(_9PartGC);
+      UI.disposeResource(_9PartImage);
+      UI.disposeResource(_9PartGC);
 
-      disposeResource(_cursorCross);
-      disposeResource(_cursorDefault);
-      disposeResource(_cursorHand);
-      disposeResource(_cursorPan);
-      disposeResource(_cursorSearchTour);
-      disposeResource(_cursorSearchTour_Scroll);
-      disposeResource(_cursorSelect);
+      UI.disposeResource(_cursorCross);
+      UI.disposeResource(_cursorDefault);
+      UI.disposeResource(_cursorHand);
+      UI.disposeResource(_cursorPan);
+      UI.disposeResource(_cursorSearchTour);
+      UI.disposeResource(_cursorSearchTour_Scroll);
+      UI.disposeResource(_cursorSelect);
 
       // dispose resources in the overlay plugins
       for (final Map2Painter overlay : _allMapPainter) {
@@ -2759,7 +2752,7 @@ public class Map2 extends Canvas {
 
       // dispose legend image
       if (_mapLegend != null) {
-         disposeResource(_mapLegend.getImage());
+         UI.disposeResource(_mapLegend.getImage());
       }
 
       if (_poi_Tooltip != null) {
@@ -6792,10 +6785,10 @@ public class Map2 extends Canvas {
     */
    public void setLegend(final MapLegend legend) {
 
-      if ((legend == null) && (_mapLegend != null)) {
+      if (legend == null && _mapLegend != null) {
 
          // dispose legend image
-         disposeResource(_mapLegend.getImage());
+         UI.disposeResource(_mapLegend.getImage());
       }
 
       _mapLegend = legend;

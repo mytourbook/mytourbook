@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -105,6 +105,6 @@ public class GarminTCX_DeviceDataReader extends TourbookDevice {
 
    @Override
    public boolean validateRawData(final String fileName) {
-      return isValidXMLFile(fileName, XML_GARMIN_TAG);
+      return isValidXMLFile(fileName, XML_GARMIN_TAG, false, true);
    }
 }

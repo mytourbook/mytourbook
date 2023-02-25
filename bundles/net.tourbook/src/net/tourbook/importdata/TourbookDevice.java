@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
+import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -76,7 +77,7 @@ public abstract class TourbookDevice implements IRawDataReader {
    /**
     * Sort priority (since version 10.11), default will sort devices to the end.
     */
-   public int    extensionSortPriority = Integer.MAX_VALUE;
+   int           extensionSortPriority = Integer.MAX_VALUE;
 
 // disabled in version 10.10, it seems to be not used anymore
 //   /**
@@ -95,32 +96,32 @@ public abstract class TourbookDevice implements IRawDataReader {
     * When set to {@link RawDataManager#ADJUST_IMPORT_YEAR_IS_DISABLED} this is ignored otherwise
     * this year is used as the import year.
     */
-   public int     importYear           = RawDataManager.ADJUST_IMPORT_YEAR_IS_DISABLED;
+   public int      importYear           = RawDataManager.ADJUST_IMPORT_YEAR_IS_DISABLED;
 
    /**
     * When <code>true</code> the tracks in one file will be merged into one track, a marker is
     * created for each track.
     */
-   public boolean isMergeTracks        = false;
+   public boolean  isMergeTracks        = false;
 
    /**
     * when <code>true</code> validate the checksum when importing data
     */
-   public boolean isChecksumValidation = true;
+   public boolean  isChecksumValidation = true;
 
    /**
     * A tour id will be created with elapsed time when <code>true</code>.
     */
-   public boolean isCreateTourIdWithElapsedTime;
+   private boolean isCreateTourIdWithElapsedTime;
 
    /**
     * When <code>true</code> imported waypoints will be converted into {@link TourMarker}.
     */
-   public boolean isConvertWayPoints;
+   public boolean  isConvertWayPoints;
 
-   public TourbookDevice() {}
+   protected TourbookDevice() {}
 
-   public TourbookDevice(final String deviceName) {
+   protected TourbookDevice(final String deviceName) {
       visibleName = deviceName;
    }
 
@@ -155,10 +156,10 @@ public abstract class TourbookDevice implements IRawDataReader {
 
       if (_isCreateRandomTourId) {
 
-         final Double randomNumber = Double.valueOf(Math.random());
+         final double randomNumber = Math.random();
 
          //We remove the "0." as it creates issues when, later, parsing back into a long
-         return randomNumber.toString().substring(2);
+         return Double.toString(randomNumber).substring(2);
       }
 
       String uniqueKey;
@@ -251,7 +252,24 @@ public abstract class TourbookDevice implements IRawDataReader {
     */
    protected boolean isValidXMLFile(final String importFilePath, final String deviceTag) {
 
-      return isValidXMLFile(importFilePath, deviceTag, false);
+      return isValidXMLFile(importFilePath, deviceTag, false, true);
+   }
+
+   /**
+    * Check if the file is a valid device xml file.
+    *
+    * @param importFilePath
+    * @param deviceTag
+    *           The deviceTag starts on the second line of a xml file.
+    * @param isRemoveBOM
+    *           When <code>true</code> the BOM (Byte Order Mark) is removed from the file.
+    * @return Returns <code>true</code> when the file contains content with the requested tag.
+    */
+   protected boolean isValidXMLFile(final String importFilePath,
+                                    final String deviceTag,
+                                    final boolean isRemoveBOM) {
+
+      return isValidXMLFile(importFilePath, deviceTag, isRemoveBOM, false);
    }
 
    /**
@@ -263,9 +281,21 @@ public abstract class TourbookDevice implements IRawDataReader {
     *           When <code>true</code> the BOM (Byte Order Mark) is removed from the file.
     * @return Returns <code>true</code> when the file contains content with the requested tag.
     */
-   protected boolean isValidXMLFile(final String importFilePath, final String deviceTag, final boolean isRemoveBOM) {
+   protected boolean isValidXMLFile(final String importFilePath,
+                                    final String deviceTag,
+                                    final boolean isRemoveBOM,
+                                    final boolean isTrimXmlDeclaration) {
 
       final String deviceTagLower = deviceTag.toLowerCase();
+
+      if (isTrimXmlDeclaration) {
+
+         try {
+            FilesUtils.trimXmlDeclaration(importFilePath, XML_START_ID);
+         } catch (final IOException e) {
+            // just ignore it
+         }
+      }
 
       try (FileInputStream inputStream = new FileInputStream(importFilePath);
             BufferedReader fileReader = new BufferedReader(new InputStreamReader(inputStream, UI.UTF_8))) {

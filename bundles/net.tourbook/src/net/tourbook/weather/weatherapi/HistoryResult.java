@@ -238,6 +238,7 @@ public class HistoryResult {
          return weatherType;
       }
 
+      //todo fb
       // Weather Icons and Codes  : https://www.weatherapi.com/docs/#weather-icons
       switch (middleHourData.getCondition().getCode()) {
       case 1006:

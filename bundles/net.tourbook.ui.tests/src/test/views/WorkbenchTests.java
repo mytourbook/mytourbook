@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package views;
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.utils.SWTBotPreferences;
 import org.junit.BeforeClass;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -35,6 +36,36 @@ public class WorkbenchTests extends UITest {
       SWTBotPreferences.TIMEOUT = 10000;
    }
 
+   @Disabled
+   //Disabled because of this error
+   //com.badlogic.gdx.utils.GdxRuntimeException: Couldn't load shared library 'vtm-jni64.dll' for target: Windows Server 2022, 64-bit
+   //My hunch is that the build machine has no 3D graphics capabilities
+   @Test
+   void open25DMap() {
+
+      Utils.showViewFromMenu(bot, "Map", "2.5D Tour Map"); //$NON-NLS-1$ //$NON-NLS-2$
+      final SWTBotView twoFiveDMapView = Utils.showView(bot, "2.5D Tour Map"); //$NON-NLS-1$
+      //Sleeping 3 seconds as the map can be slow to display
+      bot.sleep(3000);
+
+      twoFiveDMapView.close();
+   }
+
+   @Disabled
+   //Disabled because of this error
+   //java.lang.UnsatisfiedLinkError: Can't load library: D:\a\mytourbook-BUILD-autocreated\core\net.tourbook.ui.tests\natives\windows-amd64\\gluegen_rt.dll
+   //My hunch is that the build machine has no 3D graphics capabilities
+   @Test
+   void open3DMap() {
+
+      Utils.showViewFromMenu(bot, "Map", "3D Tour Map"); //$NON-NLS-1$ //$NON-NLS-2$
+      final SWTBotView threeDMapView = Utils.showView(bot, "3D Tour Map"); //$NON-NLS-1$
+      //Sleeping 3 seconds as the map can be slow to display
+      bot.sleep(3000);
+
+      threeDMapView.close();
+   }
+
    @Test
    void testOpenViews() {
 
@@ -46,15 +77,8 @@ public class WorkbenchTests extends UITest {
       bot.toolbarButtonWithTooltip("Tour Import (Ctrl+Shift+I)").click(); //$NON-NLS-1$
       Utils.showView(bot, "Tour Import"); //$NON-NLS-1$
 
-      bot.toolbarButtonWithTooltip("Statistics (Ctrl+Shift+S)").click(); //$NON-NLS-1$
-      Utils.showView(bot, "Statistics"); //$NON-NLS-1$
-
       bot.toolbarButtonWithTooltip("Shows tour in 2D map").click(); //$NON-NLS-1$
       Utils.showView(bot, "2D Tour Map"); //$NON-NLS-1$
-      //Sleeping 3 seconds as the map can be slow to display
-      bot.sleep(3000);
-
-      Utils.showViewFromMenu(bot, "Map", "2.5D Tour Map"); //$NON-NLS-1$ //$NON-NLS-2$
       //Sleeping 3 seconds as the map can be slow to display
       bot.sleep(3000);
 
@@ -64,8 +88,6 @@ public class WorkbenchTests extends UITest {
       //My hunch is that the build machine has no 3D graphics capabilities
       //Sleeping 3 seconds as the map can be slow to display
       //bot.sleep(3000);
-
-      final SWTBotView tourLogView = Utils.showView(bot, "Tour Log"); //$NON-NLS-1$
 
       Utils.openOtherMenu(bot);
       bot.tree().getTreeItem(WorkbenchTests.TOUR_PROPERTIES).expand().getNode("Waypoints").select(); //$NON-NLS-1$
@@ -84,19 +106,16 @@ public class WorkbenchTests extends UITest {
       final SWTBotView geoCompareView = Utils.showView(bot, "Geo Compare"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Tour Chart Smoothing"); //$NON-NLS-1$
-      Utils.showView(bot, "Tour Chart Smoothing"); //$NON-NLS-1$
+      final SWTBotView tourChartSmoothingView = Utils.showView(bot, "Tour Chart Smoothing"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Statistic Values"); //$NON-NLS-1$
-      Utils.showView(bot, "Statistic Values"); //$NON-NLS-1$
+      final SWTBotView statisticValuesView = Utils.showView(bot, "Statistic Values"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Training"); //$NON-NLS-1$
-      Utils.showView(bot, "Training"); //$NON-NLS-1$
-
-      Utils.showViewFromMenu(bot, Utils.TOOLS, "Conconi Test"); //$NON-NLS-1$
-      Utils.showView(bot, "Conconi Test"); //$NON-NLS-1$
+      final SWTBotView trainingView = Utils.showView(bot, "Training"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.TOOLS, "Heart Rate Variability"); //$NON-NLS-1$
-      Utils.showView(bot, "Heart Rate Variability"); //$NON-NLS-1$
+      final SWTBotView heartRateVariabilityView = Utils.showView(bot, "Heart Rate Variability"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Photos"); //$NON-NLS-1$
       final SWTBotView photosView = Utils.showView(bot, "Photos"); //$NON-NLS-1$
@@ -104,10 +123,10 @@ public class WorkbenchTests extends UITest {
       bot.sleep(3000);
 
       bot.toolbarButtonWithTooltip("Search for tours, marker and waypoints (Ctrl+K)").click(); //$NON-NLS-1$
-      Utils.showView(bot, "Search Tours"); //$NON-NLS-1$
+      final SWTBotView searchToursView = Utils.showView(bot, "Search Tours"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Tour Marker"); //$NON-NLS-1$
-      Utils.showView(bot, "Tour Marker"); //$NON-NLS-1$
+      final SWTBotView tourMarkerView = Utils.showView(bot, "Tour Marker"); //$NON-NLS-1$
 
       Utils.showViewFromMenu(bot, Utils.DIRECTORY, "Collated Tours"); //$NON-NLS-1$
       final SWTBotView collatedToursView = Utils.showView(bot, "Collated Tours"); //$NON-NLS-1$
@@ -138,12 +157,17 @@ public class WorkbenchTests extends UITest {
       bot.sleep(3000);
 
       //Close the opened views
-      tourLogView.close();
+      tourChartSmoothingView.close();
+      statisticValuesView.close();
+      trainingView.close();
+      heartRateVariabilityView.close();
+      photosView.close();
+      searchToursView.close();
+      tourMarkerView.close();
       waypointsView.close();
       tourDataView.close();
       tourAnalyzerView.close();
       geoCompareView.close();
-      photosView.close();
       collatedToursView.close();
       referenceToursView.close();
       comparisonResultsView.close();

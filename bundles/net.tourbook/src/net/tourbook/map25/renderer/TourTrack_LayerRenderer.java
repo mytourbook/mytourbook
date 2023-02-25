@@ -18,7 +18,7 @@ package net.tourbook.map25.renderer;
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
 import net.tourbook.common.color.ColorUtil;
-import net.tourbook.map.player.MapPlayerManager;
+import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig.LineColorMode;
@@ -104,13 +104,13 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
    private final class TrackCompileWorker extends SimpleWorker<TourCompileTask> {
 
-      private static final int  MIN_DIST                        = 3;
+      private static final int  MIN_DIST                           = 3;
 
       /**
        * Visible pixel of a line/tour, all other pixels are clipped with {@link #__lineClipper}
        */
       // limit coords
-      private static final int  MAX_VISIBLE_PIXEL               = 2048;
+      private static final int  MAX_VISIBLE_PIXEL                  = 2048;
 
       /**
        * Contains all available geo locations for all selected tours in lat/lon E6 format.
@@ -122,7 +122,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
        * <p>
        * Is projected from -180°...180° ==> 0...1 by using the {@link MercatorProjection}
        */
-      private double[]          __allProjectedPoints            = new double[2];
+      private double[]          __allProjectedPoints               = new double[2];
 
       /**
        * Projected points 0...1 from the geo end point of the tour to the geo start point
@@ -137,10 +137,16 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       private float[]           __pixelPoints;
 
       /**
-       * Contains indices into all geo positions for all selected tours. They are optimized for a
+       * Contains indices into all geo locations for all selected tours. They are optimized for a
        * minimum distance, so they can be also outside of the clipper (visible) area -2048...2048
        */
-      private IntArrayList      __allNotClipped_LocationIndices = new IntArrayList();
+      private IntArrayList      __allNotClipped_GeoLocationIndices = new IntArrayList();
+
+      /**
+       * Contains indices for all visible geo locations and all selected tours. They are optimized
+       * for a minimum distance, so they are clipped for the visible area -2048...2048
+       */
+      private IntArrayList      __allVisible_GeoLocationIndices    = new IntArrayList();
 
       /**
        * One {@link #__pixelPointColorsHalf} has two {@link #__pixelPoints}, half == Half of items
@@ -150,8 +156,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       /**
        * Contains the x/y projected pixels where direction arrows are painted
        */
-      private FloatArrayList    __pixelDirection_ArrowPositions = new FloatArrayList();
-      private IntArrayList      __pixelDirection_LocationIndex  = new IntArrayList();
+      private FloatArrayList    __pixelDirection_ArrowPositions    = new FloatArrayList();
+      private IntArrayList      __pixelDirection_LocationIndex     = new IntArrayList();
 
       private int[]             __allGeoPointColors;
       private IntArrayList      __allTourStarts;
@@ -189,7 +195,43 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          __pixelPointColorsHalf = new int[0];
          __pixelDirection_ArrowPositions.clear();
          __pixelDirection_LocationIndex.clear();
-         __allNotClipped_LocationIndices.clear();
+         __allNotClipped_GeoLocationIndices.clear();
+         __allVisible_GeoLocationIndices.clear();
+      }
+
+      private void addLine(final float[] pixelPoints,
+                           final int numPoints,
+                           final boolean isCapClosed,
+                           final int[] pixelPointColorsHalf,
+
+                           final TourTrack_Bucket workerBucket,
+
+                           final int geoLocationIndex) {
+
+         workerBucket.addLine(pixelPoints, numPoints, isCapClosed, pixelPointColorsHalf);
+
+         final int numGeo = __allVisible_GeoLocationIndices.size();
+         final int numTrackVertices_After = workerBucket.numTrackVertices / 2;
+
+         final int geoDiff = numTrackVertices_After - numGeo;
+
+         /*
+          * That the track end in re-Live is displayed at the correct position, the number of
+          * vertices/2 and number of geo indices MUST be the same !!!
+          */
+         for (int missingValues = 0; missingValues < geoDiff; missingValues++) {
+            __allVisible_GeoLocationIndices.add(geoLocationIndex);
+         }
+
+//         System.out.println(""
+//
+//               + "  addLine " + String.format("%5d", numPoints)
+//               + "  numVert " + String.format("%5d", numTrackVertices_After)
+//               + "  numGeo " + String.format("%5d", numGeo)
+//               + "  geoDiff " + geoDiff
+//
+//         );
+//         // TODO remove SYSTEM.OUT.PRINTLN
       }
 
       /**
@@ -203,6 +245,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
        * @return
        */
       private int addPoint(final float[] points, int pointIndex, final float x, final float y) {
+
+//         System.out.println("" + " addPoint - idx: " + pointIndex);
+//// TODO remove SYSTEM.OUT.PRINTLN
 
          points[pointIndex++] = x;
          points[pointIndex++] = y;
@@ -247,7 +292,9 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                   __pixelPointColorsHalf = new int[numGeoPoints];
                   __pixelDirection_ArrowPositions.clear();
                   __pixelDirection_LocationIndex.clear();
-                  __allNotClipped_LocationIndices.clear();
+
+                  __allNotClipped_GeoLocationIndices.clear();
+                  __allVisible_GeoLocationIndices.clear();
                }
 
                // lat/lon -> 0...1
@@ -293,6 +340,10 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
        */
       private void doWork_CompileTrack(final TourCompileTask task, final int numPoints) {
 
+//         System.out.println();
+//         System.out.println(UI.timeStamp() + " doWork_CompileTrack()");
+//// TODO remove SYSTEM.OUT.PRINTLN
+
          // set current map position into the task map position
          final MapPosition compileMapPos = task.__mapPos;
          mMap.getMapPosition(compileMapPos);
@@ -301,19 +352,11 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          final double compileMapScale = compileMapPos.scale = 1 << compileMapZoomlevel;
 
          final Map25TrackConfig trackConfig = Map25ConfigManager.getActiveTourTrackConfig();
+         final int arrow_MinimumDistance = trackConfig.arrow_MinimumDistance;
+
          final boolean isShowDirectionArrows = trackConfig.isShowDirectionArrow;
 
-         int arrow_MinimumDistance = trackConfig.arrow_IsAnimate
-
-               // use a smaller distance when animated, to show the moving figure smoothly
-               ? 1
-
-               : trackConfig.arrow_MinimumDistance;
-
-         // this is for debugging
-         arrow_MinimumDistance = trackConfig.arrow_MinimumDistance;
-
-         final TourTrack_Bucket workerBucket = getWorkerBucket(task.__taskBucketManager);
+         final TourTrack_Bucket workerBucket = updateLineStyleInWorkerBucket(task.__taskBucketManager);
 
          // current map positions 0...1
          final double compileMapPosX = compileMapPos.x; // 0...1, lat == 0 -> 0.5
@@ -349,16 +392,19 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
 // SET_FORMATTING_OFF
 
-         final float[] pixelPoints                             = __pixelPoints;
-         final int[] pixelPointColorsHalf                      = __pixelPointColorsHalf;
+         final float[]        pixelPoints                      = __pixelPoints;
+         final int[]          pixelPointColorsHalf             = __pixelPointColorsHalf;
 
-         final IntArrayList allNotClipped_LocationIndices      = __allNotClipped_LocationIndices;
+         final IntArrayList   allNotClipped_GeoLocationIndices = __allNotClipped_GeoLocationIndices;
+         final IntArrayList   allVisible_GeoLocationIndices    = __allVisible_GeoLocationIndices;
+
          final FloatArrayList allDirectionArrow_PixelPosition  = __pixelDirection_ArrowPositions;
-         final IntArrayList allDirectionArrow_LocationIndex    = __pixelDirection_LocationIndex;
+         final IntArrayList   allDirectionArrow_LocationIndex  = __pixelDirection_LocationIndex;
 
 // SET_FORMATTING_ON
 
-         allNotClipped_LocationIndices.clear();
+         allNotClipped_GeoLocationIndices.clear();
+         allVisible_GeoLocationIndices.clear();
          allDirectionArrow_PixelPosition.clear();
          allDirectionArrow_LocationIndex.clear();
 
@@ -367,7 +413,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          pixelPointColorsHalf[0] = __allGeoPointColors[0];
          allDirectionArrow_PixelPosition.addAll(pixelX, pixelY);
          allDirectionArrow_LocationIndex.add(0);
-         allNotClipped_LocationIndices.add(0);
+         allNotClipped_GeoLocationIndices.add(0);
+         allVisible_GeoLocationIndices.add(0);
 
          float prevX = pixelX;
          float prevY = pixelY;
@@ -376,11 +423,12 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
          float prevXArrow = pixelX;
          float prevYArrow = pixelY;
 
+         int geoLocationIndex = 0;
          float[] segment = null;
 
          for (int projectedPointIndex = 2; projectedPointIndex < numPoints * 2; projectedPointIndex += 2) {
 
-            final int projectedPointIndexHalf = projectedPointIndex / 2;
+            geoLocationIndex = projectedPointIndex / 2;
 
             // convert projected points 0...1 into map pixel
             pixelX = (float) ((__allProjectedPoints[projectedPointIndex + 0] - compileMapPosX) * compileMaxMapPixel);
@@ -404,13 +452,14 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                flip = flipDirection;
 
                if (pixelPointIndex > 2) {
-                  workerBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
+                  addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf, workerBucket, geoLocationIndex);
                }
 
                __lineClipper.clipStart(pixelX, pixelY);
 
                pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
-               pixelPointColorsHalf[0] = __allGeoPointColors[projectedPointIndexHalf];
+               pixelPointColorsHalf[0] = __allGeoPointColors[geoLocationIndex];
+               allVisible_GeoLocationIndices.add(geoLocationIndex);
 
                continue;
             }
@@ -420,7 +469,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
                // finish last tour (copied from flip code)
                if (pixelPointIndex > 2) {
-                  workerBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
+                  addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf, workerBucket, geoLocationIndex);
                }
 
                // setup next tour
@@ -428,7 +477,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
                __lineClipper.clipStart(pixelX, pixelY);
                pixelPointIndex = addPoint(pixelPoints, 0, pixelX, pixelY);
-               pixelPointColorsHalf[0] = __allGeoPointColors[projectedPointIndexHalf];
+               pixelPointColorsHalf[0] = __allGeoPointColors[geoLocationIndex];
+               allVisible_GeoLocationIndices.add(geoLocationIndex);
 
                continue;
             }
@@ -443,7 +493,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
                // point > min distance == 3
 
-               allNotClipped_LocationIndices.add(projectedPointIndexHalf);
+               allNotClipped_GeoLocationIndices.add(geoLocationIndex);
 
                prevXNotClipped = pixelX;
                prevYNotClipped = pixelY;
@@ -458,14 +508,14 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                 */
 
                if (pixelPointIndex > 2) {
-                  workerBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
+                  addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf, workerBucket, geoLocationIndex);
                }
 
                if (clipperCode == LineClipper.INTERSECTION) {
 
                   // add line segment
                   segment = __lineClipper.getLine(segment, 0);
-                  workerBucket.addLine(segment, 4, false, pixelPointColorsHalf);
+                  addLine(segment, 4, false, pixelPointColorsHalf, workerBucket, geoLocationIndex);
 
                   // the prev point is the real point not the clipped point
                   // prevX = __lineClipper.outX2;
@@ -482,7 +532,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                   pixelPoints[pixelPointIndex++] = prevX;
                   pixelPoints[pixelPointIndex++] = prevY;
 
-                  pixelPointColorsHalf[(pixelPointIndex - 1) / 2] = __allGeoPointColors[projectedPointIndexHalf];
+                  pixelPointColorsHalf[(pixelPointIndex - 1) / 2] = __allGeoPointColors[geoLocationIndex];
+                  allVisible_GeoLocationIndices.add(geoLocationIndex);
                }
 
                continue;
@@ -502,7 +553,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                pixelPoints[pixelPointIndex++] = prevX = pixelX;
                pixelPoints[pixelPointIndex++] = prevY = pixelY;
 
-               pixelPointColorsHalf[(pixelPointIndex - 1) / 2] = __allGeoPointColors[projectedPointIndexHalf];
+               pixelPointColorsHalf[(pixelPointIndex - 1) / 2] = __allGeoPointColors[geoLocationIndex];
+               allVisible_GeoLocationIndices.add(geoLocationIndex);
             }
 
             final float diffXArrow = pixelX - prevXArrow;
@@ -516,20 +568,18 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
                prevYArrow = pixelY;
 
                allDirectionArrow_PixelPosition.addAll(pixelX, pixelY);
-               allDirectionArrow_LocationIndex.add(projectedPointIndexHalf);
+               allDirectionArrow_LocationIndex.add(geoLocationIndex);
             }
          }
 
          if (pixelPointIndex > 2) {
-            workerBucket.addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf);
+            addLine(pixelPoints, pixelPointIndex, false, pixelPointColorsHalf, workerBucket, geoLocationIndex);
          }
 
          if (isShowDirectionArrows) {
 
             // convert arrow positions into arrow vertices
-            workerBucket.createArrowVertices(
-                  allDirectionArrow_PixelPosition.toArray(),
-                  allDirectionArrow_LocationIndex.toArray());
+            workerBucket.createArrowVertices(allDirectionArrow_PixelPosition.toArray());
          }
 
          doWork_CreateReturnTrack(compileMapPos, compileMapScale, compileMaxMapPixel);
@@ -538,7 +588,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          workerBucket.allProjectedPoints                 = __allProjectedPoints;
          workerBucket.allProjectedPoints_ReturnTrack     = __allProjectedPoints_ReturnTrack;
-         workerBucket.allNotClipped_GeoLocationIndices   = allNotClipped_LocationIndices.toArray();
+         workerBucket.allNotClipped_GeoLocationIndices   = __allNotClipped_GeoLocationIndices.toArray();
+         workerBucket.allVisible_GeoLocationIndices      = __allVisible_GeoLocationIndices.toArray();
          workerBucket.allTimeSeries                      = __allTimeSeries;
          workerBucket.allDistanceSeries                  = __allDistanceSeries;
          workerBucket.trackEnd2StartPixelDistance        = __trackEnd2StartPixelDistance;
@@ -565,7 +616,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
           * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           * <p>
           * The model is partly jumping when the number of return track points are about smaller
-          * than 30, maybe caused by the FPS
+          * than 30, maybe caused of the FPS
           * <p>
           * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
           */
@@ -684,28 +735,6 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       return style;
    }
 
-   /**
-    * Update linestyle in the bucket
-    *
-    * @param bucketManager
-    * @return
-    */
-   private TourTrack_Bucket getWorkerBucket(final TourTrack_BucketManager bucketManager) {
-
-      TourTrack_Bucket trackBucket;
-
-      trackBucket = bucketManager.getBucket_Worker();
-
-// SET_FORMATTING_OFF
-
-      trackBucket.lineStyle       = _lineStyle;
-      trackBucket.lineColorMode   = _config_LineColorMode;
-
-// SET_FORMATTING_ON
-
-      return trackBucket;
-   }
-
    public void onModifyConfig(final boolean isVerticesModified) {
 
       _lineStyle = createLineStyle();
@@ -720,10 +749,17 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
          // do a fast update
 
-         getWorkerBucket(_bucketManager_ForWorker);
+         updateLineStyleInWorkerBucket(_bucketManager_ForWorker);
 
          _map.render();
       }
+   }
+
+   public void onModifyMapModelOrCursor() {
+
+      // update shader data, this is done finally in TourTrack_Shader.bindBufferData()
+
+      _trackCompileWorker.submit(0);
    }
 
    /**
@@ -835,15 +871,6 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
 
       if (isDiffX || isDiffY || isDiffScale || _isCancelWorkerTask) {
 
-//         System.out.println(UI.timeStamp()
-//
-//               + "  isDiffX:" + isDiffX
-//               + "  isDiffY:" + isDiffY
-//               + "  isDiffScale:" + isDiffScale
-//
-//         );
-//// TODO remove SYSTEM.OUT.PRINTLN
-
          /*
           * It took me many days to find this solution that a newly selected tour is
           * displayed after the map position was moved/tilt/rotated. It works but I don't
@@ -868,7 +895,8 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       }
 
       /*
-       * workerTask will not be null after the track is compiled
+       * workerTask is not be null after the track is compiled OR
+       * with _trackCompileWorker.submit(0);
        */
       final TourCompileTask workerTask = _trackCompileWorker.poll();
 
@@ -880,7 +908,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
       }
 
       /*
-       * Layer is just compiled (above) in
+       * Layer is (above) just compiled with
        * TourTrack_LayerRenderer.TrackCompileWorker.doWork(TourCompileTask)
        */
 
@@ -899,9 +927,31 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
        * Keep zoomlevel for the animation, otherwise the old zoomlevel would be used which is
        * causing flickering
        */
-      MapPlayerManager.setCompileMapScale(
+      ModelPlayerManager.setCompileMapScale(
             _compileMapPosition.x,
             _compileMapPosition.y,
             _compileMapPosition.scale);
+   }
+
+   /**
+    * Update linestyle in the bucket
+    *
+    * @param bucketManager
+    * @return
+    */
+   private TourTrack_Bucket updateLineStyleInWorkerBucket(final TourTrack_BucketManager bucketManager) {
+
+      TourTrack_Bucket trackBucket;
+
+      trackBucket = bucketManager.getBucket_Worker();
+
+// SET_FORMATTING_OFF
+
+      trackBucket.lineStyle       = _lineStyle;
+      trackBucket.lineColorMode   = _config_LineColorMode;
+
+// SET_FORMATTING_ON
+
+      return trackBucket;
    }
 }

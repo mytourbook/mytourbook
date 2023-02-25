@@ -1,7 +1,7 @@
 /*
  * Shows a cursor (e.g. point or triangle) for the model on the track
  */
-const vec3 colors[] = vec3[]( vec3( 0.2, 1.0, 0.2),
+const vec3 colors[] = vec3[]( vec3( 1.0, 1.0, 1.0),
                               vec3( 1.0,  .2, 0.0),
                               vec3( 1.0,  .2, 0.0));
 
@@ -46,5 +46,5 @@ out vec4 out_Color;
 
 void main() {
    
-   out_Color = vec4(pass_Color, .9);
+   out_Color = vec4(pass_Color, .8);
 }
