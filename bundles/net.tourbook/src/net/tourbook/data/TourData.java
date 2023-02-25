@@ -29,6 +29,7 @@ import static javax.persistence.FetchType.EAGER;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ser.std.NumberSerializers;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -398,7 +399,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    @XmlElement
    //todo fb why this non primitive type is not serialized
-   @JsonIgnore
+   @JsonSerialize(using = NumberSerializers.IntegerSerializer.class)
    private Integer               calories;                                             // db-version 4
 
    private float                 bodyWeight;                                          // db-version 4
