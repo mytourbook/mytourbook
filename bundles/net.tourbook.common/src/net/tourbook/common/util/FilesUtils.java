@@ -104,7 +104,8 @@ public final class FilesUtils {
       for (int index = 0; index < fileContent.size(); ++index) {
          final String currentLine = fileContent.get(index);
 
-         if (currentLine.toLowerCase().contains(xmlStartId)) {
+         if (currentLine.toLowerCase().contains(xmlStartId) &&
+               !currentLine.toLowerCase().startsWith(xmlStartId)) {
 
             fileContent.set(index, currentLine.trim());
             isXmlDeclarationTrimmed = true;
