@@ -337,6 +337,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Time zone ID or <code>null</code> when the time zone ID is not available.
     */
+   @JsonIgnore
    private String                timeZoneId;
 
    // ############################################# DISTANCE #############################################
