@@ -109,7 +109,6 @@
   "training_TrainingEffect_Aerob" : 0.0,
   "training_TrainingEffect_Anaerob" : 0.0,
   "training_TrainingPerformance" : 0.0,
-  "weather_Humidity" : 0,
   "weather_Precipitation" : 0.0,
   "weather_Pressure" : 0.0,
   "weather_Snowfall" : 0.0,
