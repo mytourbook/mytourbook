@@ -24,7 +24,7 @@ package net.tourbook.data;
 // when feels like below 32F, add the cold emoji 🥶
 // and when above 90 the hot emoji 🥵
 
-// it might be easier to have jsonproperty instead of jsonignore
+// todo fb make sure that if the tcx file doesn't contain extra spac in the beginning that we dont rewrite the file
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 
