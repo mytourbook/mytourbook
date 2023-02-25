@@ -886,7 +886,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Deflection point in the conconi test, this value is the index for the data serie on the
     * x-axis
     */
-   @JsonProperty
    private int                   conconiDeflection;
 
    // ############################################# PHOTO  DATA #############################################
