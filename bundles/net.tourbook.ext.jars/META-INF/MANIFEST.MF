@@ -16,9 +16,9 @@ Bundle-ClassPath:
  json-20220320.jar,
  lat-lon-timezone-converter-2019-04-30.jar,
  simplelatlng-1.4.0.jar,
- jackson-core-2.13.3.jar,
- jackson-databind-2.13.3.jar,
- jackson-annotations-2.13.3.jar,
+ jackson-core-2.14.2.jar,
+ jackson-databind-2.14.2.jar,
+ jackson-annotations-2.14.2.jar,
  commons-suncalc-3.4.jar
 Export-Package: com.fasterxml.jackson.annotation,
  com.fasterxml.jackson.core,
