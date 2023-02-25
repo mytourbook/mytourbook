@@ -8130,7 +8130,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-
    public int getHrZone0() {
       return hrZone0;
    }
@@ -8140,7 +8139,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-
    public int getHrZone1() {
       return hrZone1;
    }
@@ -8177,7 +8175,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-
    public int getHrZone5() {
       return hrZone5;
    }
@@ -8187,7 +8184,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-
    public int getHrZone6() {
       return hrZone6;
    }
@@ -8197,7 +8193,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-
    public int getHrZone7() {
       return hrZone7;
    }
@@ -8207,7 +8202,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-
    public int getHrZone8() {
       return hrZone8;
    }
@@ -8217,7 +8211,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-
    public int getHrZone9() {
       return hrZone9;
    }
