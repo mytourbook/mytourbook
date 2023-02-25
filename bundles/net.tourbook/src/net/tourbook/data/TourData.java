@@ -31,11 +31,10 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.NumberSerializers;
 import com.skedgo.converter.TimezoneMapper;
 
 import java.awt.Point;
@@ -400,7 +399,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    @XmlElement
    //todo fb why this non primitive type is not serialized
-   @JsonSerialize(using = NumberSerializers.IntegerSerializer.class)
+  // @JsonSerialize(using = NumberSerializers.IntegerSerializer.class)
    private Integer               calories;                                             // db-version 4
 
    private float                 bodyWeight;                                          // db-version 4
@@ -588,6 +587,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float                 weather_Temperature_Max_Device;                       // db-version 39
 
    private float                 weather_Temperature_WindChill;                        // db-version 39
+
 
    /**
     * Air Quality Index
@@ -1555,6 +1555,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Tour start time with a time zone.
     */
    @Transient
+   @JsonIgnore
    private ZonedDateTime      _zonedStartTime;
 
    /**
@@ -12562,12 +12563,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       mapper.setSerializationInclusion(Include.NON_EMPTY);
       mapper.setConfig(mapper.getSerializationConfig()
             .with(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY));
-      mapper.setVisibility(mapper.getSerializationConfig().getDefaultVisibilityChecker()
-            .withCreatorVisibility(Visibility.NONE)
-            .withFieldVisibility(Visibility.ANY)
-            .withGetterVisibility(Visibility.NONE)
-            .withIsGetterVisibility(Visibility.NONE)
-            .withSetterVisibility(Visibility.NONE));
+      mapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
+      mapper.setVisibility(PropertyAccessor.FIELD, Visibility.ANY);
+      mapper.setVisibility(PropertyAccessor.GETTER, Visibility.NONE);
+      mapper.setVisibility(PropertyAccessor.IS_GETTER, Visibility.NONE);
+      mapper.setVisibility(PropertyAccessor.SETTER, Visibility.NONE);
 
       String jsonString = UI.EMPTY_STRING;
       try {
