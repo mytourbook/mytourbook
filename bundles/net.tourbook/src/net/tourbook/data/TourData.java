@@ -8439,7 +8439,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-
    public int getNumberOfPhotos() {
       return numberOfPhotos;
    }
@@ -9325,7 +9324,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns SRTM metric or imperial data serie depending on the active measurement or
     *         <code>null</code> when SRTM data serie is not available
     */
-
    public float[] getSRTMSerie(final boolean isUseSRTM1Values) {
 
       if (latitudeSerie == null) {
@@ -9498,7 +9496,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-
    public int getTemperatureScale() {
       return temperatureScale;
    }
@@ -9666,7 +9663,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns the tour time zone id, when the tour time zone is not set in the tour, then
     *         the default time zone is returned which is defined in the preferences.
     */
-
    public ZoneId getTimeZoneIdWithDefault() {
 
       final String zoneIdRaw = timeZoneId == null //
@@ -9723,7 +9719,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * !!! THIS VALUE IS NOT CACHED BECAUSE WHEN THE DEFAULT TIME ZONE IS CHANGING THEN THIS VALUE IS
     * WRONG !!!
     */
-
    public TourDateTime getTourDateTime() {
 
       return TimeTools.createTourDateTime(tourStartTime, timeZoneId);
@@ -9790,7 +9785,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns a set with all {@link TourMarker} for the tour or an empty set when markers
     *         are not available.
     */
-
    public Set<TourMarker> getTourMarkers() {
       return tourMarkers;
    }
@@ -9844,7 +9838,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns the tour start date time with the tour time zone, when not available with the
     *         default time zone.
     */
-
    public ZonedDateTime getTourStartTime() {
 
       if (_zonedStartTime == null) {
