@@ -879,7 +879,7 @@ public class ModelPlayerManager {
       _isReLivePlaying           = Util.getStateBoolean( _state, STATE_IS_RELIVE_PLAYING,             false);
       _jogWheelSpeed             = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED,               10);
       _jogWheelSpeedMultiplier   = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED_MULTIPLIER,    1);
-      _modelSize                 = Util.getStateInt(     _state, STATE_MODEL_SIZE,              200);
+      _modelSize                 = Util.getStateInt(     _state, STATE_MODEL_SIZE,                    200);
       _modelCursorSize           = Util.getStateInt(     _state, STATE_MODEL_CURSOR_SIZE,             200);
       _modelTurningFactor        = Util.getStateInt(     _state, STATE_MODEL_TURNING_ANGLE,           10);
       _relativePosition_Current  = Util.getStateDouble(  _state, STATE_RELATIVE_POSITION,             0);
@@ -907,7 +907,7 @@ public class ModelPlayerManager {
       _state.put(STATE_IS_RELIVE_PLAYING,             _isReLivePlaying);
       _state.put(STATE_JOG_WHEEL_SPEED,               _jogWheelSpeed);
       _state.put(STATE_JOG_WHEEL_SPEED_MULTIPLIER,    _jogWheelSpeedMultiplier);
-      _state.put(STATE_MODEL_SIZE,              _modelSize);
+      _state.put(STATE_MODEL_SIZE,                    _modelSize);
       _state.put(STATE_MODEL_CURSOR_SIZE,             _modelCursorSize);
       _state.put(STATE_MODEL_TURNING_ANGLE,           _modelTurningFactor);
       _state.put(STATE_RELATIVE_POSITION,             _relativePosition_Current);

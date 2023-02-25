@@ -882,6 +882,9 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
 
       if (keyEvent.character == ' ') {
 
+         // set moving direction otherwise the model could move backward
+         ModelPlayerManager.setMovingSpeedFromJogWheel(_scaleSpeedJogWheel.getSelection());
+
          togglePlayAndPaused();
 
       } else {
