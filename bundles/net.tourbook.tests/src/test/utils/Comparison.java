@@ -64,7 +64,13 @@ public class Comparison {
             new Customization("tourMarkers", tourMarkersValueMatcher), //$NON-NLS-1$
             new Customization("tourType.createId", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("geoGrid", (o1, o2) -> true), //$NON-NLS-1$
-            new Customization("tourId", (o1, o2) -> true)); //$NON-NLS-1$
+            new Customization("tourId", (o1, o2) -> true), //$NON-NLS-1$
+
+            // We ignore the below fields because the values could be different
+            // depending on the machine's timezone that execute the unit tests
+            new Customization("startHour", (o1, o2) -> true), //$NON-NLS-1$
+            new Customization("tourEndTime", (o1, o2) -> true), //$NON-NLS-1$
+            new Customization("tourStartTime", (o1, o2) -> true)); //$NON-NLS-1$
 
       final String controlDocument = readFileContent(controlFileName + JSON);
 
