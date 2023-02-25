@@ -398,6 +398,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    @XmlElement
    //todo fb why this non primitive type is not serialized
+   @JsonIgnore
    private Integer               calories;                                             // db-version 4
 
    private float                 bodyWeight;                                          // db-version 4
