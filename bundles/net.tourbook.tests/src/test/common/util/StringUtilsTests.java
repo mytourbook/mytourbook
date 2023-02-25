@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,13 @@ public class StringUtilsTests {
    void testSanitizeFileNameWindows() {
 
       final String fileName = "/\\:*?\"<>|filename#_.txt"; //$NON-NLS-1$
-      assertEquals("---------filename#_.txt", StringUtils.sanitizeFileName(fileName)); //$NON-NLS-1$
+
+      String expectedValue = "---------filename#_.txt";
+      if (UI.IS_LINUX) {
+         expectedValue = "-\\:*?\"<>|filename#_.txt";
+      }
+
+      assertEquals(expectedValue, StringUtils.sanitizeFileName(fileName));
       assertNull(StringUtils.sanitizeFileName(null));
       assertEquals(UI.EMPTY_STRING, StringUtils.sanitizeFileName(UI.EMPTY_STRING));
    }

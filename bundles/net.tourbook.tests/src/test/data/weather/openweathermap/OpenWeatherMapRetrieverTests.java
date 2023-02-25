@@ -47,6 +47,8 @@ public class OpenWeatherMapRetrieverTests {
    private static final String OPENWEATHERMAP_FILE_PATH =
          FilesUtils.rootPath + "data/weather/openweathermap/files/";                                     //$NON-NLS-1$
 
+   private static final String DenverZoneId             = "America/Denver";                              //$NON-NLS-1$
+
    static HttpClientMock       httpClientMock;
    OpenWeatherMapRetriever     openWeatherMapRetriever;
 
@@ -72,7 +74,16 @@ public class OpenWeatherMapRetrieverTests {
 
       final TourData tour = Initializer.importTour();
       //Tuesday, July 2, 2022 12:00:00 AM
-      tour.setTourStartTime(2022, 7, 2, 0, 0, 0);
+      final ZonedDateTime zonedDateTime = ZonedDateTime.of(
+            2022,
+            07,
+            02,
+            10,
+            0,
+            0,
+            0,
+            ZoneId.of(DenverZoneId));
+      tour.setTourStartTime(zonedDateTime);
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 
