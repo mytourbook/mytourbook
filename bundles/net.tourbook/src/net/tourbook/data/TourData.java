@@ -408,7 +408,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Average altitude change (m/km)
     */
-   @JsonProperty
    private int                   avgAltitudeChange;                                     // db-version 40
 
    // ############################################# PULSE/WEIGHT/POWER #############################################
@@ -588,7 +587,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Is <code>true</code> when the weather data below is from the weather API and not
     * manually entered or from the device.
     */
-   @JsonProperty
    private boolean               isWeatherDataFromProvider;                            // db-version 39
 
    private int                   weather_Wind_Direction  = -1;                         // db-version 8
@@ -596,6 +594,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Speed in km/h
     */
+   @JsonProperty
    private int                   weather_Wind_Speed;                                   // db-version 8
    @JsonProperty
    private String                weather_Clouds;                                       // db-version 8
@@ -626,13 +625,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    private float                 weather_Snowfall;                                     // db-version 47
 
-   @JsonProperty
    private float                 weather_Temperature_Min;                              // db-version 47
-   @JsonProperty
    private float                 weather_Temperature_Min_Device;                       // db-version 39
-   @JsonProperty
    private float                 weather_Temperature_Max;                              // db-version 47
-   @JsonProperty
    private float                 weather_Temperature_Max_Device;                       // db-version 39
 
    private float                 weather_Temperature_WindChill;                        // db-version 39
