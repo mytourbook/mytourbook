@@ -1178,6 +1178,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Summarized average speed in km/h from the first time slice
     */
    @Transient
+   @JsonIgnore
    private float[]               speedSerie_Summarized;
 
    @Transient
@@ -1200,6 +1201,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Pace in sec/km
     */
    @Transient
+   @JsonIgnore
    private float[]               paceSerie_Seconds;
 
    /**
@@ -1213,6 +1215,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Pace in min/km
     */
    @Transient
+   @JsonIgnore
    private float[]               paceSerie_Minute;
 
    /**
@@ -1240,6 +1243,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Summarized average pace in min/km from the first time slice
     */
    @Transient
+   @JsonIgnore
    private float[]               paceSerie_Summarized_Minute;
 
    /**
@@ -1269,6 +1273,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float[]               altimeterSerieImperial;
 
    @Transient
+   @JsonIgnore
    public float[]                gradientSerie;
 
    @Transient
@@ -1402,6 +1407,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * oooo (o) DD-record // offset
     */
    @Transient
+   @JsonIgnore
    public int                 offsetDDRecord;
 
    /*
@@ -1431,8 +1437,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Transient
    public float[]             segmentSerie_Altitude_UpDown_Hour;
    @Transient
+   @JsonIgnore
    public float               segmentSerieTotal_Altitude_Down;
    @Transient
+   @JsonIgnore
    public float               segmentSerieTotal_Altitude_Up;
 
    @Transient
@@ -1474,6 +1482,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Zoomlevel in the map
     */
    @Transient
+   @JsonIgnore
    public int                 mapZoomLevel;
 
    /**
@@ -1510,6 +1519,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * tour cannot be saved again, it must be reloaded from the file system
     */
    @Transient
+   @JsonIgnore
    public boolean             isTourDeleted;
 
    /**
@@ -1599,6 +1609,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     */
    @Transient
+   @JsonIgnore
    public boolean             isHistoryTour;
 
    /**
@@ -1681,10 +1692,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public List<List<Long>>    multipleTourPauses;
 
    @Transient
+   @JsonIgnore
    public boolean             multipleTour_IsCadenceRpm;
 
 
    @Transient
+   @JsonIgnore
    public boolean             multipleTour_IsCadenceSpm;
 
    /**
@@ -1723,6 +1736,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Is <code>true</code> when tour file is deleted in the device and in the backup folder.
     */
    @Transient
+   @JsonIgnore
    public boolean             isTourFileDeleted;
 
    /**
@@ -1730,6 +1744,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * backup folder.
     */
    @Transient
+   @JsonIgnore
    public boolean             isTourFileMoved;
 
    /**
@@ -1739,6 +1754,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <b>THIS FILE SHOULD NOT BE DELETED.</b>
     */
    @Transient
+   @JsonIgnore
    public boolean             isBackupImportFile;
 
    /*
@@ -1845,6 +1861,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * {@link #swim_Cadence} values.
     */
    @Transient
+   @JsonIgnore
    public boolean       isSwimCadence;
 
    /**
