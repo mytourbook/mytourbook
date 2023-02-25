@@ -73,8 +73,8 @@ public class Comparison {
 
       final JSONCompareResult result = JSONCompare.compareJSON(controlDocument, testJson, customArrayValueComparator);
 
-      if (result.failed()) { //todo fb to reput + "-GeneratedFromTests"
-         writeErroneousFiles(controlFileName  + JSON, testJson); //$NON-NLS-1$
+      if (result.failed()) {
+         writeErroneousFiles(controlFileName + "-GeneratedFromTests" + JSON, testJson); //$NON-NLS-1$
       }
 
       assertTrue(result.passed(), result.getMessage());
