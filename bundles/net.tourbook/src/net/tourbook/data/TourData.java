@@ -633,7 +633,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float                 weather_Temperature_Max;                              // db-version 47
    @JsonProperty
    private float                 weather_Temperature_Max_Device;                       // db-version 39
-   @JsonProperty
 
    private float                 weather_Temperature_WindChill;                        // db-version 39
 
