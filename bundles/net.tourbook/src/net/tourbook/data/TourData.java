@@ -354,6 +354,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Time zone ID or <code>null</code> when the time zone ID is not available.
     */
+   @JsonProperty
    private String                timeZoneId;
 
    // ############################################# DISTANCE #############################################
@@ -689,7 +690,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @JsonProperty
    private float                 power_IntensityFactor;
    @JsonProperty
-
    private int                   power_PedalLeftRightBalance;
    @JsonProperty
    private float                 power_AvgLeftTorqueEffectiveness;
@@ -753,7 +753,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <p>
     * Data format: YYYYMMDDhhmmss
     */
-   @JsonProperty
    private long                  dateTimeCreated;                                      // db-version 11
 
    /**
@@ -767,7 +766,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private String                tourImportFilePath;                                   // db-version 6
 
    /** File name from the import file. */
-   @JsonProperty
    private String                tourImportFileName;                                   // db-version 29
 
    /**
@@ -789,7 +787,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Disabled when float was introduces in 11.after8, preserved in database that older ejb objects
     * can be loaded
    */
-   @JsonProperty
    private int                   temperatureScale               = 1;                   // db-version 13
 
    /**
@@ -812,7 +809,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <p>
     * 0 == false, 1 == true
     */
-   @JsonProperty
    private short                  isStrideSensorPresent            = 0;
 
    // ############################################# MERGED DATA #############################################
@@ -924,18 +920,12 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    // -1 indicate that the value is not yet set
 
-   @JsonProperty
    private short                 surfing_NumberOfEvents        = 0; // must be 0 because of totals in tourbook view
-   @JsonProperty
    private short                 surfing_MinSpeed_StartStop    = SURFING_VALUE_IS_NOT_SET;
-   @JsonProperty
    private short                 surfing_MinSpeed_Surfing      = SURFING_VALUE_IS_NOT_SET;
-   @JsonProperty
    private short                 surfing_MinTimeDuration       = SURFING_VALUE_IS_NOT_SET;
 
-   @JsonProperty
    private boolean               surfing_IsMinDistance;
-   @JsonProperty
    private short                 surfing_MinDistance           = SURFING_VALUE_IS_NOT_SET;
 
    // ############################################# GEO BOUNDS #############################################
@@ -943,7 +933,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Is <code>true</code> when latitude/longitude data are available
     */
-   @JsonProperty
    private boolean               hasGeoData;
 
    // ############################################# BATTERY #############################################
@@ -998,7 +987,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Number of time slices in {@link #timeSerie}
     */
-   @JsonProperty
    private int                         numberOfTimeSlices;
 
    /**
@@ -1023,6 +1011,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    @XmlElementWrapper(name = "TourMarkers")
    @XmlElement(name = "TourMarker")
+   @JsonProperty
    private Set<TourMarker>             tourMarkers                         = new HashSet<>();
 
    /**
@@ -1640,7 +1629,6 @@ private Set<TourTag>                tourTags                            = new Ha
     * Tour markers which are sorted by serie index
     */
    @Transient
-   @JsonProperty
    private ArrayList<TourMarker>   _sortedMarkers;
 
    /**
