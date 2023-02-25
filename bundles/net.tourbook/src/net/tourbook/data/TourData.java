@@ -811,7 +811,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * 1.0f = Revolutions per minute (RPM) <br>
     * 2.0f = Steps per minute (SPM)
     */
-   @JsonProperty
    private float                  cadenceMultiplier               = RawDataManager.getCadenceMultiplierDefaultValue().getMultiplier();
 
    /**
