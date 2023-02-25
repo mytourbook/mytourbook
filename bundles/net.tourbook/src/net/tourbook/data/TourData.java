@@ -1031,7 +1031,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    @XmlElementWrapper(name = "TourMarkers")
    @XmlElement(name = "TourMarker")
-   @JsonProperty
    private Set<TourMarker>             tourMarkers                         = new HashSet<>();
 
    /**
@@ -1910,7 +1909,6 @@ private Set<TourTag>                tourTags                            = new Ha
    public short[]       swim_Strokes;
 
    @Transient
-
    private float[]      _swim_Strokes_UI;
 
    /**
