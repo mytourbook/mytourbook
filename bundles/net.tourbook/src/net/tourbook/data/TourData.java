@@ -8311,7 +8311,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-
    public short getIsDistanceFromSensor() {
       return isDistanceFromSensor;
    }
@@ -8321,7 +8320,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-
    public int getIsPowerSensorPresent() {
       return isPowerSensorPresent;
    }
@@ -8331,7 +8329,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-
    public int getIsPulseSensorPresent() {
       return isPulseSensorPresent;
    }
@@ -8341,7 +8338,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-
    public short getIsStrideSensorPresent() {
       return isStrideSensorPresent;
    }
@@ -9217,7 +9213,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-
    public SerieData getSerieData() {
       return serieData;
    }
@@ -9374,7 +9369,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *         <p>
     *         or <code>null</code> when SRTM data serie is not available
     */
-
    public float[][] getSRTMValues(final boolean isUseSRTM1Values) {
 
       if (latitudeSerie == null) {
@@ -9948,7 +9942,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *         {@link IWeather#airQualityIndexTexts} or 0 when the air quality
     *         index is not defined
     */
-
    public int getWeather_AirQualityIndex_TextIndex() {
 
       return WeatherUtils.getWeather_AirQualityIndex_TextIndex(weather_AirQualityIndex);
@@ -10224,7 +10217,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *         Returns <code>true</code> then {@link #srtmSerie} contains SRTM 1 values or partly,
     *         otherwise SRTM 3 values
     */
-
    public boolean isSRTM1Values() {
       return _isSRTM1Values;
    }
