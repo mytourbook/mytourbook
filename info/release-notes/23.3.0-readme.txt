@@ -37,6 +37,16 @@ Concatenate Tours (Frederic)
   - Increased cursor size in Tour Chart and 2D Map, when displayed on 4k displays
 
 
+Changes
+=======
+
+Map Player -> Model Player
+  - The "Map Player" view was renamed to "Model Player" view. Ignore the following error, close this view and open the "Model Player" view
+  
+2 Year Digits -> 4 Year Digits
+  - For some locales e.g. german the short formatting for a year has 2 digits, this is now changed to 4 year digits
+   
+
 Bugfix
 ======
 
