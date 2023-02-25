@@ -241,6 +241,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Unique entity id which identifies the tour
     */
    @Id
+   @JsonProperty
    private Long                  tourId;
 
    // ############################################# DATE #############################################
@@ -1049,7 +1050,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @ManyToMany(fetch = EAGER)
    @JoinTable(inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagID"))
- @JsonProperty   
+ @JsonProperty
 private Set<TourTag>                tourTags                            = new HashSet<>();
 
    /**

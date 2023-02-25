@@ -29,6 +29,7 @@ import java.util.Map;
 import net.tourbook.common.util.FilesUtils;
 import net.tourbook.data.TourData;
 
+import org.skyscreamer.jsonassert.ArrayValueMatcher;
 import org.skyscreamer.jsonassert.Customization;
 import org.skyscreamer.jsonassert.JSONCompare;
 import org.skyscreamer.jsonassert.JSONCompareMode;
@@ -52,9 +53,18 @@ public class Comparison {
    public static void compareTourDataAgainstControl(final TourData testTourData,
                                                     final String controlFileName) {
 
+      final ArrayValueMatcher<Object> tourMarkersValueMatcher = new ArrayValueMatcher<>(
+            new CustomComparator(
+                  JSONCompareMode.STRICT,
+                  new Customization("tourMarkers[*].deviceLapTime", (o1, o2) -> true), //$NON-NLS-1$
+                  new Customization("tourMarkers[*].tourData", (o1, o2) -> true))); //$NON-NLS-1$
+
       final CustomComparator customArrayValueComparator = new CustomComparator(
             JSONCompareMode.STRICT,
-            new Customization("geoGrid", (o1, o2) -> true)); //$NON-NLS-1$
+            new Customization("tourMarkers", tourMarkersValueMatcher), //$NON-NLS-1$
+            new Customization("tourType.createId", (o1, o2) -> true), //$NON-NLS-1$
+            new Customization("geoGrid", (o1, o2) -> true), //$NON-NLS-1$
+            new Customization("tourId", (o1, o2) -> true)); //$NON-NLS-1$
 
       final String controlDocument = readFileContent(controlFileName + JSON);
 
