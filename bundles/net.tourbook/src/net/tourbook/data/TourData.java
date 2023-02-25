@@ -777,7 +777,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Tolerance for the Douglas Peucker algorithm.
     */
-   @JsonProperty
    private short                 dpTolerance                     = 50;                 // 5.0 since version 14.7
 
    /**
@@ -974,7 +973,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    @SuppressWarnings("unused")
    private float                    deviceAvgSpeed;                     // db-version 12
-   
    @SuppressWarnings("unused")
    private int                      deviceDistance;
 
