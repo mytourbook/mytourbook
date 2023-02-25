@@ -385,7 +385,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Average altitude change (m/km)
     */
-   private int                   avgAltitudeChange;
+   private int                   avgAltitudeChange;                                     // db-version 40
 
    // ############################################# PULSE/WEIGHT/POWER #############################################
 
@@ -398,8 +398,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private int                   restPulse;                                             // db-version 8
 
    @XmlElement
-   //todo fb why this non primitive type is not serialized
-  // @JsonSerialize(using = NumberSerializers.IntegerSerializer.class)
    private Integer               calories;                                             // db-version 4
 
    private float                 bodyWeight;                                          // db-version 4
@@ -1137,6 +1135,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <code>true</code> is set when a time slice is a break.
     */
    @Transient
+   @JsonIgnore
    private boolean[]             breakTimeSerie;
 
    /**
@@ -1262,6 +1261,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private boolean               isPowerSerieFromDevice               = false;
 
    @Transient
+   @JsonIgnore
    private float[]               altimeterSerie;
 
    @Transient
@@ -1362,6 +1362,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * </pre>
     */
    @Transient
+   @JsonIgnore
    public int[]               geoGrid;
 
    /**

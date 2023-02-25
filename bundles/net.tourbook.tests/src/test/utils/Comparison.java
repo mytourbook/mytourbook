@@ -55,6 +55,7 @@ public class Comparison {
       final CustomComparator customArrayValueComparator = new CustomComparator(
             JSONCompareMode.STRICT,
             new Customization("importFilePath", (o1, o2) -> true), //$NON-NLS-1$
+            new Customization("geoGrid", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("tourId", (o1, o2) -> true)); //$NON-NLS-1$
 
       final String controlDocument = readFileContent(controlFileName + JSON);
