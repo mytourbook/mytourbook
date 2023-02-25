@@ -17,6 +17,7 @@ package net.tourbook.data;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import java.io.StringWriter;
@@ -138,6 +139,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @JsonProperty
    private long     markerId        = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    @ManyToOne(optional = false)
