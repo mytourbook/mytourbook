@@ -54,7 +54,7 @@ public class Comparison {
 
       final CustomComparator customArrayValueComparator = new CustomComparator(
             JSONCompareMode.STRICT,
-            new Customization("geoGrid", (o1, o2) -> true))); //$NON-NLS-1$
+            new Customization("geoGrid", (o1, o2) -> true)); //$NON-NLS-1$
 
       final String controlDocument = readFileContent(controlFileName + JSON);
 
