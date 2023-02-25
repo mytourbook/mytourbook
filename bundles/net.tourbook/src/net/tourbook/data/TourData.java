@@ -765,7 +765,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <p>
     * Data format: YYYYMMDDhhmmss
     */
-   @JsonProperty
    private long                  dateTimeModified;                                     // db-version 11
 
    /** Folder path from the import file. */
