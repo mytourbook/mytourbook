@@ -829,26 +829,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * when a tour is merged with another tour, {@link #mergeSourceTourId} contains the tour id of
     * the tour which is merged into this tour
     */
-   @JsonProperty
    private Long                  mergeSourceTourId;                                    // db-version 7
 
    /**
     * when a tour is merged into another tour, {@link #mergeTargetTourId} contains the tour id of
     * the tour into which this tour is merged
     */
-   @JsonProperty
    private Long                  mergeTargetTourId;                                    // db-version 7
 
    /**
     * positive or negative time offset in seconds for the merged tour
     */
-   @JsonProperty
    private int                   mergedTourTimeOffset;                                 // db-version 7
 
    /**
     * altitude difference for the merged tour
     */
-   @JsonProperty
    private int                   mergedAltitudeOffset;                                 // db-version 7
 
    /**
@@ -886,7 +882,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Time adjustment in seconds, this is an average value for all photos.
     */
-   @JsonProperty
    private int                   photoTimeAdjustment;
 
    // ############################################# GEARS #############################################
@@ -978,42 +973,33 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * is not used any more since 6.12.2006 but it's necessary then it's a field in the database
     */
    @SuppressWarnings("unused")
-
    private int                      distance;
 
    @SuppressWarnings("unused")
-
    private float                    deviceAvgSpeed;                     // db-version 12
-
+   
    @SuppressWarnings("unused")
-
    private int                      deviceDistance;
 
    /**
     * Profile id which is defined by the device
     */
    @SuppressWarnings("unused")
-
    private short                    deviceMode;                           // db-version 3
 
    @SuppressWarnings("unused")
-
    private int                      deviceTotalUp;
 
    @SuppressWarnings("unused")
-
    private int                      deviceTotalDown;
 
    @SuppressWarnings("unused")
-
    private long                     deviceTravelTime;
 
    @SuppressWarnings("unused")
-
    private int                      deviceWheel;
 
    @SuppressWarnings("unused")
-
    private int                      deviceWeight;
 
    // ############################################# UNUSED FIELDS - END #############################################
