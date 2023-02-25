@@ -464,7 +464,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Number of HR zones which are available for this tour, is 0 when HR zones are not defined.
     */
-   @JsonProperty
    private int                   numberOfHrZones               = 0;                     // db-version 18
 
    /**
@@ -473,25 +472,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <p>
     * These values are used in the statistic views.
     */
-   @JsonProperty
    private int                   hrZone0                        = -1;                     // db-version 16
-   @JsonProperty
    private int                   hrZone1                        = -1;                     // db-version 16
-   @JsonProperty
    private int                   hrZone2                        = -1;                     // db-version 16
-   @JsonProperty
    private int                   hrZone3                        = -1;                     // db-version 16
-   @JsonProperty
    private int                   hrZone4                        = -1;                     // db-version 16
-   @JsonProperty
    private int                   hrZone5                        = -1;                     // db-version 16
-   @JsonProperty
    private int                   hrZone6                        = -1;                     // db-version 16
-   @JsonProperty
    private int                   hrZone7                        = -1;                     // db-version 16
-   @JsonProperty
    private int                   hrZone8                        = -1;                     // db-version 16
-   @JsonProperty
    private int                   hrZone9                        = -1;                     // db-version 16
 
    /**
@@ -601,7 +590,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    @JsonProperty
    private boolean               isWeatherDataFromProvider;                            // db-version 39
 
-   @JsonProperty
    private int                   weather_Wind_Direction  = -1;                         // db-version 8
 
    /**
