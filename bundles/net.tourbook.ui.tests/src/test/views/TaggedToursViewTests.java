@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -43,7 +43,7 @@ public class TaggedToursViewTests extends UITest {
 
       final SWTBotTreeItem item = bot.tree(1).getTreeItem("Shoes 2   9").select(); //$NON-NLS-1$
       assertNotNull(item);
-      final SWTBotTreeItem node = item.getNode("5/31/15").select(); //$NON-NLS-1$
+      final SWTBotTreeItem node = item.getNode("5/31/2015").select(); //$NON-NLS-1$
       assertNotNull(node);
    }
 }

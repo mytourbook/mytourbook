@@ -47,7 +47,7 @@ public class DialogJoinToursTests extends UITest {
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "2/1/21, 9:11 AM")));//$NON-NLS-1$
+            "2/1/2021, 9:11 AM")));//$NON-NLS-1$
 
       //Check that the tour was successfully deleted
       final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
