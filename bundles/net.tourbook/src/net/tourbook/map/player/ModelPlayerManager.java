@@ -46,6 +46,8 @@ public class ModelPlayerManager {
    static final int                     SPEED_JOG_WHEEL_MAX               = 2 * 100;
    static final int                     SPEED_JOG_WHEEL_MAX_HALF          = SPEED_JOG_WHEEL_MAX / 2;
 
+   public static final int              MAP_ZOOM_LEVEL_IS_NOT_AVAILABLE   = -1;
+
    private static final String          STATE_IS_MAP_MODEL_VISIBLE        = "STATE_IS_MAP_MODEL_VISIBLE";                                         //$NON-NLS-1$
    private static final String          STATE_IS_MAP_MODEL_CURSOR_VISIBLE = "STATE_IS_MAP_MODEL_CURSOR_VISIBLE";                                  //$NON-NLS-1$
    private static final String          STATE_IS_PLAYER_RUNNING           = "STATE_IS_PLAYER_RUNNING";                                            //$NON-NLS-1$
@@ -283,6 +285,21 @@ public class ModelPlayerManager {
 
          _mapPosition.x = projectedPositionX;
          _mapPosition.y = projectedPositionY;
+
+         if (isMap25ViewAvailable()) {
+
+            final MapPosition mapPosition = _map25View.getMapPosition();
+
+            _mapPosition.zoomLevel = mapPosition.zoomLevel;
+
+            _mapPosition.bearing = mapPosition.bearing;
+            _mapPosition.roll = mapPosition.roll;
+            _mapPosition.tilt = mapPosition.tilt;
+
+         } else {
+
+            _mapPosition.zoomLevel = MAP_ZOOM_LEVEL_IS_NOT_AVAILABLE;
+         }
 
          MapManager.fireSyncMapEvent(_mapPosition, null, SyncParameter.SHOW_MAP_POSITION_WITHOUT_ANIMATION);
       }
