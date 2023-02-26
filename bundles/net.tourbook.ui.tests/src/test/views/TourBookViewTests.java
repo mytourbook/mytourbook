@@ -185,9 +185,9 @@ public class TourBookViewTests extends UITest {
 
       tour.contextMenu(Messages.App_Action_ExportViewCSV).click();
 
-      bot.button("Save").click();
+      bot.button("Save").click(); //$NON-NLS-1$
 
-      final Path csvFilePath = Paths.get(Utils.workingDirectory, "TourBook_2022-08-30_21-39-05.csv");
+      final Path csvFilePath = Paths.get(Utils.workingDirectory, "TourBook_2022-08-30_21-39-05.csv"); //$NON-NLS-1$
       assertTrue(Files.exists(csvFilePath));
 
       FilesUtils.deleteIfExists(csvFilePath);
