@@ -83,7 +83,7 @@ public class OpenWeatherMapRetrieverTests {
             2022,
             07,
             02,
-            12,
+            0,
             0,
             0,
             0,
