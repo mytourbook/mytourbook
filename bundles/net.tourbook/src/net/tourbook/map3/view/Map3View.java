@@ -77,6 +77,7 @@ import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
+import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map2.view.IDiscreteColorProvider;
 import net.tourbook.map2.view.SelectionMapPosition;
 import net.tourbook.map25.Map25FPSManager;
@@ -240,6 +241,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
    private boolean                        _isMapSynched_WithOtherMap;
    private boolean                        _isMapSynched_WithTour;
    private long                           _lastFiredSyncEventTime;
+   private long                           _lastMapSyncEventTime;
    //
    /**
     * Contains all tours which are displayed in the map.
@@ -1536,11 +1538,19 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
    private void moveToMapLocation(final MapPosition mapPosition, final IMapSyncListener.SyncParameter syncParameter) {
 
-      final int zoomLevel = mapPosition.zoomLevel + 1;
+      final int zoomLevel = mapPosition.zoomLevel;
+      final int mapZoomLevel = zoomLevel == ModelPlayerManager.MAP_ZOOM_LEVEL_IS_NOT_AVAILABLE
+
+            // use current zoom
+            ? getMapPosition().zoomLevel
+
+            // use provided zoom
+            : zoomLevel + 1;
+
       final double latitude = mapPosition.getLatitude();
       final double longitude = mapPosition.getLongitude();
 
-      final double zoomElevation = Math.pow(2 * 1.5, 20.0 - zoomLevel);
+      final double zoomElevation = Math.pow(2 * 1.5, 20.0 - mapZoomLevel);
 
       final LatLon latlon = LatLon.fromDegrees(latitude, longitude);
 
@@ -2448,12 +2458,26 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          return;
       }
 
-      final long timeDiff = System.currentTimeMillis() - _lastFiredSyncEventTime;
+      final long currentTime = System.currentTimeMillis();
+      
+      final long timeDiffLastFired = currentTime - _lastFiredSyncEventTime;
 
-      if (timeDiff < 1000) {
+      if (timeDiffLastFired < 1000) {
          // ignore because it causes LOTS of problems when synchronizing moved map
          return;
       }
+
+      final long timeDiffLastSync = currentTime - _lastMapSyncEventTime;
+      if (timeDiffLastSync < 2000) {
+
+         /*
+          * This is currently not a very good solution because I didn't found the code to move the map
+          * without any animation which is first zooming out and then zooming in
+          */
+         return;
+      }
+
+      _lastMapSyncEventTime = currentTime;
 
       moveToMapLocation(mapPosition, syncParameter);
    }

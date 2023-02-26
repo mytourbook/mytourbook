@@ -588,7 +588,7 @@ public class GLTFModel_Renderer extends LayerRenderer {
 
          StatusUtil.showStatus(String.format(
 
-               Messages.Map_Player_Error_InvalidModelFilepath,
+               Messages.Model_Player_Error_InvalidModelFilepath,
                mapModel.name,
                mapModel.filepath),
 

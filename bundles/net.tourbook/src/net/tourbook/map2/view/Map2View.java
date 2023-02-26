@@ -81,6 +81,7 @@ import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
+import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.action.ActionCreateTourMarkerFromMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
@@ -5044,15 +5045,29 @@ public class Map2View extends ViewPart implements
          @Override
          public void run() {
 
+            if (_map.isDisposed()) {
+               return;
+            }
+
             // check if a newer runnable is available
             if (__asynchRunnableCounter != _asyncCounter.get()) {
-               // a newer queryRedraw is available
+
+               // a newer runnable is available
                return;
             }
 
             _isInMapSync = true;
             {
-               _map.setZoom(mapPosition.zoomLevel + 1);
+               final int zoomLevel = mapPosition.zoomLevel;
+               final int mapZoomLevel = zoomLevel == ModelPlayerManager.MAP_ZOOM_LEVEL_IS_NOT_AVAILABLE
+
+                     // use current zoom
+                     ? _map.getZoom()
+
+                     // use provided zoom
+                     : zoomLevel + 1;
+
+               _map.setZoom(mapZoomLevel);
                _map.setMapCenter(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()));
             }
             _isInMapSync = false;

@@ -46,6 +46,8 @@ public class ModelPlayerManager {
    static final int                     SPEED_JOG_WHEEL_MAX               = 2 * 100;
    static final int                     SPEED_JOG_WHEEL_MAX_HALF          = SPEED_JOG_WHEEL_MAX / 2;
 
+   public static final int              MAP_ZOOM_LEVEL_IS_NOT_AVAILABLE   = -1;
+
    private static final String          STATE_IS_MAP_MODEL_VISIBLE        = "STATE_IS_MAP_MODEL_VISIBLE";                                         //$NON-NLS-1$
    private static final String          STATE_IS_MAP_MODEL_CURSOR_VISIBLE = "STATE_IS_MAP_MODEL_CURSOR_VISIBLE";                                  //$NON-NLS-1$
    private static final String          STATE_IS_PLAYER_RUNNING           = "STATE_IS_PLAYER_RUNNING";                                            //$NON-NLS-1$
@@ -283,6 +285,21 @@ public class ModelPlayerManager {
 
          _mapPosition.x = projectedPositionX;
          _mapPosition.y = projectedPositionY;
+
+         if (isMap25ViewAvailable()) {
+
+            final MapPosition mapPosition = _map25View.getMapPosition();
+
+            _mapPosition.zoomLevel = mapPosition.zoomLevel;
+
+            _mapPosition.bearing = mapPosition.bearing;
+            _mapPosition.roll = mapPosition.roll;
+            _mapPosition.tilt = mapPosition.tilt;
+
+         } else {
+
+            _mapPosition.zoomLevel = MAP_ZOOM_LEVEL_IS_NOT_AVAILABLE;
+         }
 
          MapManager.fireSyncMapEvent(_mapPosition, null, SyncParameter.SHOW_MAP_POSITION_WITHOUT_ANIMATION);
       }
@@ -879,7 +896,7 @@ public class ModelPlayerManager {
       _isReLivePlaying           = Util.getStateBoolean( _state, STATE_IS_RELIVE_PLAYING,             false);
       _jogWheelSpeed             = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED,               10);
       _jogWheelSpeedMultiplier   = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED_MULTIPLIER,    1);
-      _modelSize                 = Util.getStateInt(     _state, STATE_MODEL_SIZE,              200);
+      _modelSize                 = Util.getStateInt(     _state, STATE_MODEL_SIZE,                    200);
       _modelCursorSize           = Util.getStateInt(     _state, STATE_MODEL_CURSOR_SIZE,             200);
       _modelTurningFactor        = Util.getStateInt(     _state, STATE_MODEL_TURNING_ANGLE,           10);
       _relativePosition_Current  = Util.getStateDouble(  _state, STATE_RELATIVE_POSITION,             0);
@@ -907,7 +924,7 @@ public class ModelPlayerManager {
       _state.put(STATE_IS_RELIVE_PLAYING,             _isReLivePlaying);
       _state.put(STATE_JOG_WHEEL_SPEED,               _jogWheelSpeed);
       _state.put(STATE_JOG_WHEEL_SPEED_MULTIPLIER,    _jogWheelSpeedMultiplier);
-      _state.put(STATE_MODEL_SIZE,              _modelSize);
+      _state.put(STATE_MODEL_SIZE,                    _modelSize);
       _state.put(STATE_MODEL_CURSOR_SIZE,             _modelCursorSize);
       _state.put(STATE_MODEL_TURNING_ANGLE,           _modelTurningFactor);
       _state.put(STATE_RELATIVE_POSITION,             _relativePosition_Current);

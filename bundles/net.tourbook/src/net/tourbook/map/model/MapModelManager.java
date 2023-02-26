@@ -29,6 +29,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.animation.GLTFModel_Renderer;
+import net.tourbook.model.ModelActivator;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -123,7 +124,7 @@ public class MapModelManager {
 
       try {
 
-         final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry(bundleRelativeFilePathname);
+         final URL bundleUrl = ModelActivator.getDefault().getBundle().getEntry(bundleRelativeFilePathname);
 
          if (bundleUrl == null) {
             throw new Exception("Default map model file is not in bundle: " + bundleRelativeFilePathname); //$NON-NLS-1$
