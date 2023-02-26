@@ -25,6 +25,7 @@ import java.lang.reflect.Field;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
 import net.tourbook.weather.WeatherUtils;
 import net.tourbook.weather.openweathermap.OpenWeatherMapRetriever;
@@ -47,8 +48,6 @@ public class OpenWeatherMapRetrieverTests {
    private static final String OPENWEATHERMAP_FILE_PATH =
          FilesUtils.rootPath + "data/weather/openweathermap/files/";                                     //$NON-NLS-1$
 
-   private static final String DenverZoneId             = "America/Denver";                              //$NON-NLS-1$
-
    static HttpClientMock       httpClientMock;
    OpenWeatherMapRetriever     openWeatherMapRetriever;
 
@@ -63,12 +62,7 @@ public class OpenWeatherMapRetrieverTests {
       field.set(null, httpClientMock);
    }
 
-   
-   
-   
-  
-                      
-                       @Test
+   @Test
    void testWeatherRetrieval_JulySecond2022() {
 
       final String openWeatherMapResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
@@ -78,29 +72,30 @@ public class OpenWeatherMapRetrieverTests {
       httpClientMock.onGet(url).doReturn(openWeatherMapResponse);
 
       final TourData tour = Initializer.importTour();
-        //Tuesday, July 2, 2022 12:00:00 AM
+      //Tuesday, July 2, 2022 12:00:00 AM
       final ZonedDateTime zonedDateTime = ZonedDateTime.of(
             2022,
-            07,
-            02,
+            7,
+            2,
             0,
             0,
             0,
             0,
-            ZoneId.of("Europe/Paris"));
+            ZoneId.of("Europe/Paris")); //$NON-NLS-1$
       tour.setTourStartTime(zonedDateTime);
+      assertEquals("Europe/Paris", TimeTools.getDefaultTimeZone().getId());
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 
       openWeatherMapRetriever = new OpenWeatherMapRetriever(tour);
 
-      assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
+      assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData(), "The weather was not retrieved"); //$NON-NLS-1$
       httpClientMock.verify().get(url).called();
 
 // SET_FORMATTING_OFF
 
       assertEquals("broken clouds",   tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-cloudy", tour.getWeather_Clouds()); //$NON-NLS-1$
+      assertEquals("weather-cloudy",  tour.getWeather_Clouds()); //$NON-NLS-1$
       assertEquals(7.58f,             tour.getWeather_Temperature_Average());
       assertEquals(3,                 tour.getWeather_Wind_Speed());
       assertEquals(240,               tour.getWeather_Wind_Direction());
@@ -114,7 +109,7 @@ public class OpenWeatherMapRetrieverTests {
 
 // SET_FORMATTING_ON
    }
-   
+
    @Test
    void testWeatherRetrieval_JulySixth2022() {
 
