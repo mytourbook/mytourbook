@@ -81,9 +81,8 @@ public class OpenWeatherMapRetrieverTests {
             0,
             0,
             0,
-            ZoneId.of("Europe/Paris")); //$NON-NLS-1$
+            TimeTools.UTC);
       tour.setTourStartTime(zonedDateTime);
-      assertEquals("Europe/Paris", TimeTools.getDefaultTimeZone().getId());
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 
@@ -121,7 +120,16 @@ public class OpenWeatherMapRetrieverTests {
 
       final TourData tour = Initializer.importTour();
       //Tuesday, July 6, 2022 12:00:00 AM
-      tour.setTourStartTime(2022, 7, 6, 0, 0, 0);
+      final ZonedDateTime zonedDateTime = ZonedDateTime.of(
+            2022,
+            7,
+            6,
+            0,
+            0,
+            0,
+            0,
+            TimeTools.UTC);
+      tour.setTourStartTime(zonedDateTime);
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 
@@ -164,7 +172,16 @@ public class OpenWeatherMapRetrieverTests {
 
       final TourData tour = Initializer.importTour();
       //Tuesday, March 12, 2022 12:00:00 PM
-      tour.setTourStartTime(2022, 3, 12, 12, 0, 0);
+      final ZonedDateTime zonedDateTime = ZonedDateTime.of(
+            2022,
+            3,
+            12,
+            12,
+            0,
+            0,
+            0,
+            TimeTools.UTC);
+      tour.setTourStartTime(zonedDateTime);
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 
