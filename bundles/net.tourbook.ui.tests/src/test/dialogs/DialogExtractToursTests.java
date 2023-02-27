@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -77,7 +77,7 @@ public class DialogExtractToursTests extends UITest {
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "2/1/21, 7:15 AM")));//$NON-NLS-1$
+            "2/1/2021, 7:15 AM")));//$NON-NLS-1$
 
       //Check that the tour was successfully deleted
       final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
