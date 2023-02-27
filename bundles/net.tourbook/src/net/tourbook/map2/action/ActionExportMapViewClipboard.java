@@ -67,7 +67,7 @@ public class ActionExportMapViewClipboard extends Action {
          try {
             final String absoluteFilePath = Files.createTempFile("map", ".png").toString(); //$NON-NLS-1$ //$NON-NLS-2$
 
-            //We export the image to a file as a JPEG image
+            // todo fb  We export the image to a file as a JPEG image
             final ImageLoader loader = new ImageLoader();
             loader.data = new ImageData[] { mapViewImage.getImageData() };
             loader.save(absoluteFilePath, SWT.IMAGE_PNG);
