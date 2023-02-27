@@ -141,7 +141,7 @@ public class StravaUploaderTests {
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "message      = 1/3/22, 5:16 PM -> Uploaded Activity Link: <br><a href=\"https://www.strava.com/activities/6468063624\">https://www.strava.com/activities/6468063624</a></br>\n"))); //$NON-NLS-1$
+            "message      = 1/3/2022, 5:16 PM -> Uploaded Activity Link: <br><a href=\"https://www.strava.com/activities/6468063624\">https://www.strava.com/activities/6468063624</a></br>\n"))); //$NON-NLS-1$
    }
 
    @Test

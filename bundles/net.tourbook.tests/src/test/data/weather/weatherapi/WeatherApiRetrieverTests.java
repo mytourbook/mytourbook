@@ -121,7 +121,7 @@ public class WeatherApiRetrieverTests {
             2022,
             5,
             10,
-            0,
+            12,
             0,
             0,
             0,
