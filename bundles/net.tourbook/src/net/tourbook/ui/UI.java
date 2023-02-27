@@ -87,6 +87,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
@@ -903,6 +904,11 @@ public class UI {
 
       final Image resizedImage = ImageUtils.resize(Display.getDefault(), image, newimageWidth, newimageHeight, 1, 1, rotation);
 
+      //We export the image to a file as a JPEG image
+      final ImageLoader loader = new ImageLoader();
+      loader.data = new ImageData[] { resizedImage.getImageData() };
+      loader.save("C:\\Users\\frederic\\Downloads\\toto.png", SWT.IMAGE_PNG);
+
       net.tourbook.common.UI.disposeResource(image);
 
       return resizedImage;
@@ -1261,22 +1267,28 @@ public class UI {
 
       for (final TourTag tag : tourTags) {
 
-         // If the tag is already present in the UI, there is no need to create
-         // it again.
-         if (_tagsLabels.containsKey(tag.getTagId())) {
-            continue;
-         }
+         final long tagId = tag.getTagId();
 
          final CLabel label = new CLabel(tourTagsComposite, SWT.NONE);
          label.setLayoutData(new RowData(pc.convertWidthInCharsToPixels(35), pc.convertWidthInCharsToPixels(12)));
          label.setText(tag.getTagName() + UI.NEW_LINE +
-               tourTagsAccumulatedValues.get(tag.getTagId()));
+               tourTagsAccumulatedValues.get(tagId));
 
          final Image image = TagMenuManager.getTagImage(tag.getImageFilePath());
          if (image != null) {
             label.setImage(image);
          }
-         _tagsLabels.put(tag.getTagId(), label);
+
+         // If the tag is already present in the UI, we replace it with a new one
+         // in case the image has changed or was deleted
+         if (_tagsLabels.containsKey(tagId)) {
+
+            _tagsLabels.get(tagId).dispose();
+            _tagsLabels.replace(tagId, label);
+         } else {
+
+            _tagsLabels.put(tagId, label);
+         }
       }
 
       tourTagsComposite.layout();
