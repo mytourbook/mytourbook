@@ -47,7 +47,7 @@ public class DialogJoinToursTests extends UITest {
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "2/1/21, 9:11 AM")));//$NON-NLS-1$
+            "2/1/2021, 9:11 AM")));//$NON-NLS-1$
 
       //Check that the tour was successfully deleted
       final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
@@ -163,7 +163,7 @@ public class DialogJoinToursTests extends UITest {
       assertEquals("9:11 AM", tour.cell(tourBookView_StartTime_Column_Index)); //$NON-NLS-1$
       assertEquals("4:26", tour.cell(tourBookView_ElapsedTime_Column_Index)); //$NON-NLS-1$
       assertEquals("4:04", tour.cell(tourBookView_RecordedTime_Column_Index)); //$NON-NLS-1$
-      assertEquals("0:22", tour.cell(tourBookView_PausedTime_Column_Index));
+      assertEquals("0:22", tour.cell(tourBookView_PausedTime_Column_Index)); //$NON-NLS-1$
 
       //Open the Tour Marker View
       Utils.openOtherMenu(bot);
