@@ -87,7 +87,6 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowData;
@@ -904,10 +903,10 @@ public class UI {
 
       final Image resizedImage = ImageUtils.resize(Display.getDefault(), image, newimageWidth, newimageHeight, 1, 1, rotation);
 
-      //We export the image to a file as a JPEG image
-      final ImageLoader loader = new ImageLoader();
-      loader.data = new ImageData[] { resizedImage.getImageData() };
-      loader.save("C:\\Users\\frederic\\Downloads\\toto.png", SWT.IMAGE_PNG);
+      //todo fb We export the image to a file as a JPEG image
+      // final ImageLoader loader = new ImageLoader();
+      // loader.data = new ImageData[] { resizedImage.getImageData() };
+      //  loader.save("C:\\Users\\frederic\\Downloads\\toto.png", SWT.IMAGE_PNG);
 
       net.tourbook.common.UI.disposeResource(image);
 
