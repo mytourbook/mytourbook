@@ -129,7 +129,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
    private AirPollutionResult deserializeAirPollutionData(final String airPollutionDataResponse) {
 
-      AirPollutionResult airPollutionResult = null;
+      airPollutionResult = null;
       try {
 
          final ObjectMapper mapper = new ObjectMapper();
