@@ -1269,23 +1269,22 @@ public class UI {
 
          final long tagId = tag.getTagId();
 
-         final CLabel label = new CLabel(tourTagsComposite, SWT.NONE);
-         label.setLayoutData(new RowData(pc.convertWidthInCharsToPixels(35), pc.convertWidthInCharsToPixels(12)));
-         label.setText(tag.getTagName() + UI.NEW_LINE +
-               tourTagsAccumulatedValues.get(tagId));
-
          final Image image = TagMenuManager.getTagImage(tag.getImageFilePath());
-         if (image != null) {
-            label.setImage(image);
-         }
 
-         // If the tag is already present in the UI, we replace it with a new one
-         // in case the image has changed or was deleted
+         // If the tag is already present in the UI, we only replace its image in
+         // case it has changed or was deleted.
+         // We keep the CLabel to keep the order it was created in.
          if (_tagsLabels.containsKey(tagId)) {
 
-            _tagsLabels.get(tagId).dispose();
-            _tagsLabels.replace(tagId, label);
+            _tagsLabels.get(tagId).setImage(image);
+
          } else {
+
+            final CLabel label = new CLabel(tourTagsComposite, SWT.NONE);
+            label.setLayoutData(new RowData(pc.convertWidthInCharsToPixels(35), pc.convertWidthInCharsToPixels(12)));
+            label.setText(tag.getTagName() + UI.NEW_LINE +
+                  tourTagsAccumulatedValues.get(tagId));
+            label.setImage(image);
 
             _tagsLabels.put(tagId, label);
          }

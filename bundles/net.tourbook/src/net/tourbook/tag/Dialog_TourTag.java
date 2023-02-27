@@ -25,7 +25,6 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.StringUtils;
-import net.tourbook.common.util.Util;
 import net.tourbook.data.TourTag;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
