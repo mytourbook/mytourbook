@@ -77,6 +77,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       final List<String> fullWeatherDataList = new ArrayList<>();
 
+      //todo fb add the AQI
       for (final Hourly hourly : timeMachineResult.getHourly()) {
 
          final TourDateTime tourDateTime = TimeTools.createTourDateTime(
@@ -225,10 +226,10 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       setTourWeatherAirQualityIndex();
 
-      //retrieve the air quality
-
       //todo fb make sure that even if the weather is not retrieved (example :> 5 days)
       //try to retrieve the aqi because it goes back to 2020
+
+      //todo fb unit tests
 
       return true;
    }
@@ -290,10 +291,6 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       setTourWeatherWithHistoricalWeather();
 
-      //retrieve the air quality
-
-      //todo fb make sure that even if the weather is not retrieved (example :> 5 days)
-      //try to retrieve the aqi because it goes back to 2020
 
       return true;
    }
