@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import java.util.ArrayList;
 
 import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -55,7 +56,24 @@ import org.eclipse.ui.part.ViewPart;
 
 public class SearchView extends ViewPart implements ISearchView {
 
-   public static final String     ID                             = "net.tourbook.search.SearchView"; //$NON-NLS-1$
+   public static final String   ID                      = "net.tourbook.search.SearchView";                   //$NON-NLS-1$
+
+   private static final String  SYS_PROP__FORCE_BROWSER = "forceBrowserForTourSeachInLinux";                  //$NON-NLS-1$
+
+   private static final boolean _isForceBrowser         = System.getProperty(SYS_PROP__FORCE_BROWSER) != null;
+   private static final boolean _isUseEmbeddedBrowser   = _isForceBrowser == false;
+
+   static {
+
+      if (_isForceBrowser) {
+
+         Util.logSystemProperty_IsEnabled(
+
+               SearchView.class,
+               SYS_PROP__FORCE_BROWSER,
+               "The browser UI is forced for the tour search in Linux"); //$NON-NLS-1$
+      }
+   }
 
    private static final String    STATE_USE_EXTERNAL_WEB_BROWSER = "STATE_USE_EXTERNAL_WEB_BROWSER"; //$NON-NLS-1$
 
@@ -193,30 +211,30 @@ public class SearchView extends ViewPart implements ISearchView {
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
-//      if (UI.IS_WIN) {
+      if (UI.IS_WIN || _isUseEmbeddedBrowser) {
 
-      // internal browser
-      _pageWinInternalBrowser = new Composite(_pageBook, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageWinInternalBrowser);
-      GridLayoutFactory.fillDefaults().applyTo(_pageWinInternalBrowser);
+         // internal browser
+         _pageWinInternalBrowser = new Composite(_pageBook, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageWinInternalBrowser);
+         GridLayoutFactory.fillDefaults().applyTo(_pageWinInternalBrowser);
 
-      createUI_10_SearchInternal(_pageWinInternalBrowser);
+         createUI_10_SearchInternal(_pageWinInternalBrowser);
 
-      // external browser
-      _pageWinExternalBrowser = new Composite(_pageBook, SWT.NONE);
-      GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageWinExternalBrowser);
-      GridLayoutFactory.fillDefaults().applyTo(_pageWinExternalBrowser);
-      createUI_20_SearchExternal(_pageWinExternalBrowser);
+         // external browser
+         _pageWinExternalBrowser = new Composite(_pageBook, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageWinExternalBrowser);
+         GridLayoutFactory.fillDefaults().applyTo(_pageWinExternalBrowser);
+         createUI_20_SearchExternal(_pageWinExternalBrowser);
 
-//      } else {
-//
-//         // external browser
-//         _pageLinux = new Composite(_pageBook, SWT.NONE);
-//         GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageLinux);
-//         GridLayoutFactory.fillDefaults().applyTo(_pageLinux);
-//
-//         createUI_30_Linux(_pageLinux);
-//      }
+      } else {
+
+         // external browser
+         _pageLinux = new Composite(_pageBook, SWT.NONE);
+         GridDataFactory.fillDefaults().grab(true, true).applyTo(_pageLinux);
+         GridLayoutFactory.fillDefaults().applyTo(_pageLinux);
+
+         createUI_30_Linux(_pageLinux);
+      }
    }
 
    private void createUI_10_SearchInternal(final Composite parent) {
@@ -323,7 +341,7 @@ public class SearchView extends ViewPart implements ISearchView {
 
    private void enableActions() {
 
-//      _actionExternalSearchUI.setEnabled(UI.IS_WIN);
+      _actionExternalSearchUI.setEnabled(UI.IS_WIN || _isUseEmbeddedBrowser);
    }
 
    private void fillActionBars() {
@@ -362,42 +380,42 @@ public class SearchView extends ViewPart implements ISearchView {
    @Override
    public void setFocus() {
 
-//      if (UI.IS_WIN) {
+      if (UI.IS_WIN || _isUseEmbeddedBrowser) {
 
-      final boolean isInternal = _actionExternalSearchUI.isChecked() == false;
+         final boolean isInternal = _actionExternalSearchUI.isChecked() == false;
 
-      if (isInternal) {
+         if (isInternal) {
 
-         _browser.setFocus();
+            _browser.setFocus();
+         }
       }
-//      }
    }
 
    private void showUIPage() {
 
-//      if (UI.IS_WIN) {
+      if (UI.IS_WIN || _isUseEmbeddedBrowser) {
 
-      final boolean isExternal = _actionExternalSearchUI.isChecked();
+         final boolean isExternal = _actionExternalSearchUI.isChecked();
 
-      WebContentServer.setIsUsingEmbeddedBrowser(isExternal == false);
+         WebContentServer.setIsUsingEmbeddedBrowser(isExternal == false);
 
-      if (isExternal) {
+         if (isExternal) {
 
-         _pageBook.showPage(_pageWinExternalBrowser);
+            _pageBook.showPage(_pageWinExternalBrowser);
+
+         } else {
+
+            _pageBook.showPage(_pageWinInternalBrowser);
+
+            updateUI_WinInternalBrowser();
+         }
 
       } else {
 
-         _pageBook.showPage(_pageWinInternalBrowser);
+         WebContentServer.setIsUsingEmbeddedBrowser(false);
 
-         updateUI_WinInternalBrowser();
+         _pageBook.showPage(_pageLinux);
       }
-
-//      } else {
-//
-//         WebContentServer.setIsUsingEmbeddedBrowser(false);
-//
-//         _pageBook.showPage(_pageLinux);
-//      }
    }
 
    private void updateUI_WinInternalBrowser() {
