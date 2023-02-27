@@ -84,7 +84,7 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
                   .toEpochMilli() / 1000;
 
             HistoricalWeatherRetriever.checkVendorConnection(
-                  OpenWeatherMapRetriever.getBaseApiUrl() +
+                  OpenWeatherMapRetriever.getBaseTimeMachineApiUrl() +
                         "?units=metric&lat=0&lon=0&dt=" + //$NON-NLS-1$
                         previousHour,
                   IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP_ID);

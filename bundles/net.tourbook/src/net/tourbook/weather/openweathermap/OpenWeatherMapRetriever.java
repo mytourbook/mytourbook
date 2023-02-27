@@ -34,23 +34,42 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
+import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WeatherUtils;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
-   private static final String BASE_API_URL      = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/timemachine"; //$NON-NLS-1$
+   private static final String BASE_TIME_MACHINE_API_URL  = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/timemachine";   //$NON-NLS-1$
+   private static final String BASE_AIR_POLLUTION_API_URL = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/air_pollution"; //$NON-NLS-1$
 
-   private TimeMachineResult   timeMachineResult = null;
+   private TimeMachineResult   timeMachineResult          = null;
+   private AirPollutionResult  airPollutionResult         = null;
 
    public OpenWeatherMapRetriever(final TourData tourData) {
 
       super(tourData);
    }
 
-   public static String getBaseApiUrl() {
-      return BASE_API_URL;
+   public static String getBaseTimeMachineApiUrl() {
+      return BASE_TIME_MACHINE_API_URL;
+   }
+
+   private String buildAirPollutionApiRequest(final long startDateTime, final long endDateTime) {
+
+      final StringBuilder weatherRequestWithParameters = new StringBuilder(BASE_AIR_POLLUTION_API_URL + UI.SYMBOL_QUESTION_MARK);
+
+   // SET_FORMATTING_OFF
+
+         weatherRequestWithParameters.append(      "lat"   + "=" + searchAreaCenter.getLatitude()); //$NON-NLS-1$ //$NON-NLS-2$
+         weatherRequestWithParameters.append("&" + "lon"   + "=" + searchAreaCenter.getLongitude()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+         weatherRequestWithParameters.append("&" + "start" + "=" + startDateTime); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+         weatherRequestWithParameters.append("&" + "end"   + "=" + endDateTime); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+   // SET_FORMATTING_ON
+
+      return weatherRequestWithParameters.toString();
    }
 
    @Override
@@ -93,7 +112,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
    private String buildWeatherApiRequest(final long date) {
 
-      final StringBuilder weatherRequestWithParameters = new StringBuilder(BASE_API_URL + UI.SYMBOL_QUESTION_MARK);
+      final StringBuilder weatherRequestWithParameters = new StringBuilder(BASE_TIME_MACHINE_API_URL + UI.SYMBOL_QUESTION_MARK);
 
 // SET_FORMATTING_OFF
 
@@ -106,6 +125,31 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 // SET_FORMATTING_ON
 
       return weatherRequestWithParameters.toString();
+   }
+
+   private AirPollutionResult deserializeAirPollutionData(final String airPollutionDataResponse) {
+
+      AirPollutionResult airPollutionResult = null;
+      try {
+
+         final ObjectMapper mapper = new ObjectMapper();
+         final String weatherResults = mapper
+               .readValue(airPollutionDataResponse, JsonNode.class)
+               .toString();
+
+         airPollutionResult = mapper.readValue(
+               weatherResults,
+               new TypeReference<AirPollutionResult>() {});
+
+      } catch (final Exception e) {
+
+         StatusUtil.logError(
+               "OpenWeatherMapRetriever.deserializeAirPollutionData : Error while " + //$NON-NLS-1$
+                     "deserializing the historical weather JSON object :" //$NON-NLS-1$
+                     + airPollutionDataResponse + UI.SYSTEM_NEW_LINE + e.getMessage());
+      }
+
+      return airPollutionResult;
    }
 
    private TimeMachineResult deserializeWeatherData(final String weatherDataResponse) {
@@ -159,14 +203,40 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       return tourStartTimeCalendar.compareTo(currentTimeCalendar) == 0;
    }
 
-   @Override
-   public boolean retrieveHistoricalWeatherData() {
+   private AirPollutionResult retrieveAirPollutionData() {
+
+      final String airPollutionRequestWithParameters = buildAirPollutionApiRequest(tourStartTime, tourEndTime);
+
+      final String rawAirPollutionData = sendWeatherApiRequest(airPollutionRequestWithParameters);
+      if (StringUtils.isNullOrEmpty(rawAirPollutionData)) {
+         return null;
+      }
+
+      return deserializeAirPollutionData(rawAirPollutionData);
+   }
+
+   private boolean retrieveAirQualityIndex() {
+
+      //Send an API request as long as we don't have the results covering the entire duration of the tour
+      airPollutionResult = retrieveAirPollutionData();
+      if (airPollutionResult == null) {
+         return false;
+      }
+
+      setTourWeatherAirQualityIndex();
+
+      //retrieve the air quality
+
+      //todo fb make sure that even if the weather is not retrieved (example :> 5 days)
+      //try to retrieve the aqi because it goes back to 2020
+
+      return true;
+   }
+
+   private boolean retrieveHistoricalWeather() {
 
       timeMachineResult = new TimeMachineResult();
-
       long requestedTime = tourStartTime;
-
-      //retrieve the weather info
 
       while (true) {
 
@@ -228,6 +298,16 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       return true;
    }
 
+   @Override
+   public boolean retrieveHistoricalWeatherData() {
+
+      final boolean isHistoricalWeatherRetrieved = retrieveHistoricalWeather();
+
+      final boolean isAirQualityIndexRetrieved = retrieveAirQualityIndex();
+
+      return isHistoricalWeatherRetrieved || isAirQualityIndexRetrieved;
+   }
+
    private TimeMachineResult retrieveWeatherData(final long requestedTime) {
 
       final String weatherRequestWithParameters = buildWeatherApiRequest(requestedTime);
@@ -238,6 +318,13 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       }
 
       return deserializeWeatherData(rawWeatherData);
+   }
+
+   private void setTourWeatherAirQualityIndex() {
+
+      final int airQualityIndexAverage = airPollutionResult.getAirQualityIndexAverage();
+
+      tour.setWeather_AirQualityIndex(IWeather.airQualityIndexTexts[airQualityIndexAverage]);
    }
 
    private void setTourWeatherWithCurrentWeather(final Current currentWeather) {

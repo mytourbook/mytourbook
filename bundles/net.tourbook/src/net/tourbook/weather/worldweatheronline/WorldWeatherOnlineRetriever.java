@@ -90,10 +90,6 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
       return baseApiUrl + keyParameter;
    }
 
-   public static String getBaseApiUrl() {
-      return baseApiUrl;
-   }
-
    @Override
    protected String buildDetailedWeatherLog(final boolean isCompressed) {
 
