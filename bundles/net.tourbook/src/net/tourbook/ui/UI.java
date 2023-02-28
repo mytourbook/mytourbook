@@ -864,8 +864,8 @@ public class UI {
          if (imageMetadata instanceof JpegImageMetadata) {
 
             final JpegImageMetadata jpegMetadata = (JpegImageMetadata) imageMetadata;
-            final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(
-                  TiffTagConstants.TIFF_TAG_ORIENTATION);
+            final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_ORIENTATION);
+
             if (field != null) {
 
                final int orientation = field.getIntValue();
@@ -873,9 +873,11 @@ public class UI {
                if (orientation == 6) {
 
                   rotation = Rotation.CW_90;
+
                } else if (orientation == 3) {
 
                   rotation = Rotation.CW_180;
+
                } else if (orientation == 8) {
 
                   rotation = Rotation.CW_270;
@@ -894,11 +896,17 @@ public class UI {
 
       if (imageWidth > imageHeight) {
 
-         newimageHeight = Math.round(newimageWidth * imageHeight / (imageWidth * 1f));
+         /**
+          * math floor or - 0.5f is necessary that the resized image is not smaller than the image
+          * canvas which could result in a vertical 1 pixel white line
+          * <p>
+          * https://github.com/mytourbook/mytourbook/issues/1001
+          */
+         newimageHeight = (int) Math.floor(newimageWidth * imageHeight / (imageWidth * 1f));
 
       } else if (imageWidth < imageHeight) {
 
-         newimageWidth = Math.round(newimageHeight * imageWidth / (imageHeight * 1f));
+         newimageWidth = (int) Math.floor(newimageHeight * imageWidth / (imageHeight * 1f));
       }
 
       final Image resizedImage = ImageUtils.resize(Display.getDefault(), image, newimageWidth, newimageHeight, 1, 1, rotation);

@@ -102,6 +102,7 @@ import net.tourbook.tour.SelectionTourMarker;
 import net.tourbook.tour.SelectionTourPause;
 import net.tourbook.tour.TourEvent;
 import net.tourbook.tour.TourEventId;
+import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.ComboViewerCadence;
@@ -7500,8 +7501,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final List<TourData> modifiedTours = TourManager.retrieveWeatherData(List.of(_tourData));
 
-      if (modifiedTours.size() > 0) {
+      if (modifiedTours.size() == 0) {
+
+         // tour is not modified which is caused when an error occurs -> show error log
+
+         TourLogManager.showLogView();
+
+      } else {
+
+         // tour is modified
+
          setTourDirty();
+         
          updateUI_FromModel(modifiedTours.get(0), false, true);
       }
    }
