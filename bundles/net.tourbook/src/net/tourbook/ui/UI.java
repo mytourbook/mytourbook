@@ -903,11 +903,6 @@ public class UI {
 
       final Image resizedImage = ImageUtils.resize(Display.getDefault(), image, newimageWidth, newimageHeight, 1, 1, rotation);
 
-      //todo fb We export the image to a file as a JPEG image
-      // final ImageLoader loader = new ImageLoader();
-      // loader.data = new ImageData[] { resizedImage.getImageData() };
-      //  loader.save("C:\\Users\\frederic\\Downloads\\toto.png", SWT.IMAGE_PNG);
-
       net.tourbook.common.UI.disposeResource(image);
 
       return resizedImage;
