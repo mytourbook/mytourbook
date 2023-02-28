@@ -873,9 +873,11 @@ public class UI {
                if (orientation == 6) {
 
                   rotation = Rotation.CW_90;
+
                } else if (orientation == 3) {
 
                   rotation = Rotation.CW_180;
+
                } else if (orientation == 8) {
 
                   rotation = Rotation.CW_270;
@@ -894,7 +896,7 @@ public class UI {
 
       if (imageWidth > imageHeight) {
 
-         newimageHeight = Math.round(newimageWidth * imageHeight / (imageWidth * 1f));
+         newimageHeight = Math.round(newimageWidth * imageHeight / (imageWidth * 1f) - 0.5f);
 
       } else if (imageWidth < imageHeight) {
 
