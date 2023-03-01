@@ -19,7 +19,6 @@ import net.tourbook.Messages;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -34,13 +33,14 @@ public class TourLogViewTests extends UITest {
       //Opening the tour log view
       final SWTBotView tourLogView = Utils.showView(bot, "Tour Log"); //$NON-NLS-1$
 
-      final SWTBotTreeItem tour = Utils.getTour(bot);
+      SWTBotTreeItem tour = Utils.getTour(bot);
 
       triggerTourAction(tour);
 
       //Switching to a different layout
       bot.toolbarButtonWithTooltip(Messages.Tour_Log_Action_TourLogLayout_Tooltip).click();
 
+tour = Utils.getTour(bot);
       triggerTourAction(tour);
 
       //Clearing the log view
