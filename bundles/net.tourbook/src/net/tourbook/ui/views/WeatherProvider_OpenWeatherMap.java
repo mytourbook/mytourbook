@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -39,11 +39,6 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
 
    private static final String URL_OPENWEATHERMAP_ORG = "https://openweathermap.org/";//$NON-NLS-1$
 
-   /*
-    * UI controls
-    */
-   private Button _btnTestConnection;
-
    public WeatherProvider_OpenWeatherMap() {}
 
    @Override
@@ -74,9 +69,9 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
          /*
           * Button: test connection
           */
-         _btnTestConnection = new Button(container, SWT.NONE);
-         _btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
-         _btnTestConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+         final Button btnTestConnection = new Button(container, SWT.NONE);
+         btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
+         btnTestConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
             final var previousHour = Instant
                   .now()
@@ -94,7 +89,7 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
                .indent(defaultHIndent, 0)
                .align(SWT.BEGINNING, SWT.FILL)
                .span(2, 1)
-               .applyTo(_btnTestConnection);
+               .applyTo(btnTestConnection);
       }
 
       {
