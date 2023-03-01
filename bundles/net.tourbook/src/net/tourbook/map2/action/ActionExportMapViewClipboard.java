@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -67,7 +67,7 @@ public class ActionExportMapViewClipboard extends Action {
          try {
             final String absoluteFilePath = Files.createTempFile("map", ".png").toString(); //$NON-NLS-1$ //$NON-NLS-2$
 
-            //We export the image to a file as a JPEG image
+            //We export the image to a file as a PNG image
             final ImageLoader loader = new ImageLoader();
             loader.data = new ImageData[] { mapViewImage.getImageData() };
             loader.save(absoluteFilePath, SWT.IMAGE_PNG);
