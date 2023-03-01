@@ -63,11 +63,9 @@ public class ImageUtils {
     * transparency.
     * Source: https://stackoverflow.com/a/63703052
     *
-    * @param display
     * @param sourceImageData
     * @param imgWidth
     * @param imgHeight
-    * @param scaledImage
     * @return
     */
    private static ImageData copyImageTransparencyData(final ImageData sourceImageData,
