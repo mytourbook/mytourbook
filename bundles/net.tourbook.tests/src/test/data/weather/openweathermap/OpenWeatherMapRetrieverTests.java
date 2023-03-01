@@ -103,7 +103,7 @@ public class OpenWeatherMapRetrieverTests {
 // SET_FORMATTING_OFF
 
       assertEquals("broken clouds",                  tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-cloudy",                 tour.getWeather_Clouds()); //$NON-NLS-1$
+      assertEquals(IWeather.WEATHER_ID_PART_CLOUDS,  tour.getWeather_Clouds());
       assertEquals(7.58f,                            tour.getWeather_Temperature_Average());
       assertEquals(3,                                tour.getWeather_Wind_Speed());
       assertEquals(240,                              tour.getWeather_Wind_Direction());
@@ -169,6 +169,7 @@ public class OpenWeatherMapRetrieverTests {
    @Test
    void testWeatherRetrieval_March2022() {
 
+      //todo fb use yourstarttime and endtime
       final String openWeatherMapResponse1 = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapResponse-1647086400.json"); //$NON-NLS-1$
 
@@ -179,6 +180,11 @@ public class OpenWeatherMapRetrieverTests {
             + "LongsPeak-Manual-OpenWeatherMapResponse-1647129600.json"); //$NON-NLS-1$
       final String url2 = OPENWEATHERMAP_BASE_URL + "1647129600"; //$NON-NLS-1$
       httpClientMock.onGet(url2).doReturn(openWeatherMapResponse2);
+
+      final String openWeatherMapAirPollutionResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
+            + "LongsPeak-Manual-OpenWeatherMapAirPollutionResponse-1647129600.json"); //$NON-NLS-1$
+      final String airPollutionUrl = OPENWEATHERMAP_AIRPOLLUTION_BASE_URL + "1647086400&end=1647129403"; //$NON-NLS-1$
+      httpClientMock.onGet(airPollutionUrl).doReturn(openWeatherMapAirPollutionResponse);
 
       final TourData tour = Initializer.importTour();
       //Tuesday, March 12, 2022 12:00:00 PM
@@ -200,21 +206,30 @@ public class OpenWeatherMapRetrieverTests {
       assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
       httpClientMock.verify().get(url1).called();
       httpClientMock.verify().get(url2).called();
+      httpClientMock.verify().get(airPollutionUrl).called();
 
 // SET_FORMATTING_OFF
 
-      assertEquals("scattered clouds", tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-clouds",   tour.getWeather_Clouds()); //$NON-NLS-1$
-      assertEquals(-5.91f,             tour.getWeather_Temperature_Average());
-      assertEquals(11,                 tour.getWeather_Wind_Speed());
-      assertEquals(280,                tour.getWeather_Wind_Direction());
-      assertEquals(54,                 tour.getWeather_Humidity());
-      assertEquals(0.76f,              tour.getWeather_Precipitation());
-      assertEquals(0,                  tour.getWeather_Snowfall());
-      assertEquals(1024,               tour.getWeather_Pressure());
-      assertEquals(-0.87f,             tour.getWeather_Temperature_Max());
-      assertEquals(-15.96f,            tour.getWeather_Temperature_Min());
-      assertEquals(-11.07f,            tour.getWeather_Temperature_WindChill());
+      assertAll(
+            () -> assertEquals("scattered clouds",
+                  tour.getWeather()),
+            () -> assertEquals("weather-clouds",
+                  tour.getWeather_Clouds()),
+            () -> assertEquals(-5.91f,
+                  tour.getWeather_Temperature_Average()),
+            () -> assertEquals(11,
+                  tour.getWeather_Wind_Speed()),
+            () -> assertEquals(280,
+                  tour.getWeather_Wind_Direction()));
+
+      assertEquals(54,                               tour.getWeather_Humidity());
+      assertEquals(0.76f,                            tour.getWeather_Precipitation());
+      assertEquals(0,                                tour.getWeather_Snowfall());
+      assertEquals(1024,                             tour.getWeather_Pressure());
+      assertEquals(-0.87f,                           tour.getWeather_Temperature_Max());
+      assertEquals(-15.96f,                          tour.getWeather_Temperature_Min());
+      assertEquals(-11.07f,                          tour.getWeather_Temperature_WindChill());
+      assertEquals(IWeather.airQualityIndexTexts[2], tour.getWeather_AirQualityIndex());
 
 // SET_FORMATTING_ON
    }
