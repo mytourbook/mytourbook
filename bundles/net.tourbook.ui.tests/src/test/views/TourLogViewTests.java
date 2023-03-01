@@ -27,7 +27,7 @@ import utils.Utils;
 public class TourLogViewTests extends UITest {
 
    @Test
-   @Disabled
+ //  @Disabled
    void test_ViewOptions() {
 
       //Opening the tour log view
