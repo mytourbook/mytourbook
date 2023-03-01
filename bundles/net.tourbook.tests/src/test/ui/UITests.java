@@ -40,18 +40,14 @@ public class UITests {
 
       assertAll(
             () -> assertNotNull(originalImage),
-            () -> assertEquals(1200,
-                  originalImage.getBounds().height),
-            () -> assertEquals(1200,
-                  originalImage.getBounds().width));
+            () -> assertEquals(1200, originalImage.getBounds().height),
+            () -> assertEquals(1200, originalImage.getBounds().width));
 
       final Image resizedImage = UI.prepareTagImage(imageFilePath);
 
       assertAll(
             () -> assertNotNull(resizedImage),
-            () -> assertEquals(70,
-                  resizedImage.getBounds().height),
-            () -> assertEquals(70,
-                  resizedImage.getBounds().width));
+            () -> assertEquals(70, resizedImage.getBounds().height),
+            () -> assertEquals(70, resizedImage.getBounds().width));
    }
 }
