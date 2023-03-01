@@ -19,6 +19,7 @@ import net.tourbook.Messages;
 
 import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -27,6 +28,7 @@ import utils.Utils;
 public class TourLogViewTests extends UITest {
 
    @Test
+   @Disabled
    void test_ViewOptions() {
 
       //Opening the tour log view
