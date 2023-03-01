@@ -2936,7 +2936,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
             try {
 
-               final TourData tourDataCopy = (TourData) dragedTourData.clone();
+               final TourData tourDataCopy = (TourData) dragedTourData.clonePartly();
 
                // set tour start date/time AFTER tour is copied !!!
                tourDataCopy.setTourStartTime(newTourStartTime);

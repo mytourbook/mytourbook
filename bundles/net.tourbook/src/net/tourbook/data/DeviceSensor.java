@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -35,7 +36,9 @@ import net.tourbook.ui.views.sensors.SensorManager;
 /**
  */
 @Entity
-public class DeviceSensor implements Cloneable {
+public class DeviceSensor implements Cloneable, Serializable {
+
+   private static final long    serialVersionUID      = 1L;
 
    private static final char    NL                    = UI.NEW_LINE;
 

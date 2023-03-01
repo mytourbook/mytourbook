@@ -96,6 +96,7 @@ import net.tourbook.ui.views.tourBook.natTable.NatTable_Header_Tooltip;
 import net.tourbook.ui.views.tourBook.natTable.NatTable_SortModel;
 import net.tourbook.ui.views.tourBook.natTable.SingleClickSortConfiguration_MT;
 import net.tourbook.ui.views.tourBook.natTable.TourRowDataProvider;
+import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.core.runtime.Path;
@@ -1791,7 +1792,7 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
                      final boolean isDeviceTour = savedTour.isManualTour() == false;
                      final boolean canMergeTours = isOneTour && isDeviceTour && savedTour.getMergeSourceTourId() != null;
 
-                     _actionDuplicateTour.setEnabled(isOneTour && !isDeviceTour);
+                     _actionDuplicateTour.setEnabled(isOneTour);
                      _actionMergeTour.setEnabled(canMergeTours);
                      _actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);
                      _actionOpenMarkerDialog.setEnabled(isOneTour && isDeviceTour);
@@ -2685,6 +2686,12 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
             final GeoPartComparerItem comparerItem = (GeoPartComparerItem) firstElement;
 
             selectTour(comparerItem.tourId);
+
+         } else if (firstElement instanceof TVICatalogComparedTour) {
+
+            final TVICatalogComparedTour comparedTour = (TVICatalogComparedTour) firstElement;
+
+            selectTour(comparedTour.getTourId());
          }
 
       } else if (selection instanceof SelectionDeletedTours) {

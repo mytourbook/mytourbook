@@ -1397,7 +1397,7 @@ public class RawDataManager {
 
       try {
 
-         tourDataDummyClone = (TourData) oldTourData.clone();
+         tourDataDummyClone = (TourData) oldTourData.clonePartly();
 
          /*
           * Loop: For each tour value type, we save the associated data for future display
@@ -1710,7 +1710,7 @@ public class RawDataManager {
       TourData clonedTourData = null;
       try {
 
-         clonedTourData = (TourData) tourData.clone();
+         clonedTourData = (TourData) tourData.clonePartly();
 
          // loop: For each tour value type, we save the associated data for future display
          //to compare with the new data

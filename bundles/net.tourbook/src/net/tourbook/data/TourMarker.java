@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -70,7 +71,10 @@ import org.eclipse.swt.graphics.Rectangle;
 @XmlRootElement(name = "TourMarker")
 @XmlAccessorType(XmlAccessType.NONE)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "markerId")
-public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializable {
+
+public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializable, Serializable {
+
+   private static final long    serialVersionUID      = 1L;
 
    private static final char    NL                    = UI.NEW_LINE;
 
@@ -922,6 +926,15 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
 
    public void setType(final int markerType) {
       this.type = markerType;
+   }
+
+   public void setupDeepClone(final TourData tourDataFromClone) {
+
+      _createId = _createCounter.incrementAndGet();
+
+      markerId = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+      tourData = tourDataFromClone;
    }
 
    public void setUrlAddress(final String urlAddress) {

@@ -1988,57 +1988,55 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                Display.getCurrent().getActiveShell(),
                Messages.tour_editor_dlg_create_tour_title,
                Messages.tour_editor_dlg_create_tour_message);
+
          return;
       }
 
-      try {
+      TourData newTourData;
 
-         final TourData manualTourData = copyFromOtherTour != null
+      if (copyFromOtherTour != null) {
 
-               // clone other tour
-               ? (TourData) copyFromOtherTour.clone()
+         // clone other tour
 
-               // create new empty tour
-               : new TourData();
+         newTourData = copyFromOtherTour.createDeepCopy();
 
-         /*
-          * Adjust some cloned data
-          */
+      } else {
+
+         // create a new empty tour
+
+         newTourData = new TourData();
 
          // set tour start date/time
-         manualTourData.setTourStartTime(TimeTools.now());
+         newTourData.setTourStartTime(TimeTools.now());
 
          // tour id must be created after the tour date/time is set
-         manualTourData.createTourId();
+         newTourData.createTourId();
 
-         manualTourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
-         manualTourData.setTourPerson(activePerson);
-
-         // ensure that the time zone is saved in the tour
-         _isTimeZoneManuallyModified = true;
-
-         // update UI
-         _tourData = manualTourData;
-         _tourChart = null;
-         updateUI_FromModel(manualTourData, false, true);
-
-         // set editor into edit mode
-         _isEditMode = true;
-         _actionToggleReadEditMode.setChecked(true);
-
-         enableActions();
-         enableControls();
-
-         // select tour tab and first field
-         _tabFolder.setSelection(_tab_10_Tour);
-         _comboTitle.setFocus();
-
-         // set tour dirty even when nothing is entered but the user can see that this tour must be saved or discarded
-         setTourDirty();
-
-      } catch (final CloneNotSupportedException e) {
-         StatusUtil.log(e);
+         newTourData.setDeviceId(TourData.DEVICE_ID_FOR_MANUAL_TOUR);
+         newTourData.setTourPerson(activePerson);
       }
+
+      // ensure that the time zone is saved in the tour
+      _isTimeZoneManuallyModified = true;
+
+      // update UI
+      _tourData = newTourData;
+      _tourChart = null;
+      updateUI_FromModel(newTourData, false, true);
+
+      // set editor into edit mode
+      _isEditMode = true;
+      _actionToggleReadEditMode.setChecked(true);
+
+      enableActions();
+      enableControls();
+
+      // select tour tab and first field
+      _tabFolder.setSelection(_tab_10_Tour);
+      _comboTitle.setFocus();
+
+      // set tour dirty even when nothing is entered but the user can see that this tour must be saved or discarded
+      setTourDirty();
    }
 
    void actionCsvTimeSliceExport() {
@@ -7512,7 +7510,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // tour is modified
 
          setTourDirty();
-         
+
          updateUI_FromModel(modifiedTours.get(0), false, true);
       }
    }

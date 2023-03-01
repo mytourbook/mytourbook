@@ -31,6 +31,7 @@ import com.skedgo.converter.TimezoneMapper;
 import java.awt.Point;
 import java.io.File;
 import java.io.PrintStream;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -107,6 +108,7 @@ import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.weather.WeatherUtils;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
@@ -116,14 +118,17 @@ import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
 
 /**
- * Tour data contains all data for a tour (except markers), an entity will be saved in the database
+ * Tour data contains all data for one tour, an entity is saved in the database
  */
 @Entity
 @XmlType(name = "TourData")
 @XmlRootElement(name = "TourData")
 @XmlAccessorType(XmlAccessType.NONE)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tourId")
-public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable {
+
+public class TourData implements Comparable<Object>, IXmlSerializable, Serializable {
+
+   private static final long             serialVersionUID                  = 1L;
 
    private static final char             NL                                = UI.NEW_LINE;
    private static final String           INTERVAL_SUMMARY_UNIT             = " ∑  ";                                  //$NON-NLS-1$
@@ -890,14 +895,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private final Set<TourWayPoint>     tourWayPoints                       = new HashSet<>();
+   private  Set<TourWayPoint>     tourWayPoints                       = new HashSet<>();
 
    /**
     * Reference tours
     */
    @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private final Set<TourReference>    tourReferences                     = new HashSet<>();
+   private  Set<TourReference>    tourReferences                     = new HashSet<>();
 
    /**
     * Tags
@@ -2244,10 +2249,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * This clone() method is cloning only a part of the tour, e.g. {@link #serieData} is not cloned
+    * This method is cloning only a part of the tour, e.g. {@link #serieData} is not
+    * cloned
     */
-   @Override
-   public Object clone() throws CloneNotSupportedException {
+   public Object clonePartly() throws CloneNotSupportedException {
 
       final TourData tourDataCopy = new TourData();
 
@@ -5602,6 +5607,75 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       // collapse waypoints
       tourWayPoints.removeAll(allRemovedWayPoints);
+   }
+
+   /**
+    * Create a deep copy of this TourData into a new TourData
+    */
+   public TourData createDeepCopy() {
+
+      final TourData tourDataDeepCopy = SerializationUtils.clone(this);
+
+      // set a unique tour ID
+      tourDataDeepCopy.tourId = System.nanoTime();
+
+      /*
+       * Setup contained collections
+       */
+      for (final TourPhoto tourPhoto : tourDataDeepCopy.tourPhotos) {
+         tourPhoto.setupDeepClone(tourDataDeepCopy);
+      }
+
+      for (final TourMarker tourMarker : tourDataDeepCopy.tourMarkers) {
+         tourMarker.setupDeepClone(tourDataDeepCopy);
+      }
+
+      for (final TourWayPoint tourWayPoint : tourDataDeepCopy.tourWayPoints) {
+         tourWayPoint.setupDeepClone(tourDataDeepCopy);
+      }
+
+      for (final TourTag tourTag : tourDataDeepCopy.tourTags) {
+         tourTag.setupDeepClone(tourDataDeepCopy);
+      }
+
+      for (final DeviceSensorValue sensorValue : tourDataDeepCopy.deviceSensorValues) {
+         sensorValue.setupDeepClone(tourDataDeepCopy);
+      }
+
+      /**
+       * Convert PersistentSet into a "normal" set otherwise this exception occurs
+       * <p>
+       * org.hibernate.HibernateException: Don't change the reference to a collection with
+       * cascade="all-delete-orphan": net.tourbook.data.TourData.deviceSensorValues
+       */
+
+      final Set<TourPhoto> tourPhotos_Clone = new HashSet<>();
+      tourPhotos_Clone.addAll(tourDataDeepCopy.tourPhotos);
+      tourDataDeepCopy.tourPhotos = tourPhotos_Clone;
+
+      final Set<TourMarker> tourMarkers_Clone = new HashSet<>();
+      tourMarkers_Clone.addAll(tourDataDeepCopy.tourMarkers);
+      tourDataDeepCopy.tourMarkers = tourMarkers_Clone;
+
+      final Set<TourWayPoint> tourWayPoints_Clone = new HashSet<>();
+      tourWayPoints_Clone.addAll(tourDataDeepCopy.tourWayPoints);
+      tourDataDeepCopy.tourWayPoints = tourWayPoints_Clone;
+
+      final Set<TourTag> tourTags_Clone = new HashSet<>();
+      tourTags_Clone.addAll(tourDataDeepCopy.tourTags);
+      tourDataDeepCopy.tourTags = tourTags_Clone;
+
+      final Set<DeviceSensorValue> deviceSensor_Clone = new HashSet<>();
+      deviceSensor_Clone.addAll(tourDataDeepCopy.deviceSensorValues);
+      tourDataDeepCopy.deviceSensorValues = deviceSensor_Clone;
+
+      /*
+       * TourReferences are a bit special, they are bound to the original tour and need to be
+       * created manually and not cloned
+       */
+      tourDataDeepCopy.tourReferences = new HashSet<>();
+
+      return tourDataDeepCopy;
    }
 
    /**
@@ -10027,11 +10101,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public boolean isContainReferenceTour() {
 
-      if (tourReferences == null) {
-         return false;
-      } else {
-         return tourReferences.size() > 0;
-      }
+      return tourReferences.size() > 0;
    }
 
    /**
