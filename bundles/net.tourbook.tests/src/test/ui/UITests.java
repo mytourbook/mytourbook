@@ -15,12 +15,14 @@
  *******************************************************************************/
 package ui;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import net.tourbook.ui.UI;
 
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 import org.junit.jupiter.api.Test;
 
 import utils.FilesUtils;
@@ -32,10 +34,24 @@ public class UITests {
    @Test
    void testResize_ShouldReturnImageWithNewSize() {
 
-      final Image resizedImage = UI.prepareTagImage(FILES_PATH + "Black Diamond Trail Back Poles.png");
+      final String imageFilePath = FILES_PATH + "Black Diamond Trail Back Poles.png"; //$NON-NLS-1$
 
-      assertNotNull(resizedImage);
-      assertEquals(70, resizedImage.getBounds().height);
-      assertEquals(70, resizedImage.getBounds().width);
+      final Image originalImage = new Image(Display.getDefault(), imageFilePath);
+
+      assertAll(
+            () -> assertNotNull(originalImage),
+            () -> assertEquals(1200,
+                  originalImage.getBounds().height),
+            () -> assertEquals(1200,
+                  originalImage.getBounds().width));
+
+      final Image resizedImage = UI.prepareTagImage(imageFilePath);
+
+      assertAll(
+            () -> assertNotNull(resizedImage),
+            () -> assertEquals(70,
+                  resizedImage.getBounds().height),
+            () -> assertEquals(70,
+                  resizedImage.getBounds().width));
    }
 }
