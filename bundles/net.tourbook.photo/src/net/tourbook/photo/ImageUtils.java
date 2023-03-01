@@ -21,7 +21,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileFilter;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.Util;
 
 import org.apache.commons.imaging.Imaging;
 import org.eclipse.jface.preference.IPreferenceStore;
