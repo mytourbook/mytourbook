@@ -1284,8 +1284,11 @@ public class UI {
 
             final CLabel label = new CLabel(tourTagsComposite, SWT.NONE);
             label.setLayoutData(new RowData(pc.convertWidthInCharsToPixels(35), pc.convertWidthInCharsToPixels(12)));
-            label.setText(tag.getTagName() + UI.NEW_LINE +
-                  tourTagsAccumulatedValues.get(tagId));
+            label.setText(UI.EMPTY_STRING
+
+                  + tag.getTagName() + UI.NEW_LINE
+                  + tourTagsAccumulatedValues.get(tagId) //
+            );
             label.setImage(image);
 
             _tagsLabels.put(tagId, label);
