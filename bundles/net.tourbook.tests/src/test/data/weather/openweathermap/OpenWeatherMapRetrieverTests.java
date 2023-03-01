@@ -210,6 +210,7 @@ public class OpenWeatherMapRetrieverTests {
 
 // SET_FORMATTING_OFF
 
+      //todo fb assertall for other tests
       assertAll(
             () -> assertEquals("scattered clouds",
                   tour.getWeather()),
@@ -220,16 +221,25 @@ public class OpenWeatherMapRetrieverTests {
             () -> assertEquals(11,
                   tour.getWeather_Wind_Speed()),
             () -> assertEquals(280,
-                  tour.getWeather_Wind_Direction()));
-
-      assertEquals(54,                               tour.getWeather_Humidity());
-      assertEquals(0.76f,                            tour.getWeather_Precipitation());
-      assertEquals(0,                                tour.getWeather_Snowfall());
-      assertEquals(1024,                             tour.getWeather_Pressure());
-      assertEquals(-0.87f,                           tour.getWeather_Temperature_Max());
-      assertEquals(-15.96f,                          tour.getWeather_Temperature_Min());
-      assertEquals(-11.07f,                          tour.getWeather_Temperature_WindChill());
-      assertEquals(IWeather.airQualityIndexTexts[2], tour.getWeather_AirQualityIndex());
+                  tour.getWeather_Wind_Direction()),
+            () -> assertEquals(11,
+                  tour.getWeather_Wind_Speed()),
+            () -> assertEquals(54,
+                  tour.getWeather_Humidity()),
+            () -> assertEquals(0.76f,
+                  tour.getWeather_Precipitation()),
+            () -> assertEquals(0,
+                  tour.getWeather_Snowfall()),
+            () -> assertEquals(1024,
+                  tour.getWeather_Pressure()),
+            () -> assertEquals(-0.87f,
+                  tour.getWeather_Temperature_Max()),
+            () -> assertEquals(-15.96f,
+                  tour.getWeather_Temperature_Min()),
+            () -> assertEquals(-11.07f,
+                  tour.getWeather_Temperature_WindChill()),
+            () -> assertEquals(IWeather.airQualityIndexTexts[2],
+                  tour.getWeather_AirQualityIndex()));
 
 // SET_FORMATTING_ON
    }
