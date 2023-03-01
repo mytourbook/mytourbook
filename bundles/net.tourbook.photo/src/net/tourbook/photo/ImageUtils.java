@@ -58,6 +58,44 @@ public class ImageUtils {
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
+   /**
+    * For images with a transparent layer, this will keep the existing
+    * transparency.
+    * Source: https://stackoverflow.com/a/63703052
+    *
+    * @param display
+    * @param sourceImageData
+    * @param imgWidth
+    * @param imgHeight
+    * @param scaledImage
+    * @return
+    */
+   private static ImageData copyImageTransparencyData(final ImageData sourceImageData,
+                                                      final int imgWidth,
+                                                      final int imgHeight) {
+
+      if (sourceImageData.alphaData == null) {
+         return null;
+      }
+
+      final ImageData destData = new ImageData(imgWidth, imgHeight, sourceImageData.depth, sourceImageData.palette);
+
+      destData.alphaData = new byte[destData.width * destData.height];
+      for (int destRow = 0; destRow < destData.height; destRow++) {
+
+         for (int destCol = 0; destCol < destData.width; destCol++) {
+
+            final int origRow = destRow * sourceImageData.height / destData.height;
+            final int origCol = destCol * sourceImageData.width / destData.width;
+            final int o = origRow * sourceImageData.width + origCol;
+            final int d = destRow * destData.width + destCol;
+            destData.alphaData[d] = sourceImageData.alphaData[o];
+         }
+      }
+
+      return destData;
+   }
+
    public static FileFilter createImageFileFilter() {
 
       return pathname -> {
@@ -209,28 +247,12 @@ public class ImageUtils {
 
       Image scaledImage = new Image(display, imgWidth, imgHeight);
 
-      // For images with a transparent layer, this will keep the existing
-      // transparency.
-      // Source: https://stackoverflow.com/a/63703052
-      final ImageData origData = srcImage.getImageData();
-      if (origData.alphaData != null) {
+      final ImageData scaledImageWithTransparencyData =
+            copyImageTransparencyData(srcImage.getImageData(), imgWidth, imgHeight);
+      if (scaledImageWithTransparencyData != null) {
 
-         final ImageData destData = new ImageData(imgWidth, imgHeight, origData.depth, origData.palette);
-
-         destData.alphaData = new byte[destData.width * destData.height];
-         for (int destRow = 0; destRow < destData.height; destRow++) {
-
-            for (int destCol = 0; destCol < destData.width; destCol++) {
-
-               final int origRow = destRow * origData.height / destData.height;
-               final int origCol = destCol * origData.width / destData.width;
-               final int o = origRow * origData.width + origCol;
-               final int d = destRow * destData.width + destCol;
-               destData.alphaData[d] = origData.alphaData[o];
-            }
-         }
          UI.disposeResource(scaledImage);
-         scaledImage = new Image(display, destData);
+         scaledImage = new Image(display, scaledImageWithTransparencyData);
       }
 
       //Resize the image

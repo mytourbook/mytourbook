@@ -1289,6 +1289,7 @@ public class UI {
                   + tag.getTagName() + UI.NEW_LINE
                   + tourTagsAccumulatedValues.get(tagId) //
             );
+            label.setToolTipText(tag.getTagName());
             label.setImage(image);
 
             _tagsLabels.put(tagId, label);
