@@ -1270,22 +1270,30 @@ public class UI {
 
       for (final TourTag tag : tourTags) {
 
-         // If the tag is already present in the UI, there is no need to create
-         // it again.
-         if (_tagsLabels.containsKey(tag.getTagId())) {
-            continue;
-         }
-
-         final CLabel label = new CLabel(tourTagsComposite, SWT.NONE);
-         label.setLayoutData(new RowData(pc.convertWidthInCharsToPixels(35), pc.convertWidthInCharsToPixels(12)));
-         label.setText(tag.getTagName() + UI.NEW_LINE +
-               tourTagsAccumulatedValues.get(tag.getTagId()));
+         final long tagId = tag.getTagId();
 
          final Image image = TagMenuManager.getTagImage(tag.getImageFilePath());
-         if (image != null) {
+
+         // If the tag is already present in the UI, we only replace its image in
+         // case it has changed or was deleted.
+         // We keep the CLabel to keep the order it was created in.
+         if (_tagsLabels.containsKey(tagId)) {
+
+            _tagsLabels.get(tagId).setImage(image);
+
+         } else {
+
+            final CLabel label = new CLabel(tourTagsComposite, SWT.NONE);
+            label.setLayoutData(new RowData(pc.convertWidthInCharsToPixels(35), pc.convertWidthInCharsToPixels(12)));
+            label.setText(UI.EMPTY_STRING
+
+                  + tag.getTagName() + UI.NEW_LINE
+                  + tourTagsAccumulatedValues.get(tagId) //
+            );
             label.setImage(image);
+
+            _tagsLabels.put(tagId, label);
          }
-         _tagsLabels.put(tag.getTagId(), label);
       }
 
       tourTagsComposite.layout();

@@ -359,7 +359,7 @@ public class TagMenuManager {
 
          tagImage = net.tourbook.ui.UI.prepareTagImage(imageFilePath);
          if (tagImage != null) {
-            TagMenuManager._tagImagesCache.put(imageFilePath, tagImage);
+            _tagImagesCache.put(imageFilePath, tagImage);
          }
       }
 
