@@ -1984,8 +1984,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final TourPerson activePerson = TourbookPlugin.getActivePerson();
       if (activePerson == null) {
 
-         MessageDialog.openInformation(
-               Display.getCurrent().getActiveShell(),
+         MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+
                Messages.tour_editor_dlg_create_tour_title,
                Messages.tour_editor_dlg_create_tour_message);
 
@@ -1999,6 +1999,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // clone other tour
 
          newTourData = copyFromOtherTour.createDeepCopy();
+
+         actionCreateTour_SetTourTitle(newTourData);
 
       } else {
 
@@ -2037,6 +2039,59 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // set tour dirty even when nothing is entered but the user can see that this tour must be saved or discarded
       setTourDirty();
+   }
+
+   /**
+    * Add a "copy" post fix to the tour title
+    * 
+    * @param newTourData
+    */
+   private void actionCreateTour_SetTourTitle(final TourData newTourData) {
+
+      final String tourTitle = newTourData.getTourTitle();
+
+      final String newTourTitle;
+      final String copyPostfix_Start = UI.SYMBOL_BRACKET_LEFT + Messages.Tour_Editor_TourTitle_CopyPostfix;
+
+      final int lastIndexOfCopyPostfix = tourTitle.lastIndexOf(copyPostfix_Start);
+
+      if (lastIndexOfCopyPostfix >= 0) {
+
+         // title contains a "(copy" postfix -> add a number
+
+         final String titleWithoutPostfix = tourTitle.substring(0, lastIndexOfCopyPostfix);
+
+         final String copyPostfix_End = tourTitle.substring(lastIndexOfCopyPostfix);
+         final boolean isNumberAvailable = copyPostfix_End.matches(".*\\d+.*"); //$NON-NLS-1$
+
+         if (isNumberAvailable) {
+
+            // this is copy number 2+, increment copy number
+
+            String newCopyText = copyPostfix_End;
+
+            // Regex source: https://stackoverflow.com/questions/12941362/is-it-possible-to-increment-numbers-using-regex-substitution#answer-12946132
+            newCopyText = newCopyText.replaceAll("$", " ~0123456789"); //$NON-NLS-1$ //$NON-NLS-2$
+            newCopyText = newCopyText.replaceAll("(?=\\d)(?:([0-8])(?=.*\\1(\\d)\\d*$)|(?=.*(1)))(?:(9+)(?=.*(~))|)(?!\\d)", "$2$3$4$5"); //$NON-NLS-1$ //$NON-NLS-2$
+            newCopyText = newCopyText.replaceAll("9(?=9*~)(?=.*(0))|~| ~0123456789$", "$1"); //$NON-NLS-1$ //$NON-NLS-2$
+
+            newTourTitle = titleWithoutPostfix + newCopyText;
+
+         } else {
+
+            // this is the 2nd copy
+
+            newTourTitle = titleWithoutPostfix + " 2)"; //$NON-NLS-1$
+         }
+
+      } else {
+
+         // this is the 1st copy
+
+         newTourTitle = tourTitle + UI.SPACE + copyPostfix_Start + UI.SYMBOL_BRACKET_RIGHT;
+      }
+
+      newTourData.setTourTitle(newTourTitle);
    }
 
    void actionCsvTimeSliceExport() {

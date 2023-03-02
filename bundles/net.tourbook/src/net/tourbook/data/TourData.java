@@ -5614,32 +5614,32 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public TourData createDeepCopy() {
 
-      final TourData tourDataDeepCopy = SerializationUtils.clone(this);
+      final TourData tourData_DeepCopy = SerializationUtils.clone(this);
 
       // set a unique tour ID
-      tourDataDeepCopy.tourId = System.nanoTime();
+      tourData_DeepCopy.tourId = System.nanoTime();
 
       /*
-       * Setup contained collections
+       * Setup collections
        */
-      for (final TourPhoto tourPhoto : tourDataDeepCopy.tourPhotos) {
-         tourPhoto.setupDeepClone(tourDataDeepCopy);
+      for (final TourPhoto tourPhoto : tourData_DeepCopy.tourPhotos) {
+         tourPhoto.setupDeepClone(tourData_DeepCopy);
       }
 
-      for (final TourMarker tourMarker : tourDataDeepCopy.tourMarkers) {
-         tourMarker.setupDeepClone(tourDataDeepCopy);
+      for (final TourMarker tourMarker : tourData_DeepCopy.tourMarkers) {
+         tourMarker.setupDeepClone(tourData_DeepCopy);
       }
 
-      for (final TourWayPoint tourWayPoint : tourDataDeepCopy.tourWayPoints) {
-         tourWayPoint.setupDeepClone(tourDataDeepCopy);
+      for (final TourWayPoint tourWayPoint : tourData_DeepCopy.tourWayPoints) {
+         tourWayPoint.setupDeepClone(tourData_DeepCopy);
       }
 
-      for (final TourTag tourTag : tourDataDeepCopy.tourTags) {
-         tourTag.setupDeepClone(tourDataDeepCopy);
+      for (final TourTag tourTag : tourData_DeepCopy.tourTags) {
+         tourTag.setupDeepClone(tourData_DeepCopy);
       }
 
-      for (final DeviceSensorValue sensorValue : tourDataDeepCopy.deviceSensorValues) {
-         sensorValue.setupDeepClone(tourDataDeepCopy);
+      for (final DeviceSensorValue sensorValue : tourData_DeepCopy.deviceSensorValues) {
+         sensorValue.setupDeepClone(tourData_DeepCopy);
       }
 
       /**
@@ -5650,32 +5650,32 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
        */
 
       final Set<TourPhoto> tourPhotos_Clone = new HashSet<>();
-      tourPhotos_Clone.addAll(tourDataDeepCopy.tourPhotos);
-      tourDataDeepCopy.tourPhotos = tourPhotos_Clone;
+      tourPhotos_Clone.addAll(tourData_DeepCopy.tourPhotos);
+      tourData_DeepCopy.tourPhotos = tourPhotos_Clone;
 
       final Set<TourMarker> tourMarkers_Clone = new HashSet<>();
-      tourMarkers_Clone.addAll(tourDataDeepCopy.tourMarkers);
-      tourDataDeepCopy.tourMarkers = tourMarkers_Clone;
+      tourMarkers_Clone.addAll(tourData_DeepCopy.tourMarkers);
+      tourData_DeepCopy.tourMarkers = tourMarkers_Clone;
 
       final Set<TourWayPoint> tourWayPoints_Clone = new HashSet<>();
-      tourWayPoints_Clone.addAll(tourDataDeepCopy.tourWayPoints);
-      tourDataDeepCopy.tourWayPoints = tourWayPoints_Clone;
+      tourWayPoints_Clone.addAll(tourData_DeepCopy.tourWayPoints);
+      tourData_DeepCopy.tourWayPoints = tourWayPoints_Clone;
 
       final Set<TourTag> tourTags_Clone = new HashSet<>();
-      tourTags_Clone.addAll(tourDataDeepCopy.tourTags);
-      tourDataDeepCopy.tourTags = tourTags_Clone;
+      tourTags_Clone.addAll(tourData_DeepCopy.tourTags);
+      tourData_DeepCopy.tourTags = tourTags_Clone;
 
       final Set<DeviceSensorValue> deviceSensor_Clone = new HashSet<>();
-      deviceSensor_Clone.addAll(tourDataDeepCopy.deviceSensorValues);
-      tourDataDeepCopy.deviceSensorValues = deviceSensor_Clone;
+      deviceSensor_Clone.addAll(tourData_DeepCopy.deviceSensorValues);
+      tourData_DeepCopy.deviceSensorValues = deviceSensor_Clone;
 
       /*
        * TourReferences are a bit special, they are bound to the original tour and need to be
        * created manually and not cloned
        */
-      tourDataDeepCopy.tourReferences = new HashSet<>();
+      tourData_DeepCopy.tourReferences = new HashSet<>();
 
-      return tourDataDeepCopy;
+      return tourData_DeepCopy;
    }
 
    /**
