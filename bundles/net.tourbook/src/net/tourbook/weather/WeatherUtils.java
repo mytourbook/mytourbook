@@ -59,7 +59,8 @@ public class WeatherUtils {
     *           in mm
     * @param snowFallValue
     *           in epoch seconds
-    * @param timeZonedId
+    * @param airQualityIndex
+    * @param tourDateTime
     * @param isDisplayEmptyValues
     * @return
     */
@@ -184,8 +185,20 @@ public class WeatherUtils {
          // Average temperature
          final float averageTemperature = tourData.getWeather_Temperature_Average();
          if (averageTemperature != Float.MIN_VALUE) {
+
             weatherDataList.add(FormatManager.formatTemperature(UI.convertTemperatureFromMetric(averageTemperature)) +
                   UI.UNIT_LABEL_TEMPERATURE);
+
+            //TODO When using a JDK version that supports Unicode 11.0 (JDK >= 12)
+//            if (averageTemperature < 0) {
+//
+//               // Cold face 🥶
+//               weatherDataList.add(UI.SPACE + "\ud83e\udd76"); //$NON-NLS-1$
+//            } else if (averageTemperature > 32) {
+//
+//               // Hot face 🥵
+//               weatherDataList.add(UI.SPACE + "\ud83e\udd75"); //$NON-NLS-1$
+//            }
          }
 
          // Wind chill

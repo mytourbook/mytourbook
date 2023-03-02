@@ -21,10 +21,6 @@ package net.tourbook.data;
 // redo all the unit tests json files to only contain the database fields and
 // not the computed ones
 
-// when feels like below 32F, add the cold emoji 🥶
-// and when above 90 the hot emoji 🥵
-
-// todo fb make sure that if the tcx file doesn't contain extra spac in the beginning that we dont rewrite the file
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 
