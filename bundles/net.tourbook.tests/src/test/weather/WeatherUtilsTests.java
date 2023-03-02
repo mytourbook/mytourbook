@@ -58,12 +58,12 @@ public class WeatherUtilsTests {
             1023,
             0.01f,
             0.02f,
-            0,
+            1,
             new TourDateTime(zonedDateTime),
             true);
 
       assertEquals(
-            "17h       6°C   feels like     9°C       9km/h from 156°   humidity  68%   pressure 1023.0mbar   precipitation  0.01mm   snowfall  0.02mm   air quality 0", //$NON-NLS-1$
+            "17h       6°C   feels like     9°C       9km/h from 156°   humidity  68%   pressure 1023.0mbar   precipitation  0.01mm   snowfall  0.02mm   air quality 1", //$NON-NLS-1$
             fullWeatherDataString);
    }
 
