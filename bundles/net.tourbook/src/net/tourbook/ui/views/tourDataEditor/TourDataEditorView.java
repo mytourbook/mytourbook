@@ -259,8 +259,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    static final boolean                  STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT     = true;
    static final String                   STATE_LAT_LON_DIGITS                             = "STATE_LAT_LON_DIGITS";                                 //$NON-NLS-1$
    static final int                      STATE_LAT_LON_DIGITS_DEFAULT                     = 5;
-   static final String                   STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES         = "STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES";             //$NON-NLS-1$
-   static final int                      STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT = 6;
+   public static final String            STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES         = "STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES";             //$NON-NLS-1$
+   public static final int               STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT = 6;
    //
    private static final String           COLUMN_ALTITUDE                                  = "ALTITUDE_ALTITUDE";                                    //$NON-NLS-1$
    private static final String           COLUMN_CADENCE                                   = "POWERTRAIN_CADENCE";                                   //$NON-NLS-1$
@@ -7512,7 +7512,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // tour is modified
 
          setTourDirty();
-         
+
          updateUI_FromModel(modifiedTours.get(0), false, true);
       }
    }
