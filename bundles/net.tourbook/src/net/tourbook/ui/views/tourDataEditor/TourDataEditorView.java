@@ -4640,15 +4640,15 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
           * Air Quality Index
           */
          // label
-         final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_AirQualityIndex);
-         label.setToolTipText(Messages.Tour_Editor_Label_AirQualityIndex_Tooltip);
+         final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_AirQuality);
+         label.setToolTipText(Messages.Tour_Editor_Label_AirQuality_Tooltip);
          _firstColumnControls.add(label);
 
          // combo: air quality index
          _tableComboWeather_AirQualityIndex = new TableCombo(container, SWT.READ_ONLY | SWT.BORDER);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_tableComboWeather_AirQualityIndex);
          _tk.adapt(_tableComboWeather_AirQualityIndex, true, false);
-         _tableComboWeather_AirQualityIndex.setToolTipText(Messages.Tour_Editor_Label_AirQualityIndex_Tooltip);
+         _tableComboWeather_AirQualityIndex.setToolTipText(Messages.Tour_Editor_Label_AirQuality_Tooltip);
          _tableComboWeather_AirQualityIndex.addModifyListener(_modifyListener);
          _tableComboWeather_AirQualityIndex.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
