@@ -635,21 +635,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
 
    /**
-    * Air Quality Index
+    * Air Quality
     */
-   //todo fb rename to airquality
    private String                 weather_AirQuality;                             // db-version 50
 
    //TODO FB
    //https://openweathermap.org/api/air-pollution
-   //add in tour data editor view
-   //set the clabel background color with the appropriate color
-   //add in the tooltip the equivalent of each values
    //add in weather string (Strava, blog view...)
 
    //https://en.wikipedia.org/wiki/Air_quality_index#CAQI
 
-   //add the DB field
    //add the field as readonly under the temperatures in the tour data editor view (number ? combo ? both ? text as in "Good" "poor"...?
    //add tool tip of quality definitions
    //add it in the string to strava as "Air Quality: Good"
@@ -10012,7 +10007,7 @@ private Set<TourTag>                tourTags                            = new Ha
    }
 
    /**
-    * @return Returns the index for the air quality index values in
+    * @return Returns the index for the air quality value in
     *         {@link IWeather#airQualityTexts} or 0 when the air quality
     *         index is not defined
     */

@@ -4637,14 +4637,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _firstColumnContainerControls.add(container);
       {
          /*
-          * Air Quality Index
+          * Air Quality
           */
          // label
          final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_AirQuality);
          label.setToolTipText(Messages.Tour_Editor_Label_AirQuality_Tooltip);
          _firstColumnControls.add(label);
 
-         // combo: air quality index
+         // combo: Air quality
          _tableComboWeather_AirQuality = new TableCombo(container, SWT.READ_ONLY | SWT.BORDER);
          GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_tableComboWeather_AirQuality);
          _tk.adapt(_tableComboWeather_AirQuality, true, false);
@@ -9284,7 +9284,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
       _spinWeather_PressureValue.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
 
-      // Air Quality Index
+      // Air Quality
       _tableComboWeather_AirQuality.select(_tourData.getWeather_AirQuality_TextIndex());
 
       /*
