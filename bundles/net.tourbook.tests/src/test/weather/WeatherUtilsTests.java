@@ -63,7 +63,7 @@ public class WeatherUtilsTests {
             true);
 
       assertEquals(
-            "17h       6°C   feels like     9°C       9km/h from 156°   humidity  68%   pressure 1023.0mbar   precipitation  0.01mm   snowfall  0.02mm", //$NON-NLS-1$
+            "17h       6°C   feels like     9°C       9km/h from 156°   humidity  68%   pressure 1023.0mbar   precipitation  0.01mm   snowfall  0.02mm   air quality 0", //$NON-NLS-1$
             fullWeatherDataString);
    }
 
