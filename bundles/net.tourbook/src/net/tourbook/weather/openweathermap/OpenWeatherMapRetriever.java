@@ -236,11 +236,6 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       setTourWeatherAirQuality();
 
-      //todo fb make sure that even if the weather is not retrieved (example :> 5 days)
-      //try to retrieve the aqi because it goes back to 2020
-
-      //todo fb unit tests
-
       return true;
    }
 

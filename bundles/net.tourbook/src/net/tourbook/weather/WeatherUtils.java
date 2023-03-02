@@ -214,15 +214,12 @@ public class WeatherUtils {
 
          if (displayMaximumMinimumTemperature) {
 
-            weatherDataList.add("("); //$NON-NLS-1$
-
             // Maximum temperature
             weatherDataList.add(
                   Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max +
-                        UI.SPACE +
-                        FormatManager.formatTemperature(
-                              UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max())) +
-                        UI.UNIT_LABEL_TEMPERATURE);
+                  FormatManager.formatTemperature(
+                        UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max())) +
+                  UI.UNIT_LABEL_TEMPERATURE);
 
             // Minimum temperature
             weatherDataList.add(
@@ -231,8 +228,6 @@ public class WeatherUtils {
                         FormatManager.formatTemperature(
                               UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min())) +
                         UI.UNIT_LABEL_TEMPERATURE);
-
-            weatherDataList.add(")"); //$NON-NLS-1$
          }
       }
 
