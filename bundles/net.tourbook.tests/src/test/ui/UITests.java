@@ -29,19 +29,19 @@ import utils.FilesUtils;
 
 public class UITests {
 
-   public static final String FILES_PATH = FilesUtils.rootPath + "photo/files/"; //$NON-NLS-1$
+   public static final String FILES_PATH = FilesUtils.rootPath + "ui/files/"; //$NON-NLS-1$
 
    @Test
    void testResize_ShouldReturnImageWithNewSize() {
 
-      final String imageFilePath = FILES_PATH + "Black Diamond Trail Back Poles.png"; //$NON-NLS-1$
+      final String imageFilePath = FILES_PATH + "mytourbook-256x256.png"; //$NON-NLS-1$
 
       final Image originalImage = new Image(Display.getDefault(), imageFilePath);
 
       assertAll(
             () -> assertNotNull(originalImage),
-            () -> assertEquals(1200, originalImage.getBounds().height),
-            () -> assertEquals(1200, originalImage.getBounds().width));
+            () -> assertEquals(256, originalImage.getBounds().height),
+            () -> assertEquals(256, originalImage.getBounds().width));
 
       final Image resizedImage = UI.prepareTagImage(imageFilePath);
 
