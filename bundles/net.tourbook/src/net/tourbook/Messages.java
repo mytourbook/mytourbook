@@ -1253,6 +1253,7 @@ public class Messages extends NLS {
    public static String        Log_Tour_SaveTours;
    public static String        Log_Tour_SaveTours_End;
    public static String        Log_Tour_SaveTours_File;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Humidity;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Pressure;

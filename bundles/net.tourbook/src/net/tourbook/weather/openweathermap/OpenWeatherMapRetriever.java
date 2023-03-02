@@ -90,8 +90,8 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                .findAny()
                .orElse(null);
 
-         final String airQualityIndex = currentAirPollutionResult == null
-               ? UI.EMPTY_STRING : IWeather.airQualityIndexTexts[currentAirPollutionResult.getMain().getAqi()];
+         final int airQualityIndex = currentAirPollutionResult == null
+               ? 0 : currentAirPollutionResult.getMain().getAqi();
 
          final boolean isDisplayEmptyValues = !isCompressed;
          String fullWeatherData = WeatherUtils.buildFullWeatherDataString(

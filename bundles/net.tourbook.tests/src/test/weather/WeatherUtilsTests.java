@@ -58,7 +58,7 @@ public class WeatherUtilsTests {
             1023,
             0.01f,
             0.02f,
-            UI.EMPTY_STRING,
+            0,
             new TourDateTime(zonedDateTime),
             true);
 
@@ -78,7 +78,7 @@ public class WeatherUtilsTests {
             1023,
             0.01f,
             0.02f,
-            UI.EMPTY_STRING,
+            0,
             null,
             true);
 

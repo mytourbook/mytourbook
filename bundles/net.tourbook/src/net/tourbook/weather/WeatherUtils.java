@@ -71,7 +71,7 @@ public class WeatherUtils {
                                                    final int pressureValue,
                                                    final float precipitationValue,
                                                    final float snowFallValue,
-                                                   final String airQualityIndex,
+                                                   final int airQualityIndex,
                                                    final TourDateTime tourDateTime,
                                                    final boolean isDisplayEmptyValues) {
 
@@ -125,11 +125,10 @@ public class WeatherUtils {
                + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
       }
 
-      String airQualityIndexText = UI.EMPTY_STRING;
+      String airQuality = UI.EMPTY_STRING;
+      if (airQualityIndex > 0 || isDisplayEmptyValues) {
 
-      if (StringUtils.hasContent(airQualityIndex) || isDisplayEmptyValues) {
-
-         airQualityIndexText = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall
+         airQuality = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality
                + UI.SPACE
                + airQualityIndex;
       }
@@ -144,7 +143,7 @@ public class WeatherUtils {
             + pressure + UI.SPACE3
             + precipitation + UI.SPACE3
             + snowFall + UI.SPACE3
-            + airQualityIndexText;
+            + airQuality;
 
       return fullWeatherData;
    }

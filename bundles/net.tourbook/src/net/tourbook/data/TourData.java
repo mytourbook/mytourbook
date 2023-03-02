@@ -637,6 +637,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Air Quality Index
     */
+   //todo fb rename to airquality
    private String                 weather_AirQualityIndex;                             // db-version 50
 
    //TODO FB
