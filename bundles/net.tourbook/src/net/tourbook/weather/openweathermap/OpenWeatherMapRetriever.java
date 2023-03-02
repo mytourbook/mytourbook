@@ -226,7 +226,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       return deserializeAirPollutionData(rawAirPollutionData);
    }
 
-   private boolean retrieveAirQualityIndex() {
+   private boolean retrieveAirQuality() {
 
       //Send an API request as long as we don't have the results covering the entire duration of the tour
       airPollutionResult = retrieveAirPollutionData();
@@ -234,7 +234,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
          return false;
       }
 
-      setTourWeatherAirQualityIndex();
+      setTourWeatherAirQuality();
 
       //todo fb make sure that even if the weather is not retrieved (example :> 5 days)
       //try to retrieve the aqi because it goes back to 2020
@@ -309,7 +309,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       final boolean isHistoricalWeatherRetrieved = retrieveHistoricalWeather();
 
-      final boolean isAirQualityIndexRetrieved = retrieveAirQualityIndex();
+      final boolean isAirQualityIndexRetrieved = retrieveAirQuality();
 
       return isHistoricalWeatherRetrieved || isAirQualityIndexRetrieved;
    }
@@ -326,7 +326,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       return deserializeWeatherData(rawWeatherData);
    }
 
-   private void setTourWeatherAirQualityIndex() {
+   private void setTourWeatherAirQuality() {
 
       final int airQualityIndexAverage = airPollutionResult.getAirQualityIndexAverage();
 
