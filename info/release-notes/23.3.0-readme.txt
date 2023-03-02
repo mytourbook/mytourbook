@@ -11,7 +11,7 @@ New
 Tour Tags (Frederic)
   - Added the ability to add an image to a tag and display its accumulated values in the Tour Data Editor View
     https://github.com/mytourbook/mytourbook/issues/805
-
+    
 
 Improvements
 ============
