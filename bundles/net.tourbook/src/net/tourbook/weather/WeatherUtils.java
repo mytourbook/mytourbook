@@ -148,12 +148,11 @@ public class WeatherUtils {
       return fullWeatherData;
    }
 
-   //todo fb rearrange
    /**
     * Returns the weather data as a human readable string, depending on the
     * desired data.
     * Example:
-    * ☀ Sunny, 19°C, feels like 19°C (max. 26°C, min. 10°C), 6km/h from SSE, Air Quality Fair, 34%
+    * ☀ Sunny, 19°C, feels like 19°C (max. 26°C, min. 10°C), 6km/h from SSE, air quality Fair, 34%
     * humidity
     */
    public static String buildWeatherDataString(final TourData tourData,
