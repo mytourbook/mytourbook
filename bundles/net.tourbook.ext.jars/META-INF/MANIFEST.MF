@@ -7,7 +7,8 @@ Eclipse-BuddyPolicy: registered
 Bundle-Vendor: MyTourbook
 Bundle-ClassPath: 
  joda-time-2.10.14.jar,
- c3p0-0.9.1.2.jar,
+ c3p0-0.9.5.5.jar,
+ mchange-commons-java-0.2.20.jar,
  net.sf.swtaddons_0.1.1.jar,
  caffeine-3.0.1.jar,
  imgscalr-lib-4.2.jar,
