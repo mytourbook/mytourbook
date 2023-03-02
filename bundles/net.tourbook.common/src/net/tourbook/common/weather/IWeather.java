@@ -204,11 +204,11 @@ public interface IWeather {
 
          airQualityIsNotDefined,
 
-         Messages.Weather_AirQualityIndex_Good,
-         Messages.Weather_AirQualityIndex_Fair,
-         Messages.Weather_AirQualityIndex_Moderate,
-         Messages.Weather_AirQualityIndex_Poor,
-         Messages.Weather_AirQualityIndex_VeryPoor
+         Messages.Weather_AirQuality_Good,
+         Messages.Weather_AirQuality_Fair,
+         Messages.Weather_AirQuality_Moderate,
+         Messages.Weather_AirQuality_Poor,
+         Messages.Weather_AirQuality_VeryPoor
 
    };
 

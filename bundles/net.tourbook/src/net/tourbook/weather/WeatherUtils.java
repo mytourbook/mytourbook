@@ -384,12 +384,12 @@ public class WeatherUtils {
       return searchAreaCenter;
    }
 
-   public static int getWeather_AirQuality_TextIndex(final String weather_AirQualityIndex) {
+   public static int getWeather_AirQuality_TextIndex(final String weather_AirQuality) {
 
-      final int weather_AirQualityIndex_TextIndex =
-            Arrays.asList(IWeather.airQualityTexts).indexOf(weather_AirQualityIndex);
+      final int Weather_AirQuality_TextIndex =
+            Arrays.asList(IWeather.airQualityTexts).indexOf(weather_AirQuality);
 
-      return weather_AirQualityIndex_TextIndex < 0 ? 0 : weather_AirQualityIndex_TextIndex;
+      return Weather_AirQuality_TextIndex < 0 ? 0 : Weather_AirQuality_TextIndex;
    }
 
    /**

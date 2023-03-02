@@ -284,12 +284,12 @@ public class Messages extends NLS {
    public static String        Pref_System_Option_Temperature_Celsius;
    public static String        Pref_System_Option_Temperature_Fahrenheit;
 
-   public static String        Weather_AirQualityIndex_Good;
-   public static String        Weather_AirQualityIndex_Fair;
+   public static String        Weather_AirQuality_Good;
+   public static String        Weather_AirQuality_Fair;
    public static String        Weather_AirQuality_IsNotDefined;
-   public static String        Weather_AirQualityIndex_Moderate;
-   public static String        Weather_AirQualityIndex_Poor;
-   public static String        Weather_AirQualityIndex_VeryPoor;
+   public static String        Weather_AirQuality_Moderate;
+   public static String        Weather_AirQuality_Poor;
+   public static String        Weather_AirQuality_VeryPoor;
 
    public static String        Weather_Clouds_Clouds;
    public static String        Weather_Clouds_Cloudy;
