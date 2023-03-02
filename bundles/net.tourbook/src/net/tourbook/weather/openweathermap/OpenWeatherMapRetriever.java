@@ -77,12 +77,21 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       final List<String> fullWeatherDataList = new ArrayList<>();
 
-      //todo fb add the AQI
       for (final Hourly hourly : timeMachineResult.getHourly()) {
 
+         final int hourlyDateTime = hourly.getDt();
+
          final TourDateTime tourDateTime = TimeTools.createTourDateTime(
-               hourly.getDt() * 1000L,
+               hourlyDateTime * 1000L,
                tour.getTimeZoneId());
+
+         final var currentAirPollutionResult = airPollutionResult.list.stream()
+               .filter(list -> list.getDt() == hourlyDateTime)
+               .findAny()
+               .orElse(null);
+
+         final String airQualityIndex = currentAirPollutionResult == null
+               ? UI.EMPTY_STRING : IWeather.airQualityIndexTexts[currentAirPollutionResult.getMain().getAqi()];
 
          final boolean isDisplayEmptyValues = !isCompressed;
          String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
@@ -94,6 +103,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                hourly.getPressure(),
                hourly.getRain(),
                hourly.getSnow(),
+               airQualityIndex,
                tourDateTime,
                isDisplayEmptyValues);
 
@@ -290,7 +300,6 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       }
 
       setTourWeatherWithHistoricalWeather();
-
 
       return true;
    }

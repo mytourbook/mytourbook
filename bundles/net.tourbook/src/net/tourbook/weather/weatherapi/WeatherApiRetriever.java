@@ -69,6 +69,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
                (int) hour.getPressure_mb(),
                (float) hour.getPrecip_mm(),
                0,
+               UI.EMPTY_STRING,
                tourDateTime,
                isDisplayEmptyValues);
 

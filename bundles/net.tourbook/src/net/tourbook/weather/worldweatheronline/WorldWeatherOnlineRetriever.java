@@ -112,6 +112,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                hourly.getPressure(),
                hourly.getPrecipMM(),
                0,
+               UI.EMPTY_STRING,
                tourDateTime,
                isDisplayEmptyValues);
 

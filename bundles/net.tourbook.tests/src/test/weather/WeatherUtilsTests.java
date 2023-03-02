@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -58,6 +58,7 @@ public class WeatherUtilsTests {
             1023,
             0.01f,
             0.02f,
+            UI.EMPTY_STRING,
             new TourDateTime(zonedDateTime),
             true);
 
@@ -77,6 +78,7 @@ public class WeatherUtilsTests {
             1023,
             0.01f,
             0.02f,
+            UI.EMPTY_STRING,
             null,
             true);
 
