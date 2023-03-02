@@ -152,12 +152,12 @@ public class WeatherUtils {
    /**
     * Returns the weather data as a human readable string, depending on the
     * desired data.
-    * Example: ☀ Sunny, 19°C, feels like 19°C (max. 26°C, min. 10°C), 6km/h from SSE, Air Quality
-    * Good, 34% humidity
+    * Example:
+    * ☀ Sunny, 19°C, feels like 19°C (max. 26°C, min. 10°C), 6km/h from SSE, Air Quality Fair, 34%
+    * humidity
     */
    public static String buildWeatherDataString(final TourData tourData,
-                                               final boolean displayMinimumTemperature,
-                                               final boolean displayMaximumTemperature,
+                                               final boolean displayMaximumMinimumTemperature,
                                                final boolean displayPressure) {
 
       final List<String> weatherDataList = new ArrayList<>();
@@ -189,28 +189,6 @@ public class WeatherUtils {
                   UI.UNIT_LABEL_TEMPERATURE);
          }
 
-         // Maximum temperature
-         if (displayMaximumTemperature) {
-
-            weatherDataList.add(
-                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max +
-                        UI.SPACE +
-                        FormatManager.formatTemperature(
-                              UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max())) +
-                        UI.UNIT_LABEL_TEMPERATURE);
-         }
-
-         // Minimum temperature
-         if (displayMinimumTemperature) {
-
-            weatherDataList.add(
-                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min +
-                        UI.SPACE +
-                        FormatManager.formatTemperature(
-                              UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min())) +
-                        UI.UNIT_LABEL_TEMPERATURE);
-         }
-
          // Wind chill
          final float temperatureWindChill = tourData.getWeather_Temperature_WindChill();
          if (temperatureWindChill != Float.MIN_VALUE) {
@@ -220,6 +198,29 @@ public class WeatherUtils {
                         UI.SPACE +
                         FormatManager.formatTemperature(UI.convertTemperatureFromMetric(temperatureWindChill)) +
                         UI.UNIT_LABEL_TEMPERATURE);
+         }
+
+         if (displayMaximumMinimumTemperature) {
+
+            weatherDataList.add("("); //$NON-NLS-1$
+
+            // Maximum temperature
+            weatherDataList.add(
+                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max +
+                        UI.SPACE +
+                        FormatManager.formatTemperature(
+                              UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max())) +
+                        UI.UNIT_LABEL_TEMPERATURE);
+
+            // Minimum temperature
+            weatherDataList.add(
+                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min +
+                        UI.SPACE +
+                        FormatManager.formatTemperature(
+                              UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min())) +
+                        UI.UNIT_LABEL_TEMPERATURE);
+
+            weatherDataList.add(")"); //$NON-NLS-1$
          }
       }
 
@@ -236,6 +237,15 @@ public class WeatherUtils {
          weatherDataList.add(Math.round(UI.convertSpeed_FromMetric(windSpeed)) +
                UI.UNIT_LABEL_SPEED +
                windDirection);
+      }
+
+      // Air Quality
+      final String airQuality = tourData.getWeather_AirQuality();
+      if (StringUtils.hasContent(airQuality)) {
+
+         weatherDataList.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality +
+               UI.SPACE +
+               airQuality);
       }
 
       // Humidity
