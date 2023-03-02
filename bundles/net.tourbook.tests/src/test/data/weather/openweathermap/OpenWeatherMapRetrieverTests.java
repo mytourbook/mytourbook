@@ -115,7 +115,7 @@ public class OpenWeatherMapRetrieverTests {
             () ->  assertEquals(14.15f,                           tour.getWeather_Temperature_Max()),
             () ->  assertEquals(3.93f,                            tour.getWeather_Temperature_Min()),
             () ->  assertEquals(6.33f,                            tour.getWeather_Temperature_WindChill()),
-            () ->  assertEquals(IWeather.airQualityIndexTexts[1], tour.getWeather_AirQualityIndex()));
+            () ->  assertEquals(IWeather.airQualityTexts[1],      tour.getWeather_AirQualityIndex()));
 
 // SET_FORMATTING_ON
    }
@@ -225,7 +225,7 @@ public class OpenWeatherMapRetrieverTests {
             () ->  assertEquals(-0.87f,                           tour.getWeather_Temperature_Max()),
             () ->  assertEquals(-15.96f,                          tour.getWeather_Temperature_Min()),
             () ->  assertEquals(-11.07f,                          tour.getWeather_Temperature_WindChill()),
-            () ->  assertEquals(IWeather.airQualityIndexTexts[2], tour.getWeather_AirQualityIndex()));
+            () ->  assertEquals(IWeather.airQualityTexts[2],      tour.getWeather_AirQualityIndex()));
 
 // SET_FORMATTING_ON
    }

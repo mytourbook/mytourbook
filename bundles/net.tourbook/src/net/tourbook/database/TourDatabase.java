@@ -4154,7 +4154,7 @@ public class TourDatabase {
 
             // version 50 start  -  after 23.3
 
-            + " weather_AirQualityIndex   VARCHAR(" + TourData.DB_LENGTH_WEATHER_AIRQUALITYINDEX + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+            + " weather_AirQualityIndex   VARCHAR(" + TourData.DB_LENGTH_WEATHER_AIRQUALITY + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
 
             // version 50 end
 
@@ -9436,7 +9436,7 @@ public class TourDatabase {
 // SET_FORMATTING_OFF
 
          // Add new columns
-         SQL.AddColumn_VarCar (stmt, TABLE_TOUR_DATA, "weather_AirQualityIndex", TourData.DB_LENGTH_WEATHER_AIRQUALITYINDEX);       //$NON-NLS-1$
+         SQL.AddColumn_VarCar (stmt, TABLE_TOUR_DATA, "weather_AirQualityIndex", TourData.DB_LENGTH_WEATHER_AIRQUALITY);       //$NON-NLS-1$
 
 // SET_FORMATTING_ON
       }

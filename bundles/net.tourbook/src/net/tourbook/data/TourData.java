@@ -155,7 +155,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    public static final int               DB_LENGTH_TIME_ZONE_ID            = 255;
 
    public static final int               DB_LENGTH_WEATHER                 = 1000;
-   public static final int               DB_LENGTH_WEATHER_AIRQUALITYINDEX = 255;
+   public static final int               DB_LENGTH_WEATHER_AIRQUALITY = 255;
    public static final int               DB_LENGTH_WEATHER_V48             = 32000;
    public static final int               DB_LENGTH_WEATHER_CLOUDS          = 255;
 
@@ -10013,7 +10013,7 @@ private Set<TourTag>                tourTags                            = new Ha
 
    /**
     * @return Returns the index for the air quality index values in
-    *         {@link IWeather#airQualityIndexTexts} or 0 when the air quality
+    *         {@link IWeather#airQualityTexts} or 0 when the air quality
     *         index is not defined
     */
    public int getWeather_AirQualityIndex_TextIndex() {

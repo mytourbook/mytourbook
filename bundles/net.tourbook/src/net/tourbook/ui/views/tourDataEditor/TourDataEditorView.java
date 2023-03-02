@@ -6714,12 +6714,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void fillAirQualityIndexCombo() {
 
-      for (int index = 0; index < IWeather.airQualityIndexTexts.length; index++) {
+      for (int index = 0; index < IWeather.airQualityTexts.length; index++) {
 
          final TableItem tableItem = new TableItem(_tableComboWeather_AirQualityIndex.getTable(), SWT.NONE);
 
          // set the column text
-         tableItem.setText(IWeather.airQualityIndexTexts[index]);
+         tableItem.setText(IWeather.airQualityTexts[index]);
 
          int color;
          switch (index) {
@@ -7541,7 +7541,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private void onSelect_AirQualityIndex() {
 
       final int airQualityIndex_SelectionIndex = _tableComboWeather_AirQualityIndex.getSelectionIndex();
-      String airQualityIndexValue = IWeather.airQualityIndexTexts[airQualityIndex_SelectionIndex];
+      String airQualityIndexValue = IWeather.airQualityTexts[airQualityIndex_SelectionIndex];
       if (airQualityIndexValue.equals(IWeather.airQualityIndexIsNotDefined)) {
          // replace invalid value
          airQualityIndexValue = UI.EMPTY_STRING;

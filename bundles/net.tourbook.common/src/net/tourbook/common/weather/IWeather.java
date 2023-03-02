@@ -198,9 +198,9 @@ public interface IWeather {
    public static final String   airQualityIndexIsNotDefined = Messages.Weather_AirQualityIndex_IsNotDefined;
 
    /**
-    * Text for the weather's air quality index
+    * Text for the weather's air quality
     */
-   public static final String[] airQualityIndexTexts         = new String[] {
+   public static final String[] airQualityTexts         = new String[] {
 
          airQualityIndexIsNotDefined,
 
