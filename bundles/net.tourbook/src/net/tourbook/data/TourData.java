@@ -638,7 +638,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Air Quality Index
     */
    //todo fb rename to airquality
-   private String                 weather_AirQualityIndex;                             // db-version 50
+   private String                 weather_AirQuality;                             // db-version 50
 
    //TODO FB
    //https://openweathermap.org/api/air-pollution
@@ -10007,8 +10007,8 @@ private Set<TourTag>                tourTags                            = new Ha
       return weather == null ? UI.EMPTY_STRING : weather;
    }
 
-   public String getWeather_AirQualityIndex() {
-      return weather_AirQualityIndex;
+   public String getWeather_AirQuality() {
+      return weather_AirQuality;
    }
 
    /**
@@ -10016,9 +10016,9 @@ private Set<TourTag>                tourTags                            = new Ha
     *         {@link IWeather#airQualityTexts} or 0 when the air quality
     *         index is not defined
     */
-   public int getWeather_AirQualityIndex_TextIndex() {
+   public int getWeather_AirQuality_TextIndex() {
 
-      return WeatherUtils.getWeather_AirQualityIndex_TextIndex(weather_AirQualityIndex);
+      return WeatherUtils.getWeather_AirQuality_TextIndex(weather_AirQuality);
    }
 
    /**
@@ -12508,8 +12508,8 @@ private Set<TourTag>                tourTags                            = new Ha
       this.weather = weather;
    }
 
-   public void setWeather_AirQualityIndex(final String weather_AirQualityIndex) {
-      this.weather_AirQualityIndex = weather_AirQualityIndex;
+   public void setWeather_AirQuality(final String weather_AirQuality) {
+      this.weather_AirQuality = weather_AirQuality;
    }
 
    /**

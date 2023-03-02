@@ -384,7 +384,7 @@ public class WeatherUtils {
       return searchAreaCenter;
    }
 
-   public static int getWeather_AirQualityIndex_TextIndex(final String weather_AirQualityIndex) {
+   public static int getWeather_AirQuality_TextIndex(final String weather_AirQualityIndex) {
 
       final int weather_AirQualityIndex_TextIndex =
             Arrays.asList(IWeather.airQualityTexts).indexOf(weather_AirQualityIndex);
