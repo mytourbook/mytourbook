@@ -10,7 +10,7 @@ Bundle-ClassPath:
  c3p0-0.9.5.5.jar,
  mchange-commons-java-0.2.20.jar,
  net.sf.swtaddons_0.1.1.jar,
- caffeine-3.0.1.jar,
+ caffeine-3.1.4.jar,
  imgscalr-lib-4.2.jar,
  commons-imaging-1.0-alpha1.jar,
  commons-lang3-3.12.0.jar,
