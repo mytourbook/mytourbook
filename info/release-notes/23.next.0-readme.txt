@@ -25,7 +25,6 @@ Experimental
 
 New
 ===
-    
 
 Tour Weather (Frederic)
   - Added the ability to set or retrieve an Air Quality Index. At the moment, only OpenWeatherMap supports the air quality index retrieval

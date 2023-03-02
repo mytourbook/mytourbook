@@ -12,6 +12,7 @@ Tour Tags (Frederic)
   - Added the ability to add an image to a tag and display its accumulated values in the Tour Data Editor View
     https://github.com/mytourbook/mytourbook/issues/805
 
+
 Improvements
 ============
 
@@ -34,6 +35,7 @@ Concatenate Tours (Frederic)
   
 4k Display
   - Increased cursor size in Tour Chart and 2D Map, when displayed on 4k displays
+
 
 Changes
 =======
