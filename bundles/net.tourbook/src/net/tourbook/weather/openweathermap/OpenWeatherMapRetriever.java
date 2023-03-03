@@ -348,9 +348,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       final boolean isHistoricalWeatherRetrieved = retrieveHistoricalWeather();
 
-      final boolean isAirQualityIndexRetrieved = retrieveAirQuality();
+      final boolean isAirQualityRetrieved = retrieveAirQuality();
 
-      return isHistoricalWeatherRetrieved || isAirQualityIndexRetrieved;
+      return isHistoricalWeatherRetrieved || isAirQualityRetrieved;
    }
 
    private TimeMachineResult retrieveWeatherData(final long requestedTime) {
