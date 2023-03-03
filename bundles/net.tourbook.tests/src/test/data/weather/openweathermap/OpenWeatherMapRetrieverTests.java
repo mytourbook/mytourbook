@@ -171,7 +171,6 @@ public class OpenWeatherMapRetrieverTests {
    @Test
    void testWeatherRetrieval_March2022() {
 
-      //todo fb use yourstarttime and endtime
       final String openWeatherMapResponse1 = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapResponse-1647086400.json"); //$NON-NLS-1$
 

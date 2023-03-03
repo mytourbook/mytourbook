@@ -563,6 +563,7 @@ public class Messages extends NLS {
    public static String        Tour_Tooltip_Format_Pace;
    public static String        Tour_Tooltip_Format_WindDirectionUnit;
    public static String        Tour_Tooltip_Format_WindSpeedUnit;
+   public static String        Tour_Tooltip_Label_AirQuality;
    public static String        Tour_Tooltip_Label_AltitudeDown;
    public static String        Tour_Tooltip_Label_AltitudeUp;
    public static String        Tour_Tooltip_Label_AvgCadence;

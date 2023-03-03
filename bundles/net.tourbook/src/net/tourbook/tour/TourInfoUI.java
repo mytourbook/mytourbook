@@ -896,7 +896,7 @@ public class TourInfoUI {
       /*
        * Air Quality
        */
-      createUI_Label(parent, "Air Quality");// todo fb Messages.Tour_Tooltip_Label_WindDirection);
+      createUI_Label(parent, Messages.Tour_Tooltip_Label_AirQuality);
 
       _lblAirQuality = createUI_LabelValue(parent, SWT.TRAIL);
    }
