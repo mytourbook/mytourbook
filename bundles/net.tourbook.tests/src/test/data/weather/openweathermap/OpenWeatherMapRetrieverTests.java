@@ -76,7 +76,7 @@ public class OpenWeatherMapRetrieverTests {
 
       final String openWeatherMapAirPollutionResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapAirPollutionResponse-1656720000.json"); //$NON-NLS-1$
-      final String airPollutionUrl = OPENWEATHERMAP_AIRPOLLUTION_BASE_URL + "1656720000&end=1656763003"; //$NON-NLS-1$
+      final String airPollutionUrl = OPENWEATHERMAP_AIRPOLLUTION_BASE_URL + "1656720000&end=1656763200"; //$NON-NLS-1$
       httpClientMock.onGet(airPollutionUrl).doReturn(openWeatherMapAirPollutionResponse);
 
       final TourData tour = Initializer.importTour();
@@ -185,7 +185,7 @@ public class OpenWeatherMapRetrieverTests {
 
       final String openWeatherMapAirPollutionResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapAirPollutionResponse-1647129600.json"); //$NON-NLS-1$
-      final String airPollutionUrl = OPENWEATHERMAP_AIRPOLLUTION_BASE_URL + "1647086400&end=1647129403"; //$NON-NLS-1$
+      final String airPollutionUrl = OPENWEATHERMAP_AIRPOLLUTION_BASE_URL + "1647086400&end=1647129600"; //$NON-NLS-1$
       httpClientMock.onGet(airPollutionUrl).doReturn(openWeatherMapAirPollutionResponse);
 
       final TourData tour = Initializer.importTour();

@@ -25,6 +25,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
@@ -39,6 +40,8 @@ import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.weather.HistoricalWeatherRetriever;
 import net.tourbook.weather.WeatherUtils;
+
+import org.apache.commons.lang3.time.DateUtils;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
@@ -59,9 +62,10 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
    private String buildAirPollutionApiRequest() {
 
-      final long tourStart = tour.getTourStartTime().truncatedTo(ChronoUnit.HOURS).toEpochSecond();
-      final long tourEnd = tour.getTourStartTime().plus(tour.getTourDeviceTime_Elapsed(), ChronoUnit.SECONDS).truncatedTo(ChronoUnit.HOURS)
-            .plusHours(1).toEpochSecond();
+      final long tourStart = DateUtils.round(Date.from(tour.getTourStartTime().toInstant()), Calendar.HOUR).toInstant().getEpochSecond();
+      final long tourEnd = DateUtils.round(Date.from(tour.getTourStartTime().plus(tour.getTourDeviceTime_Elapsed(), ChronoUnit.SECONDS).toInstant()),
+            Calendar.HOUR)
+            .toInstant().getEpochSecond();
 
       final StringBuilder weatherRequestWithParameters = new StringBuilder(BASE_AIR_POLLUTION_API_URL + UI.SYMBOL_QUESTION_MARK);
 
