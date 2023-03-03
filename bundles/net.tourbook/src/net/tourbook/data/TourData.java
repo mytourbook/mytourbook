@@ -405,6 +405,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Average altitude change (m/km)
     */
+   @JsonProperty
    private int                   avgAltitudeChange;                                     // db-version 40
 
    // ############################################# PULSE/WEIGHT/POWER #############################################
