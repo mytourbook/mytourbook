@@ -57,7 +57,10 @@ public class Comparison {
             new CustomComparator(
                   JSONCompareMode.STRICT,
                   new Customization("tourMarkers[*].deviceLapTime", (o1, o2) -> true), //$NON-NLS-1$
-                  new Customization("tourMarkers[*].tourData", (o1, o2) -> true))); //$NON-NLS-1$
+                  new Customization("tourMarkers[*].distance20", (o1, o2) -> true), //$NON-NLS-1$
+                  new Customization("tourMarkers[*].serieIndex", (o1, o2) -> true), //$NON-NLS-1$
+                  new Customization("tourMarkers[*].time", (o1, o2) -> true), //$NON-NLS-1$
+                  new Customization("tourMarkers[*].tourTime", (o1, o2) -> true))); //$NON-NLS-1$
 
       final CustomComparator customArrayValueComparator = new CustomComparator(
             JSONCompareMode.STRICT,
