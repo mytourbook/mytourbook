@@ -5,9 +5,6 @@
   "battery_Percentage_End" : -1,
   "battery_Percentage_Start" : -1,
   "bodyWeight" : 0.0,
-  "cadenceZone_FastTime" : 0,
-  "cadenceZone_SlowTime" : 0,
-  "cadenceZones_DelimiterValue" : 0,
   "deviceTimeInterval" : -1,
   "distanceSerie" : [ 0.0, 1223.8789 ],
   "frontShiftCount" : 0,
@@ -75,7 +72,6 @@
   "training_TrainingEffect_Aerob" : 0.0,
   "training_TrainingEffect_Anaerob" : 0.0,
   "training_TrainingPerformance" : 0.0,
-  "weather_Pressure" : 0.0,
   "weather_Temperature_Average" : 0.0,
   "weather_Temperature_Average_Device" : 0.0,
   "weather_Wind_Speed" : 0

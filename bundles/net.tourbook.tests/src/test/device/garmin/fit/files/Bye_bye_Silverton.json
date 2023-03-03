@@ -6,9 +6,6 @@
   "battery_Percentage_End" : -1,
   "battery_Percentage_Start" : -1,
   "bodyWeight" : 0.0,
-  "cadenceZone_FastTime" : 0,
-  "cadenceZone_SlowTime" : 0,
-  "cadenceZones_DelimiterValue" : 0,
   "deviceModeName" : "CYCLING",
   "devicePluginName" : "STRAVA ",
   "deviceTimeInterval" : -1,
@@ -78,13 +75,19 @@
   "tourDistance" : 2137.94,
   "tourEndTime" : 1658087138000,
   "tourMarkers" : [ {
-    "markerId" : -1
+    "markerId" : -1,
+    "altitude" : 2824.2,
+    "distance20" : 2137.94,
+    "latitude" : 37.8115889978649,
+    "longitude" : -107.65748859739746,
+    "serieIndex" : 549,
+    "time" : 627,
+    "tourTime" : 1658087138000
   } ],
   "tourStartTime" : 1658086511000,
   "training_TrainingEffect_Aerob" : 0.0,
   "training_TrainingEffect_Anaerob" : 0.0,
   "training_TrainingPerformance" : 0.0,
-  "weather_Pressure" : 0.0,
   "weather_Temperature_Average" : 0.0,
   "weather_Temperature_Average_Device" : 0.0,
   "weather_Wind_Speed" : 0
