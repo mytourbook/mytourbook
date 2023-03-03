@@ -82,41 +82,74 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       final List<String> fullWeatherDataList = new ArrayList<>();
 
-      for (final Hourly hourly : timeMachineResult.getHourly()) {
+      final List<Hourly> hourlyList = timeMachineResult.getHourly();
+      if (hourlyList.size() > 0) {
+         for (final Hourly hourly : hourlyList) {
 
-         final int hourlyDateTime = hourly.getDt();
+            final int hourlyDateTime = hourly.getDt();
 
-         final TourDateTime tourDateTime = TimeTools.createTourDateTime(
-               hourlyDateTime * 1000L,
-               tour.getTimeZoneId());
+            final TourDateTime tourDateTime = TimeTools.createTourDateTime(
+                  hourlyDateTime * 1000L,
+                  tour.getTimeZoneId());
 
-         final var currentAirPollutionResult = airPollutionResult.list.stream()
-               .filter(list -> list.getDt() == hourlyDateTime)
-               .findAny()
-               .orElse(null);
+            final var currentAirPollutionResult = airPollutionResult.getList().stream()
+                  .filter(list -> list.getDt() == hourlyDateTime)
+                  .findAny()
+                  .orElse(null);
 
-         final int airQualityIndex = currentAirPollutionResult == null
-               ? 0 : currentAirPollutionResult.getMain().getAqi();
+            final int airQualityIndex = currentAirPollutionResult == null
+                  ? 0 : currentAirPollutionResult.getMain().getAqi();
 
-         final boolean isDisplayEmptyValues = !isCompressed;
-         String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
-               (float) hourly.getTemp(),
-               (float) hourly.getFeels_like(),
-               (float) hourly.getWind_speedKmph(),
-               hourly.getWind_deg(),
-               hourly.getHumidity(),
-               hourly.getPressure(),
-               hourly.getRain(),
-               hourly.getSnow(),
-               airQualityIndex,
-               tourDateTime,
-               isDisplayEmptyValues);
+            final boolean isDisplayEmptyValues = !isCompressed;
+            String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
+                  (float) hourly.getTemp(),
+                  (float) hourly.getFeels_like(),
+                  (float) hourly.getWind_speedKmph(),
+                  hourly.getWind_deg(),
+                  hourly.getHumidity(),
+                  hourly.getPressure(),
+                  hourly.getRain(),
+                  hourly.getSnow(),
+                  airQualityIndex,
+                  tourDateTime,
+                  isDisplayEmptyValues);
 
-         if (isCompressed) {
-            fullWeatherData = fullWeatherData.replaceAll("\\s+", UI.SPACE1); //$NON-NLS-1$
+            if (isCompressed) {
+               fullWeatherData = fullWeatherData.replaceAll("\\s+", UI.SPACE1); //$NON-NLS-1$
+            }
+
+            fullWeatherDataList.add(fullWeatherData);
          }
+      } else if (airPollutionResult.getAirQualityIndexAverage() != 0) {
 
-         fullWeatherDataList.add(fullWeatherData);
+         for (final net.tourbook.weather.openweathermap.List currentAirPollutionResult : airPollutionResult.getList()) {
+
+            final int airQualityIndex = currentAirPollutionResult.getMain().getAqi();
+
+            final TourDateTime tourDateTime = TimeTools.createTourDateTime(
+                  currentAirPollutionResult.getDt() * 1000L,
+                  tour.getTimeZoneId());
+
+            final boolean isDisplayEmptyValues = !isCompressed;
+            String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  airQualityIndex,
+                  tourDateTime,
+                  isDisplayEmptyValues);
+
+            if (isCompressed) {
+               fullWeatherData = fullWeatherData.replaceAll("\\s+", UI.SPACE1); //$NON-NLS-1$
+            }
+
+            fullWeatherDataList.add(fullWeatherData);
+         }
       }
 
       final String fullWeatherData = String.join(
@@ -161,7 +194,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
          StatusUtil.logError(
                "OpenWeatherMapRetriever.deserializeAirPollutionData : Error while " + //$NON-NLS-1$
-                     "deserializing the historical weather JSON object :" //$NON-NLS-1$
+                     "deserializing the historical air quality JSON object :" //$NON-NLS-1$
                      + airPollutionDataResponse + UI.SYSTEM_NEW_LINE + e.getMessage());
       }
 
@@ -235,7 +268,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
       //Send an API request as long as we don't have the results covering the entire duration of the tour
       airPollutionResult = retrieveAirPollutionData();
-      if (airPollutionResult == null) {
+      if (airPollutionResult == null || airPollutionResult.getAirQualityIndexAverage() == 0) {
          return false;
       }
 

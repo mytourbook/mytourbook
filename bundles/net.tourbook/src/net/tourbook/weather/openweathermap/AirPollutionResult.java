@@ -24,7 +24,7 @@ import java.util.function.ToDoubleFunction;
 @JsonIgnoreProperties(ignoreUnknown = true)
 class AirPollutionResult {
 
-   public List<net.tourbook.weather.openweathermap.List> list;
+   private List<net.tourbook.weather.openweathermap.List> list;
 
    public int getAirQualityIndexAverage() {
 
@@ -32,12 +32,16 @@ class AirPollutionResult {
             listElement -> listElement.getMain().getAqi();
 
       final OptionalDouble averageAirQualityIndex =
-            list.stream().mapToDouble(listFunction).average();
+            getList().stream().mapToDouble(listFunction).average();
 
       if (averageAirQualityIndex.isPresent()) {
          return (int) Math.round(averageAirQualityIndex.getAsDouble());
       }
 
       return 0;
+   }
+
+   public List<net.tourbook.weather.openweathermap.List> getList() {
+      return list;
    }
 }
