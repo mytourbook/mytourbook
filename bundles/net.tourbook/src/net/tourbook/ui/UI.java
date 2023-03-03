@@ -1283,12 +1283,13 @@ public class UI {
          } else {
 
             final CLabel label = new CLabel(tourTagsComposite, SWT.NONE);
-            label.setLayoutData(new RowData(pc.convertWidthInCharsToPixels(35), pc.convertWidthInCharsToPixels(12)));
+            label.setLayoutData(new RowData(pc.convertWidthInCharsToPixels(40), pc.convertWidthInCharsToPixels(12)));
             label.setText(UI.EMPTY_STRING
 
                   + tag.getTagName() + UI.NEW_LINE
                   + tourTagsAccumulatedValues.get(tagId) //
             );
+            label.setToolTipText(tag.getTagName());
             label.setImage(image);
 
             _tagsLabels.put(tagId, label);

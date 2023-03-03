@@ -404,13 +404,13 @@ public class TagManager {
             final StringBuilder tagAccumulatedValues = new StringBuilder();
 
             tagAccumulatedValues.append(Math.round(usedHours / 3600f));
-            tagAccumulatedValues.append(Messages.tour_editor_label_time_unit);
+            tagAccumulatedValues.append(UI.SPACE + net.tourbook.common.UI.UNIT_LABEL_TIME);
 
             tagAccumulatedValues.append(UI.NEW_LINE);
 
             usedMiles = usedMiles / 1000 / net.tourbook.common.UI.UNIT_VALUE_DISTANCE;
             tagAccumulatedValues.append(Math.round(usedMiles));
-            tagAccumulatedValues.append(net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
+            tagAccumulatedValues.append(UI.SPACE + net.tourbook.common.UI.UNIT_LABEL_DISTANCE);
 
             tourTagsAccumulatedValues.put(tourTagId, tagAccumulatedValues.toString());
          }

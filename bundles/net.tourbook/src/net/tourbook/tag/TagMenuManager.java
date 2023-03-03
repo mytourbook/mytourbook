@@ -30,6 +30,7 @@ import net.tourbook.application.ICommandIds;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.AdvancedMenuForActions;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.ToolTip;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -352,6 +353,10 @@ public class TagMenuManager {
     * @return
     */
    public static Image getTagImage(final String imageFilePath) {
+
+      if (StringUtils.isNullOrEmpty(imageFilePath)) {
+         return null;
+      }
 
       var tagImage = _tagImagesCache.get(imageFilePath);
 
