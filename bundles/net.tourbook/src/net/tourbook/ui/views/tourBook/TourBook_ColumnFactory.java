@@ -774,7 +774,7 @@ class TourBook_ColumnFactory {
             if (dbValue == 0) {
                return UI.EMPTY_STRING;
             } else {
-               return Long.toString(dbValue);
+               return _nf0.format(dbValue);
             }
          }
       });
@@ -791,7 +791,7 @@ class TourBook_ColumnFactory {
                if (dbValue == 0) {
                   cell.setText(UI.EMPTY_STRING);
                } else {
-                  cell.setText(Long.toString(dbValue));
+                  cell.setText(_nf0.format(dbValue));
                }
 
                setCellColor(cell, element);

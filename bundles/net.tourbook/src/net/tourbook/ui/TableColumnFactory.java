@@ -1156,7 +1156,7 @@ public abstract class TableColumnFactory {
          public TableColumnDefinition createColumn(final ColumnManager columnManager,
                                                   final PixelConverter pixelConverter) {
 
-            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "DATA_TOUR_ID", SWT.LEAD); //$NON-NLS-1$
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "DATA_TOUR_ID", SWT.TRAIL); //$NON-NLS-1$
 
             colDef.setColumnCategory(           Messages.ColumnFactory_Category_Data);
 

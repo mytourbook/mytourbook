@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2016 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,83 +15,91 @@
  *******************************************************************************/
 package net.tourbook.photo;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
+
+import net.tourbook.common.UI;
 
 /**
  * Metadata for the original photo image file.
  */
-public class PhotoImageMetadata {
+public class PhotoImageMetadata implements Serializable {
 
-	/**
-	 * Is <code>true</code> when the image data are loaded from the image file, otherwise it is
-	 * <code>false</code>.
-	 */
-	public boolean			isExifFromImage;
+   private static final char NL               = UI.NEW_LINE;
 
-	/**
-	 * Last modified date/time of the image file which is provided by the file system with the
-	 * system time zone.
-	 */
-	public LocalDateTime	fileDateTime;
+   private static final long serialVersionUID = 1L;
 
-	/**
-	 * Exif date/time which has no time zone.
-	 */
-	public LocalDateTime	exifDateTime;
+   /**
+    * Is <code>true</code> when the image data are loaded from the image file, otherwise it is
+    * <code>false</code>.
+    */
+   public boolean            isExifFromImage;
 
-	public int				imageWidth		= Integer.MIN_VALUE;
-	public int				imageHeight		= Integer.MIN_VALUE;
+   /**
+    * Last modified date/time of the image file which is provided by the file system with the
+    * system time zone.
+    */
+   public LocalDateTime      fileDateTime;
 
-	public int				orientation		= 1;
+   /**
+    * Exif date/time which has no time zone.
+    */
+   public LocalDateTime      exifDateTime;
 
-	public double			imageDirection	= Double.MIN_VALUE;
+   public int                imageWidth       = Integer.MIN_VALUE;
+   public int                imageHeight      = Integer.MIN_VALUE;
 
-	public double			altitude		= Double.MIN_VALUE;
+   public int                orientation      = 1;
 
-	/**
-	 * Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the value when the
-	 * value is not set !!!
-	 */
-	public double			latitude		= 0;
-	public double			longitude		= 0;
+   public double             imageDirection   = Double.MIN_VALUE;
 
-	public String			gpsAreaInfo;
+   public double             altitude         = Double.MIN_VALUE;
 
-	/**
-	 * Title
-	 */
-	public String			objectName;
+   /**
+    * Double.MIN_VALUE cannot be used, it cannot be saved in the database. 0 is the value when the
+    * value is not set !!!
+    */
+   public double             latitude         = 0;
+   public double             longitude        = 0;
 
-	/**
-	 * Description
-	 */
-	public String			captionAbstract;
+   public String             gpsAreaInfo;
 
-	/**
-	 * Camera or scanner name
-	 */
-	public String			model;
+   /**
+    * Title
+    */
+   public String             objectName;
 
-	public PhotoImageMetadata() {}
+   /**
+    * Description
+    */
+   public String             captionAbstract;
 
-	@Override
-	public String toString() {
+   /**
+    * Camera or scanner name
+    */
+   public String             model;
 
-		return "PhotoImageMetadata\n[\n" //$NON-NLS-1$
+   public PhotoImageMetadata() {}
 
-				+ ("fileDateTime=" + fileDateTime + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("exifDateTime=" + exifDateTime + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("imageWidth=" + imageWidth + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("imageHeight=" + imageHeight + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("orientation=" + orientation + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("imageDirection=" + imageDirection + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("altitude=" + altitude + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("latitude=" + latitude + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("longitude=" + longitude + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("gpsAreaInfo=" + gpsAreaInfo + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("objectName=" + objectName + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("captionAbstract=" + captionAbstract + ", \n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ ("model=" + model + "\n") //$NON-NLS-1$ //$NON-NLS-2$
-				+ "]"; //$NON-NLS-1$
-	}
+   @Override
+   public String toString() {
+
+      return "PhotoImageMetadata [" + NL //                       //$NON-NLS-1$
+
+            + "fileDateTime      =" + fileDateTime + NL //        //$NON-NLS-1$
+            + "exifDateTime      =" + exifDateTime + NL //        //$NON-NLS-1$
+            + "imageWidth        =" + imageWidth + NL //          //$NON-NLS-1$
+            + "imageHeight       =" + imageHeight + NL //         //$NON-NLS-1$
+            + "orientation       =" + orientation + NL //         //$NON-NLS-1$
+            + "imageDirection    =" + imageDirection + NL //      //$NON-NLS-1$
+            + "altitude          =" + altitude + NL //            //$NON-NLS-1$
+            + "latitude          =" + latitude + NL //            //$NON-NLS-1$
+            + "longitude         =" + longitude + NL //           //$NON-NLS-1$
+            + "gpsAreaInfo       =" + gpsAreaInfo + NL //         //$NON-NLS-1$
+            + "objectName        =" + objectName + NL //          //$NON-NLS-1$
+            + "captionAbstract   =" + captionAbstract + NL //     //$NON-NLS-1$
+            + "model             =" + model + NL //               //$NON-NLS-1$
+
+            + "]"; //                                             //$NON-NLS-1$
+   }
 }

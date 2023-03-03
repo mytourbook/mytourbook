@@ -2068,23 +2068,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             // this is copy number 2+, increment copy number
 
-            System.out.println();
+            // Regex source: https://stackoverflow.com/questions/12941362/is-it-possible-to-increment-numbers-using-regex-substitution#answer-12946132
+
+            final String regex1 = "$"; //                                                                            //$NON-NLS-1$
+            final String regex2 = "(?=\\d)(?:([0-8])(?=.*\\1(\\d)\\d*$)|(?=.*(1)))(?:(9+)(?=.*(~))|)(?!\\d)"; //     //$NON-NLS-1$
+//          original with spaces   (?= \d)(?:([0-8])(?=.* \1( \d) \d*$)|(?=.*(1)))(?:(9+)(?=.*(~))|)(?! \d)
+            final String regex3 = "9(?=9*~)(?=.*(0))|~| ~0123456789$"; //                                            //$NON-NLS-1$
 
             String newCopyText = copyPostfix_End;
-            System.out.println(newCopyText);
 
-            final String regex2 = "(?=\\d)(?:([0-8])(?=.*\\1(\\d)\\d*$)|(?=.*(1)))(?:(9+)(?=.*(~))|)(?!\\d)";
-//          final String regex2 = "(?= \d)(?:([0-8])(?=.* \1( \d) \d*$)|(?=.*(1)))(?:(9+)(?=.*(~))|)(?! \d)";
-
-            // Regex source: https://stackoverflow.com/questions/12941362/is-it-possible-to-increment-numbers-using-regex-substitution#answer-12946132
-            newCopyText = newCopyText.replaceAll("$", " ~0123456789"); //                          //$NON-NLS-1$ //$NON-NLS-2$
-            System.out.println(newCopyText);
-
-            newCopyText = newCopyText.replaceAll(regex2, "$2$3$4$5"); //                           //$NON-NLS-1$
-            System.out.println(newCopyText);
-
-            newCopyText = newCopyText.replaceAll("9(?=9*~)(?=.*(0))|~| ~0123456789$", "$1"); //    //$NON-NLS-1$ //$NON-NLS-2$
-            System.out.println(newCopyText);
+            newCopyText = newCopyText.replaceAll(regex1, " ~0123456789"); //     //$NON-NLS-1$
+            newCopyText = newCopyText.replaceAll(regex2, "$2$3$4$5"); //         //$NON-NLS-1$
+            newCopyText = newCopyText.replaceAll(regex3, "$1"); //               //$NON-NLS-1$
 
             newTourTitle = titleWithoutPostfix + newCopyText;
 

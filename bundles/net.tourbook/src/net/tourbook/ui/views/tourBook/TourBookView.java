@@ -2364,6 +2364,13 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
       _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept(allRowPositions -> {
 
+         if (allRowPositions.length < 1) {
+
+            // fixed ArrayIndexOutOfBoundsException
+
+            return;
+         }
+
          final int firstRowPosition = allRowPositions[0];
          final int numVisibleRows = _natTable_Body_ViewportLayer.getRowCount();
          final int scrollableRowCenterPosition = numVisibleRows / 2;
