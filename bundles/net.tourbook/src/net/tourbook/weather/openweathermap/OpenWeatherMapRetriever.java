@@ -87,7 +87,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       final List<String> fullWeatherDataList = new ArrayList<>();
 
       final List<Hourly> hourlyList = timeMachineResult.getHourly();
+
       if (hourlyList.size() > 0) {
+
          for (final Hourly hourly : hourlyList) {
 
             final int hourlyDateTime = hourly.getDt();
