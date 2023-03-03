@@ -156,6 +156,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * <code>-1</code>.
     */
    @XmlElement
+   @JsonProperty
    private int      time            = -1;
 
    /**
@@ -163,6 +164,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     *
     * @since Db version 25
     */
+   @JsonProperty
    private long     tourTime        = Long.MIN_VALUE;
 
    /**
@@ -177,6 +179,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * 20 == db version 20
     */
    @XmlElement
+   @JsonProperty
    private float    distance20      = -1;
 
    /**
@@ -200,6 +203,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * position of this marker in the data serie
     */
    @XmlAttribute
+   @JsonProperty
    private int      serieIndex;
 
    @XmlElement
@@ -235,16 +239,19 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    /**
     * @since Db version 25
     */
+   @JsonProperty
    private float    altitude        = TourDatabase.DEFAULT_FLOAT;
 
    /**
     * @since Db version 25
     */
+   @JsonProperty
    private double   latitude        = TourDatabase.DEFAULT_DOUBLE;
 
    /**
     * @since Db version 25
     */
+   @JsonProperty
    private double   longitude       = TourDatabase.DEFAULT_DOUBLE;
 
    private int      isMarkerVisible = 1;
