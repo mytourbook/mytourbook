@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -56,7 +57,11 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       return BASE_TIME_MACHINE_API_URL;
    }
 
-   private String buildAirPollutionApiRequest(final long startDateTime, final long endDateTime) {
+   private String buildAirPollutionApiRequest() {
+
+      final long tourStart = tour.getTourStartTime().truncatedTo(ChronoUnit.HOURS).toEpochSecond();
+      final long tourEnd = tour.getTourStartTime().plus(tour.getTourDeviceTime_Elapsed(), ChronoUnit.SECONDS).truncatedTo(ChronoUnit.HOURS)
+            .plusHours(1).toEpochSecond();
 
       final StringBuilder weatherRequestWithParameters = new StringBuilder(BASE_AIR_POLLUTION_API_URL + UI.SYMBOL_QUESTION_MARK);
 
@@ -64,8 +69,8 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
          weatherRequestWithParameters.append(      "lat"   + "=" + searchAreaCenter.getLatitude()); //$NON-NLS-1$ //$NON-NLS-2$
          weatherRequestWithParameters.append("&" + "lon"   + "=" + searchAreaCenter.getLongitude()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-         weatherRequestWithParameters.append("&" + "start" + "=" + startDateTime); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-         weatherRequestWithParameters.append("&" + "end"   + "=" + endDateTime); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+         weatherRequestWithParameters.append("&" + "start" + "=" + tourStart); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+         weatherRequestWithParameters.append("&" + "end"   + "=" + tourEnd); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 
    // SET_FORMATTING_ON
 
@@ -216,7 +221,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
    private AirPollutionResult retrieveAirPollutionData() {
 
-      final String airPollutionRequestWithParameters = buildAirPollutionApiRequest(tourStartTime, tourEndTime);
+      final String airPollutionRequestWithParameters = buildAirPollutionApiRequest();
 
       final String rawAirPollutionData = sendWeatherApiRequest(airPollutionRequestWithParameters);
       if (StringUtils.isNullOrEmpty(rawAirPollutionData)) {
