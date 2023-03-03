@@ -483,19 +483,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Time spent (in seconds) in the "Slow" cadence zone (for example: Hiking).
     */
-   @JsonProperty
    private int                   cadenceZone_SlowTime                        = 0;                     // db-version 40
 
    /**
     * Time spent (in seconds) in the "Fast" cadence zone (for example: Running).
     */
-   @JsonProperty
    private int                   cadenceZone_FastTime                        = 0;                     // db-version 40
 
    /**
     * The delimiter used when computing the existing values of cadenceZone_SlowTime & cadenceZone_FastTime
     */
-   @JsonProperty
    private int                   cadenceZones_DelimiterValue;
 
    /**
@@ -615,7 +612,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Atmospheric pressure in millibars (mb)
     */
-   @JsonProperty
    private float                 weather_Pressure;                                     // db-version 39
    /**
     * Amount of snowfall  (mm)
