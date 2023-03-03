@@ -67,7 +67,6 @@ public class Comparison {
             JSONCompareMode.STRICT,
             new Customization("tourMarkers", tourMarkersValueMatcher), //$NON-NLS-1$
             new Customization("tourType.createId", (o1, o2) -> true), //$NON-NLS-1$
-            new Customization("geoGrid", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("tourId", (o1, o2) -> true), //$NON-NLS-1$
 
             // We ignore the below fields because the values could be different
