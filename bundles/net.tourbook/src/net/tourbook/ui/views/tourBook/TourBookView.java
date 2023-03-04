@@ -1789,7 +1789,8 @@ public class TourBookView extends ViewPart implements ITourProvider2, ITourViewe
 
                   if (savedTour != null) {
 
-                     final boolean isDeviceTour = savedTour.isManualTour() == false;
+                     final boolean isManualTour = savedTour.isManualTour();
+                     final boolean isDeviceTour = isManualTour == false;
                      final boolean canMergeTours = isOneTour && isDeviceTour && savedTour.getMergeSourceTourId() != null;
 
                      _actionDuplicateTour.setEnabled(isOneTour);

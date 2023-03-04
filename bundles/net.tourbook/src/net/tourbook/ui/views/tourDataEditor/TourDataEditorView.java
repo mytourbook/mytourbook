@@ -29,6 +29,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -187,6 +188,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -214,7 +216,7 @@ import org.eclipse.ui.progress.UIJob;
 // create: 24.08.2007
 
 /**
- * This editor can edit (when all is implemented) all data for a tour
+ * This editor can edit data of a tour
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
@@ -222,6 +224,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    private static final String           GRAPH_LABEL_HEARTBEAT_UNIT                       = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
    private static final String           VALUE_UNIT_K_CALORIES                            = net.tourbook.ui.Messages.Value_Unit_KCalories;
+   //
+   private static final char             NL                                               = UI.NEW_LINE;
    //
    private static final int              COLUMN_SPACING                                   = 20;
    //
@@ -540,6 +544,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private final NumberFormat                         _nfLatLon                       = NumberFormat.getNumberInstance();
 
    private TourData                                   _tourData;
+   private LocalDate                                  _lastDuplicateTourDateCheck;
 
    private Color                                      _foregroundColor_Default;
    private Color                                      _backgroundColor_Default;
@@ -1980,11 +1985,14 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
     */
    public void actionCreateTour(final TourData copyFromOtherTour) {
 
+      final Display currentDisplay = Display.getCurrent();
+      final Shell activeShell = currentDisplay.getActiveShell();
+
       // check if a person is selected
       final TourPerson activePerson = TourbookPlugin.getActivePerson();
       if (activePerson == null) {
 
-         MessageDialog.openInformation(Display.getCurrent().getActiveShell(),
+         MessageDialog.openInformation(activeShell,
 
                Messages.tour_editor_dlg_create_tour_title,
                Messages.tour_editor_dlg_create_tour_message);
@@ -1997,6 +2005,38 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       if (copyFromOtherTour != null) {
 
          // clone other tour
+
+         /*
+          * Show warning that this feature is experimental, show once a day or when this view is reopened
+          */
+         final LocalDate today = LocalDate.now();
+
+         if (today.equals(_lastDuplicateTourDateCheck) == false) {
+
+            _lastDuplicateTourDateCheck = today;
+
+            // needs a timer otherwise it could not be displayed
+            currentDisplay.timerExec(1000, () -> {
+
+               MessageDialog.openWarning(activeShell,
+
+                     "Experimental Feature",
+
+                     UI.EMPTY_STRING
+
+                           + "Duplicating a tour is a new experimental feature in MyTourbook 23.3" + NL
+                           + NL
+                           + "Use this feature with care, mainly the duplicated tours, as it is not yet fully tested." + NL
+                           + NL
+                           + "One issue could be that when a duplicated tour is selected then it's data are not displayed "
+                           + "because the original tour was selected before. "
+                           + "This issue happened in the flat \"Tour Book\" view and is fixed. " + NL
+                           + NL
+                           + "There are so many possibilities in MyTourbook that not all of them are tested now."
+
+               );
+            });
+         }
 
          newTourData = copyFromOtherTour.createDeepCopy();
 
@@ -2072,7 +2112,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             final String regex1 = "$"; //                                                                            //$NON-NLS-1$
             final String regex2 = "(?=\\d)(?:([0-8])(?=.*\\1(\\d)\\d*$)|(?=.*(1)))(?:(9+)(?=.*(~))|)(?!\\d)"; //     //$NON-NLS-1$
-//          original with spaces   (?= \d)(?:([0-8])(?=.* \1( \d) \d*$)|(?=.*(1)))(?:(9+)(?=.*(~))|)(?! \d)
+//          original + spaces      (?= \d)(?:([0-8])(?=.* \1( \d) \d*$)|(?=.*(1)))(?:(9+)(?=.*(~))|)(?! \d)
             final String regex3 = "9(?=9*~)(?=.*(0))|~| ~0123456789$"; //                                            //$NON-NLS-1$
 
             String newCopyText = copyPostfix_End;
@@ -2109,17 +2149,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
 
       /*
-       * get export filename
+       * Get export filename
        */
       final FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
       dialog.setText(Messages.dialog_export_file_dialog_text);
 
       dialog.setFilterPath(_state.get(STATE_CSV_EXPORT_PATH));
       dialog.setFilterExtensions(new String[] { Util.CSV_FILE_EXTENSION });
-      dialog.setFileName(
-            net.tourbook.ui.UI.format_yyyymmdd_hhmmss(_tourData)
-                  + UI.SYMBOL_DOT
-                  + Util.CSV_FILE_EXTENSION);
+      dialog.setFileName(UI.EMPTY_STRING
+
+            + net.tourbook.ui.UI.format_yyyymmdd_hhmmss(_tourData)
+            + UI.SYMBOL_DOT
+            + Util.CSV_FILE_EXTENSION);
 
       final String selectedFilePath = dialog.open();
       if (selectedFilePath == null) {
@@ -9001,8 +9042,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _timeSlice_CadenceEditingSupport.setCanEditSlices(_isTourWithSwimData == false);
 
       // this action displays selected unit label
-      _actionSetStartDistanceTo_0.setText(
-            NLS.bind(Messages.TourEditor_Action_SetStartDistanceTo0, UI.UNIT_LABEL_DISTANCE));
+      _actionSetStartDistanceTo_0.setText(NLS.bind(Messages.TourEditor_Action_SetStartDistanceTo0, UI.UNIT_LABEL_DISTANCE));
 
       // show editor page
       _pageBook.showPage(_page_EditorForm);
@@ -9049,7 +9089,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          for (final TourReference refTour : refTourList) {
 
             if (refCounter > 0) {
-               sb.append(UI.NEW_LINE);
+               sb.append(NL);
             }
 
             sb.append(refTour.getLabel());
