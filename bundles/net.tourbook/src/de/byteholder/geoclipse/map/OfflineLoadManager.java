@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,8 +19,6 @@ import de.byteholder.geoclipse.mapprovider.MP;
 import de.byteholder.geoclipse.preferences.IMappingPreferences;
 
 import java.io.File;
-import java.util.Observable;
-import java.util.Observer;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -33,45 +31,37 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
- * this will manage the loading for offline images
+ * This is managing the loading for offline images
  */
 public class OfflineLoadManager {
 
    private static OfflineLoadManager                _instance;
 
-   private static final ConcurrentLinkedQueue<Tile> _offlineTiles     = new ConcurrentLinkedQueue<>();
+   private static final ConcurrentLinkedQueue<Tile> _offlineTiles            = new ConcurrentLinkedQueue<>();
 
-   private static boolean                           _isLoading        = false;
+   private static boolean                           _isLoading               = false;
+
+   private static final IPreferenceStore            _prefStore               = TourbookPlugin.getPrefStore();
 
    private MP                                       _mp;
 
-   private final IPreferenceStore                   _prefStore        = TourbookPlugin
-         .getDefault()
-         .getPreferenceStore();
-
    private String                                   _osTileCachePath;
 
-   private final TileLoadObserver                   _tileLoadObserver = new TileLoadObserver();
+   private final TileImageLoaderCallback            _tileImageLoaderCallback = new TileImageLoaderCallback_ForOfflineImages();
 
    /**
-    * This observer is called in the {@link Tile} when a tile image is set into the tile
+    * This callback is called when a tile image was loaded and is set into the tile
     */
-   private final class TileLoadObserver implements Observer {
+   final class TileImageLoaderCallback_ForOfflineImages implements TileImageLoaderCallback {
 
       @Override
-      public void update(final Observable observable, final Object arg) {
+      public void update(final Tile tile) {
 
-         if (observable instanceof Tile) {
+         // update loading state
+         final LinkedBlockingDeque<Tile> waitingQueue = MP.getTileWaitingQueue();
 
-            final Tile tile = (Tile) observable;
-
-            tile.deleteObserver(this);
-
-            // update loading state
-            final LinkedBlockingDeque<Tile> waitingQueue = MP.getTileWaitingQueue();
-            if (waitingQueue.isEmpty()) {
-               _isLoading = false;
-            }
+         if (waitingQueue.isEmpty()) {
+            _isLoading = false;
          }
       }
    }
@@ -110,7 +100,7 @@ public class OfflineLoadManager {
 
       _mp.putTileInWaitingQueue(offlineTile, false);
 
-      offlineTile.addObserver(_tileLoadObserver);
+      offlineTile.setImageLoaderCallback(_tileImageLoaderCallback);
 
       return true;
    }
