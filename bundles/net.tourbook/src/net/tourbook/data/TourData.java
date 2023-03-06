@@ -1052,6 +1052,7 @@ private Set<TourTag>                tourTags                            = new Ha
     * Category of the tour, e.g. bike, mountainbike, jogging, inlinescating
     */
    @ManyToOne
+   @JsonProperty
    private TourType                    tourType;
 
    /**

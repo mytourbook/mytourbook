@@ -15,6 +15,10 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,6 +36,7 @@ import net.tourbook.database.TourDatabase;
 import org.eclipse.swt.graphics.RGB;
 
 @Entity
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "typeId")
 public class TourType implements Comparable<Object>, Serializable {
 
    private static final long          serialVersionUID                      = 1L;
@@ -74,9 +79,11 @@ public class TourType implements Comparable<Object>, Serializable {
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @JsonProperty
    private long                       typeId                                = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    @Basic(optional = false)
+   @JsonProperty
    private String                     name;
 
    private int                        color_Gradient_Bright;

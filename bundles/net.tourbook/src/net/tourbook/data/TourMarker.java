@@ -72,7 +72,6 @@ import org.eclipse.swt.graphics.Rectangle;
 @XmlRootElement(name = "TourMarker")
 @XmlAccessorType(XmlAccessType.NONE)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "markerId")
-
 public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializable, Serializable {
 
    private static final long    serialVersionUID      = 1L;
