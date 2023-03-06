@@ -15,12 +15,6 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-//todo fb
-//tour filter starttime with a value of 12:00am doesn't work
-
-// redo all the unit tests json files to only contain the database fields and
-// not the computed ones
-
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 
