@@ -194,7 +194,7 @@ public class OpenWeatherMapRetrieverTests {
       httpClientMock.verify().get(url1).called();
       httpClientMock.verify().get(url2).called();
 
- // SET_FORMATTING_OFF
+// SET_FORMATTING_OFF
 
       assertAll(
             () ->  assertEquals("scattered clouds",           tour.getWeather()), //$NON-NLS-1$
