@@ -172,7 +172,6 @@ public class TourBookViewTests extends UITest {
             "1/1/2015, 1:00 PM")));//$NON-NLS-1$
 
       //Check that the tour was successfully deleted
-      Utils.showTourBookView(bot);
       final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
       assertTrue(Arrays.asList(allItems).stream().anyMatch(treeItem -> treeItem.getText().equals("2015   1")));//$NON-NLS-1$
    }
