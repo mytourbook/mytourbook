@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,7 +21,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.pgssoft.httpclient.HttpClientMock;
 
 import java.lang.reflect.Field;
+import java.time.ZonedDateTime;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
 import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
@@ -100,7 +102,16 @@ public class WorldWeatherOnlineRetrieverTests {
 
       final TourData tour = Initializer.importTour();
       //Tuesday, July 2, 2022 12:00:00 AM
-      tour.setTourStartTime(2022, 7, 2, 0, 0, 0);
+      final ZonedDateTime zonedDateTime = ZonedDateTime.of(
+            2022,
+            7,
+            2,
+            0,
+            0,
+            0,
+            0,
+            TimeTools.UTC);
+      tour.setTourStartTime(zonedDateTime);
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 

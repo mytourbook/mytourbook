@@ -31,7 +31,6 @@ import net.tourbook.common.time.TourDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("TimeTools should")
 public class TimeToolsTests {
 
    private double eiffelTowerLat = 48.858093;
@@ -146,12 +145,6 @@ public class TimeToolsTests {
    }
 
    @Test
-   void testGetDefaultTimeZoneOffset() {
-
-      assertEquals("0 m", TimeTools.getDefaultTimeZoneOffset()); //$NON-NLS-1$
-   }
-
-   @Test
    void testGetFirstDayOfWeek() {
 
       assertEquals(DayOfWeek.MONDAY, TimeTools.getFirstDayOfWeek());
@@ -213,7 +206,7 @@ public class TimeToolsTests {
             0,
             0,
             0,
-            TimeTools.getDefaultTimeZone());
+            TimeTools.UTC);
 
       assertEquals(1652688000000L, TimeTools.toEpochMilli(testZonedDateTime));
    }

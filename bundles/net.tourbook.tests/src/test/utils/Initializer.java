@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,10 +15,12 @@
  *******************************************************************************/
 package utils;
 
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 
 import javax.persistence.Persistence;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.device.garmin.fit.FitDataReader;
@@ -31,7 +33,16 @@ public class Initializer {
    public static TourData createManualTour() {
 
       final TourData manualTour = new TourData();
-      manualTour.setTourStartTime(2022, 1, 3, 17, 16, 0);
+      final ZonedDateTime zonedDateTime = ZonedDateTime.of(
+            2022,
+            1,
+            3,
+            17,
+            16,
+            0,
+            0,
+            TimeTools.UTC);
+      manualTour.setTourStartTime(zonedDateTime);
       manualTour.setTourDistance(10);
       manualTour.setTourDeviceTime_Elapsed(3600);
       manualTour.setTourTitle("Manual Tour"); //$NON-NLS-1$

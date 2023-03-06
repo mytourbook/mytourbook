@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.pgssoft.httpclient.HttpClientMock;
 
 import java.lang.reflect.Field;
+import java.time.ZonedDateTime;
 
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
 import net.tourbook.weather.WeatherUtils;
 import net.tourbook.weather.weatherapi.WeatherApiRetriever;
@@ -74,7 +76,16 @@ public class WeatherApiRetrieverTests {
 
       final TourData tour = Initializer.importTour();
       //Tuesday, July 02, 2022 12:00:00 PM
-      tour.setTourStartTime(2022, 7, 2, 12, 0, 0);
+      final ZonedDateTime zonedDateTime = ZonedDateTime.of(
+            2022,
+            7,
+            2,
+            12,
+            0,
+            0,
+            0,
+            TimeTools.UTC);
+      tour.setTourStartTime(zonedDateTime);
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
       final String weatherApiResponse = "LongsPeak-Manual-WeatherApiResponse-July2022.json"; //$NON-NLS-1$
@@ -106,7 +117,16 @@ public class WeatherApiRetrieverTests {
 
       final TourData tour = Initializer.importTour();
       //Tuesday, May 10, 2022 12:00:00 PM
-      tour.setTourStartTime(2022, 5, 10, 12, 0, 0);
+      final ZonedDateTime zonedDateTime = ZonedDateTime.of(
+            2022,
+            5,
+            10,
+            12,
+            0,
+            0,
+            0,
+            TimeTools.UTC);
+      tour.setTourStartTime(zonedDateTime);
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 
