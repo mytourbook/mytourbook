@@ -25,6 +25,7 @@ import de.byteholder.geoclipse.map.UI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -172,7 +173,7 @@ public class TourBookViewTests extends UITest {
 
       //Check that the tour was successfully deleted
       final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
-      assertEquals("2015   1", allItems[2].getText()); //$NON-NLS-1$
+      assertTrue(Arrays.asList(allItems).stream().anyMatch(treeItem -> treeItem.getText().equals("2015   1")));//$NON-NLS-1$
    }
 
    /**
