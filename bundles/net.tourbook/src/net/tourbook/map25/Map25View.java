@@ -2083,7 +2083,6 @@ public class Map25View extends ViewPart implements
 
       Map25ConfigManager.saveState();
       Map3GradientColorManager.saveColors();
-      ModelPlayerManager.saveState();
    }
 
    /**

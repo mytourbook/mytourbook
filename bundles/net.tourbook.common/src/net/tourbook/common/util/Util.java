@@ -1250,6 +1250,44 @@ public class Util {
       }
    }
 
+   /**
+    * @param state
+    * @param key
+    * @param defaultValue
+    * @param minValue
+    * @param maxValue
+    * @return Returns an integer value from {@link IDialogSettings}. When the key is not found, the
+    *         default value is returned.
+    */
+   public static int getStateInt(final IDialogSettings state,
+                                 final String key,
+                                 final int defaultValue,
+                                 final int minValue,
+                                 final int maxValue) {
+
+      if (state == null) {
+         return defaultValue;
+      }
+
+      try {
+
+         final int stateValue = state.get(key) == null ? defaultValue : state.getInt(key);
+
+         if (stateValue < minValue) {
+            return minValue;
+         }
+
+         if (stateValue > maxValue) {
+            return maxValue;
+         }
+
+         return stateValue;
+
+      } catch (final NumberFormatException e) {
+         return defaultValue;
+      }
+   }
+
    public static int[] getStateIntArray(final IDialogSettings state, final String key, final int[] defaultValue) {
 
       if (state == null) {

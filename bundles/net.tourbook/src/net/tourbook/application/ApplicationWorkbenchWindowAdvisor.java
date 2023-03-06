@@ -508,6 +508,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       // must be initialized early to set photoServiceProvider in the Photo
       TourPhotoManager.restoreState();
+      
+      ModelPlayerManager.restoreState();
 
       FormatManager.updateDisplayFormats();
 
