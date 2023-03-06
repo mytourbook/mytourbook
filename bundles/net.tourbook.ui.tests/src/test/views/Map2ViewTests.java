@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -41,6 +41,7 @@ public class Map2ViewTests extends UITest {
       //Sleeping 3 seconds as the map can be slow to display
       bot.sleep(3000);
 
-      map2ViewBot.bot().tree().contextMenu("Export Map").menu("As Imagefile...").click();
+      map2ViewBot.bot().tree().contextMenu(net.tourbook.map2.Messages.Map_Action_Export_Map_View).menu(
+            net.tourbook.map2.Messages.Map_Action_Export_Map_View_Image).click();
    }
 }

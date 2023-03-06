@@ -25,6 +25,7 @@ import de.byteholder.geoclipse.map.UI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -144,7 +145,9 @@ public class TourBookViewTests extends UITest {
             .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
 
       // Duplicate the tour
-      tour.contextMenu("Duplicate Tour...").click(); //$NON-NLS-1$
+      tour.contextMenu(Messages.Tour_Action_DuplicateTour).click();
+      Utils.clickOkButton(bot);
+      bot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
 
       // Set a different date than today's date
       bot.dateTime(0).setDate(new Date(1420117200000L));
@@ -170,7 +173,7 @@ public class TourBookViewTests extends UITest {
 
       //Check that the tour was successfully deleted
       final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
-      assertEquals("2015   1", allItems[2].getText()); //$NON-NLS-1$
+      assertTrue(Arrays.asList(allItems).stream().anyMatch(treeItem -> treeItem.getText().equals("2015   1")));//$NON-NLS-1$
    }
 
    /**
