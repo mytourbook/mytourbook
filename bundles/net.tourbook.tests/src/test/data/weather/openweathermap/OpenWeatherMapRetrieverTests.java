@@ -68,6 +68,7 @@ public class OpenWeatherMapRetrieverTests {
 
       final String openWeatherMapResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
             + "LongsPeak-Manual-OpenWeatherMapResponse-1656720000.json"); //$NON-NLS-1$
+
       final String url = OPENWEATHERMAP_BASE_URL + "1656720000"; //$NON-NLS-1$
       httpClientMock.onGet(url).doReturn(openWeatherMapResponse);
 
