@@ -2894,6 +2894,7 @@ public class Messages extends NLS {
    public static String        tour_editor_section_tour;
    public static String        tour_editor_section_weather;
    public static String        Tour_Editor_TabLabel_SwimSlices;
+   public static String        Tour_Editor_TourTitle_CopyPostfix;
    public static String        tour_editor_tabLabel_tour;
    public static String        tour_editor_tabLabel_tour_data;
 

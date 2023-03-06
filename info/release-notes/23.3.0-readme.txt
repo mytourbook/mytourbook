@@ -49,7 +49,20 @@ Map Player -> Model Player
   
 2 Year Digits -> 4 Year Digits
   - For some locales e.g. german the short formatting for a year has 2 digits, this is now changed to 4 year digits
-   
+
+
+Experimental
+============
+
+Duplicate Tour
+  - The action "Duplicate Tour" in the "Tour Book" context menu is now enabled for all tours, not only for manual tours as it was before.
+    All data are now duplicated, e.g. data series, markers or photos except the reference tours. A "copy" label is appended to the tour title.
+    Use this feature with care, mainly the duplicated tours, as it is not yet fully tested.
+    One issue could be that when a duplicated tour is selected then it's data are not displayed because the original tour was selected before.
+    This issue happened in the flat "Tour Book" view and is fixed.
+    There are so many possibilities in MyTourbook where issues could occure that not all of them are tested now.
+    https://github.com/mytourbook/mytourbook/issues/937
+
 
 Bugfix
 ======

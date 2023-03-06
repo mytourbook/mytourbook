@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,6 +17,7 @@ package net.tourbook.data;
 
 import static javax.persistence.CascadeType.ALL;
 
+import java.io.Serializable;
 import java.time.Period;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -47,7 +48,9 @@ import net.tourbook.ui.UI;
 import org.hibernate.annotations.Cascade;
 
 @Entity
-public class TourPerson implements Comparable<Object> {
+public class TourPerson implements Comparable<Object>, Serializable {
+
+   private static final long               serialVersionUID           = 1L;
 
    public static final ZonedDateTime       DEFAULT_BIRTHDAY           = ZonedDateTime.of(
          1977,

@@ -1,19 +1,21 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2010  Wolfgang Schramm and Contributors
- * 
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
+ *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
  * Foundation version 2 of the License.
- * 
+ *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
 package net.tourbook.data;
+
+import java.io.Serializable;
 
 import javax.persistence.Basic;
 import javax.persistence.Entity;
@@ -26,114 +28,116 @@ import javax.persistence.Id;
 import net.tourbook.database.TourDatabase;
 
 @Entity
-public class TourBike {
+public class TourBike implements Serializable {
 
-	public static final int	DB_LENGTH_NAME		= 255;
+   private static final long serialVersionUID    = 1L;
 
-	public static final int	BIKE_ID_NOT_DEFINED	= -1;
+   public static final int   DB_LENGTH_NAME      = 255;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long			bikeId				= BIKE_ID_NOT_DEFINED;
+   public static final int   BIKE_ID_NOT_DEFINED = -1;
 
-	@Basic(optional = false)
-	private String			name;
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   private long              bikeId              = BIKE_ID_NOT_DEFINED;
 
-	/**
-	 * weight in kg
-	 */
-	private float			weight;
+   @Basic(optional = false)
+   private String            name;
 
-	/**
-	 * type of the bike: MTB, Hollandbike, Rennvelo
-	 */
-	private int				typeId;
+   /**
+    * weight in kg
+    */
+   private float             weight;
 
-	private int				frontTyreId;
+   /**
+    * type of the bike: MTB, Hollandbike, Rennvelo
+    */
+   private int               typeId;
 
-	private int				rearTyreId;
+   private int               frontTyreId;
 
-	/**
-	 * default constructor used in ejb
-	 */
-	public TourBike() {}
+   private int               rearTyreId;
 
-	public long getBikeId() {
-		return bikeId;
-	}
+   /**
+    * default constructor used in ejb
+    */
+   public TourBike() {}
 
-	public int getFrontTyreId() {
-		return frontTyreId;
-	}
+   public long getBikeId() {
+      return bikeId;
+   }
 
-	public String getName() {
-		return name;
-	}
+   public int getFrontTyreId() {
+      return frontTyreId;
+   }
 
-	public int getRearTyreId() {
-		return rearTyreId;
-	}
+   public String getName() {
+      return name;
+   }
 
-	public int getTypeId() {
-		return typeId;
-	}
+   public int getRearTyreId() {
+      return rearTyreId;
+   }
 
-	public float getWeight() {
-		return weight;
-	}
+   public int getTypeId() {
+      return typeId;
+   }
 
-	public boolean persist() {
+   public float getWeight() {
+      return weight;
+   }
 
-		boolean isSaved = false;
+   public boolean persist() {
 
-		final EntityManager em = TourDatabase.getInstance().getEntityManager();
-		final EntityTransaction ts = em.getTransaction();
+      boolean isSaved = false;
 
-		try {
+      final EntityManager em = TourDatabase.getInstance().getEntityManager();
+      final EntityTransaction ts = em.getTransaction();
 
-			if (getBikeId() == BIKE_ID_NOT_DEFINED) {
-				// entity is new
-				ts.begin();
-				em.persist(this);
-				ts.commit();
-			} else {
-				// update entity
-				ts.begin();
-				em.merge(this);
-				ts.commit();
-			}
+      try {
 
-		} catch (final Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (ts.isActive()) {
-				ts.rollback();
-			} else {
-				isSaved = true;
-			}
-			em.close();
-		}
-		return isSaved;
-	}
+         if (getBikeId() == BIKE_ID_NOT_DEFINED) {
+            // entity is new
+            ts.begin();
+            em.persist(this);
+            ts.commit();
+         } else {
+            // update entity
+            ts.begin();
+            em.merge(this);
+            ts.commit();
+         }
 
-	public void setFrontTyreId(final int frontTyre) {
-		this.frontTyreId = frontTyre;
-	}
+      } catch (final Exception e) {
+         e.printStackTrace();
+      } finally {
+         if (ts.isActive()) {
+            ts.rollback();
+         } else {
+            isSaved = true;
+         }
+         em.close();
+      }
+      return isSaved;
+   }
 
-	public void setName(final String name) {
-		this.name = name;
-	}
+   public void setFrontTyreId(final int frontTyre) {
+      this.frontTyreId = frontTyre;
+   }
 
-	public void setRearTyreId(final int rearTyre) {
-		this.rearTyreId = rearTyre;
-	}
+   public void setName(final String name) {
+      this.name = name;
+   }
 
-	public void setTypeId(final int typeId) {
-		this.typeId = typeId;
-	}
+   public void setRearTyreId(final int rearTyre) {
+      this.rearTyreId = rearTyre;
+   }
 
-	public void setWeight(final float weight) {
-		this.weight = weight;
-	}
+   public void setTypeId(final int typeId) {
+      this.typeId = typeId;
+   }
+
+   public void setWeight(final float weight) {
+      this.weight = weight;
+   }
 
 }

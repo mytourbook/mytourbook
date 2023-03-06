@@ -18,6 +18,7 @@ package net.tourbook.data;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.LAZY;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,7 +37,9 @@ import net.tourbook.database.FIELD_VALIDATION;
 import net.tourbook.database.TourDatabase;
 
 @Entity
-public class TourTag implements Cloneable, Comparable<Object> {
+public class TourTag implements Cloneable, Comparable<Object>, Serializable {
+
+   private static final long          serialVersionUID           = 1L;
 
    private static final char          NL                         = UI.NEW_LINE;
 
@@ -312,6 +315,15 @@ public class TourTag implements Cloneable, Comparable<Object> {
     */
    public void setTagName(final String tagName) {
       this.name = tagName;
+   }
+
+   public void setupDeepClone(final TourData tourDataFromClone) {
+
+      _createId = _createCounter.incrementAndGet();
+
+      tagId = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+      tourData.add(tourDataFromClone);
    }
 
    /**

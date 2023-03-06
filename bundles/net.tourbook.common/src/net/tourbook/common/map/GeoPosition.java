@@ -1,6 +1,6 @@
 /* *****************************************************************************
  *  Copyright (C) 2008 Michael Kanis and others
- *  
+ *
  *  This file is part of Geoclipse.
  *
  *  Geoclipse is free software: you can redistribute it and/or modify
@@ -14,64 +14,64 @@
  *  GNU General Public License for more details.
  *
  *  You should have received a copy of the GNU General Public License
- *  along with Geoclipse.  If not, see <http://www.gnu.org/licenses/>. 
+ *  along with Geoclipse.  If not, see <http://www.gnu.org/licenses/>.
  *******************************************************************************/
-
 package net.tourbook.common.map;
+
+import java.io.Serializable;
 
 /**
  * An immutable coordinate in the real (geographic) world, composed of a latitude and a longitude.
- * 
+ *
  * @author rbair
  */
-public class GeoPosition {
+public class GeoPosition implements Serializable {
 
-//	private Latitude	latitude;
-//	private Longitude	longitude;
+   private static final long serialVersionUID = 1L;
 
-	public double	latitude;
-	public double	longitude;
+   public double             latitude;
+   public double             longitude;
 
-	/**
-	 * Creates a new instance of GeoPosition from the specified latitude and longitude. These are
-	 * double values in decimal degrees, not degrees, minutes, and seconds. Use the other
-	 * constructor for those.
-	 * 
-	 * @param lat
-	 *            a latitude value in decmial degrees
-	 * @param lon
-	 *            a longitude value in decimal degrees
-	 */
-	public GeoPosition(double lat, double lon) {
+   /**
+    * Creates a new instance of GeoPosition from the specified latitude and longitude. These are
+    * double values in decimal degrees, not degrees, minutes, and seconds. Use the other
+    * constructor for those.
+    *
+    * @param lat
+    *           a latitude value in decmial degrees
+    * @param lon
+    *           a longitude value in decimal degrees
+    */
+   public GeoPosition(double lat, double lon) {
 
-		if (lat > 90 || lat < -90) {
+      if (lat > 90 || lat < -90) {
 
-			lat = lat % 180;
-			lat = lat > 90 ? //
-					lat - 180
-					: lat < -90 ? //
-							lat + 180
-							: lat;
-		}
-		latitude = lat;
+         lat = lat % 180;
+         lat = lat > 90 ? //
+               lat - 180
+               : lat < -90 ? //
+                     lat + 180
+                     : lat;
+      }
+      latitude = lat;
 
-		if (lon > 180 || lon < -180) {
+      if (lon > 180 || lon < -180) {
 
-			lon = lon % 360;
-			lon = lon > 180 ? //
-					lon - 360
-					: lon < -180 ? //
-							lon + 360
-							: lon;
-		}
-		longitude = lon;
-	}
+         lon = lon % 360;
+         lon = lon > 180 ? //
+               lon - 360
+               : lon < -180 ? //
+                     lon + 360
+                     : lon;
+      }
+      longitude = lon;
+   }
 
 //	/**
 //	 * Creates a new instance of GeoPosition from the specified latitude and longitude. Each are
 //	 * specified as degrees, minutes, and seconds; not as decimal degrees. Use the other constructor
 //	 * for those.
-//	 * 
+//	 *
 //	 * @param latDegrees
 //	 *            the degrees part of the current latitude
 //	 * @param latMinutes
@@ -94,20 +94,20 @@ public class GeoPosition {
 //		this(latDegrees + (latMinutes + latSeconds / 60.0) / 60.0, lonDegrees + (lonMinutes + lonSeconds / 60.0) / 60.0);
 //	}
 
-	/**
-	 * Clone geo position
-	 * 
-	 * @param geoPosition
-	 */
-	public GeoPosition(final GeoPosition geoPosition) {
-		latitude = geoPosition.latitude;
-		longitude = geoPosition.longitude;
-	}
+   /**
+    * Clone geo position
+    *
+    * @param geoPosition
+    */
+   public GeoPosition(final GeoPosition geoPosition) {
+      latitude = geoPosition.latitude;
+      longitude = geoPosition.longitude;
+   }
 
 //	/**
 //	 * Returns true the specified GeoPosition and this GeoPosition represent the exact same latitude
 //	 * and longitude coordinates.
-//	 * 
+//	 *
 //	 * @param obj
 //	 *            a GeoPosition to compare this GeoPosition to
 //	 * @return returns true if the specified GeoPosition is equal to this one
@@ -152,7 +152,7 @@ public class GeoPosition {
 //
 //	/**
 //	 * Get the latitude as decimal degrees
-//	 * 
+//	 *
 //	 * @return the latitude as decimal degrees
 //	 */
 //	public double getLatitude() {
@@ -161,7 +161,7 @@ public class GeoPosition {
 //
 //	/**
 //	 * Get the longitude as decimal degrees
-//	 * 
+//	 *
 //	 * @return the longitude as decimal degrees
 //	 */
 //	public double getLongitude() {
@@ -181,8 +181,8 @@ public class GeoPosition {
 //		latitude.set(newlatitude);
 //	}
 
-	@Override
-	public String toString() {
-		return "lat:" + latitude + ", long:" + longitude; //$NON-NLS-1$ //$NON-NLS-2$ 
-	}
+   @Override
+   public String toString() {
+      return "lat:" + latitude + ", long:" + longitude; //$NON-NLS-1$ //$NON-NLS-2$
+   }
 }

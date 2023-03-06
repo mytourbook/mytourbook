@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -16,6 +16,7 @@
 package net.tourbook.data;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Entity;
@@ -38,7 +39,9 @@ import org.eclipse.core.runtime.Path;
  * @since 12.12
  */
 @Entity
-public class TourPhoto {
+public class TourPhoto implements Serializable {
+
+   private static final long          serialVersionUID    = 1L;
 
    private static final char          NL                  = UI.NEW_LINE;
 
@@ -366,6 +369,15 @@ public class TourPhoto {
 
    public void setRatingStars(final int ratingStars) {
       this.ratingStars = ratingStars;
+   }
+
+   public void setupDeepClone(final TourData tourDataFromClone) {
+
+      _createId = _createCounter.incrementAndGet();
+
+      photoId = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+      tourData = tourDataFromClone;
    }
 
    /**

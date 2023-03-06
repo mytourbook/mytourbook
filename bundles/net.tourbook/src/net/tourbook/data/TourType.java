@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.persistence.Basic;
@@ -31,7 +32,9 @@ import net.tourbook.database.TourDatabase;
 import org.eclipse.swt.graphics.RGB;
 
 @Entity
-public class TourType implements Comparable<Object> {
+public class TourType implements Comparable<Object>, Serializable {
+
+   private static final long          serialVersionUID                      = 1L;
 
    private static final char          NL                                    = UI.NEW_LINE;
 

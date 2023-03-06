@@ -235,6 +235,7 @@ class TourBook_ColumnFactory {
       defineColumn_Data_ImportFileName();
       defineColumn_Data_TimeInterval();
       defineColumn_Data_NumTimeSlices();
+      defineColumn_Data_TourID();
    }
 
    /**
@@ -749,6 +750,48 @@ class TourBook_ColumnFactory {
                   cell.setText(UI.EMPTY_STRING);
                } else {
                   cell.setText(Long.toString(dbTimeInterval));
+               }
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Data - Tour ID
+    */
+
+   private void defineColumn_Data_TourID() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.DATA_TOUR_ID.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final long dbValue = ((TVITourBookTour) element).tourId;
+            if (dbValue == 0) {
+               return UI.EMPTY_STRING;
+            } else {
+               return _nf0.format(dbValue);
+            }
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.DATA_TOUR_ID.createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof TVITourBookTour) {
+
+               final long dbValue = ((TVITourBookTour) element).tourId;
+               if (dbValue == 0) {
+                  cell.setText(UI.EMPTY_STRING);
+               } else {
+                  cell.setText(_nf0.format(dbValue));
                }
 
                setCellColor(cell, element);

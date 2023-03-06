@@ -46,6 +46,7 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory DATA_NUM_TIME_SLICES;
    public static final TreeColumnFactory DATA_NUM_TOURS;
    public static final TreeColumnFactory DATA_TIME_INTERVAL;
+   public static final TreeColumnFactory DATA_TOUR_ID;
 
    public static final TreeColumnFactory DEVICE_BATTERY_SOC_END;
    public static final String            DEVICE_BATTERY_SOC_END_ID      = "DEVICE_BATTERY_SOC_END_ID";                 //$NON-NLS-1$
@@ -122,11 +123,11 @@ public abstract class TreeColumnFactory {
    public static final TreeColumnFactory TOUR_NUM_PHOTOS;
    public static final TreeColumnFactory TOUR_REFTOUR_TOUR;
    public static final TreeColumnFactory TOUR_TAG_AND_CATEGORY_NOTES;
-   public static final String            TOUR_TAG_AND_CATEGORY_NOTES_ID = "TOUR_TAG_AND_CATEGORY_NOTES";
+   public static final String            TOUR_TAG_AND_CATEGORY_NOTES_ID = "TOUR_TAG_AND_CATEGORY_NOTES";               //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_TAG_AND_TAGS;
    public static final TreeColumnFactory TOUR_TAG_ID;
    public static final TreeColumnFactory TOUR_TAG_IMAGE_FILE_PATH;
-   public static final String            TOUR_TAG_IMAGE_FILE_PATH_ID    = "TOUR_TAG_IMAGE_FILE_PATH";
+   public static final String            TOUR_TAG_IMAGE_FILE_PATH_ID    = "TOUR_TAG_IMAGE_FILE_PATH";                  //$NON-NLS-1$
    public static final TreeColumnFactory TOUR_TAGS;
    public static final TreeColumnFactory TOUR_TITLE;
    public static final TreeColumnFactory TOUR_TYPE;
@@ -496,6 +497,24 @@ public abstract class TreeColumnFactory {
             colDef.setColumnUnit(               Messages.ColumnFactory_time_interval);
 
             colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(8));
+
+            return colDef;
+         }
+      };
+
+      DATA_TOUR_ID = new TreeColumnFactory() {
+         @Override
+         public TreeColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TreeColumnDefinition colDef = new TreeColumnDefinition(columnManager, "DATA_TOUR_ID", SWT.LEAD); //$NON-NLS-1$
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Data);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_TourId);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_TourId);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(16));
 
             return colDef;
          }

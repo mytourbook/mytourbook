@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,7 +32,9 @@ import net.tourbook.database.TourDatabase;
 /**
  */
 @Entity
-public class DeviceSensorValue {
+public class DeviceSensorValue implements Serializable {
+
+   private static final long    serialVersionUID     = 1L;
 
    private static final char    NL                   = UI.NEW_LINE;
 
@@ -403,6 +406,15 @@ public class DeviceSensorValue {
 
    public void setTourTime_Start(final long tourTime_Start) {
       this.tourStartTime = tourTime_Start;
+   }
+
+   public void setupDeepClone(final TourData tourDataFromClone) {
+
+      _createId = _createCounter.incrementAndGet();
+
+      sensorValueId = TourDatabase.ENTITY_IS_NOT_SAVED;
+
+      tourData = tourDataFromClone;
    }
 
    /**

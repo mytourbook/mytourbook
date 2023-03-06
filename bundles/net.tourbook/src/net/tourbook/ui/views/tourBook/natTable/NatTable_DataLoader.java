@@ -782,6 +782,7 @@ public class NatTable_DataLoader {
       case TableColumnFactory.DATA_IMPORT_FILE_PATH_ID:              return "tourImportFilePath";     //$NON-NLS-1$
       case TableColumnFactory.DATA_NUM_TIME_SLICES_ID:               return "numberOfTimeSlices";     //$NON-NLS-1$
       case TableColumnFactory.DATA_TIME_INTERVAL_ID:                 return "deviceTimeInterval";     //$NON-NLS-1$
+      case TableColumnFactory.DATA_TOUR_ID_ID:                       return "tourID";                 //$NON-NLS-1$
 
       /*
        * DEVICE

@@ -62,6 +62,13 @@ public class ModelPlayerManager {
    //
    private static final IDialogSettings _state                            = TourbookPlugin.getState("net.tourbook.map.player.ModelPlayerManager");//$NON-NLS-1$
 
+   private static final int             MODEL_SIZE_DEFAULT                = 200;
+   static final int                     MODEL_SIZE_MIN                    = 20;
+   static final int                     MODEL_SIZE_MAX                    = 10_000;
+   private static final int             MODEL_CURSOR_SIZE_DEFAULT         = 200;
+   static final int                     MODEL_CURSOR_SIZE_MIN             = 10;
+   static final int                     MODEL_CURSOR_SIZE_MAX             = 10_000;
+
    private static Map25View             _map25View;
    private static ModelPlayerView       _modelPlayerView;
 
@@ -183,7 +190,7 @@ public class ModelPlayerManager {
    /**
     * Angle how much the animated model is rotated in the next frame
     */
-   private static int                   _modelTurningFactor;
+   private static int                   _modelTurningAngle;
 
    private static int                   _modelCursorSize;
 
@@ -496,7 +503,7 @@ public class ModelPlayerManager {
 
    public static int getModelTurningAngle() {
 
-      return _modelTurningFactor;
+      return _modelTurningAngle;
    }
 
    public static int getMovingSpeed() {
@@ -896,12 +903,15 @@ public class ModelPlayerManager {
       _isReLivePlaying           = Util.getStateBoolean( _state, STATE_IS_RELIVE_PLAYING,             false);
       _jogWheelSpeed             = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED,               10);
       _jogWheelSpeedMultiplier   = Util.getStateInt(     _state, STATE_JOG_WHEEL_SPEED_MULTIPLIER,    1);
-      _modelSize                 = Util.getStateInt(     _state, STATE_MODEL_SIZE,                    200);
-      _modelCursorSize           = Util.getStateInt(     _state, STATE_MODEL_CURSOR_SIZE,             200);
-      _modelTurningFactor        = Util.getStateInt(     _state, STATE_MODEL_TURNING_ANGLE,           10);
+      _modelSize                 = Util.getStateInt(     _state, STATE_MODEL_SIZE,                    MODEL_SIZE_DEFAULT,           MODEL_SIZE_MIN,            MODEL_SIZE_MAX);
+      _modelCursorSize           = Util.getStateInt(     _state, STATE_MODEL_CURSOR_SIZE,             MODEL_CURSOR_SIZE_DEFAULT,    MODEL_CURSOR_SIZE_MIN,     MODEL_CURSOR_SIZE_MAX);
+      _modelTurningAngle         = Util.getStateInt(     _state, STATE_MODEL_TURNING_ANGLE,           10);
       _relativePosition_Current  = Util.getStateDouble(  _state, STATE_RELATIVE_POSITION,             0);
 
 // SET_FORMATTING_ON
+   }
+
+   public static void restoreState_UI() {
 
       if (isPlayerViewAvailable()) {
 
@@ -926,7 +936,7 @@ public class ModelPlayerManager {
       _state.put(STATE_JOG_WHEEL_SPEED_MULTIPLIER,    _jogWheelSpeedMultiplier);
       _state.put(STATE_MODEL_SIZE,                    _modelSize);
       _state.put(STATE_MODEL_CURSOR_SIZE,             _modelCursorSize);
-      _state.put(STATE_MODEL_TURNING_ANGLE,           _modelTurningFactor);
+      _state.put(STATE_MODEL_TURNING_ANGLE,           _modelTurningAngle);
       _state.put(STATE_RELATIVE_POSITION,             _relativePosition_Current);
 
 // SET_FORMATTING_ON
@@ -1019,7 +1029,7 @@ public class ModelPlayerManager {
          // the next angle is larger than a min smooth angle
          // -> smoothout the animation with a smallers angle
 
-         final float modelTurningAngle = (float) (angleDiffAbs * 0.01 * _modelTurningFactor);
+         final float modelTurningAngle = (float) (angleDiffAbs * 0.01 * _modelTurningAngle);
 
          /*
           * Find the smallest angle diff to the current position
@@ -1398,9 +1408,9 @@ public class ModelPlayerManager {
       _jogWheelSpeedMultiplier = speedMultiplier;
    }
 
-   public static void setTurningAngle(final int modelTurningFactor) {
+   public static void setTurningAngle(final int modelTurningAngle) {
 
-      _modelTurningFactor = modelTurningFactor;
+      _modelTurningAngle = modelTurningAngle;
    }
 
    private static void updateUI_Map() {

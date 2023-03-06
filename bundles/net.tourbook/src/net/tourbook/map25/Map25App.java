@@ -687,7 +687,7 @@ public class Map25App extends GdxMap implements OnItemGestureListener, ItemizedL
       super.create();
 
       // !!! restore it after super.create() !!!
-      ModelPlayerManager.restoreState();
+      ModelPlayerManager.restoreState_UI();
 
       /**
        * Overwrite input handler, using own GdxMap.create() method didn't work :-(

@@ -449,8 +449,8 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
             _lblModelSize = UI.createLabel(container, Messages.Model_Player_Label_ModelSize);
 
             _spinnerModelSize = new Spinner(container, SWT.BORDER);
-            _spinnerModelSize.setMinimum(20);
-            _spinnerModelSize.setMaximum(10000);
+            _spinnerModelSize.setMinimum(ModelPlayerManager.MODEL_SIZE_MIN);
+            _spinnerModelSize.setMaximum(ModelPlayerManager.MODEL_SIZE_MAX);
             _spinnerModelSize.setIncrement(10);
             _spinnerModelSize.setPageIncrement(50);
             _spinnerModelSize.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ModelSize()));
@@ -467,8 +467,8 @@ public class ModelPlayerView extends ViewPart implements ICloseOpenedDialogs {
             _lblModelCursorSize = UI.createLabel(container, Messages.Model_Player_Label_ModelCursorSize);
 
             _spinnerModelCursorSize = new Spinner(container, SWT.BORDER);
-            _spinnerModelCursorSize.setMinimum(10);
-            _spinnerModelCursorSize.setMaximum(10000);
+            _spinnerModelCursorSize.setMinimum(ModelPlayerManager.MODEL_CURSOR_SIZE_MIN);
+            _spinnerModelCursorSize.setMaximum(ModelPlayerManager.MODEL_CURSOR_SIZE_MAX);
             _spinnerModelCursorSize.setIncrement(10);
             _spinnerModelCursorSize.setPageIncrement(50);
             _spinnerModelCursorSize.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_ModelCursorSize()));
