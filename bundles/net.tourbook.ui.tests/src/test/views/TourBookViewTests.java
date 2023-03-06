@@ -144,7 +144,7 @@ public class TourBookViewTests extends UITest {
             .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
 
       // Duplicate the tour
-      tour.contextMenu("Duplicate Tour...").click(); //$NON-NLS-1$
+      tour.contextMenu(Messages.Tour_Action_DuplicateTour).click();
 
       // Set a different date than today's date
       bot.dateTime(0).setDate(new Date(1420117200000L));
