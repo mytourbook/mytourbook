@@ -285,6 +285,10 @@
   } ],
   "tourStartTime" : 1606331280000,
   "tourTitle" : "Mallorca, Spain",
+  "tourType" : {
+    "typeId" : -1,
+    "name" : "Cycling"
+  },
   "training_TrainingEffect_Aerob" : 0.0,
   "training_TrainingEffect_Anaerob" : 0.0,
   "training_TrainingPerformance" : 0.0,

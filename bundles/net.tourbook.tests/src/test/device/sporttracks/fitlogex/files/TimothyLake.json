@@ -92,6 +92,10 @@
   } ],
   "tourStartTime" : 1433091073000,
   "tourTags" : [ { } ],
+  "tourType" : {
+    "typeId" : -1,
+    "name" : "Running"
+  },
   "training_TrainingEffect_Aerob" : 0.0,
   "training_TrainingEffect_Anaerob" : 0.0,
   "training_TrainingPerformance" : 0.0,
