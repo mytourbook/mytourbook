@@ -130,6 +130,7 @@ import org.hibernate.annotations.Cascade;
 public class TourData implements Comparable<Object>, IXmlSerializable, Serializable {
 
    private static final long             serialVersionUID                  = 1L;
+   //todo fb fix the UI tests to run in any timezone machines
 
    private static final char             NL                                = UI.NEW_LINE;
    private static final String           INTERVAL_SUMMARY_UNIT             = " ∑  ";                                  //$NON-NLS-1$

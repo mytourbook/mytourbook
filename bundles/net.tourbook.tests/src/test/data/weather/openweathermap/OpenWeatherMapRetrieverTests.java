@@ -46,9 +46,6 @@ public class OpenWeatherMapRetrieverTests {
    private static final String OPENWEATHERMAP_BASE_URL              = WeatherUtils.OAUTH_PASSEUR_APP_URL
          + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
 
-   private static final String OPENWEATHERMAP_AIRPOLLUTION_BASE_URL = WeatherUtils.OAUTH_PASSEUR_APP_URL
-         + "/openweathermap/air_pollution?lat=40.263996&lon=-105.58854099999999&start=";                 //$NON-NLS-1$
-
    private static final String OPENWEATHERMAP_FILE_PATH             =
          FilesUtils.rootPath + "data/weather/openweathermap/files/";                                     //$NON-NLS-1$
 
@@ -74,11 +71,6 @@ public class OpenWeatherMapRetrieverTests {
       final String url = OPENWEATHERMAP_BASE_URL + "1656720000"; //$NON-NLS-1$
       httpClientMock.onGet(url).doReturn(openWeatherMapResponse);
 
-      final String openWeatherMapAirPollutionResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
-            + "LongsPeak-Manual-OpenWeatherMapAirPollutionResponse-1656720000.json"); //$NON-NLS-1$
-      final String airPollutionUrl = OPENWEATHERMAP_AIRPOLLUTION_BASE_URL + "1656720000&end=1656763200"; //$NON-NLS-1$
-      httpClientMock.onGet(airPollutionUrl).doReturn(openWeatherMapAirPollutionResponse);
-
       final TourData tour = Initializer.importTour();
       //Tuesday, July 2, 2022 12:00:00 AM
       final ZonedDateTime zonedDateTime = ZonedDateTime.of(
@@ -98,7 +90,6 @@ public class OpenWeatherMapRetrieverTests {
 
       assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData(), "The weather was not retrieved"); //$NON-NLS-1$
       httpClientMock.verify().get(url).called();
-      httpClientMock.verify().get(airPollutionUrl).called();
 
 // SET_FORMATTING_OFF
 
@@ -181,11 +172,6 @@ public class OpenWeatherMapRetrieverTests {
       final String url2 = OPENWEATHERMAP_BASE_URL + "1647129600"; //$NON-NLS-1$
       httpClientMock.onGet(url2).doReturn(openWeatherMapResponse2);
 
-      final String openWeatherMapAirPollutionResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
-            + "LongsPeak-Manual-OpenWeatherMapAirPollutionResponse-1647129600.json"); //$NON-NLS-1$
-      final String airPollutionUrl = OPENWEATHERMAP_AIRPOLLUTION_BASE_URL + "1647086400&end=1647129600"; //$NON-NLS-1$
-      httpClientMock.onGet(airPollutionUrl).doReturn(openWeatherMapAirPollutionResponse);
-
       final TourData tour = Initializer.importTour();
       //Tuesday, March 12, 2022 12:00:00 PM
       final ZonedDateTime zonedDateTime = ZonedDateTime.of(
@@ -206,7 +192,6 @@ public class OpenWeatherMapRetrieverTests {
       assertTrue(openWeatherMapRetriever.retrieveHistoricalWeatherData());
       httpClientMock.verify().get(url1).called();
       httpClientMock.verify().get(url2).called();
-      httpClientMock.verify().get(airPollutionUrl).called();
 
  // SET_FORMATTING_OFF
 
