@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <project name="reset-workspace" default="reset-workspace" basedir=".">
 
+	<!-- Source: https://tonyyan.wordpress.com/2017/03/10/integrate-git-into-ant-targets/ -->
+	
    <target name="reset-workspace">
 
       <echo message="GIT_EXE_PATH: ${GIT_EXE_PATH}"  />
