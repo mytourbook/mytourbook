@@ -206,79 +206,48 @@ public class UI {
        */
       IMAGE_REGISTRY = TourbookPlugin.getDefault().getImageRegistry();
 
+// SET_FORMATTING_OFF
+
       /*
        * Chart and map graphs.
        */
-      createGraphImageInRegistry(
-            MapGraphId.Altimeter,
-            Images.Graph_Altimeter,
-            Images.Graph_Altimeter_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Altitude,
-            Images.Graph_Elevation,
-            Images.Graph_Elevation_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Cadence,
-            Images.Graph_Cadence,
-            Images.Graph_Cadence_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Gradient,
-            Images.Graph_Gradient,
-            Images.Graph_Gradient_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.HrZone,
-            Images.PulseZones,
-            Images.PulseZones_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Pace,
-            Images.Graph_Pace,
-            Images.Graph_Pace_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Power,
-            Images.Graph_Power,
-            Images.Graph_Power_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Pulse,
-            Images.Graph_Heartbeat,
-            Images.Graph_Heartbeat_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Speed,
-            Images.Graph_Speed,
-            Images.Graph_Speed_Disabled);
-
-      createGraphImageInRegistry(
-            MapGraphId.Temperature,
-            Images.Graph_Temperature,
-            Images.Graph_Temperature_Disabled);
+      createGraphImageInRegistry(MapGraphId.Altimeter,   Images.Graph_Altimeter,    Images.Graph_Altimeter_Disabled);
+      createGraphImageInRegistry(MapGraphId.Altitude,    Images.Graph_Elevation,    Images.Graph_Elevation_Disabled);
+      createGraphImageInRegistry(MapGraphId.Cadence,     Images.Graph_Cadence,      Images.Graph_Cadence_Disabled);
+      createGraphImageInRegistry(MapGraphId.Gradient,    Images.Graph_Gradient,     Images.Graph_Gradient_Disabled);
+      createGraphImageInRegistry(MapGraphId.HrZone,      Images.PulseZones,         Images.PulseZones_Disabled);
+      createGraphImageInRegistry(MapGraphId.Pace,        Images.Graph_Pace,         Images.Graph_Pace_Disabled);
+      createGraphImageInRegistry(MapGraphId.Power,       Images.Graph_Power,        Images.Graph_Power_Disabled);
+      createGraphImageInRegistry(MapGraphId.Pulse,       Images.Graph_Heartbeat,    Images.Graph_Heartbeat_Disabled);
+      createGraphImageInRegistry(MapGraphId.Speed,       Images.Graph_Speed,        Images.Graph_Speed_Disabled);
+      createGraphImageInRegistry(MapGraphId.Temperature, Images.Graph_Temperature,  Images.Graph_Temperature_Disabled);
 
       // tour type images
-      IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER, TourbookPlugin.getThemedImageDescriptor(Images.TourType_Filter));
-      IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM, TourbookPlugin.getThemedImageDescriptor(Images.TourType_Filter_System));
+      IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER,               TourbookPlugin.getThemedImageDescriptor(Images.TourType_Filter));
+      IMAGE_REGISTRY.put(IMAGE_TOUR_TYPE_FILTER_SYSTEM,        TourbookPlugin.getThemedImageDescriptor(Images.TourType_Filter_System));
 
       // photo
       IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PIC_DIR_VIEW, TourbookPlugin.getImageDescriptor(Images.PhotoDirectoryView));
-      IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PHOTO_PHOTO, TourbookPlugin.getImageDescriptor(Images.PhotoPhotos));
+      IMAGE_REGISTRY.put(TourPhotoLinkView.IMAGE_PHOTO_PHOTO,  TourbookPlugin.getImageDescriptor(Images.PhotoPhotos));
 
       /*
        * set tag styler
        */
-      TAG_CATEGORY_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_CATEGORY, null);
-      TAG_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_TITLE, null);
-      TAG_SUB_STYLER = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
+      TAG_CATEGORY_STYLER  = StyledString.createColorRegistryStyler(VIEW_COLOR_CATEGORY, null);
+      TAG_STYLER           = StyledString.createColorRegistryStyler(VIEW_COLOR_TITLE, null);
+      TAG_SUB_STYLER       = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
+
+// SET_FORMATTING_ON
    }
 
-   private static Map<Long, CLabel> _tagsLabels = new HashMap<>();
+   private static Map<Long, TagUIContent> _allTagUIContainer = new HashMap<>();
 
    // pref store var cannot be set from a static field because it can be null !!!
 // private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
+
+   private class TagUIContent {
+
+   }
 
    private UI() {}
 
@@ -326,7 +295,7 @@ public class UI {
 
       final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 
-      final MessageDialog dialog = new MessageDialog(//
+      final MessageDialog dialog = new MessageDialog(
             shell,
             Messages.app_dlg_confirmFileOverwrite_title,
             null,
@@ -358,7 +327,7 @@ public class UI {
          Display.getDefault().syncExec(() -> {
 
             final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-            final MessageDialog dialog = new MessageDialog(//
+            final MessageDialog dialog = new MessageDialog(
                   shell,
                   Messages.app_dlg_confirmFileOverwrite_title,
                   null,
@@ -1130,6 +1099,7 @@ public class UI {
       // year
       colorRegistry.put(VIEW_COLOR_SUB,
             PreferenceConverter.getColor(_prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB));
+
       // month
       colorRegistry.put(VIEW_COLOR_SUB_SUB,
             PreferenceConverter.getColor(_prefStore, ITourbookPreferences.VIEW_LAYOUT_COLOR_SUB_SUB));
@@ -1235,11 +1205,11 @@ public class UI {
 
    public static void updateUI_TagsWithImage(final PixelConverter pc,
                                              final Set<TourTag> tourTags,
-                                             final Composite tourTagsComposite) {
+                                             final Composite tourTagsContainer) {
 
       // We dispose the tags labels that are not present in the current
       // tour tags list
-      _tagsLabels.forEach((key, value) -> {
+      _allTagUIContainer.forEach((key, value) -> {
 
          boolean isTourTagPresent = false;
 
@@ -1255,48 +1225,50 @@ public class UI {
             value.dispose();
          }
       });
+
       // We remove the disposed tag labels.
-      _tagsLabels.entrySet().removeIf(entry -> entry.getValue().isDisposed());
+      _allTagUIContainer.entrySet().removeIf(entry -> entry.getValue().isDisposed());
 
       if (tourTags.isEmpty()) {
 
-         tourTagsComposite.setData(null);
+//       tourTagsContainer.setData(null);
+
          return;
       }
 
-      final Map<Long, String> tourTagsAccumulatedValues =
-            TagManager.fetchTourTagsAccumulatedValues();
+      final Map<Long, String> tourTagsAccumulatedValues = TagManager.fetchTourTagsAccumulatedValues();
+
+//                            new RowData(pc.convertWidthInCharsToPixels(40), pc.convertWidthInCharsToPixels(12)));
+      final RowData rowData = new RowData(pc.convertWidthInCharsToPixels(40), SWT.DEFAULT);
 
       for (final TourTag tag : tourTags) {
 
          final long tagId = tag.getTagId();
-
-         final Image image = TagMenuManager.getTagImage(tag.getImageFilePath());
+         final Image tagImage = TagMenuManager.getTagImage(tag.getImageFilePath());
 
          // If the tag is already present in the UI, we only replace its image in
          // case it has changed or was deleted.
          // We keep the CLabel to keep the order it was created in.
-         if (_tagsLabels.containsKey(tagId)) {
+         if (_allTagUIContainer.containsKey(tagId)) {
 
-            _tagsLabels.get(tagId).setImage(image);
+            _allTagUIContainer.get(tagId).setImage(tagImage);
 
          } else {
 
-            final CLabel label = new CLabel(tourTagsComposite, SWT.NONE);
-            label.setLayoutData(new RowData(pc.convertWidthInCharsToPixels(40), pc.convertWidthInCharsToPixels(12)));
-            label.setText(UI.EMPTY_STRING
+            final String tagText = UI.EMPTY_STRING + tag.getTagName() + UI.NEW_LINE + tourTagsAccumulatedValues.get(tagId);
 
-                  + tag.getTagName() + UI.NEW_LINE
-                  + tourTagsAccumulatedValues.get(tagId) //
-            );
+            final CLabel label = new CLabel(tourTagsContainer, SWT.WRAP);
+
             label.setToolTipText(tag.getTagName());
-            label.setImage(image);
+            label.setText(tagText);
+            label.setImage(tagImage);
+            label.setLayoutData(rowData);
 
-            _tagsLabels.put(tagId, label);
+//            label.setBackground(net.tourbook.common.UI.SYS_COLOR_YELLOW);
+
+            _allTagUIContainer.put(tagId, label);
          }
       }
-
-      tourTagsComposite.layout();
    }
 
    /**

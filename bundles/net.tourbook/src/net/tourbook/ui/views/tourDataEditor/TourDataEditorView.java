@@ -611,8 +611,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private FormToolkit              _tk;
 
    /*
-    * tab: tour
+    * Tab: Tour
     */
+   private Composite          _containerTags;
+   private PageBook           _pageBook_Tags;
+   //
    private Combo              _comboTitle;
    //
    private ComboViewerCadence _comboCadence;
@@ -628,8 +631,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Combo              _comboWeather_Wind_DirectionText;
    private Combo              _comboWeather_WindSpeedText;
    //
-   private Composite          _compositeTags;
-   //
    private DateTime           _dtStartTime;
    private DateTime           _dtTourDate;
    //
@@ -641,6 +642,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Label              _lblPerson_BodyFatUnit;
    private Label              _lblSpeedUnit;
    private Label              _lblStartTime;
+   private Label              _lblTags;
    private Label              _lblTimeZone;
    private Label              _lblWeather_PrecipitationUnit;
    private Label              _lblWeather_PressureUnit;
@@ -2007,7 +2009,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // clone other tour
 
          /*
-          * Show warning that this feature is experimental, show once a day or when this view is reopened
+          * Show warning that this feature is experimental, show once a day or when this view is
+          * reopened
           */
          final LocalDate today = LocalDate.now();
 
@@ -4733,38 +4736,58 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       {
          {
             /*
-             * tags
+             * Tag Menu
              */
             _linkTag = new Link(container, SWT.NONE);
             _linkTag.setText(Messages.tour_editor_label_tour_tag);
-            GridDataFactory
-                  .fillDefaults()//
-                  .align(SWT.BEGINNING, SWT.BEGINNING)
-                  .applyTo(_linkTag);
             _linkTag.addSelectionListener(widgetSelectedAdapter(selectionEvent -> UI.openControlMenu(_linkTag)));
             _tk.adapt(_linkTag, true, true);
             _firstColumnControls.add(_linkTag);
+            GridDataFactory.fillDefaults()
+                  .align(SWT.BEGINNING, SWT.BEGINNING)
+                  .applyTo(_linkTag);
 
-            _compositeTags = new Composite(container, SWT.NONE);
-            final RowLayout rowLayout = new RowLayout();
-            rowLayout.fill = true;
-            _compositeTags.setLayout(rowLayout);
-            _compositeTags.setLayoutData(rowLayout);
+            {
+               /*
+                * Tag label/image
+                */
+               final GridDataFactory gridDataForTagContent = GridDataFactory.fillDefaults().grab(true, true)
 
-            GridDataFactory
-                  .fillDefaults()//
-                  .grab(true, true)
-                  /*
-                   * hint is necessary that the width is not expanded when the text is long
-                   */
-                  .hint(2 * _hintTextColumnWidth, SWT.DEFAULT)
-                  .span(3, 1)
-                  .applyTo(_compositeTags);
+                     /*
+                      * Hint is necessary that the width is not expanded when the text is long
+                      */
+                     .hint(2 * _hintTextColumnWidth, SWT.DEFAULT);
+
+               _pageBook_Tags = new PageBook(container, SWT.NONE);
+//               _pageBook_Tags.setBackground(UI.SYS_COLOR_GREEN);
+               gridDataForTagContent.span(3, 1).applyTo(_pageBook_Tags);
+               {
+                  _lblTags = _tk.createLabel(_pageBook_Tags, UI.EMPTY_STRING, SWT.WRAP);
+                  gridDataForTagContent.applyTo(_lblTags);
+               }
+               {
+                  _containerTags = new Composite(_pageBook_Tags, SWT.NONE);
+
+                  final RowLayout rowLayout = new RowLayout();
+//                  rowLayout.fill = true;
+//                  rowLayout.justify = true;
+                  rowLayout.marginTop = 0;
+                  rowLayout.marginBottom = 0;
+                  rowLayout.marginLeft = 0;
+                  rowLayout.marginRight = 0;
+                  rowLayout.spacing = 10;
+
+                  _containerTags.setLayout(rowLayout);
+
+
+                  gridDataForTagContent.applyTo(_containerTags);
+               }
+            }
          }
 
          {
             /*
-             * tour type
+             * Tour type
              */
             _linkTourType = new Link(container, SWT.NONE);
             _linkTourType.setText(Messages.tour_editor_label_tour_type);
@@ -4773,7 +4796,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _firstColumnControls.add(_linkTourType);
 
             _lblTourType = new CLabel(container, SWT.NONE);
-            GridDataFactory.swtDefaults()//
+            GridDataFactory.swtDefaults()
                   .grab(true, false)
                   .span(3, 1)
                   .applyTo(_lblTourType);
@@ -4785,8 +4808,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
              */
 
             // label
-            final Label label = _tk.createLabel(container,
-                  Messages.Tour_Editor_Label_Cadence);
+            final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_Cadence);
             label.setToolTipText(Messages.Tour_Editor_Label_Cadence_Tooltip);
             _firstColumnControls.add(label);
 
@@ -9166,7 +9188,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       displayCloudIcon();
 
       final boolean isTourTemperatureDeviceValid = _tourData.temperatureSerie != null && _tourData.temperatureSerie.length > 0;
-      final boolean temperaturesExist = _tourData.isTemperatureAvailable();
+      final boolean isTemperatureAvailable = _tourData.isTemperatureAvailable();
 
       /*
        * Avg temperature from Device
@@ -9200,7 +9222,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Temperature_Average.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_Average.setDigits(1);
       int avgTemperatureValue = 0;
-      if (temperaturesExist) {
+      if (isTemperatureAvailable) {
          avgTemperatureValue = Math.round(avgTemperature * 10);
 
       }
@@ -9214,7 +9236,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Temperature_Min.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_Min.setDigits(1);
       int minTemperatureValue = 0;
-      if (temperaturesExist) {
+      if (isTemperatureAvailable) {
          minTemperatureValue = Math.round(minTemperature * 10);
 
       }
@@ -9228,7 +9250,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Temperature_Max.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_Max.setDigits(1);
       int maxTemperatureValue = 0;
-      if (temperaturesExist) {
+      if (isTemperatureAvailable) {
          maxTemperatureValue = Math.round(maxTemperature * 10);
 
       }
@@ -9242,7 +9264,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _spinWeather_Temperature_WindChill.setData(UI.FIX_LINUX_ASYNC_EVENT_1, true);
       _spinWeather_Temperature_WindChill.setDigits(1);
       int avgWindChillValue = 0;
-      if (temperaturesExist) {
+      if (isTemperatureAvailable) {
          avgWindChillValue = Math.round(avgWindChill * 10);
 
       }
@@ -9361,28 +9383,33 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // tour type/tags
       net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
-      net.tourbook.ui.UI.updateUI_TagsWithImage(_pc, _tourData.getTourTags(), _compositeTags);
+      updateUI_TagContent();
+
+// SET_FORMATTING_OFF
 
       // measurement system
-      _lblDistanceUnit.setText(UI.UNIT_LABEL_DISTANCE);
-      _lblAltitudeUpUnit.setText(UI.UNIT_LABEL_ELEVATION);
-      _lblAltitudeDownUnit.setText(UI.UNIT_LABEL_ELEVATION);
-      _lblPerson_BodyWeightUnit.setText(UI.UNIT_LABEL_WEIGHT);
-      _lblPerson_BodyFatUnit.setText(UI.UNIT_PERCENT);
-      _lblWeather_PrecipitationUnit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
-      _lblWeather_PressureUnit.setText(UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG);
-      _lblWeather_SnowfallUnit.setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
-      _lblSpeedUnit.setText(UI.UNIT_LABEL_SPEED);
       final String averageTemperatureUnit = UI.SYMBOL_AVERAGE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
-      _lblWeather_TemperatureUnit_Avg.setText(averageTemperatureUnit);
-      _lblWeather_TemperatureUnit_Avg_Device.setText(averageTemperatureUnit);
-      final String maxTemperatureUnit = UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
-      _lblWeather_TemperatureUnit_Max.setText(maxTemperatureUnit);
-      _lblWeather_TemperatureUnit_Max_Device.setText(maxTemperatureUnit);
-      final String minTemperatureUnit = UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
-      _lblWeather_TemperatureUnit_Min.setText(minTemperatureUnit);
-      _lblWeather_TemperatureUnit_Min_Device.setText(minTemperatureUnit);
-      _lblWeather_TemperatureUnit_WindChill.setText(UI.SYMBOL_TILDE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+      final String maxTemperatureUnit     = UI.SYMBOL_MAX + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+      final String minTemperatureUnit     = UI.SYMBOL_MIN + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE;
+
+      _lblDistanceUnit                          .setText(UI.UNIT_LABEL_DISTANCE);
+      _lblAltitudeUpUnit                        .setText(UI.UNIT_LABEL_ELEVATION);
+      _lblAltitudeDownUnit                      .setText(UI.UNIT_LABEL_ELEVATION);
+      _lblPerson_BodyWeightUnit                 .setText(UI.UNIT_LABEL_WEIGHT);
+      _lblPerson_BodyFatUnit                    .setText(UI.UNIT_PERCENT);
+      _lblSpeedUnit                             .setText(UI.UNIT_LABEL_SPEED);
+      _lblWeather_PrecipitationUnit             .setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+      _lblWeather_PressureUnit                  .setText(UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG);
+      _lblWeather_SnowfallUnit                  .setText(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+      _lblWeather_TemperatureUnit_Avg           .setText(averageTemperatureUnit);
+      _lblWeather_TemperatureUnit_Avg_Device    .setText(averageTemperatureUnit);
+      _lblWeather_TemperatureUnit_Max           .setText(maxTemperatureUnit);
+      _lblWeather_TemperatureUnit_Max_Device    .setText(maxTemperatureUnit);
+      _lblWeather_TemperatureUnit_Min           .setText(minTemperatureUnit);
+      _lblWeather_TemperatureUnit_Min_Device    .setText(minTemperatureUnit);
+      _lblWeather_TemperatureUnit_WindChill     .setText(UI.SYMBOL_TILDE + UI.SPACE + UI.UNIT_LABEL_TEMPERATURE);
+
+// SET_FORMATTING_ON
 
       // cadence rpm/spm
       final CadenceMultiplier cadence = CadenceMultiplier.getByValue((int) _tourData.getCadenceMultiplier());
@@ -9443,6 +9470,24 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             // force reload when it's not yet loaded
             _swimSlice_ViewerTourId = -1L;
          }
+      }
+   }
+
+   private void updateUI_TagContent() {
+
+      final boolean isShowTagWithImage = true;
+
+      if (isShowTagWithImage) {
+
+         _pageBook_Tags.showPage(_containerTags);
+
+         net.tourbook.ui.UI.updateUI_TagsWithImage(_pc, _tourData.getTourTags(), _containerTags);
+
+      } else {
+
+         _pageBook_Tags.showPage(_lblTags);
+
+         net.tourbook.ui.UI.updateUI_Tags(_tourData, _lblTags);
       }
    }
 
@@ -9650,7 +9695,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       // tour type/tags
       net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);
-      net.tourbook.ui.UI.updateUI_TagsWithImage(_pc, _tourData.getTourTags(), _compositeTags);
+      updateUI_TagContent();
 
       // reflow layout that the tags are aligned correctly
       _tourContainer.layout(true);

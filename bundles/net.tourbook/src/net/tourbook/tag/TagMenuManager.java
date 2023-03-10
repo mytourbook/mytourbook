@@ -350,7 +350,7 @@ public class TagMenuManager {
     * Otherwise, create an image resource, and put it in the cache
     *
     * @param imageFilePath
-    * @return
+    * @return Return the tag image or <code>null</code> when not available
     */
    public static Image getTagImage(final String imageFilePath) {
 
