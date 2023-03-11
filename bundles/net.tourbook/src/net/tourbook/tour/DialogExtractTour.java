@@ -39,6 +39,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.ui.ITourProvider2;
 import net.tourbook.ui.UI;
@@ -1388,7 +1389,7 @@ public class DialogExtractTour extends TitleAreaDialog implements ITourProvider2
 
       // tour type/tags
       UI.updateUI_TourType(_tourDataTarget, _lblTourType, true);
-      UI.updateUI_Tags(_tourDataTarget, _lblTourTags);
+      TagManager.updateUI_Tags(_tourDataTarget, _lblTourTags);
 
       // reflow layout that the tags are aligned correctly
       _dlgInnerContainer.layout(true);

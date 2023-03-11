@@ -88,6 +88,7 @@ import net.tourbook.importdata.RawDataManager;
 import net.tourbook.map2.view.SelectionMapPosition;
 import net.tourbook.map2.view.SelectionMapSelection;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.ActionOpenAdjustAltitudeDialog;
 import net.tourbook.tour.ActionOpenMarkerDialog;
@@ -638,6 +639,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private Label              _lblAltitudeDownUnit;
    private Label              _lblCloudIcon;
    private Label              _lblDistanceUnit;
+   private Label              _lblNoTags;
    private Label              _lblPerson_BodyWeightUnit;
    private Label              _lblPerson_BodyFatUnit;
    private Label              _lblSpeedUnit;
@@ -3373,9 +3375,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                                  final boolean isGrabVertical,
                                  final boolean isExpandable) {
 
-      final int style = isExpandable ? //
-            Section.TWISTIE //
-                  | Section.TITLE_BAR
+      final int style = isExpandable
+            ? Section.TWISTIE | Section.TITLE_BAR
             : Section.TITLE_BAR;
 
       final Section section = tk.createSection(parent, style);
@@ -4759,7 +4760,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                      .hint(2 * _hintTextColumnWidth, SWT.DEFAULT);
 
                _pageBook_Tags = new PageBook(container, SWT.NONE);
-//               _pageBook_Tags.setBackground(UI.SYS_COLOR_GREEN);
+//               _pageBook_Tags.setBackground(UI.SYS_COLOR_BLUE);
                gridDataForTagContent.span(3, 1).applyTo(_pageBook_Tags);
                {
                   _lblTags = _tk.createLabel(_pageBook_Tags, UI.EMPTY_STRING, SWT.WRAP);
@@ -4769,8 +4770,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   _containerTags = new Composite(_pageBook_Tags, SWT.NONE);
 
                   final RowLayout rowLayout = new RowLayout();
-//                  rowLayout.fill = true;
-//                  rowLayout.justify = true;
                   rowLayout.marginTop = 0;
                   rowLayout.marginBottom = 0;
                   rowLayout.marginLeft = 0;
@@ -4779,8 +4778,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                   _containerTags.setLayout(rowLayout);
 
-
                   gridDataForTagContent.applyTo(_containerTags);
+               }
+               {
+                  _lblNoTags = UI.createLabel(_pageBook_Tags, UI.EMPTY_STRING);
                }
             }
          }
@@ -7302,6 +7303,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _hintValueFieldWidth = _pc.convertWidthInCharsToPixels(10);
 
       _columnSortListener = widgetSelectedAdapter(this::onSelect_SortColumn);
+
+      parent.addDisposeListener(e -> onDispose());
    }
 
    private void invalidateSliceViewers() {
@@ -7484,6 +7487,11 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       }
 
       return mappedTimeSlicesIndices;
+   }
+
+   private void onDispose() {
+
+      TagManager.disposeTagUIContent();
    }
 
    private void onExpandSection() {
@@ -9475,19 +9483,34 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void updateUI_TagContent() {
 
-      final boolean isShowTagWithImage = true;
+      final Set<TourTag> tourTags = _tourData.getTourTags();
 
-      if (isShowTagWithImage) {
+      if (tourTags.size() == 0) {
 
-         _pageBook_Tags.showPage(_containerTags);
+         // there are not tags
 
-         net.tourbook.ui.UI.updateUI_TagsWithImage(_pc, _tourData.getTourTags(), _containerTags);
+         _pageBook_Tags.showPage(_lblNoTags);
 
       } else {
 
-         _pageBook_Tags.showPage(_lblTags);
+         // show tag content
 
-         net.tourbook.ui.UI.updateUI_Tags(_tourData, _lblTags);
+         final boolean isShowTagWithImage = true;
+
+         if (isShowTagWithImage) {
+
+            _pageBook_Tags.showPage(_containerTags);
+
+            TagManager.updateUI_TagsWithImage(_pc, tourTags, _containerTags);
+
+         } else {
+
+            _pageBook_Tags.showPage(_lblTags);
+
+            TagManager.updateUI_Tags(_tourData, _lblTags);
+         }
+
+         _pageBook_Tags.layout(true, true);
       }
    }
 

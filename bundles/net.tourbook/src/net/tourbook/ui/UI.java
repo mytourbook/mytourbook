@@ -26,9 +26,6 @@ import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Formatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
@@ -36,17 +33,12 @@ import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.common.color.MapGraphId;
 import net.tourbook.common.util.StatusUtil;
-import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourTag;
 import net.tourbook.data.TourType;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.photo.IPhotoPreferences;
-import net.tourbook.photo.ImageUtils;
 import net.tourbook.preferences.ITourbookPreferences;
-import net.tourbook.tag.TagManager;
-import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tour.SelectionTourId;
 import net.tourbook.tour.SelectionTourIds;
 import net.tourbook.tour.TourEvent;
@@ -56,12 +48,6 @@ import net.tourbook.tourType.TourTypeImage;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.web.WEB;
 
-import org.apache.commons.imaging.ImageReadException;
-import org.apache.commons.imaging.Imaging;
-import org.apache.commons.imaging.common.ImageMetadata;
-import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
-import org.apache.commons.imaging.formats.tiff.TiffField;
-import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -89,7 +75,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -101,12 +86,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.menus.UIElement;
-import org.imgscalr.Scalr.Rotation;
 
 public class UI {
-
-   private static final int              TAG_IMAGE_WIDTH               = 70;
-   private static final int              TAG_IMAGE_HEIGHT              = 70;
 
    private static final String           ICONS_PATH                    = "/icons/";                    //$NON-NLS-1$
 
@@ -238,15 +219,6 @@ public class UI {
       TAG_SUB_STYLER       = StyledString.createColorRegistryStyler(VIEW_COLOR_SUB, null);
 
 // SET_FORMATTING_ON
-   }
-
-   private static Map<Long, TagUIContent> _allTagUIContainer = new HashMap<>();
-
-   // pref store var cannot be set from a static field because it can be null !!!
-// private final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
-
-   private class TagUIContent {
-
    }
 
    private UI() {}
@@ -544,15 +516,16 @@ public class UI {
 
       final ZonedDateTime dt = tourData.getTourStartTime();
 
-      return _formatter
-            .format(//
-                  Messages.Format_yyyymmdd_hhmmss,
-                  dt.getYear(),
-                  dt.getMonthValue(),
-                  dt.getDayOfMonth(),
-                  dt.getHour(),
-                  dt.getMinute(),
-                  dt.getSecond())//
+      return _formatter.format(
+
+            Messages.Format_yyyymmdd_hhmmss,
+            dt.getYear(),
+            dt.getMonthValue(),
+            dt.getDayOfMonth(),
+            dt.getHour(),
+            dt.getMinute(),
+            dt.getSecond())
+
             .toString();
    }
 
@@ -815,74 +788,6 @@ public class UI {
       }
 
       return UI.EMPTY_STRING;
-   }
-
-   public static Image prepareTagImage(final String imageFilePath) {
-
-      if (StringUtils.isNullOrEmpty(imageFilePath) ||
-            !new File(imageFilePath).exists()) {
-         return null;
-      }
-
-      final Image image = new Image(Display.getDefault(), imageFilePath);
-
-      Rotation rotation = null;
-      try {
-
-         final ImageMetadata imageMetadata = Imaging.getMetadata(new File(imageFilePath), null);
-         if (imageMetadata instanceof JpegImageMetadata) {
-
-            final JpegImageMetadata jpegMetadata = (JpegImageMetadata) imageMetadata;
-            final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_ORIENTATION);
-
-            if (field != null) {
-
-               final int orientation = field.getIntValue();
-
-               if (orientation == 6) {
-
-                  rotation = Rotation.CW_90;
-
-               } else if (orientation == 3) {
-
-                  rotation = Rotation.CW_180;
-
-               } else if (orientation == 8) {
-
-                  rotation = Rotation.CW_270;
-               }
-            }
-         }
-      } catch (ImageReadException | IOException e) {
-         StatusUtil.log(e);
-      }
-
-      final int imageWidth = image.getBounds().width;
-      final int imageHeight = image.getBounds().height;
-
-      int newimageWidth = TAG_IMAGE_WIDTH;
-      int newimageHeight = TAG_IMAGE_HEIGHT;
-
-      if (imageWidth > imageHeight) {
-
-         /**
-          * math floor or - 0.5f is necessary that the resized image is not smaller than the image
-          * canvas which could result in a vertical 1 pixel white line
-          * <p>
-          * https://github.com/mytourbook/mytourbook/issues/1001
-          */
-         newimageHeight = (int) Math.floor(newimageWidth * imageHeight / (imageWidth * 1f));
-
-      } else if (imageWidth < imageHeight) {
-
-         newimageWidth = (int) Math.floor(newimageHeight * imageWidth / (imageHeight * 1f));
-      }
-
-      final Image resizedImage = ImageUtils.resize(Display.getDefault(), image, newimageWidth, newimageHeight, 1, 1, rotation);
-
-      net.tourbook.common.UI.disposeResource(image);
-
-      return resizedImage;
    }
 
    public static ImageData rotate(final ImageData srcData, final int direction) {
@@ -1172,103 +1077,6 @@ public class UI {
             PreferenceConverter.getColor(_prefStore, ITourbookPreferences.GRAPH_SEGMENT_ALTERNATE_COLOR_DARK)
 
       );
-   }
-
-   public static void updateUI_Tags(final TourData tourData, final Label tourTagLabel) {
-
-      updateUI_Tags(tourData, tourTagLabel, false);
-   }
-
-   /**
-    * @param tourData
-    * @param tourTagLabel
-    * @param isVertical
-    *           When <code>true</code> the tags are displayed as a list, otherwise horizontally
-    */
-   public static void updateUI_Tags(final TourData tourData, final Label tourTagLabel, final boolean isVertical) {
-
-      // tour tags
-      final Set<TourTag> tourTags = tourData.getTourTags();
-
-      if (tourTags == null || tourTags.isEmpty()) {
-
-         tourTagLabel.setText(UI.EMPTY_STRING);
-
-      } else {
-
-         final String tagLabels = TourDatabase.getTagNames(tourTags, isVertical);
-
-         tourTagLabel.setText(tagLabels);
-         tourTagLabel.setToolTipText(tagLabels);
-      }
-   }
-
-   public static void updateUI_TagsWithImage(final PixelConverter pc,
-                                             final Set<TourTag> tourTags,
-                                             final Composite tourTagsContainer) {
-
-      // We dispose the tags labels that are not present in the current
-      // tour tags list
-      _allTagUIContainer.forEach((key, value) -> {
-
-         boolean isTourTagPresent = false;
-
-         for (final TourTag tourTag : tourTags) {
-
-            if (tourTag.getTagId() == key) {
-               isTourTagPresent = true;
-               break;
-            }
-         }
-
-         if (!isTourTagPresent) {
-            value.dispose();
-         }
-      });
-
-      // We remove the disposed tag labels.
-      _allTagUIContainer.entrySet().removeIf(entry -> entry.getValue().isDisposed());
-
-      if (tourTags.isEmpty()) {
-
-//       tourTagsContainer.setData(null);
-
-         return;
-      }
-
-      final Map<Long, String> tourTagsAccumulatedValues = TagManager.fetchTourTagsAccumulatedValues();
-
-//                            new RowData(pc.convertWidthInCharsToPixels(40), pc.convertWidthInCharsToPixels(12)));
-      final RowData rowData = new RowData(pc.convertWidthInCharsToPixels(40), SWT.DEFAULT);
-
-      for (final TourTag tag : tourTags) {
-
-         final long tagId = tag.getTagId();
-         final Image tagImage = TagMenuManager.getTagImage(tag.getImageFilePath());
-
-         // If the tag is already present in the UI, we only replace its image in
-         // case it has changed or was deleted.
-         // We keep the CLabel to keep the order it was created in.
-         if (_allTagUIContainer.containsKey(tagId)) {
-
-            _allTagUIContainer.get(tagId).setImage(tagImage);
-
-         } else {
-
-            final String tagText = UI.EMPTY_STRING + tag.getTagName() + UI.NEW_LINE + tourTagsAccumulatedValues.get(tagId);
-
-            final CLabel label = new CLabel(tourTagsContainer, SWT.WRAP);
-
-            label.setToolTipText(tag.getTagName());
-            label.setText(tagText);
-            label.setImage(tagImage);
-            label.setLayoutData(rowData);
-
-//            label.setBackground(net.tourbook.common.UI.SYS_COLOR_YELLOW);
-
-            _allTagUIContainer.put(tagId, label);
-         }
-      }
    }
 
    /**
