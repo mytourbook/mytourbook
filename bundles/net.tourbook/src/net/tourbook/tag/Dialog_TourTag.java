@@ -175,13 +175,15 @@ public class Dialog_TourTag extends TitleAreaDialog {
             /*
              * Label: Tag image
              */
+            final int tagImageSize = TagManager.getTagImageSize();
+
             final Label label = UI.createLabel(container, UI.EMPTY_STRING);
             label.setText(Messages.Dialog_TourTag_Label_Image);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 
             _canvasTagImage = new Label(container, SWT.NONE);
             GridDataFactory.fillDefaults()
-                  .hint(TagManager.TAG_IMAGE_SIZE, TagManager.TAG_IMAGE_SIZE)
+                  .hint(tagImageSize, tagImageSize)
                   .applyTo(_canvasTagImage);
 
             final Composite imageContainer = new Composite(container, SWT.NONE);
@@ -308,7 +310,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
       _txtName.setText(_tourTag_Clone.getTagName());
       _txtNotes.setText(_tourTag_Clone.getNotes());
       _imageFilePath = _tourTag_Clone.getImageFilePath();
-      
+
       setTagImage(_imageFilePath);
    }
 

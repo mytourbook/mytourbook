@@ -26,6 +26,9 @@ import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
 import net.tourbook.common.util.Util;
+import net.tourbook.tag.TagContentLayout;
+import net.tourbook.tag.TagManager;
+import net.tourbook.tag.TagManager.TagContentLayoutItem;
 
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -33,10 +36,14 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.ToolBar;
@@ -46,17 +53,17 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
-   private final IDialogSettings _state = TourbookPlugin.getState(TourDataEditorView.ID);
+   private static final IDialogSettings _state = TourbookPlugin.getState(TourDataEditorView.ID);
 
-   private TourDataEditorView    _tourEditorView;
+   private TourDataEditorView           _tourEditorView;
 
-   private ActionResetToDefaults _actionRestoreDefaults;
+   private ActionResetToDefaults        _actionRestoreDefaults;
 
-   private SelectionListener     _defaultSelectionListener;
+   private SelectionListener            _defaultSelectionListener;
+   private FocusListener                _keepOpenListener;
 
-   private PixelConverter        _pc;
-
-   private int                   _hintValueFieldWidth;
+   private PixelConverter               _pc;
+   private int                          _hintValueFieldWidth;
 
    /*
     * UI controls
@@ -67,7 +74,14 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
    private Button    _chkDelete_KeepTime;
    private Button    _chkRecomputeElevation;
 
+   private Combo     _comboTagContent;
+
+   private Label     _lblTagImageSize;
+   private Label     _lblTagContentWidth;
+
    private Spinner   _spinnerLatLonDigits;
+   private Spinner   _spinnerTagContentWidth;
+   private Spinner   _spinnerTagImageSize;
    private Spinner   _spinnerTourDescriptionNumLines;
    private Spinner   _spinnerWeatherDescriptionNumLines;
 
@@ -103,7 +117,10 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
       final Composite ui = createUI(parent);
 
+      fillUI();
       restoreState();
+
+      enableControls();
 
       return ui;
    }
@@ -122,6 +139,7 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
             createUI_12_Actions(container);
 
             createUI_20_Options(container);
+            createUI_30_Tags(container);
          }
       }
 
@@ -271,6 +289,124 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       }
    }
 
+   private void createUI_30_Tags(final Composite parent) {
+
+      final Group group = new Group(parent, SWT.NONE);
+      group.setText(Messages.Slideout_TourEditor_Group_Tags);
+      GridDataFactory.fillDefaults()
+            .grab(true, false)
+            .span(2, 1)
+            .applyTo(group);
+      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
+//      group.setBackground(UI.SYS_COLOR_BLUE);
+      {
+         {
+            /*
+             * Tag content layout
+             */
+
+            // label
+            final Label label = new Label(group, SWT.NONE);
+            label.setText(Messages.Slideout_TourEditor_Label_TagContent);
+
+            // combo
+            _comboTagContent = new Combo(group, SWT.DROP_DOWN | SWT.READ_ONLY);
+            _comboTagContent.setVisibleItemCount(20);
+            _comboTagContent.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TagContent()));
+            _comboTagContent.addFocusListener(_keepOpenListener);
+            GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboTagContent);
+         }
+         {
+            /*
+             * Tag image size
+             */
+
+            // label
+            _lblTagImageSize = new Label(group, SWT.NONE);
+            _lblTagImageSize.setText(Messages.Slideout_TourEditor_Label_TagImageSize);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblTagImageSize);
+
+            // spinner
+            _spinnerTagImageSize = new Spinner(group, SWT.BORDER);
+            _spinnerTagImageSize.setMinimum(TourDataEditorView.STATE_TAG_IMAGE_SIZE_MIN);
+            _spinnerTagImageSize.setMaximum(TourDataEditorView.STATE_TAG_IMAGE_SIZE_MAX);
+            _spinnerTagImageSize.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TagContent()));
+            _spinnerTagImageSize.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+               onSelect_TagContent();
+            });
+         }
+         {
+            /*
+             * Tag content width
+             */
+
+            // label
+            _lblTagContentWidth = new Label(group, SWT.NONE);
+            _lblTagContentWidth.setText(Messages.Slideout_TourEditor_Label_TagContentWidth);
+            GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblTagContentWidth);
+
+            // spinner
+            _spinnerTagContentWidth = new Spinner(group, SWT.BORDER);
+            _spinnerTagContentWidth.setMinimum(TourDataEditorView.STATE_TAG_CONTENT_WIDTH_MIN);
+            _spinnerTagContentWidth.setMaximum(TourDataEditorView.STATE_TAG_CONTENT_WIDTH_MAX);
+            _spinnerTagContentWidth.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TagContent()));
+            _spinnerTagContentWidth.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+               onSelect_TagContent();
+            });
+         }
+      }
+   }
+
+   private void enableControls() {
+
+      final TagContentLayout selectedTagContentLayout = getSelectedTagContentLayout();
+
+      final boolean isTagContentWithImage = TagContentLayout.IMAGE_AND_DATA.equals(selectedTagContentLayout);
+
+// SET_FORMATTING_OFF
+      
+      _lblTagContentWidth        .setEnabled(isTagContentWithImage);
+      _lblTagImageSize           .setEnabled(isTagContentWithImage);
+
+      _spinnerTagContentWidth    .setEnabled(isTagContentWithImage);
+      _spinnerTagImageSize       .setEnabled(isTagContentWithImage);
+      
+// SET_FORMATTING_ON
+   }
+
+   private void fillUI() {
+
+      for (final TagContentLayoutItem layoutItem : TagManager.ALL_TAG_CONTENT_LAYOUT) {
+         _comboTagContent.add(layoutItem.label);
+      }
+   }
+
+   private TagContentLayout getSelectedTagContentLayout() {
+
+      // get valid index
+      final int selectionIndex = Math.max(0, _comboTagContent.getSelectionIndex());
+
+      return TagManager.ALL_TAG_CONTENT_LAYOUT[selectionIndex].tagContentLayout;
+   }
+
+   private int getTagContentLayoutIndex(final TagContentLayout legendUnitLayout) {
+
+      final TagContentLayoutItem[] allTagContentLayout = TagManager.ALL_TAG_CONTENT_LAYOUT;
+
+      for (int layoutIndex = 0; layoutIndex < allTagContentLayout.length; layoutIndex++) {
+
+         final TagContentLayoutItem layoutItem = allTagContentLayout[layoutIndex];
+
+         if (legendUnitLayout == layoutItem.tagContentLayout) {
+            return layoutIndex;
+         }
+      }
+
+      return 0;
+   }
+
    private void initUI(final Composite parent) {
 
       _pc = new PixelConverter(parent);
@@ -278,6 +414,25 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _hintValueFieldWidth = _pc.convertWidthInCharsToPixels(3);
 
       _defaultSelectionListener = widgetSelectedAdapter(selectionEvent -> onChangeUI());
+
+      _keepOpenListener = new FocusListener() {
+
+         @Override
+         public void focusGained(final FocusEvent e) {
+
+            /*
+             * This will fix the problem that when the list of a combobox is displayed, then the
+             * slideout will disappear :-(((
+             */
+            setIsAnotherDialogOpened(true);
+         }
+
+         @Override
+         public void focusLost(final FocusEvent e) {
+
+            setIsAnotherDialogOpened(false);
+         }
+      };
    }
 
    private void onChangeUI() {
@@ -305,11 +460,27 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _tourEditorView.updateUI_DescriptionNumLines(tourDescriptionNumberOfLines, weatherDescriptionNumberOfLines);
    }
 
+   private void onSelect_TagContent() {
+
+      _state.put(TourDataEditorView.STATE_TAG_CONTENT_WIDTH, _spinnerTagContentWidth.getSelection());
+      _state.put(TourDataEditorView.STATE_TAG_IMAGE_SIZE, _spinnerTagImageSize.getSelection());
+
+      Util.setStateEnum(_state, TourDataEditorView.STATE_TAG_CONTENT_LAYOUT, getSelectedTagContentLayout());
+
+      enableControls();
+
+      // run async because it can take time to reload the tag images
+      _shellContainer.getDisplay().asyncExec(() -> TagManager.updateTagContent());
+   }
+
    @Override
    public void resetToDefaults() {
 
 // SET_FORMATTING_OFF
 
+      /*
+       * Get default values
+       */
       final int descriptionNumberOfLines        = TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES_DEFAULT;
       final int latLonDigits                    = TourDataEditorView.STATE_LAT_LON_DIGITS_DEFAULT;
       final int weatherDescriptionNumberOfLines = TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT;
@@ -318,14 +489,28 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       final boolean isDeleteKeepTime            = TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT;
       final boolean isRecomputeElevation        = TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT;
 
-      // update model
+      final int tagContentWidth                 = TourDataEditorView.STATE_TAG_CONTENT_WIDTH_DEFAULT;
+      final int tagImageSize                    = TourDataEditorView.STATE_TAG_IMAGE_SIZE_DEFAULT;
+      final TagContentLayout tagContentLayout   = TourDataEditorView.STATE_TAG_CONTENT_LAYOUT_DEFAULT;
+
+      /*
+       * Update model
+       */
       _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,         isDeleteKeepDistance);
       _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,             isDeleteKeepTime);
       _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,  isRecomputeElevation);
       _state.put(TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES,     descriptionNumberOfLines);
       _state.put(TourDataEditorView.STATE_LAT_LON_DIGITS,                  latLonDigits);
 
-      // update UI
+      // tags
+      _state.put(TourDataEditorView.STATE_TAG_CONTENT_WIDTH,                  tagContentWidth);
+      _state.put(TourDataEditorView.STATE_TAG_IMAGE_SIZE,                     tagImageSize);
+      Util.setStateEnum(_state, TourDataEditorView.STATE_TAG_CONTENT_LAYOUT,  tagContentLayout);
+
+
+      /*
+       * Update UI
+       */
       _chkDelete_KeepDistance             .setSelection(isDeleteKeepDistance);
       _chkDelete_KeepTime                 .setSelection(isDeleteKeepTime);
       _chkRecomputeElevation              .setSelection(isRecomputeElevation);
@@ -333,10 +518,17 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _spinnerTourDescriptionNumLines     .setSelection(descriptionNumberOfLines);
       _spinnerWeatherDescriptionNumLines  .setSelection(weatherDescriptionNumberOfLines);
 
+      // tags
+      _comboTagContent                    .select(getTagContentLayoutIndex(tagContentLayout));
+      _spinnerTagContentWidth             .setSelection(tagContentWidth);
+      _spinnerTagImageSize                .setSelection(tagImageSize);
+
 // SET_FORMATTING_ON
 
       _tourEditorView.updateUI_DescriptionNumLines(descriptionNumberOfLines, weatherDescriptionNumberOfLines);
       _tourEditorView.updateUI_LatLonDigits(latLonDigits);
+
+      TagManager.updateTagContent();
    }
 
    private void restoreState() {
@@ -364,13 +556,37 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _spinnerWeatherDescriptionNumLines.setSelection(Util.getStateInt(_state,
             TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES,
             TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT));
+
+      /*
+       * Tags
+       */
+      _spinnerTagContentWidth.setSelection(Util.getStateInt(_state,
+            TourDataEditorView.STATE_TAG_CONTENT_WIDTH,
+            TourDataEditorView.STATE_TAG_CONTENT_WIDTH_DEFAULT,
+            TourDataEditorView.STATE_TAG_CONTENT_WIDTH_MIN,
+            TourDataEditorView.STATE_TAG_CONTENT_WIDTH_MAX));
+
+      _spinnerTagImageSize.setSelection(Util.getStateInt(_state,
+            TourDataEditorView.STATE_TAG_IMAGE_SIZE,
+            TourDataEditorView.STATE_TAG_IMAGE_SIZE_DEFAULT,
+            TourDataEditorView.STATE_TAG_IMAGE_SIZE_MIN,
+            TourDataEditorView.STATE_TAG_IMAGE_SIZE_MAX));
+
+      _comboTagContent.select(getTagContentLayoutIndex((TagContentLayout) Util.getStateEnum(_state,
+            TourDataEditorView.STATE_TAG_CONTENT_LAYOUT,
+            TourDataEditorView.STATE_TAG_CONTENT_LAYOUT_DEFAULT)));
    }
 
    private void saveState() {
 
-      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE, _chkDelete_KeepDistance.getSelection());
-      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME, _chkDelete_KeepTime.getSelection());
-      _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN, _chkRecomputeElevation.getSelection());
+// SET_FORMATTING_OFF
+
+      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,         _chkDelete_KeepDistance.getSelection());
+      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,             _chkDelete_KeepTime.getSelection());
+      _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,  _chkRecomputeElevation.getSelection());
+
+// SET_FORMATTING_ON
+
    }
 
 }
