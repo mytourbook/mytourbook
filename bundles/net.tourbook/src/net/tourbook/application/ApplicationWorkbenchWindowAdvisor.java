@@ -431,7 +431,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       // do last cleanup, this dispose causes NPE in e4 when run in dispose() method
 
-      TagManager.dispose();
+      TagManager.disposeTagImages();
       TourTypeImage.dispose();
    }
 

@@ -418,7 +418,7 @@ public class TagManager {
    /**
     * Dispose images
     */
-   public static void dispose() {
+   public static void disposeTagImages() {
 
       _tagImagesCache.values().forEach(UI::disposeResource);
    }
@@ -593,10 +593,12 @@ public class TagManager {
     * Image resource from the cache.
     * Otherwise, create an image resource, and put it in the cache
     *
-    * @param imageFilePath
+    * @param tag
     * @return Return the tag image or <code>null</code> when not available
     */
-   public static Image getTagImage(final String imageFilePath) {
+   public static Image getTagImage(final TourTag tag) {
+
+      final String imageFilePath = tag.getImageFilePath();
 
       if (StringUtils.isNullOrEmpty(imageFilePath)) {
          return null;
@@ -756,7 +758,7 @@ public class TagManager {
 
       for (final TourTag tag : allTags) {
 
-         final Image tagImage = TagManager.getTagImage(tag.getImageFilePath());
+         final Image tagImage = getTagImage(tag);
 
          if (tagImage != null) {
 
@@ -768,10 +770,10 @@ public class TagManager {
       /*
        * Fill tag content
        */
-      final Map<Long, String> tourTagsAccumulatedValues = TagManager.fetchTourTagsAccumulatedValues();
+      final Map<Long, String> tourTagsAccumulatedValues = fetchTourTagsAccumulatedValues();
       final ArrayList<TagUIContent> notNeededTags = new ArrayList<>();
 
-      final GridDataFactory gdFactory = GridDataFactory.fillDefaults();
+      final GridDataFactory gd = GridDataFactory.fillDefaults();
 
       for (int tagIndex = 0; tagIndex < _allTagUIContainer.size(); tagIndex++) {
 
@@ -792,7 +794,7 @@ public class TagManager {
                // 1st label shows the tag image
                // 2nd label shows the tag text
 
-               final Image tagImage = TagManager.getTagImage(tag.getImageFilePath());
+               final Image tagImage = getTagImage(tag);
 
                label1.setText(UI.EMPTY_STRING);
 
@@ -802,8 +804,8 @@ public class TagManager {
                label2.setVisible(true);
                label2.setText(tagText);
 
-               gdFactory.grab(false, false).hint(TAG_IMAGE_SIZE, SWT.DEFAULT).applyTo(label1);
-               gdFactory.grab(true, false).applyTo(label2);
+               gd.grab(false, false).hint(TAG_IMAGE_SIZE, SWT.DEFAULT).applyTo(label1);
+               gd.grab(true, false).applyTo(label2);
 
             } else {
 
@@ -816,8 +818,8 @@ public class TagManager {
                label2.setVisible(false);
                label2.setText(UI.EMPTY_STRING);
 
-               gdFactory.grab(true, false).hint(SWT.DEFAULT, SWT.DEFAULT).applyTo(label1);
-               gdFactory.grab(false, false).applyTo(label2);
+               gd.grab(true, false).hint(SWT.DEFAULT, SWT.DEFAULT).applyTo(label1);
+               gd.grab(false, false).applyTo(label2);
             }
 
          } else {

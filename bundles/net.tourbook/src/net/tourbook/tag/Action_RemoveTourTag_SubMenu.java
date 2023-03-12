@@ -60,7 +60,7 @@ class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator {
       public ActionTourTag(final TourTag tourTag) {
 
          super(tourTag.getTagName(), AS_CHECK_BOX);
-         final var tagImage = TagManager.getTagImage(tourTag.getImageFilePath());
+         final var tagImage = TagManager.getTagImage(tourTag);
          if (tagImage != null) {
             setImageDescriptor(ImageDescriptor.createFromImage(tagImage));
          }
@@ -99,7 +99,7 @@ class Action_RemoveTourTag_SubMenu extends Action implements IMenuCreator {
       //Preload the tag images
       //Note that the hourglass is only displayed on Windows (it doesn't seem
       //to work on Linux)
-      BusyIndicator.showWhile(Display.getCurrent(), () -> allTourTags.forEach(tourTag -> TagManager.getTagImage(tourTag.getImageFilePath())));
+      BusyIndicator.showWhile(Display.getCurrent(), () -> allTourTags.forEach(tourTag -> TagManager.getTagImage(tourTag)));
 
       // add tag items
       for (final TourTag menuTourTag : allTourTags) {
