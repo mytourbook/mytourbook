@@ -222,7 +222,7 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
-   public static final String ID = "net.tourbook.views.TourDataEditorView"; //$NON-NLS-1$
+   public static final String  ID                         = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
    //
    private static final String GRAPH_LABEL_HEARTBEAT_UNIT = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
    private static final String VALUE_UNIT_K_CALORIES      = net.tourbook.ui.Messages.Value_Unit_KCalories;
@@ -3486,7 +3486,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       return _tk.createLabel(parent, UI.EMPTY_STRING);
    }
 
-   private void createUI_Section_110_Title(final Composite parent) {
+   private void createUI_Section_110_Tour(final Composite parent) {
 
       _sectionTitle = createSection(parent, _tk, Messages.tour_editor_section_tour, true, true);
 
@@ -3541,10 +3541,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _txtDescription = _tk.createText(
                   container,
                   UI.EMPTY_STRING,
-                  SWT.BORDER //
+                  SWT.BORDER
                         | SWT.WRAP
                         | SWT.V_SCROLL
-                        | SWT.H_SCROLL//
+                        | SWT.H_SCROLL //
             );
 
             // description will grab all vertical space in the tour tab
@@ -4875,7 +4875,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
          _tk.setBorderStyle(SWT.BORDER);
          {
-            createUI_Section_110_Title(_tourContainer);
+            createUI_Section_110_Tour(_tourContainer);
             createUI_SectionSeparator(_tourContainer);
 
             createUI_Section_120_DateTime(_tourContainer);
@@ -7569,7 +7569,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void onResizeTab1() {
 
-      _tab1Container.setMinSize(_tourContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+      _tab1Container.setRedraw(false);
+      {
+         _tab1Container.setMinSize(_tourContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+         _tab1Container.layout(true, true);
+      }
+      _tab1Container.setRedraw(true);
    }
 
    private void onSelect_Slice(final SelectionChangedEvent selectionChangedEvent) {

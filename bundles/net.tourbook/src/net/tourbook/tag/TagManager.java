@@ -547,7 +547,7 @@ public class TagManager {
    }
 
    public static TagContentLayout getTagContentLayout() {
-      
+
       return _tagContentLayout;
    }
 
@@ -968,8 +968,8 @@ public class TagManager {
                final Label label2 = new Label(container, SWT.WRAP);
                GridDataFactory.fillDefaults().grab(true, false).applyTo(label2);
 
-               label1.setBackground(net.tourbook.common.UI.SYS_COLOR_GREEN);
-               label2.setBackground(net.tourbook.common.UI.SYS_COLOR_YELLOW);
+//               label1.setBackground(net.tourbook.common.UI.SYS_COLOR_GREEN);
+//               label2.setBackground(net.tourbook.common.UI.SYS_COLOR_YELLOW);
 
                tagUIContent.container = container;
                tagUIContent.label1 = label1;
