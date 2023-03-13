@@ -76,12 +76,14 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
    private Combo     _comboTagContent;
 
+   private Label     _lblNumTagContentColumns;
    private Label     _lblTagImageSize;
    private Label     _lblTagContentWidth;
 
    private Spinner   _spinnerLatLonDigits;
-   private Spinner   _spinnerTagContentWidth;
-   private Spinner   _spinnerTagImageSize;
+   private Spinner   _spinnerTag_NumContentColumns;
+   private Spinner   _spinnerTag_ImageSize;
+   private Spinner   _spinnerTag_TextWidth;
    private Spinner   _spinnerTourDescriptionNumLines;
    private Spinner   _spinnerWeatherDescriptionNumLines;
 
@@ -297,8 +299,8 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
             .grab(true, false)
             .span(2, 1)
             .applyTo(group);
-      GridLayoutFactory.swtDefaults().numColumns(2).applyTo(group);
-//      group.setBackground(UI.SYS_COLOR_BLUE);
+      GridLayoutFactory.swtDefaults().numColumns(4).applyTo(group);
+//      group.setBackground(UI.SYS_COLOR_YELLOW);
       {
          {
             /*
@@ -314,7 +316,7 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
             _comboTagContent.setVisibleItemCount(20);
             _comboTagContent.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TagContent()));
             _comboTagContent.addFocusListener(_keepOpenListener);
-            GridDataFactory.fillDefaults().grab(true, false).applyTo(_comboTagContent);
+            GridDataFactory.fillDefaults().grab(true, false).span(3, 1).applyTo(_comboTagContent);
          }
          {
             /*
@@ -327,12 +329,38 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblTagImageSize);
 
             // spinner
-            _spinnerTagImageSize = new Spinner(group, SWT.BORDER);
-            _spinnerTagImageSize.setMinimum(TourDataEditorView.STATE_TAG_IMAGE_SIZE_MIN);
-            _spinnerTagImageSize.setMaximum(TourDataEditorView.STATE_TAG_IMAGE_SIZE_MAX);
-            _spinnerTagImageSize.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TagContent()));
-            _spinnerTagImageSize.addMouseWheelListener(mouseEvent -> {
+            _spinnerTag_ImageSize = new Spinner(group, SWT.BORDER);
+            _spinnerTag_ImageSize.setMinimum(TourDataEditorView.STATE_TAG_IMAGE_SIZE_MIN);
+            _spinnerTag_ImageSize.setMaximum(TourDataEditorView.STATE_TAG_IMAGE_SIZE_MAX);
+            _spinnerTag_ImageSize.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TagContent()));
+            _spinnerTag_ImageSize.addMouseWheelListener(mouseEvent -> {
                UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
+               onSelect_TagContent();
+            });
+            GridDataFactory.fillDefaults().grab(false, false).align(SWT.FILL, SWT.FILL).applyTo(_spinnerTag_ImageSize);
+         }
+         {
+            /*
+             * Number of tag content columns
+             */
+
+            // label
+            _lblNumTagContentColumns = new Label(group, SWT.NONE);
+            _lblNumTagContentColumns.setText(Messages.Slideout_TourEditor_Label_NumberOfTagColumns);
+            _lblNumTagContentColumns.setToolTipText(Messages.Slideout_TourEditor_Label_NumberOfTagColumns_Tooltip);
+            GridDataFactory.fillDefaults().align(SWT.TRAIL, SWT.CENTER)
+                  .grab(true, false)
+                  .indent(16, 0) // show more space between "columns"
+                  .applyTo(_lblNumTagContentColumns);
+
+            // spinner
+            _spinnerTag_NumContentColumns = new Spinner(group, SWT.BORDER);
+            _spinnerTag_NumContentColumns.setToolTipText(Messages.Slideout_TourEditor_Label_NumberOfTagColumns_Tooltip);
+            _spinnerTag_NumContentColumns.setMinimum(TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_MIN);
+            _spinnerTag_NumContentColumns.setMaximum(TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_MAX);
+            _spinnerTag_NumContentColumns.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TagContent()));
+            _spinnerTag_NumContentColumns.addMouseWheelListener(mouseEvent -> {
+               UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 1);
                onSelect_TagContent();
             });
          }
@@ -343,18 +371,19 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
             // label
             _lblTagContentWidth = new Label(group, SWT.NONE);
-            _lblTagContentWidth.setText(Messages.Slideout_TourEditor_Label_TagContentWidth);
+            _lblTagContentWidth.setText(Messages.Slideout_TourEditor_Label_TagTextWidth);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(_lblTagContentWidth);
 
             // spinner
-            _spinnerTagContentWidth = new Spinner(group, SWT.BORDER);
-            _spinnerTagContentWidth.setMinimum(TourDataEditorView.STATE_TAG_CONTENT_WIDTH_MIN);
-            _spinnerTagContentWidth.setMaximum(TourDataEditorView.STATE_TAG_CONTENT_WIDTH_MAX);
-            _spinnerTagContentWidth.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TagContent()));
-            _spinnerTagContentWidth.addMouseWheelListener(mouseEvent -> {
+            _spinnerTag_TextWidth = new Spinner(group, SWT.BORDER);
+            _spinnerTag_TextWidth.setMinimum(TourDataEditorView.STATE_TAG_TEXT_WIDTH_MIN);
+            _spinnerTag_TextWidth.setMaximum(TourDataEditorView.STATE_TAG_TEXT_WIDTH_MAX);
+            _spinnerTag_TextWidth.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelect_TagContent()));
+            _spinnerTag_TextWidth.addMouseWheelListener(mouseEvent -> {
                UI.adjustSpinnerValueOnMouseScroll(mouseEvent, 10);
                onSelect_TagContent();
             });
+            GridDataFactory.fillDefaults().grab(false, false).align(SWT.FILL, SWT.FILL).applyTo(_spinnerTag_TextWidth);
          }
       }
    }
@@ -366,13 +395,15 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       final boolean isTagContentWithImage = TagContentLayout.IMAGE_AND_DATA.equals(selectedTagContentLayout);
 
 // SET_FORMATTING_OFF
-      
-      _lblTagContentWidth        .setEnabled(isTagContentWithImage);
-      _lblTagImageSize           .setEnabled(isTagContentWithImage);
 
-      _spinnerTagContentWidth    .setEnabled(isTagContentWithImage);
-      _spinnerTagImageSize       .setEnabled(isTagContentWithImage);
-      
+      _lblNumTagContentColumns      .setEnabled(isTagContentWithImage);
+      _lblTagContentWidth           .setEnabled(isTagContentWithImage);
+      _lblTagImageSize              .setEnabled(isTagContentWithImage);
+
+      _spinnerTag_NumContentColumns .setEnabled(isTagContentWithImage);
+      _spinnerTag_TextWidth         .setEnabled(isTagContentWithImage);
+      _spinnerTag_ImageSize         .setEnabled(isTagContentWithImage);
+
 // SET_FORMATTING_ON
    }
 
@@ -462,8 +493,9 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
    private void onSelect_TagContent() {
 
-      _state.put(TourDataEditorView.STATE_TAG_CONTENT_WIDTH, _spinnerTagContentWidth.getSelection());
-      _state.put(TourDataEditorView.STATE_TAG_IMAGE_SIZE, _spinnerTagImageSize.getSelection());
+      _state.put(TourDataEditorView.STATE_TAG_TEXT_WIDTH, _spinnerTag_TextWidth.getSelection());
+      _state.put(TourDataEditorView.STATE_TAG_IMAGE_SIZE, _spinnerTag_ImageSize.getSelection());
+      _state.put(TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS, _spinnerTag_NumContentColumns.getSelection());
 
       Util.setStateEnum(_state, TourDataEditorView.STATE_TAG_CONTENT_LAYOUT, getSelectedTagContentLayout());
 
@@ -489,24 +521,25 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       final boolean isDeleteKeepTime            = TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT;
       final boolean isRecomputeElevation        = TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT;
 
-      final int tagContentWidth                 = TourDataEditorView.STATE_TAG_CONTENT_WIDTH_DEFAULT;
+      final int tagContentWidth                 = TourDataEditorView.STATE_TAG_TEXT_WIDTH_DEFAULT;
       final int tagImageSize                    = TourDataEditorView.STATE_TAG_IMAGE_SIZE_DEFAULT;
+      final int tagNumContentColumns            = TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_DEFAULT;
       final TagContentLayout tagContentLayout   = TourDataEditorView.STATE_TAG_CONTENT_LAYOUT_DEFAULT;
 
       /*
        * Update model
        */
-      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,         isDeleteKeepDistance);
-      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,             isDeleteKeepTime);
-      _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,  isRecomputeElevation);
-      _state.put(TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES,     descriptionNumberOfLines);
-      _state.put(TourDataEditorView.STATE_LAT_LON_DIGITS,                  latLonDigits);
+      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,            isDeleteKeepDistance);
+      _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,                isDeleteKeepTime);
+      _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,     isRecomputeElevation);
+      _state.put(TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES,        descriptionNumberOfLines);
+      _state.put(TourDataEditorView.STATE_LAT_LON_DIGITS,                     latLonDigits);
 
       // tags
-      _state.put(TourDataEditorView.STATE_TAG_CONTENT_WIDTH,                  tagContentWidth);
+      _state.put(TourDataEditorView.STATE_TAG_TEXT_WIDTH,                     tagContentWidth);
       _state.put(TourDataEditorView.STATE_TAG_IMAGE_SIZE,                     tagImageSize);
+      _state.put(TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS,            tagNumContentColumns);
       Util.setStateEnum(_state, TourDataEditorView.STATE_TAG_CONTENT_LAYOUT,  tagContentLayout);
-
 
       /*
        * Update UI
@@ -520,8 +553,9 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
       // tags
       _comboTagContent                    .select(getTagContentLayoutIndex(tagContentLayout));
-      _spinnerTagContentWidth             .setSelection(tagContentWidth);
-      _spinnerTagImageSize                .setSelection(tagImageSize);
+      _spinnerTag_TextWidth               .setSelection(tagContentWidth);
+      _spinnerTag_ImageSize               .setSelection(tagImageSize);
+      _spinnerTag_NumContentColumns       .setSelection(tagNumContentColumns);
 
 // SET_FORMATTING_ON
 
@@ -560,17 +594,23 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       /*
        * Tags
        */
-      _spinnerTagContentWidth.setSelection(Util.getStateInt(_state,
-            TourDataEditorView.STATE_TAG_CONTENT_WIDTH,
-            TourDataEditorView.STATE_TAG_CONTENT_WIDTH_DEFAULT,
-            TourDataEditorView.STATE_TAG_CONTENT_WIDTH_MIN,
-            TourDataEditorView.STATE_TAG_CONTENT_WIDTH_MAX));
+      _spinnerTag_TextWidth.setSelection(Util.getStateInt(_state,
+            TourDataEditorView.STATE_TAG_TEXT_WIDTH,
+            TourDataEditorView.STATE_TAG_TEXT_WIDTH_DEFAULT,
+            TourDataEditorView.STATE_TAG_TEXT_WIDTH_MIN,
+            TourDataEditorView.STATE_TAG_TEXT_WIDTH_MAX));
 
-      _spinnerTagImageSize.setSelection(Util.getStateInt(_state,
+      _spinnerTag_ImageSize.setSelection(Util.getStateInt(_state,
             TourDataEditorView.STATE_TAG_IMAGE_SIZE,
             TourDataEditorView.STATE_TAG_IMAGE_SIZE_DEFAULT,
             TourDataEditorView.STATE_TAG_IMAGE_SIZE_MIN,
             TourDataEditorView.STATE_TAG_IMAGE_SIZE_MAX));
+
+      _spinnerTag_NumContentColumns.setSelection(Util.getStateInt(_state,
+            TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS,
+            TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_DEFAULT,
+            TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_MIN,
+            TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_MAX));
 
       _comboTagContent.select(getTagContentLayoutIndex((TagContentLayout) Util.getStateEnum(_state,
             TourDataEditorView.STATE_TAG_CONTENT_LAYOUT,

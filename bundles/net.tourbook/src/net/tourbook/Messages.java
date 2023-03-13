@@ -2294,9 +2294,11 @@ public class Messages extends NLS {
    public static String        Slideout_TourEditor_Label_DeleteTimeSlices;
    public static String        Slideout_TourEditor_Label_LatLonDigits;
    public static String        Slideout_TourEditor_Label_LatLonDigits_Tooltip;
+   public static String        Slideout_TourEditor_Label_NumberOfTagColumns;
+   public static String        Slideout_TourEditor_Label_NumberOfTagColumns_Tooltip;
    public static String        Slideout_TourEditor_Label_TagContent;
-   public static String        Slideout_TourEditor_Label_TagContentWidth;
    public static String        Slideout_TourEditor_Label_TagImageSize;
+   public static String        Slideout_TourEditor_Label_TagTextWidth;
    public static String        Slideout_TourEditor_Label_Title;
    public static String        Slideout_TourEditor_Label_WeatherDescription_Height;
    public static String        Slideout_TourEditor_Label_WeatherDescription_Height_Tooltip;

@@ -180,7 +180,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -271,14 +270,18 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    public static final String            STATE_TAG_CONTENT_LAYOUT                         = "STATE_TAG_CONTENT_LAYOUT";                 //$NON-NLS-1$
    public static final TagContentLayout  STATE_TAG_CONTENT_LAYOUT_DEFAULT                 = TagContentLayout.IMAGE_AND_DATA;
-   public static final String            STATE_TAG_CONTENT_WIDTH                          = "STATE_TAG_CONTENT_WIDTH";                  //$NON-NLS-1$
-   public static final int               STATE_TAG_CONTENT_WIDTH_DEFAULT                  = 200;
-   public static final int               STATE_TAG_CONTENT_WIDTH_MIN                      = 20;
-   public static final int               STATE_TAG_CONTENT_WIDTH_MAX                      = 1000;
    public static final String            STATE_TAG_IMAGE_SIZE                             = "STATE_TAG_IMAGE_SIZE";                     //$NON-NLS-1$
    public static final int               STATE_TAG_IMAGE_SIZE_DEFAULT                     = 100;
    public static final int               STATE_TAG_IMAGE_SIZE_MIN                         = 10;
-   public static final int               STATE_TAG_IMAGE_SIZE_MAX                         = 200;
+   public static final int               STATE_TAG_IMAGE_SIZE_MAX                         = 500;
+   public static final String            STATE_TAG_TEXT_WIDTH                             = "STATE_TAG_TEXT_WIDTH";                     //$NON-NLS-1$
+   public static final int               STATE_TAG_TEXT_WIDTH_DEFAULT                     = 200;
+   public static final int               STATE_TAG_TEXT_WIDTH_MIN                         = 20;
+   public static final int               STATE_TAG_TEXT_WIDTH_MAX                         = 1000;
+   public static final String            STATE_TAG_NUM_CONTENT_COLUMNS                    = "STATE_TAG_NUM_CONTENT_COLUMNS";            //$NON-NLS-1$
+   public static final int               STATE_TAG_NUM_CONTENT_COLUMNS_DEFAULT            = 2;
+   public static final int               STATE_TAG_NUM_CONTENT_COLUMNS_MIN                = 1;
+   public static final int               STATE_TAG_NUM_CONTENT_COLUMNS_MAX                = 100;
    //
    private static final String           COLUMN_ALTITUDE                                  = "ALTITUDE_ALTITUDE";                        //$NON-NLS-1$
    private static final String           COLUMN_CADENCE                                   = "POWERTRAIN_CADENCE";                       //$NON-NLS-1$
@@ -627,7 +630,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    /*
     * Tab: Tour
     */
-   private Composite          _containerTags;
+   private Composite          _containerTags_Content;
+   private ScrolledComposite  _containerTags_Scrolled;
    private PageBook           _pageBook_Tags;
    //
    private Combo              _comboTitle;
@@ -3462,6 +3466,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _foregroundColor_Default = parent.getForeground(); // Color {170, 170, 170, 255}    with dark mode
          _backgroundColor_Default = parent.getBackground(); // Color {47, 47, 47, 255}       with dark mode
 
+         updateUI_BackgroundColor();
+
          if (IS_DARK_THEME) {
 
             _foregroundColor_1stColumn_RefTour = display.getSystemColor(SWT.COLOR_YELLOW);
@@ -3478,6 +3484,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _foregroundColor_1stColumn_NoRefTour = _foregroundColor_Default;
             _backgroundColor_1stColumn_NoRefTour = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
          }
+
       });
    }
 
@@ -3492,7 +3499,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final Composite container = (Composite) _sectionTitle.getClient();
       GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
-      container.setBackground(UI.SYS_COLOR_MAGENTA);
+//      container.setBackground(UI.SYS_COLOR_MAGENTA);
       {
          {
             /*
@@ -4775,7 +4782,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                /*
                 * Tag label/image
                 */
-               final GridDataFactory gridDataForTagContent = GridDataFactory.fillDefaults().grab(true, true)
+               final GridDataFactory gdForTagContent = GridDataFactory.fillDefaults().grab(true, true)
 
                      /*
                       * Hint is necessary that the width is not expanded when the text is long
@@ -4783,25 +4790,29 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                      .hint(2 * _hintTextColumnWidth, SWT.DEFAULT);
 
                _pageBook_Tags = new PageBook(container, SWT.NONE);
-               _pageBook_Tags.setBackground(UI.SYS_COLOR_BLUE);
-               gridDataForTagContent.grab(false, false).span(3, 1).applyTo(_pageBook_Tags);
+//               _pageBook_Tags.setBackground(UI.SYS_COLOR_BLUE);
+               gdForTagContent.grab(false, false).span(3, 1).applyTo(_pageBook_Tags);
                {
                   _lblTags = _tk.createLabel(_pageBook_Tags, UI.EMPTY_STRING, SWT.WRAP);
-                  gridDataForTagContent.applyTo(_lblTags);
+                  gdForTagContent.applyTo(_lblTags);
                }
                {
-                  _containerTags = new Composite(_pageBook_Tags, SWT.NONE);
 
-                  final RowLayout rowLayout = new RowLayout();
-                  rowLayout.marginTop = 0;
-                  rowLayout.marginBottom = 0;
-                  rowLayout.marginLeft = 0;
-                  rowLayout.marginRight = 0;
-                  rowLayout.spacing = 10;
+                  _containerTags_Scrolled = new ScrolledComposite(_pageBook_Tags, SWT.V_SCROLL | SWT.H_SCROLL);
+                  _containerTags_Scrolled.setExpandVertical(true);
+                  _containerTags_Scrolled.setExpandHorizontal(true);
 
-                  _containerTags.setLayout(rowLayout);
+                  _containerTags_Content = new Composite(_containerTags_Scrolled, SWT.NONE);
+                  _containerTags_Content.setBackground(_backgroundColor_Default);
 
-                  gridDataForTagContent.applyTo(_containerTags);
+                  _containerTags_Scrolled.setContent(_containerTags_Content);
+                  _containerTags_Scrolled.addControlListener(controlResizedAdapter(controlEvent -> onResize_TagContent()));
+
+                  GridLayoutFactory.fillDefaults()
+                        .numColumns(TagManager.getNumberOfTagContentColumns())
+                        .applyTo(_containerTags_Content);
+
+                  gdForTagContent.applyTo(_containerTags_Content);
                }
                {
                   _lblNoTags = UI.createLabel(_pageBook_Tags, UI.EMPTY_STRING);
@@ -4862,7 +4873,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       _tab1Container = new ScrolledComposite(parent, SWT.V_SCROLL | SWT.H_SCROLL);
       _tab1Container.setExpandVertical(true);
       _tab1Container.setExpandHorizontal(true);
-      _tab1Container.addControlListener(controlResizedAdapter(controlEvent -> onResizeTab1()));
+      _tab1Container.addControlListener(controlResizedAdapter(controlEvent -> onResize_Tab1()));
       {
          _tourContainer = new Composite(_tab1Container, SWT.NONE);
          GridDataFactory.fillDefaults().applyTo(_tourContainer);
@@ -7519,7 +7530,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
    private void onExpandSection() {
 
-      onResizeTab1();
+      onResize_Tab1();
 
 //    form.reflow(false);
    }
@@ -7567,14 +7578,27 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       discardModifications();
    }
 
-   private void onResizeTab1() {
+   private void onResize_Tab1() {
 
       _tab1Container.setRedraw(false);
       {
          _tab1Container.setMinSize(_tourContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
          _tab1Container.layout(true, true);
+
+         updateUI_BackgroundColor();
       }
       _tab1Container.setRedraw(true);
+   }
+
+   private void onResize_TagContent() {
+
+      if (_containerTags_Content == null || _containerTags_Content.isDisposed()) {
+         return;
+      }
+
+      final Point contentSize = _containerTags_Content.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+
+      _containerTags_Scrolled.setMinSize(contentSize);
    }
 
    private void onSelect_Slice(final SelectionChangedEvent selectionChangedEvent) {
@@ -8513,6 +8537,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 //    fTabFolder.setFocus();
 
       _page_EditorForm.setFocus();
+
+      _parent.getDisplay().asyncExec(() -> updateUI_BackgroundColor());
    }
 
    /**
@@ -8680,7 +8706,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          if (_tourData == modifiedTours.get(0)) {
 
             // tour type or tags can have been changed within this dialog
-            updateUI_TourTypeTags();
+            updateUI_TourTypeAndTags();
 
             setTourDirty();
          }
@@ -8967,6 +8993,34 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       fireTourIsModified();
    }
 
+   /**
+    * For some controls the background must be set otherwise a wrong background color is
+    * displayed
+    */
+   private void updateUI_BackgroundColor() {
+
+      if (_parent.isDisposed()) {
+         return;
+      }
+
+      _parent.setRedraw(false);
+
+// SET_FORMATTING_OFF
+
+      _containerTags_Content  .setBackground(_backgroundColor_Default);
+
+      _linkDefaultTimeZone    .setBackground(_backgroundColor_Default);
+      _linkGeoTimeZone        .setBackground(_backgroundColor_Default);
+      _linkRemoveTimeZone     .setBackground(_backgroundColor_Default);
+      _linkTag                .setBackground(_backgroundColor_Default);
+      _linkTourType           .setBackground(_backgroundColor_Default);
+      _linkWeather            .setBackground(_backgroundColor_Default);
+
+// SET_FORMATTING_ON
+
+      _parent.setRedraw(true);
+   }
+
    void updateUI_DescriptionNumLines(final int numTourDescriptionLines,
                                      final int numWeatherDescriptionLines) {
 
@@ -8987,7 +9041,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       final GridData weatherGridData = (GridData) _txtWeather.getLayoutData();
       weatherGridData.heightHint = _pc.convertHeightInCharsToPixels(weatherDescriptionNumLines);
 
-      onResizeTab1();
+      onResize_Tab1();
    }
 
    /**
@@ -9530,9 +9584,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             // show tag with image
 
-            _pageBook_Tags.showPage(_containerTags);
+            _pageBook_Tags.showPage(_containerTags_Scrolled);
 
-            TagManager.updateUI_TagsWithImage(_pc, tourTags, _containerTags);
+            TagManager.updateUI_TagsWithImage(_pc, tourTags, _containerTags_Content);
+
+            // update scrolled tag content container
+            onResize_TagContent();
 
          } else {
 
@@ -9550,7 +9607,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _pageBook_Tags.layout(true, true);
       }
 
-      onResizeTab1();
+      onResize_Tab1();
    }
 
    /**
@@ -9756,7 +9813,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
       });
    }
 
-   private void updateUI_TourTypeTags() {
+   private void updateUI_TourTypeAndTags() {
 
       // tour type/tags
       net.tourbook.ui.UI.updateUI_TourType(_tourData, _lblTourType, true);

@@ -62,8 +62,9 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.RowData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
@@ -91,8 +92,9 @@ public class TagManager {
    private static final String     PARAMETER_FOLLOWING = ", ?";      //$NON-NLS-1$
 
    private static TagContentLayout _tagContentLayout;
-   private static int              _tagContentWidth;
+   private static int              _tagNumContentColumns;
    private static int              _tagImageSize;
+   private static int              _tagTextWidth;
 
    static {
 
@@ -546,6 +548,11 @@ public class TagManager {
       return numItems;
    }
 
+   public static int getNumberOfTagContentColumns() {
+
+      return _tagNumContentColumns;
+   }
+
    public static TagContentLayout getTagContentLayout() {
 
       return _tagContentLayout;
@@ -735,25 +742,32 @@ public class TagManager {
             TourDataEditorView.STATE_TAG_CONTENT_LAYOUT,
             TourDataEditorView.STATE_TAG_CONTENT_LAYOUT_DEFAULT);
 
-      _tagContentWidth = Util.getStateInt(state,
-            TourDataEditorView.STATE_TAG_CONTENT_WIDTH,
-            TourDataEditorView.STATE_TAG_CONTENT_WIDTH_DEFAULT,
-            TourDataEditorView.STATE_TAG_CONTENT_WIDTH_MIN,
-            TourDataEditorView.STATE_TAG_CONTENT_WIDTH_MAX);
+      _tagTextWidth = Util.getStateInt(state,
+            TourDataEditorView.STATE_TAG_TEXT_WIDTH,
+            TourDataEditorView.STATE_TAG_TEXT_WIDTH_DEFAULT,
+            TourDataEditorView.STATE_TAG_TEXT_WIDTH_MIN,
+            TourDataEditorView.STATE_TAG_TEXT_WIDTH_MAX);
 
       _tagImageSize = Util.getStateInt(state,
             TourDataEditorView.STATE_TAG_IMAGE_SIZE,
             TourDataEditorView.STATE_TAG_IMAGE_SIZE_DEFAULT,
             TourDataEditorView.STATE_TAG_IMAGE_SIZE_MIN,
             TourDataEditorView.STATE_TAG_IMAGE_SIZE_MAX);
+
+      _tagNumContentColumns = Util.getStateInt(state,
+            TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS,
+            TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_DEFAULT,
+            TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_MIN,
+            TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_MAX);
    }
 
    public static void updateTagContent() {
 
       // get old values
       final TagContentLayout tagContentLayout = _tagContentLayout;
-      final int tagContentWidth = _tagContentWidth;
+      final int tagTextWidth = _tagTextWidth;
       final int tagImageSize = _tagImageSize;
+      final int tagNumContentColumns = _tagNumContentColumns;
 
       // update values from the state
       restoreTagContentValues();
@@ -761,7 +775,8 @@ public class TagManager {
       // check if values are modified
       if (tagContentLayout == _tagContentLayout
             && tagImageSize == _tagImageSize
-            && tagContentWidth == _tagContentWidth) {
+            && tagTextWidth == _tagTextWidth
+            && tagNumContentColumns == _tagNumContentColumns) {
 
          // tag content is not modified -> nothing to do
 
@@ -828,7 +843,7 @@ public class TagManager {
 
    public static void updateUI_TagsWithImage(final PixelConverter pc,
                                              final Set<TourTag> tourTags,
-                                             final Composite tourTagsContainer) {
+                                             final Composite tagContentContainer) {
 
       final int numTags = tourTags.size();
 
@@ -841,8 +856,11 @@ public class TagManager {
       // sort tags by name
       Arrays.sort(allTags);
 
+      // update number of tag content columns
+      ((GridLayout) tagContentContainer.getLayout()).numColumns = _tagNumContentColumns;
+
       // create missing tag UI container
-      updateUI_TagsWithImages_CreateUIContainer(pc, tourTagsContainer, numTags);
+      updateUI_TagsWithImages_CreateUIContainer(pc, tagContentContainer, numTags);
 
       /*
        * Check if any tag images are available
@@ -923,7 +941,7 @@ public class TagManager {
             notNeededTags.add(tagUIContent);
          }
 
-         tagUIContent.container.setBackground(net.tourbook.common.UI.SYS_COLOR_CYAN);
+//         tagUIContent.container.setBackground(net.tourbook.common.UI.SYS_COLOR_CYAN);
       }
 
       /*
@@ -944,28 +962,35 @@ public class TagManager {
     * @param tourTagsContainer
     * @param numTags
     */
-   private static void updateUI_TagsWithImages_CreateUIContainer(final PixelConverter pc, final Composite tourTagsContainer, final int numTags) {
+   private static void updateUI_TagsWithImages_CreateUIContainer(final PixelConverter pc,
+                                                                 final Composite tourTagsContainer,
+                                                                 final int numTags) {
 
       final int numMissingUIContainer = numTags - _allTagUIContainer.size();
 
       if (numMissingUIContainer > 0) {
 
-         final int tagContentWidth = _tagImageSize + _tagContentWidth;
+         final int tagContentWidth = _tagImageSize + _tagTextWidth;
 
-         final RowData rowData = new RowData(tagContentWidth, SWT.DEFAULT);
+         final Color backgroundColor = tourTagsContainer.getBackground();
+
+         final GridDataFactory gdContainer = GridDataFactory.fillDefaults().hint(tagContentWidth, SWT.DEFAULT);
 
          for (int numCreated = 0; numCreated < numMissingUIContainer; numCreated++) {
 
             final TagUIContent tagUIContent = new TagUIContent();
 
             final Composite container = new Composite(tourTagsContainer, SWT.NONE);
-            container.setLayoutData(rowData);
+            container.setBackground(backgroundColor);
+            gdContainer.applyTo(container);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
             {
                final Label label1 = new Label(container, SWT.WRAP);
+               label1.setBackground(backgroundColor);
                GridDataFactory.fillDefaults().hint(_tagImageSize, SWT.DEFAULT).applyTo(label1);
 
                final Label label2 = new Label(container, SWT.WRAP);
+               label2.setBackground(backgroundColor);
                GridDataFactory.fillDefaults().grab(true, false).applyTo(label2);
 
 //               label1.setBackground(net.tourbook.common.UI.SYS_COLOR_GREEN);
@@ -980,4 +1005,5 @@ public class TagManager {
          }
       }
    }
+
 }
