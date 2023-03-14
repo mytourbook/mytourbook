@@ -9599,12 +9599,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
             TagManager.updateUI_Tags(_tourData, _lblTags);
          }
-
-         /*
-          * .layout() is very important otherwise the tag content is sometimes not displayed
-          * depending on the image size or content width
-          */
-         _pageBook_Tags.layout(true, true);
       }
 
       onResize_Tab1();
