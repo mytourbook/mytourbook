@@ -54,7 +54,8 @@ Changes
 Bugfix
 ======
 
-* 
+* Tour Editor
+  - Fixed SQLException        https://github.com/mytourbook/mytourbook/issues/1022
 
 
 Translation    

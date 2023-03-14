@@ -468,9 +468,9 @@ public class TagManager {
 
             + "SELECT" + NL //                                                               //$NON-NLS-1$
 
-            + "jTdataTtag.TOURTAG_TAGID," + NL //                                            //$NON-NLS-1$
-            + "SUM(tourData.TOURDISTANCE) AS TOTALDISTANCE," + NL //                         //$NON-NLS-1$
-            + "SUM(tourData.TOURDEVICETIME_RECORDED) AS TOTALRECORDEDTIME" + NL //           //$NON-NLS-1$
+            + "jTdataTtag.TOURTAG_TAGID," + NL //                                      1     //$NON-NLS-1$
+            + "SUM(tourData.TOURDISTANCE) AS TOTALDISTANCE," + NL //                   2     //$NON-NLS-1$
+            + "SUM(tourData.TOURDEVICETIME_RECORDED) AS TOTALRECORDEDTIME" + NL //     3     //$NON-NLS-1$
 
             + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
             + "INNER JOIN " + TourDatabase.TABLE_TOUR_DATA + NL //                           //$NON-NLS-1$
@@ -489,8 +489,8 @@ public class TagManager {
          while (result.next()) {
 
             final long tourTagId = result.getLong(1);
-            float usedMiles = result.getInt(2);
-            final long usedHours = result.getInt(3);
+            float usedMiles = result.getLong(2);
+            final long usedHours = result.getLong(3);
 
             final StringBuilder tagAccumulatedValues = new StringBuilder();
 
