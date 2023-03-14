@@ -42,13 +42,7 @@ New
 Improvements
 ============
 
-* Tour Editor
-  - Show tag data and image optional and customize it           
-    https://github.com/mytourbook/mytourbook/issues/1015#issuecomment-1467547405
-    
-* Tag Image
-  - On Linux the tag images looked pixilated, now they are better interpolated
-    https://github.com/mytourbook/mytourbook/discussions/1020
+* 
 
 
 Changes
@@ -61,7 +55,7 @@ Bugfix
 ======
 
 * Tour Editor
-  - Fixed SQLException        https://github.com/mytourbook/mytourbook/issues/1022
+
 
 
 Translation    

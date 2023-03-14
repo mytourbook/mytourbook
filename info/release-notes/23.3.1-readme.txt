@@ -1,0 +1,21 @@
+23.3.1                                                 ?. March 2023
+
+
+Improvements
+============
+
+* Tour Editor
+  - Tag data and image are optional and can be customized
+    https://github.com/mytourbook/mytourbook/issues/1015#issuecomment-1467547405
+    
+* Tag Image
+  - On Linux the tag images looked pixilated, now they are higher interpolated
+    https://github.com/mytourbook/mytourbook/discussions/1020
+
+
+Bugfix
+======
+
+* Tour Editor
+  - Fixed SQLException        https://github.com/mytourbook/mytourbook/issues/1022
+
