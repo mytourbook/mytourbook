@@ -40,7 +40,9 @@ New
 Improvements
 ============
 
-*
+* Tour Editor
+  - Show tag data and image optional and customize it           
+    https://github.com/mytourbook/mytourbook/issues/1015#issuecomment-1467547405
 
 
 Changes
