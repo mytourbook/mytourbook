@@ -2042,19 +2042,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                MessageDialog.openWarning(activeShell,
 
-                     "Experimental Feature",
+                     "Experimental Feature", //$NON-NLS-1$
 
                      UI.EMPTY_STRING
 
-                           + "Duplicating a tour is a new experimental feature in MyTourbook 23.3" + NL
+                           + "Duplicating a tour is a new experimental feature in MyTourbook 23.3" + NL //$NON-NLS-1$
                            + NL
-                           + "Use this feature with care, mainly the duplicated tours, as it is not yet fully tested." + NL
+                           + "Use this feature with care, mainly the duplicated tours, as it is not yet fully tested." + NL //$NON-NLS-1$
                            + NL
-                           + "One issue could be that when a duplicated tour is selected then it's data are not displayed "
-                           + "because the original tour was selected before. "
-                           + "This issue happened in the flat \"Tour Book\" view and is fixed. " + NL
+                           + "One issue could be that when a duplicated tour is selected then it's data are not displayed " //$NON-NLS-1$
+                           + "because the original tour was selected before. " //$NON-NLS-1$
+                           + "This issue happened in the flat \"Tour Book\" view and is fixed. " + NL //$NON-NLS-1$
                            + NL
-                           + "There are so many possibilities in MyTourbook that not all of them are tested now."
+                           + "There are so many possibilities in MyTourbook that not all of them are tested now." //$NON-NLS-1$
 
                );
             });
@@ -8231,7 +8231,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             null,
             NLS.bind(Messages.tour_editor_dlg_save_tour_message, TourManager.getTourDateFull(_tourData)),
             MessageDialog.QUESTION,
-            new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.CANCEL_LABEL },
+            new String[] {
+                  Messages.Tour_Editor_Button_SaveTour,
+                  Messages.Tour_Editor_Button_DiscardModifications,
+                  IDialogConstants.CANCEL_LABEL },
             0)
                   .open();
 
