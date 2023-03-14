@@ -727,7 +727,13 @@ public class TagManager {
          newimageWidth = (int) Math.floor(newimageHeight * imageWidth / (imageHeight * 1f));
       }
 
-      final Image resizedImage = ImageUtils.resize(Display.getDefault(), image, newimageWidth, newimageHeight, 1, 1, rotation);
+      final Image resizedImage = ImageUtils.resize(Display.getDefault(),
+            image,
+            newimageWidth,
+            newimageHeight,
+            SWT.ON,
+            SWT.HIGH,
+            rotation);
 
       net.tourbook.common.UI.disposeResource(image);
 
