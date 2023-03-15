@@ -47,7 +47,7 @@ public class UITests {
 
       assertAll(
             () -> assertNotNull(resizedImage),
-            () -> assertEquals(70, resizedImage.getBounds().height),
-            () -> assertEquals(70, resizedImage.getBounds().width));
+            () -> assertEquals(100, resizedImage.getBounds().height),
+            () -> assertEquals(100, resizedImage.getBounds().width));
    }
 }
