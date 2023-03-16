@@ -9,8 +9,12 @@ Improvements
     https://github.com/mytourbook/mytourbook/issues/1015#issuecomment-1467547405
     
 * Tag Image
+  - Increased tag image size for 4k display
   - On Linux the tag images looked pixilated, now they are higher interpolated
     https://github.com/mytourbook/mytourbook/discussions/1020
+    
+* Tour Blog
+  - Show weather common data on a separate line
 
 
 Bugfix
