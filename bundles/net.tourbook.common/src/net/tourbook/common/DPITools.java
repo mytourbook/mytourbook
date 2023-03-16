@@ -38,8 +38,7 @@ public class DPITools {
 
       String imageName4k = imageName;
 
-      final int deviceZoom = org.eclipse.swt.internal.DPIUtil.getDeviceZoom();
-      if (deviceZoom >= 140) {
+      if (UI.IS_4K_DISPLAY) {
 
          final String imageNameWithoutExtension = imageName.substring(0, imageName.length() - PNG_EXTENSION_LENGTH);
 

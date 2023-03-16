@@ -712,6 +712,14 @@ public class TagManager {
       int newimageWidth = _tagImageSize;
       int newimageHeight = _tagImageSize;
 
+      if (UI.IS_4K_DISPLAY) {
+
+         // increase image size for 4k displays
+
+         newimageWidth *= 2.0f;
+         newimageHeight *= 2.0f;
+      }
+
       if (imageWidth > imageHeight) {
 
          /**
