@@ -54,7 +54,7 @@ import net.tourbook.common.FileSystemManager;
 import net.tourbook.common.UI;
 import net.tourbook.common.dialog.MessageDialogWithRadioOptions;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.ITourViewer3;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -2336,7 +2336,7 @@ public class RawDataManager {
       if (FileSystemManager.isFileFromTourBookFileSystem(osFilePath)) {
 
          // Delete the temporary created file
-         FilesUtils.deleteIfExists(importFile.toPath());
+         FileUtils.deleteIfExists(importFile.toPath());
       }
    }
 

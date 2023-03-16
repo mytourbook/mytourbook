@@ -46,7 +46,7 @@ import net.tourbook.cloud.oauth2.MultiPartBodyPublisher;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
@@ -217,7 +217,7 @@ public class StravaUploader extends TourbookCloudUploader {
                                             final Map<String, TourData> toursWithTimeSeries,
                                             final TourData tourData) {
 
-      final String absoluteTourFilePath = FilesUtils.createTemporaryFile(
+      final String absoluteTourFilePath = FileUtils.createTemporaryFile(
             String.valueOf(tourData.getTourId()),
             "tcx"); //$NON-NLS-1$
 
@@ -227,7 +227,7 @@ public class StravaUploader extends TourbookCloudUploader {
          toursWithTimeSeries.put(exportedTcxGzFile, tourData);
       }
 
-      FilesUtils.deleteIfExists(Paths.get(absoluteTourFilePath));
+      FileUtils.deleteIfExists(Paths.get(absoluteTourFilePath));
 
       monitor.worked(1);
    }
@@ -248,7 +248,7 @@ public class StravaUploader extends TourbookCloudUploader {
 
    private void deleteTemporaryTourFiles(final Map<String, TourData> tourFiles) {
 
-      tourFiles.keySet().forEach(tourFilePath -> FilesUtils.deleteIfExists(Paths.get(
+      tourFiles.keySet().forEach(tourFilePath -> FileUtils.deleteIfExists(Paths.get(
             tourFilePath)));
    }
 

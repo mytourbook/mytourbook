@@ -26,7 +26,7 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.data.TourData;
 
 import org.skyscreamer.jsonassert.ArrayValueMatcher;
@@ -117,7 +117,7 @@ public class Comparison {
 
       final String controlDocumentFilePath = utils.FilesUtils.getAbsoluteFilePath(controlDocumentFileName);
 
-      return FilesUtils.readFileContentString(controlDocumentFilePath);
+      return FileUtils.readFileContentString(controlDocumentFilePath);
    }
 
    public static TourData retrieveImportedTour(final Map<Long, TourData> newlyImportedTours) {
