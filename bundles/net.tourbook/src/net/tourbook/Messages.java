@@ -646,6 +646,7 @@ public class Messages extends NLS {
    public static String        Dialog_ImportConfig_Checkbox_RetrieveWeatherData_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_SaveTour;
    public static String        Dialog_ImportConfig_Checkbox_SaveTour_Tooltip;
+   public static String        Dialog_ImportConfig_Checkbox_SetElevationFromSRTM;
    public static String        Dialog_ImportConfig_Checkbox_ShowInDashboard;
    public static String        Dialog_ImportConfig_Checkbox_ShowInDashboard_Tooltip;
    public static String        Dialog_ImportConfig_Checkbox_ShowTile_CloudApps;
@@ -1115,6 +1116,10 @@ public class Messages extends NLS {
    public static String        Import_Data_HTML_RetrieveWeatherData_Yes;
    public static String        Import_Data_HTML_SaveTour_No;
    public static String        Import_Data_HTML_SaveTour_Yes;
+   public static String Import_Data_HTML_SetElevationFromSRTM_No;
+
+   public static String Import_Data_HTML_SetElevationFromSRTM_Yes;
+
    public static String        Import_Data_HTML_Title_Backup;
    public static String        Import_Data_HTML_Title_Delete;
    public static String        Import_Data_HTML_Title_Device;

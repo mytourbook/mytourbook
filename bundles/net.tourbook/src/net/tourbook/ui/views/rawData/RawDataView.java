@@ -1524,7 +1524,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final int numNotBackedUpFiles = easyConfig.notBackedUpFiles.size();
 
-            folderInfo = numNotBackedUpFiles == 0 //
+            folderInfo = numNotBackedUpFiles == 0
                   ? NLS.bind(Messages.Import_Data_HTML_AllFilesAreBackedUp, numDeviceFiles)
                   : NLS.bind(Messages.Import_Data_HTML_NotBackedUpFiles, numNotBackedUpFiles, numDeviceFiles);
 
@@ -1548,11 +1548,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final boolean isTopMargin = importConfig.isCreateBackup;
 
          final String folderTitle = Messages.Import_Data_HTML_Title_Device;
-         final String folderInfo = numNotImportedFiles == 0 //
+         final String folderInfo = numNotImportedFiles == 0
                ? NLS.bind(Messages.Import_Data_HTML_AllFilesAreImported, numAllFiles)
                : NLS.bind(Messages.Import_Data_HTML_NotImportedFiles, numNotImportedFiles, numAllFiles);
 
-         createHTML_56_FolderState(//
+         createHTML_56_FolderState(
                sb,
                htmlDeviceFolder,
                isDeviceFolderOK,
@@ -2077,6 +2077,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          sb.append(importLauncher.isReplaceFirstTimeSliceElevation
                ? Messages.Import_Data_HTML_ReplaceFirstTimeSliceElevation_Yes
                : Messages.Import_Data_HTML_ReplaceFirstTimeSliceElevation_No);
+      }
+
+      // set elevation from SRTM
+      {
+         sb.append(NL);
+
+         sb.append(importLauncher.isSetElevationFromSRTM
+               ? Messages.Import_Data_HTML_SetElevationFromSRTM_Yes
+               : Messages.Import_Data_HTML_SetElevationFromSRTM_No);
       }
 
       // retrieve weather data
