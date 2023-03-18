@@ -257,10 +257,10 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Button               _chkIC_TurnOffWatching;
    //
    private Button               _chkIL_AdjustTemperature;
+   private Button               _chkIL_ReplaceElevationFromSRTM;
    private Button               _chkIL_ReplaceFirstTimeSliceElevation;
    private Button               _chkIL_RetrieveWeatherData;
    private Button               _chkIL_SaveTour;
-   private Button               _chkIL_SetElevationFromSRTM;
    private Button               _chkIL_SetLastMarker;
    private Button               _chkIL_SetTourType;
    private Button               _chkIL_ShowInDashboard;
@@ -2365,13 +2365,13 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       /*
        * Checkbox: Set elevation up/down values from SRTM data
        */
-      _chkIL_SetElevationFromSRTM = new Button(parent, SWT.CHECK);
-      _chkIL_SetElevationFromSRTM.setText(Messages.Dialog_ImportConfig_Checkbox_SetElevationFromSRTM);
-      _chkIL_SetElevationFromSRTM.addSelectionListener(_ilSelectionListener);
+      _chkIL_ReplaceElevationFromSRTM = new Button(parent, SWT.CHECK);
+      _chkIL_ReplaceElevationFromSRTM.setText(Messages.Dialog_ImportConfig_Checkbox_ReplaceElevationFromSRTM);
+      _chkIL_ReplaceElevationFromSRTM.addSelectionListener(_ilSelectionListener);
       GridDataFactory.fillDefaults()
             .span(2, 1)
             .indent(0, 5)
-            .applyTo(_chkIL_SetElevationFromSRTM);
+            .applyTo(_chkIL_ReplaceElevationFromSRTM);
    }
 
    private void createUI_595_IL_RetrieveWeatherData(final Composite parent) {
@@ -3946,7 +3946,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       _selectedIL.isReplaceFirstTimeSliceElevation    = _chkIL_ReplaceFirstTimeSliceElevation.getSelection();
       _selectedIL.isRetrieveWeatherData               = _chkIL_RetrieveWeatherData.getSelection();
       _selectedIL.isSaveTour                          = _chkIL_SaveTour.getSelection();
-      _selectedIL.isSetElevationFromSRTM              = _chkIL_SetElevationFromSRTM.getSelection();
+      _selectedIL.isReplaceElevationFromSRTM          = _chkIL_ReplaceElevationFromSRTM.getSelection();
       _selectedIL.isSetTourType                       = _chkIL_SetTourType.getSelection();
       _selectedIL.isShowInDashboard                   = _chkIL_ShowInDashboard.getSelection();
 
@@ -4680,7 +4680,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          _chkIL_ReplaceFirstTimeSliceElevation.setSelection(_selectedIL.isReplaceFirstTimeSliceElevation);
 
          // set elevation from SRTM data
-         _chkIL_SetElevationFromSRTM.setSelection(_selectedIL.isSetElevationFromSRTM);
+         _chkIL_ReplaceElevationFromSRTM.setSelection(_selectedIL.isReplaceElevationFromSRTM);
 
          final Enum<TourTypeConfig> tourTypeConfig = _selectedIL.tourTypeConfig;
          final boolean isSetTourType = tourTypeConfig != null && _selectedIL.isSetTourType;

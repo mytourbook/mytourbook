@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -34,7 +34,7 @@ import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.data.AltitudeUpDown;
+import net.tourbook.data.ElevationGainLoss;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
@@ -656,7 +656,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final int currentMarkerIndex = getCurrentMarkerIndex(cell);
 
-            final AltitudeUpDown elevationGainLoss = _tourData.computeAltitudeUpDown(previousMarkerIndex, currentMarkerIndex);
+            final ElevationGainLoss elevationGainLoss = _tourData.computeAltitudeUpDown(previousMarkerIndex, currentMarkerIndex);
 
             if (elevationGainLoss == null) {
                cell.setText(UI.EMPTY_STRING);
@@ -683,7 +683,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final int currentMarkerIndex = getCurrentMarkerIndex(cell);
 
-            final AltitudeUpDown elevationGainLoss = _tourData.computeAltitudeUpDown(
+            final ElevationGainLoss elevationGainLoss = _tourData.computeAltitudeUpDown(
                   previousMarkerIndex,
                   currentMarkerIndex);
 
