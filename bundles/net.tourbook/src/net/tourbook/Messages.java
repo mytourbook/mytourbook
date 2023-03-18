@@ -2309,6 +2309,8 @@ public class Messages extends NLS {
    public static String        Slideout_TourEditor_Label_Title;
    public static String        Slideout_TourEditor_Label_WeatherDescription_Height;
    public static String        Slideout_TourEditor_Label_WeatherDescription_Height_Tooltip;
+   public static String        Slideout_TourEditor_Radio_ElevationFromDevice;
+   public static String        Slideout_TourEditor_Radio_ElevationFromSRTM;
 
    public static String        Slideout_TourFilter_Action_ActivateAll;
    public static String        Slideout_TourFilter_Action_ActivateAll_Tooltip;
@@ -2760,6 +2762,8 @@ public class Messages extends NLS {
    public static String        tour_data_label_feature_since_version_9_01;
    public static String        tour_data_label_manually_created_tour;
    public static String        Tour_Data_LoadTourData_Monitor;
+   public static String        Tour_Data_LogInfo_SRTM_DataAreNotAvailable;
+   public static String        Tour_Data_LogInfo_SRTM_UsingDeviceElevationValues;
    public static String        Tour_Data_SaveTour_Monitor;
    public static String        Tour_Data_SaveTour_MonitorSubtask;
    public static String        Tour_Data_Text_AltitudeValues;

@@ -74,6 +74,9 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
    private Button    _chkDelete_KeepTime;
    private Button    _chkRecomputeElevation;
 
+   private Button    _rdoElevationDeviceValues;
+   private Button    _rdoElevationSRTMValues;
+
    private Combo     _comboTagContent;
 
    private Label     _lblNumTagContentColumns;
@@ -288,6 +291,27 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
          _chkRecomputeElevation.setToolTipText(Messages.Slideout_TourEditor_Checkbox_RecomputeElevationUpDown_Tooltip);
          _chkRecomputeElevation.addSelectionListener(_defaultSelectionListener);
          GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkRecomputeElevation);
+
+         final Composite elevationContainer = new Composite(parent, SWT.NONE);
+         GridDataFactory.fillDefaults()
+               .grab(true, false)
+               .indent(16, 0)
+               .applyTo(elevationContainer);
+         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(elevationContainer);
+         {
+            {
+               // radio: Device values
+               _rdoElevationDeviceValues = new Button(elevationContainer, SWT.RADIO);
+               _rdoElevationDeviceValues.setText(Messages.Slideout_TourEditor_Radio_ElevationFromDevice);
+               _rdoElevationDeviceValues.addSelectionListener(_defaultSelectionListener);
+            }
+            {
+               // radio: SRTM values
+               _rdoElevationSRTMValues = new Button(elevationContainer, SWT.RADIO);
+               _rdoElevationSRTMValues.setText(Messages.Slideout_TourEditor_Radio_ElevationFromSRTM);
+               _rdoElevationSRTMValues.addSelectionListener(_defaultSelectionListener);
+            }
+         }
       }
    }
 
@@ -392,13 +416,17 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
       final TagContentLayout selectedTagContentLayout = getSelectedTagContentLayout();
 
-      final boolean isTagContentWithImage = TagContentLayout.IMAGE_AND_DATA.equals(selectedTagContentLayout);
-
 // SET_FORMATTING_OFF
+
+      final boolean isTagContentWithImage = TagContentLayout.IMAGE_AND_DATA.equals(selectedTagContentLayout);
+      final boolean isRecomputeElevation  = _chkRecomputeElevation.getSelection();
 
       _lblNumTagContentColumns      .setEnabled(isTagContentWithImage);
       _lblTagContentWidth           .setEnabled(isTagContentWithImage);
       _lblTagImageSize              .setEnabled(isTagContentWithImage);
+
+      _rdoElevationDeviceValues     .setEnabled(isRecomputeElevation);
+      _rdoElevationSRTMValues       .setEnabled(isRecomputeElevation);
 
       _spinnerTag_NumContentColumns .setEnabled(isTagContentWithImage);
       _spinnerTag_TextWidth         .setEnabled(isTagContentWithImage);
@@ -468,6 +496,8 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
    private void onChangeUI() {
 
+      enableControls();
+
       saveState();
    }
 
@@ -519,6 +549,7 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
       final boolean isDeleteKeepDistance        = TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT;
       final boolean isDeleteKeepTime            = TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT;
+      final boolean isElevationFromSRTM         = TourDataEditorView.STATE_IS_ELEVATION_FROM_SRTM_DEFAULT;
       final boolean isRecomputeElevation        = TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT;
 
       final int tagContentWidth                 = TourDataEditorView.STATE_TAG_TEXT_WIDTH_DEFAULT;
@@ -531,6 +562,7 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
        */
       _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,            isDeleteKeepDistance);
       _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,                isDeleteKeepTime);
+      _state.put(TourDataEditorView.STATE_IS_ELEVATION_FROM_SRTM,             isElevationFromSRTM);
       _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,     isRecomputeElevation);
       _state.put(TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES,        descriptionNumberOfLines);
       _state.put(TourDataEditorView.STATE_LAT_LON_DIGITS,                     latLonDigits);
@@ -547,6 +579,8 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _chkDelete_KeepDistance             .setSelection(isDeleteKeepDistance);
       _chkDelete_KeepTime                 .setSelection(isDeleteKeepTime);
       _chkRecomputeElevation              .setSelection(isRecomputeElevation);
+      _rdoElevationDeviceValues           .setSelection( ! isElevationFromSRTM); // This warning "Comparing identical expressions" is displayed when comparing with "== false"
+      _rdoElevationSRTMValues             .setSelection(isElevationFromSRTM);
       _spinnerLatLonDigits                .setSelection(latLonDigits);
       _spinnerTourDescriptionNumLines     .setSelection(descriptionNumberOfLines);
       _spinnerWeatherDescriptionNumLines  .setSelection(weatherDescriptionNumberOfLines);
@@ -563,9 +597,18 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _tourEditorView.updateUI_LatLonDigits(latLonDigits);
 
       TagManager.updateTagContent();
+
+      enableControls();
    }
 
    private void restoreState() {
+
+      final boolean isElevationFromSRTM = Util.getStateBoolean(_state,
+            TourDataEditorView.STATE_IS_ELEVATION_FROM_SRTM,
+            TourDataEditorView.STATE_IS_ELEVATION_FROM_SRTM_DEFAULT);
+
+      _rdoElevationDeviceValues.setSelection(isElevationFromSRTM == false);
+      _rdoElevationSRTMValues.setSelection(isElevationFromSRTM);
 
       _chkDelete_KeepDistance.setSelection(Util.getStateBoolean(_state,
             TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,
@@ -624,6 +667,8 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,         _chkDelete_KeepDistance.getSelection());
       _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,             _chkDelete_KeepTime.getSelection());
       _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,  _chkRecomputeElevation.getSelection());
+
+      _state.put(TourDataEditorView.STATE_IS_ELEVATION_FROM_SRTM,          _rdoElevationSRTMValues.getSelection());
 
 // SET_FORMATTING_ON
 

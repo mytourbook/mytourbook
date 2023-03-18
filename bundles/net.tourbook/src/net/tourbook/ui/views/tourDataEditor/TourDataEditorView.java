@@ -261,6 +261,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    static final boolean                  STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT            = false;
    static final String                   STATE_IS_DELETE_KEEP_TIME                        = "STATE_IS_DELETE_KEEP_TIME";                //$NON-NLS-1$
    static final boolean                  STATE_IS_DELETE_KEEP_TIME_DEFAULT                = false;
+   static final String                   STATE_IS_ELEVATION_FROM_SRTM                     = "STATE_IS_ELEVATION_FROM_SRTM";             //$NON-NLS-1$
+   static final boolean                  STATE_IS_ELEVATION_FROM_SRTM_DEFAULT             = false;
    static final String                   STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN             = "STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN";     //$NON-NLS-1$
    static final boolean                  STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT     = true;
    static final String                   STATE_LAT_LON_DIGITS                             = "STATE_LAT_LON_DIGITS";                     //$NON-NLS-1$
@@ -4988,12 +4990,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          if (keyEvent.keyCode == SWT.DEL) {
 
             final boolean isKeepDistance = Util.getStateBoolean(_state,
-                  TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,
-                  TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT);
+                  STATE_IS_DELETE_KEEP_DISTANCE,
+                  STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT);
 
             final boolean isKeepTime = Util.getStateBoolean(_state,
-                  TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,
-                  TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT);
+                  STATE_IS_DELETE_KEEP_TIME,
+                  STATE_IS_DELETE_KEEP_TIME_DEFAULT);
 
             final boolean isRemoveDistance = isKeepDistance == false;
             final boolean isRemoveTime = isKeepTime == false;
@@ -8268,15 +8270,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private boolean saveTourIntoDB() {
 
       final boolean isRecomputeElevation = Util.getStateBoolean(_state,
-            TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,
-            TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT);
+            STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,
+            STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT);
+
+      final boolean isElevationFromSRTM = Util.getStateBoolean(_state,
+            STATE_IS_ELEVATION_FROM_SRTM,
+            STATE_IS_ELEVATION_FROM_SRTM_DEFAULT);
 
       _isSavingInProgress = true;
       {
          updateModel_FromUI();
 
          if (isRecomputeElevation) {
-            _tourData.computeAltitudeUpDown();
+            _tourData.computeAltitudeUpDown(isElevationFromSRTM);
          }
 
          _tourData.computeTourMovingTime();

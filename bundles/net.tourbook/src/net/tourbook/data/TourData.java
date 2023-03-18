@@ -98,6 +98,7 @@ import net.tourbook.srtm.GeoLon;
 import net.tourbook.srtm.NumberForm;
 import net.tourbook.tour.BreakTimeResult;
 import net.tourbook.tour.BreakTimeTool;
+import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoManager;
@@ -2633,11 +2634,59 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    public boolean computeAltitudeUpDown() {
 
-      if (altitudeSerie == null) {
+      return computeAltitudeUpDown(false);
+   }
+
+   public ElevationGainLoss computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
+                                                  final float selectedMinAltiDiff) {
+
+      return computeAltitudeUpDown_30_Algorithm_9_08(segmentSerieIndexParameter, selectedMinAltiDiff);
+   }
+
+   /**
+    * Computes and sets the elevation up/down values into {@link TourData}
+    *
+    * @param isElevationFromSRTM
+    *           When <code>true</code> then SRTM elevation values are used otherwise the device
+    *           elevation values
+    * @return Returns <code>true</code> when altitude was computed otherwise <code>false</code>
+    */
+   public boolean computeAltitudeUpDown(final boolean isElevationFromSRTM) {
+
+      float[] elevationSerie;
+
+      if (isElevationFromSRTM) {
+
+         elevationSerie = getSRTMSerie(true);
+
+         if (elevationSerie == null) {
+
+            TourLogManager.showLogView();
+
+            TourLogManager.log_INFO(String.format(
+                  Messages.Tour_Data_LogInfo_SRTM_DataAreNotAvailable,
+                  TourManager.getTourDateShort(this)));
+
+            if (altitudeSerie != null && altitudeSerie.length > 0) {
+
+               TourLogManager.subLog_INFO(String.format(
+                     Messages.Tour_Data_LogInfo_SRTM_UsingDeviceElevationValues,
+                     TourManager.getTourDateShort(this)));
+
+               elevationSerie = altitudeSerie;
+            }
+         }
+
+      } else {
+
+         elevationSerie = altitudeSerie;
+      }
+
+      if (elevationSerie == null) {
          return false;
       }
 
-      final ElevationGainLoss altiUpDown = computeAltitudeUpDown(0, altitudeSerie.length - 1);
+      final ElevationGainLoss altiUpDown = computeAltitudeUpDown(0, elevationSerie.length - 1);
 
       if (altiUpDown != null) {
          setTourAltUp(altiUpDown.elevationGain);
@@ -2645,12 +2694,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
 
       return altiUpDown != null;
-   }
-
-   public ElevationGainLoss computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
-                                                  final float selectedMinAltiDiff) {
-
-      return computeAltitudeUpDown_30_Algorithm_9_08(segmentSerieIndexParameter, selectedMinAltiDiff);
    }
 
    /**
@@ -2994,7 +3037,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     *         available
     */
    public ElevationGainLoss computeAltitudeUpDown_FromSRTM() {
-      // TODO Auto-generated method stub
 
       final float[] srtmSerie = getSRTMSerie(true);
 
