@@ -141,29 +141,38 @@ public class WeatherUtils {
     * Returns the weather data as a human readable string, depending on the
     * desired data.
     * Example: ☀ Sunny, 19°C, max. 26°C, min. 10°C, feels like 19°C, 6km/h from SSE, 34% humidity
+    *
+    * @param tourData
+    * @param isDisplayMinimumTemperature
+    * @param isDisplayMaximumTemperature
+    * @param isDisplayPressure
+    * @param isWeatherDataSeparatorNewLine
+    * @return
     */
    public static String buildWeatherDataString(final TourData tourData,
-                                               final boolean displayMinimumTemperature,
-                                               final boolean displayMaximumTemperature,
-                                               final boolean displayPressure) {
+                                               final boolean isDisplayMinimumTemperature,
+                                               final boolean isDisplayMaximumTemperature,
+                                               final boolean isDisplayPressure,
+                                               final boolean isWeatherDataSeparatorNewLine) {
 
-      final List<String> weatherDataList = new ArrayList<>();
+      final List<String> weatherHourValues = new ArrayList<>();
+      final List<String> weatherAvgValues = new ArrayList<>();
 
       // Icon
       final String weatherIcon = getWeatherIcon(tourData.getWeatherIndex());
       if (StringUtils.hasContent(weatherIcon)) {
 
-         weatherDataList.add(weatherIcon.trim());
+         weatherHourValues.add(weatherIcon.trim());
       }
 
       // Description
       final String weatherText = tourData.getWeather();
       if (StringUtils.hasContent(weatherText)) {
 
-         if (weatherDataList.size() == 1) {
-            weatherDataList.set(0, weatherDataList.get(0) + UI.SPACE + weatherText);
+         if (weatherHourValues.size() == 1) {
+            weatherHourValues.set(0, weatherHourValues.get(0) + UI.SPACE + weatherText);
          } else {
-            weatherDataList.add(weatherText);
+            weatherHourValues.add(weatherText);
          }
       }
 
@@ -172,41 +181,39 @@ public class WeatherUtils {
          // Average temperature
          final float averageTemperature = tourData.getWeather_Temperature_Average();
          if (averageTemperature != Float.MIN_VALUE) {
-            weatherDataList.add(FormatManager.formatTemperature(UI.convertTemperatureFromMetric(averageTemperature)) +
-                  UI.UNIT_LABEL_TEMPERATURE);
-         }
 
-         // Maximum temperature
-         if (displayMaximumTemperature) {
-
-            weatherDataList.add(
-                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max +
-                        UI.SPACE +
-                        FormatManager.formatTemperature(
-                              UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max())) +
-                        UI.UNIT_LABEL_TEMPERATURE);
+            weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Avg
+                  + UI.SPACE
+                  + FormatManager.formatTemperature(UI.convertTemperatureFromMetric(averageTemperature))
+                  + UI.UNIT_LABEL_TEMPERATURE);
          }
 
          // Minimum temperature
-         if (displayMinimumTemperature) {
+         if (isDisplayMinimumTemperature) {
 
-            weatherDataList.add(
-                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min +
-                        UI.SPACE +
-                        FormatManager.formatTemperature(
-                              UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min())) +
-                        UI.UNIT_LABEL_TEMPERATURE);
+            weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min
+                  + UI.SPACE
+                  + FormatManager.formatTemperature(UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min()))
+                  + UI.UNIT_LABEL_TEMPERATURE);
+         }
+
+         // Maximum temperature
+         if (isDisplayMaximumTemperature) {
+
+            weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max
+                  + UI.SPACE
+                  + FormatManager.formatTemperature(UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max()))
+                  + UI.UNIT_LABEL_TEMPERATURE);
          }
 
          // Wind chill
          final float temperatureWindChill = tourData.getWeather_Temperature_WindChill();
          if (temperatureWindChill != Float.MIN_VALUE) {
 
-            weatherDataList.add(
-                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike +
-                        UI.SPACE +
-                        FormatManager.formatTemperature(UI.convertTemperatureFromMetric(temperatureWindChill)) +
-                        UI.UNIT_LABEL_TEMPERATURE);
+            weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_FeelsLike
+                  + UI.SPACE
+                  + FormatManager.formatTemperature(UI.convertTemperatureFromMetric(temperatureWindChill))
+                  + UI.UNIT_LABEL_TEMPERATURE);
          }
       }
 
@@ -214,58 +221,70 @@ public class WeatherUtils {
       final int windSpeed = tourData.getWeather_Wind_Speed();
       if (windSpeed > 0) {
 
-         final String windDirection = tourData.getWeather_Wind_Direction() != -1
-               ? UI.SPACE +
-                     Messages.Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection +
-                     UI.SPACE +
-                     getWindDirectionText(tourData.getWeather_Wind_Direction())
+         final int weather_Wind_Direction = tourData.getWeather_Wind_Direction();
+
+         final String windDirection = weather_Wind_Direction != -1
+               ? UI.SPACE
+                     + Messages.Log_HistoricalWeatherRetriever_001_WeatherData_WindDirection
+                     + UI.SPACE
+                     + getWindDirectionText(weather_Wind_Direction)
                : UI.EMPTY_STRING;
-         weatherDataList.add(Math.round(UI.convertSpeed_FromMetric(windSpeed)) +
-               UI.UNIT_LABEL_SPEED +
-               windDirection);
+
+         weatherAvgValues.add(Math.round(UI.convertSpeed_FromMetric(windSpeed))
+               + UI.UNIT_LABEL_SPEED
+               + windDirection);
       }
 
       // Humidity
       final float humidity = tourData.getWeather_Humidity();
       if (humidity > 0) {
 
-         weatherDataList.add((int) humidity +
-               UI.SYMBOL_PERCENTAGE +
-               UI.SPACE +
-               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Humidity);
+         weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Humidity
+               + UI.SPACE
+               + (int) humidity
+               + UI.SYMBOL_PERCENTAGE);
       }
 
       // Pressure
       final float weatherPressure = tourData.getWeather_Pressure();
-      if (weatherPressure > 0 && displayPressure) {
+      if (weatherPressure > 0 && isDisplayPressure) {
 
-         weatherDataList.add(roundDoubleToFloat(weatherPressure) +
-               UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG +
-               UI.SPACE +
-               Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Pressure);
+         weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Pressure
+               + UI.SPACE
+               + roundDoubleToFloat(weatherPressure)
+               + UI.UNIT_LABEL_PRESSURE_MBAR_OR_INHG);
       }
 
       // Precipitation
       final float precipitation = tourData.getWeather_Precipitation();
       if (precipitation > 0) {
 
-         weatherDataList.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation +
-               UI.SPACE +
-               roundDoubleToFloat(UI.convertPrecipitation_FromMetric(precipitation)) +
-               UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+         weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation
+               + UI.SPACE
+               + roundDoubleToFloat(UI.convertPrecipitation_FromMetric(precipitation))
+               + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       }
 
       // Snowfall
       final float snowfall = tourData.getWeather_Snowfall();
       if (snowfall > 0) {
 
-         weatherDataList.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall +
-               UI.SPACE +
-               roundDoubleToFloat(UI.convertPrecipitation_FromMetric(snowfall)) +
-               UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
+         weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Snowfall
+               + UI.SPACE
+               + roundDoubleToFloat(UI.convertPrecipitation_FromMetric(snowfall))
+               + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
       }
 
-      final String weatherData = String.join(UI.COMMA_SPACE, weatherDataList);
+      final String weatherHourValuesJoined = String.join(UI.COMMA_SPACE, weatherHourValues);
+      final String weatherAvgValuesJoined = String.join(UI.COMMA_SPACE, weatherAvgValues);
+
+      final String weatherDataSeparator = isWeatherDataSeparatorNewLine ? UI.NEW_LINE1 : UI.COMMA_SPACE;
+
+      final String weatherData = weatherHourValuesJoined
+
+            + (weatherAvgValuesJoined.length() == 0
+                  ? UI.EMPTY_STRING
+                  : weatherDataSeparator + weatherAvgValuesJoined);
 
       return weatherData;
    }

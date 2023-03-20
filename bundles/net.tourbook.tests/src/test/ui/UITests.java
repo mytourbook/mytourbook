@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import net.tourbook.ui.UI;
+import net.tourbook.tag.TagManager;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -43,11 +43,11 @@ public class UITests {
             () -> assertEquals(256, originalImage.getBounds().height),
             () -> assertEquals(256, originalImage.getBounds().width));
 
-      final Image resizedImage = UI.prepareTagImage(imageFilePath);
+      final Image resizedImage = TagManager.prepareTagImage(imageFilePath);
 
       assertAll(
             () -> assertNotNull(resizedImage),
-            () -> assertEquals(70, resizedImage.getBounds().height),
-            () -> assertEquals(70, resizedImage.getBounds().width));
+            () -> assertEquals(100, resizedImage.getBounds().height),
+            () -> assertEquals(100, resizedImage.getBounds().width));
    }
 }

@@ -43,6 +43,7 @@ import net.tourbook.data.TourWayPoint;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.ITourProvider2;
@@ -1606,10 +1607,15 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       long joinedTourTypeId = TourDatabase.ENTITY_IS_NOT_SAVED;
 
       if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_FROM_SELECTED_TOURS)) {
+
          joinedTourTypeId = _tourTypeIdFromSelectedTours;
+
       } else if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_PREVIOUS_JOINED_TOUR)) {
+
          joinedTourTypeId = _tourTypeIdPreviousJoinedTour;
+
       } else if (stateTourTypeSource.equals(STATE_TYPE_SOURCE_CUSTOM)) {
+
          joinedTourTypeId = _tourTypeIdCustom;
       }
 
@@ -1629,7 +1635,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
             firstTourStart.getMonthValue() - 1,
             firstTourStart.getDayOfMonth());
 
-      _dtTourTime.setTime(//
+      _dtTourTime.setTime(
             firstTourStart.getHour(),
             firstTourStart.getMinute(),
             firstTourStart.getSecond());
@@ -1822,15 +1828,20 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
       _cboTourMarker.setItems(markerItems);
 
       if (isRestoreState) {
+
          // restore from state
-         Util.selectStateInCombo(//
+
+         Util.selectStateInCombo(
                _state,
                STATE_MARKER_TYPE,
                ALL_STATES_TOUR_MARKER,
                STATE_MARKER_TYPE_SMALL,
                _cboTourMarker);
+
       } else {
+
          // restore selection
+
          _cboTourMarker.select(selectedMarkerIndex);
       }
    }
@@ -1839,7 +1850,7 @@ public class DialogJoinTours extends TitleAreaDialog implements ITourProvider2 {
 
       // tour type/tags
       net.tourbook.ui.UI.updateUI_TourType(_joinedTourData, _lblTourType, true);
-      net.tourbook.ui.UI.updateUI_Tags(_joinedTourData, _lblTourTags);
+      TagManager.updateUI_Tags(_joinedTourData, _lblTourTags);
 
       // reflow layout that the tags are aligned correctly
       _dlgInnerContainer.layout(true);

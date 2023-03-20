@@ -43,6 +43,7 @@ import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
@@ -151,7 +152,9 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
       public ActionTourTag(final TourTag tourTag) {
 
          super(tourTag.getTagName(), AS_CHECK_BOX);
-         final var tagImage = TagMenuManager.getTagImage(tourTag.getImageFilePath());
+
+         final Image tagImage = TagManager.getTagImage(tourTag);
+
          if (tagImage != null) {
             setImageDescriptor(ImageDescriptor.createFromImage(tagImage));
          }
@@ -305,7 +308,7 @@ class Action_AddTourTag_SubMenu extends Action implements IMenuCreator, IAdvance
       //Preload the tag images
       //Note that the hourglass is only displayed on Windows (it doesn't seem
       //to work on Linux)
-      BusyIndicator.showWhile(Display.getCurrent(), () -> allTourTags.forEach(tourTag -> TagMenuManager.getTagImage(tourTag.getImageFilePath())));
+      BusyIndicator.showWhile(Display.getCurrent(), () -> allTourTags.forEach(tourTag -> TagManager.getTagImage(tourTag)));
 
       // add tag items
       for (final TourTag menuTourTag : allTourTags) {

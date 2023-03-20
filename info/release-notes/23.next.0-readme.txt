@@ -6,6 +6,8 @@ TODO's
 
 * Tour Editor     - Change wording for save dialog actions -> Save, Discard, Cancel + dialog text
                     net.tourbook.ui.views.tourDataEditor.TourDataEditorView.saveTourConfirmation()
+                    
+                  - Size tag image for 4k display
 
 
 * FileUtils/FilesUtils     Merge these files
@@ -40,7 +42,7 @@ New
 Improvements
 ============
 
-*
+* 
 
 
 Changes
@@ -52,7 +54,8 @@ Changes
 Bugfix
 ======
 
-* 
+* Tour Editor
+
 
 
 Translation    
