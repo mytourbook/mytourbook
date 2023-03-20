@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import net.tourbook.Messages;
 
+import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -38,10 +39,10 @@ public class PrefPageTagsTests extends UITest {
 
       //Create a new tag
       bot.button(Messages.pref_tourtag_btn_new_tag).click();
-      final String newTagName = "New Tag";
+      final String newTagName = "New Tag"; //$NON-NLS-1$
       bot.textWithLabel(Messages.pref_tourtag_dlg_new_tag_message).setText(newTagName);
       Utils.clickOkButton(bot);
-      final var newTag = bot.tree(1).getTreeItem(newTagName).select();
+      final SWTBotTreeItem newTag = bot.tree(1).getTreeItem(newTagName).select();
       assertNotNull(newTag);
 
       //assert that there are 2 tags
