@@ -58,8 +58,6 @@
   "startMonth" : 5,
   "startPulse" : 0,
   "startSecond" : 0,
-  "startWeek" : 19,
-  "startWeekYear" : 2006,
   "startYear" : 2006,
   "temperatureSerie" : [ 24.0, 24.0, 24.0, 24.0 ],
   "timeSerie" : [ 0, 0, 20, 35 ],
