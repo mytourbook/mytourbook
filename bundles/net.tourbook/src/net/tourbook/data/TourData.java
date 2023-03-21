@@ -263,31 +263,37 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * year of tour start
     */
+   @JsonProperty
    private short                 startYear;
 
    /**
     * mm (d) month of tour
     */
+   @JsonProperty
    private short                 startMonth;
 
    /**
     * dd (d) day of tour
     */
+   @JsonProperty
    private short                 startDay;
 
    /**
     * HH (d) hour of tour
     */
+   @JsonProperty
    private short                 startHour;
 
    /**
     * MM (d) minute of tour
     */
+   @JsonProperty
    private short                 startMinute;
 
    /**
     *
     */
+   @JsonProperty
    private int                   startSecond;                                          // db-version 7
 
    /**
