@@ -237,6 +237,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * Unique entity id which identifies the tour
     */
    @Id
+   @JsonProperty
    private Long                  tourId;
 
    // ############################################# DATE #############################################

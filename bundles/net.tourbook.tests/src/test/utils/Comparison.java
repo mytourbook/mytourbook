@@ -65,7 +65,8 @@ public class Comparison {
       final CustomComparator customArrayValueComparator = new CustomComparator(
             JSONCompareMode.STRICT,
             new Customization("tourMarkers", tourMarkersValueMatcher), //$NON-NLS-1$
-            new Customization("tourType.createId", (o1, o2) -> true)); //$NON-NLS-1$
+            new Customization("tourType.createId", (o1, o2) -> true), //$NON-NLS-1$
+            new Customization("tourId", (o1, o2) -> true)); //$NON-NLS-1$
 
       final String controlDocument = readFileContent(controlFileName + JSON);
 
