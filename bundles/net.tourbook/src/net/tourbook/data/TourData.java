@@ -237,7 +237,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * Unique entity id which identifies the tour
     */
    @Id
-   @JsonProperty
    private Long                  tourId;
 
    // ############################################# DATE #############################################
@@ -263,37 +262,31 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * year of tour start
     */
-   @JsonProperty
    private short                 startYear;
 
    /**
     * mm (d) month of tour
     */
-   @JsonProperty
    private short                 startMonth;
 
    /**
     * dd (d) day of tour
     */
-   @JsonProperty
    private short                 startDay;
 
    /**
     * HH (d) hour of tour
     */
-   @JsonProperty
    private short                 startHour;
 
    /**
     * MM (d) minute of tour
     */
-   @JsonProperty
    private short                 startMinute;
 
    /**
     *
     */
-   @JsonProperty
    private int                   startSecond;                                          // db-version 7
 
    /**
@@ -301,7 +294,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * <p>
     * This is used in sql queries.
     */
-   @JsonProperty
    private short                 startWeek;
 
    /**
@@ -310,7 +302,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * <p>
     * This is used in sql queries.
     */
-   @JsonProperty
    private short                 startWeekYear;
 
    // ############################################# TIME #############################################
