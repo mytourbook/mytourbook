@@ -42,7 +42,6 @@ public abstract class DeviceDataReaderTester {
 
       // Set the default timezone in order for the imported tour times to be
       // identical regardless of the machine's timezone on which the tests are run
-
       TimeTools.setDefaultTimeZone(UI.TIME_ZONE_UTC);
    }
 
