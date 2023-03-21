@@ -151,7 +151,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public static final int               DB_LENGTH_TIME_ZONE_ID            = 255;
 
    public static final int               DB_LENGTH_WEATHER                 = 1000;
-   public static final int               DB_LENGTH_WEATHER_AIRQUALITY      = 255;
    public static final int               DB_LENGTH_WEATHER_V48             = 32000;
    public static final int               DB_LENGTH_WEATHER_CLOUDS          = 255;
 
