@@ -299,7 +299,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    private static final boolean          IS_LINUX                                         = UI.IS_LINUX;
    private static final boolean          IS_OSX                                           = UI.IS_OSX;
-   private static final boolean          IS_DARK_THEME                                    = UI.isDarkTheme();
+   private static final boolean          IS_DARK_THEME                                    = UI.IS_DARK_THEME;
    /**
     * this width is used as a hint for the width of the description field, this value also
     * influences the width of the columns in this editor
@@ -4803,7 +4803,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   _containerTags_Scrolled.setExpandHorizontal(true);
 
                   _containerTags_Content = new Composite(_containerTags_Scrolled, SWT.NONE);
-                  _containerTags_Content.setBackground(_backgroundColor_Default);
 
                   _containerTags_Scrolled.setContent(_containerTags_Content);
                   _containerTags_Scrolled.addControlListener(controlResizedAdapter(controlEvent -> onResize_TagContent()));
@@ -9007,16 +9006,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
 // SET_FORMATTING_OFF
 
-      _containerTags_Content  .setBackground(_backgroundColor_Default);
+      if (IS_DARK_THEME) {
 
-      _linkDefaultTimeZone    .setBackground(_backgroundColor_Default);
-      _linkGeoTimeZone        .setBackground(_backgroundColor_Default);
-      _linkRemoveTimeZone     .setBackground(_backgroundColor_Default);
-      _linkTag                .setBackground(_backgroundColor_Default);
-      _linkTourType           .setBackground(_backgroundColor_Default);
-      _linkWeather            .setBackground(_backgroundColor_Default);
+         _linkDefaultTimeZone    .setBackground(_backgroundColor_Default);
+         _linkGeoTimeZone        .setBackground(_backgroundColor_Default);
+         _linkRemoveTimeZone     .setBackground(_backgroundColor_Default);
+         _linkTag                .setBackground(_backgroundColor_Default);
+         _linkTourType           .setBackground(_backgroundColor_Default);
+         _linkWeather            .setBackground(_backgroundColor_Default);
+      }
 
 // SET_FORMATTING_ON
+
+      _containerTags_Content.setBackground(_backgroundColor_Default);
+
+//    _containerTags_Content.setBackground(UI.SYS_COLOR_BLUE);
 
       _parent.setRedraw(true);
    }

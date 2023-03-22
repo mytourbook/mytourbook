@@ -1000,13 +1000,14 @@ public class TagManager {
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
             {
                final Label label1 = new Label(container, SWT.WRAP);
-               label1.setBackground(backgroundColor);
+//               label1.setBackground(backgroundColor);
                GridDataFactory.fillDefaults().hint(_tagImageSize, SWT.DEFAULT).applyTo(label1);
 
                final Label label2 = new Label(container, SWT.WRAP);
-               label2.setBackground(backgroundColor);
+//               label2.setBackground(backgroundColor);
                GridDataFactory.fillDefaults().grab(true, false).applyTo(label2);
 
+//               container.setBackground(net.tourbook.common.UI.SYS_COLOR_RED);
 //               label1.setBackground(net.tourbook.common.UI.SYS_COLOR_GREEN);
 //               label2.setBackground(net.tourbook.common.UI.SYS_COLOR_YELLOW);
 
