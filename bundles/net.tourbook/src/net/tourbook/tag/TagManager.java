@@ -1012,15 +1012,9 @@ public class TagManager {
                tagUIContent.label2 = label2;
             }
 
-            /*
-             * Very complicated, it depends on OS and theme
-             */
-            if (UI.IS_WIN) {
-
-               container.setBackground(backgroundColor);
-               label1.setBackground(backgroundColor);
-               label2.setBackground(backgroundColor);
-            }
+            container.setBackground(backgroundColor);
+            label1.setBackground(backgroundColor);
+            label2.setBackground(backgroundColor);
 
 //            container.setBackground(net.tourbook.common.UI.SYS_COLOR_RED);
 //            label1.setBackground(net.tourbook.common.UI.SYS_COLOR_GREEN);
