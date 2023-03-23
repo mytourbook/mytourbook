@@ -2197,7 +2197,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
          if (easyConfig.isShowTile_CloudApps) {
 
-            for (final var cloudDownloader : _cloudDownloadersList) {
+            for (final TourbookCloudDownloader cloudDownloader : _cloudDownloadersList) {
 
                createHTML_92_TileAction(
                      sb,

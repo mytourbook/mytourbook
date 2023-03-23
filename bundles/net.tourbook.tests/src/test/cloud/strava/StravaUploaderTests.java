@@ -136,7 +136,7 @@ public class StravaUploaderTests {
                   "Authorization", //$NON-NLS-1$
                   OAuth2Constants.BEARER + "8888888888888888888888888888888888888888") //$NON-NLS-1$
             .withBody(equalTo(
-                  "{\"distance\":10,\"trainer\":\"0\",\"start_date_local\":\"2022-01-03T17:16:00Z[UTC]\",\"name\":\"Manual Tour ⛅\",\"elapsed_time\":3600,\"description\":\"⛅ Partly cloudy, -1°C, feels like -6°C, 18km/h from W, 78% humidity, precipitation 3.0mm, snowfall 1.3mm\",\"type\":\"Run\"}")) //$NON-NLS-1$
+                  "{\"distance\":10,\"trainer\":\"0\",\"start_date_local\":\"2022-01-03T17:16:00Z[UTC]\",\"name\":\"Manual Tour ⛅\",\"elapsed_time\":3600,\"description\":\"⛅ Partly cloudy, avg. -1°C, feels like -6°C, 18km/h from W, humidity 78%, precipitation 3.0mm, snowfall 1.3mm\",\"type\":\"Run\"}")) //$NON-NLS-1$
             .called();
 
       final List<?> logs = TourLogManager.getLogs();

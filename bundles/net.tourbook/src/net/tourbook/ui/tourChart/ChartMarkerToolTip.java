@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -362,7 +362,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
          valueIndex = _hoveredTourMarker.getSerieIndex();
       }
 
-      final var index = _tourData.getTourMarkersSorted().indexOf(_hoveredTourMarker);
+      final int index = _tourData.getTourMarkersSorted().indexOf(_hoveredTourMarker);
       TourMarker previousTourMarker = null;
       if (index > 0) {
          previousTourMarker = _tourData.getTourMarkersSorted().get(index - 1);
