@@ -361,6 +361,16 @@ public class TourChartView extends ViewPart implements
                   clearView();
                }
 
+            } else if (eventId == TourEventId.TAG_STRUCTURE_CHANGED) {
+
+               /*
+                * A tag was saved, when this view was hidden and then unhidden, it can cause an
+                * error in the tour editor to be out of sync
+                */
+
+               clearView();
+               showTour();
+
             } else if ((eventId == TourEventId.TOUR_SELECTION
                   || eventId == TourEventId.SLIDER_POSITION_CHANGED)
 
