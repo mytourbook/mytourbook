@@ -15,11 +15,16 @@ Improvements
     
 * Tour Blog
   - Show weather common data on a separate line
+    https://github.com/mytourbook/mytourbook/commit/9670c325e46c018f487ef739cddcb01ca78b5514#r104670740
 
 
 Bugfix
 ======
 
 * Tour Editor
-  - Fixed SQLException        https://github.com/mytourbook/mytourbook/issues/1022
+  - Fixed SQLException        
+    https://github.com/mytourbook/mytourbook/issues/1022
+  - Fixed the never ending "Our of sync error" in one more case
+    https://github.com/mytourbook/mytourbook/issues/1035
+    
 
