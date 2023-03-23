@@ -272,6 +272,11 @@ public class UI {
    public static boolean       IS_DARK_THEME;
 
    /**
+    * Is <code>true</code> when the bright theme in the UI is selected
+    */
+   public static boolean       IS_BRIGHT_THEME;
+
+   /**
     * Is <code>true</code> when a 4k display is used
     */
    public static boolean       IS_4K_DISPLAY                  = DPIUtil.getDeviceZoom() >= 140;
@@ -2514,6 +2519,7 @@ public class UI {
    public static void setIsDarkTheme(final boolean isDarkThemeSelected) {
 
       IS_DARK_THEME = isDarkThemeSelected;
+      IS_BRIGHT_THEME = isDarkThemeSelected == false;
    }
 
    /**

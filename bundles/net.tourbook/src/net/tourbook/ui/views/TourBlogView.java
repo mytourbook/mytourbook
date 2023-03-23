@@ -411,9 +411,16 @@ public class TourBlogView extends ViewPart {
 
    private void create_24_Tour(final StringBuilder sb) {
 
+      final boolean isSaveWeatherLogInWeatherDescription = _prefStore.getBoolean(ITourbookPreferences.WEATHER_SAVE_LOG_IN_TOUR_WEATHER_DESCRIPTION);
+
       String tourTitle = _tourData.getTourTitle();
       String tourDescription = _tourData.getTourDescription();
-      String tourWeather = WeatherUtils.buildWeatherDataString(_tourData, true, true, true, true);
+      String tourWeather = WeatherUtils.buildWeatherDataString(_tourData,
+            true, // isDisplayMinimumTemperature
+            true, // isDisplayMaximumTemperature
+            true, // isDisplayPressure
+            isSaveWeatherLogInWeatherDescription // isWeatherDataSeparatorNewLine
+      );
 
       final boolean isDescription = tourDescription.length() > 0;
       final boolean isTitle = tourTitle.length() > 0;
