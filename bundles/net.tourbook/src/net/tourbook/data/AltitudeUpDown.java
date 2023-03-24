@@ -15,12 +15,16 @@
  *******************************************************************************/
 package net.tourbook.data;
 
-public class ElevationGainLoss {
+import net.tourbook.common.UI;
 
-   public float elevationGain;
-   public float elevationLoss;
+public class AltitudeUpDown {
 
-   public ElevationGainLoss(final float elevationGain, final float elevationLoss) {
+   private static final String NL = UI.NEW_LINE1;
+
+   public float                elevationGain;
+   public float                elevationLoss;
+
+   public AltitudeUpDown(final float elevationGain, final float elevationLoss) {
 
       this.elevationGain = elevationGain;
       this.elevationLoss = elevationLoss;
@@ -32,6 +36,20 @@ public class ElevationGainLoss {
 
    public float getAltitudeUp() {
       return elevationGain;
+   }
+
+   @Override
+   public String toString() {
+
+      return "" //                                             //$NON-NLS-1$
+            + "ElevationGainLoss" + NL //                      //$NON-NLS-1$
+
+            + "[" + NL //                                      //$NON-NLS-1$
+
+            + "  elevationGain=" + elevationGain + NL //       //$NON-NLS-1$
+            + "  elevationLoss=" + elevationLoss + NL //       //$NON-NLS-1$
+
+            + "]"; //$NON-NLS-1$
    }
 
 }

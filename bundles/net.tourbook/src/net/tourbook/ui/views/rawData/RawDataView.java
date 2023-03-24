@@ -76,7 +76,7 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.ElevationGainLoss;
+import net.tourbook.data.AltitudeUpDown;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
@@ -5109,7 +5109,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final int oldElevationUp = tourData.getTourAltUp();
          final int oldElevationDown = tourData.getTourAltDown();
 
-         final ElevationGainLoss elevationUpDown = tourData.computeAltitudeUpDown_FromSRTM();
+         final AltitudeUpDown elevationUpDown = tourData.computeAltitudeUpDown_FromSRTM();
 
          if (elevationUpDown == null) {
 

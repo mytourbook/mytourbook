@@ -2297,6 +2297,8 @@ public class Messages extends NLS {
    public static String        Slideout_TourEditor_Checkbox_KeepTime_Tooltip;
    public static String        Slideout_TourEditor_Checkbox_RecomputeElevationUpDown;
    public static String        Slideout_TourEditor_Checkbox_RecomputeElevationUpDown_Tooltip;
+   public static String        Slideout_TourEditor_Combo_ElevationFromDevice;
+   public static String        Slideout_TourEditor_Combo_ElevationFromSRTM;
    public static String        Slideout_TourEditor_Group_Tags;
    public static String        Slideout_TourEditor_Label_DeleteTimeSlices;
    public static String        Slideout_TourEditor_Label_LatLonDigits;
@@ -2309,9 +2311,6 @@ public class Messages extends NLS {
    public static String        Slideout_TourEditor_Label_Title;
    public static String        Slideout_TourEditor_Label_WeatherDescription_Height;
    public static String        Slideout_TourEditor_Label_WeatherDescription_Height_Tooltip;
-   public static String        Slideout_TourEditor_Radio_ElevationFromDevice;
-   public static String        Slideout_TourEditor_Radio_ElevationFromSRTM;
-
    public static String        Slideout_TourFilter_Action_ActivateAll;
    public static String        Slideout_TourFilter_Action_ActivateAll_Tooltip;
    public static String        Slideout_TourFilter_Action_AddProfile;
