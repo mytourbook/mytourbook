@@ -992,28 +992,33 @@ public class TagManager {
 
          for (int numCreated = 0; numCreated < numMissingUIContainer; numCreated++) {
 
+            Label label1;
+            Label label2;
+
             final TagUIContent tagUIContent = new TagUIContent();
 
             final Composite container = new Composite(tourTagsContainer, SWT.NONE);
-            container.setBackground(backgroundColor);
             gdContainer.applyTo(container);
             GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
             {
-               final Label label1 = new Label(container, SWT.WRAP);
-               label1.setBackground(backgroundColor);
+               label1 = new Label(container, SWT.WRAP);
                GridDataFactory.fillDefaults().hint(_tagImageSize, SWT.DEFAULT).applyTo(label1);
 
-               final Label label2 = new Label(container, SWT.WRAP);
-               label2.setBackground(backgroundColor);
+               label2 = new Label(container, SWT.WRAP);
                GridDataFactory.fillDefaults().grab(true, false).applyTo(label2);
-
-//               label1.setBackground(net.tourbook.common.UI.SYS_COLOR_GREEN);
-//               label2.setBackground(net.tourbook.common.UI.SYS_COLOR_YELLOW);
 
                tagUIContent.container = container;
                tagUIContent.label1 = label1;
                tagUIContent.label2 = label2;
             }
+
+            container.setBackground(backgroundColor);
+            label1.setBackground(backgroundColor);
+            label2.setBackground(backgroundColor);
+
+//            container.setBackground(net.tourbook.common.UI.SYS_COLOR_RED);
+//            label1.setBackground(net.tourbook.common.UI.SYS_COLOR_GREEN);
+//            label2.setBackground(net.tourbook.common.UI.SYS_COLOR_YELLOW);
 
             _allTagUIContainer.add(tagUIContent);
          }

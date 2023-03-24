@@ -1,4 +1,4 @@
-23.3.1                                                 ?. March 2023
+23.3.1                                                 24. March 2023
 
 
 Improvements
@@ -15,11 +15,20 @@ Improvements
     
 * Tour Blog
   - Show weather common data on a separate line
+    https://github.com/mytourbook/mytourbook/commit/9670c325e46c018f487ef739cddcb01ca78b5514#r104670740
 
 
 Bugfix
 ======
 
 * Tour Editor
-  - Fixed SQLException        https://github.com/mytourbook/mytourbook/issues/1022
+  - Fixed SQLException        
+    https://github.com/mytourbook/mytourbook/issues/1022
+  - Fixed the never ending "Our of sync error" in one more case
+    https://github.com/mytourbook/mytourbook/issues/1035
+    
 
+System   
+======
+
+* MyTourbook Milestone 23.3.1             https://github.com/mytourbook/mytourbook/milestone/9?closed=1

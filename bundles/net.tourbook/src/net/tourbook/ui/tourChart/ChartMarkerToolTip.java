@@ -362,7 +362,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
          valueIndex = _hoveredTourMarker.getSerieIndex();
       }
 
-      final var index = _tourData.getTourMarkersSorted().indexOf(_hoveredTourMarker);
+      final int index = _tourData.getTourMarkersSorted().indexOf(_hoveredTourMarker);
       TourMarker previousTourMarker = null;
       if (index > 0) {
          previousTourMarker = _tourData.getTourMarkersSorted().get(index - 1);

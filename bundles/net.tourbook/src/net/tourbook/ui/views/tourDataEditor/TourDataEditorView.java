@@ -301,7 +301,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    //
    private static final boolean          IS_LINUX                                         = UI.IS_LINUX;
    private static final boolean          IS_OSX                                           = UI.IS_OSX;
-   private static final boolean          IS_DARK_THEME                                    = UI.isDarkTheme();
+   private static final boolean          IS_DARK_THEME                                    = UI.IS_DARK_THEME;
    /**
     * this width is used as a hint for the width of the description field, this value also
     * influences the width of the columns in this editor
@@ -3435,7 +3435,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final Composite formBody = _page_EditorForm.getBody();
       GridLayoutFactory.fillDefaults().applyTo(formBody);
-      formBody.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+      formBody.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
       _tabFolder = new CTabFolder(formBody, SWT.FLAT | SWT.BOTTOM);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(_tabFolder);
@@ -3456,8 +3456,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          _tab_30_SwimSlices.setControl(createUI_Tab_30_SwimSlices(_tabFolder));
       }
 
-      _foregroundColor_Default = parent.getForeground(); // Color {0, 0, 0, 255}
-      _backgroundColor_Default = parent.getBackground(); // Color {41, 41, 41, 255}
+      _foregroundColor_Default = formBody.getForeground(); // Color {0, 0, 0, 255}
+      _backgroundColor_Default = formBody.getBackground(); // Color {41, 41, 41, 255}
 
       display.asyncExec(() -> {
 
@@ -3465,8 +3465,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             return;
          }
 
-         _foregroundColor_Default = parent.getForeground(); // Color {170, 170, 170, 255}    with dark mode
-         _backgroundColor_Default = parent.getBackground(); // Color {47, 47, 47, 255}       with dark mode
+         _foregroundColor_Default = formBody.getForeground(); // Color {170, 170, 170, 255}    with dark mode
+         _backgroundColor_Default = formBody.getBackground(); // Color {47, 47, 47, 255}       with dark mode
 
          updateUI_BackgroundColor();
 
@@ -4805,7 +4805,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
                   _containerTags_Scrolled.setExpandHorizontal(true);
 
                   _containerTags_Content = new Composite(_containerTags_Scrolled, SWT.NONE);
-                  _containerTags_Content.setBackground(_backgroundColor_Default);
 
                   _containerTags_Scrolled.setContent(_containerTags_Content);
                   _containerTags_Scrolled.addControlListener(controlResizedAdapter(controlEvent -> onResize_TagContent()));
@@ -9016,16 +9015,21 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
 // SET_FORMATTING_OFF
 
-      _containerTags_Content  .setBackground(_backgroundColor_Default);
+      if (IS_DARK_THEME) {
 
-      _linkDefaultTimeZone    .setBackground(_backgroundColor_Default);
-      _linkGeoTimeZone        .setBackground(_backgroundColor_Default);
-      _linkRemoveTimeZone     .setBackground(_backgroundColor_Default);
-      _linkTag                .setBackground(_backgroundColor_Default);
-      _linkTourType           .setBackground(_backgroundColor_Default);
-      _linkWeather            .setBackground(_backgroundColor_Default);
+         _linkDefaultTimeZone    .setBackground(_backgroundColor_Default);
+         _linkGeoTimeZone        .setBackground(_backgroundColor_Default);
+         _linkRemoveTimeZone     .setBackground(_backgroundColor_Default);
+         _linkTag                .setBackground(_backgroundColor_Default);
+         _linkTourType           .setBackground(_backgroundColor_Default);
+         _linkWeather            .setBackground(_backgroundColor_Default);
+      }
 
 // SET_FORMATTING_ON
+
+      _containerTags_Content.setBackground(_backgroundColor_Default);
+
+//    _containerTags_Content.setBackground(UI.SYS_COLOR_BLUE);
 
       _parent.setRedraw(true);
    }
