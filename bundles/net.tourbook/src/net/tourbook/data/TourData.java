@@ -652,6 +652,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private float                 power_TrainingStressScore;
    @JsonProperty
    private float                 power_IntensityFactor;
+
    @JsonProperty
    private int                   power_PedalLeftRightBalance;
    @JsonProperty
@@ -921,6 +922,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    @SuppressWarnings("unused")
    private float                    deviceAvgSpeed;                     // db-version 12
+
    @SuppressWarnings("unused")
    private int                      deviceDistance;
 
@@ -1812,7 +1814,6 @@ private Set<TourTag>                tourTags                            = new Ha
    @Transient
    private float[]      _runDyn_VerticalOscillation_UI;
    @Transient
-
    private float[]      _runDyn_VerticalOscillation_UI_Imperial;
 
    @Transient
