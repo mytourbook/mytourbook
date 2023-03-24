@@ -46,6 +46,7 @@ import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.proxy.DefaultProxySelector;
 import net.tourbook.proxy.IPreferences;
 import net.tourbook.search.FTSearchManager;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tour.TourTypeFilterManager;
@@ -430,7 +431,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       // do last cleanup, this dispose causes NPE in e4 when run in dispose() method
 
-      TagMenuManager.dispose();
+      TagManager.disposeTagImages();
       TourTypeImage.dispose();
    }
 
@@ -508,7 +509,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       // must be initialized early to set photoServiceProvider in the Photo
       TourPhotoManager.restoreState();
-      
+
       ModelPlayerManager.restoreState();
 
       FormatManager.updateDisplayFormats();

@@ -89,6 +89,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.graphics.TextLayout;
+import org.eclipse.swt.internal.DPIUtil;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -271,25 +272,35 @@ public class UI {
    public static boolean       IS_DARK_THEME;
 
    /**
+    * Is <code>true</code> when the bright theme in the UI is selected
+    */
+   public static boolean       IS_BRIGHT_THEME;
+
+   /**
+    * Is <code>true</code> when a 4k display is used
+    */
+   public static boolean       IS_4K_DISPLAY                  = DPIUtil.getDeviceZoom() >= 140;
+
+   /**
     * On Linux an async selection event is fired since e4
     */
-   public static final String  FIX_LINUX_ASYNC_EVENT_1        = "FIX_LINUX_ASYNC_EVENT_1";   //$NON-NLS-1$
-   public static final String  FIX_LINUX_ASYNC_EVENT_2        = "FIX_LINUX_ASYNC_EVENT_2";   //$NON-NLS-1$
+   public static final String  FIX_LINUX_ASYNC_EVENT_1        = "FIX_LINUX_ASYNC_EVENT_1";     //$NON-NLS-1$
+   public static final String  FIX_LINUX_ASYNC_EVENT_2        = "FIX_LINUX_ASYNC_EVENT_2";     //$NON-NLS-1$
 
-   public static final String  BROWSER_TYPE_MOZILLA           = "mozilla";                   //$NON-NLS-1$
+   public static final String  BROWSER_TYPE_MOZILLA           = "mozilla";                     //$NON-NLS-1$
 
-   public static final String  TIME_ZONE_UTC                  = "UTC";                       //$NON-NLS-1$
+   public static final String  TIME_ZONE_UTC                  = "UTC";                         //$NON-NLS-1$
 
-   public static final String  UTF_8                          = "UTF-8";                     //$NON-NLS-1$
-   public static final String  UTF_16                         = "UTF-16";                    //$NON-NLS-1$
-   public static final String  ISO_8859_1                     = "ISO-8859-1";                //$NON-NLS-1$
+   public static final String  UTF_8                          = "UTF-8";                       //$NON-NLS-1$
+   public static final String  UTF_16                         = "UTF-16";                      //$NON-NLS-1$
+   public static final String  ISO_8859_1                     = "ISO-8859-1";                  //$NON-NLS-1$
 
    public static final Charset UTF8_CHARSET                   = Charset.forName(UTF_8);
 
-   public static final String  MENU_SEPARATOR_ADDITIONS       = "additions";                 //$NON-NLS-1$
+   public static final String  MENU_SEPARATOR_ADDITIONS       = "additions";                   //$NON-NLS-1$
 
-   private static final String NUMBER_FORMAT_1F               = "%.1f";                      //$NON-NLS-1$
-   private static final String SUB_TASK_PROGRESS              = "{0} / {1} - {2} % - {3} Δ"; //$NON-NLS-1$
+   private static final String NUMBER_FORMAT_1F               = "%.1f";                        //$NON-NLS-1$
+   private static final String SUB_TASK_PROGRESS              = "{0} / {1} - {2} % - {3} Δ";   //$NON-NLS-1$
 
    /**
     * Layout hint for a description field
@@ -2508,6 +2519,7 @@ public class UI {
    public static void setIsDarkTheme(final boolean isDarkThemeSelected) {
 
       IS_DARK_THEME = isDarkThemeSelected;
+      IS_BRIGHT_THEME = isDarkThemeSelected == false;
    }
 
    /**

@@ -47,6 +47,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
 import net.tourbook.statistic.StatisticView;
+import net.tourbook.tag.TagManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.action.ActionTourToolTip_EditQuick;
@@ -1644,7 +1645,7 @@ public class TourInfoUI {
        * Tags
        */
       if (_hasTags) {
-         net.tourbook.ui.UI.updateUI_Tags(_tourData, _lblTourTags_Value, true);
+         TagManager.updateUI_Tags(_tourData, _lblTourTags_Value, true);
       }
       showHideControl(_lblTourTags, _hasTags);
       showHideControl(_lblTourTags_Value, _hasTags);

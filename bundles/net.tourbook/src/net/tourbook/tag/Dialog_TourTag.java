@@ -157,9 +157,12 @@ public class Dialog_TourTag extends TitleAreaDialog {
       final Composite container = new Composite(parent, SWT.NONE);
       GridDataFactory.fillDefaults().grab(true, true).applyTo(container);
       GridLayoutFactory.swtDefaults().numColumns(4).applyTo(container);
+//    container.setBackground(UI.SYS_COLOR_CYAN);
       {
          {
-            // Text: Name
+            /*
+             * Text: Name
+             */
 
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Dialog_TourTag_Label_TagName);
@@ -169,18 +172,22 @@ public class Dialog_TourTag extends TitleAreaDialog {
             GridDataFactory.fillDefaults().span(3, 1).grab(true, false).applyTo(_txtName);
          }
          {
-            // Text: Image File Path
+            /*
+             * Label: Tag image
+             */
+            final int tagImageSize = TagManager.getTagImageSize();
+
             final Label label = UI.createLabel(container, UI.EMPTY_STRING);
             label.setText(Messages.Dialog_TourTag_Label_Image);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
 
             _canvasTagImage = new Label(container, SWT.NONE);
-            GridDataFactory.fillDefaults()//
-                  .hint(_pc.convertWidthInCharsToPixels(12), _pc.convertWidthInCharsToPixels(12))
+            GridDataFactory.fillDefaults()
+                  .hint(tagImageSize, tagImageSize)
                   .applyTo(_canvasTagImage);
 
             final Composite imageContainer = new Composite(container, SWT.NONE);
-            GridDataFactory.fillDefaults()//
+            GridDataFactory.fillDefaults()
                   .span(2, 1)
                   .align(SWT.RIGHT, SWT.TOP)
                   .applyTo(imageContainer);
@@ -188,21 +195,19 @@ public class Dialog_TourTag extends TitleAreaDialog {
             {
                final Button btnSelectImage = new Button(imageContainer, SWT.PUSH);
                btnSelectImage.setText(Messages.app_btn_browse);
-               btnSelectImage.addSelectionListener(widgetSelectedAdapter(
-                     selectionEvent -> onSelectImage()));
-               GridDataFactory.fillDefaults()
-                     .applyTo(btnSelectImage);
+               btnSelectImage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onSelectImage()));
+               GridDataFactory.fillDefaults().applyTo(btnSelectImage);
 
                _btnDeleteImage = new Button(imageContainer, SWT.PUSH);
                _btnDeleteImage.setImage(_imageTrash);
-               _btnDeleteImage.addSelectionListener(widgetSelectedAdapter(
-                     selectionEvent -> onDeleteImage()));
-               GridDataFactory.fillDefaults()
-                     .applyTo(_btnDeleteImage);
+               _btnDeleteImage.addSelectionListener(widgetSelectedAdapter(selectionEvent -> onDeleteImage()));
+               GridDataFactory.fillDefaults().applyTo(_btnDeleteImage);
             }
          }
          {
-            // Text: Notes
+            /*
+             * Text: Notes
+             */
             final Label label = new Label(container, SWT.NONE);
             label.setText(Messages.Dialog_TourTag_Label_Notes);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(label);
@@ -305,6 +310,7 @@ public class Dialog_TourTag extends TitleAreaDialog {
       _txtName.setText(_tourTag_Clone.getTagName());
       _txtNotes.setText(_tourTag_Clone.getNotes());
       _imageFilePath = _tourTag_Clone.getImageFilePath();
+
       setTagImage(_imageFilePath);
    }
 
@@ -328,16 +334,17 @@ public class Dialog_TourTag extends TitleAreaDialog {
             setErrorMessage(NLS.bind(
                   Messages.Dialog_TourTag_Label_ImageNotFound,
                   imageFilePath));
+
          } else {
 
             _imageFilePath = imageFilePath;
+
             BusyIndicator.showWhile(Display.getCurrent(),
-                  () -> image[0] = net.tourbook.ui.UI.prepareTagImage(_imageFilePath));
+                  () -> image[0] = TagManager.prepareTagImage(_imageFilePath));
          }
       }
 
-      //Before setting a new image, we make sure that the previous one was
-      //disposed
+      //Before setting a new image, we make sure that the previous one was disposed
       disposeCanvasTagImage();
 
       _canvasTagImage.setImage(image[0]);

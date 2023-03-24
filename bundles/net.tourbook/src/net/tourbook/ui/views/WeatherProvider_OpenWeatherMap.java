@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
+class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
 
    private static final String URL_OPENWEATHERMAP_ORG = "https://openweathermap.org/";//$NON-NLS-1$
 
@@ -73,7 +73,7 @@ public class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
          btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
          btnTestConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
-            final var previousHour = Instant
+            final long previousHour = Instant
                   .now()
                   .minus(1, ChronoUnit.HOURS)
                   .toEpochMilli() / 1000;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -87,6 +87,11 @@ public enum TourEventId {
    TAG_STRUCTURE_CHANGED,
 
    /**
+    * Tag content has changed, e.g. tag image size
+    */
+   TAG_CONTENT_CHANGED,
+
+   /**
     * Sliders in the tour chart moved. Property data contains {@link SelectionChartInfo} or
     * {@link SelectionChartXSliderPosition} with the position of the sliders.
     */
@@ -144,4 +149,5 @@ public enum TourEventId {
     * {@link Selection_StatisticValues}.
     */
    STATISTIC_VALUES,
+
 }

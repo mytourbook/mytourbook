@@ -15,53 +15,121 @@
  *******************************************************************************/
 package net.tourbook.tag;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import net.tourbook.Messages;
+import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.util.SQL;
 import net.tourbook.common.util.StatusUtil;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.TourData;
 import net.tourbook.data.TourTag;
 import net.tourbook.database.TourDatabase;
+import net.tourbook.photo.ImageUtils;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tag.tour.filter.TourTagFilterProfile;
 import net.tourbook.tour.TourEventId;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
-import net.tourbook.ui.UI;
+import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 
+import org.apache.commons.imaging.ImageReadException;
+import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.common.ImageMetadata;
+import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
+import org.apache.commons.imaging.formats.tiff.TiffField;
+import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.osgi.util.NLS;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.imgscalr.Scalr.Rotation;
 
-/**
- */
 public class TagManager {
 
-   private static final String     NL                  = UI.NEW_LINE;
+   private static final char       NL                  = UI.NEW_LINE;
 
    protected static final String[] EXPAND_TYPE_NAMES   = {
+
          Messages.app_action_expand_type_flat,
          Messages.app_action_expand_type_year_day,
-         Messages.app_action_expand_type_year_month_day };
+         Messages.app_action_expand_type_year_month_day
+   };
 
    protected static final int[]    EXPAND_TYPES        = {
+
          TourTag.EXPAND_TYPE_FLAT,
          TourTag.EXPAND_TYPE_YEAR_DAY,
-         TourTag.EXPAND_TYPE_YEAR_MONTH_DAY };
+         TourTag.EXPAND_TYPE_YEAR_MONTH_DAY
+   };
 
    private static final String     PARAMETER_FIRST     = "?";        //$NON-NLS-1$
    private static final String     PARAMETER_FOLLOWING = ", ?";      //$NON-NLS-1$
+
+   private static TagContentLayout _tagContentLayout;
+   private static int              _tagNumContentColumns;
+   private static int              _tagImageSize;
+   private static int              _tagTextWidth;
+
+   static {
+
+      restoreTagContentValues();
+   }
+
+   private static final Map<String, Image>      _tagImagesCache        = new HashMap<>();
+
+   private static final ArrayList<TagUIContent> _allTagUIContainer     = new ArrayList<>();
+
+   public static final TagContentLayoutItem[]   ALL_TAG_CONTENT_LAYOUT = {
+
+         new TagContentLayoutItem(Messages.Tag_ContentLayout_SimpleText, TagContentLayout.SIMPLE_TEXT),
+         new TagContentLayoutItem(Messages.Tag_ContentLayout_ImageAndData, TagContentLayout.IMAGE_AND_DATA),
+   };
+
+   public static class TagContentLayoutItem {
+
+      public String           label;
+      public TagContentLayout tagContentLayout;
+
+      public TagContentLayoutItem(final String label, final TagContentLayout legendUnitLayout) {
+
+         this.label = label;
+         this.tagContentLayout = legendUnitLayout;
+      }
+   }
+
+   private static class TagUIContent {
+
+      Composite container;
+
+      Label     label1;
+      Label     label2;
+   }
 
    private static boolean canDeleteTourTagCategory(final long categoryId, final String categoryName) {
 
@@ -110,7 +178,7 @@ public class TagManager {
          return true;
 
       } catch (final SQLException e) {
-         UI.showSQLException(e);
+         net.tourbook.ui.UI.showSQLException(e);
       }
 
       return false;
@@ -256,7 +324,7 @@ public class TagManager {
 
       } catch (final SQLException e) {
 
-         UI.showSQLException(e);
+         net.tourbook.ui.UI.showSQLException(e);
 
       } finally {
 
@@ -335,8 +403,8 @@ public class TagManager {
 
          // remove category from TOURTAGCATEGORY
          sql = "DELETE" //                                                                      //$NON-NLS-1$
-               + " FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY //                       //$NON-NLS-1$
-               + " WHERE " + TourDatabase.ENTITY_ID_TAG_CATEGORY + "=?"; //               //$NON-NLS-1$ //$NON-NLS-2$
+               + " FROM " + TourDatabase.TABLE_TOUR_TAG_CATEGORY //                             //$NON-NLS-1$
+               + " WHERE " + TourDatabase.ENTITY_ID_TAG_CATEGORY + "=?"; //                     //$NON-NLS-1$ //$NON-NLS-2$
          prepStmt_TagCategory = conn.prepareStatement(sql);
 
          int[] returnValue_CategoryCategory;
@@ -366,7 +434,7 @@ public class TagManager {
 
       } catch (final SQLException e) {
 
-         UI.showSQLException(e);
+         net.tourbook.ui.UI.showSQLException(e);
 
       } finally {
 
@@ -377,16 +445,39 @@ public class TagManager {
       return returnResult;
    }
 
+   /**
+    * Dispose images
+    */
+   public static void disposeTagImages() {
+
+      _tagImagesCache.values().forEach(UI::disposeResource);
+
+      _tagImagesCache.clear();
+   }
+
+   public static void disposeTagUIContent() {
+
+      _allTagUIContainer.forEach(tagUIContent -> tagUIContent.container.dispose());
+
+      _allTagUIContainer.clear();
+   }
+
    public static Map<Long, String> fetchTourTagsAccumulatedValues() {
 
-      final String sqlQuery = "SELECT" + UI.NEW_LINE //                                                                        //$NON-NLS-1$
-            + "jTdataTtag.TOURTAG_TAGID," + UI.NEW_LINE // //$NON-NLS-1$
-            + "SUM(tourData.TOURDISTANCE) AS TOTALDISTANCE," + UI.NEW_LINE // //$NON-NLS-1$
-            + "SUM(tourData.TOURDEVICETIME_RECORDED) AS TOTALRECORDEDTIME" + UI.NEW_LINE //                                                                   //$NON-NLS-1$
-            + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + UI.NEW_LINE //                                                                        //$NON-NLS-1$ //$NON-NLS-2$
-            + "INNER JOIN " + TourDatabase.TABLE_TOUR_DATA + UI.NEW_LINE //                                                       //$NON-NLS-1$
-            + "ON jTdataTtag.TOURDATA_TOURID = tourData.TOURID" + UI.NEW_LINE //                                                                       //$NON-NLS-1$
-            + "GROUP BY jTdataTtag.TOURTAG_TAGID"; //$NON-NLS-1$
+      final String sqlQuery = UI.EMPTY_STRING
+
+            + "SELECT" + NL //                                                               //$NON-NLS-1$
+
+            + "jTdataTtag.TOURTAG_TAGID," + NL //                                      1     //$NON-NLS-1$
+            + "SUM(tourData.TOURDISTANCE) AS TOTALDISTANCE," + NL //                   2     //$NON-NLS-1$
+            + "SUM(tourData.TOURDEVICETIME_RECORDED) AS TOTALRECORDEDTIME" + NL //     3     //$NON-NLS-1$
+
+            + "FROM " + TourDatabase.JOINTABLE__TOURDATA__TOURTAG + " jTdataTtag" + NL //    //$NON-NLS-1$ //$NON-NLS-2$
+            + "INNER JOIN " + TourDatabase.TABLE_TOUR_DATA + NL //                           //$NON-NLS-1$
+            + "ON jTdataTtag.TOURDATA_TOURID = tourData.TOURID" + NL //                      //$NON-NLS-1$
+
+            + "GROUP BY jTdataTtag.TOURTAG_TAGID" //                                         //$NON-NLS-1$
+      ;
 
       final Map<Long, String> tourTagsAccumulatedValues = new HashMap<>();
 
@@ -398,15 +489,15 @@ public class TagManager {
          while (result.next()) {
 
             final long tourTagId = result.getLong(1);
-            float usedMiles = result.getInt(2);
-            final long usedHours = result.getInt(3);
+            float usedMiles = result.getLong(2);
+            final long usedHours = result.getLong(3);
 
             final StringBuilder tagAccumulatedValues = new StringBuilder();
 
             tagAccumulatedValues.append(Math.round(usedHours / 3600f));
             tagAccumulatedValues.append(UI.SPACE + net.tourbook.common.UI.UNIT_LABEL_TIME);
 
-            tagAccumulatedValues.append(UI.NEW_LINE);
+            tagAccumulatedValues.append(NL);
 
             usedMiles = usedMiles / 1000 / net.tourbook.common.UI.UNIT_VALUE_DISTANCE;
             tagAccumulatedValues.append(Math.round(usedMiles));
@@ -419,6 +510,7 @@ public class TagManager {
 
          SQL.showException(e, sqlQuery);
       }
+
       return tourTagsAccumulatedValues;
    }
 
@@ -448,11 +540,22 @@ public class TagManager {
          }
 
       } catch (final SQLException e) {
+
          StatusUtil.logError(sql);
-         UI.showSQLException(e);
+         net.tourbook.ui.UI.showSQLException(e);
       }
 
       return numItems;
+   }
+
+   public static int getNumberOfTagContentColumns() {
+
+      return _tagNumContentColumns;
+   }
+
+   public static TagContentLayout getTagContentLayout() {
+
+      return _tagContentLayout;
    }
 
    /**
@@ -516,8 +619,10 @@ public class TagManager {
          }
 
       } catch (final SQLException e) {
+
          StatusUtil.logError(sql);
-         UI.showSQLException(e);
+         net.tourbook.ui.UI.showSQLException(e);
+
       } finally {
          Util.closeSql(statement);
       }
@@ -526,20 +631,398 @@ public class TagManager {
    }
 
    /**
+    * For a given image file path, try to retrieve the already created
+    * Image resource from the cache.
+    * Otherwise, create an image resource, and put it in the cache
+    *
+    * @param tag
+    * @return Return the tag image or <code>null</code> when not available
+    */
+   public static Image getTagImage(final TourTag tag) {
+
+      final String imageFilePath = tag.getImageFilePath();
+
+      if (StringUtils.isNullOrEmpty(imageFilePath)) {
+         return null;
+      }
+
+      Image tagImage = _tagImagesCache.get(imageFilePath);
+
+      if (tagImage == null) {
+
+         tagImage = prepareTagImage(imageFilePath);
+
+         if (tagImage != null) {
+            _tagImagesCache.put(imageFilePath, tagImage);
+         }
+      }
+
+      return tagImage;
+   }
+
+   public static int getTagImageSize() {
+
+      return _tagImageSize;
+   }
+
+   public static Image prepareTagImage(final String imageFilePath) {
+
+      if (StringUtils.isNullOrEmpty(imageFilePath)
+            || new File(imageFilePath).exists() == false) {
+
+         return null;
+      }
+
+      final Image image = new Image(Display.getDefault(), imageFilePath);
+
+      Rotation rotation = null;
+      try {
+
+         final ImageMetadata imageMetadata = Imaging.getMetadata(new File(imageFilePath), null);
+         if (imageMetadata instanceof JpegImageMetadata) {
+
+            final JpegImageMetadata jpegMetadata = (JpegImageMetadata) imageMetadata;
+            final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(TiffTagConstants.TIFF_TAG_ORIENTATION);
+
+            if (field != null) {
+
+               final int orientation = field.getIntValue();
+
+               if (orientation == 6) {
+
+                  rotation = Rotation.CW_90;
+
+               } else if (orientation == 3) {
+
+                  rotation = Rotation.CW_180;
+
+               } else if (orientation == 8) {
+
+                  rotation = Rotation.CW_270;
+               }
+            }
+         }
+      } catch (ImageReadException | IOException e) {
+         StatusUtil.log(e);
+      }
+
+      final int imageWidth = image.getBounds().width;
+      final int imageHeight = image.getBounds().height;
+
+      int newimageWidth = _tagImageSize;
+      int newimageHeight = _tagImageSize;
+
+      if (UI.IS_4K_DISPLAY) {
+
+         // increase image size for 4k displays
+
+         newimageWidth *= 2.0f;
+         newimageHeight *= 2.0f;
+      }
+
+      if (imageWidth > imageHeight) {
+
+         /**
+          * math floor or - 0.5f is necessary that the resized image is not smaller than the image
+          * canvas which could result in a vertical 1 pixel white line
+          * <p>
+          * https://github.com/mytourbook/mytourbook/issues/1001
+          */
+         newimageHeight = (int) Math.floor(newimageWidth * imageHeight / (imageWidth * 1f));
+
+      } else if (imageWidth < imageHeight) {
+
+         newimageWidth = (int) Math.floor(newimageHeight * imageWidth / (imageHeight * 1f));
+      }
+
+      final Image resizedImage = ImageUtils.resize(Display.getDefault(),
+            image,
+            newimageWidth,
+            newimageHeight,
+            SWT.ON,
+            SWT.HIGH,
+            rotation);
+
+      net.tourbook.common.UI.disposeResource(image);
+
+      return resizedImage;
+   }
+
+   private static void restoreTagContentValues() {
+
+      final IDialogSettings state = TourbookPlugin.getState(TourDataEditorView.ID);
+
+      _tagContentLayout = (TagContentLayout) Util.getStateEnum(state,
+            TourDataEditorView.STATE_TAG_CONTENT_LAYOUT,
+            TourDataEditorView.STATE_TAG_CONTENT_LAYOUT_DEFAULT);
+
+      _tagTextWidth = Util.getStateInt(state,
+            TourDataEditorView.STATE_TAG_TEXT_WIDTH,
+            TourDataEditorView.STATE_TAG_TEXT_WIDTH_DEFAULT,
+            TourDataEditorView.STATE_TAG_TEXT_WIDTH_MIN,
+            TourDataEditorView.STATE_TAG_TEXT_WIDTH_MAX);
+
+      _tagImageSize = Util.getStateInt(state,
+            TourDataEditorView.STATE_TAG_IMAGE_SIZE,
+            TourDataEditorView.STATE_TAG_IMAGE_SIZE_DEFAULT,
+            TourDataEditorView.STATE_TAG_IMAGE_SIZE_MIN,
+            TourDataEditorView.STATE_TAG_IMAGE_SIZE_MAX);
+
+      _tagNumContentColumns = Util.getStateInt(state,
+            TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS,
+            TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_DEFAULT,
+            TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_MIN,
+            TourDataEditorView.STATE_TAG_NUM_CONTENT_COLUMNS_MAX);
+   }
+
+   public static void updateTagContent() {
+
+      // get old values
+      final TagContentLayout tagContentLayout = _tagContentLayout;
+      final int tagTextWidth = _tagTextWidth;
+      final int tagImageSize = _tagImageSize;
+      final int tagNumContentColumns = _tagNumContentColumns;
+
+      // update values from the state
+      restoreTagContentValues();
+
+      // check if values are modified
+      if (tagContentLayout == _tagContentLayout
+            && tagImageSize == _tagImageSize
+            && tagTextWidth == _tagTextWidth
+            && tagNumContentColumns == _tagNumContentColumns) {
+
+         // tag content is not modified -> nothing to do
+
+         return;
+      }
+
+      // dispose tag content
+      disposeTagImages();
+      disposeTagUIContent();
+
+      // fire event that the tag content is redisplayed
+      TourManager.fireEvent(TourEventId.TAG_CONTENT_CHANGED);
+   }
+
+   /**
     * Updates the tag list in each tour tag filter profile as one or several tags were just deleted.
     *
-    * @param deletedTags
+    * @param allDeletedTags
     *           An array containing the Tag Id's of the tour tags just deleted
     */
-   private static void updateTourTagFilterProfiles(final List<TourTag> deletedTags) {
+   private static void updateTourTagFilterProfiles(final List<TourTag> allDeletedTags) {
 
-      final ArrayList<TourTagFilterProfile> profiles = TourTagFilterManager.getProfiles();
-      for (final TourTagFilterProfile profile : profiles) {
-         for (final TourTag tourTag : deletedTags) {
+      final ArrayList<TourTagFilterProfile> allProfiles = TourTagFilterManager.getProfiles();
+
+      for (final TourTagFilterProfile profile : allProfiles) {
+
+         for (final TourTag tourTag : allDeletedTags) {
+
             if (profile.tagFilterIds.contains(tourTag.getTagId())) {
                profile.tagFilterIds.remove(tourTag.getTagId());
             }
          }
       }
    }
+
+   public static void updateUI_Tags(final TourData tourData, final Label tourTagLabel) {
+
+      updateUI_Tags(tourData, tourTagLabel, false);
+   }
+
+   /**
+    * @param tourData
+    * @param tourTagLabel
+    * @param isVertical
+    *           When <code>true</code> the tags are displayed as a list, otherwise horizontally
+    */
+   public static void updateUI_Tags(final TourData tourData, final Label tourTagLabel, final boolean isVertical) {
+
+      // tour tags
+      final Set<TourTag> tourTags = tourData.getTourTags();
+
+      if (tourTags == null || tourTags.isEmpty()) {
+
+         tourTagLabel.setText(UI.EMPTY_STRING);
+
+      } else {
+
+         final String tagLabels = TourDatabase.getTagNames(tourTags, isVertical);
+
+         tourTagLabel.setText(tagLabels);
+         tourTagLabel.setToolTipText(tagLabels);
+      }
+   }
+
+   public static void updateUI_TagsWithImage(final PixelConverter pc,
+                                             final Set<TourTag> tourTags,
+                                             final Composite tagContentContainer) {
+
+      final int numTags = tourTags.size();
+
+      if (numTags == 0) {
+         return;
+      }
+
+      final TourTag[] allTags = tourTags.toArray(new TourTag[numTags]);
+
+      // sort tags by name
+      Arrays.sort(allTags);
+
+      // update number of tag content columns
+      ((GridLayout) tagContentContainer.getLayout()).numColumns = _tagNumContentColumns;
+
+      // create missing tag UI container
+      updateUI_TagsWithImages_CreateUIContainer(pc, tagContentContainer, numTags);
+
+      /*
+       * Check if any tag images are available
+       */
+      boolean isAnyTagImageAvailable = false;
+
+      for (final TourTag tag : allTags) {
+
+         final Image tagImage = getTagImage(tag);
+
+         if (tagImage != null) {
+
+            isAnyTagImageAvailable = true;
+
+            break;
+         }
+      }
+
+      /*
+       * Fill tag content
+       */
+      final Map<Long, String> tourTagsAccumulatedValues = fetchTourTagsAccumulatedValues();
+      final ArrayList<TagUIContent> notNeededTags = new ArrayList<>();
+
+      final GridDataFactory gd = GridDataFactory.fillDefaults();
+
+      for (int tagIndex = 0; tagIndex < _allTagUIContainer.size(); tagIndex++) {
+
+         final TagUIContent tagUIContent = _allTagUIContainer.get(tagIndex);
+
+         if (tagIndex < numTags) {
+
+            final TourTag tag = allTags[tagIndex];
+            final long tagId = tag.getTagId();
+
+            final String tagText = tag.getTagName() + UI.NEW_LINE + tourTagsAccumulatedValues.get(tagId);
+
+            final Label label1 = tagUIContent.label1;
+            final Label label2 = tagUIContent.label2;
+
+            if (isAnyTagImageAvailable) {
+
+               // 1st label shows the tag image
+               // 2nd label shows the tag text
+
+               final Image tagImage = getTagImage(tag);
+
+               label1.setText(UI.EMPTY_STRING);
+
+               // !!! IMPORTANT: image must be set AFTER the text, otherwise the image is not displayed !!!
+               label1.setImage(tagImage);
+
+               label2.setVisible(true);
+               label2.setText(tagText);
+
+               gd.grab(false, false).hint(_tagImageSize, SWT.DEFAULT).applyTo(label1);
+               gd.grab(true, false).applyTo(label2);
+
+            } else {
+
+               // 1st label shows the tag text
+               // 2nd label is hidden
+
+               label1.setText(tagText);
+               label1.setImage(null);
+
+               label2.setVisible(false);
+               label2.setText(UI.EMPTY_STRING);
+
+               gd.grab(true, false).hint(SWT.DEFAULT, SWT.DEFAULT).applyTo(label1);
+               gd.grab(false, false).applyTo(label2);
+            }
+
+         } else {
+
+            // there are no more tags -> dispose remaining UI container
+
+            notNeededTags.add(tagUIContent);
+         }
+
+//         tagUIContent.container.setBackground(net.tourbook.common.UI.SYS_COLOR_CYAN);
+      }
+
+      /*
+       * Not used tag UI container must be disposed and removed otherwise they still occupy UI space
+       * :-(
+       */
+      notNeededTags.forEach(tagUIContent -> {
+         tagUIContent.container.dispose();
+      });
+
+      _allTagUIContainer.removeAll(notNeededTags);
+   }
+
+   /**
+    * Create missing tag UI container
+    *
+    * @param pc
+    * @param tourTagsContainer
+    * @param numTags
+    */
+   private static void updateUI_TagsWithImages_CreateUIContainer(final PixelConverter pc,
+                                                                 final Composite tourTagsContainer,
+                                                                 final int numTags) {
+
+      final int numMissingUIContainer = numTags - _allTagUIContainer.size();
+
+      if (numMissingUIContainer > 0) {
+
+         final int tagContentWidth = _tagImageSize + _tagTextWidth;
+
+         final Color backgroundColor = tourTagsContainer.getBackground();
+
+         final GridDataFactory gdContainer = GridDataFactory.fillDefaults().hint(tagContentWidth, SWT.DEFAULT);
+
+         for (int numCreated = 0; numCreated < numMissingUIContainer; numCreated++) {
+
+            Label label1;
+            Label label2;
+
+            final TagUIContent tagUIContent = new TagUIContent();
+
+            final Composite container = new Composite(tourTagsContainer, SWT.NONE);
+            gdContainer.applyTo(container);
+            GridLayoutFactory.fillDefaults().numColumns(2).applyTo(container);
+            {
+               label1 = new Label(container, SWT.WRAP);
+               GridDataFactory.fillDefaults().hint(_tagImageSize, SWT.DEFAULT).applyTo(label1);
+
+               label2 = new Label(container, SWT.WRAP);
+               GridDataFactory.fillDefaults().grab(true, false).applyTo(label2);
+
+               tagUIContent.container = container;
+               tagUIContent.label1 = label1;
+               tagUIContent.label2 = label2;
+            }
+
+            container.setBackground(backgroundColor);
+            label1.setBackground(backgroundColor);
+            label2.setBackground(backgroundColor);
+
+//            container.setBackground(net.tourbook.common.UI.SYS_COLOR_RED);
+//            label1.setBackground(net.tourbook.common.UI.SYS_COLOR_GREEN);
+//            label2.setBackground(net.tourbook.common.UI.SYS_COLOR_YELLOW);
+
+            _allTagUIContainer.add(tagUIContent);
+         }
+      }
+   }
+
 }
