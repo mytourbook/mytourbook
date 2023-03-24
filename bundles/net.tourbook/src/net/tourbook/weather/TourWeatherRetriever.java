@@ -62,7 +62,6 @@ public final class TourWeatherRetriever {
       }
 
       final boolean isWeatherRetrieved = historicalWeatherRetriever.retrieveHistoricalWeatherData();
-
       if (isWeatherRetrieved) {
 
          tourData.setIsWeatherDataFromProvider(true);

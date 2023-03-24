@@ -152,23 +152,17 @@ public class WeatherUtils {
    /**
     * Returns the weather data as a human readable string, depending on the
     * desired data.
-<<<<<<< HEAD
-    * Example:
-    * ☀ Sunny, 19°C, feels like 19°C (max. 26°C, min. 10°C), 6km/h from SSE, air quality Fair, 34%
-    * humidity
-=======
-    * Example: ☀ Sunny, 19°C, max. 26°C, min. 10°C, feels like 19°C, 6km/h from SSE, 34% humidity
+    * Example: ☀ Sunny, avg. 19°C, max. 26°C, min. 10°C, feels like 19°C, 6km/h from SSE, air
+    * quality Fair, humidity 34%
     *
     * @param tourData
-    * @param isDisplayMinimumTemperature
-    * @param isDisplayMaximumTemperature
+    * @param isDisplayMaximumMinimumTemperature
     * @param isDisplayPressure
     * @param isWeatherDataSeparatorNewLine
     * @return
->>>>>>> refs/remotes/Wolfgang/main
     */
    public static String buildWeatherDataString(final TourData tourData,
-                                               final boolean displayMaximumMinimumTemperature,
+                                               final boolean isDisplayMaximumMinimumTemperature,
                                                final boolean isDisplayPressure,
                                                final boolean isWeatherDataSeparatorNewLine) {
 
@@ -215,7 +209,7 @@ public class WeatherUtils {
                   + UI.UNIT_LABEL_TEMPERATURE);
          }
 
-         if (displayMaximumMinimumTemperature) {
+         if (isDisplayMaximumMinimumTemperature) {
 
          // Minimum temperature
             weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min
@@ -238,24 +232,6 @@ public class WeatherUtils {
                   + UI.SPACE
                   + FormatManager.formatTemperature(UI.convertTemperatureFromMetric(temperatureWindChill))
                   + UI.UNIT_LABEL_TEMPERATURE);
-         }
-
-         if (displayMaximumMinimumTemperature) {
-
-            // Maximum temperature
-            weatherAvgValues.add(
-                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max +
-                  FormatManager.formatTemperature(
-                        UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max())) +
-                  UI.UNIT_LABEL_TEMPERATURE);
-
-            // Minimum temperature
-            weatherAvgValues.add(
-                  Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min +
-                        UI.SPACE +
-                        FormatManager.formatTemperature(
-                              UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min())) +
-                        UI.UNIT_LABEL_TEMPERATURE);
          }
       }
 

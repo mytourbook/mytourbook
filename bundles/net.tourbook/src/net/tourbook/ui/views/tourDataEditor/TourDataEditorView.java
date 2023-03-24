@@ -4767,7 +4767,6 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
       final Composite container = _tk.createComposite(parent);
       GridLayoutFactory.fillDefaults().numColumns(4).applyTo(container);
-//      container.setBackground(Display.getCurrent().getSystemColor(SWT.COLOR_GREEN));
       _firstColumnContainerControls.add(container);
       {
          /*
