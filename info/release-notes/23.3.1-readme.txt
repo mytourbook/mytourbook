@@ -1,4 +1,4 @@
-23.3.1                                                 ?. March 2023
+23.3.1                                                 24. March 2023
 
 
 Improvements
@@ -28,3 +28,7 @@ Bugfix
     https://github.com/mytourbook/mytourbook/issues/1035
     
 
+System   
+======
+
+* MyTourbook Milestone 23.3.1             https://github.com/mytourbook/mytourbook/milestone/9?closed=1
