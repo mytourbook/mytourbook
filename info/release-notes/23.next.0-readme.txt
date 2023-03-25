@@ -39,6 +39,9 @@ Improvements
   - Set elevation up/down totals from SRTM data                   
     https://github.com/mytourbook/mytourbook/issues/824#issuecomment-1483739484
 
+* Tour Chart
+  - Show "Moving time without breaks" in the value point tooltip
+    https://github.com/mytourbook/mytourbook/issues/502#issuecomment-1483897001
 
 Changes
 =======
