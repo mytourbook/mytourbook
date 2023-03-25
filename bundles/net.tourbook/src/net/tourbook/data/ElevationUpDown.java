@@ -17,14 +17,14 @@ package net.tourbook.data;
 
 import net.tourbook.common.UI;
 
-public class AltitudeUpDown {
+public class ElevationUpDown {
 
    private static final String NL = UI.NEW_LINE1;
 
    public float                elevationGain;
    public float                elevationLoss;
 
-   public AltitudeUpDown(final float elevationGain, final float elevationLoss) {
+   public ElevationUpDown(final float elevationGain, final float elevationLoss) {
 
       this.elevationGain = elevationGain;
       this.elevationLoss = elevationLoss;
