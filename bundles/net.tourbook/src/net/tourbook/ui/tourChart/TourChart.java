@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.util.Map;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartComponentAxis;
@@ -142,26 +143,6 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 //SET_FORMATTING_OFF
 
    private static final int      PAGE_NAVIGATION_SEGMENTS                  = 10;
-
-   private static final String   GRAPH_LABEL_ALTIMETER                     = net.tourbook.common.Messages.Graph_Label_Altimeter;
-   private static final String   GRAPH_LABEL_ALTITUDE                      = net.tourbook.common.Messages.Graph_Label_Altitude;
-   private static final String   GRAPH_LABEL_CADENCE                       = net.tourbook.common.Messages.Graph_Label_Cadence;
-   private static final String   GRAPH_LABEL_GEARS                         = net.tourbook.common.Messages.Graph_Label_Gears;
-   private static final String   GRAPH_LABEL_GRADIENT                      = net.tourbook.common.Messages.Graph_Label_Gradient;
-   private static final String   GRAPH_LABEL_HEARTBEAT                     = net.tourbook.common.Messages.Graph_Label_Heartbeat;
-   private static final String   GRAPH_LABEL_PACE                          = net.tourbook.common.Messages.Graph_Label_Pace;
-   private static final String   GRAPH_LABEL_POWER                         = net.tourbook.common.Messages.Graph_Label_Power;
-   private static final String   GRAPH_LABEL_SPEED                         = net.tourbook.common.Messages.Graph_Label_Speed;
-   private static final String   GRAPH_LABEL_TEMPERATURE                   = net.tourbook.common.Messages.Graph_Label_Temperature;
-   private static final String   GRAPH_LABEL_TOUR_COMPARE                  = net.tourbook.common.Messages.Graph_Label_Tour_Compare;
-   private static final String   GRAPH_LABEL_RUN_DYN_STANCE_TIME           = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
-   private static final String   GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED  = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalance;
-   private static final String   GRAPH_LABEL_RUN_DYN_STEP_LENGTH           = net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
-   private static final String   GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION  = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
-   private static final String   GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO        = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
-   private static final String   GRAPH_LABEL_SWIM_STROKES                  = net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
-   private static final String   GRAPH_LABEL_SWIM_SWOLF                    = net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
-
 
    public static final String    ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER         = "ACTION_ID_CAN_AUTO_ZOOM_TO_SLIDER";       //$NON-NLS-1$
    public static final String    ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED    = "ACTION_ID_CAN_MOVE_SLIDERS_WHEN_ZOOMED";  //$NON-NLS-1$
@@ -1342,7 +1323,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_ALTITUDE,
-            GRAPH_LABEL_ALTITUDE,
+            OtherMessages.GRAPH_LABEL_ALTITUDE,
             Messages.Tour_Action_graph_altitude_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Elevation),
             ThemeUtil.getThemedImageName(Images.Graph_Elevation_Disabled),
@@ -1350,7 +1331,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_SPEED,
-            GRAPH_LABEL_SPEED,
+            OtherMessages.GRAPH_LABEL_SPEED,
             Messages.Tour_Action_graph_speed_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Speed),
             ThemeUtil.getThemedImageName(Images.Graph_Speed_Disabled),
@@ -1358,7 +1339,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_SPEED_SUMMARIZED,
-            GRAPH_LABEL_SPEED,
+            OtherMessages.GRAPH_LABEL_SPEED,
             Messages.Tour_Action_Graph_SpeedSummarized_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Speed_Summarized),
             ThemeUtil.getThemedImageName(Images.Graph_Speed_Summarized_Disabled),
@@ -1366,7 +1347,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_PACE,
-            GRAPH_LABEL_PACE,
+            OtherMessages.GRAPH_LABEL_PACE,
             Messages.Tour_Action_graph_pace_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Pace),
             ThemeUtil.getThemedImageName(Images.Graph_Pace_Disabled),
@@ -1374,7 +1355,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_PACE_SUMMARIZED,
-            GRAPH_LABEL_PACE,
+            OtherMessages.GRAPH_LABEL_PACE,
             Messages.Tour_Action_Graph_PaceSummarized_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Pace_Summarized),
             ThemeUtil.getThemedImageName(Images.Graph_Pace_Summarized_Disabled),
@@ -1382,7 +1363,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_POWER,
-            GRAPH_LABEL_POWER,
+            OtherMessages.GRAPH_LABEL_POWER,
             Messages.Tour_Action_graph_power_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Power),
             ThemeUtil.getThemedImageName(Images.Graph_Power_Disabled),
@@ -1390,7 +1371,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_ALTIMETER,
-            GRAPH_LABEL_ALTIMETER,
+            OtherMessages.GRAPH_LABEL_ALTIMETER,
             Messages.Tour_Action_graph_altimeter_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Altimeter),
             ThemeUtil.getThemedImageName(Images.Graph_Altimeter_Disabled),
@@ -1398,7 +1379,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_PULSE,
-            GRAPH_LABEL_HEARTBEAT,
+            OtherMessages.GRAPH_LABEL_HEARTBEAT,
             Messages.Tour_Action_graph_heartbeat_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Heartbeat),
             ThemeUtil.getThemedImageName(Images.Graph_Heartbeat_Disabled),
@@ -1406,7 +1387,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_TEMPERATURE,
-            GRAPH_LABEL_TEMPERATURE,
+            OtherMessages.GRAPH_LABEL_TEMPERATURE,
             Messages.Tour_Action_graph_temperature_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Temperature),
             ThemeUtil.getThemedImageName(Images.Graph_Temperature_Disabled),
@@ -1414,7 +1395,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_CADENCE,
-            GRAPH_LABEL_CADENCE,
+            OtherMessages.GRAPH_LABEL_CADENCE,
             Messages.Tour_Action_graph_cadence_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Cadence),
             ThemeUtil.getThemedImageName(Images.Graph_Cadence_Disabled),
@@ -1422,7 +1403,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_GEARS,
-            GRAPH_LABEL_GEARS,
+            OtherMessages.GRAPH_LABEL_GEARS,
             Messages.Tour_Action_GraphGears,
             ThemeUtil.getThemedImageName(Images.Graph_Gears),
             ThemeUtil.getThemedImageName(Images.Graph_Gears_Disabled),
@@ -1430,7 +1411,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_GRADIENT,
-            GRAPH_LABEL_GRADIENT,
+            OtherMessages.GRAPH_LABEL_GRADIENT,
             Messages.Tour_Action_graph_gradient_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Gradient),
             ThemeUtil.getThemedImageName(Images.Graph_Gradient_Disabled),
@@ -1438,7 +1419,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_TOUR_COMPARE,
-            GRAPH_LABEL_TOUR_COMPARE,
+            OtherMessages.GRAPH_LABEL_TOUR_COMPARE,
             Messages.Tour_Action_graph_tour_compare_tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_TourCompare),
             ThemeUtil.getThemedImageName(Images.Graph_TourCompare_Disabled),
@@ -1449,7 +1430,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
        */
       createActions_12_GraphAction(
             TourManager.GRAPH_RUN_DYN_STANCE_TIME,
-            GRAPH_LABEL_RUN_DYN_STANCE_TIME,
+            OtherMessages.GRAPH_LABEL_RUN_DYN_STANCE_TIME,
             Messages.Tour_Action_RunDyn_StanceTime_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_RunDyn_StanceTime),
             ThemeUtil.getThemedImageName(Images.Graph_RunDyn_StanceTime_Disabled),
@@ -1457,7 +1438,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED,
-            GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED,
+            OtherMessages.GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCE,
             Messages.Tour_Action_RunDyn_StanceTimeBalance_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_RunDyn_StanceTimeBalance),
             ThemeUtil.getThemedImageName(Images.Graph_RunDyn_StanceTimeBalance_Disabled),
@@ -1465,7 +1446,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_RUN_DYN_STEP_LENGTH,
-            GRAPH_LABEL_RUN_DYN_STEP_LENGTH,
+            OtherMessages.GRAPH_LABEL_RUN_DYN_STEP_LENGTH,
             Messages.Tour_Action_RunDyn_StepLength_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_RunDyn_StepLength),
             ThemeUtil.getThemedImageName(Images.Graph_RunDyn_StepLength_Disabled),
@@ -1473,7 +1454,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION,
-            GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,
+            OtherMessages.GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,
             Messages.Tour_Action_RunDyn_VerticalOscillation_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_RunDyn_VerticalOscillation),
             ThemeUtil.getThemedImageName(Images.Graph_RunDyn_VerticalOscillation_Disabled),
@@ -1481,7 +1462,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO,
-            GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,
+            OtherMessages.GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,
             Messages.Tour_Action_RunDyn_VerticalRatio_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_RunDyn_VerticalRatio),
             ThemeUtil.getThemedImageName(Images.Graph_RunDyn_VerticalRatio_Disabled),
@@ -1492,7 +1473,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
        */
       createActions_12_GraphAction(
             TourManager.GRAPH_SWIM_STROKES,
-            GRAPH_LABEL_SWIM_STROKES,
+            OtherMessages.GRAPH_LABEL_SWIM_STROKES,
             Messages.Tour_Action_Swim_Strokes_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Swim_Strokes),
             ThemeUtil.getThemedImageName(Images.Graph_Swim_Strokes_Disabled),
@@ -1500,7 +1481,7 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
       createActions_12_GraphAction(
             TourManager.GRAPH_SWIM_SWOLF,
-            GRAPH_LABEL_SWIM_SWOLF,
+            OtherMessages.GRAPH_LABEL_SWIM_SWOLF,
             Messages.Tour_Action_Swim_Swolf_Tooltip,
             ThemeUtil.getThemedImageName(Images.Graph_Swim_Swolf),
             ThemeUtil.getThemedImageName(Images.Graph_Swim_Swolf_Disabled),

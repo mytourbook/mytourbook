@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
@@ -80,30 +81,9 @@ import org.eclipse.ui.PlatformUI;
 
 public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
-   private static final String PREF_SYSTEM_LABEL_DISTANCE                 = net.tourbook.common.Messages.Pref_System_Label_Distance;
-   private static final String PREF_SYSTEM_LABEL_DISTANCE_INFO            = net.tourbook.common.Messages.Pref_System_Label_Distance_Info;
-   private static final String PREF_SYSTEM_LABEL_ELEVATION                = net.tourbook.common.Messages.Pref_System_Label_Elevation;
-   private static final String PREF_SYSTEM_LABEL_ELEVATION_INFO           = net.tourbook.common.Messages.Pref_System_Label_Elevation_Info;
-   private static final String PREF_SYSTEM_LABEL_HEIGHT                   = net.tourbook.common.Messages.Pref_System_Label_Height;
-   private static final String PREF_SYSTEM_LABEL_HEIGHT_INFO              = net.tourbook.common.Messages.Pref_System_Label_Height_Info;
-   private static final String PREF_SYSTEM_LABEL_LENGTH_SMALL             = net.tourbook.common.Messages.Pref_System_Label_Length_Small;
-   private static final String PREF_SYSTEM_LABEL_LENGTH_SMALL_INFO        = net.tourbook.common.Messages.Pref_System_Label_Length_Small_Info;
-   private static final String PREF_SYSTEM_LABEL_LENGTH                   = net.tourbook.common.Messages.Pref_System_Label_Length;
-   private static final String PREF_SYSTEM_LABEL_LENGTH_INFO              = net.tourbook.common.Messages.Pref_System_Label_Length_Info;
-   private static final String PREF_SYSTEM_LABEL_PACE                     = net.tourbook.common.Messages.Pref_System_Label_Pace;
-   private static final String PREF_SYSTEM_LABEL_PACE_INFO                = net.tourbook.common.Messages.Pref_System_Label_Pace_Info;
-   private static final String PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE      = net.tourbook.common.Messages.Pref_System_Label_Pressure_Atmosphere;
-   private static final String PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE_INFO = net.tourbook.common.Messages.Pref_System_Label_Pressure_Atmosphere_Info;
-   private static final String PREF_SYSTEM_LABEL_SYSTEM                   = net.tourbook.common.Messages.Pref_System_Label_System;
-   private static final String PREF_SYSTEM_LABEL_TEMPERATURE              = net.tourbook.common.Messages.Pref_System_Label_Temperature;
-   private static final String PREF_SYSTEM_LABEL_USING_INFO               = net.tourbook.common.Messages.Pref_System_Label_UsingInfo;
-   private static final String PREF_SYSTEM_LABEL_USING_INFO_TOOLTIP       = net.tourbook.common.Messages.Pref_System_Label_UsingInfo_Tooltip;
-   private static final String PREF_SYSTEM_LABEL_WEIGHT                   = net.tourbook.common.Messages.Pref_System_Label_Weight;
-   private static final String PREF_SYSTEM_LABEL_WEIGHT_INFO              = net.tourbook.common.Messages.Pref_System_Label_Weight_Info;
+   public static final String  ID                         = "net.tourbook.preferences.PrefPageGeneralId"; //$NON-NLS-1$
 
-   public static final String  ID                                         = "net.tourbook.preferences.PrefPageGeneralId";                           //$NON-NLS-1$
-
-   private static final String STATE_GENERAL_SELECTED_TAB                 = "STATE_GENERAL_SELECTED_TAB";                                           //$NON-NLS-1$
+   private static final String STATE_GENERAL_SELECTED_TAB = "STATE_GENERAL_SELECTED_TAB";                 //$NON-NLS-1$
 
    // tab folder indices
    public static final int              TAB_FOLDER_MEASUREMENT_SYSTEM = 0;
@@ -313,7 +293,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText(PREF_SYSTEM_LABEL_SYSTEM);
+            label.setText(OtherMessages.PREF_SYSTEM_LABEL_SYSTEM);
             gridData_Label.applyTo(label);
 
             // combo
@@ -334,8 +314,8 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label
             final Label labelInfo = new Label(container, SWT.NONE);
-            labelInfo.setText(PREF_SYSTEM_LABEL_USING_INFO);
-            labelInfo.setToolTipText(PREF_SYSTEM_LABEL_USING_INFO_TOOLTIP);
+            labelInfo.setText(OtherMessages.PREF_SYSTEM_LABEL_USING_INFO);
+            labelInfo.setToolTipText(OtherMessages.PREF_SYSTEM_LABEL_USING_INFO_TOOLTIP);
             gridData_Label.applyTo(labelInfo);
          }
          {
@@ -345,7 +325,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText(PREF_SYSTEM_LABEL_DISTANCE);
+            label.setText(OtherMessages.PREF_SYSTEM_LABEL_DISTANCE);
             gridData_Label.applyTo(label);
 
             // combo
@@ -355,7 +335,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label: info
             final Label labelInfo = new Label(container, SWT.NONE);
-            labelInfo.setText(PREF_SYSTEM_LABEL_DISTANCE_INFO);
+            labelInfo.setText(OtherMessages.PREF_SYSTEM_LABEL_DISTANCE_INFO);
             gridData_Label.applyTo(labelInfo);
          }
          {
@@ -365,7 +345,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText(PREF_SYSTEM_LABEL_LENGTH);
+            label.setText(OtherMessages.PREF_SYSTEM_LABEL_LENGTH);
             gridData_Label.applyTo(label);
 
             // combo
@@ -375,7 +355,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label: info
             final Label labelInfo = new Label(container, SWT.NONE);
-            labelInfo.setText(PREF_SYSTEM_LABEL_LENGTH_INFO);
+            labelInfo.setText(OtherMessages.PREF_SYSTEM_LABEL_LENGTH_INFO);
             gridData_Label.applyTo(labelInfo);
          }
          {
@@ -385,7 +365,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText(PREF_SYSTEM_LABEL_LENGTH_SMALL);
+            label.setText(OtherMessages.PREF_SYSTEM_LABEL_LENGTH_SMALL);
             gridData_Label.applyTo(label);
 
             // combo
@@ -395,7 +375,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label: info
             final Label labelInfo = new Label(container, SWT.NONE);
-            labelInfo.setText(PREF_SYSTEM_LABEL_LENGTH_SMALL_INFO);
+            labelInfo.setText(OtherMessages.PREF_SYSTEM_LABEL_LENGTH_SMALL_INFO);
             gridData_Label.applyTo(labelInfo);
          }
          {
@@ -405,7 +385,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText(PREF_SYSTEM_LABEL_ELEVATION);
+            label.setText(OtherMessages.PREF_SYSTEM_LABEL_ELEVATION);
             gridData_Label.applyTo(label);
 
             // combo
@@ -415,7 +395,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label: info
             final Label labelInfo = new Label(container, SWT.NONE);
-            labelInfo.setText(PREF_SYSTEM_LABEL_ELEVATION_INFO);
+            labelInfo.setText(OtherMessages.PREF_SYSTEM_LABEL_ELEVATION_INFO);
             gridData_Label.applyTo(labelInfo);
          }
          {
@@ -425,7 +405,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText(PREF_SYSTEM_LABEL_HEIGHT);
+            label.setText(OtherMessages.PREF_SYSTEM_LABEL_HEIGHT);
             gridData_Label.applyTo(label);
 
             // combo
@@ -435,7 +415,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label: info
             final Label labelInfo = new Label(container, SWT.NONE);
-            labelInfo.setText(PREF_SYSTEM_LABEL_HEIGHT_INFO);
+            labelInfo.setText(OtherMessages.PREF_SYSTEM_LABEL_HEIGHT_INFO);
             gridData_Label.applyTo(labelInfo);
          }
          {
@@ -445,7 +425,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText(PREF_SYSTEM_LABEL_PACE);
+            label.setText(OtherMessages.PREF_SYSTEM_LABEL_PACE);
             gridData_Label.applyTo(label);
 
             // combo
@@ -455,7 +435,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label: info
             final Label labelInfo = new Label(container, SWT.NONE);
-            labelInfo.setText(PREF_SYSTEM_LABEL_PACE_INFO);
+            labelInfo.setText(OtherMessages.PREF_SYSTEM_LABEL_PACE_INFO);
             gridData_Label.applyTo(labelInfo);
          }
          {
@@ -465,7 +445,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText(PREF_SYSTEM_LABEL_WEIGHT);
+            label.setText(OtherMessages.PREF_SYSTEM_LABEL_WEIGHT);
             gridData_Label.applyTo(label);
 
             // combo
@@ -475,7 +455,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label: info
             final Label labelInfo = new Label(container, SWT.NONE);
-            labelInfo.setText(PREF_SYSTEM_LABEL_WEIGHT_INFO);
+            labelInfo.setText(OtherMessages.PREF_SYSTEM_LABEL_WEIGHT_INFO);
             gridData_Label.applyTo(labelInfo);
          }
          {
@@ -485,7 +465,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText(PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE);
+            label.setText(OtherMessages.PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE);
             gridData_Label.applyTo(label);
 
             // combo
@@ -495,7 +475,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label: info
             final Label labelInfo = new Label(container, SWT.NONE);
-            labelInfo.setText(PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE_INFO);
+            labelInfo.setText(OtherMessages.PREF_SYSTEM_LABEL_PRESSURE_ATMOSPHERE_INFO);
             gridData_Label.applyTo(labelInfo);
          }
          {
@@ -505,7 +485,7 @@ public class PrefPageGeneral extends FieldEditorPreferencePage implements IWorkb
 
             // label
             final Label label = new Label(container, SWT.NONE);
-            label.setText(PREF_SYSTEM_LABEL_TEMPERATURE);
+            label.setText(OtherMessages.PREF_SYSTEM_LABEL_TEMPERATURE);
             gridData_Label.applyTo(label);
 
             // combo

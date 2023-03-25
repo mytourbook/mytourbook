@@ -18,6 +18,7 @@ package net.tourbook.ui.tourChart;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.chart.ChartComponentGraph;
 import net.tourbook.chart.ColorCache;
 import net.tourbook.common.UI;
@@ -59,12 +60,8 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourProvider {
 
-   private static final String     GRAPH_LABEL_ALTITUDE = net.tourbook.common.Messages.Graph_Label_Altitude;
-   private static final String     GRAPH_LABEL_TIME     = net.tourbook.common.Messages.Graph_Label_Time;
-   private static final String     GRAPH_LABEL_DISTANCE = net.tourbook.common.Messages.Graph_Label_Distance;
-
-   private static final int        DEFAULT_TEXT_WIDTH   = 50;
-   private static final int        DEFAULT_TEXT_HEIGHT  = 20;
+   private static final int        DEFAULT_TEXT_WIDTH  = 50;
+   private static final int        DEFAULT_TEXT_HEIGHT = 20;
 
    /**
     * Visual position for marker tooltip, they must correspond to the position id
@@ -385,7 +382,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
           */
          if (isShowElevation || isShowElevation_Diff) {
 
-            UI.createLabel(container, GRAPH_LABEL_ALTITUDE);
+            UI.createLabel(container, OtherMessages.GRAPH_LABEL_ALTITUDE);
 
             if (isShowElevation) {
                final boolean isAvailableAltitude = _tourData.getAltitudeSerie() != null;
@@ -430,7 +427,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
           */
          if (isShowDistance || isShowDistance_Diff) {
 
-            UI.createLabel(container, GRAPH_LABEL_DISTANCE);
+            UI.createLabel(container, OtherMessages.GRAPH_LABEL_DISTANCE);
 
             if (isShowDistance) {
 
@@ -498,7 +495,7 @@ public class ChartMarkerToolTip extends AnimatedToolTipShell implements ITourPro
           */
          if (isShowDuration || isShowDuration_Diff) {
 
-            UI.createLabel(container, GRAPH_LABEL_TIME);
+            UI.createLabel(container, OtherMessages.GRAPH_LABEL_TIME);
 
             if (isShowDuration) {
 

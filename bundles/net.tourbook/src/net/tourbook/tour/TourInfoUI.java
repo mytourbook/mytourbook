@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
@@ -87,22 +88,20 @@ import org.joda.time.PeriodType;
 
 public class TourInfoUI {
 
-   private static final String            APP_ACTION_CLOSE_TOOLTIP = net.tourbook.common.Messages.App_Action_Close_Tooltip;
+   private static final int               SHELL_MARGIN          = 5;
+   private static final int               MAX_DATA_WIDTH        = 300;
 
-   private static final int               SHELL_MARGIN             = 5;
-   private static final int               MAX_DATA_WIDTH           = 300;
+   private static final String            BATTERY_FORMAT        = "... %d %%";                                                                //$NON-NLS-1$
+   private static final String            GEAR_SHIFT_FORMAT     = "%d / %d";                                                                  //$NON-NLS-1$
 
-   private static final String            BATTERY_FORMAT           = "... %d %%";                                                                //$NON-NLS-1$
-   private static final String            GEAR_SHIFT_FORMAT        = "%d / %d";                                                                  //$NON-NLS-1$
+   private static final IPreferenceStore  _prefStoreCommon      = CommonActivator.getPrefStore();
 
-   private static final IPreferenceStore  _prefStoreCommon         = CommonActivator.getPrefStore();
+   private static final GridDataFactory   _gridDataHint_Zero    = GridDataFactory.fillDefaults().hint(0, 0);
+   private static final GridDataFactory   _gridDataHint_Default = GridDataFactory.fillDefaults().hint(SWT.DEFAULT, SWT.DEFAULT);
 
-   private static final GridDataFactory   _gridDataHint_Zero       = GridDataFactory.fillDefaults().hint(0, 0);
-   private static final GridDataFactory   _gridDataHint_Default    = GridDataFactory.fillDefaults().hint(SWT.DEFAULT, SWT.DEFAULT);
+   private static final DateTimeFormatter _dtHistoryFormatter   = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.MEDIUM);
 
-   private static final DateTimeFormatter _dtHistoryFormatter      = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.MEDIUM);
-
-   private static PeriodType              _tourPeriodTemplate      = PeriodType.yearMonthDayTime()
+   private static PeriodType              _tourPeriodTemplate   = PeriodType.yearMonthDayTime()
 
          // hide these components
          // .withMinutesRemoved()
@@ -112,12 +111,12 @@ public class TourInfoUI {
 //
    ;
 
-   private final IPreferenceStore         _prefStore               = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore         _prefStore            = TourbookPlugin.getPrefStore();
 
-   private final NumberFormat             _nf0                     = NumberFormat.getNumberInstance();
-   private final NumberFormat             _nf1                     = NumberFormat.getInstance();
-   private final NumberFormat             _nf2                     = NumberFormat.getInstance();
-   private final NumberFormat             _nf3                     = NumberFormat.getInstance();
+   private final NumberFormat             _nf0                  = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf1                  = NumberFormat.getInstance();
+   private final NumberFormat             _nf2                  = NumberFormat.getInstance();
+   private final NumberFormat             _nf3                  = NumberFormat.getInstance();
 
    {
       _nf0.setMinimumFractionDigits(0);
@@ -319,7 +318,7 @@ public class TourInfoUI {
 
          super(null, IAction.AS_PUSH_BUTTON);
 
-         setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
+         setToolTipText(OtherMessages.APP_ACTION_CLOSE_TOOLTIP);
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 

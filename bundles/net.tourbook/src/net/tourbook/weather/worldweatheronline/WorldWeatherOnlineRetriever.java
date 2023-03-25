@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -49,10 +50,8 @@ import org.eclipse.osgi.util.NLS;
  */
 public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
-   private static final String  TOUR_TOOLTIP_FORMAT_DATEWEEKTIME = net.tourbook.ui.Messages.Tour_Tooltip_Format_DateWeekTime;
-
-   private static final String  SYS_PROP__LOG_WEATHER_DATA       = "logWeatherData";                                         //$NON-NLS-1$
-   private static final boolean _isLogWeatherData                = System.getProperty(SYS_PROP__LOG_WEATHER_DATA) != null;
+   private static final String  SYS_PROP__LOG_WEATHER_DATA = "logWeatherData";                                      //$NON-NLS-1$
+   private static final boolean _isLogWeatherData          = System.getProperty(SYS_PROP__LOG_WEATHER_DATA) != null;
 
    static {
 
@@ -218,7 +217,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
             System.out.println(tourTitle);
          }
 
-         System.out.println(String.format(TOUR_TOOLTIP_FORMAT_DATEWEEKTIME,
+         System.out.println(String.format(OtherMessages.TOUR_TOOLTIP_FORMAT_DATE_WEEK_TIME,
                zdtTourStart.format(TimeTools.Formatter_Date_F),
                zdtTourStart.format(TimeTools.Formatter_Time_M),
                zdtTourEnd.format(TimeTools.Formatter_Time_M),

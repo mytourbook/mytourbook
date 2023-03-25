@@ -41,6 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -137,35 +138,6 @@ public class TourManager {
          Util.logSystemProperty_IsEnabled(TourManager.class, SYS_PROP__LOG_RR_ERRORS, "R-R errors are logged"); //$NON-NLS-1$
       }
    }
-
-   private static final String GRAPH_LABEL_ALTIMETER                           = net.tourbook.common.Messages.Graph_Label_Altimeter;
-   private static final String GRAPH_LABEL_ALTITUDE                            = net.tourbook.common.Messages.Graph_Label_Altitude;
-   private static final String GRAPH_LABEL_CADENCE                             = net.tourbook.common.Messages.Graph_Label_Cadence;
-   private static final String GRAPH_LABEL_CADENCE_UNIT                        = net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
-   private static final String GRAPH_LABEL_CADENCE_UNIT_SPM                    = net.tourbook.common.Messages.Graph_Label_Cadence_Unit_Spm;
-   private static final String GRAPH_LABEL_CADENCE_UNIT_RPM_SPM                = net.tourbook.common.Messages.Graph_Label_Cadence_Unit_RpmSpm;
-   private static final String GRAPH_LABEL_GEARS                               = net.tourbook.common.Messages.Graph_Label_Gears;
-   private static final String GRAPH_LABEL_GEO_COMPARE_UNIT                    = net.tourbook.common.Messages.Graph_Label_Geo_Compare_Unit;
-   private static final String GRAPH_LABEL_GRADIENT                            = net.tourbook.common.Messages.Graph_Label_Gradient;
-   private static final String GRAPH_LABEL_GRADIENT_UNIT                       = net.tourbook.common.Messages.Graph_Label_Gradient_Unit;
-   private static final String GRAPH_LABEL_HEARTBEAT                           = net.tourbook.common.Messages.Graph_Label_Heartbeat;
-   private static final String GRAPH_LABEL_HEARTBEAT_UNIT                      = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-   private static final String GRAPH_LABEL_PACE                                = net.tourbook.common.Messages.Graph_Label_Pace;
-   private static final String GRAPH_LABEL_PACE_SUMMARIZED                     = net.tourbook.common.Messages.Graph_Label_Pace_Summarized;
-   private static final String GRAPH_LABEL_POWER                               = net.tourbook.common.Messages.Graph_Label_Power;
-   private static final String GRAPH_LABEL_POWER_UNIT                          = net.tourbook.common.Messages.Graph_Label_Power_Unit;
-   private static final String GRAPH_LABEL_SPEED                               = net.tourbook.common.Messages.Graph_Label_Speed;
-   private static final String GRAPH_LABEL_SPEED_SUMMARIZED                    = net.tourbook.common.Messages.Graph_Label_Speed_Summarized;
-   private static final String GRAPH_LABEL_TEMPERATURE                         = net.tourbook.common.Messages.Graph_Label_Temperature;
-   private static final String GRAPH_LABEL_TOUR_COMPARE                        = net.tourbook.common.Messages.Graph_Label_Tour_Compare;
-   private static final String GRAPH_LABEL_TOUR_COMPARE_UNIT                   = net.tourbook.common.Messages.Graph_Label_Tour_Compare_Unit;
-   private static final String GRAPH_LABEL_RUN_DYN_STANCE_TIME                 = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
-   private static final String GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCE         = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalance;
-   private static final String GRAPH_LABEL_RUN_DYN_STEP_LENGTH                 = net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
-   private static final String GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION        = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
-   private static final String GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO              = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
-   private static final String GRAPH_LABEL_SWIM_STROKES                        = net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
-   private static final String GRAPH_LABEL_SWIM_SWOLF                          = net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
    //
    static final String         LOG_TEMP_ADJUST_001_START                       = Messages.Log_TemperatureAdjustment_001_Start;
    static final String         LOG_TEMP_ADJUST_002_END                         = Messages.Log_TemperatureAdjustment_002_End;
@@ -179,43 +151,43 @@ public class TourManager {
    private static final String LOG_RETRIEVE_WEATHER_DATA_002_END               = Messages.Log_RetrieveWeatherData_002_End;
    private static final String LOG_RETRIEVE_WEATHER_DATA_010_NO_GPS_DATA_SERIE = Messages.Log_RetrieveWeatherData_010_NoGpsDataSeries;
    //
-   public static final String  CUSTOM_DATA_TOUR_DATA                           = "tourData";                                                         //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_TOUR_CHART_CONFIGURATION            = "tourChartConfig";                                                  //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_TOUR_DATA                           = "tourData";                                                    //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_TOUR_CHART_CONFIGURATION            = "tourChartConfig";                                             //$NON-NLS-1$
    //
-   public static final String  CUSTOM_DATA_ALTIMETER                           = "altimeter";                                                        //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_ALTITUDE                            = "altitude";                                                         //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_CADENCE                             = "cadence";                                                          //$NON-NLS-1$
-   private static final String CUSTOM_DATA_DISTANCE                            = "distance";                                                         //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_GEAR_RATIO                          = "gearRatio";                                                        //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_GRADIENT                            = "gradient";                                                         //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_HISTORY                             = "history";                                                          //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_PACE                                = "pace";                                                             //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_PACE_SUMMARIZED                     = "pace-summarized";                                                  //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_POWER                               = "power";                                                            //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_PULSE                               = "pulse";                                                            //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_SPEED                               = "speed";                                                            //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_SPEED_SUMMARIZED                    = "speed-summarized";                                                 //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_TEMPERATURE                         = "temperature";                                                      //$NON-NLS-1$
-   private static final String CUSTOM_DATA_TIME                                = "time";                                                             //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME                 = "runDyn_RunDyn_StanceTime";                                         //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCE         = "runDyn_RunDyn_StanceTimeBalance";                                  //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_RUN_DYN_STEP_LENGTH                 = "runDyn_RunDyn_StepLength";                                         //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_RUN_DYN_VERTICAL_OSCILLATION        = "runDyn_RunDyn_VerticalOscillation";                                //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO              = "runDyn_RunDyn_VerticalRatio";                                      //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_SWIM_STROKES                        = "swim_Strokes";                                                     //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_SWIM_SWOLF                          = "swim_Swolf";                                                       //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_ALTIMETER                           = "altimeter";                                                   //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_ALTITUDE                            = "altitude";                                                    //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_CADENCE                             = "cadence";                                                     //$NON-NLS-1$
+   private static final String CUSTOM_DATA_DISTANCE                            = "distance";                                                    //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_GEAR_RATIO                          = "gearRatio";                                                   //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_GRADIENT                            = "gradient";                                                    //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_HISTORY                             = "history";                                                     //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_PACE                                = "pace";                                                        //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_PACE_SUMMARIZED                     = "pace-summarized";                                             //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_POWER                               = "power";                                                       //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_PULSE                               = "pulse";                                                       //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_SPEED                               = "speed";                                                       //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_SPEED_SUMMARIZED                    = "speed-summarized";                                            //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_TEMPERATURE                         = "temperature";                                                 //$NON-NLS-1$
+   private static final String CUSTOM_DATA_TIME                                = "time";                                                        //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME                 = "runDyn_RunDyn_StanceTime";                                    //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_RUN_DYN_STANCE_TIME_BALANCE         = "runDyn_RunDyn_StanceTimeBalance";                             //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_RUN_DYN_STEP_LENGTH                 = "runDyn_RunDyn_StepLength";                                    //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_RUN_DYN_VERTICAL_OSCILLATION        = "runDyn_RunDyn_VerticalOscillation";                           //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_RUN_DYN_VERTICAL_RATIO              = "runDyn_RunDyn_VerticalRatio";                                 //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_SWIM_STROKES                        = "swim_Strokes";                                                //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_SWIM_SWOLF                          = "swim_Swolf";                                                  //$NON-NLS-1$
 
-   public static final String  CUSTOM_DATA_ANALYZER_INFO                       = "analyzerInfo";                                                     //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_SEGMENT_VALUES                      = "segmentValues";                                                    //$NON-NLS-1$
-   public static final String  CUSTOM_DATA_CONCONI_TEST                        = "CUSTOM_DATA_CONCONI_TEST";                                         //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_ANALYZER_INFO                       = "analyzerInfo";                                                //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_SEGMENT_VALUES                      = "segmentValues";                                               //$NON-NLS-1$
+   public static final String  CUSTOM_DATA_CONCONI_TEST                        = "CUSTOM_DATA_CONCONI_TEST";                                    //$NON-NLS-1$
    //
-   public static final String  X_AXIS_TIME                                     = "time";                                                             //$NON-NLS-1$
-   public static final String  X_AXIS_DISTANCE                                 = "distance";                                                         //$NON-NLS-1$
+   public static final String  X_AXIS_TIME                                     = "time";                                                        //$NON-NLS-1$
+   public static final String  X_AXIS_DISTANCE                                 = "distance";                                                    //$NON-NLS-1$
    //
-   private static final String FORMAT_MM_SS                                    = "%d:%02d";                                                          //$NON-NLS-1$
-   public static final String  GEAR_RATIO_FORMAT                               = "%1.2f";                                                            //$NON-NLS-1$
-   public static final String  GEAR_TEETH_FORMAT                               = "%2d : %2d";                                                        //$NON-NLS-1$
-   static final String         GEAR_VALUE_FORMAT                               = GEAR_TEETH_FORMAT + " - " + GEAR_RATIO_FORMAT;                      //$NON-NLS-1$
+   private static final String FORMAT_MM_SS                                    = "%d:%02d";                                                     //$NON-NLS-1$
+   public static final String  GEAR_RATIO_FORMAT                               = "%1.2f";                                                       //$NON-NLS-1$
+   public static final String  GEAR_TEETH_FORMAT                               = "%2d : %2d";                                                   //$NON-NLS-1$
+   static final String         GEAR_VALUE_FORMAT                               = GEAR_TEETH_FORMAT + " - " + GEAR_RATIO_FORMAT;                 //$NON-NLS-1$
    //
    public static final int     GRAPH_ALTITUDE                                  = 1000;
    public static final int     GRAPH_SPEED                                     = 1001;
@@ -4336,7 +4308,7 @@ public class TourManager {
 
          yDataAltimeter = createChartDataSerieNoZero(altimeterSerie, chartType);
 
-         yDataAltimeter.setYTitle(GRAPH_LABEL_ALTIMETER);
+         yDataAltimeter.setYTitle(OtherMessages.GRAPH_LABEL_ALTIMETER);
          yDataAltimeter.setUnitLabel(UI.UNIT_LABEL_ALTIMETER);
          yDataAltimeter.setShowYSlider(true);
          yDataAltimeter.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_ALTIMETER);
@@ -4406,21 +4378,21 @@ public class TourManager {
             final boolean isSpm = tourData.multipleTour_IsCadenceSpm;
 
             cadenceUnit = isRpm && isSpm
-                  ? GRAPH_LABEL_CADENCE_UNIT_RPM_SPM //
+                  ? OtherMessages.GRAPH_LABEL_CADENCE_UNIT_RPM_SPM
                   : isSpm //
-                        ? GRAPH_LABEL_CADENCE_UNIT_SPM
-                        : GRAPH_LABEL_CADENCE_UNIT;
+                        ? OtherMessages.GRAPH_LABEL_CADENCE_UNIT_SPM
+                        : OtherMessages.GRAPH_LABEL_CADENCE_UNIT;
 
          } else {
 
-            cadenceUnit = tourData.isCadenceSpm() //
-                  ? GRAPH_LABEL_CADENCE_UNIT_SPM
-                  : GRAPH_LABEL_CADENCE_UNIT;
+            cadenceUnit = tourData.isCadenceSpm()
+                  ? OtherMessages.GRAPH_LABEL_CADENCE_UNIT_SPM
+                  : OtherMessages.GRAPH_LABEL_CADENCE_UNIT;
          }
 
          yDataCadence = createChartDataSerieNoZero(cadenceSerie, chartType);
 
-         yDataCadence.setYTitle(GRAPH_LABEL_CADENCE);
+         yDataCadence.setYTitle(OtherMessages.GRAPH_LABEL_CADENCE);
          yDataCadence.setUnitLabel(cadenceUnit);
          yDataCadence.setShowYSlider(true);
          yDataCadence.setDisplayedFractionalDigits(1);
@@ -4489,7 +4461,7 @@ public class TourManager {
             yDataElevation = createChartDataSerieNoZero(altitudeSerie, chartType);
          }
 
-         yDataElevation.setYTitle(GRAPH_LABEL_ALTITUDE);
+         yDataElevation.setYTitle(OtherMessages.GRAPH_LABEL_ALTITUDE);
          yDataElevation.setUnitLabel(UI.UNIT_LABEL_ELEVATION);
          yDataElevation.setShowYSlider(true);
          yDataElevation.setDisplayedFractionalDigits(2);
@@ -4538,7 +4510,7 @@ public class TourManager {
 
          yDataGears = createChartDataSerieNoZero(chartGearSerie, ChartType.HORIZONTAL_BAR);
 
-         yDataGears.setYTitle(GRAPH_LABEL_GEARS);
+         yDataGears.setYTitle(OtherMessages.GRAPH_LABEL_GEARS);
          yDataGears.setShowYSlider(true);
          yDataGears.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GEARS);
          yDataGears.setSliderLabelProvider(new SliderLabelProvider_Gear(gearSerie));
@@ -4565,8 +4537,8 @@ public class TourManager {
 
          yDataGradient = createChartDataSerie(gradientSerie, chartType);
 
-         yDataGradient.setYTitle(GRAPH_LABEL_GRADIENT);
-         yDataGradient.setUnitLabel(GRAPH_LABEL_GRADIENT_UNIT);
+         yDataGradient.setYTitle(OtherMessages.GRAPH_LABEL_GRADIENT);
+         yDataGradient.setUnitLabel(OtherMessages.GRAPH_LABEL_GRADIENT_UNIT);
          yDataGradient.setShowYSlider(true);
          yDataGradient.setDisplayedFractionalDigits(1);
          yDataGradient.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_GRADIENT);
@@ -4946,8 +4918,8 @@ public class TourManager {
 
       if (yDataPulse != null) {
 
-         yDataPulse.setYTitle(GRAPH_LABEL_HEARTBEAT);
-         yDataPulse.setUnitLabel(GRAPH_LABEL_HEARTBEAT_UNIT);
+         yDataPulse.setYTitle(OtherMessages.GRAPH_LABEL_HEARTBEAT);
+         yDataPulse.setUnitLabel(OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
          yDataPulse.setShowYSlider(true);
          yDataPulse.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_PULSE);
          yDataPulse.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_Pulse));
@@ -4990,7 +4962,7 @@ public class TourManager {
 
          yDataPace = createChartDataSerieNoZero(paceSerie, chartType);
 
-         yDataPace.setYTitle(GRAPH_LABEL_PACE);
+         yDataPace.setYTitle(OtherMessages.GRAPH_LABEL_PACE);
          yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
          yDataPace.setShowYSlider(true);
          yDataPace.setAxisUnit(ChartDataSerie.AXIS_UNIT_MINUTE_SECOND);
@@ -5039,7 +5011,7 @@ public class TourManager {
 
          yDataPace = createChartDataSerieNoZero(paceSerie, chartType);
 
-         yDataPace.setYTitle(GRAPH_LABEL_PACE_SUMMARIZED);
+         yDataPace.setYTitle(OtherMessages.GRAPH_LABEL_PACE_SUMMARIZED);
          yDataPace.setUnitLabel(UI.UNIT_LABEL_PACE);
          yDataPace.setShowYSlider(true);
          yDataPace.setAxisUnit(ChartDataSerie.AXIS_UNIT_MINUTE_SECOND);
@@ -5085,8 +5057,8 @@ public class TourManager {
 
          yDataPower = createChartDataSerieNoZero(powerSerie, chartType);
 
-         yDataPower.setYTitle(GRAPH_LABEL_POWER);
-         yDataPower.setUnitLabel(GRAPH_LABEL_POWER_UNIT);
+         yDataPower.setYTitle(OtherMessages.GRAPH_LABEL_POWER);
+         yDataPower.setUnitLabel(OtherMessages.GRAPH_LABEL_POWER_UNIT);
          yDataPower.setShowYSlider(true);
          yDataPower.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_POWER);
          yDataPower.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, false, _computeAvg_Power, 0));
@@ -5129,7 +5101,7 @@ public class TourManager {
 
          yDataSerie = createChartDataSerie(dataSerie, chartType);
 
-         yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_STANCE_TIME);
+         yDataSerie.setYTitle(OtherMessages.GRAPH_LABEL_RUN_DYN_STANCE_TIME);
          yDataSerie.setUnitLabel(UI.UNIT_MS);
          yDataSerie.setShowYSlider(true);
          yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STANCE_TIME);
@@ -5173,7 +5145,7 @@ public class TourManager {
 
          yDataSerie = createChartDataSerie(dataSerie, chartType);
 
-         yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCE);
+         yDataSerie.setYTitle(OtherMessages.GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCE);
          yDataSerie.setUnitLabel(UI.UNIT_PERCENT);
          yDataSerie.setDisplayedFractionalDigits(1);
          yDataSerie.setShowYSlider(true);
@@ -5219,7 +5191,7 @@ public class TourManager {
 
          yDataSerie = createChartDataSerie(dataSerie, chartType);
 
-         yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_STEP_LENGTH);
+         yDataSerie.setYTitle(OtherMessages.GRAPH_LABEL_RUN_DYN_STEP_LENGTH);
          yDataSerie.setUnitLabel(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
          yDataSerie.setShowYSlider(true);
          yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_RUN_DYN_STEP_LENGTH);
@@ -5263,7 +5235,7 @@ public class TourManager {
 
          yDataSerie = createChartDataSerie(dataSerie, chartType);
 
-         yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION);
+         yDataSerie.setYTitle(OtherMessages.GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION);
          yDataSerie.setUnitLabel(UI.UNIT_LABEL_DISTANCE_MM_OR_INCH);
          yDataSerie.setDisplayedFractionalDigits(1);
          yDataSerie.setShowYSlider(true);
@@ -5308,7 +5280,7 @@ public class TourManager {
 
          yDataSerie = createChartDataSerie(dataSerie, chartType);
 
-         yDataSerie.setYTitle(GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO);
+         yDataSerie.setYTitle(OtherMessages.GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO);
          yDataSerie.setUnitLabel(UI.UNIT_PERCENT);
          yDataSerie.setDisplayedFractionalDigits(1);
          yDataSerie.setShowYSlider(true);
@@ -5353,7 +5325,7 @@ public class TourManager {
 
          yDataSpeed = createChartDataSerieNoZero(speedSerie, chartType);
 
-         yDataSpeed.setYTitle(GRAPH_LABEL_SPEED);
+         yDataSpeed.setYTitle(OtherMessages.GRAPH_LABEL_SPEED);
          yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
          yDataSpeed.setShowYSlider(true);
          yDataSpeed.setDisplayedFractionalDigits(1);
@@ -5400,7 +5372,7 @@ public class TourManager {
 
          yDataSpeed = createChartDataSerieNoZero(speedSerie, chartType);
 
-         yDataSpeed.setYTitle(GRAPH_LABEL_SPEED_SUMMARIZED);
+         yDataSpeed.setYTitle(OtherMessages.GRAPH_LABEL_SPEED_SUMMARIZED);
          yDataSpeed.setUnitLabel(UI.UNIT_LABEL_SPEED);
          yDataSpeed.setShowYSlider(true);
          yDataSpeed.setDisplayedFractionalDigits(2);
@@ -5445,8 +5417,8 @@ public class TourManager {
 
          yDataSerie = createChartDataSerie(dataSerie, chartType);
 
-         yDataSerie.setYTitle(GRAPH_LABEL_SWIM_STROKES);
-         yDataSerie.setUnitLabel(GRAPH_LABEL_SWIM_STROKES);
+         yDataSerie.setYTitle(OtherMessages.GRAPH_LABEL_SWIM_STROKES);
+         yDataSerie.setUnitLabel(OtherMessages.GRAPH_LABEL_SWIM_STROKES);
          yDataSerie.setShowYSlider(true);
          yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SWIM_STROKES);
 //         yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_RunDyn_StanceTime));
@@ -5489,8 +5461,8 @@ public class TourManager {
 
          yDataSerie = createChartDataSerie(dataSerie, chartType);
 
-         yDataSerie.setYTitle(GRAPH_LABEL_SWIM_SWOLF);
-         yDataSerie.setUnitLabel(GRAPH_LABEL_SWIM_SWOLF);
+         yDataSerie.setYTitle(OtherMessages.GRAPH_LABEL_SWIM_SWOLF);
+         yDataSerie.setUnitLabel(OtherMessages.GRAPH_LABEL_SWIM_SWOLF);
          yDataSerie.setShowYSlider(true);
          yDataSerie.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_SWIM_SWOLF);
 //         yDataSerie.setCustomData(CUSTOM_DATA_ANALYZER_INFO, new TourChartAnalyzerInfo(true, _computeAvg_RunDyn_StanceTime));
@@ -5532,7 +5504,7 @@ public class TourManager {
 
          yDataTemperature = createChartDataSerie(temperatureSerie, chartType);
 
-         yDataTemperature.setYTitle(GRAPH_LABEL_TEMPERATURE);
+         yDataTemperature.setYTitle(OtherMessages.GRAPH_LABEL_TEMPERATURE);
          yDataTemperature.setUnitLabel(UI.UNIT_LABEL_TEMPERATURE);
          yDataTemperature.setShowYSlider(true);
          yDataTemperature.setDisplayedFractionalDigits(1);
@@ -5576,10 +5548,10 @@ public class TourManager {
 
          yDataTourCompare = createChartDataSerie(tourCompareSerie, chartType);
 
-         yDataTourCompare.setYTitle(GRAPH_LABEL_TOUR_COMPARE);
+         yDataTourCompare.setYTitle(OtherMessages.GRAPH_LABEL_TOUR_COMPARE);
          yDataTourCompare.setUnitLabel(tcc.isGeoCompareDiff
-               ? GRAPH_LABEL_GEO_COMPARE_UNIT
-               : GRAPH_LABEL_TOUR_COMPARE_UNIT);
+               ? OtherMessages.GRAPH_LABEL_GEO_COMPARE_UNIT
+               : OtherMessages.GRAPH_LABEL_TOUR_COMPARE_UNIT);
          yDataTourCompare.setShowYSlider(true);
          yDataTourCompare.setGraphFillMethod(ChartDataYSerie.FILL_METHOD_FILL_BOTTOM);
          yDataTourCompare.setCustomData(ChartDataYSerie.YDATA_INFO, GRAPH_TOUR_COMPARE);

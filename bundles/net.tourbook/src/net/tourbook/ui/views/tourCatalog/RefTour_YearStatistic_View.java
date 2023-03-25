@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -79,14 +80,11 @@ import org.eclipse.ui.part.ViewPart;
 
 public class RefTour_YearStatistic_View extends ViewPart {
 
-   private static final String GRAPH_LABEL_HEARTBEAT      = net.tourbook.common.Messages.Graph_Label_Heartbeat;
-   private static final String GRAPH_LABEL_HEARTBEAT_UNIT = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   public static final String  ID                    = "net.tourbook.views.tourCatalog.yearStatisticView"; //$NON-NLS-1$
 
-   public static final String  ID                         = "net.tourbook.views.tourCatalog.yearStatisticView";     //$NON-NLS-1$
+   static final String         STATE_NUMBER_OF_YEARS = "numberOfYearsToDisplay";                           //$NON-NLS-1$
 
-   static final String         STATE_NUMBER_OF_YEARS      = "numberOfYearsToDisplay";                               //$NON-NLS-1$
-
-   private static final String GRID_PREF_PREFIX           = "GRID_REF_TOUR_YEAR_STATISTIC__";                       //$NON-NLS-1$
+   private static final String GRID_PREF_PREFIX      = "GRID_REF_TOUR_YEAR_STATISTIC__";                   //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
@@ -502,7 +500,6 @@ public class RefTour_YearStatistic_View extends ViewPart {
             }
          }
       }
-
 
       /**
        * Create data for all years
@@ -1154,7 +1151,6 @@ public class RefTour_YearStatistic_View extends ViewPart {
          createStatisticData_WithoutYearCategories(firstYear, isShowLatestYear);
       }
 
-
       final ChartDataModel chartModel = new ChartDataModel(ChartType.BAR);
 
       final ChartDataXSerie xData = new ChartDataXSerie(ArrayListToArray.integerToDouble(_statValues_DOYValues));
@@ -1202,8 +1198,8 @@ public class RefTour_YearStatistic_View extends ViewPart {
       TourManager.setBarColors(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
       TourManager.setGraphColors(yDataPulse, GraphColorManager.PREF_GRAPH_HEARTBEAT);
 
-      yDataPulse.setYTitle(GRAPH_LABEL_HEARTBEAT);
-      yDataPulse.setUnitLabel(GRAPH_LABEL_HEARTBEAT_UNIT);
+      yDataPulse.setYTitle(OtherMessages.GRAPH_LABEL_HEARTBEAT);
+      yDataPulse.setUnitLabel(OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
       yDataPulse.setShowYSlider(true);
 
       /*
