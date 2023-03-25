@@ -81,7 +81,6 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
    private Button    _chkRecomputeElevation;
    
    private Combo     _comboElevationOptions;
-
    private Combo     _comboTagContent;
    
    private Label     _lblNumTagContentColumns;

@@ -4,6 +4,8 @@
 TODO's
 ======               
 
+* Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
+
 * Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
                     Need to check how to apply it to all projects, must maybe be done with the already existing ant script
 
@@ -41,7 +43,10 @@ Improvements
 Changes
 =======
 
-* 
+* Tour Editor     
+  - Change wording for the save dialog actions: Save Tour, Discard Modifications, Cancel
+                    
+
 
 
 Bugfix
