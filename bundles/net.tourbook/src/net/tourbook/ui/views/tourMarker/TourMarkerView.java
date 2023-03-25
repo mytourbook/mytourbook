@@ -34,7 +34,7 @@ import net.tourbook.common.util.ColumnManager;
 import net.tourbook.common.util.IContextMenuProvider;
 import net.tourbook.common.util.ITourViewer;
 import net.tourbook.common.util.PostSelectionProvider;
-import net.tourbook.data.ElevationUpDown;
+import net.tourbook.data.ElevationGainLoss;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.database.TourDatabase;
@@ -656,13 +656,13 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final int currentMarkerIndex = getCurrentMarkerIndex(cell);
 
-            final ElevationUpDown elevationGainLoss = _tourData.computeAltitudeUpDown(previousMarkerIndex, currentMarkerIndex);
+            final ElevationGainLoss elevationGainLoss = _tourData.computeAltitudeUpDown(previousMarkerIndex, currentMarkerIndex);
 
             if (elevationGainLoss == null) {
                cell.setText(UI.EMPTY_STRING);
             } else {
 
-               final double value = elevationGainLoss.getAltitudeUp() / UI.UNIT_VALUE_ELEVATION;
+               final double value = elevationGainLoss.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
                colDef.printValue_0(cell, value);
             }
          }
@@ -683,7 +683,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
 
             final int currentMarkerIndex = getCurrentMarkerIndex(cell);
 
-            final ElevationUpDown elevationGainLoss = _tourData.computeAltitudeUpDown(
+            final ElevationGainLoss elevationGainLoss = _tourData.computeAltitudeUpDown(
                   previousMarkerIndex,
                   currentMarkerIndex);
 
@@ -691,7 +691,7 @@ public class TourMarkerView extends ViewPart implements ITourProvider, ITourView
                cell.setText(UI.EMPTY_STRING);
             } else {
 
-               final double value = elevationGainLoss.getAltitudeDown() / UI.UNIT_VALUE_ELEVATION;
+               final double value = elevationGainLoss.getElevationLoss() / UI.UNIT_VALUE_ELEVATION;
 
                colDef.printValue_0(cell, value);
             }
