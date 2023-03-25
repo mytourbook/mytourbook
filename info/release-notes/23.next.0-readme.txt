@@ -34,7 +34,8 @@ Improvements
 ============
 
 * Easy Import
-  - Set elevation up/down totals from SRTM data                   https://github.com/mytourbook/mytourbook/issues/824
+  - Set elevation up/down totals from SRTM data                   
+    https://github.com/mytourbook/mytourbook/issues/824#issuecomment-1483739484
 
 
 Changes
@@ -46,7 +47,7 @@ Changes
 Bugfix
 ======
 
-* Tour Editor
+* 
 
 
 
