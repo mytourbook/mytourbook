@@ -636,13 +636,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   8,
-                  Messages.Tooltip_ValuePoint_Label_MovingTime_Tooltip,
+                  UI.EMPTY_STRING,
                   GraphColorManager.PREF_GRAPH_TIME);
 
             _lblTimeMoving_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_LABEL_TIME,
-                  Messages.Tooltip_ValuePoint_Label_MovingTime_Tooltip,
+                  UI.EMPTY_STRING,
                   GraphColorManager.PREF_GRAPH_TIME);
          }
       }
@@ -1721,6 +1721,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
       _currentValueIndex = valueIndex;
 
+      final int durationTime = timeSerie[valueIndex];
+
       if (_isVisible_And_Available_Altimeter) {
          _lblAltimeter.setText(Integer.toString((int) _tourData.getAltimeterSerie()[valueIndex]));
       }
@@ -1842,15 +1844,26 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       if (_isVisible_And_Available_TimeDuration) {
-         _lblTimeDuration.setText(UI.format_hhh_mm_ss(timeSerie[valueIndex]));
+         _lblTimeDuration.setText(UI.format_hhh_mm_ss(durationTime));
       }
 
       if (_isVisible_And_Available_TimeMoving) {
-         _lblTimeMoving.setText(UI.format_hhh_mm_ss(_tourData.getMovingTimeSerie()[valueIndex]));
+
+         final int movingTime = _tourData.getMovingTimeSerie()[valueIndex];
+         final int breakTime = durationTime - movingTime;
+
+         final String tooltip = String.format(
+               Messages.Tooltip_ValuePoint_Label_MovingTime_Tooltip,
+               UI.format_hhh_mm_ss(breakTime));
+
+         _lblTimeMoving.setText(UI.format_hhh_mm_ss(movingTime));
+         _lblTimeMoving.setToolTipText(tooltip);
+         
+         _lblTimeMoving_Unit.setToolTipText(tooltip);
       }
 
       if (_isVisible_And_Available_TimeOfDay) {
-         _lblTimeOfDay.setText(UI.format_hhh_mm_ss((_tourData.getStartTimeOfDay() + timeSerie[valueIndex]) % 86400));
+         _lblTimeOfDay.setText(UI.format_hhh_mm_ss((_tourData.getStartTimeOfDay() + durationTime) % 86400));
       }
 
       if (_isVisible_And_Available_TimeSlice) {
