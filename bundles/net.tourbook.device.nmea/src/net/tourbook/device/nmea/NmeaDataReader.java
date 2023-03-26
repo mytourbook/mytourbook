@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,9 +15,14 @@
  *******************************************************************************/
 package net.tourbook.device.nmea;
 
+import com.skedgo.converter.TimezoneMapper;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -286,15 +291,29 @@ public class NmeaDataReader extends TourbookDevice {
       /*
        * set tour start date/time
        */
-      _calendar.setTimeInMillis(_timeDataList.get(0).absoluteTime);
+      if (_timeDataList.get(0).latitude != 0 && _timeDataList.get(0).longitude != 0) {
 
-      tourData.setTourStartTime(
-            _calendar.get(Calendar.YEAR),
-            _calendar.get(Calendar.MONTH) + 1,
-            _calendar.get(Calendar.DAY_OF_MONTH),
-            _calendar.get(Calendar.HOUR_OF_DAY),
-            _calendar.get(Calendar.MINUTE),
-            _calendar.get(Calendar.SECOND));
+         final String rawZoneId = TimezoneMapper.latLngToTimezoneString(
+               _timeDataList.get(0).latitude,
+               _timeDataList.get(0).longitude);
+         final ZoneId zoneId = ZoneId.of(rawZoneId);
+
+         final ZonedDateTime tourZonedDateTime = ZonedDateTime.ofInstant(
+               Instant.ofEpochMilli(_timeDataList.get(0).absoluteTime),
+               zoneId);
+
+         tourData.setTourStartTime(tourZonedDateTime);
+      } else {
+
+         _calendar.setTimeInMillis(_timeDataList.get(0).absoluteTime);
+         tourData.setTourStartTime(
+               _calendar.get(Calendar.YEAR),
+               _calendar.get(Calendar.MONTH) + 1,
+               _calendar.get(Calendar.DAY_OF_MONTH),
+               _calendar.get(Calendar.HOUR_OF_DAY),
+               _calendar.get(Calendar.MINUTE),
+               _calendar.get(Calendar.SECOND));
+      }
 
       tourData.setDeviceTimeInterval((short) -1);
       tourData.setImportFilePath(_importFilePath);
