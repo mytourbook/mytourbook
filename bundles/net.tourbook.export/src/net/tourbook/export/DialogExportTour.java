@@ -33,7 +33,7 @@ import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
@@ -1610,7 +1610,7 @@ public class DialogExportTour extends TitleAreaDialog {
 
          String fileName = getExportFileName();
 
-         fileName = FilesUtils.removeExtensions(fileName);
+         fileName = FileUtils.removeExtensions(fileName);
 
          // build file path with extension
          filePath = filePath

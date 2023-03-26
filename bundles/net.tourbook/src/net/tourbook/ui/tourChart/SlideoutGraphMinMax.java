@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionResetToDefaults;
@@ -26,7 +27,6 @@ import net.tourbook.common.action.IActionResetToDefault;
 import net.tourbook.common.color.IColorSelectorListener;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.tooltip.ToolbarSlideout;
-import net.tourbook.common.util.Util;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPagePeople;
 
@@ -52,12 +52,6 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
-   private static final String    GRAPH_LABEL_CADENCE_UNIT         = net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
-   private static final String    GRAPH_LABEL_HEARTBEAT_UNIT       = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-   private static final String    GRAPH_LABEL_POWER_UNIT           = net.tourbook.common.Messages.Graph_Label_Power_Unit;
-   private static final String    GRAPH_LABEL_SWIM_STROKES         = net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
-   private static final String    GRAPH_LABEL_SWIM_SWOLF           = net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
-
    private static final int       ALTIMETER_MIN                    = -10000;
    private static final int       ALTIMETER_MAX                    = 10000;
    private static final int       ALTITUDE_MIN                     = -1000;
@@ -71,11 +65,11 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
    private static final int       TEMPERATURE_MIN                  = -100;
    private static final int       TEMPERATURE_MAX                  = 100;
 
-   private static final int       RUN_DYN_STANCE_TIME_MAX          = 10000;                                                  // ms
-   private static final int       RUN_DYN_STANCE_TIME_BALANCED_MAX = 100;                                                    // %
-   private static final int       RUN_DYN_STEP_LENGTH_MAX          = 10000;                                                  // mm
-   private static final int       RUN_DYN_VERTICAL_OSCILLATION_MAX = 1000;                                                   // mm
-   private static final int       RUN_DYN_VERTICAL_RATIO_MAX       = 100;                                                    // %
+   private static final int       RUN_DYN_STANCE_TIME_MAX          = 10000;                        // ms
+   private static final int       RUN_DYN_STANCE_TIME_BALANCED_MAX = 100;                          // %
+   private static final int       RUN_DYN_STEP_LENGTH_MAX          = 10000;                        // mm
+   private static final int       RUN_DYN_VERTICAL_OSCILLATION_MAX = 1000;                         // mm
+   private static final int       RUN_DYN_VERTICAL_RATIO_MAX       = 100;                          // %
 
    private static final int       SWIM_STROKES_MAX                 = 10000;
    private static final int       SWIM_SWOLF_MAX                   = 10000;
@@ -508,7 +502,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       _chkMax_Pulse = createUI_Checkbox(parent);
       _spinnerMax_Pulse = createUI_Spinner(parent, 0, PrefPagePeople.HEART_BEAT_MAX);
 
-      _lblMinMax_Pulse_Unit = createUI_Label(parent, GRAPH_LABEL_HEARTBEAT_UNIT);
+      _lblMinMax_Pulse_Unit = createUI_Label(parent, OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
    }
 
    private void createUI_65_MinMax_Speed(final Composite parent) {
@@ -553,7 +547,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       _chkMax_Cadence = createUI_Checkbox(parent);
       _spinnerMax_Cadence = createUI_Spinner(parent, 0, CADENCE_MAX);
 
-      _lblMinMax_Cadence_Unit = createUI_Label(parent, GRAPH_LABEL_CADENCE_UNIT);
+      _lblMinMax_Cadence_Unit = createUI_Label(parent, OtherMessages.GRAPH_LABEL_CADENCE_UNIT);
    }
 
    private void createUI_68_MinMax_Power(final Composite parent) {
@@ -568,7 +562,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       _chkMax_Power = createUI_Checkbox(parent);
       _spinnerMax_Power = createUI_Spinner(parent, 0, POWER_MAX);
 
-      _lblMinMax_Power_Unit = createUI_Label(parent, GRAPH_LABEL_POWER_UNIT);
+      _lblMinMax_Power_Unit = createUI_Label(parent, OtherMessages.GRAPH_LABEL_POWER_UNIT);
    }
 
    private void createUI_69_MinMax_Temperature(final Composite parent) {
@@ -677,7 +671,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       _chkMax_Swim_Strokes = createUI_Checkbox(parent);
       _spinnerMax_Swim_Strokes = createUI_Spinner(parent, 0, SWIM_STROKES_MAX);
 
-      _lblMinMax_Swim_Strokes_Unit = createUI_Label(parent, GRAPH_LABEL_SWIM_STROKES);
+      _lblMinMax_Swim_Strokes_Unit = createUI_Label(parent, OtherMessages.GRAPH_LABEL_SWIM_STROKES);
    }
 
    private void createUI_86_MinMax_Swim_Swolf(final Composite parent) {
@@ -692,7 +686,7 @@ public class SlideoutGraphMinMax extends ToolbarSlideout implements IColorSelect
       _chkMax_Swim_Swolf = createUI_Checkbox(parent);
       _spinnerMax_Swim_Swolf = createUI_Spinner(parent, 0, SWIM_SWOLF_MAX);
 
-      _lblMinMax_Swim_Swolf_Unit = createUI_Label(parent, GRAPH_LABEL_SWIM_SWOLF);
+      _lblMinMax_Swim_Swolf_Unit = createUI_Label(parent, OtherMessages.GRAPH_LABEL_SWIM_SWOLF);
    }
 
    private Button createUI_Checkbox(final Composite parent) {

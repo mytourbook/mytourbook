@@ -30,7 +30,7 @@ import java.util.Date;
 import java.util.List;
 
 import net.tourbook.Messages;
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -193,7 +193,7 @@ public class TourBookViewTests extends UITest {
       final Path csvFilePath = Paths.get(Utils.workingDirectory, "TourBook_2022-08-30_21-39-05.csv"); //$NON-NLS-1$
       assertTrue(Files.exists(csvFilePath));
 
-      FilesUtils.deleteIfExists(csvFilePath);
+      FileUtils.deleteIfExists(csvFilePath);
       assertTrue(!Files.exists(csvFilePath));
    }
 

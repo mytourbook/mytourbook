@@ -2,16 +2,9 @@
 
 
 TODO's
-======
+======               
 
-* Tour Editor     - Change wording for save dialog actions -> Save, Discard, Cancel + dialog text
-                    net.tourbook.ui.views.tourDataEditor.TourDataEditorView.saveTourConfirmation()
-                    
-                  - Size tag image for 4k display
-
-
-* FileUtils/FilesUtils     Merge these files
-               
+* Tour Editor     - Remove experimental message box: net.tourbook.ui.views.tourDataEditor.TourDataEditorView.actionCreateTour(TourData)
 
 * Website         - Save action must not be done manually, they are saved in e.g. net.tourbook/.settings/org.eclipse.jdt.ui.prefs with the "sp_cleanup" key prefix
                     Need to check how to apply it to all projects, must maybe be done with the already existing ant script
@@ -44,7 +37,6 @@ Improvements
 
 * 
 
-
 Changes
 =======
 
@@ -54,7 +46,7 @@ Changes
 Bugfix
 ======
 
-* Tour Editor
+* 
 
 
 

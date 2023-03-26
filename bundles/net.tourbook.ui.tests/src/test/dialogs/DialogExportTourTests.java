@@ -22,7 +22,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import net.tourbook.Messages;
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.jupiter.api.Test;
@@ -54,7 +54,7 @@ public class DialogExportTourTests extends UITest {
       final Path gpxFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(gpxFilePath));
 
-      FilesUtils.deleteIfExists(gpxFilePath);
+      FileUtils.deleteIfExists(gpxFilePath);
       assertTrue(!Files.exists(gpxFilePath));
    }
 
@@ -71,7 +71,7 @@ public class DialogExportTourTests extends UITest {
       final Path mtFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(mtFilePath));
 
-      FilesUtils.deleteIfExists(mtFilePath);
+      FileUtils.deleteIfExists(mtFilePath);
       assertTrue(!Files.exists(mtFilePath));
    }
 
@@ -92,7 +92,7 @@ public class DialogExportTourTests extends UITest {
       final Path tcxFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(tcxFilePath));
 
-      FilesUtils.deleteIfExists(tcxFilePath);
+      FileUtils.deleteIfExists(tcxFilePath);
       assertTrue(!Files.exists(tcxFilePath));
    }
 }

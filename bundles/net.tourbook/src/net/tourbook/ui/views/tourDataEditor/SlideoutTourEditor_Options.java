@@ -53,7 +53,13 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
-   private static final IDialogSettings _state = TourbookPlugin.getState(TourDataEditorView.ID);
+   private static final IDialogSettings _state              = TourbookPlugin.getState(TourDataEditorView.ID);
+
+   private static final String[]        ALL_ELEVATION_OPTIONS = {
+
+         Messages.Slideout_TourEditor_Combo_ElevationFromDevice,
+         Messages.Slideout_TourEditor_Combo_ElevationFromSRTM,
+   };
 
    private TourDataEditorView           _tourEditorView;
 
@@ -73,9 +79,10 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
    private Button    _chkDelete_KeepDistance;
    private Button    _chkDelete_KeepTime;
    private Button    _chkRecomputeElevation;
-
+   
+   private Combo     _comboElevationOptions;
    private Combo     _comboTagContent;
-
+   
    private Label     _lblNumTagContentColumns;
    private Label     _lblTagImageSize;
    private Label     _lblTagContentWidth;
@@ -288,6 +295,17 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
          _chkRecomputeElevation.setToolTipText(Messages.Slideout_TourEditor_Checkbox_RecomputeElevationUpDown_Tooltip);
          _chkRecomputeElevation.addSelectionListener(_defaultSelectionListener);
          GridDataFactory.fillDefaults().span(2, 1).applyTo(_chkRecomputeElevation);
+
+         // combo
+         _comboElevationOptions = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY);
+         _comboElevationOptions.setVisibleItemCount(20);
+         _comboElevationOptions.addSelectionListener(_defaultSelectionListener);
+         _comboElevationOptions.addFocusListener(_keepOpenListener);
+         GridDataFactory.fillDefaults()
+               .span(2, 1)
+               .grab(true, false)
+               .indent(16, 0)
+               .applyTo(_comboElevationOptions);
       }
    }
 
@@ -392,13 +410,16 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
       final TagContentLayout selectedTagContentLayout = getSelectedTagContentLayout();
 
-      final boolean isTagContentWithImage = TagContentLayout.IMAGE_AND_DATA.equals(selectedTagContentLayout);
-
 // SET_FORMATTING_OFF
+
+      final boolean isTagContentWithImage = TagContentLayout.IMAGE_AND_DATA.equals(selectedTagContentLayout);
+      final boolean isRecomputeElevation  = _chkRecomputeElevation.getSelection();
 
       _lblNumTagContentColumns      .setEnabled(isTagContentWithImage);
       _lblTagContentWidth           .setEnabled(isTagContentWithImage);
       _lblTagImageSize              .setEnabled(isTagContentWithImage);
+
+      _comboElevationOptions         .setEnabled(isRecomputeElevation);
 
       _spinnerTag_NumContentColumns .setEnabled(isTagContentWithImage);
       _spinnerTag_TextWidth         .setEnabled(isTagContentWithImage);
@@ -409,9 +430,26 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
    private void fillUI() {
 
+      for (final String elevationOption : ALL_ELEVATION_OPTIONS) {
+         _comboElevationOptions.add(elevationOption);
+      }
+
       for (final TagContentLayoutItem layoutItem : TagManager.ALL_TAG_CONTENT_LAYOUT) {
          _comboTagContent.add(layoutItem.label);
       }
+   }
+
+   private int getElevationFromDeviceIndex(final boolean isElevationFromDevice) {
+
+      return isElevationFromDevice ? 0 : 1;
+   }
+
+   private boolean getIsElevationFromDevice() {
+
+      // get valid index
+      final int selectionIndex = Math.max(0, _comboElevationOptions.getSelectionIndex());
+
+      return selectionIndex == 0;
    }
 
    private TagContentLayout getSelectedTagContentLayout() {
@@ -468,6 +506,8 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
    private void onChangeUI() {
 
+      enableControls();
+
       saveState();
    }
 
@@ -519,6 +559,7 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
 
       final boolean isDeleteKeepDistance        = TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT;
       final boolean isDeleteKeepTime            = TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT;
+      final boolean isElevationFromDevice       = TourDataEditorView.STATE_IS_ELEVATION_FROM_DEVICE_DEFAULT;
       final boolean isRecomputeElevation        = TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT;
 
       final int tagContentWidth                 = TourDataEditorView.STATE_TAG_TEXT_WIDTH_DEFAULT;
@@ -531,6 +572,7 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
        */
       _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,            isDeleteKeepDistance);
       _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,                isDeleteKeepTime);
+      _state.put(TourDataEditorView.STATE_IS_ELEVATION_FROM_DEVICE,           isElevationFromDevice);
       _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,     isRecomputeElevation);
       _state.put(TourDataEditorView.STATE_DESCRIPTION_NUMBER_OF_LINES,        descriptionNumberOfLines);
       _state.put(TourDataEditorView.STATE_LAT_LON_DIGITS,                     latLonDigits);
@@ -547,6 +589,7 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _chkDelete_KeepDistance             .setSelection(isDeleteKeepDistance);
       _chkDelete_KeepTime                 .setSelection(isDeleteKeepTime);
       _chkRecomputeElevation              .setSelection(isRecomputeElevation);
+      _comboElevationOptions              .select(getElevationFromDeviceIndex(isElevationFromDevice));
       _spinnerLatLonDigits                .setSelection(latLonDigits);
       _spinnerTourDescriptionNumLines     .setSelection(descriptionNumberOfLines);
       _spinnerWeatherDescriptionNumLines  .setSelection(weatherDescriptionNumberOfLines);
@@ -563,9 +606,17 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _tourEditorView.updateUI_LatLonDigits(latLonDigits);
 
       TagManager.updateTagContent();
+
+      enableControls();
    }
 
    private void restoreState() {
+
+      final boolean isElevationFromDevice = Util.getStateBoolean(_state,
+            TourDataEditorView.STATE_IS_ELEVATION_FROM_DEVICE,
+            TourDataEditorView.STATE_IS_ELEVATION_FROM_DEVICE_DEFAULT);
+
+      _comboElevationOptions.select(getElevationFromDeviceIndex(isElevationFromDevice));
 
       _chkDelete_KeepDistance.setSelection(Util.getStateBoolean(_state,
             TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,
@@ -624,6 +675,8 @@ public class SlideoutTourEditor_Options extends ToolbarSlideout implements IColo
       _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,         _chkDelete_KeepDistance.getSelection());
       _state.put(TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,             _chkDelete_KeepTime.getSelection());
       _state.put(TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,  _chkRecomputeElevation.getSelection());
+
+      _state.put(TourDataEditorView.STATE_IS_ELEVATION_FROM_DEVICE,        getIsElevationFromDevice());
 
 // SET_FORMATTING_ON
 

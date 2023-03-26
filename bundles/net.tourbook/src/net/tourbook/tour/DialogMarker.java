@@ -29,6 +29,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
@@ -95,17 +96,14 @@ import org.eclipse.swt.widgets.Text;
 
 public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectionListener, ITourMarkerModifyListener {
 
-   private static final String      TOUR_MARKER_COLUMN_IS_VISIBLE         = net.tourbook.ui.Messages.Tour_Marker_Column_IsVisible;
-   private static final String      TOUR_MARKER_COLUMN_IS_VISIBLE_TOOLTIP = net.tourbook.ui.Messages.Tour_Marker_Column_IsVisible_Tooltip;
+   private static final String      DIALOG_SETTINGS_POSITION = "marker_position";                       //$NON-NLS-1$
+   private static final String      STATE_INNER_SASH_HEIGHT  = "STATE_INNER_SASH_HEIGHT";               //$NON-NLS-1$
+   private static final String      STATE_OUTER_SASH_WIDTH   = "STATE_OUTER_SASH_WIDTH";                //$NON-NLS-1$
 
-   private static final String      DIALOG_SETTINGS_POSITION              = "marker_position";                                            //$NON-NLS-1$
-   private static final String      STATE_INNER_SASH_HEIGHT               = "STATE_INNER_SASH_HEIGHT";                                    //$NON-NLS-1$
-   private static final String      STATE_OUTER_SASH_WIDTH                = "STATE_OUTER_SASH_WIDTH";                                     //$NON-NLS-1$
+   private static final int         OFFSET_PAGE_INCREMENT    = 20;
+   private static final int         OFFSET_MAX               = 200;
 
-   private static final int         OFFSET_PAGE_INCREMENT                 = 20;
-   private static final int         OFFSET_MAX                            = 200;
-
-   private final IDialogSettings    _state                                = TourbookPlugin.getState("DialogMarker");                      //$NON-NLS-1$
+   private final IDialogSettings    _state                   = TourbookPlugin.getState("DialogMarker"); //$NON-NLS-1$
 
    private TourChart                _tourChart;
    private TourData                 _tourData;
@@ -118,7 +116,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    /**
     * backup for the selected tour marker
     */
-   private TourMarker               _backupMarker                         = new TourMarker();
+   private TourMarker               _backupMarker            = new TourMarker();
 
    private Set<TourMarker>          _originalTourMarkers;
    private HashSet<TourMarker>      _dialogTourMarkers;
@@ -135,9 +133,9 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
    private boolean                  _isOkPressed;
    private boolean                  _isInCreateUI;
    private boolean                  _isUpdateUI;
-   private boolean                  _isSetXSlider                         = true;
+   private boolean                  _isSetXSlider            = true;
 
-   private NumberFormat             _nf3                                  = NumberFormat.getNumberInstance();
+   private NumberFormat             _nf3                     = NumberFormat.getNumberInstance();
 
    private int                      _contentWidthHint;
 
@@ -145,7 +143,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
     * Contains the controls which are displayed in the first column, these controls are used to get
     * the maximum width and set the first column within the different section to the same width.
     */
-   private final ArrayList<Control> _firstColumnControls                  = new ArrayList<>();
+   private final ArrayList<Control> _firstColumnControls     = new ArrayList<>();
 
    /*
     * none UI
@@ -949,7 +947,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
           */
          _chkVisibility = new Button(parent, SWT.CHECK);
          _chkVisibility.setText(Messages.Dlg_TourMarker_Checkbox_MarkerVisibility);
-         _chkVisibility.setToolTipText(TOUR_MARKER_COLUMN_IS_VISIBLE_TOOLTIP);
+         _chkVisibility.setToolTipText(OtherMessages.TOUR_MARKER_COLUMN_IS_VISIBLE_TOOLTIP);
          _chkVisibility.addSelectionListener(widgetSelectedAdapter(selectionEvent -> toggleMarkerVisibility()));
          GridDataFactory.fillDefaults()
 //					.span(2, 1)
@@ -1131,8 +1129,8 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
       final TableViewerColumn tvc = new TableViewerColumn(_markerViewer, SWT.LEAD);
       final TableColumn tc = tvc.getColumn();
 
-      tc.setText(TOUR_MARKER_COLUMN_IS_VISIBLE);
-      tc.setToolTipText(TOUR_MARKER_COLUMN_IS_VISIBLE_TOOLTIP);
+      tc.setText(OtherMessages.TOUR_MARKER_COLUMN_IS_VISIBLE);
+      tc.setToolTipText(OtherMessages.TOUR_MARKER_COLUMN_IS_VISIBLE_TOOLTIP);
 
       tvc.setEditingSupport(new MarkerEditingSupport(_markerViewer));
 
@@ -1234,7 +1232,7 @@ public class DialogMarker extends TitleAreaDialog implements ITourMarkerSelectio
             final String urlText = tourMarker.getUrlText();
 
             cell.setText(urlAddress.length() > 0 || urlText.length() > 0 ? //
-            UI.SYMBOL_STAR
+                  UI.SYMBOL_STAR
                   : UI.EMPTY_STRING);
          }
       });

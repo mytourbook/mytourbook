@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.CommonActivator;
@@ -78,13 +79,11 @@ import org.eclipse.ui.part.ViewPart;
 
 public class TourPausesView extends ViewPart implements ITourProvider, ITourViewer {
 
-   private static final String     COLUMN_FACTORY_CATEGORY_TIME = net.tourbook.ui.Messages.ColumnFactory_Category_Time;
+   public static final String      ID                = "net.tourbook.ui.views.TourPausesView"; //$NON-NLS-1$
 
-   public static final String      ID                           = "net.tourbook.ui.views.TourPausesView";              //$NON-NLS-1$
-
-   private final IPreferenceStore  _prefStore                   = TourbookPlugin.getPrefStore();
-   private final IPreferenceStore  _prefStore_Common            = CommonActivator.getPrefStore();
-   private final IDialogSettings   _state                       = TourbookPlugin.getState(ID);
+   private final IPreferenceStore  _prefStore        = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore_Common = CommonActivator.getPrefStore();
+   private final IDialogSettings   _state            = TourbookPlugin.getState(ID);
 
    private PostSelectionProvider   _postSelectionProvider;
    private ISelectionListener      _postSelectionListener;
@@ -470,7 +469,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       colDef.setColumnHeaderText(Messages.Tour_Pauses_Column_Duration_Label);
       colDef.setColumnHeaderToolTipText(Messages.Tour_Pauses_Column_Duration_Tooltip);
 
-      colDef.setColumnCategory(COLUMN_FACTORY_CATEGORY_TIME);
+      colDef.setColumnCategory(OtherMessages.COLUMN_FACTORY_CATEGORY_TIME);
 
       colDef.setIsDefaultColumn();
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
@@ -497,7 +496,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       colDef.setColumnHeaderText(Messages.Tour_Pauses_Column_EndTime_Daytime_Label);
       colDef.setColumnHeaderToolTipText(Messages.Tour_Pauses_Column_EndTime_Daytime_Tooltip);
 
-      colDef.setColumnCategory(COLUMN_FACTORY_CATEGORY_TIME);
+      colDef.setColumnCategory(OtherMessages.COLUMN_FACTORY_CATEGORY_TIME);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
@@ -523,7 +522,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       colDef.setColumnHeaderText(Messages.Tour_Pauses_Column_StartTime_Daytime_Label);
       colDef.setColumnHeaderToolTipText(Messages.Tour_Pauses_Column_StartTime_Daytime_Tooltip);
 
-      colDef.setColumnCategory(COLUMN_FACTORY_CATEGORY_TIME);
+      colDef.setColumnCategory(OtherMessages.COLUMN_FACTORY_CATEGORY_TIME);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
 
@@ -549,7 +548,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       colDef.setColumnHeaderText(Messages.Tour_Pauses_Column_EndTime_Relative_Header);
       colDef.setColumnHeaderToolTipText(Messages.Tour_Pauses_Column_EndTime_Relative_Label);
 
-      colDef.setColumnCategory(COLUMN_FACTORY_CATEGORY_TIME);
+      colDef.setColumnCategory(OtherMessages.COLUMN_FACTORY_CATEGORY_TIME);
 
       colDef.setIsDefaultColumn();
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
@@ -576,7 +575,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
       colDef.setColumnHeaderText(Messages.Tour_Pauses_Column_StartTime_Relative_Header);
       colDef.setColumnHeaderToolTipText(Messages.Tour_Pauses_Column_StartTime_Relative_Tooltip);
 
-      colDef.setColumnCategory(COLUMN_FACTORY_CATEGORY_TIME);
+      colDef.setColumnCategory(OtherMessages.COLUMN_FACTORY_CATEGORY_TIME);
 
       colDef.setIsDefaultColumn();
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));

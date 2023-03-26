@@ -37,7 +37,7 @@ import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
@@ -112,7 +112,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
     */
    private String convertTourToGpx(final TourData tourData) {
 
-      final String absoluteTourFilePath = FilesUtils.createTemporaryFile(String.valueOf(tourData.getTourId()), "gpx"); //$NON-NLS-1$
+      final String absoluteTourFilePath = FileUtils.createTemporaryFile(String.valueOf(tourData.getTourId()), "gpx"); //$NON-NLS-1$
 
       _tourExporter.useTourData(tourData);
 
@@ -137,9 +137,9 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
 
       _tourExporter.export(absoluteTourFilePath);
 
-      final String tourGpx = FilesUtils.readFileContentString(absoluteTourFilePath);
+      final String tourGpx = FileUtils.readFileContentString(absoluteTourFilePath);
 
-      FilesUtils.deleteIfExists(Paths.get(absoluteTourFilePath));
+      FileUtils.deleteIfExists(Paths.get(absoluteTourFilePath));
 
       return tourGpx;
    }

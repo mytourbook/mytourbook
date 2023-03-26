@@ -21,7 +21,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.printing.Messages;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
@@ -48,7 +48,7 @@ public class DialogPrintTourTests extends UITest {
       final Path pdfFilePath = Paths.get(Utils.workingDirectory, fileName);
       assertTrue(Files.exists(pdfFilePath));
 
-      FilesUtils.deleteIfExists(pdfFilePath);
+      FileUtils.deleteIfExists(pdfFilePath);
       assertTrue(!Files.exists(pdfFilePath));
    }
 }

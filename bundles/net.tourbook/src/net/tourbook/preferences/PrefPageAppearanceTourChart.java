@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.MouseWheelMode;
 import net.tourbook.common.UI;
@@ -56,41 +57,11 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPageAppearanceTourChart extends PreferencePage implements IWorkbenchPreferencePage {
 
-   public static final String  ID                                        = "net.tourbook.preferences.PrefPageChartGraphs";                     //$NON-NLS-1$
+   public static final String      ID                                        = "net.tourbook.preferences.PrefPageChartGraphs"; //$NON-NLS-1$
 
-   private static final String STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB = "PrefPage.ChartGraphs.SelectedTab";                                 //$NON-NLS-1$
+   private static final String     STATE_PREF_PAGE_CHART_GRAPHS_SELECTED_TAB = "PrefPage.ChartGraphs.SelectedTab";             //$NON-NLS-1$
 
-   private static final String GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS       = net.tourbook.common.Messages.Graph_Label_Prefix_RunningDynamics;
-   private static final String GRAPH_LABEL_PREFIX_SWIMMING               = net.tourbook.common.Messages.Graph_Label_Prefix_Swimming;
-   private static final String GRAPH_LABEL_PREFIX_TRAINING               = net.tourbook.common.Messages.Graph_Label_Prefix_Training;
-
-   private static final String GRAPH_LABEL_ALTIMETER                     = net.tourbook.common.Messages.Graph_Label_Altimeter;
-   private static final String GRAPH_LABEL_ALTITUDE                      = net.tourbook.common.Messages.Graph_Label_Altitude;
-   private static final String GRAPH_LABEL_CADENCE                       = net.tourbook.common.Messages.Graph_Label_Cadence;
-   private static final String GRAPH_LABEL_GEARS                         = net.tourbook.common.Messages.Graph_Label_Gears;
-   private static final String GRAPH_LABEL_GRADIENT                      = net.tourbook.common.Messages.Graph_Label_Gradient;
-   private static final String GRAPH_LABEL_HEARTBEAT                     = net.tourbook.common.Messages.Graph_Label_Heartbeat;
-   private static final String GRAPH_LABEL_PACE                          = net.tourbook.common.Messages.Graph_Label_Pace;
-   private static final String GRAPH_LABEL_POWER                         = net.tourbook.common.Messages.Graph_Label_Power;
-   private static final String GRAPH_LABEL_SPEED                         = net.tourbook.common.Messages.Graph_Label_Speed;
-   private static final String GRAPH_LABEL_TEMPERATURE                   = net.tourbook.common.Messages.Graph_Label_Temperature;
-   private static final String GRAPH_LABEL_TOUR_COMPARE_RESULT           = net.tourbook.common.Messages.Graph_Label_Tour_Compare;
-
-   private static final String GRAPH_LABEL_RUN_DYN_STANCE_TIME           = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
-   private static final String GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED  = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalance;
-   private static final String GRAPH_LABEL_RUN_DYN_STEP_LENGTH           = net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
-   private static final String GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION  = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
-   private static final String GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO        = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
-
-   private static final String GRAPH_LABEL_SWIM_STROKES                  = net.tourbook.common.Messages.Graph_Label_Swim_Strokes;
-   private static final String GRAPH_LABEL_SWIM_SWOLF                    = net.tourbook.common.Messages.Graph_Label_Swim_Swolf;
-
-   private static final String GRAPH_LABEL_TRAINING_EFFECT_AEROB         = net.tourbook.common.Messages.Graph_Label_Training_Effect_Aerob;
-   private static final String GRAPH_LABEL_TRAINING_EFFECT_ANAEROB       = net.tourbook.common.Messages.Graph_Label_Training_Effect_Anaerob;
-   private static final String GRAPH_LABEL_TRAINING_PERFORMANCE          = net.tourbook.common.Messages.Graph_Label_Training_Performance;
-   //
-   //
-   private final IPreferenceStore  _prefStore = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore                                = TourbookPlugin.getPrefStore();
 
    private HashMap<Integer, Graph> _graphMap;
    private ArrayList<Graph>        _graphList;
@@ -656,31 +627,31 @@ public class PrefPageAppearanceTourChart extends PreferencePage implements IWork
 // SET_FORMATTING_OFF
 
       // create a map and list with all available graphs
-      final Graph graph_Altitude                      = new Graph(TourManager.GRAPH_ALTITUDE,                  GRAPH_LABEL_ALTITUDE);
-      final Graph graph_Speed                         = new Graph(TourManager.GRAPH_SPEED,                     GRAPH_LABEL_SPEED);
-      final Graph graph_Pace                          = new Graph(TourManager.GRAPH_PACE,                      GRAPH_LABEL_PACE);
-      final Graph graph_Power                         = new Graph(TourManager.GRAPH_POWER,                     GRAPH_LABEL_POWER);
-      final Graph graph_Pulse                         = new Graph(TourManager.GRAPH_PULSE,                     GRAPH_LABEL_HEARTBEAT);
-      final Graph graph_Temperature                   = new Graph(TourManager.GRAPH_TEMPERATURE,               GRAPH_LABEL_TEMPERATURE);
-      final Graph graph_Cadence                       = new Graph(TourManager.GRAPH_CADENCE,                   GRAPH_LABEL_CADENCE);
-      final Graph graph_Gears                         = new Graph(TourManager.GRAPH_GEARS,                     GRAPH_LABEL_GEARS);
-      final Graph graph_Altimeter                     = new Graph(TourManager.GRAPH_ALTIMETER,                 GRAPH_LABEL_ALTIMETER);
-      final Graph graph_Gradient                      = new Graph(TourManager.GRAPH_GRADIENT,                  GRAPH_LABEL_GRADIENT);
+      final Graph graph_Altitude                      = new Graph(TourManager.GRAPH_ALTITUDE,                     OtherMessages.GRAPH_LABEL_ALTITUDE);
+      final Graph graph_Speed                         = new Graph(TourManager.GRAPH_SPEED,                        OtherMessages.GRAPH_LABEL_SPEED);
+      final Graph graph_Pace                          = new Graph(TourManager.GRAPH_PACE,                         OtherMessages.GRAPH_LABEL_PACE);
+      final Graph graph_Power                         = new Graph(TourManager.GRAPH_POWER,                        OtherMessages.GRAPH_LABEL_POWER);
+      final Graph graph_Pulse                         = new Graph(TourManager.GRAPH_PULSE,                        OtherMessages.GRAPH_LABEL_HEARTBEAT);
+      final Graph graph_Temperature                   = new Graph(TourManager.GRAPH_TEMPERATURE,                  OtherMessages.GRAPH_LABEL_TEMPERATURE);
+      final Graph graph_Cadence                       = new Graph(TourManager.GRAPH_CADENCE,                      OtherMessages.GRAPH_LABEL_CADENCE);
+      final Graph graph_Gears                         = new Graph(TourManager.GRAPH_GEARS,                        OtherMessages.GRAPH_LABEL_GEARS);
+      final Graph graph_Altimeter                     = new Graph(TourManager.GRAPH_ALTIMETER,                    OtherMessages.GRAPH_LABEL_ALTIMETER);
+      final Graph graph_Gradient                      = new Graph(TourManager.GRAPH_GRADIENT,                     OtherMessages.GRAPH_LABEL_GRADIENT);
 
-      final Graph graph_RunDyn_StanceTime             = new Graph(TourManager.GRAPH_RUN_DYN_STANCE_TIME,          GRAPH_LABEL_RUN_DYN_STANCE_TIME,             GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
-      final Graph graph_RunDyn_StanceTimeBalance      = new Graph(TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED, GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED,    GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
-      final Graph graph_RunDyn_StepLength             = new Graph(TourManager.GRAPH_RUN_DYN_STEP_LENGTH,          GRAPH_LABEL_RUN_DYN_STEP_LENGTH,             GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
-      final Graph graph_RunDyn_VerticalOscillation    = new Graph(TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION, GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,    GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
-      final Graph graph_RunDyn_VerticalRatio          = new Graph(TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO,       GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,          GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
+      final Graph graph_RunDyn_StanceTime             = new Graph(TourManager.GRAPH_RUN_DYN_STANCE_TIME,          OtherMessages.GRAPH_LABEL_RUN_DYN_STANCE_TIME,              OtherMessages.GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
+      final Graph graph_RunDyn_StanceTimeBalance      = new Graph(TourManager.GRAPH_RUN_DYN_STANCE_TIME_BALANCED, OtherMessages.GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCE,      OtherMessages.GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
+      final Graph graph_RunDyn_StepLength             = new Graph(TourManager.GRAPH_RUN_DYN_STEP_LENGTH,          OtherMessages.GRAPH_LABEL_RUN_DYN_STEP_LENGTH,              OtherMessages.GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
+      final Graph graph_RunDyn_VerticalOscillation    = new Graph(TourManager.GRAPH_RUN_DYN_VERTICAL_OSCILLATION, OtherMessages.GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,     OtherMessages.GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
+      final Graph graph_RunDyn_VerticalRatio          = new Graph(TourManager.GRAPH_RUN_DYN_VERTICAL_RATIO,       OtherMessages.GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,           OtherMessages.GRAPH_LABEL_PREFIX_RUNNING_DYNAMICS);
 
-      final Graph graph_Swim_Strokes                  = new Graph(TourManager.GRAPH_SWIM_STROKES,              GRAPH_LABEL_SWIM_STROKES,              GRAPH_LABEL_PREFIX_SWIMMING);
-      final Graph graph_Swim_Swolf                    = new Graph(TourManager.GRAPH_SWIM_SWOLF,                GRAPH_LABEL_SWIM_SWOLF,                GRAPH_LABEL_PREFIX_SWIMMING);
+      final Graph graph_Swim_Strokes                  = new Graph(TourManager.GRAPH_SWIM_STROKES,                 OtherMessages.GRAPH_LABEL_SWIM_STROKES,                     OtherMessages.GRAPH_LABEL_PREFIX_SWIMMING);
+      final Graph graph_Swim_Swolf                    = new Graph(TourManager.GRAPH_SWIM_SWOLF,                   OtherMessages.GRAPH_LABEL_SWIM_SWOLF,                       OtherMessages.GRAPH_LABEL_PREFIX_SWIMMING);
 
-      final Graph graph_Training_Effect_Aerob         = new Graph(TourManager.GRAPH_TRAINING_EFFECT_AEROB,     GRAPH_LABEL_TRAINING_EFFECT_AEROB,     GRAPH_LABEL_PREFIX_TRAINING);
-      final Graph graph_Training_Effect_Anaerob       = new Graph(TourManager.GRAPH_TRAINING_EFFECT_ANAEROB,   GRAPH_LABEL_TRAINING_EFFECT_ANAEROB,   GRAPH_LABEL_PREFIX_TRAINING);
-      final Graph graph_Training_Performance          = new Graph(TourManager.GRAPH_TRAINING_PERFORMANCE,      GRAPH_LABEL_TRAINING_PERFORMANCE,      GRAPH_LABEL_PREFIX_TRAINING);
+      final Graph graph_Training_Effect_Aerob         = new Graph(TourManager.GRAPH_TRAINING_EFFECT_AEROB,        OtherMessages.GRAPH_LABEL_TRAINING_EFFECT_AEROB,            OtherMessages.GRAPH_LABEL_PREFIX_TRAINING);
+      final Graph graph_Training_Effect_Anaerob       = new Graph(TourManager.GRAPH_TRAINING_EFFECT_ANAEROB,      OtherMessages.GRAPH_LABEL_TRAINING_EFFECT_ANAEROB,          OtherMessages.GRAPH_LABEL_PREFIX_TRAINING);
+      final Graph graph_Training_Performance          = new Graph(TourManager.GRAPH_TRAINING_PERFORMANCE,         OtherMessages.GRAPH_LABEL_TRAINING_PERFORMANCE,             OtherMessages.GRAPH_LABEL_PREFIX_TRAINING);
 
-      final Graph graph_TourCompareResult             = new Graph(TourManager.GRAPH_TOUR_COMPARE,              GRAPH_LABEL_TOUR_COMPARE_RESULT);
+      final Graph graph_TourCompareResult             = new Graph(TourManager.GRAPH_TOUR_COMPARE,                 OtherMessages.GRAPH_LABEL_TOUR_COMPARE);
 
       _graphMap = new HashMap<>();
 

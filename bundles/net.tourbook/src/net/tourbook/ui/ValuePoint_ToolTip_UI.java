@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.ui;
 import java.text.NumberFormat;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ColorCache;
 import net.tourbook.chart.HoveredValuePointData;
@@ -63,40 +64,6 @@ import org.eclipse.swt.widgets.ToolItem;
  * displays value point information.
  */
 public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinned_ToolTip {
-
-// SET_FORMATTING_OFF
-
-   private static final String   APP_ACTION_CLOSE_TOOLTIP                  = net.tourbook.common.Messages.App_Action_Close_Tooltip;
-
-   private static final String   GRAPH_LABEL_ALTIMETER                     = net.tourbook.common.Messages.Graph_Label_Altimeter;
-   private static final String   GRAPH_LABEL_ALTITUDE                      = net.tourbook.common.Messages.Graph_Label_Altitude;
-   private static final String   GRAPH_LABEL_CADENCE                       = net.tourbook.common.Messages.Graph_Label_Cadence;
-   private static final String   GRAPH_LABEL_CADENCE_UNIT_RPM              = net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
-   private static final String   GRAPH_LABEL_CADENCE_UNIT_SPM              = net.tourbook.common.Messages.Graph_Label_Cadence_Unit_Spm;
-   private static final String   GRAPH_LABEL_DISTANCE                      = net.tourbook.common.Messages.Graph_Label_Distance;
-   private static final String   GRAPH_LABEL_GEARS                         = net.tourbook.common.Messages.Graph_Label_Gears;
-   private static final String   GRAPH_LABEL_GRADIENT                      = net.tourbook.common.Messages.Graph_Label_Gradient;
-   private static final String   GRAPH_LABEL_GRADIENT_UNIT                 = net.tourbook.common.Messages.Graph_Label_Gradient_Unit;
-   private static final String   GRAPH_LABEL_HEARTBEAT                     = net.tourbook.common.Messages.Graph_Label_Heartbeat;
-   private static final String   GRAPH_LABEL_HEARTBEAT_UNIT                = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-   private static final String   GRAPH_LABEL_PACE                          = net.tourbook.common.Messages.Graph_Label_Pace;
-   private static final String   GRAPH_LABEL_PACE_SUMMARIZED               = net.tourbook.common.Messages.Graph_Label_Pace_Summarized;
-   private static final String   GRAPH_LABEL_POWER                         = net.tourbook.common.Messages.Graph_Label_Power;
-   private static final String   GRAPH_LABEL_POWER_UNIT                    = net.tourbook.common.Messages.Graph_Label_Power_Unit;
-   private static final String   GRAPH_LABEL_SPEED                         = net.tourbook.common.Messages.Graph_Label_Speed;
-   private static final String   GRAPH_LABEL_SPEED_SUMMARIZED              = net.tourbook.common.Messages.Graph_Label_Speed_Summarized;
-   private static final String   GRAPH_LABEL_TEMPERATURE                   = net.tourbook.common.Messages.Graph_Label_Temperature;
-   private static final String   GRAPH_LABEL_TIME_DURATION                 = net.tourbook.common.Messages.Graph_Label_TimeDuration;
-   private static final String   GRAPH_LABEL_TIME_OF_DAY                   = net.tourbook.common.Messages.Graph_Label_TimeOfDay;
-   private static final String   GRAPH_LABEL_TOUR_COMPARE                  = net.tourbook.common.Messages.Graph_Label_Tour_Compare;
-
-   private static final String   GRAPH_LABEL_RUN_DYN_STANCE_TIME           = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTime;
-   private static final String   GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED  = net.tourbook.common.Messages.Graph_Label_RunDyn_StanceTimeBalance;
-   private static final String   GRAPH_LABEL_RUN_DYN_STEP_LENGTH           = net.tourbook.common.Messages.Graph_Label_RunDyn_StepLength;
-   private static final String   GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION  = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalOscillation;
-   private static final String   GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO        = net.tourbook.common.Messages.Graph_Label_RunDyn_VerticalRatio;
-
-// SET_FORMATTING_ON
 
    private final IPreferenceStore         _prefStore     = TourbookPlugin.getPrefStore();
 
@@ -178,6 +145,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private boolean _isVisible_And_Available_Temperature;
    private boolean _isVisible_And_Available_TimeDuration;
    private boolean _isVisible_And_Available_TimeOfDay;
+   private boolean _isVisible_And_Available_TimeMoving;
    private boolean _isVisible_And_Available_TimeSlice;
    private boolean _isVisible_And_Available_TourCompareResult;
 
@@ -239,6 +207,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private Label     _lblTimeDuration_Unit;
    private Label     _lblTimeOfDay;
    private Label     _lblTimeOfDay_Unit;
+   private Label     _lblTimeMoving;
+   private Label     _lblTimeMoving_Unit;
    private Label     _lblTourCompareResult;
 
    private Label     _lblRunDyn_StanceTime;
@@ -258,7 +228,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          super(null, IAction.AS_PUSH_BUTTON);
 
-         setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
+         setToolTipText(OtherMessages.APP_ACTION_CLOSE_TOOLTIP);
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
@@ -584,6 +554,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       {
          createUI_100_TimeSlices(container);
          createUI_110_TimeDuration(container);
+         createUI_112_TimeMoving(container);
          createUI_120_TimeOfDay(container);
          createUI_200_Distance(container);
          createUI_210_Altitude(container);
@@ -643,13 +614,35 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   8,
-                  GRAPH_LABEL_TIME_DURATION,
+                  OtherMessages.GRAPH_LABEL_TIME_DURATION,
                   GraphColorManager.PREF_GRAPH_TIME);
 
             _lblTimeDuration_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_LABEL_TIME,
-                  GRAPH_LABEL_TIME_DURATION,
+                  OtherMessages.GRAPH_LABEL_TIME_DURATION,
+                  GraphColorManager.PREF_GRAPH_TIME);
+         }
+      }
+   }
+
+   private void createUI_112_TimeMoving(final Composite parent) {
+
+      if (_isVisible_And_Available_TimeMoving) {
+
+         final Composite valueContainer = _isHorizontalOrientation ? createUI_ValueContainer(parent) : parent;
+         {
+            _lblTimeMoving = createUI_Label_Value(
+                  valueContainer,
+                  SWT.TRAIL,
+                  8,
+                  UI.EMPTY_STRING,
+                  GraphColorManager.PREF_GRAPH_TIME);
+
+            _lblTimeMoving_Unit = createUI_Label(
+                  valueContainer,
+                  UI.UNIT_LABEL_TIME,
+                  UI.EMPTY_STRING,
                   GraphColorManager.PREF_GRAPH_TIME);
          }
       }
@@ -665,13 +658,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   8,
-                  GRAPH_LABEL_TIME_OF_DAY,
+                  OtherMessages.GRAPH_LABEL_TIME_OF_DAY,
                   GraphColorManager.PREF_GRAPH_TIME);
 
             _lblTimeOfDay_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_LABEL_TIME,
-                  GRAPH_LABEL_TIME_OF_DAY,
+                  OtherMessages.GRAPH_LABEL_TIME_OF_DAY,
                   GraphColorManager.PREF_GRAPH_TIME);
          }
       }
@@ -687,13 +680,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   9,
-                  GRAPH_LABEL_DISTANCE,
+                  OtherMessages.GRAPH_LABEL_DISTANCE,
                   GraphColorManager.PREF_GRAPH_DISTANCE);
 
             _lblDistance_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_LABEL_DISTANCE,
-                  GRAPH_LABEL_DISTANCE,
+                  OtherMessages.GRAPH_LABEL_DISTANCE,
                   GraphColorManager.PREF_GRAPH_DISTANCE);
          }
       }
@@ -709,13 +702,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   6,
-                  GRAPH_LABEL_ALTITUDE,
+                  OtherMessages.GRAPH_LABEL_ALTITUDE,
                   GraphColorManager.PREF_GRAPH_ALTITUDE);
 
             _lblElevation_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_LABEL_ELEVATION,
-                  GRAPH_LABEL_ALTITUDE,
+                  OtherMessages.GRAPH_LABEL_ALTITUDE,
                   GraphColorManager.PREF_GRAPH_ALTITUDE);
          }
       }
@@ -731,13 +724,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   3,
-                  GRAPH_LABEL_HEARTBEAT,
+                  OtherMessages.GRAPH_LABEL_HEARTBEAT,
                   GraphColorManager.PREF_GRAPH_HEARTBEAT);
 
             _lblPulse_Unit = createUI_Label(
                   valueContainer,
-                  GRAPH_LABEL_HEARTBEAT_UNIT,
-                  GRAPH_LABEL_HEARTBEAT,
+                  OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT,
+                  OtherMessages.GRAPH_LABEL_HEARTBEAT,
                   GraphColorManager.PREF_GRAPH_HEARTBEAT);
          }
       }
@@ -753,13 +746,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   6,
-                  GRAPH_LABEL_SPEED,
+                  OtherMessages.GRAPH_LABEL_SPEED,
                   GraphColorManager.PREF_GRAPH_SPEED);
 
             _lblSpeed_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_LABEL_SPEED,
-                  GRAPH_LABEL_SPEED,
+                  OtherMessages.GRAPH_LABEL_SPEED,
                   GraphColorManager.PREF_GRAPH_SPEED);
          }
       }
@@ -775,13 +768,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   6,
-                  GRAPH_LABEL_SPEED_SUMMARIZED,
+                  OtherMessages.GRAPH_LABEL_SPEED_SUMMARIZED,
                   GraphColorManager.PREF_GRAPH_SPEED);
 
             _lblSpeed_Summarized_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_LABEL_SPEED + UI.SPACE + UI.SYMBOL_SUMMARIZED_AVERAGE,
-                  GRAPH_LABEL_SPEED_SUMMARIZED,
+                  OtherMessages.GRAPH_LABEL_SPEED_SUMMARIZED,
                   GraphColorManager.PREF_GRAPH_SPEED);
          }
       }
@@ -797,13 +790,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   5,
-                  GRAPH_LABEL_PACE,
+                  OtherMessages.GRAPH_LABEL_PACE,
                   GraphColorManager.PREF_GRAPH_PACE);
 
             _lblPace_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_LABEL_PACE,
-                  GRAPH_LABEL_PACE,
+                  OtherMessages.GRAPH_LABEL_PACE,
                   GraphColorManager.PREF_GRAPH_PACE);
          }
       }
@@ -819,13 +812,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   5,
-                  GRAPH_LABEL_PACE_SUMMARIZED,
+                  OtherMessages.GRAPH_LABEL_PACE_SUMMARIZED,
                   GraphColorManager.PREF_GRAPH_PACE);
 
             _lblPace_Summarized_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_LABEL_PACE + UI.SPACE + UI.SYMBOL_SUMMARIZED_AVERAGE,
-                  GRAPH_LABEL_PACE_SUMMARIZED,
+                  OtherMessages.GRAPH_LABEL_PACE_SUMMARIZED,
                   GraphColorManager.PREF_GRAPH_PACE);
          }
       }
@@ -841,13 +834,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   4,
-                  GRAPH_LABEL_POWER,
+                  OtherMessages.GRAPH_LABEL_POWER,
                   GraphColorManager.PREF_GRAPH_POWER);
 
             _lblPower_Unit = createUI_Label(
                   valueContainer,
-                  GRAPH_LABEL_POWER_UNIT,
-                  GRAPH_LABEL_POWER,
+                  OtherMessages.GRAPH_LABEL_POWER_UNIT,
+                  OtherMessages.GRAPH_LABEL_POWER,
                   GraphColorManager.PREF_GRAPH_POWER);
          }
       }
@@ -863,13 +856,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   4,
-                  GRAPH_LABEL_TEMPERATURE,
+                  OtherMessages.GRAPH_LABEL_TEMPERATURE,
                   GraphColorManager.PREF_GRAPH_TEMPTERATURE);
 
             _lblTemperature_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_LABEL_TEMPERATURE,
-                  GRAPH_LABEL_TEMPERATURE,
+                  OtherMessages.GRAPH_LABEL_TEMPERATURE,
                   GraphColorManager.PREF_GRAPH_TEMPTERATURE);
          }
       }
@@ -885,13 +878,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   4,
-                  GRAPH_LABEL_GRADIENT,
+                  OtherMessages.GRAPH_LABEL_GRADIENT,
                   GraphColorManager.PREF_GRAPH_GRADIENT);
 
             _lblGradient_Unit = createUI_Label(
                   valueContainer,
-                  GRAPH_LABEL_GRADIENT_UNIT,
-                  GRAPH_LABEL_GRADIENT,
+                  OtherMessages.GRAPH_LABEL_GRADIENT_UNIT,
+                  OtherMessages.GRAPH_LABEL_GRADIENT,
                   GraphColorManager.PREF_GRAPH_GRADIENT);
          }
       }
@@ -907,13 +900,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   6,
-                  GRAPH_LABEL_ALTIMETER,
+                  OtherMessages.GRAPH_LABEL_ALTIMETER,
                   GraphColorManager.PREF_GRAPH_ALTIMETER);
 
             _lblAltimeter_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_LABEL_ALTIMETER,
-                  GRAPH_LABEL_ALTIMETER,
+                  OtherMessages.GRAPH_LABEL_ALTIMETER,
                   GraphColorManager.PREF_GRAPH_ALTIMETER);
          }
       }
@@ -929,13 +922,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   3,
-                  GRAPH_LABEL_CADENCE,
+                  OtherMessages.GRAPH_LABEL_CADENCE,
                   GraphColorManager.PREF_GRAPH_CADENCE);
 
             _lblCadence_Unit = createUI_Label(
                   valueContainer,
-                  GRAPH_LABEL_CADENCE_UNIT_RPM,
-                  GRAPH_LABEL_CADENCE,
+                  OtherMessages.GRAPH_LABEL_CADENCE_UNIT_RPM,
+                  OtherMessages.GRAPH_LABEL_CADENCE,
                   GraphColorManager.PREF_GRAPH_CADENCE);
          }
       }
@@ -951,7 +944,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   5,
-                  GRAPH_LABEL_GEARS,
+                  OtherMessages.GRAPH_LABEL_GEARS,
 
                   // this is a bit tricky, use default color because the text color is white
                   null);
@@ -960,7 +953,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.LEAD,
                   5,
-                  GRAPH_LABEL_GEARS,
+                  OtherMessages.GRAPH_LABEL_GEARS,
 
                   // this is a bit tricky, use default color because the text color is white
                   null);
@@ -979,14 +972,14 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   12,
-                  GRAPH_LABEL_TOUR_COMPARE,
+                  OtherMessages.GRAPH_LABEL_TOUR_COMPARE,
                   GraphColorManager.PREF_GRAPH_GRADIENT);
 
             // no unit
             createUI_Label(
                   valueContainer,
                   UI.EMPTY_STRING,
-                  GRAPH_LABEL_TOUR_COMPARE,
+                  OtherMessages.GRAPH_LABEL_TOUR_COMPARE,
                   GraphColorManager.PREF_GRAPH_TOUR_COMPARE);
          }
 
@@ -1003,13 +996,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   3,
-                  GRAPH_LABEL_RUN_DYN_STANCE_TIME,
+                  OtherMessages.GRAPH_LABEL_RUN_DYN_STANCE_TIME,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME);
 
             _lblRunDyn_StanceTime_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_MS,
-                  GRAPH_LABEL_RUN_DYN_STANCE_TIME,
+                  OtherMessages.GRAPH_LABEL_RUN_DYN_STANCE_TIME,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME);
          }
       }
@@ -1025,13 +1018,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   3,
-                  GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED,
+                  OtherMessages.GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCE,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
 
             _lblRunDyn_StanceTimeBalance_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_PERCENT,
-                  GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCED,
+                  OtherMessages.GRAPH_LABEL_RUN_DYN_STANCE_TIME_BALANCE,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_STANCE_TIME_BALANCED);
          }
       }
@@ -1047,13 +1040,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   3,
-                  GRAPH_LABEL_RUN_DYN_STEP_LENGTH,
+                  OtherMessages.GRAPH_LABEL_RUN_DYN_STEP_LENGTH,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_STEP_LENGTH);
 
             _lblRunDyn_StepLength_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_LABEL_DISTANCE_MM_OR_INCH,
-                  GRAPH_LABEL_RUN_DYN_STEP_LENGTH,
+                  OtherMessages.GRAPH_LABEL_RUN_DYN_STEP_LENGTH,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_STEP_LENGTH);
          }
       }
@@ -1069,13 +1062,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   3,
-                  GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,
+                  OtherMessages.GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
 
             _lblRunDyn_VerticalOscillation_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_LABEL_DISTANCE_MM_OR_INCH,
-                  GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,
+                  OtherMessages.GRAPH_LABEL_RUN_DYN_VERTICAL_OSCILLATION,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_OSCILLATION);
          }
       }
@@ -1091,13 +1084,13 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   valueContainer,
                   SWT.TRAIL,
                   3,
-                  GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,
+                  OtherMessages.GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_RATIO);
 
             _lblRunDyn_VerticalRatio_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_PERCENT,
-                  GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,
+                  OtherMessages.GRAPH_LABEL_RUN_DYN_VERTICAL_RATIO,
                   GraphColorManager.PREF_GRAPH_RUN_DYN_VERTICAL_RATIO);
          }
       }
@@ -1274,7 +1267,9 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          cadenceMultiplier = _tourData.getCadenceMultiplier();
       }
 
-      final String cadenceUnit = cadenceMultiplier == 2.0 ? GRAPH_LABEL_CADENCE_UNIT_SPM : GRAPH_LABEL_CADENCE_UNIT_RPM;
+      final String cadenceUnit = cadenceMultiplier == 2.0
+            ? OtherMessages.GRAPH_LABEL_CADENCE_UNIT_SPM
+            : OtherMessages.GRAPH_LABEL_CADENCE_UNIT_RPM;
 
       return cadenceUnit;
    }
@@ -1490,6 +1485,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       final long visibleId_Temperature                = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TEMPERATURE);
       final long visibleId_TimeDuration               = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_DURATION);
       final long visibleId_TimeOfDay                  = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_OF_DAY);
+      final long visibleId_TimeMoving                 = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_MOVING);
       final long visibleId_TimeSlice                  = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_SLICES);
       final long visibleId_TourCompareResult          = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TOUR_COMPARE_RESULT);
 
@@ -1512,6 +1508,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       final boolean isAvailable_Temperature           = _tourData.temperatureSerie                    != null;
       final boolean isAvailable_TimeDuration          = _tourData.timeSerie                           != null;
       final boolean isAvailable_TimeOfDay             = _tourData.timeSerie                           != null;
+      final boolean isAvailable_TimeMoving            = _tourData.getMovingTimeSerie()                != null;
       final boolean isAvailable_TimeSlice             = true;
       final boolean isAvailable_TourCompareResult     = _tourData.tourCompareSerie != null && _tourData.tourCompareSerie.length > 0;
 
@@ -1539,6 +1536,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             + visibleId_Temperature
             + visibleId_TimeDuration
             + visibleId_TimeOfDay
+            + visibleId_TimeMoving
             + visibleId_TimeSlice
             + visibleId_TourCompareResult
             + visibleId_RunDyn_StanceTime
@@ -1567,6 +1565,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             + (isAvailable_Temperature       ? visibleId_Temperature       : 0)
             + (isAvailable_TimeDuration      ? visibleId_TimeDuration      : 0)
             + (isAvailable_TimeOfDay         ? visibleId_TimeOfDay         : 0)
+            + (isAvailable_TimeMoving        ? visibleId_TimeMoving        : 0)
             + (isAvailable_TimeSlice         ? visibleId_TimeSlice         : 0)
             + (isAvailable_TourCompareResult ? visibleId_TourCompareResult : 0)
 
@@ -1594,6 +1593,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       _isVisible_And_Available_Temperature         = isAvailable_Temperature        && visibleId_Temperature > 0;
       _isVisible_And_Available_TimeDuration        = isAvailable_TimeDuration       && visibleId_TimeDuration > 0;
       _isVisible_And_Available_TimeOfDay           = isAvailable_TimeOfDay          && visibleId_TimeOfDay > 0;
+      _isVisible_And_Available_TimeMoving          = isAvailable_TimeMoving         && visibleId_TimeMoving > 0;
       _isVisible_And_Available_TimeSlice           = isAvailable_TimeSlice          && visibleId_TimeSlice > 0;
       _isVisible_And_Available_TourCompareResult   = isAvailable_TourCompareResult  && visibleId_TourCompareResult > 0;
 
@@ -1621,6 +1621,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             + (_isVisible_And_Available_Temperature                  ? 1 : 0)
             + (_isVisible_And_Available_TimeDuration                 ? 1 : 0)
             + (_isVisible_And_Available_TimeOfDay                    ? 1 : 0)
+            + (_isVisible_And_Available_TimeMoving                   ? 1 : 0)
             + (_isVisible_And_Available_TimeSlice                    ? 1 : 0)
             + (_isVisible_And_Available_TourCompareResult            ? 1 : 0)
 
@@ -1719,6 +1720,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       _currentValueIndex = valueIndex;
+
+      final int durationTime = timeSerie[valueIndex];
 
       if (_isVisible_And_Available_Altimeter) {
          _lblAltimeter.setText(Integer.toString((int) _tourData.getAltimeterSerie()[valueIndex]));
@@ -1841,11 +1844,26 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       }
 
       if (_isVisible_And_Available_TimeDuration) {
-         _lblTimeDuration.setText(UI.format_hhh_mm_ss(timeSerie[valueIndex]));
+         _lblTimeDuration.setText(UI.format_hhh_mm_ss(durationTime));
+      }
+
+      if (_isVisible_And_Available_TimeMoving) {
+
+         final int movingTime = _tourData.getMovingTimeSerie()[valueIndex];
+         final int breakTime = durationTime - movingTime;
+
+         final String tooltip = String.format(
+               Messages.Tooltip_ValuePoint_Label_MovingTime_Tooltip,
+               UI.format_hhh_mm_ss(breakTime));
+
+         _lblTimeMoving.setText(UI.format_hhh_mm_ss(movingTime));
+         _lblTimeMoving.setToolTipText(tooltip);
+         
+         _lblTimeMoving_Unit.setToolTipText(tooltip);
       }
 
       if (_isVisible_And_Available_TimeOfDay) {
-         _lblTimeOfDay.setText(UI.format_hhh_mm_ss((_tourData.getStartTimeOfDay() + timeSerie[valueIndex]) % 86400));
+         _lblTimeOfDay.setText(UI.format_hhh_mm_ss((_tourData.getStartTimeOfDay() + durationTime) % 86400));
       }
 
       if (_isVisible_And_Available_TimeSlice) {
@@ -1977,6 +1995,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       if (_isVisible_And_Available_TimeDuration) {
          updateUI_Color(_lblTimeDuration, GraphColorManager.PREF_GRAPH_TIME);
          updateUI_Color(_lblTimeDuration_Unit, GraphColorManager.PREF_GRAPH_TIME);
+      }
+
+      if (_isVisible_And_Available_TimeMoving) {
+         updateUI_Color(_lblTimeMoving, GraphColorManager.PREF_GRAPH_TIME);
+         updateUI_Color(_lblTimeMoving_Unit, GraphColorManager.PREF_GRAPH_TIME);
       }
 
       if (_isVisible_And_Available_TimeOfDay) {

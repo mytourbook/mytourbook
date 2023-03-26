@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,6 +20,7 @@ import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
@@ -57,15 +58,12 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutGraphBackground extends ToolbarSlideout implements IActionResetToDefault {
 
-   private static final String           APP_THEME_VALUE_FOR_LIGHT_TOOLTIP = net.tourbook.common.Messages.App_Theme_ValueFor_Light_Tooltip;
-   private static final String           APP_THEME_VALUE_FOR_DARK_TOOLTIP  = net.tourbook.common.Messages.App_Theme_ValueFor_Dark_Tooltip;
-
-   private static final IPreferenceStore _prefStore                        = TourbookPlugin.getPrefStore();
+   private static final IPreferenceStore _prefStore                   = TourbookPlugin.getPrefStore();
 
    /**
     * Contains all {@link GraphBgSourceType}s which can be displayed for the current tour
     */
-   private ArrayList<GraphBgSourceType>  _availableGraphBgSourceTypes      = new ArrayList<>();
+   private ArrayList<GraphBgSourceType>  _availableGraphBgSourceTypes = new ArrayList<>();
 
    private ActionResetToDefaults         _actionRestoreDefaults;
    private ActionOpenPrefDialog          _actionPrefDialog;
@@ -254,7 +252,7 @@ public class SlideoutGraphBackground extends ToolbarSlideout implements IActionR
             _spinnerGraphFillingTransparency_Light.setMaximum(UI.TRANSFORM_OPACITY_MAX);
             _spinnerGraphFillingTransparency_Light.setIncrement(1);
             _spinnerGraphFillingTransparency_Light.setPageIncrement(10);
-            _spinnerGraphFillingTransparency_Light.setToolTipText(APP_THEME_VALUE_FOR_LIGHT_TOOLTIP);
+            _spinnerGraphFillingTransparency_Light.setToolTipText(OtherMessages.APP_THEME_VALUE_FOR_LIGHT_TOOLTIP);
             _spinnerGraphFillingTransparency_Light.addMouseWheelListener(_defaultMouseWheelListener);
             _spinnerGraphFillingTransparency_Light.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults()
@@ -269,7 +267,7 @@ public class SlideoutGraphBackground extends ToolbarSlideout implements IActionR
             _spinnerGraphFillingTransparency_Dark.setMaximum(UI.TRANSFORM_OPACITY_MAX);
             _spinnerGraphFillingTransparency_Dark.setIncrement(1);
             _spinnerGraphFillingTransparency_Dark.setPageIncrement(10);
-            _spinnerGraphFillingTransparency_Dark.setToolTipText(APP_THEME_VALUE_FOR_DARK_TOOLTIP);
+            _spinnerGraphFillingTransparency_Dark.setToolTipText(OtherMessages.APP_THEME_VALUE_FOR_DARK_TOOLTIP);
             _spinnerGraphFillingTransparency_Dark.addMouseWheelListener(_defaultMouseWheelListener);
             _spinnerGraphFillingTransparency_Dark.addSelectionListener(_defaultSelectionListener);
             GridDataFactory.fillDefaults()

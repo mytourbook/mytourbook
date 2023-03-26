@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.tourbook.Images;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -209,8 +210,6 @@ public class Map2View extends ViewPart implements
       IPhotoEventListener {
 
 // SET_FORMATTING_OFF
-
-   private static final String   TOUR_TOOLTIP_LABEL_NO_GEO_TOUR                        = net.tourbook.ui.Messages.Tour_Tooltip_Label_NoGeoTour;
 
    public static final String    ID                                                    = "net.tourbook.map2.view.Map2ViewId";                   //$NON-NLS-1$
 
@@ -1906,7 +1905,7 @@ public class Map2View extends ViewPart implements
       // setup tool tip's
       _map.setTourToolTip(_tourToolTip = new TourToolTip(_map));
       _tourInfoToolTipProvider.setActionsEnabled(true);
-      _tourInfoToolTipProvider.setNoTourTooltip(TOUR_TOOLTIP_LABEL_NO_GEO_TOUR);
+      _tourInfoToolTipProvider.setNoTourTooltip(OtherMessages.TOUR_TOOLTIP_LABEL_NO_GEO_TOUR);
 
       /*
        * Setup value point tooltip

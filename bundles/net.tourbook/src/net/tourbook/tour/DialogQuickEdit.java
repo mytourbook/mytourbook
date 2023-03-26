@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -55,9 +56,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 
 public class DialogQuickEdit extends TitleAreaDialog {
-
-   private static final String          GRAPH_LABEL_HEARTBEAT_UNIT     = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-   private static final String          VALUE_UNIT_K_CALORIES          = net.tourbook.ui.Messages.Value_Unit_KCalories;
 
    private static final boolean         _isOSX                         = UI.IS_OSX;
    private static final boolean         _isLinux                       = UI.IS_LINUX;
@@ -407,7 +405,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
             _spinCalories.addMouseWheelListener(_mouseWheelListener);
 
             // label: kcal
-            _tk.createLabel(container, VALUE_UNIT_K_CALORIES);
+            _tk.createLabel(container, OtherMessages.VALUE_UNIT_K_CALORIES);
          }
          {
             /*
@@ -432,7 +430,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
             _spinRestPulse.addMouseWheelListener(_mouseWheelListener);
 
             // label: bpm
-            _tk.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
+            _tk.createLabel(container, OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
          }
       }
    }
