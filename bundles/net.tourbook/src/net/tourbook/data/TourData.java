@@ -50,7 +50,6 @@ import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -878,14 +877,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * Photos for this tour
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    private Set<TourPhoto>              tourPhotos                          = new HashSet<>();
 
    /**
     * Tour marker
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    @XmlElementWrapper(name = "TourMarkers")
    @XmlElement(name = "TourMarker")
@@ -894,16 +893,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * Contains the tour way points
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private  Set<TourWayPoint>     tourWayPoints                       = new HashSet<>();
+   private  Set<TourWayPoint>          tourWayPoints                       = new HashSet<>();
 
    /**
     * Reference tours
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private  Set<TourReference>    tourReferences                     = new HashSet<>();
+   private  Set<TourReference>         tourReferences                     = new HashSet<>();
 
    /**
     * Tags
@@ -915,7 +914,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * Sensors
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    private Set<DeviceSensorValue>     deviceSensorValues                  = new HashSet<>();
 
@@ -5687,6 +5686,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    /**
     * Create a deep copy of this TourData into a new TourData
+    *
+    * @return Returns a deep copy of this tour
     */
    public TourData createDeepCopy() {
 
@@ -5695,8 +5696,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       // set a unique tour ID
       tourData_DeepCopy.tourId = System.nanoTime();
 
-      /*
-       * Setup collections
+      /**
+       * Setup collections except @ManyToMany relations, e.g. TourTags they must not be modified
+       * because they are used in other tours
        */
       for (final TourPhoto tourPhoto : tourData_DeepCopy.tourPhotos) {
          tourPhoto.setupDeepClone(tourData_DeepCopy);
@@ -5708,10 +5710,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       for (final TourWayPoint tourWayPoint : tourData_DeepCopy.tourWayPoints) {
          tourWayPoint.setupDeepClone(tourData_DeepCopy);
-      }
-
-      for (final TourTag tourTag : tourData_DeepCopy.tourTags) {
-         tourTag.setupDeepClone(tourData_DeepCopy);
       }
 
       for (final DeviceSensorValue sensorValue : tourData_DeepCopy.deviceSensorValues) {
@@ -5745,8 +5743,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       deviceSensor_Clone.addAll(tourData_DeepCopy.deviceSensorValues);
       tourData_DeepCopy.deviceSensorValues = deviceSensor_Clone;
 
-      /*
-       * TourReferences are a bit special, they are bound to the original tour and need to be
+      /**
+       * TourReferences are special, they are bound to the original tour and need to be
        * created manually and not cloned
        */
       tourData_DeepCopy.tourReferences = new HashSet<>();
