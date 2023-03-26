@@ -25,7 +25,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Map;
 
 import net.tourbook.common.util.MtMath;
@@ -45,21 +44,21 @@ import org.opengts.util.Nmea0183;
 
 public class NmeaDataReader extends TourbookDevice {
 
-   private static final String   FILE_HEADER   = "$GP";                          //$NON-NLS-1$
+   private static final String FILE_HEADER   = "$GP";                 //$NON-NLS-1$
 
-   private static final Calendar _calendar     = GregorianCalendar.getInstance();
+   private final Calendar      _calendar     = Calendar.getInstance();
 
-   private ArrayList<TimeData>   _timeDataList = new ArrayList<>();
-   private TimeData              _prevTimeData;
+   private ArrayList<TimeData> _timeDataList = new ArrayList<>();
+   private TimeData            _prevTimeData;
 
-   private float                 _absoluteDistance;
+   private float               _absoluteDistance;
 
-   private String                _importFilePath;
+   private String              _importFilePath;
 
-   private boolean               _isNullCoordinates;
+   private boolean             _isNullCoordinates;
 
-   private Map<Long, TourData>   _alreadyImportedTours;
-   private Map<Long, TourData>   _newlyImportedTours;
+   private Map<Long, TourData> _alreadyImportedTours;
+   private Map<Long, TourData> _newlyImportedTours;
 
    public NmeaDataReader() {
       // plugin constructor
