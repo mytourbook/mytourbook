@@ -1100,6 +1100,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * This is a time serie like {@link #timeSerie} but contains only moving times, break times are 0
     */
    @Transient
+   @JsonIgnore
    private int[]                 movingTimeSerie;
 
    /**
