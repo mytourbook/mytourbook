@@ -17,6 +17,7 @@ package net.tourbook.data;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import java.io.Serializable;
@@ -71,7 +72,6 @@ import org.eclipse.swt.graphics.Rectangle;
 @XmlRootElement(name = "TourMarker")
 @XmlAccessorType(XmlAccessType.NONE)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "markerId")
-
 public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializable, Serializable {
 
    private static final long    serialVersionUID      = 1L;
@@ -142,6 +142,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     */
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @JsonProperty
    private long     markerId        = TourDatabase.ENTITY_IS_NOT_SAVED;
 
    @ManyToOne(optional = false)
@@ -158,6 +159,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * <code>-1</code>.
     */
    @XmlElement
+   @JsonProperty
    private int      time            = -1;
 
    /**
@@ -165,6 +167,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     *
     * @since Db version 25
     */
+   @JsonProperty
    private long     tourTime        = Long.MIN_VALUE;
 
    /**
@@ -179,6 +182,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * 20 == db version 20
     */
    @XmlElement
+   @JsonProperty
    private float    distance20      = -1;
 
    /**
@@ -202,6 +206,7 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
     * position of this marker in the data serie
     */
    @XmlAttribute
+   @JsonProperty
    private int      serieIndex;
 
    @XmlElement
@@ -237,16 +242,19 @@ public class TourMarker implements Cloneable, Comparable<Object>, IXmlSerializab
    /**
     * @since Db version 25
     */
+   @JsonProperty
    private float    altitude        = TourDatabase.DEFAULT_FLOAT;
 
    /**
     * @since Db version 25
     */
+   @JsonProperty
    private double   latitude        = TourDatabase.DEFAULT_DOUBLE;
 
    /**
     * @since Db version 25
     */
+   @JsonProperty
    private double   longitude       = TourDatabase.DEFAULT_DOUBLE;
 
    private int      isMarkerVisible = 1;

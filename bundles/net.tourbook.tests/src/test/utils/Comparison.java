@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -56,17 +56,16 @@ public class Comparison {
       final ArrayValueMatcher<Object> tourMarkersValueMatcher = new ArrayValueMatcher<>(
             new CustomComparator(
                   JSONCompareMode.STRICT,
-                  new Customization("tourMarkers[*].deviceLapTime", (o1, o2) -> true), //$NON-NLS-1$
-                  new Customization("tourMarkers[*].tourData", (o1, o2) -> true))); //$NON-NLS-1$
+                  new Customization("tourMarkers[*].altitude", (o1, o2) -> true), //$NON-NLS-1$
+                  new Customization("tourMarkers[*].distance20", (o1, o2) -> true), //$NON-NLS-1$
+                  new Customization("tourMarkers[*].serieIndex", (o1, o2) -> true), //$NON-NLS-1$
+                  new Customization("tourMarkers[*].time", (o1, o2) -> true), //$NON-NLS-1$
+                  new Customization("tourMarkers[*].tourTime", (o1, o2) -> true))); //$NON-NLS-1$
 
       final CustomComparator customArrayValueComparator = new CustomComparator(
             JSONCompareMode.STRICT,
             new Customization("tourMarkers", tourMarkersValueMatcher), //$NON-NLS-1$
-            new Customization("importFilePath", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("tourType.createId", (o1, o2) -> true), //$NON-NLS-1$
-            new Customization("importFilePathName", (o1, o2) -> true), //$NON-NLS-1$
-            new Customization("importFilePathNameText", (o1, o2) -> true), //$NON-NLS-1$
-            new Customization("geoGrid", (o1, o2) -> true), //$NON-NLS-1$
             new Customization("tourId", (o1, o2) -> true)); //$NON-NLS-1$
 
       final String controlDocument = readFileContent(controlFileName + JSON);

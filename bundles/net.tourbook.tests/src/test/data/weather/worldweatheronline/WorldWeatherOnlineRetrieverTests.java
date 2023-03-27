@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,13 +15,17 @@
  *******************************************************************************/
 package data.weather.worldweatheronline;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pgssoft.httpclient.HttpClientMock;
 
 import java.lang.reflect.Field;
+import java.time.ZonedDateTime;
 
+import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
@@ -72,17 +76,19 @@ public class WorldWeatherOnlineRetrieverTests {
 
 // SET_FORMATTING_OFF
 
-      assertEquals(15.92f,                      tour.getWeather_Temperature_Average());
-      assertEquals(2,                           tour.getWeather_Wind_Speed());
-      assertEquals(120,                         tour.getWeather_Wind_Direction());
-      assertEquals("Patchy rain possible",      tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-showers-scattered", tour.getWeather_Clouds()); //$NON-NLS-1$
-      assertEquals(49,                          tour.getWeather_Humidity());
-      assertEquals(1.6f,                        tour.getWeather_Precipitation());
-      assertEquals(1016.54f,                    tour.getWeather_Pressure());
-      assertEquals(19,                          tour.getWeather_Temperature_Max());
-      assertEquals(8,                           tour.getWeather_Temperature_Min());
-      assertEquals(15.62f,                      tour.getWeather_Temperature_WindChill());
+      assertAll(
+            () ->  assertEquals(15.92f,                                tour.getWeather_Temperature_Average()),
+            () ->  assertEquals(2,                                     tour.getWeather_Wind_Speed()),
+            () ->  assertEquals(120,                                   tour.getWeather_Wind_Direction()),
+            () ->  assertEquals("Patchy rain possible",                tour.getWeather()), //$NON-NLS-1$
+            () ->  assertEquals(IWeather.WEATHER_ID_SCATTERED_SHOWERS, tour.getWeather_Clouds()),
+            () ->  assertEquals(49,                                    tour.getWeather_Humidity()),
+            () ->  assertEquals(1.6f,                                  tour.getWeather_Precipitation()),
+            () ->  assertEquals(0,                                     tour.getWeather_Snowfall()),
+            () ->  assertEquals(1016.54f,                              tour.getWeather_Pressure()),
+            () ->  assertEquals(19,                                    tour.getWeather_Temperature_Max()),
+            () ->  assertEquals(8,                                     tour.getWeather_Temperature_Min()),
+            () ->  assertEquals(15.62f,                                tour.getWeather_Temperature_WindChill()));
 
 // SET_FORMATTING_ON
 
@@ -100,7 +106,16 @@ public class WorldWeatherOnlineRetrieverTests {
 
       final TourData tour = Initializer.importTour();
       //Tuesday, July 2, 2022 12:00:00 AM
-      tour.setTourStartTime(2022, 7, 2, 0, 0, 0);
+      final ZonedDateTime zonedDateTime = ZonedDateTime.of(
+            2022,
+            7,
+            2,
+            0,
+            0,
+            0,
+            0,
+            TimeTools.UTC);
+      tour.setTourStartTime(zonedDateTime);
       //We set the current time elapsed to trigger the computation of the new end time
       tour.setTourDeviceTime_Elapsed(tour.getTourDeviceTime_Elapsed());
 
@@ -111,17 +126,18 @@ public class WorldWeatherOnlineRetrieverTests {
 
 // SET_FORMATTING_OFF
 
-      assertEquals(8,                      tour.getWeather_Temperature_Average());
-      assertEquals(12,                     tour.getWeather_Wind_Speed());
-      assertEquals(267,                    tour.getWeather_Wind_Direction());
-      assertEquals("Patchy rain possible", tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-drizzle",      tour.getWeather_Clouds()); //$NON-NLS-1$
-      assertEquals(79,                     tour.getWeather_Humidity());
-      assertEquals(1.1f,                   tour.getWeather_Precipitation());
-      assertEquals(1019f,                  tour.getWeather_Pressure());
-      assertEquals(8,                      tour.getWeather_Temperature_Max());
-      assertEquals(8,                      tour.getWeather_Temperature_Min());
-      assertEquals(5.57f,                  tour.getWeather_Temperature_WindChill());
+      assertAll(
+            () ->  assertEquals(8,                           tour.getWeather_Temperature_Average()),
+            () ->  assertEquals(12,                          tour.getWeather_Wind_Speed()),
+            () ->  assertEquals(267,                         tour.getWeather_Wind_Direction()),
+            () ->  assertEquals("Patchy rain possible",      tour.getWeather()), //$NON-NLS-1$
+            () ->  assertEquals(IWeather.WEATHER_ID_DRIZZLE, tour.getWeather_Clouds()),
+            () ->  assertEquals(79,                          tour.getWeather_Humidity()),
+            () ->  assertEquals(1.1f,                        tour.getWeather_Precipitation()),
+            () ->  assertEquals(1019f,                       tour.getWeather_Pressure()),
+            () ->  assertEquals(8,                           tour.getWeather_Temperature_Max()),
+            () ->  assertEquals(8,                           tour.getWeather_Temperature_Min()),
+            () ->  assertEquals(5.57f,                       tour.getWeather_Temperature_WindChill()));
 
 // SET_FORMATTING_ON
 
