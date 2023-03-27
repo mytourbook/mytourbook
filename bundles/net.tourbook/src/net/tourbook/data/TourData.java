@@ -946,6 +946,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    @SuppressWarnings("unused")
    private float                    deviceAvgSpeed;                     // db-version 12
+
    @SuppressWarnings("unused")
    private int                      deviceDistance;
 
@@ -1843,7 +1844,6 @@ private Set<TourTag>                tourTags                            = new Ha
    @Transient
    private float[]      _runDyn_VerticalOscillation_UI;
    @Transient
-
    private float[]      _runDyn_VerticalOscillation_UI_Imperial;
 
    @Transient
