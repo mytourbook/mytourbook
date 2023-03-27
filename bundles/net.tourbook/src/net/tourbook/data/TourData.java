@@ -129,7 +129,7 @@ import org.hibernate.annotations.Cascade;
 
 public class TourData implements Comparable<Object>, IXmlSerializable, Serializable {
 
-   private static final long serialVersionUID = 1L;
+   private static final long             serialVersionUID                  = 1L;
 
    private static final char             NL                                = UI.NEW_LINE;
    private static final String           INTERVAL_SUMMARY_UNIT             = " ∑  ";                                  //$NON-NLS-1$
@@ -150,7 +150,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public static final int               DB_LENGTH_TIME_ZONE_ID            = 255;
 
    public static final int               DB_LENGTH_WEATHER                 = 1000;
-   public static final int               DB_LENGTH_WEATHER_AIRQUALITY = 255;
+   public static final int               DB_LENGTH_WEATHER_AIRQUALITY      = 255;
    public static final int               DB_LENGTH_WEATHER_V48             = 32000;
    public static final int               DB_LENGTH_WEATHER_CLOUDS          = 255;
 
@@ -300,7 +300,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * <p>
     * This is used in sql queries.
     */
-   @JsonProperty
    private short                 startWeek;
 
    /**
@@ -309,7 +308,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     * <p>
     * This is used in sql queries.
     */
-   @JsonProperty
    private short                 startWeekYear;
 
    // ############################################# TIME #############################################
