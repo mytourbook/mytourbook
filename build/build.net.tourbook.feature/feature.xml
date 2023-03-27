@@ -18,7 +18,7 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="https://mytourbook.sourceforge.io/updates/"/>
+      <update label="%updateSiteName" url="https://github.com/mytourbook/mytourbook.github.io/"/>
    </url>
 
    <includes

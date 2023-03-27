@@ -70,7 +70,7 @@ public class P2_Activator extends AbstractUIPlugin {
    private static final String ATTR_NICK_NAME         = "nickName";                                  //$NON-NLS-1$
    private static final String ATTR_URI               = "uri";                                       //$NON-NLS-1$
 
-   private static String       UPDATE_SITE_PRODUCTION = "https://mytourbook.sourceforge.io/updates"; //$NON-NLS-1$
+   private static String       UPDATE_SITE_PRODUCTION = "https://github.com/mytourbook/mytourbook.github.io"; //$NON-NLS-1$
 //   private static String     UPDATE_SITE_TEST      = "http://mytourbook.sourceforge.net/TEST-updates";                  //$NON-NLS-1$
 //   private static String     UPDATE_SITE_TEST_LOCAL   = "file:/C:/DAT/MT/mytourbook/build/build.update-site/target/repository";   //$NON-NLS-1$
 
@@ -81,7 +81,7 @@ public class P2_Activator extends AbstractUIPlugin {
       try {
 
          /*
-          * https://mytourbook.sourceforge.io/updates
+          * https://github.com/mytourbook/mytourbook.github.io
           */
          final MetadataRepositoryElement repo_PRODUCTION = new MetadataRepositoryElement(null, //
                new URI(UPDATE_SITE_PRODUCTION),
