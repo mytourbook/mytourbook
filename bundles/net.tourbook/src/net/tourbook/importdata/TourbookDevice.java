@@ -22,7 +22,6 @@ import java.io.InputStreamReader;
 
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
-import net.tourbook.common.util.FilesUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.data.TourData;
@@ -291,7 +290,7 @@ public abstract class TourbookDevice implements IRawDataReader {
       if (isTrimXmlDeclaration) {
 
          try {
-            FilesUtils.trimXmlDeclaration(importFilePath, XML_START_ID);
+            FileUtils.trimXmlDeclaration(importFilePath, XML_START_ID);
          } catch (final IOException e) {
             // just ignore it
          }
