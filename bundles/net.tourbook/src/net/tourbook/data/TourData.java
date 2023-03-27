@@ -630,7 +630,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * Air Quality
     */
-   private String                 weather_AirQuality;                             // db-version 50
+   private String                 weather_AirQuality;                                  // db-version 50
 
    //TODO FB
    //https://openweathermap.org/api/air-pollution

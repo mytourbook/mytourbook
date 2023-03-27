@@ -96,7 +96,7 @@ public class OpenWeatherMapRetrieverTests {
 
       assertAll(
             () ->  assertEquals("broken clouds",             tour.getWeather()), //$NON-NLS-1$
-            () ->  assertEquals(IWeather.WEATHER_ID_DRIZZLE, tour.getWeather_Clouds()),
+            () ->  assertEquals(IWeather.WEATHER_ID_PART_CLOUDS, tour.getWeather_Clouds()),
             () ->  assertEquals(7.58f,                       tour.getWeather_Temperature_Average()),
             () ->  assertEquals(3,                           tour.getWeather_Wind_Speed()),
             () ->  assertEquals(240,                         tour.getWeather_Wind_Direction()),
@@ -144,7 +144,7 @@ public class OpenWeatherMapRetrieverTests {
 
       assertAll(
             () ->  assertEquals("overcast clouds",        tour.getWeather()), //$NON-NLS-1$
-            () ->  assertEquals(IWeather.WEATHER_ID_RAIN, tour.getWeather_Clouds()),
+            () ->  assertEquals(IWeather.WEATHER_ID_PART_CLOUDS, tour.getWeather_Clouds()),
             () ->  assertEquals(8.35f,                    tour.getWeather_Temperature_Average()),
             () ->  assertEquals(3,                        tour.getWeather_Wind_Speed()),
             () ->  assertEquals(268,                      tour.getWeather_Wind_Direction()),
@@ -198,7 +198,7 @@ public class OpenWeatherMapRetrieverTests {
 
       assertAll(
             () ->  assertEquals("scattered clouds",              tour.getWeather()), //$NON-NLS-1$
-            () ->  assertEquals(IWeather.WEATHER_ID_PART_CLOUDS, tour.getWeather_Clouds()),
+            () ->  assertEquals(IWeather.WEATHER_ID_OVERCAST, tour.getWeather_Clouds()),
             () ->  assertEquals(-5.91f,                          tour.getWeather_Temperature_Average()),
             () ->  assertEquals(11,                              tour.getWeather_Wind_Speed()),
             () ->  assertEquals(280,                             tour.getWeather_Wind_Direction()),
@@ -239,7 +239,7 @@ public class OpenWeatherMapRetrieverTests {
 
       assertAll(
             () ->  assertEquals("overcast clouds",            tour.getWeather()), //$NON-NLS-1$
-            () ->  assertEquals(IWeather.WEATHER_ID_OVERCAST, tour.getWeather_Clouds()),
+            () ->  assertEquals(IWeather.WEATHER_ID_PART_CLOUDS, tour.getWeather_Clouds()),
             () ->  assertEquals(14.15f,                       tour.getWeather_Temperature_Average()),
             () ->  assertEquals(3,                            tour.getWeather_Wind_Speed()),
             () ->  assertEquals(140,                          tour.getWeather_Wind_Direction()),
