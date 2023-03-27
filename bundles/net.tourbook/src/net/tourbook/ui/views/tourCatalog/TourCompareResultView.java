@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,7 @@ import javax.persistence.EntityTransaction;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
@@ -110,17 +111,11 @@ import org.eclipse.ui.dialogs.ContainerCheckedTreeViewer;
 import org.eclipse.ui.part.ViewPart;
 
 public class TourCompareResultView extends ViewPart implements
+
       ITourViewer,
       ITourProvider,
       ITreeViewer,
       IReferenceTourProvider {
-
-// SET_FORMATTING_OFF
-
-   private static final String COLUMN_FACTORY_MOTION_ALTIMETER          = net.tourbook.ui.Messages.ColumnFactory_Motion_Altimeter;
-   private static final String COLUMN_FACTORY_MOTION_ALTIMETER_TOOLTIP  = net.tourbook.ui.Messages.ColumnFactory_Motion_Altimeter_Tooltip;
-
-// SET_FORMATTING_ON
 
    public static final String                  ID                                = "net.tourbook.views.tourCatalog.CompareResultView"; //$NON-NLS-1$
 
@@ -1075,8 +1070,8 @@ public class TourCompareResultView extends ViewPart implements
       colDef.setIsDefaultColumn();
       colDef.setColumnHeaderText(UI.UNIT_LABEL_ALTIMETER);
       colDef.setColumnUnit(UI.UNIT_LABEL_ALTIMETER);
-      colDef.setColumnHeaderToolTipText(COLUMN_FACTORY_MOTION_ALTIMETER_TOOLTIP);
-      colDef.setColumnLabel(COLUMN_FACTORY_MOTION_ALTIMETER);
+      colDef.setColumnHeaderToolTipText(OtherMessages.COLUMN_FACTORY_MOTION_ALTIMETER_TOOLTIP);
+      colDef.setColumnLabel(OtherMessages.COLUMN_FACTORY_MOTION_ALTIMETER);
 
       colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(8));
       colDef.setValueFormats(//

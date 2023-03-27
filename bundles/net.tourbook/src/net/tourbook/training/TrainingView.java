@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -104,6 +105,7 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 public class TrainingView extends ViewPart {
+
 
    public static final String  ID                                   = "net.tourbook.training.TrainingView"; //$NON-NLS-1$
 
@@ -728,7 +730,7 @@ public class TrainingView extends ViewPart {
       /*
        * label: bpm
        */
-      label = _tk.createLabel(parent, net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+      label = _tk.createLabel(parent, OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
       GridDataFactory.fillDefaults()
             .align(SWT.END, SWT.FILL)
             .applyTo(label);
@@ -1369,7 +1371,7 @@ public class TrainingView extends ViewPart {
        */
       final ChartDataXSerie xData = new ChartDataXSerie(_xSeriePulse);
       xData.setAxisUnit(ChartDataXSerie.X_AXIS_UNIT_NUMBER_CENTER);
-      xData.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+      xData.setUnitLabel(OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
       xData.setUnitStartValue(pulseMin);
 
       chartDataModel.setXData(xData);
@@ -1483,7 +1485,7 @@ public class TrainingView extends ViewPart {
                      + UI.DASH
                      + zoneMaxBpmText
                      + UI.SPACE
-                     + net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit
+                     + OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT
                      //
                      + UI.NEW_LINE
                      + UI.NEW_LINE
@@ -1496,8 +1498,7 @@ public class TrainingView extends ViewPart {
                      + Messages.HRMax_Label
                      + UI.SPACE
                      + zoneContext.hrMax
-                     + net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit
-         //
+                     + OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT
          ;
 
          // % values

@@ -61,7 +61,7 @@ public class ImageUtils {
    /**
     * For images with a transparent layer, this will keep the existing
     * transparency.
-    * Source: https://stackoverflow.com/a/63703052
+    * Original code: https://stackoverflow.com/a/63703052
     *
     * @param sourceImageData
     * @param imgWidth
@@ -78,16 +78,20 @@ public class ImageUtils {
 
       final ImageData destData = new ImageData(imgWidth, imgHeight, sourceImageData.depth, sourceImageData.palette);
 
-      destData.alphaData = new byte[destData.width * destData.height];
+      final int destinationImageWidth = destData.width;
+      final int sourceImageDataWidth = sourceImageData.width;
+      destData.alphaData = new byte[destinationImageWidth * destData.height];
+
       for (int destRow = 0; destRow < destData.height; destRow++) {
 
-         for (int destCol = 0; destCol < destData.width; destCol++) {
+         final int origRow = destRow * sourceImageData.height / destData.height;
+         final int destination = destRow * destinationImageWidth;
+         final int origin = origRow * sourceImageDataWidth;
 
-            final int origRow = destRow * sourceImageData.height / destData.height;
-            final int origCol = destCol * sourceImageData.width / destData.width;
-            final int o = origRow * sourceImageData.width + origCol;
-            final int d = destRow * destData.width + destCol;
-            destData.alphaData[d] = sourceImageData.alphaData[o];
+         for (int destCol = 0; destCol < destinationImageWidth; destCol++) {
+
+            final int origCol = destCol * sourceImageDataWidth / destinationImageWidth;
+            destData.alphaData[destination + destCol] = sourceImageData.alphaData[origin + origCol];
          }
       }
 

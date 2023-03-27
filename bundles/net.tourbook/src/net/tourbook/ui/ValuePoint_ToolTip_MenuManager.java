@@ -66,6 +66,7 @@ public class ValuePoint_ToolTip_MenuManager {
    static final long                     VALUE_ID_RUN_DYN_VERTICAL_RATIO          = 1 << 21;
    static final long                     VALUE_ID_PACE_SUMMARIZED                 = 1 << 22;
    static final long                     VALUE_ID_SPEED_SUMMARIZED                = 1 << 23;
+   static final long                     VALUE_ID_TIME_MOVING                     = 1 << 24;
 
    static final long                     DEFAULT_GRAPHS                           =
 
@@ -110,6 +111,7 @@ public class ValuePoint_ToolTip_MenuManager {
    private ActionValueItem               _actionValue_Temperature;
    private ActionValueItem               _actionValue_TimeDuration;
    private ActionValueItem               _actionValue_TimeOfDay;
+   private ActionValueItem               _actionValue_TimeMoving;
    private ActionValueItem               _actionValue_TimeSlices;
    private ActionValueItem               _actionValue_TourCompareResult;
 
@@ -372,6 +374,12 @@ public class ValuePoint_ToolTip_MenuManager {
             null,
             null);
 
+      _actionValue_TimeMoving = new ActionValueItem(
+            VALUE_ID_TIME_MOVING,
+            Messages.Tooltip_ValuePoint_Action_Value_TimeMoving,
+            null,
+            null);
+
       _actionValue_TimeOfDay = new ActionValueItem(
             VALUE_ID_TIME_OF_DAY,
             Messages.Tooltip_ValuePoint_Action_Value_TimeOfDay,
@@ -546,30 +554,31 @@ public class ValuePoint_ToolTip_MenuManager {
 
       _actionValue_Header                       .setEnabled(false);
 
-      _actionValue_Altimeter                    .setState((_allVisibleValueIds & VALUE_ID_ALTIMETER) > 0,            _tourData.getAltimeterSerie() != null);
-      _actionValue_Altitude                     .setState((_allVisibleValueIds & VALUE_ID_ALTITUDE) > 0,             _tourData.getAltitudeSerie() != null);
-      _actionValue_Cadence                      .setState((_allVisibleValueIds & VALUE_ID_CADENCE) > 0,              _tourData.getCadenceSerie() != null);
+      _actionValue_Altimeter                    .setState((_allVisibleValueIds & VALUE_ID_ALTIMETER) > 0,            _tourData.getAltimeterSerie()          != null);
+      _actionValue_Altitude                     .setState((_allVisibleValueIds & VALUE_ID_ALTITUDE) > 0,             _tourData.getAltitudeSerie()           != null);
+      _actionValue_Cadence                      .setState((_allVisibleValueIds & VALUE_ID_CADENCE) > 0,              _tourData.getCadenceSerie()            != null);
       _actionValue_ChartZoomFactor              .setState((_allVisibleValueIds & VALUE_ID_CHART_ZOOM_FACTOR) > 0,    true);
-      _actionValue_Distance                     .setState((_allVisibleValueIds & VALUE_ID_DISTANCE) > 0,             _tourData.distanceSerie != null);
-      _actionValue_Gears                        .setState((_allVisibleValueIds & VALUE_ID_GEARS) > 0,                _tourData.getGears() != null);
-      _actionValue_Gradient                     .setState((_allVisibleValueIds & VALUE_ID_GRADIENT) > 0,             _tourData.getGradientSerie() != null);
-      _actionValue_Pace                         .setState((_allVisibleValueIds & VALUE_ID_PACE) > 0,                 _tourData.getPaceSerie() != null);
+      _actionValue_Distance                     .setState((_allVisibleValueIds & VALUE_ID_DISTANCE) > 0,             _tourData.distanceSerie                != null);
+      _actionValue_Gears                        .setState((_allVisibleValueIds & VALUE_ID_GEARS) > 0,                _tourData.getGears()                   != null);
+      _actionValue_Gradient                     .setState((_allVisibleValueIds & VALUE_ID_GRADIENT) > 0,             _tourData.getGradientSerie()           != null);
+      _actionValue_Pace                         .setState((_allVisibleValueIds & VALUE_ID_PACE) > 0,                 _tourData.getPaceSerie()               != null);
       _actionValue_Pace_Summarized              .setState((_allVisibleValueIds & VALUE_ID_PACE_SUMMARIZED) > 0,      _tourData.getPaceSerie_Summarized_Seconds() != null);
-      _actionValue_Power                        .setState((_allVisibleValueIds & VALUE_ID_POWER) > 0,                _tourData.getPowerSerie() != null);
-      _actionValue_Pulse                        .setState((_allVisibleValueIds & VALUE_ID_PULSE) > 0,                _tourData.pulseSerie != null);
-      _actionValue_Speed                        .setState((_allVisibleValueIds & VALUE_ID_SPEED) > 0,                _tourData.getSpeedSerie() != null);
-      _actionValue_Speed_Summarized             .setState((_allVisibleValueIds & VALUE_ID_SPEED_SUMMARIZED) > 0,     _tourData.getSpeedSerie_Summarized() != null);
-      _actionValue_Temperature                  .setState((_allVisibleValueIds & VALUE_ID_TEMPERATURE) > 0,          _tourData.temperatureSerie != null);
-      _actionValue_TimeDuration                 .setState((_allVisibleValueIds & VALUE_ID_TIME_DURATION) > 0,        _tourData.timeSerie != null);
-      _actionValue_TimeOfDay                    .setState((_allVisibleValueIds & VALUE_ID_TIME_OF_DAY) > 0,          _tourData.timeSerie != null);
+      _actionValue_Power                        .setState((_allVisibleValueIds & VALUE_ID_POWER) > 0,                _tourData.getPowerSerie()              != null);
+      _actionValue_Pulse                        .setState((_allVisibleValueIds & VALUE_ID_PULSE) > 0,                _tourData.pulseSerie                   != null);
+      _actionValue_Speed                        .setState((_allVisibleValueIds & VALUE_ID_SPEED) > 0,                _tourData.getSpeedSerie()              != null);
+      _actionValue_Speed_Summarized             .setState((_allVisibleValueIds & VALUE_ID_SPEED_SUMMARIZED) > 0,     _tourData.getSpeedSerie_Summarized()   != null);
+      _actionValue_Temperature                  .setState((_allVisibleValueIds & VALUE_ID_TEMPERATURE) > 0,          _tourData.temperatureSerie             != null);
+      _actionValue_TimeDuration                 .setState((_allVisibleValueIds & VALUE_ID_TIME_DURATION) > 0,        _tourData.timeSerie                    != null);
+      _actionValue_TimeOfDay                    .setState((_allVisibleValueIds & VALUE_ID_TIME_OF_DAY) > 0,          _tourData.timeSerie                    != null);
+      _actionValue_TimeMoving                   .setState((_allVisibleValueIds & VALUE_ID_TIME_MOVING) > 0,          _tourData.getMovingTimeSerie()         != null);
       _actionValue_TimeSlices                   .setState((_allVisibleValueIds & VALUE_ID_TIME_SLICES) > 0,          true);
       _actionValue_TourCompareResult            .setState((_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,  _tourData.tourCompareSerie != null && _tourData.tourCompareSerie.length > 0);
 
-      _actionValue_RunDyn_StanceTime            .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME) > 0,           _tourData.getRunDyn_StanceTime() != null);
-      _actionValue_RunDyn_StanceTimeBalance     .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED) > 0,  _tourData.getRunDyn_StanceTimeBalance() != null);
-      _actionValue_RunDyn_StepLength            .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STEP_LENGTH) > 0,           _tourData.getRunDyn_StepLength() != null);
+      _actionValue_RunDyn_StanceTime            .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME) > 0,           _tourData.getRunDyn_StanceTime()          != null);
+      _actionValue_RunDyn_StanceTimeBalance     .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STANCE_TIME_BALANCED) > 0,  _tourData.getRunDyn_StanceTimeBalance()   != null);
+      _actionValue_RunDyn_StepLength            .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_STEP_LENGTH) > 0,           _tourData.getRunDyn_StepLength()          != null);
       _actionValue_RunDyn_VerticalOscillation   .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_VERTICAL_OSCILLATION) > 0,  _tourData.getRunDyn_VerticalOscillation() != null);
-      _actionValue_RunDyn_VerticalRatio         .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_VERTICAL_RATIO) > 0,        _tourData.getRunDyn_VerticalRatio() != null);
+      _actionValue_RunDyn_VerticalRatio         .setState((_allVisibleValueIds & VALUE_ID_RUN_DYN_VERTICAL_RATIO) > 0,        _tourData.getRunDyn_VerticalRatio()       != null);
 
 // SET_FORMATTING_ON
    }
@@ -591,6 +600,7 @@ public class ValuePoint_ToolTip_MenuManager {
 
       addItem(_actionValue_TimeSlices);
       addItem(_actionValue_TimeDuration);
+      addItem(_actionValue_TimeMoving);
       addItem(_actionValue_TimeOfDay);
       addItem(_actionValue_Distance);
       addItem(_actionValue_Altitude);

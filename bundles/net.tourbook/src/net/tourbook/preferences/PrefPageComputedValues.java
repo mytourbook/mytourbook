@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.form.FormTools;
@@ -69,8 +70,6 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
 
 public class PrefPageComputedValues extends PreferencePage implements IWorkbenchPreferencePage {
-
-   private static final String GRAPH_LABEL_CADENCE_UNIT          = net.tourbook.common.Messages.Graph_Label_Cadence_Unit;
 
    public static final String  ID                                = "net.tourbook.preferences.PrefPageComputedValues";                               //$NON-NLS-1$
 
@@ -805,7 +804,7 @@ public class PrefPageComputedValues extends PreferencePage implements IWorkbench
 
          // label: unit
          label = new Label(container, SWT.NONE);
-         label.setText(GRAPH_LABEL_CADENCE_UNIT);
+         label.setText(OtherMessages.GRAPH_LABEL_CADENCE_UNIT);
       }
 
       GridDataFactory.fillDefaults().applyTo(container);

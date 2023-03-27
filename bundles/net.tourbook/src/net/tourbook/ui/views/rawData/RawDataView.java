@@ -55,6 +55,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.FileSystemManager;
@@ -75,6 +76,7 @@ import net.tourbook.common.util.PostSelectionProvider;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.TableColumnDefinition;
 import net.tourbook.common.util.Util;
+import net.tourbook.data.ElevationGainLoss;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
@@ -200,15 +202,9 @@ import org.joda.time.Period;
 import org.joda.time.PeriodType;
 
 /**
- *
+ * Tour import view
  */
 public class RawDataView extends ViewPart implements ITourProviderAll, ITourViewer3, ITourProviderByID {
-
-// SET_FORMATTING_OFF
-
-   private static final String   COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP  = net.tourbook.ui.Messages.ColumnFactory_TimeZoneDifference_Tooltip;
-
-// SET_FORMATTING_ON
 
    public static final String ID = "net.tourbook.views.rawData.RawDataView"; //$NON-NLS-1$
 
@@ -1524,7 +1520,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
 
             final int numNotBackedUpFiles = easyConfig.notBackedUpFiles.size();
 
-            folderInfo = numNotBackedUpFiles == 0 //
+            folderInfo = numNotBackedUpFiles == 0
                   ? NLS.bind(Messages.Import_Data_HTML_AllFilesAreBackedUp, numDeviceFiles)
                   : NLS.bind(Messages.Import_Data_HTML_NotBackedUpFiles, numNotBackedUpFiles, numDeviceFiles);
 
@@ -1548,11 +1544,11 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          final boolean isTopMargin = importConfig.isCreateBackup;
 
          final String folderTitle = Messages.Import_Data_HTML_Title_Device;
-         final String folderInfo = numNotImportedFiles == 0 //
+         final String folderInfo = numNotImportedFiles == 0
                ? NLS.bind(Messages.Import_Data_HTML_AllFilesAreImported, numAllFiles)
                : NLS.bind(Messages.Import_Data_HTML_NotImportedFiles, numNotImportedFiles, numAllFiles);
 
-         createHTML_56_FolderState(//
+         createHTML_56_FolderState(
                sb,
                htmlDeviceFolder,
                isDeviceFolderOK,
@@ -2077,6 +2073,15 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          sb.append(importLauncher.isReplaceFirstTimeSliceElevation
                ? Messages.Import_Data_HTML_ReplaceFirstTimeSliceElevation_Yes
                : Messages.Import_Data_HTML_ReplaceFirstTimeSliceElevation_No);
+      }
+
+      // set elevation from SRTM
+      {
+         sb.append(NL);
+
+         sb.append(importLauncher.isReplaceElevationFromSRTM
+               ? Messages.Import_Data_HTML_ReplaceElevationFromSRTM_Yes
+               : Messages.Import_Data_HTML_ReplaceElevationFromSRTM_No);
       }
 
       // retrieve weather data
@@ -4872,6 +4877,13 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
          }
 
          /*
+          * 7. Replace elevation up/down from SRTM values
+          */
+         if (importLauncher.isReplaceElevationFromSRTM) {
+            runEasyImport_007_ReplaceElevationFromSRTM(importLauncher, importedTours);
+         }
+
+         /*
           * 50. Retrieve weather data
           */
          if (importLauncher.isRetrieveWeatherData) {
@@ -5085,9 +5097,44 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       }
    }
 
+   private void runEasyImport_007_ReplaceElevationFromSRTM(final ImportLauncher importLauncher,
+                                                           final ArrayList<TourData> importedTours) {
+      // TODO Auto-generated method stub
+
+      // "7. Replace elevation up/down total values from SRTM data"
+      TourLogManager.log_DEFAULT(EasyImportManager.LOG_EASY_IMPORT_007_REPLACE_ELEVATION_FROM_SRTM);
+
+      for (final TourData tourData : importedTours) {
+
+         final int oldElevationUp = tourData.getTourAltUp();
+         final int oldElevationDown = tourData.getTourAltDown();
+
+         final ElevationGainLoss elevationUpDown = tourData.computeAltitudeUpDown_FromSRTM();
+
+         if (elevationUpDown == null) {
+
+            TourLogManager.subLog_ERROR(String.format(Messages.Log_ReplaceElevationUpDown_SRTMDataNotAvailable,
+                  TourManager.getTourDateTimeShort(tourData)));
+
+         } else {
+
+            TourLogManager.subLog_DEFAULT(String.format(Messages.Log_ReplaceElevationUpDown_ValuesAreReplaced,
+
+                  TourManager.getTourDateTimeShort(tourData),
+
+                  oldElevationUp,
+                  elevationUpDown.elevationGain,
+
+                  oldElevationDown,
+                  elevationUpDown.elevationLoss));
+         }
+      }
+   }
+
    private void runEasyImport_050_RetrieveWeatherData(final ImportLauncher importLauncher,
                                                       final List<TourData> importedTours) {
 
+      // "50. Retrieve Weather Data"
       TourLogManager.log_DEFAULT(NLS.bind(
             EasyImportManager.LOG_EASY_IMPORT_050_RETRIEVE_WEATHER_DATA,
             new Object[] {
@@ -5574,19 +5621,6 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       final TourData firstTourData = (TourData) _tourViewer.getElementAt(0);
       if (firstTourData != null) {
          _tourViewer.setSelection(new StructuredSelection(firstTourData), true);
-      }
-   }
-
-   private void selectLastTour() {
-
-      final Collection<TourData> tourDataCollection = _rawDataMgr.getImportedTours().values();
-
-      final TourData[] tourList = tourDataCollection.toArray(new TourData[tourDataCollection.size()]);
-
-      // select the last tour in the viewer
-      if (tourList.length > 0) {
-         final TourData tourData = tourList[0];
-         _tourViewer.setSelection(new StructuredSelection(tourData), true);
       }
    }
 
@@ -6253,7 +6287,7 @@ public class RawDataView extends ViewPart implements ITourProviderAll, ITourView
       // set tooltip text
       final String timeZone = _prefStore_Common.getString(ICommonPreferences.TIME_ZONE_LOCAL_ID);
 
-      final String timeZoneTooltip = NLS.bind(COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP, timeZone);
+      final String timeZoneTooltip = NLS.bind(OtherMessages.COLUMN_FACTORY_TIME_ZONE_DIFF_TOOLTIP, timeZone);
 
       _timeZoneOffsetColDef.setColumnHeaderToolTipText(timeZoneTooltip);
    }

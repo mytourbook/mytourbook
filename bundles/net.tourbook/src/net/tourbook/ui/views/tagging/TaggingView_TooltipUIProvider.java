@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,7 @@ import java.util.HashMap;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
@@ -46,20 +47,18 @@ import org.eclipse.swt.widgets.ToolBar;
 
 public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
 
-   private static final String APP_ACTION_CLOSE_TOOLTIP = net.tourbook.common.Messages.App_Action_Close_Tooltip;
+   private static final int   SHELL_MARGIN   = 5;
+   private static final int   MAX_DATA_WIDTH = 300;
 
-   private static final int    SHELL_MARGIN             = 5;
-   private static final int    MAX_DATA_WIDTH           = 300;
+   private Object             _viewerCellData;
 
-   private Object              _viewerCellData;
+   private IToolTipProvider   _toolTipProvider;
 
-   private IToolTipProvider    _toolTipProvider;
+   private ActionCloseTooltip _actionCloseTooltip;
+   private ActionEditTag      _actionEditTag;
 
-   private ActionCloseTooltip  _actionCloseTooltip;
-   private ActionEditTag       _actionEditTag;
-
-   private boolean             _hasNotes;
-   private String              _content_Notes;
+   private boolean            _hasNotes;
+   private String             _content_Notes;
 
    /*
     * UI resources
@@ -82,7 +81,7 @@ public class TaggingView_TooltipUIProvider implements ITooltipUIProvider {
 
          super(null, Action.AS_PUSH_BUTTON);
 
-         setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
+         setToolTipText(OtherMessages.APP_ACTION_CLOSE_TOOLTIP);
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 

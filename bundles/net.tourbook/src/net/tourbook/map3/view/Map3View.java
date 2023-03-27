@@ -44,6 +44,7 @@ import java.util.List;
 
 import javax.swing.SwingUtilities;
 
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -158,25 +159,23 @@ import org.oscim.core.MapPosition;
  */
 public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, IMapBookmarkListener, IMapSyncListener {
 
-   private static final String              GRAPH_LABEL_HEARTBEAT_UNIT             = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
+   private static final String              SLIDER_TEXT_ALTITUDE                   = "%.1f %s";                                             //$NON-NLS-1$
+   private static final String              SLIDER_TEXT_GRADIENT                   = "%.1f %%";                                             //$NON-NLS-1$
+   private static final String              SLIDER_TEXT_PACE                       = "%s %s";                                               //$NON-NLS-1$
+   private static final String              SLIDER_TEXT_PULSE                      = "%.0f %s";                                             //$NON-NLS-1$
+   private static final String              SLIDER_TEXT_SPEED                      = "%.1f %s";                                             //$NON-NLS-1$
 
-   private static final String              SLIDER_TEXT_ALTITUDE                   = "%.1f %s";                                              //$NON-NLS-1$
-   private static final String              SLIDER_TEXT_GRADIENT                   = "%.1f %%";                                              //$NON-NLS-1$
-   private static final String              SLIDER_TEXT_PACE                       = "%s %s";                                                //$NON-NLS-1$
-   private static final String              SLIDER_TEXT_PULSE                      = "%.0f %s";                                              //$NON-NLS-1$
-   private static final String              SLIDER_TEXT_SPEED                      = "%.1f %s";                                              //$NON-NLS-1$
+   public static final String               ID                                     = "net.tourbook.map3.view.Map3ViewId";                   //$NON-NLS-1$
 
-   public static final String               ID                                     = "net.tourbook.map3.view.Map3ViewId";                    //$NON-NLS-1$
-
-   private static final String              STATE_IS_LEGEND_VISIBLE                = "STATE_IS_LEGEND_VISIBLE";                              //$NON-NLS-1$
-   private static final String              STATE_IS_MARKER_VISIBLE                = "STATE_IS_MARKER_VISIBLE";                              //$NON-NLS-1$
-   private static final String              STATE_IS_SYNC_MAP_VIEW_WITH_TOUR       = "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";                     //$NON-NLS-1$
-   private static final String              STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER = "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER";               //$NON-NLS-1$
-   private static final String              STATE_IS_SYNC_MAP3_WITH_OTHER_MAP      = "STATE_IS_SYNC_MAP3_WITH_OTHER_MAP";                    //$NON-NLS-1$
-   private static final String              STATE_IS_TOUR_VISIBLE                  = "STATE_IS_TOUR_VISIBLE";                                //$NON-NLS-1$
-   private static final String              STATE_IS_TRACK_SLIDER_VISIBLE          = "STATE_IS_TRACK_SLIDERVISIBLE";                         //$NON-NLS-1$
-   private static final String              STATE_MAP3_VIEW                        = "STATE_MAP3_VIEW";                                      //$NON-NLS-1$
-   private static final String              STATE_TOUR_COLOR_ID                    = "STATE_TOUR_COLOR_ID";                                  //$NON-NLS-1$
+   private static final String              STATE_IS_LEGEND_VISIBLE                = "STATE_IS_LEGEND_VISIBLE";                             //$NON-NLS-1$
+   private static final String              STATE_IS_MARKER_VISIBLE                = "STATE_IS_MARKER_VISIBLE";                             //$NON-NLS-1$
+   private static final String              STATE_IS_SYNC_MAP_VIEW_WITH_TOUR       = "STATE_IS_SYNC_MAP_VIEW_WITH_TOUR";                    //$NON-NLS-1$
+   private static final String              STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER = "STATE_IS_SYNC_MAP_POSITION_WITH_SLIDER";              //$NON-NLS-1$
+   private static final String              STATE_IS_SYNC_MAP3_WITH_OTHER_MAP      = "STATE_IS_SYNC_MAP3_WITH_OTHER_MAP";                   //$NON-NLS-1$
+   private static final String              STATE_IS_TOUR_VISIBLE                  = "STATE_IS_TOUR_VISIBLE";                               //$NON-NLS-1$
+   private static final String              STATE_IS_TRACK_SLIDER_VISIBLE          = "STATE_IS_TRACK_SLIDERVISIBLE";                        //$NON-NLS-1$
+   private static final String              STATE_MAP3_VIEW                        = "STATE_MAP3_VIEW";                                     //$NON-NLS-1$
+   private static final String              STATE_TOUR_COLOR_ID                    = "STATE_TOUR_COLOR_ID";                                 //$NON-NLS-1$
 
    private static final WorldWindowGLCanvas _wwCanvas                              = Map3Manager.getWWCanvas();
 
@@ -1034,7 +1033,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
          final float[] paceSerie = tourData.getPaceSerieSeconds();
          if (paceSerie != null) {
             final float pace = paceSerie[positionIndex];
-            graphValueText = String.format(//
+            graphValueText = String.format(
                   SLIDER_TEXT_PACE,
                   UI.format_mm_ss((long) pace),
                   UI.UNIT_LABEL_PACE);
@@ -1046,8 +1045,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
 
          final float[] pulseSerie = tourData.pulseSerie;
          if (pulseSerie != null) {
-            graphValueText = String
-                  .format(SLIDER_TEXT_PULSE, pulseSerie[positionIndex], GRAPH_LABEL_HEARTBEAT_UNIT);
+            graphValueText = String.format(SLIDER_TEXT_PULSE, pulseSerie[positionIndex], OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
          }
 
          break;
@@ -2459,7 +2457,7 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       }
 
       final long currentTime = System.currentTimeMillis();
-      
+
       final long timeDiffLastFired = currentTime - _lastFiredSyncEventTime;
 
       if (timeDiffLastFired < 1000) {
@@ -2471,8 +2469,8 @@ public class Map3View extends ViewPart implements ITourProvider, IMapBookmarks, 
       if (timeDiffLastSync < 2000) {
 
          /*
-          * This is currently not a very good solution because I didn't found the code to move the map
-          * without any animation which is first zooming out and then zooming in
+          * This is currently not a very good solution because I didn't found the code to move the
+          * map without any animation which is first zooming out and then zooming in
           */
          return;
       }

@@ -15,6 +15,7 @@
  *******************************************************************************/
 package data.weather.worldweatheronline;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -24,6 +25,7 @@ import java.lang.reflect.Field;
 import java.time.ZonedDateTime;
 
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
@@ -74,17 +76,19 @@ public class WorldWeatherOnlineRetrieverTests {
 
 // SET_FORMATTING_OFF
 
-      assertEquals(15.92f,                      tour.getWeather_Temperature_Average());
-      assertEquals(2,                           tour.getWeather_Wind_Speed());
-      assertEquals(120,                         tour.getWeather_Wind_Direction());
-      assertEquals("Patchy rain possible",      tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-showers-scattered", tour.getWeather_Clouds()); //$NON-NLS-1$
-      assertEquals(49,                          tour.getWeather_Humidity());
-      assertEquals(1.6f,                        tour.getWeather_Precipitation());
-      assertEquals(1016.54f,                    tour.getWeather_Pressure());
-      assertEquals(19,                          tour.getWeather_Temperature_Max());
-      assertEquals(8,                           tour.getWeather_Temperature_Min());
-      assertEquals(15.62f,                      tour.getWeather_Temperature_WindChill());
+      assertAll(
+            () ->  assertEquals(15.92f,                                tour.getWeather_Temperature_Average()),
+            () ->  assertEquals(2,                                     tour.getWeather_Wind_Speed()),
+            () ->  assertEquals(120,                                   tour.getWeather_Wind_Direction()),
+            () ->  assertEquals("Patchy rain possible",                tour.getWeather()), //$NON-NLS-1$
+            () ->  assertEquals(IWeather.WEATHER_ID_SCATTERED_SHOWERS, tour.getWeather_Clouds()),
+            () ->  assertEquals(49,                                    tour.getWeather_Humidity()),
+            () ->  assertEquals(1.6f,                                  tour.getWeather_Precipitation()),
+            () ->  assertEquals(0,                                     tour.getWeather_Snowfall()),
+            () ->  assertEquals(1016.54f,                              tour.getWeather_Pressure()),
+            () ->  assertEquals(19,                                    tour.getWeather_Temperature_Max()),
+            () ->  assertEquals(8,                                     tour.getWeather_Temperature_Min()),
+            () ->  assertEquals(15.62f,                                tour.getWeather_Temperature_WindChill()));
 
 // SET_FORMATTING_ON
 
@@ -122,17 +126,18 @@ public class WorldWeatherOnlineRetrieverTests {
 
 // SET_FORMATTING_OFF
 
-      assertEquals(8,                      tour.getWeather_Temperature_Average());
-      assertEquals(12,                     tour.getWeather_Wind_Speed());
-      assertEquals(267,                    tour.getWeather_Wind_Direction());
-      assertEquals("Patchy rain possible", tour.getWeather()); //$NON-NLS-1$
-      assertEquals("weather-drizzle",      tour.getWeather_Clouds()); //$NON-NLS-1$
-      assertEquals(79,                     tour.getWeather_Humidity());
-      assertEquals(1.1f,                   tour.getWeather_Precipitation());
-      assertEquals(1019f,                  tour.getWeather_Pressure());
-      assertEquals(8,                      tour.getWeather_Temperature_Max());
-      assertEquals(8,                      tour.getWeather_Temperature_Min());
-      assertEquals(5.57f,                  tour.getWeather_Temperature_WindChill());
+      assertAll(
+            () ->  assertEquals(8,                           tour.getWeather_Temperature_Average()),
+            () ->  assertEquals(12,                          tour.getWeather_Wind_Speed()),
+            () ->  assertEquals(267,                         tour.getWeather_Wind_Direction()),
+            () ->  assertEquals("Patchy rain possible",      tour.getWeather()), //$NON-NLS-1$
+            () ->  assertEquals(IWeather.WEATHER_ID_DRIZZLE, tour.getWeather_Clouds()),
+            () ->  assertEquals(79,                          tour.getWeather_Humidity()),
+            () ->  assertEquals(1.1f,                        tour.getWeather_Precipitation()),
+            () ->  assertEquals(1019f,                       tour.getWeather_Pressure()),
+            () ->  assertEquals(8,                           tour.getWeather_Temperature_Max()),
+            () ->  assertEquals(8,                           tour.getWeather_Temperature_Min()),
+            () ->  assertEquals(5.57f,                       tour.getWeather_Temperature_WindChill()));
 
 // SET_FORMATTING_ON
 

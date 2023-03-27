@@ -25,6 +25,7 @@ import java.lang.reflect.Field;
 import java.time.ZonedDateTime;
 
 import net.tourbook.common.time.TimeTools;
+import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.weather.WeatherUtils;
 import net.tourbook.weather.weatherapi.WeatherApiRetriever;
@@ -99,8 +100,8 @@ public class WeatherApiRetrieverTests {
             () ->  assertEquals(16.6f,                         tour.getWeather_Temperature_Average()),
             () ->  assertEquals(3,                             tour.getWeather_Wind_Speed()),
             () ->  assertEquals(171,                           tour.getWeather_Wind_Direction()),
-            () ->  assertEquals("Thundery outbreaks possible", tour.getWeather()),
-            () ->  assertEquals("weather-drizzle",             tour.getWeather_Clouds()),
+            () ->  assertEquals("Thundery outbreaks possible", tour.getWeather()), //$NON-NLS-1$
+            () ->  assertEquals(IWeather.WEATHER_ID_DRIZZLE,   tour.getWeather_Clouds()),
             () ->  assertEquals(51,                            tour.getWeather_Humidity()),
             () ->  assertEquals(6.13f,                         tour.getWeather_Precipitation()),
             () ->  assertEquals(0,                             tour.getWeather_Snowfall()),
@@ -138,18 +139,18 @@ public class WeatherApiRetrieverTests {
 // SET_FORMATTING_OFF
 
       assertAll(
-            () ->  assertEquals(13.92f,          tour.getWeather_Temperature_Average()),
-            () ->  assertEquals(11,              tour.getWeather_Wind_Speed()),
-            () ->  assertEquals(121,             tour.getWeather_Wind_Direction()),
-            () ->  assertEquals("Ensoleille",    tour.getWeather()),
-            () ->  assertEquals("weather-sunny", tour.getWeather_Clouds()),
-            () ->  assertEquals(29,              tour.getWeather_Humidity()),
-            () ->  assertEquals(0,               tour.getWeather_Precipitation()),
-            () ->  assertEquals(0,               tour.getWeather_Snowfall()),
-            () ->  assertEquals(1012.0,          tour.getWeather_Pressure()),
-            () ->  assertEquals(22.1f,           tour.getWeather_Temperature_Max()),
-            () ->  assertEquals(3.4f,            tour.getWeather_Temperature_Min()),
-            () ->  assertEquals(13.32f,          tour.getWeather_Temperature_WindChill()));
+            () ->  assertEquals(13.92f,                    tour.getWeather_Temperature_Average()),
+            () ->  assertEquals(11,                        tour.getWeather_Wind_Speed()),
+            () ->  assertEquals(121,                       tour.getWeather_Wind_Direction()),
+            () ->  assertEquals("Ensoleille",              tour.getWeather()), //$NON-NLS-1$
+            () ->  assertEquals(IWeather.WEATHER_ID_CLEAR, tour.getWeather_Clouds()),
+            () ->  assertEquals(29,                        tour.getWeather_Humidity()),
+            () ->  assertEquals(0,                         tour.getWeather_Precipitation()),
+            () ->  assertEquals(0,                         tour.getWeather_Snowfall()),
+            () ->  assertEquals(1012.0,                    tour.getWeather_Pressure()),
+            () ->  assertEquals(22.1f,                     tour.getWeather_Temperature_Max()),
+            () ->  assertEquals(3.4f,                      tour.getWeather_Temperature_Min()),
+            () ->  assertEquals(13.32f,                    tour.getWeather_Temperature_WindChill()));
 
 // SET_FORMATTING_ON
    }

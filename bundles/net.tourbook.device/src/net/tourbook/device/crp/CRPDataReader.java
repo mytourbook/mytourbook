@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TimeData;
 import net.tourbook.data.TourData;
@@ -183,7 +183,7 @@ public class CRPDataReader extends TourbookDevice {
     */
    private String getRawFilePath(final String importFilePath) {
 
-      String fileContent = FilesUtils.readFileContentString(importFilePath);
+      String fileContent = FileUtils.readFileContentString(importFilePath);
       String createTemporaryFile = null;
 
       // Check that the .crp file starts with the correct header
@@ -194,10 +194,10 @@ public class CRPDataReader extends TourbookDevice {
 
          //If it doesn't, it might be a compressed crp file and will need to be decompressed first
 
-         createTemporaryFile = FilesUtils.createTemporaryFile("temporaryCRP", "crp"); //$NON-NLS-1$ //$NON-NLS-2$
+         createTemporaryFile = FileUtils.createTemporaryFile("temporaryCRP", "crp"); //$NON-NLS-1$ //$NON-NLS-2$
          ZLibCompressionHelper.decompress(new File(importFilePath), new File(createTemporaryFile));
 
-         fileContent = FilesUtils.readFileContentString(createTemporaryFile);
+         fileContent = FileUtils.readFileContentString(createTemporaryFile);
          return isFileHeaderValid(fileContent) ? createTemporaryFile : null;
       }
 

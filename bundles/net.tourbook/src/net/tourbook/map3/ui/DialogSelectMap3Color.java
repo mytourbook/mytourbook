@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import net.tourbook.Images;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
@@ -93,20 +94,6 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
  * Map3 tour track layer properties dialog.
  */
 public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3ColorUpdater {
-
-// SET_FORMATTING_OFF
-
-   private static final String GRAPH_LABEL_ALTITUDE                                             = net.tourbook.common.Messages.Graph_Label_Altitude;
-   private static final String GRAPH_LABEL_GRADIENT                                             = net.tourbook.common.Messages.Graph_Label_Gradient;
-   private static final String GRAPH_LABEL_HEARTBEAT                                            = net.tourbook.common.Messages.Graph_Label_Heartbeat;
-   private static final String GRAPH_LABEL_HR_ZONE                                              = net.tourbook.common.Messages.Graph_Label_HrZone;
-   private static final String GRAPH_LABEL_PACE                                                 = net.tourbook.common.Messages.Graph_Label_Pace;
-   private static final String GRAPH_LABEL_SPEED                                                = net.tourbook.common.Messages.Graph_Label_Speed;
-   private static final String SLIDEOUT_MAP_TRACK_COLORS_LABEL_TITLE                            = net.tourbook.common.Messages.Slideout_Map_TrackColors_Label_Title;
-   private static final String SLIDEOUT_MAP_TRACK_COLORS_LABEL_VISIBLE_COLOR_PROFILES_TOOLTIP   = net.tourbook.common.Messages.Slideout_Map_TrackColors_Label_VisibleColorProfiles_Tooltip;
-   private static final String SLIDEOUT_MAP_TRACK_COLORS_LABEL_VISIBLE_COLOR_PROFILES           = net.tourbook.common.Messages.Slideout_Map_TrackColors_Label_VisibleColorProfiles;
-
-// SET_FORMATTING_ON
 
    private static final int COLUMN_WITH_ABSOLUTE_RELATIVE = 4;
    private static final int COLUMN_WITH_COLOR_IMAGE       = 15;
@@ -370,7 +357,7 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
           * Label: Title
           */
          final Label title = new Label(parent, SWT.LEAD);
-         title.setText(NLS.bind(SLIDEOUT_MAP_TRACK_COLORS_LABEL_TITLE, getSlideoutTitle()));
+         title.setText(NLS.bind(OtherMessages.SLIDEOUT_MAP_TRACK_COLORS_LABEL_TITLE, getSlideoutTitle()));
          MTFont.setBannerFont(title);
          GridDataFactory.fillDefaults()
                .grab(true, false)
@@ -508,8 +495,8 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
 
                // label
                final Label label = new Label(containerOptions, SWT.NONE);
-               label.setText(SLIDEOUT_MAP_TRACK_COLORS_LABEL_VISIBLE_COLOR_PROFILES);
-               label.setToolTipText(SLIDEOUT_MAP_TRACK_COLORS_LABEL_VISIBLE_COLOR_PROFILES_TOOLTIP);
+               label.setText(OtherMessages.SLIDEOUT_MAP_TRACK_COLORS_LABEL_VISIBLE_COLOR_PROFILES);
+               label.setToolTipText(OtherMessages.SLIDEOUT_MAP_TRACK_COLORS_LABEL_VISIBLE_COLOR_PROFILES_TOOLTIP);
 
                // spinner
                _spinnerNumVisibleProfiles = new Spinner(containerOptions, SWT.BORDER);
@@ -800,22 +787,22 @@ public class DialogSelectMap3Color extends AnimatedToolTipShell implements IMap3
       switch (_graphId) {
 
       case Altitude:
-         return GRAPH_LABEL_ALTITUDE;
+         return OtherMessages.GRAPH_LABEL_ALTITUDE;
 
       case Gradient:
-         return GRAPH_LABEL_GRADIENT;
+         return OtherMessages.GRAPH_LABEL_GRADIENT;
 
       case HrZone:
-         return GRAPH_LABEL_HR_ZONE;
+         return OtherMessages.GRAPH_LABEL_HR_ZONE;
 
       case Pace:
-         return GRAPH_LABEL_PACE;
+         return OtherMessages.GRAPH_LABEL_PACE;
 
       case Pulse:
-         return GRAPH_LABEL_HEARTBEAT;
+         return OtherMessages.GRAPH_LABEL_HEARTBEAT;
 
       case Speed:
-         return GRAPH_LABEL_SPEED;
+         return OtherMessages.GRAPH_LABEL_SPEED;
 
       default:
          break;

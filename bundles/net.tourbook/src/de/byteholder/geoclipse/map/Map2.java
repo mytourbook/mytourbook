@@ -77,6 +77,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.tourbook.Images;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.DPITools;
 import net.tourbook.common.UI;
@@ -155,11 +156,6 @@ import org.eclipse.swt.widgets.Event;
 
 public class Map2 extends Canvas {
 
-   private static final String          TOUR_TOOLTIP_LABEL_DISTANCE                    = net.tourbook.ui.Messages.Tour_Tooltip_Label_Distance;
-   private static final String          TOUR_TOOLTIP_LABEL_ELEVATION_UP                = net.tourbook.ui.Messages.Tour_Tooltip_Label_AltitudeUp;
-   private static final String          TOUR_TOOLTIP_LABEL_MOVING_TIME                 = net.tourbook.ui.Messages.Tour_Tooltip_Label_MovingTime;
-   private static final String          TOUR_TOOLTIP_LABEL_RECORDED_TIME               = net.tourbook.ui.Messages.Tour_Tooltip_Label_RecordedTime;
-
    private static final char            NL                                             = UI.NEW_LINE;
 
    private static final IDialogSettings _geoFilterState                                = TourGeoFilter_Manager.getState();
@@ -183,12 +179,12 @@ public class Map2 extends Canvas {
    public static final int              EXPANDED_HOVER_SIZE                            = 20;
    public static final int              EXPANDED_HOVER_SIZE2                           = EXPANDED_HOVER_SIZE / 2;
 
-   private static final String          DIRECTION_E                                    = "E";                                                     //$NON-NLS-1$
-   private static final String          DIRECTION_N                                    = "N";                                                     //$NON-NLS-1$
+   private static final String          DIRECTION_E                                    = "E";                             //$NON-NLS-1$
+   private static final String          DIRECTION_N                                    = "N";                             //$NON-NLS-1$
 
    private static final int             TEXT_MARGIN                                    = 6;
 
-   private static final String          GEO_GRID_ACTION_UPDATE_GEO_LOCATION_ZOOM_LEVEL = "\uE003";                                                //$NON-NLS-1$
+   private static final String          GEO_GRID_ACTION_UPDATE_GEO_LOCATION_ZOOM_LEVEL = "\uE003";                        //$NON-NLS-1$
 
    /*
     * Wikipedia data
@@ -4593,20 +4589,20 @@ public class Map2 extends Canvas {
        * Tour values
        */
       final String text_TourMovingTime = String.format(Messages.Map2_TourTooltip_Time,
-            TOUR_TOOLTIP_LABEL_MOVING_TIME,
+            OtherMessages.TOUR_TOOLTIP_LABEL_MOVING_TIME,
             FormatManager.formatMovingTime(movingTime));
 
       final String text_TourRecordedTime = String.format(Messages.Map2_TourTooltip_Time,
-            TOUR_TOOLTIP_LABEL_RECORDED_TIME,
+            OtherMessages.TOUR_TOOLTIP_LABEL_RECORDED_TIME,
             FormatManager.formatMovingTime(recordedTime));
 
       final String text_TourDistance = String.format(Messages.Map2_TourTooltip_Distance,
-            TOUR_TOOLTIP_LABEL_DISTANCE,
+            OtherMessages.TOUR_TOOLTIP_LABEL_DISTANCE,
             FormatManager.formatDistance(distance / 1000.0),
             UI.UNIT_LABEL_DISTANCE);
 
       final String text_ElevationUp = String.format(Messages.Map2_TourTooltip_Elevation,
-            TOUR_TOOLTIP_LABEL_ELEVATION_UP,
+            OtherMessages.TOUR_TOOLTIP_LABEL_ELEVATION_UP,
             FormatManager.formatElevation(elevationUp),
             UI.UNIT_LABEL_ELEVATION);
 

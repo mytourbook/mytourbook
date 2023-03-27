@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Import NMEA files
 Bundle-SymbolicName: net.tourbook.device.nmea;singleton:=true
-Bundle-Version: 23.3.1.qualifier
+Bundle-Version: 23.3.2.qualifier
 Bundle-Activator: net.tourbook.device.nmea.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
@@ -10,7 +10,8 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Bundle-Vendor: MyTourbook
-Import-Package: net.tourbook.common.util,
+Import-Package: com.skedgo.converter,
+ net.tourbook.common.util,
  net.tourbook.data,
  net.tourbook.device,
  net.tourbook.importdata

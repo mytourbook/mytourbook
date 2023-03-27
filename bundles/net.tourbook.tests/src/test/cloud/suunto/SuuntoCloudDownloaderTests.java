@@ -202,7 +202,7 @@ public class SuuntoCloudDownloaderTests {
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
             downloadedFilename)));
 
-      net.tourbook.common.util.FilesUtils.deleteIfExists(Paths.get(downloadedFilename));
+      net.tourbook.common.util.FileUtils.deleteIfExists(Paths.get(downloadedFilename));
    }
 
    @Test

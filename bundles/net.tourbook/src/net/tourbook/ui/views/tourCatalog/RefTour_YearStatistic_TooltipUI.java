@@ -1,5 +1,5 @@
 /******************************************************  *************************
- * Copyright (C) 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.ui.views.tourCatalog;
 
+import net.tourbook.OtherMessages;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
@@ -40,10 +41,8 @@ import org.eclipse.swt.widgets.ToolBar;
 
 public class RefTour_YearStatistic_TooltipUI {
 
-   private static final String APP_ACTION_CLOSE_TOOLTIP = net.tourbook.common.Messages.App_Action_Close_Tooltip;
-
-   private static final int    VERTICAL_LINE_SPACE      = 8;
-   private static final int    SHELL_MARGIN             = 5;
+   private static final int VERTICAL_LINE_SPACE = 8;
+   private static final int SHELL_MARGIN        = 5;
 
    /*
     * Tooltip context
@@ -83,7 +82,7 @@ public class RefTour_YearStatistic_TooltipUI {
 
          super(null, Action.AS_PUSH_BUTTON);
 
-         setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
+         setToolTipText(OtherMessages.APP_ACTION_CLOSE_TOOLTIP);
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 

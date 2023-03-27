@@ -48,6 +48,7 @@ import java.util.stream.Collectors;
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -222,11 +223,7 @@ import org.eclipse.ui.progress.UIJob;
  */
 public class TourDataEditorView extends ViewPart implements ISaveablePart, ISaveAndRestorePart, ITourProvider2 {
 
-   public static final String  ID                         = "net.tourbook.views.TourDataEditorView";                //$NON-NLS-1$
-   //
-   private static final String GRAPH_LABEL_HEARTBEAT_UNIT = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-   private static final String VALUE_UNIT_K_CALORIES      = net.tourbook.ui.Messages.Value_Unit_KCalories;
-   //
+   public static final String            ID                                               = "net.tourbook.views.TourDataEditorView";    //$NON-NLS-1$
    //
    private static final char             NL                                               = UI.NEW_LINE;
    //
@@ -262,6 +259,8 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    static final boolean                  STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT            = false;
    static final String                   STATE_IS_DELETE_KEEP_TIME                        = "STATE_IS_DELETE_KEEP_TIME";                //$NON-NLS-1$
    static final boolean                  STATE_IS_DELETE_KEEP_TIME_DEFAULT                = false;
+   static final String                   STATE_IS_ELEVATION_FROM_DEVICE                   = "STATE_IS_ELEVATION_FROM_DEVICE";           //$NON-NLS-1$
+   static final boolean                  STATE_IS_ELEVATION_FROM_DEVICE_DEFAULT           = true;
    static final String                   STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN             = "STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN";     //$NON-NLS-1$
    static final boolean                  STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT     = true;
    static final String                   STATE_LAT_LON_DIGITS                             = "STATE_LAT_LON_DIGITS";                     //$NON-NLS-1$
@@ -2045,19 +2044,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
 
                MessageDialog.openWarning(activeShell,
 
-                     "Experimental Feature",
+                     "Experimental Feature", //$NON-NLS-1$
 
                      UI.EMPTY_STRING
 
-                           + "Duplicating a tour is a new experimental feature in MyTourbook 23.3" + NL
+                           + "Duplicating a tour is a new experimental feature in MyTourbook 23.3" + NL //$NON-NLS-1$
                            + NL
-                           + "Use this feature with care, mainly the duplicated tours, as it is not yet fully tested." + NL
+                           + "Use this feature with care, mainly the duplicated tours, as it is not yet fully tested." + NL //$NON-NLS-1$
                            + NL
-                           + "One issue could be that when a duplicated tour is selected then it's data are not displayed "
-                           + "because the original tour was selected before. "
-                           + "This issue happened in the flat \"Tour Book\" view and is fixed. " + NL
+                           + "One issue could be that when a duplicated tour is selected then it's data are not displayed " //$NON-NLS-1$
+                           + "because the original tour was selected before. " //$NON-NLS-1$
+                           + "This issue happened in the flat \"Tour Book\" view and is fixed. " + NL //$NON-NLS-1$
                            + NL
-                           + "There are so many possibilities in MyTourbook that not all of them are tested now."
+                           + "There are so many possibilities in MyTourbook that not all of them are tested now." //$NON-NLS-1$
 
                );
             });
@@ -4027,7 +4026,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _spinPerson_Calories.addSelectionListener(_selectionListener);
 
             // label: kcal
-            _tk.createLabel(container, VALUE_UNIT_K_CALORIES);
+            _tk.createLabel(container, OtherMessages.VALUE_UNIT_K_CALORIES);
          }
 
          {
@@ -4054,7 +4053,7 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             _spinPerson_RestPulse.addSelectionListener(_selectionListener);
 
             // label: bpm
-            _tk.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
+            _tk.createLabel(container, OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
          }
          {
             /*
@@ -5030,12 +5029,12 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          if (keyEvent.keyCode == SWT.DEL) {
 
             final boolean isKeepDistance = Util.getStateBoolean(_state,
-                  TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE,
-                  TourDataEditorView.STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT);
+                  STATE_IS_DELETE_KEEP_DISTANCE,
+                  STATE_IS_DELETE_KEEP_DISTANCE_DEFAULT);
 
             final boolean isKeepTime = Util.getStateBoolean(_state,
-                  TourDataEditorView.STATE_IS_DELETE_KEEP_TIME,
-                  TourDataEditorView.STATE_IS_DELETE_KEEP_TIME_DEFAULT);
+                  STATE_IS_DELETE_KEEP_TIME,
+                  STATE_IS_DELETE_KEEP_TIME_DEFAULT);
 
             final boolean isRemoveDistance = isKeepDistance == false;
             final boolean isRemoveTime = isKeepTime == false;
@@ -8324,7 +8323,10 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
             null,
             NLS.bind(Messages.tour_editor_dlg_save_tour_message, TourManager.getTourDateFull(_tourData)),
             MessageDialog.QUESTION,
-            new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL, IDialogConstants.CANCEL_LABEL },
+            new String[] {
+                  Messages.Tour_Editor_Button_SaveTour,
+                  Messages.Tour_Editor_Button_DiscardModifications,
+                  IDialogConstants.CANCEL_LABEL },
             0)
                   .open();
 
@@ -8358,15 +8360,19 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
    private boolean saveTourIntoDB() {
 
       final boolean isRecomputeElevation = Util.getStateBoolean(_state,
-            TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,
-            TourDataEditorView.STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT);
+            STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN,
+            STATE_IS_RECOMPUTE_ELEVATION_UP_DOWN_DEFAULT);
+
+      final boolean isElevationFromDevice = Util.getStateBoolean(_state,
+            STATE_IS_ELEVATION_FROM_DEVICE,
+            STATE_IS_ELEVATION_FROM_DEVICE_DEFAULT);
 
       _isSavingInProgress = true;
       {
          updateModel_FromUI();
 
          if (isRecomputeElevation) {
-            _tourData.computeAltitudeUpDown();
+            _tourData.computeAltitudeUpDown(isElevationFromDevice);
          }
 
          _tourData.computeTourMovingTime();

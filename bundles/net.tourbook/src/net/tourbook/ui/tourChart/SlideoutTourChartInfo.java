@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.ui.tourChart;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.action.ActionOpenPrefDialog;
@@ -52,10 +53,7 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTourChartInfo extends ToolbarSlideout implements IColorSelectorListener, IActionResetToDefault {
 
-   private static final String     APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP  = net.tourbook.common.Messages.App_Theme_BackgroundColor_Dark_Tooltip;
-   private static final String     APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP = net.tourbook.common.Messages.App_Theme_BackgroundColor_Light_Tooltip;
-
-   private final IPreferenceStore  _prefStore                               = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore  _prefStore = TourbookPlugin.getPrefStore();
 
    private IPropertyChangeListener _defaultChangePropertyListener;
    private SelectionListener       _defaultSelectionListener;
@@ -243,13 +241,13 @@ public class SlideoutTourChartInfo extends ToolbarSlideout implements IColorSele
             {
                // light color
                _colorSegmentAlternateColor_Light = new ColorSelectorExtended(colorContainer);
-               _colorSegmentAlternateColor_Light.getButton().setToolTipText(APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP);
+               _colorSegmentAlternateColor_Light.getButton().setToolTipText(OtherMessages.APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP);
                _colorSegmentAlternateColor_Light.addListener(_defaultChangePropertyListener);
                _colorSegmentAlternateColor_Light.addOpenListener(this);
 
                // dark color
                _colorSegmentAlternateColor_Dark = new ColorSelectorExtended(colorContainer);
-               _colorSegmentAlternateColor_Dark.getButton().setToolTipText(APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP);
+               _colorSegmentAlternateColor_Dark.getButton().setToolTipText(OtherMessages.APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP);
                _colorSegmentAlternateColor_Dark.addListener(_defaultChangePropertyListener);
                _colorSegmentAlternateColor_Dark.addOpenListener(this);
             }

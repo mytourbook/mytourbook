@@ -317,15 +317,6 @@ public class TourTag implements Cloneable, Comparable<Object>, Serializable {
       this.name = tagName;
    }
 
-   public void setupDeepClone(final TourData tourDataFromClone) {
-
-      _createId = _createCounter.incrementAndGet();
-
-      tagId = TourDatabase.ENTITY_IS_NOT_SAVED;
-
-      tourData.add(tourDataFromClone);
-   }
-
    /**
     * This method is called in the "Tour Data" view !!!
     */

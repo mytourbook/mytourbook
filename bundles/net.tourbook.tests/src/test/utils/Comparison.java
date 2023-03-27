@@ -26,7 +26,7 @@ import java.io.Writer;
 import java.util.List;
 import java.util.Map;
 
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.data.TourData;
 
 import org.skyscreamer.jsonassert.ArrayValueMatcher;
@@ -57,7 +57,6 @@ public class Comparison {
             new CustomComparator(
                   JSONCompareMode.STRICT,
                   new Customization("tourMarkers[*].altitude", (o1, o2) -> true), //$NON-NLS-1$
-                  new Customization("tourMarkers[*].deviceLapTime", (o1, o2) -> true), //$NON-NLS-1$
                   new Customization("tourMarkers[*].distance20", (o1, o2) -> true), //$NON-NLS-1$
                   new Customization("tourMarkers[*].serieIndex", (o1, o2) -> true), //$NON-NLS-1$
                   new Customization("tourMarkers[*].time", (o1, o2) -> true), //$NON-NLS-1$
@@ -67,13 +66,7 @@ public class Comparison {
             JSONCompareMode.STRICT,
             new Customization("tourMarkers", tourMarkersValueMatcher), //$NON-NLS-1$
             new Customization("tourType.createId", (o1, o2) -> true), //$NON-NLS-1$
-            new Customization("tourId", (o1, o2) -> true), //$NON-NLS-1$
-
-            // We ignore the below fields because the values could be different
-            // depending on the machine's timezone that execute the unit tests
-            new Customization("startHour", (o1, o2) -> true), //$NON-NLS-1$
-            new Customization("tourEndTime", (o1, o2) -> true), //$NON-NLS-1$
-            new Customization("tourStartTime", (o1, o2) -> true)); //$NON-NLS-1$
+            new Customization("tourId", (o1, o2) -> true)); //$NON-NLS-1$
 
       final String controlDocument = readFileContent(controlFileName + JSON);
 
@@ -123,7 +116,7 @@ public class Comparison {
 
       final String controlDocumentFilePath = utils.FilesUtils.getAbsoluteFilePath(controlDocumentFileName);
 
-      return FilesUtils.readFileContentString(controlDocumentFilePath);
+      return FileUtils.readFileContentString(controlDocumentFilePath);
    }
 
    public static TourData retrieveImportedTour(final Map<Long, TourData> newlyImportedTours) {

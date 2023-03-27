@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -256,13 +256,14 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
    private Button               _chkIC_ImportFiles;
    private Button               _chkIC_TurnOffWatching;
    //
-   private Button               _chkIL_ReplaceFirstTimeSliceElevation;
    private Button               _chkIL_AdjustTemperature;
+   private Button               _chkIL_ReplaceElevationFromSRTM;
+   private Button               _chkIL_ReplaceFirstTimeSliceElevation;
    private Button               _chkIL_RetrieveWeatherData;
    private Button               _chkIL_SaveTour;
-   private Button               _chkIL_ShowInDashboard;
    private Button               _chkIL_SetLastMarker;
    private Button               _chkIL_SetTourType;
+   private Button               _chkIL_ShowInDashboard;
    //
    private Button               _chkOptions_ShowTile_CloudApps;
    private Button               _chkOptions_ShowTile_Files;
@@ -1532,9 +1533,8 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
       /*
        * Create tree
        */
-      final Table table = new Table(
-            parent, //
-            SWT.H_SCROLL //
+      final Table table = new Table(parent,
+            SWT.H_SCROLL
                   | SWT.V_SCROLL
                   | SWT.BORDER
                   | SWT.FULL_SELECTION);
@@ -1802,6 +1802,7 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          createUI_580_IL_LastMarker(group);
          createUI_590_IL_AdjustTemperature(group);
          createUI_591_IL_AdjustElevation(group);
+         createUI_592_IL_SetElevationFromSRTM(group);
          createUI_595_IL_RetrieveWeatherData(group);
          createUI_599_IL_Save(group);
       }
@@ -2357,6 +2358,20 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
             .span(2, 1)
             .indent(0, 5)
             .applyTo(_chkIL_ReplaceFirstTimeSliceElevation);
+   }
+
+   private void createUI_592_IL_SetElevationFromSRTM(final Composite parent) {
+
+      /*
+       * Checkbox: Set elevation up/down values from SRTM data
+       */
+      _chkIL_ReplaceElevationFromSRTM = new Button(parent, SWT.CHECK);
+      _chkIL_ReplaceElevationFromSRTM.setText(Messages.Dialog_ImportConfig_Checkbox_ReplaceElevationFromSRTM);
+      _chkIL_ReplaceElevationFromSRTM.addSelectionListener(_ilSelectionListener);
+      GridDataFactory.fillDefaults()
+            .span(2, 1)
+            .indent(0, 5)
+            .applyTo(_chkIL_ReplaceElevationFromSRTM);
    }
 
    private void createUI_595_IL_RetrieveWeatherData(final Composite parent) {
@@ -3915,22 +3930,27 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          return;
       }
 
+// SET_FORMATTING_OFF
+
       // update model which is displayed in the IL viewer
-      _selectedIL.name = _txtIL_ConfigName.getText();
-      _selectedIL.description = _txtIL_ConfigDescription.getText();
+      _selectedIL.name                                = _txtIL_ConfigName.getText();
+      _selectedIL.description                         = _txtIL_ConfigDescription.getText();
 
-      _selectedIL.isSetLastMarker = _chkIL_SetLastMarker.getSelection();
-      _selectedIL.lastMarkerDistance = getSelectedLastMarkerDistance();
+      _selectedIL.isSetLastMarker                     = _chkIL_SetLastMarker.getSelection();
+      _selectedIL.lastMarkerDistance                  = getSelectedLastMarkerDistance();
 
-      _selectedIL.isAdjustTemperature = _chkIL_AdjustTemperature.getSelection();
-      _selectedIL.temperatureAdjustmentDuration = _spinnerIL_TemperatureAdjustmentDuration.getSelection();
-      _selectedIL.tourAvgTemperature = UI.convertTemperatureToMetric(_spinnerIL_AvgTemperature.getSelection());
+      _selectedIL.isAdjustTemperature                 = _chkIL_AdjustTemperature.getSelection();
+      _selectedIL.temperatureAdjustmentDuration       = _spinnerIL_TemperatureAdjustmentDuration.getSelection();
+      _selectedIL.tourAvgTemperature                  = UI.convertTemperatureToMetric(_spinnerIL_AvgTemperature.getSelection());
 
-      _selectedIL.isReplaceFirstTimeSliceElevation = _chkIL_ReplaceFirstTimeSliceElevation.getSelection();
-      _selectedIL.isRetrieveWeatherData = _chkIL_RetrieveWeatherData.getSelection();
-      _selectedIL.isSaveTour = _chkIL_SaveTour.getSelection();
-      _selectedIL.isSetTourType = _chkIL_SetTourType.getSelection();
-      _selectedIL.isShowInDashboard = _chkIL_ShowInDashboard.getSelection();
+      _selectedIL.isReplaceFirstTimeSliceElevation    = _chkIL_ReplaceFirstTimeSliceElevation.getSelection();
+      _selectedIL.isRetrieveWeatherData               = _chkIL_RetrieveWeatherData.getSelection();
+      _selectedIL.isSaveTour                          = _chkIL_SaveTour.getSelection();
+      _selectedIL.isReplaceElevationFromSRTM          = _chkIL_ReplaceElevationFromSRTM.getSelection();
+      _selectedIL.isSetTourType                       = _chkIL_SetTourType.getSelection();
+      _selectedIL.isShowInDashboard                   = _chkIL_ShowInDashboard.getSelection();
+
+// SET_FORMATTING_ON
 
       // update UI
       _ilViewer.update(_selectedIL, null);
@@ -4425,17 +4445,21 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          return;
       }
 
-      _selectedIC.name = _txtIC_ConfigName.getText();
+// SET_FORMATTING_OFF
 
-      _selectedIC.isCreateBackup = _chkIC_CreateBackup.getSelection();
-      _selectedIC.isDeleteDeviceFiles = _chkIC_DeleteDeviceFiles.getSelection();
-      _selectedIC.isTurnOffWatching = _chkIC_TurnOffWatching.getSelection();
+      _selectedIC.name                 = _txtIC_ConfigName.getText();
 
-      _selectedIC.setBackupFolder(_comboIC_BackupFolder.getText());
-      _selectedIC.setDeviceType(_comboIC_DeviceType.getSelectionIndex());
-      _selectedIC.setDeviceFolder(_comboIC_DeviceFolder.getText());
+      _selectedIC.isCreateBackup       = _chkIC_CreateBackup.getSelection();
+      _selectedIC.isDeleteDeviceFiles  = _chkIC_DeleteDeviceFiles.getSelection();
+      _selectedIC.isTurnOffWatching    = _chkIC_TurnOffWatching.getSelection();
 
-      _selectedIC.fileGlobPattern = _txtIC_DeviceFiles.getText();
+      _selectedIC.setBackupFolder(     _comboIC_BackupFolder.getText());
+      _selectedIC.setDeviceType(       _comboIC_DeviceType.getSelectionIndex());
+      _selectedIC.setDeviceFolder(     _comboIC_DeviceFolder.getText());
+
+      _selectedIC.fileGlobPattern      = _txtIC_DeviceFiles.getText();
+
+// SET_FORMATTING_ON
    }
 
    /**
@@ -4447,20 +4471,24 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
          return;
       }
 
-      _selectedIL.name = _txtIL_ConfigName.getText();
-      _selectedIL.description = _txtIL_ConfigDescription.getText();
-      _selectedIL.isSaveTour = _chkIL_SaveTour.getSelection();
-      _selectedIL.isShowInDashboard = _chkIL_ShowInDashboard.getSelection();
+// SET_FORMATTING_OFF
+
+      _selectedIL.name                 = _txtIL_ConfigName.getText();
+      _selectedIL.description          = _txtIL_ConfigDescription.getText();
+      _selectedIL.isSaveTour           = _chkIL_SaveTour.getSelection();
+      _selectedIL.isShowInDashboard    = _chkIL_ShowInDashboard.getSelection();
 
       // last marker
-      _selectedIL.isSetLastMarker = _chkIL_SetLastMarker.getSelection();
-      _selectedIL.lastMarkerDistance = getSelectedLastMarkerDistance();
-      _selectedIL.lastMarkerText = _txtIL_LastMarker.getText();
+      _selectedIL.isSetLastMarker      = _chkIL_SetLastMarker.getSelection();
+      _selectedIL.lastMarkerDistance   = getSelectedLastMarkerDistance();
+      _selectedIL.lastMarkerText       = _txtIL_LastMarker.getText();
 
       // tour type
       final Enum<TourTypeConfig> selectedTourTypeConfig = getSelectedTourTypeConfig();
-      _selectedIL.tourTypeConfig = selectedTourTypeConfig;
-      _selectedIL.isSetTourType = _chkIL_SetTourType.getSelection();
+      _selectedIL.tourTypeConfig       = selectedTourTypeConfig;
+      _selectedIL.isSetTourType        = _chkIL_SetTourType.getSelection();
+
+// SET_FORMATTING_ON
 
       /*
        * Set tour type data
@@ -4650,6 +4678,9 @@ public class DialogEasyImportConfig extends TitleAreaDialog implements IActionRe
 
          // adjust elevation
          _chkIL_ReplaceFirstTimeSliceElevation.setSelection(_selectedIL.isReplaceFirstTimeSliceElevation);
+
+         // set elevation from SRTM data
+         _chkIL_ReplaceElevationFromSRTM.setSelection(_selectedIL.isReplaceElevationFromSRTM);
 
          final Enum<TourTypeConfig> tourTypeConfig = _selectedIL.tourTypeConfig;
          final boolean isSetTourType = tourTypeConfig != null && _selectedIL.isSetTourType;

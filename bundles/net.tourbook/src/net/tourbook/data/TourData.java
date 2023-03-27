@@ -51,7 +51,6 @@ import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -99,6 +98,7 @@ import net.tourbook.srtm.GeoLon;
 import net.tourbook.srtm.NumberForm;
 import net.tourbook.tour.BreakTimeResult;
 import net.tourbook.tour.BreakTimeTool;
+import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoManager;
@@ -129,7 +129,7 @@ import org.hibernate.annotations.Cascade;
 
 public class TourData implements Comparable<Object>, IXmlSerializable, Serializable {
 
-   private static final long             serialVersionUID                  = 1L;
+   private static final long serialVersionUID = 1L;
 
    private static final char             NL                                = UI.NEW_LINE;
    private static final String           INTERVAL_SUMMARY_UNIT             = " ∑  ";                                  //$NON-NLS-1$
@@ -678,6 +678,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private float                 power_TrainingStressScore;
    @JsonProperty
    private float                 power_IntensityFactor;
+
    @JsonProperty
    private int                   power_PedalLeftRightBalance;
    @JsonProperty
@@ -989,14 +990,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * Photos for this tour
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    private Set<TourPhoto>              tourPhotos                          = new HashSet<>();
 
    /**
     * Tour marker
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    @XmlElementWrapper(name = "TourMarkers")
    @XmlElement(name = "TourMarker")
@@ -1006,7 +1007,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * Contains the tour way points
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    @JsonProperty
    private  Set<TourWayPoint>     tourWayPoints                       = new HashSet<>();
@@ -1014,9 +1015,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    /**
     * Reference tours
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private  Set<TourReference>    tourReferences                     = new HashSet<>();
+   private  Set<TourReference>         tourReferences                     = new HashSet<>();
 
    /**
     * Tags
@@ -1029,7 +1030,7 @@ private Set<TourTag>                tourTags                            = new Ha
    /**
     * Sensors
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    private Set<DeviceSensorValue>     deviceSensorValues                  = new HashSet<>();
 
@@ -1218,6 +1219,12 @@ private Set<TourTag>                tourTags                            = new Ha
     */
    @Transient
    private boolean[]             pausedTimeSerie;
+
+   /**
+    * This is a time serie like {@link #timeSerie} but contains only moving times, break times are 0
+    */
+   @Transient
+   private int[]                 movingTimeSerie;
 
    /**
     * Contains the temperature in the metric measurement system.
@@ -2317,6 +2324,7 @@ private Set<TourTag>                tourTags                            = new Ha
 
       breakTimeSerie = null;
       pausedTimeSerie = null;
+      movingTimeSerie = null;
 
       _pulseSerie_Smoothed = null;
       pulseSerie_FromTime = null;
@@ -2773,30 +2781,73 @@ private Set<TourTag>                tourTags                            = new Ha
    }
 
    /**
-    * Computes and sets the altitude up/down values into {@link TourData}
+    * Computes and sets the elevation up/down values from the device into {@link TourData}
     *
-    * @return Returns <code>true</code> when altitude was computed otherwise <code>false</code>
+    * @return Returns <code>true</code> when elevation was computed otherwise <code>false</code>
     */
    public boolean computeAltitudeUpDown() {
 
-      if (altitudeSerie == null) {
+      return computeAltitudeUpDown(true);
+   }
+
+   public ElevationGainLoss computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
+                                                  final float selectedMinAltiDiff) {
+
+      return computeAltitudeUpDown_30_Algorithm_9_08(segmentSerieIndexParameter, selectedMinAltiDiff);
+   }
+
+   /**
+    * Computes and sets the elevation up/down values into {@link TourData}
+    *
+    * @param isElevationFromDevice
+    *           When <code>true</code> then device values are used ohterwise SRTM elevation values
+    * @return Returns <code>true</code> when altitude was computed otherwise <code>false</code>
+    */
+   public boolean computeAltitudeUpDown(final boolean isElevationFromDevice) {
+
+      float[] elevationSerie;
+
+      if (isElevationFromDevice) {
+
+         elevationSerie = altitudeSerie;
+
+      } else {
+
+         // elevation is from SRTM
+
+         elevationSerie = getSRTMSerie(true);
+
+         if (elevationSerie == null) {
+
+            TourLogManager.showLogView();
+
+            TourLogManager.log_INFO(String.format(
+                  Messages.Tour_Data_LogInfo_SRTM_DataAreNotAvailable,
+                  TourManager.getTourDateShort(this)));
+
+            if (altitudeSerie != null && altitudeSerie.length > 0) {
+
+               TourLogManager.subLog_INFO(String.format(
+                     Messages.Tour_Data_LogInfo_SRTM_UsingDeviceElevationValues,
+                     TourManager.getTourDateShort(this)));
+
+               elevationSerie = altitudeSerie;
+            }
+         }
+      }
+
+      if (elevationSerie == null) {
          return false;
       }
 
-      final AltitudeUpDown altiUpDown = computeAltitudeUpDown(0, altitudeSerie.length - 1);
+      final ElevationGainLoss altiUpDown = computeAltitudeUpDown(elevationSerie);
 
       if (altiUpDown != null) {
-         setTourAltUp(altiUpDown.altitudeUp);
-         setTourAltDown(altiUpDown.altitudeDown);
+         setTourAltUp(altiUpDown.elevationGain);
+         setTourAltDown(altiUpDown.elevationLoss);
       }
 
       return altiUpDown != null;
-   }
-
-   public AltitudeUpDown computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
-                                               final float selectedMinAltiDiff) {
-
-      return computeAltitudeUpDown_30_Algorithm_9_08(segmentSerieIndexParameter, selectedMinAltiDiff);
    }
 
    /**
@@ -2805,18 +2856,22 @@ private Set<TourTag>                tourTags                            = new Ha
     * @param elevationSerie
     * @return
     */
-   public AltitudeUpDown computeAltitudeUpDown(final float[] elevationSerie) {
+   public ElevationGainLoss computeAltitudeUpDown(final float[] elevationSerie) {
 
       float prefDPTolerance;
 
       if (_isImportedMTTour) {
+
          // use imported value
          prefDPTolerance = dpTolerance / 10f;
+
       } else {
+
          prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
       }
 
-      AltitudeUpDown altiUpDown;
+      ElevationGainLoss altiUpDown;
+
       if (elevationSerie != null) {
 
          // DP needs distance
@@ -2844,7 +2899,7 @@ private Set<TourTag>                tourTags                            = new Ha
     * @return Returns an <code>AltitudeUpDown</code> when altitude was computed otherwise
     *         <code>null</code>
     */
-   public AltitudeUpDown computeAltitudeUpDown(final int startIndex, final int endIndex) {
+   public ElevationGainLoss computeAltitudeUpDown(final int startIndex, final int endIndex) {
 
       float prefDPTolerance;
 
@@ -2855,7 +2910,7 @@ private Set<TourTag>                tourTags                            = new Ha
          prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
       }
 
-      AltitudeUpDown altiUpDown;
+      ElevationGainLoss altiUpDown;
       if (distanceSerie != null) {
 
          // DP needs distance
@@ -2885,10 +2940,10 @@ private Set<TourTag>                tourTags                            = new Ha
     *           The end of the section for which to compute the elevation gain/loss
     * @return Returns <code>null</code> when altitude up/down cannot be computed
     */
-   private AltitudeUpDown computeAltitudeUpDown_20_Algorithm_DP(final float[] elevationSerie,
-                                                                final float dpTolerance,
-                                                                final int startIndex,
-                                                                final int endIndex) {
+   private ElevationGainLoss computeAltitudeUpDown_20_Algorithm_DP(final float[] elevationSerie,
+                                                                   final float dpTolerance,
+                                                                   final int startIndex,
+                                                                   final int endIndex) {
 
       // check if all necessary data are available
       if (elevationSerie == null
@@ -2938,7 +2993,7 @@ private Set<TourTag>                tourTags                            = new Ha
          prevAltitude = currentAltitude;
       }
 
-      return new AltitudeUpDown(altitudeUpTotal, -altitudeDownTotal);
+      return new ElevationGainLoss(altitudeUpTotal, -altitudeDownTotal);
    }
 
    /**
@@ -2954,8 +3009,8 @@ private Set<TourTag>                tourTags                            = new Ha
     * @param minAltiDiff
     * @return Returns <code>null</code> when altitude up/down cannot be computed
     */
-   private AltitudeUpDown computeAltitudeUpDown_30_Algorithm_9_08(final ArrayList<AltitudeUpDownSegment> segmentSerie,
-                                                                  final float minAltiDiff) {
+   private ElevationGainLoss computeAltitudeUpDown_30_Algorithm_9_08(final ArrayList<AltitudeUpDownSegment> segmentSerie,
+                                                                     final float minAltiDiff) {
 
       // check if all necessary data are available
       if ((altitudeSerie == null) || (timeSerie == null) || (timeSerie.length < 2)) {
@@ -3128,7 +3183,28 @@ private Set<TourTag>                tourTags                            = new Ha
          prevAltitude = altitude;
       }
 
-      return new AltitudeUpDown(altitudeUpTotal, -altitudeDownTotal);
+      return new ElevationGainLoss(altitudeUpTotal, -altitudeDownTotal);
+   }
+
+   /**
+    * @return Returns elevation up/down values from SRTM data or <code>null</code> when not
+    *         available
+    */
+   public ElevationGainLoss computeAltitudeUpDown_FromSRTM() {
+
+      final float[] srtmSerie = getSRTMSerie(true);
+
+      if (srtmSerie == null) {
+
+         return null;
+      }
+
+      final ElevationGainLoss elevationUpDown = computeAltitudeUpDown(srtmSerie);
+
+      setTourAltUp(elevationUpDown.elevationGain);
+      setTourAltDown(elevationUpDown.elevationLoss);
+
+      return elevationUpDown;
    }
 
    public float computeAvg_Altitude(final int valueIndexLeft, final int valueIndexRight) {
@@ -3372,7 +3448,7 @@ private Set<TourTag>                tourTags                            = new Ha
       int nextTime = timeSerie[firstIndex + 1];
 
       /**
-       * a break is set from the previous to the current time slice
+       * A break is set from the previous to the current time slice
        */
       final boolean hasBreakTime = breakTimeSerie != null;
       boolean isPrevBreak = hasBreakTime ? breakTimeSerie[firstIndex] : false;
@@ -5757,6 +5833,8 @@ private Set<TourTag>                tourTags                            = new Ha
 
    /**
     * Create a deep copy of this TourData into a new TourData
+    *
+    * @return Returns a deep copy of this tour
     */
    public TourData createDeepCopy() {
 
@@ -5765,8 +5843,9 @@ private Set<TourTag>                tourTags                            = new Ha
       // set a unique tour ID
       tourData_DeepCopy.tourId = System.nanoTime();
 
-      /*
-       * Setup collections
+      /**
+       * Setup collections except @ManyToMany relations, e.g. TourTags they must not be modified
+       * because they are used in other tours
        */
       for (final TourPhoto tourPhoto : tourData_DeepCopy.tourPhotos) {
          tourPhoto.setupDeepClone(tourData_DeepCopy);
@@ -5778,10 +5857,6 @@ private Set<TourTag>                tourTags                            = new Ha
 
       for (final TourWayPoint tourWayPoint : tourData_DeepCopy.tourWayPoints) {
          tourWayPoint.setupDeepClone(tourData_DeepCopy);
-      }
-
-      for (final TourTag tourTag : tourData_DeepCopy.tourTags) {
-         tourTag.setupDeepClone(tourData_DeepCopy);
       }
 
       for (final DeviceSensorValue sensorValue : tourData_DeepCopy.deviceSensorValues) {
@@ -5815,8 +5890,8 @@ private Set<TourTag>                tourTags                            = new Ha
       deviceSensor_Clone.addAll(tourData_DeepCopy.deviceSensorValues);
       tourData_DeepCopy.deviceSensorValues = deviceSensor_Clone;
 
-      /*
-       * TourReferences are a bit special, they are bound to the original tour and need to be
+      /**
+       * TourReferences are special, they are bound to the original tour and need to be
        * created manually and not cloned
        */
       tourData_DeepCopy.tourReferences = new HashSet<>();
@@ -7413,29 +7488,29 @@ private Set<TourTag>                tourTags                            = new Ha
 
       out.println("Tour distance (m):   " + getTourDistance()); //$NON-NLS-1$
 
-      out.println(
-            "Tour time:      " //$NON-NLS-1$
-                  + (tourDeviceTime_Elapsed / 3600)
-                  + UI.SYMBOL_COLON
-                  + ((tourDeviceTime_Elapsed % 3600) / 60)
-                  + UI.SYMBOL_COLON
-                  + (tourDeviceTime_Elapsed % 3600) % 60);
+      out.println("Tour time:      " //$NON-NLS-1$
 
-      out.println(
-            "Recorded time:      " //$NON-NLS-1$
-                  + (getTourDeviceTime_Recorded() / 3600)
-                  + UI.SYMBOL_COLON
-                  + ((getTourDeviceTime_Recorded() % 3600) / 60)
-                  + UI.SYMBOL_COLON
-                  + (getTourDeviceTime_Recorded() % 3600) % 60);
+            + (tourDeviceTime_Elapsed / 3600)
+            + UI.SYMBOL_COLON
+            + ((tourDeviceTime_Elapsed % 3600) / 60)
+            + UI.SYMBOL_COLON
+            + (tourDeviceTime_Elapsed % 3600) % 60);
 
-      out.println(
-            "Moving time:      " //$NON-NLS-1$
-                  + (getTourComputedTime_Moving() / 3600)
-                  + UI.SYMBOL_COLON
-                  + ((getTourComputedTime_Moving() % 3600) / 60)
-                  + UI.SYMBOL_COLON
-                  + (getTourComputedTime_Moving() % 3600) % 60);
+      out.println("Recorded time:      " //$NON-NLS-1$
+
+            + (getTourDeviceTime_Recorded() / 3600)
+            + UI.SYMBOL_COLON
+            + ((getTourDeviceTime_Recorded() % 3600) / 60)
+            + UI.SYMBOL_COLON
+            + (getTourDeviceTime_Recorded() % 3600) % 60);
+
+      out.println("Moving time:      " //$NON-NLS-1$
+
+            + (getTourComputedTime_Moving() / 3600)
+            + UI.SYMBOL_COLON
+            + ((getTourComputedTime_Moving() % 3600) / 60)
+            + UI.SYMBOL_COLON
+            + (getTourComputedTime_Moving() % 3600) % 60);
 
       out.println("Altitude up (m):   " + getTourAltUp()); //$NON-NLS-1$
       out.println("Altitude down (m):   " + getTourAltDown()); //$NON-NLS-1$
@@ -8539,6 +8614,56 @@ private Set<TourTag>                tourTags                            = new Ha
     */
    public float[] getMetricDistanceSerie() {
       return distanceSerie;
+   }
+
+   public int[] getMovingTimeSerie() {
+
+      if (movingTimeSerie != null) {
+         return movingTimeSerie;
+      }
+
+      // check if data are available
+      if (timeSerie == null || timeSerie.length == 0) {
+         return null;
+      }
+
+      // get break time when not yet set
+      if (breakTimeSerie == null) {
+         getBreakTime();
+      }
+
+      // check again, a break needs a distance serie
+      if (breakTimeSerie == null) {
+         return null;
+      }
+
+      final int numTimeSlices = timeSerie.length;
+
+      movingTimeSerie = new int[numTimeSlices];
+
+      int sumBreakTimes = 0;
+
+      final int[] timeSerie2 = timeSerie;
+      final boolean[] breakTimeSerie2 = breakTimeSerie;
+
+      for (int serieIndex = 1; serieIndex < numTimeSlices; serieIndex++) {
+
+         final int currentTime = timeSerie2[serieIndex];
+
+         final boolean isBreakTime = breakTimeSerie2[serieIndex];
+
+         if (isBreakTime) {
+
+            final int prevTime = timeSerie2[serieIndex - 1];
+            final int timeDiff = currentTime - prevTime;
+
+            sumBreakTimes += timeDiff;
+         }
+
+         movingTimeSerie[serieIndex] = currentTime - sumBreakTimes;
+      }
+
+      return movingTimeSerie;
    }
 
    /**
@@ -11660,6 +11785,7 @@ private Set<TourTag>                tourTags                            = new Ha
    }
 
    public void setTourAltUp(final float tourAltUp) {
+
       this.tourAltUp = (int) (tourAltUp + 0.5);
    }
 

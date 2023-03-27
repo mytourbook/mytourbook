@@ -59,8 +59,6 @@
   "startMonth" : 1,
   "startPulse" : 0,
   "startSecond" : 2,
-  "startWeek" : 3,
-  "startWeekYear" : 2019,
   "startYear" : 2019,
   "swim_LengthType" : [ 1, 1, 1, 1, 1 ],
   "swim_StrokeStyle" : [ 2, 2, 2, 2, -32768 ],

@@ -24,7 +24,7 @@ import java.util.List;
 
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.map2.Messages;
 import net.tourbook.ui.FileCollisionBehavior;
@@ -601,7 +601,7 @@ public class DialogMap2ExportViewImage extends TitleAreaDialog {
 
       String fileName = getExportFileName();
 
-      fileName = FilesUtils.removeExtensions(fileName);
+      fileName = FileUtils.removeExtensions(fileName);
 
       // build file path with extension
       filePath = filePath

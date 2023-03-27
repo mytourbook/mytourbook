@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,6 +18,7 @@ package net.tourbook.ui.views.tourSegmenter;
 import static org.eclipse.swt.events.SelectionListener.widgetSelectedAdapter;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.ColorCache;
 import net.tourbook.common.UI;
@@ -62,13 +63,6 @@ import org.eclipse.swt.widgets.ToolBar;
  */
 public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
       implements IFontDialogListener, IColorSelectorListener, IActionResetToDefault {
-
-// SET_FORMATTING_OFF
-
-   private static final String   APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP   = net.tourbook.common.Messages.App_Theme_BackgroundColor_Dark_Tooltip;
-   private static final String   APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP  = net.tourbook.common.Messages.App_Theme_BackgroundColor_Light_Tooltip;
-
-// SET_FORMATTING_ON
 
    private static final IPreferenceStore _prefStore      = TourbookPlugin.getPrefStore();
    private static final IDialogSettings  _segmenterState = TourSegmenterView.getState();
@@ -477,13 +471,13 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
 
                // Color light
                _colorSegmenterElevationUp_Light = new ColorSelectorExtended(containerLeft);
-               _colorSegmenterElevationUp_Light.getButton().setToolTipText(APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP);
+               _colorSegmenterElevationUp_Light.getButton().setToolTipText(OtherMessages.APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP);
                _colorSegmenterElevationUp_Light.addListener(_segmenterChangePropertyListener);
                _colorSegmenterElevationUp_Light.addOpenListener(this);
 
                // Color dark
                _colorSegmenterElevationUp_Dark = new ColorSelectorExtended(containerLeft);
-               _colorSegmenterElevationUp_Dark.getButton().setToolTipText(APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP);
+               _colorSegmenterElevationUp_Dark.getButton().setToolTipText(OtherMessages.APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP);
                _colorSegmenterElevationUp_Dark.addListener(_segmenterChangePropertyListener);
                _colorSegmenterElevationUp_Dark.addOpenListener(this);
             }
@@ -501,13 +495,13 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
 
                // Color light
                _colorSegmenterElevationDown_Light = new ColorSelectorExtended(containerLeft);
-               _colorSegmenterElevationDown_Light.getButton().setToolTipText(APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP);
+               _colorSegmenterElevationDown_Light.getButton().setToolTipText(OtherMessages.APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP);
                _colorSegmenterElevationDown_Light.addListener(_segmenterChangePropertyListener);
                _colorSegmenterElevationDown_Light.addOpenListener(this);
 
                // Color dark
                _colorSegmenterElevationDown_Dark = new ColorSelectorExtended(containerLeft);
-               _colorSegmenterElevationDown_Dark.getButton().setToolTipText(APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP);
+               _colorSegmenterElevationDown_Dark.getButton().setToolTipText(OtherMessages.APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP);
                _colorSegmenterElevationDown_Dark.addListener(_segmenterChangePropertyListener);
                _colorSegmenterElevationDown_Dark.addOpenListener(this);
             }
@@ -525,13 +519,13 @@ public class SlideoutTourChartSegmenterProperties extends AnimatedToolTipShell
 
                // Color: Segmenter totals light
                _colorSegmenterTotals_Light = new ColorSelectorExtended(containerLeft);
-               _colorSegmenterTotals_Light.getButton().setToolTipText(APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP);
+               _colorSegmenterTotals_Light.getButton().setToolTipText(OtherMessages.APP_THEME_BACKGROUND_COLOR_LIGHT_TOOLTIP);
                _colorSegmenterTotals_Light.addListener(_segmenterChangePropertyListener);
                _colorSegmenterTotals_Light.addOpenListener(this);
 
                // Color: Segmenter totals dark
                _colorSegmenterTotals_Dark = new ColorSelectorExtended(containerLeft);
-               _colorSegmenterTotals_Dark.getButton().setToolTipText(APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP);
+               _colorSegmenterTotals_Dark.getButton().setToolTipText(OtherMessages.APP_THEME_BACKGROUND_COLOR_DARK_TOOLTIP);
                _colorSegmenterTotals_Dark.addListener(_segmenterChangePropertyListener);
                _colorSegmenterTotals_Dark.addOpenListener(this);
             }
