@@ -23,6 +23,10 @@ Changes
 * Tour Editor     
   - Changed wording for the save dialog actions: Save Tour, Discard Modifications, Cancel
 
+* Update Site
+  old: https://mytourbook.sourceforge.io/updates
+  new: https://github.com/mytourbook/mytourbook.github.io
+
 
 Bugfix
 ======
