@@ -181,7 +181,7 @@ Build Product
       - Run "mvn verify -P build-release -X --log-file ../log.txt" - this will log into a file
 
 
-Build Update site
+Build Update Site
 ------------------
 
    !!! BEFORE !!!
@@ -192,15 +192,15 @@ Build Update site
    * WITH NL
    
       Open cmd
-         - Select folder "cd C:\DAT\MT\mytourbook"
-         - Run "mvn verify -P build-update-site"
+         - Select folder      "cd C:\DAT\MT\mytourbook"
+         - Run                "mvn verify -P build-update-site"
 
 
    * WITHOUT NL
 
       Open cmd
-         - Select folder "cd C:\DAT\MT\mytourbook"
-         - Run "mvn verify -P build-update-site-no-nl"
+         - Select folder      "cd C:\DAT\MT\mytourbook"
+         - Run                "mvn verify -P build-update-site-no-nl"
 
 
 
