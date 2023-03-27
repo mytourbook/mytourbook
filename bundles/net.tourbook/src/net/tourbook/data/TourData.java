@@ -634,17 +634,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    //TODO FB
    //https://openweathermap.org/api/air-pollution
-   //add in weather string (Strava, blog view...)
 
    //https://en.wikipedia.org/wiki/Air_quality_index#CAQI
 
-   //add the field as readonly under the temperatures in the tour data editor view (number ? combo ? both ? text as in "Good" "poor"...?
    //add tool tip of quality definitions
-   //add it in the string to strava as "Air Quality: Good"
 
    //add the feature to re-import Weather (description and clouds)
 
-   //OWM: Broken clouds mapping is wrongDo the apping with the icon datapoint instead!
+   //OWM: Broken clouds mapping is wrong
+  //Do the apping with the icon datapoint instead!
 
 //WWO: Patchy light rain mapping wrong (review ALL mappings)Also review mappings for OWM and WeatherApi and if anything is wrong with OWM, then reimport weather from march 6 2022 to today after I fix it in MT ?
 //
