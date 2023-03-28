@@ -641,7 +641,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
    //add the feature to re-import Weather (description and clouds)
 
-   //OWM: Broken clouds mapping is wrong
+   //OWM: Clouds mapping is wrong
   //Do the apping with the icon datapoint instead!
 
 //WWO: Patchy light rain mapping wrong (review ALL mappings)Also review mappings for OWM and WeatherApi and if anything is wrong with OWM, then reimport weather from march 6 2022 to today after I fix it in MT ?

@@ -50,7 +50,7 @@ class TimeMachineResult {
     * @return
     */
    static String convertWeatherTypeToMTWeatherClouds(final String weatherIcon) {
-//todo fb
+
       String weatherType = UI.EMPTY_STRING;
 
       if (StringUtils.isNullOrEmpty(weatherIcon)) {
