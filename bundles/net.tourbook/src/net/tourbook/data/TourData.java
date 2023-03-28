@@ -633,8 +633,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private String                 weather_AirQuality;                                  // db-version 50
 
    //TODO FB
-   //https://openweathermap.org/api/air-pollution
-
    //https://en.wikipedia.org/wiki/Air_quality_index#CAQI
 
    //add tool tip of quality definitions
