@@ -41,8 +41,7 @@ public class WeatherUtils {
     * Returns the fully detailed weather data as a human readable string.
     * Example:
     * 12h ⛅ Partly cloudy 6°C feels like 3°C 12km/h from 84° humidity 97% pressure 1012mbar
-    * precipitation 3mm
-    * snowfall 0mm
+    * precipitation 3mm snowfall 0mm air quality Fair
     *
     * @param temperatureValue
     *           in Celsius
@@ -143,6 +142,7 @@ public class WeatherUtils {
 
             + tourTime + UI.SPACE3
             + cloudsType + UI.SPACE3
+            + weatherDescription + UI.SPACE3
             + temperature + UI.SPACE3
             + feelsLike + UI.SPACE3
             + wind + UI.SPACE3
