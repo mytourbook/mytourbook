@@ -98,7 +98,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                   hourlyDateTime * 1000L,
                   tour.getTimeZoneId());
 
-            final var currentAirPollutionResult = airPollutionResult.getList().stream()
+            final net.tourbook.weather.openweathermap.List currentAirPollutionResult = airPollutionResult.getList().stream()
                   .filter(list -> list.getDt() == hourlyDateTime)
                   .findAny()
                   .orElse(null);
@@ -109,6 +109,8 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
             final boolean isDisplayEmptyValues = !isCompressed;
             String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                   (float) hourly.getTemp(),
+                  WeatherUtils.getWeatherIcon(WeatherUtils.getWeatherIndex(hourly.getWeather().get(0).getDescription())),
+                  hourly.getWeather().get(0).getDescription(),
                   (float) hourly.getFeels_like(),
                   (float) hourly.getWind_speedKmph(),
                   hourly.getWind_deg(),
@@ -139,6 +141,8 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
             final boolean isDisplayEmptyValues = !isCompressed;
             String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                   0,
+                  UI.EMPTY_STRING,
+                  UI.EMPTY_STRING,
                   0,
                   0,
                   0,

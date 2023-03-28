@@ -40,11 +40,14 @@ public class WeatherUtils {
    /**
     * Returns the fully detailed weather data as a human readable string.
     * Example:
-    * 12h 6°C feels like 3°C 12km/h from 84° humidity 97% pressure 1012mbar precipitation 3mm
+    * 12h ⛅ Partly cloudy 6°C feels like 3°C 12km/h from 84° humidity 97% pressure 1012mbar
+    * precipitation 3mm
     * snowfall 0mm
     *
     * @param temperatureValue
     *           in Celsius
+    * @param cloudsType
+    * @param weatherDescription
     * @param windChill
     *           in Celsius
     * @param windSpeed
@@ -65,6 +68,8 @@ public class WeatherUtils {
     * @return
     */
    public static String buildFullWeatherDataString(final float temperatureValue,
+                                                   final String cloudsType,
+                                                   final String weatherDescription,
                                                    final float windChill,
                                                    final float windSpeed,
                                                    final int windDirection,
@@ -137,6 +142,7 @@ public class WeatherUtils {
       final String fullWeatherData = UI.EMPTY_STRING
 
             + tourTime + UI.SPACE3
+            + cloudsType + UI.SPACE3
             + temperature + UI.SPACE3
             + feelsLike + UI.SPACE3
             + wind + UI.SPACE3

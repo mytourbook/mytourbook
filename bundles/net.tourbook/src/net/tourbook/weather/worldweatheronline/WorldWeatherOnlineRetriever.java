@@ -104,6 +104,9 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
          final boolean isDisplayEmptyValues = !isCompressed;
          String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                hourly.getTempC(),
+               //todo fb
+               UI.EMPTY_STRING,
+               UI.EMPTY_STRING,
                hourly.getFeelsLikeC(),
                hourly.getWindspeedKmph(),
                hourly.getWinddirDegree(),

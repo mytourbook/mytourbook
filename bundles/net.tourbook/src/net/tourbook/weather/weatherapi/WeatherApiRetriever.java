@@ -62,6 +62,9 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
          final boolean isDisplayEmptyValues = !isCompressed;
          String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                (float) hour.getTemp_c(),
+               //todo fb
+               UI.EMPTY_STRING,
+               UI.EMPTY_STRING,
                (float) hour.getFeelslike_c(),
                (float) hour.getWind_kph(),
                hour.getWind_degree(),

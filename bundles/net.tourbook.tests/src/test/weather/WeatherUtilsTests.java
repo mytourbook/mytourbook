@@ -51,6 +51,8 @@ public class WeatherUtilsTests {
             ZoneId.of(andorraZoneId));
 
       final String fullWeatherDataString = WeatherUtils.buildFullWeatherDataString(6.09f,
+            "⛅",
+            "Partly cloudy",
             8.52f,
             9.216f,
             156,
@@ -63,7 +65,7 @@ public class WeatherUtilsTests {
             true);
 
       assertEquals(
-            "17h       6°C   feels like     9°C       9km/h from 156°   humidity  68%   pressure 1023.0mbar   precipitation  0.01mm   snowfall  0.02mm   air quality 1", //$NON-NLS-1$
+            "17h       ⛅       Partly cloudy       6°C   feels like     9°C       9km/h from 156°   humidity  68%   pressure 1023.0mbar   precipitation  0.01mm   snowfall  0.02mm   air quality 1", //$NON-NLS-1$
             fullWeatherDataString);
    }
 
@@ -71,6 +73,8 @@ public class WeatherUtilsTests {
    void testBuildFullWeatherDataString_ShouldReturnEmptyString() {
 
       final String fullWeatherDataString = WeatherUtils.buildFullWeatherDataString(6.09f,
+            UI.EMPTY_STRING,
+            UI.EMPTY_STRING,
             8.52f,
             9.216f,
             156,
