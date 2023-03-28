@@ -665,9 +665,8 @@ public class RawDataManager {
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TOUR__WEATHER) {
 
-         //todo fb Messages.
          previousData.add(
-               "Description: " + oldTourData.getWeather() + ". Clouds icon: " + WeatherUtils.getWeatherIcon(oldTourData.getWeatherIndex()) + ". " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+               oldTourData.getWeather() + UI.COMMA_SPACE + WeatherUtils.getWeatherIcon(oldTourData.getWeatherIndex()) + UI.COMMA_SPACE +
                      UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
                      UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Max())) + UI.UNIT_LABEL_TEMPERATURE
@@ -677,7 +676,7 @@ public class RawDataManager {
                      UI.SYMBOL_TILDE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_WindChill()))
                      + UI.UNIT_LABEL_TEMPERATURE);
          newData.add(
-               "Description: " + newTourData.getWeather() + ". Clouds icon: " + WeatherUtils.getWeatherIcon(newTourData.getWeatherIndex()) + ". " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+               newTourData.getWeather() + UI.COMMA_SPACE + WeatherUtils.getWeatherIcon(newTourData.getWeatherIndex()) + UI.COMMA_SPACE +
                      UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
                      UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Max()))
