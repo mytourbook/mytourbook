@@ -227,7 +227,7 @@ public interface IWeather {
          WEATHER_ID_RAIN,
          WEATHER_ID_LIGHTNING,
          WEATHER_ID_SNOW,
-         WEATHER_ID_SEVERE_WEATHER_ALERT
+         WEATHER_ID_SEVERE_WEATHER_ALERT,
 
    };
 
