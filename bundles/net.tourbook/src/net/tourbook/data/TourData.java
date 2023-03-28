@@ -649,6 +649,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 //https://github.com/mytourbook/mytourbook/issues/874
 
 
+   // MT: Print cloud and weather description for the hourly lines
+
+//14h 47°F feels like 41°F 16mph from 10° humidity 29% pressure 1008.0inHg precipitation 0.0inch snowfall 0.0inch
+
    // ############################################# POWER #############################################
 
    /** Unit is Watt */
