@@ -109,7 +109,10 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
             final boolean isDisplayEmptyValues = !isCompressed;
             String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                   (float) hourly.getTemp(),
-                  WeatherUtils.getWeatherIcon(WeatherUtils.getWeatherIndex(hourly.getWeather().get(0).getDescription())),
+                  WeatherUtils.getWeatherIcon(
+                        WeatherUtils.getWeatherIndex(
+                              TimeMachineResult.convertWeatherTypeToMTWeatherClouds(
+                                    hourly.getWeather().get(0).getIcon()))),
                   hourly.getWeather().get(0).getDescription(),
                   (float) hourly.getFeels_like(),
                   (float) hourly.getWind_speedKmph(),
