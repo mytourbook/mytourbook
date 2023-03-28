@@ -29,12 +29,12 @@ public class TimeMachineResultTests {
 
       assertAll(
             () -> assertEquals(IWeather.WEATHER_ID_LIGHTNING,
-                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds("11d")),
+                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds("11d")), //$NON-NLS-1$
             () -> assertEquals(IWeather.WEATHER_ID_SCATTERED_SHOWERS,
-                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds("09d")),
+                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds("09d")), //$NON-NLS-1$
             () -> assertEquals(IWeather.WEATHER_ID_DRIZZLE,
-                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds("50d")),
+                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds("50d")), //$NON-NLS-1$
             () -> assertEquals(IWeather.WEATHER_ID_CLEAR,
-                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds("01d")));
+                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds("01d"))); //$NON-NLS-1$
    }
 }
