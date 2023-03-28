@@ -76,6 +76,7 @@ import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.weather.WeatherUtils;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -664,9 +665,10 @@ public class RawDataManager {
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TOUR__WEATHER) {
 
+         //todo fb Messages.
          previousData.add(
-               "Description: " + oldTourData.getWeather() + ". Clouds icon: " + oldTourData.getWeather_Clouds() + "." +
-               UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average()))
+               "Description: " + oldTourData.getWeather() + ". Clouds icon: " + WeatherUtils.getWeatherIcon(oldTourData.getWeatherIndex()) + ". " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                     UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
                      UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Max())) + UI.UNIT_LABEL_TEMPERATURE
                      + UI.COMMA_SPACE +
@@ -675,8 +677,8 @@ public class RawDataManager {
                      UI.SYMBOL_TILDE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_WindChill()))
                      + UI.UNIT_LABEL_TEMPERATURE);
          newData.add(
-               "Description: " + newTourData.getWeather() + ". Clouds icon: " + newTourData.getWeather_Clouds() + "." +
-               UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average()))
+               "Description: " + newTourData.getWeather() + ". Clouds icon: " + WeatherUtils.getWeatherIcon(newTourData.getWeatherIndex()) + ". " + //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+                     UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
                      UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Max()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
