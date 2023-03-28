@@ -635,10 +635,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    //TODO FB
    //https://en.wikipedia.org/wiki/Air_quality_index#CAQI
 
-   //add tool tip of quality definitions
-
-   //add the feature to re-import Weather (description and clouds)
-
 //WWO: Patchy light rain mapping wrong (review ALL mappings)Also review mappings for OWM and WeatherApi and if anything is wrong with OWM, then reimport weather from march 6 2022 to today after I fix it in MT ?
 //
 //https://github.com/mytourbook/mytourbook/issues/874
