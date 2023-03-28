@@ -65,7 +65,7 @@ public class WeatherUtilsTests {
             true);
 
       assertEquals(
-            "17h       ⛅       Partly cloudy       6°C   feels like     9°C       9km/h from 156°   humidity  68%   pressure 1023.0mbar   precipitation  0.01mm   snowfall  0.02mm   air quality 1", //$NON-NLS-1$
+            "17h   ⛅   Partly cloudy       6°C   feels like     9°C       9km/h from 156°   humidity  68%   pressure 1023.0mbar   precipitation  0.01mm   snowfall  0.02mm   air quality 1", //$NON-NLS-1$
             fullWeatherDataString);
    }
 
