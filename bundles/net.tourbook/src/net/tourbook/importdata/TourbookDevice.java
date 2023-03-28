@@ -251,7 +251,7 @@ public abstract class TourbookDevice implements IRawDataReader {
     */
    protected boolean isValidXMLFile(final String importFilePath, final String deviceTag) {
 
-      return isValidXMLFile(importFilePath, deviceTag, false, true);
+      return isValidXMLFile(importFilePath, deviceTag, false, false);
    }
 
    /**
