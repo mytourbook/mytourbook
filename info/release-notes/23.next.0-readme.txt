@@ -37,6 +37,9 @@ Improvements
 Tour Reimport (Frederic)
   - Added the ability to reimport weather information (clouds and description)
 
+Weather (Frederic)
+  - Adjusted the mapping of vendor's icons to MyTourbook's cloud icons
+
 Changes
 =======
 
