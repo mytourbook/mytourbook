@@ -57,6 +57,42 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       super(tourData);
    }
 
+   /**
+    * Codes : https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
+    *
+    * @param weatherIcon
+    * @return
+    */
+   public static String convertWeatherTypeToMTWeatherClouds(final String weatherIcon) {
+
+      String weatherType = UI.EMPTY_STRING;
+
+      if (StringUtils.isNullOrEmpty(weatherIcon)) {
+         return weatherType;
+      }
+
+      if (weatherIcon.startsWith("01")) { //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_CLEAR;
+      } else if (weatherIcon.startsWith("02") || //$NON-NLS-1$
+            weatherIcon.startsWith("04")) { //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
+      } else if (weatherIcon.startsWith("03")) { //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_OVERCAST;
+      } else if (weatherIcon.startsWith("09")) { //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
+      } else if (weatherIcon.startsWith("10")) { //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_RAIN;
+      } else if (weatherIcon.startsWith("11")) { //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_LIGHTNING;
+      } else if (weatherIcon.startsWith("13")) { //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_SNOW;
+      } else if (weatherIcon.startsWith("50")) { //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_DRIZZLE;
+      }
+
+      return weatherType;
+   }
+
    public static String getBaseTimeMachineApiUrl() {
       return BASE_TIME_MACHINE_API_URL;
    }
@@ -112,7 +148,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                   (float) hourly.getTemp(),
                   WeatherUtils.getWeatherIcon(
                         WeatherUtils.getWeatherIndex(
-                              TimeMachineResult.convertWeatherTypeToMTWeatherClouds(
+                              convertWeatherTypeToMTWeatherClouds(
                                     hourly.getWeather().get(0).getIcon()))),
                   hourly.getWeather().get(0).getDescription(),
                   (float) hourly.getFeels_like(),
@@ -304,7 +340,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
             return false;
          }
 
-         final boolean isTourStartWithinTheCurrentHour = isTourStartTimeCurrent(tourStartTime, tour.getTimeZoneId());
+         final boolean isTourStartWithinTheCurrentHour = isTourStartTimeCurrent(
+               tourStartTime,
+               tour.getTimeZoneId());
 
          // If the tour start time is within the current hour, we use the
          // current weather data instead of the historical one.

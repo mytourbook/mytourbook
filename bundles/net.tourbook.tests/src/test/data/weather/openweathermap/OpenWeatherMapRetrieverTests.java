@@ -43,10 +43,10 @@ import utils.Initializer;
  */
 public class OpenWeatherMapRetrieverTests {
 
-   private static final String OPENWEATHERMAP_BASE_URL              = WeatherUtils.OAUTH_PASSEUR_APP_URL
+   private static final String OPENWEATHERMAP_BASE_URL  = WeatherUtils.OAUTH_PASSEUR_APP_URL
          + "/openweathermap/timemachine?units=metric&lat=40.263996&lon=-105.58854099999999&lang=en&dt="; //$NON-NLS-1$
 
-   private static final String OPENWEATHERMAP_FILE_PATH             =
+   private static final String OPENWEATHERMAP_FILE_PATH =
          FilesUtils.rootPath + "data/weather/openweathermap/files/";                                     //$NON-NLS-1$
 
    static HttpClientMock       httpClientMock;
@@ -61,6 +61,20 @@ public class OpenWeatherMapRetrieverTests {
             .getDeclaredField("httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
       field.set(null, httpClientMock);
+   }
+
+   @Test
+   void openWeatherMap_WeatherTypeMapping_AllValues() {
+
+      assertAll(
+            () -> assertEquals(IWeather.WEATHER_ID_LIGHTNING,
+                  OpenWeatherMapRetriever.convertWeatherTypeToMTWeatherClouds("11d")), //$NON-NLS-1$
+            () -> assertEquals(IWeather.WEATHER_ID_SCATTERED_SHOWERS,
+                  OpenWeatherMapRetriever.convertWeatherTypeToMTWeatherClouds("09d")), //$NON-NLS-1$
+            () -> assertEquals(IWeather.WEATHER_ID_DRIZZLE,
+                  OpenWeatherMapRetriever.convertWeatherTypeToMTWeatherClouds("50d")), //$NON-NLS-1$
+            () -> assertEquals(IWeather.WEATHER_ID_CLEAR,
+                  OpenWeatherMapRetriever.convertWeatherTypeToMTWeatherClouds("01d"))); //$NON-NLS-1$
    }
 
    @Test
