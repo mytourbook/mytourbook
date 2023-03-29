@@ -632,18 +632,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    private String                 weather_AirQuality;                                  // db-version 50
 
-   //TODO FB
-   //https://en.wikipedia.org/wiki/Air_quality_index#CAQI
-
-//WWO: Patchy light rain mapping wrong (review ALL mappings)Also review mappings for OWM and WeatherApi and if anything is wrong with OWM, then reimport weather from march 6 2022 to today after I fix it in MT ?
-//
-//https://github.com/mytourbook/mytourbook/issues/874
-
-
-   // MT: Print cloud and weather description for the hourly lines
-
-//14h 47°F feels like 41°F 16mph from 10° humidity 29% pressure 1008.0inHg precipitation 0.0inch snowfall 0.0inch
-
    // ############################################# POWER #############################################
 
    /** Unit is Watt */
