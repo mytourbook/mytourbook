@@ -62,7 +62,6 @@ public class OpenWeatherMapRetrieverTests {
       field.setAccessible(true);
       field.set(null, httpClientMock);
    }
-   //todo fb check why the values changed and if theyre ok
 
    @Test
    void openWeatherMap_WeatherTypeMapping_AllValues() {
