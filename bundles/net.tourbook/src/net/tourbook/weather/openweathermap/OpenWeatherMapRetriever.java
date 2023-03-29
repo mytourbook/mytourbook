@@ -58,7 +58,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
    }
 
    /**
-    * Codes : https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
+    * Codes : https://openweathermap.org/weather-conditions#Icon-list
     *
     * @param weatherIcon
     * @return
