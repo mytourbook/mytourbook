@@ -88,11 +88,11 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
    public static String convertWeatherCodeToMTWeatherClouds(final String weatherCode) {
 
-      String weatherType = UI.EMPTY_STRING;
+      String weatherType;
 
       // Codes : http://www.worldweatheronline.com/feed/wwoConditionCodes.xml
       //https://www.worldweatheronline.com/weather-api/api/docs/weather-icons.aspx
-      switch (weatherCode) {//) {
+      switch (weatherCode) {
       case "122": //$NON-NLS-1$
       case "119": //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_OVERCAST;
