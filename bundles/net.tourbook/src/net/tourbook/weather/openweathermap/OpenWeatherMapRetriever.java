@@ -74,9 +74,9 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
       if (weatherIcon.startsWith("01")) { //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_CLEAR;
       } else if (weatherIcon.startsWith("02") || //$NON-NLS-1$
-            weatherIcon.startsWith("04")) { //$NON-NLS-1$
+            weatherIcon.startsWith("03")) { //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
-      } else if (weatherIcon.startsWith("03")) { //$NON-NLS-1$
+      } else if (weatherIcon.startsWith("04")) { //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_OVERCAST;
       } else if (weatherIcon.startsWith("09")) { //$NON-NLS-1$
          weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
