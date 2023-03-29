@@ -182,7 +182,6 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
                tour.getTimeZoneId());
 
          final boolean isDisplayEmptyValues = !isCompressed;
-         //todo fb check
          String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                hourly.getTempC(),
                WeatherUtils.getWeatherIcon(
@@ -258,7 +257,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
    // SET_FORMATTING_OFF
 
-      weatherRequestWithParameters.append(      "key"             + "=" + prefStore.getString(ITourbookPreferences.WEATHER_API_KEY)); //$NON-NLS-1$ //$NON-NLS-2$
+      weatherRequestWithParameters.append(      "key"             + "=" + prefStore.getString(ITourbookPreferences.WEATHER_API_KEY).trim()); //$NON-NLS-1$ //$NON-NLS-2$
       weatherRequestWithParameters.append("&" + "q"               + "=" + searchAreaCenter.getLatitude() + "," + searchAreaCenter.getLongitude()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
       weatherRequestWithParameters.append("&" + "date"            + "=" + startDate); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       //tp=1 : Specifies the weather forecast time interval in hours. Here, every 1 hour
