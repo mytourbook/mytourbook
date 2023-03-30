@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -50,7 +50,7 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.graphics.Image;
 
-public class TourBook_ColumnFactory {
+class TourBook_ColumnFactory {
 
    private static final IPreferenceStore _prefStore = TourbookPlugin.getPrefStore();
 
@@ -88,7 +88,7 @@ public class TourBook_ColumnFactory {
 
    private PixelConverter       _pc;
 
-   public TourBook_ColumnFactory(final ColumnManager columnManager_NatTable, final ColumnManager columnManager_Tree, final PixelConverter pc) {
+   TourBook_ColumnFactory(final ColumnManager columnManager_NatTable, final ColumnManager columnManager_Tree, final PixelConverter pc) {
 
       _columnManager_NatTable = columnManager_NatTable;
       _columnManager_Tree = columnManager_Tree;
@@ -235,6 +235,7 @@ public class TourBook_ColumnFactory {
       defineColumn_Data_ImportFileName();
       defineColumn_Data_TimeInterval();
       defineColumn_Data_NumTimeSlices();
+      defineColumn_Data_TourID();
    }
 
    /**
@@ -749,6 +750,48 @@ public class TourBook_ColumnFactory {
                   cell.setText(UI.EMPTY_STRING);
                } else {
                   cell.setText(Long.toString(dbTimeInterval));
+               }
+
+               setCellColor(cell, element);
+            }
+         }
+      });
+   }
+
+   /**
+    * Column: Data - Tour ID
+    */
+
+   private void defineColumn_Data_TourID() {
+
+      final TableColumnDefinition colDef_NatTable = TableColumnFactory.DATA_TOUR_ID.createColumn(_columnManager_NatTable, _pc);
+      colDef_NatTable.setLabelProvider_NatTable(new NatTable_LabelProvider() {
+
+         @Override
+         public String getValueText(final Object element) {
+
+            final long dbValue = ((TVITourBookTour) element).tourId;
+            if (dbValue == 0) {
+               return UI.EMPTY_STRING;
+            } else {
+               return _nf0.format(dbValue);
+            }
+         }
+      });
+
+      final TreeColumnDefinition colDef_Tree = TreeColumnFactory.DATA_TOUR_ID.createColumn(_columnManager_Tree, _pc);
+      colDef_Tree.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final Object element = cell.getElement();
+            if (element instanceof TVITourBookTour) {
+
+               final long dbValue = ((TVITourBookTour) element).tourId;
+               if (dbValue == 0) {
+                  cell.setText(UI.EMPTY_STRING);
+               } else {
+                  cell.setText(_nf0.format(dbValue));
                }
 
                setCellColor(cell, element);
@@ -3619,7 +3662,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Average);
+            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Average);
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -3632,7 +3675,7 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Average);
+            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Average);
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -3686,7 +3729,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Average_Device);
+            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Average_Device);
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -3699,7 +3742,7 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Average_Device);
+            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Average_Device);
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -3719,7 +3762,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Max);
+            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Max);
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -3732,7 +3775,7 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Max);
+            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Max);
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -3786,7 +3829,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Max_Device);
+            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Max_Device);
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -3799,7 +3842,7 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Max_Device);
+            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Max_Device);
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -3819,7 +3862,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Min);
+            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Min);
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -3832,7 +3875,7 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Min);
+            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Min);
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -3886,7 +3929,7 @@ public class TourBook_ColumnFactory {
          @Override
          public String getValueText(final Object element) {
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Min_Device);
+            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Min_Device);
 
             return colDef_NatTable.printDoubleValue(value);
          }
@@ -3899,7 +3942,7 @@ public class TourBook_ColumnFactory {
 
             final Object element = cell.getElement();
 
-            final double value = UI.convertTemperatureFromMetric(((TVITourBookItem) element).colTemperature_Min_Device);
+            final double value = prepareTemperatureValue(((TVITourBookItem) element).colTemperature_Min_Device);
 
             colDef_Tree.printDoubleValue(cell, value, element instanceof TVITourBookTour);
 
@@ -4009,7 +4052,8 @@ public class TourBook_ColumnFactory {
 
          value = tourBookItem.colTemperature_Average;
       }
-      return UI.convertTemperatureFromMetric(value);
+
+      return prepareTemperatureValue(value);
    }
 
    private float getTemperature_Max_Combined(final Object element) {
@@ -4027,7 +4071,7 @@ public class TourBook_ColumnFactory {
 
          value = tourBookItem.colTemperature_Max;
       }
-      return UI.convertTemperatureFromMetric(value);
+      return prepareTemperatureValue(value);
    }
 
    private float getTemperature_Min_Combined(final Object element) {
@@ -4045,10 +4089,24 @@ public class TourBook_ColumnFactory {
 
          value = tourBookItem.colTemperature_Min;
       }
-      return UI.convertTemperatureFromMetric(value);
+      return prepareTemperatureValue(value);
    }
 
-   void setCellColor(final ViewerCell cell, final Object element) {
+   /**
+    * Prepares a temperature value for display.
+    * If its value is 0, we don't convert it to any other measurement system
+    * than its original one (metric), otherwise, the converted value will be
+    * displayed.
+    *
+    * @param value
+    * @return
+    */
+   private float prepareTemperatureValue(final float value) {
+
+      return value == 0 ? 0 : UI.convertTemperatureFromMetric(value);
+   }
+
+   private void setCellColor(final ViewerCell cell, final Object element) {
 
       boolean isShowSummaryRow = false;
 

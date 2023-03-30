@@ -803,6 +803,18 @@ public abstract class TVITourBookItem extends TreeViewerItem implements ITourIte
          return false;
       }
 
+      if (this instanceof TVITourBookTour && obj instanceof TVITourBookTour) {
+
+         // cloned tours can have all the same data except the tour ID
+
+         final TVITourBookTour thisTour = (TVITourBookTour) this;
+         final TVITourBookTour otherTour = (TVITourBookTour) obj;
+
+         if (thisTour.tourId != otherTour.tourId) {
+            return false;
+         }
+      }
+
       final TVITourBookItem other = (TVITourBookItem) obj;
       if (colTourDateTime == null) {
          if (other.colTourDateTime != null) {

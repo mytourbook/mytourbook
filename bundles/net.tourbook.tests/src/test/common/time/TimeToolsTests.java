@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,6 @@ package common.time;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-import org.junit.jupiter.api.DisplayName;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -29,9 +28,9 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TimeZoneData;
 import net.tourbook.common.time.TourDateTime;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("TimeTools should")
 public class TimeToolsTests {
 
    private double eiffelTowerLat = 48.858093;
@@ -146,12 +145,6 @@ public class TimeToolsTests {
    }
 
    @Test
-   void testGetDefaultTimeZoneOffset() {
-
-      assertEquals("0 m", TimeTools.getDefaultTimeZoneOffset()); //$NON-NLS-1$
-   }
-
-   @Test
    void testGetFirstDayOfWeek() {
 
       assertEquals(DayOfWeek.MONDAY, TimeTools.getFirstDayOfWeek());
@@ -213,7 +206,7 @@ public class TimeToolsTests {
             0,
             0,
             0,
-            TimeTools.getDefaultTimeZone());
+            TimeTools.UTC);
 
       assertEquals(1652688000000L, TimeTools.toEpochMilli(testZonedDateTime));
    }

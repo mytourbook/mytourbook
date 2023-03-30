@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,6 +24,7 @@ import java.util.concurrent.ConcurrentSkipListSet;
 import net.sf.swtaddons.autocomplete.combo.AutocompleteComboInput;
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -56,32 +57,30 @@ import org.eclipse.ui.forms.widgets.Section;
 
 public class DialogQuickEdit extends TitleAreaDialog {
 
-   private static final String      GRAPH_LABEL_HEARTBEAT_UNIT     = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-   private static final String      VALUE_UNIT_K_CALORIES          = net.tourbook.ui.Messages.Value_Unit_KCalories;
+   private static final boolean         _isOSX                         = UI.IS_OSX;
+   private static final boolean         _isLinux                       = UI.IS_LINUX;
 
-   private static final boolean     _isOSX                         = UI.IS_OSX;
-   private static final boolean     _isLinux                       = UI.IS_LINUX;
+   private static final IDialogSettings _tourDataEditorViewState       = TourbookPlugin.getState(TourDataEditorView.ID);
 
-   private final TourData           _tourData;
-
-   private final IDialogSettings    _state;
-   private PixelConverter           _pc;
+   private final TourData               _tourData;
+   private final IDialogSettings        _state;
+   private PixelConverter               _pc;
 
    /**
     * Contains the controls which are displayed in the first column, these controls are used to get
     * the maximum width and set the first column within the different section to the same width
     */
-   private final ArrayList<Control> _firstColumnControls           = new ArrayList<>();
-   private final ArrayList<Control> _firstColumnContainerControls  = new ArrayList<>();
-   private final ArrayList<Control> _secondColumnControls          = new ArrayList<>();
+   private final ArrayList<Control>     _firstColumnControls           = new ArrayList<>();
+   private final ArrayList<Control>     _firstColumnContainerControls  = new ArrayList<>();
+   private final ArrayList<Control>     _secondColumnControls          = new ArrayList<>();
 
-   private int                      _hintDefaultSpinnerWidth;
+   private int                          _hintDefaultSpinnerWidth;
 
-   private boolean                  _isUpdateUI                    = false;
-   private boolean                  _isTemperatureManuallyModified = false;
-   private boolean                  _isWindSpeedManuallyModified   = false;
-   private int[]                    _unitValueWindSpeed;
-   private float                    _unitValueDistance;
+   private boolean                      _isUpdateUI                    = false;
+   private boolean                      _isTemperatureManuallyModified = false;
+   private boolean                      _isWindSpeedManuallyModified   = false;
+   private int[]                        _unitValueWindSpeed;
+   private float                        _unitValueDistance;
 
    /*
     * UI controls
@@ -406,7 +405,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
             _spinCalories.addMouseWheelListener(_mouseWheelListener);
 
             // label: kcal
-            _tk.createLabel(container, VALUE_UNIT_K_CALORIES);
+            _tk.createLabel(container, OtherMessages.VALUE_UNIT_K_CALORIES);
          }
          {
             /*
@@ -431,7 +430,7 @@ public class DialogQuickEdit extends TitleAreaDialog {
             _spinRestPulse.addMouseWheelListener(_mouseWheelListener);
 
             // label: bpm
-            _tk.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
+            _tk.createLabel(container, OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
          }
       }
    }
@@ -530,13 +529,16 @@ public class DialogQuickEdit extends TitleAreaDialog {
                UI.EMPTY_STRING,
                SWT.BORDER | SWT.WRAP | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL//
          );
+         final int weatherDescriptionNumLines = Util.getStateInt(_tourDataEditorViewState,
+               TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES,
+               TourDataEditorView.STATE_WEATHERDESCRIPTION_NUMBER_OF_LINES_DEFAULT);
 
          GridDataFactory.fillDefaults()
                .grab(true, true)
                //
                // SWT.DEFAULT causes lot's of problems with the layout therefore the hint is set
                //
-               .hint(_pc.convertWidthInCharsToPixels(80), _pc.convertHeightInCharsToPixels(6))
+               .hint(_pc.convertWidthInCharsToPixels(80), _pc.convertHeightInCharsToPixels(weatherDescriptionNumLines))
                .applyTo(_txtWeather);
       }
    }

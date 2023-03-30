@@ -811,13 +811,17 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
    private void disposeFonts() {
 
-      _fontDateColumn = UI.disposeResource(_fontDateColumn);
-      _fontDayHeader = UI.disposeResource(_fontDayHeader);
-      _fontTourContent = UI.disposeResource(_fontTourContent);
-      _fontTourTitle = UI.disposeResource(_fontTourTitle);
-      _fontTourValue = UI.disposeResource(_fontTourValue);
-      _fontWeekValue = UI.disposeResource(_fontWeekValue);
-      _fontYearHeader = UI.disposeResource(_fontYearHeader);
+// SET_FORMATTING_OFF
+
+      _fontDateColumn   = UI.disposeResource(_fontDateColumn);
+      _fontDayHeader    = UI.disposeResource(_fontDayHeader);
+      _fontTourContent  = UI.disposeResource(_fontTourContent);
+      _fontTourTitle    = UI.disposeResource(_fontTourTitle);
+      _fontTourValue    = UI.disposeResource(_fontTourValue);
+      _fontWeekValue    = UI.disposeResource(_fontWeekValue);
+      _fontYearHeader   = UI.disposeResource(_fontYearHeader);
+
+// SET_FORMATTING_ON
    }
 
    void draw() {
@@ -2932,7 +2936,7 @@ public class CalendarGraph extends Canvas implements ITourProviderAll {
 
             try {
 
-               final TourData tourDataCopy = (TourData) dragedTourData.clone();
+               final TourData tourDataCopy = (TourData) dragedTourData.clonePartly();
 
                // set tour start date/time AFTER tour is copied !!!
                tourDataCopy.setTourStartTime(newTourStartTime);

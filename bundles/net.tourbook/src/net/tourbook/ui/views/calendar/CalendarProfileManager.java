@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,6 +23,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.GraphColorManager;
@@ -58,20 +59,17 @@ import org.osgi.framework.Version;
 
 public class CalendarProfileManager {
 
-   private static final String VALUE_UNIT_K_CALORIES = net.tourbook.ui.Messages.Value_Unit_KCalories;
-   private static final String VALUE_UNIT_PULSE      = net.tourbook.ui.Messages.Value_Unit_Pulse;
-
-   private static final String DEFAULT_PREFIX        = " : ";                                        //$NON-NLS-1$
+   private static final String DEFAULT_PREFIX    = " : ";                                  //$NON-NLS-1$
    //
-   private static final String PROFILE_FILE_NAME     = "calendar-profiles.xml";                      //$NON-NLS-1$
+   private static final String PROFILE_FILE_NAME = "calendar-profiles.xml";                //$NON-NLS-1$
    //
    /**
     * Version number is not yet used.
     */
-   private static final int    PROFILE_VERSION       = 1;
+   private static final int    PROFILE_VERSION   = 1;
    //
-   private static final Bundle _bundle               = TourbookPlugin.getDefault().getBundle();
-   private static final IPath  _stateLocation        = Platform.getStateLocation(_bundle);
+   private static final Bundle _bundle           = TourbookPlugin.getDefault().getBundle();
+   private static final IPath  _stateLocation    = Platform.getStateLocation(_bundle);
    //
    //
    // common attributes
@@ -1089,7 +1087,7 @@ public class CalendarProfileManager {
                final String valueText = valueFormatter.printDouble(kcal);
 
                return isShowValueUnit
-                     ? valueText + UI.SPACE + VALUE_UNIT_K_CALORIES + UI.SPACE
+                     ? valueText + UI.SPACE + OtherMessages.VALUE_UNIT_K_CALORIES + UI.SPACE
                      : valueText + UI.SPACE;
 
             } else {
@@ -1309,7 +1307,7 @@ public class CalendarProfileManager {
                final String valueText = valueFormatter.printDouble(data.pulse_Avg);
 
                return isShowValueUnit
-                     ? valueText + UI.SPACE + UI.SYMBOL_AVERAGE_WITH_SPACE + VALUE_UNIT_PULSE + UI.SPACE
+                     ? valueText + UI.SPACE + UI.SYMBOL_AVERAGE_WITH_SPACE + OtherMessages.VALUE_UNIT_PULSE + UI.SPACE
                      : valueText + UI.SPACE;
 
             } else {

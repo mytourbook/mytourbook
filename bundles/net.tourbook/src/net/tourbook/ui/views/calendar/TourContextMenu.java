@@ -191,7 +191,7 @@ public class TourContextMenu {
       // _tourDoubleClickState.canEditMarker = isOneTour;
       // _tourDoubleClickState.canAdjustAltitude = isOneTour;
 
-      _actionDuplicateTour.setEnabled(isOneTour && !isDeviceTour);
+      _actionDuplicateTour.setEnabled(isOneTour);
       _actionEditTour.setEnabled(isOneTour);
       _actionEditQuick.setEnabled(isOneTour);
       _actionOpenAdjustAltitudeDialog.setEnabled(isOneTour && isDeviceTour);

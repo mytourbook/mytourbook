@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.tourbook.Images;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -81,6 +82,7 @@ import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
+import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map2.Messages;
 import net.tourbook.map2.action.ActionCreateTourMarkerFromMap;
 import net.tourbook.map2.action.ActionManageMapProviders;
@@ -208,8 +210,6 @@ public class Map2View extends ViewPart implements
       IPhotoEventListener {
 
 // SET_FORMATTING_OFF
-
-   private static final String   TOUR_TOOLTIP_LABEL_NO_GEO_TOUR                        = net.tourbook.ui.Messages.Tour_Tooltip_Label_NoGeoTour;
 
    public static final String    ID                                                    = "net.tourbook.map2.view.Map2ViewId";                   //$NON-NLS-1$
 
@@ -1730,7 +1730,7 @@ public class Map2View extends ViewPart implements
       _actionTourColor_Pace = new ActionTourColor(
             this,
             MapGraphId.Pace,
-            Messages.map_action_tour_color_pase_tooltip,
+            Messages.map_action_tour_color_pace_tooltip,
             Images.Graph_Pace,
             Images.Graph_Pace_Disabled);
 
@@ -1905,7 +1905,7 @@ public class Map2View extends ViewPart implements
       // setup tool tip's
       _map.setTourToolTip(_tourToolTip = new TourToolTip(_map));
       _tourInfoToolTipProvider.setActionsEnabled(true);
-      _tourInfoToolTipProvider.setNoTourTooltip(TOUR_TOOLTIP_LABEL_NO_GEO_TOUR);
+      _tourInfoToolTipProvider.setNoTourTooltip(OtherMessages.TOUR_TOOLTIP_LABEL_NO_GEO_TOUR);
 
       /*
        * Setup value point tooltip
@@ -5044,15 +5044,29 @@ public class Map2View extends ViewPart implements
          @Override
          public void run() {
 
+            if (_map.isDisposed()) {
+               return;
+            }
+
             // check if a newer runnable is available
             if (__asynchRunnableCounter != _asyncCounter.get()) {
-               // a newer queryRedraw is available
+
+               // a newer runnable is available
                return;
             }
 
             _isInMapSync = true;
             {
-               _map.setZoom(mapPosition.zoomLevel + 1);
+               final int zoomLevel = mapPosition.zoomLevel;
+               final int mapZoomLevel = zoomLevel == ModelPlayerManager.MAP_ZOOM_LEVEL_IS_NOT_AVAILABLE
+
+                     // use current zoom
+                     ? _map.getZoom()
+
+                     // use provided zoom
+                     : zoomLevel + 1;
+
+               _map.setZoom(mapZoomLevel);
                _map.setMapCenter(new GeoPosition(mapPosition.getLatitude(), mapPosition.getLongitude()));
             }
             _isInMapSync = false;

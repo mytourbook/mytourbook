@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -459,8 +460,8 @@ public class ConconiView extends ViewPart {
        * power
        */
       final ChartDataXSerie xDataPower = new ChartDataXSerie(powerSerie);
-      xDataPower.setLabel(net.tourbook.common.Messages.Graph_Label_Power);
-      xDataPower.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Power_Unit);
+      xDataPower.setLabel(OtherMessages.GRAPH_LABEL_POWER);
+      xDataPower.setUnitLabel(OtherMessages.GRAPH_LABEL_POWER_UNIT);
 
       /*
        * double is not yet supported for the y-axis
@@ -471,8 +472,8 @@ public class ConconiView extends ViewPart {
        * pulse
        */
       _yDataPulse = new ChartDataYSerie(ChartType.XY_SCATTER, pulseSerieFloat);
-      _yDataPulse.setYTitle(net.tourbook.common.Messages.Graph_Label_Heartbeat);
-      _yDataPulse.setUnitLabel(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+      _yDataPulse.setYTitle(OtherMessages.GRAPH_LABEL_HEARTBEAT);
+      _yDataPulse.setUnitLabel(OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
       _yDataPulse.setRgbBar_Gradient_Dark(allRgbGradient_Dark);
       _yDataPulse.setRgbBar_Gradient_Bright(allRgbGradient_Bright);
       _yDataPulse.setRgbBar_Line(allRgbLine);
@@ -687,7 +688,7 @@ public class ConconiView extends ViewPart {
                // label: heartbeat unit
                label = new Label(containerValues, SWT.NONE);
                GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
-               label.setText(net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit);
+               label.setText(OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
 
                // label: power value
                _lblDeflactionPower = new Label(containerValues, SWT.TRAIL);

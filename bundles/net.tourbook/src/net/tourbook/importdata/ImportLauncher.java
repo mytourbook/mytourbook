@@ -102,6 +102,12 @@ public class ImportLauncher implements Cloneable {
     */
    public boolean                  isReplaceFirstTimeSliceElevation;
 
+   /**
+    * When <code>true</code> then the elevation up/down totals are computed from SRTM data when
+    * available
+    */
+   public boolean                  isReplaceElevationFromSRTM;
+
    public ImportLauncher() {
 
       _id = ++_idCreator;

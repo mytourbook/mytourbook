@@ -2378,7 +2378,7 @@
 
    <!-- 
    
-    MAP PLAYER  -  MAP PLAYER  -  MAP PLAYER  -  MAP PLAYER  -  MAP PLAYER  -  MAP PLAYER
+    MODEL PLAYER  -  MODEL PLAYER  -  MODEL PLAYER  -  MODEL PLAYER  -  MODEL PLAYER  -  MODEL PLAYER
    
    -->
 
@@ -2386,19 +2386,19 @@
 
       <view
          category    ="net.tourbook.category.map"
-         id          ="net.tourbook.map.player.MapPlayerView"
-         class       ="net.tourbook.map.player.MapPlayerView"
-         icon        ="icons/map-player.png"
-         name        ="%View_Name_MapPlayer"/>
+         id          ="net.tourbook.map.player.ModelPlayerView"
+         class       ="net.tourbook.map.player.ModelPlayerView"
+         icon        ="icons/model-player.png"
+         name        ="%View_Name_ModelPlayer"/>
    
    </extension>
 
    <extension point="org.eclipse.ui.commands">
 
       <command
-         id             ="net.tourbook.map.command.MapPlayerView"
-         name           ="%View_Name_MapPlayer"
-         defaultHandler ="net.tourbook.map.player.ActionHandler_OpenView_MapPlayer"/>
+         id             ="net.tourbook.map.command.ModelPlayerView"
+         name           ="%View_Name_ModelPlayer"
+         defaultHandler ="net.tourbook.map.player.ActionHandler_OpenView_ModelPlayer"/>
                
    </extension>
 
@@ -2407,10 +2407,10 @@
       <menuContribution locationURI="menu:m_Map?after=sep_Player" >
                   
          <command 
-            commandId   ="net.tourbook.map.command.MapPlayerView"
-            icon        ="icons/map-player.png"
-            label       ="%View_Name_MapPlayer"
-            mnemonic    ="%View_Name_MapPlayer_Mnemonic"/>
+            commandId   ="net.tourbook.map.command.ModelPlayerView"
+            icon        ="icons/model-player.png"
+            label       ="%View_Name_ModelPlayer"
+            mnemonic    ="%View_Name_ModelPlayer_Mnemonic"/>
       
       </menuContribution>
 

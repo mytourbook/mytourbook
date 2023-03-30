@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
@@ -105,32 +106,22 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferencePage {
 
-   private static final String GRAPH_LABEL_HEARTBEAT_UNIT = net.tourbook.common.Messages.Graph_Label_Heartbeat_Unit;
-
-   public static final String  ID                         = "net.tourbook.preferences.PrefPagePeopleId";            //$NON-NLS-1$
-
+   public static final String     ID                        = "net.tourbook.preferences.PrefPagePeopleId"; //$NON-NLS-1$
    //
-   private static final String    STATE_SELECTED_PERSON               = "selectedPersonId";           //$NON-NLS-1$
-   private static final String    STATE_SELECTED_TAB_FOLDER           = "selectedTabFolder";          //$NON-NLS-1$
+   private static final String    STATE_SELECTED_PERSON     = "selectedPersonId";                          //$NON-NLS-1$
+   private static final String    STATE_SELECTED_TAB_FOLDER = "selectedTabFolder";                         //$NON-NLS-1$
 
-   public static final int        HEART_BEAT_MIN                      = 10;
-   public static final int        HEART_BEAT_MAX                      = 300;
+   private static final int       HEART_BEAT_MIN            = 10;
+   public static final int        HEART_BEAT_MAX            = 300;
 
    /**
     * Id to indicate that the hr zones should be displayed for the active person when the pref
     * dialog is opened
     */
-   public static final String     PREF_DATA_SELECT_HR_ZONES           = "SelectHrZones";              //$NON-NLS-1$
+   public static final String     PREF_DATA_SELECT_HR_ZONES = "SelectHrZones";                             //$NON-NLS-1$
 
-   /**
-    * Id to indicate that the person's information should be displayed for the active person when
-    * the pref
-    * dialog is opened
-    */
-   public static final String     PREF_DATA_SELECT_PERSON_INFORMATION = "SelectPersonInformation";    //$NON-NLS-1$
-
-   private final IPreferenceStore _prefStore                          = TourbookPlugin.getPrefStore();
-   private final IDialogSettings  _state                              = TourbookPlugin.getState(ID);
+   private final IPreferenceStore _prefStore                = TourbookPlugin.getPrefStore();
+   private final IDialogSettings  _state                    = TourbookPlugin.getState(ID);
 
    // REMOVED BIKES 30.4.2011
 
@@ -960,7 +951,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
                .applyTo(_spinnerRestingHR);
 
          // label: unit
-         UI.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
+         UI.createLabel(container, OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
       }
 
       final Composite containerAge = new Composite(parent, SWT.NONE);
@@ -1025,7 +1016,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          /*
           * label: unit
           */
-         UI.createLabel(container, GRAPH_LABEL_HEARTBEAT_UNIT);
+         UI.createLabel(container, OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
 
          /*
           * combo: formula to compute hr max
@@ -1367,7 +1358,7 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
              * label: bpm
              */
             final Label label = new Label(parent, SWT.NONE);
-            label.setText(GRAPH_LABEL_HEARTBEAT_UNIT);
+            label.setText(OtherMessages.GRAPH_LABEL_HEARTBEAT_UNIT);
             label.addMouseListener(_hrZoneMouseListener);
             GridDataFactory.fillDefaults().align(SWT.FILL, SWT.CENTER).applyTo(label);
          }
@@ -1631,7 +1622,9 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
       _btnComputeHrZonesForAllTours.setEnabled(_isPersonModified == false);
 
       _txtBodyMassIndex.setText(String.valueOf(
-            UI.computeBodyMassIndex(_spinnerWeight.getSelection() / 10.0, _spinnerHeight.getSelection() / 100.0)));
+            UI.computeBodyMassIndex(_spinnerWeight.getSelection() / 10.0,
+                  _spinnerHeight.getSelection(),
+                  _spinnerHeightInches.getSelection())));
    }
 
    private void fireModifyEvent() {
@@ -2219,8 +2212,12 @@ public class PrefPagePeople extends PreferencePage implements IWorkbenchPreferen
          if (UI.UNIT_IS_ELEVATION_METER) {
             _spinnerHeight.setSelection(Math.round(bodyHeight * 100));
          } else {
-            _spinnerHeight.setSelection((int) Math.floor(bodyHeight / 12));
-            _spinnerHeightInches.setSelection((int) bodyHeight % 12);
+            final float heightFeetInches = bodyHeight / 12;
+            final int heightFeet = (int) Math.floor(heightFeetInches);
+            final int heightInches = (int) ((heightFeetInches - heightFeet) * 10);
+
+            _spinnerHeight.setSelection(heightFeet);
+            _spinnerHeightInches.setSelection(heightInches);
          }
 
          _rawDataPathEditor.setStringValue(person.getRawDataPath());

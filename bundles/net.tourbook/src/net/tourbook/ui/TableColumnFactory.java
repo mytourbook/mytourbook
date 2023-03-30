@@ -88,6 +88,8 @@ public abstract class TableColumnFactory {
    public static final String             DATA_SEQUENCE_ID                                   = "DATA_SEQUENCE";                                   //$NON-NLS-1$
    public static final TableColumnFactory DATA_TIME_INTERVAL;
    public static final String             DATA_TIME_INTERVAL_ID                              = "DATA_TIME_INTERVAL";                              //$NON-NLS-1$
+   public static final TableColumnFactory DATA_TOUR_ID;
+   public static final String             DATA_TOUR_ID_ID                                    = "DATA_TOUR_ID";                                    //$NON-NLS-1$
 
    public static final TableColumnFactory DEVICE_BATTERY_SOC_END;
    public static final String             DEVICE_BATTERY_SOC_END_ID                          = "DEVICE_BATTERY_SOC_END_ID";                       //$NON-NLS-1$
@@ -1149,6 +1151,23 @@ public abstract class TableColumnFactory {
          }
       };
 
+      DATA_TOUR_ID = new TableColumnFactory() {
+         @Override
+         public TableColumnDefinition createColumn(final ColumnManager columnManager,
+                                                  final PixelConverter pixelConverter) {
+
+            final TableColumnDefinition colDef = new TableColumnDefinition(columnManager, "DATA_TOUR_ID", SWT.TRAIL); //$NON-NLS-1$
+
+            colDef.setColumnCategory(           Messages.ColumnFactory_Category_Data);
+
+            colDef.setColumnLabel(              Messages.ColumnFactory_TourId);
+            colDef.setColumnHeaderText(         Messages.ColumnFactory_TourId);
+
+            colDef.setDefaultColumnWidth(pixelConverter.convertWidthInCharsToPixels(16));
+
+            return colDef;
+         }
+      };
       /*
        * Device
        */

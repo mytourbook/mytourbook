@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -30,6 +30,9 @@ public abstract class UITest {
    protected int                    tourBookView_Distance_Column_Index      = 10;
    protected int                    tourBookView_ElevationGain_Column_Index = 11;
    protected int                    tourBookView_TimeZone_Column_Index      = 15;
+   protected int                    tourBookView_ElapsedTime_Column_Index   = 16;
+   protected int                    tourBookView_RecordedTime_Column_Index  = 17;
+   protected int                    tourBookView_PausedTime_Column_Index    = 18;
 
    @AfterAll
    static void cleanUp() {

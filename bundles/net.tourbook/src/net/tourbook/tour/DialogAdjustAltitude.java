@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -29,7 +29,7 @@ import net.tourbook.chart.MouseAdapter;
 import net.tourbook.chart.SelectionChartXSliderPosition;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.Util;
-import net.tourbook.data.AltitudeUpDown;
+import net.tourbook.data.ElevationGainLoss;
 import net.tourbook.data.SplineData;
 import net.tourbook.data.TourData;
 import net.tourbook.math.CubicSpline;
@@ -530,13 +530,13 @@ public class DialogAdjustAltitude extends TitleAreaDialog implements I2ndAltiLay
       /*
        * Update UI up/down values
        */
-      final AltitudeUpDown adjustedElevationUpDown = _tourData.computeAltitudeUpDown(metric_AdjustedElevationSerie);
+      final ElevationGainLoss adjustedElevationUpDown = _tourData.computeAltitudeUpDown(metric_AdjustedElevationSerie);
 
       final float measurementSystem_TourElevationUp = _tourData.getTourAltUp() / UI.UNIT_VALUE_ELEVATION;
       final float measurementSystem_TourElevationDown = _tourData.getTourAltDown() / UI.UNIT_VALUE_ELEVATION;
 
-      final float adjustedElevationUp = adjustedElevationUpDown.getAltitudeUp() / UI.UNIT_VALUE_ELEVATION;
-      final float adjustedElevationDown = adjustedElevationUpDown.getAltitudeDown() / UI.UNIT_VALUE_ELEVATION;
+      final float adjustedElevationUp = adjustedElevationUpDown.getElevationGain() / UI.UNIT_VALUE_ELEVATION;
+      final float adjustedElevationDown = adjustedElevationUpDown.getElevationLoss() / UI.UNIT_VALUE_ELEVATION;
 
       final float tourElevationUp_Diff = adjustedElevationUp - measurementSystem_TourElevationUp;
       final float tourElevationDown_Diff = adjustedElevationDown - measurementSystem_TourElevationDown;

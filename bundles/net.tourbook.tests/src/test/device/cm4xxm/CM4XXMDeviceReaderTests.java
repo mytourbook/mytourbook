@@ -47,7 +47,7 @@ public class CM4XXMDeviceReaderTests extends DeviceDataReaderTester {
 
       final String importFileAbsolutePath = FilesUtils.getAbsoluteFilePath(FILES_PATH + "20060327-20060608_Touren.dat"); //$NON-NLS-1$
 
-      String dosText = net.tourbook.common.util.FilesUtils.readFileContentString(importFileAbsolutePath);
+      String dosText = net.tourbook.common.util.FileUtils.readFileContentString(importFileAbsolutePath);
       dosText = dosText.replace("\r\n", UI.NEW_LINE);//$NON-NLS-1$
       Files.writeString(Paths.get(importFileAbsolutePath), dosText, Charset.defaultCharset());
 

@@ -55,8 +55,8 @@ import net.tourbook.map.bookmark.IMapBookmarkListener;
 import net.tourbook.map.bookmark.IMapBookmarks;
 import net.tourbook.map.bookmark.MapBookmark;
 import net.tourbook.map.bookmark.MapBookmarkManager;
-import net.tourbook.map.player.MapPlayerManager;
-import net.tourbook.map.player.MapPlayerView;
+import net.tourbook.map.player.ModelPlayerManager;
+import net.tourbook.map.player.ModelPlayerView;
 import net.tourbook.map2.view.IDiscreteColorProvider;
 import net.tourbook.map25.action.ActionMap25_PhotoFilter;
 import net.tourbook.map25.action.ActionMap25_ShowMarker;
@@ -143,7 +143,7 @@ public class Map25View extends ViewPart implements
    private static final String MAP_ACTION_SHOW_TOUR_IN_MAP            = net.tourbook.map2.Messages.map_action_show_tour_in_map;
    private static final String MAP_ACTION_TOUR_COLOR_ALTITUDE_TOOLTIP = net.tourbook.map2.Messages.map_action_tour_color_altitude_tooltip;
    private static final String MAP_ACTION_TOUR_COLOR_GRADIENT_TOOLTIP = net.tourbook.map2.Messages.map_action_tour_color_gradient_tooltip;
-   private static final String MAP_ACTION_TOUR_COLOR_PACE_TOOLTIP     = net.tourbook.map2.Messages.map_action_tour_color_pase_tooltip;
+   private static final String MAP_ACTION_TOUR_COLOR_PACE_TOOLTIP     = net.tourbook.map2.Messages.map_action_tour_color_pace_tooltip;
    private static final String MAP_ACTION_TOUR_COLOR_PULSE_TOOLTIP    = net.tourbook.map2.Messages.map_action_tour_color_pulse_tooltip;
    private static final String MAP_ACTION_TOUR_COLOR_SPEED_TOOLTIP    = net.tourbook.map2.Messages.map_action_tour_color_speed_tooltip;
    private static final String TOUR_ACTION_SHOW_HR_ZONES_TOOLTIP      = net.tourbook.map2.Messages.Tour_Action_ShowHrZones_Tooltip;
@@ -777,7 +777,7 @@ public class Map25View extends ViewPart implements
 
             if (partRef.getPart(false) == Map25View.this) {
 
-               MapPlayerManager.setMap25View(map25View);
+               ModelPlayerManager.setMap25View(map25View);
             }
          }
       };
@@ -2083,7 +2083,6 @@ public class Map25View extends ViewPart implements
 
       Map25ConfigManager.saveState();
       Map3GradientColorManager.saveColors();
-      MapPlayerManager.saveState();
    }
 
    /**
@@ -2363,8 +2362,8 @@ public class Map25View extends ViewPart implements
       final long timeDiffLastFiredSync = currentTimeMillis - _lastFiredSyncEventTime;
       if (timeDiffLastFiredSync < 1000
 
-            // accept all sync events from the map player
-            && (viewPart instanceof MapPlayerView) == false) {
+            // accept all sync events from the model player
+            && (viewPart instanceof ModelPlayerView) == false) {
 
          // ignore because it causes LOTS of problems when synching moved map
          return;

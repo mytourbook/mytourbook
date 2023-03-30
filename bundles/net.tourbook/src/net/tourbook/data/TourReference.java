@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2018 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,9 @@
  *******************************************************************************/
 package net.tourbook.data;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,11 +32,13 @@ import net.tourbook.ui.UI;
  * {@link TourData} of a tour
  */
 @Entity
-public class TourReference {
+public class TourReference implements Serializable {
 
-   private static final String NL              = UI.NEW_LINE;
+   private static final long   serialVersionUID = 1L;
 
-   public static final int     DB_LENGTH_LABEL = 80;
+   private static final String NL               = UI.NEW_LINE;
+
+   public static final int     DB_LENGTH_LABEL  = 80;
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,7 +54,7 @@ public class TourReference {
 
    private int                 endIndex;
 
-   private String              label           = UI.EMPTY_STRING;
+   private String              label            = UI.EMPTY_STRING;
 
    public TourReference() {}
 
@@ -74,20 +79,20 @@ public class TourReference {
 
    @Override
    public boolean equals(final Object obj) {
+
       if (this == obj) {
          return true;
       }
       if (obj == null) {
          return false;
       }
-      if (!(obj instanceof TourReference)) {
+      if (getClass() != obj.getClass()) {
          return false;
       }
+
       final TourReference other = (TourReference) obj;
-      if (refId != other.refId) {
-         return false;
-      }
-      return true;
+
+      return refId == other.refId;
    }
 
    public int getEndValueIndex() {
@@ -124,18 +129,11 @@ public class TourReference {
 
    @Override
    public int hashCode() {
-      final int prime = 31;
-      int result = 1;
-      result = prime * result + (int) (refId ^ (refId >>> 32));
-      return result;
+      return Objects.hash(refId);
    }
 
    public void setEndValueIndex(final int endIndex) {
       this.endIndex = endIndex;
-   }
-
-   public void setGeneratedId(final long generatedId) {
-      this.refId = generatedId;
    }
 
    public void setLabel(final String label) {

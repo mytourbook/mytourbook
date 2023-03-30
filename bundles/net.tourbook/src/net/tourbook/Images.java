@@ -83,6 +83,7 @@ public class Images {
    public static final String ArrowUp_Blue                               = "arrow-up-blue.png";                                   //$NON-NLS-1$
    public static final String ArrowUp_Blue_Disabled                      = "arrow-up-blue-disabled.png";                          //$NON-NLS-1$
    public static final String Calendar                                   = "calendar.png";                                        //$NON-NLS-1$
+   public static final String Camera                                     = "camera.png";                                          //$NON-NLS-1$
    public static final String Checkbox_Checked                           = "checkbox-checked.png";                                //$NON-NLS-1$
    public static final String Checkbox_Checked_Disabled                  = "checkbox-checked-disabled.png";                       //$NON-NLS-1$
    public static final String Checkbox_Uncheck                           = "checkbox-unchecked.png";                              //$NON-NLS-1$
@@ -181,9 +182,9 @@ public class Images {
    public static final String MapOptions                                 = "map-options.png";                                     //$NON-NLS-1$
    public static final String MapOptions_Dark                            = "map-options-dark.png";                                //$NON-NLS-1$
    public static final String MapOptions_Disabled                        = "map-options-disabled.png";                            //$NON-NLS-1$
-   public static final String MapPlayer                                  = "map-player.png";                                      //$NON-NLS-1$
    public static final String MapProvider                                = "change-map-provider.png";                             //$NON-NLS-1$
    public static final String MergeTours                                 = "merge-tours.png";                                     //$NON-NLS-1$
+   public static final String ModelPlayer                                = "model-player.png";                                      //$NON-NLS-1$
    public static final String MyTourbook16                               = "tourbook16.png";                                      //$NON-NLS-1$
    public static final String POI_Anchor                                 = "anchor.png";                                          //$NON-NLS-1$
    public static final String POI_Car                                    = "car.png";                                             //$NON-NLS-1$

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -21,6 +21,7 @@ import java.util.List;
 
 import net.tourbook.Images;
 import net.tourbook.Messages;
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.chart.Chart;
 import net.tourbook.chart.ChartDataModel;
@@ -85,17 +86,14 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class HeartRateVariabilityView extends ViewPart {
 
-   public static final String  ID                                      = "net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView"; //$NON-NLS-1$
+   public static final String  ID                          = "net.tourbook.ui.views.heartRateVariability.HeartRateVariabilityView"; //$NON-NLS-1$
 
-   private static final String GRAPH_LABEL_HEART_RATE_VARIABILITY      = net.tourbook.common.Messages.Graph_Label_HeartRateVariability;
-   private static final String GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT = net.tourbook.common.Messages.Graph_Label_HeartRateVariability_Unit;
+   private static final String STATE_HRV_MIN_TIME          = "STATE_HRV_MIN_TIME";                                                  //$NON-NLS-1$
+   private static final String STATE_HRV_MAX_TIME          = "STATE_HRV_MAX_TIME";                                                  //$NON-NLS-1$
+   private static final String STATE_IS_SHOW_ALL_VALUES    = "STATE_IS_SHOW_ALL_VALUES";                                            //$NON-NLS-1$
+   private static final String STATE_IS_SYNC_CHART_SCALING = "STATE_IS_SYNC_CHART_SCALING";                                         //$NON-NLS-1$
 
-   private static final String STATE_HRV_MIN_TIME                      = "STATE_HRV_MIN_TIME";                                                  //$NON-NLS-1$
-   private static final String STATE_HRV_MAX_TIME                      = "STATE_HRV_MAX_TIME";                                                  //$NON-NLS-1$
-   private static final String STATE_IS_SHOW_ALL_VALUES                = "STATE_IS_SHOW_ALL_VALUES";                                            //$NON-NLS-1$
-   private static final String STATE_IS_SYNC_CHART_SCALING             = "STATE_IS_SYNC_CHART_SCALING";                                         //$NON-NLS-1$
-
-   private static final String GRID_PREF_PREFIX                        = "GRID_HEART_RATE_VARIABILITY__";                                       //$NON-NLS-1$
+   private static final String GRID_PREF_PREFIX            = "GRID_HEART_RATE_VARIABILITY__";                                       //$NON-NLS-1$
 
 // SET_FORMATTING_OFF
 
@@ -492,8 +490,8 @@ public class HeartRateVariabilityView extends ViewPart {
        * X axis: RR
        */
       final ChartDataXSerie xDataRR0 = new ChartDataXSerie(rr0Series);
-      xDataRR0.setLabel(GRAPH_LABEL_HEART_RATE_VARIABILITY);
-      xDataRR0.setUnitLabel(GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT);
+      xDataRR0.setLabel(OtherMessages.GRAPH_LABEL_HEART_RATE_VARIABILITY);
+      xDataRR0.setUnitLabel(OtherMessages.GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT);
 
       xDataRR0.forceXAxisMinValue(xDataRR0.getOriginalMinValue() - ADJUST_PULSE_VALUE);
       xDataRR0.forceXAxisMaxValue(xDataRR0.getOriginalMaxValue() + ADJUST_PULSE_VALUE);
@@ -504,12 +502,12 @@ public class HeartRateVariabilityView extends ViewPart {
        * Y axis: RR +1
        */
       final ChartDataYSerie yDataRR1 = new ChartDataYSerie(ChartType.XY_SCATTER, rr1Series);
-      yDataRR1.setYTitle(GRAPH_LABEL_HEART_RATE_VARIABILITY);
-      yDataRR1.setUnitLabel(GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT);
+      yDataRR1.setYTitle(OtherMessages.GRAPH_LABEL_HEART_RATE_VARIABILITY);
+      yDataRR1.setUnitLabel(OtherMessages.GRAPH_LABEL_HEART_RATE_VARIABILITY_UNIT);
       yDataRR1.setRgbBar_Gradient_Dark(allRgbDark);
       yDataRR1.setRgbBar_Gradient_Bright(allRgbGradient_Bright);
       yDataRR1.setRgbBar_Line(allRgbLine);
-      
+
       yDataRR1.setRgbGraph_Text(rgbTextColor);
 
       yDataRR1.forceYAxisMinValue(yDataRR1.getOriginalMinValue() - ADJUST_PULSE_VALUE);

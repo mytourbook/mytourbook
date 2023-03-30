@@ -1,0 +1,42 @@
+23.3.2                                                    27. March 2023
+  
+
+Improvements
+============
+
+* Easy Import
+  - Set elevation up/down totals from SRTM data                   
+    https://github.com/mytourbook/mytourbook/issues/824#issuecomment-1483739484
+    
+* Tour Editor     
+  - Set elevation up/down totals from SRTM data when tour is saved
+    https://github.com/mytourbook/mytourbook/issues/824#issuecomment-1483739484
+
+* Tour Chart
+  - Show "Moving time" in the value point tooltip
+    https://github.com/mytourbook/mytourbook/issues/502#issuecomment-1483897001
+
+
+Changes
+=======
+
+* Tour Editor     
+  - Changed wording for the save dialog actions: Save Tour, Discard Modifications, Cancel
+
+* Update Site
+  old: https://mytourbook.sourceforge.io/updates
+  new: https://github.com/mytourbook/mytourbook.github.io
+
+
+Bugfix
+======
+
+* Tour Book 
+  - Duplicating a tour with tags is causing an exception
+    https://github.com/mytourbook/mytourbook/issues/1041
+
+ 
+System   
+======
+
+* MyTourbook Milestone 23.3.2       https://github.com/mytourbook/mytourbook/milestone/8?closed=1

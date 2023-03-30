@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2020 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,7 +18,6 @@ package net.tourbook.photo;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileFilter;
 
 import net.tourbook.common.UI;
@@ -26,7 +25,6 @@ import net.tourbook.common.UI;
 import org.apache.commons.imaging.Imaging;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -48,50 +46,84 @@ public class ImageUtils {
 
    static {
 
-      final IPropertyChangeListener _prefChangeListener = new IPropertyChangeListener() {
-         @Override
-         public void propertyChange(final PropertyChangeEvent event) {
+      final IPropertyChangeListener _prefChangeListener = propertyChangeEvent -> {
 
-            final String property = event.getProperty();
+         final String property = propertyChangeEvent.getProperty();
 
-            if (property.equals(IPhotoPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY)) {
-               _isRotateImageAutomatically = (Boolean) event.getNewValue();
-            }
+         if (property.equals(IPhotoPreferences.PHOTO_SYSTEM_IS_ROTATE_IMAGE_AUTOMATICALLY)) {
+            _isRotateImageAutomatically = (Boolean) propertyChangeEvent.getNewValue();
          }
       };
 
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
+   /**
+    * For images with a transparent layer, this will keep the existing
+    * transparency.
+    * Original code: https://stackoverflow.com/a/63703052
+    *
+    * @param sourceImageData
+    * @param imgWidth
+    * @param imgHeight
+    * @return
+    */
+   private static ImageData copyImageTransparencyData(final ImageData sourceImageData,
+                                                      final int imgWidth,
+                                                      final int imgHeight) {
+
+      if (sourceImageData.alphaData == null) {
+         return null;
+      }
+
+      final ImageData destData = new ImageData(imgWidth, imgHeight, sourceImageData.depth, sourceImageData.palette);
+
+      final int destinationImageWidth = destData.width;
+      final int sourceImageDataWidth = sourceImageData.width;
+      destData.alphaData = new byte[destinationImageWidth * destData.height];
+
+      for (int destRow = 0; destRow < destData.height; destRow++) {
+
+         final int origRow = destRow * sourceImageData.height / destData.height;
+         final int destination = destRow * destinationImageWidth;
+         final int origin = origRow * sourceImageDataWidth;
+
+         for (int destCol = 0; destCol < destinationImageWidth; destCol++) {
+
+            final int origCol = destCol * sourceImageDataWidth / destinationImageWidth;
+            destData.alphaData[destination + destCol] = sourceImageData.alphaData[origin + origCol];
+         }
+      }
+
+      return destData;
+   }
+
    public static FileFilter createImageFileFilter() {
 
-      return new FileFilter() {
-         @Override
-         public boolean accept(final File pathname) {
+      return pathname -> {
 
-            if (pathname.isDirectory()) {
-               return false;
-            }
-
-            if (pathname.isHidden()) {
-               return false;
-            }
-
-            final String name = pathname.getName();
-            if (name == null || name.length() == 0) {
-               return false;
-            }
-
-            if (name.startsWith(UI.SYMBOL_DOT)) {
-               return false;
-            }
-
-            if (Imaging.hasImageFileExtension(pathname)) {
-               return true;
-            }
-
+         if (pathname.isDirectory()) {
             return false;
          }
+
+         if (pathname.isHidden()) {
+            return false;
+         }
+
+         final String name = pathname.getName();
+         if (name == null || name.length() == 0) {
+            return false;
+         }
+
+         if (name.startsWith(UI.SYMBOL_DOT)) {
+            return false;
+         }
+
+         if (Imaging.hasImageFileExtension(pathname)) {
+            return true;
+         }
+
+         return false;
       };
    }
 
@@ -215,7 +247,17 @@ public class ImageUtils {
          }
       }
 
-      final Image scaledImage = new Image(display, imgWidth, imgHeight);
+      Image scaledImage = new Image(display, imgWidth, imgHeight);
+
+      final ImageData scaledImageWithTransparencyData =
+            copyImageTransparencyData(srcImage.getImageData(), imgWidth, imgHeight);
+      if (scaledImageWithTransparencyData != null) {
+
+         UI.disposeResource(scaledImage);
+         scaledImage = new Image(display, scaledImageWithTransparencyData);
+      }
+
+      //Resize the image
       final GC gc = new GC(scaledImage);
       Transform transformation = null;
       try {
@@ -223,8 +265,8 @@ public class ImageUtils {
 
          gc.setAntialias(antialias);
          gc.setInterpolation(interpolation);
-//			gc.setAntialias(SWT.ON);
-//			gc.setInterpolation(SWT.LOW);
+//       gc.setAntialias(SWT.ON);
+//       gc.setInterpolation(SWT.HIGH);
 
          int destX = 0;
          int destY = 0;
@@ -276,13 +318,12 @@ public class ImageUtils {
                destHeight);
       } finally {
 
-         // ensure resources are disposed when an error occures
+         // ensure resources are disposed when an error occurs
 
          gc.dispose();
 
-         if (transformation != null) {
-            transformation.dispose();
-         }
+         UI.disposeResource(transformation);
+         UI.disposeResource(srcImage);
       }
 
       return scaledImage;
@@ -358,5 +399,4 @@ public class ImageUtils {
 
       return newImage;
    }
-
 }

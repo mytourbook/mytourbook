@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -18,11 +18,12 @@ package net.tourbook.data;
 import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.EAGER;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +32,7 @@ import com.skedgo.converter.TimezoneMapper;
 import java.awt.Point;
 import java.io.File;
 import java.io.PrintStream;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -49,7 +51,6 @@ import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
@@ -97,6 +98,7 @@ import net.tourbook.srtm.GeoLon;
 import net.tourbook.srtm.NumberForm;
 import net.tourbook.tour.BreakTimeResult;
 import net.tourbook.tour.BreakTimeTool;
+import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
 import net.tourbook.tour.photo.TourPhotoLink;
 import net.tourbook.tour.photo.TourPhotoManager;
@@ -107,6 +109,7 @@ import net.tourbook.ui.views.ISmoothingAlgorithm;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
 import net.tourbook.weather.WeatherUtils;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
@@ -116,14 +119,17 @@ import org.eclipse.swt.widgets.Display;
 import org.hibernate.annotations.Cascade;
 
 /**
- * Tour data contains all data for a tour (except markers), an entity will be saved in the database
+ * Tour data contains all data for one tour, an entity is saved in the database
  */
 @Entity
 @XmlType(name = "TourData")
 @XmlRootElement(name = "TourData")
 @XmlAccessorType(XmlAccessType.NONE)
 @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "tourId")
-public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable {
+
+public class TourData implements Comparable<Object>, IXmlSerializable, Serializable {
+
+   private static final long             serialVersionUID                  = 1L;
 
    private static final char             NL                                = UI.NEW_LINE;
    private static final String           INTERVAL_SUMMARY_UNIT             = " ∑  ";                                  //$NON-NLS-1$
@@ -229,6 +235,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Unique entity id which identifies the tour
     */
    @Id
+   @JsonProperty
    private Long                  tourId;
 
    // ############################################# DATE #############################################
@@ -239,6 +246,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @since DB version 22
     */
    @XmlElement
+   @JsonProperty
    private long                  tourStartTime;
 
    /**
@@ -247,36 +255,43 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @since DB version 22
     */
    @XmlElement
+   @JsonProperty
    private long                  tourEndTime;
 
    /**
     * year of tour start
     */
+   @JsonProperty
    private short                 startYear;
 
    /**
     * mm (d) month of tour
     */
+   @JsonProperty
    private short                 startMonth;
 
    /**
     * dd (d) day of tour
     */
+   @JsonProperty
    private short                 startDay;
 
    /**
     * HH (d) hour of tour
     */
+   @JsonProperty
    private short                 startHour;
 
    /**
     * MM (d) minute of tour
     */
+   @JsonProperty
    private short                 startMinute;
 
    /**
     *
     */
+   @JsonProperty
    private int                   startSecond;                                          // db-version 7
 
    /**
@@ -302,11 +317,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @since Is long since db version 22, before it was int
     */
    @XmlElement
+   @JsonProperty
    private long                  tourDeviceTime_Elapsed;
 
    /**
     * Total recorded time in seconds
     */
+   @JsonProperty
    private long                  tourDeviceTime_Recorded;
 
    /**
@@ -314,6 +331,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * This number could come from a direct value or from {@link tourTimerPauses}
     */
+   @JsonProperty
    private long                  tourDeviceTime_Paused;
 
    /**
@@ -322,11 +340,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @since Is long since db version 22, before it was int
     */
    @XmlElement
+   @JsonProperty
    private long                  tourComputedTime_Moving;
 
    /**
     * Time zone ID or <code>null</code> when the time zone ID is not available.
     */
+   @JsonProperty
    private String                timeZoneId;
 
    // ############################################# DISTANCE #############################################
@@ -335,6 +355,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Total distance of the device at tour start (km) tttt (h). Distance for the tour is stored in
     * the field {@link #tourDistance}
     */
+   @JsonProperty
    private float                 startDistance;
 
    /**
@@ -342,6 +363,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * distance data serie
     */
    @XmlElement
+   @JsonProperty
    private float                 tourDistance;
 
    /**
@@ -350,6 +372,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * 0 == false <i>(default, no distance sensor)</i> <br>
     * 1 == true
     */
+   @JsonProperty
    private short                 isDistanceFromSensor            = 0;                     // db-version 8
 
    // ############################################# ELEVATION #############################################
@@ -357,39 +380,47 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * aaaa (h) initial altitude (m)
     */
+   @JsonProperty
    private short                 startAltitude;
 
    /**
     * altitude up (m)
     */
    @XmlElement
+   @JsonProperty
    private int                   tourAltUp;
 
    /**
     * altitude down (m)
     */
    @XmlElement
+   @JsonProperty
    private int                   tourAltDown;
 
 
    /**
     * Average altitude change (m/km)
     */
-   private int                   avgAltitudeChange;
+   @JsonProperty
+   private int                   avgAltitudeChange;                                     // db-version 40
 
    // ############################################# PULSE/WEIGHT/POWER #############################################
 
    /**
     * pppp (h) initial pulse (bpm)
     */
+   @JsonProperty
    private short                 startPulse;
 
    @XmlElement
+   @JsonProperty
    private int                   restPulse;                                             // db-version 8
 
    @XmlElement
+   @JsonProperty
    private Integer               calories;                                             // db-version 4
 
+   @JsonProperty
    private float                 bodyWeight;                                          // db-version 4
 
    private float                 bodyFat;
@@ -401,6 +432,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <br>
     * 0 == false, 1 == true
     */
+   @JsonProperty
    private int                   isPowerSensorPresent            = 0;                     // db-version 12
 
    // ############################################# PULSE #############################################
@@ -411,6 +443,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @since is float since db version 21, before it was int
     */
    @XmlElement
+   @JsonProperty
    private float                 avgPulse;                                             // db-version 4
 
    /**
@@ -419,6 +452,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @since is float since db version 21, before it was int
     */
    @XmlElement
+   @JsonProperty
    private float                 maxPulse;                                             // db-version 4
 
    /**
@@ -446,16 +480,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Time spent (in seconds) in the "Slow" cadence zone (for example: Hiking).
     */
+   @JsonProperty
    private int                   cadenceZone_SlowTime                        = 0;                     // db-version 40
 
    /**
     * Time spent (in seconds) in the "Fast" cadence zone (for example: Running).
     */
+   @JsonProperty
    private int                   cadenceZone_FastTime                        = 0;                     // db-version 40
 
    /**
     * The delimiter used when computing the existing values of cadenceZone_SlowTime & cadenceZone_FastTime
     */
+   @JsonProperty
    private int                   cadenceZones_DelimiterValue;
 
    /**
@@ -465,6 +502,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <br>
     * 0 == false, 1 == true
     */
+   @JsonProperty
    private int                   isPulseSensorPresent            = 0;                     // db-version 12
 
    // ############################################# DEVICE TOUR TYPE #############################################
@@ -479,12 +517,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * "B1" ski-bike
     */
    @Column(length = 2)
+   @JsonProperty
    private String                deviceTourType;
 
    /**
     * Visible name for the used profile which is defined in {@link #deviceMode}, e.g. Jogging,
     * Running, Bike1, Bike2...
     */
+   @JsonProperty
    private String                deviceModeName;                                       // db-version 4
 
    /**
@@ -493,6 +533,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @since is float since db version 21, before it was int
     */
    @XmlElement
+   @JsonProperty
    private float                 maxAltitude;                                          // db-version 4
 
    // ############################################# MAX VALUES #############################################
@@ -501,11 +542,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * maximum speed in metric system
     */
    @XmlElement
+   @JsonProperty
    private float                 maxSpeed;                                             // db-version 4
 
    /**
     * maximum pace in metric system
     */
+   @JsonProperty
    private float                 maxPace;
 
    // ############################################# AVERAGE VALUES #############################################
@@ -514,11 +557,13 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @since is float since db version 21, before it was int
     */
    @XmlElement
+   @JsonProperty
    private float                 avgCadence;                                             // db-version 4
 
    /**
     * Average temperature with metric system (from a weather provider or entered manually)
     */
+   @JsonProperty
    private float                 weather_Temperature_Average;                          // db-version 47
 
    /**
@@ -527,6 +572,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @since Is float since db version 21, before it was int. In db version 20 this field was
     *        already float but not the database field.
     */
+   @JsonProperty
    private float                 weather_Temperature_Average_Device;                   // db-version 4
 
    // ############################################# WEATHER #############################################
@@ -535,19 +581,22 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Is <code>true</code> when the weather data below is from the weather API and not
     * manually entered or from the device.
     */
-   private boolean               isWeatherDataFromProvider;
+   private boolean               isWeatherDataFromProvider;                            // db-version 39
 
    private int                   weather_Wind_Direction  = -1;                         // db-version 8
 
    /**
     * Speed in km/h
     */
+   @JsonProperty
    private int                   weather_Wind_Speed;                                   // db-version 8
+   @JsonProperty
    private String                weather_Clouds;                                       // db-version 8
 
    /**
     * Weather description
     */
+   @JsonProperty
    private String                weather;                                              // db-version 13
 
    /**
@@ -580,28 +629,41 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    // ############################################# POWER #############################################
 
    /** Unit is Watt */
+   @JsonProperty
    private float                 power_Avg;
 
    /** Unit is Watt */
+   @JsonProperty
    private int                   power_Max;
 
    /** Unit is Watt */
+   @JsonProperty
    private int                   power_Normalized;
 
    /** Functional Threshold Power (FTP) */
+   @JsonProperty
    private int                   power_FTP;
 
    /** Total work in Joule */
+   @JsonProperty
    private long                  power_TotalWork;
+   @JsonProperty
    private float                 power_TrainingStressScore;
+   @JsonProperty
    private float                 power_IntensityFactor;
 
+   @JsonProperty
    private int                   power_PedalLeftRightBalance;
+   @JsonProperty
    private float                 power_AvgLeftTorqueEffectiveness;
+   @JsonProperty
    private float                 power_AvgRightTorqueEffectiveness;
+   @JsonProperty
    private float                 power_AvgLeftPedalSmoothness;
+   @JsonProperty
    private float                 power_AvgRightPedalSmoothness;
 
+   @JsonProperty
    private String                power_DataSource;
 
    // ############################################# TRAINING #############################################
@@ -623,22 +685,29 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @param trainingEffect
     */
+   @JsonProperty
    private float                 training_TrainingEffect_Aerob;                        // db-version 38
+   @JsonProperty
    private float                 training_TrainingEffect_Anaerob;                      // db-version 38
+   @JsonProperty
    private float                 training_TrainingPerformance;                         // db-version 38
 
    // ############################################# OTHER TOUR/DEVICE DATA #############################################
 
    @XmlElement
+   @JsonProperty
    private String                tourTitle;                                            // db-version 4
 
    @XmlElement
+   @JsonProperty
    private String                tourDescription;                                      // db-version 4
 
    @XmlElement
+   @JsonProperty
    private String                tourStartPlace;                                       // db-version 4
 
    @XmlElement
+   @JsonProperty
    private String                tourEndPlace;                                         // db-version 4
 
    /**
@@ -671,6 +740,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Time difference in seconds between 2 time slices or <code>-1</code> for GPS devices when the
     * time slices has variable time duration
     */
+   @JsonProperty
    private short                 deviceTimeInterval               = -1;                // db-version 3
 
    /**
@@ -685,6 +755,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Firmware version of the device
     */
+   @JsonProperty
    private String                deviceFirmwareVersion;                                // db-version 12
 
    /**
@@ -733,6 +804,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <p>
     * a better name would be <i>pluginId</i>
     */
+   @JsonProperty
    private String                devicePluginId;
 
    // ############################################# PLUGIN DATA #############################################
@@ -742,6 +814,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <p>
     * a better name would be <i>pluginName</i>
     */
+   @JsonProperty
    private String                devicePluginName;                                     // db-version 4
 
    /**
@@ -764,29 +837,46 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    // ############################################# GEARS #############################################
 
+   @JsonProperty
    private int                   frontShiftCount;
+   @JsonProperty
    private int                   rearShiftCount;
 
    // ############################################# RUNNING DYNAMICS #######################################
 
+   @JsonProperty
    private short                 runDyn_StanceTime_Min;
+   @JsonProperty
    private short                 runDyn_StanceTime_Max;
+   @JsonProperty
    private float                 runDyn_StanceTime_Avg;
 
+   @JsonProperty
    private short                 runDyn_StanceTimeBalance_Min;
+   @JsonProperty
    private short                 runDyn_StanceTimeBalance_Max;
+   @JsonProperty
    private float                 runDyn_StanceTimeBalance_Avg;
 
+   @JsonProperty
    private short                 runDyn_StepLength_Min;
+   @JsonProperty
    private short                 runDyn_StepLength_Max;
+   @JsonProperty
    private float                 runDyn_StepLength_Avg;
 
+   @JsonProperty
    private short                 runDyn_VerticalOscillation_Min;
+   @JsonProperty
    private short                 runDyn_VerticalOscillation_Max;
+   @JsonProperty
    private float                 runDyn_VerticalOscillation_Avg;
 
+   @JsonProperty
    private short                 runDyn_VerticalRatio_Min;
+   @JsonProperty
    private short                 runDyn_VerticalRatio_Max;
+   @JsonProperty
    private float                 runDyn_VerticalRatio_Avg;
 
    // ############################################# SURFING #######################################
@@ -815,7 +905,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * -1 indicate that the value is not yet set
     */
+   @JsonProperty
    private short                 battery_Percentage_Start      = -1;
+   @JsonProperty
    private short                 battery_Percentage_End        = -1;
 
    // ############################################# UNUSED FIELDS - START #############################################
@@ -872,44 +964,47 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * Photos for this tour
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    private Set<TourPhoto>              tourPhotos                          = new HashSet<>();
 
    /**
     * Tour marker
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    @XmlElementWrapper(name = "TourMarkers")
    @XmlElement(name = "TourMarker")
+   @JsonProperty
    private Set<TourMarker>             tourMarkers                         = new HashSet<>();
 
    /**
     * Contains the tour way points
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private final Set<TourWayPoint>     tourWayPoints                       = new HashSet<>();
+   @JsonProperty
+   private  Set<TourWayPoint>          tourWayPoints                       = new HashSet<>();
 
    /**
     * Reference tours
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private final Set<TourReference>    tourReferences                     = new HashSet<>();
+   private  Set<TourReference>         tourReferences                     = new HashSet<>();
 
    /**
     * Tags
     */
    @ManyToMany(fetch = EAGER)
    @JoinTable(inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagID"))
-   private Set<TourTag>                tourTags                            = new HashSet<>();
+ @JsonProperty
+private Set<TourTag>                tourTags                            = new HashSet<>();
 
    /**
     * Sensors
     */
-   @OneToMany(fetch = FetchType.EAGER, cascade = ALL, mappedBy = "tourData")
+   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
    private Set<DeviceSensorValue>     deviceSensorValues                  = new HashSet<>();
 
@@ -924,6 +1019,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Category of the tour, e.g. bike, mountainbike, jogging, inlinescating
     */
    @ManyToOne
+   @JsonProperty
    private TourType                    tourType;
 
    /**
@@ -965,12 +1061,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * <b>always</b> set when tour is from a device or an imported file.
     */
    @Transient
+   @JsonProperty
    public int[]               timeSerie;
 
    /**
     * Contains the absolute distance in m (metric system) or <code>null</code> when not available
     */
    @Transient
+   @JsonProperty
    public float[]             distanceSerie;
 
    /**
@@ -996,6 +1094,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * available.
     */
    @Transient
+   @JsonProperty
    public float[]             altitudeSerie;
 
    /**
@@ -1033,12 +1132,14 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private boolean               _isSRTM1Values;
 
    @Transient
+   @JsonProperty
    private float[]               cadenceSerie;
 
    /**
     * Pulse values from the device
     */
    @Transient
+   @JsonProperty
    public float[]                pulseSerie;
 
    @Transient
@@ -1066,6 +1167,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * have multiple values, depending on the heartrate.</b>
     */
    @Transient
+   @JsonProperty
    public int[]                  pulseTime_Milliseconds;
 
    /**
@@ -1075,6 +1177,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * A time index value can be -1 when there is no pulse time within a second -> heartbeat value is below 60 bpm.
    */
    @Transient
+   @JsonProperty
    public int[]                  pulseTime_TimeIndex;
 
    /**
@@ -1092,9 +1195,16 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private boolean[]             pausedTimeSerie;
 
    /**
+    * This is a time serie like {@link #timeSerie} but contains only moving times, break times are 0
+    */
+   @Transient
+   private int[]                 movingTimeSerie;
+
+   /**
     * Contains the temperature in the metric measurement system.
     */
    @Transient
+   @JsonProperty
    public float[]                temperatureSerie;
 
    /**
@@ -1110,6 +1220,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * system is imperial
     */
    @Transient
+   @JsonProperty
    private float[]               speedSerie;
 
    @Transient
@@ -1186,6 +1297,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float[]               paceSerie_Summarized_Minute_Imperial;
 
    @Transient
+   @JsonProperty
    private float[]               powerSerie;
 
    /**
@@ -1214,9 +1326,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Contains tour latitude data or <code>null</code> when GPS data are not available.
     */
    @Transient
+   @JsonProperty
    public double[]               latitudeSerie;
 
    @Transient
+   @JsonProperty
    public double[]               longitudeSerie;
 
    /**
@@ -1236,6 +1350,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * </code>
     */
    @Transient
+   @JsonProperty
    public long[]                 gearSerie;
 
    /**
@@ -1679,16 +1794,19 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @since Version 18.7
     */
    @Transient
+   @JsonProperty
    public short[]       runDyn_StanceTime;
    @Transient
    private float[]      _runDyn_StanceTime_UI;
 
    @Transient
+   @JsonProperty
    public short[]       runDyn_StanceTimeBalance;
    @Transient
    private float[]      _runDyn_StanceTimeBalance_UI;
 
    @Transient
+   @JsonProperty
    public short[]       runDyn_StepLength;
    @Transient
    private float[]      _runDyn_StepLength_UI;
@@ -1696,6 +1814,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float[]      _runDyn_StepLength_UI_Imperial;
 
    @Transient
+   @JsonProperty
    public short[]       runDyn_VerticalOscillation;
    @Transient
    private float[]      _runDyn_VerticalOscillation_UI;
@@ -1703,6 +1822,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    private float[]      _runDyn_VerticalOscillation_UI_Imperial;
 
    @Transient
+   @JsonProperty
    public short[]       runDyn_VerticalRatio;
    @Transient
    private float[]      _runDyn_VerticalRatio_UI;
@@ -1717,6 +1837,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * {@link Short#MIN_VALUE} when value is not set.
     */
    @Transient
+   @JsonProperty
    public int[]         swim_Time;
 
    /**
@@ -1724,6 +1845,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * {@link Short#MIN_VALUE} when value is not set.
     */
    @Transient
+   @JsonProperty
    public short[]       swim_LengthType;
 
    @Transient
@@ -1733,6 +1855,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Swimming data: Number of strokes. Contains {@link Short#MIN_VALUE} when value is not set.
     */
    @Transient
+   @JsonProperty
    public short[]       swim_Strokes;
 
    @Transient
@@ -1743,6 +1866,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * Contains {@link Short#MIN_VALUE} when value is not set.
     */
    @Transient
+   @JsonProperty
    public short[]       swim_StrokeStyle;
 
    @Transient
@@ -1753,6 +1877,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * not set.
     */
    @Transient
+   @JsonProperty
    public short[]       swim_Cadence;
 
    @Transient
@@ -1778,6 +1903,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * With <code>null</code>, it will be ignored and all data points are visible.
     */
    @Transient
+   @JsonProperty
    public boolean[]     visibleDataPointSerie;
 
    /**
@@ -1788,16 +1914,18 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    /**
     * An array containing the start time of each pause (in milliseconds)
-    * A timer pause is a device event, triggered by the user or automatically triggerd by the device.
+    * A timer pause is a device event, triggered by the user or automatically triggered by the device.
     */
    @Transient
+   @JsonProperty
    private long[]       pausedTime_Start;
 
    /**
     * An array containing the end time of each pause (in milliseconds)
-    * A timer pause is a device event, triggered by the user or automatically triggerd by the device.
+    * A timer pause is a device event, triggered by the user or automatically triggered by the device.
     */
    @Transient
+   @JsonProperty
    private long[]       pausedTime_End;
 
    /**
@@ -1805,6 +1933,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * This field can be <code>null</code> when pause data are not available.
     */
    @Transient
+   @JsonProperty
    private long[]       pausedTime_Data;
 
    /**
@@ -1813,6 +1942,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @since after 21.6
     */
    @Transient
+   @JsonProperty
    private int[]         battery_Time;
 
    /**
@@ -1821,6 +1951,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @since after 21.6
     */
    @Transient
+   @JsonProperty
    private short[]       battery_Percentage;
 
 
@@ -2166,6 +2297,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       breakTimeSerie = null;
       pausedTimeSerie = null;
+      movingTimeSerie = null;
 
       _pulseSerie_Smoothed = null;
       pulseSerie_FromTime = null;
@@ -2244,10 +2376,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * This clone() method is cloning only a part of the tour, e.g. {@link #serieData} is not cloned
+    * This method is cloning only a part of the tour, e.g. {@link #serieData} is not
+    * cloned
     */
-   @Override
-   public Object clone() throws CloneNotSupportedException {
+   public Object clonePartly() throws CloneNotSupportedException {
 
       final TourData tourDataCopy = new TourData();
 
@@ -2622,30 +2754,73 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
-    * Computes and sets the altitude up/down values into {@link TourData}
+    * Computes and sets the elevation up/down values from the device into {@link TourData}
     *
-    * @return Returns <code>true</code> when altitude was computed otherwise <code>false</code>
+    * @return Returns <code>true</code> when elevation was computed otherwise <code>false</code>
     */
    public boolean computeAltitudeUpDown() {
 
-      if (altitudeSerie == null) {
+      return computeAltitudeUpDown(true);
+   }
+
+   public ElevationGainLoss computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
+                                                  final float selectedMinAltiDiff) {
+
+      return computeAltitudeUpDown_30_Algorithm_9_08(segmentSerieIndexParameter, selectedMinAltiDiff);
+   }
+
+   /**
+    * Computes and sets the elevation up/down values into {@link TourData}
+    *
+    * @param isElevationFromDevice
+    *           When <code>true</code> then device values are used ohterwise SRTM elevation values
+    * @return Returns <code>true</code> when altitude was computed otherwise <code>false</code>
+    */
+   public boolean computeAltitudeUpDown(final boolean isElevationFromDevice) {
+
+      float[] elevationSerie;
+
+      if (isElevationFromDevice) {
+
+         elevationSerie = altitudeSerie;
+
+      } else {
+
+         // elevation is from SRTM
+
+         elevationSerie = getSRTMSerie(true);
+
+         if (elevationSerie == null) {
+
+            TourLogManager.showLogView();
+
+            TourLogManager.log_INFO(String.format(
+                  Messages.Tour_Data_LogInfo_SRTM_DataAreNotAvailable,
+                  TourManager.getTourDateShort(this)));
+
+            if (altitudeSerie != null && altitudeSerie.length > 0) {
+
+               TourLogManager.subLog_INFO(String.format(
+                     Messages.Tour_Data_LogInfo_SRTM_UsingDeviceElevationValues,
+                     TourManager.getTourDateShort(this)));
+
+               elevationSerie = altitudeSerie;
+            }
+         }
+      }
+
+      if (elevationSerie == null) {
          return false;
       }
 
-      final AltitudeUpDown altiUpDown = computeAltitudeUpDown(0, altitudeSerie.length - 1);
+      final ElevationGainLoss altiUpDown = computeAltitudeUpDown(elevationSerie);
 
       if (altiUpDown != null) {
-         setTourAltUp(altiUpDown.altitudeUp);
-         setTourAltDown(altiUpDown.altitudeDown);
+         setTourAltUp(altiUpDown.elevationGain);
+         setTourAltDown(altiUpDown.elevationLoss);
       }
 
       return altiUpDown != null;
-   }
-
-   public AltitudeUpDown computeAltitudeUpDown(final ArrayList<AltitudeUpDownSegment> segmentSerieIndexParameter,
-                                               final float selectedMinAltiDiff) {
-
-      return computeAltitudeUpDown_30_Algorithm_9_08(segmentSerieIndexParameter, selectedMinAltiDiff);
    }
 
    /**
@@ -2654,19 +2829,23 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @param elevationSerie
     * @return
     */
-   public AltitudeUpDown computeAltitudeUpDown(final float[] elevationSerie) {
+   public ElevationGainLoss computeAltitudeUpDown(final float[] elevationSerie) {
 
       float prefDPTolerance;
 
       if (_isImportedMTTour) {
+
          // use imported value
          prefDPTolerance = dpTolerance / 10f;
+
       } else {
+
          prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
       }
 
-      AltitudeUpDown altiUpDown;
-      if (elevationSerie != null) {
+      ElevationGainLoss altiUpDown;
+
+      if (distanceSerie != null && elevationSerie != null) {
 
          // DP needs distance
 
@@ -2693,7 +2872,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns an <code>AltitudeUpDown</code> when altitude was computed otherwise
     *         <code>null</code>
     */
-   public AltitudeUpDown computeAltitudeUpDown(final int startIndex, final int endIndex) {
+   public ElevationGainLoss computeAltitudeUpDown(final int startIndex, final int endIndex) {
 
       float prefDPTolerance;
 
@@ -2704,7 +2883,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          prefDPTolerance = _prefStore.getFloat(ITourbookPreferences.COMPUTED_ALTITUDE_DP_TOLERANCE);
       }
 
-      AltitudeUpDown altiUpDown;
+      ElevationGainLoss altiUpDown;
       if (distanceSerie != null) {
 
          // DP needs distance
@@ -2734,10 +2913,10 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *           The end of the section for which to compute the elevation gain/loss
     * @return Returns <code>null</code> when altitude up/down cannot be computed
     */
-   private AltitudeUpDown computeAltitudeUpDown_20_Algorithm_DP(final float[] elevationSerie,
-                                                                final float dpTolerance,
-                                                                final int startIndex,
-                                                                final int endIndex) {
+   private ElevationGainLoss computeAltitudeUpDown_20_Algorithm_DP(final float[] elevationSerie,
+                                                                   final float dpTolerance,
+                                                                   final int startIndex,
+                                                                   final int endIndex) {
 
       // check if all necessary data are available
       if (elevationSerie == null
@@ -2787,7 +2966,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          prevAltitude = currentAltitude;
       }
 
-      return new AltitudeUpDown(altitudeUpTotal, -altitudeDownTotal);
+      return new ElevationGainLoss(altitudeUpTotal, -altitudeDownTotal);
    }
 
    /**
@@ -2803,8 +2982,8 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @param minAltiDiff
     * @return Returns <code>null</code> when altitude up/down cannot be computed
     */
-   private AltitudeUpDown computeAltitudeUpDown_30_Algorithm_9_08(final ArrayList<AltitudeUpDownSegment> segmentSerie,
-                                                                  final float minAltiDiff) {
+   private ElevationGainLoss computeAltitudeUpDown_30_Algorithm_9_08(final ArrayList<AltitudeUpDownSegment> segmentSerie,
+                                                                     final float minAltiDiff) {
 
       // check if all necessary data are available
       if ((altitudeSerie == null) || (timeSerie == null) || (timeSerie.length < 2)) {
@@ -2977,7 +3156,28 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
          prevAltitude = altitude;
       }
 
-      return new AltitudeUpDown(altitudeUpTotal, -altitudeDownTotal);
+      return new ElevationGainLoss(altitudeUpTotal, -altitudeDownTotal);
+   }
+
+   /**
+    * @return Returns elevation up/down values from SRTM data or <code>null</code> when not
+    *         available
+    */
+   public ElevationGainLoss computeAltitudeUpDown_FromSRTM() {
+
+      final float[] srtmSerie = getSRTMSerie(true);
+
+      if (srtmSerie == null) {
+
+         return null;
+      }
+
+      final ElevationGainLoss elevationUpDown = computeAltitudeUpDown(srtmSerie);
+
+      setTourAltUp(elevationUpDown.elevationGain);
+      setTourAltDown(elevationUpDown.elevationLoss);
+
+      return elevationUpDown;
    }
 
    public float computeAvg_Altitude(final int valueIndexLeft, final int valueIndexRight) {
@@ -3221,7 +3421,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       int nextTime = timeSerie[firstIndex + 1];
 
       /**
-       * a break is set from the previous to the current time slice
+       * A break is set from the previous to the current time slice
        */
       final boolean hasBreakTime = breakTimeSerie != null;
       boolean isPrevBreak = hasBreakTime ? breakTimeSerie[firstIndex] : false;
@@ -5605,6 +5805,74 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    /**
+    * Create a deep copy of this TourData into a new TourData
+    *
+    * @return Returns a deep copy of this tour
+    */
+   public TourData createDeepCopy() {
+
+      final TourData tourData_DeepCopy = SerializationUtils.clone(this);
+
+      // set a unique tour ID
+      tourData_DeepCopy.tourId = System.nanoTime();
+
+      /**
+       * Setup collections except @ManyToMany relations, e.g. TourTags they must not be modified
+       * because they are used in other tours
+       */
+      for (final TourPhoto tourPhoto : tourData_DeepCopy.tourPhotos) {
+         tourPhoto.setupDeepClone(tourData_DeepCopy);
+      }
+
+      for (final TourMarker tourMarker : tourData_DeepCopy.tourMarkers) {
+         tourMarker.setupDeepClone(tourData_DeepCopy);
+      }
+
+      for (final TourWayPoint tourWayPoint : tourData_DeepCopy.tourWayPoints) {
+         tourWayPoint.setupDeepClone(tourData_DeepCopy);
+      }
+
+      for (final DeviceSensorValue sensorValue : tourData_DeepCopy.deviceSensorValues) {
+         sensorValue.setupDeepClone(tourData_DeepCopy);
+      }
+
+      /**
+       * Convert PersistentSet into a "normal" set otherwise this exception occurs
+       * <p>
+       * org.hibernate.HibernateException: Don't change the reference to a collection with
+       * cascade="all-delete-orphan": net.tourbook.data.TourData.deviceSensorValues
+       */
+
+      final Set<TourPhoto> tourPhotos_Clone = new HashSet<>();
+      tourPhotos_Clone.addAll(tourData_DeepCopy.tourPhotos);
+      tourData_DeepCopy.tourPhotos = tourPhotos_Clone;
+
+      final Set<TourMarker> tourMarkers_Clone = new HashSet<>();
+      tourMarkers_Clone.addAll(tourData_DeepCopy.tourMarkers);
+      tourData_DeepCopy.tourMarkers = tourMarkers_Clone;
+
+      final Set<TourWayPoint> tourWayPoints_Clone = new HashSet<>();
+      tourWayPoints_Clone.addAll(tourData_DeepCopy.tourWayPoints);
+      tourData_DeepCopy.tourWayPoints = tourWayPoints_Clone;
+
+      final Set<TourTag> tourTags_Clone = new HashSet<>();
+      tourTags_Clone.addAll(tourData_DeepCopy.tourTags);
+      tourData_DeepCopy.tourTags = tourTags_Clone;
+
+      final Set<DeviceSensorValue> deviceSensor_Clone = new HashSet<>();
+      deviceSensor_Clone.addAll(tourData_DeepCopy.deviceSensorValues);
+      tourData_DeepCopy.deviceSensorValues = deviceSensor_Clone;
+
+      /**
+       * TourReferences are special, they are bound to the original tour and need to be
+       * created manually and not cloned
+       */
+      tourData_DeepCopy.tourReferences = new HashSet<>();
+
+      return tourData_DeepCopy;
+   }
+
+   /**
     * Create {@link Photo}'s from {@link TourPhoto}'s which are displayed in views, e.g. tour chart,
     * map, ...
     */
@@ -7193,29 +7461,29 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
       out.println("Tour distance (m):   " + getTourDistance()); //$NON-NLS-1$
 
-      out.println(
-            "Tour time:      " //$NON-NLS-1$
-                  + (tourDeviceTime_Elapsed / 3600)
-                  + UI.SYMBOL_COLON
-                  + ((tourDeviceTime_Elapsed % 3600) / 60)
-                  + UI.SYMBOL_COLON
-                  + (tourDeviceTime_Elapsed % 3600) % 60);
+      out.println("Tour time:      " //$NON-NLS-1$
 
-      out.println(
-            "Recorded time:      " //$NON-NLS-1$
-                  + (getTourDeviceTime_Recorded() / 3600)
-                  + UI.SYMBOL_COLON
-                  + ((getTourDeviceTime_Recorded() % 3600) / 60)
-                  + UI.SYMBOL_COLON
-                  + (getTourDeviceTime_Recorded() % 3600) % 60);
+            + (tourDeviceTime_Elapsed / 3600)
+            + UI.SYMBOL_COLON
+            + ((tourDeviceTime_Elapsed % 3600) / 60)
+            + UI.SYMBOL_COLON
+            + (tourDeviceTime_Elapsed % 3600) % 60);
 
-      out.println(
-            "Moving time:      " //$NON-NLS-1$
-                  + (getTourComputedTime_Moving() / 3600)
-                  + UI.SYMBOL_COLON
-                  + ((getTourComputedTime_Moving() % 3600) / 60)
-                  + UI.SYMBOL_COLON
-                  + (getTourComputedTime_Moving() % 3600) % 60);
+      out.println("Recorded time:      " //$NON-NLS-1$
+
+            + (getTourDeviceTime_Recorded() / 3600)
+            + UI.SYMBOL_COLON
+            + ((getTourDeviceTime_Recorded() % 3600) / 60)
+            + UI.SYMBOL_COLON
+            + (getTourDeviceTime_Recorded() % 3600) % 60);
+
+      out.println("Moving time:      " //$NON-NLS-1$
+
+            + (getTourComputedTime_Moving() / 3600)
+            + UI.SYMBOL_COLON
+            + ((getTourComputedTime_Moving() % 3600) / 60)
+            + UI.SYMBOL_COLON
+            + (getTourComputedTime_Moving() % 3600) % 60);
 
       out.println("Altitude up (m):   " + getTourAltUp()); //$NON-NLS-1$
       out.println("Altitude down (m):   " + getTourAltDown()); //$NON-NLS-1$
@@ -7771,7 +8039,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns {@link ZonedDateTime} when the tour was created or <code>null</code> when
     *         date/time is not available
     */
-   @JsonIgnore
    public ZonedDateTime getDateTimeCreated() {
 
       if (_dateTimeCreated != null || dateTimeCreated == 0) {
@@ -7787,7 +8054,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns {@link ZonedDateTime} when the tour was modified or <code>null</code> when
     *         date/time is not available
     */
-   @JsonIgnore
    public ZonedDateTime getDateTimeModified() {
 
       if (_dateTimeModified != null || dateTimeModified == 0) {
@@ -8051,7 +8317,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getHrZone0() {
       return hrZone0;
    }
@@ -8061,7 +8326,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getHrZone1() {
       return hrZone1;
    }
@@ -8071,7 +8335,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getHrZone2() {
       return hrZone2;
    }
@@ -8081,7 +8344,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getHrZone3() {
       return hrZone3;
    }
@@ -8091,7 +8353,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getHrZone4() {
       return hrZone4;
    }
@@ -8101,7 +8362,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getHrZone5() {
       return hrZone5;
    }
@@ -8111,7 +8371,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getHrZone6() {
       return hrZone6;
    }
@@ -8121,7 +8380,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getHrZone7() {
       return hrZone7;
    }
@@ -8131,7 +8389,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getHrZone8() {
       return hrZone8;
    }
@@ -8141,7 +8398,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getHrZone9() {
       return hrZone9;
    }
@@ -8242,7 +8498,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public short getIsDistanceFromSensor() {
       return isDistanceFromSensor;
    }
@@ -8252,7 +8507,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getIsPowerSensorPresent() {
       return isPowerSensorPresent;
    }
@@ -8262,7 +8516,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getIsPulseSensorPresent() {
       return isPulseSensorPresent;
    }
@@ -8272,7 +8525,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public short getIsStrideSensorPresent() {
       return isStrideSensorPresent;
    }
@@ -8337,6 +8589,56 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return distanceSerie;
    }
 
+   public int[] getMovingTimeSerie() {
+
+      if (movingTimeSerie != null) {
+         return movingTimeSerie;
+      }
+
+      // check if data are available
+      if (timeSerie == null || timeSerie.length == 0) {
+         return null;
+      }
+
+      // get break time when not yet set
+      if (breakTimeSerie == null) {
+         getBreakTime();
+      }
+
+      // check again, a break needs a distance serie
+      if (breakTimeSerie == null) {
+         return null;
+      }
+
+      final int numTimeSlices = timeSerie.length;
+
+      movingTimeSerie = new int[numTimeSlices];
+
+      int sumBreakTimes = 0;
+
+      final int[] timeSerie2 = timeSerie;
+      final boolean[] breakTimeSerie2 = breakTimeSerie;
+
+      for (int serieIndex = 1; serieIndex < numTimeSlices; serieIndex++) {
+
+         final int currentTime = timeSerie2[serieIndex];
+
+         final boolean isBreakTime = breakTimeSerie2[serieIndex];
+
+         if (isBreakTime) {
+
+            final int prevTime = timeSerie2[serieIndex - 1];
+            final int timeDiff = currentTime - prevTime;
+
+            sumBreakTimes += timeDiff;
+         }
+
+         movingTimeSerie[serieIndex] = currentTime - sumBreakTimes;
+      }
+
+      return movingTimeSerie;
+   }
+
    /**
     * @param geoAccuracy
     * @param distanceAccuracy
@@ -8374,7 +8676,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getNumberOfPhotos() {
       return numberOfPhotos;
    }
@@ -8543,7 +8844,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return pausedTime_Start;
    }
 
-   @JsonIgnore
    public boolean[] getPausedTimeSerie() {
 
       if (pausedTimeSerie == null) {
@@ -8814,7 +9114,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return pulseSerie_FromTime;
    }
 
-   @JsonIgnore
    public String[] getPulse_RRIntervals() {
 
       if (pulseTime_TimeIndex == null) {
@@ -9150,7 +9449,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public SerieData getSerieData() {
       return serieData;
    }
@@ -9263,7 +9561,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns SRTM metric or imperial data serie depending on the active measurement or
     *         <code>null</code> when SRTM data serie is not available
     */
-   @JsonIgnore
    public float[] getSRTMSerie(final boolean isUseSRTM1Values) {
 
       if (latitudeSerie == null) {
@@ -9307,7 +9604,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *         <p>
     *         or <code>null</code> when SRTM data serie is not available
     */
-   @JsonIgnore
    public float[][] getSRTMValues(final boolean isUseSRTM1Values) {
 
       if (latitudeSerie == null) {
@@ -9360,7 +9656,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       return startWeekYear;
    }
 
-   @JsonIgnore
    public short getStartYear() {
       return startYear;
    }
@@ -9438,7 +9733,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *
     * @return
     */
-   @JsonIgnore
    public int getTemperatureScale() {
       return temperatureScale;
    }
@@ -9606,7 +9900,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns the tour time zone id, when the tour time zone is not set in the tour, then
     *         the default time zone is returned which is defined in the preferences.
     */
-   @JsonIgnore
    public ZoneId getTimeZoneIdWithDefault() {
 
       final String zoneIdRaw = timeZoneId == null //
@@ -9663,7 +9956,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * !!! THIS VALUE IS NOT CACHED BECAUSE WHEN THE DEFAULT TIME ZONE IS CHANGING THEN THIS VALUE IS
     * WRONG !!!
     */
-   @JsonIgnore
    public TourDateTime getTourDateTime() {
 
       return TimeTools.createTourDateTime(tourStartTime, timeZoneId);
@@ -9730,7 +10022,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns a set with all {@link TourMarker} for the tour or an empty set when markers
     *         are not available.
     */
-   @JsonIgnore
    public Set<TourMarker> getTourMarkers() {
       return tourMarkers;
    }
@@ -9738,7 +10029,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    /**
     * @return Returns {@link TourMarker}'s sorted by serie index.
     */
-   @JsonProperty("tourMarkers")
    public ArrayList<TourMarker> getTourMarkersSorted() {
 
       if (_sortedMarkers != null) {
@@ -9785,7 +10075,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     * @return Returns the tour start date time with the tour time zone, when not available with the
     *         default time zone.
     */
-   @JsonIgnore
    public ZonedDateTime getTourStartTime() {
 
       if (_zonedStartTime == null) {
@@ -10027,11 +10316,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     */
    public boolean isContainReferenceTour() {
 
-      if (tourReferences == null) {
-         return false;
-      } else {
-         return tourReferences.size() > 0;
-      }
+      return tourReferences.size() > 0;
    }
 
    /**
@@ -10144,7 +10429,6 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
     *         Returns <code>true</code> then {@link #srtmSerie} contains SRTM 1 values or partly,
     *         otherwise SRTM 3 values
     */
-   @JsonIgnore
    public boolean isSRTM1Values() {
       return _isSRTM1Values;
    }
@@ -10178,6 +10462,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
 
    public boolean isSurfing_IsMinDistance() {
       return surfing_IsMinDistance;
+   }
+
+   public boolean isTemperatureAvailable() {
+
+      return getWeather_Temperature_Average() != 0 ||
+            getWeather_Temperature_Max() != 0 ||
+            getWeather_Temperature_Min() != 0 ||
+            getWeather_Temperature_WindChill() != 0 ||
+            isWeatherDataFromProvider();
    }
 
    public boolean isTimeSerieWithTimeZoneAdjustment() {
@@ -11451,6 +11744,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
    }
 
    public void setTourAltUp(final float tourAltUp) {
+
       this.tourAltUp = (int) (tourAltUp + 0.5);
    }
 
@@ -12463,6 +12757,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Cloneable
       mapper.setSerializationInclusion(Include.NON_EMPTY);
       mapper.setConfig(mapper.getSerializationConfig()
             .with(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY));
+      mapper.setVisibility(PropertyAccessor.ALL, Visibility.NONE);
+      mapper.setVisibility(PropertyAccessor.FIELD, Visibility.NONE);
+      mapper.setVisibility(PropertyAccessor.GETTER, Visibility.NONE);
+      mapper.setVisibility(PropertyAccessor.IS_GETTER, Visibility.NONE);
+      mapper.setVisibility(PropertyAccessor.SETTER, Visibility.NONE);
 
       String jsonString = UI.EMPTY_STRING;
       try {

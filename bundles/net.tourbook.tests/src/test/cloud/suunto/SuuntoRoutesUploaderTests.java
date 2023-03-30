@@ -118,6 +118,6 @@ public class SuuntoRoutesUploaderTests {
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "7/4/20, 5:00 AM -> Uploaded Route Id: \"634f49bf87e35c5a61e64947\""))); //$NON-NLS-1$
+            "7/4/2020, 5:00 AM -> Uploaded Route Id: \"634f49bf87e35c5a61e64947\""))); //$NON-NLS-1$
    }
 }

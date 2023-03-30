@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -19,6 +19,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 
+import net.tourbook.common.UI;
+import net.tourbook.common.time.TimeTools;
 import net.tourbook.data.TourData;
 import net.tourbook.importdata.DeviceData;
 import net.tourbook.importdata.ImportState_File;
@@ -37,6 +39,10 @@ public abstract class DeviceDataReaderTester {
 
       Initializer.initializeDatabase();
       newlyImportedTours = new HashMap<>();
+
+      // Set the default timezone in order for the imported tour times to be
+      // identical regardless of the machine's timezone on which the tests are run
+      TimeTools.setDefaultTimeZone(UI.TIME_ZONE_UTC);
    }
 
    @AfterEach

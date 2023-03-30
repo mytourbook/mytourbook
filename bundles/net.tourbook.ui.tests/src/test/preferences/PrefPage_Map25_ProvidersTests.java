@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,7 @@ public class PrefPage_Map25_ProvidersTests extends UITest {
 
    private void openMapProviderPreferencePage() {
 
-      bot.tree().getTreeItem("2.5D Map").expand().getNode("Map Provider").select(); //$NON-NLS-1$
+      bot.tree().getTreeItem("2.5D Map").expand().getNode("Map Provider").select(); //$NON-NLS-1$ //$NON-NLS-2$
    }
 
    @Test

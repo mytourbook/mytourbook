@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2021 Frédéric Bard
+ * Copyright (C) 2021, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,12 +24,12 @@ import org.eclipse.swt.widgets.Button;
 
 public class DialogUtils {
 
-   static final Color LOCK_COLOR_DARK  = new Color(0x0, 0xff, 0x0);
-   static final Color LOCK_COLOR_LIGHT = new Color(0x0, 0xb0, 0x0);
+   public static final Color LOCK_COLOR_DARK  = new Color(0x0, 0xff, 0x0);
+   public static final Color LOCK_COLOR_LIGHT = new Color(0x0, 0xb0, 0x0);
 
-   public static void addTourValueTypeFromCheckbox(final Button checkButton,
-                                                   final TourValueType tourValueType,
-                                                   final List<TourValueType> tourValueTypes) {
+   static void addTourValueTypeFromCheckbox(final Button checkButton,
+                                            final TourValueType tourValueType,
+                                            final List<TourValueType> tourValueTypes) {
 
       if (checkButton.getSelection()) {
          tourValueTypes.add(tourValueType);

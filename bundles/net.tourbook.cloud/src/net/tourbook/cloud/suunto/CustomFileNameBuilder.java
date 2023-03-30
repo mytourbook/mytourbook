@@ -29,7 +29,7 @@ import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.suunto.workouts.Payload;
 import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.data.TourPerson;
 
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -69,7 +69,7 @@ public class CustomFileNameBuilder {
 
          case SUUNTO_FILE_NAME:
 
-            customizedFileName.append(FilesUtils.removeExtensions(suuntoFileName));
+            customizedFileName.append(FileUtils.removeExtensions(suuntoFileName));
             break;
 
          case FIT_EXTENSION:

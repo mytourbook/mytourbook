@@ -26,7 +26,7 @@ public class FilesUtilsTests {
    void testRemoveExtensions() {
 
       assertAll(
-            () -> assertEquals("file.json", FilesUtils.removeExtensions("file.json.gz")), //$NON-NLS-1$ //$NON-NLS-2$
-            () -> assertEquals("file", FilesUtils.removeExtensions("file"))); //$NON-NLS-1$ //$NON-NLS-2$
+            () -> assertEquals("file.json", FileUtils.removeExtensions("file.json.gz")), //$NON-NLS-1$ //$NON-NLS-2$
+            () -> assertEquals("file", FileUtils.removeExtensions("file"))); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }

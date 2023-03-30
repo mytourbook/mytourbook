@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -56,7 +56,24 @@ import org.eclipse.ui.part.ViewPart;
 
 public class SearchView extends ViewPart implements ISearchView {
 
-   public static final String     ID                             = "net.tourbook.search.SearchView"; //$NON-NLS-1$
+   public static final String   ID                      = "net.tourbook.search.SearchView";                   //$NON-NLS-1$
+
+   private static final String  SYS_PROP__FORCE_BROWSER = "forceBrowserForTourSeachInLinux";                  //$NON-NLS-1$
+
+   private static final boolean _isForceBrowser         = System.getProperty(SYS_PROP__FORCE_BROWSER) != null;
+   private static final boolean _isUseEmbeddedBrowser   = _isForceBrowser == false;
+
+   static {
+
+      if (_isForceBrowser) {
+
+         Util.logSystemProperty_IsEnabled(
+
+               SearchView.class,
+               SYS_PROP__FORCE_BROWSER,
+               "The browser UI is forced for the tour search in Linux"); //$NON-NLS-1$
+      }
+   }
 
    private static final String    STATE_USE_EXTERNAL_WEB_BROWSER = "STATE_USE_EXTERNAL_WEB_BROWSER"; //$NON-NLS-1$
 
@@ -194,7 +211,7 @@ public class SearchView extends ViewPart implements ISearchView {
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      if (UI.IS_WIN) {
+      if (UI.IS_WIN || _isUseEmbeddedBrowser) {
 
          // internal browser
          _pageWinInternalBrowser = new Composite(_pageBook, SWT.NONE);
@@ -324,7 +341,7 @@ public class SearchView extends ViewPart implements ISearchView {
 
    private void enableActions() {
 
-      _actionExternalSearchUI.setEnabled(UI.IS_WIN);
+      _actionExternalSearchUI.setEnabled(UI.IS_WIN || _isUseEmbeddedBrowser);
    }
 
    private void fillActionBars() {
@@ -363,7 +380,7 @@ public class SearchView extends ViewPart implements ISearchView {
    @Override
    public void setFocus() {
 
-      if (UI.IS_WIN) {
+      if (UI.IS_WIN || _isUseEmbeddedBrowser) {
 
          final boolean isInternal = _actionExternalSearchUI.isChecked() == false;
 
@@ -376,7 +393,7 @@ public class SearchView extends ViewPart implements ISearchView {
 
    private void showUIPage() {
 
-      if (UI.IS_WIN) {
+      if (UI.IS_WIN || _isUseEmbeddedBrowser) {
 
          final boolean isExternal = _actionExternalSearchUI.isChecked();
 

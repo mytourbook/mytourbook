@@ -181,24 +181,26 @@ Build Product
       - Run "mvn verify -P build-release -X --log-file ../log.txt" - this will log into a file
 
 
-Build Update site
+Build Update Site
 ------------------
 
-   BEFORE !!!
+   !!! BEFORE !!!
    
    1. Set version numbers like in this commit https://github.com/mytourbook/mytourbook/commit/4ad360673bea889647dfb54f7c754c8bb41984b0
    2. Run "CREATE_MT_BuildFiles.xml" BEFORE the following commands
 
-   Open cmd
-      - Select folder "C:\DAT\MT\mytourbook"
-      - Run "mvn verify -P build-update-site"
+   * WITH NL
+   
+      Open cmd
+         - Select folder      "cd C:\DAT\MT\mytourbook"
+         - Run                "mvn verify -P build-update-site"
 
 
-   * without NL
+   * WITHOUT NL
 
-   Open cmd
-      - Select folder "C:\DAT\MT\mytourbook"
-      - Run "mvn verify -P build-update-site-no-nl"
+      Open cmd
+         - Select folder      "cd C:\DAT\MT\mytourbook"
+         - Run                "mvn verify -P build-update-site-no-nl"
 
 
 

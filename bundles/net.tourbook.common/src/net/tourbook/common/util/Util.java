@@ -56,7 +56,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.RGBA;
-import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -649,13 +648,6 @@ public class Util {
       } catch (final SecurityException e) {
          StatusUtil.showStatus(String.format("Temp file cannot be deleted: %s", tempFile.getAbsolutePath())); //$NON-NLS-1$
       }
-   }
-
-   public static Resource disposeResource(final Resource resource) {
-      if (resource != null && !resource.isDisposed()) {
-         resource.dispose();
-      }
-      return null;
    }
 
    public static void dumpChildren(final Control parent, final int indent) {
@@ -1253,6 +1245,44 @@ public class Util {
 
       try {
          return state.get(key) == null ? defaultValue : state.getInt(key);
+      } catch (final NumberFormatException e) {
+         return defaultValue;
+      }
+   }
+
+   /**
+    * @param state
+    * @param key
+    * @param defaultValue
+    * @param minValue
+    * @param maxValue
+    * @return Returns an integer value from {@link IDialogSettings}. When the key is not found, the
+    *         default value is returned.
+    */
+   public static int getStateInt(final IDialogSettings state,
+                                 final String key,
+                                 final int defaultValue,
+                                 final int minValue,
+                                 final int maxValue) {
+
+      if (state == null) {
+         return defaultValue;
+      }
+
+      try {
+
+         final int stateValue = state.get(key) == null ? defaultValue : state.getInt(key);
+
+         if (stateValue < minValue) {
+            return minValue;
+         }
+
+         if (stateValue > maxValue) {
+            return maxValue;
+         }
+
+         return stateValue;
+
       } catch (final NumberFormatException e) {
          return defaultValue;
       }

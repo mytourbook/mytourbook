@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -37,7 +37,7 @@ import net.tourbook.data.TourPerson;
 import net.tourbook.database.PersonManager;
 import net.tourbook.database.TourDatabase;
 import net.tourbook.map.bookmark.MapBookmarkManager;
-import net.tourbook.map.player.MapPlayerManager;
+import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map3.view.Map3Manager;
 import net.tourbook.map3.view.Map3State;
 import net.tourbook.photo.PhotoUI;
@@ -46,6 +46,7 @@ import net.tourbook.preferences.PrefPagePeople;
 import net.tourbook.proxy.DefaultProxySelector;
 import net.tourbook.proxy.IPreferences;
 import net.tourbook.search.FTSearchManager;
+import net.tourbook.tag.TagManager;
 import net.tourbook.tag.TagMenuManager;
 import net.tourbook.tag.tour.filter.TourTagFilterManager;
 import net.tourbook.tour.TourTypeFilterManager;
@@ -76,7 +77,6 @@ import org.eclipse.ui.IPageListener;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IPropertyListener;
-import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISelectionService;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -114,8 +114,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
    private IPropertyListener                 _partPropertyListener;
 
-   public ApplicationWorkbenchWindowAdvisor(final ApplicationWorkbenchAdvisor wbAdvisor,
-                                            final IWorkbenchWindowConfigurer configurer) {
+   ApplicationWorkbenchWindowAdvisor(final ApplicationWorkbenchAdvisor wbAdvisor,
+                                     final IWorkbenchWindowConfigurer configurer) {
       super(configurer);
 
       _wbAdvisor = wbAdvisor;
@@ -340,16 +340,13 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
          public void partVisible(final IWorkbenchPartReference ref) {}
       });
 
-      _partPropertyListener = new IPropertyListener() {
-         @Override
-         public void propertyChanged(final Object source, final int propId) {
+      _partPropertyListener = (source, propId) -> {
 
-            if (propId == IWorkbenchPartConstants.PROP_TITLE) {
-               if (_lastActivePart != null) {
-                  final String newTitle = _lastActivePart.getTitle();
-                  if (!_lastPartTitle.equals(newTitle)) {
-                     recomputeTitle();
-                  }
+         if (propId == IWorkbenchPartConstants.PROP_TITLE) {
+            if (_lastActivePart != null) {
+               final String newTitle = _lastActivePart.getTitle();
+               if (!_lastPartTitle.equals(newTitle)) {
+                  recomputeTitle();
                }
             }
          }
@@ -358,11 +355,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
    private void loadPeopleData() {
 
-      try (Connection conn = TourDatabase.getInstance().getConnection()) {
+      final String sqlString = "SELECT *  FROM " + TourDatabase.TABLE_TOUR_PERSON; //$NON-NLS-1$
 
-         final String sqlString = "SELECT *  FROM " + TourDatabase.TABLE_TOUR_PERSON; //$NON-NLS-1$
+      try (Connection conn = TourDatabase.getInstance().getConnection();
+            final PreparedStatement statement = conn.prepareStatement(sqlString)) {
 
-         final PreparedStatement statement = conn.prepareStatement(sqlString);
          final ResultSet result = statement.executeQuery();
 
          if (result.next()) {
@@ -434,6 +431,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       // do last cleanup, this dispose causes NPE in e4 when run in dispose() method
 
+      TagManager.disposeTagImages();
       TourTypeImage.dispose();
    }
 
@@ -465,18 +463,15 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
    @Override
    public void postWindowOpen() {
 
-      Display.getDefault().asyncExec(new Runnable() {
-         @Override
-         public void run() {
+      Display.getDefault().asyncExec(() -> {
 
-            TagMenuManager.restoreTagState();
-            TourTypeMenuManager.restoreState();
+         TagMenuManager.restoreTagState();
+         TourTypeMenuManager.restoreState();
 
-            loadPeopleData();
-            setupAppSelectionListener();
+         loadPeopleData();
+         setupAppSelectionListener();
 
-            setupProxy();
-         }
+         setupProxy();
       });
    }
 
@@ -515,6 +510,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       // must be initialized early to set photoServiceProvider in the Photo
       TourPhotoManager.restoreState();
 
+      ModelPlayerManager.restoreState();
+
       FormatManager.updateDisplayFormats();
 
       ThemeUtil.setupTheme();
@@ -542,7 +539,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       TourGeoFilter_Manager.saveState();
       TourPhotoManager.saveState();
       MapBookmarkManager.saveState();
-      MapPlayerManager.saveState();
+      ModelPlayerManager.saveState();
       SwimStrokeManager.saveState();
 
       FTSearchManager.closeIndexReaderSuggester();
@@ -594,15 +591,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             .getActiveWorkbenchWindow()
             .getSelectionService();
 
-      selectionService.addPostSelectionListener(new ISelectionListener() {
-         @Override
-         public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
-            onPostSelectionChanged(part, selection);
-         }
-      });
+      selectionService.addPostSelectionListener(this::onPostSelectionChanged);
    }
-
-
 
    /**
     * Updates the window title. Format will be:

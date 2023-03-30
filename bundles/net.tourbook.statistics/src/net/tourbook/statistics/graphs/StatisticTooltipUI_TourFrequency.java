@@ -1,5 +1,5 @@
 /******************************************************  *************************
- * Copyright (C) 2020, 2021 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,6 +15,7 @@
  *******************************************************************************/
 package net.tourbook.statistics.graphs;
 
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
@@ -54,7 +55,6 @@ import org.eclipse.swt.widgets.ToolBar;
 
 public class StatisticTooltipUI_TourFrequency {
 
-   private static final String APP_ACTION_CLOSE_TOOLTIP = net.tourbook.common.Messages.App_Action_Close_Tooltip;
    private static final String NUMBERS_UNIT             = net.tourbook.statistics.Messages.NUMBERS_UNIT;
 
    // Dashes:  – — …
@@ -142,7 +142,7 @@ public class StatisticTooltipUI_TourFrequency {
 
          super(null, IAction.AS_PUSH_BUTTON);
 
-         setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
+         setToolTipText(OtherMessages.APP_ACTION_CLOSE_TOOLTIP);
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 

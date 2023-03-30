@@ -18,7 +18,7 @@ package net.tourbook.map25.renderer;
 import static org.oscim.renderer.MapRenderer.COORD_SCALE;
 
 import net.tourbook.common.color.ColorUtil;
-import net.tourbook.map.player.MapPlayerManager;
+import net.tourbook.map.player.ModelPlayerManager;
 import net.tourbook.map25.Map25ConfigManager;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig;
 import net.tourbook.map25.layer.tourtrack.Map25TrackConfig.LineColorMode;
@@ -927,7 +927,7 @@ public class TourTrack_LayerRenderer extends LayerRenderer {
        * Keep zoomlevel for the animation, otherwise the old zoomlevel would be used which is
        * causing flickering
        */
-      MapPlayerManager.setCompileMapScale(
+      ModelPlayerManager.setCompileMapScale(
             _compileMapPosition.x,
             _compileMapPosition.y,
             _compileMapPosition.scale);

@@ -21,6 +21,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 
+import net.tourbook.Messages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.NIO;
 import net.tourbook.common.UI;
@@ -28,6 +29,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
 import net.tourbook.map25.animation.GLTFModel_Renderer;
+import net.tourbook.model.ModelActivator;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Platform;
@@ -41,45 +43,49 @@ import org.osgi.framework.Version;
  */
 public class MapModelManager {
 
-   private static final String        USER_CONFIG_FILE_NAME         = "map-models.xml";                       //$NON-NLS-1$
-   private static final String        DEFAULT_CONFIG_FILE_NAME_PATH = "/map-models/default-map-models.xml";   //$NON-NLS-1$
+   private static final String        USER_CONFIG_FILE_NAME            = "map-models.xml";                       //$NON-NLS-1$
+   private static final String        DEFAULT_CONFIG_FILE_NAME_PATH    = "/map-models/default-map-models.xml";   //$NON-NLS-1$
 
    /**
     * Version number is not yet used
     */
-   private static final int           CONFIG_VERSION                = 1;
+   private static final int           CONFIG_VERSION                   = 1;
 
-   private static final String        TAG_ROOT                      = "MapModels";                            //$NON-NLS-1$
-   private static final String        ATTR_CONFIG_VERSION           = "configVersion";                        //$NON-NLS-1$
+   private static final String        TAG_ROOT                         = "MapModels";                            //$NON-NLS-1$
+   private static final String        ATTR_CONFIG_VERSION              = "configVersion";                        //$NON-NLS-1$
 
-   private static final String        TAG_ALL_MAP_MODELS            = "AllMapModels";                         //$NON-NLS-1$
-   private static final String        TAG_MAP_MODELS                = "MapModel";                             //$NON-NLS-1$
+   private static final String        TAG_ALL_MAP_MODELS               = "AllMapModels";                         //$NON-NLS-1$
+   private static final String        TAG_MAP_MODELS                   = "MapModel";                             //$NON-NLS-1$
 
-   private static final String        ATTR_DESCRIPTION              = "description";                          //$NON-NLS-1$
-   private static final String        ATTR_FILE_PATH                = "filePath";                             //$NON-NLS-1$
-   private static final String        ATTR_FORWARD_ANGLE            = "forwardAngle";                         //$NON-NLS-1$
-   private static final String        ATTR_HEAD_POSITION_FACTOR     = "headPositionFactor";                   //$NON-NLS-1$
-   private static final String        ATTR_ID                       = "id";                                   //$NON-NLS-1$
-   private static final String        ATTR_IS_DEFAULT_MODEL         = "isDefaultModel";                       //$NON-NLS-1$
-   private static final String        ATTR_NAME                     = "name";                                 //$NON-NLS-1$
+   private static final String        ATTR_DESCRIPTION                 = "description";                          //$NON-NLS-1$
+   private static final String        ATTR_FILE_PATH                   = "filePath";                             //$NON-NLS-1$
+   private static final String        ATTR_FORWARD_ANGLE               = "forwardAngle";                         //$NON-NLS-1$
+   private static final String        ATTR_HEAD_POSITION_FACTOR        = "headPositionFactor";                   //$NON-NLS-1$
+   private static final String        ATTR_ID                          = "id";                                   //$NON-NLS-1$
+   private static final String        ATTR_IS_DEFAULT_MODEL            = "isDefaultModel";                       //$NON-NLS-1$
+   private static final String        ATTR_NAME                        = "name";                                 //$NON-NLS-1$
 
-   private static final String        TAG_OPTIONS                   = "Options";                              //$NON-NLS-1$
-   private static final String        ATTR_SELECTED_MODEL_ID        = "selectedModelId";                      //$NON-NLS-1$
+   private static final String        TAG_OPTIONS                      = "Options";                              //$NON-NLS-1$
+   private static final String        ATTR_SELECTED_MODEL_ID           = "selectedModelId";                      //$NON-NLS-1$
 
-   public static final String         MAP_MODEL_FILE_EXTENTION      = "gltf";                                 //$NON-NLS-1$
+   public static final String         MAP_MODEL_FILE_EXTENTION         = "gltf";                                 //$NON-NLS-1$
+
+   private static final String        DEFAULT_MODEL_SKATEBOARD_ID      = "35417da1-d92a-4c33-8d0f-41e2d81d94bd"; //$NON-NLS-1$
+   private static final String        DEFAULT_MODEL_HIGH_WHEELER_ID    = "76f66cbb-d3ca-447a-9874-643c9ec42399"; //$NON-NLS-1$
+   private static final String        DEFAULT_MODEL_PAINTED_BICYCLE_ID = "1af34a28-157d-4a31-8065-3bb94fb81094"; //$NON-NLS-1$
 
    /**
     * Model ID for the skateboard model
     */
-   private static final String        DEFAULT_DEFAULT_MODEL_ID      = "35417da1-d92a-4c33-8d0f-41e2d81d94bd"; //$NON-NLS-1$
+   private static final String        DEFAULT_DEFAULT_MODEL_ID         = DEFAULT_MODEL_SKATEBOARD_ID;
 
-   private static final Bundle        _bundle                       = TourbookPlugin.getDefault().getBundle();
-   private static final IPath         _stateLocation                = Platform.getStateLocation(_bundle);
+   private static final Bundle        _bundle                          = TourbookPlugin.getDefault().getBundle();
+   private static final IPath         _stateLocation                   = Platform.getStateLocation(_bundle);
 
    /**
     * Contains all map models which are loaded from a xml file
     */
-   private static ArrayList<MapModel> _allMapModels                 = new ArrayList<>();
+   private static ArrayList<MapModel> _allMapModels                    = new ArrayList<>();
 
    private static MapModel            _selectedModel;
 
@@ -118,7 +124,7 @@ public class MapModelManager {
 
       try {
 
-         final URL bundleUrl = TourbookPlugin.getDefault().getBundle().getEntry(bundleRelativeFilePathname);
+         final URL bundleUrl = ModelActivator.getDefault().getBundle().getEntry(bundleRelativeFilePathname);
 
          if (bundleUrl == null) {
             throw new Exception("Default map model file is not in bundle: " + bundleRelativeFilePathname); //$NON-NLS-1$
@@ -179,6 +185,29 @@ public class MapModelManager {
 
       restoreState_10_ReadXmlFile(getAbsoluteFilePath(DEFAULT_CONFIG_FILE_NAME_PATH));
       restoreState_10_ReadXmlFile(getUserConfigFile());
+
+      /*
+       * Translate default model names
+       */
+      for (final MapModel mapModel : _allMapModels) {
+
+         switch (mapModel.id) {
+         case DEFAULT_MODEL_HIGH_WHEELER_ID:
+
+            mapModel.name = Messages.Map_Model_Name_HighWheeler;
+            break;
+
+         case DEFAULT_MODEL_PAINTED_BICYCLE_ID:
+
+            mapModel.name = Messages.Map_Model_Name_Bicycle;
+            break;
+
+         case DEFAULT_MODEL_SKATEBOARD_ID:
+
+            mapModel.name = Messages.Map_Model_Name_Skateboard;
+            break;
+         }
+      }
    }
 
    private static void restoreState_10_ReadXmlFile(final File xmlFile) {

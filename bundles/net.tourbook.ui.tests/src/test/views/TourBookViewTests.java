@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,11 +25,12 @@ import de.byteholder.geoclipse.map.UI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import net.tourbook.Messages;
-import net.tourbook.common.util.FilesUtils;
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -55,7 +56,7 @@ public class TourBookViewTests extends UITest {
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "1/31/21, 7:15 AM -> Error while retrieving the weather data: \"{\"cod\":\"400\",\"message\":\"requested time is out of allowed range of 5 days back\"}\"")));//$NON-NLS-1$
+            "1/31/2021, 7:15 AM -> Error while retrieving the weather data: \"{\"cod\":\"400\",\"message\":\"requested time is out of allowed range of 5 days back\"}\"")));//$NON-NLS-1$
    }
 
    @Test
@@ -144,7 +145,9 @@ public class TourBookViewTests extends UITest {
             .getNode("Jan   1").expand().select().getNode("1").select(); //$NON-NLS-1$ //$NON-NLS-2$
 
       // Duplicate the tour
-      tour.contextMenu("Duplicate Tour...").click(); //$NON-NLS-1$
+      tour.contextMenu(Messages.Tour_Action_DuplicateTour).click();
+      Utils.clickOkButton(bot);
+      bot.cTabItem(Messages.tour_editor_tabLabel_tour).activate();
 
       // Set a different date than today's date
       bot.dateTime(0).setDate(new Date(1420117200000L));
@@ -166,11 +169,11 @@ public class TourBookViewTests extends UITest {
 
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
-            "1/1/15, 1:00 PM")));//$NON-NLS-1$
+            "1/1/2015, 1:00 PM")));//$NON-NLS-1$
 
       //Check that the tour was successfully deleted
       final SWTBotTreeItem[] allItems = bot.tree().getAllItems();
-      assertEquals("2015   1", allItems[2].getText()); //$NON-NLS-1$
+      assertTrue(Arrays.asList(allItems).stream().anyMatch(treeItem -> treeItem.getText().equals("2015   1")));//$NON-NLS-1$
    }
 
    /**
@@ -185,12 +188,12 @@ public class TourBookViewTests extends UITest {
 
       tour.contextMenu(Messages.App_Action_ExportViewCSV).click();
 
-      bot.button("Save").click();
+      bot.button("Save").click(); //$NON-NLS-1$
 
-      final Path csvFilePath = Paths.get(Utils.workingDirectory, "TourBook_2022-08-30_21-39-05.csv");
+      final Path csvFilePath = Paths.get(Utils.workingDirectory, "TourBook_2022-08-30_21-39-05.csv"); //$NON-NLS-1$
       assertTrue(Files.exists(csvFilePath));
 
-      FilesUtils.deleteIfExists(csvFilePath);
+      FileUtils.deleteIfExists(csvFilePath);
       assertTrue(!Files.exists(csvFilePath));
    }
 

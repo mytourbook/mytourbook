@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Set;
 
+import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.CommonImages;
@@ -46,6 +47,7 @@ import net.tourbook.database.TourDatabase;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.preferences.PrefPageAppearanceDisplayFormat;
 import net.tourbook.statistic.StatisticView;
+import net.tourbook.tag.TagManager;
 import net.tourbook.ui.ITourProvider;
 import net.tourbook.ui.Messages;
 import net.tourbook.ui.action.ActionTourToolTip_EditQuick;
@@ -86,22 +88,20 @@ import org.joda.time.PeriodType;
 
 public class TourInfoUI {
 
-   private static final String            APP_ACTION_CLOSE_TOOLTIP = net.tourbook.common.Messages.App_Action_Close_Tooltip;
+   private static final int               SHELL_MARGIN          = 5;
+   private static final int               MAX_DATA_WIDTH        = 300;
 
-   private static final int               SHELL_MARGIN             = 5;
-   private static final int               MAX_DATA_WIDTH           = 300;
+   private static final String            BATTERY_FORMAT        = "... %d %%";                                                                //$NON-NLS-1$
+   private static final String            GEAR_SHIFT_FORMAT     = "%d / %d";                                                                  //$NON-NLS-1$
 
-   private static final String            BATTERY_FORMAT           = "... %d %%";                                                                //$NON-NLS-1$
-   private static final String            GEAR_SHIFT_FORMAT        = "%d / %d";                                                                  //$NON-NLS-1$
+   private static final IPreferenceStore  _prefStoreCommon      = CommonActivator.getPrefStore();
 
-   private static final IPreferenceStore  _prefStoreCommon         = CommonActivator.getPrefStore();
+   private static final GridDataFactory   _gridDataHint_Zero    = GridDataFactory.fillDefaults().hint(0, 0);
+   private static final GridDataFactory   _gridDataHint_Default = GridDataFactory.fillDefaults().hint(SWT.DEFAULT, SWT.DEFAULT);
 
-   private static final GridDataFactory   _gridDataHint_Zero       = GridDataFactory.fillDefaults().hint(0, 0);
-   private static final GridDataFactory   _gridDataHint_Default    = GridDataFactory.fillDefaults().hint(SWT.DEFAULT, SWT.DEFAULT);
+   private static final DateTimeFormatter _dtHistoryFormatter   = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.MEDIUM);
 
-   private static final DateTimeFormatter _dtHistoryFormatter      = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.MEDIUM);
-
-   private static PeriodType              _tourPeriodTemplate      = PeriodType.yearMonthDayTime()
+   private static PeriodType              _tourPeriodTemplate   = PeriodType.yearMonthDayTime()
 
          // hide these components
          // .withMinutesRemoved()
@@ -111,12 +111,12 @@ public class TourInfoUI {
 //
    ;
 
-   private final IPreferenceStore         _prefStore               = TourbookPlugin.getPrefStore();
+   private final IPreferenceStore         _prefStore            = TourbookPlugin.getPrefStore();
 
-   private final NumberFormat             _nf0                     = NumberFormat.getNumberInstance();
-   private final NumberFormat             _nf1                     = NumberFormat.getInstance();
-   private final NumberFormat             _nf2                     = NumberFormat.getInstance();
-   private final NumberFormat             _nf3                     = NumberFormat.getInstance();
+   private final NumberFormat             _nf0                  = NumberFormat.getNumberInstance();
+   private final NumberFormat             _nf1                  = NumberFormat.getInstance();
+   private final NumberFormat             _nf2                  = NumberFormat.getInstance();
+   private final NumberFormat             _nf3                  = NumberFormat.getInstance();
 
    {
       _nf0.setMinimumFractionDigits(0);
@@ -318,7 +318,7 @@ public class TourInfoUI {
 
          super(null, IAction.AS_PUSH_BUTTON);
 
-         setToolTipText(APP_ACTION_CLOSE_TOOLTIP);
+         setToolTipText(OtherMessages.APP_ACTION_CLOSE_TOOLTIP);
          setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Close));
       }
 
@@ -1229,7 +1229,7 @@ public class TourInfoUI {
       _allSensorValue_Voltage = new ArrayList<>();
 
       final Set<DeviceSensorValue> allSensorValues = _tourData.getDeviceSensorValues();
-      if (allSensorValues.size() == 0) {
+      if (allSensorValues.isEmpty()) {
          return;
       }
 
@@ -1635,7 +1635,7 @@ public class TourInfoUI {
        * Tags
        */
       if (_hasTags) {
-         net.tourbook.ui.UI.updateUI_Tags(_tourData, _lblTourTags_Value, true);
+         TagManager.updateUI_Tags(_tourData, _lblTourTags_Value, true);
       }
       showHideControl(_lblTourTags, _hasTags);
       showHideControl(_lblTourTags_Value, _hasTags);
@@ -1743,19 +1743,19 @@ public class TourInfoUI {
          _lblBreakTime.setText(breakPeriod.toString(UI.DEFAULT_DURATION_FORMATTER_SHORT));
       }
 
-      int windSpeed = _tourData.getWeather_Wind_Speed();
-      windSpeed = (int) (windSpeed / UI.UNIT_VALUE_DISTANCE);
-
-      _lblWindSpeed.setText(Integer.toString(windSpeed));
-      _lblWindSpeedUnit.setText(
-            String.format(
-                  Messages.Tour_Tooltip_Format_WindSpeedUnit,
-                  UI.UNIT_LABEL_SPEED,
-                  IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
-
-      // wind direction
+      final int windSpeed = (int) (_tourData.getWeather_Wind_Speed() / UI.UNIT_VALUE_DISTANCE);
       final int weatherWindDirectionDegree = _tourData.getWeather_Wind_Direction();
-      if (weatherWindDirectionDegree != -1) {
+      if (windSpeed > 0 && weatherWindDirectionDegree != -1) {
+
+         // Wind speed
+         _lblWindSpeed.setText(Integer.toString(windSpeed));
+         _lblWindSpeedUnit.setText(
+               String.format(
+                     Messages.Tour_Tooltip_Format_WindSpeedUnit,
+                     UI.UNIT_LABEL_SPEED,
+                     IWeather.windSpeedTextShort[getWindSpeedTextIndex(windSpeed)]));
+
+         // Wind direction
          _lblWindDirection.setText(Integer.toString(weatherWindDirectionDegree));
          _lblWindDirectionUnit.setText(String.format(
                Messages.Tour_Tooltip_Format_WindDirectionUnit,
