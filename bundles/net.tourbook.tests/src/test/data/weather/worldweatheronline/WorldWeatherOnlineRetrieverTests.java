@@ -95,6 +95,7 @@ public class WorldWeatherOnlineRetrieverTests {
 // SET_FORMATTING_ON
 
    }
+
    @Test
    void testWeatherRetrieval_July2022() {
 
