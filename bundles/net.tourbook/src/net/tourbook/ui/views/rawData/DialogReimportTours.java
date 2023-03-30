@@ -446,8 +446,7 @@ class DialogReimportTours extends TitleAreaDialog {
              * Weather (description and clouds)
              */
             _chkData_Tour_Weather = new Button(containerTour, SWT.CHECK);
-            //todo fb
-            _chkData_Tour_Weather.setText("Weather (description and clouds)");//Messages.Dialog_ModifyTours_Checkbox_TrainingValues);
+            _chkData_Tour_Weather.setText(Messages.Dialog_ModifyTours_Checkbox_WeatherValues);
             _chkData_Tour_Weather.addSelectionListener(_defaultListener);
             gridDataItem.applyTo(_chkData_Tour_Weather);
          }
