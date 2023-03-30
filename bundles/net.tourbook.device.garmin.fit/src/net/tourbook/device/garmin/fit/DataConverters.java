@@ -1,7 +1,5 @@
 package net.tourbook.device.garmin.fit;
 
-import com.garmin.fit.DateTime;
-
 import java.math.BigDecimal;
 
 /**
@@ -28,14 +26,4 @@ public class DataConverters {
 
       return 3.6f * speed;
    }
-
-   /**
-    * @param timestamp
-    * @return Returns timestamp in GARMIN time not in Java time !!!
-    */
-   public static long convertTimestamp(final DateTime timestamp) {
-
-      return timestamp.getTimestamp() * 1000L;
-   }
-
 }
