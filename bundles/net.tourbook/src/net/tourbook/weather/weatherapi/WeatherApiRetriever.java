@@ -45,7 +45,7 @@ public class WeatherApiRetriever extends HistoricalWeatherRetriever {
       super(tourData);
    }
 
-   static String convertWeatherCodeToMTWeatherClouds(final int weatherCode) {
+   public static String convertWeatherCodeToMTWeatherClouds(final int weatherCode) {
 
       String weatherType;
 

@@ -65,26 +65,6 @@ public class OpenWeatherMapRetrieverTests {
    }
 
    @Test
-   void openWeatherMap_WeatherTypeMapping_AllValues() {
-
-      assertAll(
-            () -> assertEquals(UI.EMPTY_STRING,
-                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds(UI.SPACE1)),
-            () -> assertEquals(IWeather.WEATHER_ID_LIGHTNING,
-                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("11d")), //$NON-NLS-1$
-            () -> assertEquals(IWeather.WEATHER_ID_SCATTERED_SHOWERS,
-                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("09d")), //$NON-NLS-1$
-            () -> assertEquals(IWeather.WEATHER_ID_DRIZZLE,
-                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("50d")), //$NON-NLS-1$
-            () -> assertEquals(IWeather.WEATHER_ID_RAIN,
-                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("10d")), //$NON-NLS-1$
-            () -> assertEquals(IWeather.WEATHER_ID_SNOW,
-                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("13d")), //$NON-NLS-1$
-            () -> assertEquals(IWeather.WEATHER_ID_CLEAR,
-                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("01d"))); //$NON-NLS-1$
-   }
-
-   @Test
    void testWeatherRetrieval_JulySecond2022() {
 
       final String openWeatherMapResponse = Comparison.readFileContent(OPENWEATHERMAP_FILE_PATH
@@ -273,5 +253,25 @@ public class OpenWeatherMapRetrieverTests {
             () ->  assertEquals(12.95f,                       tour.getWeather_Temperature_WindChill()));
 
 // SET_FORMATTING_ON
+   }
+
+   @Test
+   void weatherIconMapping_AllValues() {
+
+      assertAll(
+            () -> assertEquals(UI.EMPTY_STRING,
+                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds(UI.SPACE1)),
+            () -> assertEquals(IWeather.WEATHER_ID_LIGHTNING,
+                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("11d")), //$NON-NLS-1$
+            () -> assertEquals(IWeather.WEATHER_ID_SCATTERED_SHOWERS,
+                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("09d")), //$NON-NLS-1$
+            () -> assertEquals(IWeather.WEATHER_ID_DRIZZLE,
+                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("50d")), //$NON-NLS-1$
+            () -> assertEquals(IWeather.WEATHER_ID_RAIN,
+                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("10d")), //$NON-NLS-1$
+            () -> assertEquals(IWeather.WEATHER_ID_SNOW,
+                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("13d")), //$NON-NLS-1$
+            () -> assertEquals(IWeather.WEATHER_ID_CLEAR,
+                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("01d"))); //$NON-NLS-1$
    }
 }

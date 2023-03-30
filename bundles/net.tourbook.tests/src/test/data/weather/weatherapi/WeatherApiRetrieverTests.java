@@ -24,6 +24,7 @@ import com.pgssoft.httpclient.HttpClientMock;
 import java.lang.reflect.Field;
 import java.time.ZonedDateTime;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
@@ -153,5 +154,25 @@ public class WeatherApiRetrieverTests {
             () ->  assertEquals(13.32f,                    tour.getWeather_Temperature_WindChill()));
 
 // SET_FORMATTING_ON
+   }
+
+   @Test
+   void weatherCodeMapping_AllValues() {
+
+      assertAll(
+            () -> assertEquals(UI.EMPTY_STRING,
+                  WeatherApiRetriever.convertWeatherCodeToMTWeatherClouds(-1)),
+            () -> assertEquals(IWeather.WEATHER_ID_OVERCAST,
+                  WeatherApiRetriever.convertWeatherCodeToMTWeatherClouds(1006)),
+            () -> assertEquals(IWeather.WEATHER_ID_PART_CLOUDS,
+                  WeatherApiRetriever.convertWeatherCodeToMTWeatherClouds(1003)),
+            () -> assertEquals(IWeather.WEATHER_ID_LIGHTNING,
+                  WeatherApiRetriever.convertWeatherCodeToMTWeatherClouds(1087)),
+            () -> assertEquals(IWeather.WEATHER_ID_RAIN,
+                  WeatherApiRetriever.convertWeatherCodeToMTWeatherClouds(1276)),
+            () -> assertEquals(IWeather.WEATHER_ID_SNOW,
+                  WeatherApiRetriever.convertWeatherCodeToMTWeatherClouds(1282)),
+            () -> assertEquals(IWeather.WEATHER_ID_SCATTERED_SHOWERS,
+                  WeatherApiRetriever.convertWeatherCodeToMTWeatherClouds(1273)));
    }
 }
