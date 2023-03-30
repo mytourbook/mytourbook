@@ -46,8 +46,8 @@ Changes
 Bugfix
 ======
 
-* 
-
+* Tour Import
+  - "distanceSerie" is null                  https://github.com/mytourbook/mytourbook/issues/1044
 
 
 Translation    

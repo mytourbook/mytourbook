@@ -129,7 +129,7 @@ import org.hibernate.annotations.Cascade;
 
 public class TourData implements Comparable<Object>, IXmlSerializable, Serializable {
 
-   private static final long serialVersionUID = 1L;
+   private static final long             serialVersionUID                  = 1L;
 
    private static final char             NL                                = UI.NEW_LINE;
    private static final String           INTERVAL_SUMMARY_UNIT             = " ∑  ";                                  //$NON-NLS-1$
@@ -2845,7 +2845,7 @@ private Set<TourTag>                tourTags                            = new Ha
 
       ElevationGainLoss altiUpDown;
 
-      if (elevationSerie != null) {
+      if (distanceSerie != null && elevationSerie != null) {
 
          // DP needs distance
 
