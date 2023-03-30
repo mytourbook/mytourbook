@@ -73,7 +73,7 @@ public class StravaUploaderTests {
             .doReturn(passeurResponse)
             .withStatus(201);
 
-      final Field field = StravaUploader.class.getDeclaredField("httpClient"); //$NON-NLS-1$
+      final Field field = OAuth2Utils.class.getDeclaredField("httpClient"); //$NON-NLS-1$
       field.setAccessible(true);
       field.set(null, httpClientMock);
 
