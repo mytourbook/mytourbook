@@ -73,6 +73,10 @@ public class OpenWeatherMapRetrieverTests {
                   OpenWeatherMapRetriever.convertWeatherTypeToMTWeatherClouds("09d")), //$NON-NLS-1$
             () -> assertEquals(IWeather.WEATHER_ID_DRIZZLE,
                   OpenWeatherMapRetriever.convertWeatherTypeToMTWeatherClouds("50d")), //$NON-NLS-1$
+            () -> assertEquals(IWeather.WEATHER_ID_RAIN,
+                  OpenWeatherMapRetriever.convertWeatherTypeToMTWeatherClouds("10d")), //$NON-NLS-1$
+            () -> assertEquals(IWeather.WEATHER_ID_SNOW,
+                  OpenWeatherMapRetriever.convertWeatherTypeToMTWeatherClouds("13d")), //$NON-NLS-1$
             () -> assertEquals(IWeather.WEATHER_ID_CLEAR,
                   OpenWeatherMapRetriever.convertWeatherTypeToMTWeatherClouds("01d"))); //$NON-NLS-1$
    }
