@@ -2851,7 +2851,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
 
       ElevationGainLoss altiUpDown;
 
-      if (elevationSerie != null) {
+      if (distanceSerie != null && elevationSerie != null) {
 
          // DP needs distance
 
