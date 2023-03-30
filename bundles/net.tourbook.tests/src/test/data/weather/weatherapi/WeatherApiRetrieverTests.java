@@ -180,9 +180,6 @@ public class WeatherApiRetrieverTests {
    @Test
    void weatherTypeMapping_Empty() {
 
-      final HistoryResult historyResult = new HistoryResult();
-      assertAll(
-            () -> assertEquals(UI.EMPTY_STRING,
-                  historyResult.getWeatherType()));
+      assertEquals(UI.EMPTY_STRING, new HistoryResult().getWeatherType());
    }
 }

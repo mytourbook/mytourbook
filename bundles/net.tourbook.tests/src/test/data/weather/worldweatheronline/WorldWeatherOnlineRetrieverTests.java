@@ -28,6 +28,7 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
+import net.tourbook.weather.worldweatheronline.Data;
 import net.tourbook.weather.worldweatheronline.WorldWeatherOnlineRetriever;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -94,7 +95,6 @@ public class WorldWeatherOnlineRetrieverTests {
 // SET_FORMATTING_ON
 
    }
-
    @Test
    void testWeatherRetrieval_July2022() {
 
@@ -162,5 +162,11 @@ public class WorldWeatherOnlineRetrieverTests {
                   WorldWeatherOnlineRetriever.convertWeatherCodeToMTWeatherClouds("392")), //$NON-NLS-1$
             () -> assertEquals(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,
                   WorldWeatherOnlineRetriever.convertWeatherCodeToMTWeatherClouds("200"))); //$NON-NLS-1$
+   }
+
+   @Test
+   void weatherTypeMapping_Empty() {
+
+      assertEquals(UI.EMPTY_STRING, new Data().getWeatherType());
    }
 }
