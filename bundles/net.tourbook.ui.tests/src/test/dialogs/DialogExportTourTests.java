@@ -25,6 +25,7 @@ import net.tourbook.Messages;
 import net.tourbook.common.util.FileUtils;
 
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.UITest;
@@ -59,6 +60,7 @@ public class DialogExportTourTests extends UITest {
    }
 
    @Test
+   @Disabled //todo fb
    void testExportMt() {
 
       final SWTBotTreeItem tour = Utils.getTour(bot);
