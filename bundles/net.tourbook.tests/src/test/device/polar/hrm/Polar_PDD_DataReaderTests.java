@@ -17,7 +17,6 @@ package device.polar.hrm;
 
 import net.tourbook.device.polar.hrm.Polar_PDD_DataReader;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import utils.DeviceDataReaderTester;
@@ -44,7 +43,6 @@ public class Polar_PDD_DataReaderTests extends DeviceDataReaderTester {
     * https://github.com/mytourbook/mytourbook/issues/1044#issuecomment-1488725400
     */
    @Test
-   @Disabled
    void testPddImport_20230328() {
 
       testImportFile(deviceDataReader, FILES_PATH + "20230328", ".pdd"); //$NON-NLS-1$ //$NON-NLS-2$
