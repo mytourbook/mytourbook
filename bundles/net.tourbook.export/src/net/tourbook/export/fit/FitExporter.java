@@ -40,6 +40,7 @@ import com.garmin.fit.RecordMesg;
 import com.garmin.fit.SessionMesg;
 import com.garmin.fit.Sport;
 import com.garmin.fit.UserProfileMesg;
+import com.garmin.fit.util.SemicirclesConverter;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -183,8 +184,8 @@ public class FitExporter {
          recordMesg.setCadence((short) tourData.getCadenceSerie()[index]); // Sawtooth
          recordMesg.setPower((int) tourData.getPowerSerie()[index]); //Square
          recordMesg.setAltitude(tourData.altitudeSerie[index]);
-         recordMesg.setPositionLat(DataConverters.convertDegreesToSemicircles(tourData.latitudeSerie[index]));
-         recordMesg.setPositionLong(DataConverters.convertDegreesToSemicircles(tourData.longitudeSerie[index]));
+         recordMesg.setPositionLat(SemicirclesConverter.degreesToSemicircles(tourData.latitudeSerie[index]));
+         recordMesg.setPositionLong(SemicirclesConverter.degreesToSemicircles(tourData.longitudeSerie[index]));
 
          // Add a Developer Field to the Record Message
          final DeveloperField hrDevField = new DeveloperField(hrFieldDescMesg, developerIdMesg);

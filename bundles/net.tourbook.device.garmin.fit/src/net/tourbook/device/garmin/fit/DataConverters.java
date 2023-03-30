@@ -11,36 +11,31 @@ import java.math.BigDecimal;
  */
 public class DataConverters {
 
-	private DataConverters() {}
+   private DataConverters() {}
 
-	public static double convertSemicirclesToDegrees(final int value) {
+   public static String convertSoftwareVersion(final int softwareVersion) {
 
-		return 180.0d * value / 2147483647;
-	}
+      return BigDecimal.valueOf(softwareVersion, 2).toPlainString();
+   }
 
-	public static String convertSoftwareVersion(final int softwareVersion) {
+   /**
+    * Convert m/s -> km/h
+    *
+    * @param speed
+    * @return
+    */
+   public static float convertSpeed(final float speed) {
 
-		return BigDecimal.valueOf(softwareVersion, 2).toPlainString();
-	}
+      return 3.6f * speed;
+   }
 
-	/**
-	 * Convert m/s -> km/h
-	 *
-	 * @param speed
-	 * @return
-	 */
-	public static float convertSpeed(final float speed) {
+   /**
+    * @param timestamp
+    * @return Returns timestamp in GARMIN time not in Java time !!!
+    */
+   public static long convertTimestamp(final DateTime timestamp) {
 
-		return 3.6f * speed;
-	}
-
-	/**
-	 * @param timestamp
-	 * @return Returns timestamp in GARMIN time not in Java time !!!
-	 */
-	public static long convertTimestamp(final DateTime timestamp) {
-
-		return timestamp.getTimestamp() * 1000L;
-	}
+      return timestamp.getTimestamp() * 1000L;
+   }
 
 }
