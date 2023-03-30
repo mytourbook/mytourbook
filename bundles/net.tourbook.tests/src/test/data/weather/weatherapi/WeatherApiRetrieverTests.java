@@ -29,6 +29,7 @@ import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.weather.WeatherUtils;
+import net.tourbook.weather.weatherapi.HistoryResult;
 import net.tourbook.weather.weatherapi.WeatherApiRetriever;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -174,5 +175,14 @@ public class WeatherApiRetrieverTests {
                   WeatherApiRetriever.convertWeatherCodeToMTWeatherClouds(1282)),
             () -> assertEquals(IWeather.WEATHER_ID_SCATTERED_SHOWERS,
                   WeatherApiRetriever.convertWeatherCodeToMTWeatherClouds(1273)));
+   }
+
+   @Test
+   void weatherTypeMapping_Empty() {
+
+      final HistoryResult historyResult = new HistoryResult();
+      assertAll(
+            () -> assertEquals(UI.EMPTY_STRING,
+                  historyResult.getWeatherType()));
    }
 }
