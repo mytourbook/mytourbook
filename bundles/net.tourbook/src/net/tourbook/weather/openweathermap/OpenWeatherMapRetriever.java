@@ -45,7 +45,7 @@ import org.apache.commons.lang3.time.DateUtils;
 
 public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
 
-   private static final String BASE_TIME_MACHINE_API_URL  = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/timemachine";   //$NON-NLS-1$
+   private static final String BASE_TIME_MACHINE_API_URL = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/timemachine"; //$NON-NLS-1$
 
    // https://openweathermap.org/api/air-pollution
    private static final String BASE_AIR_POLLUTION_API_URL = WeatherUtils.OAUTH_PASSEUR_APP_URL + "/openweathermap/air_pollution"; //$NON-NLS-1$
@@ -64,7 +64,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
     * @param weatherIcon
     * @return
     */
-   public static String convertWeatherTypeToMTWeatherClouds(final String weatherIcon) {
+   public static String convertWeatherIconToMTWeatherClouds(final String weatherIcon) {
 
       String weatherType = UI.EMPTY_STRING;
 
@@ -149,7 +149,7 @@ public class OpenWeatherMapRetriever extends HistoricalWeatherRetriever {
                   (float) hourly.getTemp(),
                   WeatherUtils.getWeatherIcon(
                         WeatherUtils.getWeatherIndex(
-                              convertWeatherTypeToMTWeatherClouds(
+                              convertWeatherIconToMTWeatherClouds(
                                     hourly.getWeather().get(0).getIcon()))),
                   hourly.getWeather().get(0).getDescription(),
                   (float) hourly.getFeels_like(),

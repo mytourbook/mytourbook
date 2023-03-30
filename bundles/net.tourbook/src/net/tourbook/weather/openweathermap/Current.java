@@ -82,7 +82,7 @@ class Current {
          return UI.EMPTY_STRING;
       }
 
-      return OpenWeatherMapRetriever.convertWeatherTypeToMTWeatherClouds(getWeather().get(0).getIcon());
+      return OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds(getWeather().get(0).getIcon());
    }
 
    public String getWeatherDescription() {

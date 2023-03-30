@@ -25,6 +25,7 @@ import java.lang.reflect.Field;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
@@ -67,18 +68,20 @@ public class OpenWeatherMapRetrieverTests {
    void openWeatherMap_WeatherTypeMapping_AllValues() {
 
       assertAll(
+            () -> assertEquals(UI.EMPTY_STRING,
+                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds(UI.SPACE1)),
             () -> assertEquals(IWeather.WEATHER_ID_LIGHTNING,
-                  OpenWeatherMapRetriever.convertWeatherTypeToMTWeatherClouds("11d")), //$NON-NLS-1$
+                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("11d")), //$NON-NLS-1$
             () -> assertEquals(IWeather.WEATHER_ID_SCATTERED_SHOWERS,
-                  OpenWeatherMapRetriever.convertWeatherTypeToMTWeatherClouds("09d")), //$NON-NLS-1$
+                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("09d")), //$NON-NLS-1$
             () -> assertEquals(IWeather.WEATHER_ID_DRIZZLE,
-                  OpenWeatherMapRetriever.convertWeatherTypeToMTWeatherClouds("50d")), //$NON-NLS-1$
+                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("50d")), //$NON-NLS-1$
             () -> assertEquals(IWeather.WEATHER_ID_RAIN,
-                  OpenWeatherMapRetriever.convertWeatherTypeToMTWeatherClouds("10d")), //$NON-NLS-1$
+                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("10d")), //$NON-NLS-1$
             () -> assertEquals(IWeather.WEATHER_ID_SNOW,
-                  OpenWeatherMapRetriever.convertWeatherTypeToMTWeatherClouds("13d")), //$NON-NLS-1$
+                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("13d")), //$NON-NLS-1$
             () -> assertEquals(IWeather.WEATHER_ID_CLEAR,
-                  OpenWeatherMapRetriever.convertWeatherTypeToMTWeatherClouds("01d"))); //$NON-NLS-1$
+                  OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds("01d"))); //$NON-NLS-1$
    }
 
    @Test
