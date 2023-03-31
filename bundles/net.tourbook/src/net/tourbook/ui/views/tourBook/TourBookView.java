@@ -1305,7 +1305,7 @@ public class TourBookView extends ViewPart implements
       // update the viewer
 
       // delay loading, that the app filters are initialized
-      Display.getCurrent().asyncExec(() -> {
+      _parent.getDisplay().asyncExec(() -> {
 
          if (_tourViewer_Tree.getTree().isDisposed()) {
             return;
@@ -2680,9 +2680,28 @@ public class TourBookView extends ViewPart implements
       // show and select the selected tour
       if (selection instanceof SelectionTourId) {
 
-         final long newTourId = ((SelectionTourId) selection).getTourId();
+         final long tourId = ((SelectionTourId) selection).getTourId();
 
-         selectTour(newTourId);
+         if (_isLayoutNatTable) {
+
+            _selectedTourIds.clear();
+            _selectedTourIds.add(tourId);
+
+            reselectTourViewer();
+
+         } else {
+
+            selectTour(tourId);
+         }
+
+      } else if (selection instanceof SelectionTourIds) {
+
+         final SelectionTourIds selectionTourIds = (SelectionTourIds) selection;
+
+         _selectedTourIds.clear();
+         _selectedTourIds.addAll(selectionTourIds.getTourIds());
+
+         reselectTourViewer();
 
       } else if (selection instanceof StructuredSelection) {
 
@@ -2881,7 +2900,7 @@ public class TourBookView extends ViewPart implements
 
       _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept(allRowPositions -> {
 
-         // don't check reload that a tour selection is fired
+         // don't set, *is in reload", that a tour selection is fired
          selectTours_NatTable(allRowPositions, true, true, false);
       });
    }
@@ -3240,12 +3259,12 @@ public class TourBookView extends ViewPart implements
     *           When <code>true</code> then only the provided rows will be selected, otherwise the
     *           provided tours will be added to the existing selection.
     * @param isScrollIntoView
-    * @param isCheckReload
+    * @param isSetIsInReload
     */
    void selectTours_NatTable(final int[] allRowPositions,
                              final boolean isClearSelection,
                              final boolean isScrollIntoView,
-                             final boolean isCheckReload) {
+                             final boolean isSetIsInReload) {
 
       // ensure there is something to be selected
       if (allRowPositions == null || allRowPositions.length == 0 || allRowPositions[0] == -1) {
@@ -3281,13 +3300,13 @@ public class TourBookView extends ViewPart implements
                true,
                firstRowPosition);
 
-         if (isCheckReload) {
+         if (isSetIsInReload) {
             _isInReload = true;
          }
          {
             _natTable_Body_SelectionLayer.doCommand(command);
          }
-         if (isCheckReload) {
+         if (isSetIsInReload) {
             _isInReload = false;
          }
 
