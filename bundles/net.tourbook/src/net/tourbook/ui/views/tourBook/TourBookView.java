@@ -1469,7 +1469,7 @@ public class TourBookView extends ViewPart implements
             _natTable_DataProvider,
             false); // Provides rows where any cell in the row is selected
 
-      selectionProvider.addSelectionChangedListener(this::onSelect_NatTableItem);
+      selectionProvider.addSelectionChangedListener(this::onSelect_2_NatTableItem);
 
       // prevent selecting all cells when column header is clicked on a column which cannot be sorted
       uiBindingRegistry.registerSingleClickBinding(MouseEventMatcher.columnHeaderLeftClick(SWT.NONE), null);
@@ -1575,7 +1575,7 @@ public class TourBookView extends ViewPart implements
       _tourViewer_Tree.setComparer(new ItemComparer_Tree());
       _tourViewer_Tree.setUseHashlookup(true);
 
-      _tourViewer_Tree.addSelectionChangedListener(this::onSelect_TreeItem);
+      _tourViewer_Tree.addSelectionChangedListener(this::onSelect_1_TreeItem);
 
       _tourViewer_Tree.addDoubleClickListener(doubleClickEvent -> {
 
@@ -2458,126 +2458,7 @@ public class TourBookView extends ViewPart implements
       }
    }
 
-   /**
-    * Set's the tour selection {@link #_selectedTourIds} and fires an
-    * {@link TourEventId#TOUR_SELECTION} event.
-    *
-    * @param tourIds
-    */
-   private void onSelect_CreateTourSelection(final LinkedHashSet<Long> tourIds) {
-
-      ISelection selection;
-      if (tourIds.isEmpty()) {
-
-         // fire selection that nothing is selected
-
-         selection = new SelectionTourIds(new ArrayList<>());
-
-      } else {
-
-         // keep selected tour id's
-         _selectedTourIds.clear();
-         _selectedTourIds.addAll(tourIds);
-
-         selection = tourIds.size() == 1 //
-               ? new SelectionTourId(_selectedTourIds.get(0))
-               : new SelectionTourIds(_selectedTourIds);
-
-      }
-
-      _isInFireSelection = true;
-      {
-         // _postSelectionProvider should be removed when all parts are listening to the TourManager event
-         if (_isInStartup) {
-
-            _isInStartup = false;
-
-            // this view can be inactive -> selection is not fired with the SelectionProvider interface
-
-            TourManager.fireEventWithCustomData(TourEventId.TOUR_SELECTION, selection, this);
-
-         } else {
-
-            // fire selection and keep it in the provider that when this part is activated, it will fire the selection again
-            _postSelectionProvider.setSelection(selection, false);
-         }
-      }
-      _isInFireSelection = false;
-
-      enableActions();
-   }
-
-   private void onSelect_NatTableItem(final SelectionChangedEvent event) {
-
-      if (_isInReload) {
-         return;
-      }
-
-      final LinkedHashSet<Long> tourIds = new LinkedHashSet<>();
-      final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-
-      for (final Object selectedItem : selection) {
-         tourIds.add(((TVITourBookTour) selectedItem).tourId);
-      }
-
-      /*
-       * Set hovered tour to a selected tour otherwise the context menu is not opened as it requires
-       * a hovered tour.
-       * This sounds strange but after many try and error tests, this was the only "simple"
-       * solution which I've found.
-       * It seems that the context menu for the NatTable can not be implemented as easy as for a SWT
-       * table or tree.
-       */
-
-      final Set<Range> allSelectedRowPositions = getNatTable_SelectionModel().getSelectedRowPositions();
-      final IntArrayList allSelectedRowPos = new IntArrayList();
-
-      // convert all ranges into a list
-      for (final Range rowRange : allSelectedRowPositions) {
-         for (final Integer rowPos : rowRange.getMembers()) {
-            allSelectedRowPos.add(rowPos);
-         }
-      }
-
-      if (allSelectedRowPos.size() > 0) {
-
-         final int[] allRowPositions = allSelectedRowPos.toArray();
-         boolean isSelectedTourHovered = false;
-
-         final Point hoveredPosition = _natTable_Body_HoverLayer.getCurrentHoveredCellPosition();
-         if (hoveredPosition != null) {
-
-            final int hoveredRow = hoveredPosition.y;
-
-            for (final int rowPosition : allRowPositions) {
-
-               if (rowPosition == hoveredRow) {
-
-                  // tour selection is also hovered
-
-                  isSelectedTourHovered = true;
-
-                  break;
-               }
-            }
-         }
-
-         if (!isSelectedTourHovered) {
-
-            // a selected tour is NOT hovered -> set one tour also to be hovered
-
-            final PositionCoordinate selectionAnchor = _natTable_Body_SelectionLayer.getSelectionAnchor();
-
-            _natTable_Body_HoverLayer.setCurrentHoveredCellPosition(
-                  selectionAnchor.columnPosition,
-                  allRowPositions[0]);
-         }
-      }
-
-      onSelect_CreateTourSelection(tourIds);
-   }
-
-   private void onSelect_TreeItem(final SelectionChangedEvent event) {
+   private void onSelect_1_TreeItem(final SelectionChangedEvent event) {
 
       if (_isInReload) {
          return;
@@ -2668,7 +2549,126 @@ public class TourBookView extends ViewPart implements
          }
       }
 
-      onSelect_CreateTourSelection(allTourIds);
+      onSelect_3_CreateTourSelection(allTourIds);
+   }
+
+   private void onSelect_2_NatTableItem(final SelectionChangedEvent event) {
+
+      if (_isInReload) {
+         return;
+      }
+
+      final LinkedHashSet<Long> tourIds = new LinkedHashSet<>();
+      final IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+
+      for (final Object selectedItem : selection) {
+         tourIds.add(((TVITourBookTour) selectedItem).tourId);
+      }
+
+      /*
+       * Set hovered tour to a selected tour otherwise the context menu is not opened as it requires
+       * a hovered tour.
+       * This sounds strange but after many try and error tests, this was the only "simple"
+       * solution which I've found.
+       * It seems that the context menu for the NatTable can not be implemented as easy as for a SWT
+       * table or tree.
+       */
+
+      final Set<Range> allSelectedRowPositions = getNatTable_SelectionModel().getSelectedRowPositions();
+      final IntArrayList allSelectedRowPos = new IntArrayList();
+
+      // convert all ranges into a list
+      for (final Range rowRange : allSelectedRowPositions) {
+         for (final Integer rowPos : rowRange.getMembers()) {
+            allSelectedRowPos.add(rowPos);
+         }
+      }
+
+      if (allSelectedRowPos.size() > 0) {
+
+         final int[] allRowPositions = allSelectedRowPos.toArray();
+         boolean isSelectedTourHovered = false;
+
+         final Point hoveredPosition = _natTable_Body_HoverLayer.getCurrentHoveredCellPosition();
+         if (hoveredPosition != null) {
+
+            final int hoveredRow = hoveredPosition.y;
+
+            for (final int rowPosition : allRowPositions) {
+
+               if (rowPosition == hoveredRow) {
+
+                  // tour selection is also hovered
+
+                  isSelectedTourHovered = true;
+
+                  break;
+               }
+            }
+         }
+
+         if (!isSelectedTourHovered) {
+
+            // a selected tour is NOT hovered -> set one tour also to be hovered
+
+            final PositionCoordinate selectionAnchor = _natTable_Body_SelectionLayer.getSelectionAnchor();
+
+            _natTable_Body_HoverLayer.setCurrentHoveredCellPosition(
+                  selectionAnchor.columnPosition,
+                  allRowPositions[0]);
+         }
+      }
+
+      onSelect_3_CreateTourSelection(tourIds);
+   }
+
+   /**
+    * Set's the tour selection {@link #_selectedTourIds} and fires an
+    * {@link TourEventId#TOUR_SELECTION} event.
+    *
+    * @param tourIds
+    */
+   private void onSelect_3_CreateTourSelection(final LinkedHashSet<Long> tourIds) {
+
+      ISelection selection;
+      if (tourIds.isEmpty()) {
+
+         // fire selection that nothing is selected
+
+         selection = new SelectionTourIds(new ArrayList<>());
+
+      } else {
+
+         // keep selected tour id's
+         _selectedTourIds.clear();
+         _selectedTourIds.addAll(tourIds);
+
+         selection = tourIds.size() == 1 //
+               ? new SelectionTourId(_selectedTourIds.get(0))
+               : new SelectionTourIds(_selectedTourIds);
+
+      }
+
+      _isInFireSelection = true;
+      {
+         // _postSelectionProvider should be removed when all parts are listening to the TourManager event
+         if (_isInStartup) {
+
+            _isInStartup = false;
+
+            // this view can be inactive -> selection is not fired with the SelectionProvider interface
+
+            TourManager.fireEventWithCustomData(TourEventId.TOUR_SELECTION, selection, this);
+
+         } else {
+
+            // fire selection and keep it in the provider that when this part is activated, it will fire the selection again
+            _postSelectionProvider.setSelection(selection, false);
+         }
+      }
+      _isInFireSelection = false;
+
+      enableActions();
    }
 
    private void onSelectionChanged(final ISelection selection) {
@@ -3191,7 +3191,7 @@ public class TourBookView extends ViewPart implements
 
                   /**
                    * <code>
-                  
+
                      Caused by: java.lang.NullPointerException
                      at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                      at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -3209,13 +3209,13 @@ public class TourBookView extends ViewPart implements
                      at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-                  
+
                      at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-                  
+
                      at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                      at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                      ... 22 more
-                  
+
                    * </code>
                    */
 
