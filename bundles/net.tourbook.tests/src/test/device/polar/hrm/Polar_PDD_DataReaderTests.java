@@ -24,19 +24,9 @@ import utils.FilesUtils;
 
 public class Polar_PDD_DataReaderTests extends DeviceDataReaderTester {
 
-   public static final String   FILES_PATH       = FilesUtils.rootPath + "device/polar/pdd/files/"; //$NON-NLS-1$
+   public static final String   FILES_PATH       = FilesUtils.rootPath + "device/polar/hrm/files/"; //$NON-NLS-1$
 
    private Polar_PDD_DataReader deviceDataReader = new Polar_PDD_DataReader();
-
-   /**
-    * Sample provided by Thompson-ongithub
-    * https://github.com/mytourbook/mytourbook/issues/1044#issuecomment-1488725400
-    */
-   @Test
-   void testPddImport_20230321() {
-
-      testImportFile(deviceDataReader, FILES_PATH + "20230321", ".pdd"); //$NON-NLS-1$ //$NON-NLS-2$
-   }
 
    /**
     * Sample provided by Thompson-ongithub

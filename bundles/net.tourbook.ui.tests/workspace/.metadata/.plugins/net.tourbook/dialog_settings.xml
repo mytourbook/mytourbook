@@ -218,13 +218,13 @@
 		<item key="XML_STATE_EASY_IMPORT" value="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#x0D;&#x0A;&lt;EasyImportConfig&gt;&#x0D;&#x0A;&lt;DashConfig animationCrazyFactor=&quot;1&quot; animationDuration=&quot;20&quot; backgroundOpacity=&quot;5&quot; isLiveUpdate=&quot;true&quot; isLogDetails=&quot;false&quot; stateTooltipDisplayAbsoluteFilePath=&quot;false&quot; stateTooltipWidth=&quot;500&quot; tileSize=&quot;100&quot; uiColumns=&quot;5&quot;/&gt;&#x0D;&#x0A;&lt;ImportConfig backupFolder=&quot;&quot; deviceFiles=&quot;*.fit&quot; deviceFolder=&quot;D:\&quot; deviceType=&quot;0&quot; isActiveConfig=&quot;true&quot; isCreateBackup=&quot;false&quot; isDeleteDeviceFiles=&quot;false&quot; isTurnOffWatching=&quot;false&quot; name=&quot;My Tour Recording Device&quot;/&gt;&#x0D;&#x0A;&lt;LauncherConfig description=&quot;Start easy import with this configuration.&quot; isAdjustTemperature=&quot;false&quot; isReplaceFirstTimeSliceElevation=&quot;false&quot; isRetrieveWeatherData=&quot;false&quot; isSaveTour=&quot;false&quot; isSetLastMarker=&quot;false&quot; isSetTourType=&quot;false&quot; isShowInDashBoard=&quot;true&quot; lastMarkerDistance=&quot;0&quot; lastMarkerText=&quot;&quot; name=&quot;Start Import&quot; temperatureAdjustmentDuration=&quot;720&quot; tourAverageTemperature=&quot;15.0&quot;/&gt;&#x0D;&#x0A;&lt;/EasyImportConfig&gt;"/>
 	</section>
 	<section name="net.tourbook.views.tourListView">
-		<item key="STATE_SELECTED_YEAR" value="2015"/>
-		<item key="STATE_SELECTED_MONTH" value="5"/>
+		<item key="STATE_SELECTED_YEAR" value="2021"/>
+		<item key="STATE_SELECTED_MONTH" value="1"/>
 		<item key="STATE_IS_SELECT_YEAR_MONTH_TOURS" value="false"/>
 		<item key="STATE_IS_LINK_WITH_OTHER_VIEWS" value="false"/>
 		<item key="STATE_VIEW_LAYOUT" value="CATEGORY_MONTH"/>
 		<list key="STATE_SELECTED_TOURS">
-			<item value="201553195142998"/>
+			<item value="20211311415542"/>
 		</list>
 		<list key="STATE_SORT_COLUMN_ID">
 			<item value="TIME_DATE"/>
@@ -398,5 +398,7 @@
 		<item key="STATE_IS_ON_SELECT_EXPAND_COLLAPSE" value="true"/>
 		<list key="STATE_EXPANDED_ITEMS">
 		</list>
+	</section>
+	<section name="net.tourbook.map.player.ModelPlayerManager">
 	</section>
 </section>
