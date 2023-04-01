@@ -2883,6 +2883,8 @@ public class TourBookView extends ViewPart implements
     */
    private void reselectTourViewer() {
 
+//      _postSelectionProvider.setSelection(null);
+
       if (_isLayoutNatTable) {
 
          reselectTourViewer_NatTable();
@@ -2901,10 +2903,10 @@ public class TourBookView extends ViewPart implements
       _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept(allRowPositions -> {
 
          selectTours_NatTable(allRowPositions,
-               
-               true, // isClearSelection 
-               true, // isScrollIntoView 
-               true // isFireSelection 
+
+               true, // isClearSelection
+               true, // isScrollIntoView
+               true // isFireSelection
          );
       });
    }
@@ -3148,6 +3150,9 @@ public class TourBookView extends ViewPart implements
          return;
       }
 
+//      System.out.println(UI.timeStamp() + " TourBookView.selectTour(long)(): " + tourId);
+// TODO remove SYSTEM.OUT.PRINTLN
+
       // check if enabled
       if (_actionLinkWithOtherViews.getSelection() == false) {
 
@@ -3266,9 +3271,9 @@ public class TourBookView extends ViewPart implements
     * @param isSetIsInReload
     */
    void selectTours_NatTable(final int[] allRowPositions,
-                              final boolean isClearSelection,
-                              final boolean isScrollIntoView,
-                              final boolean isFireSelection) {
+                             final boolean isClearSelection,
+                             final boolean isScrollIntoView,
+                             final boolean isFireSelection) {
 
       // ensure there is something to be selected
       if (allRowPositions == null || allRowPositions.length == 0 || allRowPositions[0] == -1) {
