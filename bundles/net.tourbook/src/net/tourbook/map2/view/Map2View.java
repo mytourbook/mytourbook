@@ -2347,6 +2347,10 @@ public class Map2View extends ViewPart implements
    private void geoFilter_10_Loader(final MapGridData mapGridData,
                                     final TourGeoFilter tourGeoFilter) {
 
+      if (mapGridData == null) {
+         return;
+      }
+
       final org.eclipse.swt.graphics.Point geoParts_TopLeft_E2 = mapGridData.geoParts_TopLeft_E2;
       final org.eclipse.swt.graphics.Point geoParts_BottomRight_E2 = mapGridData.geoParts_BottomRight_E2;
 
