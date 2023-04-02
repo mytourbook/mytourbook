@@ -1954,7 +1954,7 @@ public class TourBookView extends ViewPart implements
          _selectedTourIds.clear();
          _selectedTourIds.addAll(tourIds);
 
-         selection = tourIds.size() == 1 //
+         selection = tourIds.size() == 1
                ? new SelectionTourId(_selectedTourIds.get(0))
                : new SelectionTourIds(_selectedTourIds);
 

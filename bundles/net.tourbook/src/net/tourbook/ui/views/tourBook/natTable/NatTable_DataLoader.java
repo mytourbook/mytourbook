@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2020, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -114,7 +114,7 @@ public class NatTable_DataLoader {
     * Contains all tour id's for the current tour filter and tour sorting, this is used
     * to get the row index for a tour.
     */
-   private long[]                                         _allLoadedTourIds;
+   private long[]                                         _allTourIds;
 
    public NatTable_DataLoader(final TourBookView tourBookView, final ColumnManager columnManager) {
 
@@ -181,7 +181,7 @@ public class NatTable_DataLoader {
       }
 
       final IntArrayList allRowIndices = new IntArrayList();
-      final int numAllAvailableTourIds = _allLoadedTourIds.length;
+      final int numAllAvailableTourIds = _allTourIds.length;
 
       // loop: all requested tour id's
       for (final Long requestedTourId : allRequestedTourIds) {
@@ -189,7 +189,7 @@ public class NatTable_DataLoader {
          // loop: all available tour id's
          for (int rowPosition = 0; rowPosition < numAllAvailableTourIds; rowPosition++) {
 
-            final long loadedTourId = _allLoadedTourIds[rowPosition];
+            final long loadedTourId = _allTourIds[rowPosition];
 
             if (loadedTourId == requestedTourId) {
 
@@ -374,7 +374,7 @@ public class NatTable_DataLoader {
          SQL.showException(e, sql);
       }
 
-      _allLoadedTourIds = allTourIds.toArray();
+      _allTourIds = allTourIds.toArray();
    }
 
    private int fetchNumberOfTours() {
@@ -697,7 +697,7 @@ public class NatTable_DataLoader {
     */
    public CompletableFuture<int[]> getRowIndexFromTourId(final List<Long> allRequestedTourIds) {
 
-      if (_allLoadedTourIds == null) {
+      if (_allTourIds == null) {
 
          // firstly load all tour id's
 
@@ -1011,13 +1011,13 @@ public class NatTable_DataLoader {
 
    long getTourId(final int rowIndex) {
 
-      if (_allLoadedTourIds == null) {
+      if (_allTourIds == null) {
 
          return -1;
 
       } else {
 
-         return _allLoadedTourIds[rowIndex];
+         return _allTourIds[rowIndex];
       }
    }
 
@@ -1036,7 +1036,7 @@ public class NatTable_DataLoader {
       _pageNumbers_Fetched.clear();
       _pageNumbers_Loading.clear();
 
-      _allLoadedTourIds = null;
+      _allTourIds = null;
 
       _numAllTourItems = -1;
    }
