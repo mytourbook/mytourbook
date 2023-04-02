@@ -1771,8 +1771,8 @@ public class TourInfoUI {
                UI.getCardinalDirectionText(weatherWindDirectionDegree)));
       }
 
-      final String airQuality = _tourData.getWeather_AirQuality();
       // Air Quality
+      final String airQuality = _tourData.getWeather_AirQuality();
       if (StringUtils.hasContent(airQuality) && !airQuality.equals(IWeather.airQualityIsNotDefined)) {
 
          _lblAirQuality.setText(airQuality);
