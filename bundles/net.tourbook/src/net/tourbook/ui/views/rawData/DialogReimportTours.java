@@ -1002,12 +1002,11 @@ class DialogReimportTours extends TitleAreaDialog {
             _chkData_TimeSlice_Training.getSelection() ||
             _chkData_TimeSlice_TourTimerPauses.getSelection();
 
-      final boolean isTourDataSelected = false ||
-
-            _chkData_Tour_Calories.getSelection() ||
-            _chkData_Tour_ImportFileLocation.getSelection() ||
-            _chkData_Tour_Markers.getSelection() ||
-            _chkData_Tour_Weather.getSelection();
+      final boolean isTourDataSelected = false
+            || _chkData_Tour_Calories.getSelection()
+            || _chkData_Tour_ImportFileLocation.getSelection()
+            || _chkData_Tour_Markers.getSelection()
+            || _chkData_Tour_Weather.getSelection();
 
       final boolean isDataSelected = false ||
 
