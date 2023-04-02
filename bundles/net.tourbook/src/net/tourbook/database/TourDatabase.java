@@ -360,7 +360,10 @@ public class TourDatabase {
       // set storage location for the database
       System.setProperty("derby.system.home", _databasePath); //$NON-NLS-1$
 
-// set derby debug properties, is helpful when debugging
+      /*
+       * Set derby debug properties, this is helpful when debugging, the log is written into
+       * derby.log
+       */
 //      System.setProperty("derby.language.logStatementText", "true");
 //      System.setProperty("derby.language.logQueryPlan", "true");
 

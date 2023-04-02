@@ -244,7 +244,7 @@ public class ThemeUtil {
 
       String imageNameThemed;
 
-      if (UI.isDarkTheme()) {
+      if (UI.IS_DARK_THEME) {
 
          imageNameThemed = imageName.substring(0, imageName.length() - 4) + DARK_THEME_POSTFIX + IMAGE_NAME_EXTENSION_PNG;
 
@@ -261,7 +261,7 @@ public class ThemeUtil {
     */
    public static String getThemedTreeHeaderLabel(final String headerLabel) {
 
-      if (UI.isDarkTheme()) {
+      if (UI.IS_DARK_THEME) {
 
          return headerLabel + UI.SPACE2;
       }

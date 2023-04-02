@@ -30,6 +30,7 @@ import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
+import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.preferences.ICommonPreferences;
@@ -102,6 +103,7 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.ui.di.PersistState;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener2;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -260,7 +262,7 @@ public class TourBookView extends ViewPart implements
     * The header column id needs a different id than the body column otherwise drag&drop or column
     * selection shows the 1st row image :-(
     */
-   private static final String             HEADER_COLUMN_ID_POSTFIX            = "_HEADER";                         //$NON-NLS-1$
+   private static final String             HEADER_COLUMN_ID_POSTFIX            = "_HEADER";                           //$NON-NLS-1$
    //
    private static TourBookViewLayout       _viewLayout;
    //
@@ -307,6 +309,7 @@ public class TourBookView extends ViewPart implements
    private int                             _selectedYear                       = -1;
    private int                             _selectedYearSub                    = -1;
    private final ArrayList<Long>           _selectedTourIds                    = new ArrayList<>();
+   private SelectionFilterType             _selectionFilterType                = SelectionFilterType.ALL_IS_DISPLAYED;
    //
    private boolean                         _isCollapseOthers;
    private boolean                         _isInFireSelection;
@@ -349,6 +352,7 @@ public class TourBookView extends ViewPart implements
    private ActionSelectAllTours            _actionSelectAllTours;
    private ActionSetTourTypeMenu           _actionSetTourType;
    private ActionSetPerson                 _actionSetOtherPerson;
+   private ActionToggleSelectionFilter     _actionToggleSelectionFilter;
    private ActionToggleViewLayout          _actionToggleViewLayout;
    private ActionTourBookOptions           _actionTourBookOptions;
    private ActionUpload                    _actionUploadTour;
@@ -384,6 +388,24 @@ public class TourBookView extends ViewPart implements
       @Override
       protected void onBeforeOpenSlideout() {
          closeOpenedDialogs(this);
+      }
+   }
+
+   private class ActionToggleSelectionFilter extends Action {
+
+      ActionToggleSelectionFilter() {
+
+         super(UI.EMPTY_STRING, AS_CHECK_BOX);
+
+         setToolTipText(Messages.Tour_Book_Action_ToggleSelectionFilter_Tooltip);
+
+         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
+         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter_Disabled));
+      }
+
+      @Override
+      public void runWithEvent(final Event event) {
+         actionToggleSelectionFilter(event);
       }
    }
 
@@ -704,7 +726,7 @@ public class TourBookView extends ViewPart implements
 
          style = new Style();
          style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR,
-               UI.isDarkTheme()
+               UI.IS_DARK_THEME
                      ? Display.getCurrent().getSystemColor(SWT.COLOR_DARK_YELLOW)
                      : GUIHelper.COLOR_YELLOW);
 
@@ -861,6 +883,21 @@ public class TourBookView extends ViewPart implements
       }
    }
 
+   public enum SelectionFilterType {
+
+      ALL_IS_DISPLAYED,
+
+      /**
+       * Only tours are displayed which are selected
+       */
+      SELECTED_TOURS,
+
+      /**
+       * Only tours are displayed which are not selected
+       */
+      NOT_SELECTED_TOURS
+   }
+
    void actionExportViewCSV() {
 
       /*
@@ -957,6 +994,42 @@ public class TourBookView extends ViewPart implements
          // reselect selection
          _tourViewer_Tree.setSelection(_tourViewer_Tree.getSelection());
       }
+   }
+
+   private void actionToggleSelectionFilter(final Event event) {
+
+      final boolean isForwards = UI.isCtrlKey(event) == false;
+
+      if (_selectionFilterType == SelectionFilterType.ALL_IS_DISPLAYED) {
+
+         if (isForwards) {
+            toggleSelectionFilter_SelectedTours();
+         } else {
+            toggleSelectionFilter_NotSelectedTours();
+         }
+
+      } else if (_selectionFilterType == SelectionFilterType.SELECTED_TOURS) {
+
+         if (isForwards) {
+            toggleSelectionFilter_NotSelectedTours();
+         } else {
+            toggleSelectionFilter_ShowAll();
+         }
+
+      } else {
+
+         if (isForwards) {
+            toggleSelectionFilter_ShowAll();
+         } else {
+            toggleSelectionFilter_SelectedTours();
+         }
+      }
+
+      _natTable_DataLoader.resetTourItems();
+
+      _natTable_DataLoader.setTourSelectionFilter(_selectionFilterType, _selectedTourIds);
+
+      reselectTourViewer();
    }
 
    /**
@@ -1230,6 +1303,7 @@ public class TourBookView extends ViewPart implements
       _actionSetOtherPerson = new ActionSetPerson(this);
       _actionSetTourType = new ActionSetTourTypeMenu(this);
       _actionSelectAllTours = new ActionSelectAllTours(this);
+      _actionToggleSelectionFilter = new ActionToggleSelectionFilter();
       _actionToggleViewLayout = new ActionToggleViewLayout(this);
       _actionTourBookOptions = new ActionTourBookOptions();
       _actionUploadTour = new ActionUpload(this);
@@ -1509,7 +1583,7 @@ public class TourBookView extends ViewPart implements
       _parent.getDisplay().asyncExec(() -> {
 
          // overwrite theme with MT's own theme, which is based on the modern or dark theme
-         final ThemeConfiguration themeConfiguration = UI.isDarkTheme()
+         final ThemeConfiguration themeConfiguration = UI.IS_DARK_THEME
                ? new NatTable_Configuration_Theme_Dark()
                : new NatTable_Configuration_Theme_Light();
 
@@ -1847,6 +1921,7 @@ public class TourBookView extends ViewPart implements
                         : true));
 
       _actionSelectAllTours.setEnabled(isTreeLayout);
+      _actionToggleSelectionFilter.setEnabled(isTableLayout);
       _actionToggleViewLayout.setEnabled(true);
       _actionUploadTour.setEnabled(isTourSelected);
 
@@ -1874,6 +1949,7 @@ public class TourBookView extends ViewPart implements
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
       tbm.add(_actionToggleViewLayout);
+      tbm.add(_actionToggleSelectionFilter);
       tbm.add(_actionSelectAllTours);
       tbm.add(_actionExpandSelection);
       tbm.add(_actionCollapseAll);
@@ -3219,7 +3295,7 @@ public class TourBookView extends ViewPart implements
 
                   /**
                    * <code>
-                  
+
                      Caused by: java.lang.NullPointerException
                      at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                      at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -3237,13 +3313,13 @@ public class TourBookView extends ViewPart implements
                      at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-                  
+
                      at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-                  
+
                      at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                      at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                      ... 22 more
-                  
+
                    * </code>
                    */
 
@@ -3426,6 +3502,36 @@ public class TourBookView extends ViewPart implements
       _actionToggleViewLayout.setImageDescriptor(TourbookPlugin.getImageDescriptor(Images.TourBook_NatTable));
 
       _isLayoutNatTable = true;
+   }
+
+   private void toggleSelectionFilter_NotSelectedTours() {
+
+      _selectionFilterType = SelectionFilterType.NOT_SELECTED_TOURS;
+
+      _actionToggleSelectionFilter.setChecked(true);
+
+      _actionToggleSelectionFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Selected_Not));
+      _actionToggleSelectionFilter.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Selected_Not_Disabled));
+   }
+
+   private void toggleSelectionFilter_SelectedTours() {
+
+      _selectionFilterType = SelectionFilterType.SELECTED_TOURS;
+
+      _actionToggleSelectionFilter.setChecked(true);
+
+      _actionToggleSelectionFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Selected_Selected));
+      _actionToggleSelectionFilter.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Selected_Selected_Disabled));
+   }
+
+   private void toggleSelectionFilter_ShowAll() {
+
+      _selectionFilterType = SelectionFilterType.ALL_IS_DISPLAYED;
+
+      _actionToggleSelectionFilter.setChecked(false);
+
+      _actionToggleSelectionFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Selected_All));
+      _actionToggleSelectionFilter.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Selected_All_Disabled));
    }
 
    @Override
