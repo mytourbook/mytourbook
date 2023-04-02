@@ -6839,33 +6839,36 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // set the column text
          tableItem.setText(IWeather.airQualityTexts[index]);
 
-         int color;
+         int backgroundColor;
          switch (index) {
          //Good
          case 1:
-            color = SWT.COLOR_DARK_GREEN;
+            backgroundColor = SWT.COLOR_DARK_GREEN;
             break;
          //Fair
          case 2:
-            color = SWT.COLOR_YELLOW;
+            backgroundColor = SWT.COLOR_YELLOW;
             break;
          //Moderate
          case 3:
-            color = SWT.COLOR_DARK_YELLOW;
+            backgroundColor = SWT.COLOR_DARK_YELLOW;
             break;
          //Poor
          case 4:
-            color = SWT.COLOR_DARK_RED;
+            backgroundColor = SWT.COLOR_DARK_RED;
             break;
          //Very poor
          case 5:
-            color = SWT.COLOR_DARK_GRAY;
+            backgroundColor = SWT.COLOR_DARK_GRAY;
             break;
          default:
-            color = SWT.COLOR_WHITE;
+            backgroundColor = SWT.COLOR_WHITE;
             break;
          }
-         tableItem.setBackground(Display.getCurrent().getSystemColor(color));
+         tableItem.setBackground(Display.getCurrent().getSystemColor(backgroundColor));
+         if (UI.IS_DARK_THEME) {
+            tableItem.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_BLUE));
+         }
       }
    }
 
