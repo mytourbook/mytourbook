@@ -146,6 +146,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private boolean _isVisible_And_Available_TimeDuration;
    private boolean _isVisible_And_Available_TimeOfDay;
    private boolean _isVisible_And_Available_TimeMoving;
+   private boolean _isVisible_And_Available_TimeRecorded;
    private boolean _isVisible_And_Available_TimeSlice;
    private boolean _isVisible_And_Available_TourCompareResult;
 
@@ -209,6 +210,8 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
    private Label     _lblTimeOfDay_Unit;
    private Label     _lblTimeMoving;
    private Label     _lblTimeMoving_Unit;
+   private Label     _lblTimeRecorded;
+   private Label     _lblTimeRecorded_Unit;
    private Label     _lblTourCompareResult;
 
    private Label     _lblRunDyn_StanceTime;
@@ -555,6 +558,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
          createUI_100_TimeSlices(container);
          createUI_110_TimeDuration(container);
          createUI_112_TimeMoving(container);
+         createUI_114_TimeRecorded(container);
          createUI_120_TimeOfDay(container);
          createUI_200_Distance(container);
          createUI_210_Altitude(container);
@@ -640,6 +644,28 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
                   GraphColorManager.PREF_GRAPH_TIME);
 
             _lblTimeMoving_Unit = createUI_Label(
+                  valueContainer,
+                  UI.UNIT_LABEL_TIME,
+                  UI.EMPTY_STRING,
+                  GraphColorManager.PREF_GRAPH_TIME);
+         }
+      }
+   }
+
+   private void createUI_114_TimeRecorded(final Composite parent) {
+
+      if (_isVisible_And_Available_TimeRecorded) {
+
+         final Composite valueContainer = _isHorizontalOrientation ? createUI_ValueContainer(parent) : parent;
+         {
+            _lblTimeRecorded = createUI_Label_Value(
+                  valueContainer,
+                  SWT.TRAIL,
+                  8,
+                  UI.EMPTY_STRING,
+                  GraphColorManager.PREF_GRAPH_TIME);
+
+            _lblTimeRecorded_Unit = createUI_Label(
                   valueContainer,
                   UI.UNIT_LABEL_TIME,
                   UI.EMPTY_STRING,
@@ -1486,6 +1512,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       final long visibleId_TimeDuration               = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_DURATION);
       final long visibleId_TimeOfDay                  = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_OF_DAY);
       final long visibleId_TimeMoving                 = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_MOVING);
+      final long visibleId_TimeRecorded               = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_RECORDED);
       final long visibleId_TimeSlice                  = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TIME_SLICES);
       final long visibleId_TourCompareResult          = getState(ttVisibleValues, ValuePoint_ToolTip_MenuManager.VALUE_ID_TOUR_COMPARE_RESULT);
 
@@ -1509,6 +1536,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       final boolean isAvailable_TimeDuration          = _tourData.timeSerie                           != null;
       final boolean isAvailable_TimeOfDay             = _tourData.timeSerie                           != null;
       final boolean isAvailable_TimeMoving            = _tourData.getMovingTimeSerie()                != null;
+      final boolean isAvailable_TimeRecorded          = _tourData.getRecordedTimeSerie()              != null;
       final boolean isAvailable_TimeSlice             = true;
       final boolean isAvailable_TourCompareResult     = _tourData.tourCompareSerie != null && _tourData.tourCompareSerie.length > 0;
 
@@ -1537,6 +1565,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             + visibleId_TimeDuration
             + visibleId_TimeOfDay
             + visibleId_TimeMoving
+            + visibleId_TimeRecorded
             + visibleId_TimeSlice
             + visibleId_TourCompareResult
             + visibleId_RunDyn_StanceTime
@@ -1566,6 +1595,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             + (isAvailable_TimeDuration      ? visibleId_TimeDuration      : 0)
             + (isAvailable_TimeOfDay         ? visibleId_TimeOfDay         : 0)
             + (isAvailable_TimeMoving        ? visibleId_TimeMoving        : 0)
+            + (isAvailable_TimeRecorded      ? visibleId_TimeRecorded      : 0)
             + (isAvailable_TimeSlice         ? visibleId_TimeSlice         : 0)
             + (isAvailable_TourCompareResult ? visibleId_TourCompareResult : 0)
 
@@ -1594,6 +1624,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       _isVisible_And_Available_TimeDuration        = isAvailable_TimeDuration       && visibleId_TimeDuration > 0;
       _isVisible_And_Available_TimeOfDay           = isAvailable_TimeOfDay          && visibleId_TimeOfDay > 0;
       _isVisible_And_Available_TimeMoving          = isAvailable_TimeMoving         && visibleId_TimeMoving > 0;
+      _isVisible_And_Available_TimeRecorded        = isAvailable_TimeRecorded       && visibleId_TimeRecorded > 0;
       _isVisible_And_Available_TimeSlice           = isAvailable_TimeSlice          && visibleId_TimeSlice > 0;
       _isVisible_And_Available_TourCompareResult   = isAvailable_TourCompareResult  && visibleId_TourCompareResult > 0;
 
@@ -1622,6 +1653,7 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
             + (_isVisible_And_Available_TimeDuration                 ? 1 : 0)
             + (_isVisible_And_Available_TimeOfDay                    ? 1 : 0)
             + (_isVisible_And_Available_TimeMoving                   ? 1 : 0)
+            + (_isVisible_And_Available_TimeRecorded                 ? 1 : 0)
             + (_isVisible_And_Available_TimeSlice                    ? 1 : 0)
             + (_isVisible_And_Available_TourCompareResult            ? 1 : 0)
 
@@ -1858,8 +1890,23 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
 
          _lblTimeMoving.setText(UI.format_hhh_mm_ss(movingTime));
          _lblTimeMoving.setToolTipText(tooltip);
-         
+
          _lblTimeMoving_Unit.setToolTipText(tooltip);
+      }
+
+      if (_isVisible_And_Available_TimeRecorded) {
+
+         final int recordedTime = _tourData.getRecordedTimeSerie()[valueIndex];
+         final int pauseTime = durationTime - recordedTime;
+
+         final String tooltip = String.format(
+               Messages.Tooltip_ValuePoint_Label_RecordedTime_Tooltip,
+               UI.format_hhh_mm_ss(pauseTime));
+
+         _lblTimeRecorded.setText(UI.format_hhh_mm_ss(recordedTime));
+         _lblTimeRecorded.setToolTipText(tooltip);
+
+         _lblTimeRecorded_Unit.setToolTipText(tooltip);
       }
 
       if (_isVisible_And_Available_TimeOfDay) {
@@ -2000,6 +2047,11 @@ public class ValuePoint_ToolTip_UI extends Pinned_ToolTip_Shell implements IPinn
       if (_isVisible_And_Available_TimeMoving) {
          updateUI_Color(_lblTimeMoving, GraphColorManager.PREF_GRAPH_TIME);
          updateUI_Color(_lblTimeMoving_Unit, GraphColorManager.PREF_GRAPH_TIME);
+      }
+
+      if (_isVisible_And_Available_TimeRecorded) {
+         updateUI_Color(_lblTimeRecorded, GraphColorManager.PREF_GRAPH_TIME);
+         updateUI_Color(_lblTimeRecorded_Unit, GraphColorManager.PREF_GRAPH_TIME);
       }
 
       if (_isVisible_And_Available_TimeOfDay) {

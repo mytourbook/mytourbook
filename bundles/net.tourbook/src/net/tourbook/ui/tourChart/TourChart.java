@@ -2251,12 +2251,11 @@ public class TourChart extends Chart implements ITourProvider, ITourMarkerUpdate
 
          final long[] allPausedTime_Start = _tourData.getPausedTime_Start();
          final long[] allPausedTime_Data = _tourData.getPausedTime_Data();
+         final long[] allPausedTime_End = _tourData.getPausedTime_End();
 
          if (allPausedTime_Start == null) {
             return;
          }
-
-         final long[] allPausedTime_End = _tourData.getPausedTime_End();
 
          int serieIndex = 0;
          final long tourStartTime = _tourData.getTourStartTimeMS();

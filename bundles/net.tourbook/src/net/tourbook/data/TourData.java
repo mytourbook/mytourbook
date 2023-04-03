@@ -1201,6 +1201,13 @@ private Set<TourTag>                tourTags                            = new Ha
    private int[]                 movingTimeSerie;
 
    /**
+    *
+    * This is a time serie like {@link #timeSerie} but contains only times without pauses
+    */
+   @Transient
+   private int[]                 recordedTimeSerie;
+
+   /**
     * Contains the temperature in the metric measurement system.
     */
    @Transient
@@ -2298,6 +2305,7 @@ private Set<TourTag>                tourTags                            = new Ha
       breakTimeSerie = null;
       pausedTimeSerie = null;
       movingTimeSerie = null;
+      recordedTimeSerie = null;
 
       _pulseSerie_Smoothed = null;
       pulseSerie_FromTime = null;
@@ -9224,6 +9232,105 @@ private Set<TourTag>                tourTags                            = new Ha
 
    public int getRearShiftCount() {
       return rearShiftCount;
+   }
+
+   public int[] getRecordedTimeSerie() {
+
+      if (recordedTimeSerie != null) {
+//         return recordedTimeSerie;
+      }
+
+      // check if data are available
+      if (timeSerie == null || timeSerie.length == 0) {
+         return null;
+      }
+
+      final int numPauses = pausedTime_Start.length;
+      final boolean isPauseTimeAvailable = pausedTime_Start != null && numPauses > 0;
+
+      long nextPauseStart = Long.MAX_VALUE;
+      long nextPauseEnd = Long.MAX_VALUE;
+
+      if (isPauseTimeAvailable) {
+         nextPauseStart = pausedTime_Start[0];
+         nextPauseEnd = pausedTime_End[0];
+      }
+
+      final long[] allPausedTime_Data = pausedTime_Data;
+
+      final int numTimeSlices = timeSerie.length;
+
+      recordedTimeSerie = new int[numTimeSlices];
+
+      boolean isLastPause = false;
+      int sumPausedTimes = 0;
+
+      int pauseIndex = 0;
+
+      // loop: all time slices
+      for (int serieIndex = 1; serieIndex < numTimeSlices; serieIndex++) {
+
+         final int relativeTime = timeSerie[serieIndex];
+
+         if (isPauseTimeAvailable) {
+
+            final long currentAbsoluteTime = relativeTime * 1000L + tourStartTime;
+
+            final long pauseDiffStart = currentAbsoluteTime - nextPauseStart;
+
+            if (currentAbsoluteTime < nextPauseStart) {
+
+               // before next pause -> nothing to do
+
+            } else {
+
+               // inside or after a pause
+
+               final long pauseDiffEnd = nextPauseEnd - currentAbsoluteTime;
+
+               if (currentAbsoluteTime < nextPauseEnd) {
+
+                  // inside a pause
+
+                  final int prevRelativeTime = timeSerie[serieIndex - 1];
+                  final int timeDiff = relativeTime - prevRelativeTime;
+
+                  sumPausedTimes += timeDiff;
+
+                  // last pause reached -> skip further pause check
+                  if (isLastPause) {
+
+                     nextPauseStart = Long.MAX_VALUE;
+                     nextPauseEnd = Long.MAX_VALUE;
+                  }
+
+               } else {
+
+                  // after a pause -> advance to the next pause
+
+                  pauseIndex++;
+
+                  if (pauseIndex < numPauses - 1) {
+
+                     // next pause is available
+
+                     nextPauseStart = pausedTime_Start[pauseIndex];
+                     nextPauseEnd = pausedTime_End[pauseIndex];
+
+                  } else {
+
+                     // last pause reached -> check last pause
+
+                     isLastPause = true;
+                  }
+               }
+            }
+         }
+
+         recordedTimeSerie[serieIndex] = relativeTime - sumPausedTimes;
+      }
+
+      return recordedTimeSerie;
    }
 
    public int getRestPulse() {
