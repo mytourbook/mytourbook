@@ -6840,35 +6840,41 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          tableItem.setText(IWeather.airQualityTexts[index]);
 
          int backgroundColor;
+         int foregroundColor;
          switch (index) {
          //Good
          case 1:
             backgroundColor = SWT.COLOR_DARK_GREEN;
+            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
             break;
          //Fair
          case 2:
             backgroundColor = SWT.COLOR_YELLOW;
+            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_BLACK : SWT.COLOR_DARK_BLUE;
             break;
          //Moderate
          case 3:
             backgroundColor = SWT.COLOR_DARK_YELLOW;
+            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
             break;
          //Poor
          case 4:
             backgroundColor = SWT.COLOR_DARK_RED;
+            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
             break;
          //Very poor
          case 5:
             backgroundColor = SWT.COLOR_DARK_GRAY;
+            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
             break;
          default:
             backgroundColor = SWT.COLOR_WHITE;
+            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_BLACK : SWT.COLOR_DARK_BLUE;
             break;
          }
+
          tableItem.setBackground(Display.getCurrent().getSystemColor(backgroundColor));
-         if (UI.IS_DARK_THEME) {
-            tableItem.setForeground(Display.getCurrent().getSystemColor(SWT.COLOR_DARK_BLUE));
-         }
+         tableItem.setForeground(Display.getCurrent().getSystemColor(foregroundColor));
       }
    }
 
