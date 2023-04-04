@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,8 +15,6 @@
  *******************************************************************************/
 package net.tourbook.device.polartrainer;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Map;
@@ -25,6 +23,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.Util;
@@ -928,7 +927,7 @@ class PolarTrainerSAXHandler extends DefaultHandler {
 
          final ArrayList<String> floatStrings = new ArrayList<>();
 
-         final StringTokenizer tokenizer = new StringTokenizer(valueString, UI.KOMMA);
+         final StringTokenizer tokenizer = new StringTokenizer(valueString, UI.SYMBOL_COMMA);
          while (tokenizer.hasMoreElements()) {
             floatStrings.add((String) tokenizer.nextElement());
          }
