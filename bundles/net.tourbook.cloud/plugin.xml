@@ -49,6 +49,14 @@
       />
    </extension>
    
+   <extension   point="net.tourbook.cloudUploader">
+      <cloudUploader
+         id             ="net.tourbook.cloud.SuuntoWorkoutsUploader"
+         name           ="Suunto Workouts Uploader"
+         class          ="net.tourbook.cloud.suunto.SuuntoWorkoutsUploader"
+      />
+   </extension>
+   
 	<!-- CLOUD UPLOADERS -->
 	
 	

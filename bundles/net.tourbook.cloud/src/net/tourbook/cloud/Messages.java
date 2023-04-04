@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020, 2022 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -130,8 +130,9 @@ public class Messages extends NLS {
    public static String PrefPage_SuuntoWorkouts_FolderPath_Tooltip;
    public static String SuuntoCloud_Group_AccountInformation;
    public static String SuuntoCloud_Group_FileNameCustomization;
-   public static String VendorName_Suunto_Routes;
    public static String VendorName_Suunto;
+   public static String VendorName_Suunto_Routes;
+   public static String VendorName_Suunto_Workouts;
 
    static {
       NLS.initializeMessages(BUNDLE_NAME, Messages.class);

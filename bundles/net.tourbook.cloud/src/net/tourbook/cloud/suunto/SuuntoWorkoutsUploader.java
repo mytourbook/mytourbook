@@ -72,48 +72,16 @@ import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.widgets.Display;
 import org.json.JSONObject;
 
-public class SuuntoUploader extends TourbookCloudUploader {
+public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 
    private static IPreferenceStore _prefStore        = Activator.getDefault().getPreferenceStore();
    private static TourExporter     _tourExporter     = new TourExporter(UI.EMPTY_STRING);
 
    private static String           CLOUD_UPLOADER_ID = "Suunto";                                   //$NON-NLS-1$
 
-   // Source : https://developers.strava.com/docs/reference/#api-models-ActivityType
-   private static final List<String> StravaManualActivityTypes       = List.of(
-         "InlineSkate",                                                                                    //$NON-NLS-1$
-         "Kayaking",                                                                                       //$NON-NLS-1$
-         "Kitesurf",                                                                                       //$NON-NLS-1$
-         "NordicSki",                                                                                      //$NON-NLS-1$
-         "Ride",                                                                                           //$NON-NLS-1$
-         "RockClimbing",                                                                                   //$NON-NLS-1$
-         "RollerSki",                                                                                      //$NON-NLS-1$
-         "Rowing",                                                                                         //$NON-NLS-1$
-         "Run",                                                                                            //$NON-NLS-1$
-         "Sail",                                                                                           //$NON-NLS-1$
-         "Skateboard",                                                                                     //$NON-NLS-1$
-         "Snowboard",                                                                                      //$NON-NLS-1$
-         "Snowshoe",                                                                                       //$NON-NLS-1$
-         "Soccer",                                                                                         //$NON-NLS-1$
-         "StairStepper",                                                                                   //$NON-NLS-1$
-         "StandUpPaddling",                                                                                //$NON-NLS-1$
-         "Surfing",                                                                                        //$NON-NLS-1$
-         "Swim",                                                                                           //$NON-NLS-1$
-         "Velomobile",                                                                                     //$NON-NLS-1$
-         "VirtualRide",                                                                                    //$NON-NLS-1$
-         "VirtualRun",                                                                                     //$NON-NLS-1$
-         "Walk",                                                                                           //$NON-NLS-1$
-         "WeightTraining",                                                                                 //$NON-NLS-1$
-         "Wheelchair",                                                                                     //$NON-NLS-1$
-         "Windsurf",                                                                                       //$NON-NLS-1$
-         "Workout",                                                                                        //$NON-NLS-1$
-         "Yoga");                                                                                          //$NON-NLS-1$
+   public SuuntoWorkoutsUploader() {
 
-   private String                    STRAVA_TOURTYPEFILTERSET_PREFIX = CLOUD_UPLOADER_ID + UI.SYMBOL_COLON;
-
-   public SuuntoUploader() {
-
-      super(CLOUD_UPLOADER_ID, Messages.VendorName_Strava);
+      super(CLOUD_UPLOADER_ID, Messages.VendorName_Suunto_Workouts);
 
       VelocityService.init();
    }
@@ -236,7 +204,6 @@ public class SuuntoUploader extends TourbookCloudUploader {
       Arrays.asList(DialogExportTour.StravaActivityTypes).forEach(
             stravaActivityType -> {
                final TourTypeFilterSet tourTypeFilterSet = new TourTypeFilterSet();
-               tourTypeFilterSet.setName(STRAVA_TOURTYPEFILTERSET_PREFIX + stravaActivityType);
                stravaTourTypeFilters.add(new TourTypeFilter(tourTypeFilterSet));
             });
 
@@ -344,10 +311,7 @@ public class SuuntoUploader extends TourbookCloudUploader {
             ? manualTour.getTourType().getName().trim()
             : UI.EMPTY_STRING;
 
-      return StravaManualActivityTypes.stream().filter(
-            stravaActivityType -> tourTypeName.toLowerCase().startsWith(stravaActivityType.toLowerCase()))
-            .findFirst()
-            .orElse(StravaManualActivityTypes.get(4));
+      return tourTypeName;
    }
 
    /**
@@ -369,20 +333,14 @@ public class SuuntoUploader extends TourbookCloudUploader {
 
          final TourTypeFilterSet tourTypeSet = tourTypeFilter.getTourTypeSet();
 
-         if (tourTypeSet != null &&
-               tourTypeSet.getName().toLowerCase().startsWith(STRAVA_TOURTYPEFILTERSET_PREFIX.toLowerCase())) {
+         if (tourTypeSet != null) {
 
             Arrays.asList(tourTypeSet.getTourTypes()).forEach(tourTypeItem -> {
 
                if (tourTypeItem instanceof TourType &&
                      ((TourType) tourTypeItem).getName().equals(tourType.getName())) {
 
-                  String name = tourTypeSet.getName();
-                  final int activityNameIndex =
-                        name.toLowerCase().lastIndexOf(STRAVA_TOURTYPEFILTERSET_PREFIX.toLowerCase());
-                  name = name.substring(
-                        activityNameIndex + STRAVA_TOURTYPEFILTERSET_PREFIX.length())
-                        .trim();
+                  final String name = tourTypeSet.getName();
                   matchingStravaActivityNames.add(name);
                }
             });
@@ -465,13 +423,13 @@ public class SuuntoUploader extends TourbookCloudUploader {
 
       final CompletableFuture<ActivityUpload> activityUpload =
             OAuth2Utils.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-            .thenApply(name -> convertResponseToUpload(name, tourDate))
-            .exceptionally(e -> {
-               final ActivityUpload errorUpload = new ActivityUpload();
-               errorUpload.setTourDate(tourDate);
-               errorUpload.setError(e.getMessage());
-               return errorUpload;
-            });
+                  .thenApply(name -> convertResponseToUpload(name, tourDate))
+                  .exceptionally(e -> {
+                     final ActivityUpload errorUpload = new ActivityUpload();
+                     errorUpload.setTourDate(tourDate);
+                     errorUpload.setError(e.getMessage());
+                     return errorUpload;
+                  });
 
       return activityUpload;
    }
