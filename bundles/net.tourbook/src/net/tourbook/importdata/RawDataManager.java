@@ -2032,9 +2032,9 @@ public class RawDataManager {
     * @param importState_Process
     * @return
     */
-   public void importTours_FromMultipleFiles(final List<OSFile> allImportFiles,
-                                             final String fileGlobPattern,
-                                             final ImportState_Process importState_Process) {
+   void importTours_FromMultipleFiles(final List<OSFile> allImportFiles,
+                                      final String fileGlobPattern,
+                                      final ImportState_Process importState_Process) {
 
       try {
 
