@@ -146,9 +146,7 @@ public class TourExporter {
       if (net.tourbook.common.util.StringUtils.hasContent(formatTemplate)) {
          _isGPX = formatTemplate.toLowerCase().contains("gpx"); //$NON-NLS-1$
          _isTCX = formatTemplate.toLowerCase().contains("tcx"); //$NON-NLS-1$
-      }
-      else {
-         _isFIT = true;
+         _isFIT = formatTemplate.toLowerCase().equals("fit"); //$NON-NLS-1$
       }
 
       // .tcx files always contain absolute distances
@@ -242,24 +240,24 @@ public class TourExporter {
       }
 
       if (_isGPX || _isTCX) {
-      /*
-       * Setup context
-       */
-      final File exportFile = new File(exportFileName);
-      final VelocityContext vc = new VelocityContext();
+         /*
+          * Setup context
+          */
+         final File exportFile = new File(exportFileName);
+         final VelocityContext vc = new VelocityContext();
 
-      // math tool to convert float into double
-      vc.put("math", new MathTool());//$NON-NLS-1$
+         // math tool to convert float into double
+         vc.put("math", new MathTool());//$NON-NLS-1$
 
-      if (_isGPX) {
+         if (_isGPX) {
 
-         vc.put(VC_IS_EXPORT_ALL_TOUR_DATA, _isExportAllTourData && _tourData != null);
+            vc.put(VC_IS_EXPORT_ALL_TOUR_DATA, _isExportAllTourData && _tourData != null);
 
-      } else if (_isTCX) {
+         } else if (_isTCX) {
 
-         vc.put("iscourses", _isCourse); //$NON-NLS-1$
-         vc.put("coursename", _courseName); //$NON-NLS-1$
-      }
+            vc.put("iscourses", _isCourse); //$NON-NLS-1$
+            vc.put("coursename", _courseName); //$NON-NLS-1$
+         }
 
 // SET_FORMATTING_OFF
 
@@ -319,24 +317,24 @@ public class TourExporter {
 
 // SET_FORMATTING_ON
 
-      doExport_20_TourValues(vc);
+         doExport_20_TourValues(vc);
 
-      try (final FileOutputStream fileOutputStream = new FileOutputStream(exportFile);
-            final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
-            final Writer exportWriter = new BufferedWriter(outputStreamWriter);
-            final Reader templateReader = new InputStreamReader(TourExporter.class.getClassLoader().getResourceAsStream(_formatTemplate))) {
+         try (final FileOutputStream fileOutputStream = new FileOutputStream(exportFile);
+               final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_8);
+               final Writer exportWriter = new BufferedWriter(outputStreamWriter);
+               final Reader templateReader = new InputStreamReader(TourExporter.class.getClassLoader().getResourceAsStream(_formatTemplate))) {
 
-         Velocity.evaluate(vc, exportWriter, "MyTourbook", templateReader); //$NON-NLS-1$
+            Velocity.evaluate(vc, exportWriter, "MyTourbook", templateReader); //$NON-NLS-1$
 
-      } catch (final Exception e) {
-         StatusUtil.showStatus(e);
-         return false;
+         } catch (final Exception e) {
+            StatusUtil.showStatus(e);
+            return false;
+         }
+      } else if (_isFIT) {
+
+         final FitExporter fitExporter = new FitExporter();
+         fitExporter.export(_tourData, exportFileName);
       }
-   } else if (_isFIT) {
-
-      final FitExporter fitExporter = new FitExporter();
-      fitExporter.export(_tourData, exportFileName);
-   }
 
       return true;
    }
