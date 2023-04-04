@@ -15,13 +15,13 @@
  *******************************************************************************/
 package export;
 
-import de.byteholder.geoclipse.map.UI;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.export.ExportTourGPX;
