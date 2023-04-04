@@ -9245,40 +9245,55 @@ private Set<TourTag>                tourTags                            = new Ha
          return null;
       }
 
-      final int numPauses = pausedTime_Start.length;
-      final boolean isPauseTimeAvailable = pausedTime_Start != null && numPauses > 0;
+      final boolean isPauseTimeAvailable = pausedTime_Start != null && pausedTime_Start.length > 0;
 
-      long nextPauseStart = Long.MAX_VALUE;
-      long nextPauseEnd = Long.MAX_VALUE;
+      long nextPause_Start = Long.MAX_VALUE;
+      long nextPause_End = Long.MAX_VALUE;
+
+      boolean isAutoPause = false;
+      boolean isLastPause = false;
+      boolean isLastPauseChecked = false;
 
       if (isPauseTimeAvailable) {
-         nextPauseStart = pausedTime_Start[0];
-         nextPauseEnd = pausedTime_End[0];
+
+         nextPause_Start = pausedTime_Start[0];
+         nextPause_End = pausedTime_End[0];
+
+         isAutoPause = pausedTime_Data[0] == 1;
       }
 
-      final long[] allPausedTime_Data = pausedTime_Data;
-
+      final int numPauses = pausedTime_Start.length;
       final int numTimeSlices = timeSerie.length;
 
       recordedTimeSerie = new int[numTimeSlices];
 
-      boolean isLastPause = false;
       int sumPausedTimes = 0;
+      int nextSlicePausedTime = 0;
 
       int pauseIndex = 0;
 
       // loop: all time slices
-      for (int serieIndex = 1; serieIndex < numTimeSlices; serieIndex++) {
+      for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
 
          final int relativeTime = timeSerie[serieIndex];
+
+         // set pause time from the previous slice because the pause flag is set before the pause
+         sumPausedTimes += nextSlicePausedTime;
+         nextSlicePausedTime = 0;
 
          if (isPauseTimeAvailable) {
 
             final long currentAbsoluteTime = relativeTime * 1000L + tourStartTime;
 
-            final long pauseDiffStart = currentAbsoluteTime - nextPauseStart;
+            final long pauseDiff_Start = nextPause_Start - currentAbsoluteTime;
+            final long pauseDiff_End = nextPause_End - currentAbsoluteTime;
 
-            if (currentAbsoluteTime < nextPauseStart) {
+            final boolean isBeforeNextPause = pauseDiff_Start > 0;
+            final boolean isBeforeNextPause_End = pauseDiff_End > 0;
+
+            final boolean isInPause = isBeforeNextPause == false && isBeforeNextPause_End;
+
+            if (isBeforeNextPause) {
 
                // before next pause -> nothing to do
 
@@ -9286,22 +9301,29 @@ private Set<TourTag>                tourTags                            = new Ha
 
                // inside or after a pause
 
-               final long pauseDiffEnd = nextPauseEnd - currentAbsoluteTime;
-
-               if (currentAbsoluteTime < nextPauseEnd) {
+               if (isInPause) {
 
                   // inside a pause
 
-                  final int prevRelativeTime = timeSerie[serieIndex - 1];
-                  final int timeDiff = relativeTime - prevRelativeTime;
+                  final int nextSerieIndex = serieIndex < numTimeSlices
+                        ? serieIndex + 1
+                        : serieIndex;
 
-                  sumPausedTimes += timeDiff;
+                  final int nextRelativeTime = timeSerie[nextSerieIndex];
 
-                  // last pause reached -> skip further pause check
+                  final int timeDiff = nextRelativeTime - relativeTime;
+
+                  // set pause in the next slice because the pause flag is set before the pause
+                  nextSlicePausedTime = isAutoPause
+
+                        // auto pauses are ignored
+                        ? 0
+
+                        // pause is triggered by a user
+                        : timeDiff;
+
                   if (isLastPause) {
-
-                     nextPauseStart = Long.MAX_VALUE;
-                     nextPauseEnd = Long.MAX_VALUE;
+                     isLastPauseChecked = true;
                   }
 
                } else {
@@ -9310,18 +9332,34 @@ private Set<TourTag>                tourTags                            = new Ha
 
                   pauseIndex++;
 
-                  if (pauseIndex < numPauses - 1) {
+                  if (pauseIndex < numPauses) {
 
                      // next pause is available
 
-                     nextPauseStart = pausedTime_Start[pauseIndex];
-                     nextPauseEnd = pausedTime_End[pauseIndex];
+                     nextPause_Start = pausedTime_Start[pauseIndex];
+                     nextPause_End = pausedTime_End[pauseIndex];
+
+                     isAutoPause = pausedTime_Data[pauseIndex] == 1;
 
                   } else {
 
                      // last pause reached -> check last pause
 
                      isLastPause = true;
+                  }
+
+                  if (isLastPause
+
+                        // "wait" until the last pause is also checked
+                        && isLastPauseChecked) {
+
+                     /*
+                      * After the last pause, set max value that the current slice is always before
+                      * the "next" pause so that nothing is added
+                      */
+
+                     nextPause_Start = Long.MAX_VALUE;
+                     nextPause_End = Long.MAX_VALUE;
                   }
                }
             }
