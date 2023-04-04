@@ -18,6 +18,7 @@ package net.tourbook.cloud.suunto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
@@ -249,12 +250,19 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
          return UI.EMPTY_STRING;
       }
 
-      final HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(workoutUpload.getUrl()))
-            .header("x-ms-blob-type", workoutUpload.getHeaders().getXMsBlobType())
-            .timeout(Duration.ofMinutes(5))
-            //  .PUT(HttpRequest.BodyPublishers.ofString(body.toString()))
-            .build();
+      HttpRequest request = null;
+      try {
+         request = HttpRequest.newBuilder()
+               .uri(URI.create(workoutUpload.getUrl()))
+               .header("x-ms-blob-type", workoutUpload.getHeaders().getXMsBlobType())
+               .header(OAuth2Constants.CONTENT_TYPE, "application/octet-stream")
+               .timeout(Duration.ofMinutes(5))
+               .PUT(HttpRequest.BodyPublishers.ofFile(Paths.get(tourAbsoluteFilePath)))
+               .build();
+      } catch (final FileNotFoundException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
 
       return sendAsyncRequest(tourData, request);
    }

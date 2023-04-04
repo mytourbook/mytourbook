@@ -180,8 +180,12 @@ public class FitExporter {
          // Fake Record Data of Various Signal Patterns
          recordMesg.setDistance(tourData.distanceSerie[index]);
          recordMesg.setSpeed(tourData.getSpeedSerieMetric()[index]);
+         if (tourData.pulseSerie != null) {
          recordMesg.setHeartRate((short) tourData.pulseSerie[index]); // Sine
+         }
+         if (tourData.pulseSerie != null) {
          recordMesg.setCadence((short) tourData.getCadenceSerie()[index]); // Sawtooth
+         }
          recordMesg.setPower((int) tourData.getPowerSerie()[index]); //Square
          recordMesg.setAltitude(tourData.altitudeSerie[index]);
          recordMesg.setPositionLat(SemicirclesConverter.degreesToSemicircles(tourData.latitudeSerie[index]));
