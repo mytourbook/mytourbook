@@ -51,7 +51,5 @@ public class DialogDeleteTourValuesTests extends UITest {
       //Check that the calories were deleted
       tour = Utils.getTourWithSRTM(bot);
       assertEquals(UI.EMPTY_STRING, tour.cell(tourBookView_Calories_Column_Index));
-
-      bot.sleep(5000);
    }
 }
