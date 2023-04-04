@@ -389,7 +389,6 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
          e.printStackTrace();
       }
 
-
 //      final CompletableFuture<ActivityUpload> activityUpload =
 //OAuth2Utils.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
 //                  .thenApply(name -> convertResponseToUpload(name, tourDate))
@@ -403,18 +402,6 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       return UI.EMPTY_STRING;
    }
 
-   private void setAccessToken(final String accessToken) {
-      _prefStore.setValue(Preferences.STRAVA_ACCESSTOKEN, accessToken);
-   }
-
-   private void setAccessTokenExpirationDate(final long expireAt) {
-      _prefStore.setValue(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT, expireAt);
-   }
-
-   private void setRefreshToken(final String refreshToken) {
-      _prefStore.setValue(Preferences.STRAVA_REFRESHTOKEN, refreshToken);
-   }
-
    /**
     * https://apizone.suunto.com/how-to-workout-upload
     *
@@ -423,7 +410,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
     * @return
     */
    private String uploadFile(final String compressedTourAbsoluteFilePath,
-                                                        final TourData tourData) {
+                             final TourData tourData) {
 
       //final String title = buildFormattedTitle(tourData);
 
@@ -443,8 +430,6 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 
       return sendAsyncRequest(tourData, request);
    }
-
-
 
    @Override
    public void uploadTours(final List<TourData> selectedTours) {
