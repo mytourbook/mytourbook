@@ -21,13 +21,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,14 +42,11 @@ import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
-import net.tourbook.data.TourType;
 import net.tourbook.export.TourExporter;
 import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.tour.TourLogManager;
 import net.tourbook.tour.TourManager;
-import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.ui.TourTypeFilter;
-import net.tourbook.ui.TourTypeFilterSet;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -106,7 +103,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       return absoluteTourFilePath;
    }
 
-   private void deleteTemporaryTourFiles(final Map<String, TourData> tourFiles) {
+   private void deleteTemporaryFitFiles(final Map<String, TourData> tourFiles) {
 
       tourFiles.keySet().forEach(tourFilePath -> FileUtils.deleteIfExists(Paths.get(
             tourFilePath)));
@@ -167,11 +164,11 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       }
 
       return workoutUpload;
-
    }
 
    @Override
    protected boolean isReady() {
+
       _useActivePerson = SuuntoTokensRetrievalHandler.isReady_ActivePerson();
 
       _useAllPeople = false;
@@ -189,62 +186,6 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
             : UI.EMPTY_STRING;
 
       return tourTypeName;
-   }
-
-   /**
-    * Returns the Strava activity name from a given tour type
-    *
-    * @param tourType
-    */
-   private List<String> mapTourTypeToStravaActivity(final TourType tourType) {
-
-      final List<String> matchingStravaActivityNames = new ArrayList<>();
-
-      if (tourType == null || StringUtils.isNullOrEmpty(tourType.getName())) {
-         return matchingStravaActivityNames;
-      }
-
-      final List<TourTypeFilter> tourTypeFilters = TourTypeFilterManager.readTourTypeFilters();
-
-      tourTypeFilters.forEach(tourTypeFilter -> {
-
-         final TourTypeFilterSet tourTypeSet = tourTypeFilter.getTourTypeSet();
-
-         if (tourTypeSet != null) {
-
-            Arrays.asList(tourTypeSet.getTourTypes()).forEach(tourTypeItem -> {
-
-               if (tourTypeItem instanceof TourType &&
-                     ((TourType) tourTypeItem).getName().equals(tourType.getName())) {
-
-                  final String name = tourTypeSet.getName();
-                  matchingStravaActivityNames.add(name);
-               }
-            });
-         }
-      });
-
-      return matchingStravaActivityNames;
-   }
-
-   private void processManualTour(final IProgressMonitor monitor,
-                                  final TourData tourData,
-                                  final Map<TourData, String> manualTours) {
-
-      if (StringUtils.isNullOrEmpty(tourData.getTourTitle())) {
-
-         final String tourDate = TourManager.getTourDateTimeShort(tourData);
-
-         TourLogManager.log_ERROR(NLS.bind(Messages.Log_UploadToursToStrava_002_NoTourTitle, tourDate));
-         monitor.worked(2);
-
-      } else {
-
-         final String stravaActivityName = mapTourType(tourData);
-
-         manualTours.put(tourData, stravaActivityName);
-         monitor.worked(1);
-      }
    }
 
    private void processTours(final List<TourData> selectedTours,
@@ -309,7 +250,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       }
 
       final HttpRequest request = HttpRequest.newBuilder()
-            .uri(OAuth2Utils.createOAuthPasseurUri(workoutUpload.getUrl()))
+            .uri(URI.create(workoutUpload.getUrl()))
             .header("x-ms-blob-type", workoutUpload.getHeaders().getXMsBlobType())
             .timeout(Duration.ofMinutes(5))
             //  .PUT(HttpRequest.BodyPublishers.ofString(body.toString()))
@@ -412,7 +353,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 //         }
 //      });
 
-      deleteTemporaryTourFiles(tours);
+      deleteTemporaryFitFiles(tours);
 
       return numberOfUploadedTours[0];
    }

@@ -18,7 +18,7 @@ package net.tourbook.cloud.suunto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class WorkoutUpload {
+class WorkoutUpload {
 
    private String  id;
    private String  url;
