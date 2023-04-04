@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -82,7 +82,7 @@ class Current {
          return UI.EMPTY_STRING;
       }
 
-      return TimeMachineResult.convertWeatherTypeToMTWeatherClouds(getWeather().get(0).getId());
+      return OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds(getWeather().get(0).getIcon());
    }
 
    public String getWeatherDescription() {

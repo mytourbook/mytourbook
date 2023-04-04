@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.OptionalDouble;
 
 import net.tourbook.common.UI;
-import net.tourbook.common.weather.IWeather;
 import net.tourbook.weather.WeatherUtils;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -232,83 +231,10 @@ public class HistoryResult {
 
    public String getWeatherType() {
 
-      String weatherType = UI.EMPTY_STRING;
-
       if (middleHourData == null) {
-         return weatherType;
+         return UI.EMPTY_STRING;
       }
 
-      // Weather Icons and Codes  : https://www.weatherapi.com/docs/#weather-icons
-      switch (middleHourData.getCondition().getCode()) {
-      case 1006:
-      case 1009:
-      case 1030:
-      case 1135:
-      case 1147:
-         weatherType = IWeather.WEATHER_ID_OVERCAST;
-         break;
-      case 1000:
-         weatherType = IWeather.WEATHER_ID_CLEAR;
-         break;
-      case 1003:
-         weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
-         break;
-      case 1087:
-         weatherType = IWeather.WEATHER_ID_LIGHTNING;
-         break;
-      case 1192:
-      case 1195:
-      case 1201:
-      case 1243:
-      case 1246:
-      case 1252:
-      case 1276:
-         weatherType = IWeather.WEATHER_ID_RAIN;
-         break;
-      case 1066:
-      case 1114:
-      case 1117:
-      case 1210:
-      case 1213:
-      case 1216:
-      case 1219:
-      case 1222:
-      case 1225:
-      case 1237:
-      case 1255:
-      case 1258:
-      case 1261:
-      case 1264:
-      case 1279:
-      case 1282:
-         weatherType = IWeather.WEATHER_ID_SNOW;
-         break;
-      case 1063:
-      case 1069:
-      case 1180:
-      case 1183:
-      case 1186:
-      case 1189:
-      case 1198:
-      case 1204:
-      case 1207:
-      case 1240:
-      case 1249:
-      case 1273:
-         weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
-         break;
-      case 1072:
-      case 1150:
-      case 1153:
-      case 1168:
-      case 1171:
-         weatherType = IWeather.WEATHER_ID_DRIZZLE;
-         break;
-      default:
-         weatherType = UI.EMPTY_STRING;
-         break;
-      }
-
-      return weatherType;
+      return WeatherApiRetriever.convertWeatherCodeToMTWeatherClouds(middleHourData.getCondition().getCode());
    }
 }

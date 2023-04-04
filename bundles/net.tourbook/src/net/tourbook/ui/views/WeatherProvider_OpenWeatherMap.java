@@ -39,11 +39,6 @@ class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
 
    private static final String URL_OPENWEATHERMAP_ORG = "https://openweathermap.org/";//$NON-NLS-1$
 
-   /*
-    * UI controls
-    */
-   private Button _btnTestConnection;
-
    public WeatherProvider_OpenWeatherMap() {}
 
    @Override
@@ -74,9 +69,9 @@ class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
          /*
           * Button: test connection
           */
-         _btnTestConnection = new Button(container, SWT.NONE);
-         _btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
-         _btnTestConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
+         final Button btnTestConnection = new Button(container, SWT.NONE);
+         btnTestConnection.setText(Messages.Pref_Weather_Button_TestHTTPConnection);
+         btnTestConnection.addSelectionListener(widgetSelectedAdapter(selectionEvent -> {
 
             final long previousHour = Instant
                   .now()
@@ -84,7 +79,7 @@ class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
                   .toEpochMilli() / 1000;
 
             HistoricalWeatherRetriever.checkVendorConnection(
-                  OpenWeatherMapRetriever.getBaseApiUrl() +
+                  OpenWeatherMapRetriever.getBaseTimeMachineApiUrl() +
                         "?units=metric&lat=0&lon=0&dt=" + //$NON-NLS-1$
                         previousHour,
                   IWeatherProvider.WEATHER_PROVIDER_OPENWEATHERMAP_ID);
@@ -94,7 +89,7 @@ class WeatherProvider_OpenWeatherMap implements IWeatherProvider {
                .indent(defaultHIndent, 0)
                .align(SWT.BEGINNING, SWT.FILL)
                .span(2, 1)
-               .applyTo(_btnTestConnection);
+               .applyTo(btnTestConnection);
       }
 
       {

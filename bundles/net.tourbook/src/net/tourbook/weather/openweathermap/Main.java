@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,20 +13,16 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.common.util;
+package net.tourbook.weather.openweathermap;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import org.junit.jupiter.api.Test;
+@JsonIgnoreProperties(ignoreUnknown = true)
+class Main {
 
-public class FilesUtilsTests {
+   private int aqi;
 
-   @Test
-   void testRemoveExtensions() {
-
-      assertAll(
-            () -> assertEquals("file.json", FileUtils.removeExtensions("file.json.gz")), //$NON-NLS-1$ //$NON-NLS-2$
-            () -> assertEquals("file", FileUtils.removeExtensions("file"))); //$NON-NLS-1$ //$NON-NLS-2$
+   public int getAqi() {
+      return aqi;
    }
 }

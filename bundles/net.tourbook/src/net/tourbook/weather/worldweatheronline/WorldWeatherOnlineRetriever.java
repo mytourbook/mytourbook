@@ -36,6 +36,7 @@ import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
+import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.TourData;
 import net.tourbook.preferences.ITourbookPreferences;
 import net.tourbook.ui.views.calendar.CalendarProfile;
@@ -85,12 +86,87 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
             .plusSeconds(tour.getTourDeviceTime_Elapsed()));
    }
 
-   public static String getApiUrl() {
-      return baseApiUrl + keyParameter;
+   public static String convertWeatherCodeToMTWeatherClouds(final String weatherCode) {
+
+      String weatherType;
+
+      // Codes : http://www.worldweatheronline.com/feed/wwoConditionCodes.xml
+      //https://www.worldweatheronline.com/weather-api/api/docs/weather-icons.aspx
+      switch (weatherCode) {
+      case "122": //$NON-NLS-1$
+      case "119": //$NON-NLS-1$
+      case "143": //$NON-NLS-1$
+      case "248": //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_OVERCAST;
+         break;
+      case "113": //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_CLEAR;
+         break;
+      case "116": //$NON-NLS-1$
+      case "260": //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
+         break;
+      case "299": //$NON-NLS-1$
+      case "302": //$NON-NLS-1$
+      case "305": //$NON-NLS-1$
+      case "308": //$NON-NLS-1$
+      case "314": //$NON-NLS-1$
+      case "356": //$NON-NLS-1$
+      case "359": //$NON-NLS-1$
+      case "377": //$NON-NLS-1$
+      case "365": //$NON-NLS-1$
+      case "389": //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_RAIN;
+         break;
+      case "332": //$NON-NLS-1$
+      case "335": //$NON-NLS-1$
+      case "338": //$NON-NLS-1$
+      case "329": //$NON-NLS-1$
+      case "326": //$NON-NLS-1$
+      case "323": //$NON-NLS-1$
+      case "320": //$NON-NLS-1$
+      case "371": //$NON-NLS-1$
+      case "368": //$NON-NLS-1$
+      case "230": //$NON-NLS-1$
+      case "227": //$NON-NLS-1$
+      case "179": //$NON-NLS-1$
+      case "392": //$NON-NLS-1$
+      case "395": //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_SNOW;
+         break;
+      case "200": //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
+         break;
+      case "374": //$NON-NLS-1$
+      case "362": //$NON-NLS-1$
+      case "350": //$NON-NLS-1$
+      case "317": //$NON-NLS-1$
+      case "182": //$NON-NLS-1$
+      case "176": //$NON-NLS-1$
+      case "386": //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
+         break;
+      case "311": //$NON-NLS-1$
+      case "353": //$NON-NLS-1$
+      case "185": //$NON-NLS-1$
+      case "263": //$NON-NLS-1$
+      case "266": //$NON-NLS-1$
+      case "281": //$NON-NLS-1$
+      case "284": //$NON-NLS-1$
+      case "293": //$NON-NLS-1$
+      case "296": //$NON-NLS-1$
+         weatherType = IWeather.WEATHER_ID_DRIZZLE;
+         break;
+      default:
+         weatherType = UI.EMPTY_STRING;
+         break;
+      }
+
+      return weatherType;
    }
 
-   public static String getBaseApiUrl() {
-      return baseApiUrl;
+   public static String getApiUrl() {
+      return baseApiUrl + keyParameter;
    }
 
    @Override
@@ -108,12 +184,18 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
          final boolean isDisplayEmptyValues = !isCompressed;
          String fullWeatherData = WeatherUtils.buildFullWeatherDataString(
                hourly.getTempC(),
+               WeatherUtils.getWeatherIcon(
+                     WeatherUtils.getWeatherIndex(
+                           convertWeatherCodeToMTWeatherClouds(
+                                 hourly.getWeatherCode()))),
+               hourly.getWeatherDescription(),
                hourly.getFeelsLikeC(),
                hourly.getWindspeedKmph(),
                hourly.getWinddirDegree(),
                hourly.getHumidity(),
                hourly.getPressure(),
                hourly.getPrecipMM(),
+               0,
                0,
                tourDateTime,
                isDisplayEmptyValues);
@@ -175,7 +257,7 @@ public class WorldWeatherOnlineRetriever extends HistoricalWeatherRetriever {
 
    // SET_FORMATTING_OFF
 
-      weatherRequestWithParameters.append(      "key"             + "=" + prefStore.getString(ITourbookPreferences.WEATHER_API_KEY)); //$NON-NLS-1$ //$NON-NLS-2$
+      weatherRequestWithParameters.append(      "key"             + "=" + prefStore.getString(ITourbookPreferences.WEATHER_API_KEY).trim()); //$NON-NLS-1$ //$NON-NLS-2$
       weatherRequestWithParameters.append("&" + "q"               + "=" + searchAreaCenter.getLatitude() + "," + searchAreaCenter.getLongitude()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
       weatherRequestWithParameters.append("&" + "date"            + "=" + startDate); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
       //tp=1 : Specifies the weather forecast time interval in hours. Here, every 1 hour

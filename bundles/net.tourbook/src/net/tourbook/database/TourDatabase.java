@@ -112,7 +112,7 @@ public class TourDatabase {
     * <li>/net.tourbook.export/format-templates/mt-1.0.vm</li>
     * <li>net.tourbook.device.mt.MT_StAXHandler</li>
     */
-   private static final int TOURBOOK_DB_VERSION = 49;
+   private static final int TOURBOOK_DB_VERSION = 50;
 
 //   private static final int TOURBOOK_DB_VERSION = 50; // 23.x ??????
 
@@ -4151,6 +4151,12 @@ public class TourDatabase {
 
             // version 47 end
 
+            // version 50 start  -  after 23.3
+
+            + " weather_AirQuality   VARCHAR(" + TourData.DB_LENGTH_WEATHER_AIRQUALITY + "), " + NL //$NON-NLS-1$ //$NON-NLS-2$
+
+            // version 50 end
+
             // version 5 start
             /**
              * Disabled because when two blob object's are deserialized then the error occurs:
@@ -5832,6 +5838,11 @@ public class TourDatabase {
          // 48 -> 49    23.3
          if (currentDbVersion == 48) {
             currentDbVersion = _dbDesignVersion_New = updateDb_048_To_049(conn, splashManager);
+         }
+
+         // 49 -> 50    23.X
+         if (currentDbVersion == 49) {
+            currentDbVersion = _dbDesignVersion_New = updateDb_049_To_050(conn, splashManager);
          }
 
          // update db design version number
@@ -9404,6 +9415,29 @@ public class TourDatabase {
       final Statement stmt = connection.createStatement();
       {
          SQL.AddColumn_VarCar(stmt, TABLE_TOUR_TAG, "imageFilePath", TourTag.DB_LENGTH_FILE_PATH); //$NON-NLS-1$
+      }
+      stmt.close();
+
+      logDbUpdate_End(newDbVersion);
+
+      return newDbVersion;
+   }
+
+   private int updateDb_049_To_050(final Connection conn, final SplashManager splashManager) throws SQLException {
+
+      final int newDbVersion = 50;
+
+      logDbUpdate_Start(newDbVersion);
+      updateMonitor(splashManager, newDbVersion);
+
+      final Statement stmt = conn.createStatement();
+      {
+// SET_FORMATTING_OFF
+
+         // Add new columns
+         SQL.AddColumn_VarCar (stmt, TABLE_TOUR_DATA, "weather_AirQuality", TourData.DB_LENGTH_WEATHER_AIRQUALITY);       //$NON-NLS-1$
+
+// SET_FORMATTING_ON
       }
       stmt.close();
 

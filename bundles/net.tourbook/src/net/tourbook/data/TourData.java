@@ -150,6 +150,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public static final int               DB_LENGTH_TIME_ZONE_ID            = 255;
 
    public static final int               DB_LENGTH_WEATHER                 = 1000;
+   public static final int               DB_LENGTH_WEATHER_AIRQUALITY      = 255;
    public static final int               DB_LENGTH_WEATHER_V48             = 32000;
    public static final int               DB_LENGTH_WEATHER_CLOUDS          = 255;
 
@@ -626,6 +627,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private float                 weather_Temperature_WindChill;                        // db-version 39
 
 
+   /**
+    * Air Quality
+    */
+   private String                 weather_AirQuality;                                  // db-version 50
+
    // ############################################# POWER #############################################
 
    /** Unit is Watt */
@@ -998,15 +1004,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    @ManyToMany(fetch = EAGER)
    @JoinTable(inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagID"))
- @JsonProperty
-private Set<TourTag>                tourTags                            = new HashSet<>();
+   @JsonProperty
+   private Set<TourTag>                tourTags                            = new HashSet<>();
 
    /**
     * Sensors
     */
    @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private Set<DeviceSensorValue>     deviceSensorValues                  = new HashSet<>();
+   private Set<DeviceSensorValue>      deviceSensorValues                  = new HashSet<>();
 
 //   /**
 //    * SharedMarker
@@ -1199,6 +1205,13 @@ private Set<TourTag>                tourTags                            = new Ha
     */
    @Transient
    private int[]                 movingTimeSerie;
+
+   /**
+    *
+    * This is a time serie like {@link #timeSerie} but contains only times without pauses
+    */
+   @Transient
+   private int[]                 recordedTimeSerie;
 
    /**
     * Contains the temperature in the metric measurement system.
@@ -2298,6 +2311,7 @@ private Set<TourTag>                tourTags                            = new Ha
       breakTimeSerie = null;
       pausedTimeSerie = null;
       movingTimeSerie = null;
+      recordedTimeSerie = null;
 
       _pulseSerie_Smoothed = null;
       pulseSerie_FromTime = null;
@@ -9226,6 +9240,151 @@ private Set<TourTag>                tourTags                            = new Ha
       return rearShiftCount;
    }
 
+   public int[] getRecordedTimeSerie() {
+
+      if (recordedTimeSerie != null) {
+//         return recordedTimeSerie;
+      }
+
+      // check if data are available
+      if (timeSerie == null || timeSerie.length == 0) {
+         return null;
+      }
+
+      final boolean isPauseTimeAvailable = pausedTime_Start != null && pausedTime_Start.length > 0;
+      final boolean isPauseDataAvailable = pausedTime_Data != null && pausedTime_Start.length > 0;
+
+      int numPauses = 0;
+      long nextPause_Start = Long.MAX_VALUE;
+      long nextPause_End = Long.MAX_VALUE;
+
+      // pause data are not available -> it will be displayed as an auto-pause
+      // this is equal to TourManager.createJoinedTourData()
+      boolean isAutoPause = true;
+      boolean isLastPause = false;
+      boolean isLastPauseChecked = false;
+
+      if (isPauseTimeAvailable) {
+
+         numPauses = pausedTime_Start.length;
+         nextPause_Start = pausedTime_Start[0];
+         nextPause_End = pausedTime_End[0];
+      }
+
+      if (isPauseDataAvailable) {
+         isAutoPause = pausedTime_Data[0] == 1;
+      }
+
+      final int numTimeSlices = timeSerie.length;
+
+      recordedTimeSerie = new int[numTimeSlices];
+
+      int sumPausedTimes = 0;
+      int nextSlicePausedTime = 0;
+
+      int pauseIndex = 0;
+
+      // loop: all time slices
+      for (int serieIndex = 0; serieIndex < numTimeSlices; serieIndex++) {
+
+         final int relativeTime = timeSerie[serieIndex];
+
+         // set pause time from the previous slice because the pause flag is set before the pause
+         sumPausedTimes += nextSlicePausedTime;
+         nextSlicePausedTime = 0;
+
+         if (isPauseTimeAvailable) {
+
+            final long currentAbsoluteTime = relativeTime * 1000L + tourStartTime;
+
+            final long pauseDiff_Start = nextPause_Start - currentAbsoluteTime;
+            final long pauseDiff_End = nextPause_End - currentAbsoluteTime;
+
+            final boolean isBeforeNextPause = pauseDiff_Start > 0;
+            final boolean isBeforeNextPause_End = pauseDiff_End > 0;
+
+            final boolean isInPause = isBeforeNextPause == false && isBeforeNextPause_End;
+
+            if (isBeforeNextPause) {
+
+               // before next pause -> nothing to do
+
+            } else {
+
+               // inside or after a pause
+
+               if (isInPause) {
+
+                  // inside a pause
+
+                  final int nextSerieIndex = serieIndex < numTimeSlices
+                        ? serieIndex + 1
+                        : serieIndex;
+
+                  final int nextRelativeTime = timeSerie[nextSerieIndex];
+
+                  final int timeDiff = nextRelativeTime - relativeTime;
+
+                  // set pause in the next slice because the pause flag is set before the pause
+                  nextSlicePausedTime = isAutoPause
+
+                        // auto pauses are ignored
+                        ? 0
+
+                        // pause is triggered by a user
+                        : timeDiff;
+
+                  if (isLastPause) {
+                     isLastPauseChecked = true;
+                  }
+
+               } else {
+
+                  // after a pause -> advance to the next pause
+
+                  pauseIndex++;
+
+                  if (pauseIndex < numPauses) {
+
+                     // next pause is available
+
+                     nextPause_Start = pausedTime_Start[pauseIndex];
+                     nextPause_End = pausedTime_End[pauseIndex];
+
+                     if (isPauseDataAvailable) {
+                        isAutoPause = pausedTime_Data[0] == 1;
+                     }
+
+                  } else {
+
+                     // last pause reached -> check last pause
+
+                     isLastPause = true;
+                  }
+
+                  if (isLastPause
+
+                        // "wait" until the last pause is also checked
+                        && isLastPauseChecked) {
+
+                     /*
+                      * After the last pause, set max value that the current slice is always before
+                      * the "next" pause so that nothing is added
+                      */
+
+                     nextPause_Start = Long.MAX_VALUE;
+                     nextPause_End = Long.MAX_VALUE;
+                  }
+               }
+            }
+         }
+
+         recordedTimeSerie[serieIndex] = relativeTime - sumPausedTimes;
+      }
+
+      return recordedTimeSerie;
+   }
+
    public int getRestPulse() {
       return restPulse;
    }
@@ -10161,6 +10320,20 @@ private Set<TourTag>                tourTags                            = new Ha
     */
    public String getWeather() {
       return weather == null ? UI.EMPTY_STRING : weather;
+   }
+
+   public String getWeather_AirQuality() {
+      return weather_AirQuality;
+   }
+
+   /**
+    * @return Returns the index for the air quality value in
+    *         {@link IWeather#airQualityTexts} or 0 when the air quality
+    *         index is not defined
+    */
+   public int getWeather_AirQuality_TextIndex() {
+
+      return WeatherUtils.getWeather_AirQuality_TextIndex(weather_AirQuality);
    }
 
    /**
@@ -12645,6 +12818,10 @@ private Set<TourTag>                tourTags                            = new Ha
     */
    public void setWeather(final String weather) {
       this.weather = weather;
+   }
+
+   public void setWeather_AirQuality(final String weather_AirQuality) {
+      this.weather_AirQuality = weather_AirQuality;
    }
 
    /**

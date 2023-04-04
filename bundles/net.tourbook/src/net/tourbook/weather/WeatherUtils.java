@@ -20,6 +20,7 @@ import com.javadocmd.simplelatlng.LatLngTool;
 import com.javadocmd.simplelatlng.util.LengthUnit;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import net.tourbook.Messages;
@@ -39,11 +40,13 @@ public class WeatherUtils {
    /**
     * Returns the fully detailed weather data as a human readable string.
     * Example:
-    * 12h 6°C feels like 3°C 12km/h from 84° humidity 97% pressure 1012mbar precipitation 3mm
-    * snowfall 0mm
+    * 12h ⛅ Partly cloudy 6°C feels like 3°C 12km/h from 84° humidity 97% pressure 1012mbar
+    * precipitation 3mm snowfall 0mm air quality Fair
     *
     * @param temperatureValue
     *           in Celsius
+    * @param cloudsType
+    * @param weatherDescription
     * @param windChill
     *           in Celsius
     * @param windSpeed
@@ -58,11 +61,14 @@ public class WeatherUtils {
     *           in mm
     * @param snowFallValue
     *           in epoch seconds
-    * @param timeZonedId
+    * @param airQualityIndex
+    * @param tourDateTime
     * @param isDisplayEmptyValues
     * @return
     */
    public static String buildFullWeatherDataString(final float temperatureValue,
+                                                   final String cloudsType,
+                                                   final String weatherDescription,
                                                    final float windChill,
                                                    final float windSpeed,
                                                    final int windDirection,
@@ -70,6 +76,7 @@ public class WeatherUtils {
                                                    final int pressureValue,
                                                    final float precipitationValue,
                                                    final float snowFallValue,
+                                                   final int airQualityIndex,
                                                    final TourDateTime tourDateTime,
                                                    final boolean isDisplayEmptyValues) {
 
@@ -123,16 +130,27 @@ public class WeatherUtils {
                + UI.UNIT_LABEL_DISTANCE_MM_OR_INCH;
       }
 
+      String airQuality = UI.EMPTY_STRING;
+      if (airQualityIndex > 0 || isDisplayEmptyValues) {
+
+         airQuality = Messages.Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality
+               + UI.SPACE
+               + airQualityIndex;
+      }
+
       final String fullWeatherData = UI.EMPTY_STRING
 
             + tourTime + UI.SPACE3
+            + cloudsType + UI.SPACE3
+            + weatherDescription + UI.SPACE3
             + temperature + UI.SPACE3
             + feelsLike + UI.SPACE3
             + wind + UI.SPACE3
             + humidity + UI.SYMBOL_PERCENTAGE + UI.SPACE3
             + pressure + UI.SPACE3
             + precipitation + UI.SPACE3
-            + snowFall;
+            + snowFall + UI.SPACE3
+            + airQuality;
 
       return fullWeatherData;
    }
@@ -140,18 +158,17 @@ public class WeatherUtils {
    /**
     * Returns the weather data as a human readable string, depending on the
     * desired data.
-    * Example: ☀ Sunny, 19°C, max. 26°C, min. 10°C, feels like 19°C, 6km/h from SSE, 34% humidity
+    * Example: ☀ Sunny, avg. 19°C, max. 26°C, min. 10°C, feels like 19°C, 6km/h from SSE, air
+    * quality Fair, humidity 34%
     *
     * @param tourData
-    * @param isDisplayMinimumTemperature
-    * @param isDisplayMaximumTemperature
+    * @param isDisplayMaximumMinimumTemperature
     * @param isDisplayPressure
     * @param isWeatherDataSeparatorNewLine
     * @return
     */
    public static String buildWeatherDataString(final TourData tourData,
-                                               final boolean isDisplayMinimumTemperature,
-                                               final boolean isDisplayMaximumTemperature,
+                                               final boolean isDisplayMaximumMinimumTemperature,
                                                final boolean isDisplayPressure,
                                                final boolean isWeatherDataSeparatorNewLine) {
 
@@ -182,24 +199,31 @@ public class WeatherUtils {
          final float averageTemperature = tourData.getWeather_Temperature_Average();
          if (averageTemperature != Float.MIN_VALUE) {
 
+            //TODO When using a JDK version that supports Unicode 11.0 (JDK >= 12)
+//            if (averageTemperature < 0) {
+//
+//               // Cold face 🥶
+//               weatherDataList.add(UI.SPACE + "\ud83e\udd76"); //$NON-NLS-1$
+//            } else if (averageTemperature > 32) {
+//
+//               // Hot face 🥵
+//               weatherDataList.add(UI.SPACE + "\ud83e\udd75"); //$NON-NLS-1$
+//            }
             weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Avg
                   + UI.SPACE
                   + FormatManager.formatTemperature(UI.convertTemperatureFromMetric(averageTemperature))
                   + UI.UNIT_LABEL_TEMPERATURE);
          }
 
-         // Minimum temperature
-         if (isDisplayMinimumTemperature) {
+         if (isDisplayMaximumMinimumTemperature) {
 
+         // Minimum temperature
             weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Min
                   + UI.SPACE
                   + FormatManager.formatTemperature(UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Min()))
                   + UI.UNIT_LABEL_TEMPERATURE);
-         }
 
          // Maximum temperature
-         if (isDisplayMaximumTemperature) {
-
             weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_Temperature_Max
                   + UI.SPACE
                   + FormatManager.formatTemperature(UI.convertTemperatureFromMetric(tourData.getWeather_Temperature_Max()))
@@ -233,6 +257,15 @@ public class WeatherUtils {
          weatherAvgValues.add(Math.round(UI.convertSpeed_FromMetric(windSpeed))
                + UI.UNIT_LABEL_SPEED
                + windDirection);
+      }
+
+      // Air Quality
+      final String airQuality = tourData.getWeather_AirQuality();
+      if (StringUtils.hasContent(airQuality)) {
+
+         weatherAvgValues.add(Messages.Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality +
+               UI.SPACE +
+               airQuality);
       }
 
       // Humidity
@@ -388,6 +421,14 @@ public class WeatherUtils {
             LatLngTool.travel(startPoint, bearingBetweenPoint, distanceFromStart / 2, LengthUnit.METER);
 
       return searchAreaCenter;
+   }
+
+   public static int getWeather_AirQuality_TextIndex(final String weather_AirQuality) {
+
+      final int Weather_AirQuality_TextIndex =
+            Arrays.asList(IWeather.airQualityTexts).indexOf(weather_AirQuality);
+
+      return Weather_AirQuality_TextIndex < 0 ? 0 : Weather_AirQuality_TextIndex;
    }
 
    /**

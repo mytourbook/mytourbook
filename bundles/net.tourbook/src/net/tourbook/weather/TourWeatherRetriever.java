@@ -62,14 +62,13 @@ public final class TourWeatherRetriever {
       }
 
       final boolean isWeatherRetrieved = historicalWeatherRetriever.retrieveHistoricalWeatherData();
-
       if (isWeatherRetrieved) {
 
          tourData.setIsWeatherDataFromProvider(true);
 
          TourLogManager.subLog_OK(TourManager.getTourDateTimeShort(tourData) +
                UI.SYMBOL_COLON + UI.SPACE +
-               WeatherUtils.buildWeatherDataString(tourData, true, true, true, false));
+               WeatherUtils.buildWeatherDataString(tourData, true, true, false));
 
          if (_prefStore.getBoolean(ITourbookPreferences.WEATHER_DISPLAY_FULL_LOG)) {
 

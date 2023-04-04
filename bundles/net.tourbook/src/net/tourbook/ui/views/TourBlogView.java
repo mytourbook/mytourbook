@@ -416,8 +416,7 @@ public class TourBlogView extends ViewPart {
       String tourTitle = _tourData.getTourTitle();
       String tourDescription = _tourData.getTourDescription();
       String tourWeather = WeatherUtils.buildWeatherDataString(_tourData,
-            true, // isDisplayMinimumTemperature
-            true, // isDisplayMaximumTemperature
+            true, // isdisplayMaximumMinimumTemperature
             true, // isDisplayPressure
             isSaveWeatherLogInWeatherDescription // isWeatherDataSeparatorNewLine
       );
