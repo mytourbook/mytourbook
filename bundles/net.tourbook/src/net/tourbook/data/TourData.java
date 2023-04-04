@@ -9252,23 +9252,29 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
       }
 
       final boolean isPauseTimeAvailable = pausedTime_Start != null && pausedTime_Start.length > 0;
+      final boolean isPauseDataAvailable = pausedTime_Data != null && pausedTime_Start.length > 0;
 
+      int numPauses = 0;
       long nextPause_Start = Long.MAX_VALUE;
       long nextPause_End = Long.MAX_VALUE;
 
-      boolean isAutoPause = false;
+      // pause data are not available -> it will be displayed as an auto-pause
+      // this is equal to TourManager.createJoinedTourData()
+      boolean isAutoPause = true;
       boolean isLastPause = false;
       boolean isLastPauseChecked = false;
 
       if (isPauseTimeAvailable) {
 
+         numPauses = pausedTime_Start.length;
          nextPause_Start = pausedTime_Start[0];
          nextPause_End = pausedTime_End[0];
+      }
 
+      if (isPauseDataAvailable) {
          isAutoPause = pausedTime_Data[0] == 1;
       }
 
-      final int numPauses = pausedTime_Start.length;
       final int numTimeSlices = timeSerie.length;
 
       recordedTimeSerie = new int[numTimeSlices];
@@ -9345,7 +9351,9 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
                      nextPause_Start = pausedTime_Start[pauseIndex];
                      nextPause_End = pausedTime_End[pauseIndex];
 
-                     isAutoPause = pausedTime_Data[pauseIndex] == 1;
+                     if (isPauseDataAvailable) {
+                        isAutoPause = pausedTime_Data[0] == 1;
+                     }
 
                   } else {
 
