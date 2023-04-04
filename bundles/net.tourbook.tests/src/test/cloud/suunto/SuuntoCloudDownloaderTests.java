@@ -20,8 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.pgssoft.httpclient.HttpClientMock;
 import com.sun.net.httpserver.HttpServer;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -38,6 +36,7 @@ import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.suunto.SuuntoCloudDownloader;
 import net.tourbook.cloud.suunto.SuuntoTokensRetrievalHandler;
+import net.tourbook.common.UI;
 import net.tourbook.tour.TourLogManager;
 
 import org.eclipse.jface.preference.IPreferenceStore;

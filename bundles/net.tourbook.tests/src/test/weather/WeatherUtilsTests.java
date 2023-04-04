@@ -17,11 +17,10 @@ package weather;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.byteholder.geoclipse.map.UI;
-
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import net.tourbook.common.UI;
 import net.tourbook.common.formatter.FormatManager;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.weather.WeatherUtils;
