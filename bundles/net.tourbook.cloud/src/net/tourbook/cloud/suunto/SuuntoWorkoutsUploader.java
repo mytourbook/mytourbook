@@ -18,21 +18,20 @@ package net.tourbook.cloud.suunto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Messages;
@@ -69,7 +68,7 @@ import org.json.JSONObject;
 public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
    private static final String     SuuntoUploadUrl   = "https://cloudapi.suunto.com/v2/upload";    //$NON-NLS-1$\n"
    private static IPreferenceStore _prefStore        = Activator.getDefault().getPreferenceStore();
-   private static TourExporter     _tourExporter     = new TourExporter("fit"); //$NON-NLS-1$
+   private static TourExporter     _tourExporter     = new TourExporter("fit");                    //$NON-NLS-1$
 
    private static String           CLOUD_UPLOADER_ID = "Suunto";                                   //$NON-NLS-1$
    private boolean                 _useActivePerson;
@@ -151,22 +150,6 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       return title;
    }
 
-   private String createFitTourFile(final IProgressMonitor monitor,
-                                    final TourData tourData) {
-
-      final String absoluteTourFilePath = FileUtils.createTemporaryFile(
-            String.valueOf(tourData.getTourId()),
-            "tcx"); //$NON-NLS-1$
-
-      final String exportedTcxGzFile = exportTcxGzFile(tourData, absoluteTourFilePath);
-
-      FileUtils.deleteIfExists(Paths.get(absoluteTourFilePath));
-
-      monitor.worked(1);
-
-      return absoluteTourFilePath;
-   }
-
    private List<TourTypeFilter> createStravaTourTypeFilters() {
 
       final List<TourTypeFilter> stravaTourTypeFilters = new ArrayList<>();
@@ -178,6 +161,19 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
             });
 
       return stravaTourTypeFilters;
+   }
+
+   private String createTourFile_Fit(final TourData tourData) {
+
+      final String absoluteTourFilePath = FileUtils.createTemporaryFile(
+            String.valueOf(tourData.getTourId()),
+            "fit"); //$NON-NLS-1$
+
+      final String exportedTcxGzFile = exportTcxGzFile(tourData, absoluteTourFilePath);
+
+      FileUtils.deleteIfExists(Paths.get(absoluteTourFilePath));
+
+      return absoluteTourFilePath;
    }
 
    private void deleteTemporaryTourFiles(final Map<String, TourData> tourFiles) {
@@ -193,15 +189,24 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
    }
 
    private String getAccessToken() {
-      return _prefStore.getString(Preferences.STRAVA_ACCESSTOKEN);
-   }
 
-   private long getAccessTokenExpirationDate() {
-      return _prefStore.getLong(Preferences.STRAVA_ACCESSTOKEN_EXPIRES_AT);
+      if (_useActivePerson) {
+         return SuuntoTokensRetrievalHandler.getAccessToken_ActivePerson();
+      } else if (_useAllPeople) {
+         return SuuntoTokensRetrievalHandler.getAccessToken_AllPeople();
+      }
+
+      return UI.EMPTY_STRING;
    }
 
    private String getRefreshToken() {
-      return _prefStore.getString(Preferences.STRAVA_REFRESHTOKEN);
+
+      if (_useActivePerson) {
+         return SuuntoTokensRetrievalHandler.getRefreshToken_ActivePerson();
+      } else if (_useAllPeople) {
+         return SuuntoTokensRetrievalHandler.getRefreshToken_AllPeople();
+      }
+      return UI.EMPTY_STRING;
    }
 
    @Override
@@ -213,25 +218,6 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
                   : new ArrayList<>();
 
       return stravaTourTypeFilters;
-   }
-
-   private boolean getValidTokens() {
-
-      if (OAuth2Utils.isAccessTokenValid(getAccessTokenExpirationDate())) {
-         return true;
-      }
-
-      final StravaTokens newTokens = getTokens(UI.EMPTY_STRING, true, getRefreshToken());
-
-      boolean isTokenValid = false;
-      if (newTokens != null) {
-         setAccessTokenExpirationDate(newTokens.getExpires_at());
-         setRefreshToken(newTokens.getRefresh_token());
-         setAccessToken(newTokens.getAccess_token());
-         isTokenValid = true;
-      }
-
-      return isTokenValid;
    }
 
    @Override
@@ -381,25 +367,41 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
             }
          }
 
-         createFitTourFile(monitor, tourData);
+         createTourFile_Fit(tourData);
       }
    }
 
-   private CompletableFuture<ActivityUpload> sendAsyncRequest(final TourData tour, final HttpRequest request) {
+   private String sendAsyncRequest(final TourData tour, final HttpRequest request) {
 
       final String tourDate = TourManager.getTourDateTimeShort(tour);
 
-      final CompletableFuture<ActivityUpload> activityUpload =
-            OAuth2Utils.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                  .thenApply(name -> convertResponseToUpload(name, tourDate))
-                  .exceptionally(e -> {
-                     final ActivityUpload errorUpload = new ActivityUpload();
-                     errorUpload.setTourDate(tourDate);
-                     errorUpload.setError(e.getMessage());
-                     return errorUpload;
-                  });
+      HttpResponse<String> response;
+      try {
+         response = OAuth2Utils.httpClient.send(request, BodyHandlers.ofString());
+         final var toto = response.body();
 
-      return activityUpload;
+         if (response.statusCode() != HttpURLConnection.HTTP_OK) {
+            //      logVendorError(response.body());
+            return UI.EMPTY_STRING;
+         }
+
+      } catch (IOException | InterruptedException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+
+
+//      final CompletableFuture<ActivityUpload> activityUpload =
+//OAuth2Utils.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+//                  .thenApply(name -> convertResponseToUpload(name, tourDate))
+//                  .exceptionally(e -> {
+//                     final ActivityUpload errorUpload = new ActivityUpload();
+//                     errorUpload.setTourDate(tourDate);
+//                     errorUpload.setError(e.getMessage());
+//                     return errorUpload;
+//                  });
+
+      return UI.EMPTY_STRING;
    }
 
    private void setAccessToken(final String accessToken) {
@@ -421,56 +423,29 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
     * @param tourData
     * @return
     */
-   private CompletableFuture<ActivityUpload> uploadFile(final String compressedTourAbsoluteFilePath, final TourData tourData) {
+   private String uploadFile(final String compressedTourAbsoluteFilePath,
+                                                        final TourData tourData) {
 
-      final String title = buildFormattedTitle(tourData);
-
-      final HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(SuuntoUploadUrl))
-            .header(OAuth2Constants.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
-            .timeout(Duration.ofMinutes(5))
-            // .POST(publisher.build())
-            .build();
-
-      return sendAsyncRequest(tourData, request);
-   }
-
-   /**
-    * https://developers.strava.com/playground/#/Activities/createActivity
-    *
-    * @param manualTourToUpload
-    * @return
-    */
-   private CompletableFuture<ActivityUpload> uploadManualTour(final Entry<TourData, String> manualTourToUpload) {
-
-      final TourData tourData = manualTourToUpload.getKey();
-
-      final boolean isTrainerActivity = tourData.getTourType() != null &&
-            tourData.getTourType().getName().trim().equalsIgnoreCase("trainer"); //$NON-NLS-1$
-
-      final String title = buildFormattedTitle(tourData);
+      //final String title = buildFormattedTitle(tourData);
 
       final JSONObject body = new JSONObject();
-      body.put("name", title); //$NON-NLS-1$
-      body.put("type", manualTourToUpload.getValue()); //$NON-NLS-1$
-      body.put("start_date_local", tourData.getTourStartTime().format(DateTimeFormatter.ISO_DATE_TIME)); //$NON-NLS-1$
-      body.put("elapsed_time", tourData.getTourDeviceTime_Elapsed()); //$NON-NLS-1$
-      body.put("distance", tourData.getTourDistance()); //$NON-NLS-1$
-      body.put("trainer", (isTrainerActivity ? "1" : "0")); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      body.put("description", tourData.getTourDescription()); //$NON-NLS-1$
+      body.put("comment", "TTO"); //$NON-NLS-1$
 
       final String description = buildFormattedDescription(tourData);
       body.put("description", description); //$NON-NLS-1$
 
       final HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("URL" + "/activities")) //$NON-NLS-1$ //$NON-NLS-2$
+            .uri(URI.create(SuuntoUploadUrl))
             .header(OAuth2Constants.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
-            .header(OAuth2Constants.CONTENT_TYPE, "application/json") //$NON-NLS-1$
             .timeout(Duration.ofMinutes(5))
             .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
             .build();
 
       return sendAsyncRequest(tourData, request);
    }
+
+
 
    @Override
    public void uploadTours(final List<TourData> selectedTours) {
@@ -494,13 +469,13 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 
             monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask, UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND, UI.EMPTY_STRING));
 
-            final Map<String, String> toursWithGpsSeries = new HashMap<>();
+            final Map<String, TourData> toursWithGpsSeries = new HashMap<>();
             for (int index = 0; index < numberOfTours && !monitor.isCanceled(); ++index) {
 
                final TourData tourData = selectedTours.get(index);
                final String tourStartTime = TourManager.getTourDateTimeShort(tourData);
 
-               toursWithGpsSeries.put(tourStartTime, createFitTourFile(monitor, tourData));
+               toursWithGpsSeries.put(createTourFile_Fit(tourData), tourData);
 
                monitor.worked(1);
             }
@@ -540,31 +515,31 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       }
    }
 
-   private int uploadTours(final Map<String, String> toursWithTimeSeries,
+   private int uploadTours(final Map<String, TourData> tours,
                            final IProgressMonitor monitor) {
 
-      final List<CompletableFuture<ActivityUpload>> activityUploads = new ArrayList<>();
+      final List<String> activityUploads = new ArrayList<>();
 
-      for (final Map.Entry<String, String> tourToUpload : toursWithTimeSeries.entrySet()) {
+      for (final Map.Entry<String, TourData> tourToUpload : tours.entrySet()) {
 
          if (monitor.isCanceled()) {
             return 0;
          }
 
          final String compressedTourAbsoluteFilePath = tourToUpload.getKey();
-         final String tourDatafilepath = tourToUpload.getValue();
+         final TourData tourDatafilepath = tourToUpload.getValue();
 
-         // activityUploads.add(uploadFile(compressedTourAbsoluteFilePath, tourDatafilepath));
+         activityUploads.add(uploadFile(compressedTourAbsoluteFilePath, tourDatafilepath));
       }
 
       final int[] numberOfUploadedTours = new int[1];
-      activityUploads.stream().map(CompletableFuture::join).forEach(activityUpload -> {
-         if (monitor.isCanceled()) {
-            return;
-         } else if (logUploadResult(activityUpload)) {
-            ++numberOfUploadedTours[0];
-         }
-      });
+//      activityUploads.stream().map(CompletableFuture::join).forEach(activityUpload -> {
+//         if (monitor.isCanceled()) {
+//            return;
+//         } else if (logUploadResult(activityUpload)) {
+//            ++numberOfUploadedTours[0];
+//         }
+//      });
 
       //     deleteTemporaryTourFiles(toursWithTimeSeries);
 
