@@ -18,9 +18,6 @@ package net.tourbook.cloud.suunto;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.URI;
@@ -36,7 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
-import java.util.zip.GZIPOutputStream;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Messages;
@@ -125,27 +121,6 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       return stravaTokens;
    }
 
-   private static String gzipFile(final String file) {
-
-      final String compressedFilePath = file + ".gz"; //$NON-NLS-1$
-
-      try (final FileInputStream fileInputStream = new FileInputStream(file);
-            final FileOutputStream fileOutputStream = new FileOutputStream(compressedFilePath);
-            final GZIPOutputStream gzipOS = new GZIPOutputStream(fileOutputStream)) {
-
-         final byte[] buffer = new byte[1024];
-         int length;
-         while ((length = fileInputStream.read(buffer)) != -1) {
-            gzipOS.write(buffer, 0, length);
-         }
-      } catch (final IOException e) {
-         StatusUtil.log(e);
-         return UI.EMPTY_STRING;
-      }
-
-      return compressedFilePath;
-   }
-
    private String buildFormattedDescription(final TourData tourData) {
 
       final StringBuilder description = new StringBuilder();
@@ -179,7 +154,6 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
    }
 
    private void createFitTourFile(final IProgressMonitor monitor,
-                                            final Map<String, TourData> toursWithTimeSeries,
                                             final TourData tourData) {
 
       final String absoluteTourFilePath = FileUtils.createTemporaryFile(
@@ -187,10 +161,6 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
             "tcx"); //$NON-NLS-1$
 
       final String exportedTcxGzFile = exportTcxGzFile(tourData, absoluteTourFilePath);
-      if (StringUtils.hasContent(exportedTcxGzFile)) {
-
-         toursWithTimeSeries.put(exportedTcxGzFile, tourData);
-      }
 
       FileUtils.deleteIfExists(Paths.get(absoluteTourFilePath));
 
@@ -219,8 +189,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
    private String exportTcxGzFile(final TourData tourData, final String absoluteTourFilePath) {
 
       _tourExporter.useTourData(tourData).export(absoluteTourFilePath);
-
-      return gzipFile(absoluteTourFilePath);
+      return absoluteTourFilePath;
    }
 
    private String getAccessToken() {
@@ -371,9 +340,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
    }
 
    private void processTours(final List<TourData> selectedTours,
-                             final IProgressMonitor monitor,
-                             final Map<String, TourData> toursWithTimeSeries,
-                             final Map<TourData, String> manualTours) {
+                             final IProgressMonitor monitor) {
 
       for (final TourData tourData : selectedTours) {
 
@@ -407,13 +374,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
             }
          }
 
-         if (tourData.timeSerie == null || tourData.timeSerie.length == 0) {
-
-            processManualTour(monitor, tourData, manualTours);
-         } else {
-
-            createFitTourFile(monitor, toursWithTimeSeries, tourData);
-         }
+         createFitTourFile(monitor, tourData);
       }
    }
 
@@ -538,7 +499,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 
             final Map<String, TourData> toursWithTimeSeries = new HashMap<>();
             final Map<TourData, String> manualTours = new HashMap<>();
-            processTours(selectedTours, monitor, toursWithTimeSeries, manualTours);
+            processTours(selectedTours, monitor);
 
             if (monitor.isCanceled()) {
                deleteTemporaryTourFiles(toursWithTimeSeries);
