@@ -1259,6 +1259,7 @@ public class Messages extends NLS {
    public static String        Log_Tour_SaveTours;
    public static String        Log_Tour_SaveTours_End;
    public static String        Log_Tour_SaveTours_File;
+   public static String        Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Humidity;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Pressure;
@@ -2485,6 +2486,7 @@ public class Messages extends NLS {
    public static String        Tooltip_ValuePoint_Action_Value_TimeDuration;
    public static String        Tooltip_ValuePoint_Action_Value_TimeMoving;
    public static String        Tooltip_ValuePoint_Action_Value_TimeOfDay;
+   public static String        Tooltip_ValuePoint_Action_Value_TimeRecorded;
    public static String        Tooltip_ValuePoint_Action_Value_TimeSlices;
    public static String        Tooltip_ValuePoint_Action_Value_TourCompareResult;
    public static String        Tooltip_ValuePoint_Format_Pace;
@@ -2492,6 +2494,7 @@ public class Messages extends NLS {
    public static String        Tooltip_ValuePoint_Label_MovingTime_Tooltip;
    public static String        Tooltip_ValuePoint_Label_NoData;
    public static String        Tooltip_ValuePoint_Label_NoData_Tooltip;
+   public static String        Tooltip_ValuePoint_Label_RecordedTime_Tooltip;
    public static String        Tooltip_ValuePoint_Label_SlicesCurrent_Tooltip;
    public static String        Tooltip_ValuePoint_Label_SlicesMax_Tooltip;
 
@@ -2817,6 +2820,8 @@ public class Messages extends NLS {
    public static String        tour_editor_dlg_save_tour_title;
    public static String        Tour_Editor_Label_AirPressure;
    public static String        Tour_Editor_Label_AirPressure_Tooltip;
+   public static String        Tour_Editor_Label_AirQuality;
+   public static String        Tour_Editor_Label_AirQuality_Tooltip;
    public static String        Tour_Editor_Label_AltitudeDown;
    public static String        Tour_Editor_Label_AltitudeUp;
    public static String        Tour_Editor_Label_BodyFat;

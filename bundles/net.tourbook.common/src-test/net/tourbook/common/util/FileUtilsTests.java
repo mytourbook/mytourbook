@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,28 +13,20 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.weather.openweathermap;
+package net.tourbook.common.util;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import net.tourbook.common.weather.IWeather;
-
 import org.junit.jupiter.api.Test;
 
-public class TimeMachineResultTests {
+public class FileUtilsTests {
 
    @Test
-   void openWeatherMap_WeatherTypeMapping_AllValues() {
+   void testRemoveExtensions() {
 
       assertAll(
-            () -> assertEquals(IWeather.WEATHER_ID_LIGHTNING,
-                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(210)),
-            () -> assertEquals(IWeather.WEATHER_ID_SCATTERED_SHOWERS,
-                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(522)),
-            () -> assertEquals(IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT,
-                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(771)),
-            () -> assertEquals(IWeather.WEATHER_ID_CLEAR,
-                  TimeMachineResult.convertWeatherTypeToMTWeatherClouds(800)));
+            () -> assertEquals("file.json", FileUtils.removeExtensions("file.json.gz")), //$NON-NLS-1$ //$NON-NLS-2$
+            () -> assertEquals("file", FileUtils.removeExtensions("file"))); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }

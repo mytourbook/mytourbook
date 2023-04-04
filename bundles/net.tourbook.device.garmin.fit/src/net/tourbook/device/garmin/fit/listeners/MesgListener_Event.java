@@ -103,8 +103,11 @@ public class MesgListener_Event extends AbstractMesgListener implements EventMes
 
          switch (eventType) {
 
-         //The Garmin usage of START/STOP/STOP_ALL is described here:
-         //https://www.thisisant.com/forum/viewthread/4319/#7452
+         // The Garmin usage of START/STOP/STOP_ALL is described here:
+         // https://www.thisisant.com/forum/viewthread/4319/#7452
+
+         // Garmin: Elapsed, Timer, and Moving Durations
+         // https://developer.garmin.com/fit/cookbook/durations/
 
          case START:
 

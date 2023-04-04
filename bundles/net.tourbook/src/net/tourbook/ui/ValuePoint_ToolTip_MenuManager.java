@@ -67,6 +67,7 @@ public class ValuePoint_ToolTip_MenuManager {
    static final long                     VALUE_ID_PACE_SUMMARIZED                 = 1 << 22;
    static final long                     VALUE_ID_SPEED_SUMMARIZED                = 1 << 23;
    static final long                     VALUE_ID_TIME_MOVING                     = 1 << 24;
+   static final long                     VALUE_ID_TIME_RECORDED                   = 1 << 25;
 
    static final long                     DEFAULT_GRAPHS                           =
 
@@ -112,6 +113,7 @@ public class ValuePoint_ToolTip_MenuManager {
    private ActionValueItem               _actionValue_TimeDuration;
    private ActionValueItem               _actionValue_TimeOfDay;
    private ActionValueItem               _actionValue_TimeMoving;
+   private ActionValueItem               _actionValue_TimeRecorded;
    private ActionValueItem               _actionValue_TimeSlices;
    private ActionValueItem               _actionValue_TourCompareResult;
 
@@ -380,6 +382,12 @@ public class ValuePoint_ToolTip_MenuManager {
             null,
             null);
 
+      _actionValue_TimeRecorded = new ActionValueItem(
+            VALUE_ID_TIME_RECORDED,
+            Messages.Tooltip_ValuePoint_Action_Value_TimeRecorded,
+            null,
+            null);
+
       _actionValue_TimeOfDay = new ActionValueItem(
             VALUE_ID_TIME_OF_DAY,
             Messages.Tooltip_ValuePoint_Action_Value_TimeOfDay,
@@ -571,6 +579,7 @@ public class ValuePoint_ToolTip_MenuManager {
       _actionValue_TimeDuration                 .setState((_allVisibleValueIds & VALUE_ID_TIME_DURATION) > 0,        _tourData.timeSerie                    != null);
       _actionValue_TimeOfDay                    .setState((_allVisibleValueIds & VALUE_ID_TIME_OF_DAY) > 0,          _tourData.timeSerie                    != null);
       _actionValue_TimeMoving                   .setState((_allVisibleValueIds & VALUE_ID_TIME_MOVING) > 0,          _tourData.getMovingTimeSerie()         != null);
+      _actionValue_TimeRecorded                 .setState((_allVisibleValueIds & VALUE_ID_TIME_RECORDED) > 0,        _tourData.timeSerie                    != null);
       _actionValue_TimeSlices                   .setState((_allVisibleValueIds & VALUE_ID_TIME_SLICES) > 0,          true);
       _actionValue_TourCompareResult            .setState((_allVisibleValueIds & VALUE_ID_TOUR_COMPARE_RESULT) > 0,  _tourData.tourCompareSerie != null && _tourData.tourCompareSerie.length > 0);
 
@@ -601,6 +610,7 @@ public class ValuePoint_ToolTip_MenuManager {
       addItem(_actionValue_TimeSlices);
       addItem(_actionValue_TimeDuration);
       addItem(_actionValue_TimeMoving);
+      addItem(_actionValue_TimeRecorded);
       addItem(_actionValue_TimeOfDay);
       addItem(_actionValue_Distance);
       addItem(_actionValue_Altitude);

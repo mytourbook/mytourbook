@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2022 Frédéric Bard
+ * Copyright (C) 2019, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 
-import net.tourbook.common.weather.IWeather;
 import net.tourbook.weather.WeatherUtils;
 
 /**
@@ -228,83 +227,11 @@ public class Data {
 
    public String getWeatherType() {
 
-      String weatherType = UI.EMPTY_STRING;
-
       if (middleHourly == null) {
-         return weatherType;
+         return UI.EMPTY_STRING;
       }
 
-      // Codes : http://www.worldweatheronline.com/feed/wwoConditionCodes.xml
-      switch (middleHourly.getWeatherCode()) {
-      case "122": //$NON-NLS-1$
-      case "119": //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_OVERCAST;
-         break;
-      case "113": //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_CLEAR;
-         break;
-      case "116": //$NON-NLS-1$
-      case "248": //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
-         break;
-      case "395": //$NON-NLS-1$
-      case "392": //$NON-NLS-1$
-      case "389": //$NON-NLS-1$
-      case "386": //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_LIGHTNING;
-         break;
-      case "293": //$NON-NLS-1$
-      case "296": //$NON-NLS-1$
-      case "299": //$NON-NLS-1$
-      case "302": //$NON-NLS-1$
-      case "305": //$NON-NLS-1$
-      case "308": //$NON-NLS-1$
-      case "356": //$NON-NLS-1$
-      case "359": //$NON-NLS-1$
-      case "377": //$NON-NLS-1$
-      case "365": //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_RAIN;
-         break;
-      case "332": //$NON-NLS-1$
-      case "335": //$NON-NLS-1$
-      case "338": //$NON-NLS-1$
-      case "329": //$NON-NLS-1$
-      case "326": //$NON-NLS-1$
-      case "323": //$NON-NLS-1$
-      case "320": //$NON-NLS-1$
-      case "371": //$NON-NLS-1$
-      case "368": //$NON-NLS-1$
-      case "230": //$NON-NLS-1$
-      case "227": //$NON-NLS-1$
-      case "179": //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_SNOW;
-         break;
-      case "200": //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
-         break;
-      case "353": //$NON-NLS-1$
-      case "374": //$NON-NLS-1$
-      case "362": //$NON-NLS-1$
-      case "350": //$NON-NLS-1$
-      case "317": //$NON-NLS-1$
-      case "314": //$NON-NLS-1$
-      case "311": //$NON-NLS-1$
-      case "182": //$NON-NLS-1$
-      case "176": //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
-         break;
-      case "185": //$NON-NLS-1$
-      case "263": //$NON-NLS-1$
-      case "266": //$NON-NLS-1$
-      case "281": //$NON-NLS-1$
-      case "284": //$NON-NLS-1$
-         weatherType = IWeather.WEATHER_ID_DRIZZLE;
-         break;
-      default:
-         weatherType = UI.EMPTY_STRING;
-         break;
-      }
-
-      return weatherType;
+      return WorldWeatherOnlineRetriever.convertWeatherCodeToMTWeatherClouds(middleHourly.getWeatherCode());
    }
+
 }

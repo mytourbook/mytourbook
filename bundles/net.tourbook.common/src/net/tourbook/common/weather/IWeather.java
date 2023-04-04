@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2005, 2022 Wolfgang Schramm and Contributors
+ * Copyright (C) 2005, 2023 Wolfgang Schramm and Contributors
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -179,7 +179,7 @@ public interface IWeather {
    /**
     * Text for the weather
     */
-   public static final String[] cloudText = new String[] {
+   public static final String[] cloudText              = new String[] {
 
          cloudIsNotDefined,
 
@@ -195,10 +195,27 @@ public interface IWeather {
 
    };
 
+   public static final String   airQualityIsNotDefined = Messages.Weather_AirQuality_IsNotDefined;
+
+   /**
+    * Text for the weather's air quality
+    */
+   public static final String[] airQualityTexts        = new String[] {
+
+         airQualityIsNotDefined,
+
+         Messages.Weather_AirQuality_Good,
+         Messages.Weather_AirQuality_Fair,
+         Messages.Weather_AirQuality_Moderate,
+         Messages.Weather_AirQuality_Poor,
+         Messages.Weather_AirQuality_VeryPoor
+
+   };
+
    /**
     * Icons for the weather
     */
-   public static final String[] cloudIcon = new String[] {
+   public static final String[] cloudIcon              = new String[] {
 
          UI.IMAGE_EMPTY_16,
 

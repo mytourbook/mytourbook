@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.OptionalDouble;
 
-import net.tourbook.common.weather.IWeather;
 import net.tourbook.weather.WeatherUtils;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -40,41 +39,6 @@ class TimeMachineResult {
 
    public TimeMachineResult() {
       hourly = new ArrayList<>();
-   }
-
-   /**
-    * Codes : https://openweathermap.org/weather-conditions#Weather-Condition-Codes-2
-    *
-    * @param weatherId
-    * @return
-    */
-   static String convertWeatherTypeToMTWeatherClouds(final int weatherId) {
-
-      String weatherType = UI.EMPTY_STRING;
-
-      if (weatherId >= 200 && weatherId < 300) {
-         weatherType = IWeather.WEATHER_ID_LIGHTNING;
-      } else if (weatherId >= 300 && weatherId < 313) {
-         weatherType = IWeather.WEATHER_ID_DRIZZLE;
-      } else if ((weatherId >= 313 && weatherId < 400) ||
-            (weatherId >= 520 && weatherId < 600)) {
-         weatherType = IWeather.WEATHER_ID_SCATTERED_SHOWERS;
-      } else if (weatherId >= 500 && weatherId < 520) {
-         weatherType = IWeather.WEATHER_ID_RAIN;
-      } else if (weatherId >= 600 && weatherId < 700) {
-         weatherType = IWeather.WEATHER_ID_SNOW;
-      } else if (weatherId == 800) {
-         weatherType = IWeather.WEATHER_ID_CLEAR;
-      } else if (weatherId == 801 || weatherId == 802) {
-         weatherType = IWeather.WEATHER_ID_PART_CLOUDS;
-      } else if (weatherId == 803 || weatherId == 804) {
-         weatherType = IWeather.WEATHER_ID_OVERCAST;
-      } else if (weatherId == 711 || weatherId == 762 ||
-            weatherId == 771 || weatherId == 781) {
-         weatherType = IWeather.WEATHER_ID_SEVERE_WEATHER_ALERT;
-      }
-
-      return weatherType;
    }
 
    /**
@@ -279,7 +243,7 @@ class TimeMachineResult {
          return weatherType;
       }
 
-      return convertWeatherTypeToMTWeatherClouds(middleHourlyWeather.getId());
+      return OpenWeatherMapRetriever.convertWeatherIconToMTWeatherClouds(middleHourlyWeather.getIcon());
    }
 
    public String getWeatherDescription() {

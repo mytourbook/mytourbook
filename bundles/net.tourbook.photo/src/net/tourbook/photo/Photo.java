@@ -316,7 +316,7 @@ public class Photo implements Serializable {
       _photoServiceProvider = photoServiceProvider;
    }
 
-   public static void setupTimeZone() {
+   static void setupTimeZone() {
 
       _dtParser = DateTimeFormatter//
             .ofPattern("yyyy:MM:dd HH:mm:ss") //$NON-NLS-1$
@@ -467,7 +467,7 @@ public class Photo implements Serializable {
       return sb.toString();
    }
 
-   public void dumpTourReferences() {
+   void dumpTourReferences() {
 
       for (final TourPhotoReference ref : _tourPhotoRef.values()) {
          System.out.println(UI.timeStampNano() + " \t\tphotoId=" + ref.photoId); //$NON-NLS-1$
@@ -806,8 +806,8 @@ public class Photo implements Serializable {
       try {
 
          /*
-          * read metadata WITH thumbnail image info, this is the default when the pamameter is
-          * ommitted
+          * read metadata WITH thumbnail image info, this is the default when the parameter is
+          * omitted
           */
          final HashMap<String, Object> params = new HashMap<>();
          params.put(ImagingConstants.PARAM_KEY_READ_THUMBNAILS, isReadThumbnail);
@@ -1148,7 +1148,7 @@ public class Photo implements Serializable {
       }
    }
 
-   public void replaceImageFile(final IPath newImageFilePathName) {
+   void replaceImageFile(final IPath newImageFilePathName) {
 
       // force loading of metadata
       _photoImageMetadata = null;
@@ -1170,7 +1170,7 @@ public class Photo implements Serializable {
       _linkWorldPosition.clear();
    }
 
-   public void resetTourExifState() {
+   private void resetTourExifState() {
 
       // photo is not saved any more in a tour
 
@@ -1341,7 +1341,7 @@ public class Photo implements Serializable {
       ;
    }
 
-   public void updateImageMetadata(final PhotoImageMetadata photoImageMetadata) {
+   void updateImageMetadata(final PhotoImageMetadata photoImageMetadata) {
 
       _photoImageMetadata = photoImageMetadata;
 
