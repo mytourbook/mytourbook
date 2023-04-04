@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
@@ -66,7 +65,7 @@ import org.eclipse.swt.widgets.Display;
 import org.json.JSONObject;
 
 public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
-   private static final String     SuuntoUploadUrl   = "https://cloudapi.suunto.com/v2/upload";    //$NON-NLS-1$\n"
+
    private static IPreferenceStore _prefStore        = Activator.getDefault().getPreferenceStore();
    private static TourExporter     _tourExporter     = new TourExporter("fit");                    //$NON-NLS-1$
 
@@ -436,7 +435,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       body.put("description", description); //$NON-NLS-1$
 
       final HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create(SuuntoUploadUrl))
+            .uri(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/import"))//$NON-NLS-1$
             .header(OAuth2Constants.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
             .timeout(Duration.ofMinutes(5))
             .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
