@@ -150,6 +150,7 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    public static final int               DB_LENGTH_TIME_ZONE_ID            = 255;
 
    public static final int               DB_LENGTH_WEATHER                 = 1000;
+   public static final int               DB_LENGTH_WEATHER_AIRQUALITY      = 255;
    public static final int               DB_LENGTH_WEATHER_V48             = 32000;
    public static final int               DB_LENGTH_WEATHER_CLOUDS          = 255;
 
@@ -626,6 +627,11 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
    private float                 weather_Temperature_WindChill;                        // db-version 39
 
 
+   /**
+    * Air Quality
+    */
+   private String                 weather_AirQuality;                                  // db-version 50
+
    // ############################################# POWER #############################################
 
    /** Unit is Watt */
@@ -998,15 +1004,15 @@ public class TourData implements Comparable<Object>, IXmlSerializable, Serializa
     */
    @ManyToMany(fetch = EAGER)
    @JoinTable(inverseJoinColumns = @JoinColumn(name = "TOURTAG_TagID", referencedColumnName = "TagID"))
- @JsonProperty
-private Set<TourTag>                tourTags                            = new HashSet<>();
+   @JsonProperty
+   private Set<TourTag>                tourTags                            = new HashSet<>();
 
    /**
     * Sensors
     */
    @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "tourData")
    @Cascade(org.hibernate.annotations.CascadeType.DELETE_ORPHAN)
-   private Set<DeviceSensorValue>     deviceSensorValues                  = new HashSet<>();
+   private Set<DeviceSensorValue>      deviceSensorValues                  = new HashSet<>();
 
 //   /**
 //    * SharedMarker
@@ -10163,6 +10169,20 @@ private Set<TourTag>                tourTags                            = new Ha
       return weather == null ? UI.EMPTY_STRING : weather;
    }
 
+   public String getWeather_AirQuality() {
+      return weather_AirQuality;
+   }
+
+   /**
+    * @return Returns the index for the air quality value in
+    *         {@link IWeather#airQualityTexts} or 0 when the air quality
+    *         index is not defined
+    */
+   public int getWeather_AirQuality_TextIndex() {
+
+      return WeatherUtils.getWeather_AirQuality_TextIndex(weather_AirQuality);
+   }
+
    /**
     * @return Returns the {@link IWeather#WEATHER_ID_}... or <code>null</code> when weather is not
     *         set.
@@ -12645,6 +12665,10 @@ private Set<TourTag>                tourTags                            = new Ha
     */
    public void setWeather(final String weather) {
       this.weather = weather;
+   }
+
+   public void setWeather_AirQuality(final String weather_AirQuality) {
+      this.weather_AirQuality = weather_AirQuality;
    }
 
    /**

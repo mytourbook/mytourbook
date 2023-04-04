@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -13,21 +13,28 @@
  * this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110, USA
  *******************************************************************************/
-package net.tourbook.weather.openweathermap;
+package device.polar.hrm;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import net.tourbook.device.polar.hrm.Polar_PDD_DataReader;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class Weather {
+import org.junit.jupiter.api.Test;
 
-   private String description;
-   private String icon;
+import utils.DeviceDataReaderTester;
+import utils.FilesUtils;
 
-   public String getDescription() {
-      return description;
-   }
+public class Polar_PDD_DataReaderTests extends DeviceDataReaderTester {
 
-   public String getIcon() {
-      return icon;
+   public static final String   FILES_PATH       = FilesUtils.rootPath + "device/polar/hrm/files/"; //$NON-NLS-1$
+
+   private Polar_PDD_DataReader deviceDataReader = new Polar_PDD_DataReader();
+
+   /**
+    * Sample provided by Thompson-ongithub
+    * https://github.com/mytourbook/mytourbook/issues/1044#issuecomment-1488725400
+    */
+   @Test
+   void testPddImport_20230328() {
+
+      testImportFile(deviceDataReader, FILES_PATH + "20230328", ".pdd"); //$NON-NLS-1$ //$NON-NLS-2$
    }
 }

@@ -28,14 +28,17 @@ Experimental
 New
 ===
 
-*
-  
-  
+Tour Weather (Frederic)
+  - Added the ability to set or retrieve the air quality experienced during the tour. At the moment, only OpenWeatherMap supports the air quality retrieval
 
 Improvements
 ============
 
-* 
+Tour Reimport (Frederic)
+  - Added the ability to reimport weather information (clouds and description)
+
+Weather (Frederic)
+  - Adjusted the mapping of vendor's icons to MyTourbook's cloud icons
 
 Changes
 =======
