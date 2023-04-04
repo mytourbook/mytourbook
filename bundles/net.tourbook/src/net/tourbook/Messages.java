@@ -2347,6 +2347,7 @@ public class Messages extends NLS {
    public static String        Slideout_TourGeoFilter_Action_Delete_AllWithoutName;
    public static String        Slideout_TourGeoFilter_Action_Delete_WithoutName;
    public static String        Slideout_TourGeoFilter_Action_Delete_WithoutName_Tooltip;
+   public static String        Slideout_TourGeoFilter_Action_ToggleReadEditMode_Tooltip;
    public static String        Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout;
    public static String        Slideout_TourGeoFilter_Checkbox_IsAutoOpenSlideout_Tooltip;
    public static String        Slideout_TourGeoFilter_Checkbox_IsSyncMapPosition;

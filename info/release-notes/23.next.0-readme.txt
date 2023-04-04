@@ -31,6 +31,7 @@ New
 Tour Weather (Frederic)
   - Added the ability to set or retrieve the air quality experienced during the tour. At the moment, only OpenWeatherMap supports the air quality retrieval
 
+
 Improvements
 ============
 
@@ -43,6 +44,9 @@ Improvements
 
 * Weather (Frederic)
   - Adjusted the mapping of vendor's icons to MyTourbook's cloud icons
+
+* Tour Geo Filter
+  - Toggle name in the filter history viewer between read and edit mode
 
 Changes
 =======
