@@ -178,7 +178,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       return title;
    }
 
-   private void createCompressedTcxTourFile(final IProgressMonitor monitor,
+   private void createFitTourFile(final IProgressMonitor monitor,
                                             final Map<String, TourData> toursWithTimeSeries,
                                             final TourData tourData) {
 
@@ -412,7 +412,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
             processManualTour(monitor, tourData, manualTours);
          } else {
 
-            createCompressedTcxTourFile(monitor, toursWithTimeSeries, tourData);
+            createFitTourFile(monitor, toursWithTimeSeries, tourData);
          }
       }
    }
