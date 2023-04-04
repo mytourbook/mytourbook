@@ -101,9 +101,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
             String.valueOf(tourData.getTourId()),
             "fit"); //$NON-NLS-1$
 
-      final String exportedTcxGzFile = exportTcxGzFile(tourData, absoluteTourFilePath);
-
-      FileUtils.deleteIfExists(Paths.get(absoluteTourFilePath));
+      exportToFitFile(tourData, absoluteTourFilePath);
 
       return absoluteTourFilePath;
    }
@@ -114,10 +112,9 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
             tourFilePath)));
    }
 
-   private String exportTcxGzFile(final TourData tourData, final String absoluteTourFilePath) {
+   private void exportToFitFile(final TourData tourData, final String absoluteTourFilePath) {
 
       _tourExporter.useTourData(tourData).export(absoluteTourFilePath);
-      return absoluteTourFilePath;
    }
 
    private String getAccessToken() {
@@ -145,6 +142,32 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
    public List<TourTypeFilter> getTourTypeFilters() {
 
       return new ArrayList<>();
+   }
+
+   private WorkoutUpload initializeWorkoutUpload(final TourData tourData) {
+
+      final JSONObject body = new JSONObject();
+      body.put("description", tourData.getTourTitle()); //$NON-NLS-1$
+      body.put("comment", tourData.getTourDescription()); //$NON-NLS-1$
+
+      final HttpRequest request = HttpRequest.newBuilder()
+            .uri(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/upload"))//$NON-NLS-1$
+            .header(OAuth2Constants.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
+            .timeout(Duration.ofMinutes(5))
+            .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
+            .build();
+
+      final String responseBody = sendAsyncRequest(tourData, request);
+
+      WorkoutUpload workoutUpload = null;
+      try {
+         workoutUpload = new ObjectMapper().readValue(responseBody, WorkoutUpload.class);
+      } catch (final IllegalArgumentException | JsonProcessingException e) {
+         StatusUtil.log(e);
+      }
+
+      return workoutUpload;
+
    }
 
    @Override
@@ -244,12 +267,12 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       HttpResponse<String> response;
       try {
          response = OAuth2Utils.httpClient.send(request, BodyHandlers.ofString());
-         final var toto = response.body();
 
          if (response.statusCode() != HttpURLConnection.HTTP_OK) {
-            //      logVendorError(response.body());
-            return UI.EMPTY_STRING;
+            //   logVendorError(response.body());
          }
+
+         return response.body();
 
       } catch (IOException | InterruptedException e) {
          // TODO Auto-generated catch block
@@ -272,24 +295,24 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
    /**
     * https://apizone.suunto.com/how-to-workout-upload
     *
-    * @param compressedTourAbsoluteFilePath
+    * @param tourAbsoluteFilePath
     * @param tourData
     * @return
     */
-   private String uploadFile(final String compressedTourAbsoluteFilePath,
+   private String uploadFile(final String tourAbsoluteFilePath,
                              final TourData tourData) {
 
-      //final String title = buildFormattedTitle(tourData);
+      final WorkoutUpload workoutUpload = initializeWorkoutUpload(tourData);
 
-      final JSONObject body = new JSONObject();
-      body.put("description", tourData.getTourDescription()); //$NON-NLS-1$
-      body.put("comment", "TTO"); //$NON-NLS-1$
+      if (workoutUpload == null) {
+         return UI.EMPTY_STRING;
+      }
 
       final HttpRequest request = HttpRequest.newBuilder()
-            .uri(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/upload"))//$NON-NLS-1$
-            .header(OAuth2Constants.AUTHORIZATION, OAuth2Constants.BEARER + getAccessToken())
+            .uri(OAuth2Utils.createOAuthPasseurUri(workoutUpload.getUrl()))
+            .header("x-ms-blob-type", workoutUpload.getHeaders().getXMsBlobType())
             .timeout(Duration.ofMinutes(5))
-            .POST(HttpRequest.BodyPublishers.ofString(body.toString()))
+            //  .PUT(HttpRequest.BodyPublishers.ofString(body.toString()))
             .build();
 
       return sendAsyncRequest(tourData, request);
@@ -389,7 +412,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 //         }
 //      });
 
-      //     deleteTemporaryTourFiles(toursWithTimeSeries);
+      deleteTemporaryTourFiles(tours);
 
       return numberOfUploadedTours[0];
    }
