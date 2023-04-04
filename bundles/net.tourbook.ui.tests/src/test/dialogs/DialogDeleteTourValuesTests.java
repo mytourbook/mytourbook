@@ -46,7 +46,7 @@ public class DialogDeleteTourValuesTests extends UITest {
       bot.sleep(1000);
 
       //Setting the focus again on the Tourbook view
-      tourBookView = Utils.showTourBookView(bot);
+      Utils.showTourBookView(bot);
 
       //Check that the calories were deleted
       tour = Utils.getTourWithSRTM(bot);
