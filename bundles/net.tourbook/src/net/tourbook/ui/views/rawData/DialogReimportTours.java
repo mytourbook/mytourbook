@@ -982,39 +982,40 @@ class DialogReimportTours extends TitleAreaDialog {
 
       final boolean isTimeSlice = isPartOfATourSelected && isAllTimeSlicesSelected == false;
 
-      final boolean isTourSelected = false ||
+      final boolean isTourSelected = false
 
-            _rdoReimport_Tours_All.getSelection() ||
-            _rdoReimport_Tours_Selected.getSelection() ||
-            isTourBetweenDates;
+            || _rdoReimport_Tours_All.getSelection()
+            || _rdoReimport_Tours_Selected.getSelection()
+            || isTourBetweenDates;
 
-      final boolean isTimeSliceSelected = false ||
+      final boolean isTimeSliceSelected = false
 
-            _chkData_TimeSlice_Battery.getSelection() ||
-            _chkData_TimeSlice_Cadence.getSelection() ||
-            _chkData_TimeSlice_Elevation.getSelection() ||
-            _chkData_TimeSlice_Gear.getSelection() ||
-            _chkData_TimeSlice_PowerAndPulse.getSelection() ||
-            _chkData_TimeSlice_PowerAndSpeed.getSelection() ||
-            _chkData_TimeSlice_RunningDynamics.getSelection() ||
-            _chkData_TimeSlice_Swimming.getSelection() ||
-            _chkData_TimeSlice_TemperatureFromDevice.getSelection() ||
-            _chkData_TimeSlice_Training.getSelection() ||
-            _chkData_TimeSlice_TourTimerPauses.getSelection();
+            || _chkData_TimeSlice_Battery.getSelection()
+            || _chkData_TimeSlice_Cadence.getSelection()
+            || _chkData_TimeSlice_Elevation.getSelection()
+            || _chkData_TimeSlice_Gear.getSelection()
+            || _chkData_TimeSlice_PowerAndPulse.getSelection()
+            || _chkData_TimeSlice_PowerAndSpeed.getSelection()
+            || _chkData_TimeSlice_RunningDynamics.getSelection()
+            || _chkData_TimeSlice_Swimming.getSelection()
+            || _chkData_TimeSlice_TemperatureFromDevice.getSelection()
+            || _chkData_TimeSlice_Training.getSelection()
+            || _chkData_TimeSlice_TourTimerPauses.getSelection();
 
       final boolean isTourDataSelected = false
+
             || _chkData_Tour_Calories.getSelection()
             || _chkData_Tour_ImportFileLocation.getSelection()
             || _chkData_Tour_Markers.getSelection()
             || _chkData_Tour_Weather.getSelection();
 
-      final boolean isDataSelected = false ||
+      final boolean isDataSelected = false
 
-            _rdoData_EntireTour.getSelection() ||
-            _chkData_AllTimeSlices.getSelection() ||
-
-            isTourDataSelected ||
-            isTimeSliceSelected;
+            || _rdoData_EntireTour.getSelection()
+            || _chkData_AllTimeSlices.getSelection()
+            
+            || isTourDataSelected
+            || isTimeSliceSelected;
 
       _chkData_AllTimeSlices.setEnabled(isPartOfATourSelected);
 
