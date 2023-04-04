@@ -46,10 +46,23 @@ import utils.Utils;
 public class TourBookViewTests extends UITest {
 
    @Test
-   void adustTourValues_RetrieveWeatherData_OutsideOfAllowedRange() {
+   void adustTourValues_RetrieveWeatherData() {
 
+      // Select OpenWeatherMap to make sure the air quality is retrieved
+
+      Utils.openPreferences(bot);
+      bot.tree().getTreeItem("Weather").select(); //$NON-NLS-1$
+
+      bot.comboBox().setSelection(1);
+
+      // Select to display the full weather information
+      bot.checkBox(Messages.Pref_Weather_Check_DisplayFullLog).click();
+
+      Utils.clickApplyAndCloseButton(bot);
+
+      // Select a tour
+      Utils.showTourBookView(bot);
       final SWTBotTreeItem tour = Utils.getTour(bot);
-
       tour.contextMenu(Messages.Tour_Action_AdjustTourValues)
             .menu(Messages.tour_editor_section_weather)
             .menu(Messages.Tour_Action_RetrieveWeatherData).click();
@@ -57,6 +70,8 @@ public class TourBookViewTests extends UITest {
       final List<?> logs = TourLogManager.getLogs();
       assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
             "1/31/2021, 7:15 AM -> Error while retrieving the weather data: \"{\"cod\":\"400\",\"message\":\"requested time is out of allowed range of 5 days back\"}\"")));//$NON-NLS-1$
+      assertTrue(logs.stream().map(Object::toString).anyMatch(log -> log.contains(
+            "1/31/2021, 7:15 AM: Sunny, avg. 0°C, min. 0°C, max. 0°C, feels like 0°C, air quality Fair")));//$NON-NLS-1$
    }
 
    @Test

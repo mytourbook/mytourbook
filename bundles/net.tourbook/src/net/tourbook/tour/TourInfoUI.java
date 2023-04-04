@@ -36,6 +36,7 @@ import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.time.TourDateTime;
 import net.tourbook.common.util.IToolTipProvider;
+import net.tourbook.common.util.StringUtils;
 import net.tourbook.common.util.Util;
 import net.tourbook.common.weather.IWeather;
 import net.tourbook.data.DeviceSensor;
@@ -206,6 +207,7 @@ public class TourInfoUI {
    private CLabel           _lblClouds;
    private CLabel           _lblTourType_Image;
 
+   private Label            _lblAirQuality;
    private Label            _lblAltitudeUp;
    private Label            _lblAltitudeUpUnit;
    private Label            _lblAltitudeDown;
@@ -890,6 +892,13 @@ public class TourInfoUI {
 
       _lblWindDirection = createUI_LabelValue(parent, SWT.TRAIL);
       _lblWindDirectionUnit = createUI_LabelValue(parent, SWT.LEAD);
+
+      /*
+       * Air Quality
+       */
+      createUI_Label(parent, Messages.Tour_Tooltip_Label_AirQuality);
+
+      _lblAirQuality = createUI_LabelValue(parent, SWT.TRAIL);
    }
 
    private void createUI_45_Battery(final Composite parent) {
@@ -1760,6 +1769,13 @@ public class TourInfoUI {
          _lblWindDirectionUnit.setText(String.format(
                Messages.Tour_Tooltip_Format_WindDirectionUnit,
                UI.getCardinalDirectionText(weatherWindDirectionDegree)));
+      }
+
+      // Air Quality
+      final String airQuality = _tourData.getWeather_AirQuality();
+      if (StringUtils.hasContent(airQuality) && !airQuality.equals(IWeather.airQualityIsNotDefined)) {
+
+         _lblAirQuality.setText(airQuality);
       }
 
       // Average temperature

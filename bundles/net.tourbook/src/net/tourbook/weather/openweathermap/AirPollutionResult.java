@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022, 2023 Frédéric Bard
+ * Copyright (C) 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -17,17 +17,31 @@ package net.tourbook.weather.openweathermap;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import java.util.List;
+import java.util.OptionalDouble;
+import java.util.function.ToDoubleFunction;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Weather {
+class AirPollutionResult {
 
-   private String description;
-   private String icon;
+   private List<net.tourbook.weather.openweathermap.List> list;
 
-   public String getDescription() {
-      return description;
+   public int getAirQualityIndexAverage() {
+
+      final ToDoubleFunction<net.tourbook.weather.openweathermap.List> listFunction =
+            listElement -> listElement.getMain().getAqi();
+
+      final OptionalDouble averageAirQualityIndex =
+            getList().stream().mapToDouble(listFunction).average();
+
+      if (averageAirQualityIndex.isPresent()) {
+         return (int) Math.round(averageAirQualityIndex.getAsDouble());
+      }
+
+      return 0;
    }
 
-   public String getIcon() {
-      return icon;
+   public List<net.tourbook.weather.openweathermap.List> getList() {
+      return list;
    }
 }

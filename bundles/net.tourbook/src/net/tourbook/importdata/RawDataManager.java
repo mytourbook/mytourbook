@@ -76,6 +76,7 @@ import net.tourbook.tour.TourLogView;
 import net.tourbook.tour.TourManager;
 import net.tourbook.ui.views.rawData.RawDataView;
 import net.tourbook.ui.views.tourDataEditor.TourDataEditorView;
+import net.tourbook.weather.WeatherUtils;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -665,7 +666,8 @@ public class RawDataManager {
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TOUR__WEATHER) {
 
          previousData.add(
-               UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average()))
+               oldTourData.getWeather() + UI.COMMA_SPACE + WeatherUtils.getWeatherIcon(oldTourData.getWeatherIndex()) + UI.COMMA_SPACE +
+                     UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Average()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
                      UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Max())) + UI.UNIT_LABEL_TEMPERATURE
                      + UI.COMMA_SPACE +
@@ -674,7 +676,8 @@ public class RawDataManager {
                      UI.SYMBOL_TILDE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_WindChill()))
                      + UI.UNIT_LABEL_TEMPERATURE);
          newData.add(
-               UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average()))
+               newTourData.getWeather() + UI.COMMA_SPACE + WeatherUtils.getWeatherIcon(newTourData.getWeatherIndex()) + UI.COMMA_SPACE +
+                     UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
                      UI.SYMBOL_MAX + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Max()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
@@ -1415,6 +1418,12 @@ public class RawDataManager {
                tourDataDummyClone.setImportFilePath(oldTourData.getImportFilePathName());
             }
 
+            if (isEntireTour || tourValueType == TourValueType.TOUR__WEATHER) {
+
+               tourDataDummyClone.setWeather(oldTourData.getWeather());
+               tourDataDummyClone.setWeather_Clouds(oldTourData.getWeather_Clouds());
+            }
+
             /*
              * Time slice values
              */
@@ -1540,7 +1549,7 @@ public class RawDataManager {
             dataToModifyDetails.add(Messages.Tour_Data_Text_SwimmingValues);
          }
 
-         // Temperature
+         // Weather values
          if (isAllTimeSlices || tourValueType == TourValueType.TOUR__WEATHER) {
             dataToModifyDetails.add(Messages.Tour_Data_Text_WeatherValues);
          }
@@ -3361,6 +3370,12 @@ public class RawDataManager {
                // update device name which is also not set in older versions
                oldTourData.setDeviceName(reimportedTourData.getDevicePluginName());
                oldTourData.setDeviceFirmwareVersion(reimportedTourData.getDeviceFirmwareVersion());
+            }
+
+            if (tourValueTypes.contains(TourValueType.TOUR__WEATHER)) {
+
+               oldTourData.setWeather(reimportedTourData.getWeather());
+               oldTourData.setWeather_Clouds(reimportedTourData.getWeather_Clouds());
             }
 
             newTourData = oldTourData;
