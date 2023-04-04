@@ -34,18 +34,15 @@ import java.util.Map;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Messages;
-import net.tourbook.cloud.Preferences;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
 import net.tourbook.cloud.strava.ActivityUpload;
-import net.tourbook.cloud.strava.StravaTokens;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.common.util.StringUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
-import net.tourbook.export.DialogExportTour;
 import net.tourbook.export.TourExporter;
 import net.tourbook.extension.upload.TourbookCloudUploader;
 import net.tourbook.tour.TourLogManager;
@@ -53,7 +50,6 @@ import net.tourbook.tour.TourManager;
 import net.tourbook.tour.TourTypeFilterManager;
 import net.tourbook.ui.TourTypeFilter;
 import net.tourbook.ui.TourTypeFilterSet;
-import net.tourbook.weather.WeatherUtils;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -97,69 +93,6 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       activityUpload.setTourDate(tourDate);
 
       return activityUpload;
-   }
-
-   static StravaTokens getTokens(final String authorizationCode, final boolean isRefreshToken, final String refreshToken) {
-
-      final String responseBody = OAuth2Utils.getTokens(
-            authorizationCode,
-            isRefreshToken,
-            refreshToken,
-            OAuth2Utils.createOAuthPasseurUri("/strava/token")); //$NON-NLS-1$
-
-      StravaTokens stravaTokens = null;
-      try {
-         stravaTokens = new ObjectMapper().readValue(responseBody, StravaTokens.class);
-      } catch (final IllegalArgumentException | JsonProcessingException e) {
-         StatusUtil.log(e);
-      }
-
-      return stravaTokens;
-   }
-
-   private String buildFormattedDescription(final TourData tourData) {
-
-      final StringBuilder description = new StringBuilder();
-      if (_prefStore.getBoolean(Preferences.STRAVA_SENDDESCRIPTION)) {
-
-         description.append(tourData.getTourDescription());
-      }
-      if (_prefStore.getBoolean(Preferences.STRAVA_SENDWEATHERDATA_IN_DESCRIPTION)) {
-
-         if (StringUtils.hasContent(description.toString())) {
-            description.append(UI.SYSTEM_NEW_LINE);
-         }
-         String weatherData = WeatherUtils.buildWeatherDataString(tourData, false, false, false);
-         if (StringUtils.hasContent(description.toString())) {
-            weatherData = UI.NEW_LINE1 + weatherData;
-         }
-         description.append(weatherData);
-      }
-
-      return description.toString();
-   }
-
-   private String buildFormattedTitle(final TourData tourData) {
-
-      String title = tourData.getTourTitle();
-
-      if (_prefStore.getBoolean(Preferences.STRAVA_ADDWEATHERICON_IN_TITLE)) {
-         title += WeatherUtils.getWeatherIcon(tourData.getWeatherIndex());
-      }
-      return title;
-   }
-
-   private List<TourTypeFilter> createStravaTourTypeFilters() {
-
-      final List<TourTypeFilter> stravaTourTypeFilters = new ArrayList<>();
-
-      Arrays.asList(DialogExportTour.StravaActivityTypes).forEach(
-            stravaActivityType -> {
-               final TourTypeFilterSet tourTypeFilterSet = new TourTypeFilterSet();
-               stravaTourTypeFilters.add(new TourTypeFilter(tourTypeFilterSet));
-            });
-
-      return stravaTourTypeFilters;
    }
 
    private String createTourFile_Fit(final TourData tourData) {
@@ -211,12 +144,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
    @Override
    public List<TourTypeFilter> getTourTypeFilters() {
 
-      final List<TourTypeFilter> stravaTourTypeFilters =
-            _prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING)
-                  ? createStravaTourTypeFilters()
-                  : new ArrayList<>();
-
-      return stravaTourTypeFilters;
+      return new ArrayList<>();
    }
 
    @Override
@@ -229,41 +157,6 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       }
 
       return StringUtils.hasContent(getAccessToken() + getRefreshToken());
-   }
-
-   private boolean logUploadResult(final ActivityUpload activityUpload) {
-
-      boolean isTourUploaded = false;
-
-      if (StringUtils.hasContent(activityUpload.getError())) {
-
-         TourLogManager.log_ERROR(NLS.bind(
-               Messages.Log_UploadToursToStrava_004_UploadError,
-               activityUpload.getTourDate(),
-               activityUpload.getError()));
-
-      } else {
-
-         isTourUploaded = true;
-
-         if (StringUtils.hasContent(activityUpload.getName())) {
-
-            TourLogManager.log_OK(NLS.bind(
-                  Messages.Log_UploadToursToStrava_003_ActivityLink,
-                  activityUpload.getTourDate(),
-                  activityUpload.getId()));
-         } else {
-
-            TourLogManager.log_OK(NLS.bind(
-                  Messages.Log_UploadToursToStrava_003_UploadStatus,
-                  new Object[] {
-                        activityUpload.getTourDate(),
-                        activityUpload.getId(),
-                        activityUpload.getStatus() }));
-         }
-      }
-
-      return isTourUploaded;
    }
 
    private String mapTourType(final TourData manualTour) {
@@ -340,32 +233,6 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
             return;
          }
 
-         if (_prefStore.getBoolean(Preferences.STRAVA_USETOURTYPEMAPPING)) {
-
-            final TourType tourType = tourData.getTourType();
-
-            final List<String> stravaActivityNames = mapTourTypeToStravaActivity(tourType);
-
-            final boolean useActivityType = stravaActivityNames.size() == 1;
-
-            if (stravaActivityNames.size() > 1) {
-
-               TourLogManager.log_ERROR(NLS.bind(
-                     Messages.Log_UploadToursToStrava_005_TourTypeMappedMultipleTimes,
-                     new Object[] {
-                           TourManager.getTourDateTimeShort(tourData),
-                           tourType.getName(),
-                           String.join(UI.COMMA_SPACE, stravaActivityNames) }));
-
-               continue;
-            }
-            _tourExporter.setUseActivityType(useActivityType);
-
-            if (useActivityType) {
-               _tourExporter.setActivityType(stravaActivityNames.get(0));
-            }
-         }
-
          createTourFile_Fit(tourData);
       }
    }
@@ -417,9 +284,6 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       final JSONObject body = new JSONObject();
       body.put("description", tourData.getTourDescription()); //$NON-NLS-1$
       body.put("comment", "TTO"); //$NON-NLS-1$
-
-      final String description = buildFormattedDescription(tourData);
-      body.put("description", description); //$NON-NLS-1$
 
       final HttpRequest request = HttpRequest.newBuilder()
             .uri(OAuth2Utils.createOAuthPasseurUri("/suunto/workout/upload"))//$NON-NLS-1$
