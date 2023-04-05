@@ -967,8 +967,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
          }
 
          final boolean isPauseAnAutoPause = allPausedTime_Data == null
-               ? true
-               : allPausedTime_Data[pausesIndex] == 1;
+               || allPausedTime_Data[pausesIndex] == 1;
 //
 //         final long pauseDuration = Math.round((pausedTimeEndMS - pausedTimeStartMS) / 1000f);
 
