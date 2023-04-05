@@ -58,6 +58,7 @@ import net.tourbook.commands.AppCommands;
 import net.tourbook.commands.ISaveAndRestorePart;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.swimming.StrokeStyle;
@@ -6839,42 +6840,57 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // set the column text
          tableItem.setText(IWeather.airQualityTexts[index]);
 
-         int backgroundColor;
-         int foregroundColor;
+         boolean isSysColor = true;
+         int sysBackgroundColor = 0;
+         int sysForegroundColor = 0;
+
          switch (index) {
-         //Good
-         case 1:
-            backgroundColor = SWT.COLOR_DARK_GREEN;
-            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
+
+         case 1: //Good
+
+            sysBackgroundColor = SWT.COLOR_DARK_GREEN;
+            sysForegroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
             break;
-         //Fair
-         case 2:
-            backgroundColor = SWT.COLOR_YELLOW;
-            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_BLACK : SWT.COLOR_DARK_BLUE;
+
+         case 2: //Fair
+
+            sysBackgroundColor = SWT.COLOR_YELLOW;
+            sysForegroundColor = UI.IS_DARK_THEME ? SWT.COLOR_BLACK : SWT.COLOR_DARK_BLUE;
             break;
-         //Moderate
-         case 3:
-            backgroundColor = SWT.COLOR_DARK_YELLOW;
-            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
+
+         case 3: //Moderate
+
+            sysBackgroundColor = SWT.COLOR_DARK_YELLOW;
+            sysForegroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
             break;
-         //Poor
-         case 4:
-            backgroundColor = SWT.COLOR_DARK_RED;
-            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
+
+         case 4: //Poor
+
+            sysBackgroundColor = SWT.COLOR_DARK_RED;
+            sysForegroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
             break;
-         //Very poor
-         case 5:
-            backgroundColor = SWT.COLOR_DARK_GRAY;
-            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
+
+         case 5: //Very poor
+            
+            sysBackgroundColor = SWT.COLOR_DARK_GRAY;
+            sysForegroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
             break;
+
          default:
-            backgroundColor = SWT.COLOR_WHITE;
-            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_BLACK : SWT.COLOR_DARK_BLUE;
+
+            isSysColor = false;
+
+            tableItem.setBackground(ThemeUtil.getDefaultBackgroundColor_Combo());
+            tableItem.setForeground(ThemeUtil.getDefaultForegroundColor_Combo());
+
             break;
          }
 
-         tableItem.setBackground(Display.getCurrent().getSystemColor(backgroundColor));
-         tableItem.setForeground(Display.getCurrent().getSystemColor(foregroundColor));
+         if (isSysColor) {
+
+            tableItem.setBackground(Display.getCurrent().getSystemColor(sysBackgroundColor));
+            tableItem.setForeground(Display.getCurrent().getSystemColor(sysForegroundColor));
+         }
       }
    }
 
