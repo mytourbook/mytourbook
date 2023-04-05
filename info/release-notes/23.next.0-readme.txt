@@ -43,6 +43,9 @@ Improvements
 
 * Weather (Frederic)
   - Adjusted the mapping of vendor's icons to MyTourbook's cloud icons
+  
+* Tour Pauses View (Frederic)
+  - Added a Pause Type column
 
 Changes
 =======
