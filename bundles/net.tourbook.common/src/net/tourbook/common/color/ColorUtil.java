@@ -74,6 +74,13 @@ public class ColorUtil {
             | ((rgb.red & 0xFF) << 16);
    }
 
+   public static org.eclipse.swt.graphics.Color getComplimentColor(final org.eclipse.swt.graphics.Color color) {
+
+      final RGB complimentColor = getComplimentColor(color.getRGB());
+
+      return new org.eclipse.swt.graphics.Color(complimentColor);
+   }
+
    public static RGB getComplimentColor(final RGB color) {
 
       // get compliment color
