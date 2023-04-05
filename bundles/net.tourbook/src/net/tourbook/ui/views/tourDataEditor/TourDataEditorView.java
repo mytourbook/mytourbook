@@ -58,6 +58,7 @@ import net.tourbook.commands.AppCommands;
 import net.tourbook.commands.ISaveAndRestorePart;
 import net.tourbook.common.CommonActivator;
 import net.tourbook.common.UI;
+import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.font.MTFont;
 import net.tourbook.common.preferences.ICommonPreferences;
 import net.tourbook.common.swimming.StrokeStyle;
@@ -4771,23 +4772,26 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          /*
           * Air Quality
           */
+
          // label
          final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_AirQuality);
          label.setToolTipText(Messages.Tour_Editor_Label_AirQuality_Tooltip);
          _firstColumnControls.add(label);
 
          // combo: Air quality
-         _tableComboWeather_AirQuality = new TableCombo(container, SWT.READ_ONLY);
-         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_tableComboWeather_AirQuality);
-         _tk.adapt(_tableComboWeather_AirQuality, true, false);
+         _tableComboWeather_AirQuality = new TableCombo(container, SWT.READ_ONLY | SWT.BORDER);
          _tableComboWeather_AirQuality.setToolTipText(Messages.Tour_Editor_Label_AirQuality_Tooltip);
+         _tableComboWeather_AirQuality.setShowTableHeader(false);
+         _tableComboWeather_AirQuality.defineColumns(1);
          _tableComboWeather_AirQuality.addModifyListener(_modifyListener);
+
          // We update the model in the selection listener as the selected
          // index value comes back with -1 in the modify listener
          _tableComboWeather_AirQuality.addSelectionListener(
                widgetSelectedAdapter(selectionEvent -> onSelect_AirQuality()));
-         _tableComboWeather_AirQuality.setShowTableHeader(false);
-         _tableComboWeather_AirQuality.defineColumns(1);
+
+         _tk.adapt(_tableComboWeather_AirQuality, true, false);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_tableComboWeather_AirQuality);
 
          fillAirQualityCombo();
 
@@ -6839,42 +6843,53 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // set the column text
          tableItem.setText(IWeather.airQualityTexts[index]);
 
-         int backgroundColor;
-         int foregroundColor;
+         Color backgroundColor = null;
+         Color foregroundColor = null;
+
          switch (index) {
-         //Good
-         case 1:
-            backgroundColor = SWT.COLOR_DARK_GREEN;
-            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
+
+         case 1: // Good - green
+
+            backgroundColor = new Color(0, 128, 0);
+            foregroundColor = UI.IS_DARK_THEME ? UI.SYS_COLOR_WHITE : new Color(203, 255, 203);
+
             break;
-         //Fair
-         case 2:
-            backgroundColor = SWT.COLOR_YELLOW;
-            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_BLACK : SWT.COLOR_DARK_BLUE;
+
+         case 2: // Fair - yellow
+
+            backgroundColor = new Color(255, 255, 0);
+            foregroundColor = UI.IS_DARK_THEME ? new Color(46, 46, 0) : new Color(46, 46, 0);
+
             break;
-         //Moderate
-         case 3:
-            backgroundColor = SWT.COLOR_DARK_YELLOW;
-            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
+
+         case 3: // Moderate - dark yellow
+
+            backgroundColor = new Color(128, 128, 0);
+            foregroundColor = UI.IS_DARK_THEME ? UI.SYS_COLOR_WHITE : new Color(255, 255, 165);
             break;
-         //Poor
-         case 4:
-            backgroundColor = SWT.COLOR_DARK_RED;
-            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
+
+         case 4: // Poor - dark red
+
+            backgroundColor = new Color(128, 0, 0);
+            foregroundColor = UI.IS_DARK_THEME ? UI.SYS_COLOR_WHITE : new Color(255, 170, 170);
             break;
-         //Very poor
-         case 5:
-            backgroundColor = SWT.COLOR_DARK_GRAY;
-            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
+
+         case 5: // Very poor - dark grey
+
+            backgroundColor = new Color(128, 128, 128);
+            foregroundColor = UI.IS_DARK_THEME ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
             break;
+
          default:
-            backgroundColor = SWT.COLOR_WHITE;
-            foregroundColor = UI.IS_DARK_THEME ? SWT.COLOR_BLACK : SWT.COLOR_DARK_BLUE;
+
+            backgroundColor = ThemeUtil.getDefaultBackgroundColor_Combo();
+            foregroundColor = ThemeUtil.getDefaultForegroundColor_Combo();
+
             break;
          }
 
-         tableItem.setBackground(Display.getCurrent().getSystemColor(backgroundColor));
-         tableItem.setForeground(Display.getCurrent().getSystemColor(foregroundColor));
+         tableItem.setBackground(backgroundColor);
+         tableItem.setForeground(foregroundColor);
       }
    }
 
