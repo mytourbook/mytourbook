@@ -1000,36 +1000,55 @@ public class TourBookView extends ViewPart implements
 
       final boolean isForwards = UI.isCtrlKey(event) == false;
 
+// disabled NOT_SELECTED_TOURS
+
       if (_selectionFilterType == SelectionFilterType.ALL_IS_DISPLAYED) {
 
-         if (isForwards) {
-            toggleSelectionFilter_SelectedTours();
-         } else {
-            toggleSelectionFilter_NotSelectedTours();
-         }
-
-      } else if (_selectionFilterType == SelectionFilterType.SELECTED_TOURS) {
-
-         if (isForwards) {
-            toggleSelectionFilter_NotSelectedTours();
-         } else {
-            toggleSelectionFilter_ShowAll();
-         }
+         toggleSelectionFilter_SelectedTours();
 
       } else {
 
-         if (isForwards) {
-            toggleSelectionFilter_ShowAll();
-         } else {
-            toggleSelectionFilter_SelectedTours();
-         }
+         toggleSelectionFilter_ShowAll();
       }
+
+// this code is also using NOT_SELECTED_TOURS
+
+//      if (_selectionFilterType == SelectionFilterType.ALL_IS_DISPLAYED) {
+//
+//         if (isForwards) {
+//            toggleSelectionFilter_SelectedTours();
+//         } else {
+//            toggleSelectionFilter_NotSelectedTours();
+//         }
+//
+//      } else
+//
+//         if (_selectionFilterType == SelectionFilterType.SELECTED_TOURS) {
+//
+//            if (isForwards) {
+//               toggleSelectionFilter_NotSelectedTours();
+//            } else {
+//               toggleSelectionFilter_ShowAll();
+//            }
+//
+//         } else {
+//
+//            if (isForwards) {
+//               toggleSelectionFilter_ShowAll();
+//            } else {
+//               toggleSelectionFilter_SelectedTours();
+//            }
+//         }
 
       _natTable_DataLoader.resetTourItems();
 
       _natTable_DataLoader.setTourSelectionFilter(_selectionFilterType, _selectedTourIds);
 
-      reselectTourViewer();
+      reselectTourViewer(
+
+            // do not fire a selection
+//      false);
+            true);
    }
 
    /**
@@ -2959,11 +2978,21 @@ public class TourBookView extends ViewPart implements
     */
    private void reselectTourViewer() {
 
-//      _postSelectionProvider.setSelection(null);
+      reselectTourViewer(true);
+   }
+
+   /**
+    * Reselect tours from {@link #_selectedTourIds}
+    *
+    * @param isFireSelection
+    */
+   private void reselectTourViewer(final boolean isFireSelection) {
+
+      _postSelectionProvider.clearSelection();
 
       if (_isLayoutNatTable) {
 
-         reselectTourViewer_NatTable();
+         reselectTourViewer_NatTable(isFireSelection);
 
       } else {
 
@@ -2973,8 +3002,10 @@ public class TourBookView extends ViewPart implements
 
    /**
     * Reselect tours from {@link #_selectedTourIds}
+    *
+    * @param isFireSelection
     */
-   private void reselectTourViewer_NatTable() {
+   private void reselectTourViewer_NatTable(final boolean isFireSelection) {
 
       _natTable_DataLoader.getRowIndexFromTourId(_selectedTourIds).thenAccept(allRowPositions -> {
 
@@ -2982,7 +3013,7 @@ public class TourBookView extends ViewPart implements
 
                true, // isClearSelection
                true, // isScrollIntoView
-               true // isFireSelection
+               isFireSelection // isFireSelection
          );
       });
    }
@@ -3295,7 +3326,7 @@ public class TourBookView extends ViewPart implements
 
                   /**
                    * <code>
-                  
+
                      Caused by: java.lang.NullPointerException
                      at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                      at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -3313,13 +3344,13 @@ public class TourBookView extends ViewPart implements
                      at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-                  
+
                      at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-                  
+
                      at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                      at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                      ... 22 more
-                  
+
                    * </code>
                    */
 
@@ -3363,7 +3394,7 @@ public class TourBookView extends ViewPart implements
          }
 
          /*
-          * Prevent that _tourViewer_NatTable.setFocus(); is fireing a part selection which would
+          * Prevent that _tourViewer_NatTable.setFocus() is fireing a part selection which would
           * case the 2D map crumb to show the last part selection
           */
          _postSelectionProvider.clearSelection();
