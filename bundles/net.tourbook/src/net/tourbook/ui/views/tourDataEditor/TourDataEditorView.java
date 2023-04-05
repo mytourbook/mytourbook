@@ -4772,23 +4772,26 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          /*
           * Air Quality
           */
+
          // label
          final Label label = _tk.createLabel(container, Messages.Tour_Editor_Label_AirQuality);
          label.setToolTipText(Messages.Tour_Editor_Label_AirQuality_Tooltip);
          _firstColumnControls.add(label);
 
          // combo: Air quality
-         _tableComboWeather_AirQuality = new TableCombo(container, SWT.READ_ONLY);
-         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_tableComboWeather_AirQuality);
-         _tk.adapt(_tableComboWeather_AirQuality, true, false);
+         _tableComboWeather_AirQuality = new TableCombo(container, SWT.READ_ONLY | SWT.BORDER);
          _tableComboWeather_AirQuality.setToolTipText(Messages.Tour_Editor_Label_AirQuality_Tooltip);
+         _tableComboWeather_AirQuality.setShowTableHeader(false);
+         _tableComboWeather_AirQuality.defineColumns(1);
          _tableComboWeather_AirQuality.addModifyListener(_modifyListener);
+
          // We update the model in the selection listener as the selected
          // index value comes back with -1 in the modify listener
          _tableComboWeather_AirQuality.addSelectionListener(
                widgetSelectedAdapter(selectionEvent -> onSelect_AirQuality()));
-         _tableComboWeather_AirQuality.setShowTableHeader(false);
-         _tableComboWeather_AirQuality.defineColumns(1);
+
+         _tk.adapt(_tableComboWeather_AirQuality, true, false);
+         GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.FILL).applyTo(_tableComboWeather_AirQuality);
 
          fillAirQualityCombo();
 
@@ -6840,57 +6843,53 @@ public class TourDataEditorView extends ViewPart implements ISaveablePart, ISave
          // set the column text
          tableItem.setText(IWeather.airQualityTexts[index]);
 
-         boolean isSysColor = true;
-         int sysBackgroundColor = 0;
-         int sysForegroundColor = 0;
+         Color backgroundColor = null;
+         Color foregroundColor = null;
 
          switch (index) {
 
-         case 1: //Good
+         case 1: // Good - green
 
-            sysBackgroundColor = SWT.COLOR_DARK_GREEN;
-            sysForegroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
+            backgroundColor = new Color(0, 128, 0);
+            foregroundColor = UI.IS_DARK_THEME ? UI.SYS_COLOR_WHITE : new Color(203, 255, 203);
+
             break;
 
-         case 2: //Fair
+         case 2: // Fair - yellow
 
-            sysBackgroundColor = SWT.COLOR_YELLOW;
-            sysForegroundColor = UI.IS_DARK_THEME ? SWT.COLOR_BLACK : SWT.COLOR_DARK_BLUE;
+            backgroundColor = new Color(255, 255, 0);
+            foregroundColor = UI.IS_DARK_THEME ? new Color(46, 46, 0) : new Color(46, 46, 0);
+
             break;
 
-         case 3: //Moderate
+         case 3: // Moderate - dark yellow
 
-            sysBackgroundColor = SWT.COLOR_DARK_YELLOW;
-            sysForegroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
+            backgroundColor = new Color(128, 128, 0);
+            foregroundColor = UI.IS_DARK_THEME ? UI.SYS_COLOR_WHITE : new Color(255, 255, 165);
             break;
 
-         case 4: //Poor
+         case 4: // Poor - dark red
 
-            sysBackgroundColor = SWT.COLOR_DARK_RED;
-            sysForegroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
+            backgroundColor = new Color(128, 0, 0);
+            foregroundColor = UI.IS_DARK_THEME ? UI.SYS_COLOR_WHITE : new Color(255, 170, 170);
             break;
 
-         case 5: //Very poor
-            
-            sysBackgroundColor = SWT.COLOR_DARK_GRAY;
-            sysForegroundColor = UI.IS_DARK_THEME ? SWT.COLOR_WHITE : SWT.COLOR_DARK_BLUE;
+         case 5: // Very poor - dark grey
+
+            backgroundColor = new Color(128, 128, 128);
+            foregroundColor = UI.IS_DARK_THEME ? UI.SYS_COLOR_WHITE : new Color(255, 255, 255);
             break;
 
          default:
 
-            isSysColor = false;
-
-            tableItem.setBackground(ThemeUtil.getDefaultBackgroundColor_Combo());
-            tableItem.setForeground(ThemeUtil.getDefaultForegroundColor_Combo());
+            backgroundColor = ThemeUtil.getDefaultBackgroundColor_Combo();
+            foregroundColor = ThemeUtil.getDefaultForegroundColor_Combo();
 
             break;
          }
 
-         if (isSysColor) {
-
-            tableItem.setBackground(Display.getCurrent().getSystemColor(sysBackgroundColor));
-            tableItem.setForeground(Display.getCurrent().getSystemColor(sysForegroundColor));
-         }
+         tableItem.setBackground(backgroundColor);
+         tableItem.setForeground(foregroundColor);
       }
    }
 
