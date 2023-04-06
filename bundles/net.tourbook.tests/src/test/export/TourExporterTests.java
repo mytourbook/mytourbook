@@ -57,8 +57,9 @@ public class TourExporterTests {
    @AfterEach
    void afterEach() {
 
-      net.tourbook.common.util.FileUtils.deleteIfExists(Paths.get(_testTourFilePathTcx));
+      net.tourbook.common.util.FileUtils.deleteIfExists(Paths.get(_testTourFilePathFit));
       net.tourbook.common.util.FileUtils.deleteIfExists(Paths.get(_testTourFilePathGpx));
+      net.tourbook.common.util.FileUtils.deleteIfExists(Paths.get(_testTourFilePathTcx));
    }
 
    private void executeFitTest(final String controlTourFileName) {

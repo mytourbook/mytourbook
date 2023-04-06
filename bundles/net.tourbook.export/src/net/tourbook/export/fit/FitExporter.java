@@ -185,9 +185,9 @@ public class FitExporter {
          }
          if (tourData.pulseSerie != null) {
          recordMesg.setCadence((short) tourData.getCadenceSerie()[index]); // Sawtooth
-         }
          recordMesg.setPower((int) tourData.getPowerSerie()[index]); //Square
          recordMesg.setAltitude(tourData.altitudeSerie[index]);
+         }
          recordMesg.setPositionLat(SemicirclesConverter.degreesToSemicircles(tourData.latitudeSerie[index]));
          recordMesg.setPositionLong(SemicirclesConverter.degreesToSemicircles(tourData.longitudeSerie[index]));
 

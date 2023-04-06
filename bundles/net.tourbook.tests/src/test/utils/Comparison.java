@@ -22,6 +22,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
 import java.util.List;
 import java.util.Map;
@@ -42,9 +43,12 @@ public class Comparison {
 
    private static final String JSON = ".json"; //$NON-NLS-1$
 
-   public static void compareFitAgainstControl(final String string,
-                                               final String testtourfilepathfit) {
-      // TODO Auto-generated method stub
+   public static void compareFitAgainstControl(final String controlTourFilePath,
+                                               final String testTourfilepathfit) {
+
+      //Convert the test FIT file to CSV for a human readable comparison
+
+      final String testTourFilePathCsv = convertFitToCsvFile(testTourfilepathfit);
 
    }
 
@@ -116,6 +120,40 @@ public class Comparison {
       }
 
       assertFalse(documentDiff.hasDifferences(), documentDiff.toString());
+   }
+
+   private static String convertFitToCsvFile(final String testTourfilepathfit) {
+
+      Process proc;
+      try {
+
+         final String fitCsvToolFilePath = FilesUtils.getAbsoluteFilePath(
+               FilesUtils.rootPath + "utils/files/FitCSVTool.jar");
+         final String testTourfilepathcsv = FilesUtils.getAbsoluteFilePath(
+               FilesUtils.rootPath + "export/files/toto.csv");
+
+         proc = Runtime.getRuntime().exec("java -jar " + fitCsvToolFilePath + " -b " + testTourfilepathfit + " " + testTourfilepathcsv);
+         final var titi = proc.waitFor();
+final var tutu = proc.exitValue();
+
+
+final InputStream in = proc.getInputStream();
+final InputStream err = proc.getErrorStream();
+
+final byte b[]=new byte[in.available()];
+in.read(b,0,b.length);
+System.out.println(new String(b));
+
+final byte c[]=new byte[err.available()];
+err.read(c,0,c.length);
+System.out.println(new String(c));
+
+      } catch (final IOException | InterruptedException e) {
+         Thread.currentThread().interrupt();
+         e.printStackTrace();
+      }
+
+      return "";
    }
 
    public static String readFileContent(final String controlDocumentFileName) {
