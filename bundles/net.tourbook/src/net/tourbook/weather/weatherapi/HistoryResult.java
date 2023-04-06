@@ -34,7 +34,7 @@ public class HistoryResult {
    private int        averageWindDirection;
    private Hour       middleHourData;
 
-   public void addHourList(final List<Hour> newHourList) {
+   void addHourList(final List<Hour> newHourList) {
 
       for (final Hour newHour : newHourList) {
          if (!hourList.contains(newHour)) {
@@ -43,7 +43,7 @@ public class HistoryResult {
       }
    }
 
-   public void computeAverageWindSpeedAndDirection() {
+   void computeAverageWindSpeedAndDirection() {
 
       final double[] windSpeeds = hourList
             .stream()
@@ -67,7 +67,7 @@ public class HistoryResult {
     *
     * @return
     */
-   public boolean filterHourData(final long tourStartTime, final long tourEndTime) {
+   boolean filterHourData(final long tourStartTime, final long tourEndTime) {
 
       final List<Hour> filteredHourData = new ArrayList<>();
 
@@ -95,7 +95,7 @@ public class HistoryResult {
     * Finds the hour that is closest to the middle of the tour. This will be used
     * to determine the weather description of the tour.
     */
-   public void findMiddleHour(final long tourMiddleTime) {
+   void findMiddleHour(final long tourMiddleTime) {
 
       middleHourData = null;
 

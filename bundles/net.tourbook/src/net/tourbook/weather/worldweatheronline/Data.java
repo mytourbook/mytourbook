@@ -42,7 +42,7 @@ public class Data {
    private int               averageWindSpeed;
    private int               averageWindDirection;
 
-   public void computeAverageWindSpeedAndDirection() {
+   void computeAverageWindSpeedAndDirection() {
 
       final double[] windSpeeds = filteredHourly
             .stream()
@@ -66,7 +66,7 @@ public class Data {
     *
     * @return
     */
-   public boolean filterHourlyData(final long tourStartTime, final long tourEndTime) {
+   boolean filterHourlyData(final long tourStartTime, final long tourEndTime) {
 
       //If the returned data is for more than 1 day, we combine the multiple hourly
       //lists into 1
@@ -97,7 +97,7 @@ public class Data {
     * Finds the hourly that is closest to the middle of the tour. This will be used
     * to determine the weather description of the tour.
     */
-   public void findMiddleHourly(final long tourMiddleTime) {
+   void findMiddleHourly(final long tourMiddleTime) {
 
       if (filteredHourly == null) {
          return;
