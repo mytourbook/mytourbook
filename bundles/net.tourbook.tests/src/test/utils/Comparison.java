@@ -44,11 +44,13 @@ public class Comparison {
    private static final String JSON = ".json"; //$NON-NLS-1$
 
    public static void compareFitAgainstControl(final String controlTourFilePath,
-                                               final String testTourfilepathfit) {
+                                               final String testTourFilepath) {
 
       //Convert the test FIT file to CSV for a human readable comparison
 
-      final String testTourFilePathCsv = convertFitToCsvFile(testTourfilepathfit);
+      final String testTourFilePathCsv = convertFitToCsvFile(testTourFilepath);
+
+      //Compare with the control file
 
    }
 
@@ -131,7 +133,7 @@ public class Comparison {
                FilesUtils.rootPath + "utils/files/FitCSVTool.jar");
          final String testTourfilepathcsv = FilesUtils.getAbsoluteFilePath(
                FilesUtils.rootPath + "export/files/toto.csv");
-
+//todo fb get code from FItImprover
          proc = Runtime.getRuntime().exec("java -jar " + fitCsvToolFilePath + " -b " + testTourfilepathfit + " " + testTourfilepathcsv);
          final var titi = proc.waitFor();
 final var tutu = proc.exitValue();

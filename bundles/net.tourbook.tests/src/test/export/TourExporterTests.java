@@ -94,15 +94,13 @@ public class TourExporterTests {
             attributesToFilter);
    }
 
-   @DisplayName("TimeTools tests")
+   @DisplayName("Tour Export in FIT format")
    @Test
    void exportTour_Fit() {
-//todo fb
+
       initializeTourExporterFit();
 
-      _tourExporter.setUseActivityType(true);
-
-      final String controlTourFileName = "XXX.fit"; //$NON-NLS-1$
+      final String controlTourFileName = "LongsPeak.fit"; //$NON-NLS-1$
       executeFitTest(controlTourFileName);
    }
 

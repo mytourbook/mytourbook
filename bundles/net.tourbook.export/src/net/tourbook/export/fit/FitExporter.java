@@ -42,8 +42,8 @@ import com.garmin.fit.Sport;
 import com.garmin.fit.UserProfileMesg;
 import com.garmin.fit.util.SemicirclesConverter;
 
+import java.sql.Date;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -121,7 +121,7 @@ public class FitExporter {
       final List<Mesg> messages = new ArrayList<>();
 
       // The starting timestamp for the activity
-      final DateTime startTime = new DateTime(new Date());
+      final DateTime startTime = new DateTime(Date.from(tourData.getTourStartTime().toInstant()));
 
       // Timer Events are a BEST PRACTICE for FIT ACTIVITY files
       final EventMesg eventMesg = new EventMesg();
@@ -167,12 +167,16 @@ public class FitExporter {
       messages.add(hrFieldDescMesg);
 
       // Every FIT ACTIVITY file MUST contain Record messages
-      final DateTime timestamp = new DateTime(startTime);
       final int previousTimeSerieValue = 0;
 
+      int previousTime = 0;
+      DateTime timestamp = null;
       // Create one hour (3600 seconds) of Record data
       for (int index = 0; index < tourData.timeSerie.length; ++index) {
 
+         startTime.add(tourData.timeSerie[index] - previousTime);
+         previousTime = tourData.timeSerie[index];
+         timestamp = new DateTime(startTime);
          // Create a new Record message and set the timestamp
          final RecordMesg recordMesg = new RecordMesg();
          recordMesg.setTimestamp(timestamp);
@@ -186,6 +190,9 @@ public class FitExporter {
          if (tourData.pulseSerie != null) {
          recordMesg.setCadence((short) tourData.getCadenceSerie()[index]); // Sawtooth
          recordMesg.setPower((int) tourData.getPowerSerie()[index]); //Square
+      }
+      if (tourData.altitudeSerie != null) {
+
          recordMesg.setAltitude(tourData.altitudeSerie[index]);
          }
          recordMesg.setPositionLat(SemicirclesConverter.degreesToSemicircles(tourData.latitudeSerie[index]));
@@ -224,7 +231,7 @@ public class FitExporter {
       // Every FIT ACTIVITY file MUST contain at least one Session message
       final SessionMesg sessionMesg = new SessionMesg();
       sessionMesg.setMessageIndex(0);
-      sessionMesg.setTimestamp(timestamp);
+      // sessionMesg.setTimestamp(timestamp);
       sessionMesg.setStartTime(startTime);
       sessionMesg.setTotalElapsedTime((float) tourData.getTourDeviceTime_Elapsed());
       sessionMesg.setTotalTimerTime((float) tourData.getTourDeviceTime_Recorded());
