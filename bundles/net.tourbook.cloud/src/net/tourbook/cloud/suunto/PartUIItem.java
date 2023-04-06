@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2022 Frédéric Bard
+ * Copyright (C) 2022, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -15,7 +15,7 @@
  *******************************************************************************/
 package net.tourbook.cloud.suunto;
 
-public class PartUIItem {
+class PartUIItem {
 
    PART_TYPE  partKey;
    WIDGET_KEY widgetKey;
@@ -23,10 +23,10 @@ public class PartUIItem {
    String     text;
    String     abbreviation;
 
-   public PartUIItem(final PART_TYPE partItemKey,
-                     final WIDGET_KEY partWidgetKey,
-                     final String partText,
-                     final String partAbbreviation) {
+   PartUIItem(final PART_TYPE partItemKey,
+              final WIDGET_KEY partWidgetKey,
+              final String partText,
+              final String partAbbreviation) {
 
       partKey = partItemKey;
       widgetKey = partWidgetKey;

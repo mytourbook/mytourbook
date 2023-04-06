@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import net.tourbook.cloud.oauth2.Tokens;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class SuuntoTokens extends Tokens {
+class SuuntoTokens extends Tokens {
 
    public String token_type;
    public String scope;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2020 Frédéric Bard
+ * Copyright (C) 2020, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import net.tourbook.cloud.oauth2.Tokens;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class DropboxTokens extends Tokens {
+class DropboxTokens extends Tokens {
 
    private String uid;
    private String token_type;

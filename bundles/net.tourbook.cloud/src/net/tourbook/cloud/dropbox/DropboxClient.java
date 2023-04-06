@@ -49,14 +49,14 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.Version;
 
-public class DropboxClient {
+class DropboxClient {
 
-   private static DbxClientV2    _dropboxClient;
+   private static DbxClientV2            _dropboxClient;
 
-   private static final String   DropboxApiBaseUrl  = "https://api.dropboxapi.com";                              //$NON-NLS-1$
-   public static final String    DropboxCallbackUrl = "http://localhost:" + PrefPageDropbox.CALLBACK_PORT + "/"; //$NON-NLS-1$ //$NON-NLS-2$
+   private static final String           DropboxApiBaseUrl  = "https://api.dropboxapi.com";                              //$NON-NLS-1$
+   static final String                   DropboxCallbackUrl = "http://localhost:" + PrefPageDropbox.CALLBACK_PORT + "/"; //$NON-NLS-1$ //$NON-NLS-2$
 
-   static final IPreferenceStore _prefStore         = Activator.getDefault().getPreferenceStore();
+   private static final IPreferenceStore _prefStore         = Activator.getDefault().getPreferenceStore();
 
    static {
 
@@ -82,7 +82,7 @@ public class DropboxClient {
     *           The Dropbox path of the file
     * @return The local path of the downloaded file
     */
-   public static final Path CopyLocally(String dropboxFilePath) {
+   static final Path CopyLocally(String dropboxFilePath) {
 
       if (StringUtils.isNullOrEmpty(dropboxFilePath)) {
          return null;
@@ -153,7 +153,7 @@ public class DropboxClient {
     * @param accessToken
     * @return
     */
-   public static final DbxClientV2 getDefault(final String accessToken) {
+   static final DbxClientV2 getDefault(final String accessToken) {
 
       if (StringUtils.isNullOrEmpty(accessToken)) {
          return _dropboxClient;
@@ -162,10 +162,10 @@ public class DropboxClient {
       return createDropboxClient(accessToken);
    }
 
-   public static final DropboxTokens getTokens(final String authorizationCode,
-                                               final boolean isRefreshToken,
-                                               final String refreshToken,
-                                               final String codeVerifier) {
+   static final DropboxTokens getTokens(final String authorizationCode,
+                                        final boolean isRefreshToken,
+                                        final String refreshToken,
+                                        final String codeVerifier) {
 
       final Map<String, String> data = new HashMap<>();
       data.put(OAuth2Constants.PARAM_CLIENT_ID, PrefPageDropbox.ClientId);
@@ -208,7 +208,7 @@ public class DropboxClient {
       return token;
    }
 
-   public static final String getValidTokens() {
+   static final String getValidTokens() {
 
       if (StringUtils.isNullOrEmpty(_prefStore.getString(Preferences.DROPBOX_ACCESSTOKEN))) {
          return UI.EMPTY_STRING;
