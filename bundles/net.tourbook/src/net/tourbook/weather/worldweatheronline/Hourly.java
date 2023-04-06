@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (C) 2019, 2022 Frédéric Bard
+ * Copyright (C) 2019, 2023 Frédéric Bard
  *
  * This program is free software; you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -31,15 +31,13 @@ import net.tourbook.common.util.StringUtils;
  * A Java representation of a World Weather Online query result "hourly" element.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Hourly {
+class Hourly {
 
    @JsonProperty("UTCdate")
    private String            utcDate;
 
    @JsonProperty("UTCtime")
    private String            utcTime;
-
-   private String            time;
 
    private String            windspeedKmph;
 
@@ -117,10 +115,6 @@ public class Hourly {
 
    public int getTempC() {
       return Integer.parseInt(tempC);
-   }
-
-   public String gettime() {
-      return time;
    }
 
    public String getUtcDate() {

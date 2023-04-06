@@ -27,7 +27,7 @@ import net.tourbook.weather.WeatherUtils;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HistoryResult {
 
-   public Forecast    forecast;
+   private Forecast   forecast;
 
    private List<Hour> hourList = new ArrayList<>();
    private int        averageWindSpeed;
@@ -156,11 +156,15 @@ public class HistoryResult {
       return averageWindSpeed;
    }
 
+   public Forecast getForecast() {
+      return forecast;
+   }
+
    public List<Hour> getForecastdayHourList() {
 
-      if (forecast != null && forecast.getForecastday() != null &&
-            forecast.getForecastday().size() > 0) {
-         return forecast.getForecastday().get(0).getHour();
+      if (getForecast() != null && getForecast().getForecastday() != null &&
+            getForecast().getForecastday().size() > 0) {
+         return getForecast().getForecastday().get(0).getHour();
       }
 
       return new ArrayList<>();

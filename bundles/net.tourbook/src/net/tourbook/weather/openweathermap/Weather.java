@@ -18,7 +18,7 @@ package net.tourbook.weather.openweathermap;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Weather {
+class Weather {
 
    private String description;
    private String icon;
