@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.tourbook.common.util.FileUtils;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.export.ExportTourGPX;
@@ -39,6 +40,7 @@ public class TourExporterTests {
 
    private static final String FILES_PATH           = FilesUtils.rootPath + "export/files/"; //$NON-NLS-1$
    private static final String _testTourFilePathFit = FILES_PATH + "FITExport.fit";          //$NON-NLS-1$
+   private static final String _testTourFilePathCsv = FILES_PATH + "FITExport.csv";          //$NON-NLS-1$
    private static final String _testTourFilePathTcx = FILES_PATH + "TCXExport.tcx";          //$NON-NLS-1$
    private static final String _testTourFilePathGpx = FILES_PATH + "GPXExport.gpx";          //$NON-NLS-1$
 
@@ -57,9 +59,10 @@ public class TourExporterTests {
    @AfterEach
    void afterEach() {
 
-      net.tourbook.common.util.FileUtils.deleteIfExists(Paths.get(_testTourFilePathFit));
-      net.tourbook.common.util.FileUtils.deleteIfExists(Paths.get(_testTourFilePathGpx));
-      net.tourbook.common.util.FileUtils.deleteIfExists(Paths.get(_testTourFilePathTcx));
+      FileUtils.deleteIfExists(Paths.get(_testTourFilePathFit));
+      FileUtils.deleteIfExists(Paths.get(_testTourFilePathCsv));
+      FileUtils.deleteIfExists(Paths.get(_testTourFilePathGpx));
+      FileUtils.deleteIfExists(Paths.get(_testTourFilePathTcx));
    }
 
    private void executeFitTest(final String controlTourFileName) {
@@ -67,7 +70,8 @@ public class TourExporterTests {
       _tourExporter.export(_testTourFilePathFit);
 
       Comparison.compareFitAgainstControl(FILES_PATH + controlTourFileName,
-            _testTourFilePathFit);
+            _testTourFilePathFit,
+            _testTourFilePathCsv);
    }
 
    private void executeGpxTest(final String controlTourFileName) {
@@ -100,7 +104,7 @@ public class TourExporterTests {
 
       initializeTourExporterFit();
 
-      final String controlTourFileName = "LongsPeak.fit"; //$NON-NLS-1$
+      final String controlTourFileName = "LongsPeakFit.fit"; //$NON-NLS-1$
       executeFitTest(controlTourFileName);
    }
 

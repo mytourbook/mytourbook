@@ -45,7 +45,6 @@ import com.garmin.fit.util.SemicirclesConverter;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
@@ -64,8 +63,7 @@ public class FitExporter {
       final short productId = 0;
       final float softwareVersion = 1.0f;
 
-      final Random random = new Random();
-      final int serialNumber = random.nextInt();
+      final int serialNumber = 123; //todo fb
 
       // Every FIT file MUST contain a File ID message
       final FileIdMesg fileIdMesg = new FileIdMesg();

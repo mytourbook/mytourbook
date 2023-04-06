@@ -20,16 +20,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.data.TourData;
 
+import org.apache.commons.io.IOUtils;
 import org.skyscreamer.jsonassert.ArrayValueMatcher;
 import org.skyscreamer.jsonassert.Customization;
 import org.skyscreamer.jsonassert.JSONCompare;
@@ -44,14 +49,30 @@ public class Comparison {
    private static final String JSON = ".json"; //$NON-NLS-1$
 
    public static void compareFitAgainstControl(final String controlTourFilePath,
-                                               final String testTourFilepath) {
+                                               final String testTourFilepath,
+                                               final String testTourFilepathcsv) {
 
       //Convert the test FIT file to CSV for a human readable comparison
 
-      final String testTourFilePathCsv = convertFitToCsvFile(testTourFilepath);
+      final String testTourFilePathCsv = convertFitToCsvFile(testTourFilepath, testTourFilepathcsv);
 
       //Compare with the control file
+      try {
+         final Path path1 = Paths.get(testTourFilePathCsv);
+         assertTrue(Files.exists(path1));
 
+         final Path path2 = Paths.get(utils.FilesUtils.getAbsoluteFilePath(controlTourFilePath).replace(".fit", ".csv"));
+         assertTrue(Files.exists(path2));
+
+      final InputStream inputStream1 = new FileInputStream(path1.toFile());
+      final InputStream inputStream2 = new FileInputStream(path2.toFile());
+
+      assertTrue(IOUtils.contentEquals(inputStream1, inputStream2));
+      inputStream1.close();
+      inputStream2.close();
+   } catch (final IOException e) {
+      e.printStackTrace();
+   }
    }
 
    /**
@@ -124,17 +145,18 @@ public class Comparison {
       assertFalse(documentDiff.hasDifferences(), documentDiff.toString());
    }
 
-   private static String convertFitToCsvFile(final String testTourfilepathfit) {
+   private static String convertFitToCsvFile(final String testTourfilepathfit,
+                                             final String testTourFilepathcsv) {
 
       Process proc;
+      final String csvtoto = FilesUtils.getAbsoluteFilePath(testTourFilepathcsv);
       try {
 
          final String fitCsvToolFilePath = FilesUtils.getAbsoluteFilePath(
                FilesUtils.rootPath + "utils/files/FitCSVTool.jar");
-         final String testTourfilepathcsv = FilesUtils.getAbsoluteFilePath(
-               FilesUtils.rootPath + "export/files/toto.csv");
 //todo fb get code from FItImprover
-         proc = Runtime.getRuntime().exec("java -jar " + fitCsvToolFilePath + " -b " + testTourfilepathfit + " " + testTourfilepathcsv);
+         proc = Runtime.getRuntime().exec("java -jar " + fitCsvToolFilePath + " -b " + testTourfilepathfit + " " +
+               csvtoto);
          final var titi = proc.waitFor();
 final var tutu = proc.exitValue();
 
@@ -155,7 +177,7 @@ System.out.println(new String(c));
          e.printStackTrace();
       }
 
-      return "";
+      return csvtoto;
    }
 
    public static String readFileContent(final String controlDocumentFileName) {
