@@ -41,7 +41,7 @@ public class ExportTourFIT extends ExportTourExtension {
             tourDataList,
             tourStartIndex,
             tourEndIndex,
-            null).open();
+            "fit").open(); //$NON-NLS-1$
    }
 
 }

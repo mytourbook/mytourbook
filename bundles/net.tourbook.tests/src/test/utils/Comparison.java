@@ -42,6 +42,12 @@ public class Comparison {
 
    private static final String JSON = ".json"; //$NON-NLS-1$
 
+   public static void compareFitAgainstControl(final String string,
+                                               final String testtourfilepathfit) {
+      // TODO Auto-generated method stub
+
+   }
+
    /**
     * Compares a test transaction against a control transaction.
     *

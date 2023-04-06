@@ -15,13 +15,11 @@
  *******************************************************************************/
 package export;
 
-
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import net.tourbook.common.UI;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourType;
 import net.tourbook.export.ExportTourGPX;
@@ -40,6 +38,7 @@ import utils.Initializer;
 public class TourExporterTests {
 
    private static final String FILES_PATH           = FilesUtils.rootPath + "export/files/"; //$NON-NLS-1$
+   private static final String _testTourFilePathFit = FILES_PATH + "FITExport.fit";          //$NON-NLS-1$
    private static final String _testTourFilePathTcx = FILES_PATH + "TCXExport.tcx";          //$NON-NLS-1$
    private static final String _testTourFilePathGpx = FILES_PATH + "GPXExport.gpx";          //$NON-NLS-1$
 
@@ -60,6 +59,14 @@ public class TourExporterTests {
 
       net.tourbook.common.util.FileUtils.deleteIfExists(Paths.get(_testTourFilePathTcx));
       net.tourbook.common.util.FileUtils.deleteIfExists(Paths.get(_testTourFilePathGpx));
+   }
+
+   private void executeFitTest(final String controlTourFileName) {
+
+      _tourExporter.export(_testTourFilePathFit);
+
+      Comparison.compareFitAgainstControl(FILES_PATH + controlTourFileName,
+            _testTourFilePathFit);
    }
 
    private void executeGpxTest(final String controlTourFileName) {
@@ -93,15 +100,14 @@ public class TourExporterTests {
       initializeTourExporterFit();
 
       _tourExporter.setUseActivityType(true);
-      _tourExporter.setActivityType("Hiking"); //$NON-NLS-1$
 
-      //  final String controlTourFileName = "XXX.fit"; //$NON-NLS-1$
-      //  executeTcxTest(controlTourFileName);
+      final String controlTourFileName = "XXX.fit"; //$NON-NLS-1$
+      executeFitTest(controlTourFileName);
    }
 
    private void initializeTourExporterFit() {
 
-      _tourExporter = new TourExporter(UI.EMPTY_STRING).useTourData(_tour);
+      _tourExporter = new TourExporter("fit").useTourData(_tour); //$NON-NLS-1$
       _tourExporter.setActivityType(_tour.getTourType().getName());
    }
 
@@ -187,15 +193,15 @@ public class TourExporterTests {
       executeTcxTest(controlTourFileName);
    }
 
-@Test
-void testTcxExportHikingActivity() {
+   @Test
+   void testTcxExportHikingActivity() {
 
-   initializeTourExporterTcx();
+      initializeTourExporterTcx();
 
-   _tourExporter.setUseActivityType(true);
-   _tourExporter.setActivityType("Hiking"); //$NON-NLS-1$
+      _tourExporter.setUseActivityType(true);
+      _tourExporter.setActivityType("Hiking"); //$NON-NLS-1$
 
-   final String controlTourFileName = "LongsPeak-HikingActivity.tcx"; //$NON-NLS-1$
-   executeTcxTest(controlTourFileName);
-}
+      final String controlTourFileName = "LongsPeak-HikingActivity.tcx"; //$NON-NLS-1$
+      executeTcxTest(controlTourFileName);
+   }
 }
