@@ -674,7 +674,8 @@ public class RawDataManager {
                      UI.SYMBOL_MIN + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_Min())) + UI.UNIT_LABEL_TEMPERATURE
                      + UI.COMMA_SPACE +
                      UI.SYMBOL_TILDE + Math.round(UI.convertTemperatureFromMetric(oldTourData.getWeather_Temperature_WindChill()))
-                     + UI.UNIT_LABEL_TEMPERATURE);
+                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
+                     oldTourData.getWeather_AirQuality());
          newData.add(
                newTourData.getWeather() + UI.COMMA_SPACE + WeatherUtils.getWeatherIcon(newTourData.getWeatherIndex()) + UI.COMMA_SPACE +
                      UI.SYMBOL_AVERAGE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Average()))
@@ -684,7 +685,8 @@ public class RawDataManager {
                      UI.SYMBOL_MIN + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_Min()))
                      + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
                      UI.SYMBOL_TILDE + Math.round(UI.convertTemperatureFromMetric(newTourData.getWeather_Temperature_WindChill()))
-                     + UI.UNIT_LABEL_TEMPERATURE);
+                     + UI.UNIT_LABEL_TEMPERATURE + UI.COMMA_SPACE +
+                     newTourData.getWeather_AirQuality());
       }
 
       if (isEntireTour_OR_AllTimeSlices || tourValueType == TourValueType.TIME_SLICES__TEMPERATURE_FROMDEVICE) {
@@ -747,7 +749,7 @@ public class RawDataManager {
       }
    }
 
-   public static boolean doesInvalidFileExist(final String fileName) {
+   static boolean doesInvalidFileExist(final String fileName) {
 
       final ArrayList<String> invalidFilesList = readInvalidFilesToIgnoreFile();
 
@@ -1802,6 +1804,7 @@ public class RawDataManager {
                clonedTourData.setWeather_Snowfall(tourData.getWeather_Snowfall());
                clonedTourData.setWeather_Wind_Direction(tourData.getWeather_Wind_Direction());
                clonedTourData.setWeather_Wind_Speed(tourData.getWeather_Wind_Speed());
+               clonedTourData.setWeather_AirQuality(tourData.getWeather_AirQuality());
 
                tourData.setIsWeatherDataFromProvider(false);
                tourData.setWeather_Temperature_Average(0);
@@ -1816,6 +1819,7 @@ public class RawDataManager {
                tourData.setWeather_Snowfall(0);
                tourData.setWeather_Wind_Direction(-1);
                tourData.setWeather_Wind_Speed(0);
+               tourData.setWeather_AirQuality(UI.EMPTY_STRING);
                break;
 
             case TIME_SLICES__TIME:
@@ -2028,9 +2032,9 @@ public class RawDataManager {
     * @param importState_Process
     * @return
     */
-   public void importTours_FromMultipleFiles(final ArrayList<OSFile> allImportFiles,
-                                             final String fileGlobPattern,
-                                             final ImportState_Process importState_Process) {
+   void importTours_FromMultipleFiles(final List<OSFile> allImportFiles,
+                                      final String fileGlobPattern,
+                                      final ImportState_Process importState_Process) {
 
       try {
 
@@ -3753,7 +3757,7 @@ public class RawDataManager {
       return null;
    }
 
-   private List<OSFile> skipFitLogFiles(final ArrayList<OSFile> allImportFiles) {
+   private List<OSFile> skipFitLogFiles(final List<OSFile> allImportFiles) {
 
       final List<OSFile> allNotSkippedFiles = new ArrayList<>();
 
@@ -4084,7 +4088,7 @@ public class RawDataManager {
     *
     * @param modifiedTours
     */
-   public void updateTourDataModel(final ArrayList<TourData> modifiedTours) {
+   public void updateTourDataModel(final List<TourData> modifiedTours) {
 
       for (final TourData tourData : modifiedTours) {
          if (tourData != null) {

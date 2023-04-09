@@ -256,7 +256,7 @@ public class TagMenuManager {
       _prefStore.addPropertyChangeListener(_prefChangeListener);
    }
 
-   public static void clearRecentTags() {
+   static void clearRecentTags() {
 
       _allPreviousTags.clear();
       _recentTags.clear();

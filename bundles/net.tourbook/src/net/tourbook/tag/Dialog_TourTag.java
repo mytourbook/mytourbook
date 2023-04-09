@@ -32,7 +32,6 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.layout.PixelConverter;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.swt.SWT;
@@ -69,9 +68,8 @@ public class Dialog_TourTag extends TitleAreaDialog {
    /*
     * UI resources
     */
-   private PixelConverter _pc;
-   private Image          _imageCamera;
-   private Image          _imageTrash;
+   private Image _imageCamera;
+   private Image _imageTrash;
 
    /*
     * UI controls
@@ -129,8 +127,6 @@ public class Dialog_TourTag extends TitleAreaDialog {
 
    @Override
    protected Control createDialogArea(final Composite parent) {
-
-      _pc = new PixelConverter(parent);
 
       final Composite dlgContainer = (Composite) super.createDialogArea(parent);
 

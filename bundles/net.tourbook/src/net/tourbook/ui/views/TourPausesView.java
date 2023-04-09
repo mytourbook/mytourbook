@@ -118,22 +118,26 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
 //   private Menu      _tableContextMenu;
 
-   public class DevicePause {
+   private class DevicePause {
+
+      long type;
 
       long relativeStartTime;
       long relativeEndTime;
 
       int  serieIndex;
 
-      public DevicePause(final long relativeStartTime,
+      public DevicePause(final long type,
+                         final long relativeStartTime,
                          final long relativeEndTime,
                          final int serieIndex) {
+
+         this.type = type;
 
          this.relativeStartTime = relativeStartTime;
          this.relativeEndTime = relativeEndTime;
 
          this.serieIndex = serieIndex;
-
       }
    }
 
@@ -391,7 +395,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
       _pageBook = new PageBook(parent, SWT.NONE);
 
-      _pageNoData = net.tourbook.common.UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
+      _pageNoData = UI.createUI_PageNoData(_pageBook, Messages.UI_Label_no_chart_is_selected);
 
       _viewerContainer = new Composite(_pageBook, SWT.NONE);
       GridLayoutFactory.fillDefaults().applyTo(_viewerContainer);
@@ -450,6 +454,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
    private void defineAllColumns() {
 
       defineColumn_PauseDuration();
+      defineColumn_PauseType();
 
       defineColumn_Time_Relative_Start();
       defineColumn_Time_Relative_End();
@@ -480,7 +485,34 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            cell.setText(net.tourbook.common.UI.format_hh_mm_ss(pause.relativeEndTime - pause.relativeStartTime));
+            cell.setText(UI.format_hh_mm_ss(pause.relativeEndTime - pause.relativeStartTime));
+         }
+      });
+   }
+
+   /**
+    * Column: Pause type: automatic or manual
+    */
+   private void defineColumn_PauseType() {
+
+      final TableColumnDefinition colDef = new TableColumnDefinition(_columnManager, "pauseType", SWT.TRAIL); //$NON-NLS-1$
+
+      colDef.setColumnLabel(Messages.Tour_Pauses_Column_Type_Label);
+      colDef.setColumnHeaderText(Messages.Tour_Pauses_Column_Type_Label);
+      colDef.setColumnHeaderToolTipText(Messages.Tour_Pauses_Column_Type_Tooltip);
+
+      colDef.setColumnCategory(OtherMessages.COLUMN_FACTORY_CATEGORY_DATA);
+
+      colDef.setIsDefaultColumn();
+      colDef.setDefaultColumnWidth(_pc.convertWidthInCharsToPixels(10));
+
+      colDef.setLabelProvider(new CellLabelProvider() {
+         @Override
+         public void update(final ViewerCell cell) {
+
+            final DevicePause pause = (DevicePause) cell.getElement();
+
+            cell.setText(pause.type == 0 ? Messages.Tour_Pauses_Column_TypeValue_Manual : Messages.Tour_Pauses_Column_TypeValue_Automatic);
          }
       });
    }
@@ -559,7 +591,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
             final DevicePause pause = (DevicePause) cell.getElement();
 
-            cell.setText(net.tourbook.common.UI.format_hh_mm_ss(pause.relativeEndTime));
+            cell.setText(UI.format_hh_mm_ss(pause.relativeEndTime));
          }
       });
    }
@@ -595,7 +627,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
                   : UI.EMPTY_STRING;
 
-            cell.setText(timePrefix + net.tourbook.common.UI.format_hh_mm_ss(Math.abs(relativeStartTime)));
+            cell.setText(timePrefix + UI.format_hh_mm_ss(Math.abs(relativeStartTime)));
          }
       });
    }
@@ -896,7 +928,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
       final long[] allPausedTime_Start = _tourData.getPausedTime_Start();
       final long[] allPausedTime_End = _tourData.getPausedTime_End();
-//      final long[] allPausedTime_Data = _tourData.getPausedTime_Data();
+      final long[] allPausedTime_Data = _tourData.getPausedTime_Data();
       final int[] timeSerie = _tourData.timeSerie;
 
       final long tourStartTimeMS = _tourData.getTourStartTimeMS();
@@ -918,7 +950,7 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
 
          if (relativeStartTime < 0) {
 
-            // the pause start is before the tour start -> this occures very often, so keep this value !
+            // the pause start is before the tour start -> this occurs very often, so keep this value !
 
 //            continue;
          }
@@ -934,13 +966,13 @@ public class TourPausesView extends ViewPart implements ITourProvider, ITourView
             }
          }
 
-//         final boolean isPauseAnAutoPause = allPausedTime_Data == null
-//               ? true
-//               : allPausedTime_Data[pausesIndex] == 1;
+         final boolean isPauseAnAutoPause = allPausedTime_Data == null
+               || allPausedTime_Data[pausesIndex] == 1;
 //
 //         final long pauseDuration = Math.round((pausedTimeEndMS - pausedTimeStartMS) / 1000f);
 
          _allDevicePauses.add(new DevicePause(
+               isPauseAnAutoPause ? 1 : 0,
                relativeStartTime,
                relativeEndTime,
                serieIndex));
