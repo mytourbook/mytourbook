@@ -146,7 +146,7 @@ public class TourExporter {
       if (net.tourbook.common.util.StringUtils.hasContent(formatTemplate)) {
          _isGPX = formatTemplate.toLowerCase().contains("gpx"); //$NON-NLS-1$
          _isTCX = formatTemplate.toLowerCase().contains("tcx"); //$NON-NLS-1$
-         _isFIT = formatTemplate.toLowerCase().equals("fit"); //$NON-NLS-1$
+         _isFIT = formatTemplate.equalsIgnoreCase("fit"); //$NON-NLS-1$
       }
 
       // .tcx files always contain absolute distances
