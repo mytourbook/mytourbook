@@ -42,8 +42,8 @@ import com.garmin.fit.Sport;
 import com.garmin.fit.UserProfileMesg;
 import com.garmin.fit.util.SemicirclesConverter;
 
-import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import net.tourbook.common.util.StatusUtil;
@@ -180,7 +180,7 @@ public class FitExporter {
          recordMesg.setTimestamp(timestamp);
 
          // Fake Record Data of Various Signal Patterns
-         tryExportDataSeries(tourData, index, recordMesg);
+         exportDataSeries(tourData, index, recordMesg);
 
          recordMesg.setPositionLat(SemicirclesConverter.degreesToSemicircles(tourData.latitudeSerie[index]));
          recordMesg.setPositionLong(SemicirclesConverter.degreesToSemicircles(tourData.longitudeSerie[index]));
@@ -250,10 +250,9 @@ public class FitExporter {
    public void export(final TourData _tourData, final String exportFilePath) {
 
       convertTourDataToFit(_tourData, exportFilePath);
-
    }
 
-   private void tryExportDataSeries(final TourData tourData, final int index, final RecordMesg recordMesg) {
+   private void exportDataSeries(final TourData tourData, final int index, final RecordMesg recordMesg) {
 
       final float[] distanceSerie = tourData.distanceSerie;
       if (distanceSerie != null) {
