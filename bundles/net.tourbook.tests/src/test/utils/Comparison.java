@@ -59,15 +59,14 @@ public class Comparison {
       final String testTourFilePathCsv = convertFitToCsvFile(testTourFilepath, testTourFilepathcsv);
 
       //Compare with the control file
-      try {
-         final Path path1 = Paths.get(utils.FilesUtils.getAbsoluteFilePath(testTourFilePathCsv));
-         assertTrue(Files.exists(path1));
+      final Path path1 = Paths.get(utils.FilesUtils.getAbsoluteFilePath(testTourFilePathCsv));
+      assertTrue(Files.exists(path1));
 
-         final Path path2 = Paths.get(utils.FilesUtils.getAbsoluteFilePath(controlTourFilePath).replace(".fit", ".csv"));
-         assertTrue(Files.exists(path2));
+      final Path path2 = Paths.get(utils.FilesUtils.getAbsoluteFilePath(controlTourFilePath).replace(".fit", ".csv"));
+      assertTrue(Files.exists(path2));
 
-         final InputStream inputStream1 = new FileInputStream(path1.toFile());
-         final InputStream inputStream2 = new FileInputStream(path2.toFile());
+      try (final InputStream inputStream1 = new FileInputStream(path1.toFile());
+            final InputStream inputStream2 = new FileInputStream(path2.toFile())) {
 
          final boolean csvFileIdentical = IOUtils.contentEquals(inputStream1, inputStream2);
          final String testFileContent = FileUtils.readFileContentString(testTourFilePathCsv);
@@ -79,9 +78,6 @@ public class Comparison {
 
             writeErroneousFiles(path1.getFileName() + "-GeneratedFromTests.csv", testFileContent); //$NON-NLS-1$
          }
-
-         inputStream1.close();
-         inputStream2.close();
 
       } catch (final IOException e) {
          e.printStackTrace();
