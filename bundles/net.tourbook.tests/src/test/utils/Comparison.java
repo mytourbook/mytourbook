@@ -75,12 +75,11 @@ public class Comparison {
          final String controlFileContent = FileUtils.readFileContentString(controlTourFilePathCsv);
          assertEquals(net.tourbook.common.util.StringUtils.hasContent(testFileContent), testTourFilePathCsv + " has content?");
          assertEquals(net.tourbook.common.util.StringUtils.hasContent(controlFileContent), controlTourFilePathCsv + " has content?");
-
-         assertEquals(controlFileContent, testFileContent, StringUtils.difference(controlFileContent, testFileContent));
          if (!csvFileIdentical) {
 
-            writeErroneousFiles(path1.getFileName() + "-GeneratedFromTests.csv", testFileContent); //$NON-NLS-1$
+            writeErroneousFiles(controlTourFilePathCsv.replace(".csv", "-GeneratedFromTests.csv"), testFileContent); //$NON-NLS-1$
          }
+         assertEquals(controlFileContent, testFileContent, StringUtils.difference(controlFileContent, testFileContent));
 
       } catch (final IOException e) {
          e.printStackTrace();
