@@ -58,7 +58,7 @@ public class Comparison {
 
       //Compare with the control file
       try {
-         final Path path1 = Paths.get(testTourFilePathCsv);
+         final Path path1 = Paths.get(utils.FilesUtils.getAbsoluteFilePath(testTourFilePathCsv));
          assertTrue(Files.exists(path1));
 
          final Path path2 = Paths.get(utils.FilesUtils.getAbsoluteFilePath(controlTourFilePath).replace(".fit", ".csv"));
