@@ -21,10 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -36,7 +34,6 @@ import java.util.Map;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.data.TourData;
 
-import org.apache.commons.io.IOUtils;
 import org.skyscreamer.jsonassert.ArrayValueMatcher;
 import org.skyscreamer.jsonassert.Customization;
 import org.skyscreamer.jsonassert.JSONCompare;
@@ -67,14 +64,14 @@ public class Comparison {
       final Path path2 = Paths.get(controlTourFilePathCsv);
       assertTrue(Files.exists(path2));
 
-      try (final InputStream inputStream1 = new FileInputStream(path1.toFile());
-            final InputStream inputStream2 = new FileInputStream(path2.toFile())) {
+      try {
 
-         final boolean csvFileIdentical = IOUtils.contentEquals(inputStream1, inputStream2);
-         final String testFileContent = FileUtils.readFileContentString(testTourFilePathCsv);
          final List<String> testFileContentArray = Files.readAllLines(path1, StandardCharsets.UTF_8);
          final List<String> controlFileContent = Files.readAllLines(path2, StandardCharsets.UTF_8);
-         if (!csvFileIdentical) {
+
+         if (!controlFileContent.equals(testFileContentArray)) {
+
+            final String testFileContent = FileUtils.readFileContentString(testTourFilePathCsv);
             writeErroneousFiles(controlTourFilePathCsv.replace(".csv", "-GeneratedFromTests.csv"), testFileContent); //$NON-NLS-1$
          }
          assertIterableEquals(controlFileContent, testFileContentArray);

@@ -138,8 +138,8 @@ public class FitExporter {
             (byte) 0xE9, 0x79, 0x62, (byte) 0xDB
       };
 
-      for (int i = 0; i < appId.length; i++) {
-         developerIdMesg.setApplicationId(i, appId[i]);
+      for (final byte element : appId) {
+         developerIdMesg.setApplicationId(0,  (byte) 0x90);
       }
 
       developerIdMesg.setDeveloperDataIndex((short) 0);
