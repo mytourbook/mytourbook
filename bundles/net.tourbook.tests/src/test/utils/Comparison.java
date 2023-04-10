@@ -62,7 +62,9 @@ public class Comparison {
       final Path path1 = Paths.get(utils.FilesUtils.getAbsoluteFilePath(testTourFilePathCsv));
       assertTrue(Files.exists(path1));
 
-      final Path path2 = Paths.get(utils.FilesUtils.getAbsoluteFilePath(controlTourFilePath).replace(".fit", ".csv"));
+      final String controlTourFilePathCsv = utils.FilesUtils.getAbsoluteFilePath(controlTourFilePath).replace(".fit",
+            ".csv");
+      final Path path2 = Paths.get(controlTourFilePathCsv);
       assertTrue(Files.exists(path2));
 
       try (final InputStream inputStream1 = new FileInputStream(path1.toFile());
@@ -70,10 +72,9 @@ public class Comparison {
 
          final boolean csvFileIdentical = IOUtils.contentEquals(inputStream1, inputStream2);
          final String testFileContent = FileUtils.readFileContentString(testTourFilePathCsv);
-         final String controlFileContent = FileUtils.readFileContentString(utils.FilesUtils.getAbsoluteFilePath(controlTourFilePath).replace(".fit",
-               ".csv"));
+         final String controlFileContent = FileUtils.readFileContentString(controlTourFilePathCsv);
          assertTrue(net.tourbook.common.util.StringUtils.hasContent(testFileContent), testTourFilePathCsv + " has content?");
-         assertTrue(net.tourbook.common.util.StringUtils.hasContent(controlFileContent), controlFileContent + " has content?");
+         assertTrue(net.tourbook.common.util.StringUtils.hasContent(controlFileContent), controlTourFilePathCsv + " has content?");
 
          assertEquals(controlFileContent, testFileContent, StringUtils.difference(controlFileContent, testFileContent));
          if (!csvFileIdentical) {
