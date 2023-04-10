@@ -73,8 +73,8 @@ public class Comparison {
          final boolean csvFileIdentical = IOUtils.contentEquals(inputStream1, inputStream2);
          final String testFileContent = FileUtils.readFileContentString(testTourFilePathCsv);
          final String controlFileContent = FileUtils.readFileContentString(controlTourFilePathCsv);
-         assertEquals(net.tourbook.common.util.StringUtils.hasContent(testFileContent), testTourFilePathCsv + " has content?");
-         assertEquals(net.tourbook.common.util.StringUtils.hasContent(controlFileContent), controlTourFilePathCsv + " has content?");
+         assertTrue(net.tourbook.common.util.StringUtils.hasContent(testFileContent), testTourFilePathCsv + " has content?");
+         assertTrue(net.tourbook.common.util.StringUtils.hasContent(controlFileContent), controlTourFilePathCsv + " has content?");
          if (!csvFileIdentical) {
 
             writeErroneousFiles(controlTourFilePathCsv.replace(".csv", "-GeneratedFromTests.csv"), testFileContent); //$NON-NLS-1$
