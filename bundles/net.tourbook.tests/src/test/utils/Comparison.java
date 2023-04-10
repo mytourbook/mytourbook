@@ -72,6 +72,8 @@ public class Comparison {
          final String testFileContent = FileUtils.readFileContentString(testTourFilePathCsv);
          final String controlFileContent = FileUtils.readFileContentString(utils.FilesUtils.getAbsoluteFilePath(controlTourFilePath).replace(".fit",
                ".csv"));
+         assertTrue(net.tourbook.common.util.StringUtils.hasContent(testFileContent), testTourFilePathCsv + " has content?");
+         assertTrue(net.tourbook.common.util.StringUtils.hasContent(controlFileContent), controlFileContent + " has content?");
 
          assertEquals(controlFileContent, testFileContent, StringUtils.difference(controlFileContent, testFileContent));
          if (!csvFileIdentical) {
