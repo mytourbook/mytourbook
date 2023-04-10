@@ -1,7 +1,7 @@
 name: Build
 on:
-  schedule:
-  - cron: "20 7 * * *"
+  pull_request:
+    types: [opened, reopened, synchronize]
 jobs:
   build:
     needs: check_date
@@ -67,7 +67,7 @@ jobs:
         with:
           name: Tests Report
           path: 'D:/a/mytourbook-BUILD-autocreated/core/**/target/surefire-reports/*.xml'
-          reporter: java-junit
+          reporter: java-junit          
           
   check_date:
     runs-on: windows-latest
