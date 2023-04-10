@@ -255,25 +255,34 @@ public class FitExporter {
 
    private void tryExportDataSeries(final TourData tourData, final int index, final RecordMesg recordMesg) {
 
-      //todo fb
-      recordMesg.setDistance(tourData.distanceSerie[index]);
-      recordMesg.setSpeed(tourData.getSpeedSerieMetric()[index]);
-      if (tourData.pulseSerie != null) {
-
-         recordMesg.setHeartRate((short) tourData.pulseSerie[index]);
+      final float[] distanceSerie = tourData.distanceSerie;
+      if (distanceSerie != null) {
+         recordMesg.setDistance(distanceSerie[index]);
       }
 
-      if (tourData.getCadenceSerie() != null) {
-
-         recordMesg.setCadence((short) tourData.getCadenceSerie()[index]);
+      final float[] speedSerie = tourData.getSpeedSerieMetric();
+      if (speedSerie != null) {
+         recordMesg.setSpeed(speedSerie[index]);
       }
-      if (tourData.getPowerSerie() != null) {
 
-         recordMesg.setPower((int) tourData.getPowerSerie()[index]);
+      final float[] pulseSerie = tourData.pulseSerie;
+      if (pulseSerie != null) {
+         recordMesg.setHeartRate((short) pulseSerie[index]);
       }
-      if (tourData.altitudeSerie != null) {
 
-         recordMesg.setAltitude(tourData.altitudeSerie[index]);
+      final float[] cadenceSerie = tourData.getCadenceSerie();
+      if (cadenceSerie != null) {
+         recordMesg.setCadence((short) cadenceSerie[index]);
+      }
+
+      final float[] powerSerie = tourData.getPowerSerie();
+      if (powerSerie != null) {
+         recordMesg.setPower((int) powerSerie[index]);
+      }
+
+      final float[] altitudeSerie = tourData.altitudeSerie;
+      if (altitudeSerie != null) {
+         recordMesg.setAltitude(altitudeSerie[index]);
       }
    }
 
