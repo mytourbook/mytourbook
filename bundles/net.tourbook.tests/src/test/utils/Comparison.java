@@ -169,19 +169,7 @@ public class Comparison {
 //todo fb get code from FItImprover
          proc = Runtime.getRuntime().exec("java -jar " + fitCsvToolFilePath + " -b " + testTourfilepathfit + " " +
                csvtoto);
-         final var titi = proc.waitFor();
-         final var tutu = proc.exitValue();
-
-         final InputStream in = proc.getInputStream();
-         final InputStream err = proc.getErrorStream();
-
-         final byte b[] = new byte[in.available()];
-         in.read(b, 0, b.length);
-         System.out.println(new String(b));
-
-         final byte c[] = new byte[err.available()];
-         err.read(c, 0, c.length);
-         System.out.println(new String(c));
+         proc.waitFor();
 
       } catch (final IOException | InterruptedException e) {
          Thread.currentThread().interrupt();
