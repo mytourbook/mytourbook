@@ -49,7 +49,6 @@ import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
 
-//todo fb: Add unit test -> convert to csv and use it for comparison
 public class FitExporter {
 
    private static void createFitFile(final List<Mesg> messages,

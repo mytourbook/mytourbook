@@ -48,12 +48,11 @@ public class Comparison {
    private static final String JSON = ".json"; //$NON-NLS-1$
 
    public static void compareFitAgainstControl(final String controlTourFilePath,
-                                               final String testTourFilepath,
-                                               final String testTourFilepathcsv) {
+                                               final String testTourFilePathFit,
+                                               final String testTourFilePathCSV) {
 
       //Convert the test FIT file to CSV for a human readable comparison
-
-      final String testTourFilePathCsv = convertFitToCsvFile(testTourFilepath, testTourFilepathcsv);
+      final String testTourFilePathCsv = convertFitToCsvFile(testTourFilePathFit, testTourFilePathCSV);
 
       //Compare with the control file
       final Path path1 = Paths.get(utils.FilesUtils.getAbsoluteFilePath(testTourFilePathCsv));
