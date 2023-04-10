@@ -70,7 +70,7 @@ public class Comparison {
          final InputStream inputStream2 = new FileInputStream(path2.toFile());
 
          final boolean csvFileIdentical = IOUtils.contentEquals(inputStream1, inputStream2);
-         final String testFileContent = FileUtils.readFileContentString(testTourFilepathcsv);
+         final String testFileContent = FileUtils.readFileContentString(testTourFilePathCsv);
          final String controlFileContent = FileUtils.readFileContentString(utils.FilesUtils.getAbsoluteFilePath(controlTourFilePath).replace(".fit",
                ".csv"));
 
