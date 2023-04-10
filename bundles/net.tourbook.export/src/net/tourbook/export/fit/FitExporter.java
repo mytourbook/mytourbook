@@ -180,19 +180,8 @@ public class FitExporter {
          recordMesg.setTimestamp(timestamp);
 
          // Fake Record Data of Various Signal Patterns
-         recordMesg.setDistance(tourData.distanceSerie[index]);
-         recordMesg.setSpeed(tourData.getSpeedSerieMetric()[index]);
-         if (tourData.pulseSerie != null) {
-         recordMesg.setHeartRate((short) tourData.pulseSerie[index]); // Sine
-         }
-         if (tourData.pulseSerie != null) {
-         recordMesg.setCadence((short) tourData.getCadenceSerie()[index]); // Sawtooth
-         recordMesg.setPower((int) tourData.getPowerSerie()[index]); //Square
-      }
-      if (tourData.altitudeSerie != null) {
+         tryExportDataSeries(tourData, index, recordMesg);
 
-         recordMesg.setAltitude(tourData.altitudeSerie[index]);
-         }
          recordMesg.setPositionLat(SemicirclesConverter.degreesToSemicircles(tourData.latitudeSerie[index]));
          recordMesg.setPositionLong(SemicirclesConverter.degreesToSemicircles(tourData.longitudeSerie[index]));
 
@@ -262,6 +251,30 @@ public class FitExporter {
 
       convertTourDataToFit(_tourData, exportFilePath);
 
+   }
+
+   private void tryExportDataSeries(final TourData tourData, final int index, final RecordMesg recordMesg) {
+
+      //todo fb
+      recordMesg.setDistance(tourData.distanceSerie[index]);
+      recordMesg.setSpeed(tourData.getSpeedSerieMetric()[index]);
+      if (tourData.pulseSerie != null) {
+
+         recordMesg.setHeartRate((short) tourData.pulseSerie[index]);
+      }
+
+      if (tourData.getCadenceSerie() != null) {
+
+         recordMesg.setCadence((short) tourData.getCadenceSerie()[index]);
+      }
+      if (tourData.getPowerSerie() != null) {
+
+         recordMesg.setPower((int) tourData.getPowerSerie()[index]);
+      }
+      if (tourData.altitudeSerie != null) {
+
+         recordMesg.setAltitude(tourData.altitudeSerie[index]);
+      }
    }
 
 }
