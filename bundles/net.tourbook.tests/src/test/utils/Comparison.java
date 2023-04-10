@@ -64,15 +64,23 @@ public class Comparison {
          final Path path2 = Paths.get(utils.FilesUtils.getAbsoluteFilePath(controlTourFilePath).replace(".fit", ".csv"));
          assertTrue(Files.exists(path2));
 
-      final InputStream inputStream1 = new FileInputStream(path1.toFile());
-      final InputStream inputStream2 = new FileInputStream(path2.toFile());
+         final InputStream inputStream1 = new FileInputStream(path1.toFile());
+         final InputStream inputStream2 = new FileInputStream(path2.toFile());
 
-      assertTrue(IOUtils.contentEquals(inputStream1, inputStream2));
-      inputStream1.close();
-      inputStream2.close();
-   } catch (final IOException e) {
-      e.printStackTrace();
-   }
+         final boolean csvFileIdentical = IOUtils.contentEquals(inputStream1, inputStream2);
+
+         if (!csvFileIdentical) {
+            final String testFileContent = FileUtils.readFileContentString(testTourFilepathcsv);
+            writeErroneousFiles(path1.getFileName() + "-GeneratedFromTests.csv", testFileContent); //$NON-NLS-1$
+         }
+
+         inputStream1.close();
+         inputStream2.close();
+
+         assertTrue(csvFileIdentical);
+      } catch (final IOException e) {
+         e.printStackTrace();
+      }
    }
 
    /**
@@ -158,19 +166,18 @@ public class Comparison {
          proc = Runtime.getRuntime().exec("java -jar " + fitCsvToolFilePath + " -b " + testTourfilepathfit + " " +
                csvtoto);
          final var titi = proc.waitFor();
-final var tutu = proc.exitValue();
+         final var tutu = proc.exitValue();
 
+         final InputStream in = proc.getInputStream();
+         final InputStream err = proc.getErrorStream();
 
-final InputStream in = proc.getInputStream();
-final InputStream err = proc.getErrorStream();
+         final byte b[] = new byte[in.available()];
+         in.read(b, 0, b.length);
+         System.out.println(new String(b));
 
-final byte b[]=new byte[in.available()];
-in.read(b,0,b.length);
-System.out.println(new String(b));
-
-final byte c[]=new byte[err.available()];
-err.read(c,0,c.length);
-System.out.println(new String(c));
+         final byte c[] = new byte[err.available()];
+         err.read(c, 0, c.length);
+         System.out.println(new String(c));
 
       } catch (final IOException | InterruptedException e) {
          Thread.currentThread().interrupt();
