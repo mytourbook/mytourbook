@@ -15,8 +15,8 @@
  *******************************************************************************/
 package utils;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedWriter;
@@ -26,6 +26,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -36,7 +37,6 @@ import net.tourbook.common.util.FileUtils;
 import net.tourbook.data.TourData;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.skyscreamer.jsonassert.ArrayValueMatcher;
 import org.skyscreamer.jsonassert.Customization;
 import org.skyscreamer.jsonassert.JSONCompare;
@@ -72,14 +72,12 @@ public class Comparison {
 
          final boolean csvFileIdentical = IOUtils.contentEquals(inputStream1, inputStream2);
          final String testFileContent = FileUtils.readFileContentString(testTourFilePathCsv);
-         final String controlFileContent = FileUtils.readFileContentString(controlTourFilePathCsv);
-         assertTrue(net.tourbook.common.util.StringUtils.hasContent(testFileContent), testTourFilePathCsv + " has content?");
-         assertTrue(net.tourbook.common.util.StringUtils.hasContent(controlFileContent), controlTourFilePathCsv + " has content?");
+         final List<String> testFileContentArray = Files.readAllLines(path1, StandardCharsets.UTF_8);
+         final List<String> controlFileContent = Files.readAllLines(path2, StandardCharsets.UTF_8);
          if (!csvFileIdentical) {
-
             writeErroneousFiles(controlTourFilePathCsv.replace(".csv", "-GeneratedFromTests.csv"), testFileContent); //$NON-NLS-1$
          }
-         assertEquals(controlFileContent, testFileContent, StringUtils.difference(controlFileContent, testFileContent));
+         assertIterableEquals(controlFileContent, testFileContentArray);
 
       } catch (final IOException e) {
          e.printStackTrace();
