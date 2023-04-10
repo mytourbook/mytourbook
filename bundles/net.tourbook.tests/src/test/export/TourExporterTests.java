@@ -70,8 +70,7 @@ public class TourExporterTests {
       _tourExporter.export(_testTourFilePathFit);
 
       Comparison.compareFitAgainstControl(FILES_PATH + controlTourFileName,
-            _testTourFilePathFit,
-            _testTourFilePathCsv);
+            _testTourFilePathFit);
    }
 
    private void executeGpxTest(final String controlTourFileName) {

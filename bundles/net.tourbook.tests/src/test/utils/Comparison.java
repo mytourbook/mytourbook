@@ -48,26 +48,25 @@ public class Comparison {
    private static final String JSON = ".json"; //$NON-NLS-1$
 
    public static void compareFitAgainstControl(final String controlTourFilePath,
-                                               final String testTourFilePathFit,
-                                               final String testTourFilePathCSV) {
+                                               final String testTourFilePathFit) {
 
       //Convert the test FIT file to CSV for a human readable comparison
-      final String testTourFilePathCsv = convertFitToCsvFile(testTourFilePathFit, testTourFilePathCSV);
+      convertFitToCsvFile(testTourFilePathFit);
 
-      //Compare with the control file
-      final Path path1 = Paths.get(utils.FilesUtils.getAbsoluteFilePath(testTourFilePathCsv));
-      assertTrue(Files.exists(path1));
+      final String testTourFilePathCsv = testTourFilePathFit.replace(".fit", ".csv");
+      final Path testTourAbsoluteFilePathCsv = Paths.get(utils.FilesUtils.getAbsoluteFilePath(testTourFilePathCsv));
+      assertTrue(Files.exists(testTourAbsoluteFilePathCsv));
 
-      final String controlTourFilePathCsv = utils.FilesUtils.getAbsoluteFilePath(controlTourFilePath).replace(".fit",
-            ".csv");
-      final Path path2 = Paths.get(controlTourFilePathCsv);
-      assertTrue(Files.exists(path2));
+      final String controlTourFilePathCsv = controlTourFilePath.replace(".fit", ".csv");
+      final Path controlTourAbsoluteFilePathCsv = Paths.get(utils.FilesUtils.getAbsoluteFilePath(controlTourFilePathCsv));
+      assertTrue(Files.exists(controlTourAbsoluteFilePathCsv));
 
       try {
 
-         final List<String> testFileContentArray = Files.readAllLines(path1, StandardCharsets.UTF_8);
-         final List<String> controlFileContent = Files.readAllLines(path2, StandardCharsets.UTF_8);
+         final List<String> testFileContentArray = Files.readAllLines(testTourAbsoluteFilePathCsv, StandardCharsets.UTF_8);
+         final List<String> controlFileContent = Files.readAllLines(controlTourAbsoluteFilePathCsv, StandardCharsets.UTF_8);
 
+         //Compare with the control file
          if (!controlFileContent.equals(testFileContentArray)) {
 
             final String testFileContent = FileUtils.readFileContentString(testTourFilePathCsv);
@@ -150,26 +149,26 @@ public class Comparison {
       assertFalse(documentDiff.hasDifferences(), documentDiff.toString());
    }
 
-   private static String convertFitToCsvFile(final String testTourfilepathfit,
-                                             final String testTourFilepathcsv) {
+   private static void convertFitToCsvFile(final String fitFilePath) {
 
-      Process proc;
-      final String csvtoto = FilesUtils.getAbsoluteFilePath(testTourFilepathcsv);
+      final File fileToConvert = new File(fitFilePath);
+
+      final String fitCsvToolFilePath = FilesUtils.getAbsoluteFilePath(
+            FilesUtils.rootPath + "utils/files/FitCSVTool.jar");
+
+      final ProcessBuilder processBuilder = new ProcessBuilder(
+            "java",
+            "-jar",
+            fitCsvToolFilePath,
+            fileToConvert.getAbsolutePath());
       try {
-
-         final String fitCsvToolFilePath = FilesUtils.getAbsoluteFilePath(
-               FilesUtils.rootPath + "utils/files/FitCSVTool.jar");
-//todo fb get code from FItImprover
-         proc = Runtime.getRuntime().exec("java -jar " + fitCsvToolFilePath + " -b " + testTourfilepathfit + " " +
-               csvtoto);
-         proc.waitFor();
+         final Process process = processBuilder.start();
+         process.waitFor();
 
       } catch (final IOException | InterruptedException e) {
          Thread.currentThread().interrupt();
          e.printStackTrace();
       }
-
-      return csvtoto;
    }
 
    public static String readFileContent(final String controlDocumentFileName) {
