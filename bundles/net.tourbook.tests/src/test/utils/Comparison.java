@@ -15,6 +15,7 @@
  *******************************************************************************/
 package utils;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -35,6 +36,7 @@ import net.tourbook.common.util.FileUtils;
 import net.tourbook.data.TourData;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.skyscreamer.jsonassert.ArrayValueMatcher;
 import org.skyscreamer.jsonassert.Customization;
 import org.skyscreamer.jsonassert.JSONCompare;
@@ -68,16 +70,19 @@ public class Comparison {
          final InputStream inputStream2 = new FileInputStream(path2.toFile());
 
          final boolean csvFileIdentical = IOUtils.contentEquals(inputStream1, inputStream2);
+         final String testFileContent = FileUtils.readFileContentString(testTourFilepathcsv);
+         final String controlFileContent = FileUtils.readFileContentString(utils.FilesUtils.getAbsoluteFilePath(controlTourFilePath).replace(".fit",
+               ".csv"));
 
+         assertEquals(controlFileContent, testFileContent, StringUtils.difference(controlFileContent, testFileContent));
          if (!csvFileIdentical) {
-            final String testFileContent = FileUtils.readFileContentString(testTourFilepathcsv);
+
             writeErroneousFiles(path1.getFileName() + "-GeneratedFromTests.csv", testFileContent); //$NON-NLS-1$
          }
 
          inputStream1.close();
          inputStream2.close();
 
-         assertTrue(csvFileIdentical);
       } catch (final IOException e) {
          e.printStackTrace();
       }
