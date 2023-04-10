@@ -1146,7 +1146,6 @@ public class Messages extends NLS {
    public static String        Import_Data_Task_CloseDeviceInfo_CannotClose;
    public static String        Import_Data_TourTypeConfig_BySpeed;
    public static String        Import_Data_TourTypeConfig_OneForAll;
-   public static String        import_data_updateDataFromDatabase_subTask;
    public static String        import_data_updateDataFromDatabase_task;
 
    public static String        Import_Wizard_Control_combo_person_default_settings;
@@ -1258,7 +1257,6 @@ public class Messages extends NLS {
    public static String        Log_Tour_MoveTour;
    public static String        Log_Tour_SaveTours;
    public static String        Log_Tour_SaveTours_End;
-   public static String        Log_Tour_SaveTours_File;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_AirQuality;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Humidity;
    public static String        Log_HistoricalWeatherRetriever_001_WeatherData_Precipitation;
@@ -1298,10 +1296,6 @@ public class Messages extends NLS {
    public static String        Map_Bookmark_Column_Longitude;
    public static String        Map_Bookmark_Column_Longitude_Tooltip;
    public static String        Map_Bookmark_Column_Name;
-   public static String        Map_Bookmark_Column_PositionMarkerLatitude;
-   public static String        Map_Bookmark_Column_PositionMarkerLatitude_Tooltip;
-   public static String        Map_Bookmark_Column_PositionMarkerLongitude;
-   public static String        Map_Bookmark_Column_PositionMarkerLongitude_Tooltip;
    public static String        Map_Bookmark_Column_Scale;
    public static String        Map_Bookmark_Column_Tilt2;                                                //2, because of refactoring
    public static String        Map_Bookmark_Column_Tilt2_Tooltip;                                        //2, because of refactoring
@@ -1651,9 +1645,6 @@ public class Messages extends NLS {
 
    public static String        Pref_MapLayout_Checkbox_BorderColor_Color;
    public static String        Pref_MapLayout_Checkbox_BorderColor_Darker;
-   public static String        Pref_MapLayout_Dialog_OSX_Warning_Message;
-   public static String        Pref_MapLayout_Dialog_OSX_Warning_Title;
-   public static String        Pref_MapLayout_Group_TourInMapProperties;
    public static String        Pref_MapLayout_Label_BorderColor;
    public static String        Pref_MapLayout_Label_TourPaintMethod;
    public static String        Pref_MapLayout_Label_TourPaintMethod_Complex;
@@ -2521,9 +2512,6 @@ public class Messages extends NLS {
    public static String        tourCatalog_view_action_synch_charts_bySize_tooltip;
    public static String        tourCatalog_view_action_synch_chart_years_tooltip;
    public static String        tourCatalog_view_action_undo_marker_position;
-   public static String        tourCatalog_view_compare_job_subtask;
-   public static String        tourCatalog_view_compare_job_task;
-   public static String        tourCatalog_view_compare_job_title;
    public static String        tourCatalog_view_dlg_add_reference_tour_msg;
    public static String        tourCatalog_view_dlg_add_reference_tour_title;
    public static String        tourCatalog_view_dlg_delete_comparedTour_msg;
@@ -3068,6 +3056,10 @@ public class Messages extends NLS {
    public static String        Tour_Pauses_Column_StartTime_Relative_Header;
    public static String        Tour_Pauses_Column_StartTime_Relative_Label;
    public static String        Tour_Pauses_Column_StartTime_Relative_Tooltip;
+   public static String        Tour_Pauses_Column_Type_Label;
+   public static String        Tour_Pauses_Column_Type_Tooltip;
+   public static String        Tour_Pauses_Column_TypeValue_Manual;
+   public static String        Tour_Pauses_Column_TypeValue_Automatic;
 
    public static String        Tour_Segmenter_Action_ExportViewCSV_Tooltip;
    public static String        Tour_Segmenter_Action_ShowHideSegmentsInTourChart_Tooltip;

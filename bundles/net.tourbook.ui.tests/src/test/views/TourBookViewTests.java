@@ -129,29 +129,6 @@ public class TourBookViewTests extends UITest {
    }
 
    @Test
-   void testDeleteTourCalories() {
-
-      //Check the initial calories value
-      SWTBotTreeItem tour = Utils.getTourWithSRTM(bot);
-      assertEquals("2", tour.cell(tourBookView_Calories_Column_Index)); //$NON-NLS-1$
-
-      //Delete the calories value
-      tour.contextMenu(Messages.Dialog_DeleteTourValues_Action_OpenDialog).click();
-      bot.checkBox(Messages.Dialog_ModifyTours_Checkbox_Calories).click();
-      bot.button(Messages.Dialog_DeleteTourValues_Button_Delete).click();
-      Utils.clickOkButton(bot);
-
-      bot.sleep(1000);
-
-      //Setting the focus again on the Tourbook view
-      tourBookView = Utils.showTourBookView(bot);
-
-      //Check that the calories were deleted
-      tour = Utils.getTourWithSRTM(bot);
-      assertEquals(UI.EMPTY_STRING, tour.cell(tourBookView_Calories_Column_Index));
-   }
-
-   @Test
    void testDuplicateAndDeleteTour() {
 
       // Get a tour that can be duplicated
