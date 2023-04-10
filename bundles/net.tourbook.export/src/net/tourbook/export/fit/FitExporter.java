@@ -38,6 +38,7 @@ import com.garmin.fit.Sport;
 import com.garmin.fit.UserProfileMesg;
 import com.garmin.fit.util.SemicirclesConverter;
 
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -119,7 +120,7 @@ public class FitExporter {
       final UserProfileMesg userProfileMesg = new UserProfileMesg();
       userProfileMesg.setGender(activePerson.getGender() == 0 ? Gender.MALE : Gender.FEMALE);
       userProfileMesg.setWeight(activePerson.getWeight());
-      final int age = TimeTools.now().getYear() - TimeTools.getZonedDateTime(activePerson.getBirthDay()).getYear();
+      final int age = Period.between(TimeTools.now().toLocalDate(), TimeTools.getZonedDateTime(activePerson.getBirthDay()).toLocalDate()).getYears();
       userProfileMesg.setAge((short) age);
       userProfileMesg.setFriendlyName(activePerson.getName());
 
