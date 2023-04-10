@@ -95,7 +95,9 @@ public class FitExporter {
       }
 
       final UserProfileMesg userProfileMesg = createUserProfile();
-      fileEncoder.write(userProfileMesg);
+      if (userProfileMesg != null) {
+         fileEncoder.write(userProfileMesg);
+      }
 
       fileEncoder.write(fileIdMesg);
       fileEncoder.write(deviceInfoMesg);
