@@ -1000,55 +1000,48 @@ public class TourBookView extends ViewPart implements
 
       final boolean isForwards = UI.isCtrlKey(event) == false;
 
-// disabled NOT_SELECTED_TOURS
-
       if (_selectionFilterType == SelectionFilterType.ALL_IS_DISPLAYED) {
 
-         toggleSelectionFilter_SelectedTours();
+         if (isForwards) {
+            toggleSelectionFilter_SelectedTours();
+         } else {
+            toggleSelectionFilter_NotSelectedTours();
+         }
+
+      } else
+
+      if (_selectionFilterType == SelectionFilterType.SELECTED_TOURS) {
+
+         if (isForwards) {
+            toggleSelectionFilter_NotSelectedTours();
+         } else {
+            toggleSelectionFilter_ShowAll();
+         }
 
       } else {
 
-         toggleSelectionFilter_ShowAll();
+         if (isForwards) {
+            toggleSelectionFilter_ShowAll();
+         } else {
+            toggleSelectionFilter_SelectedTours();
+         }
       }
-
-// this code is also using NOT_SELECTED_TOURS
-
-//      if (_selectionFilterType == SelectionFilterType.ALL_IS_DISPLAYED) {
-//
-//         if (isForwards) {
-//            toggleSelectionFilter_SelectedTours();
-//         } else {
-//            toggleSelectionFilter_NotSelectedTours();
-//         }
-//
-//      } else
-//
-//         if (_selectionFilterType == SelectionFilterType.SELECTED_TOURS) {
-//
-//            if (isForwards) {
-//               toggleSelectionFilter_NotSelectedTours();
-//            } else {
-//               toggleSelectionFilter_ShowAll();
-//            }
-//
-//         } else {
-//
-//            if (isForwards) {
-//               toggleSelectionFilter_ShowAll();
-//            } else {
-//               toggleSelectionFilter_SelectedTours();
-//            }
-//         }
 
       _natTable_DataLoader.resetTourItems();
 
       _natTable_DataLoader.setTourSelectionFilter(_selectionFilterType, _selectedTourIds);
 
-      reselectTourViewer(
-
-            // do not fire a selection
-//      false);
-            true);
+      /*
+       * Found no simple way to update the tabel otherwise an exceptions occurs somewhere in the
+       * deep nattable layers
+       */
+      _tourViewer_NatTable.setRedraw(false);
+      _isInSelection = true;
+      {
+         _tourViewer_NatTable.refresh();
+      }
+      _isInSelection = false;
+      _tourViewer_NatTable.setRedraw(true);
    }
 
    /**
@@ -3326,7 +3319,7 @@ public class TourBookView extends ViewPart implements
 
                   /**
                    * <code>
-
+                  
                      Caused by: java.lang.NullPointerException
                      at org.eclipse.jface.viewers.AbstractTreeViewer.getSelection(AbstractTreeViewer.java:2956)
                      at org.eclipse.jface.viewers.StructuredViewer.handleSelect(StructuredViewer.java:1211)
@@ -3344,13 +3337,13 @@ public class TourBookView extends ViewPart implements
                      at org.eclipse.jface.viewers.AbstractTreeViewer.internalCollapseToLevel(AbstractTreeViewer.java:1586)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseToLevel(AbstractTreeViewer.java:751)
                      at org.eclipse.jface.viewers.AbstractTreeViewer.collapseAll(AbstractTreeViewer.java:733)
-
+                  
                      at net.tourbook.ui.views.tourBook.TourBookView$70.run(TourBookView.java:3406)
-
+                  
                      at org.eclipse.swt.widgets.RunnableLock.run(RunnableLock.java:35)
                      at org.eclipse.swt.widgets.Synchronizer.runAsyncMessages(Synchronizer.java:135)
                      ... 22 more
-
+                  
                    * </code>
                    */
 
