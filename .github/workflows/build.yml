@@ -53,8 +53,7 @@ jobs:
       - name: Generate artifact name
         id: generate-artifact-name
         run: |
-           NAME="Full-JaCoCo-Report-$(date +%Y-%m-%d-%H_%M)"
-           echo "artifactFileName=$NAME" >> $GITHUB_OUTPUT
+           echo "artifactFileName=Full-JaCoCo-Report-$(date +%Y-%m-%d-%H_%M)" >> $GITHUB_OUTPUT
       - name: Upload JaCoCo file
         if: success()
         uses: actions/upload-artifact@v3
