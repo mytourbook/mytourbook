@@ -2292,6 +2292,13 @@ public class Messages extends NLS {
    public static String        Slideout_TourChartOptions_Radio_SRTM3;
    public static String        Slideout_TourChartSmoothing_Label_Title;
 
+   public static String        Slideout_TourCollectionFilter_Label_NumberOfAppFilterTours;
+   public static String        Slideout_TourCollectionFilter_Label_NumberOfCollectedTours;
+   public static String        Slideout_TourCollectionFilter_Label_Title;
+   public static String        Slideout_TourCollectionFilter_Radio_ShowAppFilterTours;
+   public static String        Slideout_TourCollectionFilter_Radio_ShowCollectedTours;
+   public static String        Slideout_TourCollectionFilter_Radio_ShowNotCollectedTours;
+
    public static String        Slideout_TourEditor_Checkbox_KeepDistance;
    public static String        Slideout_TourEditor_Checkbox_KeepDistance_Tooltip;
    public static String        Slideout_TourEditor_Checkbox_KeepTime;
@@ -2312,6 +2319,7 @@ public class Messages extends NLS {
    public static String        Slideout_TourEditor_Label_Title;
    public static String        Slideout_TourEditor_Label_WeatherDescription_Height;
    public static String        Slideout_TourEditor_Label_WeatherDescription_Height_Tooltip;
+
    public static String        Slideout_TourFilter_Action_ActivateAll;
    public static String        Slideout_TourFilter_Action_ActivateAll_Tooltip;
    public static String        Slideout_TourFilter_Action_AddProfile;
@@ -2715,7 +2723,6 @@ public class Messages extends NLS {
    public static String        Tour_Book_Action_delete_selected_tours_dlg_title_confirm;
    public static String        Tour_Book_Action_delete_selected_tours_menu;
    public static String        Tour_Book_Action_ExportViewCSV_Tooltip;
-   public static String        Tour_Book_Action_ToggleSelectionFilter_Tooltip;
    public static String        Tour_Book_Action_ToggleViewLayout_Tooltip;
    public static String        Tour_Book_Combo_statistic_tooltip;
    public static String        Tour_Book_Label_chart_title;

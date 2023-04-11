@@ -30,7 +30,6 @@ import net.tourbook.Messages;
 import net.tourbook.OtherMessages;
 import net.tourbook.application.TourbookPlugin;
 import net.tourbook.common.CommonActivator;
-import net.tourbook.common.CommonImages;
 import net.tourbook.common.UI;
 import net.tourbook.common.color.ThemeUtil;
 import net.tourbook.common.preferences.ICommonPreferences;
@@ -103,7 +102,6 @@ import net.tourbook.ui.views.tourCatalog.TVICatalogComparedTour;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.ui.di.PersistState;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener2;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -217,7 +215,8 @@ public class TourBookView extends ViewPart implements
       INatTable_PropertiesProvider,
       INatTable_TourProvider {
 
-   public static final String            ID                                              = "net.tourbook.views.tourListView";          //$NON-NLS-1$
+   public static final String ID = "net.tourbook.views.tourListView"; //$NON-NLS-1$
+
    //
    private static final IPreferenceStore _prefStore                                      = TourbookPlugin.getPrefStore();
    private static final IPreferenceStore _prefStore_Common                               = CommonActivator.getPrefStore();
@@ -247,7 +246,6 @@ public class TourBookView extends ViewPart implements
    private static final String CSV_EXPORT_DEFAULT_FILE_NAME           = "TourBook_";                                                       //$NON-NLS-1$
    private static final String SYS_PROP__USE_SIMPLE_CSV_EXPORT_FORMAT = "useSimpleCSVExportFormat";                                        //$NON-NLS-1$
    private static boolean      USE_SIMPLE_CSV_EXPORT_FORMAT           = System.getProperty(SYS_PROP__USE_SIMPLE_CSV_EXPORT_FORMAT) != null;
-
    static {
 
       if (USE_SIMPLE_CSV_EXPORT_FORMAT) {
@@ -257,6 +255,7 @@ public class TourBookView extends ViewPart implements
                "Using simple format when exporting tours in CSV format"); //$NON-NLS-1$
       }
    }
+
    //
    /**
     * The header column id needs a different id than the body column otherwise drag&drop or column
@@ -309,7 +308,7 @@ public class TourBookView extends ViewPart implements
    private int                             _selectedYear                       = -1;
    private int                             _selectedYearSub                    = -1;
    private final ArrayList<Long>           _selectedTourIds                    = new ArrayList<>();
-   private SelectionFilterType             _selectionFilterType                = SelectionFilterType.ALL_IS_DISPLAYED;
+   private CollectionFilterType            _tourSelectionFilterInSlideout      = CollectionFilterType.COLLECTED_TOURS;
    //
    private boolean                         _isCollapseOthers;
    private boolean                         _isInFireSelection;
@@ -352,9 +351,9 @@ public class TourBookView extends ViewPart implements
    private ActionSelectAllTours            _actionSelectAllTours;
    private ActionSetTourTypeMenu           _actionSetTourType;
    private ActionSetPerson                 _actionSetOtherPerson;
-   private ActionToggleSelectionFilter     _actionToggleSelectionFilter;
    private ActionToggleViewLayout          _actionToggleViewLayout;
    private ActionTourBookOptions           _actionTourBookOptions;
+   private ActionTourCollectionFilter      _actionTourCollectionFilter;
    private ActionUpload                    _actionUploadTour;
    //
    private PixelConverter                  _pc;
@@ -382,30 +381,13 @@ public class TourBookView extends ViewPart implements
 
       @Override
       protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
          return new SlideoutLinkWithOtherViews(_parent, toolbar, TourBookView.this);
       }
 
       @Override
       protected void onBeforeOpenSlideout() {
          closeOpenedDialogs(this);
-      }
-   }
-
-   private class ActionToggleSelectionFilter extends Action {
-
-      ActionToggleSelectionFilter() {
-
-         super(UI.EMPTY_STRING, AS_CHECK_BOX);
-
-         setToolTipText(Messages.Tour_Book_Action_ToggleSelectionFilter_Tooltip);
-
-         setImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter));
-         setDisabledImageDescriptor(CommonActivator.getThemedImageDescriptor(CommonImages.App_Filter_Disabled));
-      }
-
-      @Override
-      public void runWithEvent(final Event event) {
-         actionToggleSelectionFilter(event);
       }
    }
 
@@ -421,6 +403,73 @@ public class TourBookView extends ViewPart implements
       protected void onBeforeOpenSlideout() {
          closeOpenedDialogs(this);
       }
+   }
+
+   private class ActionTourCollectionFilter extends ActionToolbarSlideout {
+
+      SlideoutTourCollectionFilter slideoutTourSelectionFilter;
+
+      public ActionTourCollectionFilter() {
+
+         super(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Collected_All),
+               TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Collected_All_Disabled));
+
+         isToggleAction = true;
+         isShowSlideoutAlways = true;
+
+         /*
+          * Register other action images
+          */
+
+         // image 0: all tours
+         addOtherEnabledImage(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Collected_All));
+
+         // image 1: selected tours
+         addOtherEnabledImage(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Collected_Selected));
+
+         // image 2: not selected tours
+         addOtherEnabledImage(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Collected_Not));
+
+//         TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Selected_Not_Disabled);
+//         TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Selected_Selected_Disabled);
+//         TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Selected_All_Disabled));
+      }
+
+      @Override
+      protected ToolbarSlideout createSlideout(final ToolBar toolbar) {
+
+         slideoutTourSelectionFilter = new SlideoutTourCollectionFilter(_parent, toolbar, TourBookView.this);
+
+         return slideoutTourSelectionFilter;
+      }
+
+      @Override
+      protected void onBeforeOpenSlideout() {
+         closeOpenedDialogs(this);
+      }
+
+      @Override
+      protected void onSelect() {
+
+         super.onSelect();
+
+         updateTourSelectionFilter(CollectionFilterType.APP_FILTER_TOURS, false);
+      }
+   }
+
+   public enum CollectionFilterType {
+
+      APP_FILTER_TOURS,
+
+      /**
+       * Only tours are displayed which are selected
+       */
+      COLLECTED_TOURS,
+
+      /**
+       * Only tours are displayed which are not selected
+       */
+      NOT_COLLECTED_TOURS
    }
 
    private class ContentProvider_Tree implements ITreeContentProvider {
@@ -883,19 +932,14 @@ public class TourBookView extends ViewPart implements
       }
    }
 
-   public enum SelectionFilterType {
+   public class ViewerData {
 
-      ALL_IS_DISPLAYED,
+      public int             numTourItems;
+      public int             numSelectedItems;
+      public TVITourBookTour firstTourItem;
+      public boolean         firstElementHasChildren;
+      public TVITourBookItem firstTreeElement;
 
-      /**
-       * Only tours are displayed which are selected
-       */
-      SELECTED_TOURS,
-
-      /**
-       * Only tours are displayed which are not selected
-       */
-      NOT_SELECTED_TOURS
    }
 
    void actionExportViewCSV() {
@@ -994,54 +1038,6 @@ public class TourBookView extends ViewPart implements
          // reselect selection
          _tourViewer_Tree.setSelection(_tourViewer_Tree.getSelection());
       }
-   }
-
-   private void actionToggleSelectionFilter(final Event event) {
-
-      final boolean isForwards = UI.isCtrlKey(event) == false;
-
-      if (_selectionFilterType == SelectionFilterType.ALL_IS_DISPLAYED) {
-
-         if (isForwards) {
-            toggleSelectionFilter_SelectedTours();
-         } else {
-            toggleSelectionFilter_NotSelectedTours();
-         }
-
-      } else
-
-      if (_selectionFilterType == SelectionFilterType.SELECTED_TOURS) {
-
-         if (isForwards) {
-            toggleSelectionFilter_NotSelectedTours();
-         } else {
-            toggleSelectionFilter_ShowAll();
-         }
-
-      } else {
-
-         if (isForwards) {
-            toggleSelectionFilter_ShowAll();
-         } else {
-            toggleSelectionFilter_SelectedTours();
-         }
-      }
-
-      _natTable_DataLoader.resetTourItems();
-
-      _natTable_DataLoader.setTourSelectionFilter(_selectionFilterType, _selectedTourIds);
-
-      /*
-       * Found no simple way to update the tabel otherwise an exceptions occurs somewhere in the
-       * deep nattable layers
-       */
-      _tourViewer_NatTable.setRedraw(false);
-      _isInSelection = true;
-      {
-         _tourViewer_NatTable.refresh();
-      }
-      _isInSelection = false;
-      _tourViewer_NatTable.setRedraw(true);
    }
 
    /**
@@ -1292,35 +1288,39 @@ public class TourBookView extends ViewPart implements
 
    private void createActions() {
 
-      _subMenu_AdjustTourValues = new SubMenu_AdjustTourValues(this, this);
-      _actionReimport_Tours = new ActionReimportTours(this);
+// SET_FORMATTING_OFF
 
-      _actionCollapseAll = new ActionCollapseAll(this);
-      _actionCollapseOthers = new ActionCollapseOthers(this);
-      _actionDuplicateTour = new ActionDuplicateTour(this);
-      _actionDeleteTour = new ActionDeleteTourMenu(this);
-      _actionDeleteTourValues = new ActionDeleteTourValues(this);
-      _actionEditQuick = new ActionEditQuick(this);
-      _actionEditTour = new ActionEditTour(this);
-      _actionExpandSelection = new ActionExpandSelection(this);
-      _actionExportTour = new ActionExport(this);
-      _actionExportViewCSV = new ActionExportViewCSV(this);
-      _actionJoinTours = new ActionJoinTours(this);
-      _actionOpenMarkerDialog = new ActionOpenMarkerDialog(this, true);
-      _actionOpenAdjustAltitudeDialog = new ActionOpenAdjustAltitudeDialog(this);
-      _actionMergeTour = new ActionMergeTour(this);
-      _actionOpenTour = new ActionOpenTour(this);
-      _actionPrintTour = new ActionPrint(this);
-      _actionRefreshView = new ActionRefreshView(this);
-      _actionSetOtherPerson = new ActionSetPerson(this);
-      _actionSetTourType = new ActionSetTourTypeMenu(this);
-      _actionSelectAllTours = new ActionSelectAllTours(this);
-      _actionToggleSelectionFilter = new ActionToggleSelectionFilter();
-      _actionToggleViewLayout = new ActionToggleViewLayout(this);
-      _actionTourBookOptions = new ActionTourBookOptions();
-      _actionUploadTour = new ActionUpload(this);
+      _subMenu_AdjustTourValues        = new SubMenu_AdjustTourValues(this, this);
+      _actionReimport_Tours            = new ActionReimportTours(this);
 
-      _actionLinkWithOtherViews = new ActionLinkWithOtherViews();
+      _actionCollapseAll               = new ActionCollapseAll(this);
+      _actionCollapseOthers            = new ActionCollapseOthers(this);
+      _actionDuplicateTour             = new ActionDuplicateTour(this);
+      _actionDeleteTour                = new ActionDeleteTourMenu(this);
+      _actionDeleteTourValues          = new ActionDeleteTourValues(this);
+      _actionEditQuick                 = new ActionEditQuick(this);
+      _actionEditTour                  = new ActionEditTour(this);
+      _actionExpandSelection           = new ActionExpandSelection(this);
+      _actionExportTour                = new ActionExport(this);
+      _actionExportViewCSV             = new ActionExportViewCSV(this);
+      _actionJoinTours                 = new ActionJoinTours(this);
+      _actionOpenMarkerDialog          = new ActionOpenMarkerDialog(this, true);
+      _actionOpenAdjustAltitudeDialog  = new ActionOpenAdjustAltitudeDialog(this);
+      _actionMergeTour                 = new ActionMergeTour(this);
+      _actionOpenTour                  = new ActionOpenTour(this);
+      _actionPrintTour                 = new ActionPrint(this);
+      _actionRefreshView               = new ActionRefreshView(this);
+      _actionSetOtherPerson            = new ActionSetPerson(this);
+      _actionSetTourType               = new ActionSetTourTypeMenu(this);
+      _actionSelectAllTours            = new ActionSelectAllTours(this);
+      _actionToggleViewLayout          = new ActionToggleViewLayout(this);
+      _actionTourBookOptions           = new ActionTourBookOptions();
+      _actionTourCollectionFilter      = new ActionTourCollectionFilter();
+      _actionUploadTour                = new ActionUpload(this);
+
+      _actionLinkWithOtherViews        = new ActionLinkWithOtherViews();
+
+// SET_FORMATTING_ON
 
       fillActionBars();
    }
@@ -1933,7 +1933,7 @@ public class TourBookView extends ViewPart implements
                         : true));
 
       _actionSelectAllTours.setEnabled(isTreeLayout);
-      _actionToggleSelectionFilter.setEnabled(isTableLayout);
+      _actionTourCollectionFilter.setEnabled(isTableLayout);
       _actionToggleViewLayout.setEnabled(true);
       _actionUploadTour.setEnabled(isTourSelected);
 
@@ -1961,7 +1961,7 @@ public class TourBookView extends ViewPart implements
       final IToolBarManager tbm = getViewSite().getActionBars().getToolBarManager();
 
       tbm.add(_actionToggleViewLayout);
-      tbm.add(_actionToggleSelectionFilter);
+      tbm.add(_actionTourCollectionFilter);
       tbm.add(_actionSelectAllTours);
       tbm.add(_actionExpandSelection);
       tbm.add(_actionCollapseAll);
@@ -2264,6 +2264,22 @@ public class TourBookView extends ViewPart implements
       BusyIndicator.showWhile(_pageBook.getDisplay(), () -> TourManager.loadTourData(new ArrayList<>(tourIds), selectedTourData, false));
 
       return selectedTourData;
+   }
+
+   String getSlideoutData_NumberOfAllTours() {
+
+      final int numAllTours = _natTable_DataLoader.getNumberOfToursWithoutCollectionFilter();
+
+      return Integer.toString(numAllTours);
+   }
+
+   String getSlideoutData_NumberOfSelectedTours() {
+
+      return Integer.toString(_selectedTourIds.size());
+   }
+
+   CollectionFilterType getSlideoutData_TourSelectionFilter() {
+      return _tourSelectionFilterInSlideout;
    }
 
    IDialogSettings getState() {
@@ -3400,7 +3416,7 @@ public class TourBookView extends ViewPart implements
          final int firstRowPosition = allRowPositions[0];
 
          /*
-          * It took me hours to solve this issue, first deselect the old selection otherwise is
+          * It took me hours to solve this issue, first deselect the old selection otherwise it
           * was PRESERVED :-(((
           */
          if (isClearSelection) {
@@ -3534,36 +3550,6 @@ public class TourBookView extends ViewPart implements
       _isLayoutNatTable = true;
    }
 
-   private void toggleSelectionFilter_NotSelectedTours() {
-
-      _selectionFilterType = SelectionFilterType.NOT_SELECTED_TOURS;
-
-      _actionToggleSelectionFilter.setChecked(true);
-
-      _actionToggleSelectionFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Selected_Not));
-      _actionToggleSelectionFilter.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Selected_Not_Disabled));
-   }
-
-   private void toggleSelectionFilter_SelectedTours() {
-
-      _selectionFilterType = SelectionFilterType.SELECTED_TOURS;
-
-      _actionToggleSelectionFilter.setChecked(true);
-
-      _actionToggleSelectionFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Selected_Selected));
-      _actionToggleSelectionFilter.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Selected_Selected_Disabled));
-   }
-
-   private void toggleSelectionFilter_ShowAll() {
-
-      _selectionFilterType = SelectionFilterType.ALL_IS_DISPLAYED;
-
-      _actionToggleSelectionFilter.setChecked(false);
-
-      _actionToggleSelectionFilter.setImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Selected_All));
-      _actionToggleSelectionFilter.setDisabledImageDescriptor(TourbookPlugin.getThemedImageDescriptor(Images.TourFilter_Selected_All_Disabled));
-   }
-
    @Override
    public void toursAreModified(final ArrayList<TourData> modifiedTours) {
 
@@ -3582,6 +3568,70 @@ public class TourBookView extends ViewPart implements
       _columnFactory.setIsShowSummaryRow(isShowSummaryRow());
 
       reloadViewer();
+   }
+
+   void updateTourSelectionFilter(final CollectionFilterType selectionFilter, final boolean isFromSlideout) {
+
+      if (isFromSlideout) {
+
+         _tourSelectionFilterInSlideout = selectionFilter;
+      }
+
+//      final boolean isFilterActive = true;//_actionTourSelectionFilter.getSelection();
+      final boolean isFilterActive = _actionTourCollectionFilter.getSelection();
+
+      CollectionFilterType tourSelectionFilterInDataLoader;
+
+      if (isFilterActive) {
+
+         tourSelectionFilterInDataLoader = _tourSelectionFilterInSlideout;
+
+         if (tourSelectionFilterInDataLoader == CollectionFilterType.COLLECTED_TOURS) {
+
+            _actionTourCollectionFilter.showOtherEnabledImage(1);
+
+         } else if (tourSelectionFilterInDataLoader == CollectionFilterType.NOT_COLLECTED_TOURS) {
+
+            _actionTourCollectionFilter.showOtherEnabledImage(2);
+
+         } else {
+
+            // SelectionFilterType.ALL_IS_DISPLAYED
+
+            _actionTourCollectionFilter.showOtherEnabledImage(0);
+         }
+
+      } else {
+
+         // filter is not active -> show all
+
+         tourSelectionFilterInDataLoader = CollectionFilterType.APP_FILTER_TOURS;
+
+         _actionTourCollectionFilter.showOtherEnabledImage(0);
+      }
+
+      // run async that the slideout UI is updated immediately
+      _parent.getDisplay().asyncExec(() -> {
+
+         _natTable_DataLoader.resetTourItems();
+
+         _natTable_DataLoader.setTourCollectionFilter(tourSelectionFilterInDataLoader, _selectedTourIds);
+
+         /*
+          * Found no simple way to update the tabel otherwise an exceptions occurs somewhere in the
+          * deep nattable layers
+          */
+         _tourViewer_NatTable.setRedraw(false);
+         _isInSelection = true;
+         {
+            _tourViewer_NatTable.refresh();
+         }
+         _isInSelection = false;
+         _tourViewer_NatTable.setRedraw(true);
+
+         // update number of tours
+         _actionTourCollectionFilter.slideoutTourSelectionFilter.updateUI();
+      });
    }
 
    private void updateUI_TourViewerColumns_Tree() {

@@ -14948,7 +14948,7 @@
     <path
        inkscape:export-ydpi="95.999863"
        inkscape:export-xdpi="95.999863"
-       inkscape:export-filename="..\icons\tour-filter-selected-selected.png"
+       inkscape:export-filename="..\icons\tour-filter-collected-selected.png"
        sodipodi:nodetypes="ccccccc"
        inkscape:connector-curvature="0"
        id="path5771-6-9-5-5-4-8-3-1-9-9-2-8-6-4-59-9-2"
@@ -14985,7 +14985,7 @@
     <path
        inkscape:export-ydpi="95.999863"
        inkscape:export-xdpi="95.999863"
-       inkscape:export-filename="..\icons\tour-filter-selected-disabled.png"
+       inkscape:export-filename="..\icons\tour-filter-collected-disabled.png"
        sodipodi:nodetypes="ccccccc"
        inkscape:connector-curvature="0"
        id="path5771-6-9-5-5-4-8-3-1-9-9-2-8-6-4-59-9-2-3"
@@ -15022,7 +15022,7 @@
     <path
        inkscape:export-ydpi="95.999863"
        inkscape:export-xdpi="95.999863"
-       inkscape:export-filename="..\icons\tour-filter-selected-selected-dark.png"
+       inkscape:export-filename="..\icons\tour-filter-collected-selected-dark.png"
        sodipodi:nodetypes="ccccccc"
        inkscape:connector-curvature="0"
        id="path5771-6-9-5-5-4-8-3-1-9-9-2-8-6-4-59-9-8-4"
@@ -15050,7 +15050,7 @@
     <path
        inkscape:export-ydpi="95.999863"
        inkscape:export-xdpi="95.999863"
-       inkscape:export-filename="..\icons\tour-filter-selected-selected-disabled-dark.png"
+       inkscape:export-filename="..\icons\tour-filter-collected-selected-disabled-dark.png"
        sodipodi:nodetypes="ccccccc"
        inkscape:connector-curvature="0"
        id="path5771-6-9-5-5-4-8-3-1-9-9-2-8-6-4-59-9-8-3-6"
@@ -15078,7 +15078,7 @@
     <path
        inkscape:export-ydpi="95.999863"
        inkscape:export-xdpi="95.999863"
-       inkscape:export-filename="..\icons\tour-filter-selected-not.png"
+       inkscape:export-filename="..\icons\tour-filter-collected-not.png"
        sodipodi:nodetypes="ccccccc"
        inkscape:connector-curvature="0"
        id="path5771-6-9-5-5-4-8-3-1-9-9-2-8-6-4-59-9-2-2"
@@ -15115,7 +15115,7 @@
     <path
        inkscape:export-ydpi="95.999863"
        inkscape:export-xdpi="95.999863"
-       inkscape:export-filename="..\icons\tour-filter-selected-not-dark.png"
+       inkscape:export-filename="..\icons\tour-filter-collected-not-dark.png"
        sodipodi:nodetypes="ccccccc"
        inkscape:connector-curvature="0"
        id="path5771-6-9-5-5-4-8-3-1-9-9-2-8-6-4-59-9-8-4-3"
@@ -15143,7 +15143,7 @@
     <path
        inkscape:export-ydpi="95.999863"
        inkscape:export-xdpi="95.999863"
-       inkscape:export-filename="..\icons\tour-filter-selected-not-disabled-dark.png"
+       inkscape:export-filename="..\icons\tour-filter-collected-not-disabled-dark.png"
        sodipodi:nodetypes="ccccccc"
        inkscape:connector-curvature="0"
        id="path5771-6-9-5-5-4-8-3-1-9-9-2-8-6-4-59-9-8-3-6-9"
@@ -17713,7 +17713,7 @@
     <path
        inkscape:export-ydpi="95.999863"
        inkscape:export-xdpi="95.999863"
-       inkscape:export-filename="..\icons\tour-filter-selected-not-disabled.png"
+       inkscape:export-filename="..\icons\tour-filter-collected-not-disabled.png"
        sodipodi:nodetypes="ccccccc"
        inkscape:connector-curvature="0"
        id="path5771-6-9-5-5-4-8-3-1-9-9-2-8-6-4-59-9-2-2-0"
@@ -17764,7 +17764,7 @@
     <path
        inkscape:export-ydpi="95.999863"
        inkscape:export-xdpi="95.999863"
-       inkscape:export-filename="..\icons\tour-filter-selected-all.png"
+       inkscape:export-filename="..\icons\tour-filter-collected-all.png"
        sodipodi:nodetypes="ccccccc"
        inkscape:connector-curvature="0"
        id="path5771-6-9-5-5-4-8-3-1-9-9-2-8-6-4-59-9-2-2-5"
@@ -17792,7 +17792,7 @@
     <path
        inkscape:export-ydpi="95.999863"
        inkscape:export-xdpi="95.999863"
-       inkscape:export-filename="..\icons\tour-filter-selected-all-dark.png"
+       inkscape:export-filename="..\icons\tour-filter-collected-all-dark.png"
        sodipodi:nodetypes="ccccccc"
        inkscape:connector-curvature="0"
        id="path5771-6-9-5-5-4-8-3-1-9-9-2-8-6-4-59-9-8-4-3-3"
@@ -17811,7 +17811,7 @@
     <path
        inkscape:export-ydpi="95.999863"
        inkscape:export-xdpi="95.999863"
-       inkscape:export-filename="..\icons\tour-filter-selected-all-disabled-dark.png"
+       inkscape:export-filename="..\icons\tour-filter-collected-all-disabled-dark.png"
        sodipodi:nodetypes="ccccccc"
        inkscape:connector-curvature="0"
        id="path5771-6-9-5-5-4-8-3-1-9-9-2-8-6-4-59-9-8-3-6-9-4"
@@ -17830,7 +17830,7 @@
     <path
        inkscape:export-ydpi="95.999863"
        inkscape:export-xdpi="95.999863"
-       inkscape:export-filename="..\icons\tour-filter-selected-all-disabled.png"
+       inkscape:export-filename="..\icons\tour-filter-collected-all-disabled.png"
        sodipodi:nodetypes="ccccccc"
        inkscape:connector-curvature="0"
        id="path5771-6-9-5-5-4-8-3-1-9-9-2-8-6-4-59-9-2-2-0-3"
