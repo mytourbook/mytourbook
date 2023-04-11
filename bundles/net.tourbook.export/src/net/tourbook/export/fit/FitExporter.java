@@ -38,49 +38,46 @@ import com.garmin.fit.Sport;
 import com.garmin.fit.UserProfileMesg;
 import com.garmin.fit.util.SemicirclesConverter;
 
+import java.nio.ByteBuffer;
 import java.time.Period;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import net.tourbook.application.TourbookPlugin;
+import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
 import net.tourbook.data.TourPerson;
+import net.tourbook.export.Activator;
+
+import org.osgi.framework.Version;
 
 public class FitExporter {
 
+   private TourData _tourData;
+
+   private static byte[] convertUUIDToBytes(final UUID uuid) {
+
+      final ByteBuffer byteBuffer = ByteBuffer.wrap(new byte[16]);
+      byteBuffer.putLong(uuid.getMostSignificantBits());
+      byteBuffer.putLong(uuid.getLeastSignificantBits());
+      return byteBuffer.array();
+   }
+
    private static void createFitFile(final List<Mesg> messages,
                                      final String filename,
-                                     final DateTime startTime) {
-
-      // The combination of file type, manufacturer id, product id, and serial number should be unique.
-      // When available, a non-random serial number should be used.
-      final File fileType = File.ACTIVITY;
-      final short manufacturerId = Manufacturer.DEVELOPMENT;
-      final short productId = 0;
-      final float softwareVersion = 1.0f;
-
-      //todo fb
-      final int serialNumber = 123;
-
-      // Every FIT file MUST contain a File ID message
-      final FileIdMesg fileIdMesg = new FileIdMesg();
-      fileIdMesg.setType(fileType);
-      fileIdMesg.setManufacturer((int) manufacturerId);
-      fileIdMesg.setProduct((int) productId);
-      fileIdMesg.setTimeCreated(startTime);
-      fileIdMesg.setSerialNumber((long) serialNumber);
+                                     final DateTime startTime,
+                                     final Float version) {
 
       // A Device Info message is a BEST PRACTICE for FIT ACTIVITY files
       final DeviceInfoMesg deviceInfoMesg = new DeviceInfoMesg();
       deviceInfoMesg.setDeviceIndex(DeviceIndex.CREATOR);
       deviceInfoMesg.setManufacturer(Manufacturer.DEVELOPMENT);
-      deviceInfoMesg.setProduct((int) productId);
-      deviceInfoMesg.setProductName("MyTourbook"); // Max 20 Chars
-      deviceInfoMesg.setSerialNumber((long) serialNumber);
-      deviceInfoMesg.setSoftwareVersion(softwareVersion);
+      deviceInfoMesg.setProductName("MyTourbook"); //$NON-NLS-1$
+      deviceInfoMesg.setSoftwareVersion(version);
       deviceInfoMesg.setTimestamp(startTime);
 
       // Create the output stream
@@ -98,6 +95,10 @@ public class FitExporter {
          fileEncoder.write(userProfileMesg);
       }
 
+      // Every FIT file MUST contain a File ID message
+      final FileIdMesg fileIdMesg = new FileIdMesg();
+      fileIdMesg.setType(File.ACTIVITY);
+      fileIdMesg.setTimeCreated(startTime);
       fileEncoder.write(fileIdMesg);
       fileEncoder.write(deviceInfoMesg);
 
@@ -128,12 +129,14 @@ public class FitExporter {
       return userProfileMesg;
    }
 
-   private void convertTourDataToFit(final TourData tourData, final String exportFilePath) {
+   // Official documentation: https://developer.garmin.com/fit/cookbook/
+   public void export(final TourData tourData, final String exportFilePath) {
 
+      _tourData = tourData;
       final List<Mesg> messages = new ArrayList<>();
 
       // The starting timestamp for the activity
-      final DateTime startTime = new DateTime(Date.from(tourData.getTourStartTime().toInstant()));
+      final DateTime startTime = new DateTime(Date.from(_tourData.getTourStartTime().toInstant()));
 
       // Timer Events are a BEST PRACTICE for FIT ACTIVITY files
       final EventMesg eventMesg = new EventMesg();
@@ -144,19 +147,17 @@ public class FitExporter {
 
       // Create the Developer Id message for the developer data fields.
       final DeveloperDataIdMesg developerIdMesg = new DeveloperDataIdMesg();
-      // It is a BEST PRACTICE to reuse the same Guid for all FIT files created by your platform
-      final byte[] appId = new byte[] {
-            0x1, 0x1, 0x2, 0x3,
-            0x5, 0x8, 0xD, 0x15,
-            0x22, 0x37, 0x59, (byte) 0x90,
-            (byte) 0xE9, 0x79, 0x62, (byte) 0xDB
-      };
 
+      // It is a BEST PRACTICE to reuse the same Guid for all FIT files created by your platform
+      final byte[] appId = convertUUIDToBytes(UUID.fromString("e1b60f54-e7cb-46d9-88df-ced1fe7ecf0f"));
       for (int i = 0; i < appId.length; i++) {
          developerIdMesg.setApplicationId(i, appId[i]);
       }
 
       developerIdMesg.setDeveloperDataIndex((short) 0);
+      final Version softwareVersion = Activator.getDefault().getVersion();
+      final Float version = Float.valueOf(softwareVersion.getMajor() + UI.SYMBOL_DOT + softwareVersion.getMinor());
+      developerIdMesg.setApplicationVersion((long) (version * 100));
       messages.add(developerIdMesg);
 
       // Every FIT ACTIVITY file MUST contain Record messages
@@ -165,23 +166,23 @@ public class FitExporter {
       int previousTime = 0;
       DateTime timestamp = null;
       // Create one hour (3600 seconds) of Record data
-      for (int index = 0; index < tourData.timeSerie.length; ++index) {
+      for (int index = 0; index < _tourData.timeSerie.length; ++index) {
 
-         startTime.add(tourData.timeSerie[index] - previousTime);
-         previousTime = tourData.timeSerie[index];
+         startTime.add(_tourData.timeSerie[index] - previousTime);
+         previousTime = _tourData.timeSerie[index];
          timestamp = new DateTime(startTime);
          // Create a new Record message and set the timestamp
          final RecordMesg recordMesg = new RecordMesg();
          recordMesg.setTimestamp(timestamp);
 
-         exportDataSeries(tourData, index, recordMesg);
+         setDataSerieValue(index, recordMesg);
 
          // Write the Record message to the output stream
          messages.add(recordMesg);
 
          // Increment the timestamp by the number of seconds between the previous
          // timestamp and the current one
-         timestamp.add(tourData.timeSerie[index] - previousTimeSerieValue);
+         timestamp.add(_tourData.timeSerie[index] - previousTimeSerieValue);
       }
 
       //todo fb thats where we add the pauses?
@@ -206,13 +207,13 @@ public class FitExporter {
       sessionMesg.setMessageIndex(0);
       // sessionMesg.setTimestamp(timestamp);
       sessionMesg.setStartTime(startTime);
-      sessionMesg.setTotalElapsedTime((float) tourData.getTourDeviceTime_Elapsed());
-      sessionMesg.setTotalTimerTime((float) tourData.getTourDeviceTime_Recorded());
-      //do a map function with the tour type and by default use generic
+      sessionMesg.setTotalElapsedTime((float) _tourData.getTourDeviceTime_Elapsed());
+      sessionMesg.setTotalTimerTime((float) _tourData.getTourDeviceTime_Recorded());
+      //todo fb do a map function with the tour type and by default use generic
       sessionMesg.setSport(Sport.STAND_UP_PADDLEBOARDING);
-      // sessionMesg.setSubSport(SubSport.GENERIC);
       sessionMesg.setFirstLapIndex(0);
-      sessionMesg.setNumLaps(tourData.getTourMarkers().size());
+      sessionMesg.setNumLaps(_tourData.getTourMarkers().size());
+      setAvgValues(sessionMesg);
       messages.add(sessionMesg);
 
       // Every FIT ACTIVITY file MUST contain EXACTLY one Activity message
@@ -221,52 +222,54 @@ public class FitExporter {
       activityMesg.setNumSessions(1);
       messages.add(activityMesg);
 
-      createFitFile(messages, exportFilePath, startTime);
+      createFitFile(messages, exportFilePath, startTime, version);
    }
 
-   public void export(final TourData _tourData, final String exportFilePath) {
+   private void setAvgValues(final SessionMesg sessionMesg) {
+      //todo fb 
 
-      convertTourDataToFit(_tourData, exportFilePath);
+      //sessionMesg.setTotalCalories(_tourData.getCalories());
+      //sessionMesg.setAvgCadence(null);
    }
 
-   private void exportDataSeries(final TourData tourData, final int index, final RecordMesg recordMesg) {
+   private void setDataSerieValue(final int index, final RecordMesg recordMesg) {
 
-      final double[] latitudeSerie = tourData.latitudeSerie;
+      final double[] latitudeSerie = _tourData.latitudeSerie;
       if (latitudeSerie != null) {
          recordMesg.setPositionLat(SemicirclesConverter.degreesToSemicircles(latitudeSerie[index]));
       }
 
-      final double[] longitudeSerie = tourData.longitudeSerie;
+      final double[] longitudeSerie = _tourData.longitudeSerie;
       if (latitudeSerie != null) {
          recordMesg.setPositionLong(SemicirclesConverter.degreesToSemicircles(longitudeSerie[index]));
       }
 
-      final float[] distanceSerie = tourData.distanceSerie;
+      final float[] distanceSerie = _tourData.distanceSerie;
       if (distanceSerie != null) {
          recordMesg.setDistance(distanceSerie[index]);
       }
 
-      final float[] speedSerie = tourData.getSpeedSerieMetric();
+      final float[] speedSerie = _tourData.getSpeedSerieMetric();
       if (speedSerie != null) {
          recordMesg.setSpeed(speedSerie[index]);
       }
 
-      final float[] pulseSerie = tourData.pulseSerie;
+      final float[] pulseSerie = _tourData.pulseSerie;
       if (pulseSerie != null) {
          recordMesg.setHeartRate((short) pulseSerie[index]);
       }
 
-      final float[] cadenceSerie = tourData.getCadenceSerie();
+      final float[] cadenceSerie = _tourData.getCadenceSerie();
       if (cadenceSerie != null) {
          recordMesg.setCadence((short) cadenceSerie[index]);
       }
 
-      final float[] powerSerie = tourData.getPowerSerie();
+      final float[] powerSerie = _tourData.getPowerSerie();
       if (powerSerie != null) {
          recordMesg.setPower((int) powerSerie[index]);
       }
 
-      final float[] altitudeSerie = tourData.altitudeSerie;
+      final float[] altitudeSerie = _tourData.altitudeSerie;
       if (altitudeSerie != null) {
          recordMesg.setAltitude(altitudeSerie[index]);
       }
