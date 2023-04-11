@@ -149,7 +149,7 @@ public class FitExporter {
       final DeveloperDataIdMesg developerIdMesg = new DeveloperDataIdMesg();
 
       // It is a BEST PRACTICE to reuse the same Guid for all FIT files created by your platform
-      final byte[] appId = convertUUIDToBytes(UUID.fromString("e1b60f54-e7cb-46d9-88df-ced1fe7ecf0f"));
+      final byte[] appId = convertUUIDToBytes(UUID.fromString("e1b60f54-e7cb-46d9-88df-ced1fe7ecf0f")); //$NON-NLS-1$
       for (int i = 0; i < appId.length; i++) {
          developerIdMesg.setApplicationId(i, appId[i]);
       }
