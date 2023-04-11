@@ -94,10 +94,6 @@ public class FitExporter {
       if (userProfileMesg != null) {
          fileEncoder.write(userProfileMesg);
       }
-      
-      
-      
-      
 
       // Every FIT file MUST contain a File ID message
       final FileIdMesg fileIdMesg = new FileIdMesg();
@@ -230,10 +226,11 @@ public class FitExporter {
    }
 
    private void setAvgValues(final SessionMesg sessionMesg) {
-      //todo fb 
 
-      //sessionMesg.setTotalCalories(_tourData.getCalories());
-      //sessionMesg.setAvgCadence(null);
+      sessionMesg.setTotalCalories(_tourData.getCalories());
+      sessionMesg.setAvgCadence((short) _tourData.getAvgCadence());
+      sessionMesg.setAvgHeartRate((short) _tourData.getAvgPulse());
+      sessionMesg.setAvgPower((int) _tourData.getPower_Avg());
    }
 
    private void setDataSerieValue(final int index, final RecordMesg recordMesg) {
@@ -277,6 +274,6 @@ public class FitExporter {
       if (altitudeSerie != null) {
          recordMesg.setAltitude(altitudeSerie[index]);
       }
-      int toto = 1;
+      final int toto = 1;
    }
 }
