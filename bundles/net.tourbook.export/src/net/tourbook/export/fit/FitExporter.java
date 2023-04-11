@@ -143,16 +143,18 @@ public class FitExporter {
          for (int index = 0; index < pausedTime_Start.length; ++index) {
 
             final EventMesg eventMesgStop = new EventMesg();
-            eventMesgStop.setTimestamp(new DateTime(pausedTime_Start[index]));
+            eventMesgStop.setTimestamp(new DateTime(pausedTime_End[index]));
             eventMesgStop.setEvent(Event.TIMER);
             eventMesgStop.setEventType(EventType.STOP);
 
             eventMessages.add(eventMesgStop);
 
             final EventMesg eventMesgStart = new EventMesg();
-            eventMesgStart.setTimestamp(new DateTime(pausedTime_End[index]));
+            eventMesgStart.setTimestamp(new DateTime(pausedTime_Start[index]));
             eventMesgStart.setEvent(Event.TIMER);
             eventMesgStart.setEventType(EventType.START);
+
+            eventMessages.add(eventMesgStart);
          }
       }
 
@@ -170,27 +172,31 @@ public class FitExporter {
       final List<LapMesg> lapMessages = new ArrayList<>();
 
       // Every FIT ACTIVITY file MUST contain at least one Lap message
-      final int index = 0;
+      final List<TourMarker> markers = new ArrayList<>(_tourData.getTourMarkers());
+      int index = 0;
+      for (; index < markers.size(); ++index) {
 
+         final TourMarker tourMarker = markers.get(index);
+
+         final LapMesg lapMessage = new LapMesg();
+         lapMessage.setMessageIndex(index);
+         lapMessage.setTimestamp(new DateTime(tourMarker.getDeviceLapTime() / 1000));
+         lapMessage.setTotalDistance(tourMarker.getDistance());
+         lapMessage.setTotalElapsedTime((float) tourMarker.getTime());
+
+         //todo fb fix the markers
+         //lapMessages.add(lapMessage);
+      }
+
+      if (lapMessages.isEmpty()) {
       final LapMesg lapMesg = new LapMesg();
       lapMesg.setMessageIndex(index);
       lapMesg.setTimestamp(timestamp);
       lapMesg.setStartTime(startTime);
       lapMesg.setTotalElapsedTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
       lapMesg.setTotalTimerTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
-
       lapMessages.add(lapMesg);
-
-      final List<TourMarker> markers = new ArrayList<>(_tourData.getTourMarkers());
-
-      markers.forEach(marker -> {
-
-         final LapMesg lapMessage = new LapMesg();
-         lapMessage.setMessageIndex(index);
-         lapMessage.setTimestamp(new DateTime(marker.getDeviceLapTime()));
-
-         lapMessages.add(lapMessage);
-      });
+   }
 
       return lapMessages;
    }
@@ -268,6 +274,8 @@ public class FitExporter {
       sessionMesg.setNumLaps(_tourData.getTourMarkers().size());
       setAvgValues(sessionMesg);
       messages.add(sessionMesg);
+      sessionMesg.setTotalDistance(_tourData.getTourDistance());
+      //todo fb set timezone
 
       // Every FIT ACTIVITY file MUST contain EXACTLY one Activity message
       final ActivityMesg activityMesg = new ActivityMesg();
