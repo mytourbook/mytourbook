@@ -16,7 +16,7 @@
 package utils;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertLinesMatch;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedWriter;
@@ -72,7 +72,7 @@ public class Comparison {
             final String testFileContent = FileUtils.readFileContentString(testTourFilePathCsv);
             writeErroneousFiles(controlTourFilePathCsv.replace(".csv", "-GeneratedFromTests.csv"), testFileContent); //$NON-NLS-1$
          }
-         assertIterableEquals(controlFileContent, testFileContentArray);
+         assertLinesMatch(controlFileContent, testFileContentArray);
 
       } catch (final IOException e) {
          e.printStackTrace();
