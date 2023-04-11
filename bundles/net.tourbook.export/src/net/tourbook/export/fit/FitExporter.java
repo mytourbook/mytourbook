@@ -94,6 +94,10 @@ public class FitExporter {
       if (userProfileMesg != null) {
          fileEncoder.write(userProfileMesg);
       }
+      
+      
+      
+      
 
       // Every FIT file MUST contain a File ID message
       final FileIdMesg fileIdMesg = new FileIdMesg();
