@@ -172,31 +172,39 @@ public class FitExporter {
       final List<LapMesg> lapMessages = new ArrayList<>();
 
       // Every FIT ACTIVITY file MUST contain at least one Lap message
-      final List<TourMarker> markers = new ArrayList<>(_tourData.getTourMarkers());
+      final List<TourMarker> markers = _tourData.getTourMarkersSorted();
       int index = 0;
+      final DateTime currentTimeStamp = new DateTime(startTime.getDate());
       for (; index < markers.size(); ++index) {
 
          final TourMarker tourMarker = markers.get(index);
 
          final LapMesg lapMessage = new LapMesg();
          lapMessage.setMessageIndex(index);
-         lapMessage.setTimestamp(new DateTime(tourMarker.getDeviceLapTime() / 1000));
+
+         currentTimeStamp.add(tourMarker.getTime());
+         lapMessage.setStartTime(startTime);
          lapMessage.setTotalDistance(tourMarker.getDistance());
          lapMessage.setTotalElapsedTime((float) tourMarker.getTime());
+         final int pausedTime = _tourData.getPausedTime(0, tourMarker.getSerieIndex());
 
-         //todo fb fix the markers
-         //lapMessages.add(lapMessage);
+         //this seemed to be the missing link
+         lapMessage.setTotalTimerTime((float) tourMarker.getTime() - pausedTime);
+         lapMessage.setEvent(Event.LAP);
+
+         lapMessages.add(lapMessage);
       }
 
       if (lapMessages.isEmpty()) {
-      final LapMesg lapMesg = new LapMesg();
-      lapMesg.setMessageIndex(index);
-      lapMesg.setTimestamp(timestamp);
-      lapMesg.setStartTime(startTime);
-      lapMesg.setTotalElapsedTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
-      lapMesg.setTotalTimerTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
-      lapMessages.add(lapMesg);
-   }
+
+         final LapMesg lapMesg = new LapMesg();
+         lapMesg.setMessageIndex(index);
+         //     lapMesg.setTimestamp(timestamp);
+         lapMesg.setStartTime(startTime);
+         lapMesg.setTotalElapsedTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
+         lapMesg.setTotalTimerTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
+         lapMessages.add(lapMesg);
+      }
 
       return lapMessages;
    }
@@ -233,16 +241,13 @@ public class FitExporter {
       messages.add(developerIdMesg);
 
       // Every FIT ACTIVITY file MUST contain Record messages
-      final int previousTimeSerieValue = 0;
+      int previousTimeSerieValue = 0;
 
-      int previousTime = 0;
-      DateTime timestamp = null;
-      // Create one hour (3600 seconds) of Record data
+      final DateTime timestamp = new DateTime(startTime);
       for (int index = 0; index < _tourData.timeSerie.length; ++index) {
 
-         startTime.add(_tourData.timeSerie[index] - previousTime);
-         previousTime = _tourData.timeSerie[index];
-         timestamp = new DateTime(startTime);
+         timestamp.add(_tourData.timeSerie[index] - previousTimeSerieValue);
+
          // Create a new Record message and set the timestamp
          final RecordMesg recordMesg = new RecordMesg();
          recordMesg.setTimestamp(timestamp);
@@ -254,7 +259,7 @@ public class FitExporter {
 
          // Increment the timestamp by the number of seconds between the previous
          // timestamp and the current one
-         timestamp.add(_tourData.timeSerie[index] - previousTimeSerieValue);
+         previousTimeSerieValue = _tourData.timeSerie[index];
       }
 
       final List<EventMesg> eventMessages = createEventMessages(timestamp);
