@@ -277,5 +277,6 @@ public class FitExporter {
       if (altitudeSerie != null) {
          recordMesg.setAltitude(altitudeSerie[index]);
       }
+      int toto = 1;
    }
 }
