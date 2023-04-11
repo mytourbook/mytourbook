@@ -80,7 +80,7 @@ public class Comparison {
    }
 
    /**
-    * Compares a test transaction against a control transaction.
+    * Compares a test tour against a control tour.
     *
     * @param testTourData
     *           The generated test TourData object.
