@@ -194,6 +194,7 @@ public class FitExporter {
       messages.add(eventMesgStop);
 
       // Every FIT ACTIVITY file MUST contain at least one Lap message
+
       final LapMesg lapMesg = new LapMesg();
       lapMesg.setMessageIndex(0);
       lapMesg.setTimestamp(timestamp);
@@ -274,6 +275,5 @@ public class FitExporter {
       if (altitudeSerie != null) {
          recordMesg.setAltitude(altitudeSerie[index]);
       }
-      final int toto = 1;
    }
 }
