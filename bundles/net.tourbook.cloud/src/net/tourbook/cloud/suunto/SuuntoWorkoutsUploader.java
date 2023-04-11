@@ -32,12 +32,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import net.tourbook.cloud.Activator;
 import net.tourbook.cloud.Messages;
 import net.tourbook.cloud.oauth2.OAuth2Constants;
 import net.tourbook.cloud.oauth2.OAuth2Utils;
-import net.tourbook.cloud.strava.ActivityUpload;
 import net.tourbook.common.UI;
 import net.tourbook.common.util.FileUtils;
 import net.tourbook.common.util.StatusUtil;
@@ -72,25 +72,21 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       super(CLOUD_UPLOADER_ID, Messages.VendorName_Suunto_Workouts);
    }
 
-   private static ActivityUpload convertResponseToUpload(final HttpResponse<String> response, final String tourDate) {
+   private static WorkoutUpload convertResponseToUpload(final HttpResponse<String> response, final String tourDate) {
 
-      ActivityUpload activityUpload = new ActivityUpload();
+      WorkoutUpload workoutUpload = new WorkoutUpload();
 
       if (response.statusCode() == HttpURLConnection.HTTP_CREATED && StringUtils.hasContent(response.body())) {
 
          final ObjectMapper mapper = new ObjectMapper();
          try {
-            activityUpload = mapper.readValue(response.body(), ActivityUpload.class);
+            workoutUpload = mapper.readValue(response.body(), WorkoutUpload.class);
          } catch (final JsonProcessingException e) {
             StatusUtil.log(e);
          }
-      } else {
-         activityUpload.setError(response.body());
       }
 
-      activityUpload.setTourDate(tourDate);
-
-      return activityUpload;
+      return workoutUpload;
    }
 
    private String createTourFile_Fit(final TourData tourData) {
@@ -221,15 +217,13 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
          e.printStackTrace();
       }
 
-//      final CompletableFuture<ActivityUpload> activityUpload =
-//OAuth2Utils.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-//                  .thenApply(name -> convertResponseToUpload(name, tourDate))
-//                  .exceptionally(e -> {
-//                     final ActivityUpload errorUpload = new ActivityUpload();
-//                     errorUpload.setTourDate(tourDate);
-//                     errorUpload.setError(e.getMessage());
-//                     return errorUpload;
-//                  });
+      final CompletableFuture<WorkoutUpload> workoutUpload =
+            OAuth2Utils.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                  .thenApply(name -> convertResponseToUpload(name, tourDate))
+                  .exceptionally(e -> {
+                     final WorkoutUpload errorUpload = new WorkoutUpload();
+                     return errorUpload;
+                  });
 
       return UI.EMPTY_STRING;
    }

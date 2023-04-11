@@ -186,8 +186,8 @@ public class FitExporter {
          lapMessage.setStartTime(startTime);
          lapMessage.setTotalDistance(tourMarker.getDistance());
          lapMessage.setTotalElapsedTime((float) tourMarker.getTime());
-         final int pausedTime = _tourData.getPausedTime(0, tourMarker.getSerieIndex());
 
+         final int pausedTime = _tourData.getPausedTime(0, tourMarker.getSerieIndex());
          //this seemed to be the missing link
          lapMessage.setTotalTimerTime((float) tourMarker.getTime() - pausedTime);
          lapMessage.setEvent(Event.LAP);
@@ -199,7 +199,6 @@ public class FitExporter {
 
          final LapMesg lapMesg = new LapMesg();
          lapMesg.setMessageIndex(index);
-         //     lapMesg.setTimestamp(timestamp);
          lapMesg.setStartTime(startTime);
          lapMesg.setTotalElapsedTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
          lapMesg.setTotalTimerTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
@@ -280,7 +279,6 @@ public class FitExporter {
       setAvgValues(sessionMesg);
       messages.add(sessionMesg);
       sessionMesg.setTotalDistance(_tourData.getTourDistance());
-      //todo fb set timezone
 
       // Every FIT ACTIVITY file MUST contain EXACTLY one Activity message
       final ActivityMesg activityMesg = new ActivityMesg();
