@@ -50,7 +50,9 @@ import net.tourbook.common.UI;
 import net.tourbook.common.time.TimeTools;
 import net.tourbook.common.util.StatusUtil;
 import net.tourbook.data.TourData;
+import net.tourbook.data.TourMarker;
 import net.tourbook.data.TourPerson;
+import net.tourbook.data.TourType;
 import net.tourbook.export.Activator;
 
 import org.osgi.framework.Version;
@@ -129,6 +131,70 @@ public class FitExporter {
       return userProfileMesg;
    }
 
+   private List<EventMesg> createEventMessages(final DateTime timestamp) {
+
+      final List<EventMesg> eventMessages = new ArrayList<>();
+
+      final long[] pausedTime_Start = _tourData.getPausedTime_Start();
+      final long[] pausedTime_End = _tourData.getPausedTime_End();
+
+      if (pausedTime_Start != null && pausedTime_Start.length > 0) {
+
+         for (int index = 0; index < pausedTime_Start.length; ++index) {
+
+            final EventMesg eventMesgStop = new EventMesg();
+            eventMesgStop.setTimestamp(new DateTime(pausedTime_Start[index]));
+            eventMesgStop.setEvent(Event.TIMER);
+            eventMesgStop.setEventType(EventType.STOP);
+
+            eventMessages.add(eventMesgStop);
+
+            final EventMesg eventMesgStart = new EventMesg();
+            eventMesgStart.setTimestamp(new DateTime(pausedTime_End[index]));
+            eventMesgStart.setEvent(Event.TIMER);
+            eventMesgStart.setEventType(EventType.START);
+         }
+      }
+
+      final EventMesg eventMesgStop = new EventMesg();
+      eventMesgStop.setTimestamp(timestamp);
+      eventMesgStop.setEvent(Event.TIMER);
+      eventMesgStop.setEventType(EventType.STOP_ALL);
+      eventMessages.add(eventMesgStop);
+
+      return eventMessages;
+   }
+
+   private List<LapMesg> createLapMessages(final DateTime startTime, final DateTime timestamp) {
+
+      final List<LapMesg> lapMessages = new ArrayList<>();
+
+      // Every FIT ACTIVITY file MUST contain at least one Lap message
+      final int index = 0;
+
+      final LapMesg lapMesg = new LapMesg();
+      lapMesg.setMessageIndex(index);
+      lapMesg.setTimestamp(timestamp);
+      lapMesg.setStartTime(startTime);
+      lapMesg.setTotalElapsedTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
+      lapMesg.setTotalTimerTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
+
+      lapMessages.add(lapMesg);
+
+      final List<TourMarker> markers = new ArrayList<>(_tourData.getTourMarkers());
+
+      markers.forEach(marker -> {
+
+         final LapMesg lapMessage = new LapMesg();
+         lapMessage.setMessageIndex(index);
+         lapMessage.setTimestamp(new DateTime(marker.getDeviceLapTime()));
+
+         lapMessages.add(lapMessage);
+      });
+
+      return lapMessages;
+   }
+
    // Official documentation: https://developer.garmin.com/fit/cookbook/
    public void export(final TourData tourData, final String exportFilePath) {
 
@@ -185,33 +251,19 @@ public class FitExporter {
          timestamp.add(_tourData.timeSerie[index] - previousTimeSerieValue);
       }
 
-      //todo fb thats where we add the pauses?
-      // Timer Events are a BEST PRACTICE for FIT ACTIVITY files
-      final EventMesg eventMesgStop = new EventMesg();
-      eventMesgStop.setTimestamp(timestamp);
-      eventMesgStop.setEvent(Event.TIMER);
-      eventMesgStop.setEventType(EventType.STOP_ALL);
-      messages.add(eventMesgStop);
+      final List<EventMesg> eventMessages = createEventMessages(timestamp);
+      messages.addAll(eventMessages);
 
-      // Every FIT ACTIVITY file MUST contain at least one Lap message
-
-      final LapMesg lapMesg = new LapMesg();
-      lapMesg.setMessageIndex(0);
-      lapMesg.setTimestamp(timestamp);
-      lapMesg.setStartTime(startTime);
-      lapMesg.setTotalElapsedTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
-      lapMesg.setTotalTimerTime((float) (timestamp.getTimestamp() - startTime.getTimestamp()));
-      messages.add(lapMesg);
+      final List<LapMesg> lapMessages = createLapMessages(startTime, timestamp);
+      messages.addAll(lapMessages);
 
       // Every FIT ACTIVITY file MUST contain at least one Session message
       final SessionMesg sessionMesg = new SessionMesg();
       sessionMesg.setMessageIndex(0);
-      // sessionMesg.setTimestamp(timestamp);
       sessionMesg.setStartTime(startTime);
       sessionMesg.setTotalElapsedTime((float) _tourData.getTourDeviceTime_Elapsed());
       sessionMesg.setTotalTimerTime((float) _tourData.getTourDeviceTime_Recorded());
-      //todo fb do a map function with the tour type and by default use generic
-      sessionMesg.setSport(Sport.STAND_UP_PADDLEBOARDING);
+      setSport(sessionMesg);
       sessionMesg.setFirstLapIndex(0);
       sessionMesg.setNumLaps(_tourData.getTourMarkers().size());
       setAvgValues(sessionMesg);
@@ -219,7 +271,6 @@ public class FitExporter {
 
       // Every FIT ACTIVITY file MUST contain EXACTLY one Activity message
       final ActivityMesg activityMesg = new ActivityMesg();
-      // activityMesg.setTimestamp(timestamp);
       activityMesg.setNumSessions(1);
       messages.add(activityMesg);
 
@@ -275,5 +326,35 @@ public class FitExporter {
       if (altitudeSerie != null) {
          recordMesg.setAltitude(altitudeSerie[index]);
       }
+   }
+
+   private void setSport(final SessionMesg sessionMesg) {
+
+      final TourType tourType = _tourData.getTourType();
+
+      Sport sport = Sport.GENERIC;
+      sessionMesg.setSport(sport);
+
+      if (tourType == null) {
+         return;
+      }
+
+      final String tourTypeName = tourType.getName();
+
+      switch (tourTypeName.toLowerCase().trim()) {
+      case "running":
+         sport = Sport.RUNNING;
+         break;
+
+      case "walking":
+         sport = Sport.WALKING;
+         break;
+
+      default:
+         sport = Sport.GENERIC;
+         break;
+      }
+
+      sessionMesg.setSport(sport);
    }
 }
