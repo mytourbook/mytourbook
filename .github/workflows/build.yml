@@ -13,7 +13,7 @@ jobs:
         id: artifact
         run: |
           $FILENAME="Full-JaCoCo-Report-$(Get-Date -Format "yyyy-dd-MM-HH_mm")"
-          echo "artifactFileName=$FILENAME" >> $GITHUB_ENV
+          echo "artifactFileName=yellow" >> $GITHUB_ENV
       - name: Upload JaCoCod file
         if: success()
         uses: actions/upload-artifact@v3
