@@ -341,7 +341,7 @@ public class SuuntoRoutesUploader extends TourbookCloudUploader {
          MessageDialog.openInformation(
                Display.getDefault().getActiveShell(),
                Messages.Dialog_UploadRoutesToSuunto_Title,
-               NLS.bind(Messages.Dialog_UploadRoutesToSuunto_Message, numberOfUploadedTours[0], numberOfTours - numberOfUploadedTours[0]));
+               NLS.bind(Messages.Dialog_UploadToursToSuunto_Message, numberOfUploadedTours[0], numberOfTours - numberOfUploadedTours[0]));
 
       } catch (final InvocationTargetException | InterruptedException e) {
          StatusUtil.log(e);

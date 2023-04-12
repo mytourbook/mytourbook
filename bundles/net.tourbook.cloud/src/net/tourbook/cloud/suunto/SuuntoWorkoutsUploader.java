@@ -111,6 +111,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       _tourExporter.useTourData(tourData).export(absoluteTourFilePath);
    }
 
+   //todo fb refactor in a unique place ?
    private String getAccessToken() {
 
       if (_useActivePerson) {
@@ -176,16 +177,8 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
       return StringUtils.hasContent(getAccessToken() + getRefreshToken());
    }
 
-   private String mapTourType(final TourData manualTour) {
-
-      final String tourTypeName = manualTour.getTourType() != null
-            ? manualTour.getTourType().getName().trim()
-            : UI.EMPTY_STRING;
-
-      return tourTypeName;
-   }
-
    private void processTours(final List<TourData> selectedTours,
+                             final Map<String, TourData> toursToUpload,
                              final IProgressMonitor monitor) {
 
       for (final TourData tourData : selectedTours) {
@@ -194,7 +187,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
             return;
          }
 
-         createTourFile_Fit(tourData);
+         toursToUpload.put(createTourFile_Fit(tourData), tourData);
       }
    }
 
@@ -283,24 +276,20 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
 
             monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask, UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND, UI.EMPTY_STRING));
 
-            final Map<String, TourData> toursWithGpsSeries = new HashMap<>();
-            for (int index = 0; index < numberOfTours && !monitor.isCanceled(); ++index) {
+            final Map<String, TourData> toursToUpload = new HashMap<>();
+            processTours(selectedTours, toursToUpload, monitor);
 
-               final TourData tourData = selectedTours.get(index);
-               final String tourStartTime = TourManager.getTourDateTimeShort(tourData);
-
-               toursWithGpsSeries.put(createTourFile_Fit(tourData), tourData);
-
-               monitor.worked(1);
+            if (monitor.isCanceled()) {
+              // deleteTemporaryTourFiles(toursWithTimeSeries);
             }
 
             monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask,
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
                   UI.SYMBOL_HOURGLASS_WITH_FLOWING_SAND));
 
-            numberOfUploadedTours[0] = uploadTours(toursWithGpsSeries, monitor);
+            numberOfUploadedTours[0] = uploadTours(toursToUpload, monitor);
 
-            monitor.worked(toursWithGpsSeries.size());
+            monitor.worked(toursToUpload.size());
 
             monitor.subTask(NLS.bind(Messages.Dialog_UploadRoutesToSuunto_SubTask,
                   UI.SYMBOL_WHITE_HEAVY_CHECK_MARK,
@@ -321,7 +310,7 @@ public class SuuntoWorkoutsUploader extends TourbookCloudUploader {
          MessageDialog.openInformation(
                Display.getDefault().getActiveShell(),
                Messages.Dialog_UploadRoutesToSuunto_Title,
-               NLS.bind(Messages.Dialog_UploadRoutesToSuunto_Message, numberOfUploadedTours[0], numberOfTours - numberOfUploadedTours[0]));
+               NLS.bind(Messages.Dialog_UploadToursToSuunto_Message, numberOfUploadedTours[0], numberOfTours - numberOfUploadedTours[0]));
 
       } catch (final InvocationTargetException | InterruptedException e) {
          StatusUtil.log(e);

@@ -83,10 +83,10 @@ public class Messages extends NLS {
    public static String Dialog_DownloadWorkoutsFromSuunto_SubTask;
    public static String Dialog_DownloadWorkoutsFromSuunto_Task;
    public static String Dialog_DownloadWorkoutsFromSuunto_Title;
-   public static String Dialog_UploadRoutesToSuunto_Message;
    public static String Dialog_UploadRoutesToSuunto_SubTask;
    public static String Dialog_UploadRoutesToSuunto_Task;
    public static String Dialog_UploadRoutesToSuunto_Title;
+   public static String Dialog_UploadToursToSuunto_Message;
    public static String Dialog_ValidatingSuuntoTokens_SubTask;
    public static String Filename_Component_ActivityType;
    public static String Filename_Component_ActivityType_Abbr;
