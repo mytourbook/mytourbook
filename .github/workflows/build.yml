@@ -72,8 +72,8 @@ jobs:
         with:
           name: Tests Report
           path: 'D:/a/mytourbook-BUILD-autocreated/core/**/target/surefire-reports/*.xml'
-          reporter: java-junit
-
+          reporter: java-junit          
+          
   check_date:
     runs-on: windows-latest
     name: Check latest commit is less than 24 hours old
