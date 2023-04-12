@@ -127,6 +127,7 @@ public class Messages extends NLS {
    public static String Log_UploadRoutesToSuunto_003_UploadStatus;
    public static String Log_UploadRoutesToSuunto_004_UploadError;
    public static String Log_UploadWorkoutsToSuunto_001_Start;
+   public static String Log_UploadWorkoutsToSuunto_002_RetrievalError;
    public static String PrefPage_SuuntoWorkouts_Checkbox_StartDateFilter;
    public static String PrefPage_SuuntoWorkouts_DatesFilter_Tooltip;
    public static String PrefPage_SuuntoWorkouts_Checkbox_EndDateFilter;
